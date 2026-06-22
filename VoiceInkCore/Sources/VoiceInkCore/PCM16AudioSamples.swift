@@ -1,5 +1,22 @@
 import Foundation
 
+public enum VoiceInkAudioProcessingError: LocalizedError, Equatable, Sendable {
+    case invalidAudioFile
+    case conversionFailed
+    case unsupportedFormat
+
+    public var errorDescription: String? {
+        switch self {
+        case .invalidAudioFile:
+            return "The audio file is invalid or corrupted"
+        case .conversionFailed:
+            return "Failed to convert the audio format"
+        case .unsupportedFormat:
+            return "The audio format is not supported"
+        }
+    }
+}
+
 public enum VoiceInkPCM16Audio {
     public static let mono16kSampleRateHz = 16_000
     public static let mono16kSampleRate = Double(mono16kSampleRateHz)

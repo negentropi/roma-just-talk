@@ -5,27 +5,10 @@ import VoiceInkCore
 
 class AudioProcessor {
     private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "AudioProcessor")
-
-    enum AudioProcessingError: LocalizedError {
-        case invalidAudioFile
-        case conversionFailed
-        case unsupportedFormat
-        
-        var errorDescription: String? {
-            switch self {
-            case .invalidAudioFile:
-                return "The audio file is invalid or corrupted"
-            case .conversionFailed:
-                return "Failed to convert the audio format"
-            case .unsupportedFormat:
-                return "The audio format is not supported"
-            }
-        }
-    }
     
     func processAudioToSamples(_ url: URL) async throws -> [Float] {
         guard let audioFile = try? AVAudioFile(forReading: url) else {
-            throw AudioProcessingError.invalidAudioFile
+            throw VoiceInkAudioProcessingError.invalidAudioFile
         }
         
         let format = audioFile.processingFormat
@@ -41,7 +24,7 @@ class AudioProcessor {
         )
         
         guard let outputFormat = outputFormat else {
-            throw AudioProcessingError.unsupportedFormat
+            throw VoiceInkAudioProcessingError.unsupportedFormat
         }
         
         let chunkSize: AVAudioFrameCount = 50_000_000
@@ -53,7 +36,7 @@ class AudioProcessor {
             let framesToRead = min(chunkSize, AVAudioFrameCount(remainingFrames))
             
             guard let inputBuffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: framesToRead) else {
-                throw AudioProcessingError.conversionFailed
+                throw VoiceInkAudioProcessingError.conversionFailed
             }
             
             audioFile.framePosition = currentFrame
@@ -65,14 +48,14 @@ class AudioProcessor {
                 allSamples.append(contentsOf: chunkSamples)
             } else {
                 guard let converter = AVAudioConverter(from: format, to: outputFormat) else {
-                    throw AudioProcessingError.conversionFailed
+                    throw VoiceInkAudioProcessingError.conversionFailed
                 }
                 
                 let ratio = VoiceInkPCM16Audio.mono16kSampleRate / sampleRate
                 let outputFrameCount = AVAudioFrameCount(Double(inputBuffer.frameLength) * ratio)
                 
                 guard let outputBuffer = AVAudioPCMBuffer(pcmFormat: outputFormat, frameCapacity: outputFrameCount) else {
-                    throw AudioProcessingError.conversionFailed
+                    throw VoiceInkAudioProcessingError.conversionFailed
                 }
                 
                 var error: NSError?
@@ -85,12 +68,12 @@ class AudioProcessor {
                     }
                 )
                 
-                if let error = error {
-                    throw AudioProcessingError.conversionFailed
+                if error != nil {
+                    throw VoiceInkAudioProcessingError.conversionFailed
                 }
                 
                 if status == .error {
-                    throw AudioProcessingError.conversionFailed
+                    throw VoiceInkAudioProcessingError.conversionFailed
                 }
                 
                 let chunkSamples = convertToWhisperFormat(outputBuffer)
@@ -123,7 +106,7 @@ class AudioProcessor {
         )
 
         guard let outputFormat = outputFormat else {
-            throw AudioProcessingError.unsupportedFormat
+            throw VoiceInkAudioProcessingError.unsupportedFormat
         }
 
         let buffer = AVAudioPCMBuffer(
@@ -132,7 +115,7 @@ class AudioProcessor {
         )
         
         guard let buffer = buffer else {
-            throw AudioProcessingError.conversionFailed
+            throw VoiceInkAudioProcessingError.conversionFailed
         }
         
         let int16Samples = VoiceInkPCM16Audio.pcm16Samples(fromFloatSamples: samples)

@@ -1812,6 +1812,31 @@ require_pattern \
   iOS/VoiceInk-ios/AudioRecorder.swift
 
 require_pattern \
+  "shared audio-processing error vocabulary lives in VoiceInkCore" \
+  'VoiceInkAudioProcessingError|invalidAudioFile|conversionFailed|unsupportedFormat' \
+  VoiceInkCore/Sources/VoiceInkCore/PCM16AudioSamples.swift
+
+require_pattern \
+  "core tests pin shared audio-processing error copy" \
+  'testAudioProcessingErrorDescriptionsPreserveMacOSImportCopy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/PCM16AudioSamplesTests.swift
+
+require_pattern \
+  "core check runner executes shared audio-processing error copy test" \
+  'PCM16AudioSamplesTests\.testAudioProcessingErrorDescriptionsPreserveMacOSImportCopy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "macOS audio processor throws shared audio-processing errors" \
+  'VoiceInkAudioProcessingError\.(invalidAudioFile|conversionFailed|unsupportedFormat)' \
+  VoiceInk/Transcription/Engine/AudioFileProcessor.swift
+
+reject_pattern \
+  "macOS audio processor avoids shell-owned audio-processing error vocabulary" \
+  'enum +AudioProcessingError|"The audio file is invalid or corrupted"|"Failed to convert the audio format"|"The audio format is not supported"' \
+  VoiceInk/Transcription/Engine/AudioFileProcessor.swift
+
+require_pattern \
   "iOS live recording uses shared audio-meter history update plan" \
   'VoiceInkAudioMeterLevel\.iOSMeterHistoryUpdatePlan' \
   iOS/VoiceInk-ios/AudioRecorder.swift

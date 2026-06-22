@@ -2,6 +2,21 @@ import Foundation
 @testable import VoiceInkCore
 
 final class PCM16AudioSamplesTests: XCTestCase {
+    func testAudioProcessingErrorDescriptionsPreserveMacOSImportCopy() {
+        XCTAssertEqual(
+            VoiceInkAudioProcessingError.invalidAudioFile.errorDescription,
+            "The audio file is invalid or corrupted"
+        )
+        XCTAssertEqual(
+            VoiceInkAudioProcessingError.conversionFailed.errorDescription,
+            "Failed to convert the audio format"
+        )
+        XCTAssertEqual(
+            VoiceInkAudioProcessingError.unsupportedFormat.errorDescription,
+            "The audio format is not supported"
+        )
+    }
+
     func testFloatSamplesDecodeLittleEndianPCM16Data() {
         let data = pcm16Data(samples: [Int16.min, -16_384, 0, 16_384, Int16.max])
 

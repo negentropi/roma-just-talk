@@ -650,6 +650,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "UserDefaultsPreferencesTests.testProviderAPIKeyVerificationStatePersistsFalseFlag", run: { UserDefaultsPreferencesTests().testProviderAPIKeyVerificationStatePersistsFalseFlag() }),
             VoiceInkCoreCheck(name: "UserDefaultsPreferencesTests.testProviderAPIKeyVerificationStateFiltersVerifiedUserKeyProviders", run: { UserDefaultsPreferencesTests().testProviderAPIKeyVerificationStateFiltersVerifiedUserKeyProviders() }),
             VoiceInkCoreCheck(name: "UserDefaultsPreferencesTests.testProviderAPIKeyVerificationStateClearsSingleAndAllProviders", run: { UserDefaultsPreferencesTests().testProviderAPIKeyVerificationStateClearsSingleAndAllProviders() }),
+            VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testAudioProcessingErrorDescriptionsPreserveMacOSImportCopy", run: { PCM16AudioSamplesTests().testAudioProcessingErrorDescriptionsPreserveMacOSImportCopy() }),
             VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testFloatSamplesDecodeLittleEndianPCM16Data", run: { PCM16AudioSamplesTests().testFloatSamplesDecodeLittleEndianPCM16Data() }),
             VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testFloatSamplesRejectNonRIFFWAVData", run: { PCM16AudioSamplesTests().testFloatSamplesRejectNonRIFFWAVData() }),
             VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testFloatSamplesReadPCMDataChunkAfterExtraWAVChunk", run: { PCM16AudioSamplesTests().testFloatSamplesReadPCMDataChunkAfterExtraWAVChunk() }),

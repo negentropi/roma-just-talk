@@ -10,10 +10,7 @@ class TranscriptionAutoCleanupService {
     private var modelContext: ModelContext?
 
     private var recordingsDirectory: URL {
-        let appSupportDirectory = VoiceInkAppIdentity.macOSApplicationSupportDirectory(
-            in: FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-        )
-        return VoiceInkStoredAudioFile.recordingsDirectory(in: appSupportDirectory)
+        VoiceInkMacOSStorageDirectories.recordingsDirectory
     }
 
     private init() {}

@@ -344,6 +344,7 @@ Platform shells still own UI, OS permissions, audio capture, paste/keyboard beha
 
 iOS app-local storage roots are kept in `iOS/VoiceInk-ios/VoiceInkIOSStorageDirectories.swift`: the iOS shell owns the Documents/Caches base directories, while `VoiceInkCore` owns the stable app bundle identifier, macOS Application Support subdirectory, recordings/model subdirectory names, and file policies.
 The migration verifier fails if new iOS app/keyboard/shared shell files recreate Documents/Caches roots or `Recordings`/`WhisperModels` path literals outside that adapter, and it requires the adapter to keep deriving and preparing recording/model directories through `VoiceInkStoredAudioFile` and `VoiceInkWhisperModelFiles`.
+macOS app-local storage roots are kept in `VoiceInk/VoiceInkMacOSStorageDirectories.swift`: the macOS shell owns the system Application Support lookup, while `VoiceInkCore` owns the app-support subdirectory, recordings/model subdirectory names, and custom-sound relative directory policy. The migration verifier fails if macOS app code rebuilds those roots outside that adapter.
 
 ## Sibling Clone Status
 

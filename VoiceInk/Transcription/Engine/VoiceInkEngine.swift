@@ -67,10 +67,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
         self.transcriptionModelManager = transcriptionModelManager
         self.enhancementService = enhancementService
 
-        let appSupportDirectory = VoiceInkAppIdentity.macOSApplicationSupportDirectory(
-            in: FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-        )
-        self.recordingsDirectory = VoiceInkStoredAudioFile.recordingsDirectory(in: appSupportDirectory)
+        self.recordingsDirectory = VoiceInkMacOSStorageDirectories.recordingsDirectory
 
         let serviceRegistry = TranscriptionServiceRegistry(
             modelProvider: whisperModelManager,

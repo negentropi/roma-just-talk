@@ -50,9 +50,7 @@ class AudioTranscriptionService {
 
             let audioAsset = AVURLAsset(url: url)
             let duration = CMTimeGetSeconds(try await audioAsset.load(.duration))
-            let appSupportDirectory = VoiceInkAppIdentity.macOSApplicationSupportDirectory(
-                in: FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            )
+            let appSupportDirectory = VoiceInkMacOSStorageDirectories.appSupportDirectory
             let recordingsDirectory = try VoiceInkStoredAudioFile.createRecordingsDirectory(in: appSupportDirectory)
             
             let permanentURL = VoiceInkStoredAudioFile.retranscriptionFileURL(in: recordingsDirectory)

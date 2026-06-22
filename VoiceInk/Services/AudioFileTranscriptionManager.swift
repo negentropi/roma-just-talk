@@ -145,9 +145,7 @@ class AudioTranscriptionManager: ObservableObject {
             let audioAsset = AVURLAsset(url: item.url)
             let duration = CMTimeGetSeconds(try await audioAsset.load(.duration))
 
-            let appSupportDirectory = VoiceInkAppIdentity.macOSApplicationSupportDirectory(
-                in: FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            )
+            let appSupportDirectory = VoiceInkMacOSStorageDirectories.appSupportDirectory
             let recordingsDirectory = try VoiceInkStoredAudioFile.createRecordingsDirectory(in: appSupportDirectory)
 
             let permanentURL = VoiceInkStoredAudioFile.importedTranscriptionFileURL(in: recordingsDirectory)

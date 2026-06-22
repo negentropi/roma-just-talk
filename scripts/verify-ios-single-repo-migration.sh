@@ -10733,6 +10733,8 @@ require_pattern \
   'VoiceInkLicenseManagementPresentation\.(appVersionFallback|heroSystemImageName|heroTitle|heroSubtitle|licensedResourceLinks|purchaseFeatures|activeLicenseDeviceLimitText)|VoiceInkLicenseManagementResourceLink|VoiceInkLicenseManagementResourceID' \
   VoiceInk/Views/LicenseManagementView.swift
 
+reject_file VoiceInk/Views/LicenseView.swift
+
 require_pattern \
   "macOS trial message opens shared purchase link" \
   'VoiceInkLicenseLinks\.purchaseURL' \

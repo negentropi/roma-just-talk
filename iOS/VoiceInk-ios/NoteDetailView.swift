@@ -126,6 +126,7 @@ struct NoteDetailView: View {
     @ViewBuilder
     private var transcriptionStatusView: some View {
         let statusPresentation = VoiceInkTranscriptPresentation.statusPresentation(for: note.transcriptionStatus)
+        let retryControls = VoiceInkTranscriptPresentation.retryControls(isRetranscribing: isRetranscribing)
 
         if let statusPresentation {
             VStack(spacing: 12) {
@@ -136,7 +137,7 @@ struct NoteDetailView: View {
                     VStack(alignment: .leading, spacing: 6) {
                         Text(statusPresentation.title)
                             .font(.subheadline.weight(.medium))
-                        if let error = note.transcriptionError, !error.isEmpty {
+                        if let error = VoiceInkTranscriptPresentation.statusErrorDetail(note.transcriptionError) {
                             Text(error)
                                 .font(.callout)
                                 .textSelection(.enabled)
@@ -149,14 +150,15 @@ struct NoteDetailView: View {
                 }
 
                 // Mode selection for re-transcription
-                if !isRetranscribing {
+                if retryControls.shouldShowModeSelection {
                     VoiceInkModeSelectionControlView(
                         modes: settings.modes,
                         selectedModeId: $settings.selectedModeId
                     )
                 }
 
-                if isRetranscribing {
+                switch retryControls.action {
+                case .showProgress:
                     HStack {
                         ProgressView()
                             .scaleEffect(0.8)
@@ -164,7 +166,7 @@ struct NoteDetailView: View {
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }
-                } else {
+                case .showRetryButton:
                     Button {
                         retranscribe()
                     } label: {

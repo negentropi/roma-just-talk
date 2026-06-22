@@ -60,6 +60,24 @@ public struct VoiceInkTranscriptStatusPresentation: Equatable, Sendable {
     }
 }
 
+public enum VoiceInkTranscriptRetryControlAction: Equatable, Sendable {
+    case showProgress
+    case showRetryButton
+}
+
+public struct VoiceInkTranscriptRetryControlsPresentation: Equatable, Sendable {
+    public let shouldShowModeSelection: Bool
+    public let action: VoiceInkTranscriptRetryControlAction
+
+    public init(
+        shouldShowModeSelection: Bool,
+        action: VoiceInkTranscriptRetryControlAction
+    ) {
+        self.shouldShowModeSelection = shouldShowModeSelection
+        self.action = action
+    }
+}
+
 public struct VoiceInkHistoryEmptyStatePresentation: Equatable, Sendable {
     public let systemImageName: String
     public let title: String
@@ -421,6 +439,23 @@ public enum VoiceInkTranscriptPresentation {
 
     public static func shouldShowCompletedContent(for status: VoiceInkTranscriptionStatus) -> Bool {
         status == .completed
+    }
+
+    public static func statusErrorDetail(_ error: String?) -> String? {
+        guard let error, !error.isEmpty else {
+            return nil
+        }
+
+        return error
+    }
+
+    public static func retryControls(
+        isRetranscribing: Bool
+    ) -> VoiceInkTranscriptRetryControlsPresentation {
+        VoiceInkTranscriptRetryControlsPresentation(
+            shouldShowModeSelection: !isRetranscribing,
+            action: isRetranscribing ? .showProgress : .showRetryButton
+        )
     }
 
     public static func isPasteable(

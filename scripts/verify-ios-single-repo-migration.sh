@@ -1903,6 +1903,21 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
 
 require_pattern \
+  "shared transcript retry controls presentation lives in VoiceInkCore" \
+  'VoiceInkTranscriptRetryControlsPresentation|VoiceInkTranscriptRetryControlAction|retryControls\(isRetranscribing:' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+
+require_pattern \
+  "shared transcript status error detail visibility lives in VoiceInkCore" \
+  'statusErrorDetail' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+
+require_pattern \
+  "core checks execute transcript retry controls presentation tests" \
+  'testRetryControlsPresentationShows(RetryControlsWhenIdle|ProgressWhenRetranscribing)|testStatusErrorDetailShowsOnlyNonEmptyErrors' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "shared last-transcription notification copy lives in VoiceInkCore" \
   'noTranscriptionAvailableTitle|lastTranscriptionCopiedTitle|failedToCopyTranscriptionTitle|cannotRetryTitle|retryFailedTitle' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
@@ -1961,6 +1976,26 @@ require_pattern \
 require_pattern \
   "iOS note detail uses shared transcript detail presentation copy" \
   'VoiceInkTranscriptPresentation\.(noteDetailNavigationTitle|transcriptTitle|copyTranscriptSystemImageName|retranscribingDisplayText|retryTranscriptionButtonTitle|retryTranscriptionSystemImageName)' \
+  iOS/VoiceInk-ios/NoteDetailView.swift
+
+require_pattern \
+  "iOS note detail delegates retry control presentation to shared core" \
+  'VoiceInkTranscriptPresentation\.retryControls' \
+  iOS/VoiceInk-ios/NoteDetailView.swift
+
+require_pattern \
+  "iOS note detail delegates status error visibility to shared core" \
+  'VoiceInkTranscriptPresentation\.statusErrorDetail' \
+  iOS/VoiceInk-ios/NoteDetailView.swift
+
+reject_pattern \
+  "iOS note detail avoids shell-owned retry control branching" \
+  'if +!?isRetranscribing' \
+  iOS/VoiceInk-ios/NoteDetailView.swift
+
+reject_pattern \
+  "iOS note detail avoids shell-owned empty status error filtering" \
+  'note\.transcriptionError, +!error\.isEmpty' \
   iOS/VoiceInk-ios/NoteDetailView.swift
 
 require_pattern \

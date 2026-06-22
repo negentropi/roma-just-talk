@@ -480,6 +480,35 @@ final class TranscriptPresentationTests: XCTestCase {
         XCTAssertFalse(VoiceInkTranscriptPresentation.shouldShowCompletedContent(for: .canceled))
     }
 
+    func testStatusErrorDetailShowsOnlyNonEmptyErrors() {
+        XCTAssertNil(VoiceInkTranscriptPresentation.statusErrorDetail(nil))
+        XCTAssertNil(VoiceInkTranscriptPresentation.statusErrorDetail(""))
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.statusErrorDetail("Missing audio file"),
+            "Missing audio file"
+        )
+    }
+
+    func testRetryControlsPresentationShowsRetryControlsWhenIdle() {
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.retryControls(isRetranscribing: false),
+            VoiceInkTranscriptRetryControlsPresentation(
+                shouldShowModeSelection: true,
+                action: .showRetryButton
+            )
+        )
+    }
+
+    func testRetryControlsPresentationShowsProgressWhenRetranscribing() {
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.retryControls(isRetranscribing: true),
+            VoiceInkTranscriptRetryControlsPresentation(
+                shouldShowModeSelection: false,
+                action: .showProgress
+            )
+        )
+    }
+
     func testTranscriptTextVariantTitlesPreserveMacOSTabs() {
         XCTAssertEqual(VoiceInkTranscriptTextVariant.original.title, "Original")
         XCTAssertEqual(VoiceInkTranscriptTextVariant.enhanced.title, "Enhanced")

@@ -162,7 +162,7 @@ extension TranscriptionModel {
         VoiceInkTranscriptionStreamingModelSnapshot(
             name: name,
             supportsStreaming: supportsStreaming,
-            isStreamingOnly: CloudProviderRegistry.provider(for: provider)?.isStreamingOnly ?? false
+            isStreamingOnly: provider.coreTranscriptionModelProvider?.isStreamingOnly ?? false
         )
     }
 

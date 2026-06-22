@@ -88,7 +88,7 @@ extension CloudProvider {
         guard let provider = modelProvider.coreTranscriptionModelProvider else {
             return false
         }
-        return !provider.supportsRecordedFileTranscription
+        return provider.isStreamingOnly
     }
 
     /// Streaming-only providers inherit this and get a clear error if batch is somehow attempted.

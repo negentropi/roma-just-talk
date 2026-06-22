@@ -129,6 +129,10 @@ public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
         }
     }
 
+    public var isStreamingOnly: Bool {
+        !supportsRecordedFileTranscription
+    }
+
     public var apiErrorDomain: String? {
         switch self {
         case .groq:

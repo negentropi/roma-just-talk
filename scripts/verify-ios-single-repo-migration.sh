@@ -4303,14 +4303,30 @@ reject_pattern \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift \
   VoiceInk/Transcription/Cloud/CloudProvider.swift
 
-require_pattern \
-  "shared transcription provider recorded-file support lives in VoiceInkCore" \
+require_patterns \
+  "shared transcription provider recorded-file and streaming-only support lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift \
   'supportsRecordedFileTranscription' \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift
+  'isStreamingOnly'
 
 require_pattern \
   "macOS transcription model uses shared recorded-file support policy" \
   'coreTranscriptionModelProvider\?\.supportsRecordedFileTranscription' \
+  VoiceInk/Models/TranscriptionModel.swift
+
+require_pattern \
+  "macOS transcription model uses shared streaming-only support policy" \
+  'coreTranscriptionModelProvider\?\.isStreamingOnly' \
+  VoiceInk/Models/TranscriptionModel.swift
+
+require_pattern \
+  "macOS cloud provider uses shared streaming-only support policy" \
+  'provider\.isStreamingOnly' \
+  VoiceInk/Transcription/Cloud/CloudProvider.swift
+
+reject_pattern \
+  "macOS transcription model avoids cloud-registry model facts" \
+  'CloudProviderRegistry\.provider\(for: provider\)' \
   VoiceInk/Models/TranscriptionModel.swift
 
 reject_context_pattern \

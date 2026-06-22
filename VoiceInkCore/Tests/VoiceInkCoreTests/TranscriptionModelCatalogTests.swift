@@ -202,10 +202,14 @@ final class TranscriptionModelCatalogTests: XCTestCase {
         let streamingOnlyProviders = VoiceInkTranscriptionModelProvider.allCases.filter {
             !$0.supportsRecordedFileTranscription
         }
+        let streamingOnlyModelProviders = VoiceInkTranscriptionModelProvider.allCases.filter(\.isStreamingOnly)
 
         XCTAssertEqual(streamingOnlyProviders, [.cartesia])
+        XCTAssertEqual(streamingOnlyModelProviders, [.cartesia])
         XCTAssertTrue(VoiceInkTranscriptionModelProvider.groq.supportsRecordedFileTranscription)
+        XCTAssertFalse(VoiceInkTranscriptionModelProvider.groq.isStreamingOnly)
         XCTAssertTrue(VoiceInkTranscriptionModelProvider.local.supportsRecordedFileTranscription)
+        XCTAssertFalse(VoiceInkTranscriptionModelProvider.local.isStreamingOnly)
     }
 
     func testProviderAPIErrorDomainsPreserveMacOSBatchMapping() {

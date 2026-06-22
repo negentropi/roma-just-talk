@@ -160,6 +160,10 @@ struct ModelManagementView: View {
             
             VStack(spacing: 12) {
                     ForEach(filteredModels, id: \.id) { model in
+                        let downloadedLocalModel = VoiceInkWhisperModelFiles.downloadedLocalModelFile(
+                            forModelName: model.name,
+                            in: whisperModelManager.availableModels
+                        )
                         let isWarming = (model as? WhisperModel).map { whisperModel in
                             warmupCoordinator.isWarming(modelNamed: whisperModel.name)
                         } ?? false
@@ -168,10 +172,10 @@ struct ModelManagementView: View {
                             model: model,
                             fluidAudioModelManager: fluidAudioModelManager,
                             transcriptionModelManager: transcriptionModelManager,
-                            isDownloaded: whisperModelManager.availableModels.contains { $0.name == model.name },
+                            isDownloaded: downloadedLocalModel != nil,
                             isCurrent: transcriptionModelManager.currentTranscriptionModel?.name == model.name,
                             downloadProgress: whisperModelManager.downloadProgress,
-                            modelURL: whisperModelManager.availableModels.first { $0.name == model.name }?.url,
+                            modelURL: downloadedLocalModel?.url,
                             isWarming: isWarming,
                             deleteAction: {
                                 if let customModel = model as? CustomCloudModel {
@@ -182,7 +186,7 @@ struct ModelManagementView: View {
                                         transcriptionModelManager.refreshAllAvailableModels()
                                     }
                                     isShowingDeleteAlert = true
-                                } else if let downloadedModel = whisperModelManager.availableModels.first(where: { $0.name == model.name }) {
+                                } else if let downloadedModel = downloadedLocalModel {
                                     alertTitle = VoiceInkModelManagementPresentation.deleteModelButtonTitle
                                     alertMessage = VoiceInkModelManagementPresentation.deleteModelAlertMessage(modelName: downloadedModel.name)
                                     deleteActionClosure = {

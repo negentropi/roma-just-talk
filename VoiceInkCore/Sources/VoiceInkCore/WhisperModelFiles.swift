@@ -346,12 +346,19 @@ public enum VoiceInkWhisperModelFiles {
         return namesToAdd
     }
 
+    public static func downloadedLocalModelFile(
+        forModelName modelName: String,
+        in localModels: [VoiceInkWhisperLocalModelFile]
+    ) -> VoiceInkWhisperLocalModelFile? {
+        localModels.first { $0.name == modelName }
+    }
+
     public static func availableLocalModelFileURL(
         forModelName modelName: String,
         in localModels: [VoiceInkWhisperLocalModelFile],
         fileManager: FileManager = .default
     ) -> URL? {
-        guard let model = localModels.first(where: { $0.name == modelName }),
+        guard let model = downloadedLocalModelFile(forModelName: modelName, in: localModels),
               fileManager.fileExists(atPath: model.url.path) else {
             return nil
         }

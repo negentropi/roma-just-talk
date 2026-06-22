@@ -285,6 +285,27 @@ final class WhisperModelFilesTests: XCTestCase {
         )
     }
 
+    func testDownloadedLocalModelFileUsesFirstDownloadedNameMatch() throws {
+        let firstURL = URL(fileURLWithPath: "/tmp/custom-a.bin")
+        let secondURL = URL(fileURLWithPath: "/tmp/custom-a-copy.bin")
+        let first = VoiceInkWhisperLocalModelFile(name: "custom-a", url: firstURL)
+        let second = VoiceInkWhisperLocalModelFile(name: "custom-a", url: secondURL)
+
+        XCTAssertEqual(
+            VoiceInkWhisperModelFiles.downloadedLocalModelFile(
+                forModelName: "custom-a",
+                in: [first, second]
+            ),
+            first
+        )
+        XCTAssertNil(
+            VoiceInkWhisperModelFiles.downloadedLocalModelFile(
+                forModelName: "missing",
+                in: [first, second]
+            )
+        )
+    }
+
     func testAvailableLocalModelFileURLFindsExistingImportedModel() throws {
         let baseDirectory = FileManager.default.temporaryDirectory
             .appendingPathComponent("VoiceInkCore.WhisperModelFilesTests.\(UUID().uuidString)", isDirectory: true)

@@ -3473,13 +3473,18 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift
 
 require_pattern \
+  "shared Whisper downloaded local model lookup lives in VoiceInkCore" \
+  'downloadedLocalModelFile|localModels\.first' \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift
+
+require_pattern \
   "macOS transcription model manager uses shared imported local model merge plan" \
   'VoiceInkWhisperModelFiles\.importedLocalModelNamesToAdd' \
   VoiceInk/Transcription/Engine/TranscriptionModelManager.swift
 
 require_pattern \
   "core checks execute imported local model merge plan test" \
-  'WhisperModelFilesTests\.testImportedLocalModelNamesToAddSkipsExistingRegistryModelsAndDownloadedDuplicates' \
+  'WhisperModelFilesTests\.testImportedLocalModelNamesToAddSkipsExistingRegistryModelsAndDownloadedDuplicates|WhisperModelFilesTests\.testDownloadedLocalModelFileUsesFirstDownloadedNameMatch' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \
@@ -3489,7 +3494,7 @@ reject_pattern \
 
 require_pattern \
   "shared Whisper available local model URL resolution lives in VoiceInkCore" \
-  'availableLocalModelFileURL|localModels\.first\(where:|fileManager\.fileExists\(atPath: model\.url\.path\)' \
+  'availableLocalModelFileURL|downloadedLocalModelFile\(forModelName: modelName, in: localModels\)|fileManager\.fileExists\(atPath: model\.url\.path\)' \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift
 
 require_pattern \
@@ -3688,6 +3693,16 @@ reject_pattern \
 require_pattern \
   "macOS model management uses shared filter membership" \
   'selectedFilter\.includes|sortRank\(forModelName:|modelManagementFacts\(for:' \
+  VoiceInk/Views/AI\ Models/ModelManagementView.swift
+
+require_pattern \
+  "macOS model management uses shared downloaded local model lookup" \
+  'VoiceInkWhisperModelFiles\.downloadedLocalModelFile' \
+  VoiceInk/Views/AI\ Models/ModelManagementView.swift
+
+reject_pattern \
+  "macOS model management avoids shell-owned downloaded local model lookup" \
+  'availableModels\.(contains|first)\s*(\(|\{)' \
   VoiceInk/Views/AI\ Models/ModelManagementView.swift
 
 require_pattern \

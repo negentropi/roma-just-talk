@@ -150,6 +150,23 @@ public enum VoiceInkMacOSFileTranscriptionRequest {
     }
 }
 
+public enum VoiceInkMacOSAppEventRequest {
+    public static let appSettingsDidChangeNotificationName = Notification.Name("appSettingsDidChange")
+    public static let languageDidChangeNotificationName = Notification.Name("languageDidChange")
+    public static let didChangeModelNotificationName = Notification.Name("didChangeModel")
+    public static let openMainWindowRequestedNotificationName = Notification.Name("openMainWindowRequested")
+    public static let appPermissionsDidChangeNotificationName = Notification.Name("appPermissionsDidChange")
+    public static let promptSelectionChangedNotificationName = Notification.Name("promptSelectionChanged")
+    public static let powerModeConfigurationAppliedNotificationName = Notification.Name("powerModeConfigurationApplied")
+    public static let powerModeConfigurationsDidChangeNotificationName = Notification.Name("PowerModeConfigurationsDidChange")
+    public static let powerModeShortcutAvailabilityDidChangeNotificationName = Notification.Name("powerModeShortcutAvailabilityDidChange")
+    public static let transcriptionCreatedNotificationName = Notification.Name("transcriptionCreated")
+    public static let transcriptionCompletedNotificationName = Notification.Name("transcriptionCompleted")
+    public static let transcriptionDeletedNotificationName = Notification.Name("transcriptionDeleted")
+    public static let sessionMetricsDidChangeNotificationName = Notification.Name("sessionMetricsDidChange")
+    public static let enhancementToggleChangedNotificationName = Notification.Name("enhancementToggleChanged")
+}
+
 public enum VoiceInkAppIdentity {
     public static let bundleIdentifier = "com.prakashjoshipax.VoiceInk"
     public static let loggingSubsystem = "com.prakashjoshipax.voiceink"

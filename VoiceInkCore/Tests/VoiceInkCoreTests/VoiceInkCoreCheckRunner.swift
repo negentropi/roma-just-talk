@@ -18,6 +18,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "AppIdentityTests.testMacOSMainViewItemsPreserveSidebarPresentation", run: { AppIdentityTests().testMacOSMainViewItemsPreserveSidebarPresentation() }),
             VoiceInkCoreCheck(name: "AppIdentityTests.testMacOSMainViewItemsMapNavigationDestinationsAndLegacyTitles", run: { AppIdentityTests().testMacOSMainViewItemsMapNavigationDestinationsAndLegacyTitles() }),
             VoiceInkCoreCheck(name: "AppIdentityTests.testMacOSFileTranscriptionRequestPreservesPayloadContract", run: { try AppIdentityTests().testMacOSFileTranscriptionRequestPreservesPayloadContract() }),
+            VoiceInkCoreCheck(name: "AppIdentityTests.testMacOSAppEventRequestPreservesNotificationNames", run: { AppIdentityTests().testMacOSAppEventRequestPreservesNotificationNames() }),
             VoiceInkCoreCheck(name: "AppIdentityTests.testMacOSApplicationSupportDirectoryUsesBundleIdentifier", run: { AppIdentityTests().testMacOSApplicationSupportDirectoryUsesBundleIdentifier() }),
             VoiceInkCoreCheck(name: "AppIdentityTests.testBundleScopedErrorDomainUsesBundleIdentifier", run: { AppIdentityTests().testBundleScopedErrorDomainUsesBundleIdentifier() }),
             VoiceInkCoreCheck(name: "AppIdentityTests.testIOSRecordDeepLinkContractRoundTripsThroughSharedCore", run: { try AppIdentityTests().testIOSRecordDeepLinkContractRoundTripsThroughSharedCore() }),

@@ -189,6 +189,23 @@ final class AppIdentityTests: XCTestCase {
         XCTAssertEqual(VoiceInkMacOSFileTranscriptionRequest.url(from: notification), url)
     }
 
+    func testMacOSAppEventRequestPreservesNotificationNames() {
+        XCTAssertEqual(VoiceInkMacOSAppEventRequest.appSettingsDidChangeNotificationName.rawValue, "appSettingsDidChange")
+        XCTAssertEqual(VoiceInkMacOSAppEventRequest.languageDidChangeNotificationName.rawValue, "languageDidChange")
+        XCTAssertEqual(VoiceInkMacOSAppEventRequest.didChangeModelNotificationName.rawValue, "didChangeModel")
+        XCTAssertEqual(VoiceInkMacOSAppEventRequest.openMainWindowRequestedNotificationName.rawValue, "openMainWindowRequested")
+        XCTAssertEqual(VoiceInkMacOSAppEventRequest.appPermissionsDidChangeNotificationName.rawValue, "appPermissionsDidChange")
+        XCTAssertEqual(VoiceInkMacOSAppEventRequest.promptSelectionChangedNotificationName.rawValue, "promptSelectionChanged")
+        XCTAssertEqual(VoiceInkMacOSAppEventRequest.powerModeConfigurationAppliedNotificationName.rawValue, "powerModeConfigurationApplied")
+        XCTAssertEqual(VoiceInkMacOSAppEventRequest.powerModeConfigurationsDidChangeNotificationName.rawValue, "PowerModeConfigurationsDidChange")
+        XCTAssertEqual(VoiceInkMacOSAppEventRequest.powerModeShortcutAvailabilityDidChangeNotificationName.rawValue, "powerModeShortcutAvailabilityDidChange")
+        XCTAssertEqual(VoiceInkMacOSAppEventRequest.transcriptionCreatedNotificationName.rawValue, "transcriptionCreated")
+        XCTAssertEqual(VoiceInkMacOSAppEventRequest.transcriptionCompletedNotificationName.rawValue, "transcriptionCompleted")
+        XCTAssertEqual(VoiceInkMacOSAppEventRequest.transcriptionDeletedNotificationName.rawValue, "transcriptionDeleted")
+        XCTAssertEqual(VoiceInkMacOSAppEventRequest.sessionMetricsDidChangeNotificationName.rawValue, "sessionMetricsDidChange")
+        XCTAssertEqual(VoiceInkMacOSAppEventRequest.enhancementToggleChangedNotificationName.rawValue, "enhancementToggleChanged")
+    }
+
     func testMacOSApplicationSupportDirectoryUsesBundleIdentifier() {
         let baseDirectory = URL(fileURLWithPath: "/tmp/Application Support", isDirectory: true)
 

@@ -11471,6 +11471,53 @@ require_pattern \
   'navigateToDestination = VoiceInkMacOSNavigationRequest\.notificationName|openFileForTranscription = VoiceInkMacOSFileTranscriptionRequest\.notificationName' \
   VoiceInk/Notifications/AppNotifications.swift
 
+require_patterns \
+  "shared macOS app event request contract lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift \
+  'VoiceInkMacOSAppEventRequest' \
+  'appSettingsDidChangeNotificationName = Notification\.Name\("appSettingsDidChange"\)' \
+  'languageDidChangeNotificationName = Notification\.Name\("languageDidChange"\)' \
+  'didChangeModelNotificationName = Notification\.Name\("didChangeModel"\)' \
+  'openMainWindowRequestedNotificationName = Notification\.Name\("openMainWindowRequested"\)' \
+  'appPermissionsDidChangeNotificationName = Notification\.Name\("appPermissionsDidChange"\)' \
+  'promptSelectionChangedNotificationName = Notification\.Name\("promptSelectionChanged"\)' \
+  'powerModeConfigurationAppliedNotificationName = Notification\.Name\("powerModeConfigurationApplied"\)' \
+  'powerModeConfigurationsDidChangeNotificationName = Notification\.Name\("PowerModeConfigurationsDidChange"\)' \
+  'powerModeShortcutAvailabilityDidChangeNotificationName = Notification\.Name\("powerModeShortcutAvailabilityDidChange"\)' \
+  'transcriptionCreatedNotificationName = Notification\.Name\("transcriptionCreated"\)' \
+  'transcriptionCompletedNotificationName = Notification\.Name\("transcriptionCompleted"\)' \
+  'transcriptionDeletedNotificationName = Notification\.Name\("transcriptionDeleted"\)' \
+  'sessionMetricsDidChangeNotificationName = Notification\.Name\("sessionMetricsDidChange"\)' \
+  'enhancementToggleChangedNotificationName = Notification\.Name\("enhancementToggleChanged"\)'
+
+require_patterns \
+  "macOS app notifications use shared app event request names" \
+  VoiceInk/Notifications/AppNotifications.swift \
+  'AppSettingsDidChange = VoiceInkMacOSAppEventRequest\.appSettingsDidChangeNotificationName' \
+  'languageDidChange = VoiceInkMacOSAppEventRequest\.languageDidChangeNotificationName' \
+  'didChangeModel = VoiceInkMacOSAppEventRequest\.didChangeModelNotificationName' \
+  'openMainWindowRequested = VoiceInkMacOSAppEventRequest\.openMainWindowRequestedNotificationName' \
+  'appPermissionsDidChange = VoiceInkMacOSAppEventRequest\.appPermissionsDidChangeNotificationName' \
+  'promptSelectionChanged = VoiceInkMacOSAppEventRequest\.promptSelectionChangedNotificationName' \
+  'powerModeConfigurationApplied = VoiceInkMacOSAppEventRequest\.powerModeConfigurationAppliedNotificationName' \
+  'powerModeConfigurationsDidChange = VoiceInkMacOSAppEventRequest\.powerModeConfigurationsDidChangeNotificationName' \
+  'powerModeShortcutAvailabilityDidChange = VoiceInkMacOSAppEventRequest\.powerModeShortcutAvailabilityDidChangeNotificationName' \
+  'transcriptionCreated = VoiceInkMacOSAppEventRequest\.transcriptionCreatedNotificationName' \
+  'transcriptionCompleted = VoiceInkMacOSAppEventRequest\.transcriptionCompletedNotificationName' \
+  'transcriptionDeleted = VoiceInkMacOSAppEventRequest\.transcriptionDeletedNotificationName' \
+  'sessionMetricsDidChange = VoiceInkMacOSAppEventRequest\.sessionMetricsDidChangeNotificationName' \
+  'enhancementToggleChanged = VoiceInkMacOSAppEventRequest\.enhancementToggleChangedNotificationName'
+
+require_pattern \
+  "core checks execute macOS app event request test" \
+  'AppIdentityTests\.testMacOSAppEventRequestPreservesNotificationNames' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "macOS app notification shell avoids duplicate app event request names" \
+  'Notification\.Name\("(appSettingsDidChange|languageDidChange|didChangeModel|openMainWindowRequested|appPermissionsDidChange|promptSelectionChanged|powerModeConfigurationApplied|PowerModeConfigurationsDidChange|powerModeShortcutAvailabilityDidChange|transcriptionCreated|transcriptionCompleted|transcriptionDeleted|sessionMetricsDidChange|enhancementToggleChanged)"\)' \
+  VoiceInk/Notifications/AppNotifications.swift
+
 reject_pattern \
   "macOS shell avoids duplicate navigation payload key literals" \
   'userInfo: \["destination"|userInfo\?\["destination"\]|Notification\.Name\("navigateToDestination"\)' \

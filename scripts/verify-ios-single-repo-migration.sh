@@ -5989,6 +5989,41 @@ require_pattern \
   'VoiceInkCustomVocabularyUse\.streamingTranscription\(\.assemblyAI\)|\.streamingTranscription\(\.assemblyAI\)' \
   VoiceInk/Transcription/Streaming/AssemblyAIStreamingProvider.swift
 
+require_pattern \
+  "shared streaming connection model policy lives in VoiceInkCore" \
+  'streamingConnectionModelName\(for selectedModelName: String\)|scribe_v2_realtime|stt-rt-v4|selectedModelName\.contains\("standard"\) \? "standard" : "enhanced"' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift
+
+require_pattern \
+  "core checks execute streaming connection model policy tests" \
+  'TranscriptionModelCatalogTests\.testStreamingConnectionModelNamesAreSharedProviderPolicy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "macOS transcription model adapter exposes shared streaming connection model policy" \
+  'coreTranscriptionModelProvider\?\.streamingConnectionModelName\(for: name\)' \
+  VoiceInk/Models/TranscriptionModel.swift
+
+require_pattern \
+  "macOS cloud streaming adapters use shared connection model policy" \
+  'model\.streamingConnectionModelName' \
+  VoiceInk/Transcription/Streaming/AssemblyAIStreamingProvider.swift \
+  VoiceInk/Transcription/Streaming/CartesiaStreamingProvider.swift \
+  VoiceInk/Transcription/Streaming/DeepgramStreamingProvider.swift \
+  VoiceInk/Transcription/Streaming/ElevenLabsStreamingProvider.swift \
+  VoiceInk/Transcription/Streaming/SonioxStreamingProvider.swift \
+  VoiceInk/Transcription/Streaming/SpeechmaticsStreamingProvider.swift
+
+reject_pattern \
+  "macOS cloud streaming adapters avoid shell-owned connection model policy" \
+  '"scribe_v2_realtime"|"stt-rt-v4"|model\.name\.contains\("standard"\)|let +operatingPoint|model: model\.name' \
+  VoiceInk/Transcription/Streaming/AssemblyAIStreamingProvider.swift \
+  VoiceInk/Transcription/Streaming/CartesiaStreamingProvider.swift \
+  VoiceInk/Transcription/Streaming/DeepgramStreamingProvider.swift \
+  VoiceInk/Transcription/Streaming/ElevenLabsStreamingProvider.swift \
+  VoiceInk/Transcription/Streaming/SonioxStreamingProvider.swift \
+  VoiceInk/Transcription/Streaming/SpeechmaticsStreamingProvider.swift
+
 reject_pattern \
   "macOS Deepgram streaming avoids shell-only vocabulary term limit" \
   'limit: 50|prefix\(50\)' \

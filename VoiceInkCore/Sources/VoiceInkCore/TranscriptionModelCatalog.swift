@@ -160,6 +160,19 @@ public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
         }
         return apiErrorDomain
     }
+
+    public func streamingConnectionModelName(for selectedModelName: String) -> String {
+        switch self {
+        case .elevenLabs:
+            return "scribe_v2_realtime"
+        case .soniox:
+            return "stt-rt-v4"
+        case .speechmatics:
+            return selectedModelName.contains("standard") ? "standard" : "enhanced"
+        case .assemblyAI, .cartesia, .deepgram, .gemini, .groq, .mistral, .openAI, .xai, .local:
+            return selectedModelName
+        }
+    }
 }
 
 public struct VoiceInkCloudTranscriptionModelSpec: Equatable, Sendable {

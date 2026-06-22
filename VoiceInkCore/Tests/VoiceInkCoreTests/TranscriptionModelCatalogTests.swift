@@ -126,6 +126,37 @@ final class TranscriptionModelCatalogTests: XCTestCase {
         XCTAssertEqual(models.map(\.supportsStreaming), [false, true])
     }
 
+    func testStreamingConnectionModelNamesAreSharedProviderPolicy() {
+        XCTAssertEqual(
+            VoiceInkTranscriptionModelProvider.deepgram.streamingConnectionModelName(for: "nova-3"),
+            "nova-3"
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptionModelProvider.assemblyAI.streamingConnectionModelName(for: "universal-3-pro"),
+            "universal-3-pro"
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptionModelProvider.cartesia.streamingConnectionModelName(for: "ink-whisper"),
+            "ink-whisper"
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptionModelProvider.elevenLabs.streamingConnectionModelName(for: "scribe_v2"),
+            "scribe_v2_realtime"
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptionModelProvider.soniox.streamingConnectionModelName(for: "stt-async-v4"),
+            "stt-rt-v4"
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptionModelProvider.speechmatics.streamingConnectionModelName(for: "speechmatics-enhanced"),
+            "enhanced"
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptionModelProvider.speechmatics.streamingConnectionModelName(for: "speechmatics-standard"),
+            "standard"
+        )
+    }
+
     func testXAILanguageCapabilityAndModelAreSharedProviderMetadata() {
         XCTAssertEqual(VoiceInkTranscriptionModelProvider.xai.languageCodes?.first, "ar")
         XCTAssertEqual(VoiceInkTranscriptionModelProvider.xai.languageCodes?.last, "vi")

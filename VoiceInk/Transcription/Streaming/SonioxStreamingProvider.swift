@@ -38,7 +38,7 @@ final class SonioxStreamingProvider: StreamingTranscriptionProvider {
         forwardingTask = forwardLLMKitStreamingEvents(from: client, to: eventsContinuation)
 
         do {
-            try await client.connect(apiKey: apiKey, model: "stt-rt-v4", language: language, customVocabulary: vocabulary)
+            try await client.connect(apiKey: apiKey, model: model.streamingConnectionModelName, language: language, customVocabulary: vocabulary)
         } catch {
             // Clean up forwarding task on connection failure
             forwardingTask?.cancel()

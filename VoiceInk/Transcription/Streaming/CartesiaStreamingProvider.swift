@@ -32,7 +32,7 @@ final class CartesiaStreamingProvider: StreamingTranscriptionProvider {
         forwardingTask = forwardLLMKitStreamingEvents(from: client, to: eventsContinuation)
 
         do {
-            try await client.connect(apiKey: apiKey, model: model.name, language: language, customVocabulary: [])
+            try await client.connect(apiKey: apiKey, model: model.streamingConnectionModelName, language: language, customVocabulary: [])
         } catch {
             forwardingTask?.cancel()
             forwardingTask = nil

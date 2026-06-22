@@ -34,7 +34,7 @@ final class AssemblyAIStreamingProvider: StreamingTranscriptionProvider {
         do {
             try await client.connect(
                 apiKey: apiKey,
-                model: model.name,
+                model: model.streamingConnectionModelName,
                 language: language,
                 prompt: VoiceInkTranscriptionPromptUse.streamingTranscription(.assemblyAI).requestPrompt(
                     VoiceInkTranscriptionPromptPreference.requestPrompt()

@@ -176,6 +176,10 @@ extension TranscriptionModel {
         )
     }
 
+    var streamingConnectionModelName: String {
+        provider.coreTranscriptionModelProvider?.streamingConnectionModelName(for: name) ?? name
+    }
+
     var transcriptionRuntimeResourcePlan: VoiceInkTranscriptionRuntimeResourcePlan {
         VoiceInkTranscriptionRuntimeResourcePlan(serviceRoute: provider.transcriptionServiceRoute)
     }

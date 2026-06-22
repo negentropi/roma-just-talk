@@ -30,7 +30,7 @@ final class ElevenLabsStreamingProvider: StreamingTranscriptionProvider {
         forwardingTask = forwardLLMKitStreamingEvents(from: client, to: eventsContinuation)
 
         do {
-            try await client.connect(apiKey: apiKey, model: "scribe_v2_realtime", language: language)
+            try await client.connect(apiKey: apiKey, model: model.streamingConnectionModelName, language: language)
         } catch {
             // Clean up forwarding task on connection failure
             forwardingTask?.cancel()

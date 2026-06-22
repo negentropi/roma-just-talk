@@ -286,11 +286,11 @@ class AIEnhancementService: ObservableObject {
                     state: retryState
                 )
             } catch {
-                if VoiceInkAIEnhancementError.transportNetworkError(for: error) == .networkError {
+                if let retryPlan = retryState.recordNonEnhancementError(error) {
                     try await handleRetryDecision(
-                        retryState.recordTransportNetworkFailure(),
+                        retryPlan.decision,
                         state: retryState,
-                        transportNetworkFailure: true
+                        transportNetworkFailure: retryPlan.isTransportNetworkFailure
                     )
                 } else {
                     throw error

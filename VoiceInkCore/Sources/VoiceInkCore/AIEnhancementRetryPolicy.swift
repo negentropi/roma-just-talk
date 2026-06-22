@@ -38,6 +38,17 @@ public struct VoiceInkAIEnhancementRetryState: Equatable, Sendable {
         recordBackoffFailure(.networkError)
     }
 
+    public mutating func recordNonEnhancementError(_ error: Error) -> VoiceInkAIEnhancementNonEnhancementErrorRetryPlan? {
+        guard VoiceInkAIEnhancementError.transportNetworkError(for: error) == .networkError else {
+            return nil
+        }
+
+        return VoiceInkAIEnhancementNonEnhancementErrorRetryPlan(
+            decision: recordTransportNetworkFailure(),
+            isTransportNetworkFailure: true
+        )
+    }
+
     private mutating func recordBackoffFailure(_ error: VoiceInkAIEnhancementError) -> VoiceInkAIEnhancementRetryDecision {
         failedAttempts += 1
         guard failedAttempts < maxAttempts else {
@@ -56,6 +67,16 @@ public struct VoiceInkAIEnhancementRetryState: Equatable, Sendable {
         }
 
         return .retryImmediately
+    }
+}
+
+public struct VoiceInkAIEnhancementNonEnhancementErrorRetryPlan: Equatable, Sendable {
+    public let decision: VoiceInkAIEnhancementRetryDecision
+    public let isTransportNetworkFailure: Bool
+
+    public init(decision: VoiceInkAIEnhancementRetryDecision, isTransportNetworkFailure: Bool) {
+        self.decision = decision
+        self.isTransportNetworkFailure = isTransportNetworkFailure
     }
 }
 

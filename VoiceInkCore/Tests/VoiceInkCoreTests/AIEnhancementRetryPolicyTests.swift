@@ -70,6 +70,41 @@ final class AIEnhancementRetryPolicyTests: XCTestCase {
         XCTAssertEqual(state.recordTransportNetworkFailure(), .fail(.networkError))
     }
 
+    func testNonEnhancementErrorRetryPlanHandlesOnlyRetryableTransportFailures() {
+        var state = VoiceInkAIEnhancementRetryState(
+            maxAttempts: 2,
+            initialDelay: 1,
+            retryOnTimeout: true
+        )
+
+        XCTAssertEqual(
+            state.recordNonEnhancementError(
+                NSError(domain: NSURLErrorDomain, code: NSURLErrorNetworkConnectionLost)
+            ),
+            VoiceInkAIEnhancementNonEnhancementErrorRetryPlan(
+                decision: .retryAfterDelay(1),
+                isTransportNetworkFailure: true
+            )
+        )
+        XCTAssertEqual(state.failedAttempts, 1)
+        XCTAssertEqual(
+            state.recordNonEnhancementError(
+                NSError(domain: NSURLErrorDomain, code: NSURLErrorNetworkConnectionLost)
+            ),
+            VoiceInkAIEnhancementNonEnhancementErrorRetryPlan(
+                decision: .fail(.networkError),
+                isTransportNetworkFailure: true
+            )
+        )
+        XCTAssertEqual(state.failedAttempts, 2)
+
+        var nonRetryableState = VoiceInkAIEnhancementRetryState()
+        XCTAssertNil(nonRetryableState.recordNonEnhancementError(
+            NSError(domain: NSURLErrorDomain, code: NSURLErrorCancelled)
+        ))
+        XCTAssertEqual(nonRetryableState.failedAttempts, 0)
+    }
+
     func testRateLimitPolicySkipsDelayWithoutLastRequest() {
         let policy = VoiceInkAIEnhancementRateLimitPolicy(minimumInterval: 1)
 

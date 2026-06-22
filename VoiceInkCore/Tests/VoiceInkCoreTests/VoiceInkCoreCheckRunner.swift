@@ -109,6 +109,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "AIEnhancementRetryPolicyTests.testTimeoutFailsImmediatelyWhenDisabled", run: { AIEnhancementRetryPolicyTests().testTimeoutFailsImmediatelyWhenDisabled() }),
             VoiceInkCoreCheck(name: "AIEnhancementRetryPolicyTests.testNonRetryableEnhancementErrorsFailWithoutCountingAttempt", run: { AIEnhancementRetryPolicyTests().testNonRetryableEnhancementErrorsFailWithoutCountingAttempt() }),
             VoiceInkCoreCheck(name: "AIEnhancementRetryPolicyTests.testTransportNetworkFailureMapsToSharedNetworkError", run: { AIEnhancementRetryPolicyTests().testTransportNetworkFailureMapsToSharedNetworkError() }),
+            VoiceInkCoreCheck(name: "AIEnhancementRetryPolicyTests.testNonEnhancementErrorRetryPlanHandlesOnlyRetryableTransportFailures", run: { AIEnhancementRetryPolicyTests().testNonEnhancementErrorRetryPlanHandlesOnlyRetryableTransportFailures() }),
             VoiceInkCoreCheck(name: "AIEnhancementRetryPolicyTests.testRateLimitPolicySkipsDelayWithoutLastRequest", run: { AIEnhancementRetryPolicyTests().testRateLimitPolicySkipsDelayWithoutLastRequest() }),
             VoiceInkCoreCheck(name: "AIEnhancementRetryPolicyTests.testRateLimitPolicyReturnsRemainingDelay", run: { AIEnhancementRetryPolicyTests().testRateLimitPolicyReturnsRemainingDelay() }),
             VoiceInkCoreCheck(name: "AIEnhancementRetryPolicyTests.testRateLimitPolicySkipsDelayAfterIntervalExpires", run: { AIEnhancementRetryPolicyTests().testRateLimitPolicySkipsDelayAfterIntervalExpires() }),

@@ -4232,6 +4232,17 @@ reject_pattern \
   iOS/VoiceInk-ios/LocalModelManagementView.swift \
   iOS/VoiceInk-ios/APIKeysView.swift
 
+require_patterns \
+  "macOS cloud model card uses shared provider-role display name" \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift \
+  'VoiceInkProviderAPIKeyCardPresentation\(providerDisplayName: model\.provider\.apiKeyProviderName\)' \
+  'Label\(model\.provider\.apiKeyProviderName, systemImage: "cloud"\)'
+
+reject_pattern \
+  "macOS cloud model card avoids shell-only provider raw display" \
+  'model\.provider\.rawValue' \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift
+
 require_pattern \
   "macOS cloud API-key card uses shared draft policy" \
   'apiKeyFormState\.draft' \

@@ -31,7 +31,7 @@ struct CloudModelCardView: View {
     }
 
     var body: some View {
-        let apiKeyCardPresentation = VoiceInkProviderAPIKeyCardPresentation(providerDisplayName: model.provider.rawValue)
+        let apiKeyCardPresentation = VoiceInkProviderAPIKeyCardPresentation(providerDisplayName: model.provider.apiKeyProviderName)
 
         VStack(alignment: .leading, spacing: 0) {
             // Main card content
@@ -130,7 +130,7 @@ struct CloudModelCardView: View {
     private var metadataSection: some View {
         HStack(spacing: 12) {
             // Provider
-            Label(model.provider.rawValue, systemImage: "cloud")
+            Label(model.provider.apiKeyProviderName, systemImage: "cloud")
                 .font(.system(size: 11))
                 .foregroundColor(Color(.secondaryLabelColor))
                 .lineLimit(1)

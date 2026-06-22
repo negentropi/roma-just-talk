@@ -138,6 +138,19 @@ public struct VoiceInkProviderAPIKeyFormControlPresentation: Equatable, Sendable
     }
 }
 
+public struct VoiceInkProviderAPIKeyEditPlan: Equatable, Sendable {
+    public let formState: VoiceInkProviderAPIKeyFormState
+    public let verificationFlagToPersist: Bool?
+
+    public init(
+        formState: VoiceInkProviderAPIKeyFormState,
+        verificationFlagToPersist: Bool?
+    ) {
+        self.formState = formState
+        self.verificationFlagToPersist = verificationFlagToPersist
+    }
+}
+
 public extension VoiceInkProviderAPIKeyDraft {
     func verificationApplicationPlan(
         for result: VoiceInkAPIKeyVerificationResult
@@ -203,6 +216,13 @@ public struct VoiceInkProviderAPIKeyFormState: Equatable, Sendable {
             enteredKey: storedKey,
             verificationProgress: .idle,
             isEditing: true
+        )
+    }
+
+    public func iOSStoredKeyEditPlan(storedKey: String) -> VoiceInkProviderAPIKeyEditPlan {
+        VoiceInkProviderAPIKeyEditPlan(
+            formState: editingStoredKey(storedKey),
+            verificationFlagToPersist: false
         )
     }
 

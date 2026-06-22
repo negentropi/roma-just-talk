@@ -49,10 +49,13 @@ struct ProviderAPIKeyView: View {
                             .foregroundStyle(feedback.tone.statusColor)
                         Spacer()
                         Button(presentation.changeButtonTitle) {
-                            apiKeyFormState = apiKeyFormState.editingStoredKey(
+                            let editPlan = apiKeyFormState.iOSStoredKeyEditPlan(
                                 settings.storedAPIKey(for: provider)
                             )
-                            settings.setKeyVerified(false, for: provider)
+                            apiKeyFormState = editPlan.formState
+                            if let verificationFlag = editPlan.verificationFlagToPersist {
+                                settings.setKeyVerified(verificationFlag, for: provider)
+                            }
                         }
                     }
                     if let existing = VoiceInkSecretPresentation.obfuscatedAPIKey(settings.storedAPIKey(for: provider)) {

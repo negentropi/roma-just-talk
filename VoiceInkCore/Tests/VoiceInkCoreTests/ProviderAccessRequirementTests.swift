@@ -230,6 +230,21 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertTrue(editingState.isEditing)
     }
 
+    func testProviderAPIKeyFormStateEditPlanOwnsIOSVerificationReset() {
+        let state = VoiceInkProviderAPIKeyFormState(
+            enteredKey: "old-key",
+            verificationProgress: .success,
+            isEditing: false
+        )
+
+        let plan = state.iOSStoredKeyEditPlan(storedKey: "stored-key")
+
+        XCTAssertEqual(plan.formState.enteredKey, "stored-key")
+        XCTAssertEqual(plan.formState.verificationProgress, .idle)
+        XCTAssertTrue(plan.formState.isEditing)
+        XCTAssertEqual(plan.verificationFlagToPersist, false)
+    }
+
     func testProviderAPIKeyFormStateEditingKeyResetsProgressWithoutChangingMode() {
         let state = VoiceInkProviderAPIKeyFormState(
             enteredKey: "edited-key",

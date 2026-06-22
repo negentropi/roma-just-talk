@@ -2294,6 +2294,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
 
 require_pattern \
+  "shared provider API-key form state owns iOS stored-key edit plan" \
+  'VoiceInkProviderAPIKeyEditPlan|iOSStoredKeyEditPlan\(storedKey:|verificationFlagToPersist' \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
+
+require_pattern \
   "shared provider API-key form state owns iOS result feedback visibility" \
   'iOSVisibleResultFeedback\(isKeyVerified:' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
@@ -2319,6 +2324,11 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
+  "core checks execute provider API-key iOS edit plan test" \
+  'ProviderAccessRequirementTests\.testProviderAPIKeyFormStateEditPlanOwnsIOSVerificationReset' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "core checks execute provider API-key iOS control presentation test" \
   'ProviderAccessRequirementTests\.testProviderAPIKeyFormStateOwnsIOSControlPresentation' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
@@ -2334,6 +2344,11 @@ require_pattern \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
 require_pattern \
+  "iOS API-key view uses shared stored-key edit plan" \
+  'iOSStoredKeyEditPlan|editPlan\.formState|editPlan\.verificationFlagToPersist' \
+  iOS/VoiceInk-ios/ProviderAPIKeyView.swift
+
+require_pattern \
   "iOS API-key view uses shared progress presentation through form state" \
   'apiKeyFormState\.(iOSControlPresentation|iOSVisibleResultFeedback)|iOSVerifiedKeyFeedback|iOSResultFeedback|effectiveSystemImageName' \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
@@ -2346,6 +2361,11 @@ reject_pattern \
 reject_pattern \
   "iOS API-key view avoids shell-owned API-key control derivation" \
   'let +apiKeyDraft|apiKeyDraft\.|verificationProgress\.isVerifying|!apiKeyDraft\.(hasEnteredKey|canVerify)' \
+  iOS/VoiceInk-ios/ProviderAPIKeyView.swift
+
+reject_pattern \
+  "iOS API-key view avoids shell-owned stored-key edit sequencing" \
+  'apiKeyFormState = apiKeyFormState\.editingStoredKey|setKeyVerified\(false' \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
 require_pattern \

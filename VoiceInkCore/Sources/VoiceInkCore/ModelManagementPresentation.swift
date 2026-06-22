@@ -70,6 +70,8 @@ public enum VoiceInkModelManagementPresentation {
     public static let showInFinderButtonTitle = "Show in Finder"
     public static let speedLabel = "Speed"
     public static let accuracyLabel = "Accuracy"
+    public static let multilingualLanguageLabel = "Multilingual"
+    public static let englishOnlyLanguageLabel = "English-only"
     public static let importedLocalModelDescription = "Imported local model"
     public static let customProviderLabel = "Custom Provider"
     public static let openAICompatibleLabel = "OpenAI Compatible"
@@ -93,6 +95,10 @@ public enum VoiceInkModelManagementPresentation {
 
     public static func deleteModelAlertMessage(modelName: String) -> String {
         "Are you sure you want to delete the model '\(modelName)'?"
+    }
+
+    public static func languageLabel(isMultilingual: Bool) -> String {
+        isMultilingual ? multilingualLanguageLabel : englishOnlyLanguageLabel
     }
 
     public static func importedLocalModelAlreadyExistsTitle(modelFilename: String) -> String {

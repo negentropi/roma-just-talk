@@ -149,7 +149,7 @@ extension TranscriptionModel {
     }
 
     var language: String {
-        isMultilingualModel ? "Multilingual" : "English-only"
+        VoiceInkModelManagementPresentation.languageLabel(isMultilingual: isMultilingualModel)
     }
 
     var supportsStreaming: Bool { false }
@@ -442,7 +442,7 @@ struct ImportedWhisperModel: TranscriptionModel {
     init(fileBaseName: String) {
         self.name = fileBaseName
         self.displayName = fileBaseName
-        self.description = "Imported local model"
+        self.description = VoiceInkModelManagementPresentation.importedLocalModelDescription
         self.isMultilingualModel = true
         self.supportedLanguages = ModelProvider.whisper.supportedLanguages(isMultilingual: true)
     }

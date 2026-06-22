@@ -3484,8 +3484,18 @@ require_pattern \
 
 require_pattern \
   "shared model management copy presentation lives in VoiceInkCore" \
-  'enum VoiceInkModelManagementPresentation|downloadButtonTitle|editModelButtonTitle|deleteModelButtonTitle|deleteButtonTitle|deleteCustomModelAlertTitle|deleteCustomModelAlertMessage|deleteModelAlertMessage|showInFinderButtonTitle|speedLabel|accuracyLabel|importedLocalModelDescription|customProviderLabel|openAICompatibleLabel|nativeAppleProviderLabel|onDeviceLabel|macOS26RequiredLabel|importLocalModelHelpText|importLocalModelLearnMoreURLString|importLocalModelPanelTitle|intelMacLocalModelsWarningText|intelMacUseCloudButtonTitle|importedLocalModelFailureTitle' \
+  'enum VoiceInkModelManagementPresentation|downloadButtonTitle|editModelButtonTitle|deleteModelButtonTitle|deleteButtonTitle|deleteCustomModelAlertTitle|deleteCustomModelAlertMessage|deleteModelAlertMessage|showInFinderButtonTitle|speedLabel|accuracyLabel|languageLabel|multilingualLanguageLabel|englishOnlyLanguageLabel|importedLocalModelDescription|customProviderLabel|openAICompatibleLabel|nativeAppleProviderLabel|onDeviceLabel|macOS26RequiredLabel|importLocalModelHelpText|importLocalModelLearnMoreURLString|importLocalModelPanelTitle|intelMacLocalModelsWarningText|intelMacUseCloudButtonTitle|importedLocalModelFailureTitle' \
   VoiceInkCore/Sources/VoiceInkCore/ModelManagementPresentation.swift
+
+require_pattern \
+  "macOS transcription models use shared model language and imported-local copy" \
+  'VoiceInkModelManagementPresentation\.(languageLabel|importedLocalModelDescription)' \
+  VoiceInk/Models/TranscriptionModel.swift
+
+reject_pattern \
+  "macOS transcription models avoid shell-only model language and imported-local copy" \
+  '"(Multilingual|English-only|Imported local model)"' \
+  VoiceInk/Models/TranscriptionModel.swift
 
 require_pattern \
   "shared Whisper compact download status text lives in VoiceInkCore" \

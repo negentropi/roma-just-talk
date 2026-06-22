@@ -165,6 +165,67 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(resetState.apiKeyProvidersToDelete, VoiceInkProviderKind.userAPIKeyProviders)
     }
 
+    func testIOSAppSettingsStartupPolicyLoadsPersistedStateThroughAdapters() {
+        let suiteName = "VoiceInkCore.UserDefaultsPreferencesTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defaults.removePersistentDomain(forName: suiteName)
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let mode = Mode(
+            name: "Meeting",
+            transcriptionProvider: .groq,
+            transcriptionModel: "whisper-large-v3",
+            isPostProcessingEnabled: true,
+            postProcessingProvider: .openAI,
+            postProcessingModel: "gpt-4o-mini"
+        )
+        VoiceInkModeStorage.saveModes([mode], to: defaults)
+        VoiceInkModeStorage.saveSelectedModeId(mode.id, to: defaults)
+        VoiceInkAudioSessionTimeoutPreference.saveTimeoutSeconds(120, to: defaults)
+        PunctuationCleanupMode.setCurrent(.removeTrailingPeriod, in: defaults)
+        VoiceInkTranscriptionCleanupPreferenceStorage.saveTextFormattingEnabled(false, to: defaults)
+        VoiceInkTranscriptionCleanupPreferenceStorage.saveLowercaseTranscription(true, to: defaults)
+        VoiceInkTranscriptionCleanupPreferenceStorage.saveRemoveFillerWords(false, to: defaults)
+        VoiceInkFillerWordPreference.saveWords(["um", "like"], to: defaults)
+        VoiceInkWordReplacementPreference.saveRules([
+            VoiceInkWordReplacementRule(originalText: "roma", replacementText: "Roma Just Talk")
+        ], to: defaults)
+        VoiceInkCustomVocabularyPreference.saveTerms([" Felix ", "roma", " "], to: defaults)
+        VoiceInkTranscriptionLanguagePreference.saveSelectedLanguage("fr", to: defaults)
+        VoiceInkProviderAPIKeyVerificationState.setVerified(true, for: .groq, in: defaults)
+
+        let startupState = VoiceInkIOSAppSettingsStartupPolicy.state(
+            from: defaults,
+            verifiedProviders: VoiceInkProviderAPIKeyVerificationState.verifiedProviders(in: defaults),
+            loadStoredAPIKey: { provider in
+                provider == .groq ? "groq-key" : ""
+            }
+        )
+
+        XCTAssertEqual(startupState.modes.count, 1)
+        XCTAssertEqual(startupState.modes.first?.id, mode.id)
+        XCTAssertEqual(startupState.modes.first?.transcriptionProvider, .groq)
+        XCTAssertEqual(startupState.selectedModeId, mode.id)
+        XCTAssertEqual(startupState.apiKeyState.storedAPIKey(for: .groq), "groq-key")
+        XCTAssertEqual(startupState.audioSessionTimeoutSeconds, 120)
+        XCTAssertEqual(
+            startupState.transcriptionCleanupSettings,
+            VoiceInkTranscriptionCleanupSettings(
+                punctuationMode: .removeTrailingPeriod,
+                isTextFormattingEnabled: false,
+                lowercaseTranscription: true,
+                removeFillerWords: false
+            )
+        )
+        XCTAssertEqual(startupState.fillerWords, ["um", "like"])
+        XCTAssertEqual(
+            startupState.wordReplacements,
+            [VoiceInkWordReplacementRule(originalText: "roma", replacementText: "Roma Just Talk")]
+        )
+        XCTAssertEqual(startupState.customVocabularyTerms, ["Felix", "roma"])
+        XCTAssertEqual(startupState.selectedTranscriptionLanguage, "fr")
+    }
+
     func testIOSFirstTimeSetupPolicySeedsDefaultModeAndCompletionIntent() {
         let plan = VoiceInkIOSFirstTimeSetupPolicy.plan(
             modes: [],

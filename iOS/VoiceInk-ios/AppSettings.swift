@@ -64,29 +64,23 @@ final class AppSettings: ObservableObject {
     }
 
     private init() {
-        // Load modes
-        self.modes = VoiceInkModeStorage.loadModes()
-        
-        // Load selected mode
-        self.selectedModeId = VoiceInkModeStorage.loadSelectedModeId()
-        
-
-        self.apiKeyState = VoiceInkProviderAPIKeyState.loadingStoredKeys(
+        let startupState = VoiceInkIOSAppSettingsStartupPolicy.state(
             verifiedProviders: VoiceInkProviderAPIKeyVerificationState.verifiedProviders(),
             loadStoredAPIKey: { VoiceInkProviderAPIKeyStorage.storedKey(for: $0) }
         )
-        
-        // Load audio session timeout (default: 90 seconds)
-        self.audioSessionTimeoutSeconds = VoiceInkAudioSessionTimeoutPreference.timeoutSeconds()
-        let cleanupSettings = VoiceInkTranscriptionCleanupSettings.current()
-        self.punctuationCleanupMode = cleanupSettings.punctuationMode
-        self.isTextFormattingEnabled = cleanupSettings.isTextFormattingEnabled
-        self.lowercaseTranscription = cleanupSettings.lowercaseTranscription
-        self.removeFillerWords = cleanupSettings.removeFillerWords
-        self.fillerWords = VoiceInkFillerWordPreference.words()
-        self.wordReplacements = VoiceInkWordReplacementPreference.rules()
-        self.customVocabularyTerms = VoiceInkCustomVocabularyPreference.terms()
-        self.selectedTranscriptionLanguage = VoiceInkTranscriptionLanguagePreference.selectedLanguage()
+
+        self.modes = startupState.modes
+        self.selectedModeId = startupState.selectedModeId
+        self.apiKeyState = startupState.apiKeyState
+        self.audioSessionTimeoutSeconds = startupState.audioSessionTimeoutSeconds
+        self.punctuationCleanupMode = startupState.transcriptionCleanupSettings.punctuationMode
+        self.isTextFormattingEnabled = startupState.transcriptionCleanupSettings.isTextFormattingEnabled
+        self.lowercaseTranscription = startupState.transcriptionCleanupSettings.lowercaseTranscription
+        self.removeFillerWords = startupState.transcriptionCleanupSettings.removeFillerWords
+        self.fillerWords = startupState.fillerWords
+        self.wordReplacements = startupState.wordReplacements
+        self.customVocabularyTerms = startupState.customVocabularyTerms
+        self.selectedTranscriptionLanguage = startupState.selectedTranscriptionLanguage
 
         repairModeSettingsSelection()
     }

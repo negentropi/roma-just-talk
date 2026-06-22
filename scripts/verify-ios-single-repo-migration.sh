@@ -2847,8 +2847,8 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyStorage.swift
 
 require_pattern \
-  "iOS app settings loads provider API-key state through shared loader" \
-  'VoiceInkProviderAPIKeyState\.loadingStoredKeys' \
+  "iOS app settings consumes shared startup provider API-key state" \
+  'startupState\.apiKeyState' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \
@@ -9446,6 +9446,21 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_patterns \
+  "shared iOS app settings startup state lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift \
+  'VoiceInkIOSAppSettingsStartupState' \
+  'VoiceInkIOSAppSettingsStartupPolicy' \
+  'VoiceInkModeStorage\.loadModes' \
+  'VoiceInkProviderAPIKeyState\.loadingStoredKeys' \
+  'VoiceInkTranscriptionCleanupSettings\.current' \
+  'VoiceInkTranscriptionLanguagePreference\.selectedLanguage'
+
+require_pattern \
+  "core checks execute iOS app settings startup policy test" \
+  'UserDefaultsPreferencesTests\.testIOSAppSettingsStartupPolicyLoadsPersistedStateThroughAdapters' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_patterns \
   "shared iOS first-time setup policy owns mode repair and onboarding completion intent" \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift \
   'VoiceInkIOSFirstTimeSetupPolicy' \
@@ -9627,6 +9642,21 @@ reject_pattern \
 require_pattern \
   "iOS app settings reset consumes shared reset state" \
   'VoiceInkDefaultSettings\.iOS\.appSettingsResetState' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+require_patterns \
+  "iOS app settings initializer consumes shared startup state" \
+  iOS/VoiceInk-ios/AppSettings.swift \
+  'VoiceInkIOSAppSettingsStartupPolicy\.state' \
+  'startupState\.modes' \
+  'startupState\.apiKeyState' \
+  'startupState\.transcriptionCleanupSettings' \
+  'startupState\.selectedTranscriptionLanguage'
+
+reject_context_pattern \
+  "iOS app settings initializer avoids shell-owned startup preference loading" \
+  'private init\(\)' \
+  'VoiceInkModeStorage\.(loadModes|loadSelectedModeId)|VoiceInkProviderAPIKeyState\.loadingStoredKeys|VoiceInkAudioSessionTimeoutPreference\.timeoutSeconds|VoiceInkTranscriptionCleanupSettings\.current|VoiceInkFillerWordPreference\.words|VoiceInkWordReplacementPreference\.rules|VoiceInkCustomVocabularyPreference\.terms|VoiceInkTranscriptionLanguagePreference\.selectedLanguage' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_patterns \

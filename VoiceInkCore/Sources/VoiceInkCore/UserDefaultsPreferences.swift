@@ -232,6 +232,63 @@ public struct VoiceInkAppSettingsResetState {
     }
 }
 
+public struct VoiceInkIOSAppSettingsStartupState {
+    public let modes: [Mode]
+    public let selectedModeId: UUID?
+    public let apiKeyState: VoiceInkProviderAPIKeyState
+    public let audioSessionTimeoutSeconds: Int
+    public let transcriptionCleanupSettings: VoiceInkTranscriptionCleanupSettings
+    public let fillerWords: [String]
+    public let wordReplacements: [VoiceInkWordReplacementRule]
+    public let customVocabularyTerms: [String]
+    public let selectedTranscriptionLanguage: String
+
+    public init(
+        modes: [Mode],
+        selectedModeId: UUID?,
+        apiKeyState: VoiceInkProviderAPIKeyState,
+        audioSessionTimeoutSeconds: Int,
+        transcriptionCleanupSettings: VoiceInkTranscriptionCleanupSettings,
+        fillerWords: [String],
+        wordReplacements: [VoiceInkWordReplacementRule],
+        customVocabularyTerms: [String],
+        selectedTranscriptionLanguage: String
+    ) {
+        self.modes = modes
+        self.selectedModeId = selectedModeId
+        self.apiKeyState = apiKeyState
+        self.audioSessionTimeoutSeconds = audioSessionTimeoutSeconds
+        self.transcriptionCleanupSettings = transcriptionCleanupSettings
+        self.fillerWords = fillerWords
+        self.wordReplacements = wordReplacements
+        self.customVocabularyTerms = customVocabularyTerms
+        self.selectedTranscriptionLanguage = selectedTranscriptionLanguage
+    }
+}
+
+public enum VoiceInkIOSAppSettingsStartupPolicy {
+    public static func state(
+        from defaults: UserDefaults = .standard,
+        verifiedProviders: Set<VoiceInkProviderKind>,
+        loadStoredAPIKey: (VoiceInkProviderKind) -> String
+    ) -> VoiceInkIOSAppSettingsStartupState {
+        VoiceInkIOSAppSettingsStartupState(
+            modes: VoiceInkModeStorage.loadModes(from: defaults),
+            selectedModeId: VoiceInkModeStorage.loadSelectedModeId(from: defaults),
+            apiKeyState: VoiceInkProviderAPIKeyState.loadingStoredKeys(
+                verifiedProviders: verifiedProviders,
+                loadStoredAPIKey: loadStoredAPIKey
+            ),
+            audioSessionTimeoutSeconds: VoiceInkAudioSessionTimeoutPreference.timeoutSeconds(from: defaults),
+            transcriptionCleanupSettings: VoiceInkTranscriptionCleanupSettings.current(in: defaults),
+            fillerWords: VoiceInkFillerWordPreference.words(from: defaults),
+            wordReplacements: VoiceInkWordReplacementPreference.rules(from: defaults),
+            customVocabularyTerms: VoiceInkCustomVocabularyPreference.terms(from: defaults),
+            selectedTranscriptionLanguage: VoiceInkTranscriptionLanguagePreference.selectedLanguage(from: defaults)
+        )
+    }
+}
+
 public struct VoiceInkIOSFirstTimeSetupPlan {
     public let modeSettingsRepairPlan: VoiceInkModeSettingsRepairPlan
     public let shouldSaveHasCompletedOnboarding: Bool

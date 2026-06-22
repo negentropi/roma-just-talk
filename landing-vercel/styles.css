@@ -373,7 +373,8 @@ h1 .before-word {
   white-space: nowrap;
 }
 
-.keycap[aria-label="enter"] {
+.keycap[aria-label="enter"],
+.keycap[aria-label="shift"] {
   font-size: 1.18rem;
   font-weight: 700;
   line-height: 1;

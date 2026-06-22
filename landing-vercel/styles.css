@@ -331,6 +331,10 @@ h1 .before-word {
   clip-path: path("M3 4.4 10.2 3v8.2H3V4.4Zm8.4-1.7L21 1.3v9.9h-9.6V2.7ZM3 12.8h7.2V21L3 19.7v-6.9Zm8.4 0H21v9.9l-9.6-1.4v-8.5Z");
 }
 
+.chat {
+  clip-path: path("M4 5.6C4 3.6 5.6 2 7.6 2h8.8C18.4 2 20 3.6 20 5.6v5.5c0 2-1.6 3.6-3.6 3.6h-5.2l-5 5v-5.3C4.9 13.8 4 12.5 4 11.1V5.6Z");
+}
+
 .keygroup {
   display: inline-flex;
   align-items: center;

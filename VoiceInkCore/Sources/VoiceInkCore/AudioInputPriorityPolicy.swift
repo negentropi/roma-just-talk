@@ -125,6 +125,20 @@ public enum VoiceInkAudioInputPreference {
     }
 }
 
+public enum VoiceInkMacOSAudioDeviceChangeRequest {
+    public static let deviceChangedNotificationName = Notification.Name("AudioDeviceChanged")
+    public static let switchRequiredNotificationName = Notification.Name("audioDeviceSwitchRequired")
+    public static let newDeviceIDUserInfoKey = "newDeviceID"
+
+    public static func switchRequiredUserInfo(deviceID: UInt32) -> [AnyHashable: Any] {
+        [newDeviceIDUserInfoKey: deviceID]
+    }
+
+    public static func newDeviceID(from notification: Notification) -> UInt32? {
+        notification.userInfo?[newDeviceIDUserInfoKey] as? UInt32
+    }
+}
+
 public enum VoiceInkAudioInputPriorityMoveDirection: Equatable, Sendable {
     case up
     case down

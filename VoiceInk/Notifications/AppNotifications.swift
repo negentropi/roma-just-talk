@@ -23,5 +23,6 @@ extension Notification.Name {
     static let sessionMetricsDidChange = Notification.Name("sessionMetricsDidChange")
     static let enhancementToggleChanged = Notification.Name("enhancementToggleChanged")
     static let openFileForTranscription = VoiceInkMacOSFileTranscriptionRequest.notificationName
-    static let audioDeviceSwitchRequired = Notification.Name("audioDeviceSwitchRequired")
+    static let audioDeviceSwitchRequired = VoiceInkMacOSAudioDeviceChangeRequest.switchRequiredNotificationName
+    static let audioDeviceChanged = VoiceInkMacOSAudioDeviceChangeRequest.deviceChangedNotificationName
 }

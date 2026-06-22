@@ -55,6 +55,32 @@ final class AudioInputPriorityPolicyTests: XCTestCase {
         }
     }
 
+    func testMacOSAudioDeviceChangeRequestPreservesNotificationContract() {
+        XCTAssertEqual(
+            VoiceInkMacOSAudioDeviceChangeRequest.deviceChangedNotificationName.rawValue,
+            "AudioDeviceChanged"
+        )
+        XCTAssertEqual(
+            VoiceInkMacOSAudioDeviceChangeRequest.switchRequiredNotificationName.rawValue,
+            "audioDeviceSwitchRequired"
+        )
+        XCTAssertEqual(VoiceInkMacOSAudioDeviceChangeRequest.newDeviceIDUserInfoKey, "newDeviceID")
+
+        let userInfo = VoiceInkMacOSAudioDeviceChangeRequest.switchRequiredUserInfo(deviceID: 42)
+        XCTAssertEqual(userInfo[VoiceInkMacOSAudioDeviceChangeRequest.newDeviceIDUserInfoKey] as? UInt32, 42)
+
+        let notification = Notification(
+            name: VoiceInkMacOSAudioDeviceChangeRequest.switchRequiredNotificationName,
+            userInfo: userInfo
+        )
+        XCTAssertEqual(VoiceInkMacOSAudioDeviceChangeRequest.newDeviceID(from: notification), 42)
+        XCTAssertNil(
+            VoiceInkMacOSAudioDeviceChangeRequest.newDeviceID(
+                from: Notification(name: VoiceInkMacOSAudioDeviceChangeRequest.switchRequiredNotificationName)
+            )
+        )
+    }
+
     func testAudioInputModePreservesSettingsPresentation() {
         XCTAssertEqual(VoiceInkAudioInputMode.systemDefault.title, "System Default")
         XCTAssertEqual(VoiceInkAudioInputMode.systemDefault.iconSystemName, "display")

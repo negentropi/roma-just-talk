@@ -453,7 +453,7 @@ class AudioDeviceManager: ObservableObject {
                         NotificationCenter.default.post(
                             name: .audioDeviceSwitchRequired,
                             object: nil,
-                            userInfo: ["newDeviceID": deviceID]
+                            userInfo: VoiceInkMacOSAudioDeviceChangeRequest.switchRequiredUserInfo(deviceID: deviceID)
                         )
                     } else {
                         self.logger.error("No audio input devices available!")
@@ -555,6 +555,6 @@ class AudioDeviceManager: ObservableObject {
     }
     
     private func notifyDeviceChange() {
-        NotificationCenter.default.post(name: NSNotification.Name("AudioDeviceChanged"), object: nil)
+        NotificationCenter.default.post(name: .audioDeviceChanged, object: nil)
     }
 } 

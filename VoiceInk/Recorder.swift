@@ -56,7 +56,7 @@ class Recorder: NSObject, ObservableObject {
         }
 
         audioDeviceChangeObserver = NotificationCenter.default.addObserver(
-            forName: NSNotification.Name("AudioDeviceChanged"),
+            forName: .audioDeviceChanged,
             object: nil,
             queue: .main
         ) { [weak self] _ in
@@ -74,8 +74,7 @@ class Recorder: NSObject, ObservableObject {
     private func handleDeviceSwitchRequired(_ notification: Notification) async {
         guard !isReconfiguring else { return }
         guard let recorder = recorder else { return }
-        guard let userInfo = notification.userInfo,
-              let newDeviceID = userInfo["newDeviceID"] as? AudioDeviceID else {
+        guard let newDeviceID = VoiceInkMacOSAudioDeviceChangeRequest.newDeviceID(from: notification) else {
             logger.error("Device switch notification missing newDeviceID")
             return
         }

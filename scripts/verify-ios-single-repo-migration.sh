@@ -317,6 +317,28 @@ reject_fixed_string() {
   fi
 }
 
+reject_ios_storage_duplicate_pattern() {
+  local description="$1"
+  local pattern="$2"
+
+  section "$description"
+  local files=()
+  local file
+  while IFS= read -r file; do
+    [[ "$file" == "iOS/VoiceInk-ios/VoiceInkIOSStorageDirectories.swift" ]] && continue
+    files+=("$file")
+  done < <(fd -e swift -t f . iOS/VoiceInk-ios iOS/Shared iOS/VoiceInkKeyboard)
+
+  if ((${#files[@]} == 0)); then
+    fail "$description: no iOS Swift files found"
+    return
+  fi
+
+  if rg -n "$pattern" "${files[@]}"; then
+    fail "$description"
+  fi
+}
+
 reject_context_pattern() {
   local description="$1"
   local anchor="$2"
@@ -397,6 +419,36 @@ reject_fixed_string \
   "Xcode metadata avoids sibling VoiceInk-iOS clone references" \
   "VoiceInk-iOS" \
   "${xcode_metadata_files[@]}"
+
+section "iOS storage adapter stays thin"
+require_file iOS/VoiceInk-ios/VoiceInkIOSStorageDirectories.swift
+require_pattern \
+  "iOS storage adapter derives recordings directory through shared core" \
+  'VoiceInkStoredAudioFile\.recordingsDirectory\(in: documentsDirectory\)' \
+  iOS/VoiceInk-ios/VoiceInkIOSStorageDirectories.swift
+
+require_pattern \
+  "iOS storage adapter prepares recordings directory through shared core" \
+  'VoiceInkStoredAudioFile\.createRecordingsDirectory\(in: documentsDirectory\)' \
+  iOS/VoiceInk-ios/VoiceInkIOSStorageDirectories.swift
+
+require_pattern \
+  "iOS storage adapter derives local model directory through shared core" \
+  'VoiceInkWhisperModelFiles\.modelsDirectory\(in: documentsDirectory\)' \
+  iOS/VoiceInk-ios/VoiceInkIOSStorageDirectories.swift
+
+require_pattern \
+  "iOS storage adapter prepares local model directory through shared core" \
+  'VoiceInkWhisperModelFiles\.createModelsDirectory\(in: documentsDirectory\)' \
+  iOS/VoiceInk-ios/VoiceInkIOSStorageDirectories.swift
+
+reject_ios_storage_duplicate_pattern \
+  "iOS shell avoids duplicate Documents/Caches directory roots" \
+  'FileManager\.default\.urls\(for: \.(documentDirectory|cachesDirectory),'
+
+reject_ios_storage_duplicate_pattern \
+  "iOS shell avoids duplicate recordings/model directory literals" \
+  'appendingPathComponent\((VoiceInkStoredAudioFile\.recordingsDirectoryName|VoiceInkWhisperModelFiles\.modelsDirectoryName|"Recordings"|"WhisperModels")'
 
 require_pattern \
   "macOS app uses shared local Whisper framework path" \

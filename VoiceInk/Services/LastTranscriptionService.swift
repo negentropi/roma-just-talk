@@ -28,10 +28,7 @@ class LastTranscriptionService: ObservableObject {
     static func copyLastTranscription(from modelContext: ModelContext) {
         guard let lastTranscription = getLastTranscription(from: modelContext) else {
             Task { @MainActor in
-                NotificationManager.shared.showNotification(
-                    title: VoiceInkTranscriptPresentation.noTranscriptionAvailableTitle,
-                    type: .error
-                )
+                showNotification(VoiceInkLastTranscriptionPolicy.noTranscriptionNotification)
             }
             return
         }
@@ -44,27 +41,14 @@ class LastTranscriptionService: ObservableObject {
         let success = ClipboardManager.copyToClipboard(textToCopy)
         
         Task { @MainActor in
-            if success {
-                NotificationManager.shared.showNotification(
-                    title: VoiceInkTranscriptPresentation.lastTranscriptionCopiedTitle,
-                    type: .success
-                )
-            } else {
-                NotificationManager.shared.showNotification(
-                    title: VoiceInkTranscriptPresentation.failedToCopyTranscriptionTitle,
-                    type: .error
-                )
-            }
+            showNotification(VoiceInkLastTranscriptionPolicy.copyCompletionNotification(didCopy: success))
         }
     }
 
     static func pasteLastTranscription(from modelContext: ModelContext, excluding excludedID: UUID? = nil) {
         guard let lastTranscription = getLastTranscription(from: modelContext, excluding: excludedID) else {
             Task { @MainActor in
-                NotificationManager.shared.showNotification(
-                    title: VoiceInkTranscriptPresentation.noTranscriptionAvailableTitle,
-                    type: .error
-                )
+                showNotification(VoiceInkLastTranscriptionPolicy.noTranscriptionNotification)
             }
             return
         }
@@ -82,10 +66,7 @@ class LastTranscriptionService: ObservableObject {
     static func pasteLastEnhancement(from modelContext: ModelContext) {
         guard let lastTranscription = getLastTranscription(from: modelContext) else {
             Task { @MainActor in
-                NotificationManager.shared.showNotification(
-                    title: VoiceInkTranscriptPresentation.noTranscriptionAvailableTitle,
-                    type: .error
-                )
+                showNotification(VoiceInkLastTranscriptionPolicy.noTranscriptionNotification)
             }
             return
         }
@@ -104,19 +85,15 @@ class LastTranscriptionService: ObservableObject {
         Task { @MainActor in
             guard let lastTranscription = getLastTranscription(from: modelContext),
                   let audioURL = lastTranscription.existingAudioFileURL() else {
-                NotificationManager.shared.showNotification(
-                    title: VoiceInkTranscriptPresentation.cannotRetryTitle(
-                        errorDescription: VoiceInkErrorDescription.text(for: VoiceInkEngineError.audioFileNotFound)
-                    ),
-                    type: .error
+                showNotification(
+                    VoiceInkLastTranscriptionPolicy.retryPreflightFailureNotification(.missingAudio)
                 )
                 return
             }
 
             guard let currentModel = transcriptionModelManager.currentTranscriptionModel else {
-                NotificationManager.shared.showNotification(
-                    title: VoiceInkErrorDescription.text(for: VoiceInkEngineError.noTranscriptionModelSelected),
-                    type: .error
+                showNotification(
+                    VoiceInkLastTranscriptionPolicy.retryPreflightFailureNotification(.noTranscriptionModelSelected)
                 )
                 return
             }
@@ -135,18 +112,19 @@ class LastTranscriptionService: ObservableObject {
                 )
                 ClipboardManager.copyToClipboard(textToCopy)
 
-                NotificationManager.shared.showNotification(
-                    title: VoiceInkTranscriptPresentation.copiedToClipboardTitle,
-                    type: .success
-                )
+                showNotification(VoiceInkLastTranscriptionPolicy.retrySuccessNotification)
             } catch {
-                let errorDescription = VoiceInkErrorDescription.text(for: error)
-                NotificationManager.shared.showNotification(
-                    title: VoiceInkTranscriptPresentation.retryFailedTitle(errorDescription: errorDescription),
-                    type: .error
-                )
+                showNotification(VoiceInkLastTranscriptionPolicy.retryFailureNotification(for: error))
             }
         }
+    }
+
+    @MainActor
+    private static func showNotification(_ presentation: VoiceInkLastTranscriptionNotificationPresentation) {
+        NotificationManager.shared.showNotification(
+            title: presentation.title,
+            type: presentation.kind
+        )
     }
 }
 

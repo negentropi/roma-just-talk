@@ -58,6 +58,61 @@ final class LastTranscriptionPolicyTests: XCTestCase {
         XCTAssertEqual(VoiceInkLastTranscriptionPolicy.fetchLimit, 20)
     }
 
+    func testLastTranscriptionNotificationPresentationsPreserveCopyOutcomes() {
+        XCTAssertEqual(
+            VoiceInkLastTranscriptionPolicy.noTranscriptionNotification,
+            VoiceInkLastTranscriptionNotificationPresentation(
+                title: "No transcription available",
+                kind: .error
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkLastTranscriptionPolicy.copyCompletionNotification(didCopy: true),
+            VoiceInkLastTranscriptionNotificationPresentation(
+                title: "Last transcription copied",
+                kind: .success
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkLastTranscriptionPolicy.copyCompletionNotification(didCopy: false),
+            VoiceInkLastTranscriptionNotificationPresentation(
+                title: "Failed to copy transcription",
+                kind: .error
+            )
+        )
+    }
+
+    func testLastTranscriptionRetryNotificationPresentationsPreserveMacOSCopy() {
+        XCTAssertEqual(
+            VoiceInkLastTranscriptionPolicy.retryPreflightFailureNotification(.missingAudio),
+            VoiceInkLastTranscriptionNotificationPresentation(
+                title: "Cannot retry: Audio file not found",
+                kind: .error
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkLastTranscriptionPolicy.retryPreflightFailureNotification(.noTranscriptionModelSelected),
+            VoiceInkLastTranscriptionNotificationPresentation(
+                title: "No transcription model selected",
+                kind: .error
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkLastTranscriptionPolicy.retrySuccessNotification,
+            VoiceInkLastTranscriptionNotificationPresentation(
+                title: "Copied to clipboard",
+                kind: .success
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkLastTranscriptionPolicy.retryFailureNotification(errorDescription: "provider unavailable"),
+            VoiceInkLastTranscriptionNotificationPresentation(
+                title: "Retry failed: provider unavailable",
+                kind: .error
+            )
+        )
+    }
+
     private func candidate(
         id: UUID = UUID(),
         rawText: String,

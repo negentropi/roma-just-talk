@@ -40,6 +40,63 @@ final class SettingsBackupPolicyTests: XCTestCase {
         XCTAssertTrue(VoiceInkSettingsBackupImportPolicy.needsAPIKeyReminder(for: [.customModels]))
     }
 
+    func testBackupImportDiagnosticsPreserveMacOSStatusCopy() {
+        XCTAssertEqual(
+            VoiceInkSettingsBackupImportDiagnostics.noGeneralSettingsMessage,
+            "No general settings found in the imported file."
+        )
+        XCTAssertEqual(
+            VoiceInkSettingsBackupImportDiagnostics.noVocabularyWordsMessage,
+            "No vocabulary words found in the imported file. Existing items remain unchanged."
+        )
+        XCTAssertEqual(
+            VoiceInkSettingsBackupImportDiagnostics.noWordReplacementsMessage,
+            "No word replacements found in the imported file. Existing replacements remain unchanged."
+        )
+        XCTAssertEqual(
+            VoiceInkSettingsBackupImportDiagnostics.noDictionaryEntriesImportedMessage,
+            "No new dictionary entries were imported."
+        )
+        XCTAssertEqual(
+            VoiceInkSettingsBackupImportDiagnostics.generalSettingsImportedMessage,
+            "Successfully imported general settings."
+        )
+        XCTAssertEqual(
+            VoiceInkSettingsBackupImportDiagnostics.noCustomModelsMessage,
+            "No custom models found in the imported file."
+        )
+        XCTAssertEqual(
+            VoiceInkSettingsBackupImportDiagnostics.saveFailedDescription(
+                item: "dictionary entries",
+                localizedDescription: "disk full"
+            ),
+            "Failed to save imported dictionary entries: disk full"
+        )
+        XCTAssertEqual(
+            VoiceInkSettingsBackupImportDiagnostics.customPromptsImportedMessage(count: 3),
+            "Successfully imported 3 custom prompts."
+        )
+        XCTAssertEqual(
+            VoiceInkSettingsBackupImportDiagnostics.powerModeConfigurationsImportedMessage(count: 2),
+            "Successfully imported 2 Power Mode configurations."
+        )
+        XCTAssertEqual(
+            VoiceInkSettingsBackupImportDiagnostics.skippedInvalidReplacementsMessage(count: 4),
+            "Skipped 4 invalid word replacements from the imported file."
+        )
+        XCTAssertEqual(
+            VoiceInkSettingsBackupImportDiagnostics.dictionaryEntriesImportedMessage(
+                vocabularyWordCount: 2,
+                wordReplacementCount: 1
+            ),
+            "Successfully imported 2 vocabulary words and 1 word replacements to SwiftData."
+        )
+        XCTAssertEqual(
+            VoiceInkSettingsBackupImportDiagnostics.customModelsImportedMessage(count: 5),
+            "Successfully imported 5 custom model definitions."
+        )
+    }
+
     func testBackupPresentationPreservesMacOSPanelAndAlertCopy() {
         let presentation = VoiceInkSettingsBackupPresentation.macOS
 

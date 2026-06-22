@@ -40,6 +40,42 @@ public enum VoiceInkSettingsBackupImportPolicy {
     }
 }
 
+public enum VoiceInkSettingsBackupImportDiagnostics {
+    public static let noGeneralSettingsMessage = "No general settings found in the imported file."
+    public static let noVocabularyWordsMessage = "No vocabulary words found in the imported file. Existing items remain unchanged."
+    public static let noWordReplacementsMessage = "No word replacements found in the imported file. Existing replacements remain unchanged."
+    public static let noDictionaryEntriesImportedMessage = "No new dictionary entries were imported."
+    public static let generalSettingsImportedMessage = "Successfully imported general settings."
+    public static let noCustomModelsMessage = "No custom models found in the imported file."
+
+    public static func saveFailedDescription(item: String, localizedDescription: String) -> String {
+        "Failed to save imported \(item): \(localizedDescription)"
+    }
+
+    public static func customPromptsImportedMessage(count: Int) -> String {
+        "Successfully imported \(count) custom prompts."
+    }
+
+    public static func powerModeConfigurationsImportedMessage(count: Int) -> String {
+        "Successfully imported \(count) Power Mode configurations."
+    }
+
+    public static func skippedInvalidReplacementsMessage(count: Int) -> String {
+        "Skipped \(count) invalid word replacements from the imported file."
+    }
+
+    public static func dictionaryEntriesImportedMessage(
+        vocabularyWordCount: Int,
+        wordReplacementCount: Int
+    ) -> String {
+        "Successfully imported \(vocabularyWordCount) vocabulary words and \(wordReplacementCount) word replacements to SwiftData."
+    }
+
+    public static func customModelsImportedMessage(count: Int) -> String {
+        "Successfully imported \(count) custom model definitions."
+    }
+}
+
 public struct VoiceInkSettingsBackupPresentation: Equatable, Sendable {
     public let defaultFileName: String
     public let exportPanelTitle: String

@@ -9,7 +9,10 @@ enum BackupImportError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .saveFailed(let item, let error):
-            return "Failed to save imported \(item): \(error.localizedDescription)"
+            return VoiceInkSettingsBackupImportDiagnostics.saveFailedDescription(
+                item: item,
+                localizedDescription: error.localizedDescription
+            )
         }
     }
 }
@@ -38,7 +41,11 @@ enum BackupImporter {
                 backup.customPrompts,
                 currentPrompts: enhancementService.customPrompts
             )
-            print("Successfully imported \(backup.customPrompts.count) custom prompts.")
+            print(
+                VoiceInkSettingsBackupImportDiagnostics.customPromptsImportedMessage(
+                    count: backup.customPrompts.count
+                )
+            )
         }
 
         if categories.contains(.powerMode) {
@@ -69,7 +76,11 @@ enum BackupImporter {
                     _ = emojiManager.addCustomEmoji(emoji)
                 }
             }
-            print("Successfully imported \(importPlan.importedConfigurationCount) Power Mode configurations.")
+            print(
+                VoiceInkSettingsBackupImportDiagnostics.powerModeConfigurationsImportedMessage(
+                    count: importPlan.importedConfigurationCount
+                )
+            )
         }
 
         if categories.contains(.customModels) {
@@ -80,7 +91,7 @@ enum BackupImporter {
     @MainActor
     private static func importGeneral(_ general: GeneralBackup?, recordingShortcutManager: RecordingShortcutManager, menuBarManager: MenuBarManager, mediaController: MediaController, playbackController: PlaybackController, soundManager: SoundManager, recorderUIManager: RecorderUIManager) {
         guard let general else {
-            print("No general settings found in the imported file.")
+            print(VoiceInkSettingsBackupImportDiagnostics.noGeneralSettingsMessage)
             return
         }
 
@@ -180,7 +191,7 @@ enum BackupImporter {
         }
         importRollingBufferSettings(generalImportPlans.rollingBuffer)
 
-        print("Successfully imported general settings.")
+        print(VoiceInkSettingsBackupImportDiagnostics.generalSettingsImportedMessage)
     }
 
     @MainActor
@@ -257,10 +268,10 @@ enum BackupImporter {
         )
 
         if !importPlan.hasVocabularyBackupRecords {
-            print("No vocabulary words found in the imported file. Existing items remain unchanged.")
+            print(VoiceInkSettingsBackupImportDiagnostics.noVocabularyWordsMessage)
         }
         if !importPlan.hasWordReplacementBackupRecords {
-            print("No word replacements found in the imported file. Existing replacements remain unchanged.")
+            print(VoiceInkSettingsBackupImportDiagnostics.noWordReplacementsMessage)
         }
 
         for word in importPlan.vocabularyWordsToInsert {
@@ -271,9 +282,13 @@ enum BackupImporter {
         }
 
         guard importPlan.shouldSave else {
-            print("No new dictionary entries were imported.")
+            print(VoiceInkSettingsBackupImportDiagnostics.noDictionaryEntriesImportedMessage)
             if importPlan.skippedInvalidReplacementCount > 0 {
-                print("Skipped \(importPlan.skippedInvalidReplacementCount) invalid word replacements from the imported file.")
+                print(
+                    VoiceInkSettingsBackupImportDiagnostics.skippedInvalidReplacementsMessage(
+                        count: importPlan.skippedInvalidReplacementCount
+                    )
+                )
             }
             return
         }
@@ -283,9 +298,18 @@ enum BackupImporter {
             if importPlan.shouldInvalidateWordReplacementCache {
                 WordReplacementService.shared.invalidateCache()
             }
-            print("Successfully imported \(importPlan.insertedVocabularyWordCount) vocabulary words and \(importPlan.insertedWordReplacementCount) word replacements to SwiftData.")
+            print(
+                VoiceInkSettingsBackupImportDiagnostics.dictionaryEntriesImportedMessage(
+                    vocabularyWordCount: importPlan.insertedVocabularyWordCount,
+                    wordReplacementCount: importPlan.insertedWordReplacementCount
+                )
+            )
             if importPlan.skippedInvalidReplacementCount > 0 {
-                print("Skipped \(importPlan.skippedInvalidReplacementCount) invalid word replacements from the imported file.")
+                print(
+                    VoiceInkSettingsBackupImportDiagnostics.skippedInvalidReplacementsMessage(
+                        count: importPlan.skippedInvalidReplacementCount
+                    )
+                )
             }
         } catch {
             modelContext.rollback()
@@ -296,7 +320,7 @@ enum BackupImporter {
     @MainActor
     private static func importCustomModels(_ models: [VoiceInkCustomCloudModelBackup]?, transcriptionModelManager: TranscriptionModelManager) {
         guard let models else {
-            print("No custom models found in the imported file.")
+            print(VoiceInkSettingsBackupImportDiagnostics.noCustomModelsMessage)
             return
         }
 
@@ -304,7 +328,11 @@ enum BackupImporter {
         customModelManager.customModels = models.map { $0.makeModel() }
         customModelManager.saveCustomModels()
         transcriptionModelManager.refreshAllAvailableModels()
-        print("Successfully imported \(models.count) custom model definitions.")
+        print(
+            VoiceInkSettingsBackupImportDiagnostics.customModelsImportedMessage(
+                count: models.count
+            )
+        )
     }
 
 }

@@ -4602,8 +4602,8 @@ reject_pattern \
   VoiceInk/Services/BackupTypes.swift
 
 require_pattern \
-  "shared settings backup policy owns taxonomy, presentation, and import summary" \
-  'VoiceInkSettingsBackupCategory|VoiceInkSettingsBackupImportPolicy|VoiceInkSettingsBackupPresentation|categorySummary|needsAPIKeyReminder|defaultFileName|importSuccessInformativeText|Custom Model Definitions' \
+  "shared settings backup policy owns taxonomy, presentation, import diagnostics, and import summary" \
+  'VoiceInkSettingsBackupCategory|VoiceInkSettingsBackupImportPolicy|VoiceInkSettingsBackupImportDiagnostics|VoiceInkSettingsBackupPresentation|categorySummary|needsAPIKeyReminder|defaultFileName|importSuccessInformativeText|customPromptsImportedMessage|dictionaryEntriesImportedMessage|Custom Model Definitions' \
   VoiceInkCore/Sources/VoiceInkCore/SettingsBackupPolicy.swift
 
 require_pattern \
@@ -4616,6 +4616,11 @@ require_pattern \
   'Set<VoiceInkSettingsBackupCategory>' \
   VoiceInk/Services/BackupImporter.swift
 
+require_pattern \
+  "macOS backup importer uses shared import diagnostics" \
+  'VoiceInkSettingsBackupImportDiagnostics\.(saveFailedDescription|customPromptsImportedMessage|powerModeConfigurationsImportedMessage|noGeneralSettingsMessage|generalSettingsImportedMessage|noVocabularyWordsMessage|noWordReplacementsMessage|noDictionaryEntriesImportedMessage|skippedInvalidReplacementsMessage|dictionaryEntriesImportedMessage|noCustomModelsMessage|customModelsImportedMessage)' \
+  VoiceInk/Services/BackupImporter.swift
+
 reject_pattern \
   "macOS backup types avoid shell-only backup category taxonomy" \
   'enum +BackupCategory|"General Settings"|"Custom Prompts"|"Power Mode"|"Dictionary"|"Custom Model Definitions"' \
@@ -4626,14 +4631,19 @@ reject_pattern \
   '"(VoiceInk_Settings_Backup\.json|Export VoiceInk Settings|Choose a location to save your settings\.|Export Successful|Your settings have been successfully exported to|Export Error|Could not save settings to file|Export Canceled|The settings export operation was canceled\.|Could not encode settings to JSON|Import VoiceInk Settings|Choose a settings backup, then select what you want to import\.|Import Canceled|The settings import operation was canceled\.|Import Error|Could not get the file URL from the open panel\.|Version Mismatch|Proceeding with import, but be aware of potential incompatibilities\.|No settings were imported\.|Select at least one category to import\.|Error importing settings:|The file might be corrupted or not in the correct format\.|Import Settings|Choose what to import from this backup\.|All|Individual categories|Import Successful|IMPORTANT: If you were using AI enhancement features|It is recommended to restart VoiceInk|Configure API Keys)"' \
   VoiceInk/Services/ImportExportService.swift
 
+reject_pattern \
+  "macOS backup importer avoids shell-only import diagnostics copy" \
+  '"(Failed to save imported|Successfully imported .*custom prompts|Successfully imported .*Power Mode configurations|No general settings found in the imported file\.|Successfully imported general settings\.|No vocabulary words found in the imported file\. Existing items remain unchanged\.|No word replacements found in the imported file\. Existing replacements remain unchanged\.|No new dictionary entries were imported\.|Skipped .* invalid word replacements from the imported file\.|Successfully imported .* vocabulary words and .* word replacements to SwiftData\.|No custom models found in the imported file\.|Successfully imported .* custom model definitions\.)"' \
+  VoiceInk/Services/BackupImporter.swift
+
 require_pattern \
   "core checks execute settings backup policy tests" \
-  'SettingsBackupPolicyTests\.testBackupCategoriesPreserveMacOSImportOrderAndTitles|SettingsBackupPolicyTests\.testBackupImportPolicySummarizesAllAndSelectedCategories|SettingsBackupPolicyTests\.testBackupImportPolicyRemindsOnlyForAPIKeyDependentCategories|SettingsBackupPolicyTests\.testBackupPresentationPreservesMacOSPanelAndAlertCopy|SettingsBackupPolicyTests\.testBackupPresentationBuildsDynamicExportAndImportMessages|SettingsBackupPolicyTests\.testBackupPresentationBuildsImportSuccessTextWithOptionalAPIKeyReminder' \
+  'SettingsBackupPolicyTests\.testBackupCategoriesPreserveMacOSImportOrderAndTitles|SettingsBackupPolicyTests\.testBackupImportPolicySummarizesAllAndSelectedCategories|SettingsBackupPolicyTests\.testBackupImportPolicyRemindsOnlyForAPIKeyDependentCategories|SettingsBackupPolicyTests\.testBackupImportDiagnosticsPreserveMacOSStatusCopy|SettingsBackupPolicyTests\.testBackupPresentationPreservesMacOSPanelAndAlertCopy|SettingsBackupPolicyTests\.testBackupPresentationBuildsDynamicExportAndImportMessages|SettingsBackupPolicyTests\.testBackupPresentationBuildsImportSuccessTextWithOptionalAPIKeyReminder' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "migration checklist tracks shared settings backup policy" \
-  'settings backup category taxonomy, ordered category titles, import/export panel copy, alert titles/messages, version-mismatch warning, import summary text, API-key-reminder gate, and restart recommendation use `VoiceInkSettingsBackupCategory`/`VoiceInkSettingsBackupImportPolicy`/`VoiceInkSettingsBackupPresentation`' \
+  'settings backup category taxonomy, ordered category titles, import/export panel copy, import status/error diagnostic copy, alert titles/messages, version-mismatch warning, import summary text, API-key-reminder gate, and restart recommendation use `VoiceInkSettingsBackupCategory`/`VoiceInkSettingsBackupImportPolicy`/`VoiceInkSettingsBackupImportDiagnostics`/`VoiceInkSettingsBackupPresentation`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

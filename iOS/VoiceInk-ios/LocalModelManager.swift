@@ -121,22 +121,31 @@ class LocalModelManager: ObservableObject {
     
     /// Delete a downloaded model
     func deleteModel(_ model: VoiceInkWhisperModelFileSpec) throws {
-        guard model.isDownloaded(in: Self.modelsDirectory) else {
+        let deletionPlan = VoiceInkWhisperModelDeletionPolicy.plan(
+            for: model,
+            in: Self.modelsDirectory
+        )
+
+        switch deletionPlan.action {
+        case .skipMissingFile:
             logger.notice("Model \(model.modelName, privacy: .public) is not downloaded.")
-            return 
-        }
-        
-        do {
-            try model.deleteDownloadedFiles(in: Self.modelsDirectory)
-            logger.notice("Successfully deleted model \(model.modelName, privacy: .public).")
-            
-            // Trigger UI update
-            DispatchQueue.main.async {
-                self.objectWillChange.send()
+            return
+
+        case .deleteDownloadedFiles:
+            do {
+                try model.deleteDownloadedFiles(in: Self.modelsDirectory)
+                logger.notice("Successfully deleted model \(model.modelName, privacy: .public).")
+
+                if deletionPlan.shouldRefreshAfterSuccessfulDelete {
+                    // The downloaded-state query is file-backed, so force SwiftUI to refresh the row.
+                    DispatchQueue.main.async {
+                        self.objectWillChange.send()
+                    }
+                }
+            } catch {
+                logger.error("Failed to delete model \(model.modelName, privacy: .public): \(error.localizedDescription, privacy: .public)")
+                throw error
             }
-        } catch {
-            logger.error("Failed to delete model \(model.modelName, privacy: .public): \(error.localizedDescription, privacy: .public)")
-            throw error
         }
     }
     

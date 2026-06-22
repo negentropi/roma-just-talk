@@ -666,6 +666,46 @@ final class WhisperModelFilesTests: XCTestCase {
         XCTAssertFalse(idleRow.shouldShowDeleteAction)
     }
 
+    func testSimpleDownloadDeletionPolicyPreservesIOSDeleteIntent() throws {
+        let missingPlan = VoiceInkWhisperModelDeletionPlan(
+            action: .skipMissingFile,
+            shouldRefreshAfterSuccessfulDelete: false
+        )
+        let downloadedPlan = VoiceInkWhisperModelDeletionPlan(
+            action: .deleteDownloadedFiles,
+            shouldRefreshAfterSuccessfulDelete: true
+        )
+
+        XCTAssertEqual(
+            VoiceInkWhisperModelDeletionPolicy.plan(isDownloaded: false),
+            missingPlan
+        )
+
+        XCTAssertEqual(
+            VoiceInkWhisperModelDeletionPolicy.plan(isDownloaded: true),
+            downloadedPlan
+        )
+
+        let baseDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.ModelDeletionPlanTests.\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: baseDirectory) }
+
+        let modelsDirectory = try VoiceInkWhisperModelFiles.createModelsDirectory(in: baseDirectory)
+        let model = VoiceInkWhisperModelFiles.baseModel
+
+        XCTAssertEqual(
+            VoiceInkWhisperModelDeletionPolicy.plan(for: model, in: modelsDirectory),
+            missingPlan
+        )
+
+        try Data().write(to: model.fileURL(in: modelsDirectory))
+
+        XCTAssertEqual(
+            VoiceInkWhisperModelDeletionPolicy.plan(for: model, in: modelsDirectory),
+            downloadedPlan
+        )
+    }
+
     func testMacOSDownloadProgressUsesMainAndCoreMLKeys() {
         let startingProgress = VoiceInkWhisperModelDownloadProgress.macOS(
             modelName: "ggml-base",

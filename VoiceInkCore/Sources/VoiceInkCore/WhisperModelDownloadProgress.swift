@@ -373,6 +373,48 @@ public struct VoiceInkWhisperModelDownloadState: Equatable, Sendable {
     }
 }
 
+public enum VoiceInkWhisperModelDeletionAction: Equatable, Sendable {
+    case skipMissingFile
+    case deleteDownloadedFiles
+}
+
+public struct VoiceInkWhisperModelDeletionPlan: Equatable, Sendable {
+    public let action: VoiceInkWhisperModelDeletionAction
+    public let shouldRefreshAfterSuccessfulDelete: Bool
+
+    public init(
+        action: VoiceInkWhisperModelDeletionAction,
+        shouldRefreshAfterSuccessfulDelete: Bool
+    ) {
+        self.action = action
+        self.shouldRefreshAfterSuccessfulDelete = shouldRefreshAfterSuccessfulDelete
+    }
+}
+
+public enum VoiceInkWhisperModelDeletionPolicy {
+    public static func plan(
+        for model: VoiceInkWhisperModelFileSpec,
+        in modelsDirectory: URL,
+        fileManager: FileManager = .default
+    ) -> VoiceInkWhisperModelDeletionPlan {
+        plan(isDownloaded: model.isDownloaded(in: modelsDirectory, fileManager: fileManager))
+    }
+
+    public static func plan(isDownloaded: Bool) -> VoiceInkWhisperModelDeletionPlan {
+        if isDownloaded {
+            return VoiceInkWhisperModelDeletionPlan(
+                action: .deleteDownloadedFiles,
+                shouldRefreshAfterSuccessfulDelete: true
+            )
+        }
+
+        return VoiceInkWhisperModelDeletionPlan(
+            action: .skipMissingFile,
+            shouldRefreshAfterSuccessfulDelete: false
+        )
+    }
+}
+
 public struct VoiceInkWhisperModelManagementRow: Equatable, Identifiable, Sendable {
     public let model: VoiceInkWhisperModelFileSpec
     public let presentation: VoiceInkWhisperModelDownloadRowPresentation

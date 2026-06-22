@@ -3195,6 +3195,16 @@ require_pattern \
   'VoiceInkWhisperModelManagementList\.(row|rows)|managementRow' \
   iOS/VoiceInk-ios/LocalModelManager.swift
 
+require_pattern \
+  "iOS local model manager delegates delete planning to shared core" \
+  'VoiceInkWhisperModelDeletionPolicy\.plan' \
+  iOS/VoiceInk-ios/LocalModelManager.swift
+
+require_pattern \
+  "iOS local model manager applies shared delete refresh intent" \
+  'deletionPlan\.shouldRefreshAfterSuccessfulDelete' \
+  iOS/VoiceInk-ios/LocalModelManager.swift
+
 reject_pattern \
   "iOS local model manager avoids shell-owned download state dictionaries" \
   '@Published var +(downloadProgress|isDownloading)|isDownloading\[[^]]+\]|downloadProgress\[[^]]+\]' \
@@ -3253,6 +3263,11 @@ require_pattern \
 reject_pattern \
   "iOS local model manager avoids shell-owned download completion failure mapping" \
   'VoiceInkWhisperModelDownloadResponsePolicy\.completion|serverErrorDuringDownload|noFileReceived|downloadFailed\(for:|NSURLErrorCancelled|CancellationError' \
+  iOS/VoiceInk-ios/LocalModelManager.swift
+
+reject_pattern \
+  "iOS local model manager avoids shell-owned delete downloaded gate" \
+  'model\.isDownloaded\(in:' \
   iOS/VoiceInk-ios/LocalModelManager.swift
 
 require_pattern \
@@ -3521,6 +3536,21 @@ require_pattern \
   "shared local model row presentation exposes one action enum" \
   'VoiceInkWhisperModelDownloadRowAction' \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+
+require_pattern \
+  "shared local model deletion policy lives in VoiceInkCore" \
+  'VoiceInkWhisperModelDeletion(Policy|Plan|Action)' \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+
+require_pattern \
+  "shared local model deletion policy owns downloaded-state lookup" \
+  'for model: VoiceInkWhisperModelFileSpec' \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+
+require_pattern \
+  "core check runner executes local model deletion policy test" \
+  'testSimpleDownloadDeletionPolicyPreservesIOSDeleteIntent' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \
   "shared local model row presentation avoids shallow action booleans" \

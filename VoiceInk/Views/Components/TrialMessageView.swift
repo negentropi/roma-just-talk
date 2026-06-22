@@ -2,26 +2,19 @@ import SwiftUI
 import VoiceInkCore
 
 struct TrialMessageView: View {
-    let message: String
-    let type: MessageType
+    let presentation: VoiceInkLicenseTrialBanner
     var onAddLicenseKey: (() -> Void)? = nil
-    
-    enum MessageType {
-        case warning
-        case expired
-        case info
-    }
     
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: icon)
+            Image(systemName: presentation.systemImageName)
                 .font(.system(size: 20))
                 .foregroundColor(iconColor)
             
             VStack(alignment: .leading, spacing: 4) {
-                Text(title)
+                Text(presentation.title)
                     .font(.headline)
-                Text(message)
+                Text(presentation.message)
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }
@@ -32,7 +25,7 @@ struct TrialMessageView: View {
                 Button(action: {
                     onAddLicenseKey?()
                 }) {
-                    Text("Enter License")
+                    Text(presentation.enterLicenseButtonTitle)
                         .font(.system(size: 13, weight: .medium))
                 }
                 .buttonStyle(.bordered)
@@ -40,7 +33,7 @@ struct TrialMessageView: View {
                 Button(action: {
                     NSWorkspace.shared.open(VoiceInkLicenseLinks.purchaseURL)
                 }) {
-                    Text("Buy License")
+                    Text(presentation.purchaseButtonTitle)
                         .font(.system(size: 13, weight: .medium))
                 }
                 .buttonStyle(.borderedProminent)
@@ -51,32 +44,16 @@ struct TrialMessageView: View {
         .cornerRadius(12)
     }
     
-    private var icon: String {
-        switch type {
-        case .warning: return "exclamationmark.triangle.fill"
-        case .expired: return "xmark.circle.fill"
-        case .info: return "info.circle.fill"
-        }
-    }
-    
     private var iconColor: Color {
-        switch type {
+        switch presentation.tone {
         case .warning: return .orange
         case .expired: return .red
         case .info: return .blue
         }
     }
     
-    private var title: String {
-        switch type {
-        case .warning: return "Trial Ending Soon"
-        case .expired: return "Trial Expired"
-        case .info: return "Trial Active"
-        }
-    }
-    
     private var backgroundColor: Color {
-        switch type {
+        switch presentation.tone {
         case .warning: return Color.orange.opacity(0.1)
         case .expired: return Color.red.opacity(0.1)
         case .info: return Color.blue.opacity(0.1)

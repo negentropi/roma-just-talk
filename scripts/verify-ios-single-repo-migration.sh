@@ -12027,7 +12027,7 @@ reject_pattern \
 
 require_pattern \
   "shared license preference policy lives in VoiceInkCore" \
-  'VoiceInkLicenseStatusChangeRequest|notificationName = Notification\.Name\("licenseStatusChanged"\)|VoiceInkLicensePreference|requiresActivationKey|hasLaunchedBeforeKey|activationsLimitKey|deviceIdentifierKey|hasUsableStoredLicense|VoiceInkLicenseStartupPolicy|VoiceInkLicenseStartupPlan|VoiceInkLicenseState|VoiceInkLicenseLinks|purchaseURLString|purchaseDisplayURLString|managementPortalURLString|VoiceInkLicenseManagementPresentation|VoiceInkLicenseManagementResourceLink|VoiceInkLicenseManagementFeature|VoiceInkLicenseRemovalPolicy|VoiceInkLicenseRemovalPlan|VoiceInkLicenseValidationPolicy|VoiceInkLicenseValidationFeedback|VoiceInkLicenseValidationApplicationPlan|VoiceInkLicenseServicePolicy|VoiceInkLicenseOperation|VoiceInkLicenseError|VoiceInkLicenseSecureStorageAccount|VoiceInkLicenseSecureStoragePolicy' \
+  'VoiceInkLicenseStatusChangeRequest|notificationName = Notification\.Name\("licenseStatusChanged"\)|VoiceInkLicensePreference|requiresActivationKey|hasLaunchedBeforeKey|activationsLimitKey|deviceIdentifierKey|hasUsableStoredLicense|VoiceInkLicenseStartupPolicy|VoiceInkLicenseStartupPlan|VoiceInkLicenseState|VoiceInkLicenseLinks|purchaseURLString|purchaseDisplayURLString|managementPortalURLString|VoiceInkLicenseManagementPresentation|VoiceInkLicenseManagementResourceLink|VoiceInkLicenseManagementFeature|VoiceInkLicenseTrialBannerPresentation|VoiceInkLicenseTrialBanner|VoiceInkLicenseTrialBannerTone|VoiceInkLicenseRemovalPolicy|VoiceInkLicenseRemovalPlan|VoiceInkLicenseValidationPolicy|VoiceInkLicenseValidationFeedback|VoiceInkLicenseValidationApplicationPlan|VoiceInkLicenseServicePolicy|VoiceInkLicenseOperation|VoiceInkLicenseError|VoiceInkLicenseSecureStorageAccount|VoiceInkLicenseSecureStoragePolicy' \
   VoiceInkCore/Sources/VoiceInkCore/LicensePolicy.swift
 
 require_pattern \
@@ -12126,6 +12126,21 @@ require_pattern \
   VoiceInk/Views/Components/TrialMessageView.swift
 
 require_pattern \
+  "macOS metrics view uses shared trial banner presentation" \
+  'VoiceInkLicenseTrialBannerPresentation\.banner' \
+  VoiceInk/Views/MetricsView.swift
+
+require_patterns \
+  "macOS trial message view renders shared trial banner presentation" \
+  VoiceInk/Views/Components/TrialMessageView.swift \
+  'let presentation: VoiceInkLicenseTrialBanner' \
+  'presentation\.systemImageName' \
+  'presentation\.title' \
+  'presentation\.message' \
+  'presentation\.enterLicenseButtonTitle' \
+  'presentation\.purchaseButtonTitle'
+
+require_pattern \
   "macOS license view model applies shared removal policy" \
   'VoiceInkLicenseRemovalPolicy\.plan|VoiceInkLicenseRemovalPlan|plan\.(requiresActivationToSave|hasLaunchedBeforeToSave|activationsLimitToSave|shouldReloadStartupState)' \
   VoiceInk/Models/LicenseViewModel.swift
@@ -12137,12 +12152,12 @@ require_pattern \
 
 require_pattern \
   "core checks execute license preference tests" \
-  'LicensePolicyTests\.testLicensePreferenceKeysPreserveExistingStorageNames|LicensePolicyTests\.testLicenseStatusChangeRequestPreservesMacOSNotificationName|LicensePolicyTests\.testLicensePreferenceStorageRoundTripsNonSensitiveFlags|LicensePolicyTests\.testDeviceIdentifierCreatesAndStoresFallbackWhenMissing|LicensePolicyTests\.testStoredLicenseAccessPreservesExistingActivationRequirementPolicy|LicensePolicyTests\.testLicenseStartupPolicyPlansStoredLicenseAndTrialLifecycle|LicensePolicyTests\.testLicenseValidationPolicyPreservesMacOSFeedbackMessages|LicensePolicyTests\.testLicenseValidationApplicationPlansPreserveMacOSStorageWritesAndSuccessCopy|LicensePolicyTests\.testLicenseLinksPreservePurchaseAndManagementDestinations|LicensePolicyTests\.testLicenseManagementPresentationPreservesMacOSCopyAndResources|LicensePolicyTests\.testLicenseRemovalPolicyPreservesMacOSResetPlan|LicensePolicyTests\.testLicenseSecureStoragePolicyPreservesDeviceLocalAccountsAndTrialDateCodec|LicensePolicyTests\.testLicenseServicePolicyPreservesPolarEndpointsAndHeaders|LicensePolicyTests\.testLicenseHTTPStatusPolicyPreservesMacOSErrorMapping' \
+  'LicensePolicyTests\.testLicensePreferenceKeysPreserveExistingStorageNames|LicensePolicyTests\.testLicenseStatusChangeRequestPreservesMacOSNotificationName|LicensePolicyTests\.testLicensePreferenceStorageRoundTripsNonSensitiveFlags|LicensePolicyTests\.testDeviceIdentifierCreatesAndStoresFallbackWhenMissing|LicensePolicyTests\.testStoredLicenseAccessPreservesExistingActivationRequirementPolicy|LicensePolicyTests\.testLicenseStartupPolicyPlansStoredLicenseAndTrialLifecycle|LicensePolicyTests\.testLicenseValidationPolicyPreservesMacOSFeedbackMessages|LicensePolicyTests\.testLicenseValidationApplicationPlansPreserveMacOSStorageWritesAndSuccessCopy|LicensePolicyTests\.testLicenseLinksPreservePurchaseAndManagementDestinations|LicensePolicyTests\.testLicenseManagementPresentationPreservesMacOSCopyAndResources|LicensePolicyTests\.testLicenseTrialBannerPresentationPreservesMacOSCopyAndThreshold|LicensePolicyTests\.testLicenseRemovalPolicyPreservesMacOSResetPlan|LicensePolicyTests\.testLicenseSecureStoragePolicyPreservesDeviceLocalAccountsAndTrialDateCodec|LicensePolicyTests\.testLicenseServicePolicyPreservesPolarEndpointsAndHeaders|LicensePolicyTests\.testLicenseHTTPStatusPolicyPreservesMacOSErrorMapping' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "migration checklist tracks shared license secure storage policy" \
-  'license startup/trial lifecycle.*validation feedback/application planning.*purchase/management URL policy.*support-link metadata.*activation/deactivation copy.*VoiceInkLicenseStartupPolicy`/`VoiceInkLicenseValidationPolicy`/`VoiceInkLicenseLinks`/`VoiceInkLicenseManagementPresentation`/`VoiceInkLicenseRemovalPolicy`/`VoiceInkLicenseSecureStorageAccount`/`VoiceInkLicenseSecureStoragePolicy' \
+  'license startup/trial lifecycle.*validation feedback/application planning.*purchase/management URL policy.*support-link metadata.*activation/deactivation copy.*trial-banner presentation.*VoiceInkLicenseStartupPolicy`/`VoiceInkLicenseValidationPolicy`/`VoiceInkLicenseLinks`/`VoiceInkLicenseManagementPresentation`/`VoiceInkLicenseTrialBannerPresentation`/`VoiceInkLicenseRemovalPolicy`/`VoiceInkLicenseSecureStorageAccount`/`VoiceInkLicenseSecureStoragePolicy' \
   docs/ios-single-repo-migration.md
 
 reject_pattern \
@@ -12160,6 +12175,12 @@ reject_pattern \
   "macOS license management view avoids shell-owned presentation copy and resource links" \
   '"(VoiceInk Pro|Upgrade to Pro|Thank you for supporting VoiceInk|Transcribe what you say to text instantly with AI|Buy Once, Own Forever|Upgrade to VoiceInk Pro|Already have a license\?|Enter your license key|Activate|Already purchased\?|Manage your license and device activations|License Management Portal|License Active|Active|This license can be activated on up to|You can use VoiceInk Pro on all your personal devices|License Management|Deactivate License|Changelog|Discord|Email Support|Docs|Tip Jar|Priority Support|Lifetime Access|Free Updates|Multiple Devices)"|github\.com/Beingpax/VoiceInk/releases|discord\.gg/xryDy57nYD|tryvoiceink\.com/docs|buymeacoffee\.com/beingpax' \
   VoiceInk/Views/LicenseManagementView.swift
+
+reject_pattern \
+  "macOS trial banner views avoid shell-owned trial copy and icon policy" \
+  '"(You have .* days left in your trial|Your trial has expired\. Upgrade to continue using VoiceInk|Trial Ending Soon|Trial Expired|Trial Active|Enter License|Buy License|exclamationmark\.triangle\.fill|xmark\.circle\.fill|info\.circle\.fill)"|enum MessageType|daysRemaining <= 2' \
+  VoiceInk/Views/MetricsView.swift \
+  VoiceInk/Views/Components/TrialMessageView.swift
 
 reject_pattern \
   "license consumers avoid raw license links" \

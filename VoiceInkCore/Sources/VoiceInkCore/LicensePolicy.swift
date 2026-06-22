@@ -342,6 +342,80 @@ public enum VoiceInkLicenseManagementPresentation {
     }
 }
 
+public enum VoiceInkLicenseTrialBannerTone: Equatable, Sendable {
+    case warning
+    case expired
+    case info
+}
+
+public struct VoiceInkLicenseTrialBanner: Equatable, Sendable {
+    public let tone: VoiceInkLicenseTrialBannerTone
+    public let title: String
+    public let message: String
+    public let systemImageName: String
+    public let enterLicenseButtonTitle: String
+    public let purchaseButtonTitle: String
+
+    public init(
+        tone: VoiceInkLicenseTrialBannerTone,
+        title: String,
+        message: String,
+        systemImageName: String,
+        enterLicenseButtonTitle: String,
+        purchaseButtonTitle: String
+    ) {
+        self.tone = tone
+        self.title = title
+        self.message = message
+        self.systemImageName = systemImageName
+        self.enterLicenseButtonTitle = enterLicenseButtonTitle
+        self.purchaseButtonTitle = purchaseButtonTitle
+    }
+}
+
+public enum VoiceInkLicenseTrialBannerPresentation {
+    public static let warningThresholdDaysRemaining = 2
+    public static let warningTitle = "Trial Ending Soon"
+    public static let expiredTitle = "Trial Expired"
+    public static let infoTitle = "Trial Active"
+    public static let warningSystemImageName = "exclamationmark.triangle.fill"
+    public static let expiredSystemImageName = "xmark.circle.fill"
+    public static let infoSystemImageName = "info.circle.fill"
+    public static let enterLicenseButtonTitle = "Enter License"
+    public static let purchaseButtonTitle = "Buy License"
+    public static let expiredMessage = "Your trial has expired. Upgrade to continue using VoiceInk"
+
+    public static func trialMessage(daysRemaining: Int) -> String {
+        "You have \(daysRemaining) days left in your trial"
+    }
+
+    public static func banner(for licenseState: VoiceInkLicenseState) -> VoiceInkLicenseTrialBanner? {
+        switch licenseState {
+        case .trial(let daysRemaining):
+            let isWarning = daysRemaining <= warningThresholdDaysRemaining
+            return VoiceInkLicenseTrialBanner(
+                tone: isWarning ? .warning : .info,
+                title: isWarning ? warningTitle : infoTitle,
+                message: trialMessage(daysRemaining: daysRemaining),
+                systemImageName: isWarning ? warningSystemImageName : infoSystemImageName,
+                enterLicenseButtonTitle: enterLicenseButtonTitle,
+                purchaseButtonTitle: purchaseButtonTitle
+            )
+        case .trialExpired:
+            return VoiceInkLicenseTrialBanner(
+                tone: .expired,
+                title: expiredTitle,
+                message: expiredMessage,
+                systemImageName: expiredSystemImageName,
+                enterLicenseButtonTitle: enterLicenseButtonTitle,
+                purchaseButtonTitle: purchaseButtonTitle
+            )
+        case .licensed:
+            return nil
+        }
+    }
+}
+
 public struct VoiceInkLicenseRemovalPlan: Equatable, Sendable {
     public let requiresActivationToSave: Bool
     public let hasLaunchedBeforeToSave: Bool

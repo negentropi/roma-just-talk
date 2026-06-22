@@ -373,6 +373,49 @@ final class LicensePolicyTests: XCTestCase {
         )
     }
 
+    func testLicenseTrialBannerPresentationPreservesMacOSCopyAndThreshold() {
+        XCTAssertEqual(VoiceInkLicenseTrialBannerPresentation.warningThresholdDaysRemaining, 2)
+        XCTAssertEqual(VoiceInkLicenseTrialBannerPresentation.trialMessage(daysRemaining: 4), "You have 4 days left in your trial")
+
+        XCTAssertEqual(
+            VoiceInkLicenseTrialBannerPresentation.banner(for: .trial(daysRemaining: 4)),
+            VoiceInkLicenseTrialBanner(
+                tone: .info,
+                title: "Trial Active",
+                message: "You have 4 days left in your trial",
+                systemImageName: "info.circle.fill",
+                enterLicenseButtonTitle: "Enter License",
+                purchaseButtonTitle: "Buy License"
+            )
+        )
+
+        XCTAssertEqual(
+            VoiceInkLicenseTrialBannerPresentation.banner(for: .trial(daysRemaining: 2)),
+            VoiceInkLicenseTrialBanner(
+                tone: .warning,
+                title: "Trial Ending Soon",
+                message: "You have 2 days left in your trial",
+                systemImageName: "exclamationmark.triangle.fill",
+                enterLicenseButtonTitle: "Enter License",
+                purchaseButtonTitle: "Buy License"
+            )
+        )
+
+        XCTAssertEqual(
+            VoiceInkLicenseTrialBannerPresentation.banner(for: .trialExpired),
+            VoiceInkLicenseTrialBanner(
+                tone: .expired,
+                title: "Trial Expired",
+                message: "Your trial has expired. Upgrade to continue using VoiceInk",
+                systemImageName: "xmark.circle.fill",
+                enterLicenseButtonTitle: "Enter License",
+                purchaseButtonTitle: "Buy License"
+            )
+        )
+
+        XCTAssertNil(VoiceInkLicenseTrialBannerPresentation.banner(for: .licensed))
+    }
+
     func testLicenseRemovalPolicyPreservesMacOSResetPlan() {
         XCTAssertEqual(
             VoiceInkLicenseRemovalPolicy.plan(),

@@ -19,7 +19,7 @@ LATENCY_SAMPLES ?= 5
 LATENCY_TRIGGER ?= left-shift
 LATENCY_THRESHOLD_MS ?= 440
 
-.PHONY: all clean whisper setup build local check healthcheck help dev run latency-harness-build latency-harness-app latency-harness-run latency-harness-app-run
+.PHONY: all clean whisper setup build local check healthcheck help dev run latency-harness-build latency-harness-app latency-harness-check latency-harness-run latency-harness-app-run
 
 # Default target
 all: check build
@@ -54,6 +54,10 @@ latency-harness-app: latency-harness-build
 	@echo "Harness app: $(LATENCY_HARNESS_APP)"
 	@codesign -dvvv "$(LATENCY_HARNESS_APP)" 2>&1 | sed -n '1,8p'
 
+latency-harness-check:
+	bash scripts/check-latency-harness-makefile.sh
+	bash scripts/check-visible-text-latency-harness.sh
+
 latency-harness-run: latency-harness-build
 	@if [ -z "$(LATENCY_EXPECTED)" ]; then \
 		echo "Set LATENCY_EXPECTED to a unique transcript marker."; \
@@ -66,10 +70,14 @@ latency-harness-run: latency-harness-build
 		--trigger "$(LATENCY_TRIGGER)" \
 		--threshold-ms "$(LATENCY_THRESHOLD_MS)"
 
-latency-harness-app-run: latency-harness-app
+latency-harness-app-run:
 	@if [ -z "$(LATENCY_EXPECTED)" ]; then \
 		echo "Set LATENCY_EXPECTED to a unique transcript marker."; \
 		echo "Example: make latency-harness-app-run LATENCY_EXPECTED='roma latency marker'"; \
+		exit 2; \
+	fi
+	@if [ ! -x "$(LATENCY_HARNESS_APP_EXECUTABLE)" ]; then \
+		echo "Build the helper app first with: make latency-harness-app"; \
 		exit 2; \
 	fi
 	@rm -f "$(LATENCY_HARNESS_REPORT)" "$(LATENCY_HARNESS_STDOUT)" "$(LATENCY_HARNESS_STDERR)"
@@ -187,6 +195,7 @@ help:
 	@echo "  all                Run full build process (default)"
 	@echo "  latency-harness-build  Compile real visible-text latency harness"
 	@echo "  latency-harness-app    Build stable signed helper app for TCC grants"
+	@echo "  latency-harness-check  Verify helper-app run target preserves TCC identity"
 	@echo "  latency-harness-run    Run CLI latency samples; set LATENCY_EXPECTED"
 	@echo "  latency-harness-app-run Run helper-app latency samples; set LATENCY_EXPECTED"
 	@echo "  clean              Remove build artifacts"

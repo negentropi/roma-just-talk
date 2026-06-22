@@ -3,20 +3,6 @@ import LaunchAtLogin
 import SwiftData
 import VoiceInkCore
 
-enum BackupImportError: LocalizedError {
-    case saveFailed(String, Error)
-
-    var errorDescription: String? {
-        switch self {
-        case .saveFailed(let item, let error):
-            return VoiceInkSettingsBackupImportDiagnostics.saveFailedDescription(
-                item: item,
-                localizedDescription: error.localizedDescription
-            )
-        }
-    }
-}
-
 enum BackupImporter {
     @MainActor
     static func apply(_ backup: BackupFile, categories: Set<VoiceInkSettingsBackupCategory>, enhancementService: AIEnhancementService, recordingShortcutManager: RecordingShortcutManager, menuBarManager: MenuBarManager, mediaController: MediaController, playbackController: PlaybackController, soundManager: SoundManager, recorderUIManager: RecorderUIManager, modelContext: ModelContext, transcriptionModelManager: TranscriptionModelManager) throws {
@@ -313,7 +299,10 @@ enum BackupImporter {
             }
         } catch {
             modelContext.rollback()
-            throw BackupImportError.saveFailed("dictionary entries", error)
+            throw VoiceInkSettingsBackupImportError.saveFailed(
+                item: "dictionary entries",
+                localizedDescription: error.localizedDescription
+            )
         }
     }
 

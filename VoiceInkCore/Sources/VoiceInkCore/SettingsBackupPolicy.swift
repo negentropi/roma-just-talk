@@ -76,6 +76,20 @@ public enum VoiceInkSettingsBackupImportDiagnostics {
     }
 }
 
+public enum VoiceInkSettingsBackupImportError: LocalizedError, Sendable {
+    case saveFailed(item: String, localizedDescription: String)
+
+    public var errorDescription: String? {
+        switch self {
+        case .saveFailed(let item, let localizedDescription):
+            VoiceInkSettingsBackupImportDiagnostics.saveFailedDescription(
+                item: item,
+                localizedDescription: localizedDescription
+            )
+        }
+    }
+}
+
 public struct VoiceInkSettingsBackupPresentation: Equatable, Sendable {
     public let defaultFileName: String
     public let exportPanelTitle: String

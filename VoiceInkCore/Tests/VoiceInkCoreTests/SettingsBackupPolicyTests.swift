@@ -97,6 +97,18 @@ final class SettingsBackupPolicyTests: XCTestCase {
         )
     }
 
+    func testBackupImportErrorPreservesMacOSSaveFailureCopy() {
+        let error = VoiceInkSettingsBackupImportError.saveFailed(
+            item: "dictionary entries",
+            localizedDescription: "disk full"
+        )
+
+        XCTAssertEqual(
+            VoiceInkErrorDescription.text(for: error),
+            "Failed to save imported dictionary entries: disk full"
+        )
+    }
+
     func testBackupPresentationPreservesMacOSPanelAndAlertCopy() {
         let presentation = VoiceInkSettingsBackupPresentation.macOS
 

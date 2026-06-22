@@ -366,7 +366,9 @@ struct TranscriptionHistoryView: View {
                 )
             )
         } catch {
-            print("Error loading transcriptions: \(error)")
+            print(VoiceInkHistoryDiagnostics.initialLoadFailedMessage(
+                errorDescription: String(describing: error)
+            ))
         }
     }
 
@@ -392,7 +394,9 @@ struct TranscriptionHistoryView: View {
                 )
             )
         } catch {
-            print("Error loading more transcriptions: \(error)")
+            print(VoiceInkHistoryDiagnostics.loadMoreFailedMessage(
+                errorDescription: String(describing: error)
+            ))
         }
     }
     
@@ -436,7 +440,9 @@ struct TranscriptionHistoryView: View {
             NotificationCenter.default.post(name: .transcriptionDeleted, object: nil)
             await loadInitialContent()
         } catch {
-            print("Error saving deletion: \(error.localizedDescription)")
+            print(VoiceInkHistoryDiagnostics.saveDeletionFailedMessage(
+                localizedDescription: error.localizedDescription
+            ))
             await loadInitialContent()
         }
     }
@@ -481,7 +487,9 @@ struct TranscriptionHistoryView: View {
                 )
             }
         } catch {
-            print("Error selecting all transcriptions: \(error)")
+            print(VoiceInkHistoryDiagnostics.selectAllFailedMessage(
+                errorDescription: String(describing: error)
+            ))
         }
     }
 }

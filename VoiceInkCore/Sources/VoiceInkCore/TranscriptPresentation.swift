@@ -282,6 +282,24 @@ public enum VoiceInkHistoryPresentation {
     }
 }
 
+public enum VoiceInkHistoryDiagnostics {
+    public static func initialLoadFailedMessage(errorDescription: String) -> String {
+        "Error loading transcriptions: \(errorDescription)"
+    }
+
+    public static func loadMoreFailedMessage(errorDescription: String) -> String {
+        "Error loading more transcriptions: \(errorDescription)"
+    }
+
+    public static func saveDeletionFailedMessage(localizedDescription: String) -> String {
+        "Error saving deletion: \(localizedDescription)"
+    }
+
+    public static func selectAllFailedMessage(errorDescription: String) -> String {
+        "Error selecting all transcriptions: \(errorDescription)"
+    }
+}
+
 public struct VoiceInkHistoryPaginationPlan<Item> {
     public let displayedItems: [Item]
     public let lastTimestamp: Date?

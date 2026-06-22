@@ -298,6 +298,25 @@ final class TranscriptPresentationTests: XCTestCase {
         XCTAssertEqual(VoiceInkHistoryPresentation.deleteConfirmationCancelButtonTitle, "Cancel")
     }
 
+    func testHistoryDiagnosticsPreserveMacOSConsoleCopy() {
+        XCTAssertEqual(
+            VoiceInkHistoryDiagnostics.initialLoadFailedMessage(errorDescription: "store unavailable"),
+            "Error loading transcriptions: store unavailable"
+        )
+        XCTAssertEqual(
+            VoiceInkHistoryDiagnostics.loadMoreFailedMessage(errorDescription: "cursor expired"),
+            "Error loading more transcriptions: cursor expired"
+        )
+        XCTAssertEqual(
+            VoiceInkHistoryDiagnostics.saveDeletionFailedMessage(localizedDescription: "permission denied"),
+            "Error saving deletion: permission denied"
+        )
+        XCTAssertEqual(
+            VoiceInkHistoryDiagnostics.selectAllFailedMessage(errorDescription: "fetch failed"),
+            "Error selecting all transcriptions: fetch failed"
+        )
+    }
+
     func testTranscriptionMetadataPresentationPreservesMacOSDetailRows() {
         XCTAssertEqual(VoiceInkTranscriptionMetadataPresentation.detailsSectionTitle, "Details")
         XCTAssertEqual(

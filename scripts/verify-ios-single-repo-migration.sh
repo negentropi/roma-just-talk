@@ -2377,6 +2377,16 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
 
 require_pattern \
+  "shared history diagnostics own macOS console copy" \
+  'VoiceInkHistoryDiagnostics|initialLoadFailedMessage|loadMoreFailedMessage|saveDeletionFailedMessage|selectAllFailedMessage' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+
+require_pattern \
+  "core checks execute history diagnostic copy test" \
+  'TranscriptPresentationTests\.testHistoryDiagnosticsPreserveMacOSConsoleCopy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "macOS full history uses shared history search prompt" \
   'VoiceInkHistoryPresentation\.macOSHistorySearchPrompt' \
   VoiceInk/Views/History/TranscriptionHistoryView.swift
@@ -2413,6 +2423,12 @@ require_pattern \
 require_pattern \
   "macOS history views use shared delete alert copy" \
   'VoiceInkHistoryPresentation\.deleteConfirmation(Title|PrimaryButtonTitle|CancelButtonTitle)' \
+  VoiceInk/Views/History/TranscriptionHistoryView.swift \
+  VoiceInk/Views/History/InlineHistoryView.swift
+
+require_pattern \
+  "macOS history views use shared history diagnostics" \
+  'VoiceInkHistoryDiagnostics\.(initialLoadFailedMessage|loadMoreFailedMessage|saveDeletionFailedMessage|selectAllFailedMessage)' \
   VoiceInk/Views/History/TranscriptionHistoryView.swift \
   VoiceInk/Views/History/InlineHistoryView.swift
 
@@ -2476,6 +2492,12 @@ reject_pattern \
 reject_pattern \
   "macOS history views avoid shell-only history control copy" \
   '"(Search transcriptions|Search transcriptions\.\.\.|Loading\.\.\.|Load More|Select All|Deselect All|Analyze|Export|Delete|Cancel|Delete Selected Items\?)"' \
+  VoiceInk/Views/History/TranscriptionHistoryView.swift \
+  VoiceInk/Views/History/InlineHistoryView.swift
+
+reject_pattern \
+  "macOS history views avoid shell-owned console diagnostics" \
+  'Error (loading transcriptions|loading more transcriptions|saving deletion|selecting all transcriptions)' \
   VoiceInk/Views/History/TranscriptionHistoryView.swift \
   VoiceInk/Views/History/InlineHistoryView.swift
 

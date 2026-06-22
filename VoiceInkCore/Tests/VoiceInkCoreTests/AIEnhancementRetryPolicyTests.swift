@@ -140,6 +140,32 @@ final class AIEnhancementRetryPolicyTests: XCTestCase {
         ))
     }
 
+    func testRetryProgressPresentationPreservesMacOSLogMessages() {
+        XCTAssertEqual(
+            VoiceInkAIEnhancementRetryProgressPresentation.diagnosticMessage(
+                for: .retryAfterDelay(2),
+                failedAttempts: 2,
+                maxAttempts: 3
+            ),
+            "Request failed, retrying in 2.0s... (Attempt 2/3)"
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementRetryProgressPresentation.diagnosticMessage(
+                for: .retryImmediately,
+                failedAttempts: 1,
+                maxAttempts: 3
+            ),
+            "Request timed out, retrying immediately... (Attempt 1/3)"
+        )
+        XCTAssertNil(
+            VoiceInkAIEnhancementRetryProgressPresentation.diagnosticMessage(
+                for: .fail(.networkError),
+                failedAttempts: 3,
+                maxAttempts: 3
+            )
+        )
+    }
+
     func testRetryFailurePresentationPreservesMacOSLogMessages() {
         XCTAssertEqual(
             VoiceInkAIEnhancementRetryFailurePresentation.diagnosticMessage(

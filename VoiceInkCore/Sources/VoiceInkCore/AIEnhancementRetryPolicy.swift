@@ -97,6 +97,23 @@ public struct VoiceInkAIEnhancementRateLimitPolicy: Equatable, Sendable {
     }
 }
 
+public enum VoiceInkAIEnhancementRetryProgressPresentation {
+    public static func diagnosticMessage(
+        for decision: VoiceInkAIEnhancementRetryDecision,
+        failedAttempts: Int,
+        maxAttempts: Int
+    ) -> String? {
+        switch decision {
+        case .retryAfterDelay(let delay):
+            return "Request failed, retrying in \(delay)s... (Attempt \(failedAttempts)/\(maxAttempts))"
+        case .retryImmediately:
+            return "Request timed out, retrying immediately... (Attempt \(failedAttempts)/\(maxAttempts))"
+        case .fail:
+            return nil
+        }
+    }
+}
+
 public enum VoiceInkAIEnhancementRetryFailurePresentation {
     public static func diagnosticMessage(
         for error: VoiceInkAIEnhancementError,

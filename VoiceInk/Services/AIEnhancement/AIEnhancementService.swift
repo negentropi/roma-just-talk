@@ -304,12 +304,19 @@ class AIEnhancementService: ObservableObject {
         state: VoiceInkAIEnhancementRetryState,
         transportNetworkFailure: Bool = false
     ) async throws {
+        if let message = VoiceInkAIEnhancementRetryProgressPresentation.diagnosticMessage(
+            for: decision,
+            failedAttempts: state.failedAttempts,
+            maxAttempts: state.maxAttempts
+        ) {
+            logger.warning("\(message, privacy: .public)")
+        }
+
         switch decision {
         case .retryAfterDelay(let delay):
-            logger.warning("Request failed, retrying in \(delay, privacy: .public)s... (Attempt \(state.failedAttempts, privacy: .public)/\(state.maxAttempts, privacy: .public))")
             try await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
         case .retryImmediately:
-            logger.warning("Request timed out, retrying immediately... (Attempt \(state.failedAttempts, privacy: .public)/\(state.maxAttempts, privacy: .public))")
+            break
         case .fail(let error):
             logRetryFailure(
                 error,

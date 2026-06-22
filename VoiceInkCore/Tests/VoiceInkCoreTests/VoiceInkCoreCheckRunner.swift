@@ -113,6 +113,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "AIEnhancementRetryPolicyTests.testRateLimitPolicySkipsDelayWithoutLastRequest", run: { AIEnhancementRetryPolicyTests().testRateLimitPolicySkipsDelayWithoutLastRequest() }),
             VoiceInkCoreCheck(name: "AIEnhancementRetryPolicyTests.testRateLimitPolicyReturnsRemainingDelay", run: { AIEnhancementRetryPolicyTests().testRateLimitPolicyReturnsRemainingDelay() }),
             VoiceInkCoreCheck(name: "AIEnhancementRetryPolicyTests.testRateLimitPolicySkipsDelayAfterIntervalExpires", run: { AIEnhancementRetryPolicyTests().testRateLimitPolicySkipsDelayAfterIntervalExpires() }),
+            VoiceInkCoreCheck(name: "AIEnhancementRetryPolicyTests.testRetryProgressPresentationPreservesMacOSLogMessages", run: { AIEnhancementRetryPolicyTests().testRetryProgressPresentationPreservesMacOSLogMessages() }),
             VoiceInkCoreCheck(name: "AIEnhancementRetryPolicyTests.testRetryFailurePresentationPreservesMacOSLogMessages", run: { AIEnhancementRetryPolicyTests().testRetryFailurePresentationPreservesMacOSLogMessages() }),
             VoiceInkCoreCheck(name: "AIModelCatalogTests.testMacOSAIEnhancementProviderDefaultsAreShared", run: { AIModelCatalogTests().testMacOSAIEnhancementProviderDefaultsAreShared() }),
             VoiceInkCoreCheck(name: "AIModelCatalogTests.testMacOSAIEnhancementProviderModelListsAreShared", run: { AIModelCatalogTests().testMacOSAIEnhancementProviderModelListsAreShared() }),

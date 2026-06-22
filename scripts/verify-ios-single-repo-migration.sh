@@ -6592,6 +6592,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AIEnhancementRetryPolicy.swift
 
 require_pattern \
+  "shared AI enhancement retry-progress presentation lives in VoiceInkCore" \
+  'VoiceInkAIEnhancementRetryProgressPresentation|diagnosticMessage' \
+  VoiceInkCore/Sources/VoiceInkCore/AIEnhancementRetryPolicy.swift
+
+require_pattern \
   "shared AI enhancement request payload lives in VoiceInkCore" \
   'VoiceInkAIEnhancementRequestPayload|VoiceInkAIEnhancementRequestPreparation|taggedTranscript|enhancedText' \
   VoiceInkCore/Sources/VoiceInkCore/AIRequestPrompts.swift
@@ -6609,6 +6614,11 @@ require_pattern \
 require_pattern \
   "core checks execute AI enhancement retry-failure presentation test" \
   'AIEnhancementRetryPolicyTests\.testRetryFailurePresentationPreservesMacOSLogMessages' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute AI enhancement retry-progress presentation test" \
+  'AIEnhancementRetryPolicyTests\.testRetryProgressPresentationPreservesMacOSLogMessages' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -6636,6 +6646,11 @@ require_pattern \
   'VoiceInkAIEnhancementRetryFailurePresentation\.diagnosticMessage' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
+require_pattern \
+  "macOS AI enhancement service uses shared retry-progress presentation" \
+  'VoiceInkAIEnhancementRetryProgressPresentation\.diagnosticMessage' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
 reject_pattern \
   "macOS AI enhancement service avoids shell-owned rate-limit timing math" \
   'rateLimitInterval|timeSinceLastRequest|minimumInterval -' \
@@ -6644,6 +6659,11 @@ reject_pattern \
 reject_pattern \
   "macOS AI enhancement service avoids shell-owned retry-failure log messages" \
   'Request timed out after|Request failed after|retry disabled' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+reject_pattern \
+  "macOS AI enhancement service avoids shell-owned retry-progress log messages" \
+  'Request failed, retrying|Request timed out, retrying immediately' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
 reject_pattern \

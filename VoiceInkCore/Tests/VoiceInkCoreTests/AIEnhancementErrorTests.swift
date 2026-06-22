@@ -102,4 +102,27 @@ final class AIEnhancementErrorTests: XCTestCase {
             .customError("Ollama server error")
         )
     }
+
+    func testOllamaTransportFailuresMapToSharedFailurePolicy() {
+        XCTAssertEqual(VoiceInkOllamaEnhancementFailure.transportFailure(.invalidURL), .invalidURL)
+        XCTAssertEqual(VoiceInkOllamaEnhancementFailure.transportFailure(.httpStatus(404)), .modelNotFound)
+        XCTAssertEqual(VoiceInkOllamaEnhancementFailure.transportFailure(.httpStatus(500)), .serverError)
+        XCTAssertEqual(VoiceInkOllamaEnhancementFailure.transportFailure(.httpStatus(400)), .invalidResponse)
+        XCTAssertEqual(VoiceInkOllamaEnhancementFailure.transportFailure(.network), .serviceUnavailable)
+        XCTAssertEqual(VoiceInkOllamaEnhancementFailure.transportFailure(.invalidResponse), .invalidResponse)
+        XCTAssertEqual(VoiceInkOllamaEnhancementFailure.transportFailure(.invalidRequest), .invalidRequest)
+        XCTAssertEqual(VoiceInkOllamaEnhancementFailure.transportFailure(.missingCredential), .invalidResponse)
+        XCTAssertEqual(VoiceInkOllamaEnhancementFailure.transportFailure(.timeout), .timeout)
+    }
+
+    func testOllamaServiceDiagnosticsPreserveMacOSConsoleCopy() {
+        XCTAssertEqual(
+            VoiceInkOllamaServiceDiagnostics.invalidBaseURLMessage,
+            "Invalid Ollama base URL"
+        )
+        XCTAssertEqual(
+            VoiceInkOllamaServiceDiagnostics.modelFetchFailedMessage(errorDescription: "server down"),
+            "Error fetching models: server down"
+        )
+    }
 }

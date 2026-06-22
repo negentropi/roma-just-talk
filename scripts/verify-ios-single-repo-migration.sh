@@ -6346,27 +6346,27 @@ reject_pattern \
 
 require_pattern \
   "shared Ollama enhancement failure policy lives in VoiceInkCore" \
-  'VoiceInkOllamaEnhancementFailure|httpFailure|enhancementError|Ollama request timed out' \
+  'VoiceInkOllamaEnhancementFailure|VoiceInkOllamaTransportFailure|transportFailure|httpFailure|enhancementError|VoiceInkOllamaServiceDiagnostics|modelFetchFailedMessage|Ollama request timed out' \
   VoiceInkCore/Sources/VoiceInkCore/AIEnhancementError.swift
 
 require_pattern \
   "core tests pin shared Ollama enhancement failure policy" \
-  'testOllamaEnhancementFailurePolicyPreservesMacOSMessagesAndRetryShape' \
+  'testOllamaEnhancementFailurePolicyPreservesMacOSMessagesAndRetryShape|testOllamaTransportFailuresMapToSharedFailurePolicy|testOllamaServiceDiagnosticsPreserveMacOSConsoleCopy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/AIEnhancementErrorTests.swift
 
 require_pattern \
   "core check runner executes shared Ollama enhancement failure policy test" \
-  'testOllamaEnhancementFailurePolicyPreservesMacOSMessagesAndRetryShape' \
+  'testOllamaEnhancementFailurePolicyPreservesMacOSMessagesAndRetryShape|testOllamaTransportFailuresMapToSharedFailurePolicy|testOllamaServiceDiagnosticsPreserveMacOSConsoleCopy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "macOS Ollama service uses shared enhancement failure policy" \
-  'VoiceInkOllamaEnhancementFailure' \
+  'VoiceInkOllamaEnhancementFailure|VoiceInkOllamaTransportFailure|voiceInkOllamaTransportFailure|VoiceInkOllamaServiceDiagnostics' \
   VoiceInk/Services/OllamaService.swift
 
 reject_pattern \
   "macOS Ollama service avoids shell-owned enhancement failure policy" \
-  'LocalAIError|"(Invalid Ollama server URL|Ollama service is not available|Invalid response from Ollama server|Selected model not found|Ollama server error|System prompt is required|Ollama request timed out)"' \
+  'LocalAIError|VoiceInkOllamaEnhancementFailure\.httpFailure|"(Invalid Ollama server URL|Ollama service is not available|Invalid response from Ollama server|Selected model not found|Ollama server error|System prompt is required|Ollama request timed out|Invalid Ollama base URL|Error fetching models:)"' \
   VoiceInk/Services/OllamaService.swift
 
 reject_pattern \

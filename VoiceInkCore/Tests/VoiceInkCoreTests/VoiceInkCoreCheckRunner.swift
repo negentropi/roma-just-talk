@@ -112,6 +112,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "AIEnhancementErrorTests.testTransportNetworkErrorMapsRetryableFoundationErrors", run: { AIEnhancementErrorTests().testTransportNetworkErrorMapsRetryableFoundationErrors() }),
             VoiceInkCoreCheck(name: "AIEnhancementErrorTests.testTransportNetworkErrorRejectsNonRetryableFoundationErrors", run: { AIEnhancementErrorTests().testTransportNetworkErrorRejectsNonRetryableFoundationErrors() }),
             VoiceInkCoreCheck(name: "AIEnhancementErrorTests.testOllamaEnhancementFailurePolicyPreservesMacOSMessagesAndRetryShape", run: { AIEnhancementErrorTests().testOllamaEnhancementFailurePolicyPreservesMacOSMessagesAndRetryShape() }),
+            VoiceInkCoreCheck(name: "AIEnhancementErrorTests.testOllamaTransportFailuresMapToSharedFailurePolicy", run: { AIEnhancementErrorTests().testOllamaTransportFailuresMapToSharedFailurePolicy() }),
+            VoiceInkCoreCheck(name: "AIEnhancementErrorTests.testOllamaServiceDiagnosticsPreserveMacOSConsoleCopy", run: { AIEnhancementErrorTests().testOllamaServiceDiagnosticsPreserveMacOSConsoleCopy() }),
             VoiceInkCoreCheck(name: "AIEnhancementResultTests.testResultCarriesMacOSPostProcessingMetadata", run: { AIEnhancementResultTests().testResultCarriesMacOSPostProcessingMetadata() }),
             VoiceInkCoreCheck(name: "AIEnhancementResultTests.testCompletedResultDerivesDurationAndPreservesMetadata", run: { AIEnhancementResultTests().testCompletedResultDerivesDurationAndPreservesMetadata() }),
             VoiceInkCoreCheck(name: "CompletedTranscriptionDraftTests.testDraftStoresSuccessfulEnhancementMetadata", run: { CompletedTranscriptionDraftTests().testDraftStoresSuccessfulEnhancementMetadata() }),

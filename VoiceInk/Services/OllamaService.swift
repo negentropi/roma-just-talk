@@ -49,7 +49,7 @@ class OllamaService: ObservableObject {
         defer { isLoadingModels = false }
 
         guard let url = baseURLValue else {
-            print("Invalid Ollama base URL")
+            print(VoiceInkOllamaServiceDiagnostics.invalidBaseURLMessage)
             availableModels = []
             return
         }
@@ -68,7 +68,11 @@ class OllamaService: ObservableObject {
                 selectedModel = refreshedModel
             }
         } catch {
-            print("Error fetching models: \(error)")
+            print(
+                VoiceInkOllamaServiceDiagnostics.modelFetchFailedMessage(
+                    errorDescription: String(describing: error)
+                )
+            )
             availableModels = []
         }
     }
@@ -93,24 +97,28 @@ class OllamaService: ObservableObject {
                 timeout: timeout
             )
         } catch let error as LLMKitError {
-            throw mapLLMKitError(error).enhancementError
+            throw VoiceInkOllamaEnhancementFailure
+                .transportFailure(error.voiceInkOllamaTransportFailure)
+                .enhancementError
         }
     }
+}
 
-    private func mapLLMKitError(_ error: LLMKitError) -> VoiceInkOllamaEnhancementFailure {
-        switch error {
+private extension LLMKitError {
+    var voiceInkOllamaTransportFailure: VoiceInkOllamaTransportFailure {
+        switch self {
         case .invalidURL:
             return .invalidURL
         case .httpError(let statusCode, _):
-            return VoiceInkOllamaEnhancementFailure.httpFailure(statusCode: statusCode)
+            return .httpStatus(statusCode)
         case .networkError:
-            return .serviceUnavailable
+            return .network
         case .noResultReturned, .decodingError:
             return .invalidResponse
         case .encodingError:
             return .invalidRequest
         case .missingAPIKey:
-            return .invalidResponse
+            return .missingCredential
         case .timeout:
             return .timeout
         }

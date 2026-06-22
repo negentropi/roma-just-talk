@@ -44,6 +44,25 @@ public enum VoiceInkOllamaEnhancementFailure: Error, Equatable, Sendable {
     case invalidRequest
     case timeout
 
+    public static func transportFailure(
+        _ failure: VoiceInkOllamaTransportFailure
+    ) -> VoiceInkOllamaEnhancementFailure {
+        switch failure {
+        case .invalidURL:
+            return .invalidURL
+        case .httpStatus(let statusCode):
+            return httpFailure(statusCode: statusCode)
+        case .network:
+            return .serviceUnavailable
+        case .invalidResponse, .missingCredential:
+            return .invalidResponse
+        case .invalidRequest:
+            return .invalidRequest
+        case .timeout:
+            return .timeout
+        }
+    }
+
     public static func httpFailure(statusCode: Int) -> VoiceInkOllamaEnhancementFailure {
         if statusCode == 404 {
             return .modelNotFound
@@ -80,6 +99,24 @@ public enum VoiceInkOllamaEnhancementFailure: Error, Equatable, Sendable {
         case .timeout:
             return "Ollama request timed out"
         }
+    }
+}
+
+public enum VoiceInkOllamaTransportFailure: Equatable, Sendable {
+    case invalidURL
+    case httpStatus(Int)
+    case network
+    case invalidResponse
+    case invalidRequest
+    case missingCredential
+    case timeout
+}
+
+public enum VoiceInkOllamaServiceDiagnostics {
+    public static let invalidBaseURLMessage = "Invalid Ollama base URL"
+
+    public static func modelFetchFailedMessage(errorDescription: String) -> String {
+        "Error fetching models: \(errorDescription)"
     }
 }
 

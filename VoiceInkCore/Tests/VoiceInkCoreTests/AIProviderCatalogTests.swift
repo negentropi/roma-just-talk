@@ -1112,6 +1112,42 @@ final class AIProviderCatalogTests: XCTestCase {
 
             XCTAssertNil(VoiceInkAIEnhancementProviderKind.custom.textEnhancementRequestURL(from: defaults))
             XCTAssertNil(VoiceInkAIEnhancementProviderKind.localCLI.textEnhancementRequestURL(from: defaults))
+
+            let invalidCustomPlan = VoiceInkAIEnhancementRequestExecutionPlan.planning(
+                provider: .custom,
+                modelName: "custom-model",
+                defaults: defaults
+            )
+
+            do {
+                _ = try invalidCustomPlan.openAICompatibleRequestOrThrow()
+                XCTFail("Expected invalid custom endpoint to throw")
+            } catch {
+                XCTAssertEqual(
+                    error as? VoiceInkAIEnhancementError,
+                    .customError(VoiceInkAIEnhancementProviderKind.custom.invalidTextEnhancementRequestURLMessage)
+                )
+            }
+
+            VoiceInkDynamicAIProviderPreference.saveCustomProviderBaseURL(
+                "https://api.example.com/v1/chat/completions",
+                to: defaults
+            )
+            let customPlan = VoiceInkAIEnhancementRequestExecutionPlan.planning(
+                provider: .custom,
+                modelName: "custom-model",
+                defaults: defaults
+            )
+
+            do {
+                let customRequestPlan = try customPlan.openAICompatibleRequestOrThrow()
+                XCTAssertEqual(customRequestPlan.requestURL.absoluteString, "https://api.example.com/v1/chat/completions")
+                XCTAssertEqual(customRequestPlan.requestParameters.temperature, 0.3)
+                XCTAssertNil(customRequestPlan.requestParameters.reasoningEffort)
+                XCTAssertNil(customRequestPlan.requestParameters.extraBodyParameters)
+            } catch {
+                XCTFail("Expected valid custom endpoint to produce a request plan")
+            }
         }
     }
 
@@ -1275,6 +1311,29 @@ final class AIProviderCatalogTests: XCTestCase {
         for (provider, route) in expectedRoutes {
             XCTAssertEqual(provider.textEnhancementExecutionRoute, route)
         }
+
+        XCTAssertEqual(
+            VoiceInkAIEnhancementRequestExecutionPlan.planning(provider: .ollama, modelName: "mistral").route,
+            .ollama
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementRequestExecutionPlan.planning(provider: .localCLI, modelName: "local-cli").route,
+            .localCLI
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementRequestExecutionPlan.planning(provider: .anthropic, modelName: "claude-sonnet-4-5").route,
+            .anthropicMessages
+        )
+
+        let groqPlan = VoiceInkAIEnhancementRequestExecutionPlan.planning(
+            provider: .groq,
+            modelName: "openai/gpt-oss-120b"
+        )
+        let groqRequestPlan = try? groqPlan.openAICompatibleRequestOrThrow()
+        XCTAssertEqual(groqRequestPlan?.requestURL.absoluteString, VoiceInkAIModelProvider.groq.postProcessingRequestURL?.absoluteString)
+        XCTAssertEqual(groqRequestPlan?.requestParameters.temperature, 0.3)
+        XCTAssertEqual(groqRequestPlan?.requestParameters.reasoningEffort, "low")
+        XCTAssertEqual(groqRequestPlan?.requestParameters.extraBodyParameters?["include_reasoning"] as? Bool, false)
     }
 
     func testMacOSAIEnhancementRequestURLsAreShared() {

@@ -172,8 +172,11 @@ class AIEnhancementService: ObservableObject {
             self.lastUserMessageSent = formattedText
         }
 
-        let executionRoute = aiService.selectedProvider.textEnhancementExecutionRoute
-        switch executionRoute {
+        let executionPlan = VoiceInkAIEnhancementRequestExecutionPlan.planning(
+            provider: aiService.selectedProvider,
+            modelName: aiService.currentModel
+        )
+        switch executionPlan.route {
         case .ollama:
             do {
                 let result = try await aiService.enhanceWithOllama(
@@ -205,32 +208,26 @@ class AIEnhancementService: ObservableObject {
 
             do {
                 let result: String
-                switch executionRoute {
+                switch executionPlan.route {
                 case .anthropicMessages:
                     result = try await AnthropicLLMClient.chatCompletion(
                         apiKey: aiService.apiKey,
-                        model: aiService.currentModel,
+                        model: executionPlan.modelName,
                         messages: [.user(formattedText)],
                         systemPrompt: systemMessage,
                         timeout: VoiceInkAIEnhancementRequestPreference.timeoutSeconds()
                     )
                 case .openAICompatibleChatCompletions:
-                    guard let baseURL = aiService.selectedProvider.textEnhancementRequestURL() else {
-                        throw VoiceInkAIEnhancementError.customError(aiService.selectedProvider.invalidTextEnhancementRequestURLMessage)
-                    }
-                    let requestParameters = VoiceInkAIReasoningConfig.chatRequestParameters(
-                        for: aiService.selectedProvider.aiModelProvider,
-                        modelName: aiService.currentModel
-                    )
+                    let requestPlan = try executionPlan.openAICompatibleRequestOrThrow()
                     result = try await OpenAILLMClient.chatCompletion(
-                        baseURL: baseURL,
+                        baseURL: requestPlan.requestURL,
                         apiKey: aiService.apiKey,
-                        model: aiService.currentModel,
+                        model: executionPlan.modelName,
                         messages: [.user(formattedText)],
                         systemPrompt: systemMessage,
-                        temperature: requestParameters.temperature,
-                        reasoningEffort: requestParameters.reasoningEffort,
-                        extraBody: requestParameters.extraBodyParameters,
+                        temperature: requestPlan.requestParameters.temperature,
+                        reasoningEffort: requestPlan.requestParameters.reasoningEffort,
+                        extraBody: requestPlan.requestParameters.extraBodyParameters,
                         timeout: VoiceInkAIEnhancementRequestPreference.timeoutSeconds()
                     )
                 case .ollama, .localCLI:

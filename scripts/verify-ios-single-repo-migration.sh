@@ -6303,7 +6303,7 @@ require_pattern \
 
 require_pattern \
   "macOS AI enhancement service request URL selection uses shared policy" \
-  'textEnhancementRequestURL' \
+  'openAICompatibleRequestOrThrow|requestPlan\.requestURL' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
 require_pattern \
@@ -6371,12 +6371,12 @@ require_pattern \
 
 require_pattern \
   "shared AI enhancement execution route policy lives in VoiceInkCore" \
-  'VoiceInkAIEnhancementExecutionRoute|textEnhancementExecutionRoute' \
+  'VoiceInkAIEnhancementExecutionRoute|VoiceInkAIEnhancementRequestExecutionPlan|textEnhancementExecutionRoute|openAICompatibleRequestOrThrow' \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 require_pattern \
   "macOS AI enhancement service execution routing uses shared policy" \
-  'textEnhancementExecutionRoute' \
+  'VoiceInkAIEnhancementRequestExecutionPlan\.planning|executionPlan\.route|openAICompatibleRequestOrThrow' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
 require_pattern \
@@ -6385,8 +6385,8 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AIReasoningConfig.swift
 
 require_pattern \
-  "macOS AI enhancement request tuning uses shared policy" \
-  'chatRequestParameters' \
+  "macOS AI enhancement request tuning uses shared execution plan" \
+  'requestPlan\.requestParameters\.(temperature|reasoningEffort|extraBodyParameters)' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
 require_pattern \

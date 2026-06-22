@@ -14,6 +14,69 @@ public enum VoiceInkAIEnhancementExecutionRoute: Sendable, Equatable {
     case openAICompatibleChatCompletions
 }
 
+public struct VoiceInkAIEnhancementOpenAICompatibleRequestPlan {
+    public let requestURL: URL
+    public let requestParameters: VoiceInkAIChatRequestParameters
+}
+
+public struct VoiceInkAIEnhancementRequestExecutionPlan {
+    public let route: VoiceInkAIEnhancementExecutionRoute
+    public let modelName: String
+    private let openAICompatibleRequest: VoiceInkAIEnhancementOpenAICompatibleRequestPlan?
+    private let requestPreparationError: VoiceInkAIEnhancementError?
+
+    public static func planning(
+        provider: VoiceInkAIEnhancementProviderKind,
+        modelName: String,
+        defaults: UserDefaults = .standard
+    ) -> VoiceInkAIEnhancementRequestExecutionPlan {
+        let route = provider.textEnhancementExecutionRoute
+
+        guard route == .openAICompatibleChatCompletions else {
+            return VoiceInkAIEnhancementRequestExecutionPlan(
+                route: route,
+                modelName: modelName,
+                openAICompatibleRequest: nil,
+                requestPreparationError: nil
+            )
+        }
+
+        guard let requestURL = provider.textEnhancementRequestURL(from: defaults) else {
+            return VoiceInkAIEnhancementRequestExecutionPlan(
+                route: route,
+                modelName: modelName,
+                openAICompatibleRequest: nil,
+                requestPreparationError: .customError(provider.invalidTextEnhancementRequestURLMessage)
+            )
+        }
+
+        return VoiceInkAIEnhancementRequestExecutionPlan(
+            route: route,
+            modelName: modelName,
+            openAICompatibleRequest: VoiceInkAIEnhancementOpenAICompatibleRequestPlan(
+                requestURL: requestURL,
+                requestParameters: VoiceInkAIReasoningConfig.chatRequestParameters(
+                    for: provider.aiModelProvider,
+                    modelName: modelName
+                )
+            ),
+            requestPreparationError: nil
+        )
+    }
+
+    public func openAICompatibleRequestOrThrow() throws -> VoiceInkAIEnhancementOpenAICompatibleRequestPlan {
+        if let openAICompatibleRequest {
+            return openAICompatibleRequest
+        }
+
+        if let requestPreparationError {
+            throw requestPreparationError
+        }
+
+        preconditionFailure("OpenAI-compatible request plan is only available for OpenAI-compatible routes.")
+    }
+}
+
 public enum VoiceInkAIEnhancementModelCatalogSource: Sendable, Equatable {
     case staticModels
     case ollamaRuntime

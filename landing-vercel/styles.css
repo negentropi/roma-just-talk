@@ -312,6 +312,13 @@ h1 .before-word {
 
 #talk-button {
   background: transparent;
+  border-color: #fff8e7;
+  color: #fff8e7;
+  box-shadow: 5px 5px 0 rgba(255, 248, 231, 0.28);
+}
+
+#talk-button:hover {
+  box-shadow: 7px 7px 0 rgba(255, 248, 231, 0.28);
 }
 
 .icon {

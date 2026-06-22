@@ -11358,6 +11358,11 @@ reject_pattern \
   'Notification\.Name\("toggleMiniRecorder"\)|Notification\.Name\("dismissMiniRecorder"\)' \
   VoiceInk/Notifications/AppNotifications.swift
 
+reject_pattern \
+  "macOS model change notification avoids unused model-name payload" \
+  'userInfo: \["modelName"' \
+  VoiceInk/Transcription/Engine/TranscriptionModelManager.swift
+
 require_patterns \
   "shared storage startup diagnostics live in VoiceInkCore" \
   VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift \

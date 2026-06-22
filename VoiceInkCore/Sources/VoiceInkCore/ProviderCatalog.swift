@@ -242,6 +242,14 @@ public struct VoiceInkProviderAPIKeyFormState: Equatable, Sendable {
             candidate: candidate
         )
     }
+
+    public func iOSVisibleResultFeedback(isKeyVerified: Bool) -> VoiceInkProviderAPIKeyVerificationFeedback? {
+        guard !isKeyVerified else {
+            return nil
+        }
+
+        return verificationProgress.iOSResultFeedback
+    }
 }
 
 public enum VoiceInkProviderAPIKeyMissingVerificationCandidatePolicy: Equatable, Sendable {

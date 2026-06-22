@@ -59,8 +59,7 @@ struct ProviderAPIKeyView: View {
                     }
                 }
 
-                // Only show verification result when actively verifying and not already verified
-                if let feedback = apiKeyFormState.verificationProgress.iOSResultFeedback, !isKeyVerified {
+                if let feedback = apiKeyFormState.iOSVisibleResultFeedback(isKeyVerified: isKeyVerified) {
                     Label(feedback.text, systemImage: feedback.effectiveSystemImageName)
                         .foregroundStyle(feedback.tone.statusColor)
                 }

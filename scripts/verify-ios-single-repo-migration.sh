@@ -2294,6 +2294,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
 
 require_pattern \
+  "shared provider API-key form state owns iOS result feedback visibility" \
+  'iOSVisibleResultFeedback\(isKeyVerified:' \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
+
+require_pattern \
   "shared provider API-key verification start plan lives in VoiceInkCore" \
   'VoiceInkProviderAPIKeyVerificationStartPlan|verificationStartPlan|VoiceInkProviderAPIKeyMissingVerificationCandidatePolicy' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
@@ -2301,6 +2306,11 @@ require_pattern \
 require_pattern \
   "core checks execute provider API-key verification start plan tests" \
   'ProviderAccessRequirementTests\.testProviderAPIKeyVerificationStartPlan(BeginsWhenCandidateExists|CanKeepStateForMissingCandidate|CanApplyFailureForMissingCandidate)' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute provider API-key iOS feedback visibility test" \
+  'ProviderAccessRequirementTests\.testProviderAPIKeyFormStateOwnsIOSResultFeedbackVisibility' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -2315,7 +2325,12 @@ require_pattern \
 
 require_pattern \
   "iOS API-key view uses shared progress presentation through form state" \
-  'apiKeyFormState\.verificationProgress|iOSVerifiedKeyFeedback|iOSResultFeedback|effectiveSystemImageName' \
+  'apiKeyFormState\.(verificationProgress|iOSVisibleResultFeedback)|iOSVerifiedKeyFeedback|iOSResultFeedback|effectiveSystemImageName' \
+  iOS/VoiceInk-ios/ProviderAPIKeyView.swift
+
+reject_pattern \
+  "iOS API-key view avoids shell-owned result feedback visibility gate" \
+  'iOSResultFeedback.*isKeyVerified|isKeyVerified.*iOSResultFeedback' \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
 require_pattern \

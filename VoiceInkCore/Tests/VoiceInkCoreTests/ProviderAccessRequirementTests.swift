@@ -341,6 +341,31 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertTrue(failureState.isEditing)
     }
 
+    func testProviderAPIKeyFormStateOwnsIOSResultFeedbackVisibility() {
+        XCTAssertNil(
+            VoiceInkProviderAPIKeyFormState(verificationProgress: .idle)
+                .iOSVisibleResultFeedback(isKeyVerified: false)
+        )
+        XCTAssertEqual(
+            VoiceInkProviderAPIKeyFormState(verificationProgress: .success)
+                .iOSVisibleResultFeedback(isKeyVerified: false),
+            VoiceInkProviderAPIKeyVerificationProgress.iOSVerifiedKeyFeedback
+        )
+        XCTAssertEqual(
+            VoiceInkProviderAPIKeyFormState(verificationProgress: .failure(message: "Forbidden"))
+                .iOSVisibleResultFeedback(isKeyVerified: false),
+            VoiceInkProviderAPIKeyVerificationFeedback(
+                text: "Verification failed",
+                systemImageName: "xmark.seal",
+                tone: .failure
+            )
+        )
+        XCTAssertNil(
+            VoiceInkProviderAPIKeyFormState(verificationProgress: .success)
+                .iOSVisibleResultFeedback(isKeyVerified: true)
+        )
+    }
+
     func testProviderAPIKeyFormPresentationBuildsProviderCopy() {
         let presentation = VoiceInkProviderKind.deepgram.apiKeyFormPresentation
 

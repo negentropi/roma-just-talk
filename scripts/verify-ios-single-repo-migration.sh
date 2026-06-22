@@ -6959,6 +6959,16 @@ reject_pattern \
   VoiceInk/Services/ModelPrewarmService.swift \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift
 
+require_pattern \
+  "macOS recording startup uses shared local Whisper model lookup" \
+  'VoiceInkWhisperModelFiles\.downloadedLocalModelFile' \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift
+
+reject_pattern \
+  "macOS recording startup avoids shell-owned local Whisper model lookup" \
+  'availableModels\.first\(where:' \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift
+
 reject_pattern \
   "macOS transcription model manager avoids shell-owned provider availability routing" \
   'switch +model\.provider|model\.provider != \.whisper|availableModels\.contains|CloudProviderRegistry\.provider\(for: model\.provider\)|case +\.nativeApple|case +\.custom|transcriptionModelAvailabilityRequirement == \.(currentOSSupport|configuredAPIKey)' \

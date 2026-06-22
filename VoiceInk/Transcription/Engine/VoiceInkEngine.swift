@@ -270,7 +270,10 @@ class VoiceInkEngine: NSObject, ObservableObject {
                                 if let model = self.transcriptionModelManager.currentTranscriptionModel {
                                     switch model.transcriptionRuntimeResourcePlan.recordingStartupLoadAction {
                                     case .loadLocalWhisperModel:
-                                        if let localWhisperModel = self.whisperModelManager.availableModels.first(where: { $0.name == model.name }),
+                                        if let localWhisperModel = VoiceInkWhisperModelFiles.downloadedLocalModelFile(
+                                            forModelName: model.name,
+                                            in: self.whisperModelManager.availableModels
+                                        ),
                                            self.whisperModelManager.whisperContext == nil {
                                             do {
                                                 try await self.whisperModelManager.loadModel(localWhisperModel)

@@ -241,6 +241,26 @@ final class TranscriptionModelCatalogTests: XCTestCase {
         XCTAssertEqual(VoiceInkTranscriptionModelProviderRole.cloud(.groq).coreTranscriptionModelProvider, .groq)
         XCTAssertEqual(VoiceInkTranscriptionModelProviderRole.cloud(nil).transcriptionModelAvailabilityRequirement, .unavailable)
         XCTAssertEqual(VoiceInkTranscriptionModelProviderRole.cloud(nil).transcriptionLanguageSource, .all)
+
+        let customLanguages = ["zz": "Customish"]
+        XCTAssertEqual(
+            VoiceInkTranscriptionModelProviderRole.customCloud.transcriptionLanguageOptions(
+                defaultLanguages: customLanguages,
+                isMultilingual: true,
+                usesRealtimeProviderLanguages: true
+            ),
+            customLanguages
+        )
+        XCTAssertNil(VoiceInkTranscriptionModelProviderRole.cloud(.assemblyAI).transcriptionLanguageOptions(
+            defaultLanguages: [:],
+            isMultilingual: true,
+            usesRealtimeProviderLanguages: true
+        )["en_uk"])
+        XCTAssertEqual(VoiceInkTranscriptionModelProviderRole.cloud(.assemblyAI).transcriptionLanguageOptions(
+            defaultLanguages: [:],
+            isMultilingual: true,
+            usesRealtimeProviderLanguages: false
+        )["en_uk"], "British English")
     }
 
     func testProviderAPIErrorDomainsPreserveMacOSBatchMapping() {

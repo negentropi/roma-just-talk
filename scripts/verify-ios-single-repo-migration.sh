@@ -3601,11 +3601,17 @@ require_patterns \
   'modelManagementCategory' \
   'transcriptionServiceRoute' \
   'transcriptionModelAvailabilityRequirement' \
-  'transcriptionLanguageSource'
+  'transcriptionLanguageSource' \
+  'transcriptionLanguageOptions'
 
 require_pattern \
   "macOS ModelProvider adapts shared transcription model provider role" \
   'coreTranscriptionModelProviderRole' \
+  VoiceInk/Models/TranscriptionModel.swift
+
+require_pattern \
+  "macOS TranscriptionModel uses shared provider-role language options" \
+  'coreTranscriptionModelProviderRole\.transcriptionLanguageOptions' \
   VoiceInk/Models/TranscriptionModel.swift
 
 require_pattern \
@@ -3635,6 +3641,11 @@ reject_context_pattern \
   "macOS ModelProvider avoids shell-only availability switch" \
   'var transcriptionModelAvailabilityRequirement' \
   'switch self|downloadedLocalWhisperModel|downloadedLocalFluidAudioModel|currentOSSupport|alwaysAvailable|configuredAPIKey' \
+  VoiceInk/Models/TranscriptionModel.swift
+
+reject_pattern \
+  "macOS TranscriptionModel avoids shell-only AssemblyAI language-option branching" \
+  'provider == \.assemblyAI|assemblyAIUsesRealtime:' \
   VoiceInk/Models/TranscriptionModel.swift
 
 require_pattern \

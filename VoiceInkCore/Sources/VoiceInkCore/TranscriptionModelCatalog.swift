@@ -260,6 +260,23 @@ public enum VoiceInkTranscriptionModelProviderRole: Equatable, Sendable {
             return provider == nil ? .unavailable : .configuredAPIKey
         }
     }
+
+    public func transcriptionLanguageOptions(
+        defaultLanguages: [String: String],
+        isMultilingual: Bool,
+        usesRealtimeProviderLanguages: Bool
+    ) -> [String: String] {
+        switch self {
+        case .customCloud:
+            return defaultLanguages
+        case .localWhisper, .localFluidAudio, .nativeApple, .cloud:
+            return VoiceInkTranscriptionLanguageSupport.languages(
+                for: transcriptionLanguageSource,
+                isMultilingual: isMultilingual,
+                assemblyAIUsesRealtime: usesRealtimeProviderLanguages
+            )
+        }
+    }
 }
 
 public struct VoiceInkCloudTranscriptionModelSpec: Equatable, Sendable {

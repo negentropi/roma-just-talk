@@ -172,16 +172,13 @@ extension TranscriptionModel {
     }
 
     var transcriptionLanguageOptions: [String: String] {
-        if provider == .assemblyAI {
-            return VoiceInkTranscriptionLanguageSupport.languages(
-                for: provider.transcriptionLanguageSource,
-                assemblyAIUsesRealtime: VoiceInkTranscriptionStreamingPreference.shouldUseStreaming(
-                    for: streamingPreferenceSnapshot
-                )
+        provider.coreTranscriptionModelProviderRole.transcriptionLanguageOptions(
+            defaultLanguages: supportedLanguages,
+            isMultilingual: isMultilingualModel,
+            usesRealtimeProviderLanguages: VoiceInkTranscriptionStreamingPreference.shouldUseStreaming(
+                for: streamingPreferenceSnapshot
             )
-        }
-
-        return supportedLanguages
+        )
     }
 
     var transcriptionLanguageSelectionFacts: VoiceInkTranscriptionLanguageSelectionFacts {

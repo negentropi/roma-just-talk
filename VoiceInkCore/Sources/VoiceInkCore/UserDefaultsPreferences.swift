@@ -428,6 +428,58 @@ public enum VoiceInkMenuBarPreference {
     }
 }
 
+public enum VoiceInkMacOSMenuBarPresentation {
+    public static let toggleRecorderTitle = "Toggle Recorder"
+    public static let manageModelsTitle = "Manage Models"
+    public static let aiEnhancementToggleTitle = "AI Enhancement"
+    public static let noProvidersConnectedText = "No providers connected"
+    public static let noModelsAvailableText = "No models available"
+    public static let audioInputTitle = "Audio Input"
+    public static let noDevicesAvailableText = "No devices available"
+    public static let additionalMenuTitle = "Additional"
+    public static let clipboardContextTitle = VoiceInkEnhancementSettingsPresentation.macOS.clipboardContextTitle
+    public static let contextAwarenessTitle = VoiceInkPowerModePresentation.contextAwarenessDisplayText
+    public static let retryLastTranscriptionTitle = VoiceInkRecordingShortcutPreference.macOSSettingsPresentation.retryLastTranscriptionLabel
+    public static let copyLastTranscriptionTitle = "Copy Last Transcription"
+    public static let historyTitle = VoiceInkMacOSNavigationDestination.history.rawValue
+    public static let permissionsTitle = VoiceInkMacOSNavigationDestination.permissions.rawValue
+    public static let settingsTitle = VoiceInkMacOSNavigationDestination.settings.rawValue
+    public static let showDockIconTitle = "Show Dock Icon"
+    public static let hideDockIconTitle = "Hide Dock Icon"
+    public static let hideMenuBarIconTitle = "Hide Menu Bar Icon"
+    public static let launchAtLoginTitle = "Launch at Login"
+    public static let checkForUpdatesTitle = "Check for Updates"
+    public static let helpAndSupportTitle = "Help and Support"
+    public static let selectionCheckmarkSystemImageName = "checkmark"
+    public static let pickerSystemImageName = "chevron.up.chevron.down"
+
+    public static var quitTitle: String {
+        "Quit \(VoiceInkAppIdentity.compactDisplayName)"
+    }
+
+    public static func transcriptionModelTitle(currentDisplayName: String?) -> String {
+        "Transcription Model: \(currentDisplayName ?? noneDisplayText)"
+    }
+
+    public static func promptTitle(activePromptTitle: String?) -> String {
+        "Prompt: \(activePromptTitle ?? noneDisplayText)"
+    }
+
+    public static func aiProviderTitle(selectedProviderName: String) -> String {
+        "AI Provider: \(selectedProviderName)"
+    }
+
+    public static func aiModelTitle(currentModelName: String) -> String {
+        "AI Model: \(currentModelName)"
+    }
+
+    public static func dockIconTitle(isMenuBarOnly: Bool) -> String {
+        isMenuBarOnly ? showDockIconTitle : hideDockIconTitle
+    }
+
+    private static let noneDisplayText = "None"
+}
+
 public struct VoiceInkMacOSShellBackupPreferences: Codable, Equatable, Sendable {
     public let launchAtLoginEnabled: Bool?
     public let isMenuBarOnly: Bool?

@@ -22,7 +22,7 @@ struct MenuBarView: View {
     
     var body: some View {
         VStack {
-            Button("Toggle Recorder") {
+            Button(VoiceInkMacOSMenuBarPresentation.toggleRecorderTitle) {
                 recorderUIManager.handleToggleMiniRecorder()
             }
 
@@ -38,7 +38,7 @@ struct MenuBarView: View {
                         HStack {
                             Text(model.displayName)
                             if transcriptionModelManager.currentTranscriptionModel?.id == model.id {
-                                Image(systemName: "checkmark")
+                                Image(systemName: VoiceInkMacOSMenuBarPresentation.selectionCheckmarkSystemImageName)
                             }
                         }
                     }
@@ -46,20 +46,22 @@ struct MenuBarView: View {
 
                 Divider()
 
-                Button("Manage Models") {
+                Button(VoiceInkMacOSMenuBarPresentation.manageModelsTitle) {
                     openMainWindowAndNavigate(to: VoiceInkMacOSNavigationDestination.aiModels.rawValue)
                 }
             } label: {
                 HStack {
-                    Text("Transcription Model: \(transcriptionModelManager.currentTranscriptionModel?.displayName ?? "None")")
-                    Image(systemName: "chevron.up.chevron.down")
+                    Text(VoiceInkMacOSMenuBarPresentation.transcriptionModelTitle(
+                        currentDisplayName: transcriptionModelManager.currentTranscriptionModel?.displayName
+                    ))
+                    Image(systemName: VoiceInkMacOSMenuBarPresentation.pickerSystemImageName)
                         .font(.system(size: 10))
                 }
             }
             
             Divider()
             
-            Toggle("AI Enhancement", isOn: $enhancementService.isEnhancementEnabled)
+            Toggle(VoiceInkMacOSMenuBarPresentation.aiEnhancementToggleTitle, isOn: $enhancementService.isEnhancementEnabled)
             
             Menu {
                 ForEach(enhancementService.allPrompts) { prompt in
@@ -72,15 +74,15 @@ struct MenuBarView: View {
                             Text(prompt.title)
                             if enhancementService.selectedPromptId == prompt.id {
                                 Spacer()
-                                Image(systemName: "checkmark")
+                                Image(systemName: VoiceInkMacOSMenuBarPresentation.selectionCheckmarkSystemImageName)
                             }
                         }
                     }
                 }
             } label: {
                 HStack {
-                    Text("Prompt: \(enhancementService.activePrompt?.title ?? "None")")
-                    Image(systemName: "chevron.up.chevron.down")
+                    Text(VoiceInkMacOSMenuBarPresentation.promptTitle(activePromptTitle: enhancementService.activePrompt?.title))
+                    Image(systemName: VoiceInkMacOSMenuBarPresentation.pickerSystemImageName)
                         .font(.system(size: 10))
                 }
             }
@@ -93,20 +95,20 @@ struct MenuBarView: View {
                         HStack {
                             Text(provider.rawValue)
                             if aiService.selectedProvider == provider {
-                                Image(systemName: "checkmark")
+                                Image(systemName: VoiceInkMacOSMenuBarPresentation.selectionCheckmarkSystemImageName)
                             }
                         }
                     }
                 }
 
                 if aiService.connectedProviders.isEmpty {
-                    Text("No providers connected")
+                    Text(VoiceInkMacOSMenuBarPresentation.noProvidersConnectedText)
                         .foregroundColor(.secondary)
                 }
             } label: {
                 HStack {
-                    Text("AI Provider: \(aiService.selectedProvider.rawValue)")
-                    Image(systemName: "chevron.up.chevron.down")
+                    Text(VoiceInkMacOSMenuBarPresentation.aiProviderTitle(selectedProviderName: aiService.selectedProvider.rawValue))
+                    Image(systemName: VoiceInkMacOSMenuBarPresentation.pickerSystemImageName)
                         .font(.system(size: 10))
                 }
             }
@@ -119,20 +121,20 @@ struct MenuBarView: View {
                         HStack {
                             Text(model)
                             if aiService.currentModel == model {
-                                Image(systemName: "checkmark")
+                                Image(systemName: VoiceInkMacOSMenuBarPresentation.selectionCheckmarkSystemImageName)
                             }
                         }
                     }
                 }
 
                 if aiService.availableModels.isEmpty {
-                    Text("No models available")
+                    Text(VoiceInkMacOSMenuBarPresentation.noModelsAvailableText)
                         .foregroundColor(.secondary)
                 }
             } label: {
                 HStack {
-                    Text("AI Model: \(aiService.currentModel)")
-                    Image(systemName: "chevron.up.chevron.down")
+                    Text(VoiceInkMacOSMenuBarPresentation.aiModelTitle(currentModelName: aiService.currentModel))
+                    Image(systemName: VoiceInkMacOSMenuBarPresentation.pickerSystemImageName)
                         .font(.system(size: 10))
                 }
             }
@@ -147,34 +149,34 @@ struct MenuBarView: View {
                         HStack {
                             Text(device.name)
                             if audioDeviceManager.getCurrentDevice() == device.id {
-                                Image(systemName: "checkmark")
+                                Image(systemName: VoiceInkMacOSMenuBarPresentation.selectionCheckmarkSystemImageName)
                             }
                         }
                     }
                 }
 
                 if audioDeviceManager.availableDevices.isEmpty {
-                    Text("No devices available")
+                    Text(VoiceInkMacOSMenuBarPresentation.noDevicesAvailableText)
                         .foregroundColor(.secondary)
                 }
             } label: {
                 HStack {
-                    Text("Audio Input")
-                    Image(systemName: "chevron.up.chevron.down")
+                    Text(VoiceInkMacOSMenuBarPresentation.audioInputTitle)
+                    Image(systemName: VoiceInkMacOSMenuBarPresentation.pickerSystemImageName)
                         .font(.system(size: 10))
                 }
             }
 
-            Menu("Additional") {
+            Menu(VoiceInkMacOSMenuBarPresentation.additionalMenuTitle) {
                 Button {
                     enhancementService.useClipboardContext.toggle()
                     menuRefreshTrigger.toggle()
                 } label: {
                     HStack {
-                        Text("Clipboard Context")
+                        Text(VoiceInkMacOSMenuBarPresentation.clipboardContextTitle)
                         Spacer()
                         if enhancementService.useClipboardContext {
-                            Image(systemName: "checkmark")
+                            Image(systemName: VoiceInkMacOSMenuBarPresentation.selectionCheckmarkSystemImageName)
                         }
                     }
                 }
@@ -184,10 +186,10 @@ struct MenuBarView: View {
                     menuRefreshTrigger.toggle()
                 } label: {
                     HStack {
-                        Text("Context Awareness")
+                        Text(VoiceInkMacOSMenuBarPresentation.contextAwarenessTitle)
                         Spacer()
                         if enhancementService.useScreenCaptureContext {
-                            Image(systemName: "checkmark")
+                            Image(systemName: VoiceInkMacOSMenuBarPresentation.selectionCheckmarkSystemImageName)
                         }
                     }
                 }
@@ -196,7 +198,7 @@ struct MenuBarView: View {
             
             Divider()
 
-            Button("Retry Last Transcription") {
+            Button(VoiceInkMacOSMenuBarPresentation.retryLastTranscriptionTitle) {
                 LastTranscriptionService.retryLastTranscription(
                     from: engine.modelContext,
                     transcriptionModelManager: transcriptionModelManager,
@@ -205,53 +207,53 @@ struct MenuBarView: View {
                 )
             }
 
-            Button("Copy Last Transcription") {
+            Button(VoiceInkMacOSMenuBarPresentation.copyLastTranscriptionTitle) {
                 LastTranscriptionService.copyLastTranscription(from: engine.modelContext)
             }
             .keyboardShortcut("c", modifiers: [.command, .shift])
             
-            Button("History") {
+            Button(VoiceInkMacOSMenuBarPresentation.historyTitle) {
                 menuBarManager.openHistoryWindow()
             }
             .keyboardShortcut("h", modifiers: [.command, .shift])
 
-            Button("Permissions") {
+            Button(VoiceInkMacOSMenuBarPresentation.permissionsTitle) {
                 openMainWindowAndNavigate(to: VoiceInkMacOSNavigationDestination.permissions.rawValue)
             }
             
-            Button("Settings") {
+            Button(VoiceInkMacOSMenuBarPresentation.settingsTitle) {
                 openMainWindowAndNavigate(to: VoiceInkMacOSNavigationDestination.settings.rawValue)
             }
             .keyboardShortcut(",", modifiers: .command)
             
-            Button(menuBarManager.isMenuBarOnly ? "Show Dock Icon" : "Hide Dock Icon") {
+            Button(VoiceInkMacOSMenuBarPresentation.dockIconTitle(isMenuBarOnly: menuBarManager.isMenuBarOnly)) {
                 menuBarManager.toggleMenuBarOnly()
             }
             .keyboardShortcut("d", modifiers: [.command, .shift])
 
-            Button("Hide Menu Bar Icon") {
+            Button(VoiceInkMacOSMenuBarPresentation.hideMenuBarIconTitle) {
                 showMenuBarIcon = false
             }
             
-            Toggle("Launch at Login", isOn: $launchAtLoginEnabled)
+            Toggle(VoiceInkMacOSMenuBarPresentation.launchAtLoginTitle, isOn: $launchAtLoginEnabled)
                 .onChange(of: launchAtLoginEnabled) { oldValue, newValue in
                     LaunchAtLogin.isEnabled = newValue
                 }
             
             Divider()
             
-            Button("Check for Updates") {
+            Button(VoiceInkMacOSMenuBarPresentation.checkForUpdatesTitle) {
                 updaterViewModel.checkForUpdates()
             }
             .disabled(!updaterViewModel.canCheckForUpdates)
             
-            Button("Help and Support") {
+            Button(VoiceInkMacOSMenuBarPresentation.helpAndSupportTitle) {
                 EmailSupport.openSupportEmail()
             }
             
             Divider()
 
-            Button("Quit roma-just-talk") {
+            Button(VoiceInkMacOSMenuBarPresentation.quitTitle) {
                 NSApplication.shared.terminate(nil)
             }
         }

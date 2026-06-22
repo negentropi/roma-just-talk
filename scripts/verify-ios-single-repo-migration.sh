@@ -11920,6 +11920,20 @@ require_pattern \
   'VoiceInkMenuBarPreference|showMenuBarIconKey|isMenuBarOnlyKey|defaultShowMenuBarIcon|defaultIsMenuBarOnly|registeredDefaults|saveIsMenuBarOnly' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
+require_patterns \
+  "shared macOS menu bar presentation lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift \
+  'VoiceInkMacOSMenuBarPresentation' \
+  'toggleRecorderTitle' \
+  'transcriptionModelTitle' \
+  'aiEnhancementToggleTitle' \
+  'promptTitle' \
+  'aiProviderTitle' \
+  'aiModelTitle' \
+  'dockIconTitle' \
+  'selectionCheckmarkSystemImageName' \
+  'pickerSystemImageName'
+
 require_pattern \
   "shared macOS shell backup preferences live in VoiceInkCore" \
   'VoiceInkMacOSShellBackupPreferences' \
@@ -11990,6 +12004,17 @@ require_pattern \
   'VoiceInkMenuBarPreference\.(showMenuBarIconKey|defaultShowMenuBarIcon)' \
   VoiceInk/Views/MenuBarView.swift
 
+require_patterns \
+  "macOS menu bar view uses shared menu bar presentation" \
+  VoiceInk/Views/MenuBarView.swift \
+  'VoiceInkMacOSMenuBarPresentation\.toggleRecorderTitle' \
+  'VoiceInkMacOSMenuBarPresentation\.transcriptionModelTitle' \
+  'VoiceInkMacOSMenuBarPresentation\.promptTitle' \
+  'VoiceInkMacOSMenuBarPresentation\.aiProviderTitle' \
+  'VoiceInkMacOSMenuBarPresentation\.aiModelTitle' \
+  'VoiceInkMacOSMenuBarPresentation\.dockIconTitle' \
+  'VoiceInkMacOSMenuBarPresentation\.quitTitle'
+
 require_pattern \
   "macOS settings uses shared menu bar icon preference" \
   'VoiceInkMenuBarPreference\.(showMenuBarIconKey|defaultShowMenuBarIcon)' \
@@ -12002,8 +12027,13 @@ require_pattern \
 
 require_pattern \
   "core checks execute menu bar preference tests" \
-  'testSharedPreferenceDefaultsPreserveExistingMacOSMenuBarPolicy|testMenuBarPreferencePreservesRegisteredDefaultsAndStorage' \
+  'testSharedPreferenceDefaultsPreserveExistingMacOSMenuBarPolicy|testMenuBarPreferencePreservesRegisteredDefaultsAndStorage|testMacOSMenuBarPresentationPreservesMenuCopyAndIcons' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "migration checklist tracks shared macOS menu bar presentation" \
+  'macOS menu-bar icon visibility, dock-icon hiding storage/defaults, menu labels, empty-state copy, dynamic selection labels, and picker/checkmark symbols.*VoiceInkMenuBarPreference`/`VoiceInkMacOSMenuBarPresentation' \
+  docs/ios-single-repo-migration.md
 
 require_pattern \
   "core checks execute macOS shell backup export policy tests" \
@@ -12024,6 +12054,11 @@ reject_pattern \
   VoiceInk/Views/MenuBarView.swift \
   VoiceInk/Views/Settings/SettingsView.swift \
   VoiceInk/Services/SystemInfoService.swift
+
+reject_pattern \
+  "macOS menu bar view avoids shell-owned menu copy and symbol policy" \
+  '"(Toggle Recorder|Manage Models|Transcription Model:|None|AI Enhancement|Prompt:|No providers connected|AI Provider:|No models available|AI Model:|No devices available|Audio Input|Additional|Clipboard Context|Context Awareness|Retry Last Transcription|Copy Last Transcription|History|Permissions|Settings|Show Dock Icon|Hide Dock Icon|Hide Menu Bar Icon|Launch at Login|Check for Updates|Help and Support|Quit roma-just-talk|checkmark|chevron\.up\.chevron\.down)"' \
+  VoiceInk/Views/MenuBarView.swift
 
 require_pattern \
   "shared license preference policy lives in VoiceInkCore" \

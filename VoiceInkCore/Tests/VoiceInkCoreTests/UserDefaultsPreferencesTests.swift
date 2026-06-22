@@ -393,6 +393,45 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         }
     }
 
+    func testMacOSMenuBarPresentationPreservesMenuCopyAndIcons() {
+        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.toggleRecorderTitle, "Toggle Recorder")
+        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.manageModelsTitle, "Manage Models")
+        XCTAssertEqual(
+            VoiceInkMacOSMenuBarPresentation.transcriptionModelTitle(currentDisplayName: "Whisper Large"),
+            "Transcription Model: Whisper Large"
+        )
+        XCTAssertEqual(
+            VoiceInkMacOSMenuBarPresentation.transcriptionModelTitle(currentDisplayName: nil),
+            "Transcription Model: None"
+        )
+        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.aiEnhancementToggleTitle, "AI Enhancement")
+        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.promptTitle(activePromptTitle: "Email"), "Prompt: Email")
+        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.promptTitle(activePromptTitle: nil), "Prompt: None")
+        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.noProvidersConnectedText, "No providers connected")
+        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.aiProviderTitle(selectedProviderName: "OpenAI"), "AI Provider: OpenAI")
+        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.noModelsAvailableText, "No models available")
+        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.aiModelTitle(currentModelName: "gpt-4o"), "AI Model: gpt-4o")
+        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.audioInputTitle, "Audio Input")
+        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.noDevicesAvailableText, "No devices available")
+        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.additionalMenuTitle, "Additional")
+        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.clipboardContextTitle, "Clipboard Context")
+        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.contextAwarenessTitle, "Context Awareness")
+        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.retryLastTranscriptionTitle, "Retry Last Transcription")
+        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.copyLastTranscriptionTitle, "Copy Last Transcription")
+        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.historyTitle, "History")
+        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.permissionsTitle, "Permissions")
+        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.settingsTitle, "Settings")
+        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.dockIconTitle(isMenuBarOnly: true), "Show Dock Icon")
+        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.dockIconTitle(isMenuBarOnly: false), "Hide Dock Icon")
+        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.hideMenuBarIconTitle, "Hide Menu Bar Icon")
+        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.launchAtLoginTitle, "Launch at Login")
+        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.checkForUpdatesTitle, "Check for Updates")
+        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.helpAndSupportTitle, "Help and Support")
+        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.quitTitle, "Quit roma-just-talk")
+        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.selectionCheckmarkSystemImageName, "checkmark")
+        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.pickerSystemImageName, "chevron.up.chevron.down")
+    }
+
     func testMacOSShellBackupPreferencesPreserveExportShape() {
         XCTAssertEqual(
             VoiceInkMacOSShellBackupPreference.backupPreferences(

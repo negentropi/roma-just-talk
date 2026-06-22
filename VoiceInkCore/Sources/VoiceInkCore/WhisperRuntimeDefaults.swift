@@ -34,6 +34,28 @@ public enum VoiceInkWhisperRuntimeDiagnostics {
     public static let metalFlashAttentionMessage = "Flash attention enabled for Metal"
     public static let vadBundleModelLoadedMessage = "VAD model loaded from bundle resources"
     public static let vadModelPathMissingWarningMessage = "VAD model path not found, VAD will be disabled."
+
+    public static func transcriptionFailedMessage(
+        isVADEnabled: Bool,
+        platform: VoiceInkLocalWhisperPlatform
+    ) -> String {
+        "\(diagnosticPrefix(for: platform))Failed to run whisper_full. VAD enabled: \(isVADEnabled)"
+    }
+
+    public static func modelLoadFailedMessagePrefix(
+        platform: VoiceInkLocalWhisperPlatform
+    ) -> String {
+        "\(diagnosticPrefix(for: platform))Couldn't load model at"
+    }
+
+    private static func diagnosticPrefix(for platform: VoiceInkLocalWhisperPlatform) -> String {
+        switch platform {
+        case .macOS:
+            return "❌ "
+        case .iOS:
+            return ""
+        }
+    }
 }
 
 public enum VoiceInkWhisperContextEnvironment: Equatable, Sendable {

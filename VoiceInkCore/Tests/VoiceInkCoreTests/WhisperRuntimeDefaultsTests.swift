@@ -34,6 +34,28 @@ final class WhisperRuntimeDefaultsTests: XCTestCase {
         XCTAssertEqual(VoiceInkWhisperRuntimeDiagnostics.metalFlashAttentionMessage, "Flash attention enabled for Metal")
         XCTAssertEqual(VoiceInkWhisperRuntimeDiagnostics.vadBundleModelLoadedMessage, "VAD model loaded from bundle resources")
         XCTAssertEqual(VoiceInkWhisperRuntimeDiagnostics.vadModelPathMissingWarningMessage, "VAD model path not found, VAD will be disabled.")
+        XCTAssertEqual(
+            VoiceInkWhisperRuntimeDiagnostics.transcriptionFailedMessage(
+                isVADEnabled: true,
+                platform: .macOS
+            ),
+            "❌ Failed to run whisper_full. VAD enabled: true"
+        )
+        XCTAssertEqual(
+            VoiceInkWhisperRuntimeDiagnostics.transcriptionFailedMessage(
+                isVADEnabled: false,
+                platform: .iOS
+            ),
+            "Failed to run whisper_full. VAD enabled: false"
+        )
+        XCTAssertEqual(
+            VoiceInkWhisperRuntimeDiagnostics.modelLoadFailedMessagePrefix(platform: .macOS),
+            "❌ Couldn't load model at"
+        )
+        XCTAssertEqual(
+            VoiceInkWhisperRuntimeDiagnostics.modelLoadFailedMessagePrefix(platform: .iOS),
+            "Couldn't load model at"
+        )
     }
 
     func testContextRuntimePlanPreservesSimulatorAndDeviceInitializationPolicy() {

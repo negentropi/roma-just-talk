@@ -3115,22 +3115,40 @@ reject_pattern \
 
 require_pattern \
   "shared local Whisper diagnostics live in VoiceInkCore" \
-  'VoiceInkWhisperRuntimeDiagnostics|logCategory = "WhisperContext"|simulatorCPUModeMessage = "Running on the simulator, using CPU"|metalFlashAttentionMessage = "Flash attention enabled for Metal"|vadBundleModelLoadedMessage = "VAD model loaded from bundle resources"|vadModelPathMissingWarningMessage = "VAD model path not found, VAD will be disabled\."' \
+  'VoiceInkWhisperRuntimeDiagnostics|logCategory = "WhisperContext"|simulatorCPUModeMessage = "Running on the simulator, using CPU"|metalFlashAttentionMessage = "Flash attention enabled for Metal"|vadBundleModelLoadedMessage = "VAD model loaded from bundle resources"|vadModelPathMissingWarningMessage = "VAD model path not found, VAD will be disabled\."|transcriptionFailedMessage|modelLoadFailedMessagePrefix' \
   VoiceInkCore/Sources/VoiceInkCore/WhisperRuntimeDefaults.swift
+
+require_patterns \
+  "core tests cover shared local Whisper runtime failure diagnostics" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/WhisperRuntimeDefaultsTests.swift \
+  'VoiceInkWhisperRuntimeDiagnostics\.transcriptionFailedMessage' \
+  'VoiceInkWhisperRuntimeDiagnostics\.modelLoadFailedMessagePrefix'
 
 require_pattern \
   "macOS local Whisper uses shared diagnostics" \
   'VoiceInkWhisperRuntimeDiagnostics\.(logCategory|simulatorCPUModeMessage|metalFlashAttentionMessage|vadBundleModelLoadedMessage)' \
   VoiceInk/Transcription/Whisper/LibWhisper.swift
 
+require_patterns \
+  "macOS local Whisper uses shared runtime failure diagnostics" \
+  VoiceInk/Transcription/Whisper/LibWhisper.swift \
+  'VoiceInkWhisperRuntimeDiagnostics\.transcriptionFailedMessage\(isVADEnabled: params\.vad, platform: \.macOS\)' \
+  'VoiceInkWhisperRuntimeDiagnostics\.modelLoadFailedMessagePrefix\(platform: \.macOS\)'
+
 require_pattern \
   "iOS local Whisper uses shared diagnostics" \
   'VoiceInkWhisperRuntimeDiagnostics\.(logCategory|simulatorCPUModeMessage|metalFlashAttentionMessage|vadBundleModelLoadedMessage|vadModelPathMissingWarningMessage)' \
   iOS/VoiceInk-ios/LibWhisper.swift
 
+require_patterns \
+  "iOS local Whisper uses shared runtime failure diagnostics" \
+  iOS/VoiceInk-ios/LibWhisper.swift \
+  'VoiceInkWhisperRuntimeDiagnostics\.transcriptionFailedMessage\(isVADEnabled: params\.vad, platform: \.iOS\)' \
+  'VoiceInkWhisperRuntimeDiagnostics\.modelLoadFailedMessagePrefix\(platform: \.iOS\)'
+
 reject_pattern \
   "local Whisper adapters avoid duplicate shared diagnostics literals" \
-  '"(WhisperContext|Running on the simulator, using CPU|Flash attention enabled for Metal|VAD model loaded from bundle resources|VAD model path not found, VAD will be disabled\.)"' \
+  '"(WhisperContext|Running on the simulator, using CPU|Flash attention enabled for Metal|VAD model loaded from bundle resources|VAD model path not found, VAD will be disabled\.|Failed to run whisper_full\. VAD enabled:|Couldn.t load model at)"' \
   VoiceInk/Transcription/Whisper/LibWhisper.swift \
   iOS/VoiceInk-ios/LibWhisper.swift
 

@@ -33,6 +33,7 @@ public enum VoiceInkWhisperRuntimeDiagnostics {
     public static let simulatorCPUModeMessage = "Running on the simulator, using CPU"
     public static let metalFlashAttentionMessage = "Flash attention enabled for Metal"
     public static let vadBundleModelLoadedMessage = "VAD model loaded from bundle resources"
+    public static let vadModelPathMissingWarningMessage = "VAD model path not found, VAD will be disabled."
 }
 
 public enum VoiceInkWhisperContextEnvironment: Equatable, Sendable {

@@ -54,7 +54,7 @@ actor WhisperContext {
         whisper_reset_timings(context)
 
         if runtimeConfiguration.vad == nil {
-            logger.warning("VAD model path not found, VAD will be disabled.")
+            logger.warning("\(VoiceInkWhisperRuntimeDiagnostics.vadModelPathMissingWarningMessage, privacy: .public)")
         }
 
         return invocationPlan.withUnsafeCStringPointers { languagePointer, promptPointer, vadModelPathPointer in

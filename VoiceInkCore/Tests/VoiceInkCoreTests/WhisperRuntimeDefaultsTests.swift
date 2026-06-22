@@ -33,6 +33,7 @@ final class WhisperRuntimeDefaultsTests: XCTestCase {
         XCTAssertEqual(VoiceInkWhisperRuntimeDiagnostics.simulatorCPUModeMessage, "Running on the simulator, using CPU")
         XCTAssertEqual(VoiceInkWhisperRuntimeDiagnostics.metalFlashAttentionMessage, "Flash attention enabled for Metal")
         XCTAssertEqual(VoiceInkWhisperRuntimeDiagnostics.vadBundleModelLoadedMessage, "VAD model loaded from bundle resources")
+        XCTAssertEqual(VoiceInkWhisperRuntimeDiagnostics.vadModelPathMissingWarningMessage, "VAD model path not found, VAD will be disabled.")
     }
 
     func testContextRuntimePlanPreservesSimulatorAndDeviceInitializationPolicy() {

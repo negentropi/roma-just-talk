@@ -498,6 +498,38 @@ public struct VoiceInkAIEnhancementCredentialState: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkAIEnhancementCredentialStateResolutionPlan: Equatable, Sendable {
+    public let provider: VoiceInkAIEnhancementProviderKind
+    public let providerKeyStorageNameToLoad: String?
+
+    public init(
+        provider: VoiceInkAIEnhancementProviderKind,
+        providerKeyStorageNameToLoad: String?
+    ) {
+        self.provider = provider
+        self.providerKeyStorageNameToLoad = providerKeyStorageNameToLoad
+    }
+
+    public static func resolving(
+        provider: VoiceInkAIEnhancementProviderKind
+    ) -> VoiceInkAIEnhancementCredentialStateResolutionPlan {
+        VoiceInkAIEnhancementCredentialStateResolutionPlan(
+            provider: provider,
+            providerKeyStorageNameToLoad: provider.requiresUserAPIKey ? provider.rawValue : nil
+        )
+    }
+
+    public func credentialState(
+        savedAPIKey: String?,
+        isLocalCLIConfigured: Bool
+    ) -> VoiceInkAIEnhancementCredentialState {
+        provider.textEnhancementCredentialState(
+            savedAPIKey: savedAPIKey,
+            isLocalCLIConfigured: isLocalCLIConfigured
+        )
+    }
+}
+
 public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
     public static let missingVerificationCandidateMessage = "Environment variable is missing or empty"
     public static let invalidOrMissingBaseURLConfigurationMessage = "Invalid or missing base URL configuration"

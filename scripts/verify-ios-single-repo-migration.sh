@@ -6025,8 +6025,13 @@ reject_pattern \
 
 require_pattern \
   "shared AI enhancement credential-state policy lives in VoiceInkCore" \
-  'VoiceInkAIEnhancementCredentialState|textEnhancementCredentialState' \
+  'VoiceInkAIEnhancementCredentialState|VoiceInkAIEnhancementCredentialStateResolutionPlan|textEnhancementCredentialState|providerKeyStorageNameToLoad' \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+require_pattern \
+  "core checks execute shared AI enhancement credential-state resolution plan test" \
+  'AIProviderCatalogTests\.testMacOSAIEnhancementCredentialStateResolutionPlanIsShared' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "shared AI enhancement provider-selection plan lives in VoiceInkCore" \
@@ -6057,13 +6062,23 @@ require_pattern \
 
 require_pattern \
   "macOS AI service credential-state selection uses shared policy" \
-  'textEnhancementCredentialState' \
+  'VoiceInkAIEnhancementCredentialStateResolutionPlan\.resolving|providerKeyStorageNameToLoad|plan\.credentialState' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
+reject_pattern \
+  "macOS AI service avoids shell-owned credential-state key lookup policy" \
+  'selectedProvider\.requiresUserAPIKey|APIKeyManager\.shared\.getAPIKey\(forProvider: selectedProvider\.rawValue\)' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 require_pattern \
   "macOS AI service Local CLI credential refresh uses shared policy" \
   'applyCredentialStateForSelectedProvider' \
   VoiceInk/Services/AIEnhancement/AIService.swift
+
+require_pattern \
+  "migration checklist tracks shared AI enhancement credential-state resolution planning" \
+  'credential-state resolution planning.*VoiceInkAIEnhancementCredentialStateResolutionPlan' \
+  docs/ios-single-repo-migration.md
 
 require_pattern \
   "shared Local CLI configuration lives in VoiceInkCore" \

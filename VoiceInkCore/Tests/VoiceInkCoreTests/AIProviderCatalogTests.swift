@@ -92,6 +92,62 @@ final class AIProviderCatalogTests: XCTestCase {
         )
     }
 
+    func testMacOSAIEnhancementCredentialStateResolutionPlanIsShared() {
+        let groqPlan = VoiceInkAIEnhancementCredentialStateResolutionPlan.resolving(provider: .groq)
+        let localCLIPlan = VoiceInkAIEnhancementCredentialStateResolutionPlan.resolving(provider: .localCLI)
+        let ollamaPlan = VoiceInkAIEnhancementCredentialStateResolutionPlan.resolving(provider: .ollama)
+
+        XCTAssertEqual(
+            groqPlan,
+            VoiceInkAIEnhancementCredentialStateResolutionPlan(
+                provider: .groq,
+                providerKeyStorageNameToLoad: VoiceInkAIEnhancementProviderKind.groq.rawValue
+            )
+        )
+        XCTAssertEqual(
+            groqPlan.credentialState(
+                savedAPIKey: "saved-groq-key",
+                isLocalCLIConfigured: false
+            ),
+            VoiceInkAIEnhancementCredentialState(apiKey: "saved-groq-key", isAPIKeyValid: true)
+        )
+        XCTAssertEqual(
+            groqPlan.credentialState(
+                savedAPIKey: nil,
+                isLocalCLIConfigured: true
+            ),
+            VoiceInkAIEnhancementCredentialState(apiKey: "", isAPIKeyValid: false)
+        )
+        XCTAssertEqual(
+            localCLIPlan,
+            VoiceInkAIEnhancementCredentialStateResolutionPlan(
+                provider: .localCLI,
+                providerKeyStorageNameToLoad: nil
+            )
+        )
+        XCTAssertEqual(
+            localCLIPlan.credentialState(
+                savedAPIKey: "ignored-key",
+                isLocalCLIConfigured: true
+            ),
+            VoiceInkAIEnhancementCredentialState(apiKey: "", isAPIKeyValid: true)
+        )
+        XCTAssertEqual(
+            ollamaPlan,
+            VoiceInkAIEnhancementCredentialStateResolutionPlan(
+                provider: .ollama,
+                providerKeyStorageNameToLoad: nil
+            )
+        )
+        XCTAssertEqual(
+            ollamaPlan.credentialState(
+                savedAPIKey: nil,
+                isLocalCLIConfigured: false
+            ),
+            VoiceInkAIEnhancementCredentialState(apiKey: "", isAPIKeyValid: true)
+        )
+    }
+
     func testProviderAPIKeyVerificationProgressPresentsSharedFeedback() {
         XCTAssertTrue(VoiceInkProviderAPIKeyVerificationProgress.verifying.isVerifying)
         XCTAssertFalse(VoiceInkProviderAPIKeyVerificationProgress.idle.isVerifying)

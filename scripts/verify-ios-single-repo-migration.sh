@@ -10105,16 +10105,21 @@ require_patterns \
   "shared Power Mode browser metadata lives in VoiceInkCore" \
   VoiceInkCore/Sources/VoiceInkCore/PowerModeBrowser.swift \
   'VoiceInkPowerModeBrowser' \
+  'VoiceInkPowerModeBrowserURLDiagnostics' \
+  'loggerCategory' \
   'safariURL' \
   'company\.thebrowser\.Browser' \
   'com\.google\.Chrome' \
   'com\.microsoft\.edgemac' \
   'app\.zen-browser\.zen' \
-  'ru\.yandex\.desktop\.yandex-browser'
+  'ru\.yandex\.desktop\.yandex-browser' \
+  'scriptNotFoundMessage' \
+  'executionFailedMessage' \
+  'runningStatusMessage'
 
 require_pattern \
-  "core checks execute Power Mode browser metadata tests" \
-  'PowerModePolicyTests\.testPowerModeBrowserCatalogPreservesMacOSMetadata|PowerModePolicyTests\.testPowerModeBrowserCatalogPreservesCurrentDetectionSet' \
+  "core checks execute Power Mode browser metadata and diagnostics tests" \
+  'PowerModePolicyTests\.testPowerModeBrowserCatalogPreservesMacOSMetadata|PowerModePolicyTests\.testPowerModeBrowserCatalogPreservesCurrentDetectionSet|PowerModePolicyTests\.testPowerModeBrowserURLDiagnosticsPreserveMacOSLogCopy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -10123,10 +10128,12 @@ require_pattern \
   VoiceInk/PowerMode/ActiveWindowService.swift
 
 require_patterns \
-  "macOS browser URL service adapts shared Power Mode browser metadata" \
+  "macOS browser URL service adapts shared Power Mode browser metadata and diagnostics" \
   VoiceInk/PowerMode/BrowserURLService.swift \
   'getCurrentURL\(from browser: VoiceInkPowerModeBrowser\)' \
   'isRunning\(_ browser: VoiceInkPowerModeBrowser\)' \
+  'VoiceInkPowerModeBrowserURLDiagnostics\.loggerCategory' \
+  'VoiceInkPowerModeBrowserURLDiagnostics\.(scriptNotFoundMessage|attemptingExecutionMessage|browserNotRunningMessage|executingScriptMessage|emptyOutputMessage|scriptErrorMessage|successMessage|outputDecodeFailedMessage|executionFailedMessage|runningStatusMessage)' \
   'browser\.scriptName' \
   'browser\.bundleIdentifier' \
   'browser\.displayName'
@@ -10137,9 +10144,14 @@ reject_pattern \
   VoiceInk/PowerMode/BrowserURLService.swift \
   VoiceInk/PowerMode/ActiveWindowService.swift
 
+reject_pattern \
+  "macOS browser URL service avoids shell-owned diagnostic copy" \
+  '"browser\.applescript"|"❌ AppleScript file not found:|"🔍 Attempting to execute AppleScript for |"❌ Browser not running:|"▶️ Executing AppleScript for |"❌ Empty output from AppleScript for |"❌ AppleScript error for |"✅ Successfully retrieved URL from |"❌ Failed to decode output from AppleScript for |"❌ AppleScript execution failed for |running status:' \
+  VoiceInk/PowerMode/BrowserURLService.swift
+
 require_pattern \
-  "migration checklist tracks shared Power Mode browser metadata" \
-  'VoiceInkPowerModeBrowser|browser metadata' \
+  "migration checklist tracks shared Power Mode browser metadata and diagnostics" \
+  'VoiceInkPowerModeBrowserURLDiagnostics|browser URL diagnostic copy' \
   docs/ios-single-repo-migration.md
 
 reject_pattern \

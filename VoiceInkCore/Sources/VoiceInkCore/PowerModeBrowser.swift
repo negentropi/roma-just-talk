@@ -73,3 +73,50 @@ public enum VoiceInkPowerModeBrowser: Equatable, Sendable {
         .yandex
     ]
 }
+
+public enum VoiceInkPowerModeBrowserURLDiagnostics {
+    public static let loggerCategory = "browser.applescript"
+
+    public static func scriptNotFoundMessage(scriptName: String) -> String {
+        "❌ AppleScript file not found: \(scriptName).scpt"
+    }
+
+    public static func attemptingExecutionMessage(browserDisplayName: String) -> String {
+        "🔍 Attempting to execute AppleScript for \(browserDisplayName)"
+    }
+
+    public static func browserNotRunningMessage(browserDisplayName: String) -> String {
+        "❌ Browser not running: \(browserDisplayName)"
+    }
+
+    public static func executingScriptMessage(browserDisplayName: String) -> String {
+        "▶️ Executing AppleScript for \(browserDisplayName)"
+    }
+
+    public static func emptyOutputMessage(browserDisplayName: String) -> String {
+        "❌ Empty output from AppleScript for \(browserDisplayName)"
+    }
+
+    public static func scriptErrorMessage(browserDisplayName: String, output: String) -> String {
+        "❌ AppleScript error for \(browserDisplayName): \(output)"
+    }
+
+    public static func successMessage(browserDisplayName: String, output: String) -> String {
+        "✅ Successfully retrieved URL from \(browserDisplayName): \(output)"
+    }
+
+    public static func outputDecodeFailedMessage(browserDisplayName: String) -> String {
+        "❌ Failed to decode output from AppleScript for \(browserDisplayName)"
+    }
+
+    public static func executionFailedMessage(
+        browserDisplayName: String,
+        localizedDescription: String
+    ) -> String {
+        "❌ AppleScript execution failed for \(browserDisplayName): \(localizedDescription)"
+    }
+
+    public static func runningStatusMessage(browserDisplayName: String, isRunning: Bool) -> String {
+        "\(browserDisplayName) running status: \(isRunning)"
+    }
+}

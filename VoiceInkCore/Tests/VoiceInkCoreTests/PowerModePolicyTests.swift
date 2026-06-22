@@ -52,6 +52,62 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertFalse(VoiceInkPowerModeBrowser.allCases.contains(.zen))
     }
 
+    func testPowerModeBrowserURLDiagnosticsPreserveMacOSLogCopy() {
+        XCTAssertEqual(VoiceInkPowerModeBrowserURLDiagnostics.loggerCategory, "browser.applescript")
+        XCTAssertEqual(
+            VoiceInkPowerModeBrowserURLDiagnostics.scriptNotFoundMessage(scriptName: "arcURL"),
+            "❌ AppleScript file not found: arcURL.scpt"
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeBrowserURLDiagnostics.attemptingExecutionMessage(browserDisplayName: "Arc"),
+            "🔍 Attempting to execute AppleScript for Arc"
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeBrowserURLDiagnostics.browserNotRunningMessage(browserDisplayName: "Arc"),
+            "❌ Browser not running: Arc"
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeBrowserURLDiagnostics.executingScriptMessage(browserDisplayName: "Arc"),
+            "▶️ Executing AppleScript for Arc"
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeBrowserURLDiagnostics.emptyOutputMessage(browserDisplayName: "Arc"),
+            "❌ Empty output from AppleScript for Arc"
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeBrowserURLDiagnostics.scriptErrorMessage(
+                browserDisplayName: "Arc",
+                output: "error: no tab"
+            ),
+            "❌ AppleScript error for Arc: error: no tab"
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeBrowserURLDiagnostics.successMessage(
+                browserDisplayName: "Arc",
+                output: "https://example.com"
+            ),
+            "✅ Successfully retrieved URL from Arc: https://example.com"
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeBrowserURLDiagnostics.outputDecodeFailedMessage(browserDisplayName: "Arc"),
+            "❌ Failed to decode output from AppleScript for Arc"
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeBrowserURLDiagnostics.executionFailedMessage(
+                browserDisplayName: "Arc",
+                localizedDescription: "operation failed"
+            ),
+            "❌ AppleScript execution failed for Arc: operation failed"
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeBrowserURLDiagnostics.runningStatusMessage(
+                browserDisplayName: "Arc",
+                isRunning: true
+            ),
+            "Arc running status: true"
+        )
+    }
+
     func testPowerModeEmojiCatalogPreservesDefaultsStorageKeyAndCopy() {
         XCTAssertEqual(VoiceInkPowerModeEmojiCatalog.customEmojisKey, "userAddedEmojis")
         XCTAssertEqual(VoiceInkPowerModeEmojiCatalog.defaultEmojis.first, "🏢")

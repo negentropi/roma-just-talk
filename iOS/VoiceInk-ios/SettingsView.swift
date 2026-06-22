@@ -257,7 +257,32 @@ struct SettingsView: View {
 
     #if DEBUG
     private func resetAppData() {
-        // 1) Delete all SwiftData Transcription records
+        let resetPlan = VoiceInkAppDataResetPlan.iOS(
+            recordingsDirectory: VoiceInkIOSStorageDirectories.recordingsDirectory,
+            modelsDirectory: VoiceInkIOSStorageDirectories.modelsDirectory,
+            cachesDirectory: VoiceInkIOSStorageDirectories.cachesDirectory,
+            temporaryDirectory: URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+        )
+
+        for step in resetPlan.steps {
+            applyResetStep(step)
+        }
+    }
+
+    private func applyResetStep(_ step: VoiceInkAppDataResetStep) {
+        switch step {
+        case .deleteTranscriptionRecords:
+            deleteTranscriptionRecords()
+
+        case .cleanFiles(let filePlan):
+            filePlan.performBestEffort()
+
+        case .resetAppSettings:
+            settings.resetAll()
+        }
+    }
+
+    private func deleteTranscriptionRecords() {
         do {
             let descriptor = FetchDescriptor<Transcription>()
             let modelContainer = try ModelContainer(for: Transcription.self)
@@ -270,16 +295,6 @@ struct SettingsView: View {
         } catch {
             VoiceInkIOSLogger.settings.error("Failed to reset SwiftData: \(String(describing: error), privacy: .public)")
         }
-
-        VoiceInkAppDataResetFilePlan.iOS(
-            recordingsDirectory: VoiceInkIOSStorageDirectories.recordingsDirectory,
-            modelsDirectory: VoiceInkIOSStorageDirectories.modelsDirectory,
-            cachesDirectory: VoiceInkIOSStorageDirectories.cachesDirectory,
-            temporaryDirectory: URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
-        )
-        .performBestEffort()
-
-        settings.resetAll()
     }
     #endif
 }

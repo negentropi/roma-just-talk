@@ -2,6 +2,34 @@ import Foundation
 @testable import VoiceInkCore
 
 final class AppDataResetTests: XCTestCase {
+    func testIOSResetPlanPreservesRecordFileAndSettingsResetOrder() {
+        let recordingsDirectory = URL(fileURLWithPath: "/tmp/recordings", isDirectory: true)
+        let modelsDirectory = URL(fileURLWithPath: "/tmp/models", isDirectory: true)
+        let cachesDirectory = URL(fileURLWithPath: "/tmp/caches", isDirectory: true)
+        let temporaryDirectory = URL(fileURLWithPath: "/tmp/app-tmp", isDirectory: true)
+
+        let filePlan = VoiceInkAppDataResetFilePlan.iOS(
+            recordingsDirectory: recordingsDirectory,
+            modelsDirectory: modelsDirectory,
+            cachesDirectory: cachesDirectory,
+            temporaryDirectory: temporaryDirectory
+        )
+
+        XCTAssertEqual(
+            VoiceInkAppDataResetPlan.iOS(
+                recordingsDirectory: recordingsDirectory,
+                modelsDirectory: modelsDirectory,
+                cachesDirectory: cachesDirectory,
+                temporaryDirectory: temporaryDirectory
+            ).steps,
+            [
+                .deleteTranscriptionRecords,
+                .cleanFiles(filePlan),
+                .resetAppSettings
+            ]
+        )
+    }
+
     func testIOSResetFilePlanPreservesExistingDirectoryPolicy() {
         let recordingsDirectory = URL(fileURLWithPath: "/tmp/recordings", isDirectory: true)
         let modelsDirectory = URL(fileURLWithPath: "/tmp/models", isDirectory: true)

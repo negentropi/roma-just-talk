@@ -1,5 +1,37 @@
 import Foundation
 
+public enum VoiceInkAppDataResetStep: Equatable, Sendable {
+    case deleteTranscriptionRecords
+    case cleanFiles(VoiceInkAppDataResetFilePlan)
+    case resetAppSettings
+}
+
+public struct VoiceInkAppDataResetPlan: Equatable, Sendable {
+    public let steps: [VoiceInkAppDataResetStep]
+
+    public init(steps: [VoiceInkAppDataResetStep]) {
+        self.steps = steps
+    }
+
+    public static func iOS(
+        recordingsDirectory: URL,
+        modelsDirectory: URL,
+        cachesDirectory: URL,
+        temporaryDirectory: URL
+    ) -> Self {
+        Self(steps: [
+            .deleteTranscriptionRecords,
+            .cleanFiles(VoiceInkAppDataResetFilePlan.iOS(
+                recordingsDirectory: recordingsDirectory,
+                modelsDirectory: modelsDirectory,
+                cachesDirectory: cachesDirectory,
+                temporaryDirectory: temporaryDirectory
+            )),
+            .resetAppSettings
+        ])
+    }
+}
+
 public struct VoiceInkAppDataResetFilePlan: Equatable, Sendable {
     public let directoriesToRemove: [URL]
     public let directoriesToEmpty: [URL]

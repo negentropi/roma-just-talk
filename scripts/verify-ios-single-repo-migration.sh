@@ -8495,9 +8495,14 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
-  "shared app data reset file plan lives in VoiceInkCore" \
-  'VoiceInkAppDataResetFilePlan' \
+  "shared app data reset plan lives in VoiceInkCore" \
+  'VoiceInkAppDataResetPlan|VoiceInkAppDataResetStep|VoiceInkAppDataResetFilePlan|deleteTranscriptionRecords|cleanFiles|resetAppSettings' \
   VoiceInkCore/Sources/VoiceInkCore/AppDataReset.swift
+
+require_pattern \
+  "core checks execute iOS app data reset sequence test" \
+  'AppDataResetTests\.testIOSResetPlanPreservesRecordFileAndSettingsResetOrder' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "shared current-model preference remembers legacy macOS model key" \
@@ -8645,8 +8650,8 @@ require_pattern \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \
-  "iOS app settings reset consumes shared file reset plan" \
-  'VoiceInkAppDataResetFilePlan\.iOS' \
+  "iOS app settings reset consumes shared app data reset plan" \
+  'VoiceInkAppDataResetPlan\.iOS|for step in resetPlan\.steps|applyResetStep' \
   iOS/VoiceInk-ios/SettingsView.swift
 
 reject_pattern \
@@ -8656,7 +8661,7 @@ reject_pattern \
 
 reject_pattern \
   "iOS app settings reset avoids shell-only file reset sequence" \
-  'let +recordingsDir|let +modelsDir|let +cachesURL|let +tmpPath|contentsOfDirectory|removeItem\(atPath:' \
+  'VoiceInkAppDataResetFilePlan\.iOS|let +recordingsDir|let +modelsDir|let +cachesURL|let +tmpPath|contentsOfDirectory|removeItem\(atPath:' \
   iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \

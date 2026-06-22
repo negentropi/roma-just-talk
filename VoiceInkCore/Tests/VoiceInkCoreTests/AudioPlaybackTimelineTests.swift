@@ -253,4 +253,87 @@ final class AudioPlaybackTimelineTests: XCTestCase {
         )
         XCTAssertEqual(VoiceInkAudioPlaybackPresentation.viewDetailsHelpText, "View details")
     }
+
+    func testPlaybackActionBannerPresentationPreservesMacOSActionCopy() {
+        XCTAssertEqual(
+            VoiceInkAudioPlaybackActionBannerPresentation.retranscriptionSuccess,
+            VoiceInkAudioPlaybackActionBannerPresentation(
+                message: "Retranscription successful",
+                isError: false
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkAudioPlaybackActionBannerPresentation.reEnhancementSuccess,
+            VoiceInkAudioPlaybackActionBannerPresentation(
+                message: "Re-enhancement successful",
+                isError: false
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkAudioPlaybackActionBannerPresentation.retranscriptionFailure(errorDescription: ""),
+            VoiceInkAudioPlaybackActionBannerPresentation(
+                message: "Retranscription failed",
+                isError: true
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkAudioPlaybackActionBannerPresentation.retranscriptionFailure(
+                errorDescription: "provider unavailable"
+            ),
+            VoiceInkAudioPlaybackActionBannerPresentation(
+                message: "provider unavailable",
+                isError: true
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkAudioPlaybackActionBannerPresentation.reEnhancementFailure(errorDescription: ""),
+            VoiceInkAudioPlaybackActionBannerPresentation(
+                message: "Re-enhancement failed",
+                isError: true
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkAudioPlaybackActionBannerPresentation.reEnhancementFailure(errorDescription: "timeout"),
+            VoiceInkAudioPlaybackActionBannerPresentation(
+                message: "timeout",
+                isError: true
+            )
+        )
+    }
+
+    func testPlaybackActionBannerPresentationPreservesMacOSGuardCopy() {
+        XCTAssertEqual(
+            VoiceInkAudioPlaybackActionBannerPresentation.retranscriptionNoModelFailure,
+            VoiceInkAudioPlaybackActionBannerPresentation(
+                message: "No transcription model selected",
+                isError: true
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkAudioPlaybackActionBannerPresentation.reEnhancementUnavailable(
+                isEnabled: false,
+                isConfigured: false
+            ),
+            VoiceInkAudioPlaybackActionBannerPresentation(
+                message: "AI Enhancement is not enabled or configured",
+                isError: true
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkAudioPlaybackActionBannerPresentation.reEnhancementUnavailable(
+                isEnabled: true,
+                isConfigured: false
+            ),
+            VoiceInkAudioPlaybackActionBannerPresentation(
+                message: "AI Enhancement is not enabled or configured",
+                isError: true
+            )
+        )
+        XCTAssertNil(
+            VoiceInkAudioPlaybackActionBannerPresentation.reEnhancementUnavailable(
+                isEnabled: true,
+                isConfigured: true
+            )
+        )
+    }
 }

@@ -376,34 +376,24 @@ private struct AsyncCircleButton: View {
 }
 
 private struct StatusBanner: View {
-    let message: String
-    let isError: Bool
+    let presentation: VoiceInkAudioPlaybackActionBannerPresentation
 
     var body: some View {
         HStack(spacing: 8) {
-            Image(systemName: isError ? "exclamationmark.circle.fill" : "checkmark.circle.fill")
-                .foregroundColor(isError ? .red : .green)
-            Text(message)
+            Image(systemName: presentation.isError ? "exclamationmark.circle.fill" : "checkmark.circle.fill")
+                .foregroundColor(presentation.isError ? .red : .green)
+            Text(presentation.message)
                 .font(.system(size: 14, weight: .medium))
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
         .background(
             RoundedRectangle(cornerRadius: 8)
-                .fill(isError ? Color.red.opacity(0.1) : Color.green.opacity(0.1))
-                .stroke(isError ? Color.red.opacity(0.2) : Color.green.opacity(0.2), lineWidth: 1)
+                .fill(presentation.isError ? Color.red.opacity(0.1) : Color.green.opacity(0.1))
+                .stroke(presentation.isError ? Color.red.opacity(0.2) : Color.green.opacity(0.2), lineWidth: 1)
         )
         .transition(.move(edge: .top).combined(with: .opacity))
     }
-}
-
-// MARK: - Banner State
-
-private enum BannerState: Equatable {
-    case retranscribeSuccess
-    case reEnhanceSuccess
-    case retranscribeError(String)
-    case reEnhanceError(String)
 }
 
 // MARK: - AudioPlayerView
@@ -416,7 +406,7 @@ struct AudioPlayerView: View {
     @State private var isHovering = false
     @State private var isRetranscribing = false
     @State private var isReEnhancing = false
-    @State private var bannerState: BannerState?
+    @State private var bannerPresentation: VoiceInkAudioPlaybackActionBannerPresentation?
     @State private var showPromptPopover = false
     @EnvironmentObject private var engine: VoiceInkEngine
     @EnvironmentObject private var enhancementService: AIEnhancementService
@@ -488,12 +478,12 @@ struct AudioPlayerView: View {
                         }
                     }
 
-                    AsyncCircleButton(
-                        defaultIcon: "arrow.clockwise",
-                        isLoading: isRetranscribing,
-                        showSuccess: bannerState == .retranscribeSuccess,
-                        action: retranscribeAudio
-                    )
+                        AsyncCircleButton(
+                            defaultIcon: "arrow.clockwise",
+                            isLoading: isRetranscribing,
+                            showSuccess: bannerPresentation == .retranscriptionSuccess,
+                            action: retranscribeAudio
+                        )
                     .disabled(isOperationInProgress)
                     .help(VoiceInkAudioPlaybackPresentation.retranscribeAudioHelpText)
 
@@ -501,7 +491,7 @@ struct AudioPlayerView: View {
                         AsyncCircleButton(
                             defaultIcon: "wand.and.stars",
                             isLoading: isReEnhancing,
-                            showSuccess: bannerState == .reEnhanceSuccess,
+                            showSuccess: bannerPresentation == .reEnhancementSuccess,
                             action: reEnhanceOnly
                         )
                         .disabled(isOperationInProgress || !enhancementService.isEnhancementEnabled || !enhancementService.isConfigured)
@@ -534,38 +524,13 @@ struct AudioPlayerView: View {
         }
         .overlay(
             VStack {
-                if let state = bannerState {
-                    switch state {
-                    case .retranscribeSuccess:
-                        StatusBanner(
-                            message: VoiceInkTranscriptPresentation.audioFileRetranscriptionSuccessMessage,
-                            isError: false
-                        )
-                    case .reEnhanceSuccess:
-                        StatusBanner(
-                            message: VoiceInkTranscriptPresentation.audioFileReEnhancementSuccessMessage,
-                            isError: false
-                        )
-                    case .retranscribeError(let message):
-                        StatusBanner(
-                            message: VoiceInkTranscriptPresentation.audioFileRetranscriptionFailureMessage(
-                                errorDescription: message
-                            ),
-                            isError: true
-                        )
-                    case .reEnhanceError(let message):
-                        StatusBanner(
-                            message: VoiceInkTranscriptPresentation.audioFileReEnhancementFailureMessage(
-                                errorDescription: message
-                            ),
-                            isError: true
-                        )
-                    }
+                if let bannerPresentation {
+                    StatusBanner(presentation: bannerPresentation)
                 }
                 Spacer()
             }
             .padding(.top, 16)
-            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: bannerState)
+            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: bannerPresentation)
         )
     }
 
@@ -573,26 +538,26 @@ struct AudioPlayerView: View {
         NSWorkspace.shared.selectFile(url.path, inFileViewerRootedAtPath: url.deletingLastPathComponent().path)
     }
 
-    private func showTemporaryBanner(_ state: BannerState) {
-        bannerState = state
+    private func showTemporaryBanner(_ presentation: VoiceInkAudioPlaybackActionBannerPresentation) {
+        bannerPresentation = presentation
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-            withAnimation { bannerState = nil }
+            withAnimation { bannerPresentation = nil }
         }
     }
 
     private func reEnhanceOnly() {
         guard let transcription = transcription else { return }
 
-        if let unavailableMessage = VoiceInkPostProcessingFailurePresentation.enhancementUnavailableMessage(
+        if let unavailablePresentation = VoiceInkAudioPlaybackActionBannerPresentation.reEnhancementUnavailable(
             isEnabled: enhancementService.isEnhancementEnabled,
             isConfigured: enhancementService.isConfigured
         ) {
-            showTemporaryBanner(.reEnhanceError(unavailableMessage))
+            showTemporaryBanner(unavailablePresentation)
             return
         }
 
         isReEnhancing = true
-        bannerState = nil
+        bannerPresentation = nil
 
         Task {
             do {
@@ -602,12 +567,12 @@ struct AudioPlayerView: View {
                     try? modelContext.save()
 
                     isReEnhancing = false
-                    showTemporaryBanner(.reEnhanceSuccess)
+                    showTemporaryBanner(.reEnhancementSuccess)
                 }
             } catch {
                 await MainActor.run {
                     isReEnhancing = false
-                    showTemporaryBanner(.reEnhanceError(error.localizedDescription))
+                    showTemporaryBanner(.reEnhancementFailure(errorDescription: error.localizedDescription))
                 }
             }
         }
@@ -615,26 +580,24 @@ struct AudioPlayerView: View {
 
     private func retranscribeAudio() {
         guard let currentTranscriptionModel = engine.transcriptionModelManager.currentTranscriptionModel else {
-            showTemporaryBanner(.retranscribeError(
-                VoiceInkErrorDescription.text(for: VoiceInkEngineError.noTranscriptionModelSelected)
-            ))
+            showTemporaryBanner(VoiceInkAudioPlaybackActionBannerPresentation.retranscriptionNoModelFailure)
             return
         }
 
         isRetranscribing = true
-        bannerState = nil
+        bannerPresentation = nil
 
         Task {
             do {
                 let _ = try await transcriptionService.retranscribeAudio(from: url, using: currentTranscriptionModel)
                 await MainActor.run {
                     isRetranscribing = false
-                    showTemporaryBanner(.retranscribeSuccess)
+                    showTemporaryBanner(.retranscriptionSuccess)
                 }
             } catch {
                 await MainActor.run {
                     isRetranscribing = false
-                    showTemporaryBanner(.retranscribeError(error.localizedDescription))
+                    showTemporaryBanner(.retranscriptionFailure(errorDescription: error.localizedDescription))
                 }
             }
         }

@@ -297,3 +297,63 @@ public enum VoiceInkAudioPlaybackPresentation {
         isPlaying ? "pause.fill" : "play.fill"
     }
 }
+
+public struct VoiceInkAudioPlaybackActionBannerPresentation: Equatable, Sendable {
+    public let message: String
+    public let isError: Bool
+
+    public init(message: String, isError: Bool) {
+        self.message = message
+        self.isError = isError
+    }
+
+    public static let retranscriptionSuccess = VoiceInkAudioPlaybackActionBannerPresentation(
+        message: VoiceInkTranscriptPresentation.audioFileRetranscriptionSuccessMessage,
+        isError: false
+    )
+
+    public static let reEnhancementSuccess = VoiceInkAudioPlaybackActionBannerPresentation(
+        message: VoiceInkTranscriptPresentation.audioFileReEnhancementSuccessMessage,
+        isError: false
+    )
+
+    public static let retranscriptionNoModelFailure = retranscriptionFailure(
+        errorDescription: VoiceInkErrorDescription.text(for: VoiceInkEngineError.noTranscriptionModelSelected)
+    )
+
+    public static func retranscriptionFailure(
+        errorDescription: String
+    ) -> VoiceInkAudioPlaybackActionBannerPresentation {
+        VoiceInkAudioPlaybackActionBannerPresentation(
+            message: VoiceInkTranscriptPresentation.audioFileRetranscriptionFailureMessage(
+                errorDescription: errorDescription
+            ),
+            isError: true
+        )
+    }
+
+    public static func reEnhancementFailure(
+        errorDescription: String
+    ) -> VoiceInkAudioPlaybackActionBannerPresentation {
+        VoiceInkAudioPlaybackActionBannerPresentation(
+            message: VoiceInkTranscriptPresentation.audioFileReEnhancementFailureMessage(
+                errorDescription: errorDescription
+            ),
+            isError: true
+        )
+    }
+
+    public static func reEnhancementUnavailable(
+        isEnabled: Bool,
+        isConfigured: Bool
+    ) -> VoiceInkAudioPlaybackActionBannerPresentation? {
+        guard let message = VoiceInkPostProcessingFailurePresentation.enhancementUnavailableMessage(
+            isEnabled: isEnabled,
+            isConfigured: isConfigured
+        ) else {
+            return nil
+        }
+
+        return VoiceInkAudioPlaybackActionBannerPresentation(message: message, isError: true)
+    }
+}

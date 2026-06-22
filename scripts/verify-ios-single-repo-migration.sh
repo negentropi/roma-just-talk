@@ -8750,8 +8750,8 @@ require_pattern \
   VoiceInk/Services/LastTranscriptionService.swift
 
 require_pattern \
-  "macOS audio player retranscribe uses shared no-model error vocabulary" \
-  'VoiceInkEngineError\.noTranscriptionModelSelected' \
+  "macOS audio player retranscribe no-model failure uses shared banner presentation" \
+  'VoiceInkAudioPlaybackActionBannerPresentation\.retranscriptionNoModelFailure' \
   VoiceInk/Views/AudioPlayerView.swift
 
 reject_pattern \
@@ -8835,6 +8835,22 @@ require_pattern \
   'showInFinderHelpText|selectEnhancementPromptHelpText|retranscribeAudioHelpText|reEnhanceWithSelectedPromptHelpText|viewDetailsHelpText' \
   VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
 
+require_patterns \
+  "shared audio playback action banner presentation owns macOS retry copy" \
+  VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift \
+  'VoiceInkAudioPlaybackActionBannerPresentation' \
+  'retranscriptionSuccess' \
+  'reEnhancementSuccess' \
+  'retranscriptionNoModelFailure' \
+  'retranscriptionFailure' \
+  'reEnhancementFailure' \
+  'reEnhancementUnavailable'
+
+require_pattern \
+  "shared audio playback action banner owns no-model error vocabulary" \
+  'VoiceInkErrorDescription\.text\(for: VoiceInkEngineError\.noTranscriptionModelSelected\)' \
+  VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
+
 require_pattern \
   "macOS audio player uses shared playback-rate policy" \
   'VoiceInkAudioPlaybackRate' \
@@ -8893,6 +8909,11 @@ require_pattern \
 require_pattern \
   "core checks execute macOS audio playback diagnostics tests" \
   'AudioPlaybackTimelineTests\.testPlaybackDiagnosticsPreserveMacOSConsoleCopy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute macOS audio playback action banner tests" \
+  'AudioPlaybackTimelineTests\.testPlaybackActionBannerPresentationPreservesMacOSActionCopy|AudioPlaybackTimelineTests\.testPlaybackActionBannerPresentationPreservesMacOSGuardCopy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -8966,13 +8987,8 @@ require_pattern \
   VoiceInk/Views/AudioPlayerView.swift
 
 require_pattern \
-  "macOS audio player action status uses shared transcript presentation" \
-  'VoiceInkTranscriptPresentation\.audioFile(ReEnhancement|Retranscription)(SuccessMessage|FailureMessage)' \
-  VoiceInk/Views/AudioPlayerView.swift
-
-require_pattern \
-  "macOS audio player re-enhance guard uses shared post-processing presentation" \
-  'VoiceInkPostProcessingFailurePresentation\.enhancementUnavailableMessage' \
+  "macOS audio player action status adapts shared banner presentation" \
+  'VoiceInkAudioPlaybackActionBannerPresentation\.(retranscriptionSuccess|reEnhancementSuccess|retranscriptionNoModelFailure|retranscriptionFailure|reEnhancementFailure|reEnhancementUnavailable)' \
   VoiceInk/Views/AudioPlayerView.swift
 
 require_pattern \
@@ -8982,7 +8998,7 @@ require_pattern \
 
 reject_pattern \
   "macOS audio player avoids shell-only action status and re-enhance guard copy" \
-  '"Retranscription successful"|"Re-enhancement successful"|"Retranscription failed"|"Re-enhancement failed"|"AI Enhancement is not enabled or configured"' \
+  '"Retranscription successful"|"Re-enhancement successful"|"Retranscription failed"|"Re-enhancement failed"|"AI Enhancement is not enabled or configured"|VoiceInkTranscriptPresentation\.audioFile(ReEnhancement|Retranscription)(SuccessMessage|FailureMessage)|VoiceInkPostProcessingFailurePresentation\.enhancementUnavailableMessage|VoiceInkErrorDescription\.text\(for: VoiceInkEngineError\.noTranscriptionModelSelected\)|VoiceInkEngineError\.noTranscriptionModelSelected' \
   VoiceInk/Views/AudioPlayerView.swift
 
 reject_pattern \

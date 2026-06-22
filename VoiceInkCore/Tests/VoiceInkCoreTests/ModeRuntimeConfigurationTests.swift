@@ -79,6 +79,19 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
         ))
     }
 
+    func testModeListPolicyRemovesModesByOffsets() {
+        let localMode = Mode.defaultLocalWhisper(name: "Local")
+        let cloudMode = Mode(name: "Cloud")
+        let backupMode = Mode(name: "Backup")
+
+        let updatedModes = VoiceInkModeListPolicy.removing(
+            at: IndexSet(integer: 1),
+            from: [localMode, cloudMode, backupMode]
+        )
+
+        XCTAssertEqual(updatedModes.map(\.id), [localMode.id, backupMode.id])
+    }
+
     func testModeListPolicySeedsDefaultModeWhenListIsEmpty() {
         let plan = VoiceInkModeListPolicy.defaultModeRepairPlan(modes: [], selectedModeId: nil)
 

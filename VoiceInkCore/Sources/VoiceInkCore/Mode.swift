@@ -173,6 +173,10 @@ public enum VoiceInkModeListPolicy {
         return updatedModes
     }
 
+    public static func removing(at offsets: IndexSet, from modes: [Mode]) -> [Mode] {
+        VoiceInkPreferenceList.removing(at: offsets, from: modes)
+    }
+
     public static func defaultModeRepairPlan(
         modes: [Mode],
         selectedModeId: UUID?

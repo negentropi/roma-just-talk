@@ -204,7 +204,7 @@ final class AppSettings: ObservableObject {
     }
 
     func removeModes(at offsets: IndexSet) {
-        modes = VoiceInkPreferenceList.removing(at: offsets, from: modes)
+        modes = VoiceInkModeListPolicy.removing(at: offsets, from: modes)
     }
 
     func applyFillerWordSubmissionPlan(_ plan: VoiceInkFillerWordSubmissionPlan) {
@@ -284,14 +284,6 @@ final class AppSettings: ObservableObject {
 
     func repairSelectedTranscriptionLanguage() {
         repairModeSettingsSelection()
-    }
-
-    func ensureDefaultModeExists() {
-        applyModeSettingsRepairPlan(VoiceInkModeSettingsPolicy.defaultModeRepairPlan(
-            modes: modes,
-            selectedModeId: selectedModeId,
-            selectedTranscriptionLanguage: selectedTranscriptionLanguage
-        ))
     }
 
     private func applyModeSettingsRepairPlan(_ plan: VoiceInkModeSettingsRepairPlan) {

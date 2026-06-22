@@ -360,7 +360,7 @@ The remaining Swift files present in `../VoiceInk-iOS/VoiceInk-ios` but not in `
 - `KeychainService.swift`: replaced by iOS `AppSettings` calls into `VoiceInkProviderAPIKeyStorage`; macOS keeps its adapter only for local-build fallback storage and logging.
 - `RiffWaveUtils.swift`: replaced by `VoiceInkPCM16AudioSamples`.
 - `VADModelManager.swift`: replaced by direct `VoiceInkVADModelFiles.sileroPath()` calls from the macOS/iOS Whisper shells and macOS rolling preload.
-- `DefaultModeManager.swift`: replaced by `AppSettings.ensureDefaultModeExists()` plus `VoiceInkModeSettingsPolicy.defaultModeRepairPlan`.
+- `DefaultModeManager.swift`: replaced by `VoiceInkIOSFirstTimeSetupPolicy` plus `VoiceInkModeSettingsPolicy.defaultModeRepairPlan`.
 - `Mode.swift`, `PromptTemplate.swift`, `Provider.swift`: replaced by `VoiceInkCore` mode, prompt-template, and provider catalog modules.
 - `ModeSelectionView.swift`, `ModesView.swift`: obsolete iOS UI experiments; current in-repo iOS mode UI is `iOS/VoiceInk-ios/ModeConfigurationView.swift`.
 - `ContentView.swift`: obsolete clone app-root wrapper; current in-repo iOS launch path presents `NotesListView` directly after onboarding.

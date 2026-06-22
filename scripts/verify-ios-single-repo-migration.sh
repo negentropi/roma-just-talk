@@ -1251,8 +1251,13 @@ require_pattern \
 
 require_pattern \
   "shared mode list policy lives in VoiceInkCore" \
-  'VoiceInkModeListPolicy|appending\(|replacing\(|defaultModeRepairPlan|VoiceInkModeListRepairPlan' \
+  'VoiceInkModeListPolicy|appending\(|replacing\(|removing\(at:|defaultModeRepairPlan|VoiceInkModeListRepairPlan' \
   VoiceInkCore/Sources/VoiceInkCore/Mode.swift
+
+require_pattern \
+  "core checks execute mode list removal policy test" \
+  'ModeRuntimeConfigurationTests\.testModeListPolicyRemovesModesByOffsets' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "shared mode settings repair plan lives in VoiceInkCore" \
@@ -1289,10 +1294,12 @@ require_pattern \
   'summaryPresentation' \
   iOS/VoiceInk-ios/SettingsView.swift
 
-require_pattern \
+require_patterns \
   "iOS AppSettings uses shared mode list policy" \
-  'VoiceInkModeListPolicy\.(appending|replacing)|VoiceInkModeSettingsPolicy\.defaultModeRepairPlan' \
-  iOS/VoiceInk-ios/AppSettings.swift
+  iOS/VoiceInk-ios/AppSettings.swift \
+  'VoiceInkModeListPolicy\.appending' \
+  'VoiceInkModeListPolicy\.replacing' \
+  'VoiceInkModeListPolicy\.removing'
 
 require_pattern \
   "iOS AppSettings delegates mode selection and language repair to shared core" \
@@ -1397,7 +1404,7 @@ reject_pattern \
 
 reject_pattern \
   "iOS AppSettings avoids shell-owned mode list mutation policy" \
-  'modes\.append|modes\[index\]|firstIndex\(where: \{ \$0\.id == modeId \}\)|Mode\.defaultModesAndSelection\(' \
+  'modes\.append|modes\[index\]|firstIndex\(where: \{ \$0\.id == modeId \}\)|Mode\.defaultModesAndSelection\(|VoiceInkPreferenceList\.removing' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 reject_pattern \

@@ -929,15 +929,21 @@ require_pattern \
   'durationUpdateInterval: +TimeInterval += +0\.1' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
-require_pattern \
+require_patterns \
   "shared recording permission action policy lives in VoiceInkCore" \
-  'VoiceInkRecordingPermissionPolicy|VoiceInkRecordingPermissionStatus|VoiceInkRecordingPermissionAction' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift \
+  'VoiceInkRecordingPermissionPolicy' \
+  'VoiceInkRecordingPermissionStatus' \
+  'VoiceInkRecordingPermissionAction' \
+  'VoiceInkRecordingPermissionSettingsAction' \
+  'settingsOpenAction'
 
-require_pattern \
+require_patterns \
   "shared recording permission action checks run in VoiceInkCore" \
-  'testRecordingPermissionPolicyPreservesStartPermissionActions|testRecordingPermissionPolicyPreservesPermissionRequestResults' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'testRecordingPermissionPolicyPreservesStartPermissionActions' \
+  'testRecordingPermissionPolicyPreservesPermissionRequestResults' \
+  'testRecordingPermissionPolicyPreservesSettingsOpenFallback'
 
 require_pattern \
   "shared recording stop plan lives in VoiceInkCore" \
@@ -1080,6 +1086,11 @@ require_pattern \
   iOS/VoiceInk-ios/RecordingManager.swift
 
 require_pattern \
+  "iOS recording manager delegates settings-open fallback planning to shared core" \
+  'VoiceInkRecordingPermissionPolicy\.settingsOpenAction|VoiceInkRecordingPermissionSettingsAction' \
+  iOS/VoiceInk-ios/RecordingManager.swift
+
+require_pattern \
   "iOS recording manager delegates stop result planning to shared flow state" \
   'stopRecordingPlan' \
   iOS/VoiceInk-ios/RecordingManager.swift
@@ -1097,6 +1108,11 @@ reject_pattern \
 reject_pattern \
   "iOS recording manager avoids shell-owned microphone permission action enum" \
   'private enum MicrophonePermissionStatus|case granted, denied, undetermined' \
+  iOS/VoiceInk-ios/RecordingManager.swift
+
+reject_pattern \
+  "iOS recording manager avoids shell-owned settings-open fallback branch" \
+  'if +let +url += +URL\(string: +UIApplication\.openSettingsURLString\), +UIApplication\.shared\.canOpenURL\(url\)' \
   iOS/VoiceInk-ios/RecordingManager.swift
 
 reject_pattern \

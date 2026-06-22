@@ -27,6 +27,11 @@ public enum VoiceInkRecordingPermissionAction: Equatable, Sendable {
     case presentPermissionDenied
 }
 
+public enum VoiceInkRecordingPermissionSettingsAction: Equatable, Sendable {
+    case openSettings
+    case ignore
+}
+
 public enum VoiceInkRecordingPermissionPolicy {
     public static func action(for status: VoiceInkRecordingPermissionStatus) -> VoiceInkRecordingPermissionAction {
         switch status {
@@ -41,6 +46,13 @@ public enum VoiceInkRecordingPermissionPolicy {
 
     public static func action(afterPermissionRequestGranted isGranted: Bool) -> VoiceInkRecordingPermissionAction {
         isGranted ? .startRecording : .presentPermissionDenied
+    }
+
+    public static func settingsOpenAction(
+        hasSettingsURL: Bool,
+        canOpenSettingsURL: Bool
+    ) -> VoiceInkRecordingPermissionSettingsAction {
+        hasSettingsURL && canOpenSettingsURL ? .openSettings : .ignore
     }
 }
 

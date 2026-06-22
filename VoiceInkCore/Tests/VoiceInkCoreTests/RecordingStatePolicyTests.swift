@@ -73,6 +73,37 @@ final class RecordingStatePolicyTests: XCTestCase {
         )
     }
 
+    func testRecordingPermissionPolicyPreservesSettingsOpenFallback() {
+        XCTAssertEqual(
+            VoiceInkRecordingPermissionPolicy.settingsOpenAction(
+                hasSettingsURL: true,
+                canOpenSettingsURL: true
+            ),
+            .openSettings
+        )
+        XCTAssertEqual(
+            VoiceInkRecordingPermissionPolicy.settingsOpenAction(
+                hasSettingsURL: false,
+                canOpenSettingsURL: true
+            ),
+            .ignore
+        )
+        XCTAssertEqual(
+            VoiceInkRecordingPermissionPolicy.settingsOpenAction(
+                hasSettingsURL: true,
+                canOpenSettingsURL: false
+            ),
+            .ignore
+        )
+        XCTAssertEqual(
+            VoiceInkRecordingPermissionPolicy.settingsOpenAction(
+                hasSettingsURL: false,
+                canOpenSettingsURL: false
+            ),
+            .ignore
+        )
+    }
+
     func testPostRecordingProcessingStatePolicyPreservesMacOSProcessingStates() {
         XCTAssertFalse(VoiceInkRecordingState.idle.isPostRecordingProcessing)
         XCTAssertFalse(VoiceInkRecordingState.starting.isPostRecordingProcessing)

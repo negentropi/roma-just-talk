@@ -146,6 +146,15 @@ public enum VoiceInkCustomSoundType: String, CaseIterable, Sendable {
     case start
     case stop
 
+    public var displayName: String {
+        switch self {
+        case .start:
+            return "Start"
+        case .stop:
+            return "Stop"
+        }
+    }
+
     public var isUsingKey: String {
         "isUsingCustom\(capitalizedRawValue)Sound"
     }
@@ -173,6 +182,38 @@ public enum VoiceInkCustomSoundType: String, CaseIterable, Sendable {
 
     private var capitalizedRawValue: String {
         rawValue.capitalized
+    }
+}
+
+public enum VoiceInkCustomSoundMenuSelection: Hashable, Sendable {
+    case builtIn(VoiceInkBuiltInRecordingSound)
+    case custom
+}
+
+public enum VoiceInkCustomSoundSettingsPresentation {
+    public static let pickerTitle = "Sound"
+    public static let customFallbackTitle = "Custom"
+    public static let selectSoundHelpText = "Select sound"
+    public static let testButtonHelpText = "Test"
+    public static let chooseButtonHelpText = "Choose"
+    public static let resetButtonHelpText = "Reset"
+    public static let testButtonSystemImageName = "play.fill"
+    public static let chooseButtonSystemImageName = "folder"
+    public static let resetButtonSystemImageName = "arrow.uturn.backward"
+    public static let openPanelMessage = "Select an audio file"
+    public static let invalidAudioAlertTitle = "Invalid Audio File"
+    public static let alertDismissButtonTitle = "OK"
+
+    public static func label(for type: VoiceInkCustomSoundType) -> String {
+        "\(type.displayName) Sound"
+    }
+
+    public static func customMenuTitle(filename: String?) -> String {
+        "Custom: \(filename ?? customFallbackTitle)"
+    }
+
+    public static func openPanelTitle(for type: VoiceInkCustomSoundType) -> String {
+        "Choose \(type.displayName) Sound"
     }
 }
 

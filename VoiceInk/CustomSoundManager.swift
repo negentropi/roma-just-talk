@@ -3,8 +3,6 @@ import AVFoundation
 import SwiftUI
 import VoiceInkCore
 
-typealias CustomSoundError = VoiceInkCustomSoundError
-
 extension VoiceInkBuiltInRecordingSound {
     var bundleURL: URL? {
         Bundle.main.url(forResource: rawValue, withExtension: fileExtension) ??
@@ -14,9 +12,6 @@ extension VoiceInkBuiltInRecordingSound {
 
 class CustomSoundManager: ObservableObject {
     static let shared = CustomSoundManager()
-
-    typealias BuiltInSound = VoiceInkBuiltInRecordingSound
-    typealias SoundType = VoiceInkCustomSoundType
 
     @Published var isUsingCustomStartSound: Bool {
         didSet {
@@ -30,13 +25,13 @@ class CustomSoundManager: ObservableObject {
         }
     }
 
-    @Published private(set) var selectedStartBuiltInSound: BuiltInSound {
+    @Published private(set) var selectedStartBuiltInSound: VoiceInkBuiltInRecordingSound {
         didSet {
             VoiceInkCustomSoundPreference.saveSelectedBuiltInSound(selectedStartBuiltInSound, for: .start)
         }
     }
 
-    @Published private(set) var selectedStopBuiltInSound: BuiltInSound {
+    @Published private(set) var selectedStopBuiltInSound: VoiceInkBuiltInRecordingSound {
         didSet {
             VoiceInkCustomSoundPreference.saveSelectedBuiltInSound(selectedStopBuiltInSound, for: .stop)
         }
@@ -50,7 +45,7 @@ class CustomSoundManager: ObservableObject {
         didSet { updateFilenameInUserDefaults(filename: customStopSoundFilename, for: .stop) }
     }
     
-    private func updateFilenameInUserDefaults(filename: String?, for type: SoundType) {
+    private func updateFilenameInUserDefaults(filename: String?, for type: VoiceInkCustomSoundType) {
         VoiceInkCustomSoundPreference.saveCustomFilename(filename, for: type)
     }
 
@@ -77,7 +72,7 @@ class CustomSoundManager: ObservableObject {
         }
     }
 
-    func getCustomSoundURL(for type: SoundType) -> URL? {
+    func getCustomSoundURL(for type: VoiceInkCustomSoundType) -> URL? {
         let isUsing = (type == .start) ? isUsingCustomStartSound : isUsingCustomStopSound
         let filename = (type == .start) ? customStartSoundFilename : customStopSoundFilename
 
@@ -88,11 +83,11 @@ class CustomSoundManager: ObservableObject {
         )
     }
 
-    func builtInSoundURL(for type: SoundType) -> URL? {
+    func builtInSoundURL(for type: VoiceInkCustomSoundType) -> URL? {
         selectedBuiltInSound(for: type).bundleURL
     }
 
-    func selectedBuiltInSound(for type: SoundType) -> BuiltInSound {
+    func selectedBuiltInSound(for type: VoiceInkCustomSoundType) -> VoiceInkBuiltInRecordingSound {
         switch type {
         case .start:
             return selectedStartBuiltInSound
@@ -101,7 +96,7 @@ class CustomSoundManager: ObservableObject {
         }
     }
 
-    func selectBuiltInSound(_ sound: BuiltInSound, for type: SoundType) {
+    func selectBuiltInSound(_ sound: VoiceInkBuiltInRecordingSound, for type: VoiceInkCustomSoundType) {
         switch type {
         case .start:
             selectedStartBuiltInSound = sound
@@ -114,7 +109,7 @@ class CustomSoundManager: ObservableObject {
         notifyCustomSoundsChanged()
     }
 
-    func useCustomSound(for type: SoundType) {
+    func useCustomSound(for type: VoiceInkCustomSoundType) {
         guard getSoundDisplayName(for: type) != nil else { return }
 
         switch type {
@@ -127,7 +122,7 @@ class CustomSoundManager: ObservableObject {
         notifyCustomSoundsChanged()
     }
 
-    func setCustomSound(url: URL, for type: SoundType) -> Result<Void, CustomSoundError> {
+    func setCustomSound(url: URL, for type: VoiceInkCustomSoundType) -> Result<Void, VoiceInkCustomSoundError> {
         let result = validateAudioFile(url: url)
         switch result {
         case .success:
@@ -151,7 +146,7 @@ class CustomSoundManager: ObservableObject {
         }
     }
 
-    func resetSoundToDefault(for type: SoundType) {
+    func resetSoundToDefault(for type: VoiceInkCustomSoundType) {
         let filename = (type == .start) ? customStartSoundFilename : customStopSoundFilename
 
         if let fileURL = VoiceInkCustomSoundPreference.storedCustomSoundURL(
@@ -180,11 +175,11 @@ class CustomSoundManager: ObservableObject {
         )
     }
 
-    func getSoundDisplayName(for type: SoundType) -> String? {
+    func getSoundDisplayName(for type: VoiceInkCustomSoundType) -> String? {
         return (type == .start) ? customStartSoundFilename : customStopSoundFilename
     }
 
-    func isDefaultSelection(for type: SoundType) -> Bool {
+    func isDefaultSelection(for type: VoiceInkCustomSoundType) -> Bool {
         let isUsingCustom = (type == .start) ? isUsingCustomStartSound : isUsingCustomStopSound
         return VoiceInkCustomSoundPreference.isDefaultSelection(
             for: type,
@@ -193,7 +188,7 @@ class CustomSoundManager: ObservableObject {
         )
     }
 
-    private func copySoundFile(from sourceURL: URL, for type: SoundType) -> Result<String, CustomSoundError> {
+    private func copySoundFile(from sourceURL: URL, for type: VoiceInkCustomSoundType) -> Result<String, VoiceInkCustomSoundError> {
         guard let directory = customSoundsDirectory() else {
             return .failure(.directoryCreationFailed)
         }
@@ -221,7 +216,7 @@ class CustomSoundManager: ObservableObject {
         }
     }
 
-    private func validateAudioFile(url: URL) -> Result<Void, CustomSoundError> {
+    private func validateAudioFile(url: URL) -> Result<Void, VoiceInkCustomSoundError> {
         let fileExists = FileManager.default.fileExists(atPath: url.path)
         guard fileExists else {
             return .failure(

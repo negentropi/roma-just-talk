@@ -1,5 +1,6 @@
 import SwiftUI
 import UniformTypeIdentifiers
+import VoiceInkCore
 
 struct CustomSoundSettingsView: View {
     @StateObject private var customSoundManager = CustomSoundManager.shared
@@ -7,48 +8,44 @@ struct CustomSoundSettingsView: View {
     @State private var alertTitle = ""
     @State private var alertMessage = ""
 
-    private enum SoundMenuSelection: Hashable {
-        case builtIn(CustomSoundManager.BuiltInSound)
-        case custom
-    }
-
     var body: some View {
         Group {
-            LabeledContent("Start Sound") {
+            LabeledContent(VoiceInkCustomSoundSettingsPresentation.label(for: .start)) {
                 soundControls(for: .start)
             }
 
-            LabeledContent("Stop Sound") {
+            LabeledContent(VoiceInkCustomSoundSettingsPresentation.label(for: .stop)) {
                 soundControls(for: .stop)
             }
         }
         .alert(alertTitle, isPresented: $showingAlert) {
-            Button("OK", role: .cancel) {}
+            Button(VoiceInkCustomSoundSettingsPresentation.alertDismissButtonTitle, role: .cancel) {}
         } message: {
             Text(alertMessage)
         }
     }
 
     @ViewBuilder
-    private func soundControls(for type: CustomSoundManager.SoundType) -> some View {
+    private func soundControls(for type: VoiceInkCustomSoundType) -> some View {
         let isCustom = type == .start ? customSoundManager.isUsingCustomStartSound : customSoundManager.isUsingCustomStopSound
         let fileName = customSoundManager.getSoundDisplayName(for: type)
 
         HStack(spacing: 8) {
-            Picker("Sound", selection: soundSelectionBinding(for: type)) {
-                ForEach(CustomSoundManager.BuiltInSound.allCases) { sound in
-                    Text(sound.displayName).tag(SoundMenuSelection.builtIn(sound))
+            Picker(VoiceInkCustomSoundSettingsPresentation.pickerTitle, selection: soundSelectionBinding(for: type)) {
+                ForEach(VoiceInkBuiltInRecordingSound.allCases) { sound in
+                    Text(sound.displayName).tag(VoiceInkCustomSoundMenuSelection.builtIn(sound))
                 }
 
                 if isCustom || fileName != nil {
-                    Text("Custom: \(fileName ?? "Custom")").tag(SoundMenuSelection.custom)
+                    Text(VoiceInkCustomSoundSettingsPresentation.customMenuTitle(filename: fileName))
+                        .tag(VoiceInkCustomSoundMenuSelection.custom)
                 }
             }
             .labelsHidden()
             .pickerStyle(.menu)
             .frame(width: 116, alignment: .trailing)
             .fixedSize()
-            .help("Select sound")
+            .help(VoiceInkCustomSoundSettingsPresentation.selectSoundHelpText)
 
             Button {
                 if type == .start {
@@ -57,18 +54,18 @@ struct CustomSoundSettingsView: View {
                     SoundManager.shared.playStopSound()
                 }
             } label: {
-                Image(systemName: "play.fill")
+                Image(systemName: VoiceInkCustomSoundSettingsPresentation.testButtonSystemImageName)
             }
             .buttonStyle(.borderless)
-            .help("Test")
+            .help(VoiceInkCustomSoundSettingsPresentation.testButtonHelpText)
 
             Button {
                 selectSound(for: type)
             } label: {
-                Image(systemName: "folder")
+                Image(systemName: VoiceInkCustomSoundSettingsPresentation.chooseButtonSystemImageName)
             }
             .buttonStyle(.borderless)
-            .help("Choose")
+            .help(VoiceInkCustomSoundSettingsPresentation.chooseButtonHelpText)
 
             if !customSoundManager.isDefaultSelection(for: type) {
                 Button {
@@ -78,15 +75,15 @@ struct CustomSoundSettingsView: View {
                         customSoundManager.selectBuiltInSound(type.defaultBuiltInSound, for: type)
                     }
                 } label: {
-                    Image(systemName: "arrow.uturn.backward")
+                    Image(systemName: VoiceInkCustomSoundSettingsPresentation.resetButtonSystemImageName)
                 }
                 .buttonStyle(.borderless)
-                .help("Reset")
+                .help(VoiceInkCustomSoundSettingsPresentation.resetButtonHelpText)
             }
         }
     }
 
-    private func soundSelectionBinding(for type: CustomSoundManager.SoundType) -> Binding<SoundMenuSelection> {
+    private func soundSelectionBinding(for type: VoiceInkCustomSoundType) -> Binding<VoiceInkCustomSoundMenuSelection> {
         Binding(
             get: {
                 let isCustom = type == .start ? customSoundManager.isUsingCustomStartSound : customSoundManager.isUsingCustomStopSound
@@ -107,10 +104,10 @@ struct CustomSoundSettingsView: View {
         )
     }
 
-    private func selectSound(for type: CustomSoundManager.SoundType) {
+    private func selectSound(for type: VoiceInkCustomSoundType) {
         let panel = NSOpenPanel()
-        panel.title = "Choose \(type.rawValue.capitalized) Sound"
-        panel.message = "Select an audio file"
+        panel.title = VoiceInkCustomSoundSettingsPresentation.openPanelTitle(for: type)
+        panel.message = VoiceInkCustomSoundSettingsPresentation.openPanelMessage
         panel.allowedContentTypes = [
             UTType.audio,
             UTType.mp3,
@@ -125,7 +122,7 @@ struct CustomSoundSettingsView: View {
 
             let result = customSoundManager.setCustomSound(url: url, for: type)
             if case .failure(let error) = result {
-                alertTitle = "Invalid Audio File"
+                alertTitle = VoiceInkCustomSoundSettingsPresentation.invalidAudioAlertTitle
                 alertMessage = error.localizedDescription
                 showingAlert = true
             }

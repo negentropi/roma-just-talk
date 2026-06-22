@@ -17,17 +17,48 @@ final class RecordingFeedbackPreferenceTests: XCTestCase {
     }
 
     func testCustomSoundTypePreservesExistingMacOSStorageKeys() {
+        XCTAssertEqual(VoiceInkCustomSoundType.start.displayName, "Start")
         XCTAssertEqual(VoiceInkCustomSoundType.start.isUsingKey, "isUsingCustomStartSound")
         XCTAssertEqual(VoiceInkCustomSoundType.start.filenameKey, "customStartSoundFilename")
         XCTAssertEqual(VoiceInkCustomSoundType.start.builtInSoundKey, "selectedStartBuiltInSound")
         XCTAssertEqual(VoiceInkCustomSoundType.start.standardName, "CustomStartSound")
         XCTAssertEqual(VoiceInkCustomSoundType.start.defaultBuiltInSound, .sound1)
 
+        XCTAssertEqual(VoiceInkCustomSoundType.stop.displayName, "Stop")
         XCTAssertEqual(VoiceInkCustomSoundType.stop.isUsingKey, "isUsingCustomStopSound")
         XCTAssertEqual(VoiceInkCustomSoundType.stop.filenameKey, "customStopSoundFilename")
         XCTAssertEqual(VoiceInkCustomSoundType.stop.builtInSoundKey, "selectedStopBuiltInSound")
         XCTAssertEqual(VoiceInkCustomSoundType.stop.standardName, "CustomStopSound")
         XCTAssertEqual(VoiceInkCustomSoundType.stop.defaultBuiltInSound, .sound2)
+    }
+
+    func testCustomSoundSettingsPresentationPreservesMacOSCopyAndActions() {
+        XCTAssertEqual(VoiceInkCustomSoundSettingsPresentation.label(for: .start), "Start Sound")
+        XCTAssertEqual(VoiceInkCustomSoundSettingsPresentation.label(for: .stop), "Stop Sound")
+        XCTAssertEqual(VoiceInkCustomSoundSettingsPresentation.pickerTitle, "Sound")
+        XCTAssertEqual(VoiceInkCustomSoundSettingsPresentation.customFallbackTitle, "Custom")
+        XCTAssertEqual(
+            VoiceInkCustomSoundSettingsPresentation.customMenuTitle(filename: "CustomStartSound.wav"),
+            "Custom: CustomStartSound.wav"
+        )
+        XCTAssertEqual(VoiceInkCustomSoundSettingsPresentation.customMenuTitle(filename: nil), "Custom: Custom")
+        XCTAssertEqual(VoiceInkCustomSoundSettingsPresentation.selectSoundHelpText, "Select sound")
+        XCTAssertEqual(VoiceInkCustomSoundSettingsPresentation.testButtonHelpText, "Test")
+        XCTAssertEqual(VoiceInkCustomSoundSettingsPresentation.chooseButtonHelpText, "Choose")
+        XCTAssertEqual(VoiceInkCustomSoundSettingsPresentation.resetButtonHelpText, "Reset")
+        XCTAssertEqual(VoiceInkCustomSoundSettingsPresentation.testButtonSystemImageName, "play.fill")
+        XCTAssertEqual(VoiceInkCustomSoundSettingsPresentation.chooseButtonSystemImageName, "folder")
+        XCTAssertEqual(VoiceInkCustomSoundSettingsPresentation.resetButtonSystemImageName, "arrow.uturn.backward")
+        XCTAssertEqual(VoiceInkCustomSoundSettingsPresentation.openPanelTitle(for: .start), "Choose Start Sound")
+        XCTAssertEqual(VoiceInkCustomSoundSettingsPresentation.openPanelTitle(for: .stop), "Choose Stop Sound")
+        XCTAssertEqual(VoiceInkCustomSoundSettingsPresentation.openPanelMessage, "Select an audio file")
+        XCTAssertEqual(VoiceInkCustomSoundSettingsPresentation.invalidAudioAlertTitle, "Invalid Audio File")
+        XCTAssertEqual(VoiceInkCustomSoundSettingsPresentation.alertDismissButtonTitle, "OK")
+
+        XCTAssertEqual(VoiceInkCustomSoundMenuSelection.builtIn(.sound1), .builtIn(.sound1))
+        XCTAssertFalse(
+            VoiceInkCustomSoundMenuSelection.builtIn(.sound1) == VoiceInkCustomSoundMenuSelection.custom
+        )
     }
 
     func testRecordingSoundPlaybackPolicyPreservesMacOSSlotsVolumesAndFallbacks() {

@@ -7451,6 +7451,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
 
 require_pattern \
+  "shared custom recording sound settings presentation lives in VoiceInkCore" \
+  'VoiceInkCustomSoundMenuSelection|VoiceInkCustomSoundSettingsPresentation|label\(for:|customMenuTitle|openPanelTitle|testButtonSystemImageName|chooseButtonSystemImageName|resetButtonSystemImageName|invalidAudioAlertTitle' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+
+require_pattern \
   "shared custom recording sound validation and file-operation planning lives in VoiceInkCore" \
   'enum VoiceInkCustomSoundError: LocalizedError|durationTooLong|preflightValidationError|maxDuration|copiedFilename|customSoundURL|storedCustomSoundURL|VoiceInkCustomSoundCopyPlan|copyPlan|Audio file is' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
@@ -7463,6 +7468,11 @@ require_pattern \
 require_pattern \
   "core checks cover custom sound URL and copy planning" \
   'RecordingFeedbackPreferenceTests\.testCustomSoundPreferenceBuildsCustomSoundURLs|RecordingFeedbackPreferenceTests\.testCustomSoundPreferencePlansCopyActions' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks cover custom sound settings presentation" \
+  'RecordingFeedbackPreferenceTests\.testCustomSoundSettingsPresentationPreservesMacOSCopyAndActions' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -7491,6 +7501,11 @@ require_pattern \
   VoiceInk/CustomSoundManager.swift
 
 reject_pattern \
+  "macOS custom sound manager avoids shallow shared-type aliases" \
+  'typealias +(CustomSoundError|BuiltInSound|SoundType)' \
+  VoiceInk/CustomSoundManager.swift
+
+reject_pattern \
   "macOS custom sound manager avoids shell-owned URL and copy planning" \
   'VoiceInkCustomSoundPreference\.copiedFilename|resolvingSymlinksInPath|appendingPathComponent\(filename\)|let destinationURL =|sourceURL\.pathExtension' \
   VoiceInk/CustomSoundManager.swift
@@ -7509,6 +7524,16 @@ require_pattern \
   "macOS sound playback engine uses shared playback policy" \
   'VoiceInkRecordingSoundPlaybackPolicy\.(setupSlots|playbackSlots)|VoiceInkRecordingSoundPlayerSlot|VoiceInkRecordingSoundCue|slot\.volume' \
   VoiceInk/SoundPlaybackEngine.swift
+
+require_pattern \
+  "macOS custom sound settings view uses shared presentation" \
+  'VoiceInkCustomSoundSettingsPresentation\.(label|pickerTitle|customMenuTitle|selectSoundHelpText|testButtonHelpText|chooseButtonHelpText|resetButtonHelpText|testButtonSystemImageName|chooseButtonSystemImageName|resetButtonSystemImageName|openPanelTitle|openPanelMessage|invalidAudioAlertTitle|alertDismissButtonTitle)|VoiceInkCustomSoundMenuSelection|VoiceInkBuiltInRecordingSound\.allCases' \
+  VoiceInk/Views/Settings/CustomSoundSettingsView.swift
+
+reject_pattern \
+  "macOS custom sound settings view avoids shell-only presentation copy and aliases" \
+  '"(Start Sound|Stop Sound|Sound|Custom:|Custom|Select sound|Test|Choose|Reset|Choose Start Sound|Choose Stop Sound|Select an audio file|Invalid Audio File|OK|play\.fill|folder|arrow\.uturn\.backward)"|private enum SoundMenuSelection|CustomSoundManager\.(BuiltInSound|SoundType)' \
+  VoiceInk/Views/Settings/CustomSoundSettingsView.swift
 
 reject_pattern \
   "macOS sound playback engine avoids shell-owned cue fallback and volume policy" \

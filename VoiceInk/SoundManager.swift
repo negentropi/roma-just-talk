@@ -26,7 +26,7 @@ class SoundManager: ObservableObject {
             soundURLs: [
                 .defaultStart: customSoundManager.builtInSoundURL(for: .start),
                 .defaultStop: customSoundManager.builtInSoundURL(for: .stop),
-                .defaultEsc: CustomSoundManager.BuiltInSound.sound7.bundleURL,
+                .defaultEsc: VoiceInkBuiltInRecordingSound.sound7.bundleURL,
                 .customStart: customSoundManager.getCustomSoundURL(for: .start),
                 .customStop: customSoundManager.getCustomSoundURL(for: .stop)
             ]

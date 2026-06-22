@@ -190,6 +190,78 @@ public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
     }
 }
 
+public enum VoiceInkTranscriptionModelProviderRole: Equatable, Sendable {
+    case localWhisper
+    case localFluidAudio
+    case nativeApple
+    case customCloud
+    case cloud(VoiceInkTranscriptionModelProvider?)
+
+    public var coreTranscriptionModelProvider: VoiceInkTranscriptionModelProvider? {
+        switch self {
+        case .cloud(let provider):
+            return provider
+        case .localWhisper, .localFluidAudio, .nativeApple, .customCloud:
+            return nil
+        }
+    }
+
+    public var transcriptionLanguageSource: VoiceInkTranscriptionLanguageSource {
+        switch self {
+        case .localWhisper:
+            return .whisper
+        case .localFluidAudio:
+            return .fluidAudio
+        case .nativeApple:
+            return .nativeApple
+        case .customCloud:
+            return .all
+        case .cloud(let provider):
+            guard let provider else { return .all }
+            return .provider(provider)
+        }
+    }
+
+    public var modelManagementCategory: VoiceInkModelManagementModelCategory {
+        switch self {
+        case .localWhisper, .localFluidAudio, .nativeApple:
+            return .local
+        case .customCloud:
+            return .custom
+        case .cloud:
+            return .cloud
+        }
+    }
+
+    public var transcriptionServiceRoute: VoiceInkTranscriptionServiceRoute {
+        switch self {
+        case .localWhisper:
+            return .localWhisper
+        case .localFluidAudio:
+            return .localFluidAudio
+        case .nativeApple:
+            return .nativeApple
+        case .customCloud, .cloud:
+            return .cloud
+        }
+    }
+
+    public var transcriptionModelAvailabilityRequirement: VoiceInkTranscriptionModelAvailabilityRequirement {
+        switch self {
+        case .localWhisper:
+            return .downloadedLocalWhisperModel
+        case .localFluidAudio:
+            return .downloadedLocalFluidAudioModel
+        case .nativeApple:
+            return .currentOSSupport
+        case .customCloud:
+            return .alwaysAvailable
+        case .cloud(let provider):
+            return provider == nil ? .unavailable : .configuredAPIKey
+        }
+    }
+}
+
 public struct VoiceInkCloudTranscriptionModelSpec: Equatable, Sendable {
     public let name: String
     public let displayName: String

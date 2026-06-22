@@ -212,6 +212,37 @@ final class TranscriptionModelCatalogTests: XCTestCase {
         XCTAssertFalse(VoiceInkTranscriptionModelProvider.local.isStreamingOnly)
     }
 
+    func testProviderRoleOwnsModelCategoryRouteAvailabilityAndLanguageSource() {
+        XCTAssertEqual(VoiceInkTranscriptionModelProviderRole.localWhisper.modelManagementCategory, .local)
+        XCTAssertEqual(VoiceInkTranscriptionModelProviderRole.localWhisper.transcriptionServiceRoute, .localWhisper)
+        XCTAssertEqual(VoiceInkTranscriptionModelProviderRole.localWhisper.transcriptionModelAvailabilityRequirement, .downloadedLocalWhisperModel)
+        XCTAssertEqual(VoiceInkTranscriptionModelProviderRole.localWhisper.transcriptionLanguageSource, .whisper)
+        XCTAssertNil(VoiceInkTranscriptionModelProviderRole.localWhisper.coreTranscriptionModelProvider)
+
+        XCTAssertEqual(VoiceInkTranscriptionModelProviderRole.localFluidAudio.modelManagementCategory, .local)
+        XCTAssertEqual(VoiceInkTranscriptionModelProviderRole.localFluidAudio.transcriptionServiceRoute, .localFluidAudio)
+        XCTAssertEqual(VoiceInkTranscriptionModelProviderRole.localFluidAudio.transcriptionModelAvailabilityRequirement, .downloadedLocalFluidAudioModel)
+        XCTAssertEqual(VoiceInkTranscriptionModelProviderRole.localFluidAudio.transcriptionLanguageSource, .fluidAudio)
+
+        XCTAssertEqual(VoiceInkTranscriptionModelProviderRole.nativeApple.modelManagementCategory, .local)
+        XCTAssertEqual(VoiceInkTranscriptionModelProviderRole.nativeApple.transcriptionServiceRoute, .nativeApple)
+        XCTAssertEqual(VoiceInkTranscriptionModelProviderRole.nativeApple.transcriptionModelAvailabilityRequirement, .currentOSSupport)
+        XCTAssertEqual(VoiceInkTranscriptionModelProviderRole.nativeApple.transcriptionLanguageSource, .nativeApple)
+
+        XCTAssertEqual(VoiceInkTranscriptionModelProviderRole.customCloud.modelManagementCategory, .custom)
+        XCTAssertEqual(VoiceInkTranscriptionModelProviderRole.customCloud.transcriptionServiceRoute, .cloud)
+        XCTAssertEqual(VoiceInkTranscriptionModelProviderRole.customCloud.transcriptionModelAvailabilityRequirement, .alwaysAvailable)
+        XCTAssertEqual(VoiceInkTranscriptionModelProviderRole.customCloud.transcriptionLanguageSource, .all)
+
+        XCTAssertEqual(VoiceInkTranscriptionModelProviderRole.cloud(.groq).modelManagementCategory, .cloud)
+        XCTAssertEqual(VoiceInkTranscriptionModelProviderRole.cloud(.groq).transcriptionServiceRoute, .cloud)
+        XCTAssertEqual(VoiceInkTranscriptionModelProviderRole.cloud(.groq).transcriptionModelAvailabilityRequirement, .configuredAPIKey)
+        XCTAssertEqual(VoiceInkTranscriptionModelProviderRole.cloud(.groq).transcriptionLanguageSource, .provider(.groq))
+        XCTAssertEqual(VoiceInkTranscriptionModelProviderRole.cloud(.groq).coreTranscriptionModelProvider, .groq)
+        XCTAssertEqual(VoiceInkTranscriptionModelProviderRole.cloud(nil).transcriptionModelAvailabilityRequirement, .unavailable)
+        XCTAssertEqual(VoiceInkTranscriptionModelProviderRole.cloud(nil).transcriptionLanguageSource, .all)
+    }
+
     func testProviderAPIErrorDomainsPreserveMacOSBatchMapping() {
         XCTAssertEqual(VoiceInkTranscriptionModelProvider.groq.apiErrorDomain, "GroqAPI")
         XCTAssertEqual(VoiceInkTranscriptionModelProvider.deepgram.apiErrorDomain, "DeepgramAPI")

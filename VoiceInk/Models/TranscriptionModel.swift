@@ -34,31 +34,41 @@ enum ModelProvider: String, Codable, Hashable, CaseIterable {
 }
 
 extension ModelProvider {
-    var coreTranscriptionModelProvider: VoiceInkTranscriptionModelProvider? {
+    var coreTranscriptionModelProviderRole: VoiceInkTranscriptionModelProviderRole {
         switch self {
         case .groq:
-            return .groq
+            return .cloud(.groq)
         case .deepgram:
-            return .deepgram
+            return .cloud(.deepgram)
         case .elevenLabs:
-            return .elevenLabs
+            return .cloud(.elevenLabs)
         case .mistral:
-            return .mistral
+            return .cloud(.mistral)
         case .gemini:
-            return .gemini
+            return .cloud(.gemini)
         case .soniox:
-            return .soniox
+            return .cloud(.soniox)
         case .speechmatics:
-            return .speechmatics
+            return .cloud(.speechmatics)
         case .assemblyAI:
-            return .assemblyAI
+            return .cloud(.assemblyAI)
         case .xai:
-            return .xai
+            return .cloud(.xai)
         case .cartesia:
-            return .cartesia
-        default:
-            return nil
+            return .cloud(.cartesia)
+        case .whisper:
+            return .localWhisper
+        case .fluidAudio:
+            return .localFluidAudio
+        case .nativeApple:
+            return .nativeApple
+        case .custom:
+            return .customCloud
         }
+    }
+
+    var coreTranscriptionModelProvider: VoiceInkTranscriptionModelProvider? {
+        coreTranscriptionModelProviderRole.coreTranscriptionModelProvider
     }
 
     var apiKeyProviderName: String {
@@ -66,19 +76,7 @@ extension ModelProvider {
     }
 
     fileprivate var transcriptionLanguageSource: VoiceInkTranscriptionLanguageSource {
-        switch self {
-        case .whisper:
-            return .whisper
-        case .nativeApple:
-            return .nativeApple
-        case .fluidAudio:
-            return .fluidAudio
-        default:
-            guard let coreProvider = coreTranscriptionModelProvider else {
-                return .all
-            }
-            return .provider(coreProvider)
-        }
+        coreTranscriptionModelProviderRole.transcriptionLanguageSource
     }
 
     func supportedLanguages(isMultilingual: Bool) -> [String: String] {
@@ -89,42 +87,15 @@ extension ModelProvider {
     }
 
     var modelManagementCategory: VoiceInkModelManagementModelCategory {
-        switch self {
-        case .whisper, .nativeApple, .fluidAudio:
-            return .local
-        case .custom:
-            return .custom
-        default:
-            return .cloud
-        }
+        coreTranscriptionModelProviderRole.modelManagementCategory
     }
 
     var transcriptionServiceRoute: VoiceInkTranscriptionServiceRoute {
-        switch self {
-        case .whisper:
-            return .localWhisper
-        case .fluidAudio:
-            return .localFluidAudio
-        case .nativeApple:
-            return .nativeApple
-        default:
-            return .cloud
-        }
+        coreTranscriptionModelProviderRole.transcriptionServiceRoute
     }
 
     var transcriptionModelAvailabilityRequirement: VoiceInkTranscriptionModelAvailabilityRequirement {
-        switch self {
-        case .whisper:
-            return .downloadedLocalWhisperModel
-        case .fluidAudio:
-            return .downloadedLocalFluidAudioModel
-        case .nativeApple:
-            return .currentOSSupport
-        case .custom:
-            return .alwaysAvailable
-        default:
-            return coreTranscriptionModelProvider == nil ? .unavailable : .configuredAPIKey
-        }
+        coreTranscriptionModelProviderRole.transcriptionModelAvailabilityRequirement
     }
 }
 

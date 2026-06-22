@@ -3594,6 +3594,49 @@ require_pattern \
   'modelManagementFacts|VoiceInkModelManagementModelFacts|modelManagementCategory' \
   VoiceInk/Models/TranscriptionModel.swift
 
+require_patterns \
+  "shared transcription model provider role owns category route availability and language source" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift \
+  'VoiceInkTranscriptionModelProviderRole' \
+  'modelManagementCategory' \
+  'transcriptionServiceRoute' \
+  'transcriptionModelAvailabilityRequirement' \
+  'transcriptionLanguageSource'
+
+require_pattern \
+  "macOS ModelProvider adapts shared transcription model provider role" \
+  'coreTranscriptionModelProviderRole' \
+  VoiceInk/Models/TranscriptionModel.swift
+
+require_pattern \
+  "core checks execute transcription model provider role tests" \
+  'TranscriptionModelCatalogTests\.testProviderRoleOwnsModelCategoryRouteAvailabilityAndLanguageSource' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_context_pattern \
+  "macOS ModelProvider avoids shell-only language-source switch" \
+  'fileprivate var transcriptionLanguageSource' \
+  'switch self|guard let coreProvider' \
+  VoiceInk/Models/TranscriptionModel.swift
+
+reject_context_pattern \
+  "macOS ModelProvider avoids shell-only model-management category switch" \
+  'var modelManagementCategory' \
+  'switch self|case \.whisper, \.nativeApple, \.fluidAudio|case \.custom' \
+  VoiceInk/Models/TranscriptionModel.swift
+
+reject_context_pattern \
+  "macOS ModelProvider avoids shell-only service-route switch" \
+  'var transcriptionServiceRoute' \
+  'switch self|case \.whisper|case \.fluidAudio|case \.nativeApple' \
+  VoiceInk/Models/TranscriptionModel.swift
+
+reject_context_pattern \
+  "macOS ModelProvider avoids shell-only availability switch" \
+  'var transcriptionModelAvailabilityRequirement' \
+  'switch self|downloadedLocalWhisperModel|downloadedLocalFluidAudioModel|currentOSSupport|alwaysAvailable|configuredAPIKey' \
+  VoiceInk/Models/TranscriptionModel.swift
+
 require_pattern \
   "macOS model management uses shared filter membership" \
   'selectedFilter\.includes|sortRank\(forModelName:|modelManagementFacts\(for:' \

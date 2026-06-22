@@ -2,6 +2,17 @@ import Foundation
 import VoiceInkCore
 
 final class TranscriptionModelAvailabilityTests: XCTestCase {
+    func testAvailabilityRequirementPredicatesIdentifyShellFactsNeeded() {
+        XCTAssertTrue(VoiceInkTranscriptionModelAvailabilityRequirement.configuredAPIKey.requiresConfiguredAPIKey)
+        XCTAssertFalse(VoiceInkTranscriptionModelAvailabilityRequirement.configuredAPIKey.requiresCurrentOSSupport)
+        XCTAssertTrue(VoiceInkTranscriptionModelAvailabilityRequirement.currentOSSupport.requiresCurrentOSSupport)
+        XCTAssertFalse(VoiceInkTranscriptionModelAvailabilityRequirement.currentOSSupport.requiresConfiguredAPIKey)
+        XCTAssertFalse(VoiceInkTranscriptionModelAvailabilityRequirement.downloadedLocalWhisperModel.requiresConfiguredAPIKey)
+        XCTAssertFalse(VoiceInkTranscriptionModelAvailabilityRequirement.downloadedLocalWhisperModel.requiresCurrentOSSupport)
+        XCTAssertFalse(VoiceInkTranscriptionModelAvailabilityRequirement.alwaysAvailable.requiresConfiguredAPIKey)
+        XCTAssertFalse(VoiceInkTranscriptionModelAvailabilityRequirement.unavailable.requiresCurrentOSSupport)
+    }
+
     func testConfiguredAPIKeyRequirementUsesConfiguredKeyFact() {
         XCTAssertTrue(VoiceInkTranscriptionModelAvailabilityFacts(
             requirement: .configuredAPIKey,

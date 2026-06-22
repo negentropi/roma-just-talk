@@ -6738,10 +6738,12 @@ require_pattern \
   'transcriptionRuntimeResourcePlan\.recordingStartupLoadAction' \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift
 
-require_pattern \
+require_patterns \
   "shared core owns transcription model availability policy" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelAvailability.swift \
   'VoiceInkTranscriptionModelAvailability(Facts|Requirement)' \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelAvailability.swift
+  'requiresConfiguredAPIKey' \
+  'requiresCurrentOSSupport'
 
 require_pattern \
   "shared core owns Native Apple transcription policy" \
@@ -6753,10 +6755,17 @@ require_pattern \
   'transcriptionModelAvailability(Facts|Requirement)' \
   VoiceInk/Models/TranscriptionModel.swift
 
-require_pattern \
+require_patterns \
   "macOS transcription model manager uses shared availability facts" \
+  VoiceInk/Transcription/Engine/TranscriptionModelManager.swift \
   'availabilityFacts\(for: .*\)\.isUsable|transcriptionModelAvailabilityFacts' \
-  VoiceInk/Transcription/Engine/TranscriptionModelManager.swift
+  'requiresConfiguredAPIKey' \
+  'requiresCurrentOSSupport'
+
+require_pattern \
+  "core checks execute transcription availability requirement predicate tests" \
+  'TranscriptionModelAvailabilityTests\.testAvailabilityRequirementPredicatesIdentifyShellFactsNeeded' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "macOS transcription model manager uses shared Native Apple transcription policy" \
@@ -6804,7 +6813,7 @@ reject_pattern \
 
 reject_pattern \
   "macOS transcription model manager avoids shell-owned provider availability routing" \
-  'switch +model\.provider|model\.provider != \.whisper|CloudProviderRegistry\.provider\(for: model\.provider\)|case +\.nativeApple|case +\.custom' \
+  'switch +model\.provider|model\.provider != \.whisper|CloudProviderRegistry\.provider\(for: model\.provider\)|case +\.nativeApple|case +\.custom|transcriptionModelAvailabilityRequirement == \.(currentOSSupport|configuredAPIKey)' \
   VoiceInk/Transcription/Engine/TranscriptionModelManager.swift
 
 reject_pattern \

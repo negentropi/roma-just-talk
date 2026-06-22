@@ -7,6 +7,14 @@ public enum VoiceInkTranscriptionModelAvailabilityRequirement: Equatable, Sendab
     case downloadedLocalWhisperModel
     case alwaysAvailable
     case unavailable
+
+    public var requiresConfiguredAPIKey: Bool {
+        self == .configuredAPIKey
+    }
+
+    public var requiresCurrentOSSupport: Bool {
+        self == .currentOSSupport
+    }
 }
 
 public struct VoiceInkTranscriptionModelAvailabilityFacts: Equatable, Sendable {

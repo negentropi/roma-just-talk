@@ -103,7 +103,8 @@ class TranscriptionModelManager: ObservableObject {
     }
 
     private func availabilityFacts(for model: any TranscriptionModel) -> VoiceInkTranscriptionModelAvailabilityFacts {
-        let isAvailableOnCurrentOS = model.provider.transcriptionModelAvailabilityRequirement == .currentOSSupport
+        let availabilityRequirement = model.provider.transcriptionModelAvailabilityRequirement
+        let isAvailableOnCurrentOS = availabilityRequirement.requiresCurrentOSSupport
             ? isAvailableOnCurrentOSForNativeAppleTranscription
             : true
 
@@ -116,7 +117,7 @@ class TranscriptionModelManager: ObservableObject {
     }
 
     private func hasConfiguredAPIKey(for model: any TranscriptionModel) -> Bool {
-        guard model.provider.transcriptionModelAvailabilityRequirement == .configuredAPIKey else {
+        guard model.provider.transcriptionModelAvailabilityRequirement.requiresConfiguredAPIKey else {
             return false
         }
         return APIKeyManager.shared.hasAPIKey(forProvider: model.provider.apiKeyProviderName)

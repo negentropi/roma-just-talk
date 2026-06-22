@@ -52,6 +52,49 @@ final class AIEnhancementErrorTests: XCTestCase {
         )
     }
 
+    func testTransportFailureMappingPreservesMacOSLLMKitCategories() {
+        XCTAssertEqual(
+            VoiceInkAIEnhancementError.transportFailure(.missingAPIKey),
+            .notConfigured
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementError.transportFailure(.httpStatus(statusCode: 429, message: "slow down")),
+            .rateLimitExceeded
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementError.transportFailure(.httpStatus(statusCode: 500, message: "server down")),
+            .serverError
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementError.transportFailure(.httpStatus(statusCode: 400, message: "bad input")),
+            .customError("HTTP 400: bad input")
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementError.transportFailure(.noResultReturned),
+            .enhancementFailed
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementError.transportFailure(.network),
+            .networkError
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementError.transportFailure(.timeout),
+            .timeout
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementError.transportFailure(.invalidRequest(description: "bad response")),
+            .customError("bad response")
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementError.transportFailure(.invalidRequest(description: "")),
+            .customError("An unknown error occurred.")
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementError.transportFailure(.invalidRequest(description: nil)),
+            .customError("An unknown error occurred.")
+        )
+    }
+
     func testTransportNetworkErrorMapsRetryableFoundationErrors() {
         let retryableCodes = [
             NSURLErrorNotConnectedToInternet,

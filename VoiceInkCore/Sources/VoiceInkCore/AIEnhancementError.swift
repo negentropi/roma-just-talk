@@ -9,6 +9,28 @@ public enum VoiceInkAIEnhancementError: Error, Equatable, Sendable {
     case timeout
     case customError(String)
 
+    public static func transportFailure(
+        _ failure: VoiceInkAIEnhancementTransportFailure
+    ) -> VoiceInkAIEnhancementError {
+        switch failure {
+        case .missingAPIKey:
+            return .notConfigured
+        case .httpStatus(let statusCode, let message):
+            return httpError(statusCode: statusCode, message: message)
+        case .noResultReturned:
+            return .enhancementFailed
+        case .network:
+            return .networkError
+        case .timeout:
+            return .timeout
+        case .invalidRequest(let description):
+            guard let description, !description.isEmpty else {
+                return .customError("An unknown error occurred.")
+            }
+            return .customError(description)
+        }
+    }
+
     public static func httpError(statusCode: Int, message: String) -> VoiceInkAIEnhancementError {
         if statusCode == 429 {
             return .rateLimitExceeded
@@ -33,6 +55,15 @@ public enum VoiceInkAIEnhancementError: Error, Equatable, Sendable {
 
         return retryableNetworkCodes.contains(nsError.code) ? .networkError : nil
     }
+}
+
+public enum VoiceInkAIEnhancementTransportFailure: Equatable, Sendable {
+    case missingAPIKey
+    case httpStatus(statusCode: Int, message: String)
+    case noResultReturned
+    case network
+    case timeout
+    case invalidRequest(description: String?)
 }
 
 public enum VoiceInkOllamaEnhancementFailure: Error, Equatable, Sendable {

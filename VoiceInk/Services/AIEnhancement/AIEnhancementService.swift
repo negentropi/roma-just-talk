@@ -244,29 +244,14 @@ class AIEnhancementService: ObservableObject {
                 }
                 return VoiceInkAIEnhancementRequestPayload.enhancedText(from: result)
             } catch let error as LLMKitError {
-                throw mapLLMKitError(error)
+                throw VoiceInkAIEnhancementError.transportFailure(
+                    error.voiceInkAIEnhancementTransportFailure
+                )
             } catch let error as VoiceInkAIEnhancementError {
                 throw error
             } catch {
                 throw VoiceInkAIEnhancementError.customError(error.localizedDescription)
             }
-        }
-    }
-
-    private func mapLLMKitError(_ error: LLMKitError) -> VoiceInkAIEnhancementError {
-        switch error {
-        case .missingAPIKey:
-            return .notConfigured
-        case .httpError(let statusCode, let message):
-            return VoiceInkAIEnhancementError.httpError(statusCode: statusCode, message: message)
-        case .noResultReturned:
-            return .enhancementFailed
-        case .networkError:
-            return .networkError
-        case .timeout:
-            return .timeout
-        case .invalidURL, .decodingError, .encodingError:
-            return .customError(error.localizedDescription ?? "An unknown error occurred.")
         }
     }
 
@@ -466,6 +451,27 @@ class AIEnhancementService: ObservableObject {
         }
         if selectedPromptId != state.selectedPromptId {
             selectedPromptId = state.selectedPromptId
+        }
+    }
+}
+
+private extension LLMKitError {
+    var voiceInkAIEnhancementTransportFailure: VoiceInkAIEnhancementTransportFailure {
+        switch self {
+        case .missingAPIKey:
+            return .missingAPIKey
+        case .httpError(let statusCode, let message):
+            return .httpStatus(statusCode: statusCode, message: message)
+        case .noResultReturned:
+            return .noResultReturned
+        case .networkError:
+            return .network
+        case .timeout:
+            return .timeout
+        case .invalidURL, .decodingError, .encodingError:
+            return .invalidRequest(
+                description: localizedDescription
+            )
         }
     }
 }

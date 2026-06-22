@@ -109,6 +109,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "AIReasoningConfigTests.testMacOSExtraAIProvidersUseNoSharedReasoningOverrides", run: { AIReasoningConfigTests().testMacOSExtraAIProvidersUseNoSharedReasoningOverrides() }),
             VoiceInkCoreCheck(name: "AIEnhancementErrorTests.testErrorDescriptionsPreserveExistingMacOSMessages", run: { AIEnhancementErrorTests().testErrorDescriptionsPreserveExistingMacOSMessages() }),
             VoiceInkCoreCheck(name: "AIEnhancementErrorTests.testHTTPErrorMappingPreservesMacOSRetryCategories", run: { AIEnhancementErrorTests().testHTTPErrorMappingPreservesMacOSRetryCategories() }),
+            VoiceInkCoreCheck(name: "AIEnhancementErrorTests.testTransportFailureMappingPreservesMacOSLLMKitCategories", run: { AIEnhancementErrorTests().testTransportFailureMappingPreservesMacOSLLMKitCategories() }),
             VoiceInkCoreCheck(name: "AIEnhancementErrorTests.testTransportNetworkErrorMapsRetryableFoundationErrors", run: { AIEnhancementErrorTests().testTransportNetworkErrorMapsRetryableFoundationErrors() }),
             VoiceInkCoreCheck(name: "AIEnhancementErrorTests.testTransportNetworkErrorRejectsNonRetryableFoundationErrors", run: { AIEnhancementErrorTests().testTransportNetworkErrorRejectsNonRetryableFoundationErrors() }),
             VoiceInkCoreCheck(name: "AIEnhancementErrorTests.testOllamaEnhancementFailurePolicyPreservesMacOSMessagesAndRetryShape", run: { AIEnhancementErrorTests().testOllamaEnhancementFailurePolicyPreservesMacOSMessagesAndRetryShape() }),

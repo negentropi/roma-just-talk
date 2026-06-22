@@ -6345,6 +6345,31 @@ reject_pattern \
   VoiceInk/Views/Components/EnhancementSettingsPanel.swift
 
 require_pattern \
+  "shared AI enhancement transport failure policy lives in VoiceInkCore" \
+  'VoiceInkAIEnhancementTransportFailure|transportFailure|missingAPIKey|noResultReturned|invalidRequest' \
+  VoiceInkCore/Sources/VoiceInkCore/AIEnhancementError.swift
+
+require_pattern \
+  "core tests pin shared AI enhancement transport failure policy" \
+  'testTransportFailureMappingPreservesMacOSLLMKitCategories' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AIEnhancementErrorTests.swift
+
+require_pattern \
+  "core check runner executes shared AI enhancement transport failure policy test" \
+  'AIEnhancementErrorTests\.testTransportFailureMappingPreservesMacOSLLMKitCategories' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "macOS AI enhancement service adapts LLMKit transport failures through shared policy" \
+  'VoiceInkAIEnhancementError\.transportFailure|VoiceInkAIEnhancementTransportFailure|voiceInkAIEnhancementTransportFailure' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+reject_pattern \
+  "macOS AI enhancement service avoids shell-owned LLMKit error mapping" \
+  'mapLLMKitError|VoiceInkAIEnhancementError\.httpError\(statusCode: statusCode, message: message\)|VoiceInkAIEnhancementError\.timeout|return \.(notConfigured|enhancementFailed|networkError)|An unknown error occurred\.' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+require_pattern \
   "shared Ollama enhancement failure policy lives in VoiceInkCore" \
   'VoiceInkOllamaEnhancementFailure|VoiceInkOllamaTransportFailure|transportFailure|httpFailure|enhancementError|VoiceInkOllamaServiceDiagnostics|modelFetchFailedMessage|Ollama request timed out' \
   VoiceInkCore/Sources/VoiceInkCore/AIEnhancementError.swift

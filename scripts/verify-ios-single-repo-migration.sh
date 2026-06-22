@@ -11149,8 +11149,29 @@ reject_pattern \
 
 require_pattern \
   "shared session metric migration preference lives in VoiceInkCore" \
-  'VoiceInkSessionMetricMigrationPreference|completionKey = "HasCompletedStatsMigration"' \
+  'VoiceInkSessionMetricDraft|recorderSource = "recorder"|completedTranscriptionStatusRawValue|VoiceInkSessionMetricMigrationPreference|completionKey = "HasCompletedStatsMigration"' \
   VoiceInkCore/Sources/VoiceInkCore/SessionMetricPolicy.swift
+
+require_pattern \
+  "macOS session metric model adapts shared draft" \
+  'init\(draft: VoiceInkSessionMetricDraft\)' \
+  VoiceInk/Models/SessionMetric.swift
+
+require_pattern \
+  "macOS session metric recorder uses shared draft" \
+  'VoiceInkSessionMetricPolicy\.recorderDraft' \
+  VoiceInk/Services/SessionMetricRecorder.swift
+
+require_pattern \
+  "macOS stats migration uses shared session metric draft" \
+  'VoiceInkSessionMetricPolicy\.recorderDraft' \
+  VoiceInk/Services/SessionMetricMigrationService.swift
+
+reject_pattern \
+  "macOS session metric shells avoid duplicate recorder source and metric row mapping" \
+  'source: "recorder"|let metricValues = VoiceInkSessionMetricPolicy\.values|wordCount: metricValues|audioDuration: metricValues|speedFactor: metricValues' \
+  VoiceInk/Services/SessionMetricRecorder.swift \
+  VoiceInk/Services/SessionMetricMigrationService.swift
 
 require_pattern \
   "macOS stats migration uses shared completion preference" \
@@ -11158,18 +11179,18 @@ require_pattern \
   VoiceInk/Services/SessionMetricMigrationService.swift
 
 reject_pattern \
-  "macOS stats migration avoids raw completion preference" \
-  'HasCompletedStatsMigration|UserDefaults\.standard' \
+  "macOS stats migration avoids raw completion preference and status" \
+  'HasCompletedStatsMigration|UserDefaults\.standard|transcriptionStatus == "completed"' \
   VoiceInk/Services/SessionMetricMigrationService.swift
 
 require_pattern \
-  "core checks execute session metric migration preference test" \
-  'SessionMetricPolicyTests\.testMigrationPreferencePreservesCompletionStorageKey' \
+  "core checks execute session metric draft and migration preference tests" \
+  'SessionMetricPolicyTests\.testRecorderDraftPreservesSourceAndMetricFields|SessionMetricPolicyTests\.testMigrationPreferencePreservesCompletionStorageKey' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "migration checklist tracks shared session metric migration preference" \
-  'stats-migration completion storage through `VoiceInkSessionMetricPolicy`/`VoiceInkSessionMetricMigrationPreference`' \
+  'metric row drafts, recorder source, completed-status filtering, .*stats-migration completion storage through `VoiceInkSessionMetricPolicy`/`VoiceInkSessionMetricDraft`/`VoiceInkSessionMetricMigrationPreference`' \
   docs/ios-single-repo-migration.md
 
 reject_pattern \

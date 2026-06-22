@@ -16,7 +16,24 @@ public struct VoiceInkSessionMetricValues: Equatable, Sendable {
     public let enhancementDuration: TimeInterval?
 }
 
+public struct VoiceInkSessionMetricDraft: Equatable, Sendable {
+    public let transcriptionId: UUID
+    public let timestamp: Date
+    public let source: String
+    public let wordCount: Int
+    public let audioDuration: TimeInterval
+    public let transcriptionModelName: String?
+    public let transcriptionDuration: TimeInterval?
+    public let speedFactor: Double?
+    public let powerModeName: String?
+    public let aiEnhancementModelName: String?
+    public let enhancementDuration: TimeInterval?
+}
+
 public enum VoiceInkSessionMetricPolicy {
+    public static let recorderSource = "recorder"
+    public static let completedTranscriptionStatusRawValue = VoiceInkTranscriptionStatus.completed.rawValue
+
     public static func values(for source: some VoiceInkSessionMetricSource) -> VoiceInkSessionMetricValues {
         let audioDuration = max(source.duration, 0)
         let transcriptionDuration = positiveDuration(source.transcriptionDuration)
@@ -31,6 +48,30 @@ public enum VoiceInkSessionMetricPolicy {
             transcriptionDuration: transcriptionDuration,
             speedFactor: speedFactor,
             enhancementDuration: enhancementDuration
+        )
+    }
+
+    public static func recorderDraft(
+        transcriptionId: UUID,
+        timestamp: Date,
+        source: some VoiceInkSessionMetricSource,
+        transcriptionModelName: String?,
+        powerModeName: String?,
+        aiEnhancementModelName: String?
+    ) -> VoiceInkSessionMetricDraft {
+        let values = values(for: source)
+        return VoiceInkSessionMetricDraft(
+            transcriptionId: transcriptionId,
+            timestamp: timestamp,
+            source: recorderSource,
+            wordCount: values.wordCount,
+            audioDuration: values.audioDuration,
+            transcriptionModelName: transcriptionModelName,
+            transcriptionDuration: values.transcriptionDuration,
+            speedFactor: values.speedFactor,
+            powerModeName: powerModeName,
+            aiEnhancementModelName: aiEnhancementModelName,
+            enhancementDuration: values.enhancementDuration
         )
     }
 

@@ -20,7 +20,7 @@ final class SessionMetric: VoiceInkPerformanceRecord, VoiceInkDashboardMetricRec
     init(
         transcriptionId: UUID,
         timestamp: Date = Date(),
-        source: String? = "recorder",
+        source: String? = VoiceInkSessionMetricPolicy.recorderSource,
         wordCount: Int,
         audioDuration: TimeInterval,
         transcriptionModelName: String?,
@@ -42,6 +42,22 @@ final class SessionMetric: VoiceInkPerformanceRecord, VoiceInkDashboardMetricRec
         self.powerModeName = powerModeName
         self.aiEnhancementModelName = aiEnhancementModelName
         self.enhancementDuration = enhancementDuration
+    }
+
+    convenience init(draft: VoiceInkSessionMetricDraft) {
+        self.init(
+            transcriptionId: draft.transcriptionId,
+            timestamp: draft.timestamp,
+            source: draft.source,
+            wordCount: draft.wordCount,
+            audioDuration: draft.audioDuration,
+            transcriptionModelName: draft.transcriptionModelName,
+            transcriptionDuration: draft.transcriptionDuration,
+            speedFactor: draft.speedFactor,
+            powerModeName: draft.powerModeName,
+            aiEnhancementModelName: draft.aiEnhancementModelName,
+            enhancementDuration: draft.enhancementDuration
+        )
     }
 }
 

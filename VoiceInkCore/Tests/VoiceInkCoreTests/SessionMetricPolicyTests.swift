@@ -45,6 +45,39 @@ final class SessionMetricPolicyTests: XCTestCase {
         XCTAssertNil(values.enhancementDuration)
     }
 
+    func testRecorderDraftPreservesSourceAndMetricFields() {
+        let id = UUID(uuidString: "00000000-0000-0000-0000-000000000456")!
+        let timestamp = Date(timeIntervalSince1970: 1_234)
+
+        let draft = VoiceInkSessionMetricPolicy.recorderDraft(
+            transcriptionId: id,
+            timestamp: timestamp,
+            source: Source(
+                text: "raw words",
+                enhancedText: "enhanced words count",
+                duration: 12,
+                transcriptionDuration: 3,
+                enhancementDuration: 2
+            ),
+            transcriptionModelName: "Whisper",
+            powerModeName: "Focus",
+            aiEnhancementModelName: "GPT"
+        )
+
+        XCTAssertEqual(draft.transcriptionId, id)
+        XCTAssertEqual(draft.timestamp, timestamp)
+        XCTAssertEqual(draft.source, "recorder")
+        XCTAssertEqual(draft.wordCount, 3)
+        XCTAssertEqual(draft.audioDuration, 12)
+        XCTAssertEqual(draft.transcriptionModelName, "Whisper")
+        XCTAssertEqual(draft.transcriptionDuration, 3)
+        XCTAssertEqual(draft.speedFactor, 4)
+        XCTAssertEqual(draft.powerModeName, "Focus")
+        XCTAssertEqual(draft.aiEnhancementModelName, "GPT")
+        XCTAssertEqual(draft.enhancementDuration, 2)
+        XCTAssertEqual(VoiceInkSessionMetricPolicy.completedTranscriptionStatusRawValue, "completed")
+    }
+
     func testMigrationPreferencePreservesCompletionStorageKey() {
         withTemporaryDefaults { defaults in
             XCTAssertEqual(VoiceInkSessionMetricMigrationPreference.completionKey, "HasCompletedStatsMigration")

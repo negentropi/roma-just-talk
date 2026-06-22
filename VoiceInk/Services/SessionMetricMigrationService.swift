@@ -31,30 +31,24 @@ final class SessionMetricMigrationService {
                         .map { $0.transcriptionId }
                 )
 
+                let completedStatus = VoiceInkSessionMetricPolicy.completedTranscriptionStatusRawValue
                 let descriptor = FetchDescriptor<Transcription>(
-                    predicate: #Predicate<Transcription> { $0.transcriptionStatus == "completed" }
+                    predicate: #Predicate<Transcription> { $0.transcriptionStatus == completedStatus }
                 )
                 let transcriptions = try backgroundContext.fetch(descriptor)
 
                 for transcription in transcriptions {
                     guard !existingIds.contains(transcription.id) else { continue }
 
-                    let metricValues = VoiceInkSessionMetricPolicy.values(for: transcription)
-
-                    let metric = SessionMetric(
+                    let draft = VoiceInkSessionMetricPolicy.recorderDraft(
                         transcriptionId: transcription.id,
                         timestamp: transcription.timestamp,
-                        source: "recorder",
-                        wordCount: metricValues.wordCount,
-                        audioDuration: metricValues.audioDuration,
                         transcriptionModelName: transcription.transcriptionModelName,
-                        transcriptionDuration: metricValues.transcriptionDuration,
-                        speedFactor: metricValues.speedFactor,
+                        source: transcription,
                         powerModeName: transcription.powerModeName,
-                        aiEnhancementModelName: transcription.aiEnhancementModelName,
-                        enhancementDuration: metricValues.enhancementDuration
+                        aiEnhancementModelName: transcription.aiEnhancementModelName
                     )
-                    backgroundContext.insert(metric)
+                    backgroundContext.insert(SessionMetric(draft: draft))
                     insertedCount += 1
                 }
 

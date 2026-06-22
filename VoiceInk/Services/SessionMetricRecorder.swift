@@ -5,7 +5,6 @@ import VoiceInkCore
 
 enum SessionMetricRecorder {
     private static let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "SessionMetricRecorder")
-    private static let source = "recorder"
 
     @discardableResult
     static func recordRecorderSession(
@@ -44,23 +43,16 @@ enum SessionMetricRecorder {
             return false
         }
 
-        let metricValues = VoiceInkSessionMetricPolicy.values(for: transcription)
-
-        let metric = SessionMetric(
+        let draft = VoiceInkSessionMetricPolicy.recorderDraft(
             transcriptionId: transcription.id,
             timestamp: timestamp,
-            source: source,
-            wordCount: metricValues.wordCount,
-            audioDuration: metricValues.audioDuration,
+            source: transcription,
             transcriptionModelName: transcription.transcriptionModelName ?? modelDisplayName,
-            transcriptionDuration: metricValues.transcriptionDuration,
-            speedFactor: metricValues.speedFactor,
             powerModeName: transcription.powerModeName,
-            aiEnhancementModelName: transcription.aiEnhancementModelName,
-            enhancementDuration: metricValues.enhancementDuration
+            aiEnhancementModelName: transcription.aiEnhancementModelName
         )
 
-        modelContext.insert(metric)
+        modelContext.insert(SessionMetric(draft: draft))
         logger.notice("Recorded session metric for transcription \(transcriptionId.uuidString, privacy: .public)")
         return true
     }

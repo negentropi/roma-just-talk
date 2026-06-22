@@ -13,7 +13,7 @@ public enum VoiceInkModelManagementFilter: String, CaseIterable, Identifiable, S
 
     public static let recommendedModelNames = [
         "ggml-base.en",
-        "parakeet-tdt-0.6b-v2",
+        VoiceInkTranscriptionModelCatalog.defaultMacOSFluidAudioModelName,
         "ggml-large-v3-turbo-q5_0",
         "whisper-large-v3-turbo"
     ]

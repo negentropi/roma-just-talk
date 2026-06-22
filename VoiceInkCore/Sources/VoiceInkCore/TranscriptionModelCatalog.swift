@@ -269,6 +269,7 @@ public struct VoiceInkFluidAudioTranscriptionModelSpec: Equatable, Sendable {
 
 public enum VoiceInkTranscriptionModelCatalog {
     public static let localBaseModel = "base"
+    public static let defaultMacOSFluidAudioModelName = "parakeet-tdt-0.6b-v2"
 
     public static let nativeAppleModel = VoiceInkNativeAppleTranscriptionModelSpec(
         name: "apple-speech",
@@ -303,6 +304,10 @@ public enum VoiceInkTranscriptionModelCatalog {
             supportsStreaming: true
         )
     ]
+
+    public static var defaultMacOSFluidAudioModel: VoiceInkFluidAudioTranscriptionModelSpec {
+        fluidAudioModels.first { $0.name == defaultMacOSFluidAudioModelName } ?? fluidAudioModels[0]
+    }
 
     public static func fluidAudioModelVersion(forModelName modelName: String) -> VoiceInkFluidAudioModelVersion {
         fluidAudioModels.first { $0.name == modelName }?.modelVersion ?? .v3

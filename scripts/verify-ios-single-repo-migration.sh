@@ -3802,9 +3802,19 @@ require_pattern \
   'VoiceInkMacOSOnboardingPresentation\.modelDownload|presentation\.(title|subtitle|skipButtonTitle|speedLabel|accuracyLabel|ramLabel)|buttonTitle\(isModelSet:' \
   VoiceInk/Views/Onboarding/OnboardingModelDownloadView.swift
 
+require_pattern \
+  "macOS model-download onboarding uses shared default FluidAudio model" \
+  'TranscriptionModelRegistry\.defaultMacOSFluidAudioModel' \
+  VoiceInk/Views/Onboarding/OnboardingModelDownloadView.swift
+
 reject_pattern \
   "macOS model-download onboarding avoids shell-only presentation copy" \
   '"(Download AI Model|We'\''ll download the optimized model to get you started\.|Skip for now|Downloading\.\.\.|Set as Default|Download Model|Speed|Accuracy|RAM)"' \
+  VoiceInk/Views/Onboarding/OnboardingModelDownloadView.swift
+
+reject_pattern \
+  "macOS model-download onboarding avoids hardcoded default FluidAudio model" \
+  '"parakeet-tdt-0\.6b-v2"|TranscriptionModelRegistry\.models\.first' \
   VoiceInk/Views/Onboarding/OnboardingModelDownloadView.swift
 
 reject_pattern \
@@ -6345,14 +6355,29 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift
 
 require_pattern \
+  "shared FluidAudio default model policy lives in VoiceInkCore" \
+  'defaultMacOSFluidAudioModelName|defaultMacOSFluidAudioModel' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift
+
+require_pattern \
   "core checks execute FluidAudio model runtime version policy test" \
   'TranscriptionModelCatalogTests\.testFluidAudioRuntimeVersionAndLanguageHintPolicyIsShared' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
+  "core checks pin shared FluidAudio default model policy" \
+  'defaultMacOSFluidAudioModelName|defaultMacOSFluidAudioModel' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionModelCatalogTests.swift
+
+require_pattern \
   "shared FluidAudio download status presentation lives in VoiceInkCore" \
   'VoiceInkFluidAudioDownloadStatus|VoiceInkFluidAudioDownloadPhase|preparingDownload|downloadingFiles|percentText' \
   VoiceInkCore/Sources/VoiceInkCore/FluidAudioTranscriptionPolicy.swift
+
+require_pattern \
+  "macOS model registry adapts shared FluidAudio default model" \
+  'defaultMacOSFluidAudioModelName|defaultMacOSFluidAudioModel' \
+  VoiceInk/Models/TranscriptionModelRegistry.swift
 
 require_pattern \
   "macOS FluidAudio model manager adapts shared runtime version policy" \
@@ -9364,8 +9389,18 @@ require_pattern \
   VoiceInk/AppDefaults.swift
 
 require_pattern \
+  "macOS app launch registers shared default transcription model" \
+  'currentTranscriptionModel: VoiceInkTranscriptionModelCatalog\.defaultMacOSFluidAudioModelName' \
+  VoiceInk/AppDefaults.swift
+
+require_pattern \
   "macOS app launch uses shared onboarding completion storage state" \
   'VoiceInkOnboardingPreference\.hasStoredCompletionState' \
+  VoiceInk/AppDefaults.swift
+
+reject_pattern \
+  "macOS app launch avoids hardcoded default transcription model" \
+  '"parakeet-tdt-0\.6b-v2"' \
   VoiceInk/AppDefaults.swift
 
 reject_pattern \

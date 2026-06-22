@@ -6,6 +6,15 @@ enum TranscriptionModelRegistry {
     static var models: [any TranscriptionModel] {
         return predefinedModels + CustomCloudModelManager.shared.customModels
     }
+
+    static var defaultMacOSFluidAudioModel: FluidAudioModel {
+        guard let model = predefinedModels.first(where: {
+            $0.name == VoiceInkTranscriptionModelCatalog.defaultMacOSFluidAudioModelName
+        }) as? FluidAudioModel else {
+            preconditionFailure("Missing default macOS FluidAudio model")
+        }
+        return model
+    }
     
     private static let predefinedModels: [any TranscriptionModel] = {
         let platformModels: [any TranscriptionModel] = [

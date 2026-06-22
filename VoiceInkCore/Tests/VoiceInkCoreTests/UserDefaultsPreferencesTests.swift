@@ -219,7 +219,7 @@ final class UserDefaultsPreferencesTests: XCTestCase {
 
     func testDefaultSettingsBuildRegisteredUserDefaultsForPlatformSelections() {
         let registeredDefaults = VoiceInkDefaultSettings.macOS.registeredUserDefaults(
-            currentTranscriptionModel: "parakeet-tdt-0.6b-v2"
+            currentTranscriptionModel: VoiceInkTranscriptionModelCatalog.defaultMacOSFluidAudioModelName
         )
 
         XCTAssertEqual(registeredDefaults[VoiceInkUserDefaultsKey.hasCompletedOnboarding] as? Bool, false)
@@ -246,7 +246,7 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         )
         XCTAssertEqual(
             registeredDefaults[VoiceInkUserDefaultsKey.currentTranscriptionModel] as? String,
-            "parakeet-tdt-0.6b-v2"
+            VoiceInkTranscriptionModelCatalog.defaultMacOSFluidAudioModelName
         )
         XCTAssertEqual(registeredDefaults[VoiceInkUserDefaultsKey.isTranscriptionCleanupEnabled] as? Bool, false)
         XCTAssertEqual(
@@ -377,7 +377,7 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             defaults.set("fr", forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage)
             VoiceInkDefaultSettings.macOS.registerUserDefaults(
                 to: defaults,
-                currentTranscriptionModel: "parakeet-tdt-0.6b-v2"
+                currentTranscriptionModel: VoiceInkTranscriptionModelCatalog.defaultMacOSFluidAudioModelName
             )
 
             XCTAssertEqual(
@@ -390,7 +390,7 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             )
             XCTAssertEqual(
                 defaults.string(forKey: VoiceInkUserDefaultsKey.currentTranscriptionModel),
-                "parakeet-tdt-0.6b-v2"
+                VoiceInkTranscriptionModelCatalog.defaultMacOSFluidAudioModelName
             )
             XCTAssertEqual(
                 defaults.object(forKey: VoiceInkUserDefaultsKey.transcriptionRetentionMinutes) as? Int,
@@ -745,11 +745,14 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         withIsolatedDefaults { defaults in
             XCTAssertNil(VoiceInkCurrentTranscriptionModelPreference.modelName(from: defaults))
 
-            VoiceInkCurrentTranscriptionModelPreference.saveModelName("parakeet-tdt-0.6b-v2", to: defaults)
+            VoiceInkCurrentTranscriptionModelPreference.saveModelName(
+                VoiceInkTranscriptionModelCatalog.defaultMacOSFluidAudioModelName,
+                to: defaults
+            )
 
             XCTAssertEqual(
                 VoiceInkCurrentTranscriptionModelPreference.modelName(from: defaults),
-                "parakeet-tdt-0.6b-v2"
+                VoiceInkTranscriptionModelCatalog.defaultMacOSFluidAudioModelName
             )
         }
     }

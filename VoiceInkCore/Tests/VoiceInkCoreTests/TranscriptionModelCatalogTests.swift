@@ -20,6 +20,15 @@ final class TranscriptionModelCatalogTests: XCTestCase {
         XCTAssertEqual(models.map(\.displayName), ["Parakeet V2", "Parakeet V3"])
         XCTAssertEqual(models.map(\.size), ["474 MB", "494 MB"])
         XCTAssertEqual(models.map(\.modelVersion), [.v2, .v3])
+        XCTAssertEqual(
+            VoiceInkTranscriptionModelCatalog.defaultMacOSFluidAudioModelName,
+            "parakeet-tdt-0.6b-v2"
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptionModelCatalog.defaultMacOSFluidAudioModel.name,
+            VoiceInkTranscriptionModelCatalog.defaultMacOSFluidAudioModelName
+        )
+        XCTAssertEqual(VoiceInkTranscriptionModelCatalog.defaultMacOSFluidAudioModel.modelVersion, .v2)
         XCTAssertEqual(models.map(\.supportsStreaming), [true, true])
         XCTAssertEqual(models.map(\.isMultilingual), [false, true])
         XCTAssertEqual(models.first?.supportedLanguages, ["en": "English"])

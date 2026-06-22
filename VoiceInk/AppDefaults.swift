@@ -5,7 +5,7 @@ import VoiceInkCore
 enum AppDefaults {
     static var registeredDefaults: [String: Any] {
         var defaults = VoiceInkDefaultSettings.macOS.registeredUserDefaults(
-            currentTranscriptionModel: "parakeet-tdt-0.6b-v2"
+            currentTranscriptionModel: VoiceInkTranscriptionModelCatalog.defaultMacOSFluidAudioModelName
         )
 
         var platformDefaults: [String: Any] = [

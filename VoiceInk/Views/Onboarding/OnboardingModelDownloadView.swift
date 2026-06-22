@@ -11,7 +11,7 @@ struct OnboardingModelDownloadView: View {
     @State private var isModelSet = false
     @State private var showTutorial = false
     
-    private let defaultModel = TranscriptionModelRegistry.models.first { $0.name == "parakeet-tdt-0.6b-v2" } as! FluidAudioModel
+    private let defaultModel = TranscriptionModelRegistry.defaultMacOSFluidAudioModel
     private let presentation = VoiceInkMacOSOnboardingPresentation.modelDownload
     
     var body: some View {

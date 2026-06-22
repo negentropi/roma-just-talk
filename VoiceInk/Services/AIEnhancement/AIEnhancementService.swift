@@ -162,12 +162,15 @@ class AIEnhancementService: ObservableObject {
     }
 
     private func makeRequest(text: String) async throws -> String {
-        guard isConfigured else {
-            throw VoiceInkAIEnhancementError.notConfigured
-        }
-
-        guard let requestPayload = VoiceInkAIEnhancementRequestPayload(transcript: text) else {
+        let requestPayload: VoiceInkAIEnhancementRequestPayload
+        switch try VoiceInkAIEnhancementRequestPreparation.preparing(
+            transcript: text,
+            isConfigured: isConfigured
+        ) {
+        case .skipEmptyTranscript:
             return ""
+        case .execute(let payload):
+            requestPayload = payload
         }
 
         let formattedText = requestPayload.userMessage

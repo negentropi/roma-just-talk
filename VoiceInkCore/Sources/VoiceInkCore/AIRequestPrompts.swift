@@ -25,3 +25,23 @@ public struct VoiceInkAIEnhancementRequestPayload: Equatable, Sendable {
         VoiceInkAIEnhancementOutputFilter.filter(providerOutput)
     }
 }
+
+public enum VoiceInkAIEnhancementRequestPreparation: Equatable, Sendable {
+    case skipEmptyTranscript
+    case execute(VoiceInkAIEnhancementRequestPayload)
+
+    public static func preparing(
+        transcript: String,
+        isConfigured: Bool
+    ) throws -> VoiceInkAIEnhancementRequestPreparation {
+        guard isConfigured else {
+            throw VoiceInkAIEnhancementError.notConfigured
+        }
+
+        guard let requestPayload = VoiceInkAIEnhancementRequestPayload(transcript: transcript) else {
+            return .skipEmptyTranscript
+        }
+
+        return .execute(requestPayload)
+    }
+}

@@ -120,4 +120,33 @@ final class AIPromptsTests: XCTestCase {
             "Clean text"
         )
     }
+
+    func testEnhancementRequestPreparationPreservesMacOSPreflightPolicy() throws {
+        do {
+            _ = try VoiceInkAIEnhancementRequestPreparation.preparing(
+                transcript: "raw text",
+                isConfigured: false
+            )
+            XCTFail("Expected notConfigured error")
+        } catch let error as VoiceInkAIEnhancementError {
+            XCTAssertEqual(error, .notConfigured)
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+
+        XCTAssertEqual(
+            try VoiceInkAIEnhancementRequestPreparation.preparing(
+                transcript: "",
+                isConfigured: true
+            ),
+            .skipEmptyTranscript
+        )
+        XCTAssertEqual(
+            try VoiceInkAIEnhancementRequestPreparation.preparing(
+                transcript: "raw text",
+                isConfigured: true
+            ),
+            .execute(try XCTUnwrap(VoiceInkAIEnhancementRequestPayload(transcript: "raw text")))
+        )
+    }
 }

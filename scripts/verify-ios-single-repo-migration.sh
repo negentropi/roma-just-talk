@@ -6583,17 +6583,22 @@ require_pattern \
 
 require_pattern \
   "shared AI enhancement request payload lives in VoiceInkCore" \
-  'VoiceInkAIEnhancementRequestPayload|taggedTranscript|enhancedText' \
+  'VoiceInkAIEnhancementRequestPayload|VoiceInkAIEnhancementRequestPreparation|taggedTranscript|enhancedText' \
   VoiceInkCore/Sources/VoiceInkCore/AIRequestPrompts.swift
 
 require_pattern \
   "macOS AI enhancement service uses shared request payload" \
-  'VoiceInkAIEnhancementRequestPayload\(transcript: text\)|requestPayload\.userMessage|VoiceInkAIEnhancementRequestPayload\.enhancedText' \
+  'VoiceInkAIEnhancementRequestPreparation\.preparing|requestPayload\.userMessage|VoiceInkAIEnhancementRequestPayload\.enhancedText' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+require_pattern \
+  "core checks execute AI enhancement request preparation test" \
+  'AIPromptsTests\.testEnhancementRequestPreparationPreservesMacOSPreflightPolicy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \
   "macOS AI enhancement service avoids shell-owned request payload and output filtering" \
-  'guard +!text\.isEmpty|VoiceInkAIRequestPrompts\.taggedTranscript|VoiceInkAIEnhancementOutputFilter\.filter' \
+  'guard +!text\.isEmpty|guard +isConfigured|VoiceInkAIEnhancementRequestPayload\(transcript: text\)|VoiceInkAIRequestPrompts\.taggedTranscript|VoiceInkAIEnhancementOutputFilter\.filter' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
 require_pattern \

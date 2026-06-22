@@ -83,6 +83,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "AIPromptsTests.testEnhancementRequestPayloadReturnsNilForEmptyTranscript", run: { AIPromptsTests().testEnhancementRequestPayloadReturnsNilForEmptyTranscript() }),
             VoiceInkCoreCheck(name: "AIPromptsTests.testEnhancementRequestPayloadPreservesMacOSWhitespaceOnlyTranscriptPolicy", run: { try AIPromptsTests().testEnhancementRequestPayloadPreservesMacOSWhitespaceOnlyTranscriptPolicy() }),
             VoiceInkCoreCheck(name: "AIPromptsTests.testEnhancementRequestPayloadBuildsTaggedUserMessageAndFiltersProviderOutput", run: { try AIPromptsTests().testEnhancementRequestPayloadBuildsTaggedUserMessageAndFiltersProviderOutput() }),
+            VoiceInkCoreCheck(name: "AIPromptsTests.testEnhancementRequestPreparationPreservesMacOSPreflightPolicy", run: { try AIPromptsTests().testEnhancementRequestPreparationPreservesMacOSPreflightPolicy() }),
             VoiceInkCoreCheck(name: "AIReasoningConfigTests.testTemperatureUsesRequiredGPT5Temperature", run: { AIReasoningConfigTests().testTemperatureUsesRequiredGPT5Temperature() }),
             VoiceInkCoreCheck(name: "AIReasoningConfigTests.testReasoningEffortMatchesProviderModelPolicy", run: { AIReasoningConfigTests().testReasoningEffortMatchesProviderModelPolicy() }),
             VoiceInkCoreCheck(name: "AIReasoningConfigTests.testExtraBodyParametersMatchProviderModelPolicy", run: { AIReasoningConfigTests().testExtraBodyParametersMatchProviderModelPolicy() }),

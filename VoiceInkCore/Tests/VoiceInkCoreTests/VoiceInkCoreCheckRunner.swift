@@ -22,6 +22,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "AppIdentityTests.testBundleScopedErrorDomainUsesBundleIdentifier", run: { AppIdentityTests().testBundleScopedErrorDomainUsesBundleIdentifier() }),
             VoiceInkCoreCheck(name: "AppIdentityTests.testIOSRecordDeepLinkContractRoundTripsThroughSharedCore", run: { try AppIdentityTests().testIOSRecordDeepLinkContractRoundTripsThroughSharedCore() }),
             VoiceInkCoreCheck(name: "AppIntentPresentationTests.testMiniRecorderIntentPresentationPreservesMacOSShortcutCopy", run: { AppIntentPresentationTests().testMiniRecorderIntentPresentationPreservesMacOSShortcutCopy() }),
+            VoiceInkCoreCheck(name: "AppIntentPresentationTests.testMiniRecorderRequestPreservesMacOSNotificationNames", run: { AppIntentPresentationTests().testMiniRecorderRequestPreservesMacOSNotificationNames() }),
             VoiceInkCoreCheck(name: "SupportContactPolicyTests.testSupportContactPolicyPreservesEmailIdentityAndSubject", run: { SupportContactPolicyTests().testSupportContactPolicyPreservesEmailIdentityAndSubject() }),
             VoiceInkCoreCheck(name: "SupportContactPolicyTests.testSupportEmailBodyPreservesMacOSSupportCopyAndSystemInformationSlot", run: { SupportContactPolicyTests().testSupportEmailBodyPreservesMacOSSupportCopyAndSystemInformationSlot() }),
             VoiceInkCoreCheck(name: "SupportContactPolicyTests.testSupportMailtoURLPreservesRecipientAndEncodesSubject", run: { try SupportContactPolicyTests().testSupportMailtoURLPreservesRecipientAndEncodesSubject() }),

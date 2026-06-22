@@ -21,4 +21,9 @@ final class AppIntentPresentationTests: XCTestCase {
             )
         )
     }
+
+    func testMiniRecorderRequestPreservesMacOSNotificationNames() {
+        XCTAssertEqual(VoiceInkMiniRecorderRequest.toggleNotificationName.rawValue, "toggleMiniRecorder")
+        XCTAssertEqual(VoiceInkMiniRecorderRequest.dismissNotificationName.rawValue, "dismissMiniRecorder")
+    }
 }

@@ -4,8 +4,8 @@ import VoiceInkCore
 extension Notification.Name {
     static let AppSettingsDidChange = Notification.Name("appSettingsDidChange")
     static let languageDidChange = Notification.Name("languageDidChange")
-    static let toggleMiniRecorder = Notification.Name("toggleMiniRecorder")
-    static let dismissMiniRecorder = Notification.Name("dismissMiniRecorder")
+    static let toggleMiniRecorder = VoiceInkMiniRecorderRequest.toggleNotificationName
+    static let dismissMiniRecorder = VoiceInkMiniRecorderRequest.dismissNotificationName
     static let didChangeModel = Notification.Name("didChangeModel")
     static let aiProviderKeyChanged = Notification.Name("aiProviderKeyChanged")
     static let licenseStatusChanged = Notification.Name("licenseStatusChanged")

@@ -11237,6 +11237,7 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift
 
 require_file VoiceInkCore/Sources/VoiceInkCore/AppIntentPresentation.swift
+require_file VoiceInkCore/Sources/VoiceInkCore/MiniRecorderRequest.swift
 
 require_patterns \
   "shared macOS AppIntent presentation lives in VoiceInkCore" \
@@ -11249,6 +11250,13 @@ require_patterns \
   '"Dismiss VoiceInk Recorder"' \
   '"Dismiss the VoiceInk mini recorder and cancel any active recording\."' \
   '"VoiceInk recorder dismissed"'
+
+require_patterns \
+  "shared mini-recorder request notifications live in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/MiniRecorderRequest.swift \
+  'VoiceInkMiniRecorderRequest' \
+  'toggleNotificationName = Notification\.Name\("toggleMiniRecorder"\)' \
+  'dismissNotificationName = Notification\.Name\("dismissMiniRecorder"\)'
 
 require_patterns \
   "macOS mini-recorder intents use shared presentation" \
@@ -11271,6 +11279,16 @@ reject_pattern \
   '"(Toggle VoiceInk Recorder|Start or stop the VoiceInk mini recorder for voice transcription\.|VoiceInk recorder toggled|Dismiss VoiceInk Recorder|Dismiss the VoiceInk mini recorder and cancel any active recording\.|VoiceInk recorder dismissed|VoiceInk app is not available|VoiceInk recording service is not available)"|enum +IntentError|import AppKit' \
   VoiceInk/AppIntents/ToggleMiniRecorderIntent.swift \
   VoiceInk/AppIntents/DismissMiniRecorderIntent.swift
+
+require_pattern \
+  "macOS app notifications use shared mini-recorder request names" \
+  'toggleMiniRecorder = VoiceInkMiniRecorderRequest\.toggleNotificationName|dismissMiniRecorder = VoiceInkMiniRecorderRequest\.dismissNotificationName' \
+  VoiceInk/Notifications/AppNotifications.swift
+
+reject_pattern \
+  "macOS app notification shell avoids duplicate mini-recorder request names" \
+  'Notification\.Name\("toggleMiniRecorder"\)|Notification\.Name\("dismissMiniRecorder"\)' \
+  VoiceInk/Notifications/AppNotifications.swift
 
 require_patterns \
   "shared storage startup diagnostics live in VoiceInkCore" \
@@ -11741,10 +11759,11 @@ require_patterns \
   'AppIdentityTests\.testMacOSStorageAlertPresentationPreservesStartupCopy' \
   'AppIdentityTests\.testStorageStartupDiagnosticsPreserveAppStartupCopy'
 
-require_pattern \
+require_patterns \
   "core checks execute AppIntent presentation tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
   'AppIntentPresentationTests\.testMiniRecorderIntentPresentationPreservesMacOSShortcutCopy' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  'AppIntentPresentationTests\.testMiniRecorderRequestPreservesMacOSNotificationNames'
 
 require_pattern \
   "core checks execute macOS navigation request contract tests" \

@@ -11043,14 +11043,33 @@ require_pattern \
   'Logger\(subsystem: VoiceInkAppIdentity\.loggingSubsystem' \
   iOS/Shared/VoiceInkIOSLogger.swift
 
+require_patterns \
+  "VoiceInkCore owns iOS shell logging categories" \
+  VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift \
+  'VoiceInkIOSLogCategory' \
+  'iOSAppGroup' \
+  'iOSAudioSession' \
+  'iOSLocalWhisper' \
+  'iOSLocalModelManagement'
+
 require_pattern \
-  "iOS shell logging adapter owns local Whisper logger" \
-  'localWhisper = Logger\(subsystem: VoiceInkAppIdentity\.loggingSubsystem' \
+  "VoiceInkCore checks cover iOS shell logging categories" \
+  'AppIdentityTests\.testIOSLogCategoriesPreserveDiagnosticsIdentity' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "iOS shell logging adapter uses shared local Whisper category" \
+  'localWhisper = Logger\(subsystem: VoiceInkAppIdentity\.loggingSubsystem, category: VoiceInkIOSLogCategory\.localWhisper\)' \
   iOS/Shared/VoiceInkIOSLogger.swift
 
 require_pattern \
-  "iOS shell logging adapter owns local model manager logger" \
-  'localModelManagement = Logger\(subsystem: VoiceInkAppIdentity\.loggingSubsystem' \
+  "iOS shell logging adapter uses shared local model manager category" \
+  'localModelManagement = Logger\(subsystem: VoiceInkAppIdentity\.loggingSubsystem, category: VoiceInkIOSLogCategory\.localModelManagement\)' \
+  iOS/Shared/VoiceInkIOSLogger.swift
+
+reject_pattern \
+  "iOS shell logging adapter avoids shell-owned category literals" \
+  '"iOS(App|AppGroup|AudioPlayback|AudioSession|Keyboard|LocalWhisper|LocalModelManagement|Notes|Recording|Settings)"' \
   iOS/Shared/VoiceInkIOSLogger.swift
 
 require_pattern \

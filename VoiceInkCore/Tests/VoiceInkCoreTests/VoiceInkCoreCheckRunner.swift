@@ -11,6 +11,7 @@ struct VoiceInkCoreCheckRunner {
     static func main() async {
         let checks: [VoiceInkCoreCheck] = [
             VoiceInkCoreCheck(name: "AppIdentityTests.testAppIdentityPreservesSharedVisibleNames", run: { AppIdentityTests().testAppIdentityPreservesSharedVisibleNames() }),
+            VoiceInkCoreCheck(name: "AppIdentityTests.testIOSLogCategoriesPreserveDiagnosticsIdentity", run: { AppIdentityTests().testIOSLogCategoriesPreserveDiagnosticsIdentity() }),
             VoiceInkCoreCheck(name: "AppIdentityTests.testMacOSStorageAlertPresentationPreservesStartupCopy", run: { AppIdentityTests().testMacOSStorageAlertPresentationPreservesStartupCopy() }),
             VoiceInkCoreCheck(name: "AppIdentityTests.testMacOSNavigationRequestPreservesDestinationContract", run: { AppIdentityTests().testMacOSNavigationRequestPreservesDestinationContract() }),
             VoiceInkCoreCheck(name: "AppIdentityTests.testMacOSMainViewItemsPreserveSidebarPresentation", run: { AppIdentityTests().testMacOSMainViewItemsPreserveSidebarPresentation() }),

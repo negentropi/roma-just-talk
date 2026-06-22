@@ -34,6 +34,19 @@ final class AppIdentityTests: XCTestCase {
         )
     }
 
+    func testIOSLogCategoriesPreserveDiagnosticsIdentity() {
+        XCTAssertEqual(VoiceInkIOSLogCategory.app, "iOSApp")
+        XCTAssertEqual(VoiceInkIOSLogCategory.appGroup, "iOSAppGroup")
+        XCTAssertEqual(VoiceInkIOSLogCategory.audioPlayback, "iOSAudioPlayback")
+        XCTAssertEqual(VoiceInkIOSLogCategory.audioSession, "iOSAudioSession")
+        XCTAssertEqual(VoiceInkIOSLogCategory.keyboard, "iOSKeyboard")
+        XCTAssertEqual(VoiceInkIOSLogCategory.localWhisper, "iOSLocalWhisper")
+        XCTAssertEqual(VoiceInkIOSLogCategory.localModelManagement, "iOSLocalModelManagement")
+        XCTAssertEqual(VoiceInkIOSLogCategory.notes, "iOSNotes")
+        XCTAssertEqual(VoiceInkIOSLogCategory.recording, "iOSRecording")
+        XCTAssertEqual(VoiceInkIOSLogCategory.settings, "iOSSettings")
+    }
+
     func testMacOSStorageAlertPresentationPreservesStartupCopy() {
         XCTAssertEqual(
             VoiceInkAppIdentity.storageFallbackWarningPresentation,

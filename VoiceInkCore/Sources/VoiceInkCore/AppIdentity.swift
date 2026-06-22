@@ -220,6 +220,19 @@ public enum VoiceInkAppIdentity {
     }
 }
 
+public enum VoiceInkIOSLogCategory {
+    public static let app = "iOSApp"
+    public static let appGroup = "iOSAppGroup"
+    public static let audioPlayback = "iOSAudioPlayback"
+    public static let audioSession = "iOSAudioSession"
+    public static let keyboard = "iOSKeyboard"
+    public static let localWhisper = "iOSLocalWhisper"
+    public static let localModelManagement = "iOSLocalModelManagement"
+    public static let notes = "iOSNotes"
+    public static let recording = "iOSRecording"
+    public static let settings = "iOSSettings"
+}
+
 public enum VoiceInkAppDeepLink: Equatable, Sendable {
     case record
 

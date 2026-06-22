@@ -188,31 +188,26 @@ class AudioTranscriptionManager: ObservableObject {
                 powerModeEmoji: powerModeMetadata.emoji
             )
 
-            // Handle enhancement if enabled
-            var transcription: Transcription
-
-            if let enhancementService = engine.enhancementService,
-               let enhancementRequest {
+            if enhancementRequest != nil {
                 item.status = .processing(phase: .enhancing)
-                do {
-                    let enhancement = try await enhancementService.enhance(enhancementRequest.text)
-                    transcription = Transcription(completedDraft: VoiceInkAudioFileTranscriptionDraft.completed(
-                        context: draftContext,
-                        enhancementOutcome: .succeeded(enhancement)
-                    ))
-                } catch {
-                    let errorDescription = VoiceInkErrorDescription.text(for: error)
-                    logger.error("Enhancement failed: \(errorDescription, privacy: .public)")
-                    transcription = Transcription(completedDraft: VoiceInkAudioFileTranscriptionDraft.completed(
-                        context: draftContext,
-                        enhancementOutcome: .failed(reason: errorDescription, policy: .storeFailureText)
-                    ))
-                }
-            } else {
-                transcription = Transcription(completedDraft: VoiceInkAudioFileTranscriptionDraft.completed(
-                    context: draftContext
-                ))
             }
+
+            let completionResult = await VoiceInkAudioFileTranscriptionDraft.completionResult(
+                context: draftContext,
+                enhancementRequest: enhancementRequest,
+                enhancementFailurePolicy: .storeFailureText
+            ) { request in
+                guard let enhancementService = engine.enhancementService else {
+                    throw VoiceInkEngineError.unknownError
+                }
+                return try await enhancementService.enhance(request.text)
+            }
+
+            if let errorDescription = completionResult.enhancementFailureReason {
+                logger.error("Enhancement failed: \(errorDescription, privacy: .public)")
+            }
+
+            let transcription = Transcription(completedDraft: completionResult.draft)
 
             modelContext.insert(transcription)
             try modelContext.save()

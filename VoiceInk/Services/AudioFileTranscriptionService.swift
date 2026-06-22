@@ -99,35 +99,20 @@ class AudioTranscriptionService {
                 skipConfiguration: VoiceInkPostProcessingSkipConfiguration.current()
             )
 
-            // Apply AI enhancement if enabled
-            if let enhancementService = enhancementService,
-               let enhancementRequest {
-                do {
-                    let enhancement = try await enhancementService.enhance(enhancementRequest.text)
-                    let newTranscription = Transcription(completedDraft: VoiceInkAudioFileTranscriptionDraft.completed(
-                        context: draftContext,
-                        enhancementOutcome: .succeeded(enhancement)
-                    ))
-                    saveCompletedTranscription(newTranscription)
-                    return newTranscription
-                } catch {
-                    let newTranscription = Transcription(completedDraft: VoiceInkAudioFileTranscriptionDraft.completed(
-                        context: draftContext,
-                        enhancementOutcome: .failed(
-                            reason: VoiceInkErrorDescription.text(for: error),
-                            policy: .omitEnhancedText
-                        )
-                    ))
-                    saveCompletedTranscription(newTranscription)
-                    return newTranscription
+            let completionResult = await VoiceInkAudioFileTranscriptionDraft.completionResult(
+                context: draftContext,
+                enhancementRequest: enhancementRequest,
+                enhancementFailurePolicy: .omitEnhancedText
+            ) { [enhancementService] request in
+                guard let enhancementService else {
+                    throw VoiceInkEngineError.unknownError
                 }
-            } else {
-                let newTranscription = Transcription(completedDraft: VoiceInkAudioFileTranscriptionDraft.completed(
-                    context: draftContext
-                ))
-                saveCompletedTranscription(newTranscription)
-                return newTranscription
+                return try await enhancementService.enhance(request.text)
             }
+
+            let newTranscription = Transcription(completedDraft: completionResult.draft)
+            saveCompletedTranscription(newTranscription)
+            return newTranscription
         } catch {
             logger.error("❌ Transcription failed: \(error.localizedDescription, privacy: .public)")
             throw error

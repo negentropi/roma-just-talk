@@ -6128,13 +6128,13 @@ reject_pattern \
   VoiceInk/Services/AudioFileTranscriptionService.swift
 
 require_pattern \
-  "macOS audio-file import builds completed records through shared draft" \
-  'VoiceInkAudioFileTranscriptionDraft\.completed' \
+  "macOS audio-file import builds completed records through shared completion result" \
+  'VoiceInkAudioFileTranscriptionDraft\.completionResult' \
   VoiceInk/Services/AudioFileTranscriptionManager.swift
 
 require_pattern \
-  "macOS retry transcription builds completed records through shared draft" \
-  'VoiceInkAudioFileTranscriptionDraft\.completed' \
+  "macOS retry transcription builds completed records through shared completion result" \
+  'VoiceInkAudioFileTranscriptionDraft\.completionResult' \
   VoiceInk/Services/AudioFileTranscriptionService.swift
 
 reject_pattern \
@@ -8313,19 +8313,29 @@ require_pattern \
   VoiceInk/Transcription/Engine/TranscriptionPipeline.swift
 
 require_pattern \
-  "macOS audio-file import enhancement stores request metadata from shared result" \
-  'succeeded\(enhancement\)' \
+  "macOS audio-file import enhancement completion preserves queue failure text policy" \
+  'enhancementFailurePolicy: \.storeFailureText' \
   VoiceInk/Services/AudioFileTranscriptionManager.swift
 
 require_pattern \
-  "macOS retry enhancement stores request metadata from shared result" \
-  'succeeded\(enhancement\)' \
+  "macOS retry enhancement completion preserves retry failure text policy" \
+  'enhancementFailurePolicy: \.omitEnhancedText' \
   VoiceInk/Services/AudioFileTranscriptionService.swift
 
 require_pattern \
   "shared completed transcription draft stores request metadata from shared result" \
   'enhancementResult\.requestSystemMessage' \
   VoiceInkCore/Sources/VoiceInkCore/CompletedTranscriptionDraft.swift
+
+require_pattern \
+  "core tests pin audio-file enhancement completion policy" \
+  'testAudioFileTranscriptionCompletionSkipsMissingEnhancementRequest|testAudioFileTranscriptionCompletionStoresSuccessfulEnhancement|testAudioFileTranscriptionCompletionMapsEnhancementFailureToDraftAndReason' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/CompletedTranscriptionDraftTests.swift
+
+require_pattern \
+  "core check runner executes audio-file enhancement completion policy tests" \
+  'testAudioFileTranscriptionCompletionSkipsMissingEnhancementRequest|testAudioFileTranscriptionCompletionStoresSuccessfulEnhancement|testAudioFileTranscriptionCompletionMapsEnhancementFailureToDraftAndReason' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "macOS re-enhance action stores request metadata through shared record mutation" \

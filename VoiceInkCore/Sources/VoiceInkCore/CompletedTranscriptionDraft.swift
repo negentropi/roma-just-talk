@@ -39,6 +39,19 @@ public enum VoiceInkAudioFileTranscriptionEnhancementOutcome: Equatable, Sendabl
     case failed(reason: String, policy: VoiceInkEnhancementFailureDraftPolicy)
 }
 
+public struct VoiceInkAudioFileTranscriptionCompletionResult: Equatable, Sendable {
+    public let draft: VoiceInkCompletedTranscriptionDraft
+    public let enhancementFailureReason: String?
+
+    public init(
+        draft: VoiceInkCompletedTranscriptionDraft,
+        enhancementFailureReason: String? = nil
+    ) {
+        self.draft = draft
+        self.enhancementFailureReason = enhancementFailureReason
+    }
+}
+
 public enum VoiceInkAudioFileTranscriptionDraft {
     public static func completed(
         context: VoiceInkAudioFileTranscriptionDraftContext,
@@ -77,6 +90,41 @@ public enum VoiceInkAudioFileTranscriptionDraft {
                 powerModeEmoji: context.powerModeEmoji,
                 enhancementFailureReason: reason,
                 enhancementFailurePolicy: policy
+            )
+        }
+    }
+
+    public static func completionResult(
+        context: VoiceInkAudioFileTranscriptionDraftContext,
+        enhancementRequest: VoiceInkTranscriptionEnhancementRequest?,
+        enhancementFailurePolicy: VoiceInkEnhancementFailureDraftPolicy,
+        enhance: (VoiceInkTranscriptionEnhancementRequest) async throws -> VoiceInkAIEnhancementResult
+    ) async -> VoiceInkAudioFileTranscriptionCompletionResult {
+        guard let enhancementRequest else {
+            return VoiceInkAudioFileTranscriptionCompletionResult(
+                draft: completed(context: context)
+            )
+        }
+
+        do {
+            let enhancement = try await enhance(enhancementRequest)
+            return VoiceInkAudioFileTranscriptionCompletionResult(
+                draft: completed(
+                    context: context,
+                    enhancementOutcome: .succeeded(enhancement)
+                )
+            )
+        } catch {
+            let reason = VoiceInkErrorDescription.text(for: error)
+            return VoiceInkAudioFileTranscriptionCompletionResult(
+                draft: completed(
+                    context: context,
+                    enhancementOutcome: .failed(
+                        reason: reason,
+                        policy: enhancementFailurePolicy
+                    )
+                ),
+                enhancementFailureReason: reason
             )
         }
     }

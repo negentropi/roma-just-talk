@@ -1,3 +1,4 @@
+import Foundation
 @testable import VoiceInkCore
 
 final class CompletedTranscriptionDraftTests: XCTestCase {
@@ -135,6 +136,83 @@ final class CompletedTranscriptionDraftTests: XCTestCase {
         XCTAssertNil(storedFailureDraft.aiRequestUserMessage)
         XCTAssertNil(omittedFailureDraft.enhancedText)
         XCTAssertEqual(omittedFailureDraft.transcriptionStatus, .completed)
+    }
+
+    func testAudioFileTranscriptionCompletionSkipsMissingEnhancementRequest() async {
+        var didCallEnhancer = false
+
+        let result = await VoiceInkAudioFileTranscriptionDraft.completionResult(
+            context: audioFileDraftContext,
+            enhancementRequest: nil,
+            enhancementFailurePolicy: .storeFailureText
+        ) { _ in
+            didCallEnhancer = true
+            return VoiceInkAIEnhancementResult(
+                text: "unexpected",
+                duration: 1,
+                modelName: "gpt-5",
+                promptName: nil,
+                requestSystemMessage: nil,
+                requestUserMessage: nil
+            )
+        }
+
+        XCTAssertFalse(didCallEnhancer)
+        XCTAssertEqual(result.draft.text, "clean text")
+        XCTAssertNil(result.draft.enhancedText)
+        XCTAssertNil(result.enhancementFailureReason)
+    }
+
+    func testAudioFileTranscriptionCompletionStoresSuccessfulEnhancement() async {
+        let request = VoiceInkTranscriptionEnhancementRequest(text: "text for enhancement")
+        let enhancement = VoiceInkAIEnhancementResult(
+            text: "enhanced text",
+            duration: 1.25,
+            modelName: "gpt-5",
+            promptName: "Assistant",
+            requestSystemMessage: "system",
+            requestUserMessage: "user"
+        )
+
+        let result = await VoiceInkAudioFileTranscriptionDraft.completionResult(
+            context: audioFileDraftContext,
+            enhancementRequest: request,
+            enhancementFailurePolicy: .storeFailureText
+        ) { receivedRequest in
+            XCTAssertEqual(receivedRequest, request)
+            return enhancement
+        }
+
+        XCTAssertEqual(result.draft.enhancedText, "enhanced text")
+        XCTAssertEqual(result.draft.aiEnhancementModelName, "gpt-5")
+        XCTAssertEqual(result.draft.promptName, "Assistant")
+        XCTAssertEqual(result.draft.enhancementDuration, 1.25)
+        XCTAssertEqual(result.draft.aiRequestSystemMessage, "system")
+        XCTAssertEqual(result.draft.aiRequestUserMessage, "user")
+        XCTAssertNil(result.enhancementFailureReason)
+    }
+
+    func testAudioFileTranscriptionCompletionMapsEnhancementFailureToDraftAndReason() async {
+        let error = NSError(
+            domain: "VoiceInkCoreTests",
+            code: 1,
+            userInfo: [NSLocalizedDescriptionKey: "timeout"]
+        )
+
+        let result = await VoiceInkAudioFileTranscriptionDraft.completionResult(
+            context: audioFileDraftContext,
+            enhancementRequest: VoiceInkTranscriptionEnhancementRequest(text: "text for enhancement"),
+            enhancementFailurePolicy: .storeFailureText
+        ) { _ in
+            throw error
+        }
+
+        XCTAssertEqual(result.draft.enhancedText, "Enhancement failed: timeout")
+        XCTAssertNil(result.draft.aiEnhancementModelName)
+        XCTAssertNil(result.draft.promptName)
+        XCTAssertNil(result.draft.enhancementDuration)
+        XCTAssertEqual(result.enhancementFailureReason, "timeout")
+        XCTAssertEqual(result.draft.transcriptionStatus, .completed)
     }
 
     func testRecordingPendingDraftBuildsSharedPendingRow() {

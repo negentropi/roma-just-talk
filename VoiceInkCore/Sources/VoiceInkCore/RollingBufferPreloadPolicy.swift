@@ -44,6 +44,19 @@ public struct VoiceInkRollingBufferPreloadConfiguration: Equatable, Sendable {
     }
 }
 
+public enum VoiceInkRollingBufferPreloadPartialTranscriptRequest {
+    public static let notificationName = Notification.Name("rollingBufferPreloadPartialTranscript")
+    public static let textUserInfoKey = "text"
+
+    public static func userInfo(text: String) -> [AnyHashable: Any] {
+        [textUserInfoKey: text]
+    }
+
+    public static func text(from notification: Notification) -> String? {
+        notification.userInfo?[textUserInfoKey] as? String
+    }
+}
+
 public struct VoiceInkRollingBufferPowerState: Equatable, Sendable {
     public let isOnBattery: Bool
     public let batteryLevelPercent: Int?

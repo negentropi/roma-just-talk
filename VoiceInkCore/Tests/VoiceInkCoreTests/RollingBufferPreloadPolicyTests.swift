@@ -20,6 +20,28 @@ final class RollingBufferPreloadPolicyTests: XCTestCase {
         XCTAssertTrue(VoiceInkRollingBufferPreloadSettings.defaultPerModelPreloadEnabled)
     }
 
+    func testPartialTranscriptRequestPreservesNotificationContract() {
+        XCTAssertEqual(
+            VoiceInkRollingBufferPreloadPartialTranscriptRequest.notificationName.rawValue,
+            "rollingBufferPreloadPartialTranscript"
+        )
+        XCTAssertEqual(VoiceInkRollingBufferPreloadPartialTranscriptRequest.textUserInfoKey, "text")
+
+        let userInfo = VoiceInkRollingBufferPreloadPartialTranscriptRequest.userInfo(text: "hello")
+        XCTAssertEqual(userInfo[VoiceInkRollingBufferPreloadPartialTranscriptRequest.textUserInfoKey] as? String, "hello")
+
+        let notification = Notification(
+            name: VoiceInkRollingBufferPreloadPartialTranscriptRequest.notificationName,
+            userInfo: userInfo
+        )
+        XCTAssertEqual(VoiceInkRollingBufferPreloadPartialTranscriptRequest.text(from: notification), "hello")
+        XCTAssertNil(
+            VoiceInkRollingBufferPreloadPartialTranscriptRequest.text(
+                from: Notification(name: VoiceInkRollingBufferPreloadPartialTranscriptRequest.notificationName)
+            )
+        )
+    }
+
     func testSettingsPresentationPreservesMacOSCopy() {
         let presentation = VoiceInkRollingBufferPreloadSettings.macOSSettingsPresentation
 

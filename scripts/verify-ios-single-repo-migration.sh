@@ -10776,6 +10776,15 @@ require_pattern \
   'VoiceInkRollingBufferPreloadSettingsPresentation|VoiceInkRollingBufferVADModel|VoiceInkRollingBufferVADSettings|modelKey = "RollingBufferVADModel"|sileroModelName|saveImportedModel' \
   VoiceInkCore/Sources/VoiceInkCore/RollingBufferPreloadPolicy.swift
 
+require_patterns \
+  "shared rolling-buffer partial transcript request lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/RollingBufferPreloadPolicy.swift \
+  'VoiceInkRollingBufferPreloadPartialTranscriptRequest' \
+  'notificationName = Notification\.Name\("rollingBufferPreloadPartialTranscript"\)' \
+  'textUserInfoKey = "text"' \
+  'userInfo\(text: String\)' \
+  'text\(from notification: Notification\)'
+
 require_pattern \
   "shared rolling-buffer backup preferences live in VoiceInkCore" \
   'VoiceInkRollingBufferBackupPreferences' \
@@ -10815,6 +10824,21 @@ require_pattern \
   "macOS rolling VAD detector uses shared selected-model policy" \
   'VoiceInkRollingBufferVADSettings\.usesSilero\(\)' \
   VoiceInk/Transcription/RollingPreload/SileroSpeechActivityDetector.swift
+
+require_pattern \
+  "macOS app notifications use shared rolling-buffer partial transcript request name" \
+  'rollingBufferPreloadPartialTranscript = VoiceInkRollingBufferPreloadPartialTranscriptRequest\.notificationName' \
+  VoiceInk/Notifications/AppNotifications.swift
+
+require_pattern \
+  "macOS rolling preload coordinator posts shared partial transcript request payload" \
+  'VoiceInkRollingBufferPreloadPartialTranscriptRequest\.userInfo\(text: partial\)' \
+  VoiceInk/Transcription/RollingPreload/RollingBufferPreloadCoordinator.swift
+
+require_pattern \
+  "macOS engine reads shared rolling-buffer partial transcript request payload" \
+  'VoiceInkRollingBufferPreloadPartialTranscriptRequest\.text\(from: notification\)' \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift
 
 reject_pattern \
   "macOS diagnostics avoid shell-only rolling-buffer per-model default lookup" \
@@ -10882,9 +10906,21 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
+  "core checks execute rolling-buffer partial transcript request tests" \
+  'RollingBufferPreloadPolicyTests\.testPartialTranscriptRequestPreservesNotificationContract' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "core checks execute rolling-buffer backup import policy tests" \
   'RollingBufferPreloadPolicyTests\.testBackupImportPlanValidatesAndClampsRawValues|RollingBufferPreloadPolicyTests\.testImportedBackupPlanSavesPreloadAndVADSettings' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "macOS rolling-buffer shell avoids duplicate partial transcript notification contract" \
+  'Notification\.Name\("rollingBufferPreloadPartialTranscript"\)|userInfo: \["text"|userInfo\?\["text"\]' \
+  VoiceInk/Notifications/AppNotifications.swift \
+  VoiceInk/Transcription/RollingPreload/RollingBufferPreloadCoordinator.swift \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift
 
 reject_pattern \
   "macOS rolling-buffer shell avoids local VAD model settings policy" \
@@ -10896,7 +10932,7 @@ reject_pattern \
 
 require_pattern \
   "migration checklist tracks shared rolling-buffer settings labels" \
-  'macOS rolling-buffer preload settings labels/help, VAD model labels, storage key/default' \
+  'macOS rolling-buffer preload settings labels/help, partial-transcript preview notification contract, VAD model labels, storage key/default' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

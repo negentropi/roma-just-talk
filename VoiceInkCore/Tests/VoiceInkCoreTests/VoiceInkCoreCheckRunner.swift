@@ -1037,6 +1037,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "RollingAudioBufferTests.testAppendIgnoresEmptyChunksAndZeroCapacity", run: { RollingAudioBufferTests().testAppendIgnoresEmptyChunksAndZeroCapacity() }),
             VoiceInkCoreCheck(name: "RollingAudioBufferTests.testRemoveAllClearsChunksAndBytes", run: { RollingAudioBufferTests().testRemoveAllClearsChunksAndBytes() }),
             VoiceInkCoreCheck(name: "RollingBufferPreloadPolicyTests.testSettingsPreserveExistingStorageKeysAndDefaults", run: { RollingBufferPreloadPolicyTests().testSettingsPreserveExistingStorageKeysAndDefaults() }),
+            VoiceInkCoreCheck(name: "RollingBufferPreloadPolicyTests.testPartialTranscriptRequestPreservesNotificationContract", run: { RollingBufferPreloadPolicyTests().testPartialTranscriptRequestPreservesNotificationContract() }),
             VoiceInkCoreCheck(name: "RollingBufferPreloadPolicyTests.testSettingsPresentationPreservesMacOSCopy", run: { RollingBufferPreloadPolicyTests().testSettingsPresentationPreservesMacOSCopy() }),
             VoiceInkCoreCheck(name: "RollingBufferPreloadPolicyTests.testVADModelSettingsPreserveExistingStorageAndSileroIdentity", run: { RollingBufferPreloadPolicyTests().testVADModelSettingsPreserveExistingStorageAndSileroIdentity() }),
             VoiceInkCoreCheck(name: "RollingBufferPreloadPolicyTests.testVADModelSettingsReadSaveAndImportRawValues", run: { RollingBufferPreloadPolicyTests().testVADModelSettingsReadSaveAndImportRawValues() }),

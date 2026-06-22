@@ -485,7 +485,7 @@ final class RollingBufferPreloadCoordinator {
                     NotificationCenter.default.post(
                         name: .rollingBufferPreloadPartialTranscript,
                         object: nil,
-                        userInfo: ["text": partial]
+                        userInfo: VoiceInkRollingBufferPreloadPartialTranscriptRequest.userInfo(text: partial)
                     )
                 }
             }

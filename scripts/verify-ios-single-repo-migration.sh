@@ -2195,6 +2195,7 @@ require_patterns \
   'VoiceInkLastTranscriptionTextPreference' \
   'VoiceInkLastTranscriptionNotificationPresentation' \
   'VoiceInkLastTranscriptionRetryPreflightFailure' \
+  'fetchFailedDiagnosticMessage' \
   'noTranscriptionNotification' \
   'copyCompletionNotification' \
   'retryPreflightFailureNotification' \
@@ -2207,6 +2208,7 @@ require_patterns \
   'testFirstPasteableCandidateSkipsExcludedPendingBlankAndCanceledCandidates' \
   'testPasteTextUsesOriginalOrEnhancedFallbackPolicy' \
   'testFetchLimitPreservesMacOSLastTranscriptionFetchWindow' \
+  'testFetchFailureDiagnosticPreservesMacOSCopy' \
   'testLastTranscriptionNotificationPresentationsPreserveCopyOutcomes' \
   'testLastTranscriptionRetryNotificationPresentationsPreserveMacOSCopy'
 
@@ -2216,6 +2218,7 @@ require_patterns \
   'LastTranscriptionPolicyTests\.testFirstPasteableCandidateSkipsExcludedPendingBlankAndCanceledCandidates' \
   'LastTranscriptionPolicyTests\.testPasteTextUsesOriginalOrEnhancedFallbackPolicy' \
   'LastTranscriptionPolicyTests\.testFetchLimitPreservesMacOSLastTranscriptionFetchWindow' \
+  'LastTranscriptionPolicyTests\.testFetchFailureDiagnosticPreservesMacOSCopy' \
   'LastTranscriptionPolicyTests\.testLastTranscriptionNotificationPresentationsPreserveCopyOutcomes' \
   'LastTranscriptionPolicyTests\.testLastTranscriptionRetryNotificationPresentationsPreserveMacOSCopy'
 
@@ -8736,6 +8739,7 @@ require_patterns \
   "macOS last-transcription fetch and text selection use shared policy" \
   VoiceInk/Services/LastTranscriptionService.swift \
   'VoiceInkLastTranscriptionPolicy\.fetchLimit' \
+  'VoiceInkLastTranscriptionPolicy\.fetchFailedDiagnosticMessage' \
   'VoiceInkLastTranscriptionPolicy\.firstPasteableCandidate' \
   'VoiceInkLastTranscriptionPolicy\.pasteText' \
   'VoiceInkLastTranscriptionPolicy\.noTranscriptionNotification' \
@@ -8743,6 +8747,11 @@ require_patterns \
   'VoiceInkLastTranscriptionPolicy\.retryPreflightFailureNotification' \
   'VoiceInkLastTranscriptionPolicy\.retrySuccessNotification' \
   'VoiceInkLastTranscriptionPolicy\.retryFailureNotification'
+
+reject_pattern \
+  "macOS last-transcription service avoids shell-owned fetch diagnostic copy" \
+  '"Error fetching last transcription:' \
+  VoiceInk/Services/LastTranscriptionService.swift
 
 reject_pattern \
   "macOS last-transcription service avoids shell-owned pasteability scan" \
@@ -8776,7 +8785,7 @@ reject_pattern \
 
 require_pattern \
   "migration checklist tracks shared last-transcription policy gate" \
-  'last-transcription candidate selection, fetch window, original-vs-preferred copy/paste text selection, copy/retry notification presentation, and retry-preflight error presentation route through `VoiceInkLastTranscriptionPolicy`' \
+  'last-transcription candidate selection, fetch window, fetch-failure diagnostic copy, original-vs-preferred copy/paste text selection, copy/retry notification presentation, and retry-preflight error presentation route through `VoiceInkLastTranscriptionPolicy`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

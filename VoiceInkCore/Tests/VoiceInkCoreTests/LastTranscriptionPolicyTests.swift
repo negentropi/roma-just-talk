@@ -58,6 +58,13 @@ final class LastTranscriptionPolicyTests: XCTestCase {
         XCTAssertEqual(VoiceInkLastTranscriptionPolicy.fetchLimit, 20)
     }
 
+    func testFetchFailureDiagnosticPreservesMacOSCopy() {
+        XCTAssertEqual(
+            VoiceInkLastTranscriptionPolicy.fetchFailedDiagnosticMessage(errorDescription: "SwiftData failed"),
+            "Error fetching last transcription: SwiftData failed"
+        )
+    }
+
     func testLastTranscriptionNotificationPresentationsPreserveCopyOutcomes() {
         XCTAssertEqual(
             VoiceInkLastTranscriptionPolicy.noTranscriptionNotification,

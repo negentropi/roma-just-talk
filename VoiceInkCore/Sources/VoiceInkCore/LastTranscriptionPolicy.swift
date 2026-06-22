@@ -46,6 +46,10 @@ public enum VoiceInkLastTranscriptionPolicy {
         kind: .error
     )
 
+    public static func fetchFailedDiagnosticMessage(errorDescription: String) -> String {
+        "Error fetching last transcription: \(errorDescription)"
+    }
+
     public static func firstPasteableCandidate<ID: Equatable & Sendable>(
         in candidates: [VoiceInkLastTranscriptionCandidate<ID>],
         excluding excludedID: ID? = nil

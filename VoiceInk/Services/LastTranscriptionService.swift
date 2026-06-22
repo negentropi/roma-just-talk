@@ -20,7 +20,11 @@ class LastTranscriptionService: ObservableObject {
             }
             return transcriptions.first { $0.id == candidate.id }
         } catch {
-            print("Error fetching last transcription: \(error)")
+            print(
+                VoiceInkLastTranscriptionPolicy.fetchFailedDiagnosticMessage(
+                    errorDescription: String(describing: error)
+                )
+            )
             return nil
         }
     }

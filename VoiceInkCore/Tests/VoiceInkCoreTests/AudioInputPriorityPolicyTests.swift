@@ -205,6 +205,94 @@ final class AudioInputPriorityPolicyTests: XCTestCase {
         )
     }
 
+    func testAutomaticSelectionPolicyPreservesBuiltInDetection() {
+        XCTAssertEqual(VoiceInkAudioInputAutomaticSelectionPolicy.builtInUIDMarker, "BuiltIn")
+        XCTAssertEqual(VoiceInkAudioInputAutomaticSelectionPolicy.unsafeAirPodsNameMarker, "airpods")
+        XCTAssertTrue(VoiceInkAudioInputAutomaticSelectionPolicy.isBuiltInDevice(
+            transportIsBuiltIn: true,
+            uid: nil
+        ))
+        XCTAssertTrue(VoiceInkAudioInputAutomaticSelectionPolicy.isBuiltInDevice(
+            transportIsBuiltIn: false,
+            uid: "AppleUSBAudioEngine:BuiltInMicrophone"
+        ))
+        XCTAssertFalse(VoiceInkAudioInputAutomaticSelectionPolicy.isBuiltInDevice(
+            transportIsBuiltIn: false,
+            uid: "external-usb-mic"
+        ))
+    }
+
+    func testAutomaticSelectionPolicyPreservesSafeDeviceClassification() {
+        XCTAssertTrue(VoiceInkAudioInputAutomaticSelectionPolicy.isSafeAutomaticDevice(
+            name: "MacBook Microphone",
+            isBuiltIn: true,
+            isBluetooth: true
+        ))
+        XCTAssertTrue(VoiceInkAudioInputAutomaticSelectionPolicy.isSafeAutomaticDevice(
+            name: "USB Studio Mic",
+            isBuiltIn: false,
+            isBluetooth: false
+        ))
+        XCTAssertFalse(VoiceInkAudioInputAutomaticSelectionPolicy.isSafeAutomaticDevice(
+            name: "Bluetooth Headset",
+            isBuiltIn: false,
+            isBluetooth: true
+        ))
+        XCTAssertFalse(VoiceInkAudioInputAutomaticSelectionPolicy.isSafeAutomaticDevice(
+            name: "Felix AirPods Pro",
+            isBuiltIn: false,
+            isBluetooth: false
+        ))
+    }
+
+    func testAutomaticSelectionPolicyPrefersSafePreferredDevice() {
+        let devices = [
+            VoiceInkAudioInputAutomaticDevice(id: "built-in", name: "Built-in", isBuiltIn: true, isBluetooth: false),
+            VoiceInkAudioInputAutomaticDevice(id: "usb", name: "USB Mic", isBuiltIn: false, isBluetooth: false)
+        ]
+
+        XCTAssertEqual(
+            VoiceInkAudioInputAutomaticSelectionPolicy.selection(preferred: "usb", devices: devices),
+            VoiceInkAudioInputAutomaticSelection(deviceID: "usb", reason: .preferred)
+        )
+    }
+
+    func testAutomaticSelectionPolicyFallsBackToBuiltInBeforeOtherSafeDevices() {
+        let devices = [
+            VoiceInkAudioInputAutomaticDevice(id: "usb", name: "USB Mic", isBuiltIn: false, isBluetooth: false),
+            VoiceInkAudioInputAutomaticDevice(id: "built-in", name: "Built-in", isBuiltIn: true, isBluetooth: false)
+        ]
+
+        XCTAssertEqual(
+            VoiceInkAudioInputAutomaticSelectionPolicy.selection(preferred: "missing", devices: devices),
+            VoiceInkAudioInputAutomaticSelection(deviceID: "built-in", reason: .builtIn)
+        )
+    }
+
+    func testAutomaticSelectionPolicyUsesSafeFallbackWhenBuiltInUnavailable() {
+        let devices = [
+            VoiceInkAudioInputAutomaticDevice(id: "airpods", name: "AirPods", isBuiltIn: false, isBluetooth: true),
+            VoiceInkAudioInputAutomaticDevice(id: "usb", name: "USB Mic", isBuiltIn: false, isBluetooth: false)
+        ]
+
+        XCTAssertEqual(
+            VoiceInkAudioInputAutomaticSelectionPolicy.selection(devices: devices),
+            VoiceInkAudioInputAutomaticSelection(deviceID: "usb", reason: .safeFallback)
+        )
+    }
+
+    func testAutomaticSelectionPolicyRefusesUnsafeAutomaticDevices() {
+        let devices = [
+            VoiceInkAudioInputAutomaticDevice(id: "airpods", name: "AirPods", isBuiltIn: false, isBluetooth: false),
+            VoiceInkAudioInputAutomaticDevice(id: "headset", name: "Bluetooth Headset", isBuiltIn: false, isBluetooth: true)
+        ]
+
+        XCTAssertEqual(
+            VoiceInkAudioInputAutomaticSelectionPolicy.selection(preferred: "headset", devices: devices),
+            VoiceInkAudioInputAutomaticSelection<String>(deviceID: nil, reason: .unavailable)
+        )
+    }
+
     private func withIsolatedDefaults(_ run: (UserDefaults) -> Void) {
         let suiteName = "VoiceInkCore.AudioInputPriorityPolicyTests.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!

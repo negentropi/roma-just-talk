@@ -1714,7 +1714,7 @@ reject_pattern \
 
 require_pattern \
   "shared audio input priority policy lives in VoiceInkCore" \
-  'VoiceInkAudioInputMode|VoiceInkAudioInputPriorityDevice|VoiceInkAudioInputPriorityPolicy|VoiceInkAudioInputPriorityMoveDirection|firstAvailablePriorityDeviceID|reindexed|defaultMode|iconSystemName' \
+  'VoiceInkAudioInputMode|VoiceInkAudioInputPriorityDevice|VoiceInkAudioInputPriorityPolicy|VoiceInkAudioInputPriorityMoveDirection|firstAvailablePriorityDeviceID|reindexed|defaultMode|iconSystemName|VoiceInkAudioInputAutomaticSelectionPolicy|VoiceInkAudioInputAutomaticDevice|VoiceInkAudioInputAutomaticSelection|isSafeAutomaticDevice|builtInUIDMarker|unsafeAirPodsNameMarker' \
   VoiceInkCore/Sources/VoiceInkCore/AudioInputPriorityPolicy.swift
 
 require_pattern \
@@ -1728,6 +1728,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AudioInputPriorityPolicy.swift
 
 require_pattern \
+  "core audio input automatic selection tests are in runner" \
+  'testAutomaticSelectionPolicyPreservesBuiltInDetection|testAutomaticSelectionPolicyRefusesUnsafeAutomaticDevices' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "macOS audio device manager uses shared input mode" \
   'VoiceInkAudioInputMode|VoiceInkAudioInputPreference\.inputMode|VoiceInkAudioInputPreference\.saveInputMode' \
   VoiceInk/Services/AudioDeviceManager.swift
@@ -1735,6 +1740,11 @@ require_pattern \
 require_pattern \
   "macOS audio device manager uses shared input priority policy" \
   'VoiceInkAudioInputPriorityDevice|VoiceInkAudioInputPriorityPolicy\.(addDevice|removeDevice|reindexed|sortedDevices|firstAvailablePriorityDeviceID)' \
+  VoiceInk/Services/AudioDeviceManager.swift
+
+require_pattern \
+  "macOS audio device manager uses shared automatic input selection policy" \
+  'VoiceInkAudioInputAutomaticSelectionPolicy\.(selection|isBuiltInDevice)|VoiceInkAudioInputAutomaticDevice' \
   VoiceInk/Services/AudioDeviceManager.swift
 
 require_pattern \
@@ -1769,6 +1779,11 @@ reject_pattern \
   VoiceInk/Views/Settings/AudioInputSettingsView.swift
 
 reject_pattern \
+  "macOS audio input avoids shell-owned automatic selection policy" \
+  'localizedCaseInsensitiveContains\("BuiltIn"\)|localizedCaseInsensitiveContains\("airpods"\)|private func isSafeAutomaticDevice' \
+  VoiceInk/Services/AudioDeviceManager.swift
+
+reject_pattern \
   "macOS audio input avoids shell-owned storage keys" \
   'UserDefaultsKey|"(audioInputMode|selectedAudioDeviceUID|prioritizedDevices|lastUsedMicrophoneDeviceID)"|JSONDecoder\(\)\.decode\(\[VoiceInkAudioInputPriorityDevice\]|JSONEncoder\(\)\.encode\(prioritizedDevices\)' \
   VoiceInk/Services/AudioDeviceManager.swift \
@@ -1781,7 +1796,7 @@ reject_pattern \
 
 require_pattern \
   "migration checklist tracks shared audio input preference gate" \
-  'macOS audio-input storage keys, selected-device UID persistence, last-used microphone notification suppression, priority-device JSON storage, settings labels, status copy, empty states, action icons, and priority display text route through `VoiceInkAudioInputPreference`/`VoiceInkMacOSAudioInputSettingsPresentation`' \
+  'macOS audio-input storage keys, selected-device UID persistence, last-used microphone notification suppression, priority-device JSON storage, settings labels, status copy, empty states, action icons, priority display text, and safe automatic input selection route through `VoiceInkAudioInputPreference`/`VoiceInkMacOSAudioInputSettingsPresentation`/`VoiceInkAudioInputAutomaticSelectionPolicy`' \
   docs/ios-single-repo-migration.md
 
 reject_pattern \

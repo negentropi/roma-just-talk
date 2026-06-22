@@ -102,11 +102,10 @@ class AudioDeviceManager: ObservableObject {
     }
 
     func isBuiltInDevice(_ deviceID: AudioDeviceID) -> Bool {
-        if getTransportType(deviceID: deviceID) == kAudioDeviceTransportTypeBuiltIn {
-            return true
-        }
-
-        return getDeviceUID(deviceID: deviceID)?.localizedCaseInsensitiveContains("BuiltIn") == true
+        VoiceInkAudioInputAutomaticSelectionPolicy.isBuiltInDevice(
+            transportIsBuiltIn: getTransportType(deviceID: deviceID) == kAudioDeviceTransportTypeBuiltIn,
+            uid: getDeviceUID(deviceID: deviceID)
+        )
     }
     
     func loadAvailableDevices(completion: (() -> Void)? = nil) {
@@ -346,37 +345,37 @@ class AudioDeviceManager: ObservableObject {
     }
 
     private func safeAutomaticDevice(preferred preferredDeviceID: AudioDeviceID? = nil) -> AudioDeviceID? {
-        if let preferredDeviceID,
-           isDeviceAvailable(preferredDeviceID),
-           isSafeAutomaticDevice(preferredDeviceID) {
-            return preferredDeviceID
+        let selection = VoiceInkAudioInputAutomaticSelectionPolicy.selection(
+            preferred: preferredDeviceID,
+            devices: automaticSelectionDevices()
+        )
+
+        switch selection.reason {
+        case .preferred, .builtIn:
+            break
+        case .safeFallback:
+            if let deviceID = selection.deviceID,
+               let safeDevice = availableDevices.first(where: { $0.id == deviceID }) {
+                logger.warning("🎙️ No built-in input found, auto-selecting safe non-Bluetooth device: \(safeDevice.name, privacy: .public)")
+            }
+        case .unavailable:
+            if let firstDevice = availableDevices.first {
+                logger.warning("🎙️ No safe automatic input found; refusing to auto-select \(firstDevice.name, privacy: .public)")
+            }
         }
 
-        if let builtIn = availableDevices.first(where: { isBuiltInDevice($0.id) }) {
-            return builtIn.id
-        }
-
-        if let safeDevice = availableDevices.first(where: { isSafeAutomaticDevice($0.id) }) {
-            logger.warning("🎙️ No built-in input found, auto-selecting safe non-Bluetooth device: \(safeDevice.name, privacy: .public)")
-            return safeDevice.id
-        }
-
-        if let firstDevice = availableDevices.first {
-            logger.warning("🎙️ No safe automatic input found; refusing to auto-select \(firstDevice.name, privacy: .public)")
-        }
-        return nil
+        return selection.deviceID
     }
 
-    private func isSafeAutomaticDevice(_ deviceID: AudioDeviceID) -> Bool {
-        if isBuiltInDevice(deviceID) {
-            return true
+    private func automaticSelectionDevices() -> [VoiceInkAudioInputAutomaticDevice<AudioDeviceID>] {
+        availableDevices.map { device in
+            VoiceInkAudioInputAutomaticDevice(
+                id: device.id,
+                name: device.name,
+                isBuiltIn: isBuiltInDevice(device.id),
+                isBluetooth: isBluetoothDevice(device.id)
+            )
         }
-
-        let name = availableDevices.first(where: { $0.id == deviceID })?.name
-            ?? getDeviceName(deviceID: deviceID)
-            ?? ""
-
-        return !isBluetoothDevice(deviceID) && !name.localizedCaseInsensitiveContains("airpods")
     }
 
     private func isBluetoothDevice(_ deviceID: AudioDeviceID) -> Bool {

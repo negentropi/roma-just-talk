@@ -201,6 +201,100 @@ public enum VoiceInkAudioInputPriorityPolicy {
     }
 }
 
+public struct VoiceInkAudioInputAutomaticDevice<ID: Equatable & Sendable>: Equatable, Sendable {
+    public let id: ID
+    public let name: String
+    public let isBuiltIn: Bool
+    public let isBluetooth: Bool
+
+    public init(
+        id: ID,
+        name: String,
+        isBuiltIn: Bool,
+        isBluetooth: Bool
+    ) {
+        self.id = id
+        self.name = name
+        self.isBuiltIn = isBuiltIn
+        self.isBluetooth = isBluetooth
+    }
+}
+
+public enum VoiceInkAudioInputAutomaticSelectionReason: Equatable, Sendable {
+    case preferred
+    case builtIn
+    case safeFallback
+    case unavailable
+}
+
+public struct VoiceInkAudioInputAutomaticSelection<ID: Equatable & Sendable>: Equatable, Sendable {
+    public let deviceID: ID?
+    public let reason: VoiceInkAudioInputAutomaticSelectionReason
+
+    public init(
+        deviceID: ID?,
+        reason: VoiceInkAudioInputAutomaticSelectionReason
+    ) {
+        self.deviceID = deviceID
+        self.reason = reason
+    }
+}
+
+public enum VoiceInkAudioInputAutomaticSelectionPolicy {
+    public static let builtInUIDMarker = "BuiltIn"
+    public static let unsafeAirPodsNameMarker = "airpods"
+
+    public static func isBuiltInDevice(
+        transportIsBuiltIn: Bool,
+        uid: String?
+    ) -> Bool {
+        transportIsBuiltIn || (uid?.localizedCaseInsensitiveContains(builtInUIDMarker) == true)
+    }
+
+    public static func isSafeAutomaticDevice(
+        name: String,
+        isBuiltIn: Bool,
+        isBluetooth: Bool
+    ) -> Bool {
+        if isBuiltIn {
+            return true
+        }
+
+        return !isBluetooth && !name.localizedCaseInsensitiveContains(unsafeAirPodsNameMarker)
+    }
+
+    public static func selection<ID: Equatable & Sendable>(
+        preferred preferredDeviceID: ID? = nil,
+        devices: [VoiceInkAudioInputAutomaticDevice<ID>]
+    ) -> VoiceInkAudioInputAutomaticSelection<ID> {
+        if let preferredDeviceID,
+           let preferredDevice = devices.first(where: { $0.id == preferredDeviceID }),
+           isSafeAutomaticDevice(preferredDevice) {
+            return VoiceInkAudioInputAutomaticSelection(deviceID: preferredDevice.id, reason: .preferred)
+        }
+
+        if let builtInDevice = devices.first(where: \.isBuiltIn) {
+            return VoiceInkAudioInputAutomaticSelection(deviceID: builtInDevice.id, reason: .builtIn)
+        }
+
+        if let safeDevice = devices.first(where: isSafeAutomaticDevice) {
+            return VoiceInkAudioInputAutomaticSelection(deviceID: safeDevice.id, reason: .safeFallback)
+        }
+
+        return VoiceInkAudioInputAutomaticSelection(deviceID: nil, reason: .unavailable)
+    }
+
+    private static func isSafeAutomaticDevice<ID: Equatable & Sendable>(
+        _ device: VoiceInkAudioInputAutomaticDevice<ID>
+    ) -> Bool {
+        isSafeAutomaticDevice(
+            name: device.name,
+            isBuiltIn: device.isBuiltIn,
+            isBluetooth: device.isBluetooth
+        )
+    }
+}
+
 public struct VoiceInkMacOSAudioInputSettingsPresentation: Equatable, Sendable {
     public let heroSystemImageName: String
     public let heroTitle: String

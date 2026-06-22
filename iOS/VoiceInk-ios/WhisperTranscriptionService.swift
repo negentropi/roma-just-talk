@@ -21,7 +21,7 @@ struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
         prompt: String? = nil,
         customVocabulary: [String] = []
     ) async throws -> String {
-        logger.notice("Starting local transcription.")
+        logger.notice("\(VoiceInkLocalWhisperTranscriptionDiagnostics.iOSStartingLocalTranscriptionMessage, privacy: .public)")
         let failurePlatform = self.failurePlatform
 
         let transcription = try await VoiceInkLocalWhisperTranscriptionFlow.transcribe(
@@ -41,7 +41,7 @@ struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
                         )
                     }
 
-                    logger.notice("Using model at \(modelPath, privacy: .public)")
+                    logger.notice("\(VoiceInkLocalWhisperTranscriptionDiagnostics.iOSUsingModelMessage(modelPath: modelPath), privacy: .public)")
 
                     do {
                         return VoiceInkLocalWhisperContextPlan(
@@ -49,7 +49,7 @@ struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
                             shouldReleaseContext: true
                         )
                     } catch {
-                        logger.error("Failed to load model: \(error.localizedDescription, privacy: .public)")
+                        logger.error("\(VoiceInkLocalWhisperTranscriptionDiagnostics.iOSModelLoadFailedMessage(localizedDescription: error.localizedDescription), privacy: .public)")
                         throw VoiceInkLocalWhisperFailurePolicy.error(
                             for: .modelLoadFailed,
                             platform: failurePlatform
@@ -59,13 +59,13 @@ struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
                 readAudioSamples: { audioURL in
                     do {
                         guard let samples = try VoiceInkWhisperAudioSamples.floatSamples(fromWAVFileAt: audioURL) else {
-                            logger.error("Audio processing failed.")
+                            logger.error("\(VoiceInkLocalWhisperTranscriptionDiagnostics.iOSAudioProcessingFailedMessage, privacy: .public)")
                             return nil
                         }
-                        logger.notice("Processed \(samples.count, privacy: .public) audio samples.")
+                        logger.notice("\(VoiceInkLocalWhisperTranscriptionDiagnostics.iOSProcessedAudioSamplesMessage(count: samples.count), privacy: .public)")
                         return samples
                     } catch {
-                        logger.error("Audio processing failed: \(error.localizedDescription, privacy: .public)")
+                        logger.error("\(VoiceInkLocalWhisperTranscriptionDiagnostics.iOSAudioProcessingFailedMessage(localizedDescription: error.localizedDescription), privacy: .public)")
                         throw error
                     }
                 },
@@ -76,7 +76,7 @@ struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
                         prompt: prompt
                     )
                     if !success {
-                        logger.error("Transcription failed.")
+                        logger.error("\(VoiceInkLocalWhisperTranscriptionDiagnostics.iOSTranscriptionFailedMessage, privacy: .public)")
                     }
                     return success
                 },
@@ -85,12 +85,12 @@ struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
                 },
                 releaseContext: { context in
                     await context.releaseResources()
-                    logger.notice("Whisper context resources released.")
+                    logger.notice("\(VoiceInkLocalWhisperTranscriptionDiagnostics.iOSContextResourcesReleasedMessage, privacy: .public)")
                 }
             )
         )
 
-        logger.notice("Transcription completed successfully.")
+        logger.notice("\(VoiceInkLocalWhisperTranscriptionDiagnostics.iOSTranscriptionCompletedMessage, privacy: .public)")
         return transcription
     }
     

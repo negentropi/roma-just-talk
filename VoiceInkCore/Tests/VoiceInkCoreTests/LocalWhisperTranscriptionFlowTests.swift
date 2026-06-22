@@ -2,6 +2,84 @@ import Foundation
 @testable import VoiceInkCore
 
 final class LocalWhisperTranscriptionFlowTests: XCTestCase {
+    func testTranscriptionDiagnosticsPreservePlatformLogCopy() {
+        XCTAssertEqual(
+            VoiceInkLocalWhisperTranscriptionDiagnostics.macOSInitiatingLocalTranscriptionMessage(
+                modelDisplayName: "Base"
+            ),
+            "Initiating local transcription for model: Base"
+        )
+        XCTAssertEqual(
+            VoiceInkLocalWhisperTranscriptionDiagnostics.macOSUsingLoadedModelMessage(modelName: "tiny"),
+            "Using already loaded model: tiny"
+        )
+        XCTAssertEqual(
+            VoiceInkLocalWhisperTranscriptionDiagnostics.macOSModelFileNotFoundMessage(modelName: "small"),
+            "❌ Model file not found for: small"
+        )
+        XCTAssertEqual(
+            VoiceInkLocalWhisperTranscriptionDiagnostics.macOSLoadingModelMessage(modelName: "medium"),
+            "Loading model: medium"
+        )
+        XCTAssertEqual(
+            VoiceInkLocalWhisperTranscriptionDiagnostics.macOSModelLoadFailedMessage(
+                modelName: "large",
+                localizedDescription: "bad file"
+            ),
+            "❌ Failed to load model: large - bad file"
+        )
+        XCTAssertEqual(
+            VoiceInkLocalWhisperTranscriptionDiagnostics.macOSAudioSamplesProcessingFailedMessage,
+            "❌ Failed to process audio samples for local Whisper transcription."
+        )
+        XCTAssertEqual(
+            VoiceInkLocalWhisperTranscriptionDiagnostics.macOSCoreTranscriptionFailedMessage,
+            "❌ Core transcription engine failed (whisper_full)."
+        )
+        XCTAssertEqual(
+            VoiceInkLocalWhisperTranscriptionDiagnostics.macOSTranscriptionCompletedMessage,
+            "Whisper transcription completed successfully."
+        )
+        XCTAssertEqual(
+            VoiceInkLocalWhisperTranscriptionDiagnostics.iOSStartingLocalTranscriptionMessage,
+            "Starting local transcription."
+        )
+        XCTAssertEqual(
+            VoiceInkLocalWhisperTranscriptionDiagnostics.iOSUsingModelMessage(modelPath: "/tmp/model.bin"),
+            "Using model at /tmp/model.bin"
+        )
+        XCTAssertEqual(
+            VoiceInkLocalWhisperTranscriptionDiagnostics.iOSModelLoadFailedMessage(localizedDescription: "missing"),
+            "Failed to load model: missing"
+        )
+        XCTAssertEqual(
+            VoiceInkLocalWhisperTranscriptionDiagnostics.iOSAudioProcessingFailedMessage,
+            "Audio processing failed."
+        )
+        XCTAssertEqual(
+            VoiceInkLocalWhisperTranscriptionDiagnostics.iOSProcessedAudioSamplesMessage(count: 42),
+            "Processed 42 audio samples."
+        )
+        XCTAssertEqual(
+            VoiceInkLocalWhisperTranscriptionDiagnostics.iOSAudioProcessingFailedMessage(
+                localizedDescription: "decode"
+            ),
+            "Audio processing failed: decode"
+        )
+        XCTAssertEqual(
+            VoiceInkLocalWhisperTranscriptionDiagnostics.iOSTranscriptionFailedMessage,
+            "Transcription failed."
+        )
+        XCTAssertEqual(
+            VoiceInkLocalWhisperTranscriptionDiagnostics.iOSContextResourcesReleasedMessage,
+            "Whisper context resources released."
+        )
+        XCTAssertEqual(
+            VoiceInkLocalWhisperTranscriptionDiagnostics.iOSTranscriptionCompletedMessage,
+            "Transcription completed successfully."
+        )
+    }
+
     func testFlowRunsTranscriptionAndReleasesOwnedContext() async throws {
         let audioURL = URL(fileURLWithPath: "/tmp/input.wav")
         let context = StubLocalWhisperContext(text: "hello")

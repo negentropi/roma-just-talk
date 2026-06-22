@@ -2972,6 +2972,21 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
+  "shared local Whisper transcription diagnostics live in VoiceInkCore" \
+  'VoiceInkLocalWhisperTranscriptionDiagnostics|macOSInitiatingLocalTranscriptionMessage|macOSAudioSamplesProcessingFailedMessage|iOSStartingLocalTranscriptionMessage|iOSProcessedAudioSamplesMessage' \
+  VoiceInkCore/Sources/VoiceInkCore/LocalWhisperTranscriptionFlow.swift
+
+require_pattern \
+  "core tests cover shared local Whisper transcription diagnostics" \
+  'testTranscriptionDiagnosticsPreservePlatformLogCopy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/LocalWhisperTranscriptionFlowTests.swift
+
+require_pattern \
+  "core check runner executes shared local Whisper transcription diagnostics tests" \
+  'testTranscriptionDiagnosticsPreservePlatformLogCopy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "macOS local Whisper service maps failures through shared policy" \
   'VoiceInkLocalWhisperFailurePolicy\.error' \
   VoiceInk/Transcription/Whisper/WhisperTranscriptionService.swift
@@ -3025,6 +3040,16 @@ require_pattern \
   iOS/VoiceInk-ios/WhisperTranscriptionService.swift
 
 require_pattern \
+  "macOS local Whisper service uses shared transcription diagnostics" \
+  'VoiceInkLocalWhisperTranscriptionDiagnostics\.macOS' \
+  VoiceInk/Transcription/Whisper/WhisperTranscriptionService.swift
+
+require_pattern \
+  "iOS local Whisper service uses shared transcription diagnostics" \
+  'VoiceInkLocalWhisperTranscriptionDiagnostics\.iOS' \
+  iOS/VoiceInk-ios/WhisperTranscriptionService.swift
+
+require_pattern \
   "iOS local Whisper releases owned contexts through shared flow" \
   'shouldReleaseContext: true' \
   iOS/VoiceInk-ios/WhisperTranscriptionService.swift
@@ -3032,6 +3057,12 @@ require_pattern \
 reject_pattern \
   "local Whisper services avoid shell-owned sample and transcription failure mapping" \
   'for: \.(audioProcessingFailed|transcriptionFailed)' \
+  VoiceInk/Transcription/Whisper/WhisperTranscriptionService.swift \
+  iOS/VoiceInk-ios/WhisperTranscriptionService.swift
+
+reject_pattern \
+  "local Whisper services avoid shell-owned transcription diagnostics" \
+  '"(Initiating local transcription for model:|Using already loaded model:|Model file not found for:|Loading model:|Failed to load model:|Failed to process audio samples for local Whisper transcription\.|Core transcription engine failed \(whisper_full\)\.|Whisper transcription completed successfully\.|Starting local transcription\.|Using model at|Audio processing failed\.|Audio processing failed:|Processed .* audio samples\.|Transcription failed\.|Whisper context resources released\.|Transcription completed successfully\.)' \
   VoiceInk/Transcription/Whisper/WhisperTranscriptionService.swift \
   iOS/VoiceInk-ios/WhisperTranscriptionService.swift
 

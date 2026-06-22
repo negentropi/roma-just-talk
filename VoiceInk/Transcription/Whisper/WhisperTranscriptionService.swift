@@ -21,7 +21,7 @@ class WhisperTranscriptionService: TranscriptionService {
             throw VoiceInkLocalWhisperFailurePolicy.error(for: .modelUnavailable, platform: failurePlatform)
         }
 
-        logger.notice("Initiating local transcription for model: \(model.displayName, privacy: .public)")
+        logger.notice("\(VoiceInkLocalWhisperTranscriptionDiagnostics.macOSInitiatingLocalTranscriptionMessage(modelDisplayName: model.displayName), privacy: .public)")
         let failurePlatform = self.failurePlatform
 
         let text = try await VoiceInkLocalWhisperTranscriptionFlow.transcribe(
@@ -39,7 +39,7 @@ class WhisperTranscriptionService: TranscriptionService {
                        let loadedContext = await provider.whisperContext,
                        await provider.loadedWhisperModel?.name == model.name {
 
-                        self.logger.notice("Using already loaded model: \(model.name, privacy: .public)")
+                        self.logger.notice("\(VoiceInkLocalWhisperTranscriptionDiagnostics.macOSUsingLoadedModelMessage(modelName: model.name), privacy: .public)")
                         self.whisperContext = loadedContext
                         return VoiceInkLocalWhisperContextPlan(
                             context: loadedContext,
@@ -52,11 +52,11 @@ class WhisperTranscriptionService: TranscriptionService {
                         forModelName: model.name,
                         in: availableModels
                     ) else {
-                        self.logger.error("❌ Model file not found for: \(model.name, privacy: .public)")
+                        self.logger.error("\(VoiceInkLocalWhisperTranscriptionDiagnostics.macOSModelFileNotFoundMessage(modelName: model.name), privacy: .public)")
                         throw VoiceInkLocalWhisperFailurePolicy.error(for: .modelUnavailable, platform: failurePlatform)
                     }
 
-                    self.logger.notice("Loading model: \(model.name, privacy: .public)")
+                    self.logger.notice("\(VoiceInkLocalWhisperTranscriptionDiagnostics.macOSLoadingModelMessage(modelName: model.name), privacy: .public)")
                     do {
                         let context = try await WhisperContext.createContext(path: modelURL.path)
                         self.whisperContext = context
@@ -66,7 +66,7 @@ class WhisperTranscriptionService: TranscriptionService {
                             shouldReleaseContextOnFailure: false
                         )
                     } catch {
-                        self.logger.error("❌ Failed to load model: \(model.name, privacy: .public) - \(error.localizedDescription, privacy: .public)")
+                        self.logger.error("\(VoiceInkLocalWhisperTranscriptionDiagnostics.macOSModelLoadFailedMessage(modelName: model.name, localizedDescription: error.localizedDescription), privacy: .public)")
                         throw VoiceInkLocalWhisperFailurePolicy.error(for: .modelLoadFailed, platform: failurePlatform)
                     }
                 },
@@ -74,11 +74,11 @@ class WhisperTranscriptionService: TranscriptionService {
                     do {
                         let samples = try VoiceInkWhisperAudioSamples.floatSamples(fromWAVFileAt: audioURL)
                         if samples == nil {
-                            self.logger.error("❌ Failed to process audio samples for local Whisper transcription.")
+                            self.logger.error("\(VoiceInkLocalWhisperTranscriptionDiagnostics.macOSAudioSamplesProcessingFailedMessage, privacy: .public)")
                         }
                         return samples
                     } catch {
-                        self.logger.error("❌ Failed to process audio samples for local Whisper transcription.")
+                        self.logger.error("\(VoiceInkLocalWhisperTranscriptionDiagnostics.macOSAudioSamplesProcessingFailedMessage, privacy: .public)")
                         throw error
                     }
                 },
@@ -89,7 +89,7 @@ class WhisperTranscriptionService: TranscriptionService {
                         prompt: prompt
                     )
                     if !success {
-                        self.logger.error("❌ Core transcription engine failed (whisper_full).")
+                        self.logger.error("\(VoiceInkLocalWhisperTranscriptionDiagnostics.macOSCoreTranscriptionFailedMessage, privacy: .public)")
                     }
                     return success
                 },
@@ -105,7 +105,7 @@ class WhisperTranscriptionService: TranscriptionService {
             )
         )
 
-        logger.notice("Whisper transcription completed successfully.")
+        logger.notice("\(VoiceInkLocalWhisperTranscriptionDiagnostics.macOSTranscriptionCompletedMessage, privacy: .public)")
 
         return text
     }

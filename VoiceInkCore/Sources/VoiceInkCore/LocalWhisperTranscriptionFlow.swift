@@ -1,5 +1,52 @@
 import Foundation
 
+public enum VoiceInkLocalWhisperTranscriptionDiagnostics {
+    public static let macOSAudioSamplesProcessingFailedMessage = "❌ Failed to process audio samples for local Whisper transcription."
+    public static let macOSCoreTranscriptionFailedMessage = "❌ Core transcription engine failed (whisper_full)."
+    public static let macOSTranscriptionCompletedMessage = "Whisper transcription completed successfully."
+    public static let iOSStartingLocalTranscriptionMessage = "Starting local transcription."
+    public static let iOSAudioProcessingFailedMessage = "Audio processing failed."
+    public static let iOSTranscriptionFailedMessage = "Transcription failed."
+    public static let iOSContextResourcesReleasedMessage = "Whisper context resources released."
+    public static let iOSTranscriptionCompletedMessage = "Transcription completed successfully."
+
+    public static func macOSInitiatingLocalTranscriptionMessage(modelDisplayName: String) -> String {
+        "Initiating local transcription for model: \(modelDisplayName)"
+    }
+
+    public static func macOSUsingLoadedModelMessage(modelName: String) -> String {
+        "Using already loaded model: \(modelName)"
+    }
+
+    public static func macOSModelFileNotFoundMessage(modelName: String) -> String {
+        "❌ Model file not found for: \(modelName)"
+    }
+
+    public static func macOSLoadingModelMessage(modelName: String) -> String {
+        "Loading model: \(modelName)"
+    }
+
+    public static func macOSModelLoadFailedMessage(modelName: String, localizedDescription: String) -> String {
+        "❌ Failed to load model: \(modelName) - \(localizedDescription)"
+    }
+
+    public static func iOSUsingModelMessage(modelPath: String) -> String {
+        "Using model at \(modelPath)"
+    }
+
+    public static func iOSModelLoadFailedMessage(localizedDescription: String) -> String {
+        "Failed to load model: \(localizedDescription)"
+    }
+
+    public static func iOSProcessedAudioSamplesMessage(count: Int) -> String {
+        "Processed \(count) audio samples."
+    }
+
+    public static func iOSAudioProcessingFailedMessage(localizedDescription: String) -> String {
+        "Audio processing failed: \(localizedDescription)"
+    }
+}
+
 public struct VoiceInkLocalWhisperContextPlan<Context> {
     public let context: Context
     public let shouldReleaseContext: Bool

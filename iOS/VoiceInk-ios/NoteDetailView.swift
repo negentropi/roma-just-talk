@@ -126,7 +126,10 @@ struct NoteDetailView: View {
     @ViewBuilder
     private var transcriptionStatusView: some View {
         let statusPresentation = VoiceInkTranscriptPresentation.statusPresentation(for: note.transcriptionStatus)
-        let retryControls = VoiceInkTranscriptPresentation.retryControls(isRetranscribing: isRetranscribing)
+        let retryControls = VoiceInkTranscriptPresentation.retryControls(
+            for: note.transcriptionStatus,
+            isRetranscribing: isRetranscribing
+        )
 
         if let statusPresentation {
             VStack(spacing: 12) {
@@ -158,11 +161,13 @@ struct NoteDetailView: View {
                 }
 
                 switch retryControls.action {
+                case .hidden:
+                    EmptyView()
                 case .showProgress:
                     HStack {
                         ProgressView()
                             .scaleEffect(0.8)
-                        Text(VoiceInkTranscriptPresentation.retranscribingDisplayText)
+                        Text(retryControls.progressText ?? VoiceInkTranscriptPresentation.retranscribingDisplayText)
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }

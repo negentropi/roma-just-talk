@@ -61,6 +61,7 @@ public struct VoiceInkTranscriptStatusPresentation: Equatable, Sendable {
 }
 
 public enum VoiceInkTranscriptRetryControlAction: Equatable, Sendable {
+    case hidden
     case showProgress
     case showRetryButton
 }
@@ -68,13 +69,16 @@ public enum VoiceInkTranscriptRetryControlAction: Equatable, Sendable {
 public struct VoiceInkTranscriptRetryControlsPresentation: Equatable, Sendable {
     public let shouldShowModeSelection: Bool
     public let action: VoiceInkTranscriptRetryControlAction
+    public let progressText: String?
 
     public init(
         shouldShowModeSelection: Bool,
-        action: VoiceInkTranscriptRetryControlAction
+        action: VoiceInkTranscriptRetryControlAction,
+        progressText: String? = nil
     ) {
         self.shouldShowModeSelection = shouldShowModeSelection
         self.action = action
+        self.progressText = progressText
     }
 }
 
@@ -288,6 +292,7 @@ public enum VoiceInkTranscriptPresentation {
     public static let noteDetailNavigationTitle = "Note"
     public static let transcriptTitle = "Transcript"
     public static let copyTranscriptSystemImageName = "doc.on.doc"
+    public static let transcribingDisplayText = "Transcribing..."
     public static let retranscribingDisplayText = "Retranscribing..."
     public static let retryTranscriptionButtonTitle = "Retry Transcription"
     public static let retryTranscriptionSystemImageName = "arrow.clockwise"
@@ -450,12 +455,35 @@ public enum VoiceInkTranscriptPresentation {
     }
 
     public static func retryControls(
+        for status: VoiceInkTranscriptionStatus,
         isRetranscribing: Bool
     ) -> VoiceInkTranscriptRetryControlsPresentation {
-        VoiceInkTranscriptRetryControlsPresentation(
-            shouldShowModeSelection: !isRetranscribing,
-            action: isRetranscribing ? .showProgress : .showRetryButton
-        )
+        if isRetranscribing {
+            return VoiceInkTranscriptRetryControlsPresentation(
+                shouldShowModeSelection: false,
+                action: .showProgress,
+                progressText: retranscribingDisplayText
+            )
+        }
+
+        switch status {
+        case .pending:
+            return VoiceInkTranscriptRetryControlsPresentation(
+                shouldShowModeSelection: false,
+                action: .showProgress,
+                progressText: transcribingDisplayText
+            )
+        case .failed:
+            return VoiceInkTranscriptRetryControlsPresentation(
+                shouldShowModeSelection: true,
+                action: .showRetryButton
+            )
+        case .completed, .canceled:
+            return VoiceInkTranscriptRetryControlsPresentation(
+                shouldShowModeSelection: false,
+                action: .hidden
+            )
+        }
     }
 
     public static func isPasteable(

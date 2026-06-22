@@ -491,7 +491,7 @@ final class TranscriptPresentationTests: XCTestCase {
 
     func testRetryControlsPresentationShowsRetryControlsWhenIdle() {
         XCTAssertEqual(
-            VoiceInkTranscriptPresentation.retryControls(isRetranscribing: false),
+            VoiceInkTranscriptPresentation.retryControls(for: .failed, isRetranscribing: false),
             VoiceInkTranscriptRetryControlsPresentation(
                 shouldShowModeSelection: true,
                 action: .showRetryButton
@@ -501,10 +501,39 @@ final class TranscriptPresentationTests: XCTestCase {
 
     func testRetryControlsPresentationShowsProgressWhenRetranscribing() {
         XCTAssertEqual(
-            VoiceInkTranscriptPresentation.retryControls(isRetranscribing: true),
+            VoiceInkTranscriptPresentation.retryControls(for: .failed, isRetranscribing: true),
             VoiceInkTranscriptRetryControlsPresentation(
                 shouldShowModeSelection: false,
-                action: .showProgress
+                action: .showProgress,
+                progressText: "Retranscribing..."
+            )
+        )
+    }
+
+    func testRetryControlsPresentationShowsPendingProgressWithoutRetryControls() {
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.retryControls(for: .pending, isRetranscribing: false),
+            VoiceInkTranscriptRetryControlsPresentation(
+                shouldShowModeSelection: false,
+                action: .showProgress,
+                progressText: "Transcribing..."
+            )
+        )
+    }
+
+    func testRetryControlsPresentationHidesControlsForTerminalNonFailedStates() {
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.retryControls(for: .completed, isRetranscribing: false),
+            VoiceInkTranscriptRetryControlsPresentation(
+                shouldShowModeSelection: false,
+                action: .hidden
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.retryControls(for: .canceled, isRetranscribing: false),
+            VoiceInkTranscriptRetryControlsPresentation(
+                shouldShowModeSelection: false,
+                action: .hidden
             )
         )
     }

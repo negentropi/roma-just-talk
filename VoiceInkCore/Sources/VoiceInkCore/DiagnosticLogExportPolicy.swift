@@ -22,6 +22,9 @@ public enum VoiceInkDiagnosticLogExportPolicy {
     public static let headerTitle = "=== VoiceInk Diagnostic Logs ==="
     public static let headerDivider = "================================"
     public static let noLogsFoundMessage = "No logs found for this session."
+    public static let exporterErrorDomain = "LogExporter"
+    public static let downloadsDirectoryUnavailableErrorCode = 1
+    public static let downloadsDirectoryUnavailableDescription = "Downloads directory unavailable"
 
     public static func storedSessionStartDates(from defaults: UserDefaults = .standard) -> [Date] {
         guard let data = defaults.data(forKey: sessionStartDatesKey),
@@ -105,6 +108,14 @@ public enum VoiceInkDiagnosticLogExportPolicy {
 
     public static func fileName(for date: Date) -> String {
         "\(fileNamePrefix)\(formattedDate(date, format: fileNameDateFormat)).\(fileNameExtension)"
+    }
+
+    public static func downloadsDirectoryUnavailableError() -> NSError {
+        NSError(
+            domain: exporterErrorDomain,
+            code: downloadsDirectoryUnavailableErrorCode,
+            userInfo: [NSLocalizedDescriptionKey: downloadsDirectoryUnavailableDescription]
+        )
     }
 
     public static func formattedTimestamp(_ date: Date) -> String {

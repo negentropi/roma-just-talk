@@ -97,7 +97,7 @@ final class LogExporter {
         let fileName = VoiceInkDiagnosticLogExportPolicy.fileName(for: Date())
 
         guard let downloadsURL = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first else {
-            throw NSError(domain: "LogExporter", code: 1, userInfo: [NSLocalizedDescriptionKey: "Downloads directory unavailable"])
+            throw VoiceInkDiagnosticLogExportPolicy.downloadsDirectoryUnavailableError()
         }
 
         let fileURL = downloadsURL.appendingPathComponent(fileName)

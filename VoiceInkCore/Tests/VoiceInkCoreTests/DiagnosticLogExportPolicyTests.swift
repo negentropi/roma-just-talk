@@ -15,6 +15,12 @@ final class DiagnosticLogExportPolicyTests: XCTestCase {
         XCTAssertEqual(VoiceInkDiagnosticLogExportPolicy.headerTitle, "=== VoiceInk Diagnostic Logs ===")
         XCTAssertEqual(VoiceInkDiagnosticLogExportPolicy.headerDivider, "================================")
         XCTAssertEqual(VoiceInkDiagnosticLogExportPolicy.noLogsFoundMessage, "No logs found for this session.")
+        XCTAssertEqual(VoiceInkDiagnosticLogExportPolicy.exporterErrorDomain, "LogExporter")
+        XCTAssertEqual(VoiceInkDiagnosticLogExportPolicy.downloadsDirectoryUnavailableErrorCode, 1)
+        XCTAssertEqual(
+            VoiceInkDiagnosticLogExportPolicy.downloadsDirectoryUnavailableDescription,
+            "Downloads directory unavailable"
+        )
     }
 
     func testDiagnosticLogExportPolicyLoadsAndSavesStoredSessionStartDates() throws {
@@ -143,6 +149,15 @@ final class DiagnosticLogExportPolicyTests: XCTestCase {
             VoiceInkDiagnosticLogExportPolicy.fileName(for: date),
             "VoiceInk_Logs_\(timestamp).log"
         )
+    }
+
+    func testDiagnosticLogExportPolicyBuildsDownloadsUnavailableError() {
+        let error = VoiceInkDiagnosticLogExportPolicy.downloadsDirectoryUnavailableError()
+
+        XCTAssertEqual(error.domain, "LogExporter")
+        XCTAssertEqual(error.code, 1)
+        XCTAssertEqual(error.userInfo[NSLocalizedDescriptionKey] as? String, "Downloads directory unavailable")
+        XCTAssertEqual(error.localizedDescription, "Downloads directory unavailable")
     }
 
     private func localDate(

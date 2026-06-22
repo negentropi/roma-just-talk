@@ -2,6 +2,12 @@
 
 `VoiceInk/` is the source repo. The sibling `../VoiceInk-iOS` checkout is evidence only.
 
+## Migration Goal
+
+Keep the macOS Roma Just Talk app as the behavior source of truth while making the iOS app live inside this repo as another platform shell. Shared transcription, prompt, provider, model, settings, history, and recording policy belongs in `VoiceInkCore/` so one core edit can be verified against both macOS and iOS. Platform-specific work stays in the macOS app, `iOS/VoiceInk-ios/`, `iOS/VoiceInkKeyboard/`, or `iOS/Shared/` only when it touches OS UI, permissions, audio/session execution, storage adapters, Keychain/UserDefaults execution, SwiftData execution, notifications, or app-extension communication.
+
+Do not resurrect standalone-clone iOS services such as duplicate provider clients, hardcoded provider defaults, clone-local mode models, clone-local Keychain wrappers, clone-local WAV/VAD helpers, or clone-local prompt/provider enums. If a rule can be expressed without importing SwiftUI, AppKit, UIKit, AVFoundation, SwiftData, or app-extension APIs, first try to make it a `VoiceInkCore` policy or presentation type and keep the shell as an adapter. Before deleting duplicate iOS code, prove the replacement through the shared core checks and the iOS single-repo verifier; before changing shared behavior, prove macOS still keeps its current behavior.
+
 ## Current Shape
 
 - macOS app: `VoiceInk.xcodeproj`

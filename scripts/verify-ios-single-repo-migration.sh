@@ -8526,6 +8526,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
 
 require_pattern \
+  "shared audio playback diagnostics live in VoiceInkCore" \
+  'VoiceInkAudioPlaybackDiagnostics|loadFailedMessage|playFailedMessage' \
+  VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
+
+require_pattern \
   "shared audio playback presentation owns macOS action help copy" \
   'showInFinderHelpText|selectEnhancementPromptHelpText|retranscribeAudioHelpText|reEnhanceWithSelectedPromptHelpText|viewDetailsHelpText' \
   VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
@@ -8581,6 +8586,11 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
+  "core checks execute audio playback diagnostics tests" \
+  'AudioPlaybackTimelineTests\.testPlaybackDiagnosticsPreserveIOSLogCopy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "macOS audio player consumes shared timer tick plan" \
   'VoiceInkAudioPlaybackTimerTickPlan\.macOS' \
   VoiceInk/Views/AudioPlayerView.swift
@@ -8608,6 +8618,16 @@ require_pattern \
 require_pattern \
   "iOS audio player applies shared timer tick state plan" \
   'applyingTimerTickPlan' \
+  iOS/VoiceInk-ios/AudioPlayer.swift
+
+require_pattern \
+  "iOS audio player adapts shared playback diagnostics" \
+  'VoiceInkAudioPlaybackDiagnostics\.(loadFailedMessage|playFailedMessage)' \
+  iOS/VoiceInk-ios/AudioPlayer.swift
+
+reject_pattern \
+  "iOS audio player avoids shell-owned playback diagnostic copy" \
+  '"(Failed to load audio:|Failed to play audio:)' \
   iOS/VoiceInk-ios/AudioPlayer.swift
 
 require_pattern \

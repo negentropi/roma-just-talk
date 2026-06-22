@@ -2,6 +2,17 @@ import Foundation
 import VoiceInkCore
 
 final class AudioPlaybackTimelineTests: XCTestCase {
+    func testPlaybackDiagnosticsPreserveIOSLogCopy() {
+        XCTAssertEqual(
+            VoiceInkAudioPlaybackDiagnostics.loadFailedMessage(errorDescription: "missing file"),
+            "Failed to load audio: missing file"
+        )
+        XCTAssertEqual(
+            VoiceInkAudioPlaybackDiagnostics.playFailedMessage(errorDescription: "session denied"),
+            "Failed to play audio: session denied"
+        )
+    }
+
     func testProgressClampsCurrentTimeAgainstDuration() {
         XCTAssertEqual(VoiceInkAudioPlaybackTimeline.progress(currentTime: -1, duration: 10), 0)
         XCTAssertEqual(VoiceInkAudioPlaybackTimeline.progress(currentTime: 5, duration: 10), 0.5)

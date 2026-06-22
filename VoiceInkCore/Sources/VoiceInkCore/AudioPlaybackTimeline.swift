@@ -1,5 +1,15 @@
 import Foundation
 
+public enum VoiceInkAudioPlaybackDiagnostics {
+    public static func loadFailedMessage(errorDescription: String) -> String {
+        "Failed to load audio: \(errorDescription)"
+    }
+
+    public static func playFailedMessage(errorDescription: String) -> String {
+        "Failed to play audio: \(errorDescription)"
+    }
+}
+
 public enum VoiceInkAudioPlaybackTimeline {
     public static let updateInterval: TimeInterval = 0.1
 

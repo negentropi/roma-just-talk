@@ -57,7 +57,7 @@ final class AudioPlayer: ObservableObject {
             )
             isLoading = false
         } catch {
-            VoiceInkIOSLogger.audioPlayback.error("Failed to load audio: \(String(describing: error), privacy: .public)")
+            VoiceInkIOSLogger.audioPlayback.error("\(VoiceInkAudioPlaybackDiagnostics.loadFailedMessage(errorDescription: String(describing: error)), privacy: .public)")
             isLoading = false
         }
     }
@@ -74,7 +74,7 @@ final class AudioPlayer: ObservableObject {
             playbackState = playbackState.playing()
             startTimer()
         } catch {
-            VoiceInkIOSLogger.audioPlayback.error("Failed to play audio: \(String(describing: error), privacy: .public)")
+            VoiceInkIOSLogger.audioPlayback.error("\(VoiceInkAudioPlaybackDiagnostics.playFailedMessage(errorDescription: String(describing: error)), privacy: .public)")
         }
     }
     

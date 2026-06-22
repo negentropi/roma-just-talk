@@ -146,6 +146,44 @@ final class TranscriptionRunProcessorTests: XCTestCase {
         XCTAssertTrue(result.postProcessingSucceeded)
     }
 
+    func testTranscriptionRunSettingsApplySnapshotFieldsThroughSharedProcessor() async throws {
+        let service = CapturingTranscriptionService(text: "Hello, roma")
+        let processor = VoiceInkTranscriptionRunProcessor { _ in
+            XCTFail("Short transcript policy should skip post-processing")
+            return "unexpected"
+        }
+        let settings = VoiceInkTranscriptionRunSettings(
+            configuration: configuration(transcriptionProvider: .assemblyAI, isPostProcessingEnabled: true),
+            cleanupConfiguration: VoiceInkTranscriptionCleanupConfiguration(
+                punctuationMode: .removeAll
+            ),
+            postProcessingSkipConfiguration: VoiceInkPostProcessingSkipConfiguration(
+                isEnabled: true,
+                wordThreshold: 10
+            ),
+            transcriptionLanguage: "fr",
+            transcriptionPrompt: "spell Roma as Roma",
+            wordReplacementRules: [
+                VoiceInkWordReplacementRule(originalText: "roma", replacementText: "Roma Just Talk")
+            ],
+            customVocabulary: [" Roma ", "Felix", "roma", ""]
+        )
+
+        let result = try await settings.transcribe(
+            fileURL: URL(fileURLWithPath: "/tmp/audio.wav"),
+            processor: processor,
+            apiKeyProvider: { _ in "key" },
+            transcriptionServiceProvider: { _ in service }
+        )
+
+        XCTAssertEqual(service.capturedLanguage, "fr")
+        XCTAssertEqual(service.capturedPrompt, "spell Roma as Roma")
+        XCTAssertEqual(service.capturedCustomVocabulary, ["Roma", "Felix"])
+        XCTAssertEqual(result.cleanedText, "Hello Roma Just Talk")
+        XCTAssertEqual(result.finalText, "Hello Roma Just Talk")
+        XCTAssertFalse(result.postProcessingSucceeded)
+    }
+
     func testTranscribePassesSelectedLanguageToTranscriptionService() async throws {
         let service = CapturingTranscriptionService(text: "bonjour")
         let processor = VoiceInkTranscriptionRunProcessor { _ in

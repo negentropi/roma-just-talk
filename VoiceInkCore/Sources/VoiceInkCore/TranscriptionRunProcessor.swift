@@ -76,6 +76,56 @@ public struct VoiceInkPostProcessingJob: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkTranscriptionRunSettings: Equatable, Sendable {
+    public let configuration: VoiceInkModeRuntimeConfiguration
+    public let cleanupConfiguration: VoiceInkTranscriptionCleanupConfiguration
+    public let postProcessingSkipConfiguration: VoiceInkPostProcessingSkipConfiguration?
+    public let transcriptionLanguage: String?
+    public let transcriptionPrompt: String?
+    public let wordReplacementRules: [VoiceInkWordReplacementRule]
+    public let customVocabulary: [String]
+
+    public init(
+        configuration: VoiceInkModeRuntimeConfiguration,
+        cleanupConfiguration: VoiceInkTranscriptionCleanupConfiguration = .disabled,
+        postProcessingSkipConfiguration: VoiceInkPostProcessingSkipConfiguration? = nil,
+        transcriptionLanguage: String? = nil,
+        transcriptionPrompt: String? = nil,
+        wordReplacementRules: [VoiceInkWordReplacementRule] = [],
+        customVocabulary: [String] = []
+    ) {
+        self.configuration = configuration
+        self.cleanupConfiguration = cleanupConfiguration
+        self.postProcessingSkipConfiguration = postProcessingSkipConfiguration
+        self.transcriptionLanguage = transcriptionLanguage
+        self.transcriptionPrompt = transcriptionPrompt
+        self.wordReplacementRules = wordReplacementRules
+        self.customVocabulary = customVocabulary
+    }
+
+    public func transcribe(
+        fileURL: URL,
+        processor: VoiceInkTranscriptionRunProcessor,
+        apiKeyProvider: VoiceInkTranscriptionRunProcessor.APIKeyProvider,
+        transcriptionServiceProvider: VoiceInkTranscriptionRunProcessor.TranscriptionServiceProvider
+    ) async throws -> VoiceInkTranscriptionRunResult {
+        try await processor.transcribe(
+            fileURL: fileURL,
+            configuration: configuration,
+            cleanupConfiguration: cleanupConfiguration,
+            applyingWordReplacements: { text in
+                VoiceInkWordReplacementEngine.apply(wordReplacementRules, to: text)
+            },
+            postProcessingSkipConfiguration: postProcessingSkipConfiguration,
+            transcriptionLanguage: transcriptionLanguage,
+            transcriptionPrompt: transcriptionPrompt,
+            customVocabulary: customVocabulary,
+            apiKeyProvider: apiKeyProvider,
+            transcriptionServiceProvider: transcriptionServiceProvider
+        )
+    }
+}
+
 public struct VoiceInkTranscriptionRunProcessor {
     public typealias APIKeyProvider = (VoiceInkProviderKind) async -> String
     public typealias TranscriptionServiceProvider = (VoiceInkProviderKind) -> any VoiceInkAudioTranscriptionService

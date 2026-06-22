@@ -29,24 +29,11 @@ class TranscriptionRetryService {
         }
 
         let settings = AppSettings.shared
-        let modeConfiguration = await settings.effectiveModeConfiguration
-        let cleanupConfiguration = await settings.transcriptionCleanupConfiguration
-        let transcriptionLanguage = await settings.selectedTranscriptionLanguage
-        let transcriptionPrompt = await settings.localWhisperPrompt
-        let wordReplacementRules = await settings.wordReplacements
-        let customVocabulary = await settings.customVocabularyTerms
+        let runSettings = await settings.transcriptionRunSettings
 
-        return try await runProcessor.transcribe(
+        return try await runSettings.transcribe(
             fileURL: fileURL,
-            configuration: modeConfiguration,
-            cleanupConfiguration: cleanupConfiguration,
-            applyingWordReplacements: { text in
-                VoiceInkWordReplacementEngine.apply(wordReplacementRules, to: text)
-            },
-            postProcessingSkipConfiguration: VoiceInkPostProcessingSkipConfiguration.current(),
-            transcriptionLanguage: transcriptionLanguage,
-            transcriptionPrompt: transcriptionPrompt,
-            customVocabulary: customVocabulary,
+            processor: runProcessor,
             apiKeyProvider: { provider in
                 await settings.apiKey(for: provider)
             },

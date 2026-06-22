@@ -186,6 +186,18 @@ final class AppSettings: ObservableObject {
         VoiceInkTranscriptionPromptPreference.localWhisperPromptForSelectedLanguage()
     }
 
+    var transcriptionRunSettings: VoiceInkTranscriptionRunSettings {
+        VoiceInkTranscriptionRunSettings(
+            configuration: effectiveModeConfiguration,
+            cleanupConfiguration: transcriptionCleanupConfiguration,
+            postProcessingSkipConfiguration: VoiceInkPostProcessingSkipConfiguration.current(),
+            transcriptionLanguage: selectedTranscriptionLanguage,
+            transcriptionPrompt: localWhisperPrompt,
+            wordReplacementRules: wordReplacements,
+            customVocabulary: customVocabularyTerms
+        )
+    }
+
     func addMode(_ mode: Mode) {
         modes = VoiceInkModeListPolicy.appending(mode, to: modes)
     }

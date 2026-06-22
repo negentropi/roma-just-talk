@@ -6067,6 +6067,39 @@ reject_pattern \
   'transcriptionServiceKind|VoiceInkRemoteTranscriptionService\(provider:' \
   iOS/VoiceInk-ios/TranscriptionRetryService.swift
 
+require_patterns \
+  "shared transcription run settings snapshot lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift \
+  'VoiceInkTranscriptionRunSettings' \
+  'wordReplacementRules' \
+  'customVocabulary' \
+  'processor: VoiceInkTranscriptionRunProcessor' \
+  'VoiceInkWordReplacementEngine\.apply\(wordReplacementRules'
+
+require_patterns \
+  "iOS AppSettings exposes shared transcription run settings snapshot" \
+  iOS/VoiceInk-ios/AppSettings.swift \
+  'var transcriptionRunSettings: VoiceInkTranscriptionRunSettings' \
+  'postProcessingSkipConfiguration: VoiceInkPostProcessingSkipConfiguration\.current\(\)' \
+  'wordReplacementRules: wordReplacements' \
+  'customVocabulary: customVocabularyTerms'
+
+require_patterns \
+  "iOS retry transcription uses shared run settings snapshot" \
+  iOS/VoiceInk-ios/TranscriptionRetryService.swift \
+  'let runSettings = await settings\.transcriptionRunSettings' \
+  'try await runSettings\.transcribe\('
+
+require_pattern \
+  "core checks execute shared transcription run settings snapshot test" \
+  'TranscriptionRunProcessorTests\.testTranscriptionRunSettingsApplySnapshotFieldsThroughSharedProcessor' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "iOS retry transcription avoids shell-owned run settings assembly" \
+  'let (modeConfiguration|cleanupConfiguration|transcriptionLanguage|transcriptionPrompt|wordReplacementRules|customVocabulary) = await settings\.|applyingWordReplacements:|VoiceInkPostProcessingSkipConfiguration\.current\(\)' \
+  iOS/VoiceInk-ios/TranscriptionRetryService.swift
+
 require_pattern \
   "shared run processor uses shared prompt use policy" \
   'VoiceInkTranscriptionPromptUse\.recordedFileTranscription' \

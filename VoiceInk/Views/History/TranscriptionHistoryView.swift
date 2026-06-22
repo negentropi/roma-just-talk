@@ -120,19 +120,16 @@ struct TranscriptionHistoryView: View {
             isViewCurrentlyVisible = false
         }
         .onChange(of: searchText) { _, _ in
-            Task {
-                await resetPagination()
-                await loadInitialContent()
-            }
+            performHistoryRefresh(VoiceInkHistoryRefreshPolicy.searchTextDidChange())
         }
         .onChange(of: latestTranscriptionIndicator.first?.id) { oldId, newId in
-            guard isViewCurrentlyVisible else { return }
-            if newId != oldId {
-                Task {
-                    await resetPagination()
-                    await loadInitialContent()
-                }
-            }
+            performHistoryRefresh(
+                VoiceInkHistoryRefreshPolicy.latestItemDidChange(
+                    oldID: oldId,
+                    newID: newId,
+                    isViewVisible: isViewCurrentlyVisible
+                )
+            )
         }
     }
 
@@ -402,6 +399,18 @@ struct TranscriptionHistoryView: View {
     @MainActor
     private func resetPagination() {
         applyPaginationPlan(VoiceInkHistoryPaginationPolicy.reset())
+    }
+
+    private func performHistoryRefresh(_ action: VoiceInkHistoryRefreshAction) {
+        switch action {
+        case .ignore:
+            break
+        case .reload:
+            Task {
+                await resetPagination()
+                await loadInitialContent()
+            }
+        }
     }
 
     private func applyPaginationPlan(_ plan: VoiceInkHistoryPaginationPlan<Transcription>) {

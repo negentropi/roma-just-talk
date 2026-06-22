@@ -250,6 +250,48 @@ final class TranscriptPresentationTests: XCTestCase {
         XCTAssertFalse(plan.deletesID(nil))
     }
 
+    func testHistoryRefreshPolicyReloadsForSearchTextChanges() {
+        XCTAssertEqual(VoiceInkHistoryRefreshPolicy.searchTextDidChange(), .reload)
+    }
+
+    func testHistoryRefreshPolicyReloadsForVisibleLatestItemChanges() {
+        XCTAssertEqual(
+            VoiceInkHistoryRefreshPolicy.latestItemDidChange(
+                oldID: 1,
+                newID: 2,
+                isViewVisible: true
+            ),
+            .reload
+        )
+    }
+
+    func testHistoryRefreshPolicyIgnoresHiddenOrUnchangedLatestItemChanges() {
+        XCTAssertEqual(
+            VoiceInkHistoryRefreshPolicy.latestItemDidChange(
+                oldID: 1,
+                newID: 2,
+                isViewVisible: false
+            ),
+            .ignore
+        )
+        XCTAssertEqual(
+            VoiceInkHistoryRefreshPolicy.latestItemDidChange(
+                oldID: 1,
+                newID: 1,
+                isViewVisible: true
+            ),
+            .ignore
+        )
+        XCTAssertEqual(
+            VoiceInkHistoryRefreshPolicy.latestItemDidChange(
+                oldID: Optional<Int>.none,
+                newID: Optional<Int>.none,
+                isViewVisible: true
+            ),
+            .ignore
+        )
+    }
+
     func testHistoryDeleteConfirmationPresentationPreservesMacOSAlertCopy() {
         XCTAssertEqual(VoiceInkHistoryPresentation.deleteConfirmationTitle, "Delete Selected Items?")
         XCTAssertEqual(VoiceInkHistoryPresentation.deleteConfirmationPrimaryButtonTitle, "Delete")

@@ -437,6 +437,28 @@ public enum VoiceInkHistoryDeletionPolicy {
     }
 }
 
+public enum VoiceInkHistoryRefreshAction: Equatable, Sendable {
+    case ignore
+    case reload
+}
+
+public enum VoiceInkHistoryRefreshPolicy {
+    public static func searchTextDidChange() -> VoiceInkHistoryRefreshAction {
+        .reload
+    }
+
+    public static func latestItemDidChange<ID: Equatable>(
+        oldID: ID?,
+        newID: ID?,
+        isViewVisible: Bool
+    ) -> VoiceInkHistoryRefreshAction {
+        guard isViewVisible, oldID != newID else {
+            return .ignore
+        }
+        return .reload
+    }
+}
+
 public enum VoiceInkTranscriptPresentation {
     public static let pendingDisplayText = "New transcription"
     public static let failedDisplayText = "Transcription failed - tap to retry"

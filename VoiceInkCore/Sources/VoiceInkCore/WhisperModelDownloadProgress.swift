@@ -1,5 +1,43 @@
 import Foundation
 
+public enum VoiceInkWhisperModelManagementDiagnostics {
+    public static func alreadyDownloadingMessage(modelName: String) -> String {
+        "Model \(modelName) is already being downloaded."
+    }
+
+    public static func startingDownloadMessage(modelName: String, downloadURL: URL) -> String {
+        "Starting download of \(modelName) from \(downloadURL.absoluteString)."
+    }
+
+    public static func downloadFailedMessage(modelName: String, alertMessage: String) -> String {
+        "Download failed for \(modelName): \(alertMessage)"
+    }
+
+    public static func downloadCancelledMessage(modelName: String) -> String {
+        "Download cancelled for \(modelName)."
+    }
+
+    public static func downloadedMessage(modelName: String, finalPath: String) -> String {
+        "Successfully downloaded \(modelName) to \(finalPath)."
+    }
+
+    public static func saveFailedMessage(modelName: String, localizedDescription: String) -> String {
+        "Failed to save \(modelName): \(localizedDescription)"
+    }
+
+    public static func notDownloadedMessage(modelName: String) -> String {
+        "Model \(modelName) is not downloaded."
+    }
+
+    public static func deletedMessage(modelName: String) -> String {
+        "Successfully deleted model \(modelName)."
+    }
+
+    public static func deleteFailedMessage(modelName: String, localizedDescription: String) -> String {
+        "Failed to delete model \(modelName): \(localizedDescription)"
+    }
+}
+
 public struct VoiceInkWhisperModelOperationAlertPresentation: Equatable, Identifiable, Sendable {
     public let id: String
     public let title: String

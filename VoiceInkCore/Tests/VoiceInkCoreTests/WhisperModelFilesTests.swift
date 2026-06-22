@@ -586,6 +586,62 @@ final class WhisperModelFilesTests: XCTestCase {
         XCTAssertFalse(trackingState.isDownloading(model))
     }
 
+    func testModelManagementDiagnosticsPreserveIOSLogCopy() {
+        let downloadURL = URL(string: "https://example.com/ggml-base.bin")!
+
+        XCTAssertEqual(
+            VoiceInkWhisperModelManagementDiagnostics.alreadyDownloadingMessage(modelName: "ggml-base"),
+            "Model ggml-base is already being downloaded."
+        )
+        XCTAssertEqual(
+            VoiceInkWhisperModelManagementDiagnostics.startingDownloadMessage(
+                modelName: "ggml-base",
+                downloadURL: downloadURL
+            ),
+            "Starting download of ggml-base from https://example.com/ggml-base.bin."
+        )
+        XCTAssertEqual(
+            VoiceInkWhisperModelManagementDiagnostics.downloadFailedMessage(
+                modelName: "ggml-base",
+                alertMessage: "No file received"
+            ),
+            "Download failed for ggml-base: No file received"
+        )
+        XCTAssertEqual(
+            VoiceInkWhisperModelManagementDiagnostics.downloadCancelledMessage(modelName: "ggml-base"),
+            "Download cancelled for ggml-base."
+        )
+        XCTAssertEqual(
+            VoiceInkWhisperModelManagementDiagnostics.downloadedMessage(
+                modelName: "ggml-base",
+                finalPath: "/tmp/ggml-base.bin"
+            ),
+            "Successfully downloaded ggml-base to /tmp/ggml-base.bin."
+        )
+        XCTAssertEqual(
+            VoiceInkWhisperModelManagementDiagnostics.saveFailedMessage(
+                modelName: "ggml-base",
+                localizedDescription: "Permission denied"
+            ),
+            "Failed to save ggml-base: Permission denied"
+        )
+        XCTAssertEqual(
+            VoiceInkWhisperModelManagementDiagnostics.notDownloadedMessage(modelName: "ggml-base"),
+            "Model ggml-base is not downloaded."
+        )
+        XCTAssertEqual(
+            VoiceInkWhisperModelManagementDiagnostics.deletedMessage(modelName: "ggml-base"),
+            "Successfully deleted model ggml-base."
+        )
+        XCTAssertEqual(
+            VoiceInkWhisperModelManagementDiagnostics.deleteFailedMessage(
+                modelName: "ggml-base",
+                localizedDescription: "File is locked"
+            ),
+            "Failed to delete model ggml-base: File is locked"
+        )
+    }
+
     func testSimpleDownloadStateBuildsSharedRowPresentation() {
         let model = VoiceInkWhisperModelFiles.baseModel
         let downloadingState = VoiceInkWhisperModelDownloadState(

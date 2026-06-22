@@ -3236,6 +3236,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
 
 require_pattern \
+  "shared Whisper model management diagnostics live in VoiceInkCore" \
+  'VoiceInkWhisperModelManagementDiagnostics|alreadyDownloadingMessage|startingDownloadMessage|downloadFailedMessage|downloadCancelledMessage|downloadedMessage|saveFailedMessage|notDownloadedMessage|deletedMessage|deleteFailedMessage' \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+
+require_pattern \
   "shared Whisper simple download completion plan lives in VoiceInkCore" \
   'VoiceInkWhisperModelSimpleDownloadCompletionPlan|installTemporaryFile|presentFailure|ignoreCancellation' \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
@@ -3248,6 +3253,11 @@ require_pattern \
 require_pattern \
   "core checks cover iOS download cancellation completion planning" \
   'WhisperModelFilesTests\.testSimpleDownloadCompletionPlanIgnoresCancellation' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks cover iOS local model management diagnostics" \
+  'WhisperModelFilesTests\.testModelManagementDiagnosticsPreserveIOSLogCopy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -3524,6 +3534,11 @@ require_pattern \
   iOS/VoiceInk-ios/LocalModelManager.swift
 
 require_pattern \
+  "iOS local model manager uses shared management diagnostics" \
+  'VoiceInkWhisperModelManagementDiagnostics\.(alreadyDownloadingMessage|startingDownloadMessage|downloadFailedMessage|downloadCancelledMessage|downloadedMessage|saveFailedMessage|notDownloadedMessage|deletedMessage|deleteFailedMessage)' \
+  iOS/VoiceInk-ios/LocalModelManager.swift
+
+require_pattern \
   "iOS local model manager applies shared download cancellation outcome" \
   'ignoreCancellation' \
   iOS/VoiceInk-ios/LocalModelManager.swift
@@ -3536,6 +3551,11 @@ reject_pattern \
 reject_pattern \
   "iOS local model manager avoids shell-owned delete downloaded gate" \
   'model\.isDownloaded\(in:' \
+  iOS/VoiceInk-ios/LocalModelManager.swift
+
+reject_pattern \
+  "iOS local model manager avoids shell-owned management diagnostics" \
+  '"(Model |Starting download of|Download failed for|Download cancelled for|Successfully downloaded|Failed to save|Successfully deleted model|Failed to delete model)' \
   iOS/VoiceInk-ios/LocalModelManager.swift
 
 require_pattern \

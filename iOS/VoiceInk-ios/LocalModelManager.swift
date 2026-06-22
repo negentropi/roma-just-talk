@@ -31,11 +31,11 @@ class LocalModelManager: ObservableObject {
     /// Download a specific model
     func downloadModel(_ model: VoiceInkWhisperModelFileSpec) async {
         guard startDownloadTracking(for: model) else {
-            logger.notice("Model \(model.modelName, privacy: .public) is already being downloaded.")
+            logger.notice("\(VoiceInkWhisperModelManagementDiagnostics.alreadyDownloadingMessage(modelName: model.modelName), privacy: .public)")
             return
         }
         
-        logger.notice("Starting download of \(model.modelName, privacy: .public) from \(model.downloadURL.absoluteString, privacy: .public).")
+        logger.notice("\(VoiceInkWhisperModelManagementDiagnostics.startingDownloadMessage(modelName: model.modelName, downloadURL: model.downloadURL), privacy: .public)")
         
         downloadError = nil
         
@@ -84,10 +84,10 @@ class LocalModelManager: ObservableObject {
 
         case .presentFailure(let alert):
             downloadError = alert
-            logger.error("Download failed for \(model.modelName, privacy: .public): \(alert.message, privacy: .public)")
+            logger.error("\(VoiceInkWhisperModelManagementDiagnostics.downloadFailedMessage(modelName: model.modelName, alertMessage: alert.message), privacy: .public)")
 
         case .ignoreCancellation:
-            logger.notice("Download cancelled for \(model.modelName, privacy: .public).")
+            logger.notice("\(VoiceInkWhisperModelManagementDiagnostics.downloadCancelledMessage(modelName: model.modelName), privacy: .public)")
         }
     }
 
@@ -102,12 +102,12 @@ class LocalModelManager: ObservableObject {
                 in: Self.modelsDirectory
             )
             
-            logger.notice("Successfully downloaded \(model.modelName, privacy: .public) to \(finalURL.path, privacy: .public).")
+            logger.notice("\(VoiceInkWhisperModelManagementDiagnostics.downloadedMessage(modelName: model.modelName, finalPath: finalURL.path), privacy: .public)")
             updateDownloadProgress(1.0, for: model)
             
         } catch {
             downloadError = .saveFailed(for: error)
-            logger.error("Failed to save \(model.modelName, privacy: .public): \(error.localizedDescription, privacy: .public)")
+            logger.error("\(VoiceInkWhisperModelManagementDiagnostics.saveFailedMessage(modelName: model.modelName, localizedDescription: error.localizedDescription), privacy: .public)")
         }
     }
     
@@ -128,13 +128,13 @@ class LocalModelManager: ObservableObject {
 
         switch deletionPlan.action {
         case .skipMissingFile:
-            logger.notice("Model \(model.modelName, privacy: .public) is not downloaded.")
+            logger.notice("\(VoiceInkWhisperModelManagementDiagnostics.notDownloadedMessage(modelName: model.modelName), privacy: .public)")
             return
 
         case .deleteDownloadedFiles:
             do {
                 try model.deleteDownloadedFiles(in: Self.modelsDirectory)
-                logger.notice("Successfully deleted model \(model.modelName, privacy: .public).")
+                logger.notice("\(VoiceInkWhisperModelManagementDiagnostics.deletedMessage(modelName: model.modelName), privacy: .public)")
 
                 if deletionPlan.shouldRefreshAfterSuccessfulDelete {
                     // The downloaded-state query is file-backed, so force SwiftUI to refresh the row.
@@ -143,7 +143,7 @@ class LocalModelManager: ObservableObject {
                     }
                 }
             } catch {
-                logger.error("Failed to delete model \(model.modelName, privacy: .public): \(error.localizedDescription, privacy: .public)")
+                logger.error("\(VoiceInkWhisperModelManagementDiagnostics.deleteFailedMessage(modelName: model.modelName, localizedDescription: error.localizedDescription), privacy: .public)")
                 throw error
             }
         }

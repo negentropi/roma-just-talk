@@ -121,6 +121,57 @@ final class RecordingStatePolicyTests: XCTestCase {
         XCTAssertNil(VoiceInkRecordingState.busy.recorderProcessingPresentation)
     }
 
+    func testMacOSRecordingCancellationPlanFinishesActiveCaptureImmediately() {
+        for state in [VoiceInkRecordingState.starting, .recording] {
+            XCTAssertEqual(
+                VoiceInkMacOSRecordingCancellationPolicy.plan(recordingState: state),
+                VoiceInkMacOSRecordingCancellationPlan(
+                    shouldClearDeferredStopRequest: true,
+                    shouldRequestRecordingCancellation: true,
+                    shouldFinishActiveRecorderCancellation: true,
+                    shouldClearPartialTranscript: false,
+                    shouldClearCancelFlag: false,
+                    recordingStateAfterImmediateCancel: nil,
+                    shouldFinishRecorderSessionImmediately: true
+                )
+            )
+        }
+    }
+
+    func testMacOSRecordingCancellationPlanCancelsProcessingWithoutFinishingSession() {
+        for state in [VoiceInkRecordingState.transcribing, .enhancing] {
+            XCTAssertEqual(
+                VoiceInkMacOSRecordingCancellationPolicy.plan(recordingState: state),
+                VoiceInkMacOSRecordingCancellationPlan(
+                    shouldClearDeferredStopRequest: true,
+                    shouldRequestRecordingCancellation: true,
+                    shouldFinishActiveRecorderCancellation: false,
+                    shouldClearPartialTranscript: true,
+                    shouldClearCancelFlag: false,
+                    recordingStateAfterImmediateCancel: .idle,
+                    shouldFinishRecorderSessionImmediately: false
+                )
+            )
+        }
+    }
+
+    func testMacOSRecordingCancellationPlanRepairsIdleAndBusyState() {
+        for state in [VoiceInkRecordingState.idle, .busy] {
+            XCTAssertEqual(
+                VoiceInkMacOSRecordingCancellationPolicy.plan(recordingState: state),
+                VoiceInkMacOSRecordingCancellationPlan(
+                    shouldClearDeferredStopRequest: true,
+                    shouldRequestRecordingCancellation: false,
+                    shouldFinishActiveRecorderCancellation: false,
+                    shouldClearPartialTranscript: true,
+                    shouldClearCancelFlag: true,
+                    recordingStateAfterImmediateCancel: .idle,
+                    shouldFinishRecorderSessionImmediately: true
+                )
+            )
+        }
+    }
+
     func testRecordingFlowStatePreservesIOSStartAndStopTransitions() {
         var flowState = VoiceInkRecordingFlowState(currentDuration: 12)
 

@@ -647,6 +647,74 @@ public enum VoiceInkRecordingStartPolicy {
     }
 }
 
+public struct VoiceInkMacOSRecordingCancellationPlan: Equatable, Sendable {
+    public let shouldClearDeferredStopRequest: Bool
+    public let shouldRequestRecordingCancellation: Bool
+    public let shouldFinishActiveRecorderCancellation: Bool
+    public let shouldClearPartialTranscript: Bool
+    public let shouldClearCancelFlag: Bool
+    public let recordingStateAfterImmediateCancel: VoiceInkRecordingState?
+    public let shouldFinishRecorderSessionImmediately: Bool
+
+    public init(
+        shouldClearDeferredStopRequest: Bool,
+        shouldRequestRecordingCancellation: Bool,
+        shouldFinishActiveRecorderCancellation: Bool,
+        shouldClearPartialTranscript: Bool,
+        shouldClearCancelFlag: Bool,
+        recordingStateAfterImmediateCancel: VoiceInkRecordingState?,
+        shouldFinishRecorderSessionImmediately: Bool
+    ) {
+        self.shouldClearDeferredStopRequest = shouldClearDeferredStopRequest
+        self.shouldRequestRecordingCancellation = shouldRequestRecordingCancellation
+        self.shouldFinishActiveRecorderCancellation = shouldFinishActiveRecorderCancellation
+        self.shouldClearPartialTranscript = shouldClearPartialTranscript
+        self.shouldClearCancelFlag = shouldClearCancelFlag
+        self.recordingStateAfterImmediateCancel = recordingStateAfterImmediateCancel
+        self.shouldFinishRecorderSessionImmediately = shouldFinishRecorderSessionImmediately
+    }
+}
+
+public enum VoiceInkMacOSRecordingCancellationPolicy {
+    public static func plan(
+        recordingState: VoiceInkRecordingState
+    ) -> VoiceInkMacOSRecordingCancellationPlan {
+        if recordingState.isRecorderCaptureInProgress {
+            return VoiceInkMacOSRecordingCancellationPlan(
+                shouldClearDeferredStopRequest: true,
+                shouldRequestRecordingCancellation: true,
+                shouldFinishActiveRecorderCancellation: true,
+                shouldClearPartialTranscript: false,
+                shouldClearCancelFlag: false,
+                recordingStateAfterImmediateCancel: nil,
+                shouldFinishRecorderSessionImmediately: true
+            )
+        }
+
+        if recordingState.isPostRecordingProcessing {
+            return VoiceInkMacOSRecordingCancellationPlan(
+                shouldClearDeferredStopRequest: true,
+                shouldRequestRecordingCancellation: true,
+                shouldFinishActiveRecorderCancellation: false,
+                shouldClearPartialTranscript: true,
+                shouldClearCancelFlag: false,
+                recordingStateAfterImmediateCancel: .idle,
+                shouldFinishRecorderSessionImmediately: false
+            )
+        }
+
+        return VoiceInkMacOSRecordingCancellationPlan(
+            shouldClearDeferredStopRequest: true,
+            shouldRequestRecordingCancellation: false,
+            shouldFinishActiveRecorderCancellation: false,
+            shouldClearPartialTranscript: true,
+            shouldClearCancelFlag: true,
+            recordingStateAfterImmediateCancel: .idle,
+            shouldFinishRecorderSessionImmediately: true
+        )
+    }
+}
+
 public extension VoiceInkRecordingState {
     var isActivelyRecording: Bool {
         self == .recording

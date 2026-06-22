@@ -839,26 +839,35 @@ class VoiceInkEngine: NSObject, ObservableObject {
 
     func cancelRecording() async {
         logger.notice("cancelRecording called – state=\(String(describing: self.recordingState), privacy: .public)")
-        stopRequestedDuringStart = false
+        let cancellationPlan = VoiceInkMacOSRecordingCancellationPolicy.plan(
+            recordingState: recordingState
+        )
 
-        let shouldFinishSessionImmediately: Bool
-        if recordingState.isRecorderCaptureInProgress {
-            requestRecordingCancellation()
-            await finishActiveRecorderCancellation()
-            shouldFinishSessionImmediately = true
-        } else if recordingState.isPostRecordingProcessing {
-            requestRecordingCancellation()
-            partialTranscript = ""
-            recordingState = .idle
-            shouldFinishSessionImmediately = false
-        } else {
-            partialTranscript = ""
-            shouldCancelRecording = false
-            recordingState = .idle
-            shouldFinishSessionImmediately = true
+        if cancellationPlan.shouldClearDeferredStopRequest {
+            stopRequestedDuringStart = false
         }
 
-        if shouldFinishSessionImmediately {
+        if cancellationPlan.shouldRequestRecordingCancellation {
+            requestRecordingCancellation()
+        }
+
+        if cancellationPlan.shouldFinishActiveRecorderCancellation {
+            await finishActiveRecorderCancellation()
+        }
+
+        if cancellationPlan.shouldClearPartialTranscript {
+            partialTranscript = ""
+        }
+
+        if cancellationPlan.shouldClearCancelFlag {
+            shouldCancelRecording = false
+        }
+
+        if let recordingStateAfterImmediateCancel = cancellationPlan.recordingStateAfterImmediateCancel {
+            recordingState = recordingStateAfterImmediateCancel
+        }
+
+        if cancellationPlan.shouldFinishRecorderSessionImmediately {
             await finishRecorderSession()
         }
     }

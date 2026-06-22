@@ -881,8 +881,28 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
 require_pattern \
-  "shared recorder processing state checks run in VoiceInkCore" \
-  'testRecorderCaptureStatePolicyPreservesMacOSCancellationPath|testPostRecordingProcessingStatePolicyPreservesMacOSProcessingStates|testRecorderDismissCancelableStatePolicyPreservesMacOSWindowBehavior|testPipelineFinishIdleRepairStatePolicyPreservesMacOSEngineBehavior|testRecorderProcessingPresentationPreservesMacOSCopyAndTiming' \
+  "shared macOS recording cancellation plan lives in VoiceInkCore" \
+  'VoiceInkMacOSRecordingCancellationPolicy|VoiceInkMacOSRecordingCancellationPlan|shouldFinishActiveRecorderCancellation|shouldFinishRecorderSessionImmediately' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
+require_pattern \
+  "shared recorder processing and cancellation checks run in VoiceInkCore" \
+  'testRecorderCaptureStatePolicyPreservesMacOSCancellationPath|testPostRecordingProcessingStatePolicyPreservesMacOSProcessingStates|testRecorderDismissCancelableStatePolicyPreservesMacOSWindowBehavior|testPipelineFinishIdleRepairStatePolicyPreservesMacOSEngineBehavior|testRecorderProcessingPresentationPreservesMacOSCopyAndTiming|testMacOSRecordingCancellationPlanFinishesActiveCaptureImmediately|testMacOSRecordingCancellationPlanCancelsProcessingWithoutFinishingSession|testMacOSRecordingCancellationPlanRepairsIdleAndBusyState' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "shared macOS active-capture cancellation check runs in VoiceInkCore" \
+  'testMacOSRecordingCancellationPlanFinishesActiveCaptureImmediately' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "shared macOS processing cancellation check runs in VoiceInkCore" \
+  'testMacOSRecordingCancellationPlanCancelsProcessingWithoutFinishingSession' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "shared macOS idle cancellation repair check runs in VoiceInkCore" \
+  'testMacOSRecordingCancellationPlanRepairsIdleAndBusyState' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -936,13 +956,24 @@ require_pattern \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift
 
 require_pattern \
-  "macOS recording engine uses shared recorder capture predicate" \
-  'recordingState\.isRecorderCaptureInProgress' \
+  "macOS recording engine asks shared cancellation plan" \
+  'VoiceInkMacOSRecordingCancellationPolicy\.plan' \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift
 
 require_pattern \
-  "macOS recording engine uses shared post-recording processing predicate" \
-  'recordingState\.isPostRecordingProcessing' \
+  "macOS recording engine applies shared active-capture cancellation decision" \
+  'cancellationPlan\.shouldFinishActiveRecorderCancellation' \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift
+
+require_pattern \
+  "macOS recording engine applies shared immediate-session-finish decision" \
+  'cancellationPlan\.shouldFinishRecorderSessionImmediately' \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift
+
+reject_context_pattern \
+  "macOS recording cancellation avoids shell-owned state branch matrix" \
+  'func cancelRecording\(\) async' \
+  'recordingState\.isRecorderCaptureInProgress|else if +recordingState\.isPostRecordingProcessing|let shouldFinishSessionImmediately: Bool' \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift
 
 require_pattern \

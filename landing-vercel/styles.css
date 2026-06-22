@@ -366,6 +366,12 @@ h1 .before-word {
   white-space: nowrap;
 }
 
+.keycap[aria-label="enter"] {
+  font-size: 1.18rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
 .command-symbol {
   display: inline-flex;
   min-height: 24px;

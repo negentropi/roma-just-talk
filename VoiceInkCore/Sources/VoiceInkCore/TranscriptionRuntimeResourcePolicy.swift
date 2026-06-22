@@ -10,32 +10,51 @@ public enum VoiceInkTranscriptionModelSelectionResourceAction: Equatable, Sendab
     case preserveLocalWhisperModel
     case clearLocalWhisperModelAndMarkLoaded
 
-    public var localWhisperRuntimeUpdate: VoiceInkLocalWhisperRuntimeSelectionUpdate {
+    public var localWhisperRuntimeUpdate: VoiceInkLocalWhisperRuntimeUpdate {
         switch self {
         case .preserveLocalWhisperModel:
-            return VoiceInkLocalWhisperRuntimeSelectionUpdate(
-                shouldClearLoadedModel: false,
-                isModelLoadedAfterSelection: nil
-            )
+            return .preserve
         case .clearLocalWhisperModelAndMarkLoaded:
-            return VoiceInkLocalWhisperRuntimeSelectionUpdate(
-                shouldClearLoadedModel: true,
-                isModelLoadedAfterSelection: true
-            )
+            return .clearLoadedModel(isModelLoadedAfterUpdate: true)
         }
     }
 }
 
-public struct VoiceInkLocalWhisperRuntimeSelectionUpdate: Equatable, Sendable {
+public struct VoiceInkLocalWhisperRuntimeUpdate: Equatable, Sendable {
     public let shouldClearLoadedModel: Bool
-    public let isModelLoadedAfterSelection: Bool?
+    public let isModelLoadedAfterUpdate: Bool?
 
     public init(
         shouldClearLoadedModel: Bool,
-        isModelLoadedAfterSelection: Bool?
+        isModelLoadedAfterUpdate: Bool?
     ) {
         self.shouldClearLoadedModel = shouldClearLoadedModel
-        self.isModelLoadedAfterSelection = isModelLoadedAfterSelection
+        self.isModelLoadedAfterUpdate = isModelLoadedAfterUpdate
+    }
+
+    public static let preserve = Self(
+        shouldClearLoadedModel: false,
+        isModelLoadedAfterUpdate: nil
+    )
+
+    public static func clearLoadedModel(isModelLoadedAfterUpdate: Bool) -> Self {
+        Self(
+            shouldClearLoadedModel: true,
+            isModelLoadedAfterUpdate: isModelLoadedAfterUpdate
+        )
+    }
+}
+
+public struct VoiceInkTranscriptionModelDeletionPlan: Equatable, Sendable {
+    public let shouldClearCurrentModel: Bool
+    public let localWhisperRuntimeUpdate: VoiceInkLocalWhisperRuntimeUpdate
+
+    public init(currentModelName: String?, deletedModelName: String) {
+        let shouldClearCurrentModel = currentModelName == deletedModelName
+        self.shouldClearCurrentModel = shouldClearCurrentModel
+        self.localWhisperRuntimeUpdate = shouldClearCurrentModel
+            ? .clearLoadedModel(isModelLoadedAfterUpdate: false)
+            : .preserve
     }
 }
 

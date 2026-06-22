@@ -37,17 +37,43 @@ final class TranscriptionRuntimeResourcePolicyTests: XCTestCase {
     func testModelSelectionResourceActionOwnsLocalWhisperRuntimeUpdate() {
         XCTAssertEqual(
             VoiceInkTranscriptionModelSelectionResourceAction.preserveLocalWhisperModel.localWhisperRuntimeUpdate,
-            VoiceInkLocalWhisperRuntimeSelectionUpdate(
+            VoiceInkLocalWhisperRuntimeUpdate(
                 shouldClearLoadedModel: false,
-                isModelLoadedAfterSelection: nil
+                isModelLoadedAfterUpdate: nil
             )
         )
         XCTAssertEqual(
             VoiceInkTranscriptionModelSelectionResourceAction.clearLocalWhisperModelAndMarkLoaded.localWhisperRuntimeUpdate,
-            VoiceInkLocalWhisperRuntimeSelectionUpdate(
+            VoiceInkLocalWhisperRuntimeUpdate(
                 shouldClearLoadedModel: true,
-                isModelLoadedAfterSelection: true
+                isModelLoadedAfterUpdate: true
             )
         )
+    }
+
+    func testDeletedCurrentModelPlanClearsSelectionAndMarksLocalWhisperUnloaded() {
+        let plan = VoiceInkTranscriptionModelDeletionPlan(
+            currentModelName: "ggml-base.en",
+            deletedModelName: "ggml-base.en"
+        )
+
+        XCTAssertTrue(plan.shouldClearCurrentModel)
+        XCTAssertEqual(
+            plan.localWhisperRuntimeUpdate,
+            VoiceInkLocalWhisperRuntimeUpdate(
+                shouldClearLoadedModel: true,
+                isModelLoadedAfterUpdate: false
+            )
+        )
+    }
+
+    func testDeletedNonCurrentModelPlanPreservesSelectionAndLocalWhisperRuntime() {
+        let plan = VoiceInkTranscriptionModelDeletionPlan(
+            currentModelName: "ggml-base.en",
+            deletedModelName: "parakeet-tdt-0.6b-v2"
+        )
+
+        XCTAssertFalse(plan.shouldClearCurrentModel)
+        XCTAssertEqual(plan.localWhisperRuntimeUpdate, .preserve)
     }
 }

@@ -82,12 +82,7 @@ class TranscriptionModelManager: ObservableObject {
             .transcriptionRuntimeResourcePlan
             .modelSelectionResourceAction
             .localWhisperRuntimeUpdate
-        if localWhisperRuntimeUpdate.shouldClearLoadedModel {
-            whisperModelManager?.loadedWhisperModel = nil
-        }
-        if let isModelLoaded = localWhisperRuntimeUpdate.isModelLoadedAfterSelection {
-            whisperModelManager?.isModelLoaded = isModelLoaded
-        }
+        applyLocalWhisperRuntimeUpdate(localWhisperRuntimeUpdate)
 
         notifyCurrentModelDidChange(model)
     }
@@ -169,12 +164,24 @@ class TranscriptionModelManager: ObservableObject {
 
     /// Called by WhisperModelManager.onModelDeleted or FluidAudioModelManager.onModelDeleted.
     func handleModelDeleted(_ modelName: String) {
-        if currentTranscriptionModel?.name == modelName {
+        let deletionPlan = VoiceInkTranscriptionModelDeletionPlan(
+            currentModelName: currentTranscriptionModel?.name,
+            deletedModelName: modelName
+        )
+        if deletionPlan.shouldClearCurrentModel {
             currentTranscriptionModel = nil
             VoiceInkCurrentTranscriptionModelPreference.clearModelName()
-            whisperModelManager?.loadedWhisperModel = nil
-            whisperModelManager?.isModelLoaded = false
+            applyLocalWhisperRuntimeUpdate(deletionPlan.localWhisperRuntimeUpdate)
         }
         refreshAllAvailableModels()
+    }
+
+    private func applyLocalWhisperRuntimeUpdate(_ update: VoiceInkLocalWhisperRuntimeUpdate) {
+        if update.shouldClearLoadedModel {
+            whisperModelManager?.loadedWhisperModel = nil
+        }
+        if let isModelLoaded = update.isModelLoadedAfterUpdate {
+            whisperModelManager?.isModelLoaded = isModelLoaded
+        }
     }
 }

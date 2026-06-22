@@ -6805,7 +6805,8 @@ require_patterns \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionRuntimeResourcePolicy.swift \
   'VoiceInkTranscriptionRuntimeResourcePlan' \
   'VoiceInkTranscriptionRecordingStartupLoadAction' \
-  'VoiceInkLocalWhisperRuntimeSelectionUpdate' \
+  'VoiceInkLocalWhisperRuntimeUpdate' \
+  'VoiceInkTranscriptionModelDeletionPlan' \
   'localWhisperRuntimeUpdate'
 
 require_pattern \
@@ -6884,16 +6885,30 @@ require_patterns \
   VoiceInk/Transcription/Engine/TranscriptionModelManager.swift \
   'localWhisperRuntimeUpdate' \
   'shouldClearLoadedModel' \
-  'isModelLoadedAfterSelection'
+  'isModelLoadedAfterUpdate'
 
-require_pattern \
-  "core checks execute transcription runtime resource update test" \
+require_patterns \
+  "macOS transcription model manager delegates deletion cleanup to shared plan" \
+  VoiceInk/Transcription/Engine/TranscriptionModelManager.swift \
+  'VoiceInkTranscriptionModelDeletionPlan' \
+  'deletionPlan\.shouldClearCurrentModel' \
+  'deletionPlan\.localWhisperRuntimeUpdate'
+
+require_patterns \
+  "core checks execute transcription runtime resource update tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
   'TranscriptionRuntimeResourcePolicyTests\.testModelSelectionResourceActionOwnsLocalWhisperRuntimeUpdate' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  'TranscriptionRuntimeResourcePolicyTests\.testDeletedCurrentModelPlanClearsSelectionAndMarksLocalWhisperUnloaded' \
+  'TranscriptionRuntimeResourcePolicyTests\.testDeletedNonCurrentModelPlanPreservesSelectionAndLocalWhisperRuntime'
 
 reject_pattern \
   "macOS transcription model manager avoids shell-owned selection resource case check" \
   'modelSelectionResourceAction == \.clearLocalWhisperModelAndMarkLoaded' \
+  VoiceInk/Transcription/Engine/TranscriptionModelManager.swift
+
+reject_pattern \
+  "macOS transcription model manager avoids shell-owned deleted-current-model comparison" \
+  'currentTranscriptionModel\?\.name == modelName' \
   VoiceInk/Transcription/Engine/TranscriptionModelManager.swift
 
 reject_pattern \

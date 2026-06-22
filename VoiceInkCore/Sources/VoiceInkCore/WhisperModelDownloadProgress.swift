@@ -380,6 +380,7 @@ public struct VoiceInkWhisperModelManagementRow: Equatable, Identifiable, Sendab
     public let deleteConfirmation: VoiceInkWhisperModelOperationConfirmationPresentation
 
     public var id: String { model.id }
+    public var shouldShowDeleteAction: Bool { presentation.action == .downloaded }
 
     public init(
         model: VoiceInkWhisperModelFileSpec,

@@ -105,7 +105,7 @@ struct ModelRowView: View {
             }
         }
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-            if presentation.action == .downloaded {
+            if row.shouldShowDeleteAction {
                 Button(row.deleteConfirmation.primaryButtonTitle) {
                     showingDeleteAlert = true
                 }

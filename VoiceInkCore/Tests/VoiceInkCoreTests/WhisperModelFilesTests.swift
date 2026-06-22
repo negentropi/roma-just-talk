@@ -654,6 +654,16 @@ final class WhisperModelFilesTests: XCTestCase {
             )
         )
         XCTAssertEqual(rows, [row])
+        XCTAssertTrue(row.shouldShowDeleteAction)
+
+        let idleRow = VoiceInkWhisperModelManagementList.row(
+            for: model,
+            downloadState: VoiceInkWhisperModelDownloadState(
+                isDownloaded: false,
+                progress: .simple(modelName: model.modelName, isDownloading: false, progress: nil)
+            )
+        )
+        XCTAssertFalse(idleRow.shouldShowDeleteAction)
     }
 
     func testMacOSDownloadProgressUsesMainAndCoreMLKeys() {

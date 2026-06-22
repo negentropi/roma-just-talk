@@ -78,4 +78,11 @@ final class AppDataResetTests: XCTestCase {
         XCTAssertEqual(try fileManager.contentsOfDirectory(atPath: cachesDirectory.path), [])
         XCTAssertEqual(try fileManager.contentsOfDirectory(atPath: temporaryDirectory.path), [])
     }
+
+    func testAppDataResetDiagnosticsPreserveIOSLogCopy() {
+        XCTAssertEqual(
+            VoiceInkAppDataResetDiagnostics.swiftDataResetFailedMessage(errorDescription: "store unavailable"),
+            "Failed to reset SwiftData: store unavailable"
+        )
+    }
 }

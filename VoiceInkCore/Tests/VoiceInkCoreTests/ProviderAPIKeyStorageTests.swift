@@ -80,4 +80,11 @@ final class ProviderAPIKeyStorageTests: XCTestCase {
         XCTAssertNil(deleteResult.status)
         XCTAssertFalse(didDelete)
     }
+
+    func testProviderAPIKeyStorageDiagnosticsPreserveIOSLogCopy() {
+        XCTAssertEqual(
+            VoiceInkProviderAPIKeyStorageDiagnostics.saveFailureMessage(status: errSecAuthFailed),
+            "Error saving API key to keychain: \(errSecAuthFailed)"
+        )
+    }
 }

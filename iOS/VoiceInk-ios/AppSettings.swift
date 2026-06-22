@@ -319,7 +319,7 @@ final class AppSettings: ObservableObject {
     private func saveAPIKey(_ key: String, for provider: VoiceInkProviderKind) {
         let result = VoiceInkProviderAPIKeyStorage.saveStoredKey(key, for: provider)
         if result.shouldReportFailure, let status = result.status {
-            VoiceInkIOSLogger.settings.error("Error saving API key to keychain: \(status, privacy: .public)")
+            VoiceInkIOSLogger.settings.error("\(VoiceInkProviderAPIKeyStorageDiagnostics.saveFailureMessage(status: status), privacy: .public)")
         }
     }
 

@@ -2726,7 +2726,7 @@ require_pattern \
 
 require_pattern \
   "shared provider API-key storage lives in VoiceInkCore" \
-  'VoiceInkProviderAPIKeyStorage|storedKey\(|saveStoredKey|deleteStoredKey|shouldReportFailure' \
+  'VoiceInkProviderAPIKeyStorage|storedKey\(|saveStoredKey|deleteStoredKey|shouldReportFailure|VoiceInkProviderAPIKeyStorageDiagnostics|saveFailureMessage' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyStorage.swift
 
 require_pattern \
@@ -2742,6 +2742,11 @@ require_pattern \
 require_pattern \
   "iOS app settings delegates provider API-key storage to shared core" \
   'VoiceInkProviderAPIKeyStorage\.(storedKey|saveStoredKey|deleteStoredKey)' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+require_pattern \
+  "iOS app settings adapts shared provider API-key storage diagnostics" \
+  'VoiceInkProviderAPIKeyStorageDiagnostics\.saveFailureMessage' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 reject_pattern \
@@ -2802,8 +2807,13 @@ require_pattern \
 
 require_pattern \
   "core checks execute provider API-key storage tests" \
-  'ProviderAPIKeyStorageTests\.test(AccountUsesSharedProviderAccessRequirement|StoredKeyLoadsThroughProviderAccountAndDefaultsToEmpty|SaveStoredKeyTargetsProviderAccountAndReportsFailureStatus)' \
+  'ProviderAPIKeyStorageTests\.test(AccountUsesSharedProviderAccessRequirement|StoredKeyLoadsThroughProviderAccountAndDefaultsToEmpty|SaveStoredKeyTargetsProviderAccountAndReportsFailureStatus|ProviderAPIKeyStorageDiagnosticsPreserveIOSLogCopy)' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "iOS app settings avoids shell-owned provider API-key storage diagnostic copy" \
+  '"Error saving API key to keychain:' \
+  iOS/VoiceInk-ios/AppSettings.swift
 
 reject_pattern \
   "iOS API-key settings avoid account-string keychain wrapper helpers" \
@@ -8949,12 +8959,12 @@ require_pattern \
 
 require_pattern \
   "shared app data reset plan lives in VoiceInkCore" \
-  'VoiceInkAppDataResetPlan|VoiceInkAppDataResetStep|VoiceInkAppDataResetFilePlan|deleteTranscriptionRecords|cleanFiles|resetAppSettings' \
+  'VoiceInkAppDataResetPlan|VoiceInkAppDataResetStep|VoiceInkAppDataResetFilePlan|VoiceInkAppDataResetDiagnostics|deleteTranscriptionRecords|cleanFiles|resetAppSettings|swiftDataResetFailedMessage' \
   VoiceInkCore/Sources/VoiceInkCore/AppDataReset.swift
 
 require_pattern \
-  "core checks execute iOS app data reset sequence test" \
-  'AppDataResetTests\.testIOSResetPlanPreservesRecordFileAndSettingsResetOrder' \
+  "core checks execute iOS app data reset tests" \
+  'AppDataResetTests\.test(IOSResetPlanPreservesRecordFileAndSettingsResetOrder|AppDataResetDiagnosticsPreserveIOSLogCopy)' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -9142,6 +9152,11 @@ require_pattern \
   'VoiceInkAppDataResetPlan\.iOS|for step in resetPlan\.steps|applyResetStep' \
   iOS/VoiceInk-ios/SettingsView.swift
 
+require_pattern \
+  "iOS app settings reset adapts shared app data reset diagnostics" \
+  'VoiceInkAppDataResetDiagnostics\.swiftDataResetFailedMessage' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
 reject_pattern \
   "iOS app settings reset avoids shell-only reset state assembly" \
   'let +defaults += +VoiceInkDefaultSettings\.iOS|modes += +\[\]|selectedModeId += +nil|apiKeyState += +VoiceInkProviderAPIKeyState\(\)|wordReplacements += +\[\]|customVocabularyTerms += +\[\]' \
@@ -9150,6 +9165,11 @@ reject_pattern \
 reject_pattern \
   "iOS app settings reset avoids shell-only file reset sequence" \
   'VoiceInkAppDataResetFilePlan\.iOS|let +recordingsDir|let +modelsDir|let +cachesURL|let +tmpPath|contentsOfDirectory|removeItem\(atPath:' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
+reject_pattern \
+  "iOS app settings reset avoids shell-owned SwiftData reset diagnostic copy" \
+  '"Failed to reset SwiftData:' \
   iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \

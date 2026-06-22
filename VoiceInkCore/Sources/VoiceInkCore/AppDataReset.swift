@@ -81,3 +81,9 @@ public struct VoiceInkAppDataResetFilePlan: Equatable, Sendable {
         }
     }
 }
+
+public enum VoiceInkAppDataResetDiagnostics {
+    public static func swiftDataResetFailedMessage(errorDescription: String) -> String {
+        "Failed to reset SwiftData: \(errorDescription)"
+    }
+}

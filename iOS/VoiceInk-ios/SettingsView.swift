@@ -293,7 +293,7 @@ struct SettingsView: View {
             }
             try? context.save()
         } catch {
-            VoiceInkIOSLogger.settings.error("Failed to reset SwiftData: \(String(describing: error), privacy: .public)")
+            VoiceInkIOSLogger.settings.error("\(VoiceInkAppDataResetDiagnostics.swiftDataResetFailedMessage(errorDescription: String(describing: error)), privacy: .public)")
         }
     }
     #endif

@@ -66,3 +66,9 @@ public enum VoiceInkProviderAPIKeyStorage {
         )
     }
 }
+
+public enum VoiceInkProviderAPIKeyStorageDiagnostics {
+    public static func saveFailureMessage(status: OSStatus) -> String {
+        "Error saving API key to keychain: \(status)"
+    }
+}

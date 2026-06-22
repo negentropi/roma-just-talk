@@ -78,6 +78,20 @@ final class TranscriptionModelAvailabilityTests: XCTestCase {
         )
     }
 
+    func testNativeAppleFailureKindIsSharedThrowableLocalizedError() {
+        let unsupportedError: Error = VoiceInkNativeAppleTranscriptionFailureKind.unsupportedOS
+        XCTAssertEqual(
+            VoiceInkErrorDescription.text(for: unsupportedError),
+            "SpeechAnalyzer requires macOS 26 or later."
+        )
+
+        let assetError: Error = VoiceInkNativeAppleTranscriptionFailureKind.assetDownloadRequired(displayName: "English")
+        XCTAssertEqual(
+            VoiceInkErrorDescription.text(for: assetError),
+            "Download required for English."
+        )
+    }
+
     func testNativeAppleTranscriptionPolicyPreservesSelectionAndTimeoutCopy() {
         XCTAssertEqual(
             VoiceInkNativeAppleTranscriptionPolicy.requiresMacOS26Title(modelDisplayName: "Apple Speech"),

@@ -48,13 +48,17 @@ public struct VoiceInkTranscriptionModelAvailabilityFacts: Equatable, Sendable {
     }
 }
 
-public enum VoiceInkNativeAppleTranscriptionFailureKind: Equatable, Sendable {
+public enum VoiceInkNativeAppleTranscriptionFailureKind: Error, LocalizedError, Equatable, Sendable {
     case unsupportedOS
     case transcriptionFailed
     case localeNotSupported
     case invalidModel
     case assetDownloadRequired(displayName: String)
     case resultStreamTimedOut
+
+    public var errorDescription: String? {
+        VoiceInkNativeAppleTranscriptionPolicy.errorDescription(for: self)
+    }
 }
 
 public enum VoiceInkNativeAppleTranscriptionPolicy {

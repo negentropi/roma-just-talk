@@ -12,44 +12,14 @@ import Speech
 class NativeAppleTranscriptionService: TranscriptionService {
     private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "NativeAppleTranscriptionService")
 
-    enum ServiceError: Error, LocalizedError {
-        case unsupportedOS
-        case transcriptionFailed
-        case localeNotSupported
-        case invalidModel
-        case assetDownloadRequired(String)
-        case resultStreamTimedOut
-
-        var failureKind: VoiceInkNativeAppleTranscriptionFailureKind {
-            switch self {
-            case .unsupportedOS:
-                return .unsupportedOS
-            case .transcriptionFailed:
-                return .transcriptionFailed
-            case .localeNotSupported:
-                return .localeNotSupported
-            case .invalidModel:
-                return .invalidModel
-            case .assetDownloadRequired(let displayName):
-                return .assetDownloadRequired(displayName: displayName)
-            case .resultStreamTimedOut:
-                return .resultStreamTimedOut
-            }
-        }
-
-        var errorDescription: String? {
-            VoiceInkNativeAppleTranscriptionPolicy.errorDescription(for: failureKind)
-        }
-    }
-
     func transcribe(audioURL: URL, model: any TranscriptionModel) async throws -> String {
         guard model is NativeAppleModel else {
-            throw ServiceError.invalidModel
+            throw VoiceInkNativeAppleTranscriptionFailureKind.invalidModel
         }
         
         guard #available(macOS 26, *) else {
             logger.error("SpeechAnalyzer is not available on this macOS version")
-            throw ServiceError.unsupportedOS
+            throw VoiceInkNativeAppleTranscriptionFailureKind.unsupportedOS
         }
         
         // Feature gated: SpeechAnalyzer/SpeechTranscriber are future APIs.
@@ -74,12 +44,12 @@ class NativeAppleTranscriptionService: TranscriptionService {
 
         guard isLocaleSupported else {
             logger.error("Transcription failed: Locale '\(locale.identifier(.bcp47), privacy: .public)' is not supported by SpeechTranscriber.")
-            throw ServiceError.localeNotSupported
+            throw VoiceInkNativeAppleTranscriptionFailureKind.localeNotSupported
         }
 
         guard isLocaleInstalled else {
             logger.error("Transcription failed: Assets for '\(selectedLocaleIdentifier, privacy: .public)' are not downloaded.")
-            throw ServiceError.assetDownloadRequired(displayName)
+            throw VoiceInkNativeAppleTranscriptionFailureKind.assetDownloadRequired(displayName: displayName)
         }
         
         let transcriber = SpeechTranscriber(
@@ -110,7 +80,7 @@ class NativeAppleTranscriptionService: TranscriptionService {
                 resultTask.cancel()
                 await analyzer.cancelAndFinishNow()
                 logger.error("Transcription failed: Apple Speech received no audio samples for '\(selectedLocaleIdentifier, privacy: .public)'.")
-                throw ServiceError.transcriptionFailed
+                throw VoiceInkNativeAppleTranscriptionFailureKind.transcriptionFailed
             }
         } catch {
             resultTask.cancel()
@@ -136,7 +106,7 @@ class NativeAppleTranscriptionService: TranscriptionService {
 
         return finalTranscription
         #else
-        throw ServiceError.unsupportedOS
+        throw VoiceInkNativeAppleTranscriptionFailureKind.unsupportedOS
         #endif
     }
     
@@ -181,12 +151,12 @@ class NativeAppleTranscriptionService: TranscriptionService {
 
             group.addTask {
                 try await Task.sleep(nanoseconds: UInt64(timeout * 1_000_000_000))
-                throw ServiceError.resultStreamTimedOut
+                throw VoiceInkNativeAppleTranscriptionFailureKind.resultStreamTimedOut
             }
 
             do {
                 guard let result = try await group.next() else {
-                    throw ServiceError.transcriptionFailed
+                    throw VoiceInkNativeAppleTranscriptionFailureKind.transcriptionFailed
                 }
                 group.cancelAll()
                 return result

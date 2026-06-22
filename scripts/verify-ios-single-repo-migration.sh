@@ -6628,15 +6628,22 @@ require_pattern \
   'VoiceInkNativeAppleTranscriptionPolicy\.errorDescription|VoiceInkNativeAppleTranscriptionFailureKind' \
   VoiceInk/Transcription/Native/NativeAppleTranscriptionService.swift
 
+reject_pattern \
+  "macOS Native Apple transcription avoids shell-owned failure wrapper" \
+  'enum +ServiceError|failureKind' \
+  VoiceInk/Transcription/Native/NativeAppleTranscriptionService.swift
+
 require_pattern \
   "macOS Native Apple transcription uses shared result-stream timeout policy" \
   'VoiceInkNativeAppleTranscriptionPolicy\.resultStreamTimeout' \
   VoiceInk/Transcription/Native/NativeAppleTranscriptionService.swift
 
-require_pattern \
+require_patterns \
   "core checks execute Native Apple transcription policy tests" \
-  'TranscriptionModelAvailabilityTests\.testNativeAppleTranscriptionPolicyPreservesMacOSErrorCopy|TranscriptionModelAvailabilityTests\.testNativeAppleTranscriptionPolicyPreservesSelectionAndTimeoutCopy' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'TranscriptionModelAvailabilityTests\.testNativeAppleTranscriptionPolicyPreservesMacOSErrorCopy' \
+  'TranscriptionModelAvailabilityTests\.testNativeAppleFailureKindIsSharedThrowableLocalizedError' \
+  'TranscriptionModelAvailabilityTests\.testNativeAppleTranscriptionPolicyPreservesSelectionAndTimeoutCopy'
 
 require_pattern \
   "macOS transcription model manager uses shared selection resource action" \

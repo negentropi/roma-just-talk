@@ -136,7 +136,10 @@ struct ModelRowView: View {
         do {
             try modelManager.deleteModel(row.model)
         } catch {
-            VoiceInkIOSLogger.localModelManagement.error("Delete failed: \(String(describing: error), privacy: .public)")
+            let message = VoiceInkWhisperModelManagementDiagnostics.deleteActionFailedMessage(
+                errorDescription: String(describing: error)
+            )
+            VoiceInkIOSLogger.localModelManagement.error("\(message, privacy: .public)")
             modelManager.downloadError = .deleteFailed(for: error)
         }
     }

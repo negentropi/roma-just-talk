@@ -3265,7 +3265,7 @@ require_pattern \
 
 require_pattern \
   "shared Whisper model management diagnostics live in VoiceInkCore" \
-  'VoiceInkWhisperModelManagementDiagnostics|alreadyDownloadingMessage|startingDownloadMessage|downloadFailedMessage|downloadCancelledMessage|downloadedMessage|saveFailedMessage|notDownloadedMessage|deletedMessage|deleteFailedMessage' \
+  'VoiceInkWhisperModelManagementDiagnostics|alreadyDownloadingMessage|startingDownloadMessage|downloadFailedMessage|downloadCancelledMessage|downloadedMessage|saveFailedMessage|notDownloadedMessage|deletedMessage|deleteFailedMessage|deleteActionFailedMessage' \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
 
 require_pattern \
@@ -3567,6 +3567,11 @@ require_pattern \
   iOS/VoiceInk-ios/LocalModelManager.swift
 
 require_pattern \
+  "iOS local model management view uses shared management diagnostics" \
+  'VoiceInkWhisperModelManagementDiagnostics\.deleteActionFailedMessage' \
+  iOS/VoiceInk-ios/LocalModelManagementView.swift
+
+require_pattern \
   "iOS local model manager applies shared download cancellation outcome" \
   'ignoreCancellation' \
   iOS/VoiceInk-ios/LocalModelManager.swift
@@ -3585,6 +3590,11 @@ reject_pattern \
   "iOS local model manager avoids shell-owned management diagnostics" \
   '"(Model |Starting download of|Download failed for|Download cancelled for|Successfully downloaded|Failed to save|Successfully deleted model|Failed to delete model)' \
   iOS/VoiceInk-ios/LocalModelManager.swift
+
+reject_pattern \
+  "iOS local model management view avoids shell-owned management diagnostics" \
+  '"Delete failed:' \
+  iOS/VoiceInk-ios/LocalModelManagementView.swift
 
 require_pattern \
   "iOS local model deletion uses shared operation alert presentation" \

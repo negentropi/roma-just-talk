@@ -36,6 +36,10 @@ public enum VoiceInkWhisperModelManagementDiagnostics {
     public static func deleteFailedMessage(modelName: String, localizedDescription: String) -> String {
         "Failed to delete model \(modelName): \(localizedDescription)"
     }
+
+    public static func deleteActionFailedMessage(errorDescription: String) -> String {
+        "Delete failed: \(errorDescription)"
+    }
 }
 
 public struct VoiceInkWhisperModelOperationAlertPresentation: Equatable, Identifiable, Sendable {

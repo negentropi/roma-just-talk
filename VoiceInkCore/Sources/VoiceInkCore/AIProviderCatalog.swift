@@ -515,7 +515,7 @@ public struct VoiceInkAIEnhancementCredentialStateResolutionPlan: Equatable, Sen
     ) -> VoiceInkAIEnhancementCredentialStateResolutionPlan {
         VoiceInkAIEnhancementCredentialStateResolutionPlan(
             provider: provider,
-            providerKeyStorageNameToLoad: provider.requiresUserAPIKey ? provider.rawValue : nil
+            providerKeyStorageNameToLoad: provider.userAPIKeyStorageName
         )
     }
 
@@ -616,6 +616,10 @@ public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
         }
     }
 
+    public var userAPIKeyStorageName: String? {
+        requiresUserAPIKey ? rawValue : nil
+    }
+
     public func textEnhancementCredentialState(
         savedAPIKey: String?,
         isLocalCLIConfigured: Bool
@@ -647,14 +651,18 @@ public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
         allCases.filter(\.isSelectableForTextEnhancement)
     }
 
+    public static var textEnhancementProviderKeyStorageNamesToCheck: [String] {
+        selectableTextEnhancementProviders.compactMap(\.userAPIKeyStorageName)
+    }
+
     public static func connectedTextEnhancementProviders(
-        hasUserAPIKey: (Self) -> Bool,
+        providerKeyStorageNamesWithKeys: Set<String>,
         isOllamaConnected: Bool,
         isLocalCLIConfigured: Bool
     ) -> [Self] {
         selectableTextEnhancementProviders.filter { provider in
             provider.isConnectedForTextEnhancement(
-                hasUserAPIKey: { hasUserAPIKey(provider) },
+                providerKeyStorageNamesWithKeys: providerKeyStorageNamesWithKeys,
                 isOllamaConnected: isOllamaConnected,
                 isLocalCLIConfigured: isLocalCLIConfigured
             )
@@ -662,7 +670,7 @@ public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
     }
 
     public func isConnectedForTextEnhancement(
-        hasUserAPIKey: () -> Bool,
+        providerKeyStorageNamesWithKeys: Set<String>,
         isOllamaConnected: Bool,
         isLocalCLIConfigured: Bool
     ) -> Bool {
@@ -672,7 +680,8 @@ public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
         case .localCLI:
             return isLocalCLIConfigured
         case .anthropic, .cerebras, .custom, .gemini, .groq, .mistral, .openAI, .openRouter:
-            return hasUserAPIKey()
+            guard let storageName = userAPIKeyStorageName else { return false }
+            return providerKeyStorageNamesWithKeys.contains(storageName)
         case .assemblyAI, .deepgram, .elevenLabs, .soniox, .speechmatics:
             return false
         }

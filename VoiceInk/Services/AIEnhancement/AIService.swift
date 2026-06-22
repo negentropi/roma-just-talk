@@ -31,8 +31,14 @@ class AIService: ObservableObject {
     @Published private var openRouterModels: [String] = []
     
     var connectedProviders: [VoiceInkAIEnhancementProviderKind] {
+        let providerKeyStorageNamesWithKeys = Set(
+            VoiceInkAIEnhancementProviderKind.textEnhancementProviderKeyStorageNamesToCheck.filter {
+                APIKeyManager.shared.hasAPIKey(forProvider: $0)
+            }
+        )
+
         VoiceInkAIEnhancementProviderKind.connectedTextEnhancementProviders(
-            hasUserAPIKey: { APIKeyManager.shared.hasAPIKey(forProvider: $0.rawValue) },
+            providerKeyStorageNamesWithKeys: providerKeyStorageNamesWithKeys,
             isOllamaConnected: ollamaService.isConnected,
             isLocalCLIConfigured: localCLIService.isConfigured
         )

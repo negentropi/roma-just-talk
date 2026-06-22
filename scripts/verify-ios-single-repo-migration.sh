@@ -6025,7 +6025,7 @@ reject_pattern \
 
 require_pattern \
   "shared AI enhancement credential-state policy lives in VoiceInkCore" \
-  'VoiceInkAIEnhancementCredentialState|VoiceInkAIEnhancementCredentialStateResolutionPlan|textEnhancementCredentialState|providerKeyStorageNameToLoad' \
+  'VoiceInkAIEnhancementCredentialState|VoiceInkAIEnhancementCredentialStateResolutionPlan|textEnhancementCredentialState|providerKeyStorageNameToLoad|userAPIKeyStorageName' \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 require_pattern \
@@ -6058,6 +6058,26 @@ require_pattern \
 require_pattern \
   "migration checklist tracks shared AI enhancement provider-selection planning" \
   'selected-provider mutation planning.*VoiceInkAIEnhancementProviderSelectionPlan' \
+  docs/ios-single-repo-migration.md
+
+require_pattern \
+  "shared AI enhancement connected-provider key storage selection lives in VoiceInkCore" \
+  'textEnhancementProviderKeyStorageNamesToCheck|providerKeyStorageNamesWithKeys|userAPIKeyStorageName' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+require_pattern \
+  "macOS AI service connected-provider key checks use shared storage names" \
+  'textEnhancementProviderKeyStorageNamesToCheck|providerKeyStorageNamesWithKeys|connectedTextEnhancementProviders' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
+reject_pattern \
+  "macOS AI service avoids shell-owned connected-provider key storage mapping" \
+  'hasUserAPIKey:|hasAPIKey\(forProvider: \$0\.rawValue\)' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
+require_pattern \
+  "migration checklist tracks shared connected-provider key storage selection" \
+  'connected-provider key-storage name selection' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

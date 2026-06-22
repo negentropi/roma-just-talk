@@ -567,9 +567,24 @@ final class AIProviderCatalogTests: XCTestCase {
     }
 
     func testMacOSAIEnhancementConnectedProvidersUseSharedPolicy() {
+        let allProviderKeyNames = Set(VoiceInkAIEnhancementProviderKind.textEnhancementProviderKeyStorageNamesToCheck)
+
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderKind.textEnhancementProviderKeyStorageNamesToCheck,
+            [
+                VoiceInkAIEnhancementProviderKind.cerebras.rawValue,
+                VoiceInkAIEnhancementProviderKind.groq.rawValue,
+                VoiceInkAIEnhancementProviderKind.gemini.rawValue,
+                VoiceInkAIEnhancementProviderKind.anthropic.rawValue,
+                VoiceInkAIEnhancementProviderKind.openAI.rawValue,
+                VoiceInkAIEnhancementProviderKind.openRouter.rawValue,
+                VoiceInkAIEnhancementProviderKind.mistral.rawValue,
+                VoiceInkAIEnhancementProviderKind.custom.rawValue
+            ]
+        )
         XCTAssertEqual(
             VoiceInkAIEnhancementProviderKind.connectedTextEnhancementProviders(
-                hasUserAPIKey: { _ in true },
+                providerKeyStorageNamesWithKeys: allProviderKeyNames,
                 isOllamaConnected: true,
                 isLocalCLIConfigured: true
             ),
@@ -578,7 +593,10 @@ final class AIProviderCatalogTests: XCTestCase {
 
         XCTAssertEqual(
             VoiceInkAIEnhancementProviderKind.connectedTextEnhancementProviders(
-                hasUserAPIKey: { [.groq, .custom].contains($0) },
+                providerKeyStorageNamesWithKeys: Set([
+                    VoiceInkAIEnhancementProviderKind.groq.rawValue,
+                    VoiceInkAIEnhancementProviderKind.custom.rawValue
+                ]),
                 isOllamaConnected: false,
                 isLocalCLIConfigured: false
             ),
@@ -586,7 +604,7 @@ final class AIProviderCatalogTests: XCTestCase {
         )
         XCTAssertEqual(
             VoiceInkAIEnhancementProviderKind.connectedTextEnhancementProviders(
-                hasUserAPIKey: { _ in false },
+                providerKeyStorageNamesWithKeys: [],
                 isOllamaConnected: true,
                 isLocalCLIConfigured: false
             ),
@@ -594,14 +612,14 @@ final class AIProviderCatalogTests: XCTestCase {
         )
         XCTAssertTrue(
             VoiceInkAIEnhancementProviderKind.localCLI.isConnectedForTextEnhancement(
-                hasUserAPIKey: { false },
+                providerKeyStorageNamesWithKeys: [],
                 isOllamaConnected: false,
                 isLocalCLIConfigured: true
             )
         )
         XCTAssertFalse(
             VoiceInkAIEnhancementProviderKind.assemblyAI.isConnectedForTextEnhancement(
-                hasUserAPIKey: { true },
+                providerKeyStorageNamesWithKeys: allProviderKeyNames,
                 isOllamaConnected: true,
                 isLocalCLIConfigured: true
             )

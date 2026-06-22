@@ -10,7 +10,6 @@ import VoiceInkCore
 
 struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
     private let logger = VoiceInkIOSLogger.localWhisper
-    private let failurePlatform = VoiceInkLocalWhisperPlatform.iOS
     
     /// Transcribe audio file using local Whisper model
     func transcribeAudioFile(
@@ -22,22 +21,21 @@ struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
         customVocabulary: [String] = []
     ) async throws -> String {
         logger.notice("\(VoiceInkLocalWhisperTranscriptionDiagnostics.iOSStartingLocalTranscriptionMessage, privacy: .public)")
-        let failurePlatform = self.failurePlatform
+        let request = VoiceInkLocalWhisperTranscriptionRequest.iOS(
+            audioURL: fileURL,
+            language: language,
+            prompt: prompt
+        )
 
         let transcription = try await VoiceInkLocalWhisperTranscriptionFlow.transcribe(
-            request: VoiceInkLocalWhisperTranscriptionRequest(
-                audioURL: fileURL,
-                language: language,
-                prompt: prompt ?? "",
-                failurePlatform: failurePlatform
-            ),
+            request: request,
             actions: VoiceInkLocalWhisperTranscriptionActions<WhisperContext>(
                 resolveContext: {
                     let modelManager = LocalModelManager.shared
                     guard let modelPath = await modelManager.modelPath(for: model) else {
                         throw VoiceInkLocalWhisperFailurePolicy.error(
                             for: .modelUnavailable,
-                            platform: failurePlatform
+                            platform: request.failurePlatform
                         )
                     }
 
@@ -52,7 +50,7 @@ struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
                         logger.error("\(VoiceInkLocalWhisperTranscriptionDiagnostics.iOSModelLoadFailedMessage(localizedDescription: error.localizedDescription), privacy: .public)")
                         throw VoiceInkLocalWhisperFailurePolicy.error(
                             for: .modelLoadFailed,
-                            platform: failurePlatform
+                            platform: request.failurePlatform
                         )
                     }
                 },

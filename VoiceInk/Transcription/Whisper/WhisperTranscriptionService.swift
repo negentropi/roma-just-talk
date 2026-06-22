@@ -9,7 +9,6 @@ class WhisperTranscriptionService: TranscriptionService {
     private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "WhisperTranscriptionService")
     private let modelsDirectory: URL
     private weak var modelProvider: (any WhisperModelProvider)?
-    private let failurePlatform = VoiceInkLocalWhisperPlatform.macOS
 
     init(modelsDirectory: URL, modelProvider: (any WhisperModelProvider)? = nil) {
         self.modelsDirectory = modelsDirectory
@@ -17,21 +16,15 @@ class WhisperTranscriptionService: TranscriptionService {
     }
 
     func transcribe(audioURL: URL, model: any TranscriptionModel) async throws -> String {
+        let request = VoiceInkLocalWhisperTranscriptionRequest.macOS(audioURL: audioURL)
         guard model.provider == .whisper else {
-            throw VoiceInkLocalWhisperFailurePolicy.error(for: .modelUnavailable, platform: failurePlatform)
+            throw VoiceInkLocalWhisperFailurePolicy.error(for: .modelUnavailable, platform: request.failurePlatform)
         }
 
         logger.notice("\(VoiceInkLocalWhisperTranscriptionDiagnostics.macOSInitiatingLocalTranscriptionMessage(modelDisplayName: model.displayName), privacy: .public)")
-        let failurePlatform = self.failurePlatform
 
         let text = try await VoiceInkLocalWhisperTranscriptionFlow.transcribe(
-            request: VoiceInkLocalWhisperTranscriptionRequest(
-                audioURL: audioURL,
-                language: VoiceInkTranscriptionLanguagePreference.selectedLanguage(),
-                prompt: VoiceInkTranscriptionPromptPreference.localWhisperPromptForSelectedLanguage(),
-                failurePlatform: failurePlatform,
-                mapsThrownAudioSampleErrors: false
-            ),
+            request: request,
             actions: VoiceInkLocalWhisperTranscriptionActions<WhisperContext>(
                 resolveContext: {
                     if let provider = self.modelProvider,
@@ -53,7 +46,7 @@ class WhisperTranscriptionService: TranscriptionService {
                         in: availableModels
                     ) else {
                         self.logger.error("\(VoiceInkLocalWhisperTranscriptionDiagnostics.macOSModelFileNotFoundMessage(modelName: model.name), privacy: .public)")
-                        throw VoiceInkLocalWhisperFailurePolicy.error(for: .modelUnavailable, platform: failurePlatform)
+                        throw VoiceInkLocalWhisperFailurePolicy.error(for: .modelUnavailable, platform: request.failurePlatform)
                     }
 
                     self.logger.notice("\(VoiceInkLocalWhisperTranscriptionDiagnostics.macOSLoadingModelMessage(modelName: model.name), privacy: .public)")
@@ -67,7 +60,7 @@ class WhisperTranscriptionService: TranscriptionService {
                         )
                     } catch {
                         self.logger.error("\(VoiceInkLocalWhisperTranscriptionDiagnostics.macOSModelLoadFailedMessage(modelName: model.name, localizedDescription: error.localizedDescription), privacy: .public)")
-                        throw VoiceInkLocalWhisperFailurePolicy.error(for: .modelLoadFailed, platform: failurePlatform)
+                        throw VoiceInkLocalWhisperFailurePolicy.error(for: .modelLoadFailed, platform: request.failurePlatform)
                     }
                 },
                 readAudioSamples: { audioURL in

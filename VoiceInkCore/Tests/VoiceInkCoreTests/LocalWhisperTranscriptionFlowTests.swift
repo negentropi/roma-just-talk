@@ -2,6 +2,36 @@ import Foundation
 @testable import VoiceInkCore
 
 final class LocalWhisperTranscriptionFlowTests: XCTestCase {
+    func testRequestBuildersPreservePlatformDefaults() {
+        let suiteName = "LocalWhisperTranscriptionFlowTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        VoiceInkTranscriptionLanguagePreference.saveSelectedLanguage("fr", to: defaults)
+        VoiceInkTranscriptionPromptPreference.savePrompt("custom local prompt", to: defaults)
+
+        let audioURL = URL(fileURLWithPath: "/tmp/input.wav")
+        XCTAssertEqual(
+            VoiceInkLocalWhisperTranscriptionRequest.macOS(audioURL: audioURL, defaults: defaults),
+            VoiceInkLocalWhisperTranscriptionRequest(
+                audioURL: audioURL,
+                language: "fr",
+                prompt: "custom local prompt",
+                failurePlatform: .macOS,
+                mapsThrownAudioSampleErrors: false
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkLocalWhisperTranscriptionRequest.iOS(audioURL: audioURL, language: "de", prompt: nil),
+            VoiceInkLocalWhisperTranscriptionRequest(
+                audioURL: audioURL,
+                language: "de",
+                prompt: "",
+                failurePlatform: .iOS
+            )
+        )
+    }
+
     func testTranscriptionDiagnosticsPreservePlatformLogCopy() {
         XCTAssertEqual(
             VoiceInkLocalWhisperTranscriptionDiagnostics.macOSInitiatingLocalTranscriptionMessage(

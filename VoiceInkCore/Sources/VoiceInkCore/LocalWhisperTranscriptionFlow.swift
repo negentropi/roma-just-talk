@@ -83,6 +83,32 @@ public struct VoiceInkLocalWhisperTranscriptionRequest: Equatable, Sendable {
         self.failurePlatform = failurePlatform
         self.mapsThrownAudioSampleErrors = mapsThrownAudioSampleErrors
     }
+
+    public static func macOS(
+        audioURL: URL,
+        defaults: UserDefaults = .standard
+    ) -> VoiceInkLocalWhisperTranscriptionRequest {
+        VoiceInkLocalWhisperTranscriptionRequest(
+            audioURL: audioURL,
+            language: VoiceInkTranscriptionLanguagePreference.selectedLanguage(from: defaults),
+            prompt: VoiceInkTranscriptionPromptPreference.localWhisperPromptForSelectedLanguage(from: defaults),
+            failurePlatform: .macOS,
+            mapsThrownAudioSampleErrors: false
+        )
+    }
+
+    public static func iOS(
+        audioURL: URL,
+        language: String? = nil,
+        prompt: String? = nil
+    ) -> VoiceInkLocalWhisperTranscriptionRequest {
+        VoiceInkLocalWhisperTranscriptionRequest(
+            audioURL: audioURL,
+            language: language,
+            prompt: prompt ?? "",
+            failurePlatform: .iOS
+        )
+    }
 }
 
 public struct VoiceInkLocalWhisperTranscriptionActions<Context> {

@@ -1368,6 +1368,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "WhisperRuntimeDefaultsTests.testRuntimeInvocationPlanOmitsDisabledWhisperInputs", run: { WhisperRuntimeDefaultsTests().testRuntimeInvocationPlanOmitsDisabledWhisperInputs() }),
             VoiceInkCoreCheck(name: "WhisperRuntimeDefaultsTests.testLocalWhisperFailurePolicyPreservesMacOSMapping", run: { WhisperRuntimeDefaultsTests().testLocalWhisperFailurePolicyPreservesMacOSMapping() }),
             VoiceInkCoreCheck(name: "WhisperRuntimeDefaultsTests.testLocalWhisperFailurePolicyPreservesIOSMapping", run: { WhisperRuntimeDefaultsTests().testLocalWhisperFailurePolicyPreservesIOSMapping() }),
+            VoiceInkCoreCheck(name: "LocalWhisperTranscriptionFlowTests.testRequestBuildersPreservePlatformDefaults", run: { LocalWhisperTranscriptionFlowTests().testRequestBuildersPreservePlatformDefaults() }),
             VoiceInkCoreCheck(name: "LocalWhisperTranscriptionFlowTests.testTranscriptionDiagnosticsPreservePlatformLogCopy", run: { LocalWhisperTranscriptionFlowTests().testTranscriptionDiagnosticsPreservePlatformLogCopy() }),
             VoiceInkCoreCheck(name: "LocalWhisperTranscriptionFlowTests.testFlowRunsTranscriptionAndReleasesOwnedContext", run: { try await LocalWhisperTranscriptionFlowTests().testFlowRunsTranscriptionAndReleasesOwnedContext() }),
             VoiceInkCoreCheck(name: "LocalWhisperTranscriptionFlowTests.testFlowLeavesBorrowedContextLoaded", run: { try await LocalWhisperTranscriptionFlowTests().testFlowLeavesBorrowedContextLoaded() }),

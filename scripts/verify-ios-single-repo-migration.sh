@@ -3032,6 +3032,26 @@ require_pattern \
   'VoiceInkLocalWhisperTranscriptionDiagnostics|macOSInitiatingLocalTranscriptionMessage|macOSAudioSamplesProcessingFailedMessage|iOSStartingLocalTranscriptionMessage|iOSProcessedAudioSamplesMessage' \
   VoiceInkCore/Sources/VoiceInkCore/LocalWhisperTranscriptionFlow.swift
 
+require_patterns \
+  "shared local Whisper request defaults live in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/LocalWhisperTranscriptionFlow.swift \
+  'static func macOS' \
+  'VoiceInkTranscriptionLanguagePreference\.selectedLanguage' \
+  'VoiceInkTranscriptionPromptPreference\.localWhisperPromptForSelectedLanguage' \
+  'mapsThrownAudioSampleErrors: false' \
+  'static func iOS' \
+  'prompt: prompt \?\? ""'
+
+require_pattern \
+  "core tests cover shared local Whisper request defaults" \
+  'testRequestBuildersPreservePlatformDefaults' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/LocalWhisperTranscriptionFlowTests.swift
+
+require_pattern \
+  "core check runner executes shared local Whisper request default tests" \
+  'testRequestBuildersPreservePlatformDefaults' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
 require_pattern \
   "core tests cover shared local Whisper transcription diagnostics" \
   'testTranscriptionDiagnosticsPreservePlatformLogCopy' \
@@ -3076,14 +3096,19 @@ require_pattern \
   VoiceInk/Transcription/Whisper/WhisperTranscriptionService.swift
 
 require_pattern \
+  "macOS local Whisper service uses shared request defaults" \
+  'VoiceInkLocalWhisperTranscriptionRequest\.macOS\(audioURL: audioURL\)' \
+  VoiceInk/Transcription/Whisper/WhisperTranscriptionService.swift
+
+require_pattern \
   "macOS local Whisper preserves borrowed context lifetime through shared flow" \
   'shouldReleaseContext: false' \
   VoiceInk/Transcription/Whisper/WhisperTranscriptionService.swift
 
 require_pattern \
-  "macOS local Whisper preserves thrown sample-read behavior through shared flow" \
+  "macOS local Whisper preserves thrown sample-read behavior through shared request defaults" \
   'mapsThrownAudioSampleErrors: false' \
-  VoiceInk/Transcription/Whisper/WhisperTranscriptionService.swift
+  VoiceInkCore/Sources/VoiceInkCore/LocalWhisperTranscriptionFlow.swift
 
 require_pattern \
   "macOS local Whisper preserves owned context failure lifetime through shared flow" \
@@ -3093,6 +3118,11 @@ require_pattern \
 require_pattern \
   "iOS local Whisper service uses shared transcription flow" \
   'VoiceInkLocalWhisperTranscriptionFlow\.transcribe|VoiceInkLocalWhisperTranscriptionActions<WhisperContext>' \
+  iOS/VoiceInk-ios/WhisperTranscriptionService.swift
+
+require_pattern \
+  "iOS local Whisper service uses shared request defaults" \
+  'VoiceInkLocalWhisperTranscriptionRequest\.iOS\(' \
   iOS/VoiceInk-ios/WhisperTranscriptionService.swift
 
 require_pattern \
@@ -3113,6 +3143,12 @@ require_pattern \
 reject_pattern \
   "local Whisper services avoid shell-owned sample and transcription failure mapping" \
   'for: \.(audioProcessingFailed|transcriptionFailed)' \
+  VoiceInk/Transcription/Whisper/WhisperTranscriptionService.swift \
+  iOS/VoiceInk-ios/WhisperTranscriptionService.swift
+
+reject_pattern \
+  "local Whisper services avoid shell-owned request default construction" \
+  'VoiceInkLocalWhisperTranscriptionRequest\(' \
   VoiceInk/Transcription/Whisper/WhisperTranscriptionService.swift \
   iOS/VoiceInk-ios/WhisperTranscriptionService.swift
 

@@ -10106,6 +10106,7 @@ require_patterns \
   VoiceInkCore/Sources/VoiceInkCore/PowerModeBrowser.swift \
   'VoiceInkPowerModeBrowser' \
   'VoiceInkPowerModeBrowserURLDiagnostics' \
+  'VoiceInkPowerModeBrowserDetectionDiagnostics' \
   'loggerCategory' \
   'safariURL' \
   'company\.thebrowser\.Browser' \
@@ -10114,17 +10115,25 @@ require_patterns \
   'app\.zen-browser\.zen' \
   'ru\.yandex\.desktop\.yandex-browser' \
   'scriptNotFoundMessage' \
+  'urlLookupFailedMessage' \
   'executionFailedMessage' \
   'runningStatusMessage'
 
 require_pattern \
   "core checks execute Power Mode browser metadata and diagnostics tests" \
-  'PowerModePolicyTests\.testPowerModeBrowserCatalogPreservesMacOSMetadata|PowerModePolicyTests\.testPowerModeBrowserCatalogPreservesCurrentDetectionSet|PowerModePolicyTests\.testPowerModeBrowserURLDiagnosticsPreserveMacOSLogCopy' \
+  'PowerModePolicyTests\.testPowerModeBrowserCatalogPreservesMacOSMetadata|PowerModePolicyTests\.testPowerModeBrowserCatalogPreservesCurrentDetectionSet|PowerModePolicyTests\.testPowerModeBrowserURLDiagnosticsPreserveMacOSLogCopy|PowerModePolicyTests\.testPowerModeBrowserDetectionDiagnosticsPreserveMacOSLogCopy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
-require_pattern \
-  "macOS active-window service consumes shared Power Mode browser catalog" \
+require_patterns \
+  "macOS active-window service consumes shared Power Mode browser catalog and diagnostics" \
+  VoiceInk/PowerMode/ActiveWindowService.swift \
   'VoiceInkPowerModeBrowser\.allCases' \
+  'VoiceInkPowerModeBrowserDetectionDiagnostics\.loggerCategory' \
+  'VoiceInkPowerModeBrowserDetectionDiagnostics\.urlLookupFailedMessage'
+
+reject_pattern \
+  "macOS active-window service avoids shell-owned browser detection diagnostic copy" \
+  '"browser\.detection"|"❌ Failed to get URL from ' \
   VoiceInk/PowerMode/ActiveWindowService.swift
 
 require_patterns \
@@ -10151,7 +10160,7 @@ reject_pattern \
 
 require_pattern \
   "migration checklist tracks shared Power Mode browser metadata and diagnostics" \
-  'VoiceInkPowerModeBrowserURLDiagnostics|browser URL diagnostic copy' \
+  'VoiceInkPowerModeBrowserDetectionDiagnostics|browser URL and detection diagnostic copy' \
   docs/ios-single-repo-migration.md
 
 reject_pattern \

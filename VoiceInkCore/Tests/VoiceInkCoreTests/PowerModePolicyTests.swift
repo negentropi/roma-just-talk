@@ -108,6 +108,17 @@ final class PowerModePolicyTests: XCTestCase {
         )
     }
 
+    func testPowerModeBrowserDetectionDiagnosticsPreserveMacOSLogCopy() {
+        XCTAssertEqual(VoiceInkPowerModeBrowserDetectionDiagnostics.loggerCategory, "browser.detection")
+        XCTAssertEqual(
+            VoiceInkPowerModeBrowserDetectionDiagnostics.urlLookupFailedMessage(
+                browserDisplayName: "Arc",
+                localizedDescription: "no active tab"
+            ),
+            "❌ Failed to get URL from Arc: no active tab"
+        )
+    }
+
     func testPowerModeEmojiCatalogPreservesDefaultsStorageKeyAndCopy() {
         XCTAssertEqual(VoiceInkPowerModeEmojiCatalog.customEmojisKey, "userAddedEmojis")
         XCTAssertEqual(VoiceInkPowerModeEmojiCatalog.defaultEmojis.first, "🏢")

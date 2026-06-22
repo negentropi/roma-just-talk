@@ -11,7 +11,7 @@ class ActiveWindowService: ObservableObject {
 
     private let logger = Logger(
         subsystem: VoiceInkAppIdentity.loggingSubsystem,
-        category: "browser.detection"
+        category: VoiceInkPowerModeBrowserDetectionDiagnostics.loggerCategory
     )
 
     private init() {}
@@ -53,7 +53,9 @@ class ActiveWindowService: ObservableObject {
             do {
                 currentWebsiteURL = try await browserURLService.getCurrentURL(from: browserType)
             } catch {
-                logger.error("❌ Failed to get URL from \(browserType.displayName, privacy: .public): \(error.localizedDescription, privacy: .public)")
+                logger.error(
+                    "\(VoiceInkPowerModeBrowserDetectionDiagnostics.urlLookupFailedMessage(browserDisplayName: browserType.displayName, localizedDescription: error.localizedDescription), privacy: .public)"
+                )
             }
         }
 

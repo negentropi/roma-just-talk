@@ -120,3 +120,14 @@ public enum VoiceInkPowerModeBrowserURLDiagnostics {
         "\(browserDisplayName) running status: \(isRunning)"
     }
 }
+
+public enum VoiceInkPowerModeBrowserDetectionDiagnostics {
+    public static let loggerCategory = "browser.detection"
+
+    public static func urlLookupFailedMessage(
+        browserDisplayName: String,
+        localizedDescription: String
+    ) -> String {
+        "❌ Failed to get URL from \(browserDisplayName): \(localizedDescription)"
+    }
+}

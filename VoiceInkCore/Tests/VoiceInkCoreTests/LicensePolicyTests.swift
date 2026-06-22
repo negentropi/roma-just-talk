@@ -287,6 +287,88 @@ final class LicensePolicyTests: XCTestCase {
         )
     }
 
+    func testLicenseManagementPresentationPreservesMacOSCopyAndResources() {
+        XCTAssertEqual(VoiceInkLicenseManagementPresentation.appVersionFallback, "Unknown")
+        XCTAssertEqual(VoiceInkLicenseManagementPresentation.heroSystemImageName, "checkmark.seal.fill")
+        XCTAssertEqual(
+            VoiceInkLicenseManagementPresentation.heroTitle(for: .licensed),
+            "VoiceInk Pro"
+        )
+        XCTAssertEqual(
+            VoiceInkLicenseManagementPresentation.heroTitle(for: .trial(daysRemaining: 3)),
+            "Upgrade to Pro"
+        )
+        XCTAssertEqual(
+            VoiceInkLicenseManagementPresentation.heroSubtitle(for: .licensed),
+            "Thank you for supporting VoiceInk"
+        )
+        XCTAssertEqual(
+            VoiceInkLicenseManagementPresentation.heroSubtitle(for: .trialExpired),
+            "Transcribe what you say to text instantly with AI"
+        )
+        XCTAssertEqual(
+            VoiceInkLicenseManagementPresentation.appVersionText("1.2.3"),
+            "v1.2.3"
+        )
+
+        XCTAssertEqual(
+            VoiceInkLicenseManagementPresentation.licensedResourceLinks,
+            [
+                VoiceInkLicenseManagementResourceLink(
+                    id: .changelog,
+                    title: "Changelog",
+                    systemImageName: "list.bullet.clipboard.fill",
+                    urlString: "https://github.com/Beingpax/VoiceInk/releases"
+                ),
+                VoiceInkLicenseManagementResourceLink(
+                    id: .discord,
+                    title: "Discord",
+                    systemImageName: "bubble.left.and.bubble.right.fill",
+                    urlString: "https://discord.gg/xryDy57nYD"
+                ),
+                VoiceInkLicenseManagementResourceLink(
+                    id: .emailSupport,
+                    title: "Email Support",
+                    systemImageName: "envelope.fill",
+                    urlString: nil
+                ),
+                VoiceInkLicenseManagementResourceLink(
+                    id: .docs,
+                    title: "Docs",
+                    systemImageName: "book.fill",
+                    urlString: "https://tryvoiceink.com/docs"
+                ),
+                VoiceInkLicenseManagementResourceLink(
+                    id: .tipJar,
+                    title: "Tip Jar",
+                    systemImageName: "heart.fill",
+                    urlString: "https://buymeacoffee.com/beingpax"
+                )
+            ]
+        )
+        XCTAssertEqual(
+            VoiceInkLicenseManagementPresentation.purchaseFeatures.map(\.title),
+            ["Priority Support", "Lifetime Access", "Free Updates", "Multiple Devices"]
+        )
+        XCTAssertEqual(
+            VoiceInkLicenseManagementPresentation.purchaseFeatures.map(\.systemImageName),
+            [
+                "bubble.left.and.bubble.right.fill",
+                "infinity.circle.fill",
+                "arrow.up.circle.fill",
+                "macbook.and.iphone"
+            ]
+        )
+        XCTAssertEqual(
+            VoiceInkLicenseManagementPresentation.activeLicenseDeviceLimitText(activationsLimit: 3),
+            "This license can be activated on up to 3 devices"
+        )
+        XCTAssertEqual(
+            VoiceInkLicenseManagementPresentation.activeLicenseDeviceLimitText(activationsLimit: 0),
+            "You can use VoiceInk Pro on all your personal devices"
+        )
+    }
+
     func testLicenseRemovalPolicyPreservesMacOSResetPlan() {
         XCTAssertEqual(
             VoiceInkLicenseRemovalPolicy.plan(),

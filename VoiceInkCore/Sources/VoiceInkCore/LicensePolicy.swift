@@ -198,6 +198,146 @@ public enum VoiceInkLicenseLinks {
     }
 }
 
+public enum VoiceInkLicenseManagementResourceID: String, CaseIterable, Sendable {
+    case changelog
+    case discord
+    case emailSupport
+    case docs
+    case tipJar
+}
+
+public struct VoiceInkLicenseManagementResourceLink: Equatable, Sendable {
+    public let id: VoiceInkLicenseManagementResourceID
+    public let title: String
+    public let systemImageName: String
+    public let urlString: String?
+
+    public init(
+        id: VoiceInkLicenseManagementResourceID,
+        title: String,
+        systemImageName: String,
+        urlString: String?
+    ) {
+        self.id = id
+        self.title = title
+        self.systemImageName = systemImageName
+        self.urlString = urlString
+    }
+}
+
+public struct VoiceInkLicenseManagementFeature: Equatable, Sendable {
+    public let title: String
+    public let systemImageName: String
+
+    public init(title: String, systemImageName: String) {
+        self.title = title
+        self.systemImageName = systemImageName
+    }
+}
+
+public enum VoiceInkLicenseManagementPresentation {
+    public static let appVersionFallback = "Unknown"
+    public static let heroSystemImageName = "checkmark.seal.fill"
+    public static let licensedHeroTitle = "VoiceInk Pro"
+    public static let purchaseHeroTitle = "Upgrade to Pro"
+    public static let licensedHeroSubtitle = "Thank you for supporting VoiceInk"
+    public static let purchaseHeroSubtitle = "Transcribe what you say to text instantly with AI"
+    public static let lifetimeBadgeSystemImageName = "infinity.circle.fill"
+    public static let lifetimeBadgeTitle = "Buy Once, Own Forever"
+    public static let purchaseButtonTitle = "Upgrade to VoiceInk Pro"
+    public static let activationSectionTitle = "Already have a license?"
+    public static let licenseKeyPlaceholder = "Enter your license key"
+    public static let activateButtonTitle = "Activate"
+    public static let existingLicenseSectionTitle = "Already purchased?"
+    public static let existingLicenseDescription = "Manage your license and device activations"
+    public static let managementPortalButtonTitle = "License Management Portal"
+    public static let activeLicenseTitle = "License Active"
+    public static let activeLicenseBadgeText = "Active"
+    public static let deactivationSectionTitle = "License Management"
+    public static let deactivateButtonTitle = "Deactivate License"
+    public static let deactivateSystemImageName = "xmark.circle.fill"
+
+    public static let licensedResourceLinks: [VoiceInkLicenseManagementResourceLink] = [
+        VoiceInkLicenseManagementResourceLink(
+            id: .changelog,
+            title: "Changelog",
+            systemImageName: "list.bullet.clipboard.fill",
+            urlString: "https://github.com/Beingpax/VoiceInk/releases"
+        ),
+        VoiceInkLicenseManagementResourceLink(
+            id: .discord,
+            title: "Discord",
+            systemImageName: "bubble.left.and.bubble.right.fill",
+            urlString: "https://discord.gg/xryDy57nYD"
+        ),
+        VoiceInkLicenseManagementResourceLink(
+            id: .emailSupport,
+            title: "Email Support",
+            systemImageName: "envelope.fill",
+            urlString: nil
+        ),
+        VoiceInkLicenseManagementResourceLink(
+            id: .docs,
+            title: "Docs",
+            systemImageName: "book.fill",
+            urlString: "https://tryvoiceink.com/docs"
+        ),
+        VoiceInkLicenseManagementResourceLink(
+            id: .tipJar,
+            title: "Tip Jar",
+            systemImageName: "heart.fill",
+            urlString: "https://buymeacoffee.com/beingpax"
+        )
+    ]
+
+    public static let purchaseFeatures: [VoiceInkLicenseManagementFeature] = [
+        VoiceInkLicenseManagementFeature(
+            title: "Priority Support",
+            systemImageName: "bubble.left.and.bubble.right.fill"
+        ),
+        VoiceInkLicenseManagementFeature(
+            title: "Lifetime Access",
+            systemImageName: "infinity.circle.fill"
+        ),
+        VoiceInkLicenseManagementFeature(
+            title: "Free Updates",
+            systemImageName: "arrow.up.circle.fill"
+        ),
+        VoiceInkLicenseManagementFeature(
+            title: "Multiple Devices",
+            systemImageName: "macbook.and.iphone"
+        )
+    ]
+
+    public static func appVersionText(_ version: String) -> String {
+        "v\(version)"
+    }
+
+    public static func heroTitle(for licenseState: VoiceInkLicenseState) -> String {
+        if case .licensed = licenseState {
+            return licensedHeroTitle
+        }
+
+        return purchaseHeroTitle
+    }
+
+    public static func heroSubtitle(for licenseState: VoiceInkLicenseState) -> String {
+        if case .licensed = licenseState {
+            return licensedHeroSubtitle
+        }
+
+        return purchaseHeroSubtitle
+    }
+
+    public static func activeLicenseDeviceLimitText(activationsLimit: Int) -> String {
+        if activationsLimit > 0 {
+            return "This license can be activated on up to \(activationsLimit) devices"
+        }
+
+        return "You can use VoiceInk Pro on all your personal devices"
+    }
+}
+
 public struct VoiceInkLicenseRemovalPlan: Equatable, Sendable {
     public let requiresActivationToSave: Bool
     public let hasLaunchedBeforeToSave: Bool

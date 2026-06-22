@@ -4,7 +4,8 @@ import VoiceInkCore
 struct LicenseManagementView: View {
     @StateObject private var licenseViewModel = LicenseViewModel()
     @Environment(\.colorScheme) private var colorScheme
-    let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
+    let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+        ?? VoiceInkLicenseManagementPresentation.appVersionFallback
     
     var body: some View {
         ScrollView {
@@ -34,72 +35,44 @@ struct LicenseManagementView: View {
             // Title Section
             VStack(spacing: 16) {
                 HStack(spacing: 16) {
-                    Image(systemName: "checkmark.seal.fill")
+                    Image(systemName: VoiceInkLicenseManagementPresentation.heroSystemImageName)
                         .font(.system(size: 32))
                         .foregroundStyle(.blue)
                     
                     HStack(alignment: .lastTextBaseline, spacing: 8) { 
-                        Text(licenseViewModel.licenseState == .licensed ? "VoiceInk Pro" : "Upgrade to Pro")
+                        Text(VoiceInkLicenseManagementPresentation.heroTitle(for: licenseViewModel.licenseState))
                             .font(.system(size: 32, weight: .bold))
                         
-                        Text("v\(appVersion)")
+                        Text(VoiceInkLicenseManagementPresentation.appVersionText(appVersion))
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                             .padding(.bottom, 4)
                     }
                 }
                 
-                Text(licenseViewModel.licenseState == .licensed ?
-                     "Thank you for supporting VoiceInk" :
-                     "Transcribe what you say to text instantly with AI")
+                Text(VoiceInkLicenseManagementPresentation.heroSubtitle(for: licenseViewModel.licenseState))
                     .font(.title3)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
 
                 if case .licensed = licenseViewModel.licenseState {
                     HStack(spacing: 40) {
-                        Button {
-                            if let url = URL(string: "https://github.com/Beingpax/VoiceInk/releases") {
-                                NSWorkspace.shared.open(url)
+                        ForEach(VoiceInkLicenseManagementPresentation.licensedResourceLinks, id: \.id) { resource in
+                            Button {
+                                openResource(resource)
+                            } label: {
+                                if resource.id == .tipJar {
+                                    animatedTipJarItem(resource)
+                                } else {
+                                    featureItem(
+                                        icon: resource.systemImageName,
+                                        title: resource.title,
+                                        color: resourceColor(for: resource.id)
+                                    )
+                                }
                             }
-                        } label: {
-                            featureItem(icon: "list.bullet.clipboard.fill", title: "Changelog", color: .blue)
+                            .buttonStyle(.plain)
                         }
-                        .buttonStyle(.plain)
-                        
-                        Button {
-                            if let url = URL(string: "https://discord.gg/xryDy57nYD") {
-                                NSWorkspace.shared.open(url)
-                            }
-                        } label: {
-                            featureItem(icon: "bubble.left.and.bubble.right.fill", title: "Discord", color: .purple)
-                        }
-                        .buttonStyle(.plain)
-                        
-                        Button {
-                            EmailSupport.openSupportEmail()
-                        } label: {
-                            featureItem(icon: "envelope.fill", title: "Email Support", color: .orange)
-                        }
-                        .buttonStyle(.plain)
-                        
-                        Button {
-                            if let url = URL(string: "https://tryvoiceink.com/docs") {
-                                NSWorkspace.shared.open(url)
-                            }
-                        } label: {
-                            featureItem(icon: "book.fill", title: "Docs", color: .indigo)
-                        }
-                        .buttonStyle(.plain)
-                        
-                        Button {
-                            if let url = URL(string: "https://buymeacoffee.com/beingpax") {
-                                NSWorkspace.shared.open(url)
-                            }
-                        } label: {
-                            animatedTipJarItem()
-                        }
-                        .buttonStyle(.plain)
                     }
                     .padding(.top, 8)
                 }
@@ -114,10 +87,10 @@ struct LicenseManagementView: View {
             VStack(spacing: 24) {
                 // Lifetime Access Badge
                 HStack {
-                    Image(systemName: "infinity.circle.fill")
+                    Image(systemName: VoiceInkLicenseManagementPresentation.lifetimeBadgeSystemImageName)
                         .font(.system(size: 20))
                         .foregroundStyle(.blue)
-                    Text("Buy Once, Own Forever")
+                    Text(VoiceInkLicenseManagementPresentation.lifetimeBadgeTitle)
                         .font(.headline)
                 }
                 .padding(.vertical, 8)
@@ -129,7 +102,7 @@ struct LicenseManagementView: View {
                 Button(action: {
                     NSWorkspace.shared.open(VoiceInkLicenseLinks.purchaseURL)
                 }) {
-                    Text("Upgrade to VoiceInk Pro")
+                    Text(VoiceInkLicenseManagementPresentation.purchaseButtonTitle)
                         .font(.headline)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
@@ -138,10 +111,13 @@ struct LicenseManagementView: View {
                 
                 // Features Grid
                 HStack(spacing: 40) {
-                    featureItem(icon: "bubble.left.and.bubble.right.fill", title: "Priority Support", color: .purple)
-                    featureItem(icon: "infinity.circle.fill", title: "Lifetime Access", color: .blue)
-                    featureItem(icon: "arrow.up.circle.fill", title: "Free Updates", color: .green)
-                    featureItem(icon: "macbook.and.iphone", title: "Multiple Devices", color: .orange)
+                    ForEach(Array(VoiceInkLicenseManagementPresentation.purchaseFeatures.enumerated()), id: \.offset) { index, feature in
+                        featureItem(
+                            icon: feature.systemImageName,
+                            title: feature.title,
+                            color: purchaseFeatureColor(at: index)
+                        )
+                    }
                 }
                 .frame(maxWidth: .infinity, alignment: .center)
             }
@@ -151,11 +127,11 @@ struct LicenseManagementView: View {
 
             // License Activation
             VStack(spacing: 20) {
-                Text("Already have a license?")
+                Text(VoiceInkLicenseManagementPresentation.activationSectionTitle)
                     .font(.headline)
                 
                 HStack(spacing: 12) {
-                    TextField("Enter your license key", text: $licenseViewModel.licenseKey)
+                    TextField(VoiceInkLicenseManagementPresentation.licenseKeyPlaceholder, text: $licenseViewModel.licenseKey)
                         .textFieldStyle(.roundedBorder)
                         .font(.system(.body, design: .monospaced))
                         .textCase(.uppercase)
@@ -167,7 +143,7 @@ struct LicenseManagementView: View {
                             ProgressView()
                                 .controlSize(.small)
                         } else {
-                            Text("Activate")
+                            Text(VoiceInkLicenseManagementPresentation.activateButtonTitle)
                                 .frame(width: 80)
                         }
                     }
@@ -188,11 +164,11 @@ struct LicenseManagementView: View {
             
             // Already Purchased Section
             VStack(spacing: 20) {
-                Text("Already purchased?")
+                Text(VoiceInkLicenseManagementPresentation.existingLicenseSectionTitle)
                     .font(.headline)
 
                 HStack(spacing: 12) {
-                    Text("Manage your license and device activations")
+                    Text(VoiceInkLicenseManagementPresentation.existingLicenseDescription)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -200,7 +176,7 @@ struct LicenseManagementView: View {
                     Button(action: {
                         NSWorkspace.shared.open(VoiceInkLicenseLinks.managementPortalURL)
                     }) {
-                        Text("License Management Portal")
+                        Text(VoiceInkLicenseManagementPresentation.managementPortalButtonTitle)
                             .frame(width: 180)
                     }
                     .buttonStyle(.borderedProminent)
@@ -220,10 +196,10 @@ struct LicenseManagementView: View {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.system(size: 24))
                         .foregroundStyle(.green)
-                    Text("License Active")
+                    Text(VoiceInkLicenseManagementPresentation.activeLicenseTitle)
                         .font(.headline)
                     Spacer()
-                    Text("Active")
+                    Text(VoiceInkLicenseManagementPresentation.activeLicenseBadgeText)
                         .font(.caption)
                         .padding(.horizontal, 12)
                         .padding(.vertical, 4)
@@ -233,15 +209,11 @@ struct LicenseManagementView: View {
                 
                 Divider()
                 
-                if licenseViewModel.activationsLimit > 0 {
-                    Text("This license can be activated on up to \(licenseViewModel.activationsLimit) devices")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                } else {
-                    Text("You can use VoiceInk Pro on all your personal devices")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
+                Text(VoiceInkLicenseManagementPresentation.activeLicenseDeviceLimitText(
+                    activationsLimit: licenseViewModel.activationsLimit
+                ))
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
             }
             .padding(32)
             .background(CardBackground(isSelected: false))
@@ -249,13 +221,16 @@ struct LicenseManagementView: View {
             
             // Deactivation Card
             VStack(alignment: .leading, spacing: 16) {
-                Text("License Management")
+                Text(VoiceInkLicenseManagementPresentation.deactivationSectionTitle)
                     .font(.headline)
 
                 Button(role: .destructive, action: {
                     licenseViewModel.removeLicense()
                 }) {
-                    Label("Deactivate License", systemImage: "xmark.circle.fill")
+                    Label(
+                        VoiceInkLicenseManagementPresentation.deactivateButtonTitle,
+                        systemImage: VoiceInkLicenseManagementPresentation.deactivateSystemImageName
+                    )
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 8)
                 }
@@ -278,14 +253,52 @@ struct LicenseManagementView: View {
                 .foregroundStyle(.primary)
         }
     }
+
+    private func openResource(_ resource: VoiceInkLicenseManagementResourceLink) {
+        if resource.id == .emailSupport {
+            EmailSupport.openSupportEmail()
+            return
+        }
+
+        guard let urlString = resource.urlString, let url = URL(string: urlString) else { return }
+        NSWorkspace.shared.open(url)
+    }
+
+    private func resourceColor(for resourceID: VoiceInkLicenseManagementResourceID) -> Color {
+        switch resourceID {
+        case .changelog:
+            return .blue
+        case .discord:
+            return .purple
+        case .emailSupport:
+            return .orange
+        case .docs:
+            return .indigo
+        case .tipJar:
+            return .pink
+        }
+    }
+
+    private func purchaseFeatureColor(at index: Int) -> Color {
+        switch index {
+        case 0:
+            return .purple
+        case 1:
+            return .blue
+        case 2:
+            return .green
+        default:
+            return .orange
+        }
+    }
     
     @State private var heartPulse = false
     
-    private func animatedTipJarItem() -> some View {
+    private func animatedTipJarItem(_ resource: VoiceInkLicenseManagementResourceLink) -> some View {
         HStack(spacing: 8) {
-            Image(systemName: "heart.fill")
+            Image(systemName: resource.systemImageName)
                 .font(.system(size: 16, weight: .medium))
-                .foregroundStyle(.pink)
+                .foregroundStyle(resourceColor(for: resource.id))
                 .scaleEffect(heartPulse ? 1.3 : 1.0)
                 .animation(
                     Animation.easeInOut(duration: 1.2)
@@ -296,10 +309,9 @@ struct LicenseManagementView: View {
                     heartPulse = true
                 }
             
-            Text("Tip Jar")
+            Text(resource.title)
                 .font(.system(size: 13, weight: .medium))
                 .foregroundStyle(.primary)
         }
     }
 }
-

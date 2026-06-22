@@ -222,7 +222,10 @@ class PowerModeSessionManager {
             await stateProvider.cleanupModelResources()
         case .cleanupAndLoadLocalModel(let modelName):
             await stateProvider.cleanupModelResources()
-            if let localModel = stateProvider.availableModels.first(where: { $0.name == modelName }) {
+            if let localModel = VoiceInkWhisperModelFiles.downloadedLocalModelFile(
+                forModelName: modelName,
+                in: stateProvider.availableModels
+            ) {
                 do {
                     try await stateProvider.loadModel(localModel)
                 } catch {

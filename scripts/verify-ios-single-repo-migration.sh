@@ -11022,6 +11022,16 @@ require_pattern \
   'VoiceInkPowerModeSessionDiagnostics\.(notConfiguredMessage|localModelLoadFailedMessage|recoveringAbandonedSessionMessage|saveFailedMessage|loadFailedMessage)' \
   VoiceInk/PowerMode/PowerModeSessionManager.swift
 
+require_pattern \
+  "macOS Power Mode session manager uses shared local Whisper model lookup" \
+  'VoiceInkWhisperModelFiles\.downloadedLocalModelFile' \
+  VoiceInk/PowerMode/PowerModeSessionManager.swift
+
+reject_pattern \
+  "macOS Power Mode session manager avoids shell-owned local Whisper model lookup" \
+  'availableModels\.first\(where:' \
+  VoiceInk/PowerMode/PowerModeSessionManager.swift
+
 reject_pattern \
   "macOS Power Mode session manager avoids shell-owned session diagnostic copy" \
   '"(SessionManager not configured\.|Power Mode: Failed to load local model|Recovering abandoned Power Mode session\.|Error saving Power Mode session:|Error loading Power Mode session:)' \

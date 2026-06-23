@@ -1345,6 +1345,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/Mode.swift
 
 require_pattern \
+  "shared mode state owns post-processing toggle repair" \
+  'setPostProcessingEnabled\(' \
+  VoiceInkCore/Sources/VoiceInkCore/Mode.swift
+
+require_pattern \
   "shared mode list policy lives in VoiceInkCore" \
   'VoiceInkModeListPolicy|appending\(|replacing\(|removing\(at:|defaultModeRepairPlan|VoiceInkModeListRepairPlan' \
   VoiceInkCore/Sources/VoiceInkCore/Mode.swift
@@ -1362,6 +1367,11 @@ require_pattern \
 require_pattern \
   "core checks execute mode settings repair action tests" \
   'ModeRuntimeConfigurationTests\.testModeSettingsRepairPlanBuilds(NoActionsWhenCurrentStateMatches|SelectionAndLanguageActions|DefaultModeSeedActionsInOrder)' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute mode post-processing toggle repair test" \
+  'ModeRuntimeConfigurationTests\.testModePostProcessingToggleRepairsUnavailableProviderSelection' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -1426,9 +1436,19 @@ require_pattern \
   'modeFormProviderAvailability|providerAvailability\.(canSave|repairedMode|transcriptionProviders|postProcessingProviders)' \
   iOS/VoiceInk-ios/ModeConfigurationView.swift
 
+require_pattern \
+  "iOS mode configuration delegates post-processing toggle repair to shared mode state" \
+  'mode\.setPostProcessingEnabled\(' \
+  iOS/VoiceInk-ios/ModeConfigurationView.swift
+
 reject_pattern \
   "iOS mode configuration avoids shallow form pass-through properties" \
   'private var +(canSave|presentation|providerAvailability)\b' \
+  iOS/VoiceInk-ios/ModeConfigurationView.swift
+
+reject_pattern \
+  "iOS mode configuration avoids shell-owned post-processing toggle repair sequencing" \
+  'onChange\(of: mode\.isPostProcessingEnabled\)|\$mode\.isPostProcessingEnabled' \
   iOS/VoiceInk-ios/ModeConfigurationView.swift
 
 require_pattern \

@@ -410,6 +410,14 @@ public struct Mode: Identifiable, Codable {
         postProcessingModel = provider.selectedModel(postProcessingModel, for: .postProcessing)
     }
 
+    public mutating func setPostProcessingEnabled(
+        _ isEnabled: Bool,
+        providerAvailability: VoiceInkModeFormProviderAvailability
+    ) {
+        isPostProcessingEnabled = isEnabled
+        repairProviderSelection(providerAvailability: providerAvailability)
+    }
+
     public mutating func repairModelSelection() {
         transcriptionModel = effectiveTranscriptionModel
         postProcessingModel = effectivePostProcessingModel

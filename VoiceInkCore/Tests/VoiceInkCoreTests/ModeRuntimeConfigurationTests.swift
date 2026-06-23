@@ -691,4 +691,25 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
         XCTAssertEqual(originalMode.transcriptionProvider, .localWhisper)
         XCTAssertEqual(repairedMode.transcriptionProvider, .deepgram)
     }
+
+    func testModePostProcessingToggleRepairsUnavailableProviderSelection() {
+        let availability = VoiceInkModeFormProviderAvailability(
+            transcriptionProviders: [.localWhisper],
+            postProcessingProviders: [.gemini]
+        )
+        var mode = Mode(
+            name: "Clean",
+            transcriptionProvider: .localWhisper,
+            isPostProcessingEnabled: false,
+            postProcessingProvider: .voiceInk,
+            postProcessingModel: "stale-post-processing-model"
+        )
+
+        mode.setPostProcessingEnabled(true, providerAvailability: availability)
+
+        XCTAssertTrue(mode.isPostProcessingEnabled)
+        XCTAssertEqual(mode.postProcessingProvider, .gemini)
+        XCTAssertEqual(mode.postProcessingModel, VoiceInkAIModelCatalog.defaultModel(for: .gemini))
+        XCTAssertTrue(availability.canSave(mode))
+    }
 }

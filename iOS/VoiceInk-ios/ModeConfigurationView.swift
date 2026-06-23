@@ -48,7 +48,18 @@ struct ModeConfigurationView: View {
                 header: Text(formPresentation.postProcessingSectionTitle),
                 footer: formPresentation.postProcessingFooterText.map { Text($0) }
             ) {
-                Toggle(formPresentation.enablePostProcessingTitle, isOn: $mode.isPostProcessingEnabled)
+                Toggle(
+                    formPresentation.enablePostProcessingTitle,
+                    isOn: Binding(
+                        get: { mode.isPostProcessingEnabled },
+                        set: { isEnabled in
+                            mode.setPostProcessingEnabled(
+                                isEnabled,
+                                providerAvailability: providerAvailability
+                            )
+                        }
+                    )
+                )
                 
                 if formStatePresentation.shouldShowPostProcessingControls {
                     Picker(formPresentation.providerPickerTitle, selection: $mode.postProcessingProvider) {
@@ -95,9 +106,6 @@ struct ModeConfigurationView: View {
         }
         .onAppear(perform: repairUnavailableProviderSelections)
         .onChange(of: providerAvailability) { _, _ in
-            repairUnavailableProviderSelections()
-        }
-        .onChange(of: mode.isPostProcessingEnabled) { _, _ in
             repairUnavailableProviderSelections()
         }
         .onChange(of: mode.transcriptionProvider) { _, _ in

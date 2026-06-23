@@ -17,17 +17,18 @@ struct ProviderAPIKeyView: View {
         Form {
             Section(header: Text(presentation.apiKeySectionTitle)) {
                 if apiKeyFormState.isEditing {
+                    let saveAction = controlPresentation.saveRuntimeAction(save: saveKey)
                     SecureField(presentation.apiKeyPlaceholder, text: $apiKeyFormState.enteredKey)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
                     HStack {
-                        Button(action: saveKey) {
+                        Button(action: saveAction ?? {}) {
                             Label(
                                 presentation.saveButtonTitle,
                                 systemImage: presentation.saveButtonSystemImageName
                             )
                         }
-                        .disabled(controlPresentation.isSaveButtonDisabled)
+                        .disabled(saveAction == nil)
                         Spacer()
                         if controlPresentation.verificationControl.isProgressVisible {
                             ProgressView().progressViewStyle(.circular)

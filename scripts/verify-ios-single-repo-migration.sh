@@ -3072,6 +3072,13 @@ require_patterns \
   'isVerifyButtonDisabled' \
   'isProgressVisible'
 
+require_patterns \
+  "shared provider API-key form control owns iOS save runtime action mapping" \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift \
+  'public func saveRuntimeAction' \
+  'save: @escaping \(\) -> Void' \
+  'isSaveButtonDisabled \? nil : save'
+
 require_pattern \
   "shared provider API-key verification start plan lives in VoiceInkCore" \
   'VoiceInkProviderAPIKeyVerificationStartPlan|verificationStartPlan|VoiceInkProviderAPIKeyMissingVerificationCandidatePolicy' \
@@ -3117,10 +3124,12 @@ require_pattern \
   'ProviderAccessRequirementTests\.testProviderAPIKeyStateBuildsVerificationApplicationUpdatePlan' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
-require_pattern \
+require_patterns \
   "core checks execute provider API-key iOS control presentation test" \
-  'ProviderAccessRequirementTests\.testProviderAPIKeyFormStateOwnsIOSControlPresentation|ProviderAccessRequirementTests\.testProviderAPIKeyVerificationControlOwnsIOSRuntimeActionMapping' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'ProviderAccessRequirementTests\.testProviderAPIKeyFormStateOwnsIOSControlPresentation' \
+  'ProviderAccessRequirementTests\.testProviderAPIKeyVerificationControlOwnsIOSRuntimeActionMapping' \
+  'ProviderAccessRequirementTests\.testProviderAPIKeyFormControlPresentationOwnsIOSSaveRuntimeActionMapping'
 
 require_pattern \
   "shared provider API-key form presentation lives in VoiceInkCore" \
@@ -3144,7 +3153,12 @@ require_pattern \
 
 require_pattern \
   "iOS API-key view uses shared progress presentation through form state" \
-  'apiKeyFormState\.(iOSControlPresentation|iOSVisibleResultFeedback)|verificationControl\.(isProgressVisible|runtimeAction|isVerifyButtonDisabled)|iOSVerifiedKeyFeedback|iOSResultFeedback|effectiveSystemImageName' \
+  'apiKeyFormState\.(iOSControlPresentation|iOSVisibleResultFeedback)|controlPresentation\.saveRuntimeAction|verificationControl\.(isProgressVisible|runtimeAction|isVerifyButtonDisabled)|iOSVerifiedKeyFeedback|iOSResultFeedback|effectiveSystemImageName' \
+  iOS/VoiceInk-ios/ProviderAPIKeyView.swift
+
+reject_pattern \
+  "iOS API-key view avoids direct save button side effect wiring" \
+  'Button\(action: +saveKey\)|\.disabled\(controlPresentation\.isSaveButtonDisabled\)' \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
 reject_pattern \

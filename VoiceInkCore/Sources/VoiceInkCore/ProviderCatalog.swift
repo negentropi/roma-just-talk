@@ -323,6 +323,12 @@ public struct VoiceInkProviderAPIKeyFormControlPresentation: Equatable, Sendable
         self.isSaveButtonDisabled = isSaveButtonDisabled
         self.verificationControl = verificationControl
     }
+
+    public func saveRuntimeAction(
+        save: @escaping () -> Void
+    ) -> (() -> Void)? {
+        isSaveButtonDisabled ? nil : save
+    }
 }
 
 public struct VoiceInkProviderAPIKeyStoredKeyPresentation: Equatable, Sendable {

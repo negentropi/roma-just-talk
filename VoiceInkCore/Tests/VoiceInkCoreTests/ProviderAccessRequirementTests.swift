@@ -546,6 +546,25 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertNil(VoiceInkProviderAPIKeyVerificationControl.progress.runtimeAction {})
     }
 
+    func testProviderAPIKeyFormControlPresentationOwnsIOSSaveRuntimeActionMapping() {
+        var didSave = false
+
+        let saveAction = VoiceInkProviderAPIKeyFormControlPresentation(
+            isSaveButtonDisabled: false,
+            verificationControl: .verifyButton(isDisabled: true)
+        ).saveRuntimeAction {
+            didSave = true
+        }
+
+        XCTAssertTrue(saveAction != nil)
+        saveAction?()
+        XCTAssertTrue(didSave)
+        XCTAssertNil(VoiceInkProviderAPIKeyFormControlPresentation(
+            isSaveButtonDisabled: true,
+            verificationControl: .verifyButton(isDisabled: false)
+        ).saveRuntimeAction {})
+    }
+
     func testProviderAPIKeyFormPresentationBuildsProviderCopy() {
         let presentation = VoiceInkProviderKind.deepgram.apiKeyFormPresentation
 

@@ -1642,10 +1642,13 @@ reject_pattern \
   'retranscribeStoredAudio|TranscriptionRetryService\.shared\.transcribe\(fileURL:' \
   iOS/VoiceInk-ios/RecordingManager.swift
 
+section "obsolete standalone recording transcription draft module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/RecordingTranscriptionDraft.swift
+
 require_pattern \
-  "shared recording transcription draft lives in VoiceInkCore" \
+  "shared recording transcription draft lives with completed transcription drafts" \
   'VoiceInkRecordingTranscriptionDraft' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingTranscriptionDraft.swift
+  VoiceInkCore/Sources/VoiceInkCore/CompletedTranscriptionDraft.swift
 
 section "obsolete standalone transcription status module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/TranscriptionStatus.swift

@@ -260,6 +260,17 @@ public extension VoiceInkProviderAPIKeyState {
             persistenceActions: mutationPlan.persistenceActions(verificationFlag: verified)
         )
     }
+
+    func applyingEditPlan(
+        _ plan: VoiceInkProviderAPIKeyEditPlan,
+        for provider: VoiceInkProviderKind
+    ) -> VoiceInkProviderAPIKeyStateUpdatePlan {
+        guard let verificationFlag = plan.verificationFlagToPersist else {
+            return VoiceInkProviderAPIKeyStateUpdatePlan(state: self, persistenceActions: [])
+        }
+
+        return applyingVerification(verificationFlag, for: provider)
+    }
 }
 
 public struct VoiceInkProviderAccessSnapshot: Equatable, Sendable {

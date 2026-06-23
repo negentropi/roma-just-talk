@@ -2988,6 +2988,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
 
 require_pattern \
+  "shared provider API-key state applies stored-key edit plans" \
+  'applyingEditPlan\(' \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift
+
+require_pattern \
   "shared provider API-key form state owns iOS result feedback visibility" \
   'iOSVisibleResultFeedback\(isKeyVerified:' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
@@ -3028,6 +3033,11 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
+  "core checks execute provider API-key edit state update test" \
+  'ProviderAccessRequirementTests\.testProviderAPIKeyStateBuildsStoredKeyEditUpdatePlan' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "core checks execute provider API-key iOS control presentation test" \
   'ProviderAccessRequirementTests\.testProviderAPIKeyFormStateOwnsIOSControlPresentation' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
@@ -3044,8 +3054,13 @@ require_pattern \
 
 require_pattern \
   "iOS API-key view uses shared stored-key edit plan" \
-  'iOSStoredKeyEditPlan|editPlan\.formState|editPlan\.verificationFlagToPersist' \
+  'iOSStoredKeyEditPlan|editPlan\.formState|settings\.applyProviderAPIKeyEditPlan\(editPlan, for: provider\)' \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
+
+require_pattern \
+  "iOS settings adapter applies provider API-key edit plans through shared state update" \
+  'applyProviderAPIKeyEditPlan|apiKeyState\.applyingEditPlan\(plan, for: provider\)' \
+  iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \
   "iOS API-key view uses shared progress presentation through form state" \
@@ -3064,7 +3079,7 @@ reject_pattern \
 
 reject_pattern \
   "iOS API-key view avoids shell-owned stored-key edit sequencing" \
-  'apiKeyFormState = apiKeyFormState\.editingStoredKey|setKeyVerified\(false' \
+  'apiKeyFormState = apiKeyFormState\.editingStoredKey|setKeyVerified\(false|editPlan\.verificationFlagToPersist' \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
 require_pattern \

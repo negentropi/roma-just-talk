@@ -130,6 +130,16 @@ final class AppSettings: ObservableObject {
         )
     }
 
+    func applyProviderAPIKeyEditPlan(
+        _ plan: VoiceInkProviderAPIKeyEditPlan,
+        for provider: VoiceInkProviderKind
+    ) {
+        applyProviderAPIKeyStateUpdatePlan(
+            apiKeyState.applyingEditPlan(plan, for: provider),
+            for: provider
+        )
+    }
+
     private func applyProviderAPIKeyStateUpdatePlan(
         _ plan: VoiceInkProviderAPIKeyStateUpdatePlan,
         for provider: VoiceInkProviderKind

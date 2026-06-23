@@ -56,9 +56,7 @@ struct ProviderAPIKeyView: View {
                                     settings.storedAPIKey(for: provider)
                                 )
                                 apiKeyFormState = editPlan.formState
-                                if let verificationFlag = editPlan.verificationFlagToPersist {
-                                    settings.setKeyVerified(verificationFlag, for: provider)
-                                }
+                                settings.applyProviderAPIKeyEditPlan(editPlan, for: provider)
                             }
                         }
                         if let existing = storedKeyPresentation.obfuscatedKey {

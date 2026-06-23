@@ -272,6 +272,39 @@ final class DashboardMetricsTests: XCTestCase {
         XCTAssertEqual(VoiceInkNoteListPresentation.startRecordingSystemImageName, "mic.fill")
     }
 
+    func testHelpResourcesPresentationPreservesMacOSCopyIconsAndURLs() {
+        XCTAssertEqual(VoiceInkHelpResourcesPresentation.title, "Help & Resources")
+        XCTAssertEqual(VoiceInkHelpResourcesPresentation.externalLinkSystemImageName, "arrow.up.right")
+        XCTAssertEqual(
+            VoiceInkHelpResourcesPresentation.resources,
+            [
+                VoiceInkHelpResourcePresentation(
+                    id: .recommendedModels,
+                    systemImageName: "sparkles",
+                    title: "Recommended Models",
+                    url: URL(string: "https://tryvoiceink.com/recommended-models")!
+                ),
+                VoiceInkHelpResourcePresentation(
+                    id: .videoGuides,
+                    systemImageName: "video.fill",
+                    title: "YouTube Videos & Guides",
+                    url: URL(string: "https://www.youtube.com/@tryvoiceink/videos")!
+                ),
+                VoiceInkHelpResourcePresentation(
+                    id: .documentation,
+                    systemImageName: "book.fill",
+                    title: "Documentation",
+                    url: URL(string: "https://tryvoiceink.com/docs")!
+                ),
+                VoiceInkHelpResourcePresentation(
+                    id: .supportEmail,
+                    systemImageName: "exclamationmark.bubble.fill",
+                    title: "Feedback or Issues?"
+                )
+            ]
+        )
+    }
+
     func testDashboardPromotionPresentationPreservesMacOSCopyURLsAndDismissalKey() {
         XCTAssertEqual(
             VoiceInkDashboardPromotionPresentation.affiliateDismissedKey,

@@ -11949,9 +11949,19 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/DashboardMetrics.swift
 
 require_pattern \
+  "shared help resources presentation lives in VoiceInkCore" \
+  'VoiceInkHelpResourcesPresentation|VoiceInkHelpResourcePresentation|recommendedModelsURLString = "https://tryvoiceink\.com/recommended-models"|videoGuidesURLString = "https://www\.youtube\.com/@tryvoiceink/videos"|documentationURLString = "https://tryvoiceink\.com/docs"|resources:' \
+  VoiceInkCore/Sources/VoiceInkCore/DashboardMetrics.swift
+
+require_pattern \
   "macOS dashboard promotions use shared presentation" \
   'VoiceInkDashboardPromotionPresentation\.(affiliateDismissedKey|defaultIsAffiliateDismissed|cards)|VoiceInkDashboardPromotionCardPresentation' \
   VoiceInk/Views/Metrics/DashboardPromotionsSection.swift
+
+require_pattern \
+  "macOS help resources use shared presentation" \
+  'VoiceInkHelpResourcesPresentation\.(title|resources|externalLinkSystemImageName)|VoiceInkHelpResourcePresentation' \
+  VoiceInk/Views/Metrics/HelpAndResourcesSection.swift
 
 reject_pattern \
   "dashboard promotions avoid duplicate license state adapters" \
@@ -11964,10 +11974,20 @@ require_pattern \
   'DashboardMetricsTests\.testDashboardPromotionPresentationPreservesMacOSCopyURLsAndDismissalKey|DashboardMetricsTests\.testDashboardPromotionPolicyMatchesMacOSLicenseVisibilityRules' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
+require_pattern \
+  "core checks execute help resources presentation tests" \
+  'DashboardMetricsTests\.testHelpResourcesPresentationPreservesMacOSCopyIconsAndURLs' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
 reject_pattern \
   "macOS dashboard promotions avoid shell-owned promotion policy" \
   'VoiceInkAffiliatePromotionDismissed|https://tryvoiceink\.com/(social-share|affiliate)|"(30% OFF|Unlock VoiceInk Pro For Less|Share VoiceInk on your socials, and instantly unlock a 30% discount on VoiceInk Pro\.|Share & Unlock|AFFILIATE 30%|Earn With The VoiceInk Affiliate Program|Share VoiceInk with friends or your audience and receive 30% on every referral that upgrades\.|Explore Affiliate|Dismiss this promotion)"|shouldShow(Upgrade|Affiliate|Promotions)' \
   VoiceInk/Views/Metrics/DashboardPromotionsSection.swift
+
+reject_pattern \
+  "macOS help resources avoid shell-owned resource copy and URLs" \
+  'https://tryvoiceink\.com/(recommended-models|docs)|https://www\.youtube\.com/@tryvoiceink/videos|"(Help & Resources|Recommended Models|YouTube Videos & Guides|Documentation|Feedback or Issues\\?|sparkles|video\.fill|book\.fill|exclamationmark\.bubble\.fill|arrow\.up\.right)"' \
+  VoiceInk/Views/Metrics/HelpAndResourcesSection.swift
 
 require_pattern \
   "iOS note-list uses shared chrome presentation" \
@@ -12062,17 +12082,17 @@ require_pattern \
 
 require_pattern \
   "core tests pin macOS dashboard presentation copy and policy" \
-  'testDashboardPresentationPreservesMacOSDashboardCopy|testDashboardPresentationBuildsHeroTitleAndSubtitle|testDashboardPresentationBuildsMacOSMetricCards' \
+  'testDashboardPresentationPreservesMacOSDashboardCopy|testDashboardPresentationBuildsHeroTitleAndSubtitle|testDashboardPresentationBuildsMacOSMetricCards|testHelpResourcesPresentationPreservesMacOSCopyIconsAndURLs' \
   VoiceInkCore/Tests/VoiceInkCoreTests/DashboardMetricsTests.swift
 
 require_pattern \
   "core check runner executes macOS dashboard presentation tests" \
-  'DashboardMetricsTests\.testDashboardPresentationPreservesMacOSDashboardCopy|DashboardMetricsTests\.testDashboardPresentationBuildsHeroTitleAndSubtitle|DashboardMetricsTests\.testDashboardPresentationBuildsMacOSMetricCards' \
+  'DashboardMetricsTests\.testDashboardPresentationPreservesMacOSDashboardCopy|DashboardMetricsTests\.testDashboardPresentationBuildsHeroTitleAndSubtitle|DashboardMetricsTests\.testDashboardPresentationBuildsMacOSMetricCards|DashboardMetricsTests\.testHelpResourcesPresentationPreservesMacOSCopyIconsAndURLs' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
-  "migration checklist tracks shared dashboard promotion presentation" \
-  'macOS dashboard hero/empty/action/stat-card/promotion presentation.*VoiceInkDashboardPromotionPresentation' \
+  "migration checklist tracks shared dashboard promotion and help resources presentation" \
+  'macOS dashboard hero/empty/action/stat-card/promotion/help-resource presentation.*VoiceInkHelpResourcesPresentation' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

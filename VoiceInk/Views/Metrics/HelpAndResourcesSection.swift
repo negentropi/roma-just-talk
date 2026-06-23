@@ -1,38 +1,17 @@
 import SwiftUI
+import VoiceInkCore
 
 struct HelpAndResourcesSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("Help & Resources")
+            Text(VoiceInkHelpResourcesPresentation.title)
                 .font(.system(size: 18, weight: .semibold, design: .rounded))
                 .foregroundColor(.primary)
 
             VStack(alignment: .leading, spacing: 10) {
-                resourceLink(
-                    icon: "sparkles",
-                    title: "Recommended Models",
-                    url: "https://tryvoiceink.com/recommended-models"
-                )
-
-                resourceLink(
-                    icon: "video.fill",
-                    title: "YouTube Videos & Guides",
-                    url: "https://www.youtube.com/@tryvoiceink/videos"
-                )
-
-                resourceLink(
-                    icon: "book.fill",
-                    title: "Documentation",
-                    url: "https://tryvoiceink.com/docs"
-                )
-                
-                resourceLink(
-                    icon: "exclamationmark.bubble.fill",
-                    title: "Feedback or Issues?",
-                    action: {
-                        EmailSupport.openSupportEmail()
-                    }
-                )
+                ForEach(VoiceInkHelpResourcesPresentation.resources) { resource in
+                    resourceLink(resource)
+                }
             }
         }
         .padding(18)
@@ -40,27 +19,27 @@ struct HelpAndResourcesSection: View {
         .background(CardBackground(isSelected: false, cornerRadius: 22))
     }
     
-    private func resourceLink(icon: String, title: String, url: String? = nil, action: (() -> Void)? = nil) -> some View {
+    private func resourceLink(_ resource: VoiceInkHelpResourcePresentation) -> some View {
         Button(action: {
-            if let action = action {
-                action()
-            } else if let urlString = url, let url = URL(string: urlString) {
+            if let url = resource.url {
                 NSWorkspace.shared.open(url)
+            } else {
+                EmailSupport.openSupportEmail()
             }
         }) {
             HStack {
-                Image(systemName: icon)
+                Image(systemName: resource.systemImageName)
                     .font(.system(size: 15, weight: .medium))
                     .foregroundStyle(Color.accentColor)
                     .frame(width: 20)
                 
-                Text(title)
+                Text(resource.title)
                     .font(.system(size: 13))
                     .fontWeight(.semibold)
                 
                 Spacer()
                 
-                Image(systemName: "arrow.up.right")
+                Image(systemName: VoiceInkHelpResourcesPresentation.externalLinkSystemImageName)
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(.tertiary)
             }

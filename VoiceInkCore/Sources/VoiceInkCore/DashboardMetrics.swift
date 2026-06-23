@@ -268,6 +268,68 @@ public enum VoiceInkNoteListPresentation {
     public static let startRecordingSystemImageName = "mic.fill"
 }
 
+public enum VoiceInkHelpResourceKind: String, Equatable, Hashable, Sendable {
+    case recommendedModels
+    case videoGuides
+    case documentation
+    case supportEmail
+}
+
+public struct VoiceInkHelpResourcePresentation: Equatable, Sendable, Identifiable {
+    public let id: VoiceInkHelpResourceKind
+    public let systemImageName: String
+    public let title: String
+    public let url: URL?
+
+    public init(
+        id: VoiceInkHelpResourceKind,
+        systemImageName: String,
+        title: String,
+        url: URL? = nil
+    ) {
+        self.id = id
+        self.systemImageName = systemImageName
+        self.title = title
+        self.url = url
+    }
+}
+
+public enum VoiceInkHelpResourcesPresentation {
+    public static let title = "Help & Resources"
+    public static let externalLinkSystemImageName = "arrow.up.right"
+    public static let recommendedModelsURLString = "https://tryvoiceink.com/recommended-models"
+    public static let videoGuidesURLString = "https://www.youtube.com/@tryvoiceink/videos"
+    public static let documentationURLString = "https://tryvoiceink.com/docs"
+
+    public static var resources: [VoiceInkHelpResourcePresentation] {
+        [
+            VoiceInkHelpResourcePresentation(
+                id: .recommendedModels,
+                systemImageName: "sparkles",
+                title: "Recommended Models",
+                url: URL(string: recommendedModelsURLString)!
+            ),
+            VoiceInkHelpResourcePresentation(
+                id: .videoGuides,
+                systemImageName: "video.fill",
+                title: "YouTube Videos & Guides",
+                url: URL(string: videoGuidesURLString)!
+            ),
+            VoiceInkHelpResourcePresentation(
+                id: .documentation,
+                systemImageName: "book.fill",
+                title: "Documentation",
+                url: URL(string: documentationURLString)!
+            ),
+            VoiceInkHelpResourcePresentation(
+                id: .supportEmail,
+                systemImageName: "exclamationmark.bubble.fill",
+                title: "Feedback or Issues?"
+            )
+        ]
+    }
+}
+
 public enum VoiceInkDashboardPromotionKind: String, Equatable, Hashable, Sendable {
     case upgrade
     case affiliate

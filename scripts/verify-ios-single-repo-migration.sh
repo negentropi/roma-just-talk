@@ -12183,14 +12183,15 @@ require_pattern \
   'VoiceInkAppIdentity|VoiceInkStorageStartupDiagnostics|VoiceInkMacOSStorageAlertPresentation|VoiceInkMacOSNavigationDestination|VoiceInkMacOSMainViewItem|VoiceInkMacOSNavigationRequest|VoiceInkMacOSFileTranscriptionRequest|bundleIdentifier = "com\.prakashjoshipax\.VoiceInk"|loggingSubsystem = "com\.prakashjoshipax\.voiceink"|displayName = "roma just talk"|compactDisplayName = "roma-just-talk"|iOSRecordDeepLinkScheme = "voiceink"|iOSRecordDeepLinkHost = "record"|iCloudContainerIdentifier|iOSAppGroupIdentifier|iOSRecordDeepLinkURL|iOSStopRecordingDarwinNotificationName|iOSRecordingStateChangedDarwinNotificationName|iOSStopRecordingFromKeyboardNotificationName|macOSApplicationSupportDirectory|storageFallbackWarningPresentation|storageFailurePresentation|modelContainerInitializationFailedMessage|modelContainerUnavailablePreconditionMessage|iOSModelContainerCreationFailedMessage|errorDomain' \
   VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift
 
-require_file VoiceInkCore/Sources/VoiceInkCore/AppIntentPresentation.swift
+section "obsolete standalone AppIntent presentation module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/AppIntentPresentation.swift
 
 section "obsolete standalone mini-recorder request module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/MiniRecorderRequest.swift
 
 require_patterns \
-  "shared macOS AppIntent presentation lives in VoiceInkCore" \
-  VoiceInkCore/Sources/VoiceInkCore/AppIntentPresentation.swift \
+  "shared macOS AppIntent presentation lives with app identity" \
+  VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift \
   'VoiceInkAppIntentPresentation' \
   'VoiceInkMiniRecorderAppIntentPresentation' \
   '"Toggle VoiceInk Recorder"' \
@@ -12201,8 +12202,8 @@ require_patterns \
   '"VoiceInk recorder dismissed"'
 
 require_patterns \
-  "shared mini-recorder request notifications live with AppIntent presentation" \
-  VoiceInkCore/Sources/VoiceInkCore/AppIntentPresentation.swift \
+  "shared mini-recorder request notifications live with app identity" \
+  VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift \
   'VoiceInkMiniRecorderRequest' \
   'toggleNotificationName = Notification\.Name\("toggleMiniRecorder"\)' \
   'dismissNotificationName = Notification\.Name\("dismissMiniRecorder"\)'

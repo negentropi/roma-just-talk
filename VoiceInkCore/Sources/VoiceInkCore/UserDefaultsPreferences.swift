@@ -362,6 +362,21 @@ public struct VoiceInkIOSFirstTimeSetupPlan {
         self.modeSettingsRepairPlan = modeSettingsRepairPlan
         self.shouldSaveHasCompletedOnboarding = shouldSaveHasCompletedOnboarding
     }
+
+    public var applicationActions: [VoiceInkIOSFirstTimeSetupAction] {
+        var actions: [VoiceInkIOSFirstTimeSetupAction] = [
+            .applyModeSettingsRepair(modeSettingsRepairPlan)
+        ]
+        if shouldSaveHasCompletedOnboarding {
+            actions.append(.saveHasCompletedOnboarding)
+        }
+        return actions
+    }
+}
+
+public enum VoiceInkIOSFirstTimeSetupAction {
+    case applyModeSettingsRepair(VoiceInkModeSettingsRepairPlan)
+    case saveHasCompletedOnboarding
 }
 
 public enum VoiceInkIOSFirstTimeSetupPolicy {

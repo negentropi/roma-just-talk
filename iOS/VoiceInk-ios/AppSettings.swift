@@ -332,10 +332,13 @@ final class AppSettings: ObservableObject {
     }
 
     private func applyFirstTimeSetupPlan(_ plan: VoiceInkIOSFirstTimeSetupPlan) {
-        applyModeSettingsRepairPlan(plan.modeSettingsRepairPlan)
-
-        if plan.shouldSaveHasCompletedOnboarding {
-            VoiceInkOnboardingPreference.saveHasCompletedOnboarding()
+        for action in plan.applicationActions {
+            switch action {
+            case .applyModeSettingsRepair(let modeSettingsRepairPlan):
+                applyModeSettingsRepairPlan(modeSettingsRepairPlan)
+            case .saveHasCompletedOnboarding:
+                VoiceInkOnboardingPreference.saveHasCompletedOnboarding()
+            }
         }
     }
 

@@ -44,7 +44,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - iOS app/keyboard recording timing for app-launch recording start, keyboard recording-state polling, fallback button reset, deferred app-launch recording requests while onboarding is incomplete, and iOS recording coordination diagnostic copy; app and keyboard shells still own scheduling execution, notification delivery, and App Group mutation execution
 - iOS keyboard recording button title/icon presentation for idle, recording, fallback, current-state selection, tap-action planning for stop-vs-open-app, keyboard open-main-app fallback order/diagnostic copy, and app-side keyboard stop-request handling; keyboard/app shells still own UIKit/SwiftUI rendering, colors, haptics, URL-opening execution, notification delivery, and App Group stop execution
 - prompt templates and prompt text
-- predefined prompt IDs, labels, prompt text, icons, descriptions, and system-instruction flags
+- predefined prompt IDs, labels, prompt text, icons, descriptions, and system-instruction flags colocated with custom prompt persistence/repair policy
 - custom prompt system-instruction wrapping
 - transcription prompt preference loading/saving, selected-language local Whisper prompt fallback, and provider/use-specific request prompts for recorded-file, streaming, local, and direct transcription
 - post-processing request construction and output filtering
@@ -118,7 +118,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - AI-enhancement prompt context assembly for selected text, clipboard, current-window text, custom vocabulary prompt text, custom vocabulary tags, and screen-capture context window selection/text formatting; platform shells still own OS access, capture, and vocabulary storage
 - AI-enhancement result shape and completed-result construction for enhanced text, duration, selected model, prompt name, and request message metadata; transcription run results carry successful post-processing metadata through the same shape, derive success and enhancement duration from that result, and preserve attempted-model/error fields; platform shells still own provider execution and persistence targets
 - AI-enhancement custom prompt record shape, Codable compatibility, and final-prompt wrapping; macOS still owns SwiftUI prompt rendering and prompt-store orchestration
-- predefined-prompt repair/merge policy, startup prompt-store repair ordering, enable-time selected-prompt fallback planning, and trigger-detectable prompt filtering; macOS still owns when the prompt store is loaded and saved
+- predefined-prompt metadata, repair/merge policy, startup prompt-store repair ordering, enable-time selected-prompt fallback planning, and trigger-detectable prompt filtering; macOS still owns when the prompt store is loaded and saved
 - AI-enhancement custom prompt array mutation, backup import/export prompt filtering/merge policy, selected-prompt repair, and selected-prompt persistence helpers; platform shells still own notifications and UI state updates
 - selected-prompt repair, enable-time prompt settings-state fallback, and base prompt-text selection for AI enhancement; platform shells still own context capture and request execution
 - AI-enhancement prompt-store storage keys and context-toggle storage; macOS still owns persistence timing, notifications, and UI orchestration
@@ -173,7 +173,7 @@ Current macOS consumers of shared remote transport:
 - macOS recording, audio-file transcription, and retry transcription use `VoiceInkTranscriptionCleanupConfiguration` directly for shared raw-output filtering and cleanup preferences.
 - macOS model definitions read supported language sets through a thin `ModelProvider` adapter backed by `VoiceInkLanguageCatalog`; the old `LanguageDictionary` wrapper is gone.
 - macOS metrics dashboard duration copy uses `VoiceInkDurationPresentation`, removing the last dashboard-local duration formatter.
-- macOS predefined prompt persistence adapts `VoiceInkPredefinedPrompts` into `VoiceInkCustomPrompt`, so stable prompt IDs and metadata live in shared core.
+- macOS predefined prompt persistence adapts `VoiceInkPredefinedPrompts` into `VoiceInkCustomPrompt`, both colocated with shared custom-prompt policy, so stable prompt IDs and metadata live in shared core.
 - macOS custom prompt final text delegates to `VoiceInkAIPrompts.finalPromptText`, so the system-instruction wrapper stays shared.
 - macOS uses `VoiceInkCustomPrompt` directly, keeping the SwiftUI prompt-grid adapter in the macOS shell while moving the prompt record and Codable compatibility into `VoiceInkCore`.
 - macOS predefined-prompt initialization now delegates to `VoiceInkCustomPromptPolicy`, and the old shell-only `PredefinedPrompts` adapter was removed.

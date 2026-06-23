@@ -5357,6 +5357,14 @@ require_pattern \
   'macOS custom prompt icon catalog, prompt-card trigger summary/action symbols, grid empty/help copy and info icon, editor labels/placeholders/help/action symbols, and delete confirmation copy route through `VoiceInkCustomPromptPresentation`' \
   docs/ios-single-repo-migration.md
 
+section "obsolete standalone predefined prompts module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/PredefinedPrompts.swift
+
+require_pattern \
+  "predefined prompt metadata lives with custom prompt policy" \
+  'VoiceInkPredefinedPrompt|VoiceInkPredefinedPrompts|defaultPromptId|assistantPromptId|VoiceInkPromptTemplates\.macTemplate|VoiceInkAIPrompts\.assistantMode' \
+  VoiceInkCore/Sources/VoiceInkCore/CustomPrompt.swift
+
 require_pattern \
   "shared custom prompt policy owns startup prompt-store repair" \
   'startupStoreState' \

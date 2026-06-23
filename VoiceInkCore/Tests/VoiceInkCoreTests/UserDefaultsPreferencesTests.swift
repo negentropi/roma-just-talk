@@ -1472,6 +1472,30 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(configuration.cutoffDate(from: referenceDate), Date(timeIntervalSince1970: 1_800))
     }
 
+    func testTranscriptionAutoCleanupConfigurationPlansCompletedTranscriptionAction() {
+        XCTAssertEqual(
+            VoiceInkTranscriptionAutoCleanupConfiguration(
+                isEnabled: false,
+                retentionMinutes: 0
+            ).completionAction,
+            .ignore
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptionAutoCleanupConfiguration(
+                isEnabled: true,
+                retentionMinutes: 30
+            ).completionAction,
+            .sweepOldTranscriptions
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptionAutoCleanupConfiguration(
+                isEnabled: true,
+                retentionMinutes: 0
+            ).completionAction,
+            .deleteCompletedTranscription
+        )
+    }
+
     func testTranscriptionAutoCleanupBackupPreferencesPreserveMacOSExportShape() {
         XCTAssertEqual(
             VoiceInkTranscriptionAutoCleanupPreference.backupPreferences(

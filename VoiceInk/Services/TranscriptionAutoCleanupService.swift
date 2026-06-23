@@ -44,9 +44,11 @@ class TranscriptionAutoCleanupService {
 
     @objc private func handleTranscriptionCompleted(_ notification: Notification) {
         let cleanupConfiguration = VoiceInkTranscriptionAutoCleanupPreference.current()
-        guard cleanupConfiguration.isEnabled else { return }
 
-        if !cleanupConfiguration.shouldDeleteCompletedTranscriptionImmediately {
+        switch cleanupConfiguration.completionAction {
+        case .ignore:
+            return
+        case .sweepOldTranscriptions:
             if let modelContext = self.modelContext {
                 Task { [weak self] in
                     guard let self = self else { return }
@@ -54,6 +56,8 @@ class TranscriptionAutoCleanupService {
                 }
             }
             return
+        case .deleteCompletedTranscription:
+            break
         }
 
         guard let transcription = notification.object as? Transcription,

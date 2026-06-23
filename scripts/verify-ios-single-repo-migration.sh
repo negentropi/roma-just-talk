@@ -5648,6 +5648,16 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
+  "shared transcription auto-cleanup completion action lives in VoiceInkCore" \
+  'enum VoiceInkTranscriptionAutoCleanupCompletionAction' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared transcription auto-cleanup completion action policy lives in VoiceInkCore" \
+  'completionAction' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
   "shared transcription auto-cleanup backup export policy lives in VoiceInkCore" \
   'VoiceInkTranscriptionAutoCleanupBackupPreferences\(' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
@@ -5746,6 +5756,16 @@ require_pattern \
   "shared general settings core import applies transcription auto-cleanup enabled plan" \
   'VoiceInkTranscriptionAutoCleanupPreference\.saveIsEnabled' \
   VoiceInkCore/Sources/VoiceInkCore/GeneralSettingsBackupPolicy.swift
+
+require_pattern \
+  "macOS transcription auto cleanup uses shared completion action" \
+  'cleanupConfiguration\.completionAction' \
+  VoiceInk/Services/TranscriptionAutoCleanupService.swift
+
+reject_pattern \
+  "macOS transcription auto cleanup avoids shell-owned completion retention branch" \
+  'shouldDeleteCompletedTranscriptionImmediately' \
+  VoiceInk/Services/TranscriptionAutoCleanupService.swift
 
 require_pattern \
   "shared general settings core import applies transcription auto-cleanup retention plan" \

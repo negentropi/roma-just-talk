@@ -22,6 +22,7 @@
 - Moved macOS cursor-context reader bounds and text-input role filtering into shared core while leaving Accessibility execution in the macOS shell.
 - Moved the audio cleanup daily check interval into shared core while leaving Timer scheduling and file deletion in the macOS shell.
 - Moved the model prewarm trigger delay into shared core while leaving wake notifications and prewarm execution in the macOS shell.
+- Moved completed-transcription auto-cleanup action selection into shared core while leaving SwiftData and file deletion in the macOS shell.
 
 ## v1.95 - 2026-06-17
 

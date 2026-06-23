@@ -1200,6 +1200,19 @@ public struct VoiceInkTranscriptionAutoCleanupConfiguration: Equatable, Sendable
     public func cutoffDate(from referenceDate: Date = Date()) -> Date {
         referenceDate.addingTimeInterval(TimeInterval(-effectiveRetentionMinutes * 60))
     }
+
+    public var completionAction: VoiceInkTranscriptionAutoCleanupCompletionAction {
+        guard isEnabled else { return .ignore }
+        return shouldDeleteCompletedTranscriptionImmediately
+            ? .deleteCompletedTranscription
+            : .sweepOldTranscriptions
+    }
+}
+
+public enum VoiceInkTranscriptionAutoCleanupCompletionAction: Equatable, Sendable {
+    case ignore
+    case sweepOldTranscriptions
+    case deleteCompletedTranscription
 }
 
 public struct VoiceInkTranscriptionAutoCleanupBackupPreferences: Codable, Equatable, Sendable {

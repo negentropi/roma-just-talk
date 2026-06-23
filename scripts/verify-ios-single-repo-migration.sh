@@ -8081,7 +8081,10 @@ require_pattern \
 require_pattern \
   "shared AI enhancement request payload lives in VoiceInkCore" \
   'VoiceInkAIEnhancementRequestPayload|VoiceInkAIEnhancementRequestPreparation|taggedTranscript|enhancedText' \
-  VoiceInkCore/Sources/VoiceInkCore/AIRequestPrompts.swift
+  VoiceInkCore/Sources/VoiceInkCore/AIPrompts.swift
+
+section "obsolete standalone AI request prompts module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/AIRequestPrompts.swift
 
 require_pattern \
   "macOS AI enhancement service uses shared request payload" \
@@ -8098,7 +8101,7 @@ reject_file VoiceInkCore/Sources/VoiceInkCore/AIEnhancementOutputFilter.swift
 
 require_patterns \
   "AI enhancement output filter lives with request preparation policy" \
-  VoiceInkCore/Sources/VoiceInkCore/AIRequestPrompts.swift \
+  VoiceInkCore/Sources/VoiceInkCore/AIPrompts.swift \
   'VoiceInkAIEnhancementOutputFilter' \
   'codex_follow_up' \
   'VoiceInkAIEnhancementRequestPayload'

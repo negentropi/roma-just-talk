@@ -1,5 +1,12 @@
 import Foundation
 
+public enum VoiceInkTranscriptionStatus: String, Codable, CaseIterable, Sendable {
+    case pending
+    case completed
+    case failed
+    case canceled
+}
+
 public struct VoiceInkTranscriptionRecordFailurePlan: Equatable, Sendable {
     public let errorDescription: String
     public let status: VoiceInkTranscriptionStatus

@@ -1631,6 +1631,14 @@ require_pattern \
   'VoiceInkRecordingTranscriptionDraft' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingTranscriptionDraft.swift
 
+section "obsolete standalone transcription status module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/TranscriptionStatus.swift
+
+require_pattern \
+  "shared transcription status lives with record mutation policy" \
+  'public enum VoiceInkTranscriptionStatus|case pending|case completed|case failed|case canceled' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift
+
 require_pattern \
   "shared transcription cancellation plan lives in VoiceInkCore" \
   'public struct VoiceInkTranscriptionRecordCancellationPlan' \

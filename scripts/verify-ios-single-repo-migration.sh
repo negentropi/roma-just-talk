@@ -10302,10 +10302,13 @@ reject_pattern \
   '"(Audio Settings|Session Timeout|How long to keep the microphone session active after recording stops\\. Longer timeouts prevent '\''session activation failed'\'' errors when recording frequently, but may use more battery\\.)"' \
   iOS/VoiceInk-ios/SettingsView.swift
 
+section "obsolete standalone audio-session lifecycle state module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/AudioSessionLifecycleState.swift
+
 require_pattern \
   "shared audio-session lifecycle state uses shared deactivation plan" \
   'VoiceInkAudioSessionTimeoutPreference\.deactivationPlan' \
-  VoiceInkCore/Sources/VoiceInkCore/AudioSessionLifecycleState.swift
+  VoiceInkCore/Sources/VoiceInkCore/IOSAudioConfiguration.swift
 
 require_pattern \
   "shared audio-session timeout owns countdown update interval" \
@@ -10320,7 +10323,7 @@ require_pattern \
 require_pattern \
   "shared audio-session lifecycle state lives in VoiceInkCore" \
   'VoiceInkAudioSessionLifecycleState|markActivatedForRecording|scheduleDeactivationExecution|advanceCountdownExecution|markDeactivated' \
-  VoiceInkCore/Sources/VoiceInkCore/AudioSessionLifecycleState.swift
+  VoiceInkCore/Sources/VoiceInkCore/IOSAudioConfiguration.swift
 
 require_patterns \
   "shared iOS audio-session recording configuration lives in VoiceInkCore" \
@@ -10337,7 +10340,7 @@ require_patterns \
 require_pattern \
   "shared audio-session diagnostics live in VoiceInkCore" \
   'VoiceInkAudioSessionDiagnostics|activatedForRecordingMessage|activationFailedMessage|deactivationScheduledMessage|deactivatedMessage|deactivationFailedMessage' \
-  VoiceInkCore/Sources/VoiceInkCore/AudioSessionLifecycleState.swift
+  VoiceInkCore/Sources/VoiceInkCore/IOSAudioConfiguration.swift
 
 require_pattern \
   "VoiceInkCore check runner executes iOS audio-session recording configuration proof" \

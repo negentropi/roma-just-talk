@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import VoiceInkCore
 
 @Model
 final class WordReplacement {
@@ -14,5 +15,9 @@ final class WordReplacement {
         self.replacementText = replacementText
         self.dateAdded = dateAdded
         self.isEnabled = isEnabled
+    }
+
+    var voiceInkRule: VoiceInkWordReplacementRule {
+        VoiceInkWordReplacementRule(originalText: originalText, replacementText: replacementText)
     }
 }

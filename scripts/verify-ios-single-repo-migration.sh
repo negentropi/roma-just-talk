@@ -6235,6 +6235,16 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
 
 require_pattern \
+  "shared word-replacement edit state owns existing-rules submission" \
+  'public func submitting\(existingRules: \[VoiceInkWordReplacementRule\]\) -> VoiceInkWordReplacementEditSubmission' \
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
+
+require_pattern \
+  "shared word-replacement edit state existing-rules check runs in VoiceInkCore" \
+  'DictionaryPolicyTests\.testWordReplacementEditStateSubmitsAgainstExistingRules' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "shared word-replacement edit submission lives in VoiceInkCore" \
   'public struct VoiceInkWordReplacementEditSubmission|shouldComplete' \
   VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
@@ -6288,6 +6298,29 @@ require_pattern \
   "shared word-replacement sorted deletion check runs in VoiceInkCore" \
   'testDictionaryListSortPolicyRemovesDisplayedSortedWordReplacementRows' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "macOS word-replacement SwiftData row adapts to shared rule" \
+  'var voiceInkRule: VoiceInkWordReplacementRule' \
+  VoiceInk/Models/WordReplacement.swift
+
+require_pattern \
+  "macOS word-replacement add/edit/export adapters pass shared rules" \
+  'map\(\\\.voiceInkRule\)|existingRules: existingRules|wordReplacementRules = .*map\(\\\.voiceInkRule\)' \
+  VoiceInk/Views/Dictionary/WordReplacementView.swift \
+  VoiceInk/Views/Dictionary/DictionaryQuickAddPanel.swift \
+  VoiceInk/Services/DictionaryService.swift \
+  VoiceInk/Services/ImportExportService.swift \
+  VoiceInk/Transcription/Processing/WordReplacementService.swift
+
+reject_pattern \
+  "macOS word-replacement adapters avoid shell-owned shared-rule construction" \
+  'VoiceInkWordReplacementRule\(originalText: \$0\.originalText, replacementText: \$0\.replacementText\)|existingOriginalTexts: wordReplacements\.map\(\\\.originalText\)' \
+  VoiceInk/Views/Dictionary/WordReplacementView.swift \
+  VoiceInk/Views/Dictionary/DictionaryQuickAddPanel.swift \
+  VoiceInk/Services/DictionaryService.swift \
+  VoiceInk/Services/ImportExportService.swift \
+  VoiceInk/Transcription/Processing/WordReplacementService.swift
 
 require_pattern \
   "iOS settings uses shared dictionary alert presentation" \

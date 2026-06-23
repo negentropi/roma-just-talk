@@ -98,12 +98,12 @@ enum DictionaryService {
     ) -> VoiceInkWordReplacementEditSubmission {
         let descriptor = FetchDescriptor<WordReplacement>()
         let existing = (try? context.fetch(descriptor)) ?? []
-        let existingOriginalTexts = existing
+        let existingRules = existing
             .filter { $0.id != entry.id }
-            .map(\.originalText)
+            .map(\.voiceInkRule)
 
         let submission = editState.submitting(
-            existingOriginalTexts: existingOriginalTexts
+            existingRules: existingRules
         )
 
         return applyWordReplacementEditSubmission(submission, to: entry, context: context)

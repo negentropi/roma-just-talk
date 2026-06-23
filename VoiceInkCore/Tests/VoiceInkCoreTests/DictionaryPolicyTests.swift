@@ -698,6 +698,24 @@ final class DictionaryPolicyTests: XCTestCase {
         )
     }
 
+    func testWordReplacementEditStateSubmitsAgainstExistingRules() {
+        let existingRules = [
+            VoiceInkWordReplacementRule(originalText: "voice ink", replacementText: "VoiceInk")
+        ]
+
+        let submission = VoiceInkWordReplacementEditState(
+            original: "Voice Ink",
+            replacement: "Roma"
+        )
+        .submitting(existingRules: existingRules)
+
+        XCTAssertFalse(submission.shouldUpdate)
+        XCTAssertEqual(
+            submission.alertPresentation,
+            .wordReplacement(message: "'Voice Ink' already exists in word replacements")
+        )
+    }
+
     func testWordReplacementPlanRejectsDuplicateTokenAcrossCommaGroups() {
         let plan = VoiceInkDictionaryPolicy.wordReplacementInsertPlan(
             original: "Flow, Voice Ink",

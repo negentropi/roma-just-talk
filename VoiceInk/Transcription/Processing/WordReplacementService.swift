@@ -31,9 +31,7 @@ class WordReplacementService {
             predicate: #Predicate { $0.isEnabled }
         )
 
-        let rules = (try? context.fetch(descriptor))?.map {
-            VoiceInkWordReplacementRule(originalText: $0.originalText, replacementText: $0.replacementText)
-        } ?? []
+        let rules = (try? context.fetch(descriptor))?.map(\.voiceInkRule) ?? []
 
         cachedRules = rules
         return rules

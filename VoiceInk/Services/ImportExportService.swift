@@ -143,9 +143,7 @@ class ImportExportService {
         let vocabularyWords = (try? modelContext.fetch(vocabularyDescriptor).map(\.word)) ?? []
 
         let replacementsDescriptor = FetchDescriptor<WordReplacement>()
-        let wordReplacementRules = (try? modelContext.fetch(replacementsDescriptor).map {
-            VoiceInkWordReplacementRule(originalText: $0.originalText, replacementText: $0.replacementText)
-        }) ?? []
+        let wordReplacementRules = (try? modelContext.fetch(replacementsDescriptor).map(\.voiceInkRule)) ?? []
         let dictionaryExportPlan = VoiceInkDictionaryPolicy.dictionaryBackupExportPlan(
             vocabularyWords: vocabularyWords,
             wordReplacementRules: wordReplacementRules

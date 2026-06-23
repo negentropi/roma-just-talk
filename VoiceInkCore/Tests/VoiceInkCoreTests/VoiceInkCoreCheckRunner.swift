@@ -431,6 +431,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementEditStateUsesSharedSaveability", run: { DictionaryPolicyTests().testWordReplacementEditStateUsesSharedSaveability() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementEditStateSubmitsTrimmedAcceptedRule", run: { DictionaryPolicyTests().testWordReplacementEditStateSubmitsTrimmedAcceptedRule() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementEditStateRejectsDuplicateWithSharedAlert", run: { DictionaryPolicyTests().testWordReplacementEditStateRejectsDuplicateWithSharedAlert() }),
+            VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementEditStateSubmitsAgainstExistingRules", run: { DictionaryPolicyTests().testWordReplacementEditStateSubmitsAgainstExistingRules() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementPlanRejectsDuplicateTokenAcrossCommaGroups", run: { DictionaryPolicyTests().testWordReplacementPlanRejectsDuplicateTokenAcrossCommaGroups() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementPlanTrimsStoredOriginalAndReplacement", run: { DictionaryPolicyTests().testWordReplacementPlanTrimsStoredOriginalAndReplacement() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementSubmissionPlanKeepsInvalidDraftWithoutAlert", run: { DictionaryPolicyTests().testWordReplacementSubmissionPlanKeepsInvalidDraftWithoutAlert() }),

@@ -166,7 +166,7 @@ struct WordReplacementView: View {
 
     private func addReplacement() {
         let submission = wordReplacementDraftState.submitting(
-            existingOriginalTexts: wordReplacements.map(\.originalText)
+            existingRules: wordReplacements.map(\.voiceInkRule)
         )
         let appliedSubmission = DictionaryService.applyWordReplacementSubmission(
             submission,

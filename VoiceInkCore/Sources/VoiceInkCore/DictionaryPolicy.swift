@@ -251,6 +251,10 @@ public struct VoiceInkWordReplacementEditState: Equatable, Sendable {
             alertPresentation: plan.errorMessage.map(VoiceInkDictionaryAlertPresentation.wordReplacement)
         )
     }
+
+    public func submitting(existingRules: [VoiceInkWordReplacementRule]) -> VoiceInkWordReplacementEditSubmission {
+        submitting(existingOriginalTexts: existingRules.map(\.originalText))
+    }
 }
 
 public struct VoiceInkWordReplacementBackupImportPlan: Equatable, Sendable {

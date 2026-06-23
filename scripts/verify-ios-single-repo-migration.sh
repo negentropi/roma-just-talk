@@ -3247,6 +3247,14 @@ require_pattern \
   'VoiceInkLocalWhisperFailurePolicy|VoiceInkLocalWhisperFailure|VoiceInkLocalWhisperPlatform' \
   VoiceInkCore/Sources/VoiceInkCore/WhisperRuntimeDefaults.swift
 
+section "obsolete standalone error-description module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/ErrorDescription.swift
+
+require_pattern \
+  "shared error-description fallback lives with engine error vocabulary" \
+  'VoiceInkErrorDescription|LocalizedError|localizedDescription' \
+  VoiceInkCore/Sources/VoiceInkCore/VoiceInkEngineError.swift
+
 require_pattern \
   "shared local Whisper transcription flow lives in VoiceInkCore" \
   'VoiceInkLocalWhisperTranscriptionFlow|VoiceInkLocalWhisperTranscriptionActions|VoiceInkLocalWhisperContextPlan' \

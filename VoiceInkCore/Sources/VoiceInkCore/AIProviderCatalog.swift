@@ -490,6 +490,24 @@ public extension VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan {
     }
 }
 
+public extension VoiceInkAIEnhancementAPIKeyVerificationServiceStatePlan {
+    func apply(
+        setAPIKey: (String) -> Void,
+        setAPIKeyValidity: (Bool) -> Void,
+        postProviderKeyChanged: () -> Void,
+        complete: (VoiceInkAPIKeyVerificationResult) -> Void
+    ) {
+        if let apiKeyToApply {
+            setAPIKey(apiKeyToApply)
+        }
+        setAPIKeyValidity(isAPIKeyValid)
+        if shouldPostProviderKeyChanged {
+            postProviderKeyChanged()
+        }
+        complete(completionResult)
+    }
+}
+
 public enum VoiceInkAIEnhancementAPIKeyVerificationDispatch: Equatable, Sendable {
     case immediate(VoiceInkAPIKeyVerificationResult)
     case sharedProvider(VoiceInkProviderKind)
@@ -630,6 +648,18 @@ public extension VoiceInkAIEnhancementAPIKeyClearPlan {
         deleteKey: (String) -> Void
     ) {
         deleteKey(persistencePlan.providerKeyStorageNameToDelete)
+    }
+}
+
+public extension VoiceInkAIEnhancementAPIKeyClearServiceStatePlan {
+    func apply(
+        setCredentialState: (VoiceInkAIEnhancementCredentialState) -> Void,
+        postProviderKeyChanged: () -> Void
+    ) {
+        setCredentialState(credentialStateAfterClear)
+        if shouldPostProviderKeyChanged {
+            postProviderKeyChanged()
+        }
     }
 }
 

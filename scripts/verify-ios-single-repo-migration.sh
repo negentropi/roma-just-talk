@@ -7816,6 +7816,13 @@ require_pattern \
   'VoiceInkAIEnhancementAPIKeyVerificationServiceStatePlan|serviceStateApplicationPlan' \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
+require_patterns \
+  "shared macOS AI API-key verification service-state application lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift \
+  'extension VoiceInkAIEnhancementAPIKeyVerificationServiceStatePlan' \
+  'setAPIKeyValidity' \
+  'complete: \(VoiceInkAPIKeyVerificationResult\) -> Void'
+
 require_pattern \
   "shared macOS AI API-key verification request plan lives in VoiceInkCore" \
   'VoiceInkAIEnhancementAPIKeyVerificationRequestPlan|verificationRequestPlan|resolvedKeyToVerify|immediateResult' \
@@ -7852,6 +7859,11 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
+  "core checks execute shared macOS AI API-key verification service-state application test" \
+  'AIProviderCatalogTests\.testMacOSAIEnhancementAPIKeyVerificationServiceStatePlanAppliesRuntimeState' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "shared macOS AI API-key clear plan lives in VoiceInkCore" \
   'VoiceInkAIEnhancementAPIKeyClearPlan|credentialStateAfterClear|providerKeyStorageNameToDelete|clearing\(provider:' \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
@@ -7865,6 +7877,13 @@ require_pattern \
   "shared macOS AI API-key clear service-state plan lives in VoiceInkCore" \
   'VoiceInkAIEnhancementAPIKeyClearServiceStatePlan|serviceStateApplicationPlan' \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+require_patterns \
+  "shared macOS AI API-key clear service-state application lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift \
+  'extension VoiceInkAIEnhancementAPIKeyClearServiceStatePlan' \
+  'setCredentialState' \
+  'postProviderKeyChanged'
 
 require_pattern \
   "core checks execute shared macOS AI API-key clear plan test" \
@@ -7882,8 +7901,13 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
+  "core checks execute shared macOS AI API-key clear service-state application test" \
+  'AIProviderCatalogTests\.testMacOSAIEnhancementAPIKeyClearServiceStatePlanAppliesRuntimeState' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "macOS AI service applies API-key verification through shared plan" \
-  'verificationApplicationPlan\(|serviceStateApplicationPlan|completionResult' \
+  'verificationApplicationPlan\(|serviceStateApplicationPlan\.apply|complete: completion' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 require_pattern \
@@ -7898,7 +7922,7 @@ require_pattern \
 
 require_pattern \
   "macOS AI service applies API-key clear through shared plan" \
-  'VoiceInkAIEnhancementAPIKeyClearPlan\.clearing|applyTextEnhancementAPIKeyClearPlan|serviceStateApplicationPlan|applyAIEnhancementAPIKeyClearPlan' \
+  'VoiceInkAIEnhancementAPIKeyClearPlan\.clearing|applyTextEnhancementAPIKeyClearPlan|serviceStateApplicationPlan\.apply|applyAIEnhancementAPIKeyClearPlan' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 require_pattern \
@@ -7923,7 +7947,7 @@ require_pattern \
 
 require_pattern \
   "migration checklist tracks shared macOS AI API-key verification service-state plan" \
-  'verification service-state application planning.*VoiceInkAIEnhancementAPIKeyVerificationServiceStatePlan' \
+  'verification service-state application planning/execution.*VoiceInkAIEnhancementAPIKeyVerificationServiceStatePlan' \
   docs/ios-single-repo-migration.md
 
 require_pattern \
@@ -7938,7 +7962,7 @@ require_pattern \
 
 require_pattern \
   "migration checklist tracks shared macOS AI API-key clear service-state plan" \
-  'clear-key service-state application planning.*VoiceInkAIEnhancementAPIKeyClearServiceStatePlan' \
+  'clear-key service-state application planning/execution.*VoiceInkAIEnhancementAPIKeyClearServiceStatePlan' \
   docs/ios-single-repo-migration.md
 
 require_pattern \
@@ -7982,13 +8006,18 @@ reject_pattern \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 reject_pattern \
+  "macOS AI service avoids shell-owned API-key verification service-state field reads" \
+  'serviceStatePlan\.(apiKeyToApply|isAPIKeyValid|shouldPostProviderKeyChanged|completionResult)|serviceStateApplicationPlan\.(apiKeyToApply|isAPIKeyValid|shouldPostProviderKeyChanged|completionResult)' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
+reject_pattern \
   "macOS AI service avoids shell-owned API-key clear policy" \
   'apiKey = ""|isAPIKeyValid = false|deleteAPIKey\(forProvider: (selectedProvider|plan\.provider)\.rawValue\)' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 reject_pattern \
   "macOS AI service avoids shell-owned API-key clear plan field reads" \
-  'plan\.credentialStateAfterClear|plan\.providerKeyStorageNameToDelete' \
+  'plan\.credentialStateAfterClear|plan\.providerKeyStorageNameToDelete|serviceStatePlan\.(credentialStateAfterClear|shouldPostProviderKeyChanged)|serviceStateApplicationPlan\.(credentialStateAfterClear|shouldPostProviderKeyChanged)' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 require_pattern \

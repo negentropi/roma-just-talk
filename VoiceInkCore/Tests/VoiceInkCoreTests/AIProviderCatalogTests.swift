@@ -576,6 +576,61 @@ final class AIProviderCatalogTests: XCTestCase {
         XCTAssertTrue(savedKeys.isEmpty)
     }
 
+    func testMacOSAIEnhancementAPIKeyVerificationServiceStatePlanAppliesRuntimeState() {
+        let successPlan = VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan(
+            isValid: true,
+            runtimeAPIKey: "resolved-key",
+            keyToSave: "$GROQ_API_KEY",
+            providerKeyStorageNameToSave: VoiceInkAIEnhancementProviderKind.groq.rawValue,
+            errorMessage: nil
+        )
+        let failurePlan = VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan(
+            isValid: false,
+            runtimeAPIKey: nil,
+            keyToSave: nil,
+            providerKeyStorageNameToSave: nil,
+            errorMessage: "invalid"
+        )
+
+        var appliedAPIKeys: [String] = []
+        var appliedValidities: [Bool] = []
+        var providerKeyChangedPostCount = 0
+        var completionResults: [VoiceInkAPIKeyVerificationResult] = []
+
+        successPlan.serviceStateApplicationPlan.apply(
+            setAPIKey: { appliedAPIKeys.append($0) },
+            setAPIKeyValidity: { appliedValidities.append($0) },
+            postProviderKeyChanged: { providerKeyChangedPostCount += 1 },
+            complete: { completionResults.append($0) }
+        )
+
+        XCTAssertEqual(appliedAPIKeys, ["resolved-key"])
+        XCTAssertEqual(appliedValidities, [true])
+        XCTAssertEqual(providerKeyChangedPostCount, 1)
+        XCTAssertEqual(completionResults, [
+            VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: nil)
+        ])
+
+        appliedAPIKeys = []
+        appliedValidities = []
+        providerKeyChangedPostCount = 0
+        completionResults = []
+
+        failurePlan.serviceStateApplicationPlan.apply(
+            setAPIKey: { appliedAPIKeys.append($0) },
+            setAPIKeyValidity: { appliedValidities.append($0) },
+            postProviderKeyChanged: { providerKeyChangedPostCount += 1 },
+            complete: { completionResults.append($0) }
+        )
+
+        XCTAssertTrue(appliedAPIKeys.isEmpty)
+        XCTAssertEqual(appliedValidities, [false])
+        XCTAssertEqual(providerKeyChangedPostCount, 0)
+        XCTAssertEqual(completionResults, [
+            VoiceInkAPIKeyVerificationResult(isValid: false, errorMessage: "invalid")
+        ])
+    }
+
     func testMacOSAIEnhancementAPIKeyClearPlanIsShared() {
         XCTAssertEqual(
             VoiceInkAIEnhancementAPIKeyClearPlan.clearing(provider: .groq),
@@ -650,6 +705,30 @@ final class AIProviderCatalogTests: XCTestCase {
         }
 
         XCTAssertEqual(deletedProviders, [VoiceInkAIEnhancementProviderKind.groq.rawValue])
+    }
+
+    func testMacOSAIEnhancementAPIKeyClearServiceStatePlanAppliesRuntimeState() {
+        let clearPlan = VoiceInkAIEnhancementAPIKeyClearPlan(
+            provider: .groq,
+            providerKeyStorageNameToDelete: VoiceInkAIEnhancementProviderKind.groq.rawValue,
+            credentialStateAfterClear: VoiceInkAIEnhancementCredentialState(
+                apiKey: "",
+                isAPIKeyValid: false
+            )
+        )
+
+        var appliedCredentialStates: [VoiceInkAIEnhancementCredentialState] = []
+        var providerKeyChangedPostCount = 0
+
+        clearPlan.serviceStateApplicationPlan.apply(
+            setCredentialState: { appliedCredentialStates.append($0) },
+            postProviderKeyChanged: { providerKeyChangedPostCount += 1 }
+        )
+
+        XCTAssertEqual(appliedCredentialStates, [
+            VoiceInkAIEnhancementCredentialState(apiKey: "", isAPIKeyValid: false)
+        ])
+        XCTAssertEqual(providerKeyChangedPostCount, 1)
     }
 
     func testMacOSAIEnhancementAPIKeyFormStateBuildsDraftForSelectedProvider() {

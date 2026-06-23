@@ -154,17 +154,16 @@ class AIService: ObservableObject {
                     for: result,
                     resolvedRuntimeKey: resolvedKey
                 )
-                let serviceStatePlan = plan.serviceStateApplicationPlan
 
                 APIKeyManager.shared.applyAIEnhancementVerificationPlan(plan)
-                if let apiKeyToApply = serviceStatePlan.apiKeyToApply {
-                    self.apiKey = apiKeyToApply
-                }
-                self.isAPIKeyValid = serviceStatePlan.isAPIKeyValid
-                if serviceStatePlan.shouldPostProviderKeyChanged {
-                    NotificationCenter.default.post(name: .aiProviderKeyChanged, object: nil)
-                }
-                completion(serviceStatePlan.completionResult)
+                plan.serviceStateApplicationPlan.apply(
+                    setAPIKey: { self.apiKey = $0 },
+                    setAPIKeyValidity: { self.isAPIKeyValid = $0 },
+                    postProviderKeyChanged: {
+                        NotificationCenter.default.post(name: .aiProviderKeyChanged, object: nil)
+                    },
+                    complete: completion
+                )
             }
         }
     }
@@ -264,14 +263,16 @@ class AIService: ObservableObject {
     }
 
     private func applyTextEnhancementAPIKeyClearPlan(_ plan: VoiceInkAIEnhancementAPIKeyClearPlan) {
-        let serviceStatePlan = plan.serviceStateApplicationPlan
-
-        apiKey = serviceStatePlan.credentialStateAfterClear.apiKey
-        isAPIKeyValid = serviceStatePlan.credentialStateAfterClear.isAPIKeyValid
         APIKeyManager.shared.applyAIEnhancementAPIKeyClearPlan(plan)
-        if serviceStatePlan.shouldPostProviderKeyChanged {
-            NotificationCenter.default.post(name: .aiProviderKeyChanged, object: nil)
-        }
+        plan.serviceStateApplicationPlan.apply(
+            setCredentialState: { [self] credentialState in
+                apiKey = credentialState.apiKey
+                isAPIKeyValid = credentialState.isAPIKeyValid
+            },
+            postProviderKeyChanged: {
+                NotificationCenter.default.post(name: .aiProviderKeyChanged, object: nil)
+            }
+        )
     }
     
     func checkOllamaConnection(completion: @escaping (Bool) -> Void) {

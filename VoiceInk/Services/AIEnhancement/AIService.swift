@@ -264,10 +264,14 @@ class AIService: ObservableObject {
     }
 
     private func applyTextEnhancementAPIKeyClearPlan(_ plan: VoiceInkAIEnhancementAPIKeyClearPlan) {
-        apiKey = plan.credentialStateAfterClear.apiKey
-        isAPIKeyValid = plan.credentialStateAfterClear.isAPIKeyValid
-        APIKeyManager.shared.deleteAPIKey(forProvider: plan.providerKeyStorageNameToDelete)
-        NotificationCenter.default.post(name: .aiProviderKeyChanged, object: nil)
+        let serviceStatePlan = plan.serviceStateApplicationPlan
+
+        apiKey = serviceStatePlan.credentialStateAfterClear.apiKey
+        isAPIKeyValid = serviceStatePlan.credentialStateAfterClear.isAPIKeyValid
+        APIKeyManager.shared.applyAIEnhancementAPIKeyClearPlan(plan)
+        if serviceStatePlan.shouldPostProviderKeyChanged {
+            NotificationCenter.default.post(name: .aiProviderKeyChanged, object: nil)
+        }
     }
     
     func checkOllamaConnection(completion: @escaping (Bool) -> Void) {

@@ -579,6 +579,42 @@ public struct VoiceInkAIEnhancementAPIKeyClearPlan: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkAIEnhancementAPIKeyClearPersistencePlan: Equatable, Sendable {
+    public let providerKeyStorageNameToDelete: String
+
+    public init(providerKeyStorageNameToDelete: String) {
+        self.providerKeyStorageNameToDelete = providerKeyStorageNameToDelete
+    }
+}
+
+public struct VoiceInkAIEnhancementAPIKeyClearServiceStatePlan: Equatable, Sendable {
+    public let credentialStateAfterClear: VoiceInkAIEnhancementCredentialState
+    public let shouldPostProviderKeyChanged: Bool
+
+    public init(
+        credentialStateAfterClear: VoiceInkAIEnhancementCredentialState,
+        shouldPostProviderKeyChanged: Bool
+    ) {
+        self.credentialStateAfterClear = credentialStateAfterClear
+        self.shouldPostProviderKeyChanged = shouldPostProviderKeyChanged
+    }
+}
+
+public extension VoiceInkAIEnhancementAPIKeyClearPlan {
+    var persistencePlan: VoiceInkAIEnhancementAPIKeyClearPersistencePlan {
+        VoiceInkAIEnhancementAPIKeyClearPersistencePlan(
+            providerKeyStorageNameToDelete: providerKeyStorageNameToDelete
+        )
+    }
+
+    var serviceStateApplicationPlan: VoiceInkAIEnhancementAPIKeyClearServiceStatePlan {
+        VoiceInkAIEnhancementAPIKeyClearServiceStatePlan(
+            credentialStateAfterClear: credentialStateAfterClear,
+            shouldPostProviderKeyChanged: true
+        )
+    }
+}
+
 public struct VoiceInkAIEnhancementAPIKeyFormState: Equatable, Sendable {
     public var enteredKey: String
     public var verificationProgress: VoiceInkProviderAPIKeyVerificationProgress

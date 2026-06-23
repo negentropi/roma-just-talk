@@ -64,7 +64,7 @@ final class LogExporter {
 
                 logLines.append(VoiceInkDiagnosticLogExportPolicy.logEntryLine(
                     date: logEntry.date,
-                    level: logLevelString(logEntry.level),
+                    level: VoiceInkDiagnosticLogExportPolicy.logLevelLabel(for: logEntry.level),
                     category: logEntry.category,
                     message: logEntry.composedMessage
                 ))
@@ -79,18 +79,6 @@ final class LogExporter {
         }
 
         return logLines
-    }
-
-    private func logLevelString(_ level: OSLogEntryLog.Level) -> String {
-        switch level {
-        case .undefined: return "UNDEFINED"
-        case .debug: return "DEBUG"
-        case .info: return "INFO"
-        case .notice: return "NOTICE"
-        case .error: return "ERROR"
-        case .fault: return "FAULT"
-        @unknown default: return "UNKNOWN"
-        }
     }
 
     private func saveLogsToFile(_ logs: [String]) throws -> URL {

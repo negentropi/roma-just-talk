@@ -1,4 +1,5 @@
 import Foundation
+import OSLog
 @testable import VoiceInkCore
 
 final class DiagnosticLogExportPolicyTests: XCTestCase {
@@ -149,6 +150,15 @@ final class DiagnosticLogExportPolicyTests: XCTestCase {
             ),
             "[\(formattedTimestamp)] [NOTICE] [LogExporter] Ready"
         )
+    }
+
+    func testDiagnosticLogExportPolicyOwnsOSLogLevelLabels() {
+        XCTAssertEqual(VoiceInkDiagnosticLogExportPolicy.logLevelLabel(for: .undefined), "UNDEFINED")
+        XCTAssertEqual(VoiceInkDiagnosticLogExportPolicy.logLevelLabel(for: .debug), "DEBUG")
+        XCTAssertEqual(VoiceInkDiagnosticLogExportPolicy.logLevelLabel(for: .info), "INFO")
+        XCTAssertEqual(VoiceInkDiagnosticLogExportPolicy.logLevelLabel(for: .notice), "NOTICE")
+        XCTAssertEqual(VoiceInkDiagnosticLogExportPolicy.logLevelLabel(for: .error), "ERROR")
+        XCTAssertEqual(VoiceInkDiagnosticLogExportPolicy.logLevelLabel(for: .fault), "FAULT")
     }
 
     func testDiagnosticLogExportPolicyBuildsMacOSExportFileName() throws {

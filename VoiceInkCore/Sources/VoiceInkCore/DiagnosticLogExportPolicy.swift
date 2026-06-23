@@ -1,4 +1,5 @@
 import Foundation
+import OSLog
 
 public struct VoiceInkDiagnosticLogSessionRange: Equatable, Sendable {
     public let label: String
@@ -114,6 +115,25 @@ public enum VoiceInkDiagnosticLogExportPolicy {
         message: String
     ) -> String {
         "[\(formattedTimestamp(date))] [\(level)] [\(category)] \(message)"
+    }
+
+    public static func logLevelLabel(for level: OSLogEntryLog.Level) -> String {
+        switch level {
+        case .undefined:
+            return "UNDEFINED"
+        case .debug:
+            return "DEBUG"
+        case .info:
+            return "INFO"
+        case .notice:
+            return "NOTICE"
+        case .error:
+            return "ERROR"
+        case .fault:
+            return "FAULT"
+        @unknown default:
+            return "UNKNOWN"
+        }
     }
 
     public static func fileName(for date: Date) -> String {

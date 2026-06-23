@@ -12991,7 +12991,7 @@ require_file VoiceInkCore/Sources/VoiceInkCore/DiagnosticLogExportPolicy.swift
 
 require_pattern \
   "shared diagnostic log export policy lives in VoiceInkCore" \
-  'VoiceInkDiagnosticsSettingsPresentation|VoiceInkDiagnosticLogExportPolicy|VoiceInkDiagnosticLogSessionRange|sessionStartDatesKey = "logExporter\.sessionStartDates\.v1"|maxSessionStartDatesToKeep = 3|timestampDateFormat = "yyyy-MM-dd HH:mm:ss\.SSS"|fileNameDateFormat = "yyyy-MM-dd_HH-mm-ss"|fileNamePrefix = "VoiceInk_Logs_"|headerTitle = "=== VoiceInk Diagnostic Logs ==="|noLogsFoundMessage = "No logs found for this session\."|exporterErrorDomain = "LogExporter"|downloadsDirectoryUnavailableErrorCode = 1|downloadsDirectoryUnavailableDescription = "Downloads directory unavailable"|sessionRanges|headerLines|logEntryLine|fileName|downloadsDirectoryUnavailableError|rollingBufferLastClaimLabel|exportFailedAlertTitle|exportedLogSuccessSystemImageName' \
+  'VoiceInkDiagnosticsSettingsPresentation|VoiceInkDiagnosticLogExportPolicy|VoiceInkDiagnosticLogSessionRange|sessionStartDatesKey = "logExporter\.sessionStartDates\.v1"|maxSessionStartDatesToKeep = 3|timestampDateFormat = "yyyy-MM-dd HH:mm:ss\.SSS"|fileNameDateFormat = "yyyy-MM-dd_HH-mm-ss"|fileNamePrefix = "VoiceInk_Logs_"|headerTitle = "=== VoiceInk Diagnostic Logs ==="|noLogsFoundMessage = "No logs found for this session\."|exporterErrorDomain = "LogExporter"|downloadsDirectoryUnavailableErrorCode = 1|downloadsDirectoryUnavailableDescription = "Downloads directory unavailable"|sessionRanges|headerLines|logEntryLine|logLevelLabel|fileName|downloadsDirectoryUnavailableError|rollingBufferLastClaimLabel|exportFailedAlertTitle|exportedLogSuccessSystemImageName' \
   VoiceInkCore/Sources/VoiceInkCore/DiagnosticLogExportPolicy.swift
 
 require_patterns \
@@ -13007,12 +13007,12 @@ require_patterns \
 
 require_pattern \
   "macOS log exporter uses shared diagnostic log export policy" \
-  'VoiceInkDiagnosticLogExportPolicy\.(sessionStartDates|storedSessionStartDates|saveSessionStartDates|headerLines|sessionRanges|sessionHeaderLines|logEntryLine|noLogsFoundMessage|fileName|downloadsDirectoryUnavailableError)' \
+  'VoiceInkDiagnosticLogExportPolicy\.(sessionStartDates|storedSessionStartDates|saveSessionStartDates|headerLines|sessionRanges|sessionHeaderLines|logEntryLine|logLevelLabel|noLogsFoundMessage|fileName|downloadsDirectoryUnavailableError)' \
   VoiceInk/Services/LogExporter.swift
 
 require_pattern \
   "core checks execute diagnostic log export policy tests" \
-  'DiagnosticLogExportPolicyTests\.testDiagnosticsSettingsPresentationPreservesMacOSCopyAndIcons|DiagnosticLogExportPolicyTests\.testDiagnosticLogExportPolicyPreservesMacOSStorageAndFormattingConstants|DiagnosticLogExportPolicyTests\.testDiagnosticLogExportPolicyBuildsSessionRangesWithCurrentMiddleAndOldestLabels|DiagnosticLogExportPolicyTests\.testDiagnosticLogExportPolicyBuildsMacOSExportFileName|DiagnosticLogExportPolicyTests\.testDiagnosticLogExportPolicyBuildsDownloadsUnavailableError' \
+  'DiagnosticLogExportPolicyTests\.testDiagnosticsSettingsPresentationPreservesMacOSCopyAndIcons|DiagnosticLogExportPolicyTests\.testDiagnosticLogExportPolicyPreservesMacOSStorageAndFormattingConstants|DiagnosticLogExportPolicyTests\.testDiagnosticLogExportPolicyBuildsSessionRangesWithCurrentMiddleAndOldestLabels|DiagnosticLogExportPolicyTests\.testDiagnosticLogExportPolicyOwnsOSLogLevelLabels|DiagnosticLogExportPolicyTests\.testDiagnosticLogExportPolicyBuildsMacOSExportFileName|DiagnosticLogExportPolicyTests\.testDiagnosticLogExportPolicyBuildsDownloadsUnavailableError' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -13022,7 +13022,7 @@ require_pattern \
 
 reject_pattern \
   "macOS log exporter avoids shell-owned diagnostic log export policy" \
-  'logExporter\.sessionStartDates\.v1|maxSessionsToKeep|sessionRanges:|\[Date\(\)\] \+ loadedDates|prefix\(maxSessionsToKeep\)|yyyy-MM-dd HH:mm:ss\.SSS|yyyy-MM-dd_HH-mm-ss|VoiceInk_Logs_|=== VoiceInk Diagnostic Logs ===|No logs found for this session\.|Session 1 \(Current\)|Session [0-9].*\(Oldest\)|NSError\(domain: "LogExporter"|code: 1|Downloads directory unavailable|NSLocalizedDescriptionKey' \
+  'logExporter\.sessionStartDates\.v1|maxSessionsToKeep|sessionRanges:|\[Date\(\)\] \+ loadedDates|prefix\(maxSessionsToKeep\)|yyyy-MM-dd HH:mm:ss\.SSS|yyyy-MM-dd_HH-mm-ss|VoiceInk_Logs_|=== VoiceInk Diagnostic Logs ===|No logs found for this session\.|Session 1 \(Current\)|Session [0-9].*\(Oldest\)|NSError\(domain: "LogExporter"|code: 1|Downloads directory unavailable|NSLocalizedDescriptionKey|logLevelString|case \.(undefined|debug|info|notice|error|fault)|return "(UNDEFINED|DEBUG|INFO|NOTICE|ERROR|FAULT|UNKNOWN)"' \
   VoiceInk/Services/LogExporter.swift
 
 reject_pattern \

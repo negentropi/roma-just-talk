@@ -11794,6 +11794,31 @@ require_pattern \
   'RollingBufferPreloadPolicyTests\.testBufferedSnapshotTranscriptionStrategyUsesRecordedFileCapability' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
+require_patterns \
+  "shared rolling-buffer quick-release diagnostics presentation lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/RollingBufferPreloadPolicy.swift \
+  'VoiceInkRollingBufferQuickReleaseClaimStrategy' \
+  'VoiceInkRollingBufferQuickReleaseTimingStage' \
+  'VoiceInkRollingBufferQuickReleaseClaimSnapshot' \
+  'displaySummary' \
+  'exportSummary' \
+  'recordTiming'
+
+require_pattern \
+  "macOS rolling-buffer runtime diagnostics adapts shared quick-release claim snapshot" \
+  'VoiceInkRollingBufferQuickReleaseClaimSnapshot|VoiceInkRollingBufferQuickReleaseClaimStrategy|VoiceInkRollingBufferQuickReleaseTimingStage' \
+  VoiceInk/Transcription/RollingPreload/RollingBufferPreloadSettings.swift
+
+reject_pattern \
+  "macOS rolling-buffer shell avoids local quick-release claim presentation policy" \
+  'enum +RollingBufferQuickRelease(ClaimStrategy|TimingStage)|struct +RollingBufferQuickReleaseClaimSnapshot|var +(displaySummary|exportSummary)|func +recordTiming\(stage: RollingBufferQuickReleaseTimingStage' \
+  VoiceInk/Transcription/RollingPreload/RollingBufferPreloadSettings.swift
+
+require_pattern \
+  "core checks execute quick-release claim presentation tests" \
+  'RollingBufferPreloadPolicyTests\.testQuickReleaseClaimStrategyPreservesDiagnosticLabels|RollingBufferPreloadPolicyTests\.testQuickReleaseClaimSnapshotFormatsDisplayAndExportSummaries' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
 reject_pattern \
   "macOS rolling preload avoids shell-only provider classification list" \
   'case \.groq, \.elevenLabs, \.deepgram|var isLocalTranscriptionProvider: Bool' \

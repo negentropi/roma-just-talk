@@ -464,6 +464,61 @@ final class RollingBufferPreloadPolicyTests: XCTestCase {
         )
     }
 
+    func testQuickReleaseClaimStrategyPreservesDiagnosticLabels() {
+        XCTAssertEqual(VoiceInkRollingBufferQuickReleaseClaimStrategy.none.displayName, "None")
+        XCTAssertEqual(VoiceInkRollingBufferQuickReleaseClaimStrategy.readyPreload.displayName, "Ready Preload")
+        XCTAssertEqual(
+            VoiceInkRollingBufferQuickReleaseClaimStrategy.bufferedAudioSnapshot.displayName,
+            "Buffered Audio Snapshot"
+        )
+        XCTAssertEqual(VoiceInkRollingBufferQuickReleaseClaimStrategy.unavailable.displayName, "Unavailable")
+        XCTAssertEqual(VoiceInkRollingBufferQuickReleaseClaimStrategy.invalidated.displayName, "Invalidated")
+        XCTAssertEqual(VoiceInkRollingBufferQuickReleaseClaimStrategy.failed.displayName, "Failed")
+    }
+
+    func testQuickReleaseClaimSnapshotFormatsDisplayAndExportSummaries() {
+        var snapshot = VoiceInkRollingBufferQuickReleaseClaimSnapshot(
+            strategy: .bufferedAudioSnapshot,
+            reason: "no-claim",
+            audioBytes: 1024,
+            updatedAt: Date(timeIntervalSince1970: 1_000),
+            claimElapsedSeconds: 0.1234,
+            transcriptionReadySeconds: nil,
+            activeWindowReadySeconds: nil,
+            pasteStartingSeconds: nil,
+            pasteCompletedSeconds: nil,
+            pipelineReturnedSeconds: 0.8,
+            idleSeconds: nil,
+            sessionFinishedSeconds: nil,
+            savedSeconds: nil
+        )
+
+        XCTAssertEqual(
+            snapshot.displaySummary,
+            "Buffered Audio Snapshot - no-claim - 1 KB - claim 0.123s - returned 0.800s"
+        )
+
+        snapshot.recordTiming(
+            stage: .pasteCompleted,
+            elapsedSeconds: 0.4567,
+            at: Date(timeIntervalSince1970: 2_000)
+        )
+        snapshot.recordTiming(
+            stage: .idle,
+            elapsedSeconds: 0.9,
+            at: Date(timeIntervalSince1970: 3_000)
+        )
+
+        XCTAssertEqual(
+            snapshot.displaySummary,
+            "Buffered Audio Snapshot - no-claim - 1 KB - paste 0.457s - idle 0.900s"
+        )
+        XCTAssertTrue(snapshot.exportSummary.contains("claim=0.123s"))
+        XCTAssertTrue(snapshot.exportSummary.contains("paste-complete=0.457s"))
+        XCTAssertTrue(snapshot.exportSummary.contains("returned=0.800s"))
+        XCTAssertTrue(snapshot.exportSummary.contains("idle=0.900s"))
+    }
+
     private func configuration(
         mode: VoiceInkRollingBufferPreloadMode,
         autoDisablesCloudModels: Bool = false,

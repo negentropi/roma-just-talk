@@ -429,7 +429,7 @@ class TranscriptionPipeline {
 
     private func recordRollingPreloadTiming(
         _ latencyTrace: TranscriptionLatencyTrace,
-        stage: RollingBufferQuickReleaseTimingStage
+        stage: VoiceInkRollingBufferQuickReleaseTimingStage
     ) {
         guard latencyTrace.isRollingPreloadQuickRelease else { return }
         RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseTiming(

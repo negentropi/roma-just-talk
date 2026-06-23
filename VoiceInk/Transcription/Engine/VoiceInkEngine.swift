@@ -831,7 +831,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
 
     private func recordRollingPreloadTiming(
         _ latencyTrace: TranscriptionLatencyTrace?,
-        stage: RollingBufferQuickReleaseTimingStage
+        stage: VoiceInkRollingBufferQuickReleaseTimingStage
     ) {
         guard let latencyTrace, latencyTrace.isRollingPreloadQuickRelease else { return }
         RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseTiming(

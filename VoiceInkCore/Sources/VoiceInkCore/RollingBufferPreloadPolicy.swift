@@ -157,6 +157,170 @@ public enum VoiceInkRollingBufferBufferedSnapshotTranscriptionPolicy {
     }
 }
 
+public enum VoiceInkRollingBufferQuickReleaseClaimStrategy: String, Equatable, Sendable {
+    case none
+    case readyPreload
+    case bufferedAudioSnapshot
+    case unavailable
+    case invalidated
+    case failed
+
+    public var displayName: String {
+        switch self {
+        case .none:
+            return "None"
+        case .readyPreload:
+            return "Ready Preload"
+        case .bufferedAudioSnapshot:
+            return "Buffered Audio Snapshot"
+        case .unavailable:
+            return "Unavailable"
+        case .invalidated:
+            return "Invalidated"
+        case .failed:
+            return "Failed"
+        }
+    }
+}
+
+public enum VoiceInkRollingBufferQuickReleaseTimingStage: Equatable, Sendable {
+    case transcriptionReady
+    case activeWindowReady
+    case pasteStarting
+    case pasteCompleted
+    case pipelineReturned
+    case idle
+    case sessionFinished
+    case saved
+}
+
+public struct VoiceInkRollingBufferQuickReleaseClaimSnapshot: Equatable, Sendable {
+    public let strategy: VoiceInkRollingBufferQuickReleaseClaimStrategy
+    public let reason: String?
+    public let audioBytes: Int
+    public var updatedAt: Date?
+    public var claimElapsedSeconds: TimeInterval?
+    public var transcriptionReadySeconds: TimeInterval?
+    public var activeWindowReadySeconds: TimeInterval?
+    public var pasteStartingSeconds: TimeInterval?
+    public var pasteCompletedSeconds: TimeInterval?
+    public var pipelineReturnedSeconds: TimeInterval?
+    public var idleSeconds: TimeInterval?
+    public var sessionFinishedSeconds: TimeInterval?
+    public var savedSeconds: TimeInterval?
+
+    public init(
+        strategy: VoiceInkRollingBufferQuickReleaseClaimStrategy,
+        reason: String?,
+        audioBytes: Int,
+        updatedAt: Date?,
+        claimElapsedSeconds: TimeInterval?,
+        transcriptionReadySeconds: TimeInterval?,
+        activeWindowReadySeconds: TimeInterval?,
+        pasteStartingSeconds: TimeInterval?,
+        pasteCompletedSeconds: TimeInterval?,
+        pipelineReturnedSeconds: TimeInterval?,
+        idleSeconds: TimeInterval?,
+        sessionFinishedSeconds: TimeInterval?,
+        savedSeconds: TimeInterval?
+    ) {
+        self.strategy = strategy
+        self.reason = reason
+        self.audioBytes = audioBytes
+        self.updatedAt = updatedAt
+        self.claimElapsedSeconds = claimElapsedSeconds
+        self.transcriptionReadySeconds = transcriptionReadySeconds
+        self.activeWindowReadySeconds = activeWindowReadySeconds
+        self.pasteStartingSeconds = pasteStartingSeconds
+        self.pasteCompletedSeconds = pasteCompletedSeconds
+        self.pipelineReturnedSeconds = pipelineReturnedSeconds
+        self.idleSeconds = idleSeconds
+        self.sessionFinishedSeconds = sessionFinishedSeconds
+        self.savedSeconds = savedSeconds
+    }
+
+    public var displaySummary: String {
+        guard updatedAt != nil else { return "None" }
+
+        var parts = [strategy.displayName]
+        if let reason, !reason.isEmpty {
+            parts.append(reason)
+        }
+        if audioBytes > 0 {
+            parts.append(ByteCountFormatter.string(fromByteCount: Int64(audioBytes), countStyle: .file))
+        }
+        if let pasteCompletedSeconds {
+            parts.append("paste \(Self.formatSeconds(pasteCompletedSeconds))")
+        } else if let pasteStartingSeconds {
+            parts.append("paste-start \(Self.formatSeconds(pasteStartingSeconds))")
+        } else if let activeWindowReadySeconds {
+            parts.append("window \(Self.formatSeconds(activeWindowReadySeconds))")
+        } else if let transcriptionReadySeconds {
+            parts.append("transcribed \(Self.formatSeconds(transcriptionReadySeconds))")
+        } else if let claimElapsedSeconds {
+            parts.append("claim \(Self.formatSeconds(claimElapsedSeconds))")
+        }
+        if let idleSeconds {
+            parts.append("idle \(Self.formatSeconds(idleSeconds))")
+        } else if let pipelineReturnedSeconds {
+            parts.append("returned \(Self.formatSeconds(pipelineReturnedSeconds))")
+        }
+        return parts.joined(separator: " - ")
+    }
+
+    public var exportSummary: String {
+        guard let updatedAt else { return displaySummary }
+        let timingParts = [
+            Self.timingPart("claim", claimElapsedSeconds),
+            Self.timingPart("transcription", transcriptionReadySeconds),
+            Self.timingPart("active-window", activeWindowReadySeconds),
+            Self.timingPart("paste-start", pasteStartingSeconds),
+            Self.timingPart("paste-complete", pasteCompletedSeconds),
+            Self.timingPart("returned", pipelineReturnedSeconds),
+            Self.timingPart("idle", idleSeconds),
+            Self.timingPart("session-finished", sessionFinishedSeconds),
+            Self.timingPart("saved", savedSeconds)
+        ].compactMap { $0 }
+        let timingSummary = timingParts.isEmpty ? "" : " | \(timingParts.joined(separator: ", "))"
+        return "\(displaySummary) at \(updatedAt.formatted(date: .numeric, time: .standard))\(timingSummary)"
+    }
+
+    public mutating func recordTiming(
+        stage: VoiceInkRollingBufferQuickReleaseTimingStage,
+        elapsedSeconds: TimeInterval,
+        at date: Date
+    ) {
+        updatedAt = date
+        switch stage {
+        case .transcriptionReady:
+            transcriptionReadySeconds = elapsedSeconds
+        case .activeWindowReady:
+            activeWindowReadySeconds = elapsedSeconds
+        case .pasteStarting:
+            pasteStartingSeconds = elapsedSeconds
+        case .pasteCompleted:
+            pasteCompletedSeconds = elapsedSeconds
+        case .pipelineReturned:
+            pipelineReturnedSeconds = elapsedSeconds
+        case .idle:
+            idleSeconds = elapsedSeconds
+        case .sessionFinished:
+            sessionFinishedSeconds = elapsedSeconds
+        case .saved:
+            savedSeconds = elapsedSeconds
+        }
+    }
+
+    private static func timingPart(_ label: String, _ seconds: TimeInterval?) -> String? {
+        guard let seconds else { return nil }
+        return "\(label)=\(formatSeconds(seconds))"
+    }
+
+    private static func formatSeconds(_ seconds: TimeInterval) -> String {
+        String(format: "%.3fs", seconds)
+    }
+}
+
 public struct VoiceInkRollingBufferPreloadSettingsPresentation: Equatable, Sendable {
     public let sectionTitle: String
     public let modePickerTitle: String

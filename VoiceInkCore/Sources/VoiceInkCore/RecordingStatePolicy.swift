@@ -659,6 +659,15 @@ public enum VoiceInkKeyboardOpenAppDiagnostics {
 public enum VoiceInkKeyboardStopRecordingRequestAction: Equatable, Sendable {
     case handleStopRequest
     case ignore
+
+    public func applyRuntimeState(handleStopRequest: () -> Void) {
+        switch self {
+        case .handleStopRequest:
+            handleStopRequest()
+        case .ignore:
+            return
+        }
+    }
 }
 
 public enum VoiceInkKeyboardStopRecordingRequestPolicy {

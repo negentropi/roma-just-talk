@@ -62,13 +62,10 @@ struct NotesListView: View {
                 .onReceive(NotificationCenter.default.publisher(
                     for: VoiceInkAppIdentity.iOSStopRecordingFromKeyboardNotificationName
                 )) { _ in
-                    switch VoiceInkKeyboardStopRecordingRequestPolicy.action(
+                    VoiceInkKeyboardStopRecordingRequestPolicy.action(
                         recordingState: recordingManager.recordingState
-                    ) {
-                    case .handleStopRequest:
+                    ).applyRuntimeState {
                         recordingManager.stopRecording(modelContext: modelContext)
-                    case .ignore:
-                        break
                     }
                 }
         }

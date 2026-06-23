@@ -875,6 +875,19 @@ final class RecordingStatePolicyTests: XCTestCase {
         }
     }
 
+    func testKeyboardStopRecordingRequestActionAppliesRuntimeState() {
+        var handledStopRequest = false
+        VoiceInkKeyboardStopRecordingRequestAction.ignore.applyRuntimeState {
+            handledStopRequest = true
+        }
+        XCTAssertFalse(handledStopRequest)
+
+        VoiceInkKeyboardStopRecordingRequestAction.handleStopRequest.applyRuntimeState {
+            handledStopRequest = true
+        }
+        XCTAssertTrue(handledStopRequest)
+    }
+
     func testRecorderStylePreferencePreservesMacOSStorageAndLabels() {
         XCTAssertEqual(VoiceInkRecorderStylePreference.userDefaultsKey, "RecorderType")
         XCTAssertEqual(VoiceInkRecorderStylePreference.defaultStyle, .none)

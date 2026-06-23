@@ -14912,24 +14912,34 @@ reject_pattern \
   'switch tapPlan\.action|tapPlan\.shouldRefreshButtonStateAfterAction|case \.requestStopRecording|case \.openMainAppForRecording' \
   iOS/VoiceInkKeyboard/KeyboardViewController.swift
 
-require_pattern \
+require_patterns \
   "VoiceInkCore owns iOS keyboard stop-request policy" \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift \
   'VoiceInkKeyboardStopRecordingRequest(Policy|Action)|action\(recordingState:' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+  'applyRuntimeState'
 
-require_pattern \
+require_patterns \
   "VoiceInkCore checks cover iOS keyboard stop-request policy" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RecordingStatePolicyTests.swift \
   'testKeyboardStopRecordingRequestHandlesOnlyActiveRecording' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RecordingStatePolicyTests.swift
+  'testKeyboardStopRecordingRequestActionAppliesRuntimeState'
 
-require_pattern \
+require_patterns \
   "iOS recording manager delegates keyboard stop-request policy to shared core" \
+  iOS/VoiceInk-ios/RecordingManager.swift \
   'VoiceInkKeyboardStopRecordingRequestPolicy\.action' \
-  iOS/VoiceInk-ios/RecordingManager.swift
+  'applyRuntimeState'
 
-require_pattern \
+require_patterns \
   "iOS notes list delegates keyboard stop-request policy to shared core" \
+  iOS/VoiceInk-ios/NotesListView.swift \
   'VoiceInkKeyboardStopRecordingRequestPolicy\.action' \
+  'applyRuntimeState'
+
+reject_pattern \
+  "iOS app shell avoids shell-owned keyboard stop-request action switches" \
+  'switch VoiceInkKeyboardStopRecordingRequestPolicy|case \.handleStopRequest|case \.ignore' \
+  iOS/VoiceInk-ios/RecordingManager.swift \
   iOS/VoiceInk-ios/NotesListView.swift
 
 require_pattern \

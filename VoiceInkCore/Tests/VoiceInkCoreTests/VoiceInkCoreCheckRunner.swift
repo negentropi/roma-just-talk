@@ -1122,6 +1122,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "RecordingStatePolicyTests.testKeyboardOpenAppActionsApplyRuntimeState", run: { RecordingStatePolicyTests().testKeyboardOpenAppActionsApplyRuntimeState() }),
             VoiceInkCoreCheck(name: "RecordingStatePolicyTests.testKeyboardOpenAppDiagnosticsPreserveIOSLogCopy", run: { RecordingStatePolicyTests().testKeyboardOpenAppDiagnosticsPreserveIOSLogCopy() }),
             VoiceInkCoreCheck(name: "RecordingStatePolicyTests.testKeyboardStopRecordingRequestHandlesOnlyActiveRecording", run: { RecordingStatePolicyTests().testKeyboardStopRecordingRequestHandlesOnlyActiveRecording() }),
+            VoiceInkCoreCheck(name: "RecordingStatePolicyTests.testKeyboardStopRecordingRequestActionAppliesRuntimeState", run: { RecordingStatePolicyTests().testKeyboardStopRecordingRequestActionAppliesRuntimeState() }),
             VoiceInkCoreCheck(name: "RecordingStatePolicyTests.testRecorderStylePreferencePreservesMacOSStorageAndLabels", run: { RecordingStatePolicyTests().testRecorderStylePreferencePreservesMacOSStorageAndLabels() }),
             VoiceInkCoreCheck(name: "RecordingStatePolicyTests.testRecorderStylePreferenceReadsAndSavesRawValues", run: { RecordingStatePolicyTests().testRecorderStylePreferenceReadsAndSavesRawValues() }),
             VoiceInkCoreCheck(name: "RecordingStatePolicyTests.testRecorderStyleWindowKindPreservesMacOSUnknownStyleFallback", run: { RecordingStatePolicyTests().testRecorderStyleWindowKindPreservesMacOSUnknownStyleFallback() }),

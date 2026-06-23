@@ -4740,7 +4740,15 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionClient.swift \
   VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionClient.swift \
   VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionClient.swift \
-  VoiceInkCore/Sources/VoiceInkCore/CartesiaAPIKeyClient.swift
+  VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyVerifier.swift
+
+section "obsolete standalone Cartesia API-key client module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/CartesiaAPIKeyClient.swift
+
+require_pattern \
+  "Cartesia API-key request builder lives with provider verifier" \
+  'VoiceInkCartesiaRequestBuilder|VoiceInkCartesiaClient|Cartesia-Version|cartesiaVoicesURL' \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyVerifier.swift
 
 section "obsolete standalone OpenAI-compatible models request module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleModelsRequest.swift
@@ -4770,7 +4778,6 @@ reject_pattern \
   VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionClient.swift \
   VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionClient.swift \
   VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionClient.swift \
-  VoiceInkCore/Sources/VoiceInkCore/CartesiaAPIKeyClient.swift \
   VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyVerifier.swift
 
 require_pattern \

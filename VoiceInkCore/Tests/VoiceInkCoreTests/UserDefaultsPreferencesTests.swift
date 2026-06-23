@@ -1603,6 +1603,7 @@ final class UserDefaultsPreferencesTests: XCTestCase {
     func testModelRuntimePreferenceRegisteredDefaultsPreserveMacOSPolicy() {
         XCTAssertEqual(VoiceInkModelRuntimePreference.userDefaultsKey, "PrewarmModelOnWake")
         XCTAssertTrue(VoiceInkModelRuntimePreference.defaultShouldPrewarmModelOnWake)
+        XCTAssertEqual(VoiceInkModelRuntimePreference.prewarmScheduleDelay, .seconds(3))
         XCTAssertEqual(
             VoiceInkModelRuntimePreference.registeredDefaults[VoiceInkModelRuntimePreference.userDefaultsKey] as? Bool,
             true

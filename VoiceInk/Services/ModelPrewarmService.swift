@@ -52,17 +52,18 @@ final class ModelPrewarmService: ObservableObject {
     /// Trigger on app launch (cold start)
     private func schedulePrewarmOnAppLaunch() {
         logger.notice("App launched, scheduling prewarm")
-        Task {
-            try? await Task.sleep(for: .seconds(3))
-            await performPrewarm()
-        }
+        scheduleDelayedPrewarm()
     }
 
     /// Trigger on wake from sleep or screen unlock
     @objc private func schedulePrewarm() {
         logger.notice("Mac activity detected (wake/unlock), scheduling prewarm")
+        scheduleDelayedPrewarm()
+    }
+
+    private func scheduleDelayedPrewarm() {
         Task {
-            try? await Task.sleep(for: .seconds(3))
+            try? await Task.sleep(for: VoiceInkModelRuntimePreference.prewarmScheduleDelay)
             await performPrewarm()
         }
     }

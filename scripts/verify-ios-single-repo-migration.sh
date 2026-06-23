@@ -8911,6 +8911,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
+  "shared model runtime prewarm delay lives in VoiceInkCore" \
+  'public static let prewarmScheduleDelay: Duration = \.seconds\(3\)' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
   "shared model runtime preference reads policy in VoiceInkCore" \
   'shouldPrewarmModelOnWake' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
@@ -8958,6 +8963,16 @@ require_pattern \
 require_pattern \
   "macOS model prewarm uses shared model runtime preference" \
   'VoiceInkModelRuntimePreference\.shouldPrewarmModelOnWake' \
+  VoiceInk/Services/ModelPrewarmService.swift
+
+require_pattern \
+  "macOS model prewarm uses shared prewarm trigger delay" \
+  'VoiceInkModelRuntimePreference\.prewarmScheduleDelay' \
+  VoiceInk/Services/ModelPrewarmService.swift
+
+reject_pattern \
+  "macOS model prewarm avoids shell-owned prewarm delay literal" \
+  '\.seconds\(3\)' \
   VoiceInk/Services/ModelPrewarmService.swift
 
 require_pattern \

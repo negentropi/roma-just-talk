@@ -1366,6 +1366,7 @@ public enum VoiceInkAudioCleanupPreference {
 public enum VoiceInkModelRuntimePreference {
     public static let userDefaultsKey = VoiceInkUserDefaultsKey.prewarmModelOnWake
     public static let defaultShouldPrewarmModelOnWake = VoiceInkPreferenceDefault.prewarmModelOnWake
+    public static let prewarmScheduleDelay: Duration = .seconds(3)
     public static let macOSSettingsPresentation = VoiceInkMacOSAdvancedTranscriptionSettingsPresentation.macOS.modelPrewarm
 
     public static var registeredDefaults: [String: Any] {

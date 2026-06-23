@@ -47,6 +47,10 @@ struct ModelRowView: View {
     
     var body: some View {
         let presentation = row.presentation
+        let runtimeAction = presentation.action.runtimeAction(
+            requestDownload: { showingDownloadConfirmation = true },
+            cancelDownload: { modelManager.cancelDownload(for: row.model) }
+        )
 
         VStack(alignment: .leading, spacing: 8) {
             HStack {
@@ -60,29 +64,12 @@ struct ModelRowView: View {
                 
                 Spacer()
                 
-                switch presentation.action {
-                case .downloaded:
-                    Image(systemName: presentation.actionSystemImageName)
-                        .foregroundColor(.green)
-                        .font(.title2)
-
-                case .downloading:
-                    Button(action: {
-                        modelManager.cancelDownload(for: row.model)
-                    }) {
-                        Image(systemName: presentation.actionSystemImageName)
-                            .foregroundColor(.red)
-                            .font(.title2)
+                if let runtimeAction {
+                    Button(action: runtimeAction) {
+                        actionIcon(for: presentation)
                     }
-
-                case .download:
-                    Button(action: {
-                        showingDownloadConfirmation = true
-                    }) {
-                        Image(systemName: presentation.actionSystemImageName)
-                            .foregroundColor(.blue)
-                            .font(.title2)
-                    }
+                } else {
+                    actionIcon(for: presentation)
                 }
             }
             
@@ -129,6 +116,23 @@ struct ModelRowView: View {
             Button(row.downloadConfirmation.cancelButtonTitle, role: .cancel) { }
         } message: {
             Text(row.downloadConfirmation.message)
+        }
+    }
+
+    private func actionIcon(for presentation: VoiceInkWhisperModelDownloadRowPresentation) -> some View {
+        Image(systemName: presentation.actionSystemImageName)
+            .foregroundColor(actionColor(for: presentation.action))
+            .font(.title2)
+    }
+
+    private func actionColor(for action: VoiceInkWhisperModelDownloadRowAction) -> Color {
+        switch action {
+        case .downloaded:
+            return .green
+        case .downloading:
+            return .red
+        case .download:
+            return .blue
         }
     }
 }

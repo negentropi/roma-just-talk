@@ -759,6 +759,31 @@ final class WhisperModelFilesTests: XCTestCase {
         XCTAssertEqual(downloadingPresentation.actionSystemImageName, "xmark.circle.fill")
     }
 
+    func testSimpleDownloadRowActionBuildsDeferredRuntimeAction() {
+        var events: [String] = []
+
+        XCTAssertNil(VoiceInkWhisperModelDownloadRowAction.downloaded.runtimeAction(
+            requestDownload: { events.append("download") },
+            cancelDownload: { events.append("cancel") }
+        ))
+        XCTAssertTrue(events.isEmpty)
+
+        let downloadAction = VoiceInkWhisperModelDownloadRowAction.download.runtimeAction(
+            requestDownload: { events.append("download") },
+            cancelDownload: { events.append("cancel") }
+        )
+        XCTAssertTrue(events.isEmpty)
+        downloadAction?()
+        XCTAssertEqual(events, ["download"])
+
+        let cancelAction = VoiceInkWhisperModelDownloadRowAction.downloading.runtimeAction(
+            requestDownload: { events.append("download") },
+            cancelDownload: { events.append("cancel") }
+        )
+        cancelAction?()
+        XCTAssertEqual(events, ["download", "cancel"])
+    }
+
     func testSimpleDownloadManagementListBuildsSharedRows() {
         let model = VoiceInkWhisperModelFiles.baseModel
         let downloadState = VoiceInkWhisperModelDownloadState(

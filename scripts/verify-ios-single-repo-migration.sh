@@ -4246,6 +4246,11 @@ require_pattern \
   'presentation\.action' \
   iOS/VoiceInk-ios/LocalModelManagementView.swift
 
+require_pattern \
+  "iOS local model management delegates row runtime action mapping to shared core" \
+  'presentation\.action\.runtimeAction' \
+  iOS/VoiceInk-ios/LocalModelManagementView.swift
+
 reject_pattern \
   "iOS local model management avoids shallow row action booleans" \
   'presentation\.(isDownloaded|canStartDownload|canCancelDownload|canDeleteDownloadedModel)\b' \
@@ -4621,10 +4626,16 @@ reject_pattern \
   iOS/VoiceInk-ios/LocalModelManagementView.swift \
   iOS/VoiceInk-ios/OnboardingView.swift
 
-require_pattern \
+require_patterns \
   "shared local model row presentation exposes one action enum" \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift \
   'VoiceInkWhisperModelDownloadRowAction' \
-  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+  'runtimeAction'
+
+require_pattern \
+  "core check runner executes local model row runtime action test" \
+  'testSimpleDownloadRowActionBuildsDeferredRuntimeAction' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "shared local model deletion policy lives in VoiceInkCore" \
@@ -4652,9 +4663,8 @@ reject_pattern \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
 
 require_pattern \
-  "iOS model download views switch on shared row action" \
+  "iOS onboarding switches on shared row action for button presentation" \
   'switch presentation\.action' \
-  iOS/VoiceInk-ios/LocalModelManagementView.swift \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 reject_pattern \

@@ -340,6 +340,20 @@ public enum VoiceInkWhisperModelDownloadRowAction: Equatable, Sendable {
     case download
     case downloading
     case downloaded
+
+    public func runtimeAction(
+        requestDownload: @escaping () -> Void,
+        cancelDownload: @escaping () -> Void
+    ) -> (() -> Void)? {
+        switch self {
+        case .download:
+            return requestDownload
+        case .downloading:
+            return cancelDownload
+        case .downloaded:
+            return nil
+        }
+    }
 }
 
 public struct VoiceInkWhisperModelDownloadRowPresentation: Equatable, Sendable {

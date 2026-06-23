@@ -250,19 +250,8 @@ class AudioDeviceManager: ObservableObject {
         inputMode = mode
         VoiceInkAudioInputPreference.saveInputMode(mode)
 
-        switch mode {
-        case .systemDefault:
-            break
-        case .custom:
-            if selectedDeviceID == nil {
-                if let deviceID = findBestAvailableDevice() {
-                    selectDevice(id: deviceID)
-                }
-            }
-        case .prioritized:
-            if selectedDeviceID == nil {
-                selectHighestPriorityAvailableDevice()
-            }
+        if let deviceID = deviceIDToSelectWhenChangingMode(mode) {
+            selectDevice(id: deviceID)
         }
 
         notifyDeviceChange()
@@ -271,20 +260,31 @@ class AudioDeviceManager: ObservableObject {
     func getCurrentDevice() -> AudioDeviceID {
         switch inputMode {
         case .systemDefault:
-            return safeAutomaticDevice(preferred: getSystemDefaultDevice()) ?? 0
+            return VoiceInkAudioInputSelectionPolicy.currentDeviceID(
+                inputMode: inputMode,
+                selectedDeviceID: selectedDeviceID,
+                selectedDeviceIsAvailable: selectedDeviceIsAvailable,
+                priorityDeviceID: nil,
+                automaticDeviceID: nil,
+                systemDefaultDeviceID: safeAutomaticDevice(preferred: getSystemDefaultDevice())
+            ) ?? 0
         case .custom:
-            if let id = selectedDeviceID, isDeviceAvailable(id) {
-                return id
-            }
-            return findBestAvailableDevice() ?? 0
+            return VoiceInkAudioInputSelectionPolicy.currentDeviceID(
+                inputMode: inputMode,
+                selectedDeviceID: selectedDeviceID,
+                selectedDeviceIsAvailable: selectedDeviceIsAvailable,
+                priorityDeviceID: nil,
+                automaticDeviceID: selectedDeviceIsAvailable ? nil : findBestAvailableDevice()
+            ) ?? 0
         case .prioritized:
-            let sortedDevices = VoiceInkAudioInputPriorityPolicy.sortedDevices(prioritizedDevices)
-            for device in sortedDevices {
-                if let available = availableDevices.first(where: { $0.uid == device.id }) {
-                    return available.id
-                }
-            }
-            return findBestAvailableDevice() ?? 0
+            let priorityDeviceID = firstAvailablePriorityDevice()?.id
+            return VoiceInkAudioInputSelectionPolicy.currentDeviceID(
+                inputMode: inputMode,
+                selectedDeviceID: selectedDeviceID,
+                selectedDeviceIsAvailable: selectedDeviceIsAvailable,
+                priorityDeviceID: priorityDeviceID,
+                automaticDeviceID: priorityDeviceID == nil ? findBestAvailableDevice() : nil
+            ) ?? 0
         }
     }
     
@@ -330,15 +330,11 @@ class AudioDeviceManager: ObservableObject {
     }
     
     private func selectHighestPriorityAvailableDevice() {
-        let sortedDevices = VoiceInkAudioInputPriorityPolicy.sortedDevices(prioritizedDevices)
-
-        for device in sortedDevices {
-            if let availableDevice = availableDevices.first(where: { $0.uid == device.id }) {
-                selectedDeviceID = availableDevice.id
-                logger.notice("🎙️ Selected prioritized device: \(device.name, privacy: .public)")
-                notifyDeviceChange()
-                return
-            }
+        if let priorityDevice = firstAvailablePriorityDevice() {
+            selectedDeviceID = priorityDevice.id
+            logger.notice("🎙️ Selected prioritized device: \(priorityDevice.name, privacy: .public)")
+            notifyDeviceChange()
+            return
         }
 
         fallbackToDefaultDevice()
@@ -376,6 +372,37 @@ class AudioDeviceManager: ObservableObject {
                 isBluetooth: isBluetoothDevice(device.id)
             )
         }
+    }
+
+    private var selectedDeviceIsAvailable: Bool {
+        selectedDeviceID.map { isDeviceAvailable($0) } ?? false
+    }
+
+    private func availableSelectionDevices() -> [VoiceInkAudioInputAvailableDevice<AudioDeviceID>] {
+        availableDevices.map { device in
+            VoiceInkAudioInputAvailableDevice(id: device.id, uid: device.uid, name: device.name)
+        }
+    }
+
+    private func firstAvailablePriorityDevice() -> VoiceInkAudioInputAvailableDevice<AudioDeviceID>? {
+        VoiceInkAudioInputPriorityPolicy.firstAvailablePriorityDevice(
+            in: prioritizedDevices,
+            availableDevices: availableSelectionDevices()
+        )
+    }
+
+    private func deviceIDToSelectWhenChangingMode(_ mode: VoiceInkAudioInputMode) -> AudioDeviceID? {
+        guard selectedDeviceID == nil else { return nil }
+
+        let priorityDeviceID = mode == .prioritized ? firstAvailablePriorityDevice()?.id : nil
+        let automaticDeviceID = mode != .systemDefault && priorityDeviceID == nil ? findBestAvailableDevice() : nil
+
+        return VoiceInkAudioInputSelectionPolicy.deviceIDToSelectWhenChangingMode(
+            inputMode: mode,
+            selectedDeviceID: selectedDeviceID,
+            priorityDeviceID: priorityDeviceID,
+            automaticDeviceID: automaticDeviceID
+        )
     }
 
     private func isBluetoothDevice(_ deviceID: AudioDeviceID) -> Bool {
@@ -428,27 +455,18 @@ class AudioDeviceManager: ObservableObject {
                 if !self.isDeviceAvailable(currentID) {
                     self.logger.warning("🎙️ Recording device \(currentID, privacy: .public) no longer available - requesting switch")
 
-                    let newDeviceID: AudioDeviceID?
-                    if self.inputMode == .prioritized {
-                        let availableDeviceUIDs = Set(self.availableDevices.map(\.uid))
-                        let priorityDeviceID = VoiceInkAudioInputPriorityPolicy.firstAvailablePriorityDeviceID(
-                            in: self.prioritizedDevices,
-                            availableDeviceIDs: availableDeviceUIDs
-                        ).flatMap { priorityUID in
-                            self.availableDevices.first(where: { $0.uid == priorityUID })?.id
-                        }
-
-                        if let deviceID = priorityDeviceID {
-                            newDeviceID = deviceID
-                        } else {
-                            self.logger.warning("🎙️ No priority devices available, using fallback")
-                            newDeviceID = self.findBestAvailableDevice()
-                        }
-                    } else {
-                        newDeviceID = self.findBestAvailableDevice()
+                    let priorityDeviceID = self.inputMode == .prioritized ? self.firstAvailablePriorityDevice()?.id : nil
+                    if self.inputMode == .prioritized && priorityDeviceID == nil {
+                        self.logger.warning("🎙️ No priority devices available, using fallback")
                     }
+                    let automaticDeviceID = priorityDeviceID == nil ? self.findBestAvailableDevice() : nil
+                    let switchPlan = VoiceInkAudioInputSelectionPolicy.recordingSwitchPlan(
+                        inputMode: self.inputMode,
+                        priorityDeviceID: priorityDeviceID,
+                        automaticDeviceID: automaticDeviceID
+                    )
 
-                    if let deviceID = newDeviceID {
+                    if let deviceID = switchPlan.deviceID {
                         self.selectedDeviceID = deviceID
                         NotificationCenter.default.post(
                             name: .audioDeviceSwitchRequired,

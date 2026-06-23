@@ -48,6 +48,18 @@ public struct VoiceInkAudioInputPriorityDevice: Codable, Equatable, Identifiable
     }
 }
 
+public struct VoiceInkAudioInputAvailableDevice<ID: Equatable & Sendable>: Equatable, Sendable {
+    public let id: ID
+    public let uid: String
+    public let name: String
+
+    public init(id: ID, uid: String, name: String) {
+        self.id = id
+        self.uid = uid
+        self.name = name
+    }
+}
+
 public enum VoiceInkAudioInputPreference {
     public static let inputModeKey = "audioInputMode"
     public static let selectedDeviceUIDKey = "selectedAudioDeviceUID"
@@ -212,6 +224,151 @@ public enum VoiceInkAudioInputPriorityPolicy {
         availableDeviceIDs: Set<String>
     ) -> String? {
         sortedDevices(devices).first { availableDeviceIDs.contains($0.id) }?.id
+    }
+
+    public static func firstAvailablePriorityDevice<ID: Equatable & Sendable>(
+        in devices: [VoiceInkAudioInputPriorityDevice],
+        availableDevices: [VoiceInkAudioInputAvailableDevice<ID>]
+    ) -> VoiceInkAudioInputAvailableDevice<ID>? {
+        for device in sortedDevices(devices) {
+            if let availableDevice = availableDevices.first(where: { $0.uid == device.id }) {
+                return availableDevice
+            }
+        }
+
+        return nil
+    }
+
+    public static func firstAvailablePriorityDeviceID<ID: Equatable & Sendable>(
+        in devices: [VoiceInkAudioInputPriorityDevice],
+        availableDevices: [VoiceInkAudioInputAvailableDevice<ID>]
+    ) -> ID? {
+        firstAvailablePriorityDevice(in: devices, availableDevices: availableDevices)?.id
+    }
+}
+
+public struct VoiceInkAudioInputRecordingSwitchPlan<ID: Equatable & Sendable>: Equatable, Sendable {
+    public let deviceID: ID?
+    public let usedPriorityFallback: Bool
+
+    public init(deviceID: ID?, usedPriorityFallback: Bool) {
+        self.deviceID = deviceID
+        self.usedPriorityFallback = usedPriorityFallback
+    }
+}
+
+public enum VoiceInkAudioInputSelectionPolicy {
+    public static func currentDeviceID<ID: Equatable & Sendable>(
+        inputMode: VoiceInkAudioInputMode,
+        selectedDeviceID: ID?,
+        selectedDeviceIsAvailable: Bool,
+        priorityDeviceID: ID?,
+        automaticDeviceID: ID?,
+        systemDefaultDeviceID: ID? = nil
+    ) -> ID? {
+        switch inputMode {
+        case .systemDefault:
+            return systemDefaultDeviceID ?? automaticDeviceID
+        case .custom:
+            if selectedDeviceIsAvailable, let selectedDeviceID {
+                return selectedDeviceID
+            }
+
+            return automaticDeviceID
+        case .prioritized:
+            return priorityDeviceID ?? automaticDeviceID
+        }
+    }
+
+    public static func currentDeviceID<ID: Equatable & Sendable>(
+        inputMode: VoiceInkAudioInputMode,
+        selectedDeviceID: ID?,
+        prioritizedDevices: [VoiceInkAudioInputPriorityDevice],
+        availableDevices: [VoiceInkAudioInputAvailableDevice<ID>],
+        automaticDeviceID: ID?,
+        systemDefaultDeviceID: ID? = nil
+    ) -> ID? {
+        currentDeviceID(
+            inputMode: inputMode,
+            selectedDeviceID: selectedDeviceID,
+            selectedDeviceIsAvailable: selectedDeviceID.map { selectedDeviceID in
+                availableDevices.contains(where: { $0.id == selectedDeviceID })
+            } ?? false,
+            priorityDeviceID: VoiceInkAudioInputPriorityPolicy.firstAvailablePriorityDeviceID(
+                in: prioritizedDevices,
+                availableDevices: availableDevices
+            ),
+            automaticDeviceID: automaticDeviceID,
+            systemDefaultDeviceID: systemDefaultDeviceID
+        )
+    }
+
+    public static func deviceIDToSelectWhenChangingMode<ID: Equatable & Sendable>(
+        inputMode: VoiceInkAudioInputMode,
+        selectedDeviceID: ID?,
+        priorityDeviceID: ID?,
+        automaticDeviceID: ID?
+    ) -> ID? {
+        guard selectedDeviceID == nil else { return nil }
+
+        switch inputMode {
+        case .systemDefault:
+            return nil
+        case .custom:
+            return automaticDeviceID
+        case .prioritized:
+            return priorityDeviceID ?? automaticDeviceID
+        }
+    }
+
+    public static func deviceIDToSelectWhenChangingMode<ID: Equatable & Sendable>(
+        inputMode: VoiceInkAudioInputMode,
+        selectedDeviceID: ID?,
+        prioritizedDevices: [VoiceInkAudioInputPriorityDevice],
+        availableDevices: [VoiceInkAudioInputAvailableDevice<ID>],
+        automaticDeviceID: ID?
+    ) -> ID? {
+        deviceIDToSelectWhenChangingMode(
+            inputMode: inputMode,
+            selectedDeviceID: selectedDeviceID,
+            priorityDeviceID: VoiceInkAudioInputPriorityPolicy.firstAvailablePriorityDeviceID(
+                in: prioritizedDevices,
+                availableDevices: availableDevices
+            ),
+            automaticDeviceID: automaticDeviceID
+        )
+    }
+
+    public static func recordingSwitchPlan<ID: Equatable & Sendable>(
+        inputMode: VoiceInkAudioInputMode,
+        priorityDeviceID: ID?,
+        automaticDeviceID: ID?
+    ) -> VoiceInkAudioInputRecordingSwitchPlan<ID> {
+        guard inputMode == .prioritized else {
+            return VoiceInkAudioInputRecordingSwitchPlan(deviceID: automaticDeviceID, usedPriorityFallback: false)
+        }
+
+        if let priorityDeviceID {
+            return VoiceInkAudioInputRecordingSwitchPlan(deviceID: priorityDeviceID, usedPriorityFallback: false)
+        }
+
+        return VoiceInkAudioInputRecordingSwitchPlan(deviceID: automaticDeviceID, usedPriorityFallback: true)
+    }
+
+    public static func recordingSwitchPlan<ID: Equatable & Sendable>(
+        inputMode: VoiceInkAudioInputMode,
+        prioritizedDevices: [VoiceInkAudioInputPriorityDevice],
+        availableDevices: [VoiceInkAudioInputAvailableDevice<ID>],
+        automaticDeviceID: ID?
+    ) -> VoiceInkAudioInputRecordingSwitchPlan<ID> {
+        recordingSwitchPlan(
+            inputMode: inputMode,
+            priorityDeviceID: VoiceInkAudioInputPriorityPolicy.firstAvailablePriorityDeviceID(
+                in: prioritizedDevices,
+                availableDevices: availableDevices
+            ),
+            automaticDeviceID: automaticDeviceID
+        )
     }
 }
 

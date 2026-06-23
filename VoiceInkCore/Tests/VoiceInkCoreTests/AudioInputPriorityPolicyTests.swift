@@ -319,6 +319,180 @@ final class AudioInputPriorityPolicyTests: XCTestCase {
         )
     }
 
+    func testSelectionPolicyResolvesCurrentDeviceByMode() {
+        let availableDevices = [
+            VoiceInkAudioInputAvailableDevice(id: "built-in", uid: "built-in-uid", name: "Built-in"),
+            VoiceInkAudioInputAvailableDevice(id: "usb", uid: "usb-uid", name: "USB Mic")
+        ]
+        let priorityDevices = [
+            VoiceInkAudioInputPriorityDevice(id: "usb-uid", name: "USB Mic", priority: 1),
+            VoiceInkAudioInputPriorityDevice(id: "built-in-uid", name: "Built-in", priority: 2)
+        ]
+
+        XCTAssertEqual(
+            VoiceInkAudioInputSelectionPolicy.currentDeviceID(
+                inputMode: .systemDefault,
+                selectedDeviceID: "usb",
+                prioritizedDevices: priorityDevices,
+                availableDevices: availableDevices,
+                automaticDeviceID: "automatic",
+                systemDefaultDeviceID: "system-default"
+            ),
+            "system-default"
+        )
+        XCTAssertEqual(
+            VoiceInkAudioInputSelectionPolicy.currentDeviceID(
+                inputMode: .systemDefault,
+                selectedDeviceID: "usb",
+                prioritizedDevices: priorityDevices,
+                availableDevices: availableDevices,
+                automaticDeviceID: "automatic",
+                systemDefaultDeviceID: nil
+            ),
+            "automatic"
+        )
+        XCTAssertEqual(
+            VoiceInkAudioInputSelectionPolicy.currentDeviceID(
+                inputMode: .custom,
+                selectedDeviceID: "usb",
+                prioritizedDevices: priorityDevices,
+                availableDevices: availableDevices,
+                automaticDeviceID: "automatic"
+            ),
+            "usb"
+        )
+        XCTAssertEqual(
+            VoiceInkAudioInputSelectionPolicy.currentDeviceID(
+                inputMode: .custom,
+                selectedDeviceID: "missing",
+                prioritizedDevices: priorityDevices,
+                availableDevices: availableDevices,
+                automaticDeviceID: "automatic"
+            ),
+            "automatic"
+        )
+        XCTAssertEqual(
+            VoiceInkAudioInputSelectionPolicy.currentDeviceID(
+                inputMode: .custom,
+                selectedDeviceID: nil,
+                selectedDeviceIsAvailable: true,
+                priorityDeviceID: nil,
+                automaticDeviceID: "automatic"
+            ),
+            "automatic"
+        )
+        XCTAssertEqual(
+            VoiceInkAudioInputSelectionPolicy.currentDeviceID(
+                inputMode: .prioritized,
+                selectedDeviceID: "built-in",
+                prioritizedDevices: priorityDevices,
+                availableDevices: availableDevices,
+                automaticDeviceID: "automatic"
+            ),
+            "usb"
+        )
+        XCTAssertEqual(
+            VoiceInkAudioInputSelectionPolicy.currentDeviceID(
+                inputMode: .prioritized,
+                selectedDeviceID: "built-in",
+                prioritizedDevices: [
+                    VoiceInkAudioInputPriorityDevice(id: "missing-uid", name: "Missing", priority: 0)
+                ],
+                availableDevices: availableDevices,
+                automaticDeviceID: "automatic"
+            ),
+            "automatic"
+        )
+    }
+
+    func testSelectionPolicyPreservesModeChangeSelectionBehavior() {
+        let availableDevices = [
+            VoiceInkAudioInputAvailableDevice(id: 1, uid: "built-in-uid", name: "Built-in"),
+            VoiceInkAudioInputAvailableDevice(id: 2, uid: "usb-uid", name: "USB Mic")
+        ]
+        let priorityDevices = [
+            VoiceInkAudioInputPriorityDevice(id: "usb-uid", name: "USB Mic", priority: 0)
+        ]
+
+        XCTAssertNil(
+            VoiceInkAudioInputSelectionPolicy.deviceIDToSelectWhenChangingMode(
+                inputMode: .prioritized,
+                selectedDeviceID: 1,
+                prioritizedDevices: priorityDevices,
+                availableDevices: availableDevices,
+                automaticDeviceID: 1
+            )
+        )
+        XCTAssertNil(
+            VoiceInkAudioInputSelectionPolicy.deviceIDToSelectWhenChangingMode(
+                inputMode: .systemDefault,
+                selectedDeviceID: nil,
+                prioritizedDevices: priorityDevices,
+                availableDevices: availableDevices,
+                automaticDeviceID: 1
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkAudioInputSelectionPolicy.deviceIDToSelectWhenChangingMode(
+                inputMode: .custom,
+                selectedDeviceID: nil,
+                prioritizedDevices: priorityDevices,
+                availableDevices: availableDevices,
+                automaticDeviceID: 1
+            ),
+            1
+        )
+        XCTAssertEqual(
+            VoiceInkAudioInputSelectionPolicy.deviceIDToSelectWhenChangingMode(
+                inputMode: .prioritized,
+                selectedDeviceID: nil,
+                prioritizedDevices: priorityDevices,
+                availableDevices: availableDevices,
+                automaticDeviceID: 1
+            ),
+            2
+        )
+        XCTAssertEqual(
+            VoiceInkAudioInputSelectionPolicy.deviceIDToSelectWhenChangingMode(
+                inputMode: .prioritized,
+                selectedDeviceID: nil,
+                prioritizedDevices: [
+                    VoiceInkAudioInputPriorityDevice(id: "missing-uid", name: "Missing", priority: 0)
+                ],
+                availableDevices: availableDevices,
+                automaticDeviceID: 1
+            ),
+            1
+        )
+    }
+
+    func testSelectionPolicyPlansRecordingDeviceSwitches() {
+        XCTAssertEqual(
+            VoiceInkAudioInputSelectionPolicy.recordingSwitchPlan(
+                inputMode: .prioritized,
+                priorityDeviceID: "usb",
+                automaticDeviceID: "automatic"
+            ),
+            VoiceInkAudioInputRecordingSwitchPlan(deviceID: "usb", usedPriorityFallback: false)
+        )
+        XCTAssertEqual(
+            VoiceInkAudioInputSelectionPolicy.recordingSwitchPlan(
+                inputMode: .prioritized,
+                priorityDeviceID: nil,
+                automaticDeviceID: "automatic"
+            ),
+            VoiceInkAudioInputRecordingSwitchPlan(deviceID: "automatic", usedPriorityFallback: true)
+        )
+        XCTAssertEqual(
+            VoiceInkAudioInputSelectionPolicy.recordingSwitchPlan(
+                inputMode: .custom,
+                priorityDeviceID: "usb",
+                automaticDeviceID: "automatic"
+            ),
+            VoiceInkAudioInputRecordingSwitchPlan(deviceID: "automatic", usedPriorityFallback: false)
+        )
+    }
+
     private func withIsolatedDefaults(_ run: (UserDefaults) -> Void) {
         let suiteName = "VoiceInkCore.AudioInputPriorityPolicyTests.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!

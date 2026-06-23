@@ -189,6 +189,10 @@ public struct VoiceInkWordReplacementDraftState: Equatable, Sendable {
             )
         )
     }
+
+    public func submitting(existingRules: [VoiceInkWordReplacementRule]) -> VoiceInkWordReplacementDraftSubmission {
+        submitting(existingOriginalTexts: existingRules.map(\.originalText))
+    }
 }
 
 public struct VoiceInkWordReplacementEditSubmission: Equatable, Sendable {

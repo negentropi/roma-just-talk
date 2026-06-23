@@ -643,6 +643,24 @@ final class DictionaryPolicyTests: XCTestCase {
         )
     }
 
+    func testWordReplacementDraftStateSubmitsAgainstExistingRules() {
+        let existingRules = [
+            VoiceInkWordReplacementRule(originalText: "roma", replacementText: "Roma Just Talk")
+        ]
+
+        let submission = VoiceInkWordReplacementDraftState(
+            original: "Roma",
+            replacement: "RJT"
+        )
+        .submitting(existingRules: existingRules)
+
+        XCTAssertNil(submission.plan.ruleToInsert)
+        XCTAssertEqual(
+            submission.alertPresentation,
+            .wordReplacement(message: "'Roma' already exists in word replacements")
+        )
+    }
+
     func testWordReplacementEditStateUsesSharedSaveability() {
         XCTAssertFalse(VoiceInkWordReplacementEditState(original: " , ", replacement: "Roma").canSave)
         XCTAssertFalse(VoiceInkWordReplacementEditState(original: "voice ink", replacement: "").canSave)

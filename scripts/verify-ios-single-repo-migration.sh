@@ -6221,8 +6221,13 @@ require_pattern \
 
 require_pattern \
   "shared word-replacement draft state owns submission" \
-  'public func submitting\(existingOriginalTexts: \[String\]\) -> VoiceInkWordReplacementDraftSubmission' \
+  'public func submitting\(existingOriginalTexts: \[String\]\) -> VoiceInkWordReplacementDraftSubmission|public func submitting\(existingRules: \[VoiceInkWordReplacementRule\]\) -> VoiceInkWordReplacementDraftSubmission' \
   VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
+
+require_pattern \
+  "shared word-replacement draft state existing-rules check runs in VoiceInkCore" \
+  'DictionaryPolicyTests\.testWordReplacementDraftStateSubmitsAgainstExistingRules' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "shared word-replacement edit state lives in VoiceInkCore" \
@@ -6336,7 +6341,12 @@ require_pattern \
 
 require_pattern \
   "iOS word-replacement submission uses shared draft state" \
-  'VoiceInkWordReplacementDraftState|wordReplacementDraftState\.submitting|draftStateAfterSubmit|alertPresentation' \
+  'VoiceInkWordReplacementDraftState|wordReplacementDraftState\.submitting|existingRules: settings\.wordReplacements|draftStateAfterSubmit|alertPresentation' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
+reject_pattern \
+  "iOS word-replacement submission avoids shell-owned original-text extraction" \
+  'wordReplacementDraftState\.submitting\([[:space:]]*existingOriginalTexts: settings\.wordReplacements\.map\(\.originalText\)|settings\.wordReplacements\.map\(\.originalText\)' \
   iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \

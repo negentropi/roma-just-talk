@@ -427,6 +427,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementDraftStateUsesSharedVisibilityAndSaveability", run: { DictionaryPolicyTests().testWordReplacementDraftStateUsesSharedVisibilityAndSaveability() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementDraftStateSubmitsAndClearsAcceptedRule", run: { DictionaryPolicyTests().testWordReplacementDraftStateSubmitsAndClearsAcceptedRule() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementDraftStateKeepsDuplicateDraftAndBuildsSharedAlert", run: { DictionaryPolicyTests().testWordReplacementDraftStateKeepsDuplicateDraftAndBuildsSharedAlert() }),
+            VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementDraftStateSubmitsAgainstExistingRules", run: { DictionaryPolicyTests().testWordReplacementDraftStateSubmitsAgainstExistingRules() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementEditStateUsesSharedSaveability", run: { DictionaryPolicyTests().testWordReplacementEditStateUsesSharedSaveability() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementEditStateSubmitsTrimmedAcceptedRule", run: { DictionaryPolicyTests().testWordReplacementEditStateSubmitsTrimmedAcceptedRule() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementEditStateRejectsDuplicateWithSharedAlert", run: { DictionaryPolicyTests().testWordReplacementEditStateRejectsDuplicateWithSharedAlert() }),

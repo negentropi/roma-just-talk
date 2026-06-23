@@ -236,7 +236,7 @@ struct SettingsView: View {
 
     private func submitWordReplacement() {
         let submission = wordReplacementDraftState.submitting(
-            existingOriginalTexts: settings.wordReplacements.map(\.originalText)
+            existingRules: settings.wordReplacements
         )
         settings.applyWordReplacementSubmissionPlan(submission.plan)
         wordReplacementDraftState = submission.draftStateAfterSubmit

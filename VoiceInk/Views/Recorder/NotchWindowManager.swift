@@ -22,20 +22,6 @@ class NotchWindowManager: ObservableObject {
                     .environmentObject(enhancementService)
             )
         }
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(handleHideNotification),
-            name: NSNotification.Name("HideNotchRecorder"),
-            object: nil
-        )
-    }
-
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-
-    @objc private func handleHideNotification() {
-        hide()
     }
 
     func show() {

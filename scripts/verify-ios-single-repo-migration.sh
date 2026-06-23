@@ -12852,6 +12852,17 @@ reject_pattern \
   VoiceInk/Notifications/AppNotifications.swift
 
 reject_pattern \
+  "macOS recorder window managers avoid dead legacy hide notifications" \
+  'HideMiniRecorder|HideNotchRecorder|handleHideNotification' \
+  VoiceInk/Views/Recorder/MiniWindowManager.swift \
+  VoiceInk/Views/Recorder/NotchWindowManager.swift
+
+require_pattern \
+  "migration checklist tracks removed recorder window hide notifications" \
+  'obsolete per-window recorder hide notification observers stay removed' \
+  docs/ios-single-repo-migration.md
+
+reject_pattern \
   "macOS model change notification avoids unused model-name payload" \
   'userInfo: \["modelName"' \
   VoiceInk/Transcription/Engine/TranscriptionModelManager.swift

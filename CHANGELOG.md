@@ -30,6 +30,7 @@
 - Moved macOS window identifier, title, and frame autosave names into shared core while leaving AppKit window setup in the macOS shell.
 - Moved macOS diagnostic/window logger category identity into shared core while leaving OSLog delivery in the macOS shell.
 - Moved macOS shortcut event notification names into shared core while leaving NotificationCenter delivery in the macOS shell.
+- Removed unused macOS mini/notch recorder hide notification observers.
 
 ## v1.95 - 2026-06-17
 

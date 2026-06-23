@@ -20,24 +20,6 @@ class MiniWindowManager: ObservableObject {
                     .environmentObject(enhancementService)
             )
         }
-        setupNotifications()
-    }
-
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-
-    private func setupNotifications() {
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(handleHideNotification),
-            name: NSNotification.Name("HideMiniRecorder"),
-            object: nil
-        )
-    }
-
-    @objc private func handleHideNotification() {
-        hide()
     }
 
     func show() {

@@ -3744,7 +3744,7 @@ require_pattern \
 
 require_pattern \
   "shared Whisper model management diagnostics live in VoiceInkCore" \
-  'VoiceInkWhisperModelManagementDiagnostics|alreadyDownloadingMessage|startingDownloadMessage|downloadFailedMessage|downloadCancelledMessage|downloadedMessage|saveFailedMessage|notDownloadedMessage|deletedMessage|deleteFailedMessage|deleteActionFailedMessage' \
+  'VoiceInkWhisperModelManagementDiagnostics|alreadyDownloadingMessage|startingDownloadMessage|downloadFailedMessage|downloadCancelledMessage|downloadedMessage|saveFailedMessage|notDownloadedMessage|deletedMessage|deleteFailedMessage' \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
 
 require_pattern \
@@ -4157,18 +4157,13 @@ reject_pattern \
 
 require_pattern \
   "iOS local model manager uses shared operation alert presentation" \
-  'VoiceInkWhisperModelOperationAlertPresentation|\.(downloadFailed|serverErrorDuringDownload|noFileReceived|saveFailed)' \
+  'VoiceInkWhisperModelOperationAlertPresentation|\.(downloadFailed|serverErrorDuringDownload|noFileReceived|saveFailed|deleteFailed)' \
   iOS/VoiceInk-ios/LocalModelManager.swift
 
 require_pattern \
   "iOS local model manager uses shared management diagnostics" \
   'VoiceInkWhisperModelManagementDiagnostics\.(alreadyDownloadingMessage|startingDownloadMessage|downloadFailedMessage|downloadCancelledMessage|downloadedMessage|saveFailedMessage|notDownloadedMessage|deletedMessage|deleteFailedMessage)' \
   iOS/VoiceInk-ios/LocalModelManager.swift
-
-require_pattern \
-  "iOS local model management view uses shared management diagnostics" \
-  'VoiceInkWhisperModelManagementDiagnostics\.deleteActionFailedMessage' \
-  iOS/VoiceInk-ios/LocalModelManagementView.swift
 
 require_pattern \
   "iOS local model manager applies shared download cancellation outcome" \
@@ -4192,13 +4187,13 @@ reject_pattern \
 
 reject_pattern \
   "iOS local model management view avoids shell-owned management diagnostics" \
-  '"Delete failed:' \
+  'VoiceInkWhisperModelManagementDiagnostics|"Delete failed:' \
   iOS/VoiceInk-ios/LocalModelManagementView.swift
 
 require_pattern \
-  "iOS local model deletion uses shared operation alert presentation" \
+  "iOS local model manager publishes shared delete failure alert" \
   '\.deleteFailed' \
-  iOS/VoiceInk-ios/LocalModelManagementView.swift
+  iOS/VoiceInk-ios/LocalModelManager.swift
 
 reject_pattern \
   "iOS local model row avoids duplicate post-delete refresh" \

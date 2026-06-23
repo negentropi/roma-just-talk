@@ -120,7 +120,7 @@ class LocalModelManager: ObservableObject {
     }
     
     /// Delete a downloaded model
-    func deleteModel(_ model: VoiceInkWhisperModelFileSpec) throws {
+    func deleteModel(_ model: VoiceInkWhisperModelFileSpec) {
         let deletionPlan = VoiceInkWhisperModelDeletionPolicy.plan(
             for: model,
             in: Self.modelsDirectory
@@ -143,8 +143,8 @@ class LocalModelManager: ObservableObject {
                     }
                 }
             } catch {
+                downloadError = .deleteFailed(for: error)
                 logger.error("\(VoiceInkWhisperModelManagementDiagnostics.deleteFailedMessage(modelName: model.modelName, localizedDescription: error.localizedDescription), privacy: .public)")
-                throw error
             }
         }
     }

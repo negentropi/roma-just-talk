@@ -114,7 +114,7 @@ struct ModelRowView: View {
         }
         .alert(row.deleteConfirmation.title, isPresented: $showingDeleteAlert) {
             Button(row.deleteConfirmation.primaryButtonTitle, role: .destructive) {
-                deleteModel()
+                modelManager.deleteModel(row.model)
             }
             Button(row.deleteConfirmation.cancelButtonTitle, role: .cancel) { }
         } message: {
@@ -129,18 +129,6 @@ struct ModelRowView: View {
             Button(row.downloadConfirmation.cancelButtonTitle, role: .cancel) { }
         } message: {
             Text(row.downloadConfirmation.message)
-        }
-    }
-    
-    private func deleteModel() {
-        do {
-            try modelManager.deleteModel(row.model)
-        } catch {
-            let message = VoiceInkWhisperModelManagementDiagnostics.deleteActionFailedMessage(
-                errorDescription: String(describing: error)
-            )
-            VoiceInkIOSLogger.localModelManagement.error("\(message, privacy: .public)")
-            modelManager.downloadError = .deleteFailed(for: error)
         }
     }
 }

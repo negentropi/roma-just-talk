@@ -690,10 +690,6 @@ final class WhisperModelFilesTests: XCTestCase {
             ),
             "Failed to delete model ggml-base: File is locked"
         )
-        XCTAssertEqual(
-            VoiceInkWhisperModelManagementDiagnostics.deleteActionFailedMessage(errorDescription: "File is locked"),
-            "Delete failed: File is locked"
-        )
     }
 
     func testSimpleDownloadStateBuildsSharedRowPresentation() {

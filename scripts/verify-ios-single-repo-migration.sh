@@ -10017,10 +10017,13 @@ require_pattern \
   'VoiceInkDefaultSettings\.iOS\.registerUserDefaults\(\)' \
   iOS/VoiceInk-ios/VoiceInk_iosApp.swift
 
+section "obsolete standalone startup preference migration module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/StartupPreferenceMigration.swift
+
 require_pattern \
-  "shared startup preference migration lives in VoiceInkCore" \
+  "shared startup preference migration lives with UserDefaults preference policy" \
   'VoiceInkStartupPreferenceMigration|VoiceInkStartupPreferenceMigrationPlatform|PunctuationCleanupMode\.migrateLegacyUserDefaultIfNeeded|VoiceInkPasteMethod\.migrateLegacyUserDefaultIfNeeded' \
-  VoiceInkCore/Sources/VoiceInkCore/StartupPreferenceMigration.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "core tests cover shared startup preference migration platform sets" \

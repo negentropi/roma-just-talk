@@ -44,6 +44,23 @@ public enum VoiceInkProviderAPIKeyStatePersistenceAction: Equatable, Sendable {
     case persistVerificationFlag(Bool)
 }
 
+public struct VoiceInkProviderAPIKeyStateUpdatePlan: Equatable, Sendable {
+    public let state: VoiceInkProviderAPIKeyState
+    public let persistenceActions: [VoiceInkProviderAPIKeyStatePersistenceAction]
+
+    public init(
+        state: VoiceInkProviderAPIKeyState,
+        persistenceActions: [VoiceInkProviderAPIKeyStatePersistenceAction]
+    ) {
+        self.state = state
+        self.persistenceActions = persistenceActions
+    }
+
+    public var shouldApplyState: Bool {
+        !persistenceActions.isEmpty
+    }
+}
+
 public extension VoiceInkProviderAPIKeyStorageMutationPlan {
     func persistenceActions(storedKey: String) -> [VoiceInkProviderAPIKeyStatePersistenceAction] {
         guard shouldPersistStoredKey else { return [] }
@@ -216,6 +233,32 @@ public struct VoiceInkProviderAPIKeyState: Equatable, Sendable {
             verifiedProviders.remove(provider)
         }
         return VoiceInkProviderAPIKeyVerificationMutationPlan(shouldPersistVerificationFlag: true)
+    }
+}
+
+public extension VoiceInkProviderAPIKeyState {
+    func applyingStoredAPIKey(
+        _ key: String,
+        for provider: VoiceInkProviderKind
+    ) -> VoiceInkProviderAPIKeyStateUpdatePlan {
+        var updatedState = self
+        let mutationPlan = updatedState.applyStoredAPIKey(key, for: provider)
+        return VoiceInkProviderAPIKeyStateUpdatePlan(
+            state: updatedState,
+            persistenceActions: mutationPlan.persistenceActions(storedKey: key)
+        )
+    }
+
+    func applyingVerification(
+        _ verified: Bool,
+        for provider: VoiceInkProviderKind
+    ) -> VoiceInkProviderAPIKeyStateUpdatePlan {
+        var updatedState = self
+        let mutationPlan = updatedState.applyVerification(verified, for: provider)
+        return VoiceInkProviderAPIKeyStateUpdatePlan(
+            state: updatedState,
+            persistenceActions: mutationPlan.persistenceActions(verificationFlag: verified)
+        )
     }
 }
 

@@ -101,13 +101,10 @@ final class AppSettings: ObservableObject {
     }
 
     func setAPIKey(_ key: String, for provider: VoiceInkProviderKind) {
-        var updatedState = apiKeyState
-        let plan = updatedState.applyStoredAPIKey(key, for: provider)
-        let actions = plan.persistenceActions(storedKey: key)
-        guard !actions.isEmpty else { return }
-
-        apiKeyState = updatedState
-        applyProviderAPIKeyStatePersistenceActions(actions, for: provider)
+        applyProviderAPIKeyStateUpdatePlan(
+            apiKeyState.applyingStoredAPIKey(key, for: provider),
+            for: provider
+        )
     }
     
     func isKeyVerified(for provider: VoiceInkProviderKind) -> Bool {
@@ -127,13 +124,20 @@ final class AppSettings: ObservableObject {
     }
     
     func setKeyVerified(_ verified: Bool, for provider: VoiceInkProviderKind) {
-        var updatedState = apiKeyState
-        let plan = updatedState.applyVerification(verified, for: provider)
-        let actions = plan.persistenceActions(verificationFlag: verified)
-        guard !actions.isEmpty else { return }
+        applyProviderAPIKeyStateUpdatePlan(
+            apiKeyState.applyingVerification(verified, for: provider),
+            for: provider
+        )
+    }
 
-        apiKeyState = updatedState
-        applyProviderAPIKeyStatePersistenceActions(actions, for: provider)
+    private func applyProviderAPIKeyStateUpdatePlan(
+        _ plan: VoiceInkProviderAPIKeyStateUpdatePlan,
+        for provider: VoiceInkProviderKind
+    ) {
+        guard plan.shouldApplyState else { return }
+
+        apiKeyState = plan.state
+        applyProviderAPIKeyStatePersistenceActions(plan.persistenceActions, for: provider)
     }
 
     private func applyProviderAPIKeyStatePersistenceActions(

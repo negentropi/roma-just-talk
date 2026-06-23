@@ -12032,7 +12032,9 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift
 
 require_file VoiceInkCore/Sources/VoiceInkCore/AppIntentPresentation.swift
-require_file VoiceInkCore/Sources/VoiceInkCore/MiniRecorderRequest.swift
+
+section "obsolete standalone mini-recorder request module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/MiniRecorderRequest.swift
 
 require_patterns \
   "shared macOS AppIntent presentation lives in VoiceInkCore" \
@@ -12047,8 +12049,8 @@ require_patterns \
   '"VoiceInk recorder dismissed"'
 
 require_patterns \
-  "shared mini-recorder request notifications live in VoiceInkCore" \
-  VoiceInkCore/Sources/VoiceInkCore/MiniRecorderRequest.swift \
+  "shared mini-recorder request notifications live with AppIntent presentation" \
+  VoiceInkCore/Sources/VoiceInkCore/AppIntentPresentation.swift \
   'VoiceInkMiniRecorderRequest' \
   'toggleNotificationName = Notification\.Name\("toggleMiniRecorder"\)' \
   'dismissNotificationName = Notification\.Name\("dismissMiniRecorder"\)'

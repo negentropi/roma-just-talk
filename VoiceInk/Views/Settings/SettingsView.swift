@@ -490,7 +490,7 @@ struct PowerModeSection: View {
                 if newValue {
                     powerModeUIFlag = true
                     NotificationCenter.default.post(name: .powerModeShortcutAvailabilityDidChange, object: nil)
-                } else if powerModeManager.configurations.allSatisfy({ !$0.isEnabled }) {
+                } else if !powerModeManager.configurations.hasEnabledPowerModeConfigurations {
                     powerModeUIFlag = false
                     NotificationCenter.default.post(name: .powerModeShortcutAvailabilityDidChange, object: nil)
                 } else {

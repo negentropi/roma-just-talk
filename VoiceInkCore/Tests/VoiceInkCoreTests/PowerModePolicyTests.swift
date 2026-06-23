@@ -1895,6 +1895,8 @@ final class PowerModePolicyTests: XCTestCase {
 
         XCTAssertEqual(configs.powerModeConfiguration(with: appConfig.id)?.id, appConfig.id)
         XCTAssertEqual(configs.enabledPowerModeConfigurations.map(\.id), [websiteConfig.id, appConfig.id])
+        XCTAssertTrue(configs.hasEnabledPowerModeConfigurations)
+        XCTAssertFalse([disabledDefault].hasEnabledPowerModeConfigurations)
         XCTAssertEqual(configs.enabledPowerModeConfigurationIds, Set([websiteConfig.id, appConfig.id]))
         XCTAssertTrue(configs.hasPowerModeDefaultConfiguration)
         XCTAssertNil(configs.defaultPowerModeConfiguration)

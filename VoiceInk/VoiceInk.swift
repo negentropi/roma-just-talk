@@ -44,7 +44,7 @@ struct VoiceInkApp: App {
         AppDefaults.registerDefaults()
 
         VoiceInkPowerModePreference.initializeUIFlagIfNeeded(
-            hasEnabledConfigurations: !PowerModeManager.shared.configurations.enabledPowerModeConfigurations.isEmpty
+            hasEnabledConfigurations: PowerModeManager.shared.configurations.hasEnabledPowerModeConfigurations
         )
 
         let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "Initialization")

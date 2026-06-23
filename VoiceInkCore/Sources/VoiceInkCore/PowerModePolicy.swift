@@ -1133,6 +1133,10 @@ public extension Array where Element == PowerModeConfig {
         filter(\.isEnabled)
     }
 
+    var hasEnabledPowerModeConfigurations: Bool {
+        contains(where: \.isEnabled)
+    }
+
     var enabledPowerModeConfigurationIds: Set<UUID> {
         Set(enabledPowerModeConfigurations.map(\.id))
     }

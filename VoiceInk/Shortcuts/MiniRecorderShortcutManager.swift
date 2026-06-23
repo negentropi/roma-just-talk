@@ -56,7 +56,7 @@ class MiniRecorderShortcutManager: ObservableObject {
 
     private var canUsePowerModeShortcuts: Bool {
         VoiceInkPowerModePreference.canUseShortcuts(
-            hasEnabledConfigurations: !PowerModeManager.shared.configurations.enabledPowerModeConfigurations.isEmpty
+            hasEnabledConfigurations: PowerModeManager.shared.configurations.hasEnabledPowerModeConfigurations
         )
     }
 

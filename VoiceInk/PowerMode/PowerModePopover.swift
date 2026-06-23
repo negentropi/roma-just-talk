@@ -19,7 +19,7 @@ struct PowerModePopover: View {
             ScrollView {
                 let enabledConfigs = powerModeManager.configurations.enabledPowerModeConfigurations
                 VStack(alignment: .leading, spacing: 4) {
-                    if enabledConfigs.isEmpty {
+                    if !powerModeManager.configurations.hasEnabledPowerModeConfigurations {
                         VStack(alignment: .center, spacing: 8) {
                             Image(systemName: VoiceInkPowerModePresentation.popoverEmptySystemImageName)
                                 .foregroundColor(.white.opacity(0.6))

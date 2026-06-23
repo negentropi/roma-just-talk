@@ -11516,7 +11516,7 @@ reject_pattern \
 
 require_pattern \
   "migration checklist tracks shared Power Mode top-level preference gate" \
-  'macOS top-level Power Mode visibility, persist-after-recording preference, first-run visibility repair, and shortcut eligibility route through `VoiceInkPowerModePreference`' \
+  'macOS top-level Power Mode visibility, persist-after-recording preference, first-run visibility repair, enabled-configuration presence, and shortcut eligibility route through `VoiceInkPowerModePreference`/shared `PowerModeConfig` array helpers' \
   docs/ios-single-repo-migration.md
 
 reject_pattern \
@@ -11859,6 +11859,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
+  "shared Power Mode enabled-state predicate lives in VoiceInkCore" \
+  'hasEnabledPowerModeConfigurations' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
   "macOS Power Mode shortcuts consume shared shortcut eligibility policy" \
   'powerModeShortcutEntries|powerModeShortcutConfigurationId' \
   VoiceInk/Shortcuts/PowerModeShortcutManager.swift
@@ -11879,9 +11884,18 @@ reject_pattern \
   VoiceInk/VoiceInk.swift
 
 require_pattern \
-  "macOS Power Mode startup calls shared enabled-list policy directly" \
-  'configurations\.enabledPowerModeConfigurations' \
+  "macOS Power Mode startup calls shared enabled-state policy directly" \
+  'configurations\.hasEnabledPowerModeConfigurations' \
   VoiceInk/VoiceInk.swift
+
+reject_pattern \
+  "macOS Power Mode visibility avoids shell-owned enabled-state predicates" \
+  'enabledPowerModeConfigurations\.isEmpty|allSatisfy *\{ *!\$0\.isEnabled' \
+  VoiceInk/VoiceInk.swift \
+  VoiceInk/Shortcuts/MiniRecorderShortcutManager.swift \
+  VoiceInk/Views/Settings/SettingsView.swift \
+  VoiceInk/Views/Recorder/RecorderComponents.swift \
+  VoiceInk/PowerMode/PowerModePopover.swift
 
 reject_pattern \
   "macOS active-window adapter avoids shell-only Power Mode resolution policy" \

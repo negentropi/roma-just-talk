@@ -271,6 +271,33 @@ public extension VoiceInkProviderAPIKeyState {
 
         return applyingVerification(verificationFlag, for: provider)
     }
+
+    func applyingVerificationPlan(
+        _ plan: VoiceInkProviderAPIKeyVerificationApplicationPlan,
+        for provider: VoiceInkProviderKind
+    ) -> VoiceInkProviderAPIKeyStateUpdatePlan {
+        guard let persistenceApplicationPlan = plan.successPersistenceApplicationPlan else {
+            return VoiceInkProviderAPIKeyStateUpdatePlan(state: self, persistenceActions: [])
+        }
+
+        var updatedState = self
+        var persistenceActions: [VoiceInkProviderAPIKeyStatePersistenceAction] = []
+        for action in persistenceApplicationPlan.actions {
+            switch action {
+            case .saveKey(let key):
+                let mutationPlan = updatedState.applyStoredAPIKey(key, for: provider)
+                persistenceActions.append(contentsOf: mutationPlan.persistenceActions(storedKey: key))
+            case .persistVerificationFlag(let flag):
+                let mutationPlan = updatedState.applyVerification(flag, for: provider)
+                persistenceActions.append(contentsOf: mutationPlan.persistenceActions(verificationFlag: flag))
+            }
+        }
+
+        return VoiceInkProviderAPIKeyStateUpdatePlan(
+            state: updatedState,
+            persistenceActions: persistenceActions
+        )
+    }
 }
 
 public struct VoiceInkProviderAccessSnapshot: Equatable, Sendable {

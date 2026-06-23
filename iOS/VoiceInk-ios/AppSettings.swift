@@ -123,13 +123,6 @@ final class AppSettings: ObservableObject {
         providerAccessSnapshot.modeFormProviderAvailability
     }
     
-    func setKeyVerified(_ verified: Bool, for provider: VoiceInkProviderKind) {
-        applyProviderAPIKeyStateUpdatePlan(
-            apiKeyState.applyingVerification(verified, for: provider),
-            for: provider
-        )
-    }
-
     func applyProviderAPIKeyEditPlan(
         _ plan: VoiceInkProviderAPIKeyEditPlan,
         for provider: VoiceInkProviderKind
@@ -168,16 +161,10 @@ final class AppSettings: ObservableObject {
         _ plan: VoiceInkProviderAPIKeyVerificationApplicationPlan,
         for provider: VoiceInkProviderKind
     ) {
-        guard let persistenceApplicationPlan = plan.successPersistenceApplicationPlan else { return }
-
-        for action in persistenceApplicationPlan.actions {
-            switch action {
-            case .saveKey(let key):
-                setAPIKey(key, for: provider)
-            case .persistVerificationFlag(let flag):
-                setKeyVerified(flag, for: provider)
-            }
-        }
+        applyProviderAPIKeyStateUpdatePlan(
+            apiKeyState.applyingVerificationPlan(plan, for: provider),
+            for: provider
+        )
     }
 
     // MARK: - Modes Management

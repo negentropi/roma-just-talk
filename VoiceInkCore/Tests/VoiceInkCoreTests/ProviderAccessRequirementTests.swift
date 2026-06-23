@@ -828,6 +828,40 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertEqual(plan.persistenceActions, [.persistVerificationFlag(false)])
     }
 
+    func testProviderAPIKeyStateBuildsVerificationApplicationUpdatePlan() {
+        let state = VoiceInkProviderAPIKeyState(
+            storedKeysByProvider: [.groq: "old-key"],
+            verifiedProviders: [.groq]
+        )
+        let successPlan = VoiceInkProviderAPIKeyVerificationApplicationPlan(
+            progress: .success,
+            keyToSave: "new-key",
+            shouldMarkKeyVerified: true
+        )
+        let failurePlan = VoiceInkProviderAPIKeyVerificationApplicationPlan(
+            progress: .failure(message: "bad request"),
+            keyToSave: nil,
+            shouldMarkKeyVerified: false
+        )
+
+        let plan = state.applyingVerificationPlan(successPlan, for: .groq)
+        let ignoredPlan = state.applyingVerificationPlan(failurePlan, for: .groq)
+
+        XCTAssertTrue(plan.shouldApplyState)
+        XCTAssertEqual(plan.state.storedAPIKey(for: .groq), "new-key")
+        XCTAssertTrue(plan.state.isReady(for: .groq, localWhisperModelAvailable: false))
+        XCTAssertEqual(
+            plan.persistenceActions,
+            [
+                .persistStoredKey("new-key"),
+                .persistVerificationFlag(false),
+                .persistVerificationFlag(true)
+            ]
+        )
+        XCTAssertFalse(ignoredPlan.shouldApplyState)
+        XCTAssertEqual(ignoredPlan.state, state)
+    }
+
     func testProviderAPIKeyStateUpdatePlanIgnoresNonUserKeyProviders() {
         let state = VoiceInkProviderAPIKeyState()
 

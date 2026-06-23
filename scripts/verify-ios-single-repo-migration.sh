@@ -2993,6 +2993,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift
 
 require_pattern \
+  "shared provider API-key state applies verification application plans" \
+  'applyingVerificationPlan|VoiceInkProviderAPIKeyVerificationApplicationPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift
+
+require_pattern \
   "shared provider API-key form state owns iOS result feedback visibility" \
   'iOSVisibleResultFeedback\(isKeyVerified:' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
@@ -3035,6 +3040,11 @@ require_pattern \
 require_pattern \
   "core checks execute provider API-key edit state update test" \
   'ProviderAccessRequirementTests\.testProviderAPIKeyStateBuildsStoredKeyEditUpdatePlan' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute provider API-key verification application state update test" \
+  'ProviderAccessRequirementTests\.testProviderAPIKeyStateBuildsVerificationApplicationUpdatePlan' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -3168,12 +3178,17 @@ require_pattern \
 
 require_pattern \
   "iOS app settings applies shared provider API-key mutation plans" \
-  'applyingStoredAPIKey|applyingVerification|applyProviderAPIKeyStateUpdatePlan|applyAPIKeyVerificationPlan|successPersistenceApplicationPlan|persistenceActions|applyProviderAPIKeyStatePersistenceActions' \
+  'applyingStoredAPIKey|applyingVerificationPlan\(plan, for: provider\)|applyProviderAPIKeyStateUpdatePlan|applyAPIKeyVerificationPlan|persistenceActions|applyProviderAPIKeyStatePersistenceActions' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 reject_pattern \
   "iOS app settings avoids shell-owned provider verification success interpretation" \
   'plan\.shouldMarkKeyVerified|plan\.keyToSave|setKeyVerified\(true' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+reject_pattern \
+  "iOS app settings avoids shell-owned provider verification persistence action sequencing" \
+  'successPersistenceApplicationPlan|persistenceApplicationPlan\.actions|VoiceInkProviderAPIKeyVerificationPersistenceAction|setKeyVerified\(' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 reject_pattern \

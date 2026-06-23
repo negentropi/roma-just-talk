@@ -526,6 +526,26 @@ final class ProviderAccessRequirementTests: XCTestCase {
         )
     }
 
+    func testProviderAPIKeyVerificationControlOwnsIOSRuntimeActionMapping() {
+        var didVerify = false
+        let enabledAction = VoiceInkProviderAPIKeyVerificationControl.verifyButton(
+            isDisabled: false
+        ).runtimeAction {
+            didVerify = true
+        }
+
+        XCTAssertTrue(enabledAction != nil)
+        enabledAction?()
+        XCTAssertTrue(didVerify)
+        XCTAssertFalse(VoiceInkProviderAPIKeyVerificationControl.verifyButton(isDisabled: false).isProgressVisible)
+        XCTAssertFalse(VoiceInkProviderAPIKeyVerificationControl.verifyButton(isDisabled: false).isVerifyButtonDisabled)
+        XCTAssertTrue(VoiceInkProviderAPIKeyVerificationControl.verifyButton(isDisabled: true).isVerifyButtonDisabled)
+        XCTAssertNil(VoiceInkProviderAPIKeyVerificationControl.verifyButton(isDisabled: true).runtimeAction {})
+        XCTAssertTrue(VoiceInkProviderAPIKeyVerificationControl.progress.isProgressVisible)
+        XCTAssertTrue(VoiceInkProviderAPIKeyVerificationControl.progress.isVerifyButtonDisabled)
+        XCTAssertNil(VoiceInkProviderAPIKeyVerificationControl.progress.runtimeAction {})
+    }
+
     func testProviderAPIKeyFormPresentationBuildsProviderCopy() {
         let presentation = VoiceInkProviderKind.deepgram.apiKeyFormPresentation
 

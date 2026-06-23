@@ -29,17 +29,17 @@ struct ProviderAPIKeyView: View {
                         }
                         .disabled(controlPresentation.isSaveButtonDisabled)
                         Spacer()
-                        switch controlPresentation.verificationControl {
-                        case .progress:
+                        if controlPresentation.verificationControl.isProgressVisible {
                             ProgressView().progressViewStyle(.circular)
-                        case .verifyButton(let isDisabled):
-                            Button(action: verifyKey) {
+                        } else {
+                            let verifyAction = controlPresentation.verificationControl.runtimeAction(verify: verifyKey)
+                            Button(action: verifyAction ?? {}) {
                                 Label(
                                     presentation.verifyButtonTitle,
                                     systemImage: presentation.verifyButtonSystemImageName
                                 )
                             }
-                            .disabled(isDisabled)
+                            .disabled(controlPresentation.verificationControl.isVerifyButtonDisabled)
                         }
                     }
                 } else {

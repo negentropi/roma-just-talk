@@ -281,6 +281,35 @@ public extension VoiceInkProviderAPIKeyVerificationApplicationPlan {
 public enum VoiceInkProviderAPIKeyVerificationControl: Equatable, Sendable {
     case progress
     case verifyButton(isDisabled: Bool)
+
+    public var isProgressVisible: Bool {
+        switch self {
+        case .progress:
+            return true
+        case .verifyButton:
+            return false
+        }
+    }
+
+    public var isVerifyButtonDisabled: Bool {
+        switch self {
+        case .progress:
+            return true
+        case .verifyButton(let isDisabled):
+            return isDisabled
+        }
+    }
+
+    public func runtimeAction(
+        verify: @escaping () -> Void
+    ) -> (() -> Void)? {
+        switch self {
+        case .progress:
+            return nil
+        case .verifyButton(let isDisabled):
+            return isDisabled ? nil : verify
+        }
+    }
 }
 
 public struct VoiceInkProviderAPIKeyFormControlPresentation: Equatable, Sendable {

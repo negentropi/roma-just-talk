@@ -167,6 +167,73 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
         XCTAssertTrue(plan.shouldApplySelectedTranscriptionLanguage(from: "not-a-language"))
     }
 
+    func testModeSettingsRepairPlanBuildsNoActionsWhenCurrentStateMatches() {
+        let localMode = Mode.defaultLocalWhisper(name: "Local")
+        let plan = VoiceInkModeSettingsPolicy.repairPlan(
+            modes: [localMode],
+            selectedModeId: localMode.id,
+            selectedTranscriptionLanguage: VoiceInkLanguageCatalog.autoDetectCode
+        )
+
+        XCTAssertTrue(plan.applicationActions(
+            currentSelectedModeId: localMode.id,
+            currentSelectedTranscriptionLanguage: VoiceInkLanguageCatalog.autoDetectCode
+        ).isEmpty)
+    }
+
+    func testModeSettingsRepairPlanBuildsSelectionAndLanguageActions() {
+        let localMode = Mode.defaultLocalWhisper(name: "Local")
+        let cloudMode = Mode(name: "xAI", transcriptionProvider: .xai)
+        let staleModeId = UUID()
+        let plan = VoiceInkModeSettingsPolicy.repairPlan(
+            modes: [localMode, cloudMode],
+            selectedModeId: staleModeId,
+            selectedTranscriptionLanguage: "zh"
+        )
+
+        let actions = plan.applicationActions(
+            currentSelectedModeId: staleModeId,
+            currentSelectedTranscriptionLanguage: "not-a-language"
+        )
+
+        XCTAssertEqual(actions.count, 2)
+        guard case .selectMode(let selectedModeId) = actions[0] else {
+            return XCTFail("Expected selected-mode repair action")
+        }
+        XCTAssertEqual(selectedModeId, localMode.id)
+        guard case .selectTranscriptionLanguage(let selectedLanguage) = actions[1] else {
+            return XCTFail("Expected selected-language repair action")
+        }
+        XCTAssertEqual(selectedLanguage, "zh")
+    }
+
+    func testModeSettingsRepairPlanBuildsDefaultModeSeedActionsInOrder() {
+        let plan = VoiceInkModeSettingsPolicy.defaultModeRepairPlan(
+            modes: [],
+            selectedModeId: nil,
+            selectedTranscriptionLanguage: "not-a-language"
+        )
+
+        let actions = plan.applicationActions(
+            currentSelectedModeId: nil,
+            currentSelectedTranscriptionLanguage: "not-a-language"
+        )
+
+        XCTAssertEqual(actions.count, 3)
+        guard case .replaceModes(let repairedModes) = actions[0] else {
+            return XCTFail("Expected repaired mode-list action")
+        }
+        XCTAssertEqual(repairedModes.map(\.id), plan.modes.map(\.id))
+        guard case .selectMode(let selectedModeId) = actions[1] else {
+            return XCTFail("Expected selected-mode repair action")
+        }
+        XCTAssertEqual(selectedModeId, plan.selectedModeId)
+        guard case .selectTranscriptionLanguage(let selectedLanguage) = actions[2] else {
+            return XCTFail("Expected selected-language repair action")
+        }
+        XCTAssertEqual(selectedLanguage, VoiceInkLanguageCatalog.autoDetectCode)
+    }
+
     func testUnsupportedTranscriptionProviderDoesNotReceiveFakeFallbackModel() {
         let mode = Mode(name: "Unsupported", transcriptionProvider: .cerebras)
 

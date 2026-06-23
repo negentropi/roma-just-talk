@@ -1356,8 +1356,13 @@ require_pattern \
 
 require_pattern \
   "shared mode settings repair plan lives in VoiceInkCore" \
-  'VoiceInkModeSettingsPolicy|VoiceInkModeSettingsRepairPlan|shouldApplySelectedModeId|shouldApplySelectedTranscriptionLanguage' \
+  'VoiceInkModeSettingsPolicy|VoiceInkModeSettingsRepairPlan|VoiceInkModeSettingsRepairAction|applicationActions|shouldApplySelectedModeId|shouldApplySelectedTranscriptionLanguage' \
   VoiceInkCore/Sources/VoiceInkCore/Mode.swift
+
+require_pattern \
+  "core checks execute mode settings repair action tests" \
+  'ModeRuntimeConfigurationTests\.testModeSettingsRepairPlanBuilds(NoActionsWhenCurrentStateMatches|SelectionAndLanguageActions|DefaultModeSeedActionsInOrder)' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "iOS recording sheet uses shared mode selection presentation adapter" \
@@ -1398,12 +1403,12 @@ require_patterns \
 
 require_pattern \
   "iOS AppSettings delegates mode selection and language repair to shared core" \
-  'VoiceInkModeSettingsPolicy\.repairPlan|VoiceInkModeSettingsRepairPlan|shouldApplySelectedModeId|shouldApplySelectedTranscriptionLanguage' \
+  'VoiceInkModeSettingsPolicy\.repairPlan|VoiceInkModeSettingsRepairPlan|applicationActions|VoiceInkModeSettingsRepairAction' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 reject_pattern \
   "iOS AppSettings avoids shell-owned mode selection and language repair sequencing" \
-  'repairedSelectedModeId|repairedSelectedTranscriptionLanguage|VoiceInkModeListPolicy\.defaultModeRepairPlan|selectedModeId != plan\.selectedModeId|selectedTranscriptionLanguage != plan\.selectedTranscriptionLanguage' \
+  'repairedSelectedModeId|repairedSelectedTranscriptionLanguage|VoiceInkModeListPolicy\.defaultModeRepairPlan|selectedModeId != plan\.selectedModeId|selectedTranscriptionLanguage != plan\.selectedTranscriptionLanguage|plan\.shouldReplaceModes|plan\.shouldApplySelectedModeId|plan\.shouldApplySelectedTranscriptionLanguage' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \

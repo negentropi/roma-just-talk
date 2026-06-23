@@ -213,6 +213,29 @@ public struct VoiceInkModeSettingsRepairPlan {
     public func shouldApplySelectedTranscriptionLanguage(from currentLanguage: String) -> Bool {
         currentLanguage != selectedTranscriptionLanguage
     }
+
+    public func applicationActions(
+        currentSelectedModeId: UUID?,
+        currentSelectedTranscriptionLanguage: String
+    ) -> [VoiceInkModeSettingsRepairAction] {
+        var actions: [VoiceInkModeSettingsRepairAction] = []
+        if shouldReplaceModes {
+            actions.append(.replaceModes(modes))
+        }
+        if shouldApplySelectedModeId(from: currentSelectedModeId) {
+            actions.append(.selectMode(selectedModeId))
+        }
+        if shouldApplySelectedTranscriptionLanguage(from: currentSelectedTranscriptionLanguage) {
+            actions.append(.selectTranscriptionLanguage(selectedTranscriptionLanguage))
+        }
+        return actions
+    }
+}
+
+public enum VoiceInkModeSettingsRepairAction {
+    case replaceModes([Mode])
+    case selectMode(UUID?)
+    case selectTranscriptionLanguage(String)
 }
 
 public enum VoiceInkModeListPolicy {

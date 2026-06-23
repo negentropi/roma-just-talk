@@ -2938,6 +2938,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
 
 require_pattern \
+  "shared provider API-key verification persistence plan lives in VoiceInkCore" \
+  'VoiceInkProviderAPIKeyVerificationPersistencePlan|successPersistencePlan' \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
+
+require_pattern \
   "shared provider API-key form state lives in VoiceInkCore" \
   'struct +VoiceInkProviderAPIKeyFormState' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
@@ -2970,6 +2975,11 @@ require_pattern \
 require_pattern \
   "core checks execute provider API-key verification start plan tests" \
   'ProviderAccessRequirementTests\.testProviderAPIKeyVerificationStartPlan(BeginsWhenCandidateExists|CanKeepStateForMissingCandidate|CanApplyFailureForMissingCandidate)' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute provider API-key verification persistence plan test" \
+  'ProviderAccessRequirementTests\.testProviderAPIKeyVerificationApplicationPlanBuildsSuccessPersistencePlan' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -3088,7 +3098,12 @@ require_pattern \
 
 require_pattern \
   "iOS app settings applies shared provider API-key mutation plans" \
-  'applyStoredAPIKey|applyVerification|applyAPIKeyVerificationPlan|shouldPersistStoredKey|verificationFlagToPersist|shouldPersistVerificationFlag' \
+  'applyStoredAPIKey|applyVerification|applyAPIKeyVerificationPlan|successPersistencePlan|shouldPersistStoredKey|verificationFlagToPersist|shouldPersistVerificationFlag' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+reject_pattern \
+  "iOS app settings avoids shell-owned provider verification success interpretation" \
+  'plan\.shouldMarkKeyVerified|plan\.keyToSave|setKeyVerified\(true' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \
@@ -4639,7 +4654,7 @@ require_pattern \
 
 require_pattern \
   "macOS API-key manager applies shared provider verification plan" \
-  'applyProviderVerificationPlan|VoiceInkProviderAPIKeyVerificationApplicationPlan|plan\.shouldMarkKeyVerified|plan\.keyToSave' \
+  'applyProviderVerificationPlan|VoiceInkProviderAPIKeyVerificationApplicationPlan|successPersistencePlan|verificationFlagToPersist' \
   VoiceInk/Services/APIKeyManager.swift
 
 require_pattern \

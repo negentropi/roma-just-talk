@@ -177,6 +177,28 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertFalse(plan.shouldMarkKeyVerified)
     }
 
+    func testProviderAPIKeyVerificationApplicationPlanBuildsSuccessPersistencePlan() {
+        let successPlan = VoiceInkProviderAPIKeyVerificationApplicationPlan(
+            progress: .success,
+            keyToSave: "entered-key",
+            shouldMarkKeyVerified: true
+        )
+        let failurePlan = VoiceInkProviderAPIKeyVerificationApplicationPlan(
+            progress: .failure(message: "bad request"),
+            keyToSave: nil,
+            shouldMarkKeyVerified: false
+        )
+
+        XCTAssertEqual(
+            successPlan.successPersistencePlan,
+            VoiceInkProviderAPIKeyVerificationPersistencePlan(
+                keyToSave: "entered-key",
+                verificationFlagToPersist: true
+            )
+        )
+        XCTAssertNil(failurePlan.successPersistencePlan)
+    }
+
     func testProviderAPIKeyMissingVerificationCandidatePlanFailsWithoutStorageSideEffects() {
         let plan = VoiceInkProviderAPIKeyDraft.missingVerificationCandidatePlan()
 

@@ -202,6 +202,29 @@ public struct VoiceInkProviderAPIKeyVerificationApplicationPlan: Equatable, Send
     }
 }
 
+public struct VoiceInkProviderAPIKeyVerificationPersistencePlan: Equatable, Sendable {
+    public let keyToSave: String?
+    public let verificationFlagToPersist: Bool
+
+    public init(
+        keyToSave: String?,
+        verificationFlagToPersist: Bool
+    ) {
+        self.keyToSave = keyToSave
+        self.verificationFlagToPersist = verificationFlagToPersist
+    }
+}
+
+public extension VoiceInkProviderAPIKeyVerificationApplicationPlan {
+    var successPersistencePlan: VoiceInkProviderAPIKeyVerificationPersistencePlan? {
+        guard shouldMarkKeyVerified else { return nil }
+        return VoiceInkProviderAPIKeyVerificationPersistencePlan(
+            keyToSave: keyToSave,
+            verificationFlagToPersist: true
+        )
+    }
+}
+
 public enum VoiceInkProviderAPIKeyVerificationControl: Equatable, Sendable {
     case progress
     case verifyButton(isDisabled: Bool)

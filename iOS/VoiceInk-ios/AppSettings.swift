@@ -145,13 +145,13 @@ final class AppSettings: ObservableObject {
         _ plan: VoiceInkProviderAPIKeyVerificationApplicationPlan,
         for provider: VoiceInkProviderKind
     ) {
-        guard plan.shouldMarkKeyVerified else { return }
+        guard let persistencePlan = plan.successPersistencePlan else { return }
 
-        if let keyToSave = plan.keyToSave {
+        if let keyToSave = persistencePlan.keyToSave {
             setAPIKey(keyToSave, for: provider)
         }
 
-        setKeyVerified(true, for: provider)
+        setKeyVerified(persistencePlan.verificationFlagToPersist, for: provider)
     }
 
     // MARK: - Modes Management

@@ -383,6 +383,76 @@ final class CustomPromptTests: XCTestCase {
         )
     }
 
+    func testCustomPromptPolicyPlansPromptShortcutSelectionByIndex() {
+        let firstId = UUID(uuidString: "00000000-0000-0000-0000-000000000224")!
+        let secondId = UUID(uuidString: "00000000-0000-0000-0000-000000000225")!
+        let firstPrompt = VoiceInkCustomPrompt(id: firstId, title: "First", promptText: "First prompt")
+        let secondPrompt = VoiceInkCustomPrompt(id: secondId, title: "Second", promptText: "Second prompt")
+
+        XCTAssertEqual(
+            VoiceInkCustomPromptPolicy.settingsStateAfterPromptShortcutSelection(
+                index: 1,
+                current: VoiceInkAIEnhancementPromptSettingsState(
+                    isEnhancementEnabled: false,
+                    selectedPromptId: nil
+                ),
+                prompts: [firstPrompt, secondPrompt]
+            ),
+            VoiceInkAIEnhancementPromptSettingsState(
+                isEnhancementEnabled: true,
+                selectedPromptId: secondId
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkCustomPromptPolicy.settingsStateAfterPromptShortcutSelection(
+                index: 0,
+                current: VoiceInkAIEnhancementPromptSettingsState(
+                    isEnhancementEnabled: true,
+                    selectedPromptId: firstId
+                ),
+                prompts: [firstPrompt, secondPrompt]
+            ),
+            VoiceInkAIEnhancementPromptSettingsState(
+                isEnhancementEnabled: true,
+                selectedPromptId: firstId
+            )
+        )
+    }
+
+    func testCustomPromptPolicyRejectsPromptShortcutSelectionOutsidePromptList() {
+        let prompt = VoiceInkCustomPrompt(
+            id: UUID(uuidString: "00000000-0000-0000-0000-000000000226")!,
+            title: "Only",
+            promptText: "Only prompt"
+        )
+        let state = VoiceInkAIEnhancementPromptSettingsState(
+            isEnhancementEnabled: false,
+            selectedPromptId: nil
+        )
+
+        XCTAssertNil(
+            VoiceInkCustomPromptPolicy.settingsStateAfterPromptShortcutSelection(
+                index: -1,
+                current: state,
+                prompts: [prompt]
+            )
+        )
+        XCTAssertNil(
+            VoiceInkCustomPromptPolicy.settingsStateAfterPromptShortcutSelection(
+                index: 1,
+                current: state,
+                prompts: [prompt]
+            )
+        )
+        XCTAssertNil(
+            VoiceInkCustomPromptPolicy.settingsStateAfterPromptShortcutSelection(
+                index: 0,
+                current: state,
+                prompts: []
+            )
+        )
+    }
+
     func testCustomPromptPolicyRepairsSelectedPromptOnlyWhenEnhancementIsEnabled() {
         let firstId = UUID(uuidString: "00000000-0000-0000-0000-000000000101")!
         let validId = UUID(uuidString: "00000000-0000-0000-0000-000000000102")!

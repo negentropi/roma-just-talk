@@ -399,6 +399,16 @@ class AIEnhancementService: ObservableObject {
         selectedPromptId = prompt.id
     }
 
+    func selectPromptFromShortcut(index: Int) {
+        applyAIEnhancementPromptSettingsState(
+            VoiceInkCustomPromptPolicy.settingsStateAfterPromptShortcutSelection(
+                index: index,
+                current: aiEnhancementPromptSettingsState,
+                prompts: allPrompts
+            )
+        )
+    }
+
     func analyzePromptTrigger(in text: String) -> VoiceInkPromptDetectionResult {
         VoiceInkPromptDetectionPolicy.analyzeText(
             text,

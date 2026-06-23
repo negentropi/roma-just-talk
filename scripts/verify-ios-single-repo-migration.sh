@@ -5329,6 +5329,11 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
+  "core checks execute prompt shortcut selection tests" \
+  'CustomPromptTests\.testCustomPromptPolicyPlansPromptShortcutSelectionByIndex|CustomPromptTests\.testCustomPromptPolicyRejectsPromptShortcutSelectionOutsidePromptList' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "macOS AI enhancement service consumes shared prompt-trigger settings state" \
   'settingsStateAfterEnhancementEnabledChange|applyingSettingsState|restoringSettingsState|VoiceInkAIEnhancementPromptSettingsState' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
@@ -5363,6 +5368,21 @@ require_pattern \
   'VoiceInkCustomPromptPolicy\.selectedPromptIdAfterEnablingEnhancement' \
   VoiceInk/Views/AudioTranscribeView.swift
 
+require_pattern \
+  "shared custom prompt policy owns mini-recorder prompt shortcut selection" \
+  'settingsStateAfterPromptShortcutSelection' \
+  VoiceInkCore/Sources/VoiceInkCore/CustomPrompt.swift
+
+require_pattern \
+  "macOS AI enhancement service consumes shared prompt shortcut selection" \
+  'VoiceInkCustomPromptPolicy\.settingsStateAfterPromptShortcutSelection' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+require_pattern \
+  "macOS mini recorder prompt shortcut uses AI enhancement prompt shortcut adapter" \
+  'selectPromptFromShortcut' \
+  VoiceInk/Shortcuts/MiniRecorderShortcutManager.swift
+
 reject_pattern \
   "macOS AI enhancement service avoids shell-owned prompt-trigger settings application policy" \
   'result\.shouldEnableAI|restoredEnhancementState|restoredPromptId|selectedPromptId = result\.selectedPromptId|isEnhancementEnabled && selectedPromptId|VoiceInkCustomPromptPolicy\.selectedPromptIdAfterEnablingEnhancement' \
@@ -5382,6 +5402,11 @@ reject_pattern \
   "macOS audio import prompt picker avoids shell-owned first-prompt fallback" \
   'allPrompts\.first\?\.id' \
   VoiceInk/Views/AudioTranscribeView.swift
+
+reject_pattern \
+  "macOS mini recorder avoids shell-owned prompt shortcut selection policy" \
+  'allPrompts\.count|allPrompts\[index\]|index < enhancementService\.allPrompts\.count|isEnhancementEnabled = true|setActivePrompt' \
+  VoiceInk/Shortcuts/MiniRecorderShortcutManager.swift
 
 reject_pattern \
   "macOS AI enhancement service avoids shell-owned API-key invalid disable policy" \
@@ -5485,6 +5510,11 @@ require_pattern \
 require_pattern \
   "migration checklist tracks shared active prompt lookup and icon fallback" \
   'active prompt lookup, recorder-button prompt icon fallback, and audio-import prompt picker fallback' \
+  docs/ios-single-repo-migration.md
+
+require_pattern \
+  "migration checklist tracks shared mini-recorder prompt shortcut selection" \
+  'mini-recorder prompt shortcut selection delegates index validation and enable/select state planning to `VoiceInkCustomPromptPolicy`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

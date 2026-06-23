@@ -35,6 +35,7 @@
 - Moved Power Mode enhancement prompt fallback gating into shared core while leaving SwiftUI form state and provider/model execution in the macOS shell.
 - Moved active AI-enhancement prompt lookup and prompt icon fallback into shared core while leaving macOS selection state and SwiftUI binding execution in the shell.
 - Moved the macOS audio-player enhancement prompt fallback icon into shared playback presentation.
+- Moved mini-recorder prompt shortcut selection planning into shared core while leaving shortcut capture and state mutation in the macOS shell.
 
 ## v1.95 - 2026-06-17
 

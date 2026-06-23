@@ -301,6 +301,26 @@ public enum VoiceInkCustomPromptPolicy {
         )
     }
 
+    public static func settingsStateAfterPromptShortcutSelection(
+        index: Int,
+        current state: VoiceInkAIEnhancementPromptSettingsState,
+        prompts: [VoiceInkCustomPrompt]
+    ) -> VoiceInkAIEnhancementPromptSettingsState? {
+        guard prompts.indices.contains(index) else {
+            return nil
+        }
+
+        let selectedPromptId = prompts[index].id
+        if state.isEnhancementEnabled && state.selectedPromptId == selectedPromptId {
+            return state
+        }
+
+        return VoiceInkAIEnhancementPromptSettingsState(
+            isEnhancementEnabled: true,
+            selectedPromptId: selectedPromptId
+        )
+    }
+
     public static func repairedSelectedPromptId(
         _ selectedPromptId: UUID?,
         isEnhancementEnabled: Bool,

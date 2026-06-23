@@ -157,18 +157,7 @@ class MiniRecorderShortcutManager: ObservableObject {
     }
 
     private func handlePromptShortcut(index: Int) {
-        guard
-            let enhancementService = engine.getEnhancementService(),
-            index < enhancementService.allPrompts.count
-        else {
-            return
-        }
-
-        if !enhancementService.isEnhancementEnabled {
-            enhancementService.isEnhancementEnabled = true
-        }
-
-        enhancementService.setActivePrompt(enhancementService.allPrompts[index])
+        engine.getEnhancementService()?.selectPromptFromShortcut(index: index)
     }
 
     private func handlePowerModeSelectionShortcut(index: Int) async {

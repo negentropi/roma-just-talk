@@ -8,7 +8,6 @@ struct NotesListView: View {
     @Query(sort: [SortDescriptor(\Transcription.timestamp, order: .reverse)]) private var notes: [Transcription]
 
     @State private var searchText: String = ""
-    @State private var recordingStartAlert: VoiceInkRecordingAlertPresentation?
     @EnvironmentObject private var recordingManager: RecordingManager
     @StateObject private var settings = AppSettings.shared
 
@@ -58,9 +57,6 @@ struct NotesListView: View {
                     .interactiveDismissDisabled(true)
                 }
                 .alert(item: $recordingManager.activeRecordingAlert) { alertType in
-                    alert(for: alertType)
-                }
-                .alert(item: $recordingStartAlert) { alertType in
                     alert(for: alertType)
                 }
                 .onReceive(NotificationCenter.default.publisher(
@@ -152,12 +148,7 @@ struct NotesListView: View {
 
     private var unifiedRecordingComponent: some View {
         Button(action: {
-            switch VoiceInkRecordingStartPolicy.action(modeCount: settings.modes.count) {
-            case .presentAlert(let alert):
-                recordingStartAlert = alert
-            case .startRecording:
-                recordingManager.startRecordingFlow()
-            }
+            recordingManager.startRecordingFlow()
         }) {
             Label(
                 VoiceInkNoteListPresentation.startRecordingButtonTitle,

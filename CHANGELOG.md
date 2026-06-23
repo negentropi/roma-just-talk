@@ -42,6 +42,7 @@
 - Moved Power Mode form save mutation ordering into shared core while leaving macOS persistence and notifications in the shell.
 - Moved the recorder Power Mode button icon fallback into shared presentation while leaving SwiftUI rendering in the macOS shell.
 - Moved recording shortcut special-mode monitor policy into shared core while leaving event tap execution in the macOS shell.
+- Routed every imported iOS recording start entrypoint through the shared mode-count start policy, including keyboard/deep-link starts.
 
 ## v1.95 - 2026-06-17
 

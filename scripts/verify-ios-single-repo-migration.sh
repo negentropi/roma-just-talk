@@ -1255,12 +1255,17 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/RecordingStatePolicyTests.swift
 
 require_pattern \
-  "iOS recording start gate delegates mode-count policy to shared core" \
+  "iOS recording manager delegates every start entrypoint to shared mode-count policy" \
   'VoiceInkRecordingStartPolicy\.action' \
+  iOS/VoiceInk-ios/RecordingManager.swift
+
+reject_pattern \
+  "iOS note-list start button avoids duplicate start-policy branching" \
+  'VoiceInkRecordingStartPolicy\.action|recordingStartAlert|case \.presentAlert|case \.startRecording' \
   iOS/VoiceInk-ios/NotesListView.swift
 
 reject_pattern \
-  "iOS recording start gate avoids shell-owned no-mode branching" \
+  "iOS note-list start button avoids shell-owned no-mode branching" \
   'noModesAvailableIfNeeded|if +let +alert *= *VoiceInkRecordingAlertPresentation' \
   iOS/VoiceInk-ios/NotesListView.swift
 

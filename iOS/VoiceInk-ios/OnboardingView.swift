@@ -104,6 +104,16 @@ struct ModelDownloadOnboardingView: View {
         let row = modelManager.managementRow(for: baseModel)
         let presentation = row.presentation
         let primaryAction = onboardingPresentation.primaryAction(for: presentation)
+        let primaryRuntimeAction = primaryAction.runtimeAction(
+            continueSetup: {
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    currentStep.advance()
+                }
+            },
+            requestDownload: {
+                showDownloadConfirmation = true
+            }
+        )
 
         VStack(spacing: 0) {
             Spacer()
@@ -188,31 +198,16 @@ struct ModelDownloadOnboardingView: View {
             
             // Bottom Action Buttons
             VStack(spacing: 16) {
-                switch primaryAction {
-                case .waitForDownload(let title):
-                    Button(title) {}
-                        .buttonStyle(OnboardingButtonStyle())
-                        .disabled(true)
-
-                case .continueSetup(let title):
-                    Button(title) {
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            currentStep.advance()
-                        }
-                    }
-                    .buttonStyle(OnboardingButtonStyle())
-
-                case .requestDownload(let title, let systemImageName):
-                    Button(action: {
-                        showDownloadConfirmation = true
-                    }) {
-                        HStack(spacing: 8) {
+                Button(action: { primaryRuntimeAction?() }) {
+                    HStack(spacing: 8) {
+                        if let systemImageName = primaryAction.systemImageName {
                             Image(systemName: systemImageName)
-                            Text(title)
                         }
+                        Text(primaryAction.title)
                     }
-                    .buttonStyle(OnboardingButtonStyle())
                 }
+                .buttonStyle(OnboardingButtonStyle())
+                .disabled(!primaryAction.isEnabled)
             }
             .padding(.horizontal, 32)
             .padding(.bottom, 50)

@@ -104,6 +104,43 @@ public enum VoiceInkOnboardingModelDownloadPrimaryAction: Equatable, Sendable {
     case waitForDownload(title: String)
     case continueSetup(title: String)
     case requestDownload(title: String, systemImageName: String)
+
+    public var title: String {
+        switch self {
+        case .waitForDownload(let title),
+             .continueSetup(let title),
+             .requestDownload(let title, _):
+            return title
+        }
+    }
+
+    public var systemImageName: String? {
+        switch self {
+        case .requestDownload(_, let systemImageName):
+            return systemImageName
+        case .waitForDownload,
+             .continueSetup:
+            return nil
+        }
+    }
+
+    public var isEnabled: Bool {
+        runtimeAction(continueSetup: {}, requestDownload: {}) != nil
+    }
+
+    public func runtimeAction(
+        continueSetup: @escaping () -> Void,
+        requestDownload: @escaping () -> Void
+    ) -> (() -> Void)? {
+        switch self {
+        case .waitForDownload:
+            return nil
+        case .continueSetup:
+            return continueSetup
+        case .requestDownload:
+            return requestDownload
+        }
+    }
 }
 
 public struct VoiceInkMacOSOnboardingModelDownloadPresentation: Equatable, Sendable {

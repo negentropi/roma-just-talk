@@ -166,6 +166,43 @@ final class OnboardingPresentationTests: XCTestCase {
         )
     }
 
+    func testIOSModelDownloadOnboardingPrimaryActionBuildsButtonStateAndRuntimeAction() {
+        let waiting = VoiceInkOnboardingModelDownloadPrimaryAction.waitForDownload(title: "Downloading...")
+        XCTAssertEqual(waiting.title, "Downloading...")
+        XCTAssertNil(waiting.systemImageName)
+        XCTAssertFalse(waiting.isEnabled)
+        XCTAssertNil(waiting.runtimeAction(continueSetup: {}, requestDownload: {}))
+
+        let continueSetup = VoiceInkOnboardingModelDownloadPrimaryAction.continueSetup(title: "Continue")
+        XCTAssertEqual(continueSetup.title, "Continue")
+        XCTAssertNil(continueSetup.systemImageName)
+        XCTAssertTrue(continueSetup.isEnabled)
+
+        var events: [String] = []
+        let continueAction = continueSetup.runtimeAction(
+            continueSetup: { events.append("continue") },
+            requestDownload: { events.append("download") }
+        )
+        XCTAssertTrue(events.isEmpty)
+        continueAction?()
+        XCTAssertEqual(events, ["continue"])
+
+        let requestDownload = VoiceInkOnboardingModelDownloadPrimaryAction.requestDownload(
+            title: "Download Model (142 MB)",
+            systemImageName: "arrow.down.circle.fill"
+        )
+        XCTAssertEqual(requestDownload.title, "Download Model (142 MB)")
+        XCTAssertEqual(requestDownload.systemImageName, "arrow.down.circle.fill")
+        XCTAssertTrue(requestDownload.isEnabled)
+
+        let downloadAction = requestDownload.runtimeAction(
+            continueSetup: { events.append("continue") },
+            requestDownload: { events.append("download") }
+        )
+        downloadAction?()
+        XCTAssertEqual(events, ["continue", "download"])
+    }
+
     func testMacOSModelDownloadOnboardingPresentationPreservesCopyAndButtonPolicy() {
         let presentation = VoiceInkMacOSOnboardingPresentation.modelDownload
 

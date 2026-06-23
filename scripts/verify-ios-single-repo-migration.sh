@@ -4341,9 +4341,21 @@ require_pattern \
   'presentation\.action' \
   iOS/VoiceInk-ios/OnboardingView.swift
 
+require_patterns \
+  "iOS onboarding delegates primary action runtime mapping to shared core" \
+  iOS/VoiceInk-ios/OnboardingView.swift \
+  'primaryAction\.runtimeAction' \
+  'primaryAction\.isEnabled' \
+  'primaryAction\.title'
+
 reject_pattern \
   "iOS onboarding avoids shallow row action booleans" \
   'presentation\.(isDownloaded|canStartDownload|canCancelDownload|canDeleteDownloadedModel)\b' \
+  iOS/VoiceInk-ios/OnboardingView.swift
+
+reject_pattern \
+  "iOS onboarding avoids shell-owned primary-action sequencing" \
+  'switch primaryAction|case \.waitForDownload|case \.continueSetup|case \.requestDownload' \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 reject_pattern \
@@ -4491,6 +4503,19 @@ require_pattern \
   'testIOSOnboardingStepOrderPreservesExistingFlow' \
   VoiceInkCore/Tests/VoiceInkCoreTests/OnboardingPresentationTests.swift
 
+require_patterns \
+  "VoiceInkCore owns iOS onboarding primary action button state and runtime mapping" \
+  VoiceInkCore/Sources/VoiceInkCore/OnboardingPresentation.swift \
+  'VoiceInkOnboardingModelDownloadPrimaryAction' \
+  'runtimeAction' \
+  'isEnabled' \
+  'systemImageName'
+
+require_pattern \
+  "core tests pin iOS onboarding primary action runtime mapping" \
+  'testIOSModelDownloadOnboardingPrimaryActionBuildsButtonStateAndRuntimeAction' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/OnboardingPresentationTests.swift
+
 require_pattern \
   "core tests pin iOS app icon source policy" \
   'testIOSAppIconPolicyExtractsBundleIconFilesFromInfoDictionary|testIOSAppIconPolicyUsesLoadableLastBundleIcon|testIOSAppIconPolicyFallsBackWhenLastBundleIconIsMissing|testIOSAppIconPolicyFallsBackWithoutBundleIconFiles' \
@@ -4509,6 +4534,11 @@ require_pattern \
 require_pattern \
   "core check runner executes iOS onboarding step flow test" \
   'testIOSOnboardingStepOrderPreservesExistingFlow' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core check runner executes iOS onboarding primary action runtime mapping test" \
+  'testIOSModelDownloadOnboardingPrimaryActionBuildsButtonStateAndRuntimeAction' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \

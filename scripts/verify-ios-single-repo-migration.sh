@@ -706,8 +706,8 @@ reject_pattern \
   iOS
 
 reject_pattern \
-  "removed mode custom-prompt shim stays deleted" \
-  'public var customPrompt' \
+  "removed mode custom-prompt draft shim stays deleted" \
+  'public var (customPromptText|selectedTemplateType)' \
   VoiceInkCore/Sources/VoiceInkCore/Mode.swift
 
 reject_pattern \
@@ -10036,10 +10036,11 @@ require_pattern \
 
 section "obsolete standalone post-processing template module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/PostProcessingTemplate.swift
+reject_file VoiceInkCore/Sources/VoiceInkCore/PostProcessingPromptTemplate.swift
 
 require_patterns \
-  "post-processing template type lives with prompt-template policy" \
-  VoiceInkCore/Sources/VoiceInkCore/PostProcessingPromptTemplate.swift \
+  "post-processing template type lives with mode policy" \
+  VoiceInkCore/Sources/VoiceInkCore/Mode.swift \
   'VoiceInkPostProcessingTemplateType' \
   'VoiceInkPostProcessingPromptTemplate' \
   'transcriptCleanup'

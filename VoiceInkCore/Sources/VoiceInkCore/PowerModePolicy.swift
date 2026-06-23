@@ -1271,6 +1271,23 @@ public extension Array where Element == PowerModeConfig {
     }
 
     @discardableResult
+    mutating func savePowerModeConfiguration(
+        _ config: PowerModeConfig,
+        mode: VoiceInkPowerModeSaveMode
+    ) -> Bool {
+        if config.isDefault {
+            setPowerModeDefaultConfiguration(id: config.id)
+        }
+
+        switch mode {
+        case .add:
+            return appendPowerModeConfigurationIfMissing(config)
+        case .edit:
+            return updatePowerModeConfiguration(config)
+        }
+    }
+
+    @discardableResult
     mutating func removePowerModeConfiguration(with id: UUID) -> Bool {
         let originalCount = count
         removeAll { $0.id == id }

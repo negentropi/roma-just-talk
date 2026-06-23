@@ -745,17 +745,7 @@ struct ConfigurationView: View {
             return
         }
 
-        if isDefault {
-            powerModeManager.setAsDefault(configId: config.id, skipSave: true)
-        }
-
-        switch mode {
-        case .add:
-            powerModeManager.addConfiguration(config)
-        case .edit:
-            powerModeManager.updateConfiguration(config)
-        }
-
+        powerModeManager.saveConfiguration(config, mode: mode.saveMode)
         didSaveConfiguration = true
         onDismiss()
     }

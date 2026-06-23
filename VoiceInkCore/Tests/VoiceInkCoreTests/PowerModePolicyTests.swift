@@ -2225,6 +2225,49 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertFalse(configs.removePowerModeConfiguration(with: secondID))
     }
 
+    func testPowerModeConfigurationListSaveAppliesDefaultAndMutationMode() throws {
+        let firstID = UUID()
+        let secondID = UUID()
+        let thirdID = UUID()
+        var configs = [
+            config(id: firstID, name: "First", emoji: "F", isDefault: true),
+            config(id: secondID, name: "Second", emoji: "S")
+        ]
+
+        XCTAssertTrue(
+            configs.savePowerModeConfiguration(
+                config(id: thirdID, name: "Third", emoji: "T", isDefault: true),
+                mode: .add
+            )
+        )
+        XCTAssertFalse(try XCTUnwrap(configs.powerModeConfiguration(with: firstID)).isDefault)
+        XCTAssertFalse(try XCTUnwrap(configs.powerModeConfiguration(with: secondID)).isDefault)
+        XCTAssertTrue(try XCTUnwrap(configs.powerModeConfiguration(with: thirdID)).isDefault)
+
+        XCTAssertTrue(
+            configs.savePowerModeConfiguration(
+                config(id: secondID, name: "Second Updated", emoji: "U", isDefault: true),
+                mode: .edit(secondID)
+            )
+        )
+        XCTAssertFalse(try XCTUnwrap(configs.powerModeConfiguration(with: thirdID)).isDefault)
+        XCTAssertEqual(configs.powerModeConfiguration(with: secondID)?.name, "Second Updated")
+        XCTAssertTrue(try XCTUnwrap(configs.powerModeConfiguration(with: secondID)).isDefault)
+
+        XCTAssertFalse(
+            configs.savePowerModeConfiguration(
+                config(id: firstID, name: "Duplicate", emoji: "D"),
+                mode: .add
+            )
+        )
+        XCTAssertFalse(
+            configs.savePowerModeConfiguration(
+                config(id: UUID(), name: "Missing", emoji: "M"),
+                mode: .edit(UUID())
+            )
+        )
+    }
+
     func testValidationRejectsBlankAndDuplicateNameWithoutNormalizingName() {
         let existing = rule(name: "Writing")
         let blankCandidate = rule(name: " ")

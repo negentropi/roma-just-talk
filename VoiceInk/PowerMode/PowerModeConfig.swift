@@ -21,12 +21,17 @@ class PowerModeManager: ObservableObject {
         NotificationCenter.default.post(name: .powerModeConfigurationsDidChange, object: nil)
     }
 
-    func addConfiguration(_ config: PowerModeConfig) {
+    @discardableResult
+    func saveConfiguration(_ config: PowerModeConfig, mode: VoiceInkPowerModeSaveMode) -> Bool {
         let previousEnabledConfigIds = enabledConfigurationIds
-        if configurations.appendPowerModeConfigurationIfMissing(config) {
+        let didSave = configurations.savePowerModeConfiguration(config, mode: mode)
+
+        if didSave {
             saveConfigurations()
             postShortcutAvailabilityChangeIfNeeded(previousEnabledConfigIds: previousEnabledConfigIds)
         }
+
+        return didSave
     }
 
     func removeConfiguration(with id: UUID) {

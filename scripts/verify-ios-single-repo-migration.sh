@@ -11531,8 +11531,23 @@ require_pattern \
 
 require_pattern \
   "shared Power Mode config list policy lives in VoiceInkCore" \
-  'enabledPowerModeConfigurationIds|appendPowerModeConfigurationIfMissing|movePowerModeConfigurations|setPowerModeDefaultConfiguration|addPowerModeAppConfig' \
+  'enabledPowerModeConfigurationIds|appendPowerModeConfigurationIfMissing|savePowerModeConfiguration|movePowerModeConfigurations|setPowerModeDefaultConfiguration|addPowerModeAppConfig' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "core checks execute Power Mode configuration save mutation test" \
+  'PowerModePolicyTests\.testPowerModeConfigurationListSaveAppliesDefaultAndMutationMode' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "macOS Power Mode manager consumes shared configuration save mutation policy" \
+  'savePowerModeConfiguration\(config, mode: mode\)' \
+  VoiceInk/PowerMode/PowerModeConfig.swift
+
+reject_pattern \
+  "macOS Power Mode form avoids shell-owned save mutation ordering" \
+  'if +isDefault +\{|powerModeManager\.(setAsDefault|addConfiguration|updateConfiguration)' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
 
 require_pattern \
   "shared Power Mode backup shortcut import record lives in VoiceInkCore" \

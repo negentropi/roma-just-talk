@@ -1,8 +1,11 @@
 import AppKit
 import Carbon.HIToolbox
 import SwiftUI
+import VoiceInkCore
 
 struct ShortcutRecorder: View {
+    fileprivate static let presentation = VoiceInkRecordingShortcutPreference.macOSRecorderPresentation
+
     let action: ShortcutAction
     let defaultShortcut: Shortcut?
     let onShortcutChanged: () -> Void
@@ -69,10 +72,10 @@ struct ShortcutRecorder: View {
 
     private var accessibilityLabel: String {
         if recorder.isRecording {
-            return recorder.previewShortcut?.displayString ?? "Press shortcut"
+            return recorder.previewShortcut?.displayString ?? Self.presentation.recordingPlaceholderText
         }
 
-        return displayedShortcut?.displayString ?? "Record shortcut"
+        return displayedShortcut?.displayString ?? Self.presentation.idleAccessibilityLabel
     }
 
     private var displayedShortcut: Shortcut? {
@@ -103,7 +106,11 @@ private struct ShortcutVisualization: View {
                         .frame(width: 5, height: 5)
                 }
 
-                Text(isRecording ? "Press shortcut" : "Record")
+                Text(
+                    isRecording
+                        ? ShortcutRecorder.presentation.recordingPlaceholderText
+                        : ShortcutRecorder.presentation.idleButtonText
+                )
                     .font(.system(size: 12, weight: .medium))
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)

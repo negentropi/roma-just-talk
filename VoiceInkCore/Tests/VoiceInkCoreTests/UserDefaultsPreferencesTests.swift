@@ -1659,6 +1659,14 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(presentation.activationDelayUnitLabel, "ms")
     }
 
+    func testRecordingShortcutPreferencePreservesMacOSRecorderPresentation() {
+        let presentation = VoiceInkRecordingShortcutPreference.macOSRecorderPresentation
+
+        XCTAssertEqual(presentation.recordingPlaceholderText, "Press shortcut")
+        XCTAssertEqual(presentation.idleAccessibilityLabel, "Record shortcut")
+        XCTAssertEqual(presentation.idleButtonText, "Record")
+    }
+
     func testRecordingShortcutPreferenceKeysDefaultsAndRegisteredDefaults() {
         XCTAssertEqual(
             VoiceInkRecordingShortcutPreference.selectionKey(for: .primary),

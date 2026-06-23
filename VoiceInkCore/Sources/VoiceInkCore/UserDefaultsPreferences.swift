@@ -1597,6 +1597,18 @@ public struct VoiceInkMacOSRecordingShortcutSettingsPresentation: Equatable, Sen
     )
 }
 
+public struct VoiceInkMacOSShortcutRecorderPresentation: Equatable, Sendable {
+    public let recordingPlaceholderText: String
+    public let idleAccessibilityLabel: String
+    public let idleButtonText: String
+
+    public static let macOS = VoiceInkMacOSShortcutRecorderPresentation(
+        recordingPlaceholderText: "Press shortcut",
+        idleAccessibilityLabel: "Record shortcut",
+        idleButtonText: "Record"
+    )
+}
+
 public struct VoiceInkRecordingShortcutBackupPreferences: Codable, Equatable, Sendable {
     public let primaryRecordingShortcutRawValue: String?
     public let secondaryRecordingShortcutRawValue: String?
@@ -1818,6 +1830,7 @@ public enum VoiceInkRecordingShortcutPreference {
     public static let legacyCustomRecordingShortcutsMigrationKey = "Shortcut_LegacyCustomRecordingShortcutsMigrated"
 
     public static let macOSSettingsPresentation = VoiceInkMacOSRecordingShortcutSettingsPresentation.macOS
+    public static let macOSRecorderPresentation = VoiceInkMacOSShortcutRecorderPresentation.macOS
 
     public static var registeredDefaults: [String: Any] {
         [

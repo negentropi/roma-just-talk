@@ -304,6 +304,13 @@ public struct VoiceInkMacOSCleanupSettingsPresentation: Equatable, Sendable {
         "This will delete \(fileCount) audio files (\(totalSizeText))."
     }
 
+    public func audioCleanupFileSizeText(_ byteCount: Int64) -> String {
+        let formatter = ByteCountFormatter()
+        formatter.allowedUnits = [.useKB, .useMB, .useGB]
+        formatter.countStyle = .file
+        return formatter.string(fromByteCount: byteCount)
+    }
+
     public func noAudioFilesMessage(retentionDays: Int) -> String {
         "No audio files found older than \(retentionDays) day\(retentionDays > 1 ? "s" : "")."
     }

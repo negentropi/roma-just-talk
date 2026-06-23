@@ -151,11 +151,4 @@ class AudioCleanupManager {
         }
     }
     
-    /// Format file size in human-readable form
-    func formatFileSize(_ size: Int64) -> String {
-        let byteCountFormatter = ByteCountFormatter()
-        byteCountFormatter.allowedUnits = [.useKB, .useMB, .useGB]
-        byteCountFormatter.countStyle = .file
-        return byteCountFormatter.string(fromByteCount: size)
-    }
 } 

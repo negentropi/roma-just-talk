@@ -180,7 +180,7 @@ struct AudioCleanupSettingsView: View {
                         Text(
                             presentation.audioCleanupConfirmationMessage(
                                 fileCount: cleanupInfo.fileCount,
-                                totalSizeText: AudioCleanupManager.shared.formatFileSize(cleanupInfo.totalSize)
+                                totalSizeText: presentation.audioCleanupFileSizeText(cleanupInfo.totalSize)
                             )
                         )
                     } else {

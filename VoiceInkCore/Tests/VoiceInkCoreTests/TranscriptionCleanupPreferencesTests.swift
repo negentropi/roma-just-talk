@@ -117,6 +117,14 @@ final class TranscriptionCleanupPreferencesTests: XCTestCase {
         )
     }
 
+    func testMacOSCleanupSettingsPresentationFormatsAudioFileSizes() {
+        let presentation = VoiceInkMacOSCleanupSettingsPresentation.macOS
+
+        XCTAssertEqual(presentation.audioCleanupFileSizeText(512), "1 KB")
+        XCTAssertEqual(presentation.audioCleanupFileSizeText(1_024), "1 KB")
+        XCTAssertEqual(presentation.audioCleanupFileSizeText(1_048_576), "1 MB")
+    }
+
     func testCurrentFallsBackToLegacyRemovePunctuationFlag() {
         withIsolatedDefaults { defaults in
             defaults.set(true, forKey: PunctuationCleanupMode.legacyRemovePunctuationKey)

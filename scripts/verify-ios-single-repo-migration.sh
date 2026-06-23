@@ -1913,6 +1913,11 @@ reject_pattern \
   'audioFileURL = nil' \
   VoiceInk/Views/Settings/AudioCleanupManager.swift
 
+reject_pattern \
+  "macOS audio cleanup avoids shell-owned file-size presentation" \
+  'formatFileSize|ByteCountFormatter' \
+  VoiceInk/Views/Settings/AudioCleanupManager.swift
+
 require_patterns \
   "iOS live recording adapts shared recorder configuration to AVFoundation" \
   iOS/VoiceInk-ios/AudioRecorder.swift \
@@ -5588,6 +5593,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionCleanupPreferences.swift
 
 require_pattern \
+  "shared macOS cleanup settings owns file-size presentation" \
+  'audioCleanupFileSizeText|allowedUnits = \[\.useKB, \.useMB, \.useGB\]' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionCleanupPreferences.swift
+
+require_pattern \
   "shared transcription cleanup backup preferences live in VoiceInkCore" \
   'struct VoiceInkTranscriptionCleanupBackupPreferences' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionCleanupPreferences.swift
@@ -5659,7 +5669,7 @@ require_pattern \
 
 require_pattern \
   "macOS audio cleanup settings use shared presentation" \
-  'VoiceInkMacOSCleanupSettingsPresentation\.macOS|presentation\.(transcriptToggleTitle|audioRetentionOptions|audioCleanupResultMessage)' \
+  'VoiceInkMacOSCleanupSettingsPresentation\.macOS|presentation\.(transcriptToggleTitle|audioRetentionOptions|audioCleanupResultMessage|audioCleanupFileSizeText)' \
   VoiceInk/Views/Settings/AudioCleanupSettingsView.swift
 
 require_pattern \

@@ -1137,6 +1137,15 @@ public extension Array where Element == PowerModeConfig {
         Set(enabledPowerModeConfigurations.map(\.id))
     }
 
+    func powerModeConfigurationForMiniRecorderShortcut(index: Int) -> PowerModeConfig? {
+        let enabledConfigurations = enabledPowerModeConfigurations
+        guard enabledConfigurations.indices.contains(index) else {
+            return nil
+        }
+
+        return enabledConfigurations[index]
+    }
+
     var hasPowerModeDefaultConfiguration: Bool {
         contains { $0.isDefault }
     }

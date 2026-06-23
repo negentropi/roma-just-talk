@@ -5383,6 +5383,21 @@ require_pattern \
   'selectPromptFromShortcut' \
   VoiceInk/Shortcuts/MiniRecorderShortcutManager.swift
 
+require_pattern \
+  "core checks execute mini-recorder power mode shortcut selection tests" \
+  'PowerModePolicyTests\.testPowerModeConfigurationListSelectsMiniRecorderShortcutByEnabledIndex|PowerModePolicyTests\.testPowerModeConfigurationListRejectsMiniRecorderShortcutOutsideEnabledRange' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "shared Power Mode policy owns mini-recorder shortcut selection" \
+  'powerModeConfigurationForMiniRecorderShortcut' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "macOS mini recorder consumes shared Power Mode shortcut selection" \
+  'powerModeConfigurationForMiniRecorderShortcut' \
+  VoiceInk/Shortcuts/MiniRecorderShortcutManager.swift
+
 reject_pattern \
   "macOS AI enhancement service avoids shell-owned prompt-trigger settings application policy" \
   'result\.shouldEnableAI|restoredEnhancementState|restoredPromptId|selectedPromptId = result\.selectedPromptId|isEnhancementEnabled && selectedPromptId|VoiceInkCustomPromptPolicy\.selectedPromptIdAfterEnablingEnhancement' \
@@ -5406,6 +5421,11 @@ reject_pattern \
 reject_pattern \
   "macOS mini recorder avoids shell-owned prompt shortcut selection policy" \
   'allPrompts\.count|allPrompts\[index\]|index < enhancementService\.allPrompts\.count|isEnhancementEnabled = true|setActivePrompt' \
+  VoiceInk/Shortcuts/MiniRecorderShortcutManager.swift
+
+reject_pattern \
+  "macOS mini recorder avoids shell-owned Power Mode shortcut selection policy" \
+  'availableConfigurations\.count|availableConfigurations\[index\]|index < availableConfigurations\.count' \
   VoiceInk/Shortcuts/MiniRecorderShortcutManager.swift
 
 reject_pattern \

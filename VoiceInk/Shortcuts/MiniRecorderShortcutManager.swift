@@ -161,14 +161,15 @@ class MiniRecorderShortcutManager: ObservableObject {
     }
 
     private func handlePowerModeSelectionShortcut(index: Int) async {
-        guard canUsePowerModeShortcuts else { return }
-
         let powerModeManager = PowerModeManager.shared
-        let availableConfigurations = powerModeManager.configurations.enabledPowerModeConfigurations
+        guard
+            canUsePowerModeShortcuts,
+            let selectedConfig = powerModeManager.configurations
+                .powerModeConfigurationForMiniRecorderShortcut(index: index)
+        else {
+            return
+        }
 
-        guard index < availableConfigurations.count else { return }
-
-        let selectedConfig = availableConfigurations[index]
         powerModeManager.setActiveConfiguration(selectedConfig)
         await PowerModeSessionManager.shared.beginSession(with: selectedConfig)
     }

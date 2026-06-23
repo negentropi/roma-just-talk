@@ -1910,6 +1910,34 @@ final class PowerModePolicyTests: XCTestCase {
         )
     }
 
+    func testPowerModeConfigurationListSelectsMiniRecorderShortcutByEnabledIndex() {
+        let disabled = config(name: "Disabled", emoji: "D", isEnabled: false)
+        let firstEnabled = config(name: "First", emoji: "F")
+        let secondEnabled = config(name: "Second", emoji: "S")
+        let configs = [disabled, firstEnabled, secondEnabled]
+
+        XCTAssertEqual(
+            configs.powerModeConfigurationForMiniRecorderShortcut(index: 0)?.id,
+            firstEnabled.id
+        )
+        XCTAssertEqual(
+            configs.powerModeConfigurationForMiniRecorderShortcut(index: 1)?.id,
+            secondEnabled.id
+        )
+    }
+
+    func testPowerModeConfigurationListRejectsMiniRecorderShortcutOutsideEnabledRange() {
+        let configs = [config(name: "Only", emoji: "O")]
+
+        XCTAssertNil(configs.powerModeConfigurationForMiniRecorderShortcut(index: -1))
+        XCTAssertNil(configs.powerModeConfigurationForMiniRecorderShortcut(index: 1))
+        XCTAssertNil([PowerModeConfig]().powerModeConfigurationForMiniRecorderShortcut(index: 0))
+        XCTAssertNil(
+            [config(name: "Disabled", emoji: "D", isEnabled: false)]
+                .powerModeConfigurationForMiniRecorderShortcut(index: 0)
+        )
+    }
+
     func testPowerModeShortcutImportPlanKeepsOnlyImportedConfigurationKeys() {
         let importedId = UUID(uuidString: "00000000-0000-0000-0000-000000000301")!
         let secondImportedId = UUID(uuidString: "00000000-0000-0000-0000-000000000302")!

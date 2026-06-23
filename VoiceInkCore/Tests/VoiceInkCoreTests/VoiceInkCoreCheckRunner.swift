@@ -841,6 +841,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testMatchingAppRuleUsesExactEnabledBundleIdentifier", run: { PowerModePolicyTests().testMatchingAppRuleUsesExactEnabledBundleIdentifier() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testDefaultAndRulePresenceRequireEnabledRules", run: { PowerModePolicyTests().testDefaultAndRulePresenceRequireEnabledRules() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeConfigurationListQueriesUseSharedRulePolicy", run: { PowerModePolicyTests().testPowerModeConfigurationListQueriesUseSharedRulePolicy() }),
+            VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeConfigurationListSelectsMiniRecorderShortcutByEnabledIndex", run: { PowerModePolicyTests().testPowerModeConfigurationListSelectsMiniRecorderShortcutByEnabledIndex() }),
+            VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeConfigurationListRejectsMiniRecorderShortcutOutsideEnabledRange", run: { PowerModePolicyTests().testPowerModeConfigurationListRejectsMiniRecorderShortcutOutsideEnabledRange() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeShortcutImportPlanKeepsOnlyImportedConfigurationKeys", run: { PowerModePolicyTests().testPowerModeShortcutImportPlanKeepsOnlyImportedConfigurationKeys() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeBackupExportPlanPreservesMacOSExportInputs", run: { PowerModePolicyTests().testPowerModeBackupExportPlanPreservesMacOSExportInputs() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeShortcutBackupsReturnNilWhenNoShortcutsExist", run: { PowerModePolicyTests().testPowerModeShortcutBackupsReturnNilWhenNoShortcutsExist() }),

@@ -1,5 +1,43 @@
 import Foundation
 
+enum VoiceInkRemoteHTTPResponsePolicy {
+    static let successStatusCodeRange = 200..<300
+    static let retryableStatusCodes: Set<Int> = [429, 500, 502, 503, 504]
+
+    static func validateSuccess(
+        response: URLResponse,
+        data: Data,
+        errorDomain: String
+    ) throws {
+        guard let http = response as? HTTPURLResponse else {
+            throw URLError(.badServerResponse)
+        }
+
+        guard successStatusCodeRange.contains(http.statusCode) else {
+            throw apiError(statusCode: http.statusCode, data: data, errorDomain: errorDomain)
+        }
+    }
+
+    static func retryableStatusCode(in response: URLResponse) -> Int? {
+        guard let http = response as? HTTPURLResponse else {
+            return nil
+        }
+        return retryableStatusCodes.contains(http.statusCode) ? http.statusCode : nil
+    }
+
+    static func apiError(statusCode: Int, data: Data, errorDomain: String) -> NSError {
+        NSError(
+            domain: errorDomain,
+            code: statusCode,
+            userInfo: [NSLocalizedDescriptionKey: responseBodyText(from: data)]
+        )
+    }
+
+    static func responseBodyText(from data: Data) -> String {
+        String(data: data, encoding: .utf8) ?? ""
+    }
+}
+
 enum VoiceInkRetriedRequest {
     static func data(
         for request: URLRequest,
@@ -134,5 +172,57 @@ enum VoiceInkRetriedRequest {
         }
 
         throw lastError ?? URLError(.unknown)
+    }
+}
+
+enum VoiceInkRemotePollingDecision<Result> {
+    case finished(Result)
+    case keepPolling
+}
+
+enum VoiceInkRemotePollingPolicy {
+    static let defaultIntervalNanoseconds: UInt64 = 1_000_000_000
+
+    static func poll<Result>(
+        maxWaitSeconds: TimeInterval,
+        pollIntervalNanoseconds: UInt64 = defaultIntervalNanoseconds,
+        now: @escaping () -> Date = Date.init,
+        sleep: @escaping (UInt64) async throws -> Void = { try await Task.sleep(nanoseconds: $0) },
+        operation: () async throws -> VoiceInkRemotePollingDecision<Result>
+    ) async throws -> Result {
+        let start = now()
+
+        while true {
+            switch try await operation() {
+            case .finished(let result):
+                return result
+            case .keepPolling:
+                break
+            }
+
+            if now().timeIntervalSince(start) > maxWaitSeconds {
+                throw URLError(.timedOut)
+            }
+
+            try await sleep(pollIntervalNanoseconds)
+        }
+    }
+
+    static func pollValidatedData<Result>(
+        request: () throws -> URLRequest,
+        errorDomain: String,
+        maxWaitSeconds: TimeInterval,
+        decision: @escaping (Data) throws -> VoiceInkRemotePollingDecision<Result>
+    ) async throws -> Result {
+        try await poll(maxWaitSeconds: maxWaitSeconds) {
+            let request = try request()
+            let (data, response) = try await URLSession.shared.data(for: request)
+            try VoiceInkRemoteHTTPResponsePolicy.validateSuccess(
+                response: response,
+                data: data,
+                errorDomain: errorDomain
+            )
+            return try decision(data)
+        }
     }
 }

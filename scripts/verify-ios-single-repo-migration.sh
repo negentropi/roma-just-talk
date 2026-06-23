@@ -4786,7 +4786,7 @@ reject_pattern \
 require_pattern \
   "shared remote HTTP response policy owns success, retry, and provider-domain errors" \
   'VoiceInkRemoteHTTPResponsePolicy|successStatusCodeRange|retryableStatusCode|apiError|responseBodyText|URLError\(\.badServerResponse\)' \
-  VoiceInkCore/Sources/VoiceInkCore/RemoteHTTPResponsePolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/RemoteTransport.swift
 
 require_pattern \
   "direct remote clients use shared validated request helper" \
@@ -4798,7 +4798,7 @@ require_pattern \
 require_pattern \
   "shared remote retry helper owns retry classification and validated responses" \
   'VoiceInkRemoteHTTPResponsePolicy\.(retryableStatusCode|apiError|validateSuccess)|validatedData|validatedUpload' \
-  VoiceInkCore/Sources/VoiceInkCore/RetriedUpload.swift
+  VoiceInkCore/Sources/VoiceInkCore/RemoteTransport.swift
 
 require_pattern \
   "shared retried remote transcription clients use validated retry helper" \
@@ -4814,7 +4814,11 @@ require_pattern \
 require_pattern \
   "shared remote polling policy owns timeout, cadence, and HTTP validation" \
   'VoiceInkRemotePollingPolicy|defaultIntervalNanoseconds|pollValidatedData|VoiceInkRemoteHTTPResponsePolicy\.validateSuccess|URLError\(\.timedOut\)' \
-  VoiceInkCore/Sources/VoiceInkCore/RemotePollingPolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/RemoteTransport.swift
+
+reject_file VoiceInkCore/Sources/VoiceInkCore/RemoteHTTPResponsePolicy.swift
+reject_file VoiceInkCore/Sources/VoiceInkCore/RemotePollingPolicy.swift
+reject_file VoiceInkCore/Sources/VoiceInkCore/RetriedUpload.swift
 
 require_pattern \
   "shared long-running remote transcription clients use shared polling policy" \
@@ -4893,7 +4897,7 @@ reject_pattern \
 reject_pattern \
   "shared remote retry helpers avoid duplicate retry status sets" \
   'private static let retryableStatusCodes' \
-  VoiceInkCore/Sources/VoiceInkCore/RetriedUpload.swift \
+  VoiceInkCore/Sources/VoiceInkCore/RemoteTransport.swift \
   VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleTranscriptionClient.swift
 
 require_pattern \

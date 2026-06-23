@@ -6673,10 +6673,12 @@ require_pattern \
   'rawCustomVocabularyTerms\(from: modelContext\)' \
   VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift
 
+reject_file VoiceInkCore/Sources/VoiceInkCore/CloudTranscriptionError.swift
+
 require_pattern \
-  "shared cloud transcription error lives in VoiceInkCore" \
+  "shared cloud transcription error lives with audio transcription service" \
   'VoiceInkCloudTranscriptionError|CloudTranscriptionError|apiRequestFailure|apiStatusCodeRange|apiRequestFailed|networkError|noTranscriptionReturned' \
-  VoiceInkCore/Sources/VoiceInkCore/CloudTranscriptionError.swift
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift
 
 require_pattern \
   "shared cloud transcription error checks run in VoiceInkCore" \
@@ -6692,7 +6694,7 @@ require_pattern \
 require_pattern \
   "shared cloud transcription error uses shared run error description" \
   'VoiceInkTranscriptionRunError\.noTranscriptionReturned\.errorDescription' \
-  VoiceInkCore/Sources/VoiceInkCore/CloudTranscriptionError.swift
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift
 
 reject_pattern \
   "macOS cloud batch transcription avoids pre-normalized vocabulary terms" \

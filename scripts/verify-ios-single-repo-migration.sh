@@ -731,18 +731,21 @@ reject_pattern \
 require_pattern \
   "shared transcript export owns localized date style" \
   'dateStyle = \.medium' \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptFileExport.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptExport.swift
 
 require_pattern \
   "shared transcript export owns localized time style" \
   'timeStyle = \.short' \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptFileExport.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptExport.swift
 
 require_patterns \
   "shared transcript export owns macOS file extensions" \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptFileExport.swift \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptExport.swift \
   'plainTextFileExtension = "txt"' \
   'markdownFileExtension = "md"'
+
+reject_file VoiceInkCore/Sources/VoiceInkCore/TranscriptFileExport.swift
+reject_file VoiceInkCore/Sources/VoiceInkCore/TranscriptionCSVExport.swift
 
 require_pattern \
   "shared language display fallback lives in VoiceInkCore" \

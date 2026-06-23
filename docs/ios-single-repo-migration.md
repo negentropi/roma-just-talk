@@ -362,7 +362,7 @@ The remaining Swift files present in `../VoiceInk-iOS/VoiceInk-ios` but not in `
 - `RiffWaveUtils.swift`: replaced by `VoiceInkPCM16AudioSamples`.
 - `VADModelManager.swift`: replaced by direct `VoiceInkVADModelFiles.sileroPath()` calls from the macOS/iOS Whisper shells and macOS rolling preload; the helper now lives with `VoiceInkWhisperModelFiles`.
 - `DefaultModeManager.swift`: replaced by `VoiceInkIOSFirstTimeSetupPolicy` plus `VoiceInkModeSettingsPolicy.defaultModeRepairPlan`.
-- `Mode.swift`, `PromptTemplate.swift`, `Provider.swift`: replaced by `VoiceInkCore` mode, prompt-template, and provider catalog modules.
+- `Mode.swift`, `PromptTemplate.swift`, `Provider.swift`: replaced by `VoiceInkCore` mode, prompt-template, and provider catalog modules; post-processing template type/copy lives with `VoiceInkPostProcessingPromptTemplate`.
 - `ModeSelectionView.swift`, `ModesView.swift`: obsolete iOS UI experiments; current in-repo iOS mode UI is `iOS/VoiceInk-ios/ModeConfigurationView.swift`.
 - `ContentView.swift`: obsolete clone app-root wrapper; current in-repo iOS launch path presents `NotesListView` directly after onboarding.
 - `Item.swift`: unused SwiftData template sample.

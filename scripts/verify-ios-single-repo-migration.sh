@@ -9911,6 +9911,16 @@ require_pattern \
   '\$mode\.promptTemplate\.' \
   iOS/VoiceInk-ios/ModeConfigurationView.swift
 
+section "obsolete standalone post-processing template module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/PostProcessingTemplate.swift
+
+require_patterns \
+  "post-processing template type lives with prompt-template policy" \
+  VoiceInkCore/Sources/VoiceInkCore/PostProcessingPromptTemplate.swift \
+  'VoiceInkPostProcessingTemplateType' \
+  'VoiceInkPostProcessingPromptTemplate' \
+  'transcriptCleanup'
+
 reject_pattern \
   "iOS mode prompt-template editing avoids duplicate shell draft state" \
   'selectedTemplateType|customPromptText|mode\.promptTemplate = VoiceInkPostProcessingPromptTemplate' \

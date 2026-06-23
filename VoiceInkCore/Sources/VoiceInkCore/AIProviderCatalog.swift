@@ -578,6 +578,29 @@ public struct VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan: Equatable, Se
     }
 }
 
+public extension VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan {
+    func verifyResolvedAPIKey(
+        _ resolvedKey: String,
+        verifySharedProvider: (String, VoiceInkProviderKind) async -> VoiceInkAPIKeyVerificationResult,
+        verifyAnthropicMessages: (String) async -> VoiceInkAPIKeyVerificationResult,
+        verifyOpenAICompatibleModels: (URL, String, String) async -> VoiceInkAPIKeyVerificationResult,
+        verifyOpenRouterModels: (String, String) async -> VoiceInkAPIKeyVerificationResult
+    ) async -> VoiceInkAPIKeyVerificationResult {
+        switch action {
+        case .immediate(let immediateResult):
+            return immediateResult
+        case .sharedProvider(let provider):
+            return await verifySharedProvider(resolvedKey, provider)
+        case .anthropicMessages:
+            return await verifyAnthropicMessages(resolvedKey)
+        case .openAICompatibleModels(let requestURL, let model):
+            return await verifyOpenAICompatibleModels(requestURL, resolvedKey, model)
+        case .openRouterModels(let model):
+            return await verifyOpenRouterModels(resolvedKey, model)
+        }
+    }
+}
+
 public struct VoiceInkAIEnhancementAPIKeyClearPlan: Equatable, Sendable {
     public let provider: VoiceInkAIEnhancementProviderKind
     public let providerKeyStorageNameToDelete: String

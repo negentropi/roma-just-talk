@@ -204,52 +204,40 @@ class AIService: ObservableObject {
         completion: @escaping (VoiceInkAPIKeyVerificationResult) -> Void
     ) {
         Task {
-            let result: VoiceInkAPIKeyVerificationResult
             let dispatchPlan = VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan.plan(
                 provider: selectedProvider,
                 currentModel: currentModel,
                 requestURL: selectedProvider.textEnhancementRequestURL()
             )
-
-            switch dispatchPlan.action {
-            case .immediate(let immediateResult):
-                result = immediateResult
-            case .sharedProvider(let provider):
-                let verification = await VoiceInkProviderAPIKeyVerifier().verifyAPIKeyDetailed(
-                    resolvedKey,
-                    for: provider
-                )
-                result = verification
-            case .anthropicMessages:
-                result = apiKeyVerificationResult(
-                    from: await AnthropicLLMClient.verifyAPIKey(resolvedKey)
-                )
-            case .openAICompatibleModels(let requestURL, let model):
-                result = apiKeyVerificationResult(
-                    from: await OpenAILLMClient.verifyAPIKey(
-                        baseURL: requestURL,
-                        apiKey: resolvedKey,
-                        model: model
+            let result = await dispatchPlan.verifyResolvedAPIKey(
+                resolvedKey,
+                verifySharedProvider: { key, provider in
+                    await VoiceInkProviderAPIKeyVerifier().verifyAPIKeyDetailed(key, for: provider)
+                },
+                verifyAnthropicMessages: { key in
+                    VoiceInkAPIKeyVerificationResult(
+                        legacyResult: await AnthropicLLMClient.verifyAPIKey(key)
                     )
-                )
-            case .openRouterModels(let model):
-                result = apiKeyVerificationResult(
-                    from: await OpenRouterClient.verifyAPIKey(
-                        resolvedKey,
-                        model: model
+                },
+                verifyOpenAICompatibleModels: { requestURL, key, model in
+                    VoiceInkAPIKeyVerificationResult(
+                        legacyResult: await OpenAILLMClient.verifyAPIKey(
+                            baseURL: requestURL,
+                            apiKey: key,
+                            model: model
+                        )
                     )
-                )
-            }
+                },
+                verifyOpenRouterModels: { key, model in
+                    VoiceInkAPIKeyVerificationResult(
+                        legacyResult: await OpenRouterClient.verifyAPIKey(key, model: model)
+                    )
+                }
+            )
             DispatchQueue.main.async {
                 completion(result)
             }
         }
-    }
-
-    private func apiKeyVerificationResult(
-        from legacyResult: (Bool, String?)
-    ) -> VoiceInkAPIKeyVerificationResult {
-        VoiceInkAPIKeyVerificationResult(isValid: legacyResult.0, errorMessage: legacyResult.1)
     }
     
     func clearAPIKey() {

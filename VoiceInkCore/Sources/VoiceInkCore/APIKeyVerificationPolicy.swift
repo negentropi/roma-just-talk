@@ -8,6 +8,10 @@ public struct VoiceInkAPIKeyVerificationResult: Equatable, Sendable {
         self.isValid = isValid
         self.errorMessage = errorMessage
     }
+
+    public init(legacyResult: (Bool, String?)) {
+        self.init(isValid: legacyResult.0, errorMessage: legacyResult.1)
+    }
 }
 
 enum VoiceInkAPIKeyVerificationPolicy {

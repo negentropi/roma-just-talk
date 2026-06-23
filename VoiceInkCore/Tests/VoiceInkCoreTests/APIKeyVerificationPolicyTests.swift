@@ -2,6 +2,17 @@ import Foundation
 @testable import VoiceInkCore
 
 final class APIKeyVerificationPolicyTests: XCTestCase {
+    func testLegacyResultInitializerPreservesBoolAndMessage() {
+        XCTAssertEqual(
+            VoiceInkAPIKeyVerificationResult(legacyResult: (true, nil)),
+            VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: nil)
+        )
+        XCTAssertEqual(
+            VoiceInkAPIKeyVerificationResult(legacyResult: (false, "invalid key")),
+            VoiceInkAPIKeyVerificationResult(isValid: false, errorMessage: "invalid key")
+        )
+    }
+
     func testBlankAPIKeyResultPreservesSharedFailureCopy() {
         XCTAssertEqual(
             VoiceInkAPIKeyVerificationPolicy.blankAPIKeyResultIfNeeded(" \n\t "),

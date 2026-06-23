@@ -4967,7 +4967,7 @@ require_patterns \
 
 require_pattern \
   "core checks execute API-key verification policy tests" \
-  'APIKeyVerificationPolicyTests\.testBlankAPIKeyResultPreservesSharedFailureCopy|APIKeyVerificationPolicyTests\.testVerificationResultRejectsMissingHTTPResponse|APIKeyVerificationPolicyTests\.testVerificationResultAcceptsHTTP2xxResponses|APIKeyVerificationPolicyTests\.testVerificationResultReturnsHTTPBodyForFailure|APIKeyVerificationPolicyTests\.testVerificationResultFallsBackToHTTPStatusForNonUTF8FailureBody|APIKeyVerificationPolicyTests\.testFailureResultUsesLocalizedDescription' \
+  'APIKeyVerificationPolicyTests\.testLegacyResultInitializerPreservesBoolAndMessage|APIKeyVerificationPolicyTests\.testBlankAPIKeyResultPreservesSharedFailureCopy|APIKeyVerificationPolicyTests\.testVerificationResultRejectsMissingHTTPResponse|APIKeyVerificationPolicyTests\.testVerificationResultAcceptsHTTP2xxResponses|APIKeyVerificationPolicyTests\.testVerificationResultReturnsHTTPBodyForFailure|APIKeyVerificationPolicyTests\.testVerificationResultFallsBackToHTTPStatusForNonUTF8FailureBody|APIKeyVerificationPolicyTests\.testFailureResultUsesLocalizedDescription' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \
@@ -7833,6 +7833,13 @@ require_pattern \
   'VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan|VoiceInkAIEnhancementAPIKeyVerificationDispatch|openAICompatibleModels\(requestURL:|openRouterModels\(model:' \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
+require_patterns \
+  "shared macOS AI API-key verification dispatch application lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift \
+  'extension VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan' \
+  'verifyResolvedAPIKey' \
+  'verifyOpenAICompatibleModels'
+
 require_pattern \
   "core checks execute shared macOS AI API-key verification request plan test" \
   'AIProviderCatalogTests\.testMacOSAIEnhancementAPIKeyVerificationRequestPlanIsShared' \
@@ -7841,6 +7848,11 @@ require_pattern \
 require_pattern \
   "core checks execute shared macOS AI API-key verification dispatch plan test" \
   'AIProviderCatalogTests\.testMacOSAIEnhancementAPIKeyVerificationDispatchPlanIsShared' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute shared macOS AI API-key verification dispatch application test" \
+  'AIProviderCatalogTests\.testMacOSAIEnhancementAPIKeyVerificationDispatchPlanAppliesAdapters' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -7917,7 +7929,7 @@ require_pattern \
 
 require_pattern \
   "macOS AI service dispatches API-key verification through shared plan" \
-  'VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan\.plan|dispatchPlan\.action' \
+  'VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan\.plan|dispatchPlan\.verifyResolvedAPIKey' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 require_pattern \
@@ -7942,7 +7954,7 @@ require_pattern \
 
 require_pattern \
   "migration checklist tracks shared macOS AI API-key verification dispatch plan" \
-  'verification-dispatch planning.*VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan' \
+  'verification-dispatch planning/application.*VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan' \
   docs/ios-single-repo-migration.md
 
 require_pattern \
@@ -8032,7 +8044,12 @@ reject_pattern \
 
 reject_pattern \
   "macOS AI service avoids tuple-shaped API-key verification adapter results" \
-  'let result: \(isValid: Bool, errorMessage: String\?\)|VoiceInkAPIKeyVerificationResult\(isValid: isValid, errorMessage: errorMessage\)' \
+  'let result: \(isValid: Bool, errorMessage: String\?\)|apiKeyVerificationResult|VoiceInkAPIKeyVerificationResult\(isValid: isValid, errorMessage: errorMessage\)' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
+reject_pattern \
+  "macOS AI service avoids shell-owned API-key verification dispatch routing" \
+  'switch dispatchPlan\.action|case \.sharedProvider|case \.anthropicMessages|case \.openAICompatibleModels|case \.openRouterModels' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 require_pattern \

@@ -15,8 +15,10 @@ final class WhisperModelWarmupCoordinator: ObservableObject {
     }
 
     func scheduleWarmup(for model: WhisperModel, whisperModelManager: WhisperModelManager) {
-        guard VoiceInkWhisperModelFiles.supportsCoreML(forModelName: model.name),
-              !warmingModels.contains(model.name) else {
+        guard VoiceInkWhisperModelWarmupPolicy.shouldScheduleWarmup(
+            supportsCoreML: VoiceInkWhisperModelFiles.supportsCoreML(forModelName: model.name),
+            isAlreadyWarming: warmingModels.contains(model.name)
+        ) else {
             return
         }
 
@@ -27,7 +29,7 @@ final class WhisperModelWarmupCoordinator: ObservableObject {
                 try await runWarmup(for: model, whisperModelManager: whisperModelManager)
             } catch {
                 await MainActor.run {
-                    whisperModelManager.logger.error("❌ Warmup failed for \(model.name, privacy: .public): \(error.localizedDescription, privacy: .public)")
+                    whisperModelManager.logger.error("\(VoiceInkWhisperModelWarmupDiagnostics.failedMessage(modelName: model.name, errorDescription: error.localizedDescription), privacy: .public)")
                 }
             }
 
@@ -47,19 +49,12 @@ final class WhisperModelWarmupCoordinator: ObservableObject {
     }
 
     private func warmupSampleURL() -> URL? {
-        let bundle = Bundle.main
-        let candidates: [URL?] = [
-            bundle.url(forResource: "sound7", withExtension: "wav", subdirectory: "Resources/Sounds"),
-            bundle.url(forResource: "sound7", withExtension: "wav", subdirectory: "Sounds"),
-            bundle.url(forResource: "sound7", withExtension: "wav")
-        ]
-
-        for candidate in candidates {
-            if let url = candidate {
-                return url
-            }
+        VoiceInkModelPrewarmSamplePolicy.firstAvailableURL { resource in
+            Bundle.main.url(
+                forResource: resource.name,
+                withExtension: resource.fileExtension,
+                subdirectory: resource.subdirectory
+            )
         }
-
-        return nil
     }
 }

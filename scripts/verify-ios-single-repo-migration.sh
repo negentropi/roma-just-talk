@@ -9061,6 +9061,21 @@ require_pattern \
   'public static let prewarmScheduleDelay: Duration = \.seconds\(3\)' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
+require_patterns \
+  "shared model prewarm and warmup policy lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRuntimeResourcePolicy.swift \
+  'VoiceInkModelPrewarmSamplePolicy' \
+  'VoiceInkModelPrewarmPlan' \
+  'VoiceInkModelPrewarmSkipReason' \
+  'VoiceInkWhisperModelWarmupPolicy' \
+  'VoiceInkModelPrewarmDiagnostics' \
+  'VoiceInkWhisperModelWarmupDiagnostics'
+
+require_pattern \
+  "core checks execute model prewarm and warmup policy tests" \
+  'testModelPrewarmSamplePolicyPreservesMacOSLookupOrder|testModelPrewarmPlanPreservesMacOSSkipOrderAndDiagnostics|testWhisperModelWarmupPolicySchedulesOnlyCoreMLModelsNotAlreadyWarming|testModelPrewarmDiagnosticsPreserveMacOSLogCopy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
 require_pattern \
   "shared model runtime preference reads policy in VoiceInkCore" \
   'shouldPrewarmModelOnWake' \
@@ -9116,10 +9131,37 @@ require_pattern \
   'VoiceInkModelRuntimePreference\.prewarmScheduleDelay' \
   VoiceInk/Services/ModelPrewarmService.swift
 
+require_pattern \
+  "macOS model prewarm uses shared prewarm plan" \
+  'VoiceInkModelPrewarmPlan\.plan' \
+  VoiceInk/Services/ModelPrewarmService.swift
+
+require_pattern \
+  "macOS model prewarm uses shared sample lookup policy" \
+  'VoiceInkModelPrewarmSamplePolicy\.firstAvailableURL' \
+  VoiceInk/Services/ModelPrewarmService.swift \
+  VoiceInk/Transcription/Whisper/WhisperModelWarmupCoordinator.swift
+
+require_pattern \
+  "macOS Whisper warmup uses shared scheduling policy" \
+  'VoiceInkWhisperModelWarmupPolicy\.shouldScheduleWarmup' \
+  VoiceInk/Transcription/Whisper/WhisperModelWarmupCoordinator.swift
+
 reject_pattern \
   "macOS model prewarm avoids shell-owned prewarm delay literal" \
   '\.seconds\(3\)' \
   VoiceInk/Services/ModelPrewarmService.swift
+
+reject_pattern \
+  "macOS model prewarm avoids shell-owned prewarm diagnostics and sample policy" \
+  '"(ModelPrewarmService initialized - listening for wake and app launch|App launched, scheduling prewarm|Mac activity detected \(wake/unlock\), scheduling prewarm|Prewarm disabled by user|Skipping prewarm - cloud models don.?t need it|Prewarm audio file|Prewarming |Prewarm completed in|Prewarm failed:|sound7|wav)"' \
+  VoiceInk/Services/ModelPrewarmService.swift \
+  VoiceInk/Transcription/Whisper/WhisperModelWarmupCoordinator.swift
+
+reject_pattern \
+  "macOS Whisper warmup avoids shell-owned Core ML warmup gate" \
+  'guard +VoiceInkWhisperModelFiles\.supportsCoreML\(forModelName: model\.name\)|!warmingModels\.contains\(model\.name\)' \
+  VoiceInk/Transcription/Whisper/WhisperModelWarmupCoordinator.swift
 
 require_pattern \
   "macOS model settings observes shared VAD preference key" \

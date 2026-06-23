@@ -11,7 +11,15 @@ final class ModelPrewarmService: ObservableObject {
     private let modelContext: ModelContext
     private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "ModelPrewarm")
     private let serviceRegistry: TranscriptionServiceRegistry
-    private let prewarmAudioURL = Bundle.main.url(forResource: "sound7", withExtension: "wav")
+    private var prewarmAudioURL: URL? {
+        VoiceInkModelPrewarmSamplePolicy.firstAvailableURL { resource in
+            Bundle.main.url(
+                forResource: resource.name,
+                withExtension: resource.fileExtension,
+                subdirectory: resource.subdirectory
+            )
+        }
+    }
 
     init(
         transcriptionModelManager: TranscriptionModelManager,
@@ -44,20 +52,20 @@ final class ModelPrewarmService: ObservableObject {
             object: nil
         )
 
-        logger.notice("ModelPrewarmService initialized - listening for wake and app launch")
+        logger.notice("\(VoiceInkModelPrewarmDiagnostics.initializedMessage, privacy: .public)")
     }
 
     // MARK: - Trigger Handlers
 
     /// Trigger on app launch (cold start)
     private func schedulePrewarmOnAppLaunch() {
-        logger.notice("App launched, scheduling prewarm")
+        logger.notice("\(VoiceInkModelPrewarmDiagnostics.appLaunchScheduledMessage, privacy: .public)")
         scheduleDelayedPrewarm()
     }
 
     /// Trigger on wake from sleep or screen unlock
     @objc private func schedulePrewarm() {
-        logger.notice("Mac activity detected (wake/unlock), scheduling prewarm")
+        logger.notice("\(VoiceInkModelPrewarmDiagnostics.macActivityScheduledMessage, privacy: .public)")
         scheduleDelayedPrewarm()
     }
 
@@ -71,54 +79,39 @@ final class ModelPrewarmService: ObservableObject {
     // MARK: - Core Prewarming Logic
 
     private func performPrewarm() async {
-        guard shouldPrewarm() else { return }
+        let currentModel = transcriptionModelManager.currentTranscriptionModel
+        let audioURL = prewarmAudioURL
+        let prewarmPlan = VoiceInkModelPrewarmPlan.plan(
+            isEnabled: VoiceInkModelRuntimePreference.shouldPrewarmModelOnWake(),
+            hasCurrentModel: currentModel != nil,
+            shouldPrewarmModel: currentModel?.transcriptionRuntimeResourcePlan.shouldPrewarmModel ?? false,
+            hasSampleAudio: audioURL != nil
+        )
 
-        guard let audioURL = prewarmAudioURL else {
-            logger.error("❌ Prewarm audio file (sound7.wav) not found")
+        guard prewarmPlan.shouldRun else {
+            if let diagnosticMessage = prewarmPlan.diagnosticMessage {
+                logger.notice("\(diagnosticMessage, privacy: .public)")
+            }
             return
         }
+        guard let currentModel, let audioURL else { return }
 
-        guard let currentModel = transcriptionModelManager.currentTranscriptionModel else {
-            logger.notice("No model selected, skipping prewarm")
-            return
-        }
-
-        logger.notice("Prewarming \(currentModel.displayName, privacy: .public)")
+        logger.notice("\(VoiceInkModelPrewarmDiagnostics.prewarmingMessage(modelDisplayName: currentModel.displayName), privacy: .public)")
         let startTime = Date()
 
         do {
             let _ = try await serviceRegistry.transcribe(audioURL: audioURL, model: currentModel)
             let duration = Date().timeIntervalSince(startTime)
 
-            logger.notice("Prewarm completed in \(String(format: "%.2f", duration), privacy: .public)s")
+            logger.notice("\(VoiceInkModelPrewarmDiagnostics.completedMessage(durationText: String(format: "%.2f", duration)), privacy: .public)")
 
         } catch {
-            logger.error("❌ Prewarm failed: \(error.localizedDescription, privacy: .public)")
+            logger.error("\(VoiceInkModelPrewarmDiagnostics.failedMessage(errorDescription: error.localizedDescription), privacy: .public)")
         }
-    }
-
-    // MARK: - Validation
-
-    private func shouldPrewarm() -> Bool {
-        guard VoiceInkModelRuntimePreference.shouldPrewarmModelOnWake() else {
-            logger.notice("Prewarm disabled by user")
-            return false
-        }
-
-        guard let model = transcriptionModelManager.currentTranscriptionModel else {
-            return false
-        }
-
-        guard model.transcriptionRuntimeResourcePlan.shouldPrewarmModel else {
-            logger.notice("Skipping prewarm - cloud models don't need it")
-            return false
-        }
-
-        return true
     }
 
     deinit {
         NSWorkspace.shared.notificationCenter.removeObserver(self)
-        logger.notice("ModelPrewarmService deinitialized")
+        logger.notice("\(VoiceInkModelPrewarmDiagnostics.deinitializedMessage, privacy: .public)")
     }
 }

@@ -419,6 +419,33 @@ public struct VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan: Equatable,
     }
 }
 
+public struct VoiceInkAIEnhancementAPIKeyVerificationPersistencePlan: Equatable, Sendable {
+    public let runtimeAPIKey: String
+    public let keyToSave: String?
+    public let providerKeyStorageNameToSave: String?
+
+    public init(
+        runtimeAPIKey: String,
+        keyToSave: String?,
+        providerKeyStorageNameToSave: String?
+    ) {
+        self.runtimeAPIKey = runtimeAPIKey
+        self.keyToSave = keyToSave
+        self.providerKeyStorageNameToSave = providerKeyStorageNameToSave
+    }
+}
+
+public extension VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan {
+    var successPersistencePlan: VoiceInkAIEnhancementAPIKeyVerificationPersistencePlan? {
+        guard let runtimeAPIKey else { return nil }
+        return VoiceInkAIEnhancementAPIKeyVerificationPersistencePlan(
+            runtimeAPIKey: runtimeAPIKey,
+            keyToSave: keyToSave,
+            providerKeyStorageNameToSave: providerKeyStorageNameToSave
+        )
+    }
+}
+
 public enum VoiceInkAIEnhancementAPIKeyVerificationDispatch: Equatable, Sendable {
     case immediate(VoiceInkAPIKeyVerificationResult)
     case sharedProvider(VoiceInkProviderKind)

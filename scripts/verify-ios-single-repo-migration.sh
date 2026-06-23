@@ -7636,6 +7636,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 require_pattern \
+  "shared macOS AI API-key verification persistence plan lives in VoiceInkCore" \
+  'VoiceInkAIEnhancementAPIKeyVerificationPersistencePlan|successPersistencePlan' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+require_pattern \
   "shared macOS AI API-key verification request plan lives in VoiceInkCore" \
   'VoiceInkAIEnhancementAPIKeyVerificationRequestPlan|verificationRequestPlan|resolvedKeyToVerify|immediateResult' \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
@@ -7653,6 +7658,11 @@ require_pattern \
 require_pattern \
   "core checks execute shared macOS AI API-key verification dispatch plan test" \
   'AIProviderCatalogTests\.testMacOSAIEnhancementAPIKeyVerificationDispatchPlanIsShared' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute shared macOS AI API-key verification persistence plan test" \
+  'AIProviderCatalogTests\.testMacOSAIEnhancementAPIKeyVerificationPlanBuildsSuccessPersistencePlan' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -7712,7 +7722,12 @@ require_pattern \
 
 require_pattern \
   "macOS API-key manager applies AI verified-key persistence storage name from shared plan" \
-  'plan\.providerKeyStorageNameToSave|saveAPIKey\(keyToSave, forProvider: providerKeyStorageNameToSave\)' \
+  'successPersistencePlan|persistencePlan\.providerKeyStorageNameToSave|saveAPIKey\(keyToSave, forProvider: providerKeyStorageNameToSave\)' \
+  VoiceInk/Services/APIKeyManager.swift
+
+reject_pattern \
+  "macOS API-key manager avoids shell-owned AI verification persistence field reads" \
+  'plan\.runtimeAPIKey|plan\.providerKeyStorageNameToSave|plan\.keyToSave' \
   VoiceInk/Services/APIKeyManager.swift
 
 require_pattern \

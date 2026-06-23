@@ -42,14 +42,14 @@ final class APIKeyManager {
     func applyAIEnhancementVerificationPlan(
         _ plan: VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan
     ) -> String? {
-        guard let runtimeAPIKey = plan.runtimeAPIKey else { return nil }
+        guard let persistencePlan = plan.successPersistencePlan else { return nil }
 
-        if let keyToSave = plan.keyToSave,
-           let providerKeyStorageNameToSave = plan.providerKeyStorageNameToSave {
+        if let keyToSave = persistencePlan.keyToSave,
+           let providerKeyStorageNameToSave = persistencePlan.providerKeyStorageNameToSave {
             saveAPIKey(keyToSave, forProvider: providerKeyStorageNameToSave)
         }
 
-        return runtimeAPIKey
+        return persistencePlan.runtimeAPIKey
     }
 
     /// Retrieves an API key for a provider.

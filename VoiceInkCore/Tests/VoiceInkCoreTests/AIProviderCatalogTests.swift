@@ -454,6 +454,33 @@ final class AIProviderCatalogTests: XCTestCase {
         )
     }
 
+    func testMacOSAIEnhancementAPIKeyVerificationPlanBuildsSuccessPersistencePlan() {
+        let successPlan = VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan(
+            isValid: true,
+            runtimeAPIKey: "resolved-key",
+            keyToSave: "$GROQ_API_KEY",
+            providerKeyStorageNameToSave: VoiceInkAIEnhancementProviderKind.groq.rawValue,
+            errorMessage: nil
+        )
+        let failurePlan = VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan(
+            isValid: false,
+            runtimeAPIKey: nil,
+            keyToSave: nil,
+            providerKeyStorageNameToSave: nil,
+            errorMessage: "invalid"
+        )
+
+        XCTAssertEqual(
+            successPlan.successPersistencePlan,
+            VoiceInkAIEnhancementAPIKeyVerificationPersistencePlan(
+                runtimeAPIKey: "resolved-key",
+                keyToSave: "$GROQ_API_KEY",
+                providerKeyStorageNameToSave: VoiceInkAIEnhancementProviderKind.groq.rawValue
+            )
+        )
+        XCTAssertNil(failurePlan.successPersistencePlan)
+    }
+
     func testMacOSAIEnhancementAPIKeyClearPlanIsShared() {
         XCTAssertEqual(
             VoiceInkAIEnhancementAPIKeyClearPlan.clearing(provider: .groq),

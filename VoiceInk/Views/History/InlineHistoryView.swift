@@ -619,7 +619,7 @@ private struct HistoryCardRow: View {
                             .foregroundColor(.secondary)
                     }
                     .buttonStyle(.plain)
-                    .help("View details")
+                    .help(VoiceInkAudioPlaybackPresentation.viewDetailsHelpText)
                 }
             }
         }

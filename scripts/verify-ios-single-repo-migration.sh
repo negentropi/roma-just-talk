@@ -9892,6 +9892,11 @@ require_pattern \
   VoiceInk/Views/AudioPlayerView.swift
 
 require_pattern \
+  "macOS inline history audio fallback uses shared details help copy" \
+  'VoiceInkAudioPlaybackPresentation\.viewDetailsHelpText' \
+  VoiceInk/Views/History/InlineHistoryView.swift
+
+require_pattern \
   "macOS audio player uses shared playback update cadence" \
   'VoiceInkAudioPlaybackTimeline\.updateInterval' \
   VoiceInk/Views/AudioPlayerView.swift
@@ -9975,7 +9980,8 @@ reject_pattern \
 reject_pattern \
   "macOS audio player avoids shell-owned action help copy" \
   '"Show in Finder"|"Select enhancement prompt"|"Retranscribe this audio"|"Re-enhance with selected prompt"|"View details"' \
-  VoiceInk/Views/AudioPlayerView.swift
+  VoiceInk/Views/AudioPlayerView.swift \
+  VoiceInk/Views/History/InlineHistoryView.swift
 
 reject_pattern \
   "iOS audio metadata views avoid duplicate separator text" \

@@ -9787,6 +9787,16 @@ require_patterns \
   'sessionConfiguration\.category\.avCategory'
 
 require_pattern \
+  "iOS audio-session manager centralizes playback session AVFoundation adapter" \
+  'extension VoiceInkIOSAudioPlaybackSessionConfiguration\.Category' \
+  iOS/VoiceInk-ios/AudioSessionManager.swift
+
+reject_pattern \
+  "iOS audio player avoids local playback session AVFoundation adapter" \
+  'extension VoiceInkIOSAudioPlaybackSessionConfiguration\.Category|case \.playback:|return \.playback' \
+  iOS/VoiceInk-ios/AudioPlayer.swift
+
+require_pattern \
   "iOS audio player shell uses shared playback update cadence" \
   'VoiceInkAudioPlaybackTimeline\.updateInterval' \
   iOS/VoiceInk-ios/AudioPlayer.swift

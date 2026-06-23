@@ -109,7 +109,7 @@ final class AudioSessionManager: ObservableObject {
     }
 }
 
-private extension VoiceInkIOSAudioSessionRecordingConfiguration.Category {
+extension VoiceInkIOSAudioSessionRecordingConfiguration.Category {
     var avCategory: AVAudioSession.Category {
         switch self {
         case .playAndRecord:
@@ -118,7 +118,7 @@ private extension VoiceInkIOSAudioSessionRecordingConfiguration.Category {
     }
 }
 
-private extension VoiceInkIOSAudioSessionRecordingConfiguration.Mode {
+extension VoiceInkIOSAudioSessionRecordingConfiguration.Mode {
     var avMode: AVAudioSession.Mode {
         switch self {
         case .spokenAudio:
@@ -127,7 +127,7 @@ private extension VoiceInkIOSAudioSessionRecordingConfiguration.Mode {
     }
 }
 
-private extension VoiceInkIOSAudioSessionRecordingConfiguration {
+extension VoiceInkIOSAudioSessionRecordingConfiguration {
     var avOptions: AVAudioSession.CategoryOptions {
         options.reduce(into: []) { result, option in
             result.insert(option.avOption)
@@ -135,7 +135,7 @@ private extension VoiceInkIOSAudioSessionRecordingConfiguration {
     }
 }
 
-private extension VoiceInkIOSAudioSessionRecordingConfiguration.Option {
+extension VoiceInkIOSAudioSessionRecordingConfiguration.Option {
     var avOption: AVAudioSession.CategoryOptions {
         switch self {
         case .defaultToSpeaker:
@@ -146,6 +146,15 @@ private extension VoiceInkIOSAudioSessionRecordingConfiguration.Option {
             return .allowBluetoothA2DP
         case .mixWithOthers:
             return .mixWithOthers
+        }
+    }
+}
+
+extension VoiceInkIOSAudioPlaybackSessionConfiguration.Category {
+    var avCategory: AVAudioSession.Category {
+        switch self {
+        case .playback:
+            return .playback
         }
     }
 }

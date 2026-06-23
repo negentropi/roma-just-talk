@@ -131,12 +131,3 @@ final class AudioPlayer: ObservableObject {
         timer = nil
     }
 }
-
-private extension VoiceInkIOSAudioPlaybackSessionConfiguration.Category {
-    var avCategory: AVAudioSession.Category {
-        switch self {
-        case .playback:
-            return .playback
-        }
-    }
-}

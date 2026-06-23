@@ -53,6 +53,7 @@ public enum VoiceInkUserDefaultsKey {
     public static let showMenuBarIcon = "ShowMenuBarIcon"
     public static let isMenuBarOnly = "IsMenuBarOnly"
     public static let enableAnnouncements = "enableAnnouncements"
+    public static let didApplyLaunchAtLoginDefault = "DidApplyLaunchAtLoginDefault"
 
     public static func selectedAIProviderModel(_ providerRawValue: String) -> String {
         "\(providerRawValue)SelectedModel"
@@ -84,6 +85,7 @@ public enum VoiceInkPreferenceDefault {
     public static let showMenuBarIcon = false
     public static let isMenuBarOnly = true
     public static let enableAnnouncements = true
+    public static let didApplyLaunchAtLoginDefault = false
 }
 
 public enum VoiceInkPreferenceList {
@@ -123,6 +125,26 @@ public enum VoiceInkStartupPreferenceMigration {
         case .macOS:
             VoiceInkPasteMethod.migrateLegacyUserDefaultIfNeeded(in: defaults)
         }
+    }
+}
+
+public enum VoiceInkMacOSLaunchAtLoginDefaultPolicy {
+    public static let didApplyDefaultKey = VoiceInkUserDefaultsKey.didApplyLaunchAtLoginDefault
+    public static let defaultDidApplyDefault = VoiceInkPreferenceDefault.didApplyLaunchAtLoginDefault
+
+    public static var registeredDefaults: [String: Any] {
+        [didApplyDefaultKey: defaultDidApplyDefault]
+    }
+
+    public static func shouldEnableByDefaultBeforeRegisteringDefaults(
+        in defaults: UserDefaults = .standard
+    ) -> Bool {
+        !VoiceInkOnboardingPreference.hasStoredCompletionState(from: defaults)
+            && defaults.object(forKey: didApplyDefaultKey) == nil
+    }
+
+    public static func markDefaultApplied(to defaults: UserDefaults = .standard) {
+        defaults.set(true, forKey: didApplyDefaultKey)
     }
 }
 

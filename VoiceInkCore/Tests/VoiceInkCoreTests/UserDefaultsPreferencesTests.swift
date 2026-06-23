@@ -52,6 +52,7 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(VoiceInkUserDefaultsKey.customProviderModel, "customProviderModel")
         XCTAssertEqual(VoiceInkUserDefaultsKey.showMenuBarIcon, "ShowMenuBarIcon")
         XCTAssertEqual(VoiceInkUserDefaultsKey.isMenuBarOnly, "IsMenuBarOnly")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.didApplyLaunchAtLoginDefault, "DidApplyLaunchAtLoginDefault")
     }
 
     func testAIProviderModelSelectionKeyPreservesExistingProviderRawValuePattern() {
@@ -108,6 +109,7 @@ final class UserDefaultsPreferencesTests: XCTestCase {
     func testSharedPreferenceDefaultsPreserveExistingMacOSMenuBarPolicy() {
         XCTAssertFalse(VoiceInkPreferenceDefault.showMenuBarIcon)
         XCTAssertTrue(VoiceInkPreferenceDefault.isMenuBarOnly)
+        XCTAssertFalse(VoiceInkPreferenceDefault.didApplyLaunchAtLoginDefault)
     }
 
     func testSharedPreferenceDefaultsPreserveExistingRecordingShortcutFlags() {
@@ -390,6 +392,44 @@ final class UserDefaultsPreferencesTests: XCTestCase {
 
             XCTAssertTrue(VoiceInkMenuBarPreference.shouldShowMenuBarIcon(from: defaults))
             XCTAssertFalse(VoiceInkMenuBarPreference.isMenuBarOnly(from: defaults))
+        }
+    }
+
+    func testMacOSLaunchAtLoginDefaultPolicyPreservesExistingStorageAndRegisteredDefault() {
+        withIsolatedDefaults { defaults in
+            XCTAssertEqual(
+                VoiceInkMacOSLaunchAtLoginDefaultPolicy.didApplyDefaultKey,
+                VoiceInkUserDefaultsKey.didApplyLaunchAtLoginDefault
+            )
+            XCTAssertEqual(
+                VoiceInkMacOSLaunchAtLoginDefaultPolicy.registeredDefaults[
+                    VoiceInkMacOSLaunchAtLoginDefaultPolicy.didApplyDefaultKey
+                ] as? Bool,
+                false
+            )
+            XCTAssertTrue(VoiceInkMacOSLaunchAtLoginDefaultPolicy.shouldEnableByDefaultBeforeRegisteringDefaults(in: defaults))
+
+            VoiceInkMacOSLaunchAtLoginDefaultPolicy.markDefaultApplied(to: defaults)
+
+            XCTAssertFalse(VoiceInkMacOSLaunchAtLoginDefaultPolicy.shouldEnableByDefaultBeforeRegisteringDefaults(in: defaults))
+            XCTAssertEqual(
+                defaults.bool(forKey: VoiceInkMacOSLaunchAtLoginDefaultPolicy.didApplyDefaultKey),
+                true
+            )
+        }
+    }
+
+    func testMacOSLaunchAtLoginDefaultPolicySkipsExistingOnboardingOrRegisteredState() {
+        withIsolatedDefaults { defaults in
+            VoiceInkOnboardingPreference.saveHasCompletedOnboarding(false, to: defaults)
+
+            XCTAssertFalse(VoiceInkMacOSLaunchAtLoginDefaultPolicy.shouldEnableByDefaultBeforeRegisteringDefaults(in: defaults))
+        }
+
+        withIsolatedDefaults { defaults in
+            defaults.register(defaults: VoiceInkMacOSLaunchAtLoginDefaultPolicy.registeredDefaults)
+
+            XCTAssertFalse(VoiceInkMacOSLaunchAtLoginDefaultPolicy.shouldEnableByDefaultBeforeRegisteringDefaults(in: defaults))
         }
     }
 

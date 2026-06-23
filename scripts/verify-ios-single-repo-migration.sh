@@ -10742,9 +10742,19 @@ require_pattern \
   VoiceInk/AppDefaults.swift
 
 require_pattern \
-  "macOS app launch uses shared onboarding completion storage state" \
-  'VoiceInkOnboardingPreference\.hasStoredCompletionState' \
+  "macOS app launch uses shared Launch at Login default policy" \
+  'VoiceInkMacOSLaunchAtLoginDefaultPolicy\.shouldEnableByDefaultBeforeRegisteringDefaults|VoiceInkMacOSLaunchAtLoginDefaultPolicy\.markDefaultApplied' \
   VoiceInk/AppDefaults.swift
+
+require_pattern \
+  "macOS Launch at Login default policy uses shared onboarding completion storage state" \
+  'VoiceInkOnboardingPreference\.hasStoredCompletionState' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "macOS Launch at Login default policy owns existing storage key" \
+  'didApplyLaunchAtLoginDefault += +"DidApplyLaunchAtLoginDefault"|didApplyDefaultKey += +VoiceInkUserDefaultsKey\.didApplyLaunchAtLoginDefault' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 reject_pattern \
   "macOS app launch avoids hardcoded default transcription model" \

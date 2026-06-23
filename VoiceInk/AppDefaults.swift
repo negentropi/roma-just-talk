@@ -22,9 +22,9 @@ enum AppDefaults {
             VoiceInkRecorderStylePreference.userDefaultsKey: VoiceInkRecorderStylePreference.defaultRawValue,
 
             // UI & Behavior
-            "DidApplyLaunchAtLoginDefault": false,
         ]
 
+        platformDefaults.merge(VoiceInkMacOSLaunchAtLoginDefaultPolicy.registeredDefaults) { _, sharedValue in sharedValue }
         platformDefaults.merge(VoiceInkMenuBarPreference.registeredDefaults) { _, sharedValue in sharedValue }
         platformDefaults.merge(VoiceInkAppendTrailingSpacePreference.registeredDefaults) { _, sharedValue in sharedValue }
         platformDefaults.merge(VoiceInkModelRuntimePreference.registeredDefaults) { _, sharedValue in sharedValue }
@@ -43,14 +43,14 @@ enum AppDefaults {
 
     static func registerDefaults() {
         let defaults = UserDefaults.standard
-        let shouldEnableLaunchAtLoginByDefault = !VoiceInkOnboardingPreference.hasStoredCompletionState(from: defaults)
-            && defaults.object(forKey: "DidApplyLaunchAtLoginDefault") == nil
+        let shouldEnableLaunchAtLoginByDefault = VoiceInkMacOSLaunchAtLoginDefaultPolicy
+            .shouldEnableByDefaultBeforeRegisteringDefaults(in: defaults)
 
         defaults.register(defaults: registeredDefaults)
 
         if shouldEnableLaunchAtLoginByDefault {
             LaunchAtLogin.isEnabled = true
-            defaults.set(true, forKey: "DidApplyLaunchAtLoginDefault")
+            VoiceInkMacOSLaunchAtLoginDefaultPolicy.markDefaultApplied(to: defaults)
         }
 
         VoiceInkStartupPreferenceMigration.migrateLegacyPreferences(for: .macOS)

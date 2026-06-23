@@ -12023,6 +12023,27 @@ require_pattern \
   'normalizedBufferDurationSeconds' \
   VoiceInkCore/Sources/VoiceInkCore/RollingBufferPreloadPolicy.swift
 
+require_patterns \
+  "shared rolling-buffer coordinator timing defaults live in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/RollingBufferPreloadPolicy.swift \
+  'defaultStartingPreloadClaimWaitNanoseconds' \
+  'defaultUnclaimedPreloadSilenceSeconds' \
+  'defaultUnclaimedPreloadGraceSeconds' \
+  'defaultPlanRefreshInterval'
+
+require_patterns \
+  "macOS rolling preload coordinator consumes shared timing defaults" \
+  VoiceInk/Transcription/RollingPreload/RollingBufferPreloadCoordinator.swift \
+  'VoiceInkRollingBufferPreloadSettings\.defaultStartingPreloadClaimWaitNanoseconds' \
+  'VoiceInkRollingBufferPreloadSettings\.defaultUnclaimedPreloadSilenceSeconds' \
+  'VoiceInkRollingBufferPreloadSettings\.defaultUnclaimedPreloadGraceSeconds' \
+  'VoiceInkRollingBufferPreloadSettings\.defaultPlanRefreshInterval'
+
+reject_pattern \
+  "macOS rolling preload coordinator avoids shell-owned timing defaults" \
+  'static let startingPreloadClaimWaitNanoseconds|static let unclaimedPreload(Silence|Grace)Seconds|private let planRefreshInterval|Self\.(startingPreloadClaimWaitNanoseconds|unclaimedPreloadSilenceSeconds|unclaimedPreloadGraceSeconds)' \
+  VoiceInk/Transcription/RollingPreload/RollingBufferPreloadCoordinator.swift
+
 require_pattern \
   "macOS rolling-buffer settings use shared duration lower bound" \
   'VoiceInkRollingBufferPreloadSettings\.minimumBufferDurationSeconds' \
@@ -12136,6 +12157,11 @@ require_pattern \
 require_pattern \
   "core checks execute rolling-buffer duration normalization tests" \
   'RollingBufferPreloadPolicyTests\.testSettingsNormalizeDurationAndBatteryThresholdRanges' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute rolling-buffer settings default tests" \
+  'RollingBufferPreloadPolicyTests\.testSettingsPreserveExistingStorageKeysAndDefaults' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \

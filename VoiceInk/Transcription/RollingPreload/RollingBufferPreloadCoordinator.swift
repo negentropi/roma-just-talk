@@ -42,9 +42,6 @@ final class RollingBufferPreloadCoordinator {
     typealias CurrentLanguageProvider = @MainActor () -> String?
     typealias DetectorProvider = @Sendable () async -> (any SpeechActivityDetecting)?
     typealias SessionFactory = @MainActor (any TranscriptionModel, @escaping (String) -> Void) -> TranscriptionSession
-    static let startingPreloadClaimWaitNanoseconds: UInt64 = 150_000_000
-    static let unclaimedPreloadSilenceSeconds = 1.0
-    static let unclaimedPreloadGraceSeconds = 2.0
 
     private enum State {
         case idle
@@ -94,7 +91,6 @@ final class RollingBufferPreloadCoordinator {
     private var startingPreloadWaiters: [CheckedContinuation<Void, Never>] = []
 
     private let vadWindowBytes = 8_000 // 250 ms at 16 kHz, 16-bit mono.
-    private let planRefreshInterval: TimeInterval = 30
 
     init(
         serviceRegistry: TranscriptionServiceRegistry,
@@ -397,13 +393,13 @@ final class RollingBufferPreloadCoordinator {
         }
 
         if activeSilenceBytes >= VoiceInkPCM16Audio.byteCount(
-            forMono16kDuration: Self.unclaimedPreloadSilenceSeconds
+            forMono16kDuration: VoiceInkRollingBufferPreloadSettings.defaultUnclaimedPreloadSilenceSeconds
         ) {
             return "silence"
         }
 
         if preloadedBytes >= VoiceInkPCM16Audio.byteCount(
-            forMono16kDuration: configuration.bufferDurationSeconds + Self.unclaimedPreloadGraceSeconds
+            forMono16kDuration: configuration.bufferDurationSeconds + VoiceInkRollingBufferPreloadSettings.defaultUnclaimedPreloadGraceSeconds
         ) {
             return "max-duration"
         }
@@ -415,7 +411,7 @@ final class RollingBufferPreloadCoordinator {
         cachedPlan = plan
         cachedPlanModelName = modelName
         cachedPlanLanguage = language
-        cachedPlanExpiresAt = now.addingTimeInterval(planRefreshInterval)
+        cachedPlanExpiresAt = now.addingTimeInterval(VoiceInkRollingBufferPreloadSettings.defaultPlanRefreshInterval)
         return plan
     }
 
@@ -532,7 +528,9 @@ final class RollingBufferPreloadCoordinator {
 
         let timeoutTask = Task { @MainActor [weak self] in
             do {
-                try await Task.sleep(nanoseconds: Self.startingPreloadClaimWaitNanoseconds)
+                try await Task.sleep(
+                    nanoseconds: VoiceInkRollingBufferPreloadSettings.defaultStartingPreloadClaimWaitNanoseconds
+                )
             } catch {
                 return
             }

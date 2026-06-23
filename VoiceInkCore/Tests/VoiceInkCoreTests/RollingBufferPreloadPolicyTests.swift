@@ -20,6 +20,10 @@ final class RollingBufferPreloadPolicyTests: XCTestCase {
         XCTAssertEqual(VoiceInkRollingBufferPreloadSettings.maximumBufferDurationSeconds, 30.0)
         XCTAssertTrue(VoiceInkRollingBufferPreloadSettings.defaultPreRunFinalization)
         XCTAssertTrue(VoiceInkRollingBufferPreloadSettings.defaultPerModelPreloadEnabled)
+        XCTAssertEqual(VoiceInkRollingBufferPreloadSettings.defaultStartingPreloadClaimWaitNanoseconds, 150_000_000)
+        XCTAssertEqual(VoiceInkRollingBufferPreloadSettings.defaultUnclaimedPreloadSilenceSeconds, 1.0)
+        XCTAssertEqual(VoiceInkRollingBufferPreloadSettings.defaultUnclaimedPreloadGraceSeconds, 2.0)
+        XCTAssertEqual(VoiceInkRollingBufferPreloadSettings.defaultPlanRefreshInterval, 30)
     }
 
     func testSettingsNormalizeDurationAndBatteryThresholdRanges() {

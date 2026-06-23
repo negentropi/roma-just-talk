@@ -441,6 +441,10 @@ public enum VoiceInkRollingBufferPreloadSettings {
     public static let maximumBufferDurationSeconds = 30.0
     public static let defaultPreRunFinalization = true
     public static let defaultPerModelPreloadEnabled = true
+    public static let defaultStartingPreloadClaimWaitNanoseconds: UInt64 = 150_000_000
+    public static let defaultUnclaimedPreloadSilenceSeconds: TimeInterval = 1.0
+    public static let defaultUnclaimedPreloadGraceSeconds: TimeInterval = 2.0
+    public static let defaultPlanRefreshInterval: TimeInterval = 30
     public static let macOSSettingsPresentation = VoiceInkRollingBufferPreloadSettingsPresentation.macOS
 
     public static func normalizedLowBatteryThresholdPercent(_ percent: Int) -> Int {

@@ -6575,10 +6575,11 @@ require_pattern \
 
 section "obsolete standalone streaming event module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/StreamingTranscriptionEvent.swift
+reject_file VoiceInkCore/Sources/VoiceInkCore/StreamingTranscriptionError.swift
 
 require_patterns \
-  "shared streaming event and error taxonomy live together in VoiceInkCore" \
-  VoiceInkCore/Sources/VoiceInkCore/StreamingTranscriptionError.swift \
+  "shared streaming event and error taxonomy live with streaming route policy in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionStreamingPreference.swift \
   'VoiceInkStreamingTranscriptionEvent' \
   'case sessionStarted' \
   'case partial\(text: String\)' \

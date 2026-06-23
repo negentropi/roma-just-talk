@@ -73,7 +73,9 @@ class PlaybackController: ObservableObject {
         wasPlayingWhenRecordingStarted = true
         originalMediaAppBundleId = bundleId
 
-        try? await Task.sleep(nanoseconds: 50_000_000)
+        try? await Task.sleep(
+            nanoseconds: VoiceInkRecordingFeedbackPreference.defaultPauseMediaCommandDelayNanoseconds
+        )
 
         mediaController.pause()
     }
@@ -148,4 +150,3 @@ class PlaybackController: ObservableObject {
         return runningApps.contains { $0.bundleIdentifier == bundleId }
     }
 }
-

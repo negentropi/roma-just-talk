@@ -8540,6 +8540,26 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
 
 require_pattern \
+  "shared recording feedback preference owns pause-media command delay" \
+  'defaultPauseMediaCommandDelayNanoseconds' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+
+require_pattern \
+  "macOS playback controller consumes shared pause-media command delay" \
+  'VoiceInkRecordingFeedbackPreference\.defaultPauseMediaCommandDelayNanoseconds' \
+  VoiceInk/PlaybackController.swift
+
+reject_pattern \
+  "macOS playback controller avoids shell-only pause-media command delay" \
+  '50_000_000' \
+  VoiceInk/PlaybackController.swift
+
+require_pattern \
+  "core checks pin pause-media command delay policy" \
+  'defaultPauseMediaCommandDelayNanoseconds' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RecordingFeedbackPreferenceTests.swift
+
+require_pattern \
   "macOS recorder consumes shared system mute schedule delay" \
   'VoiceInkRecordingFeedbackPreference\.defaultSystemMuteScheduleDelayNanoseconds' \
   VoiceInk/Recorder.swift

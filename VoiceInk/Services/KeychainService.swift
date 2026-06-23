@@ -9,7 +9,7 @@ import VoiceInkCore
 final class KeychainService {
     static let shared = KeychainService()
 
-    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "KeychainService")
+    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: VoiceInkMacOSLogCategory.keychainService)
 
     #if LOCAL_BUILD
     private let defaults = UserDefaults.standard

@@ -13526,12 +13526,36 @@ require_patterns \
   VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift \
   'VoiceInkMacOSLogCategory' \
   'logExporter = "LogExporter"' \
-  'windowManager = "WindowManager"'
+  'windowManager = "WindowManager"' \
+  'apiKeyManager = "APIKeyManager"' \
+  'keychainService = "KeychainService"' \
+  'polarService = "PolarService"' \
+  'licenseViewModel = "LicenseViewModel"'
 
 require_pattern \
   "macOS window manager uses shared log category identity" \
   'Logger\(subsystem: VoiceInkAppIdentity\.loggingSubsystem, category: VoiceInkMacOSLogCategory\.windowManager\)' \
   VoiceInk/WindowManager.swift
+
+require_patterns \
+  "macOS credential and license services use shared log category identity" \
+  VoiceInk/Services/APIKeyManager.swift \
+  'Logger\(subsystem: VoiceInkAppIdentity\.loggingSubsystem, category: VoiceInkMacOSLogCategory\.apiKeyManager\)'
+
+require_patterns \
+  "macOS Keychain service uses shared log category identity" \
+  VoiceInk/Services/KeychainService.swift \
+  'Logger\(subsystem: VoiceInkAppIdentity\.loggingSubsystem, category: VoiceInkMacOSLogCategory\.keychainService\)'
+
+require_patterns \
+  "macOS Polar service uses shared log category identity" \
+  VoiceInk/Services/PolarService.swift \
+  'Logger\(subsystem: VoiceInkAppIdentity\.loggingSubsystem, category: VoiceInkMacOSLogCategory\.polarService\)'
+
+require_patterns \
+  "macOS license view model uses shared log category identity" \
+  VoiceInk/Models/LicenseViewModel.swift \
+  'Logger\(subsystem: VoiceInkAppIdentity\.loggingSubsystem, category: VoiceInkMacOSLogCategory\.licenseViewModel\)'
 
 require_pattern \
   "core checks execute macOS window identity test" \
@@ -13553,6 +13577,14 @@ reject_pattern \
   "macOS window manager avoids shell-owned log category literal" \
   'category: "WindowManager"' \
   VoiceInk/WindowManager.swift
+
+reject_pattern \
+  "macOS credential and license shells avoid shell-owned log category literals" \
+  'category: "(APIKeyManager|KeychainService|PolarService|LicenseViewModel)"' \
+  VoiceInk/Services/APIKeyManager.swift \
+  VoiceInk/Services/KeychainService.swift \
+  VoiceInk/Services/PolarService.swift \
+  VoiceInk/Models/LicenseViewModel.swift
 
 require_pattern \
   "iOS note list uses shared app identity presentation" \

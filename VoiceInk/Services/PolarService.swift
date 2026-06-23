@@ -4,7 +4,7 @@ import os
 import VoiceInkCore
 
 class PolarService {
-    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "PolarService")
+    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: VoiceInkMacOSLogCategory.polarService)
 
     private func createRequest(operation: VoiceInkLicenseOperation, method: String = "POST") -> URLRequest {
         var request = URLRequest(url: VoiceInkLicenseServicePolicy.requestURL(for: operation))

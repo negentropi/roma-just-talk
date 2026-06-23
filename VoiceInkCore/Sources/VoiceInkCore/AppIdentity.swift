@@ -297,6 +297,10 @@ public enum VoiceInkMacOSWindowIdentity {
 public enum VoiceInkMacOSLogCategory {
     public static let logExporter = "LogExporter"
     public static let windowManager = "WindowManager"
+    public static let apiKeyManager = "APIKeyManager"
+    public static let keychainService = "KeychainService"
+    public static let polarService = "PolarService"
+    public static let licenseViewModel = "LicenseViewModel"
 }
 
 public enum VoiceInkAppIdentity {

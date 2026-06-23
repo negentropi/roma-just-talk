@@ -17,7 +17,7 @@ class LicenseViewModel: ObservableObject {
     @Published private(set) var activationsLimit: Int = 0
 
     private let polarService = PolarService()
-    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "LicenseViewModel")
+    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: VoiceInkMacOSLogCategory.licenseViewModel)
     private let userDefaults = UserDefaults.standard
     private let licenseManager = LicenseManager.shared
 

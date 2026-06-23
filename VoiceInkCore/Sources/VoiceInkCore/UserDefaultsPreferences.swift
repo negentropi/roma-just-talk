@@ -1706,6 +1706,30 @@ public struct VoiceInkMacOSShortcutNotificationPresentation: Equatable, Sendable
     }
 }
 
+public enum VoiceInkMiniRecorderEscapeShortcutPolicy {
+    public static let doublePressThreshold: TimeInterval = 1.5
+
+    public static var confirmationPresentation: VoiceInkMacOSShortcutNotificationPresentation {
+        VoiceInkMacOSShortcutNotificationPresentation.miniRecorderEscapeConfirmation(
+            duration: doublePressThreshold
+        )
+    }
+
+    public static func isSecondPress(
+        firstPressTime: Date?,
+        now: Date = Date()
+    ) -> Bool {
+        guard let firstPressTime else { return false }
+        return now.timeIntervalSince(firstPressTime) <= doublePressThreshold
+    }
+
+    public static func timeoutNanoseconds(threshold: TimeInterval = doublePressThreshold) -> UInt64 {
+        guard threshold.isFinite else { return 0 }
+        let safeThreshold = max(0, threshold)
+        return UInt64((safeThreshold * 1_000_000_000).rounded())
+    }
+}
+
 public enum VoiceInkLegacyRecordingShortcutPreset: String, CaseIterable, Sendable {
     case rightOption
     case leftOption

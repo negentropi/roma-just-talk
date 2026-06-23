@@ -13,7 +13,6 @@ class MiniRecorderShortcutManager: ObservableObject {
     
     // Double-tap Escape handling
     private var firstEscapePressTime: Date? = nil
-    private let escapeDoublePressThreshold: TimeInterval = 1.5
     private var escapeTimeoutTask: Task<Void, Never>?
     
     init(engine: VoiceInkEngine, recorderUIManager: RecorderUIManager) {
@@ -132,24 +131,25 @@ class MiniRecorderShortcutManager: ObservableObject {
         guard ShortcutStore.shortcut(for: .cancelRecorder) == nil else { return }
 
         let now = Date()
-        if let firstTime = firstEscapePressTime,
-           now.timeIntervalSince(firstTime) <= escapeDoublePressThreshold {
+        if VoiceInkMiniRecorderEscapeShortcutPolicy.isSecondPress(
+            firstPressTime: firstEscapePressTime,
+            now: now
+        ) {
             resetEscapeState()
             await recorderUIManager.cancelRecording()
             return
         }
 
         firstEscapePressTime = now
-        let presentation = VoiceInkMacOSShortcutNotificationPresentation.miniRecorderEscapeConfirmation(
-            duration: escapeDoublePressThreshold
-        )
+        let presentation = VoiceInkMiniRecorderEscapeShortcutPolicy.confirmationPresentation
         NotificationManager.shared.showNotification(
             title: presentation.title,
             type: .info,
             duration: presentation.duration
         )
+        let timeoutNanoseconds = VoiceInkMiniRecorderEscapeShortcutPolicy.timeoutNanoseconds()
         escapeTimeoutTask = Task { [weak self] in
-            try? await Task.sleep(nanoseconds: UInt64((self?.escapeDoublePressThreshold ?? 1.5) * 1_000_000_000))
+            try? await Task.sleep(nanoseconds: timeoutNanoseconds)
             await MainActor.run {
                 self?.firstEscapePressTime = nil
             }

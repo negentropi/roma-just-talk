@@ -9050,6 +9050,15 @@ require_patterns \
   'Press ESC again to cancel recording' \
   'actionButtonLabel: "Open Settings"'
 
+require_patterns \
+  "shared mini recorder escape shortcut policy lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift \
+  'VoiceInkMiniRecorderEscapeShortcutPolicy' \
+  'doublePressThreshold: TimeInterval = 1\.5' \
+  'confirmationPresentation' \
+  'isSecondPress' \
+  'timeoutNanoseconds'
+
 require_pattern \
   "shared recording shortcut preference owns selection keys" \
   'selectionKey' \
@@ -9275,9 +9284,15 @@ require_patterns \
 require_patterns \
   "macOS mini recorder shortcut manager uses shared notification presentation" \
   VoiceInk/Shortcuts/MiniRecorderShortcutManager.swift \
-  'VoiceInkMacOSShortcutNotificationPresentation\.miniRecorderEscapeConfirmation' \
+  'VoiceInkMiniRecorderEscapeShortcutPolicy\.confirmationPresentation' \
   'presentation\.title' \
   'presentation\.duration'
+
+require_patterns \
+  "macOS mini recorder shortcut manager uses shared escape timing policy" \
+  VoiceInk/Shortcuts/MiniRecorderShortcutManager.swift \
+  'VoiceInkMiniRecorderEscapeShortcutPolicy\.isSecondPress' \
+  'VoiceInkMiniRecorderEscapeShortcutPolicy\.timeoutNanoseconds'
 
 require_pattern \
   "macOS general backup adapts recording shortcut values to shared preferences" \
@@ -9354,6 +9369,11 @@ reject_pattern \
   VoiceInk/Shortcuts/MiniRecorderShortcutManager.swift
 
 reject_pattern \
+  "macOS mini recorder shortcut manager avoids shell-owned escape timing policy" \
+  'escapeDoublePressThreshold|1\.5|1_000_000_000|timeIntervalSince\(firstTime\)' \
+  VoiceInk/Shortcuts/MiniRecorderShortcutManager.swift
+
+reject_pattern \
   "macOS backup import avoids shell-only recording shortcut raw parsing" \
   'ShortcutSelection\(rawValue:|Mode\(rawValue:' \
   VoiceInk/Services/BackupImporter.swift
@@ -9424,6 +9444,11 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
+  "core checks execute shared mini recorder escape timing tests" \
+  'UserDefaultsPreferencesTests\.testMiniRecorderEscapeShortcutPolicyPreservesMacOSTiming' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "core checks execute shared shortcut recorder presentation test" \
   'UserDefaultsPreferencesTests\.testRecordingShortcutPreferencePreservesMacOSRecorderPresentation' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
@@ -9435,7 +9460,7 @@ require_pattern \
 
 require_pattern \
   "migration checklist tracks shared recording shortcut preference gate" \
-  'macOS recording shortcut action identifiers, action display names, validation and monitor notification copy, mini-recorder escape confirmation copy, selection/mode migration plans, legacy shortcut key names, raw shortcut storage, middle-click enablement and activation-delay normalization, special empty-tap preferences, settings labels/help, shortcut recorder labels, backup import/export value planning, general-backup shortcut action ordering, and recording-shortcut selection repair when importing backed-up shortcut records route through `VoiceInkShortcutActionIdentifier`/`VoiceInkShortcutActionPresentation`/`VoiceInkShortcutValidationPresentation`/`VoiceInkMacOSShortcutNotificationPresentation`/`VoiceInkLegacyRecordingShortcutPreset`/`VoiceInkRecordingShortcutSelection`/`VoiceInkRecordingShortcutMode`/`VoiceInkRecordingShortcutPreference`/`VoiceInkShortcutStoragePreference`/`VoiceInkShortcutBackupPolicy`' \
+  'macOS recording shortcut action identifiers, action display names, validation and monitor notification copy, mini-recorder escape confirmation copy and double-press timing, selection/mode migration plans, legacy shortcut key names, raw shortcut storage, middle-click enablement and activation-delay normalization, special empty-tap preferences, settings labels/help, shortcut recorder labels, backup import/export value planning, general-backup shortcut action ordering, and recording-shortcut selection repair when importing backed-up shortcut records route through `VoiceInkShortcutActionIdentifier`/`VoiceInkShortcutActionPresentation`/`VoiceInkShortcutValidationPresentation`/`VoiceInkMacOSShortcutNotificationPresentation`/`VoiceInkMiniRecorderEscapeShortcutPolicy`/`VoiceInkLegacyRecordingShortcutPreset`/`VoiceInkRecordingShortcutSelection`/`VoiceInkRecordingShortcutMode`/`VoiceInkRecordingShortcutPreference`/`VoiceInkShortcutStoragePreference`/`VoiceInkShortcutBackupPolicy`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

@@ -1883,6 +1883,46 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         )
     }
 
+    func testMiniRecorderEscapeShortcutPolicyPreservesMacOSTiming() {
+        XCTAssertEqual(VoiceInkMiniRecorderEscapeShortcutPolicy.doublePressThreshold, 1.5)
+        XCTAssertEqual(
+            VoiceInkMiniRecorderEscapeShortcutPolicy.confirmationPresentation,
+            VoiceInkMacOSShortcutNotificationPresentation(
+                title: "Press ESC again to cancel recording",
+                duration: 1.5
+            )
+        )
+        XCTAssertEqual(VoiceInkMiniRecorderEscapeShortcutPolicy.timeoutNanoseconds(), 1_500_000_000)
+        XCTAssertEqual(
+            VoiceInkMiniRecorderEscapeShortcutPolicy.timeoutNanoseconds(threshold: -1),
+            0
+        )
+        XCTAssertEqual(
+            VoiceInkMiniRecorderEscapeShortcutPolicy.timeoutNanoseconds(threshold: .infinity),
+            0
+        )
+
+        let now = Date(timeIntervalSince1970: 1_000)
+        XCTAssertFalse(
+            VoiceInkMiniRecorderEscapeShortcutPolicy.isSecondPress(
+                firstPressTime: nil,
+                now: now
+            )
+        )
+        XCTAssertTrue(
+            VoiceInkMiniRecorderEscapeShortcutPolicy.isSecondPress(
+                firstPressTime: now.addingTimeInterval(-1.5),
+                now: now
+            )
+        )
+        XCTAssertFalse(
+            VoiceInkMiniRecorderEscapeShortcutPolicy.isSecondPress(
+                firstPressTime: now.addingTimeInterval(-1.51),
+                now: now
+            )
+        )
+    }
+
     func testRecordingShortcutSelectionMigrationPlanMigratesCurrentPresetAndRemovesLegacyKey() {
         withIsolatedDefaults { defaults in
             defaults.set("rightOption", forKey: VoiceInkUserDefaultsKey.primaryRecordingShortcut)

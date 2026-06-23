@@ -459,6 +459,7 @@ public enum VoiceInkRecordingFeedbackPreference {
 
     public static let defaultSystemMuteMode = VoiceInkSystemMuteMode.automatic
     public static let defaultAudioResumptionDelay: TimeInterval = 0.0
+    public static let defaultSystemMuteScheduleDelayNanoseconds: UInt64 = 250_000_000
     public static let defaultIsPauseMediaEnabled = false
     public static let defaultIsSoundFeedbackEnabled = false
 

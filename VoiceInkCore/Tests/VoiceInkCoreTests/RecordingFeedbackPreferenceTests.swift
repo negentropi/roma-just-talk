@@ -259,6 +259,7 @@ final class RecordingFeedbackPreferenceTests: XCTestCase {
         XCTAssertEqual(VoiceInkRecordingFeedbackPreference.isPauseMediaEnabledKey, "isPauseMediaEnabled")
         XCTAssertEqual(VoiceInkRecordingFeedbackPreference.isSoundFeedbackEnabledKey, "isSoundFeedbackEnabled")
         XCTAssertEqual(VoiceInkRecordingFeedbackPreference.experimentalFeaturesEnabledKey, "isExperimentalFeaturesEnabled")
+        XCTAssertEqual(VoiceInkRecordingFeedbackPreference.defaultSystemMuteScheduleDelayNanoseconds, 250_000_000)
         XCTAssertEqual(
             VoiceInkRecordingFeedbackPreference.registeredDefaults[VoiceInkRecordingFeedbackPreference.systemMuteModeKey] as? String,
             "auto"

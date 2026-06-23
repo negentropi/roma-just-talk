@@ -8535,6 +8535,21 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
 
 require_pattern \
+  "shared recording feedback preference owns system mute schedule delay" \
+  'defaultSystemMuteScheduleDelayNanoseconds' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+
+require_pattern \
+  "macOS recorder consumes shared system mute schedule delay" \
+  'VoiceInkRecordingFeedbackPreference\.defaultSystemMuteScheduleDelayNanoseconds' \
+  VoiceInk/Recorder.swift
+
+reject_pattern \
+  "macOS recorder avoids shell-only system mute schedule delay" \
+  '250_000_000' \
+  VoiceInk/Recorder.swift
+
+require_pattern \
   "shared recording feedback preference preserves legacy mute boolean compatibility" \
   'legacyIsSystemMuteEnabledKey = "isSystemMuteEnabled"|saveSystemMuteEnabled' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift

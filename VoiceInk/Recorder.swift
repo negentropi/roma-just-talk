@@ -116,7 +116,10 @@ class Recorder: NSObject, ObservableObject {
         }
     }
 
-    func scheduleSystemMute(forInputDevice deviceID: AudioDeviceID, afterDelayNanoseconds delay: UInt64 = 250_000_000) {
+    func scheduleSystemMute(
+        forInputDevice deviceID: AudioDeviceID,
+        afterDelayNanoseconds delay: UInt64 = VoiceInkRecordingFeedbackPreference.defaultSystemMuteScheduleDelayNanoseconds
+    ) {
         audioMuteTask?.cancel()
         audioMuteTask = Task { [weak self] in
             try? await Task.sleep(nanoseconds: delay)

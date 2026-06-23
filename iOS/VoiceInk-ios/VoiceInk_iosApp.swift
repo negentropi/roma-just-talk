@@ -91,12 +91,7 @@ struct VoiceInk_iosApp: App {
     }
 
     private func applyLaunchRecordingAction(_ action: VoiceInkLaunchRecordingRequestAction) {
-        switch action {
-        case .none, .deferUntilOnboardingCompletes:
-            return
-        case .startRecordingAfterLaunchDelay:
-            startRecordingAfterLaunchDelay()
-        }
+        action.applyRuntimeState(startRecordingAfterLaunchDelay: startRecordingAfterLaunchDelay)
     }
 
     private func startRecordingAfterLaunchDelay() {

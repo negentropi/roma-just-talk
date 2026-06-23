@@ -551,6 +551,22 @@ final class RecordingStatePolicyTests: XCTestCase {
         XCTAssertFalse(state.hasPendingRecordingAfterOnboarding)
     }
 
+    func testLaunchRecordingRequestActionAppliesRuntimeState() {
+        var events: [String] = []
+
+        VoiceInkLaunchRecordingRequestAction.none.applyRuntimeState {
+            events.append("start")
+        }
+        VoiceInkLaunchRecordingRequestAction.deferUntilOnboardingCompletes.applyRuntimeState {
+            events.append("start")
+        }
+        VoiceInkLaunchRecordingRequestAction.startRecordingAfterLaunchDelay.applyRuntimeState {
+            events.append("start")
+        }
+
+        XCTAssertEqual(events, ["start"])
+    }
+
     func testKeyboardRecordingButtonPresentationPreservesIOSCopyAndIcons() {
         XCTAssertEqual(
             VoiceInkKeyboardRecordingButtonPresentation.idle,

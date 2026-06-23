@@ -383,6 +383,15 @@ public enum VoiceInkLaunchRecordingRequestAction: Equatable, Sendable {
     case none
     case deferUntilOnboardingCompletes
     case startRecordingAfterLaunchDelay
+
+    public func applyRuntimeState(startRecordingAfterLaunchDelay: () -> Void) {
+        switch self {
+        case .none, .deferUntilOnboardingCompletes:
+            return
+        case .startRecordingAfterLaunchDelay:
+            startRecordingAfterLaunchDelay()
+        }
+    }
 }
 
 public struct VoiceInkLaunchRecordingRequestState: Equatable, Sendable {

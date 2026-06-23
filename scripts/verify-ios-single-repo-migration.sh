@@ -14668,12 +14668,12 @@ require_pattern \
 
 require_pattern \
   "VoiceInkCore owns iOS launch recording request policy" \
-  'VoiceInkLaunchRecordingRequest(State|Action)' \
+  'VoiceInkLaunchRecordingRequest(State|Action)|applyRuntimeState' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
 require_pattern \
   "VoiceInkCore checks cover iOS launch recording request policy" \
-  'testLaunchRecordingRequest(StartsImmediatelyWhenOnboardingIsComplete|DefersUntilOnboardingCompletes|NoOpsWhenNothingIsPending|ClearsPendingStateWhenRecordingCanStartNow)' \
+  'testLaunchRecordingRequest(StartsImmediatelyWhenOnboardingIsComplete|DefersUntilOnboardingCompletes|NoOpsWhenNothingIsPending|ClearsPendingStateWhenRecordingCanStartNow|ActionAppliesRuntimeState)' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -14924,7 +14924,12 @@ require_pattern \
 
 require_pattern \
   "iOS app deep-link recording uses shared launch request policy" \
-  'VoiceInkLaunchRecordingRequest(State|Action)|requestRecording\(hasCompletedOnboarding:|consumePendingRecordingIfReady\(hasCompletedOnboarding:' \
+  'VoiceInkLaunchRecordingRequest(State|Action)|requestRecording\(hasCompletedOnboarding:|consumePendingRecordingIfReady\(hasCompletedOnboarding:|applyRuntimeState' \
+  iOS/VoiceInk-ios/VoiceInk_iosApp.swift
+
+reject_pattern \
+  "iOS app deep-link recording avoids shell-owned launch request action sequencing" \
+  'switch action|case \.none|case \.deferUntilOnboardingCompletes|case \.startRecordingAfterLaunchDelay' \
   iOS/VoiceInk-ios/VoiceInk_iosApp.swift
 
 require_pattern \

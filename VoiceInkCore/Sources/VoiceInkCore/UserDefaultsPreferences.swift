@@ -311,6 +311,41 @@ public enum VoiceInkAppSettingsResetAction {
     case deleteProviderAPIKeys([VoiceInkProviderKind])
 }
 
+public extension VoiceInkAppSettingsResetState {
+    func applyRuntimeState(
+        setModes: ([Mode]) -> Void,
+        setSelectedModeId: (UUID?) -> Void,
+        setAPIKeyState: (VoiceInkProviderAPIKeyState) -> Void,
+        setAudioSessionTimeoutSeconds: (Int) -> Void,
+        setTranscriptionCleanupSettings: (VoiceInkTranscriptionCleanupSettings) -> Void,
+        setFillerWords: ([String]) -> Void,
+        setWordReplacements: ([VoiceInkWordReplacementRule]) -> Void,
+        setCustomVocabularyTerms: ([String]) -> Void,
+        setSelectedTranscriptionLanguage: (String) -> Void,
+        clearCoreUserSettings: () -> Void,
+        deleteProviderAPIKeys: ([VoiceInkProviderKind]) -> Void
+    ) {
+        for action in applicationActions {
+            switch action {
+            case .applyResetState(let resetState):
+                setModes(resetState.modes)
+                setSelectedModeId(resetState.selectedModeId)
+                setAPIKeyState(resetState.apiKeyState)
+                setAudioSessionTimeoutSeconds(resetState.audioSessionTimeoutSeconds)
+                setTranscriptionCleanupSettings(resetState.transcriptionCleanupSettings)
+                setFillerWords(resetState.fillerWords)
+                setWordReplacements(resetState.wordReplacements)
+                setCustomVocabularyTerms(resetState.customVocabularyTerms)
+                setSelectedTranscriptionLanguage(resetState.selectedTranscriptionLanguage)
+            case .clearCoreUserSettings:
+                clearCoreUserSettings()
+            case .deleteProviderAPIKeys(let providers):
+                deleteProviderAPIKeys(providers)
+            }
+        }
+    }
+}
+
 public struct VoiceInkIOSAppSettingsStartupState {
     public let modes: [Mode]
     public let selectedModeId: UUID?

@@ -332,36 +332,27 @@ final class AppSettings: ObservableObject {
     // MARK: - Debug Reset
     /// Remove all persisted preferences, API keys, and modes.
     func resetAll() {
-        for action in VoiceInkDefaultSettings.iOS.appSettingsResetState.applicationActions {
-            applyAppSettingsResetAction(action)
-        }
-    }
-
-    private func applyAppSettingsResetAction(_ action: VoiceInkAppSettingsResetAction) {
-        switch action {
-        case .applyResetState(let resetState):
-            applyAppSettingsResetState(resetState)
-        case .clearCoreUserSettings:
-            VoiceInkSharedPreferenceReset.clearCoreUserSettings()
-        case .deleteProviderAPIKeys(let providers):
-            providers.forEach(Self.deleteAPIKey)
-        }
-    }
-
-    private func applyAppSettingsResetState(_ resetState: VoiceInkAppSettingsResetState) {
-        modes = resetState.modes
-        selectedModeId = resetState.selectedModeId
-        apiKeyState = resetState.apiKeyState
-        audioSessionTimeoutSeconds = resetState.audioSessionTimeoutSeconds
-
-        let cleanupSettings = resetState.transcriptionCleanupSettings
-        punctuationCleanupMode = cleanupSettings.punctuationMode
-        isTextFormattingEnabled = cleanupSettings.isTextFormattingEnabled
-        lowercaseTranscription = cleanupSettings.lowercaseTranscription
-        removeFillerWords = cleanupSettings.removeFillerWords
-        fillerWords = resetState.fillerWords
-        wordReplacements = resetState.wordReplacements
-        customVocabularyTerms = resetState.customVocabularyTerms
-        selectedTranscriptionLanguage = resetState.selectedTranscriptionLanguage
+        VoiceInkDefaultSettings.iOS.appSettingsResetState.applyRuntimeState(
+            setModes: { [self] in modes = $0 },
+            setSelectedModeId: { [self] in selectedModeId = $0 },
+            setAPIKeyState: { [self] in apiKeyState = $0 },
+            setAudioSessionTimeoutSeconds: { [self] in audioSessionTimeoutSeconds = $0 },
+            setTranscriptionCleanupSettings: { [self] cleanupSettings in
+                punctuationCleanupMode = cleanupSettings.punctuationMode
+                isTextFormattingEnabled = cleanupSettings.isTextFormattingEnabled
+                lowercaseTranscription = cleanupSettings.lowercaseTranscription
+                removeFillerWords = cleanupSettings.removeFillerWords
+            },
+            setFillerWords: { [self] in fillerWords = $0 },
+            setWordReplacements: { [self] in wordReplacements = $0 },
+            setCustomVocabularyTerms: { [self] in customVocabularyTerms = $0 },
+            setSelectedTranscriptionLanguage: { [self] in selectedTranscriptionLanguage = $0 },
+            clearCoreUserSettings: {
+                VoiceInkSharedPreferenceReset.clearCoreUserSettings()
+            },
+            deleteProviderAPIKeys: { providers in
+                providers.forEach(Self.deleteAPIKey)
+            }
+        )
     }
 }

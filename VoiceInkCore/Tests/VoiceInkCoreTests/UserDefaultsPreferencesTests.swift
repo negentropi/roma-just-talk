@@ -185,6 +185,58 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(providers, VoiceInkProviderKind.userAPIKeyProviders)
     }
 
+    func testAppSettingsResetStateAppliesRuntimeStateInOrder() {
+        let mode = Mode(name: "Focus")
+        let resetState = VoiceInkAppSettingsResetState(
+            modes: [mode],
+            selectedModeId: mode.id,
+            apiKeyState: VoiceInkProviderAPIKeyState(storedKeysByProvider: [.groq: "groq-key"]),
+            audioSessionTimeoutSeconds: 90,
+            transcriptionCleanupSettings: VoiceInkTranscriptionCleanupSettings(
+                punctuationMode: .removeTrailingPeriod,
+                isTextFormattingEnabled: false,
+                lowercaseTranscription: true,
+                removeFillerWords: false
+            ),
+            fillerWords: ["uh"],
+            wordReplacements: [
+                VoiceInkWordReplacementRule(originalText: "roma", replacementText: "Roma Just Talk")
+            ],
+            customVocabularyTerms: ["Whisper"],
+            selectedTranscriptionLanguage: "fr",
+            apiKeyProvidersToDelete: [.groq, .openAI]
+        )
+        var events: [String] = []
+
+        resetState.applyRuntimeState(
+            setModes: { modes in events.append("modes:\(modes.count)") },
+            setSelectedModeId: { selectedModeId in events.append("selectedMode:\(selectedModeId == mode.id)") },
+            setAPIKeyState: { state in events.append("apiKey:\(state.storedAPIKey(for: .groq))") },
+            setAudioSessionTimeoutSeconds: { timeout in events.append("timeout:\(timeout)") },
+            setTranscriptionCleanupSettings: { settings in events.append("cleanup:\(settings.punctuationMode.rawValue)") },
+            setFillerWords: { words in events.append("filler:\(words.joined(separator: ","))") },
+            setWordReplacements: { rules in events.append("rules:\(rules.count)") },
+            setCustomVocabularyTerms: { terms in events.append("vocabulary:\(terms.joined(separator: ","))") },
+            setSelectedTranscriptionLanguage: { language in events.append("language:\(language)") },
+            clearCoreUserSettings: { events.append("clear") },
+            deleteProviderAPIKeys: { providers in events.append("delete:\(providers.map(\.rawValue).joined(separator: ","))") }
+        )
+
+        XCTAssertEqual(events, [
+            "modes:1",
+            "selectedMode:true",
+            "apiKey:groq-key",
+            "timeout:90",
+            "cleanup:removeTrailingPeriod",
+            "filler:uh",
+            "rules:1",
+            "vocabulary:Whisper",
+            "language:fr",
+            "clear",
+            "delete:groq,openAI"
+        ])
+    }
+
     func testAppSettingsResetStateSkipsProviderDeletionActionWhenNoProviders() {
         let resetState = VoiceInkAppSettingsResetState(
             modes: [],

@@ -11122,6 +11122,7 @@ require_patterns \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift \
   'VoiceInkAppSettingsResetAction' \
   'applicationActions' \
+  'applyRuntimeState' \
   'applyResetState' \
   'clearCoreUserSettings' \
   'deleteProviderAPIKeys'
@@ -11130,6 +11131,7 @@ require_patterns \
   "core checks execute app settings reset action tests" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
   'UserDefaultsPreferencesTests\.testAppSettingsResetStateBuildsApplicationActionsInOrder' \
+  'UserDefaultsPreferencesTests\.testAppSettingsResetStateAppliesRuntimeStateInOrder' \
   'UserDefaultsPreferencesTests\.testAppSettingsResetStateSkipsProviderDeletionActionWhenNoProviders'
 
 require_patterns \
@@ -11423,7 +11425,7 @@ reject_pattern \
 
 require_pattern \
   "iOS app settings reset consumes shared reset state" \
-  'VoiceInkDefaultSettings\.iOS\.appSettingsResetState\.applicationActions' \
+  'VoiceInkDefaultSettings\.iOS\.appSettingsResetState\.applyRuntimeState' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_patterns \
@@ -11463,12 +11465,17 @@ reject_context_pattern \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_patterns \
-  "iOS app settings reset adapts shared reset actions" \
+  "iOS app settings reset adapts shared reset runtime state" \
   iOS/VoiceInk-ios/AppSettings.swift \
-  'VoiceInkAppSettingsResetAction' \
-  'applyAppSettingsResetAction' \
-  'applyAppSettingsResetState' \
+  'setModes' \
+  'setTranscriptionCleanupSettings' \
+  'clearCoreUserSettings' \
   'deleteProviderAPIKeys'
+
+reject_pattern \
+  "iOS app settings reset avoids shell-owned reset action sequencing" \
+  'VoiceInkAppSettingsResetAction|applyAppSettingsResetAction|applyAppSettingsResetState|for action in VoiceInkDefaultSettings\.iOS\.appSettingsResetState\.applicationActions|case \.applyResetState|case \.clearCoreUserSettings|case \.deleteProviderAPIKeys' \
+  iOS/VoiceInk-ios/AppSettings.swift
 
 reject_pattern \
   "iOS app settings reset avoids direct provider-key target reads" \

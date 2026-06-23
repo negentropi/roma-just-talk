@@ -1630,6 +1630,42 @@ public enum VoiceInkShortcutValidationPresentation {
     }
 }
 
+public struct VoiceInkMacOSShortcutNotificationPresentation: Equatable, Sendable {
+    public let title: String
+    public let duration: TimeInterval
+    public let actionButtonLabel: String?
+
+    public init(title: String, duration: TimeInterval, actionButtonLabel: String? = nil) {
+        self.title = title
+        self.duration = duration
+        self.actionButtonLabel = actionButtonLabel
+    }
+
+    public static let inputMonitoringPermissionRequired = Self(
+        title: "Enable Input Monitoring for shortcuts",
+        duration: 6,
+        actionButtonLabel: "Open Settings"
+    )
+
+    public static let accessibilityPermissionRequired = Self(
+        title: "Enable Accessibility for shortcuts",
+        duration: 6,
+        actionButtonLabel: "Open Settings"
+    )
+
+    public static let monitorStartFailed = Self(
+        title: "Keyboard shortcut monitor could not start",
+        duration: 6
+    )
+
+    public static func miniRecorderEscapeConfirmation(duration: TimeInterval) -> Self {
+        Self(
+            title: "Press ESC again to cancel recording",
+            duration: duration
+        )
+    }
+}
+
 public enum VoiceInkLegacyRecordingShortcutPreset: String, CaseIterable, Sendable {
     case rightOption
     case leftOption

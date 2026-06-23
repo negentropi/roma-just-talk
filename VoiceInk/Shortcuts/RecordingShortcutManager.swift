@@ -324,18 +324,9 @@ class RecordingShortcutManager: ObservableObject {
         if !ShortcutMonitor.preflightListenEventAccess() {
             guard !hasShownInputMonitoringPermissionNotification else { return }
             hasShownInputMonitoringPermissionNotification = true
-            NotificationManager.shared.showNotification(
-                title: "Enable Input Monitoring for shortcuts",
-                type: .warning,
-                duration: 6,
-                actionButton: (
-                    label: "Open Settings",
-                    action: {
-                        Task { @MainActor in
-                            PermissionGrantCoordinator.grantInputMonitoring()
-                        }
-                    }
-                )
+            showShortcutSettingsNotification(
+                VoiceInkMacOSShortcutNotificationPresentation.inputMonitoringPermissionRequired,
+                grant: { PermissionGrantCoordinator.grantInputMonitoring() }
             )
             return
         }
@@ -343,28 +334,43 @@ class RecordingShortcutManager: ObservableObject {
         if !ShortcutMonitor.preflightAccessibilityAccess() {
             guard !hasShownAccessibilityPermissionNotification else { return }
             hasShownAccessibilityPermissionNotification = true
-            NotificationManager.shared.showNotification(
-                title: "Enable Accessibility for shortcuts",
-                type: .warning,
-                duration: 6,
-                actionButton: (
-                    label: "Open Settings",
-                    action: {
-                        Task { @MainActor in
-                            PermissionGrantCoordinator.grantAccessibility()
-                        }
-                    }
-                )
+            showShortcutSettingsNotification(
+                VoiceInkMacOSShortcutNotificationPresentation.accessibilityPermissionRequired,
+                grant: { PermissionGrantCoordinator.grantAccessibility() }
             )
             return
         }
 
         guard !hasShownShortcutMonitorFailureNotification else { return }
         hasShownShortcutMonitorFailureNotification = true
+        let presentation = VoiceInkMacOSShortcutNotificationPresentation.monitorStartFailed
         NotificationManager.shared.showNotification(
-            title: "Keyboard shortcut monitor could not start",
+            title: presentation.title,
             type: .error,
-            duration: 6
+            duration: presentation.duration
+        )
+    }
+
+    private func showShortcutSettingsNotification(
+        _ presentation: VoiceInkMacOSShortcutNotificationPresentation,
+        grant: @escaping @MainActor () -> Void
+    ) {
+        guard let actionButtonLabel = presentation.actionButtonLabel else {
+            return
+        }
+
+        NotificationManager.shared.showNotification(
+            title: presentation.title,
+            type: .warning,
+            duration: presentation.duration,
+            actionButton: (
+                label: actionButtonLabel,
+                action: {
+                    Task { @MainActor in
+                        grant()
+                    }
+                }
+            )
         )
     }
 

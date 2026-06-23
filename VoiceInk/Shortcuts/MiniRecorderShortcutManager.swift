@@ -140,10 +140,13 @@ class MiniRecorderShortcutManager: ObservableObject {
         }
 
         firstEscapePressTime = now
-        NotificationManager.shared.showNotification(
-            title: "Press ESC again to cancel recording",
-            type: .info,
+        let presentation = VoiceInkMacOSShortcutNotificationPresentation.miniRecorderEscapeConfirmation(
             duration: escapeDoublePressThreshold
+        )
+        NotificationManager.shared.showNotification(
+            title: presentation.title,
+            type: .info,
+            duration: presentation.duration
         )
         escapeTimeoutTask = Task { [weak self] in
             try? await Task.sleep(nanoseconds: UInt64((self?.escapeDoublePressThreshold ?? 1.5) * 1_000_000_000))

@@ -8786,6 +8786,20 @@ require_patterns \
   'Shortcut reserved by macOS:' \
   'Shortcut already used by'
 
+require_patterns \
+  "shared macOS shortcut notification presentation lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift \
+  'VoiceInkMacOSShortcutNotificationPresentation' \
+  'inputMonitoringPermissionRequired' \
+  'accessibilityPermissionRequired' \
+  'monitorStartFailed' \
+  'miniRecorderEscapeConfirmation' \
+  'Enable Input Monitoring for shortcuts' \
+  'Enable Accessibility for shortcuts' \
+  'Keyboard shortcut monitor could not start' \
+  'Press ESC again to cancel recording' \
+  'actionButtonLabel: "Open Settings"'
+
 require_pattern \
   "shared recording shortcut preference owns selection keys" \
   'selectionKey' \
@@ -8976,6 +8990,20 @@ require_patterns \
   'VoiceInkShortcutValidationIssue' \
   'VoiceInkShortcutValidationPresentation\.notificationTitle'
 
+require_patterns \
+  "macOS recording shortcut manager uses shared notification presentation" \
+  VoiceInk/Shortcuts/RecordingShortcutManager.swift \
+  'VoiceInkMacOSShortcutNotificationPresentation\.inputMonitoringPermissionRequired' \
+  'VoiceInkMacOSShortcutNotificationPresentation\.accessibilityPermissionRequired' \
+  'VoiceInkMacOSShortcutNotificationPresentation\.monitorStartFailed'
+
+require_patterns \
+  "macOS mini recorder shortcut manager uses shared notification presentation" \
+  VoiceInk/Shortcuts/MiniRecorderShortcutManager.swift \
+  'VoiceInkMacOSShortcutNotificationPresentation\.miniRecorderEscapeConfirmation' \
+  'presentation\.title' \
+  'presentation\.duration'
+
 require_pattern \
   "macOS general backup adapts recording shortcut values to shared preferences" \
   'recordingShortcutBackupPreferences' \
@@ -9033,6 +9061,12 @@ reject_pattern \
   "macOS shortcut validator avoids shell-owned notification copy" \
   '"(Shortcut not allowed:|Shortcut reserved by macOS:|Shortcut already used by)"' \
   VoiceInk/Shortcuts/ShortcutValidator.swift
+
+reject_pattern \
+  "macOS shortcut managers avoid shell-owned notification copy" \
+  '"(Enable Input Monitoring for shortcuts|Enable Accessibility for shortcuts|Keyboard shortcut monitor could not start|Press ESC again to cancel recording|Open Settings)"' \
+  VoiceInk/Shortcuts/RecordingShortcutManager.swift \
+  VoiceInk/Shortcuts/MiniRecorderShortcutManager.swift
 
 reject_pattern \
   "macOS backup import avoids shell-only recording shortcut raw parsing" \
@@ -9095,6 +9129,11 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
+  "core checks execute shared macOS shortcut notification presentation tests" \
+  'UserDefaultsPreferencesTests\.testMacOSShortcutNotificationPresentationPreservesShellCopy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "core checks execute shared shortcut recorder presentation test" \
   'UserDefaultsPreferencesTests\.testRecordingShortcutPreferencePreservesMacOSRecorderPresentation' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
@@ -9106,7 +9145,7 @@ require_pattern \
 
 require_pattern \
   "migration checklist tracks shared recording shortcut preference gate" \
-  'macOS recording shortcut action identifiers, action display names, validation notification copy, selection/mode migration plans, legacy shortcut key names, raw shortcut storage, middle-click, special empty-tap preferences, settings labels/help, shortcut recorder labels, backup import/export value planning, general-backup shortcut action ordering, and recording-shortcut selection repair when importing backed-up shortcut records route through `VoiceInkShortcutActionIdentifier`/`VoiceInkShortcutActionPresentation`/`VoiceInkShortcutValidationPresentation`/`VoiceInkLegacyRecordingShortcutPreset`/`VoiceInkRecordingShortcutSelection`/`VoiceInkRecordingShortcutMode`/`VoiceInkRecordingShortcutPreference`/`VoiceInkShortcutStoragePreference`/`VoiceInkShortcutBackupPolicy`' \
+  'macOS recording shortcut action identifiers, action display names, validation and monitor notification copy, mini-recorder escape confirmation copy, selection/mode migration plans, legacy shortcut key names, raw shortcut storage, middle-click, special empty-tap preferences, settings labels/help, shortcut recorder labels, backup import/export value planning, general-backup shortcut action ordering, and recording-shortcut selection repair when importing backed-up shortcut records route through `VoiceInkShortcutActionIdentifier`/`VoiceInkShortcutActionPresentation`/`VoiceInkShortcutValidationPresentation`/`VoiceInkMacOSShortcutNotificationPresentation`/`VoiceInkLegacyRecordingShortcutPreset`/`VoiceInkRecordingShortcutSelection`/`VoiceInkRecordingShortcutMode`/`VoiceInkRecordingShortcutPreference`/`VoiceInkShortcutStoragePreference`/`VoiceInkShortcutBackupPolicy`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

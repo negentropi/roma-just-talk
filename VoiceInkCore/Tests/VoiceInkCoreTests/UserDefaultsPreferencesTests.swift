@@ -1849,6 +1849,39 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         )
     }
 
+    func testMacOSShortcutNotificationPresentationPreservesShellCopy() {
+        XCTAssertEqual(
+            VoiceInkMacOSShortcutNotificationPresentation.inputMonitoringPermissionRequired,
+            VoiceInkMacOSShortcutNotificationPresentation(
+                title: "Enable Input Monitoring for shortcuts",
+                duration: 6,
+                actionButtonLabel: "Open Settings"
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkMacOSShortcutNotificationPresentation.accessibilityPermissionRequired,
+            VoiceInkMacOSShortcutNotificationPresentation(
+                title: "Enable Accessibility for shortcuts",
+                duration: 6,
+                actionButtonLabel: "Open Settings"
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkMacOSShortcutNotificationPresentation.monitorStartFailed,
+            VoiceInkMacOSShortcutNotificationPresentation(
+                title: "Keyboard shortcut monitor could not start",
+                duration: 6
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkMacOSShortcutNotificationPresentation.miniRecorderEscapeConfirmation(duration: 1.5),
+            VoiceInkMacOSShortcutNotificationPresentation(
+                title: "Press ESC again to cancel recording",
+                duration: 1.5
+            )
+        )
+    }
+
     func testRecordingShortcutSelectionMigrationPlanMigratesCurrentPresetAndRemovesLegacyKey() {
         withIsolatedDefaults { defaults in
             defaults.set("rightOption", forKey: VoiceInkUserDefaultsKey.primaryRecordingShortcut)

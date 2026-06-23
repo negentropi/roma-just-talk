@@ -1,4 +1,5 @@
 import XCTest
+import VoiceInkCore
 
 final class VoiceInkIOSUITests: XCTestCase {
     override func setUpWithError() throws {
@@ -10,8 +11,8 @@ final class VoiceInkIOSUITests: XCTestCase {
         let app = XCUIApplication()
         app.launch()
 
-        let notesTitle = app.navigationBars["roma just talk"]
-        let onboardingTitle = app.staticTexts["Welcome to roma just talk"]
+        let notesTitle = app.navigationBars[VoiceInkAppIdentity.displayName]
+        let onboardingTitle = app.staticTexts[VoiceInkIOSOnboardingPresentation.welcome.title]
 
         XCTAssertTrue(
             notesTitle.waitForExistence(timeout: 5) || onboardingTitle.waitForExistence(timeout: 5),

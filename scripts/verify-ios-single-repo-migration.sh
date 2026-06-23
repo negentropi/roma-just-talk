@@ -13067,6 +13067,27 @@ require_context_pattern_count_at_least \
   1 \
   iOS/VoiceInk-ios.xcodeproj/project.pbxproj
 
+require_context_pattern_count_at_least \
+  "iOS unit-test target links shared core package framework" \
+  'E168DF152E4B464C00F133D2 /\* Frameworks \*/' \
+  'VoiceInkCore in Frameworks' \
+  1 \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
+
+require_context_pattern_count_at_least \
+  "iOS UI-test target links shared core package framework" \
+  'E168DF1F2E4B464C00F133D2 /\* Frameworks \*/' \
+  'VoiceInkCore in Frameworks' \
+  1 \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
+
+require_patterns \
+  "iOS UI launch smoke uses shared identity and onboarding copy" \
+  iOS/VoiceInk-iosUITests/VoiceInk_iosUITests.swift \
+  'import VoiceInkCore' \
+  'VoiceInkAppIdentity\.displayName' \
+  'VoiceInkIOSOnboardingPresentation\.welcome\.title'
+
 reject_pattern \
   "local Whisper adapters avoid duplicate logging subsystem literal" \
   '"com\.prakashjoshipax\.voiceink"' \
@@ -13091,7 +13112,8 @@ reject_pattern \
   VoiceInk/VoiceInk.swift \
   VoiceInk/WindowManager.swift \
   iOS/VoiceInk-ios/NotesListView.swift \
-  iOS/VoiceInk-ios/OnboardingView.swift
+  iOS/VoiceInk-ios/OnboardingView.swift \
+  iOS/VoiceInk-iosUITests/VoiceInk_iosUITests.swift
 
 reject_pattern \
   "storage, Keychain, and platform shell paths avoid duplicate bundle identifier literals" \

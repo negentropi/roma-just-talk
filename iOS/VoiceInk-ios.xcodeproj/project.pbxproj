@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		B10000012FA0000000000001 /* VoiceInkCore in Frameworks */ = {isa = PBXBuildFile; productRef = B10000032FA0000000000001 /* VoiceInkCore */; };
 		B10000042FA0000000000001 /* VoiceInkCore in Frameworks */ = {isa = PBXBuildFile; productRef = B10000032FA0000000000001 /* VoiceInkCore */; };
+		B10000052FA0000000000001 /* VoiceInkCore in Frameworks */ = {isa = PBXBuildFile; productRef = B10000032FA0000000000001 /* VoiceInkCore */; };
+		B10000062FA0000000000001 /* VoiceInkCore in Frameworks */ = {isa = PBXBuildFile; productRef = B10000032FA0000000000001 /* VoiceInkCore */; };
 		E14E276F2E5F5B5D00143372 /* whisper.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = E14E276E2E5F5B5D00143372 /* whisper.xcframework */; };
 		E14E27702E5F5B5D00143372 /* whisper.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E14E276E2E5F5B5D00143372 /* whisper.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E18B9A542E600F9F0068773A /* VoiceInkKeyboard.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E18B9A4D2E600F9F0068773A /* VoiceInkKeyboard.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -137,6 +139,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B10000052FA0000000000001 /* VoiceInkCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -144,6 +147,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B10000062FA0000000000001 /* VoiceInkCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -239,6 +243,7 @@
 			);
 			name = "VoiceInk-iosTests";
 			packageProductDependencies = (
+				B10000032FA0000000000001 /* VoiceInkCore */,
 			);
 			productName = "VoiceInk-iosTests";
 			productReference = E168DF182E4B464C00F133D2 /* VoiceInk-iosTests.xctest */;
@@ -262,6 +267,7 @@
 			);
 			name = "VoiceInk-iosUITests";
 			packageProductDependencies = (
+				B10000032FA0000000000001 /* VoiceInkCore */,
 			);
 			productName = "VoiceInk-iosUITests";
 			productReference = E168DF222E4B464C00F133D2 /* VoiceInk-iosUITests.xctest */;

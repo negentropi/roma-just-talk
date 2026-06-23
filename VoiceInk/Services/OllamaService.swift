@@ -77,7 +77,7 @@ class OllamaService: ObservableObject {
         }
     }
 
-    func enhance(_ text: String, withSystemPrompt systemPrompt: String? = nil, timeout: TimeInterval = 30) async throws -> String {
+    func enhance(_ text: String, withSystemPrompt systemPrompt: String? = nil, timeout: TimeInterval) async throws -> String {
         guard let systemPrompt = systemPrompt else {
             throw VoiceInkOllamaEnhancementFailure.invalidRequest.enhancementError
         }

@@ -8105,6 +8105,12 @@ reject_pattern \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
 reject_pattern \
+  "macOS Ollama enhancement avoids shell-owned timeout fallback" \
+  'timeout: +TimeInterval += +30' \
+  VoiceInk/Services/AIEnhancement/AIService.swift \
+  VoiceInk/Services/OllamaService.swift
+
+reject_pattern \
   "macOS AI enhancement service avoids shallow retry-on-timeout preference wrapper" \
   'private +var +retryOnTimeout\b|case +\.timeout +where +retryOnTimeout\b' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift

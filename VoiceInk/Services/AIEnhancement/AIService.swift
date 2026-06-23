@@ -291,7 +291,7 @@ class AIService: ObservableObject {
         return ollamaService.availableModels
     }
     
-    func enhanceWithOllama(text: String, systemPrompt: String, timeout: TimeInterval = 30) async throws -> String {
+    func enhanceWithOllama(text: String, systemPrompt: String, timeout: TimeInterval) async throws -> String {
         try await ollamaService.enhance(text, withSystemPrompt: systemPrompt, timeout: timeout)
     }
     

@@ -130,6 +130,7 @@ struct NoteDetailView: View {
             for: note.transcriptionStatus,
             isRetranscribing: isRetranscribing
         )
+        let retryAction = retryControls.action.runtimeAction(retry: retranscribe)
 
         if let statusPresentation {
             VStack(spacing: 12) {
@@ -172,19 +173,19 @@ struct NoteDetailView: View {
                             .foregroundStyle(.secondary)
                     }
                 case .showRetryButton:
-                    Button {
-                        retranscribe()
-                    } label: {
-                        Label(
-                            VoiceInkTranscriptPresentation.retryTranscriptionButtonTitle,
-                            systemImage: VoiceInkTranscriptPresentation.retryTranscriptionSystemImageName
-                        )
-                            .fontWeight(.semibold)
-                            .frame(maxWidth: .infinity)
+                    if let retryAction {
+                        Button(action: retryAction) {
+                            Label(
+                                VoiceInkTranscriptPresentation.retryTranscriptionButtonTitle,
+                                systemImage: VoiceInkTranscriptPresentation.retryTranscriptionSystemImageName
+                            )
+                                .fontWeight(.semibold)
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.blue)
+                        .controlSize(.regular)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.blue)
-                    .controlSize(.regular)
                 }
             }
             .padding()

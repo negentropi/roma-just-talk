@@ -64,6 +64,18 @@ public enum VoiceInkTranscriptRetryControlAction: Equatable, Sendable {
     case hidden
     case showProgress
     case showRetryButton
+
+    public func runtimeAction(
+        retry: @escaping () -> Void
+    ) -> (() -> Void)? {
+        switch self {
+        case .hidden,
+             .showProgress:
+            return nil
+        case .showRetryButton:
+            return retry
+        }
+    }
 }
 
 public struct VoiceInkTranscriptRetryControlsPresentation: Equatable, Sendable {

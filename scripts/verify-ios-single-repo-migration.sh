@@ -2459,6 +2459,13 @@ require_pattern \
   'VoiceInkTranscriptRetryControlsPresentation|VoiceInkTranscriptRetryControlAction|retryControls\(isRetranscribing:' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
 
+require_patterns \
+  "shared transcript retry action mapping lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift \
+  'public func runtimeAction' \
+  'retry: @escaping \(\) -> Void' \
+  'case \.showRetryButton:'
+
 require_pattern \
   "shared transcript status error detail visibility lives in VoiceInkCore" \
   'statusErrorDetail' \
@@ -2466,7 +2473,7 @@ require_pattern \
 
 require_pattern \
   "core checks execute transcript retry controls presentation tests" \
-  'testRetryControlsPresentationShows(RetryControlsWhenIdle|ProgressWhenRetranscribing)|testStatusErrorDetailShowsOnlyNonEmptyErrors' \
+  'testRetryControlsPresentationShows(RetryControlsWhenIdle|ProgressWhenRetranscribing)|testRetryControlActionMapsRetryButtonToRuntimeRetry|testStatusErrorDetailShowsOnlyNonEmptyErrors' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -2584,8 +2591,24 @@ require_pattern \
   iOS/VoiceInk-ios/NoteDetailView.swift
 
 require_pattern \
+  "iOS note detail delegates retry action mapping to shared core" \
+  'retryControls\.action\.runtimeAction\(retry: retranscribe\)' \
+  iOS/VoiceInk-ios/NoteDetailView.swift
+
+require_pattern \
   "iOS note detail delegates status error visibility to shared core" \
   'VoiceInkTranscriptPresentation\.statusErrorDetail' \
+  iOS/VoiceInk-ios/NoteDetailView.swift
+
+reject_pattern \
+  "iOS note detail avoids shell-owned retry action sequencing" \
+  'Button +\{[[:space:]]*retranscribe\(\)' \
+  iOS/VoiceInk-ios/NoteDetailView.swift
+
+reject_context_pattern \
+  "iOS note detail avoids direct retry button closure" \
+  'case \.showRetryButton:' \
+  'Button +\{' \
   iOS/VoiceInk-ios/NoteDetailView.swift
 
 reject_pattern \

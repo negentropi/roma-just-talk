@@ -777,6 +777,20 @@ final class TranscriptPresentationTests: XCTestCase {
         )
     }
 
+    func testRetryControlActionMapsRetryButtonToRuntimeRetry() {
+        var didRetry = false
+
+        let retryAction = VoiceInkTranscriptRetryControlAction.showRetryButton.runtimeAction {
+            didRetry = true
+        }
+
+        XCTAssertTrue(retryAction != nil)
+        retryAction?()
+        XCTAssertTrue(didRetry)
+        XCTAssertNil(VoiceInkTranscriptRetryControlAction.hidden.runtimeAction {})
+        XCTAssertNil(VoiceInkTranscriptRetryControlAction.showProgress.runtimeAction {})
+    }
+
     func testTranscriptTextVariantTitlesPreserveMacOSTabs() {
         XCTAssertEqual(VoiceInkTranscriptTextVariant.original.title, "Original")
         XCTAssertEqual(VoiceInkTranscriptTextVariant.enhanced.title, "Enhanced")

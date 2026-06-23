@@ -98,7 +98,7 @@ class SystemInfoService {
     }
 
     private func getArchitecture() -> String {
-        return SystemArchitecture.current
+        return VoiceInkSystemArchitecture.macOSDisplayName
     }
 
     private func getAudioInputMode() -> String {

@@ -13226,6 +13226,28 @@ reject_pattern \
   VoiceInk/EmailSupport.swift
 
 require_file VoiceInkCore/Sources/VoiceInkCore/SystemInformationReport.swift
+require_file VoiceInkCore/Sources/VoiceInkCore/SystemArchitecture.swift
+
+require_patterns \
+  "shared system architecture policy lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/SystemArchitecture.swift \
+  'VoiceInkSystemArchitecture' \
+  'isIntelMac' \
+  'macOSDisplayName' \
+  'Apple Silicon \(ARM64\)' \
+  'Intel \(x86_64\)'
+
+require_pattern \
+  "macOS model management adapts shared system architecture policy" \
+  'VoiceInkSystemArchitecture\.isIntelMac' \
+  'VoiceInk/Views/AI Models/ModelManagementView.swift'
+
+require_pattern \
+  "macOS system info adapts shared system architecture display name" \
+  'VoiceInkSystemArchitecture\.macOSDisplayName' \
+  VoiceInk/Services/SystemInfoService.swift
+
+reject_file VoiceInk/Services/SystemArchitecture.swift
 
 require_patterns \
   "shared macOS system information report formatting lives in VoiceInkCore" \
@@ -13252,7 +13274,7 @@ reject_pattern \
 
 require_pattern \
   "core checks execute system information report tests" \
-  'SystemInformationReportTests\.testMacOSSystemInformationReportPreservesSectionOrderAndLabels|SystemInformationReportTests\.testMacOSSystemInformationReportKeepsRollingBufferBlockVerbatim' \
+  'SystemArchitectureTests\.testSystemArchitecturePreservesMacOSDisplayNameForCompileTarget|SystemArchitectureTests\.testSystemArchitectureIntelMacPredicateMatchesCompileTarget|SystemInformationReportTests\.testMacOSSystemInformationReportPreservesSectionOrderAndLabels|SystemInformationReportTests\.testMacOSSystemInformationReportKeepsRollingBufferBlockVerbatim' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \

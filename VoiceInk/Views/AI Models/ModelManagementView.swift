@@ -36,7 +36,7 @@ struct ModelManagementView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
-                if SystemArchitecture.isIntelMac {
+                if VoiceInkSystemArchitecture.isIntelMac {
                     intelMacWarningBanner
                 }
 

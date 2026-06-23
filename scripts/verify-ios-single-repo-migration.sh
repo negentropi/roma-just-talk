@@ -6921,6 +6921,16 @@ require_pattern \
   'VoiceInkTranscription(SessionRouteFacts|SessionRoutePlan)|VoiceInkTranscriptionStreamingAdapterKind' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionStreamingPreference.swift
 
+section "obsolete standalone streaming final-commit timeout module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/StreamingFinalCommitTimeout.swift
+
+require_patterns \
+  "streaming final-commit timeout lives with route planning" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionStreamingPreference.swift \
+  'VoiceInkStreamingFinalCommitSource' \
+  'VoiceInkStreamingFinalCommitTimeout' \
+  'VoiceInkTranscriptionSessionRoutePlan'
+
 require_pattern \
   "shared core owns transcription session execution planning" \
   'VoiceInkTranscriptionSessionExecutionPlan' \

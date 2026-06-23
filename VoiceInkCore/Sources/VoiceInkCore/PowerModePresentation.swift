@@ -107,6 +107,7 @@ public enum VoiceInkPowerModePresentation {
     public static let popoverEmptyTitle = "No Power Modes Available"
     public static let popoverEmptySystemImageName = "sparkles"
     public static let popoverSelectedSystemImageName = "checkmark"
+    public static let recorderButtonFallbackIcon = "✨"
     public static let rowEditActionTitle = "Edit"
     public static let rowEditActionSystemImageName = "pencil"
     public static let formCloseHelpText = closeHelpText
@@ -273,6 +274,17 @@ public enum VoiceInkPowerModePresentation {
 
     public static func noAIModelsAvailableText(for provider: VoiceInkAIEnhancementProviderKind) -> String {
         provider.supportsUserInitiatedTextEnhancementModelRefresh ? noAIModelsLoadedText : noAIModelsAvailableText
+    }
+
+    public static func recorderButtonIcon(
+        hasEnabledConfigurations: Bool,
+        activeConfiguration: PowerModeConfig?
+    ) -> String {
+        guard hasEnabledConfigurations else {
+            return recorderButtonFallbackIcon
+        }
+
+        return activeConfiguration?.emoji ?? recorderButtonFallbackIcon
     }
 
     private static func triggerCountText(_ count: Int, singular: String, plural: String) -> String {

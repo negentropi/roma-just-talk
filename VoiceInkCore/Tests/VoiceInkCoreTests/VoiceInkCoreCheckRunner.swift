@@ -757,6 +757,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "PowerModePresentationTests.testTriggerCountTextPreservesPowerModeRowPluralization", run: { PowerModePresentationTests().testTriggerCountTextPreservesPowerModeRowPluralization() }),
             VoiceInkCoreCheck(name: "PowerModePresentationTests.testPanelAndSidebarChromePreservesMacOSCopy", run: { PowerModePresentationTests().testPanelAndSidebarChromePreservesMacOSCopy() }),
             VoiceInkCoreCheck(name: "PowerModePresentationTests.testPopoverAndRowActionChromePreservesMacOSCopy", run: { PowerModePresentationTests().testPopoverAndRowActionChromePreservesMacOSCopy() }),
+            VoiceInkCoreCheck(name: "PowerModePresentationTests.testRecorderButtonIconPreservesActiveEmojiFallbacks", run: { PowerModePresentationTests().testRecorderButtonIconPreservesActiveEmojiFallbacks() }),
             VoiceInkCoreCheck(name: "PowerModePresentationTests.testConfigurationFormChromePreservesMacOSCopy", run: { PowerModePresentationTests().testConfigurationFormChromePreservesMacOSCopy() }),
             VoiceInkCoreCheck(name: "PowerModePresentationTests.testDeleteConfirmationPreservesPowerModeCopy", run: { PowerModePresentationTests().testDeleteConfirmationPreservesPowerModeCopy() }),
             VoiceInkCoreCheck(name: "PowerModePresentationTests.testValidationAlertPreservesFirstPowerModeErrorCopy", run: { PowerModePresentationTests().testValidationAlertPreservesFirstPowerModeErrorCopy() }),

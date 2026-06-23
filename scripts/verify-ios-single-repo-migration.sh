@@ -11195,6 +11195,21 @@ require_pattern \
   VoiceInk/PowerMode/PowerModePopover.swift
 
 require_pattern \
+  "macOS recorder Power Mode button consumes shared icon fallback policy" \
+  'VoiceInkPowerModePresentation\.recorderButtonIcon' \
+  VoiceInk/Views/Recorder/RecorderComponents.swift
+
+require_pattern \
+  "core checks execute recorder Power Mode button icon fallback test" \
+  'PowerModePresentationTests\.testRecorderButtonIconPreservesActiveEmojiFallbacks' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "macOS recorder Power Mode button avoids shell-owned icon fallback" \
+  '"✨"|activeConfiguration\?\.emoji' \
+  VoiceInk/Views/Recorder/RecorderComponents.swift
+
+require_pattern \
   "macOS Power Mode config form uses shared chrome copy" \
   'VoiceInkPowerModePresentation\.(formCloseHelpText|formCloseSystemImageName|generalSectionTitle|nameFieldPlaceholder|triggerScenariosSectionTitle|applicationsSectionTitle|addApplicationHelpText|noApplicationsText|websitesSectionTitle|websiteURLFieldPlaceholder|addWebsiteHelpText|noWebsitesText|appTriggerSystemImageName|websiteTriggerSystemImageName|removeTriggerSystemImageName|transcriptionSectionTitle|transcriptionModelPickerTitle|transcriptionLanguageTitle|autodetectedLanguageText|transcriptFormattingDisclosureSystemImageName|aiEnhancementSectionTitle|aiEnhancementToggleTitle|advancedSectionTitle|formDeleteButtonTitle|formCancelButtonTitle|formSaveButtonTitle)' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
@@ -11286,7 +11301,7 @@ require_pattern \
 
 require_pattern \
   "migration checklist tracks shared Power Mode chrome copy gate" \
-  'macOS Power Mode settings row, disable-alert copy, panel, sidebar empty state, reorder sheet, badges, row actions, manual-selection popover copy, panel help URL, and panel/reorder/sidebar/form/app-picker/popover/row trigger/action symbols route through `VoiceInkPowerModePresentation`' \
+  'macOS Power Mode settings row, disable-alert copy, panel, sidebar empty state, reorder sheet, badges, row actions, manual-selection popover copy, recorder button icon fallback, panel help URL, and panel/reorder/sidebar/form/app-picker/popover/row trigger/action symbols route through `VoiceInkPowerModePresentation`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

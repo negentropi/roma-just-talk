@@ -117,10 +117,41 @@ final class PowerModePresentationTests: XCTestCase {
         XCTAssertEqual(VoiceInkPowerModePresentation.popoverEmptyTitle, "No Power Modes Available")
         XCTAssertEqual(VoiceInkPowerModePresentation.popoverEmptySystemImageName, "sparkles")
         XCTAssertEqual(VoiceInkPowerModePresentation.popoverSelectedSystemImageName, "checkmark")
+        XCTAssertEqual(VoiceInkPowerModePresentation.recorderButtonFallbackIcon, "✨")
         XCTAssertEqual(VoiceInkPowerModePresentation.rowEditActionTitle, "Edit")
         XCTAssertEqual(VoiceInkPowerModePresentation.rowEditActionSystemImageName, "pencil")
         XCTAssertEqual(VoiceInkPowerModePresentation.rowDeleteActionTitle, "Delete")
         XCTAssertEqual(VoiceInkPowerModePresentation.rowDeleteActionSystemImageName, "trash")
+    }
+
+    func testRecorderButtonIconPreservesActiveEmojiFallbacks() {
+        let activeConfig = PowerModeConfig(
+            name: "Writing",
+            emoji: "W",
+            isAIEnhancementEnabled: false
+        )
+
+        XCTAssertEqual(
+            VoiceInkPowerModePresentation.recorderButtonIcon(
+                hasEnabledConfigurations: true,
+                activeConfiguration: activeConfig
+            ),
+            "W"
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModePresentation.recorderButtonIcon(
+                hasEnabledConfigurations: true,
+                activeConfiguration: nil
+            ),
+            "✨"
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModePresentation.recorderButtonIcon(
+                hasEnabledConfigurations: false,
+                activeConfiguration: activeConfig
+            ),
+            "✨"
+        )
     }
 
     func testConfigurationFormChromePreservesMacOSCopy() {

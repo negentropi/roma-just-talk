@@ -1704,6 +1704,14 @@ final class PowerModePolicyTests: XCTestCase {
         )
     }
 
+    func testAutoSendPolicySharesDelayAfterPasteEligibility() {
+        XCTAssertEqual(VoiceInkAutoSendPolicy.defaultDelayAfterPasteNanoseconds, 120_000_000)
+        XCTAssertNil(VoiceInkAutoSendPolicy.delayAfterPasteNanoseconds(for: .none))
+        XCTAssertEqual(VoiceInkAutoSendPolicy.delayAfterPasteNanoseconds(for: .enter), 120_000_000)
+        XCTAssertEqual(VoiceInkAutoSendPolicy.delayAfterPasteNanoseconds(for: .shiftEnter), 120_000_000)
+        XCTAssertEqual(VoiceInkAutoSendPolicy.delayAfterPasteNanoseconds(for: .commandEnter), 120_000_000)
+    }
+
     func testNormalizedWebsiteURLPreservesExistingMacOSCleanURLPolicy() {
         XCTAssertEqual(
             VoiceInkPowerModePolicy.normalizedWebsiteURL(" HTTP://WWW.Example.COM/path "),

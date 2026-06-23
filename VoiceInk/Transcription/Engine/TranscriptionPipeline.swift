@@ -28,7 +28,6 @@ class TranscriptionPipeline {
     private let serviceRegistry: TranscriptionServiceRegistry
     private let enhancementService: AIEnhancementService?
     private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "TranscriptionPipeline")
-    private static let autoSendAfterPasteDelayNanoseconds: UInt64 = 120_000_000
 
     var licenseViewModel: LicenseViewModel
 
@@ -405,9 +404,10 @@ class TranscriptionPipeline {
             let autoSendKey = PowerModeManager.shared.activeConfiguration?.autoSendKey
             SoundManager.shared.playStopSound()
             await restorePromptDetectionSettingsAndDismiss {
-                if let autoSendKey, autoSendKey.isEnabled {
+                if let autoSendKey,
+                   let delayAfterPaste = VoiceInkAutoSendPolicy.delayAfterPasteNanoseconds(for: autoSendKey) {
                     Task { @MainActor in
-                        try? await Task.sleep(nanoseconds: Self.autoSendAfterPasteDelayNanoseconds)
+                        try? await Task.sleep(nanoseconds: delayAfterPaste)
                         CursorPaster.performAutoSend(autoSendKey)
                     }
                 }

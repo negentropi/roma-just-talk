@@ -11597,6 +11597,26 @@ require_pattern \
   'enum VoiceInkAutoSendKey' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
+require_pattern \
+  "shared auto-send post-paste delay policy lives in VoiceInkCore" \
+  'enum VoiceInkAutoSendPolicy|delayAfterPasteNanoseconds' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "macOS transcription pipeline consumes shared auto-send delay policy" \
+  'VoiceInkAutoSendPolicy\.delayAfterPasteNanoseconds' \
+  VoiceInk/Transcription/Engine/TranscriptionPipeline.swift
+
+require_pattern \
+  "core checks execute shared auto-send delay policy tests" \
+  'PowerModePolicyTests\.testAutoSendPolicySharesDelayAfterPasteEligibility' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "macOS transcription pipeline avoids shell-only auto-send delay policy" \
+  'autoSendAfterPasteDelayNanoseconds|120_000_000|autoSendKey\.isEnabled' \
+  VoiceInk/Transcription/Engine/TranscriptionPipeline.swift
+
 reject_pattern \
   "macOS Power Mode avoids shell-only auto-send key state" \
   'enum +AutoSendKey|var +autoSendKey: +AutoSendKey|performAutoSend\(_ key: +AutoSendKey\)|ForEach\(AutoSendKey\.allCases' \

@@ -813,6 +813,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testConfigurationModePreservesEditIdentityByConfigId", run: { PowerModePolicyTests().testConfigurationModePreservesEditIdentityByConfigId() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testAutoSendKeyPreservesStoredValuesPickerOrderAndLabels", run: { PowerModePolicyTests().testAutoSendKeyPreservesStoredValuesPickerOrderAndLabels() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testAutoSendKeyEnablementAndCodableShape", run: { try PowerModePolicyTests().testAutoSendKeyEnablementAndCodableShape() }),
+            VoiceInkCoreCheck(name: "PowerModePolicyTests.testAutoSendPolicySharesDelayAfterPasteEligibility", run: { PowerModePolicyTests().testAutoSendPolicySharesDelayAfterPasteEligibility() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testNormalizedWebsiteURLPreservesExistingMacOSCleanURLPolicy", run: { PowerModePolicyTests().testNormalizedWebsiteURLPreservesExistingMacOSCleanURLPolicy() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testWebsiteConfigForFormInputReturnsNilForRawEmptyInput", run: { PowerModePolicyTests().testWebsiteConfigForFormInputReturnsNilForRawEmptyInput() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testWebsiteConfigForFormInputNormalizesNonEmptyInput", run: { try PowerModePolicyTests().testWebsiteConfigForFormInputNormalizesNonEmptyInput() }),

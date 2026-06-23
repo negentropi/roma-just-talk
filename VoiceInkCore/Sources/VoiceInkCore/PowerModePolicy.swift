@@ -1464,6 +1464,14 @@ public enum VoiceInkAutoSendKey: String, Codable, CaseIterable, Sendable {
     }
 }
 
+public enum VoiceInkAutoSendPolicy {
+    public static let defaultDelayAfterPasteNanoseconds: UInt64 = 120_000_000
+
+    public static func delayAfterPasteNanoseconds(for key: VoiceInkAutoSendKey) -> UInt64? {
+        key.isEnabled ? defaultDelayAfterPasteNanoseconds : nil
+    }
+}
+
 public enum VoiceInkPowerModeSaveMode: Equatable, Sendable {
     case add
     case edit(UUID)

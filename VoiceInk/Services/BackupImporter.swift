@@ -123,22 +123,6 @@ enum BackupImporter {
             recorderUIManager.recorderType = recType
         }
 
-        let transcriptionAutoCleanupImportPlan = generalImportPlans.transcriptionAutoCleanup
-        if let transcriptionCleanup = transcriptionAutoCleanupImportPlan.isEnabled {
-            VoiceInkTranscriptionAutoCleanupPreference.saveIsEnabled(transcriptionCleanup)
-        }
-        if let transcriptionMinutes = transcriptionAutoCleanupImportPlan.retentionMinutes {
-            VoiceInkTranscriptionAutoCleanupPreference.saveRetentionMinutes(transcriptionMinutes)
-        }
-
-        let audioCleanupImportPlan = generalImportPlans.audioCleanup
-        if let audioCleanup = audioCleanupImportPlan.isEnabled {
-            VoiceInkAudioCleanupPreference.saveIsEnabled(audioCleanup)
-        }
-        if let audioRetention = audioCleanupImportPlan.retentionDays {
-            VoiceInkAudioCleanupPreference.saveRetentionDays(audioRetention)
-        }
-
         let recordingFeedbackImportPlan = generalImportPlans.recordingFeedback
         if let soundFeedback = recordingFeedbackImportPlan.isSoundFeedbackEnabled {
             soundManager.isEnabled = soundFeedback
@@ -152,30 +136,15 @@ enum BackupImporter {
         if let audioDelay = recordingFeedbackImportPlan.audioResumptionDelay {
             mediaController.audioResumptionDelay = audioDelay
         }
-        if let experimentalEnabled = recordingFeedbackImportPlan.isExperimentalFeaturesEnabled {
-            VoiceInkRecordingFeedbackPreference.saveExperimentalFeaturesEnabled(experimentalEnabled)
-        }
         if recordingFeedbackImportPlan.shouldDisablePauseMediaForExperimentalImport {
             playbackController.isPauseMediaEnabled = false
         }
-        let transcriptionCleanupImportPlan = generalImportPlans.transcriptionCleanup
-        if let textFormattingEnabled = transcriptionCleanupImportPlan.isTextFormattingEnabled {
-            VoiceInkTranscriptionCleanupPreferenceStorage.saveTextFormattingEnabled(textFormattingEnabled)
+        let corePreferenceImportResult = VoiceInkGeneralSettingsBackupPolicy.applyCorePreferenceImportPlans(
+            generalImportPlans
+        )
+        if corePreferenceImportResult.didImportRollingBufferSetting {
+            NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
         }
-        if let punctuationCleanupMode = transcriptionCleanupImportPlan.punctuationCleanupMode {
-            PunctuationCleanupMode.setCurrent(punctuationCleanupMode)
-        }
-        if let lowercaseTranscription = transcriptionCleanupImportPlan.lowercaseTranscription {
-            VoiceInkTranscriptionCleanupPreferenceStorage.saveLowercaseTranscription(lowercaseTranscription)
-        }
-        let pasteImportPlan = generalImportPlans.paste
-        if let restoreClipboard = pasteImportPlan.shouldRestoreClipboardAfterPaste {
-            VoiceInkPastePreference.saveShouldRestoreClipboardAfterPaste(restoreClipboard)
-        }
-        if let clipboardDelay = pasteImportPlan.clipboardRestoreDelay {
-            VoiceInkPastePreference.saveClipboardRestoreDelay(clipboardDelay)
-        }
-        importRollingBufferSettings(generalImportPlans.rollingBuffer)
 
         print(VoiceInkSettingsBackupImportDiagnostics.generalSettingsImportedMessage)
     }
@@ -211,20 +180,6 @@ enum BackupImporter {
             case .none:
                 break
             }
-        }
-    }
-
-    private static func importRollingBufferSettings(_ rollingBufferImportPlan: VoiceInkRollingBufferBackupImportPlan) {
-        var didImportRollingBufferSetting = VoiceInkRollingBufferPreloadSettings.saveImportedSettings(
-            from: rollingBufferImportPlan
-        )
-
-        if VoiceInkRollingBufferVADSettings.saveImportedModel(from: rollingBufferImportPlan) {
-            didImportRollingBufferSetting = true
-        }
-
-        if didImportRollingBufferSetting {
-            NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
         }
     }
 

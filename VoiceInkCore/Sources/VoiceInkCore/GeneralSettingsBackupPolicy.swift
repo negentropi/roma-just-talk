@@ -62,6 +62,14 @@ public struct VoiceInkGeneralSettingsBackupImportPlans: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkGeneralSettingsCorePreferenceImportResult: Equatable, Sendable {
+    public let didImportRollingBufferSetting: Bool
+
+    public init(didImportRollingBufferSetting: Bool) {
+        self.didImportRollingBufferSetting = didImportRollingBufferSetting
+    }
+}
+
 public enum VoiceInkGeneralSettingsBackupPolicy {
     public static func backupPreferences(
         recordingShortcut: VoiceInkRecordingShortcutBackupPreferences,
@@ -114,5 +122,101 @@ public enum VoiceInkGeneralSettingsBackupPolicy {
                 from: preferences.rollingBuffer
             )
         )
+    }
+
+    @discardableResult
+    public static func applyCorePreferenceImportPlans(
+        _ importPlans: VoiceInkGeneralSettingsBackupImportPlans,
+        to defaults: UserDefaults = .standard
+    ) -> VoiceInkGeneralSettingsCorePreferenceImportResult {
+        applyTranscriptionAutoCleanupImportPlan(importPlans.transcriptionAutoCleanup, to: defaults)
+        applyAudioCleanupImportPlan(importPlans.audioCleanup, to: defaults)
+        applyRecordingFeedbackCorePreferenceImportPlan(importPlans.recordingFeedback, to: defaults)
+        applyTranscriptionCleanupImportPlan(importPlans.transcriptionCleanup, to: defaults)
+        applyPasteImportPlan(importPlans.paste, to: defaults)
+
+        var didImportRollingBufferSetting = VoiceInkRollingBufferPreloadSettings.saveImportedSettings(
+            from: importPlans.rollingBuffer,
+            to: defaults
+        )
+        if VoiceInkRollingBufferVADSettings.saveImportedModel(from: importPlans.rollingBuffer, to: defaults) {
+            didImportRollingBufferSetting = true
+        }
+
+        return VoiceInkGeneralSettingsCorePreferenceImportResult(
+            didImportRollingBufferSetting: didImportRollingBufferSetting
+        )
+    }
+
+    private static func applyTranscriptionAutoCleanupImportPlan(
+        _ importPlan: VoiceInkTranscriptionAutoCleanupBackupImportPlan,
+        to defaults: UserDefaults
+    ) {
+        if let isEnabled = importPlan.isEnabled {
+            VoiceInkTranscriptionAutoCleanupPreference.saveIsEnabled(isEnabled, to: defaults)
+        }
+        if let retentionMinutes = importPlan.retentionMinutes {
+            VoiceInkTranscriptionAutoCleanupPreference.saveRetentionMinutes(retentionMinutes, to: defaults)
+        }
+    }
+
+    private static func applyAudioCleanupImportPlan(
+        _ importPlan: VoiceInkAudioCleanupBackupImportPlan,
+        to defaults: UserDefaults
+    ) {
+        if let isEnabled = importPlan.isEnabled {
+            VoiceInkAudioCleanupPreference.saveIsEnabled(isEnabled, to: defaults)
+        }
+        if let retentionDays = importPlan.retentionDays {
+            VoiceInkAudioCleanupPreference.saveRetentionDays(retentionDays, to: defaults)
+        }
+    }
+
+    private static func applyRecordingFeedbackCorePreferenceImportPlan(
+        _ importPlan: VoiceInkRecordingFeedbackBackupImportPlan,
+        to defaults: UserDefaults
+    ) {
+        if let isExperimentalFeaturesEnabled = importPlan.isExperimentalFeaturesEnabled {
+            VoiceInkRecordingFeedbackPreference.saveExperimentalFeaturesEnabled(
+                isExperimentalFeaturesEnabled,
+                to: defaults
+            )
+        }
+    }
+
+    private static func applyTranscriptionCleanupImportPlan(
+        _ importPlan: VoiceInkTranscriptionCleanupBackupImportPlan,
+        to defaults: UserDefaults
+    ) {
+        if let isTextFormattingEnabled = importPlan.isTextFormattingEnabled {
+            VoiceInkTranscriptionCleanupPreferenceStorage.saveTextFormattingEnabled(
+                isTextFormattingEnabled,
+                to: defaults
+            )
+        }
+        if let punctuationCleanupMode = importPlan.punctuationCleanupMode {
+            PunctuationCleanupMode.setCurrent(punctuationCleanupMode, in: defaults)
+        }
+        if let lowercaseTranscription = importPlan.lowercaseTranscription {
+            VoiceInkTranscriptionCleanupPreferenceStorage.saveLowercaseTranscription(
+                lowercaseTranscription,
+                to: defaults
+            )
+        }
+    }
+
+    private static func applyPasteImportPlan(
+        _ importPlan: VoiceInkPasteBackupImportPlan,
+        to defaults: UserDefaults
+    ) {
+        if let shouldRestoreClipboardAfterPaste = importPlan.shouldRestoreClipboardAfterPaste {
+            VoiceInkPastePreference.saveShouldRestoreClipboardAfterPaste(
+                shouldRestoreClipboardAfterPaste,
+                to: defaults
+            )
+        }
+        if let clipboardRestoreDelay = importPlan.clipboardRestoreDelay {
+            VoiceInkPastePreference.saveClipboardRestoreDelay(clipboardRestoreDelay, to: defaults)
+        }
     }
 }

@@ -103,6 +103,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "SettingsBackupPolicyTests.testBackupPresentationBuildsImportSuccessTextWithOptionalAPIKeyReminder", run: { SettingsBackupPolicyTests().testBackupPresentationBuildsImportSuccessTextWithOptionalAPIKeyReminder() }),
             VoiceInkCoreCheck(name: "GeneralSettingsBackupPolicyTests.testBackupPreferencesPreserveGroupedExportShape", run: { GeneralSettingsBackupPolicyTests().testBackupPreferencesPreserveGroupedExportShape() }),
             VoiceInkCoreCheck(name: "GeneralSettingsBackupPolicyTests.testImportPlansApplySharedSubPolicies", run: { GeneralSettingsBackupPolicyTests().testImportPlansApplySharedSubPolicies() }),
+            VoiceInkCoreCheck(name: "GeneralSettingsBackupPolicyTests.testApplyCorePreferenceImportPlansWritesPortablePreferences", run: { GeneralSettingsBackupPolicyTests().testApplyCorePreferenceImportPlansWritesPortablePreferences() }),
+            VoiceInkCoreCheck(name: "GeneralSettingsBackupPolicyTests.testApplyCorePreferenceImportPlansIgnoresMissingFields", run: { GeneralSettingsBackupPolicyTests().testApplyCorePreferenceImportPlansIgnoresMissingFields() }),
             VoiceInkCoreCheck(name: "AIPromptsTests.testFinalPromptTextReturnsRawPromptWithoutSystemInstructions", run: { AIPromptsTests().testFinalPromptTextReturnsRawPromptWithoutSystemInstructions() }),
             VoiceInkCoreCheck(name: "AIPromptsTests.testFinalPromptTextWrapsPromptWithSystemInstructions", run: { AIPromptsTests().testFinalPromptTextWrapsPromptWithSystemInstructions() }),
             VoiceInkCoreCheck(name: "AIPromptsTests.testEnhancementPromptBuilderAppendsContextSectionsInMacOSOrder", run: { AIPromptsTests().testEnhancementPromptBuilderAppendsContextSectionsInMacOSOrder() }),

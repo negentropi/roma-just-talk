@@ -101,3 +101,45 @@ public enum VoiceInkMacOSPermissionSettingsPresentation {
         infoTipURLString: "https://tryvoiceink.com/docs/contextual-awareness"
     )
 }
+
+public enum VoiceInkMacOSPermissionPollingAction: Equatable, Sendable {
+    case continuePolling
+    case stopPolling
+}
+
+public struct VoiceInkMacOSPermissionPollingState: Equatable, Sendable {
+    public private(set) var pollsRemaining: Int
+
+    public static let stopped = VoiceInkMacOSPermissionPollingState(pollsRemaining: 0)
+
+    public var isActive: Bool {
+        pollsRemaining > 0
+    }
+
+    public init(pollsRemaining: Int) {
+        self.pollsRemaining = max(0, pollsRemaining)
+    }
+
+    public static func started(limit: Int = VoiceInkMacOSPermissionTimingPolicy.refreshPollLimit) -> Self {
+        VoiceInkMacOSPermissionPollingState(pollsRemaining: limit)
+    }
+
+    @discardableResult
+    public mutating func consumePoll() -> VoiceInkMacOSPermissionPollingAction {
+        guard pollsRemaining > 0 else {
+            return .stopPolling
+        }
+
+        pollsRemaining -= 1
+        return pollsRemaining > 0 ? .continuePolling : .stopPolling
+    }
+}
+
+public enum VoiceInkMacOSPermissionTimingPolicy {
+    public static let pollingInterval: TimeInterval = 0.5
+    public static let refreshPollLimit = 120
+    public static let relaunchRequiredDelay: TimeInterval = 6.0
+    public static let manualRefreshAnimationResetDelay: TimeInterval = 0.5
+    public static let floatingAuthorizationPanelDelay: TimeInterval = 0.25
+    public static let openPermissionsGrantMicrophoneDelay: TimeInterval = 0.2
+}

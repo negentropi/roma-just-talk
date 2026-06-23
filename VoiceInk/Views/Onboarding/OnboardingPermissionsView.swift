@@ -310,7 +310,10 @@ struct OnboardingPermissionsView: View {
             permissionFlowGuide.open(.accessibility)
             
             // Start checking for permission status
-            Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { timer in
+            Timer.scheduledTimer(
+                withTimeInterval: VoiceInkMacOSPermissionTimingPolicy.pollingInterval,
+                repeats: true
+            ) { timer in
                 if AXIsProcessTrusted() {
                     timer.invalidate()
                     permissionStates[currentPermissionIndex] = true
@@ -327,7 +330,10 @@ struct OnboardingPermissionsView: View {
             permissionFlowGuide.open(.inputMonitoring)
 
             let permissionIndex = currentPermissionIndex
-            Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { timer in
+            Timer.scheduledTimer(
+                withTimeInterval: VoiceInkMacOSPermissionTimingPolicy.pollingInterval,
+                repeats: true
+            ) { timer in
                 if ShortcutMonitor.preflightListenEventAccess() {
                     timer.invalidate()
                     permissionStates[permissionIndex] = true
@@ -348,7 +354,10 @@ struct OnboardingPermissionsView: View {
             
             let permissionIndex = currentPermissionIndex
             // Start checking for permission status
-            Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { timer in
+            Timer.scheduledTimer(
+                withTimeInterval: VoiceInkMacOSPermissionTimingPolicy.pollingInterval,
+                repeats: true
+            ) { timer in
                 if CGPreflightScreenCaptureAccess() {
                     timer.invalidate()
                     permissionStates[permissionIndex] = true
@@ -383,7 +392,9 @@ struct OnboardingPermissionsView: View {
     }
     
     private func markRelaunchNeededIfPermissionStillInactive(at index: Int, isActive: @escaping () -> Bool) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 6.0) {
+        DispatchQueue.main.asyncAfter(
+            deadline: .now() + VoiceInkMacOSPermissionTimingPolicy.relaunchRequiredDelay
+        ) {
             Task { @MainActor in
                 guard index < permissionStates.count else { return }
 

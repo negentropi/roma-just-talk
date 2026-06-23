@@ -4375,6 +4375,12 @@ require_pattern \
   'VoiceInkMacOSOnboardingPermissionPresentation\.all|audioDeviceSelectionPresentation\.(emptyStateTitle|pickerLabel|selectedDevicePlaceholder|unknownDeviceName|recommendationText)|skipButtonTitle|canSkipWhenNotGranted|buttonTitle\(isGranted:|screenContextInfoMessage' \
   VoiceInk/Views/Onboarding/OnboardingPermissionsView.swift
 
+require_patterns \
+  "macOS onboarding permissions use shared permission timing policy" \
+  VoiceInk/Views/Onboarding/OnboardingPermissionsView.swift \
+  'VoiceInkMacOSPermissionTimingPolicy\.pollingInterval' \
+  'VoiceInkMacOSPermissionTimingPolicy\.relaunchRequiredDelay'
+
 reject_pattern \
   "macOS onboarding permissions avoid shell-only permission presentation copy" \
   'struct +OnboardingPermission[[:space:]:{]|enum +PermissionType|"(Microphone Access|Microphone Selection|Accessibility Access|Input Monitoring|Screen Context \(Optional\)|Keyboard Shortcut|Enable your microphone to start speaking and converting your voice to text instantly\.|Select the audio input device you want to use with roma-just-talk\.|Add roma-just-talk to Accessibility, then turn its switch on\.|Allow roma-just-talk to detect your recording shortcut while other apps are active\.|Enable screen context only if you want roma-just-talk to use visible text for transcript enhancement\.|Set up a keyboard shortcut to quickly access roma-just-talk from anywhere\.|No microphones found|Microphone:|Select Device|Unknown Device|For best results, using your Mac'\''s built-in microphone is recommended\.|Skip for now|Relaunch to Apply|Set Shortcut|Grant|Enable)"' \
@@ -4387,7 +4393,7 @@ reject_pattern \
 
 require_pattern \
   "shared macOS permission settings presentation lives in VoiceInkCore" \
-  'VoiceInkMacOSPermissionSettingsPresentation|VoiceInkMacOSPermissionSettingsCardPresentation|headerIconSystemName|inputMonitoringCard|screenContextCard|relaunchRequiredMessage' \
+  'VoiceInkMacOSPermissionSettingsPresentation|VoiceInkMacOSPermissionSettingsCardPresentation|VoiceInkMacOSPermissionTimingPolicy|VoiceInkMacOSPermissionPollingState|headerIconSystemName|inputMonitoringCard|screenContextCard|relaunchRequiredMessage|pollingInterval|refreshPollLimit|consumePoll' \
   VoiceInkCore/Sources/VoiceInkCore/PermissionPresentation.swift
 
 require_pattern \
@@ -4395,10 +4401,47 @@ require_pattern \
   'VoiceInkMacOSPermissionSettingsPresentation\.(headerIconSystemName|inputMonitoringCard|microphoneCard|accessibilityCard|screenContextCard)|presentation\.buttonTitle\(requiresRelaunch:' \
   VoiceInk/Views/PermissionsView.swift
 
+require_patterns \
+  "macOS permissions settings uses shared permission timing and polling state" \
+  VoiceInk/Views/PermissionsView.swift \
+  'VoiceInkMacOSPermissionTimingPolicy\.pollingInterval' \
+  'VoiceInkMacOSPermissionTimingPolicy\.relaunchRequiredDelay' \
+  'VoiceInkMacOSPermissionTimingPolicy\.manualRefreshAnimationResetDelay' \
+  'VoiceInkMacOSPermissionPollingState\.stopped' \
+  'permissionRefreshPollingState = \.started\(\)' \
+  'permissionRefreshPollingState\.consumePoll\(\)'
+
+require_patterns \
+  "macOS permission refresh center uses shared permission timing and polling state" \
+  VoiceInk/Services/PermissionFlowGuide.swift \
+  'VoiceInkMacOSPermissionTimingPolicy\.pollingInterval' \
+  'VoiceInkMacOSPermissionTimingPolicy\.floatingAuthorizationPanelDelay' \
+  'VoiceInkMacOSPermissionTimingPolicy\.openPermissionsGrantMicrophoneDelay' \
+  'VoiceInkMacOSPermissionPollingState\.stopped' \
+  'pollingState = \.started\(\)' \
+  'pollingState\.consumePoll\(\)'
+
+require_pattern \
+  "core checks execute permission timing and polling tests" \
+  'PermissionPresentationTests\.testMacOSPermissionTimingPolicyPreservesPollingAndRelaunchDelays|PermissionPresentationTests\.testMacOSPermissionPollingStateStopsAfterConfiguredPollLimit' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "migration checklist tracks shared permission timing and polling policy" \
+  'macOS permission polling countdown/timing policy|VoiceInkMacOSPermissionPollingState' \
+  docs/ios-single-repo-migration.md
+
 reject_pattern \
   "macOS permissions settings avoids shell-only permission presentation copy" \
   '"(App Permissions|Microphone and shortcut access are needed for recording\. Screen context is optional\.|Input Monitoring Access|Allow roma-just-talk to listen for your recording hotkey globally|Microphone Access|Allow roma-just-talk to record your voice for transcription|Accessibility Access|Add roma-just-talk to Accessibility, then turn its switch on|Screen Context \(Optional\)|Use visible screen text to improve transcript enhancement when you choose\.|Relaunch to Apply|Grant|Enable|If you already turned this on in System Settings, relaunch roma-just-talk to activate it\.)"|systemName: "arrow\.clockwise"|systemName: "checkmark\.seal\.fill"|systemName: "xmark\.seal\.fill"|systemName: "arrow\.right"' \
   VoiceInk/Views/PermissionsView.swift
+
+reject_pattern \
+  "macOS permission shells avoid duplicate polling and relaunch timing literals" \
+  'withTimeInterval: 0\.5|deadline: \.now\(\) \+ (0\.25|0\.2|6\.0)|pollsRemaining = 120|permissionRefreshPollsRemaining' \
+  VoiceInk/Services/PermissionFlowGuide.swift \
+  VoiceInk/Views/PermissionsView.swift \
+  VoiceInk/Views/Onboarding/OnboardingPermissionsView.swift
 
 reject_pattern \
   "iOS model download views avoid shell-only downloaded/progress state assembly" \

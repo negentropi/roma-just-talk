@@ -15,7 +15,7 @@ class PermissionManager: ObservableObject {
     @Published var screenRecordingNeedsRelaunch = false
     private let permissionFlowGuide = PermissionFlowGuide()
     private var permissionRefreshTimer: Timer?
-    private var permissionRefreshPollsRemaining = 0
+    private var permissionRefreshPollingState = VoiceInkMacOSPermissionPollingState.stopped
     
     init() {
         // Start observing system events that might indicate permission changes
@@ -123,8 +123,11 @@ class PermissionManager: ObservableObject {
     private func startPermissionRefreshPolling() {
         PermissionRefreshCenter.shared.beginPolling()
         permissionRefreshTimer?.invalidate()
-        permissionRefreshPollsRemaining = 120
-        permissionRefreshTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] timer in
+        permissionRefreshPollingState = .started()
+        permissionRefreshTimer = Timer.scheduledTimer(
+            withTimeInterval: VoiceInkMacOSPermissionTimingPolicy.pollingInterval,
+            repeats: true
+        ) { [weak self] timer in
             Task { @MainActor [weak self] in
                 guard let self else {
                     timer.invalidate()
@@ -132,9 +135,8 @@ class PermissionManager: ObservableObject {
                 }
 
                 self.checkAllPermissions()
-                self.permissionRefreshPollsRemaining -= 1
 
-                if self.permissionRefreshPollsRemaining <= 0 {
+                if self.permissionRefreshPollingState.consumePoll() == .stopPolling {
                     timer.invalidate()
                     self.permissionRefreshTimer = nil
                 }
@@ -148,7 +150,9 @@ class PermissionManager: ObservableObject {
     }
 
     private func markRelaunchNeededIfPermissionStillInactive(_ permission: RelaunchSensitivePermission) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 6.0) { [weak self] in
+        DispatchQueue.main.asyncAfter(
+            deadline: .now() + VoiceInkMacOSPermissionTimingPolicy.relaunchRequiredDelay
+        ) { [weak self] in
             Task { @MainActor [weak self] in
                 guard let self else { return }
 
@@ -220,7 +224,9 @@ struct PermissionCard: View {
                         checkPermission()
                         
                         // Reset the animation after a delay
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        DispatchQueue.main.asyncAfter(
+                            deadline: .now() + VoiceInkMacOSPermissionTimingPolicy.manualRefreshAnimationResetDelay
+                        ) {
                             isRefreshing = false
                         }
                     }) {

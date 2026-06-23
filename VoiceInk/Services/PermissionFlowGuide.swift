@@ -23,7 +23,9 @@ final class PermissionFlowGuide: ObservableObject {
         )
 
         if pane.supportsFloatingAuthorizationPanel {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+            DispatchQueue.main.asyncAfter(
+                deadline: .now() + VoiceInkMacOSPermissionTimingPolicy.floatingAuthorizationPanelDelay
+            ) {
                 Task { @MainActor in
                     controller.showPanel()
                 }
@@ -65,7 +67,7 @@ final class PermissionRefreshCenter: NSObject {
     static let shared = PermissionRefreshCenter()
 
     private var timer: Timer?
-    private var pollsRemaining = 0
+    private var pollingState = VoiceInkMacOSPermissionPollingState.stopped
     private var lastSnapshot = AppPermissionSnapshot.current()
     private var isObservingApplicationActivation = false
 
@@ -88,10 +90,13 @@ final class PermissionRefreshCenter: NSObject {
     func beginPolling() {
         startObservingApplicationActivation()
         refreshPermissions()
-        pollsRemaining = 120
+        pollingState = .started()
 
         guard timer == nil else { return }
-        timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] timer in
+        timer = Timer.scheduledTimer(
+            withTimeInterval: VoiceInkMacOSPermissionTimingPolicy.pollingInterval,
+            repeats: true
+        ) { [weak self] timer in
             Task { @MainActor [weak self] in
                 guard let self else {
                     timer.invalidate()
@@ -99,9 +104,8 @@ final class PermissionRefreshCenter: NSObject {
                 }
 
                 self.refreshPermissions()
-                self.pollsRemaining -= 1
 
-                if self.pollsRemaining <= 0 {
+                if self.pollingState.consumePoll() == .stopPolling {
                     timer.invalidate()
                     self.timer = nil
                 }
@@ -198,7 +202,9 @@ enum PermissionGrantCoordinator {
             userInfo: VoiceInkMacOSNavigationRequest.userInfo(destination: .permissions)
         )
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+        DispatchQueue.main.asyncAfter(
+            deadline: .now() + VoiceInkMacOSPermissionTimingPolicy.openPermissionsGrantMicrophoneDelay
+        ) {
             Task { @MainActor in
                 grantMicrophone()
             }

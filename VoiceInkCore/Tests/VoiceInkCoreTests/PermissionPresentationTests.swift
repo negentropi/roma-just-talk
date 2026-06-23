@@ -64,4 +64,29 @@ final class PermissionPresentationTests: XCTestCase {
         )
         XCTAssertEqual(screenContext.infoTipURLString, "https://tryvoiceink.com/docs/contextual-awareness")
     }
+
+    func testMacOSPermissionTimingPolicyPreservesPollingAndRelaunchDelays() {
+        XCTAssertEqual(VoiceInkMacOSPermissionTimingPolicy.pollingInterval, 0.5)
+        XCTAssertEqual(VoiceInkMacOSPermissionTimingPolicy.refreshPollLimit, 120)
+        XCTAssertEqual(VoiceInkMacOSPermissionTimingPolicy.relaunchRequiredDelay, 6.0)
+        XCTAssertEqual(VoiceInkMacOSPermissionTimingPolicy.manualRefreshAnimationResetDelay, 0.5)
+        XCTAssertEqual(VoiceInkMacOSPermissionTimingPolicy.floatingAuthorizationPanelDelay, 0.25)
+        XCTAssertEqual(VoiceInkMacOSPermissionTimingPolicy.openPermissionsGrantMicrophoneDelay, 0.2)
+    }
+
+    func testMacOSPermissionPollingStateStopsAfterConfiguredPollLimit() {
+        var state = VoiceInkMacOSPermissionPollingState.started(limit: 2)
+
+        XCTAssertTrue(state.isActive)
+        XCTAssertEqual(state.pollsRemaining, 2)
+        XCTAssertEqual(state.consumePoll(), .continuePolling)
+        XCTAssertEqual(state.pollsRemaining, 1)
+        XCTAssertEqual(state.consumePoll(), .stopPolling)
+        XCTAssertFalse(state.isActive)
+        XCTAssertEqual(state.consumePoll(), .stopPolling)
+
+        let negativeState = VoiceInkMacOSPermissionPollingState(pollsRemaining: -1)
+        XCTAssertFalse(negativeState.isActive)
+        XCTAssertEqual(negativeState.pollsRemaining, 0)
+    }
 }

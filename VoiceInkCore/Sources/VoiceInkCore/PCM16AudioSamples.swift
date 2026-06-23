@@ -17,6 +17,21 @@ public enum VoiceInkAudioProcessingError: LocalizedError, Equatable, Sendable {
     }
 }
 
+public enum VoiceInkWhisperAudioSamples {
+    public static func floatSamples(fromWAVData data: Data) -> [Float]? {
+        VoiceInkPCM16Audio.leveledFloatSamples(
+            fromWAVData: data,
+            targetPeak: VoiceInkWhisperRuntimeDefaults.audioLevelingTargetPeak,
+            noiseFloorPeak: VoiceInkWhisperRuntimeDefaults.audioLevelingNoiseFloorPeak,
+            maxGain: VoiceInkWhisperRuntimeDefaults.audioLevelingMaxGain
+        )
+    }
+
+    public static func floatSamples(fromWAVFileAt url: URL) throws -> [Float]? {
+        try floatSamples(fromWAVData: Data(contentsOf: url))
+    }
+}
+
 public enum VoiceInkPCM16Audio {
     public static let mono16kSampleRateHz = 16_000
     public static let mono16kSampleRate = Double(mono16kSampleRateHz)

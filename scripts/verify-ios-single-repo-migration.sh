@@ -1899,6 +1899,14 @@ require_pattern \
   'VoiceInkAudioProcessingError|invalidAudioFile|conversionFailed|unsupportedFormat' \
   VoiceInkCore/Sources/VoiceInkCore/PCM16AudioSamples.swift
 
+section "obsolete standalone Whisper audio sample module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/WhisperAudioSamples.swift
+
+require_pattern \
+  "shared Whisper audio sample policy lives with PCM16 conversion" \
+  'VoiceInkWhisperAudioSamples|audioLevelingTargetPeak|leveledFloatSamples' \
+  VoiceInkCore/Sources/VoiceInkCore/PCM16AudioSamples.swift
+
 require_pattern \
   "core tests pin shared audio-processing error copy" \
   'testAudioProcessingErrorDescriptionsPreserveMacOSImportCopy' \

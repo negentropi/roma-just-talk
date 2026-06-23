@@ -3487,6 +3487,16 @@ reject_pattern \
   VoiceInk/Transcription/Whisper/LibWhisper.swift \
   iOS/VoiceInk-ios/LibWhisper.swift
 
+section "obsolete standalone VAD model resource module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/VADModelFiles.swift
+
+require_patterns \
+  "VAD resource helper lives with Whisper model-file policy" \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift \
+  'VoiceInkVADModelFiles' \
+  'ggml-silero-v5\.1\.2' \
+  'VoiceInkWhisperModelFiles'
+
 require_pattern \
   "macOS local Whisper uses shared VAD resource policy" \
   'VoiceInkVADModelFiles\.sileroPath' \

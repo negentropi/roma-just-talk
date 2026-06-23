@@ -457,7 +457,9 @@ struct AudioPlayerView: View {
                     .help(VoiceInkAudioPlaybackRate.controlTitle)
 
                     CircleIconButton(
-                        icon: enhancementService.activePrompt?.icon ?? "sparkles",
+                        icon: VoiceInkAudioPlaybackPresentation.enhancementPromptSystemImageName(
+                            activePromptIcon: enhancementService.activePrompt?.icon
+                        ),
                         action: { showPromptPopover.toggle() }
                     )
                     .opacity(enhancementService.isEnhancementEnabled ? 1.0 : 0.4)

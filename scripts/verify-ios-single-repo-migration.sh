@@ -10084,6 +10084,11 @@ require_pattern \
   'showInFinderHelpText|selectEnhancementPromptHelpText|retranscribeAudioHelpText|reEnhanceWithSelectedPromptHelpText|viewDetailsHelpText' \
   VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
 
+require_pattern \
+  "shared audio playback presentation owns enhancement prompt icon fallback" \
+  'enhancementPromptFallbackSystemImageName|enhancementPromptSystemImageName' \
+  VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
+
 require_patterns \
   "shared audio playback action banner presentation owns macOS retry copy" \
   VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift \
@@ -10227,7 +10232,7 @@ require_pattern \
 
 require_pattern \
   "migration docs track shared iOS playback session configuration" \
-  'VoiceInkIOSAudioPlaybackSessionConfiguration` for the iOS playback category/mode policy' \
+  'VoiceInkIOSAudioPlaybackSessionConfiguration` for the iOS playback category/mode policy.*enhancement prompt icon fallback' \
   docs/ios-single-repo-migration.md
 
 require_pattern \
@@ -10268,6 +10273,16 @@ require_pattern \
 require_pattern \
   "macOS audio player uses shared audio action help copy" \
   'VoiceInkAudioPlaybackPresentation\.(showInFinderHelpText|selectEnhancementPromptHelpText|retranscribeAudioHelpText|reEnhanceWithSelectedPromptHelpText|viewDetailsHelpText)' \
+  VoiceInk/Views/AudioPlayerView.swift
+
+require_pattern \
+  "macOS audio player uses shared enhancement prompt icon fallback" \
+  'VoiceInkAudioPlaybackPresentation\.enhancementPromptSystemImageName' \
+  VoiceInk/Views/AudioPlayerView.swift
+
+reject_pattern \
+  "macOS audio player avoids shell-owned enhancement prompt icon fallback" \
+  'activePrompt\?\.icon \?\? "sparkles"|"sparkles"' \
   VoiceInk/Views/AudioPlayerView.swift
 
 require_pattern \

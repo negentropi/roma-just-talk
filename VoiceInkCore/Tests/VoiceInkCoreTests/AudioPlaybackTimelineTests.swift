@@ -256,6 +256,15 @@ final class AudioPlaybackTimelineTests: XCTestCase {
             VoiceInkAudioPlaybackPresentation.selectEnhancementPromptHelpText,
             "Select enhancement prompt"
         )
+        XCTAssertEqual(VoiceInkAudioPlaybackPresentation.enhancementPromptFallbackSystemImageName, "sparkles")
+        XCTAssertEqual(
+            VoiceInkAudioPlaybackPresentation.enhancementPromptSystemImageName(activePromptIcon: "wand.and.stars"),
+            "wand.and.stars"
+        )
+        XCTAssertEqual(
+            VoiceInkAudioPlaybackPresentation.enhancementPromptSystemImageName(activePromptIcon: nil),
+            "sparkles"
+        )
         XCTAssertEqual(VoiceInkAudioPlaybackPresentation.retranscribeAudioHelpText, "Retranscribe this audio")
         XCTAssertEqual(
             VoiceInkAudioPlaybackPresentation.reEnhanceWithSelectedPromptHelpText,

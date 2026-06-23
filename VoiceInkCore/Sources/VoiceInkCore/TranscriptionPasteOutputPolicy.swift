@@ -91,3 +91,51 @@ public enum VoiceInkTranscriptionPasteOutputPolicy {
         return textWithLicensePrefix + (appendTrailingSpace ? " " : "")
     }
 }
+
+public enum VoiceInkCursorTextContextPolicy {
+    public static let defaultMaximumLength = 240
+    public static let parentTraversalLimit = 4
+    public static let textInputRoleNames: Set<String> = [
+        "AXComboBox",
+        "AXTextArea",
+        "AXTextField"
+    ]
+
+    public static func shouldAttemptRead(maximumLength: Int = defaultMaximumLength) -> Bool {
+        maximumLength > 0
+    }
+
+    public static func prefixLength(
+        cursorLocation: Int,
+        maximumLength: Int = defaultMaximumLength
+    ) -> Int? {
+        guard shouldAttemptRead(maximumLength: maximumLength),
+              cursorLocation >= 0 else {
+            return nil
+        }
+
+        return min(maximumLength, cursorLocation)
+    }
+
+    public static func isTextInputRole(_ role: String?) -> Bool {
+        guard let role else { return false }
+        return textInputRoleNames.contains(role)
+    }
+
+    public static func valueSuffix(
+        from text: String,
+        role: String?,
+        maximumLength: Int = defaultMaximumLength
+    ) -> String? {
+        guard shouldAttemptRead(maximumLength: maximumLength),
+              isTextInputRole(role) else {
+            return nil
+        }
+
+        guard text.count > maximumLength else {
+            return text
+        }
+
+        return String(text.suffix(maximumLength))
+    }
+}

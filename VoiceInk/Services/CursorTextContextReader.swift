@@ -1,17 +1,13 @@
 import AppKit
 import Foundation
+import VoiceInkCore
 
 enum CursorTextContextReader {
-    private static let defaultMaximumLength = 240
-    private static let textInputRoles = Set([
-        kAXComboBoxRole as String,
-        kAXTextAreaRole as String,
-        kAXTextFieldRole as String
-    ])
-
     @MainActor
-    static func textBeforeCursor(maximumLength: Int = defaultMaximumLength) -> String? {
-        guard maximumLength > 0,
+    static func textBeforeCursor(
+        maximumLength: Int = VoiceInkCursorTextContextPolicy.defaultMaximumLength
+    ) -> String? {
+        guard VoiceInkCursorTextContextPolicy.shouldAttemptRead(maximumLength: maximumLength),
               AXIsProcessTrusted() else {
             return nil
         }
@@ -30,13 +26,15 @@ enum CursorTextContextReader {
 
         for element in elements {
             guard let selectedRange = selectedTextRange(from: element),
-                  selectedRange.location != kCFNotFound else {
+                  let prefixLength = VoiceInkCursorTextContextPolicy.prefixLength(
+                    cursorLocation: selectedRange.location,
+                    maximumLength: maximumLength
+                  ) else {
                 continue
             }
 
-            guard selectedRange.location > 0 else { return "" }
+            guard prefixLength > 0 else { return "" }
 
-            let prefixLength = min(maximumLength, selectedRange.location)
             let prefixRange = CFRange(
                 location: selectedRange.location - prefixLength,
                 length: prefixLength
@@ -61,7 +59,7 @@ enum CursorTextContextReader {
         var elements = [element]
         var currentElement = element
 
-        for _ in 0..<4 {
+        for _ in 0..<VoiceInkCursorTextContextPolicy.parentTraversalLimit {
             guard let parent = parentElement(from: currentElement) else {
                 break
             }
@@ -166,7 +164,8 @@ enum CursorTextContextReader {
     }
 
     private static func valueSuffix(in element: AXUIElement, maximumLength: Int) -> String? {
-        guard isTextInput(element) else {
+        guard let role = role(from: element),
+              VoiceInkCursorTextContextPolicy.isTextInputRole(role) else {
             return nil
         }
 
@@ -180,14 +179,14 @@ enum CursorTextContextReader {
             return nil
         }
 
-        guard text.count > maximumLength else {
-            return text
-        }
-
-        return String(text.suffix(maximumLength))
+        return VoiceInkCursorTextContextPolicy.valueSuffix(
+            from: text,
+            role: role,
+            maximumLength: maximumLength
+        )
     }
 
-    private static func isTextInput(_ element: AXUIElement) -> Bool {
+    private static func role(from element: AXUIElement) -> String? {
         var value: CFTypeRef?
         guard AXUIElementCopyAttributeValue(
             element,
@@ -195,9 +194,9 @@ enum CursorTextContextReader {
             &value
         ) == .success,
               let role = value as? String else {
-            return false
+            return nil
         }
 
-        return textInputRoles.contains(role)
+        return role
     }
 }

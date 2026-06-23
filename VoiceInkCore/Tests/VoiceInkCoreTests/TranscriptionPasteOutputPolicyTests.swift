@@ -116,4 +116,70 @@ final class TranscriptionPasteOutputPolicyTests: XCTestCase {
         XCTAssertEqual(presentation.toggleTitle, "Add Space After Paste")
         XCTAssertEqual(presentation.helpText, "Add a trailing space after pasted transcription output.")
     }
+
+    func testCursorTextContextPolicyPreservesMacOSAccessibilityReadBounds() {
+        XCTAssertEqual(VoiceInkCursorTextContextPolicy.defaultMaximumLength, 240)
+        XCTAssertEqual(VoiceInkCursorTextContextPolicy.parentTraversalLimit, 4)
+        XCTAssertTrue(VoiceInkCursorTextContextPolicy.shouldAttemptRead(maximumLength: 1))
+        XCTAssertFalse(VoiceInkCursorTextContextPolicy.shouldAttemptRead(maximumLength: 0))
+        XCTAssertFalse(VoiceInkCursorTextContextPolicy.shouldAttemptRead(maximumLength: -1))
+    }
+
+    func testCursorTextContextPolicyOwnsTextInputRoles() {
+        XCTAssertTrue(VoiceInkCursorTextContextPolicy.isTextInputRole("AXTextField"))
+        XCTAssertTrue(VoiceInkCursorTextContextPolicy.isTextInputRole("AXTextArea"))
+        XCTAssertTrue(VoiceInkCursorTextContextPolicy.isTextInputRole("AXComboBox"))
+        XCTAssertFalse(VoiceInkCursorTextContextPolicy.isTextInputRole("AXButton"))
+        XCTAssertFalse(VoiceInkCursorTextContextPolicy.isTextInputRole(nil))
+    }
+
+    func testCursorTextContextPolicyBoundsPrefixLength() {
+        XCTAssertEqual(
+            VoiceInkCursorTextContextPolicy.prefixLength(cursorLocation: 120, maximumLength: 240),
+            120
+        )
+        XCTAssertEqual(
+            VoiceInkCursorTextContextPolicy.prefixLength(cursorLocation: 300, maximumLength: 240),
+            240
+        )
+        XCTAssertEqual(
+            VoiceInkCursorTextContextPolicy.prefixLength(cursorLocation: 0, maximumLength: 240),
+            0
+        )
+        XCTAssertNil(VoiceInkCursorTextContextPolicy.prefixLength(cursorLocation: -1, maximumLength: 240))
+        XCTAssertNil(VoiceInkCursorTextContextPolicy.prefixLength(cursorLocation: 1, maximumLength: 0))
+    }
+
+    func testCursorTextContextPolicyBoundsValueSuffixToTextInputRoles() {
+        XCTAssertEqual(
+            VoiceInkCursorTextContextPolicy.valueSuffix(
+                from: "hello",
+                role: "AXTextField",
+                maximumLength: 10
+            ),
+            "hello"
+        )
+        XCTAssertEqual(
+            VoiceInkCursorTextContextPolicy.valueSuffix(
+                from: "hello world",
+                role: "AXTextArea",
+                maximumLength: 5
+            ),
+            "world"
+        )
+        XCTAssertNil(
+            VoiceInkCursorTextContextPolicy.valueSuffix(
+                from: "hello",
+                role: "AXButton",
+                maximumLength: 10
+            )
+        )
+        XCTAssertNil(
+            VoiceInkCursorTextContextPolicy.valueSuffix(
+                from: "hello",
+                role: "AXTextField",
+                maximumLength: 0
+            )
+        )
+    }
 }

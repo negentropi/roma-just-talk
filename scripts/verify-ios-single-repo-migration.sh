@@ -8294,6 +8294,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionPasteOutputPolicy.swift
 
 require_pattern \
+  "shared cursor text context policy owns macOS reader bounds and role filtering" \
+  'VoiceInkCursorTextContextPolicy|defaultMaximumLength = 240|parentTraversalLimit = 4|textInputRoleNames|prefixLength|valueSuffix' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionPasteOutputPolicy.swift
+
+require_pattern \
   "shared trailing-space preference owns user-defaults key" \
   'userDefaultsKey' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionPasteOutputPolicy.swift
@@ -8333,6 +8338,16 @@ require_pattern \
   'preparedTextForPaste|shouldReadCursorContext' \
   VoiceInk/Paste/CursorPaster.swift
 
+require_pattern \
+  "macOS cursor text reader adapts shared cursor-context reader policy" \
+  'VoiceInkCursorTextContextPolicy\.(defaultMaximumLength|shouldAttemptRead|parentTraversalLimit|prefixLength|isTextInputRole|valueSuffix)' \
+  VoiceInk/Services/CursorTextContextReader.swift
+
+reject_pattern \
+  "macOS cursor text reader avoids shell-owned cursor-context reader policy" \
+  'defaultMaximumLength = 240|textInputRoles|0\.\.<4|min\(maximumLength, selectedRange\.location\)|String\(text\.suffix\(maximumLength\)\)' \
+  VoiceInk/Services/CursorTextContextReader.swift
+
 reject_pattern \
   "macOS transcription pipeline avoids shell-only paste output policy" \
   'Your trial has expired|"AppendTrailingSpace"|textToPaste \+ \(appendSpace \? " " : ""\)|VoiceInkContextualCapitalizationFormatter\.(needsCursorContext|format)|VoiceInkTranscriptionPasteOutputPolicy\.cursorPasteTextPlan' \
@@ -8341,6 +8356,11 @@ reject_pattern \
 require_pattern \
   "core checks execute preference-backed cursor paste plan test" \
   'TranscriptionPasteOutputPolicyTests\.testCursorPasteTextPlanReadsLowercaseCleanupPreference' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute cursor text context policy tests" \
+  'TranscriptionPasteOutputPolicyTests\.testCursorTextContextPolicyPreservesMacOSAccessibilityReadBounds|TranscriptionPasteOutputPolicyTests\.testCursorTextContextPolicyOwnsTextInputRoles|TranscriptionPasteOutputPolicyTests\.testCursorTextContextPolicyBoundsPrefixLength|TranscriptionPasteOutputPolicyTests\.testCursorTextContextPolicyBoundsValueSuffixToTextInputRoles' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -8376,7 +8396,7 @@ reject_pattern \
 
 require_pattern \
   "migration checklist tracks shared paste output gate" \
-  'macOS final paste text assembly routes cursor-context capitalization planning, lowercase-cleanup preference gating, trial-expired prefix, trailing-space storage/default registration, and trailing-space settings labels/help through `VoiceInkTranscriptionPasteOutputPolicy`/`VoiceInkAppendTrailingSpacePreference`' \
+  'macOS final paste text assembly routes cursor-context capitalization planning, cursor-context reader bounds/text-input role filtering, lowercase-cleanup preference gating, trial-expired prefix, trailing-space storage/default registration, and trailing-space settings labels/help through `VoiceInkTranscriptionPasteOutputPolicy`/`VoiceInkCursorTextContextPolicy`/`VoiceInkAppendTrailingSpacePreference`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

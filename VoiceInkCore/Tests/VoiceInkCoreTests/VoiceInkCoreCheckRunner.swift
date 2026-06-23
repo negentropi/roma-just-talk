@@ -709,6 +709,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testLeveledLittleEndianDataLeavesSingleImpulseUnchanged", run: { PCM16AudioSamplesTests().testLeveledLittleEndianDataLeavesSingleImpulseUnchanged() }),
             VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testLeveledLittleEndianDataLeavesSparseImpulseTrainUnchanged", run: { PCM16AudioSamplesTests().testLeveledLittleEndianDataLeavesSparseImpulseTrainUnchanged() }),
             VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testDurationAndByteCountUseMono16kPCM16Format", run: { PCM16AudioSamplesTests().testDurationAndByteCountUseMono16kPCM16Format() }),
+            VoiceInkCoreCheck(name: "AudioRecorderConfigurationTests.testIOSAudioRecorderConfigurationUsesMono16kPCM16Policy", run: { AudioRecorderConfigurationTests().testIOSAudioRecorderConfigurationUsesMono16kPCM16Policy() }),
             VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testMonoPCM16ChunksSplitDataOnSampleAlignedByteCounts", run: { PCM16AudioSamplesTests().testMonoPCM16ChunksSplitDataOnSampleAlignedByteCounts() }),
             VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testMonoPCM16ChunksDropTrailingPartialSample", run: { PCM16AudioSamplesTests().testMonoPCM16ChunksDropTrailingPartialSample() }),
             VoiceInkCoreCheck(name: "PCM16AudioSamplesTests.testMonoPCM16ChunksAlignOddChunkSizeToSampleBoundary", run: { PCM16AudioSamplesTests().testMonoPCM16ChunksAlignOddChunkSizeToSampleBoundary() }),

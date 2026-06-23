@@ -26,20 +26,11 @@ final class AudioRecorder: NSObject, ObservableObject {
             in: VoiceInkIOSStorageDirectories.preparedRecordingsDirectory
         )
 
-        // Whisper-compatible format: 16kHz mono WAV
-        let settings: [String: Any] = [
-            AVFormatIDKey: Int(kAudioFormatLinearPCM),
-            AVSampleRateKey: VoiceInkPCM16Audio.mono16kSampleRate,
-            AVNumberOfChannelsKey: VoiceInkPCM16Audio.monoChannelCount,
-            AVLinearPCMBitDepthKey: VoiceInkPCM16Audio.bitsPerSample,
-            AVLinearPCMIsBigEndianKey: VoiceInkPCM16Audio.isBigEndian,
-            AVLinearPCMIsFloatKey: VoiceInkPCM16Audio.isFloatingPoint,
-            AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
-        ]
+        let configuration = VoiceInkIOSAudioRecorderConfiguration.voiceRecording
 
-        audioRecorder = try AVAudioRecorder(url: url, settings: settings)
+        audioRecorder = try AVAudioRecorder(url: url, settings: configuration.avAudioRecorderSettings)
         audioRecorder?.delegate = self
-        audioRecorder?.isMeteringEnabled = true
+        audioRecorder?.isMeteringEnabled = configuration.isMeteringEnabled
         guard audioRecorder?.record() == true else {
             throw VoiceInkAudioRecorderStartFailurePolicy.returnedFalseError()
         }
@@ -107,3 +98,35 @@ final class AudioRecorder: NSObject, ObservableObject {
 }
 
 extension AudioRecorder: AVAudioRecorderDelegate {}
+
+private extension VoiceInkIOSAudioRecorderConfiguration {
+    var avAudioRecorderSettings: [String: Any] {
+        [
+            AVFormatIDKey: format.avFormatID,
+            AVSampleRateKey: sampleRate,
+            AVNumberOfChannelsKey: channelCount,
+            AVLinearPCMBitDepthKey: bitDepth,
+            AVLinearPCMIsBigEndianKey: isBigEndian,
+            AVLinearPCMIsFloatKey: isFloatingPoint,
+            AVEncoderAudioQualityKey: quality.avQualityRawValue
+        ]
+    }
+}
+
+private extension VoiceInkIOSAudioRecorderConfiguration.Format {
+    var avFormatID: Int {
+        switch self {
+        case .linearPCM:
+            return Int(kAudioFormatLinearPCM)
+        }
+    }
+}
+
+private extension VoiceInkIOSAudioRecorderConfiguration.Quality {
+    var avQualityRawValue: Int {
+        switch self {
+        case .high:
+            return AVAudioQuality.high.rawValue
+        }
+    }
+}

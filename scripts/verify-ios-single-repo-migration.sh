@@ -997,6 +997,42 @@ require_pattern \
   'VoiceInkAudioRecorderStopPolicy\.plan|applyStopPlan|shouldDeleteCurrentRecordingFile|shouldClearCurrentRecordingURL' \
   iOS/VoiceInk-ios/AudioRecorder.swift
 
+require_patterns \
+  "shared iOS audio recorder configuration lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/AudioRecorderConfiguration.swift \
+  'VoiceInkIOSAudioRecorderConfiguration' \
+  'voiceRecording' \
+  'linearPCM' \
+  'sampleRate: VoiceInkPCM16Audio\.mono16kSampleRate' \
+  'channelCount: VoiceInkPCM16Audio\.monoChannelCount' \
+  'bitDepth: VoiceInkPCM16Audio\.bitsPerSample' \
+  'isBigEndian: VoiceInkPCM16Audio\.isBigEndian' \
+  'isFloatingPoint: VoiceInkPCM16Audio\.isFloatingPoint' \
+  'quality: \.high' \
+  'isMeteringEnabled: true'
+
+require_pattern \
+  "VoiceInkCore checks cover iOS audio recorder configuration policy" \
+  'AudioRecorderConfigurationTests\.testIOSAudioRecorderConfigurationUsesMono16kPCM16Policy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_patterns \
+  "iOS audio recorder adapts shared recorder configuration" \
+  iOS/VoiceInk-ios/AudioRecorder.swift \
+  'VoiceInkIOSAudioRecorderConfiguration\.voiceRecording' \
+  'configuration\.avAudioRecorderSettings' \
+  'configuration\.isMeteringEnabled'
+
+reject_pattern \
+  "iOS audio recorder avoids shell-owned PCM16 recorder policy values" \
+  'VoiceInkPCM16Audio\.(mono16kSampleRate|monoChannelCount|bitsPerSample|isBigEndian|isFloatingPoint)|isMeteringEnabled = true' \
+  iOS/VoiceInk-ios/AudioRecorder.swift
+
+require_pattern \
+  "migration docs track shared iOS audio recorder configuration policy" \
+  'AudioRecorder\.swift` maps AVFoundation recorder settings from `VoiceInkIOSAudioRecorderConfiguration`' \
+  docs/ios-single-repo-migration.md
+
 require_pattern \
   "macOS recording engine uses shared active-recording predicate" \
   'recordingState\.isActivelyRecording' \
@@ -1847,30 +1883,16 @@ reject_pattern \
   'audioFileURL = nil' \
   VoiceInk/Views/Settings/AudioCleanupManager.swift
 
-require_pattern \
-  "iOS live recording uses shared PCM16 sample-rate policy" \
-  'AVSampleRateKey: VoiceInkPCM16Audio\.mono16kSampleRate' \
-  iOS/VoiceInk-ios/AudioRecorder.swift
-
-require_pattern \
-  "iOS live recording uses shared PCM16 channel policy" \
-  'AVNumberOfChannelsKey: VoiceInkPCM16Audio\.monoChannelCount' \
-  iOS/VoiceInk-ios/AudioRecorder.swift
-
-require_pattern \
-  "iOS live recording uses shared PCM16 bit-depth policy" \
-  'AVLinearPCMBitDepthKey: VoiceInkPCM16Audio\.bitsPerSample' \
-  iOS/VoiceInk-ios/AudioRecorder.swift
-
-require_pattern \
-  "iOS live recording uses shared PCM16 endian policy" \
-  'AVLinearPCMIsBigEndianKey: VoiceInkPCM16Audio\.isBigEndian' \
-  iOS/VoiceInk-ios/AudioRecorder.swift
-
-require_pattern \
-  "iOS live recording uses shared PCM16 sample-type policy" \
-  'AVLinearPCMIsFloatKey: VoiceInkPCM16Audio\.isFloatingPoint' \
-  iOS/VoiceInk-ios/AudioRecorder.swift
+require_patterns \
+  "iOS live recording adapts shared recorder configuration to AVFoundation" \
+  iOS/VoiceInk-ios/AudioRecorder.swift \
+  'AVFormatIDKey: format\.avFormatID' \
+  'AVSampleRateKey: sampleRate' \
+  'AVNumberOfChannelsKey: channelCount' \
+  'AVLinearPCMBitDepthKey: bitDepth' \
+  'AVLinearPCMIsBigEndianKey: isBigEndian' \
+  'AVLinearPCMIsFloatKey: isFloatingPoint' \
+  'AVEncoderAudioQualityKey: quality\.avQualityRawValue'
 
 require_pattern \
   "shared audio-processing error vocabulary lives in VoiceInkCore" \

@@ -9,28 +9,30 @@ enum VoiceInkKeyboardURLOpener {
         responder: UIResponder,
         fallback: @escaping () -> Void
     ) {
-        switch VoiceInkKeyboardOpenAppPolicy.initialAction(hasExtensionContext: extensionContext != nil) {
-        case .openExtensionContext:
-            extensionContext?.open(url) { success in
-                applyExtensionContextOpenResult(
-                    succeeded: success,
+        VoiceInkKeyboardOpenAppPolicy.initialAction(
+            hasExtensionContext: extensionContext != nil
+        ).applyRuntimeState(
+            openExtensionContext: {
+                extensionContext?.open(url) { success in
+                    applyExtensionContextOpenResult(
+                        succeeded: success,
+                        url: url,
+                        responder: responder,
+                        fallback: fallback
+                    )
+                }
+            },
+            openThroughApplicationOrResponderChain: {
+                VoiceInkIOSLogger.keyboard.error("\(VoiceInkKeyboardOpenAppDiagnostics.extensionContextUnavailable, privacy: .public)")
+                openThroughApplicationOrResponderChain(
                     url: url,
                     responder: responder,
                     fallback: fallback
                 )
-            }
-
-        case .openThroughApplicationOrResponderChain:
-            VoiceInkIOSLogger.keyboard.error("\(VoiceInkKeyboardOpenAppDiagnostics.extensionContextUnavailable, privacy: .public)")
-            openThroughApplicationOrResponderChain(
-                url: url,
-                responder: responder,
-                fallback: fallback
-            )
-
-        case .finish, .showFallback:
-            break
-        }
+            },
+            finish: {},
+            showFallback: {}
+        )
     }
 
     private static func applyExtensionContextOpenResult(
@@ -39,23 +41,25 @@ enum VoiceInkKeyboardURLOpener {
         responder: UIResponder,
         fallback: @escaping () -> Void
     ) {
-        switch VoiceInkKeyboardOpenAppPolicy.actionAfterExtensionContextOpen(succeeded: succeeded) {
-        case .finish:
-            VoiceInkIOSLogger.keyboard.notice("\(VoiceInkKeyboardOpenAppDiagnostics.openedViaExtensionContext, privacy: .public)")
-
-        case .openThroughApplicationOrResponderChain:
-            VoiceInkIOSLogger.keyboard.error("\(VoiceInkKeyboardOpenAppDiagnostics.extensionContextOpenFailed, privacy: .public)")
-            DispatchQueue.main.async {
-                openThroughApplicationOrResponderChain(
-                    url: url,
-                    responder: responder,
-                    fallback: fallback
-                )
-            }
-
-        case .openExtensionContext, .showFallback:
-            break
-        }
+        VoiceInkKeyboardOpenAppPolicy.actionAfterExtensionContextOpen(
+            succeeded: succeeded
+        ).applyRuntimeState(
+            openExtensionContext: {},
+            openThroughApplicationOrResponderChain: {
+                VoiceInkIOSLogger.keyboard.error("\(VoiceInkKeyboardOpenAppDiagnostics.extensionContextOpenFailed, privacy: .public)")
+                DispatchQueue.main.async {
+                    openThroughApplicationOrResponderChain(
+                        url: url,
+                        responder: responder,
+                        fallback: fallback
+                    )
+                }
+            },
+            finish: {
+                VoiceInkIOSLogger.keyboard.notice("\(VoiceInkKeyboardOpenAppDiagnostics.openedViaExtensionContext, privacy: .public)")
+            },
+            showFallback: {}
+        )
     }
 
     private static func openThroughApplicationOrResponderChain(
@@ -64,34 +68,37 @@ enum VoiceInkKeyboardURLOpener {
         fallback: @escaping () -> Void
     ) {
         let sharedApp = UIApplication.value(forKeyPath: "sharedApplication") as? UIApplication
-        switch VoiceInkKeyboardOpenAppPolicy.applicationAction(
+        VoiceInkKeyboardOpenAppPolicy.applicationAction(
             canOpenURL: sharedApp?.canOpenURL(url) == true
-        ) {
-        case .openViaApplication:
-            sharedApp?.open(url, options: [:]) { success in
-                applyApplicationOpenResult(succeeded: success, fallback: fallback)
+        ).applyRuntimeState(
+            openViaApplication: {
+                sharedApp?.open(url, options: [:]) { success in
+                    applyApplicationOpenResult(succeeded: success, fallback: fallback)
+                }
+            },
+            openViaResponderChain: {
+                openURLViaResponderChain(url, responder: responder, fallback: fallback)
             }
-
-        case .openViaResponderChain:
-            openURLViaResponderChain(url, responder: responder, fallback: fallback)
-        }
+        )
     }
 
     private static func applyApplicationOpenResult(
         succeeded: Bool,
         fallback: @escaping () -> Void
     ) {
-        switch VoiceInkKeyboardOpenAppPolicy.actionAfterApplicationOpen(succeeded: succeeded) {
-        case .finish:
-            VoiceInkIOSLogger.keyboard.notice("\(VoiceInkKeyboardOpenAppDiagnostics.openedViaApplication, privacy: .public)")
-
-        case .showFallback:
-            VoiceInkIOSLogger.keyboard.error("\(VoiceInkKeyboardOpenAppDiagnostics.applicationOpenFailed, privacy: .public)")
-            showFallback(fallback)
-
-        case .openExtensionContext, .openThroughApplicationOrResponderChain:
-            break
-        }
+        VoiceInkKeyboardOpenAppPolicy.actionAfterApplicationOpen(
+            succeeded: succeeded
+        ).applyRuntimeState(
+            openExtensionContext: {},
+            openThroughApplicationOrResponderChain: {},
+            finish: {
+                VoiceInkIOSLogger.keyboard.notice("\(VoiceInkKeyboardOpenAppDiagnostics.openedViaApplication, privacy: .public)")
+            },
+            showFallback: {
+                VoiceInkIOSLogger.keyboard.error("\(VoiceInkKeyboardOpenAppDiagnostics.applicationOpenFailed, privacy: .public)")
+                showFallback(fallback)
+            }
+        )
     }
 
     private static func openURLViaResponderChain(
@@ -106,17 +113,20 @@ enum VoiceInkKeyboardURLOpener {
             nextResponder = currentResponder.next
         }
 
-        switch VoiceInkKeyboardOpenAppPolicy.responderAction(hasResponder: nextResponder != nil) {
-        case .performResponderChainOpen:
-            if let nextResponder {
-                _ = nextResponder.perform(selector, with: url)
-                VoiceInkIOSLogger.keyboard.notice("\(VoiceInkKeyboardOpenAppDiagnostics.attemptedViaResponderChain, privacy: .public)")
+        VoiceInkKeyboardOpenAppPolicy.responderAction(
+            hasResponder: nextResponder != nil
+        ).applyRuntimeState(
+            performResponderChainOpen: {
+                if let nextResponder {
+                    _ = nextResponder.perform(selector, with: url)
+                    VoiceInkIOSLogger.keyboard.notice("\(VoiceInkKeyboardOpenAppDiagnostics.attemptedViaResponderChain, privacy: .public)")
+                }
+            },
+            showFallback: {
+                VoiceInkIOSLogger.keyboard.error("\(VoiceInkKeyboardOpenAppDiagnostics.allMethodsFailed, privacy: .public)")
+                showFallback(fallback)
             }
-
-        case .showFallback:
-            VoiceInkIOSLogger.keyboard.error("\(VoiceInkKeyboardOpenAppDiagnostics.allMethodsFailed, privacy: .public)")
-            showFallback(fallback)
-        }
+        )
     }
 
     private static func showFallback(_ fallback: @escaping () -> Void) {

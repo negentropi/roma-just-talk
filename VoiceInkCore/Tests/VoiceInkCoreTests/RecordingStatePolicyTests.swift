@@ -767,6 +767,62 @@ final class RecordingStatePolicyTests: XCTestCase {
         )
     }
 
+    func testKeyboardOpenAppActionsApplyRuntimeState() {
+        var events: [String] = []
+
+        VoiceInkKeyboardOpenAppAction.openExtensionContext.applyRuntimeState(
+            openExtensionContext: { events.append("extension") },
+            openThroughApplicationOrResponderChain: { events.append("fallbackChain") },
+            finish: { events.append("finish") },
+            showFallback: { events.append("fallback") }
+        )
+        VoiceInkKeyboardOpenAppAction.openThroughApplicationOrResponderChain.applyRuntimeState(
+            openExtensionContext: { events.append("extension") },
+            openThroughApplicationOrResponderChain: { events.append("fallbackChain") },
+            finish: { events.append("finish") },
+            showFallback: { events.append("fallback") }
+        )
+        VoiceInkKeyboardOpenAppAction.finish.applyRuntimeState(
+            openExtensionContext: { events.append("extension") },
+            openThroughApplicationOrResponderChain: { events.append("fallbackChain") },
+            finish: { events.append("finish") },
+            showFallback: { events.append("fallback") }
+        )
+        VoiceInkKeyboardOpenAppAction.showFallback.applyRuntimeState(
+            openExtensionContext: { events.append("extension") },
+            openThroughApplicationOrResponderChain: { events.append("fallbackChain") },
+            finish: { events.append("finish") },
+            showFallback: { events.append("fallback") }
+        )
+        VoiceInkKeyboardOpenAppApplicationAction.openViaApplication.applyRuntimeState(
+            openViaApplication: { events.append("application") },
+            openViaResponderChain: { events.append("responderChain") }
+        )
+        VoiceInkKeyboardOpenAppApplicationAction.openViaResponderChain.applyRuntimeState(
+            openViaApplication: { events.append("application") },
+            openViaResponderChain: { events.append("responderChain") }
+        )
+        VoiceInkKeyboardOpenAppResponderAction.performResponderChainOpen.applyRuntimeState(
+            performResponderChainOpen: { events.append("responder") },
+            showFallback: { events.append("responderFallback") }
+        )
+        VoiceInkKeyboardOpenAppResponderAction.showFallback.applyRuntimeState(
+            performResponderChainOpen: { events.append("responder") },
+            showFallback: { events.append("responderFallback") }
+        )
+
+        XCTAssertEqual(events, [
+            "extension",
+            "fallbackChain",
+            "finish",
+            "fallback",
+            "application",
+            "responderChain",
+            "responder",
+            "responderFallback"
+        ])
+    }
+
     func testKeyboardOpenAppDiagnosticsPreserveIOSLogCopy() {
         XCTAssertEqual(
             VoiceInkKeyboardOpenAppDiagnostics.extensionContextUnavailable,

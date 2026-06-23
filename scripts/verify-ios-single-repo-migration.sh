@@ -14740,12 +14740,14 @@ require_patterns \
   'VoiceInkKeyboardOpenAppDiagnostics' \
   'actionAfterExtensionContextOpen' \
   'applicationAction' \
-  'responderAction'
+  'responderAction' \
+  'applyRuntimeState'
 
 require_patterns \
   "VoiceInkCore checks cover iOS keyboard open-app fallback policy and diagnostics" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
   'testKeyboardOpenAppPolicyPreservesFallbackOrder' \
+  'testKeyboardOpenAppActionsApplyRuntimeState' \
   'testKeyboardOpenAppDiagnosticsPreserveIOSLogCopy'
 
 require_pattern \
@@ -14762,7 +14764,8 @@ require_patterns \
   "iOS keyboard URL opener adapts shared open-app policy and diagnostics" \
   iOS/Shared/VoiceInkKeyboardURLOpener.swift \
   'VoiceInkKeyboardOpenAppPolicy' \
-  'VoiceInkKeyboardOpenAppDiagnostics'
+  'VoiceInkKeyboardOpenAppDiagnostics' \
+  'applyRuntimeState'
 
 require_pattern \
   "iOS keyboard URL opener owns extension-context opening" \
@@ -14782,6 +14785,11 @@ require_pattern \
 reject_pattern \
   "iOS keyboard URL opener avoids shell-owned fallback diagnostic copy" \
   '"(extensionContext unavailable, trying alternative methods|Opened main app via extensionContext|extensionContext\.open failed, trying alternative methods|Opened main app via UIApplication\.open|UIApplication\.open failed|Attempted to open main app via responder chain|All URL opening methods failed)"' \
+  iOS/Shared/VoiceInkKeyboardURLOpener.swift
+
+reject_pattern \
+  "iOS keyboard URL opener avoids shell-owned open-app action switches" \
+  'switch VoiceInkKeyboardOpenAppPolicy|case \.openExtensionContext|case \.openThroughApplicationOrResponderChain|case \.finish|case \.showFallback|case \.openViaApplication|case \.openViaResponderChain|case \.performResponderChainOpen' \
   iOS/Shared/VoiceInkKeyboardURLOpener.swift
 
 reject_pattern \

@@ -570,16 +570,58 @@ public enum VoiceInkKeyboardOpenAppAction: Equatable, Sendable {
     case openThroughApplicationOrResponderChain
     case finish
     case showFallback
+
+    public func applyRuntimeState(
+        openExtensionContext: () -> Void,
+        openThroughApplicationOrResponderChain: () -> Void,
+        finish: () -> Void,
+        showFallback: () -> Void
+    ) {
+        switch self {
+        case .openExtensionContext:
+            openExtensionContext()
+        case .openThroughApplicationOrResponderChain:
+            openThroughApplicationOrResponderChain()
+        case .finish:
+            finish()
+        case .showFallback:
+            showFallback()
+        }
+    }
 }
 
 public enum VoiceInkKeyboardOpenAppApplicationAction: Equatable, Sendable {
     case openViaApplication
     case openViaResponderChain
+
+    public func applyRuntimeState(
+        openViaApplication: () -> Void,
+        openViaResponderChain: () -> Void
+    ) {
+        switch self {
+        case .openViaApplication:
+            openViaApplication()
+        case .openViaResponderChain:
+            openViaResponderChain()
+        }
+    }
 }
 
 public enum VoiceInkKeyboardOpenAppResponderAction: Equatable, Sendable {
     case performResponderChainOpen
     case showFallback
+
+    public func applyRuntimeState(
+        performResponderChainOpen: () -> Void,
+        showFallback: () -> Void
+    ) {
+        switch self {
+        case .performResponderChainOpen:
+            performResponderChainOpen()
+        case .showFallback:
+            showFallback()
+        }
+    }
 }
 
 public enum VoiceInkKeyboardOpenAppPolicy {

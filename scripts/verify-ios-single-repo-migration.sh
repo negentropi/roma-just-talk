@@ -1908,6 +1908,16 @@ require_pattern \
   'deleteExistingAudioFileAndClearReference\(\)' \
   VoiceInk/Views/Settings/AudioCleanupManager.swift
 
+require_pattern \
+  "macOS audio cleanup uses shared cleanup check interval" \
+  'VoiceInkAudioCleanupPreference\.cleanupCheckInterval' \
+  VoiceInk/Views/Settings/AudioCleanupManager.swift
+
+reject_pattern \
+  "macOS audio cleanup avoids shell-owned cleanup check interval literals" \
+  '\b(86400|86_400)\b' \
+  VoiceInk/Views/Settings/AudioCleanupManager.swift
+
 reject_pattern \
   "macOS audio cleanup avoids shell-only delete-and-clear sequence" \
   'audioFileURL = nil' \

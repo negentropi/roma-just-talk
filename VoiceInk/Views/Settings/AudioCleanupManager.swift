@@ -8,7 +8,7 @@ class AudioCleanupManager {
 
     private var cleanupTimer: Timer?
     
-    private let cleanupCheckInterval: TimeInterval = 86400 // Check once per day (in seconds)
+    private let cleanupCheckInterval = VoiceInkAudioCleanupPreference.cleanupCheckInterval
     
     private init() {}
     

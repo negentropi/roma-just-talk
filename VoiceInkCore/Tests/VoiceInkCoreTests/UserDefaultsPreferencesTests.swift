@@ -1525,6 +1525,10 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         }
     }
 
+    func testAudioCleanupPreferencePreservesDailyCleanupCheckInterval() {
+        XCTAssertEqual(VoiceInkAudioCleanupPreference.cleanupCheckInterval, 86_400)
+    }
+
     func testAudioCleanupPreferenceReadsStoredValues() {
         withIsolatedDefaults { defaults in
             VoiceInkAudioCleanupPreference.saveIsEnabled(true, to: defaults)

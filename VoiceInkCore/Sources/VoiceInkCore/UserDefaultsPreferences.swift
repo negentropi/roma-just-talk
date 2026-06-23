@@ -1313,6 +1313,8 @@ public struct VoiceInkAudioCleanupBackupImportPlan: Equatable, Sendable {
 }
 
 public enum VoiceInkAudioCleanupPreference {
+    public static let cleanupCheckInterval: TimeInterval = 86_400
+
     public static func current(from defaults: UserDefaults = .standard) -> VoiceInkAudioCleanupConfiguration {
         VoiceInkAudioCleanupConfiguration(
             isEnabled: isEnabled(from: defaults),

@@ -20,6 +20,7 @@
 - Fixed imported iOS note playback after recording so AirPods and other Bluetooth outputs keep a playback-owned audio session instead of being cut off by stale recording-session cleanup.
 - Moved the macOS first-launch Launch at Login default decision into shared core while leaving the LaunchAtLogin execution in the macOS shell.
 - Moved macOS cursor-context reader bounds and text-input role filtering into shared core while leaving Accessibility execution in the macOS shell.
+- Moved the audio cleanup daily check interval into shared core while leaving Timer scheduling and file deletion in the macOS shell.
 
 ## v1.95 - 2026-06-17
 

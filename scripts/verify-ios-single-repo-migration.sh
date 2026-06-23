@@ -8845,6 +8845,16 @@ require_pattern \
   'specialShortcutPasteLastTranscriptOnEmptyTap = "specialShortcutPasteLastTranscriptOnEmptyTap"' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
+section "obsolete standalone special shortcut key-evidence policy module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/SpecialShortcutKeyEvidencePolicy.swift
+
+require_patterns \
+  "special shortcut key-evidence policy lives with empty-tap fallback policy" \
+  VoiceInkCore/Sources/VoiceInkCore/SpecialShortcutEmptyFallbackPolicy.swift \
+  'VoiceInkShortcutPressContext' \
+  'VoiceInkSpecialShortcutKeyEvidencePolicy' \
+  'VoiceInkSpecialShortcutEmptyFallbackPolicy'
+
 require_pattern \
   "shared recording shortcut selection values live in VoiceInkCore" \
   'public enum VoiceInkRecordingShortcutSelection' \

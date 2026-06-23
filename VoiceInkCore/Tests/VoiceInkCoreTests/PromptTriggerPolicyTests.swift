@@ -169,6 +169,43 @@ final class PromptTriggerPolicyTests: XCTestCase {
         XCTAssertTrue(VoiceInkPromptTriggerPolicy.hasTriggerWordDraft("  Roma  "))
     }
 
+    func testTriggerWordDraftStateUsesSharedBlankPolicy() {
+        XCTAssertFalse(VoiceInkPromptTriggerDraftState(draft: " \n\t ").canSubmit)
+        XCTAssertTrue(VoiceInkPromptTriggerDraftState(draft: "  Roma  ").canSubmit)
+    }
+
+    func testTriggerWordDraftStateSubmitsAndClearsAcceptedWord() {
+        let submission = VoiceInkPromptTriggerDraftState(draft: "  Roma  ")
+            .submitting(existingWords: ["Dictate"])
+
+        XCTAssertEqual(submission.updatedWords, ["Dictate", "Roma"])
+        XCTAssertEqual(submission.draftStateAfterSubmit, VoiceInkPromptTriggerDraftState())
+    }
+
+    func testTriggerWordDraftStateKeepsRejectedDraft() {
+        let submission = VoiceInkPromptTriggerDraftState(draft: "dictate")
+            .submitting(existingWords: ["Dictate"])
+
+        XCTAssertNil(submission.updatedWords)
+        XCTAssertEqual(submission.draftStateAfterSubmit, VoiceInkPromptTriggerDraftState(draft: "dictate"))
+    }
+
+    func testTriggerWordDraftSubmissionAppliesRuntimeState() {
+        let submission = VoiceInkPromptTriggerDraftState(draft: "  Roma  ")
+            .submitting(existingWords: ["Dictate"])
+        var triggerWords = ["Dictate"]
+        var draftState = VoiceInkPromptTriggerDraftState(draft: "  Roma  ")
+
+        let returnedSubmission = submission.applyRuntimeState(
+            setTriggerWords: { triggerWords = $0 },
+            setDraftState: { draftState = $0 }
+        )
+
+        XCTAssertEqual(returnedSubmission, submission)
+        XCTAssertEqual(triggerWords, ["Dictate", "Roma"])
+        XCTAssertEqual(draftState, VoiceInkPromptTriggerDraftState())
+    }
+
     func testDetectStripsLeadingTriggerAndCapitalizesRemainingText() throws {
         let promptId = UUID()
         let match = try XCTUnwrap(

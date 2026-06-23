@@ -278,12 +278,12 @@ struct PromptEditorView: View {
 // MARK: - Trigger Words Editor
 struct TriggerWordsEditor: View {
     @Binding var triggerWords: [String]
-    @State private var newTriggerWord: String = ""
+    @State private var triggerWordDraftState = VoiceInkPromptTriggerDraftState()
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                TextField(VoiceInkCustomPromptPresentation.triggerWordPlaceholder, text: $newTriggerWord)
+                TextField(VoiceInkCustomPromptPresentation.triggerWordPlaceholder, text: $triggerWordDraftState.draft)
                     .textFieldStyle(.roundedBorder)
                     .onSubmit { addTriggerWord() }
 
@@ -294,7 +294,7 @@ struct TriggerWordsEditor: View {
                         .font(.system(size: 18))
                 }
                 .buttonStyle(.plain)
-                .disabled(!VoiceInkPromptTriggerPolicy.hasTriggerWordDraft(newTriggerWord))
+                .disabled(!triggerWordDraftState.canSubmit)
             }
 
             if !triggerWords.isEmpty {
@@ -315,12 +315,12 @@ struct TriggerWordsEditor: View {
     }
     
     private func addTriggerWord() {
-        guard let updatedWords = VoiceInkPromptTriggerPolicy.addingTriggerWord(newTriggerWord, to: triggerWords) else {
-            return
-        }
-
-        triggerWords = updatedWords
-        newTriggerWord = ""
+        triggerWordDraftState
+            .submitting(existingWords: triggerWords)
+            .applyRuntimeState(
+                setTriggerWords: { triggerWords = $0 },
+                setDraftState: { triggerWordDraftState = $0 }
+            )
     }
 }
 

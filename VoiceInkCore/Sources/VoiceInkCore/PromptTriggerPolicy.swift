@@ -243,3 +243,48 @@ public enum VoiceInkPromptTriggerPolicy {
         return remainingText
     }
 }
+
+public struct VoiceInkPromptTriggerDraftSubmission: Equatable, Sendable {
+    public let updatedWords: [String]?
+    public let draftStateAfterSubmit: VoiceInkPromptTriggerDraftState
+
+    public init(
+        updatedWords: [String]?,
+        draftStateAfterSubmit: VoiceInkPromptTriggerDraftState
+    ) {
+        self.updatedWords = updatedWords
+        self.draftStateAfterSubmit = draftStateAfterSubmit
+    }
+
+    @discardableResult
+    public func applyRuntimeState(
+        setTriggerWords: ([String]) -> Void,
+        setDraftState: (VoiceInkPromptTriggerDraftState) -> Void
+    ) -> Self {
+        if let updatedWords {
+            setTriggerWords(updatedWords)
+        }
+        setDraftState(draftStateAfterSubmit)
+        return self
+    }
+}
+
+public struct VoiceInkPromptTriggerDraftState: Equatable, Sendable {
+    public var draft: String
+
+    public init(draft: String = "") {
+        self.draft = draft
+    }
+
+    public var canSubmit: Bool {
+        VoiceInkPromptTriggerPolicy.hasTriggerWordDraft(draft)
+    }
+
+    public func submitting(existingWords: [String]) -> VoiceInkPromptTriggerDraftSubmission {
+        let updatedWords = VoiceInkPromptTriggerPolicy.addingTriggerWord(draft, to: existingWords)
+        return VoiceInkPromptTriggerDraftSubmission(
+            updatedWords: updatedWords,
+            draftStateAfterSubmit: VoiceInkPromptTriggerDraftState(draft: updatedWords == nil ? draft : "")
+        )
+    }
+}

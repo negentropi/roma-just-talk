@@ -5626,12 +5626,12 @@ require_pattern \
 
 require_pattern \
   "shared prompt trigger-word draft validation lives in VoiceInkCore" \
-  'hasTriggerWordDraft' \
+  'VoiceInkPromptTriggerDraftState|hasTriggerWordDraft|canSubmit' \
   VoiceInkCore/Sources/VoiceInkCore/PromptTriggerPolicy.swift
 
 require_pattern \
   "shared prompt trigger-word add policy lives in VoiceInkCore" \
-  'addingTriggerWord' \
+  'VoiceInkPromptTriggerDraftSubmission|addingTriggerWord|applyRuntimeState' \
   VoiceInkCore/Sources/VoiceInkCore/PromptTriggerPolicy.swift
 
 require_pattern \
@@ -5655,13 +5655,13 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PromptTriggerPolicy.swift
 
 require_pattern \
-  "macOS prompt editor consumes shared trigger-word draft validation" \
-  'VoiceInkPromptTriggerPolicy\.hasTriggerWordDraft' \
+  "macOS prompt editor consumes shared trigger-word draft state" \
+  'VoiceInkPromptTriggerDraftState|triggerWordDraftState\.(draft|canSubmit|submitting)|applyRuntimeState' \
   VoiceInk/Views/PromptEditorView.swift
 
 require_pattern \
-  "macOS prompt editor consumes shared trigger-word add policy" \
-  'VoiceInkPromptTriggerPolicy\.addingTriggerWord' \
+  "macOS prompt editor consumes shared trigger-word add submission" \
+  'triggerWordDraftState\.submitting|setTriggerWords|setDraftState' \
   VoiceInk/Views/PromptEditorView.swift
 
 require_pattern \
@@ -5669,9 +5669,19 @@ require_pattern \
   'VoiceInkPromptTriggerPolicy\.removingTriggerWord' \
   VoiceInk/Views/PromptEditorView.swift
 
+reject_pattern \
+  "macOS prompt editor avoids shell-owned trigger-word draft submit policy" \
+  'VoiceInkPromptTriggerPolicy\.(hasTriggerWordDraft|addingTriggerWord)|@State private var newTriggerWord\b' \
+  VoiceInk/Views/PromptEditorView.swift
+
 require_pattern \
   "core checks execute prompt trigger-word removal policy test" \
   'PromptTriggerPolicyTests\.testRemovingTriggerWordPreservesExactMacOSEditingRule' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute prompt trigger-word draft state tests" \
+  'PromptTriggerPolicyTests\.testTriggerWordDraftState(SubmitsAndClearsAcceptedWord|KeepsRejectedDraft)|PromptTriggerPolicyTests\.testTriggerWordDraftSubmissionAppliesRuntimeState' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \

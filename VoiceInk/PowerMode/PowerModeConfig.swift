@@ -55,14 +55,6 @@ class PowerModeManager: ObservableObject {
         saveConfigurations()
     }
 
-    func setAsDefault(configId: UUID, skipSave: Bool = false) {
-        configurations.setPowerModeDefaultConfiguration(id: configId)
-
-        if !skipSave {
-            saveConfigurations()
-        }
-    }
-    
     func enableConfiguration(with id: UUID) {
         let previousEnabledConfigIds = enabledConfigurationIds
         if configurations.setPowerModeConfiguration(id: id, isEnabled: true) {

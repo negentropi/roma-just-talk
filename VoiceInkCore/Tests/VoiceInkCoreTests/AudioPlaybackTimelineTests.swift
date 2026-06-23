@@ -355,4 +355,39 @@ final class AudioPlaybackTimelineTests: XCTestCase {
             )
         )
     }
+
+    func testPlaybackReEnhancementControlPresentationOwnsAvailabilityAndOpacity() {
+        let available = VoiceInkAudioPlaybackReEnhancementControlPresentation(
+            isOperationInProgress: false,
+            isEnhancementEnabled: true,
+            isEnhancementConfigured: true
+        )
+        XCTAssertFalse(available.isActionDisabled)
+        XCTAssertEqual(available.opacity, 1.0)
+        XCTAssertNil(available.unavailableBannerPresentation)
+
+        let unavailable = VoiceInkAudioPlaybackReEnhancementControlPresentation(
+            isOperationInProgress: false,
+            isEnhancementEnabled: false,
+            isEnhancementConfigured: false
+        )
+        XCTAssertTrue(unavailable.isActionDisabled)
+        XCTAssertEqual(unavailable.opacity, 0.4)
+        XCTAssertEqual(
+            unavailable.unavailableBannerPresentation,
+            VoiceInkAudioPlaybackActionBannerPresentation(
+                message: "AI Enhancement is not enabled or configured",
+                isError: true
+            )
+        )
+
+        let busy = VoiceInkAudioPlaybackReEnhancementControlPresentation(
+            isOperationInProgress: true,
+            isEnhancementEnabled: true,
+            isEnhancementConfigured: true
+        )
+        XCTAssertTrue(busy.isActionDisabled)
+        XCTAssertEqual(busy.opacity, 1.0)
+        XCTAssertNil(busy.unavailableBannerPresentation)
+    }
 }

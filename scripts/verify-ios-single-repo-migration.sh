@@ -11025,13 +11025,28 @@ require_pattern \
   VoiceInk/Views/AudioPlayerView.swift
 
 require_pattern \
+  "shared re-enhancement control presentation owns availability state" \
+  'VoiceInkAudioPlaybackReEnhancementControlPresentation|isActionDisabled|unavailableBannerPresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
+
+require_pattern \
+  "macOS audio player consumes shared re-enhancement control presentation" \
+  'reEnhancementControlPresentation|reEnhancementControl\.(isActionDisabled|opacity|unavailableBannerPresentation)' \
+  VoiceInk/Views/AudioPlayerView.swift
+
+require_pattern \
+  "core checks execute re-enhancement control presentation test" \
+  'AudioPlaybackTimelineTests\.testPlaybackReEnhancementControlPresentationOwnsAvailabilityAndOpacity' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "macOS audio player applies enhancement result through shared record mutation" \
   'applyEnhancementResult\(enhancement\)' \
   VoiceInk/Views/AudioPlayerView.swift
 
 reject_pattern \
   "macOS audio player avoids shell-only action status and re-enhance guard copy" \
-  '"Retranscription successful"|"Re-enhancement successful"|"Retranscription failed"|"Re-enhancement failed"|"AI Enhancement is not enabled or configured"|VoiceInkTranscriptPresentation\.audioFile(ReEnhancement|Retranscription)(SuccessMessage|FailureMessage)|VoiceInkPostProcessingFailurePresentation\.enhancementUnavailableMessage|VoiceInkErrorDescription\.text\(for: VoiceInkEngineError\.noTranscriptionModelSelected\)|VoiceInkEngineError\.noTranscriptionModelSelected' \
+  '"Retranscription successful"|"Re-enhancement successful"|"Retranscription failed"|"Re-enhancement failed"|"AI Enhancement is not enabled or configured"|VoiceInkTranscriptPresentation\.audioFile(ReEnhancement|Retranscription)(SuccessMessage|FailureMessage)|VoiceInkPostProcessingFailurePresentation\.enhancementUnavailableMessage|VoiceInkErrorDescription\.text\(for: VoiceInkEngineError\.noTranscriptionModelSelected\)|VoiceInkEngineError\.noTranscriptionModelSelected|isOperationInProgress \|\| !enhancementService\.isEnhancementEnabled \|\| !enhancementService\.isConfigured|enhancementService\.isEnhancementEnabled && enhancementService\.isConfigured' \
   VoiceInk/Views/AudioPlayerView.swift
 
 section "obsolete standalone post-processing failure presentation module stays deleted"

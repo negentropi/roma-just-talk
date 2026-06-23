@@ -416,11 +416,21 @@ struct AudioPlayerView: View {
         isRetranscribing || isReEnhancing
     }
 
+    private var reEnhancementControlPresentation: VoiceInkAudioPlaybackReEnhancementControlPresentation {
+        VoiceInkAudioPlaybackReEnhancementControlPresentation(
+            isOperationInProgress: isOperationInProgress,
+            isEnhancementEnabled: enhancementService.isEnhancementEnabled,
+            isEnhancementConfigured: enhancementService.isConfigured
+        )
+    }
+
     private var transcriptionService: AudioTranscriptionService {
         AudioTranscriptionService(modelContext: modelContext, engine: engine)
     }
 
     var body: some View {
+        let reEnhancementControl = reEnhancementControlPresentation
+
         VStack(spacing: 8) {
             WaveformView(
                 samples: playerManager.waveformSamples,
@@ -496,8 +506,8 @@ struct AudioPlayerView: View {
                             showSuccess: bannerPresentation == .reEnhancementSuccess,
                             action: reEnhanceOnly
                         )
-                        .disabled(isOperationInProgress || !enhancementService.isEnhancementEnabled || !enhancementService.isConfigured)
-                        .opacity(enhancementService.isEnhancementEnabled && enhancementService.isConfigured ? 1.0 : 0.4)
+                        .disabled(reEnhancementControl.isActionDisabled)
+                        .opacity(reEnhancementControl.opacity)
                         .help(VoiceInkAudioPlaybackPresentation.reEnhanceWithSelectedPromptHelpText)
                     }
 
@@ -549,14 +559,14 @@ struct AudioPlayerView: View {
 
     private func reEnhanceOnly() {
         guard let transcription = transcription else { return }
+        let reEnhancementControl = reEnhancementControlPresentation
 
-        if let unavailablePresentation = VoiceInkAudioPlaybackActionBannerPresentation.reEnhancementUnavailable(
-            isEnabled: enhancementService.isEnhancementEnabled,
-            isConfigured: enhancementService.isConfigured
-        ) {
+        if let unavailablePresentation = reEnhancementControl.unavailableBannerPresentation {
             showTemporaryBanner(unavailablePresentation)
             return
         }
+
+        guard !reEnhancementControl.isActionDisabled else { return }
 
         isReEnhancing = true
         bannerPresentation = nil

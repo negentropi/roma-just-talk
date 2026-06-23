@@ -303,6 +303,27 @@ public enum VoiceInkAudioPlaybackPresentation {
     }
 }
 
+public struct VoiceInkAudioPlaybackReEnhancementControlPresentation: Equatable, Sendable {
+    public let isActionDisabled: Bool
+    public let opacity: Double
+    public let unavailableBannerPresentation: VoiceInkAudioPlaybackActionBannerPresentation?
+
+    public init(
+        isOperationInProgress: Bool,
+        isEnhancementEnabled: Bool,
+        isEnhancementConfigured: Bool
+    ) {
+        let unavailableBannerPresentation = VoiceInkAudioPlaybackActionBannerPresentation.reEnhancementUnavailable(
+            isEnabled: isEnhancementEnabled,
+            isConfigured: isEnhancementConfigured
+        )
+
+        self.isActionDisabled = isOperationInProgress || unavailableBannerPresentation != nil
+        self.opacity = unavailableBannerPresentation == nil ? 1.0 : 0.4
+        self.unavailableBannerPresentation = unavailableBannerPresentation
+    }
+}
+
 public struct VoiceInkAudioPlaybackActionBannerPresentation: Equatable, Sendable {
     public let message: String
     public let isError: Bool

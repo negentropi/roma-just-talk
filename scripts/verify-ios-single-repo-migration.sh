@@ -4393,6 +4393,17 @@ require_pattern \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 require_pattern \
+  "iOS onboarding delegates download confirmation action mapping to shared core" \
+  'row\.confirmedDownloadRuntimeAction' \
+  iOS/VoiceInk-ios/OnboardingView.swift
+
+reject_context_pattern \
+  "iOS onboarding avoids direct download confirmation task wiring" \
+  'row\.downloadConfirmation\.title' \
+  'Task +\{' \
+  iOS/VoiceInk-ios/OnboardingView.swift
+
+require_pattern \
   "iOS onboarding uses shared compact download status text" \
   '\.progress\.compactStatusText' \
   iOS/VoiceInk-ios/OnboardingView.swift

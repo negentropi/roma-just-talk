@@ -104,6 +104,11 @@ struct ModelDownloadOnboardingView: View {
         let row = modelManager.managementRow(for: baseModel)
         let presentation = row.presentation
         let primaryAction = onboardingPresentation.primaryAction(for: presentation)
+        let confirmedDownloadAction = row.confirmedDownloadRuntimeAction {
+            Task {
+                await modelManager.downloadModel(baseModel)
+            }
+        }
         let primaryRuntimeAction = primaryAction.runtimeAction(
             continueSetup: {
                 withAnimation(.easeInOut(duration: 0.3)) {
@@ -223,11 +228,7 @@ struct ModelDownloadOnboardingView: View {
             )
         }
         .alert(row.downloadConfirmation.title, isPresented: $showDownloadConfirmation) {
-            Button(row.downloadConfirmation.primaryButtonTitle) {
-                Task {
-                    await modelManager.downloadModel(baseModel)
-                }
-            }
+            Button(row.downloadConfirmation.primaryButtonTitle, action: confirmedDownloadAction ?? {})
             Button(row.downloadConfirmation.cancelButtonTitle, role: .cancel) { }
         } message: {
             Text(row.downloadConfirmation.message)

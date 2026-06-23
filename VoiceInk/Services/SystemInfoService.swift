@@ -9,80 +9,7 @@ class SystemInfoService {
     private init() {}
 
     func getSystemInfoString() -> String {
-        let transcriptionCleanup = VoiceInkTranscriptionAutoCleanupPreference.current()
-        let audioCleanup = VoiceInkAudioCleanupPreference.current()
-        let info = """
-        === VOICEINK SYSTEM INFORMATION ===
-        Generated: \(Date().formatted(date: .long, time: .standard))
-
-        APP INFORMATION:
-        App Version: \(getAppVersion())
-        Build Version: \(getBuildVersion())
-        License Status: \(getLicenseStatus())
-
-        OPERATING SYSTEM:
-        macOS Version: \(ProcessInfo.processInfo.operatingSystemVersionString)
-
-        HARDWARE INFORMATION:
-        Device Model: \(getMacModel())
-        CPU: \(getCPUInfo())
-        Memory: \(getMemoryInfo())
-        Architecture: \(getArchitecture())
-
-        AUDIO SETTINGS:
-        Input Mode: \(getAudioInputMode())
-        Current Audio Device: \(getCurrentAudioDevice())
-        Available Audio Devices: \(getAvailableAudioDevices())
-
-        HOTKEY SETTINGS:
-        Primary Shortcut: \(getPrimaryShortcut())
-        Secondary Shortcut: \(getSecondaryShortcut())
-        Middle-Click Recording: \(VoiceInkRecordingShortcutPreference.isMiddleClickToggleEnabled())
-        Middle-Click Activation Delay: \(VoiceInkRecordingShortcutPreference.middleClickActivationDelay()) ms
-
-        TRANSCRIPTION SETTINGS:
-        Selected Model: \(getCurrentTranscriptionModel())
-        Selected Language: \(VoiceInkTranscriptionLanguagePreference.selectedMacOSLanguage())
-        AI Enhancement: \(VoiceInkAIEnhancementPreference.statusDiagnosticDescription())
-        AI Provider: \(VoiceInkAIEnhancementProviderPreference.selectedProviderDiagnosticDescription())
-        AI Model: \(VoiceInkAIEnhancementProviderPreference.selectedModelDiagnosticDescription())
-
-        ROLLING BUFFER PRELOAD:
-        \(getRollingBufferPreloadInfo())
-
-        UI SETTINGS:
-        Hide Dock Icon: \(VoiceInkMenuBarPreference.isMenuBarOnly())
-        Recorder Style: \(VoiceInkRecorderStylePreference.rawValue())
-
-        RECORDING FEEDBACK:
-        Sound Feedback: \(VoiceInkRecordingFeedbackPreference.isSoundFeedbackEnabled())
-        Pause Media While Recording: \(VoiceInkRecordingFeedbackPreference.isPauseMediaEnabled())
-        Mute Audio While Recording: \(VoiceInkRecordingFeedbackPreference.systemMuteMode().rawValue)
-        Audio Resumption Delay: \(VoiceInkRecordingFeedbackPreference.audioResumptionDelay())s
-
-        CLIPBOARD & PASTE SETTINGS:
-        Restore Clipboard After Paste: \(VoiceInkPastePreference.shouldRestoreClipboardAfterPaste())
-        Clipboard Restore Delay: \(VoiceInkPastePreference.clipboardRestoreDelay())s
-        Paste Method: \(VoiceInkPasteMethod.current().displayName)
-
-        POWER MODE:
-        Power Mode Enabled: \(VoiceInkPowerModePreference.isUIEnabled())
-        Persist Configured Preferences: \(VoiceInkPowerModePreference.shouldPersistConfiguredPreferences())
-
-        DATA CLEANUP SETTINGS:
-        Auto-Delete Transcriptions: \(transcriptionCleanup.isEnabled)
-        Transcription Retention: \(transcriptionCleanup.retentionMinutes) minutes
-        Auto-Delete Audio Files: \(audioCleanup.isEnabled)
-        Audio Retention Period: \(audioCleanup.retentionDays) days
-
-        PERMISSIONS:
-        Accessibility: \(getAccessibilityStatus())
-        Input Monitoring: \(getInputMonitoringStatus())
-        Screen Recording: \(getScreenRecordingStatus())
-        Microphone: \(getMicrophoneStatus())
-        """
-
-        return info
+        VoiceInkSystemInformationReport.macOS(makeMacOSSystemInformationFacts())
     }
 
     func copySystemInfoToClipboard() {
@@ -98,6 +25,55 @@ class SystemInfoService {
 
     private func getBuildVersion() -> String {
         return Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "Unknown"
+    }
+
+    private func makeMacOSSystemInformationFacts() -> VoiceInkMacOSSystemInformationFacts {
+        let transcriptionCleanup = VoiceInkTranscriptionAutoCleanupPreference.current()
+        let audioCleanup = VoiceInkAudioCleanupPreference.current()
+
+        return VoiceInkMacOSSystemInformationFacts(
+            generated: Date().formatted(date: .long, time: .standard),
+            appVersion: getAppVersion(),
+            buildVersion: getBuildVersion(),
+            licenseStatus: getLicenseStatus(),
+            operatingSystemVersion: ProcessInfo.processInfo.operatingSystemVersionString,
+            deviceModel: getMacModel(),
+            cpu: getCPUInfo(),
+            memory: getMemoryInfo(),
+            architecture: getArchitecture(),
+            audioInputMode: getAudioInputMode(),
+            currentAudioDevice: getCurrentAudioDevice(),
+            availableAudioDevices: getAvailableAudioDevices(),
+            primaryShortcut: getPrimaryShortcut(),
+            secondaryShortcut: getSecondaryShortcut(),
+            middleClickRecording: VoiceInkRecordingShortcutPreference.isMiddleClickToggleEnabled(),
+            middleClickActivationDelayMilliseconds: VoiceInkRecordingShortcutPreference.middleClickActivationDelay(),
+            selectedModel: getCurrentTranscriptionModel(),
+            selectedLanguage: VoiceInkTranscriptionLanguagePreference.selectedMacOSLanguage(),
+            aiEnhancement: VoiceInkAIEnhancementPreference.statusDiagnosticDescription(),
+            aiProvider: VoiceInkAIEnhancementProviderPreference.selectedProviderDiagnosticDescription(),
+            aiModel: VoiceInkAIEnhancementProviderPreference.selectedModelDiagnosticDescription(),
+            rollingBufferPreload: getRollingBufferPreloadInfo(),
+            hideDockIcon: VoiceInkMenuBarPreference.isMenuBarOnly(),
+            recorderStyle: VoiceInkRecorderStylePreference.rawValue(),
+            soundFeedback: VoiceInkRecordingFeedbackPreference.isSoundFeedbackEnabled(),
+            pauseMediaWhileRecording: VoiceInkRecordingFeedbackPreference.isPauseMediaEnabled(),
+            muteAudioWhileRecording: VoiceInkRecordingFeedbackPreference.systemMuteMode().rawValue,
+            audioResumptionDelaySeconds: VoiceInkRecordingFeedbackPreference.audioResumptionDelay(),
+            restoreClipboardAfterPaste: VoiceInkPastePreference.shouldRestoreClipboardAfterPaste(),
+            clipboardRestoreDelaySeconds: VoiceInkPastePreference.clipboardRestoreDelay(),
+            pasteMethod: VoiceInkPasteMethod.current().displayName,
+            powerModeEnabled: VoiceInkPowerModePreference.isUIEnabled(),
+            persistConfiguredPreferences: VoiceInkPowerModePreference.shouldPersistConfiguredPreferences(),
+            autoDeleteTranscriptions: transcriptionCleanup.isEnabled,
+            transcriptionRetentionMinutes: transcriptionCleanup.retentionMinutes,
+            autoDeleteAudioFiles: audioCleanup.isEnabled,
+            audioRetentionPeriodDays: audioCleanup.retentionDays,
+            accessibilityPermission: getAccessibilityStatus(),
+            inputMonitoringPermission: getInputMonitoringStatus(),
+            screenRecordingPermission: getScreenRecordingStatus(),
+            microphonePermission: getMicrophoneStatus()
+        )
     }
 
     private func getMacModel() -> String {

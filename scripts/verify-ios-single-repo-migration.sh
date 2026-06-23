@@ -13182,6 +13182,41 @@ reject_pattern \
   '"support@tryvoiceink\.com"|"VoiceInk Support Request"|SCREEN RECORDING HIGHLY RECOMMENDED|COMMON ISSUES|tryvoiceink\.com/common-issues|URL\(string: "mailto:' \
   VoiceInk/EmailSupport.swift
 
+require_file VoiceInkCore/Sources/VoiceInkCore/SystemInformationReport.swift
+
+require_patterns \
+  "shared macOS system information report formatting lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/SystemInformationReport.swift \
+  'VoiceInkMacOSSystemInformationFacts' \
+  'VoiceInkSystemInformationReport' \
+  '=== VOICEINK SYSTEM INFORMATION ===' \
+  'APP INFORMATION:' \
+  'ROLLING BUFFER PRELOAD:' \
+  'CLIPBOARD & PASTE SETTINGS:' \
+  'DATA CLEANUP SETTINGS:' \
+  'PERMISSIONS:'
+
+require_patterns \
+  "macOS system info service adapts shared report formatter" \
+  VoiceInk/Services/SystemInfoService.swift \
+  'VoiceInkSystemInformationReport\.macOS\(makeMacOSSystemInformationFacts\(\)\)' \
+  'VoiceInkMacOSSystemInformationFacts'
+
+reject_pattern \
+  "macOS system info service avoids shell-owned report template" \
+  '=== VOICEINK SYSTEM INFORMATION ===|APP INFORMATION:|CLIPBOARD & PASTE SETTINGS:|DATA CLEANUP SETTINGS:|PERMISSIONS:' \
+  VoiceInk/Services/SystemInfoService.swift
+
+require_pattern \
+  "core checks execute system information report tests" \
+  'SystemInformationReportTests\.testMacOSSystemInformationReportPreservesSectionOrderAndLabels|SystemInformationReportTests\.testMacOSSystemInformationReportKeepsRollingBufferBlockVerbatim' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "migration docs describe shared macOS system information report formatting" \
+  'macOS support system-information report formatting|VoiceInkSystemInformationReport' \
+  docs/ios-single-repo-migration.md
+
 section "obsolete standalone app notification presentation module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/AppNotificationPresentation.swift
 

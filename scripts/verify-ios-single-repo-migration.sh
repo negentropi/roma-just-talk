@@ -7853,6 +7853,14 @@ require_pattern \
   'chatRequestParameters' \
   VoiceInkCore/Sources/VoiceInkCore/PostProcessingClient.swift
 
+section "obsolete standalone post-processing request module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/PostProcessingRequest.swift
+
+require_pattern \
+  "shared post-processing request policy lives with post-processing client" \
+  'VoiceInkPostProcessingRequest|finalizedTranscript|defaultTemperature' \
+  VoiceInkCore/Sources/VoiceInkCore/PostProcessingClient.swift
+
 reject_pattern \
   "macOS AI API-key path avoids shell-only key-reference and blank-key policy" \
   'VoiceInkAPIKeyReference\.resolvedValue|VoiceInkProviderCredential\.nonBlank\(apiKey\)' \

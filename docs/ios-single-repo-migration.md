@@ -355,7 +355,7 @@ The remaining Swift files present in `../VoiceInk-iOS/VoiceInk-ios` but not in `
 - `DeepgramTranscriptionService.swift`: replaced by `VoiceInkCore` Deepgram request/client helpers and `VoiceInkRemoteTranscriptionService`.
 - `GroqTranscriptionService.swift`: replaced by `VoiceInkCore` OpenAI-compatible request/client helpers and `VoiceInkRemoteTranscriptionService`.
 - `OpenAICompatibleClient.swift`: replaced by `VoiceInkCore` chat DTOs/request builders, models-verification request builder, and client.
-- `LLMPostProcessor.swift`: replaced by `VoiceInkPostProcessingRequest`, `VoiceInkPostProcessingClient`, and `VoiceInkTranscriptionRunProcessor`.
+- `LLMPostProcessor.swift`: replaced by `VoiceInkPostProcessingClient`, its colocated `VoiceInkPostProcessingRequest`, and `VoiceInkTranscriptionRunProcessor`.
 - `TranscriptionServiceFactory.swift`: replaced by `VoiceInkTranscriptionRunProcessor` service-provider injection plus the iOS local Whisper adapter and shared `VoiceInkRemoteTranscriptionService`.
 - `KeychainService.swift`: replaced by iOS `AppSettings` calls into `VoiceInkProviderAPIKeyStorage`; macOS keeps its adapter only for local-build fallback storage and logging.
 - `RiffWaveUtils.swift`: replaced by `VoiceInkPCM16AudioSamples`.

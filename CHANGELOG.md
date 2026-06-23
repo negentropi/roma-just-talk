@@ -24,6 +24,7 @@
 - Moved the model prewarm trigger delay into shared core while leaving wake notifications and prewarm execution in the macOS shell.
 - Moved completed-transcription auto-cleanup action selection into shared core while leaving SwiftData and file deletion in the macOS shell.
 - Removed the shell-only Ollama enhancement timeout fallback so Ollama requests use the shared enhancement request timeout.
+- Moved the default selected AI enhancement provider into shared core while leaving provider execution in the macOS shell.
 
 ## v1.95 - 2026-06-17
 

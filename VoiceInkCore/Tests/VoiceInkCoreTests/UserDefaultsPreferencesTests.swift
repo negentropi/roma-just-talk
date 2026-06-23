@@ -967,8 +967,9 @@ final class UserDefaultsPreferencesTests: XCTestCase {
     func testAIEnhancementProviderPreferenceUsesDefaultWhenMissing() {
         withIsolatedDefaults { defaults in
             XCTAssertNil(VoiceInkAIEnhancementProviderPreference.selectedProviderRawValue(from: defaults))
+            XCTAssertEqual(VoiceInkAIEnhancementProviderPreference.defaultSelectedProvider, .gemini)
             XCTAssertEqual(
-                VoiceInkAIEnhancementProviderPreference.selectedProvider(default: .gemini, from: defaults),
+                VoiceInkAIEnhancementProviderPreference.selectedProvider(from: defaults),
                 .gemini
             )
         }

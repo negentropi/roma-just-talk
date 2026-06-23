@@ -7727,6 +7727,21 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 require_pattern \
+  "shared AI enhancement selected-provider default lives in VoiceInkCore" \
+  'defaultSelectedProvider = VoiceInkAIEnhancementProviderKind\.gemini' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "macOS AI service reads selected provider through shared default policy" \
+  'VoiceInkAIEnhancementProviderPreference\.selectedProvider\(from: userDefaults\)' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
+reject_pattern \
+  "macOS AI service avoids shell-owned selected-provider default" \
+  'selectedProvider\(.*default: *\.gemini|default: *VoiceInkAIEnhancementProviderKind\.gemini' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
+require_pattern \
   "macOS AI service default text model selection uses shared policy" \
   'defaultTextEnhancementModel' \
   VoiceInk/Services/AIEnhancement/AIService.swift

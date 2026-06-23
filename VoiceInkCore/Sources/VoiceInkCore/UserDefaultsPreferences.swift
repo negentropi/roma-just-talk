@@ -895,6 +895,8 @@ public enum VoiceInkAIEnhancementContextPreference {
 }
 
 public enum VoiceInkAIEnhancementProviderPreference {
+    public static let defaultSelectedProvider = VoiceInkAIEnhancementProviderKind.gemini
+
     public static func selectedProviderRawValue(from defaults: UserDefaults = .standard) -> String? {
         defaults.string(forKey: VoiceInkUserDefaultsKey.selectedAIProvider)
     }
@@ -924,7 +926,7 @@ public enum VoiceInkAIEnhancementProviderPreference {
     }
 
     public static func selectedProvider(
-        default defaultProvider: VoiceInkAIEnhancementProviderKind = .gemini,
+        default defaultProvider: VoiceInkAIEnhancementProviderKind = VoiceInkAIEnhancementProviderPreference.defaultSelectedProvider,
         from defaults: UserDefaults = .standard
     ) -> VoiceInkAIEnhancementProviderKind {
         guard let storedProvider = selectedProviderRawValue(from: defaults),

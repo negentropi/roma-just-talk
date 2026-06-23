@@ -76,10 +76,7 @@ class AIService: ObservableObject {
     }
     
     init() {
-        self.selectedProvider = VoiceInkAIEnhancementProviderPreference.selectedProvider(
-            default: .gemini,
-            from: userDefaults
-        )
+        self.selectedProvider = VoiceInkAIEnhancementProviderPreference.selectedProvider(from: userDefaults)
 
         applyCredentialStateForSelectedProvider()
 

@@ -1520,6 +1520,14 @@ reject_pattern \
   'modes\.append|modes\[index\]|firstIndex\(where: \{ \$0\.id == modeId \}\)|Mode\.defaultModesAndSelection\(|VoiceInkPreferenceList\.removing' \
   iOS/VoiceInk-ios/AppSettings.swift
 
+section "obsolete standalone preference-list module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/PreferenceList.swift
+
+require_pattern \
+  "shared preference-list policy lives with UserDefaults preference policy" \
+  'VoiceInkPreferenceList|changedElements|removing<Element>' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
 reject_pattern \
   "iOS recording sheet avoids shell-only recording controls copy" \
   '"(Cancel|Stop Recording|Mode)"' \

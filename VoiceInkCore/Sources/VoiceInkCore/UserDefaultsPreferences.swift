@@ -86,6 +86,25 @@ public enum VoiceInkPreferenceDefault {
     public static let enableAnnouncements = true
 }
 
+public enum VoiceInkPreferenceList {
+    public static func changedElements<Element: Equatable>(
+        from currentElements: [Element],
+        to proposedElements: [Element]
+    ) -> [Element]? {
+        currentElements == proposedElements ? nil : proposedElements
+    }
+
+    public static func removing<Element>(at offsets: IndexSet, from elements: [Element]) -> [Element] {
+        var updatedElements = elements
+
+        for index in offsets.sorted(by: >) where updatedElements.indices.contains(index) {
+            updatedElements.remove(at: index)
+        }
+
+        return updatedElements
+    }
+}
+
 public enum VoiceInkStartupPreferenceMigrationPlatform: Equatable, Sendable {
     case iOS
     case macOS

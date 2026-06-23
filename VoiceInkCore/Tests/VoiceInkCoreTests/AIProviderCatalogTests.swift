@@ -633,6 +633,25 @@ final class AIProviderCatalogTests: XCTestCase {
         )
     }
 
+    func testMacOSAIEnhancementAPIKeyClearPlanAppliesPersistence() {
+        let clearPlan = VoiceInkAIEnhancementAPIKeyClearPlan(
+            provider: .groq,
+            providerKeyStorageNameToDelete: VoiceInkAIEnhancementProviderKind.groq.rawValue,
+            credentialStateAfterClear: VoiceInkAIEnhancementCredentialState(
+                apiKey: "",
+                isAPIKeyValid: false
+            )
+        )
+
+        var deletedProviders: [String] = []
+
+        clearPlan.applyClearPersistence { provider in
+            deletedProviders.append(provider)
+        }
+
+        XCTAssertEqual(deletedProviders, [VoiceInkAIEnhancementProviderKind.groq.rawValue])
+    }
+
     func testMacOSAIEnhancementAPIKeyFormStateBuildsDraftForSelectedProvider() {
         let state = VoiceInkAIEnhancementAPIKeyFormState(enteredKey: " $GROQ_API_KEY ")
         let draft = state.draft(for: .groq)

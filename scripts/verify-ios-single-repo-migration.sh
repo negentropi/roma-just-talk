@@ -7877,6 +7877,11 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
+  "core checks execute shared macOS AI API-key clear persistence application test" \
+  'AIProviderCatalogTests\.testMacOSAIEnhancementAPIKeyClearPlanAppliesPersistence' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "macOS AI service applies API-key verification through shared plan" \
   'verificationApplicationPlan\(|serviceStateApplicationPlan|completionResult' \
   VoiceInk/Services/AIEnhancement/AIService.swift
@@ -7898,7 +7903,12 @@ require_pattern \
 
 require_pattern \
   "macOS API-key manager applies AI clear persistence through shared plan" \
-  'applyAIEnhancementAPIKeyClearPlan|persistencePlan\.providerKeyStorageNameToDelete|deleteAPIKey\(forProvider: persistencePlan\.providerKeyStorageNameToDelete\)' \
+  'applyAIEnhancementAPIKeyClearPlan|VoiceInkAIEnhancementAPIKeyClearPlan|applyClearPersistence' \
+  VoiceInk/Services/APIKeyManager.swift
+
+reject_pattern \
+  "macOS API-key manager avoids shell-owned AI clear persistence field reads" \
+  'persistencePlan\.providerKeyStorageNameToDelete|deleteAPIKey\(forProvider: persistencePlan\.providerKeyStorageNameToDelete\)' \
   VoiceInk/Services/APIKeyManager.swift
 
 require_pattern \

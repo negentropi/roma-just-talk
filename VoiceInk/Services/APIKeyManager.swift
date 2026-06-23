@@ -43,8 +43,9 @@ final class APIKeyManager {
     }
 
     func applyAIEnhancementAPIKeyClearPlan(_ plan: VoiceInkAIEnhancementAPIKeyClearPlan) {
-        let persistencePlan = plan.persistencePlan
-        deleteAPIKey(forProvider: persistencePlan.providerKeyStorageNameToDelete)
+        plan.applyClearPersistence { [self] provider in
+            deleteAPIKey(forProvider: provider)
+        }
     }
 
     /// Retrieves an API key for a provider.

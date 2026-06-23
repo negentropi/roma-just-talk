@@ -625,6 +625,12 @@ public extension VoiceInkAIEnhancementAPIKeyClearPlan {
             shouldPostProviderKeyChanged: true
         )
     }
+
+    func applyClearPersistence(
+        deleteKey: (String) -> Void
+    ) {
+        deleteKey(persistencePlan.providerKeyStorageNameToDelete)
+    }
 }
 
 public struct VoiceInkAIEnhancementAPIKeyFormState: Equatable, Sendable {

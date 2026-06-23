@@ -28,13 +28,13 @@ final class AudioSessionManager: ObservableObject {
     /// Activates audio session for recording with optimal settings
     func activateSessionForRecording() throws {
         let audioSession = AVAudioSession.sharedInstance()
+        let configuration = VoiceInkIOSAudioSessionRecordingConfiguration.voiceRecording
         
         do {
-            // Configure session for recording with background support
             try audioSession.setCategory(
-                .playAndRecord,
-                mode: .spokenAudio,
-                options: [.defaultToSpeaker, .allowBluetooth, .allowBluetoothA2DP, .mixWithOthers]
+                configuration.category.avCategory,
+                mode: configuration.mode.avMode,
+                options: configuration.avOptions
             )
             
             // Activate the session
@@ -106,5 +106,46 @@ final class AudioSessionManager: ObservableObject {
         deactivationTimer?.invalidate()
         deactivationTimer = nil
         lifecycleState.cancelScheduledDeactivation()
+    }
+}
+
+private extension VoiceInkIOSAudioSessionRecordingConfiguration.Category {
+    var avCategory: AVAudioSession.Category {
+        switch self {
+        case .playAndRecord:
+            return .playAndRecord
+        }
+    }
+}
+
+private extension VoiceInkIOSAudioSessionRecordingConfiguration.Mode {
+    var avMode: AVAudioSession.Mode {
+        switch self {
+        case .spokenAudio:
+            return .spokenAudio
+        }
+    }
+}
+
+private extension VoiceInkIOSAudioSessionRecordingConfiguration {
+    var avOptions: AVAudioSession.CategoryOptions {
+        options.reduce(into: []) { result, option in
+            result.insert(option.avOption)
+        }
+    }
+}
+
+private extension VoiceInkIOSAudioSessionRecordingConfiguration.Option {
+    var avOption: AVAudioSession.CategoryOptions {
+        switch self {
+        case .defaultToSpeaker:
+            return .defaultToSpeaker
+        case .allowBluetooth:
+            return .allowBluetooth
+        case .allowBluetoothA2DP:
+            return .allowBluetoothA2DP
+        case .mixWithOthers:
+            return .mixWithOthers
+        }
     }
 }

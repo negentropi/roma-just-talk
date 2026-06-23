@@ -17,6 +17,39 @@ public enum VoiceInkAudioSessionDiagnostics {
     }
 }
 
+public struct VoiceInkIOSAudioSessionRecordingConfiguration: Equatable, Sendable {
+    public enum Category: String, Equatable, Sendable {
+        case playAndRecord
+    }
+
+    public enum Mode: String, Equatable, Sendable {
+        case spokenAudio
+    }
+
+    public enum Option: String, Equatable, Sendable {
+        case defaultToSpeaker
+        case allowBluetooth
+        case allowBluetoothA2DP
+        case mixWithOthers
+    }
+
+    public let category: Category
+    public let mode: Mode
+    public let options: [Option]
+
+    public init(category: Category, mode: Mode, options: [Option]) {
+        self.category = category
+        self.mode = mode
+        self.options = options
+    }
+
+    public static let voiceRecording = Self(
+        category: .playAndRecord,
+        mode: .spokenAudio,
+        options: [.defaultToSpeaker, .allowBluetooth, .allowBluetoothA2DP, .mixWithOthers]
+    )
+}
+
 public struct VoiceInkAudioSessionLifecycleState: Equatable, Sendable {
     public private(set) var isSessionActive: Bool
     public private(set) var timeoutRemaining: TimeInterval

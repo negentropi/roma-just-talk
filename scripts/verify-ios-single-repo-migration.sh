@@ -10058,6 +10058,11 @@ require_pattern \
   'VoiceInkAudioSessionTimeoutPreference\.(minimumSeconds|maximumSeconds|stepSeconds)' \
   iOS/VoiceInk-ios/SettingsView.swift
 
+require_pattern \
+  "migration docs track shared iOS audio-session recording configuration" \
+  'recording category/mode/options through `VoiceInkIOSAudioSessionRecordingConfiguration`' \
+  docs/ios-single-repo-migration.md
+
 reject_pattern \
   "iOS audio settings avoid shell-only timeout range and display policy" \
   '0\.\.\.300|step: 15|audioSessionTimeoutSeconds\)s' \
@@ -10088,10 +10093,27 @@ require_pattern \
   'VoiceInkAudioSessionLifecycleState|markActivatedForRecording|scheduleDeactivationExecution|advanceCountdownExecution|markDeactivated' \
   VoiceInkCore/Sources/VoiceInkCore/AudioSessionLifecycleState.swift
 
+require_patterns \
+  "shared iOS audio-session recording configuration lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/AudioSessionLifecycleState.swift \
+  'VoiceInkIOSAudioSessionRecordingConfiguration' \
+  'voiceRecording' \
+  'playAndRecord' \
+  'spokenAudio' \
+  'defaultToSpeaker' \
+  'allowBluetooth' \
+  'allowBluetoothA2DP' \
+  'mixWithOthers'
+
 require_pattern \
   "shared audio-session diagnostics live in VoiceInkCore" \
   'VoiceInkAudioSessionDiagnostics|activatedForRecordingMessage|activationFailedMessage|deactivationScheduledMessage|deactivatedMessage|deactivationFailedMessage' \
   VoiceInkCore/Sources/VoiceInkCore/AudioSessionLifecycleState.swift
+
+require_pattern \
+  "VoiceInkCore check runner executes iOS audio-session recording configuration proof" \
+  'testIOSAudioSessionRecordingConfigurationPreservesRecordingPolicy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "VoiceInkCore check runner executes audio-session diagnostics proof" \
@@ -10102,6 +10124,14 @@ require_pattern \
   "iOS audio-session manager uses shared lifecycle state" \
   'VoiceInkAudioSessionLifecycleState|lifecycleState' \
   iOS/VoiceInk-ios/AudioSessionManager.swift
+
+require_patterns \
+  "iOS audio-session manager adapts shared recording configuration" \
+  iOS/VoiceInk-ios/AudioSessionManager.swift \
+  'VoiceInkIOSAudioSessionRecordingConfiguration\.voiceRecording' \
+  'configuration\.category\.avCategory' \
+  'configuration\.mode\.avMode' \
+  'configuration\.avOptions'
 
 require_pattern \
   "iOS audio-session manager adapts shared diagnostics" \
@@ -10126,6 +10156,11 @@ reject_pattern \
 reject_pattern \
   "iOS audio-session manager avoids shell-only timeout scheduling policy" \
   'shouldDeactivateImmediately|deactivationInterval|timeoutSeconds > 0|TimeInterval\(timeoutSeconds\)|withTimeInterval: +1\.0|timeoutRemaining -= 1|VoiceInkAudioSessionTimeoutPreference\.(deactivationPlan|remainingTimeAfterCountdownTick)' \
+  iOS/VoiceInk-ios/AudioSessionManager.swift
+
+reject_pattern \
+  "iOS audio-session manager avoids shell-owned recording configuration literals" \
+  'mode: \.spokenAudio|options: \[\.(defaultToSpeaker|allowBluetooth|allowBluetoothA2DP|mixWithOthers)' \
   iOS/VoiceInk-ios/AudioSessionManager.swift
 
 reject_pattern \

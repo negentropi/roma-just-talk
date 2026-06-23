@@ -2,6 +2,17 @@ import Foundation
 @testable import VoiceInkCore
 
 final class AudioSessionLifecycleStateTests: XCTestCase {
+    func testIOSAudioSessionRecordingConfigurationPreservesRecordingPolicy() {
+        XCTAssertEqual(
+            VoiceInkIOSAudioSessionRecordingConfiguration.voiceRecording,
+            VoiceInkIOSAudioSessionRecordingConfiguration(
+                category: .playAndRecord,
+                mode: .spokenAudio,
+                options: [.defaultToSpeaker, .allowBluetooth, .allowBluetoothA2DP, .mixWithOthers]
+            )
+        )
+    }
+
     func testAudioSessionDiagnosticsPreserveIOSLogCopy() {
         XCTAssertEqual(
             VoiceInkAudioSessionDiagnostics.activatedForRecordingMessage,

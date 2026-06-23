@@ -200,6 +200,12 @@ public struct VoiceInkProviderAPIKeyVerificationApplicationPlan: Equatable, Send
         self.keyToSave = keyToSave
         self.shouldMarkKeyVerified = shouldMarkKeyVerified
     }
+
+    public static let unsupportedProvider = VoiceInkProviderAPIKeyVerificationApplicationPlan(
+        progress: .unsupportedProviderFailure,
+        keyToSave: nil,
+        shouldMarkKeyVerified: false
+    )
 }
 
 public struct VoiceInkProviderAPIKeyVerificationPersistencePlan: Equatable, Sendable {
@@ -487,6 +493,24 @@ public struct VoiceInkProviderAPIKeyFormState: Equatable, Sendable {
         )
     }
 
+    public func verificationCompletionPlan(
+        startPlan: VoiceInkProviderAPIKeyVerificationStartPlan,
+        result: VoiceInkAPIKeyVerificationResult
+    ) -> VoiceInkProviderAPIKeyVerificationCompletionPlan {
+        verificationCompletionPlan(
+            applicationPlan: startPlan.draft.verificationApplicationPlan(for: result)
+        )
+    }
+
+    public func verificationCompletionPlan(
+        applicationPlan: VoiceInkProviderAPIKeyVerificationApplicationPlan
+    ) -> VoiceInkProviderAPIKeyVerificationCompletionPlan {
+        VoiceInkProviderAPIKeyVerificationCompletionPlan(
+            formState: applyingVerificationPlan(applicationPlan),
+            applicationPlan: applicationPlan
+        )
+    }
+
     public func iOSVisibleResultFeedback(isKeyVerified: Bool) -> VoiceInkProviderAPIKeyVerificationFeedback? {
         guard !isKeyVerified else {
             return nil
@@ -535,6 +559,28 @@ public struct VoiceInkProviderAPIKeyVerificationStartPlan: Equatable, Sendable {
         self.formState = formState
         self.draft = draft
         self.candidate = candidate
+    }
+}
+
+public struct VoiceInkProviderAPIKeyVerificationCompletionPlan: Equatable, Sendable {
+    public let formState: VoiceInkProviderAPIKeyFormState
+    public let applicationPlan: VoiceInkProviderAPIKeyVerificationApplicationPlan
+
+    public init(
+        formState: VoiceInkProviderAPIKeyFormState,
+        applicationPlan: VoiceInkProviderAPIKeyVerificationApplicationPlan
+    ) {
+        self.formState = formState
+        self.applicationPlan = applicationPlan
+    }
+
+    @discardableResult
+    public func applyRuntimeState<Result>(
+        setFormState: (VoiceInkProviderAPIKeyFormState) -> Void,
+        applyVerificationPlan: (VoiceInkProviderAPIKeyVerificationApplicationPlan) -> Result
+    ) -> Result {
+        setFormState(formState)
+        return applyVerificationPlan(applicationPlan)
     }
 }
 

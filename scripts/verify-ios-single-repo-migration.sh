@@ -3001,7 +3001,7 @@ reject_pattern \
 
 require_pattern \
   "iOS API-key view delegates verification persistence to settings adapter" \
-  'settings\.applyAPIKeyVerificationPlan\(plan, for: provider\)' \
+  'applyVerificationPlan: \{ settings\.applyAPIKeyVerificationPlan\(\$0, for: provider\) \}' \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
 reject_pattern \
@@ -3017,6 +3017,11 @@ require_pattern \
 require_pattern \
   "shared provider API-key verification application plan lives in VoiceInkCore" \
   'VoiceInkProviderAPIKeyVerificationApplicationPlan|verificationApplicationPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
+
+require_pattern \
+  "shared provider API-key verification completion plan lives in VoiceInkCore" \
+  'VoiceInkProviderAPIKeyVerificationCompletionPlan|verificationCompletionPlan|applyRuntimeState' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
 
 require_pattern \
@@ -3088,6 +3093,16 @@ require_pattern \
   "core checks execute provider API-key verification start plan tests" \
   'ProviderAccessRequirementTests\.testProviderAPIKeyVerificationStartPlan(BeginsWhenCandidateExists|CanKeepStateForMissingCandidate|CanApplyFailureForMissingCandidate)' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute provider API-key verification completion plan tests" \
+  'ProviderAccessRequirementTests\.testProviderAPIKeyVerificationCompletionPlan(UsesStartDraftAndCurrentFormState|AppliesRuntimeStateInOrderAndReturnsResult)' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "migration checklist tracks shared provider API-key verification completion plan" \
+  'provider API-key draft verification candidate, verification start/completion planning' \
+  docs/ios-single-repo-migration.md
 
 require_pattern \
   "core checks execute provider API-key verification persistence plan test" \
@@ -3182,13 +3197,18 @@ reject_pattern \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
 require_pattern \
-  "iOS API-key view uses shared verification application plan" \
-  'verificationApplicationPlan|VoiceInkProviderAPIKeyDraft[[:space:]]*\.[[:space:]]*missingVerificationCandidatePlan' \
+  "iOS API-key view uses shared verification completion plan" \
+  'verificationCompletionPlan|applyRuntimeState' \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
 require_pattern \
   "iOS API-key view uses shared verification start plan" \
   'verificationStartPlan|missingCandidatePolicy: \.applyFailurePlan' \
+  iOS/VoiceInk-ios/ProviderAPIKeyView.swift
+
+reject_pattern \
+  "iOS API-key view avoids shell-owned verification completion sequencing" \
+  'startPlan\.draft\.verificationApplicationPlan|apiKeyFormState = apiKeyFormState\.applyingVerificationPlan|VoiceInkProviderAPIKeyVerificationApplicationPlan\(' \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
 require_pattern \
@@ -4933,8 +4953,8 @@ reject_pattern \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
 
 require_pattern \
-  "macOS cloud API-key card uses shared verification application plan" \
-  'verificationApplicationPlan' \
+  "macOS cloud API-key card uses shared verification completion plan" \
+  'verificationCompletionPlan|applyRuntimeState' \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift
 
 require_pattern \
@@ -4980,6 +5000,11 @@ require_pattern \
 reject_pattern \
   "macOS cloud API-key card avoids shell-owned verification persistence sequencing" \
   'plan\.shouldMarkKeyVerified|plan\.keyToSave|saveAPIKey\(keyToSave' \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift
+
+reject_pattern \
+  "macOS cloud API-key card avoids shell-owned verification completion sequencing" \
+  'startPlan\.draft\.verificationApplicationPlan|apiKeyFormState = apiKeyFormState\.applyingVerificationPlan|VoiceInkProviderAPIKeyVerificationApplicationPlan\(' \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift
 
 require_pattern \

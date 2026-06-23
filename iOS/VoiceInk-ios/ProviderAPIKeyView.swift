@@ -113,10 +113,12 @@ struct ProviderAPIKeyView: View {
             }
             
             let result = await apiKeyVerifier.verifyStoredAPIKeyDetailed(keyToVerify, for: provider)
-            let plan = startPlan.draft.verificationApplicationPlan(for: result)
-            
-            apiKeyFormState = apiKeyFormState.applyingVerificationPlan(plan)
-            settings.applyAPIKeyVerificationPlan(plan, for: provider)
+            apiKeyFormState
+                .verificationCompletionPlan(startPlan: startPlan, result: result)
+                .applyRuntimeState(
+                    setFormState: { apiKeyFormState = $0 },
+                    applyVerificationPlan: { settings.applyAPIKeyVerificationPlan($0, for: provider) }
+                )
         }
     }
 

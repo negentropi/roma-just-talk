@@ -302,13 +302,12 @@ struct CloudModelCardView: View {
         guard let keyToVerify = startPlan.candidate else { return }
 
         guard let provider = model.provider.coreTranscriptionModelProvider else {
-            apiKeyFormState = apiKeyFormState.applyingVerificationPlan(
-                VoiceInkProviderAPIKeyVerificationApplicationPlan(
-                    progress: .unsupportedProviderFailure,
-                    keyToSave: nil,
-                    shouldMarkKeyVerified: false
+            apiKeyFormState
+                .verificationCompletionPlan(applicationPlan: .unsupportedProvider)
+                .applyRuntimeState(
+                    setFormState: { apiKeyFormState = $0 },
+                    applyVerificationPlan: { _ in }
                 )
-            )
             return
         }
 
@@ -316,13 +315,19 @@ struct CloudModelCardView: View {
             let result = await apiKeyVerifier.verifyStoredAPIKeyDetailed(keyToVerify, for: provider)
 
             await MainActor.run {
-                let plan = startPlan.draft.verificationApplicationPlan(for: result)
-                apiKeyFormState = apiKeyFormState.applyingVerificationPlan(plan)
+                let didSaveKey = apiKeyFormState
+                    .verificationCompletionPlan(startPlan: startPlan, result: result)
+                    .applyRuntimeState(
+                        setFormState: { apiKeyFormState = $0 },
+                        applyVerificationPlan: {
+                            APIKeyManager.shared.applyProviderVerificationPlan(
+                                $0,
+                                forProvider: model.provider.apiKeyProviderName
+                            )
+                        }
+                    )
 
-                if APIKeyManager.shared.applyProviderVerificationPlan(
-                    plan,
-                    forProvider: model.provider.apiKeyProviderName
-                ) {
+                if didSaveKey {
                     transcriptionModelManager.refreshAllAvailableModels()
                     withAnimation(.easeInOut(duration: 0.3)) {
                         isExpanded = false

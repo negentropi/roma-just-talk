@@ -91,38 +91,10 @@ enum ShortcutAction: Hashable {
     }
 
     var displayName: String {
-        switch self {
-        case .primaryRecording:
-            return "Primary Shortcut"
-        case .secondaryRecording:
-            return "Secondary Shortcut"
-        case .pasteLastTranscription:
-            return "Paste Last Transcription"
-        case .pasteLastEnhancement:
-            return "Paste Last Enhanced Transcription"
-        case .retryLastTranscription:
-            return "Retry Last Transcription"
-        case .cancelRecorder:
-            return "Cancel Recording"
-        case .openHistoryWindow:
-            return VoiceInkHistoryPresentation.macOSShortcutTip.shortcutLabel
-        case .quickAddToDictionary:
-            return "Quick Add to Dictionary"
-        case .toggleEnhancement:
-            return "Toggle Enhancement"
-        case .powerMode(let id):
-            if let config = PowerModeManager.shared.configurations.powerModeConfiguration(with: id) {
-                return "\(config.name) Power Mode"
-            }
-
-            return "Power Mode"
-        case .miniRecorderEscape:
-            return "Mini Recorder Cancel"
-        case .miniRecorderPrompt(let index):
-            return "Select Prompt \(Self.displayNumber(forMiniRecorderIndex: index))"
-        case .miniRecorderPowerMode(let index):
-            return "Select Power Mode \(Self.displayNumber(forMiniRecorderIndex: index))"
-        }
+        VoiceInkShortcutActionPresentation.displayName(
+            for: coreIdentifier,
+            powerModeName: powerModeConfigurationName
+        )
     }
 
     static let globalUtilityActions: [Self] = [
@@ -140,7 +112,11 @@ enum ShortcutAction: Hashable {
 
     static let legacyKeyboardShortcutActions = VoiceInkShortcutActionIdentifier.legacyKeyboardShortcutActions.map(Self.init(coreIdentifier:))
 
-    private static func displayNumber(forMiniRecorderIndex index: Int) -> String {
-        index == 9 ? "10" : "\(index + 1)"
+    private var powerModeConfigurationName: String? {
+        guard case .powerMode(let id) = self else {
+            return nil
+        }
+
+        return PowerModeManager.shared.configurations.powerModeConfiguration(with: id)?.name
     }
 }

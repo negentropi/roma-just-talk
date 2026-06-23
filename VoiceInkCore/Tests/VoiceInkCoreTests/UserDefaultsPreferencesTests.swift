@@ -1749,6 +1749,75 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(VoiceInkShortcutActionIdentifier.legacyCustomRecordingShortcutActions, [.primaryRecording, .secondaryRecording])
     }
 
+    func testShortcutActionPresentationPreservesMacOSDisplayNames() {
+        let powerModeId = UUID(uuidString: "11111111-2222-3333-4444-555555555555")!
+
+        XCTAssertEqual(
+            VoiceInkShortcutActionPresentation.displayName(for: .primaryRecording),
+            "Primary Shortcut"
+        )
+        XCTAssertEqual(
+            VoiceInkShortcutActionPresentation.displayName(for: .secondaryRecording),
+            "Secondary Shortcut"
+        )
+        XCTAssertEqual(
+            VoiceInkShortcutActionPresentation.displayName(for: .pasteLastTranscription),
+            "Paste Last Transcription"
+        )
+        XCTAssertEqual(
+            VoiceInkShortcutActionPresentation.displayName(for: .pasteLastEnhancement),
+            "Paste Last Enhanced Transcription"
+        )
+        XCTAssertEqual(
+            VoiceInkShortcutActionPresentation.displayName(for: .retryLastTranscription),
+            "Retry Last Transcription"
+        )
+        XCTAssertEqual(
+            VoiceInkShortcutActionPresentation.displayName(for: .cancelRecorder),
+            "Cancel Recording"
+        )
+        XCTAssertEqual(
+            VoiceInkShortcutActionPresentation.displayName(for: .openHistoryWindow),
+            "Open History Window"
+        )
+        XCTAssertEqual(
+            VoiceInkShortcutActionPresentation.displayName(for: .quickAddToDictionary),
+            "Quick Add to Dictionary"
+        )
+        XCTAssertEqual(
+            VoiceInkShortcutActionPresentation.displayName(for: .toggleEnhancement),
+            "Toggle Enhancement"
+        )
+        XCTAssertEqual(
+            VoiceInkShortcutActionPresentation.displayName(for: .powerMode(powerModeId)),
+            "Power Mode"
+        )
+        XCTAssertEqual(
+            VoiceInkShortcutActionPresentation.displayName(for: .powerMode(powerModeId), powerModeName: "Writing"),
+            "Writing Power Mode"
+        )
+        XCTAssertEqual(
+            VoiceInkShortcutActionPresentation.displayName(for: .miniRecorderEscape),
+            "Mini Recorder Cancel"
+        )
+        XCTAssertEqual(
+            VoiceInkShortcutActionPresentation.displayName(for: .miniRecorderPrompt(0)),
+            "Select Prompt 1"
+        )
+        XCTAssertEqual(
+            VoiceInkShortcutActionPresentation.displayName(for: .miniRecorderPrompt(9)),
+            "Select Prompt 10"
+        )
+        XCTAssertEqual(
+            VoiceInkShortcutActionPresentation.displayName(for: .miniRecorderPowerMode(0)),
+            "Select Power Mode 1"
+        )
+        XCTAssertEqual(
+            VoiceInkShortcutActionPresentation.displayName(for: .miniRecorderPowerMode(9)),
+            "Select Power Mode 10"
+        )
+    }
+
     func testRecordingShortcutSelectionMigrationPlanMigratesCurrentPresetAndRemovesLegacyKey() {
         withIsolatedDefaults { defaults in
             defaults.set("rightOption", forKey: VoiceInkUserDefaultsKey.primaryRecordingShortcut)

@@ -1552,6 +1552,61 @@ public enum VoiceInkShortcutActionIdentifier: Hashable, Sendable {
     ]
 }
 
+public enum VoiceInkShortcutActionPresentation {
+    public static let primaryRecordingDisplayName = "Primary Shortcut"
+    public static let secondaryRecordingDisplayName = "Secondary Shortcut"
+    public static let pasteLastTranscriptionDisplayName = "Paste Last Transcription"
+    public static let pasteLastEnhancementDisplayName = "Paste Last Enhanced Transcription"
+    public static let retryLastTranscriptionDisplayName = "Retry Last Transcription"
+    public static let cancelRecorderDisplayName = "Cancel Recording"
+    public static let openHistoryWindowDisplayName = VoiceInkHistoryPresentation.macOSShortcutTip.shortcutLabel
+    public static let quickAddToDictionaryDisplayName = "Quick Add to Dictionary"
+    public static let toggleEnhancementDisplayName = "Toggle Enhancement"
+    public static let fallbackPowerModeDisplayName = "Power Mode"
+    public static let miniRecorderEscapeDisplayName = "Mini Recorder Cancel"
+
+    public static func displayName(
+        for identifier: VoiceInkShortcutActionIdentifier,
+        powerModeName: String? = nil
+    ) -> String {
+        switch identifier {
+        case .primaryRecording:
+            return primaryRecordingDisplayName
+        case .secondaryRecording:
+            return secondaryRecordingDisplayName
+        case .pasteLastTranscription:
+            return pasteLastTranscriptionDisplayName
+        case .pasteLastEnhancement:
+            return pasteLastEnhancementDisplayName
+        case .retryLastTranscription:
+            return retryLastTranscriptionDisplayName
+        case .cancelRecorder:
+            return cancelRecorderDisplayName
+        case .openHistoryWindow:
+            return openHistoryWindowDisplayName
+        case .quickAddToDictionary:
+            return quickAddToDictionaryDisplayName
+        case .toggleEnhancement:
+            return toggleEnhancementDisplayName
+        case .powerMode:
+            guard let powerModeName else {
+                return fallbackPowerModeDisplayName
+            }
+            return "\(powerModeName) Power Mode"
+        case .miniRecorderEscape:
+            return miniRecorderEscapeDisplayName
+        case .miniRecorderPrompt(let index):
+            return "Select Prompt \(displayNumber(forMiniRecorderIndex: index))"
+        case .miniRecorderPowerMode(let index):
+            return "Select Power Mode \(displayNumber(forMiniRecorderIndex: index))"
+        }
+    }
+
+    public static func displayNumber(forMiniRecorderIndex index: Int) -> String {
+        index == 9 ? "10" : "\(index + 1)"
+    }
+}
+
 public enum VoiceInkLegacyRecordingShortcutPreset: String, CaseIterable, Sendable {
     case rightOption
     case leftOption

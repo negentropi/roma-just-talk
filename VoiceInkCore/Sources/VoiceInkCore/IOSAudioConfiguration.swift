@@ -71,6 +71,19 @@ public enum VoiceInkAudioSessionDiagnostics {
     }
 }
 
+public struct VoiceInkAudioSessionPlaybackActivationPlan: Equatable, Sendable {
+    public let shouldCancelScheduledDeactivation: Bool
+    public let shouldDeactivateCurrentSession: Bool
+
+    public init(
+        shouldCancelScheduledDeactivation: Bool,
+        shouldDeactivateCurrentSession: Bool
+    ) {
+        self.shouldCancelScheduledDeactivation = shouldCancelScheduledDeactivation
+        self.shouldDeactivateCurrentSession = shouldDeactivateCurrentSession
+    }
+}
+
 public struct VoiceInkAudioSessionLifecycleState: Equatable, Sendable {
     public private(set) var isSessionActive: Bool
     public private(set) var timeoutRemaining: TimeInterval
@@ -91,6 +104,15 @@ public struct VoiceInkAudioSessionLifecycleState: Equatable, Sendable {
     public mutating func markActivatedForPlayback() {
         isSessionActive = true
         cancelScheduledDeactivation()
+    }
+
+    public mutating func beginPlaybackActivation() -> VoiceInkAudioSessionPlaybackActivationPlan {
+        let plan = VoiceInkAudioSessionPlaybackActivationPlan(
+            shouldCancelScheduledDeactivation: true,
+            shouldDeactivateCurrentSession: isSessionActive
+        )
+        cancelScheduledDeactivation()
+        return plan
     }
 
     public mutating func scheduleDeactivation(timeoutSeconds: Int) -> VoiceInkAudioSessionDeactivationPlan {

@@ -56,9 +56,12 @@ final class AudioSessionManager: ObservableObject {
         let audioSession = AVAudioSession.sharedInstance()
         let configuration = VoiceInkIOSAudioPlaybackSessionConfiguration.notePlayback
 
-        cancelScheduledDeactivation()
+        let activationPlan = lifecycleState.beginPlaybackActivation()
+        if activationPlan.shouldCancelScheduledDeactivation {
+            invalidateDeactivationTimer()
+        }
 
-        if lifecycleState.isSessionActive {
+        if activationPlan.shouldDeactivateCurrentSession {
             try audioSession.setActive(false, options: .notifyOthersOnDeactivation)
             lifecycleState.markDeactivated()
         }
@@ -126,9 +129,13 @@ final class AudioSessionManager: ObservableObject {
     // MARK: - Private Methods
     
     private func cancelScheduledDeactivation() {
+        invalidateDeactivationTimer()
+        lifecycleState.cancelScheduledDeactivation()
+    }
+
+    private func invalidateDeactivationTimer() {
         deactivationTimer?.invalidate()
         deactivationTimer = nil
-        lifecycleState.cancelScheduledDeactivation()
     }
 }
 

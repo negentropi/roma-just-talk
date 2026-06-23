@@ -84,6 +84,31 @@ final class AudioSessionLifecycleStateTests: XCTestCase {
         XCTAssertEqual(state.timeoutRemaining, 0)
     }
 
+    func testAudioSessionLifecycleStatePlansPlaybackActivationSideEffects() {
+        var activeState = VoiceInkAudioSessionLifecycleState(isSessionActive: true)
+        XCTAssertEqual(activeState.scheduleDeactivation(timeoutSeconds: 90), .delayed(90))
+
+        XCTAssertEqual(
+            activeState.beginPlaybackActivation(),
+            VoiceInkAudioSessionPlaybackActivationPlan(
+                shouldCancelScheduledDeactivation: true,
+                shouldDeactivateCurrentSession: true
+            )
+        )
+        XCTAssertEqual(activeState.timeoutRemaining, 0)
+        XCTAssertTrue(activeState.isSessionActive)
+
+        var inactiveState = VoiceInkAudioSessionLifecycleState()
+        XCTAssertEqual(
+            inactiveState.beginPlaybackActivation(),
+            VoiceInkAudioSessionPlaybackActivationPlan(
+                shouldCancelScheduledDeactivation: true,
+                shouldDeactivateCurrentSession: false
+            )
+        )
+        XCTAssertFalse(inactiveState.isSessionActive)
+    }
+
     func testAudioSessionLifecycleStateRequestsDeactivationWhenCountdownExpires() {
         var state = VoiceInkAudioSessionLifecycleState(isSessionActive: true, timeoutRemaining: 1)
 

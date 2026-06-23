@@ -14663,15 +14663,19 @@ require_pattern \
   'diagnostic log session storage/range/header/filename/error policy.*VoiceInkDiagnosticLogExportPolicy' \
   docs/ios-single-repo-migration.md
 
-require_pattern \
+require_patterns \
   "VoiceInkCore owns iOS record deep-link contract" \
-  'public enum VoiceInkAppDeepLink|public init\?\(url: URL\)|VoiceInkAppIdentity\.iOSRecordDeepLinkURL' \
-  VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift
+  VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift \
+  'public enum VoiceInkAppDeepLink' \
+  'public init\?\(url: URL\)' \
+  'VoiceInkAppIdentity\.iOSRecordDeepLinkURL' \
+  'applyRuntimeState'
 
-require_pattern \
+require_patterns \
   "VoiceInkCore checks cover iOS record deep-link contract" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
   'testIOSRecordDeepLinkContractRoundTripsThroughSharedCore' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  'testIOSRecordDeepLinkAppliesRuntimeState'
 
 require_context_pattern_count_at_least \
   "iOS keyboard target depends on shared app identity package product" \
@@ -15083,9 +15087,15 @@ require_pattern \
   'VoiceInkKeyboardRecordingTiming\.(recordingStatusPollingInterval|openAppFallbackResetDelay)' \
   iOS/VoiceInkKeyboard/KeyboardViewController.swift
 
-require_pattern \
+require_patterns \
   "iOS app deep-link recording uses shared core deep-link contract" \
+  iOS/VoiceInk-ios/VoiceInk_iosApp.swift \
   'VoiceInkAppDeepLink\(url: url\)' \
+  'deepLink\.applyRuntimeState'
+
+reject_pattern \
+  "iOS app deep-link recording avoids shell-owned deep-link branching" \
+  'switch +deepLink|case +\.record' \
   iOS/VoiceInk-ios/VoiceInk_iosApp.swift
 
 require_pattern \

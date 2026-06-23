@@ -252,4 +252,14 @@ final class AppIdentityTests: XCTestCase {
         XCTAssertNil(VoiceInkAppDeepLink(url: try XCTUnwrap(URL(string: "voiceink://settings"))))
         XCTAssertNil(VoiceInkAppDeepLink(url: try XCTUnwrap(URL(string: "roma://record"))))
     }
+
+    func testIOSRecordDeepLinkAppliesRuntimeState() {
+        var didHandleRecord = false
+
+        VoiceInkAppDeepLink.record.applyRuntimeState {
+            didHandleRecord = true
+        }
+
+        XCTAssertTrue(didHandleRecord)
+    }
 }

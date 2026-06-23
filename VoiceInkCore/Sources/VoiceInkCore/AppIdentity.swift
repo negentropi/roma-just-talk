@@ -416,4 +416,13 @@ public enum VoiceInkAppDeepLink: Equatable, Sendable {
 
         self = .record
     }
+
+    public func applyRuntimeState(
+        handleRecord: () -> Void
+    ) {
+        switch self {
+        case .record:
+            handleRecord()
+        }
+    }
 }

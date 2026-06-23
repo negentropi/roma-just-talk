@@ -24,6 +24,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "AppIdentityTests.testMacOSApplicationSupportDirectoryUsesBundleIdentifier", run: { AppIdentityTests().testMacOSApplicationSupportDirectoryUsesBundleIdentifier() }),
             VoiceInkCoreCheck(name: "AppIdentityTests.testBundleScopedErrorDomainUsesBundleIdentifier", run: { AppIdentityTests().testBundleScopedErrorDomainUsesBundleIdentifier() }),
             VoiceInkCoreCheck(name: "AppIdentityTests.testIOSRecordDeepLinkContractRoundTripsThroughSharedCore", run: { try AppIdentityTests().testIOSRecordDeepLinkContractRoundTripsThroughSharedCore() }),
+            VoiceInkCoreCheck(name: "AppIdentityTests.testIOSRecordDeepLinkAppliesRuntimeState", run: { AppIdentityTests().testIOSRecordDeepLinkAppliesRuntimeState() }),
             VoiceInkCoreCheck(name: "AppIntentPresentationTests.testMiniRecorderIntentPresentationPreservesMacOSShortcutCopy", run: { AppIntentPresentationTests().testMiniRecorderIntentPresentationPreservesMacOSShortcutCopy() }),
             VoiceInkCoreCheck(name: "AppIntentPresentationTests.testMiniRecorderRequestPreservesMacOSNotificationNames", run: { AppIntentPresentationTests().testMiniRecorderRequestPreservesMacOSNotificationNames() }),
             VoiceInkCoreCheck(name: "SupportContactPolicyTests.testSupportContactPolicyPreservesEmailIdentityAndSubject", run: { SupportContactPolicyTests().testSupportContactPolicyPreservesEmailIdentityAndSubject() }),

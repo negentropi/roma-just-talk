@@ -78,8 +78,7 @@ struct VoiceInk_iosApp: App {
     private func handleURL(_ url: URL) {
         guard let deepLink = VoiceInkAppDeepLink(url: url) else { return }
 
-        switch deepLink {
-        case .record:
+        deepLink.applyRuntimeState {
             VoiceInkIOSLogger.app.notice("\(VoiceInkIOSRecordingCoordinationDiagnostics.recordDeepLinkOpenedMessage, privacy: .public)")
             applyLaunchRecordingAction(
                 launchRecordingRequestState.requestRecording(

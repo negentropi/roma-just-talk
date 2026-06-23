@@ -8403,6 +8403,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 require_pattern \
+  "shared AI enhancement OpenRouter refresh runtime application lives in VoiceInkCore" \
+  'applyOpenRouterRuntimeState|setOpenRouterModels|sendObjectWillChange' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+require_pattern \
   "shared AI enhancement refresh persistence application lives in VoiceInkCore" \
   'applyModelRefreshPlan|applyOpenRouterModelRefreshPlan|applyOllamaModelRefreshPlan' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
@@ -8414,8 +8419,13 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
+  "core tests pin shared AI enhancement OpenRouter refresh runtime application" \
+  'AIProviderCatalogTests\.testMacOSAIEnhancementOpenRouterModelRefreshPlanAppliesRuntimeState' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "macOS AI service refresh model application uses shared policy" \
-  'VoiceInkAIEnhancementModelRefreshPlan\.(refreshed|failed)' \
+  'VoiceInkAIEnhancementModelRefreshPlan\.(refreshed|failed)|applyOpenRouterRuntimeState' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 require_pattern \
@@ -8578,7 +8588,7 @@ reject_pattern \
 
 reject_pattern \
   "macOS AI service avoids shell-owned OpenRouter refresh cache decisions" \
-  'self\.openRouterModels = models|self\.openRouterModels = \[\]' \
+  'openRouterModels = plan\.refreshedModelNames|self\.openRouterModels = models|self\.openRouterModels = \[\]' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 reject_pattern \

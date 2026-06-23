@@ -148,6 +148,23 @@ public struct VoiceInkAIEnhancementModelRefreshPlan: Sendable, Equatable {
     )
 }
 
+public extension VoiceInkAIEnhancementModelRefreshPlan {
+    func applyOpenRouterRuntimeState(
+        setOpenRouterModels: ([String]) -> Void,
+        applyPersistence: (VoiceInkAIEnhancementModelRefreshPlan) -> String?,
+        setSelectedOpenRouterModel: (String) -> Void,
+        postSettingsChanged: () -> Void,
+        sendObjectWillChange: () -> Void
+    ) {
+        setOpenRouterModels(refreshedModelNames)
+        if let refreshedModel = applyPersistence(self) {
+            setSelectedOpenRouterModel(refreshedModel)
+            postSettingsChanged()
+        }
+        sendObjectWillChange()
+    }
+}
+
 public struct VoiceInkAIEnhancementModelSelectionPlan: Sendable, Equatable {
     public let selectedModels: [VoiceInkAIEnhancementProviderKind: String]
     public let provider: VoiceInkAIEnhancementProviderKind

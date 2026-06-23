@@ -1600,6 +1600,71 @@ final class AIProviderCatalogTests: XCTestCase {
         )
     }
 
+    func testMacOSAIEnhancementOpenRouterModelRefreshPlanAppliesRuntimeState() {
+        let refreshedPlan = VoiceInkAIEnhancementModelRefreshPlan(
+            refreshedModelNames: [
+                "anthropic/claude-3.5-sonnet",
+                "openai/gpt-4o"
+            ],
+            selectedModelToSave: "anthropic/claude-3.5-sonnet"
+        )
+
+        var events: [String] = []
+
+        refreshedPlan.applyOpenRouterRuntimeState(
+            setOpenRouterModels: { models in
+                events.append("models:\(models.joined(separator: ","))")
+            },
+            applyPersistence: { plan in
+                events.append("persist:\(plan.refreshedModelNames.joined(separator: ","))")
+                return plan.selectedModelToSave
+            },
+            setSelectedOpenRouterModel: { model in
+                events.append("select:\(model)")
+            },
+            postSettingsChanged: {
+                events.append("settings")
+            },
+            sendObjectWillChange: {
+                events.append("willChange")
+            }
+        )
+
+        XCTAssertEqual(events, [
+            "models:anthropic/claude-3.5-sonnet,openai/gpt-4o",
+            "persist:anthropic/claude-3.5-sonnet,openai/gpt-4o",
+            "select:anthropic/claude-3.5-sonnet",
+            "settings",
+            "willChange"
+        ])
+
+        events = []
+        VoiceInkAIEnhancementModelRefreshPlan.failed.applyOpenRouterRuntimeState(
+            setOpenRouterModels: { models in
+                events.append("models:\(models.joined(separator: ","))")
+            },
+            applyPersistence: { plan in
+                events.append("persist:\(plan.refreshedModelNames.joined(separator: ","))")
+                return plan.selectedModelToSave
+            },
+            setSelectedOpenRouterModel: { model in
+                events.append("select:\(model)")
+            },
+            postSettingsChanged: {
+                events.append("settings")
+            },
+            sendObjectWillChange: {
+                events.append("willChange")
+            }
+        )
+
+        XCTAssertEqual(events, [
+            "models:",
+            "persist:",
+            "willChange"
+        ])
+    }
+
     func testMacOSAIEnhancementProviderVerificationRoutesAreShared() {
         let expectedRoutes: [VoiceInkAIEnhancementProviderKind: VoiceInkAIEnhancementAPIKeyVerificationRoute?] = [
             .anthropic: .anthropicMessages,

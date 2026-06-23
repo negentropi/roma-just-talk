@@ -337,14 +337,25 @@ class AIService: ObservableObject {
     }
 
     private func applyOpenRouterModelRefreshPlan(_ plan: VoiceInkAIEnhancementModelRefreshPlan) {
-        openRouterModels = plan.refreshedModelNames
-        if let refreshedModel = VoiceInkDynamicAIProviderPreference.applyOpenRouterModelRefreshPlan(
-            plan,
-            to: userDefaults
-        ) {
-            selectedModels[.openRouter] = refreshedModel
-            NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
-        }
-        objectWillChange.send()
+        plan.applyOpenRouterRuntimeState(
+            setOpenRouterModels: { [self] models in
+                openRouterModels = models
+            },
+            applyPersistence: { [self] plan in
+                VoiceInkDynamicAIProviderPreference.applyOpenRouterModelRefreshPlan(
+                    plan,
+                    to: userDefaults
+                )
+            },
+            setSelectedOpenRouterModel: { [self] model in
+                selectedModels[.openRouter] = model
+            },
+            postSettingsChanged: {
+                NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
+            },
+            sendObjectWillChange: { [self] in
+                objectWillChange.send()
+            }
+        )
     }
 }

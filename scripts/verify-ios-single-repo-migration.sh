@@ -9870,6 +9870,14 @@ reject_pattern \
   '"Retranscription successful"|"Re-enhancement successful"|"Retranscription failed"|"Re-enhancement failed"|"AI Enhancement is not enabled or configured"|VoiceInkTranscriptPresentation\.audioFile(ReEnhancement|Retranscription)(SuccessMessage|FailureMessage)|VoiceInkPostProcessingFailurePresentation\.enhancementUnavailableMessage|VoiceInkErrorDescription\.text\(for: VoiceInkEngineError\.noTranscriptionModelSelected\)|VoiceInkEngineError\.noTranscriptionModelSelected' \
   VoiceInk/Views/AudioPlayerView.swift
 
+section "obsolete standalone post-processing failure presentation module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/PostProcessingFailurePresentation.swift
+
+require_pattern \
+  "post-processing failure presentation lives with transcript presentation" \
+  'VoiceInkPostProcessingFailurePresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+
 reject_pattern \
   "macOS enhancement record callers avoid shell-owned enhancement metadata mutation" \
   'transcription\.(enhancedText|aiEnhancementModelName|promptName|enhancementDuration|aiRequestSystemMessage|aiRequestUserMessage)\s*=' \

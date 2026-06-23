@@ -501,6 +501,22 @@ public struct VoiceInkKeyboardRecordingButtonTapPlan: Equatable, Sendable {
         self.action = action
         self.shouldRefreshButtonStateAfterAction = shouldRefreshButtonStateAfterAction
     }
+
+    public func applyRuntimeState(
+        requestStopRecording: () -> Void,
+        openMainAppForRecording: () -> Void,
+        refreshButtonState: () -> Void
+    ) {
+        switch action {
+        case .requestStopRecording:
+            requestStopRecording()
+            if shouldRefreshButtonStateAfterAction {
+                refreshButtonState()
+            }
+        case .openMainAppForRecording:
+            openMainAppForRecording()
+        }
+    }
 }
 
 public enum VoiceInkKeyboardRecordingButtonTapPolicy {

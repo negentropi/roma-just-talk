@@ -14881,17 +14881,22 @@ require_pattern \
 
 require_pattern \
   "VoiceInkCore owns iOS keyboard recording button tap policy" \
-  'VoiceInkKeyboardRecordingButtonTap(Policy|Plan|Action)|plan\(isRecording:' \
+  'VoiceInkKeyboardRecordingButtonTap(Policy|Plan|Action)|plan\(isRecording:|applyRuntimeState' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
 require_pattern \
   "VoiceInkCore checks cover iOS keyboard recording button tap policy" \
-  'testKeyboardRecordingButtonTapPlan(StopsActiveRecordingAndRefreshesState|OpensAppWhenIdleWithoutRefreshingState)' \
+  'testKeyboardRecordingButtonTapPlan(StopsActiveRecordingAndRefreshesState|OpensAppWhenIdleWithoutRefreshingState|AppliesRuntimeState)' \
   VoiceInkCore/Tests/VoiceInkCoreTests/RecordingStatePolicyTests.swift
 
 require_pattern \
-  "iOS keyboard controller delegates tap action policy to shared core" \
-  'VoiceInkKeyboardRecordingButtonTapPolicy\.plan' \
+  "iOS keyboard controller delegates tap action policy and application to shared core" \
+  'VoiceInkKeyboardRecordingButtonTapPolicy\.plan|tapPlan\.applyRuntimeState' \
+  iOS/VoiceInkKeyboard/KeyboardViewController.swift
+
+reject_pattern \
+  "iOS keyboard controller avoids shell-owned tap action sequencing" \
+  'switch tapPlan\.action|tapPlan\.shouldRefreshButtonStateAfterAction|case \.requestStopRecording|case \.openMainAppForRecording' \
   iOS/VoiceInkKeyboard/KeyboardViewController.swift
 
 require_pattern \

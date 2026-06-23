@@ -669,6 +669,23 @@ final class RecordingStatePolicyTests: XCTestCase {
         )
     }
 
+    func testKeyboardRecordingButtonTapPlanAppliesRuntimeState() {
+        var events: [String] = []
+
+        VoiceInkKeyboardRecordingButtonTapPolicy.plan(isRecording: true).applyRuntimeState(
+            requestStopRecording: { events.append("stop") },
+            openMainAppForRecording: { events.append("open") },
+            refreshButtonState: { events.append("refresh") }
+        )
+        VoiceInkKeyboardRecordingButtonTapPolicy.plan(isRecording: false).applyRuntimeState(
+            requestStopRecording: { events.append("stop") },
+            openMainAppForRecording: { events.append("open") },
+            refreshButtonState: { events.append("refresh") }
+        )
+
+        XCTAssertEqual(events, ["stop", "refresh", "open"])
+    }
+
     func testKeyboardOpenAppPolicyPreservesFallbackOrder() {
         XCTAssertEqual(
             VoiceInkKeyboardOpenAppPolicy.initialAction(hasExtensionContext: true),

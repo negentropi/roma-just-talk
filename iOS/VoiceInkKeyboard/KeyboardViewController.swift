@@ -135,15 +135,11 @@ class KeyboardViewController: KeyboardInputViewController {
             isRecording: coordinator.isRecording
         )
 
-        switch tapPlan.action {
-        case .requestStopRecording:
-            coordinator.requestStopRecording()
-            if tapPlan.shouldRefreshButtonStateAfterAction {
-                updateButtonAppearanceBasedOnState()
-            }
-        case .openMainAppForRecording:
-            openMainAppForRecording()
-        }
+        tapPlan.applyRuntimeState(
+            requestStopRecording: coordinator.requestStopRecording,
+            openMainAppForRecording: openMainAppForRecording,
+            refreshButtonState: updateButtonAppearanceBasedOnState
+        )
     }
     
     private func addButtonPressAnimation() {

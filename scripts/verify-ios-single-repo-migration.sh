@@ -3093,8 +3093,13 @@ require_pattern \
 
 require_pattern \
   "shared provider API-key state mutation plans live in VoiceInkCore" \
-  'VoiceInkProviderAPIKeyStorageMutationPlan|VoiceInkProviderAPIKeyVerificationMutationPlan|applyStoredAPIKey|applyVerification|verificationFlagToPersist|shouldPersistVerificationFlag' \
+  'VoiceInkProviderAPIKeyStorageMutationPlan|VoiceInkProviderAPIKeyVerificationMutationPlan|VoiceInkProviderAPIKeyStatePersistenceAction|applyStoredAPIKey|applyVerification|persistenceActions|verificationFlagToPersist|shouldPersistVerificationFlag' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift
+
+require_pattern \
+  "core checks execute provider API-key state persistence action tests" \
+  'ProviderAccessRequirementTests\.testProviderAPIKeyState(Storage|Verification)MutationPlanBuildsPersistenceActions' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "shared provider API-key storage lives in VoiceInkCore" \
@@ -3108,7 +3113,7 @@ require_pattern \
 
 require_pattern \
   "iOS app settings applies shared provider API-key mutation plans" \
-  'applyStoredAPIKey|applyVerification|applyAPIKeyVerificationPlan|successPersistenceApplicationPlan|shouldPersistStoredKey|verificationFlagToPersist|shouldPersistVerificationFlag' \
+  'applyStoredAPIKey|applyVerification|applyAPIKeyVerificationPlan|successPersistenceApplicationPlan|persistenceActions|applyProviderAPIKeyStatePersistenceActions' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 reject_pattern \
@@ -3119,6 +3124,11 @@ reject_pattern \
 reject_pattern \
   "iOS app settings avoids shell-owned provider verification persistence field reads" \
   'persistencePlan\.keyToSave|persistencePlan\.verificationFlagToPersist' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+reject_pattern \
+  "iOS app settings avoids shell-owned provider API-key state mutation field reads" \
+  'plan\.shouldPersistStoredKey|plan\.verificationFlagToPersist|plan\.shouldPersistVerificationFlag' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \

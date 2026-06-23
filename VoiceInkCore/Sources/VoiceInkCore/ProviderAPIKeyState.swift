@@ -39,11 +39,37 @@ public struct VoiceInkProviderAPIKeyStorageMutationPlan: Equatable, Sendable {
     }
 }
 
+public enum VoiceInkProviderAPIKeyStatePersistenceAction: Equatable, Sendable {
+    case persistStoredKey(String)
+    case persistVerificationFlag(Bool)
+}
+
+public extension VoiceInkProviderAPIKeyStorageMutationPlan {
+    func persistenceActions(storedKey: String) -> [VoiceInkProviderAPIKeyStatePersistenceAction] {
+        guard shouldPersistStoredKey else { return [] }
+
+        var actions: [VoiceInkProviderAPIKeyStatePersistenceAction] = [
+            .persistStoredKey(storedKey)
+        ]
+        if let verificationFlagToPersist {
+            actions.append(.persistVerificationFlag(verificationFlagToPersist))
+        }
+        return actions
+    }
+}
+
 public struct VoiceInkProviderAPIKeyVerificationMutationPlan: Equatable, Sendable {
     public let shouldPersistVerificationFlag: Bool
 
     public init(shouldPersistVerificationFlag: Bool) {
         self.shouldPersistVerificationFlag = shouldPersistVerificationFlag
+    }
+}
+
+public extension VoiceInkProviderAPIKeyVerificationMutationPlan {
+    func persistenceActions(verificationFlag: Bool) -> [VoiceInkProviderAPIKeyStatePersistenceAction] {
+        guard shouldPersistVerificationFlag else { return [] }
+        return [.persistVerificationFlag(verificationFlag)]
     }
 }
 

@@ -96,13 +96,11 @@ final class AppSettings: ObservableObject {
     func setAPIKey(_ key: String, for provider: VoiceInkProviderKind) {
         var updatedState = apiKeyState
         let plan = updatedState.applyStoredAPIKey(key, for: provider)
-        guard plan.shouldPersistStoredKey else { return }
+        let actions = plan.persistenceActions(storedKey: key)
+        guard !actions.isEmpty else { return }
 
         apiKeyState = updatedState
-        saveAPIKey(key, for: provider)
-        if let verificationFlag = plan.verificationFlagToPersist {
-            VoiceInkProviderAPIKeyVerificationState.setVerified(verificationFlag, for: provider)
-        }
+        applyProviderAPIKeyStatePersistenceActions(actions, for: provider)
     }
     
     func isKeyVerified(for provider: VoiceInkProviderKind) -> Bool {
@@ -135,10 +133,25 @@ final class AppSettings: ObservableObject {
     func setKeyVerified(_ verified: Bool, for provider: VoiceInkProviderKind) {
         var updatedState = apiKeyState
         let plan = updatedState.applyVerification(verified, for: provider)
-        guard plan.shouldPersistVerificationFlag else { return }
+        let actions = plan.persistenceActions(verificationFlag: verified)
+        guard !actions.isEmpty else { return }
 
         apiKeyState = updatedState
-        VoiceInkProviderAPIKeyVerificationState.setVerified(verified, for: provider)
+        applyProviderAPIKeyStatePersistenceActions(actions, for: provider)
+    }
+
+    private func applyProviderAPIKeyStatePersistenceActions(
+        _ actions: [VoiceInkProviderAPIKeyStatePersistenceAction],
+        for provider: VoiceInkProviderKind
+    ) {
+        for action in actions {
+            switch action {
+            case .persistStoredKey(let key):
+                saveAPIKey(key, for: provider)
+            case .persistVerificationFlag(let flag):
+                VoiceInkProviderAPIKeyVerificationState.setVerified(flag, for: provider)
+            }
+        }
     }
 
     func applyAPIKeyVerificationPlan(

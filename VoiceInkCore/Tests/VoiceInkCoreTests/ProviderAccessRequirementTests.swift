@@ -697,6 +697,54 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertFalse(state.isReady(for: .groq, localWhisperModelAvailable: false))
     }
 
+    func testProviderAPIKeyStateStorageMutationPlanBuildsPersistenceActions() {
+        XCTAssertEqual(
+            VoiceInkProviderAPIKeyStorageMutationPlan(
+                shouldPersistStoredKey: true,
+                verificationFlagToPersist: nil
+            ).persistenceActions(storedKey: "same-key"),
+            [.persistStoredKey("same-key")]
+        )
+        XCTAssertEqual(
+            VoiceInkProviderAPIKeyStorageMutationPlan(
+                shouldPersistStoredKey: true,
+                verificationFlagToPersist: false
+            ).persistenceActions(storedKey: "new-key"),
+            [
+                .persistStoredKey("new-key"),
+                .persistVerificationFlag(false)
+            ]
+        )
+        XCTAssertEqual(
+            VoiceInkProviderAPIKeyStorageMutationPlan(
+                shouldPersistStoredKey: false,
+                verificationFlagToPersist: nil
+            ).persistenceActions(storedKey: "ignored"),
+            []
+        )
+    }
+
+    func testProviderAPIKeyStateVerificationMutationPlanBuildsPersistenceActions() {
+        XCTAssertEqual(
+            VoiceInkProviderAPIKeyVerificationMutationPlan(
+                shouldPersistVerificationFlag: true
+            ).persistenceActions(verificationFlag: true),
+            [.persistVerificationFlag(true)]
+        )
+        XCTAssertEqual(
+            VoiceInkProviderAPIKeyVerificationMutationPlan(
+                shouldPersistVerificationFlag: true
+            ).persistenceActions(verificationFlag: false),
+            [.persistVerificationFlag(false)]
+        )
+        XCTAssertEqual(
+            VoiceInkProviderAPIKeyVerificationMutationPlan(
+                shouldPersistVerificationFlag: false
+            ).persistenceActions(verificationFlag: true),
+            []
+        )
+    }
+
     func testProviderAPIKeyStateVerificationIgnoresNonUserKeyProviders() {
         var state = VoiceInkProviderAPIKeyState()
 

@@ -533,6 +533,49 @@ final class AIProviderCatalogTests: XCTestCase {
         )
     }
 
+    func testMacOSAIEnhancementAPIKeyVerificationPlanAppliesSuccessPersistence() {
+        let successPlan = VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan(
+            isValid: true,
+            runtimeAPIKey: "resolved-key",
+            keyToSave: "$GROQ_API_KEY",
+            providerKeyStorageNameToSave: VoiceInkAIEnhancementProviderKind.groq.rawValue,
+            errorMessage: nil
+        )
+        let storedKeySuccessPlan = VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan(
+            isValid: true,
+            runtimeAPIKey: "resolved-key",
+            keyToSave: nil,
+            providerKeyStorageNameToSave: VoiceInkAIEnhancementProviderKind.groq.rawValue,
+            errorMessage: nil
+        )
+        let failurePlan = VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan(
+            isValid: false,
+            runtimeAPIKey: nil,
+            keyToSave: nil,
+            providerKeyStorageNameToSave: nil,
+            errorMessage: "invalid"
+        )
+
+        var savedKeys: [(key: String, provider: String)] = []
+
+        successPlan.applySuccessPersistence { key, provider in
+            savedKeys.append((key, provider))
+        }
+        XCTAssertEqual(savedKeys.map { $0.key }, ["$GROQ_API_KEY"])
+        XCTAssertEqual(savedKeys.map { $0.provider }, [VoiceInkAIEnhancementProviderKind.groq.rawValue])
+
+        savedKeys = []
+        storedKeySuccessPlan.applySuccessPersistence { key, provider in
+            savedKeys.append((key, provider))
+        }
+        XCTAssertTrue(savedKeys.isEmpty)
+
+        failurePlan.applySuccessPersistence { key, provider in
+            savedKeys.append((key, provider))
+        }
+        XCTAssertTrue(savedKeys.isEmpty)
+    }
+
     func testMacOSAIEnhancementAPIKeyClearPlanIsShared() {
         XCTAssertEqual(
             VoiceInkAIEnhancementAPIKeyClearPlan.clearing(provider: .groq),

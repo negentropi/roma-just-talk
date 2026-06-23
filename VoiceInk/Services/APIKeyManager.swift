@@ -37,11 +37,8 @@ final class APIKeyManager {
     func applyAIEnhancementVerificationPlan(
         _ plan: VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan
     ) {
-        guard let persistencePlan = plan.successPersistencePlan else { return }
-
-        if let keyToSave = persistencePlan.keyToSave,
-           let providerKeyStorageNameToSave = persistencePlan.providerKeyStorageNameToSave {
-            saveAPIKey(keyToSave, forProvider: providerKeyStorageNameToSave)
+        plan.applySuccessPersistence { [self] key, provider in
+            saveAPIKey(key, forProvider: provider)
         }
     }
 

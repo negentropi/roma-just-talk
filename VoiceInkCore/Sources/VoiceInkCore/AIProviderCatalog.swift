@@ -476,6 +476,18 @@ public extension VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan {
             )
         )
     }
+
+    func applySuccessPersistence(
+        saveKey: (String, String) -> Void
+    ) {
+        guard let persistencePlan = successPersistencePlan,
+              let keyToSave = persistencePlan.keyToSave,
+              let providerKeyStorageNameToSave = persistencePlan.providerKeyStorageNameToSave else {
+            return
+        }
+
+        saveKey(keyToSave, providerKeyStorageNameToSave)
+    }
 }
 
 public enum VoiceInkAIEnhancementAPIKeyVerificationDispatch: Equatable, Sendable {

@@ -1818,6 +1818,37 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         )
     }
 
+    func testShortcutValidationPresentationPreservesMacOSNotificationTitles() {
+        XCTAssertEqual(
+            VoiceInkShortcutValidationPresentation.notificationTitle(
+                for: .plainKeyRequiresModifier,
+                shortcutDisplayString: "A"
+            ),
+            "Shortcut not allowed: A"
+        )
+        XCTAssertEqual(
+            VoiceInkShortcutValidationPresentation.notificationTitle(
+                for: .shiftTypingKeyRequiresAdditionalModifier,
+                shortcutDisplayString: "Shift + A"
+            ),
+            "Shortcut not allowed: Shift + A"
+        )
+        XCTAssertEqual(
+            VoiceInkShortcutValidationPresentation.notificationTitle(
+                for: .reservedBySystem,
+                shortcutDisplayString: "Command + Q"
+            ),
+            "Shortcut reserved by macOS: Command + Q"
+        )
+        XCTAssertEqual(
+            VoiceInkShortcutValidationPresentation.notificationTitle(
+                for: .alreadyUsedBy("Open History Window"),
+                shortcutDisplayString: "Command + H"
+            ),
+            "Shortcut already used by Open History Window"
+        )
+    }
+
     func testRecordingShortcutSelectionMigrationPlanMigratesCurrentPresetAndRemovesLegacyKey() {
         withIsolatedDefaults { defaults in
             defaults.set("rightOption", forKey: VoiceInkUserDefaultsKey.primaryRecordingShortcut)

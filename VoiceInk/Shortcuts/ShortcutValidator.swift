@@ -1,23 +1,15 @@
 import AppKit
 import Carbon.HIToolbox
+import VoiceInkCore
 
-enum ShortcutValidationError: Equatable {
-    case plainKeyRequiresModifier
-    case shiftTypingKeyRequiresAdditionalModifier
-    case reservedBySystem
-    case alreadyUsedBy(String)
+typealias ShortcutValidationError = VoiceInkShortcutValidationIssue
 
+extension VoiceInkShortcutValidationIssue {
     func notificationTitle(for shortcut: Shortcut) -> String {
-        switch self {
-        case .plainKeyRequiresModifier:
-            return "Shortcut not allowed: \(shortcut.displayString)"
-        case .shiftTypingKeyRequiresAdditionalModifier:
-            return "Shortcut not allowed: \(shortcut.displayString)"
-        case .reservedBySystem:
-            return "Shortcut reserved by macOS: \(shortcut.displayString)"
-        case .alreadyUsedBy(let actionName):
-            return "Shortcut already used by \(actionName)"
-        }
+        VoiceInkShortcutValidationPresentation.notificationTitle(
+            for: self,
+            shortcutDisplayString: shortcut.displayString
+        )
     }
 }
 

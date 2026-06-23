@@ -1607,6 +1607,29 @@ public enum VoiceInkShortcutActionPresentation {
     }
 }
 
+public enum VoiceInkShortcutValidationIssue: Equatable, Sendable {
+    case plainKeyRequiresModifier
+    case shiftTypingKeyRequiresAdditionalModifier
+    case reservedBySystem
+    case alreadyUsedBy(String)
+}
+
+public enum VoiceInkShortcutValidationPresentation {
+    public static func notificationTitle(
+        for issue: VoiceInkShortcutValidationIssue,
+        shortcutDisplayString: String
+    ) -> String {
+        switch issue {
+        case .plainKeyRequiresModifier, .shiftTypingKeyRequiresAdditionalModifier:
+            return "Shortcut not allowed: \(shortcutDisplayString)"
+        case .reservedBySystem:
+            return "Shortcut reserved by macOS: \(shortcutDisplayString)"
+        case .alreadyUsedBy(let actionName):
+            return "Shortcut already used by \(actionName)"
+        }
+    }
+}
+
 public enum VoiceInkLegacyRecordingShortcutPreset: String, CaseIterable, Sendable {
     case rightOption
     case leftOption

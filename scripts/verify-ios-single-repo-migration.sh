@@ -8776,6 +8776,16 @@ require_patterns \
   'miniRecorderEscapeDisplayName = "Mini Recorder Cancel"' \
   'displayNumber\(forMiniRecorderIndex:'
 
+require_patterns \
+  "shared shortcut validation notification presentation lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift \
+  'VoiceInkShortcutValidationIssue' \
+  'VoiceInkShortcutValidationPresentation' \
+  'notificationTitle' \
+  'Shortcut not allowed:' \
+  'Shortcut reserved by macOS:' \
+  'Shortcut already used by'
+
 require_pattern \
   "shared recording shortcut preference owns selection keys" \
   'selectionKey' \
@@ -8960,6 +8970,12 @@ require_patterns \
   'VoiceInkShortcutActionPresentation\.displayName' \
   'powerModeConfigurationName'
 
+require_patterns \
+  "macOS shortcut validator uses shared validation presentation" \
+  VoiceInk/Shortcuts/ShortcutValidator.swift \
+  'VoiceInkShortcutValidationIssue' \
+  'VoiceInkShortcutValidationPresentation\.notificationTitle'
+
 require_pattern \
   "macOS general backup adapts recording shortcut values to shared preferences" \
   'recordingShortcutBackupPreferences' \
@@ -9012,6 +9028,11 @@ reject_pattern \
   "macOS shortcut action avoids shell-owned display-name copy and numbering" \
   '"(Primary Shortcut|Secondary Shortcut|Paste Last Transcription|Paste Last Enhanced Transcription|Retry Last Transcription|Cancel Recording|Open History Window|Quick Add to Dictionary|Toggle Enhancement|Power Mode|Mini Recorder Cancel|Select Prompt|Select Power Mode)"|displayNumber\(forMiniRecorderIndex:' \
   VoiceInk/Shortcuts/ShortcutAction.swift
+
+reject_pattern \
+  "macOS shortcut validator avoids shell-owned notification copy" \
+  '"(Shortcut not allowed:|Shortcut reserved by macOS:|Shortcut already used by)"' \
+  VoiceInk/Shortcuts/ShortcutValidator.swift
 
 reject_pattern \
   "macOS backup import avoids shell-only recording shortcut raw parsing" \
@@ -9069,6 +9090,11 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
+  "core checks execute shared shortcut validation presentation tests" \
+  'UserDefaultsPreferencesTests\.testShortcutValidationPresentationPreservesMacOSNotificationTitles' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "core checks execute shared shortcut recorder presentation test" \
   'UserDefaultsPreferencesTests\.testRecordingShortcutPreferencePreservesMacOSRecorderPresentation' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
@@ -9080,7 +9106,7 @@ require_pattern \
 
 require_pattern \
   "migration checklist tracks shared recording shortcut preference gate" \
-  'macOS recording shortcut action identifiers, action display names, selection/mode migration plans, legacy shortcut key names, raw shortcut storage, middle-click, special empty-tap preferences, settings labels/help, shortcut recorder labels, backup import/export value planning, general-backup shortcut action ordering, and recording-shortcut selection repair when importing backed-up shortcut records route through `VoiceInkShortcutActionIdentifier`/`VoiceInkShortcutActionPresentation`/`VoiceInkLegacyRecordingShortcutPreset`/`VoiceInkRecordingShortcutSelection`/`VoiceInkRecordingShortcutMode`/`VoiceInkRecordingShortcutPreference`/`VoiceInkShortcutStoragePreference`/`VoiceInkShortcutBackupPolicy`' \
+  'macOS recording shortcut action identifiers, action display names, validation notification copy, selection/mode migration plans, legacy shortcut key names, raw shortcut storage, middle-click, special empty-tap preferences, settings labels/help, shortcut recorder labels, backup import/export value planning, general-backup shortcut action ordering, and recording-shortcut selection repair when importing backed-up shortcut records route through `VoiceInkShortcutActionIdentifier`/`VoiceInkShortcutActionPresentation`/`VoiceInkShortcutValidationPresentation`/`VoiceInkLegacyRecordingShortcutPreset`/`VoiceInkRecordingShortcutSelection`/`VoiceInkRecordingShortcutMode`/`VoiceInkRecordingShortcutPreference`/`VoiceInkShortcutStoragePreference`/`VoiceInkShortcutBackupPolicy`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

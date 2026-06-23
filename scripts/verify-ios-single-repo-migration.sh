@@ -7173,7 +7173,7 @@ require_pattern \
 
 require_patterns \
   "shared core owns transcription model availability policy" \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelAvailability.swift \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift \
   'VoiceInkTranscriptionModelAvailability(Facts|Requirement)' \
   'requiresConfiguredAPIKey' \
   'requiresCurrentOSSupport'
@@ -7181,7 +7181,9 @@ require_patterns \
 require_pattern \
   "shared core owns Native Apple transcription policy" \
   'VoiceInkNativeAppleTranscriptionPolicy|VoiceInkNativeAppleTranscriptionFailureKind|errorDescription|resultStreamTimeout|requiresMacOS26Title' \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelAvailability.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift
+
+reject_file VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelAvailability.swift
 
 require_pattern \
   "macOS model adapts shared transcription model availability facts" \

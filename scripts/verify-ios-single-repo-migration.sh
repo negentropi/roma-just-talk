@@ -3766,7 +3766,7 @@ require_pattern \
 
 require_pattern \
   "iOS local model manager uses shared completion policy" \
-  'VoiceInkWhisperModelSimpleDownloadCompletionPlan\.completion\(' \
+  'VoiceInkWhisperModelSimpleDownloadCompletionPlan\.completion\(|applyRuntimeState' \
   iOS/VoiceInk-ios/LocalModelManager.swift
 
 require_pattern \
@@ -3806,7 +3806,7 @@ require_pattern \
 
 require_pattern \
   "shared Whisper simple download completion plan lives in VoiceInkCore" \
-  'VoiceInkWhisperModelSimpleDownloadCompletionPlan|installTemporaryFile|presentFailure|ignoreCancellation' \
+  'VoiceInkWhisperModelSimpleDownloadCompletionPlan|installTemporaryFile|presentFailure|ignoreCancellation|applyRuntimeState' \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
 
 require_pattern \
@@ -3817,6 +3817,11 @@ require_pattern \
 require_pattern \
   "core checks cover iOS download cancellation completion planning" \
   'WhisperModelFilesTests\.testSimpleDownloadCompletionPlanIgnoresCancellation' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks cover iOS download completion runtime application" \
+  'WhisperModelFilesTests\.testSimpleDownloadCompletionPlanAppliesRuntimeState' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -4163,8 +4168,13 @@ require_pattern \
   iOS/VoiceInk-ios/LocalModelManager.swift
 
 require_pattern \
-  "iOS local model manager applies shared delete refresh intent" \
-  'deletionPlan\.shouldRefreshAfterSuccessfulDelete' \
+  "iOS local model manager applies shared delete runtime application" \
+  'deletionPlan\.applyRuntimeState' \
+  iOS/VoiceInk-ios/LocalModelManager.swift
+
+reject_pattern \
+  "iOS local model manager avoids shell-owned download completion and delete sequencing" \
+  'switch VoiceInkWhisperModelSimpleDownloadCompletionPlan|switch deletionPlan\.action|deletionPlan\.shouldRefreshAfterSuccessfulDelete|case \.installTemporaryFile|case \.presentFailure|case \.ignoreCancellation|case \.skipMissingFile|case \.deleteDownloadedFiles' \
   iOS/VoiceInk-ios/LocalModelManager.swift
 
 reject_pattern \
@@ -4584,7 +4594,7 @@ require_pattern \
 
 require_pattern \
   "shared local model deletion policy lives in VoiceInkCore" \
-  'VoiceInkWhisperModelDeletion(Policy|Plan|Action)' \
+  'VoiceInkWhisperModelDeletion(Policy|Plan|Action)|applyRuntimeState' \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
 
 require_pattern \
@@ -4595,6 +4605,11 @@ require_pattern \
 require_pattern \
   "core check runner executes local model deletion policy test" \
   'testSimpleDownloadDeletionPolicyPreservesIOSDeleteIntent' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core check runner executes local model deletion runtime application tests" \
+  'testSimpleDownloadDeletionPlanApplies(RuntimeState|FailureStateWithoutRefresh)' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \

@@ -148,6 +148,21 @@ public enum VoiceInkWhisperModelSimpleDownloadCompletionPlan: Equatable, Sendabl
         }
     }
 
+    public func applyRuntimeState(
+        installTemporaryFile: (URL) -> Void,
+        presentFailure: (VoiceInkWhisperModelOperationAlertPresentation) -> Void,
+        ignoreCancellation: () -> Void
+    ) {
+        switch self {
+        case .installTemporaryFile(let temporaryURL):
+            installTemporaryFile(temporaryURL)
+        case .presentFailure(let alert):
+            presentFailure(alert)
+        case .ignoreCancellation:
+            ignoreCancellation()
+        }
+    }
+
     private static func isCancellation(_ error: Error) -> Bool {
         if error is CancellationError {
             return true
@@ -426,6 +441,27 @@ public struct VoiceInkWhisperModelDeletionPlan: Equatable, Sendable {
     ) {
         self.action = action
         self.shouldRefreshAfterSuccessfulDelete = shouldRefreshAfterSuccessfulDelete
+    }
+
+    public func applyRuntimeState(
+        skipMissingFile: () -> Void,
+        deleteDownloadedFiles: () throws -> Void,
+        refreshAfterSuccessfulDelete: () -> Void,
+        handleDeleteFailure: (Error) -> Void
+    ) {
+        switch action {
+        case .skipMissingFile:
+            skipMissingFile()
+        case .deleteDownloadedFiles:
+            do {
+                try deleteDownloadedFiles()
+                if shouldRefreshAfterSuccessfulDelete {
+                    refreshAfterSuccessfulDelete()
+                }
+            } catch {
+                handleDeleteFailure(error)
+            }
+        }
     }
 }
 

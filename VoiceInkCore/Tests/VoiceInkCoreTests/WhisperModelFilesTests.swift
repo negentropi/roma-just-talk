@@ -551,6 +551,30 @@ final class WhisperModelFilesTests: XCTestCase {
         )
     }
 
+    func testSimpleDownloadCompletionPlanAppliesRuntimeState() {
+        let temporaryURL = URL(fileURLWithPath: "/tmp/ggml-base.download")
+        let plans: [VoiceInkWhisperModelSimpleDownloadCompletionPlan] = [
+            .installTemporaryFile(temporaryURL),
+            .presentFailure(.noFileReceived),
+            .ignoreCancellation
+        ]
+        var events: [String] = []
+
+        for plan in plans {
+            plan.applyRuntimeState(
+                installTemporaryFile: { url in events.append("install:\(url.lastPathComponent)") },
+                presentFailure: { alert in events.append("failure:\(alert.id)") },
+                ignoreCancellation: { events.append("cancel") }
+            )
+        }
+
+        XCTAssertEqual(events, [
+            "install:ggml-base.download",
+            "failure:noFileReceived",
+            "cancel"
+        ])
+    }
+
     func testSimpleDownloadProgressFormatsIOSProgress() {
         let progress = VoiceInkWhisperModelDownloadProgress.simple(
             modelName: "ggml-base",
@@ -810,6 +834,55 @@ final class WhisperModelFilesTests: XCTestCase {
             VoiceInkWhisperModelDeletionPolicy.plan(for: model, in: modelsDirectory),
             downloadedPlan
         )
+    }
+
+    func testSimpleDownloadDeletionPlanAppliesRuntimeState() {
+        var events: [String] = []
+        VoiceInkWhisperModelDeletionPlan(
+            action: .skipMissingFile,
+            shouldRefreshAfterSuccessfulDelete: false
+        ).applyRuntimeState(
+            skipMissingFile: { events.append("missing") },
+            deleteDownloadedFiles: { events.append("delete") },
+            refreshAfterSuccessfulDelete: { events.append("refresh") },
+            handleDeleteFailure: { error in events.append("failure:\(error.localizedDescription)") }
+        )
+
+        VoiceInkWhisperModelDeletionPlan(
+            action: .deleteDownloadedFiles,
+            shouldRefreshAfterSuccessfulDelete: true
+        ).applyRuntimeState(
+            skipMissingFile: { events.append("missing") },
+            deleteDownloadedFiles: { events.append("delete") },
+            refreshAfterSuccessfulDelete: { events.append("refresh") },
+            handleDeleteFailure: { error in events.append("failure:\(error.localizedDescription)") }
+        )
+
+        XCTAssertEqual(events, ["missing", "delete", "refresh"])
+    }
+
+    func testSimpleDownloadDeletionPlanAppliesFailureStateWithoutRefresh() {
+        let error = NSError(
+            domain: "VoiceInkCoreTests",
+            code: 1,
+            userInfo: [NSLocalizedDescriptionKey: "Permission denied"]
+        )
+        var events: [String] = []
+
+        VoiceInkWhisperModelDeletionPlan(
+            action: .deleteDownloadedFiles,
+            shouldRefreshAfterSuccessfulDelete: true
+        ).applyRuntimeState(
+            skipMissingFile: { events.append("missing") },
+            deleteDownloadedFiles: {
+                events.append("delete")
+                throw error
+            },
+            refreshAfterSuccessfulDelete: { events.append("refresh") },
+            handleDeleteFailure: { error in events.append("failure:\(error.localizedDescription)") }
+        )
+
+        XCTAssertEqual(events, ["delete", "failure:Permission denied"])
     }
 
     func testMacOSDownloadProgressUsesMainAndCoreMLKeys() {

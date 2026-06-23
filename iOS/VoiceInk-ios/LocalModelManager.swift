@@ -74,21 +74,22 @@ class LocalModelManager: ObservableObject {
             progressObservations[model.id] = nil
         }
         
-        switch VoiceInkWhisperModelSimpleDownloadCompletionPlan.completion(
+        VoiceInkWhisperModelSimpleDownloadCompletionPlan.completion(
             temporaryURL: temporaryURL,
             response: response,
             error: error
-        ) {
-        case .installTemporaryFile(let temporaryURL):
-            installDownloadedModel(model, from: temporaryURL)
-
-        case .presentFailure(let alert):
-            downloadError = alert
-            logger.error("\(VoiceInkWhisperModelManagementDiagnostics.downloadFailedMessage(modelName: model.modelName, alertMessage: alert.message), privacy: .public)")
-
-        case .ignoreCancellation:
-            logger.notice("\(VoiceInkWhisperModelManagementDiagnostics.downloadCancelledMessage(modelName: model.modelName), privacy: .public)")
-        }
+        ).applyRuntimeState(
+            installTemporaryFile: { temporaryURL in
+                installDownloadedModel(model, from: temporaryURL)
+            },
+            presentFailure: { alert in
+                downloadError = alert
+                logger.error("\(VoiceInkWhisperModelManagementDiagnostics.downloadFailedMessage(modelName: model.modelName, alertMessage: alert.message), privacy: .public)")
+            },
+            ignoreCancellation: {
+                logger.notice("\(VoiceInkWhisperModelManagementDiagnostics.downloadCancelledMessage(modelName: model.modelName), privacy: .public)")
+            }
+        )
     }
 
     private func installDownloadedModel(
@@ -126,27 +127,25 @@ class LocalModelManager: ObservableObject {
             in: Self.modelsDirectory
         )
 
-        switch deletionPlan.action {
-        case .skipMissingFile:
-            logger.notice("\(VoiceInkWhisperModelManagementDiagnostics.notDownloadedMessage(modelName: model.modelName), privacy: .public)")
-            return
-
-        case .deleteDownloadedFiles:
-            do {
+        deletionPlan.applyRuntimeState(
+            skipMissingFile: {
+                logger.notice("\(VoiceInkWhisperModelManagementDiagnostics.notDownloadedMessage(modelName: model.modelName), privacy: .public)")
+            },
+            deleteDownloadedFiles: {
                 try model.deleteDownloadedFiles(in: Self.modelsDirectory)
                 logger.notice("\(VoiceInkWhisperModelManagementDiagnostics.deletedMessage(modelName: model.modelName), privacy: .public)")
-
-                if deletionPlan.shouldRefreshAfterSuccessfulDelete {
-                    // The downloaded-state query is file-backed, so force SwiftUI to refresh the row.
-                    DispatchQueue.main.async {
-                        self.objectWillChange.send()
-                    }
+            },
+            refreshAfterSuccessfulDelete: {
+                // The downloaded-state query is file-backed, so force SwiftUI to refresh the row.
+                DispatchQueue.main.async {
+                    self.objectWillChange.send()
                 }
-            } catch {
+            },
+            handleDeleteFailure: { error in
                 downloadError = .deleteFailed(for: error)
                 logger.error("\(VoiceInkWhisperModelManagementDiagnostics.deleteFailedMessage(modelName: model.modelName, localizedDescription: error.localizedDescription), privacy: .public)")
             }
-        }
+        )
     }
     
     func modelPath(for runtimeModelName: String) -> String? {

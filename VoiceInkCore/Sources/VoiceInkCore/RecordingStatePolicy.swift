@@ -801,6 +801,17 @@ public struct VoiceInkRecordingAlertPresentation: Equatable, Identifiable, Senda
     public enum Action: Equatable, Sendable {
         case dismiss
         case openSettings
+
+        public func runtimeAction(
+            openSettings: @escaping () -> Void
+        ) -> (() -> Void)? {
+            switch self {
+            case .dismiss:
+                return nil
+            case .openSettings:
+                return openSettings
+            }
+        }
     }
 
     public static let microphoneInUseOSStatusCode = 561017449

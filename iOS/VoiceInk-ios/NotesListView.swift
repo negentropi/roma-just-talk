@@ -164,26 +164,27 @@ struct NotesListView: View {
 
     // MARK: - Helper Functions
     private func alert(for presentation: VoiceInkRecordingAlertPresentation) -> Alert {
-        switch presentation.action {
-        case .openSettings:
+        let primaryAction = presentation.action.runtimeAction(openSettings: recordingManager.openSettings)
+        if let secondaryButtonTitle = presentation.secondaryButtonTitle {
             return Alert(
                 title: Text(presentation.title),
                 message: Text(presentation.message),
                 primaryButton: .default(
                     Text(presentation.primaryButtonTitle),
-                    action: recordingManager.openSettings
+                    action: primaryAction
                 ),
-                secondaryButton: .cancel(Text(
-                    presentation.secondaryButtonTitle ?? VoiceInkRecordingSheetPresentation.iOS.cancelButtonTitle
-                ))
-            )
-        case .dismiss:
-            return Alert(
-                title: Text(presentation.title),
-                message: Text(presentation.message),
-                dismissButton: .default(Text(presentation.primaryButtonTitle))
+                secondaryButton: .cancel(Text(secondaryButtonTitle))
             )
         }
+
+        return Alert(
+            title: Text(presentation.title),
+            message: Text(presentation.message),
+            dismissButton: .default(
+                Text(presentation.primaryButtonTitle),
+                action: primaryAction
+            )
+        )
     }
     
     private func deleteItems(offsets: IndexSet) {

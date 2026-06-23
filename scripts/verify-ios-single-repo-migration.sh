@@ -1211,10 +1211,16 @@ reject_pattern \
   'guard +let +fileURL += +recorder\.currentRecordingURL +else +\{ +return +\}' \
   iOS/VoiceInk-ios/RecordingManager.swift
 
-require_pattern \
+require_patterns \
   "shared recording alert presentation lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift \
   'VoiceInkRecordingAlertPresentation' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+  'runtimeAction'
+
+require_pattern \
+  "VoiceInkCore checks cover iOS recording alert runtime action mapping" \
+  'testRecordingAlertActionBuildsDeferredRuntimeAction' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "shared recording notification presentation lives in VoiceInkCore" \
@@ -1284,6 +1290,17 @@ reject_pattern \
 reject_pattern \
   "iOS note-list start button avoids shell-owned no-mode branching" \
   'noModesAvailableIfNeeded|if +let +alert *= *VoiceInkRecordingAlertPresentation' \
+  iOS/VoiceInk-ios/NotesListView.swift
+
+require_patterns \
+  "iOS note-list adapts shared recording alert runtime action" \
+  iOS/VoiceInk-ios/NotesListView.swift \
+  'presentation\.action\.runtimeAction' \
+  'secondaryButtonTitle'
+
+reject_pattern \
+  "iOS note-list avoids shell-owned recording alert action switches" \
+  'switch presentation\.action|case \.openSettings|case \.dismiss' \
   iOS/VoiceInk-ios/NotesListView.swift
 
 require_pattern \
@@ -13257,10 +13274,11 @@ require_pattern \
   'VoiceInkNoteListPresentation\.(sectionTitle|settingsSystemImageName|startRecordingButtonTitle|startRecordingSystemImageName)' \
   iOS/VoiceInk-ios/NotesListView.swift
 
-require_pattern \
-  "iOS recording alert fallback uses shared cancel copy" \
-  'VoiceInkRecordingSheetPresentation\.iOS\.cancelButtonTitle' \
-  iOS/VoiceInk-ios/NotesListView.swift
+require_patterns \
+  "iOS recording alert adapter uses shared action and secondary button copy" \
+  iOS/VoiceInk-ios/NotesListView.swift \
+  'presentation\.action\.runtimeAction' \
+  'presentation\.secondaryButtonTitle'
 
 reject_pattern \
   "iOS note-list avoids duplicate summary count formatting" \

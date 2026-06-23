@@ -1036,6 +1036,22 @@ final class RecordingStatePolicyTests: XCTestCase {
         XCTAssertEqual(alert.action, .openSettings)
     }
 
+    func testRecordingAlertActionBuildsDeferredRuntimeAction() {
+        var didOpenSettings = false
+        XCTAssertNil(VoiceInkRecordingAlertPresentation.Action.dismiss.runtimeAction {
+            didOpenSettings = true
+        })
+        XCTAssertFalse(didOpenSettings)
+
+        let action = VoiceInkRecordingAlertPresentation.Action.openSettings.runtimeAction {
+            didOpenSettings = true
+        }
+        XCTAssertFalse(didOpenSettings)
+
+        action?()
+        XCTAssertTrue(didOpenSettings)
+    }
+
     func testRecordingSheetPresentationPreservesIOSControlsCopy() {
         let presentation = VoiceInkRecordingSheetPresentation.iOS
 

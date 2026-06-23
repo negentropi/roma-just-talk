@@ -26,8 +26,8 @@ struct RollingBufferPreloadSettingsControls: View {
 
     private var durationFormatter: NumberFormatter {
         let formatter = NumberFormatter()
-        formatter.minimum = 0.25
-        formatter.maximum = 30
+        formatter.minimum = NSNumber(value: VoiceInkRollingBufferPreloadSettings.minimumBufferDurationSeconds)
+        formatter.maximum = NSNumber(value: VoiceInkRollingBufferPreloadSettings.maximumBufferDurationSeconds)
         formatter.minimumFractionDigits = 0
         formatter.maximumFractionDigits = 2
         return formatter
@@ -114,7 +114,7 @@ struct RollingBufferPreloadSettingsControls: View {
     }
 
     private func normalizeDuration() {
-        let normalized = min(max(bufferDurationSeconds, 0.25), 30.0)
+        let normalized = VoiceInkRollingBufferPreloadSettings.normalizedBufferDurationSeconds(bufferDurationSeconds)
         if normalized != bufferDurationSeconds {
             bufferDurationSeconds = normalized
         }

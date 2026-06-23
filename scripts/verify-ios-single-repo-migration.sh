@@ -11850,6 +11850,36 @@ require_pattern \
   VoiceInk/Views/Settings/RollingBufferPreloadSettingsControls.swift
 
 require_pattern \
+  "shared rolling-buffer duration lower bound lives in VoiceInkCore" \
+  'minimumBufferDurationSeconds = 0\.25' \
+  VoiceInkCore/Sources/VoiceInkCore/RollingBufferPreloadPolicy.swift
+
+require_pattern \
+  "shared rolling-buffer duration upper bound lives in VoiceInkCore" \
+  'maximumBufferDurationSeconds = 30\.0' \
+  VoiceInkCore/Sources/VoiceInkCore/RollingBufferPreloadPolicy.swift
+
+require_pattern \
+  "shared rolling-buffer duration normalization lives in VoiceInkCore" \
+  'normalizedBufferDurationSeconds' \
+  VoiceInkCore/Sources/VoiceInkCore/RollingBufferPreloadPolicy.swift
+
+require_pattern \
+  "macOS rolling-buffer settings use shared duration lower bound" \
+  'VoiceInkRollingBufferPreloadSettings\.minimumBufferDurationSeconds' \
+  VoiceInk/Views/Settings/RollingBufferPreloadSettingsControls.swift
+
+require_pattern \
+  "macOS rolling-buffer settings use shared duration upper bound" \
+  'VoiceInkRollingBufferPreloadSettings\.maximumBufferDurationSeconds' \
+  VoiceInk/Views/Settings/RollingBufferPreloadSettingsControls.swift
+
+require_pattern \
+  "macOS rolling-buffer settings use shared duration normalization" \
+  'VoiceInkRollingBufferPreloadSettings\.normalizedBufferDurationSeconds' \
+  VoiceInk/Views/Settings/RollingBufferPreloadSettingsControls.swift
+
+require_pattern \
   "macOS settings uses shared rolling-buffer section title" \
   'VoiceInkRollingBufferPreloadSettings\.macOSSettingsPresentation|rollingBufferPresentation\.sectionTitle' \
   VoiceInk/Views/Settings/SettingsView.swift
@@ -11945,6 +11975,11 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
+  "core checks execute rolling-buffer duration normalization tests" \
+  'RollingBufferPreloadPolicyTests\.testSettingsNormalizeDurationAndBatteryThresholdRanges' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "core checks execute rolling-buffer partial transcript request tests" \
   'RollingBufferPreloadPolicyTests\.testPartialTranscriptRequestPreservesNotificationContract' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
@@ -11969,9 +12004,14 @@ reject_pattern \
   VoiceInk/Views/Settings/RollingBufferPreloadSettingsControls.swift \
   VoiceInk/Transcription/RollingPreload/SileroSpeechActivityDetector.swift
 
+reject_pattern \
+  "macOS rolling-buffer settings avoid shell-owned duration bounds" \
+  'formatter\.(minimum|maximum) = (0\.25|30)|min\(max\(bufferDurationSeconds, 0\.25\), 30\.0\)' \
+  VoiceInk/Views/Settings/RollingBufferPreloadSettingsControls.swift
+
 require_pattern \
   "migration checklist tracks shared rolling-buffer settings labels" \
-  'macOS rolling-buffer preload settings labels/help, partial-transcript preview notification contract, VAD model labels, storage key/default, selected-model fallback, Silero predicate, service-route provider classification' \
+  'macOS rolling-buffer preload settings labels/help, duration bounds/normalization, partial-transcript preview notification contract, VAD model labels, storage key/default, selected-model fallback, Silero predicate, service-route provider classification' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

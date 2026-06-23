@@ -95,8 +95,12 @@ public struct VoiceInkRollingBufferPreloadConfiguration: Equatable, Sendable {
         self.mode = mode
         self.autoDisablesCloudModels = autoDisablesCloudModels
         self.autoDisablesLowBatteryLocalModels = autoDisablesLowBatteryLocalModels
-        self.lowBatteryThresholdPercent = min(max(lowBatteryThresholdPercent, 1), 100)
-        self.bufferDurationSeconds = min(max(bufferDurationSeconds, 0.25), 30.0)
+        self.lowBatteryThresholdPercent = VoiceInkRollingBufferPreloadSettings.normalizedLowBatteryThresholdPercent(
+            lowBatteryThresholdPercent
+        )
+        self.bufferDurationSeconds = VoiceInkRollingBufferPreloadSettings.normalizedBufferDurationSeconds(
+            bufferDurationSeconds
+        )
         self.preRunFinalization = preRunFinalization
     }
 }
@@ -433,9 +437,19 @@ public enum VoiceInkRollingBufferPreloadSettings {
     public static let defaultAutoDisablesLowBatteryLocalModels = true
     public static let defaultLowBatteryThresholdPercent = 40
     public static let defaultBufferDurationSeconds = 3.0
+    public static let minimumBufferDurationSeconds = 0.25
+    public static let maximumBufferDurationSeconds = 30.0
     public static let defaultPreRunFinalization = true
     public static let defaultPerModelPreloadEnabled = true
     public static let macOSSettingsPresentation = VoiceInkRollingBufferPreloadSettingsPresentation.macOS
+
+    public static func normalizedLowBatteryThresholdPercent(_ percent: Int) -> Int {
+        min(max(percent, 1), 100)
+    }
+
+    public static func normalizedBufferDurationSeconds(_ seconds: Double) -> Double {
+        min(max(seconds, minimumBufferDurationSeconds), maximumBufferDurationSeconds)
+    }
 
     public static func configuration(in defaults: UserDefaults = .standard) -> VoiceInkRollingBufferPreloadConfiguration {
         let mode = defaults.string(forKey: modeKey)
@@ -516,8 +530,8 @@ public enum VoiceInkRollingBufferPreloadSettings {
             mode: preferences.preloadModeRawValue.flatMap(VoiceInkRollingBufferPreloadMode.init(rawValue:)),
             autoDisablesCloudModels: preferences.autoDisablesCloudModels,
             autoDisablesLowBatteryLocalModels: preferences.autoDisablesLowBatteryLocalModels,
-            lowBatteryThresholdPercent: preferences.lowBatteryThresholdPercent.map { min(max($0, 1), 100) },
-            bufferDurationSeconds: preferences.bufferDurationSeconds.map { min(max($0, 0.25), 30.0) },
+            lowBatteryThresholdPercent: preferences.lowBatteryThresholdPercent.map(Self.normalizedLowBatteryThresholdPercent),
+            bufferDurationSeconds: preferences.bufferDurationSeconds.map(Self.normalizedBufferDurationSeconds),
             preRunFinalization: preferences.preRunFinalization,
             vadModel: preferences.vadModelRawValue.flatMap(VoiceInkRollingBufferVADModel.init(rawValue:)),
             perModelPreloadEnabled: preferences.perModelPreloadEnabled

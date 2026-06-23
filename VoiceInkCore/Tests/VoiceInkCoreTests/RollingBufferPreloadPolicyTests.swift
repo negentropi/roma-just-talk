@@ -16,8 +16,19 @@ final class RollingBufferPreloadPolicyTests: XCTestCase {
         XCTAssertTrue(VoiceInkRollingBufferPreloadSettings.defaultAutoDisablesLowBatteryLocalModels)
         XCTAssertEqual(VoiceInkRollingBufferPreloadSettings.defaultLowBatteryThresholdPercent, 40)
         XCTAssertEqual(VoiceInkRollingBufferPreloadSettings.defaultBufferDurationSeconds, 3.0)
+        XCTAssertEqual(VoiceInkRollingBufferPreloadSettings.minimumBufferDurationSeconds, 0.25)
+        XCTAssertEqual(VoiceInkRollingBufferPreloadSettings.maximumBufferDurationSeconds, 30.0)
         XCTAssertTrue(VoiceInkRollingBufferPreloadSettings.defaultPreRunFinalization)
         XCTAssertTrue(VoiceInkRollingBufferPreloadSettings.defaultPerModelPreloadEnabled)
+    }
+
+    func testSettingsNormalizeDurationAndBatteryThresholdRanges() {
+        XCTAssertEqual(VoiceInkRollingBufferPreloadSettings.normalizedLowBatteryThresholdPercent(-1), 1)
+        XCTAssertEqual(VoiceInkRollingBufferPreloadSettings.normalizedLowBatteryThresholdPercent(55), 55)
+        XCTAssertEqual(VoiceInkRollingBufferPreloadSettings.normalizedLowBatteryThresholdPercent(500), 100)
+        XCTAssertEqual(VoiceInkRollingBufferPreloadSettings.normalizedBufferDurationSeconds(0), 0.25)
+        XCTAssertEqual(VoiceInkRollingBufferPreloadSettings.normalizedBufferDurationSeconds(4.5), 4.5)
+        XCTAssertEqual(VoiceInkRollingBufferPreloadSettings.normalizedBufferDurationSeconds(99), 30.0)
     }
 
     func testPartialTranscriptRequestPreservesNotificationContract() {

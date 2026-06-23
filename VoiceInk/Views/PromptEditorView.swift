@@ -22,12 +22,7 @@ struct PromptEditorView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var enhancementService: AIEnhancementService
     var onDismiss: (() -> Void)?
-    @State private var title: String
-    @State private var promptText: String
-    @State private var selectedIcon: String
-    @State private var description: String
-    @State private var triggerWords: [String]
-    @State private var useSystemInstructions: Bool
+    @State private var draft: VoiceInkCustomPromptDraft
     @State private var showingIconPicker = false
     
     private var isEditingPredefinedPrompt: Bool {
@@ -37,35 +32,14 @@ struct PromptEditorView: View {
         return false
     }
 
-    private var currentDraft: VoiceInkCustomPromptDraft {
-        VoiceInkCustomPromptDraft(
-            title: title,
-            promptText: promptText,
-            icon: selectedIcon,
-            description: description,
-            triggerWords: triggerWords,
-            useSystemInstructions: useSystemInstructions
-        )
-    }
-    
     init(mode: Mode, onDismiss: (() -> Void)? = nil) {
         self.mode = mode
         self.onDismiss = onDismiss
         switch mode {
         case .add:
-            _title = State(initialValue: "")
-            _promptText = State(initialValue: "")
-            _selectedIcon = State(initialValue: VoiceInkCustomPromptPresentation.defaultIconSystemName)
-            _description = State(initialValue: "")
-            _triggerWords = State(initialValue: [])
-            _useSystemInstructions = State(initialValue: true)
+            _draft = State(initialValue: .newPrompt)
         case .edit(let prompt):
-            _title = State(initialValue: prompt.title)
-            _promptText = State(initialValue: prompt.promptText)
-            _selectedIcon = State(initialValue: prompt.icon)
-            _description = State(initialValue: prompt.description ?? "")
-            _triggerWords = State(initialValue: prompt.triggerWords)
-            _useSystemInstructions = State(initialValue: prompt.useSystemInstructions)
+            _draft = State(initialValue: VoiceInkCustomPromptDraft(prompt: prompt))
         }
     }
     
@@ -136,7 +110,7 @@ struct PromptEditorView: View {
                             .frame(minWidth: 100)
                     }
                     .buttonStyle(.borderedProminent)
-                    .disabled(isEditingPredefinedPrompt ? false : !VoiceInkCustomPromptPolicy.isSaveableCustomPromptDraft(currentDraft))
+                    .disabled(isEditingPredefinedPrompt ? false : !draft.isSaveable)
                     .keyboardShortcut(.return, modifiers: .command)
                 }
                 .padding(.horizontal, 20)
@@ -156,11 +130,11 @@ struct PromptEditorView: View {
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             } header: {
-                Text(VoiceInkCustomPromptPresentation.editingHeaderTitle(for: title))
+                Text(VoiceInkCustomPromptPresentation.editingHeaderTitle(for: draft.title))
             }
 
             Section {
-                TriggerWordsEditor(triggerWords: $triggerWords)
+                TriggerWordsEditor(triggerWords: $draft.triggerWords)
             }
         }
         .formStyle(.grouped)
@@ -174,7 +148,7 @@ struct PromptEditorView: View {
             Section {
                 HStack(alignment: .center, spacing: 14) {
                     Button(action: { showingIconPicker = true }) {
-                        Image(systemName: selectedIcon)
+                        Image(systemName: draft.icon)
                             .font(.system(size: 22))
                             .foregroundColor(.primary)
                             .frame(width: 44, height: 44)
@@ -187,14 +161,14 @@ struct PromptEditorView: View {
                     }
                     .buttonStyle(.plain)
                     .popover(isPresented: $showingIconPicker, arrowEdge: .bottom) {
-                        IconPickerPopover(selectedIcon: $selectedIcon, isPresented: $showingIconPicker)
+                        IconPickerPopover(selectedIcon: $draft.icon, isPresented: $showingIconPicker)
                     }
 
-                    TextField(VoiceInkCustomPromptPresentation.promptNamePlaceholder, text: $title)
+                    TextField(VoiceInkCustomPromptPresentation.promptNamePlaceholder, text: $draft.title)
                         .textFieldStyle(.roundedBorder)
                 }
 
-                TextField(VoiceInkCustomPromptPresentation.descriptionPlaceholder, text: $description)
+                TextField(VoiceInkCustomPromptPresentation.descriptionPlaceholder, text: $draft.description)
                     .textFieldStyle(.roundedBorder)
             } header: {
                 Text(VoiceInkCustomPromptPresentation.detailsSectionTitle)
@@ -202,12 +176,12 @@ struct PromptEditorView: View {
 
             Section {
                 ZStack(alignment: .topLeading) {
-                    TextEditor(text: $promptText)
+                    TextEditor(text: $draft.promptText)
                         .font(.system(.body, design: .monospaced))
                         .frame(minHeight: 160)
                         .scrollContentBackground(.hidden)
 
-                    if promptText.isEmpty {
+                    if draft.promptText.isEmpty {
                         Text(VoiceInkCustomPromptPresentation.promptInstructionsPlaceholder)
                             .font(.system(.body, design: .monospaced))
                             .foregroundStyle(.tertiary)
@@ -216,7 +190,7 @@ struct PromptEditorView: View {
                     }
                 }
 
-                Toggle(isOn: $useSystemInstructions) {
+                Toggle(isOn: $draft.useSystemInstructions) {
                     HStack(spacing: 4) {
                         Text(VoiceInkCustomPromptPresentation.useSystemTemplateTitle)
                         InfoTip(VoiceInkCustomPromptPresentation.useSystemTemplateHelpText)
@@ -228,7 +202,7 @@ struct PromptEditorView: View {
             }
 
             Section {
-                TriggerWordsEditor(triggerWords: $triggerWords)
+                TriggerWordsEditor(triggerWords: $draft.triggerWords)
             } header: {
                 HStack(spacing: 4) {
                     Text(VoiceInkCustomPromptPresentation.triggerWordsSectionTitle)
@@ -241,10 +215,7 @@ struct PromptEditorView: View {
                     Menu {
                         ForEach(VoiceInkPromptTemplates.macTemplates, id: \.title) { template in
                             Button {
-                                title = template.title
-                                promptText = template.promptText
-                                selectedIcon = template.icon
-                                description = template.description
+                                draft = draft.applyingTemplate(template)
                             } label: {
                                 Label(template.title, systemImage: template.icon)
                             }
@@ -266,10 +237,10 @@ struct PromptEditorView: View {
     private func save() {
         switch mode {
         case .add:
-            enhancementService.addPrompt(VoiceInkCustomPromptPolicy.customPrompt(from: currentDraft))
+            enhancementService.addPrompt(draft.customPrompt)
         case .edit(let prompt):
             enhancementService.updatePrompt(
-                VoiceInkCustomPromptPolicy.prompt(prompt, applying: currentDraft)
+                draft.applying(to: prompt)
             )
         }
     }

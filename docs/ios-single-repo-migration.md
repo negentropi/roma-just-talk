@@ -176,7 +176,7 @@ Current macOS consumers of shared remote transport:
 - macOS custom prompt final text delegates to `VoiceInkAIPrompts.finalPromptText`, so the system-instruction wrapper stays shared.
 - macOS uses `VoiceInkCustomPrompt` directly, keeping the SwiftUI prompt-grid adapter in the macOS shell while moving the prompt record and Codable compatibility into `VoiceInkCore`.
 - macOS predefined-prompt initialization now delegates to `VoiceInkCustomPromptPolicy`, and the old shell-only `PredefinedPrompts` adapter was removed.
-- macOS custom prompt draft saveability, add/update record construction, and add/update/delete selection behavior delegate to `VoiceInkCustomPromptPolicy`; macOS `AIEnhancementService` still owns persistence timing, notifications, and SwiftUI state.
+- macOS custom prompt editor draft construction, saveability, template application, add/update record construction, and add/update/delete selection behavior delegate to `VoiceInkCustomPromptDraft`/`VoiceInkCustomPromptPolicy`; macOS still owns SwiftUI form bindings, popovers, persistence timing, notifications, and service state mutation.
 - macOS custom prompt backup export filtering and import merge ordering delegate to `VoiceInkCustomPromptPolicy`; macOS still owns backup file encoding/decoding, panels, alerts, and service state mutation.
 - macOS custom prompt icon catalog, prompt-card trigger summary/action symbols, grid empty/help copy and info icon, editor labels/placeholders/help/action symbols, and delete confirmation copy route through `VoiceInkCustomPromptPresentation`; macOS still owns SwiftUI layout, popovers, drag/drop, and alert execution.
 - macOS custom prompt loading, saving, and selected-prompt persistence now use `VoiceInkCustomPromptStorage`.

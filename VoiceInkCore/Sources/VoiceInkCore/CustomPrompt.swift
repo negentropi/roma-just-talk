@@ -145,12 +145,21 @@ public struct VoiceInkAIEnhancementPromptSettingsState: Equatable, Sendable {
 }
 
 public struct VoiceInkCustomPromptDraft: Equatable, Sendable {
-    public let title: String
-    public let promptText: String
-    public let icon: String
-    public let description: String
-    public let triggerWords: [String]
-    public let useSystemInstructions: Bool
+    public var title: String
+    public var promptText: String
+    public var icon: String
+    public var description: String
+    public var triggerWords: [String]
+    public var useSystemInstructions: Bool
+
+    public static let newPrompt = VoiceInkCustomPromptDraft(
+        title: "",
+        promptText: "",
+        icon: VoiceInkCustomPromptPresentation.defaultIconSystemName,
+        description: "",
+        triggerWords: [],
+        useSystemInstructions: true
+    )
 
     public init(
         title: String,
@@ -166,6 +175,40 @@ public struct VoiceInkCustomPromptDraft: Equatable, Sendable {
         self.description = description
         self.triggerWords = triggerWords
         self.useSystemInstructions = useSystemInstructions
+    }
+
+    public init(prompt: VoiceInkCustomPrompt) {
+        self.init(
+            title: prompt.title,
+            promptText: prompt.promptText,
+            icon: prompt.icon,
+            description: prompt.description ?? "",
+            triggerWords: prompt.triggerWords,
+            useSystemInstructions: prompt.useSystemInstructions
+        )
+    }
+
+    public var isSaveable: Bool {
+        VoiceInkCustomPromptPolicy.isSaveableCustomPromptDraft(self)
+    }
+
+    public var customPrompt: VoiceInkCustomPrompt {
+        VoiceInkCustomPromptPolicy.customPrompt(from: self)
+    }
+
+    public func applying(to prompt: VoiceInkCustomPrompt) -> VoiceInkCustomPrompt {
+        VoiceInkCustomPromptPolicy.prompt(prompt, applying: self)
+    }
+
+    public func applyingTemplate(_ template: VoiceInkTemplatePrompt) -> Self {
+        VoiceInkCustomPromptDraft(
+            title: template.title,
+            promptText: template.promptText,
+            icon: template.icon,
+            description: template.description,
+            triggerWords: triggerWords,
+            useSystemInstructions: useSystemInstructions
+        )
     }
 }
 

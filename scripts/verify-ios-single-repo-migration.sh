@@ -5644,6 +5644,16 @@ require_pattern \
   'VoiceInkAIEnhancementPromptSettingsState|settingsStateAfterEnhancementEnabledChange' \
   VoiceInkCore/Sources/VoiceInkCore/CustomPrompt.swift
 
+require_patterns \
+  "shared custom prompt draft owns editor state helpers" \
+  VoiceInkCore/Sources/VoiceInkCore/CustomPrompt.swift \
+  'public static let newPrompt' \
+  'public init\(prompt: VoiceInkCustomPrompt\)' \
+  'public var isSaveable: Bool' \
+  'public var customPrompt: VoiceInkCustomPrompt' \
+  'public func applying\(to prompt: VoiceInkCustomPrompt\)' \
+  'public func applyingTemplate\(_ template: VoiceInkTemplatePrompt\)'
+
 require_pattern \
   "shared AI enhancement API-key validity state planning lives in VoiceInkCore" \
   'settingsStateAfterAPIKeyValidityChange' \
@@ -5659,6 +5669,17 @@ require_pattern \
   'VoiceInkPromptTriggerDraftState|triggerWordDraftState\.(draft|canSubmit|submitting)|applyRuntimeState' \
   VoiceInk/Views/PromptEditorView.swift
 
+require_patterns \
+  "macOS prompt editor consumes shared custom prompt draft state" \
+  VoiceInk/Views/PromptEditorView.swift \
+  '@State private var draft: VoiceInkCustomPromptDraft' \
+  'State\(initialValue: \.newPrompt\)' \
+  'State\(initialValue: VoiceInkCustomPromptDraft\(prompt: prompt\)\)' \
+  'draft\.isSaveable' \
+  'draft\.customPrompt' \
+  'draft\.applying\(to: prompt\)' \
+  'draft = draft\.applyingTemplate\(template\)'
+
 require_pattern \
   "macOS prompt editor consumes shared trigger-word add submission" \
   'triggerWordDraftState\.submitting|setTriggerWords|setDraftState' \
@@ -5672,6 +5693,11 @@ require_pattern \
 reject_pattern \
   "macOS prompt editor avoids shell-owned trigger-word draft submit policy" \
   'VoiceInkPromptTriggerPolicy\.(hasTriggerWordDraft|addingTriggerWord)|@State private var newTriggerWord\b' \
+  VoiceInk/Views/PromptEditorView.swift
+
+reject_pattern \
+  "macOS prompt editor avoids shell-owned custom prompt draft fields" \
+  '@State private var (title|promptText|selectedIcon|description|triggerWords|useSystemInstructions)\b|private var currentDraft|VoiceInkCustomPromptPolicy\.(isSaveableCustomPromptDraft|customPrompt|prompt)\(' \
   VoiceInk/Views/PromptEditorView.swift
 
 require_pattern \
@@ -5693,6 +5719,13 @@ require_pattern \
   "core checks execute enhancement prompt settings state test" \
   'CustomPromptTests\.testCustomPromptPolicyPlansPromptSelectionWhenEnablingEnhancement' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_patterns \
+  "core checks execute custom prompt draft editor-state tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'CustomPromptTests\.testCustomPromptDraftBuildsNewAndEditState' \
+  'CustomPromptTests\.testCustomPromptDraftOwnsSaveAndApplyHelpers' \
+  'CustomPromptTests\.testCustomPromptDraftAppliesTemplatePreservingTriggerAndSystemInstructionState'
 
 require_pattern \
   "core checks execute AI enhancement API-key validity state test" \

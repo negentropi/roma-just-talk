@@ -680,6 +680,123 @@ final class CustomPromptTests: XCTestCase {
         )
     }
 
+    func testCustomPromptDraftBuildsNewAndEditState() {
+        let newDraft = VoiceInkCustomPromptDraft.newPrompt
+        XCTAssertEqual(newDraft.title, "")
+        XCTAssertEqual(newDraft.promptText, "")
+        XCTAssertEqual(newDraft.icon, VoiceInkCustomPromptPresentation.defaultIconSystemName)
+        XCTAssertEqual(newDraft.description, "")
+        XCTAssertTrue(newDraft.triggerWords.isEmpty)
+        XCTAssertTrue(newDraft.useSystemInstructions)
+
+        let existing = VoiceInkCustomPrompt(
+            title: "Existing",
+            promptText: "Existing prompt",
+            icon: "tray.full.fill",
+            description: nil,
+            triggerWords: ["reply"],
+            useSystemInstructions: false
+        )
+        let editDraft = VoiceInkCustomPromptDraft(prompt: existing)
+
+        XCTAssertEqual(editDraft.title, "Existing")
+        XCTAssertEqual(editDraft.promptText, "Existing prompt")
+        XCTAssertEqual(editDraft.icon, "tray.full.fill")
+        XCTAssertEqual(editDraft.description, "")
+        XCTAssertEqual(editDraft.triggerWords, ["reply"])
+        XCTAssertFalse(editDraft.useSystemInstructions)
+    }
+
+    func testCustomPromptDraftOwnsSaveAndApplyHelpers() {
+        let draft = VoiceInkCustomPromptDraft(
+            title: "Proofread",
+            promptText: "Fix grammar.",
+            icon: "pencil",
+            description: "",
+            triggerWords: ["proof"],
+            useSystemInstructions: false
+        )
+
+        XCTAssertTrue(draft.isSaveable)
+
+        let newPrompt = draft.customPrompt
+        XCTAssertEqual(newPrompt.title, "Proofread")
+        XCTAssertEqual(newPrompt.promptText, "Fix grammar.")
+        XCTAssertEqual(newPrompt.icon, "pencil")
+        XCTAssertNil(newPrompt.description)
+        XCTAssertFalse(newPrompt.isPredefined)
+        XCTAssertEqual(newPrompt.triggerWords, ["proof"])
+        XCTAssertFalse(newPrompt.useSystemInstructions)
+
+        let customPrompt = VoiceInkCustomPrompt(
+            id: UUID(uuidString: "00000000-0000-0000-0000-000000000304")!,
+            title: "Old",
+            promptText: "Old prompt",
+            isActive: true,
+            icon: "old.icon",
+            description: "Old description",
+            isPredefined: false,
+            triggerWords: ["old"],
+            useSystemInstructions: true
+        )
+        let updatedCustomPrompt = draft.applying(to: customPrompt)
+        XCTAssertEqual(updatedCustomPrompt.id, customPrompt.id)
+        XCTAssertEqual(updatedCustomPrompt.title, "Proofread")
+        XCTAssertEqual(updatedCustomPrompt.promptText, "Fix grammar.")
+        XCTAssertTrue(updatedCustomPrompt.isActive)
+        XCTAssertEqual(updatedCustomPrompt.icon, "pencil")
+        XCTAssertNil(updatedCustomPrompt.description)
+        XCTAssertFalse(updatedCustomPrompt.isPredefined)
+        XCTAssertEqual(updatedCustomPrompt.triggerWords, ["proof"])
+        XCTAssertFalse(updatedCustomPrompt.useSystemInstructions)
+
+        let predefinedPrompt = VoiceInkCustomPrompt(
+            id: VoiceInkPredefinedPrompts.defaultPromptId,
+            title: "Default",
+            promptText: "Template prompt",
+            isActive: true,
+            icon: "template.icon",
+            description: "Template description",
+            isPredefined: true,
+            triggerWords: ["old"],
+            useSystemInstructions: true
+        )
+        let updatedPredefinedPrompt = draft.applying(to: predefinedPrompt)
+        XCTAssertEqual(updatedPredefinedPrompt.title, predefinedPrompt.title)
+        XCTAssertEqual(updatedPredefinedPrompt.promptText, predefinedPrompt.promptText)
+        XCTAssertEqual(updatedPredefinedPrompt.icon, predefinedPrompt.icon)
+        XCTAssertEqual(updatedPredefinedPrompt.description, predefinedPrompt.description)
+        XCTAssertEqual(updatedPredefinedPrompt.triggerWords, ["proof"])
+        XCTAssertTrue(updatedPredefinedPrompt.useSystemInstructions)
+    }
+
+    func testCustomPromptDraftAppliesTemplatePreservingTriggerAndSystemInstructionState() {
+        let draft = VoiceInkCustomPromptDraft(
+            title: "Old",
+            promptText: "Old prompt",
+            icon: "old.icon",
+            description: "Old description",
+            triggerWords: ["email"],
+            useSystemInstructions: false
+        )
+        let template = VoiceInkTemplatePrompt(
+            id: "reply",
+            title: "Reply",
+            promptText: "Write a reply.",
+            icon: "arrowshape.turn.up.left.fill",
+            description: "Reply template"
+        )
+
+        let appliedDraft = draft.applyingTemplate(template)
+
+        XCTAssertEqual(appliedDraft.title, "Reply")
+        XCTAssertEqual(appliedDraft.promptText, "Write a reply.")
+        XCTAssertEqual(appliedDraft.icon, "arrowshape.turn.up.left.fill")
+        XCTAssertEqual(appliedDraft.description, "Reply template")
+        XCTAssertEqual(appliedDraft.triggerWords, ["email"])
+        XCTAssertFalse(appliedDraft.useSystemInstructions)
+    }
+
     func testCustomPromptPolicyBuildsNewPromptFromDraft() {
         let prompt = VoiceInkCustomPromptPolicy.customPrompt(
             from: VoiceInkCustomPromptDraft(

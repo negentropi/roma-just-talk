@@ -132,7 +132,7 @@ struct APIKeyManagementView: View {
                             Spacer()
                             Button(providerSettingsPresentation.ollamaEditButtonTitle) { isEditingURL = true }
                             Button(action: {
-                                ollamaBaseURL = VoiceInkPreferenceDefault.ollamaBaseURL
+                                ollamaBaseURL = VoiceInkDynamicAIProviderPreference.defaultOllamaBaseURL
                                 aiService.updateOllamaBaseURL(ollamaBaseURL)
                                 checkOllamaConnection()
                             }) {

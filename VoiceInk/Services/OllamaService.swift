@@ -22,12 +22,8 @@ class OllamaService: ObservableObject {
     @Published var isLoadingModels: Bool = false
 
     init() {
-        self.baseURL = VoiceInkDynamicAIProviderPreference.ollamaBaseURL(
-            fallback: VoiceInkPreferenceDefault.ollamaBaseURL
-        )
-        self.selectedModel = VoiceInkDynamicAIProviderPreference.ollamaSelectedModel(
-            fallback: VoiceInkAIEnhancementProviderKind.legacyOllamaServiceSelectedModelFallback
-        )
+        self.baseURL = VoiceInkDynamicAIProviderPreference.ollamaBaseURL()
+        self.selectedModel = VoiceInkDynamicAIProviderPreference.ollamaRuntimeSelectedModel()
     }
 
     private var baseURLValue: URL? {

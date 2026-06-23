@@ -7758,7 +7758,7 @@ require_pattern \
 
 require_pattern \
   "macOS Ollama service selected-model fallback uses shared policy" \
-  'legacyOllamaServiceSelectedModelFallback' \
+  'VoiceInkDynamicAIProviderPreference\.ollamaRuntimeSelectedModel\(\)' \
   VoiceInk/Services/OllamaService.swift
 
 require_pattern \
@@ -10852,19 +10852,28 @@ reject_pattern \
   'VoiceInkUserDefaultsKey\.hasCompletedOnboarding|object\(forKey: +"hasCompletedOnboarding"\)' \
   VoiceInk/AppDefaults.swift
 
-require_pattern \
-  "macOS Ollama service uses shared default base URL" \
-  'VoiceInkPreferenceDefault\.ollamaBaseURL' \
-  VoiceInk/Services/OllamaService.swift
+require_patterns \
+  "shared dynamic AI provider preference owns Ollama runtime defaults" \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift \
+  'defaultOllamaBaseURL' \
+  'defaultOllamaRuntimeSelectedModel' \
+  'ollamaRuntimeSelectedModel'
+
+require_patterns \
+  "macOS Ollama service uses shared runtime defaults" \
+  VoiceInk/Services/OllamaService.swift \
+  'VoiceInkDynamicAIProviderPreference\.ollamaBaseURL\(\)' \
+  'VoiceInkDynamicAIProviderPreference\.ollamaRuntimeSelectedModel\(\)'
 
 reject_pattern \
   "macOS Ollama default base URL shim stays deleted" \
-  'defaultBaseURL' \
-  VoiceInk/Services/OllamaService.swift
+  'defaultBaseURL|VoiceInkPreferenceDefault\.ollamaBaseURL' \
+  VoiceInk/Services/OllamaService.swift \
+  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
 
 reject_pattern \
   "macOS Ollama service avoids duplicate selected-model fallback literals" \
-  '"llama2"|ollamaSelectedModel\(fallback: +"[^"]+"\)' \
+  '"llama2"|ollamaSelectedModel\(fallback:|legacyOllamaServiceSelectedModelFallback' \
   VoiceInk/Services/OllamaService.swift
 
 reject_pattern \

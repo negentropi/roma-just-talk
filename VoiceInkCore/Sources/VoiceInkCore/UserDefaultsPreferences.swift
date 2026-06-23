@@ -1021,9 +1021,12 @@ public enum VoiceInkAIEnhancementProviderPreference {
 }
 
 public enum VoiceInkDynamicAIProviderPreference {
+    public static let defaultOllamaBaseURL = VoiceInkPreferenceDefault.ollamaBaseURL
+    public static let defaultOllamaRuntimeSelectedModel = VoiceInkAIEnhancementProviderKind.legacyOllamaServiceSelectedModelFallback
+
     public static func ollamaBaseURL(
         from defaults: UserDefaults = .standard,
-        fallback: String = VoiceInkPreferenceDefault.ollamaBaseURL
+        fallback: String = defaultOllamaBaseURL
     ) -> String {
         defaults.string(forKey: VoiceInkUserDefaultsKey.ollamaBaseURL) ?? fallback
     }
@@ -1037,6 +1040,10 @@ public enum VoiceInkDynamicAIProviderPreference {
         fallback: String
     ) -> String {
         defaults.string(forKey: VoiceInkUserDefaultsKey.ollamaSelectedModel) ?? fallback
+    }
+
+    public static func ollamaRuntimeSelectedModel(from defaults: UserDefaults = .standard) -> String {
+        ollamaSelectedModel(from: defaults, fallback: defaultOllamaRuntimeSelectedModel)
     }
 
     public static func saveOllamaSelectedModel(_ model: String, to defaults: UserDefaults = .standard) {

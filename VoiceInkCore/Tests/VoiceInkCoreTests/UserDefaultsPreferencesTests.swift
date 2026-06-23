@@ -1197,8 +1197,20 @@ final class UserDefaultsPreferencesTests: XCTestCase {
     func testDynamicAIProviderPreferenceReadsOllamaFallbacksAndSavedValues() {
         withIsolatedDefaults { defaults in
             XCTAssertEqual(
+                VoiceInkDynamicAIProviderPreference.defaultOllamaBaseURL,
+                VoiceInkPreferenceDefault.ollamaBaseURL
+            )
+            XCTAssertEqual(
+                VoiceInkDynamicAIProviderPreference.defaultOllamaRuntimeSelectedModel,
+                VoiceInkAIEnhancementProviderKind.legacyOllamaServiceSelectedModelFallback
+            )
+            XCTAssertEqual(
                 VoiceInkDynamicAIProviderPreference.ollamaBaseURL(from: defaults),
                 VoiceInkPreferenceDefault.ollamaBaseURL
+            )
+            XCTAssertEqual(
+                VoiceInkDynamicAIProviderPreference.ollamaRuntimeSelectedModel(from: defaults),
+                VoiceInkAIEnhancementProviderKind.legacyOllamaServiceSelectedModelFallback
             )
             XCTAssertEqual(
                 VoiceInkDynamicAIProviderPreference.ollamaSelectedModel(from: defaults, fallback: "llama2"),
@@ -1214,6 +1226,10 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             )
             XCTAssertEqual(
                 VoiceInkDynamicAIProviderPreference.ollamaSelectedModel(from: defaults, fallback: "llama2"),
+                "mistral"
+            )
+            XCTAssertEqual(
+                VoiceInkDynamicAIProviderPreference.ollamaRuntimeSelectedModel(from: defaults),
                 "mistral"
             )
         }

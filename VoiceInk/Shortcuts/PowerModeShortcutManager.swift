@@ -67,12 +67,13 @@ class PowerModeShortcutManager {
             return
         }
 
-        let shortcuts = PowerModeManager.shared.configurations.enabledPowerModeConfigurations.reduce(into: [ShortcutAction: Shortcut]()) { result, config in
-            let action = ShortcutAction.powerMode(config.id)
-            if let shortcut = ShortcutStore.shortcut(for: action) {
-                result[action] = shortcut
+        let shortcuts = PowerModeManager.shared.configurations
+            .powerModeShortcutEntries { id in
+                ShortcutStore.shortcut(for: .powerMode(id))
             }
-        }
+            .reduce(into: [ShortcutAction: Shortcut]()) { result, entry in
+                result[.powerMode(entry.configuration.id)] = entry.shortcut
+            }
 
         shortcutMonitor.start(
             shortcuts: shortcuts,
@@ -134,13 +135,15 @@ class PowerModeShortcutManager {
     }
 
     private func powerModeId(for action: ShortcutAction) -> UUID? {
-        guard case .powerMode(let powerModeId) = action,
-              let config = PowerModeManager.shared.configurations.powerModeConfiguration(with: powerModeId),
-              config.isEnabled,
-              ShortcutStore.shortcut(for: .powerMode(config.id)) != nil else {
+        guard case .powerMode(let powerModeId) = action else {
             return nil
         }
 
-        return powerModeId
+        return PowerModeManager.shared.configurations.powerModeShortcutConfigurationId(
+            for: powerModeId,
+            shortcutExists: { id in
+                ShortcutStore.shortcut(for: .powerMode(id)) != nil
+            }
+        )
     }
 }

@@ -11828,8 +11828,23 @@ reject_pattern \
   VoiceInk/PowerMode/PowerModeViewComponents.swift
 
 require_pattern \
-  "macOS Power Mode shortcuts call shared enabled-list policy directly" \
-  'configurations\.enabledPowerModeConfigurations' \
+  "shared Power Mode shortcut eligibility policy lives in VoiceInkCore" \
+  'powerModeShortcutEntries|powerModeShortcutConfigurationId' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "macOS Power Mode shortcuts consume shared shortcut eligibility policy" \
+  'powerModeShortcutEntries|powerModeShortcutConfigurationId' \
+  VoiceInk/Shortcuts/PowerModeShortcutManager.swift
+
+require_pattern \
+  "core checks execute Power Mode shortcut eligibility tests" \
+  'PowerModePolicyTests\.testPowerModeShortcutEntriesIncludeOnlyEnabledConfigurationsWithShortcuts|PowerModePolicyTests\.testPowerModeShortcutConfigurationIdRequiresEnabledConfigAndStoredShortcut' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "macOS Power Mode shortcut manager avoids shell-owned enabled shortcut filtering" \
+  'enabledPowerModeConfigurations\.reduce|config\.isEnabled' \
   VoiceInk/Shortcuts/PowerModeShortcutManager.swift
 
 reject_pattern \

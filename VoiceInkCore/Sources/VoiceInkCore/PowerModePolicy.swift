@@ -1146,6 +1146,29 @@ public extension Array where Element == PowerModeConfig {
         return enabledConfigurations[index]
     }
 
+    func powerModeShortcutEntries<ShortcutValue>(
+        shortcutForConfiguration: (UUID) -> ShortcutValue?
+    ) -> [(configuration: PowerModeConfig, shortcut: ShortcutValue)] {
+        enabledPowerModeConfigurations.compactMap { configuration in
+            shortcutForConfiguration(configuration.id).map { shortcut in
+                (configuration, shortcut)
+            }
+        }
+    }
+
+    func powerModeShortcutConfigurationId(
+        for id: UUID,
+        shortcutExists: (UUID) -> Bool
+    ) -> UUID? {
+        guard let configuration = powerModeConfiguration(with: id),
+              configuration.isEnabled,
+              shortcutExists(configuration.id) else {
+            return nil
+        }
+
+        return configuration.id
+    }
+
     var hasPowerModeDefaultConfiguration: Bool {
         contains { $0.isDefault }
     }

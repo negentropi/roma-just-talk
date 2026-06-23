@@ -1938,6 +1938,61 @@ final class PowerModePolicyTests: XCTestCase {
         )
     }
 
+    func testPowerModeShortcutEntriesIncludeOnlyEnabledConfigurationsWithShortcuts() {
+        let disabled = config(name: "Disabled", emoji: "D", isEnabled: false)
+        let firstEnabled = config(name: "First", emoji: "F")
+        let secondEnabled = config(name: "Second", emoji: "S")
+        let configs = [disabled, firstEnabled, secondEnabled]
+
+        let entries = configs.powerModeShortcutEntries { id -> String? in
+            switch id {
+            case disabled.id:
+                return "disabled"
+            case firstEnabled.id:
+                return "first"
+            default:
+                return nil
+            }
+        }
+
+        XCTAssertEqual(entries.map(\.configuration.id), [firstEnabled.id])
+        XCTAssertEqual(entries.map(\.shortcut), ["first"])
+    }
+
+    func testPowerModeShortcutConfigurationIdRequiresEnabledConfigAndStoredShortcut() {
+        let disabled = config(name: "Disabled", emoji: "D", isEnabled: false)
+        let firstEnabled = config(name: "First", emoji: "F")
+        let secondEnabled = config(name: "Second", emoji: "S")
+        let missing = UUID(uuidString: "00000000-0000-0000-0000-000000000304")!
+        let configs = [disabled, firstEnabled, secondEnabled]
+
+        XCTAssertEqual(
+            configs.powerModeShortcutConfigurationId(
+                for: firstEnabled.id,
+                shortcutExists: { $0 == firstEnabled.id }
+            ),
+            firstEnabled.id
+        )
+        XCTAssertNil(
+            configs.powerModeShortcutConfigurationId(
+                for: disabled.id,
+                shortcutExists: { _ in true }
+            )
+        )
+        XCTAssertNil(
+            configs.powerModeShortcutConfigurationId(
+                for: secondEnabled.id,
+                shortcutExists: { _ in false }
+            )
+        )
+        XCTAssertNil(
+            configs.powerModeShortcutConfigurationId(
+                for: missing,
+                shortcutExists: { _ in true }
+            )
+        )
+    }
+
     func testPowerModeShortcutImportPlanKeepsOnlyImportedConfigurationKeys() {
         let importedId = UUID(uuidString: "00000000-0000-0000-0000-000000000301")!
         let secondImportedId = UUID(uuidString: "00000000-0000-0000-0000-000000000302")!

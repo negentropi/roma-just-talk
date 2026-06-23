@@ -11762,9 +11762,36 @@ require_pattern \
   'provider\.transcriptionServiceRoute\.isCloudTranscriptionProvider' \
   VoiceInk/Transcription/RollingPreload/RollingBufferPreloadSettings.swift
 
+require_patterns \
+  "shared rolling-buffer buffered snapshot strategy lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/RollingBufferPreloadPolicy.swift \
+  'supportsRecordedFileTranscription' \
+  'VoiceInkRollingBufferBufferedSnapshotTranscriptionStrategy' \
+  'VoiceInkRollingBufferBufferedSnapshotTranscriptionPolicy'
+
+require_pattern \
+  "macOS rolling preload snapshot adapts recorded-file support into shared facts" \
+  'supportsRecordedFileTranscription: supportsRecordedFileTranscription' \
+  VoiceInk/Transcription/RollingPreload/RollingBufferPreloadSettings.swift
+
+require_pattern \
+  "macOS rolling-buffer quick release uses shared buffered snapshot strategy" \
+  'VoiceInkRollingBufferBufferedSnapshotTranscriptionPolicy\.strategy\(' \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift
+
+reject_pattern \
+  "macOS rolling-buffer shell avoids local buffered snapshot strategy policy" \
+  'enum +RollingBufferBufferedSnapshotTranscription(Strategy|Policy)' \
+  VoiceInk/Transcription/RollingPreload/RollingBufferPreloadSettings.swift
+
 require_pattern \
   "core checks execute service-route provider classification test" \
   'TranscriptionStreamingPreferenceTests\.testServiceRouteClassifiesCloudAndLocalProviders' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute buffered snapshot strategy test" \
+  'RollingBufferPreloadPolicyTests\.testBufferedSnapshotTranscriptionStrategyUsesRecordedFileCapability' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \

@@ -1079,6 +1079,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "RollingBufferPreloadPolicyTests.testPolicyHonorsModeOnAndOff", run: { RollingBufferPreloadPolicyTests().testPolicyHonorsModeOnAndOff() }),
             VoiceInkCoreCheck(name: "RollingBufferPreloadPolicyTests.testAutoPolicyCanDisableCloudModels", run: { RollingBufferPreloadPolicyTests().testAutoPolicyCanDisableCloudModels() }),
             VoiceInkCoreCheck(name: "RollingBufferPreloadPolicyTests.testAutoPolicyCanDisableLocalModelsOnLowBattery", run: { RollingBufferPreloadPolicyTests().testAutoPolicyCanDisableLocalModelsOnLowBattery() }),
+            VoiceInkCoreCheck(name: "RollingBufferPreloadPolicyTests.testBufferedSnapshotTranscriptionStrategyUsesRecordedFileCapability", run: { RollingBufferPreloadPolicyTests().testBufferedSnapshotTranscriptionStrategyUsesRecordedFileCapability() }),
             VoiceInkCoreCheck(name: "SessionMetricPolicyTests.testValuesUseEnhancedTextForWordCountWhenEnhancementWasAttempted", run: { SessionMetricPolicyTests().testValuesUseEnhancedTextForWordCountWhenEnhancementWasAttempted() }),
             VoiceInkCoreCheck(name: "SessionMetricPolicyTests.testValuesUseRawTextWhenEnhancementDurationIsMissing", run: { SessionMetricPolicyTests().testValuesUseRawTextWhenEnhancementDurationIsMissing() }),
             VoiceInkCoreCheck(name: "SessionMetricPolicyTests.testValuesClampNonPositiveDurationsAndSkipSpeedFactor", run: { SessionMetricPolicyTests().testValuesClampNonPositiveDurationsAndSkipSpeedFactor() }),

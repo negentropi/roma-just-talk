@@ -433,7 +433,9 @@ class VoiceInkEngine: NSObject, ObservableObject {
             )
         }
 
-        guard RollingBufferBufferedSnapshotTranscriptionPolicy.strategy(for: model) == .recordedFile else {
+        guard VoiceInkRollingBufferBufferedSnapshotTranscriptionPolicy.strategy(
+            for: model.rollingBufferPreloadSnapshot
+        ) == .recordedFile else {
             discardPreparedQuickReleaseContext()
             RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
                 strategy: .unavailable,

@@ -127,6 +127,7 @@ public struct VoiceInkRollingBufferPowerState: Equatable, Sendable {
 public struct VoiceInkRollingBufferPreloadModelSnapshot: Equatable, Sendable {
     public let supportsStreaming: Bool
     public let isCloudTranscriptionProvider: Bool
+    public let supportsRecordedFileTranscription: Bool
 
     public var isLocalTranscriptionProvider: Bool {
         !isCloudTranscriptionProvider
@@ -134,10 +135,25 @@ public struct VoiceInkRollingBufferPreloadModelSnapshot: Equatable, Sendable {
 
     public init(
         supportsStreaming: Bool,
-        isCloudTranscriptionProvider: Bool
+        isCloudTranscriptionProvider: Bool,
+        supportsRecordedFileTranscription: Bool = false
     ) {
         self.supportsStreaming = supportsStreaming
         self.isCloudTranscriptionProvider = isCloudTranscriptionProvider
+        self.supportsRecordedFileTranscription = supportsRecordedFileTranscription
+    }
+}
+
+public enum VoiceInkRollingBufferBufferedSnapshotTranscriptionStrategy: Equatable, Sendable {
+    case recordedFile
+    case unavailable
+}
+
+public enum VoiceInkRollingBufferBufferedSnapshotTranscriptionPolicy {
+    public static func strategy(
+        for model: VoiceInkRollingBufferPreloadModelSnapshot
+    ) -> VoiceInkRollingBufferBufferedSnapshotTranscriptionStrategy {
+        model.supportsRecordedFileTranscription ? .recordedFile : .unavailable
     }
 }
 

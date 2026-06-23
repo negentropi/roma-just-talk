@@ -15,7 +15,8 @@ extension TranscriptionModel {
     var rollingBufferPreloadSnapshot: VoiceInkRollingBufferPreloadModelSnapshot {
         VoiceInkRollingBufferPreloadModelSnapshot(
             supportsStreaming: supportsStreaming,
-            isCloudTranscriptionProvider: provider.transcriptionServiceRoute.isCloudTranscriptionProvider
+            isCloudTranscriptionProvider: provider.transcriptionServiceRoute.isCloudTranscriptionProvider,
+            supportsRecordedFileTranscription: supportsRecordedFileTranscription
         )
     }
 }
@@ -62,17 +63,6 @@ struct IOKitRollingBufferPowerStateProvider: RollingBufferPowerStateProviding {
             isOnBattery: hasBattery && isOnBattery,
             batteryLevelPercent: levels.min()
         )
-    }
-}
-
-enum RollingBufferBufferedSnapshotTranscriptionStrategy {
-    case recordedFile
-    case unavailable
-}
-
-enum RollingBufferBufferedSnapshotTranscriptionPolicy {
-    static func strategy(for model: any TranscriptionModel) -> RollingBufferBufferedSnapshotTranscriptionStrategy {
-        model.supportsRecordedFileTranscription ? .recordedFile : .unavailable
     }
 }
 

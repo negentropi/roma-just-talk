@@ -441,6 +441,29 @@ final class RollingBufferPreloadPolicyTests: XCTestCase {
         ).allowsPreload(for: model, perModelEnabled: true))
     }
 
+    func testBufferedSnapshotTranscriptionStrategyUsesRecordedFileCapability() {
+        XCTAssertEqual(
+            VoiceInkRollingBufferBufferedSnapshotTranscriptionPolicy.strategy(
+                for: VoiceInkRollingBufferPreloadModelSnapshot(
+                    supportsStreaming: true,
+                    isCloudTranscriptionProvider: false,
+                    supportsRecordedFileTranscription: true
+                )
+            ),
+            .recordedFile
+        )
+        XCTAssertEqual(
+            VoiceInkRollingBufferBufferedSnapshotTranscriptionPolicy.strategy(
+                for: VoiceInkRollingBufferPreloadModelSnapshot(
+                    supportsStreaming: true,
+                    isCloudTranscriptionProvider: true,
+                    supportsRecordedFileTranscription: false
+                )
+            ),
+            .unavailable
+        )
+    }
+
     private func configuration(
         mode: VoiceInkRollingBufferPreloadMode,
         autoDisablesCloudModels: Bool = false,

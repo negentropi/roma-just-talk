@@ -294,6 +294,11 @@ public enum VoiceInkMacOSWindowIdentity {
     }
 }
 
+public enum VoiceInkMacOSLogCategory {
+    public static let logExporter = "LogExporter"
+    public static let windowManager = "WindowManager"
+}
+
 public enum VoiceInkAppIdentity {
     public static let bundleIdentifier = "com.prakashjoshipax.VoiceInk"
     public static let loggingSubsystem = "com.prakashjoshipax.voiceink"

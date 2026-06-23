@@ -13011,6 +13011,11 @@ require_pattern \
   VoiceInk/Services/LogExporter.swift
 
 require_pattern \
+  "macOS log exporter uses shared log category identity" \
+  'Logger\(subsystem: VoiceInkAppIdentity\.loggingSubsystem, category: VoiceInkMacOSLogCategory\.logExporter\)' \
+  VoiceInk/Services/LogExporter.swift
+
+require_pattern \
   "core checks execute diagnostic log export policy tests" \
   'DiagnosticLogExportPolicyTests\.testDiagnosticsSettingsPresentationPreservesMacOSCopyAndIcons|DiagnosticLogExportPolicyTests\.testDiagnosticLogExportPolicyPreservesMacOSStorageAndFormattingConstants|DiagnosticLogExportPolicyTests\.testDiagnosticLogExportPolicyBuildsSessionRangesWithCurrentMiddleAndOldestLabels|DiagnosticLogExportPolicyTests\.testDiagnosticLogExportPolicyOwnsOSLogLevelLabels|DiagnosticLogExportPolicyTests\.testDiagnosticLogExportPolicyBuildsMacOSExportFileName|DiagnosticLogExportPolicyTests\.testDiagnosticLogExportPolicyBuildsDownloadsUnavailableError' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
@@ -13023,6 +13028,11 @@ require_pattern \
 reject_pattern \
   "macOS log exporter avoids shell-owned diagnostic log export policy" \
   'logExporter\.sessionStartDates\.v1|maxSessionsToKeep|sessionRanges:|\[Date\(\)\] \+ loadedDates|prefix\(maxSessionsToKeep\)|yyyy-MM-dd HH:mm:ss\.SSS|yyyy-MM-dd_HH-mm-ss|VoiceInk_Logs_|=== VoiceInk Diagnostic Logs ===|No logs found for this session\.|Session 1 \(Current\)|Session [0-9].*\(Oldest\)|NSError\(domain: "LogExporter"|code: 1|Downloads directory unavailable|NSLocalizedDescriptionKey|logLevelString|case \.(undefined|debug|info|notice|error|fault)|return "(UNDEFINED|DEBUG|INFO|NOTICE|ERROR|FAULT|UNKNOWN)"' \
+  VoiceInk/Services/LogExporter.swift
+
+reject_pattern \
+  "macOS log exporter avoids shell-owned log category literal" \
+  'category: "LogExporter"' \
   VoiceInk/Services/LogExporter.swift
 
 reject_pattern \
@@ -13473,9 +13483,26 @@ require_patterns \
   'onboardingTitle' \
   'historyTitle'
 
+require_patterns \
+  "shared macOS log category identity lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift \
+  'VoiceInkMacOSLogCategory' \
+  'logExporter = "LogExporter"' \
+  'windowManager = "WindowManager"'
+
+require_pattern \
+  "macOS window manager uses shared log category identity" \
+  'Logger\(subsystem: VoiceInkAppIdentity\.loggingSubsystem, category: VoiceInkMacOSLogCategory\.windowManager\)' \
+  VoiceInk/WindowManager.swift
+
 require_pattern \
   "core checks execute macOS window identity test" \
   'AppIdentityTests\.testMacOSWindowIdentityPreservesIdentifiersTitlesAndFrameNames' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute macOS log category identity test" \
+  'AppIdentityTests\.testMacOSLogCategoriesPreserveDiagnosticsIdentity' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \
@@ -13483,6 +13510,11 @@ reject_pattern \
   '"(VoiceInkMainWindowFrame|VoiceInkHistoryWindowFrame|roma-just-talk - Transcription History)"|loggingSubsystem\)\.(mainWindow|onboardingWindow|historyWindow)' \
   VoiceInk/WindowManager.swift \
   VoiceInk/HistoryWindowController.swift
+
+reject_pattern \
+  "macOS window manager avoids shell-owned log category literal" \
+  'category: "WindowManager"' \
+  VoiceInk/WindowManager.swift
 
 require_pattern \
   "iOS note list uses shared app identity presentation" \

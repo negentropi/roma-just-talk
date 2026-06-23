@@ -5,7 +5,7 @@ import VoiceInkCore
 final class LogExporter {
     static let shared = LogExporter()
 
-    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "LogExporter")
+    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: VoiceInkMacOSLogCategory.logExporter)
     private let subsystem = VoiceInkAppIdentity.loggingSubsystem
 
     private(set) var sessionStartDates: [Date] = []

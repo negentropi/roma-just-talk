@@ -10,7 +10,7 @@ class WindowManager: NSObject {
     private static let onboardingWindowIdentifier = NSUserInterfaceItemIdentifier(VoiceInkMacOSWindowIdentity.onboardingIdentifierRawValue)
     private static let mainWindowAutosaveName = NSWindow.FrameAutosaveName(VoiceInkMacOSWindowIdentity.mainFrameAutosaveName)
 
-    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "WindowManager")
+    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: VoiceInkMacOSLogCategory.windowManager)
     private weak var mainWindow: NSWindow?
     private var didApplyInitialPlacement = false
 

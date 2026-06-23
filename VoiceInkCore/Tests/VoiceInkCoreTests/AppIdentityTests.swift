@@ -47,6 +47,11 @@ final class AppIdentityTests: XCTestCase {
         XCTAssertEqual(VoiceInkIOSLogCategory.settings, "iOSSettings")
     }
 
+    func testMacOSLogCategoriesPreserveDiagnosticsIdentity() {
+        XCTAssertEqual(VoiceInkMacOSLogCategory.logExporter, "LogExporter")
+        XCTAssertEqual(VoiceInkMacOSLogCategory.windowManager, "WindowManager")
+    }
+
     func testMacOSWindowIdentityPreservesIdentifiersTitlesAndFrameNames() {
         XCTAssertEqual(VoiceInkMacOSWindowIdentity.mainIdentifierRawValue, "com.prakashjoshipax.voiceink.mainWindow")
         XCTAssertEqual(VoiceInkMacOSWindowIdentity.onboardingIdentifierRawValue, "com.prakashjoshipax.voiceink.onboardingWindow")

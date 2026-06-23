@@ -215,6 +215,30 @@ public struct VoiceInkProviderAPIKeyVerificationPersistencePlan: Equatable, Send
     }
 }
 
+public enum VoiceInkProviderAPIKeyVerificationPersistenceAction: Equatable, Sendable {
+    case saveKey(String)
+    case persistVerificationFlag(Bool)
+}
+
+public struct VoiceInkProviderAPIKeyVerificationPersistenceApplicationPlan: Equatable, Sendable {
+    public let actions: [VoiceInkProviderAPIKeyVerificationPersistenceAction]
+
+    public init(actions: [VoiceInkProviderAPIKeyVerificationPersistenceAction]) {
+        self.actions = actions
+    }
+}
+
+public extension VoiceInkProviderAPIKeyVerificationPersistencePlan {
+    var applicationPlan: VoiceInkProviderAPIKeyVerificationPersistenceApplicationPlan {
+        var actions: [VoiceInkProviderAPIKeyVerificationPersistenceAction] = []
+        if let keyToSave {
+            actions.append(.saveKey(keyToSave))
+        }
+        actions.append(.persistVerificationFlag(verificationFlagToPersist))
+        return VoiceInkProviderAPIKeyVerificationPersistenceApplicationPlan(actions: actions)
+    }
+}
+
 public extension VoiceInkProviderAPIKeyVerificationApplicationPlan {
     var successPersistencePlan: VoiceInkProviderAPIKeyVerificationPersistencePlan? {
         guard shouldMarkKeyVerified else { return nil }
@@ -222,6 +246,10 @@ public extension VoiceInkProviderAPIKeyVerificationApplicationPlan {
             keyToSave: keyToSave,
             verificationFlagToPersist: true
         )
+    }
+
+    var successPersistenceApplicationPlan: VoiceInkProviderAPIKeyVerificationPersistenceApplicationPlan? {
+        successPersistencePlan?.applicationPlan
     }
 }
 

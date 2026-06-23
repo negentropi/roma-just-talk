@@ -29,13 +29,19 @@ final class APIKeyManager {
         _ plan: VoiceInkProviderAPIKeyVerificationApplicationPlan,
         forProvider provider: String
     ) -> Bool {
-        guard let persistencePlan = plan.successPersistencePlan else { return false }
+        guard let persistenceApplicationPlan = plan.successPersistenceApplicationPlan else { return false }
 
-        if let keyToSave = persistencePlan.keyToSave {
-            saveAPIKey(keyToSave, forProvider: provider)
+        var verificationFlagToPersist = false
+        for action in persistenceApplicationPlan.actions {
+            switch action {
+            case .saveKey(let key):
+                saveAPIKey(key, forProvider: provider)
+            case .persistVerificationFlag(let flag):
+                verificationFlagToPersist = flag
+            }
         }
 
-        return persistencePlan.verificationFlagToPersist
+        return verificationFlagToPersist
     }
 
     func applyAIEnhancementVerificationPlan(

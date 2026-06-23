@@ -202,6 +202,24 @@ public struct VoiceInkAIEnhancementModelSelectionPlan: Sendable, Equatable {
     }
 }
 
+public extension VoiceInkAIEnhancementModelSelectionPlan {
+    func applyRuntimeState(
+        setSelectedModels: ([VoiceInkAIEnhancementProviderKind: String]) -> Void,
+        applyPersistence: (VoiceInkAIEnhancementModelSelectionPlan) -> Void,
+        setOllamaRuntimeModel: (String) -> Void,
+        sendObjectWillChange: () -> Void,
+        postSettingsChanged: () -> Void
+    ) {
+        setSelectedModels(selectedModels)
+        applyPersistence(self)
+        if let ollamaModelToApply {
+            setOllamaRuntimeModel(ollamaModelToApply)
+        }
+        sendObjectWillChange()
+        postSettingsChanged()
+    }
+}
+
 public enum VoiceInkAIEnhancementConnectionStatusTone: Sendable, Equatable {
     case connected
     case disconnected

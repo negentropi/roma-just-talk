@@ -8376,20 +8376,25 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 require_pattern \
+  "shared AI enhancement model-selection runtime application lives in VoiceInkCore" \
+  'applyRuntimeState|setSelectedModels|setOllamaRuntimeModel' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+require_pattern \
   "shared AI enhancement model-selection persistence application lives in VoiceInkCore" \
   'applyModelSelectionPlan' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "core tests pin shared AI enhancement model-selection planning" \
-  'testMacOSAIEnhancementModelSelectionPlanIsShared|testAIEnhancementProviderPreferenceAppliesModelSelectionPlan' \
+  'testMacOSAIEnhancementModelSelectionPlanIsShared|testMacOSAIEnhancementModelSelectionPlanAppliesRuntimeState|testAIEnhancementProviderPreferenceAppliesModelSelectionPlan' \
   VoiceInkCore/Tests/VoiceInkCoreTests/AIProviderCatalogTests.swift \
   VoiceInkCore/Tests/VoiceInkCoreTests/UserDefaultsPreferencesTests.swift \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "macOS AI service selected-model mutation uses shared plan" \
-  'VoiceInkAIEnhancementModelSelectionPlan\.selecting|applyTextEnhancementModelSelectionPlan|VoiceInkAIEnhancementProviderPreference\.applyModelSelectionPlan|ollamaModelToApply' \
+  'VoiceInkAIEnhancementModelSelectionPlan\.selecting|applyTextEnhancementModelSelectionPlan|applyRuntimeState|VoiceInkAIEnhancementProviderPreference\.applyModelSelectionPlan' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 require_pattern \
@@ -8545,7 +8550,7 @@ reject_pattern \
 
 reject_pattern \
   "macOS AI service avoids shell-owned selected-model mutation policy" \
-  'selectedModels\[selectedProvider\] = model|VoiceInkAIEnhancementProviderPreference\.saveSelectedModel\(|updateSelectedOllamaModel\(model\)' \
+  'selectedModels\[selectedProvider\] = model|VoiceInkAIEnhancementProviderPreference\.saveSelectedModel\(|updateSelectedOllamaModel\(model\)|selectedModels = plan\.selectedModels|plan\.ollamaModelToApply' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 reject_pattern \

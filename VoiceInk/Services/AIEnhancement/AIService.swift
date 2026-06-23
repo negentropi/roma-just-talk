@@ -127,15 +127,23 @@ class AIService: ObservableObject {
     }
 
     private func applyTextEnhancementModelSelectionPlan(_ plan: VoiceInkAIEnhancementModelSelectionPlan) {
-        selectedModels = plan.selectedModels
-        VoiceInkAIEnhancementProviderPreference.applyModelSelectionPlan(plan, to: userDefaults)
-
-        if let ollamaModelToApply = plan.ollamaModelToApply {
-            updateSelectedOllamaModel(ollamaModelToApply)
-        }
-
-        objectWillChange.send()
-        NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
+        plan.applyRuntimeState(
+            setSelectedModels: { [self] models in
+                selectedModels = models
+            },
+            applyPersistence: { [self] plan in
+                VoiceInkAIEnhancementProviderPreference.applyModelSelectionPlan(plan, to: userDefaults)
+            },
+            setOllamaRuntimeModel: { [self] ollamaRuntimeModel in
+                updateSelectedOllamaModel(ollamaRuntimeModel)
+            },
+            sendObjectWillChange: { [self] in
+                objectWillChange.send()
+            },
+            postSettingsChanged: {
+                NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
+            }
+        )
     }
     
     func saveAPIKey(_ key: String, completion: @escaping (VoiceInkAPIKeyVerificationResult) -> Void) {

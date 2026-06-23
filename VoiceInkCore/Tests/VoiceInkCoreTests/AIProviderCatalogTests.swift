@@ -1246,6 +1246,67 @@ final class AIProviderCatalogTests: XCTestCase {
         )
     }
 
+    func testMacOSAIEnhancementModelSelectionPlanAppliesRuntimeState() throws {
+        let initialModels: [VoiceInkAIEnhancementProviderKind: String] = [
+            .groq: "old-groq-model",
+            .openAI: "gpt-5.4"
+        ]
+        let groqPlan = try XCTUnwrap(
+            VoiceInkAIEnhancementModelSelectionPlan.selecting(
+                "openai/gpt-oss-120b",
+                provider: .groq,
+                selectedModels: initialModels
+            )
+        )
+        let ollamaPlan = try XCTUnwrap(
+            VoiceInkAIEnhancementModelSelectionPlan.selecting(
+                "llama3",
+                provider: .ollama,
+                selectedModels: initialModels
+            )
+        )
+
+        var events: [String] = []
+        func apply(_ plan: VoiceInkAIEnhancementModelSelectionPlan) {
+            plan.applyRuntimeState(
+                setSelectedModels: { models in
+                    let selected = models[plan.provider] ?? ""
+                    events.append("selected:\(plan.provider.rawValue):\(selected)")
+                },
+                applyPersistence: { plan in
+                    events.append("persist:\(plan.provider.rawValue):\(plan.selectedModelToSave)")
+                },
+                setOllamaRuntimeModel: { model in
+                    events.append("ollama:\(model)")
+                },
+                sendObjectWillChange: {
+                    events.append("willChange")
+                },
+                postSettingsChanged: {
+                    events.append("settings")
+                }
+            )
+        }
+
+        apply(groqPlan)
+        XCTAssertEqual(events, [
+            "selected:Groq:openai/gpt-oss-120b",
+            "persist:Groq:openai/gpt-oss-120b",
+            "willChange",
+            "settings"
+        ])
+
+        events = []
+        apply(ollamaPlan)
+        XCTAssertEqual(events, [
+            "selected:Ollama:llama3",
+            "persist:Ollama:llama3",
+            "ollama:llama3",
+            "willChange",
+            "settings"
+        ])
+    }
+
     func testMacOSAIEnhancementDefaultTextEnhancementModelsAreShared() {
         withIsolatedDefaults { defaults in
             XCTAssertEqual(

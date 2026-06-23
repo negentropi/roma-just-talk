@@ -667,9 +667,17 @@ reject_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests
 
 require_pattern \
-  "shared custom model API-key account identifier lives in VoiceInkCore" \
+  "shared custom model API-key account identifier lives with provider catalog" \
   'customModelAccountIdentifier\(forModelId:|customModel_.*_APIKey' \
-  VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyAccounts.swift
+  VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
+
+section "obsolete standalone provider API-key account module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyAccounts.swift
+
+require_pattern \
+  "shared provider API-key accounts live with provider access requirements" \
+  'VoiceInkProviderAPIKeyAccount|VoiceInkProviderAccessRequirement|fallbackEnvironmentKey\(forProviderName:' \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
 
 require_pattern \
   "macOS API-key manager uses shared custom model account identifier" \

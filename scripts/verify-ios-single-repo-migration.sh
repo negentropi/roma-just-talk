@@ -11170,13 +11170,15 @@ require_pattern \
 
 require_pattern \
   "shared app data reset plan lives in VoiceInkCore" \
-  'VoiceInkAppDataResetPlan|VoiceInkAppDataResetStep|VoiceInkAppDataResetFilePlan|VoiceInkAppDataResetDiagnostics|deleteTranscriptionRecords|cleanFiles|resetAppSettings|swiftDataResetFailedMessage' \
+  'VoiceInkAppDataResetPlan|VoiceInkAppDataResetStep|VoiceInkAppDataResetFilePlan|VoiceInkAppDataResetDiagnostics|applyRuntimeState|deleteTranscriptionRecords|cleanFiles|resetAppSettings|swiftDataResetFailedMessage' \
   VoiceInkCore/Sources/VoiceInkCore/AppDataReset.swift
 
-require_pattern \
+require_patterns \
   "core checks execute iOS app data reset tests" \
-  'AppDataResetTests\.test(IOSResetPlanPreservesRecordFileAndSettingsResetOrder|AppDataResetDiagnosticsPreserveIOSLogCopy)' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'AppDataResetTests\.testIOSResetPlanPreservesRecordFileAndSettingsResetOrder' \
+  'AppDataResetTests\.testIOSResetPlanAppliesRuntimeStateInOrder' \
+  'AppDataResetTests\.testAppDataResetDiagnosticsPreserveIOSLogCopy'
 
 require_pattern \
   "shared current-model preference remembers legacy macOS model key" \
@@ -11475,7 +11477,7 @@ reject_pattern \
 
 require_pattern \
   "iOS app settings reset consumes shared app data reset plan" \
-  'VoiceInkAppDataResetPlan\.iOS|for step in resetPlan\.steps|applyResetStep' \
+  'VoiceInkAppDataResetPlan\.iOS|resetPlan\.applyRuntimeState|deleteTranscriptionRecords|resetAppSettings' \
   iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \
@@ -11490,7 +11492,7 @@ reject_pattern \
 
 reject_pattern \
   "iOS app settings reset avoids shell-only file reset sequence" \
-  'VoiceInkAppDataResetFilePlan\.iOS|let +recordingsDir|let +modelsDir|let +cachesURL|let +tmpPath|contentsOfDirectory|removeItem\(atPath:' \
+  'VoiceInkAppDataResetFilePlan\.iOS|for step in resetPlan\.steps|applyResetStep|VoiceInkAppDataResetStep|let +recordingsDir|let +modelsDir|let +cachesURL|let +tmpPath|contentsOfDirectory|removeItem\(atPath:' \
   iOS/VoiceInk-ios/SettingsView.swift
 
 reject_pattern \

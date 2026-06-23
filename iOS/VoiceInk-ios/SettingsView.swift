@@ -264,22 +264,10 @@ struct SettingsView: View {
             temporaryDirectory: URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
         )
 
-        for step in resetPlan.steps {
-            applyResetStep(step)
-        }
-    }
-
-    private func applyResetStep(_ step: VoiceInkAppDataResetStep) {
-        switch step {
-        case .deleteTranscriptionRecords:
-            deleteTranscriptionRecords()
-
-        case .cleanFiles(let filePlan):
-            filePlan.performBestEffort()
-
-        case .resetAppSettings:
-            settings.resetAll()
-        }
+        resetPlan.applyRuntimeState(
+            deleteTranscriptionRecords: deleteTranscriptionRecords,
+            resetAppSettings: { settings.resetAll() }
+        )
     }
 
     private func deleteTranscriptionRecords() {

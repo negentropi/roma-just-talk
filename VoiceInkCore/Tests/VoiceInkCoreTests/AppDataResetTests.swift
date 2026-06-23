@@ -30,6 +30,41 @@ final class AppDataResetTests: XCTestCase {
         )
     }
 
+    func testIOSResetPlanAppliesRuntimeStateInOrder() {
+        let recordingsDirectory = URL(fileURLWithPath: "/tmp/recordings", isDirectory: true)
+        let modelsDirectory = URL(fileURLWithPath: "/tmp/models", isDirectory: true)
+        let cachesDirectory = URL(fileURLWithPath: "/tmp/caches", isDirectory: true)
+        let temporaryDirectory = URL(fileURLWithPath: "/tmp/app-tmp", isDirectory: true)
+        var events: [String] = []
+
+        VoiceInkAppDataResetPlan.iOS(
+            recordingsDirectory: recordingsDirectory,
+            modelsDirectory: modelsDirectory,
+            cachesDirectory: cachesDirectory,
+            temporaryDirectory: temporaryDirectory
+        )
+        .applyRuntimeState(
+            deleteTranscriptionRecords: {
+                events.append("deleteTranscriptionRecords")
+            },
+            cleanFiles: { filePlan in
+                let directoryNames = filePlan.directoriesToRemove
+                    .map(\.lastPathComponent)
+                    .joined(separator: ",")
+                events.append("cleanFiles:\(directoryNames)")
+            },
+            resetAppSettings: {
+                events.append("resetAppSettings")
+            }
+        )
+
+        XCTAssertEqual(events, [
+            "deleteTranscriptionRecords",
+            "cleanFiles:recordings,models",
+            "resetAppSettings"
+        ])
+    }
+
     func testIOSResetFilePlanPreservesExistingDirectoryPolicy() {
         let recordingsDirectory = URL(fileURLWithPath: "/tmp/recordings", isDirectory: true)
         let modelsDirectory = URL(fileURLWithPath: "/tmp/models", isDirectory: true)

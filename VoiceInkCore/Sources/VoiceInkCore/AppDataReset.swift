@@ -32,6 +32,25 @@ public struct VoiceInkAppDataResetPlan: Equatable, Sendable {
     }
 }
 
+public extension VoiceInkAppDataResetPlan {
+    func applyRuntimeState(
+        deleteTranscriptionRecords: () -> Void,
+        cleanFiles: (VoiceInkAppDataResetFilePlan) -> Void = { $0.performBestEffort() },
+        resetAppSettings: () -> Void
+    ) {
+        for step in steps {
+            switch step {
+            case .deleteTranscriptionRecords:
+                deleteTranscriptionRecords()
+            case .cleanFiles(let filePlan):
+                cleanFiles(filePlan)
+            case .resetAppSettings:
+                resetAppSettings()
+            }
+        }
+    }
+}
+
 public struct VoiceInkAppDataResetFilePlan: Equatable, Sendable {
     public let directoriesToRemove: [URL]
     public let directoriesToEmpty: [URL]

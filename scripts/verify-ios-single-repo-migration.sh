@@ -12289,11 +12289,12 @@ reject_pattern \
   '"support@tryvoiceink\.com"|"VoiceInk Support Request"|SCREEN RECORDING HIGHLY RECOMMENDED|COMMON ISSUES|tryvoiceink\.com/common-issues|URL\(string: "mailto:' \
   VoiceInk/EmailSupport.swift
 
-require_file VoiceInkCore/Sources/VoiceInkCore/AppNotificationPresentation.swift
+section "obsolete standalone app notification presentation module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/AppNotificationPresentation.swift
 
 require_patterns \
-  "shared app notification presentation lives in VoiceInkCore" \
-  VoiceInkCore/Sources/VoiceInkCore/AppNotificationPresentation.swift \
+  "shared app notification presentation lives with app identity" \
+  VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift \
   'VoiceInkAppNotificationKind' \
   'case error' \
   'case warning' \

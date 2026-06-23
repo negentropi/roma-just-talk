@@ -118,6 +118,13 @@ public enum VoiceInkPerformancePresentation {
     public static func transcriptSampleCountText(_ count: Int) -> String {
         "\(count) transcripts"
     }
+
+    public static func physicalMemoryText(byteCount: UInt64) -> String {
+        ByteCountFormatter.string(
+            fromByteCount: Int64(clamping: byteCount),
+            countStyle: .memory
+        )
+    }
 }
 
 public enum VoiceInkPerformanceAnalyzer {

@@ -12255,7 +12255,12 @@ require_pattern \
 
 require_pattern \
   "shared performance panel presentation lives in VoiceInkCore" \
-  'VoiceInkPerformancePresentation|modelPerformancePanelTitle|performanceAnalysisPanelTitle|averageEnhancementTimeLabel|transcriptSampleCountText' \
+  'VoiceInkPerformancePresentation|modelPerformancePanelTitle|performanceAnalysisPanelTitle|averageEnhancementTimeLabel|transcriptSampleCountText|physicalMemoryText' \
+  VoiceInkCore/Sources/VoiceInkCore/PerformanceAnalysis.swift
+
+require_pattern \
+  "shared performance presentation owns physical-memory text" \
+  'physicalMemoryText\(byteCount: UInt64\)|ByteCountFormatter\.string\(fromByteCount: Int64\(clamping: byteCount\), countStyle: \.memory\)' \
   VoiceInkCore/Sources/VoiceInkCore/PerformanceAnalysis.swift
 
 require_pattern \
@@ -12274,8 +12279,23 @@ require_pattern \
   VoiceInk/Views/Metrics/PerformanceAnalysisPanelView.swift
 
 require_pattern \
+  "macOS system info uses shared physical-memory presentation" \
+  'VoiceInkPerformancePresentation\.physicalMemoryText\(byteCount: totalMemory\)' \
+  VoiceInk/Services/SystemInfoService.swift
+
+require_pattern \
+  "macOS performance helper uses shared physical-memory presentation" \
+  'VoiceInkPerformancePresentation\.physicalMemoryText\(byteCount: totalMemory\)' \
+  VoiceInk/Views/Metrics/PerformanceAnalysisView.swift
+
+require_pattern \
   "core tests pin macOS performance panel presentation" \
   'testPerformancePresentationPreservesMacOSPanelCopyAndIcons' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/PerformanceAnalysisTests.swift
+
+require_pattern \
+  "core tests pin physical-memory presentation" \
+  'physicalMemoryText\(byteCount: 1_073_741_824\)' \
   VoiceInkCore/Tests/VoiceInkCoreTests/PerformanceAnalysisTests.swift
 
 require_pattern \
@@ -12293,6 +12313,12 @@ reject_pattern \
   '"(Model Performance|Performance Analysis|No data for this period|Summary|System Information|Transcription Models|Enhancement Models|Total|Analyzable|Enhanced|Device|Processor|Memory|Avg\. Audio|Avg\. Processing|Avg\. Enhancement Time)"|systemName: "(xmark|chart\.bar\.xaxis|doc\.text\.fill|waveform\.path\.ecg|sparkles)"|sampleCount\) (sessions|transcripts)' \
   VoiceInk/Views/Metrics/ModelPerformancePanel.swift \
   VoiceInk/Views/Metrics/PerformanceAnalysisPanelView.swift
+
+reject_pattern \
+  "macOS system info and performance helpers avoid shell-only physical-memory formatting" \
+  'ByteCountFormatter\.string\(fromByteCount:.*countStyle: \.memory\)' \
+  VoiceInk/Services/SystemInfoService.swift \
+  VoiceInk/Views/Metrics/PerformanceAnalysisView.swift
 
 reject_pattern \
   "platform metric views avoid shell-only realtime presentation text" \

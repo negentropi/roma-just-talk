@@ -27,7 +27,7 @@ struct PerformanceAnalyzer {
 
     static func getMemoryInfo() -> String {
         let totalMemory = ProcessInfo.processInfo.physicalMemory
-        return ByteCountFormatter.string(fromByteCount: Int64(totalMemory), countStyle: .memory)
+        return VoiceInkPerformancePresentation.physicalMemoryText(byteCount: totalMemory)
     }
 }
 

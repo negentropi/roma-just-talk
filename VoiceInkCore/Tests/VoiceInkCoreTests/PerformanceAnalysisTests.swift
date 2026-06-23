@@ -187,6 +187,8 @@ final class PerformanceAnalysisTests: XCTestCase {
         XCTAssertEqual(VoiceInkPerformancePresentation.averageEnhancementTimeLabel, "Avg. Enhancement Time")
         XCTAssertEqual(VoiceInkPerformancePresentation.sessionSampleCountText(2), "2 sessions")
         XCTAssertEqual(VoiceInkPerformancePresentation.transcriptSampleCountText(3), "3 transcripts")
+        XCTAssertEqual(VoiceInkPerformancePresentation.physicalMemoryText(byteCount: 1_073_741_824), "1 GB")
+        XCTAssertEqual(VoiceInkPerformancePresentation.physicalMemoryText(byteCount: 17_179_869_184), "16 GB")
     }
 }
 

@@ -3028,6 +3028,11 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
+  "core checks execute provider API-key verification persistence application test" \
+  'ProviderAccessRequirementTests\.testProviderAPIKeyVerificationApplicationPlanAppliesSuccessPersistence' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "core checks execute provider API-key iOS feedback visibility test" \
   'ProviderAccessRequirementTests\.testProviderAPIKeyFormStateOwnsIOSResultFeedbackVisibility' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
@@ -4754,7 +4759,12 @@ require_pattern \
 
 require_pattern \
   "macOS API-key manager applies shared provider verification plan" \
-  'applyProviderVerificationPlan|VoiceInkProviderAPIKeyVerificationApplicationPlan|successPersistenceApplicationPlan|persistenceApplicationPlan\.actions|persistVerificationFlag' \
+  'applyProviderVerificationPlan|VoiceInkProviderAPIKeyVerificationApplicationPlan|applySuccessPersistence' \
+  VoiceInk/Services/APIKeyManager.swift
+
+reject_pattern \
+  "macOS API-key manager avoids shell-owned provider verification persistence sequencing" \
+  'persistenceApplicationPlan\.actions|persistVerificationFlag|verificationFlagToPersist' \
   VoiceInk/Services/APIKeyManager.swift
 
 require_pattern \

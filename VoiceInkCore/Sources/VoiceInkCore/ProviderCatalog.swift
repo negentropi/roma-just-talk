@@ -239,6 +239,24 @@ public extension VoiceInkProviderAPIKeyVerificationPersistencePlan {
     }
 }
 
+public extension VoiceInkProviderAPIKeyVerificationPersistenceApplicationPlan {
+    func applySuccessPersistence(
+        saveKey: (String) -> Void
+    ) -> Bool {
+        var verificationFlagToPersist = false
+        for action in actions {
+            switch action {
+            case .saveKey(let key):
+                saveKey(key)
+            case .persistVerificationFlag(let flag):
+                verificationFlagToPersist = flag
+            }
+        }
+
+        return verificationFlagToPersist
+    }
+}
+
 public extension VoiceInkProviderAPIKeyVerificationApplicationPlan {
     var successPersistencePlan: VoiceInkProviderAPIKeyVerificationPersistencePlan? {
         guard shouldMarkKeyVerified else { return nil }
@@ -250,6 +268,13 @@ public extension VoiceInkProviderAPIKeyVerificationApplicationPlan {
 
     var successPersistenceApplicationPlan: VoiceInkProviderAPIKeyVerificationPersistenceApplicationPlan? {
         successPersistencePlan?.applicationPlan
+    }
+
+    func applySuccessPersistence(
+        saveKey: (String) -> Void
+    ) -> Bool {
+        guard let successPersistenceApplicationPlan else { return false }
+        return successPersistenceApplicationPlan.applySuccessPersistence(saveKey: saveKey)
     }
 }
 

@@ -6050,6 +6050,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
 
 require_pattern \
+  "shared dictionary settings section selector lives in VoiceInkCore" \
+  'VoiceInkDictionarySettingsSection|defaultSelection|presentation\(|in presentation: VoiceInkDictionarySettingsPresentation|case wordReplacements|case vocabulary' \
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
+
+require_pattern \
   "shared dictionary quick-add presentation lives in VoiceInkCore" \
   'VoiceInkDictionaryQuickAddPresentation|vocabularyPlaceholder|dismissHintTitle' \
   VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
@@ -6447,7 +6452,12 @@ require_pattern \
 
 require_pattern \
   "macOS dictionary settings chrome uses shared dictionary settings presentation" \
-  'VoiceInkDictionarySettingsPresentation\.macOS|dictionaryPresentation|section\.presentation' \
+  'VoiceInkDictionarySettingsPresentation\.macOS|VoiceInkDictionarySettingsSection\.allCases|section\.presentation\(in: dictionaryPresentation\)' \
+  VoiceInk/Views/Dictionary/DictionarySettingsView.swift
+
+reject_pattern \
+  "macOS dictionary settings avoids shell-owned section selector policy" \
+  'enum DictionarySection|case +(replacements|spellings)|section\.presentation[^(\n]' \
   VoiceInk/Views/Dictionary/DictionarySettingsView.swift
 
 require_pattern \
@@ -6592,7 +6602,7 @@ reject_pattern \
 
 require_pattern \
   "migration checklist tracks shared dictionary sort gate" \
-  'dictionary form/chrome, quick-add, word-replacement guidance, edit-sheet, list/row copy, vocabulary draft text/submit/reset/duplicate-alert planning, word-replacement draft text/visibility/submit/reset/duplicate-alert planning, word-replacement edit state/saveability/update-completion planning, accepted-submission list application, sort mode storage/toggle/indicator policy, vocabulary/word-replacement list sorting, and sorted-row deletion planning route through `VoiceInkDictionarySettingsPresentation`/`VoiceInkDictionaryQuickAddPresentation`/`VoiceInkWordReplacementInfoPresentation`/`VoiceInkWordReplacementEditPresentation`/`VoiceInkVocabularyListPresentation`/`VoiceInkWordReplacementListPresentation`/`VoiceInkVocabularyDraftState`/`VoiceInkVocabularyDraftSubmission`/`VoiceInkVocabularySubmissionPlan`/`VoiceInkWordReplacementDraftState`/`VoiceInkWordReplacementDraftSubmission`/`VoiceInkWordReplacementSubmissionPlan`/`VoiceInkWordReplacementEditState`/`VoiceInkWordReplacementEditSubmission`/`VoiceInkDictionaryListSortPreference`/`VoiceInkDictionaryListSortPolicy`' \
+  'section order/default selection.*`VoiceInkDictionarySettingsPresentation`/`VoiceInkDictionarySettingsSection`.*`VoiceInkDictionaryListSortPreference`/`VoiceInkDictionaryListSortPolicy`.*local section enums' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

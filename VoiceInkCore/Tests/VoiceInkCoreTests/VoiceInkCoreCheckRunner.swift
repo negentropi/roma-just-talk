@@ -392,6 +392,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testDictionaryPersistenceFailureMessagesPreservePlatformCopy", run: { DictionaryPolicyTests().testDictionaryPersistenceFailureMessagesPreservePlatformCopy() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testDictionarySettingsPresentationPreservesIOSCopy", run: { DictionaryPolicyTests().testDictionarySettingsPresentationPreservesIOSCopy() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testDictionarySettingsPresentationPreservesMacOSCopy", run: { DictionaryPolicyTests().testDictionarySettingsPresentationPreservesMacOSCopy() }),
+            VoiceInkCoreCheck(name: "DictionaryPolicyTests.testDictionarySettingsSectionsPreserveMacOSSelectorOrderAndPresentation", run: { DictionaryPolicyTests().testDictionarySettingsSectionsPreserveMacOSSelectorOrderAndPresentation() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testDictionaryQuickAddPresentationPreservesMacOSCopy", run: { DictionaryPolicyTests().testDictionaryQuickAddPresentationPreservesMacOSCopy() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementInfoPresentationPreservesMacOSCopy", run: { DictionaryPolicyTests().testWordReplacementInfoPresentationPreservesMacOSCopy() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementEditPresentationPreservesMacOSCopy", run: { DictionaryPolicyTests().testWordReplacementEditPresentationPreservesMacOSCopy() }),

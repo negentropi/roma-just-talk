@@ -482,6 +482,24 @@ public struct VoiceInkDictionarySettingsSectionPresentation: Equatable, Sendable
     }
 }
 
+public enum VoiceInkDictionarySettingsSection: String, CaseIterable, Sendable {
+    case wordReplacements
+    case vocabulary
+
+    public static let defaultSelection: Self = .wordReplacements
+
+    public func presentation(
+        in presentation: VoiceInkDictionarySettingsPresentation
+    ) -> VoiceInkDictionarySettingsSectionPresentation {
+        switch self {
+        case .wordReplacements:
+            return presentation.wordReplacementsSection
+        case .vocabulary:
+            return presentation.vocabularySection
+        }
+    }
+}
+
 public struct VoiceInkDictionaryQuickAddPresentation: Equatable, Sendable {
     public let vocabularyMode: VoiceInkDictionaryQuickAddModePresentation
     public let replacementMode: VoiceInkDictionaryQuickAddModePresentation

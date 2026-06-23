@@ -4,24 +4,10 @@ import VoiceInkCore
 
 struct DictionarySettingsView: View {
     @Environment(\.modelContext) private var modelContext
-    @State private var selectedSection: DictionarySection = .replacements
+    @State private var selectedSection: VoiceInkDictionarySettingsSection = .defaultSelection
     @State private var isShowingSettings = false
     private let dictionaryPresentation = VoiceInkDictionarySettingsPresentation.macOS
-    
-    enum DictionarySection: CaseIterable {
-        case replacements
-        case spellings
-        
-        var presentation: VoiceInkDictionarySettingsSectionPresentation {
-            switch self {
-            case .spellings:
-                return VoiceInkDictionarySettingsPresentation.macOS.vocabularySection
-            case .replacements:
-                return VoiceInkDictionarySettingsPresentation.macOS.wordReplacementsSection
-            }
-        }
-    }
-    
+
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
@@ -81,9 +67,9 @@ struct DictionarySettingsView: View {
             }
 
             HStack(spacing: 20) {
-                ForEach(DictionarySection.allCases, id: \.self) { section in
+                ForEach(VoiceInkDictionarySettingsSection.allCases, id: \.self) { section in
                     SectionCard(
-                        presentation: section.presentation,
+                        presentation: section.presentation(in: dictionaryPresentation),
                         isSelected: selectedSection == section,
                         action: { selectedSection = section }
                     )
@@ -95,11 +81,11 @@ struct DictionarySettingsView: View {
     private var selectedSectionContent: some View {
         VStack(alignment: .leading, spacing: 20) {
             switch selectedSection {
-            case .spellings:
-                VocabularyView()
-                    .background(CardBackground(isSelected: false))
-            case .replacements:
+            case .wordReplacements:
                 WordReplacementView()
+                    .background(CardBackground(isSelected: false))
+            case .vocabulary:
+                VocabularyView()
                     .background(CardBackground(isSelected: false))
             }
         }

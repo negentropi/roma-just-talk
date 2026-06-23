@@ -116,6 +116,24 @@ final class DictionaryPolicyTests: XCTestCase {
         XCTAssertEqual(presentation.closeButtonHelp, "Close")
     }
 
+    func testDictionarySettingsSectionsPreserveMacOSSelectorOrderAndPresentation() {
+        let presentation = VoiceInkDictionarySettingsPresentation.macOS
+
+        XCTAssertEqual(
+            VoiceInkDictionarySettingsSection.allCases,
+            [.wordReplacements, .vocabulary]
+        )
+        XCTAssertEqual(VoiceInkDictionarySettingsSection.defaultSelection, .wordReplacements)
+        XCTAssertEqual(
+            VoiceInkDictionarySettingsSection.wordReplacements.presentation(in: presentation),
+            presentation.wordReplacementsSection
+        )
+        XCTAssertEqual(
+            VoiceInkDictionarySettingsSection.vocabulary.presentation(in: presentation),
+            presentation.vocabularySection
+        )
+    }
+
     func testDictionaryQuickAddPresentationPreservesMacOSCopy() {
         let presentation = VoiceInkDictionaryQuickAddPresentation.macOS
 

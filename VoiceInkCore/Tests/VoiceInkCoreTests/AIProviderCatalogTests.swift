@@ -1137,6 +1137,45 @@ final class AIProviderCatalogTests: XCTestCase {
         )
     }
 
+    func testMacOSAIEnhancementProviderSelectionPlanAppliesRuntimeState() {
+        let groqPlan = VoiceInkAIEnhancementProviderSelectionPlan.selecting(.groq)
+        let ollamaPlan = VoiceInkAIEnhancementProviderSelectionPlan.selecting(.ollama)
+
+        var events: [String] = []
+        func apply(_ plan: VoiceInkAIEnhancementProviderSelectionPlan) {
+            plan.applyRuntimeState(
+                applyPersistence: { plan in
+                    events.append("persist:\(plan.selectedProviderToSave.rawValue)")
+                },
+                applyCredentialState: {
+                    events.append("credential")
+                },
+                refreshOllamaRuntimeModels: {
+                    events.append("refreshOllama")
+                },
+                postSettingsChanged: {
+                    events.append("settings")
+                }
+            )
+        }
+
+        apply(groqPlan)
+        XCTAssertEqual(events, [
+            "persist:Groq",
+            "credential",
+            "settings"
+        ])
+
+        events = []
+        apply(ollamaPlan)
+        XCTAssertEqual(events, [
+            "persist:Ollama",
+            "credential",
+            "refreshOllama",
+            "settings"
+        ])
+    }
+
     func testMacOSAIEnhancementModelSelectionPreservesAvailableSelections() {
         XCTAssertEqual(
             VoiceInkAIEnhancementProviderKind.groq.selectedTextEnhancementModel(

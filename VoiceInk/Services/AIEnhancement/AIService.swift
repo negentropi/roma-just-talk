@@ -85,17 +85,23 @@ class AIService: ObservableObject {
     }
 
     private func applyTextEnhancementProviderSelectionPlan(_ plan: VoiceInkAIEnhancementProviderSelectionPlan) {
-        VoiceInkAIEnhancementProviderPreference.applyProviderSelectionPlan(plan, to: userDefaults)
-        applyCredentialStateForSelectedProvider()
-
-        if plan.shouldRefreshOllamaRuntimeModels {
-            Task {
-                await ollamaService.checkConnection()
-                await ollamaService.refreshModels()
+        plan.applyRuntimeState(
+            applyPersistence: { [self] plan in
+                VoiceInkAIEnhancementProviderPreference.applyProviderSelectionPlan(plan, to: userDefaults)
+            },
+            applyCredentialState: { [self] in
+                applyCredentialStateForSelectedProvider()
+            },
+            refreshOllamaRuntimeModels: { [self] in
+                Task {
+                    await ollamaService.checkConnection()
+                    await ollamaService.refreshModels()
+                }
+            },
+            postSettingsChanged: {
+                NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
             }
-        }
-
-        NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
+        )
     }
 
     private func applyCredentialStateForSelectedProvider() {

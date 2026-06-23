@@ -8103,20 +8103,25 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 require_pattern \
+  "shared AI enhancement provider-selection runtime application lives in VoiceInkCore" \
+  'extension VoiceInkAIEnhancementProviderSelectionPlan|refreshOllamaRuntimeModels|applyCredentialState' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+require_pattern \
   "shared AI enhancement provider-selection persistence application lives in VoiceInkCore" \
   'applyProviderSelectionPlan' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "core tests pin shared AI enhancement provider-selection planning" \
-  'testMacOSAIEnhancementProviderSelectionPlanIsShared|testAIEnhancementProviderPreferenceAppliesProviderSelectionPlan' \
+  'testMacOSAIEnhancementProviderSelectionPlanIsShared|testMacOSAIEnhancementProviderSelectionPlanAppliesRuntimeState|testAIEnhancementProviderPreferenceAppliesProviderSelectionPlan' \
   VoiceInkCore/Tests/VoiceInkCoreTests/AIProviderCatalogTests.swift \
   VoiceInkCore/Tests/VoiceInkCoreTests/UserDefaultsPreferencesTests.swift \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "macOS AI service selected-provider mutation uses shared plan" \
-  'VoiceInkAIEnhancementProviderSelectionPlan\.selecting|applyTextEnhancementProviderSelectionPlan|VoiceInkAIEnhancementProviderPreference\.applyProviderSelectionPlan|shouldRefreshOllamaRuntimeModels' \
+  'VoiceInkAIEnhancementProviderSelectionPlan\.selecting|applyTextEnhancementProviderSelectionPlan|applyRuntimeState|VoiceInkAIEnhancementProviderPreference\.applyProviderSelectionPlan' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 require_pattern \
@@ -8509,7 +8514,7 @@ reject_pattern \
 
 reject_pattern \
   "macOS AI service avoids shell-owned selected-provider mutation policy" \
-  'VoiceInkAIEnhancementProviderPreference\.saveSelectedProvider\(|selectedProvider\.textEnhancementModelCatalogSource == \.ollamaRuntime' \
+  'VoiceInkAIEnhancementProviderPreference\.saveSelectedProvider\(|selectedProvider\.textEnhancementModelCatalogSource == \.ollamaRuntime|plan\.shouldRefreshOllamaRuntimeModels' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 reject_pattern \

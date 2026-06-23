@@ -117,6 +117,22 @@ public struct VoiceInkAIEnhancementProviderSelectionPlan: Sendable, Equatable {
     }
 }
 
+public extension VoiceInkAIEnhancementProviderSelectionPlan {
+    func applyRuntimeState(
+        applyPersistence: (VoiceInkAIEnhancementProviderSelectionPlan) -> Void,
+        applyCredentialState: () -> Void,
+        refreshOllamaRuntimeModels: () -> Void,
+        postSettingsChanged: () -> Void
+    ) {
+        applyPersistence(self)
+        applyCredentialState()
+        if shouldRefreshOllamaRuntimeModels {
+            refreshOllamaRuntimeModels()
+        }
+        postSettingsChanged()
+    }
+}
+
 public struct VoiceInkAIEnhancementModelRefreshPlan: Sendable, Equatable {
     public let refreshedModelNames: [String]
     public let selectedModelToSave: String?

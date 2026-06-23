@@ -234,6 +234,44 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
         XCTAssertEqual(selectedLanguage, VoiceInkLanguageCatalog.autoDetectCode)
     }
 
+    func testModeSettingsRepairPlanAppliesRuntimeStateInOrder() {
+        let plan = VoiceInkModeSettingsPolicy.defaultModeRepairPlan(
+            modes: [],
+            selectedModeId: nil,
+            selectedTranscriptionLanguage: "not-a-language"
+        )
+        var runtimeModes: [Mode] = []
+        var runtimeSelectedModeId: UUID?
+        var runtimeLanguage = "not-a-language"
+        var events: [String] = []
+
+        plan.applyRuntimeState(
+            currentSelectedModeId: runtimeSelectedModeId,
+            currentSelectedTranscriptionLanguage: runtimeLanguage,
+            replaceModes: { modes in
+                runtimeModes = modes
+                events.append("modes:\(modes.count)")
+            },
+            selectMode: { selectedModeId in
+                runtimeSelectedModeId = selectedModeId
+                events.append("selectedMode:\(selectedModeId == plan.selectedModeId)")
+            },
+            selectTranscriptionLanguage: { language in
+                runtimeLanguage = language
+                events.append("language:\(language)")
+            }
+        )
+
+        XCTAssertEqual(events, [
+            "modes:1",
+            "selectedMode:true",
+            "language:\(VoiceInkLanguageCatalog.autoDetectCode)"
+        ])
+        XCTAssertEqual(runtimeModes.map(\.id), plan.modes.map(\.id))
+        XCTAssertEqual(runtimeSelectedModeId, plan.selectedModeId)
+        XCTAssertEqual(runtimeLanguage, VoiceInkLanguageCatalog.autoDetectCode)
+    }
+
     func testUnsupportedTranscriptionProviderDoesNotReceiveFakeFallbackModel() {
         let mode = Mode(name: "Unsupported", transcriptionProvider: .cerebras)
 

@@ -284,19 +284,13 @@ final class AppSettings: ObservableObject {
     }
 
     private func applyModeSettingsRepairPlan(_ plan: VoiceInkModeSettingsRepairPlan) {
-        for action in plan.applicationActions(
+        plan.applyRuntimeState(
             currentSelectedModeId: selectedModeId,
-            currentSelectedTranscriptionLanguage: selectedTranscriptionLanguage
-        ) {
-            switch action {
-            case .replaceModes(let actionModes):
-                modes = actionModes
-            case .selectMode(let actionSelectedModeId):
-                selectedModeId = actionSelectedModeId
-            case .selectTranscriptionLanguage(let actionLanguage):
-                selectedTranscriptionLanguage = actionLanguage
-            }
-        }
+            currentSelectedTranscriptionLanguage: selectedTranscriptionLanguage,
+            replaceModes: { modes = $0 },
+            selectMode: { selectedModeId = $0 },
+            selectTranscriptionLanguage: { selectedTranscriptionLanguage = $0 }
+        )
     }
 
     func completeFirstTimeSetup() {

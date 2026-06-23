@@ -218,7 +218,7 @@ public struct VoiceInkModeSettingsRepairPlan {
         currentLanguage != selectedTranscriptionLanguage
     }
 
-    public func applicationActions(
+    func applicationActions(
         currentSelectedModeId: UUID?,
         currentSelectedTranscriptionLanguage: String
     ) -> [VoiceInkModeSettingsRepairAction] {
@@ -236,10 +236,34 @@ public struct VoiceInkModeSettingsRepairPlan {
     }
 }
 
-public enum VoiceInkModeSettingsRepairAction {
+enum VoiceInkModeSettingsRepairAction {
     case replaceModes([Mode])
     case selectMode(UUID?)
     case selectTranscriptionLanguage(String)
+}
+
+public extension VoiceInkModeSettingsRepairPlan {
+    func applyRuntimeState(
+        currentSelectedModeId: UUID?,
+        currentSelectedTranscriptionLanguage: String,
+        replaceModes: ([Mode]) -> Void,
+        selectMode: (UUID?) -> Void,
+        selectTranscriptionLanguage: (String) -> Void
+    ) {
+        for action in applicationActions(
+            currentSelectedModeId: currentSelectedModeId,
+            currentSelectedTranscriptionLanguage: currentSelectedTranscriptionLanguage
+        ) {
+            switch action {
+            case .replaceModes(let modes):
+                replaceModes(modes)
+            case .selectMode(let selectedModeId):
+                selectMode(selectedModeId)
+            case .selectTranscriptionLanguage(let language):
+                selectTranscriptionLanguage(language)
+            }
+        }
+    }
 }
 
 public enum VoiceInkModeListPolicy {

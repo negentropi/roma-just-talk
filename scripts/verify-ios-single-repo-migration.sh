@@ -1361,12 +1361,12 @@ require_pattern \
 
 require_pattern \
   "shared mode settings repair plan lives in VoiceInkCore" \
-  'VoiceInkModeSettingsPolicy|VoiceInkModeSettingsRepairPlan|VoiceInkModeSettingsRepairAction|applicationActions|shouldApplySelectedModeId|shouldApplySelectedTranscriptionLanguage' \
+  'VoiceInkModeSettingsPolicy|VoiceInkModeSettingsRepairPlan|VoiceInkModeSettingsRepairAction|applicationActions|applyRuntimeState|shouldApplySelectedModeId|shouldApplySelectedTranscriptionLanguage' \
   VoiceInkCore/Sources/VoiceInkCore/Mode.swift
 
 require_pattern \
-  "core checks execute mode settings repair action tests" \
-  'ModeRuntimeConfigurationTests\.testModeSettingsRepairPlanBuilds(NoActionsWhenCurrentStateMatches|SelectionAndLanguageActions|DefaultModeSeedActionsInOrder)' \
+  "core checks execute mode settings repair action and runtime application tests" \
+  'ModeRuntimeConfigurationTests\.testModeSettingsRepairPlan(Builds(NoActionsWhenCurrentStateMatches|SelectionAndLanguageActions|DefaultModeSeedActionsInOrder)|AppliesRuntimeStateInOrder)' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -1412,13 +1412,13 @@ require_patterns \
   'VoiceInkModeListPolicy\.removing'
 
 require_pattern \
-  "iOS AppSettings delegates mode selection and language repair to shared core" \
-  'VoiceInkModeSettingsPolicy\.repairPlan|VoiceInkModeSettingsRepairPlan|applicationActions|VoiceInkModeSettingsRepairAction' \
+  "iOS AppSettings delegates mode selection and language repair runtime application to shared core" \
+  'VoiceInkModeSettingsPolicy\.repairPlan|VoiceInkModeSettingsRepairPlan|plan\.applyRuntimeState' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 reject_pattern \
   "iOS AppSettings avoids shell-owned mode selection and language repair sequencing" \
-  'repairedSelectedModeId|repairedSelectedTranscriptionLanguage|VoiceInkModeListPolicy\.defaultModeRepairPlan|selectedModeId != plan\.selectedModeId|selectedTranscriptionLanguage != plan\.selectedTranscriptionLanguage|plan\.shouldReplaceModes|plan\.shouldApplySelectedModeId|plan\.shouldApplySelectedTranscriptionLanguage' \
+  'repairedSelectedModeId|repairedSelectedTranscriptionLanguage|VoiceInkModeListPolicy\.defaultModeRepairPlan|selectedModeId != plan\.selectedModeId|selectedTranscriptionLanguage != plan\.selectedTranscriptionLanguage|plan\.shouldReplaceModes|plan\.shouldApplySelectedModeId|plan\.shouldApplySelectedTranscriptionLanguage|plan\.applicationActions|VoiceInkModeSettingsRepairAction|case \.replaceModes|case \.selectMode|case \.selectTranscriptionLanguage' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \

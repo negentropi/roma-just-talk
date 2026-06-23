@@ -6227,6 +6227,17 @@ reject_pattern \
   VoiceInk/Views/Components/FillerWordsSettingsView.swift \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
+section "obsolete standalone transcript text normalizer module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/TranscriptTextNormalizer.swift
+
+require_patterns \
+  "transcript text normalizer lives with output filtering" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionOutputFilter.swift \
+  'VoiceInkTranscriptTextNormalizer' \
+  'collapseWhitespaceRunsAndTrim' \
+  'normalizeParagraphSpacing' \
+  'VoiceInkTranscriptionOutputFilter'
+
 reject_pattern \
   "macOS audio cleanup settings avoid shell-only presentation copy" \
   '"(Auto-delete Transcripts|Automatically delete transcript history based on the retention period you set\.|Delete After|Immediately|1 hour|1 day|3 days|7 days|Run Cleanup Now|Transcript Cleanup|Cleanup complete\.|Auto-delete Audio Files|Automatically delete audio recordings while keeping text transcripts intact\.|Keep Audio For|14 days|30 days|Analyzing\.\.\.|Audio Cleanup|Cancel|Cleanup Complete)"|Delete \\\(cleanupInfo\.fileCount\\\) Files|This will delete \\\(cleanupInfo\.fileCount\\\) audio files|No audio files found older than|Deleted \\\(cleanupResult\.deletedCount\\\)' \

@@ -420,6 +420,15 @@ public struct VoiceInkPowerModeEnhancementSelection: Equatable, Sendable {
         )
     }
 
+    public func selectingPromptForEnhancementState(
+        isEnabled: Bool,
+        prompts: [VoiceInkCustomPrompt]
+    ) -> Self {
+        guard isEnabled else { return self }
+
+        return selectingPromptAfterEnabling(prompts: prompts)
+    }
+
     private var selectedProviderKind: VoiceInkAIEnhancementProviderKind? {
         selectedAIProvider.flatMap(VoiceInkAIEnhancementProviderKind.init(storedValue:))
     }

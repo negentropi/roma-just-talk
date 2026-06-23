@@ -11283,8 +11283,18 @@ require_pattern \
 
 require_pattern \
   "shared Power Mode enhancement selection default repair lives in VoiceInkCore" \
-  'VoiceInkPowerModeEnhancementSelection|fillingMissingProviderAndModel|selectingPromptAfterEnabling' \
+  'VoiceInkPowerModeEnhancementSelection|fillingMissingProviderAndModel|selectingPromptAfterEnabling|selectingPromptForEnhancementState' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "core checks execute Power Mode enhancement prompt-state repair test" \
+  'PowerModePolicyTests\.testPowerModeEnhancementSelectionRepairsPromptOnlyWhenEnhancementIsEnabled' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "macOS Power Mode view avoids shell-owned enhancement prompt fallback condition" \
+  'isAIEnhancementEnabled && selectedPromptId == nil|selectingPromptAfterEnabling' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
 
 require_pattern \
   "shared Power Mode provider/model picker selection repair lives in VoiceInkCore" \

@@ -426,7 +426,10 @@ struct ConfigurationView: View {
                                             currentModel: aiService.currentModel,
                                             treatsEmptyModelAsMissing: false
                                         )
-                                        .selectingPromptAfterEnabling(prompts: enhancementService.allPrompts)
+                                        .selectingPromptForEnhancementState(
+                                            isEnabled: newValue,
+                                            prompts: enhancementService.allPrompts
+                                        )
                                 )
                             }
                         }
@@ -577,11 +580,12 @@ struct ConfigurationView: View {
                     )
                 }
 
-                if isAIEnhancementEnabled && selectedPromptId == nil {
-                    applyEnhancementSelection(
-                        enhancementSelection.selectingPromptAfterEnabling(prompts: enhancementService.allPrompts)
+                applyEnhancementSelection(
+                    enhancementSelection.selectingPromptForEnhancementState(
+                        isEnabled: isAIEnhancementEnabled,
+                        prompts: enhancementService.allPrompts
                     )
-                }
+                )
 
                 if let model = selectedTranscriptionModel {
                     let facts = modelFacts(for: model)

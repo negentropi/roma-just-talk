@@ -856,6 +856,30 @@ final class PowerModePolicyTests: XCTestCase {
         )
     }
 
+    func testPowerModeEnhancementSelectionRepairsPromptOnlyWhenEnhancementIsEnabled() {
+        let promptID = UUID()
+        let prompt = VoiceInkCustomPrompt(id: promptID, title: "Rewrite", promptText: "Rewrite this")
+        let missingSelection = VoiceInkPowerModeEnhancementSelection(
+            selectedPromptId: nil,
+            selectedAIProvider: "Groq",
+            selectedAIModel: "llama-3.3"
+        )
+
+        XCTAssertEqual(
+            missingSelection.selectingPromptForEnhancementState(
+                isEnabled: true,
+                prompts: [prompt]
+            ).selectedPromptId,
+            promptID
+        )
+        XCTAssertNil(
+            missingSelection.selectingPromptForEnhancementState(
+                isEnabled: false,
+                prompts: [prompt]
+            ).selectedPromptId
+        )
+    }
+
     func testPowerModeEnhancementSelectionResolvesProviderPickerAndModelOptions() {
         let missingSelection = VoiceInkPowerModeEnhancementSelection(
             selectedPromptId: nil,

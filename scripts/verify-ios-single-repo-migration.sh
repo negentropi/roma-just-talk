@@ -11653,6 +11653,13 @@ require_pattern \
   'VoiceInkRollingBufferPreloadSettingsPresentation|VoiceInkRollingBufferVADModel|VoiceInkRollingBufferVADSettings|modelKey = "RollingBufferVADModel"|sileroModelName|saveImportedModel' \
   VoiceInkCore/Sources/VoiceInkCore/RollingBufferPreloadPolicy.swift
 
+reject_file VoiceInkCore/Sources/VoiceInkCore/RollingAudioBuffer.swift
+
+require_pattern \
+  "shared rolling-buffer lead-in buffer lives with preload policy" \
+  'VoiceInkRollingAudioBuffer' \
+  VoiceInkCore/Sources/VoiceInkCore/RollingBufferPreloadPolicy.swift
+
 require_patterns \
   "shared rolling-buffer partial transcript request lives in VoiceInkCore" \
   VoiceInkCore/Sources/VoiceInkCore/RollingBufferPreloadPolicy.swift \

@@ -83,12 +83,10 @@ final class RecordingManager: ObservableObject {
     }
 
     private func applyStartAction(_ action: VoiceInkRecordingStartAction) {
-        switch action {
-        case .startRecording:
-            startRecordingWithPermissionCheck()
-        case .presentAlert(let alert):
-            activeRecordingAlert = alert
-        }
+        action.applyRuntimeState(
+            startRecording: startRecordingWithPermissionCheck,
+            presentAlert: { activeRecordingAlert = $0 }
+        )
     }
 
     private func startRecordingWithPermissionCheck() {
@@ -98,20 +96,19 @@ final class RecordingManager: ObservableObject {
     }
 
     private func applyPermissionAction(_ action: VoiceInkRecordingPermissionAction) {
-        switch action {
-        case .startRecording:
-            proceedToStartRecording()
-
-        case .presentPermissionDenied:
-            activeRecordingAlert = VoiceInkRecordingAlertPresentation.microphonePermissionDenied
-
-        case .requestPermission:
-            requestPermission { [weak self] granted in
-                self?.applyPermissionAction(
-                    VoiceInkRecordingPermissionPolicy.action(afterPermissionRequestGranted: granted)
-                )
+        action.applyRuntimeState(
+            startRecording: { [weak self] in
+                self?.proceedToStartRecording()
+            },
+            presentPermissionDenied: { [weak self] in
+                self?.activeRecordingAlert = VoiceInkRecordingAlertPresentation.microphonePermissionDenied
+            },
+            requestPermission: { [weak self] completion in
+                self?.requestPermission { granted in
+                    completion(granted)
+                }
             }
-        }
+        )
     }
     
     private func proceedToStartRecording() {
@@ -185,12 +182,9 @@ final class RecordingManager: ObservableObject {
             canOpenSettingsURL: url.map { UIApplication.shared.canOpenURL($0) } ?? false
         )
 
-        switch action {
-        case .openSettings:
+        action.applyRuntimeState {
             guard let url else { return }
             UIApplication.shared.open(url)
-        case .ignore:
-            break
         }
     }
     

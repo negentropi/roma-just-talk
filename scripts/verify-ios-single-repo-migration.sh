@@ -974,14 +974,21 @@ require_patterns \
   'VoiceInkRecordingPermissionStatus' \
   'VoiceInkRecordingPermissionAction' \
   'VoiceInkRecordingPermissionSettingsAction' \
-  'settingsOpenAction'
+  'settingsOpenAction' \
+  'applyRuntimeState'
 
 require_patterns \
   "shared recording permission action checks run in VoiceInkCore" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
   'testRecordingPermissionPolicyPreservesStartPermissionActions' \
   'testRecordingPermissionPolicyPreservesPermissionRequestResults' \
+  'testRecordingPermissionActionAppliesRuntimeState' \
   'testRecordingPermissionPolicyPreservesSettingsOpenFallback'
+
+require_pattern \
+  "shared recording permission settings action application checks run in VoiceInkCore" \
+  'testRecordingPermissionSettingsActionAppliesRuntimeState' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "shared recording stop plan lives in VoiceInkCore" \
@@ -1155,13 +1162,13 @@ require_pattern \
   iOS/VoiceInk-ios/RecordingManager.swift
 
 require_pattern \
-  "iOS recording manager delegates microphone permission action planning to shared core" \
-  'VoiceInkRecordingPermissionPolicy\.action|VoiceInkRecordingPermissionStatus|VoiceInkRecordingPermissionAction' \
+  "iOS recording manager delegates microphone permission action planning and application to shared core" \
+  'VoiceInkRecordingPermissionPolicy\.action|VoiceInkRecordingPermissionStatus|VoiceInkRecordingPermissionAction|action\.applyRuntimeState' \
   iOS/VoiceInk-ios/RecordingManager.swift
 
 require_pattern \
-  "iOS recording manager delegates settings-open fallback planning to shared core" \
-  'VoiceInkRecordingPermissionPolicy\.settingsOpenAction|VoiceInkRecordingPermissionSettingsAction' \
+  "iOS recording manager delegates settings-open fallback planning and application to shared core" \
+  'VoiceInkRecordingPermissionPolicy\.settingsOpenAction|VoiceInkRecordingPermissionSettingsAction|action\.applyRuntimeState' \
   iOS/VoiceInk-ios/RecordingManager.swift
 
 require_pattern \
@@ -1246,17 +1253,22 @@ require_pattern \
 
 require_pattern \
   "VoiceInkCore owns iOS recording start action policy" \
-  'VoiceInkRecordingStart(Action|Policy)|action\(modeCount:' \
+  'VoiceInkRecordingStart(Action|Policy)|action\(modeCount:|applyRuntimeState' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
 require_pattern \
   "VoiceInkCore checks cover iOS recording start action policy" \
-  'testRecordingStartPolicy(StartsWhenModesAreAvailable|PresentsNoModeAlertWhenNoModesAreAvailable)' \
+  'testRecordingStartPolicy(StartsWhenModesAreAvailable|PresentsNoModeAlertWhenNoModesAreAvailable)|testRecordingStartActionAppliesRuntimeState' \
   VoiceInkCore/Tests/VoiceInkCoreTests/RecordingStatePolicyTests.swift
 
 require_pattern \
-  "iOS recording manager delegates every start entrypoint to shared mode-count policy" \
-  'VoiceInkRecordingStartPolicy\.action' \
+  "iOS recording manager delegates every start entrypoint to shared mode-count policy and action application" \
+  'VoiceInkRecordingStartPolicy\.action|action\.applyRuntimeState' \
+  iOS/VoiceInk-ios/RecordingManager.swift
+
+reject_pattern \
+  "iOS recording manager avoids shell-owned recording action sequencing" \
+  'switch action|case \.startRecording|case \.presentAlert|case \.presentPermissionDenied|case \.requestPermission|case \.openSettings' \
   iOS/VoiceInk-ios/RecordingManager.swift
 
 reject_pattern \

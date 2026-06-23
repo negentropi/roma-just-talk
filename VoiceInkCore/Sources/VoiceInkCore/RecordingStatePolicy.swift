@@ -25,11 +25,42 @@ public enum VoiceInkRecordingPermissionAction: Equatable, Sendable {
     case startRecording
     case requestPermission
     case presentPermissionDenied
+
+    public func applyRuntimeState(
+        startRecording: @escaping () -> Void,
+        presentPermissionDenied: @escaping () -> Void,
+        requestPermission: @escaping (@escaping (Bool) -> Void) -> Void
+    ) {
+        switch self {
+        case .startRecording:
+            startRecording()
+        case .presentPermissionDenied:
+            presentPermissionDenied()
+        case .requestPermission:
+            requestPermission { granted in
+                VoiceInkRecordingPermissionPolicy.action(afterPermissionRequestGranted: granted)
+                    .applyRuntimeState(
+                        startRecording: startRecording,
+                        presentPermissionDenied: presentPermissionDenied,
+                        requestPermission: requestPermission
+                    )
+            }
+        }
+    }
 }
 
 public enum VoiceInkRecordingPermissionSettingsAction: Equatable, Sendable {
     case openSettings
     case ignore
+
+    public func applyRuntimeState(openSettings: () -> Void) {
+        switch self {
+        case .openSettings:
+            openSettings()
+        case .ignore:
+            return
+        }
+    }
 }
 
 public enum VoiceInkRecordingPermissionPolicy {
@@ -761,6 +792,18 @@ public struct VoiceInkRecordingAlertPresentation: Equatable, Identifiable, Senda
 public enum VoiceInkRecordingStartAction: Equatable, Sendable {
     case startRecording
     case presentAlert(VoiceInkRecordingAlertPresentation)
+
+    public func applyRuntimeState(
+        startRecording: () -> Void,
+        presentAlert: (VoiceInkRecordingAlertPresentation) -> Void
+    ) {
+        switch self {
+        case .startRecording:
+            startRecording()
+        case .presentAlert(let alert):
+            presentAlert(alert)
+        }
+    }
 }
 
 public enum VoiceInkRecordingStartPolicy {

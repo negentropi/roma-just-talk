@@ -73,6 +73,52 @@ final class RecordingStatePolicyTests: XCTestCase {
         )
     }
 
+    func testRecordingPermissionActionAppliesRuntimeState() {
+        var events: [String] = []
+
+        VoiceInkRecordingPermissionAction.startRecording.applyRuntimeState(
+            startRecording: { events.append("start") },
+            presentPermissionDenied: { events.append("denied") },
+            requestPermission: { completion in
+                events.append("request")
+                completion(true)
+            }
+        )
+        VoiceInkRecordingPermissionAction.presentPermissionDenied.applyRuntimeState(
+            startRecording: { events.append("start") },
+            presentPermissionDenied: { events.append("denied") },
+            requestPermission: { completion in
+                events.append("request")
+                completion(true)
+            }
+        )
+        VoiceInkRecordingPermissionAction.requestPermission.applyRuntimeState(
+            startRecording: { events.append("start") },
+            presentPermissionDenied: { events.append("denied") },
+            requestPermission: { completion in
+                events.append("request")
+                completion(true)
+            }
+        )
+        VoiceInkRecordingPermissionAction.requestPermission.applyRuntimeState(
+            startRecording: { events.append("start") },
+            presentPermissionDenied: { events.append("denied") },
+            requestPermission: { completion in
+                events.append("request")
+                completion(false)
+            }
+        )
+
+        XCTAssertEqual(events, [
+            "start",
+            "denied",
+            "request",
+            "start",
+            "request",
+            "denied"
+        ])
+    }
+
     func testRecordingPermissionPolicyPreservesSettingsOpenFallback() {
         XCTAssertEqual(
             VoiceInkRecordingPermissionPolicy.settingsOpenAction(
@@ -102,6 +148,19 @@ final class RecordingStatePolicyTests: XCTestCase {
             ),
             .ignore
         )
+    }
+
+    func testRecordingPermissionSettingsActionAppliesRuntimeState() {
+        var events: [String] = []
+
+        VoiceInkRecordingPermissionSettingsAction.ignore.applyRuntimeState {
+            events.append("open")
+        }
+        VoiceInkRecordingPermissionSettingsAction.openSettings.applyRuntimeState {
+            events.append("open")
+        }
+
+        XCTAssertEqual(events, ["open"])
     }
 
     func testPostRecordingProcessingStatePolicyPreservesMacOSProcessingStates() {
@@ -822,6 +881,24 @@ final class RecordingStatePolicyTests: XCTestCase {
         XCTAssertEqual(alert.primaryButtonTitle, "OK")
         XCTAssertNil(alert.secondaryButtonTitle)
         XCTAssertEqual(alert.action, .dismiss)
+    }
+
+    func testRecordingStartActionAppliesRuntimeState() {
+        var events: [String] = []
+
+        VoiceInkRecordingStartAction.startRecording.applyRuntimeState(
+            startRecording: { events.append("start") },
+            presentAlert: { alert in events.append("alert:\(alert.id)") }
+        )
+        VoiceInkRecordingStartAction.presentAlert(.noModesAvailable).applyRuntimeState(
+            startRecording: { events.append("start") },
+            presentAlert: { alert in events.append("alert:\(alert.id)") }
+        )
+
+        XCTAssertEqual(events, [
+            "start",
+            "alert:noModesAvailable"
+        ])
     }
 
     func testRecordingAlertPresentationPreservesIOSPermissionDeniedCopy() {

@@ -212,6 +212,76 @@ public struct VoiceInkCustomPromptDraft: Equatable, Sendable {
     }
 }
 
+public enum VoiceInkCustomPromptEditorSavePlan: Equatable, Sendable {
+    case add(VoiceInkCustomPrompt)
+    case update(VoiceInkCustomPrompt)
+
+    public func applyRuntimeState(
+        addPrompt: (VoiceInkCustomPrompt) -> Void,
+        updatePrompt: (VoiceInkCustomPrompt) -> Void
+    ) {
+        switch self {
+        case .add(let prompt):
+            addPrompt(prompt)
+        case .update(let prompt):
+            updatePrompt(prompt)
+        }
+    }
+}
+
+public struct VoiceInkCustomPromptEditorContext: Equatable, Sendable {
+    private let prompt: VoiceInkCustomPrompt?
+
+    public init(prompt: VoiceInkCustomPrompt? = nil) {
+        self.prompt = prompt
+    }
+
+    public static let add = VoiceInkCustomPromptEditorContext()
+
+    public static func edit(prompt: VoiceInkCustomPrompt) -> VoiceInkCustomPromptEditorContext {
+        VoiceInkCustomPromptEditorContext(prompt: prompt)
+    }
+
+    public var initialDraft: VoiceInkCustomPromptDraft {
+        prompt.map { VoiceInkCustomPromptDraft(prompt: $0) } ?? .newPrompt
+    }
+
+    public var isAddingPrompt: Bool {
+        prompt == nil
+    }
+
+    public var isEditingPredefinedPrompt: Bool {
+        prompt?.isPredefined == true
+    }
+
+    public var shouldShowPredefinedPromptForm: Bool {
+        isEditingPredefinedPrompt
+    }
+
+    public var shouldShowTemplateSection: Bool {
+        isAddingPrompt
+    }
+
+    public var editorTitle: String {
+        VoiceInkCustomPromptPresentation.editorTitle(
+            isEditingPredefinedPrompt: isEditingPredefinedPrompt,
+            isAddingPrompt: isAddingPrompt
+        )
+    }
+
+    public func isSaveButtonDisabled(for draft: VoiceInkCustomPromptDraft) -> Bool {
+        isEditingPredefinedPrompt ? false : !draft.isSaveable
+    }
+
+    public func savePlan(for draft: VoiceInkCustomPromptDraft) -> VoiceInkCustomPromptEditorSavePlan {
+        guard let prompt else {
+            return .add(draft.customPrompt)
+        }
+
+        return .update(draft.applying(to: prompt))
+    }
+}
+
 public enum VoiceInkCustomPromptPolicy {
     public static func startupStoreState(
         loadedPrompts: [VoiceInkCustomPrompt],

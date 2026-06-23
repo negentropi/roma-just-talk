@@ -5654,6 +5654,16 @@ require_patterns \
   'public func applying\(to prompt: VoiceInkCustomPrompt\)' \
   'public func applyingTemplate\(_ template: VoiceInkTemplatePrompt\)'
 
+require_patterns \
+  "shared custom prompt editor context owns mode and save planning" \
+  VoiceInkCore/Sources/VoiceInkCore/CustomPrompt.swift \
+  'VoiceInkCustomPromptEditorContext' \
+  'VoiceInkCustomPromptEditorSavePlan' \
+  'public var initialDraft: VoiceInkCustomPromptDraft' \
+  'public var editorTitle: String' \
+  'public func isSaveButtonDisabled\(for draft: VoiceInkCustomPromptDraft\)' \
+  'public func savePlan\(for draft: VoiceInkCustomPromptDraft\)'
+
 require_pattern \
   "shared AI enhancement API-key validity state planning lives in VoiceInkCore" \
   'settingsStateAfterAPIKeyValidityChange' \
@@ -5673,12 +5683,19 @@ require_patterns \
   "macOS prompt editor consumes shared custom prompt draft state" \
   VoiceInk/Views/PromptEditorView.swift \
   '@State private var draft: VoiceInkCustomPromptDraft' \
-  'State\(initialValue: \.newPrompt\)' \
-  'State\(initialValue: VoiceInkCustomPromptDraft\(prompt: prompt\)\)' \
-  'draft\.isSaveable' \
-  'draft\.customPrompt' \
-  'draft\.applying\(to: prompt\)' \
   'draft = draft\.applyingTemplate\(template\)'
+
+require_patterns \
+  "macOS prompt editor consumes shared custom prompt editor context" \
+  VoiceInk/Views/PromptEditorView.swift \
+  'private let editorContext: VoiceInkCustomPromptEditorContext' \
+  'editorContext\.initialDraft' \
+  'editorContext\.editorTitle' \
+  'editorContext\.shouldShowPredefinedPromptForm' \
+  'editorContext\.shouldShowTemplateSection' \
+  'editorContext\.isSaveButtonDisabled\(for: draft\)' \
+  '\.savePlan\(for: draft\)' \
+  'applyRuntimeState'
 
 require_pattern \
   "macOS prompt editor consumes shared trigger-word add submission" \
@@ -5697,7 +5714,12 @@ reject_pattern \
 
 reject_pattern \
   "macOS prompt editor avoids shell-owned custom prompt draft fields" \
-  '@State private var (title|promptText|selectedIcon|description|triggerWords|useSystemInstructions)\b|private var currentDraft|VoiceInkCustomPromptPolicy\.(isSaveableCustomPromptDraft|customPrompt|prompt)\(' \
+  '@State private var (title|promptText|selectedIcon|description|triggerWords|useSystemInstructions)\b|private var currentDraft|VoiceInkCustomPromptPolicy\.(isSaveableCustomPromptDraft|customPrompt|prompt)\(|draft\.isSaveable|draft\.customPrompt|draft\.applying\(to: prompt\)' \
+  VoiceInk/Views/PromptEditorView.swift
+
+reject_pattern \
+  "macOS prompt editor avoids shell-owned editor mode branching" \
+  'private var isEditingPredefinedPrompt|mode == \.add|if case \.add = mode|VoiceInkCustomPromptPresentation\.editorTitle\(' \
   VoiceInk/Views/PromptEditorView.swift
 
 require_pattern \
@@ -5726,6 +5748,18 @@ require_patterns \
   'CustomPromptTests\.testCustomPromptDraftBuildsNewAndEditState' \
   'CustomPromptTests\.testCustomPromptDraftOwnsSaveAndApplyHelpers' \
   'CustomPromptTests\.testCustomPromptDraftAppliesTemplatePreservingTriggerAndSystemInstructionState'
+
+require_patterns \
+  "core checks execute custom prompt editor context tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'CustomPromptTests\.testCustomPromptEditorContextBuildsAddModeStateAndSavePlan' \
+  'CustomPromptTests\.testCustomPromptEditorContextBuildsCustomEditModeStateAndSavePlan' \
+  'CustomPromptTests\.testCustomPromptEditorContextBuildsPredefinedEditModeStateAndSavePlan'
+
+require_pattern \
+  "migration checklist tracks shared custom prompt editor context" \
+  'macOS custom prompt editor mode/title planning, draft construction, saveability, template visibility/application, add/update save-plan dispatch' \
+  docs/ios-single-repo-migration.md
 
 require_pattern \
   "core checks execute AI enhancement API-key validity state test" \

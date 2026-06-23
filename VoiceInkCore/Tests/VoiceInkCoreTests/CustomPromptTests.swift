@@ -797,6 +797,128 @@ final class CustomPromptTests: XCTestCase {
         XCTAssertFalse(appliedDraft.useSystemInstructions)
     }
 
+    func testCustomPromptEditorContextBuildsAddModeStateAndSavePlan() {
+        let context = VoiceInkCustomPromptEditorContext.add
+
+        XCTAssertEqual(context.initialDraft, .newPrompt)
+        XCTAssertTrue(context.isAddingPrompt)
+        XCTAssertFalse(context.isEditingPredefinedPrompt)
+        XCTAssertFalse(context.shouldShowPredefinedPromptForm)
+        XCTAssertTrue(context.shouldShowTemplateSection)
+        XCTAssertEqual(context.editorTitle, "New Prompt")
+        XCTAssertTrue(context.isSaveButtonDisabled(for: context.initialDraft))
+
+        let draft = VoiceInkCustomPromptDraft(
+            title: "Proofread",
+            promptText: "Fix grammar.",
+            icon: "pencil",
+            description: "",
+            triggerWords: ["proof"],
+            useSystemInstructions: false
+        )
+        XCTAssertFalse(context.isSaveButtonDisabled(for: draft))
+
+        let plan = context.savePlan(for: draft)
+        switch plan {
+        case .add(let prompt):
+            XCTAssertEqual(prompt.title, "Proofread")
+            XCTAssertEqual(prompt.promptText, "Fix grammar.")
+            XCTAssertEqual(prompt.triggerWords, ["proof"])
+        case .update:
+            XCTFail("Expected add plan")
+        }
+
+        var events: [String] = []
+        plan.applyRuntimeState(
+            addPrompt: { events.append("add:\($0.title)") },
+            updatePrompt: { events.append("update:\($0.title)") }
+        )
+        XCTAssertEqual(events, ["add:Proofread"])
+    }
+
+    func testCustomPromptEditorContextBuildsCustomEditModeStateAndSavePlan() {
+        let existing = VoiceInkCustomPrompt(
+            id: UUID(uuidString: "00000000-0000-0000-0000-000000000305")!,
+            title: "Old",
+            promptText: "Old prompt",
+            icon: "old.icon",
+            description: "Old description",
+            triggerWords: ["old"],
+            useSystemInstructions: true
+        )
+        let context = VoiceInkCustomPromptEditorContext.edit(prompt: existing)
+
+        XCTAssertEqual(context.initialDraft, VoiceInkCustomPromptDraft(prompt: existing))
+        XCTAssertFalse(context.isAddingPrompt)
+        XCTAssertFalse(context.isEditingPredefinedPrompt)
+        XCTAssertFalse(context.shouldShowPredefinedPromptForm)
+        XCTAssertFalse(context.shouldShowTemplateSection)
+        XCTAssertEqual(context.editorTitle, "Edit Prompt")
+
+        let draft = VoiceInkCustomPromptDraft(
+            title: "New",
+            promptText: "New prompt",
+            icon: "new.icon",
+            description: "",
+            triggerWords: ["new"],
+            useSystemInstructions: false
+        )
+        let plan = context.savePlan(for: draft)
+
+        switch plan {
+        case .add:
+            XCTFail("Expected update plan")
+        case .update(let prompt):
+            XCTAssertEqual(prompt.id, existing.id)
+            XCTAssertEqual(prompt.title, "New")
+            XCTAssertEqual(prompt.promptText, "New prompt")
+            XCTAssertEqual(prompt.icon, "new.icon")
+            XCTAssertNil(prompt.description)
+            XCTAssertEqual(prompt.triggerWords, ["new"])
+            XCTAssertFalse(prompt.useSystemInstructions)
+        }
+    }
+
+    func testCustomPromptEditorContextBuildsPredefinedEditModeStateAndSavePlan() {
+        let existing = VoiceInkCustomPrompt(
+            id: VoiceInkPredefinedPrompts.defaultPromptId,
+            title: "Default",
+            promptText: "Template prompt",
+            isActive: true,
+            icon: "template.icon",
+            description: "Template description",
+            isPredefined: true,
+            triggerWords: ["old"],
+            useSystemInstructions: true
+        )
+        let context = VoiceInkCustomPromptEditorContext.edit(prompt: existing)
+
+        XCTAssertFalse(context.isAddingPrompt)
+        XCTAssertTrue(context.isEditingPredefinedPrompt)
+        XCTAssertTrue(context.shouldShowPredefinedPromptForm)
+        XCTAssertFalse(context.shouldShowTemplateSection)
+        XCTAssertEqual(context.editorTitle, "Edit Trigger Words")
+        XCTAssertFalse(context.isSaveButtonDisabled(for: .newPrompt))
+
+        var draft = context.initialDraft
+        draft.title = ""
+        draft.promptText = ""
+        draft.triggerWords = ["updated"]
+
+        switch context.savePlan(for: draft) {
+        case .add:
+            XCTFail("Expected update plan")
+        case .update(let prompt):
+            XCTAssertEqual(prompt.id, existing.id)
+            XCTAssertEqual(prompt.title, existing.title)
+            XCTAssertEqual(prompt.promptText, existing.promptText)
+            XCTAssertEqual(prompt.icon, existing.icon)
+            XCTAssertEqual(prompt.description, existing.description)
+            XCTAssertEqual(prompt.triggerWords, ["updated"])
+            XCTAssertTrue(prompt.useSystemInstructions)
+        }
+    }
+
     func testCustomPromptPolicyBuildsNewPromptFromDraft() {
         let prompt = VoiceInkCustomPromptPolicy.customPrompt(
             from: VoiceInkCustomPromptDraft(

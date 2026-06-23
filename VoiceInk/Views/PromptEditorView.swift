@@ -5,42 +5,26 @@ struct PromptEditorView: View {
     enum Mode {
         case add
         case edit(VoiceInkCustomPrompt)
-        
-        static func == (lhs: Mode, rhs: Mode) -> Bool {
-            switch (lhs, rhs) {
-            case (.add, .add):
-                return true
-            case let (.edit(prompt1), .edit(prompt2)):
-                return prompt1.id == prompt2.id
-            default:
-                return false
-            }
-        }
     }
-    
-    let mode: Mode
+
+    private let editorContext: VoiceInkCustomPromptEditorContext
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var enhancementService: AIEnhancementService
     var onDismiss: (() -> Void)?
     @State private var draft: VoiceInkCustomPromptDraft
     @State private var showingIconPicker = false
-    
-    private var isEditingPredefinedPrompt: Bool {
-        if case .edit(let prompt) = mode {
-            return prompt.isPredefined
-        }
-        return false
-    }
 
     init(mode: Mode, onDismiss: (() -> Void)? = nil) {
-        self.mode = mode
         self.onDismiss = onDismiss
+        let editorContext: VoiceInkCustomPromptEditorContext
         switch mode {
         case .add:
-            _draft = State(initialValue: .newPrompt)
+            editorContext = .add
         case .edit(let prompt):
-            _draft = State(initialValue: VoiceInkCustomPromptDraft(prompt: prompt))
+            editorContext = .edit(prompt: prompt)
         }
+        self.editorContext = editorContext
+        _draft = State(initialValue: editorContext.initialDraft)
     }
     
     private func dismissPanel() {
@@ -55,12 +39,7 @@ struct PromptEditorView: View {
         VStack(spacing: 0) {
             // Header
             HStack(spacing: 12) {
-                Text(
-                    VoiceInkCustomPromptPresentation.editorTitle(
-                        isEditingPredefinedPrompt: isEditingPredefinedPrompt,
-                        isAddingPrompt: mode == .add
-                    )
-                )
+                Text(editorContext.editorTitle)
                     .font(.headline)
                     .fontWeight(.semibold)
                     .foregroundColor(.primary)
@@ -86,7 +65,7 @@ struct PromptEditorView: View {
             )
 
             // Content
-            if isEditingPredefinedPrompt {
+            if editorContext.shouldShowPredefinedPromptForm {
                 predefinedPromptForm
             } else {
                 customPromptForm
@@ -110,7 +89,7 @@ struct PromptEditorView: View {
                             .frame(minWidth: 100)
                     }
                     .buttonStyle(.borderedProminent)
-                    .disabled(isEditingPredefinedPrompt ? false : !draft.isSaveable)
+                    .disabled(editorContext.isSaveButtonDisabled(for: draft))
                     .keyboardShortcut(.return, modifiers: .command)
                 }
                 .padding(.horizontal, 20)
@@ -210,7 +189,7 @@ struct PromptEditorView: View {
                 }
             }
 
-            if case .add = mode {
+            if editorContext.shouldShowTemplateSection {
                 Section {
                     Menu {
                         ForEach(VoiceInkPromptTemplates.macTemplates, id: \.title) { template in
@@ -235,14 +214,12 @@ struct PromptEditorView: View {
     }
 
     private func save() {
-        switch mode {
-        case .add:
-            enhancementService.addPrompt(draft.customPrompt)
-        case .edit(let prompt):
-            enhancementService.updatePrompt(
-                draft.applying(to: prompt)
+        editorContext
+            .savePlan(for: draft)
+            .applyRuntimeState(
+                addPrompt: { enhancementService.addPrompt($0) },
+                updatePrompt: { enhancementService.updatePrompt($0) }
             )
-        }
     }
 }
 

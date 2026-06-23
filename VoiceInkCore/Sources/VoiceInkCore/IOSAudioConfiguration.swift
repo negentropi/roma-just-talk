@@ -1,3 +1,50 @@
+public struct VoiceInkIOSAudioSessionRecordingConfiguration: Equatable, Sendable {
+    public enum Category: String, Equatable, Sendable {
+        case playAndRecord
+    }
+
+    public enum Mode: String, Equatable, Sendable {
+        case spokenAudio
+    }
+
+    public enum Option: String, Equatable, Sendable {
+        case defaultToSpeaker
+        case allowBluetooth
+        case allowBluetoothA2DP
+        case mixWithOthers
+    }
+
+    public let category: Category
+    public let mode: Mode
+    public let options: [Option]
+
+    public init(category: Category, mode: Mode, options: [Option]) {
+        self.category = category
+        self.mode = mode
+        self.options = options
+    }
+
+    public static let voiceRecording = Self(
+        category: .playAndRecord,
+        mode: .spokenAudio,
+        options: [.defaultToSpeaker, .allowBluetooth, .allowBluetoothA2DP, .mixWithOthers]
+    )
+}
+
+public struct VoiceInkIOSAudioPlaybackSessionConfiguration: Equatable, Sendable {
+    public enum Category: String, Equatable, Sendable {
+        case playback
+    }
+
+    public let category: Category
+
+    public init(category: Category) {
+        self.category = category
+    }
+
+    public static let notePlayback = Self(category: .playback)
+}
+
 public struct VoiceInkIOSAudioRecorderConfiguration: Equatable, Sendable {
     public enum Format: String, Equatable, Sendable {
         case linearPCM

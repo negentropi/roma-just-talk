@@ -999,7 +999,7 @@ require_pattern \
 
 require_patterns \
   "shared iOS audio recorder configuration lives in VoiceInkCore" \
-  VoiceInkCore/Sources/VoiceInkCore/AudioRecorderConfiguration.swift \
+  VoiceInkCore/Sources/VoiceInkCore/IOSAudioConfiguration.swift \
   'VoiceInkIOSAudioRecorderConfiguration' \
   'voiceRecording' \
   'linearPCM' \
@@ -9503,7 +9503,7 @@ require_pattern \
 
 require_patterns \
   "shared iOS audio playback session configuration lives in VoiceInkCore" \
-  VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift \
+  VoiceInkCore/Sources/VoiceInkCore/IOSAudioConfiguration.swift \
   'VoiceInkIOSAudioPlaybackSessionConfiguration' \
   'notePlayback' \
   'playback'
@@ -10145,7 +10145,7 @@ require_pattern \
 
 require_patterns \
   "shared iOS audio-session recording configuration lives in VoiceInkCore" \
-  VoiceInkCore/Sources/VoiceInkCore/AudioSessionLifecycleState.swift \
+  VoiceInkCore/Sources/VoiceInkCore/IOSAudioConfiguration.swift \
   'VoiceInkIOSAudioSessionRecordingConfiguration' \
   'voiceRecording' \
   'playAndRecord' \

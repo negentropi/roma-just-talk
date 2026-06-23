@@ -18,20 +18,6 @@ public enum VoiceInkAudioPlaybackDiagnostics {
     }
 }
 
-public struct VoiceInkIOSAudioPlaybackSessionConfiguration: Equatable, Sendable {
-    public enum Category: String, Equatable, Sendable {
-        case playback
-    }
-
-    public let category: Category
-
-    public init(category: Category) {
-        self.category = category
-    }
-
-    public static let notePlayback = Self(category: .playback)
-}
-
 public enum VoiceInkAudioPlaybackTimeline {
     public static let updateInterval: TimeInterval = 0.1
 

@@ -4694,6 +4694,17 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionClient.swift \
   VoiceInkCore/Sources/VoiceInkCore/CartesiaAPIKeyClient.swift
 
+section "obsolete standalone OpenAI-compatible models request module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleModelsRequest.swift
+
+require_patterns \
+  "OpenAI-compatible models request builder lives with its client" \
+  VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleClient.swift \
+  'VoiceInkOpenAICompatibleModelsRequestBuilder' \
+  'openAICompatibleModelsURL' \
+  'Authorization' \
+  'VoiceInkOpenAICompatibleClient'
+
 require_pattern \
   "core checks execute API-key verification policy tests" \
   'APIKeyVerificationPolicyTests\.testBlankAPIKeyResultPreservesSharedFailureCopy|APIKeyVerificationPolicyTests\.testVerificationResultRejectsMissingHTTPResponse|APIKeyVerificationPolicyTests\.testVerificationResultAcceptsHTTP2xxResponses|APIKeyVerificationPolicyTests\.testVerificationResultReturnsHTTPBodyForFailure|APIKeyVerificationPolicyTests\.testVerificationResultFallsBackToHTTPStatusForNonUTF8FailureBody|APIKeyVerificationPolicyTests\.testFailureResultUsesLocalizedDescription' \

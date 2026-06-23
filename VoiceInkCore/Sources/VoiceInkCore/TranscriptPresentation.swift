@@ -104,6 +104,25 @@ public struct VoiceInkHistoryActionPresentation: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkHistoryShortcutTipPresentation: Equatable, Sendable {
+    public let title: String
+    public let subtitle: String
+    public let shortcutLabel: String
+    public let systemImageName: String
+
+    public init(
+        title: String,
+        subtitle: String,
+        shortcutLabel: String,
+        systemImageName: String
+    ) {
+        self.title = title
+        self.subtitle = subtitle
+        self.shortcutLabel = shortcutLabel
+        self.systemImageName = systemImageName
+    }
+}
+
 public struct VoiceInkTranscriptionMetadataRowPresentation: Equatable, Sendable {
     public let label: String
     public let systemImageName: String
@@ -219,6 +238,12 @@ public enum VoiceInkHistoryPresentation {
     public static let deleteConfirmationTitle = "Delete Selected Items?"
     public static let deleteConfirmationPrimaryButtonTitle = "Delete"
     public static let deleteConfirmationCancelButtonTitle = "Cancel"
+    public static let macOSShortcutTip = VoiceInkHistoryShortcutTipPresentation(
+        title: "Quick Access",
+        subtitle: "Open history from anywhere with a global shortcut",
+        shortcutLabel: "Open History Window",
+        systemImageName: "command.circle"
+    )
 
     public static let analyzeAction = VoiceInkHistoryActionPresentation(
         title: "Analyze",

@@ -1,18 +1,19 @@
 import SwiftUI
+import VoiceInkCore
 
 struct HistoryShortcutTipView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 12) {
-                Image(systemName: "command.circle")
+                Image(systemName: VoiceInkHistoryPresentation.macOSShortcutTip.systemImageName)
                     .font(.system(size: 20))
                     .foregroundColor(.accentColor)
                     .frame(width: 24, height: 24)
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Quick Access")
+                    Text(VoiceInkHistoryPresentation.macOSShortcutTip.title)
                         .font(.headline)
-                    Text("Open history from anywhere with a global shortcut")
+                    Text(VoiceInkHistoryPresentation.macOSShortcutTip.subtitle)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
@@ -22,7 +23,7 @@ struct HistoryShortcutTipView: View {
                 .padding(.vertical, 4)
 
             HStack(spacing: 12) {
-                Text("Open History Window")
+                Text(VoiceInkHistoryPresentation.macOSShortcutTip.shortcutLabel)
                     .font(.system(size: 13, weight: .medium))
                     .foregroundColor(.secondary)
 

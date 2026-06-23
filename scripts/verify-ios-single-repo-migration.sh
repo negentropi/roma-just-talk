@@ -2549,6 +2549,16 @@ require_pattern \
   'analyzeAction|exportAction|deleteAction|chart\.bar\.xaxis|square\.and\.arrow\.up|systemImageName: "trash"' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
 
+require_patterns \
+  "shared history presentation owns macOS shortcut tip copy and icon" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift \
+  'VoiceInkHistoryShortcutTipPresentation' \
+  'macOSShortcutTip' \
+  'title: "Quick Access"' \
+  'subtitle: "Open history from anywhere with a global shortcut"' \
+  'shortcutLabel: "Open History Window"' \
+  'systemImageName: "command\.circle"'
+
 require_pattern \
   "shared history presentation owns macOS delete alert copy" \
   'deleteConfirmationTitle = "Delete Selected Items\?"|deleteConfirmationPrimaryButtonTitle = "Delete"|deleteConfirmationCancelButtonTitle = "Cancel"' \
@@ -2562,6 +2572,11 @@ require_pattern \
 require_pattern \
   "core checks execute history diagnostic copy test" \
   'TranscriptPresentationTests\.testHistoryDiagnosticsPreserveMacOSConsoleCopy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute history shortcut tip presentation test" \
+  'TranscriptPresentationTests\.testHistoryShortcutTipPresentationPreservesMacOSCopyAndIcon' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -2597,6 +2612,19 @@ require_pattern \
   'VoiceInkHistoryPresentation\.(analyzeAction|exportAction|deleteAction)' \
   VoiceInk/Views/History/TranscriptionHistoryView.swift \
   VoiceInk/Views/History/InlineHistoryView.swift
+
+require_patterns \
+  "macOS history shortcut tip uses shared presentation" \
+  VoiceInk/Views/History/HistoryShortcutTipView.swift \
+  'VoiceInkHistoryPresentation\.macOSShortcutTip\.systemImageName' \
+  'VoiceInkHistoryPresentation\.macOSShortcutTip\.title' \
+  'VoiceInkHistoryPresentation\.macOSShortcutTip\.subtitle' \
+  'VoiceInkHistoryPresentation\.macOSShortcutTip\.shortcutLabel'
+
+require_pattern \
+  "macOS shortcut action display name uses shared history shortcut label" \
+  'VoiceInkHistoryPresentation\.macOSShortcutTip\.shortcutLabel' \
+  VoiceInk/Shortcuts/ShortcutAction.swift
 
 require_pattern \
   "macOS history views use shared delete alert copy" \
@@ -2672,6 +2700,21 @@ reject_pattern \
   '"(Search transcriptions|Search transcriptions\.\.\.|Loading\.\.\.|Load More|Select All|Deselect All|Analyze|Export|Delete|Cancel|Delete Selected Items\?)"' \
   VoiceInk/Views/History/TranscriptionHistoryView.swift \
   VoiceInk/Views/History/InlineHistoryView.swift
+
+reject_pattern \
+  "macOS history shortcut tip avoids shell-owned presentation copy and icon" \
+  '"(Quick Access|Open history from anywhere with a global shortcut|Open History Window|command\.circle)"' \
+  VoiceInk/Views/History/HistoryShortcutTipView.swift
+
+reject_pattern \
+  "macOS shortcut action avoids duplicate history shortcut display name" \
+  '"Open History Window"' \
+  VoiceInk/Shortcuts/ShortcutAction.swift
+
+require_pattern \
+  "migration checklist tracks shared history shortcut tip presentation" \
+  'macOS history shortcut-tip copy/icon.*VoiceInkHistoryPresentation' \
+  docs/ios-single-repo-migration.md
 
 reject_pattern \
   "macOS history views avoid shell-owned console diagnostics" \

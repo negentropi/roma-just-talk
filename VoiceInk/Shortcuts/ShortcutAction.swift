@@ -105,7 +105,7 @@ enum ShortcutAction: Hashable {
         case .cancelRecorder:
             return "Cancel Recording"
         case .openHistoryWindow:
-            return "Open History Window"
+            return VoiceInkHistoryPresentation.macOSShortcutTip.shortcutLabel
         case .quickAddToDictionary:
             return "Quick Add to Dictionary"
         case .toggleEnhancement:

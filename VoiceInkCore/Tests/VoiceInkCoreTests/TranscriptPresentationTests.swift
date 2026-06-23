@@ -82,6 +82,16 @@ final class TranscriptPresentationTests: XCTestCase {
         )
     }
 
+    func testHistoryShortcutTipPresentationPreservesMacOSCopyAndIcon() {
+        XCTAssertEqual(VoiceInkHistoryPresentation.macOSShortcutTip.title, "Quick Access")
+        XCTAssertEqual(
+            VoiceInkHistoryPresentation.macOSShortcutTip.subtitle,
+            "Open history from anywhere with a global shortcut"
+        )
+        XCTAssertEqual(VoiceInkHistoryPresentation.macOSShortcutTip.shortcutLabel, "Open History Window")
+        XCTAssertEqual(VoiceInkHistoryPresentation.macOSShortcutTip.systemImageName, "command.circle")
+    }
+
     func testHistoryPaginationPolicyBuildsInitialPageState() {
         let first = HistoryItem(id: 1, timestamp: Date(timeIntervalSince1970: 200))
         let second = HistoryItem(id: 2, timestamp: Date(timeIntervalSince1970: 100))

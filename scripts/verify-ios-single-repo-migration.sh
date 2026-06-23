@@ -9479,6 +9479,13 @@ require_pattern \
   'VoiceInkAudioPlaybackRate' \
   VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
 
+require_patterns \
+  "shared iOS audio playback session configuration lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift \
+  'VoiceInkIOSAudioPlaybackSessionConfiguration' \
+  'notePlayback' \
+  'playback'
+
 require_pattern \
   "shared audio playback timeline owns update cadence" \
   'updateInterval' \
@@ -9525,6 +9532,12 @@ require_pattern \
   'VoiceInkAudioPlaybackRate' \
   iOS/VoiceInk-ios/AudioPlayer.swift
 
+require_patterns \
+  "iOS audio player adapts shared playback session configuration" \
+  iOS/VoiceInk-ios/AudioPlayer.swift \
+  'VoiceInkIOSAudioPlaybackSessionConfiguration\.notePlayback' \
+  'sessionConfiguration\.category\.avCategory'
+
 require_pattern \
   "iOS audio player shell uses shared playback update cadence" \
   'VoiceInkAudioPlaybackTimeline\.updateInterval' \
@@ -9553,6 +9566,11 @@ require_pattern \
 require_pattern \
   "core checks execute audio player timer tick plan tests" \
   'AudioPlaybackTimelineTests\.testTimerTickPlanPreservesPlatformCompletionBehavior' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute iOS audio playback session configuration tests" \
+  'AudioPlaybackTimelineTests\.testIOSAudioPlaybackSessionConfigurationPreservesPlaybackPolicy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -9611,6 +9629,11 @@ require_pattern \
   iOS/VoiceInk-ios/AudioPlayer.swift
 
 require_pattern \
+  "migration docs track shared iOS playback session configuration" \
+  'VoiceInkIOSAudioPlaybackSessionConfiguration` for the iOS playback category policy' \
+  docs/ios-single-repo-migration.md
+
+require_pattern \
   "iOS audio player adapts shared playback diagnostics" \
   'VoiceInkAudioPlaybackDiagnostics\.(loadFailedMessage|playFailedMessage)' \
   iOS/VoiceInk-ios/AudioPlayer.swift
@@ -9623,6 +9646,11 @@ require_pattern \
 reject_pattern \
   "iOS audio player avoids shell-owned playback diagnostic copy" \
   '"(Failed to load audio:|Failed to play audio:)' \
+  iOS/VoiceInk-ios/AudioPlayer.swift
+
+reject_pattern \
+  "iOS audio player avoids shell-owned playback session category literal" \
+  'setCategory\(\.playback\)' \
   iOS/VoiceInk-ios/AudioPlayer.swift
 
 reject_pattern \

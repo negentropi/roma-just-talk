@@ -2,6 +2,13 @@ import Foundation
 import VoiceInkCore
 
 final class AudioPlaybackTimelineTests: XCTestCase {
+    func testIOSAudioPlaybackSessionConfigurationPreservesPlaybackPolicy() {
+        XCTAssertEqual(
+            VoiceInkIOSAudioPlaybackSessionConfiguration.notePlayback,
+            VoiceInkIOSAudioPlaybackSessionConfiguration(category: .playback)
+        )
+    }
+
     func testPlaybackDiagnosticsPreserveIOSLogCopy() {
         XCTAssertEqual(
             VoiceInkAudioPlaybackDiagnostics.loadFailedMessage(errorDescription: "missing file"),

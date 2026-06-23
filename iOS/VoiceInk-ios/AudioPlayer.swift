@@ -64,9 +64,10 @@ final class AudioPlayer: ObservableObject {
     
     func play() {
         guard let player = audioPlayer else { return }
+        let sessionConfiguration = VoiceInkIOSAudioPlaybackSessionConfiguration.notePlayback
         
         do {
-            try AVAudioSession.sharedInstance().setCategory(.playback)
+            try AVAudioSession.sharedInstance().setCategory(sessionConfiguration.category.avCategory)
             try AVAudioSession.sharedInstance().setActive(true)
 
             player.rate = playbackRate
@@ -128,5 +129,14 @@ final class AudioPlayer: ObservableObject {
     deinit {
         timer?.invalidate()
         timer = nil
+    }
+}
+
+private extension VoiceInkIOSAudioPlaybackSessionConfiguration.Category {
+    var avCategory: AVAudioSession.Category {
+        switch self {
+        case .playback:
+            return .playback
+        }
     }
 }

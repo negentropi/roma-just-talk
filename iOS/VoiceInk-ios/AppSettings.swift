@@ -184,25 +184,11 @@ final class AppSettings: ObservableObject {
     
     // MARK: - Mode-based Settings
 
-    var effectiveModeConfiguration: VoiceInkModeRuntimeConfiguration {
-        modes.runtimeConfiguration(selectedModeId: selectedModeId)
-    }
-
-    var transcriptionCleanupConfiguration: VoiceInkTranscriptionCleanupConfiguration {
-        VoiceInkTranscriptionCleanupConfiguration.current()
-    }
-
-    var localWhisperPrompt: String {
-        VoiceInkTranscriptionPromptPreference.localWhisperPromptForSelectedLanguage()
-    }
-
     var transcriptionRunSettings: VoiceInkTranscriptionRunSettings {
-        VoiceInkTranscriptionRunSettings(
-            configuration: effectiveModeConfiguration,
-            cleanupConfiguration: transcriptionCleanupConfiguration,
-            postProcessingSkipConfiguration: VoiceInkPostProcessingSkipConfiguration.current(),
-            transcriptionLanguage: selectedTranscriptionLanguage,
-            transcriptionPrompt: localWhisperPrompt,
+        VoiceInkTranscriptionRunSettingsPolicy.iOSAppSettingsSnapshot(
+            modes: modes,
+            selectedModeId: selectedModeId,
+            selectedTranscriptionLanguage: selectedTranscriptionLanguage,
             wordReplacementRules: wordReplacements,
             customVocabulary: customVocabularyTerms
         )

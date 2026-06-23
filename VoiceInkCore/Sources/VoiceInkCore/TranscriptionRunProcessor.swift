@@ -126,6 +126,33 @@ public struct VoiceInkTranscriptionRunSettings: Equatable, Sendable {
     }
 }
 
+public enum VoiceInkTranscriptionRunSettingsPolicy {
+    public static func iOSAppSettingsSnapshot(
+        modes: [Mode],
+        selectedModeId: UUID?,
+        selectedTranscriptionLanguage: String,
+        wordReplacementRules: [VoiceInkWordReplacementRule],
+        customVocabulary: [String],
+        defaults: UserDefaults = .standard
+    ) -> VoiceInkTranscriptionRunSettings {
+        VoiceInkTranscriptionRunSettings(
+            configuration: modes.runtimeConfiguration(selectedModeId: selectedModeId),
+            cleanupConfiguration: VoiceInkTranscriptionCleanupConfiguration.current(in: defaults),
+            postProcessingSkipConfiguration: VoiceInkPostProcessingSkipConfiguration.current(in: defaults),
+            transcriptionLanguage: selectedTranscriptionLanguage,
+            transcriptionPrompt: VoiceInkTranscriptionPromptPreference.localWhisperPrompt(
+                from: defaults,
+                fallback: VoiceInkLocalWhisperPromptCatalog.prompt(
+                    for: selectedTranscriptionLanguage,
+                    customPrompts: VoiceInkLocalWhisperPromptCatalog.storedCustomPrompts(from: defaults)
+                )
+            ),
+            wordReplacementRules: wordReplacementRules,
+            customVocabulary: customVocabulary
+        )
+    }
+}
+
 public struct VoiceInkTranscriptionRunProcessor {
     public typealias APIKeyProvider = (VoiceInkProviderKind) async -> String
     public typealias TranscriptionServiceProvider = (VoiceInkProviderKind) -> any VoiceInkAudioTranscriptionService

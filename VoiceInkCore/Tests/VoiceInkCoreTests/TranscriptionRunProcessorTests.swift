@@ -184,6 +184,54 @@ final class TranscriptionRunProcessorTests: XCTestCase {
         XCTAssertFalse(result.postProcessingSucceeded)
     }
 
+    func testIOSAppSettingsSnapshotBuildsRunSettingsFromSharedPolicy() {
+        let suiteName = "VoiceInkCore.TranscriptionRunProcessorTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defaults.removePersistentDomain(forName: suiteName)
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let mode = Mode(
+            name: "Meeting",
+            transcriptionProvider: .assemblyAI,
+            transcriptionModel: "slam-1",
+            isPostProcessingEnabled: true,
+            postProcessingProvider: .openAI,
+            postProcessingModel: "gpt-4o-mini"
+        )
+        PunctuationCleanupMode.setCurrent(.removeAll, in: defaults)
+        defaults.set(false, forKey: VoiceInkUserDefaultsKey.skipShortEnhancement)
+        defaults.set(8, forKey: VoiceInkUserDefaultsKey.shortEnhancementWordThreshold)
+        VoiceInkLocalWhisperPromptCatalog.saveCustomPrompts(["fr": "French Roma style"], to: defaults)
+
+        let expectedRuntimeConfiguration = [mode].runtimeConfiguration(selectedModeId: mode.id)
+        let settings = VoiceInkTranscriptionRunSettingsPolicy.iOSAppSettingsSnapshot(
+            modes: [mode],
+            selectedModeId: mode.id,
+            selectedTranscriptionLanguage: "fr",
+            wordReplacementRules: [
+                VoiceInkWordReplacementRule(originalText: "roma", replacementText: "Roma Just Talk")
+            ],
+            customVocabulary: [" Roma ", "Felix", "roma", ""],
+            defaults: defaults
+        )
+
+        XCTAssertEqual(settings.configuration.transcriptionProvider, .assemblyAI)
+        XCTAssertEqual(settings.configuration.transcriptionModel, expectedRuntimeConfiguration.transcriptionModel)
+        XCTAssertEqual(settings.configuration.postProcessingProvider, .openAI)
+        XCTAssertEqual(settings.configuration.postProcessingModel, expectedRuntimeConfiguration.postProcessingModel)
+        XCTAssertEqual(settings.cleanupConfiguration.punctuationMode, .removeAll)
+        XCTAssertEqual(settings.postProcessingSkipConfiguration, VoiceInkPostProcessingSkipConfiguration(
+            isEnabled: false,
+            wordThreshold: 8
+        ))
+        XCTAssertEqual(settings.transcriptionLanguage, "fr")
+        XCTAssertEqual(settings.transcriptionPrompt, "French Roma style")
+        XCTAssertEqual(settings.wordReplacementRules, [
+            VoiceInkWordReplacementRule(originalText: "roma", replacementText: "Roma Just Talk")
+        ])
+        XCTAssertEqual(settings.customVocabulary, [" Roma ", "Felix", "roma", ""])
+    }
+
     func testTranscribePassesSelectedLanguageToTranscriptionService() async throws {
         let service = CapturingTranscriptionService(text: "bonjour")
         let processor = VoiceInkTranscriptionRunProcessor { _ in

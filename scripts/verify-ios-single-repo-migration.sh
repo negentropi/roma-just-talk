@@ -6780,6 +6780,11 @@ require_patterns \
   "shared transcription run settings snapshot lives in VoiceInkCore" \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift \
   'VoiceInkTranscriptionRunSettings' \
+  'VoiceInkTranscriptionRunSettingsPolicy' \
+  'iOSAppSettingsSnapshot' \
+  'VoiceInkTranscriptionCleanupConfiguration\.current' \
+  'VoiceInkPostProcessingSkipConfiguration\.current' \
+  'VoiceInkTranscriptionPromptPreference\.localWhisperPrompt' \
   'wordReplacementRules' \
   'customVocabulary' \
   'processor: VoiceInkTranscriptionRunProcessor' \
@@ -6789,9 +6794,17 @@ require_patterns \
   "iOS AppSettings exposes shared transcription run settings snapshot" \
   iOS/VoiceInk-ios/AppSettings.swift \
   'var transcriptionRunSettings: VoiceInkTranscriptionRunSettings' \
-  'postProcessingSkipConfiguration: VoiceInkPostProcessingSkipConfiguration\.current\(\)' \
+  'VoiceInkTranscriptionRunSettingsPolicy\.iOSAppSettingsSnapshot' \
+  'modes: modes' \
+  'selectedTranscriptionLanguage: selectedTranscriptionLanguage' \
   'wordReplacementRules: wordReplacements' \
   'customVocabulary: customVocabularyTerms'
+
+reject_context_pattern \
+  "iOS AppSettings avoids shell-owned transcription run snapshot assembly" \
+  'var transcriptionRunSettings' \
+  'modes\.runtimeConfiguration|VoiceInkTranscriptionCleanupConfiguration\.current|VoiceInkPostProcessingSkipConfiguration\.current|VoiceInkTranscriptionPromptPreference\.localWhisperPromptForSelectedLanguage|configuration:|cleanupConfiguration:|postProcessingSkipConfiguration:' \
+  iOS/VoiceInk-ios/AppSettings.swift
 
 require_patterns \
   "iOS retry transcription uses shared run settings snapshot" \
@@ -6802,6 +6815,11 @@ require_patterns \
 require_pattern \
   "core checks execute shared transcription run settings snapshot test" \
   'TranscriptionRunProcessorTests\.testTranscriptionRunSettingsApplySnapshotFieldsThroughSharedProcessor' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute iOS app settings snapshot policy test" \
+  'TranscriptionRunProcessorTests\.testIOSAppSettingsSnapshotBuildsRunSettingsFromSharedPolicy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \

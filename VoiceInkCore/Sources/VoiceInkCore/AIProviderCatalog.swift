@@ -435,6 +435,25 @@ public struct VoiceInkAIEnhancementAPIKeyVerificationPersistencePlan: Equatable,
     }
 }
 
+public struct VoiceInkAIEnhancementAPIKeyVerificationServiceStatePlan: Equatable, Sendable {
+    public let apiKeyToApply: String?
+    public let isAPIKeyValid: Bool
+    public let shouldPostProviderKeyChanged: Bool
+    public let completionResult: VoiceInkAPIKeyVerificationResult
+
+    public init(
+        apiKeyToApply: String?,
+        isAPIKeyValid: Bool,
+        shouldPostProviderKeyChanged: Bool,
+        completionResult: VoiceInkAPIKeyVerificationResult
+    ) {
+        self.apiKeyToApply = apiKeyToApply
+        self.isAPIKeyValid = isAPIKeyValid
+        self.shouldPostProviderKeyChanged = shouldPostProviderKeyChanged
+        self.completionResult = completionResult
+    }
+}
+
 public extension VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan {
     var successPersistencePlan: VoiceInkAIEnhancementAPIKeyVerificationPersistencePlan? {
         guard let runtimeAPIKey else { return nil }
@@ -442,6 +461,19 @@ public extension VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan {
             runtimeAPIKey: runtimeAPIKey,
             keyToSave: keyToSave,
             providerKeyStorageNameToSave: providerKeyStorageNameToSave
+        )
+    }
+
+    var serviceStateApplicationPlan: VoiceInkAIEnhancementAPIKeyVerificationServiceStatePlan {
+        let persistencePlan = successPersistencePlan
+        return VoiceInkAIEnhancementAPIKeyVerificationServiceStatePlan(
+            apiKeyToApply: persistencePlan?.runtimeAPIKey,
+            isAPIKeyValid: isValid,
+            shouldPostProviderKeyChanged: persistencePlan != nil,
+            completionResult: VoiceInkAPIKeyVerificationResult(
+                isValid: isValid,
+                errorMessage: errorMessage
+            )
         )
     }
 }

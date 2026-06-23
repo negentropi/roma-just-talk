@@ -154,20 +154,17 @@ class AIService: ObservableObject {
                     for: result,
                     resolvedRuntimeKey: resolvedKey
                 )
+                let serviceStatePlan = plan.serviceStateApplicationPlan
 
-                if let runtimeAPIKey = APIKeyManager.shared.applyAIEnhancementVerificationPlan(
-                    plan
-                ) {
-                    self.apiKey = runtimeAPIKey
-                    self.isAPIKeyValid = plan.isValid
-                    NotificationCenter.default.post(name: .aiProviderKeyChanged, object: nil)
-                } else {
-                    self.isAPIKeyValid = plan.isValid
+                APIKeyManager.shared.applyAIEnhancementVerificationPlan(plan)
+                if let apiKeyToApply = serviceStatePlan.apiKeyToApply {
+                    self.apiKey = apiKeyToApply
                 }
-                completion(VoiceInkAPIKeyVerificationResult(
-                    isValid: plan.isValid,
-                    errorMessage: plan.errorMessage
-                ))
+                self.isAPIKeyValid = serviceStatePlan.isAPIKeyValid
+                if serviceStatePlan.shouldPostProviderKeyChanged {
+                    NotificationCenter.default.post(name: .aiProviderKeyChanged, object: nil)
+                }
+                completion(serviceStatePlan.completionResult)
             }
         }
     }

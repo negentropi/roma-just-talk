@@ -481,6 +481,58 @@ final class AIProviderCatalogTests: XCTestCase {
         XCTAssertNil(failurePlan.successPersistencePlan)
     }
 
+    func testMacOSAIEnhancementAPIKeyVerificationPlanBuildsServiceStateApplicationPlan() {
+        let successPlan = VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan(
+            isValid: true,
+            runtimeAPIKey: "resolved-key",
+            keyToSave: "$GROQ_API_KEY",
+            providerKeyStorageNameToSave: VoiceInkAIEnhancementProviderKind.groq.rawValue,
+            errorMessage: nil
+        )
+        let failurePlan = VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan(
+            isValid: false,
+            runtimeAPIKey: nil,
+            keyToSave: nil,
+            providerKeyStorageNameToSave: nil,
+            errorMessage: "invalid"
+        )
+        let noKeyProviderPlan = VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan(
+            isValid: true,
+            runtimeAPIKey: nil,
+            keyToSave: nil,
+            providerKeyStorageNameToSave: nil,
+            errorMessage: nil
+        )
+
+        XCTAssertEqual(
+            successPlan.serviceStateApplicationPlan,
+            VoiceInkAIEnhancementAPIKeyVerificationServiceStatePlan(
+                apiKeyToApply: "resolved-key",
+                isAPIKeyValid: true,
+                shouldPostProviderKeyChanged: true,
+                completionResult: VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: nil)
+            )
+        )
+        XCTAssertEqual(
+            failurePlan.serviceStateApplicationPlan,
+            VoiceInkAIEnhancementAPIKeyVerificationServiceStatePlan(
+                apiKeyToApply: nil,
+                isAPIKeyValid: false,
+                shouldPostProviderKeyChanged: false,
+                completionResult: VoiceInkAPIKeyVerificationResult(isValid: false, errorMessage: "invalid")
+            )
+        )
+        XCTAssertEqual(
+            noKeyProviderPlan.serviceStateApplicationPlan,
+            VoiceInkAIEnhancementAPIKeyVerificationServiceStatePlan(
+                apiKeyToApply: nil,
+                isAPIKeyValid: true,
+                shouldPostProviderKeyChanged: false,
+                completionResult: VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: nil)
+            )
+        )
+    }
+
     func testMacOSAIEnhancementAPIKeyClearPlanIsShared() {
         XCTAssertEqual(
             VoiceInkAIEnhancementAPIKeyClearPlan.clearing(provider: .groq),

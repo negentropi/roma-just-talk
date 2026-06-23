@@ -594,6 +594,42 @@ final class ProviderAccessRequirementTests: XCTestCase {
         )
     }
 
+    func testProviderAccessSnapshotBuildsIOSAccessSurfacesFromLocalModelFact() {
+        let state = VoiceInkProviderAPIKeyState(
+            storedKeysByProvider: [.groq: "groq-key"],
+            verifiedProviders: [.groq]
+        )
+        let snapshotWithLocalModel = VoiceInkProviderAccessSnapshot(
+            apiKeyState: state,
+            localWhisperModelAvailable: true
+        )
+        let snapshotWithoutLocalModel = VoiceInkProviderAccessSnapshot(
+            apiKeyState: state,
+            localWhisperModelAvailable: false
+        )
+
+        XCTAssertTrue(snapshotWithLocalModel.isKeyVerified(for: .groq))
+        XCTAssertTrue(snapshotWithLocalModel.isKeyVerified(for: .localWhisper))
+        XCTAssertFalse(snapshotWithoutLocalModel.isKeyVerified(for: .localWhisper))
+        XCTAssertEqual(snapshotWithLocalModel.apiKeyListRows().map(\.provider), VoiceInkProviderKind.userAPIKeyProviders)
+        XCTAssertEqual(
+            snapshotWithLocalModel.availableProviders(for: .transcription),
+            [.groq, .localWhisper]
+        )
+        XCTAssertEqual(
+            snapshotWithoutLocalModel.availableProviders(for: .transcription),
+            [.groq]
+        )
+        XCTAssertEqual(
+            snapshotWithLocalModel.modeFormProviderAvailability.transcriptionProviders,
+            [.groq, .localWhisper]
+        )
+        XCTAssertEqual(
+            snapshotWithLocalModel.modeFormProviderAvailability.postProcessingProviders,
+            [.groq]
+        )
+    }
+
     func testProviderAPIKeyStateBuildsListRowPresentation() {
         let state = VoiceInkProviderAPIKeyState(
             storedKeysByProvider: [.groq: "groq-key"],

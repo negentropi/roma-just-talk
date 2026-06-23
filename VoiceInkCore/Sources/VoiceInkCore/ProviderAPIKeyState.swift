@@ -218,3 +218,41 @@ public struct VoiceInkProviderAPIKeyState: Equatable, Sendable {
         return VoiceInkProviderAPIKeyVerificationMutationPlan(shouldPersistVerificationFlag: true)
     }
 }
+
+public struct VoiceInkProviderAccessSnapshot: Equatable, Sendable {
+    public let apiKeyState: VoiceInkProviderAPIKeyState
+    public let localWhisperModelAvailable: Bool
+
+    public init(
+        apiKeyState: VoiceInkProviderAPIKeyState,
+        localWhisperModelAvailable: Bool
+    ) {
+        self.apiKeyState = apiKeyState
+        self.localWhisperModelAvailable = localWhisperModelAvailable
+    }
+
+    public func isKeyVerified(for provider: VoiceInkProviderKind) -> Bool {
+        apiKeyState.isReady(
+            for: provider,
+            localWhisperModelAvailable: localWhisperModelAvailable
+        )
+    }
+
+    public func apiKeyListRows() -> [VoiceInkProviderAPIKeyListRow] {
+        apiKeyState.listRows(localWhisperModelAvailable: localWhisperModelAvailable)
+    }
+
+    public func availableProviders(for use: VoiceInkProviderModelUse) -> [VoiceInkProviderKind] {
+        apiKeyState.availableProviders(
+            for: use,
+            localWhisperModelAvailable: localWhisperModelAvailable
+        )
+    }
+
+    public var modeFormProviderAvailability: VoiceInkModeFormProviderAvailability {
+        VoiceInkModeFormProviderAvailability(
+            transcriptionProviders: availableProviders(for: .transcription),
+            postProcessingProviders: availableProviders(for: .postProcessing)
+        )
+    }
+}

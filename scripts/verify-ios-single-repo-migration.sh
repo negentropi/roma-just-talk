@@ -3092,6 +3092,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift
 
 require_pattern \
+  "shared provider access snapshot lives in VoiceInkCore" \
+  'VoiceInkProviderAccessSnapshot|modeFormProviderAvailability|apiKeyListRows|availableProviders' \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift
+
+require_pattern \
   "shared provider API-key state loader lives in VoiceInkCore" \
   'loadingStoredKeys' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift
@@ -3104,6 +3109,11 @@ require_pattern \
 require_pattern \
   "core checks execute provider API-key state persistence action tests" \
   'ProviderAccessRequirementTests\.testProviderAPIKeyState(Storage|Verification)MutationPlanBuildsPersistenceActions' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute provider access snapshot test" \
+  'ProviderAccessRequirementTests\.testProviderAccessSnapshotBuildsIOSAccessSurfacesFromLocalModelFact' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -3163,7 +3173,12 @@ reject_pattern \
 
 require_pattern \
   "iOS app settings uses shared provider API-key list rows" \
-  'listRows' \
+  'VoiceInkProviderAccessSnapshot|providerAccessSnapshot|apiKeyListRows' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+reject_pattern \
+  "iOS app settings avoids shell-owned provider access derivation" \
+  'apiKeyState\.(isReady|listRows|availableProviders)' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \
@@ -10746,7 +10761,7 @@ require_pattern \
 
 require_pattern \
   "iOS settings adapter builds mode provider availability from provider-key state" \
-  'availableProviders\(for: \.(transcription|postProcessing)\)' \
+  'providerAccessSnapshot\.modeFormProviderAvailability' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \

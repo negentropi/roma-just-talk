@@ -93,6 +93,13 @@ final class AppSettings: ObservableObject {
         apiKeyState.storedAPIKey(for: provider)
     }
 
+    private var providerAccessSnapshot: VoiceInkProviderAccessSnapshot {
+        VoiceInkProviderAccessSnapshot(
+            apiKeyState: apiKeyState,
+            localWhisperModelAvailable: LocalModelManager.shared.hasAvailableModel
+        )
+    }
+
     func setAPIKey(_ key: String, for provider: VoiceInkProviderKind) {
         var updatedState = apiKeyState
         let plan = updatedState.applyStoredAPIKey(key, for: provider)
@@ -104,30 +111,19 @@ final class AppSettings: ObservableObject {
     }
     
     func isKeyVerified(for provider: VoiceInkProviderKind) -> Bool {
-        apiKeyState.isReady(
-            for: provider,
-            localWhisperModelAvailable: LocalModelManager.shared.hasAvailableModel
-        )
+        providerAccessSnapshot.isKeyVerified(for: provider)
     }
 
     func apiKeyListRows() -> [VoiceInkProviderAPIKeyListRow] {
-        apiKeyState.listRows(
-            localWhisperModelAvailable: LocalModelManager.shared.hasAvailableModel
-        )
+        providerAccessSnapshot.apiKeyListRows()
     }
 
     func availableProviders(for use: VoiceInkProviderModelUse) -> [VoiceInkProviderKind] {
-        apiKeyState.availableProviders(
-            for: use,
-            localWhisperModelAvailable: LocalModelManager.shared.hasAvailableModel
-        )
+        providerAccessSnapshot.availableProviders(for: use)
     }
 
     var modeFormProviderAvailability: VoiceInkModeFormProviderAvailability {
-        VoiceInkModeFormProviderAvailability(
-            transcriptionProviders: availableProviders(for: .transcription),
-            postProcessingProviders: availableProviders(for: .postProcessing)
-        )
+        providerAccessSnapshot.modeFormProviderAvailability
     }
     
     func setKeyVerified(_ verified: Bool, for provider: VoiceInkProviderKind) {

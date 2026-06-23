@@ -1753,6 +1753,17 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(presentation.idleButtonText, "Record")
     }
 
+    func testRecordingShortcutPreferencePreservesMacOSNotificationNames() {
+        XCTAssertEqual(
+            VoiceInkRecordingShortcutPreference.shortcutDidChangeNotificationName.rawValue,
+            "ShortcutStoreShortcutDidChange"
+        )
+        XCTAssertEqual(
+            VoiceInkRecordingShortcutPreference.shortcutRecordingDidStartNotificationName.rawValue,
+            "ShortcutRecorderRecordingDidStart"
+        )
+    }
+
     func testRecordingShortcutPreferenceKeysDefaultsAndRegisteredDefaults() {
         XCTAssertEqual(
             VoiceInkRecordingShortcutPreference.selectionKey(for: .primary),

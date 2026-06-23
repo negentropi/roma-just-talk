@@ -2,7 +2,7 @@ import Foundation
 import VoiceInkCore
 
 enum ShortcutStore {
-    static let shortcutDidChange = Notification.Name("ShortcutStoreShortcutDidChange")
+    static let shortcutDidChange = VoiceInkRecordingShortcutPreference.shortcutDidChangeNotificationName
 
     typealias StoredState = VoiceInkShortcutStorageState
 

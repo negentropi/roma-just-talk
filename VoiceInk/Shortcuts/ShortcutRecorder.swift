@@ -86,7 +86,7 @@ struct ShortcutRecorder: View {
         return shortcut ?? defaultShortcut
     }
 
-    private static let shortcutRecordingDidStart = Notification.Name("ShortcutRecorderRecordingDidStart")
+    private static let shortcutRecordingDidStart = VoiceInkRecordingShortcutPreference.shortcutRecordingDidStartNotificationName
 }
 
 private struct ShortcutVisualization: View {

@@ -2052,6 +2052,8 @@ public enum VoiceInkRecordingShortcutPreference {
     public static let legacyKeyboardShortcutsMigrationKey = "Shortcut_LegacyKeyboardShortcutsMigrated"
     public static let legacyCustomRecordingShortcutsMigrationKey = "Shortcut_LegacyCustomRecordingShortcutsMigrated"
     public static let minimumMiddleClickActivationDelay = 0
+    public static let shortcutDidChangeNotificationName = Notification.Name("ShortcutStoreShortcutDidChange")
+    public static let shortcutRecordingDidStartNotificationName = Notification.Name("ShortcutRecorderRecordingDidStart")
 
     public static let macOSSettingsPresentation = VoiceInkMacOSRecordingShortcutSettingsPresentation.macOS
     public static let macOSRecorderPresentation = VoiceInkMacOSShortcutRecorderPresentation.macOS

@@ -308,14 +308,12 @@ final class AppSettings: ObservableObject {
     }
 
     private func applyFirstTimeSetupPlan(_ plan: VoiceInkIOSFirstTimeSetupPlan) {
-        for action in plan.applicationActions {
-            switch action {
-            case .applyModeSettingsRepair(let modeSettingsRepairPlan):
-                applyModeSettingsRepairPlan(modeSettingsRepairPlan)
-            case .saveHasCompletedOnboarding:
+        plan.applyRuntimeState(
+            applyModeSettingsRepair: applyModeSettingsRepairPlan,
+            saveHasCompletedOnboarding: {
                 VoiceInkOnboardingPreference.saveHasCompletedOnboarding()
             }
-        }
+        )
     }
 
     private func saveAPIKey(_ key: String, for provider: VoiceInkProviderKind) {

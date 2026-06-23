@@ -431,6 +431,22 @@ public enum VoiceInkIOSFirstTimeSetupAction {
     case saveHasCompletedOnboarding
 }
 
+public extension VoiceInkIOSFirstTimeSetupPlan {
+    func applyRuntimeState(
+        applyModeSettingsRepair: (VoiceInkModeSettingsRepairPlan) -> Void,
+        saveHasCompletedOnboarding: () -> Void
+    ) {
+        for action in applicationActions {
+            switch action {
+            case .applyModeSettingsRepair(let plan):
+                applyModeSettingsRepair(plan)
+            case .saveHasCompletedOnboarding:
+                saveHasCompletedOnboarding()
+            }
+        }
+    }
+}
+
 public enum VoiceInkIOSFirstTimeSetupPolicy {
     public static func plan(
         modes: [Mode],

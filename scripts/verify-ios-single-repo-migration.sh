@@ -11156,14 +11156,16 @@ require_patterns \
   'VoiceInkIOSFirstTimeSetupPlan' \
   'VoiceInkIOSFirstTimeSetupAction' \
   'applicationActions' \
+  'applyRuntimeState' \
   'modeSettingsRepairPlan' \
   'shouldSaveHasCompletedOnboarding' \
   'VoiceInkModeSettingsPolicy\.defaultModeRepairPlan'
 
-require_pattern \
+require_patterns \
   "core checks execute iOS first-time setup action test" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
   'UserDefaultsPreferencesTests\.testIOSFirstTimeSetupPlanBuildsApplicationActionsInOrder' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  'UserDefaultsPreferencesTests\.testIOSFirstTimeSetupPlanAppliesRuntimeStateInOrder'
 
 require_pattern \
   "core checks execute iOS first-time setup policy test" \
@@ -11449,13 +11451,13 @@ require_patterns \
   'VoiceInkIOSFirstTimeSetupPolicy\.plan' \
   'VoiceInkIOSFirstTimeSetupPlan' \
   'applyFirstTimeSetupPlan' \
-  'plan\.applicationActions' \
+  'plan\.applyRuntimeState' \
   'applyModeSettingsRepair'
 
 reject_context_pattern \
   "iOS app settings first-time setup avoids direct shared setup plan field execution" \
   'private func applyFirstTimeSetupPlan' \
-  'plan\.(modeSettingsRepairPlan|shouldSaveHasCompletedOnboarding)' \
+  'plan\.(modeSettingsRepairPlan|shouldSaveHasCompletedOnboarding|applicationActions)|VoiceInkIOSFirstTimeSetupAction|case \.applyModeSettingsRepair|case \.saveHasCompletedOnboarding' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 reject_context_pattern \

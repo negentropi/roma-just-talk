@@ -356,6 +356,29 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         }
     }
 
+    func testIOSFirstTimeSetupPlanAppliesRuntimeStateInOrder() {
+        let plan = VoiceInkIOSFirstTimeSetupPolicy.plan(
+            modes: [],
+            selectedModeId: nil,
+            selectedTranscriptionLanguage: "not-a-language"
+        )
+        var events: [String] = []
+
+        plan.applyRuntimeState(
+            applyModeSettingsRepair: { repairPlan in
+                events.append("repair:\(repairPlan.modes.count)")
+            },
+            saveHasCompletedOnboarding: {
+                events.append("saveOnboarding")
+            }
+        )
+
+        XCTAssertEqual(events, [
+            "repair:1",
+            "saveOnboarding"
+        ])
+    }
+
     func testDefaultSettingsPreserveMacOSSelectedLanguageDefault() {
         let defaults = VoiceInkDefaultSettings.macOS
         let registeredDefaults = defaults.registeredUserDefaults()

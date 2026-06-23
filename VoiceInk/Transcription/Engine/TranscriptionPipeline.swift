@@ -209,6 +209,8 @@ class TranscriptionPipeline {
             transcription.transcriptionModelName = model.displayName
             transcription.transcriptionDuration = transcriptionDuration
             finalPastedText = cleanedText
+            var enhancementResult: VoiceInkAIEnhancementResult?
+            var enhancementFailureReason: String?
 
             if let enhancementService,
                enhancementService.isConfigured,
@@ -233,14 +235,11 @@ class TranscriptionPipeline {
 
                 do {
                     let enhancement = try await enhancementService.enhance(enhancementRequest.text)
-                    transcription.applyEnhancementResult(enhancement)
+                    enhancementResult = enhancement
                     finalPastedText = enhancement.text
                 } catch {
                     let errorDescription = VoiceInkErrorDescription.text(for: error)
-                    transcription.applyEnhancementFailure(
-                        reason: errorDescription,
-                        policy: .storeFailureText
-                    )
+                    enhancementFailureReason = errorDescription
                     await MainActor.run {
                         NotificationManager.shared.showNotification(
                             title: VoiceInkPostProcessingFailurePresentation.enhancementFailureNotificationTitle(
@@ -253,7 +252,19 @@ class TranscriptionPipeline {
                 }
             }
 
-            transcription.transcriptionState = .completed
+            let completedDraft = VoiceInkCompletedTranscriptionDraft(
+                cleanedText: cleanedText,
+                duration: transcription.duration,
+                audioFileURL: transcription.audioFileURL,
+                transcriptionModelName: model.displayName,
+                transcriptionDuration: transcriptionDuration,
+                powerModeName: transcription.powerModeName,
+                powerModeEmoji: transcription.powerModeEmoji,
+                enhancementResult: enhancementResult,
+                enhancementFailureReason: enhancementFailureReason,
+                enhancementFailurePolicy: .storeFailureText
+            )
+            transcription.applyCompletedDraft(completedDraft)
         } catch {
             let errorDescription = VoiceInkErrorDescription.text(for: error)
 

@@ -72,6 +72,23 @@ final class Transcription: VoiceInkStoredAudioRecord, VoiceInkSessionMetricSourc
         )
     }
 
+    func applyCompletedDraft(_ draft: VoiceInkCompletedTranscriptionDraft) {
+        text = draft.text
+        duration = draft.duration
+        enhancedText = draft.enhancedText
+        audioFileURL = draft.audioFileURL
+        transcriptionModelName = draft.transcriptionModelName
+        aiEnhancementModelName = draft.aiEnhancementModelName
+        promptName = draft.promptName
+        transcriptionDuration = draft.transcriptionDuration
+        enhancementDuration = draft.enhancementDuration
+        aiRequestSystemMessage = draft.aiRequestSystemMessage
+        aiRequestUserMessage = draft.aiRequestUserMessage
+        powerModeName = draft.powerModeName
+        powerModeEmoji = draft.powerModeEmoji
+        transcriptionState = draft.transcriptionStatus
+    }
+
     convenience init(recordingDraft draft: VoiceInkRecordingTranscriptionDraft) {
         self.init(
             text: draft.text,

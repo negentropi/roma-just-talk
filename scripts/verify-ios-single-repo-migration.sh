@@ -9389,10 +9389,13 @@ reject_pattern \
   'public let enhancementDuration|enhancementDuration: TimeInterval\? =|enhancementDuration: postProcessingResult' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift
 
-require_pattern \
-  "macOS recorder enhancement stores request metadata through shared record mutation" \
-  'applyEnhancementResult\(enhancement\)' \
-  VoiceInk/Transcription/Engine/TranscriptionPipeline.swift
+require_patterns \
+  "macOS recorder completion stores request metadata through shared completed draft" \
+  VoiceInk/Transcription/Engine/TranscriptionPipeline.swift \
+  'VoiceInkCompletedTranscriptionDraft\(' \
+  'enhancementResult: enhancementResult' \
+  'enhancementFailurePolicy: \.storeFailureText' \
+  'transcription\.applyCompletedDraft\(completedDraft\)'
 
 require_pattern \
   "macOS audio-file import enhancement completion preserves queue failure text policy" \
@@ -9431,6 +9434,11 @@ reject_pattern \
   VoiceInk/Services/AudioFileTranscriptionManager.swift \
   VoiceInk/Services/AudioFileTranscriptionService.swift \
   VoiceInk/Views/AudioPlayerView.swift
+
+reject_pattern \
+  "macOS recorder pipeline avoids shell-owned enhancement record mutation" \
+  'applyEnhancement(Result|Failure)\(' \
+  VoiceInk/Transcription/Engine/TranscriptionPipeline.swift
 
 require_pattern \
   "shared transcription failure plan type lives in core" \
@@ -9503,8 +9511,8 @@ require_pattern \
   docs/ios-single-repo-migration.md
 
 require_pattern \
-  "migration checklist tracks shared enhancement record mutation" \
-  'apply AI enhancement success/failure metadata through `VoiceInkMutableTranscriptionEnhancementRecord`' \
+  "migration checklist tracks shared completed draft and enhancement record mutation" \
+  'VoiceInkCompletedTranscriptionDraft.*VoiceInkMutableTranscriptionEnhancementRecord' \
   docs/ios-single-repo-migration.md
 
 require_pattern \
@@ -9538,13 +9546,13 @@ require_pattern \
   VoiceInk/Transcription/Engine/TranscriptionPipeline.swift
 
 require_pattern \
-  "macOS transcription pipeline applies enhancement result through shared record mutation" \
-  'applyEnhancementResult\(enhancement\)' \
+  "macOS transcription pipeline applies live completion through shared completed draft" \
+  'VoiceInkCompletedTranscriptionDraft\(' \
   VoiceInk/Transcription/Engine/TranscriptionPipeline.swift
 
 require_pattern \
-  "macOS transcription pipeline applies enhancement failure through shared record mutation" \
-  'applyEnhancementFailure\(' \
+  "macOS transcription pipeline preserves live enhancement failure text policy" \
+  'enhancementFailurePolicy: \.storeFailureText' \
   VoiceInk/Transcription/Engine/TranscriptionPipeline.swift
 
 require_pattern \

@@ -47,6 +47,17 @@ final class AppIdentityTests: XCTestCase {
         XCTAssertEqual(VoiceInkIOSLogCategory.settings, "iOSSettings")
     }
 
+    func testMacOSWindowIdentityPreservesIdentifiersTitlesAndFrameNames() {
+        XCTAssertEqual(VoiceInkMacOSWindowIdentity.mainIdentifierRawValue, "com.prakashjoshipax.voiceink.mainWindow")
+        XCTAssertEqual(VoiceInkMacOSWindowIdentity.onboardingIdentifierRawValue, "com.prakashjoshipax.voiceink.onboardingWindow")
+        XCTAssertEqual(VoiceInkMacOSWindowIdentity.historyIdentifierRawValue, "com.prakashjoshipax.voiceink.historyWindow")
+        XCTAssertEqual(VoiceInkMacOSWindowIdentity.mainFrameAutosaveName, "VoiceInkMainWindowFrame")
+        XCTAssertEqual(VoiceInkMacOSWindowIdentity.historyFrameAutosaveName, "VoiceInkHistoryWindowFrame")
+        XCTAssertEqual(VoiceInkMacOSWindowIdentity.mainTitle, "roma-just-talk")
+        XCTAssertEqual(VoiceInkMacOSWindowIdentity.onboardingTitle, "roma-just-talk Onboarding")
+        XCTAssertEqual(VoiceInkMacOSWindowIdentity.historyTitle, "roma-just-talk - Transcription History")
+    }
+
     func testMacOSStorageAlertPresentationPreservesStartupCopy() {
         XCTAssertEqual(
             VoiceInkAppIdentity.storageFallbackWarningPresentation,

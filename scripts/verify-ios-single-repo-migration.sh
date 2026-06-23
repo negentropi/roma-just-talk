@@ -13444,10 +13444,45 @@ require_pattern \
   'AppIdentityTests\.testMacOSNavigationRequestPreservesDestinationContract|AppIdentityTests\.testMacOSMainViewItemsPreserveSidebarPresentation|AppIdentityTests\.testMacOSMainViewItemsMapNavigationDestinationsAndLegacyTitles|AppIdentityTests\.testMacOSFileTranscriptionRequestPreservesPayloadContract' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
-require_pattern \
+require_patterns \
   "macOS windows use shared app identity presentation" \
-  'VoiceInkAppIdentity\.(compactDisplayName|onboardingWindowTitle)' \
-  VoiceInk/WindowManager.swift
+  VoiceInk/WindowManager.swift \
+  'VoiceInkMacOSWindowIdentity\.mainIdentifierRawValue' \
+  'VoiceInkMacOSWindowIdentity\.onboardingIdentifierRawValue' \
+  'VoiceInkMacOSWindowIdentity\.mainFrameAutosaveName' \
+  'VoiceInkMacOSWindowIdentity\.mainTitle' \
+  'VoiceInkMacOSWindowIdentity\.onboardingTitle'
+
+require_patterns \
+  "macOS history window uses shared window identity" \
+  VoiceInk/HistoryWindowController.swift \
+  'VoiceInkMacOSWindowIdentity\.historyIdentifierRawValue' \
+  'VoiceInkMacOSWindowIdentity\.historyFrameAutosaveName' \
+  'VoiceInkMacOSWindowIdentity\.historyTitle'
+
+require_patterns \
+  "shared macOS window identity lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift \
+  'VoiceInkMacOSWindowIdentity' \
+  'mainIdentifierRawValue' \
+  'onboardingIdentifierRawValue' \
+  'historyIdentifierRawValue' \
+  'mainFrameAutosaveName' \
+  'historyFrameAutosaveName' \
+  'mainTitle' \
+  'onboardingTitle' \
+  'historyTitle'
+
+require_pattern \
+  "core checks execute macOS window identity test" \
+  'AppIdentityTests\.testMacOSWindowIdentityPreservesIdentifiersTitlesAndFrameNames' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "macOS window shells avoid raw window identity strings" \
+  '"(VoiceInkMainWindowFrame|VoiceInkHistoryWindowFrame|roma-just-talk - Transcription History)"|loggingSubsystem\)\.(mainWindow|onboardingWindow|historyWindow)' \
+  VoiceInk/WindowManager.swift \
+  VoiceInk/HistoryWindowController.swift
 
 require_pattern \
   "iOS note list uses shared app identity presentation" \
@@ -13635,6 +13670,7 @@ reject_pattern \
   VoiceInk/Views/ContentView.swift \
   VoiceInk/VoiceInk.swift \
   VoiceInk/WindowManager.swift \
+  VoiceInk/HistoryWindowController.swift \
   iOS/VoiceInk-ios/NotesListView.swift \
   iOS/VoiceInk-ios/OnboardingView.swift \
   iOS/VoiceInk-iosUITests/VoiceInk_iosUITests.swift

@@ -27,6 +27,7 @@
 - Moved the default selected AI enhancement provider into shared core while leaving provider execution in the macOS shell.
 - Moved Ollama runtime startup and settings reset fallbacks into shared core while leaving Ollama transport execution in the macOS shell.
 - Moved diagnostic log level labels into shared core while leaving OSLog fetching and file writing in the macOS shell.
+- Moved macOS window identifier, title, and frame autosave names into shared core while leaving AppKit window setup in the macOS shell.
 
 ## v1.95 - 2026-06-17
 

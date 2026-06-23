@@ -6,9 +6,9 @@ import VoiceInkCore
 class WindowManager: NSObject {
     static let shared = WindowManager()
 
-    private static let mainWindowIdentifier = NSUserInterfaceItemIdentifier("\(VoiceInkAppIdentity.loggingSubsystem).mainWindow")
-    private static let onboardingWindowIdentifier = NSUserInterfaceItemIdentifier("\(VoiceInkAppIdentity.loggingSubsystem).onboardingWindow")
-    private static let mainWindowAutosaveName = NSWindow.FrameAutosaveName("VoiceInkMainWindowFrame")
+    private static let mainWindowIdentifier = NSUserInterfaceItemIdentifier(VoiceInkMacOSWindowIdentity.mainIdentifierRawValue)
+    private static let onboardingWindowIdentifier = NSUserInterfaceItemIdentifier(VoiceInkMacOSWindowIdentity.onboardingIdentifierRawValue)
+    private static let mainWindowAutosaveName = NSWindow.FrameAutosaveName(VoiceInkMacOSWindowIdentity.mainFrameAutosaveName)
 
     private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "WindowManager")
     private weak var mainWindow: NSWindow?
@@ -33,7 +33,7 @@ class WindowManager: NSObject {
         window.titleVisibility = .hidden
         window.backgroundColor = .windowBackgroundColor
         window.isReleasedWhenClosed = false
-        window.title = VoiceInkAppIdentity.compactDisplayName
+        window.title = VoiceInkMacOSWindowIdentity.mainTitle
         window.collectionBehavior = [.fullScreenPrimary]
         window.level = .normal
         window.isOpaque = true
@@ -59,7 +59,7 @@ class WindowManager: NSObject {
         window.backgroundColor = .clear
         window.isReleasedWhenClosed = false
         window.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
-        window.title = VoiceInkAppIdentity.onboardingWindowTitle
+        window.title = VoiceInkMacOSWindowIdentity.onboardingTitle
         window.isOpaque = false
         window.minSize = NSSize(width: 900, height: 780)
         window.makeKeyAndOrderFront(nil)

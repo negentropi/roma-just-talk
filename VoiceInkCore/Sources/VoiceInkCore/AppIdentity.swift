@@ -265,6 +265,35 @@ public enum VoiceInkMacOSAppEventRequest {
     public static let enhancementToggleChangedNotificationName = Notification.Name("enhancementToggleChanged")
 }
 
+public enum VoiceInkMacOSWindowIdentity {
+    public static var mainIdentifierRawValue: String {
+        "\(VoiceInkAppIdentity.loggingSubsystem).mainWindow"
+    }
+
+    public static var onboardingIdentifierRawValue: String {
+        "\(VoiceInkAppIdentity.loggingSubsystem).onboardingWindow"
+    }
+
+    public static var historyIdentifierRawValue: String {
+        "\(VoiceInkAppIdentity.loggingSubsystem).historyWindow"
+    }
+
+    public static let mainFrameAutosaveName = "VoiceInkMainWindowFrame"
+    public static let historyFrameAutosaveName = "VoiceInkHistoryWindowFrame"
+
+    public static var mainTitle: String {
+        VoiceInkAppIdentity.compactDisplayName
+    }
+
+    public static var onboardingTitle: String {
+        VoiceInkAppIdentity.onboardingWindowTitle
+    }
+
+    public static var historyTitle: String {
+        "\(VoiceInkAppIdentity.compactDisplayName) - Transcription History"
+    }
+}
+
 public enum VoiceInkAppIdentity {
     public static let bundleIdentifier = "com.prakashjoshipax.VoiceInk"
     public static let loggingSubsystem = "com.prakashjoshipax.voiceink"

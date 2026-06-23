@@ -46,7 +46,13 @@ class RecordingShortcutManager: ObservableObject {
     }
     @Published var middleClickActivationDelay: Int {
         didSet {
-            VoiceInkRecordingShortcutPreference.saveMiddleClickActivationDelay(middleClickActivationDelay)
+            let normalizedDelay = VoiceInkRecordingShortcutPreference.normalizedMiddleClickActivationDelay(
+                middleClickActivationDelay
+            )
+            if normalizedDelay != middleClickActivationDelay {
+                middleClickActivationDelay = normalizedDelay
+            }
+            VoiceInkRecordingShortcutPreference.saveMiddleClickActivationDelay(normalizedDelay)
         }
     }
     @Published var specialShortcutPasteLastTranscriptOnEmptyTap: Bool {
@@ -222,7 +228,10 @@ class RecordingShortcutManager: ObservableObject {
             self.middleClickTask?.cancel()
             self.middleClickTask = Task {
                 do {
-                    let delay = UInt64(self.middleClickActivationDelay) * 1_000_000 // ms to ns
+                    let delayMilliseconds = VoiceInkRecordingShortcutPreference.normalizedMiddleClickActivationDelay(
+                        self.middleClickActivationDelay
+                    )
+                    let delay = UInt64(delayMilliseconds) * 1_000_000 // ms to ns
                     try await Task.sleep(nanoseconds: delay)
                     
                     guard self.isMiddleClickToggleEnabled, !Task.isCancelled else { return }

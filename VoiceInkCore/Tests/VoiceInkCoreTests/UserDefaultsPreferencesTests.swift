@@ -1692,6 +1692,7 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(VoiceInkRecordingShortcutPreference.defaultSelection(for: .secondary), .none)
         XCTAssertEqual(VoiceInkRecordingShortcutPreference.defaultMode(for: .primary), .special)
         XCTAssertEqual(VoiceInkRecordingShortcutPreference.defaultMode(for: .secondary), .hybrid)
+        XCTAssertEqual(VoiceInkRecordingShortcutPreference.minimumMiddleClickActivationDelay, 0)
         XCTAssertEqual(
             VoiceInkRecordingShortcutPreference.registeredDefaults[VoiceInkUserDefaultsKey.isMiddleClickToggleEnabled] as? Bool,
             VoiceInkPreferenceDefault.isMiddleClickToggleEnabled
@@ -2023,6 +2024,11 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             XCTAssertEqual(VoiceInkRecordingShortcutPreference.middleClickActivationDelay(from: defaults), 350)
             XCTAssertFalse(VoiceInkRecordingShortcutPreference.shouldPasteLastTranscriptOnEmptyTap(from: defaults))
 
+            VoiceInkRecordingShortcutPreference.saveMiddleClickActivationDelay(-1, to: defaults)
+            XCTAssertEqual(VoiceInkRecordingShortcutPreference.middleClickActivationDelay(from: defaults), 0)
+            defaults.set(-50, forKey: VoiceInkUserDefaultsKey.middleClickActivationDelay)
+            XCTAssertEqual(VoiceInkRecordingShortcutPreference.middleClickActivationDelay(from: defaults), 0)
+
             VoiceInkRecordingShortcutPreference.clear(from: defaults)
 
             XCTAssertNil(VoiceInkRecordingShortcutPreference.selection(for: .primary, from: defaults))
@@ -2138,6 +2144,20 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(plan.specialShortcutPasteLastTranscriptOnEmptyTap, false)
         XCTAssertEqual(plan.isMiddleClickToggleEnabled, true)
         XCTAssertEqual(plan.middleClickActivationDelay, 350)
+
+        let negativeDelayPlan = VoiceInkRecordingShortcutPreference.backupImportPlan(
+            from: VoiceInkRecordingShortcutBackupPreferences(
+                primaryRecordingShortcutRawValue: nil,
+                secondaryRecordingShortcutRawValue: nil,
+                primaryRecordingShortcutModeRawValue: nil,
+                secondaryRecordingShortcutModeRawValue: nil,
+                specialShortcutPasteLastTranscriptOnEmptyTap: nil,
+                isMiddleClickToggleEnabled: nil,
+                middleClickActivationDelay: -1
+            )
+        )
+
+        XCTAssertEqual(negativeDelayPlan.middleClickActivationDelay, 0)
     }
 
     func testShortcutBackupPolicyExportsGeneralShortcutsInStableOrder() {

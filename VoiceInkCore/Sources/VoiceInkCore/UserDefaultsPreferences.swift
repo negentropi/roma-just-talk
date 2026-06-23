@@ -1982,6 +1982,7 @@ public enum VoiceInkShortcutStoragePreference {
 public enum VoiceInkRecordingShortcutPreference {
     public static let legacyKeyboardShortcutsMigrationKey = "Shortcut_LegacyKeyboardShortcutsMigrated"
     public static let legacyCustomRecordingShortcutsMigrationKey = "Shortcut_LegacyCustomRecordingShortcutsMigrated"
+    public static let minimumMiddleClickActivationDelay = 0
 
     public static let macOSSettingsPresentation = VoiceInkMacOSRecordingShortcutSettingsPresentation.macOS
     public static let macOSRecorderPresentation = VoiceInkMacOSShortcutRecorderPresentation.macOS
@@ -2191,7 +2192,7 @@ public enum VoiceInkRecordingShortcutPreference {
             secondaryRecordingShortcutMode: backup.secondaryRecordingShortcutModeRawValue.flatMap(VoiceInkRecordingShortcutMode.init(rawValue:)),
             specialShortcutPasteLastTranscriptOnEmptyTap: backup.specialShortcutPasteLastTranscriptOnEmptyTap,
             isMiddleClickToggleEnabled: backup.isMiddleClickToggleEnabled,
-            middleClickActivationDelay: backup.middleClickActivationDelay
+            middleClickActivationDelay: backup.middleClickActivationDelay.map(Self.normalizedMiddleClickActivationDelay)
         )
     }
 
@@ -2239,15 +2240,24 @@ public enum VoiceInkRecordingShortcutPreference {
     }
 
     public static func middleClickActivationDelay(from defaults: UserDefaults = .standard) -> Int {
-        defaults.object(forKey: VoiceInkUserDefaultsKey.middleClickActivationDelay) as? Int
-            ?? VoiceInkPreferenceDefault.middleClickActivationDelay
+        normalizedMiddleClickActivationDelay(
+            defaults.object(forKey: VoiceInkUserDefaultsKey.middleClickActivationDelay) as? Int
+                ?? VoiceInkPreferenceDefault.middleClickActivationDelay
+        )
     }
 
     public static func saveMiddleClickActivationDelay(
         _ delay: Int,
         to defaults: UserDefaults = .standard
     ) {
-        defaults.set(delay, forKey: VoiceInkUserDefaultsKey.middleClickActivationDelay)
+        defaults.set(
+            normalizedMiddleClickActivationDelay(delay),
+            forKey: VoiceInkUserDefaultsKey.middleClickActivationDelay
+        )
+    }
+
+    public static func normalizedMiddleClickActivationDelay(_ delay: Int) -> Int {
+        max(delay, minimumMiddleClickActivationDelay)
     }
 
     public static func shouldPasteLastTranscriptOnEmptyTap(from defaults: UserDefaults = .standard) -> Bool {

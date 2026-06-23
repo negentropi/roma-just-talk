@@ -152,7 +152,9 @@ struct SettingsView: View {
                         HStack {
                             TextField("", value: $recordingShortcutManager.middleClickActivationDelay, formatter: {
                                 let formatter = NumberFormatter()
-                                formatter.minimum = 0
+                                formatter.minimum = NSNumber(
+                                    value: VoiceInkRecordingShortcutPreference.minimumMiddleClickActivationDelay
+                                )
                                 return formatter
                             }())
                                 .textFieldStyle(.roundedBorder)

@@ -9081,8 +9081,23 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
+  "shared recording shortcut preference owns middle-click delay minimum" \
+  'minimumMiddleClickActivationDelay = 0' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared recording shortcut preference normalizes middle-click delay" \
+  'normalizedMiddleClickActivationDelay' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
   "shared recording shortcut preference saves middle-click delay" \
   'saveMiddleClickActivationDelay' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared recording shortcut backup import normalizes middle-click delay" \
+  'middleClickActivationDelay: backup\.middleClickActivationDelay\.map\(Self\.normalizedMiddleClickActivationDelay\)' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
@@ -9164,6 +9179,16 @@ require_pattern \
   "macOS recording shortcut manager saves middle-click delay through shared preference" \
   'VoiceInkRecordingShortcutPreference\.saveMiddleClickActivationDelay' \
   VoiceInk/Shortcuts/RecordingShortcutManager.swift
+
+require_pattern \
+  "macOS recording shortcut manager normalizes middle-click delay through shared preference" \
+  'VoiceInkRecordingShortcutPreference\.normalizedMiddleClickActivationDelay' \
+  VoiceInk/Shortcuts/RecordingShortcutManager.swift
+
+require_pattern \
+  "macOS shortcut settings uses shared middle-click delay minimum" \
+  'VoiceInkRecordingShortcutPreference\.minimumMiddleClickActivationDelay' \
+  VoiceInk/Views/Settings/SettingsView.swift
 
 require_pattern \
   "macOS recording shortcut manager reads special empty-tap setting through shared preference" \
@@ -9293,8 +9318,18 @@ reject_pattern \
   VoiceInk/Shortcuts/ShortcutMigration.swift
 
 reject_pattern \
+  "macOS recording shortcut manager avoids raw middle-click delay UInt64 conversion" \
+  'UInt64\(self\.middleClickActivationDelay\)' \
+  VoiceInk/Shortcuts/RecordingShortcutManager.swift
+
+reject_pattern \
   "macOS recording settings avoid shell-owned shortcut presentation copy" \
   '"(Primary Shortcut|Secondary Shortcut|Add Second Shortcut|Empty Tap Pastes Last|Additional Shortcuts|Paste Last Transcription \(Original\)|Paste Last Transcription \(Enhanced\)|Retry Last Transcription|Cancel Recording|Reset to default|Middle-Click Recording|Activation Delay|ms)"' \
+  VoiceInk/Views/Settings/SettingsView.swift
+
+reject_pattern \
+  "macOS shortcut settings avoid shell-owned middle-click delay bounds" \
+  'formatter\.minimum = 0' \
   VoiceInk/Views/Settings/SettingsView.swift
 
 reject_pattern \
@@ -9349,6 +9384,11 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
+  "core tests pin middle-click delay normalization" \
+  'saveMiddleClickActivationDelay\(-1|middleClickActivationDelay: -1' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/UserDefaultsPreferencesTests.swift
+
+require_pattern \
   "core checks execute shortcut backup export policy tests" \
   'UserDefaultsPreferencesTests\.testShortcutBackupPolicyExportsGeneralShortcutsInStableOrder' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
@@ -9395,7 +9435,7 @@ require_pattern \
 
 require_pattern \
   "migration checklist tracks shared recording shortcut preference gate" \
-  'macOS recording shortcut action identifiers, action display names, validation and monitor notification copy, mini-recorder escape confirmation copy, selection/mode migration plans, legacy shortcut key names, raw shortcut storage, middle-click, special empty-tap preferences, settings labels/help, shortcut recorder labels, backup import/export value planning, general-backup shortcut action ordering, and recording-shortcut selection repair when importing backed-up shortcut records route through `VoiceInkShortcutActionIdentifier`/`VoiceInkShortcutActionPresentation`/`VoiceInkShortcutValidationPresentation`/`VoiceInkMacOSShortcutNotificationPresentation`/`VoiceInkLegacyRecordingShortcutPreset`/`VoiceInkRecordingShortcutSelection`/`VoiceInkRecordingShortcutMode`/`VoiceInkRecordingShortcutPreference`/`VoiceInkShortcutStoragePreference`/`VoiceInkShortcutBackupPolicy`' \
+  'macOS recording shortcut action identifiers, action display names, validation and monitor notification copy, mini-recorder escape confirmation copy, selection/mode migration plans, legacy shortcut key names, raw shortcut storage, middle-click enablement and activation-delay normalization, special empty-tap preferences, settings labels/help, shortcut recorder labels, backup import/export value planning, general-backup shortcut action ordering, and recording-shortcut selection repair when importing backed-up shortcut records route through `VoiceInkShortcutActionIdentifier`/`VoiceInkShortcutActionPresentation`/`VoiceInkShortcutValidationPresentation`/`VoiceInkMacOSShortcutNotificationPresentation`/`VoiceInkLegacyRecordingShortcutPreset`/`VoiceInkRecordingShortcutSelection`/`VoiceInkRecordingShortcutMode`/`VoiceInkRecordingShortcutPreference`/`VoiceInkShortcutStoragePreference`/`VoiceInkShortcutBackupPolicy`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

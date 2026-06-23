@@ -1,5 +1,39 @@
 import Foundation
 
+public protocol VoiceInkDictionaryDraftRuntimeSubmission {
+    associatedtype Plan
+    associatedtype DraftState
+
+    var plan: Plan { get }
+    var draftStateAfterSubmit: DraftState { get }
+    var alertPresentation: VoiceInkDictionaryAlertPresentation? { get }
+}
+
+public extension VoiceInkDictionaryDraftRuntimeSubmission {
+    @discardableResult
+    func applyRuntimeState(
+        applyPlan: (Plan) -> Void,
+        setDraftState: (DraftState) -> Void,
+        setAlertPresentation: (VoiceInkDictionaryAlertPresentation?) -> Void
+    ) -> Self {
+        applyPlan(plan)
+        return applyRuntimeState(
+            setDraftState: setDraftState,
+            setAlertPresentation: setAlertPresentation
+        )
+    }
+
+    @discardableResult
+    func applyRuntimeState(
+        setDraftState: (DraftState) -> Void,
+        setAlertPresentation: (VoiceInkDictionaryAlertPresentation?) -> Void
+    ) -> Self {
+        setDraftState(draftStateAfterSubmit)
+        setAlertPresentation(alertPresentation)
+        return self
+    }
+}
+
 public struct VoiceInkVocabularySubmissionPlan: Equatable, Sendable {
     public let wordsToInsert: [String]
     public let draftAfterSubmit: String
@@ -34,7 +68,7 @@ public struct VoiceInkVocabularySubmissionPlan: Equatable, Sendable {
     }
 }
 
-public struct VoiceInkVocabularyDraftSubmission: Equatable, Sendable {
+public struct VoiceInkVocabularyDraftSubmission: Equatable, Sendable, VoiceInkDictionaryDraftRuntimeSubmission {
     public let submittedDraft: String
     public let plan: VoiceInkVocabularySubmissionPlan
     public let draftStateAfterSubmit: VoiceInkVocabularyDraftState
@@ -130,7 +164,7 @@ public struct VoiceInkWordReplacementSubmissionPlan: Equatable, Sendable {
     }
 }
 
-public struct VoiceInkWordReplacementDraftSubmission: Equatable, Sendable {
+public struct VoiceInkWordReplacementDraftSubmission: Equatable, Sendable, VoiceInkDictionaryDraftRuntimeSubmission {
     public let submittedOriginal: String
     public let submittedReplacement: String
     public let plan: VoiceInkWordReplacementSubmissionPlan

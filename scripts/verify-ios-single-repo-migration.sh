@@ -5981,6 +5981,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/FillerWords.swift
 
 require_pattern \
+  "shared dictionary draft submissions own runtime state application" \
+  'VoiceInkDictionaryDraftRuntimeSubmission|func applyRuntimeState\(' \
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
+
+require_pattern \
   "shared filler-word draft state owns submit availability" \
   'public var canSubmit: Bool' \
   VoiceInkCore/Sources/VoiceInkCore/FillerWords.swift
@@ -6024,12 +6029,12 @@ reject_pattern \
 
 require_pattern \
   "macOS filler-word view consumes shared draft state submission result" \
-  'VoiceInkFillerWordDraftState|draftState\.submitting|draftStateAfterSubmit|alertPresentation' \
+  'VoiceInkFillerWordDraftState|draftState\.submitting|applyRuntimeState' \
   VoiceInk/Views/Components/FillerWordsSettingsView.swift
 
 require_pattern \
   "iOS filler-word view consumes shared draft state submission result" \
-  'VoiceInkFillerWordDraftState|fillerWordDraftState\.submitting|draftStateAfterSubmit|alertPresentation' \
+  'VoiceInkFillerWordDraftState|fillerWordDraftState\.submitting|applyRuntimeState' \
   iOS/VoiceInk-ios/SettingsView.swift
 
 reject_pattern \
@@ -6684,7 +6689,7 @@ require_pattern \
 
 require_pattern \
   "macOS vocabulary view consumes shared draft state submission result" \
-  'VoiceInkVocabularyDraftState|vocabularyDraftState\.submitting|draftStateAfterSubmit|alertPresentation = appliedSubmission\.alertPresentation' \
+  'VoiceInkVocabularyDraftState|vocabularyDraftState\.submitting|applyRuntimeState' \
   VoiceInk/Views/Dictionary/VocabularyView.swift
 
 reject_pattern \
@@ -6700,7 +6705,7 @@ require_pattern \
 
 require_pattern \
   "macOS word-replacement view consumes shared draft state submission result" \
-  'VoiceInkWordReplacementDraftState|wordReplacementDraftState\.submitting|draftStateAfterSubmit|alertPresentation = appliedSubmission\.alertPresentation' \
+  'VoiceInkWordReplacementDraftState|wordReplacementDraftState\.submitting|applyRuntimeState' \
   VoiceInk/Views/Dictionary/WordReplacementView.swift
 
 reject_pattern \
@@ -6722,6 +6727,14 @@ reject_pattern \
 reject_pattern \
   "iOS dictionary settings avoids shell-owned draft submit guards" \
   'guard +wordReplacementDraftState\.canSubmit' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
+reject_pattern \
+  "settings views avoid shell-owned submission state choreography" \
+  '(draftState|fillerWordDraftState|customVocabularyDraftState|wordReplacementDraftState|alertPresentation|dictionaryAlert) = (submission|appliedSubmission)\.(draftStateAfterSubmit|alertPresentation)' \
+  VoiceInk/Views/Components/FillerWordsSettingsView.swift \
+  VoiceInk/Views/Dictionary/VocabularyView.swift \
+  VoiceInk/Views/Dictionary/WordReplacementView.swift \
   iOS/VoiceInk-ios/SettingsView.swift
 
 reject_pattern \

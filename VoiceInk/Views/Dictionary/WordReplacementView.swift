@@ -168,12 +168,14 @@ struct WordReplacementView: View {
         let submission = wordReplacementDraftState.submitting(
             existingRules: wordReplacements.map(\.voiceInkRule)
         )
-        let appliedSubmission = DictionaryService.applyWordReplacementSubmission(
+        DictionaryService.applyWordReplacementSubmission(
             submission,
             context: modelContext
         )
-        wordReplacementDraftState = appliedSubmission.draftStateAfterSubmit
-        alertPresentation = appliedSubmission.alertPresentation
+        .applyRuntimeState(
+            setDraftState: { wordReplacementDraftState = $0 },
+            setAlertPresentation: { alertPresentation = $0 }
+        )
     }
 
     private func removeReplacement(_ replacement: WordReplacement) {

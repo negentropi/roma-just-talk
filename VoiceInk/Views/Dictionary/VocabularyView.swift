@@ -107,12 +107,14 @@ struct VocabularyView: View {
         let submission = vocabularyDraftState.submitting(
             existingWords: vocabularyWords.map(\.word)
         )
-        let appliedSubmission = DictionaryService.applyVocabularySubmission(
+        DictionaryService.applyVocabularySubmission(
             submission,
             context: modelContext
         )
-        vocabularyDraftState = appliedSubmission.draftStateAfterSubmit
-        alertPresentation = appliedSubmission.alertPresentation
+        .applyRuntimeState(
+            setDraftState: { vocabularyDraftState = $0 },
+            setAlertPresentation: { alertPresentation = $0 }
+        )
     }
 
     private func removeWord(_ word: VocabularyWord) {

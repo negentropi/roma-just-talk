@@ -123,6 +123,36 @@ final class FillerWordsTests: XCTestCase {
         )
     }
 
+    func testDraftSubmissionAppliesRuntimeStateAfterStoragePlan() {
+        let submission = VoiceInkFillerWordDraftState(draft: "LIKE")
+            .submitting(existingWords: ["um"])
+        var events = [String]()
+        var appliedPlan: VoiceInkFillerWordSubmissionPlan?
+        var draftState = VoiceInkFillerWordDraftState(draft: "LIKE")
+        var alertPresentation: VoiceInkDictionaryAlertPresentation? = .vocabulary(message: "stale")
+
+        let returnedSubmission = submission.applyRuntimeState(
+            applyPlan: {
+                events.append("plan")
+                appliedPlan = $0
+            },
+            setDraftState: {
+                events.append("draft")
+                draftState = $0
+            },
+            setAlertPresentation: {
+                events.append("alert")
+                alertPresentation = $0
+            }
+        )
+
+        XCTAssertEqual(returnedSubmission, submission)
+        XCTAssertEqual(events, ["plan", "draft", "alert"])
+        XCTAssertEqual(appliedPlan, submission.plan)
+        XCTAssertEqual(draftState, VoiceInkFillerWordDraftState())
+        XCTAssertNil(alertPresentation)
+    }
+
     func testRemovingDropsWordsCaseInsensitively() {
         XCTAssertEqual(
             VoiceInkFillerWords.removing("UM", from: ["uh", "um", "like"]),

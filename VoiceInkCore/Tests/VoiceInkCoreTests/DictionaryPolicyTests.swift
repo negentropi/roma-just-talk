@@ -389,6 +389,22 @@ final class DictionaryPolicyTests: XCTestCase {
         )
     }
 
+    func testVocabularyDraftSubmissionAppliesRuntimeState() {
+        let submission = VoiceInkVocabularyDraftState(draft: "Voice Ink")
+            .submitting(existingWords: [])
+        var draftState = VoiceInkVocabularyDraftState(draft: "Voice Ink")
+        var alertPresentation: VoiceInkDictionaryAlertPresentation? = .vocabulary(message: "stale")
+
+        let returnedSubmission = submission.applyRuntimeState(
+            setDraftState: { draftState = $0 },
+            setAlertPresentation: { alertPresentation = $0 }
+        )
+
+        XCTAssertEqual(returnedSubmission, submission)
+        XCTAssertEqual(draftState, VoiceInkVocabularyDraftState())
+        XCTAssertNil(alertPresentation)
+    }
+
     func testVocabularySubmissionPlanKeepsBlankDraftWithoutAlert() {
         let plan = VoiceInkDictionaryPolicy.vocabularySubmissionPlan(
             input: " , \n ",
@@ -657,6 +673,31 @@ final class DictionaryPolicyTests: XCTestCase {
         XCTAssertNil(submission.plan.ruleToInsert)
         XCTAssertEqual(
             submission.alertPresentation,
+            .wordReplacement(message: "'Roma' already exists in word replacements")
+        )
+    }
+
+    func testWordReplacementDraftSubmissionAppliesRuntimeState() {
+        let submission = VoiceInkWordReplacementDraftState(
+            original: "Roma",
+            replacement: "Roma Just Talk"
+        )
+        .submitting(existingOriginalTexts: ["roma"])
+        var draftState = VoiceInkWordReplacementDraftState()
+        var alertPresentation: VoiceInkDictionaryAlertPresentation?
+
+        let returnedSubmission = submission.applyRuntimeState(
+            setDraftState: { draftState = $0 },
+            setAlertPresentation: { alertPresentation = $0 }
+        )
+
+        XCTAssertEqual(returnedSubmission, submission)
+        XCTAssertEqual(
+            draftState,
+            VoiceInkWordReplacementDraftState(original: "Roma", replacement: "Roma Just Talk")
+        )
+        XCTAssertEqual(
+            alertPresentation,
             .wordReplacement(message: "'Roma' already exists in word replacements")
         )
     }

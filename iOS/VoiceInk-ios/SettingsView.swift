@@ -221,26 +221,33 @@ struct SettingsView: View {
     }
 
     private func addFillerWord() {
-        let submission = fillerWordDraftState.submitting(existingWords: settings.fillerWords)
-        settings.applyFillerWordSubmissionPlan(submission.plan)
-        fillerWordDraftState = submission.draftStateAfterSubmit
-        dictionaryAlert = submission.alertPresentation
+        fillerWordDraftState
+            .submitting(existingWords: settings.fillerWords)
+            .applyRuntimeState(
+                applyPlan: { settings.applyFillerWordSubmissionPlan($0) },
+                setDraftState: { fillerWordDraftState = $0 },
+                setAlertPresentation: { dictionaryAlert = $0 }
+            )
     }
 
     private func addCustomVocabularyTerm() {
-        let submission = customVocabularyDraftState.submitting(existingWords: settings.customVocabularyTerms)
-        settings.applyCustomVocabularySubmissionPlan(submission.plan)
-        customVocabularyDraftState = submission.draftStateAfterSubmit
-        dictionaryAlert = submission.alertPresentation
+        customVocabularyDraftState
+            .submitting(existingWords: settings.customVocabularyTerms)
+            .applyRuntimeState(
+                applyPlan: { settings.applyCustomVocabularySubmissionPlan($0) },
+                setDraftState: { customVocabularyDraftState = $0 },
+                setAlertPresentation: { dictionaryAlert = $0 }
+            )
     }
 
     private func submitWordReplacement() {
-        let submission = wordReplacementDraftState.submitting(
-            existingRules: settings.wordReplacements
-        )
-        settings.applyWordReplacementSubmissionPlan(submission.plan)
-        wordReplacementDraftState = submission.draftStateAfterSubmit
-        dictionaryAlert = submission.alertPresentation
+        wordReplacementDraftState
+            .submitting(existingRules: settings.wordReplacements)
+            .applyRuntimeState(
+                applyPlan: { settings.applyWordReplacementSubmissionPlan($0) },
+                setDraftState: { wordReplacementDraftState = $0 },
+                setAlertPresentation: { dictionaryAlert = $0 }
+            )
     }
 
     private func deleteCustomVocabularyTerms(at offsets: IndexSet) {

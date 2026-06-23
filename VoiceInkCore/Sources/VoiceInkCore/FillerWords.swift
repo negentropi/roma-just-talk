@@ -23,7 +23,7 @@ public struct VoiceInkFillerWordSubmissionPlan: Equatable, Sendable {
     }
 }
 
-public struct VoiceInkFillerWordDraftSubmission: Equatable, Sendable {
+public struct VoiceInkFillerWordDraftSubmission: Equatable, Sendable, VoiceInkDictionaryDraftRuntimeSubmission {
     public let plan: VoiceInkFillerWordSubmissionPlan
     public let draftStateAfterSubmit: VoiceInkFillerWordDraftState
 

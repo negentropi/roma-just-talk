@@ -108,9 +108,12 @@ struct FillerWordsSettingsView: View {
     }
 
     private func addWord() {
-        let submission = draftState.submitting(existingWords: fillerWordManager.fillerWords)
-        fillerWordManager.applySubmissionPlan(submission.plan)
-        draftState = submission.draftStateAfterSubmit
-        alertPresentation = submission.alertPresentation
+        draftState
+            .submitting(existingWords: fillerWordManager.fillerWords)
+            .applyRuntimeState(
+                applyPlan: { fillerWordManager.applySubmissionPlan($0) },
+                setDraftState: { draftState = $0 },
+                setAlertPresentation: { alertPresentation = $0 }
+            )
     }
 }

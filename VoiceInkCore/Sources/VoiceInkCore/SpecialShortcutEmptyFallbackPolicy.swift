@@ -24,6 +24,14 @@ public enum VoiceInkSpecialShortcutKeyEvidencePolicy {
     }
 }
 
+public enum VoiceInkShortcutInterruptionPolicy {
+    public static let interruptionWindow: TimeInterval = 1.0
+
+    public static func isWithinInterruptionWindow(pressedAt: TimeInterval, eventTime: TimeInterval) -> Bool {
+        eventTime - pressedAt <= interruptionWindow
+    }
+}
+
 public enum VoiceInkRecordingShortcutTimingPolicy {
     public static let pressCooldown: TimeInterval = 0.08
     public static let hybridPushToTalkThreshold: TimeInterval = 0.5

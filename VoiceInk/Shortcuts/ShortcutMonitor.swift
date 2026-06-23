@@ -129,7 +129,6 @@ final class ShortcutMonitor {
     private static var accessibilityClient = AccessibilityPermission.systemClient
     private static var secureEventInputClient = SecureEventInputState.systemClient
     private static var keyboardStateClient = KeyboardState.systemClient
-    private static let shortcutInterruptionWindow: TimeInterval = 1.0
     private static let nonModifierKeyCodes = (0...127)
         .map(UInt16.init)
         .filter { !Shortcut.isModifierKeyCode($0) }
@@ -685,7 +684,10 @@ final class ShortcutMonitor {
                   state.isDown,
                   !state.isInterrupted,
                   let pressedAt = state.pressedAt,
-                  eventTime - pressedAt <= Self.shortcutInterruptionWindow,
+                  VoiceInkShortcutInterruptionPolicy.isWithinInterruptionWindow(
+                    pressedAt: pressedAt,
+                    eventTime: eventTime
+                  ),
                   state.shortcut.isInterruptedByAdditionalKeyDown(keyCode: keyCode)
             else {
                 continue

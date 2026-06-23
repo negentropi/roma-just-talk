@@ -50,6 +50,29 @@ final class AudioSessionManager: ObservableObject {
             throw error
         }
     }
+
+    /// Activates audio session for note playback and cancels stale recording cleanup.
+    func activateSessionForPlayback() throws {
+        let audioSession = AVAudioSession.sharedInstance()
+        let configuration = VoiceInkIOSAudioPlaybackSessionConfiguration.notePlayback
+
+        cancelScheduledDeactivation()
+
+        if lifecycleState.isSessionActive {
+            try audioSession.setActive(false, options: .notifyOthersOnDeactivation)
+            lifecycleState.markDeactivated()
+        }
+
+        try audioSession.setCategory(
+            configuration.category.avCategory,
+            mode: configuration.mode.avMode
+        )
+
+        try audioSession.setActive(true)
+        lifecycleState.markActivatedForPlayback()
+
+        VoiceInkIOSLogger.audioSession.notice("\(VoiceInkAudioSessionDiagnostics.activatedForPlaybackMessage, privacy: .public)")
+    }
     
     /// Schedules session deactivation after configured timeout
     func scheduleDeactivation() {
@@ -155,6 +178,15 @@ extension VoiceInkIOSAudioPlaybackSessionConfiguration.Category {
         switch self {
         case .playback:
             return .playback
+        }
+    }
+}
+
+extension VoiceInkIOSAudioPlaybackSessionConfiguration.Mode {
+    var avMode: AVAudioSession.Mode {
+        switch self {
+        case .spokenAudio:
+            return .spokenAudio
         }
     }
 }

@@ -9022,6 +9022,8 @@ require_patterns \
   VoiceInkCore/Sources/VoiceInkCore/SpecialShortcutEmptyFallbackPolicy.swift \
   'VoiceInkShortcutPressContext' \
   'VoiceInkSpecialShortcutKeyEvidencePolicy' \
+  'VoiceInkShortcutInterruptionPolicy' \
+  'interruptionWindow: TimeInterval = 1\.0' \
   'VoiceInkRecordingShortcutTimingPolicy' \
   'pressCooldown: TimeInterval = 0\.08' \
   'hybridPushToTalkThreshold: TimeInterval = 0\.5' \
@@ -9029,6 +9031,16 @@ require_patterns \
   'shouldStopHybridRecording' \
   'sleepNanoseconds' \
   'VoiceInkSpecialShortcutEmptyFallbackPolicy'
+
+require_pattern \
+  "macOS shortcut monitor delegates interruption timing to shared policy" \
+  'VoiceInkShortcutInterruptionPolicy\.isWithinInterruptionWindow' \
+  VoiceInk/Shortcuts/ShortcutMonitor.swift
+
+reject_pattern \
+  "macOS shortcut monitor avoids shell-owned interruption timing policy" \
+  'shortcutInterruptionWindow|eventTime - pressedAt <=|interruptionWindow' \
+  VoiceInk/Shortcuts/ShortcutMonitor.swift
 
 require_patterns \
   "macOS recording shortcut mode handler delegates timing to shared policy" \
@@ -9048,8 +9060,13 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
+  "core checks execute shared shortcut interruption policy tests" \
+  'SpecialShortcutKeyEvidencePolicyTests\.testShortcutInterruptionPolicyPreservesMacOSWindow' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "migration docs track shared recording shortcut timing policy" \
-  'recording shortcut mode handling delegates cooldown, hybrid push-to-talk threshold, and hold-delay sleep conversion to `VoiceInkRecordingShortcutTimingPolicy`' \
+  'shortcut interruption timing to `VoiceInkShortcutInterruptionPolicy`.*recording shortcut mode handling delegates cooldown, hybrid push-to-talk threshold, and hold-delay sleep conversion to `VoiceInkRecordingShortcutTimingPolicy`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \
@@ -9881,7 +9898,8 @@ require_patterns \
   VoiceInkCore/Sources/VoiceInkCore/IOSAudioConfiguration.swift \
   'VoiceInkIOSAudioPlaybackSessionConfiguration' \
   'notePlayback' \
-  'playback'
+  'playback' \
+  'spokenAudio'
 
 require_pattern \
   "shared audio playback timeline owns update cadence" \
@@ -9930,15 +9948,19 @@ require_pattern \
   iOS/VoiceInk-ios/AudioPlayer.swift
 
 require_patterns \
-  "iOS audio player adapts shared playback session configuration" \
+  "iOS audio player delegates playback session activation" \
   iOS/VoiceInk-ios/AudioPlayer.swift \
-  'VoiceInkIOSAudioPlaybackSessionConfiguration\.notePlayback' \
-  'sessionConfiguration\.category\.avCategory'
+  'sessionManager\.activateSessionForPlayback' \
+  'sessionManager\.scheduleDeactivation'
 
-require_pattern \
+require_patterns \
   "iOS audio-session manager centralizes playback session AVFoundation adapter" \
+  iOS/VoiceInk-ios/AudioSessionManager.swift \
+  'VoiceInkIOSAudioPlaybackSessionConfiguration\.notePlayback' \
+  'configuration\.category\.avCategory' \
+  'configuration\.mode\.avMode' \
   'extension VoiceInkIOSAudioPlaybackSessionConfiguration\.Category' \
-  iOS/VoiceInk-ios/AudioSessionManager.swift
+  'extension VoiceInkIOSAudioPlaybackSessionConfiguration\.Mode'
 
 reject_pattern \
   "iOS audio player avoids local playback session AVFoundation adapter" \
@@ -9978,6 +10000,11 @@ require_pattern \
 require_pattern \
   "core checks execute iOS audio playback session configuration tests" \
   'AudioPlaybackTimelineTests\.testIOSAudioPlaybackSessionConfigurationPreservesPlaybackPolicy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute iOS playback session lifecycle test" \
+  'AudioSessionLifecycleStateTests\.testAudioSessionLifecycleStateCancelsPendingDeactivationForPlayback' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -10037,7 +10064,7 @@ require_pattern \
 
 require_pattern \
   "migration docs track shared iOS playback session configuration" \
-  'VoiceInkIOSAudioPlaybackSessionConfiguration` for the iOS playback category policy' \
+  'VoiceInkIOSAudioPlaybackSessionConfiguration` for the iOS playback category/mode policy' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

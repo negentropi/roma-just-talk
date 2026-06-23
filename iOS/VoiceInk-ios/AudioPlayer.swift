@@ -16,6 +16,7 @@ final class AudioPlayer: ObservableObject {
     
     private var audioPlayer: AVAudioPlayer?
     private var timer: Timer?
+    private let sessionManager = AudioSessionManager.shared
 
     private var playbackState: VoiceInkAudioPlaybackState {
         get {
@@ -64,11 +65,9 @@ final class AudioPlayer: ObservableObject {
     
     func play() {
         guard let player = audioPlayer else { return }
-        let sessionConfiguration = VoiceInkIOSAudioPlaybackSessionConfiguration.notePlayback
         
         do {
-            try AVAudioSession.sharedInstance().setCategory(sessionConfiguration.category.avCategory)
-            try AVAudioSession.sharedInstance().setActive(true)
+            try sessionManager.activateSessionForPlayback()
 
             player.rate = playbackRate
             player.play()
@@ -90,6 +89,7 @@ final class AudioPlayer: ObservableObject {
         audioPlayer?.currentTime = 0
         playbackState = playbackState.stopped()
         stopTimer()
+        sessionManager.scheduleDeactivation()
     }
     
     func seek(to time: TimeInterval) {
@@ -116,6 +116,7 @@ final class AudioPlayer: ObservableObject {
                 self.playbackState = self.playbackState.applyingTimerTickPlan(plan)
                 if plan.shouldStopTimer {
                     self.stopTimer()
+                    self.sessionManager.scheduleDeactivation()
                 }
             }
         }

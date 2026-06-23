@@ -5,7 +5,10 @@ final class AudioPlaybackTimelineTests: XCTestCase {
     func testIOSAudioPlaybackSessionConfigurationPreservesPlaybackPolicy() {
         XCTAssertEqual(
             VoiceInkIOSAudioPlaybackSessionConfiguration.notePlayback,
-            VoiceInkIOSAudioPlaybackSessionConfiguration(category: .playback)
+            VoiceInkIOSAudioPlaybackSessionConfiguration(
+                category: .playback,
+                mode: .spokenAudio
+            )
         )
     }
 

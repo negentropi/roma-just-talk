@@ -38,17 +38,24 @@ public struct VoiceInkIOSAudioPlaybackSessionConfiguration: Equatable, Sendable 
         case playback
     }
 
-    public let category: Category
-
-    public init(category: Category) {
-        self.category = category
+    public enum Mode: String, Equatable, Sendable {
+        case spokenAudio
     }
 
-    public static let notePlayback = Self(category: .playback)
+    public let category: Category
+    public let mode: Mode
+
+    public init(category: Category, mode: Mode) {
+        self.category = category
+        self.mode = mode
+    }
+
+    public static let notePlayback = Self(category: .playback, mode: .spokenAudio)
 }
 
 public enum VoiceInkAudioSessionDiagnostics {
     public static let activatedForRecordingMessage = "Audio session activated for recording"
+    public static let activatedForPlaybackMessage = "Audio session activated for playback"
     public static let deactivatedMessage = "Audio session deactivated"
 
     public static func activationFailedMessage(localizedDescription: String, code: Int) -> String {
@@ -77,6 +84,11 @@ public struct VoiceInkAudioSessionLifecycleState: Equatable, Sendable {
     }
 
     public mutating func markActivatedForRecording() {
+        isSessionActive = true
+        cancelScheduledDeactivation()
+    }
+
+    public mutating func markActivatedForPlayback() {
         isSessionActive = true
         cancelScheduledDeactivation()
     }

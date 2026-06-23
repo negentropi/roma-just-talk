@@ -19,6 +19,10 @@ final class AudioSessionLifecycleStateTests: XCTestCase {
             "Audio session activated for recording"
         )
         XCTAssertEqual(
+            VoiceInkAudioSessionDiagnostics.activatedForPlaybackMessage,
+            "Audio session activated for playback"
+        )
+        XCTAssertEqual(
             VoiceInkAudioSessionDiagnostics.activationFailedMessage(
                 localizedDescription: "denied",
                 code: 561_017_449
@@ -65,6 +69,18 @@ final class AudioSessionLifecycleStateTests: XCTestCase {
 
         state.markDeactivated()
         XCTAssertFalse(state.isSessionActive)
+        XCTAssertEqual(state.timeoutRemaining, 0)
+    }
+
+    func testAudioSessionLifecycleStateCancelsPendingDeactivationForPlayback() {
+        var state = VoiceInkAudioSessionLifecycleState(isSessionActive: true)
+
+        XCTAssertEqual(state.scheduleDeactivation(timeoutSeconds: 90), .delayed(90))
+        XCTAssertEqual(state.timeoutRemaining, 90)
+
+        state.markActivatedForPlayback()
+
+        XCTAssertTrue(state.isSessionActive)
         XCTAssertEqual(state.timeoutRemaining, 0)
     }
 

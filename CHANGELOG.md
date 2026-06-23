@@ -17,6 +17,7 @@
 - Stripped Codex follow-up JSON payloads from Local CLI enhancement output so transcript cleanup cannot paste assistant metadata into the target app.
 - Reworked Special shortcuts so Shift-down only arms the rolling-buffer commit path; Shift+typing, secure-input, and other unreliable key evidence now discard without starting audio, canceling, saving history, or writing recorder files.
 - Removed the unsafe Special Key Down and Special Flex settings that could start recording before the app knew whether the Shift press was just normal typing.
+- Fixed imported iOS note playback after recording so AirPods and other Bluetooth outputs keep a playback-owned audio session instead of being cut off by stale recording-session cleanup.
 
 ## v1.95 - 2026-06-17
 

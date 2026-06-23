@@ -12322,11 +12322,11 @@ require_pattern \
   'VoiceInkMacOSMainViewItem|case metrics|case transcribeAudio|case audioInput|case dictionary|title|systemImageName|defaultSelection|emptySelectionTitle|visibleItems\(powerModeEnabled: Bool\)|item\(forNavigationDestination destination: String\)' \
   VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift
 
-require_file VoiceInkCore/Sources/VoiceInkCore/SupportContactPolicy.swift
+reject_file VoiceInkCore/Sources/VoiceInkCore/SupportContactPolicy.swift
 
 require_patterns \
-  "shared support contact policy lives in VoiceInkCore" \
-  VoiceInkCore/Sources/VoiceInkCore/SupportContactPolicy.swift \
+  "shared support contact policy lives with app identity in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift \
   'VoiceInkSupportContactPolicy' \
   'emailAddress = "support@tryvoiceink\.com"' \
   'emailSubject = "VoiceInk Support Request"' \

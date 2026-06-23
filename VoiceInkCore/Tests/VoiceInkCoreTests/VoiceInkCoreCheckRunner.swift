@@ -146,6 +146,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "CompletedTranscriptionDraftTests.testAudioFileTranscriptionCompletionMapsEnhancementFailureToDraftAndReason", run: { await CompletedTranscriptionDraftTests().testAudioFileTranscriptionCompletionMapsEnhancementFailureToDraftAndReason() }),
             VoiceInkCoreCheck(name: "CompletedTranscriptionDraftTests.testRecordingPendingDraftBuildsSharedPendingRow", run: { CompletedTranscriptionDraftTests().testRecordingPendingDraftBuildsSharedPendingRow() }),
             VoiceInkCoreCheck(name: "CompletedTranscriptionDraftTests.testRecordingCanceledDraftUsesSharedCanceledText", run: { CompletedTranscriptionDraftTests().testRecordingCanceledDraftUsesSharedCanceledText() }),
+            VoiceInkCoreCheck(name: "AIEnhancementRetryPolicyTests.testDefaultRetryStatePreservesMacOSAttemptAndDelayDefaults", run: { AIEnhancementRetryPolicyTests().testDefaultRetryStatePreservesMacOSAttemptAndDelayDefaults() }),
             VoiceInkCoreCheck(name: "AIEnhancementRetryPolicyTests.testBackoffFailuresRetryUntilAttemptLimit", run: { AIEnhancementRetryPolicyTests().testBackoffFailuresRetryUntilAttemptLimit() }),
             VoiceInkCoreCheck(name: "AIEnhancementRetryPolicyTests.testTimeoutRetriesImmediatelyWhenEnabled", run: { AIEnhancementRetryPolicyTests().testTimeoutRetriesImmediatelyWhenEnabled() }),
             VoiceInkCoreCheck(name: "AIEnhancementRetryPolicyTests.testTimeoutFailsImmediatelyWhenDisabled", run: { AIEnhancementRetryPolicyTests().testTimeoutFailsImmediatelyWhenDisabled() }),

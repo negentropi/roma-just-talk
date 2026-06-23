@@ -255,10 +255,8 @@ class AIEnhancementService: ObservableObject {
         }
     }
 
-    private func makeRequestWithRetry(text: String, maxRetries: Int = 3, initialDelay: TimeInterval = 1.0) async throws -> String {
+    private func makeRequestWithRetry(text: String) async throws -> String {
         var retryState = VoiceInkAIEnhancementRetryState(
-            maxAttempts: maxRetries,
-            initialDelay: initialDelay,
             retryOnTimeout: VoiceInkAIEnhancementRequestPreference.shouldRetryOnTimeout()
         )
 

@@ -8106,6 +8106,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AIEnhancementRetryPolicy.swift
 
 require_pattern \
+  "core checks execute AI enhancement retry default policy test" \
+  'AIEnhancementRetryPolicyTests\.testDefaultRetryStatePreservesMacOSAttemptAndDelayDefaults' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "shared AI enhancement retry-failure presentation lives in VoiceInkCore" \
   'VoiceInkAIEnhancementRetryFailurePresentation|diagnosticMessage' \
   VoiceInkCore/Sources/VoiceInkCore/AIEnhancementRetryPolicy.swift
@@ -8171,6 +8176,11 @@ require_pattern \
 require_pattern \
   "macOS AI enhancement service uses shared non-enhancement error retry plan" \
   'recordNonEnhancementError|retryPlan\.decision|retryPlan\.isTransportNetworkFailure' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+reject_pattern \
+  "macOS AI enhancement service avoids duplicate retry attempt and delay defaults" \
+  'maxRetries|initialDelay' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
 require_pattern \

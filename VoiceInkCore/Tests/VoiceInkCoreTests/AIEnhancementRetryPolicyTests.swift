@@ -2,6 +2,18 @@ import Foundation
 @testable import VoiceInkCore
 
 final class AIEnhancementRetryPolicyTests: XCTestCase {
+    func testDefaultRetryStatePreservesMacOSAttemptAndDelayDefaults() {
+        var state = VoiceInkAIEnhancementRetryState()
+
+        XCTAssertEqual(state.maxAttempts, 3)
+        XCTAssertTrue(state.retryOnTimeout)
+        XCTAssertEqual(state.failedAttempts, 0)
+        XCTAssertEqual(state.nextDelay, 1)
+        XCTAssertEqual(state.recordFailure(.networkError), .retryAfterDelay(1))
+        XCTAssertEqual(state.recordFailure(.serverError), .retryAfterDelay(2))
+        XCTAssertEqual(state.recordFailure(.rateLimitExceeded), .fail(.rateLimitExceeded))
+    }
+
     func testBackoffFailuresRetryUntilAttemptLimit() {
         var state = VoiceInkAIEnhancementRetryState(
             maxAttempts: 3,

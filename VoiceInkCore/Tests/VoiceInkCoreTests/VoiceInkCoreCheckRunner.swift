@@ -65,6 +65,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "AppDataResetTests.testResetFilePlanRemovesDirectoriesAndEmptiesCacheDirectoriesBestEffort", run: { try AppDataResetTests().testResetFilePlanRemovesDirectoriesAndEmptiesCacheDirectoriesBestEffort() }),
             VoiceInkCoreCheck(name: "AppDataResetTests.testAppDataResetDiagnosticsPreserveIOSLogCopy", run: { AppDataResetTests().testAppDataResetDiagnosticsPreserveIOSLogCopy() }),
             VoiceInkCoreCheck(name: "OnboardingPresentationTests.testIOSOnboardingAppIconFallbackPreservesSymbolName", run: { OnboardingPresentationTests().testIOSOnboardingAppIconFallbackPreservesSymbolName() }),
+            VoiceInkCoreCheck(name: "OnboardingPresentationTests.testIOSAppIconPolicyExtractsBundleIconFilesFromInfoDictionary", run: { OnboardingPresentationTests().testIOSAppIconPolicyExtractsBundleIconFilesFromInfoDictionary() }),
             VoiceInkCoreCheck(name: "OnboardingPresentationTests.testIOSAppIconPolicyUsesLoadableLastBundleIcon", run: { OnboardingPresentationTests().testIOSAppIconPolicyUsesLoadableLastBundleIcon() }),
             VoiceInkCoreCheck(name: "OnboardingPresentationTests.testIOSAppIconPolicyFallsBackWhenLastBundleIconIsMissing", run: { OnboardingPresentationTests().testIOSAppIconPolicyFallsBackWhenLastBundleIconIsMissing() }),
             VoiceInkCoreCheck(name: "OnboardingPresentationTests.testIOSAppIconPolicyFallsBackWithoutBundleIconFiles", run: { OnboardingPresentationTests().testIOSAppIconPolicyFallsBackWithoutBundleIconFiles() }),

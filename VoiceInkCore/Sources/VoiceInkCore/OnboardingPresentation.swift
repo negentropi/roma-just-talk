@@ -464,6 +464,19 @@ public enum VoiceInkIOSAppIconSource: Equatable, Sendable {
 }
 
 public enum VoiceInkIOSAppIconPolicy {
+    private static let bundleIconsKey = "CFBundleIcons"
+    private static let bundlePrimaryIconKey = "CFBundlePrimaryIcon"
+    private static let bundleIconFilesKey = "CFBundleIconFiles"
+
+    public static func bundleIconFiles(from infoDictionary: [String: Any]?) -> [String]? {
+        guard let iconsDictionary = infoDictionary?[bundleIconsKey] as? [String: Any],
+              let primaryIconsDictionary = iconsDictionary[bundlePrimaryIconKey] as? [String: Any] else {
+            return nil
+        }
+
+        return primaryIconsDictionary[bundleIconFilesKey] as? [String]
+    }
+
     public static func source(
         iconFiles: [String]?,
         canLoadImageNamed: (String) -> Bool

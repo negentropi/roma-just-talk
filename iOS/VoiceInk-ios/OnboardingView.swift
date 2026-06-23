@@ -381,7 +381,7 @@ struct HowItWorksStep: View {
 
 struct AppIconView: View {
     var body: some View {
-        let iconFiles = bundleAppIconFiles()
+        let iconFiles = VoiceInkIOSAppIconPolicy.bundleIconFiles(from: Bundle.main.infoDictionary)
         let iconSource = VoiceInkIOSAppIconPolicy.source(
             iconFiles: iconFiles,
             canLoadImageNamed: { UIImage(named: $0) != nil }
@@ -400,15 +400,6 @@ struct AppIconView: View {
         case .fallbackSystemImageName(let systemImageName):
             fallbackIcon(systemImageName)
         }
-    }
-
-    private func bundleAppIconFiles() -> [String]? {
-        guard let iconsDictionary = Bundle.main.infoDictionary?["CFBundleIcons"] as? [String: Any],
-              let primaryIconsDictionary = iconsDictionary["CFBundlePrimaryIcon"] as? [String: Any] else {
-            return nil
-        }
-
-        return primaryIconsDictionary["CFBundleIconFiles"] as? [String]
     }
 
     private func fallbackIcon(_ systemImageName: String) -> some View {

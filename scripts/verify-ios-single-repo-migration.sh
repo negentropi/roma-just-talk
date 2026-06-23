@@ -4154,12 +4154,12 @@ reject_pattern \
 
 require_pattern \
   "shared iOS onboarding presentation lives in VoiceInkCore" \
-  'VoiceInkIOSOnboardingStep|VoiceInkIOSOnboardingPresentation|VoiceInkOnboardingFeaturePresentation|VoiceInkOnboardingStepPresentation|VoiceInkIOSAppIconSource|VoiceInkIOSAppIconPolicy|appIconFallbackSystemImageName' \
+  'VoiceInkIOSOnboardingStep|VoiceInkIOSOnboardingPresentation|VoiceInkOnboardingFeaturePresentation|VoiceInkOnboardingStepPresentation|VoiceInkIOSAppIconSource|VoiceInkIOSAppIconPolicy|appIconFallbackSystemImageName|bundleIconFiles\(from infoDictionary:' \
   VoiceInkCore/Sources/VoiceInkCore/OnboardingPresentation.swift
 
 require_pattern \
   "iOS onboarding uses shared onboarding presentation" \
-  'VoiceInkIOSOnboardingPresentation\.(appIconFallbackSystemImageName|welcome|modelDownload|ready)|VoiceInkIOSAppIconPolicy\.source' \
+  'VoiceInkIOSOnboardingPresentation\.(appIconFallbackSystemImageName|welcome|modelDownload|ready)|VoiceInkIOSAppIconPolicy\.(bundleIconFiles|source)' \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 require_pattern \
@@ -4179,7 +4179,7 @@ reject_pattern \
 
 reject_pattern \
   "iOS onboarding avoids shell-owned app icon source decision" \
-  'let +lastIcon += +iconFiles\.last|UIImage\(named: +lastIcon\)' \
+  'let +lastIcon += +iconFiles\.last|UIImage\(named: +lastIcon\)|CFBundle(Icons|PrimaryIcon|IconFiles)' \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 reject_pattern \
@@ -4289,12 +4289,12 @@ require_pattern \
 
 require_pattern \
   "core tests pin iOS app icon source policy" \
-  'testIOSAppIconPolicyUsesLoadableLastBundleIcon|testIOSAppIconPolicyFallsBackWhenLastBundleIconIsMissing|testIOSAppIconPolicyFallsBackWithoutBundleIconFiles' \
+  'testIOSAppIconPolicyExtractsBundleIconFilesFromInfoDictionary|testIOSAppIconPolicyUsesLoadableLastBundleIcon|testIOSAppIconPolicyFallsBackWhenLastBundleIconIsMissing|testIOSAppIconPolicyFallsBackWithoutBundleIconFiles' \
   VoiceInkCore/Tests/VoiceInkCoreTests/OnboardingPresentationTests.swift
 
 require_pattern \
   "core check runner executes iOS app icon source policy tests" \
-  'testIOSAppIconPolicyUsesLoadableLastBundleIcon|testIOSAppIconPolicyFallsBackWhenLastBundleIconIsMissing|testIOSAppIconPolicyFallsBackWithoutBundleIconFiles' \
+  'testIOSAppIconPolicyExtractsBundleIconFilesFromInfoDictionary|testIOSAppIconPolicyUsesLoadableLastBundleIcon|testIOSAppIconPolicyFallsBackWhenLastBundleIconIsMissing|testIOSAppIconPolicyFallsBackWithoutBundleIconFiles' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \

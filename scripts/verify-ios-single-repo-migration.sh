@@ -8977,7 +8977,35 @@ require_patterns \
   VoiceInkCore/Sources/VoiceInkCore/SpecialShortcutEmptyFallbackPolicy.swift \
   'VoiceInkShortcutPressContext' \
   'VoiceInkSpecialShortcutKeyEvidencePolicy' \
+  'VoiceInkRecordingShortcutTimingPolicy' \
+  'pressCooldown: TimeInterval = 0\.08' \
+  'hybridPushToTalkThreshold: TimeInterval = 0\.5' \
+  'isPressWithinCooldown' \
+  'shouldStopHybridRecording' \
+  'sleepNanoseconds' \
   'VoiceInkSpecialShortcutEmptyFallbackPolicy'
+
+require_patterns \
+  "macOS recording shortcut mode handler delegates timing to shared policy" \
+  VoiceInk/Shortcuts/RecordingShortcutManager.swift \
+  'VoiceInkRecordingShortcutTimingPolicy\.isPressWithinCooldown' \
+  'VoiceInkRecordingShortcutTimingPolicy\.shouldStopHybridRecording' \
+  'VoiceInkRecordingShortcutTimingPolicy\.sleepNanoseconds'
+
+reject_pattern \
+  "macOS recording shortcut mode handler avoids shell-owned timing constants" \
+  'shortcutPressCooldown|hybridPressThreshold|1_000_000_000|pressDuration >=|Date\(\)\.timeIntervalSince\(lastTrigger\)' \
+  VoiceInk/Shortcuts/RecordingShortcutManager.swift
+
+require_pattern \
+  "core checks execute shared recording shortcut timing policy tests" \
+  'SpecialShortcutEmptyFallbackPolicyTests\.testRecordingShortcutTimingPolicy(PreservesMacOSThresholds|DetectsPressCooldown|HybridStopRequiresThresholdAndRecordingState|ConvertsSleepDelaySafely)' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "migration docs track shared recording shortcut timing policy" \
+  'recording shortcut mode handling delegates cooldown, hybrid push-to-talk threshold, and hold-delay sleep conversion to `VoiceInkRecordingShortcutTimingPolicy`' \
+  docs/ios-single-repo-migration.md
 
 require_pattern \
   "shared recording shortcut selection values live in VoiceInkCore" \
@@ -9057,7 +9085,8 @@ require_patterns \
   'doublePressThreshold: TimeInterval = 1\.5' \
   'confirmationPresentation' \
   'isSecondPress' \
-  'timeoutNanoseconds'
+  'timeoutNanoseconds' \
+  'VoiceInkRecordingShortcutTimingPolicy\.sleepNanoseconds'
 
 require_pattern \
   "shared recording shortcut preference owns selection keys" \

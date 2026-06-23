@@ -2,6 +2,74 @@ import Foundation
 @testable import VoiceInkCore
 
 final class SpecialShortcutEmptyFallbackPolicyTests: XCTestCase {
+    func testRecordingShortcutTimingPolicyPreservesMacOSThresholds() {
+        XCTAssertEqual(VoiceInkRecordingShortcutTimingPolicy.pressCooldown, 0.08)
+        XCTAssertEqual(VoiceInkRecordingShortcutTimingPolicy.hybridPushToTalkThreshold, 0.5)
+    }
+
+    func testRecordingShortcutTimingPolicyDetectsPressCooldown() {
+        let now = Date(timeIntervalSinceReferenceDate: 1_000)
+
+        XCTAssertFalse(
+            VoiceInkRecordingShortcutTimingPolicy.isPressWithinCooldown(
+                lastPressTime: nil,
+                now: now
+            )
+        )
+        XCTAssertTrue(
+            VoiceInkRecordingShortcutTimingPolicy.isPressWithinCooldown(
+                lastPressTime: now.addingTimeInterval(-0.079),
+                now: now
+            )
+        )
+        XCTAssertFalse(
+            VoiceInkRecordingShortcutTimingPolicy.isPressWithinCooldown(
+                lastPressTime: now.addingTimeInterval(-0.08),
+                now: now
+            )
+        )
+    }
+
+    func testRecordingShortcutTimingPolicyHybridStopRequiresThresholdAndRecordingState() {
+        XCTAssertFalse(
+            VoiceInkRecordingShortcutTimingPolicy.shouldStopHybridRecording(
+                pressDuration: 0.499,
+                recordingState: .recording
+            )
+        )
+        XCTAssertTrue(
+            VoiceInkRecordingShortcutTimingPolicy.shouldStopHybridRecording(
+                pressDuration: 0.5,
+                recordingState: .recording
+            )
+        )
+        XCTAssertFalse(
+            VoiceInkRecordingShortcutTimingPolicy.shouldStopHybridRecording(
+                pressDuration: 0.5,
+                recordingState: .idle
+            )
+        )
+    }
+
+    func testRecordingShortcutTimingPolicyConvertsSleepDelaySafely() {
+        XCTAssertEqual(
+            VoiceInkRecordingShortcutTimingPolicy.sleepNanoseconds(delaySeconds: 0.25),
+            250_000_000
+        )
+        XCTAssertEqual(
+            VoiceInkRecordingShortcutTimingPolicy.sleepNanoseconds(delaySeconds: -1),
+            0
+        )
+        XCTAssertEqual(
+            VoiceInkRecordingShortcutTimingPolicy.sleepNanoseconds(delaySeconds: .infinity),
+            0
+        )
+        XCTAssertEqual(
+            VoiceInkRecordingShortcutTimingPolicy.sleepNanoseconds(delaySeconds: .greatestFiniteMagnitude),
+            UInt64.max
+        )
+    }
+
     func testShortPressSchedulesEmptyTapFallbackOnlyBelowThreshold() {
         XCTAssertTrue(
             VoiceInkSpecialShortcutEmptyFallbackPolicy.shouldScheduleFallback(pressDuration: 0.319)

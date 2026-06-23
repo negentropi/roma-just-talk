@@ -508,9 +508,6 @@ final class RecordingShortcutModeHandler {
     private var lastShortcutPressTime: Date?
     private var specialHoldToRecordTask: Task<Void, Never>?
 
-    private let shortcutPressCooldown: TimeInterval = 0.08
-    private let hybridPressThreshold: TimeInterval = 0.5
-
     init(
         logger: Logger,
         canHandleShortcutAction: @escaping @MainActor () -> Bool,
@@ -563,8 +560,11 @@ final class RecordingShortcutModeHandler {
             return
         }
 
-        if let lastTrigger = lastShortcutPressTime,
-           Date().timeIntervalSince(lastTrigger) < shortcutPressCooldown {
+        let now = Date()
+        if VoiceInkRecordingShortcutTimingPolicy.isPressWithinCooldown(
+            lastPressTime: lastShortcutPressTime,
+            now: now
+        ) {
             return
         }
 
@@ -574,7 +574,7 @@ final class RecordingShortcutModeHandler {
         activeShortcutCanCancelAccidentalStart = canCurrentShortcutPressCancelAccidentalStart
         activeSpecialOptions = specialOptions
         activeShortcutPressContext = VoiceInkShortcutPressContext()
-        lastShortcutPressTime = Date()
+        lastShortcutPressTime = now
         shortcutPressStartTime = eventTime
 
         switch mode {
@@ -662,7 +662,10 @@ final class RecordingShortcutModeHandler {
 
         case .hybrid:
             let pressDuration = shortcutPressStartTime.map { eventTime - $0 } ?? 0
-            if pressDuration >= hybridPressThreshold && recordingState() == .recording {
+            if VoiceInkRecordingShortcutTimingPolicy.shouldStopHybridRecording(
+                pressDuration: pressDuration,
+                recordingState: recordingState()
+            ) {
                 guard canHandleShortcutAction() else { return }
                 logger.notice("handleShortcutKeyUp: stopping recording (hybrid push-to-talk, duration=\(pressDuration, privacy: .public)s)")
                 await toggleMiniRecorder(powerModeId)
@@ -719,8 +722,9 @@ final class RecordingShortcutModeHandler {
     private func scheduleSpecialHoldToRecord(action: ShortcutAction, powerModeId: UUID?) {
         specialHoldToRecordTask?.cancel()
 
-        let delaySeconds = max(specialHoldToRecordDelay(), 0)
-        let delayNanoseconds = UInt64((delaySeconds * 1_000_000_000).rounded())
+        let delayNanoseconds = VoiceInkRecordingShortcutTimingPolicy.sleepNanoseconds(
+            delaySeconds: specialHoldToRecordDelay()
+        )
         specialHoldToRecordTask = Task { @MainActor [weak self] in
             do {
                 try await Task.sleep(nanoseconds: delayNanoseconds)

@@ -1724,9 +1724,7 @@ public enum VoiceInkMiniRecorderEscapeShortcutPolicy {
     }
 
     public static func timeoutNanoseconds(threshold: TimeInterval = doublePressThreshold) -> UInt64 {
-        guard threshold.isFinite else { return 0 }
-        let safeThreshold = max(0, threshold)
-        return UInt64((safeThreshold * 1_000_000_000).rounded())
+        VoiceInkRecordingShortcutTimingPolicy.sleepNanoseconds(delaySeconds: threshold)
     }
 }
 

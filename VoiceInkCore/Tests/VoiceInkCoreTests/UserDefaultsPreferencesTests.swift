@@ -1901,6 +1901,10 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             VoiceInkMiniRecorderEscapeShortcutPolicy.timeoutNanoseconds(threshold: .infinity),
             0
         )
+        XCTAssertEqual(
+            VoiceInkMiniRecorderEscapeShortcutPolicy.timeoutNanoseconds(threshold: .greatestFiniteMagnitude),
+            UInt64.max
+        )
 
         let now = Date(timeIntervalSince1970: 1_000)
         XCTAssertFalse(

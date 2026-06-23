@@ -3004,7 +3004,15 @@ reject_pattern \
 require_pattern \
   "shared API-key obfuscation fallback lives in VoiceInkCore" \
   'obfuscatedAPIKeyOrPlaceholder|obfuscatedAPIKeyPlaceholder' \
-  VoiceInkCore/Sources/VoiceInkCore/SecretPresentation.swift
+  VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
+
+section "obsolete standalone secret presentation module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/SecretPresentation.swift
+
+require_pattern \
+  "shared secret presentation lives with provider-key form policy" \
+  'VoiceInkSecretPresentation|obfuscatedAPIKey|obfuscatedAPIKeyOrPlaceholder' \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
 
 require_pattern \
   "shared provider API-key list row presentation lives in VoiceInkCore" \

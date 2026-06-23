@@ -3205,10 +3205,13 @@ reject_pattern \
   VoiceInk/Transcription/Whisper/LibWhisper.swift \
   iOS/VoiceInk-ios/LibWhisper.swift
 
+section "obsolete standalone Whisper transcript segments module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/WhisperTranscriptSegments.swift
+
 require_pattern \
-  "shared local Whisper transcript segment policy lives in VoiceInkCore" \
+  "shared local Whisper transcript segment policy lives with runtime policy" \
   'VoiceInkWhisperTranscriptSegments|joinedText\(segmentCount:' \
-  VoiceInkCore/Sources/VoiceInkCore/WhisperTranscriptSegments.swift
+  VoiceInkCore/Sources/VoiceInkCore/WhisperRuntimeDefaults.swift
 
 require_pattern \
   "core tests cover shared local Whisper transcript segment policy" \

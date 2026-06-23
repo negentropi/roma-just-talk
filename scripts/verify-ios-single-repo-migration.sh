@@ -2217,12 +2217,20 @@ reject_pattern \
 require_pattern \
   "shared date presentation owns macOS detail timestamp format" \
   'abbreviatedTimestamp' \
-  VoiceInkCore/Sources/VoiceInkCore/DatePresentation.swift
+  VoiceInkCore/Sources/VoiceInkCore/DurationPresentation.swift
 
 require_pattern \
   "shared date presentation owns macOS history timestamp format" \
   'compactTimestamp' \
-  VoiceInkCore/Sources/VoiceInkCore/DatePresentation.swift
+  VoiceInkCore/Sources/VoiceInkCore/DurationPresentation.swift
+
+section "obsolete standalone date presentation module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/DatePresentation.swift
+
+require_pattern \
+  "shared date and duration presentation live together" \
+  'VoiceInkDatePresentation|VoiceInkDurationPresentation|relativeTimestamp|minutesSeconds' \
+  VoiceInkCore/Sources/VoiceInkCore/DurationPresentation.swift
 
 require_pattern \
   "macOS transcription details use shared timestamp presentation" \

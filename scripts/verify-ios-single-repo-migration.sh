@@ -6473,6 +6473,24 @@ require_pattern \
   'VoiceInkCustomVocabularyUse\.streamingTranscription\(\.assemblyAI\)|\.streamingTranscription\(\.assemblyAI\)' \
   VoiceInk/Transcription/Streaming/AssemblyAIStreamingProvider.swift
 
+section "obsolete standalone streaming event module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/StreamingTranscriptionEvent.swift
+
+require_patterns \
+  "shared streaming event and error taxonomy live together in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/StreamingTranscriptionError.swift \
+  'VoiceInkStreamingTranscriptionEvent' \
+  'case sessionStarted' \
+  'case partial\(text: String\)' \
+  'case committed\(text: String\)' \
+  'case error\(Error\)' \
+  'VoiceInkStreamingTranscriptionError' \
+  'missingAPIKey' \
+  'connectionFailed' \
+  'timeout' \
+  'serverError' \
+  'notConnected'
+
 require_pattern \
   "shared streaming connection model policy lives in VoiceInkCore" \
   'streamingConnectionModelName\(for selectedModelName: String\)|scribe_v2_realtime|stt-rt-v4|voxtral-mini-transcribe-realtime-2602|selectedModelName\.contains\("standard"\) \? "standard" : "enhanced"' \

@@ -1,5 +1,12 @@
 import Foundation
 
+public enum VoiceInkStreamingTranscriptionEvent {
+    case sessionStarted
+    case partial(text: String)
+    case committed(text: String)
+    case error(Error)
+}
+
 public enum VoiceInkStreamingTranscriptionError: LocalizedError, Equatable, Sendable {
     public static let unknownServerErrorMessage = "Unknown error"
 

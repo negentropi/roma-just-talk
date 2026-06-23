@@ -821,6 +821,55 @@ final class WhisperModelFilesTests: XCTestCase {
         XCTAssertFalse(idleRow.shouldShowDeleteAction)
     }
 
+    func testSimpleDownloadManagementRowBuildsConfirmationRuntimeActions() {
+        let model = VoiceInkWhisperModelFiles.baseModel
+        let downloadedRow = VoiceInkWhisperModelManagementList.row(
+            for: model,
+            downloadState: VoiceInkWhisperModelDownloadState(
+                isDownloaded: true,
+                progress: .simple(modelName: model.modelName, isDownloading: false, progress: nil)
+            )
+        )
+        let idleRow = VoiceInkWhisperModelManagementList.row(
+            for: model,
+            downloadState: VoiceInkWhisperModelDownloadState(
+                isDownloaded: false,
+                progress: .simple(modelName: model.modelName, isDownloading: false, progress: nil)
+            )
+        )
+        let downloadingRow = VoiceInkWhisperModelManagementList.row(
+            for: model,
+            downloadState: VoiceInkWhisperModelDownloadState(
+                isDownloaded: false,
+                progress: .simple(modelName: model.modelName, isDownloading: true, progress: 0.5)
+            )
+        )
+        var events: [String] = []
+
+        let deleteRequestAction = downloadedRow.deleteRequestRuntimeAction {
+            events.append("delete-request")
+        }
+        let confirmedDeleteAction = downloadedRow.confirmedDeleteRuntimeAction {
+            events.append("delete")
+        }
+        let confirmedDownloadAction = idleRow.confirmedDownloadRuntimeAction {
+            events.append("download")
+        }
+
+        XCTAssertTrue(deleteRequestAction != nil)
+        XCTAssertTrue(confirmedDeleteAction != nil)
+        XCTAssertTrue(confirmedDownloadAction != nil)
+        XCTAssertNil(idleRow.deleteRequestRuntimeAction {})
+        XCTAssertNil(idleRow.confirmedDeleteRuntimeAction {})
+        XCTAssertNil(downloadedRow.confirmedDownloadRuntimeAction {})
+        XCTAssertNil(downloadingRow.confirmedDownloadRuntimeAction {})
+
+        deleteRequestAction?()
+        confirmedDeleteAction?()
+        confirmedDownloadAction?()
+        XCTAssertEqual(events, ["delete-request", "delete", "download"])
+    }
+
     func testSimpleDownloadDeletionPolicyPreservesIOSDeleteIntent() throws {
         let missingPlan = VoiceInkWhisperModelDeletionPlan(
             action: .skipMissingFile,

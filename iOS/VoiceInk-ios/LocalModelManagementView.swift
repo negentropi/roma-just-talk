@@ -51,6 +51,17 @@ struct ModelRowView: View {
             requestDownload: { showingDownloadConfirmation = true },
             cancelDownload: { modelManager.cancelDownload(for: row.model) }
         )
+        let deleteRequestAction = row.deleteRequestRuntimeAction {
+            showingDeleteAlert = true
+        }
+        let confirmedDeleteAction = row.confirmedDeleteRuntimeAction {
+            modelManager.deleteModel(row.model)
+        }
+        let confirmedDownloadAction = row.confirmedDownloadRuntimeAction {
+            Task {
+                await modelManager.downloadModel(row.model)
+            }
+        }
 
         VStack(alignment: .leading, spacing: 8) {
             HStack {
@@ -92,27 +103,19 @@ struct ModelRowView: View {
             }
         }
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-            if row.shouldShowDeleteAction {
-                Button(row.deleteConfirmation.primaryButtonTitle) {
-                    showingDeleteAlert = true
-                }
+            if let deleteRequestAction {
+                Button(row.deleteConfirmation.primaryButtonTitle, action: deleteRequestAction)
                 .tint(.red)
             }
         }
         .alert(row.deleteConfirmation.title, isPresented: $showingDeleteAlert) {
-            Button(row.deleteConfirmation.primaryButtonTitle, role: .destructive) {
-                modelManager.deleteModel(row.model)
-            }
+            Button(row.deleteConfirmation.primaryButtonTitle, role: .destructive, action: confirmedDeleteAction ?? {})
             Button(row.deleteConfirmation.cancelButtonTitle, role: .cancel) { }
         } message: {
             Text(row.deleteConfirmation.message)
         }
         .alert(row.downloadConfirmation.title, isPresented: $showingDownloadConfirmation) {
-            Button(row.downloadConfirmation.primaryButtonTitle) {
-                Task {
-                    await modelManager.downloadModel(row.model)
-                }
-            }
+            Button(row.downloadConfirmation.primaryButtonTitle, action: confirmedDownloadAction ?? {})
             Button(row.downloadConfirmation.cancelButtonTitle, role: .cancel) { }
         } message: {
             Text(row.downloadConfirmation.message)

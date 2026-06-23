@@ -4301,6 +4301,22 @@ require_pattern \
   'presentation\.action\.runtimeAction' \
   iOS/VoiceInk-ios/LocalModelManagementView.swift
 
+require_pattern \
+  "iOS local model management delegates confirmation action mapping to shared core" \
+  'row\.(deleteRequestRuntimeAction|confirmedDeleteRuntimeAction|confirmedDownloadRuntimeAction)' \
+  iOS/VoiceInk-ios/LocalModelManagementView.swift
+
+reject_pattern \
+  "iOS local model management avoids direct delete-action visibility branching" \
+  'if +row\.shouldShowDeleteAction' \
+  iOS/VoiceInk-ios/LocalModelManagementView.swift
+
+reject_context_pattern \
+  "iOS local model management avoids direct download confirmation task wiring" \
+  'row\.downloadConfirmation\.title' \
+  'Task +\{' \
+  iOS/VoiceInk-ios/LocalModelManagementView.swift
+
 reject_pattern \
   "iOS local model management avoids shallow row action booleans" \
   'presentation\.(isDownloaded|canStartDownload|canCancelDownload|canDeleteDownloadedModel)\b' \
@@ -4715,6 +4731,18 @@ require_patterns \
 require_pattern \
   "core check runner executes local model row runtime action test" \
   'testSimpleDownloadRowActionBuildsDeferredRuntimeAction' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_patterns \
+  "shared local model management row owns confirmation runtime actions" \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift \
+  'deleteRequestRuntimeAction' \
+  'confirmedDeleteRuntimeAction' \
+  'confirmedDownloadRuntimeAction'
+
+require_pattern \
+  "core check runner executes local model management row confirmation action test" \
+  'testSimpleDownloadManagementRowBuildsConfirmationRuntimeActions' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \

@@ -512,6 +512,24 @@ public struct VoiceInkWhisperModelManagementRow: Equatable, Identifiable, Sendab
     public var id: String { model.id }
     public var shouldShowDeleteAction: Bool { presentation.action == .downloaded }
 
+    public func deleteRequestRuntimeAction(
+        requestDelete: @escaping () -> Void
+    ) -> (() -> Void)? {
+        shouldShowDeleteAction ? requestDelete : nil
+    }
+
+    public func confirmedDeleteRuntimeAction(
+        delete: @escaping () -> Void
+    ) -> (() -> Void)? {
+        shouldShowDeleteAction ? delete : nil
+    }
+
+    public func confirmedDownloadRuntimeAction(
+        startDownload: @escaping () -> Void
+    ) -> (() -> Void)? {
+        presentation.action == .download ? startDownload : nil
+    }
+
     public init(
         model: VoiceInkWhisperModelFileSpec,
         presentation: VoiceInkWhisperModelDownloadRowPresentation,

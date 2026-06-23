@@ -1599,6 +1599,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadStateBuildsSharedRowPresentation", run: { WhisperModelFilesTests().testSimpleDownloadStateBuildsSharedRowPresentation() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadRowActionBuildsDeferredRuntimeAction", run: { WhisperModelFilesTests().testSimpleDownloadRowActionBuildsDeferredRuntimeAction() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadManagementListBuildsSharedRows", run: { WhisperModelFilesTests().testSimpleDownloadManagementListBuildsSharedRows() }),
+            VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadManagementRowBuildsConfirmationRuntimeActions", run: { WhisperModelFilesTests().testSimpleDownloadManagementRowBuildsConfirmationRuntimeActions() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadDeletionPolicyPreservesIOSDeleteIntent", run: { try WhisperModelFilesTests().testSimpleDownloadDeletionPolicyPreservesIOSDeleteIntent() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadDeletionPlanAppliesRuntimeState", run: { WhisperModelFilesTests().testSimpleDownloadDeletionPlanAppliesRuntimeState() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadDeletionPlanAppliesFailureStateWithoutRefresh", run: { WhisperModelFilesTests().testSimpleDownloadDeletionPlanAppliesFailureStateWithoutRefresh() }),

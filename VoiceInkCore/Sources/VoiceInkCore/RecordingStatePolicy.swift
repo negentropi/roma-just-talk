@@ -215,6 +215,36 @@ public struct VoiceInkAudioRecorderStopPlan: Equatable, Sendable {
         self.shouldClearCurrentRecordingURL = shouldClearCurrentRecordingURL
         self.shouldScheduleSessionDeactivation = shouldScheduleSessionDeactivation
     }
+
+    public func applyRuntimeState(
+        stopRecorder: () -> Void,
+        invalidateMeterTimer: () -> Void,
+        setIsRecording: (Bool) -> Void,
+        clearAudioLevels: () -> Void,
+        deleteCurrentRecordingFile: () -> Void,
+        clearCurrentRecordingURL: () -> Void,
+        scheduleSessionDeactivation: () -> Void
+    ) {
+        if shouldStopRecorder {
+            stopRecorder()
+        }
+        if shouldInvalidateMeterTimer {
+            invalidateMeterTimer()
+        }
+        setIsRecording(isRecordingAfterStop)
+        if shouldClearAudioLevels {
+            clearAudioLevels()
+        }
+        if shouldDeleteCurrentRecordingFile {
+            deleteCurrentRecordingFile()
+        }
+        if shouldClearCurrentRecordingURL {
+            clearCurrentRecordingURL()
+        }
+        if shouldScheduleSessionDeactivation {
+            scheduleSessionDeactivation()
+        }
+    }
 }
 
 public enum VoiceInkAudioRecorderStopPolicy {

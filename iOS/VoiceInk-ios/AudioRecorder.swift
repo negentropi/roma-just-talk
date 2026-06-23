@@ -67,33 +67,25 @@ final class AudioRecorder: NSObject, ObservableObject {
     }
 
     private func applyStopPlan(_ plan: VoiceInkAudioRecorderStopPlan) {
-        if plan.shouldStopRecorder {
-            audioRecorder?.stop()
-            audioRecorder = nil
-        }
-
-        if plan.shouldInvalidateMeterTimer {
-            meterTimer?.invalidate()
-            meterTimer = nil
-        }
-
-        isRecording = plan.isRecordingAfterStop
-
-        if plan.shouldClearAudioLevels {
-            levelsHistory.removeAll()
-        }
-
-        if plan.shouldDeleteCurrentRecordingFile, let url = currentRecordingURL {
-            try? FileManager.default.removeItem(at: url)
-        }
-
-        if plan.shouldClearCurrentRecordingURL {
-            currentRecordingURL = nil
-        }
-
-        if plan.shouldScheduleSessionDeactivation {
-            sessionManager.scheduleDeactivation()
-        }
+        plan.applyRuntimeState(
+            stopRecorder: {
+                audioRecorder?.stop()
+                audioRecorder = nil
+            },
+            invalidateMeterTimer: {
+                meterTimer?.invalidate()
+                meterTimer = nil
+            },
+            setIsRecording: { isRecording = $0 },
+            clearAudioLevels: { levelsHistory.removeAll() },
+            deleteCurrentRecordingFile: {
+                if let url = currentRecordingURL {
+                    try? FileManager.default.removeItem(at: url)
+                }
+            },
+            clearCurrentRecordingURL: { currentRecordingURL = nil },
+            scheduleSessionDeactivation: sessionManager.scheduleDeactivation
+        )
     }
 }
 

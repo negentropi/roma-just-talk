@@ -348,6 +348,44 @@ final class RecordingStatePolicyTests: XCTestCase {
         )
     }
 
+    func testAudioRecorderStopPlanAppliesRuntimeStateInOrder() {
+        var events: [String] = []
+
+        VoiceInkAudioRecorderStopPolicy.plan(for: .keepRecordingFile).applyRuntimeState(
+            stopRecorder: { events.append("stop") },
+            invalidateMeterTimer: { events.append("timer") },
+            setIsRecording: { events.append("recording:\($0)") },
+            clearAudioLevels: { events.append("levels") },
+            deleteCurrentRecordingFile: { events.append("delete") },
+            clearCurrentRecordingURL: { events.append("url") },
+            scheduleSessionDeactivation: { events.append("session") }
+        )
+        VoiceInkAudioRecorderStopPolicy.plan(for: .discardRecordingFile).applyRuntimeState(
+            stopRecorder: { events.append("stop") },
+            invalidateMeterTimer: { events.append("timer") },
+            setIsRecording: { events.append("recording:\($0)") },
+            clearAudioLevels: { events.append("levels") },
+            deleteCurrentRecordingFile: { events.append("delete") },
+            clearCurrentRecordingURL: { events.append("url") },
+            scheduleSessionDeactivation: { events.append("session") }
+        )
+
+        XCTAssertEqual(events, [
+            "stop",
+            "timer",
+            "recording:false",
+            "levels",
+            "session",
+            "stop",
+            "timer",
+            "recording:false",
+            "levels",
+            "delete",
+            "url",
+            "session"
+        ])
+    }
+
     func testRecordingFlowStatePreservesIOSStartFailureAndCancelTransitions() {
         var failedState = VoiceInkRecordingFlowState(currentDuration: 8)
         failedState.prepareRecordingStart()

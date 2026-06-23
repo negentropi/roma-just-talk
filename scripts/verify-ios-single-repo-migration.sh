@@ -1002,17 +1002,22 @@ require_pattern \
 
 require_pattern \
   "shared audio-recorder stop cleanup plan lives in VoiceInkCore" \
-  'VoiceInkAudioRecorderStopPolicy|VoiceInkAudioRecorderStopPlan|VoiceInkAudioRecorderStopMode' \
+  'VoiceInkAudioRecorderStopPolicy|VoiceInkAudioRecorderStopPlan|VoiceInkAudioRecorderStopMode|applyRuntimeState' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
 require_pattern \
   "shared audio-recorder stop cleanup checks run in VoiceInkCore" \
-  'testAudioRecorderStopPolicyPreservesIOSStopCleanup|testAudioRecorderStopPolicyPreservesIOSDiscardCleanup' \
+  'testAudioRecorderStopPolicyPreservesIOSStopCleanup|testAudioRecorderStopPolicyPreservesIOSDiscardCleanup|testAudioRecorderStopPlanAppliesRuntimeStateInOrder' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "iOS audio recorder applies shared stop cleanup plan" \
-  'VoiceInkAudioRecorderStopPolicy\.plan|applyStopPlan|shouldDeleteCurrentRecordingFile|shouldClearCurrentRecordingURL' \
+  'VoiceInkAudioRecorderStopPolicy\.plan|applyStopPlan|plan\.applyRuntimeState' \
+  iOS/VoiceInk-ios/AudioRecorder.swift
+
+reject_pattern \
+  "iOS audio recorder avoids shell-owned stop-plan sequencing" \
+  'plan\.should(StopRecorder|InvalidateMeterTimer|ClearAudioLevels|DeleteCurrentRecordingFile|ClearCurrentRecordingURL|ScheduleSessionDeactivation)|plan\.isRecordingAfterStop' \
   iOS/VoiceInk-ios/AudioRecorder.swift
 
 require_patterns \

@@ -412,6 +412,71 @@ final class CustomPromptTests: XCTestCase {
         XCTAssertNil(VoiceInkCustomPromptPolicy.repairedSelectedPromptId(nil, isEnhancementEnabled: true, prompts: []))
     }
 
+    func testCustomPromptPolicyFindsActivePromptBySelectedId() {
+        let firstId = UUID(uuidString: "00000000-0000-0000-0000-000000000219")!
+        let secondId = UUID(uuidString: "00000000-0000-0000-0000-000000000220")!
+        let staleId = UUID(uuidString: "00000000-0000-0000-0000-000000000221")!
+        let firstPrompt = VoiceInkCustomPrompt(id: firstId, title: "First", promptText: "First prompt")
+        let secondPrompt = VoiceInkCustomPrompt(id: secondId, title: "Second", promptText: "Second prompt")
+
+        XCTAssertEqual(
+            VoiceInkCustomPromptPolicy.activePrompt(selectedPromptId: secondId, prompts: [firstPrompt, secondPrompt]),
+            secondPrompt
+        )
+        XCTAssertNil(VoiceInkCustomPromptPolicy.activePrompt(selectedPromptId: nil, prompts: [firstPrompt]))
+        XCTAssertNil(VoiceInkCustomPromptPolicy.activePrompt(selectedPromptId: staleId, prompts: [firstPrompt]))
+    }
+
+    func testCustomPromptPolicyBuildsActivePromptIconFallbacks() throws {
+        let selectedId = UUID(uuidString: "00000000-0000-0000-0000-000000000222")!
+        let activePrompt = VoiceInkCustomPrompt(
+            id: selectedId,
+            title: "Active",
+            promptText: "Active prompt",
+            icon: "wand.and.stars"
+        )
+        let storedDefaultPrompt = VoiceInkCustomPrompt(
+            id: VoiceInkPredefinedPrompts.defaultPromptId,
+            title: "Default",
+            promptText: "Default prompt",
+            icon: "stored.default"
+        )
+
+        XCTAssertEqual(
+            VoiceInkCustomPromptPolicy.activePromptIcon(
+                selectedPromptId: selectedId,
+                prompts: [storedDefaultPrompt, activePrompt]
+            ),
+            "wand.and.stars"
+        )
+        XCTAssertEqual(
+            VoiceInkCustomPromptPolicy.activePromptIcon(
+                selectedPromptId: nil,
+                prompts: [storedDefaultPrompt, activePrompt]
+            ),
+            "stored.default"
+        )
+
+        let defaultPrompt = try XCTUnwrap(
+            VoiceInkPredefinedPrompts.all.first { $0.id == VoiceInkPredefinedPrompts.defaultPromptId }
+        )
+        XCTAssertEqual(
+            VoiceInkCustomPromptPolicy.activePromptIcon(
+                selectedPromptId: UUID(uuidString: "00000000-0000-0000-0000-000000000223")!,
+                prompts: [activePrompt]
+            ),
+            defaultPrompt.icon
+        )
+        XCTAssertEqual(
+            VoiceInkCustomPromptPolicy.activePromptIcon(
+                selectedPromptId: nil,
+                prompts: [],
+                predefinedPrompts: []
+            ),
+            VoiceInkCustomPromptPresentation.defaultPromptFallbackIconSystemName
+        )
+    }
+
     func testCustomPromptPolicyBuildsStartupStoreStateInMacOSRepairOrder() {
         let storedPromptId = UUID(uuidString: "00000000-0000-0000-0000-000000000104")!
         let stalePromptId = UUID(uuidString: "00000000-0000-0000-0000-000000000105")!
@@ -667,6 +732,7 @@ final class CustomPromptTests: XCTestCase {
 
     func testCustomPromptPresentationPreservesIconCatalogAndGridCopy() {
         XCTAssertEqual(VoiceInkCustomPromptPresentation.defaultIconSystemName, "doc.text.fill")
+        XCTAssertEqual(VoiceInkCustomPromptPresentation.defaultPromptFallbackIconSystemName, "checkmark.seal.fill")
         XCTAssertEqual(VoiceInkCustomPromptPresentation.iconSystemNames.first, "doc.text.fill")
         XCTAssertEqual(VoiceInkCustomPromptPresentation.iconSystemNames.last, "hand.thumbsup.fill")
         XCTAssertTrue(VoiceInkCustomPromptPresentation.iconSystemNames.contains("bubble.left.and.bubble.right.fill"))

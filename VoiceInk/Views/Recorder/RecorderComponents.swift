@@ -162,7 +162,10 @@ struct RecorderPromptButton: View {
     var body: some View {
         RecorderToggleButton(
             isEnabled: enhancementService.isEnhancementEnabled,
-            icon: enhancementService.activePrompt?.icon ?? enhancementService.allPrompts.first(where: { $0.id == VoiceInkPredefinedPrompts.defaultPromptId })?.icon ?? "checkmark.seal.fill",
+            icon: VoiceInkCustomPromptPolicy.activePromptIcon(
+                selectedPromptId: enhancementService.selectedPromptId,
+                prompts: enhancementService.allPrompts
+            ),
             disabled: false
         ) {
             if enhancementService.isEnhancementEnabled {

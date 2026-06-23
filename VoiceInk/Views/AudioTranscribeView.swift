@@ -254,7 +254,10 @@ struct AudioTranscribeView: View {
 
                 let promptBinding = Binding<UUID>(
                     get: {
-                        selectedPromptId ?? enhancementService.allPrompts.first?.id ?? UUID()
+                        VoiceInkCustomPromptPolicy.selectedPromptIdAfterEnablingEnhancement(
+                            selectedPromptId,
+                            prompts: enhancementService.allPrompts
+                        ) ?? UUID()
                     },
                     set: { newValue in
                         selectedPromptId = newValue

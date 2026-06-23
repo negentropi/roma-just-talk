@@ -55,7 +55,7 @@ class AIEnhancementService: ObservableObject {
     @Published var lastUserMessageSent: String?
 
     var activePrompt: VoiceInkCustomPrompt? {
-        allPrompts.first { $0.id == selectedPromptId }
+        VoiceInkCustomPromptPolicy.activePrompt(selectedPromptId: selectedPromptId, prompts: allPrompts)
     }
 
     var allPrompts: [VoiceInkCustomPrompt] {

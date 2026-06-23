@@ -33,6 +33,7 @@
 - Removed unused macOS mini/notch recorder hide notification observers.
 - Moved macOS credential/license logger category identity into shared core while leaving Keychain, license, and network execution in the macOS shell.
 - Moved Power Mode enhancement prompt fallback gating into shared core while leaving SwiftUI form state and provider/model execution in the macOS shell.
+- Moved active AI-enhancement prompt lookup and prompt icon fallback into shared core while leaving macOS selection state and SwiftUI binding execution in the shell.
 
 ## v1.95 - 2026-06-17
 

@@ -5324,6 +5324,11 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
+  "core checks execute active prompt lookup and icon fallback tests" \
+  'CustomPromptTests\.testCustomPromptPolicyFindsActivePromptBySelectedId|CustomPromptTests\.testCustomPromptPolicyBuildsActivePromptIconFallbacks' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "macOS AI enhancement service consumes shared prompt-trigger settings state" \
   'settingsStateAfterEnhancementEnabledChange|applyingSettingsState|restoringSettingsState|VoiceInkAIEnhancementPromptSettingsState' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
@@ -5333,10 +5338,50 @@ require_pattern \
   'settingsStateAfterAPIKeyValidityChange' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
+require_pattern \
+  "shared custom prompt policy owns active prompt lookup" \
+  'func activePrompt\(' \
+  VoiceInkCore/Sources/VoiceInkCore/CustomPrompt.swift
+
+require_pattern \
+  "shared custom prompt policy owns active prompt icon fallback" \
+  'func activePromptIcon\(' \
+  VoiceInkCore/Sources/VoiceInkCore/CustomPrompt.swift
+
+require_pattern \
+  "macOS AI enhancement service consumes shared active prompt lookup" \
+  'VoiceInkCustomPromptPolicy\.activePrompt' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+require_pattern \
+  "macOS recorder prompt button consumes shared active prompt icon fallback" \
+  'VoiceInkCustomPromptPolicy\.activePromptIcon' \
+  VoiceInk/Views/Recorder/RecorderComponents.swift
+
+require_pattern \
+  "macOS audio import prompt picker consumes shared selection fallback" \
+  'VoiceInkCustomPromptPolicy\.selectedPromptIdAfterEnablingEnhancement' \
+  VoiceInk/Views/AudioTranscribeView.swift
+
 reject_pattern \
   "macOS AI enhancement service avoids shell-owned prompt-trigger settings application policy" \
   'result\.shouldEnableAI|restoredEnhancementState|restoredPromptId|selectedPromptId = result\.selectedPromptId|isEnhancementEnabled && selectedPromptId|VoiceInkCustomPromptPolicy\.selectedPromptIdAfterEnablingEnhancement' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+reject_pattern \
+  "macOS AI enhancement service avoids shell-owned active prompt lookup" \
+  'allPrompts\.first \{ \$0\.id == selectedPromptId \}' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+reject_pattern \
+  "macOS recorder prompt button avoids shell-owned default prompt icon fallback" \
+  'VoiceInkPredefinedPrompts\.defaultPromptId|"checkmark\.seal\.fill"|allPrompts\.first\(where:' \
+  VoiceInk/Views/Recorder/RecorderComponents.swift
+
+reject_pattern \
+  "macOS audio import prompt picker avoids shell-owned first-prompt fallback" \
+  'allPrompts\.first\?\.id' \
+  VoiceInk/Views/AudioTranscribeView.swift
 
 reject_pattern \
   "macOS AI enhancement service avoids shell-owned API-key invalid disable policy" \
@@ -5435,6 +5480,11 @@ require_pattern \
 require_pattern \
   "migration checklist tracks shared startup prompt-store repair" \
   'startup prompt-store repair ordering' \
+  docs/ios-single-repo-migration.md
+
+require_pattern \
+  "migration checklist tracks shared active prompt lookup and icon fallback" \
+  'active prompt lookup, recorder-button prompt icon fallback, and audio-import prompt picker fallback' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

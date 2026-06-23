@@ -340,6 +340,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "CustomPromptTests.testCustomPromptPolicyPlansPromptSelectionWhenEnablingEnhancement", run: { CustomPromptTests().testCustomPromptPolicyPlansPromptSelectionWhenEnablingEnhancement() }),
             VoiceInkCoreCheck(name: "CustomPromptTests.testCustomPromptPolicyPlansEnhancementDisableWhenAPIKeyIsInvalid", run: { CustomPromptTests().testCustomPromptPolicyPlansEnhancementDisableWhenAPIKeyIsInvalid() }),
             VoiceInkCoreCheck(name: "CustomPromptTests.testCustomPromptPolicyRepairsSelectedPromptOnlyWhenEnhancementIsEnabled", run: { CustomPromptTests().testCustomPromptPolicyRepairsSelectedPromptOnlyWhenEnhancementIsEnabled() }),
+            VoiceInkCoreCheck(name: "CustomPromptTests.testCustomPromptPolicyFindsActivePromptBySelectedId", run: { CustomPromptTests().testCustomPromptPolicyFindsActivePromptBySelectedId() }),
+            VoiceInkCoreCheck(name: "CustomPromptTests.testCustomPromptPolicyBuildsActivePromptIconFallbacks", run: { try CustomPromptTests().testCustomPromptPolicyBuildsActivePromptIconFallbacks() }),
             VoiceInkCoreCheck(name: "CustomPromptTests.testCustomPromptPolicyBuildsStartupStoreStateInMacOSRepairOrder", run: { CustomPromptTests().testCustomPromptPolicyBuildsStartupStoreStateInMacOSRepairOrder() }),
             VoiceInkCoreCheck(name: "CustomPromptTests.testCustomPromptPolicyUsesAssistantPromptWithoutSystemInstructions", run: { try CustomPromptTests().testCustomPromptPolicyUsesAssistantPromptWithoutSystemInstructions() }),
             VoiceInkCoreCheck(name: "CustomPromptTests.testCustomPromptPolicyWrapsNonAssistantActivePrompt", run: { CustomPromptTests().testCustomPromptPolicyWrapsNonAssistantActivePrompt() }),

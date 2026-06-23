@@ -318,6 +318,32 @@ public enum VoiceInkCustomPromptPolicy {
         return selectedPromptId
     }
 
+    public static func activePrompt(
+        selectedPromptId: UUID?,
+        prompts: [VoiceInkCustomPrompt]
+    ) -> VoiceInkCustomPrompt? {
+        guard let selectedPromptId else {
+            return nil
+        }
+
+        return prompts.first { $0.id == selectedPromptId }
+    }
+
+    public static func activePromptIcon(
+        selectedPromptId: UUID?,
+        prompts: [VoiceInkCustomPrompt],
+        defaultPromptId: UUID = VoiceInkPredefinedPrompts.defaultPromptId,
+        predefinedPrompts: [VoiceInkPredefinedPrompt] = VoiceInkPredefinedPrompts.all
+    ) -> String {
+        if let activePrompt = activePrompt(selectedPromptId: selectedPromptId, prompts: prompts) {
+            return activePrompt.icon
+        }
+
+        return prompts.first { $0.id == defaultPromptId }?.icon
+            ?? predefinedPrompts.first { $0.id == defaultPromptId }?.icon
+            ?? VoiceInkCustomPromptPresentation.defaultPromptFallbackIconSystemName
+    }
+
     public static func basePromptText(
         activePrompt: VoiceInkCustomPrompt?,
         prompts: [VoiceInkCustomPrompt],

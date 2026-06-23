@@ -12,6 +12,7 @@ public struct VoiceInkCustomPromptTriggerSummary: Equatable, Sendable {
 
 public enum VoiceInkCustomPromptPresentation {
     public static let defaultIconSystemName = "doc.text.fill"
+    public static let defaultPromptFallbackIconSystemName = "checkmark.seal.fill"
     public static let triggerSummaryIconSystemName = "mic.fill"
     public static let addPromptTitle = "Add New"
     public static let addPromptSystemImageName = "plus.circle.fill"

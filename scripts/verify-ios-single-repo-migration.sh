@@ -1341,7 +1341,7 @@ require_pattern \
 
 require_pattern \
   "shared mode form provider availability lives in VoiceInkCore" \
-  'VoiceInkModeFormProviderAvailability|providerAvailability' \
+  'VoiceInkModeFormProviderAvailability|providerAvailability|newModeDraft' \
   VoiceInkCore/Sources/VoiceInkCore/Mode.swift
 
 require_pattern \
@@ -10810,6 +10810,16 @@ reject_pattern \
 require_pattern \
   "iOS mode provider availability uses settings adapter" \
   'settings\.modeFormProviderAvailability' \
+  iOS/VoiceInk-ios/ModeConfigurationView.swift
+
+require_pattern \
+  "iOS new-mode draft uses shared provider availability" \
+  'settings\.modeFormProviderAvailability\.newModeDraft\(\)' \
+  iOS/VoiceInk-ios/ModeConfigurationView.swift
+
+reject_pattern \
+  "iOS mode form avoids shell-owned new-mode draft construction" \
+  'Mode\(name: ""\)' \
   iOS/VoiceInk-ios/ModeConfigurationView.swift
 
 require_pattern \

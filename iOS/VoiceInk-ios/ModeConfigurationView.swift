@@ -14,7 +14,7 @@ struct ModeConfigurationView: View {
         self.settings = settings
         self.onSave = onSave
         self.isEditing = mode != nil
-        let initialMode = mode ?? Mode(name: "")
+        let initialMode = mode ?? settings.modeFormProviderAvailability.newModeDraft()
         self._mode = State(initialValue: initialMode)
     }
     

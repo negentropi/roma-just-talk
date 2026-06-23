@@ -612,6 +612,21 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
         XCTAssertTrue(availability.canSave(mode))
     }
 
+    func testModeFormProviderAvailabilityCreatesRepairedNewModeDraft() {
+        let availability = VoiceInkModeFormProviderAvailability(
+            transcriptionProviders: [.localWhisper],
+            postProcessingProviders: [.gemini]
+        )
+
+        let draft = availability.newModeDraft()
+
+        XCTAssertEqual(draft.name, "")
+        XCTAssertEqual(draft.transcriptionProvider, .localWhisper)
+        XCTAssertEqual(draft.transcriptionModel, VoiceInkTranscriptionModelCatalog.localBaseModel)
+        XCTAssertEqual(draft.postProcessingProvider, .groq)
+        XCTAssertFalse(availability.canSave(draft))
+    }
+
     func testModeFormProviderAvailabilityOwnsFormStatePresentation() {
         let availability = VoiceInkModeFormProviderAvailability(
             transcriptionProviders: [.localWhisper],

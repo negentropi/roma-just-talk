@@ -6714,6 +6714,14 @@ require_pattern \
   'shouldSkipEnhancement' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunPreparation.swift
 
+section "obsolete standalone post-processing skip policy module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/PostProcessingSkipPolicy.swift
+
+require_pattern \
+  "shared post-processing skip policy lives with transcription run preparation" \
+  'VoiceInkPostProcessingSkipConfiguration|VoiceInkPostProcessingSkipPolicy|shouldSkipPostProcessing' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunPreparation.swift
+
 require_pattern \
   "shared transcription enhancement request planning lives in VoiceInkCore" \
   'VoiceInkTranscriptionEnhancementRequest' \

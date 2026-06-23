@@ -9266,6 +9266,32 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
+  "shared recording shortcut mode monitor policy lives in VoiceInkCore" \
+  'tracksKeyUpEvidence|allowsShortcutInterruption' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "macOS recording shortcut manager consumes shared mode monitor policy" \
+  'tracksKeyUpEvidence|allowsShortcutInterruption' \
+  VoiceInk/Shortcuts/RecordingShortcutManager.swift
+
+require_pattern \
+  "macOS Power Mode shortcut manager consumes shared mode monitor policy" \
+  'tracksKeyUpEvidence|allowsShortcutInterruption' \
+  VoiceInk/Shortcuts/PowerModeShortcutManager.swift
+
+require_pattern \
+  "core checks execute recording shortcut mode monitor policy test" \
+  'UserDefaultsPreferencesTests\.testRecordingShortcutModePreservesMonitorPolicy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "macOS shortcut managers avoid shell-owned special-mode monitor policy" \
+  'primaryRecordingShortcutMode != \.special|secondaryRecordingShortcutMode != \.special|recordingMode\(for: \$0\) == \.special|recordingMode\(for: action\) == \.special|modeProvider\(\) == \.special' \
+  VoiceInk/Shortcuts/RecordingShortcutManager.swift \
+  VoiceInk/Shortcuts/PowerModeShortcutManager.swift
+
+require_pattern \
   "shared recording shortcut preference module lives in VoiceInkCore" \
   'public enum VoiceInkRecordingShortcutPreference' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift

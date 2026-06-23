@@ -38,6 +38,7 @@
 - Moved mini-recorder prompt shortcut selection planning into shared core while leaving shortcut capture and state mutation in the macOS shell.
 - Moved mini-recorder Power Mode shortcut index selection into shared core while leaving active-session execution in the macOS shell.
 - Moved Power Mode global shortcut eligibility into shared core while leaving shortcut storage and event monitoring in the macOS shell.
+- Moved recording shortcut special-mode monitor policy into shared core while leaving event tap execution in the macOS shell.
 
 ## v1.95 - 2026-06-17
 

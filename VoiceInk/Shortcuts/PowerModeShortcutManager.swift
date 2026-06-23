@@ -75,10 +75,11 @@ class PowerModeShortcutManager {
                 result[.powerMode(entry.configuration.id)] = entry.shortcut
             }
 
+        let mode = modeProvider()
         shortcutMonitor.start(
             shortcuts: shortcuts,
-            interruptibleActions: modeProvider() == .special ? [] : Set(shortcuts.keys),
-            tracksKeyUpEvidence: modeProvider() == .special,
+            interruptibleActions: mode.allowsShortcutInterruption ? Set(shortcuts.keys) : [],
+            tracksKeyUpEvidence: mode.tracksKeyUpEvidence,
             onKeyDown: { [weak self] action, eventTime in
                 Task { @MainActor in
                     guard let self,
@@ -116,7 +117,7 @@ class PowerModeShortcutManager {
                 Task { @MainActor in
                     guard let self,
                           case .powerMode = action,
-                          self.modeProvider() == .special else {
+                          self.modeProvider().tracksKeyUpEvidence else {
                         return
                     }
                     self.shortcutModeHandler.handlePressContextChanged(

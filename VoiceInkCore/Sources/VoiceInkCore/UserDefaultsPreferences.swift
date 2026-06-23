@@ -1477,6 +1477,14 @@ public enum VoiceInkRecordingShortcutMode: String, CaseIterable, Sendable {
             return "Hybrid"
         }
     }
+
+    public var tracksKeyUpEvidence: Bool {
+        self == .special
+    }
+
+    public var allowsShortcutInterruption: Bool {
+        !tracksKeyUpEvidence
+    }
 }
 
 public enum VoiceInkShortcutActionIdentifier: Hashable, Sendable {

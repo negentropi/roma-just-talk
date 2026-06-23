@@ -1726,6 +1726,20 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(VoiceInkRecordingShortcutMode.hybrid.displayName, "Hybrid")
     }
 
+    func testRecordingShortcutModePreservesMonitorPolicy() {
+        XCTAssertTrue(VoiceInkRecordingShortcutMode.special.tracksKeyUpEvidence)
+        XCTAssertFalse(VoiceInkRecordingShortcutMode.special.allowsShortcutInterruption)
+
+        for mode in [
+            VoiceInkRecordingShortcutMode.toggle,
+            .pushToTalk,
+            .hybrid
+        ] {
+            XCTAssertFalse(mode.tracksKeyUpEvidence)
+            XCTAssertTrue(mode.allowsShortcutInterruption)
+        }
+    }
+
     func testRecordingShortcutPreferencePreservesMacOSSettingsPresentation() {
         let presentation = VoiceInkRecordingShortcutPreference.macOSSettingsPresentation
 

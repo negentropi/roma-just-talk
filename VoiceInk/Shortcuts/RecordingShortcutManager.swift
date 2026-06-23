@@ -263,19 +263,21 @@ class RecordingShortcutManager: ObservableObject {
 
         if let primaryShortcut {
             shortcuts[.primaryRecording] = primaryShortcut
-            if primaryRecordingShortcutMode != .special {
+            if primaryRecordingShortcutMode.allowsShortcutInterruption {
                 interruptibleRecordingActions.insert(.primaryRecording)
             }
         }
 
         if let secondaryShortcut {
             shortcuts[.secondaryRecording] = secondaryShortcut
-            if secondaryRecordingShortcutMode != .special {
+            if secondaryRecordingShortcutMode.allowsShortcutInterruption {
                 interruptibleRecordingActions.insert(.secondaryRecording)
             }
         }
 
-        let tracksKeyUpEvidence = shortcuts.keys.contains { recordingMode(for: $0) == .special }
+        let tracksKeyUpEvidence = shortcuts.keys.contains {
+            recordingMode(for: $0)?.tracksKeyUpEvidence == true
+        }
 
         let isMonitoring = shortcutMonitor.start(
             shortcuts: shortcuts,
@@ -311,7 +313,10 @@ class RecordingShortcutManager: ObservableObject {
             },
             onPressContextChanged: { [weak self] action, context in
                 Task { @MainActor in
-                    guard let self, self.recordingMode(for: action) == .special else { return }
+                    guard let self,
+                          self.recordingMode(for: action)?.tracksKeyUpEvidence == true else {
+                        return
+                    }
                     self.shortcutModeHandler.handlePressContextChanged(
                         action: action,
                         context: context

@@ -3153,7 +3153,7 @@ require_pattern \
 
 require_pattern \
   "shared provider API-key state mutation plans live in VoiceInkCore" \
-  'VoiceInkProviderAPIKeyStorageMutationPlan|VoiceInkProviderAPIKeyVerificationMutationPlan|VoiceInkProviderAPIKeyStatePersistenceAction|VoiceInkProviderAPIKeyStateUpdatePlan|applyStoredAPIKey|applyVerification|applyingStoredAPIKey|applyingVerification|persistenceActions|verificationFlagToPersist|shouldPersistVerificationFlag' \
+  'VoiceInkProviderAPIKeyStorageMutationPlan|VoiceInkProviderAPIKeyVerificationMutationPlan|VoiceInkProviderAPIKeyStatePersistenceAction|VoiceInkProviderAPIKeyStateUpdatePlan|applyStoredAPIKey|applyVerification|applyingStoredAPIKey|applyingVerification|persistenceActions|applyRuntimeState|applyPersistenceActions|verificationFlagToPersist|shouldPersistVerificationFlag' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift
 
 require_pattern \
@@ -3161,10 +3161,12 @@ require_pattern \
   'ProviderAccessRequirementTests\.testProviderAPIKeyState(Storage|Verification)MutationPlanBuildsPersistenceActions' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
-require_pattern \
+require_patterns \
   "core checks execute provider API-key state update plan tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
   'ProviderAccessRequirementTests\.testProviderAPIKeyStateBuilds(StoredKey|Verification)UpdatePlan|ProviderAccessRequirementTests\.testProviderAPIKeyStateUpdatePlanIgnoresNonUserKeyProviders' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  'ProviderAccessRequirementTests\.testProviderAPIKeyStateUpdatePlanAppliesRuntimeStateInOrder' \
+  'ProviderAccessRequirementTests\.testProviderAPIKeyStateUpdatePlanSkipsRuntimeApplicationWhenNoPersistenceActions'
 
 require_pattern \
   "core checks execute provider access snapshot test" \
@@ -3183,7 +3185,7 @@ require_pattern \
 
 require_pattern \
   "iOS app settings applies shared provider API-key mutation plans" \
-  'applyingStoredAPIKey|applyingVerificationPlan\(plan, for: provider\)|applyProviderAPIKeyStateUpdatePlan|applyAPIKeyVerificationPlan|persistenceActions|applyProviderAPIKeyStatePersistenceActions' \
+  'applyingStoredAPIKey|applyingVerificationPlan\(plan, for: provider\)|applyProviderAPIKeyStateUpdatePlan|applyAPIKeyVerificationPlan|plan\.applyRuntimeState|persistStoredKey|persistVerificationFlag' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 reject_pattern \
@@ -3208,7 +3210,7 @@ reject_pattern \
 
 reject_pattern \
   "iOS app settings avoids shell-owned provider API-key state update sequencing" \
-  'var updatedState = apiKeyState|updatedState\.applyStoredAPIKey|updatedState\.applyVerification|let actions = plan\.persistenceActions' \
+  'var updatedState = apiKeyState|updatedState\.applyStoredAPIKey|updatedState\.applyVerification|let actions = plan\.persistenceActions|applyProviderAPIKeyStatePersistenceActions|VoiceInkProviderAPIKeyStatePersistenceAction' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \

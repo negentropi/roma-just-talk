@@ -137,24 +137,17 @@ final class AppSettings: ObservableObject {
         _ plan: VoiceInkProviderAPIKeyStateUpdatePlan,
         for provider: VoiceInkProviderKind
     ) {
-        guard plan.shouldApplyState else { return }
-
-        apiKeyState = plan.state
-        applyProviderAPIKeyStatePersistenceActions(plan.persistenceActions, for: provider)
-    }
-
-    private func applyProviderAPIKeyStatePersistenceActions(
-        _ actions: [VoiceInkProviderAPIKeyStatePersistenceAction],
-        for provider: VoiceInkProviderKind
-    ) {
-        for action in actions {
-            switch action {
-            case .persistStoredKey(let key):
+        plan.applyRuntimeState(
+            setAPIKeyState: { [self] state in
+                apiKeyState = state
+            },
+            persistStoredKey: { [self] key in
                 saveAPIKey(key, for: provider)
-            case .persistVerificationFlag(let flag):
+            },
+            persistVerificationFlag: { flag in
                 VoiceInkProviderAPIKeyVerificationState.setVerified(flag, for: provider)
             }
-        }
+        )
     }
 
     func applyAPIKeyVerificationPlan(

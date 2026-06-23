@@ -61,6 +61,36 @@ public struct VoiceInkProviderAPIKeyStateUpdatePlan: Equatable, Sendable {
     }
 }
 
+public extension VoiceInkProviderAPIKeyStateUpdatePlan {
+    func applyRuntimeState(
+        setAPIKeyState: (VoiceInkProviderAPIKeyState) -> Void,
+        persistStoredKey: (String) -> Void,
+        persistVerificationFlag: (Bool) -> Void
+    ) {
+        guard shouldApplyState else { return }
+
+        setAPIKeyState(state)
+        applyPersistenceActions(
+            persistStoredKey: persistStoredKey,
+            persistVerificationFlag: persistVerificationFlag
+        )
+    }
+
+    func applyPersistenceActions(
+        persistStoredKey: (String) -> Void,
+        persistVerificationFlag: (Bool) -> Void
+    ) {
+        for action in persistenceActions {
+            switch action {
+            case .persistStoredKey(let key):
+                persistStoredKey(key)
+            case .persistVerificationFlag(let flag):
+                persistVerificationFlag(flag)
+            }
+        }
+    }
+}
+
 public extension VoiceInkProviderAPIKeyStorageMutationPlan {
     func persistenceActions(storedKey: String) -> [VoiceInkProviderAPIKeyStatePersistenceAction] {
         guard shouldPersistStoredKey else { return [] }

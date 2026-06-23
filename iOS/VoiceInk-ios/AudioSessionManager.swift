@@ -113,9 +113,12 @@ final class AudioSessionManager: ObservableObject {
     
     /// Immediately deactivates the session
     func deactivateSession() {
-        cancelScheduledDeactivation()
+        let deactivationPlan = lifecycleState.beginImmediateDeactivation()
+        if deactivationPlan.shouldCancelScheduledDeactivation {
+            invalidateDeactivationTimer()
+        }
         
-        guard lifecycleState.isSessionActive else { return }
+        guard deactivationPlan.shouldDeactivateSession else { return }
         
         do {
             try AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)

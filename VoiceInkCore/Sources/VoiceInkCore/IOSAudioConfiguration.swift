@@ -84,6 +84,19 @@ public struct VoiceInkAudioSessionPlaybackActivationPlan: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkAudioSessionImmediateDeactivationPlan: Equatable, Sendable {
+    public let shouldCancelScheduledDeactivation: Bool
+    public let shouldDeactivateSession: Bool
+
+    public init(
+        shouldCancelScheduledDeactivation: Bool,
+        shouldDeactivateSession: Bool
+    ) {
+        self.shouldCancelScheduledDeactivation = shouldCancelScheduledDeactivation
+        self.shouldDeactivateSession = shouldDeactivateSession
+    }
+}
+
 public struct VoiceInkAudioSessionLifecycleState: Equatable, Sendable {
     public private(set) var isSessionActive: Bool
     public private(set) var timeoutRemaining: TimeInterval
@@ -110,6 +123,15 @@ public struct VoiceInkAudioSessionLifecycleState: Equatable, Sendable {
         let plan = VoiceInkAudioSessionPlaybackActivationPlan(
             shouldCancelScheduledDeactivation: true,
             shouldDeactivateCurrentSession: isSessionActive
+        )
+        cancelScheduledDeactivation()
+        return plan
+    }
+
+    public mutating func beginImmediateDeactivation() -> VoiceInkAudioSessionImmediateDeactivationPlan {
+        let plan = VoiceInkAudioSessionImmediateDeactivationPlan(
+            shouldCancelScheduledDeactivation: true,
+            shouldDeactivateSession: isSessionActive
         )
         cancelScheduledDeactivation()
         return plan

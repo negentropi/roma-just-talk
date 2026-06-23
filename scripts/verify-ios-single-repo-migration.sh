@@ -11178,7 +11178,7 @@ require_pattern \
 
 require_pattern \
   "shared audio-session lifecycle state lives in VoiceInkCore" \
-  'VoiceInkAudioSessionLifecycleState|VoiceInkAudioSessionPlaybackActivationPlan|markActivatedForRecording|beginPlaybackActivation|scheduleDeactivationExecution|advanceCountdownExecution|markDeactivated' \
+  'VoiceInkAudioSessionLifecycleState|VoiceInkAudioSessionPlaybackActivationPlan|VoiceInkAudioSessionImmediateDeactivationPlan|markActivatedForRecording|beginPlaybackActivation|beginImmediateDeactivation|scheduleDeactivationExecution|advanceCountdownExecution|markDeactivated' \
   VoiceInkCore/Sources/VoiceInkCore/IOSAudioConfiguration.swift
 
 require_patterns \
@@ -11206,6 +11206,11 @@ require_pattern \
 require_pattern \
   "VoiceInkCore check runner executes audio-session diagnostics proof" \
   'testAudioSessionDiagnosticsPreserveIOSLogCopy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "VoiceInkCore check runner executes audio-session immediate deactivation proof" \
+  'testAudioSessionLifecycleStatePlansImmediateDeactivationSideEffects' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -11241,9 +11246,14 @@ require_pattern \
   'lifecycleState\.beginPlaybackActivation\(\)' \
   iOS/VoiceInk-ios/AudioSessionManager.swift
 
+require_pattern \
+  "iOS audio-session manager delegates immediate deactivation planning to shared lifecycle state" \
+  'lifecycleState\.beginImmediateDeactivation\(\)' \
+  iOS/VoiceInk-ios/AudioSessionManager.swift
+
 reject_pattern \
-  "iOS playback activation avoids shell-owned active-session branching" \
-  'if lifecycleState\.isSessionActive' \
+  "iOS audio-session manager avoids shell-owned active-session branching" \
+  '(if|guard) +lifecycleState\.isSessionActive' \
   iOS/VoiceInk-ios/AudioSessionManager.swift
 
 reject_pattern \

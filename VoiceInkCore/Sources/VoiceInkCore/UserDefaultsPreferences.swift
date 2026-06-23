@@ -292,6 +292,23 @@ public struct VoiceInkAppSettingsResetState {
         self.selectedTranscriptionLanguage = selectedTranscriptionLanguage
         self.apiKeyProvidersToDelete = apiKeyProvidersToDelete
     }
+
+    public var applicationActions: [VoiceInkAppSettingsResetAction] {
+        var actions: [VoiceInkAppSettingsResetAction] = [
+            .applyResetState(self),
+            .clearCoreUserSettings
+        ]
+        if !apiKeyProvidersToDelete.isEmpty {
+            actions.append(.deleteProviderAPIKeys(apiKeyProvidersToDelete))
+        }
+        return actions
+    }
+}
+
+public enum VoiceInkAppSettingsResetAction {
+    case applyResetState(VoiceInkAppSettingsResetState)
+    case clearCoreUserSettings
+    case deleteProviderAPIKeys([VoiceInkProviderKind])
 }
 
 public struct VoiceInkIOSAppSettingsStartupState {

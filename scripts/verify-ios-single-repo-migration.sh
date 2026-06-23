@@ -10884,6 +10884,21 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_patterns \
+  "shared app settings reset state owns ordered application actions" \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift \
+  'VoiceInkAppSettingsResetAction' \
+  'applicationActions' \
+  'applyResetState' \
+  'clearCoreUserSettings' \
+  'deleteProviderAPIKeys'
+
+require_patterns \
+  "core checks execute app settings reset action tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'UserDefaultsPreferencesTests\.testAppSettingsResetStateBuildsApplicationActionsInOrder' \
+  'UserDefaultsPreferencesTests\.testAppSettingsResetStateSkipsProviderDeletionActionWhenNoProviders'
+
+require_patterns \
   "shared iOS app settings startup state lives in VoiceInkCore" \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift \
   'VoiceInkIOSAppSettingsStartupState' \
@@ -11152,7 +11167,7 @@ reject_pattern \
 
 require_pattern \
   "iOS app settings reset consumes shared reset state" \
-  'VoiceInkDefaultSettings\.iOS\.appSettingsResetState' \
+  'VoiceInkDefaultSettings\.iOS\.appSettingsResetState\.applicationActions' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_patterns \
@@ -11191,9 +11206,17 @@ reject_context_pattern \
   'ensureDefaultModeExists\(\)' \
   iOS/VoiceInk-ios/AppSettings.swift
 
-require_pattern \
-  "iOS app settings reset consumes shared provider-key deletion targets" \
-  'apiKeyProvidersToDelete' \
+require_patterns \
+  "iOS app settings reset adapts shared reset actions" \
+  iOS/VoiceInk-ios/AppSettings.swift \
+  'VoiceInkAppSettingsResetAction' \
+  'applyAppSettingsResetAction' \
+  'applyAppSettingsResetState' \
+  'deleteProviderAPIKeys'
+
+reject_pattern \
+  "iOS app settings reset avoids direct provider-key target reads" \
+  'resetState\.apiKeyProvidersToDelete' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \

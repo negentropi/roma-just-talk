@@ -8003,6 +8003,16 @@ require_pattern \
   'AIPromptsTests\.testEnhancementRequestPreparationPreservesMacOSPreflightPolicy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
+section "obsolete standalone AI enhancement output filter module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/AIEnhancementOutputFilter.swift
+
+require_patterns \
+  "AI enhancement output filter lives with request preparation policy" \
+  VoiceInkCore/Sources/VoiceInkCore/AIRequestPrompts.swift \
+  'VoiceInkAIEnhancementOutputFilter' \
+  'codex_follow_up' \
+  'VoiceInkAIEnhancementRequestPayload'
+
 require_pattern \
   "core checks execute AI enhancement retry-failure presentation test" \
   'AIEnhancementRetryPolicyTests\.testRetryFailurePresentationPreservesMacOSLogMessages' \

@@ -21,7 +21,7 @@ struct SettingsView: View {
     @AppStorage(VoiceInkAnnouncementPreference.isEnabledKey) private var enableAnnouncements = VoiceInkAnnouncementPreference.defaultIsEnabled
     @AppStorage(VoiceInkPastePreference.restoreClipboardAfterPasteKey) private var restoreClipboardAfterPaste = VoiceInkPastePreference.defaultRestoreClipboardAfterPaste
     @AppStorage(VoiceInkPastePreference.clipboardRestoreDelayKey) private var clipboardRestoreDelay = VoiceInkPastePreference.defaultClipboardRestoreDelay
-    @AppStorage(VoiceInkPasteMethod.userDefaultsKey) private var pasteMethodRawValue = VoiceInkPasteMethod.standard.rawValue
+    @AppStorage(VoiceInkPasteMethod.userDefaultsKey) private var pasteMethodRawValue = VoiceInkPasteMethod.current().rawValue
     @AppStorage(VoiceInkMenuBarPreference.showMenuBarIconKey) private var showMenuBarIcon = VoiceInkMenuBarPreference.defaultShowMenuBarIcon
     @State private var showResetOnboardingAlert = false
     @State private var hasCancelRecordingShortcut = ShortcutStore.shortcut(for: .cancelRecorder) != nil
@@ -38,6 +38,18 @@ struct SettingsView: View {
     private static let rollingBufferPresentation = VoiceInkRollingBufferPreloadSettings.macOSSettingsPresentation
     private static let resetOnboardingPresentation = VoiceInkMacOSOnboardingPresentation.resetSettingsAlert
     private static let settingsPresentation = VoiceInkMacOSSettingsPresentation.macOS
+
+    private var pasteMethod: Binding<VoiceInkPasteMethod> {
+        Binding(
+            get: {
+                VoiceInkPasteMethod.selection(fromStoredRawValue: pasteMethodRawValue)
+            },
+            set: { newMethod in
+                pasteMethodRawValue = newMethod.rawValue
+                VoiceInkPasteMethod.setCurrent(newMethod)
+            }
+        )
+    }
 
     var body: some View {
         Form {
@@ -206,9 +218,9 @@ struct SettingsView: View {
                 }
 
                 // Paste Method
-                Picker(selection: $pasteMethodRawValue) {
+                Picker(selection: pasteMethod) {
                     ForEach(VoiceInkPasteMethod.allCases) { method in
-                        Text(method.displayName).tag(method.rawValue)
+                        Text(method.displayName).tag(method)
                     }
                 } label: {
                     HStack(spacing: 4) {
@@ -217,13 +229,6 @@ struct SettingsView: View {
                     }
                 }
                 .pickerStyle(.menu)
-                .onChange(of: pasteMethodRawValue) { _, newValue in
-                    guard let method = VoiceInkPasteMethod(rawValue: newValue) else {
-                        pasteMethodRawValue = VoiceInkPasteMethod.standard.rawValue
-                        return
-                    }
-                    VoiceInkPasteMethod.setCurrent(method)
-                }
             }
 
             // MARK: - Rolling Buffer

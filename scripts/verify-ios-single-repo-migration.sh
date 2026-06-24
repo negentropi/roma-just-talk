@@ -9329,6 +9329,16 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
 
 require_pattern \
+  "shared paste method stored selection fallback lives in VoiceInkCore" \
+  'fromStoredRawValue storedRawValue' \
+  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+
+require_pattern \
+  "shared paste method stored selection fallback reuses current defaults" \
+  'return current\(in: defaults\)' \
+  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+
+require_pattern \
   "shared clipboard restore preference owns enabled storage key" \
   'restoreClipboardAfterPasteKey = "restoreClipboardAfterPaste"' \
   VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
@@ -9381,6 +9391,16 @@ require_pattern \
 require_pattern \
   "macOS settings uses shared paste preferences" \
   'VoiceInkPastePreference\.(restoreClipboardAfterPasteKey|clipboardRestoreDelayKey|defaultRestoreClipboardAfterPaste|defaultClipboardRestoreDelay)|VoiceInkPasteMethod\.(userDefaultsKey|standard|allCases|setCurrent)' \
+  VoiceInk/Views/Settings/SettingsView.swift
+
+require_pattern \
+  "macOS settings uses shared paste method stored selection fallback" \
+  'VoiceInkPasteMethod\.selection\(fromStoredRawValue: pasteMethodRawValue\)' \
+  VoiceInk/Views/Settings/SettingsView.swift
+
+reject_pattern \
+  "macOS settings avoids shell-owned paste method raw-value fallback" \
+  'VoiceInkPasteMethod\(rawValue: newValue\)|pasteMethodRawValue = VoiceInkPasteMethod\.standard\.rawValue' \
   VoiceInk/Views/Settings/SettingsView.swift
 
 require_pattern \
@@ -9442,7 +9462,7 @@ reject_pattern \
 
 require_pattern \
   "migration checklist tracks shared paste preference gate" \
-  'macOS paste method and clipboard restore settings route through `VoiceInkPasteMethod`/`VoiceInkPastePreference`, including settings labels/options/help and backup import/export plans' \
+  'macOS paste method and clipboard restore settings route through `VoiceInkPasteMethod`/`VoiceInkPastePreference`, including stored selection repair, settings labels/options/help, and backup import/export plans' \
   docs/ios-single-repo-migration.md
 
 require_file \

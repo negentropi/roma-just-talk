@@ -28,6 +28,28 @@ final class PastePreferencesTests: XCTestCase {
         }
     }
 
+    func testPasteMethodSelectionFromStoredRawValueUsesValidMethodBeforeDefaults() {
+        withTemporaryDefaults { defaults in
+            defaults.set(true, forKey: VoiceInkPasteMethod.legacyAppleScriptPasteKey)
+
+            XCTAssertEqual(
+                VoiceInkPasteMethod.selection(fromStoredRawValue: VoiceInkPasteMethod.standard.rawValue, in: defaults),
+                .standard
+            )
+        }
+    }
+
+    func testPasteMethodSelectionFromStoredRawValueFallsBackToLegacyDefaults() {
+        withTemporaryDefaults { defaults in
+            defaults.set(true, forKey: VoiceInkPasteMethod.legacyAppleScriptPasteKey)
+
+            XCTAssertEqual(
+                VoiceInkPasteMethod.selection(fromStoredRawValue: "unknown", in: defaults),
+                .appleScript
+            )
+        }
+    }
+
     func testSetCurrentWritesModernAndLegacyCompatibilityKeys() {
         withTemporaryDefaults { defaults in
             VoiceInkPasteMethod.setCurrent(.appleScript, in: defaults)

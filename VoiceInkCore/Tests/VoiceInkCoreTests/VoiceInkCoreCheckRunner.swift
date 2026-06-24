@@ -1493,6 +1493,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "PastePreferencesTests.testPasteMethodPreservesRawValuesAndDisplayNames", run: { PastePreferencesTests().testPasteMethodPreservesRawValuesAndDisplayNames() }),
             VoiceInkCoreCheck(name: "PastePreferencesTests.testPasteMethodCurrentUsesStoredMethodBeforeLegacyFlag", run: { PastePreferencesTests().testPasteMethodCurrentUsesStoredMethodBeforeLegacyFlag() }),
             VoiceInkCoreCheck(name: "PastePreferencesTests.testPasteMethodCurrentFallsBackToLegacyAppleScriptFlag", run: { PastePreferencesTests().testPasteMethodCurrentFallsBackToLegacyAppleScriptFlag() }),
+            VoiceInkCoreCheck(name: "PastePreferencesTests.testPasteMethodSelectionFromStoredRawValueUsesValidMethodBeforeDefaults", run: { PastePreferencesTests().testPasteMethodSelectionFromStoredRawValueUsesValidMethodBeforeDefaults() }),
+            VoiceInkCoreCheck(name: "PastePreferencesTests.testPasteMethodSelectionFromStoredRawValueFallsBackToLegacyDefaults", run: { PastePreferencesTests().testPasteMethodSelectionFromStoredRawValueFallsBackToLegacyDefaults() }),
             VoiceInkCoreCheck(name: "PastePreferencesTests.testSetCurrentWritesModernAndLegacyCompatibilityKeys", run: { PastePreferencesTests().testSetCurrentWritesModernAndLegacyCompatibilityKeys() }),
             VoiceInkCoreCheck(name: "PastePreferencesTests.testMigrateLegacyUserDefaultWritesModernMethodWhenMissing", run: { PastePreferencesTests().testMigrateLegacyUserDefaultWritesModernMethodWhenMissing() }),
             VoiceInkCoreCheck(name: "PastePreferencesTests.testMigrateLegacyUserDefaultDoesNotOverwriteValidModernMethod", run: { PastePreferencesTests().testMigrateLegacyUserDefaultDoesNotOverwriteValidModernMethod() }),

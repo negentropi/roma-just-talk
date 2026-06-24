@@ -27,6 +27,17 @@ public enum VoiceInkPasteMethod: String, CaseIterable, Identifiable, Sendable {
         return defaults.bool(forKey: legacyAppleScriptPasteKey) ? .appleScript : .standard
     }
 
+    public static func selection(
+        fromStoredRawValue storedRawValue: String?,
+        in defaults: UserDefaults = .standard
+    ) -> VoiceInkPasteMethod {
+        if let storedRawValue, let method = VoiceInkPasteMethod(rawValue: storedRawValue) {
+            return method
+        }
+
+        return current(in: defaults)
+    }
+
     public static func setCurrent(_ method: VoiceInkPasteMethod, in defaults: UserDefaults = .standard) {
         defaults.set(method.rawValue, forKey: userDefaultsKey)
         defaults.set(method == .appleScript, forKey: legacyAppleScriptPasteKey)

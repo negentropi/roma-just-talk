@@ -455,10 +455,18 @@ public enum VoiceInkRollingBufferPreloadSettings {
         min(max(seconds, minimumBufferDurationSeconds), maximumBufferDurationSeconds)
     }
 
+    public static func preloadModeSelection(
+        fromStoredRawValue storedRawValue: String?
+    ) -> VoiceInkRollingBufferPreloadMode {
+        if let storedRawValue, let mode = VoiceInkRollingBufferPreloadMode(rawValue: storedRawValue) {
+            return mode
+        }
+
+        return defaultMode
+    }
+
     public static func configuration(in defaults: UserDefaults = .standard) -> VoiceInkRollingBufferPreloadConfiguration {
-        let mode = defaults.string(forKey: modeKey)
-            .flatMap(VoiceInkRollingBufferPreloadMode.init(rawValue:))
-            ?? defaultMode
+        let mode = preloadModeSelection(fromStoredRawValue: defaults.string(forKey: modeKey))
         let cloudGuard = defaults.object(forKey: autoDisableCloudModelsKey) as? Bool
             ?? defaultAutoDisablesCloudModels
         let lowBatteryGuard = defaults.object(forKey: autoDisableLowBatteryLocalModelsKey) as? Bool

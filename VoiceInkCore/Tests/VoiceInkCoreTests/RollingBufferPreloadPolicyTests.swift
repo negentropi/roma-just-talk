@@ -35,6 +35,24 @@ final class RollingBufferPreloadPolicyTests: XCTestCase {
         XCTAssertEqual(VoiceInkRollingBufferPreloadSettings.normalizedBufferDurationSeconds(99), 30.0)
     }
 
+    func testPreloadModeSelectionUsesValidStoredRawValue() {
+        XCTAssertEqual(
+            VoiceInkRollingBufferPreloadSettings.preloadModeSelection(fromStoredRawValue: "on"),
+            .on
+        )
+    }
+
+    func testPreloadModeSelectionFallsBackToDefaultForInvalidRawValue() {
+        XCTAssertEqual(
+            VoiceInkRollingBufferPreloadSettings.preloadModeSelection(fromStoredRawValue: "bad"),
+            VoiceInkRollingBufferPreloadSettings.defaultMode
+        )
+        XCTAssertEqual(
+            VoiceInkRollingBufferPreloadSettings.preloadModeSelection(fromStoredRawValue: nil),
+            VoiceInkRollingBufferPreloadSettings.defaultMode
+        )
+    }
+
     func testPartialTranscriptRequestPreservesNotificationContract() {
         XCTAssertEqual(
             VoiceInkRollingBufferPreloadPartialTranscriptRequest.notificationName.rawValue,

@@ -13329,6 +13329,16 @@ require_pattern \
   'normalizedBufferDurationSeconds' \
   VoiceInkCore/Sources/VoiceInkCore/RollingBufferPreloadPolicy.swift
 
+require_pattern \
+  "shared rolling-buffer preload mode stored selection fallback lives in VoiceInkCore" \
+  'preloadModeSelection\(fromStoredRawValue' \
+  VoiceInkCore/Sources/VoiceInkCore/RollingBufferPreloadPolicy.swift
+
+require_pattern \
+  "shared rolling-buffer configuration uses stored preload mode selection" \
+  'preloadModeSelection\(fromStoredRawValue: defaults\.string\(forKey: modeKey\)\)' \
+  VoiceInkCore/Sources/VoiceInkCore/RollingBufferPreloadPolicy.swift
+
 require_patterns \
   "shared rolling-buffer coordinator timing defaults live in VoiceInkCore" \
   VoiceInkCore/Sources/VoiceInkCore/RollingBufferPreloadPolicy.swift \
@@ -13363,6 +13373,16 @@ require_pattern \
 require_pattern \
   "macOS rolling-buffer settings use shared duration normalization" \
   'VoiceInkRollingBufferPreloadSettings\.normalizedBufferDurationSeconds' \
+  VoiceInk/Views/Settings/RollingBufferPreloadSettingsControls.swift
+
+require_pattern \
+  "macOS rolling-buffer settings use shared preload mode stored selection fallback" \
+  'VoiceInkRollingBufferPreloadSettings\.preloadModeSelection\(fromStoredRawValue: modeRaw\)' \
+  VoiceInk/Views/Settings/RollingBufferPreloadSettingsControls.swift
+
+reject_pattern \
+  "macOS rolling-buffer settings avoids shell-owned preload mode raw-value fallback" \
+  'VoiceInkRollingBufferPreloadMode\(rawValue: modeRaw\) \?\?' \
   VoiceInk/Views/Settings/RollingBufferPreloadSettingsControls.swift
 
 require_pattern \
@@ -13502,7 +13522,7 @@ reject_pattern \
 
 require_pattern \
   "migration checklist tracks shared rolling-buffer settings labels" \
-  'macOS rolling-buffer preload settings labels/help, duration bounds/normalization, partial-transcript preview notification contract, VAD model labels, storage key/default, selected-model fallback, Silero predicate, service-route provider classification' \
+  'macOS rolling-buffer preload settings labels/help, preload-mode stored selection repair, duration bounds/normalization, partial-transcript preview notification contract, VAD model labels, storage key/default, selected-model fallback, Silero predicate, service-route provider classification' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

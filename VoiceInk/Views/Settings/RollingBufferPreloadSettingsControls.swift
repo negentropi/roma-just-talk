@@ -15,7 +15,7 @@ struct RollingBufferPreloadSettingsControls: View {
     private var mode: Binding<VoiceInkRollingBufferPreloadMode> {
         Binding(
             get: {
-                VoiceInkRollingBufferPreloadMode(rawValue: modeRaw) ?? VoiceInkRollingBufferPreloadSettings.defaultMode
+                VoiceInkRollingBufferPreloadSettings.preloadModeSelection(fromStoredRawValue: modeRaw)
             },
             set: { newMode in
                 modeRaw = newMode.rawValue

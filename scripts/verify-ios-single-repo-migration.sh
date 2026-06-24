@@ -3147,6 +3147,11 @@ require_patterns \
   'ProviderAccessRequirementTests\.testProviderAPIKeyFormControlPresentationOwnsIOSSaveRuntimeActionMapping'
 
 require_pattern \
+  "core checks execute provider API-key macOS card control presentation test" \
+  'ProviderAccessRequirementTests\.testProviderAPIKeyFormStateOwnsMacOSCardControlPresentation' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "shared provider API-key form presentation lives in VoiceInkCore" \
   'VoiceInkProviderAPIKeyFormPresentation|apiKeyFormPresentation|saveButtonSystemImageName|verifyButtonSystemImageName|consoleLeadingSystemImageName|consoleTrailingSystemImageName' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
@@ -4912,8 +4917,13 @@ reject_pattern \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift
 
 require_pattern \
-  "macOS cloud API-key card uses shared draft policy" \
-  'apiKeyFormState\.draft' \
+  "shared provider API-key card control presentation lives in VoiceInkCore" \
+  'VoiceInkProviderAPIKeyCardControlPresentation|macOSCardControlPresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
+
+require_pattern \
+  "macOS cloud API-key card uses shared card control presentation" \
+  'macOSCardControlPresentation|controlPresentation\.' \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift
 
 require_pattern \
@@ -4932,13 +4942,13 @@ reject_pattern \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift
 
 require_pattern \
-  "macOS cloud API-key card reads verification progress through shared form state" \
-  'apiKeyFormState\.verificationProgress' \
+  "macOS cloud API-key card uses shared verification progress presentation through card controls" \
+  'controlPresentation\.(verifyButtonTitle|inlineFeedback|isVerifyButtonSuccess)' \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift
 
-require_pattern \
-  "macOS cloud API-key card uses shared verification progress presentation" \
-  'macOSVerifyButtonTitle|macOSInlineFeedback' \
+reject_pattern \
+  "macOS cloud API-key card avoids shell-owned card control branching" \
+  'apiKeyFormState\.draft|apiKeyFormState\.verificationProgress|verificationProgress\.|apiKeyDraft\.canVerify' \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift
 
 require_pattern \

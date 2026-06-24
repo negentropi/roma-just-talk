@@ -585,6 +585,62 @@ final class ProviderAccessRequirementTests: XCTestCase {
         )
     }
 
+    func testProviderAPIKeyFormStateOwnsMacOSCardControlPresentation() {
+        XCTAssertEqual(
+            VoiceInkProviderAPIKeyFormState(enteredKey: " entered-key ")
+                .macOSCardControlPresentation(storedRuntimeKey: nil),
+            VoiceInkProviderAPIKeyCardControlPresentation(
+                isAPIKeyFieldDisabled: false,
+                isVerifyProgressVisible: false,
+                isVerifyButtonDisabled: false,
+                verifyButtonTitle: "Verify",
+                verifyButtonSystemImageName: "checkmark.shield",
+                isVerifyButtonSuccess: false,
+                inlineFeedback: nil
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkProviderAPIKeyFormState(enteredKey: " \n\t ")
+                .macOSCardControlPresentation(storedRuntimeKey: nil)
+                .isVerifyButtonDisabled,
+            true
+        )
+        XCTAssertEqual(
+            VoiceInkProviderAPIKeyFormState(
+                enteredKey: "entered-key",
+                verificationProgress: .verifying
+            ).macOSCardControlPresentation(storedRuntimeKey: nil),
+            VoiceInkProviderAPIKeyCardControlPresentation(
+                isAPIKeyFieldDisabled: true,
+                isVerifyProgressVisible: true,
+                isVerifyButtonDisabled: true,
+                verifyButtonTitle: "Verifying...",
+                verifyButtonSystemImageName: "checkmark.shield",
+                isVerifyButtonSuccess: false,
+                inlineFeedback: nil
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkProviderAPIKeyFormState(
+                enteredKey: "stored-key",
+                verificationProgress: .success,
+                isEditing: false
+            ).macOSCardControlPresentation(storedRuntimeKey: nil),
+            VoiceInkProviderAPIKeyCardControlPresentation(
+                isAPIKeyFieldDisabled: false,
+                isVerifyProgressVisible: false,
+                isVerifyButtonDisabled: false,
+                verifyButtonTitle: "Verify",
+                verifyButtonSystemImageName: "checkmark",
+                isVerifyButtonSuccess: true,
+                inlineFeedback: VoiceInkProviderAPIKeyVerificationFeedback(
+                    text: "API key verified successfully!",
+                    tone: .success
+                )
+            )
+        )
+    }
+
     func testProviderAPIKeyVerificationControlOwnsIOSRuntimeActionMapping() {
         var didVerify = false
         let enabledAction = VoiceInkProviderAPIKeyVerificationControl.verifyButton(

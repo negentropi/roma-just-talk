@@ -236,8 +236,7 @@ struct CloudModelCardView: View {
     private func configurationSection(
         apiKeyCardPresentation: VoiceInkProviderAPIKeyCardPresentation
     ) -> some View {
-        let verificationProgress = apiKeyFormState.verificationProgress
-        let apiKeyDraft = apiKeyFormState.draft(
+        let controlPresentation = apiKeyFormState.macOSCardControlPresentation(
             storedRuntimeKey: APIKeyManager.shared.getAPIKey(forProvider: model.provider.apiKeyProviderName)
         )
 
@@ -249,19 +248,19 @@ struct CloudModelCardView: View {
             HStack(spacing: 8) {
                 SecureField(apiKeyCardPresentation.apiKeyFieldPlaceholder, text: $apiKeyFormState.enteredKey)
                     .textFieldStyle(.roundedBorder)
-                    .disabled(verificationProgress.isVerifying)
+                    .disabled(controlPresentation.isAPIKeyFieldDisabled)
                 
                 Button(action: verifyAPIKey) {
                     HStack(spacing: 4) {
-                        if verificationProgress.isVerifying {
+                        if controlPresentation.isVerifyProgressVisible {
                             ProgressView()
                                 .scaleEffect(0.7)
                                 .frame(width: 12, height: 12)
                         } else {
-                            Image(systemName: verificationProgress.macOSVerifyButtonSystemImageName)
+                            Image(systemName: controlPresentation.verifyButtonSystemImageName)
                                 .font(.system(size: 12, weight: .medium))
                         }
-                        Text(verificationProgress.macOSVerifyButtonTitle)
+                        Text(controlPresentation.verifyButtonTitle)
                             .font(.system(size: 12, weight: .medium))
                     }
                     .foregroundColor(.white)
@@ -269,14 +268,14 @@ struct CloudModelCardView: View {
                     .padding(.vertical, 6)
                     .background(
                         Capsule()
-                            .fill(verificationProgress.isSuccess ? Color(.systemGreen) : Color(.controlAccentColor))
+                            .fill(controlPresentation.isVerifyButtonSuccess ? Color(.systemGreen) : Color(.controlAccentColor))
                     )
                 }
                 .buttonStyle(.plain)
-                .disabled(!apiKeyDraft.canVerify || verificationProgress.isVerifying)
+                .disabled(controlPresentation.isVerifyButtonDisabled)
             }
             
-            if let feedback = verificationProgress.macOSInlineFeedback {
+            if let feedback = controlPresentation.inlineFeedback {
                 Text(feedback.text)
                     .font(.caption)
                     .foregroundColor(feedback.tone.macOSStatusColor)

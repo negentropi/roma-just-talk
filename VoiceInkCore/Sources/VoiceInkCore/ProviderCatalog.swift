@@ -337,6 +337,34 @@ public struct VoiceInkProviderAPIKeyFormControlPresentation: Equatable, Sendable
     }
 }
 
+public struct VoiceInkProviderAPIKeyCardControlPresentation: Equatable, Sendable {
+    public let isAPIKeyFieldDisabled: Bool
+    public let isVerifyProgressVisible: Bool
+    public let isVerifyButtonDisabled: Bool
+    public let verifyButtonTitle: String
+    public let verifyButtonSystemImageName: String
+    public let isVerifyButtonSuccess: Bool
+    public let inlineFeedback: VoiceInkProviderAPIKeyVerificationFeedback?
+
+    public init(
+        isAPIKeyFieldDisabled: Bool,
+        isVerifyProgressVisible: Bool,
+        isVerifyButtonDisabled: Bool,
+        verifyButtonTitle: String,
+        verifyButtonSystemImageName: String,
+        isVerifyButtonSuccess: Bool,
+        inlineFeedback: VoiceInkProviderAPIKeyVerificationFeedback?
+    ) {
+        self.isAPIKeyFieldDisabled = isAPIKeyFieldDisabled
+        self.isVerifyProgressVisible = isVerifyProgressVisible
+        self.isVerifyButtonDisabled = isVerifyButtonDisabled
+        self.verifyButtonTitle = verifyButtonTitle
+        self.verifyButtonSystemImageName = verifyButtonSystemImageName
+        self.isVerifyButtonSuccess = isVerifyButtonSuccess
+        self.inlineFeedback = inlineFeedback
+    }
+}
+
 public struct VoiceInkProviderAPIKeyStoredKeyPresentation: Equatable, Sendable {
     public let feedback: VoiceInkProviderAPIKeyVerificationFeedback
     public let obfuscatedKey: String?
@@ -537,6 +565,19 @@ public struct VoiceInkProviderAPIKeyFormState: Equatable, Sendable {
             verificationControl: verificationProgress.isVerifying
                 ? .progress
                 : .verifyButton(isDisabled: !draft.canVerify)
+        )
+    }
+
+    public func macOSCardControlPresentation(storedRuntimeKey: String?) -> VoiceInkProviderAPIKeyCardControlPresentation {
+        let draft = draft(storedRuntimeKey: storedRuntimeKey)
+        return VoiceInkProviderAPIKeyCardControlPresentation(
+            isAPIKeyFieldDisabled: verificationProgress.isVerifying,
+            isVerifyProgressVisible: verificationProgress.isVerifying,
+            isVerifyButtonDisabled: !draft.canVerify || verificationProgress.isVerifying,
+            verifyButtonTitle: verificationProgress.macOSVerifyButtonTitle,
+            verifyButtonSystemImageName: verificationProgress.macOSVerifyButtonSystemImageName,
+            isVerifyButtonSuccess: verificationProgress.isSuccess,
+            inlineFeedback: verificationProgress.macOSInlineFeedback
         )
     }
 }

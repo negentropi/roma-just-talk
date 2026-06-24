@@ -1111,6 +1111,61 @@ final class AIProviderCatalogTests: XCTestCase {
         )
     }
 
+    func testMacOSAIEnhancementAPIKeyControlPresentationUsesDraftAndCustomSubmitPolicy() {
+        let presentation = VoiceInkAIEnhancementProviderSettingsPresentation.macOS
+
+        XCTAssertEqual(
+            presentation.apiKeyControlPresentation(
+                formState: VoiceInkAIEnhancementAPIKeyFormState(enteredKey: "draft-key"),
+                provider: .groq,
+                customProviderBaseURL: "https://api.example.test/v1/chat/completions",
+                customProviderModelName: "custom-model"
+            ),
+            VoiceInkAIEnhancementAPIKeyControlPresentation(
+                isVerificationProgressVisible: false,
+                isDefaultVerifyAndSaveButtonDisabled: false,
+                isCustomVerifyAndSaveButtonDisabled: false
+            )
+        )
+        XCTAssertEqual(
+            presentation.apiKeyControlPresentation(
+                formState: VoiceInkAIEnhancementAPIKeyFormState(
+                    enteredKey: "draft-key",
+                    verificationProgress: .verifying
+                ),
+                provider: .groq,
+                customProviderBaseURL: "https://api.example.test/v1/chat/completions",
+                customProviderModelName: "custom-model"
+            ),
+            VoiceInkAIEnhancementAPIKeyControlPresentation(
+                isVerificationProgressVisible: true,
+                isDefaultVerifyAndSaveButtonDisabled: false,
+                isCustomVerifyAndSaveButtonDisabled: false
+            )
+        )
+        XCTAssertEqual(
+            presentation.apiKeyControlPresentation(
+                formState: VoiceInkAIEnhancementAPIKeyFormState(enteredKey: ""),
+                provider: .custom,
+                customProviderBaseURL: "https://api.example.test/v1/chat/completions",
+                customProviderModelName: "custom-model"
+            ),
+            VoiceInkAIEnhancementAPIKeyControlPresentation(
+                isVerificationProgressVisible: false,
+                isDefaultVerifyAndSaveButtonDisabled: true,
+                isCustomVerifyAndSaveButtonDisabled: true
+            )
+        )
+        XCTAssertTrue(
+            presentation.apiKeyControlPresentation(
+                formState: VoiceInkAIEnhancementAPIKeyFormState(enteredKey: "draft-key"),
+                provider: .custom,
+                customProviderBaseURL: "",
+                customProviderModelName: "custom-model"
+            ).isCustomVerifyAndSaveButtonDisabled
+        )
+    }
+
     func testMacOSAIEnhancementProviderSelectionPlanIsShared() {
         XCTAssertEqual(
             VoiceInkAIEnhancementProviderSelectionPlan.selecting(.groq),

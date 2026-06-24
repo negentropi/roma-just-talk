@@ -246,6 +246,22 @@ public enum VoiceInkAIEnhancementConnectionStatusPresentation: Sendable, Equatab
     case status(text: String, tone: VoiceInkAIEnhancementConnectionStatusTone)
 }
 
+public struct VoiceInkAIEnhancementAPIKeyControlPresentation: Sendable, Equatable {
+    public let isVerificationProgressVisible: Bool
+    public let isDefaultVerifyAndSaveButtonDisabled: Bool
+    public let isCustomVerifyAndSaveButtonDisabled: Bool
+
+    public init(
+        isVerificationProgressVisible: Bool,
+        isDefaultVerifyAndSaveButtonDisabled: Bool,
+        isCustomVerifyAndSaveButtonDisabled: Bool
+    ) {
+        self.isVerificationProgressVisible = isVerificationProgressVisible
+        self.isDefaultVerifyAndSaveButtonDisabled = isDefaultVerifyAndSaveButtonDisabled
+        self.isCustomVerifyAndSaveButtonDisabled = isCustomVerifyAndSaveButtonDisabled
+    }
+}
+
 public struct VoiceInkAIEnhancementProviderSettingsPresentation: Sendable, Equatable {
     public let sectionTitle: String
     public let providerPickerTitle: String
@@ -331,6 +347,24 @@ public struct VoiceInkAIEnhancementProviderSettingsPresentation: Sendable, Equat
         hasDraftAPIKey: Bool
     ) -> Bool {
         !baseURL.isEmpty && !modelName.isEmpty && hasDraftAPIKey
+    }
+
+    public func apiKeyControlPresentation(
+        formState: VoiceInkAIEnhancementAPIKeyFormState,
+        provider: VoiceInkAIEnhancementProviderKind,
+        customProviderBaseURL: String,
+        customProviderModelName: String
+    ) -> VoiceInkAIEnhancementAPIKeyControlPresentation {
+        let draft = formState.draft(for: provider)
+        return VoiceInkAIEnhancementAPIKeyControlPresentation(
+            isVerificationProgressVisible: formState.isVerifying,
+            isDefaultVerifyAndSaveButtonDisabled: !draft.hasEnteredKey,
+            isCustomVerifyAndSaveButtonDisabled: !canSubmitCustomProvider(
+                baseURL: customProviderBaseURL,
+                modelName: customProviderModelName,
+                hasDraftAPIKey: draft.hasEnteredKey
+            )
+        )
     }
 }
 

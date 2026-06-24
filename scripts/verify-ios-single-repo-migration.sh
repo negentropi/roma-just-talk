@@ -8047,8 +8047,13 @@ require_pattern \
   docs/ios-single-repo-migration.md
 
 require_pattern \
-  "macOS AI API-key view uses shared AI draft policy" \
-  'apiKeyFormState\.draft' \
+  "shared macOS AI API-key control presentation lives in VoiceInkCore" \
+  'VoiceInkAIEnhancementAPIKeyControlPresentation|apiKeyControlPresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+require_pattern \
+  "macOS AI API-key view uses shared AI API-key control presentation" \
+  'apiKeyControlPresentation|providerSettingsPresentation\.apiKeyControlPresentation' \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
 
 require_pattern \
@@ -8072,13 +8077,18 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 require_pattern \
+  "core checks execute macOS AI API-key control presentation test" \
+  'AIProviderCatalogTests\.testMacOSAIEnhancementAPIKeyControlPresentationUsesDraftAndCustomSubmitPolicy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "macOS AI API-key view uses shared AI form state" \
   'VoiceInkAIEnhancementAPIKeyFormState' \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
 
 require_pattern \
   "macOS AI API-key view routes entry through shared AI form state" \
-  'apiKeyFormState\.(draft|enteredKey|isVerifying|verifying|completedVerification)' \
+  'apiKeyFormState\.(enteredKey|verifying|completedVerification)|apiKeyControlPresentation' \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
 
 require_pattern \
@@ -8104,6 +8114,11 @@ require_pattern \
 reject_pattern \
   "macOS AI API-key view avoids shallow draft-key wrapper" \
   'private +var +(hasDraftAPIKey|apiKeyDraft)\b' \
+  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
+
+reject_pattern \
+  "macOS AI API-key view avoids shell-owned API-key control branching" \
+  'let +apiKeyDraft|apiKeyDraft\.|apiKeyFormState\.isVerifying|canSubmitCustomProvider\(' \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
 
 reject_pattern \

@@ -22,13 +22,18 @@ struct APIKeyManagementView: View {
     private let localCLIPresentation = VoiceInkLocalCLIPreference.macOSSettingsPresentation
 
     var body: some View {
-        let apiKeyDraft = apiKeyFormState.draft(for: aiService.selectedProvider)
         let selectedProviderSettingsSurface = aiService.selectedProvider.textEnhancementSettingsSurface
         let connectionStatusPresentation = providerSettingsPresentation.connectionStatus(
             surface: selectedProviderSettingsSurface,
             isAPIKeyValid: aiService.isAPIKeyValid,
             isCheckingOllama: isCheckingOllama,
             hasOllamaModels: !ollamaModels.isEmpty
+        )
+        let apiKeyControlPresentation = providerSettingsPresentation.apiKeyControlPresentation(
+            formState: apiKeyFormState,
+            provider: aiService.selectedProvider,
+            customProviderBaseURL: aiService.customBaseURL,
+            customProviderModelName: aiService.customModel
         )
 
         Section(providerSettingsPresentation.sectionTitle) {
@@ -248,11 +253,7 @@ struct APIKeyManagementView: View {
                         Button(providerSettingsPresentation.verifyAndSaveButtonTitle) {
                             verifyAndSaveAPIKey()
                         }
-                        .disabled(!providerSettingsPresentation.canSubmitCustomProvider(
-                            baseURL: aiService.customBaseURL,
-                            modelName: aiService.customModel,
-                            hasDraftAPIKey: apiKeyDraft.hasEnteredKey
-                        ))
+                        .disabled(apiKeyControlPresentation.isCustomVerifyAndSaveButtonDisabled)
                     }
                     
                 } else {
@@ -293,13 +294,13 @@ struct APIKeyManagementView: View {
                                 verifyAndSaveAPIKey()
                             }) {
                                 HStack {
-                                    if apiKeyFormState.isVerifying {
+                                    if apiKeyControlPresentation.isVerificationProgressVisible {
                                         ProgressView().controlSize(.small)
                                     }
                                     Text(providerSettingsPresentation.verifyAndSaveButtonTitle)
                                 }
                             }
-                            .disabled(!apiKeyDraft.hasEnteredKey)
+                            .disabled(apiKeyControlPresentation.isDefaultVerifyAndSaveButtonDisabled)
                         }
                     }
                 }

@@ -16,6 +16,36 @@ public struct VoiceInkMacOSLocalWhisperPromptSettingsPresentation: Equatable, Se
     )
 }
 
+public struct VoiceInkLocalWhisperPromptDraftState: Equatable, Sendable {
+    public var text: String
+    public var isEditing: Bool
+
+    public init(
+        text: String = "",
+        isEditing: Bool = false
+    ) {
+        self.text = text
+        self.isEditing = isEditing
+    }
+
+    public func editing(prompt: String) -> VoiceInkLocalWhisperPromptDraftState {
+        VoiceInkLocalWhisperPromptDraftState(text: prompt, isEditing: true)
+    }
+
+    public func saved() -> VoiceInkLocalWhisperPromptDraftState {
+        VoiceInkLocalWhisperPromptDraftState(text: text, isEditing: false)
+    }
+
+    public func refreshingForSelectedLanguage(
+        prompt: String
+    ) -> VoiceInkLocalWhisperPromptDraftState {
+        guard isEditing else {
+            return self
+        }
+        return VoiceInkLocalWhisperPromptDraftState(text: prompt, isEditing: true)
+    }
+}
+
 public enum VoiceInkLocalWhisperPromptCatalog {
     public static let customLanguagePromptsKey = "CustomLanguagePrompts"
     public static let macOSSettingsPresentation = VoiceInkMacOSLocalWhisperPromptSettingsPresentation.macOS

@@ -17,8 +17,7 @@ struct ModelSettingsView: View {
     private var prewarmModelOnWake = VoiceInkModelRuntimePreference.defaultShouldPrewarmModelOnWake
     @AppStorage(VoiceInkRecorderPreviewPreference.userDefaultsKey)
     private var showLiveTextPreview = VoiceInkRecorderPreviewPreference.defaultIsLiveTextPreviewEnabled
-    @State private var customPrompt: String = ""
-    @State private var isEditing: Bool = false
+    @State private var promptDraftState = VoiceInkLocalWhisperPromptDraftState()
     private let advancedSettingsPresentation = VoiceInkMacOSAdvancedTranscriptionSettingsPresentation.macOS
     private let appendTrailingSpacePresentation = VoiceInkAppendTrailingSpacePreference.macOSSettingsPresentation
     private let cleanupPresentation = VoiceInkTranscriptionCleanupPresentation.macOS
@@ -40,16 +39,16 @@ struct ModelSettingsView: View {
         Form {
             Section {
                 VStack(alignment: .leading, spacing: 8) {
-                    if isEditing {
-                        TextEditor(text: $customPrompt)
+                    if promptDraftState.isEditing {
+                        TextEditor(text: $promptDraftState.text)
                             .font(.system(size: 12))
                             .frame(minHeight: 40, maxHeight: 80)
                             .fixedSize(horizontal: false, vertical: true)
                             .scrollContentBackground(.hidden)
 
                         Button(localWhisperPromptPresentation.saveButtonTitle) {
-                            whisperPrompt.setCustomPrompt(customPrompt, for: selectedLanguage)
-                            isEditing = false
+                            whisperPrompt.setCustomPrompt(promptDraftState.text, for: selectedLanguage)
+                            promptDraftState = promptDraftState.saved()
                         }
                     } else {
                         Text(whisperPrompt.getLanguagePrompt(for: selectedLanguage))
@@ -58,8 +57,9 @@ struct ModelSettingsView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
 
                         Button(localWhisperPromptPresentation.editButtonTitle) {
-                            customPrompt = whisperPrompt.getLanguagePrompt(for: selectedLanguage)
-                            isEditing = true
+                            promptDraftState = promptDraftState.editing(
+                                prompt: whisperPrompt.getLanguagePrompt(for: selectedLanguage)
+                            )
                         }
                     }
                 }
@@ -151,10 +151,10 @@ struct ModelSettingsView: View {
         }
         .formStyle(.grouped)
         .scrollContentBackground(.hidden)
-        .onChange(of: selectedLanguage) { oldValue, newValue in
-            if isEditing {
-                customPrompt = whisperPrompt.getLanguagePrompt(for: selectedLanguage)
-            }
+        .onChange(of: selectedLanguage) { _, _ in
+            promptDraftState = promptDraftState.refreshingForSelectedLanguage(
+                prompt: whisperPrompt.getLanguagePrompt(for: selectedLanguage)
+            )
         }
     }
 }

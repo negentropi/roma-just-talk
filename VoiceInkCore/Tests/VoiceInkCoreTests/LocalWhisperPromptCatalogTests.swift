@@ -22,6 +22,34 @@ final class LocalWhisperPromptCatalogTests: XCTestCase {
         XCTAssertEqual(presentation.editButtonTitle, "Edit")
     }
 
+    func testPromptDraftStateOwnsMacOSEditSaveAndLanguageRefresh() {
+        let draftState = VoiceInkLocalWhisperPromptDraftState()
+
+        XCTAssertEqual(draftState, VoiceInkLocalWhisperPromptDraftState(text: "", isEditing: false))
+
+        let editingState = draftState.editing(prompt: "Use sentence case.")
+        XCTAssertEqual(
+            editingState,
+            VoiceInkLocalWhisperPromptDraftState(text: "Use sentence case.", isEditing: true)
+        )
+
+        XCTAssertEqual(
+            editingState.refreshingForSelectedLanguage(prompt: "Use French punctuation."),
+            VoiceInkLocalWhisperPromptDraftState(text: "Use French punctuation.", isEditing: true)
+        )
+
+        let savedState = editingState.saved()
+        XCTAssertEqual(
+            savedState,
+            VoiceInkLocalWhisperPromptDraftState(text: "Use sentence case.", isEditing: false)
+        )
+
+        XCTAssertEqual(
+            savedState.refreshingForSelectedLanguage(prompt: "Use German punctuation."),
+            savedState
+        )
+    }
+
     func testDefaultPromptsPreserveExistingMacOSLanguageSeeds() {
         XCTAssertEqual(
             VoiceInkLocalWhisperPromptCatalog.defaultPrompt(for: "en"),

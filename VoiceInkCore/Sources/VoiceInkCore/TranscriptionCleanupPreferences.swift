@@ -335,6 +335,63 @@ public struct VoiceInkMacOSCleanupSettingsPresentation: Equatable, Sendable {
     }
 }
 
+public enum VoiceInkCleanupAutomaticAudioAction: Equatable, Sendable {
+    case none
+    case start
+    case stop
+}
+
+public struct VoiceInkMacOSCleanupSettingsTogglePlan: Equatable, Sendable {
+    public let isExpanded: Bool
+    public let audioAction: VoiceInkCleanupAutomaticAudioAction
+
+    public init(
+        isExpanded: Bool,
+        audioAction: VoiceInkCleanupAutomaticAudioAction = .none
+    ) {
+        self.isExpanded = isExpanded
+        self.audioAction = audioAction
+    }
+}
+
+public enum VoiceInkMacOSCleanupSettingsPolicy {
+    public static func shouldShowAudioCleanupSection(
+        isTranscriptionCleanupEnabled: Bool
+    ) -> Bool {
+        !isTranscriptionCleanupEnabled
+    }
+
+    public static func transcriptCleanupChangePlan(
+        isEnabled: Bool,
+        isAudioCleanupEnabled: Bool
+    ) -> VoiceInkMacOSCleanupSettingsTogglePlan {
+        VoiceInkMacOSCleanupSettingsTogglePlan(
+            isExpanded: isEnabled,
+            audioAction: audioActionAfterTranscriptCleanupChange(
+                isTranscriptionCleanupEnabled: isEnabled,
+                isAudioCleanupEnabled: isAudioCleanupEnabled
+            )
+        )
+    }
+
+    public static func audioCleanupChangePlan(
+        isEnabled: Bool
+    ) -> VoiceInkMacOSCleanupSettingsTogglePlan {
+        VoiceInkMacOSCleanupSettingsTogglePlan(isExpanded: isEnabled)
+    }
+
+    public static func audioActionAfterTranscriptCleanupChange(
+        isTranscriptionCleanupEnabled: Bool,
+        isAudioCleanupEnabled: Bool
+    ) -> VoiceInkCleanupAutomaticAudioAction {
+        if isTranscriptionCleanupEnabled {
+            return .stop
+        }
+
+        return isAudioCleanupEnabled ? .start : .none
+    }
+}
+
 public struct VoiceInkTranscriptionCleanupConfiguration: Equatable, Sendable {
     public static let disabled = VoiceInkTranscriptionCleanupConfiguration()
 

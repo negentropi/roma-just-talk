@@ -84,16 +84,25 @@ struct AudioCleanupSettingsView: View {
             }
             .onChange(of: isTranscriptionCleanupEnabled) { _, newValue in
                 isHandlingTranscriptToggle = true
-                if newValue {
+                let plan = VoiceInkMacOSCleanupSettingsPolicy.transcriptCleanupChangePlan(
+                    isEnabled: newValue,
+                    isAudioCleanupEnabled: isAudioCleanupEnabled
+                )
+                if plan.isExpanded {
                     withAnimation(.easeInOut(duration: 0.2)) {
-                        isTranscriptExpanded = true
+                        isTranscriptExpanded = plan.isExpanded
                     }
-                    AudioCleanupManager.shared.stopAutomaticCleanup()
                 } else {
-                    isTranscriptExpanded = false
-                    if isAudioCleanupEnabled {
-                        AudioCleanupManager.shared.startAutomaticCleanup(modelContext: modelContext)
-                    }
+                    isTranscriptExpanded = plan.isExpanded
+                }
+
+                switch plan.audioAction {
+                case .none:
+                    break
+                case .start:
+                    AudioCleanupManager.shared.startAutomaticCleanup(modelContext: modelContext)
+                case .stop:
+                    AudioCleanupManager.shared.stopAutomaticCleanup()
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                     isHandlingTranscriptToggle = false
@@ -101,7 +110,9 @@ struct AudioCleanupSettingsView: View {
             }
 
             // Audio cleanup - only show if transcript cleanup is disabled
-            if !isTranscriptionCleanupEnabled {
+            if VoiceInkMacOSCleanupSettingsPolicy.shouldShowAudioCleanupSection(
+                isTranscriptionCleanupEnabled: isTranscriptionCleanupEnabled
+            ) {
                 VStack(alignment: .leading, spacing: 0) {
                     HStack {
                         Toggle(isOn: $isAudioCleanupEnabled) {
@@ -199,12 +210,13 @@ struct AudioCleanupSettingsView: View {
                 }
                 .onChange(of: isAudioCleanupEnabled) { _, newValue in
                     isHandlingAudioToggle = true
-                    if newValue {
+                    let plan = VoiceInkMacOSCleanupSettingsPolicy.audioCleanupChangePlan(isEnabled: newValue)
+                    if plan.isExpanded {
                         withAnimation(.easeInOut(duration: 0.2)) {
-                            isAudioExpanded = true
+                            isAudioExpanded = plan.isExpanded
                         }
                     } else {
-                        isAudioExpanded = false
+                        isAudioExpanded = plan.isExpanded
                     }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                         isHandlingAudioToggle = false

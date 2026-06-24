@@ -6211,6 +6211,16 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionCleanupPreferences.swift
 
 require_pattern \
+  "shared macOS cleanup settings owns transcript/audio toggle policy" \
+  'VoiceInkMacOSCleanupSettingsPolicy|transcriptCleanupChangePlan|audioActionAfterTranscriptCleanupChange' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionCleanupPreferences.swift
+
+require_pattern \
+  "core checks execute macOS cleanup toggle policy tests" \
+  'testMacOSCleanupSettingsPolicyHidesAudioSectionWhenTranscriptCleanupIsEnabled|testMacOSCleanupSettingsPolicyRestartsAudioCleanupOnlyWhenStillEnabled' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "shared transcription cleanup backup preferences live in VoiceInkCore" \
   'struct VoiceInkTranscriptionCleanupBackupPreferences' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionCleanupPreferences.swift
@@ -6313,6 +6323,16 @@ require_pattern \
 require_pattern \
   "macOS audio cleanup settings use shared presentation" \
   'VoiceInkMacOSCleanupSettingsPresentation\.macOS|presentation\.(transcriptToggleTitle|audioRetentionOptions|audioCleanupResultMessage|audioCleanupFileSizeText)' \
+  VoiceInk/Views/Settings/AudioCleanupSettingsView.swift
+
+require_pattern \
+  "macOS audio cleanup settings use shared toggle policy" \
+  'VoiceInkMacOSCleanupSettingsPolicy\.(shouldShowAudioCleanupSection|transcriptCleanupChangePlan|audioCleanupChangePlan)' \
+  VoiceInk/Views/Settings/AudioCleanupSettingsView.swift
+
+reject_pattern \
+  "macOS audio cleanup settings avoids shell-owned transcript/audio toggle action policy" \
+  'if newValue \{|if !isTranscriptionCleanupEnabled' \
   VoiceInk/Views/Settings/AudioCleanupSettingsView.swift
 
 require_pattern \

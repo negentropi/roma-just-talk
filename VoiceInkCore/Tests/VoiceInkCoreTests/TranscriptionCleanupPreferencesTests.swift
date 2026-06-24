@@ -125,6 +125,70 @@ final class TranscriptionCleanupPreferencesTests: XCTestCase {
         XCTAssertEqual(presentation.audioCleanupFileSizeText(1_048_576), "1 MB")
     }
 
+    func testMacOSCleanupSettingsPolicyHidesAudioSectionWhenTranscriptCleanupIsEnabled() {
+        XCTAssertFalse(
+            VoiceInkMacOSCleanupSettingsPolicy.shouldShowAudioCleanupSection(
+                isTranscriptionCleanupEnabled: true
+            )
+        )
+        XCTAssertTrue(
+            VoiceInkMacOSCleanupSettingsPolicy.shouldShowAudioCleanupSection(
+                isTranscriptionCleanupEnabled: false
+            )
+        )
+    }
+
+    func testMacOSCleanupSettingsPolicyStopsAudioCleanupWhenTranscriptCleanupStarts() {
+        XCTAssertEqual(
+            VoiceInkMacOSCleanupSettingsPolicy.transcriptCleanupChangePlan(
+                isEnabled: true,
+                isAudioCleanupEnabled: true
+            ),
+            VoiceInkMacOSCleanupSettingsTogglePlan(
+                isExpanded: true,
+                audioAction: .stop
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkMacOSCleanupSettingsPolicy.transcriptCleanupChangePlan(
+                isEnabled: true,
+                isAudioCleanupEnabled: false
+            ).audioAction,
+            .stop
+        )
+    }
+
+    func testMacOSCleanupSettingsPolicyRestartsAudioCleanupOnlyWhenStillEnabled() {
+        XCTAssertEqual(
+            VoiceInkMacOSCleanupSettingsPolicy.transcriptCleanupChangePlan(
+                isEnabled: false,
+                isAudioCleanupEnabled: true
+            ),
+            VoiceInkMacOSCleanupSettingsTogglePlan(
+                isExpanded: false,
+                audioAction: .start
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkMacOSCleanupSettingsPolicy.transcriptCleanupChangePlan(
+                isEnabled: false,
+                isAudioCleanupEnabled: false
+            ),
+            VoiceInkMacOSCleanupSettingsTogglePlan(isExpanded: false)
+        )
+    }
+
+    func testMacOSCleanupSettingsPolicyAudioToggleOnlyPlansExpansion() {
+        XCTAssertEqual(
+            VoiceInkMacOSCleanupSettingsPolicy.audioCleanupChangePlan(isEnabled: true),
+            VoiceInkMacOSCleanupSettingsTogglePlan(isExpanded: true)
+        )
+        XCTAssertEqual(
+            VoiceInkMacOSCleanupSettingsPolicy.audioCleanupChangePlan(isEnabled: false),
+            VoiceInkMacOSCleanupSettingsTogglePlan(isExpanded: false)
+        )
+    }
+
     func testCurrentFallsBackToLegacyRemovePunctuationFlag() {
         withIsolatedDefaults { defaults in
             defaults.set(true, forKey: PunctuationCleanupMode.legacyRemovePunctuationKey)

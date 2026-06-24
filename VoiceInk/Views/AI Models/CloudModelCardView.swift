@@ -285,11 +285,9 @@ struct CloudModelCardView: View {
     }
     
     private func loadSavedAPIKey() {
-        let hasSavedKey = APIKeyManager.shared.hasAPIKey(forProvider: model.provider.apiKeyProviderName)
-        apiKeyFormState = VoiceInkProviderAPIKeyFormState(
-            enteredKey: APIKeyManager.shared.getStoredAPIKey(forProvider: model.provider.apiKeyProviderName) ?? "",
-            verificationProgress: hasSavedKey ? .success : .idle,
-            isEditing: !hasSavedKey
+        apiKeyFormState = .loaded(
+            storedKey: APIKeyManager.shared.getStoredAPIKey(forProvider: model.provider.apiKeyProviderName) ?? "",
+            isVerified: APIKeyManager.shared.hasAPIKey(forProvider: model.provider.apiKeyProviderName)
         )
     }
     

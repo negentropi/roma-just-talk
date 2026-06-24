@@ -4922,6 +4922,16 @@ require_pattern \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift
 
 require_pattern \
+  "macOS cloud API-key card loads saved key through shared form state policy" \
+  'apiKeyFormState = \.loaded\(' \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift
+
+reject_pattern \
+  "macOS cloud API-key card avoids shell-owned loaded state construction" \
+  'verificationProgress: hasSavedKey \? \.success : \.idle|isEditing: !hasSavedKey' \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift
+
+require_pattern \
   "macOS cloud API-key card reads verification progress through shared form state" \
   'apiKeyFormState\.verificationProgress' \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift

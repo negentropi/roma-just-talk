@@ -133,6 +133,28 @@ final class TranscriptionCleanupPreferencesTests: XCTestCase {
         }
     }
 
+    func testSelectionFromStoredRawValueUsesValidModeBeforeDefaults() {
+        withIsolatedDefaults { defaults in
+            defaults.set(true, forKey: PunctuationCleanupMode.legacyRemovePunctuationKey)
+
+            XCTAssertEqual(
+                PunctuationCleanupMode.selection(fromStoredRawValue: "removeTrailingPeriod", in: defaults),
+                .removeTrailingPeriod
+            )
+        }
+    }
+
+    func testSelectionFromStoredRawValueFallsBackToLegacyDefaults() {
+        withIsolatedDefaults { defaults in
+            defaults.set(true, forKey: PunctuationCleanupMode.legacyRemovePunctuationKey)
+
+            XCTAssertEqual(
+                PunctuationCleanupMode.selection(fromStoredRawValue: "unknown", in: defaults),
+                .removeAll
+            )
+        }
+    }
+
     func testSetCurrentWritesNewModeAndLegacyCompatibilityFlag() {
         withIsolatedDefaults { defaults in
             PunctuationCleanupMode.setCurrent(.removeTrailingPeriod, in: defaults)

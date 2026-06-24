@@ -6241,6 +6241,26 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionCleanupPreferences.swift
 
 require_pattern \
+  "shared punctuation cleanup stored selection fallback lives in VoiceInkCore" \
+  'fromStoredRawValue storedRawValue' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionCleanupPreferences.swift
+
+require_pattern \
+  "shared punctuation cleanup stored selection fallback reuses current defaults" \
+  'return current\(in: defaults\)' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionCleanupPreferences.swift
+
+require_pattern \
+  "macOS model settings uses shared punctuation cleanup stored selection fallback" \
+  'PunctuationCleanupMode\.selection\(fromStoredRawValue: punctuationCleanupModeRaw\)' \
+  VoiceInk/Views/ModelSettingsView.swift
+
+reject_pattern \
+  "macOS model settings avoids shell-owned punctuation raw-value fallback" \
+  'PunctuationCleanupMode\(rawValue: punctuationCleanupModeRaw\) \?\?' \
+  VoiceInk/Views/ModelSettingsView.swift
+
+require_pattern \
   "shared transcription auto-cleanup backup preferences live in VoiceInkCore" \
   'struct VoiceInkTranscriptionAutoCleanupBackupPreferences' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift

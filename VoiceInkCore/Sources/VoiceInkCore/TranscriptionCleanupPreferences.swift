@@ -30,6 +30,17 @@ public enum PunctuationCleanupMode: String, Codable, CaseIterable, Identifiable,
         return defaults.bool(forKey: legacyRemovePunctuationKey) ? .removeAll : .keep
     }
 
+    public static func selection(
+        fromStoredRawValue storedRawValue: String?,
+        in defaults: UserDefaults = .standard
+    ) -> PunctuationCleanupMode {
+        if let storedRawValue, let mode = PunctuationCleanupMode(rawValue: storedRawValue) {
+            return mode
+        }
+
+        return current(in: defaults)
+    }
+
     public static func setCurrent(_ mode: PunctuationCleanupMode, in defaults: UserDefaults = .standard) {
         defaults.set(mode.rawValue, forKey: userDefaultsKey)
         defaults.set(mode == .removeAll, forKey: legacyRemovePunctuationKey)

@@ -26,7 +26,7 @@ struct ModelSettingsView: View {
     private var punctuationCleanupMode: Binding<PunctuationCleanupMode> {
         Binding(
             get: {
-                PunctuationCleanupMode(rawValue: punctuationCleanupModeRaw) ?? PunctuationCleanupMode.current()
+                PunctuationCleanupMode.selection(fromStoredRawValue: punctuationCleanupModeRaw)
             },
             set: { newMode in
                 punctuationCleanupModeRaw = newMode.rawValue

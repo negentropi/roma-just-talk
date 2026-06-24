@@ -338,6 +338,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "CustomCloudModelPolicyTests.testGeneratedNamePreservesExistingLowercaseSpaceReplacementPolicy", run: { CustomCloudModelPolicyTests().testGeneratedNamePreservesExistingLowercaseSpaceReplacementPolicy() }),
             VoiceInkCoreCheck(name: "CustomCloudModelPolicyTests.testNormalizedDraftPreservesCurrentMacOSFormPreparation", run: { CustomCloudModelPolicyTests().testNormalizedDraftPreservesCurrentMacOSFormPreparation() }),
             VoiceInkCoreCheck(name: "CustomCloudModelPolicyTests.testRequiredFieldPolicyMatchesMacOSButtonEnablement", run: { CustomCloudModelPolicyTests().testRequiredFieldPolicyMatchesMacOSButtonEnablement() }),
+            VoiceInkCoreCheck(name: "CustomCloudModelPolicyTests.testMacOSFormControlPresentationOwnsSubmitState", run: { CustomCloudModelPolicyTests().testMacOSFormControlPresentationOwnsSubmitState() }),
             VoiceInkCoreCheck(name: "CustomCloudModelPolicyTests.testValidationReturnsExistingMacOSErrorsInOrder", run: { CustomCloudModelPolicyTests().testValidationReturnsExistingMacOSErrorsInOrder() }),
             VoiceInkCoreCheck(name: "CustomCloudModelPolicyTests.testValidationRejectsDuplicateNameUnlessEditingSameModel", run: { CustomCloudModelPolicyTests().testValidationRejectsDuplicateNameUnlessEditingSameModel() }),
             VoiceInkCoreCheck(name: "CustomCloudModelPolicyTests.testMacOSFormPresentationPreservesDefaultsAndCopy", run: { CustomCloudModelPolicyTests().testMacOSFormPresentationPreservesDefaultsAndCopy() }),

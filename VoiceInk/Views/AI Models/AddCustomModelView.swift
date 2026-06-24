@@ -63,7 +63,13 @@ struct AddCustomModelCardView: View {
             
             // Expandable Form Section
             if isExpanded {
-                let formHasRequiredFields = VoiceInkCustomCloudModelPolicy.hasRequiredFields(currentDraft)
+                let formControlPresentation = VoiceInkCustomCloudModelPolicy.formControlPresentation(
+                    for: currentDraft,
+                    isSaving: isSaving
+                )
+                let submitButtonColor = formControlPresentation.usesEnabledSubmitStyle
+                    ? Color(.controlAccentColor)
+                    : Color.secondary
                 VStack(alignment: .leading, spacing: 20) {
                     // Header
                     HStack {
@@ -149,7 +155,7 @@ struct AddCustomModelCardView: View {
                             addModel()
                         }) {
                             HStack(spacing: 6) {
-                                if isSaving {
+                                if formControlPresentation.isSubmitProgressVisible {
                                     ProgressView()
                                         .scaleEffect(0.8)
                                         .frame(width: 14, height: 14)
@@ -165,12 +171,12 @@ struct AddCustomModelCardView: View {
                             .padding(.vertical, 10)
                             .background(
                                 RoundedRectangle(cornerRadius: 8)
-                                    .fill(formHasRequiredFields ? Color(.controlAccentColor) : Color.secondary)
-                                    .shadow(color: (formHasRequiredFields ? Color(.controlAccentColor) : Color.secondary).opacity(0.2), radius: 2, x: 0, y: 1)
+                                    .fill(submitButtonColor)
+                                    .shadow(color: submitButtonColor.opacity(0.2), radius: 2, x: 0, y: 1)
                             )
                         }
                         .buttonStyle(.plain)
-                        .disabled(!formHasRequiredFields || isSaving)
+                        .disabled(formControlPresentation.isSubmitButtonDisabled)
                     }
                 }
                 .padding(16)

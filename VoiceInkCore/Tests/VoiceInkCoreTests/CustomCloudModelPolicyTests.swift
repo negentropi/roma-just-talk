@@ -53,6 +53,57 @@ final class CustomCloudModelPolicyTests: XCTestCase {
         )
     }
 
+    func testMacOSFormControlPresentationOwnsSubmitState() {
+        let draft = VoiceInkCustomCloudModelPolicy.normalizedDraft(
+            displayName: "Custom",
+            apiEndpoint: "https://api.example.com/v1/audio/transcriptions",
+            apiKey: "key",
+            modelName: "whisper-1"
+        )
+        let ready = VoiceInkCustomCloudModelPolicy.formControlPresentation(
+            for: draft,
+            isSaving: false
+        )
+
+        XCTAssertEqual(
+            ready,
+            VoiceInkCustomCloudModelFormControlPresentation(
+                isSubmitProgressVisible: false,
+                isSubmitButtonDisabled: false,
+                usesEnabledSubmitStyle: true
+            )
+        )
+
+        XCTAssertEqual(
+            VoiceInkCustomCloudModelPolicy.formControlPresentation(
+                for: draft,
+                isSaving: true
+            ),
+            VoiceInkCustomCloudModelFormControlPresentation(
+                isSubmitProgressVisible: true,
+                isSubmitButtonDisabled: true,
+                usesEnabledSubmitStyle: true
+            )
+        )
+
+        XCTAssertEqual(
+            VoiceInkCustomCloudModelPolicy.formControlPresentation(
+                for: VoiceInkCustomCloudModelPolicy.normalizedDraft(
+                    displayName: "",
+                    apiEndpoint: "https://api.example.com/v1/audio/transcriptions",
+                    apiKey: "key",
+                    modelName: "whisper-1"
+                ),
+                isSaving: false
+            ),
+            VoiceInkCustomCloudModelFormControlPresentation(
+                isSubmitProgressVisible: false,
+                isSubmitButtonDisabled: true,
+                usesEnabledSubmitStyle: false
+            )
+        )
+    }
+
     func testValidationReturnsExistingMacOSErrorsInOrder() {
         let errors = VoiceInkCustomCloudModelPolicy.validationErrors(
             for: VoiceInkCustomCloudModelDraft(

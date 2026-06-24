@@ -112,6 +112,22 @@ public struct VoiceInkCustomCloudModelFormPresentation: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkCustomCloudModelFormControlPresentation: Equatable, Sendable {
+    public let isSubmitProgressVisible: Bool
+    public let isSubmitButtonDisabled: Bool
+    public let usesEnabledSubmitStyle: Bool
+
+    public init(
+        isSubmitProgressVisible: Bool,
+        isSubmitButtonDisabled: Bool,
+        usesEnabledSubmitStyle: Bool
+    ) {
+        self.isSubmitProgressVisible = isSubmitProgressVisible
+        self.isSubmitButtonDisabled = isSubmitButtonDisabled
+        self.usesEnabledSubmitStyle = usesEnabledSubmitStyle
+    }
+}
+
 public struct VoiceInkCustomCloudModelBackup: Codable, Equatable, Sendable {
     public let id: UUID
     public let name: String
@@ -334,6 +350,18 @@ public enum VoiceInkCustomCloudModelPolicy {
         !draft.apiEndpoint.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
         !draft.apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
         !draft.modelName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    public static func formControlPresentation(
+        for draft: VoiceInkCustomCloudModelDraft,
+        isSaving: Bool
+    ) -> VoiceInkCustomCloudModelFormControlPresentation {
+        let hasRequiredFields = hasRequiredFields(draft)
+        return VoiceInkCustomCloudModelFormControlPresentation(
+            isSubmitProgressVisible: isSaving,
+            isSubmitButtonDisabled: !hasRequiredFields || isSaving,
+            usesEnabledSubmitStyle: hasRequiredFields
+        )
     }
 
     public static func validationErrors(

@@ -5407,6 +5407,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
 
 require_pattern \
+  "shared custom cloud model form control presentation owns submit state" \
+  'VoiceInkCustomCloudModelFormControlPresentation|formControlPresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
+
+require_pattern \
   "shared custom cloud transcription policy lives in VoiceInkCore" \
   'VoiceInkCustomCloudTranscriptionPolicy|openAICompatibleOptions' \
   VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
@@ -5457,13 +5462,18 @@ require_pattern \
   "VoiceInk/Views/AI Models/AddCustomModelView.swift"
 
 require_pattern \
-  "macOS custom cloud model form uses shared required-field policy" \
-  'VoiceInkCustomCloudModelPolicy\.hasRequiredFields\(currentDraft\)' \
+  "macOS custom cloud model form uses shared form control presentation" \
+  'VoiceInkCustomCloudModelPolicy\.formControlPresentation|formControlPresentation\.(isSubmitProgressVisible|isSubmitButtonDisabled|usesEnabledSubmitStyle)' \
   "VoiceInk/Views/AI Models/AddCustomModelView.swift"
+
+require_pattern \
+  "core checks execute custom cloud model form control presentation test" \
+  'CustomCloudModelPolicyTests\.testMacOSFormControlPresentationOwnsSubmitState' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \
   "macOS custom cloud model form avoids shallow validity wrapper" \
-  'private +var +isFormValid\b' \
+  'private +var +isFormValid\b|formHasRequiredFields|VoiceInkCustomCloudModelPolicy\.hasRequiredFields\(currentDraft\)' \
   "VoiceInk/Views/AI Models/AddCustomModelView.swift"
 
 reject_pattern \

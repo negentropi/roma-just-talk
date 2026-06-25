@@ -10198,6 +10198,11 @@ require_pattern \
   'enum VoiceInkCustomSoundType: String, CaseIterable|isUsingKey|filenameKey|builtInSoundKey|defaultBuiltInSound|VoiceInkCustomSoundPreference|registeredDefaults|customSoundsRelativeDirectory|changedNotificationName' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
 
+require_pattern \
+  "shared custom recording sound selection state owns menu and transition policy" \
+  'VoiceInkCustomSoundSelectionState|menuSelection|usingExistingCustomSound|settingCustomFilename|resettingToDefault|selectionState' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+
 require_patterns \
   "shared custom recording sound settings presentation lives in VoiceInkCore" \
   VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift \
@@ -10242,6 +10247,11 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
+  "core checks cover custom sound selection state policy" \
+  'RecordingFeedbackPreferenceTests\.testCustomSoundSelectionStateOwnsMenuAndTransitionPolicy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "core checks cover recording sound playback policy" \
   'RecordingFeedbackPreferenceTests\.testRecordingSoundPlaybackPolicyPreservesMacOSSlotsVolumesAndFallbacks' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
@@ -10264,6 +10274,11 @@ require_pattern \
 require_pattern \
   "macOS custom sound manager uses shared custom sound policy" \
   'VoiceInkCustomSoundPreference\.(saveIsUsingCustomSound|saveSelectedBuiltInSound|saveCustomFilename|isUsingCustomSound|selectedBuiltInSound|customFilename|customSoundsRelativeDirectory|changedNotificationName|isDefaultSelection|customSoundURL|storedCustomSoundURL|copyPlan|preflightValidationError)|VoiceInkBuiltInRecordingSound|VoiceInkCustomSoundType|VoiceInkCustomSoundError' \
+  VoiceInk/CustomSoundManager.swift
+
+require_pattern \
+  "macOS custom sound manager uses shared custom sound selection state" \
+  'VoiceInkCustomSoundSelectionState|customSoundSelectionState|applyCustomSoundSelectionState|menuSelection|usingExistingCustomSound|settingCustomFilename|resettingToDefault' \
   VoiceInk/CustomSoundManager.swift
 
 require_pattern \

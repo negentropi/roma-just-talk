@@ -27,7 +27,7 @@ struct CustomSoundSettingsView: View {
 
     @ViewBuilder
     private func soundControls(for type: VoiceInkCustomSoundType) -> some View {
-        let isCustom = type == .start ? customSoundManager.isUsingCustomStartSound : customSoundManager.isUsingCustomStopSound
+        let isCustom = customSoundManager.isUsingCustomSound(for: type)
         let fileName = customSoundManager.getSoundDisplayName(for: type)
 
         HStack(spacing: 8) {
@@ -86,12 +86,7 @@ struct CustomSoundSettingsView: View {
     private func soundSelectionBinding(for type: VoiceInkCustomSoundType) -> Binding<VoiceInkCustomSoundMenuSelection> {
         Binding(
             get: {
-                let isCustom = type == .start ? customSoundManager.isUsingCustomStartSound : customSoundManager.isUsingCustomStopSound
-                if isCustom {
-                    return .custom
-                }
-
-                return .builtIn(customSoundManager.selectedBuiltInSound(for: type))
+                customSoundManager.menuSelection(for: type)
             },
             set: { selection in
                 switch selection {

@@ -117,11 +117,84 @@ final class RecordingFeedbackPreferenceTests: XCTestCase {
                 Optional("CustomStartSound.wav")
             )
             XCTAssertEqual(VoiceInkCustomSoundPreference.selectedBuiltInSound(for: .start, from: defaults), .sound5)
+            XCTAssertEqual(
+                VoiceInkCustomSoundPreference.selectionState(for: .start, from: defaults),
+                VoiceInkCustomSoundSelectionState(
+                    type: .start,
+                    isUsingCustomSound: true,
+                    selectedBuiltInSound: .sound5,
+                    customFilename: "CustomStartSound.wav"
+                )
+            )
 
             VoiceInkCustomSoundPreference.saveCustomFilename(nil, for: .start, to: defaults)
 
             XCTAssertNil(VoiceInkCustomSoundPreference.customFilename(for: .start, from: defaults))
         }
+    }
+
+    func testCustomSoundSelectionStateOwnsMenuAndTransitionPolicy() {
+        let directory = URL(fileURLWithPath: "/tmp/VoiceInk/CustomSounds", isDirectory: true)
+        let state = VoiceInkCustomSoundSelectionState(
+            type: .start,
+            isUsingCustomSound: false,
+            selectedBuiltInSound: .sound3,
+            customFilename: "CustomStartSound.wav"
+        )
+
+        XCTAssertEqual(state.menuSelection, .builtIn(.sound3))
+        XCTAssertFalse(state.isDefaultSelection)
+        XCTAssertNil(state.customSoundURL(in: directory))
+        XCTAssertEqual(
+            state.storedCustomSoundURL(in: directory)?.path,
+            "/tmp/VoiceInk/CustomSounds/CustomStartSound.wav"
+        )
+
+        XCTAssertEqual(
+            state.selectingBuiltInSound(.sound5),
+            VoiceInkCustomSoundSelectionState(
+                type: .start,
+                isUsingCustomSound: false,
+                selectedBuiltInSound: .sound5,
+                customFilename: "CustomStartSound.wav"
+            )
+        )
+        XCTAssertEqual(
+            state.usingExistingCustomSound(),
+            VoiceInkCustomSoundSelectionState(
+                type: .start,
+                isUsingCustomSound: true,
+                selectedBuiltInSound: .sound3,
+                customFilename: "CustomStartSound.wav"
+            )
+        )
+        XCTAssertEqual(
+            state.settingCustomFilename("CustomStartSound.aiff"),
+            VoiceInkCustomSoundSelectionState(
+                type: .start,
+                isUsingCustomSound: true,
+                selectedBuiltInSound: .sound3,
+                customFilename: "CustomStartSound.aiff"
+            )
+        )
+        XCTAssertEqual(
+            state.resettingToDefault(),
+            VoiceInkCustomSoundSelectionState(
+                type: .start,
+                isUsingCustomSound: false,
+                selectedBuiltInSound: .sound1,
+                customFilename: nil
+            )
+        )
+
+        let missingCustomFile = VoiceInkCustomSoundSelectionState(
+            type: .stop,
+            isUsingCustomSound: false,
+            selectedBuiltInSound: .sound2,
+            customFilename: nil
+        )
+        XCTAssertTrue(missingCustomFile.isDefaultSelection)
+        XCTAssertNil(missingCustomFile.usingExistingCustomSound())
     }
 
     func testCustomSoundPreferenceRepairsInvalidBuiltInSelectionToDefault() {

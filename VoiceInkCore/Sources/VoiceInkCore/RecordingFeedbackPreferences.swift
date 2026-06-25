@@ -190,6 +190,91 @@ public enum VoiceInkCustomSoundMenuSelection: Hashable, Sendable {
     case custom
 }
 
+public struct VoiceInkCustomSoundSelectionState: Equatable, Sendable {
+    public let type: VoiceInkCustomSoundType
+    public let isUsingCustomSound: Bool
+    public let selectedBuiltInSound: VoiceInkBuiltInRecordingSound
+    public let customFilename: String?
+
+    public init(
+        type: VoiceInkCustomSoundType,
+        isUsingCustomSound: Bool,
+        selectedBuiltInSound: VoiceInkBuiltInRecordingSound,
+        customFilename: String?
+    ) {
+        self.type = type
+        self.isUsingCustomSound = isUsingCustomSound
+        self.selectedBuiltInSound = selectedBuiltInSound
+        self.customFilename = customFilename
+    }
+
+    public var menuSelection: VoiceInkCustomSoundMenuSelection {
+        isUsingCustomSound ? .custom : .builtIn(selectedBuiltInSound)
+    }
+
+    public var isDefaultSelection: Bool {
+        VoiceInkCustomSoundPreference.isDefaultSelection(
+            for: type,
+            isUsingCustomSound: isUsingCustomSound,
+            selectedBuiltInSound: selectedBuiltInSound
+        )
+    }
+
+    public func customSoundURL(in customSoundsDirectory: URL?) -> URL? {
+        VoiceInkCustomSoundPreference.customSoundURL(
+            isUsingCustomSound: isUsingCustomSound,
+            filename: customFilename,
+            in: customSoundsDirectory
+        )
+    }
+
+    public func storedCustomSoundURL(in customSoundsDirectory: URL?) -> URL? {
+        VoiceInkCustomSoundPreference.storedCustomSoundURL(
+            filename: customFilename,
+            in: customSoundsDirectory
+        )
+    }
+
+    public func selectingBuiltInSound(
+        _ sound: VoiceInkBuiltInRecordingSound
+    ) -> VoiceInkCustomSoundSelectionState {
+        VoiceInkCustomSoundSelectionState(
+            type: type,
+            isUsingCustomSound: false,
+            selectedBuiltInSound: sound,
+            customFilename: customFilename
+        )
+    }
+
+    public func usingExistingCustomSound() -> VoiceInkCustomSoundSelectionState? {
+        guard customFilename != nil else { return nil }
+        return VoiceInkCustomSoundSelectionState(
+            type: type,
+            isUsingCustomSound: true,
+            selectedBuiltInSound: selectedBuiltInSound,
+            customFilename: customFilename
+        )
+    }
+
+    public func settingCustomFilename(_ filename: String) -> VoiceInkCustomSoundSelectionState {
+        VoiceInkCustomSoundSelectionState(
+            type: type,
+            isUsingCustomSound: true,
+            selectedBuiltInSound: selectedBuiltInSound,
+            customFilename: filename
+        )
+    }
+
+    public func resettingToDefault() -> VoiceInkCustomSoundSelectionState {
+        VoiceInkCustomSoundSelectionState(
+            type: type,
+            isUsingCustomSound: false,
+            selectedBuiltInSound: type.defaultBuiltInSound,
+            customFilename: nil
+        )
+    }
+}
+
 public enum VoiceInkCustomSoundSettingsPresentation {
     public static let pickerTitle = "Sound"
     public static let customFallbackTitle = "Custom"
@@ -343,6 +428,18 @@ public enum VoiceInkCustomSoundPreference {
             VoiceInkCustomSoundType.start.builtInSoundKey: VoiceInkCustomSoundType.start.defaultBuiltInSound.rawValue,
             VoiceInkCustomSoundType.stop.builtInSoundKey: VoiceInkCustomSoundType.stop.defaultBuiltInSound.rawValue
         ]
+    }
+
+    public static func selectionState(
+        for type: VoiceInkCustomSoundType,
+        from defaults: UserDefaults = .standard
+    ) -> VoiceInkCustomSoundSelectionState {
+        VoiceInkCustomSoundSelectionState(
+            type: type,
+            isUsingCustomSound: isUsingCustomSound(for: type, from: defaults),
+            selectedBuiltInSound: selectedBuiltInSound(for: type, from: defaults),
+            customFilename: customFilename(for: type, from: defaults)
+        )
     }
 
     public static func isUsingCustomSound(

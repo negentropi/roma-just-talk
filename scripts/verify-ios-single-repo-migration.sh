@@ -3748,7 +3748,7 @@ reject_pattern \
 
 require_pattern \
   "shared Keychain query and data-store policy lives in VoiceInkCore" \
-  'VoiceInkKeychainQuery|VoiceInkKeychainDataStore|VoiceInkKeychainValueStore|SecItem(Add|CopyMatching|Delete)' \
+  'VoiceInkKeychainQuery|VoiceInkKeychainDataStore|VoiceInkKeychainValueStore|VoiceInkKeychainDiagnostics|SecItem(Add|CopyMatching|Delete)' \
   VoiceInkCore/Sources/VoiceInkCore/KeychainQuery.swift
 
 require_pattern \
@@ -3767,6 +3767,11 @@ require_pattern \
   VoiceInk/Services/KeychainService.swift
 
 require_pattern \
+  "macOS Keychain adapter uses shared diagnostics" \
+  'VoiceInkKeychainDiagnostics\.(valueEncodingFailureMessage|itemLoadFailureMessage|itemDeleteSuccessMessage|itemDeleteFailureMessage|itemSaveSuccessMessage|itemSaveFailureMessage)' \
+  VoiceInk/Services/KeychainService.swift
+
+require_pattern \
   "macOS API-key manager uses shared provider API-key storage diagnostics" \
   'VoiceInkProviderAPIKeyStorageDiagnostics\.(savedProviderAPIKeyMessage|deletedProviderAPIKeyMessage|savedCustomModelAPIKeyMessage|deletedCustomModelAPIKeyMessage)' \
   VoiceInk/Services/APIKeyManager.swift
@@ -3780,6 +3785,16 @@ require_pattern \
   "core checks execute provider API-key storage tests" \
   'ProviderAPIKeyStorageTests\.test(AccountUsesSharedProviderAccessRequirement|StoredKeyLoadsThroughProviderAccountAndDefaultsToEmpty|SaveStoredKeyTargetsProviderAccountAndReportsFailureStatus|ProviderAPIKeyStorageDiagnosticsPreserveIOSLogCopy|ProviderAPIKeyStorageDiagnosticsPreserveMacOSSuccessLogCopy)' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute Keychain diagnostics test" \
+  'KeychainQueryTests\.testKeychainDiagnosticsPreserveMacOSAdapterLogCopy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "macOS Keychain adapter avoids shell-owned diagnostic copy" \
+  '"(Failed to convert value to data for key:|Failed to retrieve keychain item for key:|Successfully deleted keychain item for key:|Failed to delete keychain item for key:|Successfully saved keychain item for key:|Failed to save keychain item for key:)' \
+  VoiceInk/Services/KeychainService.swift
 
 reject_pattern \
   "macOS API-key manager avoids shell-owned provider API-key storage success copy" \

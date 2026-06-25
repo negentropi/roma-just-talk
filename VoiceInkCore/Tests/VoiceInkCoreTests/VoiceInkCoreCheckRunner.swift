@@ -276,6 +276,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "KeychainQueryTests.testStringLoadResultDecodesUTF8Values", run: { KeychainQueryTests().testStringLoadResultDecodesUTF8Values() }),
             VoiceInkCoreCheck(name: "KeychainQueryTests.testStringLoadResultRejectsInvalidUTF8DataButKeepsStatus", run: { KeychainQueryTests().testStringLoadResultRejectsInvalidUTF8DataButKeepsStatus() }),
             VoiceInkCoreCheck(name: "KeychainQueryTests.testValueStoreStringEncodingAndDeleteStatusPolicy", run: { KeychainQueryTests().testValueStoreStringEncodingAndDeleteStatusPolicy() }),
+            VoiceInkCoreCheck(name: "KeychainQueryTests.testKeychainDiagnosticsPreserveMacOSAdapterLogCopy", run: { KeychainQueryTests().testKeychainDiagnosticsPreserveMacOSAdapterLogCopy() }),
             VoiceInkCoreCheck(name: "AudioInputPriorityPolicyTests.testAudioInputModePreservesRawValuesDefaultAndOrder", run: { AudioInputPriorityPolicyTests().testAudioInputModePreservesRawValuesDefaultAndOrder() }),
             VoiceInkCoreCheck(name: "AudioInputPriorityPolicyTests.testAudioInputPreferencePreservesStorageKeysDefaultsAndRoundTrips", run: { AudioInputPriorityPolicyTests().testAudioInputPreferencePreservesStorageKeysDefaultsAndRoundTrips() }),
             VoiceInkCoreCheck(name: "AudioInputPriorityPolicyTests.testMacOSAudioDeviceChangeRequestPreservesNotificationContract", run: { AudioInputPriorityPolicyTests().testMacOSAudioDeviceChangeRequestPreservesNotificationContract() }),

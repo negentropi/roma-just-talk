@@ -179,3 +179,29 @@ public enum VoiceInkKeychainValueStore {
         status == errSecSuccess || status == errSecItemNotFound
     }
 }
+
+public enum VoiceInkKeychainDiagnostics {
+    public static func valueEncodingFailureMessage(key: String) -> String {
+        "Failed to convert value to data for key: \(key)"
+    }
+
+    public static func itemLoadFailureMessage(key: String, status: OSStatus) -> String {
+        "Failed to retrieve keychain item for key: \(key), status: \(status)"
+    }
+
+    public static func itemDeleteSuccessMessage(key: String) -> String {
+        "Successfully deleted keychain item for key: \(key)"
+    }
+
+    public static func itemDeleteFailureMessage(key: String, status: OSStatus) -> String {
+        "Failed to delete keychain item for key: \(key), status: \(status)"
+    }
+
+    public static func itemSaveSuccessMessage(key: String) -> String {
+        "Successfully saved keychain item for key: \(key)"
+    }
+
+    public static func itemSaveFailureMessage(key: String, status: OSStatus) -> String {
+        "Failed to save keychain item for key: \(key), status: \(status)"
+    }
+}

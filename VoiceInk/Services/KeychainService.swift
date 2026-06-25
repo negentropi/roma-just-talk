@@ -25,14 +25,16 @@ final class KeychainService {
     func save(_ value: String, forKey key: String, syncable: Bool = true) -> Bool {
         #if LOCAL_BUILD
         guard let data = VoiceInkKeychainValueStore.data(forString: value) else {
-            logger.error("Failed to convert value to data for key: \(key, privacy: .public)")
+            let message = VoiceInkKeychainDiagnostics.valueEncodingFailureMessage(key: key)
+            logger.error("\(message, privacy: .public)")
             return false
         }
         defaults.set(data, forKey: localPrefix + key)
         return true
         #else
         guard let status = VoiceInkKeychainValueStore.saveString(value, account: key, syncable: syncable) else {
-            logger.error("Failed to convert value to data for key: \(key, privacy: .public)")
+            let message = VoiceInkKeychainDiagnostics.valueEncodingFailureMessage(key: key)
+            logger.error("\(message, privacy: .public)")
             return false
         }
         return didSave(status: status, key: key)
@@ -65,7 +67,8 @@ final class KeychainService {
         if result.isSuccess {
             return result.value
         } else if result.status != errSecItemNotFound {
-            logger.error("Failed to retrieve keychain item for key: \(key, privacy: .public), status: \(result.status, privacy: .public)")
+            let message = VoiceInkKeychainDiagnostics.itemLoadFailureMessage(key: key, status: result.status)
+            logger.error("\(message, privacy: .public)")
         }
 
         return nil
@@ -82,7 +85,8 @@ final class KeychainService {
         if result.isSuccess {
             return result.data
         } else if result.status != errSecItemNotFound {
-            logger.error("Failed to retrieve keychain item for key: \(key, privacy: .public), status: \(result.status, privacy: .public)")
+            let message = VoiceInkKeychainDiagnostics.itemLoadFailureMessage(key: key, status: result.status)
+            logger.error("\(message, privacy: .public)")
         }
 
         return nil
@@ -100,11 +104,13 @@ final class KeychainService {
 
         if VoiceInkKeychainValueStore.isSuccessfulDeleteStatus(status) {
             if status == errSecSuccess {
-                logger.info("Successfully deleted keychain item for key: \(key, privacy: .public)")
+                let message = VoiceInkKeychainDiagnostics.itemDeleteSuccessMessage(key: key)
+                logger.info("\(message, privacy: .public)")
             }
             return true
         } else {
-            logger.error("Failed to delete keychain item for key: \(key, privacy: .public), status: \(status, privacy: .public)")
+            let message = VoiceInkKeychainDiagnostics.itemDeleteFailureMessage(key: key, status: status)
+            logger.error("\(message, privacy: .public)")
             return false
         }
         #endif
@@ -121,10 +127,12 @@ final class KeychainService {
 
     private func didSave(status: OSStatus, key: String) -> Bool {
         if status == errSecSuccess {
-            logger.info("Successfully saved keychain item for key: \(key, privacy: .public)")
+            let message = VoiceInkKeychainDiagnostics.itemSaveSuccessMessage(key: key)
+            logger.info("\(message, privacy: .public)")
             return true
         } else {
-            logger.error("Failed to save keychain item for key: \(key, privacy: .public), status: \(status, privacy: .public)")
+            let message = VoiceInkKeychainDiagnostics.itemSaveFailureMessage(key: key, status: status)
+            logger.error("\(message, privacy: .public)")
             return false
         }
     }

@@ -89,6 +89,33 @@ final class KeychainQueryTests: XCTestCase {
         XCTAssertFalse(VoiceInkKeychainValueStore.isSuccessfulDeleteStatus(errSecAuthFailed))
     }
 
+    func testKeychainDiagnosticsPreserveMacOSAdapterLogCopy() {
+        XCTAssertEqual(
+            VoiceInkKeychainDiagnostics.valueEncodingFailureMessage(key: "groqAPIKey"),
+            "Failed to convert value to data for key: groqAPIKey"
+        )
+        XCTAssertEqual(
+            VoiceInkKeychainDiagnostics.itemLoadFailureMessage(key: "groqAPIKey", status: errSecAuthFailed),
+            "Failed to retrieve keychain item for key: groqAPIKey, status: \(errSecAuthFailed)"
+        )
+        XCTAssertEqual(
+            VoiceInkKeychainDiagnostics.itemDeleteSuccessMessage(key: "groqAPIKey"),
+            "Successfully deleted keychain item for key: groqAPIKey"
+        )
+        XCTAssertEqual(
+            VoiceInkKeychainDiagnostics.itemDeleteFailureMessage(key: "groqAPIKey", status: errSecAuthFailed),
+            "Failed to delete keychain item for key: groqAPIKey, status: \(errSecAuthFailed)"
+        )
+        XCTAssertEqual(
+            VoiceInkKeychainDiagnostics.itemSaveSuccessMessage(key: "groqAPIKey"),
+            "Successfully saved keychain item for key: groqAPIKey"
+        )
+        XCTAssertEqual(
+            VoiceInkKeychainDiagnostics.itemSaveFailureMessage(key: "groqAPIKey", status: errSecAuthFailed),
+            "Failed to save keychain item for key: groqAPIKey, status: \(errSecAuthFailed)"
+        )
+    }
+
     private func booleanValue(_ value: Any?) -> Bool? {
         value as? Bool
     }

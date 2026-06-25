@@ -129,19 +129,6 @@ struct ModelRowView: View {
     }
 }
 
-private extension VoiceInkWhisperModelDownloadRowActionTint {
-    var iOSColor: Color {
-        switch self {
-        case .primary:
-            return .blue
-        case .destructive:
-            return .red
-        case .success:
-            return .green
-        }
-    }
-}
-
 // MARK: - Preview
 
 #Preview {

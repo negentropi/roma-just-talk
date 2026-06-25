@@ -421,6 +421,7 @@ in_repo_only_ios_app_files=(
   ProviderAPIKeyTone+iOS.swift
   TranscriptStatusTone+iOS.swift
   Transcription.swift
+  WhisperModelDownloadTint+iOS.swift
 )
 
 xcode_metadata_files=(
@@ -5163,6 +5164,19 @@ require_patterns \
   iOS/VoiceInk-ios/OnboardingView.swift \
   'presentation\.shouldShowCircularProgressAccessory' \
   'presentation\.actionTint\.onboardingColor'
+
+require_patterns \
+  "iOS local model tint adapter is shared across iOS model screens" \
+  iOS/VoiceInk-ios/WhisperModelDownloadTint+iOS.swift \
+  'extension +VoiceInkWhisperModelDownloadRowActionTint' \
+  'var +iOSColor' \
+  'var +onboardingColor'
+
+reject_pattern \
+  "iOS local model screens avoid duplicate tint adapters" \
+  'extension +VoiceInkWhisperModelDownloadRowActionTint|var +(iOSColor|onboardingColor)' \
+  iOS/VoiceInk-ios/LocalModelManagementView.swift \
+  iOS/VoiceInk-ios/OnboardingView.swift
 
 reject_pattern \
   "iOS model download views avoid shallow row action booleans" \

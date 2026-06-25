@@ -296,17 +296,6 @@ struct ReadyOnboardingView: View {
 
 // MARK: - Supporting Views
 
-private extension VoiceInkWhisperModelDownloadRowActionTint {
-    var onboardingColor: Color {
-        switch self {
-        case .primary, .destructive:
-            return .accentColor
-        case .success:
-            return .green
-        }
-    }
-}
-
 struct OnboardingButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
 

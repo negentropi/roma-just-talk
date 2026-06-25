@@ -178,21 +178,39 @@ final class AudioSessionLifecycleStateTests: XCTestCase {
     func testAudioSessionLifecycleStateReturnsShellExecutionPlans() {
         var state = VoiceInkAudioSessionLifecycleState(isSessionActive: true)
 
-        XCTAssertEqual(
+        assertDeactivationExecution(
             state.scheduleDeactivationExecution(timeoutSeconds: 90),
-            .runCountdownTimer
+            expectedEvents: ["timer", "scheduled"]
         )
         XCTAssertEqual(state.timeoutRemaining, 90)
 
         state = VoiceInkAudioSessionLifecycleState(isSessionActive: true)
-        XCTAssertEqual(
+        assertDeactivationExecution(
             state.scheduleDeactivationExecution(timeoutSeconds: 0),
-            .deactivateSession
+            expectedEvents: ["deactivate"]
         )
         XCTAssertEqual(state.timeoutRemaining, 0)
 
         state = VoiceInkAudioSessionLifecycleState(isSessionActive: true, timeoutRemaining: 1)
-        XCTAssertEqual(state.advanceCountdownExecution(), .deactivateSession)
+        assertDeactivationExecution(
+            state.advanceCountdownExecution(),
+            expectedEvents: ["deactivate"]
+        )
         XCTAssertEqual(state.timeoutRemaining, 0)
+    }
+
+    private func assertDeactivationExecution(
+        _ plan: VoiceInkAudioSessionDeactivationExecutionPlan,
+        expectedEvents: [String]
+    ) {
+        var events: [String] = []
+
+        plan.applyRuntimeState(
+            deactivateSession: { events.append("deactivate") },
+            runCountdownTimer: { events.append("timer") },
+            countdownTimerDidStart: { events.append("scheduled") }
+        )
+
+        XCTAssertEqual(events, expectedEvents)
     }
 }

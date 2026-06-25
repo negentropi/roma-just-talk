@@ -81,16 +81,17 @@ final class AudioSessionManager: ObservableObject {
         cancelScheduledDeactivation()
         
         let timeoutSeconds = settings.audioSessionTimeoutSeconds
-        let executionAction = lifecycleState.scheduleDeactivationExecution(
+        lifecycleState.scheduleDeactivationExecution(
             timeoutSeconds: timeoutSeconds
         ).applyRuntimeState(
             deactivateSession: deactivateSession,
-            runCountdownTimer: startDeactivationCountdownTimer
+            runCountdownTimer: startDeactivationCountdownTimer,
+            countdownTimerDidStart: {
+                VoiceInkIOSLogger.audioSession.notice(
+                    "\(VoiceInkAudioSessionDiagnostics.deactivationScheduledMessage(seconds: Int(self.lifecycleState.timeoutRemaining)), privacy: .public)"
+                )
+            }
         )
-
-        guard executionAction == .runCountdownTimer else { return }
-
-        VoiceInkIOSLogger.audioSession.notice("\(VoiceInkAudioSessionDiagnostics.deactivationScheduledMessage(seconds: Int(lifecycleState.timeoutRemaining)), privacy: .public)")
     }
 
     private func startDeactivationCountdownTimer() {

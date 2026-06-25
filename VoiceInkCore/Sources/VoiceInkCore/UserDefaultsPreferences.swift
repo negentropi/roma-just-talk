@@ -521,29 +521,36 @@ public enum VoiceInkAudioSessionDeactivationPlan: Equatable, Sendable {
     public var executionPlan: VoiceInkAudioSessionDeactivationExecutionPlan {
         switch self {
         case .immediate:
-            return .deactivateSession
+            return VoiceInkAudioSessionDeactivationExecutionPlan(action: .deactivateSession)
         case .delayed:
-            return .runCountdownTimer
+            return VoiceInkAudioSessionDeactivationExecutionPlan(action: .runCountdownTimer)
         }
     }
 }
 
-public enum VoiceInkAudioSessionDeactivationExecutionPlan: Equatable, Sendable {
+fileprivate enum VoiceInkAudioSessionDeactivationExecutionAction: Equatable, Sendable {
     case deactivateSession
     case runCountdownTimer
+}
 
-    @discardableResult
+public struct VoiceInkAudioSessionDeactivationExecutionPlan: Equatable, Sendable {
+    private let action: VoiceInkAudioSessionDeactivationExecutionAction
+
+    fileprivate init(action: VoiceInkAudioSessionDeactivationExecutionAction) {
+        self.action = action
+    }
+
     public func applyRuntimeState(
         deactivateSession: () -> Void,
-        runCountdownTimer: () -> Void
-    ) -> VoiceInkAudioSessionDeactivationExecutionPlan {
-        switch self {
+        runCountdownTimer: () -> Void,
+        countdownTimerDidStart: () -> Void = {}
+    ) {
+        switch action {
         case .deactivateSession:
             deactivateSession()
-            return .deactivateSession
         case .runCountdownTimer:
             runCountdownTimer()
-            return .runCountdownTimer
+            countdownTimerDidStart()
         }
     }
 }

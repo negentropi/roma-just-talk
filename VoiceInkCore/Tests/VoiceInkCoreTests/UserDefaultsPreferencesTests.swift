@@ -751,32 +751,40 @@ final class UserDefaultsPreferencesTests: XCTestCase {
     }
 
     func testAudioSessionDeactivationPlanOwnsShellExecutionIntent() {
-        XCTAssertEqual(
+        assertAudioSessionDeactivationExecution(
             VoiceInkAudioSessionDeactivationPlan.immediate.executionPlan,
-            .deactivateSession
+            expectedEvents: ["deactivate"]
         )
-        XCTAssertEqual(
+        assertAudioSessionDeactivationExecution(
             VoiceInkAudioSessionDeactivationPlan.delayed(90).executionPlan,
-            .runCountdownTimer
+            expectedEvents: ["timer", "scheduled"]
         )
     }
 
     func testAudioSessionDeactivationExecutionPlanAppliesRuntimeState() {
+        assertAudioSessionDeactivationExecution(
+            VoiceInkAudioSessionDeactivationPlan.immediate.executionPlan,
+            expectedEvents: ["deactivate"]
+        )
+        assertAudioSessionDeactivationExecution(
+            VoiceInkAudioSessionDeactivationPlan.delayed(90).executionPlan,
+            expectedEvents: ["timer", "scheduled"]
+        )
+    }
+
+    private func assertAudioSessionDeactivationExecution(
+        _ plan: VoiceInkAudioSessionDeactivationExecutionPlan,
+        expectedEvents: [String]
+    ) {
         var events: [String] = []
 
-        let deactivationAction = VoiceInkAudioSessionDeactivationExecutionPlan.deactivateSession.applyRuntimeState(
+        plan.applyRuntimeState(
             deactivateSession: { events.append("deactivate") },
-            runCountdownTimer: { events.append("timer") }
+            runCountdownTimer: { events.append("timer") },
+            countdownTimerDidStart: { events.append("scheduled") }
         )
-        XCTAssertEqual(deactivationAction, .deactivateSession)
 
-        let countdownAction = VoiceInkAudioSessionDeactivationExecutionPlan.runCountdownTimer.applyRuntimeState(
-            deactivateSession: { events.append("deactivate") },
-            runCountdownTimer: { events.append("timer") }
-        )
-        XCTAssertEqual(countdownAction, .runCountdownTimer)
-
-        XCTAssertEqual(events, ["deactivate", "timer"])
+        XCTAssertEqual(events, expectedEvents)
     }
 
     func testAudioSessionTimeoutPresentationPreservesIOSSettingsCopy() {

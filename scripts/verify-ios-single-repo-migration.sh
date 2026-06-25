@@ -12115,12 +12115,24 @@ require_pattern \
 
 require_pattern \
   "shared audio-session timeout preference owns iOS deactivation execution intent" \
-  'enum VoiceInkAudioSessionDeactivationExecutionPlan|case deactivateSession|case runCountdownTimer|executionPlan|applyRuntimeState' \
+  'VoiceInkAudioSessionDeactivationExecutionPlan|executionPlan|applyRuntimeState|countdownTimerDidStart' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_patterns \
+  "shared audio-session deactivation execution plan hides raw action payload" \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift \
+  '(private|fileprivate) enum VoiceInkAudioSessionDeactivationExecutionAction' \
+  'private let action: VoiceInkAudioSessionDeactivationExecutionAction' \
+  'fileprivate init\(action: VoiceInkAudioSessionDeactivationExecutionAction\)'
+
+reject_pattern \
+  "shared audio-session deactivation execution plan avoids public raw action cases" \
+  'public enum VoiceInkAudioSessionDeactivationExecutionPlan|public static let deactivateSession|public static let runCountdownTimer' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 reject_pattern \
   "shared audio-session deactivation execution plan avoids raw flag interface" \
-  'struct VoiceInkAudioSessionDeactivationExecutionPlan|VoiceInkAudioSessionDeactivationRuntimeAction|shouldDeactivateSession|shouldRunCountdownTimer' \
+  'VoiceInkAudioSessionDeactivationRuntimeAction|shouldDeactivateSession|shouldRunCountdownTimer' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
@@ -12132,6 +12144,12 @@ reject_pattern \
   "core audio-session deactivation execution tests avoid raw flag interface" \
   'shouldDeactivateSession|shouldRunCountdownTimer|VoiceInkAudioSessionDeactivationExecutionPlan\(' \
   VoiceInkCore/Tests/VoiceInkCoreTests/UserDefaultsPreferencesTests.swift
+
+reject_pattern \
+  "core audio-session deactivation execution tests avoid raw action cases" \
+  'VoiceInkAudioSessionDeactivationExecutionPlan\.|== \.(deactivateSession|runCountdownTimer)' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/UserDefaultsPreferencesTests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AudioSessionLifecycleStateTests.swift
 
 require_pattern \
   "shared audio-session timeout presentation lives in VoiceInkCore" \
@@ -12280,7 +12298,13 @@ require_patterns \
   'scheduleDeactivationExecution\(' \
   'timeoutSeconds: +timeoutSeconds' \
   'runCountdownTimer: +startDeactivationCountdownTimer' \
+  'countdownTimerDidStart:' \
   'advanceCountdownExecution\(\)\.applyRuntimeState'
+
+reject_pattern \
+  "iOS audio-session manager avoids raw deactivation execution comparisons" \
+  '== \.(deactivateSession|runCountdownTimer)|VoiceInkAudioSessionDeactivationExecutionPlan\.' \
+  iOS/VoiceInk-ios/AudioSessionManager.swift
 
 require_pattern \
   "iOS audio-session manager delegates countdown ticks to shared lifecycle state" \

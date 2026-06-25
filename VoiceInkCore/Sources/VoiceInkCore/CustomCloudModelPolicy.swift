@@ -476,10 +476,12 @@ public enum VoiceInkCustomCloudTranscriptionPolicy {
         transport: TranscriptionTransport
     ) async throws -> String {
         guard let url = endpointURL(from: apiEndpoint) else {
-            throw NSError(
-                domain: apiErrorDomain,
-                code: -1,
-                userInfo: [NSLocalizedDescriptionKey: invalidEndpointDescription]
+            throw VoiceInkCloudTranscriptionError.networkError(
+                NSError(
+                    domain: apiErrorDomain,
+                    code: -1,
+                    userInfo: [NSLocalizedDescriptionKey: invalidEndpointDescription]
+                )
             )
         }
 
@@ -500,16 +502,11 @@ public enum VoiceInkCustomCloudTranscriptionPolicy {
                 throw VoiceInkCloudTranscriptionError.noTranscriptionReturned
             }
             return text
-        } catch let error as VoiceInkCloudTranscriptionError {
-            throw error
         } catch {
-            if let apiError = VoiceInkCloudTranscriptionError.apiRequestFailure(
-                from: error as NSError,
+            throw VoiceInkCloudTranscriptionError.remoteExecutionFailure(
+                from: error,
                 matchingErrorDomain: apiErrorDomain
-            ) {
-                throw apiError
-            }
-            throw error
+            )
         }
     }
 }

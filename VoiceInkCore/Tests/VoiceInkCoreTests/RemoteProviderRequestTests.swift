@@ -491,6 +491,35 @@ final class RemoteProviderRequestTests: XCTestCase {
         }
     }
 
+    func testMacOSCloudTranscriptionPolicyMapsUnknownErrorsToNetworkError() async {
+        do {
+            _ = try await VoiceInkMacOSCloudTranscriptionPolicy.transcribeAudioData(
+                modelProvider: .soniox,
+                apiKey: "soniox-key",
+                modelName: "stt-async-v4",
+                audioData: Data(),
+                fileName: "clip.wav",
+                language: nil,
+                prompt: nil,
+                customVocabulary: []
+            ) { _ in
+                throw NSError(
+                    domain: "Transport",
+                    code: -42,
+                    userInfo: [NSLocalizedDescriptionKey: "socket closed"]
+                )
+            }
+            XCTFail("Expected network error")
+        } catch VoiceInkCloudTranscriptionError.networkError(let error) {
+            let nsError = error as NSError
+            XCTAssertEqual(nsError.domain, "Transport")
+            XCTAssertEqual(nsError.code, -42)
+            XCTAssertEqual(nsError.localizedDescription, "socket closed")
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+
     func testRemoteTranscriptionServiceUsesSharedProviderErrorDomainsForProviderTransports() throws {
         let providers: [(VoiceInkProviderKind, VoiceInkTranscriptionModelProvider)] = [
             (.mistral, .mistral),

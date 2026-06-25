@@ -57,6 +57,24 @@ public enum VoiceInkCloudTranscriptionError: Error, LocalizedError {
     public static func apiRequestFailureMessage(from error: NSError) -> String {
         error.userInfo[NSLocalizedDescriptionKey] as? String ?? error.localizedDescription
     }
+
+    public static func remoteExecutionFailure(
+        from error: Error,
+        matchingErrorDomain errorDomain: String?
+    ) -> VoiceInkCloudTranscriptionError {
+        if let cloudError = error as? VoiceInkCloudTranscriptionError {
+            return cloudError
+        }
+
+        if let apiError = apiRequestFailure(
+            from: error as NSError,
+            matchingErrorDomain: errorDomain
+        ) {
+            return apiError
+        }
+
+        return .networkError(error)
+    }
 }
 
 public typealias CloudTranscriptionError = VoiceInkCloudTranscriptionError
@@ -264,16 +282,11 @@ public enum VoiceInkMacOSCloudTranscriptionPolicy {
                 throw VoiceInkCloudTranscriptionError.noTranscriptionReturned
             }
             return text
-        } catch let error as VoiceInkCloudTranscriptionError {
-            throw error
         } catch {
-            if let apiError = VoiceInkCloudTranscriptionError.apiRequestFailure(
-                from: error as NSError,
+            throw VoiceInkCloudTranscriptionError.remoteExecutionFailure(
+                from: error,
                 matchingErrorDomain: modelProvider.apiErrorDomain
-            ) {
-                throw apiError
-            }
-            throw error
+            )
         }
     }
 }

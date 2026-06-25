@@ -492,6 +492,59 @@ final class CustomCloudModelPolicyTests: XCTestCase {
             XCTFail("Unexpected error: \(error)")
         }
     }
+
+    func testCustomCloudTranscriptionPolicyMapsUnknownErrorsToNetworkError() async {
+        do {
+            _ = try await VoiceInkCustomCloudTranscriptionPolicy.transcribeAudioData(
+                apiEndpoint: "https://api.example.com/v1/audio/transcriptions",
+                apiKey: "custom-key",
+                model: "custom-stt",
+                audioData: Data(),
+                fileName: "clip.wav",
+                language: nil,
+                prompt: nil
+            ) { _ in
+                throw NSError(
+                    domain: "Transport",
+                    code: -7,
+                    userInfo: [NSLocalizedDescriptionKey: "connection dropped"]
+                )
+            }
+            XCTFail("Expected network error")
+        } catch VoiceInkCloudTranscriptionError.networkError(let error) {
+            let nsError = error as NSError
+            XCTAssertEqual(nsError.domain, "Transport")
+            XCTAssertEqual(nsError.code, -7)
+            XCTAssertEqual(nsError.localizedDescription, "connection dropped")
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+
+    func testCustomCloudTranscriptionPolicyMapsInvalidEndpointToNetworkError() async {
+        do {
+            _ = try await VoiceInkCustomCloudTranscriptionPolicy.transcribeAudioData(
+                apiEndpoint: "http://[",
+                apiKey: "custom-key",
+                model: "custom-stt",
+                audioData: Data(),
+                fileName: "clip.wav",
+                language: nil,
+                prompt: nil
+            ) { _ in
+                XCTFail("Invalid endpoint should not call transport")
+                return "unexpected"
+            }
+            XCTFail("Expected network error")
+        } catch VoiceInkCloudTranscriptionError.networkError(let error) {
+            let nsError = error as NSError
+            XCTAssertEqual(nsError.domain, VoiceInkCustomCloudTranscriptionPolicy.apiErrorDomain)
+            XCTAssertEqual(nsError.code, -1)
+            XCTAssertEqual(nsError.localizedDescription, VoiceInkCustomCloudTranscriptionPolicy.invalidEndpointDescription)
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
 }
 
 private actor CustomCloudTranscriptionRequestCapture {

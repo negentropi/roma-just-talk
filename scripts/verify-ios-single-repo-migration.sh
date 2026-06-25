@@ -4983,6 +4983,17 @@ require_pattern \
   'VoiceInkWhisperModelDeletion(Policy|Plan|Action)|applyRuntimeState' \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
 
+require_patterns \
+  "shared local model deletion plan hides raw action payload" \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift \
+  'private enum VoiceInkWhisperModelDeletionAction' \
+  'private let action: VoiceInkWhisperModelDeletionAction'
+
+reject_pattern \
+  "shared local model deletion plan avoids public raw action and refresh flags" \
+  'public enum VoiceInkWhisperModelDeletionAction|public let action: VoiceInkWhisperModelDeletionAction|shouldRefreshAfterSuccessfulDelete' \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+
 require_pattern \
   "shared local model deletion policy owns downloaded-state lookup" \
   'for model: VoiceInkWhisperModelFileSpec' \
@@ -4997,6 +5008,11 @@ require_pattern \
   "core check runner executes local model deletion runtime application tests" \
   'testSimpleDownloadDeletionPlanApplies(RuntimeState|FailureStateWithoutRefresh)' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "core local model deletion tests avoid raw deletion plan construction" \
+  'VoiceInkWhisperModelDeletionPlan\(|VoiceInkWhisperModelDeletionAction|shouldRefreshAfterSuccessfulDelete' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/WhisperModelFilesTests.swift
 
 reject_pattern \
   "shared local model row presentation avoids shallow action booleans" \

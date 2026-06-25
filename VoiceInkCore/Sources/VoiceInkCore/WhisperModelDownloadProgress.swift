@@ -471,21 +471,16 @@ public struct VoiceInkWhisperModelDownloadState: Equatable, Sendable {
     }
 }
 
-public enum VoiceInkWhisperModelDeletionAction: Equatable, Sendable {
+private enum VoiceInkWhisperModelDeletionAction: Equatable, Sendable {
     case skipMissingFile
     case deleteDownloadedFiles
 }
 
 public struct VoiceInkWhisperModelDeletionPlan: Equatable, Sendable {
-    public let action: VoiceInkWhisperModelDeletionAction
-    public let shouldRefreshAfterSuccessfulDelete: Bool
+    private let action: VoiceInkWhisperModelDeletionAction
 
-    public init(
-        action: VoiceInkWhisperModelDeletionAction,
-        shouldRefreshAfterSuccessfulDelete: Bool
-    ) {
+    fileprivate init(action: VoiceInkWhisperModelDeletionAction) {
         self.action = action
-        self.shouldRefreshAfterSuccessfulDelete = shouldRefreshAfterSuccessfulDelete
     }
 
     public func applyRuntimeState(
@@ -500,9 +495,7 @@ public struct VoiceInkWhisperModelDeletionPlan: Equatable, Sendable {
         case .deleteDownloadedFiles:
             do {
                 try deleteDownloadedFiles()
-                if shouldRefreshAfterSuccessfulDelete {
-                    refreshAfterSuccessfulDelete()
-                }
+                refreshAfterSuccessfulDelete()
             } catch {
                 handleDeleteFailure(error)
             }
@@ -521,16 +514,10 @@ public enum VoiceInkWhisperModelDeletionPolicy {
 
     public static func plan(isDownloaded: Bool) -> VoiceInkWhisperModelDeletionPlan {
         if isDownloaded {
-            return VoiceInkWhisperModelDeletionPlan(
-                action: .deleteDownloadedFiles,
-                shouldRefreshAfterSuccessfulDelete: true
-            )
+            return VoiceInkWhisperModelDeletionPlan(action: .deleteDownloadedFiles)
         }
 
-        return VoiceInkWhisperModelDeletionPlan(
-            action: .skipMissingFile,
-            shouldRefreshAfterSuccessfulDelete: false
-        )
+        return VoiceInkWhisperModelDeletionPlan(action: .skipMissingFile)
     }
 }
 

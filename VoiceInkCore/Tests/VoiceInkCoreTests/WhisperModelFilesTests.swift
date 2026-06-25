@@ -884,23 +884,13 @@ final class WhisperModelFilesTests: XCTestCase {
     }
 
     func testSimpleDownloadDeletionPolicyPreservesIOSDeleteIntent() throws {
-        let missingPlan = VoiceInkWhisperModelDeletionPlan(
-            action: .skipMissingFile,
-            shouldRefreshAfterSuccessfulDelete: false
-        )
-        let downloadedPlan = VoiceInkWhisperModelDeletionPlan(
-            action: .deleteDownloadedFiles,
-            shouldRefreshAfterSuccessfulDelete: true
-        )
-
-        XCTAssertEqual(
+        assertDeletionPlanEvents(
             VoiceInkWhisperModelDeletionPolicy.plan(isDownloaded: false),
-            missingPlan
+            expectedEvents: ["missing"]
         )
-
-        XCTAssertEqual(
+        assertDeletionPlanEvents(
             VoiceInkWhisperModelDeletionPolicy.plan(isDownloaded: true),
-            downloadedPlan
+            expectedEvents: ["delete", "refresh"]
         )
 
         let baseDirectory = FileManager.default.temporaryDirectory
@@ -911,41 +901,27 @@ final class WhisperModelFilesTests: XCTestCase {
         let model = VoiceInkWhisperModelFiles.baseModel
 
         XCTAssertEqual(
-            VoiceInkWhisperModelDeletionPolicy.plan(for: model, in: modelsDirectory),
-            missingPlan
+            deletionPlanEvents(VoiceInkWhisperModelDeletionPolicy.plan(for: model, in: modelsDirectory)),
+            ["missing"]
         )
 
         try Data().write(to: model.fileURL(in: modelsDirectory))
 
         XCTAssertEqual(
-            VoiceInkWhisperModelDeletionPolicy.plan(for: model, in: modelsDirectory),
-            downloadedPlan
+            deletionPlanEvents(VoiceInkWhisperModelDeletionPolicy.plan(for: model, in: modelsDirectory)),
+            ["delete", "refresh"]
         )
     }
 
     func testSimpleDownloadDeletionPlanAppliesRuntimeState() {
-        var events: [String] = []
-        VoiceInkWhisperModelDeletionPlan(
-            action: .skipMissingFile,
-            shouldRefreshAfterSuccessfulDelete: false
-        ).applyRuntimeState(
-            skipMissingFile: { events.append("missing") },
-            deleteDownloadedFiles: { events.append("delete") },
-            refreshAfterSuccessfulDelete: { events.append("refresh") },
-            handleDeleteFailure: { error in events.append("failure:\(error.localizedDescription)") }
+        assertDeletionPlanEvents(
+            VoiceInkWhisperModelDeletionPolicy.plan(isDownloaded: false),
+            expectedEvents: ["missing"]
         )
-
-        VoiceInkWhisperModelDeletionPlan(
-            action: .deleteDownloadedFiles,
-            shouldRefreshAfterSuccessfulDelete: true
-        ).applyRuntimeState(
-            skipMissingFile: { events.append("missing") },
-            deleteDownloadedFiles: { events.append("delete") },
-            refreshAfterSuccessfulDelete: { events.append("refresh") },
-            handleDeleteFailure: { error in events.append("failure:\(error.localizedDescription)") }
+        assertDeletionPlanEvents(
+            VoiceInkWhisperModelDeletionPolicy.plan(isDownloaded: true),
+            expectedEvents: ["delete", "refresh"]
         )
-
-        XCTAssertEqual(events, ["missing", "delete", "refresh"])
     }
 
     func testSimpleDownloadDeletionPlanAppliesFailureStateWithoutRefresh() {
@@ -956,10 +932,7 @@ final class WhisperModelFilesTests: XCTestCase {
         )
         var events: [String] = []
 
-        VoiceInkWhisperModelDeletionPlan(
-            action: .deleteDownloadedFiles,
-            shouldRefreshAfterSuccessfulDelete: true
-        ).applyRuntimeState(
+        VoiceInkWhisperModelDeletionPolicy.plan(isDownloaded: true).applyRuntimeState(
             skipMissingFile: { events.append("missing") },
             deleteDownloadedFiles: {
                 events.append("delete")
@@ -970,6 +943,26 @@ final class WhisperModelFilesTests: XCTestCase {
         )
 
         XCTAssertEqual(events, ["delete", "failure:Permission denied"])
+    }
+
+    private func assertDeletionPlanEvents(
+        _ plan: VoiceInkWhisperModelDeletionPlan,
+        expectedEvents: [String]
+    ) {
+        XCTAssertEqual(deletionPlanEvents(plan), expectedEvents)
+    }
+
+    private func deletionPlanEvents(_ plan: VoiceInkWhisperModelDeletionPlan) -> [String] {
+        var events: [String] = []
+
+        plan.applyRuntimeState(
+            skipMissingFile: { events.append("missing") },
+            deleteDownloadedFiles: { events.append("delete") },
+            refreshAfterSuccessfulDelete: { events.append("refresh") },
+            handleDeleteFailure: { error in events.append("failure:\(error.localizedDescription)") }
+        )
+
+        return events
     }
 
     func testMacOSDownloadProgressUsesMainAndCoreMLKeys() {

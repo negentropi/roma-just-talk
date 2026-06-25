@@ -268,7 +268,10 @@ final class TranscriptionStreamingPreferenceTests: XCTestCase {
 
             let plan = facts.plan(forceStreaming: false, defaults: defaults)
 
-            XCTAssertEqual(plan.executionPlan, .file(serviceRoute: .cloud))
+            XCTAssertEqual(
+                executionSummary(for: plan.executionPlan),
+                "file:cloud"
+            )
         }
     }
 
@@ -282,17 +285,36 @@ final class TranscriptionStreamingPreferenceTests: XCTestCase {
             )
 
             let plan = facts.plan(forceStreaming: true, defaults: defaults)
+            let expectedSummary = [
+                "streaming",
+                "localFluidAudio",
+                "localFluidAudio",
+                "true",
+                "\(VoiceInkStreamingFinalCommitTimeout.localFluidAudioNanoseconds)"
+            ].joined(separator: ":")
 
             XCTAssertEqual(
-                plan.executionPlan,
-                .streaming(
-                    serviceRoute: .localFluidAudio,
-                    adapterKind: .localFluidAudio,
-                    usesRollingPreload: true,
-                    finalCommitTimeoutNanoseconds: VoiceInkStreamingFinalCommitTimeout.localFluidAudioNanoseconds
-                )
+                executionSummary(for: plan.executionPlan),
+                expectedSummary
             )
         }
+    }
+
+    private func executionSummary(for plan: VoiceInkTranscriptionSessionExecutionPlan) -> String {
+        plan.applyRuntimeState(
+            file: { serviceRoute in
+                "file:\(serviceRoute)"
+            },
+            streaming: { request in
+                [
+                    "streaming",
+                    "\(request.serviceRoute)",
+                    "\(request.adapterKind)",
+                    "\(request.usesRollingPreload)",
+                    "\(request.finalCommitTimeoutNanoseconds)"
+                ].joined(separator: ":")
+            }
+        )
     }
 
     private func withIsolatedDefaults(_ run: (UserDefaults) -> Void) {

@@ -8177,6 +8177,19 @@ require_pattern \
   'VoiceInkTranscriptionSessionExecutionPlan' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionStreamingPreference.swift
 
+require_patterns \
+  "shared transcription session execution plan hides raw action payload" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionStreamingPreference.swift \
+  'VoiceInkTranscriptionStreamingSessionRequest' \
+  '(private|fileprivate) enum VoiceInkTranscriptionSessionExecutionAction' \
+  'private let action: VoiceInkTranscriptionSessionExecutionAction' \
+  'applyRuntimeState'
+
+reject_pattern \
+  "shared transcription session execution plan avoids public raw action cases" \
+  'public enum VoiceInkTranscriptionSessionExecutionPlan|public static let file|public static let streaming' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionStreamingPreference.swift
+
 require_pattern \
   "shared transcription session route plan packages concrete execution plan" \
   'var executionPlan: VoiceInkTranscriptionSessionExecutionPlan' \
@@ -8194,12 +8207,17 @@ require_pattern \
 
 require_pattern \
   "macOS transcription service registry consumes shared session execution plan" \
-  'routePlan\.executionPlan|case \.streaming|case \.file' \
+  'routePlan\.executionPlan\.applyRuntimeState|file:|streaming:' \
   VoiceInk/Transcription/Engine/TranscriptionServiceRegistry.swift
 
 require_pattern \
   "macOS session creation passes shared streaming adapter kind" \
-  'streamingAdapterKind: streamingAdapterKind' \
+  'streamingAdapterKind: request\.adapterKind' \
+  VoiceInk/Transcription/Engine/TranscriptionServiceRegistry.swift
+
+reject_pattern \
+  "macOS transcription service registry avoids raw session execution cases" \
+  'switch routePlan\.executionPlan|case \.streaming|case \.file' \
   VoiceInk/Transcription/Engine/TranscriptionServiceRegistry.swift
 
 require_pattern \
@@ -8472,6 +8490,11 @@ require_pattern \
   "core checks execute transcription session execution plan tests" \
   'TranscriptionStreamingPreferenceTests\.testSessionRouteExecutionPlanUsesFileServiceWhenStreamingDisabled|TranscriptionStreamingPreferenceTests\.testSessionRouteExecutionPlanPackagesStreamingAdapterPreloadAndTimeout' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "core transcription session execution tests avoid raw action cases" \
+  '== \.(file|streaming)|\.(file|streaming)\(' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionStreamingPreferenceTests.swift
 
 require_pattern \
   "migration checklist tracks shared transcription session execution plan" \

@@ -175,14 +175,36 @@ public enum VoiceInkTranscriptionStreamingAdapterKind: Equatable, Sendable {
     case localFluidAudio
 }
 
-public enum VoiceInkTranscriptionSessionExecutionPlan: Equatable, Sendable {
+public struct VoiceInkTranscriptionStreamingSessionRequest: Equatable, Sendable {
+    public let serviceRoute: VoiceInkTranscriptionServiceRoute
+    public let adapterKind: VoiceInkTranscriptionStreamingAdapterKind
+    public let usesRollingPreload: Bool
+    public let finalCommitTimeoutNanoseconds: UInt64
+}
+
+fileprivate enum VoiceInkTranscriptionSessionExecutionAction: Equatable, Sendable {
     case file(serviceRoute: VoiceInkTranscriptionServiceRoute)
-    case streaming(
-        serviceRoute: VoiceInkTranscriptionServiceRoute,
-        adapterKind: VoiceInkTranscriptionStreamingAdapterKind,
-        usesRollingPreload: Bool,
-        finalCommitTimeoutNanoseconds: UInt64
-    )
+    case streaming(VoiceInkTranscriptionStreamingSessionRequest)
+}
+
+public struct VoiceInkTranscriptionSessionExecutionPlan: Equatable, Sendable {
+    private let action: VoiceInkTranscriptionSessionExecutionAction
+
+    fileprivate init(action: VoiceInkTranscriptionSessionExecutionAction) {
+        self.action = action
+    }
+
+    public func applyRuntimeState<Result>(
+        file: (VoiceInkTranscriptionServiceRoute) -> Result,
+        streaming: (VoiceInkTranscriptionStreamingSessionRequest) -> Result
+    ) -> Result {
+        switch action {
+        case .file(let serviceRoute):
+            return file(serviceRoute)
+        case .streaming(let request):
+            return streaming(request)
+        }
+    }
 }
 
 public struct VoiceInkTranscriptionSessionRouteFacts: Equatable, Sendable {
@@ -256,7 +278,9 @@ public struct VoiceInkTranscriptionSessionRoutePlan: Equatable, Sendable {
 
     public var executionPlan: VoiceInkTranscriptionSessionExecutionPlan {
         guard usesStreaming else {
-            return .file(serviceRoute: serviceRoute)
+            return VoiceInkTranscriptionSessionExecutionPlan(
+                action: .file(serviceRoute: serviceRoute)
+            )
         }
 
         guard let streamingAdapterKind,
@@ -264,11 +288,15 @@ public struct VoiceInkTranscriptionSessionRoutePlan: Equatable, Sendable {
             preconditionFailure("Streaming route plan missing streaming adapter details.")
         }
 
-        return .streaming(
-            serviceRoute: serviceRoute,
-            adapterKind: streamingAdapterKind,
-            usesRollingPreload: usesRollingPreload,
-            finalCommitTimeoutNanoseconds: finalCommitTimeoutNanoseconds
+        return VoiceInkTranscriptionSessionExecutionPlan(
+            action: .streaming(
+                VoiceInkTranscriptionStreamingSessionRequest(
+                    serviceRoute: serviceRoute,
+                    adapterKind: streamingAdapterKind,
+                    usesRollingPreload: usesRollingPreload,
+                    finalCommitTimeoutNanoseconds: finalCommitTimeoutNanoseconds
+                )
+            )
         )
     }
 }

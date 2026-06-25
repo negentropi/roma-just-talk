@@ -52,21 +52,26 @@ class TranscriptionServiceRegistry {
     ) -> TranscriptionSession {
         let routePlan = model.transcriptionSessionRouteFacts.plan(forceStreaming: forceStreaming)
 
-        switch routePlan.executionPlan {
-        case .streaming(let serviceRoute, let streamingAdapterKind, let usesRollingPreload, let finalCommitTimeoutNanoseconds):
-            let streamingService = StreamingTranscriptionService(
-                modelContext: modelContext,
-                streamingAdapterKind: streamingAdapterKind,
-                fluidAudioService: streamingAdapterKind == .localFluidAudio ? fluidAudioTranscriptionService : nil,
-                fluidAudioStreamingConfig: usesRollingPreload ? .rollingPreload : nil,
-                finalCommitTimeoutNanoseconds: finalCommitTimeoutNanoseconds,
-                onPartialTranscript: onPartialTranscript
-            )
-            let fallback = service(for: serviceRoute)
-            return StreamingTranscriptionSession(streamingService: streamingService, fallbackService: fallback)
-        case .file(let serviceRoute):
-            return FileTranscriptionSession(service: service(for: serviceRoute))
-        }
+        return routePlan.executionPlan.applyRuntimeState(
+            file: { serviceRoute -> TranscriptionSession in
+                FileTranscriptionSession(service: service(for: serviceRoute))
+            },
+            streaming: { request -> TranscriptionSession in
+                let streamingService = StreamingTranscriptionService(
+                    modelContext: modelContext,
+                    streamingAdapterKind: request.adapterKind,
+                    fluidAudioService: request.adapterKind == .localFluidAudio ? fluidAudioTranscriptionService : nil,
+                    fluidAudioStreamingConfig: request.usesRollingPreload ? .rollingPreload : nil,
+                    finalCommitTimeoutNanoseconds: request.finalCommitTimeoutNanoseconds,
+                    onPartialTranscript: onPartialTranscript
+                )
+                let fallback = service(for: request.serviceRoute)
+                return StreamingTranscriptionSession(
+                    streamingService: streamingService,
+                    fallbackService: fallback
+                )
+            }
+        )
     }
 
     func cleanup() async {

@@ -1099,13 +1099,13 @@ public struct VoiceInkPowerModeSession: Codable, Equatable, Sendable {
 }
 
 public struct VoiceInkPowerModeSessionBeginPlan: Equatable, Sendable {
-    public var startsNewSession: Bool
+    private var startsNewSession: Bool
 
-    public var shouldInstallSettingsObserver: Bool {
+    private var shouldInstallSettingsObserver: Bool {
         startsNewSession
     }
 
-    public init(startsNewSession: Bool) {
+    fileprivate init(startsNewSession: Bool) {
         self.startsNewSession = startsNewSession
     }
 
@@ -1113,7 +1113,7 @@ public struct VoiceInkPowerModeSessionBeginPlan: Equatable, Sendable {
         Self(startsNewSession: activeSession == nil)
     }
 
-    public func sessionToSave(
+    private func sessionToSave(
         id: UUID,
         startTime: Date,
         originalState: @autoclosure () -> VoiceInkPowerModeApplicationState
@@ -1125,16 +1125,36 @@ public struct VoiceInkPowerModeSessionBeginPlan: Equatable, Sendable {
             originalState: originalState()
         )
     }
+
+    public func applyRuntimeState(
+        id: UUID,
+        startTime: Date,
+        originalState: @autoclosure () -> VoiceInkPowerModeApplicationState,
+        saveSession: (VoiceInkPowerModeSession) -> Void,
+        installSettingsObserver: () -> Void
+    ) {
+        guard let session = sessionToSave(
+            id: id,
+            startTime: startTime,
+            originalState: originalState()
+        ) else { return }
+
+        saveSession(session)
+
+        if shouldInstallSettingsObserver {
+            installSettingsObserver()
+        }
+    }
 }
 
 public struct VoiceInkPowerModeSessionSnapshotPlan: Equatable, Sendable {
-    public var activeSession: VoiceInkPowerModeSession?
+    private var activeSession: VoiceInkPowerModeSession?
 
-    public var shouldCaptureCurrentState: Bool {
+    private var shouldCaptureCurrentState: Bool {
         activeSession != nil
     }
 
-    public init(activeSession: VoiceInkPowerModeSession?) {
+    fileprivate init(activeSession: VoiceInkPowerModeSession?) {
         self.activeSession = activeSession
     }
 
@@ -1149,12 +1169,22 @@ public struct VoiceInkPowerModeSessionSnapshotPlan: Equatable, Sendable {
         return Self(activeSession: activeSession)
     }
 
-    public func sessionToSave(
+    private func sessionToSave(
         currentState: VoiceInkPowerModeApplicationState
     ) -> VoiceInkPowerModeSession? {
         guard var activeSession else { return nil }
         activeSession.originalState = currentState
         return activeSession
+    }
+
+    public func applyRuntimeState(
+        currentState: @autoclosure () -> VoiceInkPowerModeApplicationState,
+        saveSession: (VoiceInkPowerModeSession) -> Void
+    ) {
+        guard shouldCaptureCurrentState,
+              let session = sessionToSave(currentState: currentState()) else { return }
+
+        saveSession(session)
     }
 }
 

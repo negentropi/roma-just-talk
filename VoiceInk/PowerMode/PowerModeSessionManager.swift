@@ -27,20 +27,18 @@ class PowerModeSessionManager {
         }
 
         let beginPlan = VoiceInkPowerModeSessionBeginPlan.plan(activeSession: loadSession())
-        if let newSession = beginPlan.sessionToSave(
+        beginPlan.applyRuntimeState(
             id: UUID(),
             startTime: Date(),
             originalState: currentApplicationState(
                 stateProvider: stateProvider,
                 enhancementService: enhancementService
-            )
-        ) {
-            saveSession(newSession)
-
-            if beginPlan.shouldInstallSettingsObserver {
+            ),
+            saveSession: saveSession,
+            installSettingsObserver: {
                 NotificationCenter.default.addObserver(self, selector: #selector(updateSessionSnapshot), name: .AppSettingsDidChange, object: nil)
             }
-        }
+        )
 
         // Always apply the new configuration
         isApplyingPowerModeConfig = true
@@ -69,18 +67,16 @@ class PowerModeSessionManager {
             isApplyingPowerModeConfiguration: isApplyingPowerModeConfig,
             activeSession: loadSession()
         )
-        guard snapshotPlan.shouldCaptureCurrentState,
-              let stateProvider = stateProvider,
+        guard let stateProvider = stateProvider,
               let enhancementService = enhancementService else { return }
 
-        if let session = snapshotPlan.sessionToSave(
+        snapshotPlan.applyRuntimeState(
             currentState: currentApplicationState(
                 stateProvider: stateProvider,
                 enhancementService: enhancementService
-            )
-        ) {
-            saveSession(session)
-        }
+            ),
+            saveSession: saveSession
+        )
     }
 
     private func currentApplicationState(

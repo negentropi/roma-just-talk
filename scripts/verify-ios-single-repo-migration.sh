@@ -13952,12 +13952,17 @@ require_pattern \
 
 require_pattern \
   "shared Power Mode begin-session lifecycle plan lives in VoiceInkCore" \
-  'VoiceInkPowerModeSessionBeginPlan|shouldInstallSettingsObserver' \
+  'VoiceInkPowerModeSessionBeginPlan|applyRuntimeState|installSettingsObserver' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
   "shared Power Mode snapshot-update lifecycle plan lives in VoiceInkCore" \
-  'VoiceInkPowerModeSessionSnapshotPlan|shouldCaptureCurrentState' \
+  'VoiceInkPowerModeSessionSnapshotPlan|applyRuntimeState|saveSession' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+reject_pattern \
+  "shared Power Mode session lifecycle plans avoid public raw execution flags" \
+  'public var startsNewSession|public var shouldInstallSettingsObserver|public var activeSession|public var shouldCaptureCurrentState|public func sessionToSave' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
@@ -14057,12 +14062,17 @@ require_pattern \
 
 require_pattern \
   "macOS Power Mode session manager consumes shared begin-session plan" \
-  'VoiceInkPowerModeSessionBeginPlan\.plan|beginPlan\.sessionToSave' \
+  'VoiceInkPowerModeSessionBeginPlan\.plan|beginPlan\.applyRuntimeState' \
   VoiceInk/PowerMode/PowerModeSessionManager.swift
 
 require_pattern \
   "macOS Power Mode session manager consumes shared snapshot-update plan" \
-  'VoiceInkPowerModeSessionSnapshotPlan\.plan|snapshotPlan\.sessionToSave' \
+  'VoiceInkPowerModeSessionSnapshotPlan\.plan|snapshotPlan\.applyRuntimeState' \
+  VoiceInk/PowerMode/PowerModeSessionManager.swift
+
+reject_pattern \
+  "macOS Power Mode session manager avoids raw lifecycle plan fields" \
+  'beginPlan\.(startsNewSession|shouldInstallSettingsObserver|sessionToSave)|snapshotPlan\.(activeSession|shouldCaptureCurrentState|sessionToSave)' \
   VoiceInk/PowerMode/PowerModeSessionManager.swift
 
 require_pattern \

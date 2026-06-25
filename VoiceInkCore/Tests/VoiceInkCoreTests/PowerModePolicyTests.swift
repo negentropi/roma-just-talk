@@ -1627,15 +1627,17 @@ final class PowerModePolicyTests: XCTestCase {
         let originalState = powerModeApplicationState(selectedAIModel: "original")
         let plan = VoiceInkPowerModeSessionBeginPlan.plan(activeSession: nil)
 
-        XCTAssertTrue(plan.startsNewSession)
-        XCTAssertTrue(plan.shouldInstallSettingsObserver)
         XCTAssertEqual(
-            plan.sessionToSave(id: id, startTime: startTime, originalState: originalState),
-            VoiceInkPowerModeSession(
+            powerModeSessionBeginEvents(
+                for: plan,
                 id: id,
                 startTime: startTime,
                 originalState: originalState
-            )
+            ),
+            [
+                "save:\(id.uuidString):1700000001.0:original",
+                "installObserver"
+            ]
         )
     }
 
@@ -1653,14 +1655,14 @@ final class PowerModePolicyTests: XCTestCase {
         )
         let plan = VoiceInkPowerModeSessionBeginPlan.plan(activeSession: existingSession)
 
-        XCTAssertFalse(plan.startsNewSession)
-        XCTAssertFalse(plan.shouldInstallSettingsObserver)
-        XCTAssertNil(
-            plan.sessionToSave(
+        XCTAssertEqual(
+            powerModeSessionBeginEvents(
+                for: plan,
                 id: UUID(),
                 startTime: Date(timeIntervalSince1970: 1_700_000_003),
                 originalState: newOriginalState()
-            )
+            ),
+            []
         )
         XCTAssertEqual(stateBuildCount, 0)
     }
@@ -1681,10 +1683,20 @@ final class PowerModePolicyTests: XCTestCase {
             activeSession: nil
         )
 
-        XCTAssertFalse(applyingPlan.shouldCaptureCurrentState)
-        XCTAssertNil(applyingPlan.sessionToSave(currentState: powerModeApplicationState(selectedAIModel: "ignored")))
-        XCTAssertFalse(missingPlan.shouldCaptureCurrentState)
-        XCTAssertNil(missingPlan.sessionToSave(currentState: powerModeApplicationState(selectedAIModel: "ignored")))
+        XCTAssertEqual(
+            powerModeSessionSnapshotEvents(
+                for: applyingPlan,
+                currentState: powerModeApplicationState(selectedAIModel: "ignored")
+            ),
+            []
+        )
+        XCTAssertEqual(
+            powerModeSessionSnapshotEvents(
+                for: missingPlan,
+                currentState: powerModeApplicationState(selectedAIModel: "ignored")
+            ),
+            []
+        )
     }
 
     func testPowerModeSessionSnapshotPlanUpdatesOriginalStateWhenIdle() {
@@ -1700,12 +1712,55 @@ final class PowerModePolicyTests: XCTestCase {
             isApplyingPowerModeConfiguration: false,
             activeSession: activeSession
         )
-        let sessionToSave = plan.sessionToSave(currentState: currentState)
 
-        XCTAssertTrue(plan.shouldCaptureCurrentState)
-        XCTAssertEqual(sessionToSave?.id, id)
-        XCTAssertEqual(sessionToSave?.startTime, startTime)
-        XCTAssertEqual(sessionToSave?.originalState, currentState)
+        XCTAssertEqual(
+            powerModeSessionSnapshotEvents(for: plan, currentState: currentState),
+            ["save:\(id.uuidString):1700000005.0:current"]
+        )
+    }
+
+    private func powerModeSessionBeginEvents(
+        for plan: VoiceInkPowerModeSessionBeginPlan,
+        id: UUID,
+        startTime: Date,
+        originalState: @autoclosure () -> VoiceInkPowerModeApplicationState
+    ) -> [String] {
+        var events: [String] = []
+
+        plan.applyRuntimeState(
+            id: id,
+            startTime: startTime,
+            originalState: originalState(),
+            saveSession: { session in
+                events.append(powerModeSessionEvent(prefix: "save", session: session))
+            },
+            installSettingsObserver: { events.append("installObserver") }
+        )
+
+        return events
+    }
+
+    private func powerModeSessionSnapshotEvents(
+        for plan: VoiceInkPowerModeSessionSnapshotPlan,
+        currentState: @autoclosure () -> VoiceInkPowerModeApplicationState
+    ) -> [String] {
+        var events: [String] = []
+
+        plan.applyRuntimeState(
+            currentState: currentState(),
+            saveSession: { session in
+                events.append(powerModeSessionEvent(prefix: "save", session: session))
+            }
+        )
+
+        return events
+    }
+
+    private func powerModeSessionEvent(
+        prefix: String,
+        session: VoiceInkPowerModeSession
+    ) -> String {
+        "\(prefix):\(session.id.uuidString):\(session.startTime.timeIntervalSince1970):\(session.originalState.selectedAIModel ?? "nil")"
     }
 
     func testPowerModeSessionDiagnosticsPreserveMacOSConsoleCopy() {

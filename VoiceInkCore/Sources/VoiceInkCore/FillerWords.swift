@@ -21,6 +21,14 @@ public struct VoiceInkFillerWordSubmissionPlan: Equatable, Sendable {
     public func updatedWordsIfChanged(from currentWords: [String]) -> [String]? {
         VoiceInkPreferenceList.changedElements(from: currentWords, to: updatedWords)
     }
+
+    public func applyRuntimeState(
+        currentWords: [String],
+        setWords: ([String]) -> Void
+    ) {
+        guard let updatedWords = updatedWordsIfChanged(from: currentWords) else { return }
+        setWords(updatedWords)
+    }
 }
 
 public struct VoiceInkFillerWordDraftSubmission: Equatable, Sendable, VoiceInkDictionaryDraftRuntimeSubmission {

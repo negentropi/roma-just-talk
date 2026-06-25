@@ -201,9 +201,7 @@ final class AppSettings: ObservableObject {
     }
 
     func applyFillerWordSubmissionPlan(_ plan: VoiceInkFillerWordSubmissionPlan) {
-        if let updatedWords = plan.updatedWordsIfChanged(from: fillerWords) {
-            fillerWords = updatedWords
-        }
+        plan.applyRuntimeState(currentWords: fillerWords) { fillerWords = $0 }
     }
 
     func removeFillerWords(at offsets: IndexSet) {

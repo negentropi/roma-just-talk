@@ -537,6 +537,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "EnhancementSettingsPresentationTests.testMacOSEnhancementSettingsPresentationPreservesOptions", run: { EnhancementSettingsPresentationTests().testMacOSEnhancementSettingsPresentationPreservesOptions() }),
             VoiceInkCoreCheck(name: "FillerWordsTests.testDefaultWordsMatchMacOSCleanupDefaults", run: { FillerWordsTests().testDefaultWordsMatchMacOSCleanupDefaults() }),
             VoiceInkCoreCheck(name: "FillerWordsTests.testSubmissionPlanInsertsWordAndClearsDraft", run: { FillerWordsTests().testSubmissionPlanInsertsWordAndClearsDraft() }),
+            VoiceInkCoreCheck(name: "FillerWordsTests.testSubmissionPlanAppliesAcceptedWordsToRuntimeState", run: { FillerWordsTests().testSubmissionPlanAppliesAcceptedWordsToRuntimeState() }),
             VoiceInkCoreCheck(name: "FillerWordsTests.testSubmissionPlanKeepsBlankDraftWithoutAlert", run: { FillerWordsTests().testSubmissionPlanKeepsBlankDraftWithoutAlert() }),
             VoiceInkCoreCheck(name: "FillerWordsTests.testSubmissionPlanKeepsDuplicateDraftAndBuildsSharedAlert", run: { FillerWordsTests().testSubmissionPlanKeepsDuplicateDraftAndBuildsSharedAlert() }),
             VoiceInkCoreCheck(name: "FillerWordsTests.testDraftAvailabilityUsesSharedNormalization", run: { FillerWordsTests().testDraftAvailabilityUsesSharedNormalization() }),

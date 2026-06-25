@@ -7067,8 +7067,13 @@ require_pattern \
 
 require_pattern \
   "shared filler-word submission policy owns changed-list application" \
-  'func updatedWordsIfChanged\(from currentWords: \[String\]\)' \
+  'func updatedWordsIfChanged\(from currentWords: \[String\]\)|func applyRuntimeState\([[:space:]]*currentWords: \[String\]' \
   VoiceInkCore/Sources/VoiceInkCore/FillerWords.swift
+
+require_pattern \
+  "core checks execute filler-word runtime application test" \
+  'FillerWordsTests\.testSubmissionPlanAppliesAcceptedWordsToRuntimeState' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "shared filler-word draft state lives in core" \
@@ -7102,7 +7107,7 @@ require_pattern \
 
 require_pattern \
   "macOS filler-word storage applies shared updated words" \
-  'plan\.updatedWordsIfChanged\(from: fillerWords\)' \
+  'plan\.applyRuntimeState\(currentWords: fillerWords\)' \
   VoiceInk/Transcription/Processing/FillerWordManager.swift
 
 require_pattern \
@@ -7112,7 +7117,7 @@ require_pattern \
 
 require_pattern \
   "iOS filler-word storage applies shared updated words" \
-  'plan\.updatedWordsIfChanged\(from: fillerWords\)' \
+  'plan\.applyRuntimeState\(currentWords: fillerWords\)' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 reject_pattern \
@@ -7123,7 +7128,7 @@ reject_pattern \
 
 reject_pattern \
   "platform filler-word storage avoids shell-owned changed-list comparison" \
-  'fillerWords != plan\.updatedWords|fillerWords = plan\.updatedWords' \
+  'if let updatedWords = plan\.updatedWordsIfChanged|fillerWords != plan\.updatedWords|fillerWords = plan\.updatedWords' \
   VoiceInk/Transcription/Processing/FillerWordManager.swift \
   iOS/VoiceInk-ios/AppSettings.swift
 

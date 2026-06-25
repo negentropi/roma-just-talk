@@ -27,6 +27,15 @@ final class FillerWordsTests: XCTestCase {
         )
     }
 
+    func testSubmissionPlanAppliesAcceptedWordsToRuntimeState() {
+        let plan = VoiceInkFillerWords.submissionPlan("LIKE", existingWords: ["um"])
+        var words = ["um"]
+
+        plan.applyRuntimeState(currentWords: words) { words = $0 }
+
+        XCTAssertEqual(words, ["um", "like"])
+    }
+
     func testSubmissionPlanKeepsBlankDraftWithoutAlert() {
         XCTAssertEqual(
             VoiceInkFillerWords.submissionPlan("   ", existingWords: ["um"]),

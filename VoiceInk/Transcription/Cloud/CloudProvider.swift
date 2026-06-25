@@ -24,27 +24,11 @@ struct CoreCloudProvider: CloudProvider {
     }
 }
 
-private extension VoiceInkCloudTranscriptionModelSpec {
-    func makeCloudModel(provider: ModelProvider) -> CloudModel {
-        CloudModel(
-            name: name,
-            displayName: displayName,
-            description: description,
-            provider: provider,
-            speed: speed,
-            accuracy: accuracy,
-            isMultilingual: isMultilingual,
-            supportsStreaming: supportsStreaming,
-            supportedLanguages: provider.supportedLanguages(isMultilingual: isMultilingual)
-        )
-    }
-}
-
 extension CloudProvider {
     var models: [CloudModel] {
         modelProvider
             .cloudModelSpecs
-            .map { $0.makeCloudModel(provider: modelProvider) }
+            .map { CloudModel(spec: $0, provider: modelProvider) }
     }
 
 }

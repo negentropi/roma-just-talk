@@ -164,17 +164,17 @@ struct CloudModel: TranscriptionModel {
     let supportsStreaming: Bool
     let supportedLanguages: [String: String]
 
-    init(id: UUID = UUID(), name: String, displayName: String, description: String, provider: ModelProvider, speed: Double, accuracy: Double, isMultilingual: Bool, supportsStreaming: Bool = false, supportedLanguages: [String: String]) {
-        self.id = id
-        self.name = name
-        self.displayName = displayName
-        self.description = description
+    init(spec: VoiceInkCloudTranscriptionModelSpec, provider: ModelProvider) {
+        self.id = UUID()
+        self.name = spec.name
+        self.displayName = spec.displayName
+        self.description = spec.description
         self.provider = provider
-        self.speed = speed
-        self.accuracy = accuracy
-        self.isMultilingualModel = isMultilingual
-        self.supportsStreaming = supportsStreaming
-        self.supportedLanguages = supportedLanguages
+        self.speed = spec.speed
+        self.accuracy = spec.accuracy
+        self.isMultilingualModel = spec.isMultilingual
+        self.supportsStreaming = spec.supportsStreaming
+        self.supportedLanguages = provider.supportedLanguages(isMultilingual: spec.isMultilingual)
     }
 }
 

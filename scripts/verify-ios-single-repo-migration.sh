@@ -5660,6 +5660,21 @@ reject_pattern \
   VoiceInk/Transcription/Cloud/CloudProvider.swift
 
 reject_pattern \
+  "macOS cloud provider avoids private cloud-model spec adapter shim" \
+  'private extension VoiceInkCloudTranscriptionModelSpec|makeCloudModel' \
+  VoiceInk/Transcription/Cloud/CloudProvider.swift
+
+require_pattern \
+  "macOS CloudModel adapts shared cloud-model specs directly" \
+  'init\(spec: VoiceInkCloudTranscriptionModelSpec, provider: ModelProvider\)' \
+  VoiceInk/Models/TranscriptionModel.swift
+
+reject_pattern \
+  "macOS CloudModel avoids shell-owned literal cloud model initializer" \
+  'init\(id: UUID = UUID\(\), name: String, displayName: String, description: String, provider: ModelProvider, speed: Double' \
+  VoiceInk/Models/TranscriptionModel.swift
+
+reject_pattern \
   "macOS cloud provider protocol keeps shared batch dispatch out of its interface" \
   '^    func transcribe\(audioData:' \
   VoiceInk/Transcription/Cloud/CloudProvider.swift

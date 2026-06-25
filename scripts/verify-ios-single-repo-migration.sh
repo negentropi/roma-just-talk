@@ -13043,14 +13043,17 @@ require_patterns \
   "iOS app settings first-time setup consumes shared setup plan" \
   iOS/VoiceInk-ios/AppSettings.swift \
   'VoiceInkIOSFirstTimeSetupPolicy\.plan' \
-  'VoiceInkIOSFirstTimeSetupPlan' \
-  'applyFirstTimeSetupPlan' \
-  'plan\.applyRuntimeState' \
+  'applyRuntimeState' \
   'applyModeSettingsRepair'
+
+reject_pattern \
+  "iOS app settings first-time setup avoids shallow setup-plan wrapper" \
+  'private func +applyFirstTimeSetupPlan\b' \
+  iOS/VoiceInk-ios/AppSettings.swift
 
 reject_context_pattern \
   "iOS app settings first-time setup avoids direct shared setup plan field execution" \
-  'private func applyFirstTimeSetupPlan' \
+  'func completeFirstTimeSetup' \
   'plan\.(modeSettingsRepairPlan|shouldSaveHasCompletedOnboarding|applicationActions)|VoiceInkIOSFirstTimeSetupAction|case \.applyModeSettingsRepair|case \.saveHasCompletedOnboarding' \
   iOS/VoiceInk-ios/AppSettings.swift
 

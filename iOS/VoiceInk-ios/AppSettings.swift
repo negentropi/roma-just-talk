@@ -290,15 +290,11 @@ final class AppSettings: ObservableObject {
     }
 
     func completeFirstTimeSetup() {
-        applyFirstTimeSetupPlan(VoiceInkIOSFirstTimeSetupPolicy.plan(
+        VoiceInkIOSFirstTimeSetupPolicy.plan(
             modes: modes,
             selectedModeId: selectedModeId,
             selectedTranscriptionLanguage: selectedTranscriptionLanguage
-        ))
-    }
-
-    private func applyFirstTimeSetupPlan(_ plan: VoiceInkIOSFirstTimeSetupPlan) {
-        plan.applyRuntimeState(
+        ).applyRuntimeState(
             applyModeSettingsRepair: applyModeSettingsRepairPlan,
             saveHasCompletedOnboarding: {
                 VoiceInkOnboardingPreference.saveHasCompletedOnboarding()

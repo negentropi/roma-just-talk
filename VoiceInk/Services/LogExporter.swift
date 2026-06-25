@@ -89,7 +89,7 @@ final class LogExporter {
         }
 
         let fileURL = downloadsURL.appendingPathComponent(fileName)
-        let content = logs.joined(separator: "\n")
+        let content = VoiceInkDiagnosticLogExportPolicy.exportContent(from: logs)
         try content.write(to: fileURL, atomically: true, encoding: .utf8)
 
         return fileURL

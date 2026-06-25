@@ -152,6 +152,19 @@ final class DiagnosticLogExportPolicyTests: XCTestCase {
         )
     }
 
+    func testDiagnosticLogExportPolicyBuildsExportContentWithLineBreaks() {
+        XCTAssertEqual(
+            VoiceInkDiagnosticLogExportPolicy.exportContent(
+                from: [
+                    "=== VoiceInk Diagnostic Logs ===",
+                    "",
+                    "No logs found for this session."
+                ]
+            ),
+            "=== VoiceInk Diagnostic Logs ===\n\nNo logs found for this session."
+        )
+    }
+
     func testDiagnosticLogExportPolicyOwnsOSLogLevelLabels() {
         XCTAssertEqual(VoiceInkDiagnosticLogExportPolicy.logLevelLabel(for: .undefined), "UNDEFINED")
         XCTAssertEqual(VoiceInkDiagnosticLogExportPolicy.logLevelLabel(for: .debug), "DEBUG")

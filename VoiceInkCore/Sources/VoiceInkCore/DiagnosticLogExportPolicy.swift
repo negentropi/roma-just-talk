@@ -117,6 +117,10 @@ public enum VoiceInkDiagnosticLogExportPolicy {
         "[\(formattedTimestamp(date))] [\(level)] [\(category)] \(message)"
     }
 
+    public static func exportContent(from lines: [String]) -> String {
+        lines.joined(separator: "\n")
+    }
+
     public static func logLevelLabel(for level: OSLogEntryLog.Level) -> String {
         switch level {
         case .undefined:

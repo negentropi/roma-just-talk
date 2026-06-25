@@ -13997,6 +13997,12 @@ reject_pattern \
   '"browser\.detection"|"❌ Failed to get URL from ' \
   VoiceInk/PowerMode/ActiveWindowService.swift
 
+reject_pattern \
+  "macOS active-window service avoids unused AI enhancement wiring" \
+  'private var enhancementService: AIEnhancementService\?|func configure\(with enhancementService|configure\(with: enhancementService\)' \
+  VoiceInk/PowerMode/ActiveWindowService.swift \
+  VoiceInk/VoiceInk.swift
+
 require_patterns \
   "macOS browser URL service adapts shared Power Mode browser metadata and diagnostics" \
   VoiceInk/PowerMode/BrowserURLService.swift \

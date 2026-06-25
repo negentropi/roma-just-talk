@@ -157,9 +157,7 @@ struct VoiceInkApp: App {
         _menuBarManager = StateObject(wrappedValue: menuBarManager)
         menuBarManager.configure(modelContainer: resolvedContainer, engine: engine)
 
-        let activeWindowService = ActiveWindowService.shared
-        activeWindowService.configure(with: enhancementService)
-        _activeWindowService = StateObject(wrappedValue: activeWindowService)
+        _activeWindowService = StateObject(wrappedValue: ActiveWindowService.shared)
 
         let prewarmService = ModelPrewarmService(
             transcriptionModelManager: transcriptionModelManager,

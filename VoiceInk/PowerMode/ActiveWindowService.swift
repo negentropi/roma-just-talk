@@ -6,7 +6,6 @@ import VoiceInkCore
 class ActiveWindowService: ObservableObject {
     static let shared = ActiveWindowService()
     @Published var currentApplication: NSRunningApplication?
-    private var enhancementService: AIEnhancementService?
     private let browserURLService = BrowserURLService.shared
 
     private let logger = Logger(
@@ -16,10 +15,6 @@ class ActiveWindowService: ObservableObject {
 
     private init() {}
 
-    func configure(with enhancementService: AIEnhancementService) {
-        self.enhancementService = enhancementService
-    }
-    
     func resolveConfiguration(
         powerModeId: UUID? = nil,
         updateCurrentApplication: Bool = true

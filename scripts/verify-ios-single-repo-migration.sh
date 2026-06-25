@@ -4436,13 +4436,13 @@ require_pattern \
   iOS/VoiceInk-ios/LocalModelManagementView.swift
 
 require_pattern \
-  "iOS local model management uses shared row action enum" \
-  'presentation\.action' \
+  "iOS local model management uses shared row runtime action interface" \
+  'presentation\.runtimeAction' \
   iOS/VoiceInk-ios/LocalModelManagementView.swift
 
 require_pattern \
   "iOS local model management delegates row runtime action mapping to shared core" \
-  'presentation\.action\.runtimeAction' \
+  'presentation\.runtimeAction' \
   iOS/VoiceInk-ios/LocalModelManagementView.swift
 
 require_pattern \
@@ -4557,9 +4557,9 @@ require_pattern \
   'row\.presentation|actionSystemImageName|downloadButtonSystemImageName' \
   iOS/VoiceInk-ios/OnboardingView.swift
 
-require_pattern \
-  "iOS onboarding uses shared model row action enum" \
-  'presentation\.action' \
+reject_pattern \
+  "iOS onboarding avoids direct local model row action access" \
+  'presentation\.action\b' \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 require_patterns \
@@ -4878,7 +4878,7 @@ reject_pattern \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 require_patterns \
-  "shared local model row presentation exposes one action enum" \
+  "shared local model row presentation hides row action behind runtime interface" \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift \
   'VoiceInkWhisperModelDownloadRowAction' \
   'runtimeAction' \
@@ -4888,8 +4888,13 @@ require_patterns \
 
 require_pattern \
   "core check runner executes local model row runtime action test" \
-  'testSimpleDownloadRowActionBuildsDeferredRuntimeAction' \
+  'testSimpleDownloadRowPresentationBuildsDeferredRuntimeAction' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "shared local model row presentation avoids public row action enum" \
+  'public enum VoiceInkWhisperModelDownloadRowAction\b|public let action: VoiceInkWhisperModelDownloadRowAction\b' \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
 
 require_patterns \
   "shared local model management row owns confirmation runtime actions" \
@@ -4942,7 +4947,7 @@ require_patterns \
 
 reject_pattern \
   "iOS model download views avoid shallow row action booleans" \
-  'presentation\.(isDownloaded|canStartDownload|canCancelDownload|canDeleteDownloadedModel)\b' \
+  'presentation\.(action\b|isDownloaded|canStartDownload|canCancelDownload|canDeleteDownloadedModel)\b' \
   iOS/VoiceInk-ios/LocalModelManagementView.swift \
   iOS/VoiceInk-ios/OnboardingView.swift
 

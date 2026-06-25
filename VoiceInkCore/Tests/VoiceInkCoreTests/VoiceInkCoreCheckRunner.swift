@@ -1646,7 +1646,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadTrackingStateOwnsIOSLifecycle", run: { try WhisperModelFilesTests().testSimpleDownloadTrackingStateOwnsIOSLifecycle() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testModelManagementDiagnosticsPreserveIOSLogCopy", run: { WhisperModelFilesTests().testModelManagementDiagnosticsPreserveIOSLogCopy() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadStateBuildsSharedRowPresentation", run: { WhisperModelFilesTests().testSimpleDownloadStateBuildsSharedRowPresentation() }),
-            VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadRowActionBuildsDeferredRuntimeAction", run: { WhisperModelFilesTests().testSimpleDownloadRowActionBuildsDeferredRuntimeAction() }),
+            VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadRowPresentationBuildsDeferredRuntimeAction", run: { WhisperModelFilesTests().testSimpleDownloadRowPresentationBuildsDeferredRuntimeAction() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadManagementListBuildsSharedRows", run: { WhisperModelFilesTests().testSimpleDownloadManagementListBuildsSharedRows() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadManagementRowBuildsConfirmationRuntimeActions", run: { WhisperModelFilesTests().testSimpleDownloadManagementRowBuildsConfirmationRuntimeActions() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadDeletionPolicyPreservesIOSDeleteIntent", run: { try WhisperModelFilesTests().testSimpleDownloadDeletionPolicyPreservesIOSDeleteIntent() }),

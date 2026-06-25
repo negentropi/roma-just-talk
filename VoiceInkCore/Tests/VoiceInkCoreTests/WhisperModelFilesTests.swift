@@ -723,18 +723,14 @@ final class WhisperModelFilesTests: XCTestCase {
             progress: .simple(modelName: model.modelName, isDownloading: true, progress: 0.25)
         )
 
-        XCTAssertEqual(
-            downloadingState.rowPresentation(for: model),
-            VoiceInkWhisperModelDownloadRowPresentation(
-                title: model.displayName,
-                subtitle: model.description,
-                action: .downloading,
-                downloadButtonTitle: VoiceInkWhisperModelDownloadProgress.downloadActionTitle(for: model),
-                progress: downloadingState.progress
-            )
-        )
         let downloadingPresentation = downloadingState.rowPresentation(for: model)
-        XCTAssertEqual(downloadingPresentation.action, .downloading)
+        XCTAssertEqual(downloadingPresentation.title, model.displayName)
+        XCTAssertEqual(downloadingPresentation.subtitle, model.description)
+        XCTAssertEqual(
+            downloadingPresentation.downloadButtonTitle,
+            VoiceInkWhisperModelDownloadProgress.downloadActionTitle(for: model)
+        )
+        XCTAssertEqual(downloadingPresentation.progress, downloadingState.progress)
         XCTAssertTrue(downloadingPresentation.shouldShowProgress)
         XCTAssertTrue(downloadingPresentation.shouldShowCircularProgressAccessory)
         XCTAssertEqual(downloadingPresentation.actionTint, .destructive)
@@ -745,7 +741,6 @@ final class WhisperModelFilesTests: XCTestCase {
             progress: nil
         ))
         let downloadedPresentation = downloadedState.rowPresentation(for: model)
-        XCTAssertEqual(downloadedPresentation.action, .downloaded)
         XCTAssertEqual(downloadedPresentation.actionSystemImageName, "checkmark.circle.fill")
         XCTAssertFalse(downloadedPresentation.shouldShowCircularProgressAccessory)
         XCTAssertEqual(downloadedPresentation.actionTint, .success)
@@ -756,7 +751,6 @@ final class WhisperModelFilesTests: XCTestCase {
             progress: nil
         ))
         let idlePresentation = idleState.rowPresentation(for: model)
-        XCTAssertEqual(idlePresentation.action, .download)
         XCTAssertEqual(idlePresentation.actionSystemImageName, "icloud.and.arrow.down")
         XCTAssertEqual(idlePresentation.downloadButtonSystemImageName, "arrow.down.circle.fill")
         XCTAssertFalse(idlePresentation.shouldShowProgress)
@@ -765,16 +759,29 @@ final class WhisperModelFilesTests: XCTestCase {
         XCTAssertEqual(downloadingPresentation.actionSystemImageName, "xmark.circle.fill")
     }
 
-    func testSimpleDownloadRowActionBuildsDeferredRuntimeAction() {
+    func testSimpleDownloadRowPresentationBuildsDeferredRuntimeAction() {
+        let model = VoiceInkWhisperModelFiles.baseModel
+        let downloadedPresentation = VoiceInkWhisperModelDownloadState(
+            isDownloaded: true,
+            progress: .simple(modelName: model.modelName, isDownloading: false, progress: nil)
+        ).rowPresentation(for: model)
+        let idlePresentation = VoiceInkWhisperModelDownloadState(
+            isDownloaded: false,
+            progress: .simple(modelName: model.modelName, isDownloading: false, progress: nil)
+        ).rowPresentation(for: model)
+        let downloadingPresentation = VoiceInkWhisperModelDownloadState(
+            isDownloaded: false,
+            progress: .simple(modelName: model.modelName, isDownloading: true, progress: 0.5)
+        ).rowPresentation(for: model)
         var events: [String] = []
 
-        XCTAssertNil(VoiceInkWhisperModelDownloadRowAction.downloaded.runtimeAction(
+        XCTAssertNil(downloadedPresentation.runtimeAction(
             requestDownload: { events.append("download") },
             cancelDownload: { events.append("cancel") }
         ))
         XCTAssertTrue(events.isEmpty)
 
-        let downloadAction = VoiceInkWhisperModelDownloadRowAction.download.runtimeAction(
+        let downloadAction = idlePresentation.runtimeAction(
             requestDownload: { events.append("download") },
             cancelDownload: { events.append("cancel") }
         )
@@ -782,7 +789,7 @@ final class WhisperModelFilesTests: XCTestCase {
         downloadAction?()
         XCTAssertEqual(events, ["download"])
 
-        let cancelAction = VoiceInkWhisperModelDownloadRowAction.downloading.runtimeAction(
+        let cancelAction = downloadingPresentation.runtimeAction(
             requestDownload: { events.append("download") },
             cancelDownload: { events.append("cancel") }
         )

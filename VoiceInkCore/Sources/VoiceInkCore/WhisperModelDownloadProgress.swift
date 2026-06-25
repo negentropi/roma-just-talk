@@ -336,12 +336,12 @@ public struct VoiceInkWhisperModelDownloadProgress: Equatable, Sendable {
     }
 }
 
-public enum VoiceInkWhisperModelDownloadRowAction: Equatable, Sendable {
+enum VoiceInkWhisperModelDownloadRowAction: Equatable, Sendable {
     case download
     case downloading
     case downloaded
 
-    public func runtimeAction(
+    func runtimeAction(
         requestDownload: @escaping () -> Void,
         cancelDownload: @escaping () -> Void
     ) -> (() -> Void)? {
@@ -365,7 +365,7 @@ public enum VoiceInkWhisperModelDownloadRowActionTint: Equatable, Sendable {
 public struct VoiceInkWhisperModelDownloadRowPresentation: Equatable, Sendable {
     public let title: String
     public let subtitle: String
-    public let action: VoiceInkWhisperModelDownloadRowAction
+    let action: VoiceInkWhisperModelDownloadRowAction
     public let downloadButtonTitle: String
     public let progress: VoiceInkWhisperModelDownloadProgress
 
@@ -401,6 +401,16 @@ public struct VoiceInkWhisperModelDownloadRowPresentation: Equatable, Sendable {
 
     public var shouldShowProgress: Bool {
         progress.isActive
+    }
+
+    public func runtimeAction(
+        requestDownload: @escaping () -> Void,
+        cancelDownload: @escaping () -> Void
+    ) -> (() -> Void)? {
+        action.runtimeAction(
+            requestDownload: requestDownload,
+            cancelDownload: cancelDownload
+        )
     }
 }
 

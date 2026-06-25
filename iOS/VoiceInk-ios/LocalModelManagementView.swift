@@ -47,7 +47,7 @@ struct ModelRowView: View {
     
     var body: some View {
         let presentation = row.presentation
-        let runtimeAction = presentation.action.runtimeAction(
+        let runtimeAction = presentation.runtimeAction(
             requestDownload: { showingDownloadConfirmation = true },
             cancelDownload: { modelManager.cancelDownload(for: row.model) }
         )

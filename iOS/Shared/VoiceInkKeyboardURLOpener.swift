@@ -68,7 +68,7 @@ enum VoiceInkKeyboardURLOpener {
         fallback: @escaping () -> Void
     ) {
         let sharedApp = UIApplication.value(forKeyPath: "sharedApplication") as? UIApplication
-        VoiceInkKeyboardOpenAppPolicy.applicationAction(
+        VoiceInkKeyboardOpenAppPolicy.applicationActionPlan(
             canOpenURL: sharedApp?.canOpenURL(url) == true
         ).applyRuntimeState(
             openViaApplication: {

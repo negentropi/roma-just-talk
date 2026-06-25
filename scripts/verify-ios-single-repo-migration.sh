@@ -15491,20 +15491,21 @@ require_patterns \
   'VoiceInkKeyboardOpenAppDiagnostics' \
   'initialActionPlan' \
   'actionPlanAfterExtensionContextOpen' \
+  'applicationActionPlan' \
   'actionPlanAfterApplicationOpen' \
   'responderActionPlan' \
-  'actionAfterExtensionContextOpen' \
-  'applicationAction' \
-  'responderAction' \
   'applyRuntimeState'
 
 require_patterns \
   "VoiceInkCore checks cover iOS keyboard open-app fallback policy and diagnostics" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'testKeyboardOpenAppPolicyPreservesFallbackOrder' \
-  'testKeyboardOpenAppActionsApplyRuntimeState' \
   'testKeyboardOpenAppPlansApplyDiagnosticsAndRuntimeState' \
   'testKeyboardOpenAppDiagnosticsPreserveIOSLogCopy'
+
+reject_pattern \
+  "VoiceInkCore keyboard open-app policy avoids public action-only helpers" \
+  'public static func (initialAction|actionAfterExtensionContextOpen|applicationAction|actionAfterApplicationOpen|responderAction)\(' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
 require_pattern \
   "iOS keyboard URL opener lives in shared shell adapter" \
@@ -15522,6 +15523,7 @@ require_patterns \
   'VoiceInkKeyboardOpenAppPolicy' \
   'initialActionPlan' \
   'actionPlanAfterExtensionContextOpen' \
+  'applicationActionPlan' \
   'actionPlanAfterApplicationOpen' \
   'responderActionPlan' \
   'applyRuntimeState' \

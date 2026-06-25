@@ -611,13 +611,13 @@ public enum VoiceInkKeyboardRecordingButtonTapPolicy {
     }
 }
 
-public enum VoiceInkKeyboardOpenAppAction: Equatable, Sendable {
+enum VoiceInkKeyboardOpenAppAction: Equatable, Sendable {
     case openExtensionContext
     case openThroughApplicationOrResponderChain
     case finish
     case showFallback
 
-    public func applyRuntimeState(
+    func applyRuntimeState(
         openExtensionContext: () -> Void,
         openThroughApplicationOrResponderChain: () -> Void,
         finish: () -> Void,
@@ -636,26 +636,26 @@ public enum VoiceInkKeyboardOpenAppAction: Equatable, Sendable {
     }
 }
 
-public enum VoiceInkKeyboardOpenAppDiagnosticLevel: Equatable, Sendable {
+enum VoiceInkKeyboardOpenAppDiagnosticLevel: Equatable, Sendable {
     case notice
     case error
 }
 
-public enum VoiceInkKeyboardOpenAppDiagnosticTiming: Equatable, Sendable {
+enum VoiceInkKeyboardOpenAppDiagnosticTiming: Equatable, Sendable {
     case beforeAction
     case afterAction
 }
 
-public struct VoiceInkKeyboardOpenAppDiagnosticEvent: Equatable, Sendable {
-    public let level: VoiceInkKeyboardOpenAppDiagnosticLevel
-    public let message: String
+struct VoiceInkKeyboardOpenAppDiagnosticEvent: Equatable, Sendable {
+    let level: VoiceInkKeyboardOpenAppDiagnosticLevel
+    let message: String
 
-    public init(level: VoiceInkKeyboardOpenAppDiagnosticLevel, message: String) {
+    init(level: VoiceInkKeyboardOpenAppDiagnosticLevel, message: String) {
         self.level = level
         self.message = message
     }
 
-    public func applyRuntimeState(
+    func applyRuntimeState(
         logNotice: (String) -> Void,
         logError: (String) -> Void
     ) {
@@ -668,12 +668,12 @@ public struct VoiceInkKeyboardOpenAppDiagnosticEvent: Equatable, Sendable {
     }
 }
 
-public struct VoiceInkKeyboardOpenAppActionPlan: Equatable, Sendable {
-    public let action: VoiceInkKeyboardOpenAppAction
-    public let diagnosticEvent: VoiceInkKeyboardOpenAppDiagnosticEvent?
-    public let diagnosticTiming: VoiceInkKeyboardOpenAppDiagnosticTiming
+public struct VoiceInkKeyboardOpenAppActionPlan: Sendable {
+    private let action: VoiceInkKeyboardOpenAppAction
+    private let diagnosticEvent: VoiceInkKeyboardOpenAppDiagnosticEvent?
+    private let diagnosticTiming: VoiceInkKeyboardOpenAppDiagnosticTiming
 
-    public init(
+    init(
         action: VoiceInkKeyboardOpenAppAction,
         diagnosticEvent: VoiceInkKeyboardOpenAppDiagnosticEvent? = nil,
         diagnosticTiming: VoiceInkKeyboardOpenAppDiagnosticTiming = .beforeAction
@@ -708,11 +708,11 @@ public struct VoiceInkKeyboardOpenAppActionPlan: Equatable, Sendable {
     }
 }
 
-public enum VoiceInkKeyboardOpenAppApplicationAction: Equatable, Sendable {
+enum VoiceInkKeyboardOpenAppApplicationAction: Equatable, Sendable {
     case openViaApplication
     case openViaResponderChain
 
-    public func applyRuntimeState(
+    func applyRuntimeState(
         openViaApplication: () -> Void,
         openViaResponderChain: () -> Void
     ) {
@@ -725,11 +725,11 @@ public enum VoiceInkKeyboardOpenAppApplicationAction: Equatable, Sendable {
     }
 }
 
-public enum VoiceInkKeyboardOpenAppResponderAction: Equatable, Sendable {
+enum VoiceInkKeyboardOpenAppResponderAction: Equatable, Sendable {
     case performResponderChainOpen
     case showFallback
 
-    public func applyRuntimeState(
+    func applyRuntimeState(
         performResponderChainOpen: () -> Void,
         showFallback: () -> Void
     ) {
@@ -742,12 +742,30 @@ public enum VoiceInkKeyboardOpenAppResponderAction: Equatable, Sendable {
     }
 }
 
-public struct VoiceInkKeyboardOpenAppResponderActionPlan: Equatable, Sendable {
-    public let action: VoiceInkKeyboardOpenAppResponderAction
-    public let diagnosticEvent: VoiceInkKeyboardOpenAppDiagnosticEvent?
-    public let diagnosticTiming: VoiceInkKeyboardOpenAppDiagnosticTiming
+public struct VoiceInkKeyboardOpenAppApplicationActionPlan: Sendable {
+    private let action: VoiceInkKeyboardOpenAppApplicationAction
 
-    public init(
+    init(action: VoiceInkKeyboardOpenAppApplicationAction) {
+        self.action = action
+    }
+
+    public func applyRuntimeState(
+        openViaApplication: () -> Void,
+        openViaResponderChain: () -> Void
+    ) {
+        action.applyRuntimeState(
+            openViaApplication: openViaApplication,
+            openViaResponderChain: openViaResponderChain
+        )
+    }
+}
+
+public struct VoiceInkKeyboardOpenAppResponderActionPlan: Sendable {
+    private let action: VoiceInkKeyboardOpenAppResponderAction
+    private let diagnosticEvent: VoiceInkKeyboardOpenAppDiagnosticEvent?
+    private let diagnosticTiming: VoiceInkKeyboardOpenAppDiagnosticTiming
+
+    init(
         action: VoiceInkKeyboardOpenAppResponderAction,
         diagnosticEvent: VoiceInkKeyboardOpenAppDiagnosticEvent? = nil,
         diagnosticTiming: VoiceInkKeyboardOpenAppDiagnosticTiming = .beforeAction
@@ -796,10 +814,6 @@ public enum VoiceInkKeyboardOpenAppPolicy {
             )
     }
 
-    public static func initialAction(hasExtensionContext: Bool) -> VoiceInkKeyboardOpenAppAction {
-        initialActionPlan(hasExtensionContext: hasExtensionContext).action
-    }
-
     public static func actionPlanAfterExtensionContextOpen(
         succeeded: Bool
     ) -> VoiceInkKeyboardOpenAppActionPlan {
@@ -814,12 +828,12 @@ public enum VoiceInkKeyboardOpenAppPolicy {
             )
     }
 
-    public static func actionAfterExtensionContextOpen(succeeded: Bool) -> VoiceInkKeyboardOpenAppAction {
-        actionPlanAfterExtensionContextOpen(succeeded: succeeded).action
-    }
-
-    public static func applicationAction(canOpenURL: Bool) -> VoiceInkKeyboardOpenAppApplicationAction {
-        canOpenURL ? .openViaApplication : .openViaResponderChain
+    public static func applicationActionPlan(
+        canOpenURL: Bool
+    ) -> VoiceInkKeyboardOpenAppApplicationActionPlan {
+        VoiceInkKeyboardOpenAppApplicationActionPlan(
+            action: canOpenURL ? .openViaApplication : .openViaResponderChain
+        )
     }
 
     public static func actionPlanAfterApplicationOpen(
@@ -834,10 +848,6 @@ public enum VoiceInkKeyboardOpenAppPolicy {
                 action: .showFallback,
                 diagnosticEvent: error(VoiceInkKeyboardOpenAppDiagnostics.applicationOpenFailed)
             )
-    }
-
-    public static func actionAfterApplicationOpen(succeeded: Bool) -> VoiceInkKeyboardOpenAppAction {
-        actionPlanAfterApplicationOpen(succeeded: succeeded).action
     }
 
     public static func responderActionPlan(
@@ -855,9 +865,6 @@ public enum VoiceInkKeyboardOpenAppPolicy {
             )
     }
 
-    public static func responderAction(hasResponder: Bool) -> VoiceInkKeyboardOpenAppResponderAction {
-        responderActionPlan(hasResponder: hasResponder).action
-    }
 }
 
 public enum VoiceInkKeyboardOpenAppDiagnostics {

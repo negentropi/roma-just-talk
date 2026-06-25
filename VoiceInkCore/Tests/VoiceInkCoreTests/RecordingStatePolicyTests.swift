@@ -851,105 +851,6 @@ final class RecordingStatePolicyTests: XCTestCase {
         XCTAssertEqual(events, ["stop", "refresh", "open"])
     }
 
-    func testKeyboardOpenAppPolicyPreservesFallbackOrder() {
-        XCTAssertEqual(
-            VoiceInkKeyboardOpenAppPolicy.initialAction(hasExtensionContext: true),
-            .openExtensionContext
-        )
-        XCTAssertEqual(
-            VoiceInkKeyboardOpenAppPolicy.initialAction(hasExtensionContext: false),
-            .openThroughApplicationOrResponderChain
-        )
-        XCTAssertEqual(
-            VoiceInkKeyboardOpenAppPolicy.actionAfterExtensionContextOpen(succeeded: true),
-            .finish
-        )
-        XCTAssertEqual(
-            VoiceInkKeyboardOpenAppPolicy.actionAfterExtensionContextOpen(succeeded: false),
-            .openThroughApplicationOrResponderChain
-        )
-        XCTAssertEqual(
-            VoiceInkKeyboardOpenAppPolicy.applicationAction(canOpenURL: true),
-            .openViaApplication
-        )
-        XCTAssertEqual(
-            VoiceInkKeyboardOpenAppPolicy.applicationAction(canOpenURL: false),
-            .openViaResponderChain
-        )
-        XCTAssertEqual(
-            VoiceInkKeyboardOpenAppPolicy.actionAfterApplicationOpen(succeeded: true),
-            .finish
-        )
-        XCTAssertEqual(
-            VoiceInkKeyboardOpenAppPolicy.actionAfterApplicationOpen(succeeded: false),
-            .showFallback
-        )
-        XCTAssertEqual(
-            VoiceInkKeyboardOpenAppPolicy.responderAction(hasResponder: true),
-            .performResponderChainOpen
-        )
-        XCTAssertEqual(
-            VoiceInkKeyboardOpenAppPolicy.responderAction(hasResponder: false),
-            .showFallback
-        )
-    }
-
-    func testKeyboardOpenAppActionsApplyRuntimeState() {
-        var events: [String] = []
-
-        VoiceInkKeyboardOpenAppAction.openExtensionContext.applyRuntimeState(
-            openExtensionContext: { events.append("extension") },
-            openThroughApplicationOrResponderChain: { events.append("fallbackChain") },
-            finish: { events.append("finish") },
-            showFallback: { events.append("fallback") }
-        )
-        VoiceInkKeyboardOpenAppAction.openThroughApplicationOrResponderChain.applyRuntimeState(
-            openExtensionContext: { events.append("extension") },
-            openThroughApplicationOrResponderChain: { events.append("fallbackChain") },
-            finish: { events.append("finish") },
-            showFallback: { events.append("fallback") }
-        )
-        VoiceInkKeyboardOpenAppAction.finish.applyRuntimeState(
-            openExtensionContext: { events.append("extension") },
-            openThroughApplicationOrResponderChain: { events.append("fallbackChain") },
-            finish: { events.append("finish") },
-            showFallback: { events.append("fallback") }
-        )
-        VoiceInkKeyboardOpenAppAction.showFallback.applyRuntimeState(
-            openExtensionContext: { events.append("extension") },
-            openThroughApplicationOrResponderChain: { events.append("fallbackChain") },
-            finish: { events.append("finish") },
-            showFallback: { events.append("fallback") }
-        )
-        VoiceInkKeyboardOpenAppApplicationAction.openViaApplication.applyRuntimeState(
-            openViaApplication: { events.append("application") },
-            openViaResponderChain: { events.append("responderChain") }
-        )
-        VoiceInkKeyboardOpenAppApplicationAction.openViaResponderChain.applyRuntimeState(
-            openViaApplication: { events.append("application") },
-            openViaResponderChain: { events.append("responderChain") }
-        )
-        VoiceInkKeyboardOpenAppResponderAction.performResponderChainOpen.applyRuntimeState(
-            performResponderChainOpen: { events.append("responder") },
-            showFallback: { events.append("responderFallback") }
-        )
-        VoiceInkKeyboardOpenAppResponderAction.showFallback.applyRuntimeState(
-            performResponderChainOpen: { events.append("responder") },
-            showFallback: { events.append("responderFallback") }
-        )
-
-        XCTAssertEqual(events, [
-            "extension",
-            "fallbackChain",
-            "finish",
-            "fallback",
-            "application",
-            "responderChain",
-            "responder",
-            "responderFallback"
-        ])
-    }
-
     func testKeyboardOpenAppPlansApplyDiagnosticsAndRuntimeState() {
         var events: [String] = []
 
@@ -973,7 +874,17 @@ final class RecordingStatePolicyTests: XCTestCase {
             )
         }
 
+        func apply(_ plan: VoiceInkKeyboardOpenAppApplicationActionPlan) {
+            plan.applyRuntimeState(
+                openViaApplication: { events.append("application") },
+                openViaResponderChain: { events.append("responderChain") }
+            )
+        }
+
+        apply(VoiceInkKeyboardOpenAppPolicy.initialActionPlan(hasExtensionContext: true))
         apply(VoiceInkKeyboardOpenAppPolicy.initialActionPlan(hasExtensionContext: false))
+        apply(VoiceInkKeyboardOpenAppPolicy.applicationActionPlan(canOpenURL: true))
+        apply(VoiceInkKeyboardOpenAppPolicy.applicationActionPlan(canOpenURL: false))
         apply(VoiceInkKeyboardOpenAppPolicy.actionPlanAfterExtensionContextOpen(succeeded: true))
         apply(VoiceInkKeyboardOpenAppPolicy.actionPlanAfterExtensionContextOpen(succeeded: false))
         apply(VoiceInkKeyboardOpenAppPolicy.actionPlanAfterApplicationOpen(succeeded: true))
@@ -982,8 +893,11 @@ final class RecordingStatePolicyTests: XCTestCase {
         apply(VoiceInkKeyboardOpenAppPolicy.responderActionPlan(hasResponder: false))
 
         XCTAssertEqual(events, [
+            "extension",
             "error:\(VoiceInkKeyboardOpenAppDiagnostics.extensionContextUnavailable)",
             "fallbackChain",
+            "application",
+            "responderChain",
             "notice:\(VoiceInkKeyboardOpenAppDiagnostics.openedViaExtensionContext)",
             "finish",
             "error:\(VoiceInkKeyboardOpenAppDiagnostics.extensionContextOpenFailed)",

@@ -193,7 +193,7 @@ struct AddCustomModelCardView: View {
         .alert(presentation.validationAlertTitle, isPresented: $showingAlert) {
             Button(presentation.validationAlertDismissButtonTitle) { }
         } message: {
-            Text(validationErrors.joined(separator: "\n"))
+            Text(presentation.validationAlertMessage(for: validationErrors))
         }
         .onChange(of: editingModel) { oldValue, newValue in
             if newValue != nil {

@@ -181,6 +181,18 @@ final class CustomCloudModelPolicyTests: XCTestCase {
         )
     }
 
+    func testMacOSFormPresentationBuildsValidationAlertMessage() {
+        XCTAssertEqual(
+            VoiceInkCustomCloudModelFormPresentation.macOS.validationAlertMessage(
+                for: [
+                    "Name cannot be empty",
+                    "API key cannot be empty"
+                ]
+            ),
+            "Name cannot be empty\nAPI key cannot be empty"
+        )
+    }
+
     func testMacOSFormPresentationSelectsAddAndEditLabelsAndIcons() {
         let presentation = VoiceInkCustomCloudModelFormPresentation.macOS
 

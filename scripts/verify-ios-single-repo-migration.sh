@@ -6024,7 +6024,7 @@ require_pattern \
 
 require_pattern \
   "shared custom cloud model form presentation owns defaults and copy" \
-  'VoiceInkCustomCloudModelFormPresentation|defaultAPIEndpoint|defaultModelName|keychainSaveFailureMessage|submitButtonSystemImageName' \
+  'VoiceInkCustomCloudModelFormPresentation|defaultAPIEndpoint|defaultModelName|keychainSaveFailureMessage|submitButtonSystemImageName|validationAlertMessage' \
   VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
 
 require_pattern \
@@ -6084,7 +6084,7 @@ reject_pattern \
 
 require_pattern \
   "macOS custom cloud model form uses shared presentation" \
-  'VoiceInkCustomCloudModelFormPresentation\.macOS|presentation\.(defaultAPIEndpoint|defaultModelName|buttonTitle|title|compatibilityWarningText|displayNameFieldTitle|apiEndpointFieldTitle|apiKeyFieldTitle|modelNameFieldTitle|multilingualToggleTitle|cancelButtonTitle|submitButtonTitle|submitButtonSystemImageName|validationAlertTitle|validationAlertDismissButtonTitle|defaultModelDescription|keychainSaveFailureMessage)' \
+  'VoiceInkCustomCloudModelFormPresentation\.macOS|presentation\.(defaultAPIEndpoint|defaultModelName|buttonTitle|title|compatibilityWarningText|displayNameFieldTitle|apiEndpointFieldTitle|apiKeyFieldTitle|modelNameFieldTitle|multilingualToggleTitle|cancelButtonTitle|submitButtonTitle|submitButtonSystemImageName|validationAlertTitle|validationAlertDismissButtonTitle|validationAlertMessage|defaultModelDescription|keychainSaveFailureMessage)' \
   "VoiceInk/Views/AI Models/AddCustomModelView.swift"
 
 require_pattern \
@@ -6097,9 +6097,19 @@ require_pattern \
   'CustomCloudModelPolicyTests\.testMacOSFormControlPresentationOwnsSubmitState' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
+require_pattern \
+  "core checks execute custom cloud model validation alert message test" \
+  'CustomCloudModelPolicyTests\.testMacOSFormPresentationBuildsValidationAlertMessage' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
 reject_pattern \
   "macOS custom cloud model form avoids shallow validity wrapper" \
   'private +var +isFormValid\b|formHasRequiredFields|VoiceInkCustomCloudModelPolicy\.hasRequiredFields\(currentDraft\)' \
+  "VoiceInk/Views/AI Models/AddCustomModelView.swift"
+
+reject_pattern \
+  "macOS custom cloud model form avoids shell-owned validation alert message composition" \
+  'validationErrors\.joined\(separator: "\\n"\)' \
   "VoiceInk/Views/AI Models/AddCustomModelView.swift"
 
 reject_pattern \

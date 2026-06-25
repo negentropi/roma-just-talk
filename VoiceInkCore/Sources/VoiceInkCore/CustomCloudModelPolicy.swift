@@ -110,6 +110,10 @@ public struct VoiceInkCustomCloudModelFormPresentation: Equatable, Sendable {
     public func submitButtonSystemImageName(isEditing: Bool) -> String {
         isEditing ? editSubmitSystemImageName : addSubmitSystemImageName
     }
+
+    public func validationAlertMessage(for errors: [String]) -> String {
+        errors.joined(separator: "\n")
+    }
 }
 
 public struct VoiceInkCustomCloudModelFormControlPresentation: Equatable, Sendable {

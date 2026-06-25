@@ -1028,7 +1028,7 @@ final class RecordingStatePolicyTests: XCTestCase {
         XCTAssertEqual(alert.message, "Please create a new mode in Settings before recording.")
         XCTAssertEqual(alert.primaryButtonTitle, "OK")
         XCTAssertNil(alert.secondaryButtonTitle)
-        XCTAssertEqual(alert.action, .dismiss)
+        XCTAssertNil(alert.runtimeAction(openSettings: {}))
     }
 
     func testRecordingAlertPresentationPreservesIOSPermissionDeniedCopy() {
@@ -1039,17 +1039,16 @@ final class RecordingStatePolicyTests: XCTestCase {
         XCTAssertEqual(alert.message, "To record audio, please grant microphone access in Settings.")
         XCTAssertEqual(alert.primaryButtonTitle, "Settings")
         XCTAssertEqual(alert.secondaryButtonTitle, "Cancel")
-        XCTAssertEqual(alert.action, .openSettings)
     }
 
-    func testRecordingAlertActionBuildsDeferredRuntimeAction() {
+    func testRecordingAlertPresentationBuildsDeferredRuntimeAction() {
         var didOpenSettings = false
-        XCTAssertNil(VoiceInkRecordingAlertPresentation.Action.dismiss.runtimeAction {
+        XCTAssertNil(VoiceInkRecordingAlertPresentation.noModesAvailable.runtimeAction {
             didOpenSettings = true
         })
         XCTAssertFalse(didOpenSettings)
 
-        let action = VoiceInkRecordingAlertPresentation.Action.openSettings.runtimeAction {
+        let action = VoiceInkRecordingAlertPresentation.microphonePermissionDenied.runtimeAction {
             didOpenSettings = true
         }
         XCTAssertFalse(didOpenSettings)
@@ -1113,7 +1112,7 @@ final class RecordingStatePolicyTests: XCTestCase {
         XCTAssertEqual(alert.title, "Microphone In Use")
         XCTAssertEqual(alert.message, "Another app is using the microphone. Please try again.")
         XCTAssertEqual(alert.primaryButtonTitle, "OK")
-        XCTAssertEqual(alert.action, .dismiss)
+        XCTAssertNil(alert.runtimeAction(openSettings: {}))
     }
 
     func testRecordingStartFailurePreservesGenericFailureCopy() {
@@ -1127,7 +1126,7 @@ final class RecordingStatePolicyTests: XCTestCase {
         XCTAssertEqual(alert.title, "Recording Failed")
         XCTAssertEqual(alert.message, "Could not start recording: Hardware unavailable")
         XCTAssertEqual(alert.primaryButtonTitle, "OK")
-        XCTAssertEqual(alert.action, .dismiss)
+        XCTAssertNil(alert.runtimeAction(openSettings: {}))
     }
 
     func testRecordingStartFailurePreservesIOSRecorderStartReturnedFalseReason() {

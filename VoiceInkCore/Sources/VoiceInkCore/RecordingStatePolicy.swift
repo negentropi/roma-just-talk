@@ -1081,11 +1081,11 @@ public struct VoiceInkRecordingNotificationPresentation: Equatable, Sendable {
 }
 
 public struct VoiceInkRecordingAlertPresentation: Equatable, Identifiable, Sendable {
-    public enum Action: Equatable, Sendable {
+    enum Action: Equatable, Sendable {
         case dismiss
         case openSettings
 
-        public func runtimeAction(
+        func runtimeAction(
             openSettings: @escaping () -> Void
         ) -> (() -> Void)? {
             switch self {
@@ -1105,9 +1105,9 @@ public struct VoiceInkRecordingAlertPresentation: Equatable, Identifiable, Senda
     public let message: String
     public let primaryButtonTitle: String
     public let secondaryButtonTitle: String?
-    public let action: Action
+    let action: Action
 
-    public init(
+    init(
         id: String,
         title: String,
         message: String,
@@ -1121,6 +1121,12 @@ public struct VoiceInkRecordingAlertPresentation: Equatable, Identifiable, Senda
         self.primaryButtonTitle = primaryButtonTitle
         self.secondaryButtonTitle = secondaryButtonTitle
         self.action = action
+    }
+
+    public func runtimeAction(
+        openSettings: @escaping () -> Void
+    ) -> (() -> Void)? {
+        action.runtimeAction(openSettings: openSettings)
     }
 
     public static var noModesAvailable: VoiceInkRecordingAlertPresentation {

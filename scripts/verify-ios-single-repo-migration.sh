@@ -1252,8 +1252,13 @@ require_patterns \
 
 require_pattern \
   "VoiceInkCore checks cover iOS recording alert runtime action mapping" \
-  'testRecordingAlertActionBuildsDeferredRuntimeAction' \
+  'testRecordingAlertPresentationBuildsDeferredRuntimeAction' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "shared recording alert presentation avoids public raw action interface" \
+  'public enum Action: Equatable, Sendable|public let action: Action\b' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
 require_pattern \
   "shared recording notification presentation lives in VoiceInkCore" \
@@ -1337,12 +1342,12 @@ reject_pattern \
 require_patterns \
   "iOS note-list adapts shared recording alert runtime action" \
   iOS/VoiceInk-ios/NotesListView.swift \
-  'presentation\.action\.runtimeAction' \
+  'presentation\.runtimeAction' \
   'secondaryButtonTitle'
 
 reject_pattern \
   "iOS note-list avoids shell-owned recording alert action switches" \
-  'switch presentation\.action|case \.openSettings|case \.dismiss' \
+  'presentation\.action\b|switch presentation\.action|case \.openSettings|case \.dismiss' \
   iOS/VoiceInk-ios/NotesListView.swift
 
 require_pattern \
@@ -14050,7 +14055,7 @@ require_pattern \
 require_patterns \
   "iOS recording alert adapter uses shared action and secondary button copy" \
   iOS/VoiceInk-ios/NotesListView.swift \
-  'presentation\.action\.runtimeAction' \
+  'presentation\.runtimeAction' \
   'presentation\.secondaryButtonTitle'
 
 reject_pattern \

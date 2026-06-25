@@ -164,7 +164,7 @@ struct NotesListView: View {
 
     // MARK: - Helper Functions
     private func alert(for presentation: VoiceInkRecordingAlertPresentation) -> Alert {
-        let primaryAction = presentation.action.runtimeAction(openSettings: recordingManager.openSettings)
+        let primaryAction = presentation.runtimeAction(openSettings: recordingManager.openSettings)
         if let secondaryButtonTitle = presentation.secondaryButtonTitle {
             return Alert(
                 title: Text(presentation.title),

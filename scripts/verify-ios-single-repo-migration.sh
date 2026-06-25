@@ -14268,7 +14268,7 @@ reject_pattern \
 
 reject_pattern \
   "macOS active-window adapter avoids shallow resolve-and-apply wrapper" \
-  'func +applyConfiguration\(' \
+  'func +(applyConfiguration|applyResolvedConfiguration)\(' \
   VoiceInk/PowerMode/ActiveWindowService.swift
 
 require_pattern \
@@ -14412,9 +14412,16 @@ reject_pattern \
   'if +let +activeConfigId = VoiceInkPowerModeConfigurationPreference\.loadActiveConfigurationId|activeConfiguration = configurations\.powerModeConfiguration' \
   VoiceInk/PowerMode/PowerModeConfig.swift
 
-require_pattern \
-  "macOS active-window activation uses shared manager activation adapter" \
-  'activateConfiguration\(config\)' \
+require_patterns \
+  "macOS recording engine applies resolved Power Mode configs through manager activation adapter" \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift \
+  'activateConfiguration\(resolvedPowerModeConfig\)' \
+  'activateConfiguration\(config\)'
+
+reject_pattern \
+  "macOS recording engine avoids shallow active-window apply wrapper" \
+  'applyResolvedConfiguration' \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift \
   VoiceInk/PowerMode/ActiveWindowService.swift
 
 require_pattern \

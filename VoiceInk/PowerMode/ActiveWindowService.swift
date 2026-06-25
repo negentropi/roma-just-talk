@@ -47,8 +47,4 @@ class ActiveWindowService: ObservableObject {
             }
         )
     }
-
-    func applyResolvedConfiguration(_ config: PowerModeConfig?) async {
-        await PowerModeManager.shared.activateConfiguration(config)
-    }
 }

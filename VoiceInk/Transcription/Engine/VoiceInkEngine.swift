@@ -185,7 +185,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
                             self.logger.notice("toggleRecord: recording started successfully, state=recording")
 
                             let resolvedPowerModeConfig = await powerModeConfigTask.value
-                            await ActiveWindowService.shared.applyResolvedConfiguration(resolvedPowerModeConfig)
+                            await PowerModeManager.shared.activateConfiguration(resolvedPowerModeConfig)
                             self.logger.notice("toggleRecord: Power Mode config applied before streaming setup")
 
                             var claimedPreload: RollingBufferPreloadClaim?
@@ -678,12 +678,12 @@ class VoiceInkEngine: NSObject, ObservableObject {
     ) async {
         if let preparedContext {
             let config = await preparedContext.powerModeTask.value
-            await ActiveWindowService.shared.applyResolvedConfiguration(config)
+            await PowerModeManager.shared.activateConfiguration(config)
             return
         }
 
         let config = await ActiveWindowService.shared.resolveConfiguration(powerModeId: powerModeId)
-        await ActiveWindowService.shared.applyResolvedConfiguration(config)
+        await PowerModeManager.shared.activateConfiguration(config)
     }
 
     private func startPowerModeConfigurationApply(

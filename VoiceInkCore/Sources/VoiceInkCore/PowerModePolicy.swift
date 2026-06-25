@@ -558,26 +558,52 @@ public struct VoiceInkPowerModeTranscriptionModelResourceFacts: Equatable, Senda
     }
 }
 
-public enum VoiceInkPowerModeTranscriptionModelResourceAction: Equatable, Sendable {
+private enum VoiceInkPowerModeTranscriptionModelResourceAction: Equatable, Sendable {
     case none
     case cleanupOnly
     case cleanupAndLoadLocalModel(String)
 }
 
 public struct VoiceInkPowerModeTranscriptionModelResourcePlan: Equatable, Sendable {
-    public var selectedModelName: String?
-    public var action: VoiceInkPowerModeTranscriptionModelResourceAction
+    public let selectedModelName: String?
+    private let action: VoiceInkPowerModeTranscriptionModelResourceAction
 
     public var shouldChangeModel: Bool {
         selectedModelName != nil
     }
 
-    public init(
+    private init(
         selectedModelName: String?,
         action: VoiceInkPowerModeTranscriptionModelResourceAction
     ) {
         self.selectedModelName = selectedModelName
         self.action = action
+    }
+
+    public func applyRuntimeState(
+        setDefaultTranscriptionModelNamed: (String) async -> Bool,
+        cleanupModelResources: () async -> Void,
+        loadDownloadedLocalModelNamed: (String) async throws -> Void,
+        handleLocalModelLoadFailure: (String, Error) async -> Void
+    ) async {
+        guard let selectedModelName,
+              await setDefaultTranscriptionModelNamed(selectedModelName) else {
+            return
+        }
+
+        switch action {
+        case .none:
+            break
+        case .cleanupOnly:
+            await cleanupModelResources()
+        case .cleanupAndLoadLocalModel(let modelName):
+            await cleanupModelResources()
+            do {
+                try await loadDownloadedLocalModelNamed(modelName)
+            } catch {
+                await handleLocalModelLoadFailure(modelName, error)
+            }
+        }
     }
 
     public static func plan(

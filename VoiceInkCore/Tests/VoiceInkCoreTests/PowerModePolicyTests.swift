@@ -1130,46 +1130,41 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertTrue(plan.shouldPostLanguageDidChange)
     }
 
-    func testPowerModeTranscriptionModelResourcePlanSkipsMissingUnchangedSelection() {
+    func testPowerModeTranscriptionModelResourcePlanSkipsMissingUnchangedSelection() async {
         let availableModels = [
             transcriptionModelResourceFacts(name: "base", loadsLocalWhisperModel: true)
         ]
-        let expectedNoChange = VoiceInkPowerModeTranscriptionModelResourcePlan(
+        let missingSelection = VoiceInkPowerModeTranscriptionModelResourcePlan.plan(
             selectedModelName: nil,
-            action: .none
+            currentModelName: "current",
+            availableModels: availableModels,
+            availableLocalModelNames: []
+        )
+        let missingModel = VoiceInkPowerModeTranscriptionModelResourcePlan.plan(
+            selectedModelName: "missing",
+            currentModelName: "current",
+            availableModels: availableModels,
+            availableLocalModelNames: ["missing"]
+        )
+        let unchangedModel = VoiceInkPowerModeTranscriptionModelResourcePlan.plan(
+            selectedModelName: "base",
+            currentModelName: "base",
+            availableModels: availableModels,
+            availableLocalModelNames: ["base"]
         )
 
-        XCTAssertEqual(
-            VoiceInkPowerModeTranscriptionModelResourcePlan.plan(
-                selectedModelName: nil,
-                currentModelName: "current",
-                availableModels: availableModels,
-                availableLocalModelNames: []
-            ),
-            expectedNoChange
-        )
-        XCTAssertEqual(
-            VoiceInkPowerModeTranscriptionModelResourcePlan.plan(
-                selectedModelName: "missing",
-                currentModelName: "current",
-                availableModels: availableModels,
-                availableLocalModelNames: ["missing"]
-            ),
-            expectedNoChange
-        )
-        XCTAssertEqual(
-            VoiceInkPowerModeTranscriptionModelResourcePlan.plan(
-                selectedModelName: "base",
-                currentModelName: "base",
-                availableModels: availableModels,
-                availableLocalModelNames: ["base"]
-            ),
-            expectedNoChange
-        )
-        XCTAssertFalse(expectedNoChange.shouldChangeModel)
+        XCTAssertFalse(missingSelection.shouldChangeModel)
+        XCTAssertFalse(missingModel.shouldChangeModel)
+        XCTAssertFalse(unchangedModel.shouldChangeModel)
+        let missingSelectionEvents = await runtimeEvents(for: missingSelection)
+        let missingModelEvents = await runtimeEvents(for: missingModel)
+        let unchangedModelEvents = await runtimeEvents(for: unchangedModel)
+        XCTAssertEqual(missingSelectionEvents, [])
+        XCTAssertEqual(missingModelEvents, [])
+        XCTAssertEqual(unchangedModelEvents, [])
     }
 
-    func testPowerModeTranscriptionModelResourcePlanCleansNonWhisperModels() {
+    func testPowerModeTranscriptionModelResourcePlanCleansNonWhisperModels() async {
         let plan = VoiceInkPowerModeTranscriptionModelResourcePlan.plan(
             selectedModelName: "nova-3",
             currentModelName: "base",
@@ -1181,10 +1176,11 @@ final class PowerModePolicyTests: XCTestCase {
 
         XCTAssertTrue(plan.shouldChangeModel)
         XCTAssertEqual(plan.selectedModelName, "nova-3")
-        XCTAssertEqual(plan.action, .cleanupOnly)
+        let events = await runtimeEvents(for: plan)
+        XCTAssertEqual(events, ["select:nova-3", "cleanup"])
     }
 
-    func testPowerModeTranscriptionModelResourcePlanLoadsDownloadedLocalWhisperModel() {
+    func testPowerModeTranscriptionModelResourcePlanLoadsDownloadedLocalWhisperModel() async {
         let plan = VoiceInkPowerModeTranscriptionModelResourcePlan.plan(
             selectedModelName: "base",
             currentModelName: "nova-3",
@@ -1196,10 +1192,11 @@ final class PowerModePolicyTests: XCTestCase {
 
         XCTAssertTrue(plan.shouldChangeModel)
         XCTAssertEqual(plan.selectedModelName, "base")
-        XCTAssertEqual(plan.action, .cleanupAndLoadLocalModel("base"))
+        let events = await runtimeEvents(for: plan)
+        XCTAssertEqual(events, ["select:base", "cleanup", "load:base"])
     }
 
-    func testPowerModeTranscriptionModelResourcePlanCleansMissingLocalWhisperFile() {
+    func testPowerModeTranscriptionModelResourcePlanCleansMissingLocalWhisperFile() async {
         let plan = VoiceInkPowerModeTranscriptionModelResourcePlan.plan(
             selectedModelName: "base",
             currentModelName: "nova-3",
@@ -1211,7 +1208,22 @@ final class PowerModePolicyTests: XCTestCase {
 
         XCTAssertTrue(plan.shouldChangeModel)
         XCTAssertEqual(plan.selectedModelName, "base")
-        XCTAssertEqual(plan.action, .cleanupOnly)
+        let events = await runtimeEvents(for: plan)
+        XCTAssertEqual(events, ["select:base", "cleanup"])
+    }
+
+    func testPowerModeTranscriptionModelResourcePlanReportsLocalModelLoadFailure() async {
+        let plan = VoiceInkPowerModeTranscriptionModelResourcePlan.plan(
+            selectedModelName: "base",
+            currentModelName: "nova-3",
+            availableModels: [
+                transcriptionModelResourceFacts(name: "base", loadsLocalWhisperModel: true)
+            ],
+            availableLocalModelNames: ["base"]
+        )
+
+        let events = await runtimeEvents(for: plan, loadError: PowerModeResourcePlanFixtureError.loadFailed)
+        XCTAssertEqual(events, ["select:base", "cleanup", "load:base", "loadFailed:base"])
     }
 
     func testPowerModeApplicationStatePreservesStoredShapeAndCleanupKeys() throws {
@@ -1461,7 +1473,7 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertEqual(application.cleanupRestore.punctuationMode, .removeAll)
     }
 
-    func testPowerModeSessionApplicationPlanBuildsConfigurationApplicationSequence() {
+    func testPowerModeSessionApplicationPlanBuildsConfigurationApplicationSequence() async {
         let promptID = UUID()
         let config = PowerModeConfig(
             name: "Coding",
@@ -1489,12 +1501,13 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertEqual(plan.preferenceApplication.selectedAIProvider, .groq)
         XCTAssertEqual(plan.preferenceApplication.selectedAIModel, "llama-3.3")
         XCTAssertEqual(plan.modelResourcePlan.selectedModelName, "base")
-        XCTAssertEqual(plan.modelResourcePlan.action, .cleanupAndLoadLocalModel("base"))
+        let modelResourceEvents = await runtimeEvents(for: plan.modelResourcePlan)
+        XCTAssertEqual(modelResourceEvents, ["select:base", "cleanup", "load:base"])
         XCTAssertEqual(plan.languageApplicationPlan.languageToSave, "fr")
         XCTAssertTrue(plan.shouldPostConfigurationApplied)
     }
 
-    func testPowerModeSessionApplicationPlanBuildsRestoreSequenceWithoutConfigurationNotification() {
+    func testPowerModeSessionApplicationPlanBuildsRestoreSequenceWithoutConfigurationNotification() async {
         let promptID = UUID()
         let state = VoiceInkPowerModeApplicationState(
             isEnhancementEnabled: false,
@@ -1522,7 +1535,8 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertEqual(plan.preferenceApplication.selectedAIModel, "llama-3.3")
         XCTAssertEqual(plan.preferenceApplication.cleanupRestore.punctuationMode, .removeAll)
         XCTAssertEqual(plan.modelResourcePlan.selectedModelName, "english-only")
-        XCTAssertEqual(plan.modelResourcePlan.action, .cleanupOnly)
+        let modelResourceEvents = await runtimeEvents(for: plan.modelResourcePlan)
+        XCTAssertEqual(modelResourceEvents, ["select:english-only", "cleanup"])
         XCTAssertEqual(plan.languageApplicationPlan.languageToSave, "en")
         XCTAssertFalse(plan.shouldPostConfigurationApplied)
     }
@@ -1544,7 +1558,7 @@ final class PowerModePolicyTests: XCTestCase {
         )
 
         XCTAssertEqual(plan.modelResourcePlan.selectedModelName, nil)
-        XCTAssertEqual(plan.modelResourcePlan.action, .none)
+        XCTAssertFalse(plan.modelResourcePlan.shouldChangeModel)
         XCTAssertNil(plan.languageApplicationPlan.languageToSave)
         XCTAssertFalse(plan.shouldPostConfigurationApplied)
     }
@@ -2503,6 +2517,35 @@ final class PowerModePolicyTests: XCTestCase {
         )
     }
 
+    private func runtimeEvents(
+        for plan: VoiceInkPowerModeTranscriptionModelResourcePlan,
+        selectionSucceeds: Bool = true,
+        loadError: Error? = nil
+    ) async -> [String] {
+        let events = PowerModeResourcePlanEvents()
+
+        await plan.applyRuntimeState(
+            setDefaultTranscriptionModelNamed: { modelName in
+                await events.append("select:\(modelName)")
+                return selectionSucceeds
+            },
+            cleanupModelResources: {
+                await events.append("cleanup")
+            },
+            loadDownloadedLocalModelNamed: { modelName in
+                await events.append("load:\(modelName)")
+                if let loadError {
+                    throw loadError
+                }
+            },
+            handleLocalModelLoadFailure: { modelName, _ in
+                await events.append("loadFailed:\(modelName)")
+            }
+        )
+
+        return await events.values
+    }
+
     private func jsonObject<T: Encodable>(from value: T) throws -> [String: Any] {
         let data = try JSONEncoder().encode(value)
         return try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
@@ -2520,5 +2563,21 @@ final class PowerModePolicyTests: XCTestCase {
         }
 
         run(defaults)
+    }
+}
+
+private enum PowerModeResourcePlanFixtureError: Error {
+    case loadFailed
+}
+
+private actor PowerModeResourcePlanEvents {
+    private var recordedEvents: [String] = []
+
+    var values: [String] {
+        recordedEvents
+    }
+
+    func append(_ event: String) {
+        recordedEvents.append(event)
     }
 }

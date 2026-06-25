@@ -208,36 +208,35 @@ class PowerModeSessionManager {
         _ plan: VoiceInkPowerModeTranscriptionModelResourcePlan,
         stateProvider: any PowerModeStateProvider
     ) async {
-        guard let selectedModelName = plan.selectedModelName,
-              let selectedModel = stateProvider.allAvailableModels.first(where: { $0.name == selectedModelName }) else {
-            return
-        }
-
-        stateProvider.setDefaultTranscriptionModel(selectedModel)
-
-        switch plan.action {
-        case .none:
-            break
-        case .cleanupOnly:
-            await stateProvider.cleanupModelResources()
-        case .cleanupAndLoadLocalModel(let modelName):
-            await stateProvider.cleanupModelResources()
-            if let localModel = VoiceInkWhisperModelFiles.downloadedLocalModelFile(
-                forModelName: modelName,
-                in: stateProvider.availableModels
-            ) {
-                do {
-                    try await stateProvider.loadModel(localModel)
-                } catch {
-                    print(
-                        VoiceInkPowerModeSessionDiagnostics.localModelLoadFailedMessage(
-                            modelName: localModel.name,
-                            errorDescription: String(describing: error)
-                        )
-                    )
+        await plan.applyRuntimeState(
+            setDefaultTranscriptionModelNamed: { modelName in
+                guard let selectedModel = stateProvider.allAvailableModels.first(where: { $0.name == modelName }) else {
+                    return false
                 }
+
+                stateProvider.setDefaultTranscriptionModel(selectedModel)
+                return true
+            },
+            cleanupModelResources: {
+                await stateProvider.cleanupModelResources()
+            },
+            loadDownloadedLocalModelNamed: { modelName in
+                if let localModel = VoiceInkWhisperModelFiles.downloadedLocalModelFile(
+                    forModelName: modelName,
+                    in: stateProvider.availableModels
+                ) {
+                    try await stateProvider.loadModel(localModel)
+                }
+            },
+            handleLocalModelLoadFailure: { modelName, error in
+                print(
+                    VoiceInkPowerModeSessionDiagnostics.localModelLoadFailedMessage(
+                        modelName: modelName,
+                        errorDescription: String(describing: error)
+                    )
+                )
             }
-        }
+        )
     }
 
     private func recoverSession() {

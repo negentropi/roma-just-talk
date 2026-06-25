@@ -6826,7 +6826,17 @@ require_pattern \
 
 require_pattern \
   "shared Power Mode transcription model resource plan lives in VoiceInkCore" \
-  'VoiceInkPowerModeTranscriptionModelResourcePlan|VoiceInkPowerModeTranscriptionModelResourceAction|VoiceInkPowerModeTranscriptionModelResourceFacts' \
+  'VoiceInkPowerModeTranscriptionModelResourcePlan|VoiceInkPowerModeTranscriptionModelResourceFacts|applyRuntimeState' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode model resource runtime application lives in VoiceInkCore" \
+  'setDefaultTranscriptionModelNamed|cleanupModelResources|loadDownloadedLocalModelNamed|handleLocalModelLoadFailure' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+reject_pattern \
+  "shared Power Mode model resource action payload stays hidden" \
+  'public enum VoiceInkPowerModeTranscriptionModelResourceAction|public (var|let) action: VoiceInkPowerModeTranscriptionModelResourceAction|public init\([^)]*action: VoiceInkPowerModeTranscriptionModelResourceAction' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
@@ -6850,6 +6860,11 @@ require_pattern \
   VoiceInk/PowerMode/PowerModeSessionManager.swift
 
 require_pattern \
+  "macOS Power Mode session applies shared model resource runtime plan" \
+  'applyRuntimeState\(' \
+  VoiceInk/PowerMode/PowerModeSessionManager.swift
+
+require_pattern \
   "macOS Power Mode session uses shared language application plan" \
   'languageApplicationPlan\(|applyLanguageApplicationPlan' \
   VoiceInk/PowerMode/PowerModeSessionManager.swift
@@ -6869,6 +6884,16 @@ reject_pattern \
   "macOS Power Mode session avoids shell-only model resource branching" \
   'handleModelChange|switch +newModel\.provider|case +\.whisper|case +\.fluidAudio|stateProvider\.currentTranscriptionModel\?\.name != modelName' \
   VoiceInk/PowerMode/PowerModeSessionManager.swift
+
+reject_pattern \
+  "macOS Power Mode session avoids raw model resource action branching" \
+  'switch plan\.action|case \.cleanupOnly|case \.cleanupAndLoadLocalModel' \
+  VoiceInk/PowerMode/PowerModeSessionManager.swift
+
+reject_pattern \
+  "Power Mode tests exercise model resource runtime behavior instead of raw actions" \
+  'plan(\.modelResourcePlan)?\.action|cleanupAndLoadLocalModel|cleanupOnly' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/PowerModePolicyTests.swift
 
 reject_pattern \
   "macOS Power Mode session avoids shell-only compatible-language branching" \

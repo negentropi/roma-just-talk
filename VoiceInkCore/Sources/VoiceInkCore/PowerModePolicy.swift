@@ -581,12 +581,8 @@ private enum VoiceInkPowerModeTranscriptionModelResourceAction: Equatable, Senda
 }
 
 public struct VoiceInkPowerModeTranscriptionModelResourcePlan: Equatable, Sendable {
-    public let selectedModelName: String?
+    private let selectedModelName: String?
     private let action: VoiceInkPowerModeTranscriptionModelResourceAction
-
-    public var shouldChangeModel: Bool {
-        selectedModelName != nil
-    }
 
     private init(
         selectedModelName: String?,

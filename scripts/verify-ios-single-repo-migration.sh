@@ -7048,8 +7048,8 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 reject_pattern \
-  "shared Power Mode model resource action payload stays hidden" \
-  'public enum VoiceInkPowerModeTranscriptionModelResourceAction|public (var|let) action: VoiceInkPowerModeTranscriptionModelResourceAction|public init\([^)]*action: VoiceInkPowerModeTranscriptionModelResourceAction' \
+  "shared Power Mode model resource raw payload stays hidden" \
+  'public enum VoiceInkPowerModeTranscriptionModelResourceAction|public let selectedModelName: String\?|public var shouldChangeModel|public (var|let) action: VoiceInkPowerModeTranscriptionModelResourceAction|public init\([^)]*action: VoiceInkPowerModeTranscriptionModelResourceAction' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_patterns \

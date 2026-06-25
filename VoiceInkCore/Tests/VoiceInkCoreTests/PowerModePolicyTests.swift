@@ -1157,9 +1157,6 @@ final class PowerModePolicyTests: XCTestCase {
             availableLocalModelNames: ["base"]
         )
 
-        XCTAssertFalse(missingSelection.shouldChangeModel)
-        XCTAssertFalse(missingModel.shouldChangeModel)
-        XCTAssertFalse(unchangedModel.shouldChangeModel)
         let missingSelectionEvents = await runtimeEvents(for: missingSelection)
         let missingModelEvents = await runtimeEvents(for: missingModel)
         let unchangedModelEvents = await runtimeEvents(for: unchangedModel)
@@ -1178,8 +1175,6 @@ final class PowerModePolicyTests: XCTestCase {
             availableLocalModelNames: []
         )
 
-        XCTAssertTrue(plan.shouldChangeModel)
-        XCTAssertEqual(plan.selectedModelName, "nova-3")
         let events = await runtimeEvents(for: plan)
         XCTAssertEqual(events, ["select:nova-3", "cleanup"])
     }
@@ -1194,8 +1189,6 @@ final class PowerModePolicyTests: XCTestCase {
             availableLocalModelNames: ["base"]
         )
 
-        XCTAssertTrue(plan.shouldChangeModel)
-        XCTAssertEqual(plan.selectedModelName, "base")
         let events = await runtimeEvents(for: plan)
         XCTAssertEqual(events, ["select:base", "cleanup", "load:base"])
     }
@@ -1210,8 +1203,6 @@ final class PowerModePolicyTests: XCTestCase {
             availableLocalModelNames: []
         )
 
-        XCTAssertTrue(plan.shouldChangeModel)
-        XCTAssertEqual(plan.selectedModelName, "base")
         let events = await runtimeEvents(for: plan)
         XCTAssertEqual(events, ["select:base", "cleanup"])
     }
@@ -1523,7 +1514,6 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertEqual(promptApplication.selectedPromptId, promptID)
         XCTAssertEqual(application.selectedAIProvider, .groq)
         XCTAssertEqual(application.selectedAIModel, "llama-3.3")
-        XCTAssertEqual(modelResourcePlan.selectedModelName, "base")
         let modelResourceEvents = await runtimeEvents(for: modelResourcePlan)
         XCTAssertEqual(modelResourceEvents, ["select:base", "cleanup", "load:base"])
         XCTAssertEqual(languageRuntimeEvents(for: languageApplicationPlan), ["save:fr", "post"])
@@ -1567,7 +1557,6 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertEqual(application.selectedAIProvider, .groq)
         XCTAssertEqual(application.selectedAIModel, "llama-3.3")
         XCTAssertEqual(application.cleanupRestore.punctuationMode, .removeAll)
-        XCTAssertEqual(modelResourcePlan.selectedModelName, "english-only")
         let modelResourceEvents = await runtimeEvents(for: modelResourcePlan)
         XCTAssertEqual(modelResourceEvents, ["select:english-only", "cleanup"])
         XCTAssertEqual(languageRuntimeEvents(for: languageApplicationPlan), ["save:en", "post"])
@@ -1597,9 +1586,9 @@ final class PowerModePolicyTests: XCTestCase {
             return
         }
 
-        XCTAssertEqual(modelResourcePlan.selectedModelName, nil)
-        XCTAssertFalse(modelResourcePlan.shouldChangeModel)
         XCTAssertEqual(languageRuntimeEvents(for: languageApplicationPlan), [])
+        let modelResourceEvents = await runtimeEvents(for: modelResourcePlan)
+        XCTAssertEqual(modelResourceEvents, [])
         XCTAssertFalse(runtime.didPostConfigurationApplied)
     }
 

@@ -198,55 +198,69 @@ final class RecordingStatePolicyTests: XCTestCase {
         XCTAssertNil(VoiceInkRecordingState.busy.recorderProcessingPresentation)
     }
 
-    func testMacOSRecordingCancellationPlanFinishesActiveCaptureImmediately() {
+    func testMacOSRecordingCancellationPlanFinishesActiveCaptureImmediately() async {
         for state in [VoiceInkRecordingState.starting, .recording] {
+            let events = await macOSRecordingCancellationEvents(for: state)
+
             XCTAssertEqual(
-                VoiceInkMacOSRecordingCancellationPolicy.plan(recordingState: state),
-                VoiceInkMacOSRecordingCancellationPlan(
-                    shouldClearDeferredStopRequest: true,
-                    shouldRequestRecordingCancellation: true,
-                    shouldFinishActiveRecorderCancellation: true,
-                    shouldClearPartialTranscript: false,
-                    shouldClearCancelFlag: false,
-                    recordingStateAfterImmediateCancel: nil,
-                    shouldFinishRecorderSessionImmediately: true
-                )
+                events,
+                [
+                    "clearDeferredStopRequest",
+                    "requestRecordingCancellation",
+                    "finishActiveRecorderCancellation",
+                    "finishRecorderSessionImmediately"
+                ]
             )
         }
     }
 
-    func testMacOSRecordingCancellationPlanCancelsProcessingWithoutFinishingSession() {
+    func testMacOSRecordingCancellationPlanCancelsProcessingWithoutFinishingSession() async {
         for state in [VoiceInkRecordingState.transcribing, .enhancing] {
+            let events = await macOSRecordingCancellationEvents(for: state)
+
             XCTAssertEqual(
-                VoiceInkMacOSRecordingCancellationPolicy.plan(recordingState: state),
-                VoiceInkMacOSRecordingCancellationPlan(
-                    shouldClearDeferredStopRequest: true,
-                    shouldRequestRecordingCancellation: true,
-                    shouldFinishActiveRecorderCancellation: false,
-                    shouldClearPartialTranscript: true,
-                    shouldClearCancelFlag: false,
-                    recordingStateAfterImmediateCancel: .idle,
-                    shouldFinishRecorderSessionImmediately: false
-                )
+                events,
+                [
+                    "clearDeferredStopRequest",
+                    "requestRecordingCancellation",
+                    "clearPartialTranscript",
+                    "recordingState:idle"
+                ]
             )
         }
     }
 
-    func testMacOSRecordingCancellationPlanRepairsIdleAndBusyState() {
+    func testMacOSRecordingCancellationPlanRepairsIdleAndBusyState() async {
         for state in [VoiceInkRecordingState.idle, .busy] {
+            let events = await macOSRecordingCancellationEvents(for: state)
+
             XCTAssertEqual(
-                VoiceInkMacOSRecordingCancellationPolicy.plan(recordingState: state),
-                VoiceInkMacOSRecordingCancellationPlan(
-                    shouldClearDeferredStopRequest: true,
-                    shouldRequestRecordingCancellation: false,
-                    shouldFinishActiveRecorderCancellation: false,
-                    shouldClearPartialTranscript: true,
-                    shouldClearCancelFlag: true,
-                    recordingStateAfterImmediateCancel: .idle,
-                    shouldFinishRecorderSessionImmediately: true
-                )
+                events,
+                [
+                    "clearDeferredStopRequest",
+                    "clearPartialTranscript",
+                    "clearCancelFlag",
+                    "recordingState:idle",
+                    "finishRecorderSessionImmediately"
+                ]
             )
         }
+    }
+
+    private func macOSRecordingCancellationEvents(for state: VoiceInkRecordingState) async -> [String] {
+        var events: [String] = []
+
+        await VoiceInkMacOSRecordingCancellationPolicy.plan(recordingState: state).applyRuntimeState(
+            clearDeferredStopRequest: { events.append("clearDeferredStopRequest") },
+            requestRecordingCancellation: { events.append("requestRecordingCancellation") },
+            finishActiveRecorderCancellation: { events.append("finishActiveRecorderCancellation") },
+            clearPartialTranscript: { events.append("clearPartialTranscript") },
+            clearCancelFlag: { events.append("clearCancelFlag") },
+            setRecordingState: { events.append("recordingState:\($0)") },
+            finishRecorderSessionImmediately: { events.append("finishRecorderSessionImmediately") }
+        )
+
+        return events
     }
 
     func testRecordingFlowStatePreservesIOSStartAndStopTransitions() {

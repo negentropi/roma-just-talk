@@ -1284,15 +1284,15 @@ public enum VoiceInkRecordingStartPolicy {
 }
 
 public struct VoiceInkMacOSRecordingCancellationPlan: Equatable, Sendable {
-    public let shouldClearDeferredStopRequest: Bool
-    public let shouldRequestRecordingCancellation: Bool
-    public let shouldFinishActiveRecorderCancellation: Bool
-    public let shouldClearPartialTranscript: Bool
-    public let shouldClearCancelFlag: Bool
-    public let recordingStateAfterImmediateCancel: VoiceInkRecordingState?
-    public let shouldFinishRecorderSessionImmediately: Bool
+    private let shouldClearDeferredStopRequest: Bool
+    private let shouldRequestRecordingCancellation: Bool
+    private let shouldFinishActiveRecorderCancellation: Bool
+    private let shouldClearPartialTranscript: Bool
+    private let shouldClearCancelFlag: Bool
+    private let recordingStateAfterImmediateCancel: VoiceInkRecordingState?
+    private let shouldFinishRecorderSessionImmediately: Bool
 
-    public init(
+    fileprivate init(
         shouldClearDeferredStopRequest: Bool,
         shouldRequestRecordingCancellation: Bool,
         shouldFinishActiveRecorderCancellation: Bool,
@@ -1308,6 +1308,44 @@ public struct VoiceInkMacOSRecordingCancellationPlan: Equatable, Sendable {
         self.shouldClearCancelFlag = shouldClearCancelFlag
         self.recordingStateAfterImmediateCancel = recordingStateAfterImmediateCancel
         self.shouldFinishRecorderSessionImmediately = shouldFinishRecorderSessionImmediately
+    }
+
+    public func applyRuntimeState(
+        clearDeferredStopRequest: () -> Void,
+        requestRecordingCancellation: () -> Void,
+        finishActiveRecorderCancellation: () async -> Void,
+        clearPartialTranscript: () -> Void,
+        clearCancelFlag: () -> Void,
+        setRecordingState: (VoiceInkRecordingState) -> Void,
+        finishRecorderSessionImmediately: () async -> Void
+    ) async {
+        if shouldClearDeferredStopRequest {
+            clearDeferredStopRequest()
+        }
+
+        if shouldRequestRecordingCancellation {
+            requestRecordingCancellation()
+        }
+
+        if shouldFinishActiveRecorderCancellation {
+            await finishActiveRecorderCancellation()
+        }
+
+        if shouldClearPartialTranscript {
+            clearPartialTranscript()
+        }
+
+        if shouldClearCancelFlag {
+            clearCancelFlag()
+        }
+
+        if let recordingStateAfterImmediateCancel {
+            setRecordingState(recordingStateAfterImmediateCancel)
+        }
+
+        if shouldFinishRecorderSessionImmediately {
+            await finishRecorderSessionImmediately()
+        }
     }
 }
 

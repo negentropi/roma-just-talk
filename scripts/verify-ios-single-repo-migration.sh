@@ -960,7 +960,12 @@ require_pattern \
 
 require_pattern \
   "shared macOS recording cancellation plan lives in VoiceInkCore" \
-  'VoiceInkMacOSRecordingCancellationPolicy|VoiceInkMacOSRecordingCancellationPlan|shouldFinishActiveRecorderCancellation|shouldFinishRecorderSessionImmediately' \
+  'VoiceInkMacOSRecordingCancellationPolicy|VoiceInkMacOSRecordingCancellationPlan|applyRuntimeState|finishActiveRecorderCancellation|finishRecorderSessionImmediately' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
+reject_pattern \
+  "shared macOS cancellation plan avoids public raw execution flags" \
+  'public let should(ClearDeferredStopRequest|RequestRecordingCancellation|FinishActiveRecorderCancellation|ClearPartialTranscript|ClearCancelFlag|FinishRecorderSessionImmediately)|public let recordingStateAfterImmediateCancel|public init\([[:space:]]*shouldClearDeferredStopRequest' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
 require_pattern \
@@ -1120,13 +1125,18 @@ require_pattern \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift
 
 require_pattern \
-  "macOS recording engine applies shared active-capture cancellation decision" \
-  'cancellationPlan\.shouldFinishActiveRecorderCancellation' \
+  "macOS recording engine applies shared cancellation runtime plan" \
+  'cancellationPlan\.applyRuntimeState' \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift
 
 require_pattern \
-  "macOS recording engine applies shared immediate-session-finish decision" \
-  'cancellationPlan\.shouldFinishRecorderSessionImmediately' \
+  "macOS recording engine preserves active-capture cancellation executor" \
+  'finishActiveRecorderCancellation:' \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift
+
+require_pattern \
+  "macOS recording engine preserves immediate-session-finish executor" \
+  'finishRecorderSessionImmediately:' \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift
 
 reject_context_pattern \

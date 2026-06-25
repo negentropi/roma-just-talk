@@ -847,33 +847,29 @@ class VoiceInkEngine: NSObject, ObservableObject {
             recordingState: recordingState
         )
 
-        if cancellationPlan.shouldClearDeferredStopRequest {
-            stopRequestedDuringStart = false
-        }
-
-        if cancellationPlan.shouldRequestRecordingCancellation {
-            requestRecordingCancellation()
-        }
-
-        if cancellationPlan.shouldFinishActiveRecorderCancellation {
-            await finishActiveRecorderCancellation()
-        }
-
-        if cancellationPlan.shouldClearPartialTranscript {
-            partialTranscript = ""
-        }
-
-        if cancellationPlan.shouldClearCancelFlag {
-            shouldCancelRecording = false
-        }
-
-        if let recordingStateAfterImmediateCancel = cancellationPlan.recordingStateAfterImmediateCancel {
-            recordingState = recordingStateAfterImmediateCancel
-        }
-
-        if cancellationPlan.shouldFinishRecorderSessionImmediately {
-            await finishRecorderSession()
-        }
+        await cancellationPlan.applyRuntimeState(
+            clearDeferredStopRequest: {
+                stopRequestedDuringStart = false
+            },
+            requestRecordingCancellation: {
+                requestRecordingCancellation()
+            },
+            finishActiveRecorderCancellation: {
+                await finishActiveRecorderCancellation()
+            },
+            clearPartialTranscript: {
+                partialTranscript = ""
+            },
+            clearCancelFlag: {
+                shouldCancelRecording = false
+            },
+            setRecordingState: {
+                recordingState = $0
+            },
+            finishRecorderSessionImmediately: {
+                await finishRecorderSession()
+            }
+        )
     }
 
     func resetRecordingSession() async {

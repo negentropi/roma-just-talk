@@ -4881,7 +4881,10 @@ require_patterns \
   "shared local model row presentation exposes one action enum" \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift \
   'VoiceInkWhisperModelDownloadRowAction' \
-  'runtimeAction'
+  'runtimeAction' \
+  'VoiceInkWhisperModelDownloadRowActionTint' \
+  'actionTint' \
+  'shouldShowCircularProgressAccessory'
 
 require_pattern \
   "core check runner executes local model row runtime action test" \
@@ -4925,14 +4928,27 @@ reject_pattern \
   'public var +(isDownloaded|canStartDownload|canCancelDownload|canDeleteDownloadedModel)\b' \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
 
-require_pattern \
-  "iOS onboarding switches on shared row action for button presentation" \
-  'switch presentation\.action' \
-  iOS/VoiceInk-ios/OnboardingView.swift
+require_patterns \
+  "iOS model download views render shared row action tint and accessory presentation" \
+  iOS/VoiceInk-ios/LocalModelManagementView.swift \
+  'presentation\.actionTint\.iOSColor' \
+  'actionIcon\(for: presentation\)'
+
+require_patterns \
+  "iOS onboarding renders shared row action tint and accessory presentation" \
+  iOS/VoiceInk-ios/OnboardingView.swift \
+  'presentation\.shouldShowCircularProgressAccessory' \
+  'presentation\.actionTint\.onboardingColor'
 
 reject_pattern \
   "iOS model download views avoid shallow row action booleans" \
   'presentation\.(isDownloaded|canStartDownload|canCancelDownload|canDeleteDownloadedModel)\b' \
+  iOS/VoiceInk-ios/LocalModelManagementView.swift \
+  iOS/VoiceInk-ios/OnboardingView.swift
+
+reject_pattern \
+  "iOS model download views avoid shell-owned row action presentation switches" \
+  'switch presentation\.action|switch action|case \.(download|downloading|downloaded)|actionColor\(for:' \
   iOS/VoiceInk-ios/LocalModelManagementView.swift \
   iOS/VoiceInk-ios/OnboardingView.swift
 

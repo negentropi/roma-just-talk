@@ -736,6 +736,8 @@ final class WhisperModelFilesTests: XCTestCase {
         let downloadingPresentation = downloadingState.rowPresentation(for: model)
         XCTAssertEqual(downloadingPresentation.action, .downloading)
         XCTAssertTrue(downloadingPresentation.shouldShowProgress)
+        XCTAssertTrue(downloadingPresentation.shouldShowCircularProgressAccessory)
+        XCTAssertEqual(downloadingPresentation.actionTint, .destructive)
 
         let downloadedState = VoiceInkWhisperModelDownloadState(isDownloaded: true, progress: .simple(
             modelName: model.modelName,
@@ -745,6 +747,8 @@ final class WhisperModelFilesTests: XCTestCase {
         let downloadedPresentation = downloadedState.rowPresentation(for: model)
         XCTAssertEqual(downloadedPresentation.action, .downloaded)
         XCTAssertEqual(downloadedPresentation.actionSystemImageName, "checkmark.circle.fill")
+        XCTAssertFalse(downloadedPresentation.shouldShowCircularProgressAccessory)
+        XCTAssertEqual(downloadedPresentation.actionTint, .success)
 
         let idleState = VoiceInkWhisperModelDownloadState(isDownloaded: false, progress: .simple(
             modelName: model.modelName,
@@ -756,6 +760,8 @@ final class WhisperModelFilesTests: XCTestCase {
         XCTAssertEqual(idlePresentation.actionSystemImageName, "icloud.and.arrow.down")
         XCTAssertEqual(idlePresentation.downloadButtonSystemImageName, "arrow.down.circle.fill")
         XCTAssertFalse(idlePresentation.shouldShowProgress)
+        XCTAssertFalse(idlePresentation.shouldShowCircularProgressAccessory)
+        XCTAssertEqual(idlePresentation.actionTint, .primary)
         XCTAssertEqual(downloadingPresentation.actionSystemImageName, "xmark.circle.fill")
     }
 

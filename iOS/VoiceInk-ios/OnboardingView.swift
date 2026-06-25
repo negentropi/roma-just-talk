@@ -159,19 +159,12 @@ struct ModelDownloadOnboardingView: View {
                         
                         Spacer()
                         
-                        switch presentation.action {
-                        case .downloading:
+                        if presentation.shouldShowCircularProgressAccessory {
                             ProgressView()
                                 .progressViewStyle(CircularProgressViewStyle())
-
-                        case .downloaded:
+                        } else {
                             Image(systemName: presentation.actionSystemImageName)
-                                .foregroundColor(.green)
-                                .font(.title)
-
-                        case .download:
-                            Image(systemName: presentation.actionSystemImageName)
-                                .foregroundColor(.accentColor)
+                                .foregroundColor(presentation.actionTint.onboardingColor)
                                 .font(.title)
                         }
                     }
@@ -302,6 +295,17 @@ struct ReadyOnboardingView: View {
 }
 
 // MARK: - Supporting Views
+
+private extension VoiceInkWhisperModelDownloadRowActionTint {
+    var onboardingColor: Color {
+        switch self {
+        case .primary, .destructive:
+            return .accentColor
+        case .success:
+            return .green
+        }
+    }
+}
 
 struct OnboardingButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled

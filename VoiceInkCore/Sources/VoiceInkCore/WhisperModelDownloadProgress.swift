@@ -356,6 +356,12 @@ public enum VoiceInkWhisperModelDownloadRowAction: Equatable, Sendable {
     }
 }
 
+public enum VoiceInkWhisperModelDownloadRowActionTint: Equatable, Sendable {
+    case primary
+    case destructive
+    case success
+}
+
 public struct VoiceInkWhisperModelDownloadRowPresentation: Equatable, Sendable {
     public let title: String
     public let subtitle: String
@@ -372,6 +378,21 @@ public struct VoiceInkWhisperModelDownloadRowPresentation: Equatable, Sendable {
         case .downloaded:
             return "checkmark.circle.fill"
         }
+    }
+
+    public var actionTint: VoiceInkWhisperModelDownloadRowActionTint {
+        switch action {
+        case .download:
+            return .primary
+        case .downloading:
+            return .destructive
+        case .downloaded:
+            return .success
+        }
+    }
+
+    public var shouldShowCircularProgressAccessory: Bool {
+        action == .downloading
     }
 
     public var downloadButtonSystemImageName: String {

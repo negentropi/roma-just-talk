@@ -124,18 +124,20 @@ struct ModelRowView: View {
 
     private func actionIcon(for presentation: VoiceInkWhisperModelDownloadRowPresentation) -> some View {
         Image(systemName: presentation.actionSystemImageName)
-            .foregroundColor(actionColor(for: presentation.action))
+            .foregroundColor(presentation.actionTint.iOSColor)
             .font(.title2)
     }
+}
 
-    private func actionColor(for action: VoiceInkWhisperModelDownloadRowAction) -> Color {
-        switch action {
-        case .downloaded:
-            return .green
-        case .downloading:
-            return .red
-        case .download:
+private extension VoiceInkWhisperModelDownloadRowActionTint {
+    var iOSColor: Color {
+        switch self {
+        case .primary:
             return .blue
+        case .destructive:
+            return .red
+        case .success:
+            return .green
         }
     }
 }

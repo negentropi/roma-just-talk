@@ -116,10 +116,7 @@ class SystemInfoService {
 
     private func getAvailableAudioDevices() -> String {
         let devices = AudioDeviceManager.shared.availableDevices
-        if devices.isEmpty {
-            return "None detected"
-        }
-        return devices.map { $0.name }.joined(separator: ", ")
+        return VoiceInkSystemInformationReport.availableAudioDevicesText(devices.map(\.name))
     }
 
     private func getPrimaryShortcut() -> String {

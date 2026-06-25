@@ -131,6 +131,15 @@ public struct VoiceInkMacOSSystemInformationFacts: Equatable, Sendable {
 }
 
 public enum VoiceInkSystemInformationReport {
+    public static let noAudioDevicesDetectedText = "None detected"
+
+    public static func availableAudioDevicesText(_ deviceNames: [String]) -> String {
+        guard !deviceNames.isEmpty else {
+            return noAudioDevicesDetectedText
+        }
+        return deviceNames.joined(separator: ", ")
+    }
+
     public static func macOS(_ facts: VoiceInkMacOSSystemInformationFacts) -> String {
         """
         === VOICEINK SYSTEM INFORMATION ===

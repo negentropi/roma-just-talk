@@ -131,6 +131,20 @@ final class SystemInformationReportTests: XCTestCase {
         XCTAssertTrue(VoiceInkSystemInformationReport.macOS(facts).contains("ROLLING BUFFER PRELOAD:\nline one\nline two\n\nUI SETTINGS:"))
     }
 
+    func testAvailableAudioDevicesTextPreservesMacOSDiagnosticsListPolicy() {
+        XCTAssertEqual(
+            VoiceInkSystemInformationReport.availableAudioDevicesText([
+                "Built-in Microphone",
+                "Studio Display Microphone"
+            ]),
+            "Built-in Microphone, Studio Display Microphone"
+        )
+        XCTAssertEqual(
+            VoiceInkSystemInformationReport.availableAudioDevicesText([]),
+            "None detected"
+        )
+    }
+
     func testSystemInformationCopyPresentationPreservesDashboardButtonPolicy() {
         XCTAssertEqual(
             VoiceInkSystemInformationCopyPresentation.button(isCopied: false),

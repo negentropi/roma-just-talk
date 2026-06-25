@@ -15775,6 +15775,8 @@ require_patterns \
   VoiceInkCore/Sources/VoiceInkCore/SystemInformationReport.swift \
   'VoiceInkMacOSSystemInformationFacts' \
   'VoiceInkSystemInformationReport' \
+  'availableAudioDevicesText' \
+  'noAudioDevicesDetectedText = "None detected"' \
   '=== VOICEINK SYSTEM INFORMATION ===' \
   'APP INFORMATION:' \
   'ROLLING BUFFER PRELOAD:' \
@@ -15797,6 +15799,7 @@ require_patterns \
   "macOS system info service adapts shared report formatter" \
   VoiceInk/Services/SystemInfoService.swift \
   'VoiceInkSystemInformationReport\.macOS\(makeMacOSSystemInformationFacts\(\)\)' \
+  'VoiceInkSystemInformationReport\.availableAudioDevicesText' \
   'VoiceInkMacOSSystemInformationFacts'
 
 require_patterns \
@@ -15809,7 +15812,7 @@ require_patterns \
 
 reject_pattern \
   "macOS system info service avoids shell-owned report template" \
-  '=== VOICEINK SYSTEM INFORMATION ===|APP INFORMATION:|CLIPBOARD & PASTE SETTINGS:|DATA CLEANUP SETTINGS:|PERMISSIONS:' \
+  '=== VOICEINK SYSTEM INFORMATION ===|APP INFORMATION:|CLIPBOARD & PASTE SETTINGS:|DATA CLEANUP SETTINGS:|PERMISSIONS:|None detected|joined\(separator: ", "\)' \
   VoiceInk/Services/SystemInfoService.swift
 
 reject_pattern \
@@ -15824,12 +15827,13 @@ require_patterns \
   'SystemArchitectureTests\.testSystemArchitectureIntelMacPredicateMatchesCompileTarget' \
   'SystemInformationReportTests\.testMacOSSystemInformationReportPreservesSectionOrderAndLabels' \
   'SystemInformationReportTests\.testMacOSSystemInformationReportKeepsRollingBufferBlockVerbatim' \
+  'SystemInformationReportTests\.testAvailableAudioDevicesTextPreservesMacOSDiagnosticsListPolicy' \
   'SystemInformationReportTests\.testSystemInformationCopyPresentationPreservesDashboardButtonPolicy'
 
 require_patterns \
   "migration docs describe shared macOS system information presentation" \
   docs/ios-single-repo-migration.md \
-  'macOS support system-information report formatting and copy-button presentation' \
+  'macOS support system-information report formatting, available-audio-device list formatting, and copy-button presentation' \
   'VoiceInkSystemInformationReport' \
   'VoiceInkSystemInformationCopyPresentation'
 

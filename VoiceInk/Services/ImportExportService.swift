@@ -219,18 +219,8 @@ class ImportExportService {
             paste: pasteBackupPreferences,
             rollingBuffer: rollingBufferBackupPreferences
         )
-        let shortcutBackupCandidates = VoiceInkShortcutBackupPolicy
-            .generalBackupShortcutActionIdentifiers
-            .reduce(into: [VoiceInkShortcutActionIdentifier: ShortcutBackup]()) { records, actionIdentifier in
-                guard let shortcut = ShortcutStore.shortcut(for: actionIdentifier) else {
-                    return
-                }
-                records[actionIdentifier] = ShortcutBackup(shortcut)
-            }
-        let shortcutBackupRecords = VoiceInkShortcutBackupPolicy.generalBackupShortcutExportPlan(
-            availableActionIdentifiers: Set(shortcutBackupCandidates.keys)
-        ).reduce(into: [VoiceInkShortcutActionIdentifier: ShortcutBackup]()) { records, actionIdentifier in
-            records[actionIdentifier] = shortcutBackupCandidates[actionIdentifier]
+        let shortcutBackupRecords = VoiceInkShortcutBackupPolicy.generalBackupShortcutRecords { actionIdentifier in
+            ShortcutStore.shortcut(for: actionIdentifier).map(ShortcutBackup.init)
         }
         let generalSettingsToExport = GeneralBackup(
             shortcutBackupRecords: shortcutBackupRecords,

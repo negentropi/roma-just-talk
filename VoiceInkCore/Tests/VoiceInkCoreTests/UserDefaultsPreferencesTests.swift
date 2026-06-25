@@ -2596,6 +2596,36 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         )
     }
 
+    func testShortcutBackupPolicyBuildsGeneralShortcutRecordsThroughAdapter() {
+        var requestedActionIdentifiers = [VoiceInkShortcutActionIdentifier]()
+        let records = VoiceInkShortcutBackupPolicy.generalBackupShortcutRecords { actionIdentifier in
+            requestedActionIdentifiers.append(actionIdentifier)
+            switch actionIdentifier {
+            case .primaryRecording:
+                return "primary"
+            case .retryLastTranscription:
+                return "retry"
+            case .toggleEnhancement:
+                return "toggle"
+            default:
+                return nil
+            }
+        }
+
+        XCTAssertEqual(
+            requestedActionIdentifiers,
+            VoiceInkShortcutBackupPolicy.generalBackupShortcutActionIdentifiers
+        )
+        XCTAssertEqual(
+            records,
+            [
+                .primaryRecording: "primary",
+                .retryLastTranscription: "retry",
+                .toggleEnhancement: "toggle"
+            ]
+        )
+    }
+
     func testShortcutBackupPolicyImportsGeneralShortcutsWithRecordingSelections() {
         XCTAssertEqual(
             VoiceInkShortcutBackupPolicy.generalBackupShortcutImportPlan(

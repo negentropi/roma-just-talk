@@ -2095,6 +2095,24 @@ public enum VoiceInkShortcutBackupPolicy {
         generalBackupShortcutActionIdentifiers.filter(availableActionIdentifiers.contains)
     }
 
+    public static func generalBackupShortcutRecords<ShortcutBackup>(
+        backupForActionIdentifier: (VoiceInkShortcutActionIdentifier) -> ShortcutBackup?
+    ) -> [VoiceInkShortcutActionIdentifier: ShortcutBackup] {
+        let candidates = generalBackupShortcutActionIdentifiers
+            .reduce(into: [VoiceInkShortcutActionIdentifier: ShortcutBackup]()) { records, actionIdentifier in
+                guard let backup = backupForActionIdentifier(actionIdentifier) else {
+                    return
+                }
+                records[actionIdentifier] = backup
+            }
+
+        return generalBackupShortcutExportPlan(
+            availableActionIdentifiers: Set(candidates.keys)
+        ).reduce(into: [VoiceInkShortcutActionIdentifier: ShortcutBackup]()) { records, actionIdentifier in
+            records[actionIdentifier] = candidates[actionIdentifier]
+        }
+    }
+
     public static func generalBackupShortcutImportPlan(
         importedActionIdentifiers: Set<VoiceInkShortcutActionIdentifier>
     ) -> [VoiceInkShortcutBackupImport] {

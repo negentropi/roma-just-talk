@@ -116,6 +116,10 @@ public enum VoiceInkModelManagementPresentation {
         isMultilingual ? multilingualLanguageLabel : englishOnlyLanguageLabel
     }
 
+    public static func scoreText(_ value: Double) -> String {
+        String(format: "%.1f", value)
+    }
+
     public static func importedLocalModelAlreadyExistsTitle(modelFilename: String) -> String {
         "A model named \(modelFilename) already exists"
     }

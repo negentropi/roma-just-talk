@@ -93,6 +93,7 @@ final class ModelManagementPresentationTests: XCTestCase {
         XCTAssertEqual(VoiceInkModelManagementPresentation.showInFinderButtonTitle, "Show in Finder")
         XCTAssertEqual(VoiceInkModelManagementPresentation.speedLabel, "Speed")
         XCTAssertEqual(VoiceInkModelManagementPresentation.accuracyLabel, "Accuracy")
+        XCTAssertEqual(VoiceInkModelManagementPresentation.scoreText(8.5), "8.5")
         XCTAssertEqual(VoiceInkModelManagementPresentation.multilingualLanguageLabel, "Multilingual")
         XCTAssertEqual(VoiceInkModelManagementPresentation.englishOnlyLanguageLabel, "English-only")
         XCTAssertEqual(VoiceInkModelManagementPresentation.languageLabel(isMultilingual: true), "Multilingual")

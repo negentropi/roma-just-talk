@@ -4365,7 +4365,7 @@ require_pattern \
 
 require_pattern \
   "shared model management copy presentation lives in VoiceInkCore" \
-  'enum VoiceInkModelManagementPresentation|downloadButtonTitle|editModelButtonTitle|deleteModelButtonTitle|deleteButtonTitle|deleteCustomModelAlertTitle|deleteCustomModelAlertMessage|deleteModelAlertMessage|showInFinderButtonTitle|speedLabel|accuracyLabel|languageLabel|multilingualLanguageLabel|englishOnlyLanguageLabel|importedLocalModelDescription|customProviderLabel|openAICompatibleLabel|nativeAppleProviderLabel|onDeviceLabel|macOS26RequiredLabel|importLocalModelHelpText|importLocalModelLearnMoreURLString|importLocalModelPanelTitle|intelMacLocalModelsWarningText|intelMacUseCloudButtonTitle|importedLocalModelFailureTitle' \
+  'enum VoiceInkModelManagementPresentation|downloadButtonTitle|editModelButtonTitle|deleteModelButtonTitle|deleteButtonTitle|deleteCustomModelAlertTitle|deleteCustomModelAlertMessage|deleteModelAlertMessage|showInFinderButtonTitle|speedLabel|accuracyLabel|scoreText|languageLabel|multilingualLanguageLabel|englishOnlyLanguageLabel|importedLocalModelDescription|customProviderLabel|openAICompatibleLabel|nativeAppleProviderLabel|onDeviceLabel|macOS26RequiredLabel|importLocalModelHelpText|importLocalModelLearnMoreURLString|importLocalModelPanelTitle|intelMacLocalModelsWarningText|intelMacUseCloudButtonTitle|importedLocalModelFailureTitle' \
   VoiceInkCore/Sources/VoiceInkCore/ModelManagementPresentation.swift
 
 require_pattern \
@@ -4432,7 +4432,12 @@ require_pattern \
 
 require_pattern \
   "macOS Whisper model card uses shared model-card presentation copy" \
-  'VoiceInkModelManagementPresentation\.(speedLabel|accuracyLabel|downloadButtonTitle|deleteModelButtonTitle|showInFinderButtonTitle|importedLocalModelDescription)' \
+  'VoiceInkModelManagementPresentation\.(speedLabel|accuracyLabel|scoreText|downloadButtonTitle|deleteModelButtonTitle|showInFinderButtonTitle|importedLocalModelDescription)' \
+  VoiceInk/Views/AI\ Models/WhisperModelCardView.swift
+
+reject_pattern \
+  "macOS Whisper model card avoids shell-owned score formatting" \
+  'String\(format: "%.1f"' \
   VoiceInk/Views/AI\ Models/WhisperModelCardView.swift
 
 require_pattern \

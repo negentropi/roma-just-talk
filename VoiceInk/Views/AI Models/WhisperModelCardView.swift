@@ -248,7 +248,7 @@ struct ImportedWhisperModelCardView: View {
 func progressDotsWithNumber(value: Double) -> some View {
     HStack(spacing: 4) {
         progressDots(value: value)
-        Text(String(format: "%.1f", value))
+        Text(VoiceInkModelManagementPresentation.scoreText(value))
             .font(.system(size: 10, weight: .medium, design: .monospaced))
             .foregroundColor(Color(.secondaryLabelColor))
     }

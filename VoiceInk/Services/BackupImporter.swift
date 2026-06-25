@@ -93,55 +93,35 @@ enum BackupImporter {
 
         generalImportPlans.applyRuntimeState(
             applyRecordingShortcutImportPlan: { recordingShortcutImportPlan in
-                if let shortcut = recordingShortcutImportPlan.primaryRecordingShortcut {
-                    recordingShortcutManager.primaryRecordingShortcut = shortcut
-                }
-                if let shortcut = recordingShortcutImportPlan.secondaryRecordingShortcut {
-                    recordingShortcutManager.secondaryRecordingShortcut = shortcut
-                }
-                if let mode = recordingShortcutImportPlan.primaryRecordingShortcutMode {
-                    recordingShortcutManager.primaryRecordingShortcutMode = mode
-                }
-                if let mode = recordingShortcutImportPlan.secondaryRecordingShortcutMode {
-                    recordingShortcutManager.secondaryRecordingShortcutMode = mode
-                }
-                if let pasteLastTranscriptOnEmptyTap = recordingShortcutImportPlan.specialShortcutPasteLastTranscriptOnEmptyTap {
-                    recordingShortcutManager.specialShortcutPasteLastTranscriptOnEmptyTap = pasteLastTranscriptOnEmptyTap
-                }
-                if let isMiddleClickToggleEnabled = recordingShortcutImportPlan.isMiddleClickToggleEnabled {
-                    recordingShortcutManager.isMiddleClickToggleEnabled = isMiddleClickToggleEnabled
-                }
-                if let middleClickActivationDelay = recordingShortcutImportPlan.middleClickActivationDelay {
-                    recordingShortcutManager.middleClickActivationDelay = middleClickActivationDelay
-                }
+                recordingShortcutImportPlan.applyRuntimeState(
+                    setPrimaryRecordingShortcut: { recordingShortcutManager.primaryRecordingShortcut = $0 },
+                    setSecondaryRecordingShortcut: { recordingShortcutManager.secondaryRecordingShortcut = $0 },
+                    setPrimaryRecordingShortcutMode: { recordingShortcutManager.primaryRecordingShortcutMode = $0 },
+                    setSecondaryRecordingShortcutMode: { recordingShortcutManager.secondaryRecordingShortcutMode = $0 },
+                    setSpecialShortcutPasteLastTranscriptOnEmptyTap: {
+                        recordingShortcutManager.specialShortcutPasteLastTranscriptOnEmptyTap = $0
+                    },
+                    setMiddleClickToggleEnabled: { recordingShortcutManager.isMiddleClickToggleEnabled = $0 },
+                    setMiddleClickActivationDelay: { recordingShortcutManager.middleClickActivationDelay = $0 }
+                )
             },
             applyMacOSShellImportPlan: { macOSShellImportPlan in
-                if let launch = macOSShellImportPlan.launchAtLoginEnabled {
-                    LaunchAtLogin.isEnabled = launch
-                }
-                if let menuOnly = macOSShellImportPlan.isMenuBarOnly {
-                    menuBarManager.isMenuBarOnly = menuOnly
-                }
-                if let recType = macOSShellImportPlan.recorderType {
-                    recorderUIManager.recorderType = recType
-                }
+                macOSShellImportPlan.applyRuntimeState(
+                    setLaunchAtLoginEnabled: { LaunchAtLogin.isEnabled = $0 },
+                    setMenuBarOnly: { menuBarManager.isMenuBarOnly = $0 },
+                    setRecorderType: { recorderUIManager.recorderType = $0 }
+                )
             },
             applyRecordingFeedbackImportPlan: { recordingFeedbackImportPlan in
-                if let soundFeedback = recordingFeedbackImportPlan.isSoundFeedbackEnabled {
-                    soundManager.isEnabled = soundFeedback
-                }
-                if let systemMuteMode = recordingFeedbackImportPlan.systemMuteMode {
-                    mediaController.systemMuteMode = systemMuteMode
-                }
-                if let pauseMedia = recordingFeedbackImportPlan.isPauseMediaEnabled {
-                    playbackController.isPauseMediaEnabled = pauseMedia
-                }
-                if let audioDelay = recordingFeedbackImportPlan.audioResumptionDelay {
-                    mediaController.audioResumptionDelay = audioDelay
-                }
-                if recordingFeedbackImportPlan.shouldDisablePauseMediaForExperimentalImport {
-                    playbackController.isPauseMediaEnabled = false
-                }
+                recordingFeedbackImportPlan.applyRuntimeState(
+                    setSoundFeedbackEnabled: { soundManager.isEnabled = $0 },
+                    setSystemMuteMode: { mediaController.systemMuteMode = $0 },
+                    setPauseMediaEnabled: { playbackController.isPauseMediaEnabled = $0 },
+                    setAudioResumptionDelay: { mediaController.audioResumptionDelay = $0 },
+                    disablePauseMediaForExperimentalImport: {
+                        playbackController.isPauseMediaEnabled = false
+                    }
+                )
             },
             postCorePreferenceSettingsDidChange: {
                 NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)

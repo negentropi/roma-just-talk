@@ -2528,13 +2528,27 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             )
         )
 
-        XCTAssertEqual(plan.primaryRecordingShortcut, .custom)
-        XCTAssertNil(plan.secondaryRecordingShortcut)
-        XCTAssertEqual(plan.primaryRecordingShortcutMode, .toggle)
-        XCTAssertNil(plan.secondaryRecordingShortcutMode)
-        XCTAssertEqual(plan.specialShortcutPasteLastTranscriptOnEmptyTap, false)
-        XCTAssertEqual(plan.isMiddleClickToggleEnabled, true)
-        XCTAssertEqual(plan.middleClickActivationDelay, 350)
+        var appliedEvents = [String]()
+        plan.applyRuntimeState(
+            setPrimaryRecordingShortcut: { appliedEvents.append("primary:\($0.rawValue)") },
+            setSecondaryRecordingShortcut: { appliedEvents.append("secondary:\($0.rawValue)") },
+            setPrimaryRecordingShortcutMode: { appliedEvents.append("primaryMode:\($0.rawValue)") },
+            setSecondaryRecordingShortcutMode: { appliedEvents.append("secondaryMode:\($0.rawValue)") },
+            setSpecialShortcutPasteLastTranscriptOnEmptyTap: { appliedEvents.append("paste:\($0)") },
+            setMiddleClickToggleEnabled: { appliedEvents.append("middleClick:\($0)") },
+            setMiddleClickActivationDelay: { appliedEvents.append("middleClickDelay:\($0)") }
+        )
+
+        XCTAssertEqual(
+            appliedEvents,
+            [
+                "primary:custom",
+                "primaryMode:toggle",
+                "paste:false",
+                "middleClick:true",
+                "middleClickDelay:350"
+            ]
+        )
 
         let negativeDelayPlan = VoiceInkRecordingShortcutPreference.backupImportPlan(
             from: VoiceInkRecordingShortcutBackupPreferences(
@@ -2548,7 +2562,18 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             )
         )
 
-        XCTAssertEqual(negativeDelayPlan.middleClickActivationDelay, 0)
+        var negativeDelayEvents = [String]()
+        negativeDelayPlan.applyRuntimeState(
+            setPrimaryRecordingShortcut: { negativeDelayEvents.append("primary:\($0.rawValue)") },
+            setSecondaryRecordingShortcut: { negativeDelayEvents.append("secondary:\($0.rawValue)") },
+            setPrimaryRecordingShortcutMode: { negativeDelayEvents.append("primaryMode:\($0.rawValue)") },
+            setSecondaryRecordingShortcutMode: { negativeDelayEvents.append("secondaryMode:\($0.rawValue)") },
+            setSpecialShortcutPasteLastTranscriptOnEmptyTap: { negativeDelayEvents.append("paste:\($0)") },
+            setMiddleClickToggleEnabled: { negativeDelayEvents.append("middleClick:\($0)") },
+            setMiddleClickActivationDelay: { negativeDelayEvents.append("middleClickDelay:\($0)") }
+        )
+
+        XCTAssertEqual(negativeDelayEvents, ["middleClickDelay:0"])
     }
 
     func testShortcutBackupPolicyExportsGeneralShortcutsInStableOrder() {

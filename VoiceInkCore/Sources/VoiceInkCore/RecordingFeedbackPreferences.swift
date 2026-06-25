@@ -88,11 +88,11 @@ public struct VoiceInkRecordingFeedbackBackupPreferences: Codable, Equatable, Se
 }
 
 public struct VoiceInkRecordingFeedbackBackupImportPlan: Equatable, Sendable {
-    public let isSoundFeedbackEnabled: Bool?
-    public let systemMuteMode: VoiceInkSystemMuteMode?
-    public let isPauseMediaEnabled: Bool?
-    public let audioResumptionDelay: Double?
-    public let isExperimentalFeaturesEnabled: Bool?
+    private let isSoundFeedbackEnabled: Bool?
+    private let systemMuteMode: VoiceInkSystemMuteMode?
+    private let isPauseMediaEnabled: Bool?
+    private let audioResumptionDelay: Double?
+    private let isExperimentalFeaturesEnabled: Bool?
 
     public var shouldDisablePauseMediaForExperimentalImport: Bool {
         isExperimentalFeaturesEnabled == false
@@ -110,6 +110,38 @@ public struct VoiceInkRecordingFeedbackBackupImportPlan: Equatable, Sendable {
         self.isPauseMediaEnabled = isPauseMediaEnabled
         self.audioResumptionDelay = audioResumptionDelay
         self.isExperimentalFeaturesEnabled = isExperimentalFeaturesEnabled
+    }
+
+    public func applyRuntimeState(
+        setSoundFeedbackEnabled: (Bool) -> Void,
+        setSystemMuteMode: (VoiceInkSystemMuteMode) -> Void,
+        setPauseMediaEnabled: (Bool) -> Void,
+        setAudioResumptionDelay: (Double) -> Void,
+        disablePauseMediaForExperimentalImport: () -> Void
+    ) {
+        if let isSoundFeedbackEnabled {
+            setSoundFeedbackEnabled(isSoundFeedbackEnabled)
+        }
+        if let systemMuteMode {
+            setSystemMuteMode(systemMuteMode)
+        }
+        if let isPauseMediaEnabled {
+            setPauseMediaEnabled(isPauseMediaEnabled)
+        }
+        if let audioResumptionDelay {
+            setAudioResumptionDelay(audioResumptionDelay)
+        }
+        if shouldDisablePauseMediaForExperimentalImport {
+            disablePauseMediaForExperimentalImport()
+        }
+    }
+
+    public func applyCorePreferenceState(
+        setExperimentalFeaturesEnabled: (Bool) -> Void
+    ) {
+        if let isExperimentalFeaturesEnabled {
+            setExperimentalFeaturesEnabled(isExperimentalFeaturesEnabled)
+        }
     }
 }
 

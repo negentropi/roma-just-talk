@@ -201,7 +201,7 @@ public enum VoiceInkGeneralSettingsBackupPolicy {
         _ importPlan: VoiceInkRecordingFeedbackBackupImportPlan,
         to defaults: UserDefaults
     ) {
-        if let isExperimentalFeaturesEnabled = importPlan.isExperimentalFeaturesEnabled {
+        importPlan.applyCorePreferenceState { isExperimentalFeaturesEnabled in
             VoiceInkRecordingFeedbackPreference.saveExperimentalFeaturesEnabled(
                 isExperimentalFeaturesEnabled,
                 to: defaults

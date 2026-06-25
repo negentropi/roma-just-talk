@@ -6195,14 +6195,52 @@ require_pattern \
   'applyRuntimeState|postCorePreferenceSettingsDidChange|reportImportedGeneralSettings' \
   VoiceInkCore/Sources/VoiceInkCore/GeneralSettingsBackupPolicy.swift
 
+require_pattern \
+  "shared recording shortcut import plan applies runtime state" \
+  'setPrimaryRecordingShortcut|setMiddleClickActivationDelay' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared macOS shell import plan applies runtime state" \
+  'setLaunchAtLoginEnabled|setRecorderType' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "shared recording feedback import plan applies runtime state" \
+  'setSoundFeedbackEnabled|disablePauseMediaForExperimentalImport' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+
 reject_pattern \
   "shared general settings import plan raw payload stays hidden" \
   'public let +(recordingShortcut|macOSShell|transcriptionAutoCleanup|audioCleanup|recordingFeedback|transcriptionCleanup|paste|rollingBuffer): VoiceInk.*BackupImportPlan' \
   VoiceInkCore/Sources/VoiceInkCore/GeneralSettingsBackupPolicy.swift
 
+reject_context_pattern \
+  "shared recording shortcut import plan raw payload stays hidden" \
+  'struct VoiceInkRecordingShortcutBackupImportPlan' \
+  'public let +(primaryRecordingShortcut|secondaryRecordingShortcut|primaryRecordingShortcutMode|secondaryRecordingShortcutMode|specialShortcutPasteLastTranscriptOnEmptyTap|isMiddleClickToggleEnabled|middleClickActivationDelay)' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+reject_context_pattern \
+  "shared macOS shell import plan raw payload stays hidden" \
+  'struct VoiceInkMacOSShellBackupImportPlan' \
+  'public let +(launchAtLoginEnabled|isMenuBarOnly|recorderType)' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+reject_context_pattern \
+  "shared recording feedback import plan raw payload stays hidden" \
+  'struct VoiceInkRecordingFeedbackBackupImportPlan' \
+  'public let +(isSoundFeedbackEnabled|systemMuteMode|isPauseMediaEnabled|audioResumptionDelay|isExperimentalFeaturesEnabled)' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+
 reject_pattern \
   "macOS general backup import avoids raw general import plan fields" \
   'generalImportPlans\.(recordingShortcut|macOSShell|transcriptionAutoCleanup|audioCleanup|recordingFeedback|transcriptionCleanup|paste|rollingBuffer)|VoiceInkGeneralSettingsBackupPolicy\.applyCorePreferenceImportPlans|corePreferenceImportResult\.didImportRollingBufferSetting' \
+  VoiceInk/Services/BackupImporter.swift
+
+reject_pattern \
+  "macOS general backup import avoids raw shell subplan fields" \
+  '(recordingShortcutImportPlan|macOSShellImportPlan|recordingFeedbackImportPlan)\.(primaryRecordingShortcut|secondaryRecordingShortcut|primaryRecordingShortcutMode|secondaryRecordingShortcutMode|specialShortcutPasteLastTranscriptOnEmptyTap|isMiddleClickToggleEnabled|middleClickActivationDelay|launchAtLoginEnabled|isMenuBarOnly|recorderType|isSoundFeedbackEnabled|systemMuteMode|isPauseMediaEnabled|audioResumptionDelay|isExperimentalFeaturesEnabled|shouldDisablePauseMediaForExperimentalImport)' \
   VoiceInk/Services/BackupImporter.swift
 
 reject_pattern \
@@ -10553,7 +10591,7 @@ require_pattern \
 
 require_pattern \
   "macOS backup import applies shared recording feedback import plan" \
-  'recordingFeedbackImportPlan\.(isSoundFeedbackEnabled|systemMuteMode|isPauseMediaEnabled|audioResumptionDelay|isExperimentalFeaturesEnabled|shouldDisablePauseMediaForExperimentalImport)' \
+  'recordingFeedbackImportPlan\.applyRuntimeState|setSoundFeedbackEnabled|disablePauseMediaForExperimentalImport' \
   VoiceInk/Services/BackupImporter.swift
 
 require_pattern \

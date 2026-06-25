@@ -501,7 +501,11 @@ final class RecordingFeedbackPreferenceTests: XCTestCase {
             )
         )
 
-        XCTAssertEqual(disabledImportPlan.isExperimentalFeaturesEnabled, false)
+        var disabledExperimentalImports = [Bool]()
+        disabledImportPlan.applyCorePreferenceState {
+            disabledExperimentalImports.append($0)
+        }
+        XCTAssertEqual(disabledExperimentalImports, [false])
         XCTAssertTrue(disabledImportPlan.shouldDisablePauseMediaForExperimentalImport)
 
         let enabledImportPlan = VoiceInkRecordingFeedbackPreference.backupImportPlan(
@@ -514,7 +518,11 @@ final class RecordingFeedbackPreferenceTests: XCTestCase {
             )
         )
 
-        XCTAssertEqual(enabledImportPlan.isExperimentalFeaturesEnabled, true)
+        var enabledExperimentalImports = [Bool]()
+        enabledImportPlan.applyCorePreferenceState {
+            enabledExperimentalImports.append($0)
+        }
+        XCTAssertEqual(enabledExperimentalImports, [true])
         XCTAssertFalse(enabledImportPlan.shouldDisablePauseMediaForExperimentalImport)
 
         let missingImportPlan = VoiceInkRecordingFeedbackPreference.backupImportPlan(
@@ -526,7 +534,11 @@ final class RecordingFeedbackPreferenceTests: XCTestCase {
             )
         )
 
-        XCTAssertNil(missingImportPlan.isExperimentalFeaturesEnabled)
+        var missingExperimentalImports = [Bool]()
+        missingImportPlan.applyCorePreferenceState {
+            missingExperimentalImports.append($0)
+        }
+        XCTAssertTrue(missingExperimentalImports.isEmpty)
         XCTAssertFalse(missingImportPlan.shouldDisablePauseMediaForExperimentalImport)
     }
 

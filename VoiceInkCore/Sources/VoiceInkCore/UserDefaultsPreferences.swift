@@ -654,9 +654,9 @@ public struct VoiceInkMacOSShellBackupPreferences: Codable, Equatable, Sendable 
 }
 
 public struct VoiceInkMacOSShellBackupImportPlan: Equatable, Sendable {
-    public let launchAtLoginEnabled: Bool?
-    public let isMenuBarOnly: Bool?
-    public let recorderType: String?
+    private let launchAtLoginEnabled: Bool?
+    private let isMenuBarOnly: Bool?
+    private let recorderType: String?
 
     public init(
         launchAtLoginEnabled: Bool?,
@@ -666,6 +666,22 @@ public struct VoiceInkMacOSShellBackupImportPlan: Equatable, Sendable {
         self.launchAtLoginEnabled = launchAtLoginEnabled
         self.isMenuBarOnly = isMenuBarOnly
         self.recorderType = recorderType
+    }
+
+    public func applyRuntimeState(
+        setLaunchAtLoginEnabled: (Bool) -> Void,
+        setMenuBarOnly: (Bool) -> Void,
+        setRecorderType: (String) -> Void
+    ) {
+        if let launchAtLoginEnabled {
+            setLaunchAtLoginEnabled(launchAtLoginEnabled)
+        }
+        if let isMenuBarOnly {
+            setMenuBarOnly(isMenuBarOnly)
+        }
+        if let recorderType {
+            setRecorderType(recorderType)
+        }
     }
 }
 
@@ -1985,13 +2001,13 @@ public struct VoiceInkRecordingShortcutBackupPreferences: Codable, Equatable, Se
 }
 
 public struct VoiceInkRecordingShortcutBackupImportPlan: Equatable, Sendable {
-    public let primaryRecordingShortcut: VoiceInkRecordingShortcutSelection?
-    public let secondaryRecordingShortcut: VoiceInkRecordingShortcutSelection?
-    public let primaryRecordingShortcutMode: VoiceInkRecordingShortcutMode?
-    public let secondaryRecordingShortcutMode: VoiceInkRecordingShortcutMode?
-    public let specialShortcutPasteLastTranscriptOnEmptyTap: Bool?
-    public let isMiddleClickToggleEnabled: Bool?
-    public let middleClickActivationDelay: Int?
+    private let primaryRecordingShortcut: VoiceInkRecordingShortcutSelection?
+    private let secondaryRecordingShortcut: VoiceInkRecordingShortcutSelection?
+    private let primaryRecordingShortcutMode: VoiceInkRecordingShortcutMode?
+    private let secondaryRecordingShortcutMode: VoiceInkRecordingShortcutMode?
+    private let specialShortcutPasteLastTranscriptOnEmptyTap: Bool?
+    private let isMiddleClickToggleEnabled: Bool?
+    private let middleClickActivationDelay: Int?
 
     public init(
         primaryRecordingShortcut: VoiceInkRecordingShortcutSelection?,
@@ -2009,6 +2025,38 @@ public struct VoiceInkRecordingShortcutBackupImportPlan: Equatable, Sendable {
         self.specialShortcutPasteLastTranscriptOnEmptyTap = specialShortcutPasteLastTranscriptOnEmptyTap
         self.isMiddleClickToggleEnabled = isMiddleClickToggleEnabled
         self.middleClickActivationDelay = middleClickActivationDelay
+    }
+
+    public func applyRuntimeState(
+        setPrimaryRecordingShortcut: (VoiceInkRecordingShortcutSelection) -> Void,
+        setSecondaryRecordingShortcut: (VoiceInkRecordingShortcutSelection) -> Void,
+        setPrimaryRecordingShortcutMode: (VoiceInkRecordingShortcutMode) -> Void,
+        setSecondaryRecordingShortcutMode: (VoiceInkRecordingShortcutMode) -> Void,
+        setSpecialShortcutPasteLastTranscriptOnEmptyTap: (Bool) -> Void,
+        setMiddleClickToggleEnabled: (Bool) -> Void,
+        setMiddleClickActivationDelay: (Int) -> Void
+    ) {
+        if let primaryRecordingShortcut {
+            setPrimaryRecordingShortcut(primaryRecordingShortcut)
+        }
+        if let secondaryRecordingShortcut {
+            setSecondaryRecordingShortcut(secondaryRecordingShortcut)
+        }
+        if let primaryRecordingShortcutMode {
+            setPrimaryRecordingShortcutMode(primaryRecordingShortcutMode)
+        }
+        if let secondaryRecordingShortcutMode {
+            setSecondaryRecordingShortcutMode(secondaryRecordingShortcutMode)
+        }
+        if let specialShortcutPasteLastTranscriptOnEmptyTap {
+            setSpecialShortcutPasteLastTranscriptOnEmptyTap(specialShortcutPasteLastTranscriptOnEmptyTap)
+        }
+        if let isMiddleClickToggleEnabled {
+            setMiddleClickToggleEnabled(isMiddleClickToggleEnabled)
+        }
+        if let middleClickActivationDelay {
+            setMiddleClickActivationDelay(middleClickActivationDelay)
+        }
     }
 }
 

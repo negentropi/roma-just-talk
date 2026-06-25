@@ -336,29 +336,52 @@ final class GeneralSettingsBackupPolicyTests: XCTestCase {
     ) -> [String] {
         var events = [String]()
         let appendRecordingShortcut: (VoiceInkRecordingShortcutBackupImportPlan) -> Void = { plan in
-            let primaryShortcut = plan.primaryRecordingShortcut?.rawValue ?? "nil"
-            let secondaryShortcut = plan.secondaryRecordingShortcut?.rawValue ?? "nil"
-            let primaryMode = plan.primaryRecordingShortcutMode?.rawValue ?? "nil"
-            let secondaryMode = plan.secondaryRecordingShortcutMode?.rawValue ?? "nil"
-            let pasteLastTranscriptOnEmptyTap = plan.specialShortcutPasteLastTranscriptOnEmptyTap.map { String($0) } ?? "nil"
-            let middleClickEnabled = plan.isMiddleClickToggleEnabled.map { String($0) } ?? "nil"
-            let middleClickDelay = plan.middleClickActivationDelay.map { String($0) } ?? "nil"
+            var primaryShortcut = "nil"
+            var secondaryShortcut = "nil"
+            var primaryMode = "nil"
+            var secondaryMode = "nil"
+            var pasteLastTranscriptOnEmptyTap = "nil"
+            var middleClickEnabled = "nil"
+            var middleClickDelay = "nil"
+            plan.applyRuntimeState(
+                setPrimaryRecordingShortcut: { primaryShortcut = $0.rawValue },
+                setSecondaryRecordingShortcut: { secondaryShortcut = $0.rawValue },
+                setPrimaryRecordingShortcutMode: { primaryMode = $0.rawValue },
+                setSecondaryRecordingShortcutMode: { secondaryMode = $0.rawValue },
+                setSpecialShortcutPasteLastTranscriptOnEmptyTap: {
+                    pasteLastTranscriptOnEmptyTap = String($0)
+                },
+                setMiddleClickToggleEnabled: { middleClickEnabled = String($0) },
+                setMiddleClickActivationDelay: { middleClickDelay = String($0) }
+            )
             events.append(
                 "recordingShortcut:\(primaryShortcut):\(secondaryShortcut):\(primaryMode):\(secondaryMode):\(pasteLastTranscriptOnEmptyTap):\(middleClickEnabled):\(middleClickDelay)"
             )
         }
         let appendMacOSShell: (VoiceInkMacOSShellBackupImportPlan) -> Void = { plan in
-            let launchAtLogin = plan.launchAtLoginEnabled.map { String($0) } ?? "nil"
-            let menuOnly = plan.isMenuBarOnly.map { String($0) } ?? "nil"
-            let recorderType = plan.recorderType ?? "nil"
+            var launchAtLogin = "nil"
+            var menuOnly = "nil"
+            var recorderType = "nil"
+            plan.applyRuntimeState(
+                setLaunchAtLoginEnabled: { launchAtLogin = String($0) },
+                setMenuBarOnly: { menuOnly = String($0) },
+                setRecorderType: { recorderType = $0 }
+            )
             events.append("macOSShell:\(launchAtLogin):\(menuOnly):\(recorderType)")
         }
         let appendRecordingFeedback: (VoiceInkRecordingFeedbackBackupImportPlan) -> Void = { plan in
-            let soundFeedback = plan.isSoundFeedbackEnabled.map { String($0) } ?? "nil"
-            let systemMuteMode = plan.systemMuteMode?.rawValue ?? "nil"
-            let pauseMedia = plan.isPauseMediaEnabled.map { String($0) } ?? "nil"
-            let audioResumptionDelay = plan.audioResumptionDelay.map { String($0) } ?? "nil"
-            let disablesPauseMedia = String(plan.shouldDisablePauseMediaForExperimentalImport)
+            var soundFeedback = "nil"
+            var systemMuteMode = "nil"
+            var pauseMedia = "nil"
+            var audioResumptionDelay = "nil"
+            var disablesPauseMedia = "false"
+            plan.applyRuntimeState(
+                setSoundFeedbackEnabled: { soundFeedback = String($0) },
+                setSystemMuteMode: { systemMuteMode = $0.rawValue },
+                setPauseMediaEnabled: { pauseMedia = String($0) },
+                setAudioResumptionDelay: { audioResumptionDelay = String($0) },
+                disablePauseMediaForExperimentalImport: { disablesPauseMedia = "true" }
+            )
             events.append(
                 "recordingFeedback:\(soundFeedback):\(systemMuteMode):\(pauseMedia):\(audioResumptionDelay):\(disablesPauseMedia)"
             )

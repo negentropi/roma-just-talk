@@ -82,6 +82,21 @@ public struct VoiceInkAudioSessionPlaybackActivationPlan: Equatable, Sendable {
         self.shouldCancelScheduledDeactivation = shouldCancelScheduledDeactivation
         self.shouldDeactivateCurrentSession = shouldDeactivateCurrentSession
     }
+
+    public func applyRuntimeState(
+        cancelScheduledDeactivation: () -> Void,
+        deactivateCurrentSession: () throws -> Void,
+        markDeactivated: () -> Void
+    ) throws {
+        if shouldCancelScheduledDeactivation {
+            cancelScheduledDeactivation()
+        }
+
+        if shouldDeactivateCurrentSession {
+            try deactivateCurrentSession()
+            markDeactivated()
+        }
+    }
 }
 
 public struct VoiceInkAudioSessionImmediateDeactivationPlan: Equatable, Sendable {
@@ -94,6 +109,25 @@ public struct VoiceInkAudioSessionImmediateDeactivationPlan: Equatable, Sendable
     ) {
         self.shouldCancelScheduledDeactivation = shouldCancelScheduledDeactivation
         self.shouldDeactivateSession = shouldDeactivateSession
+    }
+
+    @discardableResult
+    public func applyRuntimeState(
+        cancelScheduledDeactivation: () -> Void,
+        deactivateSession: () throws -> Void,
+        markDeactivated: () -> Void
+    ) throws -> Bool {
+        if shouldCancelScheduledDeactivation {
+            cancelScheduledDeactivation()
+        }
+
+        guard shouldDeactivateSession else {
+            return false
+        }
+
+        try deactivateSession()
+        markDeactivated()
+        return true
     }
 }
 

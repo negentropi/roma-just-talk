@@ -57,14 +57,13 @@ final class AudioSessionManager: ObservableObject {
         let configuration = VoiceInkIOSAudioPlaybackSessionConfiguration.notePlayback
 
         let activationPlan = lifecycleState.beginPlaybackActivation()
-        if activationPlan.shouldCancelScheduledDeactivation {
-            invalidateDeactivationTimer()
-        }
-
-        if activationPlan.shouldDeactivateCurrentSession {
-            try audioSession.setActive(false, options: .notifyOthersOnDeactivation)
-            lifecycleState.markDeactivated()
-        }
+        try activationPlan.applyRuntimeState(
+            cancelScheduledDeactivation: invalidateDeactivationTimer,
+            deactivateCurrentSession: {
+                try audioSession.setActive(false, options: .notifyOthersOnDeactivation)
+            },
+            markDeactivated: { lifecycleState.markDeactivated() }
+        )
 
         try audioSession.setCategory(
             configuration.category.avCategory,
@@ -114,16 +113,18 @@ final class AudioSessionManager: ObservableObject {
     /// Immediately deactivates the session
     func deactivateSession() {
         let deactivationPlan = lifecycleState.beginImmediateDeactivation()
-        if deactivationPlan.shouldCancelScheduledDeactivation {
-            invalidateDeactivationTimer()
-        }
-        
-        guard deactivationPlan.shouldDeactivateSession else { return }
-        
+
         do {
-            try AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
-            lifecycleState.markDeactivated()
-            VoiceInkIOSLogger.audioSession.notice("\(VoiceInkAudioSessionDiagnostics.deactivatedMessage, privacy: .public)")
+            let didDeactivate = try deactivationPlan.applyRuntimeState(
+                cancelScheduledDeactivation: invalidateDeactivationTimer,
+                deactivateSession: {
+                    try AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+                },
+                markDeactivated: { lifecycleState.markDeactivated() }
+            )
+            if didDeactivate {
+                VoiceInkIOSLogger.audioSession.notice("\(VoiceInkAudioSessionDiagnostics.deactivatedMessage, privacy: .public)")
+            }
         } catch {
             VoiceInkIOSLogger.audioSession.error("\(VoiceInkAudioSessionDiagnostics.deactivationFailedMessage(localizedDescription: error.localizedDescription), privacy: .public)")
         }

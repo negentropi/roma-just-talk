@@ -11979,7 +11979,7 @@ require_pattern \
 
 require_pattern \
   "shared audio-session lifecycle state lives in VoiceInkCore" \
-  'VoiceInkAudioSessionLifecycleState|VoiceInkAudioSessionPlaybackActivationPlan|VoiceInkAudioSessionImmediateDeactivationPlan|markActivatedForRecording|beginPlaybackActivation|beginImmediateDeactivation|scheduleDeactivationExecution|advanceCountdownExecution|markDeactivated' \
+  'VoiceInkAudioSessionLifecycleState|VoiceInkAudioSessionPlaybackActivationPlan|VoiceInkAudioSessionImmediateDeactivationPlan|markActivatedForRecording|beginPlaybackActivation|beginImmediateDeactivation|scheduleDeactivationExecution|advanceCountdownExecution|applyRuntimeState|markDeactivated' \
   VoiceInkCore/Sources/VoiceInkCore/IOSAudioConfiguration.swift
 
 require_patterns \
@@ -12012,6 +12012,16 @@ require_pattern \
 require_pattern \
   "VoiceInkCore check runner executes audio-session immediate deactivation proof" \
   'testAudioSessionLifecycleStatePlansImmediateDeactivationSideEffects' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "VoiceInkCore check runner executes audio-session immediate deactivation runtime application proof" \
+  'testAudioSessionImmediateDeactivationPlanAppliesRuntimeStateInOrder' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "VoiceInkCore check runner executes audio-session playback runtime application proof" \
+  'testAudioSessionPlaybackActivationPlanAppliesRuntimeStateInOrder' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -12048,8 +12058,18 @@ require_pattern \
   iOS/VoiceInk-ios/AudioSessionManager.swift
 
 require_pattern \
+  "iOS audio-session manager applies shared playback activation runtime order" \
+  'activationPlan\.applyRuntimeState' \
+  iOS/VoiceInk-ios/AudioSessionManager.swift
+
+require_pattern \
   "iOS audio-session manager delegates immediate deactivation planning to shared lifecycle state" \
   'lifecycleState\.beginImmediateDeactivation\(\)' \
+  iOS/VoiceInk-ios/AudioSessionManager.swift
+
+require_pattern \
+  "iOS audio-session manager applies shared immediate deactivation runtime order" \
+  'deactivationPlan\.applyRuntimeState' \
   iOS/VoiceInk-ios/AudioSessionManager.swift
 
 reject_pattern \
@@ -12060,6 +12080,11 @@ reject_pattern \
 reject_pattern \
   "iOS audio-session manager avoids shell-owned deactivation-plan matching" \
   'case \.(immediate|delayed)|== \.immediate|VoiceInkAudioSessionDeactivationPlan' \
+  iOS/VoiceInk-ios/AudioSessionManager.swift
+
+reject_pattern \
+  "iOS audio-session manager avoids shell-owned audio-session side-effect plan unpacking" \
+  'activationPlan\.should(CancelScheduledDeactivation|DeactivateCurrentSession)|deactivationPlan\.shouldCancelScheduledDeactivation' \
   iOS/VoiceInk-ios/AudioSessionManager.swift
 
 reject_pattern \

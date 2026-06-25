@@ -109,6 +109,38 @@ final class AudioSessionLifecycleStateTests: XCTestCase {
         XCTAssertFalse(inactiveState.isSessionActive)
     }
 
+    func testAudioSessionPlaybackActivationPlanAppliesRuntimeStateInOrder() {
+        var activeEvents: [String] = []
+        do {
+            try VoiceInkAudioSessionPlaybackActivationPlan(
+                shouldCancelScheduledDeactivation: true,
+                shouldDeactivateCurrentSession: true
+            ).applyRuntimeState(
+                cancelScheduledDeactivation: { activeEvents.append("cancel") },
+                deactivateCurrentSession: { activeEvents.append("deactivate") },
+                markDeactivated: { activeEvents.append("mark") }
+            )
+        } catch {
+            XCTFail("Unexpected playback activation error: \(error)")
+        }
+        XCTAssertEqual(activeEvents, ["cancel", "deactivate", "mark"])
+
+        var inactiveEvents: [String] = []
+        do {
+            try VoiceInkAudioSessionPlaybackActivationPlan(
+                shouldCancelScheduledDeactivation: true,
+                shouldDeactivateCurrentSession: false
+            ).applyRuntimeState(
+                cancelScheduledDeactivation: { inactiveEvents.append("cancel") },
+                deactivateCurrentSession: { inactiveEvents.append("deactivate") },
+                markDeactivated: { inactiveEvents.append("mark") }
+            )
+        } catch {
+            XCTFail("Unexpected playback activation error: \(error)")
+        }
+        XCTAssertEqual(inactiveEvents, ["cancel"])
+    }
+
     func testAudioSessionLifecycleStatePlansImmediateDeactivationSideEffects() {
         var activeState = VoiceInkAudioSessionLifecycleState(isSessionActive: true, timeoutRemaining: 12)
 
@@ -132,6 +164,40 @@ final class AudioSessionLifecycleStateTests: XCTestCase {
         )
         XCTAssertEqual(inactiveState.timeoutRemaining, 0)
         XCTAssertFalse(inactiveState.isSessionActive)
+    }
+
+    func testAudioSessionImmediateDeactivationPlanAppliesRuntimeStateInOrder() {
+        var activeEvents: [String] = []
+        do {
+            let didDeactivate = try VoiceInkAudioSessionImmediateDeactivationPlan(
+                shouldCancelScheduledDeactivation: true,
+                shouldDeactivateSession: true
+            ).applyRuntimeState(
+                cancelScheduledDeactivation: { activeEvents.append("cancel") },
+                deactivateSession: { activeEvents.append("deactivate") },
+                markDeactivated: { activeEvents.append("mark") }
+            )
+            XCTAssertTrue(didDeactivate)
+        } catch {
+            XCTFail("Unexpected immediate deactivation error: \(error)")
+        }
+        XCTAssertEqual(activeEvents, ["cancel", "deactivate", "mark"])
+
+        var inactiveEvents: [String] = []
+        do {
+            let didDeactivate = try VoiceInkAudioSessionImmediateDeactivationPlan(
+                shouldCancelScheduledDeactivation: true,
+                shouldDeactivateSession: false
+            ).applyRuntimeState(
+                cancelScheduledDeactivation: { inactiveEvents.append("cancel") },
+                deactivateSession: { inactiveEvents.append("deactivate") },
+                markDeactivated: { inactiveEvents.append("mark") }
+            )
+            XCTAssertFalse(didDeactivate)
+        } catch {
+            XCTFail("Unexpected immediate deactivation error: \(error)")
+        }
+        XCTAssertEqual(inactiveEvents, ["cancel"])
     }
 
     func testAudioSessionLifecycleStateRequestsDeactivationWhenCountdownExpires() {

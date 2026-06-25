@@ -269,15 +269,15 @@ public enum VoiceInkAudioRecorderStopMode: Equatable, Sendable {
 }
 
 public struct VoiceInkAudioRecorderStopPlan: Equatable, Sendable {
-    public let shouldStopRecorder: Bool
-    public let shouldInvalidateMeterTimer: Bool
-    public let isRecordingAfterStop: Bool
-    public let shouldClearAudioLevels: Bool
-    public let shouldDeleteCurrentRecordingFile: Bool
-    public let shouldClearCurrentRecordingURL: Bool
-    public let shouldScheduleSessionDeactivation: Bool
+    private let shouldStopRecorder: Bool
+    private let shouldInvalidateMeterTimer: Bool
+    private let isRecordingAfterStop: Bool
+    private let shouldClearAudioLevels: Bool
+    private let shouldDeleteCurrentRecordingFile: Bool
+    private let shouldClearCurrentRecordingURL: Bool
+    private let shouldScheduleSessionDeactivation: Bool
 
-    public init(
+    fileprivate init(
         shouldStopRecorder: Bool,
         shouldInvalidateMeterTimer: Bool,
         isRecordingAfterStop: Bool,

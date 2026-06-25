@@ -369,55 +369,21 @@ final class RecordingStatePolicyTests: XCTestCase {
 
     func testAudioRecorderStopPolicyPreservesIOSStopCleanup() {
         XCTAssertEqual(
-            VoiceInkAudioRecorderStopPolicy.plan(for: .keepRecordingFile),
-            VoiceInkAudioRecorderStopPlan(
-                shouldStopRecorder: true,
-                shouldInvalidateMeterTimer: true,
-                isRecordingAfterStop: false,
-                shouldClearAudioLevels: true,
-                shouldDeleteCurrentRecordingFile: false,
-                shouldClearCurrentRecordingURL: false,
-                shouldScheduleSessionDeactivation: true
-            )
+            audioRecorderStopEvents(for: .keepRecordingFile),
+            ["stop", "timer", "recording:false", "levels", "session"]
         )
     }
 
     func testAudioRecorderStopPolicyPreservesIOSDiscardCleanup() {
         XCTAssertEqual(
-            VoiceInkAudioRecorderStopPolicy.plan(for: .discardRecordingFile),
-            VoiceInkAudioRecorderStopPlan(
-                shouldStopRecorder: true,
-                shouldInvalidateMeterTimer: true,
-                isRecordingAfterStop: false,
-                shouldClearAudioLevels: true,
-                shouldDeleteCurrentRecordingFile: true,
-                shouldClearCurrentRecordingURL: true,
-                shouldScheduleSessionDeactivation: true
-            )
+            audioRecorderStopEvents(for: .discardRecordingFile),
+            ["stop", "timer", "recording:false", "levels", "delete", "url", "session"]
         )
     }
 
     func testAudioRecorderStopPlanAppliesRuntimeStateInOrder() {
-        var events: [String] = []
-
-        VoiceInkAudioRecorderStopPolicy.plan(for: .keepRecordingFile).applyRuntimeState(
-            stopRecorder: { events.append("stop") },
-            invalidateMeterTimer: { events.append("timer") },
-            setIsRecording: { events.append("recording:\($0)") },
-            clearAudioLevels: { events.append("levels") },
-            deleteCurrentRecordingFile: { events.append("delete") },
-            clearCurrentRecordingURL: { events.append("url") },
-            scheduleSessionDeactivation: { events.append("session") }
-        )
-        VoiceInkAudioRecorderStopPolicy.plan(for: .discardRecordingFile).applyRuntimeState(
-            stopRecorder: { events.append("stop") },
-            invalidateMeterTimer: { events.append("timer") },
-            setIsRecording: { events.append("recording:\($0)") },
-            clearAudioLevels: { events.append("levels") },
-            deleteCurrentRecordingFile: { events.append("delete") },
-            clearCurrentRecordingURL: { events.append("url") },
-            scheduleSessionDeactivation: { events.append("session") }
-        )
+        let events = audioRecorderStopEvents(for: .keepRecordingFile) +
+            audioRecorderStopEvents(for: .discardRecordingFile)
 
         XCTAssertEqual(events, [
             "stop",
@@ -433,6 +399,22 @@ final class RecordingStatePolicyTests: XCTestCase {
             "url",
             "session"
         ])
+    }
+
+    private func audioRecorderStopEvents(for mode: VoiceInkAudioRecorderStopMode) -> [String] {
+        var events: [String] = []
+
+        VoiceInkAudioRecorderStopPolicy.plan(for: mode).applyRuntimeState(
+            stopRecorder: { events.append("stop") },
+            invalidateMeterTimer: { events.append("timer") },
+            setIsRecording: { events.append("recording:\($0)") },
+            clearAudioLevels: { events.append("levels") },
+            deleteCurrentRecordingFile: { events.append("delete") },
+            clearCurrentRecordingURL: { events.append("url") },
+            scheduleSessionDeactivation: { events.append("session") }
+        )
+
+        return events
     }
 
     func testRecordingFlowStatePreservesIOSStartFailureAndCancelTransitions() {

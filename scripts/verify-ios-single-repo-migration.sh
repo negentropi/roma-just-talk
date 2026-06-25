@@ -1043,6 +1043,11 @@ require_pattern \
   'VoiceInkAudioRecorderStopPolicy|VoiceInkAudioRecorderStopPlan|VoiceInkAudioRecorderStopMode|applyRuntimeState' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
+reject_pattern \
+  "shared audio-recorder stop plan avoids public raw cleanup flags" \
+  'public let should(StopRecorder|InvalidateMeterTimer|ClearAudioLevels|DeleteCurrentRecordingFile|ClearCurrentRecordingURL|ScheduleSessionDeactivation)|public let isRecordingAfterStop|public init\([[:space:]]*shouldStopRecorder' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
 require_pattern \
   "shared audio-recorder stop cleanup checks run in VoiceInkCore" \
   'testAudioRecorderStopPolicyPreservesIOSStopCleanup|testAudioRecorderStopPolicyPreservesIOSDiscardCleanup|testAudioRecorderStopPlanAppliesRuntimeStateInOrder' \

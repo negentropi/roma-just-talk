@@ -171,6 +171,16 @@ public enum VoiceInkAudioFileQueuePolicy {
     }
 }
 
+public enum VoiceInkAudioFileQueueDiagnostics {
+    public static func enhancementFailedMessage(errorDescription: String) -> String {
+        "Enhancement failed: \(errorDescription)"
+    }
+
+    public static func transcriptionErrorMessage(errorDescription: String) -> String {
+        "Transcription error: \(errorDescription)"
+    }
+}
+
 public enum VoiceInkAudioImportPresentation {
     public static let dropTargetSystemImageName = "arrow.down.doc"
     public static let dropTargetTitle = "Drop audio or video files here"

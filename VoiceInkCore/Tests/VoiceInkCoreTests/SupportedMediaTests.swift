@@ -180,6 +180,17 @@ final class SupportedMediaTests: XCTestCase {
         )
     }
 
+    func testAudioFileQueueDiagnosticsPreserveMacOSLogCopy() {
+        XCTAssertEqual(
+            VoiceInkAudioFileQueueDiagnostics.enhancementFailedMessage(errorDescription: "timeout"),
+            "Enhancement failed: timeout"
+        )
+        XCTAssertEqual(
+            VoiceInkAudioFileQueueDiagnostics.transcriptionErrorMessage(errorDescription: "No model"),
+            "Transcription error: No model"
+        )
+    }
+
     func testAudioFileQueuePresentationPreservesRowCopyAndIcons() {
         XCTAssertEqual(VoiceInkAudioFileQueuePresentation.pendingStatusSystemImageName, "clock")
         XCTAssertEqual(VoiceInkAudioFileQueuePresentation.pendingStatusText, "Waiting")

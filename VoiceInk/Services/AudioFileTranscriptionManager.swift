@@ -20,7 +20,10 @@ class AudioTranscriptionManager: ObservableObject {
     private var processingTask: Task<Void, Never>?
     private var processingGeneration: UInt64 = 0
     private let audioProcessor = AudioProcessor()
-    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "AudioTranscriptionManager")
+    private let logger = Logger(
+        subsystem: VoiceInkAppIdentity.loggingSubsystem,
+        category: VoiceInkMacOSLogCategory.audioTranscriptionManager
+    )
 
     private init() {}
 
@@ -204,7 +207,10 @@ class AudioTranscriptionManager: ObservableObject {
             }
 
             if let errorDescription = completionResult.enhancementFailureReason {
-                logger.error("Enhancement failed: \(errorDescription, privacy: .public)")
+                let message = VoiceInkAudioFileQueueDiagnostics.enhancementFailedMessage(
+                    errorDescription: errorDescription
+                )
+                logger.error("\(message, privacy: .public)")
             }
 
             let transcription = Transcription(completedDraft: completionResult.draft)
@@ -223,7 +229,10 @@ class AudioTranscriptionManager: ObservableObject {
                 item.status = .pending
             } else {
                 let errorDescription = VoiceInkErrorDescription.text(for: error)
-                logger.error("Transcription error: \(errorDescription, privacy: .public)")
+                let message = VoiceInkAudioFileQueueDiagnostics.transcriptionErrorMessage(
+                    errorDescription: errorDescription
+                )
+                logger.error("\(message, privacy: .public)")
                 item.status = .failed(message: errorDescription)
             }
         }

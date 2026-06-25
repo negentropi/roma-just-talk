@@ -2095,12 +2095,17 @@ require_pattern \
 
 require_pattern \
   "shared audio-file queue status and presentation live in VoiceInkCore" \
-  'VoiceInkAudioFileQueue(Status|ProcessingPhase|Policy|Presentation)|VoiceInkAudioImportPresentation' \
+  'VoiceInkAudioFileQueue(Status|ProcessingPhase|Policy|Diagnostics|Presentation)|VoiceInkAudioImportPresentation' \
   VoiceInkCore/Sources/VoiceInkCore/SupportedMedia.swift
 
 require_pattern \
   "shared audio-file queue policy owns mutation decisions" \
   'VoiceInkAudioFileQueuePolicy|eligibleAdditionURLs|canRemoveItem|statusAfterRetryRequest|nextPendingItemID|hasPendingItems|statusesAfterCancelingProcessing' \
+  VoiceInkCore/Sources/VoiceInkCore/SupportedMedia.swift
+
+require_pattern \
+  "shared audio-file queue diagnostics live in VoiceInkCore" \
+  'VoiceInkAudioFileQueueDiagnostics|enhancementFailedMessage|transcriptionErrorMessage|Enhancement failed:|Transcription error:' \
   VoiceInkCore/Sources/VoiceInkCore/SupportedMedia.swift
 
 reject_pattern \
@@ -2134,6 +2139,11 @@ require_pattern \
   VoiceInk/Services/AudioFileTranscriptionManager.swift
 
 require_pattern \
+  "macOS audio queue manager uses shared queue diagnostics" \
+  'VoiceInkAudioFileQueueDiagnostics\.(enhancementFailedMessage|transcriptionErrorMessage)' \
+  VoiceInk/Services/AudioFileTranscriptionManager.swift
+
+require_pattern \
   "macOS audio file row uses shared queue presentation" \
   'VoiceInkAudioFileQueuePresentation\.(pendingStatusSystemImageName|pendingStatusText|completedStatusSystemImageName|failedStatusSystemImageName|retryButtonSystemImageName)' \
   VoiceInk/Views/AudioFileRow.swift
@@ -2145,7 +2155,7 @@ require_pattern \
 
 require_pattern \
   "core tests pin audio-file queue status and presentation" \
-  'testAudioImportPresentationPreservesMacOSQueueCopyAndActions|testAudioFileQueueProcessingPhasesPreserveCopy|testAudioFileQueueStatusCancelingProcessingResetsOnlyProcessingItems|testAudioFileQueuePolicyKeepsOnlyExistingSupportedNonActivePaths|testAudioFileQueuePolicyPreservesMutationDecisions|testAudioFileQueuePresentationPreservesRowCopyAndIcons' \
+  'testAudioImportPresentationPreservesMacOSQueueCopyAndActions|testAudioFileQueueProcessingPhasesPreserveCopy|testAudioFileQueueStatusCancelingProcessingResetsOnlyProcessingItems|testAudioFileQueuePolicyKeepsOnlyExistingSupportedNonActivePaths|testAudioFileQueuePolicyPreservesMutationDecisions|testAudioFileQueueDiagnosticsPreserveMacOSLogCopy|testAudioFileQueuePresentationPreservesRowCopyAndIcons' \
   VoiceInkCore/Tests/VoiceInkCoreTests/SupportedMediaTests.swift
 
 require_pattern \
@@ -2155,7 +2165,7 @@ require_pattern \
 
 require_pattern \
   "core check runner executes audio-file queue status and presentation tests" \
-  'testAudioImportPresentationPreservesMacOSQueueCopyAndActions|testAudioFileQueueProcessingPhasesPreserveCopy|testAudioFileQueueStatusCancelingProcessingResetsOnlyProcessingItems|testAudioFileQueuePolicyKeepsOnlyExistingSupportedNonActivePaths|testAudioFileQueuePolicyPreservesMutationDecisions|testAudioFileQueuePresentationPreservesRowCopyAndIcons' \
+  'testAudioImportPresentationPreservesMacOSQueueCopyAndActions|testAudioFileQueueProcessingPhasesPreserveCopy|testAudioFileQueueStatusCancelingProcessingResetsOnlyProcessingItems|testAudioFileQueuePolicyKeepsOnlyExistingSupportedNonActivePaths|testAudioFileQueuePolicyPreservesMutationDecisions|testAudioFileQueueDiagnosticsPreserveMacOSLogCopy|testAudioFileQueuePresentationPreservesRowCopyAndIcons' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \
@@ -2174,8 +2184,8 @@ reject_pattern \
   VoiceInk/Models/AudioFileQueueItem.swift
 
 reject_pattern \
-  "macOS audio queue manager avoids shell-owned queue status predicates" \
-  'guard +case +\.(pending|failed) += +item\.status|if +case +\.processing += +item\.status|queue\.(contains|first) +\{ +if +case +\.pending += +\$0\.status' \
+  "macOS audio queue manager avoids shell-owned queue status predicates and diagnostics" \
+  'guard +case +\.(pending|failed) += +item\.status|if +case +\.processing += +item\.status|queue\.(contains|first) +\{ +if +case +\.pending += +\$0\.status|"Enhancement failed:|"Transcription error:|category: "AudioTranscriptionManager"' \
   VoiceInk/Services/AudioFileTranscriptionManager.swift
 
 reject_pattern \
@@ -16816,7 +16826,8 @@ require_patterns \
   'modelPrewarm = "ModelPrewarm"' \
   'cursorPaster = "CursorPaster"' \
   'sessionMetricRecorder = "SessionMetricRecorder"' \
-  'soundPlaybackEngine = "SoundPlaybackEngine"'
+  'soundPlaybackEngine = "SoundPlaybackEngine"' \
+  'audioTranscriptionManager = "AudioTranscriptionManager"'
 
 require_pattern \
   "macOS window manager uses shared log category identity" \
@@ -16872,6 +16883,12 @@ require_patterns \
   VoiceInk/SoundPlaybackEngine.swift \
   'Logger\(' \
   'category: VoiceInkMacOSLogCategory\.soundPlaybackEngine'
+
+require_patterns \
+  "macOS audio transcription manager uses shared log category identity" \
+  VoiceInk/Services/AudioFileTranscriptionManager.swift \
+  'Logger\(' \
+  'category: VoiceInkMacOSLogCategory\.audioTranscriptionManager'
 
 require_pattern \
   "core checks execute macOS window identity test" \

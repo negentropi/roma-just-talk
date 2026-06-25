@@ -50,6 +50,7 @@ final class AppIdentityTests: XCTestCase {
     func testMacOSLogCategoriesPreserveDiagnosticsIdentity() {
         XCTAssertEqual(VoiceInkMacOSLogCategory.logExporter, "LogExporter")
         XCTAssertEqual(VoiceInkMacOSLogCategory.windowManager, "WindowManager")
+        XCTAssertEqual(VoiceInkMacOSLogCategory.menuBarManager, "MenuBarManager")
         XCTAssertEqual(VoiceInkMacOSLogCategory.apiKeyManager, "APIKeyManager")
         XCTAssertEqual(VoiceInkMacOSLogCategory.keychainService, "KeychainService")
         XCTAssertEqual(VoiceInkMacOSLogCategory.polarService, "PolarService")

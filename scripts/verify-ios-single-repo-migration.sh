@@ -16132,6 +16132,14 @@ require_patterns \
   'selectionCheckmarkSystemImageName' \
   'pickerSystemImageName'
 
+require_patterns \
+  "shared macOS menu bar diagnostics live in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift \
+  'VoiceInkMacOSMenuBarDiagnostics' \
+  'windowDidCloseAccessoryPolicyMessage' \
+  'openMainWindowRequestedMessage' \
+  'openHistoryWindowDependenciesMissingMessage'
+
 require_pattern \
   "shared macOS shell backup preferences live in VoiceInkCore" \
   'VoiceInkMacOSShellBackupPreferences' \
@@ -16192,6 +16200,14 @@ require_pattern \
   'VoiceInkMenuBarPreference\.(saveIsMenuBarOnly|isMenuBarOnly)' \
   VoiceInk/MenuBarManager.swift
 
+require_patterns \
+  "macOS menu bar manager uses shared log category and diagnostics" \
+  VoiceInk/MenuBarManager.swift \
+  'VoiceInkMacOSLogCategory\.menuBarManager' \
+  'VoiceInkMacOSMenuBarDiagnostics\.windowDidCloseAccessoryPolicyMessage' \
+  'VoiceInkMacOSMenuBarDiagnostics\.openMainWindowRequestedMessage' \
+  'VoiceInkMacOSMenuBarDiagnostics\.openHistoryWindowDependenciesMissingMessage'
+
 require_pattern \
   "macOS app scene uses shared menu bar icon preference" \
   'VoiceInkMenuBarPreference\.(showMenuBarIconKey|defaultShowMenuBarIcon)' \
@@ -16225,12 +16241,12 @@ require_pattern \
 
 require_pattern \
   "core checks execute menu bar preference tests" \
-  'testSharedPreferenceDefaultsPreserveExistingMacOSMenuBarPolicy|testMenuBarPreferencePreservesRegisteredDefaultsAndStorage|testMacOSMenuBarPresentationPreservesMenuCopyAndIcons' \
+  'testSharedPreferenceDefaultsPreserveExistingMacOSMenuBarPolicy|testMenuBarPreferencePreservesRegisteredDefaultsAndStorage|testMacOSMenuBarPresentationPreservesMenuCopyAndIcons|testMacOSMenuBarDiagnosticsPreserveManagerCopy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "migration checklist tracks shared macOS menu bar presentation" \
-  'macOS menu-bar icon visibility, dock-icon hiding storage/defaults, menu labels, empty-state copy, dynamic selection labels, and picker/checkmark symbols.*VoiceInkMenuBarPreference`/`VoiceInkMacOSMenuBarPresentation' \
+  'macOS menu-bar icon visibility, dock-icon hiding storage/defaults, menu labels, empty-state copy, dynamic selection labels, picker/checkmark symbols, and menu-bar diagnostic copy.*VoiceInkMenuBarPreference`/`VoiceInkMacOSMenuBarPresentation`/`VoiceInkMacOSMenuBarDiagnostics' \
   docs/ios-single-repo-migration.md
 
 require_pattern \
@@ -16252,6 +16268,11 @@ reject_pattern \
   VoiceInk/Views/MenuBarView.swift \
   VoiceInk/Views/Settings/SettingsView.swift \
   VoiceInk/Services/SystemInfoService.swift
+
+reject_pattern \
+  "macOS menu bar manager avoids shell-owned diagnostics and log category" \
+  'category: "MenuBarManager"|"(windowDidClose: no visible windows, switching to \.accessory policy|focusMainWindow: activation policy set to \.regular|focusMainWindow: showMainWindow returned nil|updateAppActivationPolicy: switching to \.(accessory|regular)|openMainWindowAndNavigate:|openHistoryWindow:)' \
+  VoiceInk/MenuBarManager.swift
 
 reject_pattern \
   "macOS menu bar view avoids shell-owned menu copy and symbol policy" \
@@ -16588,6 +16609,7 @@ require_patterns \
   'VoiceInkMacOSLogCategory' \
   'logExporter = "LogExporter"' \
   'windowManager = "WindowManager"' \
+  'menuBarManager = "MenuBarManager"' \
   'apiKeyManager = "APIKeyManager"' \
   'keychainService = "KeychainService"' \
   'polarService = "PolarService"' \

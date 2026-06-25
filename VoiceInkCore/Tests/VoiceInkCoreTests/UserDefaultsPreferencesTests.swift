@@ -632,6 +632,67 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.pickerSystemImageName, "chevron.up.chevron.down")
     }
 
+    func testMacOSMenuBarDiagnosticsPreserveManagerCopy() {
+        XCTAssertEqual(
+            VoiceInkMacOSMenuBarDiagnostics.windowDidCloseAccessoryPolicyMessage,
+            "windowDidClose: no visible windows, switching to .accessory policy"
+        )
+        XCTAssertEqual(
+            VoiceInkMacOSMenuBarDiagnostics.focusMainWindowActivationPolicyMessage,
+            "focusMainWindow: activation policy set to .regular"
+        )
+        XCTAssertEqual(
+            VoiceInkMacOSMenuBarDiagnostics.focusMainWindowFailedMessage,
+            "focusMainWindow: showMainWindow returned nil"
+        )
+        XCTAssertEqual(
+            VoiceInkMacOSMenuBarDiagnostics.updateActivationPolicyAccessoryMessage,
+            "updateAppActivationPolicy: switching to .accessory (dock icon hidden)"
+        )
+        XCTAssertEqual(
+            VoiceInkMacOSMenuBarDiagnostics.updateActivationPolicyRegularMessage,
+            "updateAppActivationPolicy: switching to .regular (dock icon visible)"
+        )
+        XCTAssertEqual(
+            VoiceInkMacOSMenuBarDiagnostics.openMainWindowRequestedMessage(
+                destination: "Settings",
+                isMenuBarOnly: true
+            ),
+            "openMainWindowAndNavigate: requested destination=Settings, isMenuBarOnly=true"
+        )
+        XCTAssertEqual(
+            VoiceInkMacOSMenuBarDiagnostics.openMainWindowActivationPolicyMessage,
+            "openMainWindowAndNavigate: activation policy set to .regular"
+        )
+        XCTAssertEqual(
+            VoiceInkMacOSMenuBarDiagnostics.openMainWindowFailedMessage(destination: "Settings"),
+            "openMainWindowAndNavigate: showMainWindow returned nil — cannot navigate to Settings"
+        )
+        XCTAssertEqual(
+            VoiceInkMacOSMenuBarDiagnostics.openMainWindowPostingNavigationMessage(destination: "Settings"),
+            "openMainWindowAndNavigate: window shown, posting navigation notification for Settings"
+        )
+        XCTAssertEqual(
+            VoiceInkMacOSMenuBarDiagnostics.openMainWindowNavigationPostedMessage(destination: "Settings"),
+            "openMainWindowAndNavigate: navigation notification posted for Settings"
+        )
+        XCTAssertEqual(
+            VoiceInkMacOSMenuBarDiagnostics.openHistoryWindowDependenciesMissingMessage(
+                hasModelContainer: false,
+                hasEngine: true
+            ),
+            "openHistoryWindow: dependencies not configured (modelContainer=false, engine=true)"
+        )
+        XCTAssertEqual(
+            VoiceInkMacOSMenuBarDiagnostics.openHistoryWindowOpeningMessage,
+            "openHistoryWindow: opening history window"
+        )
+        XCTAssertEqual(
+            VoiceInkMacOSMenuBarDiagnostics.openHistoryWindowActivationPolicyMessage,
+            "openHistoryWindow: activation policy set to .regular"
+        )
+    }
+
     func testMacOSShellBackupPreferencesPreserveExportShape() {
         XCTAssertEqual(
             VoiceInkMacOSShellBackupPreference.backupPreferences(

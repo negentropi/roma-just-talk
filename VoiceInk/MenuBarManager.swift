@@ -5,7 +5,7 @@ import OSLog
 import VoiceInkCore
 
 class MenuBarManager: ObservableObject {
-    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "MenuBarManager")
+    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: VoiceInkMacOSLogCategory.menuBarManager)
     @Published var isMenuBarOnly: Bool {
         didSet {
             VoiceInkMenuBarPreference.saveIsMenuBarOnly(isMenuBarOnly)
@@ -40,7 +40,7 @@ class MenuBarManager: ObservableObject {
                 $0.isVisible && $0.level == .normal && !$0.styleMask.contains(.nonactivatingPanel)
             }
             if !hasVisibleWindows && NSApplication.shared.activationPolicy() != .accessory {
-                self?.logger.notice("windowDidClose: no visible windows, switching to .accessory policy")
+                self?.logger.notice("\(VoiceInkMacOSMenuBarDiagnostics.windowDidCloseAccessoryPolicyMessage, privacy: .public)")
                 NSApplication.shared.setActivationPolicy(.accessory)
             }
         }
@@ -61,9 +61,9 @@ class MenuBarManager: ObservableObject {
     
     func focusMainWindow() {
         NSApplication.shared.setActivationPolicy(.regular)
-        logger.notice("focusMainWindow: activation policy set to .regular")
+        logger.notice("\(VoiceInkMacOSMenuBarDiagnostics.focusMainWindowActivationPolicyMessage, privacy: .public)")
         if WindowManager.shared.showMainWindow() == nil {
-            logger.error("focusMainWindow: showMainWindow returned nil")
+            logger.error("\(VoiceInkMacOSMenuBarDiagnostics.focusMainWindowFailedMessage, privacy: .public)")
         }
     }
     
@@ -72,11 +72,11 @@ class MenuBarManager: ObservableObject {
             guard let self else { return }
             let application = NSApplication.shared
             if self.isMenuBarOnly {
-                self.logger.notice("updateAppActivationPolicy: switching to .accessory (dock icon hidden)")
+                self.logger.notice("\(VoiceInkMacOSMenuBarDiagnostics.updateActivationPolicyAccessoryMessage, privacy: .public)")
                 application.setActivationPolicy(.accessory)
                 WindowManager.shared.hideMainWindow()
             } else {
-                self.logger.notice("updateAppActivationPolicy: switching to .regular (dock icon visible)")
+                self.logger.notice("\(VoiceInkMacOSMenuBarDiagnostics.updateActivationPolicyRegularMessage, privacy: .public)")
                 application.setActivationPolicy(.regular)
                 WindowManager.shared.showMainWindow()
             }
@@ -90,17 +90,27 @@ class MenuBarManager: ObservableObject {
     }
     
     func openMainWindowAndNavigate(to destination: String) {
-        logger.notice("openMainWindowAndNavigate: requested destination=\(destination, privacy: .public), isMenuBarOnly=\(self.isMenuBarOnly, privacy: .public)")
+        let requestedMessage = VoiceInkMacOSMenuBarDiagnostics.openMainWindowRequestedMessage(
+            destination: destination,
+            isMenuBarOnly: isMenuBarOnly
+        )
+        logger.notice("\(requestedMessage, privacy: .public)")
 
         NSApplication.shared.setActivationPolicy(.regular)
-        logger.notice("openMainWindowAndNavigate: activation policy set to .regular")
+        logger.notice("\(VoiceInkMacOSMenuBarDiagnostics.openMainWindowActivationPolicyMessage, privacy: .public)")
 
         guard WindowManager.shared.showMainWindow() != nil else {
-            logger.error("openMainWindowAndNavigate: showMainWindow returned nil — cannot navigate to \(destination, privacy: .public)")
+            let failureMessage = VoiceInkMacOSMenuBarDiagnostics.openMainWindowFailedMessage(
+                destination: destination
+            )
+            logger.error("\(failureMessage, privacy: .public)")
             return
         }
 
-        logger.notice("openMainWindowAndNavigate: window shown, posting navigation notification for \(destination, privacy: .public)")
+        let postingMessage = VoiceInkMacOSMenuBarDiagnostics.openMainWindowPostingNavigationMessage(
+            destination: destination
+        )
+        logger.notice("\(postingMessage, privacy: .public)")
 
         // Post a notification to navigate to the desired destination
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
@@ -109,19 +119,26 @@ class MenuBarManager: ObservableObject {
                 object: nil,
                 userInfo: VoiceInkMacOSNavigationRequest.userInfo(destination: destination)
             )
-            self?.logger.notice("openMainWindowAndNavigate: navigation notification posted for \(destination, privacy: .public)")
+            let postedMessage = VoiceInkMacOSMenuBarDiagnostics.openMainWindowNavigationPostedMessage(
+                destination: destination
+            )
+            self?.logger.notice("\(postedMessage, privacy: .public)")
         }
     }
 
     func openHistoryWindow() {
         guard let modelContainer = modelContainer,
               let engine = engine else {
-            logger.error("openHistoryWindow: dependencies not configured (modelContainer=\(self.modelContainer != nil, privacy: .public), engine=\(self.engine != nil, privacy: .public))")
+            let failureMessage = VoiceInkMacOSMenuBarDiagnostics.openHistoryWindowDependenciesMissingMessage(
+                hasModelContainer: self.modelContainer != nil,
+                hasEngine: self.engine != nil
+            )
+            logger.error("\(failureMessage, privacy: .public)")
             return
         }
-        logger.notice("openHistoryWindow: opening history window")
+        logger.notice("\(VoiceInkMacOSMenuBarDiagnostics.openHistoryWindowOpeningMessage, privacy: .public)")
         NSApplication.shared.setActivationPolicy(.regular)
-        logger.notice("openHistoryWindow: activation policy set to .regular")
+        logger.notice("\(VoiceInkMacOSMenuBarDiagnostics.openHistoryWindowActivationPolicyMessage, privacy: .public)")
         HistoryWindowController.shared.showHistoryWindow(
             modelContainer: modelContainer,
             engine: engine

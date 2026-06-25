@@ -637,6 +637,40 @@ public enum VoiceInkMacOSMenuBarPresentation {
     private static let noneDisplayText = "None"
 }
 
+public enum VoiceInkMacOSMenuBarDiagnostics {
+    public static let windowDidCloseAccessoryPolicyMessage = "windowDidClose: no visible windows, switching to .accessory policy"
+    public static let focusMainWindowActivationPolicyMessage = "focusMainWindow: activation policy set to .regular"
+    public static let focusMainWindowFailedMessage = "focusMainWindow: showMainWindow returned nil"
+    public static let updateActivationPolicyAccessoryMessage = "updateAppActivationPolicy: switching to .accessory (dock icon hidden)"
+    public static let updateActivationPolicyRegularMessage = "updateAppActivationPolicy: switching to .regular (dock icon visible)"
+    public static let openMainWindowActivationPolicyMessage = "openMainWindowAndNavigate: activation policy set to .regular"
+    public static let openHistoryWindowOpeningMessage = "openHistoryWindow: opening history window"
+    public static let openHistoryWindowActivationPolicyMessage = "openHistoryWindow: activation policy set to .regular"
+
+    public static func openMainWindowRequestedMessage(destination: String, isMenuBarOnly: Bool) -> String {
+        "openMainWindowAndNavigate: requested destination=\(destination), isMenuBarOnly=\(isMenuBarOnly)"
+    }
+
+    public static func openMainWindowFailedMessage(destination: String) -> String {
+        "openMainWindowAndNavigate: showMainWindow returned nil — cannot navigate to \(destination)"
+    }
+
+    public static func openMainWindowPostingNavigationMessage(destination: String) -> String {
+        "openMainWindowAndNavigate: window shown, posting navigation notification for \(destination)"
+    }
+
+    public static func openMainWindowNavigationPostedMessage(destination: String) -> String {
+        "openMainWindowAndNavigate: navigation notification posted for \(destination)"
+    }
+
+    public static func openHistoryWindowDependenciesMissingMessage(
+        hasModelContainer: Bool,
+        hasEngine: Bool
+    ) -> String {
+        "openHistoryWindow: dependencies not configured (modelContainer=\(hasModelContainer), engine=\(hasEngine))"
+    }
+}
+
 public struct VoiceInkMacOSShellBackupPreferences: Codable, Equatable, Sendable {
     public let launchAtLoginEnabled: Bool?
     public let isMenuBarOnly: Bool?

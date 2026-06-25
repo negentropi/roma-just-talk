@@ -412,6 +412,38 @@ final class DictionaryPolicyTests: XCTestCase {
         XCTAssertNil(alertPresentation)
     }
 
+    func testVocabularySubmissionPlanAppliesAcceptedWordsToRuntimeState() {
+        let plan = VoiceInkDictionaryPolicy.vocabularySubmissionPlan(
+            input: "Roma, VoiceInk",
+            existingWords: ["Cursor"]
+        )
+        var words = ["Cursor"]
+
+        plan.applyRuntimeState(currentWords: words) { words = $0 }
+
+        XCTAssertEqual(words, ["Cursor", "Roma", "VoiceInk"])
+    }
+
+    func testVocabularyDraftSubmissionAppliesPersistenceFailureInCore() {
+        let submission = VoiceInkVocabularyDraftState(draft: "Roma, VoiceInk")
+            .submitting(existingWords: [])
+        var insertedWords = [String]()
+
+        let returnedSubmission = submission.applyPersistenceRuntimeState { word in
+            insertedWords.append(word)
+            return word == "Roma" ? "Disk full" : nil
+        }
+
+        XCTAssertEqual(insertedWords, ["Roma", "VoiceInk"])
+        XCTAssertEqual(returnedSubmission.submittedDraft, "Roma, VoiceInk")
+        XCTAssertEqual(returnedSubmission.plan.wordsToInsert, ["Roma", "VoiceInk"])
+        XCTAssertEqual(returnedSubmission.draftStateAfterSubmit, VoiceInkVocabularyDraftState(draft: "Roma, VoiceInk"))
+        XCTAssertEqual(
+            returnedSubmission.alertPresentation,
+            .vocabulary(message: "Failed to add 'Roma': Disk full")
+        )
+    }
+
     func testVocabularySubmissionPlanKeepsBlankDraftWithoutAlert() {
         let plan = VoiceInkDictionaryPolicy.vocabularySubmissionPlan(
             input: " , \n ",
@@ -712,6 +744,51 @@ final class DictionaryPolicyTests: XCTestCase {
         XCTAssertEqual(
             alertPresentation,
             .wordReplacement(message: "'Roma' already exists in word replacements")
+        )
+    }
+
+    func testWordReplacementSubmissionPlanAppliesAcceptedRuleToRuntimeState() {
+        let plan = VoiceInkDictionaryPolicy.wordReplacementSubmissionPlan(
+            original: "Roma",
+            replacement: "Roma Just Talk",
+            existingOriginalTexts: []
+        )
+        var rules = [VoiceInkWordReplacementRule]()
+
+        plan.applyRuntimeState(currentRules: rules) { rules = $0 }
+
+        XCTAssertEqual(
+            rules,
+            [VoiceInkWordReplacementRule(originalText: "Roma", replacementText: "Roma Just Talk")]
+        )
+    }
+
+    func testWordReplacementDraftSubmissionAppliesPersistenceFailureInCore() {
+        let submission = VoiceInkWordReplacementDraftState(
+            original: "Roma",
+            replacement: "Roma Just Talk"
+        )
+        .submitting(existingOriginalTexts: [])
+        var insertedRules = [VoiceInkWordReplacementRule]()
+
+        let returnedSubmission = submission.applyPersistenceRuntimeState { rule in
+            insertedRules.append(rule)
+            return "Disk full"
+        }
+
+        XCTAssertEqual(
+            insertedRules,
+            [VoiceInkWordReplacementRule(originalText: "Roma", replacementText: "Roma Just Talk")]
+        )
+        XCTAssertEqual(returnedSubmission.submittedOriginal, "Roma")
+        XCTAssertEqual(returnedSubmission.submittedReplacement, "Roma Just Talk")
+        XCTAssertEqual(
+            returnedSubmission.draftStateAfterSubmit,
+            VoiceInkWordReplacementDraftState(original: "Roma", replacement: "Roma Just Talk")
+        )
+        XCTAssertEqual(
+            returnedSubmission.alertPresentation,
+            .wordReplacement(message: "Failed to add replacement: Disk full")
         )
     }
 

@@ -10,28 +10,9 @@ enum DictionaryService {
         _ submission: VoiceInkVocabularyDraftSubmission,
         context: ModelContext
     ) -> VoiceInkVocabularyDraftSubmission {
-        let plan = submission.plan
-        guard plan.shouldInsert else { return submission }
-
-        var errors = [String]()
-        for word in plan.wordsToInsert {
-            if let error = insertVocabularyWord(word, context: context) {
-                errors.append(error)
-            }
+        submission.applyPersistenceRuntimeState { word in
+            insertVocabularyWord(word, context: context)
         }
-
-        guard !errors.isEmpty else { return submission }
-
-        let failurePlan = VoiceInkVocabularySubmissionPlan(
-            wordsToInsert: plan.wordsToInsert,
-            draftAfterSubmit: submission.submittedDraft,
-            alertPresentation: VoiceInkDictionaryAlertPresentation.failedToAddVocabularyWords(errors)
-        )
-        return VoiceInkVocabularyDraftSubmission(
-            submittedDraft: submission.submittedDraft,
-            plan: failurePlan,
-            draftStateAfterSubmit: VoiceInkVocabularyDraftState(draft: failurePlan.draftAfterSubmit)
-        )
     }
 
     @discardableResult
@@ -43,10 +24,7 @@ enum DictionaryService {
             return nil
         } catch {
             context.delete(entry)
-            return VoiceInkDictionaryAlertPresentation.failedToAddVocabularyWord(
-                word,
-                localizedDescription: error.localizedDescription
-            )
+            return error.localizedDescription
         }
     }
 
@@ -57,36 +35,17 @@ enum DictionaryService {
         _ submission: VoiceInkWordReplacementDraftSubmission,
         context: ModelContext
     ) -> VoiceInkWordReplacementDraftSubmission {
-        let plan = submission.plan
-        guard let rule = plan.ruleToInsert else { return submission }
-
-        let entry = WordReplacement(originalText: rule.originalText, replacementText: rule.replacementText)
-        context.insert(entry)
-        do {
-            try context.save()
-            WordReplacementService.shared.invalidateCache()
-            return submission
-        } catch {
-            context.delete(entry)
-            let failurePlan = VoiceInkWordReplacementSubmissionPlan(
-                ruleToInsert: rule,
-                originalDraftAfterSubmit: submission.submittedOriginal,
-                replacementDraftAfterSubmit: submission.submittedReplacement,
-                alertPresentation: .wordReplacement(
-                    message: VoiceInkDictionaryAlertPresentation.failedToAddWordReplacement(
-                        localizedDescription: error.localizedDescription
-                    )
-                )
-            )
-            return VoiceInkWordReplacementDraftSubmission(
-                submittedOriginal: submission.submittedOriginal,
-                submittedReplacement: submission.submittedReplacement,
-                plan: failurePlan,
-                draftStateAfterSubmit: VoiceInkWordReplacementDraftState(
-                    original: failurePlan.originalDraftAfterSubmit,
-                    replacement: failurePlan.replacementDraftAfterSubmit
-                )
-            )
+        submission.applyPersistenceRuntimeState { rule in
+            let entry = WordReplacement(originalText: rule.originalText, replacementText: rule.replacementText)
+            context.insert(entry)
+            do {
+                try context.save()
+                WordReplacementService.shared.invalidateCache()
+                return nil
+            } catch {
+                context.delete(entry)
+                return error.localizedDescription
+            }
         }
     }
 

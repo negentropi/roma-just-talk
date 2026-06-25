@@ -211,9 +211,7 @@ final class AppSettings: ObservableObject {
     }
 
     func applyWordReplacementSubmissionPlan(_ plan: VoiceInkWordReplacementSubmissionPlan) {
-        if let updatedRules = plan.updatedRulesIfChanged(from: wordReplacements) {
-            wordReplacements = updatedRules
-        }
+        plan.applyRuntimeState(currentRules: wordReplacements) { wordReplacements = $0 }
     }
 
     func sortedWordReplacements(
@@ -241,9 +239,7 @@ final class AppSettings: ObservableObject {
     }
 
     func applyCustomVocabularySubmissionPlan(_ plan: VoiceInkVocabularySubmissionPlan) {
-        if let updatedTerms = plan.updatedWordsIfChanged(from: customVocabularyTerms) {
-            customVocabularyTerms = updatedTerms
-        }
+        plan.applyRuntimeState(currentWords: customVocabularyTerms) { customVocabularyTerms = $0 }
     }
 
     func sortedCustomVocabularyTerms(mode: VoiceInkVocabularySortMode) -> [String] {

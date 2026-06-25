@@ -7604,7 +7604,12 @@ require_pattern \
 
 require_pattern \
   "shared vocabulary submission policy owns list application" \
-  'func updatedWordsIfChanged\(from existingWords: \[String\]\)' \
+  'func updatedWordsIfChanged\(from existingWords: \[String\]\)|func applyRuntimeState\([[:space:]]*currentWords: \[String\]' \
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
+
+require_pattern \
+  "shared vocabulary draft submission owns persistence failure application" \
+  'VoiceInkVocabularyDraftSubmission|applyPersistenceRuntimeState|insertVocabularyWord|failedToAddVocabularyWords' \
   VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
 
 require_pattern \
@@ -7639,7 +7644,12 @@ require_pattern \
 
 require_pattern \
   "shared word-replacement submission policy owns list application" \
-  'func updatedRulesIfChanged' \
+  'func updatedRulesIfChanged|func applyRuntimeState\([[:space:]]*currentRules: \[VoiceInkWordReplacementRule\]' \
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
+
+require_pattern \
+  "shared word-replacement draft submission owns persistence failure application" \
+  'VoiceInkWordReplacementDraftSubmission|applyPersistenceRuntimeState|insertWordReplacementRule|failedToAddWordReplacement' \
   VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
 
 require_pattern \
@@ -7680,6 +7690,11 @@ require_pattern \
 require_pattern \
   "shared word-replacement draft state existing-rules check runs in VoiceInkCore" \
   'DictionaryPolicyTests\.testWordReplacementDraftStateSubmitsAgainstExistingRules' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "shared dictionary runtime application checks run in VoiceInkCore" \
+  'DictionaryPolicyTests\.testVocabularySubmissionPlanAppliesAcceptedWordsToRuntimeState|DictionaryPolicyTests\.testVocabularyDraftSubmissionAppliesPersistenceFailureInCore|DictionaryPolicyTests\.testWordReplacementSubmissionPlanAppliesAcceptedRuleToRuntimeState|DictionaryPolicyTests\.testWordReplacementDraftSubmissionAppliesPersistenceFailureInCore' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -7797,7 +7812,7 @@ require_pattern \
 
 require_pattern \
   "iOS vocabulary adapter applies shared submission result" \
-  'plan\.updatedWordsIfChanged\(from: customVocabularyTerms\)' \
+  'plan\.applyRuntimeState\(currentWords: customVocabularyTerms\)' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \
@@ -7842,12 +7857,12 @@ require_pattern \
 
 require_pattern \
   "iOS word-replacement adapter applies shared submission result" \
-  'plan\.updatedRulesIfChanged\(from: wordReplacements\)' \
+  'plan\.applyRuntimeState\(currentRules: wordReplacements\)' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 reject_pattern \
   "iOS dictionary adapters avoid shell-owned changed-list comparison" \
-  'let updated(Rules|Terms) = plan\.applying|wordReplacements != updatedRules|customVocabularyTerms != updatedTerms' \
+  'let updated(Rules|Terms) = plan\.applying|if let updated(Rules|Terms) = plan\.updated|wordReplacements != updatedRules|customVocabularyTerms != updatedTerms' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \
@@ -7898,6 +7913,16 @@ require_pattern \
 require_pattern \
   "macOS word-replacement adapter accepts shared draft submission type" \
   '_ submission: VoiceInkWordReplacementDraftSubmission' \
+  VoiceInk/Services/DictionaryService.swift
+
+require_pattern \
+  "macOS dictionary adapter delegates insert failure runtime application to core" \
+  'applyPersistenceRuntimeState' \
+  VoiceInk/Services/DictionaryService.swift
+
+reject_pattern \
+  "macOS dictionary adapter avoids shell-owned insert payload unpacking" \
+  'plan\.(wordsToInsert|ruleToInsert)|VoiceInkVocabularySubmissionPlan\(|VoiceInkWordReplacementSubmissionPlan\(' \
   VoiceInk/Services/DictionaryService.swift
 
 require_pattern \

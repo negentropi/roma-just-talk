@@ -66,6 +66,14 @@ public struct VoiceInkVocabularySubmissionPlan: Equatable, Sendable {
         let updatedWords = applying(to: existingWords)
         return VoiceInkPreferenceList.changedElements(from: existingWords, to: updatedWords)
     }
+
+    public func applyRuntimeState(
+        currentWords: [String],
+        setWords: ([String]) -> Void
+    ) {
+        guard let updatedWords = updatedWordsIfChanged(from: currentWords) else { return }
+        setWords(updatedWords)
+    }
 }
 
 public struct VoiceInkVocabularyDraftSubmission: Equatable, Sendable, VoiceInkDictionaryDraftRuntimeSubmission {
@@ -85,6 +93,35 @@ public struct VoiceInkVocabularyDraftSubmission: Equatable, Sendable, VoiceInkDi
 
     public var alertPresentation: VoiceInkDictionaryAlertPresentation? {
         plan.alertPresentation
+    }
+
+    @discardableResult
+    public func applyPersistenceRuntimeState(
+        insertVocabularyWord: (String) -> String?
+    ) -> Self {
+        guard plan.shouldInsert else { return self }
+
+        let failureMessages = plan.wordsToInsert.compactMap { word -> String? in
+            insertVocabularyWord(word).map {
+                VoiceInkDictionaryAlertPresentation.failedToAddVocabularyWord(
+                    word,
+                    localizedDescription: $0
+                )
+            }
+        }
+
+        guard !failureMessages.isEmpty else { return self }
+
+        let failurePlan = VoiceInkVocabularySubmissionPlan(
+            wordsToInsert: plan.wordsToInsert,
+            draftAfterSubmit: submittedDraft,
+            alertPresentation: VoiceInkDictionaryAlertPresentation.failedToAddVocabularyWords(failureMessages)
+        )
+        return VoiceInkVocabularyDraftSubmission(
+            submittedDraft: submittedDraft,
+            plan: failurePlan,
+            draftStateAfterSubmit: VoiceInkVocabularyDraftState(draft: failurePlan.draftAfterSubmit)
+        )
     }
 }
 
@@ -162,6 +199,14 @@ public struct VoiceInkWordReplacementSubmissionPlan: Equatable, Sendable {
         let updatedRules = applying(to: existingRules)
         return VoiceInkPreferenceList.changedElements(from: existingRules, to: updatedRules)
     }
+
+    public func applyRuntimeState(
+        currentRules: [VoiceInkWordReplacementRule],
+        setRules: ([VoiceInkWordReplacementRule]) -> Void
+    ) {
+        guard let updatedRules = updatedRulesIfChanged(from: currentRules) else { return }
+        setRules(updatedRules)
+    }
 }
 
 public struct VoiceInkWordReplacementDraftSubmission: Equatable, Sendable, VoiceInkDictionaryDraftRuntimeSubmission {
@@ -184,6 +229,36 @@ public struct VoiceInkWordReplacementDraftSubmission: Equatable, Sendable, Voice
 
     public var alertPresentation: VoiceInkDictionaryAlertPresentation? {
         plan.alertPresentation
+    }
+
+    @discardableResult
+    public func applyPersistenceRuntimeState(
+        insertWordReplacementRule: (VoiceInkWordReplacementRule) -> String?
+    ) -> Self {
+        guard let rule = plan.ruleToInsert,
+              let localizedDescription = insertWordReplacementRule(rule) else {
+            return self
+        }
+
+        let failurePlan = VoiceInkWordReplacementSubmissionPlan(
+            ruleToInsert: rule,
+            originalDraftAfterSubmit: submittedOriginal,
+            replacementDraftAfterSubmit: submittedReplacement,
+            alertPresentation: .wordReplacement(
+                message: VoiceInkDictionaryAlertPresentation.failedToAddWordReplacement(
+                    localizedDescription: localizedDescription
+                )
+            )
+        )
+        return VoiceInkWordReplacementDraftSubmission(
+            submittedOriginal: submittedOriginal,
+            submittedReplacement: submittedReplacement,
+            plan: failurePlan,
+            draftStateAfterSubmit: VoiceInkWordReplacementDraftState(
+                original: failurePlan.originalDraftAfterSubmit,
+                replacement: failurePlan.replacementDraftAfterSubmit
+            )
+        )
     }
 }
 

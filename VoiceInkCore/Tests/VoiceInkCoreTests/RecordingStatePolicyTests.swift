@@ -644,6 +644,24 @@ final class RecordingStatePolicyTests: XCTestCase {
         )
     }
 
+    func testAppGroupRecordingStateMutationPlanAppliesRuntimeNotification() {
+        var notifications: [String] = []
+
+        VoiceInkAppGroupRecordingStatePolicy.stopRequestedMutationPlan(
+            now: Date(timeIntervalSince1970: 42)
+        ).applyRuntimeState { notifications.append($0) }
+
+        VoiceInkAppGroupRecordingStatePolicy.recordingStateMutationPlan(
+            isRecording: true,
+            now: Date(timeIntervalSince1970: 43)
+        ).applyRuntimeState { notifications.append($0) }
+
+        XCTAssertEqual(notifications, [
+            VoiceInkAppIdentity.iOSStopRecordingDarwinNotificationName,
+            VoiceInkAppIdentity.iOSRecordingStateChangedDarwinNotificationName
+        ])
+    }
+
     func testAppGroupRecordingDiagnosticsPreserveIOSLogCopy() {
         XCTAssertEqual(
             VoiceInkAppGroupRecordingDiagnostics.staleRecordingStateClearedMessage,

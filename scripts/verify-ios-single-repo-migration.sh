@@ -15408,6 +15408,11 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
+  "VoiceInkCore checks cover iOS App Group mutation notification runtime application" \
+  'testAppGroupRecordingStateMutationPlanAppliesRuntimeNotification' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "VoiceInkCore checks cover iOS App Group recording diagnostics" \
   'testAppGroupRecordingDiagnosticsPreserveIOSLogCopy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
@@ -15578,6 +15583,11 @@ require_patterns \
   'VoiceInkAppGroupRecordingBridge\.apply\(mutationPlan'
 
 require_pattern \
+  "iOS App Group coordinator applies shared mutation notification runtime plan" \
+  'mutationPlan\.applyRuntimeState' \
+  iOS/Shared/AppGroupCoordinator.swift
+
+require_pattern \
   "iOS App Group coordinator adapts shared recording diagnostics" \
   'VoiceInkAppGroupRecordingDiagnostics\.(staleRecordingStateClearedMessage|updatedRecordingStateMessage)' \
   iOS/Shared/AppGroupCoordinator.swift
@@ -15605,6 +15615,11 @@ reject_pattern \
 reject_pattern \
   "iOS App Group coordinator avoids shell-owned read-plan optional branching" \
   'if +let +mutationPlan += +readPlan\.staleStateRepairMutationPlan|readPlan\.staleStateRepairMutationPlan' \
+  iOS/Shared/AppGroupCoordinator.swift
+
+reject_pattern \
+  "iOS App Group coordinator avoids shell-owned mutation notification names" \
+  'mutationPlan\.darwinNotificationName' \
   iOS/Shared/AppGroupCoordinator.swift
 
 reject_pattern \

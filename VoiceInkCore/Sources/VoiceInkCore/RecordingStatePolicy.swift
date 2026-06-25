@@ -342,6 +342,12 @@ public struct VoiceInkAppGroupRecordingStateMutationPlan: Equatable, Sendable {
         self.writePlan = writePlan
         self.darwinNotificationName = darwinNotificationName
     }
+
+    public func applyRuntimeState(
+        postDarwinNotification: (String) -> Void
+    ) {
+        postDarwinNotification(darwinNotificationName)
+    }
 }
 
 public struct VoiceInkAppGroupRecordingStateReadPlan: Equatable, Sendable {

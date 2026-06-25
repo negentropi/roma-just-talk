@@ -30,7 +30,7 @@ final class AppGroupCoordinator {
         let mutationPlan = VoiceInkAppGroupRecordingBridge.markStopRequested(in: sharedDefaults)
         
         // Send immediate notification
-        postDarwinNotification(mutationPlan.darwinNotificationName)
+        mutationPlan.applyRuntimeState(postDarwinNotification: postDarwinNotification)
     }
     
     /// Get current recording state (for keyboard UI updates)
@@ -39,7 +39,7 @@ final class AppGroupCoordinator {
         let state = readPlan.applyRuntimeState { mutationPlan in
             VoiceInkIOSLogger.appGroup.warning("\(VoiceInkAppGroupRecordingDiagnostics.staleRecordingStateClearedMessage, privacy: .public)")
             VoiceInkAppGroupRecordingBridge.apply(mutationPlan, to: sharedDefaults)
-            postDarwinNotification(mutationPlan.darwinNotificationName)
+            mutationPlan.applyRuntimeState(postDarwinNotification: postDarwinNotification)
         }
 
         return state.isRecording
@@ -52,7 +52,7 @@ final class AppGroupCoordinator {
         let mutationPlan = VoiceInkAppGroupRecordingBridge.writeRecordingState(isRecording, to: sharedDefaults)
         
         // Notify keyboard of state change
-        postDarwinNotification(mutationPlan.darwinNotificationName)
+        mutationPlan.applyRuntimeState(postDarwinNotification: postDarwinNotification)
         
         VoiceInkIOSLogger.appGroup.notice("\(VoiceInkAppGroupRecordingDiagnostics.updatedRecordingStateMessage(isRecording: isRecording), privacy: .public)")
     }

@@ -1623,6 +1623,11 @@ reject_pattern \
   iOS/VoiceInk-ios/ModeConfigurationView.swift
 
 reject_pattern \
+  "iOS mode configuration avoids shallow provider-repair wrapper" \
+  'private func +repairUnavailableProviderSelections\b' \
+  iOS/VoiceInk-ios/ModeConfigurationView.swift
+
+reject_pattern \
   "iOS mode configuration avoids shell-owned post-processing toggle repair sequencing" \
   'onChange\(of: mode\.isPostProcessingEnabled\)|\$mode\.isPostProcessingEnabled' \
   iOS/VoiceInk-ios/ModeConfigurationView.swift

@@ -104,9 +104,11 @@ struct ModeConfigurationView: View {
                 .disabled(formStatePresentation.isSaveButtonDisabled)
             }
         }
-        .onAppear(perform: repairUnavailableProviderSelections)
-        .onChange(of: providerAvailability) { _, _ in
-            repairUnavailableProviderSelections()
+        .onAppear {
+            mode = providerAvailability.repairedMode(mode)
+        }
+        .onChange(of: providerAvailability) { _, availability in
+            mode = availability.repairedMode(mode)
         }
         .onChange(of: mode.transcriptionProvider) { _, _ in
             mode.selectTranscriptionProvider(mode.transcriptionProvider)
@@ -114,10 +116,6 @@ struct ModeConfigurationView: View {
         .onChange(of: mode.postProcessingProvider) { _, _ in
             mode.selectPostProcessingProvider(mode.postProcessingProvider)
         }
-    }
-
-    private func repairUnavailableProviderSelections() {
-        mode = settings.modeFormProviderAvailability.repairedMode(mode)
     }
 }
 

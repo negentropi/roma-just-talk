@@ -12083,13 +12083,23 @@ require_pattern \
 
 require_pattern \
   "shared audio-session timeout preference owns iOS deactivation execution intent" \
-  'VoiceInkAudioSessionDeactivationExecutionPlan|VoiceInkAudioSessionDeactivationRuntimeAction|executionPlan|applyRuntimeState' \
+  'enum VoiceInkAudioSessionDeactivationExecutionPlan|case deactivateSession|case runCountdownTimer|executionPlan|applyRuntimeState' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+reject_pattern \
+  "shared audio-session deactivation execution plan avoids raw flag interface" \
+  'struct VoiceInkAudioSessionDeactivationExecutionPlan|VoiceInkAudioSessionDeactivationRuntimeAction|shouldDeactivateSession|shouldRunCountdownTimer' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "VoiceInkCore check runner executes audio-session deactivation execution runtime proof" \
   'testAudioSessionDeactivationExecutionPlanAppliesRuntimeState' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "core audio-session deactivation execution tests avoid raw flag interface" \
+  'shouldDeactivateSession|shouldRunCountdownTimer|VoiceInkAudioSessionDeactivationExecutionPlan\(' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/UserDefaultsPreferencesTests.swift
 
 require_pattern \
   "shared audio-session timeout presentation lives in VoiceInkCore" \

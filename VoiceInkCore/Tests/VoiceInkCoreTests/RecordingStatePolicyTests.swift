@@ -814,26 +814,6 @@ final class RecordingStatePolicyTests: XCTestCase {
         XCTAssertEqual(VoiceInkKeyboardRecordingButtonPresentation.current(isRecording: true), .recording)
     }
 
-    func testKeyboardRecordingButtonTapPlanStopsActiveRecordingAndRefreshesState() {
-        XCTAssertEqual(
-            VoiceInkKeyboardRecordingButtonTapPolicy.plan(isRecording: true),
-            VoiceInkKeyboardRecordingButtonTapPlan(
-                action: .requestStopRecording,
-                shouldRefreshButtonStateAfterAction: true
-            )
-        )
-    }
-
-    func testKeyboardRecordingButtonTapPlanOpensAppWhenIdleWithoutRefreshingState() {
-        XCTAssertEqual(
-            VoiceInkKeyboardRecordingButtonTapPolicy.plan(isRecording: false),
-            VoiceInkKeyboardRecordingButtonTapPlan(
-                action: .openMainAppForRecording,
-                shouldRefreshButtonStateAfterAction: false
-            )
-        )
-    }
-
     func testKeyboardRecordingButtonTapPlanAppliesRuntimeState() {
         var events: [String] = []
 

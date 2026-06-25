@@ -561,16 +561,16 @@ public struct VoiceInkKeyboardRecordingButtonPresentation: Equatable, Sendable {
     }
 }
 
-public enum VoiceInkKeyboardRecordingButtonTapAction: Equatable, Sendable {
+enum VoiceInkKeyboardRecordingButtonTapAction: Equatable, Sendable {
     case requestStopRecording
     case openMainAppForRecording
 }
 
-public struct VoiceInkKeyboardRecordingButtonTapPlan: Equatable, Sendable {
-    public let action: VoiceInkKeyboardRecordingButtonTapAction
-    public let shouldRefreshButtonStateAfterAction: Bool
+public struct VoiceInkKeyboardRecordingButtonTapPlan: Sendable {
+    private let action: VoiceInkKeyboardRecordingButtonTapAction
+    private let shouldRefreshButtonStateAfterAction: Bool
 
-    public init(
+    init(
         action: VoiceInkKeyboardRecordingButtonTapAction,
         shouldRefreshButtonStateAfterAction: Bool
     ) {

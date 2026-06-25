@@ -367,7 +367,7 @@ class TranscriptionPipeline {
         await waitForPowerModeApplyIfNeeded()
 
         if SpecialShortcutEmptyTranscriptionFallback.consumeIfNeeded(for: transcription, modelContext: modelContext) {
-            SoundManager.shared.playStopSound()
+            SoundManager.shared.play(.stop)
             await restorePromptDetectionSettingsAndDismiss()
         } else if var textToPaste = finalPastedText,
            transcription.transcriptionState == .completed {
@@ -402,7 +402,7 @@ class TranscriptionPipeline {
                 recordRollingPreloadTiming(latencyTrace, stage: .pasteCompleted)
             }
             let autoSendKey = PowerModeManager.shared.activeConfiguration?.autoSendKey
-            SoundManager.shared.playStopSound()
+            SoundManager.shared.play(.stop)
             await restorePromptDetectionSettingsAndDismiss {
                 if let autoSendKey,
                    let delayAfterPaste = VoiceInkAutoSendPolicy.delayAfterPasteNanoseconds(for: autoSendKey) {

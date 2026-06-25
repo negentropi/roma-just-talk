@@ -27,7 +27,7 @@ class NotificationManager {
         }
         
         if type.playsFailureSound {
-            SoundManager.shared.playEscSound()
+            SoundManager.shared.play(.esc)
         }
         
         let notificationView = AppNotificationView(

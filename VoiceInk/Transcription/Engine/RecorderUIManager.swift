@@ -146,7 +146,7 @@ class RecorderUIManager: ObservableObject {
                 }
             )
         } else {
-            SoundManager.shared.playStartSound()
+            SoundManager.shared.play(.start)
             beginRecorderSession()
             await engine.toggleRecord(powerModeId: powerModeId)
         }

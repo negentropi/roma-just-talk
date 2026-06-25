@@ -10326,6 +10326,26 @@ require_pattern \
   'func play\(_ cue: VoiceInkRecordingSoundCue\)|playbackEngine\.play\(cue\)' \
   VoiceInk/SoundManager.swift
 
+reject_pattern \
+  "macOS sound manager avoids start stop esc cue wrappers" \
+  'play(Start|Stop|Esc)Sound' \
+  VoiceInk/SoundManager.swift
+
+require_pattern \
+  "macOS failure notifications use shared esc sound cue" \
+  'SoundManager\.shared\.play\(\.esc\)' \
+  VoiceInk/Notifications/NotificationManager.swift
+
+require_pattern \
+  "macOS recorder start uses shared start sound cue" \
+  'SoundManager\.shared\.play\(\.start\)' \
+  VoiceInk/Transcription/Engine/RecorderUIManager.swift
+
+require_pattern \
+  "macOS transcription completion uses shared stop sound cue" \
+  'SoundManager\.shared\.play\(\.stop\)' \
+  VoiceInk/Transcription/Engine/TranscriptionPipeline.swift
+
 require_patterns \
   "macOS custom sound settings view uses shared presentation" \
   VoiceInk/Views/Settings/CustomSoundSettingsView.swift \

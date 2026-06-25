@@ -41,18 +41,6 @@ class SoundManager: ObservableObject {
         guard isSoundFeedbackEnabled else { return }
         playbackEngine.play(cue)
     }
-
-    func playStartSound() {
-        play(.start)
-    }
-
-    func playStopSound() {
-        play(.stop)
-    }
-    
-    func playEscSound() {
-        play(.esc)
-    }
     
     var isEnabled: Bool {
         get { isSoundFeedbackEnabled }

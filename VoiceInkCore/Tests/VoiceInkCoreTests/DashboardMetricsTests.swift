@@ -282,24 +282,25 @@ final class DashboardMetricsTests: XCTestCase {
                     id: .recommendedModels,
                     systemImageName: "sparkles",
                     title: "Recommended Models",
-                    url: URL(string: "https://tryvoiceink.com/recommended-models")!
+                    destination: .url(URL(string: "https://tryvoiceink.com/recommended-models")!)
                 ),
                 VoiceInkHelpResourcePresentation(
                     id: .videoGuides,
                     systemImageName: "video.fill",
                     title: "YouTube Videos & Guides",
-                    url: URL(string: "https://www.youtube.com/@tryvoiceink/videos")!
+                    destination: .url(URL(string: "https://www.youtube.com/@tryvoiceink/videos")!)
                 ),
                 VoiceInkHelpResourcePresentation(
                     id: .documentation,
                     systemImageName: "book.fill",
                     title: "Documentation",
-                    url: URL(string: "https://tryvoiceink.com/docs")!
+                    destination: .url(URL(string: "https://tryvoiceink.com/docs")!)
                 ),
                 VoiceInkHelpResourcePresentation(
                     id: .supportEmail,
                     systemImageName: "exclamationmark.bubble.fill",
-                    title: "Feedback or Issues?"
+                    title: "Feedback or Issues?",
+                    destination: .supportEmail
                 )
             ]
         )

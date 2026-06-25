@@ -21,9 +21,10 @@ struct HelpAndResourcesSection: View {
     
     private func resourceLink(_ resource: VoiceInkHelpResourcePresentation) -> some View {
         Button(action: {
-            if let url = resource.url {
+            switch resource.destination {
+            case .url(let url):
                 NSWorkspace.shared.open(url)
-            } else {
+            case .supportEmail:
                 EmailSupport.openSupportEmail()
             }
         }) {

@@ -275,22 +275,27 @@ public enum VoiceInkHelpResourceKind: String, Equatable, Hashable, Sendable {
     case supportEmail
 }
 
+public enum VoiceInkHelpResourceDestination: Equatable, Sendable {
+    case url(URL)
+    case supportEmail
+}
+
 public struct VoiceInkHelpResourcePresentation: Equatable, Sendable, Identifiable {
     public let id: VoiceInkHelpResourceKind
     public let systemImageName: String
     public let title: String
-    public let url: URL?
+    public let destination: VoiceInkHelpResourceDestination
 
     public init(
         id: VoiceInkHelpResourceKind,
         systemImageName: String,
         title: String,
-        url: URL? = nil
+        destination: VoiceInkHelpResourceDestination
     ) {
         self.id = id
         self.systemImageName = systemImageName
         self.title = title
-        self.url = url
+        self.destination = destination
     }
 }
 
@@ -307,24 +312,25 @@ public enum VoiceInkHelpResourcesPresentation {
                 id: .recommendedModels,
                 systemImageName: "sparkles",
                 title: "Recommended Models",
-                url: URL(string: recommendedModelsURLString)!
+                destination: .url(URL(string: recommendedModelsURLString)!)
             ),
             VoiceInkHelpResourcePresentation(
                 id: .videoGuides,
                 systemImageName: "video.fill",
                 title: "YouTube Videos & Guides",
-                url: URL(string: videoGuidesURLString)!
+                destination: .url(URL(string: videoGuidesURLString)!)
             ),
             VoiceInkHelpResourcePresentation(
                 id: .documentation,
                 systemImageName: "book.fill",
                 title: "Documentation",
-                url: URL(string: documentationURLString)!
+                destination: .url(URL(string: documentationURLString)!)
             ),
             VoiceInkHelpResourcePresentation(
                 id: .supportEmail,
                 systemImageName: "exclamationmark.bubble.fill",
-                title: "Feedback or Issues?"
+                title: "Feedback or Issues?",
+                destination: .supportEmail
             )
         ]
     }

@@ -15218,7 +15218,7 @@ require_pattern \
 
 require_pattern \
   "shared help resources presentation lives in VoiceInkCore" \
-  'VoiceInkHelpResourcesPresentation|VoiceInkHelpResourcePresentation|recommendedModelsURLString = "https://tryvoiceink\.com/recommended-models"|videoGuidesURLString = "https://www\.youtube\.com/@tryvoiceink/videos"|documentationURLString = "https://tryvoiceink\.com/docs"|resources:' \
+  'VoiceInkHelpResourcesPresentation|VoiceInkHelpResourcePresentation|VoiceInkHelpResourceDestination|recommendedModelsURLString = "https://tryvoiceink\.com/recommended-models"|videoGuidesURLString = "https://www\.youtube\.com/@tryvoiceink/videos"|documentationURLString = "https://tryvoiceink\.com/docs"|resources:' \
   VoiceInkCore/Sources/VoiceInkCore/DashboardMetrics.swift
 
 require_pattern \
@@ -15228,7 +15228,7 @@ require_pattern \
 
 require_pattern \
   "macOS help resources use shared presentation" \
-  'VoiceInkHelpResourcesPresentation\.(title|resources|externalLinkSystemImageName)|VoiceInkHelpResourcePresentation' \
+  'VoiceInkHelpResourcesPresentation\.(title|resources|externalLinkSystemImageName)|VoiceInkHelpResourcePresentation|resource\.destination' \
   VoiceInk/Views/Metrics/HelpAndResourcesSection.swift
 
 reject_pattern \
@@ -15254,7 +15254,7 @@ reject_pattern \
 
 reject_pattern \
   "macOS help resources avoid shell-owned resource copy and URLs" \
-  'https://tryvoiceink\.com/(recommended-models|docs)|https://www\.youtube\.com/@tryvoiceink/videos|"(Help & Resources|Recommended Models|YouTube Videos & Guides|Documentation|Feedback or Issues\\?|sparkles|video\.fill|book\.fill|exclamationmark\.bubble\.fill|arrow\.up\.right)"' \
+  'https://tryvoiceink\.com/(recommended-models|docs)|https://www\.youtube\.com/@tryvoiceink/videos|"(Help & Resources|Recommended Models|YouTube Videos & Guides|Documentation|Feedback or Issues\\?|sparkles|video\.fill|book\.fill|exclamationmark\.bubble\.fill|arrow\.up\.right)"|resource\.url|if let url = resource\.url' \
   VoiceInk/Views/Metrics/HelpAndResourcesSection.swift
 
 require_pattern \

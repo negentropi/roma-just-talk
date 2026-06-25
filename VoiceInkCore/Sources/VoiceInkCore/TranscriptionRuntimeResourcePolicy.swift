@@ -21,10 +21,10 @@ fileprivate enum VoiceInkTranscriptionModelSelectionResourceAction: Equatable, S
 }
 
 public struct VoiceInkLocalWhisperRuntimeUpdate: Equatable, Sendable {
-    public let shouldClearLoadedModel: Bool
-    public let isModelLoadedAfterUpdate: Bool?
+    private let shouldClearLoadedModel: Bool
+    private let isModelLoadedAfterUpdate: Bool?
 
-    public init(
+    fileprivate init(
         shouldClearLoadedModel: Bool,
         isModelLoadedAfterUpdate: Bool?
     ) {
@@ -43,11 +43,24 @@ public struct VoiceInkLocalWhisperRuntimeUpdate: Equatable, Sendable {
             isModelLoadedAfterUpdate: isModelLoadedAfterUpdate
         )
     }
+
+    public func applyRuntimeState(
+        clearLoadedModel: () -> Void,
+        setIsModelLoaded: (Bool) -> Void
+    ) {
+        if shouldClearLoadedModel {
+            clearLoadedModel()
+        }
+
+        if let isModelLoadedAfterUpdate {
+            setIsModelLoaded(isModelLoadedAfterUpdate)
+        }
+    }
 }
 
 public struct VoiceInkTranscriptionModelDeletionPlan: Equatable, Sendable {
-    public let shouldClearCurrentModel: Bool
-    public let localWhisperRuntimeUpdate: VoiceInkLocalWhisperRuntimeUpdate
+    private let shouldClearCurrentModel: Bool
+    private let localWhisperRuntimeUpdate: VoiceInkLocalWhisperRuntimeUpdate
 
     public init(currentModelName: String?, deletedModelName: String) {
         let shouldClearCurrentModel = currentModelName == deletedModelName
@@ -55,6 +68,16 @@ public struct VoiceInkTranscriptionModelDeletionPlan: Equatable, Sendable {
         self.localWhisperRuntimeUpdate = shouldClearCurrentModel
             ? .clearLoadedModel(isModelLoadedAfterUpdate: false)
             : .preserve
+    }
+
+    public func applyRuntimeState(
+        clearCurrentModel: () -> Void,
+        applyLocalWhisperRuntimeUpdate: (VoiceInkLocalWhisperRuntimeUpdate) -> Void
+    ) {
+        guard shouldClearCurrentModel else { return }
+
+        clearCurrentModel()
+        applyLocalWhisperRuntimeUpdate(localWhisperRuntimeUpdate)
     }
 }
 

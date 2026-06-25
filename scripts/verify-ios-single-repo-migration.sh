@@ -8675,15 +8675,25 @@ require_patterns \
   "macOS transcription model manager applies shared local Whisper runtime update" \
   VoiceInk/Transcription/Engine/TranscriptionModelManager.swift \
   'modelSelectionLocalWhisperRuntimeUpdate' \
-  'shouldClearLoadedModel' \
-  'isModelLoadedAfterUpdate'
+  'update\.applyRuntimeState' \
+  'clearLoadedModel'
 
 require_patterns \
   "macOS transcription model manager delegates deletion cleanup to shared plan" \
   VoiceInk/Transcription/Engine/TranscriptionModelManager.swift \
   'VoiceInkTranscriptionModelDeletionPlan' \
-  'deletionPlan\.shouldClearCurrentModel' \
-  'deletionPlan\.localWhisperRuntimeUpdate'
+  'deletionPlan\.applyRuntimeState' \
+  'clearCurrentModel'
+
+reject_pattern \
+  "shared transcription runtime resource plans avoid public raw execution flags" \
+  'public let shouldClearLoadedModel|public let isModelLoadedAfterUpdate|public let shouldClearCurrentModel|public let localWhisperRuntimeUpdate|public init\([[:space:]]*shouldClearLoadedModel' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRuntimeResourcePolicy.swift
+
+reject_pattern \
+  "macOS transcription model manager avoids raw runtime resource plan flags" \
+  '\.(shouldClearLoadedModel|isModelLoadedAfterUpdate|shouldClearCurrentModel|localWhisperRuntimeUpdate)' \
+  VoiceInk/Transcription/Engine/TranscriptionModelManager.swift
 
 require_patterns \
   "core checks execute transcription runtime resource update tests" \

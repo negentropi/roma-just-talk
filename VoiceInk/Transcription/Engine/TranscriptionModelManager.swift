@@ -179,20 +179,20 @@ class TranscriptionModelManager: ObservableObject {
             currentModelName: currentTranscriptionModel?.name,
             deletedModelName: modelName
         )
-        if deletionPlan.shouldClearCurrentModel {
-            currentTranscriptionModel = nil
-            VoiceInkCurrentTranscriptionModelPreference.clearModelName()
-            applyLocalWhisperRuntimeUpdate(deletionPlan.localWhisperRuntimeUpdate)
-        }
+        deletionPlan.applyRuntimeState(
+            clearCurrentModel: {
+                currentTranscriptionModel = nil
+                VoiceInkCurrentTranscriptionModelPreference.clearModelName()
+            },
+            applyLocalWhisperRuntimeUpdate: applyLocalWhisperRuntimeUpdate
+        )
         refreshAllAvailableModels()
     }
 
     private func applyLocalWhisperRuntimeUpdate(_ update: VoiceInkLocalWhisperRuntimeUpdate) {
-        if update.shouldClearLoadedModel {
-            whisperModelManager?.loadedWhisperModel = nil
-        }
-        if let isModelLoaded = update.isModelLoadedAfterUpdate {
-            whisperModelManager?.isModelLoaded = isModelLoaded
-        }
+        update.applyRuntimeState(
+            clearLoadedModel: { whisperModelManager?.loadedWhisperModel = nil },
+            setIsModelLoaded: { whisperModelManager?.isModelLoaded = $0 }
+        )
     }
 }

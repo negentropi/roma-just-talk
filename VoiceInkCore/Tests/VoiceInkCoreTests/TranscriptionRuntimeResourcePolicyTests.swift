@@ -72,36 +72,24 @@ final class TranscriptionRuntimeResourcePolicyTests: XCTestCase {
 
     func testModelSelectionResourcePlanOwnsLocalWhisperRuntimeUpdate() {
         XCTAssertEqual(
-            VoiceInkTranscriptionRuntimeResourcePlan(serviceRoute: .localWhisper)
-                .modelSelectionLocalWhisperRuntimeUpdate,
-            VoiceInkLocalWhisperRuntimeUpdate(
-                shouldClearLoadedModel: false,
-                isModelLoadedAfterUpdate: nil
-            )
+            localWhisperRuntimeUpdateEvents(for: VoiceInkTranscriptionRuntimeResourcePlan(serviceRoute: .localWhisper)
+                .modelSelectionLocalWhisperRuntimeUpdate),
+            []
         )
         XCTAssertEqual(
-            VoiceInkTranscriptionRuntimeResourcePlan(serviceRoute: .localFluidAudio)
-                .modelSelectionLocalWhisperRuntimeUpdate,
-            VoiceInkLocalWhisperRuntimeUpdate(
-                shouldClearLoadedModel: true,
-                isModelLoadedAfterUpdate: true
-            )
+            localWhisperRuntimeUpdateEvents(for: VoiceInkTranscriptionRuntimeResourcePlan(serviceRoute: .localFluidAudio)
+                .modelSelectionLocalWhisperRuntimeUpdate),
+            ["clearLoadedModel", "isModelLoaded:true"]
         )
         XCTAssertEqual(
-            VoiceInkTranscriptionRuntimeResourcePlan(serviceRoute: .cloud)
-                .modelSelectionLocalWhisperRuntimeUpdate,
-            VoiceInkLocalWhisperRuntimeUpdate(
-                shouldClearLoadedModel: true,
-                isModelLoadedAfterUpdate: true
-            )
+            localWhisperRuntimeUpdateEvents(for: VoiceInkTranscriptionRuntimeResourcePlan(serviceRoute: .cloud)
+                .modelSelectionLocalWhisperRuntimeUpdate),
+            ["clearLoadedModel", "isModelLoaded:true"]
         )
         XCTAssertEqual(
-            VoiceInkTranscriptionRuntimeResourcePlan(serviceRoute: .nativeApple)
-                .modelSelectionLocalWhisperRuntimeUpdate,
-            VoiceInkLocalWhisperRuntimeUpdate(
-                shouldClearLoadedModel: true,
-                isModelLoadedAfterUpdate: true
-            )
+            localWhisperRuntimeUpdateEvents(for: VoiceInkTranscriptionRuntimeResourcePlan(serviceRoute: .nativeApple)
+                .modelSelectionLocalWhisperRuntimeUpdate),
+            ["clearLoadedModel", "isModelLoaded:true"]
         )
     }
 
@@ -111,13 +99,9 @@ final class TranscriptionRuntimeResourcePolicyTests: XCTestCase {
             deletedModelName: "ggml-base.en"
         )
 
-        XCTAssertTrue(plan.shouldClearCurrentModel)
         XCTAssertEqual(
-            plan.localWhisperRuntimeUpdate,
-            VoiceInkLocalWhisperRuntimeUpdate(
-                shouldClearLoadedModel: true,
-                isModelLoadedAfterUpdate: false
-            )
+            transcriptionModelDeletionEvents(for: plan),
+            ["clearCurrentModel", "clearLoadedModel", "isModelLoaded:false"]
         )
     }
 
@@ -127,8 +111,31 @@ final class TranscriptionRuntimeResourcePolicyTests: XCTestCase {
             deletedModelName: "parakeet-tdt-0.6b-v2"
         )
 
-        XCTAssertFalse(plan.shouldClearCurrentModel)
-        XCTAssertEqual(plan.localWhisperRuntimeUpdate, .preserve)
+        XCTAssertEqual(transcriptionModelDeletionEvents(for: plan), [])
+    }
+
+    private func localWhisperRuntimeUpdateEvents(for update: VoiceInkLocalWhisperRuntimeUpdate) -> [String] {
+        var events: [String] = []
+
+        update.applyRuntimeState(
+            clearLoadedModel: { events.append("clearLoadedModel") },
+            setIsModelLoaded: { events.append("isModelLoaded:\($0)") }
+        )
+
+        return events
+    }
+
+    private func transcriptionModelDeletionEvents(for plan: VoiceInkTranscriptionModelDeletionPlan) -> [String] {
+        var events: [String] = []
+
+        plan.applyRuntimeState(
+            clearCurrentModel: { events.append("clearCurrentModel") },
+            applyLocalWhisperRuntimeUpdate: {
+                events.append(contentsOf: localWhisperRuntimeUpdateEvents(for: $0))
+            }
+        )
+
+        return events
     }
 
     func testModelPrewarmSamplePolicyPreservesMacOSLookupOrder() {

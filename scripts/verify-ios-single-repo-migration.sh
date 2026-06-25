@@ -6136,10 +6136,29 @@ require_patterns \
   'decodeIfPresent\(\[VoiceInkCustomPrompt\]\.self, forKey: \.customPrompts\) \?\? \[\]' \
   'decodeIfPresent\(\[PowerModeConfig\]\.self, forKey: \.powerModeConfigs\) \?\? \[\]'
 
+require_patterns \
+  "shared settings backup file codec owns export formatting and import decoding" \
+  VoiceInkCore/Sources/VoiceInkCore/SettingsBackupPolicy.swift \
+  'VoiceInkSettingsBackupFileCodec' \
+  'encoder\.outputFormatting = \.prettyPrinted' \
+  'func encode<ShortcutBackup: Codable>' \
+  'func decode<ShortcutBackup: Codable>' \
+  'decoder\.decode\(VoiceInkSettingsBackupFile<ShortcutBackup>\.self, from: data\)'
+
 require_pattern \
   "macOS backup file type adapts shared wire shape to shortcut adapter" \
   'typealias BackupFile = VoiceInkSettingsBackupFile<ShortcutBackup>' \
   VoiceInk/Services/BackupTypes.swift
+
+require_pattern \
+  "macOS import/export consumes shared settings backup file codec" \
+  'VoiceInkSettingsBackupFileCodec\.(encode|decode)' \
+  VoiceInk/Services/ImportExportService.swift
+
+reject_pattern \
+  "macOS import/export avoids shell-owned backup JSON codec" \
+  'JSONEncoder\(\)|JSONDecoder\(\)|outputFormatting = \.prettyPrinted|encoder\.encode\(exportedSettings\)|decoder\.decode\(BackupFile\.self' \
+  VoiceInk/Services/ImportExportService.swift
 
 reject_pattern \
   "macOS backup types avoid shell-owned top-level backup file wire shape" \
@@ -6193,11 +6212,12 @@ require_patterns \
   'SettingsBackupPolicyTests\.testBackupPresentationBuildsDynamicExportAndImportMessages' \
   'SettingsBackupPolicyTests\.testBackupPresentationBuildsImportSuccessTextWithOptionalAPIKeyReminder' \
   'SettingsBackupPolicyTests\.testSettingsBackupFilePreservesMacOSLegacyDecodeDefaults' \
-  'SettingsBackupPolicyTests\.testSettingsBackupFileRoundTripsTopLevelSharedWireShape'
+  'SettingsBackupPolicyTests\.testSettingsBackupFileRoundTripsTopLevelSharedWireShape' \
+  'SettingsBackupPolicyTests\.testSettingsBackupFileCodecPreservesPrettyPrintedExportAndSharedDecode'
 
 require_pattern \
   "migration checklist tracks shared settings backup policy" \
-  'settings backup category taxonomy, top-level backup file wire shape, legacy top-level decode defaults, ordered category titles, import/export panel copy, import status/error diagnostic copy, save-failure import error, alert titles/messages, version-mismatch warning, import summary text, API-key-reminder gate, and restart recommendation use `VoiceInkSettingsBackupFile`/`VoiceInkSettingsBackupCategory`/`VoiceInkSettingsBackupImportPolicy`/`VoiceInkSettingsBackupImportDiagnostics`/`VoiceInkSettingsBackupImportError`/`VoiceInkSettingsBackupPresentation`' \
+  'settings backup category taxonomy, top-level backup file wire shape, legacy top-level decode defaults, pretty-printed export encoding, shared import decoding, ordered category titles, import/export panel copy, import status/error diagnostic copy, save-failure import error, alert titles/messages, version-mismatch warning, import summary text, API-key-reminder gate, and restart recommendation use `VoiceInkSettingsBackupFile`/`VoiceInkSettingsBackupFileCodec`/`VoiceInkSettingsBackupCategory`/`VoiceInkSettingsBackupImportPolicy`/`VoiceInkSettingsBackupImportDiagnostics`/`VoiceInkSettingsBackupImportError`/`VoiceInkSettingsBackupPresentation`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

@@ -149,6 +149,28 @@ public struct VoiceInkSettingsBackupFile<ShortcutBackup: Codable>: Codable {
     }
 }
 
+public enum VoiceInkSettingsBackupFileCodec {
+    public static func makeEncoder() -> JSONEncoder {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .prettyPrinted
+        return encoder
+    }
+
+    public static func encode<ShortcutBackup: Codable>(
+        _ backupFile: VoiceInkSettingsBackupFile<ShortcutBackup>,
+        encoder: JSONEncoder = makeEncoder()
+    ) throws -> Data {
+        try encoder.encode(backupFile)
+    }
+
+    public static func decode<ShortcutBackup: Codable>(
+        from data: Data,
+        decoder: JSONDecoder = JSONDecoder()
+    ) throws -> VoiceInkSettingsBackupFile<ShortcutBackup> {
+        try decoder.decode(VoiceInkSettingsBackupFile<ShortcutBackup>.self, from: data)
+    }
+}
+
 public struct VoiceInkSettingsBackupPresentation: Equatable, Sendable {
     public let defaultFileName: String
     public let exportPanelTitle: String

@@ -251,11 +251,8 @@ class ImportExportService {
             customCloudModels: customModels
         )
 
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = .prettyPrinted
-
         do {
-            let jsonData = try encoder.encode(exportedSettings)
+            let jsonData = try VoiceInkSettingsBackupFileCodec.encode(exportedSettings)
 
             let savePanel = NSSavePanel()
             savePanel.allowedContentTypes = [UTType.json]
@@ -322,8 +319,7 @@ class ImportExportService {
 
         do {
             let jsonData = try Data(contentsOf: url)
-            let decoder = JSONDecoder()
-            let backup = try decoder.decode(BackupFile.self, from: jsonData)
+            let backup: BackupFile = try VoiceInkSettingsBackupFileCodec.decode(from: jsonData)
 
             if backup.version != currentSettingsVersion {
                 showAlert(

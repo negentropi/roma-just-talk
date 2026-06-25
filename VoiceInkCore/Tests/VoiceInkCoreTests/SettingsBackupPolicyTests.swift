@@ -278,4 +278,28 @@ final class SettingsBackupPolicyTests: XCTestCase {
         XCTAssertEqual(decoded.customCloudModels?.map(\.id), [customModelId])
         XCTAssertEqual(decoded.customCloudModels?.map(\.modelName), ["whisper-1"])
     }
+
+    func testSettingsBackupFileCodecPreservesPrettyPrintedExportAndSharedDecode() throws {
+        let backup = VoiceInkSettingsBackupFile<TestShortcutBackup>(
+            version: "2.4.0",
+            customPrompts: [],
+            powerModeConfigs: [],
+            powerModeShortcuts: nil,
+            vocabularyWords: nil,
+            wordReplacements: nil,
+            generalSettings: nil,
+            customEmojis: nil,
+            customCloudModels: nil
+        )
+
+        let data = try VoiceInkSettingsBackupFileCodec.encode(backup)
+        let json = try XCTUnwrap(String(data: data, encoding: .utf8))
+        let decoded: VoiceInkSettingsBackupFile<TestShortcutBackup> = try VoiceInkSettingsBackupFileCodec.decode(from: data)
+
+        XCTAssertTrue(json.contains("\n"))
+        XCTAssertTrue(json.contains("  \"version\""))
+        XCTAssertEqual(decoded.version, "2.4.0")
+        XCTAssertEqual(decoded.customPrompts, [])
+        XCTAssertEqual(decoded.powerModeConfigs, [])
+    }
 }

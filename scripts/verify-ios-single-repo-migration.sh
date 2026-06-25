@@ -6928,7 +6928,12 @@ reject_pattern \
 
 require_pattern \
   "shared Power Mode transcription selection lives in VoiceInkCore" \
-  'VoiceInkPowerModeTranscriptionSelection|VoiceInkPowerModeTranscriptionModelFacts|VoiceInkPowerModeLanguageControl' \
+  'VoiceInkPowerModeTranscriptionSelection|VoiceInkPowerModeTranscriptionModelFacts|shouldShowAutodetectOnlyLanguage|shouldShowLanguagePicker|shouldApplyDefaultLanguageIfMissing|shouldRepairSelectedLanguageForPowerMode' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+reject_pattern \
+  "shared Power Mode transcription facts avoid public raw language control" \
+  'public enum +VoiceInkPowerModeLanguageControl|public var +languageControl: +VoiceInkPowerModeLanguageControl' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
@@ -6958,7 +6963,12 @@ require_pattern \
 
 require_pattern \
   "macOS Power Mode transcription settings use shared selection policy" \
-  'VoiceInkPowerModeTranscriptionSelection|VoiceInkPowerModeTranscriptionModelFacts|languageControl' \
+  'VoiceInkPowerModeTranscriptionSelection|VoiceInkPowerModeTranscriptionModelFacts|shouldShowAutodetectOnlyLanguage|shouldShowLanguagePicker|shouldApplyDefaultLanguageIfMissing|shouldRepairSelectedLanguageForPowerMode' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
+reject_pattern \
+  "macOS Power Mode transcription settings avoid direct language-control switching" \
+  'languageControl|case \.(disabledAutodetect|picker|hiddenDefault)' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
 require_pattern \

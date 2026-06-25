@@ -945,19 +945,24 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertEqual(selection.selectingModel("gpt-4.1").selectedAIModel, "gpt-4.1")
     }
 
-    func testPowerModeTranscriptionModelFactsResolveLanguageControl() {
-        XCTAssertEqual(
-            transcriptionModelFacts(disablesLanguageSelection: true, isMultilingual: true).languageControl,
-            .disabledAutodetect
-        )
-        XCTAssertEqual(
-            transcriptionModelFacts(disablesLanguageSelection: false, isMultilingual: true).languageControl,
-            .picker
-        )
-        XCTAssertEqual(
-            transcriptionModelFacts(disablesLanguageSelection: false, isMultilingual: false).languageControl,
-            .hiddenDefault
-        )
+    func testPowerModeTranscriptionModelFactsResolveLanguagePresentationPolicy() {
+        let autodetectFacts = transcriptionModelFacts(disablesLanguageSelection: true, isMultilingual: true)
+        XCTAssertTrue(autodetectFacts.shouldShowAutodetectOnlyLanguage)
+        XCTAssertFalse(autodetectFacts.shouldShowLanguagePicker)
+        XCTAssertFalse(autodetectFacts.shouldApplyDefaultLanguageIfMissing)
+        XCTAssertFalse(autodetectFacts.shouldRepairSelectedLanguageForPowerMode)
+
+        let pickerFacts = transcriptionModelFacts(disablesLanguageSelection: false, isMultilingual: true)
+        XCTAssertFalse(pickerFacts.shouldShowAutodetectOnlyLanguage)
+        XCTAssertTrue(pickerFacts.shouldShowLanguagePicker)
+        XCTAssertFalse(pickerFacts.shouldApplyDefaultLanguageIfMissing)
+        XCTAssertTrue(pickerFacts.shouldRepairSelectedLanguageForPowerMode)
+
+        let hiddenDefaultFacts = transcriptionModelFacts(disablesLanguageSelection: false, isMultilingual: false)
+        XCTAssertFalse(hiddenDefaultFacts.shouldShowAutodetectOnlyLanguage)
+        XCTAssertFalse(hiddenDefaultFacts.shouldShowLanguagePicker)
+        XCTAssertTrue(hiddenDefaultFacts.shouldApplyDefaultLanguageIfMissing)
+        XCTAssertTrue(hiddenDefaultFacts.shouldRepairSelectedLanguageForPowerMode)
     }
 
     func testPowerModeTranscriptionModelFactsDeriveProviderPoliciesFromLanguageSource() {
@@ -981,11 +986,14 @@ final class PowerModePolicyTests: XCTestCase {
         )
 
         XCTAssertTrue(geminiFacts.disablesLanguageSelection)
-        XCTAssertEqual(geminiFacts.languageControl, .disabledAutodetect)
+        XCTAssertTrue(geminiFacts.shouldShowAutodetectOnlyLanguage)
+        XCTAssertFalse(geminiFacts.shouldRepairSelectedLanguageForPowerMode)
         XCTAssertFalse(geminiFacts.prefersNativeAppleEnglish)
         XCTAssertFalse(nativeAppleFacts.disablesLanguageSelection)
+        XCTAssertTrue(nativeAppleFacts.shouldShowLanguagePicker)
         XCTAssertTrue(nativeAppleFacts.prefersNativeAppleEnglish)
         XCTAssertFalse(whisperFacts.disablesLanguageSelection)
+        XCTAssertTrue(whisperFacts.shouldShowLanguagePicker)
         XCTAssertFalse(whisperFacts.prefersNativeAppleEnglish)
     }
 

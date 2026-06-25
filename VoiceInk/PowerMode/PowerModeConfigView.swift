@@ -323,8 +323,7 @@ struct ConfigurationView: View {
                     if let model = selectedTranscriptionModel {
                         let facts = modelFacts(for: model)
 
-                        switch facts.languageControl {
-                        case .disabledAutodetect:
+                        if facts.shouldShowAutodetectOnlyLanguage {
                             LabeledContent(VoiceInkPowerModePresentation.transcriptionLanguageTitle) {
                                 Text(VoiceInkPowerModePresentation.autodetectedLanguageText)
                                     .foregroundColor(.secondary)
@@ -332,7 +331,7 @@ struct ConfigurationView: View {
                             .onAppear {
                                 applyTranscriptionSelection(transcriptionSelection.selectingAutodetectLanguage())
                             }
-                        case .picker:
+                        } else if facts.shouldShowLanguagePicker {
                             let languageBinding = Binding<String?>(
                                 get: {
                                     transcriptionSelection.selectedLanguageForPicker(
@@ -349,7 +348,7 @@ struct ConfigurationView: View {
                                     Text(option.name).tag(option.code as String?)
                                 }
                             }
-                        case .hiddenDefault:
+                        } else if facts.shouldApplyDefaultLanguageIfMissing {
                             EmptyView()
                                 .onAppear {
                                     applyTranscriptionSelection(
@@ -589,7 +588,7 @@ struct ConfigurationView: View {
 
                 if let model = selectedTranscriptionModel {
                     let facts = modelFacts(for: model)
-                    if facts.languageControl != .disabledAutodetect {
+                    if facts.shouldRepairSelectedLanguageForPowerMode {
                         applyTranscriptionSelection(
                             transcriptionSelection.selectingCompatibleLanguage(
                                 for: facts,

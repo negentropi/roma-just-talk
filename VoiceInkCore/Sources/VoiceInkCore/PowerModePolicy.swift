@@ -434,7 +434,7 @@ public struct VoiceInkPowerModeEnhancementSelection: Equatable, Sendable {
     }
 }
 
-public enum VoiceInkPowerModeLanguageControl: Equatable, Sendable {
+enum VoiceInkPowerModeLanguageControl: Equatable, Sendable {
     case disabledAutodetect
     case picker
     case hiddenDefault
@@ -447,12 +447,28 @@ public struct VoiceInkPowerModeTranscriptionModelFacts: Equatable, Sendable {
     public var languageOptions: [String: String]
     public var prefersNativeAppleEnglish: Bool
 
-    public var languageControl: VoiceInkPowerModeLanguageControl {
+    var languageControl: VoiceInkPowerModeLanguageControl {
         if disablesLanguageSelection {
             return .disabledAutodetect
         }
 
         return isMultilingual ? .picker : .hiddenDefault
+    }
+
+    public var shouldShowAutodetectOnlyLanguage: Bool {
+        languageControl == .disabledAutodetect
+    }
+
+    public var shouldShowLanguagePicker: Bool {
+        languageControl == .picker
+    }
+
+    public var shouldApplyDefaultLanguageIfMissing: Bool {
+        languageControl == .hiddenDefault
+    }
+
+    public var shouldRepairSelectedLanguageForPowerMode: Bool {
+        languageControl != .disabledAutodetect
     }
 
     public init(

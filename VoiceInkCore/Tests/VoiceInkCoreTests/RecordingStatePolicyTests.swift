@@ -560,6 +560,31 @@ final class RecordingStatePolicyTests: XCTestCase {
         )
     }
 
+    func testAppGroupRecordingStateWritePlanAppliesRuntimeStateInOrder() {
+        var events: [String] = []
+
+        VoiceInkAppGroupRecordingStatePolicy.stopRequestedWritePlan(
+            now: Date(timeIntervalSince1970: 42)
+        ).applyRuntimeState(
+            setIsRecording: { events.append("recording:\($0)") },
+            setLastRecordingTimestamp: { events.append("timestamp:\($0)") }
+        )
+
+        VoiceInkAppGroupRecordingStatePolicy.recordingStateWritePlan(
+            isRecording: true,
+            now: Date(timeIntervalSince1970: 43)
+        ).applyRuntimeState(
+            setIsRecording: { events.append("recording:\($0)") },
+            setLastRecordingTimestamp: { events.append("timestamp:\($0)") }
+        )
+
+        XCTAssertEqual(events, [
+            "timestamp:42.0",
+            "recording:true",
+            "timestamp:43.0"
+        ])
+    }
+
     func testAppGroupRecordingStateMutationPlansPreserveIOSBridgeNotifications() {
         XCTAssertEqual(
             VoiceInkAppGroupRecordingStatePolicy.stopRequestedMutationPlan(

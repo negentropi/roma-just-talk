@@ -15372,7 +15372,7 @@ require_plist_value \
 
 require_pattern \
   "VoiceInkCore owns iOS App Group recording state policy" \
-  'VoiceInkAppGroupRecordingStatePolicy|staleRecordingInterval|UserDefaultsKey|VoiceInkAppGroupRecordingStateReadPlan|staleStateRepairMutationPlan' \
+  'VoiceInkAppGroupRecordingStatePolicy|staleRecordingInterval|UserDefaultsKey|VoiceInkAppGroupRecordingStateReadPlan|staleStateRepairMutationPlan|applyRuntimeState' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
 require_patterns \
@@ -15395,6 +15395,11 @@ require_patterns \
 require_pattern \
   "VoiceInkCore checks cover iOS App Group recording state policy" \
   'testAppGroupRecordingStatePolicy(PreservesIOSStorageKeysAndTimeout|KeepsFreshRecordingActive|ClearsStaleRecording|DoesNotClearInactiveRecording)|testAppGroupRecordingState(WritePlansPreserveIOSBridgeWrites|MutationPlansPreserveIOSBridgeNotifications)|testAppGroupRecordingStateReadPlan(DoesNotRepairFreshRecording|OwnsStaleRepairMutation)' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "VoiceInkCore checks cover iOS App Group write-plan runtime application" \
+  'testAppGroupRecordingStateWritePlanAppliesRuntimeStateInOrder' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -15557,6 +15562,11 @@ require_pattern \
   iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
 
 require_pattern \
+  "iOS App Group bridge applies shared write-plan runtime order" \
+  'plan\.applyRuntimeState' \
+  iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
+
+require_pattern \
   "iOS App Group coordinator applies shared stale repair mutation plan" \
   'staleStateRepairMutationPlan|VoiceInkAppGroupRecordingBridge\.apply\(mutationPlan' \
   iOS/Shared/AppGroupCoordinator.swift
@@ -15579,6 +15589,11 @@ require_pattern \
 reject_pattern \
   "iOS App Group bridge avoids shell-owned recording state policy" \
   'struct VoiceInkAppGroupRecordingState|staleRecordingInterval|enum UserDefaultsKey|static let (isRecording|lastRecordingTimestamp) = "|shouldClearStaleState' \
+  iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
+
+reject_pattern \
+  "iOS App Group bridge avoids shell-owned write-plan optional branching" \
+  'if +let +isRecording += +plan\.isRecording|plan\.lastRecordingTimestamp' \
   iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
 
 reject_pattern \

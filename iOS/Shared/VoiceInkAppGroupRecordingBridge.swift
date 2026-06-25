@@ -65,16 +65,19 @@ enum VoiceInkAppGroupRecordingBridge {
         _ plan: VoiceInkAppGroupRecordingStateWritePlan,
         to defaults: UserDefaults?
     ) {
-        if let isRecording = plan.isRecording {
-            defaults?.set(
-                isRecording,
-                forKey: VoiceInkAppGroupRecordingStatePolicy.UserDefaultsKey.isRecording
-            )
-        }
-
-        defaults?.set(
-            plan.lastRecordingTimestamp,
-            forKey: VoiceInkAppGroupRecordingStatePolicy.UserDefaultsKey.lastRecordingTimestamp
+        plan.applyRuntimeState(
+            setIsRecording: {
+                defaults?.set(
+                    $0,
+                    forKey: VoiceInkAppGroupRecordingStatePolicy.UserDefaultsKey.isRecording
+                )
+            },
+            setLastRecordingTimestamp: {
+                defaults?.set(
+                    $0,
+                    forKey: VoiceInkAppGroupRecordingStatePolicy.UserDefaultsKey.lastRecordingTimestamp
+                )
+            }
         )
     }
 }

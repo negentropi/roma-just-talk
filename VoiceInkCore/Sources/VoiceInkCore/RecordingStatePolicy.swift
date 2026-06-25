@@ -318,6 +318,17 @@ public struct VoiceInkAppGroupRecordingStateWritePlan: Equatable, Sendable {
         self.isRecording = isRecording
         self.lastRecordingTimestamp = lastRecordingTimestamp
     }
+
+    public func applyRuntimeState(
+        setIsRecording: (Bool) -> Void,
+        setLastRecordingTimestamp: (TimeInterval) -> Void
+    ) {
+        if let isRecording {
+            setIsRecording(isRecording)
+        }
+
+        setLastRecordingTimestamp(lastRecordingTimestamp)
+    }
 }
 
 public struct VoiceInkAppGroupRecordingStateMutationPlan: Equatable, Sendable {

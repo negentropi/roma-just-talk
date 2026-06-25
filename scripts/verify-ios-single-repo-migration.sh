@@ -2282,9 +2282,15 @@ require_pattern \
   'VoiceInkMacOSCoreAudioRecorderDiagnostics\.(knownText|transportText|deviceInfoMessage|deviceDetailsMessage|bufferLatencyMessage)' \
   VoiceInk/CoreAudioRecorder.swift
 
+require_patterns \
+  "macOS CoreAudio recorder uses shared log category identity" \
+  VoiceInk/CoreAudioRecorder.swift \
+  'Logger\(' \
+  'category: VoiceInkMacOSLogCategory\.coreAudioRecorder'
+
 reject_pattern \
   "macOS CoreAudio recorder avoids shell-owned CoreAudio diagnostic copy" \
-  '48000\.0|String\(format: "%.1f"|~latency:|Buffer size:|\?\? "Unknown"|return "Unknown"|return "(Built-in|USB|Bluetooth|Bluetooth LE|Aggregate|Virtual|PCI|FireWire|DisplayPort|HDMI|AVB|Thunderbolt)"|Other \(\|Device info:|Device details:' \
+  '48000\.0|String\(format: "%.1f"|~latency:|Buffer size:|\?\? "Unknown"|return "Unknown"|return "(Built-in|USB|Bluetooth|Bluetooth LE|Aggregate|Virtual|PCI|FireWire|DisplayPort|HDMI|AVB|Thunderbolt)"|Other \(\|Device info:|Device details:|category: "CoreAudioRecorder"' \
   VoiceInk/CoreAudioRecorder.swift
 
 require_pattern \
@@ -16843,7 +16849,8 @@ require_patterns \
   'sessionMetricRecorder = "SessionMetricRecorder"' \
   'soundPlaybackEngine = "SoundPlaybackEngine"' \
   'audioTranscriptionManager = "AudioTranscriptionManager"' \
-  'audioTranscriptionService = "AudioTranscriptionService"'
+  'audioTranscriptionService = "AudioTranscriptionService"' \
+  'coreAudioRecorder = "CoreAudioRecorder"'
 
 require_pattern \
   "macOS window manager uses shared log category identity" \

@@ -327,6 +327,7 @@ public enum VoiceInkMacOSLogCategory {
     public static let soundPlaybackEngine = "SoundPlaybackEngine"
     public static let audioTranscriptionManager = "AudioTranscriptionManager"
     public static let audioTranscriptionService = "AudioTranscriptionService"
+    public static let coreAudioRecorder = "CoreAudioRecorder"
 }
 
 public enum VoiceInkAppIdentity {

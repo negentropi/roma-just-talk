@@ -205,7 +205,10 @@ final class CoreAudioRecorder: @unchecked Sendable {
 
     // MARK: - Properties
 
-    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "CoreAudioRecorder")
+    private let logger = Logger(
+        subsystem: VoiceInkAppIdentity.loggingSubsystem,
+        category: VoiceInkMacOSLogCategory.coreAudioRecorder
+    )
 
     private var audioUnit: AudioUnit?
     private var audioFile: ExtAudioFileRef?

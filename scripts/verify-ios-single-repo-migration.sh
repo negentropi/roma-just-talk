@@ -1108,7 +1108,12 @@ require_pattern \
 
 require_pattern \
   "macOS recording engine delegates microphone permission action planning to shared core" \
-  'VoiceInkRecordingPermissionPolicy\.action|VoiceInkRecordingPermissionStatus' \
+  'VoiceInkRecordingPermissionPolicy\.plan|VoiceInkRecordingPermissionStatus|applyRuntimeState' \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift
+
+reject_pattern \
+  "macOS recording engine avoids raw microphone permission action helpers" \
+  'VoiceInkRecordingPermissionPolicy\.action|switch VoiceInkRecordingPermissionPolicy\.plan|case \.(startRecording|requestPermission|presentPermissionDenied)' \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift
 
 require_pattern \

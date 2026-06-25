@@ -707,22 +707,21 @@ class VoiceInkEngine: NSObject, ObservableObject {
             permissionStatus = .denied
         }
 
-        switch VoiceInkRecordingPermissionPolicy.action(for: permissionStatus) {
-        case .startRecording:
-            response(true)
-        case .requestPermission:
-            AVCaptureDevice.requestAccess(for: .audio) { granted in
-                DispatchQueue.main.async {
-                    response(
-                        VoiceInkRecordingPermissionPolicy.action(
-                            afterPermissionRequestGranted: granted
-                        ) == .startRecording
-                    )
+        VoiceInkRecordingPermissionPolicy.plan(for: permissionStatus).applyRuntimeState(
+            startRecording: {
+                response(true)
+            },
+            presentPermissionDenied: {
+                response(false)
+            },
+            requestPermission: { completion in
+                AVCaptureDevice.requestAccess(for: .audio) { granted in
+                    DispatchQueue.main.async {
+                        completion(granted)
+                    }
                 }
             }
-        case .presentPermissionDenied:
-            response(false)
-        }
+        )
     }
 
     // MARK: - Pipeline Dispatch

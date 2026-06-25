@@ -163,14 +163,10 @@ final class RecordingManager: ObservableObject {
     }
     
     func openSettings() {
-        let url = URL(string: UIApplication.openSettingsURLString)
-        let plan = VoiceInkRecordingPermissionPolicy.settingsOpenPlan(
-            hasSettingsURL: url != nil,
-            canOpenSettingsURL: url.map { UIApplication.shared.canOpenURL($0) } ?? false
-        )
-
-        plan.applyRuntimeState {
-            guard let url else { return }
+        VoiceInkRecordingPermissionPolicy.settingsOpenPlan(
+            settingsURL: URL(string: UIApplication.openSettingsURLString),
+            canOpenURL: UIApplication.shared.canOpenURL
+        ).applyRuntimeState { url in
             UIApplication.shared.open(url)
         }
     }

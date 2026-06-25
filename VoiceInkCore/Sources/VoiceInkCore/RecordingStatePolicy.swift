@@ -70,13 +70,13 @@ public struct VoiceInkRecordingPermissionPlan: Sendable {
 }
 
 enum VoiceInkRecordingPermissionSettingsAction: Equatable, Sendable {
-    case openSettings
+    case openSettings(URL)
     case ignore
 
-    func applyRuntimeState(openSettings: () -> Void) {
+    func applyRuntimeState(openSettings: (URL) -> Void) {
         switch self {
-        case .openSettings:
-            openSettings()
+        case .openSettings(let url):
+            openSettings(url)
         case .ignore:
             return
         }
@@ -90,7 +90,7 @@ public struct VoiceInkRecordingPermissionSettingsPlan: Sendable {
         self.action = action
     }
 
-    public func applyRuntimeState(openSettings: () -> Void) {
+    public func applyRuntimeState(openSettings: (URL) -> Void) {
         action.applyRuntimeState(openSettings: openSettings)
     }
 }
@@ -114,11 +114,15 @@ public enum VoiceInkRecordingPermissionPolicy {
     }
 
     public static func settingsOpenPlan(
-        hasSettingsURL: Bool,
-        canOpenSettingsURL: Bool
+        settingsURL: URL?,
+        canOpenURL: (URL) -> Bool
     ) -> VoiceInkRecordingPermissionSettingsPlan {
-        VoiceInkRecordingPermissionSettingsPlan(
-            action: hasSettingsURL && canOpenSettingsURL ? .openSettings : .ignore
+        guard let settingsURL, canOpenURL(settingsURL) else {
+            return VoiceInkRecordingPermissionSettingsPlan(action: .ignore)
+        }
+
+        return VoiceInkRecordingPermissionSettingsPlan(
+            action: .openSettings(settingsURL)
         )
     }
 }

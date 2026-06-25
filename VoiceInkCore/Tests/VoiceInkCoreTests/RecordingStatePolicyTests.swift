@@ -132,22 +132,23 @@ final class RecordingStatePolicyTests: XCTestCase {
 
     func testRecordingPermissionSettingsOpenPlanAppliesOnlyWhenURLCanOpen() {
         var events: [String] = []
+        let settingsURL = URL(string: "app-settings:")!
 
         for input in [
-            (hasSettingsURL: true, canOpenSettingsURL: true),
-            (hasSettingsURL: false, canOpenSettingsURL: true),
-            (hasSettingsURL: true, canOpenSettingsURL: false),
-            (hasSettingsURL: false, canOpenSettingsURL: false)
+            (settingsURL: settingsURL as URL?, canOpenSettingsURL: true),
+            (settingsURL: nil, canOpenSettingsURL: true),
+            (settingsURL: settingsURL as URL?, canOpenSettingsURL: false),
+            (settingsURL: nil, canOpenSettingsURL: false)
         ] {
             VoiceInkRecordingPermissionPolicy.settingsOpenPlan(
-                hasSettingsURL: input.hasSettingsURL,
-                canOpenSettingsURL: input.canOpenSettingsURL
-            ).applyRuntimeState {
-                events.append("open")
+                settingsURL: input.settingsURL,
+                canOpenURL: { _ in input.canOpenSettingsURL }
+            ).applyRuntimeState { url in
+                events.append("open:\(url.absoluteString)")
             }
         }
 
-        XCTAssertEqual(events, ["open"])
+        XCTAssertEqual(events, ["open:app-settings:"])
     }
 
     func testPostRecordingProcessingStatePolicyPreservesMacOSProcessingStates() {

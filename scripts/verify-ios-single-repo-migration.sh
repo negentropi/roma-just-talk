@@ -1265,7 +1265,9 @@ require_patterns \
   "iOS recording manager delegates settings-open fallback planning and application to shared core" \
   iOS/VoiceInk-ios/RecordingManager.swift \
   'VoiceInkRecordingPermissionPolicy\.settingsOpenPlan' \
-  'plan\.applyRuntimeState'
+  'settingsURL: URL\(string: UIApplication\.openSettingsURLString\)' \
+  'canOpenURL: UIApplication\.shared\.canOpenURL' \
+  'applyRuntimeState'
 
 require_pattern \
   "iOS recording manager delegates stop result planning to shared flow state" \
@@ -1300,7 +1302,7 @@ reject_pattern \
 
 reject_pattern \
   "iOS recording manager avoids shell-owned settings-open fallback branch" \
-  'if +let +url += +URL\(string: +UIApplication\.openSettingsURLString\), +UIApplication\.shared\.canOpenURL\(url\)' \
+  'if +let +url += +URL\(string: +UIApplication\.openSettingsURLString\), +UIApplication\.shared\.canOpenURL\(url\)|guard +let +url' \
   iOS/VoiceInk-ios/RecordingManager.swift
 
 reject_pattern \

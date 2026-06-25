@@ -4921,12 +4921,12 @@ reject_pattern \
 
 require_pattern \
   "shared macOS model-download onboarding presentation lives in VoiceInkCore" \
-  'VoiceInkMacOSOnboardingPresentation|VoiceInkMacOSOnboardingModelDownloadPresentation|modelDownload|skipButtonTitle|speedLabel|ramLabel|buttonTitle' \
+  'VoiceInkMacOSOnboardingPresentation|VoiceInkMacOSOnboardingModelDownloadPresentation|modelDownload|skipButtonTitle|speedLabel|ramLabel|buttonTitle|ramUsageText' \
   VoiceInkCore/Sources/VoiceInkCore/OnboardingPresentation.swift
 
 require_pattern \
   "macOS model-download onboarding uses shared presentation" \
-  'VoiceInkMacOSOnboardingPresentation\.modelDownload|presentation\.(title|subtitle|skipButtonTitle|speedLabel|accuracyLabel|ramLabel)|buttonTitle\(isModelSet:' \
+  'VoiceInkMacOSOnboardingPresentation\.modelDownload|presentation\.(title|subtitle|skipButtonTitle|speedLabel|accuracyLabel|ramLabel|ramUsageText)|buttonTitle\(isModelSet:' \
   VoiceInk/Views/Onboarding/OnboardingModelDownloadView.swift
 
 require_pattern \
@@ -4947,6 +4947,11 @@ reject_pattern \
 reject_pattern \
   "macOS model-download onboarding avoids shallow button-title wrappers" \
   'private func +getButtonTitle\(' \
+  VoiceInk/Views/Onboarding/OnboardingModelDownloadView.swift
+
+reject_pattern \
+  "macOS model-download onboarding avoids shell-owned RAM formatting" \
+  'String\(format: +"%\.1f GB"' \
   VoiceInk/Views/Onboarding/OnboardingModelDownloadView.swift
 
 require_pattern \

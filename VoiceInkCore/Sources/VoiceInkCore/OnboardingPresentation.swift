@@ -206,6 +206,10 @@ public struct VoiceInkMacOSOnboardingModelDownloadPresentation: Equatable, Senda
         }
         return downloadButtonTitle
     }
+
+    public func ramUsageText(gb: Double) -> String {
+        String(format: "%.1f GB", gb)
+    }
 }
 
 public struct VoiceInkMacOSOnboardingTutorialPresentation: Equatable, Sendable {

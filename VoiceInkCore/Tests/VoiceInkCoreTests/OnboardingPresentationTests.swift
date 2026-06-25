@@ -232,6 +232,8 @@ final class OnboardingPresentationTests: XCTestCase {
             presentation.buttonTitle(isModelSet: false, isDownloading: false, isModelDownloaded: false),
             "Download Model"
         )
+        XCTAssertEqual(presentation.ramUsageText(gb: 3), "3.0 GB")
+        XCTAssertEqual(presentation.ramUsageText(gb: 3.25), "3.2 GB")
     }
 
     func testMacOSOnboardingTutorialPresentationPreservesCopyAndStepOrder() {

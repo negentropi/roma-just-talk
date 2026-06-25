@@ -330,6 +330,7 @@ public enum VoiceInkMacOSLogCategory {
     public static let audioTranscriptionManager = "AudioTranscriptionManager"
     public static let audioTranscriptionService = "AudioTranscriptionService"
     public static let coreAudioRecorder = "CoreAudioRecorder"
+    public static let transcriptionServiceRegistry = "TranscriptionServiceRegistry"
     public static let nativeAppleTranscriptionService = "NativeAppleTranscriptionService"
     public static let nativeAppleLanguageAssetControl = "NativeAppleLanguageAssetControl"
     public static let whisperTranscriptionService = "WhisperTranscriptionService"

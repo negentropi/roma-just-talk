@@ -21,6 +21,16 @@ final class TranscriptionStreamingPreferenceTests: XCTestCase {
         XCTAssertTrue(VoiceInkTranscriptionServiceRoute.nativeApple.isLocalTranscriptionProvider)
     }
 
+    func testTranscriptionServiceRouteDiagnosticsPreservesRuntimeLogCopy() {
+        XCTAssertEqual(
+            VoiceInkTranscriptionServiceRouteDiagnostics.transcribingMessage(
+                modelDisplayName: "nova-3",
+                serviceTypeDescription: "CloudTranscriptionService"
+            ),
+            "Transcribing with nova-3 using CloudTranscriptionService"
+        )
+    }
+
     func testStreamingTranscriptAssemblyPreservesCommittedPreviewAndFinalText() {
         XCTAssertEqual(VoiceInkStreamingTranscriptAssembly.committedText(["hello", "world"]), "hello world")
         XCTAssertEqual(VoiceInkStreamingTranscriptAssembly.committedText([]), "")

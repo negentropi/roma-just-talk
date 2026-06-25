@@ -9,7 +9,10 @@ class TranscriptionServiceRegistry {
     private weak var modelProvider: (any WhisperModelProvider)?
     private let modelsDirectory: URL
     private let modelContext: ModelContext
-    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "TranscriptionServiceRegistry")
+    private let logger = Logger(
+        subsystem: VoiceInkAppIdentity.loggingSubsystem,
+        category: VoiceInkMacOSLogCategory.transcriptionServiceRegistry
+    )
 
     private(set) lazy var localTranscriptionService = WhisperTranscriptionService(
         modelsDirectory: modelsDirectory,
@@ -40,7 +43,11 @@ class TranscriptionServiceRegistry {
 
     func transcribe(audioURL: URL, model: any TranscriptionModel) async throws -> String {
         let service = service(for: model.transcriptionSessionRouteFacts.serviceRoute)
-        logger.debug("Transcribing with \(model.displayName, privacy: .public) using \(String(describing: type(of: service)), privacy: .public)")
+        let message = VoiceInkTranscriptionServiceRouteDiagnostics.transcribingMessage(
+            modelDisplayName: model.displayName,
+            serviceTypeDescription: String(describing: type(of: service))
+        )
+        logger.debug("\(message, privacy: .public)")
         return try await service.transcribe(audioURL: audioURL, model: model)
     }
 

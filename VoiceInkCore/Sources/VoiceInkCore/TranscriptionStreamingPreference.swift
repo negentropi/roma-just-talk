@@ -187,6 +187,15 @@ public enum VoiceInkTranscriptionServiceRoute: Equatable, Sendable {
     }
 }
 
+public enum VoiceInkTranscriptionServiceRouteDiagnostics {
+    public static func transcribingMessage(
+        modelDisplayName: String,
+        serviceTypeDescription: String
+    ) -> String {
+        "Transcribing with \(modelDisplayName) using \(serviceTypeDescription)"
+    }
+}
+
 public enum VoiceInkTranscriptionStreamingAdapterKind: Equatable, Sendable {
     case cloud
     case localFluidAudio

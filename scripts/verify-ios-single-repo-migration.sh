@@ -8923,6 +8923,19 @@ require_pattern \
   'transcriptionSessionRouteFacts\.plan\(forceStreaming: forceStreaming\)' \
   VoiceInk/Transcription/Engine/TranscriptionServiceRegistry.swift
 
+require_patterns \
+  "shared transcription route diagnostics live in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionStreamingPreference.swift \
+  'VoiceInkTranscriptionServiceRouteDiagnostics' \
+  'transcribingMessage' \
+  '"Transcribing with'
+
+require_patterns \
+  "macOS transcription service registry uses shared route diagnostics" \
+  VoiceInk/Transcription/Engine/TranscriptionServiceRegistry.swift \
+  'VoiceInkTranscriptionServiceRouteDiagnostics\.transcribingMessage' \
+  'serviceTypeDescription: String\(describing: type\(of: service\)\)'
+
 require_pattern \
   "macOS transcription service registry consumes shared session execution plan" \
   'routePlan\.executionPlan\.applyRuntimeState|file:|streaming:' \
@@ -8936,6 +8949,11 @@ require_pattern \
 reject_pattern \
   "macOS transcription service registry avoids raw session execution cases" \
   'switch routePlan\.executionPlan|case \.streaming|case \.file' \
+  VoiceInk/Transcription/Engine/TranscriptionServiceRegistry.swift
+
+reject_pattern \
+  "macOS transcription service registry avoids shell-owned route diagnostic copy and category literal" \
+  '"Transcribing with|category: "TranscriptionServiceRegistry"' \
   VoiceInk/Transcription/Engine/TranscriptionServiceRegistry.swift
 
 require_pattern \
@@ -9261,6 +9279,11 @@ reject_pattern \
 require_pattern \
   "core checks execute transcription session execution plan tests" \
   'TranscriptionStreamingPreferenceTests\.testSessionRouteExecutionPlanUsesFileServiceWhenStreamingDisabled|TranscriptionStreamingPreferenceTests\.testSessionRouteExecutionPlanPackagesStreamingAdapterPreloadAndTimeout' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute transcription route diagnostics test" \
+  'TranscriptionStreamingPreferenceTests\.testTranscriptionServiceRouteDiagnosticsPreservesRuntimeLogCopy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -16909,6 +16932,7 @@ require_patterns \
   'audioTranscriptionManager = "AudioTranscriptionManager"' \
   'audioTranscriptionService = "AudioTranscriptionService"' \
   'coreAudioRecorder = "CoreAudioRecorder"' \
+  'transcriptionServiceRegistry = "TranscriptionServiceRegistry"' \
   'nativeAppleTranscriptionService = "NativeAppleTranscriptionService"' \
   'nativeAppleLanguageAssetControl = "NativeAppleLanguageAssetControl"' \
   'whisperTranscriptionService = "WhisperTranscriptionService"' \
@@ -16987,6 +17011,12 @@ require_patterns \
   VoiceInk/Services/AudioFileTranscriptionService.swift \
   'Logger\(' \
   'category: VoiceInkMacOSLogCategory\.audioTranscriptionService'
+
+require_patterns \
+  "macOS transcription service registry uses shared log category identity" \
+  VoiceInk/Transcription/Engine/TranscriptionServiceRegistry.swift \
+  'Logger\(' \
+  'category: VoiceInkMacOSLogCategory\.transcriptionServiceRegistry'
 
 require_patterns \
   "macOS Native Apple transcription service uses shared log category identity" \

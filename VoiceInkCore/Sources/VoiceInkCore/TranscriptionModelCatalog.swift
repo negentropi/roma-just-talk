@@ -592,6 +592,18 @@ public enum VoiceInkMacOSTranscriptionModelProvider: String, Codable, Hashable, 
         )
     }
 
+    public func transcriptionLanguageOptions(
+        defaultLanguages: [String: String],
+        isMultilingual: Bool,
+        usesRealtimeProviderLanguages: Bool
+    ) -> [String: String] {
+        coreTranscriptionModelProviderRole.transcriptionLanguageOptions(
+            defaultLanguages: defaultLanguages,
+            isMultilingual: isMultilingual,
+            usesRealtimeProviderLanguages: usesRealtimeProviderLanguages
+        )
+    }
+
     public var modelManagementCategory: VoiceInkModelManagementModelCategory {
         coreTranscriptionModelProviderRole.modelManagementCategory
     }

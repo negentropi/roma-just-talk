@@ -351,6 +351,19 @@ final class TranscriptionModelCatalogTests: XCTestCase {
             VoiceInkMacOSTranscriptionModelProvider.fluidAudio.supportedLanguages(isMultilingual: false),
             VoiceInkLanguageCatalog.englishOnly
         )
+        XCTAssertEqual(
+            VoiceInkMacOSTranscriptionModelProvider.custom.transcriptionLanguageOptions(
+                defaultLanguages: ["custom": "Custom"],
+                isMultilingual: false,
+                usesRealtimeProviderLanguages: false
+            ),
+            ["custom": "Custom"]
+        )
+        XCTAssertNil(VoiceInkMacOSTranscriptionModelProvider.assemblyAI.transcriptionLanguageOptions(
+            defaultLanguages: [:],
+            isMultilingual: true,
+            usesRealtimeProviderLanguages: true
+        )["en_uk"])
         XCTAssertEqual(VoiceInkMacOSTranscriptionModelProvider.nativeApple.modelManagementCategory, .local)
         XCTAssertEqual(VoiceInkMacOSTranscriptionModelProvider.custom.transcriptionServiceRoute, .cloud)
         XCTAssertEqual(

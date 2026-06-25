@@ -4159,14 +4159,15 @@ require_pattern \
   VoiceInk/Models/TranscriptionModel.swift
 
 require_pattern \
-  "macOS TranscriptionModel uses shared provider-role language options" \
-  'coreTranscriptionModelProviderRole\.transcriptionLanguageOptions' \
+  "macOS TranscriptionModel uses shared provider language options" \
+  'provider\.transcriptionLanguageOptions' \
   VoiceInk/Models/TranscriptionModel.swift
 
 require_patterns \
   "shared macOS transcription model provider exposes provider-role streaming facts" \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift \
   'coreTranscriptionModelProviderRole\.apiKeyProviderName' \
+  'coreTranscriptionModelProviderRole\.transcriptionLanguageOptions' \
   'coreTranscriptionModelProviderRole\.supportsRecordedFileTranscription' \
   'coreTranscriptionModelProviderRole\.isStreamingOnly' \
   'coreTranscriptionModelProviderRole\.streamingConnectionModelName' \
@@ -4180,6 +4181,11 @@ require_pattern \
 reject_pattern \
   "macOS ModelProvider avoids shell-owned enum and role mapping" \
   'enum ModelProvider|case fluidAudio = "Parakeet"|Invalid ModelProvider|switch self' \
+  VoiceInk/Models/TranscriptionModel.swift
+
+reject_pattern \
+  "macOS TranscriptionModel avoids provider-role reach-through" \
+  'coreTranscriptionModelProviderRole' \
   VoiceInk/Models/TranscriptionModel.swift
 
 reject_context_pattern \
@@ -5106,12 +5112,12 @@ require_patterns \
 
 require_pattern \
   "macOS transcription model uses shared recorded-file support policy" \
-  'coreTranscriptionModelProviderRole\.supportsRecordedFileTranscription' \
+  'provider\.supportsRecordedFileTranscription' \
   VoiceInk/Models/TranscriptionModel.swift
 
 require_pattern \
   "macOS transcription model uses shared streaming-only support policy" \
-  'coreTranscriptionModelProviderRole\.isStreamingOnly' \
+  'provider\.isStreamingOnly' \
   VoiceInk/Models/TranscriptionModel.swift
 
 require_pattern \
@@ -7396,7 +7402,7 @@ require_pattern \
 
 require_pattern \
   "macOS transcription model adapter exposes shared streaming connection model policy" \
-  'coreTranscriptionModelProviderRole\.streamingConnectionModelName\(for: name\)' \
+  'provider\.streamingConnectionModelName\(for: name\)' \
   VoiceInk/Models/TranscriptionModel.swift
 
 require_pattern \
@@ -7423,7 +7429,7 @@ require_pattern \
 
 require_pattern \
   "macOS transcription model adapter exposes shared streaming timeout mapping policy" \
-  'coreTranscriptionModelProviderRole\.mapsStreamingTransportTimeoutToFinalTimeout' \
+  'provider\.mapsStreamingTransportTimeoutToFinalTimeout' \
   VoiceInk/Models/TranscriptionModel.swift
 
 require_pattern \

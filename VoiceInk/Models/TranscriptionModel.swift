@@ -30,14 +30,14 @@ extension TranscriptionModel {
     var supportsStreaming: Bool { false }
 
     var supportsRecordedFileTranscription: Bool {
-        provider.coreTranscriptionModelProviderRole.supportsRecordedFileTranscription
+        provider.supportsRecordedFileTranscription
     }
 
     var streamingPreferenceSnapshot: VoiceInkTranscriptionStreamingModelSnapshot {
         VoiceInkTranscriptionStreamingModelSnapshot(
             name: name,
             supportsStreaming: supportsStreaming,
-            isStreamingOnly: provider.coreTranscriptionModelProviderRole.isStreamingOnly
+            isStreamingOnly: provider.isStreamingOnly
         )
     }
 
@@ -49,11 +49,11 @@ extension TranscriptionModel {
     }
 
     var streamingConnectionModelName: String {
-        provider.coreTranscriptionModelProviderRole.streamingConnectionModelName(for: name)
+        provider.streamingConnectionModelName(for: name)
     }
 
     var mapsStreamingTransportTimeoutToFinalTimeout: Bool {
-        provider.coreTranscriptionModelProviderRole.mapsStreamingTransportTimeoutToFinalTimeout
+        provider.mapsStreamingTransportTimeoutToFinalTimeout
     }
 
     var transcriptionRuntimeResourcePlan: VoiceInkTranscriptionRuntimeResourcePlan {
@@ -76,7 +76,7 @@ extension TranscriptionModel {
     }
 
     var transcriptionLanguageOptions: [String: String] {
-        provider.coreTranscriptionModelProviderRole.transcriptionLanguageOptions(
+        provider.transcriptionLanguageOptions(
             defaultLanguages: supportedLanguages,
             isMultilingual: isMultilingualModel,
             usesRealtimeProviderLanguages: VoiceInkTranscriptionStreamingPreference.shouldUseStreaming(

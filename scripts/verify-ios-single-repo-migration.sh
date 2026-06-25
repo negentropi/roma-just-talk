@@ -13318,6 +13318,21 @@ require_pattern \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
 require_pattern \
+  "shared Power Mode config form dismissal plan lives in VoiceInkCore" \
+  'VoiceInkPowerModeConfigurationFormDismissalPlan|dismissalPlan|shouldRemoveUnsavedShortcut' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "macOS Power Mode config form delegates unsaved shortcut cleanup planning" \
+  'mode\.dismissalPlan\(didSaveConfiguration: didSaveConfiguration\)' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
+require_pattern \
+  "core checks execute Power Mode config form dismissal plan test" \
+  'PowerModePolicyTests\.testConfigurationModePlansUnsavedAddShortcutCleanupOnDismiss' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "macOS app picker uses shared search copy and app trigger selection policy" \
   'VoiceInkPowerModePresentation\.(appPickerSearchPlaceholder|appPickerSearchSystemImageName|appPickerClearSearchSystemImageName|appPickerSelectedSystemImageName)|selectedAppConfigs\.(containsPowerModeAppConfig|togglePowerModeAppConfig)' \
   VoiceInk/PowerMode/AppPicker.swift
@@ -13424,7 +13439,7 @@ require_pattern \
 
 require_pattern \
   "migration checklist tracks shared Power Mode config form chrome gate" \
-  'macOS Power Mode config form seed defaults, trigger-section labels, transcription section labels, AI toggle title, footer actions, website add planning, and trigger removal route through `VoiceInkPowerModeConfigurationFormState`/`VoiceInkPowerModePresentation`/`VoiceInkPowerModePolicy`' \
+  'macOS Power Mode config form seed defaults, trigger-section labels, transcription section labels, AI toggle title, footer actions, website add planning, trigger removal, and unsaved add-form shortcut cleanup planning route through `VoiceInkPowerModeConfigurationFormState`/`VoiceInkPowerModeConfigurationFormDismissalPlan`/`VoiceInkPowerModePresentation`/`VoiceInkPowerModePolicy`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \
@@ -13465,6 +13480,11 @@ reject_pattern \
 reject_pattern \
   "macOS Power Mode config form avoids shell-only form symbol metadata" \
   '"(xmark|app\.fill|xmark\.circle\.fill|globe|chevron\.right)"' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
+reject_pattern \
+  "macOS Power Mode config form avoids shell-owned unsaved shortcut cleanup planning" \
+  'guard case \.add = mode, !didSaveConfiguration' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
 reject_pattern \

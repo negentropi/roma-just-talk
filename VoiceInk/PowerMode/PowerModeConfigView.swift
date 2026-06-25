@@ -751,11 +751,10 @@ struct ConfigurationView: View {
     }
 
     private func cleanupUnsavedShortcutIfNeeded() {
-        guard case .add = mode, !didSaveConfiguration else {
-            return
-        }
-
-        ShortcutStore.removeShortcutStorage(for: .powerMode(powerModeConfigId))
+        mode.dismissalPlan(didSaveConfiguration: didSaveConfiguration)
+            .applyRuntimeState {
+                ShortcutStore.removeShortcutStorage(for: .powerMode(powerModeConfigId))
+            }
     }
 }
 

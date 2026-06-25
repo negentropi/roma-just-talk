@@ -2523,6 +2523,40 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertEqual(editMode.saveMode, .edit(id))
     }
 
+    func testConfigurationModePlansUnsavedAddShortcutCleanupOnDismiss() {
+        let id = UUID()
+        let editMode = VoiceInkPowerModeConfigurationMode.edit(
+            config(id: id, name: "Writing", emoji: "W")
+        )
+
+        XCTAssertEqual(
+            VoiceInkPowerModeConfigurationMode.add.dismissalPlan(didSaveConfiguration: false),
+            VoiceInkPowerModeConfigurationFormDismissalPlan(shouldRemoveUnsavedShortcut: true)
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeConfigurationMode.add.dismissalPlan(didSaveConfiguration: true),
+            VoiceInkPowerModeConfigurationFormDismissalPlan(shouldRemoveUnsavedShortcut: false)
+        )
+        XCTAssertEqual(
+            editMode.dismissalPlan(didSaveConfiguration: false),
+            VoiceInkPowerModeConfigurationFormDismissalPlan(shouldRemoveUnsavedShortcut: false)
+        )
+
+        var events = [String]()
+        VoiceInkPowerModeConfigurationMode.add
+            .dismissalPlan(didSaveConfiguration: false)
+            .applyRuntimeState {
+                events.append("remove")
+            }
+        VoiceInkPowerModeConfigurationMode.add
+            .dismissalPlan(didSaveConfiguration: true)
+            .applyRuntimeState {
+                events.append("remove")
+            }
+
+        XCTAssertEqual(events, ["remove"])
+    }
+
     func testConfigurationModePreservesEditIdentityByConfigId() {
         let id = UUID()
         let first = VoiceInkPowerModeConfigurationMode.edit(

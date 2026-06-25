@@ -1786,6 +1786,14 @@ public enum VoiceInkPowerModeConfigurationMode: Hashable, Sendable {
         }
     }
 
+    public func dismissalPlan(
+        didSaveConfiguration: Bool
+    ) -> VoiceInkPowerModeConfigurationFormDismissalPlan {
+        VoiceInkPowerModeConfigurationFormDismissalPlan(
+            shouldRemoveUnsavedShortcut: isAdding && !didSaveConfiguration
+        )
+    }
+
     public func hash(into hasher: inout Hasher) {
         switch self {
         case .add:
@@ -1808,6 +1816,21 @@ public enum VoiceInkPowerModeConfigurationMode: Hashable, Sendable {
         default:
             return false
         }
+    }
+}
+
+public struct VoiceInkPowerModeConfigurationFormDismissalPlan: Equatable, Sendable {
+    public let shouldRemoveUnsavedShortcut: Bool
+
+    public init(shouldRemoveUnsavedShortcut: Bool) {
+        self.shouldRemoveUnsavedShortcut = shouldRemoveUnsavedShortcut
+    }
+
+    public func applyRuntimeState(
+        removeUnsavedShortcut: () -> Void
+    ) {
+        guard shouldRemoveUnsavedShortcut else { return }
+        removeUnsavedShortcut()
     }
 }
 

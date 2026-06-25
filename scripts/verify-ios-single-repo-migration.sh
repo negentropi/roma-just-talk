@@ -4956,7 +4956,12 @@ reject_pattern \
 
 require_pattern \
   "shared macOS permission settings presentation lives in VoiceInkCore" \
-  'VoiceInkMacOSPermissionSettingsPresentation|VoiceInkMacOSPermissionSettingsCardPresentation|VoiceInkMacOSPermissionTimingPolicy|VoiceInkMacOSPermissionPollingState|headerIconSystemName|inputMonitoringCard|screenContextCard|relaunchRequiredMessage|pollingInterval|refreshPollLimit|consumePoll' \
+  'VoiceInkMacOSPermissionSettingsPresentation|VoiceInkMacOSPermissionSettingsCardPresentation|VoiceInkMacOSPermissionTimingPolicy|VoiceInkMacOSPermissionPollingState|headerIconSystemName|inputMonitoringCard|screenContextCard|relaunchRequiredMessage|pollingInterval|refreshPollLimit|consumePollAndShouldStop' \
+  VoiceInkCore/Sources/VoiceInkCore/PermissionPresentation.swift
+
+reject_pattern \
+  "shared macOS permission polling avoids public raw action enum" \
+  'VoiceInkMacOSPermissionPollingAction|continuePolling|stopPolling' \
   VoiceInkCore/Sources/VoiceInkCore/PermissionPresentation.swift
 
 require_pattern \
@@ -4972,7 +4977,7 @@ require_patterns \
   'VoiceInkMacOSPermissionTimingPolicy\.manualRefreshAnimationResetDelay' \
   'VoiceInkMacOSPermissionPollingState\.stopped' \
   'permissionRefreshPollingState = \.started\(\)' \
-  'permissionRefreshPollingState\.consumePoll\(\)'
+  'permissionRefreshPollingState\.consumePollAndShouldStop\(\)'
 
 require_patterns \
   "macOS permission refresh center uses shared permission timing and polling state" \
@@ -4982,7 +4987,13 @@ require_patterns \
   'VoiceInkMacOSPermissionTimingPolicy\.openPermissionsGrantMicrophoneDelay' \
   'VoiceInkMacOSPermissionPollingState\.stopped' \
   'pollingState = \.started\(\)' \
-  'pollingState\.consumePoll\(\)'
+  'pollingState\.consumePollAndShouldStop\(\)'
+
+reject_pattern \
+  "macOS permission shells avoid raw polling actions" \
+  '\.consumePoll\(\)|\.(continuePolling|stopPolling)' \
+  VoiceInk/Services/PermissionFlowGuide.swift \
+  VoiceInk/Views/PermissionsView.swift
 
 require_pattern \
   "core checks execute permission timing and polling tests" \

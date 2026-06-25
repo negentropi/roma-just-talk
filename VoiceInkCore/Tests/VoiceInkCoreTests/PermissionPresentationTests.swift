@@ -79,11 +79,11 @@ final class PermissionPresentationTests: XCTestCase {
 
         XCTAssertTrue(state.isActive)
         XCTAssertEqual(state.pollsRemaining, 2)
-        XCTAssertEqual(state.consumePoll(), .continuePolling)
+        XCTAssertFalse(state.consumePollAndShouldStop())
         XCTAssertEqual(state.pollsRemaining, 1)
-        XCTAssertEqual(state.consumePoll(), .stopPolling)
+        XCTAssertTrue(state.consumePollAndShouldStop())
         XCTAssertFalse(state.isActive)
-        XCTAssertEqual(state.consumePoll(), .stopPolling)
+        XCTAssertTrue(state.consumePollAndShouldStop())
 
         let negativeState = VoiceInkMacOSPermissionPollingState(pollsRemaining: -1)
         XCTAssertFalse(negativeState.isActive)

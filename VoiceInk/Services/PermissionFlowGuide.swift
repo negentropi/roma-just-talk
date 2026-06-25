@@ -105,7 +105,7 @@ final class PermissionRefreshCenter: NSObject {
 
                 self.refreshPermissions()
 
-                if self.pollingState.consumePoll() == .stopPolling {
+                if self.pollingState.consumePollAndShouldStop() {
                     timer.invalidate()
                     self.timer = nil
                 }

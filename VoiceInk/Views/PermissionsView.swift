@@ -136,7 +136,7 @@ class PermissionManager: ObservableObject {
 
                 self.checkAllPermissions()
 
-                if self.permissionRefreshPollingState.consumePoll() == .stopPolling {
+                if self.permissionRefreshPollingState.consumePollAndShouldStop() {
                     timer.invalidate()
                     self.permissionRefreshTimer = nil
                 }

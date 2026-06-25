@@ -102,11 +102,6 @@ public enum VoiceInkMacOSPermissionSettingsPresentation {
     )
 }
 
-public enum VoiceInkMacOSPermissionPollingAction: Equatable, Sendable {
-    case continuePolling
-    case stopPolling
-}
-
 public struct VoiceInkMacOSPermissionPollingState: Equatable, Sendable {
     public private(set) var pollsRemaining: Int
 
@@ -125,13 +120,13 @@ public struct VoiceInkMacOSPermissionPollingState: Equatable, Sendable {
     }
 
     @discardableResult
-    public mutating func consumePoll() -> VoiceInkMacOSPermissionPollingAction {
+    public mutating func consumePollAndShouldStop() -> Bool {
         guard pollsRemaining > 0 else {
-            return .stopPolling
+            return true
         }
 
         pollsRemaining -= 1
-        return pollsRemaining > 0 ? .continuePolling : .stopPolling
+        return pollsRemaining <= 0
     }
 }
 

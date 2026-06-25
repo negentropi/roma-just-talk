@@ -5,7 +5,10 @@ import VoiceInkCore
 class CustomCloudModelManager: ObservableObject {
     static let shared = CustomCloudModelManager()
     
-    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "CustomCloudModelManager")
+    private let logger = Logger(
+        subsystem: VoiceInkAppIdentity.loggingSubsystem,
+        category: VoiceInkMacOSLogCategory.customCloudModelManager
+    )
     
     @Published var customModels: [CustomCloudModel] = []
     
@@ -40,7 +43,7 @@ class CustomCloudModelManager: ObservableObject {
             let storedModels: [CustomCloudModel]? = try VoiceInkCustomCloudModelStorage.loadModels()
             customModels = storedModels ?? []
         } catch {
-            logger.error("Failed to decode custom models: \(error.localizedDescription, privacy: .public)")
+            logger.error("\(VoiceInkCustomCloudModelStorage.decodeFailedMessage(errorDescription: error.localizedDescription), privacy: .public)")
             customModels = []
         }
     }
@@ -49,7 +52,7 @@ class CustomCloudModelManager: ObservableObject {
         do {
             try VoiceInkCustomCloudModelStorage.saveModels(customModels)
         } catch {
-            logger.error("Failed to encode custom models: \(error.localizedDescription, privacy: .public)")
+            logger.error("\(VoiceInkCustomCloudModelStorage.encodeFailedMessage(errorDescription: error.localizedDescription), privacy: .public)")
         }
     }
     

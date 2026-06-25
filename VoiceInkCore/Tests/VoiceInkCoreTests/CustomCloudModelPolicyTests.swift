@@ -545,6 +545,17 @@ final class CustomCloudModelPolicyTests: XCTestCase {
         XCTAssertNil(defaults.data(forKey: VoiceInkCustomCloudModelStorage.userDefaultsKey))
     }
 
+    func testCustomCloudModelStorageDiagnosticsPreserveMacOSLogCopy() {
+        XCTAssertEqual(
+            VoiceInkCustomCloudModelStorage.decodeFailedMessage(errorDescription: "Bad JSON"),
+            "Failed to decode custom models: Bad JSON"
+        )
+        XCTAssertEqual(
+            VoiceInkCustomCloudModelStorage.encodeFailedMessage(errorDescription: "Disk full"),
+            "Failed to encode custom models: Disk full"
+        )
+    }
+
     func testCustomCloudTranscriptionPolicyPreservesOpenAICompatibleRequestDefaults() {
         let options = VoiceInkCustomCloudTranscriptionPolicy.openAICompatibleOptions
 

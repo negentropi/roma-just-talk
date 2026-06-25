@@ -6131,6 +6131,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
 
 require_pattern \
+  "shared custom cloud model storage owns persistence diagnostics" \
+  'decodeFailedMessage|encodeFailedMessage|Failed to decode custom models:|Failed to encode custom models:' \
+  VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
+
+require_pattern \
   "shared custom cloud model storage exposes JSON load helper" \
   'func loadModels' \
   VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
@@ -6221,6 +6226,11 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
+  "core checks execute custom cloud model storage diagnostics test" \
+  'CustomCloudModelPolicyTests\.testCustomCloudModelStorageDiagnosticsPreserveMacOSLogCopy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "core checks execute custom cloud model backup import plan tests" \
   'CustomCloudModelPolicyTests\.testBackupImportCollectionPlanAppliesRuntimeStateInMacOSOrder|CustomCloudModelPolicyTests\.testBackupImportCollectionPlanReportsMissingCustomModelsOnly' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
@@ -6290,9 +6300,20 @@ require_pattern \
   'VoiceInkCustomCloudModelStorage\.saveModels' \
   VoiceInk/Transcription/Cloud/CustomCloudModelManager.swift
 
+require_patterns \
+  "macOS custom cloud model manager uses shared diagnostics and log category identity" \
+  VoiceInk/Transcription/Cloud/CustomCloudModelManager.swift \
+  'VoiceInkCustomCloudModelStorage\.(decodeFailedMessage|encodeFailedMessage)' \
+  'category: VoiceInkMacOSLogCategory\.customCloudModelManager'
+
 reject_pattern \
   "macOS custom cloud model manager avoids shell-owned defaults key and JSON persistence loop" \
   'customModelsKey|"customCloudModels"|UserDefaults\.standard|data\(forKey:|set\(data, forKey:|JSONDecoder\(\)\.decode|JSONEncoder\(\)\.encode' \
+  VoiceInk/Transcription/Cloud/CustomCloudModelManager.swift
+
+reject_pattern \
+  "macOS custom cloud model manager avoids shell-owned diagnostics and log category" \
+  'category: "CustomCloudModelManager"|"Failed to decode custom models:|"Failed to encode custom models:' \
   VoiceInk/Transcription/Cloud/CustomCloudModelManager.swift
 
 require_pattern \
@@ -16878,6 +16899,7 @@ require_patterns \
   'polarService = "PolarService"' \
   'licenseViewModel = "LicenseViewModel"' \
   'aiEnhancementService = "AIEnhancementService"' \
+  'customCloudModelManager = "CustomCloudModelManager"' \
   'transcriptionAutoCleanupService = "TranscriptionAutoCleanupService"' \
   'sessionMetricMigrationService = "SessionMetricMigrationService"' \
   'modelPrewarm = "ModelPrewarm"' \

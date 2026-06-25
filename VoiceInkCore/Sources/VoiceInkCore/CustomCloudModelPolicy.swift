@@ -361,6 +361,14 @@ public struct VoiceInkCustomCloudModelStoredRecord: Codable, Equatable, Sendable
 public enum VoiceInkCustomCloudModelStorage {
     public static let userDefaultsKey = "customCloudModels"
 
+    public static func decodeFailedMessage(errorDescription: String) -> String {
+        "Failed to decode custom models: \(errorDescription)"
+    }
+
+    public static func encodeFailedMessage(errorDescription: String) -> String {
+        "Failed to encode custom models: \(errorDescription)"
+    }
+
     public static func loadModels<Model: Decodable>(
         from defaults: UserDefaults = .standard,
         decoder: JSONDecoder = JSONDecoder()

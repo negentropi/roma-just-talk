@@ -56,6 +56,7 @@ final class AppIdentityTests: XCTestCase {
         XCTAssertEqual(VoiceInkMacOSLogCategory.polarService, "PolarService")
         XCTAssertEqual(VoiceInkMacOSLogCategory.licenseViewModel, "LicenseViewModel")
         XCTAssertEqual(VoiceInkMacOSLogCategory.aiEnhancementService, "AIEnhancementService")
+        XCTAssertEqual(VoiceInkMacOSLogCategory.customCloudModelManager, "CustomCloudModelManager")
         XCTAssertEqual(VoiceInkMacOSLogCategory.transcriptionAutoCleanupService, "TranscriptionAutoCleanupService")
         XCTAssertEqual(VoiceInkMacOSLogCategory.sessionMetricMigrationService, "SessionMetricMigrationService")
         XCTAssertEqual(VoiceInkMacOSLogCategory.modelPrewarm, "ModelPrewarm")

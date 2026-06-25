@@ -453,6 +453,13 @@ reject_fixed_string \
   "VoiceInk-iOS" \
   "${xcode_metadata_files[@]}"
 
+reject_pattern \
+  "iOS shell avoids raw SwiftUI-facing copy literals" \
+  '(Text|Button|Label|SecureField|TextField|Picker)\("[A-Za-z][^"]*"\)|\.(navigationTitle|help|alert)\("[A-Za-z][^"]*"\)' \
+  iOS/VoiceInk-ios/*.swift \
+  iOS/Shared/*.swift \
+  iOS/VoiceInkKeyboard/*.swift
+
 section "iOS storage directories live in shared core"
 reject_file iOS/VoiceInk-ios/VoiceInkIOSStorageDirectories.swift
 require_patterns \

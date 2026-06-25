@@ -314,165 +314,168 @@ final class AIProviderCatalogTests: XCTestCase {
         )
     }
 
-    func testMacOSAIEnhancementAPIKeyVerificationDispatchPlanIsShared() {
+    func testMacOSAIEnhancementAPIKeyVerificationDispatchPlanIsShared() async {
         let customRequestURL = URL(string: "https://api.example.com/v1/chat/completions")!
 
-        XCTAssertEqual(
+        await assertVerificationDispatch(
             VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan.plan(
                 provider: .localCLI,
                 currentModel: "ignored",
                 requestURL: nil
             ),
-            VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan(
-                provider: .localCLI,
-                action: .immediate(VoiceInkAPIKeyVerificationResult(
+            expectedResult: VoiceInkAPIKeyVerificationResult(
                     isValid: false,
                     errorMessage: VoiceInkAIEnhancementProviderKind.localCLI.unsupportedAPIKeyVerificationMessage
-                ))
-            )
+            ),
+            expectedCalls: []
         )
-        XCTAssertEqual(
+        await assertVerificationDispatch(
             VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan.plan(
                 provider: .custom,
                 currentModel: "custom-model",
                 requestURL: nil
             ),
-            VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan(
-                provider: .custom,
-                action: .immediate(VoiceInkAPIKeyVerificationResult(
+            expectedResult: VoiceInkAPIKeyVerificationResult(
                     isValid: false,
                     errorMessage: VoiceInkAIEnhancementProviderKind.invalidOrMissingBaseURLConfigurationMessage
-                ))
-            )
+            ),
+            expectedCalls: []
         )
-        XCTAssertEqual(
+        await assertVerificationDispatch(
             VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan.plan(
                 provider: .custom,
                 currentModel: "custom-model",
                 requestURL: customRequestURL
             ),
-            VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan(
-                provider: .custom,
-                action: .openAICompatibleModels(requestURL: customRequestURL, model: "custom-model")
-            )
+            expectedResult: VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: "openai"),
+            expectedCalls: [
+                "openai:https://api.example.com/v1/chat/completions:resolved-key:custom-model"
+            ]
         )
-        XCTAssertEqual(
+        await assertVerificationDispatch(
             VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan.plan(
                 provider: .gemini,
                 currentModel: "gemini-2.5-pro",
                 requestURL: nil
             ),
-            VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan(
-                provider: .gemini,
-                action: .sharedProvider(.gemini)
-            )
+            expectedResult: VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: "shared"),
+            expectedCalls: [
+                "shared:resolved-key:gemini"
+            ]
         )
-        XCTAssertEqual(
+        await assertVerificationDispatch(
             VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan.plan(
                 provider: .anthropic,
                 currentModel: "claude-sonnet-4-20250514",
                 requestURL: nil
             ),
-            VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan(
-                provider: .anthropic,
-                action: .anthropicMessages
-            )
+            expectedResult: VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: "anthropic"),
+            expectedCalls: [
+                "anthropic:resolved-key"
+            ]
         )
-        XCTAssertEqual(
+        await assertVerificationDispatch(
             VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan.plan(
                 provider: .openRouter,
                 currentModel: "openai/gpt-5.5",
                 requestURL: nil
             ),
-            VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan(
-                provider: .openRouter,
-                action: .openRouterModels(model: "openai/gpt-5.5")
-            )
+            expectedResult: VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: "openrouter"),
+            expectedCalls: [
+                "openrouter:resolved-key:openai/gpt-5.5"
+            ]
         )
     }
 
     func testMacOSAIEnhancementAPIKeyVerificationDispatchPlanAppliesAdapters() async {
         let customRequestURL = URL(string: "https://api.example.com/v1/chat/completions")!
-        let immediatePlan = VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan(
-            provider: .custom,
-            action: .immediate(VoiceInkAPIKeyVerificationResult(isValid: false, errorMessage: "missing URL"))
-        )
-        let sharedProviderPlan = VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan(
-            provider: .gemini,
-            action: .sharedProvider(.gemini)
-        )
-        let anthropicPlan = VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan(
-            provider: .anthropic,
-            action: .anthropicMessages
-        )
-        let openAICompatiblePlan = VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan(
-            provider: .custom,
-            action: .openAICompatibleModels(requestURL: customRequestURL, model: "custom-model")
-        )
-        let openRouterPlan = VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan(
-            provider: .openRouter,
-            action: .openRouterModels(model: "openai/gpt-5.5")
-        )
 
+        await assertVerificationDispatch(
+            VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan.plan(
+                provider: .custom,
+                currentModel: "custom-model",
+                requestURL: nil
+            ),
+            expectedResult: VoiceInkAPIKeyVerificationResult(
+                isValid: false,
+                errorMessage: VoiceInkAIEnhancementProviderKind.invalidOrMissingBaseURLConfigurationMessage
+            ),
+            expectedCalls: []
+        )
+        await assertVerificationDispatch(
+            VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan.plan(
+                provider: .gemini,
+                currentModel: "gemini-2.5-pro",
+                requestURL: nil
+            ),
+            expectedResult: VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: "shared"),
+            expectedCalls: [
+                "shared:resolved-key:gemini"
+            ]
+        )
+        await assertVerificationDispatch(
+            VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan.plan(
+                provider: .anthropic,
+                currentModel: "claude-sonnet-4-20250514",
+                requestURL: nil
+            ),
+            expectedResult: VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: "anthropic"),
+            expectedCalls: [
+                "anthropic:resolved-key"
+            ]
+        )
+        await assertVerificationDispatch(
+            VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan.plan(
+                provider: .custom,
+                currentModel: "custom-model",
+                requestURL: customRequestURL
+            ),
+            expectedResult: VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: "openai"),
+            expectedCalls: [
+                "openai:https://api.example.com/v1/chat/completions:resolved-key:custom-model"
+            ]
+        )
+        await assertVerificationDispatch(
+            VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan.plan(
+                provider: .openRouter,
+                currentModel: "openai/gpt-5.5",
+                requestURL: nil
+            ),
+            expectedResult: VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: "openrouter"),
+            expectedCalls: [
+                "openrouter:resolved-key:openai/gpt-5.5"
+            ]
+        )
+    }
+
+    private func assertVerificationDispatch(
+        _ plan: VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan,
+        expectedResult: VoiceInkAPIKeyVerificationResult,
+        expectedCalls: [String]
+    ) async {
         var calls: [String] = []
-        func apply(
-            _ plan: VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan
-        ) async -> VoiceInkAPIKeyVerificationResult {
-            await plan.verifyResolvedAPIKey(
-                "resolved-key",
-                verifySharedProvider: { key, provider in
-                    calls.append("shared:\(key):\(provider.rawValue)")
-                    return VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: "shared")
-                },
-                verifyAnthropicMessages: { key in
-                    calls.append("anthropic:\(key)")
-                    return VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: "anthropic")
-                },
-                verifyOpenAICompatibleModels: { requestURL, key, model in
-                    calls.append("openai:\(requestURL.absoluteString):\(key):\(model)")
-                    return VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: "openai")
-                },
-                verifyOpenRouterModels: { key, model in
-                    calls.append("openrouter:\(key):\(model)")
-                    return VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: "openrouter")
-                }
-            )
-        }
+        let result = await plan.verifyResolvedAPIKey(
+            "resolved-key",
+            verifySharedProvider: { key, provider in
+                calls.append("shared:\(key):\(provider.rawValue)")
+                return VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: "shared")
+            },
+            verifyAnthropicMessages: { key in
+                calls.append("anthropic:\(key)")
+                return VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: "anthropic")
+            },
+            verifyOpenAICompatibleModels: { requestURL, key, model in
+                calls.append("openai:\(requestURL.absoluteString):\(key):\(model)")
+                return VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: "openai")
+            },
+            verifyOpenRouterModels: { key, model in
+                calls.append("openrouter:\(key):\(model)")
+                return VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: "openrouter")
+            }
+        )
 
-        let immediateResult = await apply(immediatePlan)
-        XCTAssertEqual(
-            immediateResult,
-            VoiceInkAPIKeyVerificationResult(isValid: false, errorMessage: "missing URL")
-        )
-        XCTAssertTrue(calls.isEmpty)
-
-        let sharedProviderResult = await apply(sharedProviderPlan)
-        let anthropicResult = await apply(anthropicPlan)
-        let openAICompatibleResult = await apply(openAICompatiblePlan)
-        let openRouterResult = await apply(openRouterPlan)
-
-        XCTAssertEqual(
-            sharedProviderResult,
-            VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: "shared")
-        )
-        XCTAssertEqual(
-            anthropicResult,
-            VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: "anthropic")
-        )
-        XCTAssertEqual(
-            openAICompatibleResult,
-            VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: "openai")
-        )
-        XCTAssertEqual(
-            openRouterResult,
-            VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: "openrouter")
-        )
-        XCTAssertEqual(calls, [
-            "shared:resolved-key:gemini",
-            "anthropic:resolved-key",
-            "openai:https://api.example.com/v1/chat/completions:resolved-key:custom-model",
-            "openrouter:resolved-key:openai/gpt-5.5"
-        ])
+        XCTAssertEqual(result, expectedResult)
+        XCTAssertEqual(calls, expectedCalls)
     }
 
     func testMacOSAIEnhancementAPIKeyVerificationPlanSavesEnteredReferenceAndAppliesResolvedRuntimeKey() {

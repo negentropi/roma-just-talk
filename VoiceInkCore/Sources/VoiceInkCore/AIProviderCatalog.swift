@@ -614,7 +614,7 @@ public extension VoiceInkAIEnhancementAPIKeyVerificationServiceStatePlan {
     }
 }
 
-public enum VoiceInkAIEnhancementAPIKeyVerificationDispatch: Equatable, Sendable {
+fileprivate enum VoiceInkAIEnhancementAPIKeyVerificationDispatch: Equatable, Sendable {
     case immediate(VoiceInkAPIKeyVerificationResult)
     case sharedProvider(VoiceInkProviderKind)
     case anthropicMessages
@@ -623,10 +623,10 @@ public enum VoiceInkAIEnhancementAPIKeyVerificationDispatch: Equatable, Sendable
 }
 
 public struct VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan: Equatable, Sendable {
-    public let provider: VoiceInkAIEnhancementProviderKind
-    public let action: VoiceInkAIEnhancementAPIKeyVerificationDispatch
+    private let provider: VoiceInkAIEnhancementProviderKind
+    private let action: VoiceInkAIEnhancementAPIKeyVerificationDispatch
 
-    public init(
+    private init(
         provider: VoiceInkAIEnhancementProviderKind,
         action: VoiceInkAIEnhancementAPIKeyVerificationDispatch
     ) {

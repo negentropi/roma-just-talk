@@ -8615,7 +8615,19 @@ require_pattern \
 
 require_pattern \
   "shared macOS AI API-key verification dispatch plan lives in VoiceInkCore" \
-  'VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan|VoiceInkAIEnhancementAPIKeyVerificationDispatch|openAICompatibleModels\(requestURL:|openRouterModels\(model:' \
+  'VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan|VoiceInkAIEnhancementAPIKeyVerificationDispatch|verifyResolvedAPIKey' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+require_patterns \
+  "shared macOS AI API-key verification dispatch plan hides raw action payload" \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift \
+  '(private|fileprivate) enum VoiceInkAIEnhancementAPIKeyVerificationDispatch' \
+  'private let action: VoiceInkAIEnhancementAPIKeyVerificationDispatch' \
+  'private init\('
+
+reject_pattern \
+  "shared macOS AI API-key verification dispatch plan avoids public raw action cases" \
+  'public enum VoiceInkAIEnhancementAPIKeyVerificationDispatch|public let action' \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 require_patterns \
@@ -8639,6 +8651,11 @@ require_pattern \
   "core checks execute shared macOS AI API-key verification dispatch application test" \
   'AIProviderCatalogTests\.testMacOSAIEnhancementAPIKeyVerificationDispatchPlanAppliesAdapters' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "core AI API-key verification dispatch tests avoid raw action construction" \
+  'VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan\(|action: \.' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AIProviderCatalogTests.swift
 
 require_pattern \
   "core checks execute shared macOS AI API-key verification persistence plan test" \

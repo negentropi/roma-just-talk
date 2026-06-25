@@ -2415,13 +2415,14 @@ require_pattern \
 
 require_pattern \
   "shared macOS audio input settings presentation lives in VoiceInkCore" \
-  'VoiceInkMacOSAudioInputSettingsPresentation|heroTitle|prioritizedDevicesDescription|priorityDisplayText' \
+  'VoiceInkMacOSAudioInputSettingsPresentation|heroTitle|prioritizedDevicesDescription|priorityDisplayText|switchedDeviceNotificationTitle|usingDeviceNotificationTitle' \
   VoiceInkCore/Sources/VoiceInkCore/AudioInputPriorityPolicy.swift
 
 require_patterns \
   "core audio input automatic selection tests are in runner" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
   'testMacOSAudioDeviceChangeRequestPreservesNotificationContract' \
+  'testMacOSAudioInputSettingsPresentationPreservesCopyAndIcons' \
   'testAutomaticSelectionPolicyPreservesBuiltInDetection' \
   'testAutomaticSelectionPolicyRefusesUnsafeAutomaticDevices' \
   'testSelectionPolicyResolvesCurrentDeviceByMode' \
@@ -2486,6 +2487,12 @@ require_pattern \
   'VoiceInkAudioInputPreference\.(shouldAnnounceMicrophoneChange|saveLastUsedMicrophoneDeviceID)' \
   VoiceInk/Recorder.swift
 
+require_patterns \
+  "macOS recorder uses shared audio-input notification presentation" \
+  VoiceInk/Recorder.swift \
+  'VoiceInkMacOSAudioInputSettingsPresentation\.macOS\.switchedDeviceNotificationTitle' \
+  'VoiceInkMacOSAudioInputSettingsPresentation\.macOS\.usingDeviceNotificationTitle'
+
 require_pattern \
   "shared preference reset clears last-used microphone state" \
   'VoiceInkAudioInputPreference\.clearLastUsedMicrophoneDeviceID' \
@@ -2521,13 +2528,18 @@ reject_pattern \
   VoiceInk/Notifications/AppNotifications.swift
 
 reject_pattern \
+  "macOS recorder avoids shell-owned audio input notification copy" \
+  '"(Switched to:|Using:)' \
+  VoiceInk/Recorder.swift
+
+reject_pattern \
   "macOS audio input settings avoid shell-only presentation copy" \
   '"(Audio Input|Configure your microphone preferences|Input Mode|Current Device|No device available|Active|Available Devices|Refresh|Prioritized Devices|Devices will be used in order of priority\. If a device is unavailable, the next one will be tried\. If no prioritized device is available, the built-in microphone will be used\.|No prioritized devices|No additional devices available|No Audio Devices|Connect an audio input device to get started|Unavailable)"|"waveform"|"wave\.3\.right"|"arrow\.clockwise"|"mic\.slash\.circle\.fill"|"exclamationmark\.triangle"|"plus\.circle\.fill"|"minus\.circle\.fill"|"chevron\.up"|"chevron\.down"|Text\("-"\)|Text\("\\\(\(priority \+ 1\)\\\)"\)' \
   VoiceInk/Views/Settings/AudioInputSettingsView.swift
 
 require_pattern \
   "migration checklist tracks shared audio input preference gate" \
-  'macOS audio-input storage keys, selected-device UID persistence, last-used microphone notification suppression, priority-device JSON storage, audio-device change/switch notification contract, settings labels, status copy, empty states, action icons, priority display text, current-device and mode-change selection planning, recording-device switch planning, and safe automatic input selection route through `VoiceInkAudioInputPreference`/`VoiceInkMacOSAudioDeviceChangeRequest`/`VoiceInkMacOSAudioInputSettingsPresentation`/`VoiceInkAudioInputSelectionPolicy`/`VoiceInkAudioInputAutomaticSelectionPolicy`' \
+  'macOS audio-input storage keys, selected-device UID persistence, last-used microphone notification suppression, priority-device JSON storage, audio-device change/switch notification contract, settings labels, status copy, empty states, action icons, priority display text, microphone notification title copy, current-device and mode-change selection planning, recording-device switch planning, and safe automatic input selection route through `VoiceInkAudioInputPreference`/`VoiceInkMacOSAudioDeviceChangeRequest`/`VoiceInkMacOSAudioInputSettingsPresentation`/`VoiceInkAudioInputSelectionPolicy`/`VoiceInkAudioInputAutomaticSelectionPolicy`' \
   docs/ios-single-repo-migration.md
 
 reject_pattern \

@@ -101,7 +101,9 @@ class Recorder: NSObject, ObservableObject {
             if let deviceName = deviceManager.availableDevices.first(where: { $0.id == newDeviceID })?.name {
                 await MainActor.run {
                     NotificationManager.shared.showNotification(
-                        title: "Switched to: \(deviceName)",
+                        title: VoiceInkMacOSAudioInputSettingsPresentation.macOS.switchedDeviceNotificationTitle(
+                            deviceName: deviceName
+                        ),
                         type: .info
                     )
                 }
@@ -167,7 +169,12 @@ class Recorder: NSObject, ObservableObject {
         let currentDeviceIdentifier = String(currentDeviceID)
         if VoiceInkAudioInputPreference.shouldAnnounceMicrophoneChange(to: currentDeviceIdentifier) {
             if let deviceName = deviceManager.availableDevices.first(where: { $0.id == currentDeviceID })?.name {
-                NotificationManager.shared.showNotification(title: "Using: \(deviceName)", type: .info)
+                NotificationManager.shared.showNotification(
+                    title: VoiceInkMacOSAudioInputSettingsPresentation.macOS.usingDeviceNotificationTitle(
+                        deviceName: deviceName
+                    ),
+                    type: .info
+                )
             }
         }
         VoiceInkAudioInputPreference.saveLastUsedMicrophoneDeviceID(currentDeviceIdentifier)

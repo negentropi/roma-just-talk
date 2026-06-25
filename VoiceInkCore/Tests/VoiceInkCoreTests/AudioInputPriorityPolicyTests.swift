@@ -127,6 +127,14 @@ final class AudioInputPriorityPolicyTests: XCTestCase {
         XCTAssertEqual(presentation.moveUpSystemImageName, "chevron.up")
         XCTAssertEqual(presentation.moveDownSystemImageName, "chevron.down")
         XCTAssertEqual(presentation.unprioritizedPriorityPlaceholder, "-")
+        XCTAssertEqual(
+            presentation.switchedDeviceNotificationTitle(deviceName: "Studio Display Microphone"),
+            "Switched to: Studio Display Microphone"
+        )
+        XCTAssertEqual(
+            presentation.usingDeviceNotificationTitle(deviceName: "Studio Display Microphone"),
+            "Using: Studio Display Microphone"
+        )
     }
 
     func testMacOSAudioInputSettingsPresentationFormatsPriorityDisplay() {

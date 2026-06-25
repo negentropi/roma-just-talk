@@ -526,4 +526,12 @@ public struct VoiceInkMacOSAudioInputSettingsPresentation: Equatable, Sendable {
     public func priorityDisplayText(for zeroBasedPriority: Int) -> String {
         "\(zeroBasedPriority + 1)"
     }
+
+    public func switchedDeviceNotificationTitle(deviceName: String) -> String {
+        "Switched to: \(deviceName)"
+    }
+
+    public func usingDeviceNotificationTitle(deviceName: String) -> String {
+        "Using: \(deviceName)"
+    }
 }

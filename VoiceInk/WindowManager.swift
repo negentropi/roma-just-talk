@@ -20,12 +20,12 @@ class WindowManager: NSObject {
     
     func configureWindow(_ window: NSWindow) {
         if let existingWindow = NSApplication.shared.windows.first(where: { $0.identifier == Self.mainWindowIdentifier && $0 != window }) {
-            logger.notice("configureWindow: duplicate detected, reusing existing window")
+            logger.notice("\(VoiceInkMacOSWindowIdentity.configureWindowDuplicateDetectedMessage, privacy: .public)")
             window.close()
             existingWindow.makeKeyAndOrderFront(nil)
             return
         }
-        logger.notice("configureWindow: registering main window")
+        logger.notice("\(VoiceInkMacOSWindowIdentity.configureWindowRegisteringMainMessage, privacy: .public)")
         
         let requiredStyleMask: NSWindow.StyleMask = [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView]
         window.styleMask.formUnion(requiredStyleMask)
@@ -113,10 +113,10 @@ class WindowManager: NSObject {
             return window
         }
 
-        logger.notice("resolveMainWindow: weak ref is nil, searching \(NSApplication.shared.windows.count, privacy: .public) windows by identifier")
+        logger.notice("\(VoiceInkMacOSWindowIdentity.resolveMainWindowSearchingMessage(windowCount: NSApplication.shared.windows.count), privacy: .public)")
 
         if let window = NSApplication.shared.windows.first(where: { $0.identifier == Self.mainWindowIdentifier }) {
-            logger.notice("resolveMainWindow: recovered window via identifier fallback")
+            logger.notice("\(VoiceInkMacOSWindowIdentity.resolveMainWindowRecoveredMessage, privacy: .public)")
             mainWindow = window
             window.delegate = self
             return window
@@ -125,7 +125,7 @@ class WindowManager: NSObject {
         let windowIDs = VoiceInkMacOSWindowIdentity.identifierListDebugText(
             NSApplication.shared.windows.map { $0.identifier?.rawValue }
         )
-        logger.error("resolveMainWindow: FAILED — no window found with main identifier. Total windows: \(NSApplication.shared.windows.count, privacy: .public), identifiers: \(windowIDs, privacy: .public)")
+        logger.error("\(VoiceInkMacOSWindowIdentity.resolveMainWindowFailedMessage(windowCount: NSApplication.shared.windows.count, identifiers: windowIDs), privacy: .public)")
         return nil
     }
 }
@@ -134,7 +134,7 @@ extension WindowManager: NSWindowDelegate {
     func windowWillClose(_ notification: Notification) {
         guard let window = notification.object as? NSWindow else { return }
         if window.identifier == Self.mainWindowIdentifier {
-            logger.notice("windowWillClose: main window closing, clearing weak reference")
+            logger.notice("\(VoiceInkMacOSWindowIdentity.windowWillCloseMainMessage, privacy: .public)")
             window.orderOut(nil)
             mainWindow = nil
             didApplyInitialPlacement = false

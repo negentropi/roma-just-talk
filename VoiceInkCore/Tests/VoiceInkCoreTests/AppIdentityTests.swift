@@ -74,6 +74,33 @@ final class AppIdentityTests: XCTestCase {
             "com.prakashjoshipax.voiceink.mainWindow, nil, com.prakashjoshipax.voiceink.historyWindow"
         )
         XCTAssertEqual(VoiceInkMacOSWindowIdentity.identifierListDebugText([]), "")
+        XCTAssertEqual(
+            VoiceInkMacOSWindowIdentity.configureWindowDuplicateDetectedMessage,
+            "configureWindow: duplicate detected, reusing existing window"
+        )
+        XCTAssertEqual(
+            VoiceInkMacOSWindowIdentity.configureWindowRegisteringMainMessage,
+            "configureWindow: registering main window"
+        )
+        XCTAssertEqual(
+            VoiceInkMacOSWindowIdentity.resolveMainWindowSearchingMessage(windowCount: 3),
+            "resolveMainWindow: weak ref is nil, searching 3 windows by identifier"
+        )
+        XCTAssertEqual(
+            VoiceInkMacOSWindowIdentity.resolveMainWindowRecoveredMessage,
+            "resolveMainWindow: recovered window via identifier fallback"
+        )
+        XCTAssertEqual(
+            VoiceInkMacOSWindowIdentity.resolveMainWindowFailedMessage(
+                windowCount: 3,
+                identifiers: "main, nil, history"
+            ),
+            "resolveMainWindow: FAILED — no window found with main identifier. Total windows: 3, identifiers: main, nil, history"
+        )
+        XCTAssertEqual(
+            VoiceInkMacOSWindowIdentity.windowWillCloseMainMessage,
+            "windowWillClose: main window closing, clearing weak reference"
+        )
     }
 
     func testMacOSStorageAlertPresentationPreservesStartupCopy() {

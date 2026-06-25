@@ -296,6 +296,19 @@ public enum VoiceInkMacOSWindowIdentity {
     public static func identifierListDebugText(_ rawValues: [String?]) -> String {
         rawValues.map { $0 ?? "nil" }.joined(separator: ", ")
     }
+
+    public static let configureWindowDuplicateDetectedMessage = "configureWindow: duplicate detected, reusing existing window"
+    public static let configureWindowRegisteringMainMessage = "configureWindow: registering main window"
+    public static let resolveMainWindowRecoveredMessage = "resolveMainWindow: recovered window via identifier fallback"
+    public static let windowWillCloseMainMessage = "windowWillClose: main window closing, clearing weak reference"
+
+    public static func resolveMainWindowSearchingMessage(windowCount: Int) -> String {
+        "resolveMainWindow: weak ref is nil, searching \(windowCount) windows by identifier"
+    }
+
+    public static func resolveMainWindowFailedMessage(windowCount: Int, identifiers: String) -> String {
+        "resolveMainWindow: FAILED — no window found with main identifier. Total windows: \(windowCount), identifiers: \(identifiers)"
+    }
 }
 
 public enum VoiceInkMacOSLogCategory {

@@ -16543,6 +16543,9 @@ require_patterns \
   'VoiceInkMacOSWindowIdentity\.mainIdentifierRawValue' \
   'VoiceInkMacOSWindowIdentity\.onboardingIdentifierRawValue' \
   'VoiceInkMacOSWindowIdentity\.identifierListDebugText' \
+  'VoiceInkMacOSWindowIdentity\.configureWindowDuplicateDetectedMessage' \
+  'VoiceInkMacOSWindowIdentity\.resolveMainWindowSearchingMessage' \
+  'VoiceInkMacOSWindowIdentity\.resolveMainWindowFailedMessage' \
   'VoiceInkMacOSWindowIdentity\.mainFrameAutosaveName' \
   'VoiceInkMacOSWindowIdentity\.mainTitle' \
   'VoiceInkMacOSWindowIdentity\.onboardingTitle'
@@ -16566,7 +16569,13 @@ require_patterns \
   'mainTitle' \
   'onboardingTitle' \
   'historyTitle' \
-  'identifierListDebugText'
+  'identifierListDebugText' \
+  'configureWindowDuplicateDetectedMessage' \
+  'configureWindowRegisteringMainMessage' \
+  'resolveMainWindowSearchingMessage' \
+  'resolveMainWindowRecoveredMessage' \
+  'resolveMainWindowFailedMessage' \
+  'windowWillCloseMainMessage'
 
 require_patterns \
   "shared macOS log category identity lives in VoiceInkCore" \
@@ -16623,6 +16632,11 @@ reject_pattern \
 reject_pattern \
   "macOS window manager avoids shell-owned window identifier list formatting" \
   '\?\? "nil"|joined\(separator: ", "\)' \
+  VoiceInk/WindowManager.swift
+
+reject_pattern \
+  "macOS window manager avoids shell-owned diagnostic copy" \
+  '"(configureWindow: duplicate detected, reusing existing window|configureWindow: registering main window|resolveMainWindow: weak ref is nil, searching|resolveMainWindow: recovered window via identifier fallback|resolveMainWindow: FAILED|windowWillClose: main window closing, clearing weak reference)' \
   VoiceInk/WindowManager.swift
 
 reject_pattern \

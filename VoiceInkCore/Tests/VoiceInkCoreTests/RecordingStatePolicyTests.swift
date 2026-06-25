@@ -950,6 +950,55 @@ final class RecordingStatePolicyTests: XCTestCase {
         ])
     }
 
+    func testKeyboardOpenAppPlansApplyDiagnosticsAndRuntimeState() {
+        var events: [String] = []
+
+        func apply(_ plan: VoiceInkKeyboardOpenAppActionPlan) {
+            plan.applyRuntimeState(
+                logNotice: { events.append("notice:\($0)") },
+                logError: { events.append("error:\($0)") },
+                openExtensionContext: { events.append("extension") },
+                openThroughApplicationOrResponderChain: { events.append("fallbackChain") },
+                finish: { events.append("finish") },
+                showFallback: { events.append("fallback") }
+            )
+        }
+
+        func apply(_ plan: VoiceInkKeyboardOpenAppResponderActionPlan) {
+            plan.applyRuntimeState(
+                logNotice: { events.append("notice:\($0)") },
+                logError: { events.append("error:\($0)") },
+                performResponderChainOpen: { events.append("responder") },
+                showFallback: { events.append("responderFallback") }
+            )
+        }
+
+        apply(VoiceInkKeyboardOpenAppPolicy.initialActionPlan(hasExtensionContext: false))
+        apply(VoiceInkKeyboardOpenAppPolicy.actionPlanAfterExtensionContextOpen(succeeded: true))
+        apply(VoiceInkKeyboardOpenAppPolicy.actionPlanAfterExtensionContextOpen(succeeded: false))
+        apply(VoiceInkKeyboardOpenAppPolicy.actionPlanAfterApplicationOpen(succeeded: true))
+        apply(VoiceInkKeyboardOpenAppPolicy.actionPlanAfterApplicationOpen(succeeded: false))
+        apply(VoiceInkKeyboardOpenAppPolicy.responderActionPlan(hasResponder: true))
+        apply(VoiceInkKeyboardOpenAppPolicy.responderActionPlan(hasResponder: false))
+
+        XCTAssertEqual(events, [
+            "error:\(VoiceInkKeyboardOpenAppDiagnostics.extensionContextUnavailable)",
+            "fallbackChain",
+            "notice:\(VoiceInkKeyboardOpenAppDiagnostics.openedViaExtensionContext)",
+            "finish",
+            "error:\(VoiceInkKeyboardOpenAppDiagnostics.extensionContextOpenFailed)",
+            "fallbackChain",
+            "notice:\(VoiceInkKeyboardOpenAppDiagnostics.openedViaApplication)",
+            "finish",
+            "error:\(VoiceInkKeyboardOpenAppDiagnostics.applicationOpenFailed)",
+            "fallback",
+            "responder",
+            "notice:\(VoiceInkKeyboardOpenAppDiagnostics.attemptedViaResponderChain)",
+            "error:\(VoiceInkKeyboardOpenAppDiagnostics.allMethodsFailed)",
+            "responderFallback"
+        ])
+    }
+
     func testKeyboardOpenAppDiagnosticsPreserveIOSLogCopy() {
         XCTAssertEqual(
             VoiceInkKeyboardOpenAppDiagnostics.extensionContextUnavailable,

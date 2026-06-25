@@ -15486,7 +15486,13 @@ require_patterns \
   "VoiceInkCore owns iOS keyboard open-app fallback policy and diagnostics" \
   VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift \
   'VoiceInkKeyboardOpenAppPolicy' \
+  'VoiceInkKeyboardOpenAppActionPlan' \
+  'VoiceInkKeyboardOpenAppDiagnosticEvent' \
   'VoiceInkKeyboardOpenAppDiagnostics' \
+  'initialActionPlan' \
+  'actionPlanAfterExtensionContextOpen' \
+  'actionPlanAfterApplicationOpen' \
+  'responderActionPlan' \
   'actionAfterExtensionContextOpen' \
   'applicationAction' \
   'responderAction' \
@@ -15497,6 +15503,7 @@ require_patterns \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
   'testKeyboardOpenAppPolicyPreservesFallbackOrder' \
   'testKeyboardOpenAppActionsApplyRuntimeState' \
+  'testKeyboardOpenAppPlansApplyDiagnosticsAndRuntimeState' \
   'testKeyboardOpenAppDiagnosticsPreserveIOSLogCopy'
 
 require_pattern \
@@ -15510,11 +15517,16 @@ require_pattern \
   iOS/Shared/VoiceInkKeyboardURLOpener.swift
 
 require_patterns \
-  "iOS keyboard URL opener adapts shared open-app policy and diagnostics" \
+  "iOS keyboard URL opener adapts shared open-app policy plans" \
   iOS/Shared/VoiceInkKeyboardURLOpener.swift \
   'VoiceInkKeyboardOpenAppPolicy' \
-  'VoiceInkKeyboardOpenAppDiagnostics' \
-  'applyRuntimeState'
+  'initialActionPlan' \
+  'actionPlanAfterExtensionContextOpen' \
+  'actionPlanAfterApplicationOpen' \
+  'responderActionPlan' \
+  'applyRuntimeState' \
+  'logNotice' \
+  'logError'
 
 require_pattern \
   "iOS keyboard URL opener owns extension-context opening" \
@@ -15534,6 +15546,11 @@ require_pattern \
 reject_pattern \
   "iOS keyboard URL opener avoids shell-owned fallback diagnostic copy" \
   '"(extensionContext unavailable, trying alternative methods|Opened main app via extensionContext|extensionContext\.open failed, trying alternative methods|Opened main app via UIApplication\.open|UIApplication\.open failed|Attempted to open main app via responder chain|All URL opening methods failed)"' \
+  iOS/Shared/VoiceInkKeyboardURLOpener.swift
+
+reject_pattern \
+  "iOS keyboard URL opener avoids shell-owned open-app diagnostic selection" \
+  'VoiceInkKeyboardOpenAppDiagnostics\.' \
   iOS/Shared/VoiceInkKeyboardURLOpener.swift
 
 reject_pattern \

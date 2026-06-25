@@ -9,9 +9,11 @@ enum VoiceInkKeyboardURLOpener {
         responder: UIResponder,
         fallback: @escaping () -> Void
     ) {
-        VoiceInkKeyboardOpenAppPolicy.initialAction(
+        VoiceInkKeyboardOpenAppPolicy.initialActionPlan(
             hasExtensionContext: extensionContext != nil
         ).applyRuntimeState(
+            logNotice: logNotice,
+            logError: logError,
             openExtensionContext: {
                 extensionContext?.open(url) { success in
                     applyExtensionContextOpenResult(
@@ -23,7 +25,6 @@ enum VoiceInkKeyboardURLOpener {
                 }
             },
             openThroughApplicationOrResponderChain: {
-                VoiceInkIOSLogger.keyboard.error("\(VoiceInkKeyboardOpenAppDiagnostics.extensionContextUnavailable, privacy: .public)")
                 openThroughApplicationOrResponderChain(
                     url: url,
                     responder: responder,
@@ -41,12 +42,13 @@ enum VoiceInkKeyboardURLOpener {
         responder: UIResponder,
         fallback: @escaping () -> Void
     ) {
-        VoiceInkKeyboardOpenAppPolicy.actionAfterExtensionContextOpen(
+        VoiceInkKeyboardOpenAppPolicy.actionPlanAfterExtensionContextOpen(
             succeeded: succeeded
         ).applyRuntimeState(
+            logNotice: logNotice,
+            logError: logError,
             openExtensionContext: {},
             openThroughApplicationOrResponderChain: {
-                VoiceInkIOSLogger.keyboard.error("\(VoiceInkKeyboardOpenAppDiagnostics.extensionContextOpenFailed, privacy: .public)")
                 DispatchQueue.main.async {
                     openThroughApplicationOrResponderChain(
                         url: url,
@@ -55,9 +57,7 @@ enum VoiceInkKeyboardURLOpener {
                     )
                 }
             },
-            finish: {
-                VoiceInkIOSLogger.keyboard.notice("\(VoiceInkKeyboardOpenAppDiagnostics.openedViaExtensionContext, privacy: .public)")
-            },
+            finish: {},
             showFallback: {}
         )
     }
@@ -86,16 +86,15 @@ enum VoiceInkKeyboardURLOpener {
         succeeded: Bool,
         fallback: @escaping () -> Void
     ) {
-        VoiceInkKeyboardOpenAppPolicy.actionAfterApplicationOpen(
+        VoiceInkKeyboardOpenAppPolicy.actionPlanAfterApplicationOpen(
             succeeded: succeeded
         ).applyRuntimeState(
+            logNotice: logNotice,
+            logError: logError,
             openExtensionContext: {},
             openThroughApplicationOrResponderChain: {},
-            finish: {
-                VoiceInkIOSLogger.keyboard.notice("\(VoiceInkKeyboardOpenAppDiagnostics.openedViaApplication, privacy: .public)")
-            },
+            finish: {},
             showFallback: {
-                VoiceInkIOSLogger.keyboard.error("\(VoiceInkKeyboardOpenAppDiagnostics.applicationOpenFailed, privacy: .public)")
                 showFallback(fallback)
             }
         )
@@ -113,17 +112,17 @@ enum VoiceInkKeyboardURLOpener {
             nextResponder = currentResponder.next
         }
 
-        VoiceInkKeyboardOpenAppPolicy.responderAction(
+        VoiceInkKeyboardOpenAppPolicy.responderActionPlan(
             hasResponder: nextResponder != nil
         ).applyRuntimeState(
+            logNotice: logNotice,
+            logError: logError,
             performResponderChainOpen: {
                 if let nextResponder {
                     _ = nextResponder.perform(selector, with: url)
-                    VoiceInkIOSLogger.keyboard.notice("\(VoiceInkKeyboardOpenAppDiagnostics.attemptedViaResponderChain, privacy: .public)")
                 }
             },
             showFallback: {
-                VoiceInkIOSLogger.keyboard.error("\(VoiceInkKeyboardOpenAppDiagnostics.allMethodsFailed, privacy: .public)")
                 showFallback(fallback)
             }
         )
@@ -133,5 +132,13 @@ enum VoiceInkKeyboardURLOpener {
         DispatchQueue.main.async {
             fallback()
         }
+    }
+
+    private static func logNotice(_ message: String) {
+        VoiceInkIOSLogger.keyboard.notice("\(message, privacy: .public)")
+    }
+
+    private static func logError(_ message: String) {
+        VoiceInkIOSLogger.keyboard.error("\(message, privacy: .public)")
     }
 }

@@ -1167,6 +1167,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "RecordingStatePolicyTests.testKeyboardRecordingButtonTapPlanAppliesRuntimeState", run: { RecordingStatePolicyTests().testKeyboardRecordingButtonTapPlanAppliesRuntimeState() }),
             VoiceInkCoreCheck(name: "RecordingStatePolicyTests.testKeyboardOpenAppPolicyPreservesFallbackOrder", run: { RecordingStatePolicyTests().testKeyboardOpenAppPolicyPreservesFallbackOrder() }),
             VoiceInkCoreCheck(name: "RecordingStatePolicyTests.testKeyboardOpenAppActionsApplyRuntimeState", run: { RecordingStatePolicyTests().testKeyboardOpenAppActionsApplyRuntimeState() }),
+            VoiceInkCoreCheck(name: "RecordingStatePolicyTests.testKeyboardOpenAppPlansApplyDiagnosticsAndRuntimeState", run: { RecordingStatePolicyTests().testKeyboardOpenAppPlansApplyDiagnosticsAndRuntimeState() }),
             VoiceInkCoreCheck(name: "RecordingStatePolicyTests.testKeyboardOpenAppDiagnosticsPreserveIOSLogCopy", run: { RecordingStatePolicyTests().testKeyboardOpenAppDiagnosticsPreserveIOSLogCopy() }),
             VoiceInkCoreCheck(name: "RecordingStatePolicyTests.testKeyboardStopRecordingRequestHandlesOnlyActiveRecording", run: { RecordingStatePolicyTests().testKeyboardStopRecordingRequestHandlesOnlyActiveRecording() }),
             VoiceInkCoreCheck(name: "RecordingStatePolicyTests.testKeyboardStopRecordingRequestActionAppliesRuntimeState", run: { RecordingStatePolicyTests().testKeyboardStopRecordingRequestActionAppliesRuntimeState() }),

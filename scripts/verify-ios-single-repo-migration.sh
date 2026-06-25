@@ -15726,6 +15726,11 @@ require_pattern \
   'VoiceInkAppGroupRecordingStateMutationPlan|darwinNotificationName' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
+reject_pattern \
+  "VoiceInkCore App Group recording plans avoid public raw mutation internals" \
+  'public let (writePlan|darwinNotificationName|staleStateRepairMutationPlan)\b|public let isRecording: Bool\?|public let lastRecordingTimestamp' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
 require_pattern \
   "iOS App Group bridge tests use shared recording state policy" \
   'VoiceInkAppGroupRecordingStatePolicy\.(staleRecordingInterval|UserDefaultsKey|recordingStateMutationPlan)' \

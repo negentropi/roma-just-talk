@@ -468,16 +468,19 @@ final class RecordingStatePolicyTests: XCTestCase {
             now: Date(timeIntervalSince1970: 129)
         )
 
+        var didRepair = false
+        let state = plan.applyRuntimeState { _ in
+            didRepair = true
+        }
+
         XCTAssertEqual(
-            plan,
-            VoiceInkAppGroupRecordingStateReadPlan(
-                state: VoiceInkAppGroupRecordingState(
-                    isRecording: true,
-                    shouldClearStaleState: false
-                ),
-                staleStateRepairMutationPlan: nil
+            state,
+            VoiceInkAppGroupRecordingState(
+                isRecording: true,
+                shouldClearStaleState: false
             )
         )
+        XCTAssertFalse(didRepair)
     }
 
     func testAppGroupRecordingStateReadPlanOwnsStaleRepairMutation() {
@@ -487,22 +490,26 @@ final class RecordingStatePolicyTests: XCTestCase {
             now: Date(timeIntervalSince1970: 131)
         )
 
+        var events: [String] = []
+        let state = plan.applyRuntimeState { mutationPlan in
+            mutationPlan.applyRuntimeState(
+                applyWritePlan: { $0.recordAppGroupWriteEvents(into: &events) },
+                postDarwinNotification: { events.append("notify:\($0)") }
+            )
+        }
+
         XCTAssertEqual(
-            plan,
-            VoiceInkAppGroupRecordingStateReadPlan(
-                state: VoiceInkAppGroupRecordingState(
-                    isRecording: false,
-                    shouldClearStaleState: true
-                ),
-                staleStateRepairMutationPlan: VoiceInkAppGroupRecordingStateMutationPlan(
-                    writePlan: VoiceInkAppGroupRecordingStateWritePlan(
-                        isRecording: false,
-                        lastRecordingTimestamp: 131
-                    ),
-                    darwinNotificationName: VoiceInkAppIdentity.iOSRecordingStateChangedDarwinNotificationName
-                )
+            state,
+            VoiceInkAppGroupRecordingState(
+                isRecording: false,
+                shouldClearStaleState: true
             )
         )
+        XCTAssertEqual(events, [
+            "recording:false",
+            "timestamp:131.0",
+            "notify:\(VoiceInkAppIdentity.iOSRecordingStateChangedDarwinNotificationName)"
+        ])
     }
 
     func testAppGroupRecordingStateReadPlanAppliesStaleRepairRuntimeState() {
@@ -522,40 +529,41 @@ final class RecordingStatePolicyTests: XCTestCase {
             lastRecordingTimestamp: 100,
             now: Date(timeIntervalSince1970: 131)
         ).applyRuntimeState { mutationPlan in
-            events.append(
-                "repair:\(mutationPlan.darwinNotificationName):\(mutationPlan.writePlan.isRecording == false)"
+            mutationPlan.applyRuntimeState(
+                applyWritePlan: { $0.recordAppGroupWriteEvents(into: &events, prefix: "repair-") },
+                postDarwinNotification: { events.append("repair-notify:\($0)") }
             )
         }
         events.append("stale-state:\(staleState.isRecording)")
 
         XCTAssertEqual(events, [
             "fresh-state:true",
-            "repair:\(VoiceInkAppIdentity.iOSRecordingStateChangedDarwinNotificationName):true",
+            "repair-recording:false",
+            "repair-timestamp:131.0",
+            "repair-notify:\(VoiceInkAppIdentity.iOSRecordingStateChangedDarwinNotificationName)",
             "stale-state:false"
         ])
     }
 
     func testAppGroupRecordingStateWritePlansPreserveIOSBridgeWrites() {
-        XCTAssertEqual(
-            VoiceInkAppGroupRecordingStatePolicy.stopRequestedWritePlan(
-                now: Date(timeIntervalSince1970: 42)
-            ),
-            VoiceInkAppGroupRecordingStateWritePlan(
-                isRecording: nil,
-                lastRecordingTimestamp: 42
-            )
-        )
+        var events: [String] = []
 
-        XCTAssertEqual(
-            VoiceInkAppGroupRecordingStatePolicy.recordingStateWritePlan(
-                isRecording: true,
-                now: Date(timeIntervalSince1970: 43)
-            ),
-            VoiceInkAppGroupRecordingStateWritePlan(
-                isRecording: true,
-                lastRecordingTimestamp: 43
-            )
+        VoiceInkAppGroupRecordingStatePolicy.stopRequestedWritePlan(
+            now: Date(timeIntervalSince1970: 42)
         )
+        .recordAppGroupWriteEvents(into: &events)
+
+        VoiceInkAppGroupRecordingStatePolicy.recordingStateWritePlan(
+            isRecording: true,
+            now: Date(timeIntervalSince1970: 43)
+        )
+        .recordAppGroupWriteEvents(into: &events)
+
+        XCTAssertEqual(events, [
+            "timestamp:42.0",
+            "recording:true",
+            "timestamp:43.0"
+        ])
     }
 
     func testAppGroupRecordingStateWritePlanAppliesRuntimeStateInOrder() {
@@ -563,18 +571,14 @@ final class RecordingStatePolicyTests: XCTestCase {
 
         VoiceInkAppGroupRecordingStatePolicy.stopRequestedWritePlan(
             now: Date(timeIntervalSince1970: 42)
-        ).applyRuntimeState(
-            setIsRecording: { events.append("recording:\($0)") },
-            setLastRecordingTimestamp: { events.append("timestamp:\($0)") }
         )
+        .recordAppGroupWriteEvents(into: &events)
 
         VoiceInkAppGroupRecordingStatePolicy.recordingStateWritePlan(
             isRecording: true,
             now: Date(timeIntervalSince1970: 43)
-        ).applyRuntimeState(
-            setIsRecording: { events.append("recording:\($0)") },
-            setLastRecordingTimestamp: { events.append("timestamp:\($0)") }
         )
+        .recordAppGroupWriteEvents(into: &events)
 
         XCTAssertEqual(events, [
             "timestamp:42.0",
@@ -584,32 +588,30 @@ final class RecordingStatePolicyTests: XCTestCase {
     }
 
     func testAppGroupRecordingStateMutationPlansPreserveIOSBridgeNotifications() {
-        XCTAssertEqual(
-            VoiceInkAppGroupRecordingStatePolicy.stopRequestedMutationPlan(
-                now: Date(timeIntervalSince1970: 42)
-            ),
-            VoiceInkAppGroupRecordingStateMutationPlan(
-                writePlan: VoiceInkAppGroupRecordingStateWritePlan(
-                    isRecording: nil,
-                    lastRecordingTimestamp: 42
-                ),
-                darwinNotificationName: VoiceInkAppIdentity.iOSStopRecordingDarwinNotificationName
-            )
+        var events: [String] = []
+
+        VoiceInkAppGroupRecordingStatePolicy.stopRequestedMutationPlan(
+            now: Date(timeIntervalSince1970: 42)
+        ).applyRuntimeState(
+            applyWritePlan: { $0.recordAppGroupWriteEvents(into: &events) },
+            postDarwinNotification: { events.append("notify:\($0)") }
         )
 
-        XCTAssertEqual(
-            VoiceInkAppGroupRecordingStatePolicy.recordingStateMutationPlan(
-                isRecording: true,
-                now: Date(timeIntervalSince1970: 43)
-            ),
-            VoiceInkAppGroupRecordingStateMutationPlan(
-                writePlan: VoiceInkAppGroupRecordingStateWritePlan(
-                    isRecording: true,
-                    lastRecordingTimestamp: 43
-                ),
-                darwinNotificationName: VoiceInkAppIdentity.iOSRecordingStateChangedDarwinNotificationName
-            )
+        VoiceInkAppGroupRecordingStatePolicy.recordingStateMutationPlan(
+            isRecording: true,
+            now: Date(timeIntervalSince1970: 43)
+        ).applyRuntimeState(
+            applyWritePlan: { $0.recordAppGroupWriteEvents(into: &events) },
+            postDarwinNotification: { events.append("notify:\($0)") }
         )
+
+        XCTAssertEqual(events, [
+            "timestamp:42.0",
+            "notify:\(VoiceInkAppIdentity.iOSStopRecordingDarwinNotificationName)",
+            "recording:true",
+            "timestamp:43.0",
+            "notify:\(VoiceInkAppIdentity.iOSRecordingStateChangedDarwinNotificationName)"
+        ])
     }
 
     func testAppGroupRecordingStateMutationPlanAppliesRuntimeWriteBeforeNotification() {
@@ -618,9 +620,7 @@ final class RecordingStatePolicyTests: XCTestCase {
         VoiceInkAppGroupRecordingStatePolicy.stopRequestedMutationPlan(
             now: Date(timeIntervalSince1970: 42)
         ).applyRuntimeState(
-            applyWritePlan: {
-                events.append("write:\($0.isRecording == nil):\($0.lastRecordingTimestamp)")
-            },
+            applyWritePlan: { $0.recordAppGroupWriteEvents(into: &events, prefix: "write-") },
             postDarwinNotification: {
                 events.append("notify:\($0)")
             }
@@ -630,18 +630,17 @@ final class RecordingStatePolicyTests: XCTestCase {
             isRecording: true,
             now: Date(timeIntervalSince1970: 43)
         ).applyRuntimeState(
-            applyWritePlan: {
-                events.append("write:\($0.isRecording == true):\($0.lastRecordingTimestamp)")
-            },
+            applyWritePlan: { $0.recordAppGroupWriteEvents(into: &events, prefix: "write-") },
             postDarwinNotification: {
                 events.append("notify:\($0)")
             }
         )
 
         XCTAssertEqual(events, [
-            "write:true:42.0",
+            "write-timestamp:42.0",
             "notify:\(VoiceInkAppIdentity.iOSStopRecordingDarwinNotificationName)",
-            "write:true:43.0",
+            "write-recording:true",
+            "write-timestamp:43.0",
             "notify:\(VoiceInkAppIdentity.iOSRecordingStateChangedDarwinNotificationName)"
         ])
     }
@@ -1170,5 +1169,14 @@ final class RecordingStatePolicyTests: XCTestCase {
         }
 
         run(defaults)
+    }
+}
+
+private extension VoiceInkAppGroupRecordingStateWritePlan {
+    func recordAppGroupWriteEvents(into events: inout [String], prefix: String = "") {
+        applyRuntimeState(
+            setIsRecording: { events.append("\(prefix)recording:\($0)") },
+            setLastRecordingTimestamp: { events.append("\(prefix)timestamp:\($0)") }
+        )
     }
 }

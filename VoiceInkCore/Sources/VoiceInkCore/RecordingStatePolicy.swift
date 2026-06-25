@@ -347,10 +347,10 @@ public struct VoiceInkAppGroupRecordingState: Equatable, Sendable {
 }
 
 public struct VoiceInkAppGroupRecordingStateWritePlan: Equatable, Sendable {
-    public let isRecording: Bool?
-    public let lastRecordingTimestamp: TimeInterval
+    private let isRecording: Bool?
+    private let lastRecordingTimestamp: TimeInterval
 
-    public init(isRecording: Bool?, lastRecordingTimestamp: TimeInterval) {
+    init(isRecording: Bool?, lastRecordingTimestamp: TimeInterval) {
         self.isRecording = isRecording
         self.lastRecordingTimestamp = lastRecordingTimestamp
     }
@@ -368,10 +368,10 @@ public struct VoiceInkAppGroupRecordingStateWritePlan: Equatable, Sendable {
 }
 
 public struct VoiceInkAppGroupRecordingStateMutationPlan: Equatable, Sendable {
-    public let writePlan: VoiceInkAppGroupRecordingStateWritePlan
-    public let darwinNotificationName: String
+    private let writePlan: VoiceInkAppGroupRecordingStateWritePlan
+    private let darwinNotificationName: String
 
-    public init(
+    init(
         writePlan: VoiceInkAppGroupRecordingStateWritePlan,
         darwinNotificationName: String
     ) {
@@ -389,10 +389,10 @@ public struct VoiceInkAppGroupRecordingStateMutationPlan: Equatable, Sendable {
 }
 
 public struct VoiceInkAppGroupRecordingStateReadPlan: Equatable, Sendable {
-    public let state: VoiceInkAppGroupRecordingState
-    public let staleStateRepairMutationPlan: VoiceInkAppGroupRecordingStateMutationPlan?
+    private let state: VoiceInkAppGroupRecordingState
+    private let staleStateRepairMutationPlan: VoiceInkAppGroupRecordingStateMutationPlan?
 
-    public init(
+    init(
         state: VoiceInkAppGroupRecordingState,
         staleStateRepairMutationPlan: VoiceInkAppGroupRecordingStateMutationPlan?
     ) {

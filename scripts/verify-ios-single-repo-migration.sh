@@ -979,23 +979,25 @@ require_patterns \
   VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift \
   'VoiceInkRecordingPermissionPolicy' \
   'VoiceInkRecordingPermissionStatus' \
-  'VoiceInkRecordingPermissionAction' \
-  'VoiceInkRecordingPermissionSettingsAction' \
-  'settingsOpenAction' \
+  'VoiceInkRecordingPermissionPlan' \
+  'VoiceInkRecordingPermissionSettingsPlan' \
+  'settingsOpenPlan' \
   'applyRuntimeState'
 
 require_patterns \
   "shared recording permission action checks run in VoiceInkCore" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'testRecordingPermissionPolicyPreservesStartPermissionActions' \
-  'testRecordingPermissionPolicyPreservesPermissionRequestResults' \
-  'testRecordingPermissionActionAppliesRuntimeState' \
-  'testRecordingPermissionPolicyPreservesSettingsOpenFallback'
+  'testRecordingPermissionPlanAppliesStatusAndRequestResultRuntimeState'
 
 require_pattern \
   "shared recording permission settings action application checks run in VoiceInkCore" \
-  'testRecordingPermissionSettingsActionAppliesRuntimeState' \
+  'testRecordingPermissionSettingsOpenPlanAppliesOnlyWhenURLCanOpen' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "shared recording permission policy avoids public action-only helpers" \
+  'public (enum VoiceInkRecordingPermission(Action|SettingsAction)|static func action\(|static func settingsOpenAction)' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
 require_pattern \
   "shared recording stop plan lives in VoiceInkCore" \
@@ -1183,15 +1185,19 @@ require_pattern \
   'VoiceInkRecordingFlowState\.durationUpdateInterval|advanceDuration' \
   iOS/VoiceInk-ios/RecordingManager.swift
 
-require_pattern \
+require_patterns \
   "iOS recording manager delegates microphone permission action planning and application to shared core" \
-  'VoiceInkRecordingPermissionPolicy\.action|VoiceInkRecordingPermissionStatus|VoiceInkRecordingPermissionAction|action\.applyRuntimeState' \
-  iOS/VoiceInk-ios/RecordingManager.swift
+  iOS/VoiceInk-ios/RecordingManager.swift \
+  'VoiceInkRecordingPermissionPolicy\.plan' \
+  'VoiceInkRecordingPermissionStatus' \
+  'VoiceInkRecordingPermissionPlan' \
+  'plan\.applyRuntimeState'
 
-require_pattern \
+require_patterns \
   "iOS recording manager delegates settings-open fallback planning and application to shared core" \
-  'VoiceInkRecordingPermissionPolicy\.settingsOpenAction|VoiceInkRecordingPermissionSettingsAction|action\.applyRuntimeState' \
-  iOS/VoiceInk-ios/RecordingManager.swift
+  iOS/VoiceInk-ios/RecordingManager.swift \
+  'VoiceInkRecordingPermissionPolicy\.settingsOpenPlan' \
+  'plan\.applyRuntimeState'
 
 require_pattern \
   "iOS recording manager delegates stop result planning to shared flow state" \

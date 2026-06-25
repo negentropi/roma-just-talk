@@ -88,13 +88,13 @@ final class RecordingManager: ObservableObject {
     }
 
     private func startRecordingWithPermissionCheck() {
-        applyPermissionAction(
-            VoiceInkRecordingPermissionPolicy.action(for: checkPermissionStatus())
+        applyPermissionPlan(
+            VoiceInkRecordingPermissionPolicy.plan(for: checkPermissionStatus())
         )
     }
 
-    private func applyPermissionAction(_ action: VoiceInkRecordingPermissionAction) {
-        action.applyRuntimeState(
+    private func applyPermissionPlan(_ plan: VoiceInkRecordingPermissionPlan) {
+        plan.applyRuntimeState(
             startRecording: { [weak self] in
                 self?.proceedToStartRecording()
             },
@@ -176,12 +176,12 @@ final class RecordingManager: ObservableObject {
     
     func openSettings() {
         let url = URL(string: UIApplication.openSettingsURLString)
-        let action = VoiceInkRecordingPermissionPolicy.settingsOpenAction(
+        let plan = VoiceInkRecordingPermissionPolicy.settingsOpenPlan(
             hasSettingsURL: url != nil,
             canOpenSettingsURL: url.map { UIApplication.shared.canOpenURL($0) } ?? false
         )
 
-        action.applyRuntimeState {
+        plan.applyRuntimeState {
             guard let url else { return }
             UIApplication.shared.open(url)
         }

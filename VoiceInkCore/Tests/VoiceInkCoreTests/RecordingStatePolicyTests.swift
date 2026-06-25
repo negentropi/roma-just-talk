@@ -47,36 +47,10 @@ final class RecordingStatePolicyTests: XCTestCase {
         XCTAssertEqual(VoiceInkRecordingState.busy.recorderUIToggleAction, .dismissRecorder)
     }
 
-    func testRecordingPermissionPolicyPreservesStartPermissionActions() {
-        XCTAssertEqual(
-            VoiceInkRecordingPermissionPolicy.action(for: .granted),
-            .startRecording
-        )
-        XCTAssertEqual(
-            VoiceInkRecordingPermissionPolicy.action(for: .denied),
-            .presentPermissionDenied
-        )
-        XCTAssertEqual(
-            VoiceInkRecordingPermissionPolicy.action(for: .undetermined),
-            .requestPermission
-        )
-    }
-
-    func testRecordingPermissionPolicyPreservesPermissionRequestResults() {
-        XCTAssertEqual(
-            VoiceInkRecordingPermissionPolicy.action(afterPermissionRequestGranted: true),
-            .startRecording
-        )
-        XCTAssertEqual(
-            VoiceInkRecordingPermissionPolicy.action(afterPermissionRequestGranted: false),
-            .presentPermissionDenied
-        )
-    }
-
-    func testRecordingPermissionActionAppliesRuntimeState() {
+    func testRecordingPermissionPlanAppliesStatusAndRequestResultRuntimeState() {
         var events: [String] = []
 
-        VoiceInkRecordingPermissionAction.startRecording.applyRuntimeState(
+        VoiceInkRecordingPermissionPolicy.plan(for: .granted).applyRuntimeState(
             startRecording: { events.append("start") },
             presentPermissionDenied: { events.append("denied") },
             requestPermission: { completion in
@@ -84,7 +58,7 @@ final class RecordingStatePolicyTests: XCTestCase {
                 completion(true)
             }
         )
-        VoiceInkRecordingPermissionAction.presentPermissionDenied.applyRuntimeState(
+        VoiceInkRecordingPermissionPolicy.plan(for: .denied).applyRuntimeState(
             startRecording: { events.append("start") },
             presentPermissionDenied: { events.append("denied") },
             requestPermission: { completion in
@@ -92,7 +66,7 @@ final class RecordingStatePolicyTests: XCTestCase {
                 completion(true)
             }
         )
-        VoiceInkRecordingPermissionAction.requestPermission.applyRuntimeState(
+        VoiceInkRecordingPermissionPolicy.plan(for: .undetermined).applyRuntimeState(
             startRecording: { events.append("start") },
             presentPermissionDenied: { events.append("denied") },
             requestPermission: { completion in
@@ -100,12 +74,28 @@ final class RecordingStatePolicyTests: XCTestCase {
                 completion(true)
             }
         )
-        VoiceInkRecordingPermissionAction.requestPermission.applyRuntimeState(
+        VoiceInkRecordingPermissionPolicy.plan(for: .undetermined).applyRuntimeState(
             startRecording: { events.append("start") },
             presentPermissionDenied: { events.append("denied") },
             requestPermission: { completion in
                 events.append("request")
                 completion(false)
+            }
+        )
+        VoiceInkRecordingPermissionPolicy.plan(afterPermissionRequestGranted: true).applyRuntimeState(
+            startRecording: { events.append("start") },
+            presentPermissionDenied: { events.append("denied") },
+            requestPermission: { completion in
+                events.append("request")
+                completion(false)
+            }
+        )
+        VoiceInkRecordingPermissionPolicy.plan(afterPermissionRequestGranted: false).applyRuntimeState(
+            startRecording: { events.append("start") },
+            presentPermissionDenied: { events.append("denied") },
+            requestPermission: { completion in
+                events.append("request")
+                completion(true)
             }
         )
 
@@ -115,49 +105,27 @@ final class RecordingStatePolicyTests: XCTestCase {
             "request",
             "start",
             "request",
+            "denied",
+            "start",
             "denied"
         ])
     }
 
-    func testRecordingPermissionPolicyPreservesSettingsOpenFallback() {
-        XCTAssertEqual(
-            VoiceInkRecordingPermissionPolicy.settingsOpenAction(
-                hasSettingsURL: true,
-                canOpenSettingsURL: true
-            ),
-            .openSettings
-        )
-        XCTAssertEqual(
-            VoiceInkRecordingPermissionPolicy.settingsOpenAction(
-                hasSettingsURL: false,
-                canOpenSettingsURL: true
-            ),
-            .ignore
-        )
-        XCTAssertEqual(
-            VoiceInkRecordingPermissionPolicy.settingsOpenAction(
-                hasSettingsURL: true,
-                canOpenSettingsURL: false
-            ),
-            .ignore
-        )
-        XCTAssertEqual(
-            VoiceInkRecordingPermissionPolicy.settingsOpenAction(
-                hasSettingsURL: false,
-                canOpenSettingsURL: false
-            ),
-            .ignore
-        )
-    }
-
-    func testRecordingPermissionSettingsActionAppliesRuntimeState() {
+    func testRecordingPermissionSettingsOpenPlanAppliesOnlyWhenURLCanOpen() {
         var events: [String] = []
 
-        VoiceInkRecordingPermissionSettingsAction.ignore.applyRuntimeState {
-            events.append("open")
-        }
-        VoiceInkRecordingPermissionSettingsAction.openSettings.applyRuntimeState {
-            events.append("open")
+        for input in [
+            (hasSettingsURL: true, canOpenSettingsURL: true),
+            (hasSettingsURL: false, canOpenSettingsURL: true),
+            (hasSettingsURL: true, canOpenSettingsURL: false),
+            (hasSettingsURL: false, canOpenSettingsURL: false)
+        ] {
+            VoiceInkRecordingPermissionPolicy.settingsOpenPlan(
+                hasSettingsURL: input.hasSettingsURL,
+                canOpenSettingsURL: input.canOpenSettingsURL
+            ).applyRuntimeState {
+                events.append("open")
+            }
         }
 
         XCTAssertEqual(events, ["open"])

@@ -21,12 +21,12 @@ public enum VoiceInkRecordingPermissionStatus: Equatable, Sendable {
     case undetermined
 }
 
-public enum VoiceInkRecordingPermissionAction: Equatable, Sendable {
+enum VoiceInkRecordingPermissionAction: Equatable, Sendable {
     case startRecording
     case requestPermission
     case presentPermissionDenied
 
-    public func applyRuntimeState(
+    func applyRuntimeState(
         startRecording: @escaping () -> Void,
         presentPermissionDenied: @escaping () -> Void,
         requestPermission: @escaping (@escaping (Bool) -> Void) -> Void
@@ -38,7 +38,7 @@ public enum VoiceInkRecordingPermissionAction: Equatable, Sendable {
             presentPermissionDenied()
         case .requestPermission:
             requestPermission { granted in
-                VoiceInkRecordingPermissionPolicy.action(afterPermissionRequestGranted: granted)
+                VoiceInkRecordingPermissionPolicy.plan(afterPermissionRequestGranted: granted)
                     .applyRuntimeState(
                         startRecording: startRecording,
                         presentPermissionDenied: presentPermissionDenied,
@@ -49,11 +49,31 @@ public enum VoiceInkRecordingPermissionAction: Equatable, Sendable {
     }
 }
 
-public enum VoiceInkRecordingPermissionSettingsAction: Equatable, Sendable {
+public struct VoiceInkRecordingPermissionPlan: Sendable {
+    private let action: VoiceInkRecordingPermissionAction
+
+    init(action: VoiceInkRecordingPermissionAction) {
+        self.action = action
+    }
+
+    public func applyRuntimeState(
+        startRecording: @escaping () -> Void,
+        presentPermissionDenied: @escaping () -> Void,
+        requestPermission: @escaping (@escaping (Bool) -> Void) -> Void
+    ) {
+        action.applyRuntimeState(
+            startRecording: startRecording,
+            presentPermissionDenied: presentPermissionDenied,
+            requestPermission: requestPermission
+        )
+    }
+}
+
+enum VoiceInkRecordingPermissionSettingsAction: Equatable, Sendable {
     case openSettings
     case ignore
 
-    public func applyRuntimeState(openSettings: () -> Void) {
+    func applyRuntimeState(openSettings: () -> Void) {
         switch self {
         case .openSettings:
             openSettings()
@@ -63,27 +83,43 @@ public enum VoiceInkRecordingPermissionSettingsAction: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkRecordingPermissionSettingsPlan: Sendable {
+    private let action: VoiceInkRecordingPermissionSettingsAction
+
+    init(action: VoiceInkRecordingPermissionSettingsAction) {
+        self.action = action
+    }
+
+    public func applyRuntimeState(openSettings: () -> Void) {
+        action.applyRuntimeState(openSettings: openSettings)
+    }
+}
+
 public enum VoiceInkRecordingPermissionPolicy {
-    public static func action(for status: VoiceInkRecordingPermissionStatus) -> VoiceInkRecordingPermissionAction {
+    public static func plan(for status: VoiceInkRecordingPermissionStatus) -> VoiceInkRecordingPermissionPlan {
         switch status {
         case .granted:
-            return .startRecording
+            return VoiceInkRecordingPermissionPlan(action: .startRecording)
         case .denied:
-            return .presentPermissionDenied
+            return VoiceInkRecordingPermissionPlan(action: .presentPermissionDenied)
         case .undetermined:
-            return .requestPermission
+            return VoiceInkRecordingPermissionPlan(action: .requestPermission)
         }
     }
 
-    public static func action(afterPermissionRequestGranted isGranted: Bool) -> VoiceInkRecordingPermissionAction {
-        isGranted ? .startRecording : .presentPermissionDenied
+    public static func plan(afterPermissionRequestGranted isGranted: Bool) -> VoiceInkRecordingPermissionPlan {
+        VoiceInkRecordingPermissionPlan(
+            action: isGranted ? .startRecording : .presentPermissionDenied
+        )
     }
 
-    public static func settingsOpenAction(
+    public static func settingsOpenPlan(
         hasSettingsURL: Bool,
         canOpenSettingsURL: Bool
-    ) -> VoiceInkRecordingPermissionSettingsAction {
-        hasSettingsURL && canOpenSettingsURL ? .openSettings : .ignore
+    ) -> VoiceInkRecordingPermissionSettingsPlan {
+        VoiceInkRecordingPermissionSettingsPlan(
+            action: hasSettingsURL && canOpenSettingsURL ? .openSettings : .ignore
+        )
     }
 }
 

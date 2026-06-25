@@ -7806,13 +7806,23 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
 
 require_pattern \
-  "macOS backup export uses shared dictionary export plan" \
-  'VoiceInkDictionaryPolicy\.dictionaryBackupExportPlan\(' \
+  "shared dictionary backup export runtime application lives in VoiceInkCore" \
+  'setVocabularyBackupRecords|setWordReplacementBackupRecords' \
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
+
+reject_pattern \
+  "shared dictionary backup export raw payload stays hidden" \
+  'public let +(vocabularyBackupRecords|wordReplacementBackupRecords)|public init\([^)]*vocabularyBackupRecords' \
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
+
+require_pattern \
+  "macOS backup export applies shared dictionary export plan" \
+  'dictionaryExportPlan\.applyRuntimeState' \
   VoiceInk/Services/ImportExportService.swift
 
 reject_pattern \
   "macOS backup export avoids shell-owned dictionary export planning" \
-  'var exported(DictionaryItems|WordReplacements)|vocabularyBackupRecords\(from: items\.map|Dictionary\(replacements\.map' \
+  'var exported(DictionaryItems|WordReplacements)|vocabularyBackupRecords\(from: items\.map|Dictionary\(replacements\.map|dictionaryExportPlan\.(vocabularyBackupRecords|wordReplacementBackupRecords)' \
   VoiceInk/Services/ImportExportService.swift
 
 require_pattern \

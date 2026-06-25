@@ -159,6 +159,16 @@ class ImportExportService {
             vocabularyWords: vocabularyWords,
             wordReplacementRules: wordReplacementRules
         )
+        var vocabularyBackupRecords: [VoiceInkVocabularyWordBackup]?
+        var wordReplacementBackupRecords: [String: String]?
+        dictionaryExportPlan.applyRuntimeState(
+            setVocabularyBackupRecords: { records in
+                vocabularyBackupRecords = records
+            },
+            setWordReplacementBackupRecords: { records in
+                wordReplacementBackupRecords = records
+            }
+        )
 
         let cleanupSettings = VoiceInkTranscriptionCleanupSettings.current()
         let transcriptionCleanup = VoiceInkTranscriptionAutoCleanupPreference.current()
@@ -234,8 +244,8 @@ class ImportExportService {
             customPrompts: exportablePrompts,
             powerModeConfigs: powerModeConfigs,
             powerModeShortcuts: powerModeShortcuts,
-            vocabularyWords: dictionaryExportPlan.vocabularyBackupRecords,
-            wordReplacements: dictionaryExportPlan.wordReplacementBackupRecords,
+            vocabularyWords: vocabularyBackupRecords,
+            wordReplacements: wordReplacementBackupRecords,
             generalSettings: generalSettingsToExport,
             customEmojis: powerModeCustomEmojis,
             customCloudModels: customModels

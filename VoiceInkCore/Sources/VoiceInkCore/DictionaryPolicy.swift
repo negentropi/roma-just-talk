@@ -387,15 +387,23 @@ public struct VoiceInkDictionaryBackupImportPlan: Equatable, Sendable {
 }
 
 public struct VoiceInkDictionaryBackupExportPlan: Equatable, Sendable {
-    public let vocabularyBackupRecords: [VoiceInkVocabularyWordBackup]?
-    public let wordReplacementBackupRecords: [String: String]?
+    private let vocabularyBackupRecords: [VoiceInkVocabularyWordBackup]?
+    private let wordReplacementBackupRecords: [String: String]?
 
-    public init(
+    fileprivate init(
         vocabularyBackupRecords: [VoiceInkVocabularyWordBackup]?,
         wordReplacementBackupRecords: [String: String]?
     ) {
         self.vocabularyBackupRecords = vocabularyBackupRecords
         self.wordReplacementBackupRecords = wordReplacementBackupRecords
+    }
+
+    public func applyRuntimeState(
+        setVocabularyBackupRecords: ([VoiceInkVocabularyWordBackup]?) -> Void,
+        setWordReplacementBackupRecords: ([String: String]?) -> Void
+    ) {
+        setVocabularyBackupRecords(vocabularyBackupRecords)
+        setWordReplacementBackupRecords(wordReplacementBackupRecords)
     }
 }
 

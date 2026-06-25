@@ -520,30 +520,31 @@ final class DictionaryPolicyTests: XCTestCase {
 
     func testDictionaryBackupExportPlanPreservesMacOSNilAndRecordShape() {
         XCTAssertEqual(
-            VoiceInkDictionaryPolicy.dictionaryBackupExportPlan(
-                vocabularyWords: [],
-                wordReplacementRules: []
+            dictionaryBackupExportRuntimeEvents(
+                for: VoiceInkDictionaryPolicy.dictionaryBackupExportPlan(
+                    vocabularyWords: [],
+                    wordReplacementRules: []
+                )
             ),
-            VoiceInkDictionaryBackupExportPlan(
-                vocabularyBackupRecords: nil,
-                wordReplacementBackupRecords: nil
-            )
+            [
+                "vocabulary:nil",
+                "replacements:nil"
+            ]
         )
 
         XCTAssertEqual(
-            VoiceInkDictionaryPolicy.dictionaryBackupExportPlan(
-                vocabularyWords: ["Roma", "VoiceInk"],
-                wordReplacementRules: [
-                    VoiceInkWordReplacementRule(originalText: "voice ink", replacementText: "VoiceInk")
-                ]
+            dictionaryBackupExportRuntimeEvents(
+                for: VoiceInkDictionaryPolicy.dictionaryBackupExportPlan(
+                    vocabularyWords: ["Roma", "VoiceInk"],
+                    wordReplacementRules: [
+                        VoiceInkWordReplacementRule(originalText: "voice ink", replacementText: "VoiceInk")
+                    ]
+                )
             ),
-            VoiceInkDictionaryBackupExportPlan(
-                vocabularyBackupRecords: [
-                    VoiceInkVocabularyWordBackup(word: "Roma"),
-                    VoiceInkVocabularyWordBackup(word: "VoiceInk")
-                ],
-                wordReplacementBackupRecords: ["voice ink": "VoiceInk"]
-            )
+            [
+                "vocabulary:Roma,VoiceInk",
+                "replacements:voice ink=VoiceInk"
+            ]
         )
     }
 
@@ -556,8 +557,13 @@ final class DictionaryPolicyTests: XCTestCase {
             ]
         )
 
-        XCTAssertEqual(plan.vocabularyBackupRecords, nil)
-        XCTAssertEqual(plan.wordReplacementBackupRecords, ["voice ink": "roma just talk"])
+        XCTAssertEqual(
+            dictionaryBackupExportRuntimeEvents(for: plan),
+            [
+                "vocabulary:nil",
+                "replacements:voice ink=roma just talk"
+            ]
+        )
     }
 
     func testVocabularyBackupImportUsesSharedTrimAndDuplicatePolicy() {
@@ -990,6 +996,27 @@ final class DictionaryPolicyTests: XCTestCase {
                 "imported:1:0"
             ]
         )
+    }
+
+    private func dictionaryBackupExportRuntimeEvents(
+        for plan: VoiceInkDictionaryBackupExportPlan
+    ) -> [String] {
+        var events: [String] = []
+
+        plan.applyRuntimeState(
+            setVocabularyBackupRecords: { records in
+                events.append("vocabulary:\(records?.map(\.word).joined(separator: ",") ?? "nil")")
+            },
+            setWordReplacementBackupRecords: { records in
+                let summary = records?
+                    .sorted { $0.key < $1.key }
+                    .map { "\($0.key)=\($0.value)" }
+                    .joined(separator: ",") ?? "nil"
+                events.append("replacements:\(summary)")
+            }
+        )
+
+        return events
     }
 
     private func dictionaryBackupImportRuntimeEvents(

@@ -8,7 +8,10 @@ import VoiceInkCore
 class AudioTranscriptionService {
     private let modelContext: ModelContext
     private let enhancementService: AIEnhancementService?
-    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "AudioTranscriptionService")
+    private let logger = Logger(
+        subsystem: VoiceInkAppIdentity.loggingSubsystem,
+        category: VoiceInkMacOSLogCategory.audioTranscriptionService
+    )
     private let serviceRegistry: TranscriptionServiceRegistry
 
     init(modelContext: ModelContext, engine: VoiceInkEngine) {
@@ -45,7 +48,7 @@ class AudioTranscriptionService {
                 WordReplacementService.shared.applyReplacements(to: text, using: modelContext)
             }
             let text = textPlan.textForEnhancement
-            logger.notice("✅ Word replacements applied")
+            logger.notice("\(VoiceInkAudioFileTranscriptionDiagnostics.wordReplacementsAppliedMessage, privacy: .public)")
             let cleanedText = textPlan.cleanedText
 
             let audioAsset = AVURLAsset(url: url)
@@ -58,7 +61,10 @@ class AudioTranscriptionService {
             do {
                 try FileManager.default.copyItem(at: url, to: permanentURL)
             } catch {
-                logger.error("❌ Failed to create permanent copy of audio: \(error.localizedDescription, privacy: .public)")
+                let message = VoiceInkAudioFileTranscriptionDiagnostics.permanentCopyFailedMessage(
+                    localizedDescription: error.localizedDescription
+                )
+                logger.error("\(message, privacy: .public)")
                 throw error
             }
             
@@ -114,7 +120,10 @@ class AudioTranscriptionService {
             saveCompletedTranscription(newTranscription)
             return newTranscription
         } catch {
-            logger.error("❌ Transcription failed: \(error.localizedDescription, privacy: .public)")
+            let message = VoiceInkAudioFileTranscriptionDiagnostics.transcriptionFailedMessage(
+                localizedDescription: error.localizedDescription
+            )
+            logger.error("\(message, privacy: .public)")
             throw error
         }
     }
@@ -126,7 +135,10 @@ class AudioTranscriptionService {
             NotificationCenter.default.post(name: .transcriptionCreated, object: transcription)
             NotificationCenter.default.post(name: .transcriptionCompleted, object: transcription)
         } catch {
-            logger.error("❌ Failed to save transcription: \(error.localizedDescription, privacy: .public)")
+            let message = VoiceInkAudioFileTranscriptionDiagnostics.saveFailedMessage(
+                localizedDescription: error.localizedDescription
+            )
+            logger.error("\(message, privacy: .public)")
         }
     }
 }

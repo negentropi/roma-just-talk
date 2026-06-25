@@ -8549,6 +8549,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/CompletedTranscriptionDraft.swift
 
 require_pattern \
+  "shared audio-file retry diagnostics live in VoiceInkCore" \
+  'VoiceInkAudioFileTranscriptionDiagnostics|wordReplacementsAppliedMessage|permanentCopyFailedMessage|transcriptionFailedMessage|saveFailedMessage|Word replacements applied|Failed to create permanent copy of audio|Failed to save transcription' \
+  VoiceInkCore/Sources/VoiceInkCore/CompletedTranscriptionDraft.swift
+
+require_pattern \
   "shared transcription enhancement text plan type lives in VoiceInkCore" \
   'VoiceInkTranscriptionEnhancementTextPlan' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunPreparation.swift
@@ -8700,6 +8705,16 @@ require_pattern \
 require_pattern \
   "macOS retry transcription builds completed records through shared completion result" \
   'VoiceInkAudioFileTranscriptionDraft\.completionResult' \
+  VoiceInk/Services/AudioFileTranscriptionService.swift
+
+require_pattern \
+  "macOS retry transcription uses shared audio-file diagnostics" \
+  'VoiceInkAudioFileTranscriptionDiagnostics\.(wordReplacementsAppliedMessage|permanentCopyFailedMessage|transcriptionFailedMessage|saveFailedMessage)' \
+  VoiceInk/Services/AudioFileTranscriptionService.swift
+
+reject_pattern \
+  "macOS retry transcription avoids shell-owned diagnostic literals and log category" \
+  '"✅ Word replacements applied"|"❌ Failed to create permanent copy of audio:|"❌ Transcription failed:|"❌ Failed to save transcription:|category: "AudioTranscriptionService"' \
   VoiceInk/Services/AudioFileTranscriptionService.swift
 
 reject_pattern \
@@ -11998,12 +12013,12 @@ require_pattern \
 
 require_pattern \
   "core tests pin audio-file enhancement completion policy" \
-  'testAudioFileTranscriptionCompletionSkipsMissingEnhancementRequest|testAudioFileTranscriptionCompletionStoresSuccessfulEnhancement|testAudioFileTranscriptionCompletionMapsEnhancementFailureToDraftAndReason' \
+  'testAudioFileTranscriptionCompletionSkipsMissingEnhancementRequest|testAudioFileTranscriptionCompletionStoresSuccessfulEnhancement|testAudioFileTranscriptionCompletionMapsEnhancementFailureToDraftAndReason|testAudioFileTranscriptionDiagnosticsPreserveMacOSRetryLogCopy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/CompletedTranscriptionDraftTests.swift
 
 require_pattern \
   "core check runner executes audio-file enhancement completion policy tests" \
-  'testAudioFileTranscriptionCompletionSkipsMissingEnhancementRequest|testAudioFileTranscriptionCompletionStoresSuccessfulEnhancement|testAudioFileTranscriptionCompletionMapsEnhancementFailureToDraftAndReason' \
+  'testAudioFileTranscriptionCompletionSkipsMissingEnhancementRequest|testAudioFileTranscriptionCompletionStoresSuccessfulEnhancement|testAudioFileTranscriptionCompletionMapsEnhancementFailureToDraftAndReason|testAudioFileTranscriptionDiagnosticsPreserveMacOSRetryLogCopy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -16827,7 +16842,8 @@ require_patterns \
   'cursorPaster = "CursorPaster"' \
   'sessionMetricRecorder = "SessionMetricRecorder"' \
   'soundPlaybackEngine = "SoundPlaybackEngine"' \
-  'audioTranscriptionManager = "AudioTranscriptionManager"'
+  'audioTranscriptionManager = "AudioTranscriptionManager"' \
+  'audioTranscriptionService = "AudioTranscriptionService"'
 
 require_pattern \
   "macOS window manager uses shared log category identity" \
@@ -16889,6 +16905,12 @@ require_patterns \
   VoiceInk/Services/AudioFileTranscriptionManager.swift \
   'Logger\(' \
   'category: VoiceInkMacOSLogCategory\.audioTranscriptionManager'
+
+require_patterns \
+  "macOS audio transcription service uses shared log category identity" \
+  VoiceInk/Services/AudioFileTranscriptionService.swift \
+  'Logger\(' \
+  'category: VoiceInkMacOSLogCategory\.audioTranscriptionService'
 
 require_pattern \
   "core checks execute macOS window identity test" \

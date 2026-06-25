@@ -62,6 +62,7 @@ final class AppIdentityTests: XCTestCase {
         XCTAssertEqual(VoiceInkMacOSLogCategory.sessionMetricRecorder, "SessionMetricRecorder")
         XCTAssertEqual(VoiceInkMacOSLogCategory.soundPlaybackEngine, "SoundPlaybackEngine")
         XCTAssertEqual(VoiceInkMacOSLogCategory.audioTranscriptionManager, "AudioTranscriptionManager")
+        XCTAssertEqual(VoiceInkMacOSLogCategory.audioTranscriptionService, "AudioTranscriptionService")
     }
 
     func testMacOSWindowIdentityPreservesIdentifiersTitlesAndFrameNames() {

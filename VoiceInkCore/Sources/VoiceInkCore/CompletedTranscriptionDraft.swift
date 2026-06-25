@@ -116,6 +116,22 @@ public struct VoiceInkAudioFileTranscriptionCompletionResult: Equatable, Sendabl
     }
 }
 
+public enum VoiceInkAudioFileTranscriptionDiagnostics {
+    public static let wordReplacementsAppliedMessage = "✅ Word replacements applied"
+
+    public static func permanentCopyFailedMessage(localizedDescription: String) -> String {
+        "❌ Failed to create permanent copy of audio: \(localizedDescription)"
+    }
+
+    public static func transcriptionFailedMessage(localizedDescription: String) -> String {
+        "❌ Transcription failed: \(localizedDescription)"
+    }
+
+    public static func saveFailedMessage(localizedDescription: String) -> String {
+        "❌ Failed to save transcription: \(localizedDescription)"
+    }
+}
+
 public enum VoiceInkAudioFileTranscriptionDraft {
     public static func completed(
         context: VoiceInkAudioFileTranscriptionDraftContext,

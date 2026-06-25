@@ -15609,9 +15609,19 @@ require_pattern \
   'VoiceInkAppGroupRecordingStatePolicy\.(staleRecordingInterval|UserDefaultsKey|recordingStateMutationPlan)' \
   iOS/VoiceInk-iosTests/VoiceInk_iosTests.swift
 
+require_pattern \
+  "iOS App Group bridge tests apply shared read-plan runtime state" \
+  'readPlan\.applyRuntimeState' \
+  iOS/VoiceInk-iosTests/VoiceInk_iosTests.swift
+
 reject_pattern \
   "iOS App Group bridge avoids shell-owned recording state policy" \
   'struct VoiceInkAppGroupRecordingState|staleRecordingInterval|enum UserDefaultsKey|static let (isRecording|lastRecordingTimestamp) = "|shouldClearStaleState' \
+  iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
+
+reject_pattern \
+  "iOS App Group bridge avoids state-only read helper" \
+  'static func recordingState\(' \
   iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
 
 reject_pattern \

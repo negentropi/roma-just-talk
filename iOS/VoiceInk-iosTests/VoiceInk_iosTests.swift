@@ -123,10 +123,17 @@ final class VoiceInkIOSTests: XCTestCase {
             to: defaults,
             notifications: &notifications
         )
-        let state = VoiceInkAppGroupRecordingBridge.recordingState(
+        let readPlan = VoiceInkAppGroupRecordingBridge.recordingStateReadPlan(
             in: defaults,
             now: timestamp.addingTimeInterval(VoiceInkAppGroupRecordingStatePolicy.staleRecordingInterval)
         )
+        let state = readPlan.applyRuntimeState { mutationPlan in
+            apply(
+                mutationPlan,
+                to: defaults,
+                notifications: &notifications
+            )
+        }
 
         XCTAssertEqual(state, VoiceInkAppGroupRecordingState(isRecording: true, shouldClearStaleState: false))
         XCTAssertEqual(notifications, [VoiceInkAppIdentity.iOSRecordingStateChangedDarwinNotificationName])

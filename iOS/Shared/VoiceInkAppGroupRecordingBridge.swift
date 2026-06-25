@@ -8,13 +8,6 @@ enum VoiceInkAppGroupRecordingBridge {
         UserDefaults(suiteName: appGroupIdentifier)
     }
 
-    static func recordingState(
-        in defaults: UserDefaults?,
-        now: Date = Date()
-    ) -> VoiceInkAppGroupRecordingState {
-        recordingStateReadPlan(in: defaults, now: now).state
-    }
-
     static func recordingStateReadPlan(
         in defaults: UserDefaults?,
         now: Date = Date()

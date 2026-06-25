@@ -1995,6 +1995,13 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(presentation.activationDelayUnitLabel, "ms")
     }
 
+    func testRecordingShortcutPreferenceBuildsMiddleClickActivationDelayFormatter() {
+        let formatter = VoiceInkRecordingShortcutPreference.middleClickActivationDelayFormatter()
+
+        XCTAssertEqual(formatter.minimum, NSNumber(value: VoiceInkRecordingShortcutPreference.minimumMiddleClickActivationDelay))
+        XCTAssertNil(formatter.maximum)
+    }
+
     func testRecordingShortcutPreferencePreservesMacOSRecorderPresentation() {
         let presentation = VoiceInkRecordingShortcutPreference.macOSRecorderPresentation
 

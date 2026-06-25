@@ -455,6 +455,15 @@ public enum VoiceInkRollingBufferPreloadSettings {
         min(max(seconds, minimumBufferDurationSeconds), maximumBufferDurationSeconds)
     }
 
+    public static func bufferDurationFormatter() -> NumberFormatter {
+        let formatter = NumberFormatter()
+        formatter.minimum = NSNumber(value: minimumBufferDurationSeconds)
+        formatter.maximum = NSNumber(value: maximumBufferDurationSeconds)
+        formatter.minimumFractionDigits = 0
+        formatter.maximumFractionDigits = 2
+        return formatter
+    }
+
     public static func preloadModeSelection(
         fromStoredRawValue storedRawValue: String?
     ) -> VoiceInkRollingBufferPreloadMode {

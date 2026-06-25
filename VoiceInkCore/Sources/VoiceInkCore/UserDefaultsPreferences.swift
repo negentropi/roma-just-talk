@@ -2521,6 +2521,12 @@ public enum VoiceInkRecordingShortcutPreference {
         max(delay, minimumMiddleClickActivationDelay)
     }
 
+    public static func middleClickActivationDelayFormatter() -> NumberFormatter {
+        let formatter = NumberFormatter()
+        formatter.minimum = NSNumber(value: minimumMiddleClickActivationDelay)
+        return formatter
+    }
+
     public static func shouldPasteLastTranscriptOnEmptyTap(from defaults: UserDefaults = .standard) -> Bool {
         defaults.object(forKey: VoiceInkUserDefaultsKey.specialShortcutPasteLastTranscriptOnEmptyTap) as? Bool
             ?? VoiceInkPreferenceDefault.specialShortcutPasteLastTranscriptOnEmptyTap

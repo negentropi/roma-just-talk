@@ -24,15 +24,6 @@ struct RollingBufferPreloadSettingsControls: View {
         )
     }
 
-    private var durationFormatter: NumberFormatter {
-        let formatter = NumberFormatter()
-        formatter.minimum = NSNumber(value: VoiceInkRollingBufferPreloadSettings.minimumBufferDurationSeconds)
-        formatter.maximum = NSNumber(value: VoiceInkRollingBufferPreloadSettings.maximumBufferDurationSeconds)
-        formatter.minimumFractionDigits = 0
-        formatter.maximumFractionDigits = 2
-        return formatter
-    }
-
     var body: some View {
         Picker(selection: mode) {
             ForEach(VoiceInkRollingBufferPreloadMode.allCases) { mode in
@@ -48,7 +39,7 @@ struct RollingBufferPreloadSettingsControls: View {
 
         LabeledContent(Self.presentation.durationLabel) {
             HStack(spacing: 6) {
-                TextField("", value: $bufferDurationSeconds, formatter: durationFormatter)
+                TextField("", value: $bufferDurationSeconds, formatter: VoiceInkRollingBufferPreloadSettings.bufferDurationFormatter())
                     .textFieldStyle(.roundedBorder)
                     .frame(width: 64)
                     .onSubmit(normalizeDuration)

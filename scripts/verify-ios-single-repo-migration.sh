@@ -11315,6 +11315,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
+  "shared recording shortcut preference owns middle-click delay formatter" \
+  'middleClickActivationDelayFormatter' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
   "shared recording shortcut preference saves middle-click delay" \
   'saveMiddleClickActivationDelay' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
@@ -11410,8 +11415,8 @@ require_pattern \
   VoiceInk/Shortcuts/RecordingShortcutManager.swift
 
 require_pattern \
-  "macOS shortcut settings uses shared middle-click delay minimum" \
-  'VoiceInkRecordingShortcutPreference\.minimumMiddleClickActivationDelay' \
+  "macOS shortcut settings uses shared middle-click delay formatter" \
+  'VoiceInkRecordingShortcutPreference\.middleClickActivationDelayFormatter\(\)' \
   VoiceInk/Views/Settings/SettingsView.swift
 
 require_pattern \
@@ -11594,7 +11599,7 @@ reject_pattern \
 
 reject_pattern \
   "macOS shortcut settings avoid shell-owned middle-click delay bounds" \
-  'formatter\.minimum = 0' \
+  'NumberFormatter|formatter\.minimum|minimumMiddleClickActivationDelay' \
   VoiceInk/Views/Settings/SettingsView.swift
 
 reject_pattern \
@@ -11659,6 +11664,11 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/UserDefaultsPreferencesTests.swift
 
 require_pattern \
+  "core checks execute middle-click delay formatter tests" \
+  'UserDefaultsPreferencesTests\.testRecordingShortcutPreferenceBuildsMiddleClickActivationDelayFormatter' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "core checks execute shortcut backup export policy tests" \
   'UserDefaultsPreferencesTests\.testShortcutBackupPolicyExportsGeneralShortcutsInStableOrder' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
@@ -11715,7 +11725,7 @@ require_pattern \
 
 require_pattern \
   "migration checklist tracks shared recording shortcut preference gate" \
-  'macOS recording shortcut action identifiers, action display names, validation and monitor notification copy, shortcut change/recording-start notification names, mini-recorder escape confirmation copy and double-press timing, selection/mode migration plans, legacy shortcut key names, raw shortcut storage, middle-click enablement and activation-delay normalization, special empty-tap preferences, settings labels/help, shortcut recorder labels, backup import/export value planning, general-backup shortcut action ordering, missing-shortcut filtering, backup-record assembly through a shell adapter, and recording-shortcut selection repair when importing backed-up shortcut records route through `VoiceInkShortcutActionIdentifier`/`VoiceInkShortcutActionPresentation`/`VoiceInkShortcutValidationPresentation`/`VoiceInkMacOSShortcutNotificationPresentation`/`VoiceInkMiniRecorderEscapeShortcutPolicy`/`VoiceInkLegacyRecordingShortcutPreset`/`VoiceInkRecordingShortcutSelection`/`VoiceInkRecordingShortcutMode`/`VoiceInkRecordingShortcutPreference`/`VoiceInkShortcutStoragePreference`/`VoiceInkShortcutBackupPolicy`' \
+  'macOS recording shortcut action identifiers, action display names, validation and monitor notification copy, shortcut change/recording-start notification names, mini-recorder escape confirmation copy and double-press timing, selection/mode migration plans, legacy shortcut key names, raw shortcut storage, middle-click enablement, activation-delay normalization/formatter, special empty-tap preferences, settings labels/help, shortcut recorder labels, backup import/export value planning, general-backup shortcut action ordering, missing-shortcut filtering, backup-record assembly through a shell adapter, and recording-shortcut selection repair when importing backed-up shortcut records route through `VoiceInkShortcutActionIdentifier`/`VoiceInkShortcutActionPresentation`/`VoiceInkShortcutValidationPresentation`/`VoiceInkMacOSShortcutNotificationPresentation`/`VoiceInkMiniRecorderEscapeShortcutPolicy`/`VoiceInkLegacyRecordingShortcutPreset`/`VoiceInkRecordingShortcutSelection`/`VoiceInkRecordingShortcutMode`/`VoiceInkRecordingShortcutPreference`/`VoiceInkShortcutStoragePreference`/`VoiceInkShortcutBackupPolicy`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \
@@ -14996,6 +15006,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/RollingBufferPreloadPolicy.swift
 
 require_pattern \
+  "shared rolling-buffer duration formatter lives in VoiceInkCore" \
+  'bufferDurationFormatter' \
+  VoiceInkCore/Sources/VoiceInkCore/RollingBufferPreloadPolicy.swift
+
+require_pattern \
   "shared rolling-buffer preload mode stored selection fallback lives in VoiceInkCore" \
   'preloadModeSelection\(fromStoredRawValue' \
   VoiceInkCore/Sources/VoiceInkCore/RollingBufferPreloadPolicy.swift
@@ -15027,13 +15042,8 @@ reject_pattern \
   VoiceInk/Transcription/RollingPreload/RollingBufferPreloadCoordinator.swift
 
 require_pattern \
-  "macOS rolling-buffer settings use shared duration lower bound" \
-  'VoiceInkRollingBufferPreloadSettings\.minimumBufferDurationSeconds' \
-  VoiceInk/Views/Settings/RollingBufferPreloadSettingsControls.swift
-
-require_pattern \
-  "macOS rolling-buffer settings use shared duration upper bound" \
-  'VoiceInkRollingBufferPreloadSettings\.maximumBufferDurationSeconds' \
+  "macOS rolling-buffer settings use shared duration formatter" \
+  'VoiceInkRollingBufferPreloadSettings\.bufferDurationFormatter\(\)' \
   VoiceInk/Views/Settings/RollingBufferPreloadSettingsControls.swift
 
 require_pattern \
@@ -15152,6 +15162,11 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
+  "core checks execute rolling-buffer duration formatter tests" \
+  'RollingBufferPreloadPolicyTests\.testSettingsBuildBufferDurationFormatterFromSharedBounds' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "core checks execute rolling-buffer settings default tests" \
   'RollingBufferPreloadPolicyTests\.testSettingsPreserveExistingStorageKeysAndDefaults' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
@@ -15183,12 +15198,12 @@ reject_pattern \
 
 reject_pattern \
   "macOS rolling-buffer settings avoid shell-owned duration bounds" \
-  'formatter\.(minimum|maximum) = (0\.25|30)|min\(max\(bufferDurationSeconds, 0\.25\), 30\.0\)' \
+  'NumberFormatter|formatter\.(minimum|maximum|minimumFractionDigits|maximumFractionDigits)|minimumBufferDurationSeconds|maximumBufferDurationSeconds|min\(max\(bufferDurationSeconds, 0\.25\), 30\.0\)' \
   VoiceInk/Views/Settings/RollingBufferPreloadSettingsControls.swift
 
 require_pattern \
   "migration checklist tracks shared rolling-buffer settings labels" \
-  'macOS rolling-buffer preload settings labels/help, preload-mode stored selection repair, duration bounds/normalization, partial-transcript preview notification contract, VAD model labels, storage key/default, selected-model fallback, Silero predicate, service-route provider classification' \
+  'macOS rolling-buffer preload settings labels/help, preload-mode stored selection repair, duration bounds/normalization/formatter, partial-transcript preview notification contract, VAD model labels, storage key/default, selected-model fallback, Silero predicate, service-route provider classification' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

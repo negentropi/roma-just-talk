@@ -35,6 +35,15 @@ final class RollingBufferPreloadPolicyTests: XCTestCase {
         XCTAssertEqual(VoiceInkRollingBufferPreloadSettings.normalizedBufferDurationSeconds(99), 30.0)
     }
 
+    func testSettingsBuildBufferDurationFormatterFromSharedBounds() {
+        let formatter = VoiceInkRollingBufferPreloadSettings.bufferDurationFormatter()
+
+        XCTAssertEqual(formatter.minimum, NSNumber(value: VoiceInkRollingBufferPreloadSettings.minimumBufferDurationSeconds))
+        XCTAssertEqual(formatter.maximum, NSNumber(value: VoiceInkRollingBufferPreloadSettings.maximumBufferDurationSeconds))
+        XCTAssertEqual(formatter.minimumFractionDigits, 0)
+        XCTAssertEqual(formatter.maximumFractionDigits, 2)
+    }
+
     func testPreloadModeSelectionUsesValidStoredRawValue() {
         XCTAssertEqual(
             VoiceInkRollingBufferPreloadSettings.preloadModeSelection(fromStoredRawValue: "on"),

@@ -162,13 +162,11 @@ struct SettingsView: View {
                 ) {
                     LabeledContent(Self.recordingShortcutPresentation.activationDelayLabel) {
                         HStack {
-                            TextField("", value: $recordingShortcutManager.middleClickActivationDelay, formatter: {
-                                let formatter = NumberFormatter()
-                                formatter.minimum = NSNumber(
-                                    value: VoiceInkRecordingShortcutPreference.minimumMiddleClickActivationDelay
-                                )
-                                return formatter
-                            }())
+                            TextField(
+                                "",
+                                value: $recordingShortcutManager.middleClickActivationDelay,
+                                formatter: VoiceInkRecordingShortcutPreference.middleClickActivationDelayFormatter()
+                            )
                                 .textFieldStyle(.roundedBorder)
                                 .frame(width: 60)
                             Text(Self.recordingShortcutPresentation.activationDelayUnitLabel)

@@ -60,6 +60,33 @@ final class ModelManagementPresentationTests: XCTestCase {
         )
     }
 
+    func testModelManagementFiltersOwnListFilteringAndRecommendedOrder() {
+        let models = [
+            model(name: "custom-api", category: .custom),
+            model(name: "whisper-large-v3-turbo", category: .cloud),
+            model(name: "ggml-base.en", category: .local),
+            model(name: "ggml-large-v3-turbo-q5_0", category: .local, isAvailableOnCurrentOS: false),
+            model(name: "parakeet-tdt-0.6b-v2", category: .local)
+        ]
+
+        XCTAssertEqual(
+            VoiceInkModelManagementFilter.recommended.filteredModels(models, facts: \.facts).map(\.facts.name),
+            ["ggml-base.en", "parakeet-tdt-0.6b-v2", "ggml-large-v3-turbo-q5_0", "whisper-large-v3-turbo"]
+        )
+        XCTAssertEqual(
+            VoiceInkModelManagementFilter.local.filteredModels(models, facts: \.facts).map(\.facts.name),
+            ["ggml-base.en", "parakeet-tdt-0.6b-v2"]
+        )
+        XCTAssertEqual(
+            VoiceInkModelManagementFilter.cloud.filteredModels(models, facts: \.facts).map(\.facts.name),
+            ["whisper-large-v3-turbo"]
+        )
+        XCTAssertEqual(
+            VoiceInkModelManagementFilter.custom.filteredModels(models, facts: \.facts).map(\.facts.name),
+            ["custom-api"]
+        )
+    }
+
     func testModelManagementPresentationPreservesPlatformCopy() {
         XCTAssertEqual(VoiceInkModelManagementPresentation.settingsTitle, "Model Settings")
         XCTAssertEqual(VoiceInkModelManagementPresentation.defaultModelTitle, "Default Model")
@@ -131,4 +158,22 @@ final class ModelManagementPresentationTests: XCTestCase {
             "Failed to import model: Permission denied"
         )
     }
+
+    private func model(
+        name: String,
+        category: VoiceInkModelManagementModelCategory,
+        isAvailableOnCurrentOS: Bool = true
+    ) -> ModelManagementFilterFixture {
+        ModelManagementFilterFixture(
+            facts: VoiceInkModelManagementModelFacts(
+                name: name,
+                category: category,
+                isAvailableOnCurrentOS: isAvailableOnCurrentOS
+            )
+        )
+    }
+}
+
+private struct ModelManagementFilterFixture {
+    let facts: VoiceInkModelManagementModelFacts
 }

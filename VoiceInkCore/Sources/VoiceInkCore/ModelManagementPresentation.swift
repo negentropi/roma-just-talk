@@ -34,6 +34,21 @@ public enum VoiceInkModelManagementFilter: String, CaseIterable, Identifiable, S
     public func sortRank(forModelName name: String) -> Int {
         Self.recommendedModelNames.firstIndex(of: name) ?? Int.max
     }
+
+    public func filteredModels<Model>(
+        _ models: [Model],
+        facts: (Model) -> VoiceInkModelManagementModelFacts
+    ) -> [Model] {
+        let includedModels = models.filter { includes(facts($0)) }
+
+        guard self == .recommended else {
+            return includedModels
+        }
+
+        return includedModels.sorted {
+            sortRank(forModelName: facts($0).name) < sortRank(forModelName: facts($1).name)
+        }
+    }
 }
 
 public enum VoiceInkModelManagementModelCategory: Equatable, Sendable {

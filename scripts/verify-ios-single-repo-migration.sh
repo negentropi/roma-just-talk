@@ -4256,8 +4256,13 @@ require_pattern \
 
 require_pattern \
   "shared model management filter owns model facts and recommended order" \
-  'VoiceInkModelManagementModelFacts|VoiceInkModelManagementModelCategory|recommendedModelNames|func +includes' \
+  'VoiceInkModelManagementModelFacts|VoiceInkModelManagementModelCategory|recommendedModelNames|func +includes|filteredModels' \
   VoiceInkCore/Sources/VoiceInkCore/ModelManagementPresentation.swift
+
+require_pattern \
+  "core checks execute model management list filtering policy" \
+  'ModelManagementPresentationTests\.testModelManagementFiltersOwnListFilteringAndRecommendedOrder' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "shared model management copy presentation lives in VoiceInkCore" \
@@ -4482,8 +4487,13 @@ reject_pattern \
   VoiceInk/Models/TranscriptionModel.swift
 
 require_pattern \
-  "macOS model management uses shared filter membership" \
-  'selectedFilter\.includes|sortRank\(forModelName:|modelManagementFacts\(for:' \
+  "macOS model management uses shared list filtering policy" \
+  'selectedFilter\.filteredModels|modelManagementFacts\(for:' \
+  VoiceInk/Views/AI\ Models/ModelManagementView.swift
+
+reject_pattern \
+  "macOS model management avoids shell-owned filter and recommended ordering" \
+  'selectedFilter\.includes|sortRank\(forModelName:' \
   VoiceInk/Views/AI\ Models/ModelManagementView.swift
 
 require_pattern \

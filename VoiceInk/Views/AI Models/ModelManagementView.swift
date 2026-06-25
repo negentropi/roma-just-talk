@@ -301,16 +301,8 @@ struct ModelManagementView: View {
     }
 
     private var filteredModels: [any TranscriptionModel] {
-        let models = transcriptionModelManager.allAvailableModels.filter {
-            selectedFilter.includes(modelManagementFacts(for: $0))
-        }
-
-        guard selectedFilter == .recommended else {
-            return models
-        }
-
-        return models.sorted {
-            selectedFilter.sortRank(forModelName: $0.name) < selectedFilter.sortRank(forModelName: $1.name)
+        selectedFilter.filteredModels(transcriptionModelManager.allAvailableModels) {
+            modelManagementFacts(for: $0)
         }
     }
 

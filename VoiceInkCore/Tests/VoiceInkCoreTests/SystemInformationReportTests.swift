@@ -131,6 +131,24 @@ final class SystemInformationReportTests: XCTestCase {
         XCTAssertTrue(VoiceInkSystemInformationReport.macOS(facts).contains("ROLLING BUFFER PRELOAD:\nline one\nline two\n\nUI SETTINGS:"))
     }
 
+    func testSystemInformationCopyPresentationPreservesDashboardButtonPolicy() {
+        XCTAssertEqual(
+            VoiceInkSystemInformationCopyPresentation.button(isCopied: false),
+            VoiceInkSystemInformationCopyButtonPresentation(
+                systemImageName: "doc.on.doc",
+                title: "Copy System Info"
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkSystemInformationCopyPresentation.button(isCopied: true),
+            VoiceInkSystemInformationCopyButtonPresentation(
+                systemImageName: "checkmark",
+                title: "Copied!"
+            )
+        )
+        XCTAssertEqual(VoiceInkSystemInformationCopyPresentation.copiedResetDelay, 1.5)
+    }
+
     private static var sampleFacts: VoiceInkMacOSSystemInformationFacts {
         VoiceInkMacOSSystemInformationFacts(
             generated: "June 24, 2026 at 3:42:11 PM",

@@ -204,3 +204,28 @@ public enum VoiceInkSystemInformationReport {
         """
     }
 }
+
+public struct VoiceInkSystemInformationCopyButtonPresentation: Equatable, Sendable {
+    public let systemImageName: String
+    public let title: String
+
+    public init(systemImageName: String, title: String) {
+        self.systemImageName = systemImageName
+        self.title = title
+    }
+}
+
+public enum VoiceInkSystemInformationCopyPresentation {
+    public static let idleSystemImageName = "doc.on.doc"
+    public static let copiedSystemImageName = "checkmark"
+    public static let idleTitle = "Copy System Info"
+    public static let copiedTitle = "Copied!"
+    public static let copiedResetDelay: TimeInterval = 1.5
+
+    public static func button(isCopied: Bool) -> VoiceInkSystemInformationCopyButtonPresentation {
+        VoiceInkSystemInformationCopyButtonPresentation(
+            systemImageName: isCopied ? copiedSystemImageName : idleSystemImageName,
+            title: isCopied ? copiedTitle : idleTitle
+        )
+    }
+}

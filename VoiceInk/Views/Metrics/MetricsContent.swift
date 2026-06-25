@@ -402,15 +402,17 @@ private struct CopySystemInfoButton: View {
     @State private var isCopied: Bool = false
 
     var body: some View {
+        let presentation = VoiceInkSystemInformationCopyPresentation.button(isCopied: isCopied)
+
         Button(action: {
             copySystemInfo()
         }) {
             HStack(spacing: 8) {
-                Image(systemName: isCopied ? "checkmark" : "doc.on.doc")
+                Image(systemName: presentation.systemImageName)
                     .rotationEffect(.degrees(isCopied ? 360 : 0))
                     .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isCopied)
 
-                Text(isCopied ? "Copied!" : "Copy System Info")
+                Text(presentation.title)
                     .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isCopied)
             }
             .font(.system(size: 13, weight: .medium))
@@ -430,7 +432,7 @@ private struct CopySystemInfoButton: View {
             isCopied = true
         }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + VoiceInkSystemInformationCopyPresentation.copiedResetDelay) {
             withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                 isCopied = false
             }

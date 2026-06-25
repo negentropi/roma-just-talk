@@ -15721,25 +15721,55 @@ require_patterns \
   'PERMISSIONS:'
 
 require_patterns \
+  "shared system information copy presentation lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/SystemInformationReport.swift \
+  'VoiceInkSystemInformationCopyPresentation' \
+  'VoiceInkSystemInformationCopyButtonPresentation' \
+  'idleSystemImageName = "doc\.on\.doc"' \
+  'copiedSystemImageName = "checkmark"' \
+  'idleTitle = "Copy System Info"' \
+  'copiedTitle = "Copied!"' \
+  'copiedResetDelay: TimeInterval = 1\.5'
+
+require_patterns \
   "macOS system info service adapts shared report formatter" \
   VoiceInk/Services/SystemInfoService.swift \
   'VoiceInkSystemInformationReport\.macOS\(makeMacOSSystemInformationFacts\(\)\)' \
   'VoiceInkMacOSSystemInformationFacts'
+
+require_patterns \
+  "macOS dashboard adapts shared system information copy presentation" \
+  VoiceInk/Views/Metrics/MetricsContent.swift \
+  'VoiceInkSystemInformationCopyPresentation\.button\(isCopied: isCopied\)' \
+  'presentation\.systemImageName' \
+  'presentation\.title' \
+  'VoiceInkSystemInformationCopyPresentation\.copiedResetDelay'
 
 reject_pattern \
   "macOS system info service avoids shell-owned report template" \
   '=== VOICEINK SYSTEM INFORMATION ===|APP INFORMATION:|CLIPBOARD & PASTE SETTINGS:|DATA CLEANUP SETTINGS:|PERMISSIONS:' \
   VoiceInk/Services/SystemInfoService.swift
 
-require_pattern \
-  "core checks execute system information report tests" \
-  'SystemArchitectureTests\.testSystemArchitecturePreservesMacOSDisplayNameForCompileTarget|SystemArchitectureTests\.testSystemArchitectureIntelMacPredicateMatchesCompileTarget|SystemInformationReportTests\.testMacOSSystemInformationReportPreservesSectionOrderAndLabels|SystemInformationReportTests\.testMacOSSystemInformationReportKeepsRollingBufferBlockVerbatim' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+reject_pattern \
+  "macOS dashboard avoids shell-owned system information copy presentation" \
+  '"(Copy System Info|Copied!|doc\.on\.doc|checkmark)"|deadline: \.now\(\) \+ 1\.5' \
+  VoiceInk/Views/Metrics/MetricsContent.swift
 
-require_pattern \
-  "migration docs describe shared macOS system information report formatting" \
-  'macOS support system-information report formatting|VoiceInkSystemInformationReport' \
-  docs/ios-single-repo-migration.md
+require_patterns \
+  "core checks execute system information report tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'SystemArchitectureTests\.testSystemArchitecturePreservesMacOSDisplayNameForCompileTarget' \
+  'SystemArchitectureTests\.testSystemArchitectureIntelMacPredicateMatchesCompileTarget' \
+  'SystemInformationReportTests\.testMacOSSystemInformationReportPreservesSectionOrderAndLabels' \
+  'SystemInformationReportTests\.testMacOSSystemInformationReportKeepsRollingBufferBlockVerbatim' \
+  'SystemInformationReportTests\.testSystemInformationCopyPresentationPreservesDashboardButtonPolicy'
+
+require_patterns \
+  "migration docs describe shared macOS system information presentation" \
+  docs/ios-single-repo-migration.md \
+  'macOS support system-information report formatting and copy-button presentation' \
+  'VoiceInkSystemInformationReport' \
+  'VoiceInkSystemInformationCopyPresentation'
 
 section "obsolete standalone app notification presentation module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/AppNotificationPresentation.swift

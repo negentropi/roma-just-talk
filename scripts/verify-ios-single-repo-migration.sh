@@ -12160,15 +12160,23 @@ require_patterns \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift \
   'VoiceInkCurrentTranscriptionModelLoadPlan' \
   'VoiceInkCurrentTranscriptionModelLoadAction' \
-  'shouldRestoreSavedModel' \
-  'shouldClearStoredModelName'
+  'applyRuntimeState'
+
+reject_pattern \
+  "shared current-model preference avoids public raw load action interface" \
+  'public enum VoiceInkCurrentTranscriptionModelLoadAction|public let action: VoiceInkCurrentTranscriptionModelLoadAction|public var shouldRestoreSavedModel|public var shouldClearStoredModelName' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_patterns \
   "macOS transcription model manager delegates current-model load planning" \
   VoiceInk/Transcription/Engine/TranscriptionModelManager.swift \
   'VoiceInkCurrentTranscriptionModelPreference\.loadPlan' \
-  'loadPlan\.shouldClearStoredModelName' \
-  'loadPlan\.shouldRestoreSavedModel'
+  'loadPlan\.applyRuntimeState'
+
+reject_pattern \
+  "macOS transcription model manager avoids raw current-model load plan field checks" \
+  'loadPlan\.action|loadPlan\.shouldClearStoredModelName|loadPlan\.shouldRestoreSavedModel|case \.(restoreSavedModel|clearStoredModelName)' \
+  VoiceInk/Transcription/Engine/TranscriptionModelManager.swift
 
 require_patterns \
   "core checks execute current-model load plan tests" \

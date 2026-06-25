@@ -1077,10 +1077,18 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             candidateModelExists: false,
             isCandidateAvailableOnCurrentOS: false
         )
+        var events: [String] = []
 
-        XCTAssertEqual(plan.action, .none)
-        XCTAssertFalse(plan.shouldRestoreSavedModel)
-        XCTAssertFalse(plan.shouldClearStoredModelName)
+        plan.applyRuntimeState(
+            clearStoredModelName: {
+                events.append("clear")
+            },
+            restoreSavedModel: {
+                events.append("restore")
+            }
+        )
+
+        XCTAssertEqual(events, [])
     }
 
     func testCurrentTranscriptionModelLoadPlanNoOpsWhenSavedModelIsMissingFromRegistry() {
@@ -1089,10 +1097,18 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             candidateModelExists: false,
             isCandidateAvailableOnCurrentOS: false
         )
+        var events: [String] = []
 
-        XCTAssertEqual(plan.action, .none)
-        XCTAssertFalse(plan.shouldRestoreSavedModel)
-        XCTAssertFalse(plan.shouldClearStoredModelName)
+        plan.applyRuntimeState(
+            clearStoredModelName: {
+                events.append("clear")
+            },
+            restoreSavedModel: {
+                events.append("restore")
+            }
+        )
+
+        XCTAssertEqual(events, [])
     }
 
     func testCurrentTranscriptionModelLoadPlanRestoresAvailableSavedModel() {
@@ -1101,10 +1117,18 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             candidateModelExists: true,
             isCandidateAvailableOnCurrentOS: true
         )
+        var events: [String] = []
 
-        XCTAssertEqual(plan.action, .restoreSavedModel)
-        XCTAssertTrue(plan.shouldRestoreSavedModel)
-        XCTAssertFalse(plan.shouldClearStoredModelName)
+        plan.applyRuntimeState(
+            clearStoredModelName: {
+                events.append("clear")
+            },
+            restoreSavedModel: {
+                events.append("restore")
+            }
+        )
+
+        XCTAssertEqual(events, ["restore"])
     }
 
     func testCurrentTranscriptionModelLoadPlanClearsUnavailableSavedModel() {
@@ -1113,10 +1137,18 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             candidateModelExists: true,
             isCandidateAvailableOnCurrentOS: false
         )
+        var events: [String] = []
 
-        XCTAssertEqual(plan.action, .clearStoredModelName)
-        XCTAssertFalse(plan.shouldRestoreSavedModel)
-        XCTAssertTrue(plan.shouldClearStoredModelName)
+        plan.applyRuntimeState(
+            clearStoredModelName: {
+                events.append("clear")
+            },
+            restoreSavedModel: {
+                events.append("restore")
+            }
+        )
+
+        XCTAssertEqual(events, ["clear"])
     }
 
     func testAIEnhancementProviderPreferenceUsesDefaultWhenMissing() {

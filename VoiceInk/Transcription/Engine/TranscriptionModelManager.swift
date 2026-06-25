@@ -57,17 +57,18 @@ class TranscriptionModelManager: ObservableObject {
             isCandidateAvailableOnCurrentOS: savedModel.map(isAvailableOnCurrentOS) ?? false
         )
 
-        if loadPlan.shouldClearStoredModelName {
-            VoiceInkCurrentTranscriptionModelPreference.clearModelName()
-            currentTranscriptionModel = nil
-            return
-        }
-
-        guard loadPlan.shouldRestoreSavedModel, let savedModel else { return }
-
-        currentTranscriptionModel = savedModel
-        ensureSelectedLanguageIsSupported(by: savedModel)
-        notifyCurrentModelDidChange(savedModel)
+        loadPlan.applyRuntimeState(
+            clearStoredModelName: {
+                VoiceInkCurrentTranscriptionModelPreference.clearModelName()
+                currentTranscriptionModel = nil
+            },
+            restoreSavedModel: {
+                guard let savedModel else { return }
+                currentTranscriptionModel = savedModel
+                ensureSelectedLanguageIsSupported(by: savedModel)
+                notifyCurrentModelDidChange(savedModel)
+            }
+        )
     }
 
     // MARK: - Set default model

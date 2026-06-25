@@ -919,14 +919,14 @@ public enum VoiceInkCurrentTranscriptionModelPreference {
     }
 }
 
-public enum VoiceInkCurrentTranscriptionModelLoadAction: Equatable, Sendable {
+fileprivate enum VoiceInkCurrentTranscriptionModelLoadAction: Equatable, Sendable {
     case none
     case restoreSavedModel
     case clearStoredModelName
 }
 
 public struct VoiceInkCurrentTranscriptionModelLoadPlan: Equatable, Sendable {
-    public let action: VoiceInkCurrentTranscriptionModelLoadAction
+    private let action: VoiceInkCurrentTranscriptionModelLoadAction
 
     public init(
         savedModelName: String?,
@@ -943,12 +943,18 @@ public struct VoiceInkCurrentTranscriptionModelLoadPlan: Equatable, Sendable {
             : .clearStoredModelName
     }
 
-    public var shouldRestoreSavedModel: Bool {
-        action == .restoreSavedModel
-    }
-
-    public var shouldClearStoredModelName: Bool {
-        action == .clearStoredModelName
+    public func applyRuntimeState(
+        clearStoredModelName: () -> Void,
+        restoreSavedModel: () -> Void
+    ) {
+        switch action {
+        case .none:
+            break
+        case .restoreSavedModel:
+            restoreSavedModel()
+        case .clearStoredModelName:
+            clearStoredModelName()
+        }
     }
 }
 

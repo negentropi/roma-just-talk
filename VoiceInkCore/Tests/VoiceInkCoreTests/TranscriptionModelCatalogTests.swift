@@ -343,8 +343,29 @@ final class TranscriptionModelCatalogTests: XCTestCase {
 
         XCTAssertEqual(VoiceInkMacOSTranscriptionModelProvider.groq.coreTranscriptionModelProvider, .groq)
         XCTAssertNil(VoiceInkMacOSTranscriptionModelProvider.whisper.coreTranscriptionModelProvider)
+        XCTAssertEqual(VoiceInkMacOSTranscriptionModelProvider.groq.remoteTranscriptionProviderKind, .groq)
+        XCTAssertNil(VoiceInkMacOSTranscriptionModelProvider.whisper.remoteTranscriptionProviderKind)
+        XCTAssertEqual(VoiceInkMacOSTranscriptionModelProvider.groq.apiErrorDomain, "GroqAPI")
+        XCTAssertNil(VoiceInkMacOSTranscriptionModelProvider.whisper.apiErrorDomain)
         XCTAssertEqual(VoiceInkMacOSTranscriptionModelProvider.cartesia.apiKeyProviderName, "Cartesia")
         XCTAssertEqual(VoiceInkMacOSTranscriptionModelProvider.custom.apiKeyProviderName, "Custom")
+        XCTAssertEqual(VoiceInkMacOSTranscriptionModelProvider.deepgram.languageCodes?.first, "ar")
+        XCTAssertTrue(VoiceInkMacOSTranscriptionModelProvider.deepgram.includesAutoDetect)
+        XCTAssertFalse(VoiceInkMacOSTranscriptionModelProvider.groq.includesAutoDetect)
+        XCTAssertEqual(
+            VoiceInkMacOSTranscriptionModelProvider.groq.cloudModelSpecs.map(\.name),
+            VoiceInkTranscriptionModelCatalog.cloudModels(for: .groq).map(\.name)
+        )
+        XCTAssertTrue(VoiceInkMacOSTranscriptionModelProvider.whisper.cloudModelSpecs.isEmpty)
+        XCTAssertEqual(
+            VoiceInkMacOSTranscriptionModelProvider.soniox.remoteTranscriptionOptions(
+                prompt: "ignored",
+                customVocabulary: [" Roma ", "Felix", "roma", ""]
+            ).customVocabulary,
+            ["Roma", "Felix"]
+        )
+        XCTAssertFalse(VoiceInkMacOSTranscriptionModelProvider.soniox.acceptsRemoteTranscriptionText(" \n\t "))
+        XCTAssertTrue(VoiceInkMacOSTranscriptionModelProvider.mistral.acceptsRemoteTranscriptionText(""))
         XCTAssertEqual(VoiceInkMacOSTranscriptionModelProvider.whisper.transcriptionLanguageSource, .whisper)
         XCTAssertEqual(VoiceInkMacOSTranscriptionModelProvider.custom.transcriptionLanguageSource, .all)
         XCTAssertEqual(

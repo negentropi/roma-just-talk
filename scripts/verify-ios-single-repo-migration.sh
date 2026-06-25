@@ -5128,6 +5128,17 @@ require_patterns \
   'supportsRecordedFileTranscription' \
   'isStreamingOnly'
 
+require_patterns \
+  "shared macOS cloud provider facts live in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift \
+  'remoteTranscriptionProviderKind' \
+  'apiErrorDomain' \
+  'languageCodes' \
+  'includesAutoDetect' \
+  'cloudModelSpecs' \
+  'remoteTranscriptionOptions' \
+  'acceptsRemoteTranscriptionText'
+
 require_pattern \
   "macOS transcription model uses shared recorded-file support policy" \
   'coreFacts\.supportsRecordedFileTranscription' \
@@ -5140,7 +5151,7 @@ require_pattern \
 
 require_pattern \
   "macOS cloud provider uses shared streaming-only support policy" \
-  'provider\.isStreamingOnly' \
+  'modelProvider\.isStreamingOnly' \
   VoiceInk/Transcription/Cloud/CloudProvider.swift
 
 reject_pattern \
@@ -5166,7 +5177,12 @@ require_pattern \
 
 require_pattern \
   "macOS cloud provider uses shared API error-domain mapping" \
-  'coreTranscriptionModelProvider\?\.apiErrorDomain' \
+  'modelProvider\.apiErrorDomain' \
+  VoiceInk/Transcription/Cloud/CloudProvider.swift
+
+reject_pattern \
+  "macOS cloud provider avoids direct core transcription provider reach-through" \
+  'coreTranscriptionModelProvider' \
   VoiceInk/Transcription/Cloud/CloudProvider.swift
 
 reject_pattern \

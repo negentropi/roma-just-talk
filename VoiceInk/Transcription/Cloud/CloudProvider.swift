@@ -49,52 +49,41 @@ private extension VoiceInkCloudTranscriptionModelSpec {
 
 extension CloudProvider {
     private var apiErrorDomain: String? {
-        modelProvider.coreTranscriptionModelProvider?.apiErrorDomain
+        modelProvider.apiErrorDomain
     }
 
     private func remoteTranscriptionOptions(
         prompt: String?,
         customVocabulary: [String]
     ) -> VoiceInkRemoteTranscriptionOptions {
-        guard let provider = modelProvider.coreTranscriptionModelProvider?.providerKind else {
-            return VoiceInkRemoteTranscriptionOptions()
-        }
-        return VoiceInkRemoteTranscriptionOptions.batchDefaults(
-            forProviderKind: provider,
+        modelProvider.remoteTranscriptionOptions(
             prompt: prompt,
             customVocabulary: customVocabulary
         )
     }
 
     var languageCodes: [String]? {
-        modelProvider.coreTranscriptionModelProvider?.languageCodes
+        modelProvider.languageCodes
     }
 
     var models: [CloudModel] {
-        guard let provider = modelProvider.coreTranscriptionModelProvider else {
-            return []
-        }
-
-        return VoiceInkTranscriptionModelCatalog
-            .cloudModels(for: provider)
+        modelProvider
+            .cloudModelSpecs
             .map { $0.makeCloudModel(provider: modelProvider) }
     }
 
     var includesAutoDetect: Bool {
-        modelProvider.coreTranscriptionModelProvider?.includesAutoDetect ?? false
+        modelProvider.includesAutoDetect
     }
 
     var isStreamingOnly: Bool {
-        guard let provider = modelProvider.coreTranscriptionModelProvider else {
-            return false
-        }
-        return provider.isStreamingOnly
+        modelProvider.isStreamingOnly
     }
 
     /// Streaming-only providers inherit this and get a clear error if batch is somehow attempted.
     /// Batch providers share the core remote dispatch while this shell keeps SwiftData and streaming adapters.
     func transcribe(audioData: Data, fileName: String, apiKey: String, model: String, language: String?, prompt: String?, customVocabulary: [String]) async throws -> String {
-        guard let provider = modelProvider.coreTranscriptionModelProvider?.providerKind else {
+        guard let provider = modelProvider.remoteTranscriptionProviderKind else {
             throw CloudTranscriptionError.unsupportedProvider
         }
 
@@ -110,7 +99,7 @@ extension CloudProvider {
                     customVocabulary: customVocabulary
                 )
             )
-            guard provider.transcriptionEmptyTextPolicy.accepts(text) else {
+            guard modelProvider.acceptsRemoteTranscriptionText(text) else {
                 throw CloudTranscriptionError.noTranscriptionReturned
             }
             return text

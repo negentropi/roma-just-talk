@@ -577,8 +577,51 @@ public enum VoiceInkMacOSTranscriptionModelProvider: String, Codable, Hashable, 
         coreTranscriptionModelProviderRole.coreTranscriptionModelProvider
     }
 
+    public var remoteTranscriptionProviderKind: VoiceInkProviderKind? {
+        coreTranscriptionModelProvider?.providerKind
+    }
+
+    public var apiErrorDomain: String? {
+        coreTranscriptionModelProvider?.apiErrorDomain
+    }
+
     public var apiKeyProviderName: String {
         coreTranscriptionModelProviderRole.apiKeyProviderName(defaultName: rawValue)
+    }
+
+    public var languageCodes: [String]? {
+        coreTranscriptionModelProvider?.languageCodes
+    }
+
+    public var includesAutoDetect: Bool {
+        coreTranscriptionModelProvider?.includesAutoDetect ?? false
+    }
+
+    public var cloudModelSpecs: [VoiceInkCloudTranscriptionModelSpec] {
+        guard let provider = coreTranscriptionModelProvider else {
+            return []
+        }
+
+        return VoiceInkTranscriptionModelCatalog.cloudModels(for: provider)
+    }
+
+    public func remoteTranscriptionOptions(
+        prompt: String?,
+        customVocabulary: [String]
+    ) -> VoiceInkRemoteTranscriptionOptions {
+        guard let provider = remoteTranscriptionProviderKind else {
+            return VoiceInkRemoteTranscriptionOptions()
+        }
+
+        return VoiceInkRemoteTranscriptionOptions.batchDefaults(
+            forProviderKind: provider,
+            prompt: prompt,
+            customVocabulary: customVocabulary
+        )
+    }
+
+    public func acceptsRemoteTranscriptionText(_ text: String) -> Bool {
+        remoteTranscriptionProviderKind?.transcriptionEmptyTextPolicy.accepts(text) ?? true
     }
 
     public var transcriptionLanguageSource: VoiceInkTranscriptionLanguageSource {

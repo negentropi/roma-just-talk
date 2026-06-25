@@ -138,30 +138,16 @@ struct FluidAudioModel: TranscriptionModel {
     }
     let supportedLanguages: [String: String]
 
-    init(name: String, displayName: String, description: String, size: String, speed: Double, accuracy: Double, ramUsage: Double, supportsStreaming: Bool = false, supportedLanguages: [String: String]) {
-        self.name = name
-        self.displayName = displayName
-        self.description = description
-        self.size = size
-        self.speed = speed
-        self.accuracy = accuracy
-        self.ramUsage = ramUsage
-        self.supportsStreaming = supportsStreaming
-        self.supportedLanguages = supportedLanguages
-    }
-
     init(spec: VoiceInkFluidAudioTranscriptionModelSpec) {
-        self.init(
-            name: spec.name,
-            displayName: spec.displayName,
-            description: spec.description,
-            size: spec.size,
-            speed: spec.speed,
-            accuracy: spec.accuracy,
-            ramUsage: spec.ramUsage,
-            supportsStreaming: spec.supportsStreaming,
-            supportedLanguages: spec.supportedLanguages
-        )
+        self.name = spec.name
+        self.displayName = spec.displayName
+        self.description = spec.description
+        self.size = spec.size
+        self.speed = spec.speed
+        self.accuracy = spec.accuracy
+        self.ramUsage = spec.ramUsage
+        self.supportsStreaming = spec.supportsStreaming
+        self.supportedLanguages = spec.supportedLanguages
     }
 }
 

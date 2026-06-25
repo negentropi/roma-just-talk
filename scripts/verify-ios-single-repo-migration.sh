@@ -8841,6 +8841,11 @@ reject_pattern \
   'predefinedModels\.first|defaultMacOSFluidAudioModelName|Missing default macOS FluidAudio model' \
   VoiceInk/Models/TranscriptionModelRegistry.swift
 
+reject_pattern \
+  "macOS FluidAudio model adapter avoids shell-owned literal model initializer" \
+  'init\(name: String, displayName: String, description: String, size: String, speed: Double, accuracy: Double, ramUsage: Double' \
+  VoiceInk/Models/TranscriptionModel.swift
+
 require_pattern \
   "macOS FluidAudio model manager adapts shared runtime version policy" \
   'VoiceInkTranscriptionModelCatalog\.fluidAudioModelVersion|fluidAudioLanguageHintCode|init\(_ version: VoiceInkFluidAudioModelVersion\)' \

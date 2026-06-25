@@ -321,6 +321,7 @@ public enum VoiceInkMacOSLogCategory {
     public static let licenseViewModel = "LicenseViewModel"
     public static let transcriptionAutoCleanupService = "TranscriptionAutoCleanupService"
     public static let sessionMetricMigrationService = "SessionMetricMigrationService"
+    public static let modelPrewarm = "ModelPrewarm"
 }
 
 public enum VoiceInkAppIdentity {

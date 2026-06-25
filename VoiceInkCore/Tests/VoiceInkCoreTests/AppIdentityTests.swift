@@ -57,6 +57,7 @@ final class AppIdentityTests: XCTestCase {
         XCTAssertEqual(VoiceInkMacOSLogCategory.licenseViewModel, "LicenseViewModel")
         XCTAssertEqual(VoiceInkMacOSLogCategory.transcriptionAutoCleanupService, "TranscriptionAutoCleanupService")
         XCTAssertEqual(VoiceInkMacOSLogCategory.sessionMetricMigrationService, "SessionMetricMigrationService")
+        XCTAssertEqual(VoiceInkMacOSLogCategory.modelPrewarm, "ModelPrewarm")
     }
 
     func testMacOSWindowIdentityPreservesIdentifiersTitlesAndFrameNames() {

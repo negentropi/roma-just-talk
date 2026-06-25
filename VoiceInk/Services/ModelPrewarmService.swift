@@ -9,7 +9,10 @@ final class ModelPrewarmService: ObservableObject {
     private let transcriptionModelManager: TranscriptionModelManager
     private let whisperModelManager: WhisperModelManager
     private let modelContext: ModelContext
-    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "ModelPrewarm")
+    private let logger = Logger(
+        subsystem: VoiceInkAppIdentity.loggingSubsystem,
+        category: VoiceInkMacOSLogCategory.modelPrewarm
+    )
     private let serviceRegistry: TranscriptionServiceRegistry
     private var prewarmAudioURL: URL? {
         VoiceInkModelPrewarmSamplePolicy.firstAvailableURL { resource in

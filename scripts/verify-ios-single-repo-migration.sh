@@ -11163,6 +11163,12 @@ require_pattern \
   'VoiceInkModelPrewarmDiagnostics\.completedMessage\(duration: duration\)' \
   VoiceInk/Services/ModelPrewarmService.swift
 
+require_patterns \
+  "macOS model prewarm uses shared log category identity" \
+  VoiceInk/Services/ModelPrewarmService.swift \
+  'Logger\(' \
+  'category: VoiceInkMacOSLogCategory\.modelPrewarm'
+
 require_pattern \
   "macOS model prewarm uses shared sample lookup policy" \
   'VoiceInkModelPrewarmSamplePolicy\.firstAvailableURL' \
@@ -11181,7 +11187,7 @@ reject_pattern \
 
 reject_pattern \
   "macOS model prewarm avoids shell-owned prewarm diagnostics and sample policy" \
-  '"(ModelPrewarmService initialized - listening for wake and app launch|App launched, scheduling prewarm|Mac activity detected \(wake/unlock\), scheduling prewarm|Prewarm disabled by user|Skipping prewarm - cloud models don.?t need it|Prewarm audio file|Prewarming |Prewarm completed in|Prewarm failed:|sound7|wav)"|String\(format: +"%\.2f"' \
+  '"(ModelPrewarmService initialized - listening for wake and app launch|App launched, scheduling prewarm|Mac activity detected \(wake/unlock\), scheduling prewarm|Prewarm disabled by user|Skipping prewarm - cloud models don.?t need it|Prewarm audio file|Prewarming |Prewarm completed in|Prewarm failed:|sound7|wav)"|category: "ModelPrewarm"|String\(format: +"%\.2f"' \
   VoiceInk/Services/ModelPrewarmService.swift \
   VoiceInk/Transcription/Whisper/WhisperModelWarmupCoordinator.swift
 
@@ -16761,7 +16767,8 @@ require_patterns \
   'polarService = "PolarService"' \
   'licenseViewModel = "LicenseViewModel"' \
   'transcriptionAutoCleanupService = "TranscriptionAutoCleanupService"' \
-  'sessionMetricMigrationService = "SessionMetricMigrationService"'
+  'sessionMetricMigrationService = "SessionMetricMigrationService"' \
+  'modelPrewarm = "ModelPrewarm"'
 
 require_pattern \
   "macOS window manager uses shared log category identity" \

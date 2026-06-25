@@ -418,20 +418,13 @@ struct ConfigurationView: View {
                 Section(VoiceInkPowerModePresentation.aiEnhancementSectionTitle) {
                     Toggle(VoiceInkPowerModePresentation.aiEnhancementToggleTitle, isOn: $isAIEnhancementEnabled)
                         .onChange(of: isAIEnhancementEnabled) { _, newValue in
-                            if newValue {
-                                applyEnhancementSelection(
-                                    enhancementSelection
-                                        .fillingMissingProviderAndModel(
-                                            currentProvider: aiService.selectedProvider,
-                                            currentModel: aiService.currentModel,
-                                            treatsEmptyModelAsMissing: false
-                                        )
-                                        .selectingPromptForEnhancementState(
-                                            isEnabled: newValue,
-                                            prompts: enhancementService.allPrompts
-                                        )
-                                )
-                            }
+                            enhancementSelection.togglePlan(
+                                isEnabled: newValue,
+                                currentProvider: aiService.selectedProvider,
+                                currentModel: aiService.currentModel,
+                                prompts: enhancementService.allPrompts
+                            )
+                            .applyRuntimeState(applyEnhancementSelection: applyEnhancementSelection)
                         }
 
                     let providerBinding = Binding<VoiceInkAIEnhancementProviderKind>(

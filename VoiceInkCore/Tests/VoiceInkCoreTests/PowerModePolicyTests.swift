@@ -943,6 +943,84 @@ final class PowerModePolicyTests: XCTestCase {
         )
     }
 
+    func testPowerModeEnhancementTogglePlanAppliesMacOSToggleEnablementRules() {
+        let promptID = UUID()
+        let prompt = VoiceInkCustomPrompt(id: promptID, title: "Rewrite", promptText: "Rewrite this")
+        let missingSelection = VoiceInkPowerModeEnhancementSelection(
+            selectedPromptId: nil,
+            selectedAIProvider: nil,
+            selectedAIModel: nil
+        )
+        let emptyModelSelection = VoiceInkPowerModeEnhancementSelection(
+            selectedPromptId: nil,
+            selectedAIProvider: "OpenAI",
+            selectedAIModel: ""
+        )
+        let existingSelection = VoiceInkPowerModeEnhancementSelection(
+            selectedPromptId: UUID(),
+            selectedAIProvider: "Groq",
+            selectedAIModel: "llama-3.3"
+        )
+
+        let enabledPlan = missingSelection.togglePlan(
+            isEnabled: true,
+            currentProvider: .gemini,
+            currentModel: "gemini-2.5-flash",
+            prompts: [prompt]
+        )
+        XCTAssertEqual(
+            enabledPlan.selectionToApply,
+            VoiceInkPowerModeEnhancementSelection(
+                selectedPromptId: promptID,
+                selectedAIProvider: "Gemini",
+                selectedAIModel: "gemini-2.5-flash"
+            )
+        )
+
+        XCTAssertEqual(
+            emptyModelSelection.togglePlan(
+                isEnabled: true,
+                currentProvider: .groq,
+                currentModel: "llama-3.3",
+                prompts: [prompt]
+            ).selectionToApply?.selectedAIModel,
+            ""
+        )
+        XCTAssertEqual(
+            existingSelection.togglePlan(
+                isEnabled: true,
+                currentProvider: .openAI,
+                currentModel: "gpt-4o",
+                prompts: [prompt]
+            ).selectionToApply,
+            existingSelection
+        )
+        XCTAssertNil(
+            missingSelection.togglePlan(
+                isEnabled: false,
+                currentProvider: .openAI,
+                currentModel: "gpt-4o",
+                prompts: [prompt]
+            ).selectionToApply
+        )
+
+        var events = [String]()
+        enabledPlan.applyRuntimeState {
+            events.append("\($0.selectedAIProvider ?? "nil"):\($0.selectedAIModel ?? "nil")")
+        }
+        missingSelection.togglePlan(
+            isEnabled: false,
+            currentProvider: .openAI,
+            currentModel: "gpt-4o",
+            prompts: [prompt]
+        )
+        .applyRuntimeState {
+            events.append($0.selectedAIProvider ?? "nil")
+        }
+
+        XCTAssertEqual(events, ["Gemini:gemini-2.5-flash"])
+    }
+
     func testPowerModeEnhancementSelectionResolvesProviderPickerAndModelOptions() {
         let missingSelection = VoiceInkPowerModeEnhancementSelection(
             selectedPromptId: nil,

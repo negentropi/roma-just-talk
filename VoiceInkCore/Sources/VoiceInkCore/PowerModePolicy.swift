@@ -429,8 +429,46 @@ public struct VoiceInkPowerModeEnhancementSelection: Equatable, Sendable {
         return selectingPromptAfterEnabling(prompts: prompts)
     }
 
+    public func togglePlan(
+        isEnabled: Bool,
+        currentProvider: VoiceInkAIEnhancementProviderKind,
+        currentModel: String,
+        prompts: [VoiceInkCustomPrompt]
+    ) -> VoiceInkPowerModeEnhancementTogglePlan {
+        guard isEnabled else {
+            return VoiceInkPowerModeEnhancementTogglePlan(selectionToApply: nil)
+        }
+
+        return VoiceInkPowerModeEnhancementTogglePlan(
+            selectionToApply: fillingMissingProviderAndModel(
+                currentProvider: currentProvider,
+                currentModel: currentModel,
+                treatsEmptyModelAsMissing: false
+            )
+            .selectingPromptForEnhancementState(
+                isEnabled: isEnabled,
+                prompts: prompts
+            )
+        )
+    }
+
     private var selectedProviderKind: VoiceInkAIEnhancementProviderKind? {
         selectedAIProvider.flatMap(VoiceInkAIEnhancementProviderKind.init(storedValue:))
+    }
+}
+
+public struct VoiceInkPowerModeEnhancementTogglePlan: Equatable, Sendable {
+    public let selectionToApply: VoiceInkPowerModeEnhancementSelection?
+
+    public init(selectionToApply: VoiceInkPowerModeEnhancementSelection?) {
+        self.selectionToApply = selectionToApply
+    }
+
+    public func applyRuntimeState(
+        applyEnhancementSelection: (VoiceInkPowerModeEnhancementSelection) -> Void
+    ) {
+        guard let selectionToApply else { return }
+        applyEnhancementSelection(selectionToApply)
     }
 }
 

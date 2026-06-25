@@ -13318,6 +13318,21 @@ require_pattern \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
 require_pattern \
+  "shared Power Mode AI enhancement toggle plan lives in VoiceInkCore" \
+  'VoiceInkPowerModeEnhancementTogglePlan|togglePlan|selectionToApply' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "macOS Power Mode config form delegates AI enhancement toggle selection planning" \
+  'enhancementSelection\.togglePlan' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
+require_pattern \
+  "core checks execute Power Mode AI enhancement toggle plan test" \
+  'PowerModePolicyTests\.testPowerModeEnhancementTogglePlanAppliesMacOSToggleEnablementRules' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "shared Power Mode config form appear plan lives in VoiceInkCore" \
   'VoiceInkPowerModeConfigurationFormAppearPlan|appearPlan|selectedTranscriptionModelFacts' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
@@ -13455,7 +13470,7 @@ require_pattern \
 
 require_pattern \
   "migration checklist tracks shared Power Mode config form chrome gate" \
-  'macOS Power Mode config form seed defaults, trigger-section labels, transcription section labels, AI toggle title, footer actions, form-load provider/model/prompt/language repair, website add planning, trigger removal, and unsaved add-form shortcut cleanup planning route through `VoiceInkPowerModeConfigurationFormState`/`VoiceInkPowerModeConfigurationFormAppearPlan`/`VoiceInkPowerModeConfigurationFormDismissalPlan`/`VoiceInkPowerModePresentation`/`VoiceInkPowerModePolicy`' \
+  'macOS Power Mode config form seed defaults, trigger-section labels, transcription section labels, AI toggle title, AI-enhancement toggle enablement planning, footer actions, form-load provider/model/prompt/language repair, website add planning, trigger removal, and unsaved add-form shortcut cleanup planning route through `VoiceInkPowerModeConfigurationFormState`/`VoiceInkPowerModeConfigurationFormAppearPlan`/`VoiceInkPowerModeConfigurationFormDismissalPlan`/`VoiceInkPowerModeEnhancementTogglePlan`/`VoiceInkPowerModePresentation`/`VoiceInkPowerModePolicy`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \
@@ -13506,6 +13521,11 @@ reject_pattern \
 reject_pattern \
   "macOS Power Mode config form avoids shell-owned form-load selection repair" \
   'treatsEmptyModelAsMissing: true|shouldRepairSelectedLanguageForPowerMode' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
+reject_pattern \
+  "macOS Power Mode config form avoids shell-owned AI enhancement toggle selection planning" \
+  'fillingMissingProviderAndModel\(|selectingPromptForEnhancementState' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
 reject_pattern \

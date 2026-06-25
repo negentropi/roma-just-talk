@@ -336,6 +336,52 @@ final class StoredAudioFileTests: XCTestCase {
         XCTAssertFalse(record.hasStoredAudioFile())
     }
 
+    func testStoredAudioRecordReportingDeleteRemovesFileWithoutReportingFailure() throws {
+        let baseDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.StoredAudioFileTests.\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: baseDirectory) }
+
+        let recordingsDirectory = try VoiceInkStoredAudioFile.createRecordingsDirectory(in: baseDirectory)
+        let fileURL = VoiceInkStoredAudioFile.fileURL(forFilename: "voiceink-recording.m4a", in: recordingsDirectory)
+        try Data().write(to: fileURL)
+        let record = StubStoredAudioRecord(
+            audioFileURL: "voiceink-recording.m4a",
+            storedAudioRecordingsDirectory: recordingsDirectory
+        )
+        var messages: [String] = []
+
+        XCTAssertEqual(
+            record.deleteExistingAudioFileReportingFailure(reportFailure: { messages.append($0) })?.path,
+            fileURL.path
+        )
+        XCTAssertTrue(messages.isEmpty)
+        XCTAssertFalse(record.hasStoredAudioFile())
+    }
+
+    func testStoredAudioRecordReportingDeleteReportsSharedFailureText() throws {
+        let baseDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.StoredAudioFileTests.\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: baseDirectory) }
+
+        let recordingsDirectory = try VoiceInkStoredAudioFile.createRecordingsDirectory(in: baseDirectory)
+        let fileURL = VoiceInkStoredAudioFile.fileURL(forFilename: "voiceink-recording.m4a", in: recordingsDirectory)
+        try Data().write(to: fileURL)
+        let record = StubStoredAudioRecord(
+            audioFileURL: "voiceink-recording.m4a",
+            storedAudioRecordingsDirectory: recordingsDirectory
+        )
+        var messages: [String] = []
+
+        let deletedURL = record.deleteExistingAudioFileReportingFailure(
+            fileManager: FailingRemoveFileManager(),
+            reportFailure: { messages.append($0) }
+        )
+
+        XCTAssertNil(deletedURL)
+        XCTAssertEqual(messages, ["Error deleting audio file: blocked"])
+        XCTAssertTrue(record.hasStoredAudioFile())
+    }
+
     func testStoredAudioRecordDeleteAndClearOnlyClearsReferenceWhenFileWasDeleted() throws {
         let baseDirectory = FileManager.default.temporaryDirectory
             .appendingPathComponent("VoiceInkCore.StoredAudioFileTests.\(UUID().uuidString)", isDirectory: true)
@@ -356,6 +402,16 @@ final class StoredAudioFileTests: XCTestCase {
         record.audioFileURL = "missing-recording.m4a"
         XCTAssertNil(try record.deleteExistingAudioFileAndClearReference())
         XCTAssertEqual(record.audioFileURL, "missing-recording.m4a")
+    }
+}
+
+private final class FailingRemoveFileManager: FileManager {
+    override func removeItem(at URL: URL) throws {
+        throw NSError(
+            domain: NSCocoaErrorDomain,
+            code: CocoaError.fileWriteNoPermission.rawValue,
+            userInfo: [NSLocalizedDescriptionKey: "blocked"]
+        )
     }
 }
 

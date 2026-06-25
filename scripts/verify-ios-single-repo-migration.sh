@@ -1834,7 +1834,7 @@ reject_pattern \
 
 require_pattern \
   "iOS note deletion uses shared stored-audio record delete helper" \
-  'deleteExistingAudioFile\(\)' \
+  'deleteExistingAudioFileReportingFailure' \
   iOS/VoiceInk-ios/NotesListView.swift
 
 require_pattern \
@@ -1843,28 +1843,39 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/StoredAudioFile.swift
 
 require_pattern \
+  "shared stored-audio record owns reporting delete helper" \
+  'deleteExisting(Audio)?FileReportingFailure|reportFailure' \
+  VoiceInkCore/Sources/VoiceInkCore/StoredAudioFile.swift
+
+require_pattern \
+  "core checks cover stored-audio reporting delete helper" \
+  'testStoredAudioRecordReportingDeleteRemovesFileWithoutReportingFailure|testStoredAudioRecordReportingDeleteReportsSharedFailureText' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/StoredAudioFileTests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "shared stored-audio deletion error copy is centralized" \
   '"Error deleting audio file:' \
   VoiceInkCore/Sources/VoiceInkCore/StoredAudioFile.swift
 
 require_pattern \
-  "iOS note deletion uses shared stored-audio deletion error text" \
-  'VoiceInkStoredAudioFile\.deletionErrorMessage' \
+  "iOS note deletion uses shared stored-audio reporting delete helper" \
+  'deleteExistingAudioFileReportingFailure' \
   iOS/VoiceInk-ios/NotesListView.swift
 
 require_pattern \
-  "macOS full history deletion uses shared stored-audio deletion error text" \
-  'VoiceInkStoredAudioFile\.deletionErrorMessage' \
+  "macOS full history deletion uses shared stored-audio reporting delete helper" \
+  'deleteExistingAudioFileReportingFailure' \
   VoiceInk/Views/History/TranscriptionHistoryView.swift
 
 require_pattern \
-  "macOS inline history deletion uses shared stored-audio deletion error text" \
-  'VoiceInkStoredAudioFile\.deletionErrorMessage' \
+  "macOS inline history deletion uses shared stored-audio reporting delete helper" \
+  'deleteExistingAudioFileReportingFailure' \
   VoiceInk/Views/History/InlineHistoryView.swift
 
 reject_pattern \
-  "platform note/history deletion avoids duplicate stored-audio deletion error text" \
-  '"Error deleting audio file:' \
+  "platform note/history deletion avoids duplicate stored-audio deletion error mapping" \
+  '"Error deleting audio file:|VoiceInkStoredAudioFile\.deletionErrorMessage|try .*deleteExistingAudioFile\(\)' \
   iOS/VoiceInk-ios/NotesListView.swift \
   VoiceInk/Views/History/TranscriptionHistoryView.swift \
   VoiceInk/Views/History/InlineHistoryView.swift

@@ -434,12 +434,9 @@ struct InlineHistoryView: View {
     }
 
     private func deleteTranscriptionRecord(_ transcription: Transcription) {
-        do {
-            try transcription.deleteExistingAudioFile()
-        } catch {
-            print(VoiceInkStoredAudioFile.deletionErrorMessage(for: error))
+        transcription.deleteExistingAudioFileReportingFailure { message in
+            print(message)
         }
-
         modelContext.delete(transcription)
     }
 

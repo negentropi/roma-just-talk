@@ -182,6 +182,25 @@ public enum VoiceInkStoredAudioFile {
         return url
     }
 
+    @discardableResult
+    public static func deleteExistingFileReportingFailure(
+        for storedValue: String?,
+        relativeTo recordingsDirectory: URL? = nil,
+        fileManager: FileManager = .default,
+        reportFailure: (String) -> Void
+    ) -> URL? {
+        do {
+            return try deleteExistingFile(
+                for: storedValue,
+                relativeTo: recordingsDirectory,
+                fileManager: fileManager
+            )
+        } catch {
+            reportFailure(deletionErrorMessage(for: error))
+            return nil
+        }
+    }
+
     private static func cleanedStoredValue(_ value: String?) -> String? {
         guard let value else {
             return nil
@@ -247,6 +266,20 @@ public extension VoiceInkStoredAudioRecord {
             for: audioFileURL,
             relativeTo: recordingsDirectory ?? storedAudioRecordingsDirectory,
             fileManager: fileManager
+        )
+    }
+
+    @discardableResult
+    func deleteExistingAudioFileReportingFailure(
+        relativeTo recordingsDirectory: URL? = nil,
+        fileManager: FileManager = .default,
+        reportFailure: (String) -> Void
+    ) -> URL? {
+        VoiceInkStoredAudioFile.deleteExistingFileReportingFailure(
+            for: audioFileURL,
+            relativeTo: recordingsDirectory ?? storedAudioRecordingsDirectory,
+            fileManager: fileManager,
+            reportFailure: reportFailure
         )
     }
 

@@ -190,10 +190,8 @@ struct NotesListView: View {
     private func deleteItems(offsets: IndexSet) {
         withAnimation {
             for note in VoiceInkHistoryDeletionPolicy.targets(atOffsets: offsets, from: filteredNotes) {
-                do {
-                    try note.deleteExistingAudioFile()
-                } catch {
-                    VoiceInkIOSLogger.notes.error("\(VoiceInkStoredAudioFile.deletionErrorMessage(for: error), privacy: .public)")
+                note.deleteExistingAudioFileReportingFailure { message in
+                    VoiceInkIOSLogger.notes.error("\(message, privacy: .public)")
                 }
                 modelContext.delete(note)
             }

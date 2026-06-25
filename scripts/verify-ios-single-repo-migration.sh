@@ -15398,6 +15398,13 @@ require_pattern \
   'VoiceInkDashboardPromotionPresentation\.(affiliateDismissedKey|defaultIsAffiliateDismissed|cards|dismissSystemImageName)|VoiceInkDashboardPromotionCardPresentation|presentation\.badgeDisplayText' \
   VoiceInk/Views/Metrics/DashboardPromotionsSection.swift
 
+reject_pattern \
+  "macOS dashboard license state avoids shallow view-model alias" \
+  'typealias LicenseState|LicenseViewModel\.LicenseState' \
+  VoiceInk/Models/LicenseViewModel.swift \
+  VoiceInk/Views/Metrics/MetricsContent.swift \
+  VoiceInk/Views/Metrics/DashboardPromotionsSection.swift
+
 require_pattern \
   "macOS help resources use shared presentation" \
   'VoiceInkHelpResourcesPresentation\.(title|resources|externalLinkSystemImageName)|VoiceInkHelpResourcePresentation|resource\.destination' \

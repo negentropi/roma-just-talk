@@ -3,7 +3,7 @@ import AppKit
 import VoiceInkCore
 
 struct DashboardPromotionsSection: View {
-    let licenseState: LicenseViewModel.LicenseState
+    let licenseState: VoiceInkLicenseState
     @AppStorage(VoiceInkDashboardPromotionPresentation.affiliateDismissedKey)
     private var isAffiliatePromotionDismissed = VoiceInkDashboardPromotionPresentation.defaultIsAffiliateDismissed
 

@@ -5,9 +5,7 @@ import VoiceInkCore
 
 @MainActor
 class LicenseViewModel: ObservableObject {
-    typealias LicenseState = VoiceInkLicenseState
-
-    @Published private(set) var licenseState: LicenseState = .trial(
+    @Published private(set) var licenseState: VoiceInkLicenseState = .trial(
         daysRemaining: VoiceInkLicenseStartupPolicy.defaultTrialPeriodDays
     )
     @Published var licenseKey: String = ""

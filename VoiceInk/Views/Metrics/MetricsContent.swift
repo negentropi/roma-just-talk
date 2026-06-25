@@ -61,7 +61,7 @@ struct MetricsContent: View {
     private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "MetricsContent")
     @Environment(\.colorScheme) private var colorScheme
     let modelContext: ModelContext
-    let licenseState: LicenseViewModel.LicenseState
+    let licenseState: VoiceInkLicenseState
 
     @State private var totalCount: Int = 0
     @State private var totalWords: Int = 0
@@ -71,7 +71,7 @@ struct MetricsContent: View {
     @State private var isModelStatsPanelPresented = false
     @State private var isAccessibilityEnabled = AXIsProcessTrusted()
 
-    init(modelContext: ModelContext, licenseState: LicenseViewModel.LicenseState) {
+    init(modelContext: ModelContext, licenseState: VoiceInkLicenseState) {
         self.modelContext = modelContext
         self.licenseState = licenseState
 

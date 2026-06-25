@@ -993,10 +993,16 @@ class VoiceInkEngine: NSObject, ObservableObject {
     }
 
     private func restorePowerModeIfNeeded() async {
-        guard !VoiceInkPowerModePreference.shouldPersistConfiguredPreferences() else { return }
-
-        await PowerModeSessionManager.shared.endSession()
-        PowerModeManager.shared.setActiveConfiguration(nil)
+        await VoiceInkPowerModeRecordingFinishPlan.finishingRecording(
+            shouldPersistConfiguredPreferences: VoiceInkPowerModePreference.shouldPersistConfiguredPreferences()
+        ).applyRuntimeState(
+            endSession: {
+                await PowerModeSessionManager.shared.endSession()
+            },
+            clearActiveConfiguration: {
+                PowerModeManager.shared.setActiveConfiguration(nil)
+            }
+        )
     }
 
     func cleanupResources() async {

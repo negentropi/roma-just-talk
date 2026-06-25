@@ -2891,6 +2891,32 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertTrue(events.isEmpty)
     }
 
+    func testPowerModeRecordingFinishPlanSkipsWhenPreferencesPersist() async {
+        var events = [String]()
+
+        await VoiceInkPowerModeRecordingFinishPlan.finishingRecording(
+            shouldPersistConfiguredPreferences: true
+        ).applyRuntimeState(
+            endSession: { events.append("endSession") },
+            clearActiveConfiguration: { events.append("clearActiveConfiguration") }
+        )
+
+        XCTAssertEqual(events, [])
+    }
+
+    func testPowerModeRecordingFinishPlanEndsSessionBeforeClearingActiveConfig() async {
+        var events = [String]()
+
+        await VoiceInkPowerModeRecordingFinishPlan.finishingRecording(
+            shouldPersistConfiguredPreferences: false
+        ).applyRuntimeState(
+            endSession: { events.append("endSession") },
+            clearActiveConfiguration: { events.append("clearActiveConfiguration") }
+        )
+
+        XCTAssertEqual(events, ["endSession", "clearActiveConfiguration"])
+    }
+
     func testValidationRejectsBlankAndDuplicateNameWithoutNormalizingName() {
         let existing = rule(name: "Writing")
         let blankCandidate = rule(name: " ")

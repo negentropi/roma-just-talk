@@ -10901,6 +10901,11 @@ require_patterns \
   'VoiceInkWhisperModelWarmupDiagnostics'
 
 require_pattern \
+  "shared model prewarm diagnostics own completion duration formatting" \
+  'completedMessage\(duration: TimeInterval\)|String\(format: +"%\.2f", duration\)' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRuntimeResourcePolicy.swift
+
+require_pattern \
   "core checks execute model prewarm and warmup policy tests" \
   'testModelPrewarmSamplePolicyPreservesMacOSLookupOrder|testModelPrewarmPlanPreservesMacOSSkipOrderAndDiagnostics|testWhisperModelWarmupPolicySchedulesOnlyCoreMLModelsNotAlreadyWarming|testModelPrewarmDiagnosticsPreserveMacOSLogCopy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
@@ -10966,6 +10971,11 @@ require_pattern \
   VoiceInk/Services/ModelPrewarmService.swift
 
 require_pattern \
+  "macOS model prewarm delegates completion duration formatting to shared diagnostics" \
+  'VoiceInkModelPrewarmDiagnostics\.completedMessage\(duration: duration\)' \
+  VoiceInk/Services/ModelPrewarmService.swift
+
+require_pattern \
   "macOS model prewarm uses shared sample lookup policy" \
   'VoiceInkModelPrewarmSamplePolicy\.firstAvailableURL' \
   VoiceInk/Services/ModelPrewarmService.swift \
@@ -10983,7 +10993,7 @@ reject_pattern \
 
 reject_pattern \
   "macOS model prewarm avoids shell-owned prewarm diagnostics and sample policy" \
-  '"(ModelPrewarmService initialized - listening for wake and app launch|App launched, scheduling prewarm|Mac activity detected \(wake/unlock\), scheduling prewarm|Prewarm disabled by user|Skipping prewarm - cloud models don.?t need it|Prewarm audio file|Prewarming |Prewarm completed in|Prewarm failed:|sound7|wav)"' \
+  '"(ModelPrewarmService initialized - listening for wake and app launch|App launched, scheduling prewarm|Mac activity detected \(wake/unlock\), scheduling prewarm|Prewarm disabled by user|Skipping prewarm - cloud models don.?t need it|Prewarm audio file|Prewarming |Prewarm completed in|Prewarm failed:|sound7|wav)"|String\(format: +"%\.2f"' \
   VoiceInk/Services/ModelPrewarmService.swift \
   VoiceInk/Transcription/Whisper/WhisperModelWarmupCoordinator.swift
 

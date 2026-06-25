@@ -103,7 +103,7 @@ final class ModelPrewarmService: ObservableObject {
             let _ = try await serviceRegistry.transcribe(audioURL: audioURL, model: currentModel)
             let duration = Date().timeIntervalSince(startTime)
 
-            logger.notice("\(VoiceInkModelPrewarmDiagnostics.completedMessage(durationText: String(format: "%.2f", duration)), privacy: .public)")
+            logger.notice("\(VoiceInkModelPrewarmDiagnostics.completedMessage(duration: duration), privacy: .public)")
 
         } catch {
             logger.error("\(VoiceInkModelPrewarmDiagnostics.failedMessage(errorDescription: error.localizedDescription), privacy: .public)")

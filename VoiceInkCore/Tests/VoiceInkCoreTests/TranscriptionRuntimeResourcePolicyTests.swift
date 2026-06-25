@@ -263,7 +263,7 @@ final class TranscriptionRuntimeResourcePolicyTests: XCTestCase {
             "Prewarming Base"
         )
         XCTAssertEqual(
-            VoiceInkModelPrewarmDiagnostics.completedMessage(durationText: "1.23"),
+            VoiceInkModelPrewarmDiagnostics.completedMessage(duration: 1.234),
             "Prewarm completed in 1.23s"
         )
         XCTAssertEqual(

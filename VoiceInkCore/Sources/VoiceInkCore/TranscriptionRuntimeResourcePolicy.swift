@@ -254,8 +254,8 @@ public enum VoiceInkModelPrewarmDiagnostics {
         "Prewarming \(modelDisplayName)"
     }
 
-    public static func completedMessage(durationText: String) -> String {
-        "Prewarm completed in \(durationText)s"
+    public static func completedMessage(duration: TimeInterval) -> String {
+        "Prewarm completed in \(String(format: "%.2f", duration))s"
     }
 
     public static func failedMessage(errorDescription: String) -> String {

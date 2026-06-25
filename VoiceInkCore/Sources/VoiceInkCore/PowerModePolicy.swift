@@ -716,14 +716,25 @@ public struct VoiceInkPowerModeBackupExportPlan: Equatable, Sendable {
 }
 
 public struct VoiceInkPowerModeLanguageApplicationPlan: Equatable, Sendable {
-    public var languageToSave: String?
+    private var languageToSave: String?
 
-    public var shouldPostLanguageDidChange: Bool {
+    private var shouldPostLanguageDidChange: Bool {
         languageToSave != nil
     }
 
-    public init(languageToSave: String?) {
+    private init(languageToSave: String?) {
         self.languageToSave = languageToSave
+    }
+
+    public func applyRuntimeState(
+        saveSelectedLanguage: (String) -> Void,
+        postLanguageDidChange: () -> Void
+    ) {
+        guard shouldPostLanguageDidChange,
+              let languageToSave else { return }
+
+        saveSelectedLanguage(languageToSave)
+        postLanguageDidChange()
     }
 
     public static func plan(
@@ -791,7 +802,7 @@ public struct VoiceInkPowerModeSessionApplicationPlan: Equatable, Sendable {
     public var preferenceApplication: VoiceInkPowerModePreferenceApplication
     public var modelResourcePlan: VoiceInkPowerModeTranscriptionModelResourcePlan
     public var languageApplicationPlan: VoiceInkPowerModeLanguageApplicationPlan
-    public var shouldPostConfigurationApplied: Bool
+    private var shouldPostConfigurationApplied: Bool
 
     public init(
         preferenceApplication: VoiceInkPowerModePreferenceApplication,
@@ -803,6 +814,21 @@ public struct VoiceInkPowerModeSessionApplicationPlan: Equatable, Sendable {
         self.modelResourcePlan = modelResourcePlan
         self.languageApplicationPlan = languageApplicationPlan
         self.shouldPostConfigurationApplied = shouldPostConfigurationApplied
+    }
+
+    public func applyRuntimeState(
+        applyPreferenceApplication: (VoiceInkPowerModePreferenceApplication) -> Void,
+        applyModelResourcePlan: (VoiceInkPowerModeTranscriptionModelResourcePlan) async -> Void,
+        applyLanguageApplicationPlan: (VoiceInkPowerModeLanguageApplicationPlan) -> Void,
+        postConfigurationApplied: () -> Void
+    ) async {
+        applyPreferenceApplication(preferenceApplication)
+        await applyModelResourcePlan(modelResourcePlan)
+        applyLanguageApplicationPlan(languageApplicationPlan)
+
+        if shouldPostConfigurationApplied {
+            postConfigurationApplied()
+        }
     }
 
     public static func applying(

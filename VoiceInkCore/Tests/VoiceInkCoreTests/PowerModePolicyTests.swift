@@ -1082,8 +1082,7 @@ final class PowerModePolicyTests: XCTestCase {
             ]
         )
 
-        XCTAssertNil(plan.languageToSave)
-        XCTAssertFalse(plan.shouldPostLanguageDidChange)
+        XCTAssertEqual(languageRuntimeEvents(for: plan), [])
     }
 
     func testPowerModeLanguageApplicationPlanSavesRawLanguageWithoutModel() {
@@ -1094,8 +1093,7 @@ final class PowerModePolicyTests: XCTestCase {
             availableModels: []
         )
 
-        XCTAssertEqual(plan.languageToSave, "fr")
-        XCTAssertTrue(plan.shouldPostLanguageDidChange)
+        XCTAssertEqual(languageRuntimeEvents(for: plan), ["save:fr", "post"])
     }
 
     func testPowerModeLanguageApplicationPlanUsesPreferredModelBeforeCurrentModel() {
@@ -1116,8 +1114,7 @@ final class PowerModePolicyTests: XCTestCase {
             ]
         )
 
-        XCTAssertEqual(plan.languageToSave, "en")
-        XCTAssertTrue(plan.shouldPostLanguageDidChange)
+        XCTAssertEqual(languageRuntimeEvents(for: plan), ["save:en", "post"])
     }
 
     func testPowerModeLanguageApplicationPlanFallsBackToCurrentModelWhenPreferredIsMissing() {
@@ -1134,8 +1131,7 @@ final class PowerModePolicyTests: XCTestCase {
             ]
         )
 
-        XCTAssertEqual(plan.languageToSave, "en-US")
-        XCTAssertTrue(plan.shouldPostLanguageDidChange)
+        XCTAssertEqual(languageRuntimeEvents(for: plan), ["save:en-US", "post"])
     }
 
     func testPowerModeTranscriptionModelResourcePlanSkipsMissingUnchangedSelection() async {
@@ -1522,8 +1518,9 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertEqual(plan.modelResourcePlan.selectedModelName, "base")
         let modelResourceEvents = await runtimeEvents(for: plan.modelResourcePlan)
         XCTAssertEqual(modelResourceEvents, ["select:base", "cleanup", "load:base"])
-        XCTAssertEqual(plan.languageApplicationPlan.languageToSave, "fr")
-        XCTAssertTrue(plan.shouldPostConfigurationApplied)
+        XCTAssertEqual(languageRuntimeEvents(for: plan.languageApplicationPlan), ["save:fr", "post"])
+        let didPostConfigurationApplied = await postsConfigurationApplied(for: plan)
+        XCTAssertTrue(didPostConfigurationApplied)
     }
 
     func testPowerModeSessionApplicationPlanBuildsRestoreSequenceWithoutConfigurationNotification() async {
@@ -1558,11 +1555,12 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertEqual(plan.modelResourcePlan.selectedModelName, "english-only")
         let modelResourceEvents = await runtimeEvents(for: plan.modelResourcePlan)
         XCTAssertEqual(modelResourceEvents, ["select:english-only", "cleanup"])
-        XCTAssertEqual(plan.languageApplicationPlan.languageToSave, "en")
-        XCTAssertFalse(plan.shouldPostConfigurationApplied)
+        XCTAssertEqual(languageRuntimeEvents(for: plan.languageApplicationPlan), ["save:en", "post"])
+        let didPostConfigurationApplied = await postsConfigurationApplied(for: plan)
+        XCTAssertFalse(didPostConfigurationApplied)
     }
 
-    func testPowerModeSessionApplicationPlanKeepsModelAndLanguageNoOpWhenRestoreSelectionsAreMissing() {
+    func testPowerModeSessionApplicationPlanKeepsModelAndLanguageNoOpWhenRestoreSelectionsAreMissing() async {
         let state = VoiceInkPowerModeApplicationState(
             isEnhancementEnabled: false,
             useScreenCaptureContext: false,
@@ -1580,8 +1578,9 @@ final class PowerModePolicyTests: XCTestCase {
 
         XCTAssertEqual(plan.modelResourcePlan.selectedModelName, nil)
         XCTAssertFalse(plan.modelResourcePlan.shouldChangeModel)
-        XCTAssertNil(plan.languageApplicationPlan.languageToSave)
-        XCTAssertFalse(plan.shouldPostConfigurationApplied)
+        XCTAssertEqual(languageRuntimeEvents(for: plan.languageApplicationPlan), [])
+        let didPostConfigurationApplied = await postsConfigurationApplied(for: plan)
+        XCTAssertFalse(didPostConfigurationApplied)
     }
 
     func testPowerModeSessionPreservesStoredShapeAndOriginalState() throws {
@@ -2606,6 +2605,40 @@ final class PowerModePolicyTests: XCTestCase {
         }
 
         return (didApply, selectedPromptId)
+    }
+
+    private func languageRuntimeEvents(
+        for plan: VoiceInkPowerModeLanguageApplicationPlan
+    ) -> [String] {
+        var events: [String] = []
+
+        plan.applyRuntimeState(
+            saveSelectedLanguage: { language in
+                events.append("save:\(language)")
+            },
+            postLanguageDidChange: {
+                events.append("post")
+            }
+        )
+
+        return events
+    }
+
+    private func postsConfigurationApplied(
+        for plan: VoiceInkPowerModeSessionApplicationPlan
+    ) async -> Bool {
+        var didPost = false
+
+        await plan.applyRuntimeState(
+            applyPreferenceApplication: { _ in },
+            applyModelResourcePlan: { _ in },
+            applyLanguageApplicationPlan: { _ in },
+            postConfigurationApplied: {
+                didPost = true
+            }
+        )
+
+        return didPost
     }
 
     private func runtimeEvents(

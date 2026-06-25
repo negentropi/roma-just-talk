@@ -7052,9 +7052,17 @@ reject_pattern \
   'public enum VoiceInkPowerModeTranscriptionModelResourceAction|public (var|let) action: VoiceInkPowerModeTranscriptionModelResourceAction|public init\([^)]*action: VoiceInkPowerModeTranscriptionModelResourceAction' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
-require_pattern \
-  "shared Power Mode language application plan lives in VoiceInkCore" \
-  'VoiceInkPowerModeLanguageApplicationPlan|modelForLanguageApplication|shouldPostLanguageDidChange' \
+require_patterns \
+  "shared Power Mode language application runtime lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift \
+  'VoiceInkPowerModeLanguageApplicationPlan' \
+  'modelForLanguageApplication' \
+  'applyRuntimeState' \
+  'postLanguageDidChange'
+
+reject_pattern \
+  "shared Power Mode language application raw payload stays hidden" \
+  'public (var|let) +languageToSave|public var +shouldPostLanguageDidChange|public init\(languageToSave:' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
@@ -13985,9 +13993,17 @@ reject_pattern \
   'public enum +VoiceInkPowerModePromptSelectionApplication|public (let|var) +promptSelection' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
-require_pattern \
-  "shared Power Mode session application plan lives in VoiceInkCore" \
-  'VoiceInkPowerModeSessionApplicationPlan|VoiceInkPowerModeSessionApplicationFacts|shouldPostConfigurationApplied' \
+require_patterns \
+  "shared Power Mode session application runtime lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift \
+  'VoiceInkPowerModeSessionApplicationPlan' \
+  'VoiceInkPowerModeSessionApplicationFacts' \
+  'applyRuntimeState' \
+  'postConfigurationApplied'
+
+reject_pattern \
+  "shared Power Mode session application notification flag stays hidden" \
+  'public (var|let) +shouldPostConfigurationApplied' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
@@ -14081,8 +14097,8 @@ require_pattern \
   VoiceInk/PowerMode/PowerModeSessionManager.swift
 
 require_pattern \
-  "macOS Power Mode session manager applies configs through shared preference application plan" \
-  'plan\.preferenceApplication' \
+  "macOS Power Mode session manager applies configs through shared application runtime" \
+  'plan\.applyRuntimeState|applyPreferenceApplication:' \
   VoiceInk/PowerMode/PowerModeSessionManager.swift
 
 require_pattern \

@@ -127,13 +127,16 @@ class PowerModeSessionManager {
         _ plan: VoiceInkPowerModeSessionApplicationPlan,
         stateProvider: any PowerModeStateProvider
     ) async {
-        applyPreferenceApplication(plan.preferenceApplication)
-        await applyModelResourcePlan(plan.modelResourcePlan, stateProvider: stateProvider)
-        applyLanguageApplicationPlan(plan.languageApplicationPlan)
-
-        if plan.shouldPostConfigurationApplied {
-            NotificationCenter.default.post(name: .powerModeConfigurationApplied, object: nil)
-        }
+        await plan.applyRuntimeState(
+            applyPreferenceApplication: applyPreferenceApplication,
+            applyModelResourcePlan: { plan in
+                await self.applyModelResourcePlan(plan, stateProvider: stateProvider)
+            },
+            applyLanguageApplicationPlan: applyLanguageApplicationPlan,
+            postConfigurationApplied: {
+                NotificationCenter.default.post(name: .powerModeConfigurationApplied, object: nil)
+            }
+        )
     }
 
     private func applyPreferenceApplication(_ application: VoiceInkPowerModePreferenceApplication) {
@@ -184,11 +187,14 @@ class PowerModeSessionManager {
     }
 
     private func applyLanguageApplicationPlan(_ plan: VoiceInkPowerModeLanguageApplicationPlan) {
-        guard plan.shouldPostLanguageDidChange,
-              let languageToSave = plan.languageToSave else { return }
-
-        VoiceInkTranscriptionLanguagePreference.saveSelectedLanguage(languageToSave)
-        NotificationCenter.default.post(name: .languageDidChange, object: nil)
+        plan.applyRuntimeState(
+            saveSelectedLanguage: { language in
+                VoiceInkTranscriptionLanguagePreference.saveSelectedLanguage(language)
+            },
+            postLanguageDidChange: {
+                NotificationCenter.default.post(name: .languageDidChange, object: nil)
+            }
+        )
     }
 
     private func modelResourceFacts(

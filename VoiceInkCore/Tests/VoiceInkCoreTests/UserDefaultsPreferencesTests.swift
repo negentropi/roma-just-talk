@@ -340,33 +340,43 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             selectedModeId: nil,
             selectedTranscriptionLanguage: "not-a-language"
         )
+        var didSaveHasCompletedOnboarding = false
+        var appliedModeSettingsRepairPlan: VoiceInkModeSettingsRepairPlan?
 
-        XCTAssertTrue(plan.shouldSaveHasCompletedOnboarding)
-        XCTAssertTrue(plan.modeSettingsRepairPlan.shouldReplaceModes)
-        XCTAssertEqual(plan.modeSettingsRepairPlan.modes.count, 1)
-        XCTAssertEqual(plan.modeSettingsRepairPlan.modes.first?.id, plan.modeSettingsRepairPlan.selectedModeId)
-        XCTAssertEqual(plan.modeSettingsRepairPlan.modes.first?.transcriptionProvider, .localWhisper)
+        plan.applyRuntimeState(
+            applyModeSettingsRepair: { repairPlan in
+                appliedModeSettingsRepairPlan = repairPlan
+            },
+            saveHasCompletedOnboarding: {
+                didSaveHasCompletedOnboarding = true
+            }
+        )
+
+        XCTAssertTrue(didSaveHasCompletedOnboarding)
+        guard let modeSettingsRepairPlan = appliedModeSettingsRepairPlan else {
+            return XCTFail("Expected first-time setup to apply mode repair")
+        }
+        XCTAssertTrue(modeSettingsRepairPlan.shouldReplaceModes)
+        XCTAssertEqual(modeSettingsRepairPlan.modes.count, 1)
+        XCTAssertEqual(modeSettingsRepairPlan.modes.first?.id, modeSettingsRepairPlan.selectedModeId)
+        XCTAssertEqual(modeSettingsRepairPlan.modes.first?.transcriptionProvider, .localWhisper)
         XCTAssertEqual(
-            plan.modeSettingsRepairPlan.selectedTranscriptionLanguage,
+            modeSettingsRepairPlan.selectedTranscriptionLanguage,
             VoiceInkLanguageCatalog.autoDetectCode
         )
     }
 
-    func testIOSFirstTimeSetupPlanBuildsApplicationActionsInOrder() {
-        let plan = VoiceInkIOSFirstTimeSetupPolicy.plan(
-            modes: [],
-            selectedModeId: nil,
-            selectedTranscriptionLanguage: "not-a-language"
+    func testIOSFirstTimeSetupPlanSkipsOnboardingRuntimeActionWhenDisabled() {
+        let plan = VoiceInkIOSFirstTimeSetupPlan(
+            modeSettingsRepairPlan: VoiceInkModeSettingsPolicy.defaultModeRepairPlan(
+                modes: [],
+                selectedModeId: nil,
+                selectedTranscriptionLanguage: "not-a-language"
+            ),
+            shouldSaveHasCompletedOnboarding: false
         )
 
-        XCTAssertEqual(plan.applicationActions.count, 2)
-        guard case .applyModeSettingsRepair(let modeSettingsRepairPlan) = plan.applicationActions[0] else {
-            return XCTFail("Expected first-time setup to apply mode repair first")
-        }
-        XCTAssertEqual(modeSettingsRepairPlan.modes.map(\.id), plan.modeSettingsRepairPlan.modes.map(\.id))
-        guard case .saveHasCompletedOnboarding = plan.applicationActions[1] else {
-            return XCTFail("Expected first-time setup to persist onboarding completion last")
-        }
+        XCTAssertEqual(iOSFirstTimeSetupEvents(for: plan), ["repair:1"])
     }
 
     func testIOSFirstTimeSetupPlanAppliesRuntimeStateInOrder() {
@@ -375,8 +385,16 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             selectedModeId: nil,
             selectedTranscriptionLanguage: "not-a-language"
         )
-        var events: [String] = []
+        XCTAssertEqual(iOSFirstTimeSetupEvents(for: plan), [
+            "repair:1",
+            "saveOnboarding"
+        ])
+    }
 
+    private func iOSFirstTimeSetupEvents(
+        for plan: VoiceInkIOSFirstTimeSetupPlan
+    ) -> [String] {
+        var events: [String] = []
         plan.applyRuntimeState(
             applyModeSettingsRepair: { repairPlan in
                 events.append("repair:\(repairPlan.modes.count)")
@@ -385,11 +403,7 @@ final class UserDefaultsPreferencesTests: XCTestCase {
                 events.append("saveOnboarding")
             }
         )
-
-        XCTAssertEqual(events, [
-            "repair:1",
-            "saveOnboarding"
-        ])
+        return events
     }
 
     func testDefaultSettingsPreserveMacOSSelectedLanguageDefault() {

@@ -404,8 +404,8 @@ public enum VoiceInkIOSAppSettingsStartupPolicy {
 }
 
 public struct VoiceInkIOSFirstTimeSetupPlan {
-    public let modeSettingsRepairPlan: VoiceInkModeSettingsRepairPlan
-    public let shouldSaveHasCompletedOnboarding: Bool
+    private let modeSettingsRepairPlan: VoiceInkModeSettingsRepairPlan
+    private let shouldSaveHasCompletedOnboarding: Bool
 
     public init(
         modeSettingsRepairPlan: VoiceInkModeSettingsRepairPlan,
@@ -415,7 +415,7 @@ public struct VoiceInkIOSFirstTimeSetupPlan {
         self.shouldSaveHasCompletedOnboarding = shouldSaveHasCompletedOnboarding
     }
 
-    public var applicationActions: [VoiceInkIOSFirstTimeSetupAction] {
+    private var applicationActions: [VoiceInkIOSFirstTimeSetupAction] {
         var actions: [VoiceInkIOSFirstTimeSetupAction] = [
             .applyModeSettingsRepair(modeSettingsRepairPlan)
         ]
@@ -426,7 +426,7 @@ public struct VoiceInkIOSFirstTimeSetupPlan {
     }
 }
 
-public enum VoiceInkIOSFirstTimeSetupAction {
+fileprivate enum VoiceInkIOSFirstTimeSetupAction {
     case applyModeSettingsRepair(VoiceInkModeSettingsRepairPlan)
     case saveHasCompletedOnboarding
 }

@@ -12146,17 +12146,22 @@ require_patterns \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift \
   'VoiceInkIOSFirstTimeSetupPolicy' \
   'VoiceInkIOSFirstTimeSetupPlan' \
-  'VoiceInkIOSFirstTimeSetupAction' \
-  'applicationActions' \
+  'fileprivate enum VoiceInkIOSFirstTimeSetupAction' \
+  'private var applicationActions' \
   'applyRuntimeState' \
-  'modeSettingsRepairPlan' \
-  'shouldSaveHasCompletedOnboarding' \
+  'private let modeSettingsRepairPlan' \
+  'private let shouldSaveHasCompletedOnboarding' \
   'VoiceInkModeSettingsPolicy\.defaultModeRepairPlan'
+
+reject_pattern \
+  "shared iOS first-time setup avoids public raw action interface" \
+  'public enum VoiceInkIOSFirstTimeSetupAction|public var applicationActions: \[VoiceInkIOSFirstTimeSetupAction\]|public let modeSettingsRepairPlan|public let shouldSaveHasCompletedOnboarding' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_patterns \
   "core checks execute iOS first-time setup action test" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'UserDefaultsPreferencesTests\.testIOSFirstTimeSetupPlanBuildsApplicationActionsInOrder' \
+  'UserDefaultsPreferencesTests\.testIOSFirstTimeSetupPlanSkipsOnboardingRuntimeActionWhenDisabled' \
   'UserDefaultsPreferencesTests\.testIOSFirstTimeSetupPlanAppliesRuntimeStateInOrder'
 
 require_pattern \

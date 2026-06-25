@@ -11,14 +11,14 @@ public enum VoiceInkModelManagementFilter: String, CaseIterable, Identifiable, S
     public var settingsSectionTitle: String { "\(title) Models" }
     public var manageSettingsTitle: String { "Manage \(settingsSectionTitle)" }
 
-    public static let recommendedModelNames = [
+    private static let recommendedModelNames = [
         "ggml-base.en",
         VoiceInkTranscriptionModelCatalog.defaultMacOSFluidAudioModelName,
         "ggml-large-v3-turbo-q5_0",
         "whisper-large-v3-turbo"
     ]
 
-    public func includes(_ facts: VoiceInkModelManagementModelFacts) -> Bool {
+    private func includes(_ facts: VoiceInkModelManagementModelFacts) -> Bool {
         switch self {
         case .recommended:
             return Self.recommendedModelNames.contains(facts.name)
@@ -31,7 +31,7 @@ public enum VoiceInkModelManagementFilter: String, CaseIterable, Identifiable, S
         }
     }
 
-    public func sortRank(forModelName name: String) -> Int {
+    private func sortRank(forModelName name: String) -> Int {
         Self.recommendedModelNames.firstIndex(of: name) ?? Int.max
     }
 

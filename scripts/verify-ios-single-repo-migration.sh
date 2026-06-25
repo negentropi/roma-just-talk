@@ -4256,7 +4256,12 @@ require_pattern \
 
 require_pattern \
   "shared model management filter owns model facts and recommended order" \
-  'VoiceInkModelManagementModelFacts|VoiceInkModelManagementModelCategory|recommendedModelNames|func +includes|filteredModels' \
+  'VoiceInkModelManagementModelFacts|VoiceInkModelManagementModelCategory|private static let recommendedModelNames|private func +includes|private func +sortRank|filteredModels' \
+  VoiceInkCore/Sources/VoiceInkCore/ModelManagementPresentation.swift
+
+reject_pattern \
+  "shared model management filter hides recommended ordering internals" \
+  'public static let recommendedModelNames|public func +(includes|sortRank)' \
   VoiceInkCore/Sources/VoiceInkCore/ModelManagementPresentation.swift
 
 require_pattern \

@@ -14,49 +14,43 @@ final class ModelManagementPresentationTests: XCTestCase {
     }
 
     func testModelManagementFiltersApplySharedModelFacts() {
-        let localAvailable = VoiceInkModelManagementModelFacts(
-            name: "ggml-base.en",
-            category: .local,
-            isAvailableOnCurrentOS: true
-        )
-        let localUnavailable = VoiceInkModelManagementModelFacts(
-            name: "ggml-large-v3-turbo-q5_0",
-            category: .local,
-            isAvailableOnCurrentOS: false
-        )
-        let cloud = VoiceInkModelManagementModelFacts(
-            name: "whisper-large-v3-turbo",
-            category: .cloud,
-            isAvailableOnCurrentOS: true
-        )
-        let custom = VoiceInkModelManagementModelFacts(
-            name: "custom-api",
-            category: .custom,
-            isAvailableOnCurrentOS: true
-        )
+        let models = [
+            model(name: "ggml-base.en", category: .local),
+            model(name: "ggml-large-v3-turbo-q5_0", category: .local, isAvailableOnCurrentOS: false),
+            model(name: "whisper-large-v3-turbo", category: .cloud),
+            model(name: "custom-api", category: .custom)
+        ]
 
-        XCTAssertTrue(VoiceInkModelManagementFilter.recommended.includes(localAvailable))
-        XCTAssertTrue(VoiceInkModelManagementFilter.recommended.includes(localUnavailable))
-        XCTAssertTrue(VoiceInkModelManagementFilter.recommended.includes(cloud))
-        XCTAssertTrue(VoiceInkModelManagementFilter.local.includes(localAvailable))
-        XCTAssertFalse(VoiceInkModelManagementFilter.local.includes(localUnavailable))
-        XCTAssertTrue(VoiceInkModelManagementFilter.cloud.includes(cloud))
-        XCTAssertFalse(VoiceInkModelManagementFilter.cloud.includes(custom))
-        XCTAssertTrue(VoiceInkModelManagementFilter.custom.includes(custom))
+        XCTAssertEqual(
+            VoiceInkModelManagementFilter.recommended.filteredModels(models, facts: \.facts).map(\.facts.name),
+            ["ggml-base.en", "ggml-large-v3-turbo-q5_0", "whisper-large-v3-turbo"]
+        )
+        XCTAssertEqual(
+            VoiceInkModelManagementFilter.local.filteredModels(models, facts: \.facts).map(\.facts.name),
+            ["ggml-base.en"]
+        )
+        XCTAssertEqual(
+            VoiceInkModelManagementFilter.cloud.filteredModels(models, facts: \.facts).map(\.facts.name),
+            ["whisper-large-v3-turbo"]
+        )
+        XCTAssertEqual(
+            VoiceInkModelManagementFilter.custom.filteredModels(models, facts: \.facts).map(\.facts.name),
+            ["custom-api"]
+        )
     }
 
     func testModelManagementRecommendedOrderIsShared() {
+        let models = [
+            model(name: "whisper-large-v3-turbo", category: .cloud),
+            model(name: "ggml-large-v3-turbo-q5_0", category: .local),
+            model(name: "parakeet-tdt-0.6b-v2", category: .local),
+            model(name: "ggml-base.en", category: .local),
+            model(name: "missing", category: .cloud)
+        ]
+
         XCTAssertEqual(
-            VoiceInkModelManagementFilter.recommendedModelNames,
+            VoiceInkModelManagementFilter.recommended.filteredModels(models, facts: \.facts).map(\.facts.name),
             ["ggml-base.en", "parakeet-tdt-0.6b-v2", "ggml-large-v3-turbo-q5_0", "whisper-large-v3-turbo"]
-        )
-        XCTAssertLessThan(
-            VoiceInkModelManagementFilter.recommended.sortRank(forModelName: "ggml-base.en"),
-            VoiceInkModelManagementFilter.recommended.sortRank(forModelName: "whisper-large-v3-turbo")
-        )
-        XCTAssertEqual(
-            VoiceInkModelManagementFilter.recommended.sortRank(forModelName: "missing"),
-            Int.max
         )
     }
 

@@ -2429,19 +2429,26 @@ require_pattern \
   'deleteConfirmationMessage' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
 
-require_pattern \
-  "shared transcript deletion target selection lives in VoiceInkCore" \
+require_patterns \
+  "shared history deletion target selection lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift \
+  'VoiceInkHistoryDeletionPolicy' \
+  'targets<Item>' \
+  'atOffsets offsets'
+
+reject_pattern \
+  "transcript presentation does not own history deletion target selection" \
   'deletionTargets.*atOffsets' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
 
 require_pattern \
-  "core tests pin transcript deletion target selection" \
-  'testDeletionTargetsUseDisplayedListOffsets|testDeletionTargetsIgnoreStaleOffsets' \
+  "core tests pin history deletion target selection" \
+  'testHistoryDeletionPolicyUsesDisplayedListOffsets|testHistoryDeletionPolicyIgnoresStaleOffsets' \
   VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptPresentationTests.swift
 
 require_pattern \
-  "core check runner executes transcript deletion target tests" \
-  'testDeletionTargetsUseDisplayedListOffsets|testDeletionTargetsIgnoreStaleOffsets' \
+  "core check runner executes history deletion target tests" \
+  'testHistoryDeletionPolicyUsesDisplayedListOffsets|testHistoryDeletionPolicyIgnoresStaleOffsets' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -2656,7 +2663,7 @@ require_pattern \
 
 require_pattern \
   "iOS note list uses shared deletion target selection" \
-  'VoiceInkTranscriptPresentation\.deletionTargets\(atOffsets: offsets, from: filteredNotes\)' \
+  'VoiceInkHistoryDeletionPolicy\.targets\(atOffsets: offsets, from: filteredNotes\)' \
   iOS/VoiceInk-ios/NotesListView.swift
 
 require_pattern \

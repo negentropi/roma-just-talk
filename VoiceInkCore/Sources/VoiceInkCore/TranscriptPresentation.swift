@@ -471,6 +471,18 @@ public struct VoiceInkHistoryDeletionPlan<Item: Hashable, ID: Hashable> {
 }
 
 public enum VoiceInkHistoryDeletionPolicy {
+    public static func targets<Item>(
+        atOffsets offsets: IndexSet,
+        from displayedItems: [Item]
+    ) -> [Item] {
+        offsets.compactMap { index in
+            guard displayedItems.indices.contains(index) else {
+                return nil
+            }
+            return displayedItems[index]
+        }
+    }
+
     public static func selectedItemsDeletionPlan<Item: Hashable, ID: Hashable>(
         selectedItems: Set<Item>,
         id: (Item) -> ID
@@ -596,15 +608,6 @@ public enum VoiceInkTranscriptPresentation {
 
     public static func deleteConfirmationMessage(selectedCount: Int) -> String {
         "This action cannot be undone. Are you sure you want to delete \(selectedCount) item\(selectedCount == 1 ? "" : "s")?"
-    }
-
-    public static func deletionTargets<Item>(atOffsets offsets: IndexSet, from displayedItems: [Item]) -> [Item] {
-        offsets.compactMap { index in
-            guard displayedItems.indices.contains(index) else {
-                return nil
-            }
-            return displayedItems[index]
-        }
     }
 
     public static func failedTranscriptText(reason: String) -> String {

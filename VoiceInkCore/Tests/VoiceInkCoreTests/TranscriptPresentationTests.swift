@@ -519,9 +519,9 @@ final class TranscriptPresentationTests: XCTestCase {
         )
     }
 
-    func testDeletionTargetsUseDisplayedListOffsets() {
+    func testHistoryDeletionPolicyUsesDisplayedListOffsets() {
         XCTAssertEqual(
-            VoiceInkTranscriptPresentation.deletionTargets(
+            VoiceInkHistoryDeletionPolicy.targets(
                 atOffsets: IndexSet([0, 2]),
                 from: ["latest", "hidden-by-search", "oldest"]
             ),
@@ -529,9 +529,9 @@ final class TranscriptPresentationTests: XCTestCase {
         )
     }
 
-    func testDeletionTargetsIgnoreStaleOffsets() {
+    func testHistoryDeletionPolicyIgnoresStaleOffsets() {
         XCTAssertEqual(
-            VoiceInkTranscriptPresentation.deletionTargets(
+            VoiceInkHistoryDeletionPolicy.targets(
                 atOffsets: IndexSet([1, 5]),
                 from: ["latest", "oldest"]
             ),

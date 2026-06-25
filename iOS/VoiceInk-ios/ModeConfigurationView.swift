@@ -128,17 +128,18 @@ private struct ProviderModelSelectionView: View {
     let presentation: VoiceInkModeFormPresentation
 
     var body: some View {
-        switch provider.modelSelectionPresentation(for: use) {
-        case .fixedModel(let model):
+        let modelSelection = provider.modelSelectionPresentation(for: use)
+
+        if let model = modelSelection.fixedModelName {
             HStack {
                 Text(presentation.modelFieldTitle)
                 Spacer()
                 Text(model)
                     .foregroundColor(.secondary)
             }
-        case .selectableModels(let models):
+        } else {
             Picker(presentation.modelFieldTitle, selection: $selectedModel) {
-                ForEach(models, id: \.self) { model in
+                ForEach(modelSelection.selectableModels, id: \.self) { model in
                     Text(model).tag(model)
                 }
             }

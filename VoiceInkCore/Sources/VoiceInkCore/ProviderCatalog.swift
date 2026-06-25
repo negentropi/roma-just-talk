@@ -5,9 +5,18 @@ public enum VoiceInkProviderModelUse: Sendable {
     case postProcessing
 }
 
-public enum VoiceInkProviderModelSelectionPresentation: Equatable, Sendable {
-    case fixedModel(String)
-    case selectableModels([String])
+public struct VoiceInkProviderModelSelectionPresentation: Equatable, Sendable {
+    public let fixedModelName: String?
+    public let selectableModels: [String]
+
+    init(fixedModelName: String? = nil, selectableModels: [String] = []) {
+        self.fixedModelName = fixedModelName
+        self.selectableModels = selectableModels
+    }
+
+    public var shouldShowPicker: Bool {
+        fixedModelName == nil
+    }
 }
 
 public enum VoiceInkTranscriptionTransport: Sendable {
@@ -1242,10 +1251,10 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
 
     public func modelSelectionPresentation(for use: VoiceInkProviderModelUse) -> VoiceInkProviderModelSelectionPresentation {
         if let fixedModel = fixedModel(for: use) {
-            return .fixedModel(fixedModel)
+            return VoiceInkProviderModelSelectionPresentation(fixedModelName: fixedModel)
         }
 
-        return .selectableModels(models(for: use))
+        return VoiceInkProviderModelSelectionPresentation(selectableModels: models(for: use))
     }
 
     public func models(for use: VoiceInkProviderModelUse) -> [String] {

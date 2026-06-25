@@ -541,6 +541,30 @@ public struct VoiceInkAudioSessionDeactivationExecutionPlan: Equatable, Sendable
         shouldDeactivateSession: false,
         shouldRunCountdownTimer: true
     )
+
+    @discardableResult
+    public func applyRuntimeState(
+        deactivateSession: () -> Void,
+        runCountdownTimer: () -> Void
+    ) -> VoiceInkAudioSessionDeactivationRuntimeAction {
+        if shouldDeactivateSession {
+            deactivateSession()
+            return .deactivateSession
+        }
+
+        if shouldRunCountdownTimer {
+            runCountdownTimer()
+            return .runCountdownTimer
+        }
+
+        return .none
+    }
+}
+
+public enum VoiceInkAudioSessionDeactivationRuntimeAction: Equatable, Sendable {
+    case deactivateSession
+    case runCountdownTimer
+    case none
 }
 
 public enum VoiceInkMenuBarPreference {

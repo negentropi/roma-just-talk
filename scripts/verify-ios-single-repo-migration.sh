@@ -11921,8 +11921,13 @@ require_pattern \
 
 require_pattern \
   "shared audio-session timeout preference owns iOS deactivation execution intent" \
-  'VoiceInkAudioSessionDeactivationExecutionPlan|executionPlan' \
+  'VoiceInkAudioSessionDeactivationExecutionPlan|VoiceInkAudioSessionDeactivationRuntimeAction|executionPlan|applyRuntimeState' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "VoiceInkCore check runner executes audio-session deactivation execution runtime proof" \
+  'testAudioSessionDeactivationExecutionPlanAppliesRuntimeState' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "shared audio-session timeout presentation lives in VoiceInkCore" \
@@ -12044,8 +12049,16 @@ require_pattern \
 
 require_pattern \
   "iOS audio-session manager delegates deactivation planning to shared lifecycle state" \
-  'lifecycleState\.scheduleDeactivationExecution\(timeoutSeconds:' \
+  'lifecycleState\.scheduleDeactivationExecution\(' \
   iOS/VoiceInk-ios/AudioSessionManager.swift
+
+require_patterns \
+  "iOS audio-session manager applies shared deactivation execution runtime order" \
+  iOS/VoiceInk-ios/AudioSessionManager.swift \
+  'scheduleDeactivationExecution\(' \
+  'timeoutSeconds: +timeoutSeconds' \
+  'runCountdownTimer: +startDeactivationCountdownTimer' \
+  'advanceCountdownExecution\(\)\.applyRuntimeState'
 
 require_pattern \
   "iOS audio-session manager delegates countdown ticks to shared lifecycle state" \
@@ -12084,7 +12097,7 @@ reject_pattern \
 
 reject_pattern \
   "iOS audio-session manager avoids shell-owned audio-session side-effect plan unpacking" \
-  'activationPlan\.should(CancelScheduledDeactivation|DeactivateCurrentSession)|deactivationPlan\.shouldCancelScheduledDeactivation' \
+  'activationPlan\.should(CancelScheduledDeactivation|DeactivateCurrentSession)|deactivationPlan\.should(CancelScheduledDeactivation|DeactivateSession|RunCountdownTimer)|advanceCountdownExecution\(\)\.shouldDeactivateSession' \
   iOS/VoiceInk-ios/AudioSessionManager.swift
 
 reject_pattern \

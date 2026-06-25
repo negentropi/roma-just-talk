@@ -81,15 +81,19 @@ final class AudioSessionManager: ObservableObject {
         cancelScheduledDeactivation()
         
         let timeoutSeconds = settings.audioSessionTimeoutSeconds
-        let deactivationPlan = lifecycleState.scheduleDeactivationExecution(timeoutSeconds: timeoutSeconds)
-        
-        if deactivationPlan.shouldDeactivateSession {
-            deactivateSession()
-            return
-        }
+        let executionAction = lifecycleState.scheduleDeactivationExecution(
+            timeoutSeconds: timeoutSeconds
+        ).applyRuntimeState(
+            deactivateSession: deactivateSession,
+            runCountdownTimer: startDeactivationCountdownTimer
+        )
 
-        guard deactivationPlan.shouldRunCountdownTimer else { return }
-        
+        guard executionAction == .runCountdownTimer else { return }
+
+        VoiceInkIOSLogger.audioSession.notice("\(VoiceInkAudioSessionDiagnostics.deactivationScheduledMessage(seconds: Int(lifecycleState.timeoutRemaining)), privacy: .public)")
+    }
+
+    private func startDeactivationCountdownTimer() {
         // Create timer with shared countdown cadence and deactivate when done
         deactivationTimer = Timer.scheduledTimer(
             withTimeInterval: VoiceInkAudioSessionTimeoutPreference.countdownUpdateInterval,
@@ -100,14 +104,13 @@ final class AudioSessionManager: ObservableObject {
                     timer.invalidate()
                     return
                 }
-                
-                if self.lifecycleState.advanceCountdownExecution().shouldDeactivateSession {
-                    self.deactivateSession()
-                }
+
+                self.lifecycleState.advanceCountdownExecution().applyRuntimeState(
+                    deactivateSession: { self.deactivateSession() },
+                    runCountdownTimer: {}
+                )
             }
         }
-        
-        VoiceInkIOSLogger.audioSession.notice("\(VoiceInkAudioSessionDiagnostics.deactivationScheduledMessage(seconds: Int(lifecycleState.timeoutRemaining)), privacy: .public)")
     }
     
     /// Immediately deactivates the session

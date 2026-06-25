@@ -649,6 +649,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "UserDefaultsPreferencesTests.testAudioSessionTimeoutPreferenceSavesAndClearsTimeout", run: { UserDefaultsPreferencesTests().testAudioSessionTimeoutPreferenceSavesAndClearsTimeout() }),
             VoiceInkCoreCheck(name: "UserDefaultsPreferencesTests.testAudioSessionTimeoutPreferenceOwnsIOSRuntimePolicy", run: { UserDefaultsPreferencesTests().testAudioSessionTimeoutPreferenceOwnsIOSRuntimePolicy() }),
             VoiceInkCoreCheck(name: "UserDefaultsPreferencesTests.testAudioSessionDeactivationPlanOwnsShellExecutionIntent", run: { UserDefaultsPreferencesTests().testAudioSessionDeactivationPlanOwnsShellExecutionIntent() }),
+            VoiceInkCoreCheck(name: "UserDefaultsPreferencesTests.testAudioSessionDeactivationExecutionPlanAppliesRuntimeState", run: { UserDefaultsPreferencesTests().testAudioSessionDeactivationExecutionPlanAppliesRuntimeState() }),
             VoiceInkCoreCheck(name: "UserDefaultsPreferencesTests.testAudioSessionTimeoutPresentationPreservesIOSSettingsCopy", run: { UserDefaultsPreferencesTests().testAudioSessionTimeoutPresentationPreservesIOSSettingsCopy() }),
             VoiceInkCoreCheck(name: "UserDefaultsPreferencesTests.testVADPreferenceUsesSharedDefaultWhenMissing", run: { UserDefaultsPreferencesTests().testVADPreferenceUsesSharedDefaultWhenMissing() }),
             VoiceInkCoreCheck(name: "UserDefaultsPreferencesTests.testVADPreferenceSavesAndClearsEnabledState", run: { UserDefaultsPreferencesTests().testVADPreferenceSavesAndClearsEnabledState() }),

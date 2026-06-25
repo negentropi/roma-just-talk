@@ -765,6 +765,33 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertTrue(VoiceInkAudioSessionDeactivationExecutionPlan.runCountdownTimer.shouldRunCountdownTimer)
     }
 
+    func testAudioSessionDeactivationExecutionPlanAppliesRuntimeState() {
+        var events: [String] = []
+
+        let deactivationAction = VoiceInkAudioSessionDeactivationExecutionPlan.deactivateSession.applyRuntimeState(
+            deactivateSession: { events.append("deactivate") },
+            runCountdownTimer: { events.append("timer") }
+        )
+        XCTAssertEqual(deactivationAction, .deactivateSession)
+
+        let countdownAction = VoiceInkAudioSessionDeactivationExecutionPlan.runCountdownTimer.applyRuntimeState(
+            deactivateSession: { events.append("deactivate") },
+            runCountdownTimer: { events.append("timer") }
+        )
+        XCTAssertEqual(countdownAction, .runCountdownTimer)
+
+        let noAction = VoiceInkAudioSessionDeactivationExecutionPlan(
+            shouldDeactivateSession: false,
+            shouldRunCountdownTimer: false
+        ).applyRuntimeState(
+            deactivateSession: { events.append("deactivate") },
+            runCountdownTimer: { events.append("timer") }
+        )
+        XCTAssertEqual(noAction, .none)
+
+        XCTAssertEqual(events, ["deactivate", "timer"])
+    }
+
     func testAudioSessionTimeoutPresentationPreservesIOSSettingsCopy() {
         let presentation = VoiceInkAudioSessionTimeoutPreference.settingsPresentation
 

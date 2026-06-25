@@ -6,7 +6,10 @@ import VoiceInkCore
 class TranscriptionAutoCleanupService {
     static let shared = TranscriptionAutoCleanupService()
 
-    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "TranscriptionAutoCleanupService")
+    private let logger = Logger(
+        subsystem: VoiceInkAppIdentity.loggingSubsystem,
+        category: VoiceInkMacOSLogCategory.transcriptionAutoCleanupService
+    )
     private var modelContext: ModelContext?
 
     private var recordingsDirectory: URL {
@@ -64,7 +67,7 @@ class TranscriptionAutoCleanupService {
     private func deleteCompletedTranscription(from notification: Notification) {
         guard let transcription = notification.object as? Transcription,
               let modelContext = self.modelContext else {
-            logger.error("Invalid transcription or missing model context")
+            logger.error("\(VoiceInkTranscriptionAutoCleanupDiagnostics.invalidCompletedTranscriptionMessage, privacy: .public)")
             return
         }
 
@@ -78,7 +81,10 @@ class TranscriptionAutoCleanupService {
             try modelContext.save()
             NotificationCenter.default.post(name: .transcriptionDeleted, object: nil)
         } catch {
-            logger.error("Failed to save after transcription deletion: \(error.localizedDescription, privacy: .public)")
+            let message = VoiceInkTranscriptionAutoCleanupDiagnostics.saveAfterCompletedDeletionFailedMessage(
+                errorDescription: error.localizedDescription
+            )
+            logger.error("\(message, privacy: .public)")
         }
     }
 
@@ -109,13 +115,19 @@ class TranscriptionAutoCleanupService {
             }
             if deletedCount > 0 {
                 try backgroundContext.save()
-                logger.notice("Cleaned up \(deletedCount, privacy: .public) old transcription(s)")
+                let message = VoiceInkTranscriptionAutoCleanupDiagnostics.oldTranscriptionsCleanedMessage(
+                    deletedCount: deletedCount
+                )
+                logger.notice("\(message, privacy: .public)")
                 await MainActor.run {
                     NotificationCenter.default.post(name: .transcriptionDeleted, object: nil)
                 }
             }
         } catch {
-            logger.error("Failed during transcription cleanup: \(error.localizedDescription, privacy: .public)")
+            let message = VoiceInkTranscriptionAutoCleanupDiagnostics.transcriptionCleanupFailedMessage(
+                errorDescription: error.localizedDescription
+            )
+            logger.error("\(message, privacy: .public)")
         }
     }
 
@@ -154,10 +166,16 @@ class TranscriptionAutoCleanupService {
             }
 
             if deletedCount > 0 {
-                logger.notice("Cleaned up \(deletedCount, privacy: .public) orphan audio file(s)")
+                let message = VoiceInkTranscriptionAutoCleanupDiagnostics.orphanAudioFilesCleanedMessage(
+                    deletedCount: deletedCount
+                )
+                logger.notice("\(message, privacy: .public)")
             }
         } catch {
-            logger.error("Failed during orphan audio cleanup: \(error.localizedDescription, privacy: .public)")
+            let message = VoiceInkTranscriptionAutoCleanupDiagnostics.orphanAudioCleanupFailedMessage(
+                errorDescription: error.localizedDescription
+            )
+            logger.error("\(message, privacy: .public)")
         }
     }
 }

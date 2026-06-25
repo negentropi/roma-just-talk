@@ -1853,6 +1853,33 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         )
     }
 
+    func testTranscriptionAutoCleanupDiagnosticsPreserveMacOSLogCopy() {
+        XCTAssertEqual(
+            VoiceInkTranscriptionAutoCleanupDiagnostics.invalidCompletedTranscriptionMessage,
+            "Invalid transcription or missing model context"
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptionAutoCleanupDiagnostics.saveAfterCompletedDeletionFailedMessage(errorDescription: "disk full"),
+            "Failed to save after transcription deletion: disk full"
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptionAutoCleanupDiagnostics.oldTranscriptionsCleanedMessage(deletedCount: 2),
+            "Cleaned up 2 old transcription(s)"
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptionAutoCleanupDiagnostics.transcriptionCleanupFailedMessage(errorDescription: "fetch failed"),
+            "Failed during transcription cleanup: fetch failed"
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptionAutoCleanupDiagnostics.orphanAudioFilesCleanedMessage(deletedCount: 3),
+            "Cleaned up 3 orphan audio file(s)"
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptionAutoCleanupDiagnostics.orphanAudioCleanupFailedMessage(errorDescription: "remove failed"),
+            "Failed during orphan audio cleanup: remove failed"
+        )
+    }
+
     func testAudioCleanupPreferenceUsesSharedDefaultsWhenUnset() {
         withIsolatedDefaults { defaults in
             let configuration = VoiceInkAudioCleanupPreference.current(from: defaults)

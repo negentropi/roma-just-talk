@@ -7181,6 +7181,11 @@ require_pattern \
   'applyCompletionRuntimeState' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
+require_pattern \
+  "shared transcription auto-cleanup diagnostics live in VoiceInkCore" \
+  'VoiceInkTranscriptionAutoCleanupDiagnostics|invalidCompletedTranscriptionMessage|saveAfterCompletedDeletionFailedMessage|oldTranscriptionsCleanedMessage|transcriptionCleanupFailedMessage|orphanAudioFilesCleanedMessage|orphanAudioCleanupFailedMessage' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
 reject_pattern \
   "shared transcription auto-cleanup completion action avoids public raw action interface" \
   'public enum VoiceInkTranscriptionAutoCleanupCompletionAction|public var completionAction' \
@@ -7301,9 +7306,24 @@ require_pattern \
   'cleanupConfiguration\.applyCompletionRuntimeState' \
   VoiceInk/Services/TranscriptionAutoCleanupService.swift
 
+require_pattern \
+  "macOS transcription auto cleanup uses shared diagnostics" \
+  'VoiceInkTranscriptionAutoCleanupDiagnostics\.(invalidCompletedTranscriptionMessage|saveAfterCompletedDeletionFailedMessage|oldTranscriptionsCleanedMessage|transcriptionCleanupFailedMessage|orphanAudioFilesCleanedMessage|orphanAudioCleanupFailedMessage)' \
+  VoiceInk/Services/TranscriptionAutoCleanupService.swift
+
+require_pattern \
+  "core checks execute transcription auto-cleanup diagnostics test" \
+  'UserDefaultsPreferencesTests\.testTranscriptionAutoCleanupDiagnosticsPreserveMacOSLogCopy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
 reject_pattern \
   "macOS transcription auto cleanup avoids shell-owned completion action branching" \
   'completionAction|shouldDeleteCompletedTranscriptionImmediately|case \.(ignore|sweepOldTranscriptions|deleteCompletedTranscription)' \
+  VoiceInk/Services/TranscriptionAutoCleanupService.swift
+
+reject_pattern \
+  "macOS transcription auto cleanup avoids shell-owned diagnostic copy" \
+  '"(Invalid transcription or missing model context|Failed to save after transcription deletion:|Cleaned up .* old transcription\\(s\\)|Failed during transcription cleanup:|Cleaned up .* orphan audio file\\(s\\)|Failed during orphan audio cleanup:)' \
   VoiceInk/Services/TranscriptionAutoCleanupService.swift
 
 require_pattern \
@@ -16724,7 +16744,8 @@ require_patterns \
   'apiKeyManager = "APIKeyManager"' \
   'keychainService = "KeychainService"' \
   'polarService = "PolarService"' \
-  'licenseViewModel = "LicenseViewModel"'
+  'licenseViewModel = "LicenseViewModel"' \
+  'transcriptionAutoCleanupService = "TranscriptionAutoCleanupService"'
 
 require_pattern \
   "macOS window manager uses shared log category identity" \
@@ -16750,6 +16771,12 @@ require_patterns \
   "macOS license view model uses shared log category identity" \
   VoiceInk/Models/LicenseViewModel.swift \
   'Logger\(subsystem: VoiceInkAppIdentity\.loggingSubsystem, category: VoiceInkMacOSLogCategory\.licenseViewModel\)'
+
+require_patterns \
+  "macOS transcription auto cleanup uses shared log category identity" \
+  VoiceInk/Services/TranscriptionAutoCleanupService.swift \
+  'Logger\(' \
+  'category: VoiceInkMacOSLogCategory\.transcriptionAutoCleanupService'
 
 require_pattern \
   "core checks execute macOS window identity test" \
@@ -16784,11 +16811,12 @@ reject_pattern \
 
 reject_pattern \
   "macOS credential and license shells avoid shell-owned log category literals" \
-  'category: "(APIKeyManager|KeychainService|PolarService|LicenseViewModel)"' \
+  'category: "(APIKeyManager|KeychainService|PolarService|LicenseViewModel|TranscriptionAutoCleanupService)"' \
   VoiceInk/Services/APIKeyManager.swift \
   VoiceInk/Services/KeychainService.swift \
   VoiceInk/Services/PolarService.swift \
-  VoiceInk/Models/LicenseViewModel.swift
+  VoiceInk/Models/LicenseViewModel.swift \
+  VoiceInk/Services/TranscriptionAutoCleanupService.swift
 
 require_pattern \
   "iOS note list uses shared app identity presentation" \

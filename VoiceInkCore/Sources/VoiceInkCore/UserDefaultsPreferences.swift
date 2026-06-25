@@ -1459,6 +1459,30 @@ public enum VoiceInkTranscriptionAutoCleanupPreference {
     }
 }
 
+public enum VoiceInkTranscriptionAutoCleanupDiagnostics {
+    public static let invalidCompletedTranscriptionMessage = "Invalid transcription or missing model context"
+
+    public static func saveAfterCompletedDeletionFailedMessage(errorDescription: String) -> String {
+        "Failed to save after transcription deletion: \(errorDescription)"
+    }
+
+    public static func oldTranscriptionsCleanedMessage(deletedCount: Int) -> String {
+        "Cleaned up \(deletedCount) old transcription(s)"
+    }
+
+    public static func transcriptionCleanupFailedMessage(errorDescription: String) -> String {
+        "Failed during transcription cleanup: \(errorDescription)"
+    }
+
+    public static func orphanAudioFilesCleanedMessage(deletedCount: Int) -> String {
+        "Cleaned up \(deletedCount) orphan audio file(s)"
+    }
+
+    public static func orphanAudioCleanupFailedMessage(errorDescription: String) -> String {
+        "Failed during orphan audio cleanup: \(errorDescription)"
+    }
+}
+
 public struct VoiceInkAudioCleanupConfiguration: Equatable, Sendable {
     public let isEnabled: Bool
     public let retentionDays: Int

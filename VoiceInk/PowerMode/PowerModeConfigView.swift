@@ -450,10 +450,11 @@ struct ConfigurationView: View {
                                 }
                             }
                             .onChange(of: selectedAIProvider) { _, _ in
-                                applyEnhancementSelection(
-                                    enhancementSelection.selectingDefaultModelForSelectedProvider { provider in
-                                        provider.defaultTextEnhancementModel()
-                                    }
+                                enhancementSelection.providerChangePlan { provider in
+                                    provider.defaultTextEnhancementModel()
+                                }
+                                .applyRuntimeState(
+                                    applyEnhancementSelection: applyEnhancementSelection
                                 )
                             }
                         }

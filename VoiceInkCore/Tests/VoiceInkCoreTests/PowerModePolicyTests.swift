@@ -1021,6 +1021,57 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertEqual(events, ["Gemini:gemini-2.5-flash"])
     }
 
+    func testPowerModeEnhancementProviderChangePlanAppliesDefaultModelOnlyForValidProvider() {
+        let promptID = UUID()
+        let selection = VoiceInkPowerModeEnhancementSelection(
+            selectedPromptId: promptID,
+            selectedAIProvider: "Groq",
+            selectedAIModel: nil
+        )
+        let existingModelSelection = VoiceInkPowerModeEnhancementSelection(
+            selectedPromptId: promptID,
+            selectedAIProvider: "OpenAI",
+            selectedAIModel: "old-model"
+        )
+        let invalidProviderSelection = VoiceInkPowerModeEnhancementSelection(
+            selectedPromptId: promptID,
+            selectedAIProvider: "MissingProvider",
+            selectedAIModel: "kept"
+        )
+
+        XCTAssertEqual(
+            selection.providerChangePlan { "\($0.rawValue)-default" }.selectionToApply,
+            VoiceInkPowerModeEnhancementSelection(
+                selectedPromptId: promptID,
+                selectedAIProvider: "Groq",
+                selectedAIModel: "Groq-default"
+            )
+        )
+        XCTAssertEqual(
+            existingModelSelection.providerChangePlan { "\($0.rawValue)-default" }.selectionToApply,
+            VoiceInkPowerModeEnhancementSelection(
+                selectedPromptId: promptID,
+                selectedAIProvider: "OpenAI",
+                selectedAIModel: "OpenAI-default"
+            )
+        )
+        XCTAssertNil(
+            invalidProviderSelection.providerChangePlan { "\($0.rawValue)-default" }.selectionToApply
+        )
+
+        var events = [String]()
+        selection.providerChangePlan { "\($0.rawValue)-default" }
+            .applyRuntimeState {
+                events.append("\($0.selectedAIProvider ?? "nil"):\($0.selectedAIModel ?? "nil")")
+            }
+        invalidProviderSelection.providerChangePlan { "\($0.rawValue)-default" }
+            .applyRuntimeState {
+                events.append($0.selectedAIProvider ?? "nil")
+            }
+
+        XCTAssertEqual(events, ["Groq:Groq-default"])
+    }
+
     func testPowerModeEnhancementSelectionResolvesProviderPickerAndModelOptions() {
         let missingSelection = VoiceInkPowerModeEnhancementSelection(
             selectedPromptId: nil,

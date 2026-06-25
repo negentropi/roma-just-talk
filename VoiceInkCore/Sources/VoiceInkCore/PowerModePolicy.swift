@@ -393,6 +393,20 @@ public struct VoiceInkPowerModeEnhancementSelection: Equatable, Sendable {
         )
     }
 
+    public func providerChangePlan(
+        defaultModelForProvider: (VoiceInkAIEnhancementProviderKind) -> String
+    ) -> VoiceInkPowerModeEnhancementProviderChangePlan {
+        guard selectedProviderKind != nil else {
+            return VoiceInkPowerModeEnhancementProviderChangePlan(selectionToApply: nil)
+        }
+
+        return VoiceInkPowerModeEnhancementProviderChangePlan(
+            selectionToApply: selectingDefaultModelForSelectedProvider(
+                defaultModelForProvider: defaultModelForProvider
+            )
+        )
+    }
+
     public func selectedModelForPicker(currentModel: String) -> String {
         guard let selectedAIModel, !selectedAIModel.isEmpty else {
             return currentModel
@@ -454,6 +468,21 @@ public struct VoiceInkPowerModeEnhancementSelection: Equatable, Sendable {
 
     private var selectedProviderKind: VoiceInkAIEnhancementProviderKind? {
         selectedAIProvider.flatMap(VoiceInkAIEnhancementProviderKind.init(storedValue:))
+    }
+}
+
+public struct VoiceInkPowerModeEnhancementProviderChangePlan: Equatable, Sendable {
+    public let selectionToApply: VoiceInkPowerModeEnhancementSelection?
+
+    public init(selectionToApply: VoiceInkPowerModeEnhancementSelection?) {
+        self.selectionToApply = selectionToApply
+    }
+
+    public func applyRuntimeState(
+        applyEnhancementSelection: (VoiceInkPowerModeEnhancementSelection) -> Void
+    ) {
+        guard let selectionToApply else { return }
+        applyEnhancementSelection(selectionToApply)
     }
 }
 

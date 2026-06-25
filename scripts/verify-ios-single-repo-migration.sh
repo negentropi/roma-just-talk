@@ -3470,6 +3470,11 @@ reject_pattern \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
 reject_pattern \
+  "iOS API-key view avoids shallow save wrapper" \
+  'private func +saveKey\b|saveRuntimeAction\(save: +saveKey\)' \
+  iOS/VoiceInk-ios/ProviderAPIKeyView.swift
+
+reject_pattern \
   "iOS API-key view avoids shell-owned verification control branching" \
   'controlPresentation\.verificationControl\b|switch +controlPresentation\.verificationControl|case +\.verifyButton|case +\.progress' \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift

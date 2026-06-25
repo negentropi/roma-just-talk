@@ -17,7 +17,9 @@ struct ProviderAPIKeyView: View {
         Form {
             Section(header: Text(presentation.apiKeySectionTitle)) {
                 if apiKeyFormState.isEditing {
-                    let saveAction = controlPresentation.saveRuntimeAction(save: saveKey)
+                    let saveAction = controlPresentation.saveRuntimeAction {
+                        settings.setAPIKey(apiKeyFormState.enteredKey, for: provider)
+                    }
                     SecureField(presentation.apiKeyPlaceholder, text: $apiKeyFormState.enteredKey)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
@@ -95,10 +97,6 @@ struct ProviderAPIKeyView: View {
         .onChange(of: apiKeyFormState.enteredKey) { _, _ in
             apiKeyFormState = apiKeyFormState.keyEdited()
         }
-    }
-
-    private func saveKey() {
-        settings.setAPIKey(apiKeyFormState.enteredKey, for: provider)
     }
 
     private func verifyKey() {

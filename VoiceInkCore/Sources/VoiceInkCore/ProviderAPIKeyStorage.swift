@@ -71,4 +71,20 @@ public enum VoiceInkProviderAPIKeyStorageDiagnostics {
     public static func saveFailureMessage(status: OSStatus) -> String {
         "Error saving API key to keychain: \(status)"
     }
+
+    public static func savedProviderAPIKeyMessage(providerName: String, keyIdentifier: String) -> String {
+        "Saved API key for provider: \(providerName) with key: \(keyIdentifier)"
+    }
+
+    public static func deletedProviderAPIKeyMessage(providerName: String) -> String {
+        "Deleted API key for provider: \(providerName)"
+    }
+
+    public static func savedCustomModelAPIKeyMessage(modelId: UUID) -> String {
+        "Saved API key for custom model: \(modelId.uuidString)"
+    }
+
+    public static func deletedCustomModelAPIKeyMessage(modelId: UUID) -> String {
+        "Deleted API key for custom model: \(modelId.uuidString)"
+    }
 }

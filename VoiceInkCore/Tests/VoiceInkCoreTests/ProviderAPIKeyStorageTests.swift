@@ -87,4 +87,28 @@ final class ProviderAPIKeyStorageTests: XCTestCase {
             "Error saving API key to keychain: \(errSecAuthFailed)"
         )
     }
+
+    func testProviderAPIKeyStorageDiagnosticsPreserveMacOSSuccessLogCopy() {
+        let modelId = UUID(uuidString: "11111111-2222-3333-4444-555555555555")!
+
+        XCTAssertEqual(
+            VoiceInkProviderAPIKeyStorageDiagnostics.savedProviderAPIKeyMessage(
+                providerName: "Groq",
+                keyIdentifier: VoiceInkProviderAPIKeyAccount.groq
+            ),
+            "Saved API key for provider: Groq with key: \(VoiceInkProviderAPIKeyAccount.groq)"
+        )
+        XCTAssertEqual(
+            VoiceInkProviderAPIKeyStorageDiagnostics.deletedProviderAPIKeyMessage(providerName: "Groq"),
+            "Deleted API key for provider: Groq"
+        )
+        XCTAssertEqual(
+            VoiceInkProviderAPIKeyStorageDiagnostics.savedCustomModelAPIKeyMessage(modelId: modelId),
+            "Saved API key for custom model: 11111111-2222-3333-4444-555555555555"
+        )
+        XCTAssertEqual(
+            VoiceInkProviderAPIKeyStorageDiagnostics.deletedCustomModelAPIKeyMessage(modelId: modelId),
+            "Deleted API key for custom model: 11111111-2222-3333-4444-555555555555"
+        )
+    }
 }

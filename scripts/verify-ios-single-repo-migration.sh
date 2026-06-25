@@ -3662,7 +3662,7 @@ require_pattern \
 
 require_pattern \
   "shared provider API-key storage lives in VoiceInkCore" \
-  'VoiceInkProviderAPIKeyStorage|storedKey\(|saveStoredKey|deleteStoredKey|shouldReportFailure|VoiceInkProviderAPIKeyStorageDiagnostics|saveFailureMessage' \
+  'VoiceInkProviderAPIKeyStorage|storedKey\(|saveStoredKey|deleteStoredKey|shouldReportFailure|VoiceInkProviderAPIKeyStorageDiagnostics|saveFailureMessage|savedProviderAPIKeyMessage|deletedProviderAPIKeyMessage|savedCustomModelAPIKeyMessage|deletedCustomModelAPIKeyMessage' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyStorage.swift
 
 require_pattern \
@@ -3767,14 +3767,24 @@ require_pattern \
   VoiceInk/Services/KeychainService.swift
 
 require_pattern \
+  "macOS API-key manager uses shared provider API-key storage diagnostics" \
+  'VoiceInkProviderAPIKeyStorageDiagnostics\.(savedProviderAPIKeyMessage|deletedProviderAPIKeyMessage|savedCustomModelAPIKeyMessage|deletedCustomModelAPIKeyMessage)' \
+  VoiceInk/Services/APIKeyManager.swift
+
+require_pattern \
   "shared provider API-key storage uses shared string value policy" \
   'VoiceInkKeychainValueStore\.(saveString|loadString|deleteValue)' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyStorage.swift
 
 require_pattern \
   "core checks execute provider API-key storage tests" \
-  'ProviderAPIKeyStorageTests\.test(AccountUsesSharedProviderAccessRequirement|StoredKeyLoadsThroughProviderAccountAndDefaultsToEmpty|SaveStoredKeyTargetsProviderAccountAndReportsFailureStatus|ProviderAPIKeyStorageDiagnosticsPreserveIOSLogCopy)' \
+  'ProviderAPIKeyStorageTests\.test(AccountUsesSharedProviderAccessRequirement|StoredKeyLoadsThroughProviderAccountAndDefaultsToEmpty|SaveStoredKeyTargetsProviderAccountAndReportsFailureStatus|ProviderAPIKeyStorageDiagnosticsPreserveIOSLogCopy|ProviderAPIKeyStorageDiagnosticsPreserveMacOSSuccessLogCopy)' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "macOS API-key manager avoids shell-owned provider API-key storage success copy" \
+  '"(Saved API key for provider:|Deleted API key for provider:|Saved API key for custom model:|Deleted API key for custom model:)' \
+  VoiceInk/Services/APIKeyManager.swift
 
 reject_pattern \
   "iOS app settings avoids shell-owned provider API-key storage diagnostic copy" \

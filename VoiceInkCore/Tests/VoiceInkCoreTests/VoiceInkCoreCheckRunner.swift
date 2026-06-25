@@ -265,6 +265,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "ProviderAPIKeyStorageTests.testSaveStoredKeyTargetsProviderAccountAndReportsFailureStatus", run: { ProviderAPIKeyStorageTests().testSaveStoredKeyTargetsProviderAccountAndReportsFailureStatus() }),
             VoiceInkCoreCheck(name: "ProviderAPIKeyStorageTests.testSaveAndDeleteSkipProvidersWithoutUserKeyAccounts", run: { ProviderAPIKeyStorageTests().testSaveAndDeleteSkipProvidersWithoutUserKeyAccounts() }),
             VoiceInkCoreCheck(name: "ProviderAPIKeyStorageTests.testProviderAPIKeyStorageDiagnosticsPreserveIOSLogCopy", run: { ProviderAPIKeyStorageTests().testProviderAPIKeyStorageDiagnosticsPreserveIOSLogCopy() }),
+            VoiceInkCoreCheck(name: "ProviderAPIKeyStorageTests.testProviderAPIKeyStorageDiagnosticsPreserveMacOSSuccessLogCopy", run: { ProviderAPIKeyStorageTests().testProviderAPIKeyStorageDiagnosticsPreserveMacOSSuccessLogCopy() }),
             VoiceInkCoreCheck(name: "KeychainQueryTests.testBaseQueryPreservesSharedAppServiceAndAccount", run: { KeychainQueryTests().testBaseQueryPreservesSharedAppServiceAndAccount() }),
             VoiceInkCoreCheck(name: "KeychainQueryTests.testBaseQueryCanDisableSyncableForMacOSCallers", run: { KeychainQueryTests().testBaseQueryCanDisableSyncableForMacOSCallers() }),
             VoiceInkCoreCheck(name: "KeychainQueryTests.testAddQueryAddsValueData", run: { KeychainQueryTests().testAddQueryAddsValueData() }),

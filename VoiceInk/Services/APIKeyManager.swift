@@ -19,7 +19,11 @@ final class APIKeyManager {
         let keyIdentifier = VoiceInkProviderAPIKeyAccount.accountIdentifier(forProviderName: provider)
         let success = keychain.save(key, forKey: keyIdentifier)
         if success {
-            logger.info("Saved API key for provider: \(provider, privacy: .public) with key: \(keyIdentifier, privacy: .public)")
+            let message = VoiceInkProviderAPIKeyStorageDiagnostics.savedProviderAPIKeyMessage(
+                providerName: provider,
+                keyIdentifier: keyIdentifier
+            )
+            logger.info("\(message, privacy: .public)")
         }
         return success
     }
@@ -69,7 +73,8 @@ final class APIKeyManager {
         let keyIdentifier = VoiceInkProviderAPIKeyAccount.accountIdentifier(forProviderName: provider)
         let success = keychain.delete(forKey: keyIdentifier)
         if success {
-            logger.info("Deleted API key for provider: \(provider, privacy: .public)")
+            let message = VoiceInkProviderAPIKeyStorageDiagnostics.deletedProviderAPIKeyMessage(providerName: provider)
+            logger.info("\(message, privacy: .public)")
         }
         return success
     }
@@ -87,7 +92,8 @@ final class APIKeyManager {
         let keyIdentifier = VoiceInkProviderAPIKeyAccount.customModelAccountIdentifier(forModelId: modelId)
         let success = keychain.save(key, forKey: keyIdentifier)
         if success {
-            logger.info("Saved API key for custom model: \(modelId.uuidString, privacy: .public)")
+            let message = VoiceInkProviderAPIKeyStorageDiagnostics.savedCustomModelAPIKeyMessage(modelId: modelId)
+            logger.info("\(message, privacy: .public)")
         }
         return success
     }
@@ -105,7 +111,8 @@ final class APIKeyManager {
         let keyIdentifier = VoiceInkProviderAPIKeyAccount.customModelAccountIdentifier(forModelId: modelId)
         let success = keychain.delete(forKey: keyIdentifier)
         if success {
-            logger.info("Deleted API key for custom model: \(modelId.uuidString, privacy: .public)")
+            let message = VoiceInkProviderAPIKeyStorageDiagnostics.deletedCustomModelAPIKeyMessage(modelId: modelId)
+            logger.info("\(message, privacy: .public)")
         }
         return success
     }

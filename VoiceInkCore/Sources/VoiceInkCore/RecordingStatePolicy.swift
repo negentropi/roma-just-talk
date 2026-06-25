@@ -877,11 +877,11 @@ public enum VoiceInkKeyboardOpenAppDiagnostics {
     public static let allMethodsFailed = "All URL opening methods failed"
 }
 
-public enum VoiceInkKeyboardStopRecordingRequestAction: Equatable, Sendable {
+enum VoiceInkKeyboardStopRecordingRequestAction: Equatable, Sendable {
     case handleStopRequest
     case ignore
 
-    public func applyRuntimeState(handleStopRequest: () -> Void) {
+    func applyRuntimeState(handleStopRequest: () -> Void) {
         switch self {
         case .handleStopRequest:
             handleStopRequest()
@@ -891,11 +891,25 @@ public enum VoiceInkKeyboardStopRecordingRequestAction: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkKeyboardStopRecordingRequestPlan: Sendable {
+    private let action: VoiceInkKeyboardStopRecordingRequestAction
+
+    init(action: VoiceInkKeyboardStopRecordingRequestAction) {
+        self.action = action
+    }
+
+    public func applyRuntimeState(handleStopRequest: () -> Void) {
+        action.applyRuntimeState(handleStopRequest: handleStopRequest)
+    }
+}
+
 public enum VoiceInkKeyboardStopRecordingRequestPolicy {
-    public static func action(
+    public static func plan(
         recordingState: VoiceInkRecordingState
-    ) -> VoiceInkKeyboardStopRecordingRequestAction {
-        recordingState.isActivelyRecording ? .handleStopRequest : .ignore
+    ) -> VoiceInkKeyboardStopRecordingRequestPlan {
+        VoiceInkKeyboardStopRecordingRequestPlan(
+            action: recordingState.isActivelyRecording ? .handleStopRequest : .ignore
+        )
     }
 }
 

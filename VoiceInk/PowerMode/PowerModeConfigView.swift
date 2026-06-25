@@ -329,7 +329,13 @@ struct ConfigurationView: View {
                                     .foregroundColor(.secondary)
                             }
                             .onAppear {
-                                applyTranscriptionSelection(transcriptionSelection.selectingAutodetectLanguage())
+                                transcriptionSelection.languageControlAppearPlan(
+                                    for: facts,
+                                    defaultLanguage: VoiceInkDefaultSettings.macOS.selectedTranscriptionLanguage
+                                )
+                                .applyRuntimeState(
+                                    applyTranscriptionSelection: applyTranscriptionSelection
+                                )
                             }
                         } else if facts.shouldShowLanguagePicker {
                             let languageBinding = Binding<String?>(
@@ -351,10 +357,12 @@ struct ConfigurationView: View {
                         } else if facts.shouldApplyDefaultLanguageIfMissing {
                             EmptyView()
                                 .onAppear {
-                                    applyTranscriptionSelection(
-                                        transcriptionSelection.selectingDefaultLanguageIfMissing(
-                                            VoiceInkDefaultSettings.macOS.selectedTranscriptionLanguage
-                                        )
+                                    transcriptionSelection.languageControlAppearPlan(
+                                        for: facts,
+                                        defaultLanguage: VoiceInkDefaultSettings.macOS.selectedTranscriptionLanguage
+                                    )
+                                    .applyRuntimeState(
+                                        applyTranscriptionSelection: applyTranscriptionSelection
                                     )
                                 }
                         }

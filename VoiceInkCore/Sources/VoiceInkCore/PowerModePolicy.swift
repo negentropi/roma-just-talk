@@ -638,9 +638,42 @@ public struct VoiceInkPowerModeTranscriptionSelection: Equatable, Sendable {
             )
         )
     }
+
+    public func languageControlAppearPlan(
+        for model: VoiceInkPowerModeTranscriptionModelFacts,
+        defaultLanguage: String
+    ) -> VoiceInkPowerModeTranscriptionLanguageControlAppearPlan {
+        switch model.languageControl {
+        case .disabledAutodetect:
+            return VoiceInkPowerModeTranscriptionLanguageControlAppearPlan(
+                selectionToApply: selectingAutodetectLanguage()
+            )
+        case .picker:
+            return VoiceInkPowerModeTranscriptionLanguageControlAppearPlan(selectionToApply: nil)
+        case .hiddenDefault:
+            return VoiceInkPowerModeTranscriptionLanguageControlAppearPlan(
+                selectionToApply: selectingDefaultLanguageIfMissing(defaultLanguage)
+            )
+        }
+    }
 }
 
 public struct VoiceInkPowerModeTranscriptionModelChangePlan: Equatable, Sendable {
+    public let selectionToApply: VoiceInkPowerModeTranscriptionSelection?
+
+    public init(selectionToApply: VoiceInkPowerModeTranscriptionSelection?) {
+        self.selectionToApply = selectionToApply
+    }
+
+    public func applyRuntimeState(
+        applyTranscriptionSelection: (VoiceInkPowerModeTranscriptionSelection) -> Void
+    ) {
+        guard let selectionToApply else { return }
+        applyTranscriptionSelection(selectionToApply)
+    }
+}
+
+public struct VoiceInkPowerModeTranscriptionLanguageControlAppearPlan: Equatable, Sendable {
     public let selectionToApply: VoiceInkPowerModeTranscriptionSelection?
 
     public init(selectionToApply: VoiceInkPowerModeTranscriptionSelection?) {

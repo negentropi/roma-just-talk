@@ -7235,7 +7235,7 @@ require_pattern \
 
 reject_pattern \
   "macOS Power Mode transcription settings avoid direct language-control switching" \
-  'languageControl|case \.(disabledAutodetect|picker|hiddenDefault)' \
+  '(^|[^[:alnum:]_])languageControl([^[:alnum:]_]|$)|case \.(disabledAutodetect|picker|hiddenDefault)' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
 require_pattern \
@@ -13333,6 +13333,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
+  "shared Power Mode transcription language-control appear plan lives in VoiceInkCore" \
+  'VoiceInkPowerModeTranscriptionLanguageControlAppearPlan|languageControlAppearPlan|selectionToApply' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
   "macOS Power Mode config form delegates AI enhancement toggle selection planning" \
   'enhancementSelection\.togglePlan' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
@@ -13348,6 +13353,11 @@ require_pattern \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
 require_pattern \
+  "macOS Power Mode config form delegates transcription language-control appearance planning" \
+  'transcriptionSelection\.languageControlAppearPlan' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
+require_pattern \
   "core checks execute Power Mode AI enhancement toggle plan test" \
   'PowerModePolicyTests\.testPowerModeEnhancementTogglePlanAppliesMacOSToggleEnablementRules' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
@@ -13360,6 +13370,11 @@ require_pattern \
 require_pattern \
   "core checks execute Power Mode transcription model-change plan test" \
   'PowerModePolicyTests\.testPowerModeTranscriptionModelChangePlanAppliesCompatibleLanguageOnlyForSelectedModel' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute Power Mode transcription language-control appear plan test" \
+  'PowerModePolicyTests\.testPowerModeTranscriptionLanguageControlAppearPlanAppliesOnlyRenderedControlSideEffects' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -13500,7 +13515,7 @@ require_pattern \
 
 require_pattern \
   "migration checklist tracks shared Power Mode config form chrome gate" \
-  'macOS Power Mode config form seed defaults, trigger-section labels, transcription section labels, transcription model-change language repair planning, AI toggle title, AI-enhancement toggle enablement planning, AI-provider change default-model planning, footer actions, form-load provider/model/prompt/language repair, website add planning, trigger removal, and unsaved add-form shortcut cleanup planning route through `VoiceInkPowerModeConfigurationFormState`/`VoiceInkPowerModeConfigurationFormAppearPlan`/`VoiceInkPowerModeConfigurationFormDismissalPlan`/`VoiceInkPowerModeTranscriptionModelChangePlan`/`VoiceInkPowerModeEnhancementTogglePlan`/`VoiceInkPowerModeEnhancementProviderChangePlan`/`VoiceInkPowerModePresentation`/`VoiceInkPowerModePolicy`' \
+  'macOS Power Mode config form seed defaults, trigger-section labels, transcription section labels, transcription model-change language repair planning, transcription language-control appearance planning, AI toggle title, AI-enhancement toggle enablement planning, AI-provider change default-model planning, footer actions, form-load provider/model/prompt/language repair, website add planning, trigger removal, and unsaved add-form shortcut cleanup planning route through `VoiceInkPowerModeConfigurationFormState`/`VoiceInkPowerModeConfigurationFormAppearPlan`/`VoiceInkPowerModeConfigurationFormDismissalPlan`/`VoiceInkPowerModeTranscriptionModelChangePlan`/`VoiceInkPowerModeTranscriptionLanguageControlAppearPlan`/`VoiceInkPowerModeEnhancementTogglePlan`/`VoiceInkPowerModeEnhancementProviderChangePlan`/`VoiceInkPowerModePresentation`/`VoiceInkPowerModePolicy`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \
@@ -13566,6 +13581,11 @@ reject_pattern \
 reject_pattern \
   "macOS Power Mode config form avoids shell-owned transcription model-change language repair planning" \
   'selectingCompatibleLanguage' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
+reject_pattern \
+  "macOS Power Mode config form avoids shell-owned transcription language-control appearance planning" \
+  'selectingAutodetectLanguage|selectingDefaultLanguageIfMissing' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
 reject_pattern \

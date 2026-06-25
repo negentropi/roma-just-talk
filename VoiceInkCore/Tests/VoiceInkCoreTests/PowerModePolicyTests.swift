@@ -1314,6 +1314,69 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertEqual(events, ["base:auto"])
     }
 
+    func testPowerModeTranscriptionLanguageControlAppearPlanAppliesOnlyRenderedControlSideEffects() {
+        let selection = VoiceInkPowerModeTranscriptionSelection(
+            selectedModelName: "base",
+            selectedLanguage: nil
+        )
+        let selectedLanguage = VoiceInkPowerModeTranscriptionSelection(
+            selectedModelName: "base",
+            selectedLanguage: "fr"
+        )
+
+        XCTAssertEqual(
+            selection.languageControlAppearPlan(
+                for: transcriptionModelFacts(disablesLanguageSelection: true),
+                defaultLanguage: "en"
+            ).selectionToApply?.selectedLanguage,
+            VoiceInkLanguageCatalog.autoDetectCode
+        )
+        XCTAssertNil(
+            selection.languageControlAppearPlan(
+                for: transcriptionModelFacts(isMultilingual: true),
+                defaultLanguage: "en"
+            ).selectionToApply
+        )
+        XCTAssertEqual(
+            selection.languageControlAppearPlan(
+                for: transcriptionModelFacts(
+                    isMultilingual: false,
+                    languageOptions: VoiceInkLanguageCatalog.englishOnly
+                ),
+                defaultLanguage: "en"
+            ).selectionToApply?.selectedLanguage,
+            "en"
+        )
+        XCTAssertEqual(
+            selectedLanguage.languageControlAppearPlan(
+                for: transcriptionModelFacts(
+                    isMultilingual: false,
+                    languageOptions: VoiceInkLanguageCatalog.englishOnly
+                ),
+                defaultLanguage: "en"
+            ).selectionToApply?.selectedLanguage,
+            "fr"
+        )
+
+        var events = [String]()
+        selection.languageControlAppearPlan(
+            for: transcriptionModelFacts(disablesLanguageSelection: true),
+            defaultLanguage: "en"
+        )
+        .applyRuntimeState {
+            events.append("\($0.selectedModelName ?? "nil"):\($0.selectedLanguage ?? "nil")")
+        }
+        selection.languageControlAppearPlan(
+            for: transcriptionModelFacts(isMultilingual: true),
+            defaultLanguage: "en"
+        )
+        .applyRuntimeState {
+            events.append($0.selectedLanguage ?? "nil")
+        }
+
+        XCTAssertEqual(events, ["base:auto"])
+    }
+
     func testPowerModeLanguageApplicationPlanSkipsMissingLanguage() {
         let plan = VoiceInkPowerModeLanguageApplicationPlan.plan(
             selectedLanguage: nil,

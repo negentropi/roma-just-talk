@@ -370,11 +370,16 @@ final class ProviderAccessRequirementTests: XCTestCase {
             missingCandidatePolicy: .keepCurrentState
         )
 
-        XCTAssertEqual(plan.candidate, "entered-key")
-        XCTAssertEqual(plan.draft.keyToSaveAfterSuccessfulVerification, "entered-key")
-        XCTAssertEqual(plan.formState.enteredKey, " entered-key \n")
-        XCTAssertEqual(plan.formState.verificationProgress, .verifying)
-        XCTAssertTrue(plan.formState.isEditing)
+        var formState: VoiceInkProviderAPIKeyFormState?
+        let verificationResult = plan.applyRuntimeState(
+            setFormState: { formState = $0 },
+            verifyCandidate: { "candidate:\($0)" }
+        )
+
+        XCTAssertEqual(verificationResult, "candidate:entered-key")
+        XCTAssertEqual(formState?.enteredKey, " entered-key \n")
+        XCTAssertEqual(formState?.verificationProgress, .verifying)
+        XCTAssertEqual(formState?.isEditing, true)
     }
 
     func testProviderAPIKeyVerificationStartPlanCanKeepStateForMissingCandidate() {
@@ -389,9 +394,19 @@ final class ProviderAccessRequirementTests: XCTestCase {
             missingCandidatePolicy: .keepCurrentState
         )
 
-        XCTAssertNil(plan.candidate)
-        XCTAssertFalse(plan.draft.canVerify)
-        XCTAssertEqual(plan.formState, state)
+        var didVerifyCandidate = false
+        var formState: VoiceInkProviderAPIKeyFormState?
+        let verificationResult: Bool? = plan.applyRuntimeState(
+            setFormState: { formState = $0 },
+            verifyCandidate: { _ in
+                didVerifyCandidate = true
+                return true
+            }
+        )
+
+        XCTAssertNil(verificationResult)
+        XCTAssertFalse(didVerifyCandidate)
+        XCTAssertEqual(formState, state)
     }
 
     func testProviderAPIKeyVerificationStartPlanCanApplyFailureForMissingCandidate() {
@@ -406,11 +421,21 @@ final class ProviderAccessRequirementTests: XCTestCase {
             missingCandidatePolicy: .applyFailurePlan
         )
 
-        XCTAssertNil(plan.candidate)
-        XCTAssertFalse(plan.draft.canVerify)
-        XCTAssertEqual(plan.formState.enteredKey, " \n\t ")
-        XCTAssertEqual(plan.formState.verificationProgress, .failure(message: nil))
-        XCTAssertTrue(plan.formState.isEditing)
+        var didVerifyCandidate = false
+        var formState: VoiceInkProviderAPIKeyFormState?
+        let verificationResult: Bool? = plan.applyRuntimeState(
+            setFormState: { formState = $0 },
+            verifyCandidate: { _ in
+                didVerifyCandidate = true
+                return true
+            }
+        )
+
+        XCTAssertNil(verificationResult)
+        XCTAssertFalse(didVerifyCandidate)
+        XCTAssertEqual(formState?.enteredKey, " \n\t ")
+        XCTAssertEqual(formState?.verificationProgress, .failure(message: nil))
+        XCTAssertEqual(formState?.isEditing, true)
     }
 
     func testProviderAPIKeyFormStateAppliesVerificationPlanAndClosesEditingOnSuccess() {

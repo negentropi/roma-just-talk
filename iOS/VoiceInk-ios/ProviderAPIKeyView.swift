@@ -107,12 +107,15 @@ struct ProviderAPIKeyView: View {
                 storedRuntimeKey: settings.apiKey(for: provider),
                 missingCandidatePolicy: .applyFailurePlan
             )
-            apiKeyFormState = startPlan.formState
-            guard let keyToVerify = startPlan.candidate else {
+            guard let result = await startPlan.applyRuntimeState(
+                setFormState: { apiKeyFormState = $0 },
+                verifyCandidate: { keyToVerify in
+                    await apiKeyVerifier.verifyStoredAPIKeyDetailed(keyToVerify, for: provider)
+                }
+            ) else {
                 return
             }
-            
-            let result = await apiKeyVerifier.verifyStoredAPIKeyDetailed(keyToVerify, for: provider)
+
             apiKeyFormState
                 .verificationCompletionPlan(startPlan: startPlan, result: result)
                 .applyRuntimeState(

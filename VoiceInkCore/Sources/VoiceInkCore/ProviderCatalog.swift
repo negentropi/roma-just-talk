@@ -611,11 +611,11 @@ public enum VoiceInkProviderAPIKeyMissingVerificationCandidatePolicy: Equatable,
 }
 
 public struct VoiceInkProviderAPIKeyVerificationStartPlan: Equatable, Sendable {
-    public let formState: VoiceInkProviderAPIKeyFormState
-    public let draft: VoiceInkProviderAPIKeyDraft
-    public let candidate: String?
+    private let formState: VoiceInkProviderAPIKeyFormState
+    fileprivate let draft: VoiceInkProviderAPIKeyDraft
+    private let candidate: String?
 
-    public init(
+    init(
         formState: VoiceInkProviderAPIKeyFormState,
         draft: VoiceInkProviderAPIKeyDraft,
         candidate: String?
@@ -623,6 +623,32 @@ public struct VoiceInkProviderAPIKeyVerificationStartPlan: Equatable, Sendable {
         self.formState = formState
         self.draft = draft
         self.candidate = candidate
+    }
+
+    @discardableResult
+    public func applyRuntimeState<Result>(
+        setFormState: (VoiceInkProviderAPIKeyFormState) -> Void,
+        verifyCandidate: (String) -> Result
+    ) -> Result? {
+        setFormState(formState)
+        guard let candidate else {
+            return nil
+        }
+
+        return verifyCandidate(candidate)
+    }
+
+    @discardableResult
+    public func applyRuntimeState<Result>(
+        setFormState: (VoiceInkProviderAPIKeyFormState) -> Void,
+        verifyCandidate: (String) async -> Result
+    ) async -> Result? {
+        setFormState(formState)
+        guard let candidate else {
+            return nil
+        }
+
+        return await verifyCandidate(candidate)
     }
 }
 

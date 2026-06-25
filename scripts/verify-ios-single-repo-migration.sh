@@ -3214,6 +3214,21 @@ require_pattern \
   'VoiceInkProviderAPIKeyVerificationStartPlan|verificationStartPlan|VoiceInkProviderAPIKeyMissingVerificationCandidatePolicy' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
 
+reject_pattern \
+  "shared provider API-key verification start plan avoids public raw candidate interface" \
+  'public let candidate\b|public let draft: VoiceInkProviderAPIKeyDraft' \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
+
+require_pattern \
+  "iOS provider API-key view applies shared verification start runtime plan" \
+  'startPlan\.applyRuntimeState' \
+  iOS/VoiceInk-ios/ProviderAPIKeyView.swift
+
+reject_pattern \
+  "iOS provider API-key view avoids shell-owned verification candidate branching" \
+  'startPlan\.(formState|candidate|draft)|guard +let +keyToVerify += +startPlan\.candidate' \
+  iOS/VoiceInk-ios/ProviderAPIKeyView.swift
+
 require_pattern \
   "core checks execute provider API-key verification start plan tests" \
   'ProviderAccessRequirementTests\.testProviderAPIKeyVerificationStartPlan(BeginsWhenCandidateExists|CanKeepStateForMissingCandidate|CanApplyFailureForMissingCandidate)' \

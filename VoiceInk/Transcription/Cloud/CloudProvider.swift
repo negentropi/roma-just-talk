@@ -1,4 +1,3 @@
-import Foundation
 import SwiftData
 import VoiceInkCore
 
@@ -46,42 +45,6 @@ extension CloudProvider {
         modelProvider
             .cloudModelSpecs
             .map { $0.makeCloudModel(provider: modelProvider) }
-    }
-
-    /// Streaming-only providers inherit this and get a clear error if batch is somehow attempted.
-    /// Batch providers share the core remote dispatch while this shell keeps SwiftData and streaming adapters.
-    func transcribe(audioData: Data, fileName: String, apiKey: String, model: String, language: String?, prompt: String?, customVocabulary: [String]) async throws -> String {
-        guard let provider = modelProvider.remoteTranscriptionProviderKind else {
-            throw CloudTranscriptionError.unsupportedProvider
-        }
-
-        do {
-            let text = try await VoiceInkRemoteTranscriptionService(provider: provider).transcribeAudioData(
-                apiKey: apiKey,
-                model: model,
-                audioData: audioData,
-                fileName: fileName,
-                language: language,
-                options: modelProvider.remoteTranscriptionOptions(
-                    prompt: prompt,
-                    customVocabulary: customVocabulary
-                )
-            )
-            guard modelProvider.acceptsRemoteTranscriptionText(text) else {
-                throw CloudTranscriptionError.noTranscriptionReturned
-            }
-            return text
-        } catch let error as CloudTranscriptionError {
-            throw error
-        } catch {
-            if let apiError = CloudTranscriptionError.apiRequestFailure(
-                from: error as NSError,
-                matchingErrorDomain: modelProvider.apiErrorDomain
-            ) {
-                throw apiError
-            }
-            throw error
-        }
     }
 
 }

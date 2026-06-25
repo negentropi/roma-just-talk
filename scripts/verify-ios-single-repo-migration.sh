@@ -5161,8 +5161,26 @@ reject_pattern \
 
 reject_pattern \
   "macOS cloud provider protocol keeps shared batch dispatch out of its interface" \
-  '^    func transcribe\(audioData: Data, fileName: String, apiKey: String, model: String, language: String\?, prompt: String\?, customVocabulary: \[String\]\) async throws -> String$' \
+  '^    func transcribe\(audioData:' \
   VoiceInk/Transcription/Cloud/CloudProvider.swift
+
+reject_pattern \
+  "macOS cloud provider stays streaming/model-list only" \
+  'VoiceInkRemoteTranscriptionService|remoteTranscriptionProviderKind|remoteTranscriptionOptions|acceptsRemoteTranscriptionText|apiRequestFailure' \
+  VoiceInk/Transcription/Cloud/CloudProvider.swift
+
+reject_pattern \
+  "macOS batch cloud transcription avoids provider registry dispatch" \
+  'CloudProviderRegistry\.provider\(for: model\.provider\)|cloudProvider\.transcribe' \
+  VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift
+
+require_patterns \
+  "macOS batch cloud transcription uses shared provider metadata directly" \
+  VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift \
+  'modelProvider\.remoteTranscriptionProviderKind' \
+  'modelProvider\.remoteTranscriptionOptions' \
+  'modelProvider\.acceptsRemoteTranscriptionText' \
+  'modelProvider\.apiErrorDomain'
 
 require_pattern \
   "macOS transcription model uses shared recorded-file support policy" \
@@ -5201,9 +5219,9 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift
 
 require_pattern \
-  "macOS cloud provider uses shared API error-domain mapping" \
+  "macOS batch cloud transcription uses shared API error-domain mapping" \
   'modelProvider\.apiErrorDomain' \
-  VoiceInk/Transcription/Cloud/CloudProvider.swift
+  VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift
 
 reject_pattern \
   "macOS cloud provider avoids direct core transcription provider reach-through" \
@@ -7565,8 +7583,7 @@ require_pattern \
 require_pattern \
   "macOS cloud batch transcription uses shared cloud transcription error" \
   'CloudTranscriptionError\.(unsupportedProvider|missingAPIKey|audioFileNotFound|apiRequestFailure|networkError|noTranscriptionReturned)' \
-  VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift \
-  VoiceInk/Transcription/Cloud/CloudProvider.swift
+  VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift
 
 require_pattern \
   "shared cloud transcription error uses shared run error description" \

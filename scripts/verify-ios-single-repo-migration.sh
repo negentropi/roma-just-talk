@@ -2319,6 +2319,11 @@ reject_pattern \
   'barSpacing: CGFloat = 3|duration: 0\.12|\.padding\(\.horizontal, 2\)|\.frame\(height: 48\)|size\.width - 16|max\(2,|size\.height - minHeight' \
   iOS/VoiceInk-ios/AudioVisualizerView.swift
 
+reject_pattern \
+  "iOS audio visualizer avoids shallow geometry wrappers" \
+  'private func +(barWidth|barHeight)\b' \
+  iOS/VoiceInk-ios/AudioVisualizerView.swift
+
 require_pattern \
   "iOS audio visualizer uses shared bar-height policy" \
   'VoiceInkAudioMeterLevel\.iOSVisualizerBarHeight' \

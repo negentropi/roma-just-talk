@@ -13,8 +13,14 @@ struct AudioVisualizerView: View {
                     Capsule()
                         .fill(Color.secondary.opacity(0.6))
                         .frame(
-                            width: barWidth(in: proxy.size),
-                            height: barHeight(for: index, in: proxy.size)
+                            width: CGFloat(VoiceInkAudioMeterLevel.iOSVisualizerBarWidth(
+                                containerWidth: Double(proxy.size.width)
+                            )),
+                            height: CGFloat(VoiceInkAudioMeterLevel.iOSVisualizerBarHeight(
+                                forBarAt: index,
+                                levels: levels,
+                                containerHeight: Double(proxy.size.height)
+                            ))
                         )
                         .animation(.easeOut(duration: VoiceInkAudioMeterLevel.iOSVisualizerAnimationDuration), value: levels)
                 }
@@ -24,18 +30,6 @@ struct AudioVisualizerView: View {
         }
         .frame(height: CGFloat(VoiceInkAudioMeterLevel.iOSVisualizerFrameHeight))
         .accessibilityLabel(VoiceInkAudioMeterLevel.visualizerAccessibilityLabel)
-    }
-
-    private func barWidth(in size: CGSize) -> CGFloat {
-        CGFloat(VoiceInkAudioMeterLevel.iOSVisualizerBarWidth(containerWidth: Double(size.width)))
-    }
-
-    private func barHeight(for index: Int, in size: CGSize) -> CGFloat {
-        CGFloat(VoiceInkAudioMeterLevel.iOSVisualizerBarHeight(
-            forBarAt: index,
-            levels: levels,
-            containerHeight: Double(size.height)
-        ))
     }
 }
 

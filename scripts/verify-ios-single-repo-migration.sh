@@ -13338,6 +13338,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
+  "shared Power Mode config form save plan lives in VoiceInkCore" \
+  'VoiceInkPowerModeConfigurationFormSavePlan|formSavePlan|applyRuntimeState' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
   "macOS Power Mode config form delegates AI enhancement toggle selection planning" \
   'enhancementSelection\.togglePlan' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
@@ -13358,6 +13363,11 @@ require_pattern \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
 require_pattern \
+  "macOS Power Mode config form delegates save validation and runtime ordering" \
+  'VoiceInkPowerModePolicy\.formSavePlan' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
+require_pattern \
   "core checks execute Power Mode AI enhancement toggle plan test" \
   'PowerModePolicyTests\.testPowerModeEnhancementTogglePlanAppliesMacOSToggleEnablementRules' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
@@ -13375,6 +13385,11 @@ require_pattern \
 require_pattern \
   "core checks execute Power Mode transcription language-control appear plan test" \
   'PowerModePolicyTests\.testPowerModeTranscriptionLanguageControlAppearPlanAppliesOnlyRenderedControlSideEffects' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute Power Mode config form save plan test" \
+  'PowerModePolicyTests\.testConfigurationFormSavePlanValidatesBeforeApplyingRuntimeSave' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -13515,7 +13530,7 @@ require_pattern \
 
 require_pattern \
   "migration checklist tracks shared Power Mode config form chrome gate" \
-  'macOS Power Mode config form seed defaults, trigger-section labels, transcription section labels, transcription model-change language repair planning, transcription language-control appearance planning, AI toggle title, AI-enhancement toggle enablement planning, AI-provider change default-model planning, footer actions, form-load provider/model/prompt/language repair, website add planning, trigger removal, and unsaved add-form shortcut cleanup planning route through `VoiceInkPowerModeConfigurationFormState`/`VoiceInkPowerModeConfigurationFormAppearPlan`/`VoiceInkPowerModeConfigurationFormDismissalPlan`/`VoiceInkPowerModeTranscriptionModelChangePlan`/`VoiceInkPowerModeTranscriptionLanguageControlAppearPlan`/`VoiceInkPowerModeEnhancementTogglePlan`/`VoiceInkPowerModeEnhancementProviderChangePlan`/`VoiceInkPowerModePresentation`/`VoiceInkPowerModePolicy`' \
+  'macOS Power Mode config form seed defaults, trigger-section labels, transcription section labels, transcription model-change language repair planning, transcription language-control appearance planning, AI toggle title, AI-enhancement toggle enablement planning, AI-provider change default-model planning, footer actions, form-load provider/model/prompt/language repair, website add planning, trigger removal, save validation/runtime ordering, and unsaved add-form shortcut cleanup planning route through `VoiceInkPowerModeConfigurationFormState`/`VoiceInkPowerModeConfigurationFormAppearPlan`/`VoiceInkPowerModeConfigurationFormSavePlan`/`VoiceInkPowerModeConfigurationFormDismissalPlan`/`VoiceInkPowerModeTranscriptionModelChangePlan`/`VoiceInkPowerModeTranscriptionLanguageControlAppearPlan`/`VoiceInkPowerModeEnhancementTogglePlan`/`VoiceInkPowerModeEnhancementProviderChangePlan`/`VoiceInkPowerModePresentation`/`VoiceInkPowerModePolicy`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \
@@ -13586,6 +13601,11 @@ reject_pattern \
 reject_pattern \
   "macOS Power Mode config form avoids shell-owned transcription language-control appearance planning" \
   'selectingAutodetectLanguage|selectingDefaultLanguageIfMissing' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
+reject_pattern \
+  "macOS Power Mode config form avoids shell-owned save validation and runtime ordering" \
+  'validateForSave|mode\.saveMode|VoiceInkPowerModePolicy\.configuration\(from: draft' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
 reject_pattern \
@@ -14077,7 +14097,7 @@ require_pattern \
 
 require_pattern \
   "macOS Power Mode form consumes shared draft construction" \
-  'VoiceInkPowerModeConfigurationDraft|VoiceInkPowerModePolicy\.configuration\(from: draft, mode: mode\)' \
+  'VoiceInkPowerModeConfigurationDraft|VoiceInkPowerModePolicy\.formSavePlan' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
 require_pattern \
@@ -14245,8 +14265,8 @@ require_pattern \
   VoiceInk/PowerMode/PowerModeView.swift
 
 require_pattern \
-  "macOS Power Mode config form consumes shared save mode" \
-  'VoiceInkPowerModeConfigurationMode|mode\.saveMode' \
+  "macOS Power Mode config form consumes shared save planning" \
+  'VoiceInkPowerModeConfigurationMode|VoiceInkPowerModePolicy\.formSavePlan' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
 reject_pattern \

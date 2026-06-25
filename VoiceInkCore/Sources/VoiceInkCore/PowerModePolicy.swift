@@ -2031,6 +2031,42 @@ public struct VoiceInkPowerModeConfigurationFormDismissalPlan: Equatable, Sendab
     }
 }
 
+public struct VoiceInkPowerModeConfigurationFormSavePlan: Equatable, Sendable {
+    public let validationErrors: [VoiceInkPowerModeValidationError]
+    private let configurationToSave: PowerModeConfig?
+    private let saveMode: VoiceInkPowerModeSaveMode?
+
+    init(
+        validationErrors: [VoiceInkPowerModeValidationError],
+        configurationToSave: PowerModeConfig?,
+        saveMode: VoiceInkPowerModeSaveMode?
+    ) {
+        self.validationErrors = validationErrors
+        self.configurationToSave = configurationToSave
+        self.saveMode = saveMode
+    }
+
+    public func applyRuntimeState(
+        setValidationErrors: ([VoiceInkPowerModeValidationError]) -> Void,
+        showValidationAlert: () -> Void,
+        saveConfiguration: (PowerModeConfig, VoiceInkPowerModeSaveMode) -> Void,
+        markSaved: () -> Void,
+        dismiss: () -> Void
+    ) {
+        setValidationErrors(validationErrors)
+
+        if !validationErrors.isEmpty {
+            showValidationAlert()
+            return
+        }
+
+        guard let configurationToSave, let saveMode else { return }
+        saveConfiguration(configurationToSave, saveMode)
+        markSaved()
+        dismiss()
+    }
+}
+
 public enum VoiceInkPowerModeValidationError: Error, Equatable, Identifiable, Sendable {
     case emptyName
     case duplicateName(String)
@@ -2210,6 +2246,25 @@ public enum VoiceInkPowerModePolicy {
             updatedConfig.isDefault = draft.isDefault
             return updatedConfig
         }
+    }
+
+    public static func formSavePlan(
+        draft: VoiceInkPowerModeConfigurationDraft,
+        mode: VoiceInkPowerModeConfigurationMode,
+        existing rules: [VoiceInkPowerModeRule]
+    ) -> VoiceInkPowerModeConfigurationFormSavePlan {
+        let config = configuration(from: draft, mode: mode)
+        let validationErrors = validateForSave(
+            candidate: config.powerModePolicyRule,
+            mode: mode.saveMode,
+            existing: rules
+        )
+
+        return VoiceInkPowerModeConfigurationFormSavePlan(
+            validationErrors: validationErrors,
+            configurationToSave: validationErrors.isEmpty ? config : nil,
+            saveMode: validationErrors.isEmpty ? mode.saveMode : nil
+        )
     }
 
     public static func hasEnabledAutomaticRules(in rules: [VoiceInkPowerModeRule]) -> Bool {

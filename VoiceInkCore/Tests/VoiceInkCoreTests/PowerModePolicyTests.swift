@@ -2751,6 +2751,61 @@ final class PowerModePolicyTests: XCTestCase {
         )
     }
 
+    func testConfigurationFormSavePlanValidatesBeforeApplyingRuntimeSave() {
+        let invalidDraft = VoiceInkPowerModeConfigurationDraft(
+            id: UUID(),
+            name: "Writing",
+            emoji: "W",
+            isAIEnhancementEnabled: false
+        )
+        let validDraft = VoiceInkPowerModeConfigurationDraft(
+            id: UUID(),
+            name: "Coding",
+            emoji: "C",
+            isAIEnhancementEnabled: false
+        )
+        let existing = rule(name: "Writing")
+        let invalidPlan = VoiceInkPowerModePolicy.formSavePlan(
+            draft: invalidDraft,
+            mode: .add,
+            existing: [existing]
+        )
+        let validPlan = VoiceInkPowerModePolicy.formSavePlan(
+            draft: validDraft,
+            mode: .add,
+            existing: [existing]
+        )
+
+        XCTAssertEqual(
+            invalidPlan.validationErrors,
+            [VoiceInkPowerModeValidationError.duplicateName("Writing")]
+        )
+        XCTAssertTrue(validPlan.validationErrors.isEmpty)
+
+        var invalidEvents = [String]()
+        invalidPlan.applyRuntimeState(
+            setValidationErrors: { invalidEvents.append("errors:\($0.count)") },
+            showValidationAlert: { invalidEvents.append("alert") },
+            saveConfiguration: { config, _ in invalidEvents.append("save:\(config.name)") },
+            markSaved: { invalidEvents.append("saved") },
+            dismiss: { invalidEvents.append("dismiss") }
+        )
+
+        var validEvents = [String]()
+        validPlan.applyRuntimeState(
+            setValidationErrors: { validEvents.append("errors:\($0.count)") },
+            showValidationAlert: { validEvents.append("alert") },
+            saveConfiguration: { config, saveMode in
+                validEvents.append("save:\(config.name):\(saveMode == .add)")
+            },
+            markSaved: { validEvents.append("saved") },
+            dismiss: { validEvents.append("dismiss") }
+        )
+
+        XCTAssertEqual(invalidEvents, ["errors:1", "alert"])
+        XCTAssertEqual(validEvents, ["errors:0", "save:Coding:true", "saved", "dismiss"])
+    }
+
     func testConfigurationModePreservesFormTitlesAndSaveModes() {
         let id = UUID()
         let editMode = VoiceInkPowerModeConfigurationMode.edit(

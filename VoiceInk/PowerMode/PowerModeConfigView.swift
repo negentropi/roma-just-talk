@@ -640,8 +640,8 @@ struct ConfigurationView: View {
         newWebsiteURL = ""
     }
 
-    private func getConfigForForm() -> PowerModeConfig {
-        let draft = VoiceInkPowerModeConfigurationDraft(
+    private func draftForForm() -> VoiceInkPowerModeConfigurationDraft {
+        VoiceInkPowerModeConfigurationDraft(
             id: powerModeConfigId,
             name: configName,
             emoji: selectedEmoji,
@@ -660,8 +660,6 @@ struct ConfigurationView: View {
             autoSendKey: autoSendKey,
             isDefault: isDefault
         )
-
-        return VoiceInkPowerModePolicy.configuration(from: draft, mode: mode)
     }
 
     private func loadInstalledApps() {
@@ -720,21 +718,20 @@ struct ConfigurationView: View {
     }
 
     private func saveConfiguration() {
-        let config = getConfigForForm()
-        validationErrors = VoiceInkPowerModePolicy.validateForSave(
-            candidate: config.powerModePolicyRule,
-            mode: mode.saveMode,
+        VoiceInkPowerModePolicy.formSavePlan(
+            draft: draftForForm(),
+            mode: mode,
             existing: powerModeManager.configurations.powerModePolicyRules
         )
-
-        if !validationErrors.isEmpty {
-            showValidationAlert = true
-            return
-        }
-
-        powerModeManager.saveConfiguration(config, mode: mode.saveMode)
-        didSaveConfiguration = true
-        onDismiss()
+        .applyRuntimeState(
+            setValidationErrors: { validationErrors = $0 },
+            showValidationAlert: { showValidationAlert = true },
+            saveConfiguration: { config, saveMode in
+                powerModeManager.saveConfiguration(config, mode: saveMode)
+            },
+            markSaved: { didSaveConfiguration = true },
+            dismiss: onDismiss
+        )
     }
 
     private func cleanupUnsavedShortcutIfNeeded() {

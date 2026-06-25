@@ -944,6 +944,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testValidationRejectsBlankAndDuplicateNameWithoutNormalizingName", run: { PowerModePolicyTests().testValidationRejectsBlankAndDuplicateNameWithoutNormalizingName() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testValidationSkipsEditedRuleAndReportsDuplicateTriggers", run: { PowerModePolicyTests().testValidationSkipsEditedRuleAndReportsDuplicateTriggers() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testValidationComparesWebsiteDuplicatesByRawStoredURL", run: { PowerModePolicyTests().testValidationComparesWebsiteDuplicatesByRawStoredURL() }),
+            VoiceInkCoreCheck(name: "PowerModePolicyTests.testConfigurationFormSavePlanValidatesBeforeApplyingRuntimeSave", run: { PowerModePolicyTests().testConfigurationFormSavePlanValidatesBeforeApplyingRuntimeSave() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testValidationErrorDescriptionsPreserveMacOSAlertText", run: { PowerModePolicyTests().testValidationErrorDescriptionsPreserveMacOSAlertText() }),
             VoiceInkCoreCheck(name: "PredefinedPromptTests.testStablePromptIdsPreserveMacOSStorageIdentity", run: { PredefinedPromptTests().testStablePromptIdsPreserveMacOSStorageIdentity() }),
             VoiceInkCoreCheck(name: "PredefinedPromptTests.testPromptOrderKeepsDefaultBeforeAssistant", run: { PredefinedPromptTests().testPromptOrderKeepsDefaultBeforeAssistant() }),

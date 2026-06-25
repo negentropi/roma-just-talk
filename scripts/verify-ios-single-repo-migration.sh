@@ -6641,12 +6641,17 @@ require_pattern \
 
 require_pattern \
   "shared transcription auto-cleanup completion action lives in VoiceInkCore" \
-  'enum VoiceInkTranscriptionAutoCleanupCompletionAction' \
+  'fileprivate enum VoiceInkTranscriptionAutoCleanupCompletionAction' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared transcription auto-cleanup completion action policy lives in VoiceInkCore" \
-  'completionAction' \
+  'applyCompletionRuntimeState' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+reject_pattern \
+  "shared transcription auto-cleanup completion action avoids public raw action interface" \
+  'public enum VoiceInkTranscriptionAutoCleanupCompletionAction|public var completionAction' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
@@ -6761,12 +6766,12 @@ require_pattern \
 
 require_pattern \
   "macOS transcription auto cleanup uses shared completion action" \
-  'cleanupConfiguration\.completionAction' \
+  'cleanupConfiguration\.applyCompletionRuntimeState' \
   VoiceInk/Services/TranscriptionAutoCleanupService.swift
 
 reject_pattern \
-  "macOS transcription auto cleanup avoids shell-owned completion retention branch" \
-  'shouldDeleteCompletedTranscriptionImmediately' \
+  "macOS transcription auto cleanup avoids shell-owned completion action branching" \
+  'completionAction|shouldDeleteCompletedTranscriptionImmediately|case \.(ignore|sweepOldTranscriptions|deleteCompletedTranscription)' \
   VoiceInk/Services/TranscriptionAutoCleanupService.swift
 
 require_pattern \

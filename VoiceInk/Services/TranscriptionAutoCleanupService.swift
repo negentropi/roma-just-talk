@@ -45,21 +45,23 @@ class TranscriptionAutoCleanupService {
     @objc private func handleTranscriptionCompleted(_ notification: Notification) {
         let cleanupConfiguration = VoiceInkTranscriptionAutoCleanupPreference.current()
 
-        switch cleanupConfiguration.completionAction {
-        case .ignore:
-            return
-        case .sweepOldTranscriptions:
-            if let modelContext = self.modelContext {
-                Task { [weak self] in
-                    guard let self = self else { return }
-                    await self.sweepOldTranscriptions(modelContext: modelContext)
+        cleanupConfiguration.applyCompletionRuntimeState(
+            ignore: {},
+            sweepOldTranscriptions: {
+                if let modelContext = self.modelContext {
+                    Task { [weak self] in
+                        guard let self = self else { return }
+                        await self.sweepOldTranscriptions(modelContext: modelContext)
+                    }
                 }
+            },
+            deleteCompletedTranscription: {
+                self.deleteCompletedTranscription(from: notification)
             }
-            return
-        case .deleteCompletedTranscription:
-            break
-        }
+        )
+    }
 
+    private func deleteCompletedTranscription(from notification: Notification) {
         guard let transcription = notification.object as? Transcription,
               let modelContext = self.modelContext else {
             logger.error("Invalid transcription or missing model context")

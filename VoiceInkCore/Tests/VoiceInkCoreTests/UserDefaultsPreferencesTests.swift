@@ -1676,28 +1676,50 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(configuration.cutoffDate(from: referenceDate), Date(timeIntervalSince1970: 1_800))
     }
 
-    func testTranscriptionAutoCleanupConfigurationPlansCompletedTranscriptionAction() {
+    func testTranscriptionAutoCleanupConfigurationAppliesCompletedTranscriptionRuntimeState() {
         XCTAssertEqual(
-            VoiceInkTranscriptionAutoCleanupConfiguration(
+            transcriptionAutoCleanupCompletionEvents(
                 isEnabled: false,
                 retentionMinutes: 0
-            ).completionAction,
-            .ignore
+            ),
+            ["ignore"]
         )
         XCTAssertEqual(
-            VoiceInkTranscriptionAutoCleanupConfiguration(
+            transcriptionAutoCleanupCompletionEvents(
                 isEnabled: true,
                 retentionMinutes: 30
-            ).completionAction,
-            .sweepOldTranscriptions
+            ),
+            ["sweep"]
         )
         XCTAssertEqual(
-            VoiceInkTranscriptionAutoCleanupConfiguration(
+            transcriptionAutoCleanupCompletionEvents(
                 isEnabled: true,
                 retentionMinutes: 0
-            ).completionAction,
-            .deleteCompletedTranscription
+            ),
+            ["delete"]
         )
+    }
+
+    private func transcriptionAutoCleanupCompletionEvents(
+        isEnabled: Bool,
+        retentionMinutes: Int
+    ) -> [String] {
+        var events: [String] = []
+        VoiceInkTranscriptionAutoCleanupConfiguration(
+            isEnabled: isEnabled,
+            retentionMinutes: retentionMinutes
+        ).applyCompletionRuntimeState(
+            ignore: {
+                events.append("ignore")
+            },
+            sweepOldTranscriptions: {
+                events.append("sweep")
+            },
+            deleteCompletedTranscription: {
+                events.append("delete")
+            }
+        )
+        return events
     }
 
     func testTranscriptionAutoCleanupBackupPreferencesPreserveMacOSExportShape() {

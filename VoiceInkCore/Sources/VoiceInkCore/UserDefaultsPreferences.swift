@@ -1311,15 +1311,30 @@ public struct VoiceInkTranscriptionAutoCleanupConfiguration: Equatable, Sendable
         referenceDate.addingTimeInterval(TimeInterval(-effectiveRetentionMinutes * 60))
     }
 
-    public var completionAction: VoiceInkTranscriptionAutoCleanupCompletionAction {
+    private var completionAction: VoiceInkTranscriptionAutoCleanupCompletionAction {
         guard isEnabled else { return .ignore }
         return shouldDeleteCompletedTranscriptionImmediately
             ? .deleteCompletedTranscription
             : .sweepOldTranscriptions
     }
+
+    public func applyCompletionRuntimeState(
+        ignore: () -> Void,
+        sweepOldTranscriptions: () -> Void,
+        deleteCompletedTranscription: () -> Void
+    ) {
+        switch completionAction {
+        case .ignore:
+            ignore()
+        case .sweepOldTranscriptions:
+            sweepOldTranscriptions()
+        case .deleteCompletedTranscription:
+            deleteCompletedTranscription()
+        }
+    }
 }
 
-public enum VoiceInkTranscriptionAutoCleanupCompletionAction: Equatable, Sendable {
+fileprivate enum VoiceInkTranscriptionAutoCleanupCompletionAction: Equatable, Sendable {
     case ignore
     case sweepOldTranscriptions
     case deleteCompletedTranscription

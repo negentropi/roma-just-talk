@@ -44,6 +44,92 @@ final class SettingsBackupPolicyTests: XCTestCase {
         XCTAssertTrue(VoiceInkSettingsBackupImportPolicy.needsAPIKeyReminder(for: [.customModels]))
     }
 
+    func testBackupImportPolicyBuildsCurrentVersionWithFallback() {
+        XCTAssertEqual(
+            VoiceInkSettingsBackupImportPolicy.currentVersion(bundleShortVersion: "2.4.0"),
+            "2.4.0"
+        )
+        XCTAssertEqual(
+            VoiceInkSettingsBackupImportPolicy.currentVersion(bundleShortVersion: nil),
+            "0.0.0"
+        )
+    }
+
+    func testBackupVersionReviewReportsOnlyMismatches() {
+        var events = [String]()
+
+        VoiceInkSettingsBackupImportPolicy.versionReview(
+            importedVersion: "2.4.0",
+            currentVersion: "2.4.0"
+        ).applyRuntimeState { importedVersion, currentVersion in
+            events.append("\(importedVersion)->\(currentVersion)")
+        }
+
+        VoiceInkSettingsBackupImportPolicy.versionReview(
+            importedVersion: "2.3.0",
+            currentVersion: "2.4.0"
+        ).applyRuntimeState { importedVersion, currentVersion in
+            events.append("\(importedVersion)->\(currentVersion)")
+        }
+
+        XCTAssertEqual(events, ["2.3.0->2.4.0"])
+    }
+
+    func testBackupImportSelectionReviewAppliesMacOSImportFlowDecisions() throws {
+        var events = [String]()
+
+        try VoiceInkSettingsBackupImportPolicy.importSelectionReview(
+            selectedCategories: nil
+        ).applyRuntimeState(
+            reportNoSettingsImported: {
+                events.append("canceled")
+            },
+            reportEmptyCategorySelection: {
+                events.append("empty")
+            },
+            importSelectedCategories: { categories in
+                events.append("import:\(VoiceInkSettingsBackupImportPolicy.categorySummary(for: categories))")
+            }
+        )
+
+        try VoiceInkSettingsBackupImportPolicy.importSelectionReview(
+            selectedCategories: []
+        ).applyRuntimeState(
+            reportNoSettingsImported: {
+                events.append("canceled")
+            },
+            reportEmptyCategorySelection: {
+                events.append("empty")
+            },
+            importSelectedCategories: { categories in
+                events.append("import:\(VoiceInkSettingsBackupImportPolicy.categorySummary(for: categories))")
+            }
+        )
+
+        try VoiceInkSettingsBackupImportPolicy.importSelectionReview(
+            selectedCategories: [.general, .dictionary]
+        ).applyRuntimeState(
+            reportNoSettingsImported: {
+                events.append("canceled")
+            },
+            reportEmptyCategorySelection: {
+                events.append("empty")
+            },
+            importSelectedCategories: { categories in
+                events.append("import:\(VoiceInkSettingsBackupImportPolicy.categorySummary(for: categories))")
+            }
+        )
+
+        XCTAssertEqual(
+            events,
+            [
+                "canceled",
+                "empty",
+                "import:General Settings, Dictionary"
+            ]
+        )
+    }
+
     func testBackupImportDiagnosticsPreserveMacOSStatusCopy() {
         XCTAssertEqual(
             VoiceInkSettingsBackupImportDiagnostics.noGeneralSettingsMessage,

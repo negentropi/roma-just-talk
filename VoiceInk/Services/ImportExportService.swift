@@ -109,11 +109,9 @@ class ImportExportService {
     private let currentSettingsVersion: String
 
     private init() {
-        if let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String {
-            self.currentSettingsVersion = version
-        } else {
-            self.currentSettingsVersion = "0.0.0"
-        }
+        self.currentSettingsVersion = VoiceInkSettingsBackupImportPolicy.currentVersion(
+            bundleShortVersion: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
+        )
     }
 
     @MainActor
@@ -321,49 +319,54 @@ class ImportExportService {
             let jsonData = try Data(contentsOf: url)
             let backup: BackupFile = try VoiceInkSettingsBackupFileCodec.decode(from: jsonData)
 
-            if backup.version != currentSettingsVersion {
+            VoiceInkSettingsBackupImportPolicy.versionReview(
+                importedVersion: backup.version,
+                currentVersion: currentSettingsVersion
+            ).applyRuntimeState { importedVersion, currentVersion in
                 showAlert(
                     title: backupPresentation.versionMismatchTitle,
                     message: backupPresentation.versionMismatchMessage(
-                        importedVersion: backup.version,
-                        currentVersion: currentSettingsVersion
+                        importedVersion: importedVersion,
+                        currentVersion: currentVersion
                     )
                 )
             }
 
-            guard let selectedCategories = presentImportSelectionDialog() else {
-                showAlert(
-                    title: backupPresentation.importCanceledTitle,
-                    message: backupPresentation.noSettingsImportedMessage
-                )
-                return
-            }
+            try VoiceInkSettingsBackupImportPolicy.importSelectionReview(
+                selectedCategories: presentImportSelectionDialog()
+            ).applyRuntimeState(
+                reportNoSettingsImported: {
+                    showAlert(
+                        title: backupPresentation.importCanceledTitle,
+                        message: backupPresentation.noSettingsImportedMessage
+                    )
+                },
+                reportEmptyCategorySelection: {
+                    showAlert(
+                        title: backupPresentation.importErrorTitle,
+                        message: backupPresentation.emptyCategorySelectionMessage
+                    )
+                },
+                importSelectedCategories: { selectedCategories in
+                    try BackupImporter.apply(
+                        backup,
+                        categories: selectedCategories,
+                        enhancementService: enhancementService,
+                        recordingShortcutManager: recordingShortcutManager,
+                        menuBarManager: menuBarManager,
+                        mediaController: mediaController,
+                        playbackController: playbackController,
+                        soundManager: soundManager,
+                        recorderUIManager: recorderUIManager,
+                        modelContext: modelContext,
+                        transcriptionModelManager: transcriptionModelManager
+                    )
 
-            guard !selectedCategories.isEmpty else {
-                showAlert(
-                    title: backupPresentation.importErrorTitle,
-                    message: backupPresentation.emptyCategorySelectionMessage
-                )
-                return
-            }
-
-            try BackupImporter.apply(
-                backup,
-                categories: selectedCategories,
-                enhancementService: enhancementService,
-                recordingShortcutManager: recordingShortcutManager,
-                menuBarManager: menuBarManager,
-                mediaController: mediaController,
-                playbackController: playbackController,
-                soundManager: soundManager,
-                recorderUIManager: recorderUIManager,
-                modelContext: modelContext,
-                transcriptionModelManager: transcriptionModelManager
-            )
-
-            showImportSuccessAlert(
-                fileName: url.lastPathComponent,
-                categories: selectedCategories
+                    showImportSuccessAlert(
+                        fileName: url.lastPathComponent,
+                        categories: selectedCategories
+                    )
+                }
             )
         } catch {
             showAlert(

@@ -24,6 +24,12 @@ public enum VoiceInkSettingsBackupCategory: String, CaseIterable, Hashable, Send
 }
 
 public enum VoiceInkSettingsBackupImportPolicy {
+    public static let fallbackVersion = "0.0.0"
+
+    public static func currentVersion(bundleShortVersion: String?) -> String {
+        bundleShortVersion ?? fallbackVersion
+    }
+
     public static func categorySummary(for categories: Set<VoiceInkSettingsBackupCategory>) -> String {
         if categories == Set(VoiceInkSettingsBackupCategory.allCases) {
             return "All settings"
@@ -37,6 +43,79 @@ public enum VoiceInkSettingsBackupImportPolicy {
 
     public static func needsAPIKeyReminder(for categories: Set<VoiceInkSettingsBackupCategory>) -> Bool {
         !categories.isDisjoint(with: [.prompts, .powerMode, .customModels])
+    }
+
+    public static func versionReview(
+        importedVersion: String,
+        currentVersion: String
+    ) -> VoiceInkSettingsBackupVersionReview {
+        VoiceInkSettingsBackupVersionReview(
+            importedVersion: importedVersion,
+            currentVersion: currentVersion
+        )
+    }
+
+    public static func importSelectionReview(
+        selectedCategories: Set<VoiceInkSettingsBackupCategory>?
+    ) -> VoiceInkSettingsBackupImportSelectionReview {
+        VoiceInkSettingsBackupImportSelectionReview(
+            selectedCategories: selectedCategories
+        )
+    }
+}
+
+public struct VoiceInkSettingsBackupVersionReview: Equatable, Sendable {
+    public let importedVersion: String
+    public let currentVersion: String
+
+    public var hasMismatch: Bool {
+        importedVersion != currentVersion
+    }
+
+    public init(importedVersion: String, currentVersion: String) {
+        self.importedVersion = importedVersion
+        self.currentVersion = currentVersion
+    }
+
+    public func applyRuntimeState(
+        reportVersionMismatch: (_ importedVersion: String, _ currentVersion: String) -> Void
+    ) {
+        guard hasMismatch else { return }
+        reportVersionMismatch(importedVersion, currentVersion)
+    }
+}
+
+public enum VoiceInkSettingsBackupImportSelectionReview: Equatable, Sendable {
+    case canceled
+    case emptySelection
+    case selected(Set<VoiceInkSettingsBackupCategory>)
+
+    public init(selectedCategories: Set<VoiceInkSettingsBackupCategory>?) {
+        guard let selectedCategories else {
+            self = .canceled
+            return
+        }
+
+        if selectedCategories.isEmpty {
+            self = .emptySelection
+        } else {
+            self = .selected(selectedCategories)
+        }
+    }
+
+    public func applyRuntimeState(
+        reportNoSettingsImported: () -> Void,
+        reportEmptyCategorySelection: () -> Void,
+        importSelectedCategories: (Set<VoiceInkSettingsBackupCategory>) throws -> Void
+    ) rethrows {
+        switch self {
+        case .canceled:
+            reportNoSettingsImported()
+        case .emptySelection:
+            reportEmptyCategorySelection()
+        case .selected(let categories):
+            try importSelectedCategories(categories)
+        }
     }
 }
 

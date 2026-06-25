@@ -185,53 +185,54 @@ class AIEnhancementService: ObservableObject {
             provider: aiService.selectedProvider,
             modelName: aiService.currentModel
         )
-        switch executionPlan.route {
-        case .ollama:
-            do {
-                let result = try await aiService.enhanceWithOllama(
-                    text: formattedText,
-                    systemPrompt: systemMessage,
-                    timeout: VoiceInkAIEnhancementRequestPreference.timeoutSeconds()
-                )
-                return VoiceInkAIEnhancementRequestPayload.enhancedText(from: result)
-            } catch let error as VoiceInkAIEnhancementError {
-                throw error
-            } catch {
-                throw VoiceInkAIEnhancementError.customError(error.localizedDescription)
-            }
 
-        case .localCLI:
-            do {
-                let result = try await aiService.enhanceWithLocalCLI(systemPrompt: systemMessage, userPrompt: formattedText)
-                return VoiceInkAIEnhancementRequestPayload.enhancedText(from: result)
-            } catch {
-                if let localError = error as? VoiceInkLocalCLIExecutionError {
-                    throw VoiceInkAIEnhancementError.customError(localError.errorDescription ?? "An unknown Local CLI error occurred.")
-                } else {
+        return try await executionPlan.applyRuntimeState(
+            ollama: { _ in
+                do {
+                    let result = try await aiService.enhanceWithOllama(
+                        text: formattedText,
+                        systemPrompt: systemMessage,
+                        timeout: VoiceInkAIEnhancementRequestPreference.timeoutSeconds()
+                    )
+                    return VoiceInkAIEnhancementRequestPayload.enhancedText(from: result)
+                } catch let error as VoiceInkAIEnhancementError {
+                    throw error
+                } catch {
                     throw VoiceInkAIEnhancementError.customError(error.localizedDescription)
                 }
-            }
-
-        case .anthropicMessages, .openAICompatibleChatCompletions:
-            try await waitForRateLimit()
-
-            do {
-                let result: String
-                switch executionPlan.route {
-                case .anthropicMessages:
-                    result = try await AnthropicLLMClient.chatCompletion(
+            },
+            localCLI: { _ in
+                do {
+                    let result = try await aiService.enhanceWithLocalCLI(
+                        systemPrompt: systemMessage,
+                        userPrompt: formattedText
+                    )
+                    return VoiceInkAIEnhancementRequestPayload.enhancedText(from: result)
+                } catch {
+                    if let localError = error as? VoiceInkLocalCLIExecutionError {
+                        throw VoiceInkAIEnhancementError.customError(localError.errorDescription ?? "An unknown Local CLI error occurred.")
+                    } else {
+                        throw VoiceInkAIEnhancementError.customError(error.localizedDescription)
+                    }
+                }
+            },
+            anthropicMessages: { modelName in
+                try await executeCloudAIRequest {
+                    try await AnthropicLLMClient.chatCompletion(
                         apiKey: aiService.apiKey,
-                        model: executionPlan.modelName,
+                        model: modelName,
                         messages: [.user(formattedText)],
                         systemPrompt: systemMessage,
                         timeout: VoiceInkAIEnhancementRequestPreference.timeoutSeconds()
                     )
-                case .openAICompatibleChatCompletions:
-                    let requestPlan = try executionPlan.openAICompatibleRequestOrThrow()
-                    result = try await OpenAILLMClient.chatCompletion(
+                }
+            },
+            openAICompatibleChatCompletions: { modelName, requestPlan in
+                try await executeCloudAIRequest {
+                    try await OpenAILLMClient.chatCompletion(
                         baseURL: requestPlan.requestURL,
                         apiKey: aiService.apiKey,
-                        model: executionPlan.modelName,
+                        model: modelName,
                         messages: [.user(formattedText)],
                         systemPrompt: systemMessage,
                         temperature: requestPlan.requestParameters.temperature,
@@ -239,19 +240,25 @@ class AIEnhancementService: ObservableObject {
                         extraBody: requestPlan.requestParameters.extraBodyParameters,
                         timeout: VoiceInkAIEnhancementRequestPreference.timeoutSeconds()
                     )
-                case .ollama, .localCLI:
-                    preconditionFailure("Local AI routes should return before cloud request execution.")
                 }
-                return VoiceInkAIEnhancementRequestPayload.enhancedText(from: result)
-            } catch let error as LLMKitError {
-                throw VoiceInkAIEnhancementError.transportFailure(
-                    error.voiceInkAIEnhancementTransportFailure
-                )
-            } catch let error as VoiceInkAIEnhancementError {
-                throw error
-            } catch {
-                throw VoiceInkAIEnhancementError.customError(error.localizedDescription)
             }
+        )
+    }
+
+    private func executeCloudAIRequest(_ request: () async throws -> String) async throws -> String {
+        try await waitForRateLimit()
+
+        do {
+            let result = try await request()
+            return VoiceInkAIEnhancementRequestPayload.enhancedText(from: result)
+        } catch let error as LLMKitError {
+            throw VoiceInkAIEnhancementError.transportFailure(
+                error.voiceInkAIEnhancementTransportFailure
+            )
+        } catch let error as VoiceInkAIEnhancementError {
+            throw error
+        } catch {
+            throw VoiceInkAIEnhancementError.customError(error.localizedDescription)
         }
     }
 

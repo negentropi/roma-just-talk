@@ -24,8 +24,8 @@ public struct VoiceInkAIEnhancementOpenAICompatibleRequestPlan {
 }
 
 public struct VoiceInkAIEnhancementRequestExecutionPlan {
-    public let route: VoiceInkAIEnhancementExecutionRoute
-    public let modelName: String
+    private let route: VoiceInkAIEnhancementExecutionRoute
+    private let modelName: String
     private let openAICompatibleRequest: VoiceInkAIEnhancementOpenAICompatibleRequestPlan?
     private let requestPreparationError: VoiceInkAIEnhancementError?
 
@@ -68,7 +68,28 @@ public struct VoiceInkAIEnhancementRequestExecutionPlan {
         )
     }
 
-    public func openAICompatibleRequestOrThrow() throws -> VoiceInkAIEnhancementOpenAICompatibleRequestPlan {
+    public func applyRuntimeState<Result>(
+        ollama: (String) async throws -> Result,
+        localCLI: (String) async throws -> Result,
+        anthropicMessages: (String) async throws -> Result,
+        openAICompatibleChatCompletions: (String, VoiceInkAIEnhancementOpenAICompatibleRequestPlan) async throws -> Result
+    ) async throws -> Result {
+        switch route {
+        case .ollama:
+            return try await ollama(modelName)
+        case .localCLI:
+            return try await localCLI(modelName)
+        case .anthropicMessages:
+            return try await anthropicMessages(modelName)
+        case .openAICompatibleChatCompletions:
+            return try await openAICompatibleChatCompletions(
+                modelName,
+                openAICompatibleRequestOrThrow()
+            )
+        }
+    }
+
+    private func openAICompatibleRequestOrThrow() throws -> VoiceInkAIEnhancementOpenAICompatibleRequestPlan {
         if let openAICompatibleRequest {
             return openAICompatibleRequest
         }

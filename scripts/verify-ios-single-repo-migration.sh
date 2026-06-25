@@ -9157,7 +9157,7 @@ require_pattern \
 
 require_pattern \
   "macOS AI enhancement service request URL selection uses shared policy" \
-  'openAICompatibleRequestOrThrow|requestPlan\.requestURL' \
+  'openAICompatibleChatCompletions:|requestPlan\.requestURL' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
 require_pattern \
@@ -9240,12 +9240,22 @@ require_pattern \
 
 require_pattern \
   "shared AI enhancement execution route policy lives in VoiceInkCore" \
-  'VoiceInkAIEnhancementExecutionRoute|VoiceInkAIEnhancementRequestExecutionPlan|textEnhancementExecutionRoute|openAICompatibleRequestOrThrow' \
+  'VoiceInkAIEnhancementExecutionRoute|VoiceInkAIEnhancementRequestExecutionPlan|textEnhancementExecutionRoute|applyRuntimeState' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+reject_pattern \
+  "shared AI enhancement request execution plan hides raw route payload" \
+  'public let route|public let modelName|public func openAICompatibleRequestOrThrow' \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 require_pattern \
   "macOS AI enhancement service execution routing uses shared policy" \
-  'VoiceInkAIEnhancementRequestExecutionPlan\.planning|executionPlan\.route|openAICompatibleRequestOrThrow' \
+  'VoiceInkAIEnhancementRequestExecutionPlan\.planning|executionPlan\.applyRuntimeState|executeCloudAIRequest' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+reject_pattern \
+  "macOS AI enhancement service avoids raw execution route switch" \
+  'switch executionPlan\.route|executionPlan\.route|openAICompatibleRequestOrThrow|preconditionFailure\("Local AI routes should return before cloud request execution\."\)' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
 require_pattern \
@@ -9257,6 +9267,11 @@ require_pattern \
   "macOS AI enhancement request tuning uses shared execution plan" \
   'requestPlan\.requestParameters\.(temperature|reasoningEffort|extraBodyParameters)' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+reject_pattern \
+  "core AI enhancement execution tests avoid raw request-plan escape hatch" \
+  '\.route|openAICompatibleRequestOrThrow' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AIProviderCatalogTests.swift
 
 require_pattern \
   "macOS AI enhancement service reads shared timeout preference directly" \

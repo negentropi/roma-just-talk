@@ -1563,8 +1563,8 @@ final class AIProviderCatalogTests: XCTestCase {
         }
     }
 
-    func testMacOSAIEnhancementRequestURLSelectionIsShared() {
-        withIsolatedDefaults { defaults in
+    func testMacOSAIEnhancementRequestURLSelectionIsShared() async {
+        await withIsolatedDefaultsAsync { defaults in
             XCTAssertEqual(
                 VoiceInkAIEnhancementProviderKind.groq.textEnhancementRequestURLString(from: defaults),
                 VoiceInkAIModelProvider.groq.postProcessingRequestURL?.absoluteString
@@ -1614,7 +1614,7 @@ final class AIProviderCatalogTests: XCTestCase {
             )
 
             do {
-                _ = try invalidCustomPlan.openAICompatibleRequestOrThrow()
+                _ = try await openAICompatibleRequestPlan(for: invalidCustomPlan)
                 XCTFail("Expected invalid custom endpoint to throw")
             } catch {
                 XCTAssertEqual(
@@ -1634,11 +1634,11 @@ final class AIProviderCatalogTests: XCTestCase {
             )
 
             do {
-                let customRequestPlan = try customPlan.openAICompatibleRequestOrThrow()
-                XCTAssertEqual(customRequestPlan.requestURL.absoluteString, "https://api.example.com/v1/chat/completions")
-                XCTAssertEqual(customRequestPlan.requestParameters.temperature, 0.3)
-                XCTAssertNil(customRequestPlan.requestParameters.reasoningEffort)
-                XCTAssertNil(customRequestPlan.requestParameters.extraBodyParameters)
+                let customRequestPlan = try await openAICompatibleRequestPlan(for: customPlan)
+                XCTAssertEqual(customRequestPlan?.requestURL.absoluteString, "https://api.example.com/v1/chat/completions")
+                XCTAssertEqual(customRequestPlan?.requestParameters.temperature, 0.3)
+                XCTAssertNil(customRequestPlan?.requestParameters.reasoningEffort)
+                XCTAssertNil(customRequestPlan?.requestParameters.extraBodyParameters)
             } catch {
                 XCTFail("Expected valid custom endpoint to produce a request plan")
             }
@@ -1846,7 +1846,7 @@ final class AIProviderCatalogTests: XCTestCase {
         }
     }
 
-    func testMacOSAIEnhancementExecutionRoutesAreShared() {
+    func testMacOSAIEnhancementExecutionRoutesAreShared() async throws {
         let expectedRoutes: [VoiceInkAIEnhancementProviderKind: VoiceInkAIEnhancementExecutionRoute] = [
             .anthropic: .anthropicMessages,
             .assemblyAI: .openAICompatibleChatCompletions,
@@ -1871,28 +1871,52 @@ final class AIProviderCatalogTests: XCTestCase {
             XCTAssertEqual(provider.textEnhancementExecutionRoute, route)
         }
 
-        XCTAssertEqual(
-            VoiceInkAIEnhancementRequestExecutionPlan.planning(provider: .ollama, modelName: "mistral").route,
-            .ollama
+        let ollamaSummary = try await executionSummary(
+            for: VoiceInkAIEnhancementRequestExecutionPlan.planning(provider: .ollama, modelName: "mistral")
         )
-        XCTAssertEqual(
-            VoiceInkAIEnhancementRequestExecutionPlan.planning(provider: .localCLI, modelName: "local-cli").route,
-            .localCLI
+        XCTAssertEqual(ollamaSummary, "ollama:mistral")
+
+        let localCLISummary = try await executionSummary(
+            for: VoiceInkAIEnhancementRequestExecutionPlan.planning(provider: .localCLI, modelName: "local-cli")
         )
-        XCTAssertEqual(
-            VoiceInkAIEnhancementRequestExecutionPlan.planning(provider: .anthropic, modelName: "claude-sonnet-4-5").route,
-            .anthropicMessages
+        XCTAssertEqual(localCLISummary, "localCLI:local-cli")
+
+        let anthropicSummary = try await executionSummary(
+            for: VoiceInkAIEnhancementRequestExecutionPlan.planning(provider: .anthropic, modelName: "claude-sonnet-4-5")
         )
+        XCTAssertEqual(anthropicSummary, "anthropicMessages:claude-sonnet-4-5")
 
         let groqPlan = VoiceInkAIEnhancementRequestExecutionPlan.planning(
             provider: .groq,
             modelName: "openai/gpt-oss-120b"
         )
-        let groqRequestPlan = try? groqPlan.openAICompatibleRequestOrThrow()
+        let groqRequestPlan = try await openAICompatibleRequestPlan(for: groqPlan)
         XCTAssertEqual(groqRequestPlan?.requestURL.absoluteString, VoiceInkAIModelProvider.groq.postProcessingRequestURL?.absoluteString)
         XCTAssertEqual(groqRequestPlan?.requestParameters.temperature, 0.3)
         XCTAssertEqual(groqRequestPlan?.requestParameters.reasoningEffort, "low")
         XCTAssertEqual(groqRequestPlan?.requestParameters.extraBodyParameters?["include_reasoning"] as? Bool, false)
+    }
+
+    private func executionSummary(for plan: VoiceInkAIEnhancementRequestExecutionPlan) async throws -> String {
+        try await plan.applyRuntimeState(
+            ollama: { modelName in "ollama:\(modelName)" },
+            localCLI: { modelName in "localCLI:\(modelName)" },
+            anthropicMessages: { modelName in "anthropicMessages:\(modelName)" },
+            openAICompatibleChatCompletions: { modelName, requestPlan in
+                "openAICompatibleChatCompletions:\(modelName):\(requestPlan.requestURL.absoluteString)"
+            }
+        )
+    }
+
+    private func openAICompatibleRequestPlan(
+        for plan: VoiceInkAIEnhancementRequestExecutionPlan
+    ) async throws -> VoiceInkAIEnhancementOpenAICompatibleRequestPlan? {
+        try await plan.applyRuntimeState(
+            ollama: { _ in nil },
+            localCLI: { _ in nil },
+            anthropicMessages: { _ in nil },
+            openAICompatibleChatCompletions: { _, requestPlan in requestPlan }
+        )
     }
 
     func testMacOSAIEnhancementRequestURLsAreShared() {
@@ -1967,5 +1991,19 @@ final class AIProviderCatalogTests: XCTestCase {
         }
 
         run(defaults)
+    }
+
+    private func withIsolatedDefaultsAsync(_ run: (UserDefaults) async -> Void) async {
+        let suiteName = "VoiceInkCore.AIProviderCatalogTests.\(UUID().uuidString)"
+        guard let defaults = UserDefaults(suiteName: suiteName) else {
+            XCTFail("Unable to create isolated defaults")
+            return
+        }
+
+        defer {
+            defaults.removePersistentDomain(forName: suiteName)
+        }
+
+        await run(defaults)
     }
 }

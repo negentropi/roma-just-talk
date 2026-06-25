@@ -11421,9 +11421,19 @@ require_pattern \
   'VoiceInkAudioPlaybackTimerTickPlan|VoiceInkAudioPlaybackTimerTickAction|applyRuntimeState' \
   VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
 
+require_pattern \
+  "shared audio player tick plan hides raw tick time payload" \
+  'fileprivate let tickCurrentTime' \
+  VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
+
 reject_pattern \
   "shared audio player tick plan avoids shallow public side-effect hints" \
   'shouldStopTimer|playerSeekTime' \
+  VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
+
+reject_pattern \
+  "shared audio player tick plan avoids public raw tick time interface" \
+  'public let tickCurrentTime' \
   VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
 
 reject_pattern \
@@ -11465,6 +11475,11 @@ require_pattern \
   "core checks execute audio player timer tick runtime application test" \
   'AudioPlaybackTimelineTests\.testTimerTickPlanAppliesRuntimeStateInOrder' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "core audio player timer tick tests avoid raw timer plan payload reads" \
+  'VoiceInkAudioPlaybackTimerTickPlan.*\.currentTime|^[[:space:]]*\.currentTime,' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AudioPlaybackTimelineTests.swift
 
 require_pattern \
   "core checks execute audio player state plan tests" \

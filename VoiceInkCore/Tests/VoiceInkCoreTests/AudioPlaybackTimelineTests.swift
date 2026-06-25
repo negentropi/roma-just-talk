@@ -93,8 +93,10 @@ final class AudioPlaybackTimelineTests: XCTestCase {
         )
 
         XCTAssertEqual(
-            VoiceInkAudioPlaybackTimerTickPlan.macOS(currentTime: 4, duration: 10).currentTime,
-            4
+            playingState.applyingTimerTickPlan(
+                VoiceInkAudioPlaybackTimerTickPlan.macOS(currentTime: 4, duration: 10)
+            ),
+            VoiceInkAudioPlaybackState(isPlaying: true, currentTime: 4, duration: 10, playbackRate: 1)
         )
         XCTAssertEqual(
             playingState.applyingTimerTickPlan(
@@ -113,9 +115,14 @@ final class AudioPlaybackTimelineTests: XCTestCase {
             VoiceInkAudioPlaybackState(isPlaying: false, currentTime: 9.5, duration: 10, playbackRate: 1)
         )
         XCTAssertEqual(
-            VoiceInkAudioPlaybackTimerTickPlan.iOS(currentTime: 9.5, playerIsPlaying: false, shellIsPlaying: false)
-                .currentTime,
-            9.5
+            playingState.applyingTimerTickPlan(
+                VoiceInkAudioPlaybackTimerTickPlan.iOS(
+                    currentTime: 9.5,
+                    playerIsPlaying: false,
+                    shellIsPlaying: false
+                )
+            ),
+            VoiceInkAudioPlaybackState(isPlaying: true, currentTime: 9.5, duration: 10, playbackRate: 1)
         )
     }
 

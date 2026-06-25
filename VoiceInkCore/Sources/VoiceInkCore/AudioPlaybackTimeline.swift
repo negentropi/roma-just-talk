@@ -90,14 +90,14 @@ enum VoiceInkAudioPlaybackTimerTickAction: Equatable, Sendable {
 }
 
 public struct VoiceInkAudioPlaybackTimerTickPlan: Equatable, Sendable {
-    public let currentTime: TimeInterval
-    let action: VoiceInkAudioPlaybackTimerTickAction
+    fileprivate let tickCurrentTime: TimeInterval
+    fileprivate let action: VoiceInkAudioPlaybackTimerTickAction
 
     init(
         currentTime: TimeInterval,
         action: VoiceInkAudioPlaybackTimerTickAction
     ) {
-        self.currentTime = currentTime
+        self.tickCurrentTime = currentTime
         self.action = action
     }
 
@@ -194,7 +194,7 @@ public struct VoiceInkAudioPlaybackState: Equatable, Sendable {
     }
 
     public func applyingTimerTickPlan(_ plan: VoiceInkAudioPlaybackTimerTickPlan) -> VoiceInkAudioPlaybackState {
-        let updatedState = updatingCurrentTime(plan.currentTime)
+        let updatedState = updatingCurrentTime(plan.tickCurrentTime)
 
         switch plan.action {
         case .none:

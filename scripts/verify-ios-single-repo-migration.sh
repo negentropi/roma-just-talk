@@ -2452,6 +2452,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AudioInputPriorityPolicy.swift
 
 require_pattern \
+  "shared macOS audio input diagnostics live in VoiceInkCore" \
+  'VoiceInkAudioInputDiagnostics|systemDefaultDeviceLookupFailedMessage|savedDeviceUnavailableMessage|autoSelectingNewDeviceMessage|audioDevicesLoadFailedMessage|inputCapabilityCheckFailedMessage|streamConfigurationLoadFailedMessage|safeFallbackDeviceSelectedMessage|unsafeAutomaticDeviceRefusedMessage|recordingDeviceUnavailableMessage|devicePropertyLookupFailedMessage|transportTypeLookupFailedMessage' \
+  VoiceInkCore/Sources/VoiceInkCore/AudioInputPriorityPolicy.swift
+
+require_pattern \
   "shared macOS audio input settings presentation lives in VoiceInkCore" \
   'VoiceInkMacOSAudioInputSettingsPresentation|heroTitle|prioritizedDevicesDescription|priorityDisplayText|switchedDeviceNotificationTitle|usingDeviceNotificationTitle' \
   VoiceInkCore/Sources/VoiceInkCore/AudioInputPriorityPolicy.swift
@@ -2460,6 +2465,7 @@ require_patterns \
   "core audio input automatic selection tests are in runner" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
   'testMacOSAudioDeviceChangeRequestPreservesNotificationContract' \
+  'testAudioInputDiagnosticsPreserveMacOSLogCopy' \
   'testMacOSAudioInputSettingsPresentationPreservesCopyAndIcons' \
   'testAutomaticSelectionPolicyPreservesBuiltInDetection' \
   'testAutomaticSelectionPolicyRefusesUnsafeAutomaticDevices' \
@@ -2491,6 +2497,12 @@ require_pattern \
   "macOS audio device manager uses shared audio input preference storage" \
   'VoiceInkAudioInputPreference\.(selectedDeviceUID|saveSelectedDeviceUID|clearSelectedDeviceUID|prioritizedDevices|savePrioritizedDevices)' \
   VoiceInk/Services/AudioDeviceManager.swift
+
+require_patterns \
+  "macOS audio device manager uses shared diagnostics and log category identity" \
+  VoiceInk/Services/AudioDeviceManager.swift \
+  'VoiceInkAudioInputDiagnostics\.' \
+  'category: VoiceInkMacOSLogCategory\.audioDeviceManager'
 
 require_patterns \
   "macOS audio device manager uses shared audio device change request" \
@@ -2559,6 +2571,11 @@ reject_pattern \
   VoiceInk/Recorder.swift
 
 reject_pattern \
+  "macOS audio device manager avoids shell-owned diagnostics and log category" \
+  'category: "AudioDeviceManager"|"Failed to get system default device:|"🎙️ Using System Default mode"|"🎙️ Saved device UID|"🎙️ Current device unavailable, selecting new device\.\.\."|"No input devices available!"|"Unknown Device"|"🎙️ Auto-selecting new device:|"Error getting audio devices:|"🎙️ Currently selected device is no longer available"|"Error checking input capability for device|"Error getting stream configuration for device|"Attempted to select unavailable device:|"🎙️ Selected prioritized device:|"🎙️ No built-in input found, auto-selecting safe non-Bluetooth device:|"🎙️ No safe automatic input found; refusing to auto-select|"Failed to add device change listener:|"🎙️ Device list change detected"|"🎙️ Recording device|"🎙️ No priority devices available, using fallback"|"No audio input devices available!"|"Failed to get device property|"Failed to get transport type for device' \
+  VoiceInk/Services/AudioDeviceManager.swift
+
+reject_pattern \
   "macOS audio device shell avoids duplicate notification contracts" \
   '(NS)?Notification\.Name\("AudioDeviceChanged"\)|Notification\.Name\("audioDeviceSwitchRequired"\)|\["newDeviceID"\]|userInfo\["newDeviceID"\]' \
   VoiceInk/Services/AudioDeviceManager.swift \
@@ -2577,7 +2594,7 @@ reject_pattern \
 
 require_pattern \
   "migration checklist tracks shared audio input preference gate" \
-  'macOS audio-input storage keys, selected-device UID persistence, last-used microphone notification suppression, priority-device JSON storage, audio-device change/switch notification contract, settings labels, status copy, empty states, action icons, priority display text, microphone notification title copy, current-device and mode-change selection planning, recording-device switch planning, and safe automatic input selection route through `VoiceInkAudioInputPreference`/`VoiceInkMacOSAudioDeviceChangeRequest`/`VoiceInkMacOSAudioInputSettingsPresentation`/`VoiceInkAudioInputSelectionPolicy`/`VoiceInkAudioInputAutomaticSelectionPolicy`' \
+  'macOS audio-input storage keys, selected-device UID persistence, last-used microphone notification suppression, priority-device JSON storage, audio-device change/switch notification contract, settings labels, status copy, empty states, action icons, priority display text, microphone notification title copy, manager diagnostic copy/category identity, current-device and mode-change selection planning, recording-device switch planning, and safe automatic input selection route through `VoiceInkAudioInputPreference`/`VoiceInkMacOSAudioDeviceChangeRequest`/`VoiceInkMacOSAudioInputSettingsPresentation`/`VoiceInkAudioInputDiagnostics`/`VoiceInkMacOSLogCategory`/`VoiceInkAudioInputSelectionPolicy`/`VoiceInkAudioInputAutomaticSelectionPolicy`' \
   docs/ios-single-repo-migration.md
 
 reject_pattern \
@@ -16852,7 +16869,8 @@ require_patterns \
   'audioTranscriptionService = "AudioTranscriptionService"' \
   'coreAudioRecorder = "CoreAudioRecorder"' \
   'whisperTranscriptionService = "WhisperTranscriptionService"' \
-  'whisperModelManager = "WhisperModelManager"'
+  'whisperModelManager = "WhisperModelManager"' \
+  'audioDeviceManager = "AudioDeviceManager"'
 
 require_pattern \
   "macOS window manager uses shared log category identity" \

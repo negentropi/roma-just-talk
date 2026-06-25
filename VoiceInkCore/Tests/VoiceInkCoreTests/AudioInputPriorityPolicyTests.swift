@@ -81,6 +81,79 @@ final class AudioInputPriorityPolicyTests: XCTestCase {
         )
     }
 
+    func testAudioInputDiagnosticsPreserveMacOSLogCopy() {
+        XCTAssertEqual(VoiceInkAudioInputDiagnostics.unknownDeviceName, "Unknown Device")
+        XCTAssertEqual(VoiceInkAudioInputDiagnostics.systemDefaultModeMessage, "🎙️ Using System Default mode")
+        XCTAssertEqual(
+            VoiceInkAudioInputDiagnostics.systemDefaultDeviceLookupFailedMessage(status: -1),
+            "Failed to get system default device: -1"
+        )
+        XCTAssertEqual(
+            VoiceInkAudioInputDiagnostics.savedDeviceUnavailableMessage(uid: "old-uid"),
+            "🎙️ Saved device UID old-uid is no longer available"
+        )
+        XCTAssertEqual(
+            VoiceInkAudioInputDiagnostics.currentDeviceUnavailableSelectingNewDeviceMessage,
+            "🎙️ Current device unavailable, selecting new device..."
+        )
+        XCTAssertEqual(VoiceInkAudioInputDiagnostics.noInputDevicesAvailableMessage, "No input devices available!")
+        XCTAssertEqual(
+            VoiceInkAudioInputDiagnostics.autoSelectingNewDeviceMessage(name: "Studio Mic"),
+            "🎙️ Auto-selecting new device: Studio Mic"
+        )
+        XCTAssertEqual(
+            VoiceInkAudioInputDiagnostics.audioDevicesLoadFailedMessage(status: -2),
+            "Error getting audio devices: -2"
+        )
+        XCTAssertEqual(VoiceInkAudioInputDiagnostics.currentDeviceUnavailableMessage, "🎙️ Currently selected device is no longer available")
+        XCTAssertEqual(
+            VoiceInkAudioInputDiagnostics.inputCapabilityCheckFailedMessage(deviceID: 42, status: -3),
+            "Error checking input capability for device 42: -3"
+        )
+        XCTAssertEqual(
+            VoiceInkAudioInputDiagnostics.streamConfigurationLoadFailedMessage(deviceID: 43, status: -4),
+            "Error getting stream configuration for device 43: -4"
+        )
+        XCTAssertEqual(
+            VoiceInkAudioInputDiagnostics.unavailableDeviceSelectionAttemptedMessage(deviceID: 44),
+            "Attempted to select unavailable device: 44"
+        )
+        XCTAssertEqual(
+            VoiceInkAudioInputDiagnostics.selectedPrioritizedDeviceMessage(name: "USB Mic"),
+            "🎙️ Selected prioritized device: USB Mic"
+        )
+        XCTAssertEqual(
+            VoiceInkAudioInputDiagnostics.safeFallbackDeviceSelectedMessage(name: "USB Mic"),
+            "🎙️ No built-in input found, auto-selecting safe non-Bluetooth device: USB Mic"
+        )
+        XCTAssertEqual(
+            VoiceInkAudioInputDiagnostics.unsafeAutomaticDeviceRefusedMessage(name: "AirPods"),
+            "🎙️ No safe automatic input found; refusing to auto-select AirPods"
+        )
+        XCTAssertEqual(
+            VoiceInkAudioInputDiagnostics.deviceChangeListenerAddFailedMessage(status: -5),
+            "Failed to add device change listener: -5"
+        )
+        XCTAssertEqual(VoiceInkAudioInputDiagnostics.deviceListChangeDetectedMessage, "🎙️ Device list change detected")
+        XCTAssertEqual(
+            VoiceInkAudioInputDiagnostics.recordingDeviceUnavailableMessage(deviceID: 45),
+            "🎙️ Recording device 45 no longer available - requesting switch"
+        )
+        XCTAssertEqual(
+            VoiceInkAudioInputDiagnostics.noPriorityDevicesAvailableFallbackMessage,
+            "🎙️ No priority devices available, using fallback"
+        )
+        XCTAssertEqual(VoiceInkAudioInputDiagnostics.noAudioInputDevicesAvailableMessage, "No audio input devices available!")
+        XCTAssertEqual(
+            VoiceInkAudioInputDiagnostics.devicePropertyLookupFailedMessage(selector: 46, deviceID: 47, status: -6),
+            "Failed to get device property 46 for device 47: -6"
+        )
+        XCTAssertEqual(
+            VoiceInkAudioInputDiagnostics.transportTypeLookupFailedMessage(deviceID: 48, status: -7),
+            "Failed to get transport type for device 48: -7"
+        )
+    }
+
     func testAudioInputModePreservesSettingsPresentation() {
         XCTAssertEqual(VoiceInkAudioInputMode.systemDefault.title, "System Default")
         XCTAssertEqual(VoiceInkAudioInputMode.systemDefault.iconSystemName, "display")

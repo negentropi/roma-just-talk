@@ -151,6 +151,73 @@ public enum VoiceInkMacOSAudioDeviceChangeRequest {
     }
 }
 
+public enum VoiceInkAudioInputDiagnostics {
+    public static let unknownDeviceName = "Unknown Device"
+    public static let systemDefaultModeMessage = "🎙️ Using System Default mode"
+    public static let currentDeviceUnavailableSelectingNewDeviceMessage = "🎙️ Current device unavailable, selecting new device..."
+    public static let currentDeviceUnavailableMessage = "🎙️ Currently selected device is no longer available"
+    public static let noInputDevicesAvailableMessage = "No input devices available!"
+    public static let noAudioInputDevicesAvailableMessage = "No audio input devices available!"
+    public static let deviceListChangeDetectedMessage = "🎙️ Device list change detected"
+    public static let noPriorityDevicesAvailableFallbackMessage = "🎙️ No priority devices available, using fallback"
+
+    public static func systemDefaultDeviceLookupFailedMessage(status: Int32) -> String {
+        "Failed to get system default device: \(status)"
+    }
+
+    public static func savedDeviceUnavailableMessage(uid: String) -> String {
+        "🎙️ Saved device UID \(uid) is no longer available"
+    }
+
+    public static func autoSelectingNewDeviceMessage(name: String) -> String {
+        "🎙️ Auto-selecting new device: \(name)"
+    }
+
+    public static func audioDevicesLoadFailedMessage(status: Int32) -> String {
+        "Error getting audio devices: \(status)"
+    }
+
+    public static func inputCapabilityCheckFailedMessage(deviceID: UInt32, status: Int32) -> String {
+        "Error checking input capability for device \(deviceID): \(status)"
+    }
+
+    public static func streamConfigurationLoadFailedMessage(deviceID: UInt32, status: Int32) -> String {
+        "Error getting stream configuration for device \(deviceID): \(status)"
+    }
+
+    public static func unavailableDeviceSelectionAttemptedMessage(deviceID: UInt32) -> String {
+        "Attempted to select unavailable device: \(deviceID)"
+    }
+
+    public static func selectedPrioritizedDeviceMessage(name: String) -> String {
+        "🎙️ Selected prioritized device: \(name)"
+    }
+
+    public static func safeFallbackDeviceSelectedMessage(name: String) -> String {
+        "🎙️ No built-in input found, auto-selecting safe non-Bluetooth device: \(name)"
+    }
+
+    public static func unsafeAutomaticDeviceRefusedMessage(name: String) -> String {
+        "🎙️ No safe automatic input found; refusing to auto-select \(name)"
+    }
+
+    public static func deviceChangeListenerAddFailedMessage(status: Int32) -> String {
+        "Failed to add device change listener: \(status)"
+    }
+
+    public static func recordingDeviceUnavailableMessage(deviceID: UInt32) -> String {
+        "🎙️ Recording device \(deviceID) no longer available - requesting switch"
+    }
+
+    public static func devicePropertyLookupFailedMessage(selector: UInt32, deviceID: UInt32, status: Int32) -> String {
+        "Failed to get device property \(selector) for device \(deviceID): \(status)"
+    }
+
+    public static func transportTypeLookupFailedMessage(deviceID: UInt32, status: Int32) -> String {
+        "Failed to get transport type for device \(deviceID): \(status)"
+    }
+}
+
 public enum VoiceInkAudioInputPriorityMoveDirection: Equatable, Sendable {
     case up
     case down

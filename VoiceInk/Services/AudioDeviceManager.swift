@@ -5,7 +5,10 @@ import os
 import VoiceInkCore
 
 class AudioDeviceManager: ObservableObject {
-    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "AudioDeviceManager")
+    private let logger = Logger(
+        subsystem: VoiceInkAppIdentity.loggingSubsystem,
+        category: VoiceInkMacOSLogCategory.audioDeviceManager
+    )
     @Published var availableDevices: [(id: AudioDeviceID, uid: String, name: String)] = []
     @Published var selectedDeviceID: AudioDeviceID?
     @Published var inputMode: VoiceInkAudioInputMode = .defaultMode
@@ -46,7 +49,7 @@ class AudioDeviceManager: ObservableObject {
         )
 
         guard status == noErr, deviceID != 0 else {
-            logger.error("Failed to get system default device: \(status, privacy: .public)")
+            logger.error("\(VoiceInkAudioInputDiagnostics.systemDefaultDeviceLookupFailedMessage(status: status), privacy: .public)")
             return nil
         }
         return deviceID
@@ -60,7 +63,7 @@ class AudioDeviceManager: ObservableObject {
     private func initializeSelectedDevice() {
         switch inputMode {
         case .systemDefault:
-            logger.notice("🎙️ Using System Default mode")
+            logger.notice("\(VoiceInkAudioInputDiagnostics.systemDefaultModeMessage, privacy: .public)")
         case .prioritized:
             selectHighestPriorityAvailableDevice()
         case .custom:
@@ -68,7 +71,7 @@ class AudioDeviceManager: ObservableObject {
                 if let device = availableDevices.first(where: { $0.uid == savedUID }) {
                     selectedDeviceID = device.id
                 } else {
-                    logger.warning("🎙️ Saved device UID \(savedUID, privacy: .public) is no longer available")
+                    logger.warning("\(VoiceInkAudioInputDiagnostics.savedDeviceUnavailableMessage(uid: savedUID), privacy: .public)")
                     VoiceInkAudioInputPreference.clearSelectedDeviceUID()
                     fallbackToDefaultDevice()
                 }
@@ -83,17 +86,17 @@ class AudioDeviceManager: ObservableObject {
     }
     
     private func fallbackToDefaultDevice() {
-        logger.notice("🎙️ Current device unavailable, selecting new device...")
+        logger.notice("\(VoiceInkAudioInputDiagnostics.currentDeviceUnavailableSelectingNewDeviceMessage, privacy: .public)")
 
         guard let newDeviceID = findBestAvailableDevice() else {
-            logger.error("No input devices available!")
+            logger.error("\(VoiceInkAudioInputDiagnostics.noInputDevicesAvailableMessage, privacy: .public)")
             selectedDeviceID = nil
             notifyDeviceChange()
             return
         }
 
-        let newDeviceName = getDeviceName(deviceID: newDeviceID) ?? "Unknown Device"
-        logger.notice("🎙️ Auto-selecting new device: \(newDeviceName, privacy: .public)")
+        let newDeviceName = getDeviceName(deviceID: newDeviceID) ?? VoiceInkAudioInputDiagnostics.unknownDeviceName
+        logger.notice("\(VoiceInkAudioInputDiagnostics.autoSelectingNewDeviceMessage(name: newDeviceName), privacy: .public)")
         selectDevice(id: newDeviceID)
     }
 
@@ -138,7 +141,7 @@ class AudioDeviceManager: ObservableObject {
         )
         
         if result != noErr {
-            logger.error("Error getting audio devices: \(result, privacy: .public)")
+            logger.error("\(VoiceInkAudioInputDiagnostics.audioDevicesLoadFailedMessage(status: result), privacy: .public)")
             return
         }
         
@@ -155,7 +158,7 @@ class AudioDeviceManager: ObservableObject {
             guard let self = self else { return }
             self.availableDevices = devices.map { ($0.id, $0.uid, $0.name) }
             if let currentID = self.selectedDeviceID, !devices.contains(where: { $0.id == currentID }) {
-                self.logger.warning("🎙️ Currently selected device is no longer available")
+                self.logger.warning("\(VoiceInkAudioInputDiagnostics.currentDeviceUnavailableMessage, privacy: .public)")
                 if !self.isRecordingActive {
                     if self.inputMode == .prioritized {
                         self.selectHighestPriorityAvailableDevice()
@@ -191,7 +194,7 @@ class AudioDeviceManager: ObservableObject {
         )
 
         if result != noErr {
-            logger.error("Error checking input capability for device \(deviceID, privacy: .public): \(result, privacy: .public)")
+            logger.error("\(VoiceInkAudioInputDiagnostics.inputCapabilityCheckFailedMessage(deviceID: deviceID, status: result), privacy: .public)")
             return false
         }
 
@@ -208,7 +211,7 @@ class AudioDeviceManager: ObservableObject {
         )
 
         if result != noErr {
-            logger.error("Error getting stream configuration for device \(deviceID, privacy: .public): \(result, privacy: .public)")
+            logger.error("\(VoiceInkAudioInputDiagnostics.streamConfigurationLoadFailedMessage(deviceID: deviceID, status: result), privacy: .public)")
             return false
         }
 
@@ -225,7 +228,7 @@ class AudioDeviceManager: ObservableObject {
                 self.notifyDeviceChange()
             }
         } else {
-            logger.error("Attempted to select unavailable device: \(id, privacy: .public)")
+            logger.error("\(VoiceInkAudioInputDiagnostics.unavailableDeviceSelectionAttemptedMessage(deviceID: id), privacy: .public)")
             fallbackToDefaultDevice()
         }
     }
@@ -241,7 +244,7 @@ class AudioDeviceManager: ObservableObject {
                 self.notifyDeviceChange()
             }
         } else {
-            logger.error("Attempted to select unavailable device: \(id, privacy: .public)")
+            logger.error("\(VoiceInkAudioInputDiagnostics.unavailableDeviceSelectionAttemptedMessage(deviceID: id), privacy: .public)")
             fallbackToDefaultDevice()
         }
     }
@@ -332,7 +335,7 @@ class AudioDeviceManager: ObservableObject {
     private func selectHighestPriorityAvailableDevice() {
         if let priorityDevice = firstAvailablePriorityDevice() {
             selectedDeviceID = priorityDevice.id
-            logger.notice("🎙️ Selected prioritized device: \(priorityDevice.name, privacy: .public)")
+            logger.notice("\(VoiceInkAudioInputDiagnostics.selectedPrioritizedDeviceMessage(name: priorityDevice.name), privacy: .public)")
             notifyDeviceChange()
             return
         }
@@ -352,11 +355,11 @@ class AudioDeviceManager: ObservableObject {
         case .safeFallback:
             if let deviceID = selection.deviceID,
                let safeDevice = availableDevices.first(where: { $0.id == deviceID }) {
-                logger.warning("🎙️ No built-in input found, auto-selecting safe non-Bluetooth device: \(safeDevice.name, privacy: .public)")
+                logger.warning("\(VoiceInkAudioInputDiagnostics.safeFallbackDeviceSelectedMessage(name: safeDevice.name), privacy: .public)")
             }
         case .unavailable:
             if let firstDevice = availableDevices.first {
-                logger.warning("🎙️ No safe automatic input found; refusing to auto-select \(firstDevice.name, privacy: .public)")
+                logger.warning("\(VoiceInkAudioInputDiagnostics.unsafeAutomaticDeviceRefusedMessage(name: firstDevice.name), privacy: .public)")
             }
         }
 
@@ -434,12 +437,12 @@ class AudioDeviceManager: ObservableObject {
         )
         
         if status != noErr {
-            logger.error("Failed to add device change listener: \(status, privacy: .public)")
+            logger.error("\(VoiceInkAudioInputDiagnostics.deviceChangeListenerAddFailedMessage(status: status), privacy: .public)")
         }
     }
     
     private func handleDeviceListChange() {
-        logger.notice("🎙️ Device list change detected")
+        logger.notice("\(VoiceInkAudioInputDiagnostics.deviceListChangeDetectedMessage, privacy: .public)")
 
         loadAvailableDevices { [weak self] in
             guard let self = self else { return }
@@ -453,11 +456,11 @@ class AudioDeviceManager: ObservableObject {
                 guard let currentID = self.selectedDeviceID else { return }
 
                 if !self.isDeviceAvailable(currentID) {
-                    self.logger.warning("🎙️ Recording device \(currentID, privacy: .public) no longer available - requesting switch")
+                    self.logger.warning("\(VoiceInkAudioInputDiagnostics.recordingDeviceUnavailableMessage(deviceID: currentID), privacy: .public)")
 
                     let priorityDeviceID = self.inputMode == .prioritized ? self.firstAvailablePriorityDevice()?.id : nil
                     if self.inputMode == .prioritized && priorityDeviceID == nil {
-                        self.logger.warning("🎙️ No priority devices available, using fallback")
+                        self.logger.warning("\(VoiceInkAudioInputDiagnostics.noPriorityDevicesAvailableFallbackMessage, privacy: .public)")
                     }
                     let automaticDeviceID = priorityDeviceID == nil ? self.findBestAvailableDevice() : nil
                     let switchPlan = VoiceInkAudioInputSelectionPolicy.recordingSwitchPlan(
@@ -474,7 +477,7 @@ class AudioDeviceManager: ObservableObject {
                             userInfo: VoiceInkMacOSAudioDeviceChangeRequest.switchRequiredUserInfo(deviceID: deviceID)
                         )
                     } else {
-                        self.logger.error("No audio input devices available!")
+                        self.logger.error("\(VoiceInkAudioInputDiagnostics.noAudioInputDevicesAvailableMessage, privacy: .public)")
                         NotificationCenter.default.post(name: .toggleMiniRecorder, object: nil)
                     }
                 }
@@ -543,7 +546,7 @@ class AudioDeviceManager: ObservableObject {
         )
         
         if status != noErr {
-            logger.error("Failed to get device property \(selector, privacy: .public) for device \(deviceID, privacy: .public): \(status, privacy: .public)")
+            logger.error("\(VoiceInkAudioInputDiagnostics.devicePropertyLookupFailedMessage(selector: selector, deviceID: deviceID, status: status), privacy: .public)")
             return nil
         }
         
@@ -565,7 +568,7 @@ class AudioDeviceManager: ObservableObject {
         )
 
         if status != noErr {
-            logger.error("Failed to get transport type for device \(deviceID, privacy: .public): \(status, privacy: .public)")
+            logger.error("\(VoiceInkAudioInputDiagnostics.transportTypeLookupFailedMessage(deviceID: deviceID, status: status), privacy: .public)")
             return nil
         }
 

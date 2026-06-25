@@ -80,10 +80,13 @@ class ScreenCaptureService: ObservableObject {
                 guard let observations = request.results else {
                     return .success(nil)
                 }
-                let text = observations
+                let recognizedCandidates = observations
                     .compactMap { $0.topCandidates(1).first?.string }
-                    .joined(separator: "\n")
-                return .success(text.isEmpty ? nil : text)
+                return .success(
+                    VoiceInkAIEnhancementScreenContext.extractedText(
+                        fromRecognizedCandidates: recognizedCandidates
+                    )
+                )
             } catch {
                 return .failure(error)
             }

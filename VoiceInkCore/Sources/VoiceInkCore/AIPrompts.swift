@@ -259,6 +259,11 @@ public enum VoiceInkAIEnhancementScreenContext {
         """
     }
 
+    public static func extractedText(fromRecognizedCandidates candidates: [String]) -> String? {
+        let text = candidates.joined(separator: "\n")
+        return text.isEmpty ? nil : text
+    }
+
     private static func isCaptureCandidate(
         _ window: VoiceInkScreenCaptureWindowFacts,
         currentProcessID: Int

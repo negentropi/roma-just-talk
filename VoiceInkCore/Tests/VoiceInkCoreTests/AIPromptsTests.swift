@@ -165,6 +165,20 @@ final class AIPromptsTests: XCTestCase {
         )
     }
 
+    func testScreenContextExtractedTextPreservesMacOSOCRAssembly() {
+        XCTAssertEqual(
+            VoiceInkAIEnhancementScreenContext.extractedText(
+                fromRecognizedCandidates: ["Roadmap", "Architecture"]
+            ),
+            "Roadmap\nArchitecture"
+        )
+        XCTAssertNil(
+            VoiceInkAIEnhancementScreenContext.extractedText(
+                fromRecognizedCandidates: []
+            )
+        )
+    }
+
     func testEnhancementRequestPayloadReturnsNilForEmptyTranscript() {
         XCTAssertNil(VoiceInkAIEnhancementRequestPayload(transcript: ""))
     }

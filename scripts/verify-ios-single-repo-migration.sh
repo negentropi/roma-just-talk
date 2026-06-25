@@ -10223,22 +10223,22 @@ reject_pattern \
 
 require_pattern \
   "shared AI enhancement screen-context policy lives in VoiceInkCore" \
-  'VoiceInkAIEnhancementScreenContext|VoiceInkScreenCaptureWindowFacts|preferredWindowIndex|contextText' \
+  'VoiceInkAIEnhancementScreenContext|VoiceInkScreenCaptureWindowFacts|preferredWindowIndex|contextText|extractedText\(fromRecognizedCandidates:' \
   VoiceInkCore/Sources/VoiceInkCore/AIPrompts.swift
 
 require_pattern \
   "core checks execute shared AI enhancement screen-context policy tests" \
-  'AIPromptsTests\.testScreenContextPrefersFrontmostVisibleNonSelfWindow|AIPromptsTests\.testScreenContextFallsBackToFirstVisibleNonSelfWindow|AIPromptsTests\.testScreenContextTextPreservesMacOSCaptureCopy|AIPromptsTests\.testScreenContextTextUsesExistingFallbacks' \
+  'AIPromptsTests\.testScreenContextPrefersFrontmostVisibleNonSelfWindow|AIPromptsTests\.testScreenContextFallsBackToFirstVisibleNonSelfWindow|AIPromptsTests\.testScreenContextTextPreservesMacOSCaptureCopy|AIPromptsTests\.testScreenContextTextUsesExistingFallbacks|AIPromptsTests\.testScreenContextExtractedTextPreservesMacOSOCRAssembly' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "macOS screen capture service adapts shared screen-context policy" \
-  'VoiceInkAIEnhancementScreenContext\.(preferredWindowIndex|contextText)|voiceInkScreenCaptureWindowFacts' \
+  'VoiceInkAIEnhancementScreenContext\.(preferredWindowIndex|contextText|extractedText)|voiceInkScreenCaptureWindowFacts' \
   VoiceInk/Services/ScreenCaptureService.swift
 
 reject_pattern \
   "macOS screen capture service avoids shell-owned screen-context copy and selection policy" \
-  '"(Active Window:|Application:|Window Content:|No text detected via OCR|Unknown)"|content\.windows\.first|owningApplication\?\.processID == frontmostPID|owningApplication\?\.processID != currentPID|windowLayer == 0' \
+  '"(Active Window:|Application:|Window Content:|No text detected via OCR|Unknown)"|content\.windows\.first|owningApplication\?\.processID == frontmostPID|owningApplication\?\.processID != currentPID|windowLayer == 0|joined\(separator: "\\n"\)|text\.isEmpty \? nil' \
   VoiceInk/Services/ScreenCaptureService.swift
 
 require_pattern \

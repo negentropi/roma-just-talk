@@ -141,6 +141,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "AIPromptsTests.testScreenContextFallsBackToFirstVisibleNonSelfWindow", run: { AIPromptsTests().testScreenContextFallsBackToFirstVisibleNonSelfWindow() }),
             VoiceInkCoreCheck(name: "AIPromptsTests.testScreenContextTextPreservesMacOSCaptureCopy", run: { AIPromptsTests().testScreenContextTextPreservesMacOSCaptureCopy() }),
             VoiceInkCoreCheck(name: "AIPromptsTests.testScreenContextTextUsesExistingFallbacks", run: { AIPromptsTests().testScreenContextTextUsesExistingFallbacks() }),
+            VoiceInkCoreCheck(name: "AIPromptsTests.testScreenContextExtractedTextPreservesMacOSOCRAssembly", run: { AIPromptsTests().testScreenContextExtractedTextPreservesMacOSOCRAssembly() }),
             VoiceInkCoreCheck(name: "AIPromptsTests.testEnhancementRequestPayloadReturnsNilForEmptyTranscript", run: { AIPromptsTests().testEnhancementRequestPayloadReturnsNilForEmptyTranscript() }),
             VoiceInkCoreCheck(name: "AIPromptsTests.testEnhancementRequestPayloadPreservesMacOSWhitespaceOnlyTranscriptPolicy", run: { try AIPromptsTests().testEnhancementRequestPayloadPreservesMacOSWhitespaceOnlyTranscriptPolicy() }),
             VoiceInkCoreCheck(name: "AIPromptsTests.testEnhancementRequestPayloadBuildsTaggedUserMessageAndFiltersProviderOutput", run: { try AIPromptsTests().testEnhancementRequestPayloadBuildsTaggedUserMessageAndFiltersProviderOutput() }),

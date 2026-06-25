@@ -321,6 +321,8 @@ final class DashboardMetricsTests: XCTestCase {
         )
         XCTAssertEqual(VoiceInkDashboardPromotionPresentation.dismissHelpText, "Dismiss this promotion")
         XCTAssertEqual(VoiceInkDashboardPromotionPresentation.dismissSystemImageName, "xmark.circle.fill")
+        XCTAssertEqual(VoiceInkDashboardPromotionPresentation.upgradeCard.badgeDisplayText, "30% OFF")
+        XCTAssertEqual(VoiceInkDashboardPromotionPresentation.affiliateCard.badgeDisplayText, "AFFILIATE 30%")
 
         XCTAssertEqual(
             VoiceInkDashboardPromotionPresentation.upgradeCard,

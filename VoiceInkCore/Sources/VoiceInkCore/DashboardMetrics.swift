@@ -368,6 +368,10 @@ public struct VoiceInkDashboardPromotionCardPresentation: Equatable, Sendable, I
     public var isDismissible: Bool {
         dismissHelpText != nil
     }
+
+    public var badgeDisplayText: String {
+        badge.uppercased()
+    }
 }
 
 public enum VoiceInkDashboardPromotionPresentation {

@@ -51,7 +51,7 @@ private struct DashboardPromotionCard: View {
     var body: some View {
         ZStack(alignment: .topTrailing) {
             VStack(alignment: .leading, spacing: 13) {
-                Text(presentation.badge.uppercased())
+                Text(presentation.badgeDisplayText)
                     .font(.system(size: 10, weight: .bold))
                     .tracking(0.4)
                     .padding(.horizontal, 10)

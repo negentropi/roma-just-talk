@@ -7,7 +7,10 @@ import VoiceInkCore
 final class SessionMetricMigrationService {
     static let shared = SessionMetricMigrationService()
 
-    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "SessionMetricMigrationService")
+    private let logger = Logger(
+        subsystem: VoiceInkAppIdentity.loggingSubsystem,
+        category: VoiceInkMacOSLogCategory.sessionMetricMigrationService
+    )
     private(set) var isRunning = false
 
     private init() {}
@@ -57,9 +60,13 @@ final class SessionMetricMigrationService {
                 }
 
                 VoiceInkSessionMetricMigrationPreference.markCompleted()
-                logger.notice("Completed stats migration with \(insertedCount, privacy: .public) session metric(s)")
+                let message = VoiceInkSessionMetricMigrationDiagnostics.completedMessage(insertedCount: insertedCount)
+                logger.notice("\(message, privacy: .public)")
             } catch {
-                logger.error("Stats migration failed: \(error.localizedDescription, privacy: .public)")
+                let message = VoiceInkSessionMetricMigrationDiagnostics.failedMessage(
+                    localizedDescription: error.localizedDescription
+                )
+                logger.error("\(message, privacy: .public)")
             }
 
             await MainActor.run {

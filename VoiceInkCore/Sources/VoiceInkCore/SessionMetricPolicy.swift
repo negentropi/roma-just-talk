@@ -101,3 +101,13 @@ public enum VoiceInkSessionMetricMigrationPreference {
         defaults.set(true, forKey: completionKey)
     }
 }
+
+public enum VoiceInkSessionMetricMigrationDiagnostics {
+    public static func completedMessage(insertedCount: Int) -> String {
+        "Completed stats migration with \(insertedCount) session metric(s)"
+    }
+
+    public static func failedMessage(localizedDescription: String) -> String {
+        "Stats migration failed: \(localizedDescription)"
+    }
+}

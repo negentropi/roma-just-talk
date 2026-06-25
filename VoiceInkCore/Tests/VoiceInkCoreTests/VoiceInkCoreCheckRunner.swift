@@ -1270,6 +1270,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "SessionMetricPolicyTests.testValuesClampNonPositiveDurationsAndSkipSpeedFactor", run: { SessionMetricPolicyTests().testValuesClampNonPositiveDurationsAndSkipSpeedFactor() }),
             VoiceInkCoreCheck(name: "SessionMetricPolicyTests.testRecorderDraftPreservesSourceAndMetricFields", run: { SessionMetricPolicyTests().testRecorderDraftPreservesSourceAndMetricFields() }),
             VoiceInkCoreCheck(name: "SessionMetricPolicyTests.testMigrationPreferencePreservesCompletionStorageKey", run: { SessionMetricPolicyTests().testMigrationPreferencePreservesCompletionStorageKey() }),
+            VoiceInkCoreCheck(name: "SessionMetricPolicyTests.testMigrationDiagnosticsPreserveMacOSLogCopy", run: { SessionMetricPolicyTests().testMigrationDiagnosticsPreserveMacOSLogCopy() }),
             VoiceInkCoreCheck(name: "StreamingFinalCommitTimeoutTests.testStreamingFinalCommitTimeoutPreservesCloudDefault", run: { StreamingFinalCommitTimeoutTests().testStreamingFinalCommitTimeoutPreservesCloudDefault() }),
             VoiceInkCoreCheck(name: "StreamingFinalCommitTimeoutTests.testStreamingFinalCommitTimeoutPreservesLocalFluidAudioFastCommit", run: { StreamingFinalCommitTimeoutTests().testStreamingFinalCommitTimeoutPreservesLocalFluidAudioFastCommit() }),
             VoiceInkCoreCheck(name: "StreamingTranscriptionEventTests.testStreamingEventsCarrySessionAndTextUpdates", run: { StreamingTranscriptionEventTests().testStreamingEventsCarrySessionAndTextUpdates() }),

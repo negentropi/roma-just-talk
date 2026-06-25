@@ -15550,6 +15550,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/SessionMetricPolicy.swift
 
 require_pattern \
+  "shared session metric migration diagnostics live in VoiceInkCore" \
+  'VoiceInkSessionMetricMigrationDiagnostics|completedMessage|failedMessage|Completed stats migration with|Stats migration failed:' \
+  VoiceInkCore/Sources/VoiceInkCore/SessionMetricPolicy.swift
+
+require_pattern \
   "macOS session metric model adapts shared draft" \
   'init\(draft: VoiceInkSessionMetricDraft\)' \
   VoiceInk/Models/SessionMetric.swift
@@ -15575,19 +15580,29 @@ require_pattern \
   'VoiceInkSessionMetricMigrationPreference\.(isCompleted|markCompleted)' \
   VoiceInk/Services/SessionMetricMigrationService.swift
 
+require_pattern \
+  "macOS stats migration uses shared diagnostics" \
+  'VoiceInkSessionMetricMigrationDiagnostics\.(completedMessage|failedMessage)' \
+  VoiceInk/Services/SessionMetricMigrationService.swift
+
 reject_pattern \
   "macOS stats migration avoids raw completion preference and status" \
   'HasCompletedStatsMigration|UserDefaults\.standard|transcriptionStatus == "completed"' \
   VoiceInk/Services/SessionMetricMigrationService.swift
 
+reject_pattern \
+  "macOS stats migration avoids shell-owned diagnostic copy" \
+  '"(Completed stats migration with|Stats migration failed:)' \
+  VoiceInk/Services/SessionMetricMigrationService.swift
+
 require_pattern \
   "core checks execute session metric draft and migration preference tests" \
-  'SessionMetricPolicyTests\.testRecorderDraftPreservesSourceAndMetricFields|SessionMetricPolicyTests\.testMigrationPreferencePreservesCompletionStorageKey' \
+  'SessionMetricPolicyTests\.testRecorderDraftPreservesSourceAndMetricFields|SessionMetricPolicyTests\.testMigrationPreferencePreservesCompletionStorageKey|SessionMetricPolicyTests\.testMigrationDiagnosticsPreserveMacOSLogCopy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "migration checklist tracks shared session metric migration preference" \
-  'metric row drafts, recorder source, completed-status filtering, .*stats-migration completion storage through `VoiceInkSessionMetricPolicy`/`VoiceInkSessionMetricDraft`/`VoiceInkSessionMetricMigrationPreference`' \
+  'metric row drafts, recorder source, completed-status filtering, .*stats-migration diagnostic copy, and stats-migration completion storage through `VoiceInkSessionMetricPolicy`/`VoiceInkSessionMetricDraft`/`VoiceInkSessionMetricMigrationPreference`/`VoiceInkSessionMetricMigrationDiagnostics`' \
   docs/ios-single-repo-migration.md
 
 reject_pattern \
@@ -16745,7 +16760,8 @@ require_patterns \
   'keychainService = "KeychainService"' \
   'polarService = "PolarService"' \
   'licenseViewModel = "LicenseViewModel"' \
-  'transcriptionAutoCleanupService = "TranscriptionAutoCleanupService"'
+  'transcriptionAutoCleanupService = "TranscriptionAutoCleanupService"' \
+  'sessionMetricMigrationService = "SessionMetricMigrationService"'
 
 require_pattern \
   "macOS window manager uses shared log category identity" \
@@ -16777,6 +16793,12 @@ require_patterns \
   VoiceInk/Services/TranscriptionAutoCleanupService.swift \
   'Logger\(' \
   'category: VoiceInkMacOSLogCategory\.transcriptionAutoCleanupService'
+
+require_patterns \
+  "macOS session metric migration uses shared log category identity" \
+  VoiceInk/Services/SessionMetricMigrationService.swift \
+  'Logger\(' \
+  'category: VoiceInkMacOSLogCategory\.sessionMetricMigrationService'
 
 require_pattern \
   "core checks execute macOS window identity test" \
@@ -16811,12 +16833,13 @@ reject_pattern \
 
 reject_pattern \
   "macOS credential and license shells avoid shell-owned log category literals" \
-  'category: "(APIKeyManager|KeychainService|PolarService|LicenseViewModel|TranscriptionAutoCleanupService)"' \
+  'category: "(APIKeyManager|KeychainService|PolarService|LicenseViewModel|TranscriptionAutoCleanupService|SessionMetricMigrationService)"' \
   VoiceInk/Services/APIKeyManager.swift \
   VoiceInk/Services/KeychainService.swift \
   VoiceInk/Services/PolarService.swift \
   VoiceInk/Models/LicenseViewModel.swift \
-  VoiceInk/Services/TranscriptionAutoCleanupService.swift
+  VoiceInk/Services/TranscriptionAutoCleanupService.swift \
+  VoiceInk/Services/SessionMetricMigrationService.swift
 
 require_pattern \
   "iOS note list uses shared app identity presentation" \

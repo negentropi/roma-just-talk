@@ -90,6 +90,17 @@ final class SessionMetricPolicyTests: XCTestCase {
         }
     }
 
+    func testMigrationDiagnosticsPreserveMacOSLogCopy() {
+        XCTAssertEqual(
+            VoiceInkSessionMetricMigrationDiagnostics.completedMessage(insertedCount: 3),
+            "Completed stats migration with 3 session metric(s)"
+        )
+        XCTAssertEqual(
+            VoiceInkSessionMetricMigrationDiagnostics.failedMessage(localizedDescription: "store failed"),
+            "Stats migration failed: store failed"
+        )
+    }
+
     private func withTemporaryDefaults(_ test: (UserDefaults) -> Void) {
         let suiteName = "VoiceInkCore.SessionMetricPolicyTests.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!

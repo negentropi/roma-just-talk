@@ -2,32 +2,72 @@ import Foundation
 import VoiceInkCore
 
 final class TranscriptionRuntimeResourcePolicyTests: XCTestCase {
-    func testLocalWhisperRoutePrewarmsAndLoadsWhisperAtRecordingStartup() {
+    func testLocalWhisperRoutePrewarmsAndLoadsWhisperAtRecordingStartup() async {
         let plan = VoiceInkTranscriptionRuntimeResourcePlan(serviceRoute: .localWhisper)
+        var events: [String] = []
+
+        await plan.applyRecordingStartupRuntimeState(
+            loadLocalWhisperModel: {
+                events.append("whisper")
+            },
+            loadLocalFluidAudioModel: {
+                events.append("fluid")
+            }
+        )
 
         XCTAssertTrue(plan.shouldPrewarmModel)
-        XCTAssertEqual(plan.recordingStartupLoadAction, .loadLocalWhisperModel)
+        XCTAssertEqual(events, ["whisper"])
     }
 
-    func testLocalFluidAudioRoutePrewarmsAndLoadsFluidAudioAtRecordingStartup() {
+    func testLocalFluidAudioRoutePrewarmsAndLoadsFluidAudioAtRecordingStartup() async {
         let plan = VoiceInkTranscriptionRuntimeResourcePlan(serviceRoute: .localFluidAudio)
+        var events: [String] = []
+
+        await plan.applyRecordingStartupRuntimeState(
+            loadLocalWhisperModel: {
+                events.append("whisper")
+            },
+            loadLocalFluidAudioModel: {
+                events.append("fluid")
+            }
+        )
 
         XCTAssertTrue(plan.shouldPrewarmModel)
-        XCTAssertEqual(plan.recordingStartupLoadAction, .loadLocalFluidAudioModel)
+        XCTAssertEqual(events, ["fluid"])
     }
 
-    func testCloudRouteSkipsLocalRuntimeWork() {
+    func testCloudRouteSkipsLocalRuntimeWork() async {
         let plan = VoiceInkTranscriptionRuntimeResourcePlan(serviceRoute: .cloud)
+        var events: [String] = []
+
+        await plan.applyRecordingStartupRuntimeState(
+            loadLocalWhisperModel: {
+                events.append("whisper")
+            },
+            loadLocalFluidAudioModel: {
+                events.append("fluid")
+            }
+        )
 
         XCTAssertFalse(plan.shouldPrewarmModel)
-        XCTAssertEqual(plan.recordingStartupLoadAction, .none)
+        XCTAssertEqual(events, [])
     }
 
-    func testNativeAppleRouteSkipsLocalRuntimeWork() {
+    func testNativeAppleRouteSkipsLocalRuntimeWork() async {
         let plan = VoiceInkTranscriptionRuntimeResourcePlan(serviceRoute: .nativeApple)
+        var events: [String] = []
+
+        await plan.applyRecordingStartupRuntimeState(
+            loadLocalWhisperModel: {
+                events.append("whisper")
+            },
+            loadLocalFluidAudioModel: {
+                events.append("fluid")
+            }
+        )
 
         XCTAssertFalse(plan.shouldPrewarmModel)
-        XCTAssertEqual(plan.recordingStartupLoadAction, .none)
+        XCTAssertEqual(events, [])
     }
 
     func testModelSelectionResourcePlanOwnsLocalWhisperRuntimeUpdate() {

@@ -268,26 +268,26 @@ class VoiceInkEngine: NSObject, ObservableObject {
                                 guard let self else { return }
 
                                 if let model = self.transcriptionModelManager.currentTranscriptionModel {
-                                    switch model.transcriptionRuntimeResourcePlan.recordingStartupLoadAction {
-                                    case .loadLocalWhisperModel:
-                                        if let localWhisperModel = VoiceInkWhisperModelFiles.downloadedLocalModelFile(
-                                            forModelName: model.name,
-                                            in: self.whisperModelManager.availableModels
-                                        ),
-                                           self.whisperModelManager.whisperContext == nil {
-                                            do {
-                                                try await self.whisperModelManager.loadModel(localWhisperModel)
-                                            } catch {
-                                                self.logger.error("❌ Model loading failed: \(error.localizedDescription, privacy: .public)")
+                                    await model.transcriptionRuntimeResourcePlan.applyRecordingStartupRuntimeState(
+                                        loadLocalWhisperModel: {
+                                            if let localWhisperModel = VoiceInkWhisperModelFiles.downloadedLocalModelFile(
+                                                forModelName: model.name,
+                                                in: self.whisperModelManager.availableModels
+                                            ),
+                                               self.whisperModelManager.whisperContext == nil {
+                                                do {
+                                                    try await self.whisperModelManager.loadModel(localWhisperModel)
+                                                } catch {
+                                                    self.logger.error("❌ Model loading failed: \(error.localizedDescription, privacy: .public)")
+                                                }
+                                            }
+                                        },
+                                        loadLocalFluidAudioModel: {
+                                            if let fluidAudioModel = model as? FluidAudioModel {
+                                                try? await self.serviceRegistry.fluidAudioTranscriptionService.loadModel(for: fluidAudioModel)
                                             }
                                         }
-                                    case .loadLocalFluidAudioModel:
-                                        if let fluidAudioModel = model as? FluidAudioModel {
-                                            try? await self.serviceRegistry.fluidAudioTranscriptionService.loadModel(for: fluidAudioModel)
-                                        }
-                                    case .none:
-                                        break
-                                    }
+                                    )
                                 }
 
                                 if let enhancementService = self.enhancementService {

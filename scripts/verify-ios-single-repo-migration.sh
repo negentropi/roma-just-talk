@@ -8366,11 +8366,17 @@ require_patterns \
   'VoiceInkTranscriptionRecordingStartupLoadAction' \
   'VoiceInkLocalWhisperRuntimeUpdate' \
   'VoiceInkTranscriptionModelDeletionPlan' \
+  'applyRecordingStartupRuntimeState' \
   'modelSelectionLocalWhisperRuntimeUpdate'
 
 reject_pattern \
   "shared core avoids public model-selection resource action interface" \
   'public enum VoiceInkTranscriptionModelSelectionResourceAction|public let modelSelectionResourceAction|public var localWhisperRuntimeUpdate' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRuntimeResourcePolicy.swift
+
+reject_pattern \
+  "shared core avoids public recording-startup resource action interface" \
+  'public enum VoiceInkTranscriptionRecordingStartupLoadAction|public let recordingStartupLoadAction' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionRuntimeResourcePolicy.swift
 
 require_pattern \
@@ -8385,7 +8391,12 @@ require_pattern \
 
 require_pattern \
   "macOS recording startup uses shared transcription runtime load action" \
-  'transcriptionRuntimeResourcePlan\.recordingStartupLoadAction' \
+  'transcriptionRuntimeResourcePlan\.applyRecordingStartupRuntimeState' \
+  VoiceInk/Transcription/Engine/VoiceInkEngine.swift
+
+reject_pattern \
+  "macOS recording startup avoids raw transcription runtime load action switching" \
+  'recordingStartupLoadAction|switch model\.transcriptionRuntimeResourcePlan|case \.(loadLocalWhisperModel|loadLocalFluidAudioModel|none)' \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift
 
 require_patterns \

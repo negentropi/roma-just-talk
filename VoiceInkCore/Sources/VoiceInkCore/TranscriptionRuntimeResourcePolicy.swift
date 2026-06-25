@@ -1,6 +1,6 @@
 import Foundation
 
-public enum VoiceInkTranscriptionRecordingStartupLoadAction: Equatable, Sendable {
+fileprivate enum VoiceInkTranscriptionRecordingStartupLoadAction: Equatable, Sendable {
     case none
     case loadLocalWhisperModel
     case loadLocalFluidAudioModel
@@ -60,7 +60,7 @@ public struct VoiceInkTranscriptionModelDeletionPlan: Equatable, Sendable {
 
 public struct VoiceInkTranscriptionRuntimeResourcePlan: Equatable, Sendable {
     public let shouldPrewarmModel: Bool
-    public let recordingStartupLoadAction: VoiceInkTranscriptionRecordingStartupLoadAction
+    private let recordingStartupLoadAction: VoiceInkTranscriptionRecordingStartupLoadAction
     private let modelSelectionResourceAction: VoiceInkTranscriptionModelSelectionResourceAction
 
     public init(serviceRoute: VoiceInkTranscriptionServiceRoute) {
@@ -82,6 +82,20 @@ public struct VoiceInkTranscriptionRuntimeResourcePlan: Equatable, Sendable {
 
     public var modelSelectionLocalWhisperRuntimeUpdate: VoiceInkLocalWhisperRuntimeUpdate {
         modelSelectionResourceAction.localWhisperRuntimeUpdate
+    }
+
+    public func applyRecordingStartupRuntimeState(
+        loadLocalWhisperModel: () async -> Void,
+        loadLocalFluidAudioModel: () async -> Void
+    ) async {
+        switch recordingStartupLoadAction {
+        case .none:
+            break
+        case .loadLocalWhisperModel:
+            await loadLocalWhisperModel()
+        case .loadLocalFluidAudioModel:
+            await loadLocalFluidAudioModel()
+        }
     }
 }
 

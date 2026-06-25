@@ -42,20 +42,6 @@ private extension VoiceInkCloudTranscriptionModelSpec {
 }
 
 extension CloudProvider {
-    private var apiErrorDomain: String? {
-        modelProvider.apiErrorDomain
-    }
-
-    private func remoteTranscriptionOptions(
-        prompt: String?,
-        customVocabulary: [String]
-    ) -> VoiceInkRemoteTranscriptionOptions {
-        modelProvider.remoteTranscriptionOptions(
-            prompt: prompt,
-            customVocabulary: customVocabulary
-        )
-    }
-
     var models: [CloudModel] {
         modelProvider
             .cloudModelSpecs
@@ -76,7 +62,7 @@ extension CloudProvider {
                 audioData: audioData,
                 fileName: fileName,
                 language: language,
-                options: remoteTranscriptionOptions(
+                options: modelProvider.remoteTranscriptionOptions(
                     prompt: prompt,
                     customVocabulary: customVocabulary
                 )
@@ -90,7 +76,7 @@ extension CloudProvider {
         } catch {
             if let apiError = CloudTranscriptionError.apiRequestFailure(
                 from: error as NSError,
-                matchingErrorDomain: apiErrorDomain
+                matchingErrorDomain: modelProvider.apiErrorDomain
             ) {
                 throw apiError
             }

@@ -5155,6 +5155,11 @@ reject_pattern \
   VoiceInk/Transcription/Cloud/CloudProvider.swift
 
 reject_pattern \
+  "macOS cloud provider avoids shallow shared fact helpers" \
+  '^    private (var apiErrorDomain|func remoteTranscriptionOptions)' \
+  VoiceInk/Transcription/Cloud/CloudProvider.swift
+
+reject_pattern \
   "macOS cloud provider protocol keeps shared batch dispatch out of its interface" \
   '^    func transcribe\(audioData: Data, fileName: String, apiKey: String, model: String, language: String\?, prompt: String\?, customVocabulary: \[String\]\) async throws -> String$' \
   VoiceInk/Transcription/Cloud/CloudProvider.swift

@@ -250,6 +250,58 @@ final class CustomCloudModelPolicyTests: XCTestCase {
         )
     }
 
+    func testBackupImportPlanAppliesRuntimeStateForMacOSAdapter() {
+        let id = UUID(uuidString: "E31E4D7A-437B-4BD3-A4B5-9624F38F3BBE")!
+        let plan = VoiceInkCustomCloudModelImportPlan(
+            id: id,
+            name: "custom",
+            displayName: "Custom",
+            description: "Transcribes audio",
+            apiEndpoint: "https://api.example.com/v1/audio/transcriptions",
+            modelName: "whisper-1",
+            isMultilingualModel: true,
+            supportedLanguages: ["en": "English"],
+            apiKeyToRestore: "secret"
+        )
+        var restoredAPIKeys = [(String, UUID)]()
+
+        let model = plan.applyRuntimeState(
+            makeModel: { id, name, displayName, description, apiEndpoint, modelName, isMultilingualModel, supportedLanguages in
+                VoiceInkCustomCloudModelImportPlan(
+                    id: id,
+                    name: name,
+                    displayName: displayName,
+                    description: description,
+                    apiEndpoint: apiEndpoint,
+                    modelName: modelName,
+                    isMultilingualModel: isMultilingualModel,
+                    supportedLanguages: supportedLanguages,
+                    apiKeyToRestore: nil
+                )
+            },
+            restoreAPIKey: { apiKey, modelId in
+                restoredAPIKeys.append((apiKey, modelId))
+            }
+        )
+
+        XCTAssertEqual(
+            model,
+            VoiceInkCustomCloudModelImportPlan(
+                id: id,
+                name: "custom",
+                displayName: "Custom",
+                description: "Transcribes audio",
+                apiEndpoint: "https://api.example.com/v1/audio/transcriptions",
+                modelName: "whisper-1",
+                isMultilingualModel: true,
+                supportedLanguages: ["en": "English"],
+                apiKeyToRestore: nil
+            )
+        )
+        XCTAssertEqual(restoredAPIKeys.map(\.0), ["secret"])
+        XCTAssertEqual(restoredAPIKeys.map(\.1), [id])
+    }
+
     func testBackupRecordSkipsOnlyMissingOrEmptyAPIKeyOnImport() {
         XCTAssertNil(VoiceInkCustomCloudModelBackup(
             id: UUID(),

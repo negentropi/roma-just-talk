@@ -19,23 +19,23 @@ extension VoiceInkCustomCloudModelBackup {
     }
 
     func makeModel() -> CustomCloudModel {
-        let importPlan = self.importPlan
-        let model = CustomCloudModel(
-            id: importPlan.id,
-            name: importPlan.name,
-            displayName: importPlan.displayName,
-            description: importPlan.description,
-            apiEndpoint: importPlan.apiEndpoint,
-            modelName: importPlan.modelName,
-            isMultilingual: importPlan.isMultilingualModel,
-            supportedLanguages: importPlan.supportedLanguages
+        return importPlan.applyRuntimeState(
+            makeModel: { id, name, displayName, description, apiEndpoint, modelName, isMultilingualModel, supportedLanguages in
+                CustomCloudModel(
+                    id: id,
+                    name: name,
+                    displayName: displayName,
+                    description: description,
+                    apiEndpoint: apiEndpoint,
+                    modelName: modelName,
+                    isMultilingual: isMultilingualModel,
+                    supportedLanguages: supportedLanguages
+                )
+            },
+            restoreAPIKey: { apiKey, modelId in
+                APIKeyManager.shared.saveCustomModelAPIKey(apiKey, forModelId: modelId)
+            }
         )
-
-        if let apiKey = importPlan.apiKeyToRestore {
-            APIKeyManager.shared.saveCustomModelAPIKey(apiKey, forModelId: importPlan.id)
-        }
-
-        return model
     }
 }
 

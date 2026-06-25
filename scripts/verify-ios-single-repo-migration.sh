@@ -5894,8 +5894,15 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
 
 require_pattern \
-  "shared custom cloud model import plan owns API-key restore decision" \
-  'apiKeyToRestore' \
+  "shared custom cloud model import plan owns runtime API-key restore decision" \
+  'applyRuntimeState|restoreAPIKey|apiKeyToRestore' \
+  VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
+
+require_context_pattern_count_at_least \
+  "shared custom cloud model import plan raw payload stays hidden" \
+  'struct VoiceInkCustomCloudModelImportPlan' \
+  'private let +(id|name|displayName|description|apiEndpoint|modelName|isMultilingualModel|supportedLanguages|apiKeyToRestore)' \
+  9 \
   VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
 
 require_pattern \
@@ -6074,13 +6081,18 @@ require_pattern \
   VoiceInk/Services/ImportExportService.swift
 
 require_pattern \
-  "macOS custom model import consumes shared import plan" \
-  'let importPlan = self\.importPlan' \
+  "macOS custom model import consumes shared import plan runtime state" \
+  'importPlan\.applyRuntimeState' \
   VoiceInk/Services/BackupTypes.swift
 
 require_pattern \
-  "macOS custom model import restores API key from shared import plan" \
-  'importPlan\.apiKeyToRestore' \
+  "macOS custom model import restores API key through shared import plan" \
+  'restoreAPIKey|saveCustomModelAPIKey' \
+  VoiceInk/Services/BackupTypes.swift
+
+reject_pattern \
+  "macOS custom model import avoids raw shared import plan fields" \
+  'importPlan\.(id|name|displayName|description|apiEndpoint|modelName|isMultilingualModel|supportedLanguages|apiKeyToRestore)' \
   VoiceInk/Services/BackupTypes.swift
 
 reject_pattern \

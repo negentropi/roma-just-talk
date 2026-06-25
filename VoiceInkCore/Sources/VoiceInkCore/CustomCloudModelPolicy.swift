@@ -192,15 +192,15 @@ public struct VoiceInkCustomCloudModelBackup: Codable, Equatable, Sendable {
 }
 
 public struct VoiceInkCustomCloudModelImportPlan: Equatable, Sendable {
-    public let id: UUID
-    public let name: String
-    public let displayName: String
-    public let description: String
-    public let apiEndpoint: String
-    public let modelName: String
-    public let isMultilingualModel: Bool
-    public let supportedLanguages: [String: String]
-    public let apiKeyToRestore: String?
+    private let id: UUID
+    private let name: String
+    private let displayName: String
+    private let description: String
+    private let apiEndpoint: String
+    private let modelName: String
+    private let isMultilingualModel: Bool
+    private let supportedLanguages: [String: String]
+    private let apiKeyToRestore: String?
 
     public init(
         id: UUID,
@@ -222,6 +222,37 @@ public struct VoiceInkCustomCloudModelImportPlan: Equatable, Sendable {
         self.isMultilingualModel = isMultilingualModel
         self.supportedLanguages = supportedLanguages
         self.apiKeyToRestore = apiKeyToRestore
+    }
+
+    public func applyRuntimeState<Model>(
+        makeModel: (
+            _ id: UUID,
+            _ name: String,
+            _ displayName: String,
+            _ description: String,
+            _ apiEndpoint: String,
+            _ modelName: String,
+            _ isMultilingualModel: Bool,
+            _ supportedLanguages: [String: String]
+        ) -> Model,
+        restoreAPIKey: (_ apiKey: String, _ modelId: UUID) -> Void
+    ) -> Model {
+        let model = makeModel(
+            id,
+            name,
+            displayName,
+            description,
+            apiEndpoint,
+            modelName,
+            isMultilingualModel,
+            supportedLanguages
+        )
+
+        if let apiKeyToRestore {
+            restoreAPIKey(apiKeyToRestore, id)
+        }
+
+        return model
     }
 }
 

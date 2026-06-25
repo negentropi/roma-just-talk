@@ -14408,6 +14408,11 @@ require_pattern \
   'VoiceInkPowerModeSessionSnapshotPlan|applyRuntimeState|saveSession' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
+require_pattern \
+  "shared Power Mode recovery lifecycle plan lives in VoiceInkCore" \
+  'VoiceInkPowerModeSessionRecoveryPlan|applyRuntimeState|scheduleEndSession' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
 reject_pattern \
   "shared Power Mode session lifecycle plans avoid public raw execution flags" \
   'public var startsNewSession|public var shouldInstallSettingsObserver|public var activeSession|public var shouldCaptureCurrentState|public func sessionToSave' \
@@ -14454,6 +14459,11 @@ require_pattern \
 require_pattern \
   "core checks execute Power Mode session diagnostics tests" \
   'PowerModePolicyTests\.testPowerModeSessionDiagnosticsPreserveMacOSConsoleCopy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute Power Mode session recovery tests" \
+  'PowerModePolicyTests\.testPowerModeSessionRecoveryPlanLogsBeforeSchedulingEndSession' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -14529,6 +14539,11 @@ require_pattern \
 require_pattern \
   "macOS Power Mode session manager consumes shared snapshot-update plan" \
   'VoiceInkPowerModeSessionSnapshotPlan\.plan|snapshotPlan\.applyRuntimeState' \
+  VoiceInk/PowerMode/PowerModeSessionManager.swift
+
+require_pattern \
+  "macOS Power Mode session manager consumes shared recovery plan" \
+  'VoiceInkPowerModeSessionRecoveryPlan\.plan|scheduleEndSession' \
   VoiceInk/PowerMode/PowerModeSessionManager.swift
 
 reject_pattern \

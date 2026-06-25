@@ -908,6 +908,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeSessionBeginPlanKeepsExistingSession", run: { PowerModePolicyTests().testPowerModeSessionBeginPlanKeepsExistingSession() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeSessionSnapshotPlanSkipsApplyingOrMissingSession", run: { PowerModePolicyTests().testPowerModeSessionSnapshotPlanSkipsApplyingOrMissingSession() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeSessionSnapshotPlanUpdatesOriginalStateWhenIdle", run: { PowerModePolicyTests().testPowerModeSessionSnapshotPlanUpdatesOriginalStateWhenIdle() }),
+            VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeSessionRecoveryPlanSkipsMissingSession", run: { PowerModePolicyTests().testPowerModeSessionRecoveryPlanSkipsMissingSession() }),
+            VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeSessionRecoveryPlanLogsBeforeSchedulingEndSession", run: { PowerModePolicyTests().testPowerModeSessionRecoveryPlanLogsBeforeSchedulingEndSession() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeSessionDiagnosticsPreserveMacOSConsoleCopy", run: { PowerModePolicyTests().testPowerModeSessionDiagnosticsPreserveMacOSConsoleCopy() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testConfigurationModePreservesFormTitlesAndSaveModes", run: { PowerModePolicyTests().testConfigurationModePreservesFormTitlesAndSaveModes() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testConfigurationModePlansUnsavedAddShortcutCleanupOnDismiss", run: { PowerModePolicyTests().testConfigurationModePlansUnsavedAddShortcutCleanupOnDismiss() }),

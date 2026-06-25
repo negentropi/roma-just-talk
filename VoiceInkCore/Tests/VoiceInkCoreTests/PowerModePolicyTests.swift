@@ -2063,6 +2063,36 @@ final class PowerModePolicyTests: XCTestCase {
         "\(prefix):\(session.id.uuidString):\(session.startTime.timeIntervalSince1970):\(session.originalState.selectedAIModel ?? "nil")"
     }
 
+    func testPowerModeSessionRecoveryPlanSkipsMissingSession() {
+        let plan = VoiceInkPowerModeSessionRecoveryPlan.plan(activeSession: nil)
+
+        XCTAssertEqual(powerModeSessionRecoveryEvents(for: plan), [])
+    }
+
+    func testPowerModeSessionRecoveryPlanLogsBeforeSchedulingEndSession() {
+        let session = VoiceInkPowerModeSession(
+            id: UUID(),
+            startTime: Date(timeIntervalSince1970: 1_700_000_006),
+            originalState: powerModeApplicationState(selectedAIModel: "existing")
+        )
+        let plan = VoiceInkPowerModeSessionRecoveryPlan.plan(activeSession: session)
+
+        XCTAssertEqual(powerModeSessionRecoveryEvents(for: plan), ["log", "scheduleEndSession"])
+    }
+
+    private func powerModeSessionRecoveryEvents(
+        for plan: VoiceInkPowerModeSessionRecoveryPlan
+    ) -> [String] {
+        var events: [String] = []
+
+        plan.applyRuntimeState(
+            logRecoveringAbandonedSession: { events.append("log") },
+            scheduleEndSession: { events.append("scheduleEndSession") }
+        )
+
+        return events
+    }
+
     func testPowerModeSessionDiagnosticsPreserveMacOSConsoleCopy() {
         XCTAssertEqual(
             VoiceInkPowerModeSessionDiagnostics.notConfiguredMessage,

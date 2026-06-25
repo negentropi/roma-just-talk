@@ -1437,6 +1437,28 @@ public struct VoiceInkPowerModeSessionSnapshotPlan: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkPowerModeSessionRecoveryPlan: Equatable, Sendable {
+    private let shouldRecover: Bool
+
+    fileprivate init(shouldRecover: Bool) {
+        self.shouldRecover = shouldRecover
+    }
+
+    public static func plan(activeSession: VoiceInkPowerModeSession?) -> Self {
+        Self(shouldRecover: activeSession != nil)
+    }
+
+    public func applyRuntimeState(
+        logRecoveringAbandonedSession: () -> Void,
+        scheduleEndSession: () -> Void
+    ) {
+        guard shouldRecover else { return }
+
+        logRecoveringAbandonedSession()
+        scheduleEndSession()
+    }
+}
+
 public enum VoiceInkPowerModeSessionDiagnostics {
     public static let notConfiguredMessage = "SessionManager not configured."
     public static let recoveringAbandonedSessionMessage = "Recovering abandoned Power Mode session."

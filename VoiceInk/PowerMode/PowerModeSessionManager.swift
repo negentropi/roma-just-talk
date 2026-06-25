@@ -225,11 +225,16 @@ class PowerModeSessionManager {
     }
 
     private func recoverSession() {
-        guard let session = loadSession() else { return }
-        print(VoiceInkPowerModeSessionDiagnostics.recoveringAbandonedSessionMessage)
-        Task {
-            await endSession()
-        }
+        VoiceInkPowerModeSessionRecoveryPlan.plan(activeSession: loadSession()).applyRuntimeState(
+            logRecoveringAbandonedSession: {
+                print(VoiceInkPowerModeSessionDiagnostics.recoveringAbandonedSessionMessage)
+            },
+            scheduleEndSession: {
+                Task {
+                    await self.endSession()
+                }
+            }
+        )
     }
 
     private func saveSession(_ session: VoiceInkPowerModeSession) {

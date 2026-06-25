@@ -1,5 +1,198 @@
 import Foundation
 
+public struct VoiceInkGeneralSettingsBackupPayload<ShortcutBackup: Codable>: Codable {
+    private let primaryRecordingShortcut: ShortcutBackup?
+    private let secondaryRecordingShortcut: ShortcutBackup?
+    private let pasteLastTranscriptionShortcut: ShortcutBackup?
+    private let pasteLastEnhancementShortcut: ShortcutBackup?
+    private let retryLastTranscriptionShortcut: ShortcutBackup?
+    private let cancelRecorderShortcut: ShortcutBackup?
+    private let openHistoryWindowShortcut: ShortcutBackup?
+    private let quickAddToDictionaryShortcut: ShortcutBackup?
+    private let toggleEnhancementShortcut: ShortcutBackup?
+    private let primaryRecordingShortcutRawValue: String?
+    private let secondaryRecordingShortcutRawValue: String?
+    private let primaryRecordingShortcutModeRawValue: String?
+    private let secondaryRecordingShortcutModeRawValue: String?
+    private let specialShortcutPasteLastTranscriptOnEmptyTap: Bool?
+    private let isMiddleClickToggleEnabled: Bool?
+    private let middleClickActivationDelay: Int?
+    private let launchAtLoginEnabled: Bool?
+    private let isMenuBarOnly: Bool?
+    private let recorderType: String?
+    private let isTranscriptionCleanupEnabled: Bool?
+    private let transcriptionRetentionMinutes: Int?
+    private let isAudioCleanupEnabled: Bool?
+    private let audioRetentionPeriod: Int?
+    private let isSoundFeedbackEnabled: Bool?
+    private let isSystemMuteEnabled: Bool?
+    private let isPauseMediaEnabled: Bool?
+    private let audioResumptionDelay: Double?
+    private let isTextFormattingEnabled: Bool?
+    private let punctuationCleanupMode: PunctuationCleanupMode?
+    private let removePunctuation: Bool?
+    private let lowercaseTranscription: Bool?
+    private let isExperimentalFeaturesEnabled: Bool?
+    private let restoreClipboardAfterPaste: Bool?
+    private let clipboardRestoreDelay: Double?
+    private let rollingBufferPreloadModeRawValue: String?
+    private let rollingBufferPreloadAutoDisableCloudModels: Bool?
+    private let rollingBufferPreloadAutoDisableLowBatteryLocalModels: Bool?
+    private let rollingBufferPreloadLowBatteryThresholdPercent: Int?
+    private let rollingBufferDurationSeconds: Double?
+    private let rollingBufferPreloadFinalization: Bool?
+    private let rollingBufferVADModel: String?
+    private let rollingBufferPreloadEnabledByModel: [String: Bool]?
+
+    public init(
+        shortcutBackupRecords: [VoiceInkShortcutActionIdentifier: ShortcutBackup],
+        preferences: VoiceInkGeneralSettingsBackupPreferences
+    ) {
+        self.primaryRecordingShortcut = shortcutBackupRecords[.primaryRecording]
+        self.secondaryRecordingShortcut = shortcutBackupRecords[.secondaryRecording]
+        self.pasteLastTranscriptionShortcut = shortcutBackupRecords[.pasteLastTranscription]
+        self.pasteLastEnhancementShortcut = shortcutBackupRecords[.pasteLastEnhancement]
+        self.retryLastTranscriptionShortcut = shortcutBackupRecords[.retryLastTranscription]
+        self.cancelRecorderShortcut = shortcutBackupRecords[.cancelRecorder]
+        self.openHistoryWindowShortcut = shortcutBackupRecords[.openHistoryWindow]
+        self.quickAddToDictionaryShortcut = shortcutBackupRecords[.quickAddToDictionary]
+        self.toggleEnhancementShortcut = shortcutBackupRecords[.toggleEnhancement]
+        self.primaryRecordingShortcutRawValue = preferences.recordingShortcut.primaryRecordingShortcutRawValue
+        self.secondaryRecordingShortcutRawValue = preferences.recordingShortcut.secondaryRecordingShortcutRawValue
+        self.primaryRecordingShortcutModeRawValue = preferences.recordingShortcut.primaryRecordingShortcutModeRawValue
+        self.secondaryRecordingShortcutModeRawValue = preferences.recordingShortcut.secondaryRecordingShortcutModeRawValue
+        self.specialShortcutPasteLastTranscriptOnEmptyTap = preferences.recordingShortcut.specialShortcutPasteLastTranscriptOnEmptyTap
+        self.isMiddleClickToggleEnabled = preferences.recordingShortcut.isMiddleClickToggleEnabled
+        self.middleClickActivationDelay = preferences.recordingShortcut.middleClickActivationDelay
+        self.launchAtLoginEnabled = preferences.macOSShell.launchAtLoginEnabled
+        self.isMenuBarOnly = preferences.macOSShell.isMenuBarOnly
+        self.recorderType = preferences.macOSShell.recorderType
+        self.isTranscriptionCleanupEnabled = preferences.transcriptionAutoCleanup.isEnabled
+        self.transcriptionRetentionMinutes = preferences.transcriptionAutoCleanup.retentionMinutes
+        self.isAudioCleanupEnabled = preferences.audioCleanup.isEnabled
+        self.audioRetentionPeriod = preferences.audioCleanup.retentionDays
+        self.isSoundFeedbackEnabled = preferences.recordingFeedback.isSoundFeedbackEnabled
+        self.isSystemMuteEnabled = preferences.recordingFeedback.isSystemMuteEnabled
+        self.isPauseMediaEnabled = preferences.recordingFeedback.isPauseMediaEnabled
+        self.audioResumptionDelay = preferences.recordingFeedback.audioResumptionDelay
+        self.isTextFormattingEnabled = preferences.transcriptionCleanup.isTextFormattingEnabled
+        self.punctuationCleanupMode = preferences.transcriptionCleanup.punctuationCleanupMode
+        self.removePunctuation = preferences.transcriptionCleanup.removePunctuation
+        self.lowercaseTranscription = preferences.transcriptionCleanup.lowercaseTranscription
+        self.isExperimentalFeaturesEnabled = preferences.recordingFeedback.isExperimentalFeaturesEnabled
+        self.restoreClipboardAfterPaste = preferences.paste.shouldRestoreClipboardAfterPaste
+        self.clipboardRestoreDelay = preferences.paste.clipboardRestoreDelay
+        self.rollingBufferPreloadModeRawValue = preferences.rollingBuffer.preloadModeRawValue
+        self.rollingBufferPreloadAutoDisableCloudModels = preferences.rollingBuffer.autoDisablesCloudModels
+        self.rollingBufferPreloadAutoDisableLowBatteryLocalModels = preferences.rollingBuffer.autoDisablesLowBatteryLocalModels
+        self.rollingBufferPreloadLowBatteryThresholdPercent = preferences.rollingBuffer.lowBatteryThresholdPercent
+        self.rollingBufferDurationSeconds = preferences.rollingBuffer.bufferDurationSeconds
+        self.rollingBufferPreloadFinalization = preferences.rollingBuffer.preRunFinalization
+        self.rollingBufferVADModel = preferences.rollingBuffer.vadModelRawValue
+        self.rollingBufferPreloadEnabledByModel = preferences.rollingBuffer.perModelPreloadEnabled
+    }
+
+    public var shortcutBackupRecords: [VoiceInkShortcutActionIdentifier: ShortcutBackup] {
+        var records: [VoiceInkShortcutActionIdentifier: ShortcutBackup] = [:]
+        records[.primaryRecording] = primaryRecordingShortcut
+        records[.secondaryRecording] = secondaryRecordingShortcut
+        records[.pasteLastTranscription] = pasteLastTranscriptionShortcut
+        records[.pasteLastEnhancement] = pasteLastEnhancementShortcut
+        records[.retryLastTranscription] = retryLastTranscriptionShortcut
+        records[.cancelRecorder] = cancelRecorderShortcut
+        records[.openHistoryWindow] = openHistoryWindowShortcut
+        records[.quickAddToDictionary] = quickAddToDictionaryShortcut
+        records[.toggleEnhancement] = toggleEnhancementShortcut
+        return records
+    }
+
+    public var generalSettingsBackupPreferences: VoiceInkGeneralSettingsBackupPreferences {
+        VoiceInkGeneralSettingsBackupPolicy.backupPreferences(
+            recordingShortcut: recordingShortcutBackupPreferences,
+            macOSShell: macOSShellBackupPreferences,
+            transcriptionAutoCleanup: transcriptionAutoCleanupBackupPreferences,
+            audioCleanup: audioCleanupBackupPreferences,
+            recordingFeedback: recordingFeedbackBackupPreferences,
+            transcriptionCleanup: transcriptionCleanupBackupPreferences,
+            paste: pasteBackupPreferences,
+            rollingBuffer: rollingBufferBackupPreferences
+        )
+    }
+
+    private var recordingShortcutBackupPreferences: VoiceInkRecordingShortcutBackupPreferences {
+        VoiceInkRecordingShortcutBackupPreferences(
+            primaryRecordingShortcutRawValue: primaryRecordingShortcutRawValue,
+            secondaryRecordingShortcutRawValue: secondaryRecordingShortcutRawValue,
+            primaryRecordingShortcutModeRawValue: primaryRecordingShortcutModeRawValue,
+            secondaryRecordingShortcutModeRawValue: secondaryRecordingShortcutModeRawValue,
+            specialShortcutPasteLastTranscriptOnEmptyTap: specialShortcutPasteLastTranscriptOnEmptyTap,
+            isMiddleClickToggleEnabled: isMiddleClickToggleEnabled,
+            middleClickActivationDelay: middleClickActivationDelay
+        )
+    }
+
+    private var recordingFeedbackBackupPreferences: VoiceInkRecordingFeedbackBackupPreferences {
+        VoiceInkRecordingFeedbackBackupPreferences(
+            isSoundFeedbackEnabled: isSoundFeedbackEnabled,
+            isSystemMuteEnabled: isSystemMuteEnabled,
+            isPauseMediaEnabled: isPauseMediaEnabled,
+            audioResumptionDelay: audioResumptionDelay,
+            isExperimentalFeaturesEnabled: isExperimentalFeaturesEnabled
+        )
+    }
+
+    private var macOSShellBackupPreferences: VoiceInkMacOSShellBackupPreferences {
+        VoiceInkMacOSShellBackupPreferences(
+            launchAtLoginEnabled: launchAtLoginEnabled,
+            isMenuBarOnly: isMenuBarOnly,
+            recorderType: recorderType
+        )
+    }
+
+    private var pasteBackupPreferences: VoiceInkPasteBackupPreferences {
+        VoiceInkPasteBackupPreferences(
+            shouldRestoreClipboardAfterPaste: restoreClipboardAfterPaste,
+            clipboardRestoreDelay: clipboardRestoreDelay
+        )
+    }
+
+    private var transcriptionAutoCleanupBackupPreferences: VoiceInkTranscriptionAutoCleanupBackupPreferences {
+        VoiceInkTranscriptionAutoCleanupBackupPreferences(
+            isEnabled: isTranscriptionCleanupEnabled,
+            retentionMinutes: transcriptionRetentionMinutes
+        )
+    }
+
+    private var audioCleanupBackupPreferences: VoiceInkAudioCleanupBackupPreferences {
+        VoiceInkAudioCleanupBackupPreferences(
+            isEnabled: isAudioCleanupEnabled,
+            retentionDays: audioRetentionPeriod
+        )
+    }
+
+    private var transcriptionCleanupBackupPreferences: VoiceInkTranscriptionCleanupBackupPreferences {
+        VoiceInkTranscriptionCleanupBackupPreferences(
+            isTextFormattingEnabled: isTextFormattingEnabled,
+            punctuationCleanupMode: punctuationCleanupMode,
+            removePunctuation: removePunctuation,
+            lowercaseTranscription: lowercaseTranscription
+        )
+    }
+
+    private var rollingBufferBackupPreferences: VoiceInkRollingBufferBackupPreferences {
+        VoiceInkRollingBufferBackupPreferences(
+            preloadModeRawValue: rollingBufferPreloadModeRawValue,
+            autoDisablesCloudModels: rollingBufferPreloadAutoDisableCloudModels,
+            autoDisablesLowBatteryLocalModels: rollingBufferPreloadAutoDisableLowBatteryLocalModels,
+            lowBatteryThresholdPercent: rollingBufferPreloadLowBatteryThresholdPercent,
+            bufferDurationSeconds: rollingBufferDurationSeconds,
+            preRunFinalization: rollingBufferPreloadFinalization,
+            vadModelRawValue: rollingBufferVADModel,
+            perModelPreloadEnabled: rollingBufferPreloadEnabledByModel
+        )
+    }
+}
+
 public struct VoiceInkGeneralSettingsBackupPreferences: Equatable, Sendable {
     public let recordingShortcut: VoiceInkRecordingShortcutBackupPreferences
     public let macOSShell: VoiceInkMacOSShellBackupPreferences

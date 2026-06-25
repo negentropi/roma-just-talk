@@ -2,6 +2,41 @@ import Foundation
 @testable import VoiceInkCore
 
 final class GeneralSettingsBackupPolicyTests: XCTestCase {
+    func testGeneralSettingsBackupPayloadPreservesWireShapeAndGroupedPreferences() throws {
+        let preferences = generalSettingsBackupPreferencesFixture()
+        let payload = VoiceInkGeneralSettingsBackupPayload(
+            shortcutBackupRecords: [
+                .primaryRecording: "primary-shortcut",
+                .toggleEnhancement: "toggle-shortcut"
+            ],
+            preferences: preferences
+        )
+
+        let data = try JSONEncoder().encode(payload)
+        let json = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        XCTAssertEqual(json["primaryRecordingShortcut"] as? String, "primary-shortcut")
+        XCTAssertEqual(json["toggleEnhancementShortcut"] as? String, "toggle-shortcut")
+        XCTAssertEqual(json["primaryRecordingShortcutRawValue"] as? String, "custom")
+        XCTAssertEqual(json["secondaryRecordingShortcutModeRawValue"] as? String, "hybrid")
+        XCTAssertEqual(json["launchAtLoginEnabled"] as? Bool, true)
+        XCTAssertEqual(json["isSoundFeedbackEnabled"] as? Bool, true)
+        XCTAssertEqual(json["rollingBufferVADModel"] as? String, "silero")
+
+        let decoded = try JSONDecoder().decode(
+            VoiceInkGeneralSettingsBackupPayload<String>.self,
+            from: data
+        )
+
+        XCTAssertEqual(
+            decoded.shortcutBackupRecords,
+            [
+                .primaryRecording: "primary-shortcut",
+                .toggleEnhancement: "toggle-shortcut"
+            ]
+        )
+        XCTAssertEqual(decoded.generalSettingsBackupPreferences, preferences)
+    }
+
     func testBackupPreferencesPreserveGroupedExportShape() {
         let recordingShortcut = VoiceInkRecordingShortcutBackupPreferences(
             primaryRecordingShortcutRawValue: VoiceInkRecordingShortcutSelection.custom.rawValue,
@@ -328,6 +363,60 @@ final class GeneralSettingsBackupPolicyTests: XCTestCase {
         defaults.removePersistentDomain(forName: suiteName)
         run(defaults)
         defaults.removePersistentDomain(forName: suiteName)
+    }
+
+    private func generalSettingsBackupPreferencesFixture() -> VoiceInkGeneralSettingsBackupPreferences {
+        VoiceInkGeneralSettingsBackupPreferences(
+            recordingShortcut: VoiceInkRecordingShortcutBackupPreferences(
+                primaryRecordingShortcutRawValue: VoiceInkRecordingShortcutSelection.custom.rawValue,
+                secondaryRecordingShortcutRawValue: VoiceInkRecordingShortcutSelection.none.rawValue,
+                primaryRecordingShortcutModeRawValue: VoiceInkRecordingShortcutMode.special.rawValue,
+                secondaryRecordingShortcutModeRawValue: VoiceInkRecordingShortcutMode.hybrid.rawValue,
+                specialShortcutPasteLastTranscriptOnEmptyTap: true,
+                isMiddleClickToggleEnabled: false,
+                middleClickActivationDelay: 220
+            ),
+            macOSShell: VoiceInkMacOSShellBackupPreferences(
+                launchAtLoginEnabled: true,
+                isMenuBarOnly: false,
+                recorderType: "mini"
+            ),
+            transcriptionAutoCleanup: VoiceInkTranscriptionAutoCleanupBackupPreferences(
+                isEnabled: true,
+                retentionMinutes: 120
+            ),
+            audioCleanup: VoiceInkAudioCleanupBackupPreferences(
+                isEnabled: false,
+                retentionDays: 9
+            ),
+            recordingFeedback: VoiceInkRecordingFeedbackBackupPreferences(
+                isSoundFeedbackEnabled: true,
+                isSystemMuteEnabled: false,
+                isPauseMediaEnabled: true,
+                audioResumptionDelay: 2.5,
+                isExperimentalFeaturesEnabled: false
+            ),
+            transcriptionCleanup: VoiceInkTranscriptionCleanupBackupPreferences(
+                isTextFormattingEnabled: false,
+                punctuationCleanupMode: .removeTrailingPeriod,
+                removePunctuation: true,
+                lowercaseTranscription: true
+            ),
+            paste: VoiceInkPasteBackupPreferences(
+                shouldRestoreClipboardAfterPaste: false,
+                clipboardRestoreDelay: 1.25
+            ),
+            rollingBuffer: VoiceInkRollingBufferBackupPreferences(
+                preloadModeRawValue: VoiceInkRollingBufferPreloadMode.on.rawValue,
+                autoDisablesCloudModels: true,
+                autoDisablesLowBatteryLocalModels: false,
+                lowBatteryThresholdPercent: 55,
+                bufferDurationSeconds: 4.5,
+                preRunFinalization: true,
+                vadModelRawValue: VoiceInkRollingBufferVADModel.silero.rawValue,
+                perModelPreloadEnabled: ["parakeet": false]
+            )
+        )
     }
 
     private func generalSettingsImportRuntimeEvents(

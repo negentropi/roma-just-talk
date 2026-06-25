@@ -6151,6 +6151,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/GeneralSettingsBackupPolicy.swift
 
 require_pattern \
+  "shared general settings backup payload lives in VoiceInkCore" \
+  'VoiceInkGeneralSettingsBackupPayload' \
+  VoiceInkCore/Sources/VoiceInkCore/GeneralSettingsBackupPolicy.swift
+
+require_pattern \
   "shared general settings backup import plans live in VoiceInkCore" \
   'VoiceInkGeneralSettingsBackupImportPlans' \
   VoiceInkCore/Sources/VoiceInkCore/GeneralSettingsBackupPolicy.swift
@@ -6172,7 +6177,7 @@ require_pattern \
 
 require_pattern \
   "macOS general backup adapts to shared general settings preferences" \
-  'generalSettingsBackupPreferences' \
+  'typealias GeneralBackup = VoiceInkGeneralSettingsBackupPayload<ShortcutBackup>' \
   VoiceInk/Services/BackupTypes.swift
 
 require_pattern \
@@ -6234,6 +6239,11 @@ reject_context_pattern \
   VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
 
 reject_pattern \
+  "macOS general backup avoids shell-owned wire payload implementation" \
+  'struct GeneralBackup|extension GeneralBackup|primaryRecordingShortcutRawValue|rollingBufferPreloadModeRawValue|var generalSettingsBackupPreferences' \
+  VoiceInk/Services/BackupTypes.swift
+
+reject_pattern \
   "macOS general backup import avoids raw general import plan fields" \
   'generalImportPlans\.(recordingShortcut|macOSShell|transcriptionAutoCleanup|audioCleanup|recordingFeedback|transcriptionCleanup|paste|rollingBuffer)|VoiceInkGeneralSettingsBackupPolicy\.applyCorePreferenceImportPlans|corePreferenceImportResult\.didImportRollingBufferSetting' \
   VoiceInk/Services/BackupImporter.swift
@@ -6256,12 +6266,12 @@ reject_context_pattern \
 
 require_pattern \
   "core checks execute general settings backup policy tests" \
-  'GeneralSettingsBackupPolicyTests\.testBackupPreferencesPreserveGroupedExportShape|GeneralSettingsBackupPolicyTests\.testImportPlansApplySharedSubPolicies|GeneralSettingsBackupPolicyTests\.testApplyCorePreferenceImportPlansWritesPortablePreferences|GeneralSettingsBackupPolicyTests\.testApplyCorePreferenceImportPlansIgnoresMissingFields' \
+  'GeneralSettingsBackupPolicyTests\.testGeneralSettingsBackupPayloadPreservesWireShapeAndGroupedPreferences|GeneralSettingsBackupPolicyTests\.testBackupPreferencesPreserveGroupedExportShape|GeneralSettingsBackupPolicyTests\.testImportPlansApplySharedSubPolicies|GeneralSettingsBackupPolicyTests\.testApplyCorePreferenceImportPlansWritesPortablePreferences|GeneralSettingsBackupPolicyTests\.testApplyCorePreferenceImportPlansIgnoresMissingFields' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "migration checklist tracks shared general settings backup policy" \
-  'general settings backup.*VoiceInkGeneralSettingsBackupPolicy' \
+  'general settings backup.*VoiceInkGeneralSettingsBackupPayload.*VoiceInkGeneralSettingsBackupPolicy' \
   docs/ios-single-repo-migration.md
 
 require_pattern \
@@ -6951,14 +6961,14 @@ require_pattern \
   VoiceInk/Services/ImportExportService.swift
 
 require_pattern \
-  "macOS backup export applies shared transcription auto-cleanup enabled preference" \
-  'isTranscriptionCleanupEnabled: preferences\.transcriptionAutoCleanup\.isEnabled' \
-  VoiceInk/Services/BackupTypes.swift
+  "shared general backup payload applies transcription auto-cleanup enabled preference" \
+  'isTranscriptionCleanupEnabled = preferences\.transcriptionAutoCleanup\.isEnabled' \
+  VoiceInkCore/Sources/VoiceInkCore/GeneralSettingsBackupPolicy.swift
 
 require_pattern \
-  "macOS backup export applies shared transcription auto-cleanup retention preference" \
-  'transcriptionRetentionMinutes: preferences\.transcriptionAutoCleanup\.retentionMinutes' \
-  VoiceInk/Services/BackupTypes.swift
+  "shared general backup payload applies transcription auto-cleanup retention preference" \
+  'transcriptionRetentionMinutes = preferences\.transcriptionAutoCleanup\.retentionMinutes' \
+  VoiceInkCore/Sources/VoiceInkCore/GeneralSettingsBackupPolicy.swift
 
 require_pattern \
   "macOS backup export uses shared audio cleanup backup preferences" \
@@ -6966,14 +6976,14 @@ require_pattern \
   VoiceInk/Services/ImportExportService.swift
 
 require_pattern \
-  "macOS backup export applies shared audio cleanup enabled preference" \
-  'isAudioCleanupEnabled: preferences\.audioCleanup\.isEnabled' \
-  VoiceInk/Services/BackupTypes.swift
+  "shared general backup payload applies audio cleanup enabled preference" \
+  'isAudioCleanupEnabled = preferences\.audioCleanup\.isEnabled' \
+  VoiceInkCore/Sources/VoiceInkCore/GeneralSettingsBackupPolicy.swift
 
 require_pattern \
-  "macOS backup export applies shared audio cleanup retention preference" \
-  'audioRetentionPeriod: preferences\.audioCleanup\.retentionDays' \
-  VoiceInk/Services/BackupTypes.swift
+  "shared general backup payload applies audio cleanup retention preference" \
+  'audioRetentionPeriod = preferences\.audioCleanup\.retentionDays' \
+  VoiceInkCore/Sources/VoiceInkCore/GeneralSettingsBackupPolicy.swift
 
 require_pattern \
   "macOS backup export uses shared transcription cleanup backup preferences" \
@@ -6981,24 +6991,24 @@ require_pattern \
   VoiceInk/Services/ImportExportService.swift
 
 require_pattern \
-  "macOS backup export applies shared transcription cleanup text preference" \
-  'isTextFormattingEnabled: preferences\.transcriptionCleanup\.isTextFormattingEnabled' \
-  VoiceInk/Services/BackupTypes.swift
+  "shared general backup payload applies transcription cleanup text preference" \
+  'isTextFormattingEnabled = preferences\.transcriptionCleanup\.isTextFormattingEnabled' \
+  VoiceInkCore/Sources/VoiceInkCore/GeneralSettingsBackupPolicy.swift
 
 require_pattern \
-  "macOS backup export applies shared transcription cleanup punctuation preference" \
-  'punctuationCleanupMode: preferences\.transcriptionCleanup\.punctuationCleanupMode' \
-  VoiceInk/Services/BackupTypes.swift
+  "shared general backup payload applies transcription cleanup punctuation preference" \
+  'punctuationCleanupMode = preferences\.transcriptionCleanup\.punctuationCleanupMode' \
+  VoiceInkCore/Sources/VoiceInkCore/GeneralSettingsBackupPolicy.swift
 
 require_pattern \
-  "macOS backup export applies shared transcription cleanup legacy punctuation preference" \
-  'removePunctuation: preferences\.transcriptionCleanup\.removePunctuation' \
-  VoiceInk/Services/BackupTypes.swift
+  "shared general backup payload applies transcription cleanup legacy punctuation preference" \
+  'removePunctuation = preferences\.transcriptionCleanup\.removePunctuation' \
+  VoiceInkCore/Sources/VoiceInkCore/GeneralSettingsBackupPolicy.swift
 
 require_pattern \
-  "macOS backup export applies shared transcription cleanup lowercase preference" \
-  'lowercaseTranscription: preferences\.transcriptionCleanup\.lowercaseTranscription' \
-  VoiceInk/Services/BackupTypes.swift
+  "shared general backup payload applies transcription cleanup lowercase preference" \
+  'lowercaseTranscription = preferences\.transcriptionCleanup\.lowercaseTranscription' \
+  VoiceInkCore/Sources/VoiceInkCore/GeneralSettingsBackupPolicy.swift
 
 require_pattern \
   "shared general settings core import reads transcription auto-cleanup plan" \
@@ -10580,9 +10590,9 @@ require_pattern \
   VoiceInk/Services/ImportExportService.swift
 
 require_pattern \
-  "macOS backup export emits experimental flag from shared recording feedback preferences" \
+  "shared general backup payload emits experimental flag from shared recording feedback preferences" \
   'preferences\.recordingFeedback\.isExperimentalFeaturesEnabled' \
-  VoiceInk/Services/BackupTypes.swift
+  VoiceInkCore/Sources/VoiceInkCore/GeneralSettingsBackupPolicy.swift
 
 require_pattern \
   "macOS backup import receives shared recording feedback plan from grouped runtime hook" \
@@ -11327,14 +11337,14 @@ require_patterns \
   'VoiceInkMiniRecorderEscapeShortcutPolicy\.timeoutNanoseconds'
 
 require_pattern \
-  "macOS general backup adapts recording shortcut values to shared preferences" \
+  "shared general backup payload adapts recording shortcut values to shared preferences" \
   'recordingShortcutBackupPreferences' \
-  VoiceInk/Services/BackupTypes.swift
+  VoiceInkCore/Sources/VoiceInkCore/GeneralSettingsBackupPolicy.swift
 
 require_pattern \
-  "macOS general backup adapts shortcut backup records for shared policy" \
+  "shared general backup payload adapts shortcut backup records for shared policy" \
   'shortcutBackupRecords' \
-  VoiceInk/Services/BackupTypes.swift
+  VoiceInkCore/Sources/VoiceInkCore/GeneralSettingsBackupPolicy.swift
 
 require_pattern \
   "macOS backup import receives shared recording shortcut plan from grouped runtime hook" \
@@ -14530,9 +14540,9 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/GeneralSettingsBackupPolicy.swift
 
 require_pattern \
-  "macOS general backup adapts rolling-buffer values to shared backup preferences" \
+  "shared general backup payload adapts rolling-buffer values to shared backup preferences" \
   'rollingBufferBackupPreferences' \
-  VoiceInk/Services/BackupTypes.swift
+  VoiceInkCore/Sources/VoiceInkCore/GeneralSettingsBackupPolicy.swift
 
 reject_pattern \
   "macOS backup import avoids shell-only rolling-buffer preload storage" \
@@ -15446,9 +15456,9 @@ require_context_pattern_count_at_least \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
-  "macOS general backup adapts shell values to shared preferences" \
+  "shared general backup payload adapts shell values to shared preferences" \
   'macOSShellBackupPreferences' \
-  VoiceInk/Services/BackupTypes.swift
+  VoiceInkCore/Sources/VoiceInkCore/GeneralSettingsBackupPolicy.swift
 
 require_pattern \
   "macOS backup export uses shared macOS shell backup preferences" \

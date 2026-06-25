@@ -955,6 +955,26 @@ final class RecordingStatePolicyTests: XCTestCase {
         XCTAssertTrue(VoiceInkRecorderStylePreference.hasVisibleRecorder(rawValue: "future-style"))
     }
 
+    func testRecorderStyleWindowRuntimeStatePreservesMacOSUnknownStyleFallback() {
+        var events: [String] = []
+
+        for rawValue in ["none", "notch", "mini", "future-style"] {
+            VoiceInkRecorderStylePreference.applyWindowRuntimeState(
+                forRawValue: rawValue,
+                none: { events.append("\(rawValue):none") },
+                notch: { events.append("\(rawValue):notch") },
+                mini: { events.append("\(rawValue):mini") }
+            )
+        }
+
+        XCTAssertEqual(events, [
+            "none:none",
+            "notch:notch",
+            "mini:mini",
+            "future-style:mini"
+        ])
+    }
+
     func testRecorderSessionShortcutPolicyKeepsHiddenIdleRecorderInactive() {
         XCTAssertFalse(
             VoiceInkRecorderUISessionPolicy.isActiveForRecordingShortcut(

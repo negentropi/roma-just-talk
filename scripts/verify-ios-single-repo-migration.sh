@@ -1413,7 +1413,17 @@ require_pattern \
 
 require_pattern \
   "macOS recorder UI manager uses shared recorder style policy" \
-  'VoiceInkRecorderStylePreference\.(rawValue|saveRawValue|hasVisibleRecorder|windowKind)' \
+  'VoiceInkRecorderStylePreference\.(rawValue|saveRawValue|hasVisibleRecorder|applyWindowRuntimeState)' \
+  VoiceInk/Transcription/Engine/RecorderUIManager.swift
+
+require_pattern \
+  "core checks execute shared recorder window runtime application test" \
+  'RecordingStatePolicyTests\.testRecorderStyleWindowRuntimeStatePreservesMacOSUnknownStyleFallback' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "macOS recorder UI avoids shell-owned recorder window kind switches" \
+  'windowKind\(forRawValue: recorderType\)|case \.(notch|mini|none)\b' \
   VoiceInk/Transcription/Engine/RecorderUIManager.swift
 
 require_pattern \

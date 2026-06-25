@@ -980,10 +980,25 @@ public enum VoiceInkRecorderStyle: String, CaseIterable, Identifiable, Sendable 
     }
 }
 
-public enum VoiceInkRecorderWindowKind: Equatable, Sendable {
+enum VoiceInkRecorderWindowKind: Equatable, Sendable {
     case none
     case notch
     case mini
+
+    func applyRuntimeState(
+        none: () -> Void,
+        notch: () -> Void,
+        mini: () -> Void
+    ) {
+        switch self {
+        case .none:
+            none()
+        case .notch:
+            notch()
+        case .mini:
+            mini()
+        }
+    }
 }
 
 public struct VoiceInkMacOSRecorderStyleSettingsPresentation: Equatable, Sendable {
@@ -1016,7 +1031,7 @@ public enum VoiceInkRecorderStylePreference {
         defaults.set(rawValue, forKey: userDefaultsKey)
     }
 
-    public static func windowKind(forRawValue rawValue: String) -> VoiceInkRecorderWindowKind {
+    static func windowKind(forRawValue rawValue: String) -> VoiceInkRecorderWindowKind {
         switch rawValue {
         case VoiceInkRecorderStyle.none.rawValue:
             return .none
@@ -1029,6 +1044,19 @@ public enum VoiceInkRecorderStylePreference {
 
     public static func hasVisibleRecorder(rawValue: String) -> Bool {
         windowKind(forRawValue: rawValue) != .none
+    }
+
+    public static func applyWindowRuntimeState(
+        forRawValue rawValue: String,
+        none: () -> Void = {},
+        notch: () -> Void,
+        mini: () -> Void
+    ) {
+        windowKind(forRawValue: rawValue).applyRuntimeState(
+            none: none,
+            notch: notch,
+            mini: mini
+        )
     }
 }
 

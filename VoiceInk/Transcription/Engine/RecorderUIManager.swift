@@ -55,44 +55,43 @@ class RecorderUIManager: ObservableObject {
         guard let engine = engine, let recorder = recorder else { return }
         logger.notice("Showing \(self.recorderType, privacy: .public) recorder")
 
-        switch VoiceInkRecorderStylePreference.windowKind(forRawValue: recorderType) {
-        case .none:
-            return
-        case .notch:
-            if notchWindowManager == nil {
-                notchWindowManager = NotchWindowManager(engine: engine, recorder: recorder)
+        VoiceInkRecorderStylePreference.applyWindowRuntimeState(
+            forRawValue: recorderType,
+            notch: {
+                if notchWindowManager == nil {
+                    notchWindowManager = NotchWindowManager(engine: engine, recorder: recorder)
+                }
+                notchWindowManager?.show()
+            },
+            mini: {
+                if miniWindowManager == nil {
+                    miniWindowManager = MiniWindowManager(engine: engine, recorder: recorder)
+                }
+                miniWindowManager?.show()
             }
-            notchWindowManager?.show()
-        case .mini:
-            if miniWindowManager == nil {
-                miniWindowManager = MiniWindowManager(engine: engine, recorder: recorder)
-            }
-            miniWindowManager?.show()
-        }
+        )
     }
 
     func hideRecorderPanel() {
-        switch VoiceInkRecorderStylePreference.windowKind(forRawValue: recorderType) {
-        case .notch:
-            notchWindowManager?.hide()
-        case .mini:
-            miniWindowManager?.hide()
-        case .none:
-            break
-        }
+        VoiceInkRecorderStylePreference.applyWindowRuntimeState(
+            forRawValue: recorderType,
+            notch: { notchWindowManager?.hide() },
+            mini: { miniWindowManager?.hide() }
+        )
     }
 
     private func destroyWindow(for recorderType: String) {
-        switch VoiceInkRecorderStylePreference.windowKind(forRawValue: recorderType) {
-        case .notch:
-            notchWindowManager?.destroyWindow()
-            notchWindowManager = nil
-        case .mini:
-            miniWindowManager?.destroyWindow()
-            miniWindowManager = nil
-        case .none:
-            break
-        }
+        VoiceInkRecorderStylePreference.applyWindowRuntimeState(
+            forRawValue: recorderType,
+            notch: {
+                notchWindowManager?.destroyWindow()
+                notchWindowManager = nil
+            },
+            mini: {
+                miniWindowManager?.destroyWindow()
+                miniWindowManager = nil
+            }
+        )
     }
 
     // MARK: - Mini Recorder Management

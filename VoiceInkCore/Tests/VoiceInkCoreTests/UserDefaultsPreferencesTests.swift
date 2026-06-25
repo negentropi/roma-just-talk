@@ -167,22 +167,14 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(resetState.apiKeyProvidersToDelete, VoiceInkProviderKind.userAPIKeyProviders)
     }
 
-    func testAppSettingsResetStateBuildsApplicationActionsInOrder() {
+    func testAppSettingsResetStateAppliesDefaultRuntimeStateInOrder() {
         let resetState = VoiceInkDefaultSettings.iOS.appSettingsResetState
 
-        XCTAssertEqual(resetState.applicationActions.count, 3)
-        guard case .applyResetState(let actionResetState) = resetState.applicationActions[0] else {
-            return XCTFail("Expected app settings reset to apply in-memory state first")
-        }
-        XCTAssertEqual(actionResetState.audioSessionTimeoutSeconds, resetState.audioSessionTimeoutSeconds)
-        XCTAssertEqual(actionResetState.selectedTranscriptionLanguage, resetState.selectedTranscriptionLanguage)
-        guard case .clearCoreUserSettings = resetState.applicationActions[1] else {
-            return XCTFail("Expected app settings reset to clear persisted settings after state reset")
-        }
-        guard case .deleteProviderAPIKeys(let providers) = resetState.applicationActions[2] else {
-            return XCTFail("Expected app settings reset to delete provider API keys last")
-        }
-        XCTAssertEqual(providers, VoiceInkProviderKind.userAPIKeyProviders)
+        XCTAssertEqual(appSettingsResetActionEvents(for: resetState), [
+            "applyResetState",
+            "clearCoreUserSettings",
+            "deleteProviderAPIKeys:\(VoiceInkProviderKind.userAPIKeyProviders.map(\.rawValue).joined(separator: ","))"
+        ])
     }
 
     func testAppSettingsResetStateAppliesRuntimeStateInOrder() {
@@ -237,7 +229,7 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         ])
     }
 
-    func testAppSettingsResetStateSkipsProviderDeletionActionWhenNoProviders() {
+    func testAppSettingsResetStateSkipsProviderDeletionRuntimeActionWhenNoProviders() {
         let resetState = VoiceInkAppSettingsResetState(
             modes: [],
             selectedModeId: nil,
@@ -251,13 +243,34 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             apiKeyProvidersToDelete: []
         )
 
-        XCTAssertEqual(resetState.applicationActions.count, 2)
-        guard case .applyResetState = resetState.applicationActions[0] else {
-            return XCTFail("Expected app settings reset to apply in-memory state first")
-        }
-        guard case .clearCoreUserSettings = resetState.applicationActions[1] else {
-            return XCTFail("Expected app settings reset to still clear persisted settings")
-        }
+        XCTAssertEqual(appSettingsResetActionEvents(for: resetState), [
+            "applyResetState",
+            "clearCoreUserSettings"
+        ])
+    }
+
+    private func appSettingsResetActionEvents(
+        for resetState: VoiceInkAppSettingsResetState
+    ) -> [String] {
+        var events: [String] = []
+        resetState.applyRuntimeState(
+            setModes: { _ in events.append("applyResetState") },
+            setSelectedModeId: { _ in },
+            setAPIKeyState: { _ in },
+            setAudioSessionTimeoutSeconds: { _ in },
+            setTranscriptionCleanupSettings: { _ in },
+            setFillerWords: { _ in },
+            setWordReplacements: { _ in },
+            setCustomVocabularyTerms: { _ in },
+            setSelectedTranscriptionLanguage: { _ in },
+            clearCoreUserSettings: {
+                events.append("clearCoreUserSettings")
+            },
+            deleteProviderAPIKeys: { providers in
+                events.append("deleteProviderAPIKeys:\(providers.map(\.rawValue).joined(separator: ","))")
+            }
+        )
+        return events
     }
 
     func testIOSAppSettingsStartupPolicyLoadsPersistedStateThroughAdapters() {

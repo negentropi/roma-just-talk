@@ -12105,21 +12105,26 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_patterns \
-  "shared app settings reset state owns ordered application actions" \
+  "shared app settings reset state owns ordered runtime application" \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift \
-  'VoiceInkAppSettingsResetAction' \
-  'applicationActions' \
+  'fileprivate enum VoiceInkAppSettingsResetAction' \
+  'private var applicationActions' \
   'applyRuntimeState' \
   'applyResetState' \
   'clearCoreUserSettings' \
   'deleteProviderAPIKeys'
 
+reject_pattern \
+  "shared app settings reset state avoids public raw action interface" \
+  'public enum VoiceInkAppSettingsResetAction|public var applicationActions: \[VoiceInkAppSettingsResetAction\]' \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
 require_patterns \
   "core checks execute app settings reset action tests" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'UserDefaultsPreferencesTests\.testAppSettingsResetStateBuildsApplicationActionsInOrder' \
+  'UserDefaultsPreferencesTests\.testAppSettingsResetStateAppliesDefaultRuntimeStateInOrder' \
   'UserDefaultsPreferencesTests\.testAppSettingsResetStateAppliesRuntimeStateInOrder' \
-  'UserDefaultsPreferencesTests\.testAppSettingsResetStateSkipsProviderDeletionActionWhenNoProviders'
+  'UserDefaultsPreferencesTests\.testAppSettingsResetStateSkipsProviderDeletionRuntimeActionWhenNoProviders'
 
 require_patterns \
   "shared iOS app settings startup state lives in VoiceInkCore" \

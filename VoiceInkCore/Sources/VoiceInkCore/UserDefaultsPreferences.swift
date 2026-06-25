@@ -293,7 +293,7 @@ public struct VoiceInkAppSettingsResetState {
         self.apiKeyProvidersToDelete = apiKeyProvidersToDelete
     }
 
-    public var applicationActions: [VoiceInkAppSettingsResetAction] {
+    private var applicationActions: [VoiceInkAppSettingsResetAction] {
         var actions: [VoiceInkAppSettingsResetAction] = [
             .applyResetState(self),
             .clearCoreUserSettings
@@ -305,7 +305,7 @@ public struct VoiceInkAppSettingsResetState {
     }
 }
 
-public enum VoiceInkAppSettingsResetAction {
+fileprivate enum VoiceInkAppSettingsResetAction {
     case applyResetState(VoiceInkAppSettingsResetState)
     case clearCoreUserSettings
     case deleteProviderAPIKeys([VoiceInkProviderKind])

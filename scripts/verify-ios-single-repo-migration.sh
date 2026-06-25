@@ -1004,7 +1004,7 @@ require_pattern \
 
 require_pattern \
   "shared recording stop plan checks run in VoiceInkCore" \
-  'testRecordingStopPlanFinishesFlowAndCreatesPendingDraftOnlyWhenAudioExists' \
+  'testRecordingStopPlanFinishesFlowAndCreatesPendingDraftOnlyWhenAudioExists|testRecordingStopPlanAppliesIOSRuntimeStateInOrder' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -1199,6 +1199,11 @@ require_pattern \
   iOS/VoiceInk-ios/RecordingManager.swift
 
 require_pattern \
+  "iOS recording manager applies shared stop plan runtime order" \
+  'stopPlan\.applyRuntimeState|insertPendingDraft' \
+  iOS/VoiceInk-ios/RecordingManager.swift
+
+require_pattern \
   "iOS recording manager adapts recorder URL into shared stop plan" \
   'audioFileURL: +recorder\.currentRecordingURL\?\.lastPathComponent' \
   iOS/VoiceInk-ios/RecordingManager.swift
@@ -1226,6 +1231,11 @@ reject_pattern \
 reject_pattern \
   "iOS recording manager avoids missing-audio early return before stop cleanup" \
   'guard +let +fileURL += +recorder\.currentRecordingURL +else +\{ +return +\}' \
+  iOS/VoiceInk-ios/RecordingManager.swift
+
+reject_pattern \
+  "iOS recording manager avoids shell-owned stop-plan field unpacking" \
+  'flowState += +stopPlan\.flowStateAfterStop|stopPlan\.pendingDraft' \
   iOS/VoiceInk-ios/RecordingManager.swift
 
 require_patterns \
@@ -1798,8 +1808,8 @@ reject_pattern \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift
 
 require_pattern \
-  "iOS live recording receives shared stop-plan pending draft" \
-  'stopPlan\.pendingDraft' \
+  "iOS live recording receives shared stop-plan pending draft through runtime adapter" \
+  'insertPendingDraft' \
   iOS/VoiceInk-ios/RecordingManager.swift
 
 require_pattern \

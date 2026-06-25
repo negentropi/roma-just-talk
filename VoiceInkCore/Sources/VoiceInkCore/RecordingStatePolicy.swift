@@ -182,6 +182,23 @@ public struct VoiceInkRecordingStopPlan: Equatable, Sendable {
         self.flowStateAfterStop = flowStateAfterStop
         self.pendingDraft = pendingDraft
     }
+
+    public func applyRuntimeState(
+        stopRecorder: () -> Void,
+        stopDurationTimer: () -> Void,
+        setFlowState: (VoiceInkRecordingFlowState) -> Void,
+        updateRecordingState: (Bool) -> Void,
+        insertPendingDraft: (VoiceInkRecordingTranscriptionDraft) -> Void
+    ) {
+        stopRecorder()
+        stopDurationTimer()
+        setFlowState(flowStateAfterStop)
+        updateRecordingState(false)
+
+        if let pendingDraft {
+            insertPendingDraft(pendingDraft)
+        }
+    }
 }
 
 public enum VoiceInkAudioRecorderStopMode: Equatable, Sendable {

@@ -132,18 +132,19 @@ final class RecordingManager: ObservableObject {
             audioFileURL: recorder.currentRecordingURL?.lastPathComponent
         )
 
-        recorder.stopRecording()
-        stopDurationTimer()
-        flowState = stopPlan.flowStateAfterStop
-        coordinator.updateRecordingState(false)
+        stopPlan.applyRuntimeState(
+            stopRecorder: recorder.stopRecording,
+            stopDurationTimer: stopDurationTimer,
+            setFlowState: { flowState = $0 },
+            updateRecordingState: coordinator.updateRecordingState,
+            insertPendingDraft: { draft in
+                let note = Transcription(recordingDraft: draft)
+                modelContext.insert(note)
+                try? modelContext.save()
 
-        guard let draft = stopPlan.pendingDraft else { return }
-
-        let note = Transcription(recordingDraft: draft)
-        modelContext.insert(note)
-        try? modelContext.save()
-
-        transcribeInBackground(note: note, modelContext: modelContext)
+                transcribeInBackground(note: note, modelContext: modelContext)
+            }
+        )
     }
     
     func cancelRecording() {

@@ -318,6 +318,44 @@ final class RecordingStatePolicyTests: XCTestCase {
         XCTAssertNil(missingAudioPlan.pendingDraft)
     }
 
+    func testRecordingStopPlanAppliesIOSRuntimeStateInOrder() {
+        let recordingState = VoiceInkRecordingFlowState(
+            recordingState: .recording,
+            animate: true,
+            isRecordingSheetPresented: true,
+            currentDuration: 4.5
+        )
+        var events: [String] = []
+
+        recordingState.stopRecordingPlan(audioFileURL: "recording_42.wav").applyRuntimeState(
+            stopRecorder: { events.append("stop") },
+            stopDurationTimer: { events.append("timer") },
+            setFlowState: { events.append("state:\($0.recordingState):\($0.currentDuration)") },
+            updateRecordingState: { events.append("coordinator:\($0)") },
+            insertPendingDraft: { events.append("draft:\($0.audioFileURL ?? "")") }
+        )
+
+        recordingState.stopRecordingPlan(audioFileURL: nil).applyRuntimeState(
+            stopRecorder: { events.append("stop") },
+            stopDurationTimer: { events.append("timer") },
+            setFlowState: { events.append("state:\($0.recordingState):\($0.currentDuration)") },
+            updateRecordingState: { events.append("coordinator:\($0)") },
+            insertPendingDraft: { events.append("draft:\($0.audioFileURL ?? "")") }
+        )
+
+        XCTAssertEqual(events, [
+            "stop",
+            "timer",
+            "state:idle:4.5",
+            "coordinator:false",
+            "draft:recording_42.wav",
+            "stop",
+            "timer",
+            "state:idle:4.5",
+            "coordinator:false"
+        ])
+    }
+
     func testAudioRecorderStopPolicyPreservesIOSStopCleanup() {
         XCTAssertEqual(
             VoiceInkAudioRecorderStopPolicy.plan(for: .keepRecordingFile),

@@ -355,6 +355,16 @@ public struct VoiceInkAppGroupRecordingStateReadPlan: Equatable, Sendable {
         self.state = state
         self.staleStateRepairMutationPlan = staleStateRepairMutationPlan
     }
+
+    public func applyRuntimeState(
+        repairStaleState: (VoiceInkAppGroupRecordingStateMutationPlan) -> Void
+    ) -> VoiceInkAppGroupRecordingState {
+        if let staleStateRepairMutationPlan {
+            repairStaleState(staleStateRepairMutationPlan)
+        }
+
+        return state
+    }
 }
 
 public enum VoiceInkAppGroupRecordingStatePolicy {

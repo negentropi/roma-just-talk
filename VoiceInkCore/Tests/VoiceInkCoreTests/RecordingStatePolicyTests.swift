@@ -537,6 +537,36 @@ final class RecordingStatePolicyTests: XCTestCase {
         )
     }
 
+    func testAppGroupRecordingStateReadPlanAppliesStaleRepairRuntimeState() {
+        var events: [String] = []
+
+        let freshState = VoiceInkAppGroupRecordingStatePolicy.readPlan(
+            storedIsRecording: true,
+            lastRecordingTimestamp: 100,
+            now: Date(timeIntervalSince1970: 129)
+        ).applyRuntimeState { _ in
+            events.append("fresh-repair")
+        }
+        events.append("fresh-state:\(freshState.isRecording)")
+
+        let staleState = VoiceInkAppGroupRecordingStatePolicy.readPlan(
+            storedIsRecording: true,
+            lastRecordingTimestamp: 100,
+            now: Date(timeIntervalSince1970: 131)
+        ).applyRuntimeState { mutationPlan in
+            events.append(
+                "repair:\(mutationPlan.darwinNotificationName):\(mutationPlan.writePlan.isRecording == false)"
+            )
+        }
+        events.append("stale-state:\(staleState.isRecording)")
+
+        XCTAssertEqual(events, [
+            "fresh-state:true",
+            "repair:\(VoiceInkAppIdentity.iOSRecordingStateChangedDarwinNotificationName):true",
+            "stale-state:false"
+        ])
+    }
+
     func testAppGroupRecordingStateWritePlansPreserveIOSBridgeWrites() {
         XCTAssertEqual(
             VoiceInkAppGroupRecordingStatePolicy.stopRequestedWritePlan(

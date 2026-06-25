@@ -15403,6 +15403,11 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
+  "VoiceInkCore checks cover iOS App Group read-plan stale repair runtime application" \
+  'testAppGroupRecordingStateReadPlanAppliesStaleRepairRuntimeState' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "VoiceInkCore checks cover iOS App Group recording diagnostics" \
   'testAppGroupRecordingDiagnosticsPreserveIOSLogCopy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
@@ -15566,10 +15571,11 @@ require_pattern \
   'plan\.applyRuntimeState' \
   iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
 
-require_pattern \
-  "iOS App Group coordinator applies shared stale repair mutation plan" \
-  'staleStateRepairMutationPlan|VoiceInkAppGroupRecordingBridge\.apply\(mutationPlan' \
-  iOS/Shared/AppGroupCoordinator.swift
+require_patterns \
+  "iOS App Group coordinator applies shared stale repair runtime plan" \
+  iOS/Shared/AppGroupCoordinator.swift \
+  'readPlan\.applyRuntimeState' \
+  'VoiceInkAppGroupRecordingBridge\.apply\(mutationPlan'
 
 require_pattern \
   "iOS App Group coordinator adapts shared recording diagnostics" \
@@ -15595,6 +15601,11 @@ reject_pattern \
   "iOS App Group bridge avoids shell-owned write-plan optional branching" \
   'if +let +isRecording += +plan\.isRecording|plan\.lastRecordingTimestamp' \
   iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
+
+reject_pattern \
+  "iOS App Group coordinator avoids shell-owned read-plan optional branching" \
+  'if +let +mutationPlan += +readPlan\.staleStateRepairMutationPlan|readPlan\.staleStateRepairMutationPlan' \
+  iOS/Shared/AppGroupCoordinator.swift
 
 reject_pattern \
   "iOS App Group coordinator avoids shell-owned stale-state repair mutation" \

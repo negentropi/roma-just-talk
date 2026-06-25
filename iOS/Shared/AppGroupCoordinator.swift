@@ -36,13 +36,13 @@ final class AppGroupCoordinator {
     /// Get current recording state (for keyboard UI updates)
     var isRecording: Bool {
         let readPlan = VoiceInkAppGroupRecordingBridge.recordingStateReadPlan(in: sharedDefaults)
-        if let mutationPlan = readPlan.staleStateRepairMutationPlan {
+        let state = readPlan.applyRuntimeState { mutationPlan in
             VoiceInkIOSLogger.appGroup.warning("\(VoiceInkAppGroupRecordingDiagnostics.staleRecordingStateClearedMessage, privacy: .public)")
             VoiceInkAppGroupRecordingBridge.apply(mutationPlan, to: sharedDefaults)
             postDarwinNotification(mutationPlan.darwinNotificationName)
         }
 
-        return readPlan.state.isRecording
+        return state.isRecording
     }
     
     // MARK: - Public Interface for Main App

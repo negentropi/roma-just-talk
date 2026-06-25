@@ -280,6 +280,92 @@ final class TranscriptionModelCatalogTests: XCTestCase {
         )["en_uk"], "British English")
     }
 
+    func testMacOSTranscriptionModelProviderPreservesRawValuesAndLegacyLocalDecode() throws {
+        XCTAssertEqual(
+            VoiceInkMacOSTranscriptionModelProvider.allCases.map(\.rawValue),
+            [
+                "Whisper",
+                "Parakeet",
+                "Groq",
+                "ElevenLabs",
+                "Deepgram",
+                "Mistral",
+                "Gemini",
+                "Soniox",
+                "Speechmatics",
+                "AssemblyAI",
+                "xAI",
+                "Cartesia",
+                "Custom",
+                "Native Apple"
+            ]
+        )
+
+        let decoder = JSONDecoder()
+        XCTAssertEqual(
+            try decoder.decode(VoiceInkMacOSTranscriptionModelProvider.self, from: Data(#""Local""#.utf8)),
+            .whisper
+        )
+        XCTAssertEqual(
+            try decoder.decode(VoiceInkMacOSTranscriptionModelProvider.self, from: Data(#""Parakeet""#.utf8)),
+            .fluidAudio
+        )
+
+        do {
+            _ = try decoder.decode(VoiceInkMacOSTranscriptionModelProvider.self, from: Data(#""Unknown""#.utf8))
+            XCTFail("Unknown macOS transcription model provider raw value should throw")
+        } catch {
+            XCTAssertTrue(error is DecodingError)
+        }
+    }
+
+    func testMacOSTranscriptionModelProviderRoleMappingIsShared() {
+        let expectedRoles: [(VoiceInkMacOSTranscriptionModelProvider, VoiceInkTranscriptionModelProviderRole)] = [
+            (.whisper, .localWhisper),
+            (.fluidAudio, .localFluidAudio),
+            (.nativeApple, .nativeApple),
+            (.custom, .customCloud),
+            (.groq, .cloud(.groq)),
+            (.deepgram, .cloud(.deepgram)),
+            (.elevenLabs, .cloud(.elevenLabs)),
+            (.mistral, .cloud(.mistral)),
+            (.gemini, .cloud(.gemini)),
+            (.soniox, .cloud(.soniox)),
+            (.speechmatics, .cloud(.speechmatics)),
+            (.assemblyAI, .cloud(.assemblyAI)),
+            (.xai, .cloud(.xai)),
+            (.cartesia, .cloud(.cartesia))
+        ]
+
+        for (provider, role) in expectedRoles {
+            XCTAssertEqual(provider.coreTranscriptionModelProviderRole, role)
+        }
+
+        XCTAssertEqual(VoiceInkMacOSTranscriptionModelProvider.groq.coreTranscriptionModelProvider, .groq)
+        XCTAssertNil(VoiceInkMacOSTranscriptionModelProvider.whisper.coreTranscriptionModelProvider)
+        XCTAssertEqual(VoiceInkMacOSTranscriptionModelProvider.cartesia.apiKeyProviderName, "Cartesia")
+        XCTAssertEqual(VoiceInkMacOSTranscriptionModelProvider.custom.apiKeyProviderName, "Custom")
+        XCTAssertEqual(VoiceInkMacOSTranscriptionModelProvider.whisper.transcriptionLanguageSource, .whisper)
+        XCTAssertEqual(VoiceInkMacOSTranscriptionModelProvider.custom.transcriptionLanguageSource, .all)
+        XCTAssertEqual(
+            VoiceInkMacOSTranscriptionModelProvider.fluidAudio.supportedLanguages(isMultilingual: false),
+            VoiceInkLanguageCatalog.englishOnly
+        )
+        XCTAssertEqual(VoiceInkMacOSTranscriptionModelProvider.nativeApple.modelManagementCategory, .local)
+        XCTAssertEqual(VoiceInkMacOSTranscriptionModelProvider.custom.transcriptionServiceRoute, .cloud)
+        XCTAssertEqual(
+            VoiceInkMacOSTranscriptionModelProvider.nativeApple.transcriptionModelAvailabilityRequirement,
+            .currentOSSupport
+        )
+        XCTAssertTrue(VoiceInkMacOSTranscriptionModelProvider.whisper.supportsRecordedFileTranscription)
+        XCTAssertTrue(VoiceInkMacOSTranscriptionModelProvider.cartesia.isStreamingOnly)
+        XCTAssertEqual(
+            VoiceInkMacOSTranscriptionModelProvider.elevenLabs.streamingConnectionModelName(for: "scribe_v1"),
+            "scribe_v2_realtime"
+        )
+        XCTAssertTrue(VoiceInkMacOSTranscriptionModelProvider.assemblyAI.mapsStreamingTransportTimeoutToFinalTimeout)
+    }
+
     func testProviderAPIErrorDomainsPreserveMacOSBatchMapping() {
         XCTAssertEqual(VoiceInkTranscriptionModelProvider.groq.apiErrorDomain, "GroqAPI")
         XCTAssertEqual(VoiceInkTranscriptionModelProvider.deepgram.apiErrorDomain, "DeepgramAPI")

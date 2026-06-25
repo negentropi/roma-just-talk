@@ -4143,9 +4143,19 @@ require_patterns \
   'streamingConnectionModelName' \
   'mapsStreamingTransportTimeoutToFinalTimeout'
 
-require_pattern \
-  "macOS ModelProvider adapts shared transcription model provider role" \
+require_patterns \
+  "shared macOS transcription model provider owns legacy raw values and role mapping" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift \
+  'VoiceInkMacOSTranscriptionModelProvider' \
+  'rawValue == "Local"' \
+  'case fluidAudio = "Parakeet"' \
   'coreTranscriptionModelProviderRole' \
+  'apiKeyProviderName' \
+  'supportedLanguages\(isMultilingual:'
+
+require_pattern \
+  "macOS ModelProvider aliases shared transcription model provider" \
+  'typealias ModelProvider = VoiceInkMacOSTranscriptionModelProvider' \
   VoiceInk/Models/TranscriptionModel.swift
 
 require_pattern \
@@ -4154,8 +4164,8 @@ require_pattern \
   VoiceInk/Models/TranscriptionModel.swift
 
 require_patterns \
-  "macOS TranscriptionModel uses shared provider-role streaming facts" \
-  VoiceInk/Models/TranscriptionModel.swift \
+  "shared macOS transcription model provider exposes provider-role streaming facts" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift \
   'coreTranscriptionModelProviderRole\.apiKeyProviderName' \
   'coreTranscriptionModelProviderRole\.supportsRecordedFileTranscription' \
   'coreTranscriptionModelProviderRole\.isStreamingOnly' \
@@ -4164,8 +4174,13 @@ require_patterns \
 
 require_pattern \
   "core checks execute transcription model provider role tests" \
-  'TranscriptionModelCatalogTests\.testProviderRoleOwnsModelCategoryRouteAvailabilityAndLanguageSource' \
+  'TranscriptionModelCatalogTests\.testProviderRoleOwnsModelCategoryRouteAvailabilityAndLanguageSource|TranscriptionModelCatalogTests\.testMacOSTranscriptionModelProviderRoleMappingIsShared' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "macOS ModelProvider avoids shell-owned enum and role mapping" \
+  'enum ModelProvider|case fluidAudio = "Parakeet"|Invalid ModelProvider|switch self' \
+  VoiceInk/Models/TranscriptionModel.swift
 
 reject_context_pattern \
   "macOS ModelProvider avoids shell-only language-source switch" \

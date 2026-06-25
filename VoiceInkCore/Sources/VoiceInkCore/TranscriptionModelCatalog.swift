@@ -506,6 +506,121 @@ public struct VoiceInkFluidAudioTranscriptionModelSpec: Equatable, Sendable {
     }
 }
 
+public enum VoiceInkMacOSTranscriptionModelProvider: String, Codable, Hashable, CaseIterable, Sendable {
+    case whisper = "Whisper"
+    case fluidAudio = "Parakeet"
+    case groq = "Groq"
+    case elevenLabs = "ElevenLabs"
+    case deepgram = "Deepgram"
+    case mistral = "Mistral"
+    case gemini = "Gemini"
+    case soniox = "Soniox"
+    case speechmatics = "Speechmatics"
+    case assemblyAI = "AssemblyAI"
+    case xai = "xAI"
+    case cartesia = "Cartesia"
+    case custom = "Custom"
+    case nativeApple = "Native Apple"
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let rawValue = try container.decode(String.self)
+        if rawValue == "Local" {
+            self = .whisper
+            return
+        }
+
+        guard let provider = Self(rawValue: rawValue) else {
+            throw DecodingError.dataCorruptedError(
+                in: container,
+                debugDescription: "Invalid ModelProvider: \(rawValue)"
+            )
+        }
+
+        self = provider
+    }
+
+    public var coreTranscriptionModelProviderRole: VoiceInkTranscriptionModelProviderRole {
+        switch self {
+        case .groq:
+            return .cloud(.groq)
+        case .deepgram:
+            return .cloud(.deepgram)
+        case .elevenLabs:
+            return .cloud(.elevenLabs)
+        case .mistral:
+            return .cloud(.mistral)
+        case .gemini:
+            return .cloud(.gemini)
+        case .soniox:
+            return .cloud(.soniox)
+        case .speechmatics:
+            return .cloud(.speechmatics)
+        case .assemblyAI:
+            return .cloud(.assemblyAI)
+        case .xai:
+            return .cloud(.xai)
+        case .cartesia:
+            return .cloud(.cartesia)
+        case .whisper:
+            return .localWhisper
+        case .fluidAudio:
+            return .localFluidAudio
+        case .nativeApple:
+            return .nativeApple
+        case .custom:
+            return .customCloud
+        }
+    }
+
+    public var coreTranscriptionModelProvider: VoiceInkTranscriptionModelProvider? {
+        coreTranscriptionModelProviderRole.coreTranscriptionModelProvider
+    }
+
+    public var apiKeyProviderName: String {
+        coreTranscriptionModelProviderRole.apiKeyProviderName(defaultName: rawValue)
+    }
+
+    public var transcriptionLanguageSource: VoiceInkTranscriptionLanguageSource {
+        coreTranscriptionModelProviderRole.transcriptionLanguageSource
+    }
+
+    public func supportedLanguages(isMultilingual: Bool) -> [String: String] {
+        VoiceInkTranscriptionLanguageSupport.languages(
+            for: transcriptionLanguageSource,
+            isMultilingual: isMultilingual
+        )
+    }
+
+    public var modelManagementCategory: VoiceInkModelManagementModelCategory {
+        coreTranscriptionModelProviderRole.modelManagementCategory
+    }
+
+    public var transcriptionServiceRoute: VoiceInkTranscriptionServiceRoute {
+        coreTranscriptionModelProviderRole.transcriptionServiceRoute
+    }
+
+    public var transcriptionModelAvailabilityRequirement: VoiceInkTranscriptionModelAvailabilityRequirement {
+        coreTranscriptionModelProviderRole.transcriptionModelAvailabilityRequirement
+    }
+
+    public var supportsRecordedFileTranscription: Bool {
+        coreTranscriptionModelProviderRole.supportsRecordedFileTranscription
+    }
+
+    public var isStreamingOnly: Bool {
+        coreTranscriptionModelProviderRole.isStreamingOnly
+    }
+
+    public func streamingConnectionModelName(for selectedModelName: String) -> String {
+        coreTranscriptionModelProviderRole.streamingConnectionModelName(for: selectedModelName)
+    }
+
+    public var mapsStreamingTransportTimeoutToFinalTimeout: Bool {
+        coreTranscriptionModelProviderRole.mapsStreamingTransportTimeoutToFinalTimeout
+    }
+}
+
 public enum VoiceInkTranscriptionModelCatalog {
     public static let localBaseModel = "base"
     public static let defaultMacOSFluidAudioModelName = "parakeet-tdt-0.6b-v2"

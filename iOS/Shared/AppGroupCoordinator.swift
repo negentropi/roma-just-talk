@@ -27,10 +27,10 @@ final class AppGroupCoordinator {
     
     /// Call this from the keyboard extension to request recording stop
     func requestStopRecording() {
-        let mutationPlan = VoiceInkAppGroupRecordingBridge.markStopRequested(in: sharedDefaults)
+        let mutationPlan = VoiceInkAppGroupRecordingStatePolicy.stopRequestedMutationPlan()
         
         // Send immediate notification
-        mutationPlan.applyRuntimeState(postDarwinNotification: postDarwinNotification)
+        apply(mutationPlan)
     }
     
     /// Get current recording state (for keyboard UI updates)
@@ -38,8 +38,7 @@ final class AppGroupCoordinator {
         let readPlan = VoiceInkAppGroupRecordingBridge.recordingStateReadPlan(in: sharedDefaults)
         let state = readPlan.applyRuntimeState { mutationPlan in
             VoiceInkIOSLogger.appGroup.warning("\(VoiceInkAppGroupRecordingDiagnostics.staleRecordingStateClearedMessage, privacy: .public)")
-            VoiceInkAppGroupRecordingBridge.apply(mutationPlan, to: sharedDefaults)
-            mutationPlan.applyRuntimeState(postDarwinNotification: postDarwinNotification)
+            apply(mutationPlan)
         }
 
         return state.isRecording
@@ -49,12 +48,23 @@ final class AppGroupCoordinator {
     
     /// Call this from the main app to update recording state
     func updateRecordingState(_ isRecording: Bool) {
-        let mutationPlan = VoiceInkAppGroupRecordingBridge.writeRecordingState(isRecording, to: sharedDefaults)
+        let mutationPlan = VoiceInkAppGroupRecordingStatePolicy.recordingStateMutationPlan(
+            isRecording: isRecording
+        )
         
         // Notify keyboard of state change
-        mutationPlan.applyRuntimeState(postDarwinNotification: postDarwinNotification)
+        apply(mutationPlan)
         
         VoiceInkIOSLogger.appGroup.notice("\(VoiceInkAppGroupRecordingDiagnostics.updatedRecordingStateMessage(isRecording: isRecording), privacy: .public)")
+    }
+
+    private func apply(_ mutationPlan: VoiceInkAppGroupRecordingStateMutationPlan) {
+        mutationPlan.applyRuntimeState(
+            applyWritePlan: {
+                VoiceInkAppGroupRecordingBridge.apply($0, to: sharedDefaults)
+            },
+            postDarwinNotification: postDarwinNotification
+        )
     }
     
     // MARK: - Darwin Notifications (Real-time Communication)

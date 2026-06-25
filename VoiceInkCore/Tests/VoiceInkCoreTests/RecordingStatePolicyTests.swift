@@ -644,21 +644,37 @@ final class RecordingStatePolicyTests: XCTestCase {
         )
     }
 
-    func testAppGroupRecordingStateMutationPlanAppliesRuntimeNotification() {
-        var notifications: [String] = []
+    func testAppGroupRecordingStateMutationPlanAppliesRuntimeWriteBeforeNotification() {
+        var events: [String] = []
 
         VoiceInkAppGroupRecordingStatePolicy.stopRequestedMutationPlan(
             now: Date(timeIntervalSince1970: 42)
-        ).applyRuntimeState { notifications.append($0) }
+        ).applyRuntimeState(
+            applyWritePlan: {
+                events.append("write:\($0.isRecording == nil):\($0.lastRecordingTimestamp)")
+            },
+            postDarwinNotification: {
+                events.append("notify:\($0)")
+            }
+        )
 
         VoiceInkAppGroupRecordingStatePolicy.recordingStateMutationPlan(
             isRecording: true,
             now: Date(timeIntervalSince1970: 43)
-        ).applyRuntimeState { notifications.append($0) }
+        ).applyRuntimeState(
+            applyWritePlan: {
+                events.append("write:\($0.isRecording == true):\($0.lastRecordingTimestamp)")
+            },
+            postDarwinNotification: {
+                events.append("notify:\($0)")
+            }
+        )
 
-        XCTAssertEqual(notifications, [
-            VoiceInkAppIdentity.iOSStopRecordingDarwinNotificationName,
-            VoiceInkAppIdentity.iOSRecordingStateChangedDarwinNotificationName
+        XCTAssertEqual(events, [
+            "write:true:42.0",
+            "notify:\(VoiceInkAppIdentity.iOSStopRecordingDarwinNotificationName)",
+            "write:true:43.0",
+            "notify:\(VoiceInkAppIdentity.iOSRecordingStateChangedDarwinNotificationName)"
         ])
     }
 

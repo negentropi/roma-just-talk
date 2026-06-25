@@ -8,30 +8,6 @@ enum VoiceInkAppGroupRecordingBridge {
         UserDefaults(suiteName: appGroupIdentifier)
     }
 
-    @discardableResult
-    static func markStopRequested(
-        in defaults: UserDefaults?,
-        now: Date = Date()
-    ) -> VoiceInkAppGroupRecordingStateMutationPlan {
-        let mutationPlan = VoiceInkAppGroupRecordingStatePolicy.stopRequestedMutationPlan(now: now)
-        apply(mutationPlan.writePlan, to: defaults)
-        return mutationPlan
-    }
-
-    @discardableResult
-    static func writeRecordingState(
-        _ isRecording: Bool,
-        to defaults: UserDefaults?,
-        now: Date = Date()
-    ) -> VoiceInkAppGroupRecordingStateMutationPlan {
-        let mutationPlan = VoiceInkAppGroupRecordingStatePolicy.recordingStateMutationPlan(
-            isRecording: isRecording,
-            now: now
-        )
-        apply(mutationPlan.writePlan, to: defaults)
-        return mutationPlan
-    }
-
     static func recordingState(
         in defaults: UserDefaults?,
         now: Date = Date()
@@ -55,13 +31,6 @@ enum VoiceInkAppGroupRecordingBridge {
     }
 
     static func apply(
-        _ mutationPlan: VoiceInkAppGroupRecordingStateMutationPlan,
-        to defaults: UserDefaults?
-    ) {
-        apply(mutationPlan.writePlan, to: defaults)
-    }
-
-    private static func apply(
         _ plan: VoiceInkAppGroupRecordingStateWritePlan,
         to defaults: UserDefaults?
     ) {

@@ -15408,8 +15408,8 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
-  "VoiceInkCore checks cover iOS App Group mutation notification runtime application" \
-  'testAppGroupRecordingStateMutationPlanAppliesRuntimeNotification' \
+  "VoiceInkCore checks cover iOS App Group mutation write/notification runtime application" \
+  'testAppGroupRecordingStateMutationPlanAppliesRuntimeWriteBeforeNotification' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -15580,12 +15580,19 @@ require_patterns \
   "iOS App Group coordinator applies shared stale repair runtime plan" \
   iOS/Shared/AppGroupCoordinator.swift \
   'readPlan\.applyRuntimeState' \
-  'VoiceInkAppGroupRecordingBridge\.apply\(mutationPlan'
+  'apply\(mutationPlan\)'
 
-require_pattern \
-  "iOS App Group coordinator applies shared mutation notification runtime plan" \
+require_patterns \
+  "iOS App Group coordinator creates shared recording mutation plans" \
+  iOS/Shared/AppGroupCoordinator.swift \
+  'VoiceInkAppGroupRecordingStatePolicy\.stopRequestedMutationPlan' \
+  'VoiceInkAppGroupRecordingStatePolicy\.recordingStateMutationPlan'
+
+require_patterns \
+  "iOS App Group coordinator applies shared mutation write/notification runtime plan" \
+  iOS/Shared/AppGroupCoordinator.swift \
   'mutationPlan\.applyRuntimeState' \
-  iOS/Shared/AppGroupCoordinator.swift
+  'applyWritePlan'
 
 require_pattern \
   "iOS App Group coordinator adapts shared recording diagnostics" \
@@ -15610,6 +15617,11 @@ reject_pattern \
 reject_pattern \
   "iOS App Group bridge avoids shell-owned write-plan optional branching" \
   'if +let +isRecording += +plan\.isRecording|plan\.lastRecordingTimestamp' \
+  iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
+
+reject_pattern \
+  "iOS App Group bridge avoids shell-owned mutation helper sequencing" \
+  'markStopRequested|writeRecordingState|VoiceInkAppGroupRecordingStateMutationPlan|mutationPlan\.writePlan' \
   iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
 
 reject_pattern \

@@ -113,14 +113,23 @@ final class VoiceInkIOSTests: XCTestCase {
     func testAppGroupRecordingBridgeKeepsFreshRecordingState() throws {
         let defaults = try makeIsolatedDefaults()
         let timestamp = Date(timeIntervalSince1970: 100)
+        var notifications: [String] = []
 
-        VoiceInkAppGroupRecordingBridge.writeRecordingState(true, to: defaults, now: timestamp)
+        apply(
+            VoiceInkAppGroupRecordingStatePolicy.recordingStateMutationPlan(
+                isRecording: true,
+                now: timestamp
+            ),
+            to: defaults,
+            notifications: &notifications
+        )
         let state = VoiceInkAppGroupRecordingBridge.recordingState(
             in: defaults,
             now: timestamp.addingTimeInterval(VoiceInkAppGroupRecordingStatePolicy.staleRecordingInterval)
         )
 
         XCTAssertEqual(state, VoiceInkAppGroupRecordingState(isRecording: true, shouldClearStaleState: false))
+        XCTAssertEqual(notifications, [VoiceInkAppIdentity.iOSRecordingStateChangedDarwinNotificationName])
     }
 
     func testAppGroupRecordingBridgeMarksStaleRecordingStateForClearing() throws {
@@ -129,47 +138,84 @@ final class VoiceInkIOSTests: XCTestCase {
         let staleReadTime = timestamp.addingTimeInterval(
             VoiceInkAppGroupRecordingStatePolicy.staleRecordingInterval + 1
         )
+        var notifications: [String] = []
 
-        VoiceInkAppGroupRecordingBridge.writeRecordingState(true, to: defaults, now: timestamp)
+        apply(
+            VoiceInkAppGroupRecordingStatePolicy.recordingStateMutationPlan(
+                isRecording: true,
+                now: timestamp
+            ),
+            to: defaults,
+            notifications: &notifications
+        )
         let readPlan = VoiceInkAppGroupRecordingBridge.recordingStateReadPlan(
             in: defaults,
             now: staleReadTime
         )
 
-        XCTAssertEqual(
-            readPlan.state,
-            VoiceInkAppGroupRecordingState(isRecording: false, shouldClearStaleState: true)
-        )
-        XCTAssertEqual(
-            readPlan.staleStateRepairMutationPlan,
-            VoiceInkAppGroupRecordingStatePolicy.recordingStateMutationPlan(
-                isRecording: false,
-                now: staleReadTime
+        let state = readPlan.applyRuntimeState { mutationPlan in
+            apply(
+                mutationPlan,
+                to: defaults,
+                notifications: &notifications
             )
-        )
+        }
 
-        let repairPlan = try XCTUnwrap(readPlan.staleStateRepairMutationPlan)
-        VoiceInkAppGroupRecordingBridge.apply(repairPlan, to: defaults)
-
+        XCTAssertEqual(state, VoiceInkAppGroupRecordingState(isRecording: false, shouldClearStaleState: true))
         XCTAssertFalse(defaults.bool(forKey: VoiceInkAppGroupRecordingStatePolicy.UserDefaultsKey.isRecording))
         XCTAssertEqual(
             defaults.double(forKey: VoiceInkAppGroupRecordingStatePolicy.UserDefaultsKey.lastRecordingTimestamp),
             staleReadTime.timeIntervalSince1970
         )
+        XCTAssertEqual(notifications, [
+            VoiceInkAppIdentity.iOSRecordingStateChangedDarwinNotificationName,
+            VoiceInkAppIdentity.iOSRecordingStateChangedDarwinNotificationName
+        ])
     }
 
     func testAppGroupRecordingBridgeStopRequestRefreshesTimestampWithoutChangingRecordingFlag() throws {
         let defaults = try makeIsolatedDefaults()
         let recordingStart = Date(timeIntervalSince1970: 100)
         let stopRequest = Date(timeIntervalSince1970: 110)
+        var notifications: [String] = []
 
-        VoiceInkAppGroupRecordingBridge.writeRecordingState(true, to: defaults, now: recordingStart)
-        VoiceInkAppGroupRecordingBridge.markStopRequested(in: defaults, now: stopRequest)
+        apply(
+            VoiceInkAppGroupRecordingStatePolicy.recordingStateMutationPlan(
+                isRecording: true,
+                now: recordingStart
+            ),
+            to: defaults,
+            notifications: &notifications
+        )
+        apply(
+            VoiceInkAppGroupRecordingStatePolicy.stopRequestedMutationPlan(now: stopRequest),
+            to: defaults,
+            notifications: &notifications
+        )
 
         XCTAssertTrue(defaults.bool(forKey: VoiceInkAppGroupRecordingStatePolicy.UserDefaultsKey.isRecording))
         XCTAssertEqual(
             defaults.double(forKey: VoiceInkAppGroupRecordingStatePolicy.UserDefaultsKey.lastRecordingTimestamp),
             stopRequest.timeIntervalSince1970
+        )
+        XCTAssertEqual(notifications, [
+            VoiceInkAppIdentity.iOSRecordingStateChangedDarwinNotificationName,
+            VoiceInkAppIdentity.iOSStopRecordingDarwinNotificationName
+        ])
+    }
+
+    private func apply(
+        _ mutationPlan: VoiceInkAppGroupRecordingStateMutationPlan,
+        to defaults: UserDefaults,
+        notifications: inout [String]
+    ) {
+        mutationPlan.applyRuntimeState(
+            applyWritePlan: {
+                VoiceInkAppGroupRecordingBridge.apply($0, to: defaults)
+            },
+            postDarwinNotification: {
+                notifications.append($0)
+            }
         )
     }
 

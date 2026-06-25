@@ -344,8 +344,10 @@ public struct VoiceInkAppGroupRecordingStateMutationPlan: Equatable, Sendable {
     }
 
     public func applyRuntimeState(
+        applyWritePlan: (VoiceInkAppGroupRecordingStateWritePlan) -> Void,
         postDarwinNotification: (String) -> Void
     ) {
+        applyWritePlan(writePlan)
         postDarwinNotification(darwinNotificationName)
     }
 }

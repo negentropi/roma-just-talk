@@ -7,7 +7,10 @@ import VoiceInkCore
 
 @MainActor
 class AIEnhancementService: ObservableObject {
-    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "AIEnhancementService")
+    private let logger = Logger(
+        subsystem: VoiceInkAppIdentity.loggingSubsystem,
+        category: VoiceInkMacOSLogCategory.aiEnhancementService
+    )
 
     @Published var isEnhancementEnabled: Bool {
         didSet {

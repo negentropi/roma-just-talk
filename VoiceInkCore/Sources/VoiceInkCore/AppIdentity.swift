@@ -319,6 +319,7 @@ public enum VoiceInkMacOSLogCategory {
     public static let keychainService = "KeychainService"
     public static let polarService = "PolarService"
     public static let licenseViewModel = "LicenseViewModel"
+    public static let aiEnhancementService = "AIEnhancementService"
     public static let transcriptionAutoCleanupService = "TranscriptionAutoCleanupService"
     public static let sessionMetricMigrationService = "SessionMetricMigrationService"
     public static let modelPrewarm = "ModelPrewarm"

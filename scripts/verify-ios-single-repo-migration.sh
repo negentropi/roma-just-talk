@@ -16859,6 +16859,7 @@ require_patterns \
   'keychainService = "KeychainService"' \
   'polarService = "PolarService"' \
   'licenseViewModel = "LicenseViewModel"' \
+  'aiEnhancementService = "AIEnhancementService"' \
   'transcriptionAutoCleanupService = "TranscriptionAutoCleanupService"' \
   'sessionMetricMigrationService = "SessionMetricMigrationService"' \
   'modelPrewarm = "ModelPrewarm"' \
@@ -16896,6 +16897,12 @@ require_patterns \
   "macOS license view model uses shared log category identity" \
   VoiceInk/Models/LicenseViewModel.swift \
   'Logger\(subsystem: VoiceInkAppIdentity\.loggingSubsystem, category: VoiceInkMacOSLogCategory\.licenseViewModel\)'
+
+require_patterns \
+  "macOS AI enhancement service uses shared log category identity" \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift \
+  'Logger\(' \
+  'category: VoiceInkMacOSLogCategory\.aiEnhancementService'
 
 require_patterns \
   "macOS transcription auto cleanup uses shared log category identity" \
@@ -16971,12 +16978,13 @@ reject_pattern \
   VoiceInk/WindowManager.swift
 
 reject_pattern \
-  "macOS credential and license shells avoid shell-owned log category literals" \
-  'category: "(APIKeyManager|KeychainService|PolarService|LicenseViewModel|TranscriptionAutoCleanupService|SessionMetricMigrationService)"' \
+  "macOS credential, license, and AI enhancement shells avoid shell-owned log category literals" \
+  'category: "(APIKeyManager|KeychainService|PolarService|LicenseViewModel|AIEnhancementService|TranscriptionAutoCleanupService|SessionMetricMigrationService)"' \
   VoiceInk/Services/APIKeyManager.swift \
   VoiceInk/Services/KeychainService.swift \
   VoiceInk/Services/PolarService.swift \
   VoiceInk/Models/LicenseViewModel.swift \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift \
   VoiceInk/Services/TranscriptionAutoCleanupService.swift \
   VoiceInk/Services/SessionMetricMigrationService.swift
 

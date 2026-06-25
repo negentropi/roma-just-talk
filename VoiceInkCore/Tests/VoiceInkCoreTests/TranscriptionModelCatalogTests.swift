@@ -379,6 +379,83 @@ final class TranscriptionModelCatalogTests: XCTestCase {
         XCTAssertTrue(VoiceInkMacOSTranscriptionModelProvider.assemblyAI.mapsStreamingTransportTimeoutToFinalTimeout)
     }
 
+    func testMacOSTranscriptionModelFactsDeriveSharedModelPolicy() {
+        let streamingFacts = VoiceInkMacOSTranscriptionModelFacts(
+            name: "scribe_v1",
+            provider: .elevenLabs,
+            isMultilingual: true,
+            supportedLanguages: ["fallback": "Fallback"],
+            supportsStreaming: true
+        )
+        let streamingSnapshot = VoiceInkTranscriptionStreamingModelSnapshot(
+            name: "scribe_v1",
+            supportsStreaming: true
+        )
+
+        XCTAssertTrue(streamingFacts.supportsRecordedFileTranscription)
+        XCTAssertEqual(streamingFacts.streamingPreferenceSnapshot, streamingSnapshot)
+        XCTAssertEqual(
+            streamingFacts.transcriptionSessionRouteFacts,
+            VoiceInkTranscriptionSessionRouteFacts(
+                serviceRoute: .cloud,
+                streamingSnapshot: streamingSnapshot
+            )
+        )
+        XCTAssertEqual(streamingFacts.streamingConnectionModelName, "scribe_v2_realtime")
+        XCTAssertFalse(streamingFacts.mapsStreamingTransportTimeoutToFinalTimeout)
+        XCTAssertEqual(
+            streamingFacts.transcriptionRuntimeResourcePlan,
+            VoiceInkTranscriptionRuntimeResourcePlan(serviceRoute: .cloud)
+        )
+        XCTAssertEqual(
+            streamingFacts.transcriptionModelAvailabilityFacts(hasConfiguredAPIKey: true),
+            VoiceInkTranscriptionModelAvailabilityFacts(
+                requirement: .configuredAPIKey,
+                hasConfiguredAPIKey: true
+            )
+        )
+
+        let customLanguages = ["custom": "Custom"]
+        let customFacts = VoiceInkMacOSTranscriptionModelFacts(
+            name: "custom-model",
+            provider: .custom,
+            isMultilingual: false,
+            supportedLanguages: customLanguages,
+            supportsStreaming: false
+        )
+
+        XCTAssertEqual(customFacts.transcriptionLanguageOptions, customLanguages)
+        XCTAssertEqual(
+            customFacts.transcriptionLanguageSelectionFacts,
+            VoiceInkTranscriptionLanguageSelectionFacts(
+                source: .all,
+                isMultilingual: false,
+                languageOptions: customLanguages
+            )
+        )
+        XCTAssertEqual(
+            customFacts.powerModeTranscriptionModelFacts,
+            VoiceInkPowerModeTranscriptionModelFacts(
+                name: "custom-model",
+                languageSource: .all,
+                isMultilingual: false,
+                languageOptions: customLanguages
+            )
+        )
+        XCTAssertEqual(
+            customFacts.powerModeTranscriptionModelResourceFacts,
+            VoiceInkPowerModeTranscriptionModelResourceFacts(name: "custom-model", languageSource: .all)
+        )
+        XCTAssertEqual(
+            customFacts.modelManagementFacts(isAvailableOnCurrentOS: false),
+            VoiceInkModelManagementModelFacts(
+                name: "custom-model",
+                category: .custom,
+                isAvailableOnCurrentOS: false
+            )
+        )
+    }
+
     func testProviderAPIErrorDomainsPreserveMacOSBatchMapping() {
         XCTAssertEqual(VoiceInkTranscriptionModelProvider.groq.apiErrorDomain, "GroqAPI")
         XCTAssertEqual(VoiceInkTranscriptionModelProvider.deepgram.apiErrorDomain, "DeepgramAPI")

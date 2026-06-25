@@ -23,6 +23,16 @@ extension TranscriptionModel {
         hasher.combine(id)
     }
 
+    private var coreFacts: VoiceInkMacOSTranscriptionModelFacts {
+        VoiceInkMacOSTranscriptionModelFacts(
+            name: name,
+            provider: provider,
+            isMultilingual: isMultilingualModel,
+            supportedLanguages: supportedLanguages,
+            supportsStreaming: supportsStreaming
+        )
+    }
+
     var language: String {
         VoiceInkModelManagementPresentation.languageLabel(isMultilingual: isMultilingualModel)
     }
@@ -30,34 +40,27 @@ extension TranscriptionModel {
     var supportsStreaming: Bool { false }
 
     var supportsRecordedFileTranscription: Bool {
-        provider.supportsRecordedFileTranscription
+        coreFacts.supportsRecordedFileTranscription
     }
 
     var streamingPreferenceSnapshot: VoiceInkTranscriptionStreamingModelSnapshot {
-        VoiceInkTranscriptionStreamingModelSnapshot(
-            name: name,
-            supportsStreaming: supportsStreaming,
-            isStreamingOnly: provider.isStreamingOnly
-        )
+        coreFacts.streamingPreferenceSnapshot
     }
 
     var transcriptionSessionRouteFacts: VoiceInkTranscriptionSessionRouteFacts {
-        VoiceInkTranscriptionSessionRouteFacts(
-            serviceRoute: provider.transcriptionServiceRoute,
-            streamingSnapshot: streamingPreferenceSnapshot
-        )
+        coreFacts.transcriptionSessionRouteFacts
     }
 
     var streamingConnectionModelName: String {
-        provider.streamingConnectionModelName(for: name)
+        coreFacts.streamingConnectionModelName
     }
 
     var mapsStreamingTransportTimeoutToFinalTimeout: Bool {
-        provider.mapsStreamingTransportTimeoutToFinalTimeout
+        coreFacts.mapsStreamingTransportTimeoutToFinalTimeout
     }
 
     var transcriptionRuntimeResourcePlan: VoiceInkTranscriptionRuntimeResourcePlan {
-        VoiceInkTranscriptionRuntimeResourcePlan(serviceRoute: provider.transcriptionServiceRoute)
+        coreFacts.transcriptionRuntimeResourcePlan
     }
 
     func transcriptionModelAvailabilityFacts(
@@ -66,8 +69,7 @@ extension TranscriptionModel {
         isLocalFluidAudioModelDownloaded: Bool = false,
         isLocalWhisperModelDownloaded: Bool = false
     ) -> VoiceInkTranscriptionModelAvailabilityFacts {
-        VoiceInkTranscriptionModelAvailabilityFacts(
-            requirement: provider.transcriptionModelAvailabilityRequirement,
+        coreFacts.transcriptionModelAvailabilityFacts(
             hasConfiguredAPIKey: hasConfiguredAPIKey,
             isAvailableOnCurrentOS: isAvailableOnCurrentOS,
             isLocalFluidAudioModelDownloaded: isLocalFluidAudioModelDownloaded,
@@ -76,49 +78,27 @@ extension TranscriptionModel {
     }
 
     var transcriptionLanguageOptions: [String: String] {
-        provider.transcriptionLanguageOptions(
-            defaultLanguages: supportedLanguages,
-            isMultilingual: isMultilingualModel,
-            usesRealtimeProviderLanguages: VoiceInkTranscriptionStreamingPreference.shouldUseStreaming(
-                for: streamingPreferenceSnapshot
-            )
-        )
+        coreFacts.transcriptionLanguageOptions
     }
 
     var transcriptionLanguageSelectionFacts: VoiceInkTranscriptionLanguageSelectionFacts {
-        VoiceInkTranscriptionLanguageSelectionFacts(
-            source: provider.transcriptionLanguageSource,
-            isMultilingual: isMultilingualModel,
-            languageOptions: transcriptionLanguageOptions
-        )
+        coreFacts.transcriptionLanguageSelectionFacts
     }
 
     func validTranscriptionLanguageOrFallback(_ language: String?) -> String {
-        transcriptionLanguageSelectionFacts.compatibleLanguage(language)
+        coreFacts.validTranscriptionLanguageOrFallback(language)
     }
 
     var powerModeTranscriptionModelFacts: VoiceInkPowerModeTranscriptionModelFacts {
-        VoiceInkPowerModeTranscriptionModelFacts(
-            name: name,
-            languageSource: provider.transcriptionLanguageSource,
-            isMultilingual: isMultilingualModel,
-            languageOptions: transcriptionLanguageOptions
-        )
+        coreFacts.powerModeTranscriptionModelFacts
     }
 
     var powerModeTranscriptionModelResourceFacts: VoiceInkPowerModeTranscriptionModelResourceFacts {
-        VoiceInkPowerModeTranscriptionModelResourceFacts(
-            name: name,
-            languageSource: provider.transcriptionLanguageSource
-        )
+        coreFacts.powerModeTranscriptionModelResourceFacts
     }
 
     func modelManagementFacts(isAvailableOnCurrentOS: Bool) -> VoiceInkModelManagementModelFacts {
-        VoiceInkModelManagementModelFacts(
-            name: name,
-            category: provider.modelManagementCategory,
-            isAvailableOnCurrentOS: isAvailableOnCurrentOS
-        )
+        coreFacts.modelManagementFacts(isAvailableOnCurrentOS: isAvailableOnCurrentOS)
     }
 }
 

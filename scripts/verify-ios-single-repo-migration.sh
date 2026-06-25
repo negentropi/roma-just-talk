@@ -804,7 +804,7 @@ require_pattern \
 
 require_pattern \
   "macOS TranscriptionModel adapts shared language selection facts" \
-  'transcriptionLanguageSelectionFacts|VoiceInkTranscriptionLanguageSelectionFacts' \
+  'coreFacts\.transcriptionLanguageSelectionFacts|VoiceInkMacOSTranscriptionModelFacts' \
   VoiceInk/Models/TranscriptionModel.swift
 
 require_pattern \
@@ -4127,8 +4127,21 @@ require_pattern \
 
 require_pattern \
   "macOS TranscriptionModel adapts shared model-management facts" \
-  'modelManagementFacts|VoiceInkModelManagementModelFacts|modelManagementCategory' \
+  'coreFacts\.modelManagementFacts|VoiceInkMacOSTranscriptionModelFacts' \
   VoiceInk/Models/TranscriptionModel.swift
+
+require_patterns \
+  "shared macOS transcription model facts derive model policy" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift \
+  'VoiceInkMacOSTranscriptionModelFacts' \
+  'streamingPreferenceSnapshot' \
+  'transcriptionSessionRouteFacts' \
+  'transcriptionRuntimeResourcePlan' \
+  'transcriptionModelAvailabilityFacts' \
+  'transcriptionLanguageSelectionFacts' \
+  'powerModeTranscriptionModelFacts' \
+  'powerModeTranscriptionModelResourceFacts' \
+  'modelManagementFacts'
 
 require_patterns \
   "shared transcription model provider role owns category route availability and language source" \
@@ -4160,7 +4173,7 @@ require_pattern \
 
 require_pattern \
   "macOS TranscriptionModel uses shared provider language options" \
-  'provider\.transcriptionLanguageOptions' \
+  'coreFacts\.transcriptionLanguageOptions' \
   VoiceInk/Models/TranscriptionModel.swift
 
 require_patterns \
@@ -4175,7 +4188,7 @@ require_patterns \
 
 require_pattern \
   "core checks execute transcription model provider role tests" \
-  'TranscriptionModelCatalogTests\.testProviderRoleOwnsModelCategoryRouteAvailabilityAndLanguageSource|TranscriptionModelCatalogTests\.testMacOSTranscriptionModelProviderRoleMappingIsShared' \
+  'TranscriptionModelCatalogTests\.testProviderRoleOwnsModelCategoryRouteAvailabilityAndLanguageSource|TranscriptionModelCatalogTests\.testMacOSTranscriptionModelProviderRoleMappingIsShared|TranscriptionModelCatalogTests\.testMacOSTranscriptionModelFactsDeriveSharedModelPolicy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \
@@ -4186,6 +4199,11 @@ reject_pattern \
 reject_pattern \
   "macOS TranscriptionModel avoids provider-role reach-through" \
   'coreTranscriptionModelProviderRole' \
+  VoiceInk/Models/TranscriptionModel.swift
+
+reject_pattern \
+  "macOS TranscriptionModel avoids shell-owned derived fact construction" \
+  'VoiceInkTranscriptionStreamingModelSnapshot\(|VoiceInkTranscriptionSessionRouteFacts\(|VoiceInkTranscriptionRuntimeResourcePlan\(|VoiceInkTranscriptionModelAvailabilityFacts\(|VoiceInkTranscriptionLanguageSelectionFacts\(|VoiceInkPowerModeTranscriptionModelFacts\(|VoiceInkPowerModeTranscriptionModelResourceFacts\(|VoiceInkModelManagementModelFacts\(' \
   VoiceInk/Models/TranscriptionModel.swift
 
 reject_context_pattern \
@@ -5112,12 +5130,12 @@ require_patterns \
 
 require_pattern \
   "macOS transcription model uses shared recorded-file support policy" \
-  'provider\.supportsRecordedFileTranscription' \
+  'coreFacts\.supportsRecordedFileTranscription' \
   VoiceInk/Models/TranscriptionModel.swift
 
 require_pattern \
   "macOS transcription model uses shared streaming-only support policy" \
-  'provider\.isStreamingOnly' \
+  'coreFacts\.streamingPreferenceSnapshot' \
   VoiceInk/Models/TranscriptionModel.swift
 
 require_pattern \
@@ -6508,7 +6526,7 @@ require_pattern \
 
 require_pattern \
   "macOS TranscriptionModel adapts Power Mode facts through shared policy" \
-  'powerModeTranscriptionModelFacts|powerModeTranscriptionModelResourceFacts' \
+  'coreFacts\.powerModeTranscriptionModelFacts|coreFacts\.powerModeTranscriptionModelResourceFacts' \
   VoiceInk/Models/TranscriptionModel.swift
 
 require_pattern \
@@ -7402,7 +7420,7 @@ require_pattern \
 
 require_pattern \
   "macOS transcription model adapter exposes shared streaming connection model policy" \
-  'provider\.streamingConnectionModelName\(for: name\)' \
+  'coreFacts\.streamingConnectionModelName' \
   VoiceInk/Models/TranscriptionModel.swift
 
 require_pattern \
@@ -7429,7 +7447,7 @@ require_pattern \
 
 require_pattern \
   "macOS transcription model adapter exposes shared streaming timeout mapping policy" \
-  'provider\.mapsStreamingTransportTimeoutToFinalTimeout' \
+  'coreFacts\.mapsStreamingTransportTimeoutToFinalTimeout' \
   VoiceInk/Models/TranscriptionModel.swift
 
 require_pattern \

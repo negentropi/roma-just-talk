@@ -633,6 +633,120 @@ public enum VoiceInkMacOSTranscriptionModelProvider: String, Codable, Hashable, 
     }
 }
 
+public struct VoiceInkMacOSTranscriptionModelFacts: Equatable, Sendable {
+    public let name: String
+    public let provider: VoiceInkMacOSTranscriptionModelProvider
+    public let isMultilingual: Bool
+    public let supportedLanguages: [String: String]
+    public let supportsStreaming: Bool
+
+    public init(
+        name: String,
+        provider: VoiceInkMacOSTranscriptionModelProvider,
+        isMultilingual: Bool,
+        supportedLanguages: [String: String],
+        supportsStreaming: Bool
+    ) {
+        self.name = name
+        self.provider = provider
+        self.isMultilingual = isMultilingual
+        self.supportedLanguages = supportedLanguages
+        self.supportsStreaming = supportsStreaming
+    }
+
+    public var supportsRecordedFileTranscription: Bool {
+        provider.supportsRecordedFileTranscription
+    }
+
+    public var streamingPreferenceSnapshot: VoiceInkTranscriptionStreamingModelSnapshot {
+        VoiceInkTranscriptionStreamingModelSnapshot(
+            name: name,
+            supportsStreaming: supportsStreaming,
+            isStreamingOnly: provider.isStreamingOnly
+        )
+    }
+
+    public var transcriptionSessionRouteFacts: VoiceInkTranscriptionSessionRouteFacts {
+        VoiceInkTranscriptionSessionRouteFacts(
+            serviceRoute: provider.transcriptionServiceRoute,
+            streamingSnapshot: streamingPreferenceSnapshot
+        )
+    }
+
+    public var streamingConnectionModelName: String {
+        provider.streamingConnectionModelName(for: name)
+    }
+
+    public var mapsStreamingTransportTimeoutToFinalTimeout: Bool {
+        provider.mapsStreamingTransportTimeoutToFinalTimeout
+    }
+
+    public var transcriptionRuntimeResourcePlan: VoiceInkTranscriptionRuntimeResourcePlan {
+        VoiceInkTranscriptionRuntimeResourcePlan(serviceRoute: provider.transcriptionServiceRoute)
+    }
+
+    public func transcriptionModelAvailabilityFacts(
+        hasConfiguredAPIKey: Bool = false,
+        isAvailableOnCurrentOS: Bool = true,
+        isLocalFluidAudioModelDownloaded: Bool = false,
+        isLocalWhisperModelDownloaded: Bool = false
+    ) -> VoiceInkTranscriptionModelAvailabilityFacts {
+        VoiceInkTranscriptionModelAvailabilityFacts(
+            requirement: provider.transcriptionModelAvailabilityRequirement,
+            hasConfiguredAPIKey: hasConfiguredAPIKey,
+            isAvailableOnCurrentOS: isAvailableOnCurrentOS,
+            isLocalFluidAudioModelDownloaded: isLocalFluidAudioModelDownloaded,
+            isLocalWhisperModelDownloaded: isLocalWhisperModelDownloaded
+        )
+    }
+
+    public var transcriptionLanguageOptions: [String: String] {
+        provider.transcriptionLanguageOptions(
+            defaultLanguages: supportedLanguages,
+            isMultilingual: isMultilingual,
+            usesRealtimeProviderLanguages: VoiceInkTranscriptionStreamingPreference.shouldUseStreaming(
+                for: streamingPreferenceSnapshot
+            )
+        )
+    }
+
+    public var transcriptionLanguageSelectionFacts: VoiceInkTranscriptionLanguageSelectionFacts {
+        VoiceInkTranscriptionLanguageSelectionFacts(
+            source: provider.transcriptionLanguageSource,
+            isMultilingual: isMultilingual,
+            languageOptions: transcriptionLanguageOptions
+        )
+    }
+
+    public func validTranscriptionLanguageOrFallback(_ language: String?) -> String {
+        transcriptionLanguageSelectionFacts.compatibleLanguage(language)
+    }
+
+    public var powerModeTranscriptionModelFacts: VoiceInkPowerModeTranscriptionModelFacts {
+        VoiceInkPowerModeTranscriptionModelFacts(
+            name: name,
+            languageSource: provider.transcriptionLanguageSource,
+            isMultilingual: isMultilingual,
+            languageOptions: transcriptionLanguageOptions
+        )
+    }
+
+    public var powerModeTranscriptionModelResourceFacts: VoiceInkPowerModeTranscriptionModelResourceFacts {
+        VoiceInkPowerModeTranscriptionModelResourceFacts(
+            name: name,
+            languageSource: provider.transcriptionLanguageSource
+        )
+    }
+
+    public func modelManagementFacts(isAvailableOnCurrentOS: Bool) -> VoiceInkModelManagementModelFacts {
+        VoiceInkModelManagementModelFacts(
+            name: name,
+            category: provider.modelManagementCategory,
+            isAvailableOnCurrentOS: isAvailableOnCurrentOS
+        )
+    }
+}
+
 public enum VoiceInkTranscriptionModelCatalog {
     public static let localBaseModel = "base"
     public static let defaultMacOSFluidAudioModelName = "parakeet-tdt-0.6b-v2"

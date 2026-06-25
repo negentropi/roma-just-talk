@@ -1873,12 +1873,22 @@ require_pattern \
   'deleteExistingAudioFileReportingFailure' \
   VoiceInk/Views/History/InlineHistoryView.swift
 
+require_pattern \
+  "macOS transcription auto cleanup uses shared stored-audio reporting delete helper" \
+  'deleteExistingAudioFileReportingFailure' \
+  VoiceInk/Services/TranscriptionAutoCleanupService.swift
+
 reject_pattern \
   "platform note/history deletion avoids duplicate stored-audio deletion error mapping" \
   '"Error deleting audio file:|VoiceInkStoredAudioFile\.deletionErrorMessage|try .*deleteExistingAudioFile\(\)' \
   iOS/VoiceInk-ios/NotesListView.swift \
   VoiceInk/Views/History/TranscriptionHistoryView.swift \
   VoiceInk/Views/History/InlineHistoryView.swift
+
+reject_pattern \
+  "macOS transcription auto cleanup avoids duplicate completed-audio deletion failure copy" \
+  'Failed to delete audio file:|if let url = transcription\.resolvedAudioFileURL|try FileManager\.default\.removeItem\(at: url\)' \
+  VoiceInk/Services/TranscriptionAutoCleanupService.swift
 
 reject_pattern \
   "iOS note deletion avoids shell-only stored-audio file deletion" \

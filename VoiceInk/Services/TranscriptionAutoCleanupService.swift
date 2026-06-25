@@ -66,12 +66,8 @@ class TranscriptionAutoCleanupService {
             return
         }
 
-        if let url = transcription.resolvedAudioFileURL(relativeTo: recordingsDirectory) {
-            do {
-                try FileManager.default.removeItem(at: url)
-            } catch {
-                logger.error("Failed to delete audio file: \(error.localizedDescription, privacy: .public)")
-            }
+        transcription.deleteExistingAudioFileReportingFailure(relativeTo: recordingsDirectory) { message in
+            logger.error("\(message, privacy: .public)")
         }
 
         modelContext.delete(transcription)

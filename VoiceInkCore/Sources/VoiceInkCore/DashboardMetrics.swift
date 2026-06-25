@@ -376,6 +376,7 @@ public enum VoiceInkDashboardPromotionPresentation {
     public static let socialShareURLString = "https://tryvoiceink.com/social-share"
     public static let affiliateURLString = "https://tryvoiceink.com/affiliate"
     public static let dismissHelpText = "Dismiss this promotion"
+    public static let dismissSystemImageName = "xmark.circle.fill"
 
     public static var socialShareURL: URL {
         URL(string: socialShareURLString)!

@@ -89,7 +89,7 @@ private struct DashboardPromotionCard: View {
 
             if let onDismiss = onDismiss, let dismissHelpText = presentation.dismissHelpText {
                 Button(action: onDismiss) {
-                    Image(systemName: "xmark.circle.fill")
+                    Image(systemName: VoiceInkDashboardPromotionPresentation.dismissSystemImageName)
                         .font(.system(size: 18, weight: .medium))
                         .foregroundStyle(.secondary)
                 }

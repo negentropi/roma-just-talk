@@ -320,6 +320,7 @@ final class DashboardMetricsTests: XCTestCase {
             "https://tryvoiceink.com/affiliate"
         )
         XCTAssertEqual(VoiceInkDashboardPromotionPresentation.dismissHelpText, "Dismiss this promotion")
+        XCTAssertEqual(VoiceInkDashboardPromotionPresentation.dismissSystemImageName, "xmark.circle.fill")
 
         XCTAssertEqual(
             VoiceInkDashboardPromotionPresentation.upgradeCard,

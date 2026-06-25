@@ -15213,7 +15213,7 @@ require_pattern \
 
 require_pattern \
   "shared dashboard promotion presentation lives in VoiceInkCore" \
-  'VoiceInkDashboardPromotionPresentation|VoiceInkLicenseState|VoiceInkDashboardPromotionCardPresentation|affiliateDismissedKey = "VoiceInkAffiliatePromotionDismissed"|socialShareURLString = "https://tryvoiceink\.com/social-share"|affiliateURLString = "https://tryvoiceink\.com/affiliate"|cards\(' \
+  'VoiceInkDashboardPromotionPresentation|VoiceInkLicenseState|VoiceInkDashboardPromotionCardPresentation|affiliateDismissedKey = "VoiceInkAffiliatePromotionDismissed"|socialShareURLString = "https://tryvoiceink\.com/social-share"|affiliateURLString = "https://tryvoiceink\.com/affiliate"|dismissSystemImageName = "xmark\.circle\.fill"|cards\(' \
   VoiceInkCore/Sources/VoiceInkCore/DashboardMetrics.swift
 
 require_pattern \
@@ -15223,7 +15223,7 @@ require_pattern \
 
 require_pattern \
   "macOS dashboard promotions use shared presentation" \
-  'VoiceInkDashboardPromotionPresentation\.(affiliateDismissedKey|defaultIsAffiliateDismissed|cards)|VoiceInkDashboardPromotionCardPresentation' \
+  'VoiceInkDashboardPromotionPresentation\.(affiliateDismissedKey|defaultIsAffiliateDismissed|cards|dismissSystemImageName)|VoiceInkDashboardPromotionCardPresentation' \
   VoiceInk/Views/Metrics/DashboardPromotionsSection.swift
 
 require_pattern \
@@ -15249,7 +15249,7 @@ require_pattern \
 
 reject_pattern \
   "macOS dashboard promotions avoid shell-owned promotion policy" \
-  'VoiceInkAffiliatePromotionDismissed|https://tryvoiceink\.com/(social-share|affiliate)|"(30% OFF|Unlock VoiceInk Pro For Less|Share VoiceInk on your socials, and instantly unlock a 30% discount on VoiceInk Pro\.|Share & Unlock|AFFILIATE 30%|Earn With The VoiceInk Affiliate Program|Share VoiceInk with friends or your audience and receive 30% on every referral that upgrades\.|Explore Affiliate|Dismiss this promotion)"|shouldShow(Upgrade|Affiliate|Promotions)' \
+  'VoiceInkAffiliatePromotionDismissed|https://tryvoiceink\.com/(social-share|affiliate)|"(30% OFF|Unlock VoiceInk Pro For Less|Share VoiceInk on your socials, and instantly unlock a 30% discount on VoiceInk Pro\.|Share & Unlock|AFFILIATE 30%|Earn With The VoiceInk Affiliate Program|Share VoiceInk with friends or your audience and receive 30% on every referral that upgrades\.|Explore Affiliate|Dismiss this promotion|xmark\.circle\.fill)"|shouldShow(Upgrade|Affiliate|Promotions)' \
   VoiceInk/Views/Metrics/DashboardPromotionsSection.swift
 
 reject_pattern \

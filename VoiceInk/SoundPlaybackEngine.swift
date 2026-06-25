@@ -21,19 +21,7 @@ final class SoundPlaybackEngine: @unchecked Sendable {
         }
     }
 
-    func playStartSound() {
-        play(.start)
-    }
-
-    func playStopSound() {
-        play(.stop)
-    }
-
-    func playEscSound() {
-        play(.esc)
-    }
-
-    private func play(_ cue: VoiceInkRecordingSoundCue) {
+    func play(_ cue: VoiceInkRecordingSoundCue) {
         queue.async { [weak self] in
             guard let self else { return }
 

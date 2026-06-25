@@ -10195,7 +10195,7 @@ require_pattern \
 
 require_pattern \
   "shared custom recording sound preference owns storage keys and defaults" \
-  'enum VoiceInkCustomSoundType: String, CaseIterable|isUsingKey|filenameKey|builtInSoundKey|defaultBuiltInSound|VoiceInkCustomSoundPreference|registeredDefaults|customSoundsRelativeDirectory|changedNotificationName' \
+  'enum VoiceInkCustomSoundType: String, CaseIterable|isUsingKey|filenameKey|builtInSoundKey|defaultBuiltInSound|recordingSoundCue|VoiceInkCustomSoundPreference|registeredDefaults|customSoundsRelativeDirectory|changedNotificationName' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
 
 require_pattern \
@@ -10321,6 +10321,11 @@ require_pattern \
   'VoiceInkRecordingSoundPlaybackPolicy\.(setupSlots|playbackSlots)|VoiceInkRecordingSoundPlayerSlot|VoiceInkRecordingSoundCue|slot\.volume' \
   VoiceInk/SoundPlaybackEngine.swift
 
+require_pattern \
+  "macOS sound manager exposes shared recording sound cue playback" \
+  'func play\(_ cue: VoiceInkRecordingSoundCue\)|playbackEngine\.play\(cue\)' \
+  VoiceInk/SoundManager.swift
+
 require_patterns \
   "macOS custom sound settings view uses shared presentation" \
   VoiceInk/Views/Settings/CustomSoundSettingsView.swift \
@@ -10339,16 +10344,17 @@ require_patterns \
   'VoiceInkCustomSoundSettingsPresentation\.invalidAudioAlertTitle' \
   'VoiceInkCustomSoundSettingsPresentation\.alertDismissButtonTitle' \
   'VoiceInkCustomSoundMenuSelection' \
-  'VoiceInkBuiltInRecordingSound\.allCases'
+  'VoiceInkBuiltInRecordingSound\.allCases' \
+  'recordingSoundCue'
 
 reject_pattern \
   "macOS custom sound settings view avoids shell-only presentation copy and aliases" \
-  '"(Start Sound|Stop Sound|Sound|Custom:|Custom|Select sound|Test|Choose|Reset|Choose Start Sound|Choose Stop Sound|Select an audio file|Invalid Audio File|OK|play\.fill|folder|arrow\.uturn\.backward)"|private enum SoundMenuSelection|CustomSoundManager\.(BuiltInSound|SoundType)' \
+  '"(Start Sound|Stop Sound|Sound|Custom:|Custom|Select sound|Test|Choose|Reset|Choose Start Sound|Choose Stop Sound|Select an audio file|Invalid Audio File|OK|play\.fill|folder|arrow\.uturn\.backward)"|private enum SoundMenuSelection|CustomSoundManager\.(BuiltInSound|SoundType)|SoundManager\.shared\.play(Start|Stop)Sound|type == \.start' \
   VoiceInk/Views/Settings/CustomSoundSettingsView.swift
 
 reject_pattern \
   "macOS sound playback engine avoids shell-owned cue fallback and volume policy" \
-  'private enum Sound|startSound|stopSound|escSound|customStartSound|customStopSound|customStartSound \?\? startSound|customStopSound \?\? stopSound|volume: 0\.[34]' \
+  'private enum Sound|playStartSound|playStopSound|playEscSound|startSound|stopSound|escSound|customStartSound|customStopSound|customStartSound \?\? startSound|customStopSound \?\? stopSound|volume: 0\.[34]' \
   VoiceInk/SoundPlaybackEngine.swift
 
 require_pattern \

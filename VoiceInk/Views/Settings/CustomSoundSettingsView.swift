@@ -48,11 +48,7 @@ struct CustomSoundSettingsView: View {
             .help(VoiceInkCustomSoundSettingsPresentation.selectSoundHelpText)
 
             Button {
-                if type == .start {
-                    SoundManager.shared.playStartSound()
-                } else {
-                    SoundManager.shared.playStopSound()
-                }
+                SoundManager.shared.play(type.recordingSoundCue)
             } label: {
                 Image(systemName: VoiceInkCustomSoundSettingsPresentation.testButtonSystemImageName)
             }

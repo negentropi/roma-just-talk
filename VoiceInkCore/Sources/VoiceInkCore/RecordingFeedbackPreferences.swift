@@ -180,6 +180,15 @@ public enum VoiceInkCustomSoundType: String, CaseIterable, Sendable {
         }
     }
 
+    public var recordingSoundCue: VoiceInkRecordingSoundCue {
+        switch self {
+        case .start:
+            return .start
+        case .stop:
+            return .stop
+        }
+    }
+
     private var capitalizedRawValue: String {
         rawValue.capitalized
     }

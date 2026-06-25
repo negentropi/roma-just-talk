@@ -37,19 +37,21 @@ class SoundManager: ObservableObject {
         setupSounds()
     }
 
-    func playStartSound() {
+    func play(_ cue: VoiceInkRecordingSoundCue) {
         guard isSoundFeedbackEnabled else { return }
-        playbackEngine.playStartSound()
+        playbackEngine.play(cue)
+    }
+
+    func playStartSound() {
+        play(.start)
     }
 
     func playStopSound() {
-        guard isSoundFeedbackEnabled else { return }
-        playbackEngine.playStopSound()
+        play(.stop)
     }
     
     func playEscSound() {
-        guard isSoundFeedbackEnabled else { return }
-        playbackEngine.playEscSound()
+        play(.esc)
     }
     
     var isEnabled: Bool {

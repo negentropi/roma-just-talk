@@ -23,6 +23,7 @@ final class RecordingFeedbackPreferenceTests: XCTestCase {
         XCTAssertEqual(VoiceInkCustomSoundType.start.builtInSoundKey, "selectedStartBuiltInSound")
         XCTAssertEqual(VoiceInkCustomSoundType.start.standardName, "CustomStartSound")
         XCTAssertEqual(VoiceInkCustomSoundType.start.defaultBuiltInSound, .sound1)
+        XCTAssertEqual(VoiceInkCustomSoundType.start.recordingSoundCue, .start)
 
         XCTAssertEqual(VoiceInkCustomSoundType.stop.displayName, "Stop")
         XCTAssertEqual(VoiceInkCustomSoundType.stop.isUsingKey, "isUsingCustomStopSound")
@@ -30,6 +31,7 @@ final class RecordingFeedbackPreferenceTests: XCTestCase {
         XCTAssertEqual(VoiceInkCustomSoundType.stop.builtInSoundKey, "selectedStopBuiltInSound")
         XCTAssertEqual(VoiceInkCustomSoundType.stop.standardName, "CustomStopSound")
         XCTAssertEqual(VoiceInkCustomSoundType.stop.defaultBuiltInSound, .sound2)
+        XCTAssertEqual(VoiceInkCustomSoundType.stop.recordingSoundCue, .stop)
     }
 
     func testCustomSoundSettingsPresentationPreservesMacOSCopyAndActions() {

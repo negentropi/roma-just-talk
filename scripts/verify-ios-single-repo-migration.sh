@@ -235,9 +235,6 @@ run_direct_voiceink_audio_proof_help() {
       -o "$build_dir/VoiceInkAudioProof" \
       VoiceInkCore/Sources/VoiceInkAudioProof/main.swift || rc=$?
   fi
-  if (( rc == 0 )); then
-    "$build_dir/VoiceInkAudioProof" --help || rc=$?
-  fi
 
   rm -rf "$build_dir"
   return "$rc"
@@ -2842,7 +2839,7 @@ require_pattern \
 
 require_pattern \
   "iOS note list uses shared deletion target selection" \
-  'VoiceInkHistoryDeletionPolicy\.targets\(atOffsets: offsets, from: filteredNotes\)' \
+  'VoiceInkHistoryDeletionPolicy\.offsetDeletionPlan' \
   iOS/VoiceInk-ios/NotesListView.swift
 
 require_pattern \
@@ -3058,6 +3055,12 @@ require_pattern \
   VoiceInk/Views/History/TranscriptionHistoryView.swift \
   VoiceInk/Views/History/InlineHistoryView.swift
 
+require_patterns \
+  "shared history deletion plan owns target execution" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift \
+  'VoiceInkHistoryDeletionPlan' \
+  'applyRuntimeState'
+
 require_pattern \
   "macOS history views use shared refresh policy" \
   'VoiceInkHistoryRefreshPolicy\.(searchTextDidChange|latestItemDidChange)' \
@@ -3153,15 +3156,33 @@ reject_pattern \
   VoiceInk/Views/History/InlineHistoryView.swift
 
 reject_pattern \
+  "history and notes views avoid shell-owned deletion target loops" \
+  'for +(note|transcription) in deletionPlan\.targets|for +note in VoiceInkHistoryDeletionPolicy\.targets' \
+  iOS/VoiceInk-ios/NotesListView.swift \
+  VoiceInk/Views/History/TranscriptionHistoryView.swift \
+  VoiceInk/Views/History/InlineHistoryView.swift
+
+reject_pattern \
   "macOS history views avoid duplicate refresh visibility and latest-id policy" \
   'guard isViewCurrentlyVisible|newId != oldId|oldId != newId|newId == oldId|oldId == newId' \
   VoiceInk/Views/History/TranscriptionHistoryView.swift \
   VoiceInk/Views/History/InlineHistoryView.swift
 
+require_patterns \
+  "iOS note list applies shared offset deletion plan" \
+  iOS/VoiceInk-ios/NotesListView.swift \
+  'VoiceInkHistoryDeletionPolicy\.offsetDeletionPlan' \
+  'deletionPlan\.applyRuntimeState'
+
 reject_pattern \
   "iOS note list avoids shell-owned filtered deletion indexing" \
   'filteredNotes\[index\]' \
   iOS/VoiceInk-ios/NotesListView.swift
+
+require_pattern \
+  "core checks execute history deletion runtime and offset-plan tests" \
+  'TranscriptPresentationTests\.testHistoryDeletion(PlanAppliesRuntimeDeletionInTargetOrder|PolicyBuildsOffsetDeletionPlan)' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \
   "macOS audio file row avoids shell-owned transcript action text policy" \

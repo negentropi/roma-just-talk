@@ -490,6 +490,12 @@ public struct VoiceInkHistoryDeletionPlan<Item: Hashable, ID: Hashable> {
         guard let id else { return false }
         return targetIDs.contains(id)
     }
+
+    public func applyRuntimeState(deleteTarget: (Item) -> Void) {
+        for target in targets {
+            deleteTarget(target)
+        }
+    }
 }
 
 public enum VoiceInkHistoryDeletionPolicy {
@@ -510,6 +516,18 @@ public enum VoiceInkHistoryDeletionPolicy {
         id: (Item) -> ID
     ) -> VoiceInkHistoryDeletionPlan<Item, ID> {
         deleting(Array(selectedItems), from: selectedItems, id: id)
+    }
+
+    public static func offsetDeletionPlan<Item: Hashable, ID: Hashable>(
+        atOffsets offsets: IndexSet,
+        from displayedItems: [Item],
+        id: (Item) -> ID
+    ) -> VoiceInkHistoryDeletionPlan<Item, ID> {
+        deleting(
+            targets(atOffsets: offsets, from: displayedItems),
+            from: Set<Item>(),
+            id: id
+        )
     }
 
     public static func deleting<Item: Hashable, ID: Hashable>(

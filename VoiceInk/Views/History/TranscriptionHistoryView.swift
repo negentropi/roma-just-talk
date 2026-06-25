@@ -449,9 +449,7 @@ struct TranscriptionHistoryView: View {
             id: \.id
         )
 
-        for transcription in deletionPlan.targets {
-            deleteTranscriptionRecord(transcription)
-        }
+        deletionPlan.applyRuntimeState(deleteTarget: deleteTranscriptionRecord)
 
         if deletionPlan.deletesItem(selectedTranscription) {
             selectedTranscription = nil

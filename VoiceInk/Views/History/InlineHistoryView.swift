@@ -445,9 +445,7 @@ struct InlineHistoryView: View {
             id: \.id
         )
 
-        for transcription in deletionPlan.targets {
-            deleteTranscriptionRecord(transcription)
-        }
+        deletionPlan.applyRuntimeState(deleteTarget: deleteTranscriptionRecord)
 
         if deletionPlan.deletesID(expandedId) {
             expandedId = nil

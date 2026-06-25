@@ -260,6 +260,39 @@ final class TranscriptPresentationTests: XCTestCase {
         XCTAssertFalse(plan.deletesID(nil))
     }
 
+    func testHistoryDeletionPlanAppliesRuntimeDeletionInTargetOrder() {
+        let first = HistorySelectionItem(id: 1, label: "first")
+        let second = HistorySelectionItem(id: 2, label: "second")
+        let plan = VoiceInkHistoryDeletionPolicy.deleting(
+            [second, first],
+            from: Set([first, second]),
+            id: \.id
+        )
+
+        var deletedIDs: [Int] = []
+        plan.applyRuntimeState { item in
+            deletedIDs.append(item.id)
+        }
+
+        XCTAssertEqual(deletedIDs, [2, 1])
+    }
+
+    func testHistoryDeletionPolicyBuildsOffsetDeletionPlan() {
+        let latest = HistorySelectionItem(id: 1, label: "latest")
+        let hiddenBySearch = HistorySelectionItem(id: 2, label: "hidden-by-search")
+        let oldest = HistorySelectionItem(id: 3, label: "oldest")
+
+        let plan = VoiceInkHistoryDeletionPolicy.offsetDeletionPlan(
+            atOffsets: IndexSet([0, 2, 7]),
+            from: [latest, hiddenBySearch, oldest],
+            id: \.id
+        )
+
+        XCTAssertEqual(plan.targets, [latest, oldest])
+        XCTAssertTrue(plan.remainingSelection.isEmpty)
+        XCTAssertEqual(plan.targetIDs, Set([latest.id, oldest.id]))
+    }
+
     func testHistoryRefreshPolicyReloadsForSearchTextChanges() {
         XCTAssertEqual(
             historyRefreshEvents(for: VoiceInkHistoryRefreshPolicy.searchTextDidChange()),

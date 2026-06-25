@@ -10552,6 +10552,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
 
 require_pattern \
+  "shared paste diagnostics live in VoiceInkCore" \
+  'VoiceInkPasteDiagnostics|failedToPrepareClipboardMessage|skippedClipboardRestoreCommandNotPostedMessage|appleScriptPasteScriptUnavailableMessage|appleScriptPasteFailedMessage|accessibilityPermissionRequiredForSimulatedPasteMessage|failedToCreateCommandVPasteEventsMessage' \
+  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+
+require_pattern \
   "macOS paste adapter uses shared paste method preference" \
   'VoiceInkPasteMethod\.current\(\)' \
   VoiceInk/Paste/CursorPaster.swift
@@ -10560,6 +10565,16 @@ require_pattern \
   "macOS paste adapter uses shared clipboard restore preference" \
   'VoiceInkPastePreference\.(shouldRestoreClipboardAfterPaste|boundedClipboardRestoreDelay)' \
   VoiceInk/Paste/CursorPaster.swift
+
+require_pattern \
+  "macOS paste adapter uses shared paste diagnostics" \
+  'VoiceInkPasteDiagnostics\.(failedToPrepareClipboardMessage|skippedClipboardRestoreCommandNotPostedMessage|appleScriptPasteScriptUnavailableMessage|appleScriptPasteFailedMessage|accessibilityPermissionRequiredForSimulatedPasteMessage|failedToCreateCommandVPasteEventsMessage)' \
+  VoiceInk/Paste/CursorPaster.swift
+
+require_pattern \
+  "core checks execute paste diagnostics test" \
+  'PastePreferencesTests\.testPasteDiagnosticsPreserveMacOSLogCopy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "macOS settings uses shared paste preferences" \
@@ -10629,13 +10644,18 @@ reject_pattern \
   VoiceInk/Services/BackupImporter.swift
 
 reject_pattern \
+  "macOS paste adapter avoids shell-owned paste diagnostics and log category" \
+  '"(Failed to prepare clipboard for paste|Skipping clipboard restore because paste command was not posted|AppleScript paste script is unavailable|AppleScript paste failed:|Accessibility permission is required to paste with simulated key events|Failed to create Cmd\+V keyboard events)"|category: "CursorPaster"' \
+  VoiceInk/Paste/CursorPaster.swift
+
+reject_pattern \
   "macOS settings avoids shell-only paste settings presentation copy" \
   '"(Keep Clipboard Content|Restore Delay|Paste Method|250ms|500ms|Default uses simulated Cmd\+V key events\. AppleScript can help when custom keyboard layouts do not paste correctly\.)"' \
   VoiceInk/Views/Settings/SettingsView.swift
 
 require_pattern \
   "migration checklist tracks shared paste preference gate" \
-  'macOS paste method and clipboard restore settings route through `VoiceInkPasteMethod`/`VoiceInkPastePreference`, including stored selection repair, settings labels/options/help, and backup import/export plans' \
+  'macOS paste method and clipboard restore settings route through `VoiceInkPasteMethod`/`VoiceInkPastePreference`/`VoiceInkPasteDiagnostics`, including stored selection repair, paste diagnostics, settings labels/options/help, and backup import/export plans' \
   docs/ios-single-repo-migration.md
 
 require_file \
@@ -16768,7 +16788,8 @@ require_patterns \
   'licenseViewModel = "LicenseViewModel"' \
   'transcriptionAutoCleanupService = "TranscriptionAutoCleanupService"' \
   'sessionMetricMigrationService = "SessionMetricMigrationService"' \
-  'modelPrewarm = "ModelPrewarm"'
+  'modelPrewarm = "ModelPrewarm"' \
+  'cursorPaster = "CursorPaster"'
 
 require_pattern \
   "macOS window manager uses shared log category identity" \
@@ -16806,6 +16827,12 @@ require_patterns \
   VoiceInk/Services/SessionMetricMigrationService.swift \
   'Logger\(' \
   'category: VoiceInkMacOSLogCategory\.sessionMetricMigrationService'
+
+require_patterns \
+  "macOS paste adapter uses shared log category identity" \
+  VoiceInk/Paste/CursorPaster.swift \
+  'Logger\(' \
+  'category: VoiceInkMacOSLogCategory\.cursorPaster'
 
 require_pattern \
   "core checks execute macOS window identity test" \

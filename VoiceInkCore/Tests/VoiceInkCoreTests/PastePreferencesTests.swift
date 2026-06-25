@@ -191,6 +191,33 @@ final class PastePreferencesTests: XCTestCase {
         )
     }
 
+    func testPasteDiagnosticsPreserveMacOSLogCopy() {
+        XCTAssertEqual(
+            VoiceInkPasteDiagnostics.failedToPrepareClipboardMessage,
+            "Failed to prepare clipboard for paste"
+        )
+        XCTAssertEqual(
+            VoiceInkPasteDiagnostics.skippedClipboardRestoreCommandNotPostedMessage,
+            "Skipping clipboard restore because paste command was not posted"
+        )
+        XCTAssertEqual(
+            VoiceInkPasteDiagnostics.appleScriptPasteScriptUnavailableMessage,
+            "AppleScript paste script is unavailable"
+        )
+        XCTAssertEqual(
+            VoiceInkPasteDiagnostics.appleScriptPasteFailedMessage(errorDescription: "event denied"),
+            "AppleScript paste failed: event denied"
+        )
+        XCTAssertEqual(
+            VoiceInkPasteDiagnostics.accessibilityPermissionRequiredForSimulatedPasteMessage,
+            "Accessibility permission is required to paste with simulated key events"
+        )
+        XCTAssertEqual(
+            VoiceInkPasteDiagnostics.failedToCreateCommandVPasteEventsMessage,
+            "Failed to create Cmd+V keyboard events"
+        )
+    }
+
     private func withTemporaryDefaults(_ test: (UserDefaults) -> Void) {
         let suiteName = "VoiceInkCore.PastePreferencesTests.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!

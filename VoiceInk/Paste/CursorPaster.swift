@@ -7,7 +7,10 @@ import VoiceInkCore
 class CursorPaster {
     fileprivate typealias ClipboardItemSnapshot = [(NSPasteboard.PasteboardType, Data)]
     fileprivate typealias ClipboardSnapshot = [ClipboardItemSnapshot]
-    private static let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "CursorPaster")
+    private static let logger = Logger(
+        subsystem: VoiceInkAppIdentity.loggingSubsystem,
+        category: VoiceInkMacOSLogCategory.cursorPaster
+    )
     @MainActor private static var pasteCommandPosterForTesting: (() async -> PasteResult)?
 
     struct PreparedPasteContext {
@@ -115,7 +118,7 @@ class CursorPaster {
             transient: shouldRestoreClipboard,
             sessionID: shouldRestoreClipboard ? sessionID : nil
         ) else {
-            logger.error("Failed to prepare clipboard for paste")
+            logger.error("\(VoiceInkPasteDiagnostics.failedToPrepareClipboardMessage, privacy: .public)")
             return .commandNotPosted
         }
 
@@ -128,7 +131,7 @@ class CursorPaster {
                 on: pasteboard
             )
         } else if shouldRestoreClipboard {
-            logger.notice("Skipping clipboard restore because paste command was not posted")
+            logger.notice("\(VoiceInkPasteDiagnostics.skippedClipboardRestoreCommandNotPostedMessage, privacy: .public)")
         }
 
         return pasteResult
@@ -221,14 +224,17 @@ class CursorPaster {
     @MainActor
     private static func pasteUsingAppleScript() -> Bool {
         guard let script = layoutSwitchesToQWERTYOnCommand ? pasteScriptKeyCode : pasteScriptKeystroke else {
-            logger.error("AppleScript paste script is unavailable")
+            logger.error("\(VoiceInkPasteDiagnostics.appleScriptPasteScriptUnavailableMessage, privacy: .public)")
             return false
         }
 
         var error: NSDictionary?
         script.executeAndReturnError(&error)
         if let error {
-            logger.error("AppleScript paste failed: \(String(describing: error), privacy: .public)")
+            let message = VoiceInkPasteDiagnostics.appleScriptPasteFailedMessage(
+                errorDescription: String(describing: error)
+            )
+            logger.error("\(message, privacy: .public)")
         }
         return error == nil
     }
@@ -239,7 +245,9 @@ class CursorPaster {
     @MainActor
     private static func pasteFromClipboard() async -> PasteResult {
         guard AXIsProcessTrusted() else {
-            logger.error("Accessibility permission is required to paste with simulated key events")
+            logger.error(
+                "\(VoiceInkPasteDiagnostics.accessibilityPermissionRequiredForSimulatedPasteMessage, privacy: .public)"
+            )
             return .commandNotPosted
         }
 
@@ -249,7 +257,7 @@ class CursorPaster {
               let vDown = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: true),
               let vUp = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: false),
               let cmdUp = CGEvent(keyboardEventSource: source, virtualKey: 0x37, keyDown: false) else {
-            logger.error("Failed to create Cmd+V keyboard events")
+            logger.error("\(VoiceInkPasteDiagnostics.failedToCreateCommandVPasteEventsMessage, privacy: .public)")
             return .commandNotPosted
         }
 

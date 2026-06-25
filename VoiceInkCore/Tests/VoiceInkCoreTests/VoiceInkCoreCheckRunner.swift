@@ -1591,6 +1591,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "PastePreferencesTests.testPastePreferenceReadsSavesAndBoundsRestoreDelay", run: { PastePreferencesTests().testPastePreferenceReadsSavesAndBoundsRestoreDelay() }),
             VoiceInkCoreCheck(name: "PastePreferencesTests.testBackupPreferencesPreserveMacOSExportShape", run: { PastePreferencesTests().testBackupPreferencesPreserveMacOSExportShape() }),
             VoiceInkCoreCheck(name: "PastePreferencesTests.testBackupImportPlanPreservesOptionalRestorePolicy", run: { PastePreferencesTests().testBackupImportPlanPreservesOptionalRestorePolicy() }),
+            VoiceInkCoreCheck(name: "PastePreferencesTests.testPasteDiagnosticsPreserveMacOSLogCopy", run: { PastePreferencesTests().testPasteDiagnosticsPreserveMacOSLogCopy() }),
             VoiceInkCoreCheck(name: "RecordingFeedbackPreferenceTests.testBuiltInRecordingSoundsPreserveCatalogNamesAndExtensions", run: { RecordingFeedbackPreferenceTests().testBuiltInRecordingSoundsPreserveCatalogNamesAndExtensions() }),
             VoiceInkCoreCheck(name: "RecordingFeedbackPreferenceTests.testCustomSoundTypePreservesExistingMacOSStorageKeys", run: { RecordingFeedbackPreferenceTests().testCustomSoundTypePreservesExistingMacOSStorageKeys() }),
             VoiceInkCoreCheck(name: "RecordingFeedbackPreferenceTests.testCustomSoundSettingsPresentationPreservesMacOSCopyAndActions", run: { RecordingFeedbackPreferenceTests().testCustomSoundSettingsPresentationPreservesMacOSCopyAndActions() }),

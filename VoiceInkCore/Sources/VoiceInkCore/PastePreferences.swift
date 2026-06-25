@@ -193,3 +193,15 @@ public enum VoiceInkPastePreference {
         )
     }
 }
+
+public enum VoiceInkPasteDiagnostics {
+    public static let failedToPrepareClipboardMessage = "Failed to prepare clipboard for paste"
+    public static let skippedClipboardRestoreCommandNotPostedMessage = "Skipping clipboard restore because paste command was not posted"
+    public static let appleScriptPasteScriptUnavailableMessage = "AppleScript paste script is unavailable"
+    public static let accessibilityPermissionRequiredForSimulatedPasteMessage = "Accessibility permission is required to paste with simulated key events"
+    public static let failedToCreateCommandVPasteEventsMessage = "Failed to create Cmd+V keyboard events"
+
+    public static func appleScriptPasteFailedMessage(errorDescription: String) -> String {
+        "AppleScript paste failed: \(errorDescription)"
+    }
+}

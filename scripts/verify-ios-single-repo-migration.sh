@@ -7358,7 +7358,7 @@ reject_pattern \
 
 require_pattern \
   "shared dictionary alert presentation lives in VoiceInkCore" \
-  'VoiceInkDictionaryAlertPresentation' \
+  'VoiceInkDictionaryAlertPresentation|failedToAddVocabularyWords' \
   VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
 
 require_pattern \
@@ -7865,7 +7865,12 @@ require_pattern \
 
 require_pattern \
   "macOS dictionary persistence failures use shared dictionary alert copy" \
-  'VoiceInkDictionaryAlertPresentation\.(failedToAddVocabularyWord|failedToAddWordReplacement|failedToSaveWordReplacementChanges)' \
+  'VoiceInkDictionaryAlertPresentation\.(failedToAddVocabularyWord|failedToAddVocabularyWords|failedToAddWordReplacement|failedToSaveWordReplacementChanges)' \
+  VoiceInk/Services/DictionaryService.swift
+
+reject_pattern \
+  "macOS dictionary persistence avoids shell-owned vocabulary failure formatting" \
+  'errors\.joined\(separator: "; "\)' \
   VoiceInk/Services/DictionaryService.swift
 
 reject_pattern \

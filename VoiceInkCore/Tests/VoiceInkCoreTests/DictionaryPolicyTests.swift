@@ -30,6 +30,13 @@ final class DictionaryPolicyTests: XCTestCase {
             "Failed to add 'Roma': Disk full"
         )
         XCTAssertEqual(
+            VoiceInkDictionaryAlertPresentation.failedToAddVocabularyWords([
+                "Failed to add 'Roma': Disk full",
+                "Failed to add 'VoiceInk': Permission denied"
+            ]),
+            .vocabulary(message: "Failed to add 'Roma': Disk full; Failed to add 'VoiceInk': Permission denied")
+        )
+        XCTAssertEqual(
             VoiceInkDictionaryAlertPresentation.failedToAddWordReplacement(localizedDescription: "Disk full"),
             "Failed to add replacement: Disk full"
         )

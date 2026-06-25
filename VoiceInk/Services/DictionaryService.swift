@@ -25,7 +25,7 @@ enum DictionaryService {
         let failurePlan = VoiceInkVocabularySubmissionPlan(
             wordsToInsert: plan.wordsToInsert,
             draftAfterSubmit: submission.submittedDraft,
-            alertPresentation: .vocabulary(message: errors.joined(separator: "; "))
+            alertPresentation: VoiceInkDictionaryAlertPresentation.failedToAddVocabularyWords(errors)
         )
         return VoiceInkVocabularyDraftSubmission(
             submittedDraft: submission.submittedDraft,

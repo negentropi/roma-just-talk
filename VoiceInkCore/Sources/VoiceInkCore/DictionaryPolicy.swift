@@ -464,6 +464,12 @@ public struct VoiceInkDictionaryAlertPresentation: Equatable, Identifiable, Send
         "Failed to add '\(word)': \(localizedDescription)"
     }
 
+    public static func failedToAddVocabularyWords(
+        _ failureMessages: [String]
+    ) -> VoiceInkDictionaryAlertPresentation {
+        vocabulary(message: failureMessages.joined(separator: "; "))
+    }
+
     public static func failedToAddWordReplacement(localizedDescription: String) -> String {
         "Failed to add replacement: \(localizedDescription)"
     }

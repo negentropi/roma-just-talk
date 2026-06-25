@@ -11065,8 +11065,17 @@ reject_pattern \
 require_patterns \
   "macOS shortcut action display names use shared presentation" \
   VoiceInk/Shortcuts/ShortcutAction.swift \
+  'typealias +ShortcutAction += +VoiceInkShortcutActionIdentifier' \
   'VoiceInkShortcutActionPresentation\.displayName' \
   'powerModeConfigurationName'
+
+reject_pattern \
+  "macOS shortcut action avoids duplicate shared identifier enum and conversions" \
+  'enum +ShortcutAction|coreIdentifier|ShortcutAction\(coreIdentifier:' \
+  VoiceInk/Shortcuts/ShortcutAction.swift \
+  VoiceInk/Shortcuts/ShortcutMigration.swift \
+  VoiceInk/Services/ImportExportService.swift \
+  VoiceInk/Services/BackupImporter.swift
 
 require_patterns \
   "macOS shortcut validator uses shared validation presentation" \

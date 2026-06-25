@@ -165,7 +165,7 @@ enum BackupImporter {
 
             ShortcutStore.setShortcut(
                 shortcutBackup.shortcut,
-                for: ShortcutAction(coreIdentifier: shortcutImport.actionIdentifier)
+                for: shortcutImport.actionIdentifier
             )
 
             guard let recordingShortcutSelection = shortcutImport.recordingShortcutSelection else {

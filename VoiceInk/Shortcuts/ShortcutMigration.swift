@@ -57,7 +57,7 @@ enum ShortcutMigration {
         allowsNone: Bool
     ) -> RecordingShortcutManager.ShortcutSelection {
         let plan = VoiceInkRecordingShortcutPreference.shortcutSelectionMigrationPlan(
-            for: action.coreIdentifier,
+            for: action,
             allowsNone: allowsNone
         )
 
@@ -79,15 +79,15 @@ enum ShortcutMigration {
     static func migrateShortcutMode(
         for action: ShortcutAction
     ) -> RecordingShortcutManager.Mode {
-        VoiceInkRecordingShortcutPreference.migrateShortcutMode(for: action.coreIdentifier)
+        VoiceInkRecordingShortcutPreference.migrateShortcutMode(for: action)
     }
 
     static func removeLegacyCustomRecordingShortcut(for action: ShortcutAction) {
-        VoiceInkRecordingShortcutPreference.removeLegacyCustomRecordingShortcut(for: action.coreIdentifier)
+        VoiceInkRecordingShortcutPreference.removeLegacyCustomRecordingShortcut(for: action)
     }
 
     static func removeLegacyKeyboardShortcut(for action: ShortcutAction) {
-        VoiceInkRecordingShortcutPreference.removeLegacyKeyboardShortcut(for: action.coreIdentifier)
+        VoiceInkRecordingShortcutPreference.removeLegacyKeyboardShortcut(for: action)
     }
 
     static func migrateLegacyKeyboardShortcut(for action: ShortcutAction) {
@@ -112,8 +112,7 @@ enum ShortcutMigration {
         }
 
         for identifier in VoiceInkShortcutActionIdentifier.legacyCustomRecordingShortcutActions {
-            let action = ShortcutAction(coreIdentifier: identifier)
-            migrateLegacyCustomRecordingShortcut(for: action)
+            migrateLegacyCustomRecordingShortcut(for: identifier)
         }
 
         VoiceInkRecordingShortcutPreference.markLegacyCustomRecordingShortcutsMigrationComplete()
@@ -127,7 +126,7 @@ enum ShortcutMigration {
         guard
             ShortcutStore.rawShortcut(for: action) == nil,
             !ShortcutStore.isShortcutCleared(for: action),
-            let data = UserDefaults.standard.data(forKey: action.coreIdentifier.legacyCustomRecordingShortcutKey),
+            let data = UserDefaults.standard.data(forKey: action.legacyCustomRecordingShortcutKey),
             let shortcut = try? JSONDecoder().decode(Shortcut.self, from: data)
         else {
             return
@@ -159,7 +158,7 @@ enum ShortcutMigration {
 
     private static func legacyKeyboardShortcut(for action: ShortcutAction) -> Shortcut? {
         guard
-            let storageKey = action.coreIdentifier.legacyKeyboardShortcutStorageKey,
+            let storageKey = action.legacyKeyboardShortcutStorageKey,
             let data = UserDefaults.standard.string(forKey: storageKey)?.data(using: .utf8),
             let legacyShortcut = try? JSONDecoder().decode(LegacyKeyboardShortcut.self, from: data)
         else {

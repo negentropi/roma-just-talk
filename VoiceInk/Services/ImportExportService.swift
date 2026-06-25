@@ -203,7 +203,7 @@ class ImportExportService {
         let shortcutBackupCandidates = VoiceInkShortcutBackupPolicy
             .generalBackupShortcutActionIdentifiers
             .reduce(into: [VoiceInkShortcutActionIdentifier: ShortcutBackup]()) { records, actionIdentifier in
-                guard let shortcut = ShortcutStore.shortcut(for: ShortcutAction(coreIdentifier: actionIdentifier)) else {
+                guard let shortcut = ShortcutStore.shortcut(for: actionIdentifier) else {
                     return
                 }
                 records[actionIdentifier] = ShortcutBackup(shortcut)

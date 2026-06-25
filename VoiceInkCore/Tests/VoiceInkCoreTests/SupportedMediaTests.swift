@@ -70,6 +70,10 @@ final class SupportedMediaTests: XCTestCase {
         XCTAssertEqual(VoiceInkAudioImportPresentation.clearButtonHelpText, "Clear all items")
         XCTAssertEqual(VoiceInkAudioImportPresentation.enhancementToggleTitle, "AI Enhancement")
         XCTAssertEqual(VoiceInkAudioImportPresentation.promptPickerTitle, "Prompt")
+        XCTAssertEqual(
+            VoiceInkAudioImportPresentation.droppedFileLoadFailedDiagnosticMessage(errorDescription: "provider error"),
+            "Error loading dropped file: provider error"
+        )
     }
 
     func testAudioFileQueueProcessingPhasesPreserveCopy() {

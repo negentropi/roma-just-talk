@@ -321,7 +321,7 @@ struct AudioTranscribeView: View {
                 if provider.hasItemConformingToTypeIdentifier(typeIdentifier) {
                     provider.loadItem(forTypeIdentifier: typeIdentifier, options: nil) { item, error in
                         if let error = error {
-                            print("Error loading dropped file: \(error)")
+                            print(VoiceInkAudioImportPresentation.droppedFileLoadFailedDiagnosticMessage(errorDescription: String(describing: error)))
                             return
                         }
 

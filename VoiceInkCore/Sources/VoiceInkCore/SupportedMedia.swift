@@ -192,6 +192,10 @@ public enum VoiceInkAudioImportPresentation {
     public static let enhancementToggleTitle = "AI Enhancement"
     public static let promptPickerTitle = "Prompt"
 
+    public static func droppedFileLoadFailedDiagnosticMessage(errorDescription: String) -> String {
+        "Error loading dropped file: \(errorDescription)"
+    }
+
     public static func queueCountText(_ count: Int) -> String {
         "\(count) file\(count == 1 ? "" : "s")"
     }

@@ -2120,7 +2120,7 @@ require_pattern \
 
 require_pattern \
   "macOS audio import view uses shared queue presentation" \
-  'VoiceInkAudioImportPresentation\.(dropTargetSystemImageName|queueCountText|addButtonTitle|cancelButtonTitle|startButtonTitle|clearButtonTitle|enhancementToggleTitle|promptPickerTitle)' \
+  'VoiceInkAudioImportPresentation\.(dropTargetSystemImageName|queueCountText|addButtonTitle|cancelButtonTitle|startButtonTitle|clearButtonTitle|enhancementToggleTitle|promptPickerTitle|droppedFileLoadFailedDiagnosticMessage)' \
   VoiceInk/Views/AudioTranscribeView.swift
 
 require_pattern \
@@ -2165,7 +2165,7 @@ reject_pattern \
 
 reject_pattern \
   "macOS audio import view avoids shell-owned queue copy and action icons" \
-  '"(arrow\.down\.doc|Drop audio or video files here|or|Choose Files|Drop files anywhere to add more|Drop to add files|plus|Add|Add files|stop\.fill|Cancel|Cancel transcription|play\.fill|Start|xmark\.bin|Clear|Clear all items|AI Enhancement|Prompt)"' \
+  '"(arrow\.down\.doc|Drop audio or video files here|or|Choose Files|Drop files anywhere to add more|Drop to add files|plus|Add|Add files|stop\.fill|Cancel|Cancel transcription|play\.fill|Start|xmark\.bin|Clear|Clear all items|AI Enhancement|Prompt|Error loading dropped file:)"' \
   VoiceInk/Views/AudioTranscribeView.swift
 
 reject_pattern \

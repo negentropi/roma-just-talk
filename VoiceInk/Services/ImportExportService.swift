@@ -401,7 +401,9 @@ class ImportExportService {
     ) {
         DispatchQueue.main.async {
             let alert = NSAlert()
-            let needsAPIKeyReminder = VoiceInkSettingsBackupImportPolicy.needsAPIKeyReminder(for: categories)
+            let importSuccessPlan = VoiceInkSettingsBackupImportPolicy.importSuccessPlan(
+                categories: categories
+            )
             alert.messageText = self.backupPresentation.importSuccessTitle
             alert.informativeText = self.backupPresentation.importSuccessInformativeText(
                 fileName: fileName,
@@ -409,18 +411,21 @@ class ImportExportService {
             )
             alert.alertStyle = .informational
             alert.addButton(withTitle: self.backupPresentation.okActionTitle)
-            if needsAPIKeyReminder {
+            if importSuccessPlan.isConfigureAPIKeysActionVisible {
                 alert.addButton(withTitle: self.backupPresentation.configureAPIKeysActionTitle)
             }
             
             let response = alert.runModal()
-            if needsAPIKeyReminder && response == .alertSecondButtonReturn {
-                NotificationCenter.default.post(
-                    name: .navigateToDestination,
-                    object: nil,
-                    userInfo: VoiceInkMacOSNavigationRequest.userInfo(destination: .enhancement)
-                )
-            }
+            importSuccessPlan.applyRuntimeState(
+                selectedConfigureAPIKeysAction: response == .alertSecondButtonReturn,
+                navigateToAPIKeySettings: {
+                    NotificationCenter.default.post(
+                        name: .navigateToDestination,
+                        object: nil,
+                        userInfo: VoiceInkMacOSNavigationRequest.userInfo(destination: .enhancement)
+                    )
+                }
+            )
         }
     }
 }

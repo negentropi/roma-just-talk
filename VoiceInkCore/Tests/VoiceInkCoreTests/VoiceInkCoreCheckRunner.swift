@@ -112,6 +112,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "SettingsBackupPolicyTests.testBackupImportPolicyBuildsCurrentVersionWithFallback", run: { SettingsBackupPolicyTests().testBackupImportPolicyBuildsCurrentVersionWithFallback() }),
             VoiceInkCoreCheck(name: "SettingsBackupPolicyTests.testBackupVersionReviewReportsOnlyMismatches", run: { SettingsBackupPolicyTests().testBackupVersionReviewReportsOnlyMismatches() }),
             VoiceInkCoreCheck(name: "SettingsBackupPolicyTests.testBackupImportSelectionReviewAppliesMacOSImportFlowDecisions", run: { try SettingsBackupPolicyTests().testBackupImportSelectionReviewAppliesMacOSImportFlowDecisions() }),
+            VoiceInkCoreCheck(name: "SettingsBackupPolicyTests.testBackupImportSuccessPlanShowsAndAppliesAPIKeyFollowUpOnlyWhenNeeded", run: { SettingsBackupPolicyTests().testBackupImportSuccessPlanShowsAndAppliesAPIKeyFollowUpOnlyWhenNeeded() }),
             VoiceInkCoreCheck(name: "SettingsBackupPolicyTests.testBackupImportDiagnosticsPreserveMacOSStatusCopy", run: { SettingsBackupPolicyTests().testBackupImportDiagnosticsPreserveMacOSStatusCopy() }),
             VoiceInkCoreCheck(name: "SettingsBackupPolicyTests.testBackupImportErrorPreservesMacOSSaveFailureCopy", run: { SettingsBackupPolicyTests().testBackupImportErrorPreservesMacOSSaveFailureCopy() }),
             VoiceInkCoreCheck(name: "SettingsBackupPolicyTests.testBackupPresentationPreservesMacOSPanelAndAlertCopy", run: { SettingsBackupPolicyTests().testBackupPresentationPreservesMacOSPanelAndAlertCopy() }),

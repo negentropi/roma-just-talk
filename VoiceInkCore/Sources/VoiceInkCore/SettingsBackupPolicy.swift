@@ -62,6 +62,12 @@ public enum VoiceInkSettingsBackupImportPolicy {
             selectedCategories: selectedCategories
         )
     }
+
+    public static func importSuccessPlan(
+        categories: Set<VoiceInkSettingsBackupCategory>
+    ) -> VoiceInkSettingsBackupImportSuccessPlan {
+        VoiceInkSettingsBackupImportSuccessPlan(categories: categories)
+    }
 }
 
 public struct VoiceInkSettingsBackupVersionReview: Equatable, Sendable {
@@ -116,6 +122,27 @@ public enum VoiceInkSettingsBackupImportSelectionReview: Equatable, Sendable {
         case .selected(let categories):
             try importSelectedCategories(categories)
         }
+    }
+}
+
+public struct VoiceInkSettingsBackupImportSuccessPlan: Equatable, Sendable {
+    public let categories: Set<VoiceInkSettingsBackupCategory>
+
+    public var isConfigureAPIKeysActionVisible: Bool {
+        VoiceInkSettingsBackupImportPolicy.needsAPIKeyReminder(for: categories)
+    }
+
+    public init(categories: Set<VoiceInkSettingsBackupCategory>) {
+        self.categories = categories
+    }
+
+    public func applyRuntimeState(
+        selectedConfigureAPIKeysAction: Bool,
+        navigateToAPIKeySettings: () -> Void
+    ) {
+        guard isConfigureAPIKeysActionVisible,
+              selectedConfigureAPIKeysAction else { return }
+        navigateToAPIKeySettings()
     }
 }
 

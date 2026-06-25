@@ -130,6 +130,36 @@ final class SettingsBackupPolicyTests: XCTestCase {
         )
     }
 
+    func testBackupImportSuccessPlanShowsAndAppliesAPIKeyFollowUpOnlyWhenNeeded() {
+        let generalPlan = VoiceInkSettingsBackupImportPolicy.importSuccessPlan(categories: [.general])
+        XCTAssertFalse(generalPlan.isConfigureAPIKeysActionVisible)
+
+        var events = [String]()
+        generalPlan.applyRuntimeState(
+            selectedConfigureAPIKeysAction: true,
+            navigateToAPIKeySettings: {
+                events.append("navigate")
+            }
+        )
+
+        let promptPlan = VoiceInkSettingsBackupImportPolicy.importSuccessPlan(categories: [.prompts])
+        XCTAssertTrue(promptPlan.isConfigureAPIKeysActionVisible)
+        promptPlan.applyRuntimeState(
+            selectedConfigureAPIKeysAction: false,
+            navigateToAPIKeySettings: {
+                events.append("navigate")
+            }
+        )
+        promptPlan.applyRuntimeState(
+            selectedConfigureAPIKeysAction: true,
+            navigateToAPIKeySettings: {
+                events.append("navigate")
+            }
+        )
+
+        XCTAssertEqual(events, ["navigate"])
+    }
+
     func testBackupImportDiagnosticsPreserveMacOSStatusCopy() {
         XCTAssertEqual(
             VoiceInkSettingsBackupImportDiagnostics.noGeneralSettingsMessage,

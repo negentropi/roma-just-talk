@@ -6136,7 +6136,10 @@ require_patterns \
   'case canceled' \
   'case emptySelection' \
   'case selected\(Set<VoiceInkSettingsBackupCategory>\)' \
-  'importSelectedCategories'
+  'importSelectedCategories' \
+  'VoiceInkSettingsBackupImportSuccessPlan' \
+  'isConfigureAPIKeysActionVisible' \
+  'selectedConfigureAPIKeysAction'
 
 require_patterns \
   "shared settings backup file owns top-level wire shape and legacy defaults" \
@@ -6180,12 +6183,12 @@ reject_pattern \
 
 require_pattern \
   "macOS import/export uses shared settings backup policy and presentation" \
-  'VoiceInkSettingsBackupCategory|VoiceInkSettingsBackupImportPolicy\.(currentVersion|versionReview|importSelectionReview|needsAPIKeyReminder)|VoiceInkSettingsBackupPresentation\.macOS|backupPresentation\.(defaultFileName|exportPanelTitle|exportSuccessMessage|importPanelTitle|versionMismatchMessage|importSuccessInformativeText)' \
+  'VoiceInkSettingsBackupCategory|VoiceInkSettingsBackupImportPolicy\.(currentVersion|versionReview|importSelectionReview|importSuccessPlan|needsAPIKeyReminder)|VoiceInkSettingsBackupPresentation\.macOS|backupPresentation\.(defaultFileName|exportPanelTitle|exportSuccessMessage|importPanelTitle|versionMismatchMessage|importSuccessInformativeText)' \
   VoiceInk/Services/ImportExportService.swift
 
 reject_pattern \
   "macOS import/export avoids shell-owned backup import review flow" \
-  'if let version = Bundle\.main\.object|currentSettingsVersion = "0\.0\.0"|backup\.version != currentSettingsVersion|guard let selectedCategories|guard !selectedCategories\.isEmpty' \
+  'if let version = Bundle\.main\.object|currentSettingsVersion = "0\.0\.0"|backup\.version != currentSettingsVersion|guard let selectedCategories|guard !selectedCategories\.isEmpty|let needsAPIKeyReminder|needsAPIKeyReminder && response == \.alertSecondButtonReturn' \
   VoiceInk/Services/ImportExportService.swift
 
 require_pattern \
@@ -6227,6 +6230,7 @@ require_patterns \
   'SettingsBackupPolicyTests\.testBackupImportPolicyBuildsCurrentVersionWithFallback' \
   'SettingsBackupPolicyTests\.testBackupVersionReviewReportsOnlyMismatches' \
   'SettingsBackupPolicyTests\.testBackupImportSelectionReviewAppliesMacOSImportFlowDecisions' \
+  'SettingsBackupPolicyTests\.testBackupImportSuccessPlanShowsAndAppliesAPIKeyFollowUpOnlyWhenNeeded' \
   'SettingsBackupPolicyTests\.testBackupImportDiagnosticsPreserveMacOSStatusCopy' \
   'SettingsBackupPolicyTests\.testBackupImportErrorPreservesMacOSSaveFailureCopy' \
   'SettingsBackupPolicyTests\.testBackupPresentationPreservesMacOSPanelAndAlertCopy' \
@@ -6238,7 +6242,7 @@ require_patterns \
 
 require_pattern \
   "migration checklist tracks shared settings backup policy" \
-  'settings backup category taxonomy, app-version fallback, imported-version mismatch review, selected-category cancellation/empty-selection/import routing, top-level backup file wire shape, legacy top-level decode defaults, pretty-printed export encoding, shared import decoding, ordered category titles, import/export panel copy, import status/error diagnostic copy, save-failure import error, alert titles/messages, version-mismatch warning, import summary text, API-key-reminder gate, and restart recommendation use `VoiceInkSettingsBackupFile`/`VoiceInkSettingsBackupFileCodec`/`VoiceInkSettingsBackupCategory`/`VoiceInkSettingsBackupImportPolicy`/`VoiceInkSettingsBackupVersionReview`/`VoiceInkSettingsBackupImportSelectionReview`/`VoiceInkSettingsBackupImportDiagnostics`/`VoiceInkSettingsBackupImportError`/`VoiceInkSettingsBackupPresentation`' \
+  'settings backup category taxonomy, app-version fallback, imported-version mismatch review, selected-category cancellation/empty-selection/import routing, import-success API-key follow-up action planning, top-level backup file wire shape, legacy top-level decode defaults, pretty-printed export encoding, shared import decoding, ordered category titles, import/export panel copy, import status/error diagnostic copy, save-failure import error, alert titles/messages, version-mismatch warning, import summary text, API-key-reminder gate, and restart recommendation use `VoiceInkSettingsBackupFile`/`VoiceInkSettingsBackupFileCodec`/`VoiceInkSettingsBackupCategory`/`VoiceInkSettingsBackupImportPolicy`/`VoiceInkSettingsBackupVersionReview`/`VoiceInkSettingsBackupImportSelectionReview`/`VoiceInkSettingsBackupImportSuccessPlan`/`VoiceInkSettingsBackupImportDiagnostics`/`VoiceInkSettingsBackupImportError`/`VoiceInkSettingsBackupPresentation`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

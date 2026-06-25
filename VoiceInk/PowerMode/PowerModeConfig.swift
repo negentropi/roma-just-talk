@@ -23,88 +23,80 @@ class PowerModeManager: ObservableObject {
 
     @discardableResult
     func saveConfiguration(_ config: PowerModeConfig, mode: VoiceInkPowerModeSaveMode) -> Bool {
-        let previousEnabledConfigIds = enabledConfigurationIds
-        let didSave = configurations.savePowerModeConfiguration(config, mode: mode)
-
-        if didSave {
-            saveConfigurations()
-            postShortcutAvailabilityChangeIfNeeded(previousEnabledConfigIds: previousEnabledConfigIds)
-        }
-
-        return didSave
+        applyConfigurationMutationPlan(
+            .saving(config, mode: mode, in: configurations)
+        )
     }
 
     func removeConfiguration(with id: UUID) {
-        let previousEnabledConfigIds = enabledConfigurationIds
-        ShortcutStore.removeShortcutStorage(for: .powerMode(id))
-        configurations.removePowerModeConfiguration(with: id)
-        saveConfigurations()
-        postShortcutAvailabilityChangeIfNeeded(previousEnabledConfigIds: previousEnabledConfigIds)
+        applyConfigurationMutationPlan(
+            .removing(id: id, from: configurations)
+        )
     }
 
     func updateConfiguration(_ config: PowerModeConfig) {
-        let previousEnabledConfigIds = enabledConfigurationIds
-        if configurations.updatePowerModeConfiguration(config) {
-            saveConfigurations()
-            postShortcutAvailabilityChangeIfNeeded(previousEnabledConfigIds: previousEnabledConfigIds)
-        }
+        applyConfigurationMutationPlan(
+            .updating(config, in: configurations)
+        )
     }
 
     func moveConfigurations(fromOffsets: IndexSet, toOffset: Int) {
-        configurations.movePowerModeConfigurations(fromOffsets: fromOffsets, toOffset: toOffset)
-        saveConfigurations()
+        applyConfigurationMutationPlan(
+            .moving(fromOffsets: fromOffsets, toOffset: toOffset, in: configurations)
+        )
     }
 
     func enableConfiguration(with id: UUID) {
-        let previousEnabledConfigIds = enabledConfigurationIds
-        if configurations.setPowerModeConfiguration(id: id, isEnabled: true) {
-            saveConfigurations()
-            postShortcutAvailabilityChangeIfNeeded(previousEnabledConfigIds: previousEnabledConfigIds)
-        }
+        applyConfigurationMutationPlan(
+            .settingEnabled(id: id, isEnabled: true, in: configurations)
+        )
     }
     
     func disableConfiguration(with id: UUID) {
-        let previousEnabledConfigIds = enabledConfigurationIds
-        if configurations.setPowerModeConfiguration(id: id, isEnabled: false) {
-            saveConfigurations()
-            postShortcutAvailabilityChangeIfNeeded(previousEnabledConfigIds: previousEnabledConfigIds)
-        }
-    }
-    
-    private var enabledConfigurationIds: Set<UUID> {
-        configurations.enabledPowerModeConfigurationIds
+        applyConfigurationMutationPlan(
+            .settingEnabled(id: id, isEnabled: false, in: configurations)
+        )
     }
 
-    private func postShortcutAvailabilityChangeIfNeeded(previousEnabledConfigIds: Set<UUID>) {
-        guard previousEnabledConfigIds != enabledConfigurationIds else {
-            return
-        }
-
+    private func postShortcutAvailabilityDidChange() {
         NotificationCenter.default.post(name: .powerModeShortcutAvailabilityDidChange, object: nil)
     }
 
+    @discardableResult
+    private func applyConfigurationMutationPlan(_ plan: VoiceInkPowerModeConfigurationMutationPlan) -> Bool {
+        plan.applyRuntimeState(
+            setConfigurations: { configurations = $0 },
+            removeShortcutStorageForConfiguration: { id in
+                ShortcutStore.removeShortcutStorage(for: .powerMode(id))
+            },
+            saveConfigurations: saveConfigurations,
+            postShortcutAvailabilityDidChange: postShortcutAvailabilityDidChange
+        )
+        return plan.didMutate
+    }
+
     func addAppConfig(_ appConfig: VoiceInkPowerModeAppConfig, to config: PowerModeConfig) {
-        if configurations.addPowerModeAppConfig(appConfig, toConfigurationID: config.id) {
-            saveConfigurations()
-        }
+        applyConfigurationMutationPlan(
+            .addingAppConfig(appConfig, toConfigurationID: config.id, in: configurations)
+        )
     }
 
     func removeAppConfig(_ appConfig: VoiceInkPowerModeAppConfig, from config: PowerModeConfig) {
-        if configurations.removePowerModeAppConfig(id: appConfig.id, fromConfigurationID: config.id) {
-            saveConfigurations()
-        }
+        applyConfigurationMutationPlan(
+            .removingAppConfig(id: appConfig.id, fromConfigurationID: config.id, in: configurations)
+        )
     }
 
     func addURLConfig(_ urlConfig: VoiceInkPowerModeURLConfig, to config: PowerModeConfig) {
-        if configurations.addPowerModeURLConfig(urlConfig, toConfigurationID: config.id) {
-            saveConfigurations()
-        }
+        applyConfigurationMutationPlan(
+            .addingURLConfig(urlConfig, toConfigurationID: config.id, in: configurations)
+        )
     }
 
     func removeURLConfig(_ urlConfig: VoiceInkPowerModeURLConfig, from config: PowerModeConfig) {
-        if configurations.removePowerModeURLConfig(id: urlConfig.id, fromConfigurationID: config.id) {
-            saveConfigurations()
-        }
+        applyConfigurationMutationPlan(
+            .removingURLConfig(id: urlConfig.id, fromConfigurationID: config.id, in: configurations)
+        )
     }
 
     func setActiveConfiguration(_ config: PowerModeConfig?) {

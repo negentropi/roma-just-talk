@@ -1454,6 +1454,200 @@ public enum VoiceInkPowerModeSessionDiagnostics {
     }
 }
 
+public struct VoiceInkPowerModeConfigurationMutationPlan: Equatable, Sendable {
+    public let didMutate: Bool
+    private let updatedConfigurations: [PowerModeConfig]
+    private let shouldApplyConfigurations: Bool
+    private let shortcutConfigurationIdToRemove: UUID?
+    private let shouldSaveConfigurations: Bool
+    private let shouldPostShortcutAvailabilityChange: Bool
+
+    private init(
+        originalConfigurations: [PowerModeConfig],
+        updatedConfigurations: [PowerModeConfig],
+        didMutate: Bool,
+        shouldApplyConfigurations: Bool? = nil,
+        shortcutConfigurationIdToRemove: UUID? = nil,
+        shouldSaveConfigurations: Bool,
+        detectsShortcutAvailabilityChange: Bool
+    ) {
+        self.didMutate = didMutate
+        self.updatedConfigurations = updatedConfigurations
+        self.shouldApplyConfigurations = shouldApplyConfigurations ?? didMutate
+        self.shortcutConfigurationIdToRemove = shortcutConfigurationIdToRemove
+        self.shouldSaveConfigurations = shouldSaveConfigurations
+        self.shouldPostShortcutAvailabilityChange = shouldSaveConfigurations
+            && detectsShortcutAvailabilityChange
+            && originalConfigurations.enabledPowerModeConfigurationIds != updatedConfigurations.enabledPowerModeConfigurationIds
+    }
+
+    public func applyRuntimeState(
+        setConfigurations: ([PowerModeConfig]) -> Void,
+        removeShortcutStorageForConfiguration: (UUID) -> Void,
+        saveConfigurations: () -> Void,
+        postShortcutAvailabilityDidChange: () -> Void
+    ) {
+        if let shortcutConfigurationIdToRemove {
+            removeShortcutStorageForConfiguration(shortcutConfigurationIdToRemove)
+        }
+
+        if shouldApplyConfigurations {
+            setConfigurations(updatedConfigurations)
+        }
+
+        guard shouldSaveConfigurations else { return }
+        saveConfigurations()
+
+        if shouldPostShortcutAvailabilityChange {
+            postShortcutAvailabilityDidChange()
+        }
+    }
+
+    public static func saving(
+        _ config: PowerModeConfig,
+        mode: VoiceInkPowerModeSaveMode,
+        in configurations: [PowerModeConfig]
+    ) -> Self {
+        var updatedConfigurations = configurations
+        let didMutate = updatedConfigurations.savePowerModeConfiguration(config, mode: mode)
+        return Self(
+            originalConfigurations: configurations,
+            updatedConfigurations: updatedConfigurations,
+            didMutate: didMutate,
+            shouldApplyConfigurations: didMutate || config.isDefault,
+            shouldSaveConfigurations: didMutate,
+            detectsShortcutAvailabilityChange: true
+        )
+    }
+
+    public static func removing(
+        id: UUID,
+        from configurations: [PowerModeConfig]
+    ) -> Self {
+        var updatedConfigurations = configurations
+        let didMutate = updatedConfigurations.removePowerModeConfiguration(with: id)
+        return Self(
+            originalConfigurations: configurations,
+            updatedConfigurations: updatedConfigurations,
+            didMutate: didMutate,
+            shortcutConfigurationIdToRemove: id,
+            shouldSaveConfigurations: true,
+            detectsShortcutAvailabilityChange: true
+        )
+    }
+
+    public static func updating(
+        _ config: PowerModeConfig,
+        in configurations: [PowerModeConfig]
+    ) -> Self {
+        var updatedConfigurations = configurations
+        let didMutate = updatedConfigurations.updatePowerModeConfiguration(config)
+        return Self(
+            originalConfigurations: configurations,
+            updatedConfigurations: updatedConfigurations,
+            didMutate: didMutate,
+            shouldSaveConfigurations: didMutate,
+            detectsShortcutAvailabilityChange: true
+        )
+    }
+
+    public static func moving(
+        fromOffsets offsets: IndexSet,
+        toOffset: Int,
+        in configurations: [PowerModeConfig]
+    ) -> Self {
+        var updatedConfigurations = configurations
+        updatedConfigurations.movePowerModeConfigurations(fromOffsets: offsets, toOffset: toOffset)
+        return Self(
+            originalConfigurations: configurations,
+            updatedConfigurations: updatedConfigurations,
+            didMutate: updatedConfigurations != configurations,
+            shouldSaveConfigurations: true,
+            detectsShortcutAvailabilityChange: false
+        )
+    }
+
+    public static func settingEnabled(
+        id: UUID,
+        isEnabled: Bool,
+        in configurations: [PowerModeConfig]
+    ) -> Self {
+        var updatedConfigurations = configurations
+        let didMutate = updatedConfigurations.setPowerModeConfiguration(id: id, isEnabled: isEnabled)
+        return Self(
+            originalConfigurations: configurations,
+            updatedConfigurations: updatedConfigurations,
+            didMutate: didMutate,
+            shouldSaveConfigurations: didMutate,
+            detectsShortcutAvailabilityChange: true
+        )
+    }
+
+    public static func addingAppConfig(
+        _ appConfig: VoiceInkPowerModeAppConfig,
+        toConfigurationID configID: UUID,
+        in configurations: [PowerModeConfig]
+    ) -> Self {
+        var updatedConfigurations = configurations
+        let didMutate = updatedConfigurations.addPowerModeAppConfig(appConfig, toConfigurationID: configID)
+        return Self(
+            originalConfigurations: configurations,
+            updatedConfigurations: updatedConfigurations,
+            didMutate: didMutate,
+            shouldSaveConfigurations: didMutate,
+            detectsShortcutAvailabilityChange: false
+        )
+    }
+
+    public static func removingAppConfig(
+        id appConfigID: UUID,
+        fromConfigurationID configID: UUID,
+        in configurations: [PowerModeConfig]
+    ) -> Self {
+        var updatedConfigurations = configurations
+        let didMutate = updatedConfigurations.removePowerModeAppConfig(id: appConfigID, fromConfigurationID: configID)
+        return Self(
+            originalConfigurations: configurations,
+            updatedConfigurations: updatedConfigurations,
+            didMutate: didMutate,
+            shouldSaveConfigurations: didMutate,
+            detectsShortcutAvailabilityChange: false
+        )
+    }
+
+    public static func addingURLConfig(
+        _ urlConfig: VoiceInkPowerModeURLConfig,
+        toConfigurationID configID: UUID,
+        in configurations: [PowerModeConfig]
+    ) -> Self {
+        var updatedConfigurations = configurations
+        let didMutate = updatedConfigurations.addPowerModeURLConfig(urlConfig, toConfigurationID: configID)
+        return Self(
+            originalConfigurations: configurations,
+            updatedConfigurations: updatedConfigurations,
+            didMutate: didMutate,
+            shouldSaveConfigurations: didMutate,
+            detectsShortcutAvailabilityChange: false
+        )
+    }
+
+    public static func removingURLConfig(
+        id urlConfigID: UUID,
+        fromConfigurationID configID: UUID,
+        in configurations: [PowerModeConfig]
+    ) -> Self {
+        var updatedConfigurations = configurations
+        let didMutate = updatedConfigurations.removePowerModeURLConfig(id: urlConfigID, fromConfigurationID: configID)
+        return Self(
+            originalConfigurations: configurations,
+            updatedConfigurations: updatedConfigurations,
+            didMutate: didMutate,
+            shouldSaveConfigurations: didMutate,
+            detectsShortcutAvailabilityChange: false
+        )
+    }
+}
+
 public extension Array where Element == PowerModeConfig {
     var powerModePolicyRules: [VoiceInkPowerModeRule] {
         map(\.powerModePolicyRule)

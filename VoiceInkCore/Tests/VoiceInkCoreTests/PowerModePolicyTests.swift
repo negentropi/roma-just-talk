@@ -2671,6 +2671,73 @@ final class PowerModePolicyTests: XCTestCase {
         )
     }
 
+    func testPowerModeConfigurationMutationPlanAppliesManagerRuntimeOrdering() throws {
+        let firstID = UUID()
+        let secondID = UUID()
+        let missingID = UUID()
+        var runtimeConfigs = [
+            config(id: firstID, name: "First", emoji: "F", isEnabled: true)
+        ]
+
+        func apply(_ plan: VoiceInkPowerModeConfigurationMutationPlan) -> [String] {
+            var events = [String]()
+            plan.applyRuntimeState(
+                setConfigurations: {
+                    runtimeConfigs = $0
+                    events.append("set:\($0.map(\.id).count)")
+                },
+                removeShortcutStorageForConfiguration: { events.append("remove:\($0 == missingID)") },
+                saveConfigurations: { events.append("save") },
+                postShortcutAvailabilityDidChange: { events.append("shortcut") }
+            )
+            return events
+        }
+
+        let addPlan = VoiceInkPowerModeConfigurationMutationPlan.saving(
+            config(id: secondID, name: "Second", emoji: "S", isEnabled: true),
+            mode: .add,
+            in: runtimeConfigs
+        )
+        XCTAssertTrue(addPlan.didMutate)
+        XCTAssertEqual(apply(addPlan), ["set:2", "save", "shortcut"])
+        XCTAssertEqual(runtimeConfigs.map(\.id), [firstID, secondID])
+
+        var disabledFirst = try XCTUnwrap(runtimeConfigs.powerModeConfiguration(with: firstID))
+        disabledFirst.isEnabled = false
+        let updatePlan = VoiceInkPowerModeConfigurationMutationPlan.updating(
+            disabledFirst,
+            in: runtimeConfigs
+        )
+        XCTAssertTrue(updatePlan.didMutate)
+        XCTAssertEqual(apply(updatePlan), ["set:2", "save", "shortcut"])
+        XCTAssertFalse(try XCTUnwrap(runtimeConfigs.powerModeConfiguration(with: firstID)).isEnabled)
+
+        let appConfig = VoiceInkPowerModeAppConfig(bundleIdentifier: "com.example.App", appName: "App")
+        let appPlan = VoiceInkPowerModeConfigurationMutationPlan.addingAppConfig(
+            appConfig,
+            toConfigurationID: firstID,
+            in: runtimeConfigs
+        )
+        XCTAssertTrue(appPlan.didMutate)
+        XCTAssertEqual(apply(appPlan), ["set:2", "save"])
+        XCTAssertEqual(runtimeConfigs.powerModeConfiguration(with: firstID)?.appConfigs?.map(\.id), [appConfig.id])
+
+        let missingRemovePlan = VoiceInkPowerModeConfigurationMutationPlan.removing(
+            id: missingID,
+            from: runtimeConfigs
+        )
+        XCTAssertFalse(missingRemovePlan.didMutate)
+        XCTAssertEqual(apply(missingRemovePlan), ["remove:true", "save"])
+
+        let invalidMovePlan = VoiceInkPowerModeConfigurationMutationPlan.moving(
+            fromOffsets: IndexSet([99]),
+            toOffset: 0,
+            in: runtimeConfigs
+        )
+        XCTAssertFalse(invalidMovePlan.didMutate)
+        XCTAssertEqual(apply(invalidMovePlan), ["save"])
+    }
+
     func testValidationRejectsBlankAndDuplicateNameWithoutNormalizingName() {
         let existing = rule(name: "Writing")
         let blankCandidate = rule(name: " ")

@@ -13814,13 +13814,23 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
+  "shared Power Mode configuration mutation runtime plan lives in VoiceInkCore" \
+  'VoiceInkPowerModeConfigurationMutationPlan|applyRuntimeState|postShortcutAvailabilityDidChange' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
   "core checks execute Power Mode configuration save mutation test" \
   'PowerModePolicyTests\.testPowerModeConfigurationListSaveAppliesDefaultAndMutationMode' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
-  "macOS Power Mode manager consumes shared configuration save mutation policy" \
-  'savePowerModeConfiguration\(config, mode: mode\)' \
+  "core checks execute Power Mode configuration mutation runtime plan test" \
+  'PowerModePolicyTests\.testPowerModeConfigurationMutationPlanAppliesManagerRuntimeOrdering' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "macOS Power Mode manager consumes shared configuration mutation runtime plan" \
+  'VoiceInkPowerModeConfigurationMutationPlan|applyConfigurationMutationPlan|\.saving\(' \
   VoiceInk/PowerMode/PowerModeConfig.swift
 
 reject_pattern \
@@ -14022,7 +14032,12 @@ reject_pattern \
 
 require_pattern \
   "macOS Power Mode manager consumes shared config list policy" \
-  'appendPowerModeConfigurationIfMissing|movePowerModeConfigurations|powerModeConfiguration\(forWebsiteURL:|enabledPowerModeConfigurationIds|containsPowerModeEmoji' \
+  'VoiceInkPowerModeConfigurationMutationPlan|applyConfigurationMutationPlan|powerModeConfiguration\(with:' \
+  VoiceInk/PowerMode/PowerModeConfig.swift
+
+reject_pattern \
+  "macOS Power Mode manager avoids direct config list mutation policy" \
+  'configurations\.(savePowerModeConfiguration|updatePowerModeConfiguration|removePowerModeConfiguration|movePowerModeConfigurations|setPowerModeConfiguration|addPowerModeAppConfig|removePowerModeAppConfig|addPowerModeURLConfig|removePowerModeURLConfig|enabledPowerModeConfigurationIds)' \
   VoiceInk/PowerMode/PowerModeConfig.swift
 
 reject_pattern \

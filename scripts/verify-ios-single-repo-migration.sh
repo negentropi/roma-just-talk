@@ -6125,6 +6125,27 @@ require_pattern \
   'VoiceInkSettingsBackupCategory|VoiceInkSettingsBackupImportPolicy|VoiceInkSettingsBackupImportDiagnostics|VoiceInkSettingsBackupImportError|VoiceInkSettingsBackupPresentation|categorySummary|needsAPIKeyReminder|defaultFileName|importSuccessInformativeText|customPromptsImportedMessage|dictionaryEntriesImportedMessage|Custom Model Definitions' \
   VoiceInkCore/Sources/VoiceInkCore/SettingsBackupPolicy.swift
 
+require_patterns \
+  "shared settings backup file owns top-level wire shape and legacy defaults" \
+  VoiceInkCore/Sources/VoiceInkCore/SettingsBackupPolicy.swift \
+  'struct VoiceInkSettingsBackupFile<ShortcutBackup: Codable>: Codable' \
+  'let customPrompts: \[VoiceInkCustomPrompt\]' \
+  'let powerModeConfigs: \[PowerModeConfig\]' \
+  'let generalSettings: VoiceInkGeneralSettingsBackupPayload<ShortcutBackup>\?' \
+  'decodeIfPresent\(String\.self, forKey: \.version\) \?\? "0\.0\.0"' \
+  'decodeIfPresent\(\[VoiceInkCustomPrompt\]\.self, forKey: \.customPrompts\) \?\? \[\]' \
+  'decodeIfPresent\(\[PowerModeConfig\]\.self, forKey: \.powerModeConfigs\) \?\? \[\]'
+
+require_pattern \
+  "macOS backup file type adapts shared wire shape to shortcut adapter" \
+  'typealias BackupFile = VoiceInkSettingsBackupFile<ShortcutBackup>' \
+  VoiceInk/Services/BackupTypes.swift
+
+reject_pattern \
+  "macOS backup types avoid shell-owned top-level backup file wire shape" \
+  'struct +BackupFile|decodeIfPresent\(String\.self, forKey: \.version\) \?\? "0\.0\.0"|decodeIfPresent\(\[VoiceInkCustomPrompt\]\.self, forKey: \.customPrompts\) \?\? \[\]|decodeIfPresent\(\[PowerModeConfig\]\.self, forKey: \.powerModeConfigs\) \?\? \[\]' \
+  VoiceInk/Services/BackupTypes.swift
+
 require_pattern \
   "macOS import/export uses shared settings backup policy and presentation" \
   'VoiceInkSettingsBackupCategory|VoiceInkSettingsBackupImportPolicy\.needsAPIKeyReminder|VoiceInkSettingsBackupPresentation\.macOS|backupPresentation\.(defaultFileName|exportPanelTitle|exportSuccessMessage|importPanelTitle|versionMismatchMessage|importSuccessInformativeText)' \
@@ -6170,11 +6191,13 @@ require_patterns \
   'SettingsBackupPolicyTests\.testBackupImportErrorPreservesMacOSSaveFailureCopy' \
   'SettingsBackupPolicyTests\.testBackupPresentationPreservesMacOSPanelAndAlertCopy' \
   'SettingsBackupPolicyTests\.testBackupPresentationBuildsDynamicExportAndImportMessages' \
-  'SettingsBackupPolicyTests\.testBackupPresentationBuildsImportSuccessTextWithOptionalAPIKeyReminder'
+  'SettingsBackupPolicyTests\.testBackupPresentationBuildsImportSuccessTextWithOptionalAPIKeyReminder' \
+  'SettingsBackupPolicyTests\.testSettingsBackupFilePreservesMacOSLegacyDecodeDefaults' \
+  'SettingsBackupPolicyTests\.testSettingsBackupFileRoundTripsTopLevelSharedWireShape'
 
 require_pattern \
   "migration checklist tracks shared settings backup policy" \
-  'settings backup category taxonomy, ordered category titles, import/export panel copy, import status/error diagnostic copy, save-failure import error, alert titles/messages, version-mismatch warning, import summary text, API-key-reminder gate, and restart recommendation use `VoiceInkSettingsBackupCategory`/`VoiceInkSettingsBackupImportPolicy`/`VoiceInkSettingsBackupImportDiagnostics`/`VoiceInkSettingsBackupImportError`/`VoiceInkSettingsBackupPresentation`' \
+  'settings backup category taxonomy, top-level backup file wire shape, legacy top-level decode defaults, ordered category titles, import/export panel copy, import status/error diagnostic copy, save-failure import error, alert titles/messages, version-mismatch warning, import summary text, API-key-reminder gate, and restart recommendation use `VoiceInkSettingsBackupFile`/`VoiceInkSettingsBackupCategory`/`VoiceInkSettingsBackupImportPolicy`/`VoiceInkSettingsBackupImportDiagnostics`/`VoiceInkSettingsBackupImportError`/`VoiceInkSettingsBackupPresentation`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

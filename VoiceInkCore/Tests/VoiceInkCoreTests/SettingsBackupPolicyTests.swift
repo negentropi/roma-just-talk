@@ -2,6 +2,10 @@ import Foundation
 @testable import VoiceInkCore
 
 final class SettingsBackupPolicyTests: XCTestCase {
+    private struct TestShortcutBackup: Codable, Equatable {
+        let shortcut: String
+    }
+
     func testBackupCategoriesPreserveMacOSImportOrderAndTitles() {
         XCTAssertEqual(
             VoiceInkSettingsBackupCategory.allCases.map(\.rawValue),
@@ -184,5 +188,94 @@ final class SettingsBackupPolicyTests: XCTestCase {
             It is recommended to restart VoiceInk for all changes to take full effect.
             """
         )
+    }
+
+    func testSettingsBackupFilePreservesMacOSLegacyDecodeDefaults() throws {
+        let data = try XCTUnwrap("{}".data(using: .utf8))
+        let backup = try JSONDecoder().decode(VoiceInkSettingsBackupFile<TestShortcutBackup>.self, from: data)
+
+        XCTAssertEqual(backup.version, "0.0.0")
+        XCTAssertEqual(backup.customPrompts, [])
+        XCTAssertEqual(backup.powerModeConfigs, [])
+        XCTAssertNil(backup.powerModeShortcuts)
+        XCTAssertNil(backup.vocabularyWords)
+        XCTAssertNil(backup.wordReplacements)
+        XCTAssertNil(backup.generalSettings)
+        XCTAssertNil(backup.customEmojis)
+        XCTAssertNil(backup.customCloudModels)
+    }
+
+    func testSettingsBackupFileRoundTripsTopLevelSharedWireShape() throws {
+        let promptId = UUID(uuidString: "00000000-0000-0000-0000-000000000701")!
+        let powerModeId = UUID(uuidString: "00000000-0000-0000-0000-000000000702")!
+        let customModelId = UUID(uuidString: "00000000-0000-0000-0000-000000000703")!
+        let backup = VoiceInkSettingsBackupFile<TestShortcutBackup>(
+            version: "2.4.0",
+            customPrompts: [
+                VoiceInkCustomPrompt(
+                    id: promptId,
+                    title: "Roma",
+                    promptText: "Clean dictation",
+                    isActive: true,
+                    icon: "sparkles",
+                    description: "Polish transcript",
+                    isPredefined: false,
+                    triggerWords: ["roma"],
+                    useSystemInstructions: true
+                )
+            ],
+            powerModeConfigs: [
+                PowerModeConfig(
+                    id: powerModeId,
+                    name: "Focus",
+                    emoji: "F",
+                    isAIEnhancementEnabled: true,
+                    selectedPrompt: promptId.uuidString,
+                    selectedTranscriptionModelName: "large-v3",
+                    selectedLanguage: "en",
+                    selectedAIProvider: "openai",
+                    selectedAIModel: "gpt-4.1"
+                )
+            ],
+            powerModeShortcuts: [
+                powerModeId.uuidString: TestShortcutBackup(shortcut: "command-space")
+            ],
+            vocabularyWords: [
+                VoiceInkVocabularyWordBackup(word: "VoiceInk")
+            ],
+            wordReplacements: [
+                "voice ink": "VoiceInk"
+            ],
+            generalSettings: nil,
+            customEmojis: ["F"],
+            customCloudModels: [
+                VoiceInkCustomCloudModelBackup(
+                    id: customModelId,
+                    name: "custom",
+                    displayName: "Custom",
+                    description: "Custom OpenAI-compatible model",
+                    apiEndpoint: "https://api.example.com/v1/audio/transcriptions",
+                    modelName: "whisper-1",
+                    isMultilingualModel: true,
+                    supportedLanguages: ["en": "English"],
+                    apiKey: nil
+                )
+            ]
+        )
+
+        let data = try JSONEncoder().encode(backup)
+        let decoded = try JSONDecoder().decode(VoiceInkSettingsBackupFile<TestShortcutBackup>.self, from: data)
+
+        XCTAssertEqual(decoded.version, "2.4.0")
+        XCTAssertEqual(decoded.customPrompts.map(\.id), [promptId])
+        XCTAssertEqual(decoded.customPrompts.map(\.title), ["Roma"])
+        XCTAssertEqual(decoded.powerModeConfigs.map(\.id), [powerModeId])
+        XCTAssertEqual(decoded.powerModeConfigs.map(\.name), ["Focus"])
+        XCTAssertEqual(decoded.powerModeShortcuts, [powerModeId.uuidString: TestShortcutBackup(shortcut: "command-space")])
+        XCTAssertEqual(decoded.vocabularyWords, [VoiceInkVocabularyWordBackup(word: "VoiceInk")])
+        XCTAssertEqual(decoded.wordReplacements, ["voice ink": "VoiceInk"])
+        XCTAssertEqual(decoded.customEmojis, ["F"])
+        XCTAssertEqual(decoded.customCloudModels?.map(\.id), [customModelId])
+        XCTAssertEqual(decoded.customCloudModels?.map(\.modelName), ["whisper-1"])
     }
 }

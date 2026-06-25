@@ -90,6 +90,65 @@ public enum VoiceInkSettingsBackupImportError: LocalizedError, Sendable {
     }
 }
 
+public struct VoiceInkSettingsBackupFile<ShortcutBackup: Codable>: Codable {
+    public let version: String
+    public let customPrompts: [VoiceInkCustomPrompt]
+    public let powerModeConfigs: [PowerModeConfig]
+    public let powerModeShortcuts: [String: ShortcutBackup]?
+    public let vocabularyWords: [VoiceInkVocabularyWordBackup]?
+    public let wordReplacements: [String: String]?
+    public let generalSettings: VoiceInkGeneralSettingsBackupPayload<ShortcutBackup>?
+    public let customEmojis: [String]?
+    public let customCloudModels: [VoiceInkCustomCloudModelBackup]?
+
+    private enum CodingKeys: String, CodingKey {
+        case version
+        case customPrompts
+        case powerModeConfigs
+        case powerModeShortcuts
+        case vocabularyWords
+        case wordReplacements
+        case generalSettings
+        case customEmojis
+        case customCloudModels
+    }
+
+    public init(
+        version: String,
+        customPrompts: [VoiceInkCustomPrompt],
+        powerModeConfigs: [PowerModeConfig],
+        powerModeShortcuts: [String: ShortcutBackup]?,
+        vocabularyWords: [VoiceInkVocabularyWordBackup]?,
+        wordReplacements: [String: String]?,
+        generalSettings: VoiceInkGeneralSettingsBackupPayload<ShortcutBackup>?,
+        customEmojis: [String]?,
+        customCloudModels: [VoiceInkCustomCloudModelBackup]?
+    ) {
+        self.version = version
+        self.customPrompts = customPrompts
+        self.powerModeConfigs = powerModeConfigs
+        self.powerModeShortcuts = powerModeShortcuts
+        self.vocabularyWords = vocabularyWords
+        self.wordReplacements = wordReplacements
+        self.generalSettings = generalSettings
+        self.customEmojis = customEmojis
+        self.customCloudModels = customCloudModels
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        version = try container.decodeIfPresent(String.self, forKey: .version) ?? "0.0.0"
+        customPrompts = try container.decodeIfPresent([VoiceInkCustomPrompt].self, forKey: .customPrompts) ?? []
+        powerModeConfigs = try container.decodeIfPresent([PowerModeConfig].self, forKey: .powerModeConfigs) ?? []
+        powerModeShortcuts = try container.decodeIfPresent([String: ShortcutBackup].self, forKey: .powerModeShortcuts)
+        vocabularyWords = try container.decodeIfPresent([VoiceInkVocabularyWordBackup].self, forKey: .vocabularyWords)
+        wordReplacements = try container.decodeIfPresent([String: String].self, forKey: .wordReplacements)
+        generalSettings = try container.decodeIfPresent(VoiceInkGeneralSettingsBackupPayload<ShortcutBackup>.self, forKey: .generalSettings)
+        customEmojis = try container.decodeIfPresent([String].self, forKey: .customEmojis)
+        customCloudModels = try container.decodeIfPresent([VoiceInkCustomCloudModelBackup].self, forKey: .customCloudModels)
+    }
+}
+
 public struct VoiceInkSettingsBackupPresentation: Equatable, Sendable {
     public let defaultFileName: String
     public let exportPanelTitle: String

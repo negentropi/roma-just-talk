@@ -13816,7 +13816,12 @@ require_pattern \
 
 require_pattern \
   "shared Power Mode preference application plan lives in VoiceInkCore" \
-  'VoiceInkPowerModePreferenceApplication|VoiceInkPowerModePromptSelectionApplication|powerModePreference(Application|Restore)' \
+  'VoiceInkPowerModePreferenceApplication|applyPromptSelection|powerModePreference(Application|Restore)' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+reject_pattern \
+  "shared Power Mode preference application avoids public raw prompt selection action" \
+  'public enum +VoiceInkPowerModePromptSelectionApplication|public (let|var) +promptSelection' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
@@ -13872,6 +13877,16 @@ reject_pattern \
 reject_pattern \
   "macOS Power Mode session manager avoids shell-only preference application policy" \
   'if +config\.isAIEnhancementEnabled|config\.selectedPromptUUID|config\.selectedAIProviderKind|state\.selectedPromptUUID|state\.selectedAIProviderKind|state\.cleanupRestore|VoiceInkTranscriptionCleanupPreferenceStorage\.saveTextFormattingEnabled\(config\.|PunctuationCleanupMode\.setCurrent\(config\.|VoiceInkTranscriptionCleanupPreferenceStorage\.saveLowercaseTranscription\(config\.|let +cleanupRestore += +state\.cleanupRestore' \
+  VoiceInk/PowerMode/PowerModeSessionManager.swift
+
+reject_pattern \
+  "macOS Power Mode session manager avoids direct prompt selection action switching" \
+  'promptSelection|case \.(leaveUnchanged|set)\b' \
+  VoiceInk/PowerMode/PowerModeSessionManager.swift
+
+require_pattern \
+  "macOS Power Mode session manager applies shared prompt selection policy" \
+  'applyPromptSelection' \
   VoiceInk/PowerMode/PowerModeSessionManager.swift
 
 reject_pattern \

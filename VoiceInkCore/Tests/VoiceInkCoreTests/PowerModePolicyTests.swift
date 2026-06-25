@@ -1394,10 +1394,12 @@ final class PowerModePolicyTests: XCTestCase {
         )
 
         let application = config.powerModePreferenceApplication
+        let promptApplication = appliedPromptSelection(application)
 
         XCTAssertTrue(application.isEnhancementEnabled)
         XCTAssertTrue(application.useScreenCaptureContext)
-        XCTAssertEqual(application.promptSelection, .set(promptID))
+        XCTAssertTrue(promptApplication.didApply)
+        XCTAssertEqual(promptApplication.selectedPromptId, promptID)
         XCTAssertEqual(application.selectedAIProvider, .groq)
         XCTAssertEqual(application.selectedAIModel, "llama-3.3")
         XCTAssertEqual(
@@ -1423,10 +1425,13 @@ final class PowerModePolicyTests: XCTestCase {
         )
 
         let application = config.powerModePreferenceApplication
+        let existingPromptID = UUID()
+        let promptApplication = appliedPromptSelection(application, startingAt: existingPromptID)
 
         XCTAssertFalse(application.isEnhancementEnabled)
         XCTAssertTrue(application.useScreenCaptureContext)
-        XCTAssertEqual(application.promptSelection, .leaveUnchanged)
+        XCTAssertFalse(promptApplication.didApply)
+        XCTAssertEqual(promptApplication.selectedPromptId, existingPromptID)
         XCTAssertNil(application.selectedAIProvider)
         XCTAssertNil(application.selectedAIModel)
         XCTAssertEqual(application.cleanupRestore.punctuationMode, .keep)
@@ -1446,10 +1451,12 @@ final class PowerModePolicyTests: XCTestCase {
         )
 
         let application = state.powerModePreferenceRestore
+        let promptApplication = appliedPromptSelection(application)
 
         XCTAssertTrue(application.isEnhancementEnabled)
         XCTAssertTrue(application.useScreenCaptureContext)
-        XCTAssertEqual(application.promptSelection, .set(promptID))
+        XCTAssertTrue(promptApplication.didApply)
+        XCTAssertEqual(promptApplication.selectedPromptId, promptID)
         XCTAssertEqual(application.selectedAIProvider, .groq)
         XCTAssertEqual(application.selectedAIModel, "llama-3.3")
         XCTAssertEqual(
@@ -1472,10 +1479,12 @@ final class PowerModePolicyTests: XCTestCase {
         )
 
         let application = state.powerModePreferenceRestore
+        let promptApplication = appliedPromptSelection(application, startingAt: UUID())
 
         XCTAssertFalse(application.isEnhancementEnabled)
         XCTAssertFalse(application.useScreenCaptureContext)
-        XCTAssertEqual(application.promptSelection, .set(nil))
+        XCTAssertTrue(promptApplication.didApply)
+        XCTAssertNil(promptApplication.selectedPromptId)
         XCTAssertNil(application.selectedAIProvider)
         XCTAssertNil(application.selectedAIModel)
         XCTAssertEqual(application.cleanupRestore.punctuationMode, .removeAll)
@@ -1505,7 +1514,9 @@ final class PowerModePolicyTests: XCTestCase {
 
         XCTAssertTrue(plan.preferenceApplication.isEnhancementEnabled)
         XCTAssertTrue(plan.preferenceApplication.useScreenCaptureContext)
-        XCTAssertEqual(plan.preferenceApplication.promptSelection, .set(promptID))
+        let promptApplication = appliedPromptSelection(plan.preferenceApplication)
+        XCTAssertTrue(promptApplication.didApply)
+        XCTAssertEqual(promptApplication.selectedPromptId, promptID)
         XCTAssertEqual(plan.preferenceApplication.selectedAIProvider, .groq)
         XCTAssertEqual(plan.preferenceApplication.selectedAIModel, "llama-3.3")
         XCTAssertEqual(plan.modelResourcePlan.selectedModelName, "base")
@@ -1538,7 +1549,9 @@ final class PowerModePolicyTests: XCTestCase {
 
         XCTAssertFalse(plan.preferenceApplication.isEnhancementEnabled)
         XCTAssertFalse(plan.preferenceApplication.useScreenCaptureContext)
-        XCTAssertEqual(plan.preferenceApplication.promptSelection, .set(promptID))
+        let promptApplication = appliedPromptSelection(plan.preferenceApplication)
+        XCTAssertTrue(promptApplication.didApply)
+        XCTAssertEqual(promptApplication.selectedPromptId, promptID)
         XCTAssertEqual(plan.preferenceApplication.selectedAIProvider, .groq)
         XCTAssertEqual(plan.preferenceApplication.selectedAIModel, "llama-3.3")
         XCTAssertEqual(plan.preferenceApplication.cleanupRestore.punctuationMode, .removeAll)
@@ -2523,6 +2536,21 @@ final class PowerModePolicyTests: XCTestCase {
             ],
             availableLocalModelNames: availableLocalModelNames
         )
+    }
+
+    private func appliedPromptSelection(
+        _ application: VoiceInkPowerModePreferenceApplication,
+        startingAt initialPromptId: UUID? = nil
+    ) -> (didApply: Bool, selectedPromptId: UUID?) {
+        var didApply = false
+        var selectedPromptId = initialPromptId
+
+        application.applyPromptSelection { newPromptId in
+            didApply = true
+            selectedPromptId = newPromptId
+        }
+
+        return (didApply, selectedPromptId)
     }
 
     private func runtimeEvents(

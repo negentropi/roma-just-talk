@@ -146,10 +146,7 @@ class PowerModeSessionManager {
         enhancementService.isEnhancementEnabled = application.isEnhancementEnabled
         enhancementService.useScreenCaptureContext = application.useScreenCaptureContext
 
-        switch application.promptSelection {
-        case .leaveUnchanged:
-            break
-        case .set(let selectedPromptId):
+        application.applyPromptSelection { selectedPromptId in
             enhancementService.selectedPromptId = selectedPromptId
         }
 

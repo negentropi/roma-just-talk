@@ -1002,7 +1002,7 @@ public struct VoiceInkPowerModeCleanupRestore: Equatable, Sendable {
     }
 }
 
-public enum VoiceInkPowerModePromptSelectionApplication: Equatable, Sendable {
+enum VoiceInkPowerModePromptSelectionApplication: Equatable, Sendable {
     case leaveUnchanged
     case set(UUID?)
 }
@@ -1010,12 +1010,12 @@ public enum VoiceInkPowerModePromptSelectionApplication: Equatable, Sendable {
 public struct VoiceInkPowerModePreferenceApplication: Equatable, Sendable {
     public let isEnhancementEnabled: Bool
     public let useScreenCaptureContext: Bool
-    public let promptSelection: VoiceInkPowerModePromptSelectionApplication
+    let promptSelection: VoiceInkPowerModePromptSelectionApplication
     public let selectedAIProvider: VoiceInkAIEnhancementProviderKind?
     public let selectedAIModel: String?
     public let cleanupRestore: VoiceInkPowerModeCleanupRestore
 
-    public init(
+    init(
         isEnhancementEnabled: Bool,
         useScreenCaptureContext: Bool,
         promptSelection: VoiceInkPowerModePromptSelectionApplication,
@@ -1029,6 +1029,15 @@ public struct VoiceInkPowerModePreferenceApplication: Equatable, Sendable {
         self.selectedAIProvider = selectedAIProvider
         self.selectedAIModel = selectedAIModel
         self.cleanupRestore = cleanupRestore
+    }
+
+    public func applyPromptSelection(setSelectedPromptId: (UUID?) -> Void) {
+        switch promptSelection {
+        case .leaveUnchanged:
+            break
+        case .set(let selectedPromptId):
+            setSelectedPromptId(selectedPromptId)
+        }
     }
 }
 

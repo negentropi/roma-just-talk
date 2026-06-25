@@ -2,6 +2,36 @@ import Foundation
 @testable import VoiceInkCore
 
 final class LicensePolicyTests: XCTestCase {
+    private enum LicenseStartupRuntimeEvent: Equatable {
+        case saveHasLaunchedBefore(Bool)
+        case saveTrialStartDate(Date)
+        case setState(VoiceInkLicenseState)
+        case postStatusChanged
+    }
+
+    private enum LicenseValidationRuntimeEvent: Equatable {
+        case clearActivationId
+        case saveActivationId(String)
+        case saveRequiresActivation(Bool)
+        case setActivationsLimit(Int)
+        case saveActivationsLimit(Int)
+        case setState(VoiceInkLicenseState)
+        case applyFeedback(VoiceInkLicenseValidationFeedback)
+        case postStatusChanged
+    }
+
+    private enum LicenseRemovalRuntimeEvent: Equatable {
+        case saveRequiresActivation(Bool)
+        case saveHasLaunchedBefore(Bool)
+        case saveActivationsLimit(Int)
+        case setState(VoiceInkLicenseState)
+        case clearLicenseKey
+        case clearValidationMessage
+        case setActivationsLimit(Int)
+        case postStatusChanged
+        case reloadStartupState
+    }
+
     func testLicensePreferenceKeysPreserveExistingStorageNames() {
         XCTAssertEqual(VoiceInkLicensePreference.requiresActivationKey, "VoiceInkLicenseRequiresActivation")
         XCTAssertEqual(VoiceInkLicensePreference.hasLaunchedBeforeKey, "VoiceInkHasLaunchedBefore")
@@ -97,78 +127,67 @@ final class LicensePolicyTests: XCTestCase {
         let later = calendar.date(byAdding: .day, value: 7, to: trialStart)!
 
         XCTAssertEqual(
-            VoiceInkLicenseStartupPolicy.plan(
+            licenseStartupEvents(for: VoiceInkLicenseStartupPolicy.plan(
                 hasUsableStoredLicense: true,
                 hasLaunchedBefore: true,
                 trialStartDate: trialStart,
                 now: now,
                 calendar: calendar
-            ),
-            VoiceInkLicenseStartupPlan(
-                state: .licensed,
-                shouldSaveHasLaunchedBefore: false,
-                trialStartDateToSave: nil,
-                shouldPostLicenseStatusChanged: false
-            )
+            )),
+            [.setState(.licensed)]
         )
 
         XCTAssertEqual(
-            VoiceInkLicenseStartupPolicy.plan(
+            licenseStartupEvents(for: VoiceInkLicenseStartupPolicy.plan(
                 hasUsableStoredLicense: false,
                 hasLaunchedBefore: false,
                 trialStartDate: nil,
                 now: now,
                 calendar: calendar
-            ),
-            VoiceInkLicenseStartupPlan(
-                state: .trial(daysRemaining: VoiceInkLicenseStartupPolicy.defaultTrialPeriodDays),
-                shouldSaveHasLaunchedBefore: true,
-                trialStartDateToSave: now,
-                shouldPostLicenseStatusChanged: true
-            )
+            )),
+            [
+                .saveHasLaunchedBefore(true),
+                .saveTrialStartDate(now),
+                .setState(.trial(daysRemaining: VoiceInkLicenseStartupPolicy.defaultTrialPeriodDays)),
+                .postStatusChanged
+            ]
         )
 
         XCTAssertEqual(
-            VoiceInkLicenseStartupPolicy.plan(
+            licenseStartupEvents(for: VoiceInkLicenseStartupPolicy.plan(
                 hasUsableStoredLicense: false,
                 hasLaunchedBefore: true,
                 trialStartDate: nil,
                 now: now,
                 calendar: calendar
-            ),
-            VoiceInkLicenseStartupPlan(
-                state: .trial(daysRemaining: VoiceInkLicenseStartupPolicy.defaultTrialPeriodDays),
-                shouldSaveHasLaunchedBefore: false,
-                trialStartDateToSave: now,
-                shouldPostLicenseStatusChanged: true
-            )
+            )),
+            [
+                .saveTrialStartDate(now),
+                .setState(.trial(daysRemaining: VoiceInkLicenseStartupPolicy.defaultTrialPeriodDays)),
+                .postStatusChanged
+            ]
         )
 
         XCTAssertEqual(
-            VoiceInkLicenseStartupPolicy.plan(
+            licenseStartupEvents(for: VoiceInkLicenseStartupPolicy.plan(
                 hasUsableStoredLicense: false,
                 hasLaunchedBefore: true,
                 trialStartDate: trialStart,
                 now: now,
                 calendar: calendar
-            ),
-            VoiceInkLicenseStartupPlan(
-                state: .trial(daysRemaining: 4),
-                shouldSaveHasLaunchedBefore: false,
-                trialStartDateToSave: nil,
-                shouldPostLicenseStatusChanged: false
-            )
+            )),
+            [.setState(.trial(daysRemaining: 4))]
         )
 
         XCTAssertEqual(
-            VoiceInkLicenseStartupPolicy.plan(
+            licenseStartupEvents(for: VoiceInkLicenseStartupPolicy.plan(
                 hasUsableStoredLicense: false,
                 hasLaunchedBefore: true,
                 trialStartDate: trialStart,
                 now: later,
                 calendar: calendar
-            ).state,
-            .trialExpired
+            )),
+            [.setState(.trialExpired)]
         )
         XCTAssertTrue(VoiceInkLicenseState.trial(daysRemaining: 1).canUseApp)
         XCTAssertTrue(VoiceInkLicenseState.licensed.canUseApp)
@@ -226,54 +245,50 @@ final class LicensePolicyTests: XCTestCase {
 
     func testLicenseValidationApplicationPlansPreserveMacOSStorageWritesAndSuccessCopy() {
         XCTAssertEqual(
-            VoiceInkLicenseValidationPolicy.existingActivationSuccessPlan(),
-            VoiceInkLicenseValidationApplicationPlan(
-                state: .licensed,
-                requiresActivationToSave: nil,
-                activationIdToSave: nil,
-                shouldClearActivationId: false,
-                activationsLimitToSave: nil,
-                feedback: VoiceInkLicenseValidationFeedback(
+            licenseValidationEvents(for: VoiceInkLicenseValidationPolicy.existingActivationSuccessPlan()),
+            [
+                .setState(.licensed),
+                .applyFeedback(VoiceInkLicenseValidationFeedback(
                     isSuccess: true,
                     message: "License activated successfully!"
-                ),
-                shouldPostLicenseStatusChanged: true
-            )
+                )),
+                .postStatusChanged
+            ]
         )
 
         XCTAssertEqual(
-            VoiceInkLicenseValidationPolicy.activatedLicenseSuccessPlan(
+            licenseValidationEvents(for: VoiceInkLicenseValidationPolicy.activatedLicenseSuccessPlan(
                 activationId: "activation-id",
                 activationsLimit: 3
-            ),
-            VoiceInkLicenseValidationApplicationPlan(
-                state: .licensed,
-                requiresActivationToSave: true,
-                activationIdToSave: "activation-id",
-                shouldClearActivationId: false,
-                activationsLimitToSave: 3,
-                feedback: VoiceInkLicenseValidationFeedback(
+            )),
+            [
+                .saveActivationId("activation-id"),
+                .saveRequiresActivation(true),
+                .setActivationsLimit(3),
+                .saveActivationsLimit(3),
+                .setState(.licensed),
+                .applyFeedback(VoiceInkLicenseValidationFeedback(
                     isSuccess: true,
                     message: "License activated successfully!"
-                ),
-                shouldPostLicenseStatusChanged: true
-            )
+                )),
+                .postStatusChanged
+            ]
         )
 
         XCTAssertEqual(
-            VoiceInkLicenseValidationPolicy.unlimitedLicenseSuccessPlan(activationsLimit: nil),
-            VoiceInkLicenseValidationApplicationPlan(
-                state: .licensed,
-                requiresActivationToSave: false,
-                activationIdToSave: nil,
-                shouldClearActivationId: true,
-                activationsLimitToSave: 0,
-                feedback: VoiceInkLicenseValidationFeedback(
+            licenseValidationEvents(for: VoiceInkLicenseValidationPolicy.unlimitedLicenseSuccessPlan(activationsLimit: nil)),
+            [
+                .clearActivationId,
+                .saveRequiresActivation(false),
+                .setActivationsLimit(0),
+                .saveActivationsLimit(0),
+                .setState(.licensed),
+                .applyFeedback(VoiceInkLicenseValidationFeedback(
                     isSuccess: true,
                     message: "License validated successfully!"
-                ),
-                shouldPostLicenseStatusChanged: true
-            )
+                )),
+                .postStatusChanged
+            ]
         )
     }
 
@@ -418,19 +433,24 @@ final class LicensePolicyTests: XCTestCase {
 
     func testLicenseRemovalPolicyPreservesMacOSResetPlan() {
         XCTAssertEqual(
-            VoiceInkLicenseRemovalPolicy.plan(),
-            VoiceInkLicenseRemovalPlan(
-                requiresActivationToSave: false,
-                hasLaunchedBeforeToSave: false,
-                activationsLimitToSave: 0,
-                state: .trial(daysRemaining: VoiceInkLicenseStartupPolicy.defaultTrialPeriodDays),
-                shouldPostLicenseStatusChanged: true,
-                shouldReloadStartupState: true
-            )
+            licenseRemovalEvents(for: VoiceInkLicenseRemovalPolicy.plan()),
+            [
+                .saveRequiresActivation(false),
+                .saveHasLaunchedBefore(false),
+                .saveActivationsLimit(0),
+                .setState(.trial(daysRemaining: VoiceInkLicenseStartupPolicy.defaultTrialPeriodDays)),
+                .clearLicenseKey,
+                .clearValidationMessage,
+                .setActivationsLimit(0),
+                .postStatusChanged,
+                .reloadStartupState
+            ]
         )
         XCTAssertEqual(
-            VoiceInkLicenseRemovalPolicy.plan(trialPeriodDays: 14).state,
-            .trial(daysRemaining: 14)
+            licenseRemovalEvents(for: VoiceInkLicenseRemovalPolicy.plan(trialPeriodDays: 14)).contains(
+                .setState(.trial(daysRemaining: 14))
+            ),
+            true
         )
     }
 
@@ -574,6 +594,60 @@ final class LicensePolicyTests: XCTestCase {
             VoiceInkLicenseServicePolicy.error(forHTTPStatusCode: 500, operation: .activation),
             Optional(.serverError(500))
         )
+    }
+
+    private func licenseStartupEvents(
+        for plan: VoiceInkLicenseStartupPlan
+    ) -> [LicenseStartupRuntimeEvent] {
+        var events: [LicenseStartupRuntimeEvent] = []
+
+        plan.applyRuntimeState(
+            saveHasLaunchedBefore: { events.append(.saveHasLaunchedBefore($0)) },
+            saveTrialStartDate: { events.append(.saveTrialStartDate($0)) },
+            setLicenseState: { events.append(.setState($0)) },
+            postLicenseStatusChanged: { events.append(.postStatusChanged) }
+        )
+
+        return events
+    }
+
+    private func licenseValidationEvents(
+        for plan: VoiceInkLicenseValidationApplicationPlan
+    ) -> [LicenseValidationRuntimeEvent] {
+        var events: [LicenseValidationRuntimeEvent] = []
+
+        plan.applyRuntimeState(
+            clearActivationId: { events.append(.clearActivationId) },
+            saveActivationId: { events.append(.saveActivationId($0)) },
+            saveRequiresActivation: { events.append(.saveRequiresActivation($0)) },
+            setActivationsLimit: { events.append(.setActivationsLimit($0)) },
+            saveActivationsLimit: { events.append(.saveActivationsLimit($0)) },
+            setLicenseState: { events.append(.setState($0)) },
+            applyFeedback: { events.append(.applyFeedback($0)) },
+            postLicenseStatusChanged: { events.append(.postStatusChanged) }
+        )
+
+        return events
+    }
+
+    private func licenseRemovalEvents(
+        for plan: VoiceInkLicenseRemovalPlan
+    ) -> [LicenseRemovalRuntimeEvent] {
+        var events: [LicenseRemovalRuntimeEvent] = []
+
+        plan.applyRuntimeState(
+            saveRequiresActivation: { events.append(.saveRequiresActivation($0)) },
+            saveHasLaunchedBefore: { events.append(.saveHasLaunchedBefore($0)) },
+            saveActivationsLimit: { events.append(.saveActivationsLimit($0)) },
+            setLicenseState: { events.append(.setState($0)) },
+            clearLicenseKey: { events.append(.clearLicenseKey) },
+            clearValidationMessage: { events.append(.clearValidationMessage) },
+            setActivationsLimit: { events.append(.setActivationsLimit($0)) },
+            postLicenseStatusChanged: { events.append(.postStatusChanged) },
+            reloadStartupState: { events.append(.reloadStartupState) }
+        )
+
+        return events
     }
 
     private func withIsolatedDefaults(_ run: (UserDefaults) -> Void) {

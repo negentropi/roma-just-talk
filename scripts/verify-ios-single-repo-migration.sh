@@ -15460,7 +15460,12 @@ require_pattern \
 
 require_pattern \
   "macOS license view model applies shared startup plans" \
-  'VoiceInkLicenseStartupPlan' \
+  'VoiceInkLicenseStartupPlan|plan\.applyRuntimeState|isLicensedState' \
+  VoiceInk/Models/LicenseViewModel.swift
+
+reject_pattern \
+  "macOS license view model avoids raw startup plan execution flags" \
+  'plan\.(shouldSaveHasLaunchedBefore|trialStartDateToSave|shouldPostLicenseStatusChanged|state)' \
   VoiceInk/Models/LicenseViewModel.swift
 
 require_pattern \
@@ -15535,8 +15540,18 @@ require_patterns \
 
 require_pattern \
   "macOS license view model applies shared removal policy" \
-  'VoiceInkLicenseRemovalPolicy\.plan|VoiceInkLicenseRemovalPlan|plan\.(requiresActivationToSave|hasLaunchedBeforeToSave|activationsLimitToSave|shouldReloadStartupState)' \
+  'VoiceInkLicenseRemovalPolicy\.plan|VoiceInkLicenseRemovalPlan|plan\.applyRuntimeState' \
   VoiceInk/Models/LicenseViewModel.swift
+
+reject_pattern \
+  "macOS license view model avoids raw removal plan execution flags" \
+  'plan\.(requiresActivationToSave|hasLaunchedBeforeToSave|activationsLimitToSave|shouldPostLicenseStatusChanged|shouldReloadStartupState)' \
+  VoiceInk/Models/LicenseViewModel.swift
+
+reject_pattern \
+  "shared license plans avoid public raw execution flags" \
+  'public let (shouldSaveHasLaunchedBefore|trialStartDateToSave|shouldPostLicenseStatusChanged|requiresActivationToSave|hasLaunchedBeforeToSave|activationsLimitToSave|shouldReloadStartupState|activationIdToSave|shouldClearActivationId)|public init\([[:space:]]*state: VoiceInkLicenseState' \
+  VoiceInkCore/Sources/VoiceInkCore/LicensePolicy.swift
 
 require_pattern \
   "macOS diagnostics use shared license access policy" \

@@ -59,25 +59,18 @@ class LicenseViewModel: ObservableObject {
 
         applyStartupPlan(plan)
 
-        if case .licensed = plan.state {
+        if plan.isLicensedState {
             activationsLimit = VoiceInkLicensePreference.activationsLimit(from: userDefaults)
         }
     }
 
     private func applyStartupPlan(_ plan: VoiceInkLicenseStartupPlan) {
-        if plan.shouldSaveHasLaunchedBefore {
-            VoiceInkLicensePreference.saveHasLaunchedBefore(true, to: userDefaults)
-        }
-
-        if let trialStartDate = plan.trialStartDateToSave {
-            licenseManager.trialStartDate = trialStartDate
-        }
-
-        licenseState = plan.state
-
-        if plan.shouldPostLicenseStatusChanged {
-            NotificationCenter.default.post(name: .licenseStatusChanged, object: nil)
-        }
+        plan.applyRuntimeState(
+            saveHasLaunchedBefore: { VoiceInkLicensePreference.saveHasLaunchedBefore($0, to: userDefaults) },
+            saveTrialStartDate: { licenseManager.trialStartDate = $0 },
+            setLicenseState: { licenseState = $0 },
+            postLicenseStatusChanged: postLicenseStatusChanged
+        )
     }
 
     var canUseApp: Bool {
@@ -151,29 +144,16 @@ class LicenseViewModel: ObservableObject {
     }
 
     private func applyValidationPlan(_ plan: VoiceInkLicenseValidationApplicationPlan) {
-        if plan.shouldClearActivationId {
-            licenseManager.activationId = nil
-        }
-
-        if let activationId = plan.activationIdToSave {
-            licenseManager.activationId = activationId
-        }
-
-        if let requiresActivation = plan.requiresActivationToSave {
-            VoiceInkLicensePreference.saveRequiresActivation(requiresActivation, to: userDefaults)
-        }
-
-        if let activationsLimit = plan.activationsLimitToSave {
-            self.activationsLimit = activationsLimit
-            VoiceInkLicensePreference.saveActivationsLimit(activationsLimit, to: userDefaults)
-        }
-
-        licenseState = plan.state
-        applyValidationFeedback(plan.feedback)
-
-        if plan.shouldPostLicenseStatusChanged {
-            NotificationCenter.default.post(name: .licenseStatusChanged, object: nil)
-        }
+        plan.applyRuntimeState(
+            clearActivationId: { licenseManager.activationId = nil },
+            saveActivationId: { licenseManager.activationId = $0 },
+            saveRequiresActivation: { VoiceInkLicensePreference.saveRequiresActivation($0, to: userDefaults) },
+            setActivationsLimit: { activationsLimit = $0 },
+            saveActivationsLimit: { VoiceInkLicensePreference.saveActivationsLimit($0, to: userDefaults) },
+            setLicenseState: { licenseState = $0 },
+            applyFeedback: applyValidationFeedback,
+            postLicenseStatusChanged: postLicenseStatusChanged
+        )
     }
 
     private func applyValidationFeedback(_ feedback: VoiceInkLicenseValidationFeedback) {
@@ -186,22 +166,20 @@ class LicenseViewModel: ObservableObject {
         licenseManager.removeAll()
         let plan = VoiceInkLicenseRemovalPolicy.plan()
 
-        // Reset UserDefaults flags
-        VoiceInkLicensePreference.saveRequiresActivation(plan.requiresActivationToSave, to: userDefaults)
-        VoiceInkLicensePreference.saveHasLaunchedBefore(plan.hasLaunchedBeforeToSave, to: userDefaults)
-        VoiceInkLicensePreference.saveActivationsLimit(plan.activationsLimitToSave, to: userDefaults)
+        plan.applyRuntimeState(
+            saveRequiresActivation: { VoiceInkLicensePreference.saveRequiresActivation($0, to: userDefaults) },
+            saveHasLaunchedBefore: { VoiceInkLicensePreference.saveHasLaunchedBefore($0, to: userDefaults) },
+            saveActivationsLimit: { VoiceInkLicensePreference.saveActivationsLimit($0, to: userDefaults) },
+            setLicenseState: { licenseState = $0 },
+            clearLicenseKey: { licenseKey = "" },
+            clearValidationMessage: { validationMessage = nil },
+            setActivationsLimit: { activationsLimit = $0 },
+            postLicenseStatusChanged: postLicenseStatusChanged,
+            reloadStartupState: loadLicenseState
+        )
+    }
 
-        licenseState = plan.state
-        licenseKey = ""
-        validationMessage = nil
-        activationsLimit = plan.activationsLimitToSave
-
-        if plan.shouldPostLicenseStatusChanged {
-            NotificationCenter.default.post(name: .licenseStatusChanged, object: nil)
-        }
-
-        if plan.shouldReloadStartupState {
-            loadLicenseState()
-        }
+    private func postLicenseStatusChanged() {
+        NotificationCenter.default.post(name: .licenseStatusChanged, object: nil)
     }
 }

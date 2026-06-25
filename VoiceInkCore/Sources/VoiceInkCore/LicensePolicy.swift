@@ -73,12 +73,12 @@ public enum VoiceInkLicenseState: Equatable, Sendable {
 }
 
 public struct VoiceInkLicenseStartupPlan: Equatable, Sendable {
-    public let state: VoiceInkLicenseState
-    public let shouldSaveHasLaunchedBefore: Bool
-    public let trialStartDateToSave: Date?
-    public let shouldPostLicenseStatusChanged: Bool
+    private let state: VoiceInkLicenseState
+    private let shouldSaveHasLaunchedBefore: Bool
+    private let trialStartDateToSave: Date?
+    private let shouldPostLicenseStatusChanged: Bool
 
-    public init(
+    fileprivate init(
         state: VoiceInkLicenseState,
         shouldSaveHasLaunchedBefore: Bool,
         trialStartDateToSave: Date?,
@@ -88,6 +88,31 @@ public struct VoiceInkLicenseStartupPlan: Equatable, Sendable {
         self.shouldSaveHasLaunchedBefore = shouldSaveHasLaunchedBefore
         self.trialStartDateToSave = trialStartDateToSave
         self.shouldPostLicenseStatusChanged = shouldPostLicenseStatusChanged
+    }
+
+    public var isLicensedState: Bool {
+        state == .licensed
+    }
+
+    public func applyRuntimeState(
+        saveHasLaunchedBefore: (Bool) -> Void,
+        saveTrialStartDate: (Date) -> Void,
+        setLicenseState: (VoiceInkLicenseState) -> Void,
+        postLicenseStatusChanged: () -> Void
+    ) {
+        if shouldSaveHasLaunchedBefore {
+            saveHasLaunchedBefore(true)
+        }
+
+        if let trialStartDateToSave {
+            saveTrialStartDate(trialStartDateToSave)
+        }
+
+        setLicenseState(state)
+
+        if shouldPostLicenseStatusChanged {
+            postLicenseStatusChanged()
+        }
     }
 }
 
@@ -417,14 +442,14 @@ public enum VoiceInkLicenseTrialBannerPresentation {
 }
 
 public struct VoiceInkLicenseRemovalPlan: Equatable, Sendable {
-    public let requiresActivationToSave: Bool
-    public let hasLaunchedBeforeToSave: Bool
-    public let activationsLimitToSave: Int
-    public let state: VoiceInkLicenseState
-    public let shouldPostLicenseStatusChanged: Bool
-    public let shouldReloadStartupState: Bool
+    private let requiresActivationToSave: Bool
+    private let hasLaunchedBeforeToSave: Bool
+    private let activationsLimitToSave: Int
+    private let state: VoiceInkLicenseState
+    private let shouldPostLicenseStatusChanged: Bool
+    private let shouldReloadStartupState: Bool
 
-    public init(
+    fileprivate init(
         requiresActivationToSave: Bool,
         hasLaunchedBeforeToSave: Bool,
         activationsLimitToSave: Int,
@@ -438,6 +463,35 @@ public struct VoiceInkLicenseRemovalPlan: Equatable, Sendable {
         self.state = state
         self.shouldPostLicenseStatusChanged = shouldPostLicenseStatusChanged
         self.shouldReloadStartupState = shouldReloadStartupState
+    }
+
+    public func applyRuntimeState(
+        saveRequiresActivation: (Bool) -> Void,
+        saveHasLaunchedBefore: (Bool) -> Void,
+        saveActivationsLimit: (Int) -> Void,
+        setLicenseState: (VoiceInkLicenseState) -> Void,
+        clearLicenseKey: () -> Void,
+        clearValidationMessage: () -> Void,
+        setActivationsLimit: (Int) -> Void,
+        postLicenseStatusChanged: () -> Void,
+        reloadStartupState: () -> Void
+    ) {
+        saveRequiresActivation(requiresActivationToSave)
+        saveHasLaunchedBefore(hasLaunchedBeforeToSave)
+        saveActivationsLimit(activationsLimitToSave)
+
+        setLicenseState(state)
+        clearLicenseKey()
+        clearValidationMessage()
+        setActivationsLimit(activationsLimitToSave)
+
+        if shouldPostLicenseStatusChanged {
+            postLicenseStatusChanged()
+        }
+
+        if shouldReloadStartupState {
+            reloadStartupState()
+        }
     }
 }
 
@@ -467,15 +521,15 @@ public struct VoiceInkLicenseValidationFeedback: Equatable, Sendable {
 }
 
 public struct VoiceInkLicenseValidationApplicationPlan: Equatable, Sendable {
-    public let state: VoiceInkLicenseState
-    public let requiresActivationToSave: Bool?
-    public let activationIdToSave: String?
-    public let shouldClearActivationId: Bool
-    public let activationsLimitToSave: Int?
-    public let feedback: VoiceInkLicenseValidationFeedback
-    public let shouldPostLicenseStatusChanged: Bool
+    private let state: VoiceInkLicenseState
+    private let requiresActivationToSave: Bool?
+    private let activationIdToSave: String?
+    private let shouldClearActivationId: Bool
+    private let activationsLimitToSave: Int?
+    private let feedback: VoiceInkLicenseValidationFeedback
+    private let shouldPostLicenseStatusChanged: Bool
 
-    public init(
+    fileprivate init(
         state: VoiceInkLicenseState,
         requiresActivationToSave: Bool?,
         activationIdToSave: String?,
@@ -491,6 +545,41 @@ public struct VoiceInkLicenseValidationApplicationPlan: Equatable, Sendable {
         self.activationsLimitToSave = activationsLimitToSave
         self.feedback = feedback
         self.shouldPostLicenseStatusChanged = shouldPostLicenseStatusChanged
+    }
+
+    public func applyRuntimeState(
+        clearActivationId: () -> Void,
+        saveActivationId: (String) -> Void,
+        saveRequiresActivation: (Bool) -> Void,
+        setActivationsLimit: (Int) -> Void,
+        saveActivationsLimit: (Int) -> Void,
+        setLicenseState: (VoiceInkLicenseState) -> Void,
+        applyFeedback: (VoiceInkLicenseValidationFeedback) -> Void,
+        postLicenseStatusChanged: () -> Void
+    ) {
+        if shouldClearActivationId {
+            clearActivationId()
+        }
+
+        if let activationIdToSave {
+            saveActivationId(activationIdToSave)
+        }
+
+        if let requiresActivationToSave {
+            saveRequiresActivation(requiresActivationToSave)
+        }
+
+        if let activationsLimitToSave {
+            setActivationsLimit(activationsLimitToSave)
+            saveActivationsLimit(activationsLimitToSave)
+        }
+
+        setLicenseState(state)
+        applyFeedback(feedback)
+
+        if shouldPostLicenseStatusChanged {
+            postLicenseStatusChanged()
+        }
     }
 }
 

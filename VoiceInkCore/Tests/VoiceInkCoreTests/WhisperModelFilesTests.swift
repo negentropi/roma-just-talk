@@ -859,7 +859,7 @@ final class WhisperModelFilesTests: XCTestCase {
             )
         )
         XCTAssertEqual(rows, [row])
-        XCTAssertTrue(row.shouldShowDeleteAction)
+        XCTAssertTrue(row.deleteRequestRuntimeAction {} != nil)
 
         let idleRow = VoiceInkWhisperModelManagementList.row(
             for: model,
@@ -868,7 +868,7 @@ final class WhisperModelFilesTests: XCTestCase {
                 progress: .simple(modelName: model.modelName, isDownloading: false, progress: nil)
             )
         )
-        XCTAssertFalse(idleRow.shouldShowDeleteAction)
+        XCTAssertNil(idleRow.deleteRequestRuntimeAction {})
     }
 
     func testSimpleDownloadManagementRowBuildsConfirmationRuntimeActions() {

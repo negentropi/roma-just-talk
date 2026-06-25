@@ -536,7 +536,7 @@ public struct VoiceInkWhisperModelManagementRow: Equatable, Identifiable, Sendab
     public let deleteConfirmation: VoiceInkWhisperModelOperationConfirmationPresentation
 
     public var id: String { model.id }
-    public var shouldShowDeleteAction: Bool { presentation.action == .downloaded }
+    private var shouldShowDeleteAction: Bool { presentation.action == .downloaded }
 
     public func deleteRequestRuntimeAction(
         requestDelete: @escaping () -> Void

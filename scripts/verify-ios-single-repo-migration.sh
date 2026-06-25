@@ -4675,6 +4675,11 @@ require_pattern \
   iOS/VoiceInk-ios/LocalModelManagementView.swift
 
 reject_pattern \
+  "shared local model management row avoids public raw delete-action boolean" \
+  'public var shouldShowDeleteAction' \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+
+reject_pattern \
   "iOS local model management avoids direct delete-action visibility branching" \
   'if +row\.shouldShowDeleteAction' \
   iOS/VoiceInk-ios/LocalModelManagementView.swift

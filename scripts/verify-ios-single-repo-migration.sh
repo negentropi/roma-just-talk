@@ -1397,7 +1397,12 @@ require_patterns \
   "iOS recording manager delegates every start entrypoint to shared mode-count policy and action application" \
   iOS/VoiceInk-ios/RecordingManager.swift \
   'VoiceInkRecordingStartPolicy\.plan' \
-  'plan\.applyRuntimeState'
+  'applyRuntimeState'
+
+reject_pattern \
+  "iOS recording manager avoids shallow start-plan wrapper" \
+  'private func +applyStartPlan\b' \
+  iOS/VoiceInk-ios/RecordingManager.swift
 
 reject_pattern \
   "iOS recording manager avoids shell-owned recording action sequencing" \

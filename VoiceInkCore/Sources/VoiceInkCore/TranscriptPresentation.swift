@@ -526,25 +526,42 @@ public enum VoiceInkHistoryDeletionPolicy {
     }
 }
 
-public enum VoiceInkHistoryRefreshAction: Equatable, Sendable {
+fileprivate enum VoiceInkHistoryRefreshAction: Equatable, Sendable {
     case ignore
     case reload
 }
 
+public struct VoiceInkHistoryRefreshPlan: Sendable {
+    private let action: VoiceInkHistoryRefreshAction
+
+    fileprivate init(action: VoiceInkHistoryRefreshAction) {
+        self.action = action
+    }
+
+    public func applyRuntimeState(reload: () -> Void) {
+        switch action {
+        case .ignore:
+            break
+        case .reload:
+            reload()
+        }
+    }
+}
+
 public enum VoiceInkHistoryRefreshPolicy {
-    public static func searchTextDidChange() -> VoiceInkHistoryRefreshAction {
-        .reload
+    public static func searchTextDidChange() -> VoiceInkHistoryRefreshPlan {
+        VoiceInkHistoryRefreshPlan(action: .reload)
     }
 
     public static func latestItemDidChange<ID: Equatable>(
         oldID: ID?,
         newID: ID?,
         isViewVisible: Bool
-    ) -> VoiceInkHistoryRefreshAction {
+    ) -> VoiceInkHistoryRefreshPlan {
         guard isViewVisible, oldID != newID else {
-            return .ignore
+            return VoiceInkHistoryRefreshPlan(action: .ignore)
         }
-        return .reload
+        return VoiceInkHistoryRefreshPlan(action: .reload)
     }
 }
 

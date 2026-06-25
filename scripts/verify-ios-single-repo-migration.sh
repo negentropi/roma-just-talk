@@ -2996,6 +2996,30 @@ require_pattern \
   VoiceInk/Views/History/TranscriptionHistoryView.swift \
   VoiceInk/Views/History/InlineHistoryView.swift
 
+require_patterns \
+  "shared history refresh plan avoids public raw action interface" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift \
+  'VoiceInkHistoryRefreshPlan' \
+  'fileprivate enum VoiceInkHistoryRefreshAction' \
+  'applyRuntimeState'
+
+reject_pattern \
+  "shared history refresh plan avoids public raw action cases" \
+  'public enum VoiceInkHistoryRefreshAction' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+
+require_pattern \
+  "macOS history views apply shared refresh runtime plan" \
+  'performHistoryRefresh\(_ plan: VoiceInkHistoryRefreshPlan\)|plan\.applyRuntimeState' \
+  VoiceInk/Views/History/TranscriptionHistoryView.swift \
+  VoiceInk/Views/History/InlineHistoryView.swift
+
+reject_pattern \
+  "macOS history views avoid shell-owned refresh action switches" \
+  'VoiceInkHistoryRefreshAction|case \.(ignore|reload)|switch action' \
+  VoiceInk/Views/History/TranscriptionHistoryView.swift \
+  VoiceInk/Views/History/InlineHistoryView.swift
+
 reject_pattern \
   "history and notes views avoid shell-only empty-state copy" \
   'No notes yet|Tap Start Recording to capture your first note\.|No transcriptions yet|No transcriptions|No results found|Your transcription history will appear here|Try a different search term|No Selection|Select a transcription to view details|No Metadata' \

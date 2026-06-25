@@ -405,16 +405,15 @@ struct TranscriptionHistoryView: View {
         applyPaginationPlan(VoiceInkHistoryPaginationPolicy.reset())
     }
 
-    private func performHistoryRefresh(_ action: VoiceInkHistoryRefreshAction) {
-        switch action {
-        case .ignore:
-            break
-        case .reload:
-            Task {
-                await resetPagination()
-                await loadInitialContent()
+    private func performHistoryRefresh(_ plan: VoiceInkHistoryRefreshPlan) {
+        plan.applyRuntimeState(
+            reload: {
+                Task {
+                    await resetPagination()
+                    await loadInitialContent()
+                }
             }
-        }
+        )
     }
 
     private func applyPaginationPlan(_ plan: VoiceInkHistoryPaginationPlan<Transcription>) {

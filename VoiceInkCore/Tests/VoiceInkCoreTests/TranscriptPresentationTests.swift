@@ -261,45 +261,66 @@ final class TranscriptPresentationTests: XCTestCase {
     }
 
     func testHistoryRefreshPolicyReloadsForSearchTextChanges() {
-        XCTAssertEqual(VoiceInkHistoryRefreshPolicy.searchTextDidChange(), .reload)
+        XCTAssertEqual(
+            historyRefreshEvents(for: VoiceInkHistoryRefreshPolicy.searchTextDidChange()),
+            ["reload"]
+        )
     }
 
     func testHistoryRefreshPolicyReloadsForVisibleLatestItemChanges() {
         XCTAssertEqual(
-            VoiceInkHistoryRefreshPolicy.latestItemDidChange(
-                oldID: 1,
-                newID: 2,
-                isViewVisible: true
+            historyRefreshEvents(
+                for: VoiceInkHistoryRefreshPolicy.latestItemDidChange(
+                    oldID: 1,
+                    newID: 2,
+                    isViewVisible: true
+                )
             ),
-            .reload
+            ["reload"]
         )
     }
 
     func testHistoryRefreshPolicyIgnoresHiddenOrUnchangedLatestItemChanges() {
         XCTAssertEqual(
-            VoiceInkHistoryRefreshPolicy.latestItemDidChange(
-                oldID: 1,
-                newID: 2,
-                isViewVisible: false
+            historyRefreshEvents(
+                for: VoiceInkHistoryRefreshPolicy.latestItemDidChange(
+                    oldID: 1,
+                    newID: 2,
+                    isViewVisible: false
+                )
             ),
-            .ignore
+            []
         )
         XCTAssertEqual(
-            VoiceInkHistoryRefreshPolicy.latestItemDidChange(
-                oldID: 1,
-                newID: 1,
-                isViewVisible: true
+            historyRefreshEvents(
+                for: VoiceInkHistoryRefreshPolicy.latestItemDidChange(
+                    oldID: 1,
+                    newID: 1,
+                    isViewVisible: true
+                )
             ),
-            .ignore
+            []
         )
         XCTAssertEqual(
-            VoiceInkHistoryRefreshPolicy.latestItemDidChange(
-                oldID: Optional<Int>.none,
-                newID: Optional<Int>.none,
-                isViewVisible: true
+            historyRefreshEvents(
+                for: VoiceInkHistoryRefreshPolicy.latestItemDidChange(
+                    oldID: Optional<Int>.none,
+                    newID: Optional<Int>.none,
+                    isViewVisible: true
+                )
             ),
-            .ignore
+            []
         )
+    }
+
+    private func historyRefreshEvents(for plan: VoiceInkHistoryRefreshPlan) -> [String] {
+        var events: [String] = []
+        plan.applyRuntimeState(
+            reload: {
+                events.append("reload")
+            }
+        )
+        return events
     }
 
     func testHistoryDeleteConfirmationPresentationPreservesMacOSAlertCopy() {

@@ -192,6 +192,98 @@ public struct VoiceInkRemoteTranscriptionOptions: Equatable, Sendable {
     }
 }
 
+public enum VoiceInkMacOSCloudTranscriptionPolicy {
+    typealias TranscriptionTransport = @Sendable (VoiceInkMacOSCloudTranscriptionRequest) async throws -> String
+
+    public static func transcribeAudioData(
+        modelProvider: VoiceInkMacOSTranscriptionModelProvider,
+        apiKey: String,
+        modelName: String,
+        audioData: Data,
+        fileName: String,
+        language: String?,
+        prompt: String?,
+        customVocabulary: [String]
+    ) async throws -> String {
+        try await transcribeAudioData(
+            modelProvider: modelProvider,
+            apiKey: apiKey,
+            modelName: modelName,
+            audioData: audioData,
+            fileName: fileName,
+            language: language,
+            prompt: prompt,
+            customVocabulary: customVocabulary
+        ) { request in
+            try await VoiceInkRemoteTranscriptionService(provider: request.provider).transcribeAudioData(
+                apiKey: request.apiKey,
+                model: request.modelName,
+                audioData: request.audioData,
+                fileName: request.fileName,
+                language: request.language,
+                options: request.options
+            )
+        }
+    }
+
+    static func transcribeAudioData(
+        modelProvider: VoiceInkMacOSTranscriptionModelProvider,
+        apiKey: String,
+        modelName: String,
+        audioData: Data,
+        fileName: String,
+        language: String?,
+        prompt: String?,
+        customVocabulary: [String],
+        transport: TranscriptionTransport
+    ) async throws -> String {
+        guard let provider = modelProvider.remoteTranscriptionProviderKind else {
+            throw VoiceInkCloudTranscriptionError.unsupportedProvider
+        }
+
+        let request = VoiceInkMacOSCloudTranscriptionRequest(
+            provider: provider,
+            apiKey: apiKey,
+            modelName: modelName,
+            audioData: audioData,
+            fileName: fileName,
+            language: language,
+            options: modelProvider.remoteTranscriptionOptions(
+                prompt: prompt,
+                customVocabulary: customVocabulary
+            )
+        )
+
+        do {
+            let text = try await transport(request)
+            guard modelProvider.acceptsRemoteTranscriptionText(text) else {
+                throw VoiceInkCloudTranscriptionError.noTranscriptionReturned
+            }
+            return text
+        } catch let error as VoiceInkCloudTranscriptionError {
+            throw error
+        } catch {
+            if let apiError = VoiceInkCloudTranscriptionError.apiRequestFailure(
+                from: error as NSError,
+                matchingErrorDomain: modelProvider.apiErrorDomain
+            ) {
+                throw apiError
+            }
+            throw error
+        }
+    }
+}
+
+struct VoiceInkMacOSCloudTranscriptionRequest: Equatable, Sendable {
+    let provider: VoiceInkProviderKind
+    let apiKey: String
+    let modelName: String
+    let audioData: Data
+    let fileName: String
+    let language: String?
+    let options: VoiceInkRemoteTranscriptionOptions
+}
+
 public struct VoiceInkRemoteTranscriptionService: VoiceInkAudioTranscriptionService, Sendable {
     private let provider: VoiceInkProviderKind?
     private let transport: VoiceInkTranscriptionTransport

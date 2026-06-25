@@ -388,6 +388,86 @@ final class RemoteProviderRequestTests: XCTestCase {
         XCTAssertNil(directTransport.openAICompatibleTimeout)
     }
 
+    func testMacOSCloudTranscriptionPolicyBuildsSharedTransportRequest() async throws {
+        let requestCapture = MacOSCloudTranscriptionRequestCapture()
+
+        let text = try await VoiceInkMacOSCloudTranscriptionPolicy.transcribeAudioData(
+            modelProvider: .soniox,
+            apiKey: "soniox-key",
+            modelName: "stt-async-v4",
+            audioData: Data([4, 5, 6]),
+            fileName: "clip.wav",
+            language: "en",
+            prompt: "ignored",
+            customVocabulary: [" Roma ", "Felix", "roma", ""]
+        ) { request in
+            await requestCapture.store(request)
+            return "remote transcript"
+        }
+
+        let capturedRequest = await requestCapture.value
+        let request = try XCTUnwrap(capturedRequest)
+        XCTAssertEqual(text, "remote transcript")
+        XCTAssertEqual(request.provider, .soniox)
+        XCTAssertEqual(request.apiKey, "soniox-key")
+        XCTAssertEqual(request.modelName, "stt-async-v4")
+        XCTAssertEqual(request.audioData, Data([4, 5, 6]))
+        XCTAssertEqual(request.fileName, "clip.wav")
+        XCTAssertEqual(request.language, "en")
+        XCTAssertNil(request.options.prompt)
+        XCTAssertEqual(request.options.customVocabulary, ["Roma", "Felix"])
+    }
+
+    func testMacOSCloudTranscriptionPolicyRejectsUnsupportedBatchProvider() async {
+        do {
+            _ = try await VoiceInkMacOSCloudTranscriptionPolicy.transcribeAudioData(
+                modelProvider: .cartesia,
+                apiKey: "cartesia-key",
+                modelName: "ink-whisper",
+                audioData: Data(),
+                fileName: "clip.wav",
+                language: nil,
+                prompt: nil,
+                customVocabulary: []
+            ) { _ in
+                XCTFail("Unsupported provider should not call transport")
+                return "unexpected"
+            }
+            XCTFail("Expected unsupported provider error")
+        } catch VoiceInkCloudTranscriptionError.unsupportedProvider {
+            // Expected.
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+
+    func testMacOSCloudTranscriptionPolicyMapsProviderHTTPNSError() async {
+        do {
+            _ = try await VoiceInkMacOSCloudTranscriptionPolicy.transcribeAudioData(
+                modelProvider: .assemblyAI,
+                apiKey: "assembly-key",
+                modelName: "universal-3-pro",
+                audioData: Data(),
+                fileName: "clip.wav",
+                language: nil,
+                prompt: nil,
+                customVocabulary: []
+            ) { _ in
+                throw NSError(
+                    domain: try XCTUnwrap(VoiceInkMacOSTranscriptionModelProvider.assemblyAI.apiErrorDomain),
+                    code: 500,
+                    userInfo: [NSLocalizedDescriptionKey: "server failed"]
+                )
+            }
+            XCTFail("Expected API request failure")
+        } catch VoiceInkCloudTranscriptionError.apiRequestFailed(let statusCode, let message) {
+            XCTAssertEqual(statusCode, 500)
+            XCTAssertEqual(message, "server failed")
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+
     func testRemoteTranscriptionServiceUsesSharedProviderErrorDomainsForProviderTransports() throws {
         let providers: [(VoiceInkProviderKind, VoiceInkTranscriptionModelProvider)] = [
             (.mistral, .mistral),
@@ -1304,6 +1384,18 @@ final class RemoteProviderRequestTests: XCTestCase {
                 errorMessage: "API key is missing or empty."
             )
         )
+    }
+}
+
+private actor MacOSCloudTranscriptionRequestCapture {
+    private var storedValue: VoiceInkMacOSCloudTranscriptionRequest?
+
+    var value: VoiceInkMacOSCloudTranscriptionRequest? {
+        storedValue
+    }
+
+    func store(_ request: VoiceInkMacOSCloudTranscriptionRequest) {
+        storedValue = request
     }
 }
 

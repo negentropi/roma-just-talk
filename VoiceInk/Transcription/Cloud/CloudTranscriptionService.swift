@@ -32,17 +32,13 @@ class CloudTranscriptionService: TranscriptionService {
             }
 
             let modelProvider = model.provider
-            guard let provider = modelProvider.remoteTranscriptionProviderKind else {
-                throw CloudTranscriptionError.unsupportedProvider
-            }
             let apiKey = try requireAPIKey(forProvider: modelProvider.apiKeyProviderName)
-            return try await transcribeProvider(
-                provider: provider,
+            return try await VoiceInkMacOSCloudTranscriptionPolicy.transcribeAudioData(
                 modelProvider: modelProvider,
-                audioData: audioData,
-                fileName: fileName,
                 apiKey: apiKey,
                 modelName: model.name,
+                audioData: audioData,
+                fileName: fileName,
                 language: language,
                 prompt: prompt,
                 customVocabulary: CustomVocabularyService.shared.rawCustomVocabularyTerms(from: modelContext)
@@ -70,45 +66,5 @@ class CloudTranscriptionService: TranscriptionService {
             throw CloudTranscriptionError.missingAPIKey
         }
         return apiKey
-    }
-
-    private func transcribeProvider(
-        provider: VoiceInkProviderKind,
-        modelProvider: ModelProvider,
-        audioData: Data,
-        fileName: String,
-        apiKey: String,
-        modelName: String,
-        language: String?,
-        prompt: String?,
-        customVocabulary: [String]
-    ) async throws -> String {
-        do {
-            let text = try await VoiceInkRemoteTranscriptionService(provider: provider).transcribeAudioData(
-                apiKey: apiKey,
-                model: modelName,
-                audioData: audioData,
-                fileName: fileName,
-                language: language,
-                options: modelProvider.remoteTranscriptionOptions(
-                    prompt: prompt,
-                    customVocabulary: customVocabulary
-                )
-            )
-            guard modelProvider.acceptsRemoteTranscriptionText(text) else {
-                throw CloudTranscriptionError.noTranscriptionReturned
-            }
-            return text
-        } catch let error as CloudTranscriptionError {
-            throw error
-        } catch {
-            if let apiError = CloudTranscriptionError.apiRequestFailure(
-                from: error as NSError,
-                matchingErrorDomain: modelProvider.apiErrorDomain
-            ) {
-                throw apiError
-            }
-            throw error
-        }
     }
 }

@@ -5175,12 +5175,29 @@ reject_pattern \
   VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift
 
 require_patterns \
-  "macOS batch cloud transcription uses shared provider metadata directly" \
-  VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift \
+  "shared macOS cloud transcription execution lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift \
+  'VoiceInkMacOSCloudTranscriptionPolicy' \
+  'VoiceInkMacOSCloudTranscriptionRequest' \
   'modelProvider\.remoteTranscriptionProviderKind' \
   'modelProvider\.remoteTranscriptionOptions' \
   'modelProvider\.acceptsRemoteTranscriptionText' \
   'modelProvider\.apiErrorDomain'
+
+require_pattern \
+  "core checks execute macOS cloud transcription policy tests" \
+  'RemoteProviderRequestTests\.testMacOSCloudTranscriptionPolicyBuildsSharedTransportRequest|RemoteProviderRequestTests\.testMacOSCloudTranscriptionPolicyRejectsUnsupportedBatchProvider|RemoteProviderRequestTests\.testMacOSCloudTranscriptionPolicyMapsProviderHTTPNSError' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "macOS batch cloud transcription uses shared execution policy" \
+  'VoiceInkMacOSCloudTranscriptionPolicy\.transcribeAudioData' \
+  VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift
+
+reject_pattern \
+  "macOS batch cloud transcription avoids shell-owned execution policy" \
+  'transcribeProvider|VoiceInkRemoteTranscriptionService\(provider:|modelProvider\.(remoteTranscriptionProviderKind|remoteTranscriptionOptions|acceptsRemoteTranscriptionText|apiErrorDomain)|CloudTranscriptionError\.apiRequestFailure' \
+  VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift
 
 require_pattern \
   "macOS transcription model uses shared recorded-file support policy" \
@@ -5221,7 +5238,7 @@ require_pattern \
 require_pattern \
   "macOS batch cloud transcription uses shared API error-domain mapping" \
   'modelProvider\.apiErrorDomain' \
-  VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift
 
 reject_pattern \
   "macOS cloud provider avoids direct core transcription provider reach-through" \

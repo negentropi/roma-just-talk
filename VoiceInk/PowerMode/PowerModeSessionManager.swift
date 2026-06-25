@@ -46,10 +46,6 @@ class PowerModeSessionManager {
         isApplyingPowerModeConfig = false
     }
 
-    var hasActiveSession: Bool {
-        return loadSession() != nil
-    }
-
     func endSession() async {
         guard let session = loadSession() else { return }
 

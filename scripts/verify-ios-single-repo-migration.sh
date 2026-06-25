@@ -14503,6 +14503,11 @@ reject_pattern \
   VoiceInk/PowerMode/PowerModeSessionManager.swift
 
 reject_pattern \
+  "macOS Power Mode session manager avoids unused active-session wrapper" \
+  'hasActiveSession' \
+  VoiceInk/PowerMode/PowerModeSessionManager.swift
+
+reject_pattern \
   "macOS Power Mode session manager avoids shell-only provider raw-value parsing" \
   'VoiceInkAIEnhancementProviderKind\(storedValue:' \
   VoiceInk/PowerMode/PowerModeSessionManager.swift

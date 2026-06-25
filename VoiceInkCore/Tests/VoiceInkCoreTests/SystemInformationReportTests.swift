@@ -145,6 +145,12 @@ final class SystemInformationReportTests: XCTestCase {
         )
     }
 
+    func testKnownTextPreservesMacOSUnknownFallback() {
+        XCTAssertEqual(VoiceInkSystemInformationReport.unknownValueText, "Unknown")
+        XCTAssertEqual(VoiceInkSystemInformationReport.knownText("Mac16,1"), "Mac16,1")
+        XCTAssertEqual(VoiceInkSystemInformationReport.knownText(nil), "Unknown")
+    }
+
     func testGeneratedDateTextPreservesMacOSFormattingStyle() {
         let generatedAt = Date(timeIntervalSince1970: 1_782_315_731)
 

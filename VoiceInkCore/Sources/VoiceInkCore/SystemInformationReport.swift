@@ -132,9 +132,14 @@ public struct VoiceInkMacOSSystemInformationFacts: Equatable, Sendable {
 
 public enum VoiceInkSystemInformationReport {
     public static let noAudioDevicesDetectedText = "None detected"
+    public static let unknownValueText = "Unknown"
 
     public static func generatedDateText(_ date: Date) -> String {
         date.formatted(date: .long, time: .standard)
+    }
+
+    public static func knownText(_ text: String?) -> String {
+        text ?? unknownValueText
     }
 
     public static func availableAudioDevicesText(_ deviceNames: [String]) -> String {

@@ -20,11 +20,15 @@ class SystemInfoService {
     }
 
     private func getAppVersion() -> String {
-        return Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
+        VoiceInkSystemInformationReport.knownText(
+            Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+        )
     }
 
     private func getBuildVersion() -> String {
-        return Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "Unknown"
+        VoiceInkSystemInformationReport.knownText(
+            Bundle.main.infoDictionary?["CFBundleVersion"] as? String
+        )
     }
 
     private func makeMacOSSystemInformationFacts() -> VoiceInkMacOSSystemInformationFacts {
@@ -109,9 +113,9 @@ class SystemInfoService {
         let audioManager = AudioDeviceManager.shared
         let deviceID = audioManager.getCurrentDevice()
         if deviceID != 0, let deviceName = audioManager.getDeviceName(deviceID: deviceID) {
-            return deviceName
+            return VoiceInkSystemInformationReport.knownText(deviceName)
         }
-        return "Unknown"
+        return VoiceInkSystemInformationReport.knownText(nil)
     }
 
     private func getAvailableAudioDevices() -> String {

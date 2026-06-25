@@ -15850,6 +15850,8 @@ require_patterns \
   'VoiceInkSystemInformationReport' \
   'generatedDateText' \
   'formatted\(date: \.long, time: \.standard\)' \
+  'unknownValueText = "Unknown"' \
+  'knownText' \
   'availableAudioDevicesText' \
   'VoiceInkSystemInformationPermissionStatus' \
   'VoiceInkSystemInformationLicenseStatus' \
@@ -15878,6 +15880,7 @@ require_patterns \
   VoiceInk/Services/SystemInfoService.swift \
   'VoiceInkSystemInformationReport\.macOS\(makeMacOSSystemInformationFacts\(\)\)' \
   'VoiceInkSystemInformationReport\.generatedDateText\(Date\(\)\)' \
+  'VoiceInkSystemInformationReport\.knownText' \
   'VoiceInkSystemInformationReport\.availableAudioDevicesText' \
   'VoiceInkSystemInformationPermissionStatus\.grantStatus' \
   'VoiceInkSystemInformationLicenseStatus\.status' \
@@ -15893,7 +15896,7 @@ require_patterns \
 
 reject_pattern \
   "macOS system info service avoids shell-owned report template" \
-  '=== VOICEINK SYSTEM INFORMATION ===|APP INFORMATION:|CLIPBOARD & PASTE SETTINGS:|DATA CLEANUP SETTINGS:|PERMISSIONS:|None detected|joined\(separator: ", "\)|formatted\(date: \.long, time: \.standard\)' \
+  '=== VOICEINK SYSTEM INFORMATION ===|APP INFORMATION:|CLIPBOARD & PASTE SETTINGS:|DATA CLEANUP SETTINGS:|PERMISSIONS:|None detected|joined\(separator: ", "\)|formatted\(date: \.long, time: \.standard\)|\?\? "Unknown"|return "Unknown"' \
   VoiceInk/Services/SystemInfoService.swift
 
 reject_pattern \
@@ -15914,6 +15917,7 @@ require_patterns \
   'SystemInformationReportTests\.testMacOSSystemInformationReportPreservesSectionOrderAndLabels' \
   'SystemInformationReportTests\.testMacOSSystemInformationReportKeepsRollingBufferBlockVerbatim' \
   'SystemInformationReportTests\.testAvailableAudioDevicesTextPreservesMacOSDiagnosticsListPolicy' \
+  'SystemInformationReportTests\.testKnownTextPreservesMacOSUnknownFallback' \
   'SystemInformationReportTests\.testGeneratedDateTextPreservesMacOSFormattingStyle' \
   'SystemInformationReportTests\.testPermissionStatusPresentationPreservesMacOSDiagnosticsCopy' \
   'SystemInformationReportTests\.testLicenseStatusPresentationPreservesMacOSDiagnosticsCopy' \
@@ -15922,7 +15926,7 @@ require_patterns \
 require_patterns \
   "migration docs describe shared macOS system information presentation" \
   docs/ios-single-repo-migration.md \
-  'macOS support system-information generated-date/report formatting, available-audio-device list formatting, permission/license diagnostic status copy, and copy-button presentation' \
+  'macOS support system-information generated-date/report formatting, unknown-value fallback, available-audio-device list formatting, permission/license diagnostic status copy, and copy-button presentation' \
   'VoiceInkSystemInformationReport' \
   'VoiceInkSystemInformationCopyPresentation'
 

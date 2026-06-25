@@ -193,6 +193,33 @@ final class AudioPlaybackTimelineTests: XCTestCase {
         )
     }
 
+    func testPlaybackStateBuildsPlayPauseRuntimePlan() {
+        var events: [String] = []
+        let stopped = VoiceInkAudioPlaybackState(
+            isPlaying: false,
+            currentTime: 0,
+            duration: 10,
+            playbackRate: 1
+        )
+        let playing = VoiceInkAudioPlaybackState(
+            isPlaying: true,
+            currentTime: 1,
+            duration: 10,
+            playbackRate: 1
+        )
+
+        stopped.playPausePlan.applyRuntimeState(
+            play: { events.append("play") },
+            pause: { events.append("pause") }
+        )
+        playing.playPausePlan.applyRuntimeState(
+            play: { events.append("play") },
+            pause: { events.append("pause") }
+        )
+
+        XCTAssertEqual(events, ["play", "pause"])
+    }
+
     func testPlaybackStateAppliesTimerTickPlanActions() {
         let state = VoiceInkAudioPlaybackState(
             isPlaying: true,

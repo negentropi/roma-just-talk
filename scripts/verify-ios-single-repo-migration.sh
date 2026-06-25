@@ -12120,6 +12120,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
 
 require_pattern \
+  "shared audio playback state owns play-pause runtime plan" \
+  'VoiceInkAudioPlaybackPlayPausePlan|playPausePlan|applyRuntimeState' \
+  VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
+
+require_pattern \
   "core checks execute audio player timer tick plan tests" \
   'AudioPlaybackTimelineTests\.testTimerTickPlanPreservesPlatformCompletionBehavior' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
@@ -12152,6 +12157,11 @@ reject_pattern \
 require_pattern \
   "core checks execute audio player state plan tests" \
   'AudioPlaybackTimelineTests\.testPlaybackState(LoadPreservesPlatformResetBehavior|PlansPlayPauseStopAndTickUpdates|SeekAndRateCycleUseSharedPolicies)' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute audio playback play-pause runtime plan test" \
+  'AudioPlaybackTimelineTests\.testPlaybackStateBuildsPlayPauseRuntimePlan' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -12200,6 +12210,11 @@ require_pattern \
   iOS/VoiceInk-ios/AudioPlayer.swift
 
 require_pattern \
+  "iOS audio player shell applies shared play-pause plan" \
+  'playPausePlan\.applyRuntimeState' \
+  iOS/VoiceInk-ios/AudioPlayer.swift
+
+require_pattern \
   "iOS audio player applies shared timer tick state plan" \
   'applyingTimerTickPlan' \
   iOS/VoiceInk-ios/AudioPlayer.swift
@@ -12245,6 +12260,11 @@ require_pattern \
   iOS/VoiceInk-ios/AudioPlayerView.swift
 
 require_pattern \
+  "iOS audio player view delegates play-pause action to shell adapter" \
+  'Button\(action: player\.togglePlayback\)' \
+  iOS/VoiceInk-ios/AudioPlayerView.swift
+
+require_pattern \
   "macOS audio player uses shared playback presentation" \
   'VoiceInkAudioPlaybackPresentation' \
   VoiceInk/Views/AudioPlayerView.swift
@@ -12272,6 +12292,11 @@ require_pattern \
 require_pattern \
   "macOS audio player uses shared playback update cadence" \
   'VoiceInkAudioPlaybackTimeline\.updateInterval' \
+  VoiceInk/Views/AudioPlayerView.swift
+
+require_pattern \
+  "macOS audio player shell applies shared play-pause plan" \
+  'playPausePlan\.applyRuntimeState' \
   VoiceInk/Views/AudioPlayerView.swift
 
 require_pattern \
@@ -12303,6 +12328,12 @@ reject_pattern \
   "macOS audio player avoids shell-only action status and re-enhance guard copy" \
   '"Retranscription successful"|"Re-enhancement successful"|"Retranscription failed"|"Re-enhancement failed"|"AI Enhancement is not enabled or configured"|VoiceInkTranscriptPresentation\.audioFile(ReEnhancement|Retranscription)(SuccessMessage|FailureMessage)|VoiceInkPostProcessingFailurePresentation\.enhancementUnavailableMessage|VoiceInkErrorDescription\.text\(for: VoiceInkEngineError\.noTranscriptionModelSelected\)|VoiceInkEngineError\.noTranscriptionModelSelected|isOperationInProgress \|\| !enhancementService\.isEnhancementEnabled \|\| !enhancementService\.isConfigured|enhancementService\.isEnhancementEnabled && enhancementService\.isConfigured' \
   VoiceInk/Views/AudioPlayerView.swift
+
+reject_pattern \
+  "audio player views avoid shell-owned play-pause branching" \
+  'playerManager\.isPlaying \? playerManager\.pause\(\) : playerManager\.play\(\)|if +player\.isPlaying' \
+  VoiceInk/Views/AudioPlayerView.swift \
+  iOS/VoiceInk-ios/AudioPlayerView.swift
 
 section "obsolete standalone post-processing failure presentation module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/PostProcessingFailurePresentation.swift

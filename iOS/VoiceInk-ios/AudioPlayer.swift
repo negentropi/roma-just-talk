@@ -83,6 +83,13 @@ final class AudioPlayer: ObservableObject {
         playbackState = playbackState.paused()
         stopTimer()
     }
+
+    func togglePlayback() {
+        playbackState.playPausePlan.applyRuntimeState(
+            play: play,
+            pause: pause
+        )
+    }
     
     func stop() {
         audioPlayer?.stop()

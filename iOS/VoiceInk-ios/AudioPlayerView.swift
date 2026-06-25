@@ -50,13 +50,7 @@ struct AudioPlayerView: View {
                 // Clean player interface
                 HStack(spacing: 16) {
                     // Play/Pause button
-                    Button(action: {
-                        if player.isPlaying {
-                            player.pause()
-                        } else {
-                            player.play()
-                        }
-                    }) {
+                    Button(action: player.togglePlayback) {
                         Circle()
                             .fill(.blue)
                             .frame(width: 44, height: 44)

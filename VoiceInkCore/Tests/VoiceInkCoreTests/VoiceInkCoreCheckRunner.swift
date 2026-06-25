@@ -327,6 +327,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testTimerTickPlanAppliesRuntimeStateInOrder", run: { AudioPlaybackTimelineTests().testTimerTickPlanAppliesRuntimeStateInOrder() }),
             VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testPlaybackStateLoadPreservesPlatformResetBehavior", run: { AudioPlaybackTimelineTests().testPlaybackStateLoadPreservesPlatformResetBehavior() }),
             VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testPlaybackStatePlansPlayPauseStopAndTickUpdates", run: { AudioPlaybackTimelineTests().testPlaybackStatePlansPlayPauseStopAndTickUpdates() }),
+            VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testPlaybackStateBuildsPlayPauseRuntimePlan", run: { AudioPlaybackTimelineTests().testPlaybackStateBuildsPlayPauseRuntimePlan() }),
             VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testPlaybackStateAppliesTimerTickPlanActions", run: { AudioPlaybackTimelineTests().testPlaybackStateAppliesTimerTickPlanActions() }),
             VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testPlaybackStateSeekAndRateCycleUseSharedPolicies", run: { AudioPlaybackTimelineTests().testPlaybackStateSeekAndRateCycleUseSharedPolicies() }),
             VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testPlaybackRateRestoresExistingPositiveMacOSValues", run: { AudioPlaybackTimelineTests().testPlaybackRateRestoresExistingPositiveMacOSValues() }),

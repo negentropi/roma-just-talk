@@ -134,6 +134,13 @@ class AudioPlayerManager: ObservableObject {
         playbackState = playbackState.paused()
         stopTimer()
     }
+
+    func togglePlayback() {
+        playbackState.playPausePlan.applyRuntimeState(
+            play: play,
+            pause: pause
+        )
+    }
     
     func seek(to time: TimeInterval) {
         let state = playbackState.seeking(to: time)
@@ -481,7 +488,7 @@ struct AudioPlayerView: View {
 
                     CircleIconButton(
                         icon: VoiceInkAudioPlaybackPresentation.playPauseSystemImageName(isPlaying: playerManager.isPlaying),
-                        action: { playerManager.isPlaying ? playerManager.pause() : playerManager.play() }
+                        action: playerManager.togglePlayback
                     )
                     .scaleEffect(isHovering ? 1.05 : 1.0)
                     .onHover { hovering in

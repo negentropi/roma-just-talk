@@ -193,6 +193,10 @@ public struct VoiceInkAudioPlaybackState: Equatable, Sendable {
         copy(currentTime: time)
     }
 
+    public var playPausePlan: VoiceInkAudioPlaybackPlayPausePlan {
+        VoiceInkAudioPlaybackPlayPausePlan(action: isPlaying ? .pause : .play)
+    }
+
     public func applyingTimerTickPlan(_ plan: VoiceInkAudioPlaybackTimerTickPlan) -> VoiceInkAudioPlaybackState {
         let updatedState = updatingCurrentTime(plan.tickCurrentTime)
 
@@ -222,6 +226,31 @@ public struct VoiceInkAudioPlaybackState: Equatable, Sendable {
             duration: duration ?? self.duration,
             playbackRate: playbackRate ?? self.playbackRate
         )
+    }
+}
+
+enum VoiceInkAudioPlaybackPlayPauseAction: Equatable, Sendable {
+    case play
+    case pause
+}
+
+public struct VoiceInkAudioPlaybackPlayPausePlan: Equatable, Sendable {
+    fileprivate let action: VoiceInkAudioPlaybackPlayPauseAction
+
+    init(action: VoiceInkAudioPlaybackPlayPauseAction) {
+        self.action = action
+    }
+
+    public func applyRuntimeState(
+        play: () -> Void,
+        pause: () -> Void
+    ) {
+        switch action {
+        case .play:
+            play()
+        case .pause:
+            pause()
+        }
     }
 }
 

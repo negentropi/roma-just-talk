@@ -56,22 +56,10 @@ extension CloudProvider {
         )
     }
 
-    var languageCodes: [String]? {
-        modelProvider.languageCodes
-    }
-
     var models: [CloudModel] {
         modelProvider
             .cloudModelSpecs
             .map { $0.makeCloudModel(provider: modelProvider) }
-    }
-
-    var includesAutoDetect: Bool {
-        modelProvider.includesAutoDetect
-    }
-
-    var isStreamingOnly: Bool {
-        modelProvider.isStreamingOnly
     }
 
     /// Streaming-only providers inherit this and get a clear error if batch is somehow attempted.

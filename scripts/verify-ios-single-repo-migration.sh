@@ -5150,6 +5150,11 @@ reject_pattern \
   VoiceInk/Transcription/Cloud/CloudProvider.swift
 
 reject_pattern \
+  "macOS cloud provider avoids unused shared fact pass-throughs" \
+  '^    var (languageCodes|includesAutoDetect|isStreamingOnly): ' \
+  VoiceInk/Transcription/Cloud/CloudProvider.swift
+
+reject_pattern \
   "macOS cloud provider protocol keeps shared batch dispatch out of its interface" \
   '^    func transcribe\(audioData: Data, fileName: String, apiKey: String, model: String, language: String\?, prompt: String\?, customVocabulary: \[String\]\) async throws -> String$' \
   VoiceInk/Transcription/Cloud/CloudProvider.swift
@@ -5164,9 +5169,9 @@ require_pattern \
   'coreFacts\.streamingPreferenceSnapshot' \
   VoiceInk/Models/TranscriptionModel.swift
 
-require_pattern \
-  "macOS cloud provider uses shared streaming-only support policy" \
-  'modelProvider\.isStreamingOnly' \
+reject_pattern \
+  "macOS cloud provider keeps streaming-only support policy out of the shell" \
+  'modelProvider\.isStreamingOnly|cloudProvider\.isStreamingOnly' \
   VoiceInk/Transcription/Cloud/CloudProvider.swift
 
 reject_pattern \

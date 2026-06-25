@@ -45,10 +45,10 @@ public enum VoiceInkProviderAPIKeyStatePersistenceAction: Equatable, Sendable {
 }
 
 public struct VoiceInkProviderAPIKeyStateUpdatePlan: Equatable, Sendable {
-    public let state: VoiceInkProviderAPIKeyState
-    public let persistenceActions: [VoiceInkProviderAPIKeyStatePersistenceAction]
+    private let state: VoiceInkProviderAPIKeyState
+    private let persistenceActions: [VoiceInkProviderAPIKeyStatePersistenceAction]
 
-    public init(
+    fileprivate init(
         state: VoiceInkProviderAPIKeyState,
         persistenceActions: [VoiceInkProviderAPIKeyStatePersistenceAction]
     ) {

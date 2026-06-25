@@ -3405,6 +3405,11 @@ require_pattern \
   'VoiceInkProviderAPIKeyStorageMutationPlan|VoiceInkProviderAPIKeyVerificationMutationPlan|VoiceInkProviderAPIKeyStatePersistenceAction|VoiceInkProviderAPIKeyStateUpdatePlan|applyStoredAPIKey|applyVerification|applyingStoredAPIKey|applyingVerification|persistenceActions|applyRuntimeState|applyPersistenceActions|verificationFlagToPersist|shouldPersistVerificationFlag' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift
 
+reject_pattern \
+  "shared provider API-key state update plan hides raw runtime payload fields" \
+  'public let state: VoiceInkProviderAPIKeyState|public let persistenceActions: \[VoiceInkProviderAPIKeyStatePersistenceAction\]' \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift
+
 require_pattern \
   "core checks execute provider API-key state persistence action tests" \
   'ProviderAccessRequirementTests\.testProviderAPIKeyState(Storage|Verification)MutationPlanBuildsPersistenceActions' \
@@ -3416,6 +3421,11 @@ require_patterns \
   'ProviderAccessRequirementTests\.testProviderAPIKeyStateBuilds(StoredKey|Verification)UpdatePlan|ProviderAccessRequirementTests\.testProviderAPIKeyStateUpdatePlanIgnoresNonUserKeyProviders' \
   'ProviderAccessRequirementTests\.testProviderAPIKeyStateUpdatePlanAppliesRuntimeStateInOrder' \
   'ProviderAccessRequirementTests\.testProviderAPIKeyStateUpdatePlanSkipsRuntimeApplicationWhenNoPersistenceActions'
+
+reject_pattern \
+  "core provider API-key state update tests avoid raw update plan payload reads" \
+  'plan\.state|plan\.persistenceActions|VoiceInkProviderAPIKeyStateUpdatePlan\(' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/ProviderAccessRequirementTests.swift
 
 require_pattern \
   "core checks execute provider access snapshot test" \

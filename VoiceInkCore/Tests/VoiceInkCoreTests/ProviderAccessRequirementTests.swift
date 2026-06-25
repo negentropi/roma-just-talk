@@ -995,31 +995,62 @@ final class ProviderAccessRequirementTests: XCTestCase {
         let plan = state.applyingStoredAPIKey("new-key", for: .groq)
 
         XCTAssertTrue(plan.shouldApplyState)
-        XCTAssertEqual(plan.state.storedAPIKey(for: .groq), "new-key")
-        XCTAssertFalse(plan.state.isReady(for: .groq, localWhisperModelAvailable: false))
-        XCTAssertEqual(
-            plan.persistenceActions,
-            [
-                .persistStoredKey("new-key"),
-                .persistVerificationFlag(false)
-            ]
-        )
+        let application = applyProviderAPIKeyStateUpdatePlan(plan)
+        XCTAssertEqual(application.appliedState?.storedAPIKey(for: .groq), "new-key")
+        XCTAssertFalse(application.appliedState?.isReady(for: .groq, localWhisperModelAvailable: false) ?? true)
+        XCTAssertEqual(application.events, [
+            "state:new-key:false",
+            "key:new-key",
+            "verified:false"
+        ])
     }
 
     func testProviderAPIKeyStateUpdatePlanAppliesRuntimeStateInOrder() {
-        let updatedState = VoiceInkProviderAPIKeyState(storedKeysByProvider: [.groq: "new-key"])
-        let plan = VoiceInkProviderAPIKeyStateUpdatePlan(
-            state: updatedState,
-            persistenceActions: [
-                .persistStoredKey("new-key"),
-                .persistVerificationFlag(true)
-            ]
+        let state = VoiceInkProviderAPIKeyState(
+            storedKeysByProvider: [.groq: "old-key"],
+            verifiedProviders: [.groq]
         )
+
+        let application = applyProviderAPIKeyStateUpdatePlan(
+            state.applyingStoredAPIKey("new-key", for: .groq)
+        )
+
+        XCTAssertEqual(application.events, [
+            "state:new-key:false",
+            "key:new-key",
+            "verified:false"
+        ])
+    }
+
+    func testProviderAPIKeyStateUpdatePlanSkipsRuntimeApplicationWhenNoPersistenceActions() {
+        let plan = VoiceInkProviderAPIKeyState()
+            .applyingVerificationPlan(
+                VoiceInkProviderAPIKeyVerificationApplicationPlan(
+                    progress: .failure(message: "bad request"),
+                    keyToSave: nil,
+                    shouldMarkKeyVerified: false
+                ),
+                for: .groq
+            )
+        let application = applyProviderAPIKeyStateUpdatePlan(plan)
+
+        XCTAssertEqual(application.events, [])
+        XCTAssertNil(application.appliedState)
+    }
+
+    private func applyProviderAPIKeyStateUpdatePlan(
+        _ plan: VoiceInkProviderAPIKeyStateUpdatePlan,
+        provider: VoiceInkProviderKind = .groq
+    ) -> (appliedState: VoiceInkProviderAPIKeyState?, events: [String]) {
+        var appliedState: VoiceInkProviderAPIKeyState?
         var events: [String] = []
 
         plan.applyRuntimeState(
             setAPIKeyState: { state in
-                events.append("state:\(state.storedAPIKey(for: .groq))")
+                appliedState = state
+                events.append(
+                    "state:\(state.storedAPIKey(for: provider)):\(state.isReady(for: provider, localWhisperModelAvailable: false))"
+                )
             },
             persistStoredKey: { key in
                 events.append("key:\(key)")
@@ -1029,27 +1060,7 @@ final class ProviderAccessRequirementTests: XCTestCase {
             }
         )
 
-        XCTAssertEqual(events, [
-            "state:new-key",
-            "key:new-key",
-            "verified:true"
-        ])
-    }
-
-    func testProviderAPIKeyStateUpdatePlanSkipsRuntimeApplicationWhenNoPersistenceActions() {
-        let plan = VoiceInkProviderAPIKeyStateUpdatePlan(
-            state: VoiceInkProviderAPIKeyState(storedKeysByProvider: [.groq: "ignored-key"]),
-            persistenceActions: []
-        )
-        var events: [String] = []
-
-        plan.applyRuntimeState(
-            setAPIKeyState: { _ in events.append("state") },
-            persistStoredKey: { _ in events.append("key") },
-            persistVerificationFlag: { _ in events.append("verified") }
-        )
-
-        XCTAssertEqual(events, [])
+        return (appliedState, events)
     }
 
     func testProviderAPIKeyStateBuildsVerificationUpdatePlan() {
@@ -1058,8 +1069,12 @@ final class ProviderAccessRequirementTests: XCTestCase {
         let plan = state.applyingVerification(true, for: .groq)
 
         XCTAssertTrue(plan.shouldApplyState)
-        XCTAssertTrue(plan.state.isReady(for: .groq, localWhisperModelAvailable: false))
-        XCTAssertEqual(plan.persistenceActions, [.persistVerificationFlag(true)])
+        let application = applyProviderAPIKeyStateUpdatePlan(plan)
+        XCTAssertTrue(application.appliedState?.isReady(for: .groq, localWhisperModelAvailable: false) ?? false)
+        XCTAssertEqual(application.events, [
+            "state:groq-key:true",
+            "verified:true"
+        ])
     }
 
     func testProviderAPIKeyStateBuildsStoredKeyEditUpdatePlan() {
@@ -1075,8 +1090,12 @@ final class ProviderAccessRequirementTests: XCTestCase {
         let plan = state.applyingEditPlan(editPlan, for: .groq)
 
         XCTAssertTrue(plan.shouldApplyState)
-        XCTAssertFalse(plan.state.isReady(for: .groq, localWhisperModelAvailable: false))
-        XCTAssertEqual(plan.persistenceActions, [.persistVerificationFlag(false)])
+        let application = applyProviderAPIKeyStateUpdatePlan(plan)
+        XCTAssertFalse(application.appliedState?.isReady(for: .groq, localWhisperModelAvailable: false) ?? true)
+        XCTAssertEqual(application.events, [
+            "state:groq-key:false",
+            "verified:false"
+        ])
     }
 
     func testProviderAPIKeyStateBuildsVerificationApplicationUpdatePlan() {
@@ -1099,18 +1118,17 @@ final class ProviderAccessRequirementTests: XCTestCase {
         let ignoredPlan = state.applyingVerificationPlan(failurePlan, for: .groq)
 
         XCTAssertTrue(plan.shouldApplyState)
-        XCTAssertEqual(plan.state.storedAPIKey(for: .groq), "new-key")
-        XCTAssertTrue(plan.state.isReady(for: .groq, localWhisperModelAvailable: false))
-        XCTAssertEqual(
-            plan.persistenceActions,
-            [
-                .persistStoredKey("new-key"),
-                .persistVerificationFlag(false),
-                .persistVerificationFlag(true)
-            ]
-        )
+        let application = applyProviderAPIKeyStateUpdatePlan(plan)
+        XCTAssertEqual(application.appliedState?.storedAPIKey(for: .groq), "new-key")
+        XCTAssertTrue(application.appliedState?.isReady(for: .groq, localWhisperModelAvailable: false) ?? false)
+        XCTAssertEqual(application.events, [
+            "state:new-key:true",
+            "key:new-key",
+            "verified:false",
+            "verified:true"
+        ])
         XCTAssertFalse(ignoredPlan.shouldApplyState)
-        XCTAssertEqual(ignoredPlan.state, state)
+        XCTAssertNil(applyProviderAPIKeyStateUpdatePlan(ignoredPlan).appliedState)
     }
 
     func testProviderAPIKeyStateUpdatePlanIgnoresNonUserKeyProviders() {
@@ -1120,10 +1138,9 @@ final class ProviderAccessRequirementTests: XCTestCase {
         let storagePlan = state.applyingStoredAPIKey("ignored", for: .voiceInk)
 
         XCTAssertFalse(verificationPlan.shouldApplyState)
-        XCTAssertEqual(verificationPlan.persistenceActions, [])
+        XCTAssertEqual(applyProviderAPIKeyStateUpdatePlan(verificationPlan, provider: .localWhisper).events, [])
         XCTAssertFalse(storagePlan.shouldApplyState)
-        XCTAssertEqual(storagePlan.persistenceActions, [])
-        XCTAssertEqual(storagePlan.state.storedAPIKey(for: .voiceInk), "")
+        XCTAssertEqual(applyProviderAPIKeyStateUpdatePlan(storagePlan, provider: .voiceInk).events, [])
     }
 
     func testProviderAPIKeyStateVerificationIgnoresNonUserKeyProviders() {

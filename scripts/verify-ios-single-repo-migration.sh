@@ -13323,6 +13323,21 @@ require_pattern \
   VoiceInk/PowerMode/AppPicker.swift
 
 require_pattern \
+  "shared Power Mode app picker search policy lives in VoiceInkCore" \
+  'VoiceInkPowerModeAppPickerPolicy|matchesSearch|filteredItems' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "macOS Power Mode config form delegates app picker search filtering to shared policy" \
+  'VoiceInkPowerModeAppPickerPolicy\.filteredItems' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
+require_pattern \
+  "core checks execute Power Mode app picker search policy test" \
+  'PowerModePolicyTests\.testPowerModeAppPickerSearchMatchesNameAndBundleIdentifier' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "macOS Power Mode edit form uses shared delete confirmation copy" \
   'VoiceInkPowerModePresentation\.deleteConfirmation(Title|\(configName:)' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
@@ -13414,7 +13429,7 @@ require_pattern \
 
 require_pattern \
   "migration checklist tracks shared Power Mode app picker gate" \
-  'macOS Power Mode app picker search copy and app-trigger toggle policy route through `VoiceInkPowerModePresentation`/`VoiceInkPowerModeAppConfig`' \
+  'macOS Power Mode app picker search copy, search filtering, and app-trigger toggle policy route through `VoiceInkPowerModePresentation`/`VoiceInkPowerModeAppPickerPolicy`/`VoiceInkPowerModeAppConfig`' \
   docs/ios-single-repo-migration.md
 
 reject_pattern \
@@ -13456,6 +13471,11 @@ reject_pattern \
   "macOS app picker avoids shell-only search copy and app trigger selection policy" \
   '"Search apps\.\.\."|"(magnifyingglass|xmark\.circle\.fill|checkmark)"|selectedAppConfigs\.(contains|firstIndex|append|remove)\(' \
   VoiceInk/PowerMode/AppPicker.swift
+
+reject_pattern \
+  "macOS Power Mode config form avoids shell-owned app picker search filtering" \
+  'localizedCaseInsensitiveContains\(searchText\)' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
 
 reject_pattern \
   "macOS Power Mode emoji shell avoids raw catalog storage and validation policy" \

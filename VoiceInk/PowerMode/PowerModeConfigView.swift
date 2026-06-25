@@ -40,11 +40,12 @@ struct ConfigurationView: View {
     private let cleanupPresentation = VoiceInkTranscriptionCleanupPresentation.macOS
 
     private var filteredApps: [(url: URL, name: String, bundleId: String, icon: NSImage)] {
-        if searchText.isEmpty { return installedApps }
-        return installedApps.filter { app in
-            app.name.localizedCaseInsensitiveContains(searchText) ||
-            app.bundleId.localizedCaseInsensitiveContains(searchText)
-        }
+        VoiceInkPowerModeAppPickerPolicy.filteredItems(
+            installedApps,
+            searchText: searchText,
+            appName: { $0.name },
+            bundleIdentifier: { $0.bundleId }
+        )
     }
 
     private var transcriptionSelection: VoiceInkPowerModeTranscriptionSelection {

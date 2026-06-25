@@ -1605,6 +1605,36 @@ public struct VoiceInkPowerModeAppRule: Equatable, Sendable {
     }
 }
 
+public enum VoiceInkPowerModeAppPickerPolicy {
+    public static func matchesSearch(
+        appName: String,
+        bundleIdentifier: String,
+        searchText: String
+    ) -> Bool {
+        guard !searchText.isEmpty else { return true }
+
+        return appName.localizedCaseInsensitiveContains(searchText)
+            || bundleIdentifier.localizedCaseInsensitiveContains(searchText)
+    }
+
+    public static func filteredItems<Item>(
+        _ items: [Item],
+        searchText: String,
+        appName: (Item) -> String,
+        bundleIdentifier: (Item) -> String
+    ) -> [Item] {
+        guard !searchText.isEmpty else { return items }
+
+        return items.filter {
+            matchesSearch(
+                appName: appName($0),
+                bundleIdentifier: bundleIdentifier($0),
+                searchText: searchText
+            )
+        }
+    }
+}
+
 public extension Array where Element == VoiceInkPowerModeAppConfig {
     func containsPowerModeAppConfig(bundleIdentifier: String) -> Bool {
         contains { $0.bundleIdentifier == bundleIdentifier }

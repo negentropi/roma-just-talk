@@ -859,6 +859,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testTranscriptionMetadataUsesOnlyEnabledPowerModeConfig", run: { PowerModePolicyTests().testTranscriptionMetadataUsesOnlyEnabledPowerModeConfig() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeTriggerConfigsAdaptToPolicyRules", run: { PowerModePolicyTests().testPowerModeTriggerConfigsAdaptToPolicyRules() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeAppConfigSelectionTogglesByBundleIdentifier", run: { PowerModePolicyTests().testPowerModeAppConfigSelectionTogglesByBundleIdentifier() }),
+            VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeAppPickerSearchMatchesNameAndBundleIdentifier", run: { PowerModePolicyTests().testPowerModeAppPickerSearchMatchesNameAndBundleIdentifier() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeConfigPreservesStoredShapeEqualityAndRuleAdapter", run: { try PowerModePolicyTests().testPowerModeConfigPreservesStoredShapeEqualityAndRuleAdapter() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeConfigExposesParsedPromptAndProviderForApplication", run: { PowerModePolicyTests().testPowerModeConfigExposesParsedPromptAndProviderForApplication() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeConfigResolvesSelectedPromptTitle", run: { PowerModePolicyTests().testPowerModeConfigResolvesSelectedPromptTitle() }),

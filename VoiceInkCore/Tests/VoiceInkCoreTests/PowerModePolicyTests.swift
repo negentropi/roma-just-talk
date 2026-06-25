@@ -397,6 +397,69 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertFalse(configs.contains { $0.id == existingID })
     }
 
+    func testPowerModeAppPickerSearchMatchesNameAndBundleIdentifier() {
+        struct AppItem: Equatable {
+            let name: String
+            let bundleIdentifier: String
+        }
+
+        let apps = [
+            AppItem(name: "Safari", bundleIdentifier: "com.apple.Safari"),
+            AppItem(name: "Roma Notes", bundleIdentifier: "talk.roma.notes"),
+            AppItem(name: "Mail", bundleIdentifier: "com.apple.mail")
+        ]
+
+        XCTAssertTrue(
+            VoiceInkPowerModeAppPickerPolicy.matchesSearch(
+                appName: "Roma Notes",
+                bundleIdentifier: "talk.roma.notes",
+                searchText: "roma"
+            )
+        )
+        XCTAssertTrue(
+            VoiceInkPowerModeAppPickerPolicy.matchesSearch(
+                appName: "Safari",
+                bundleIdentifier: "com.apple.Safari",
+                searchText: "APPLE"
+            )
+        )
+        XCTAssertFalse(
+            VoiceInkPowerModeAppPickerPolicy.matchesSearch(
+                appName: "Mail",
+                bundleIdentifier: "com.apple.mail",
+                searchText: "notes"
+            )
+        )
+
+        XCTAssertEqual(
+            VoiceInkPowerModeAppPickerPolicy.filteredItems(
+                apps,
+                searchText: "",
+                appName: { $0.name },
+                bundleIdentifier: { $0.bundleIdentifier }
+            ),
+            apps
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeAppPickerPolicy.filteredItems(
+                apps,
+                searchText: "roma",
+                appName: { $0.name },
+                bundleIdentifier: { $0.bundleIdentifier }
+            ),
+            [apps[1]]
+        )
+        XCTAssertEqual(
+            VoiceInkPowerModeAppPickerPolicy.filteredItems(
+                apps,
+                searchText: "com.apple",
+                appName: { $0.name },
+                bundleIdentifier: { $0.bundleIdentifier }
+            ),
+            [apps[0], apps[2]]
+        )
+    }
+
     func testPowerModeConfigPreservesStoredShapeEqualityAndRuleAdapter() throws {
         let id = UUID()
         let config = PowerModeConfig(

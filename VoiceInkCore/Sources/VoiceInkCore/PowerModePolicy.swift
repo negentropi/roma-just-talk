@@ -1030,12 +1030,12 @@ enum VoiceInkPowerModePromptSelectionApplication: Equatable, Sendable {
 }
 
 public struct VoiceInkPowerModePreferenceApplication: Equatable, Sendable {
-    public let isEnhancementEnabled: Bool
-    public let useScreenCaptureContext: Bool
-    let promptSelection: VoiceInkPowerModePromptSelectionApplication
-    public let selectedAIProvider: VoiceInkAIEnhancementProviderKind?
-    public let selectedAIModel: String?
-    public let cleanupRestore: VoiceInkPowerModeCleanupRestore
+    private let isEnhancementEnabled: Bool
+    private let useScreenCaptureContext: Bool
+    private let promptSelection: VoiceInkPowerModePromptSelectionApplication
+    private let selectedAIProvider: VoiceInkAIEnhancementProviderKind?
+    private let selectedAIModel: String?
+    private let cleanupRestore: VoiceInkPowerModeCleanupRestore
 
     init(
         isEnhancementEnabled: Bool,
@@ -1053,12 +1053,41 @@ public struct VoiceInkPowerModePreferenceApplication: Equatable, Sendable {
         self.cleanupRestore = cleanupRestore
     }
 
-    public func applyPromptSelection(setSelectedPromptId: (UUID?) -> Void) {
+    public func applyRuntimeState(
+        setEnhancementEnabled: (Bool) -> Void,
+        setUseScreenCaptureContext: (Bool) -> Void,
+        setSelectedPromptId: (UUID?) -> Void,
+        setSelectedAIProvider: (VoiceInkAIEnhancementProviderKind) -> Void,
+        selectAIModel: (String) -> Void,
+        saveTextFormattingEnabled: (Bool) -> Void,
+        setPunctuationCleanupMode: (PunctuationCleanupMode) -> Void,
+        saveLowercaseTranscription: (Bool) -> Void
+    ) {
+        setEnhancementEnabled(isEnhancementEnabled)
+        setUseScreenCaptureContext(useScreenCaptureContext)
+
         switch promptSelection {
         case .leaveUnchanged:
             break
         case .set(let selectedPromptId):
             setSelectedPromptId(selectedPromptId)
+        }
+
+        if let selectedAIProvider {
+            setSelectedAIProvider(selectedAIProvider)
+        }
+        if let selectedAIModel {
+            selectAIModel(selectedAIModel)
+        }
+
+        if let isTextFormattingEnabled = cleanupRestore.isTextFormattingEnabled {
+            saveTextFormattingEnabled(isTextFormattingEnabled)
+        }
+        if let punctuationCleanupMode = cleanupRestore.punctuationMode {
+            setPunctuationCleanupMode(punctuationCleanupMode)
+        }
+        if let lowercaseTranscription = cleanupRestore.lowercaseTranscription {
+            saveLowercaseTranscription(lowercaseTranscription)
         }
     }
 }

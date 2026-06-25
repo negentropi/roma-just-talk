@@ -142,31 +142,17 @@ class PowerModeSessionManager {
     private func applyPreferenceApplication(_ application: VoiceInkPowerModePreferenceApplication) {
         guard let enhancementService else { return }
 
-        enhancementService.isEnhancementEnabled = application.isEnhancementEnabled
-        enhancementService.useScreenCaptureContext = application.useScreenCaptureContext
-
-        application.applyPromptSelection { selectedPromptId in
-            enhancementService.selectedPromptId = selectedPromptId
-        }
-
         let aiService = enhancementService.getAIService()
-        if let provider = application.selectedAIProvider {
-            aiService.selectedProvider = provider
-        }
-        if let model = application.selectedAIModel {
-            aiService.selectModel(model)
-        }
-
-        let cleanupRestore = application.cleanupRestore
-        if let isTextFormattingEnabled = cleanupRestore.isTextFormattingEnabled {
-            VoiceInkTranscriptionCleanupPreferenceStorage.saveTextFormattingEnabled(isTextFormattingEnabled)
-        }
-        if let punctuationCleanupMode = cleanupRestore.punctuationMode {
-            PunctuationCleanupMode.setCurrent(punctuationCleanupMode)
-        }
-        if let lowercaseTranscription = cleanupRestore.lowercaseTranscription {
-            VoiceInkTranscriptionCleanupPreferenceStorage.saveLowercaseTranscription(lowercaseTranscription)
-        }
+        application.applyRuntimeState(
+            setEnhancementEnabled: { enhancementService.isEnhancementEnabled = $0 },
+            setUseScreenCaptureContext: { enhancementService.useScreenCaptureContext = $0 },
+            setSelectedPromptId: { enhancementService.selectedPromptId = $0 },
+            setSelectedAIProvider: { aiService.selectedProvider = $0 },
+            selectAIModel: { aiService.selectModel($0) },
+            saveTextFormattingEnabled: VoiceInkTranscriptionCleanupPreferenceStorage.saveTextFormattingEnabled,
+            setPunctuationCleanupMode: PunctuationCleanupMode.setCurrent,
+            saveLowercaseTranscription: VoiceInkTranscriptionCleanupPreferenceStorage.saveLowercaseTranscription
+        )
     }
 
     private func sessionApplicationFacts(

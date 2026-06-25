@@ -1380,23 +1380,17 @@ final class PowerModePolicyTests: XCTestCase {
             selectedAIModel: "llama-3.3"
         )
 
-        let application = config.powerModePreferenceApplication
-        let promptApplication = appliedPromptSelection(application)
+        let runtime = preferenceApplicationRuntime(for: config.powerModePreferenceApplication)
 
-        XCTAssertTrue(application.isEnhancementEnabled)
-        XCTAssertTrue(application.useScreenCaptureContext)
-        XCTAssertTrue(promptApplication.didApply)
-        XCTAssertEqual(promptApplication.selectedPromptId, promptID)
-        XCTAssertEqual(application.selectedAIProvider, .groq)
-        XCTAssertEqual(application.selectedAIModel, "llama-3.3")
-        XCTAssertEqual(
-            application.cleanupRestore,
-            VoiceInkPowerModeCleanupRestore(
-                isTextFormattingEnabled: true,
-                punctuationMode: .removeTrailingPeriod,
-                lowercaseTranscription: true
-            )
-        )
+        XCTAssertEqual(runtime.isEnhancementEnabled, true)
+        XCTAssertEqual(runtime.useScreenCaptureContext, true)
+        XCTAssertTrue(runtime.didApplyPrompt)
+        XCTAssertEqual(runtime.selectedPromptId, promptID)
+        XCTAssertEqual(runtime.selectedAIProvider, .groq)
+        XCTAssertEqual(runtime.selectedAIModel, "llama-3.3")
+        XCTAssertEqual(runtime.isTextFormattingEnabled, true)
+        XCTAssertEqual(runtime.punctuationMode, .removeTrailingPeriod)
+        XCTAssertEqual(runtime.lowercaseTranscription, true)
     }
 
     func testPowerModeConfigPreferenceApplicationLeavesEnhancementDetailsWhenDisabled() {
@@ -1411,17 +1405,19 @@ final class PowerModePolicyTests: XCTestCase {
             selectedAIModel: "llama-3.3"
         )
 
-        let application = config.powerModePreferenceApplication
         let existingPromptID = UUID()
-        let promptApplication = appliedPromptSelection(application, startingAt: existingPromptID)
+        let runtime = preferenceApplicationRuntime(
+            for: config.powerModePreferenceApplication,
+            startingAt: existingPromptID
+        )
 
-        XCTAssertFalse(application.isEnhancementEnabled)
-        XCTAssertTrue(application.useScreenCaptureContext)
-        XCTAssertFalse(promptApplication.didApply)
-        XCTAssertEqual(promptApplication.selectedPromptId, existingPromptID)
-        XCTAssertNil(application.selectedAIProvider)
-        XCTAssertNil(application.selectedAIModel)
-        XCTAssertEqual(application.cleanupRestore.punctuationMode, .keep)
+        XCTAssertEqual(runtime.isEnhancementEnabled, false)
+        XCTAssertEqual(runtime.useScreenCaptureContext, true)
+        XCTAssertFalse(runtime.didApplyPrompt)
+        XCTAssertEqual(runtime.selectedPromptId, existingPromptID)
+        XCTAssertNil(runtime.selectedAIProvider)
+        XCTAssertNil(runtime.selectedAIModel)
+        XCTAssertEqual(runtime.punctuationMode, .keep)
     }
 
     func testPowerModeApplicationStateBuildsPreferenceRestoreApplication() {
@@ -1437,23 +1433,17 @@ final class PowerModePolicyTests: XCTestCase {
             lowercaseTranscription: true
         )
 
-        let application = state.powerModePreferenceRestore
-        let promptApplication = appliedPromptSelection(application)
+        let runtime = preferenceApplicationRuntime(for: state.powerModePreferenceRestore)
 
-        XCTAssertTrue(application.isEnhancementEnabled)
-        XCTAssertTrue(application.useScreenCaptureContext)
-        XCTAssertTrue(promptApplication.didApply)
-        XCTAssertEqual(promptApplication.selectedPromptId, promptID)
-        XCTAssertEqual(application.selectedAIProvider, .groq)
-        XCTAssertEqual(application.selectedAIModel, "llama-3.3")
-        XCTAssertEqual(
-            application.cleanupRestore,
-            VoiceInkPowerModeCleanupRestore(
-                isTextFormattingEnabled: false,
-                punctuationMode: .removeAll,
-                lowercaseTranscription: true
-            )
-        )
+        XCTAssertEqual(runtime.isEnhancementEnabled, true)
+        XCTAssertEqual(runtime.useScreenCaptureContext, true)
+        XCTAssertTrue(runtime.didApplyPrompt)
+        XCTAssertEqual(runtime.selectedPromptId, promptID)
+        XCTAssertEqual(runtime.selectedAIProvider, .groq)
+        XCTAssertEqual(runtime.selectedAIModel, "llama-3.3")
+        XCTAssertEqual(runtime.isTextFormattingEnabled, false)
+        XCTAssertEqual(runtime.punctuationMode, .removeAll)
+        XCTAssertEqual(runtime.lowercaseTranscription, true)
     }
 
     func testPowerModeApplicationStatePreferenceRestoreClearsInvalidPromptAndKeepsLegacyCleanup() {
@@ -1465,16 +1455,15 @@ final class PowerModePolicyTests: XCTestCase {
             removePunctuation: true
         )
 
-        let application = state.powerModePreferenceRestore
-        let promptApplication = appliedPromptSelection(application, startingAt: UUID())
+        let runtime = preferenceApplicationRuntime(for: state.powerModePreferenceRestore, startingAt: UUID())
 
-        XCTAssertFalse(application.isEnhancementEnabled)
-        XCTAssertFalse(application.useScreenCaptureContext)
-        XCTAssertTrue(promptApplication.didApply)
-        XCTAssertNil(promptApplication.selectedPromptId)
-        XCTAssertNil(application.selectedAIProvider)
-        XCTAssertNil(application.selectedAIModel)
-        XCTAssertEqual(application.cleanupRestore.punctuationMode, .removeAll)
+        XCTAssertEqual(runtime.isEnhancementEnabled, false)
+        XCTAssertEqual(runtime.useScreenCaptureContext, false)
+        XCTAssertTrue(runtime.didApplyPrompt)
+        XCTAssertNil(runtime.selectedPromptId)
+        XCTAssertNil(runtime.selectedAIProvider)
+        XCTAssertNil(runtime.selectedAIModel)
+        XCTAssertEqual(runtime.punctuationMode, .removeAll)
     }
 
     func testPowerModeSessionApplicationPlanBuildsConfigurationApplicationSequence() async {
@@ -1500,20 +1489,19 @@ final class PowerModePolicyTests: XCTestCase {
         )
 
         let runtime = await sessionApplicationRuntime(for: plan)
-        guard let application = runtime.preferenceApplication,
+        guard let preferenceApplication = runtime.preferenceApplication,
               let modelResourcePlan = runtime.modelResourcePlan,
               let languageApplicationPlan = runtime.languageApplicationPlan else {
             XCTFail("Expected session application runtime plans")
             return
         }
 
-        XCTAssertTrue(application.isEnhancementEnabled)
-        XCTAssertTrue(application.useScreenCaptureContext)
-        let promptApplication = appliedPromptSelection(application)
-        XCTAssertTrue(promptApplication.didApply)
-        XCTAssertEqual(promptApplication.selectedPromptId, promptID)
-        XCTAssertEqual(application.selectedAIProvider, .groq)
-        XCTAssertEqual(application.selectedAIModel, "llama-3.3")
+        XCTAssertEqual(preferenceApplication.isEnhancementEnabled, true)
+        XCTAssertEqual(preferenceApplication.useScreenCaptureContext, true)
+        XCTAssertTrue(preferenceApplication.didApplyPrompt)
+        XCTAssertEqual(preferenceApplication.selectedPromptId, promptID)
+        XCTAssertEqual(preferenceApplication.selectedAIProvider, .groq)
+        XCTAssertEqual(preferenceApplication.selectedAIModel, "llama-3.3")
         let modelResourceEvents = await runtimeEvents(for: modelResourcePlan)
         XCTAssertEqual(modelResourceEvents, ["select:base", "cleanup", "load:base"])
         XCTAssertEqual(languageRuntimeEvents(for: languageApplicationPlan), ["save:fr", "post"])
@@ -1542,21 +1530,20 @@ final class PowerModePolicyTests: XCTestCase {
         )
 
         let runtime = await sessionApplicationRuntime(for: plan)
-        guard let application = runtime.preferenceApplication,
+        guard let preferenceApplication = runtime.preferenceApplication,
               let modelResourcePlan = runtime.modelResourcePlan,
               let languageApplicationPlan = runtime.languageApplicationPlan else {
             XCTFail("Expected session application runtime plans")
             return
         }
 
-        XCTAssertFalse(application.isEnhancementEnabled)
-        XCTAssertFalse(application.useScreenCaptureContext)
-        let promptApplication = appliedPromptSelection(application)
-        XCTAssertTrue(promptApplication.didApply)
-        XCTAssertEqual(promptApplication.selectedPromptId, promptID)
-        XCTAssertEqual(application.selectedAIProvider, .groq)
-        XCTAssertEqual(application.selectedAIModel, "llama-3.3")
-        XCTAssertEqual(application.cleanupRestore.punctuationMode, .removeAll)
+        XCTAssertEqual(preferenceApplication.isEnhancementEnabled, false)
+        XCTAssertEqual(preferenceApplication.useScreenCaptureContext, false)
+        XCTAssertTrue(preferenceApplication.didApplyPrompt)
+        XCTAssertEqual(preferenceApplication.selectedPromptId, promptID)
+        XCTAssertEqual(preferenceApplication.selectedAIProvider, .groq)
+        XCTAssertEqual(preferenceApplication.selectedAIModel, "llama-3.3")
+        XCTAssertEqual(preferenceApplication.punctuationMode, .removeAll)
         let modelResourceEvents = await runtimeEvents(for: modelResourcePlan)
         XCTAssertEqual(modelResourceEvents, ["select:english-only", "cleanup"])
         XCTAssertEqual(languageRuntimeEvents(for: languageApplicationPlan), ["save:en", "post"])
@@ -2601,19 +2588,39 @@ final class PowerModePolicyTests: XCTestCase {
         )
     }
 
-    private func appliedPromptSelection(
-        _ application: VoiceInkPowerModePreferenceApplication,
+    private struct PreferenceApplicationRuntime {
+        var isEnhancementEnabled: Bool?
+        var useScreenCaptureContext: Bool?
+        var selectedPromptId: UUID?
+        var didApplyPrompt = false
+        var selectedAIProvider: VoiceInkAIEnhancementProviderKind?
+        var selectedAIModel: String?
+        var isTextFormattingEnabled: Bool?
+        var punctuationMode: PunctuationCleanupMode?
+        var lowercaseTranscription: Bool?
+    }
+
+    private func preferenceApplicationRuntime(
+        for application: VoiceInkPowerModePreferenceApplication,
         startingAt initialPromptId: UUID? = nil
-    ) -> (didApply: Bool, selectedPromptId: UUID?) {
-        var didApply = false
-        var selectedPromptId = initialPromptId
+    ) -> PreferenceApplicationRuntime {
+        var runtime = PreferenceApplicationRuntime(selectedPromptId: initialPromptId)
 
-        application.applyPromptSelection { newPromptId in
-            didApply = true
-            selectedPromptId = newPromptId
-        }
+        application.applyRuntimeState(
+            setEnhancementEnabled: { runtime.isEnhancementEnabled = $0 },
+            setUseScreenCaptureContext: { runtime.useScreenCaptureContext = $0 },
+            setSelectedPromptId: { selectedPromptId in
+                runtime.didApplyPrompt = true
+                runtime.selectedPromptId = selectedPromptId
+            },
+            setSelectedAIProvider: { runtime.selectedAIProvider = $0 },
+            selectAIModel: { runtime.selectedAIModel = $0 },
+            saveTextFormattingEnabled: { runtime.isTextFormattingEnabled = $0 },
+            setPunctuationCleanupMode: { runtime.punctuationMode = $0 },
+            saveLowercaseTranscription: { runtime.lowercaseTranscription = $0 }
+        )
 
-        return (didApply, selectedPromptId)
+        return runtime
     }
 
     private func languageRuntimeEvents(
@@ -2634,7 +2641,7 @@ final class PowerModePolicyTests: XCTestCase {
     }
 
     private struct SessionApplicationRuntime {
-        var preferenceApplication: VoiceInkPowerModePreferenceApplication?
+        var preferenceApplication: PreferenceApplicationRuntime?
         var modelResourcePlan: VoiceInkPowerModeTranscriptionModelResourcePlan?
         var languageApplicationPlan: VoiceInkPowerModeLanguageApplicationPlan?
         var didPostConfigurationApplied = false
@@ -2647,7 +2654,7 @@ final class PowerModePolicyTests: XCTestCase {
 
         await plan.applyRuntimeState(
             applyPreferenceApplication: { application in
-                runtime.preferenceApplication = application
+                runtime.preferenceApplication = preferenceApplicationRuntime(for: application)
             },
             applyModelResourcePlan: { modelResourcePlan in
                 runtime.modelResourcePlan = modelResourcePlan

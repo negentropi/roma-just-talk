@@ -1217,6 +1217,19 @@ final class RecordingStatePolicyTests: XCTestCase {
         XCTAssertEqual(error.localizedDescription, VoiceInkAudioRecorderStartFailurePolicy.returnedFalseDescription)
     }
 
+    func testMacOSCoreAudioRecorderDiagnosticsPreserveBufferLatencyCopy() {
+        XCTAssertEqual(VoiceInkMacOSCoreAudioRecorderDiagnostics.assumedLatencySampleRate, 48_000)
+        XCTAssertEqual(
+            VoiceInkMacOSCoreAudioRecorderDiagnostics.bufferLatencyMilliseconds(bufferFrameSize: 512),
+            10.666666666666666,
+            accuracy: 0.0001
+        )
+        XCTAssertEqual(
+            VoiceInkMacOSCoreAudioRecorderDiagnostics.bufferLatencyMessage(bufferFrameSize: 512),
+            "🎙️ Buffer size: 512 frames, ~latency: 10.7ms"
+        )
+    }
+
     private func withIsolatedDefaults(_ run: (UserDefaults) -> Void) {
         let suiteName = "VoiceInkCore.RecordingStatePolicyTests.\(UUID().uuidString)"
         guard let defaults = UserDefaults(suiteName: suiteName) else {

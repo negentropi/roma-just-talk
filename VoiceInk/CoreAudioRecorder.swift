@@ -1068,8 +1068,7 @@ final class CoreAudioRecorder: @unchecked Sendable {
 
         // Get buffer frame size
         if let bufferSize = getBufferFrameSize(deviceID: deviceID) {
-            let latencyMs = (Double(bufferSize) / 48000.0) * 1000.0 // Approximate latency assuming 48kHz
-            logger.notice("🎙️ Buffer size: \(bufferSize, privacy: .public) frames, ~latency: \(String(format: "%.1f", latencyMs), privacy: .public)ms")
+            logger.notice("\(VoiceInkMacOSCoreAudioRecorderDiagnostics.bufferLatencyMessage(bufferFrameSize: bufferSize), privacy: .public)")
         }
     }
 

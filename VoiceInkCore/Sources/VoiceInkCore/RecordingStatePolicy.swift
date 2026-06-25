@@ -366,6 +366,19 @@ public enum VoiceInkAudioRecorderStartFailurePolicy {
     }
 }
 
+public enum VoiceInkMacOSCoreAudioRecorderDiagnostics {
+    public static let assumedLatencySampleRate: Double = 48_000
+
+    public static func bufferLatencyMilliseconds(bufferFrameSize: UInt32) -> Double {
+        (Double(bufferFrameSize) / assumedLatencySampleRate) * 1_000
+    }
+
+    public static func bufferLatencyMessage(bufferFrameSize: UInt32) -> String {
+        let latencyMilliseconds = bufferLatencyMilliseconds(bufferFrameSize: bufferFrameSize)
+        return "🎙️ Buffer size: \(bufferFrameSize) frames, ~latency: \(String(format: "%.1f", latencyMilliseconds))ms"
+    }
+}
+
 public struct VoiceInkAppGroupRecordingState: Equatable, Sendable {
     public let isRecording: Bool
     public let shouldClearStaleState: Bool

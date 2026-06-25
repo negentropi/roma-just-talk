@@ -929,6 +929,17 @@ require_pattern \
   'isRecorderDismissCancelable' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
+require_patterns \
+  "shared recording state applies recorder UI toggle runtime plan without public raw actions" \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift \
+  'fileprivate enum VoiceInkRecorderUIToggleAction' \
+  'applyRecorderUIToggleRuntimeState'
+
+reject_pattern \
+  "shared recording state avoids public recorder UI toggle actions" \
+  'public enum VoiceInkRecorderUIToggleAction|public var recorderUIToggleAction|public let recorderUIToggleAction' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
 require_pattern \
   "shared recording state owns active-pipeline finish policy" \
   'shouldReturnToIdleWhenActivePipelineFinishes' \
@@ -1135,6 +1146,21 @@ require_pattern \
   "core checks execute stale hidden recorder session policy test" \
   'RecordingStatePolicyTests\.testRecorderSessionPolicyClearsOnlyStaleHiddenIdleSessions' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute shared recorder UI toggle runtime plan test" \
+  'RecordingStatePolicyTests\.testRecorderUITogglePlanAppliesMacOSRuntimeStateMapping' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "macOS recorder UI applies shared recorder UI toggle runtime plan" \
+  'applyRecorderUIToggleRuntimeState' \
+  VoiceInk/Transcription/Engine/RecorderUIManager.swift
+
+reject_pattern \
+  "macOS recorder UI avoids shell-owned recorder toggle action switches" \
+  'recorderUIToggleAction|VoiceInkRecorderUIToggleAction|case \.(toggleRecord|cancelRecording|dismissRecorder)' \
+  VoiceInk/Transcription/Engine/RecorderUIManager.swift
 
 require_pattern \
   "macOS recorder preview uses shared active-recording predicate" \

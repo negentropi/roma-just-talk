@@ -38,13 +38,32 @@ final class RecordingStatePolicyTests: XCTestCase {
         XCTAssertFalse(VoiceInkRecordingState.busy.acceptsRecordingShortcutAction)
     }
 
-    func testRecorderUIToggleActionPreservesMacOSStateMapping() {
-        XCTAssertEqual(VoiceInkRecordingState.idle.recorderUIToggleAction, .dismissRecorder)
-        XCTAssertEqual(VoiceInkRecordingState.starting.recorderUIToggleAction, .toggleRecord)
-        XCTAssertEqual(VoiceInkRecordingState.recording.recorderUIToggleAction, .toggleRecord)
-        XCTAssertEqual(VoiceInkRecordingState.transcribing.recorderUIToggleAction, .cancelRecording)
-        XCTAssertEqual(VoiceInkRecordingState.enhancing.recorderUIToggleAction, .cancelRecording)
-        XCTAssertEqual(VoiceInkRecordingState.busy.recorderUIToggleAction, .dismissRecorder)
+    func testRecorderUITogglePlanAppliesMacOSRuntimeStateMapping() async {
+        var events: [String] = []
+
+        for state in [
+            VoiceInkRecordingState.idle,
+            .starting,
+            .recording,
+            .transcribing,
+            .enhancing,
+            .busy,
+        ] {
+            await state.applyRecorderUIToggleRuntimeState(
+                toggleRecord: { events.append("toggle") },
+                cancelRecording: { events.append("cancel") },
+                dismissRecorder: { events.append("dismiss") }
+            )
+        }
+
+        XCTAssertEqual(events, [
+            "dismiss",
+            "toggle",
+            "toggle",
+            "cancel",
+            "cancel",
+            "dismiss",
+        ])
     }
 
     func testRecordingPermissionPlanAppliesStatusAndRequestResultRuntimeState() {

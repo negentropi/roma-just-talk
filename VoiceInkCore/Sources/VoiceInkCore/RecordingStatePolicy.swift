@@ -9,7 +9,7 @@ public enum VoiceInkRecordingState: Equatable, Sendable {
     case busy
 }
 
-public enum VoiceInkRecorderUIToggleAction: Equatable, Sendable {
+fileprivate enum VoiceInkRecorderUIToggleAction: Equatable, Sendable {
     case toggleRecord
     case cancelRecording
     case dismissRecorder
@@ -1333,7 +1333,7 @@ public extension VoiceInkRecordingState {
         isPostRecordingProcessing || self == .busy
     }
 
-    var recorderUIToggleAction: VoiceInkRecorderUIToggleAction {
+    private var recorderUIToggleAction: VoiceInkRecorderUIToggleAction {
         switch self {
         case .recording, .starting:
             return .toggleRecord
@@ -1341,6 +1341,21 @@ public extension VoiceInkRecordingState {
             return .cancelRecording
         case .idle, .busy:
             return .dismissRecorder
+        }
+    }
+
+    func applyRecorderUIToggleRuntimeState(
+        toggleRecord: () async -> Void,
+        cancelRecording: () async -> Void,
+        dismissRecorder: () async -> Void
+    ) async {
+        switch recorderUIToggleAction {
+        case .toggleRecord:
+            await toggleRecord()
+        case .cancelRecording:
+            await cancelRecording()
+        case .dismissRecorder:
+            await dismissRecorder()
         }
     }
 

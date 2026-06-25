@@ -128,21 +128,24 @@ class RecorderUIManager: ObservableObject {
         }
 
         if isRecorderSessionActive {
-            switch engine.recordingState.recorderUIToggleAction {
-            case .toggleRecord:
-                if engine.recordingState == .starting {
-                    logger.notice("toggleMiniRecorder: deferring stop while recording starts")
-                } else {
-                    logger.notice("toggleMiniRecorder: stopping recording (was recording)")
+            await engine.recordingState.applyRecorderUIToggleRuntimeState(
+                toggleRecord: {
+                    if engine.recordingState == .starting {
+                        logger.notice("toggleMiniRecorder: deferring stop while recording starts")
+                    } else {
+                        logger.notice("toggleMiniRecorder: stopping recording (was recording)")
+                    }
+                    await engine.toggleRecord(powerModeId: powerModeId)
+                },
+                cancelRecording: {
+                    logger.notice("toggleMiniRecorder: cancelling active recorder work")
+                    await cancelRecording()
+                },
+                dismissRecorder: {
+                    logger.notice("toggleMiniRecorder: dismissing recorder UI")
+                    await dismissMiniRecorder()
                 }
-                await engine.toggleRecord(powerModeId: powerModeId)
-            case .cancelRecording:
-                logger.notice("toggleMiniRecorder: cancelling active recorder work")
-                await cancelRecording()
-            case .dismissRecorder:
-                logger.notice("toggleMiniRecorder: dismissing recorder UI")
-                await dismissMiniRecorder()
-            }
+            )
         } else {
             SoundManager.shared.playStartSound()
             beginRecorderSession()

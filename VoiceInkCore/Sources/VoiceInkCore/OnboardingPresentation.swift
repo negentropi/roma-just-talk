@@ -100,28 +100,39 @@ public struct VoiceInkOnboardingModelDownloadPresentation: Equatable, Sendable {
     }
 }
 
-public enum VoiceInkOnboardingModelDownloadPrimaryAction: Equatable, Sendable {
-    case waitForDownload(title: String)
-    case continueSetup(title: String)
-    case requestDownload(title: String, systemImageName: String)
+private enum VoiceInkOnboardingModelDownloadPrimaryActionKind: Equatable, Sendable {
+    case waitForDownload
+    case continueSetup
+    case requestDownload
+}
 
-    public var title: String {
-        switch self {
-        case .waitForDownload(let title),
-             .continueSetup(let title),
-             .requestDownload(let title, _):
-            return title
-        }
+public struct VoiceInkOnboardingModelDownloadPrimaryAction: Equatable, Sendable {
+    public let title: String
+    public let systemImageName: String?
+    private let kind: VoiceInkOnboardingModelDownloadPrimaryActionKind
+
+    static func waitForDownload(title: String) -> Self {
+        VoiceInkOnboardingModelDownloadPrimaryAction(
+            title: title,
+            systemImageName: nil,
+            kind: .waitForDownload
+        )
     }
 
-    public var systemImageName: String? {
-        switch self {
-        case .requestDownload(_, let systemImageName):
-            return systemImageName
-        case .waitForDownload,
-             .continueSetup:
-            return nil
-        }
+    static func continueSetup(title: String) -> Self {
+        VoiceInkOnboardingModelDownloadPrimaryAction(
+            title: title,
+            systemImageName: nil,
+            kind: .continueSetup
+        )
+    }
+
+    static func requestDownload(title: String, systemImageName: String) -> Self {
+        VoiceInkOnboardingModelDownloadPrimaryAction(
+            title: title,
+            systemImageName: systemImageName,
+            kind: .requestDownload
+        )
     }
 
     public var isEnabled: Bool {
@@ -132,7 +143,7 @@ public enum VoiceInkOnboardingModelDownloadPrimaryAction: Equatable, Sendable {
         continueSetup: @escaping () -> Void,
         requestDownload: @escaping () -> Void
     ) -> (() -> Void)? {
-        switch self {
+        switch kind {
         case .waitForDownload:
             return nil
         case .continueSetup:

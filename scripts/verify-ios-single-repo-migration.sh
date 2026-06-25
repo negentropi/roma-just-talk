@@ -4868,10 +4868,16 @@ require_pattern \
 require_patterns \
   "VoiceInkCore owns iOS onboarding primary action button state and runtime mapping" \
   VoiceInkCore/Sources/VoiceInkCore/OnboardingPresentation.swift \
-  'VoiceInkOnboardingModelDownloadPrimaryAction' \
+  'struct VoiceInkOnboardingModelDownloadPrimaryAction' \
+  'private enum VoiceInkOnboardingModelDownloadPrimaryActionKind' \
   'runtimeAction' \
   'isEnabled' \
   'systemImageName'
+
+reject_pattern \
+  "iOS onboarding primary action avoids public raw action enum" \
+  'public enum VoiceInkOnboardingModelDownloadPrimaryAction|public (let|var) kind: VoiceInkOnboardingModelDownloadPrimaryActionKind' \
+  VoiceInkCore/Sources/VoiceInkCore/OnboardingPresentation.swift
 
 require_pattern \
   "core tests pin iOS onboarding primary action runtime mapping" \

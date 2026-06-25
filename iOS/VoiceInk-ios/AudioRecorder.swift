@@ -79,9 +79,7 @@ final class AudioRecorder: NSObject, ObservableObject {
             setIsRecording: { isRecording = $0 },
             clearAudioLevels: { levelsHistory.removeAll() },
             deleteCurrentRecordingFile: {
-                if let url = currentRecordingURL {
-                    try? FileManager.default.removeItem(at: url)
-                }
+                try? VoiceInkStoredAudioFile.deleteExistingFile(for: currentRecordingURL?.absoluteString)
             },
             clearCurrentRecordingURL: { currentRecordingURL = nil },
             scheduleSessionDeactivation: sessionManager.scheduleDeactivation

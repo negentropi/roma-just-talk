@@ -1022,9 +1022,19 @@ require_pattern \
   'VoiceInkAudioRecorderStopPolicy\.plan|applyStopPlan|plan\.applyRuntimeState' \
   iOS/VoiceInk-ios/AudioRecorder.swift
 
+require_pattern \
+  "iOS audio recorder deletes discarded recordings through shared stored-audio helper" \
+  'VoiceInkStoredAudioFile\.deleteExistingFile\(for: currentRecordingURL\?\.absoluteString\)' \
+  iOS/VoiceInk-ios/AudioRecorder.swift
+
 reject_pattern \
   "iOS audio recorder avoids shell-owned stop-plan sequencing" \
   'plan\.should(StopRecorder|InvalidateMeterTimer|ClearAudioLevels|DeleteCurrentRecordingFile|ClearCurrentRecordingURL|ScheduleSessionDeactivation)|plan\.isRecordingAfterStop' \
+  iOS/VoiceInk-ios/AudioRecorder.swift
+
+reject_pattern \
+  "iOS audio recorder avoids shell-owned stored-audio deletion" \
+  'FileManager|removeItem' \
   iOS/VoiceInk-ios/AudioRecorder.swift
 
 require_patterns \

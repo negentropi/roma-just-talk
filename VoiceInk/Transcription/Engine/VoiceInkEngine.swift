@@ -637,7 +637,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
         audioFileReadyTask.cancel()
         Task.detached(priority: .utility) {
             _ = try? await audioFileReadyTask.value
-            try? FileManager.default.removeItem(at: url)
+            try? VoiceInkStoredAudioFile.deleteExistingFile(for: url.absoluteString)
         }
     }
 

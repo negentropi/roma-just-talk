@@ -9792,6 +9792,18 @@ require_pattern \
   'LocalCLIConfigurationTests\.testLocalCLIExecutionErrorsPreserveMacOSCopyAndFailureClassification' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
+require_patterns \
+  "shared AI enhancement error maps Local CLI execution failures" \
+  VoiceInkCore/Sources/VoiceInkCore/AIEnhancementError.swift \
+  'localCLIExecutionFailure' \
+  'VoiceInkLocalCLIExecutionError' \
+  'An unknown Local CLI error occurred'
+
+require_pattern \
+  "core checks execute Local CLI enhancement error mapping test" \
+  'AIEnhancementErrorTests\.testLocalCLIExecutionFailureMapsCoreErrorsAndGenericFallbacks' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
 require_pattern \
   "macOS AI service exposes shared Local CLI template type" \
   'VoiceInkLocalCLITemplate' \
@@ -9814,7 +9826,7 @@ require_pattern \
 
 require_pattern \
   "migration checklist tracks shared Local CLI configuration gate" \
-  'macOS Local CLI template identity, settings labels/help, command template catalog, command/selected-template/timeout storage, timeout default/options/clamp, configured-command predicate, full-prompt wrapper, stdout/stderr cleanup, command-failure classification, and execution error copy route through `VoiceInkLocalCLITemplate`/`VoiceInkLocalCLIPreference`/`VoiceInkLocalCLIExecutionError`' \
+  'macOS Local CLI template identity, settings labels/help, command template catalog, command/selected-template/timeout storage, timeout default/options/clamp, configured-command predicate, full-prompt wrapper, stdout/stderr cleanup, command-failure classification, AI-enhancement error mapping, and execution error copy route through `VoiceInkLocalCLITemplate`/`VoiceInkLocalCLIPreference`/`VoiceInkLocalCLIExecutionError`/`VoiceInkAIEnhancementError`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \
@@ -10144,6 +10156,16 @@ reject_pattern \
   "macOS Local CLI adapter avoids shell-owned template and preference policy" \
   'enum +LocalCLITemplate|enum +LocalCLIError|"(localCLICommandTemplate|localCLISelectedTemplate|localCLITimeoutSeconds|Local CLI command is not configured|Local CLI command was not found|Local CLI command timed out|Local CLI command failed with exit code|Local CLI command returned empty output|Failed to execute Local CLI command)"|defaultTimeoutSeconds|max\(5, timeoutSeconds\)|makeFullPrompt|cleanOutput\(' \
   VoiceInk/Services/AIEnhancement/LocalCLIService.swift
+
+require_pattern \
+  "macOS AI enhancement service uses shared Local CLI failure mapping" \
+  'VoiceInkAIEnhancementError\.localCLIExecutionFailure\(error\)' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+reject_pattern \
+  "macOS AI enhancement service avoids shell-owned Local CLI failure mapping copy" \
+  'VoiceInkLocalCLIExecutionError|An unknown Local CLI error occurred|localError\.errorDescription' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
 reject_pattern \
   "macOS AI settings avoid duplicate Local CLI timeout options" \

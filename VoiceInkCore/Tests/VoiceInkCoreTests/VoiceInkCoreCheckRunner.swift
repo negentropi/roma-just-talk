@@ -162,6 +162,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "AIEnhancementErrorTests.testTransportFailureMappingPreservesMacOSLLMKitCategories", run: { AIEnhancementErrorTests().testTransportFailureMappingPreservesMacOSLLMKitCategories() }),
             VoiceInkCoreCheck(name: "AIEnhancementErrorTests.testTransportNetworkErrorMapsRetryableFoundationErrors", run: { AIEnhancementErrorTests().testTransportNetworkErrorMapsRetryableFoundationErrors() }),
             VoiceInkCoreCheck(name: "AIEnhancementErrorTests.testTransportNetworkErrorRejectsNonRetryableFoundationErrors", run: { AIEnhancementErrorTests().testTransportNetworkErrorRejectsNonRetryableFoundationErrors() }),
+            VoiceInkCoreCheck(name: "AIEnhancementErrorTests.testLocalCLIExecutionFailureMapsCoreErrorsAndGenericFallbacks", run: { AIEnhancementErrorTests().testLocalCLIExecutionFailureMapsCoreErrorsAndGenericFallbacks() }),
             VoiceInkCoreCheck(name: "AIEnhancementErrorTests.testOllamaEnhancementFailurePolicyPreservesMacOSMessagesAndRetryShape", run: { AIEnhancementErrorTests().testOllamaEnhancementFailurePolicyPreservesMacOSMessagesAndRetryShape() }),
             VoiceInkCoreCheck(name: "AIEnhancementErrorTests.testOllamaTransportFailuresMapToSharedFailurePolicy", run: { AIEnhancementErrorTests().testOllamaTransportFailuresMapToSharedFailurePolicy() }),
             VoiceInkCoreCheck(name: "AIEnhancementErrorTests.testOllamaServiceDiagnosticsPreserveMacOSConsoleCopy", run: { AIEnhancementErrorTests().testOllamaServiceDiagnosticsPreserveMacOSConsoleCopy() }),

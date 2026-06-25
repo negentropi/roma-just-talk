@@ -120,6 +120,25 @@ final class AIEnhancementErrorTests: XCTestCase {
         ))
     }
 
+    func testLocalCLIExecutionFailureMapsCoreErrorsAndGenericFallbacks() {
+        XCTAssertEqual(
+            VoiceInkAIEnhancementError.localCLIExecutionFailure(
+                VoiceInkLocalCLIExecutionError.timeout(seconds: 45.9)
+            ),
+            .customError("Local CLI command timed out after 45 seconds.")
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementError.localCLIExecutionFailure(
+                NSError(
+                    domain: "VoiceInkLocalCLI",
+                    code: 1,
+                    userInfo: [NSLocalizedDescriptionKey: "sandbox denied"]
+                )
+            ),
+            .customError("sandbox denied")
+        )
+    }
+
     func testOllamaEnhancementFailurePolicyPreservesMacOSMessagesAndRetryShape() {
         let expectedMessages: [(VoiceInkOllamaEnhancementFailure, String)] = [
             (.invalidURL, "Invalid Ollama server URL"),

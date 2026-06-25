@@ -55,6 +55,14 @@ public enum VoiceInkAIEnhancementError: Error, Equatable, Sendable {
 
         return retryableNetworkCodes.contains(nsError.code) ? .networkError : nil
     }
+
+    public static func localCLIExecutionFailure(_ error: Error) -> VoiceInkAIEnhancementError {
+        if let localCLIError = error as? VoiceInkLocalCLIExecutionError {
+            return .customError(localCLIError.errorDescription ?? "An unknown Local CLI error occurred.")
+        }
+
+        return .customError(error.localizedDescription)
+    }
 }
 
 public enum VoiceInkAIEnhancementTransportFailure: Equatable, Sendable {

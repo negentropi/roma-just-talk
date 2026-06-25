@@ -83,7 +83,7 @@ public enum VoiceInkAudioPlaybackTimeline {
     }
 }
 
-public enum VoiceInkAudioPlaybackTimerTickAction: Equatable, Sendable {
+enum VoiceInkAudioPlaybackTimerTickAction: Equatable, Sendable {
     case none
     case markStopped
     case markStoppedAndSeek(TimeInterval)
@@ -91,9 +91,9 @@ public enum VoiceInkAudioPlaybackTimerTickAction: Equatable, Sendable {
 
 public struct VoiceInkAudioPlaybackTimerTickPlan: Equatable, Sendable {
     public let currentTime: TimeInterval
-    public let action: VoiceInkAudioPlaybackTimerTickAction
+    let action: VoiceInkAudioPlaybackTimerTickAction
 
-    public init(
+    init(
         currentTime: TimeInterval,
         action: VoiceInkAudioPlaybackTimerTickAction
     ) {

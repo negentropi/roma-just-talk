@@ -11401,6 +11401,11 @@ reject_pattern \
   'shouldStopTimer|playerSeekTime' \
   VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
 
+reject_pattern \
+  "shared audio player tick plan avoids public raw action interface" \
+  'public enum VoiceInkAudioPlaybackTimerTickAction|public let action: VoiceInkAudioPlaybackTimerTickAction' \
+  VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
+
 require_pattern \
   "shared audio player state plan lives in VoiceInkCore" \
   'VoiceInkAudioPlaybackState' \

@@ -39,7 +39,7 @@ public enum VoiceInkTranscriptionLanguageSource: Equatable, Sendable {
     case all
 }
 
-public enum VoiceInkTranscriptionLanguageSelectionControl: Equatable, Sendable {
+enum VoiceInkTranscriptionLanguageSelectionControl: Equatable, Sendable {
     case disabledAutodetect
     case picker
     case hiddenDefault
@@ -64,12 +64,24 @@ public struct VoiceInkTranscriptionLanguageSelectionFacts: Equatable, Sendable {
     public var isMultilingual: Bool
     public var languageOptions: [String: String]
 
-    public var control: VoiceInkTranscriptionLanguageSelectionControl {
+    var control: VoiceInkTranscriptionLanguageSelectionControl {
         if source.disablesTranscriptionLanguageSelection {
             return .disabledAutodetect
         }
 
         return isMultilingual ? .picker : .hiddenDefault
+    }
+
+    public var shouldShowDisabledAutodetectControl: Bool {
+        control == .disabledAutodetect
+    }
+
+    public var shouldShowPicker: Bool {
+        control == .picker
+    }
+
+    public var shouldShowDefaultLanguageOnly: Bool {
+        control == .hiddenDefault
     }
 
     public var showsNativeAppleAssetControl: Bool {

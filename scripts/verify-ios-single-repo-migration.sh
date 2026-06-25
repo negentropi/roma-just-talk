@@ -771,7 +771,12 @@ require_pattern \
 
 require_pattern \
   "shared transcription language selection facts live in VoiceInkCore" \
-  'VoiceInkTranscriptionLanguageSelectionFacts|VoiceInkTranscriptionLanguageSelectionControl|compatibleLanguage' \
+  'VoiceInkTranscriptionLanguageSelectionFacts|shouldShowDisabledAutodetectControl|shouldShowPicker|shouldShowDefaultLanguageOnly|compatibleLanguage' \
+  VoiceInkCore/Sources/VoiceInkCore/LanguageCatalog.swift
+
+reject_pattern \
+  "shared transcription language selection facts avoid public raw control enum" \
+  'public enum +VoiceInkTranscriptionLanguageSelectionControl|public var +control: +VoiceInkTranscriptionLanguageSelectionControl' \
   VoiceInkCore/Sources/VoiceInkCore/LanguageCatalog.swift
 
 require_pattern \
@@ -801,7 +806,7 @@ require_pattern \
 
 require_pattern \
   "macOS language picker uses shared selection facts" \
-  'languageSelectionFacts|facts\.control|showsNativeAppleAssetControl' \
+  'languageSelectionFacts|facts\.(shouldShowDisabledAutodetectControl|shouldShowPicker|shouldShowDefaultLanguageOnly|showsNativeAppleAssetControl)' \
   "VoiceInk/Views/AI Models/LanguageSelectionView.swift"
 
 require_pattern \
@@ -847,6 +852,11 @@ reject_pattern \
 reject_pattern \
   "macOS language picker avoids duplicate provider selection policy" \
   'languageSelectionDisabled|isMultilingualModel\(|isNativeAppleModelSelected|availableLanguagesForCurrentModel|provider == \.(gemini|nativeApple)' \
+  "VoiceInk/Views/AI Models/LanguageSelectionView.swift"
+
+reject_pattern \
+  "macOS language picker avoids direct shared language control switching" \
+  'facts\.control|switch +facts\.control|case \.(disabledAutodetect|picker|hiddenDefault)' \
   "VoiceInk/Views/AI Models/LanguageSelectionView.swift"
 
 reject_pattern \

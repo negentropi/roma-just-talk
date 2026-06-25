@@ -92,8 +92,7 @@ struct LanguageSelectionView: View {
                 .font(.headline)
 
             if let facts = languageSelectionFacts {
-                switch facts.control {
-                case .disabledAutodetect:
+                if facts.shouldShowDisabledAutodetectControl {
                     VStack(alignment: .leading, spacing: 8) {
                         Text(VoiceInkTranscriptionLanguagePresentation.autoDetectedLabel)
                             .font(.subheadline)
@@ -104,7 +103,7 @@ struct LanguageSelectionView: View {
                             .foregroundColor(.secondary)
                     }
                     .disabled(true)
-                case .picker:
+                } else if facts.shouldShowPicker {
                     VStack(alignment: .leading, spacing: 8) {
                         HStack(spacing: 8) {
                             Picker(
@@ -134,7 +133,7 @@ struct LanguageSelectionView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                     }
-                case .hiddenDefault:
+                } else if facts.shouldShowDefaultLanguageOnly {
                     // For English-only models, force set language to English
                     VStack(alignment: .leading, spacing: 8) {
                         Text(VoiceInkTranscriptionLanguagePresentation.englishOnlyLabel)
@@ -168,8 +167,7 @@ struct LanguageSelectionView: View {
     private var menuItemView: some View {
         Group {
             if let facts = languageSelectionFacts {
-                switch facts.control {
-                case .disabledAutodetect:
+                if facts.shouldShowDisabledAutodetectControl {
                     Button {
                         // Do nothing, just showing info
                     } label: {
@@ -177,7 +175,7 @@ struct LanguageSelectionView: View {
                             .foregroundColor(.secondary)
                     }
                     .disabled(true)
-                case .picker:
+                } else if facts.shouldShowPicker {
                     HStack(spacing: 8) {
                         Menu {
                             ForEach(
@@ -211,7 +209,7 @@ struct LanguageSelectionView: View {
                             nativeAppleAssetControl
                         }
                     }
-                case .hiddenDefault:
+                } else if facts.shouldShowDefaultLanguageOnly {
                     englishOnlyMenuButton
                 }
             } else {

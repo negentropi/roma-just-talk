@@ -232,12 +232,24 @@ final class LanguageCatalogTests: XCTestCase {
         )
 
         XCTAssertEqual(geminiFacts.control, .disabledAutodetect)
+        XCTAssertTrue(geminiFacts.shouldShowDisabledAutodetectControl)
+        XCTAssertFalse(geminiFacts.shouldShowPicker)
+        XCTAssertFalse(geminiFacts.shouldShowDefaultLanguageOnly)
         XCTAssertFalse(geminiFacts.showsNativeAppleAssetControl)
         XCTAssertEqual(whisperFacts.control, .picker)
+        XCTAssertFalse(whisperFacts.shouldShowDisabledAutodetectControl)
+        XCTAssertTrue(whisperFacts.shouldShowPicker)
+        XCTAssertFalse(whisperFacts.shouldShowDefaultLanguageOnly)
         XCTAssertFalse(whisperFacts.showsNativeAppleAssetControl)
         XCTAssertEqual(nativeAppleFacts.control, .picker)
+        XCTAssertFalse(nativeAppleFacts.shouldShowDisabledAutodetectControl)
+        XCTAssertTrue(nativeAppleFacts.shouldShowPicker)
+        XCTAssertFalse(nativeAppleFacts.shouldShowDefaultLanguageOnly)
         XCTAssertTrue(nativeAppleFacts.showsNativeAppleAssetControl)
         XCTAssertEqual(englishOnlyFacts.control, .hiddenDefault)
+        XCTAssertFalse(englishOnlyFacts.shouldShowDisabledAutodetectControl)
+        XCTAssertFalse(englishOnlyFacts.shouldShowPicker)
+        XCTAssertTrue(englishOnlyFacts.shouldShowDefaultLanguageOnly)
     }
 
     func testTranscriptionLanguageSelectionFactsUseSharedCompatibleFallback() {

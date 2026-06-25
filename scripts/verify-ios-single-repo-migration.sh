@@ -16452,6 +16452,7 @@ require_patterns \
   VoiceInk/WindowManager.swift \
   'VoiceInkMacOSWindowIdentity\.mainIdentifierRawValue' \
   'VoiceInkMacOSWindowIdentity\.onboardingIdentifierRawValue' \
+  'VoiceInkMacOSWindowIdentity\.identifierListDebugText' \
   'VoiceInkMacOSWindowIdentity\.mainFrameAutosaveName' \
   'VoiceInkMacOSWindowIdentity\.mainTitle' \
   'VoiceInkMacOSWindowIdentity\.onboardingTitle'
@@ -16474,7 +16475,8 @@ require_patterns \
   'historyFrameAutosaveName' \
   'mainTitle' \
   'onboardingTitle' \
-  'historyTitle'
+  'historyTitle' \
+  'identifierListDebugText'
 
 require_patterns \
   "shared macOS log category identity lives in VoiceInkCore" \
@@ -16527,6 +16529,11 @@ reject_pattern \
   '"(VoiceInkMainWindowFrame|VoiceInkHistoryWindowFrame|roma-just-talk - Transcription History)"|loggingSubsystem\)\.(mainWindow|onboardingWindow|historyWindow)' \
   VoiceInk/WindowManager.swift \
   VoiceInk/HistoryWindowController.swift
+
+reject_pattern \
+  "macOS window manager avoids shell-owned window identifier list formatting" \
+  '\?\? "nil"|joined\(separator: ", "\)' \
+  VoiceInk/WindowManager.swift
 
 reject_pattern \
   "macOS window manager avoids shell-owned log category literal" \

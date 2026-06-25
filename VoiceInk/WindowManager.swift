@@ -122,7 +122,9 @@ class WindowManager: NSObject {
             return window
         }
 
-        let windowIDs = NSApplication.shared.windows.map { $0.identifier?.rawValue ?? "nil" }.joined(separator: ", ")
+        let windowIDs = VoiceInkMacOSWindowIdentity.identifierListDebugText(
+            NSApplication.shared.windows.map { $0.identifier?.rawValue }
+        )
         logger.error("resolveMainWindow: FAILED — no window found with main identifier. Total windows: \(NSApplication.shared.windows.count, privacy: .public), identifiers: \(windowIDs, privacy: .public)")
         return nil
     }

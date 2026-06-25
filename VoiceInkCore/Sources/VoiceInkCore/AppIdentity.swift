@@ -292,6 +292,10 @@ public enum VoiceInkMacOSWindowIdentity {
     public static var historyTitle: String {
         "\(VoiceInkAppIdentity.compactDisplayName) - Transcription History"
     }
+
+    public static func identifierListDebugText(_ rawValues: [String?]) -> String {
+        rawValues.map { $0 ?? "nil" }.joined(separator: ", ")
+    }
 }
 
 public enum VoiceInkMacOSLogCategory {

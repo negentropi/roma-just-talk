@@ -65,6 +65,15 @@ final class AppIdentityTests: XCTestCase {
         XCTAssertEqual(VoiceInkMacOSWindowIdentity.mainTitle, "roma-just-talk")
         XCTAssertEqual(VoiceInkMacOSWindowIdentity.onboardingTitle, "roma-just-talk Onboarding")
         XCTAssertEqual(VoiceInkMacOSWindowIdentity.historyTitle, "roma-just-talk - Transcription History")
+        XCTAssertEqual(
+            VoiceInkMacOSWindowIdentity.identifierListDebugText([
+                VoiceInkMacOSWindowIdentity.mainIdentifierRawValue,
+                nil,
+                VoiceInkMacOSWindowIdentity.historyIdentifierRawValue
+            ]),
+            "com.prakashjoshipax.voiceink.mainWindow, nil, com.prakashjoshipax.voiceink.historyWindow"
+        )
+        XCTAssertEqual(VoiceInkMacOSWindowIdentity.identifierListDebugText([]), "")
     }
 
     func testMacOSStorageAlertPresentationPreservesStartupCopy() {

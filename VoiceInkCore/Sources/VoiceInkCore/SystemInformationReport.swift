@@ -218,6 +218,54 @@ public enum VoiceInkSystemInformationReport {
     }
 }
 
+public enum VoiceInkSystemInformationPermissionStatus: Equatable, Sendable {
+    case granted
+    case notGranted
+    case denied
+    case restricted
+    case notDetermined
+    case unknown
+
+    public var displayText: String {
+        switch self {
+        case .granted:
+            return "Granted"
+        case .notGranted:
+            return "Not Granted"
+        case .denied:
+            return "Denied"
+        case .restricted:
+            return "Restricted"
+        case .notDetermined:
+            return "Not Determined"
+        case .unknown:
+            return "Unknown"
+        }
+    }
+
+    public static func grantStatus(isGranted: Bool) -> Self {
+        isGranted ? .granted : .notGranted
+    }
+}
+
+public enum VoiceInkSystemInformationLicenseStatus: Equatable, Sendable {
+    case licensedPro
+    case notLicensed
+
+    public var displayText: String {
+        switch self {
+        case .licensedPro:
+            return "Licensed (Pro)"
+        case .notLicensed:
+            return "Not Licensed"
+        }
+    }
+
+    public static func status(hasUsableStoredLicense: Bool) -> Self {
+        hasUsableStoredLicense ? .licensedPro : .notLicensed
+    }
+}
+
 public struct VoiceInkSystemInformationCopyButtonPresentation: Equatable, Sendable {
     public let systemImageName: String
     public let title: String

@@ -15851,6 +15851,9 @@ require_patterns \
   'generatedDateText' \
   'formatted\(date: \.long, time: \.standard\)' \
   'availableAudioDevicesText' \
+  'VoiceInkSystemInformationPermissionStatus' \
+  'VoiceInkSystemInformationLicenseStatus' \
+  '"(Granted|Not Granted|Denied|Restricted|Not Determined|Unknown|Licensed \(Pro\)|Not Licensed)"' \
   'noAudioDevicesDetectedText = "None detected"' \
   '=== VOICEINK SYSTEM INFORMATION ===' \
   'APP INFORMATION:' \
@@ -15876,6 +15879,8 @@ require_patterns \
   'VoiceInkSystemInformationReport\.macOS\(makeMacOSSystemInformationFacts\(\)\)' \
   'VoiceInkSystemInformationReport\.generatedDateText\(Date\(\)\)' \
   'VoiceInkSystemInformationReport\.availableAudioDevicesText' \
+  'VoiceInkSystemInformationPermissionStatus\.grantStatus' \
+  'VoiceInkSystemInformationLicenseStatus\.status' \
   'VoiceInkMacOSSystemInformationFacts'
 
 require_patterns \
@@ -15892,6 +15897,11 @@ reject_pattern \
   VoiceInk/Services/SystemInfoService.swift
 
 reject_pattern \
+  "macOS system info service avoids shell-owned permission and license diagnostic copy" \
+  '"(Granted|Not Granted|Denied|Restricted|Not Determined|Licensed \(Pro\)|Not Licensed)"' \
+  VoiceInk/Services/SystemInfoService.swift
+
+reject_pattern \
   "macOS dashboard avoids shell-owned system information copy presentation" \
   '"(Copy System Info|Copied!|doc\.on\.doc|checkmark)"|deadline: \.now\(\) \+ 1\.5' \
   VoiceInk/Views/Metrics/MetricsContent.swift
@@ -15905,12 +15915,14 @@ require_patterns \
   'SystemInformationReportTests\.testMacOSSystemInformationReportKeepsRollingBufferBlockVerbatim' \
   'SystemInformationReportTests\.testAvailableAudioDevicesTextPreservesMacOSDiagnosticsListPolicy' \
   'SystemInformationReportTests\.testGeneratedDateTextPreservesMacOSFormattingStyle' \
+  'SystemInformationReportTests\.testPermissionStatusPresentationPreservesMacOSDiagnosticsCopy' \
+  'SystemInformationReportTests\.testLicenseStatusPresentationPreservesMacOSDiagnosticsCopy' \
   'SystemInformationReportTests\.testSystemInformationCopyPresentationPreservesDashboardButtonPolicy'
 
 require_patterns \
   "migration docs describe shared macOS system information presentation" \
   docs/ios-single-repo-migration.md \
-  'macOS support system-information generated-date/report formatting, available-audio-device list formatting, and copy-button presentation' \
+  'macOS support system-information generated-date/report formatting, available-audio-device list formatting, permission/license diagnostic status copy, and copy-button presentation' \
   'VoiceInkSystemInformationReport' \
   'VoiceInkSystemInformationCopyPresentation'
 

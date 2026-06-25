@@ -163,44 +163,50 @@ class SystemInfoService {
     }
 
     private func getAccessibilityStatus() -> String {
-        return AXIsProcessTrusted() ? "Granted" : "Not Granted"
+        VoiceInkSystemInformationPermissionStatus.grantStatus(
+            isGranted: AXIsProcessTrusted()
+        ).displayText
     }
 
     private func getInputMonitoringStatus() -> String {
-        return ShortcutMonitor.preflightListenEventAccess() ? "Granted" : "Not Granted"
+        VoiceInkSystemInformationPermissionStatus.grantStatus(
+            isGranted: ShortcutMonitor.preflightListenEventAccess()
+        ).displayText
     }
 
     private func getScreenRecordingStatus() -> String {
-        return CGPreflightScreenCaptureAccess() ? "Granted" : "Not Granted"
+        VoiceInkSystemInformationPermissionStatus.grantStatus(
+            isGranted: CGPreflightScreenCaptureAccess()
+        ).displayText
     }
 
     private func getMicrophoneStatus() -> String {
+        let status: VoiceInkSystemInformationPermissionStatus
         switch AVCaptureDevice.authorizationStatus(for: .audio) {
         case .authorized:
-            return "Granted"
+            status = .granted
         case .denied:
-            return "Denied"
+            status = .denied
         case .restricted:
-            return "Restricted"
+            status = .restricted
         case .notDetermined:
-            return "Not Determined"
+            status = .notDetermined
         @unknown default:
-            return "Unknown"
+            status = .unknown
         }
+
+        return status.displayText
     }
 
     private func getLicenseStatus() -> String {
         let licenseManager = LicenseManager.shared
 
-        // Check for existing license key and activation
-        if VoiceInkLicensePreference.hasUsableStoredLicense(
-            licenseKey: licenseManager.licenseKey,
-            activationId: licenseManager.activationId
-        ) {
-            return "Licensed (Pro)"
-        }
-
-        return "Not Licensed"
+        return VoiceInkSystemInformationLicenseStatus.status(
+            hasUsableStoredLicense: VoiceInkLicensePreference.hasUsableStoredLicense(
+                licenseKey: licenseManager.licenseKey,
+                activationId: licenseManager.activationId
+            )
+        ).displayText
     }
 
 }

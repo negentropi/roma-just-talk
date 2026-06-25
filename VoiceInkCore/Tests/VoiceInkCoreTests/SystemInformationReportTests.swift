@@ -154,6 +154,36 @@ final class SystemInformationReportTests: XCTestCase {
         )
     }
 
+    func testPermissionStatusPresentationPreservesMacOSDiagnosticsCopy() {
+        XCTAssertEqual(
+            VoiceInkSystemInformationPermissionStatus.grantStatus(isGranted: true),
+            .granted
+        )
+        XCTAssertEqual(
+            VoiceInkSystemInformationPermissionStatus.grantStatus(isGranted: false),
+            .notGranted
+        )
+        XCTAssertEqual(VoiceInkSystemInformationPermissionStatus.granted.displayText, "Granted")
+        XCTAssertEqual(VoiceInkSystemInformationPermissionStatus.notGranted.displayText, "Not Granted")
+        XCTAssertEqual(VoiceInkSystemInformationPermissionStatus.denied.displayText, "Denied")
+        XCTAssertEqual(VoiceInkSystemInformationPermissionStatus.restricted.displayText, "Restricted")
+        XCTAssertEqual(VoiceInkSystemInformationPermissionStatus.notDetermined.displayText, "Not Determined")
+        XCTAssertEqual(VoiceInkSystemInformationPermissionStatus.unknown.displayText, "Unknown")
+    }
+
+    func testLicenseStatusPresentationPreservesMacOSDiagnosticsCopy() {
+        XCTAssertEqual(
+            VoiceInkSystemInformationLicenseStatus.status(hasUsableStoredLicense: true),
+            .licensedPro
+        )
+        XCTAssertEqual(
+            VoiceInkSystemInformationLicenseStatus.status(hasUsableStoredLicense: false),
+            .notLicensed
+        )
+        XCTAssertEqual(VoiceInkSystemInformationLicenseStatus.licensedPro.displayText, "Licensed (Pro)")
+        XCTAssertEqual(VoiceInkSystemInformationLicenseStatus.notLicensed.displayText, "Not Licensed")
+    }
+
     func testSystemInformationCopyPresentationPreservesDashboardButtonPolicy() {
         XCTAssertEqual(
             VoiceInkSystemInformationCopyPresentation.button(isCopied: false),

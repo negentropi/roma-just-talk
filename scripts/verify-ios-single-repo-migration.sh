@@ -10291,6 +10291,26 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
+  "shared selected-text diagnostics live with AI prompt context policy" \
+  'VoiceInkSelectedTextDiagnostics|fetchFailedMessage|Failed to get selected text:' \
+  VoiceInkCore/Sources/VoiceInkCore/AIPrompts.swift
+
+require_pattern \
+  "core checks execute selected-text diagnostics test" \
+  'AIPromptsTests\.testSelectedTextDiagnosticsPreservesMacOSFailureCopy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "macOS selected-text service adapts shared diagnostics" \
+  'VoiceInkSelectedTextDiagnostics\.fetchFailedMessage' \
+  VoiceInk/Services/SelectedTextService.swift
+
+reject_pattern \
+  "macOS selected-text service avoids shell-owned diagnostic copy" \
+  '"Failed to get selected text:' \
+  VoiceInk/Services/SelectedTextService.swift
+
+require_pattern \
   "macOS screen capture service adapts shared screen-context policy" \
   'VoiceInkAIEnhancementScreenContext\.(preferredWindowIndex|contextText|extractedText)|voiceInkScreenCaptureWindowFacts' \
   VoiceInk/Services/ScreenCaptureService.swift

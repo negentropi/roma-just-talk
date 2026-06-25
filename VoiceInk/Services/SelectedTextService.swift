@@ -1,6 +1,7 @@
 import Foundation
 import AppKit
 import SelectedTextKit
+import VoiceInkCore
 
 class SelectedTextService {
     static func fetchSelectedText() async -> String? {
@@ -9,7 +10,7 @@ class SelectedTextService {
             let selectedText = try await SelectedTextManager.shared.getSelectedText(strategies: strategies)
             return selectedText
         } catch {
-            print("Failed to get selected text: \(error)")
+            print(VoiceInkSelectedTextDiagnostics.fetchFailedMessage(errorDescription: String(describing: error)))
             return nil
         }
     }

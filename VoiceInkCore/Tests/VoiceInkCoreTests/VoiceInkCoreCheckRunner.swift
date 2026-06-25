@@ -141,6 +141,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "AIPromptsTests.testEnhancementVocabularyContextFormatsTermsInOrder", run: { AIPromptsTests().testEnhancementVocabularyContextFormatsTermsInOrder() }),
             VoiceInkCoreCheck(name: "AIPromptsTests.testEnhancementVocabularyContextNormalizesRawTermsForPostProcessing", run: { AIPromptsTests().testEnhancementVocabularyContextNormalizesRawTermsForPostProcessing() }),
             VoiceInkCoreCheck(name: "AIPromptsTests.testEnhancementVocabularyContextReturnsEmptyForNoTerms", run: { AIPromptsTests().testEnhancementVocabularyContextReturnsEmptyForNoTerms() }),
+            VoiceInkCoreCheck(name: "AIPromptsTests.testSelectedTextDiagnosticsPreservesMacOSFailureCopy", run: { AIPromptsTests().testSelectedTextDiagnosticsPreservesMacOSFailureCopy() }),
             VoiceInkCoreCheck(name: "AIPromptsTests.testScreenContextPrefersFrontmostVisibleNonSelfWindow", run: { AIPromptsTests().testScreenContextPrefersFrontmostVisibleNonSelfWindow() }),
             VoiceInkCoreCheck(name: "AIPromptsTests.testScreenContextFallsBackToFirstVisibleNonSelfWindow", run: { AIPromptsTests().testScreenContextFallsBackToFirstVisibleNonSelfWindow() }),
             VoiceInkCoreCheck(name: "AIPromptsTests.testScreenContextTextPreservesMacOSCaptureCopy", run: { AIPromptsTests().testScreenContextTextPreservesMacOSCaptureCopy() }),

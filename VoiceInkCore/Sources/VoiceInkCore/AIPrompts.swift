@@ -147,6 +147,12 @@ public struct VoiceInkAIEnhancementPromptContext: Equatable, Sendable {
     }
 }
 
+public enum VoiceInkSelectedTextDiagnostics {
+    public static func fetchFailedMessage(errorDescription: String) -> String {
+        "Failed to get selected text: \(errorDescription)"
+    }
+}
+
 public enum VoiceInkAIEnhancementPromptBuilder {
     public static func systemMessage(
         basePrompt: String,

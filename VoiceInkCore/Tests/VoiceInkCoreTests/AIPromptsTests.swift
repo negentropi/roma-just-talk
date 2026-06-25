@@ -93,6 +93,13 @@ final class AIPromptsTests: XCTestCase {
         )
     }
 
+    func testSelectedTextDiagnosticsPreservesMacOSFailureCopy() {
+        XCTAssertEqual(
+            VoiceInkSelectedTextDiagnostics.fetchFailedMessage(errorDescription: "permission denied"),
+            "Failed to get selected text: permission denied"
+        )
+    }
+
     func testScreenContextPrefersFrontmostVisibleNonSelfWindow() {
         let windows = [
             screenWindow(processID: 7, title: "Background"),

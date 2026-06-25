@@ -1289,20 +1289,29 @@ require_pattern \
   'VoiceInkAudioRecorderStartFailurePolicy\.returnedFalseError\(\)' \
   iOS/VoiceInk-ios/AudioRecorder.swift
 
-require_pattern \
+require_patterns \
   "VoiceInkCore owns iOS recording start action policy" \
-  'VoiceInkRecordingStart(Action|Policy)|action\(modeCount:|applyRuntimeState' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift \
+  'VoiceInkRecordingStartPolicy' \
+  'VoiceInkRecordingStartPlan' \
+  'public static func plan\(modeCount:' \
+  'applyRuntimeState'
 
 require_pattern \
   "VoiceInkCore checks cover iOS recording start action policy" \
-  'testRecordingStartPolicy(StartsWhenModesAreAvailable|PresentsNoModeAlertWhenNoModesAreAvailable)|testRecordingStartActionAppliesRuntimeState' \
+  'testRecordingStartPlanStartsOrPresentsNoModeAlert' \
   VoiceInkCore/Tests/VoiceInkCoreTests/RecordingStatePolicyTests.swift
 
-require_pattern \
+reject_pattern \
+  "VoiceInkCore recording start policy avoids public action-only helper" \
+  'public (enum VoiceInkRecordingStartAction|static func action\(modeCount:)' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
+require_patterns \
   "iOS recording manager delegates every start entrypoint to shared mode-count policy and action application" \
-  'VoiceInkRecordingStartPolicy\.action|action\.applyRuntimeState' \
-  iOS/VoiceInk-ios/RecordingManager.swift
+  iOS/VoiceInk-ios/RecordingManager.swift \
+  'VoiceInkRecordingStartPolicy\.plan' \
+  'plan\.applyRuntimeState'
 
 reject_pattern \
   "iOS recording manager avoids shell-owned recording action sequencing" \

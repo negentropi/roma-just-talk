@@ -1132,11 +1132,11 @@ public struct VoiceInkRecordingAlertPresentation: Equatable, Identifiable, Senda
     }
 }
 
-public enum VoiceInkRecordingStartAction: Equatable, Sendable {
+enum VoiceInkRecordingStartAction: Equatable, Sendable {
     case startRecording
     case presentAlert(VoiceInkRecordingAlertPresentation)
 
-    public func applyRuntimeState(
+    func applyRuntimeState(
         startRecording: () -> Void,
         presentAlert: (VoiceInkRecordingAlertPresentation) -> Void
     ) {
@@ -1149,9 +1149,29 @@ public enum VoiceInkRecordingStartAction: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkRecordingStartPlan: Sendable {
+    private let action: VoiceInkRecordingStartAction
+
+    init(action: VoiceInkRecordingStartAction) {
+        self.action = action
+    }
+
+    public func applyRuntimeState(
+        startRecording: () -> Void,
+        presentAlert: (VoiceInkRecordingAlertPresentation) -> Void
+    ) {
+        action.applyRuntimeState(
+            startRecording: startRecording,
+            presentAlert: presentAlert
+        )
+    }
+}
+
 public enum VoiceInkRecordingStartPolicy {
-    public static func action(modeCount: Int) -> VoiceInkRecordingStartAction {
-        modeCount <= 0 ? .presentAlert(.noModesAvailable) : .startRecording
+    public static func plan(modeCount: Int) -> VoiceInkRecordingStartPlan {
+        VoiceInkRecordingStartPlan(
+            action: modeCount <= 0 ? .presentAlert(.noModesAvailable) : .startRecording
+        )
     }
 }
 

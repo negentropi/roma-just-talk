@@ -1041,44 +1041,36 @@ final class RecordingStatePolicyTests: XCTestCase {
         )
     }
 
-    func testRecordingStartPolicyStartsWhenModesAreAvailable() {
-        XCTAssertEqual(
-            VoiceInkRecordingStartPolicy.action(modeCount: 1),
-            .startRecording
-        )
-    }
+    func testRecordingStartPlanStartsOrPresentsNoModeAlert() {
+        var events: [String] = []
 
-    func testRecordingStartPolicyPresentsNoModeAlertWhenNoModesAreAvailable() {
-        XCTAssertEqual(
-            VoiceInkRecordingStartPolicy.action(modeCount: 0),
-            .presentAlert(.noModesAvailable)
+        VoiceInkRecordingStartPolicy.plan(modeCount: 1).applyRuntimeState(
+            startRecording: { events.append("start") },
+            presentAlert: { alert in events.append("alert:\(alert.id)") }
+        )
+        VoiceInkRecordingStartPolicy.plan(modeCount: 0).applyRuntimeState(
+            startRecording: { events.append("start") },
+            presentAlert: { alert in events.append("alert:\(alert.id)") }
         )
 
-        let alert = VoiceInkRecordingAlertPresentation.noModesAvailable
+        XCTAssertEqual(events, ["start", "alert:noModesAvailable"])
+
+        var presentedAlert: VoiceInkRecordingAlertPresentation?
+        VoiceInkRecordingStartPolicy.plan(modeCount: 0).applyRuntimeState(
+            startRecording: {},
+            presentAlert: { presentedAlert = $0 }
+        )
+
+        guard let alert = presentedAlert else {
+            XCTFail("Expected no-modes alert")
+            return
+        }
         XCTAssertEqual(alert.id, "noModesAvailable")
         XCTAssertEqual(alert.title, "No Modes Found")
         XCTAssertEqual(alert.message, "Please create a new mode in Settings before recording.")
         XCTAssertEqual(alert.primaryButtonTitle, "OK")
         XCTAssertNil(alert.secondaryButtonTitle)
         XCTAssertEqual(alert.action, .dismiss)
-    }
-
-    func testRecordingStartActionAppliesRuntimeState() {
-        var events: [String] = []
-
-        VoiceInkRecordingStartAction.startRecording.applyRuntimeState(
-            startRecording: { events.append("start") },
-            presentAlert: { alert in events.append("alert:\(alert.id)") }
-        )
-        VoiceInkRecordingStartAction.presentAlert(.noModesAvailable).applyRuntimeState(
-            startRecording: { events.append("start") },
-            presentAlert: { alert in events.append("alert:\(alert.id)") }
-        )
-
-        XCTAssertEqual(events, [
-            "start",
-            "alert:noModesAvailable"
-        ])
     }
 
     func testRecordingAlertPresentationPreservesIOSPermissionDeniedCopy() {

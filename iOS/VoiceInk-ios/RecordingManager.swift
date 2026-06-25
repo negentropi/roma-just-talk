@@ -75,13 +75,13 @@ final class RecordingManager: ObservableObject {
     
     // MARK: - Recording Flow
     func startRecordingFlow() {
-        applyStartAction(
-            VoiceInkRecordingStartPolicy.action(modeCount: settings.modes.count)
+        applyStartPlan(
+            VoiceInkRecordingStartPolicy.plan(modeCount: settings.modes.count)
         )
     }
 
-    private func applyStartAction(_ action: VoiceInkRecordingStartAction) {
-        action.applyRuntimeState(
+    private func applyStartPlan(_ plan: VoiceInkRecordingStartPlan) {
+        plan.applyRuntimeState(
             startRecording: startRecordingWithPermissionCheck,
             presentAlert: { activeRecordingAlert = $0 }
         )

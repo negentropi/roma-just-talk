@@ -115,10 +115,6 @@ final class AppSettings: ObservableObject {
         providerAccessSnapshot.apiKeyListRows()
     }
 
-    func availableProviders(for use: VoiceInkProviderModelUse) -> [VoiceInkProviderKind] {
-        providerAccessSnapshot.availableProviders(for: use)
-    }
-
     var modeFormProviderAvailability: VoiceInkModeFormProviderAvailability {
         providerAccessSnapshot.modeFormProviderAvailability
     }

@@ -12406,6 +12406,11 @@ require_pattern \
   'providerAccessSnapshot\.modeFormProviderAvailability' \
   iOS/VoiceInk-ios/AppSettings.swift
 
+reject_pattern \
+  "iOS settings adapter avoids unused provider availability pass-through" \
+  'func +availableProviders\(for use: VoiceInkProviderModelUse\)' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
 require_pattern \
   "shared provider model selection presentation lives in VoiceInkCore" \
   'VoiceInkProviderModelSelectionPresentation|modelSelectionPresentation|fixedModelName|selectableModels|shouldShowPicker' \

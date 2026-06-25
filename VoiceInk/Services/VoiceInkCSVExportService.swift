@@ -13,14 +13,14 @@ class VoiceInkCSVExportService {
         
         let savePanel = NSSavePanel()
         savePanel.allowedContentTypes = [.commaSeparatedText]
-        savePanel.nameFieldStringValue = "VoiceInk-transcription.csv"
+        savePanel.nameFieldStringValue = VoiceInkTranscriptionCSVExporter.defaultFilename
         
         savePanel.begin { result in
             if result == .OK, let url = savePanel.url {
                 do {
                     try csvString.write(to: url, atomically: true, encoding: .utf8)
                 } catch {
-                    print("Error writing CSV file: \(error)")
+                    print(VoiceInkTranscriptionCSVExporter.writeFailureDiagnosticMessage(errorDescription: String(describing: error)))
                 }
             }
         }

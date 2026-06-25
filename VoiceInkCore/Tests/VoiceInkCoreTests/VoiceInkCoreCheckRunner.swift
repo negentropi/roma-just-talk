@@ -1465,6 +1465,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "TranscriptParagraphFormatterTests.testFormatReturnsEmptyForWhitespaceOnlyInput", run: { TranscriptParagraphFormatterTests().testFormatReturnsEmptyForWhitespaceOnlyInput() }),
             VoiceInkCoreCheck(name: "TranscriptParagraphFormatterTests.testFormatTrimsAndKeepsShortTextInOneParagraph", run: { TranscriptParagraphFormatterTests().testFormatTrimsAndKeepsShortTextInOneParagraph() }),
             VoiceInkCoreCheck(name: "TranscriptParagraphFormatterTests.testFormatSplitsAfterFourSignificantSentencesWhenChunkHitsWordTarget", run: { TranscriptParagraphFormatterTests().testFormatSplitsAfterFourSignificantSentencesWhenChunkHitsWordTarget() }),
+            VoiceInkCoreCheck(name: "TranscriptionCSVExportTests.testCSVExportPresentationPreservesMacOSFilenameAndFailureCopy", run: { TranscriptionCSVExportTests().testCSVExportPresentationPreservesMacOSFilenameAndFailureCopy() }),
             VoiceInkCoreCheck(name: "TranscriptionCSVExportTests.testCSVStringPreservesMacOSHeaderAndColumnOrder", run: { TranscriptionCSVExportTests().testCSVStringPreservesMacOSHeaderAndColumnOrder() }),
             VoiceInkCoreCheck(name: "TranscriptionCSVExportTests.testCSVStringUsesMacOSOptionalFallbacks", run: { TranscriptionCSVExportTests().testCSVStringUsesMacOSOptionalFallbacks() }),
             VoiceInkCoreCheck(name: "TranscriptionCSVExportTests.testEscapeCSVStringPreservesExistingMacOSQuotingPolicy", run: { TranscriptionCSVExportTests().testEscapeCSVStringPreservesExistingMacOSQuotingPolicy() }),

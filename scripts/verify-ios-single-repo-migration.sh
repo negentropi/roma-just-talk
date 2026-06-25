@@ -749,6 +749,28 @@ require_patterns \
   'plainTextFileExtension = "txt"' \
   'markdownFileExtension = "md"'
 
+require_patterns \
+  "shared CSV export owns macOS filename and failure copy" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptExport.swift \
+  'defaultFilename = "VoiceInk-transcription\.csv"' \
+  'writeFailureDiagnosticMessage' \
+  'Error writing CSV file:'
+
+require_pattern \
+  "macOS CSV export service uses shared CSV export presentation" \
+  'VoiceInkTranscriptionCSVExporter\.(defaultFilename|writeFailureDiagnosticMessage)' \
+  VoiceInk/Services/VoiceInkCSVExportService.swift
+
+reject_pattern \
+  "macOS CSV export service avoids shell-owned filename and failure copy" \
+  '"VoiceInk-transcription\.csv"|"Error writing CSV file:' \
+  VoiceInk/Services/VoiceInkCSVExportService.swift
+
+require_pattern \
+  "core checks execute CSV export presentation test" \
+  'TranscriptionCSVExportTests\.testCSVExportPresentationPreservesMacOSFilenameAndFailureCopy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
 reject_file VoiceInkCore/Sources/VoiceInkCore/TranscriptFileExport.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/TranscriptionCSVExport.swift
 

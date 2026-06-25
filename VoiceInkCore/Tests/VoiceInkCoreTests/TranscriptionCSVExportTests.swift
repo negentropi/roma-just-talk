@@ -2,6 +2,14 @@ import Foundation
 import VoiceInkCore
 
 final class TranscriptionCSVExportTests: XCTestCase {
+    func testCSVExportPresentationPreservesMacOSFilenameAndFailureCopy() {
+        XCTAssertEqual(VoiceInkTranscriptionCSVExporter.defaultFilename, "VoiceInk-transcription.csv")
+        XCTAssertEqual(
+            VoiceInkTranscriptionCSVExporter.writeFailureDiagnosticMessage(errorDescription: "disk full"),
+            "Error writing CSV file: disk full"
+        )
+    }
+
     func testCSVStringPreservesMacOSHeaderAndColumnOrder() {
         let csv = VoiceInkTranscriptionCSVExporter.csvString(for: [
             VoiceInkTranscriptionCSVRecord(

@@ -99,7 +99,13 @@ public struct VoiceInkTranscriptionCSVRecord: Equatable, Sendable {
 }
 
 public enum VoiceInkTranscriptionCSVExporter {
+    public static let defaultFilename = "VoiceInk-transcription.csv"
+    public static let writeFailurePrefix = "Error writing CSV file:"
     public static let header = "Original Transcript,Enhanced Transcript,Enhancement Model,Prompt Name,Transcription Model,Power Mode,Enhancement Time,Transcription Time,Timestamp,Duration"
+
+    public static func writeFailureDiagnosticMessage(errorDescription: String) -> String {
+        "\(writeFailurePrefix) \(errorDescription)"
+    }
 
     public static func csvString(for records: [VoiceInkTranscriptionCSVRecord]) -> String {
         var csvString = header + "\n"

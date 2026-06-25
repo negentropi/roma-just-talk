@@ -416,4 +416,92 @@ final class CustomCloudModelPolicyTests: XCTestCase {
         XCTAssertTrue(VoiceInkCustomCloudTranscriptionPolicy.acceptsTranscriptionText("transcript"))
         XCTAssertFalse(VoiceInkCustomCloudTranscriptionPolicy.acceptsTranscriptionText(""))
     }
+
+    func testCustomCloudTranscriptionPolicyBuildsSharedTransportRequest() async throws {
+        let requestCapture = CustomCloudTranscriptionRequestCapture()
+
+        let text = try await VoiceInkCustomCloudTranscriptionPolicy.transcribeAudioData(
+            apiEndpoint: "https://api.example.com/v1/audio/transcriptions",
+            apiKey: "custom-key",
+            model: "custom-stt",
+            audioData: Data([1, 2, 3]),
+            fileName: "clip.wav",
+            language: "en",
+            prompt: "spell Roma correctly"
+        ) { request in
+            await requestCapture.store(request)
+            return "custom transcript"
+        }
+
+        let capturedRequest = await requestCapture.value
+        let request = try XCTUnwrap(capturedRequest)
+        XCTAssertEqual(text, "custom transcript")
+        XCTAssertEqual(request.url.absoluteString, "https://api.example.com/v1/audio/transcriptions")
+        XCTAssertEqual(request.apiKey, "custom-key")
+        XCTAssertEqual(request.model, "custom-stt")
+        XCTAssertEqual(request.audioData, Data([1, 2, 3]))
+        XCTAssertEqual(request.fileName, "clip.wav")
+        XCTAssertEqual(request.language, "en")
+        XCTAssertEqual(request.prompt, "spell Roma correctly")
+        XCTAssertEqual(request.options, VoiceInkCustomCloudTranscriptionPolicy.openAICompatibleOptions)
+    }
+
+    func testCustomCloudTranscriptionPolicyRejectsEmptyTransportText() async {
+        do {
+            _ = try await VoiceInkCustomCloudTranscriptionPolicy.transcribeAudioData(
+                apiEndpoint: "https://api.example.com/v1/audio/transcriptions",
+                apiKey: "custom-key",
+                model: "custom-stt",
+                audioData: Data(),
+                fileName: "clip.wav",
+                language: nil,
+                prompt: nil
+            ) { _ in
+                ""
+            }
+            XCTFail("Expected empty custom cloud transcription error")
+        } catch VoiceInkCloudTranscriptionError.noTranscriptionReturned {
+            // Expected.
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+
+    func testCustomCloudTranscriptionPolicyMapsHTTPNSError() async {
+        do {
+            _ = try await VoiceInkCustomCloudTranscriptionPolicy.transcribeAudioData(
+                apiEndpoint: "https://api.example.com/v1/audio/transcriptions",
+                apiKey: "custom-key",
+                model: "custom-stt",
+                audioData: Data(),
+                fileName: "clip.wav",
+                language: nil,
+                prompt: nil
+            ) { _ in
+                throw NSError(
+                    domain: VoiceInkCustomCloudTranscriptionPolicy.apiErrorDomain,
+                    code: 429,
+                    userInfo: [NSLocalizedDescriptionKey: "rate limited"]
+                )
+            }
+            XCTFail("Expected API request failure")
+        } catch VoiceInkCloudTranscriptionError.apiRequestFailed(let statusCode, let message) {
+            XCTAssertEqual(statusCode, 429)
+            XCTAssertEqual(message, "rate limited")
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+}
+
+private actor CustomCloudTranscriptionRequestCapture {
+    private var storedValue: VoiceInkCustomCloudTranscriptionRequest?
+
+    var value: VoiceInkCustomCloudTranscriptionRequest? {
+        storedValue
+    }
+
+    func store(_ request: VoiceInkCustomCloudTranscriptionRequest) {
+        storedValue = request
+    }
 }

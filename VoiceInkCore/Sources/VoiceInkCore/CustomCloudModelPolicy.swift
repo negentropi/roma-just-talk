@@ -409,6 +409,8 @@ public enum VoiceInkCustomCloudModelPolicy {
 }
 
 public enum VoiceInkCustomCloudTranscriptionPolicy {
+    typealias TranscriptionTransport = @Sendable (VoiceInkCustomCloudTranscriptionRequest) async throws -> String
+
     public static let apiErrorDomain = "CustomWhisperTranscriptionService"
     public static let invalidEndpointDescription = "Invalid API endpoint URL"
 
@@ -426,4 +428,99 @@ public enum VoiceInkCustomCloudTranscriptionPolicy {
     public static func acceptsTranscriptionText(_ text: String) -> Bool {
         !text.isEmpty
     }
+
+    public static func transcribeAudioData(
+        apiEndpoint: String,
+        apiKey: String,
+        model: String,
+        audioData: Data,
+        fileName: String,
+        language: String?,
+        prompt: String?
+    ) async throws -> String {
+        try await transcribeAudioData(
+            apiEndpoint: apiEndpoint,
+            apiKey: apiKey,
+            model: model,
+            audioData: audioData,
+            fileName: fileName,
+            language: language,
+            prompt: prompt
+        ) { request in
+            try await VoiceInkOpenAICompatibleTranscriptionClient().transcribeAudioData(
+                url: request.url,
+                apiKey: request.apiKey,
+                model: request.model,
+                audioData: request.audioData,
+                fileName: request.fileName,
+                language: request.language,
+                prompt: request.prompt,
+                responseFormat: request.options.openAICompatibleResponseFormat,
+                temperature: request.options.openAICompatibleTemperature,
+                errorDomain: request.options.openAICompatibleErrorDomain,
+                timeout: request.options.openAICompatibleTimeout,
+                maxRetries: request.options.openAICompatibleMaxRetries,
+                allowPlainTextFallback: request.options.openAICompatibleAllowsPlainTextFallback
+            )
+        }
+    }
+
+    static func transcribeAudioData(
+        apiEndpoint: String,
+        apiKey: String,
+        model: String,
+        audioData: Data,
+        fileName: String,
+        language: String?,
+        prompt: String?,
+        transport: TranscriptionTransport
+    ) async throws -> String {
+        guard let url = endpointURL(from: apiEndpoint) else {
+            throw NSError(
+                domain: apiErrorDomain,
+                code: -1,
+                userInfo: [NSLocalizedDescriptionKey: invalidEndpointDescription]
+            )
+        }
+
+        let request = VoiceInkCustomCloudTranscriptionRequest(
+            url: url,
+            apiKey: apiKey,
+            model: model,
+            audioData: audioData,
+            fileName: fileName,
+            language: language,
+            prompt: prompt,
+            options: openAICompatibleOptions
+        )
+
+        do {
+            let text = try await transport(request)
+            guard acceptsTranscriptionText(text) else {
+                throw VoiceInkCloudTranscriptionError.noTranscriptionReturned
+            }
+            return text
+        } catch let error as VoiceInkCloudTranscriptionError {
+            throw error
+        } catch {
+            if let apiError = VoiceInkCloudTranscriptionError.apiRequestFailure(
+                from: error as NSError,
+                matchingErrorDomain: apiErrorDomain
+            ) {
+                throw apiError
+            }
+            throw error
+        }
+    }
+}
+
+struct VoiceInkCustomCloudTranscriptionRequest: Equatable, Sendable {
+    let url: URL
+    let apiKey: String
+    let model: String
+    let audioData: Data
+    let fileName: String
+    let language: String?
+    let prompt: String?
+    let options: VoiceInkRemoteTranscriptionOptions
 }

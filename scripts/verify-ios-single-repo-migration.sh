@@ -5543,7 +5543,7 @@ require_pattern \
 
 require_pattern \
   "macOS custom cloud transcription uses shared request policy" \
-  'VoiceInkCustomCloudTranscriptionPolicy\.(endpointURL|openAICompatibleOptions|acceptsTranscriptionText|apiErrorDomain)' \
+  'VoiceInkCustomCloudTranscriptionPolicy\.transcribeAudioData' \
   VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift
 
 require_pattern \
@@ -7599,6 +7599,29 @@ reject_pattern \
 reject_pattern \
   "macOS custom cloud avoids duplicate empty-response error copy" \
   'The API returned an empty or invalid response\.' \
+  VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift
+
+require_patterns \
+  "shared custom cloud transcription execution lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift \
+  'VoiceInkCustomCloudTranscriptionRequest' \
+  'transcribeAudioData\(' \
+  'VoiceInkOpenAICompatibleTranscriptionClient\(\)\.transcribeAudioData' \
+  'VoiceInkCloudTranscriptionError\.apiRequestFailure'
+
+require_pattern \
+  "core checks execute custom cloud transcription execution tests" \
+  'CustomCloudModelPolicyTests\.testCustomCloudTranscriptionPolicyBuildsSharedTransportRequest|CustomCloudModelPolicyTests\.testCustomCloudTranscriptionPolicyRejectsEmptyTransportText|CustomCloudModelPolicyTests\.testCustomCloudTranscriptionPolicyMapsHTTPNSError' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "macOS custom cloud transcription uses shared execution policy" \
+  'VoiceInkCustomCloudTranscriptionPolicy\.transcribeAudioData' \
+  VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift
+
+reject_pattern \
+  "macOS custom cloud transcription avoids shell-owned execution policy" \
+  'VoiceInkOpenAICompatibleTranscriptionClient|openAICompatibleTranscriptionClient|transcribeCustomModel|VoiceInkCustomCloudTranscriptionPolicy\.(endpointURL|openAICompatibleOptions|acceptsTranscriptionText|apiErrorDomain|invalidEndpointDescription)' \
   VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift
 
 reject_pattern \

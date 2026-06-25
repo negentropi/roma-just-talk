@@ -4,7 +4,6 @@ import VoiceInkCore
 
 class CloudTranscriptionService: TranscriptionService {
     private let modelContext: ModelContext
-    private let openAICompatibleTranscriptionClient = VoiceInkOpenAICompatibleTranscriptionClient()
 
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
@@ -21,10 +20,12 @@ class CloudTranscriptionService: TranscriptionService {
                 guard let customModel = model as? CustomCloudModel else {
                     throw CloudTranscriptionError.unsupportedProvider
                 }
-                return try await transcribeCustomModel(
+                return try await VoiceInkCustomCloudTranscriptionPolicy.transcribeAudioData(
+                    apiEndpoint: customModel.apiEndpoint,
+                    apiKey: customModel.apiKey,
+                    model: customModel.modelName,
                     audioData: audioData,
                     fileName: fileName,
-                    model: customModel,
                     language: language,
                     prompt: prompt
                 )
@@ -104,53 +105,6 @@ class CloudTranscriptionService: TranscriptionService {
             if let apiError = CloudTranscriptionError.apiRequestFailure(
                 from: error as NSError,
                 matchingErrorDomain: modelProvider.apiErrorDomain
-            ) {
-                throw apiError
-            }
-            throw error
-        }
-    }
-
-    private func transcribeCustomModel(
-        audioData: Data,
-        fileName: String,
-        model: CustomCloudModel,
-        language: String?,
-        prompt: String?
-    ) async throws -> String {
-        guard let url = VoiceInkCustomCloudTranscriptionPolicy.endpointURL(from: model.apiEndpoint) else {
-            throw NSError(
-                domain: VoiceInkCustomCloudTranscriptionPolicy.apiErrorDomain,
-                code: -1,
-                userInfo: [NSLocalizedDescriptionKey: VoiceInkCustomCloudTranscriptionPolicy.invalidEndpointDescription]
-            )
-        }
-        let options = VoiceInkCustomCloudTranscriptionPolicy.openAICompatibleOptions
-
-        do {
-            let text = try await openAICompatibleTranscriptionClient.transcribeAudioData(
-                url: url,
-                apiKey: model.apiKey,
-                model: model.modelName,
-                audioData: audioData,
-                fileName: fileName,
-                language: language,
-                prompt: prompt,
-                responseFormat: options.openAICompatibleResponseFormat,
-                temperature: options.openAICompatibleTemperature,
-                errorDomain: options.openAICompatibleErrorDomain,
-                allowPlainTextFallback: options.openAICompatibleAllowsPlainTextFallback
-            )
-            guard VoiceInkCustomCloudTranscriptionPolicy.acceptsTranscriptionText(text) else {
-                throw CloudTranscriptionError.noTranscriptionReturned
-            }
-            return text
-        } catch let error as CloudTranscriptionError {
-            throw error
-        } catch {
-            if let apiError = CloudTranscriptionError.apiRequestFailure(
-                from: error as NSError,
-                matchingErrorDomain: VoiceInkCustomCloudTranscriptionPolicy.apiErrorDomain
             ) {
                 throw apiError
             }

@@ -9461,9 +9461,17 @@ require_patterns \
   'setAPIKeyValidity' \
   'complete: \(VoiceInkAPIKeyVerificationResult\) -> Void'
 
-require_pattern \
+require_patterns \
   "shared macOS AI API-key verification request plan lives in VoiceInkCore" \
-  'VoiceInkAIEnhancementAPIKeyVerificationRequestPlan|verificationRequestPlan|resolvedKeyToVerify|immediateResult' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift \
+  'VoiceInkAIEnhancementAPIKeyVerificationRequestPlan|verificationRequestPlan' \
+  'applyRuntimeState' \
+  'completeImmediateResult' \
+  'verifyResolvedKey'
+
+reject_pattern \
+  "shared macOS AI API-key verification request plan avoids public raw action payloads" \
+  'public let (resolvedKeyToVerify|immediateResult)' \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 require_pattern \
@@ -9493,6 +9501,11 @@ require_patterns \
 require_pattern \
   "core checks execute shared macOS AI API-key verification request plan test" \
   'AIProviderCatalogTests\.testMacOSAIEnhancementAPIKeyVerificationRequestPlanIsShared' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute shared macOS AI API-key verification request runtime application test" \
+  'AIProviderCatalogTests\.testMacOSAIEnhancementAPIKeyVerificationRequestPlanAppliesRuntimeState' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -9579,7 +9592,12 @@ require_pattern \
 
 require_pattern \
   "macOS AI service starts API-key verification through shared request plan" \
-  'verificationRequestPlan\(\)|resolvedKeyToVerify\(from:' \
+  'verificationRequestPlan\(\)\.applyRuntimeState|completeImmediateResult: completion|verifyResolvedKey' \
+  VoiceInk/Services/AIEnhancement/AIService.swift
+
+reject_pattern \
+  "macOS AI service avoids shell-owned API-key verification request field reads" \
+  'resolvedKeyToVerify\(from:|plan\.(immediateResult|resolvedKeyToVerify)' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 require_pattern \
@@ -9604,7 +9622,7 @@ reject_pattern \
 
 require_pattern \
   "migration checklist tracks shared macOS AI API-key verification request plan" \
-  'verification-request planning.*VoiceInkAIEnhancementAPIKeyVerificationRequestPlan' \
+  'verification-request planning/application.*VoiceInkAIEnhancementAPIKeyVerificationRequestPlan' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

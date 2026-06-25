@@ -154,44 +154,39 @@ class AIService: ObservableObject {
     
     func saveAPIKey(_ key: String, completion: @escaping (VoiceInkAPIKeyVerificationResult) -> Void) {
         let draft = apiKeyDraft(for: key)
-        guard let resolvedKey = resolvedKeyToVerify(
-            from: draft.verificationRequestPlan(),
-            completion: completion
-        ) else {
-            return
-        }
+        draft.verificationRequestPlan().applyRuntimeState(
+            completeImmediateResult: completion,
+            verifyResolvedKey: { resolvedKey in
+                verifyResolvedAPIKey(resolvedKey) { [weak self] result in
+                    guard let self = self else { return }
+                    DispatchQueue.main.async {
+                        let plan = draft.verificationApplicationPlan(
+                            for: result,
+                            resolvedRuntimeKey: resolvedKey
+                        )
 
-        verifyResolvedAPIKey(resolvedKey) { [weak self] result in
-            guard let self = self else { return }
-            DispatchQueue.main.async {
-                let plan = draft.verificationApplicationPlan(
-                    for: result,
-                    resolvedRuntimeKey: resolvedKey
-                )
-
-                APIKeyManager.shared.applyAIEnhancementVerificationPlan(plan)
-                plan.serviceStateApplicationPlan.apply(
-                    setAPIKey: { self.apiKey = $0 },
-                    setAPIKeyValidity: { self.isAPIKeyValid = $0 },
-                    postProviderKeyChanged: {
-                        NotificationCenter.default.post(name: .aiProviderKeyChanged, object: nil)
-                    },
-                    complete: completion
-                )
+                        APIKeyManager.shared.applyAIEnhancementVerificationPlan(plan)
+                        plan.serviceStateApplicationPlan.apply(
+                            setAPIKey: { self.apiKey = $0 },
+                            setAPIKeyValidity: { self.isAPIKeyValid = $0 },
+                            postProviderKeyChanged: {
+                                NotificationCenter.default.post(name: .aiProviderKeyChanged, object: nil)
+                            },
+                            complete: completion
+                        )
+                    }
+                }
             }
-        }
+        )
     }
     
     func verifyAPIKey(_ key: String, completion: @escaping (VoiceInkAPIKeyVerificationResult) -> Void) {
-        let draft = apiKeyDraft(for: key)
-        guard let resolvedKey = resolvedKeyToVerify(
-            from: draft.verificationRequestPlan(),
-            completion: completion
-        ) else {
-            return
-        }
-
-        verifyResolvedAPIKey(resolvedKey, completion: completion)
+        apiKeyDraft(for: key).verificationRequestPlan().applyRuntimeState(
+            completeImmediateResult: completion,
+            verifyResolvedKey: { resolvedKey in
+                verifyResolvedAPIKey(resolvedKey, completion: completion)
+            }
+        )
     }
 
     private func apiKeyDraft(for key: String) -> VoiceInkAIEnhancementAPIKeyDraft {
@@ -199,18 +194,6 @@ class AIService: ObservableObject {
             provider: selectedProvider,
             enteredKey: key
         )
-    }
-
-    private func resolvedKeyToVerify(
-        from plan: VoiceInkAIEnhancementAPIKeyVerificationRequestPlan,
-        completion: @escaping (VoiceInkAPIKeyVerificationResult) -> Void
-    ) -> String? {
-        if let immediateResult = plan.immediateResult {
-            completion(immediateResult)
-            return nil
-        }
-
-        return plan.resolvedKeyToVerify
     }
 
     private func verifyResolvedAPIKey(

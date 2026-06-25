@@ -491,8 +491,8 @@ public struct VoiceInkAIEnhancementAPIKeyDraft: Equatable, Sendable {
 }
 
 public struct VoiceInkAIEnhancementAPIKeyVerificationRequestPlan: Equatable, Sendable {
-    public let resolvedKeyToVerify: String?
-    public let immediateResult: VoiceInkAPIKeyVerificationResult?
+    private let resolvedKeyToVerify: String?
+    private let immediateResult: VoiceInkAPIKeyVerificationResult?
 
     public init(
         resolvedKeyToVerify: String?,
@@ -500,6 +500,20 @@ public struct VoiceInkAIEnhancementAPIKeyVerificationRequestPlan: Equatable, Sen
     ) {
         self.resolvedKeyToVerify = resolvedKeyToVerify
         self.immediateResult = immediateResult
+    }
+
+    public func applyRuntimeState(
+        completeImmediateResult: (VoiceInkAPIKeyVerificationResult) -> Void,
+        verifyResolvedKey: (String) -> Void
+    ) {
+        if let immediateResult {
+            completeImmediateResult(immediateResult)
+            return
+        }
+
+        if let resolvedKeyToVerify {
+            verifyResolvedKey(resolvedKeyToVerify)
+        }
     }
 }
 

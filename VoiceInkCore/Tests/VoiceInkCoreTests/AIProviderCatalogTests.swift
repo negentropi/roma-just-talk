@@ -314,6 +314,40 @@ final class AIProviderCatalogTests: XCTestCase {
         )
     }
 
+    func testMacOSAIEnhancementAPIKeyVerificationRequestPlanAppliesRuntimeState() {
+        var completionResults: [VoiceInkAPIKeyVerificationResult] = []
+        var resolvedKeys: [String] = []
+
+        VoiceInkAIEnhancementAPIKeyVerificationRequestPlan(
+            resolvedKeyToVerify: nil,
+            immediateResult: VoiceInkAPIKeyVerificationResult(isValid: false, errorMessage: "missing")
+        )
+        .applyRuntimeState(
+            completeImmediateResult: { completionResults.append($0) },
+            verifyResolvedKey: { resolvedKeys.append($0) }
+        )
+
+        XCTAssertEqual(completionResults, [
+            VoiceInkAPIKeyVerificationResult(isValid: false, errorMessage: "missing")
+        ])
+        XCTAssertTrue(resolvedKeys.isEmpty)
+
+        completionResults = []
+        resolvedKeys = []
+
+        VoiceInkAIEnhancementAPIKeyVerificationRequestPlan(
+            resolvedKeyToVerify: "resolved-key",
+            immediateResult: nil
+        )
+        .applyRuntimeState(
+            completeImmediateResult: { completionResults.append($0) },
+            verifyResolvedKey: { resolvedKeys.append($0) }
+        )
+
+        XCTAssertTrue(completionResults.isEmpty)
+        XCTAssertEqual(resolvedKeys, ["resolved-key"])
+    }
+
     func testMacOSAIEnhancementAPIKeyVerificationDispatchPlanIsShared() async {
         let customRequestURL = URL(string: "https://api.example.com/v1/chat/completions")!
 

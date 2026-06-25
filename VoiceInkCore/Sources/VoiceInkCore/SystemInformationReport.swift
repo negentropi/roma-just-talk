@@ -133,6 +133,10 @@ public struct VoiceInkMacOSSystemInformationFacts: Equatable, Sendable {
 public enum VoiceInkSystemInformationReport {
     public static let noAudioDevicesDetectedText = "None detected"
 
+    public static func generatedDateText(_ date: Date) -> String {
+        date.formatted(date: .long, time: .standard)
+    }
+
     public static func availableAudioDevicesText(_ deviceNames: [String]) -> String {
         guard !deviceNames.isEmpty else {
             return noAudioDevicesDetectedText

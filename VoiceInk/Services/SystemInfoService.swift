@@ -32,7 +32,7 @@ class SystemInfoService {
         let audioCleanup = VoiceInkAudioCleanupPreference.current()
 
         return VoiceInkMacOSSystemInformationFacts(
-            generated: Date().formatted(date: .long, time: .standard),
+            generated: VoiceInkSystemInformationReport.generatedDateText(Date()),
             appVersion: getAppVersion(),
             buildVersion: getBuildVersion(),
             licenseStatus: getLicenseStatus(),

@@ -15834,6 +15834,8 @@ require_patterns \
   VoiceInkCore/Sources/VoiceInkCore/SystemInformationReport.swift \
   'VoiceInkMacOSSystemInformationFacts' \
   'VoiceInkSystemInformationReport' \
+  'generatedDateText' \
+  'formatted\(date: \.long, time: \.standard\)' \
   'availableAudioDevicesText' \
   'noAudioDevicesDetectedText = "None detected"' \
   '=== VOICEINK SYSTEM INFORMATION ===' \
@@ -15858,6 +15860,7 @@ require_patterns \
   "macOS system info service adapts shared report formatter" \
   VoiceInk/Services/SystemInfoService.swift \
   'VoiceInkSystemInformationReport\.macOS\(makeMacOSSystemInformationFacts\(\)\)' \
+  'VoiceInkSystemInformationReport\.generatedDateText\(Date\(\)\)' \
   'VoiceInkSystemInformationReport\.availableAudioDevicesText' \
   'VoiceInkMacOSSystemInformationFacts'
 
@@ -15871,7 +15874,7 @@ require_patterns \
 
 reject_pattern \
   "macOS system info service avoids shell-owned report template" \
-  '=== VOICEINK SYSTEM INFORMATION ===|APP INFORMATION:|CLIPBOARD & PASTE SETTINGS:|DATA CLEANUP SETTINGS:|PERMISSIONS:|None detected|joined\(separator: ", "\)' \
+  '=== VOICEINK SYSTEM INFORMATION ===|APP INFORMATION:|CLIPBOARD & PASTE SETTINGS:|DATA CLEANUP SETTINGS:|PERMISSIONS:|None detected|joined\(separator: ", "\)|formatted\(date: \.long, time: \.standard\)' \
   VoiceInk/Services/SystemInfoService.swift
 
 reject_pattern \
@@ -15887,12 +15890,13 @@ require_patterns \
   'SystemInformationReportTests\.testMacOSSystemInformationReportPreservesSectionOrderAndLabels' \
   'SystemInformationReportTests\.testMacOSSystemInformationReportKeepsRollingBufferBlockVerbatim' \
   'SystemInformationReportTests\.testAvailableAudioDevicesTextPreservesMacOSDiagnosticsListPolicy' \
+  'SystemInformationReportTests\.testGeneratedDateTextPreservesMacOSFormattingStyle' \
   'SystemInformationReportTests\.testSystemInformationCopyPresentationPreservesDashboardButtonPolicy'
 
 require_patterns \
   "migration docs describe shared macOS system information presentation" \
   docs/ios-single-repo-migration.md \
-  'macOS support system-information report formatting, available-audio-device list formatting, and copy-button presentation' \
+  'macOS support system-information generated-date/report formatting, available-audio-device list formatting, and copy-button presentation' \
   'VoiceInkSystemInformationReport' \
   'VoiceInkSystemInformationCopyPresentation'
 

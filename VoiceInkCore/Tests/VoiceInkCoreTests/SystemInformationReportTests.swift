@@ -145,6 +145,15 @@ final class SystemInformationReportTests: XCTestCase {
         )
     }
 
+    func testGeneratedDateTextPreservesMacOSFormattingStyle() {
+        let generatedAt = Date(timeIntervalSince1970: 1_782_315_731)
+
+        XCTAssertEqual(
+            VoiceInkSystemInformationReport.generatedDateText(generatedAt),
+            generatedAt.formatted(date: .long, time: .standard)
+        )
+    }
+
     func testSystemInformationCopyPresentationPreservesDashboardButtonPolicy() {
         XCTAssertEqual(
             VoiceInkSystemInformationCopyPresentation.button(isCopied: false),

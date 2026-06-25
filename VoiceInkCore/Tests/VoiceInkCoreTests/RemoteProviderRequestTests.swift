@@ -583,6 +583,25 @@ final class RemoteProviderRequestTests: XCTestCase {
         XCTAssertTrue(capturedBody.contains("spell Roma correctly"))
     }
 
+    func testRemoteTranscriptionServiceUsesSharedAudioFilePolicyForMissingFile() async {
+        let audioURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.RemoteProviderRequestTests.missing.\(UUID().uuidString).wav")
+        let service = VoiceInkRemoteTranscriptionService(provider: .openAI)
+
+        do {
+            _ = try await service.transcribeAudioFile(
+                apiKey: "stt-key",
+                model: "gpt-4o-transcribe",
+                fileURL: audioURL
+            )
+            XCTFail("Expected audio file not found")
+        } catch VoiceInkCloudTranscriptionError.audioFileNotFound {
+            // Expected.
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+
     func testDeepgramTranscriptionRequestBuilderUsesListenEndpointAndBody() throws {
         let audioData = Data("WAVDATA".utf8)
         let request = try VoiceInkDeepgramRequestBuilder.makeTranscriptionRequest(

@@ -10,8 +10,7 @@ class CloudTranscriptionService: TranscriptionService {
     }
 
     func transcribe(audioURL: URL, model: any TranscriptionModel) async throws -> String {
-        let audioData = try loadAudioData(from: audioURL)
-        let fileName = audioURL.lastPathComponent
+        let audioFile = try VoiceInkCloudTranscriptionAudioFile.load(from: audioURL)
         let language = VoiceInkTranscriptionLanguagePreference.requestLanguage()
         let prompt = VoiceInkTranscriptionPromptPreference.requestPrompt()
 
@@ -23,8 +22,8 @@ class CloudTranscriptionService: TranscriptionService {
                 apiEndpoint: customModel.apiEndpoint,
                 apiKey: customModel.apiKey,
                 model: customModel.modelName,
-                audioData: audioData,
-                fileName: fileName,
+                audioData: audioFile.data,
+                fileName: audioFile.fileName,
                 language: language,
                 prompt: prompt
             )
@@ -35,20 +34,11 @@ class CloudTranscriptionService: TranscriptionService {
             modelProvider: modelProvider,
             apiKey: APIKeyManager.shared.getAPIKey(forProvider: modelProvider.apiKeyProviderName),
             modelName: model.name,
-            audioData: audioData,
-            fileName: fileName,
+            audioData: audioFile.data,
+            fileName: audioFile.fileName,
             language: language,
             prompt: prompt,
             customVocabulary: CustomVocabularyService.shared.rawCustomVocabularyTerms(from: modelContext)
         )
-    }
-
-    // MARK: - Helpers
-
-    private func loadAudioData(from url: URL) throws -> Data {
-        guard FileManager.default.fileExists(atPath: url.path) else {
-            throw CloudTranscriptionError.audioFileNotFound
-        }
-        return try Data(contentsOf: url)
     }
 }

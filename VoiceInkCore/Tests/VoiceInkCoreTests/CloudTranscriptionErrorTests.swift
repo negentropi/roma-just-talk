@@ -32,6 +32,32 @@ final class CloudTranscriptionErrorTests: XCTestCase {
         )
     }
 
+    func testCloudTranscriptionAudioFileLoadsBytesAndFileName() throws {
+        let audioURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.CloudTranscriptionErrorTests.\(UUID().uuidString).wav")
+        try Data("WAVDATA".utf8).write(to: audioURL)
+        defer { try? FileManager.default.removeItem(at: audioURL) }
+
+        let audioFile = try VoiceInkCloudTranscriptionAudioFile.load(from: audioURL)
+
+        XCTAssertEqual(audioFile.data, Data("WAVDATA".utf8))
+        XCTAssertEqual(audioFile.fileName, audioURL.lastPathComponent)
+    }
+
+    func testCloudTranscriptionAudioFileMapsMissingFile() {
+        let audioURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.CloudTranscriptionErrorTests.missing.\(UUID().uuidString).wav")
+
+        do {
+            _ = try VoiceInkCloudTranscriptionAudioFile.load(from: audioURL)
+            XCTFail("Expected audio file not found")
+        } catch VoiceInkCloudTranscriptionError.audioFileNotFound {
+            // Expected.
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+
     func testAPIRequestFailureMapsMatchingHTTPNSError() {
         let error = NSError(
             domain: "GroqAPI",

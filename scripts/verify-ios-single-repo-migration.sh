@@ -5179,6 +5179,7 @@ require_patterns \
   VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift \
   'VoiceInkMacOSCloudTranscriptionPolicy' \
   'VoiceInkMacOSCloudTranscriptionRequest' \
+  'VoiceInkCloudTranscriptionAudioFile' \
   'VoiceInkProviderCredential\.nonBlank\(apiKey\)' \
   'VoiceInkCloudTranscriptionError\.missingAPIKey' \
   'VoiceInkCloudTranscriptionError\.remoteExecutionFailure' \
@@ -5197,6 +5198,11 @@ require_pattern \
   'VoiceInkMacOSCloudTranscriptionPolicy\.transcribeAudioData' \
   VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift
 
+require_pattern \
+  "macOS batch cloud transcription uses shared audio file policy" \
+  'VoiceInkCloudTranscriptionAudioFile\.load\(from: audioURL\)' \
+  VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift
+
 reject_pattern \
   "macOS batch cloud transcription avoids shell-owned execution policy" \
   'transcribeProvider|VoiceInkRemoteTranscriptionService\(provider:|modelProvider\.(remoteTranscriptionProviderKind|remoteTranscriptionOptions|acceptsRemoteTranscriptionText|apiErrorDomain)|CloudTranscriptionError\.apiRequestFailure' \
@@ -5210,6 +5216,11 @@ reject_pattern \
 reject_pattern \
   "macOS batch cloud transcription avoids shell-owned error wrapping" \
   'CloudTranscriptionError\.networkError|VoiceInkCloudTranscriptionError\.networkError|catch \{' \
+  VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift
+
+reject_pattern \
+  "macOS batch cloud transcription avoids shell-owned audio file policy" \
+  'loadAudioData|FileManager\.default\.fileExists|Data\(contentsOf:|CloudTranscriptionError\.audioFileNotFound' \
   VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift
 
 require_pattern \
@@ -7602,12 +7613,17 @@ reject_file VoiceInkCore/Sources/VoiceInkCore/CloudTranscriptionError.swift
 
 require_pattern \
   "shared cloud transcription error lives with audio transcription service" \
-  'VoiceInkCloudTranscriptionError|CloudTranscriptionError|apiRequestFailure|apiStatusCodeRange|apiRequestFailed|networkError|noTranscriptionReturned' \
+  'VoiceInkCloudTranscriptionError|CloudTranscriptionError|VoiceInkCloudTranscriptionAudioFile|apiRequestFailure|apiStatusCodeRange|apiRequestFailed|networkError|noTranscriptionReturned' \
   VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift
 
 require_pattern \
   "shared cloud transcription error checks run in VoiceInkCore" \
-  'CloudTranscriptionErrorTests\.testErrorDescriptionsPreserveMacOSCloudTranscriptionCopy|CloudTranscriptionErrorTests\.testNoTranscriptionReturnedUsesSharedRunErrorDescription|CloudTranscriptionErrorTests\.testAPIRequestFailureMapsMatchingHTTPNSError|CloudTranscriptionErrorTests\.testAPIRequestFailureFallsBackToLocalizedDescription|CloudTranscriptionErrorTests\.testAPIRequestFailureRejectsWrongDomainMissingDomainAndNonHTTPStatus|CloudTranscriptionErrorTests\.testLegacyCloudTranscriptionErrorAliasResolvesToSharedCoreError' \
+  'CloudTranscriptionErrorTests\.testErrorDescriptionsPreserveMacOSCloudTranscriptionCopy|CloudTranscriptionErrorTests\.testNoTranscriptionReturnedUsesSharedRunErrorDescription|CloudTranscriptionErrorTests\.testCloudTranscriptionAudioFileLoadsBytesAndFileName|CloudTranscriptionErrorTests\.testCloudTranscriptionAudioFileMapsMissingFile|CloudTranscriptionErrorTests\.testAPIRequestFailureMapsMatchingHTTPNSError|CloudTranscriptionErrorTests\.testAPIRequestFailureFallsBackToLocalizedDescription|CloudTranscriptionErrorTests\.testAPIRequestFailureRejectsWrongDomainMissingDomainAndNonHTTPStatus|CloudTranscriptionErrorTests\.testLegacyCloudTranscriptionErrorAliasResolvesToSharedCoreError' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute shared remote audio file policy test" \
+  'RemoteProviderRequestTests\.testRemoteTranscriptionServiceUsesSharedAudioFilePolicyForMissingFile' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \

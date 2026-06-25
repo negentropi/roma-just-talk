@@ -79,6 +79,27 @@ public enum VoiceInkCloudTranscriptionError: Error, LocalizedError {
 
 public typealias CloudTranscriptionError = VoiceInkCloudTranscriptionError
 
+public struct VoiceInkCloudTranscriptionAudioFile: Equatable, Sendable {
+    public let data: Data
+    public let fileName: String
+
+    public init(data: Data, fileName: String) {
+        self.data = data
+        self.fileName = fileName
+    }
+
+    public static func load(from url: URL) throws -> VoiceInkCloudTranscriptionAudioFile {
+        guard FileManager.default.fileExists(atPath: url.path) else {
+            throw VoiceInkCloudTranscriptionError.audioFileNotFound
+        }
+
+        return VoiceInkCloudTranscriptionAudioFile(
+            data: try Data(contentsOf: url),
+            fileName: url.lastPathComponent
+        )
+    }
+}
+
 public struct VoiceInkAudioTranscriptionServiceFactory {
     public typealias RemoteServiceFactory = (VoiceInkProviderKind) -> any VoiceInkAudioTranscriptionService
     public typealias LocalWhisperServiceFactory = () -> any VoiceInkAudioTranscriptionService
@@ -408,12 +429,12 @@ public struct VoiceInkRemoteTranscriptionService: VoiceInkAudioTranscriptionServ
         prompt: String? = nil,
         customVocabulary: [String] = []
     ) async throws -> String {
-        let audioData = try Data(contentsOf: fileURL)
+        let audioFile = try VoiceInkCloudTranscriptionAudioFile.load(from: fileURL)
         return try await transcribeAudioData(
             apiKey: apiKey,
             model: model,
-            audioData: audioData,
-            fileName: fileURL.lastPathComponent,
+            audioData: audioFile.data,
+            fileName: audioFile.fileName,
             language: language,
             options: fileTranscriptionOptions(
                 prompt: prompt,

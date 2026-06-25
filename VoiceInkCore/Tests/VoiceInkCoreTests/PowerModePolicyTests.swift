@@ -2108,7 +2108,7 @@ final class PowerModePolicyTests: XCTestCase {
         )
     }
 
-    func testPowerModeBackupExportPlanPreservesMacOSExportInputs() {
+    func testPowerModeBackupExportPlanAppliesMacOSExportRuntimeState() {
         let firstId = UUID(uuidString: "00000000-0000-0000-0000-000000000501")!
         let secondId = UUID(uuidString: "00000000-0000-0000-0000-000000000502")!
         let configurations = [
@@ -2121,39 +2121,40 @@ final class PowerModePolicyTests: XCTestCase {
             customEmojis: ["F", "S"]
         )
 
-        XCTAssertEqual(plan.configurationsToExport, configurations)
         XCTAssertEqual(
-            plan.shortcutRequests,
+            backupExportRuntimeEvents(
+                for: plan,
+                shortcutBackups: [
+                    firstId: "First Shortcut"
+                ]
+            ),
             [
-                VoiceInkPowerModeShortcutExportRequest(backupKey: firstId.uuidString, id: firstId),
-                VoiceInkPowerModeShortcutExportRequest(backupKey: secondId.uuidString, id: secondId)
+                "configs:\(firstId.uuidString),\(secondId.uuidString)",
+                "shortcuts:\(firstId.uuidString)=First Shortcut",
+                "emojis:F,S"
             ]
         )
-        XCTAssertEqual(plan.customEmojisToExport, ["F", "S"])
-        XCTAssertEqual(plan.exportedConfigurationCount, 2)
     }
 
-    func testPowerModeShortcutBackupsReturnNilWhenNoShortcutsExist() {
+    func testPowerModeBackupExportPlanOmitsShortcutBackupsWhenNoShortcutsExist() {
         let firstId = UUID(uuidString: "00000000-0000-0000-0000-000000000601")!
         let secondId = UUID(uuidString: "00000000-0000-0000-0000-000000000602")!
-        let requests = [
-            VoiceInkPowerModeShortcutExportRequest(backupKey: firstId.uuidString, id: firstId),
-            VoiceInkPowerModeShortcutExportRequest(backupKey: secondId.uuidString, id: secondId)
-        ]
-
-        let backups: [String: String]? = VoiceInkPowerModePolicy.powerModeShortcutBackups(
-            for: requests,
-            backupForConfiguration: { id in
-                id == secondId ? "Second Shortcut" : nil
-            }
+        let plan = VoiceInkPowerModePolicy.powerModeBackupExportPlan(
+            configurations: [
+                config(id: firstId, name: "First", emoji: "F"),
+                config(id: secondId, name: "Second", emoji: "S")
+            ],
+            customEmojis: []
         )
-        XCTAssertEqual(backups, [secondId.uuidString: "Second Shortcut"])
 
-        let missingBackups: [String: String]? = VoiceInkPowerModePolicy.powerModeShortcutBackups(
-            for: requests,
-            backupForConfiguration: { _ in nil }
+        XCTAssertEqual(
+            backupExportRuntimeEvents(for: plan),
+            [
+                "configs:\(firstId.uuidString),\(secondId.uuidString)",
+                "shortcuts:nil",
+                "emojis:"
+            ]
         )
-        XCTAssertNil(missingBackups)
     }
 
     func testPowerModeBackupImportPlanPreservesMacOSImportSequencingInputs() {
@@ -2598,6 +2599,35 @@ final class PowerModePolicyTests: XCTestCase {
             ],
             availableLocalModelNames: availableLocalModelNames
         )
+    }
+
+    private func backupExportRuntimeEvents(
+        for plan: VoiceInkPowerModeBackupExportPlan,
+        shortcutBackups: [UUID: String] = [:]
+    ) -> [String] {
+        var events: [String] = []
+
+        plan.applyRuntimeState(
+            backupForConfiguration: { id in
+                shortcutBackups[id]
+            },
+            setConfigurations: { configurations in
+                let ids = configurations.map(\.id.uuidString).joined(separator: ",")
+                events.append("configs:\(ids)")
+            },
+            setShortcutBackups: { backups in
+                let summary = backups?
+                    .sorted { $0.key < $1.key }
+                    .map { "\($0.key)=\($0.value)" }
+                    .joined(separator: ",") ?? "nil"
+                events.append("shortcuts:\(summary)")
+            },
+            setCustomEmojis: { customEmojis in
+                events.append("emojis:\(customEmojis.joined(separator: ","))")
+            }
+        )
+
+        return events
     }
 
     private func backupImportRuntimeEvents(

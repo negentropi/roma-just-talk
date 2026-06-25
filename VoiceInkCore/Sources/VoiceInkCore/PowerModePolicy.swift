@@ -655,11 +655,11 @@ public struct VoiceInkPowerModeShortcutImport: Equatable, Sendable {
     }
 }
 
-public struct VoiceInkPowerModeShortcutExportRequest: Equatable, Sendable {
-    public var backupKey: String
-    public var id: UUID
+fileprivate struct VoiceInkPowerModeShortcutExportRequest: Equatable, Sendable {
+    var backupKey: String
+    var id: UUID
 
-    public init(backupKey: String, id: UUID) {
+    init(backupKey: String, id: UUID) {
         self.backupKey = backupKey
         self.id = id
     }
@@ -723,15 +723,11 @@ public struct VoiceInkPowerModeBackupImportPlan: Equatable, Sendable {
 }
 
 public struct VoiceInkPowerModeBackupExportPlan: Equatable, Sendable {
-    public var configurationsToExport: [PowerModeConfig]
-    public var shortcutRequests: [VoiceInkPowerModeShortcutExportRequest]
-    public var customEmojisToExport: [String]
+    private var configurationsToExport: [PowerModeConfig]
+    private var shortcutRequests: [VoiceInkPowerModeShortcutExportRequest]
+    private var customEmojisToExport: [String]
 
-    public var exportedConfigurationCount: Int {
-        configurationsToExport.count
-    }
-
-    public init(
+    fileprivate init(
         configurationsToExport: [PowerModeConfig],
         shortcutRequests: [VoiceInkPowerModeShortcutExportRequest],
         customEmojisToExport: [String]
@@ -739,6 +735,22 @@ public struct VoiceInkPowerModeBackupExportPlan: Equatable, Sendable {
         self.configurationsToExport = configurationsToExport
         self.shortcutRequests = shortcutRequests
         self.customEmojisToExport = customEmojisToExport
+    }
+
+    public func applyRuntimeState<ShortcutBackup>(
+        backupForConfiguration: (UUID) -> ShortcutBackup?,
+        setConfigurations: ([PowerModeConfig]) -> Void,
+        setShortcutBackups: ([String: ShortcutBackup]?) -> Void,
+        setCustomEmojis: ([String]) -> Void
+    ) {
+        setConfigurations(configurationsToExport)
+        setShortcutBackups(
+            VoiceInkPowerModePolicy.powerModeShortcutBackups(
+                for: shortcutRequests,
+                backupForConfiguration: backupForConfiguration
+            )
+        )
+        setCustomEmojis(customEmojisToExport)
     }
 }
 
@@ -1816,7 +1828,7 @@ public enum VoiceInkPowerModePolicy {
         )
     }
 
-    public static func powerModeShortcutBackups<Backup>(
+    fileprivate static func powerModeShortcutBackups<Backup>(
         for requests: [VoiceInkPowerModeShortcutExportRequest],
         backupForConfiguration: (UUID) -> Backup?
     ) -> [String: Backup]? {

@@ -129,10 +129,21 @@ class ImportExportService {
             configurations: powerModeManager.configurations,
             customEmojis: emojiManager.customEmojis
         )
-        let powerModeShortcuts = VoiceInkPowerModePolicy.powerModeShortcutBackups(
-            for: powerModeExportPlan.shortcutRequests,
+        var powerModeConfigs: [PowerModeConfig] = []
+        var powerModeShortcuts: [String: ShortcutBackup]?
+        var powerModeCustomEmojis: [String]?
+        powerModeExportPlan.applyRuntimeState(
             backupForConfiguration: { id in
                 ShortcutStore.shortcut(for: .powerMode(id)).map(ShortcutBackup.init)
+            },
+            setConfigurations: { configurations in
+                powerModeConfigs = configurations
+            },
+            setShortcutBackups: { shortcuts in
+                powerModeShortcuts = shortcuts
+            },
+            setCustomEmojis: { customEmojis in
+                powerModeCustomEmojis = customEmojis
             }
         )
 
@@ -221,12 +232,12 @@ class ImportExportService {
         let exportedSettings = BackupFile(
             version: currentSettingsVersion,
             customPrompts: exportablePrompts,
-            powerModeConfigs: powerModeExportPlan.configurationsToExport,
+            powerModeConfigs: powerModeConfigs,
             powerModeShortcuts: powerModeShortcuts,
             vocabularyWords: dictionaryExportPlan.vocabularyBackupRecords,
             wordReplacements: dictionaryExportPlan.wordReplacementBackupRecords,
             generalSettings: generalSettingsToExport,
-            customEmojis: powerModeExportPlan.customEmojisToExport,
+            customEmojis: powerModeCustomEmojis,
             customCloudModels: customModels
         )
 

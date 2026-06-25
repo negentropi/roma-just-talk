@@ -799,10 +799,16 @@ reject_pattern \
   'public enum +VoiceInkTranscriptionLanguageSelectionControl|public var +control: +VoiceInkTranscriptionLanguageSelectionControl' \
   VoiceInkCore/Sources/VoiceInkCore/LanguageCatalog.swift
 
-require_pattern \
+require_patterns \
   "shared transcription language repair plan lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/LanguageCatalog.swift \
   'VoiceInkTranscriptionLanguageRepairPlan|repairPlan\(for selectedLanguage' \
-  VoiceInkCore/Sources/VoiceInkCore/LanguageCatalog.swift
+  'applyRuntimeState'
+
+require_pattern \
+  "core checks execute transcription language repair runtime application test" \
+  'LanguageCatalogTests\.testTranscriptionLanguageRepairPlanAppliesOnlyWhenLanguageChanges' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "shared Native Apple language asset presentation and diagnostics live in VoiceInkCore" \
@@ -828,6 +834,12 @@ require_pattern \
   "macOS language picker uses shared selection facts" \
   'languageSelectionFacts|facts\.(shouldShowDisabledAutodetectControl|shouldShowPicker|shouldShowDefaultLanguageOnly|showsNativeAppleAssetControl)' \
   "VoiceInk/Views/AI Models/LanguageSelectionView.swift"
+
+require_patterns \
+  "macOS language picker uses shared repair runtime application" \
+  "VoiceInk/Views/AI Models/LanguageSelectionView.swift" \
+  'facts\.repairPlan' \
+  'plan\.applyRuntimeState'
 
 require_pattern \
   "macOS Native Apple asset control uses shared presentation" \
@@ -863,6 +875,11 @@ reject_pattern \
 reject_pattern \
   "macOS language picker avoids shell-only language display fallback" \
   'private func +currentLanguageDisplayName|\?\? "Unknown"' \
+  "VoiceInk/Views/AI Models/LanguageSelectionView.swift"
+
+reject_pattern \
+  "macOS language picker avoids shell-owned compatible-language application" \
+  'compatibleLanguage\(selectedLanguage\)|plan\.languageToSave' \
   "VoiceInk/Views/AI Models/LanguageSelectionView.swift"
 
 reject_pattern \
@@ -12962,14 +12979,15 @@ reject_pattern \
   'CloudProviderRegistry\.provider\(for: model\.provider\)|"Streaming"|"Buffer Preload"|active-recording streaming|Saved-file batch mode|Rolling buffer can pre-run|Rolling buffer preload disabled' \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift
 
-require_pattern \
+require_patterns \
   "macOS cloud model card delegates selected-language repair planning to shared core" \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift \
   'transcriptionLanguageSelectionFacts\.repairPlan' \
-  VoiceInk/Views/AI\ Models/CloudModelCardView.swift
+  'plan\.applyRuntimeState'
 
 reject_pattern \
-  "macOS cloud model card avoids shell-owned selected-language repair comparisons" \
-  'validTranscriptionLanguageOrFallback|selectedLanguage !=' \
+  "macOS cloud model card avoids shell-owned selected-language repair comparisons and raw plan payload reads" \
+  'validTranscriptionLanguageOrFallback|selectedLanguage !=|plan\.languageToSave' \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift
 
 reject_pattern \
@@ -13186,14 +13204,15 @@ reject_pattern \
   'guard +isAvailableOnCurrentOS\(savedModel\)|if let savedModelName = VoiceInkCurrentTranscriptionModelPreference\.modelName\(\),' \
   VoiceInk/Transcription/Engine/TranscriptionModelManager.swift
 
-require_pattern \
+require_patterns \
   "macOS transcription model manager delegates selected-language repair planning to shared core" \
+  VoiceInk/Transcription/Engine/TranscriptionModelManager.swift \
   'transcriptionLanguageSelectionFacts\.repairPlan' \
-  VoiceInk/Transcription/Engine/TranscriptionModelManager.swift
+  'plan\.applyRuntimeState'
 
 reject_pattern \
-  "macOS transcription model manager avoids shell-owned selected-language repair comparisons" \
-  'validTranscriptionLanguageOrFallback|currentLanguage !=|compatibleLanguage' \
+  "macOS transcription model manager avoids shell-owned selected-language repair comparisons and raw plan payload reads" \
+  'validTranscriptionLanguageOrFallback|currentLanguage !=|compatibleLanguage|plan\.languageToSave' \
   VoiceInk/Transcription/Engine/TranscriptionModelManager.swift
 
 require_pattern \

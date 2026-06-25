@@ -106,7 +106,7 @@ class TranscriptionModelManager: ObservableObject {
             for: VoiceInkTranscriptionLanguagePreference.storedLanguage()
         )
 
-        if let languageToSave = plan.languageToSave {
+        plan.applyRuntimeState { languageToSave in
             VoiceInkTranscriptionLanguagePreference.saveSelectedLanguage(languageToSave)
             NotificationCenter.default.post(name: .languageDidChange, object: nil)
         }

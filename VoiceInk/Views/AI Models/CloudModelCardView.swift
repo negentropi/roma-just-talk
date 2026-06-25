@@ -121,7 +121,7 @@ struct CloudModelCardView: View {
         }
 
         let plan = model.transcriptionLanguageSelectionFacts.repairPlan(for: selectedLanguage)
-        if let languageToSave = plan.languageToSave {
+        plan.applyRuntimeState { languageToSave in
             selectedLanguage = languageToSave
             NotificationCenter.default.post(name: .languageDidChange, object: nil)
         }

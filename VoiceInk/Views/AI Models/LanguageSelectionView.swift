@@ -35,7 +35,8 @@ struct LanguageSelectionView: View {
 
     private func useCompatibleLanguageForCurrentModel() {
         guard let facts = languageSelectionFacts else { return }
-        updateLanguage(facts.compatibleLanguage(selectedLanguage))
+        let plan = facts.repairPlan(for: selectedLanguage)
+        plan.applyRuntimeState(saveSelectedLanguage: updateLanguage)
     }
 
     private var nativeAppleAssetControl: some View {

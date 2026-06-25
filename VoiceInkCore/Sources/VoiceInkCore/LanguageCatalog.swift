@@ -57,6 +57,13 @@ public struct VoiceInkTranscriptionLanguageRepairPlan: Equatable, Sendable {
         self.selectedLanguage = selectedLanguage
         self.languageToSave = languageToSave
     }
+
+    public func applyRuntimeState(
+        saveSelectedLanguage: (String) -> Void
+    ) {
+        guard let languageToSave else { return }
+        saveSelectedLanguage(languageToSave)
+    }
 }
 
 public struct VoiceInkTranscriptionLanguageSelectionFacts: Equatable, Sendable {

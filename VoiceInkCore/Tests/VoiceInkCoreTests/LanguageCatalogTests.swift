@@ -308,6 +308,22 @@ final class LanguageCatalogTests: XCTestCase {
         )
     }
 
+    func testTranscriptionLanguageRepairPlanAppliesOnlyWhenLanguageChanges() {
+        var savedLanguages: [String] = []
+        VoiceInkTranscriptionLanguageRepairPlan(
+            selectedLanguage: "fr",
+            languageToSave: nil
+        )
+        .applyRuntimeState { savedLanguages.append($0) }
+        VoiceInkTranscriptionLanguageRepairPlan(
+            selectedLanguage: "en-US",
+            languageToSave: "en-US"
+        )
+        .applyRuntimeState { savedLanguages.append($0) }
+
+        XCTAssertEqual(savedLanguages, ["en-US"])
+    }
+
     func testNativeAppleLanguageAssetPresentationPreservesProgressAndIconStates() {
         let checking = VoiceInkNativeAppleLanguageAssetPresentation.presentation(for: .checking)
         XCTAssertEqual(checking.display, .progress)

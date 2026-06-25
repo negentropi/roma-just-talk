@@ -7,7 +7,10 @@ import Speech
 #endif
 
 struct NativeAppleLanguageAssetControl: View {
-    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "NativeAppleLanguageAssetControl")
+    private let logger = Logger(
+        subsystem: VoiceInkAppIdentity.loggingSubsystem,
+        category: VoiceInkMacOSLogCategory.nativeAppleLanguageAssetControl
+    )
 
     let localeIdentifier: String
     let isVisible: Bool
@@ -126,7 +129,7 @@ struct NativeAppleLanguageAssetControl: View {
 
     private func installAsset(for localeIdentifier: String) async -> VoiceInkNativeAppleLanguageAssetState {
         guard #available(macOS 26, *) else {
-            logger.error("Apple Speech asset download unavailable for '\(localeIdentifier, privacy: .public)': requires macOS 26 or later.")
+            logger.error("\(VoiceInkNativeAppleLanguageAssetDiagnostics.downloadUnavailableRequiresMacOS26Message(localeIdentifier: localeIdentifier), privacy: .public)")
             return .assetManagementUnavailable
         }
 
@@ -154,7 +157,7 @@ struct NativeAppleLanguageAssetControl: View {
                     return currentState
                 }
 
-                logger.warning("Apple Speech asset reservation returned false for '\(normalizedIdentifier, privacy: .public)'. Continuing to request installation after confirming the asset still needs download.")
+                logger.warning("\(VoiceInkNativeAppleLanguageAssetDiagnostics.reservationReturnedFalseMessage(normalizedIdentifier: normalizedIdentifier), privacy: .public)")
             }
 
             guard let request = try await AssetInventory.assetInstallationRequest(supporting: [transcriber]) else {
@@ -164,11 +167,11 @@ struct NativeAppleLanguageAssetControl: View {
             try await request.downloadAndInstall()
             return await assetState(for: localeIdentifier)
         } catch {
-            logger.error("Apple Speech asset download failed for '\(localeIdentifier, privacy: .public)': \(error.localizedDescription, privacy: .public).")
+            logger.error("\(VoiceInkNativeAppleLanguageAssetDiagnostics.downloadFailedMessage(localeIdentifier: localeIdentifier, errorDescription: error.localizedDescription), privacy: .public)")
             return .failed(error.localizedDescription)
         }
         #else
-        logger.error("Apple Speech asset download unavailable for '\(localeIdentifier, privacy: .public)': ENABLE_NATIVE_SPEECH_ANALYZER is not active.")
+        logger.error("\(VoiceInkNativeAppleLanguageAssetDiagnostics.downloadUnavailableFeatureFlagMessage(localeIdentifier: localeIdentifier), privacy: .public)")
         return .assetManagementUnavailable
         #endif
     }

@@ -73,6 +73,7 @@ public enum VoiceInkNativeAppleTranscriptionPolicy {
     public static let minimumResultStreamTimeout: TimeInterval = 20.0
     public static let resultStreamTimeoutMultiplier = 4.0
     public static let resultStreamTimeoutPadding: TimeInterval = 10.0
+    public static let unsupportedOSDiagnosticMessage = "SpeechAnalyzer is not available on this macOS version"
 
     public static func requiresMacOS26Title(modelDisplayName: String) -> String {
         "\(modelDisplayName) requires macOS 26 or later"
@@ -97,6 +98,37 @@ public enum VoiceInkNativeAppleTranscriptionPolicy {
 
     public static func resultStreamTimeout(forAudioDuration audioDuration: TimeInterval) -> TimeInterval {
         max(minimumResultStreamTimeout, audioDuration * resultStreamTimeoutMultiplier + resultStreamTimeoutPadding)
+    }
+
+    public static func unsupportedLocaleDiagnosticMessage(localeIdentifier: String) -> String {
+        "Transcription failed: Locale '\(localeIdentifier)' is not supported by SpeechTranscriber."
+    }
+
+    public static func missingAssetDiagnosticMessage(localeIdentifier: String) -> String {
+        "Transcription failed: Assets for '\(localeIdentifier)' are not downloaded."
+    }
+
+    public static func emptyAudioDiagnosticMessage(localeIdentifier: String) -> String {
+        "Transcription failed: Apple Speech received no audio samples for '\(localeIdentifier)'."
+    }
+
+    public static func assetReservationReturnedFalseDiagnosticMessage(
+        localeIdentifier: String,
+        statusDescription: String
+    ) -> String {
+        "Apple Speech asset reservation returned false for '\(localeIdentifier)'. Continuing because the locale is already downloaded. Status: \(statusDescription)."
+    }
+
+    public static func assetReservationFailedDiagnosticMessage(
+        localeIdentifier: String,
+        errorDescription: String,
+        statusDescription: String
+    ) -> String {
+        "Apple Speech asset reservation failed for '\(localeIdentifier)': \(errorDescription). Continuing because the locale is already downloaded. Status: \(statusDescription)."
+    }
+
+    public static func resultWaitFailedDiagnosticMessage(errorDescription: String) -> String {
+        "Apple Speech result wait failed: \(errorDescription)."
     }
 }
 

@@ -805,13 +805,13 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/LanguageCatalog.swift
 
 require_pattern \
-  "shared Native Apple language asset presentation lives in VoiceInkCore" \
-  'VoiceInkNativeAppleLanguageAsset(State|Display|Presentation)|presentation\(for state: VoiceInkNativeAppleLanguageAssetState\)' \
+  "shared Native Apple language asset presentation and diagnostics live in VoiceInkCore" \
+  'VoiceInkNativeAppleLanguageAsset(State|Display|Presentation|Diagnostics)|presentation\(for state: VoiceInkNativeAppleLanguageAssetState\)|downloadUnavailableRequiresMacOS26Message|reservationReturnedFalseMessage|downloadFailedMessage|downloadUnavailableFeatureFlagMessage' \
   VoiceInkCore/Sources/VoiceInkCore/LanguageCatalog.swift
 
 require_pattern \
-  "core checks execute Native Apple language asset presentation tests" \
-  'LanguageCatalogTests\.testNativeAppleLanguageAssetPresentationPreservesProgressAndIconStates|LanguageCatalogTests\.testNativeAppleLanguageAssetPresentationPreservesActionStates' \
+  "core checks execute Native Apple language asset presentation and diagnostics tests" \
+  'LanguageCatalogTests\.testNativeAppleLanguageAssetPresentationPreservesProgressAndIconStates|LanguageCatalogTests\.testNativeAppleLanguageAssetPresentationPreservesActionStates|LanguageCatalogTests\.testNativeAppleLanguageAssetDiagnosticsPreserveMacOSLogCopy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -833,6 +833,12 @@ require_pattern \
   "macOS Native Apple asset control uses shared presentation" \
   'VoiceInkNativeAppleLanguageAsset(Presentation|State)|presentation\.(display|helpText|accessibilityLabel)' \
   "VoiceInk/Views/AI Models/NativeAppleLanguageAssetControl.swift"
+
+require_patterns \
+  "macOS Native Apple asset control uses shared diagnostics and log category identity" \
+  "VoiceInk/Views/AI Models/NativeAppleLanguageAssetControl.swift" \
+  'VoiceInkNativeAppleLanguageAssetDiagnostics\.' \
+  'category: VoiceInkMacOSLogCategory\.nativeAppleLanguageAssetControl'
 
 require_pattern \
   "macOS TranscriptionModel adapts shared language selection facts" \
@@ -882,6 +888,11 @@ reject_pattern \
 reject_pattern \
   "macOS Native Apple asset control avoids shell-owned presentation copy and icons" \
   '"(Checking Apple Speech language download status\.|Download this Apple Speech language before transcribing\.|Download Apple Speech language|Downloading Apple Speech language\.|This language is not supported by Apple Speech\.|Apple Speech asset management is not available on this system\.|Retry downloading this Apple Speech language\.|Retry Apple Speech language download|arrow\.down\.circle\.fill|arrow\.clockwise\.circle\.fill|exclamationmark\.triangle)"' \
+  "VoiceInk/Views/AI Models/NativeAppleLanguageAssetControl.swift"
+
+reject_pattern \
+  "macOS Native Apple asset control avoids shell-owned diagnostics and log category" \
+  'category: "NativeAppleLanguageAssetControl"|"Apple Speech asset download unavailable for|requires macOS 26 or later|Apple Speech asset reservation returned false for|Continuing to request installation after confirming the asset still needs download|Apple Speech asset download failed for|ENABLE_NATIVE_SPEECH_ANALYZER is not active' \
   "VoiceInk/Views/AI Models/NativeAppleLanguageAssetControl.swift"
 
 reject_pattern \
@@ -9085,7 +9096,7 @@ require_patterns \
 
 require_pattern \
   "shared core owns Native Apple transcription policy" \
-  'VoiceInkNativeAppleTranscriptionPolicy|VoiceInkNativeAppleTranscriptionFailureKind|errorDescription|resultStreamTimeout|requiresMacOS26Title' \
+  'VoiceInkNativeAppleTranscriptionPolicy|VoiceInkNativeAppleTranscriptionFailureKind|errorDescription|resultStreamTimeout|requiresMacOS26Title|unsupportedOSDiagnosticMessage|unsupportedLocaleDiagnosticMessage|missingAssetDiagnosticMessage|emptyAudioDiagnosticMessage|assetReservationReturnedFalseDiagnosticMessage|assetReservationFailedDiagnosticMessage|resultWaitFailedDiagnosticMessage' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift
 
 reject_file VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelAvailability.swift
@@ -9129,11 +9140,18 @@ require_pattern \
   VoiceInk/Transcription/Native/NativeAppleTranscriptionService.swift
 
 require_patterns \
+  "macOS Native Apple transcription uses shared diagnostics and log category identity" \
+  VoiceInk/Transcription/Native/NativeAppleTranscriptionService.swift \
+  'VoiceInkNativeAppleTranscriptionPolicy\.(unsupportedOSDiagnosticMessage|unsupportedLocaleDiagnosticMessage|missingAssetDiagnosticMessage|emptyAudioDiagnosticMessage|assetReservationReturnedFalseDiagnosticMessage|assetReservationFailedDiagnosticMessage|resultWaitFailedDiagnosticMessage)' \
+  'category: VoiceInkMacOSLogCategory\.nativeAppleTranscriptionService'
+
+require_patterns \
   "core checks execute Native Apple transcription policy tests" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
   'TranscriptionModelAvailabilityTests\.testNativeAppleTranscriptionPolicyPreservesMacOSErrorCopy' \
   'TranscriptionModelAvailabilityTests\.testNativeAppleFailureKindIsSharedThrowableLocalizedError' \
-  'TranscriptionModelAvailabilityTests\.testNativeAppleTranscriptionPolicyPreservesSelectionAndTimeoutCopy'
+  'TranscriptionModelAvailabilityTests\.testNativeAppleTranscriptionPolicyPreservesSelectionAndTimeoutCopy' \
+  'TranscriptionModelAvailabilityTests\.testNativeAppleTranscriptionDiagnosticsPreserveMacOSLogCopy'
 
 require_patterns \
   "macOS transcription model manager applies shared local Whisper runtime update" \
@@ -9205,7 +9223,7 @@ reject_pattern \
 
 reject_pattern \
   "macOS Native Apple runtime policy avoids shell-owned literals and timeout math" \
-  '"(SpeechAnalyzer requires macOS 26 or later\.|Transcription failed using SpeechAnalyzer\.|The selected language is not supported by SpeechAnalyzer\.|Invalid model type provided for Native Apple transcription\.|Download required for|Apple Speech did not finish returning transcription results\.)"|max\(20\.0|audioDuration \* 4\.0 \+ 10\.0' \
+  '"(SpeechAnalyzer requires macOS 26 or later\.|Transcription failed using SpeechAnalyzer\.|The selected language is not supported by SpeechAnalyzer\.|Invalid model type provided for Native Apple transcription\.|Download required for|Apple Speech did not finish returning transcription results\.|SpeechAnalyzer is not available on this macOS version|Transcription failed: Locale|is not supported by SpeechTranscriber\.|Transcription failed: Assets for|are not downloaded\.|Apple Speech received no audio samples|Apple Speech asset reservation returned false for|Continuing because the locale is already downloaded\. Status:|Apple Speech asset reservation failed for|Apple Speech result wait failed:)|category: "NativeAppleTranscriptionService"|max\(20\.0|audioDuration \* 4\.0 \+ 10\.0' \
   VoiceInk/Transcription/Engine/TranscriptionModelManager.swift \
   VoiceInk/Transcription/Native/NativeAppleTranscriptionService.swift
 
@@ -16869,6 +16887,8 @@ require_patterns \
   'audioTranscriptionManager = "AudioTranscriptionManager"' \
   'audioTranscriptionService = "AudioTranscriptionService"' \
   'coreAudioRecorder = "CoreAudioRecorder"' \
+  'nativeAppleTranscriptionService = "NativeAppleTranscriptionService"' \
+  'nativeAppleLanguageAssetControl = "NativeAppleLanguageAssetControl"' \
   'whisperTranscriptionService = "WhisperTranscriptionService"' \
   'whisperModelManager = "WhisperModelManager"' \
   'audioDeviceManager = "AudioDeviceManager"'
@@ -16945,6 +16965,18 @@ require_patterns \
   VoiceInk/Services/AudioFileTranscriptionService.swift \
   'Logger\(' \
   'category: VoiceInkMacOSLogCategory\.audioTranscriptionService'
+
+require_patterns \
+  "macOS Native Apple transcription service uses shared log category identity" \
+  VoiceInk/Transcription/Native/NativeAppleTranscriptionService.swift \
+  'Logger\(' \
+  'category: VoiceInkMacOSLogCategory\.nativeAppleTranscriptionService'
+
+require_patterns \
+  "macOS Native Apple language asset control uses shared log category identity" \
+  "VoiceInk/Views/AI Models/NativeAppleLanguageAssetControl.swift" \
+  'Logger\(' \
+  'category: VoiceInkMacOSLogCategory\.nativeAppleLanguageAssetControl'
 
 require_pattern \
   "core checks execute macOS window identity test" \

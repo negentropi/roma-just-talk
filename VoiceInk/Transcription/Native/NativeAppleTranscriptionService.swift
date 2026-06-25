@@ -10,7 +10,10 @@ import Speech
 /// Transcription service that leverages the new SpeechAnalyzer / SpeechTranscriber API available on macOS 26 (Tahoe).
 /// Falls back with an unsupported-provider error on earlier OS versions so the application can gracefully degrade.
 class NativeAppleTranscriptionService: TranscriptionService {
-    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "NativeAppleTranscriptionService")
+    private let logger = Logger(
+        subsystem: VoiceInkAppIdentity.loggingSubsystem,
+        category: VoiceInkMacOSLogCategory.nativeAppleTranscriptionService
+    )
 
     func transcribe(audioURL: URL, model: any TranscriptionModel) async throws -> String {
         guard model is NativeAppleModel else {
@@ -18,7 +21,7 @@ class NativeAppleTranscriptionService: TranscriptionService {
         }
         
         guard #available(macOS 26, *) else {
-            logger.error("SpeechAnalyzer is not available on this macOS version")
+            logger.error("\(VoiceInkNativeAppleTranscriptionPolicy.unsupportedOSDiagnosticMessage, privacy: .public)")
             throw VoiceInkNativeAppleTranscriptionFailureKind.unsupportedOS
         }
         
@@ -43,12 +46,12 @@ class NativeAppleTranscriptionService: TranscriptionService {
         let displayName = VoiceInkLanguageCatalog.nativeAppleDisplayName(for: selectedLocaleIdentifier)
 
         guard isLocaleSupported else {
-            logger.error("Transcription failed: Locale '\(locale.identifier(.bcp47), privacy: .public)' is not supported by SpeechTranscriber.")
+            logger.error("\(VoiceInkNativeAppleTranscriptionPolicy.unsupportedLocaleDiagnosticMessage(localeIdentifier: selectedLocaleIdentifier), privacy: .public)")
             throw VoiceInkNativeAppleTranscriptionFailureKind.localeNotSupported
         }
 
         guard isLocaleInstalled else {
-            logger.error("Transcription failed: Assets for '\(selectedLocaleIdentifier, privacy: .public)' are not downloaded.")
+            logger.error("\(VoiceInkNativeAppleTranscriptionPolicy.missingAssetDiagnosticMessage(localeIdentifier: selectedLocaleIdentifier), privacy: .public)")
             throw VoiceInkNativeAppleTranscriptionFailureKind.assetDownloadRequired(displayName: displayName)
         }
         
@@ -79,7 +82,7 @@ class NativeAppleTranscriptionService: TranscriptionService {
             } else {
                 resultTask.cancel()
                 await analyzer.cancelAndFinishNow()
-                logger.error("Transcription failed: Apple Speech received no audio samples for '\(selectedLocaleIdentifier, privacy: .public)'.")
+                logger.error("\(VoiceInkNativeAppleTranscriptionPolicy.emptyAudioDiagnosticMessage(localeIdentifier: selectedLocaleIdentifier), privacy: .public)")
                 throw VoiceInkNativeAppleTranscriptionFailureKind.transcriptionFailed
             }
         } catch {
@@ -130,12 +133,12 @@ class NativeAppleTranscriptionService: TranscriptionService {
 
             guard reserved else {
                 let finalStatus = await AssetInventory.status(forModules: [transcriber])
-                logger.warning("Apple Speech asset reservation returned false for '\(localeIdentifier, privacy: .public)'. Continuing because the locale is already downloaded. Status: \(String(describing: finalStatus), privacy: .public).")
+                logger.warning("\(VoiceInkNativeAppleTranscriptionPolicy.assetReservationReturnedFalseDiagnosticMessage(localeIdentifier: localeIdentifier, statusDescription: String(describing: finalStatus)), privacy: .public)")
                 return
             }
         } catch {
             let finalStatus = await AssetInventory.status(forModules: [transcriber])
-            logger.warning("Apple Speech asset reservation failed for '\(localeIdentifier, privacy: .public)': \(error.localizedDescription, privacy: .public). Continuing because the locale is already downloaded. Status: \(String(describing: finalStatus), privacy: .public).")
+            logger.warning("\(VoiceInkNativeAppleTranscriptionPolicy.assetReservationFailedDiagnosticMessage(localeIdentifier: localeIdentifier, errorDescription: error.localizedDescription, statusDescription: String(describing: finalStatus)), privacy: .public)")
         }
         #endif
     }
@@ -162,7 +165,7 @@ class NativeAppleTranscriptionService: TranscriptionService {
                 return result
             } catch {
                 group.cancelAll()
-                logger.error("Apple Speech result wait failed: \(error.localizedDescription, privacy: .public).")
+                logger.error("\(VoiceInkNativeAppleTranscriptionPolicy.resultWaitFailedDiagnosticMessage(errorDescription: error.localizedDescription), privacy: .public)")
                 throw error
             }
         }

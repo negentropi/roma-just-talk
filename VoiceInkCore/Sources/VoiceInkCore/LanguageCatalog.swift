@@ -187,6 +187,24 @@ public struct VoiceInkNativeAppleLanguageAssetPresentation: Equatable, Sendable 
     }
 }
 
+public enum VoiceInkNativeAppleLanguageAssetDiagnostics {
+    public static func downloadUnavailableRequiresMacOS26Message(localeIdentifier: String) -> String {
+        "Apple Speech asset download unavailable for '\(localeIdentifier)': requires macOS 26 or later."
+    }
+
+    public static func reservationReturnedFalseMessage(normalizedIdentifier: String) -> String {
+        "Apple Speech asset reservation returned false for '\(normalizedIdentifier)'. Continuing to request installation after confirming the asset still needs download."
+    }
+
+    public static func downloadFailedMessage(localeIdentifier: String, errorDescription: String) -> String {
+        "Apple Speech asset download failed for '\(localeIdentifier)': \(errorDescription)."
+    }
+
+    public static func downloadUnavailableFeatureFlagMessage(localeIdentifier: String) -> String {
+        "Apple Speech asset download unavailable for '\(localeIdentifier)': ENABLE_NATIVE_SPEECH_ANALYZER is not active."
+    }
+}
+
 extension VoiceInkTranscriptionLanguageSource {
     var disablesTranscriptionLanguageSelection: Bool {
         self == .provider(.gemini)

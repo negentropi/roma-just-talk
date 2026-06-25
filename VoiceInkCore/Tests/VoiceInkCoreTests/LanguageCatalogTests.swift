@@ -350,6 +350,28 @@ final class LanguageCatalogTests: XCTestCase {
         XCTAssertEqual(failed.accessibilityLabel, "Retry Apple Speech language download")
     }
 
+    func testNativeAppleLanguageAssetDiagnosticsPreserveMacOSLogCopy() {
+        XCTAssertEqual(
+            VoiceInkNativeAppleLanguageAssetDiagnostics.downloadUnavailableRequiresMacOS26Message(localeIdentifier: "en-US"),
+            "Apple Speech asset download unavailable for 'en-US': requires macOS 26 or later."
+        )
+        XCTAssertEqual(
+            VoiceInkNativeAppleLanguageAssetDiagnostics.reservationReturnedFalseMessage(normalizedIdentifier: "en-US"),
+            "Apple Speech asset reservation returned false for 'en-US'. Continuing to request installation after confirming the asset still needs download."
+        )
+        XCTAssertEqual(
+            VoiceInkNativeAppleLanguageAssetDiagnostics.downloadFailedMessage(
+                localeIdentifier: "en-US",
+                errorDescription: "Network unavailable"
+            ),
+            "Apple Speech asset download failed for 'en-US': Network unavailable."
+        )
+        XCTAssertEqual(
+            VoiceInkNativeAppleLanguageAssetDiagnostics.downloadUnavailableFeatureFlagMessage(localeIdentifier: "en-US"),
+            "Apple Speech asset download unavailable for 'en-US': ENABLE_NATIVE_SPEECH_ANALYZER is not active."
+        )
+    }
+
     func testSortedLanguageOptionsPutAutoDetectFirstThenSortByDisplayName() {
         XCTAssertEqual(
             VoiceInkLanguageCatalog.sortedOptions([

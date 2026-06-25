@@ -65,6 +65,8 @@ final class AppIdentityTests: XCTestCase {
         XCTAssertEqual(VoiceInkMacOSLogCategory.audioTranscriptionManager, "AudioTranscriptionManager")
         XCTAssertEqual(VoiceInkMacOSLogCategory.audioTranscriptionService, "AudioTranscriptionService")
         XCTAssertEqual(VoiceInkMacOSLogCategory.coreAudioRecorder, "CoreAudioRecorder")
+        XCTAssertEqual(VoiceInkMacOSLogCategory.nativeAppleTranscriptionService, "NativeAppleTranscriptionService")
+        XCTAssertEqual(VoiceInkMacOSLogCategory.nativeAppleLanguageAssetControl, "NativeAppleLanguageAssetControl")
         XCTAssertEqual(VoiceInkMacOSLogCategory.whisperTranscriptionService, "WhisperTranscriptionService")
         XCTAssertEqual(VoiceInkMacOSLogCategory.whisperModelManager, "WhisperModelManager")
         XCTAssertEqual(VoiceInkMacOSLogCategory.audioDeviceManager, "AudioDeviceManager")

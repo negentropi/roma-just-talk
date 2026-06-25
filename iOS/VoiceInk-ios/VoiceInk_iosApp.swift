@@ -50,11 +50,9 @@ struct VoiceInk_iosApp: App {
                         handleURL(url)
                     }
                     .onAppear {
-                        applyLaunchRecordingPlan(
-                            launchRecordingRequestState.consumePendingRecordingIfReady(
-                                hasCompletedOnboarding: hasCompletedOnboarding
-                            )
-                        )
+                        launchRecordingRequestState.consumePendingRecordingIfReady(
+                            hasCompletedOnboarding: hasCompletedOnboarding
+                        ).applyRuntimeState(startRecordingAfterLaunchDelay: startRecordingAfterLaunchDelay)
                     }
             } else {
                 OnboardingView(isOnboardingComplete: $hasCompletedOnboarding)
@@ -63,11 +61,9 @@ struct VoiceInk_iosApp: App {
                     }
                     .onChange(of: hasCompletedOnboarding) { _, completed in
                         if completed {
-                            applyLaunchRecordingPlan(
-                                launchRecordingRequestState.consumePendingRecordingIfReady(
-                                    hasCompletedOnboarding: hasCompletedOnboarding
-                                )
-                            )
+                            launchRecordingRequestState.consumePendingRecordingIfReady(
+                                hasCompletedOnboarding: hasCompletedOnboarding
+                            ).applyRuntimeState(startRecordingAfterLaunchDelay: startRecordingAfterLaunchDelay)
                         }
                     }
             }
@@ -80,17 +76,11 @@ struct VoiceInk_iosApp: App {
 
         deepLink.applyRuntimeState {
             VoiceInkIOSLogger.app.notice("\(VoiceInkIOSRecordingCoordinationDiagnostics.recordDeepLinkOpenedMessage, privacy: .public)")
-            applyLaunchRecordingPlan(
-                launchRecordingRequestState.requestRecording(
-                    hasCompletedOnboarding: hasCompletedOnboarding
-                )
-            )
+            launchRecordingRequestState.requestRecording(
+                hasCompletedOnboarding: hasCompletedOnboarding
+            ).applyRuntimeState(startRecordingAfterLaunchDelay: startRecordingAfterLaunchDelay)
             VoiceInkIOSLogger.app.notice("\(VoiceInkIOSRecordingCoordinationDiagnostics.keyboardRecordingRequestOpenedMessage, privacy: .public)")
         }
-    }
-
-    private func applyLaunchRecordingPlan(_ plan: VoiceInkLaunchRecordingRequestPlan) {
-        plan.applyRuntimeState(startRecordingAfterLaunchDelay: startRecordingAfterLaunchDelay)
     }
 
     private func startRecordingAfterLaunchDelay() {

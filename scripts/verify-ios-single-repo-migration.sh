@@ -17065,11 +17065,10 @@ require_patterns \
   "iOS app deep-link recording uses shared launch request policy" \
   iOS/VoiceInk-ios/VoiceInk_iosApp.swift \
   'VoiceInkLaunchRecordingRequestState' \
-  'VoiceInkLaunchRecordingRequestPlan' \
   'requestRecording\(' \
   'consumePendingRecordingIfReady\(' \
   'hasCompletedOnboarding:' \
-  'applyRuntimeState'
+  'applyRuntimeState\(startRecordingAfterLaunchDelay:'
 
 reject_pattern \
   "iOS app deep-link recording avoids shell-owned launch request action sequencing" \
@@ -17095,7 +17094,7 @@ require_patterns \
 
 reject_pattern \
   "iOS app launch recording avoids shallow shared-policy wrappers" \
-  'private func +(requestRecordingFromDeepLink|startPendingRecordingIfNeeded)\(' \
+  'private func +(requestRecordingFromDeepLink|startPendingRecordingIfNeeded|applyLaunchRecordingPlan)\(' \
   iOS/VoiceInk-ios/VoiceInk_iosApp.swift
 
 require_pattern \

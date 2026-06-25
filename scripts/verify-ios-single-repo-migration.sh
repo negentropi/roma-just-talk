@@ -5889,6 +5889,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
 
 require_pattern \
+  "shared custom cloud model backup import plan owns runtime sequencing" \
+  'VoiceInkCustomCloudModelBackupImportPlan|reportNoCustomModels|reportImportedModelCount|refreshAvailableModels' \
+  VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
+
+require_pattern \
   "shared custom cloud model backup exposes import plan" \
   'var importPlan: VoiceInkCustomCloudModelImportPlan' \
   VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift
@@ -6010,6 +6015,11 @@ require_pattern \
   'CustomCloudModelPolicyTests\.testCustomCloudModelStorageCanClearSharedDefaultsKey' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
+require_pattern \
+  "core checks execute custom cloud model backup import plan tests" \
+  'CustomCloudModelPolicyTests\.testBackupImportCollectionPlanAppliesRuntimeStateInMacOSOrder|CustomCloudModelPolicyTests\.testBackupImportCollectionPlanReportsMissingCustomModelsOnly' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
 reject_pattern \
   "macOS custom cloud transcription avoids shell-owned request policy" \
   '"CustomWhisperTranscriptionService"|"Invalid API endpoint URL"|responseFormat: "json"|temperature: "0"|allowPlainTextFallback: false|!text\.isEmpty|\(100\.\.\.599\)\.contains\(error\.code\)' \
@@ -6079,6 +6089,16 @@ require_pattern \
   "macOS custom model export adapts to shared backup record" \
   'VoiceInkCustomCloudModelBackup\(model: \$0\)' \
   VoiceInk/Services/ImportExportService.swift
+
+require_pattern \
+  "macOS custom model backup import consumes shared collection import plan" \
+  'VoiceInkCustomCloudModelBackupImportPlan|importPlan\.applyRuntimeState' \
+  VoiceInk/Services/BackupImporter.swift
+
+reject_pattern \
+  "macOS custom model backup import avoids shell-owned collection sequencing" \
+  'guard let models|No custom models found|models\.map|models\.count|customModels = models|customModelManager\.saveCustomModels\(\)|transcriptionModelManager\.refreshAllAvailableModels\(\)' \
+  VoiceInk/Services/BackupImporter.swift
 
 require_pattern \
   "macOS custom model import consumes shared import plan runtime state" \

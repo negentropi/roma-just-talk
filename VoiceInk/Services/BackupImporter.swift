@@ -240,19 +240,23 @@ enum BackupImporter {
 
     @MainActor
     private static func importCustomModels(_ models: [VoiceInkCustomCloudModelBackup]?, transcriptionModelManager: TranscriptionModelManager) {
-        guard let models else {
-            print(VoiceInkSettingsBackupImportDiagnostics.noCustomModelsMessage)
-            return
-        }
-
         let customModelManager = CustomCloudModelManager.shared
-        customModelManager.customModels = models.map { $0.makeModel() }
-        customModelManager.saveCustomModels()
-        transcriptionModelManager.refreshAllAvailableModels()
-        print(
-            VoiceInkSettingsBackupImportDiagnostics.customModelsImportedMessage(
-                count: models.count
-            )
+        let importPlan = VoiceInkCustomCloudModelBackupImportPlan(backups: models)
+        importPlan.applyRuntimeState(
+            makeModel: { $0.makeModel() },
+            setCustomModels: { customModelManager.customModels = $0 },
+            saveCustomModels: customModelManager.saveCustomModels,
+            refreshAvailableModels: transcriptionModelManager.refreshAllAvailableModels,
+            reportNoCustomModels: {
+                print(VoiceInkSettingsBackupImportDiagnostics.noCustomModelsMessage)
+            },
+            reportImportedModelCount: { count in
+                print(
+                    VoiceInkSettingsBackupImportDiagnostics.customModelsImportedMessage(
+                        count: count
+                    )
+                )
+            }
         )
     }
 

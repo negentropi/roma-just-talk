@@ -256,6 +256,33 @@ public struct VoiceInkCustomCloudModelImportPlan: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkCustomCloudModelBackupImportPlan: Equatable, Sendable {
+    private let backups: [VoiceInkCustomCloudModelBackup]?
+
+    public init(backups: [VoiceInkCustomCloudModelBackup]?) {
+        self.backups = backups
+    }
+
+    public func applyRuntimeState<Model>(
+        makeModel: (VoiceInkCustomCloudModelBackup) -> Model,
+        setCustomModels: ([Model]) -> Void,
+        saveCustomModels: () -> Void,
+        refreshAvailableModels: () -> Void,
+        reportNoCustomModels: () -> Void,
+        reportImportedModelCount: (Int) -> Void
+    ) {
+        guard let backups else {
+            reportNoCustomModels()
+            return
+        }
+
+        setCustomModels(backups.map(makeModel))
+        saveCustomModels()
+        refreshAvailableModels()
+        reportImportedModelCount(backups.count)
+    }
+}
+
 public struct VoiceInkCustomCloudModelStoredRecord: Codable, Equatable, Sendable {
     public let id: UUID
     public let name: String

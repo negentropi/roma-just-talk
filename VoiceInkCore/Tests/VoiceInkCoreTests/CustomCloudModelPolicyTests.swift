@@ -302,6 +302,95 @@ final class CustomCloudModelPolicyTests: XCTestCase {
         XCTAssertEqual(restoredAPIKeys.map(\.1), [id])
     }
 
+    func testBackupImportCollectionPlanAppliesRuntimeStateInMacOSOrder() {
+        let firstBackup = VoiceInkCustomCloudModelBackup(
+            id: UUID(uuidString: "E31E4D7A-437B-4BD3-A4B5-9624F38F3BBE")!,
+            name: "first",
+            displayName: "First",
+            description: "First custom model",
+            apiEndpoint: "https://api.example.com/v1/audio/transcriptions",
+            modelName: "first-model",
+            isMultilingualModel: true,
+            supportedLanguages: ["en": "English"],
+            apiKey: nil
+        )
+        let secondBackup = VoiceInkCustomCloudModelBackup(
+            id: UUID(uuidString: "1CE7D350-8555-4B4B-A9C1-24E8484E9C8A")!,
+            name: "second",
+            displayName: "Second",
+            description: "Second custom model",
+            apiEndpoint: "https://api.example.com/v1/audio/transcriptions",
+            modelName: "second-model",
+            isMultilingualModel: false,
+            supportedLanguages: [:],
+            apiKey: nil
+        )
+
+        var events = [String]()
+        let plan = VoiceInkCustomCloudModelBackupImportPlan(backups: [firstBackup, secondBackup])
+        plan.applyRuntimeState(
+            makeModel: { backup in
+                events.append("make:\(backup.name)")
+                return backup.name
+            },
+            setCustomModels: { models in
+                events.append("set:\(models.joined(separator: ","))")
+            },
+            saveCustomModels: {
+                events.append("save")
+            },
+            refreshAvailableModels: {
+                events.append("refresh")
+            },
+            reportNoCustomModels: {
+                events.append("none")
+            },
+            reportImportedModelCount: { count in
+                events.append("report:\(count)")
+            }
+        )
+
+        XCTAssertEqual(
+            events,
+            [
+                "make:first",
+                "make:second",
+                "set:first,second",
+                "save",
+                "refresh",
+                "report:2"
+            ]
+        )
+    }
+
+    func testBackupImportCollectionPlanReportsMissingCustomModelsOnly() {
+        var events = [String]()
+        let plan = VoiceInkCustomCloudModelBackupImportPlan(backups: nil)
+        plan.applyRuntimeState(
+            makeModel: { backup in
+                events.append("make:\(backup.name)")
+                return backup.name
+            },
+            setCustomModels: { models in
+                events.append("set:\(models.joined(separator: ","))")
+            },
+            saveCustomModels: {
+                events.append("save")
+            },
+            refreshAvailableModels: {
+                events.append("refresh")
+            },
+            reportNoCustomModels: {
+                events.append("none")
+            },
+            reportImportedModelCount: { count in
+                events.append("report:\(count)")
+            }
+        )
+
+        XCTAssertEqual(events, ["none"])
+    }
+
     func testBackupRecordSkipsOnlyMissingOrEmptyAPIKeyOnImport() {
         XCTAssertNil(VoiceInkCustomCloudModelBackup(
             id: UUID(),

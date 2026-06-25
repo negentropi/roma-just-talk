@@ -199,21 +199,10 @@ class CustomSoundManager: ObservableObject {
             for: type
         )
 
-        switch copyPlan.action {
-        case .useExistingDestination:
-            return .success(copyPlan.filename)
-        case .replaceExistingDestinationAndCopy:
-            try? FileManager.default.removeItem(at: copyPlan.destinationURL)
-        case .copy:
-            break
-        }
-
-        do {
-            try FileManager.default.copyItem(at: sourceURL, to: copyPlan.destinationURL)
-            return .success(copyPlan.filename)
-        } catch {
-            return .failure(.fileCopyFailed)
-        }
+        return copyPlan.applyRuntimeState(
+            removeExistingDestination: { try FileManager.default.removeItem(at: $0) },
+            copyToDestination: { try FileManager.default.copyItem(at: sourceURL, to: $0) }
+        )
     }
 
     private func validateAudioFile(url: URL) -> Result<Void, VoiceInkCustomSoundError> {

@@ -290,7 +290,7 @@ public enum VoiceInkCustomSoundError: LocalizedError, Equatable, Sendable {
     }
 }
 
-public enum VoiceInkCustomSoundCopyAction: Equatable, Sendable {
+fileprivate enum VoiceInkCustomSoundCopyAction: Equatable, Sendable {
     case useExistingDestination
     case copy
     case replaceExistingDestinationAndCopy
@@ -299,9 +299,9 @@ public enum VoiceInkCustomSoundCopyAction: Equatable, Sendable {
 public struct VoiceInkCustomSoundCopyPlan: Equatable, Sendable {
     public let filename: String
     public let destinationURL: URL
-    public let action: VoiceInkCustomSoundCopyAction
+    private let action: VoiceInkCustomSoundCopyAction
 
-    public init(
+    fileprivate init(
         filename: String,
         destinationURL: URL,
         action: VoiceInkCustomSoundCopyAction
@@ -309,6 +309,27 @@ public struct VoiceInkCustomSoundCopyPlan: Equatable, Sendable {
         self.filename = filename
         self.destinationURL = destinationURL
         self.action = action
+    }
+
+    public func applyRuntimeState(
+        removeExistingDestination: (URL) throws -> Void,
+        copyToDestination: (URL) throws -> Void
+    ) -> Result<String, VoiceInkCustomSoundError> {
+        switch action {
+        case .useExistingDestination:
+            return .success(filename)
+        case .replaceExistingDestinationAndCopy:
+            try? removeExistingDestination(destinationURL)
+        case .copy:
+            break
+        }
+
+        do {
+            try copyToDestination(destinationURL)
+            return .success(filename)
+        } catch {
+            return .failure(.fileCopyFailed)
+        }
     }
 }
 

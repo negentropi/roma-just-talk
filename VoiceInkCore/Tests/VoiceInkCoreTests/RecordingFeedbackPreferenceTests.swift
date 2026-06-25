@@ -188,7 +188,9 @@ final class RecordingFeedbackPreferenceTests: XCTestCase {
         )
         XCTAssertEqual(plan.filename, "CustomStartSound.aiff")
         XCTAssertEqual(plan.destinationURL, directory.appendingPathComponent("CustomStartSound.aiff"))
-        XCTAssertEqual(plan.action, .copy)
+        var runtimeResult = customSoundCopyRuntimeResult(for: plan)
+        XCTAssertEqual(runtimeResult.result, .success("CustomStartSound.aiff"))
+        XCTAssertEqual(runtimeResult.events, ["copy:CustomStartSound.aiff"])
 
         try? Data("existing".utf8).write(to: plan.destinationURL)
         plan = VoiceInkCustomSoundPreference.copyPlan(
@@ -196,7 +198,9 @@ final class RecordingFeedbackPreferenceTests: XCTestCase {
             customSoundsDirectory: directory,
             for: .start
         )
-        XCTAssertEqual(plan.action, .replaceExistingDestinationAndCopy)
+        runtimeResult = customSoundCopyRuntimeResult(for: plan)
+        XCTAssertEqual(runtimeResult.result, .success("CustomStartSound.aiff"))
+        XCTAssertEqual(runtimeResult.events, ["remove:CustomStartSound.aiff", "copy:CustomStartSound.aiff"])
 
         let destinationURL = directory.appendingPathComponent("CustomStartSound.aiff")
         plan = VoiceInkCustomSoundPreference.copyPlan(
@@ -204,7 +208,18 @@ final class RecordingFeedbackPreferenceTests: XCTestCase {
             customSoundsDirectory: directory,
             for: .start
         )
-        XCTAssertEqual(plan.action, .useExistingDestination)
+        runtimeResult = customSoundCopyRuntimeResult(for: plan)
+        XCTAssertEqual(runtimeResult.result, .success("CustomStartSound.aiff"))
+        XCTAssertEqual(runtimeResult.events, [])
+
+        plan = VoiceInkCustomSoundPreference.copyPlan(
+            sourceURL: sourceURL,
+            customSoundsDirectory: directory,
+            for: .stop
+        )
+        runtimeResult = customSoundCopyRuntimeResult(for: plan, copyThrows: true)
+        XCTAssertEqual(runtimeResult.result, .failure(.fileCopyFailed))
+        XCTAssertEqual(runtimeResult.events, ["copy:CustomStopSound.aiff"])
     }
 
     func testCustomSoundValidationPreservesMacOSErrorPolicy() {
@@ -514,6 +529,26 @@ final class RecordingFeedbackPreferenceTests: XCTestCase {
         )
     }
 
+    private func customSoundCopyRuntimeResult(
+        for plan: VoiceInkCustomSoundCopyPlan,
+        copyThrows: Bool = false
+    ) -> (result: Result<String, VoiceInkCustomSoundError>, events: [String]) {
+        var events: [String] = []
+        let result = plan.applyRuntimeState(
+            removeExistingDestination: { url in
+                events.append("remove:\(url.lastPathComponent)")
+            },
+            copyToDestination: { url in
+                events.append("copy:\(url.lastPathComponent)")
+                if copyThrows {
+                    throw CustomSoundCopyFixtureError.copyFailed
+                }
+            }
+        )
+
+        return (result, events)
+    }
+
     private func withTemporaryDefaults(_ test: (UserDefaults) -> Void) {
         let suiteName = "VoiceInkCore.RecordingFeedbackPreferenceTests.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!
@@ -522,4 +557,8 @@ final class RecordingFeedbackPreferenceTests: XCTestCase {
         }
         test(defaults)
     }
+}
+
+private enum CustomSoundCopyFixtureError: Error {
+    case copyFailed
 }

@@ -10075,7 +10075,17 @@ require_patterns \
 
 require_pattern \
   "shared custom recording sound validation and file-operation planning lives in VoiceInkCore" \
-  'enum VoiceInkCustomSoundError: LocalizedError|durationTooLong|preflightValidationError|maxDuration|copiedFilename|customSoundURL|storedCustomSoundURL|VoiceInkCustomSoundCopyPlan|copyPlan|Audio file is' \
+  'enum VoiceInkCustomSoundError: LocalizedError|durationTooLong|preflightValidationError|maxDuration|copiedFilename|customSoundURL|storedCustomSoundURL|VoiceInkCustomSoundCopyPlan|copyPlan|applyRuntimeState|Audio file is' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+
+require_pattern \
+  "shared custom sound copy runtime application lives in VoiceInkCore" \
+  'removeExistingDestination|copyToDestination|fileCopyFailed' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+
+reject_pattern \
+  "shared custom sound copy action payload stays hidden" \
+  'public enum VoiceInkCustomSoundCopyAction|public let action: VoiceInkCustomSoundCopyAction|public init\([^)]*action: VoiceInkCustomSoundCopyAction' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
 
 require_pattern \
@@ -10118,6 +10128,11 @@ require_pattern \
   'VoiceInkCustomSoundPreference\.(saveIsUsingCustomSound|saveSelectedBuiltInSound|saveCustomFilename|isUsingCustomSound|selectedBuiltInSound|customFilename|customSoundsRelativeDirectory|changedNotificationName|isDefaultSelection|customSoundURL|storedCustomSoundURL|copyPlan|preflightValidationError)|VoiceInkBuiltInRecordingSound|VoiceInkCustomSoundType|VoiceInkCustomSoundError' \
   VoiceInk/CustomSoundManager.swift
 
+require_pattern \
+  "macOS custom sound manager applies shared copy runtime plan" \
+  'copyPlan\.applyRuntimeState|removeExistingDestination|copyToDestination' \
+  VoiceInk/CustomSoundManager.swift
+
 reject_pattern \
   "macOS custom sound manager avoids shallow shared-type aliases" \
   'typealias +(CustomSoundError|BuiltInSound|SoundType)' \
@@ -10127,6 +10142,16 @@ reject_pattern \
   "macOS custom sound manager avoids shell-owned URL and copy planning" \
   'VoiceInkCustomSoundPreference\.copiedFilename|resolvingSymlinksInPath|appendingPathComponent\(filename\)|let destinationURL =|sourceURL\.pathExtension' \
   VoiceInk/CustomSoundManager.swift
+
+reject_pattern \
+  "macOS custom sound manager avoids raw copy action branching" \
+  'copyPlan\.action|case \.(useExistingDestination|replaceExistingDestinationAndCopy|copy)' \
+  VoiceInk/CustomSoundManager.swift
+
+reject_pattern \
+  "recording feedback tests exercise copy runtime behavior instead of raw actions" \
+  'plan\.action|useExistingDestination|replaceExistingDestinationAndCopy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RecordingFeedbackPreferenceTests.swift
 
 require_pattern \
   "macOS sound reload uses shared custom sound notification name" \

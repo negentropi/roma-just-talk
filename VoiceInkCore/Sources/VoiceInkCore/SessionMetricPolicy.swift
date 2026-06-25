@@ -111,3 +111,9 @@ public enum VoiceInkSessionMetricMigrationDiagnostics {
         "Stats migration failed: \(localizedDescription)"
     }
 }
+
+public enum VoiceInkSessionMetricRecorderDiagnostics {
+    public static func recordedSessionMetricMessage(transcriptionId: UUID) -> String {
+        "Recorded session metric for transcription \(transcriptionId.uuidString)"
+    }
+}

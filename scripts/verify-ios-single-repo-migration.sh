@@ -15581,6 +15581,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/SessionMetricPolicy.swift
 
 require_pattern \
+  "shared session metric recorder diagnostics live in VoiceInkCore" \
+  'VoiceInkSessionMetricRecorderDiagnostics|recordedSessionMetricMessage|Recorded session metric for transcription' \
+  VoiceInkCore/Sources/VoiceInkCore/SessionMetricPolicy.swift
+
+require_pattern \
   "macOS session metric model adapts shared draft" \
   'init\(draft: VoiceInkSessionMetricDraft\)' \
   VoiceInk/Models/SessionMetric.swift
@@ -15588,6 +15593,11 @@ require_pattern \
 require_pattern \
   "macOS session metric recorder uses shared draft" \
   'VoiceInkSessionMetricPolicy\.recorderDraft' \
+  VoiceInk/Services/SessionMetricRecorder.swift
+
+require_pattern \
+  "macOS session metric recorder uses shared diagnostics" \
+  'VoiceInkSessionMetricRecorderDiagnostics\.recordedSessionMetricMessage' \
   VoiceInk/Services/SessionMetricRecorder.swift
 
 require_pattern \
@@ -15600,6 +15610,11 @@ reject_pattern \
   'source: "recorder"|let metricValues = VoiceInkSessionMetricPolicy\.values|wordCount: metricValues|audioDuration: metricValues|speedFactor: metricValues' \
   VoiceInk/Services/SessionMetricRecorder.swift \
   VoiceInk/Services/SessionMetricMigrationService.swift
+
+reject_pattern \
+  "macOS session metric recorder avoids shell-owned diagnostics and log category" \
+  '"Recorded session metric for transcription|category: "SessionMetricRecorder"' \
+  VoiceInk/Services/SessionMetricRecorder.swift
 
 require_pattern \
   "macOS stats migration uses shared completion preference" \
@@ -15623,12 +15638,12 @@ reject_pattern \
 
 require_pattern \
   "core checks execute session metric draft and migration preference tests" \
-  'SessionMetricPolicyTests\.testRecorderDraftPreservesSourceAndMetricFields|SessionMetricPolicyTests\.testMigrationPreferencePreservesCompletionStorageKey|SessionMetricPolicyTests\.testMigrationDiagnosticsPreserveMacOSLogCopy' \
+  'SessionMetricPolicyTests\.testRecorderDraftPreservesSourceAndMetricFields|SessionMetricPolicyTests\.testMigrationPreferencePreservesCompletionStorageKey|SessionMetricPolicyTests\.testMigrationDiagnosticsPreserveMacOSLogCopy|SessionMetricPolicyTests\.testRecorderDiagnosticsPreserveMacOSLogCopy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "migration checklist tracks shared session metric migration preference" \
-  'metric row drafts, recorder source, completed-status filtering, .*stats-migration diagnostic copy, and stats-migration completion storage through `VoiceInkSessionMetricPolicy`/`VoiceInkSessionMetricDraft`/`VoiceInkSessionMetricMigrationPreference`/`VoiceInkSessionMetricMigrationDiagnostics`' \
+  'metric row drafts, recorder source, completed-status filtering, .*recorder diagnostic copy, stats-migration diagnostic copy, and stats-migration completion storage through `VoiceInkSessionMetricPolicy`/`VoiceInkSessionMetricDraft`/`VoiceInkSessionMetricRecorderDiagnostics`/`VoiceInkSessionMetricMigrationPreference`/`VoiceInkSessionMetricMigrationDiagnostics`' \
   docs/ios-single-repo-migration.md
 
 reject_pattern \
@@ -16789,7 +16804,8 @@ require_patterns \
   'transcriptionAutoCleanupService = "TranscriptionAutoCleanupService"' \
   'sessionMetricMigrationService = "SessionMetricMigrationService"' \
   'modelPrewarm = "ModelPrewarm"' \
-  'cursorPaster = "CursorPaster"'
+  'cursorPaster = "CursorPaster"' \
+  'sessionMetricRecorder = "SessionMetricRecorder"'
 
 require_pattern \
   "macOS window manager uses shared log category identity" \
@@ -16827,6 +16843,12 @@ require_patterns \
   VoiceInk/Services/SessionMetricMigrationService.swift \
   'Logger\(' \
   'category: VoiceInkMacOSLogCategory\.sessionMetricMigrationService'
+
+require_patterns \
+  "macOS session metric recorder uses shared log category identity" \
+  VoiceInk/Services/SessionMetricRecorder.swift \
+  'Logger\(' \
+  'category: VoiceInkMacOSLogCategory\.sessionMetricRecorder'
 
 require_patterns \
   "macOS paste adapter uses shared log category identity" \

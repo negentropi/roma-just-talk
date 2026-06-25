@@ -101,6 +101,15 @@ final class SessionMetricPolicyTests: XCTestCase {
         )
     }
 
+    func testRecorderDiagnosticsPreserveMacOSLogCopy() {
+        let id = UUID(uuidString: "00000000-0000-0000-0000-000000000789")!
+
+        XCTAssertEqual(
+            VoiceInkSessionMetricRecorderDiagnostics.recordedSessionMetricMessage(transcriptionId: id),
+            "Recorded session metric for transcription 00000000-0000-0000-0000-000000000789"
+        )
+    }
+
     private func withTemporaryDefaults(_ test: (UserDefaults) -> Void) {
         let suiteName = "VoiceInkCore.SessionMetricPolicyTests.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!

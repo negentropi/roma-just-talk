@@ -4,7 +4,10 @@ import OSLog
 import VoiceInkCore
 
 enum SessionMetricRecorder {
-    private static let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "SessionMetricRecorder")
+    private static let logger = Logger(
+        subsystem: VoiceInkAppIdentity.loggingSubsystem,
+        category: VoiceInkMacOSLogCategory.sessionMetricRecorder
+    )
 
     @discardableResult
     static func recordRecorderSession(
@@ -53,7 +56,10 @@ enum SessionMetricRecorder {
         )
 
         modelContext.insert(SessionMetric(draft: draft))
-        logger.notice("Recorded session metric for transcription \(transcriptionId.uuidString, privacy: .public)")
+        let message = VoiceInkSessionMetricRecorderDiagnostics.recordedSessionMetricMessage(
+            transcriptionId: transcriptionId
+        )
+        logger.notice("\(message, privacy: .public)")
         return true
     }
 

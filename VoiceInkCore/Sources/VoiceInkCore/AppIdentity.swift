@@ -323,6 +323,7 @@ public enum VoiceInkMacOSLogCategory {
     public static let sessionMetricMigrationService = "SessionMetricMigrationService"
     public static let modelPrewarm = "ModelPrewarm"
     public static let cursorPaster = "CursorPaster"
+    public static let sessionMetricRecorder = "SessionMetricRecorder"
 }
 
 public enum VoiceInkAppIdentity {

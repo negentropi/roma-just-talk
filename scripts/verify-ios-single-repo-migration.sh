@@ -13318,6 +13318,22 @@ require_pattern \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
 require_pattern \
+  "shared Power Mode config form appear plan lives in VoiceInkCore" \
+  'VoiceInkPowerModeConfigurationFormAppearPlan|appearPlan|selectedTranscriptionModelFacts' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "macOS Power Mode config form delegates form-load selection repair" \
+  'mode\.appearPlan\(' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
+require_patterns \
+  "core checks execute Power Mode config form appear plan tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'PowerModePolicyTests\.testConfigurationModeAppearPlanRepairsAddSelections' \
+  'PowerModePolicyTests\.testConfigurationModeAppearPlanKeepsEditProviderAndSkipsUnsupportedLanguageRepair'
+
+require_pattern \
   "shared Power Mode config form dismissal plan lives in VoiceInkCore" \
   'VoiceInkPowerModeConfigurationFormDismissalPlan|dismissalPlan|shouldRemoveUnsavedShortcut' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
@@ -13439,7 +13455,7 @@ require_pattern \
 
 require_pattern \
   "migration checklist tracks shared Power Mode config form chrome gate" \
-  'macOS Power Mode config form seed defaults, trigger-section labels, transcription section labels, AI toggle title, footer actions, website add planning, trigger removal, and unsaved add-form shortcut cleanup planning route through `VoiceInkPowerModeConfigurationFormState`/`VoiceInkPowerModeConfigurationFormDismissalPlan`/`VoiceInkPowerModePresentation`/`VoiceInkPowerModePolicy`' \
+  'macOS Power Mode config form seed defaults, trigger-section labels, transcription section labels, AI toggle title, footer actions, form-load provider/model/prompt/language repair, website add planning, trigger removal, and unsaved add-form shortcut cleanup planning route through `VoiceInkPowerModeConfigurationFormState`/`VoiceInkPowerModeConfigurationFormAppearPlan`/`VoiceInkPowerModeConfigurationFormDismissalPlan`/`VoiceInkPowerModePresentation`/`VoiceInkPowerModePolicy`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \
@@ -13485,6 +13501,11 @@ reject_pattern \
 reject_pattern \
   "macOS Power Mode config form avoids shell-owned unsaved shortcut cleanup planning" \
   'guard case \.add = mode, !didSaveConfiguration' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
+reject_pattern \
+  "macOS Power Mode config form avoids shell-owned form-load selection repair" \
+  'treatsEmptyModelAsMissing: true|shouldRepairSelectedLanguageForPowerMode' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
 reject_pattern \

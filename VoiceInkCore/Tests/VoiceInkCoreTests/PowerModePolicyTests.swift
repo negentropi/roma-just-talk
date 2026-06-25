@@ -2557,6 +2557,89 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertEqual(events, ["remove"])
     }
 
+    func testConfigurationModeAppearPlanRepairsAddSelections() {
+        let promptID = UUID()
+        let prompt = VoiceInkCustomPrompt(id: promptID, title: "Rewrite", promptText: "Rewrite this")
+        let enhancementSelection = VoiceInkPowerModeEnhancementSelection(
+            selectedPromptId: nil,
+            selectedAIProvider: nil,
+            selectedAIModel: ""
+        )
+        let transcriptionSelection = VoiceInkPowerModeTranscriptionSelection(
+            selectedModelName: "base",
+            selectedLanguage: nil
+        )
+
+        let plan = VoiceInkPowerModeConfigurationMode.add.appearPlan(
+            enhancementSelection: enhancementSelection,
+            isAIEnhancementEnabled: true,
+            prompts: [prompt],
+            currentAIProvider: .groq,
+            currentAIModel: "llama-3.3",
+            transcriptionSelection: transcriptionSelection,
+            selectedTranscriptionModelFacts: transcriptionModelFacts(
+                name: "base",
+                languageOptions: ["en": "English", "fr": "French"]
+            ),
+            storedLanguage: "fr"
+        )
+
+        XCTAssertEqual(
+            plan.enhancementSelection,
+            VoiceInkPowerModeEnhancementSelection(
+                selectedPromptId: promptID,
+                selectedAIProvider: "Groq",
+                selectedAIModel: "llama-3.3"
+            )
+        )
+        XCTAssertEqual(
+            plan.transcriptionSelection,
+            VoiceInkPowerModeTranscriptionSelection(
+                selectedModelName: "base",
+                selectedLanguage: "fr"
+            )
+        )
+
+        var events = [String]()
+        plan.applyRuntimeState(
+            applyEnhancementSelection: { events.append("enhancement:\($0.selectedAIProvider ?? "nil")") },
+            applyTranscriptionSelection: { events.append("language:\($0.selectedLanguage ?? "nil")") }
+        )
+        XCTAssertEqual(events, ["enhancement:Groq", "language:fr"])
+    }
+
+    func testConfigurationModeAppearPlanKeepsEditProviderAndSkipsUnsupportedLanguageRepair() {
+        let id = UUID()
+        let editMode = VoiceInkPowerModeConfigurationMode.edit(
+            config(id: id, name: "Writing", emoji: "W")
+        )
+        let enhancementSelection = VoiceInkPowerModeEnhancementSelection(
+            selectedPromptId: nil,
+            selectedAIProvider: nil,
+            selectedAIModel: nil
+        )
+
+        let plan = editMode.appearPlan(
+            enhancementSelection: enhancementSelection,
+            isAIEnhancementEnabled: false,
+            prompts: [VoiceInkCustomPrompt(id: UUID(), title: "Rewrite", promptText: "Rewrite this")],
+            currentAIProvider: .openAI,
+            currentAIModel: "gpt-4o",
+            transcriptionSelection: VoiceInkPowerModeTranscriptionSelection(
+                selectedModelName: "gemini",
+                selectedLanguage: "fr"
+            ),
+            selectedTranscriptionModelFacts: transcriptionModelFacts(
+                name: "gemini",
+                disablesLanguageSelection: true
+            ),
+            storedLanguage: "en"
+        )
+
+        XCTAssertEqual(plan.enhancementSelection, enhancementSelection)
+        XCTAssertNil(plan.transcriptionSelection)
+    }
+
     func testConfigurationModePreservesEditIdentityByConfigId() {
         let id = UUID()
         let first = VoiceInkPowerModeConfigurationMode.edit(

@@ -569,35 +569,21 @@ struct ConfigurationView: View {
             }
             .powerModeValidationAlert(errors: validationErrors, isPresented: $showValidationAlert)
             .onAppear {
-                // Set AI provider/model after EnvironmentObjects are available
-                if case .add = mode {
-                    applyEnhancementSelection(
-                        enhancementSelection.fillingMissingProviderAndModel(
-                            currentProvider: aiService.selectedProvider,
-                            currentModel: aiService.currentModel,
-                            treatsEmptyModelAsMissing: true
-                        )
-                    )
-                }
-
-                applyEnhancementSelection(
-                    enhancementSelection.selectingPromptForEnhancementState(
-                        isEnabled: isAIEnhancementEnabled,
-                        prompts: enhancementService.allPrompts
-                    )
+                let selectedModelFacts = selectedTranscriptionModel.map { modelFacts(for: $0) }
+                mode.appearPlan(
+                    enhancementSelection: enhancementSelection,
+                    isAIEnhancementEnabled: isAIEnhancementEnabled,
+                    prompts: enhancementService.allPrompts,
+                    currentAIProvider: aiService.selectedProvider,
+                    currentAIModel: aiService.currentModel,
+                    transcriptionSelection: transcriptionSelection,
+                    selectedTranscriptionModelFacts: selectedModelFacts,
+                    storedLanguage: VoiceInkTranscriptionLanguagePreference.storedLanguage()
                 )
-
-                if let model = selectedTranscriptionModel {
-                    let facts = modelFacts(for: model)
-                    if facts.shouldRepairSelectedLanguageForPowerMode {
-                        applyTranscriptionSelection(
-                            transcriptionSelection.selectingCompatibleLanguage(
-                                for: facts,
-                                storedLanguage: VoiceInkTranscriptionLanguagePreference.storedLanguage()
-                            )
-                        )
-                    }
-                }
+                .applyRuntimeState(
+                    applyEnhancementSelection: applyEnhancementSelection,
+                    applyTranscriptionSelection: applyTranscriptionSelection
+                )
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                     isNameFieldFocused = true

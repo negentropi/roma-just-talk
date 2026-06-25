@@ -557,6 +557,30 @@ public struct VoiceInkPowerModeTranscriptionSelection: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkPowerModeConfigurationFormAppearPlan: Equatable, Sendable {
+    public let enhancementSelection: VoiceInkPowerModeEnhancementSelection
+    public let transcriptionSelection: VoiceInkPowerModeTranscriptionSelection?
+
+    public init(
+        enhancementSelection: VoiceInkPowerModeEnhancementSelection,
+        transcriptionSelection: VoiceInkPowerModeTranscriptionSelection?
+    ) {
+        self.enhancementSelection = enhancementSelection
+        self.transcriptionSelection = transcriptionSelection
+    }
+
+    public func applyRuntimeState(
+        applyEnhancementSelection: (VoiceInkPowerModeEnhancementSelection) -> Void,
+        applyTranscriptionSelection: (VoiceInkPowerModeTranscriptionSelection) -> Void
+    ) {
+        applyEnhancementSelection(enhancementSelection)
+
+        if let transcriptionSelection {
+            applyTranscriptionSelection(transcriptionSelection)
+        }
+    }
+}
+
 public struct VoiceInkPowerModeTranscriptionModelResourceFacts: Equatable, Sendable {
     public var name: String
     public var loadsLocalWhisperModel: Bool
@@ -1784,6 +1808,48 @@ public enum VoiceInkPowerModeConfigurationMode: Hashable, Sendable {
         case .edit(let config):
             return .editing(existingConfigurations.powerModeConfiguration(with: config.id) ?? config)
         }
+    }
+
+    public func appearPlan(
+        enhancementSelection: VoiceInkPowerModeEnhancementSelection,
+        isAIEnhancementEnabled: Bool,
+        prompts: [VoiceInkCustomPrompt],
+        currentAIProvider: VoiceInkAIEnhancementProviderKind,
+        currentAIModel: String,
+        transcriptionSelection: VoiceInkPowerModeTranscriptionSelection,
+        selectedTranscriptionModelFacts: VoiceInkPowerModeTranscriptionModelFacts?,
+        storedLanguage: String?
+    ) -> VoiceInkPowerModeConfigurationFormAppearPlan {
+        var nextEnhancementSelection = enhancementSelection
+
+        if isAdding {
+            nextEnhancementSelection = nextEnhancementSelection.fillingMissingProviderAndModel(
+                currentProvider: currentAIProvider,
+                currentModel: currentAIModel,
+                treatsEmptyModelAsMissing: true
+            )
+        }
+
+        nextEnhancementSelection = nextEnhancementSelection.selectingPromptForEnhancementState(
+            isEnabled: isAIEnhancementEnabled,
+            prompts: prompts
+        )
+
+        let nextTranscriptionSelection: VoiceInkPowerModeTranscriptionSelection?
+        if let selectedTranscriptionModelFacts,
+           selectedTranscriptionModelFacts.shouldRepairSelectedLanguageForPowerMode {
+            nextTranscriptionSelection = transcriptionSelection.selectingCompatibleLanguage(
+                for: selectedTranscriptionModelFacts,
+                storedLanguage: storedLanguage
+            )
+        } else {
+            nextTranscriptionSelection = nil
+        }
+
+        return VoiceInkPowerModeConfigurationFormAppearPlan(
+            enhancementSelection: nextEnhancementSelection,
+            transcriptionSelection: nextTranscriptionSelection
+        )
     }
 
     public func dismissalPlan(

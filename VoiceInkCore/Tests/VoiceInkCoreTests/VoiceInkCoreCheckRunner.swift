@@ -907,6 +907,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testPowerModeSessionDiagnosticsPreserveMacOSConsoleCopy", run: { PowerModePolicyTests().testPowerModeSessionDiagnosticsPreserveMacOSConsoleCopy() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testConfigurationModePreservesFormTitlesAndSaveModes", run: { PowerModePolicyTests().testConfigurationModePreservesFormTitlesAndSaveModes() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testConfigurationModePlansUnsavedAddShortcutCleanupOnDismiss", run: { PowerModePolicyTests().testConfigurationModePlansUnsavedAddShortcutCleanupOnDismiss() }),
+            VoiceInkCoreCheck(name: "PowerModePolicyTests.testConfigurationModeAppearPlanRepairsAddSelections", run: { PowerModePolicyTests().testConfigurationModeAppearPlanRepairsAddSelections() }),
+            VoiceInkCoreCheck(name: "PowerModePolicyTests.testConfigurationModeAppearPlanKeepsEditProviderAndSkipsUnsupportedLanguageRepair", run: { PowerModePolicyTests().testConfigurationModeAppearPlanKeepsEditProviderAndSkipsUnsupportedLanguageRepair() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testConfigurationModePreservesEditIdentityByConfigId", run: { PowerModePolicyTests().testConfigurationModePreservesEditIdentityByConfigId() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testAutoSendKeyPreservesStoredValuesPickerOrderAndLabels", run: { PowerModePolicyTests().testAutoSendKeyPreservesStoredValuesPickerOrderAndLabels() }),
             VoiceInkCoreCheck(name: "PowerModePolicyTests.testAutoSendKeyEnablementAndCodableShape", run: { try PowerModePolicyTests().testAutoSendKeyEnablementAndCodableShape() }),

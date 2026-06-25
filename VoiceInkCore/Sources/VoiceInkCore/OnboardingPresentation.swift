@@ -261,7 +261,7 @@ public struct VoiceInkMacOSResetOnboardingPresentation: Equatable, Sendable {
     }
 }
 
-public enum VoiceInkMacOSSetupStepKind: String, Equatable, Sendable {
+enum VoiceInkMacOSSetupStepKind: String, Equatable, Sendable {
     case shortcut
     case accessibility
     case screenContext
@@ -269,15 +269,15 @@ public enum VoiceInkMacOSSetupStepKind: String, Equatable, Sendable {
 }
 
 public struct VoiceInkMacOSSetupStepPresentation: Identifiable, Equatable, Sendable {
-    public let kind: VoiceInkMacOSSetupStepKind
+    let kind: VoiceInkMacOSSetupStepKind
     public let isOptional: Bool
     public let iconSystemName: String
     public let title: String
     public let description: String
 
-    public var id: VoiceInkMacOSSetupStepKind { kind }
+    public var id: String { kind.rawValue }
 
-    public init(
+    init(
         kind: VoiceInkMacOSSetupStepKind,
         isOptional: Bool,
         iconSystemName: String,
@@ -289,6 +289,24 @@ public struct VoiceInkMacOSSetupStepPresentation: Identifiable, Equatable, Senda
         self.iconSystemName = iconSystemName
         self.title = title
         self.description = description
+    }
+
+    public func isCompleted(
+        isShortcutConfigured: Bool,
+        isAccessibilityEnabled: Bool,
+        isScreenRecordingEnabled: Bool,
+        hasCurrentTranscriptionModel: Bool
+    ) -> Bool {
+        switch kind {
+        case .shortcut:
+            return isShortcutConfigured
+        case .accessibility:
+            return isAccessibilityEnabled
+        case .screenContext:
+            return isScreenRecordingEnabled
+        case .modelDownload:
+            return hasCurrentTranscriptionModel
+        }
     }
 }
 

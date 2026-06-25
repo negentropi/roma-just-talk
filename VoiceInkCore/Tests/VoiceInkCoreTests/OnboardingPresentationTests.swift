@@ -314,6 +314,55 @@ final class OnboardingPresentationTests: XCTestCase {
         )
     }
 
+    func testMacOSSetupStepCompletionPolicyPreservesMacOSChecks() {
+        let steps = VoiceInkMacOSSetupPresentation.steps
+        XCTAssertEqual(steps.map(\.id), ["shortcut", "accessibility", "screenContext", "modelDownload"])
+        XCTAssertEqual(
+            steps.map {
+                $0.isCompleted(
+                    isShortcutConfigured: true,
+                    isAccessibilityEnabled: false,
+                    isScreenRecordingEnabled: false,
+                    hasCurrentTranscriptionModel: false
+                )
+            },
+            [true, false, false, false]
+        )
+        XCTAssertEqual(
+            steps.map {
+                $0.isCompleted(
+                    isShortcutConfigured: false,
+                    isAccessibilityEnabled: true,
+                    isScreenRecordingEnabled: false,
+                    hasCurrentTranscriptionModel: false
+                )
+            },
+            [false, true, false, false]
+        )
+        XCTAssertEqual(
+            steps.map {
+                $0.isCompleted(
+                    isShortcutConfigured: false,
+                    isAccessibilityEnabled: false,
+                    isScreenRecordingEnabled: true,
+                    hasCurrentTranscriptionModel: false
+                )
+            },
+            [false, false, true, false]
+        )
+        XCTAssertEqual(
+            steps.map {
+                $0.isCompleted(
+                    isShortcutConfigured: false,
+                    isAccessibilityEnabled: false,
+                    isScreenRecordingEnabled: false,
+                    hasCurrentTranscriptionModel: true
+                )
+            },
+            [false, false, false, true]
+        )
+    }
+
     func testMacOSSetupPresentationPreservesActionTitlePolicy() {
         XCTAssertEqual(
             VoiceInkMacOSSetupPresentation.actionButtonTitle(

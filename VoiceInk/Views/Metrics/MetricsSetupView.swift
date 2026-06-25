@@ -162,16 +162,12 @@ struct MetricsSetupView: View {
     }
 
     private func isStepCompleted(_ step: VoiceInkMacOSSetupStepPresentation) -> Bool {
-        switch step.kind {
-        case .shortcut:
-            return recordingShortcutManager.isShortcutConfigured
-        case .accessibility:
-            return isAccessibilityEnabled
-        case .screenContext:
-            return isScreenRecordingEnabled
-        case .modelDownload:
-            return transcriptionModelManager.currentTranscriptionModel != nil
-        }
+        step.isCompleted(
+            isShortcutConfigured: recordingShortcutManager.isShortcutConfigured,
+            isAccessibilityEnabled: isAccessibilityEnabled,
+            isScreenRecordingEnabled: isScreenRecordingEnabled,
+            hasCurrentTranscriptionModel: transcriptionModelManager.currentTranscriptionModel != nil
+        )
     }
 
     private func stepColor(isCompleted: Bool, isOptional: Bool) -> Color {

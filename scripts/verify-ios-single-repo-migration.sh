@@ -4867,17 +4867,22 @@ reject_pattern \
 
 require_pattern \
   "shared macOS setup presentation lives in VoiceInkCore" \
-  'VoiceInkMacOSSetupPresentation|VoiceInkMacOSSetupStepPresentation|actionButtonTitle' \
+  'VoiceInkMacOSSetupPresentation|VoiceInkMacOSSetupStepPresentation|actionButtonTitle|isCompleted' \
+  VoiceInkCore/Sources/VoiceInkCore/OnboardingPresentation.swift
+
+reject_pattern \
+  "shared macOS setup presentation avoids public raw step kind" \
+  'public enum +VoiceInkMacOSSetupStepKind|public let +kind: +VoiceInkMacOSSetupStepKind' \
   VoiceInkCore/Sources/VoiceInkCore/OnboardingPresentation.swift
 
 require_pattern \
   "macOS metrics setup uses shared setup presentation" \
-  'VoiceInkMacOSSetupPresentation\.(title|subtitle|steps|actionButtonTitle|helpText|completedSystemImageName|optionalSystemImageName|requiredSystemImageName)' \
+  'VoiceInkMacOSSetupPresentation\.(title|subtitle|steps|actionButtonTitle|helpText|completedSystemImageName|optionalSystemImageName|requiredSystemImageName)|step\.isCompleted' \
   VoiceInk/Views/Metrics/MetricsSetupView.swift
 
 require_pattern \
   "core tests pin macOS setup presentation copy and policy" \
-  'testMacOSSetupPresentationPreservesHeaderAndStepOrder|testMacOSSetupPresentationPreservesActionTitlePolicy' \
+  'testMacOSSetupPresentationPreservesHeaderAndStepOrder|testMacOSSetupStepCompletionPolicyPreservesMacOSChecks|testMacOSSetupPresentationPreservesActionTitlePolicy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/OnboardingPresentationTests.swift
 
 require_pattern \
@@ -4916,7 +4921,7 @@ require_pattern \
 
 require_pattern \
   "core check runner executes macOS setup presentation tests" \
-  'testMacOSSetupPresentationPreservesHeaderAndStepOrder|testMacOSSetupPresentationPreservesActionTitlePolicy' \
+  'testMacOSSetupPresentationPreservesHeaderAndStepOrder|testMacOSSetupStepCompletionPolicyPreservesMacOSChecks|testMacOSSetupPresentationPreservesActionTitlePolicy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -4937,6 +4942,11 @@ reject_pattern \
 reject_pattern \
   "macOS metrics setup avoids shallow action-title wrapper" \
   'private var +actionButtonTitle[[:space:]]*:' \
+  VoiceInk/Views/Metrics/MetricsSetupView.swift
+
+reject_pattern \
+  "macOS metrics setup avoids direct setup-step kind switching" \
+  'step\.kind|switch +step\.kind|case \.(shortcut|accessibility|screenContext|modelDownload)' \
   VoiceInk/Views/Metrics/MetricsSetupView.swift
 
 require_pattern \

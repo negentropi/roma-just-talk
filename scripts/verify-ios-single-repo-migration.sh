@@ -15558,7 +15558,7 @@ require_pattern \
 
 require_pattern \
   "shared performance panel presentation lives in VoiceInkCore" \
-  'VoiceInkPerformancePresentation|modelPerformancePanelTitle|performanceAnalysisPanelTitle|averageEnhancementTimeLabel|transcriptSampleCountText|physicalMemoryText' \
+  'VoiceInkPerformancePresentation|modelPerformancePanelTitle|performanceAnalysisPanelTitle|totalTranscriptsText|totalWithTranscriptionDataText|totalEnhancedFilesText|averageEnhancementTimeLabel|transcriptSampleCountText|physicalMemoryText' \
   VoiceInkCore/Sources/VoiceInkCore/PerformanceAnalysis.swift
 
 require_pattern \
@@ -15578,7 +15578,7 @@ require_pattern \
 
 require_pattern \
   "macOS performance analysis panel uses shared presentation" \
-  'VoiceInkPerformancePresentation\.(performanceAnalysisPanelTitle|summarySectionTitle|transcriptSampleCountText|averageProcessingLabel)' \
+  'VoiceInkPerformancePresentation\.(performanceAnalysisPanelTitle|summarySectionTitle|transcriptSampleCountText|averageProcessingLabel)|analysis\.(totalTranscriptsText|totalWithTranscriptionDataText|totalEnhancedFilesText)' \
   VoiceInk/Views/Metrics/PerformanceAnalysisPanelView.swift
 
 require_pattern \
@@ -15593,7 +15593,7 @@ require_pattern \
 
 require_pattern \
   "core tests pin macOS performance panel presentation" \
-  'testPerformancePresentationPreservesMacOSPanelCopyAndIcons' \
+  'testPerformancePresentationPreservesMacOSPanelCopyAndIcons|totalTranscriptsText|totalWithTranscriptionDataText|totalEnhancedFilesText' \
   VoiceInkCore/Tests/VoiceInkCoreTests/PerformanceAnalysisTests.swift
 
 require_pattern \
@@ -15615,6 +15615,11 @@ reject_pattern \
   "macOS performance panels avoid shell-only shared performance presentation copy" \
   '"(Model Performance|Performance Analysis|No data for this period|Summary|System Information|Transcription Models|Enhancement Models|Total|Analyzable|Enhanced|Device|Processor|Memory|Avg\. Audio|Avg\. Processing|Avg\. Enhancement Time)"|systemName: "(xmark|chart\.bar\.xaxis|doc\.text\.fill|waveform\.path\.ecg|sparkles)"|sampleCount\) (sessions|transcripts)' \
   VoiceInk/Views/Metrics/ModelPerformancePanel.swift \
+  VoiceInk/Views/Metrics/PerformanceAnalysisPanelView.swift
+
+reject_pattern \
+  "macOS performance analysis panel avoids shell-owned summary count display" \
+  '"\\\(analysis\.(totalTranscripts|totalWithTranscriptionData|totalEnhancedFiles)\\\)"' \
   VoiceInk/Views/Metrics/PerformanceAnalysisPanelView.swift
 
 reject_pattern \

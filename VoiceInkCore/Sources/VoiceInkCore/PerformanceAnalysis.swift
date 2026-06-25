@@ -23,6 +23,18 @@ public struct VoiceInkPerformanceAnalysis: Equatable, Sendable {
     public let totalEnhancedFiles: Int
     public let transcriptionModels: [VoiceInkPerformanceModelStat]
     public let enhancementModels: [VoiceInkPerformanceModelStat]
+
+    public var totalTranscriptsText: String {
+        "\(totalTranscripts)"
+    }
+
+    public var totalWithTranscriptionDataText: String {
+        "\(totalWithTranscriptionData)"
+    }
+
+    public var totalEnhancedFilesText: String {
+        "\(totalEnhancedFiles)"
+    }
 }
 
 public struct VoiceInkPerformanceModelStat: Identifiable, Equatable, Sendable {

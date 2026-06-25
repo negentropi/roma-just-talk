@@ -39,9 +39,12 @@ final class PerformanceAnalysisTests: XCTestCase {
         ])
 
         XCTAssertEqual(analysis.totalTranscripts, 4)
+        XCTAssertEqual(analysis.totalTranscriptsText, "4")
         XCTAssertEqual(analysis.totalWithTranscriptionData, 3)
+        XCTAssertEqual(analysis.totalWithTranscriptionDataText, "3")
         XCTAssertEqual(analysis.totalAudioDuration, 55)
         XCTAssertEqual(analysis.totalEnhancedFiles, 1)
+        XCTAssertEqual(analysis.totalEnhancedFilesText, "1")
         XCTAssertEqual(analysis.transcriptionModels.map(\.name), ["fast", "slow"])
         XCTAssertEqual(analysis.transcriptionModels[0].sampleCount, 2)
         XCTAssertEqual(analysis.transcriptionModels[0].totalProcessingTime, 6)

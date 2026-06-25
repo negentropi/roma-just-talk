@@ -69,19 +69,19 @@ struct PerformanceAnalysisPanelView: View {
             HStack(spacing: 10) {
                 summaryPill(
                     icon: VoiceInkPerformancePresentation.totalSummaryIconSystemName,
-                    value: "\(analysis.totalTranscripts)",
+                    value: analysis.totalTranscriptsText,
                     label: VoiceInkPerformancePresentation.totalSummaryLabel,
                     color: .indigo
                 )
                 summaryPill(
                     icon: VoiceInkPerformancePresentation.analyzableSummaryIconSystemName,
-                    value: "\(analysis.totalWithTranscriptionData)",
+                    value: analysis.totalWithTranscriptionDataText,
                     label: VoiceInkPerformancePresentation.analyzableSummaryLabel,
                     color: .teal
                 )
                 summaryPill(
                     icon: VoiceInkPerformancePresentation.enhancedSummaryIconSystemName,
-                    value: "\(analysis.totalEnhancedFiles)",
+                    value: analysis.totalEnhancedFilesText,
                     label: VoiceInkPerformancePresentation.enhancedSummaryLabel,
                     color: .mint
                 )

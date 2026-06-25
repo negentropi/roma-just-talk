@@ -298,18 +298,8 @@ struct CloudModelCardView: View {
         apiKeyFormState = startPlan.formState
         guard let keyToVerify = startPlan.candidate else { return }
 
-        guard let provider = model.provider.coreTranscriptionModelProvider else {
-            apiKeyFormState
-                .verificationCompletionPlan(applicationPlan: .unsupportedProvider)
-                .applyRuntimeState(
-                    setFormState: { apiKeyFormState = $0 },
-                    applyVerificationPlan: { _ in }
-                )
-            return
-        }
-
         Task {
-            let result = await apiKeyVerifier.verifyStoredAPIKeyDetailed(keyToVerify, for: provider)
+            let result = await apiKeyVerifier.verifyStoredAPIKeyDetailed(keyToVerify, for: model.provider)
 
             await MainActor.run {
                 let didSaveKey = apiKeyFormState

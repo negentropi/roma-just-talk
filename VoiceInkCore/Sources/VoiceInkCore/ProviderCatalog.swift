@@ -707,8 +707,9 @@ public enum VoiceInkProviderAPIKeyVerificationProgress: Equatable, Sendable {
     case success
     case failure(message: String?)
 
+    public static let unsupportedProviderFailureMessage = "Unsupported provider"
     public static let unsupportedProviderFailure: VoiceInkProviderAPIKeyVerificationProgress = .failure(
-        message: "Unsupported provider"
+        message: unsupportedProviderFailureMessage
     )
 
     public var isVerifying: Bool {

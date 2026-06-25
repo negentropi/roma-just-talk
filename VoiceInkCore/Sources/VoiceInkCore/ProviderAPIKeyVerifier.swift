@@ -214,4 +214,37 @@ public struct VoiceInkProviderAPIKeyVerifier: Sendable {
 
         return await verifyAPIKeyDetailed(apiKey, for: transcriptionProvider)
     }
+
+    public func verifyAPIKeyDetailed(
+        _ apiKey: String,
+        for macOSProvider: VoiceInkMacOSTranscriptionModelProvider
+    ) async -> VoiceInkAPIKeyVerificationResult {
+        guard let transcriptionProvider = macOSProvider.coreTranscriptionModelProvider else {
+            return VoiceInkAPIKeyVerificationResult(
+                isValid: false,
+                errorMessage: VoiceInkProviderAPIKeyVerificationProgress.unsupportedProviderFailureMessage
+            )
+        }
+
+        return await verifyAPIKeyDetailed(apiKey, for: transcriptionProvider)
+    }
+
+    public func verifyStoredAPIKeyDetailed(
+        _ storedKey: String?,
+        for macOSProvider: VoiceInkMacOSTranscriptionModelProvider,
+        environment: [String: String] = ProcessInfo.processInfo.environment
+    ) async -> VoiceInkAPIKeyVerificationResult {
+        guard let transcriptionProvider = macOSProvider.coreTranscriptionModelProvider else {
+            return VoiceInkAPIKeyVerificationResult(
+                isValid: false,
+                errorMessage: VoiceInkProviderAPIKeyVerificationProgress.unsupportedProviderFailureMessage
+            )
+        }
+
+        return await verifyStoredAPIKeyDetailed(
+            storedKey,
+            for: transcriptionProvider,
+            environment: environment
+        )
+    }
 }

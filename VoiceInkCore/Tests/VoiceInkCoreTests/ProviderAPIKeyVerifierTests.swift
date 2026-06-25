@@ -92,12 +92,47 @@ final class ProviderAPIKeyVerifierTests: XCTestCase {
         }
     }
 
+    func testVerifierRoutesMacOSTranscriptionModelProvidersWithoutNetworkForBlankKeys() async {
+        let verifier = VoiceInkProviderAPIKeyVerifier()
+
+        for provider in VoiceInkMacOSTranscriptionModelProvider.allCases where provider.coreTranscriptionModelProvider != nil {
+            let result = await verifier.verifyAPIKeyDetailed(" \n\t ", for: provider)
+
+            XCTAssertEqual(
+                result,
+                VoiceInkAPIKeyVerificationResult(
+                    isValid: false,
+                    errorMessage: "API key is missing or empty."
+                ),
+                "\(provider.rawValue) should route through shared macOS model-provider verification"
+            )
+        }
+    }
+
     func testStoredKeyVerifierRejectsMissingTranscriptionModelProviderKeyWithoutNetwork() async {
         let verifier = VoiceInkProviderAPIKeyVerifier()
 
         let result = await verifier.verifyStoredAPIKeyDetailed(
             "$MISSING_CARTESIA_API_KEY",
-            for: .cartesia,
+            for: VoiceInkTranscriptionModelProvider.cartesia,
+            environment: [:]
+        )
+
+        XCTAssertEqual(
+            result,
+            VoiceInkAPIKeyVerificationResult(
+                isValid: false,
+                errorMessage: "API key is missing or empty."
+            )
+        )
+    }
+
+    func testStoredKeyVerifierRejectsMissingMacOSTranscriptionModelProviderKeyWithoutNetwork() async {
+        let verifier = VoiceInkProviderAPIKeyVerifier()
+
+        let result = await verifier.verifyStoredAPIKeyDetailed(
+            "$MISSING_GROQ_API_KEY",
+            for: VoiceInkMacOSTranscriptionModelProvider.groq,
             environment: [:]
         )
 
@@ -134,6 +169,28 @@ final class ProviderAPIKeyVerifierTests: XCTestCase {
             VoiceInkAPIKeyVerificationResult(
                 isValid: false,
                 errorMessage: "Local (Whisper) does not support API key verification."
+            )
+        )
+    }
+
+    func testVerifierRejectsLocalMacOSTranscriptionModelProviderWithoutVerificationTransport() async {
+        let verifier = VoiceInkProviderAPIKeyVerifier()
+
+        let directResult = await verifier.verifyAPIKeyDetailed("key", for: VoiceInkMacOSTranscriptionModelProvider.whisper)
+        XCTAssertEqual(
+            directResult,
+            VoiceInkAPIKeyVerificationResult(
+                isValid: false,
+                errorMessage: "Unsupported provider"
+            )
+        )
+
+        let storedResult = await verifier.verifyStoredAPIKeyDetailed("key", for: VoiceInkMacOSTranscriptionModelProvider.whisper)
+        XCTAssertEqual(
+            storedResult,
+            VoiceInkAPIKeyVerificationResult(
+                isValid: false,
+                errorMessage: "Unsupported provider"
             )
         )
     }

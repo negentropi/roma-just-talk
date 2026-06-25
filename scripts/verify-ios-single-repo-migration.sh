@@ -5073,7 +5073,12 @@ require_pattern \
 
 require_pattern \
   "macOS cloud API-key card uses shared stored-key verifier" \
-  'verifyStoredAPIKeyDetailed\(keyToVerify, for: provider\)' \
+  'verifyStoredAPIKeyDetailed\(keyToVerify, for: model\.provider\)' \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift
+
+reject_pattern \
+  "macOS cloud API-key card avoids direct core transcription provider reach-through" \
+  'coreTranscriptionModelProvider' \
   VoiceInk/Views/AI\ Models/CloudModelCardView.swift
 
 reject_pattern \
@@ -5233,6 +5238,18 @@ require_pattern \
   "Cartesia API-key request builder lives with provider verifier" \
   'VoiceInkCartesiaRequestBuilder|VoiceInkCartesiaClient|Cartesia-Version|cartesiaVoicesURL' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyVerifier.swift
+
+require_patterns \
+  "shared provider verifier accepts macOS transcription model providers" \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyVerifier.swift \
+  'for macOSProvider: VoiceInkMacOSTranscriptionModelProvider' \
+  'macOSProvider\.coreTranscriptionModelProvider' \
+  'unsupportedProviderFailureMessage'
+
+require_pattern \
+  "core checks execute macOS transcription provider verification tests" \
+  'ProviderAPIKeyVerifierTests\.testVerifierRoutesMacOSTranscriptionModelProvidersWithoutNetworkForBlankKeys|ProviderAPIKeyVerifierTests\.testStoredKeyVerifierRejectsMissingMacOSTranscriptionModelProviderKeyWithoutNetwork|ProviderAPIKeyVerifierTests\.testVerifierRejectsLocalMacOSTranscriptionModelProviderWithoutVerificationTransport' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 section "obsolete standalone OpenAI-compatible models request module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleModelsRequest.swift

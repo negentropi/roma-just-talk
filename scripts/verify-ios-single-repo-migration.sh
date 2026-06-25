@@ -12401,6 +12401,11 @@ reject_pattern \
   'Mode\(name: ""\)' \
   iOS/VoiceInk-ios/ModeConfigurationView.swift
 
+reject_pattern \
+  "iOS mode form avoids state-owned edit mode" \
+  '@State private var isEditing' \
+  iOS/VoiceInk-ios/ModeConfigurationView.swift
+
 require_pattern \
   "iOS settings adapter builds mode provider availability from provider-key state" \
   'providerAccessSnapshot\.modeFormProviderAvailability' \

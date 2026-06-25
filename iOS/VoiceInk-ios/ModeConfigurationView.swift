@@ -6,7 +6,7 @@ struct ModeConfigurationView: View {
     @ObservedObject var settings: AppSettings
     
     @State private var mode: Mode
-    @State private var isEditing: Bool
+    private let isEditing: Bool
     
     let onSave: (Mode) -> Void
     

@@ -24,44 +24,32 @@ class ActiveWindowService: ObservableObject {
         powerModeId: UUID? = nil,
         updateCurrentApplication: Bool = true
     ) async -> PowerModeConfig? {
-        let powerModeManager = PowerModeManager.shared
-        let configurations = powerModeManager.configurations
+        await VoiceInkPowerModeAutomaticResolutionPlan.resolving(
+            configurations: PowerModeManager.shared.configurations,
+            explicitID: powerModeId
+        ).applyRuntimeState(
+            frontmostApplicationBundleIdentifier: {
+                guard let frontmostApp = NSWorkspace.shared.frontmostApplication,
+                      let bundleIdentifier = frontmostApp.bundleIdentifier else {
+                    return nil
+                }
 
-        if let config = configurations.resolvedPowerModeConfiguration(explicitID: powerModeId) {
-            return config
-        }
+                if updateCurrentApplication {
+                    await MainActor.run {
+                        currentApplication = frontmostApp
+                    }
+                }
 
-        guard configurations.hasEnabledAutomaticRules else {
-            return nil
-        }
-
-        guard let frontmostApp = NSWorkspace.shared.frontmostApplication,
-              let bundleIdentifier = frontmostApp.bundleIdentifier else {
-            return nil
-        }
-
-        if updateCurrentApplication {
-            await MainActor.run {
-                currentApplication = frontmostApp
-            }
-        }
-
-        var currentWebsiteURL: String?
-
-        if configurations.hasEnabledURLRules,
-           let browserType = VoiceInkPowerModeBrowser.allCases.first(where: { $0.bundleIdentifier == bundleIdentifier }) {
-            do {
-                currentWebsiteURL = try await browserURLService.getCurrentURL(from: browserType)
-            } catch {
+                return bundleIdentifier
+            },
+            readCurrentWebsiteURL: { browser in
+                try await browserURLService.getCurrentURL(from: browser)
+            },
+            logBrowserURLFailure: { message in
                 logger.error(
-                    "\(VoiceInkPowerModeBrowserDetectionDiagnostics.urlLookupFailedMessage(browserDisplayName: browserType.displayName, localizedDescription: error.localizedDescription), privacy: .public)"
+                    "\(message, privacy: .public)"
                 )
             }
-        }
-
-        return configurations.resolvedPowerModeConfiguration(
-            websiteURL: currentWebsiteURL,
-            appBundleIdentifier: bundleIdentifier
         )
     }
 

@@ -13795,7 +13795,7 @@ reject_pattern \
 
 require_pattern \
   "migration checklist tracks shared Power Mode top-level preference gate" \
-  'macOS top-level Power Mode visibility, persist-after-recording preference, first-run visibility repair, enabled-configuration presence, shortcut eligibility, and active-configuration/session-start activation order route through `VoiceInkPowerModePreference`/`VoiceInkPowerModeActivationPlan`/shared `PowerModeConfig` array helpers' \
+  'macOS top-level Power Mode visibility, persist-after-recording preference, first-run visibility repair, enabled-configuration presence, shortcut eligibility, automatic frontmost-app/browser URL resolution planning, and active-configuration/session-start activation order route through `VoiceInkPowerModePreference`/`VoiceInkPowerModeAutomaticResolutionPlan`/`VoiceInkPowerModeActivationPlan`/shared `PowerModeConfig` array helpers' \
   docs/ios-single-repo-migration.md
 
 reject_pattern \
@@ -13982,11 +13982,15 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_patterns \
-  "macOS active-window service consumes shared Power Mode browser catalog and diagnostics" \
-  VoiceInk/PowerMode/ActiveWindowService.swift \
+  "shared Power Mode automatic resolution plan consumes browser catalog and diagnostics" \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift \
   'VoiceInkPowerModeBrowser\.allCases' \
-  'VoiceInkPowerModeBrowserDetectionDiagnostics\.loggerCategory' \
   'VoiceInkPowerModeBrowserDetectionDiagnostics\.urlLookupFailedMessage'
+
+require_pattern \
+  "macOS active-window service adapts shared Power Mode browser diagnostics logger" \
+  'VoiceInkPowerModeBrowserDetectionDiagnostics\.loggerCategory' \
+  VoiceInk/PowerMode/ActiveWindowService.swift \
 
 reject_pattern \
   "macOS active-window service avoids shell-owned browser detection diagnostic copy" \
@@ -14193,6 +14197,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
+  "shared Power Mode automatic resolution runtime plan lives in VoiceInkCore" \
+  'VoiceInkPowerModeAutomaticResolutionPlan|frontmostApplicationBundleIdentifier|readCurrentWebsiteURL|logBrowserURLFailure' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
   "macOS Power Mode shortcuts consume shared shortcut eligibility policy" \
   'powerModeShortcutEntries|powerModeShortcutConfigurationId' \
   VoiceInk/Shortcuts/PowerModeShortcutManager.swift
@@ -14200,6 +14209,11 @@ require_pattern \
 require_pattern \
   "core checks execute Power Mode shortcut eligibility tests" \
   'PowerModePolicyTests\.testPowerModeShortcutEntriesIncludeOnlyEnabledConfigurationsWithShortcuts|PowerModePolicyTests\.testPowerModeShortcutConfigurationIdRequiresEnabledConfigAndStoredShortcut' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute Power Mode automatic resolution runtime plan tests" \
+  'PowerModePolicyTests\.testPowerModeAutomaticResolutionPlanAvoidsUnneededRuntimeLookup|PowerModePolicyTests\.testPowerModeAutomaticResolutionPlanReadsBrowserURLBeforeAppFallback' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \
@@ -14228,12 +14242,12 @@ reject_pattern \
 
 reject_pattern \
   "macOS active-window adapter avoids shell-only Power Mode resolution policy" \
-  'getConfigurationForURL|getConfigurationForApp|getDefaultConfiguration|configToApply' \
+  'getConfigurationForURL|getConfigurationForApp|getDefaultConfiguration|configToApply|hasEnabledAutomaticRules|hasEnabledURLRules|resolvedPowerModeConfiguration|VoiceInkPowerModeBrowser\.allCases|urlLookupFailedMessage' \
   VoiceInk/PowerMode/ActiveWindowService.swift
 
 require_pattern \
-  "macOS active-window adapter consumes shared Power Mode resolution policy" \
-  'resolvedPowerModeConfiguration' \
+  "macOS active-window adapter consumes shared Power Mode automatic resolution runtime plan" \
+  'VoiceInkPowerModeAutomaticResolutionPlan\.resolving|frontmostApplicationBundleIdentifier|readCurrentWebsiteURL|logBrowserURLFailure' \
   VoiceInk/PowerMode/ActiveWindowService.swift
 
 reject_pattern \

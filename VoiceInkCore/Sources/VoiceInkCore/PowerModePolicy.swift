@@ -1476,6 +1476,61 @@ public struct VoiceInkPowerModeActivationPlan: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkPowerModeAutomaticResolutionPlan: Equatable, Sendable {
+    private let configurations: [PowerModeConfig]
+    private let explicitID: UUID?
+
+    private init(configurations: [PowerModeConfig], explicitID: UUID?) {
+        self.configurations = configurations
+        self.explicitID = explicitID
+    }
+
+    public static func resolving(
+        configurations: [PowerModeConfig],
+        explicitID: UUID? = nil
+    ) -> Self {
+        Self(configurations: configurations, explicitID: explicitID)
+    }
+
+    public func applyRuntimeState(
+        frontmostApplicationBundleIdentifier: () async -> String?,
+        readCurrentWebsiteURL: (VoiceInkPowerModeBrowser) async throws -> String,
+        logBrowserURLFailure: (String) -> Void
+    ) async -> PowerModeConfig? {
+        if let config = configurations.resolvedPowerModeConfiguration(explicitID: explicitID) {
+            return config
+        }
+
+        guard configurations.hasEnabledAutomaticRules else {
+            return nil
+        }
+
+        guard let bundleIdentifier = await frontmostApplicationBundleIdentifier() else {
+            return nil
+        }
+
+        var currentWebsiteURL: String?
+        if configurations.hasEnabledURLRules,
+           let browser = VoiceInkPowerModeBrowser.allCases.first(where: { $0.bundleIdentifier == bundleIdentifier }) {
+            do {
+                currentWebsiteURL = try await readCurrentWebsiteURL(browser)
+            } catch {
+                logBrowserURLFailure(
+                    VoiceInkPowerModeBrowserDetectionDiagnostics.urlLookupFailedMessage(
+                        browserDisplayName: browser.displayName,
+                        localizedDescription: error.localizedDescription
+                    )
+                )
+            }
+        }
+
+        return configurations.resolvedPowerModeConfiguration(
+            websiteURL: currentWebsiteURL,
+            appBundleIdentifier: bundleIdentifier
+        )
+    }
+}
+
 public struct VoiceInkPowerModeConfigurationMutationPlan: Equatable, Sendable {
     public let didMutate: Bool
     private let updatedConfigurations: [PowerModeConfig]

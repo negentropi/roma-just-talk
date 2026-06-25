@@ -2578,6 +2578,104 @@ final class PowerModePolicyTests: XCTestCase {
         )
     }
 
+    func testPowerModeAutomaticResolutionPlanAvoidsUnneededRuntimeLookup() async {
+        let explicitConfig = config(name: "Explicit", emoji: "E", isEnabled: false)
+        var lookupCount = 0
+
+        let explicitResult = await VoiceInkPowerModeAutomaticResolutionPlan.resolving(
+            configurations: [explicitConfig],
+            explicitID: explicitConfig.id
+        ).applyRuntimeState(
+            frontmostApplicationBundleIdentifier: {
+                lookupCount += 1
+                return "com.example.App"
+            },
+            readCurrentWebsiteURL: { _ in
+                lookupCount += 1
+                return "https://example.com"
+            },
+            logBrowserURLFailure: { _ in lookupCount += 1 }
+        )
+
+        XCTAssertEqual(explicitResult?.id, explicitConfig.id)
+        XCTAssertEqual(lookupCount, 0)
+
+        let disabledResult = await VoiceInkPowerModeAutomaticResolutionPlan.resolving(
+            configurations: [config(name: "Disabled", emoji: "D", isEnabled: false)]
+        ).applyRuntimeState(
+            frontmostApplicationBundleIdentifier: {
+                lookupCount += 1
+                return "com.example.App"
+            },
+            readCurrentWebsiteURL: { _ in
+                lookupCount += 1
+                return "https://example.com"
+            },
+            logBrowserURLFailure: { _ in lookupCount += 1 }
+        )
+
+        XCTAssertNil(disabledResult)
+        XCTAssertEqual(lookupCount, 0)
+    }
+
+    func testPowerModeAutomaticResolutionPlanReadsBrowserURLBeforeAppFallback() async {
+        let websiteConfig = config(
+            name: "Website",
+            emoji: "W",
+            urlConfigs: [VoiceInkPowerModeURLConfig(url: "example.com/docs")]
+        )
+        let appConfig = config(
+            name: "App",
+            emoji: "A",
+            appConfigs: [VoiceInkPowerModeAppConfig(bundleIdentifier: "com.google.Chrome", appName: "Chrome")]
+        )
+        let defaultConfig = config(name: "Default", emoji: "D", isDefault: true)
+        let configs = [websiteConfig, appConfig, defaultConfig]
+        var events = [String]()
+
+        let websiteResult = await VoiceInkPowerModeAutomaticResolutionPlan.resolving(
+            configurations: configs
+        ).applyRuntimeState(
+            frontmostApplicationBundleIdentifier: {
+                events.append("frontmost")
+                return "com.google.Chrome"
+            },
+            readCurrentWebsiteURL: { browser in
+                events.append("browser:\(browser.displayName)")
+                return "https://www.example.com/docs/today"
+            },
+            logBrowserURLFailure: { events.append("log:\($0)") }
+        )
+
+        XCTAssertEqual(websiteResult?.id, websiteConfig.id)
+        XCTAssertEqual(events, ["frontmost", "browser:Google Chrome"])
+
+        events.removeAll()
+        let appResult = await VoiceInkPowerModeAutomaticResolutionPlan.resolving(
+            configurations: configs
+        ).applyRuntimeState(
+            frontmostApplicationBundleIdentifier: {
+                events.append("frontmost")
+                return "com.google.Chrome"
+            },
+            readCurrentWebsiteURL: { browser in
+                events.append("browser:\(browser.displayName)")
+                throw PowerModeResolutionTestError()
+            },
+            logBrowserURLFailure: { events.append("log:\($0)") }
+        )
+
+        XCTAssertEqual(appResult?.id, appConfig.id)
+        XCTAssertEqual(
+            events,
+            [
+                "frontmost",
+                "browser:Google Chrome",
+                "log:\(VoiceInkPowerModeBrowserDetectionDiagnostics.urlLookupFailedMessage(browserDisplayName: "Google Chrome", localizedDescription: "offline"))"
+            ]
+        )
+    }
+
     func testPowerModeConfigurationListMutationsPreserveManagerSemantics() throws {
         let firstID = UUID()
         let secondID = UUID()
@@ -3083,6 +3181,12 @@ final class PowerModePolicyTests: XCTestCase {
             isEnabled: isEnabled,
             isDefault: isDefault
         )
+    }
+
+    private struct PowerModeResolutionTestError: LocalizedError {
+        var errorDescription: String? {
+            "offline"
+        }
     }
 
     private func rule(

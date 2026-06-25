@@ -5106,7 +5106,7 @@ reject_pattern \
 
 require_pattern \
   "shared macOS permission settings presentation lives in VoiceInkCore" \
-  'VoiceInkMacOSPermissionSettingsPresentation|VoiceInkMacOSPermissionSettingsCardPresentation|VoiceInkMacOSPermissionTimingPolicy|VoiceInkMacOSPermissionPollingState|headerIconSystemName|inputMonitoringCard|screenContextCard|relaunchRequiredMessage|pollingInterval|refreshPollLimit|consumePollAndShouldStop' \
+  'VoiceInkMacOSPermissionSettingsPresentation|VoiceInkMacOSPermissionSettingsCardPresentation|VoiceInkMacOSPermissionTimingPolicy|VoiceInkMacOSPermissionPollingState|headerIconSystemName|inputMonitoringCard|screenContextCard|dashboardAccessibilityCallout|relaunchRequiredMessage|pollingInterval|refreshPollLimit|consumePollAndShouldStop' \
   VoiceInkCore/Sources/VoiceInkCore/PermissionPresentation.swift
 
 reject_pattern \
@@ -5118,6 +5118,14 @@ require_pattern \
   "macOS permissions settings uses shared presentation" \
   'VoiceInkMacOSPermissionSettingsPresentation\.(headerIconSystemName|inputMonitoringCard|microphoneCard|accessibilityCard|screenContextCard)|presentation\.buttonTitle\(requiresRelaunch:' \
   VoiceInk/Views/PermissionsView.swift
+
+require_patterns \
+  "macOS metrics dashboard uses shared accessibility permission callout" \
+  VoiceInk/Views/Metrics/MetricsContent.swift \
+  'VoiceInkMacOSPermissionSettingsPresentation\.dashboardAccessibilityCallout' \
+  'presentation\.iconSystemName' \
+  'presentation\.buttonTitle\(requiresRelaunch: false\)' \
+  'presentation\.infoTipMessage'
 
 require_patterns \
   "macOS permissions settings uses shared permission timing and polling state" \
@@ -5145,20 +5153,33 @@ reject_pattern \
   VoiceInk/Services/PermissionFlowGuide.swift \
   VoiceInk/Views/PermissionsView.swift
 
-require_pattern \
-  "core checks execute permission timing and polling tests" \
-  'PermissionPresentationTests\.testMacOSPermissionTimingPolicyPreservesPollingAndRelaunchDelays|PermissionPresentationTests\.testMacOSPermissionPollingStateStopsAfterConfiguredPollLimit' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+require_patterns \
+  "core checks execute permission presentation tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'PermissionPresentationTests\.testMacOSPermissionSettingsCardsPreserveCopyAndButtonPolicy' \
+  'PermissionPresentationTests\.testMacOSDashboardAccessibilityCalloutPreservesMetricsCopy' \
+  'PermissionPresentationTests\.testMacOSPermissionTimingPolicyPreservesPollingAndRelaunchDelays' \
+  'PermissionPresentationTests\.testMacOSPermissionPollingStateStopsAfterConfiguredPollLimit'
 
 require_pattern \
   "migration checklist tracks shared permission timing and polling policy" \
   'macOS permission polling countdown/timing policy|VoiceInkMacOSPermissionPollingState' \
   docs/ios-single-repo-migration.md
 
+require_pattern \
+  "migration checklist tracks shared dashboard accessibility callout presentation" \
+  'accessibility permission callout presentation.*VoiceInkMacOSPermissionSettingsPresentation' \
+  docs/ios-single-repo-migration.md
+
 reject_pattern \
   "macOS permissions settings avoids shell-only permission presentation copy" \
   '"(App Permissions|Microphone and shortcut access are needed for recording\. Screen context is optional\.|Input Monitoring Access|Allow roma-just-talk to listen for your recording hotkey globally|Microphone Access|Allow roma-just-talk to record your voice for transcription|Accessibility Access|Add roma-just-talk to Accessibility, then turn its switch on|Screen Context \(Optional\)|Use visible screen text to improve transcript enhancement when you choose\.|Relaunch to Apply|Grant|Enable|If you already turned this on in System Settings, relaunch roma-just-talk to activate it\.)"|systemName: "arrow\.clockwise"|systemName: "checkmark\.seal\.fill"|systemName: "xmark\.seal\.fill"|systemName: "arrow\.right"' \
   VoiceInk/Views/PermissionsView.swift
+
+reject_pattern \
+  "macOS metrics dashboard avoids shell-owned accessibility permission callout copy" \
+  '"(Accessibility Access|VoiceInk needs Accessibility permission to work reliably across your entire Mac|Open System Settings|VoiceInk uses Accessibility to work reliably across apps\.|hand\.raised)"' \
+  VoiceInk/Views/Metrics/MetricsContent.swift
 
 reject_pattern \
   "macOS permission shells avoid duplicate polling and relaunch timing literals" \

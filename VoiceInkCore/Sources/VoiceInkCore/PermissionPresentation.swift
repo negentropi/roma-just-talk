@@ -90,6 +90,15 @@ public enum VoiceInkMacOSPermissionSettingsPresentation {
         infoTipMessage: "macOS requires you to enable the roma-just-talk switch yourself. Dragging the app into the list only adds it when it is missing."
     )
 
+    public static let dashboardAccessibilityCallout = VoiceInkMacOSPermissionSettingsCardPresentation(
+        kind: .accessibility,
+        iconSystemName: "hand.raised",
+        title: "Accessibility Access",
+        description: "VoiceInk needs Accessibility permission to work reliably across your entire Mac",
+        grantButtonTitle: "Open System Settings",
+        infoTipMessage: "VoiceInk uses Accessibility to work reliably across apps."
+    )
+
     public static let screenContextCard = VoiceInkMacOSPermissionSettingsCardPresentation(
         kind: .screenContext,
         iconSystemName: "rectangle.on.rectangle",

@@ -65,6 +65,17 @@ final class PermissionPresentationTests: XCTestCase {
         XCTAssertEqual(screenContext.infoTipURLString, "https://tryvoiceink.com/docs/contextual-awareness")
     }
 
+    func testMacOSDashboardAccessibilityCalloutPreservesMetricsCopy() {
+        let callout = VoiceInkMacOSPermissionSettingsPresentation.dashboardAccessibilityCallout
+
+        XCTAssertEqual(callout.kind, .accessibility)
+        XCTAssertEqual(callout.iconSystemName, "hand.raised")
+        XCTAssertEqual(callout.title, "Accessibility Access")
+        XCTAssertEqual(callout.description, "VoiceInk needs Accessibility permission to work reliably across your entire Mac")
+        XCTAssertEqual(callout.buttonTitle(requiresRelaunch: true), "Open System Settings")
+        XCTAssertEqual(callout.infoTipMessage, "VoiceInk uses Accessibility to work reliably across apps.")
+    }
+
     func testMacOSPermissionTimingPolicyPreservesPollingAndRelaunchDelays() {
         XCTAssertEqual(VoiceInkMacOSPermissionTimingPolicy.pollingInterval, 0.5)
         XCTAssertEqual(VoiceInkMacOSPermissionTimingPolicy.refreshPollLimit, 120)

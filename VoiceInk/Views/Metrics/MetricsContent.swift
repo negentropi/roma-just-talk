@@ -161,15 +161,17 @@ struct MetricsContent: View {
     }
 
     private var accessibilityPermissionCallout: some View {
+        let presentation = VoiceInkMacOSPermissionSettingsPresentation.dashboardAccessibilityCallout
+
         PermissionCard(
-            icon: "hand.raised",
-            title: "Accessibility Access",
-            description: "VoiceInk needs Accessibility permission to work reliably across your entire Mac",
+            icon: presentation.iconSystemName,
+            title: presentation.title,
+            description: presentation.description,
             isGranted: isAccessibilityEnabled,
-            buttonTitle: "Open System Settings",
+            buttonTitle: presentation.buttonTitle(requiresRelaunch: false),
             buttonAction: grantAccessibilityPermission,
             checkPermission: refreshAccessibilityStatus,
-            infoTipMessage: "VoiceInk uses Accessibility to work reliably across apps."
+            infoTipMessage: presentation.infoTipMessage
         )
     }
 

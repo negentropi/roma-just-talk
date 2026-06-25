@@ -14911,6 +14911,16 @@ require_pattern \
   VoiceInk/Services/SystemInfoService.swift
 
 require_pattern \
+  "macOS diagnostics use shared rolling-buffer system-info export" \
+  'VoiceInkRollingBufferPreloadDiagnostics\.systemInformationText' \
+  VoiceInk/Services/SystemInfoService.swift
+
+reject_pattern \
+  "macOS diagnostics avoid shell-owned rolling-buffer system-info export" \
+  'powerDescription|Current Power State:|Current Model Buffer Preload:|Last Quick Release Claim:|Rolling VAD Model:|Auto Disable Cloud Models:' \
+  VoiceInk/Services/SystemInfoService.swift
+
+require_pattern \
   "shared rolling-buffer VAD model settings live in VoiceInkCore" \
   'VoiceInkRollingBufferPreloadSettingsPresentation|VoiceInkRollingBufferVADModel|VoiceInkRollingBufferVADSettings|modelKey = "RollingBufferVADModel"|sileroModelName|saveImportedModel' \
   VoiceInkCore/Sources/VoiceInkCore/RollingBufferPreloadPolicy.swift
@@ -14992,6 +15002,10 @@ require_pattern \
 require_patterns \
   "shared rolling-buffer quick-release diagnostics presentation lives in VoiceInkCore" \
   VoiceInkCore/Sources/VoiceInkCore/RollingBufferPreloadPolicy.swift \
+  'VoiceInkRollingBufferPreloadDiagnostics' \
+  'systemInformationText' \
+  'powerStateText' \
+  'currentModelPreloadText' \
   'VoiceInkRollingBufferQuickReleaseClaimStrategy' \
   'VoiceInkRollingBufferQuickReleaseTimingStage' \
   'VoiceInkRollingBufferQuickReleaseClaimSnapshot' \
@@ -15011,7 +15025,7 @@ reject_pattern \
 
 require_pattern \
   "core checks execute quick-release claim presentation tests" \
-  'RollingBufferPreloadPolicyTests\.testQuickReleaseClaimStrategyPreservesDiagnosticLabels|RollingBufferPreloadPolicyTests\.testQuickReleaseClaimSnapshotFormatsDisplayAndExportSummaries' \
+  'RollingBufferPreloadPolicyTests\.testQuickReleaseClaimStrategyPreservesDiagnosticLabels|RollingBufferPreloadPolicyTests\.testQuickReleaseClaimSnapshotFormatsDisplayAndExportSummaries|RollingBufferPreloadPolicyTests\.testSystemInformationTextPreservesMacOSRollingBufferDiagnosticsBlock|RollingBufferPreloadPolicyTests\.testSystemInformationDiagnosticsFormatPowerAndMissingModelState' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \
@@ -15247,7 +15261,7 @@ reject_pattern \
 
 require_pattern \
   "migration checklist tracks shared rolling-buffer settings labels" \
-  'macOS rolling-buffer preload settings labels/help, preload-mode stored selection repair, duration bounds/normalization/formatter, partial-transcript preview notification contract, VAD model labels, storage key/default, selected-model fallback, Silero predicate, service-route provider classification' \
+  'macOS rolling-buffer preload settings labels/help, preload-mode stored selection repair, duration bounds/normalization/formatter, partial-transcript preview notification contract, VAD model labels, storage key/default, selected-model fallback, Silero predicate, service-route provider classification.*system-information export diagnostics' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

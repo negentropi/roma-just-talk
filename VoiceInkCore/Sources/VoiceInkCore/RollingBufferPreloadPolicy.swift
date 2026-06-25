@@ -128,6 +128,42 @@ public struct VoiceInkRollingBufferPowerState: Equatable, Sendable {
     }
 }
 
+public enum VoiceInkRollingBufferPreloadDiagnostics {
+    public static func systemInformationText(
+        configuration: VoiceInkRollingBufferPreloadConfiguration,
+        selectedVADModelRawValue: String,
+        powerState: VoiceInkRollingBufferPowerState,
+        currentModelPreloadEnabled: Bool?,
+        quickReleaseClaimExportSummary: String
+    ) -> String {
+        """
+        Mode: \(configuration.mode.displayName)
+        Pre-run Finalization: \(configuration.preRunFinalization)
+        Buffer Duration: \(configuration.bufferDurationSeconds)s
+        Rolling VAD Model: \(selectedVADModelRawValue)
+        Auto Disable Cloud Models: \(configuration.autoDisablesCloudModels)
+        Auto Disable Local Models on Low Battery: \(configuration.autoDisablesLowBatteryLocalModels)
+        Low Battery Threshold: \(configuration.lowBatteryThresholdPercent)%
+        Current Power State: \(powerStateText(powerState))
+        Current Model Buffer Preload: \(currentModelPreloadText(isEnabled: currentModelPreloadEnabled))
+        Last Quick Release Claim: \(quickReleaseClaimExportSummary)
+        """
+    }
+
+    public static func powerStateText(_ powerState: VoiceInkRollingBufferPowerState) -> String {
+        guard powerState.isOnBattery else {
+            return "External Power"
+        }
+
+        let batteryLevel = powerState.batteryLevelPercent.map { "\($0)" } ?? "unknown"
+        return "Battery (\(batteryLevel)%)"
+    }
+
+    public static func currentModelPreloadText(isEnabled: Bool?) -> String {
+        isEnabled.map { "\($0)" } ?? VoiceInkModelManagementPresentation.noModelSelectedText
+    }
+}
+
 public struct VoiceInkRollingBufferPreloadModelSnapshot: Equatable, Sendable {
     public let supportsStreaming: Bool
     public let isCloudTranscriptionProvider: Bool

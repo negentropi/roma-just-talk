@@ -561,6 +561,59 @@ final class RollingBufferPreloadPolicyTests: XCTestCase {
         XCTAssertTrue(snapshot.exportSummary.contains("idle=0.900s"))
     }
 
+    func testSystemInformationTextPreservesMacOSRollingBufferDiagnosticsBlock() {
+        let diagnostics = VoiceInkRollingBufferPreloadDiagnostics.systemInformationText(
+            configuration: VoiceInkRollingBufferPreloadConfiguration(
+                mode: .auto,
+                autoDisablesCloudModels: true,
+                autoDisablesLowBatteryLocalModels: false,
+                lowBatteryThresholdPercent: 35,
+                bufferDurationSeconds: 8.0,
+                preRunFinalization: true
+            ),
+            selectedVADModelRawValue: "silero",
+            powerState: VoiceInkRollingBufferPowerState(isOnBattery: true, batteryLevelPercent: 42),
+            currentModelPreloadEnabled: false,
+            quickReleaseClaimExportSummary: "Ready Preload at 6/24/2026, 3:42:11 PM"
+        )
+
+        XCTAssertEqual(
+            diagnostics,
+            """
+            Mode: Auto
+            Pre-run Finalization: true
+            Buffer Duration: 8.0s
+            Rolling VAD Model: silero
+            Auto Disable Cloud Models: true
+            Auto Disable Local Models on Low Battery: false
+            Low Battery Threshold: 35%
+            Current Power State: Battery (42%)
+            Current Model Buffer Preload: false
+            Last Quick Release Claim: Ready Preload at 6/24/2026, 3:42:11 PM
+            """
+        )
+    }
+
+    func testSystemInformationDiagnosticsFormatPowerAndMissingModelState() {
+        XCTAssertEqual(
+            VoiceInkRollingBufferPreloadDiagnostics.powerStateText(
+                VoiceInkRollingBufferPowerState(isOnBattery: true, batteryLevelPercent: nil)
+            ),
+            "Battery (unknown%)"
+        )
+        XCTAssertEqual(
+            VoiceInkRollingBufferPreloadDiagnostics.powerStateText(
+                VoiceInkRollingBufferPowerState(isOnBattery: false, batteryLevelPercent: 10)
+            ),
+            "External Power"
+        )
+        XCTAssertEqual(
+            VoiceInkRollingBufferPreloadDiagnostics.currentModelPreloadText(isEnabled: nil),
+            VoiceInkModelManagementPresentation.noModelSelectedText
+        )
+        XCTAssertEqual(VoiceInkRollingBufferPreloadDiagnostics.currentModelPreloadText(isEnabled: true), "true")
+    }
+
     private func configuration(
         mode: VoiceInkRollingBufferPreloadMode,
         autoDisablesCloudModels: Bool = false,

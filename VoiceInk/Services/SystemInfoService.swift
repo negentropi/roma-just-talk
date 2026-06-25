@@ -145,34 +145,21 @@ class SystemInfoService {
         let configuration = VoiceInkRollingBufferPreloadSettings.configuration()
         let powerState = IOKitRollingBufferPowerStateProvider().currentPowerState()
         let runtimeClaim = RollingBufferPreloadRuntimeDiagnostics.shared.currentQuickReleaseClaim()
-        let powerDescription: String
-        if powerState.isOnBattery {
-            powerDescription = "Battery (\(powerState.batteryLevelPercent.map { "\($0)" } ?? "unknown")%)"
-        } else {
-            powerDescription = "External Power"
-        }
-
         let currentModelName = VoiceInkCurrentTranscriptionModelPreference.modelName()
-        let currentModelPreloadEnabled: String
+        let currentModelPreloadEnabled: Bool?
         if let currentModelName {
-            let enabled = VoiceInkRollingBufferPreloadSettings.perModelPreloadEnabled(forModelName: currentModelName)
-            currentModelPreloadEnabled = "\(enabled)"
+            currentModelPreloadEnabled = VoiceInkRollingBufferPreloadSettings.perModelPreloadEnabled(forModelName: currentModelName)
         } else {
-            currentModelPreloadEnabled = VoiceInkModelManagementPresentation.noModelSelectedText
+            currentModelPreloadEnabled = nil
         }
 
-        return """
-        Mode: \(configuration.mode.displayName)
-        Pre-run Finalization: \(configuration.preRunFinalization)
-        Buffer Duration: \(configuration.bufferDurationSeconds)s
-        Rolling VAD Model: \(VoiceInkRollingBufferVADSettings.selectedModel())
-        Auto Disable Cloud Models: \(configuration.autoDisablesCloudModels)
-        Auto Disable Local Models on Low Battery: \(configuration.autoDisablesLowBatteryLocalModels)
-        Low Battery Threshold: \(configuration.lowBatteryThresholdPercent)%
-        Current Power State: \(powerDescription)
-        Current Model Buffer Preload: \(currentModelPreloadEnabled)
-        Last Quick Release Claim: \(runtimeClaim.exportSummary)
-        """
+        return VoiceInkRollingBufferPreloadDiagnostics.systemInformationText(
+            configuration: configuration,
+            selectedVADModelRawValue: VoiceInkRollingBufferVADSettings.selectedModel(),
+            powerState: powerState,
+            currentModelPreloadEnabled: currentModelPreloadEnabled,
+            quickReleaseClaimExportSummary: runtimeClaim.exportSummary
+        )
     }
 
     private func getAccessibilityStatus() -> String {

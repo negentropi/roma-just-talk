@@ -82,13 +82,7 @@ final class RecordingManager: ObservableObject {
     }
 
     private func startRecordingWithPermissionCheck() {
-        applyPermissionPlan(
-            VoiceInkRecordingPermissionPolicy.plan(for: checkPermissionStatus())
-        )
-    }
-
-    private func applyPermissionPlan(_ plan: VoiceInkRecordingPermissionPlan) {
-        plan.applyRuntimeState(
+        VoiceInkRecordingPermissionPolicy.plan(for: checkPermissionStatus()).applyRuntimeState(
             startRecording: { [weak self] in
                 self?.proceedToStartRecording()
             },

@@ -1254,8 +1254,12 @@ require_patterns \
   iOS/VoiceInk-ios/RecordingManager.swift \
   'VoiceInkRecordingPermissionPolicy\.plan' \
   'VoiceInkRecordingPermissionStatus' \
-  'VoiceInkRecordingPermissionPlan' \
-  'plan\.applyRuntimeState'
+  'applyRuntimeState'
+
+reject_pattern \
+  "iOS recording manager avoids shallow permission-plan wrapper" \
+  'private func +applyPermissionPlan\b' \
+  iOS/VoiceInk-ios/RecordingManager.swift
 
 require_patterns \
   "iOS recording manager delegates settings-open fallback planning and application to shared core" \

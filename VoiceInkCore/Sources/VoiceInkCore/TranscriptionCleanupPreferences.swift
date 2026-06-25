@@ -335,7 +335,7 @@ public struct VoiceInkMacOSCleanupSettingsPresentation: Equatable, Sendable {
     }
 }
 
-public enum VoiceInkCleanupAutomaticAudioAction: Equatable, Sendable {
+fileprivate enum VoiceInkCleanupAutomaticAudioAction: Equatable, Sendable {
     case none
     case start
     case stop
@@ -343,14 +343,32 @@ public enum VoiceInkCleanupAutomaticAudioAction: Equatable, Sendable {
 
 public struct VoiceInkMacOSCleanupSettingsTogglePlan: Equatable, Sendable {
     public let isExpanded: Bool
-    public let audioAction: VoiceInkCleanupAutomaticAudioAction
+    private let audioAction: VoiceInkCleanupAutomaticAudioAction
 
-    public init(
+    public init(isExpanded: Bool) {
+        self.init(isExpanded: isExpanded, audioAction: .none)
+    }
+
+    fileprivate init(
         isExpanded: Bool,
-        audioAction: VoiceInkCleanupAutomaticAudioAction = .none
+        audioAction: VoiceInkCleanupAutomaticAudioAction
     ) {
         self.isExpanded = isExpanded
         self.audioAction = audioAction
+    }
+
+    public func applyAutomaticAudioRuntimeState(
+        start: () -> Void,
+        stop: () -> Void
+    ) {
+        switch audioAction {
+        case .none:
+            break
+        case .start:
+            start()
+        case .stop:
+            stop()
+        }
     }
 }
 
@@ -380,7 +398,7 @@ public enum VoiceInkMacOSCleanupSettingsPolicy {
         VoiceInkMacOSCleanupSettingsTogglePlan(isExpanded: isEnabled)
     }
 
-    public static func audioActionAfterTranscriptCleanupChange(
+    private static func audioActionAfterTranscriptCleanupChange(
         isTranscriptionCleanupEnabled: Bool,
         isAudioCleanupEnabled: Bool
     ) -> VoiceInkCleanupAutomaticAudioAction {

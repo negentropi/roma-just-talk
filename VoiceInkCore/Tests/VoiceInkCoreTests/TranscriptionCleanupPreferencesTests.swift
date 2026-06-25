@@ -139,54 +139,66 @@ final class TranscriptionCleanupPreferencesTests: XCTestCase {
     }
 
     func testMacOSCleanupSettingsPolicyStopsAudioCleanupWhenTranscriptCleanupStarts() {
-        XCTAssertEqual(
-            VoiceInkMacOSCleanupSettingsPolicy.transcriptCleanupChangePlan(
-                isEnabled: true,
-                isAudioCleanupEnabled: true
-            ),
-            VoiceInkMacOSCleanupSettingsTogglePlan(
-                isExpanded: true,
-                audioAction: .stop
-            )
+        let enabledAudioPlan = VoiceInkMacOSCleanupSettingsPolicy.transcriptCleanupChangePlan(
+            isEnabled: true,
+            isAudioCleanupEnabled: true
         )
+        XCTAssertEqual(enabledAudioPlan.isExpanded, true)
+        XCTAssertEqual(macOSCleanupSettingsAudioEvents(for: enabledAudioPlan), ["stop"])
+
+        let disabledAudioPlan = VoiceInkMacOSCleanupSettingsPolicy.transcriptCleanupChangePlan(
+            isEnabled: true,
+            isAudioCleanupEnabled: false
+        )
+        XCTAssertEqual(disabledAudioPlan.isExpanded, true)
         XCTAssertEqual(
-            VoiceInkMacOSCleanupSettingsPolicy.transcriptCleanupChangePlan(
-                isEnabled: true,
-                isAudioCleanupEnabled: false
-            ).audioAction,
-            .stop
+            macOSCleanupSettingsAudioEvents(for: disabledAudioPlan),
+            ["stop"]
         )
     }
 
     func testMacOSCleanupSettingsPolicyRestartsAudioCleanupOnlyWhenStillEnabled() {
-        XCTAssertEqual(
-            VoiceInkMacOSCleanupSettingsPolicy.transcriptCleanupChangePlan(
-                isEnabled: false,
-                isAudioCleanupEnabled: true
-            ),
-            VoiceInkMacOSCleanupSettingsTogglePlan(
-                isExpanded: false,
-                audioAction: .start
-            )
+        let enabledAudioPlan = VoiceInkMacOSCleanupSettingsPolicy.transcriptCleanupChangePlan(
+            isEnabled: false,
+            isAudioCleanupEnabled: true
+        )
+        XCTAssertEqual(enabledAudioPlan.isExpanded, false)
+        XCTAssertEqual(macOSCleanupSettingsAudioEvents(for: enabledAudioPlan), ["start"])
+
+        let disabledAudioPlan = VoiceInkMacOSCleanupSettingsPolicy.transcriptCleanupChangePlan(
+            isEnabled: false,
+            isAudioCleanupEnabled: false
         )
         XCTAssertEqual(
-            VoiceInkMacOSCleanupSettingsPolicy.transcriptCleanupChangePlan(
-                isEnabled: false,
-                isAudioCleanupEnabled: false
-            ),
+            disabledAudioPlan,
             VoiceInkMacOSCleanupSettingsTogglePlan(isExpanded: false)
         )
+        XCTAssertEqual(macOSCleanupSettingsAudioEvents(for: disabledAudioPlan), [])
     }
 
     func testMacOSCleanupSettingsPolicyAudioToggleOnlyPlansExpansion() {
-        XCTAssertEqual(
-            VoiceInkMacOSCleanupSettingsPolicy.audioCleanupChangePlan(isEnabled: true),
-            VoiceInkMacOSCleanupSettingsTogglePlan(isExpanded: true)
+        let enabledPlan = VoiceInkMacOSCleanupSettingsPolicy.audioCleanupChangePlan(isEnabled: true)
+        XCTAssertEqual(enabledPlan, VoiceInkMacOSCleanupSettingsTogglePlan(isExpanded: true))
+        XCTAssertEqual(macOSCleanupSettingsAudioEvents(for: enabledPlan), [])
+
+        let disabledPlan = VoiceInkMacOSCleanupSettingsPolicy.audioCleanupChangePlan(isEnabled: false)
+        XCTAssertEqual(disabledPlan, VoiceInkMacOSCleanupSettingsTogglePlan(isExpanded: false))
+        XCTAssertEqual(macOSCleanupSettingsAudioEvents(for: disabledPlan), [])
+    }
+
+    private func macOSCleanupSettingsAudioEvents(
+        for plan: VoiceInkMacOSCleanupSettingsTogglePlan
+    ) -> [String] {
+        var events: [String] = []
+        plan.applyAutomaticAudioRuntimeState(
+            start: {
+                events.append("start")
+            },
+            stop: {
+                events.append("stop")
+            }
         )
-        XCTAssertEqual(
-            VoiceInkMacOSCleanupSettingsPolicy.audioCleanupChangePlan(isEnabled: false),
-            VoiceInkMacOSCleanupSettingsTogglePlan(isExpanded: false)
-        )
+        return events
     }
 
     func testCurrentFallsBackToLegacyRemovePunctuationFlag() {

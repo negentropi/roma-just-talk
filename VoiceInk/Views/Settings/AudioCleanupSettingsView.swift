@@ -96,14 +96,14 @@ struct AudioCleanupSettingsView: View {
                     isTranscriptExpanded = plan.isExpanded
                 }
 
-                switch plan.audioAction {
-                case .none:
-                    break
-                case .start:
-                    AudioCleanupManager.shared.startAutomaticCleanup(modelContext: modelContext)
-                case .stop:
-                    AudioCleanupManager.shared.stopAutomaticCleanup()
-                }
+                plan.applyAutomaticAudioRuntimeState(
+                    start: {
+                        AudioCleanupManager.shared.startAutomaticCleanup(modelContext: modelContext)
+                    },
+                    stop: {
+                        AudioCleanupManager.shared.stopAutomaticCleanup()
+                    }
+                )
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                     isHandlingTranscriptToggle = false
                 }

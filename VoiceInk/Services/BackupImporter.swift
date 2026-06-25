@@ -209,50 +209,37 @@ enum BackupImporter {
             existingOriginalTexts: existingOriginalTexts
         )
 
-        if !importPlan.hasVocabularyBackupRecords {
-            print(VoiceInkSettingsBackupImportDiagnostics.noVocabularyWordsMessage)
-        }
-        if !importPlan.hasWordReplacementBackupRecords {
-            print(VoiceInkSettingsBackupImportDiagnostics.noWordReplacementsMessage)
-        }
-
-        for word in importPlan.vocabularyWordsToInsert {
-            modelContext.insert(VocabularyWord(word: word))
-        }
-        for rule in importPlan.wordReplacementRulesToInsert {
-            modelContext.insert(WordReplacement(originalText: rule.originalText, replacementText: rule.replacementText))
-        }
-
-        guard importPlan.shouldSave else {
-            print(VoiceInkSettingsBackupImportDiagnostics.noDictionaryEntriesImportedMessage)
-            if importPlan.skippedInvalidReplacementCount > 0 {
-                print(
-                    VoiceInkSettingsBackupImportDiagnostics.skippedInvalidReplacementsMessage(
-                        count: importPlan.skippedInvalidReplacementCount
-                    )
-                )
-            }
-            return
-        }
-
         do {
-            try modelContext.save()
-            if importPlan.shouldInvalidateWordReplacementCache {
-                WordReplacementService.shared.invalidateCache()
-            }
-            print(
-                VoiceInkSettingsBackupImportDiagnostics.dictionaryEntriesImportedMessage(
-                    vocabularyWordCount: importPlan.insertedVocabularyWordCount,
-                    wordReplacementCount: importPlan.insertedWordReplacementCount
-                )
-            )
-            if importPlan.skippedInvalidReplacementCount > 0 {
-                print(
-                    VoiceInkSettingsBackupImportDiagnostics.skippedInvalidReplacementsMessage(
-                        count: importPlan.skippedInvalidReplacementCount
+            try importPlan.applyRuntimeState(
+                reportNoVocabularyBackupRecords: {
+                    print(VoiceInkSettingsBackupImportDiagnostics.noVocabularyWordsMessage)
+                },
+                reportNoWordReplacementBackupRecords: {
+                    print(VoiceInkSettingsBackupImportDiagnostics.noWordReplacementsMessage)
+                },
+                insertVocabularyWord: { word in
+                    modelContext.insert(VocabularyWord(word: word))
+                },
+                insertWordReplacementRule: { rule in
+                    modelContext.insert(WordReplacement(originalText: rule.originalText, replacementText: rule.replacementText))
+                },
+                reportNoDictionaryEntriesImported: {
+                    print(VoiceInkSettingsBackupImportDiagnostics.noDictionaryEntriesImportedMessage)
+                },
+                save: modelContext.save,
+                invalidateWordReplacementCache: WordReplacementService.shared.invalidateCache,
+                reportImportedEntryCounts: { vocabularyWordCount, wordReplacementCount in
+                    print(
+                        VoiceInkSettingsBackupImportDiagnostics.dictionaryEntriesImportedMessage(
+                            vocabularyWordCount: vocabularyWordCount,
+                            wordReplacementCount: wordReplacementCount
+                        )
                     )
-                )
-            }
+                },
+                reportSkippedInvalidReplacementCount: { count in
+                    print(VoiceInkSettingsBackupImportDiagnostics.skippedInvalidReplacementsMessage(count: count))
+                }
+            )
         } catch {
             modelContext.rollback()
             throw VoiceInkSettingsBackupImportError.saveFailed(

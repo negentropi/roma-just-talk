@@ -305,29 +305,29 @@ public struct VoiceInkWordReplacementBackupImportPlan: Equatable, Sendable {
 }
 
 public struct VoiceInkDictionaryBackupImportPlan: Equatable, Sendable {
-    public let hasVocabularyBackupRecords: Bool
-    public let hasWordReplacementBackupRecords: Bool
-    public let vocabularyWordsToInsert: [String]
-    public let wordReplacementRulesToInsert: [VoiceInkWordReplacementRule]
-    public let skippedInvalidReplacementCount: Int
+    private let hasVocabularyBackupRecords: Bool
+    private let hasWordReplacementBackupRecords: Bool
+    private let vocabularyWordsToInsert: [String]
+    private let wordReplacementRulesToInsert: [VoiceInkWordReplacementRule]
+    private let skippedInvalidReplacementCount: Int
 
-    public var insertedVocabularyWordCount: Int {
+    private var insertedVocabularyWordCount: Int {
         vocabularyWordsToInsert.count
     }
 
-    public var insertedWordReplacementCount: Int {
+    private var insertedWordReplacementCount: Int {
         wordReplacementRulesToInsert.count
     }
 
-    public var shouldSave: Bool {
+    private var shouldSave: Bool {
         insertedVocabularyWordCount > 0 || insertedWordReplacementCount > 0
     }
 
-    public var shouldInvalidateWordReplacementCache: Bool {
+    private var shouldInvalidateWordReplacementCache: Bool {
         insertedWordReplacementCount > 0
     }
 
-    public init(
+    fileprivate init(
         hasVocabularyBackupRecords: Bool,
         hasWordReplacementBackupRecords: Bool,
         vocabularyWordsToInsert: [String],
@@ -339,6 +339,50 @@ public struct VoiceInkDictionaryBackupImportPlan: Equatable, Sendable {
         self.vocabularyWordsToInsert = vocabularyWordsToInsert
         self.wordReplacementRulesToInsert = wordReplacementRulesToInsert
         self.skippedInvalidReplacementCount = skippedInvalidReplacementCount
+    }
+
+    public func applyRuntimeState(
+        reportNoVocabularyBackupRecords: () -> Void,
+        reportNoWordReplacementBackupRecords: () -> Void,
+        insertVocabularyWord: (String) -> Void,
+        insertWordReplacementRule: (VoiceInkWordReplacementRule) -> Void,
+        reportNoDictionaryEntriesImported: () -> Void,
+        save: () throws -> Void,
+        invalidateWordReplacementCache: () -> Void,
+        reportImportedEntryCounts: (Int, Int) -> Void,
+        reportSkippedInvalidReplacementCount: (Int) -> Void
+    ) throws {
+        if !hasVocabularyBackupRecords {
+            reportNoVocabularyBackupRecords()
+        }
+        if !hasWordReplacementBackupRecords {
+            reportNoWordReplacementBackupRecords()
+        }
+
+        for word in vocabularyWordsToInsert {
+            insertVocabularyWord(word)
+        }
+        for rule in wordReplacementRulesToInsert {
+            insertWordReplacementRule(rule)
+        }
+
+        guard shouldSave else {
+            reportNoDictionaryEntriesImported()
+            if skippedInvalidReplacementCount > 0 {
+                reportSkippedInvalidReplacementCount(skippedInvalidReplacementCount)
+            }
+            return
+        }
+
+        try save()
+
+        if shouldInvalidateWordReplacementCache {
+            invalidateWordReplacementCache()
+        }
+        reportImportedEntryCounts(insertedVocabularyWordCount, insertedWordReplacementCount)
+        if skippedInvalidReplacementCount > 0 {
+            reportSkippedInvalidReplacementCount(skippedInvalidReplacementCount)
+        }
     }
 }
 

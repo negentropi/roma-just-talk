@@ -7791,6 +7791,16 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
 
 require_pattern \
+  "shared dictionary backup import runtime application lives in VoiceInkCore" \
+  'reportNoDictionaryEntriesImported|insertWordReplacementRule|reportImportedEntryCounts' \
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
+
+reject_pattern \
+  "shared dictionary backup import raw payload stays hidden" \
+  'public let +(hasVocabularyBackupRecords|hasWordReplacementBackupRecords|vocabularyWordsToInsert|wordReplacementRulesToInsert)|public var +(insertedVocabularyWordCount|insertedWordReplacementCount|shouldSave|shouldInvalidateWordReplacementCache)|public init\([^)]*hasVocabularyBackupRecords' \
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
+
+require_pattern \
   "shared dictionary backup export plan lives in VoiceInkCore" \
   'VoiceInkDictionaryBackupExportPlan|dictionaryBackupExportPlan\(' \
   VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
@@ -7812,7 +7822,7 @@ require_pattern \
 
 reject_pattern \
   "macOS backup import avoids shell-owned dictionary import counters and subplans" \
-  'var +(insertedWords|insertedReplacements|skippedInvalidReplacements)\b|VoiceInkDictionaryPolicy\.(vocabularyWordsToInsert|wordReplacementBackupImportPlan)\(' \
+  'var +(insertedWords|insertedReplacements|skippedInvalidReplacements)\b|VoiceInkDictionaryPolicy\.(vocabularyWordsToInsert|wordReplacementBackupImportPlan)\(|importPlan\.(hasVocabularyBackupRecords|hasWordReplacementBackupRecords|vocabularyWordsToInsert|wordReplacementRulesToInsert|skippedInvalidReplacementCount|insertedVocabularyWordCount|insertedWordReplacementCount|shouldSave|shouldInvalidateWordReplacementCache)' \
   VoiceInk/Services/BackupImporter.swift
 
 reject_pattern \

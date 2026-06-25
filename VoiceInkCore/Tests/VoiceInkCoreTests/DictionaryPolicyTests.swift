@@ -940,18 +940,17 @@ final class DictionaryPolicyTests: XCTestCase {
             existingOriginalTexts: ["quick release"]
         )
 
-        XCTAssertTrue(plan.hasVocabularyBackupRecords)
-        XCTAssertTrue(plan.hasWordReplacementBackupRecords)
-        XCTAssertEqual(plan.vocabularyWordsToInsert, ["Roma"])
         XCTAssertEqual(
-            plan.wordReplacementRulesToInsert,
-            [VoiceInkWordReplacementRule(originalText: "Flow, Voice Ink", replacementText: "roma")]
+            dictionaryBackupImportRuntimeEvents(for: plan),
+            [
+                "vocabulary:Roma",
+                "replacement:Flow, Voice Ink=roma",
+                "save",
+                "invalidateReplacements",
+                "imported:1:1",
+                "skippedInvalid:2"
+            ]
         )
-        XCTAssertEqual(plan.skippedInvalidReplacementCount, 2)
-        XCTAssertEqual(plan.insertedVocabularyWordCount, 1)
-        XCTAssertEqual(plan.insertedWordReplacementCount, 1)
-        XCTAssertTrue(plan.shouldSave)
-        XCTAssertTrue(plan.shouldInvalidateWordReplacementCache)
     }
 
     func testDictionaryBackupImportPlanPreservesNoDataNoSaveDecision() {
@@ -962,13 +961,14 @@ final class DictionaryPolicyTests: XCTestCase {
             existingOriginalTexts: ["quick release"]
         )
 
-        XCTAssertFalse(plan.hasVocabularyBackupRecords)
-        XCTAssertFalse(plan.hasWordReplacementBackupRecords)
-        XCTAssertEqual(plan.vocabularyWordsToInsert, [])
-        XCTAssertEqual(plan.wordReplacementRulesToInsert, [])
-        XCTAssertEqual(plan.skippedInvalidReplacementCount, 0)
-        XCTAssertFalse(plan.shouldSave)
-        XCTAssertFalse(plan.shouldInvalidateWordReplacementCache)
+        XCTAssertEqual(
+            dictionaryBackupImportRuntimeEvents(for: plan),
+            [
+                "noVocabulary",
+                "noReplacements",
+                "noImported"
+            ]
+        )
     }
 
     func testDictionaryBackupImportPlanDoesNotInvalidateReplacementCacheForVocabularyOnlyImport() {
@@ -981,10 +981,57 @@ final class DictionaryPolicyTests: XCTestCase {
             existingOriginalTexts: []
         )
 
-        XCTAssertEqual(plan.vocabularyWordsToInsert, ["Roma"])
-        XCTAssertEqual(plan.wordReplacementRulesToInsert, [])
-        XCTAssertTrue(plan.shouldSave)
-        XCTAssertFalse(plan.shouldInvalidateWordReplacementCache)
+        XCTAssertEqual(
+            dictionaryBackupImportRuntimeEvents(for: plan),
+            [
+                "noReplacements",
+                "vocabulary:Roma",
+                "save",
+                "imported:1:0"
+            ]
+        )
+    }
+
+    private func dictionaryBackupImportRuntimeEvents(
+        for plan: VoiceInkDictionaryBackupImportPlan
+    ) -> [String] {
+        var events: [String] = []
+
+        do {
+            try plan.applyRuntimeState(
+                reportNoVocabularyBackupRecords: {
+                    events.append("noVocabulary")
+                },
+                reportNoWordReplacementBackupRecords: {
+                    events.append("noReplacements")
+                },
+                insertVocabularyWord: { word in
+                    events.append("vocabulary:\(word)")
+                },
+                insertWordReplacementRule: { rule in
+                    events.append("replacement:\(rule.originalText)=\(rule.replacementText)")
+                },
+                reportNoDictionaryEntriesImported: {
+                    events.append("noImported")
+                },
+                save: {
+                    events.append("save")
+                },
+                invalidateWordReplacementCache: {
+                    events.append("invalidateReplacements")
+                },
+                reportImportedEntryCounts: { vocabularyWordCount, wordReplacementCount in
+                    events.append("imported:\(vocabularyWordCount):\(wordReplacementCount)")
+                },
+                reportSkippedInvalidReplacementCount: { count in
+                    events.append("skippedInvalid:\(count)")
+                }
+            )
+        } catch {
+            XCTFail("Unexpected dictionary import runtime error: \(error)")
+        }
+
+        return events
     }
 
     private func withIsolatedDefaults(_ run: (UserDefaults) -> Void) {

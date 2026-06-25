@@ -12150,6 +12150,19 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/IOSAudioConfiguration.swift
 
 require_patterns \
+  "shared audio-session activation plans hide raw shell side-effect fields" \
+  VoiceInkCore/Sources/VoiceInkCore/IOSAudioConfiguration.swift \
+  'private let shouldCancelScheduledDeactivation' \
+  'private let shouldDeactivateCurrentSession' \
+  'private let shouldDeactivateSession' \
+  'fileprivate init\('
+
+reject_pattern \
+  "shared audio-session activation plans avoid public raw shell side-effect fields" \
+  'public let shouldCancelScheduledDeactivation|public let shouldDeactivateCurrentSession|public let shouldDeactivateSession' \
+  VoiceInkCore/Sources/VoiceInkCore/IOSAudioConfiguration.swift
+
+require_patterns \
   "shared iOS audio-session recording configuration lives in VoiceInkCore" \
   VoiceInkCore/Sources/VoiceInkCore/IOSAudioConfiguration.swift \
   'VoiceInkIOSAudioSessionRecordingConfiguration' \
@@ -12190,6 +12203,11 @@ require_pattern \
   "VoiceInkCore check runner executes audio-session playback runtime application proof" \
   'testAudioSessionPlaybackActivationPlanAppliesRuntimeStateInOrder' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "core audio-session lifecycle tests avoid raw activation-plan construction" \
+  'VoiceInkAudioSessionPlaybackActivationPlan\(|VoiceInkAudioSessionImmediateDeactivationPlan\(|shouldCancelScheduledDeactivation|shouldDeactivateCurrentSession|shouldDeactivateSession' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AudioSessionLifecycleStateTests.swift
 
 require_pattern \
   "iOS audio-session manager uses shared lifecycle state" \

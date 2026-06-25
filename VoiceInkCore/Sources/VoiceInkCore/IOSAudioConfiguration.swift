@@ -72,10 +72,10 @@ public enum VoiceInkAudioSessionDiagnostics {
 }
 
 public struct VoiceInkAudioSessionPlaybackActivationPlan: Equatable, Sendable {
-    public let shouldCancelScheduledDeactivation: Bool
-    public let shouldDeactivateCurrentSession: Bool
+    private let shouldCancelScheduledDeactivation: Bool
+    private let shouldDeactivateCurrentSession: Bool
 
-    public init(
+    fileprivate init(
         shouldCancelScheduledDeactivation: Bool,
         shouldDeactivateCurrentSession: Bool
     ) {
@@ -100,10 +100,10 @@ public struct VoiceInkAudioSessionPlaybackActivationPlan: Equatable, Sendable {
 }
 
 public struct VoiceInkAudioSessionImmediateDeactivationPlan: Equatable, Sendable {
-    public let shouldCancelScheduledDeactivation: Bool
-    public let shouldDeactivateSession: Bool
+    private let shouldCancelScheduledDeactivation: Bool
+    private let shouldDeactivateSession: Bool
 
-    public init(
+    fileprivate init(
         shouldCancelScheduledDeactivation: Bool,
         shouldDeactivateSession: Bool
     ) {

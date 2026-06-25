@@ -2232,27 +2232,27 @@ reject_pattern \
 
 require_pattern \
   "shared macOS CoreAudio recorder diagnostics live in VoiceInkCore" \
-  'VoiceInkMacOSCoreAudioRecorderDiagnostics|assumedLatencySampleRate|bufferLatencyMilliseconds|bufferLatencyMessage' \
+  'VoiceInkMacOSCoreAudioRecorderDiagnostics|TransportKind|knownText|transportText|deviceInfoMessage|deviceDetailsMessage|assumedLatencySampleRate|bufferLatencyMilliseconds|bufferLatencyMessage' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
 require_pattern \
   "core tests pin macOS CoreAudio buffer latency diagnostics" \
-  'testMacOSCoreAudioRecorderDiagnosticsPreserveBufferLatencyCopy' \
+  'testMacOSCoreAudioRecorderDiagnosticsPreserveBufferLatencyCopy|testMacOSCoreAudioRecorderDiagnosticsPreserveDeviceDetailsCopy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/RecordingStatePolicyTests.swift
 
 require_pattern \
   "core check runner executes macOS CoreAudio buffer latency diagnostic test" \
-  'RecordingStatePolicyTests\.testMacOSCoreAudioRecorderDiagnosticsPreserveBufferLatencyCopy' \
+  'RecordingStatePolicyTests\.testMacOSCoreAudioRecorderDiagnosticsPreserveBufferLatencyCopy|RecordingStatePolicyTests\.testMacOSCoreAudioRecorderDiagnosticsPreserveDeviceDetailsCopy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "macOS CoreAudio recorder uses shared buffer latency diagnostics" \
-  'VoiceInkMacOSCoreAudioRecorderDiagnostics\.bufferLatencyMessage' \
+  'VoiceInkMacOSCoreAudioRecorderDiagnostics\.(knownText|transportText|deviceInfoMessage|deviceDetailsMessage|bufferLatencyMessage)' \
   VoiceInk/CoreAudioRecorder.swift
 
 reject_pattern \
-  "macOS CoreAudio recorder avoids shell-owned buffer latency formatting" \
-  '48000\.0|String\(format: "%.1f"|~latency:|Buffer size:' \
+  "macOS CoreAudio recorder avoids shell-owned CoreAudio diagnostic copy" \
+  '48000\.0|String\(format: "%.1f"|~latency:|Buffer size:|\?\? "Unknown"|return "Unknown"|return "(Built-in|USB|Bluetooth|Bluetooth LE|Aggregate|Virtual|PCI|FireWire|DisplayPort|HDMI|AVB|Thunderbolt)"|Other \(\|Device info:|Device details:' \
   VoiceInk/CoreAudioRecorder.swift
 
 require_pattern \

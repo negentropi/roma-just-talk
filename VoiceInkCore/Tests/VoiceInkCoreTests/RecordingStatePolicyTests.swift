@@ -1230,6 +1230,39 @@ final class RecordingStatePolicyTests: XCTestCase {
         )
     }
 
+    func testMacOSCoreAudioRecorderDiagnosticsPreserveDeviceDetailsCopy() {
+        XCTAssertEqual(VoiceInkMacOSCoreAudioRecorderDiagnostics.knownText("Studio Display"), "Studio Display")
+        XCTAssertEqual(VoiceInkMacOSCoreAudioRecorderDiagnostics.knownText(nil), "Unknown")
+        XCTAssertEqual(VoiceInkMacOSCoreAudioRecorderDiagnostics.transportText(.builtIn), "Built-in")
+        XCTAssertEqual(VoiceInkMacOSCoreAudioRecorderDiagnostics.transportText(.usb), "USB")
+        XCTAssertEqual(VoiceInkMacOSCoreAudioRecorderDiagnostics.transportText(.bluetooth), "Bluetooth")
+        XCTAssertEqual(VoiceInkMacOSCoreAudioRecorderDiagnostics.transportText(.bluetoothLE), "Bluetooth LE")
+        XCTAssertEqual(VoiceInkMacOSCoreAudioRecorderDiagnostics.transportText(.aggregate), "Aggregate")
+        XCTAssertEqual(VoiceInkMacOSCoreAudioRecorderDiagnostics.transportText(.virtual), "Virtual")
+        XCTAssertEqual(VoiceInkMacOSCoreAudioRecorderDiagnostics.transportText(.pci), "PCI")
+        XCTAssertEqual(VoiceInkMacOSCoreAudioRecorderDiagnostics.transportText(.fireWire), "FireWire")
+        XCTAssertEqual(VoiceInkMacOSCoreAudioRecorderDiagnostics.transportText(.displayPort), "DisplayPort")
+        XCTAssertEqual(VoiceInkMacOSCoreAudioRecorderDiagnostics.transportText(.hdmi), "HDMI")
+        XCTAssertEqual(VoiceInkMacOSCoreAudioRecorderDiagnostics.transportText(.avb), "AVB")
+        XCTAssertEqual(VoiceInkMacOSCoreAudioRecorderDiagnostics.transportText(.thunderbolt), "Thunderbolt")
+        XCTAssertEqual(VoiceInkMacOSCoreAudioRecorderDiagnostics.transportText(.other(1234)), "Other (1234)")
+        XCTAssertEqual(VoiceInkMacOSCoreAudioRecorderDiagnostics.transportText(.unknown), "Unknown")
+        XCTAssertEqual(
+            VoiceInkMacOSCoreAudioRecorderDiagnostics.deviceInfoMessage(
+                name: "Studio Display Microphone",
+                uid: "uid-1"
+            ),
+            "🎙️ Device info: name=Studio Display Microphone, uid=uid-1"
+        )
+        XCTAssertEqual(
+            VoiceInkMacOSCoreAudioRecorderDiagnostics.deviceDetailsMessage(
+                transport: "USB",
+                manufacturer: "Apple"
+            ),
+            "🎙️ Device details: transport=USB, manufacturer=Apple"
+        )
+    }
+
     private func withIsolatedDefaults(_ run: (UserDefaults) -> Void) {
         let suiteName = "VoiceInkCore.RecordingStatePolicyTests.\(UUID().uuidString)"
         guard let defaults = UserDefaults(suiteName: suiteName) else {

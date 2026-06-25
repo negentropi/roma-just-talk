@@ -1052,19 +1052,25 @@ final class CoreAudioRecorder: @unchecked Sendable {
 
     private func logDeviceDetails(deviceID: AudioDeviceID) {
         // Get device name
-        let deviceName = getDeviceStringProperty(deviceID: deviceID, selector: kAudioDevicePropertyDeviceNameCFString) ?? "Unknown"
+        let deviceName = VoiceInkMacOSCoreAudioRecorderDiagnostics.knownText(
+            getDeviceStringProperty(deviceID: deviceID, selector: kAudioDevicePropertyDeviceNameCFString)
+        )
 
         // Get device UID
-        let deviceUID = getDeviceStringProperty(deviceID: deviceID, selector: kAudioDevicePropertyDeviceUID) ?? "Unknown"
+        let deviceUID = VoiceInkMacOSCoreAudioRecorderDiagnostics.knownText(
+            getDeviceStringProperty(deviceID: deviceID, selector: kAudioDevicePropertyDeviceUID)
+        )
 
         // Get transport type
         let transportType = getTransportType(deviceID: deviceID)
 
         // Get manufacturer
-        let manufacturer = getDeviceStringProperty(deviceID: deviceID, selector: kAudioDevicePropertyDeviceManufacturerCFString) ?? "Unknown"
+        let manufacturer = VoiceInkMacOSCoreAudioRecorderDiagnostics.knownText(
+            getDeviceStringProperty(deviceID: deviceID, selector: kAudioDevicePropertyDeviceManufacturerCFString)
+        )
 
-        logger.notice("🎙️ Device info: name=\(deviceName, privacy: .public), uid=\(deviceUID, privacy: .public)")
-        logger.notice("🎙️ Device details: transport=\(transportType, privacy: .public), manufacturer=\(manufacturer, privacy: .public)")
+        logger.notice("\(VoiceInkMacOSCoreAudioRecorderDiagnostics.deviceInfoMessage(name: deviceName, uid: deviceUID), privacy: .public)")
+        logger.notice("\(VoiceInkMacOSCoreAudioRecorderDiagnostics.deviceDetailsMessage(transport: transportType, manufacturer: manufacturer), privacy: .public)")
 
         // Get buffer frame size
         if let bufferSize = getBufferFrameSize(deviceID: deviceID) {
@@ -1117,37 +1123,40 @@ final class CoreAudioRecorder: @unchecked Sendable {
         )
 
         if status != noErr {
-            return "Unknown"
+            return VoiceInkMacOSCoreAudioRecorderDiagnostics.transportText(.unknown)
         }
 
+        let transportKind: VoiceInkMacOSCoreAudioRecorderDiagnostics.TransportKind
         switch transportType {
         case kAudioDeviceTransportTypeBuiltIn:
-            return "Built-in"
+            transportKind = .builtIn
         case kAudioDeviceTransportTypeUSB:
-            return "USB"
+            transportKind = .usb
         case kAudioDeviceTransportTypeBluetooth:
-            return "Bluetooth"
+            transportKind = .bluetooth
         case kAudioDeviceTransportTypeBluetoothLE:
-            return "Bluetooth LE"
+            transportKind = .bluetoothLE
         case kAudioDeviceTransportTypeAggregate:
-            return "Aggregate"
+            transportKind = .aggregate
         case kAudioDeviceTransportTypeVirtual:
-            return "Virtual"
+            transportKind = .virtual
         case kAudioDeviceTransportTypePCI:
-            return "PCI"
+            transportKind = .pci
         case kAudioDeviceTransportTypeFireWire:
-            return "FireWire"
+            transportKind = .fireWire
         case kAudioDeviceTransportTypeDisplayPort:
-            return "DisplayPort"
+            transportKind = .displayPort
         case kAudioDeviceTransportTypeHDMI:
-            return "HDMI"
+            transportKind = .hdmi
         case kAudioDeviceTransportTypeAVB:
-            return "AVB"
+            transportKind = .avb
         case kAudioDeviceTransportTypeThunderbolt:
-            return "Thunderbolt"
+            transportKind = .thunderbolt
         default:
-            return "Other (\(transportType))"
+            transportKind = .other(transportType)
         }
+
+        return VoiceInkMacOSCoreAudioRecorderDiagnostics.transportText(transportKind)
     }
 
     private func getBufferFrameSize(deviceID: AudioDeviceID) -> UInt32? {

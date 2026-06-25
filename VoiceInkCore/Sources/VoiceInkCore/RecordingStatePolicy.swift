@@ -368,6 +368,69 @@ public enum VoiceInkAudioRecorderStartFailurePolicy {
 
 public enum VoiceInkMacOSCoreAudioRecorderDiagnostics {
     public static let assumedLatencySampleRate: Double = 48_000
+    public static let unknownValueText = "Unknown"
+
+    public enum TransportKind: Equatable, Sendable {
+        case builtIn
+        case usb
+        case bluetooth
+        case bluetoothLE
+        case aggregate
+        case virtual
+        case pci
+        case fireWire
+        case displayPort
+        case hdmi
+        case avb
+        case thunderbolt
+        case other(UInt32)
+        case unknown
+    }
+
+    public static func knownText(_ text: String?) -> String {
+        text ?? unknownValueText
+    }
+
+    public static func transportText(_ transportKind: TransportKind) -> String {
+        switch transportKind {
+        case .builtIn:
+            return "Built-in"
+        case .usb:
+            return "USB"
+        case .bluetooth:
+            return "Bluetooth"
+        case .bluetoothLE:
+            return "Bluetooth LE"
+        case .aggregate:
+            return "Aggregate"
+        case .virtual:
+            return "Virtual"
+        case .pci:
+            return "PCI"
+        case .fireWire:
+            return "FireWire"
+        case .displayPort:
+            return "DisplayPort"
+        case .hdmi:
+            return "HDMI"
+        case .avb:
+            return "AVB"
+        case .thunderbolt:
+            return "Thunderbolt"
+        case .other(let rawValue):
+            return "Other (\(rawValue))"
+        case .unknown:
+            return unknownValueText
+        }
+    }
+
+    public static func deviceInfoMessage(name: String, uid: String) -> String {
+        "🎙️ Device info: name=\(name), uid=\(uid)"
+    }
+
+    public static func deviceDetailsMessage(transport: String, manufacturer: String) -> String {
+        "🎙️ Device details: transport=\(transport), manufacturer=\(manufacturer)"
+    }
 
     public static func bufferLatencyMilliseconds(bufferFrameSize: UInt32) -> Double {
         (Double(bufferFrameSize) / assumedLatencySampleRate) * 1_000

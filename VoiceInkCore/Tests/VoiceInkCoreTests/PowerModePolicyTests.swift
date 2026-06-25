@@ -2182,18 +2182,28 @@ final class PowerModePolicyTests: XCTestCase {
             customEmojis: ["I", "S"]
         )
 
-        XCTAssertEqual(plan.existingConfigurationIdsToClear, [existingId, secondExistingId])
-        XCTAssertEqual(plan.importedConfigurations, importedConfigurations)
-        XCTAssertEqual(
-            plan.shortcutImports,
-            [
-                VoiceInkPowerModeShortcutImport(backupKey: importedId.uuidString.lowercased(), id: importedId),
-                VoiceInkPowerModeShortcutImport(backupKey: secondImportedId.uuidString, id: secondImportedId)
+        let events = backupImportRuntimeEvents(
+            for: plan,
+            shortcutBackups: [
+                importedId.uuidString.lowercased(): "Imported Shortcut",
+                secondImportedId.uuidString: "Second Shortcut"
             ]
         )
-        XCTAssertEqual(plan.customEmojisToImport, ["I", "S"])
-        XCTAssertTrue(plan.hasCustomEmojiBackupRecord)
-        XCTAssertEqual(plan.importedConfigurationCount, 2)
+
+        XCTAssertEqual(
+            events,
+            [
+                "clear:\(existingId.uuidString)",
+                "clear:\(secondExistingId.uuidString)",
+                "set:\(importedId.uuidString),\(secondImportedId.uuidString)",
+                "shortcut:Imported Shortcut:\(importedId.uuidString)",
+                "shortcut:Second Shortcut:\(secondImportedId.uuidString)",
+                "save",
+                "emoji:I",
+                "emoji:S",
+                "count:2"
+            ]
+        )
     }
 
     func testPowerModeBackupImportPlanTreatsMissingCustomEmojiRecordsAsNoOps() {
@@ -2204,12 +2214,14 @@ final class PowerModePolicyTests: XCTestCase {
             customEmojis: nil
         )
 
-        XCTAssertEqual(plan.existingConfigurationIdsToClear, [])
-        XCTAssertEqual(plan.importedConfigurations, [])
-        XCTAssertEqual(plan.shortcutImports, [])
-        XCTAssertFalse(plan.hasCustomEmojiBackupRecord)
-        XCTAssertEqual(plan.customEmojisToImport, [])
-        XCTAssertEqual(plan.importedConfigurationCount, 0)
+        XCTAssertEqual(
+            backupImportRuntimeEvents(for: plan),
+            [
+                "set:",
+                "save",
+                "count:0"
+            ]
+        )
     }
 
     func testResolvedPowerModeConfigurationPreservesAutomaticResolutionOrder() {
@@ -2586,6 +2598,40 @@ final class PowerModePolicyTests: XCTestCase {
             ],
             availableLocalModelNames: availableLocalModelNames
         )
+    }
+
+    private func backupImportRuntimeEvents(
+        for plan: VoiceInkPowerModeBackupImportPlan,
+        shortcutBackups: [String: String] = [:]
+    ) -> [String] {
+        var events: [String] = []
+
+        plan.applyRuntimeState(
+            removeShortcutStorageForConfiguration: { id in
+                events.append("clear:\(id.uuidString)")
+            },
+            setImportedConfigurations: { configurations in
+                let ids = configurations.map(\.id.uuidString).joined(separator: ",")
+                events.append("set:\(ids)")
+            },
+            shortcutBackup: { key in
+                shortcutBackups[key]
+            },
+            importShortcut: { backup, id in
+                events.append("shortcut:\(backup):\(id.uuidString)")
+            },
+            saveConfigurations: {
+                events.append("save")
+            },
+            addCustomEmoji: { emoji in
+                events.append("emoji:\(emoji)")
+            },
+            reportImportedConfigurationCount: { count in
+                events.append("count:\(count)")
+            }
+        )
+
+        return events
     }
 
     private struct PreferenceApplicationRuntime {

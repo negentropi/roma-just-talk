@@ -666,17 +666,17 @@ public struct VoiceInkPowerModeShortcutExportRequest: Equatable, Sendable {
 }
 
 public struct VoiceInkPowerModeBackupImportPlan: Equatable, Sendable {
-    public var existingConfigurationIdsToClear: [UUID]
-    public var importedConfigurations: [PowerModeConfig]
-    public var shortcutImports: [VoiceInkPowerModeShortcutImport]
-    public var hasCustomEmojiBackupRecord: Bool
-    public var customEmojisToImport: [String]
+    private var existingConfigurationIdsToClear: [UUID]
+    private var importedConfigurations: [PowerModeConfig]
+    private var shortcutImports: [VoiceInkPowerModeShortcutImport]
+    private var hasCustomEmojiBackupRecord: Bool
+    private var customEmojisToImport: [String]
 
-    public var importedConfigurationCount: Int {
+    private var importedConfigurationCount: Int {
         importedConfigurations.count
     }
 
-    public init(
+    fileprivate init(
         existingConfigurationIdsToClear: [UUID],
         importedConfigurations: [PowerModeConfig],
         shortcutImports: [VoiceInkPowerModeShortcutImport],
@@ -688,6 +688,37 @@ public struct VoiceInkPowerModeBackupImportPlan: Equatable, Sendable {
         self.shortcutImports = shortcutImports
         self.hasCustomEmojiBackupRecord = hasCustomEmojiBackupRecord
         self.customEmojisToImport = customEmojisToImport
+    }
+
+    public func applyRuntimeState<ShortcutBackup>(
+        removeShortcutStorageForConfiguration: (UUID) -> Void,
+        setImportedConfigurations: ([PowerModeConfig]) -> Void,
+        shortcutBackup: (String) -> ShortcutBackup?,
+        importShortcut: (ShortcutBackup, UUID) -> Void,
+        saveConfigurations: () -> Void,
+        addCustomEmoji: (String) -> Void,
+        reportImportedConfigurationCount: (Int) -> Void
+    ) {
+        for id in existingConfigurationIdsToClear {
+            removeShortcutStorageForConfiguration(id)
+        }
+
+        setImportedConfigurations(importedConfigurations)
+
+        for shortcutImport in shortcutImports {
+            guard let backup = shortcutBackup(shortcutImport.backupKey) else { continue }
+            importShortcut(backup, shortcutImport.id)
+        }
+
+        saveConfigurations()
+
+        if hasCustomEmojiBackupRecord {
+            for emoji in customEmojisToImport {
+                addCustomEmoji(emoji)
+            }
+        }
+
+        reportImportedConfigurationCount(importedConfigurationCount)
     }
 }
 

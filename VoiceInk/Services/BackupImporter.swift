@@ -43,29 +43,30 @@ enum BackupImporter {
                 customEmojis: backup.customEmojis
             )
 
-            for id in importPlan.existingConfigurationIdsToClear {
-                ShortcutStore.removeShortcutStorage(for: .powerMode(id))
-            }
-
-            powerModeManager.configurations = importPlan.importedConfigurations
-
-            for shortcutImport in importPlan.shortcutImports {
-                guard let shortcutBackup = backup.powerModeShortcuts?[shortcutImport.backupKey] else { continue }
-                ShortcutStore.setShortcut(shortcutBackup.shortcut, for: .powerMode(shortcutImport.id))
-            }
-
-            powerModeManager.saveConfigurations()
-
-            if importPlan.hasCustomEmojiBackupRecord {
-                let emojiManager = EmojiManager.shared
-                for emoji in importPlan.customEmojisToImport {
-                    _ = emojiManager.addCustomEmoji(emoji)
+            importPlan.applyRuntimeState(
+                removeShortcutStorageForConfiguration: { id in
+                    ShortcutStore.removeShortcutStorage(for: .powerMode(id))
+                },
+                setImportedConfigurations: { configurations in
+                    powerModeManager.configurations = configurations
+                },
+                shortcutBackup: { key in
+                    backup.powerModeShortcuts?[key]
+                },
+                importShortcut: { shortcutBackup, id in
+                    ShortcutStore.setShortcut(shortcutBackup.shortcut, for: .powerMode(id))
+                },
+                saveConfigurations: powerModeManager.saveConfigurations,
+                addCustomEmoji: { emoji in
+                    _ = EmojiManager.shared.addCustomEmoji(emoji)
+                },
+                reportImportedConfigurationCount: { count in
+                    print(
+                        VoiceInkSettingsBackupImportDiagnostics.powerModeConfigurationsImportedMessage(
+                            count: count
+                        )
+                    )
                 }
-            }
-            print(
-                VoiceInkSettingsBackupImportDiagnostics.powerModeConfigurationsImportedMessage(
-                    count: importPlan.importedConfigurationCount
-                )
             )
         }
 

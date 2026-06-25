@@ -13516,7 +13516,12 @@ reject_pattern \
 
 require_pattern \
   "shared Power Mode backup import plan record lives in VoiceInkCore" \
-  'VoiceInkPowerModeBackupImportPlan' \
+  'VoiceInkPowerModeBackupImportPlan|applyRuntimeState' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+reject_pattern \
+  "shared Power Mode backup import raw payload stays hidden" \
+  'public (var|let) +(existingConfigurationIdsToClear|importedConfigurations|shortcutImports|hasCustomEmojiBackupRecord|customEmojisToImport)|public var importedConfigurationCount|public init\([^)]*existingConfigurationIdsToClear' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
@@ -13526,7 +13531,12 @@ require_pattern \
 
 require_pattern \
   "macOS backup importer uses shared Power Mode import plan" \
-  'VoiceInkPowerModePolicy\.powerModeBackupImportPlan' \
+  'VoiceInkPowerModePolicy\.powerModeBackupImportPlan|importPlan\.applyRuntimeState' \
+  VoiceInk/Services/BackupImporter.swift
+
+reject_pattern \
+  "macOS backup importer avoids raw Power Mode import plan fields" \
+  'importPlan\.(existingConfigurationIdsToClear|importedConfigurations|shortcutImports|hasCustomEmojiBackupRecord|customEmojisToImport|importedConfigurationCount)' \
   VoiceInk/Services/BackupImporter.swift
 
 reject_pattern \

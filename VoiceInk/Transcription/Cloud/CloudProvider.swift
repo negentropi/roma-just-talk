@@ -4,13 +4,7 @@ import VoiceInkCore
 
 protocol CloudProvider {
     var modelProvider: ModelProvider { get }
-    var languageCodes: [String]? { get }
-    var includesAutoDetect: Bool { get }
-    var models: [CloudModel] { get }
-    /// True when the provider has no batch HTTP endpoint and requires streaming for all transcription.
-    var isStreamingOnly: Bool { get }
 
-    func transcribe(audioData: Data, fileName: String, apiKey: String, model: String, language: String?, prompt: String?, customVocabulary: [String]) async throws -> String
     func makeStreamingProvider(modelContext: ModelContext) -> (any StreamingTranscriptionProvider)?
 }
 

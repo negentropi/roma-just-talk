@@ -5144,6 +5144,16 @@ require_patterns \
   'remoteTranscriptionOptions' \
   'acceptsRemoteTranscriptionText'
 
+reject_pattern \
+  "macOS cloud provider protocol keeps shared facts out of its interface" \
+  '^    var (languageCodes|includesAutoDetect|models|isStreamingOnly): .* \{ get \}' \
+  VoiceInk/Transcription/Cloud/CloudProvider.swift
+
+reject_pattern \
+  "macOS cloud provider protocol keeps shared batch dispatch out of its interface" \
+  '^    func transcribe\(audioData: Data, fileName: String, apiKey: String, model: String, language: String\?, prompt: String\?, customVocabulary: \[String\]\) async throws -> String$' \
+  VoiceInk/Transcription/Cloud/CloudProvider.swift
+
 require_pattern \
   "macOS transcription model uses shared recorded-file support policy" \
   'coreFacts\.supportsRecordedFileTranscription' \

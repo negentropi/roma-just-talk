@@ -16850,7 +16850,9 @@ require_patterns \
   'soundPlaybackEngine = "SoundPlaybackEngine"' \
   'audioTranscriptionManager = "AudioTranscriptionManager"' \
   'audioTranscriptionService = "AudioTranscriptionService"' \
-  'coreAudioRecorder = "CoreAudioRecorder"'
+  'coreAudioRecorder = "CoreAudioRecorder"' \
+  'whisperTranscriptionService = "WhisperTranscriptionService"' \
+  'whisperModelManager = "WhisperModelManager"'
 
 require_pattern \
   "macOS window manager uses shared log category identity" \
@@ -16989,6 +16991,24 @@ require_pattern \
   "macOS local Whisper logging uses shared diagnostics category" \
   'category: VoiceInkWhisperRuntimeDiagnostics\.logCategory' \
   VoiceInk/Transcription/Whisper/LibWhisper.swift
+
+require_patterns \
+  "macOS local Whisper service logging uses shared app identity category" \
+  VoiceInk/Transcription/Whisper/WhisperTranscriptionService.swift \
+  'Logger\(' \
+  'category: VoiceInkMacOSLogCategory\.whisperTranscriptionService'
+
+require_patterns \
+  "macOS local model manager logging uses shared app identity category" \
+  VoiceInk/Transcription/Whisper/WhisperModelManager.swift \
+  'Logger\(' \
+  'category: VoiceInkMacOSLogCategory\.whisperModelManager'
+
+reject_pattern \
+  "macOS local Whisper and model manager avoid shell-owned log category literals" \
+  'category: "(WhisperTranscriptionService|WhisperModelManager)"' \
+  VoiceInk/Transcription/Whisper/WhisperTranscriptionService.swift \
+  VoiceInk/Transcription/Whisper/WhisperModelManager.swift
 
 require_pattern \
   "iOS local Whisper logging uses shared app identity subsystem" \

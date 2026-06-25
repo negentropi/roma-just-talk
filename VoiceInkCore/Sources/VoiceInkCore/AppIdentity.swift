@@ -328,6 +328,8 @@ public enum VoiceInkMacOSLogCategory {
     public static let audioTranscriptionManager = "AudioTranscriptionManager"
     public static let audioTranscriptionService = "AudioTranscriptionService"
     public static let coreAudioRecorder = "CoreAudioRecorder"
+    public static let whisperTranscriptionService = "WhisperTranscriptionService"
+    public static let whisperModelManager = "WhisperModelManager"
 }
 
 public enum VoiceInkAppIdentity {

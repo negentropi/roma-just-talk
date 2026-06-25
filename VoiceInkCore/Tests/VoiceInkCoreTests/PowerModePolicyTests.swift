@@ -2738,6 +2738,31 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertEqual(apply(invalidMovePlan), ["save"])
     }
 
+    func testPowerModeActivationPlanAppliesActiveSelectionBeforeSessionStart() async {
+        let configID = UUID()
+        let selectedConfig = config(id: configID, name: "Meeting", emoji: "M")
+        var events = [String]()
+
+        await VoiceInkPowerModeActivationPlan.activating(selectedConfig).applyRuntimeState(
+            setActiveConfiguration: { config in
+                events.append("active:\(config.id == configID)")
+            },
+            beginSession: { config in
+                events.append("session:\(config.id == configID)")
+            }
+        )
+
+        XCTAssertEqual(events, ["active:true", "session:true"])
+
+        events.removeAll()
+        await VoiceInkPowerModeActivationPlan.activating(nil).applyRuntimeState(
+            setActiveConfiguration: { _ in events.append("active") },
+            beginSession: { _ in events.append("session") }
+        )
+
+        XCTAssertTrue(events.isEmpty)
+    }
+
     func testValidationRejectsBlankAndDuplicateNameWithoutNormalizingName() {
         let existing = rule(name: "Writing")
         let blankCandidate = rule(name: " ")

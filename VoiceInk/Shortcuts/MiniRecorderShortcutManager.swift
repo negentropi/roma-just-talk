@@ -170,8 +170,7 @@ class MiniRecorderShortcutManager: ObservableObject {
             return
         }
 
-        powerModeManager.setActiveConfiguration(selectedConfig)
-        await PowerModeSessionManager.shared.beginSession(with: selectedConfig)
+        await powerModeManager.activateConfiguration(selectedConfig)
     }
 
     deinit {

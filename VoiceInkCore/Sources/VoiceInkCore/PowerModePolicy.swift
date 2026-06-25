@@ -1454,6 +1454,28 @@ public enum VoiceInkPowerModeSessionDiagnostics {
     }
 }
 
+public struct VoiceInkPowerModeActivationPlan: Equatable, Sendable {
+    private let configuration: PowerModeConfig?
+
+    private init(configuration: PowerModeConfig?) {
+        self.configuration = configuration
+    }
+
+    public static func activating(_ configuration: PowerModeConfig?) -> Self {
+        Self(configuration: configuration)
+    }
+
+    public func applyRuntimeState(
+        setActiveConfiguration: (PowerModeConfig) async -> Void,
+        beginSession: (PowerModeConfig) async -> Void
+    ) async {
+        guard let configuration else { return }
+
+        await setActiveConfiguration(configuration)
+        await beginSession(configuration)
+    }
+}
+
 public struct VoiceInkPowerModeConfigurationMutationPlan: Equatable, Sendable {
     public let didMutate: Bool
     private let updatedConfigurations: [PowerModeConfig]

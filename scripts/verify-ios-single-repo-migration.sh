@@ -13795,7 +13795,7 @@ reject_pattern \
 
 require_pattern \
   "migration checklist tracks shared Power Mode top-level preference gate" \
-  'macOS top-level Power Mode visibility, persist-after-recording preference, first-run visibility repair, enabled-configuration presence, and shortcut eligibility route through `VoiceInkPowerModePreference`/shared `PowerModeConfig` array helpers' \
+  'macOS top-level Power Mode visibility, persist-after-recording preference, first-run visibility repair, enabled-configuration presence, shortcut eligibility, and active-configuration/session-start activation order route through `VoiceInkPowerModePreference`/`VoiceInkPowerModeActivationPlan`/shared `PowerModeConfig` array helpers' \
   docs/ios-single-repo-migration.md
 
 reject_pattern \
@@ -14260,11 +14260,6 @@ reject_pattern \
   VoiceInk/PowerMode/AppPicker.swift
 
 require_pattern \
-  "macOS Power Mode config consumes shared trigger config records" \
-  'VoiceInkPowerMode(App|URL)Config' \
-  VoiceInk/PowerMode/PowerModeConfig.swift
-
-require_pattern \
   "macOS Power Mode form consumes shared trigger config records" \
   'VoiceInkPowerMode(App|URL)Config' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
@@ -14341,6 +14336,48 @@ require_pattern \
   "shared Power Mode config owns shared auto-send key state" \
   'VoiceInkAutoSendKey' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode activation runtime plan lives in VoiceInkCore" \
+  'VoiceInkPowerModeActivationPlan|applyRuntimeState|beginSession' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "core checks execute Power Mode activation runtime plan test" \
+  'PowerModePolicyTests\.testPowerModeActivationPlanAppliesActiveSelectionBeforeSessionStart' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "macOS Power Mode manager consumes shared activation runtime plan" \
+  'VoiceInkPowerModeActivationPlan\.activating|activateConfiguration' \
+  VoiceInk/PowerMode/PowerModeConfig.swift
+
+require_pattern \
+  "macOS active-window activation uses shared manager activation adapter" \
+  'activateConfiguration\(config\)' \
+  VoiceInk/PowerMode/ActiveWindowService.swift
+
+require_pattern \
+  "macOS Power Mode popover activation uses shared manager activation adapter" \
+  'activateConfiguration\(config\)' \
+  VoiceInk/PowerMode/PowerModePopover.swift
+
+require_pattern \
+  "macOS mini recorder Power Mode shortcut activation uses shared manager activation adapter" \
+  'activateConfiguration\(selectedConfig\)' \
+  VoiceInk/Shortcuts/MiniRecorderShortcutManager.swift
+
+reject_pattern \
+  "macOS Power Mode activation callers avoid shell-owned activation sequencing" \
+  'setActiveConfiguration\(|beginSession\(with:' \
+  VoiceInk/PowerMode/ActiveWindowService.swift \
+  VoiceInk/PowerMode/PowerModePopover.swift \
+  VoiceInk/Shortcuts/MiniRecorderShortcutManager.swift
+
+reject_pattern \
+  "macOS Power Mode manager avoids unused mutation wrapper methods" \
+  'func +(enableConfiguration|disableConfiguration|addAppConfig|removeAppConfig|addURLConfig|removeURLConfig)\(' \
+  VoiceInk/PowerMode/PowerModeConfig.swift
 
 require_pattern \
   "shared Power Mode session snapshot records live in VoiceInkCore" \

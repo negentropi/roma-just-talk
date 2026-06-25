@@ -66,13 +66,7 @@ class ActiveWindowService: ObservableObject {
     }
 
     func applyResolvedConfiguration(_ config: PowerModeConfig?) async {
-        guard let config else { return }
-
-        let powerModeManager = PowerModeManager.shared
-        await MainActor.run {
-            powerModeManager.setActiveConfiguration(config)
-        }
-        await PowerModeSessionManager.shared.beginSession(with: config)
+        await PowerModeManager.shared.activateConfiguration(config)
     }
 
     func applyConfiguration(powerModeId: UUID? = nil) async {

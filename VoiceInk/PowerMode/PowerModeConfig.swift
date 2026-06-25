@@ -46,18 +46,6 @@ class PowerModeManager: ObservableObject {
         )
     }
 
-    func enableConfiguration(with id: UUID) {
-        applyConfigurationMutationPlan(
-            .settingEnabled(id: id, isEnabled: true, in: configurations)
-        )
-    }
-    
-    func disableConfiguration(with id: UUID) {
-        applyConfigurationMutationPlan(
-            .settingEnabled(id: id, isEnabled: false, in: configurations)
-        )
-    }
-
     private func postShortcutAvailabilityDidChange() {
         NotificationCenter.default.post(name: .powerModeShortcutAvailabilityDidChange, object: nil)
     }
@@ -75,33 +63,22 @@ class PowerModeManager: ObservableObject {
         return plan.didMutate
     }
 
-    func addAppConfig(_ appConfig: VoiceInkPowerModeAppConfig, to config: PowerModeConfig) {
-        applyConfigurationMutationPlan(
-            .addingAppConfig(appConfig, toConfigurationID: config.id, in: configurations)
-        )
-    }
-
-    func removeAppConfig(_ appConfig: VoiceInkPowerModeAppConfig, from config: PowerModeConfig) {
-        applyConfigurationMutationPlan(
-            .removingAppConfig(id: appConfig.id, fromConfigurationID: config.id, in: configurations)
-        )
-    }
-
-    func addURLConfig(_ urlConfig: VoiceInkPowerModeURLConfig, to config: PowerModeConfig) {
-        applyConfigurationMutationPlan(
-            .addingURLConfig(urlConfig, toConfigurationID: config.id, in: configurations)
-        )
-    }
-
-    func removeURLConfig(_ urlConfig: VoiceInkPowerModeURLConfig, from config: PowerModeConfig) {
-        applyConfigurationMutationPlan(
-            .removingURLConfig(id: urlConfig.id, fromConfigurationID: config.id, in: configurations)
-        )
-    }
-
     func setActiveConfiguration(_ config: PowerModeConfig?) {
         activeConfiguration = config
         VoiceInkPowerModeConfigurationPreference.saveActiveConfigurationId(config?.id)
         self.objectWillChange.send()
+    }
+
+    func activateConfiguration(_ config: PowerModeConfig?) async {
+        await VoiceInkPowerModeActivationPlan.activating(config).applyRuntimeState(
+            setActiveConfiguration: { config in
+                await MainActor.run {
+                    self.setActiveConfiguration(config)
+                }
+            },
+            beginSession: { config in
+                await PowerModeSessionManager.shared.beginSession(with: config)
+            }
+        )
     }
 }

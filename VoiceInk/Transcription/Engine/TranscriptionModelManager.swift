@@ -90,8 +90,7 @@ class TranscriptionModelManager: ObservableObject {
 
         let localWhisperRuntimeUpdate = model
             .transcriptionRuntimeResourcePlan
-            .modelSelectionResourceAction
-            .localWhisperRuntimeUpdate
+            .modelSelectionLocalWhisperRuntimeUpdate
         applyLocalWhisperRuntimeUpdate(localWhisperRuntimeUpdate)
 
         notifyCurrentModelDidChange(model)

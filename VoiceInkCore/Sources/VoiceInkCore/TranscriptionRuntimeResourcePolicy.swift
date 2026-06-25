@@ -6,11 +6,11 @@ public enum VoiceInkTranscriptionRecordingStartupLoadAction: Equatable, Sendable
     case loadLocalFluidAudioModel
 }
 
-public enum VoiceInkTranscriptionModelSelectionResourceAction: Equatable, Sendable {
+fileprivate enum VoiceInkTranscriptionModelSelectionResourceAction: Equatable, Sendable {
     case preserveLocalWhisperModel
     case clearLocalWhisperModelAndMarkLoaded
 
-    public var localWhisperRuntimeUpdate: VoiceInkLocalWhisperRuntimeUpdate {
+    var localWhisperRuntimeUpdate: VoiceInkLocalWhisperRuntimeUpdate {
         switch self {
         case .preserveLocalWhisperModel:
             return .preserve
@@ -61,7 +61,7 @@ public struct VoiceInkTranscriptionModelDeletionPlan: Equatable, Sendable {
 public struct VoiceInkTranscriptionRuntimeResourcePlan: Equatable, Sendable {
     public let shouldPrewarmModel: Bool
     public let recordingStartupLoadAction: VoiceInkTranscriptionRecordingStartupLoadAction
-    public let modelSelectionResourceAction: VoiceInkTranscriptionModelSelectionResourceAction
+    private let modelSelectionResourceAction: VoiceInkTranscriptionModelSelectionResourceAction
 
     public init(serviceRoute: VoiceInkTranscriptionServiceRoute) {
         switch serviceRoute {
@@ -78,6 +78,10 @@ public struct VoiceInkTranscriptionRuntimeResourcePlan: Equatable, Sendable {
             self.recordingStartupLoadAction = .none
             self.modelSelectionResourceAction = .clearLocalWhisperModelAndMarkLoaded
         }
+    }
+
+    public var modelSelectionLocalWhisperRuntimeUpdate: VoiceInkLocalWhisperRuntimeUpdate {
+        modelSelectionResourceAction.localWhisperRuntimeUpdate
     }
 }
 

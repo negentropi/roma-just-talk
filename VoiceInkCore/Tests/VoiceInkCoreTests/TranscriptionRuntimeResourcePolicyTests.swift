@@ -7,7 +7,6 @@ final class TranscriptionRuntimeResourcePolicyTests: XCTestCase {
 
         XCTAssertTrue(plan.shouldPrewarmModel)
         XCTAssertEqual(plan.recordingStartupLoadAction, .loadLocalWhisperModel)
-        XCTAssertEqual(plan.modelSelectionResourceAction, .preserveLocalWhisperModel)
     }
 
     func testLocalFluidAudioRoutePrewarmsAndLoadsFluidAudioAtRecordingStartup() {
@@ -15,7 +14,6 @@ final class TranscriptionRuntimeResourcePolicyTests: XCTestCase {
 
         XCTAssertTrue(plan.shouldPrewarmModel)
         XCTAssertEqual(plan.recordingStartupLoadAction, .loadLocalFluidAudioModel)
-        XCTAssertEqual(plan.modelSelectionResourceAction, .clearLocalWhisperModelAndMarkLoaded)
     }
 
     func testCloudRouteSkipsLocalRuntimeWork() {
@@ -23,7 +21,6 @@ final class TranscriptionRuntimeResourcePolicyTests: XCTestCase {
 
         XCTAssertFalse(plan.shouldPrewarmModel)
         XCTAssertEqual(plan.recordingStartupLoadAction, .none)
-        XCTAssertEqual(plan.modelSelectionResourceAction, .clearLocalWhisperModelAndMarkLoaded)
     }
 
     func testNativeAppleRouteSkipsLocalRuntimeWork() {
@@ -31,19 +28,36 @@ final class TranscriptionRuntimeResourcePolicyTests: XCTestCase {
 
         XCTAssertFalse(plan.shouldPrewarmModel)
         XCTAssertEqual(plan.recordingStartupLoadAction, .none)
-        XCTAssertEqual(plan.modelSelectionResourceAction, .clearLocalWhisperModelAndMarkLoaded)
     }
 
-    func testModelSelectionResourceActionOwnsLocalWhisperRuntimeUpdate() {
+    func testModelSelectionResourcePlanOwnsLocalWhisperRuntimeUpdate() {
         XCTAssertEqual(
-            VoiceInkTranscriptionModelSelectionResourceAction.preserveLocalWhisperModel.localWhisperRuntimeUpdate,
+            VoiceInkTranscriptionRuntimeResourcePlan(serviceRoute: .localWhisper)
+                .modelSelectionLocalWhisperRuntimeUpdate,
             VoiceInkLocalWhisperRuntimeUpdate(
                 shouldClearLoadedModel: false,
                 isModelLoadedAfterUpdate: nil
             )
         )
         XCTAssertEqual(
-            VoiceInkTranscriptionModelSelectionResourceAction.clearLocalWhisperModelAndMarkLoaded.localWhisperRuntimeUpdate,
+            VoiceInkTranscriptionRuntimeResourcePlan(serviceRoute: .localFluidAudio)
+                .modelSelectionLocalWhisperRuntimeUpdate,
+            VoiceInkLocalWhisperRuntimeUpdate(
+                shouldClearLoadedModel: true,
+                isModelLoadedAfterUpdate: true
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptionRuntimeResourcePlan(serviceRoute: .cloud)
+                .modelSelectionLocalWhisperRuntimeUpdate,
+            VoiceInkLocalWhisperRuntimeUpdate(
+                shouldClearLoadedModel: true,
+                isModelLoadedAfterUpdate: true
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptionRuntimeResourcePlan(serviceRoute: .nativeApple)
+                .modelSelectionLocalWhisperRuntimeUpdate,
             VoiceInkLocalWhisperRuntimeUpdate(
                 shouldClearLoadedModel: true,
                 isModelLoadedAfterUpdate: true

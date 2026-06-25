@@ -8366,7 +8366,12 @@ require_patterns \
   'VoiceInkTranscriptionRecordingStartupLoadAction' \
   'VoiceInkLocalWhisperRuntimeUpdate' \
   'VoiceInkTranscriptionModelDeletionPlan' \
-  'localWhisperRuntimeUpdate'
+  'modelSelectionLocalWhisperRuntimeUpdate'
+
+reject_pattern \
+  "shared core avoids public model-selection resource action interface" \
+  'public enum VoiceInkTranscriptionModelSelectionResourceAction|public let modelSelectionResourceAction|public var localWhisperRuntimeUpdate' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRuntimeResourcePolicy.swift
 
 require_pattern \
   "macOS model adapts shared transcription runtime resource plan" \
@@ -8445,7 +8450,7 @@ require_patterns \
 require_patterns \
   "macOS transcription model manager applies shared local Whisper runtime update" \
   VoiceInk/Transcription/Engine/TranscriptionModelManager.swift \
-  'localWhisperRuntimeUpdate' \
+  'modelSelectionLocalWhisperRuntimeUpdate' \
   'shouldClearLoadedModel' \
   'isModelLoadedAfterUpdate'
 
@@ -8459,13 +8464,13 @@ require_patterns \
 require_patterns \
   "core checks execute transcription runtime resource update tests" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'TranscriptionRuntimeResourcePolicyTests\.testModelSelectionResourceActionOwnsLocalWhisperRuntimeUpdate' \
+  'TranscriptionRuntimeResourcePolicyTests\.testModelSelectionResourcePlanOwnsLocalWhisperRuntimeUpdate' \
   'TranscriptionRuntimeResourcePolicyTests\.testDeletedCurrentModelPlanClearsSelectionAndMarksLocalWhisperUnloaded' \
   'TranscriptionRuntimeResourcePolicyTests\.testDeletedNonCurrentModelPlanPreservesSelectionAndLocalWhisperRuntime'
 
 reject_pattern \
   "macOS transcription model manager avoids shell-owned selection resource case check" \
-  'modelSelectionResourceAction == \.clearLocalWhisperModelAndMarkLoaded' \
+  'modelSelectionResourceAction|clearLocalWhisperModelAndMarkLoaded|preserveLocalWhisperModel' \
   VoiceInk/Transcription/Engine/TranscriptionModelManager.swift
 
 reject_pattern \

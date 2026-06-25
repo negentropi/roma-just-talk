@@ -8833,7 +8833,12 @@ require_pattern \
 
 require_pattern \
   "macOS model registry adapts shared FluidAudio default model" \
-  'defaultMacOSFluidAudioModelName|defaultMacOSFluidAudioModel' \
+  'FluidAudioModel\(spec: VoiceInkTranscriptionModelCatalog\.defaultMacOSFluidAudioModel\)' \
+  VoiceInk/Models/TranscriptionModelRegistry.swift
+
+reject_pattern \
+  "macOS model registry avoids shell-owned FluidAudio default lookup" \
+  'predefinedModels\.first|defaultMacOSFluidAudioModelName|Missing default macOS FluidAudio model' \
   VoiceInk/Models/TranscriptionModelRegistry.swift
 
 require_pattern \

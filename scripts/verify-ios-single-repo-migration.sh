@@ -8232,6 +8232,9 @@ require_patterns \
   'case partial\(text: String\)' \
   'case committed\(text: String\)' \
   'case error\(Error\)' \
+  'VoiceInkStreamingTranscriptAssembly' \
+  'committedText' \
+  'previewText' \
   'VoiceInkStreamingTranscriptionError' \
   'missingAPIKey' \
   'connectionFailed' \
@@ -8742,6 +8745,11 @@ require_pattern \
   VoiceInk/Transcription/Streaming/StreamingTranscriptionService.swift
 
 require_pattern \
+  "macOS streaming service uses shared transcript assembly" \
+  'VoiceInkStreamingTranscriptAssembly\.(committedText|previewText)' \
+  VoiceInk/Transcription/Streaming/StreamingTranscriptionService.swift
+
+require_pattern \
   "shared FluidAudio transcription policy lives in VoiceInkCore" \
   'VoiceInkFluidAudioTranscriptionPolicy' \
   VoiceInkCore/Sources/VoiceInkCore/FluidAudioTranscriptionPolicy.swift
@@ -9039,15 +9047,26 @@ require_pattern \
   'TranscriptionStreamingPreferenceTests\.testSessionRouteExecutionPlanUsesFileServiceWhenStreamingDisabled|TranscriptionStreamingPreferenceTests\.testSessionRouteExecutionPlanPackagesStreamingAdapterPreloadAndTimeout' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
+require_pattern \
+  "core checks execute streaming transcript assembly test" \
+  'TranscriptionStreamingPreferenceTests\.testStreamingTranscriptAssemblyPreservesCommittedPreviewAndFinalText' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "macOS streaming service avoids shell-owned transcript assembly" \
+  'committedSegments\.joined\(separator: " "\)|hasPrefix\(prefix \+ " "\)|prefix \+ " " \+ text' \
+  VoiceInk/Transcription/Streaming/StreamingTranscriptionService.swift
+
 reject_pattern \
   "core transcription session execution tests avoid raw action cases" \
   '== \.(file|streaming)|\.(file|streaming)\(' \
   VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionStreamingPreferenceTests.swift
 
-require_pattern \
+require_patterns \
   "migration checklist tracks shared transcription session execution plan" \
+  docs/ios-single-repo-migration.md \
   'VoiceInkTranscriptionSessionExecutionPlan' \
-  docs/ios-single-repo-migration.md
+  'VoiceInkStreamingTranscriptAssembly'
 
 require_pattern \
   "shared macOS AI API-key control presentation lives in VoiceInkCore" \

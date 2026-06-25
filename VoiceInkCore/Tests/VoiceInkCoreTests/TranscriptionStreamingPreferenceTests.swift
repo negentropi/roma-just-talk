@@ -21,6 +21,39 @@ final class TranscriptionStreamingPreferenceTests: XCTestCase {
         XCTAssertTrue(VoiceInkTranscriptionServiceRoute.nativeApple.isLocalTranscriptionProvider)
     }
 
+    func testStreamingTranscriptAssemblyPreservesCommittedPreviewAndFinalText() {
+        XCTAssertEqual(VoiceInkStreamingTranscriptAssembly.committedText(["hello", "world"]), "hello world")
+        XCTAssertEqual(VoiceInkStreamingTranscriptAssembly.committedText([]), "")
+        XCTAssertEqual(
+            VoiceInkStreamingTranscriptAssembly.previewText(
+                committedSegments: [],
+                partialText: "hel"
+            ),
+            "hel"
+        )
+        XCTAssertEqual(
+            VoiceInkStreamingTranscriptAssembly.previewText(
+                committedSegments: ["hello", "world"],
+                partialText: "hello world again"
+            ),
+            "hello world again"
+        )
+        XCTAssertEqual(
+            VoiceInkStreamingTranscriptAssembly.previewText(
+                committedSegments: ["hello", "world"],
+                partialText: "again"
+            ),
+            "hello world again"
+        )
+        XCTAssertEqual(
+            VoiceInkStreamingTranscriptAssembly.previewText(
+                committedSegments: ["hello"],
+                partialText: ""
+            ),
+            "hello "
+        )
+    }
+
     func testStreamingPreferenceDefaultsEnabledWhenUnset() {
         withIsolatedDefaults { defaults in
             XCTAssertTrue(VoiceInkTranscriptionStreamingPreference.isEnabled(

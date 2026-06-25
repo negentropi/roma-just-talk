@@ -306,7 +306,9 @@ class StreamingTranscriptionService {
                         // Refresh the live preview so it keeps showing the full running transcript
                         // after a commit (instead of resetting to empty until the next partial).
                         if self.state == .streaming {
-                            self.onPartialTranscript?(self.committedSegments.joined(separator: " "))
+                            self.onPartialTranscript?(
+                                VoiceInkStreamingTranscriptAssembly.committedText(self.committedSegments)
+                            )
                         }
                         if self.state == .committing {
                             self.commitSignal?.yield()
@@ -319,16 +321,10 @@ class StreamingTranscriptionService {
                             self.logger.notice("Streaming first partial event chars=\(text.count, privacy: .public)")
                         }
                         if self.state == .streaming {
-                            let prefix = self.committedSegments.joined(separator: " ")
-                            let display: String
-                            if prefix.isEmpty {
-                                display = text
-                            } else if text.hasPrefix(prefix) || text.hasPrefix(prefix + " ") {
-                                // Provider already sends cumulative partials (e.g. FluidAudio fullText).
-                                display = text
-                            } else {
-                                display = prefix + " " + text
-                            }
+                            let display = VoiceInkStreamingTranscriptAssembly.previewText(
+                                committedSegments: self.committedSegments,
+                                partialText: text
+                            )
                             self.onPartialTranscript?(display)
                         }
                     }
@@ -373,7 +369,7 @@ class StreamingTranscriptionService {
             logger.warning("No transcript received from streaming")
         }
 
-        return committedSegments.isEmpty ? "" : committedSegments.joined(separator: " ")
+        return VoiceInkStreamingTranscriptAssembly.committedText(committedSegments)
     }
 
     private func cleanupStreaming() async {

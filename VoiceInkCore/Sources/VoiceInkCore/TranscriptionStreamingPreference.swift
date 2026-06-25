@@ -7,6 +7,23 @@ public enum VoiceInkStreamingTranscriptionEvent {
     case error(Error)
 }
 
+public enum VoiceInkStreamingTranscriptAssembly {
+    public static func committedText(_ committedSegments: [String]) -> String {
+        committedSegments.joined(separator: " ")
+    }
+
+    public static func previewText(committedSegments: [String], partialText: String) -> String {
+        let prefix = committedText(committedSegments)
+        guard !prefix.isEmpty else {
+            return partialText
+        }
+        if partialText.hasPrefix(prefix) || partialText.hasPrefix(prefix + " ") {
+            return partialText
+        }
+        return prefix + " " + partialText
+    }
+}
+
 public enum VoiceInkStreamingTranscriptionError: LocalizedError, Equatable, Sendable {
     public static let unknownServerErrorMessage = "Unknown error"
 

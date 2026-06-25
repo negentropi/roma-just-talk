@@ -17128,6 +17128,11 @@ reject_pattern \
   iOS/VoiceInkKeyboard/KeyboardViewController.swift
 
 reject_pattern \
+  "iOS keyboard controller avoids shallow idle-button wrapper" \
+  'private func +configureButtonForIdleState\b' \
+  iOS/VoiceInkKeyboard/KeyboardViewController.swift
+
+reject_pattern \
   "iOS keyboard controller avoids shell-owned recording tap action policy" \
   'if +coordinator\.isRecording|else +\{[[:space:]]*openMainAppForRecording\(\)' \
   iOS/VoiceInkKeyboard/KeyboardViewController.swift

@@ -33,7 +33,10 @@ class KeyboardViewController: KeyboardInputViewController {
         recordButton.addTarget(self, action: #selector(recordButtonTapped), for: .touchUpInside)
         
         // Configure for idle state initially
-        configureButtonForIdleState()
+        configureButton(
+            VoiceInkKeyboardRecordingButtonPresentation.idle,
+            backgroundColor: .systemBlue
+        )
         
         // Add native iOS styling
         recordButton.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
@@ -62,13 +65,6 @@ class KeyboardViewController: KeyboardInputViewController {
         
         // Ensure button stays on top
         view.bringSubviewToFront(recordButton)
-    }
-    
-    private func configureButtonForIdleState() {
-        configureButton(
-            VoiceInkKeyboardRecordingButtonPresentation.idle,
-            backgroundColor: .systemBlue
-        )
     }
     
     private func configureButton(
@@ -172,7 +168,10 @@ class KeyboardViewController: KeyboardInputViewController {
         )
         
         DispatchQueue.main.asyncAfter(deadline: .now() + VoiceInkKeyboardRecordingTiming.openAppFallbackResetDelay) {
-            self.configureButtonForIdleState()
+            self.configureButton(
+                VoiceInkKeyboardRecordingButtonPresentation.idle,
+                backgroundColor: .systemBlue
+            )
         }
     }
     

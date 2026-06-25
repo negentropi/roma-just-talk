@@ -6661,18 +6661,23 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/CustomPrompt.swift
 
 require_pattern \
+  "shared custom prompt backup import plan owns runtime execution" \
+  'VoiceInkCustomPromptBackupImportPlan|applyRuntimeState|reportImportedPromptCount' \
+  VoiceInkCore/Sources/VoiceInkCore/CustomPrompt.swift
+
+require_pattern \
   "macOS settings export uses shared custom prompt export policy" \
   'VoiceInkCustomPromptPolicy\.exportedCustomPrompts' \
   VoiceInk/Services/ImportExportService.swift
 
 require_pattern \
-  "macOS settings import uses shared custom prompt import policy" \
-  'VoiceInkCustomPromptPolicy\.promptsAfterImportingCustomPrompts' \
+  "macOS settings import uses shared custom prompt import plan" \
+  'VoiceInkCustomPromptPolicy\.customPromptBackupImportPlan|importPlan\.applyRuntimeState' \
   VoiceInk/Services/BackupImporter.swift
 
 reject_pattern \
   "macOS backup shells avoid shell-owned custom prompt import/export policy" \
-  'customPrompts\.filter \{ !?\$0\.isPredefined \}|predefinedPrompts \+ backup\.customPrompts' \
+  'customPrompts\.filter \{ !?\$0\.isPredefined \}|predefinedPrompts \+ backup\.customPrompts|promptsAfterImportingCustomPrompts|backup\.customPrompts\.count' \
   VoiceInk/Services/ImportExportService.swift \
   VoiceInk/Services/BackupImporter.swift
 
@@ -6683,12 +6688,12 @@ require_pattern \
 
 require_pattern \
   "core checks execute custom prompt backup import policy tests" \
-  'CustomPromptTests\.testCustomPromptPolicyImportsBackupPromptsAfterCurrentPredefinedPrompts' \
+  'CustomPromptTests\.testCustomPromptPolicyImportsBackupPromptsAfterCurrentPredefinedPrompts|CustomPromptTests\.testCustomPromptBackupImportPlanAppliesMergedPromptsAndImportedCount' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "migration checklist tracks shared custom prompt backup policy" \
-  'backup export filtering and import merge ordering' \
+  'backup export filtering, import merge ordering, and import runtime count reporting' \
   docs/ios-single-repo-migration.md
 
 reject_pattern \

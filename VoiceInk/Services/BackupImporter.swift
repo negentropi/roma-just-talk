@@ -23,14 +23,21 @@ enum BackupImporter {
         }
 
         if categories.contains(.prompts) {
-            enhancementService.customPrompts = VoiceInkCustomPromptPolicy.promptsAfterImportingCustomPrompts(
-                backup.customPrompts,
+            let importPlan = VoiceInkCustomPromptPolicy.customPromptBackupImportPlan(
+                importedPrompts: backup.customPrompts,
                 currentPrompts: enhancementService.customPrompts
             )
-            print(
-                VoiceInkSettingsBackupImportDiagnostics.customPromptsImportedMessage(
-                    count: backup.customPrompts.count
-                )
+            importPlan.applyRuntimeState(
+                setPrompts: { prompts in
+                    enhancementService.customPrompts = prompts
+                },
+                reportImportedPromptCount: { count in
+                    print(
+                        VoiceInkSettingsBackupImportDiagnostics.customPromptsImportedMessage(
+                            count: count
+                        )
+                    )
+                }
             )
         }
 

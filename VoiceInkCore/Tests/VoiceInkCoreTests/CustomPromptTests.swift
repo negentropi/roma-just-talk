@@ -281,6 +281,52 @@ final class CustomPromptTests: XCTestCase {
         XCTAssertEqual(importedPrompts[2].title, "Imported Assistant")
     }
 
+    func testCustomPromptBackupImportPlanAppliesMergedPromptsAndImportedCount() {
+        let currentCustomPrompt = VoiceInkCustomPrompt(
+            id: UUID(uuidString: "00000000-0000-0000-0000-000000000216")!,
+            title: "Current Custom",
+            promptText: "Current custom prompt"
+        )
+        let currentDefaultPrompt = VoiceInkCustomPrompt(
+            id: VoiceInkPredefinedPrompts.defaultPromptId,
+            title: "Default",
+            promptText: "Default prompt",
+            isPredefined: true
+        )
+        let importedCustomPrompt = VoiceInkCustomPrompt(
+            id: UUID(uuidString: "00000000-0000-0000-0000-000000000217")!,
+            title: "Imported Custom",
+            promptText: "Imported custom prompt"
+        )
+        let importedPredefinedPrompt = VoiceInkCustomPrompt(
+            id: VoiceInkPredefinedPrompts.assistantPromptId,
+            title: "Imported Assistant",
+            promptText: "Imported assistant prompt",
+            isPredefined: true
+        )
+
+        let plan = VoiceInkCustomPromptPolicy.customPromptBackupImportPlan(
+            importedPrompts: [importedCustomPrompt, importedPredefinedPrompt],
+            currentPrompts: [currentCustomPrompt, currentDefaultPrompt]
+        )
+        var appliedPrompts = [VoiceInkCustomPrompt]()
+        var reportedCounts = [Int]()
+        plan.applyRuntimeState(
+            setPrompts: { appliedPrompts = $0 },
+            reportImportedPromptCount: { reportedCounts.append($0) }
+        )
+
+        XCTAssertEqual(
+            appliedPrompts.map(\.id),
+            [
+                VoiceInkPredefinedPrompts.defaultPromptId,
+                importedCustomPrompt.id,
+                VoiceInkPredefinedPrompts.assistantPromptId
+            ]
+        )
+        XCTAssertEqual(reportedCounts, [2])
+    }
+
     func testCustomPromptPolicySelectsFirstPromptOnlyWhenEnablingEnhancementWithoutSelection() {
         let firstId = UUID(uuidString: "00000000-0000-0000-0000-000000000208")!
         let staleId = UUID(uuidString: "00000000-0000-0000-0000-000000000209")!

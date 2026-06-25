@@ -282,6 +282,27 @@ public struct VoiceInkCustomPromptEditorContext: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkCustomPromptBackupImportPlan: Equatable, Sendable {
+    private let importedPrompts: [VoiceInkCustomPrompt]
+    fileprivate let promptsAfterImport: [VoiceInkCustomPrompt]
+
+    public init(
+        importedPrompts: [VoiceInkCustomPrompt],
+        currentPrompts: [VoiceInkCustomPrompt]
+    ) {
+        self.importedPrompts = importedPrompts
+        self.promptsAfterImport = currentPrompts.filter { $0.isPredefined } + importedPrompts
+    }
+
+    public func applyRuntimeState(
+        setPrompts: ([VoiceInkCustomPrompt]) -> Void,
+        reportImportedPromptCount: (Int) -> Void
+    ) {
+        setPrompts(promptsAfterImport)
+        reportImportedPromptCount(importedPrompts.count)
+    }
+}
+
 public enum VoiceInkCustomPromptPolicy {
     public static func startupStoreState(
         loadedPrompts: [VoiceInkCustomPrompt],
@@ -373,7 +394,20 @@ public enum VoiceInkCustomPromptPolicy {
         _ importedPrompts: [VoiceInkCustomPrompt],
         currentPrompts: [VoiceInkCustomPrompt]
     ) -> [VoiceInkCustomPrompt] {
-        currentPrompts.filter { $0.isPredefined } + importedPrompts
+        customPromptBackupImportPlan(
+            importedPrompts: importedPrompts,
+            currentPrompts: currentPrompts
+        ).promptsAfterImport
+    }
+
+    public static func customPromptBackupImportPlan(
+        importedPrompts: [VoiceInkCustomPrompt],
+        currentPrompts: [VoiceInkCustomPrompt]
+    ) -> VoiceInkCustomPromptBackupImportPlan {
+        VoiceInkCustomPromptBackupImportPlan(
+            importedPrompts: importedPrompts,
+            currentPrompts: currentPrompts
+        )
     }
 
     public static func selectedPromptIdAfterEnablingEnhancement(

@@ -96,7 +96,7 @@ struct OnboardingModelDownloadView: View {
                                             .font(.caption)
                                             .foregroundColor(.white.opacity(0.7))
                                         Spacer()
-                                        Text("\(Int(status.fractionCompleted * 100))%")
+                                        Text(status.percentText)
                                             .font(.caption.monospacedDigit())
                                             .foregroundColor(.white.opacity(0.7))
                                     }

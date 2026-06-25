@@ -8787,6 +8787,11 @@ require_pattern \
   VoiceInk/Views/AI\ Models/FluidAudioModelCardView.swift
 
 require_pattern \
+  "macOS onboarding model download uses shared FluidAudio percent presentation" \
+  'status\.percentText' \
+  VoiceInk/Views/Onboarding/OnboardingModelDownloadView.swift
+
+require_pattern \
   "macOS FluidAudio batch transcription uses shared local ASR policy" \
   'VoiceInkFluidAudioTranscriptionPolicy\.paddedSamplesForTranscription' \
   VoiceInk/Transcription/FluidAudio/FluidAudioTranscriptionService.swift
@@ -8816,7 +8821,8 @@ reject_pattern \
   "macOS FluidAudio download UI avoids shell-owned status copy and percent formatting" \
   '"(Preparing FluidAudio download|Listing files from repository|Checking cached models|Downloading models:|Finalizing models|Compiling )|replacingOccurrences\(of: "\.mlmodelc"|Int\(status\.fractionCompleted \* 100\)|VoiceInkWhisperModelDownloadProgress\.compactDownloadingStatusText' \
   VoiceInk/Transcription/FluidAudio/FluidAudioModelManager.swift \
-  VoiceInk/Views/AI\ Models/FluidAudioModelCardView.swift
+  VoiceInk/Views/AI\ Models/FluidAudioModelCardView.swift \
+  VoiceInk/Views/Onboarding/OnboardingModelDownloadView.swift
 
 reject_pattern \
   "macOS FluidAudio adapters avoid shell-owned model version and language-hint policy" \

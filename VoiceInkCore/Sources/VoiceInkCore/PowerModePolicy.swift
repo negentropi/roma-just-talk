@@ -1498,6 +1498,29 @@ public struct VoiceInkPowerModeActivationPlan: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkPowerModeActiveConfigurationRestorePlan: Equatable, Sendable {
+    private let activeConfiguration: PowerModeConfig?
+
+    private init(activeConfiguration: PowerModeConfig?) {
+        self.activeConfiguration = activeConfiguration
+    }
+
+    public static func restoring(
+        configurations: [PowerModeConfig],
+        activeConfigurationID: UUID?
+    ) -> Self {
+        guard let activeConfigurationID else {
+            return Self(activeConfiguration: nil)
+        }
+
+        return Self(activeConfiguration: configurations.powerModeConfiguration(with: activeConfigurationID))
+    }
+
+    public func applyRuntimeState(setActiveConfiguration: (PowerModeConfig?) -> Void) {
+        setActiveConfiguration(activeConfiguration)
+    }
+}
+
 public struct VoiceInkPowerModeRecordingFinishPlan: Equatable, Sendable {
     private let shouldRestorePowerModeSession: Bool
 

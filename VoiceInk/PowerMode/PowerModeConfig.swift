@@ -7,13 +7,12 @@ class PowerModeManager: ObservableObject {
     @Published var activeConfiguration: PowerModeConfig?
 
     private init() {
-        configurations = VoiceInkPowerModeConfigurationPreference.loadConfigurations()
-
-        if let activeConfigId = VoiceInkPowerModeConfigurationPreference.loadActiveConfigurationId() {
-            activeConfiguration = configurations.powerModeConfiguration(with: activeConfigId)
-        } else {
-            activeConfiguration = nil
-        }
+        let loadedConfigurations = VoiceInkPowerModeConfigurationPreference.loadConfigurations()
+        configurations = loadedConfigurations
+        VoiceInkPowerModeActiveConfigurationRestorePlan.restoring(
+            configurations: loadedConfigurations,
+            activeConfigurationID: VoiceInkPowerModeConfigurationPreference.loadActiveConfigurationId()
+        ).applyRuntimeState { activeConfiguration = $0 }
     }
 
     func saveConfigurations() {

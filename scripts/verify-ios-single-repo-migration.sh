@@ -13800,7 +13800,7 @@ reject_pattern \
 
 require_pattern \
   "migration checklist tracks shared Power Mode top-level preference gate" \
-  'macOS top-level Power Mode visibility, persist-after-recording preference, first-run visibility repair, enabled-configuration presence, shortcut eligibility, automatic frontmost-app/browser URL resolution planning, active-configuration/session-start activation order, and recording-finish restore order route through `VoiceInkPowerModePreference`/`VoiceInkPowerModeAutomaticResolutionPlan`/`VoiceInkPowerModeActivationPlan`/`VoiceInkPowerModeRecordingFinishPlan`/shared `PowerModeConfig` array helpers' \
+  'macOS top-level Power Mode visibility, persist-after-recording preference, first-run visibility repair, enabled-configuration presence, shortcut eligibility, automatic frontmost-app/browser URL resolution planning, startup active-configuration restore planning, active-configuration/session-start activation order, and recording-finish restore order route through `VoiceInkPowerModePreference`/`VoiceInkPowerModeAutomaticResolutionPlan`/`VoiceInkPowerModeActiveConfigurationRestorePlan`/`VoiceInkPowerModeActivationPlan`/`VoiceInkPowerModeRecordingFinishPlan`/shared `PowerModeConfig` array helpers' \
   docs/ios-single-repo-migration.md
 
 reject_pattern \
@@ -14383,13 +14383,33 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
+  "shared Power Mode active configuration restore plan lives in VoiceInkCore" \
+  'VoiceInkPowerModeActiveConfigurationRestorePlan|activeConfigurationID|applyRuntimeState' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
   "core checks execute Power Mode activation runtime plan test" \
   'PowerModePolicyTests\.testPowerModeActivationPlanAppliesActiveSelectionBeforeSessionStart' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
+  "core checks execute Power Mode active configuration restore tests" \
+  'PowerModePolicyTests\.testPowerModeActiveConfigurationRestorePlan(ClearsMissingAndStaleSelection|RestoresMatchingConfiguration)' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "macOS Power Mode manager consumes shared activation runtime plan" \
   'VoiceInkPowerModeActivationPlan\.activating|activateConfiguration' \
+  VoiceInk/PowerMode/PowerModeConfig.swift
+
+require_pattern \
+  "macOS Power Mode manager consumes shared active configuration restore plan" \
+  'VoiceInkPowerModeActiveConfigurationRestorePlan\.restoring|loadActiveConfigurationId|applyRuntimeState' \
+  VoiceInk/PowerMode/PowerModeConfig.swift
+
+reject_pattern \
+  "macOS Power Mode manager avoids shell-owned active configuration restore branching" \
+  'if +let +activeConfigId = VoiceInkPowerModeConfigurationPreference\.loadActiveConfigurationId|activeConfiguration = configurations\.powerModeConfiguration' \
   VoiceInk/PowerMode/PowerModeConfig.swift
 
 require_pattern \

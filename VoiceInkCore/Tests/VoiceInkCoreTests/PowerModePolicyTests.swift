@@ -2891,6 +2891,39 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertTrue(events.isEmpty)
     }
 
+    func testPowerModeActiveConfigurationRestorePlanClearsMissingAndStaleSelection() {
+        let configID = UUID()
+        let existingConfig = config(id: configID, name: "Meeting", emoji: "M")
+
+        XCTAssertEqual(
+            powerModeActiveConfigurationRestoreEvents(
+                configurations: [existingConfig],
+                activeConfigurationID: nil
+            ),
+            ["active:nil"]
+        )
+        XCTAssertEqual(
+            powerModeActiveConfigurationRestoreEvents(
+                configurations: [existingConfig],
+                activeConfigurationID: UUID()
+            ),
+            ["active:nil"]
+        )
+    }
+
+    func testPowerModeActiveConfigurationRestorePlanRestoresMatchingConfiguration() {
+        let configID = UUID()
+        let existingConfig = config(id: configID, name: "Meeting", emoji: "M")
+
+        XCTAssertEqual(
+            powerModeActiveConfigurationRestoreEvents(
+                configurations: [existingConfig],
+                activeConfigurationID: configID
+            ),
+            ["active:Meeting"]
+        )
+    }
+
     func testPowerModeRecordingFinishPlanSkipsWhenPreferencesPersist() async {
         var events = [String]()
 
@@ -3216,6 +3249,20 @@ final class PowerModePolicyTests: XCTestCase {
             VoiceInkPowerModeValidationError.duplicateWebsiteTrigger("example.com", "Writing").localizedDescription,
             "The website 'example.com' is already configured in the 'Writing' power mode."
         )
+    }
+
+    private func powerModeActiveConfigurationRestoreEvents(
+        configurations: [PowerModeConfig],
+        activeConfigurationID: UUID?
+    ) -> [String] {
+        var events = [String]()
+        VoiceInkPowerModeActiveConfigurationRestorePlan.restoring(
+            configurations: configurations,
+            activeConfigurationID: activeConfigurationID
+        ).applyRuntimeState { config in
+            events.append("active:\(config?.name ?? "nil")")
+        }
+        return events
     }
 
     private func config(

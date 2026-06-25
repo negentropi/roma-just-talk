@@ -1508,19 +1508,26 @@ final class PowerModePolicyTests: XCTestCase {
             )
         )
 
-        XCTAssertTrue(plan.preferenceApplication.isEnhancementEnabled)
-        XCTAssertTrue(plan.preferenceApplication.useScreenCaptureContext)
-        let promptApplication = appliedPromptSelection(plan.preferenceApplication)
+        let runtime = await sessionApplicationRuntime(for: plan)
+        guard let application = runtime.preferenceApplication,
+              let modelResourcePlan = runtime.modelResourcePlan,
+              let languageApplicationPlan = runtime.languageApplicationPlan else {
+            XCTFail("Expected session application runtime plans")
+            return
+        }
+
+        XCTAssertTrue(application.isEnhancementEnabled)
+        XCTAssertTrue(application.useScreenCaptureContext)
+        let promptApplication = appliedPromptSelection(application)
         XCTAssertTrue(promptApplication.didApply)
         XCTAssertEqual(promptApplication.selectedPromptId, promptID)
-        XCTAssertEqual(plan.preferenceApplication.selectedAIProvider, .groq)
-        XCTAssertEqual(plan.preferenceApplication.selectedAIModel, "llama-3.3")
-        XCTAssertEqual(plan.modelResourcePlan.selectedModelName, "base")
-        let modelResourceEvents = await runtimeEvents(for: plan.modelResourcePlan)
+        XCTAssertEqual(application.selectedAIProvider, .groq)
+        XCTAssertEqual(application.selectedAIModel, "llama-3.3")
+        XCTAssertEqual(modelResourcePlan.selectedModelName, "base")
+        let modelResourceEvents = await runtimeEvents(for: modelResourcePlan)
         XCTAssertEqual(modelResourceEvents, ["select:base", "cleanup", "load:base"])
-        XCTAssertEqual(languageRuntimeEvents(for: plan.languageApplicationPlan), ["save:fr", "post"])
-        let didPostConfigurationApplied = await postsConfigurationApplied(for: plan)
-        XCTAssertTrue(didPostConfigurationApplied)
+        XCTAssertEqual(languageRuntimeEvents(for: languageApplicationPlan), ["save:fr", "post"])
+        XCTAssertTrue(runtime.didPostConfigurationApplied)
     }
 
     func testPowerModeSessionApplicationPlanBuildsRestoreSequenceWithoutConfigurationNotification() async {
@@ -1544,20 +1551,27 @@ final class PowerModePolicyTests: XCTestCase {
             )
         )
 
-        XCTAssertFalse(plan.preferenceApplication.isEnhancementEnabled)
-        XCTAssertFalse(plan.preferenceApplication.useScreenCaptureContext)
-        let promptApplication = appliedPromptSelection(plan.preferenceApplication)
+        let runtime = await sessionApplicationRuntime(for: plan)
+        guard let application = runtime.preferenceApplication,
+              let modelResourcePlan = runtime.modelResourcePlan,
+              let languageApplicationPlan = runtime.languageApplicationPlan else {
+            XCTFail("Expected session application runtime plans")
+            return
+        }
+
+        XCTAssertFalse(application.isEnhancementEnabled)
+        XCTAssertFalse(application.useScreenCaptureContext)
+        let promptApplication = appliedPromptSelection(application)
         XCTAssertTrue(promptApplication.didApply)
         XCTAssertEqual(promptApplication.selectedPromptId, promptID)
-        XCTAssertEqual(plan.preferenceApplication.selectedAIProvider, .groq)
-        XCTAssertEqual(plan.preferenceApplication.selectedAIModel, "llama-3.3")
-        XCTAssertEqual(plan.preferenceApplication.cleanupRestore.punctuationMode, .removeAll)
-        XCTAssertEqual(plan.modelResourcePlan.selectedModelName, "english-only")
-        let modelResourceEvents = await runtimeEvents(for: plan.modelResourcePlan)
+        XCTAssertEqual(application.selectedAIProvider, .groq)
+        XCTAssertEqual(application.selectedAIModel, "llama-3.3")
+        XCTAssertEqual(application.cleanupRestore.punctuationMode, .removeAll)
+        XCTAssertEqual(modelResourcePlan.selectedModelName, "english-only")
+        let modelResourceEvents = await runtimeEvents(for: modelResourcePlan)
         XCTAssertEqual(modelResourceEvents, ["select:english-only", "cleanup"])
-        XCTAssertEqual(languageRuntimeEvents(for: plan.languageApplicationPlan), ["save:en", "post"])
-        let didPostConfigurationApplied = await postsConfigurationApplied(for: plan)
-        XCTAssertFalse(didPostConfigurationApplied)
+        XCTAssertEqual(languageRuntimeEvents(for: languageApplicationPlan), ["save:en", "post"])
+        XCTAssertFalse(runtime.didPostConfigurationApplied)
     }
 
     func testPowerModeSessionApplicationPlanKeepsModelAndLanguageNoOpWhenRestoreSelectionsAreMissing() async {
@@ -1576,11 +1590,17 @@ final class PowerModePolicyTests: XCTestCase {
             )
         )
 
-        XCTAssertEqual(plan.modelResourcePlan.selectedModelName, nil)
-        XCTAssertFalse(plan.modelResourcePlan.shouldChangeModel)
-        XCTAssertEqual(languageRuntimeEvents(for: plan.languageApplicationPlan), [])
-        let didPostConfigurationApplied = await postsConfigurationApplied(for: plan)
-        XCTAssertFalse(didPostConfigurationApplied)
+        let runtime = await sessionApplicationRuntime(for: plan)
+        guard let modelResourcePlan = runtime.modelResourcePlan,
+              let languageApplicationPlan = runtime.languageApplicationPlan else {
+            XCTFail("Expected session application runtime plans")
+            return
+        }
+
+        XCTAssertEqual(modelResourcePlan.selectedModelName, nil)
+        XCTAssertFalse(modelResourcePlan.shouldChangeModel)
+        XCTAssertEqual(languageRuntimeEvents(for: languageApplicationPlan), [])
+        XCTAssertFalse(runtime.didPostConfigurationApplied)
     }
 
     func testPowerModeSessionPreservesStoredShapeAndOriginalState() throws {
@@ -2624,21 +2644,34 @@ final class PowerModePolicyTests: XCTestCase {
         return events
     }
 
-    private func postsConfigurationApplied(
+    private struct SessionApplicationRuntime {
+        var preferenceApplication: VoiceInkPowerModePreferenceApplication?
+        var modelResourcePlan: VoiceInkPowerModeTranscriptionModelResourcePlan?
+        var languageApplicationPlan: VoiceInkPowerModeLanguageApplicationPlan?
+        var didPostConfigurationApplied = false
+    }
+
+    private func sessionApplicationRuntime(
         for plan: VoiceInkPowerModeSessionApplicationPlan
-    ) async -> Bool {
-        var didPost = false
+    ) async -> SessionApplicationRuntime {
+        var runtime = SessionApplicationRuntime()
 
         await plan.applyRuntimeState(
-            applyPreferenceApplication: { _ in },
-            applyModelResourcePlan: { _ in },
-            applyLanguageApplicationPlan: { _ in },
+            applyPreferenceApplication: { application in
+                runtime.preferenceApplication = application
+            },
+            applyModelResourcePlan: { modelResourcePlan in
+                runtime.modelResourcePlan = modelResourcePlan
+            },
+            applyLanguageApplicationPlan: { languageApplicationPlan in
+                runtime.languageApplicationPlan = languageApplicationPlan
+            },
             postConfigurationApplied: {
-                didPost = true
+                runtime.didPostConfigurationApplied = true
             }
         )
 
-        return didPost
+        return runtime
     }
 
     private func runtimeEvents(

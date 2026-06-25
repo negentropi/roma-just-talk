@@ -14002,8 +14002,8 @@ require_patterns \
   'postConfigurationApplied'
 
 reject_pattern \
-  "shared Power Mode session application notification flag stays hidden" \
-  'public (var|let) +shouldPostConfigurationApplied' \
+  "shared Power Mode session application raw payload stays hidden" \
+  'public (var|let) +(preferenceApplication|modelResourcePlan|languageApplicationPlan|shouldPostConfigurationApplied)|public init\([^)]*preferenceApplication: VoiceInkPowerModePreferenceApplication' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \

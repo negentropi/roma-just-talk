@@ -799,12 +799,12 @@ public struct VoiceInkPowerModeSessionApplicationFacts: Equatable, Sendable {
 }
 
 public struct VoiceInkPowerModeSessionApplicationPlan: Equatable, Sendable {
-    public var preferenceApplication: VoiceInkPowerModePreferenceApplication
-    public var modelResourcePlan: VoiceInkPowerModeTranscriptionModelResourcePlan
-    public var languageApplicationPlan: VoiceInkPowerModeLanguageApplicationPlan
+    private var preferenceApplication: VoiceInkPowerModePreferenceApplication
+    private var modelResourcePlan: VoiceInkPowerModeTranscriptionModelResourcePlan
+    private var languageApplicationPlan: VoiceInkPowerModeLanguageApplicationPlan
     private var shouldPostConfigurationApplied: Bool
 
-    public init(
+    private init(
         preferenceApplication: VoiceInkPowerModePreferenceApplication,
         modelResourcePlan: VoiceInkPowerModeTranscriptionModelResourcePlan,
         languageApplicationPlan: VoiceInkPowerModeLanguageApplicationPlan,

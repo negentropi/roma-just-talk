@@ -4068,6 +4068,17 @@ require_pattern \
   'VoiceInkWhisperModelSimpleDownloadCompletionPlan|installTemporaryFile|presentFailure|ignoreCancellation|applyRuntimeState' \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
 
+require_patterns \
+  "shared Whisper simple download completion plan hides raw action payload" \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift \
+  'private enum VoiceInkWhisperModelSimpleDownloadCompletionAction' \
+  'private let action: VoiceInkWhisperModelSimpleDownloadCompletionAction'
+
+reject_pattern \
+  "shared Whisper simple download completion plan avoids public raw action cases" \
+  'public enum VoiceInkWhisperModelSimpleDownloadCompletionPlan|public enum VoiceInkWhisperModelSimpleDownloadCompletionAction|public let action: VoiceInkWhisperModelSimpleDownloadCompletionAction' \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+
 require_pattern \
   "shared Whisper simple download completion plan owns cancellation outcome" \
   'ignoreCancellation|NSURLErrorCancelled|CancellationError' \
@@ -4082,6 +4093,11 @@ require_pattern \
   "core checks cover iOS download completion runtime application" \
   'WhisperModelFilesTests\.testSimpleDownloadCompletionPlanAppliesRuntimeState' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "core simple download completion tests avoid raw completion case construction" \
+  '\.(installTemporaryFile|presentFailure|ignoreCancellation)\(' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/WhisperModelFilesTests.swift
 
 require_pattern \
   "core checks cover iOS local model management diagnostics" \

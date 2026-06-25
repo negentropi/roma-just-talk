@@ -491,37 +491,37 @@ final class WhisperModelFilesTests: XCTestCase {
             )!
         }
 
-        XCTAssertEqual(
+        assertSimpleDownloadCompletionEvents(
             VoiceInkWhisperModelSimpleDownloadCompletionPlan.completion(
                 temporaryURL: temporaryURL,
                 response: response(statusCode: 200),
                 error: nil
             ),
-            .installTemporaryFile(temporaryURL)
+            expectedEvents: ["install:ggml-base.download"]
         )
-        XCTAssertEqual(
+        assertSimpleDownloadCompletionEvents(
             VoiceInkWhisperModelSimpleDownloadCompletionPlan.completion(
                 temporaryURL: temporaryURL,
                 response: response(statusCode: 200),
                 error: networkError
             ),
-            .presentFailure(.downloadFailed(localizedDescription: "Offline"))
+            expectedEvents: ["failure:downloadFailed-Offline"]
         )
-        XCTAssertEqual(
+        assertSimpleDownloadCompletionEvents(
             VoiceInkWhisperModelSimpleDownloadCompletionPlan.completion(
                 temporaryURL: temporaryURL,
                 response: response(statusCode: 500),
                 error: nil
             ),
-            .presentFailure(.serverErrorDuringDownload)
+            expectedEvents: ["failure:serverErrorDuringDownload"]
         )
-        XCTAssertEqual(
+        assertSimpleDownloadCompletionEvents(
             VoiceInkWhisperModelSimpleDownloadCompletionPlan.completion(
                 temporaryURL: nil,
                 response: response(statusCode: 200),
                 error: nil
             ),
-            .presentFailure(.noFileReceived)
+            expectedEvents: ["failure:noFileReceived"]
         )
     }
 
@@ -532,31 +532,53 @@ final class WhisperModelFilesTests: XCTestCase {
             code: NSURLErrorCancelled
         )
 
-        XCTAssertEqual(
+        assertSimpleDownloadCompletionEvents(
             VoiceInkWhisperModelSimpleDownloadCompletionPlan.completion(
                 temporaryURL: temporaryURL,
                 response: nil,
                 error: cancelledURLSessionError
             ),
-            .ignoreCancellation
+            expectedEvents: ["cancel"]
         )
 
-        XCTAssertEqual(
+        assertSimpleDownloadCompletionEvents(
             VoiceInkWhisperModelSimpleDownloadCompletionPlan.completion(
                 temporaryURL: temporaryURL,
                 response: nil,
                 error: CancellationError()
             ),
-            .ignoreCancellation
+            expectedEvents: ["cancel"]
         )
     }
 
     func testSimpleDownloadCompletionPlanAppliesRuntimeState() {
         let temporaryURL = URL(fileURLWithPath: "/tmp/ggml-base.download")
         let plans: [VoiceInkWhisperModelSimpleDownloadCompletionPlan] = [
-            .installTemporaryFile(temporaryURL),
-            .presentFailure(.noFileReceived),
-            .ignoreCancellation
+            VoiceInkWhisperModelSimpleDownloadCompletionPlan.completion(
+                temporaryURL: temporaryURL,
+                response: HTTPURLResponse(
+                    url: URL(string: "https://example.com/ggml-base.bin")!,
+                    statusCode: 200,
+                    httpVersion: nil,
+                    headerFields: nil
+                ),
+                error: nil
+            ),
+            VoiceInkWhisperModelSimpleDownloadCompletionPlan.completion(
+                temporaryURL: nil,
+                response: HTTPURLResponse(
+                    url: URL(string: "https://example.com/ggml-base.bin")!,
+                    statusCode: 200,
+                    httpVersion: nil,
+                    headerFields: nil
+                ),
+                error: nil
+            ),
+            VoiceInkWhisperModelSimpleDownloadCompletionPlan.completion(
+                temporaryURL: temporaryURL,
+                response: nil,
+                error: CancellationError()
+            )
         ]
         var events: [String] = []
 
@@ -573,6 +595,21 @@ final class WhisperModelFilesTests: XCTestCase {
             "failure:noFileReceived",
             "cancel"
         ])
+    }
+
+    private func assertSimpleDownloadCompletionEvents(
+        _ plan: VoiceInkWhisperModelSimpleDownloadCompletionPlan,
+        expectedEvents: [String]
+    ) {
+        var events: [String] = []
+
+        plan.applyRuntimeState(
+            installTemporaryFile: { url in events.append("install:\(url.lastPathComponent)") },
+            presentFailure: { alert in events.append("failure:\(alert.id)") },
+            ignoreCancellation: { events.append("cancel") }
+        )
+
+        XCTAssertEqual(events, expectedEvents)
     }
 
     func testSimpleDownloadProgressFormatsIOSProgress() {

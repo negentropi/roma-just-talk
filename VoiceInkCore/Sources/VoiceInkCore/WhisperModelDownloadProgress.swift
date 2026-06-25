@@ -117,10 +117,18 @@ public struct VoiceInkWhisperModelOperationAlertPresentation: Equatable, Identif
     }
 }
 
-public enum VoiceInkWhisperModelSimpleDownloadCompletionPlan: Equatable, Sendable {
+private enum VoiceInkWhisperModelSimpleDownloadCompletionAction: Equatable, Sendable {
     case installTemporaryFile(URL)
     case presentFailure(VoiceInkWhisperModelOperationAlertPresentation)
     case ignoreCancellation
+}
+
+public struct VoiceInkWhisperModelSimpleDownloadCompletionPlan: Equatable, Sendable {
+    private let action: VoiceInkWhisperModelSimpleDownloadCompletionAction
+
+    private init(action: VoiceInkWhisperModelSimpleDownloadCompletionAction) {
+        self.action = action
+    }
 
     public static func completion(
         temporaryURL: URL?,
@@ -129,10 +137,10 @@ public enum VoiceInkWhisperModelSimpleDownloadCompletionPlan: Equatable, Sendabl
     ) -> Self {
         if let error {
             if isCancellation(error) {
-                return .ignoreCancellation
+                return Self(action: .ignoreCancellation)
             }
 
-            return .presentFailure(.downloadFailed(for: error))
+            return Self(action: .presentFailure(.downloadFailed(for: error)))
         }
 
         switch VoiceInkWhisperModelDownloadResponsePolicy.completion(
@@ -140,11 +148,11 @@ public enum VoiceInkWhisperModelSimpleDownloadCompletionPlan: Equatable, Sendabl
             response: response
         ) {
         case .ready(let temporaryURL):
-            return .installTemporaryFile(temporaryURL)
+            return Self(action: .installTemporaryFile(temporaryURL))
         case .serverError:
-            return .presentFailure(.serverErrorDuringDownload)
+            return Self(action: .presentFailure(.serverErrorDuringDownload))
         case .missingTemporaryFile:
-            return .presentFailure(.noFileReceived)
+            return Self(action: .presentFailure(.noFileReceived))
         }
     }
 
@@ -153,7 +161,7 @@ public enum VoiceInkWhisperModelSimpleDownloadCompletionPlan: Equatable, Sendabl
         presentFailure: (VoiceInkWhisperModelOperationAlertPresentation) -> Void,
         ignoreCancellation: () -> Void
     ) {
-        switch self {
+        switch action {
         case .installTemporaryFile(let temporaryURL):
             installTemporaryFile(temporaryURL)
         case .presentFailure(let alert):

@@ -1135,6 +1135,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "RecordingStatePolicyTests.testRecordingFlowStatePreservesIOSStartAndStopTransitions", run: { RecordingStatePolicyTests().testRecordingFlowStatePreservesIOSStartAndStopTransitions() }),
             VoiceInkCoreCheck(name: "RecordingStatePolicyTests.testRecordingStopPlanFinishesFlowAndCreatesPendingDraftOnlyWhenAudioExists", run: { RecordingStatePolicyTests().testRecordingStopPlanFinishesFlowAndCreatesPendingDraftOnlyWhenAudioExists() }),
             VoiceInkCoreCheck(name: "RecordingStatePolicyTests.testRecordingStopPlanAppliesIOSRuntimeStateInOrder", run: { RecordingStatePolicyTests().testRecordingStopPlanAppliesIOSRuntimeStateInOrder() }),
+            VoiceInkCoreCheck(name: "RecordingStatePolicyTests.testRecordingCancelPlanAppliesIOSRuntimeStateInOrder", run: { RecordingStatePolicyTests().testRecordingCancelPlanAppliesIOSRuntimeStateInOrder() }),
             VoiceInkCoreCheck(name: "RecordingStatePolicyTests.testAudioRecorderStopPolicyPreservesIOSStopCleanup", run: { RecordingStatePolicyTests().testAudioRecorderStopPolicyPreservesIOSStopCleanup() }),
             VoiceInkCoreCheck(name: "RecordingStatePolicyTests.testAudioRecorderStopPolicyPreservesIOSDiscardCleanup", run: { RecordingStatePolicyTests().testAudioRecorderStopPolicyPreservesIOSDiscardCleanup() }),
             VoiceInkCoreCheck(name: "RecordingStatePolicyTests.testAudioRecorderStopPlanAppliesRuntimeStateInOrder", run: { RecordingStatePolicyTests().testAudioRecorderStopPlanAppliesRuntimeStateInOrder() }),

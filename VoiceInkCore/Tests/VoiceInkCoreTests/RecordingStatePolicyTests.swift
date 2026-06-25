@@ -343,6 +343,30 @@ final class RecordingStatePolicyTests: XCTestCase {
         ])
     }
 
+    func testRecordingCancelPlanAppliesIOSRuntimeStateInOrder() {
+        let recordingState = VoiceInkRecordingFlowState(
+            recordingState: .recording,
+            animate: true,
+            isRecordingSheetPresented: true,
+            currentDuration: 4.5
+        )
+        var events: [String] = []
+
+        recordingState.cancelRecordingPlan().applyRuntimeState(
+            discardRecorder: { events.append("discard") },
+            stopDurationTimer: { events.append("timer") },
+            setFlowState: { events.append("state:\($0.recordingState):\($0.currentDuration)") },
+            updateRecordingState: { events.append("coordinator:\($0)") }
+        )
+
+        XCTAssertEqual(events, [
+            "discard",
+            "timer",
+            "state:idle:0.0",
+            "coordinator:false"
+        ])
+    }
+
     func testAudioRecorderStopPolicyPreservesIOSStopCleanup() {
         XCTAssertEqual(
             VoiceInkAudioRecorderStopPolicy.plan(for: .keepRecordingFile),

@@ -205,6 +205,12 @@ public struct VoiceInkRecordingFlowState: Equatable, Sendable {
             }
         )
     }
+
+    public func cancelRecordingPlan() -> VoiceInkRecordingCancelPlan {
+        var flowStateAfterCancel = self
+        flowStateAfterCancel.cancelRecording()
+        return VoiceInkRecordingCancelPlan(flowStateAfterCancel: flowStateAfterCancel)
+    }
 }
 
 public struct VoiceInkRecordingStopPlan: Equatable, Sendable {
@@ -234,6 +240,26 @@ public struct VoiceInkRecordingStopPlan: Equatable, Sendable {
         if let pendingDraft {
             insertPendingDraft(pendingDraft)
         }
+    }
+}
+
+public struct VoiceInkRecordingCancelPlan: Equatable, Sendable {
+    public let flowStateAfterCancel: VoiceInkRecordingFlowState
+
+    public init(flowStateAfterCancel: VoiceInkRecordingFlowState) {
+        self.flowStateAfterCancel = flowStateAfterCancel
+    }
+
+    public func applyRuntimeState(
+        discardRecorder: () -> Void,
+        stopDurationTimer: () -> Void,
+        setFlowState: (VoiceInkRecordingFlowState) -> Void,
+        updateRecordingState: (Bool) -> Void
+    ) {
+        discardRecorder()
+        stopDurationTimer()
+        setFlowState(flowStateAfterCancel)
+        updateRecordingState(false)
     }
 }
 

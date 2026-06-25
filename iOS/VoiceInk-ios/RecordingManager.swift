@@ -148,12 +148,12 @@ final class RecordingManager: ObservableObject {
     }
     
     func cancelRecording() {
-        recorder.discard()
-        stopDurationTimer()
-        updateFlowState { $0.cancelRecording() }
-        
-        // Update coordinator state
-        coordinator.updateRecordingState(false)
+        flowState.cancelRecordingPlan().applyRuntimeState(
+            discardRecorder: recorder.discard,
+            stopDurationTimer: stopDurationTimer,
+            setFlowState: { flowState = $0 },
+            updateRecordingState: coordinator.updateRecordingState
+        )
     }
     
     // MARK: - Permissions

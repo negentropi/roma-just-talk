@@ -1032,6 +1032,16 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
+  "shared recording cancel plan lives in VoiceInkCore" \
+  'VoiceInkRecordingCancelPlan|cancelRecordingPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+
+require_pattern \
+  "shared recording cancel plan checks run in VoiceInkCore" \
+  'testRecordingCancelPlanAppliesIOSRuntimeStateInOrder' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "shared audio-recorder stop cleanup plan lives in VoiceInkCore" \
   'VoiceInkAudioRecorderStopPolicy|VoiceInkAudioRecorderStopPlan|VoiceInkAudioRecorderStopMode|applyRuntimeState' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
@@ -1251,6 +1261,12 @@ require_pattern \
   'stopPlan\.applyRuntimeState|insertPendingDraft' \
   iOS/VoiceInk-ios/RecordingManager.swift
 
+require_patterns \
+  "iOS recording manager applies shared cancel plan runtime order" \
+  iOS/VoiceInk-ios/RecordingManager.swift \
+  'cancelRecordingPlan\(\)' \
+  'applyRuntimeState'
+
 require_pattern \
   "iOS recording manager adapts recorder URL into shared stop plan" \
   'audioFileURL: +recorder\.currentRecordingURL\?\.lastPathComponent' \
@@ -1284,6 +1300,11 @@ reject_pattern \
 reject_pattern \
   "iOS recording manager avoids shell-owned stop-plan field unpacking" \
   'flowState += +stopPlan\.flowStateAfterStop|stopPlan\.pendingDraft' \
+  iOS/VoiceInk-ios/RecordingManager.swift
+
+reject_pattern \
+  "iOS recording manager avoids shell-owned cancel sequencing" \
+  'recorder\.discard\(\)|updateFlowState *\{ *\$0\.cancelRecording\(\) *\}' \
   iOS/VoiceInk-ios/RecordingManager.swift
 
 require_patterns \

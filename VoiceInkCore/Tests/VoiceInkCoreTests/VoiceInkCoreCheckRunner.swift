@@ -424,6 +424,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "DashboardMetricsTests.testAverageWordsPerMinuteDisplayTextRoundsToOneDecimalPlace", run: { DashboardMetricsTests().testAverageWordsPerMinuteDisplayTextRoundsToOneDecimalPlace() }),
             VoiceInkCoreCheck(name: "DashboardMetricsTests.testDashboardPresentationPreservesMacOSDashboardCopy", run: { DashboardMetricsTests().testDashboardPresentationPreservesMacOSDashboardCopy() }),
             VoiceInkCoreCheck(name: "DashboardMetricsTests.testDashboardPresentationBuildsHeroTitleAndSubtitle", run: { DashboardMetricsTests().testDashboardPresentationBuildsHeroTitleAndSubtitle() }),
+            VoiceInkCoreCheck(name: "DashboardMetricsTests.testDashboardPresentationBuildsHeroPills", run: { DashboardMetricsTests().testDashboardPresentationBuildsHeroPills() }),
             VoiceInkCoreCheck(name: "DashboardMetricsTests.testDashboardPresentationBuildsMacOSMetricCards", run: { DashboardMetricsTests().testDashboardPresentationBuildsMacOSMetricCards() }),
             VoiceInkCoreCheck(name: "DashboardMetricsTests.testNoteListSummaryPresentationBuildsIOSHeaderText", run: { DashboardMetricsTests().testNoteListSummaryPresentationBuildsIOSHeaderText() }),
             VoiceInkCoreCheck(name: "DashboardMetricsTests.testNoteListSummaryPresentationOmitsFastestModelWhenNoTimedModelExists", run: { DashboardMetricsTests().testNoteListSummaryPresentationOmitsFastestModelWhenNoTimedModelExists() }),

@@ -288,15 +288,15 @@ struct MetricsContent: View {
     }
 
     private var heroStatBlock: some View {
+        let heroPills = VoiceInkDashboardPresentation.heroPills(
+            isSnapshotLoaded: hasLoadedMetricsSnapshot,
+            summary: dashboardMetrics.summary
+        )
+
         HStack(spacing: 10) {
-            heroPill(
-                title: VoiceInkDashboardPresentation.sessionsPillTitle,
-                value: hasLoadedMetricsSnapshot ? VoiceInkDashboardPresentation.formattedNumber(totalCount) : VoiceInkDashboardPresentation.metricValuePlaceholder
-            )
-            heroPill(
-                title: VoiceInkDashboardPresentation.wordsPillTitle,
-                value: hasLoadedMetricsSnapshot ? VoiceInkDashboardPresentation.formattedNumber(totalWords) : VoiceInkDashboardPresentation.metricValuePlaceholder
-            )
+            ForEach(heroPills) { pill in
+                heroPill(title: pill.title, value: pill.value)
+            }
         }
         .frame(maxWidth: 280, alignment: .trailing)
     }

@@ -124,6 +124,22 @@ public struct VoiceInkDashboardMetricCardPresentation: Equatable, Sendable, Iden
     }
 }
 
+public struct VoiceInkDashboardHeroPillPresentation: Equatable, Sendable, Identifiable {
+    public let id: String
+    public let title: String
+    public let value: String
+
+    public init(
+        id: String,
+        title: String,
+        value: String
+    ) {
+        self.id = id
+        self.title = title
+        self.value = value
+    }
+}
+
 public enum VoiceInkDashboardPresentation {
     public static let metricValuePlaceholder = "–"
     public static let emptyStateSystemImageName = "waveform"
@@ -188,6 +204,24 @@ public enum VoiceInkDashboardPresentation {
             totalCount: totalCount,
             formattedWordCount: formattedNumber(totalWords)
         )
+    }
+
+    public static func heroPills(
+        isSnapshotLoaded: Bool,
+        summary: VoiceInkDashboardMetricsSummary
+    ) -> [VoiceInkDashboardHeroPillPresentation] {
+        [
+            VoiceInkDashboardHeroPillPresentation(
+                id: "sessions",
+                title: sessionsPillTitle,
+                value: isSnapshotLoaded ? formattedNumber(summary.totalCount) : metricValuePlaceholder
+            ),
+            VoiceInkDashboardHeroPillPresentation(
+                id: "words",
+                title: wordsPillTitle,
+                value: isSnapshotLoaded ? formattedNumber(summary.totalWords) : metricValuePlaceholder
+            )
+        ]
     }
 
     public static func metricCards(

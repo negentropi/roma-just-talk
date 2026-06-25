@@ -15341,27 +15341,27 @@ require_pattern \
 
 require_pattern \
   "shared macOS dashboard presentation lives in VoiceInkCore" \
-  'VoiceInkDashboardPresentation|VoiceInkDashboardMetricCardPresentation|heroTitle|heroSubtitle|metricCards|modelPerformanceButtonTitle' \
+  'VoiceInkDashboardPresentation|VoiceInkDashboardHeroPillPresentation|VoiceInkDashboardMetricCardPresentation|heroTitle|heroSubtitle|heroPills|metricCards|modelPerformanceButtonTitle' \
   VoiceInkCore/Sources/VoiceInkCore/DashboardMetrics.swift
 
 require_pattern \
   "macOS dashboard uses shared dashboard presentation" \
-  'VoiceInkDashboardPresentation\.(emptyStateSystemImageName|emptyStateTitle|emptyStateMessage|heroSectionTitle|heroTitle|heroSubtitle|sessionsPillTitle|wordsPillTitle|formattedNumber|metricValuePlaceholder|metricCards|modelPerformanceButtonTitle|modelPerformanceSystemImageName|modelPerformanceHelpText)' \
+  'VoiceInkDashboardPresentation\.(emptyStateSystemImageName|emptyStateTitle|emptyStateMessage|heroSectionTitle|heroTitle|heroSubtitle|heroPills|metricCards|modelPerformanceButtonTitle|modelPerformanceSystemImageName|modelPerformanceHelpText)' \
   VoiceInk/Views/Metrics/MetricsContent.swift
 
 require_pattern \
   "core tests pin macOS dashboard presentation copy and policy" \
-  'testDashboardPresentationPreservesMacOSDashboardCopy|testDashboardPresentationBuildsHeroTitleAndSubtitle|testDashboardPresentationBuildsMacOSMetricCards|testHelpResourcesPresentationPreservesMacOSCopyIconsAndURLs' \
+  'testDashboardPresentationPreservesMacOSDashboardCopy|testDashboardPresentationBuildsHeroTitleAndSubtitle|testDashboardPresentationBuildsHeroPills|testDashboardPresentationBuildsMacOSMetricCards|testHelpResourcesPresentationPreservesMacOSCopyIconsAndURLs' \
   VoiceInkCore/Tests/VoiceInkCoreTests/DashboardMetricsTests.swift
 
 require_pattern \
   "core check runner executes macOS dashboard presentation tests" \
-  'DashboardMetricsTests\.testDashboardPresentationPreservesMacOSDashboardCopy|DashboardMetricsTests\.testDashboardPresentationBuildsHeroTitleAndSubtitle|DashboardMetricsTests\.testDashboardPresentationBuildsMacOSMetricCards|DashboardMetricsTests\.testHelpResourcesPresentationPreservesMacOSCopyIconsAndURLs' \
+  'DashboardMetricsTests\.testDashboardPresentationPreservesMacOSDashboardCopy|DashboardMetricsTests\.testDashboardPresentationBuildsHeroTitleAndSubtitle|DashboardMetricsTests\.testDashboardPresentationBuildsHeroPills|DashboardMetricsTests\.testDashboardPresentationBuildsMacOSMetricCards|DashboardMetricsTests\.testHelpResourcesPresentationPreservesMacOSCopyIconsAndURLs' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "migration checklist tracks shared dashboard promotion and help resources presentation" \
-  'macOS dashboard hero/empty/action/stat-card/promotion/help-resource presentation.*VoiceInkHelpResourcesPresentation' \
+  'macOS dashboard hero/hero-pill/empty/action/stat-card/promotion/help-resource presentation.*VoiceInkHelpResourcesPresentation' \
   docs/ios-single-repo-migration.md
 
 require_pattern \
@@ -15376,7 +15376,7 @@ reject_pattern \
 
 reject_pattern \
   "macOS dashboard avoids shell-only shared dashboard presentation copy" \
-  '"(No sessions yet|Start a recording; your dictation rhythm will show here\.|Dashboard|Ready when you are|Your usage summary will appear here\.|Your first roma-just-talk recording starts the timeline\.|Time savings coming soon|Sessions|Words|Model Performance|View transcription and enhancement model performance)"|systemName: "(waveform|gauge)"|totalCount == 1 \? "session" : "sessions"' \
+  '"(No sessions yet|Start a recording; your dictation rhythm will show here\.|Dashboard|Ready when you are|Your usage summary will appear here\.|Your first roma-just-talk recording starts the timeline\.|Time savings coming soon|Sessions|Words|Model Performance|View transcription and enhancement model performance)"|systemName: "(waveform|gauge)"|totalCount == 1 \? "session" : "sessions"|hasLoadedMetricsSnapshot \? VoiceInkDashboardPresentation\.formattedNumber|VoiceInkDashboardPresentation\.metricValuePlaceholder' \
   VoiceInk/Views/Metrics/MetricsContent.swift
 
 reject_pattern \

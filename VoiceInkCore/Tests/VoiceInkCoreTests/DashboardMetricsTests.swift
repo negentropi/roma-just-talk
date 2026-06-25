@@ -165,6 +165,40 @@ final class DashboardMetricsTests: XCTestCase {
         )
     }
 
+    func testDashboardPresentationBuildsHeroPills() {
+        let summary = VoiceInkDashboardMetricsSummary(
+            totalCount: 1200,
+            totalWords: 3456,
+            totalDuration: 60
+        )
+
+        XCTAssertEqual(
+            VoiceInkDashboardPresentation.heroPills(
+                isSnapshotLoaded: true,
+                summary: summary
+            ),
+            [
+                VoiceInkDashboardHeroPillPresentation(
+                    id: "sessions",
+                    title: "Sessions",
+                    value: "1,200"
+                ),
+                VoiceInkDashboardHeroPillPresentation(
+                    id: "words",
+                    title: "Words",
+                    value: "3,456"
+                )
+            ]
+        )
+
+        XCTAssertEqual(
+            VoiceInkDashboardPresentation
+                .heroPills(isSnapshotLoaded: false, summary: summary)
+                .map(\.value),
+            Array(repeating: VoiceInkDashboardPresentation.metricValuePlaceholder, count: 2)
+        )
+    }
+
     func testDashboardPresentationBuildsMacOSMetricCards() {
         let metrics = VoiceInkDashboardMetrics(summary: VoiceInkDashboardMetricsSummary(
             totalCount: 2,

@@ -682,7 +682,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
             return
         }
 
-        await ActiveWindowService.shared.applyConfiguration(powerModeId: powerModeId)
+        let config = await ActiveWindowService.shared.resolveConfiguration(powerModeId: powerModeId)
+        await ActiveWindowService.shared.applyResolvedConfiguration(config)
     }
 
     private func startPowerModeConfigurationApply(

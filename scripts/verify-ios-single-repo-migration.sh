@@ -14266,6 +14266,11 @@ reject_pattern \
   'getConfigurationForURL|getConfigurationForApp|getDefaultConfiguration|configToApply|hasEnabledAutomaticRules|hasEnabledURLRules|resolvedPowerModeConfiguration|VoiceInkPowerModeBrowser\.allCases|urlLookupFailedMessage' \
   VoiceInk/PowerMode/ActiveWindowService.swift
 
+reject_pattern \
+  "macOS active-window adapter avoids shallow resolve-and-apply wrapper" \
+  'func +applyConfiguration\(' \
+  VoiceInk/PowerMode/ActiveWindowService.swift
+
 require_pattern \
   "macOS active-window adapter consumes shared Power Mode automatic resolution runtime plan" \
   'VoiceInkPowerModeAutomaticResolutionPlan\.resolving|frontmostApplicationBundleIdentifier|readCurrentWebsiteURL|logBrowserURLFailure' \

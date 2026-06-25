@@ -127,6 +127,19 @@ public struct VoiceInkAudioPlaybackTimerTickPlan: Equatable, Sendable {
         action.playerSeekTime
     }
 
+    public func applyRuntimeState(
+        seekPlayer: (TimeInterval) -> Void,
+        stopTimer: () -> Void
+    ) {
+        if let seekTime = playerSeekTime {
+            seekPlayer(seekTime)
+        }
+
+        if shouldStopTimer {
+            stopTimer()
+        }
+    }
+
     public static func macOS(
         currentTime: TimeInterval,
         duration: TimeInterval

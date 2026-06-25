@@ -149,13 +149,13 @@ class AudioPlayerManager: ObservableObject {
                 duration: self.duration
             )
             self.playbackState = self.playbackState.applyingTimerTickPlan(plan)
-            if let seekTime = plan.playerSeekTime {
-                self.audioPlayer?.pause()
-                self.audioPlayer?.currentTime = seekTime
-            }
-            if plan.shouldStopTimer {
-                self.stopTimer()
-            }
+            plan.applyRuntimeState(
+                seekPlayer: { seekTime in
+                    self.audioPlayer?.pause()
+                    self.audioPlayer?.currentTime = seekTime
+                },
+                stopTimer: self.stopTimer
+            )
         }
     }
 

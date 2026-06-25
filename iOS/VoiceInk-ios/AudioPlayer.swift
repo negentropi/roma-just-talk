@@ -114,10 +114,13 @@ final class AudioPlayer: ObservableObject {
                     shellIsPlaying: self.isPlaying
                 )
                 self.playbackState = self.playbackState.applyingTimerTickPlan(plan)
-                if plan.shouldStopTimer {
-                    self.stopTimer()
-                    self.sessionManager.scheduleDeactivation()
-                }
+                plan.applyRuntimeState(
+                    seekPlayer: { self.audioPlayer?.currentTime = $0 },
+                    stopTimer: {
+                        self.stopTimer()
+                        self.sessionManager.scheduleDeactivation()
+                    }
+                )
             }
         }
     }

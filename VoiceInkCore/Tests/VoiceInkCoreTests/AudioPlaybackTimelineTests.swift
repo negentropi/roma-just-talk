@@ -134,6 +134,36 @@ final class AudioPlaybackTimelineTests: XCTestCase {
         )
     }
 
+    func testTimerTickPlanAppliesRuntimeStateInOrder() {
+        var events: [String] = []
+
+        VoiceInkAudioPlaybackTimerTickPlan(
+            currentTime: 4,
+            action: .none
+        ).applyRuntimeState(
+            seekPlayer: { events.append("seek:\($0)") },
+            stopTimer: { events.append("stop") }
+        )
+
+        VoiceInkAudioPlaybackTimerTickPlan(
+            currentTime: 9.5,
+            action: .markStopped
+        ).applyRuntimeState(
+            seekPlayer: { events.append("seek:\($0)") },
+            stopTimer: { events.append("stop") }
+        )
+
+        VoiceInkAudioPlaybackTimerTickPlan(
+            currentTime: 10,
+            action: .markStoppedAndSeek(0)
+        ).applyRuntimeState(
+            seekPlayer: { events.append("seek:\($0)") },
+            stopTimer: { events.append("stop") }
+        )
+
+        XCTAssertEqual(events, ["stop", "seek:0.0", "stop"])
+    }
+
     func testPlaybackStateLoadPreservesPlatformResetBehavior() {
         let state = VoiceInkAudioPlaybackState(
             isPlaying: true,

@@ -39,7 +39,7 @@ struct SettingsView: View {
                         ModeRowView(mode: mode)
                     }
                 }
-                .onDelete(perform: deleteMode)
+                .onDelete(perform: settings.removeModes)
                 
                 NavigationLink(destination: ModeConfigurationView(
                     settings: settings
@@ -132,7 +132,9 @@ struct SettingsView: View {
                 ForEach(settings.sortedCustomVocabularyTerms(mode: vocabularySortMode), id: \.self) { term in
                     Text(term)
                 }
-                .onDelete(perform: deleteCustomVocabularyTerms)
+                .onDelete { offsets in
+                    settings.removeCustomVocabularyTerms(atSortedOffsets: offsets, mode: vocabularySortMode)
+                }
 
                 TextField(dictionaryPresentation.originalTextPlaceholder, text: $wordReplacementDraftState.original)
                     .textInputAutocapitalization(.never)
@@ -161,7 +163,9 @@ struct SettingsView: View {
                             .foregroundStyle(.secondary)
                     }
                 }
-                .onDelete(perform: deleteWordReplacements)
+                .onDelete { offsets in
+                    settings.removeWordReplacements(atSortedOffsets: offsets, mode: wordReplacementSortMode)
+                }
             }
             
             Section(header: Text(audioTimeoutPresentation.sectionTitle)) {
@@ -248,18 +252,6 @@ struct SettingsView: View {
                 setDraftState: { wordReplacementDraftState = $0 },
                 setAlertPresentation: { dictionaryAlert = $0 }
             )
-    }
-
-    private func deleteCustomVocabularyTerms(at offsets: IndexSet) {
-        settings.removeCustomVocabularyTerms(atSortedOffsets: offsets, mode: vocabularySortMode)
-    }
-
-    private func deleteWordReplacements(at offsets: IndexSet) {
-        settings.removeWordReplacements(atSortedOffsets: offsets, mode: wordReplacementSortMode)
-    }
-    
-    private func deleteMode(at offsets: IndexSet) {
-        settings.removeModes(at: offsets)
     }
 
     #if DEBUG

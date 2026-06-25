@@ -1742,6 +1742,11 @@ reject_pattern \
   'modes\.append|modes\[index\]|firstIndex\(where: \{ \$0\.id == modeId \}\)|Mode\.defaultModesAndSelection\(|VoiceInkPreferenceList\.removing' \
   iOS/VoiceInk-ios/AppSettings.swift
 
+reject_pattern \
+  "iOS settings avoids shallow mode deletion wrapper" \
+  'private func +deleteMode\b' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
 section "obsolete standalone preference-list module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/PreferenceList.swift
 
@@ -7714,6 +7719,11 @@ reject_pattern \
 reject_pattern \
   "iOS dictionary settings avoid raw-storage list deletes" \
   'onDelete\(perform: settings\.remove(CustomVocabularyTerms|WordReplacements)\)' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
+reject_pattern \
+  "iOS dictionary settings avoid shallow sorted-delete wrappers" \
+  'private func +(deleteCustomVocabularyTerms|deleteWordReplacements)\b' \
   iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \

@@ -32,10 +32,9 @@ class CloudTranscriptionService: TranscriptionService {
             }
 
             let modelProvider = model.provider
-            let apiKey = try requireAPIKey(forProvider: modelProvider.apiKeyProviderName)
             return try await VoiceInkMacOSCloudTranscriptionPolicy.transcribeAudioData(
                 modelProvider: modelProvider,
-                apiKey: apiKey,
+                apiKey: APIKeyManager.shared.getAPIKey(forProvider: modelProvider.apiKeyProviderName),
                 modelName: model.name,
                 audioData: audioData,
                 fileName: fileName,
@@ -57,14 +56,5 @@ class CloudTranscriptionService: TranscriptionService {
             throw CloudTranscriptionError.audioFileNotFound
         }
         return try Data(contentsOf: url)
-    }
-
-    private func requireAPIKey(forProvider provider: String) throws -> String {
-        guard let apiKey = VoiceInkProviderCredential.nonBlank(
-            APIKeyManager.shared.getAPIKey(forProvider: provider)
-        ) else {
-            throw CloudTranscriptionError.missingAPIKey
-        }
-        return apiKey
     }
 }

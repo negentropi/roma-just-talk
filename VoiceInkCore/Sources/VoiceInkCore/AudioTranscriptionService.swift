@@ -197,7 +197,7 @@ public enum VoiceInkMacOSCloudTranscriptionPolicy {
 
     public static func transcribeAudioData(
         modelProvider: VoiceInkMacOSTranscriptionModelProvider,
-        apiKey: String,
+        apiKey: String?,
         modelName: String,
         audioData: Data,
         fileName: String,
@@ -228,7 +228,7 @@ public enum VoiceInkMacOSCloudTranscriptionPolicy {
 
     static func transcribeAudioData(
         modelProvider: VoiceInkMacOSTranscriptionModelProvider,
-        apiKey: String,
+        apiKey: String?,
         modelName: String,
         audioData: Data,
         fileName: String,
@@ -237,13 +237,17 @@ public enum VoiceInkMacOSCloudTranscriptionPolicy {
         customVocabulary: [String],
         transport: TranscriptionTransport
     ) async throws -> String {
+        guard let usableAPIKey = VoiceInkProviderCredential.nonBlank(apiKey) else {
+            throw VoiceInkCloudTranscriptionError.missingAPIKey
+        }
+
         guard let provider = modelProvider.remoteTranscriptionProviderKind else {
             throw VoiceInkCloudTranscriptionError.unsupportedProvider
         }
 
         let request = VoiceInkMacOSCloudTranscriptionRequest(
             provider: provider,
-            apiKey: apiKey,
+            apiKey: usableAPIKey,
             modelName: modelName,
             audioData: audioData,
             fileName: fileName,

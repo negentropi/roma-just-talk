@@ -5179,6 +5179,8 @@ require_patterns \
   VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift \
   'VoiceInkMacOSCloudTranscriptionPolicy' \
   'VoiceInkMacOSCloudTranscriptionRequest' \
+  'VoiceInkProviderCredential\.nonBlank\(apiKey\)' \
+  'VoiceInkCloudTranscriptionError\.missingAPIKey' \
   'modelProvider\.remoteTranscriptionProviderKind' \
   'modelProvider\.remoteTranscriptionOptions' \
   'modelProvider\.acceptsRemoteTranscriptionText' \
@@ -5186,7 +5188,7 @@ require_patterns \
 
 require_pattern \
   "core checks execute macOS cloud transcription policy tests" \
-  'RemoteProviderRequestTests\.testMacOSCloudTranscriptionPolicyBuildsSharedTransportRequest|RemoteProviderRequestTests\.testMacOSCloudTranscriptionPolicyRejectsUnsupportedBatchProvider|RemoteProviderRequestTests\.testMacOSCloudTranscriptionPolicyMapsProviderHTTPNSError' \
+  'RemoteProviderRequestTests\.testMacOSCloudTranscriptionPolicyBuildsSharedTransportRequest|RemoteProviderRequestTests\.testMacOSCloudTranscriptionPolicyRejectsBlankAPIKeyBeforeTransport|RemoteProviderRequestTests\.testMacOSCloudTranscriptionPolicyRejectsUnsupportedBatchProvider|RemoteProviderRequestTests\.testMacOSCloudTranscriptionPolicyMapsProviderHTTPNSError' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -5197,6 +5199,11 @@ require_pattern \
 reject_pattern \
   "macOS batch cloud transcription avoids shell-owned execution policy" \
   'transcribeProvider|VoiceInkRemoteTranscriptionService\(provider:|modelProvider\.(remoteTranscriptionProviderKind|remoteTranscriptionOptions|acceptsRemoteTranscriptionText|apiErrorDomain)|CloudTranscriptionError\.apiRequestFailure' \
+  VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift
+
+reject_pattern \
+  "macOS batch cloud transcription avoids shell-owned API-key policy" \
+  'VoiceInkProviderCredential\.nonBlank|CloudTranscriptionError\.missingAPIKey|private func requireAPIKey' \
   VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift
 
 require_pattern \

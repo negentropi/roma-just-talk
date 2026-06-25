@@ -418,6 +418,29 @@ final class RemoteProviderRequestTests: XCTestCase {
         XCTAssertEqual(request.options.customVocabulary, ["Roma", "Felix"])
     }
 
+    func testMacOSCloudTranscriptionPolicyRejectsBlankAPIKeyBeforeTransport() async {
+        do {
+            _ = try await VoiceInkMacOSCloudTranscriptionPolicy.transcribeAudioData(
+                modelProvider: .soniox,
+                apiKey: " \n\t ",
+                modelName: "stt-async-v4",
+                audioData: Data(),
+                fileName: "clip.wav",
+                language: nil,
+                prompt: nil,
+                customVocabulary: []
+            ) { _ in
+                XCTFail("Blank API keys should not call transport")
+                return "unexpected"
+            }
+            XCTFail("Expected missing API key error")
+        } catch VoiceInkCloudTranscriptionError.missingAPIKey {
+            // Expected.
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+
     func testMacOSCloudTranscriptionPolicyRejectsUnsupportedBatchProvider() async {
         do {
             _ = try await VoiceInkMacOSCloudTranscriptionPolicy.transcribeAudioData(

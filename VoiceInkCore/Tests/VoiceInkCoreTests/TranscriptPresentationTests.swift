@@ -729,66 +729,63 @@ final class TranscriptPresentationTests: XCTestCase {
     }
 
     func testRetryControlsPresentationShowsRetryControlsWhenIdle() {
-        XCTAssertEqual(
-            VoiceInkTranscriptPresentation.retryControls(for: .failed, isRetranscribing: false),
-            VoiceInkTranscriptRetryControlsPresentation(
-                shouldShowModeSelection: true,
-                action: .showRetryButton
-            )
-        )
+        let presentation = VoiceInkTranscriptPresentation.retryControls(for: .failed, isRetranscribing: false)
+
+        XCTAssertTrue(presentation.shouldShowModeSelection)
+        XCTAssertFalse(presentation.shouldShowProgress)
+        XCTAssertNil(presentation.progressDisplayText)
     }
 
     func testRetryControlsPresentationShowsProgressWhenRetranscribing() {
-        XCTAssertEqual(
-            VoiceInkTranscriptPresentation.retryControls(for: .failed, isRetranscribing: true),
-            VoiceInkTranscriptRetryControlsPresentation(
-                shouldShowModeSelection: false,
-                action: .showProgress,
-                progressText: "Retranscribing..."
-            )
-        )
+        let presentation = VoiceInkTranscriptPresentation.retryControls(for: .failed, isRetranscribing: true)
+
+        XCTAssertFalse(presentation.shouldShowModeSelection)
+        XCTAssertTrue(presentation.shouldShowProgress)
+        XCTAssertEqual(presentation.progressDisplayText, "Retranscribing...")
     }
 
     func testRetryControlsPresentationShowsPendingProgressWithoutRetryControls() {
-        XCTAssertEqual(
-            VoiceInkTranscriptPresentation.retryControls(for: .pending, isRetranscribing: false),
-            VoiceInkTranscriptRetryControlsPresentation(
-                shouldShowModeSelection: false,
-                action: .showProgress,
-                progressText: "Transcribing..."
-            )
-        )
+        let presentation = VoiceInkTranscriptPresentation.retryControls(for: .pending, isRetranscribing: false)
+
+        XCTAssertFalse(presentation.shouldShowModeSelection)
+        XCTAssertTrue(presentation.shouldShowProgress)
+        XCTAssertEqual(presentation.progressDisplayText, "Transcribing...")
     }
 
     func testRetryControlsPresentationHidesControlsForTerminalNonFailedStates() {
-        XCTAssertEqual(
-            VoiceInkTranscriptPresentation.retryControls(for: .completed, isRetranscribing: false),
-            VoiceInkTranscriptRetryControlsPresentation(
-                shouldShowModeSelection: false,
-                action: .hidden
-            )
-        )
-        XCTAssertEqual(
-            VoiceInkTranscriptPresentation.retryControls(for: .canceled, isRetranscribing: false),
-            VoiceInkTranscriptRetryControlsPresentation(
-                shouldShowModeSelection: false,
-                action: .hidden
-            )
-        )
+        let completed = VoiceInkTranscriptPresentation.retryControls(for: .completed, isRetranscribing: false)
+        XCTAssertFalse(completed.shouldShowModeSelection)
+        XCTAssertFalse(completed.shouldShowProgress)
+        XCTAssertNil(completed.progressDisplayText)
+        XCTAssertNil(completed.runtimeAction {})
+
+        let canceled = VoiceInkTranscriptPresentation.retryControls(for: .canceled, isRetranscribing: false)
+        XCTAssertFalse(canceled.shouldShowModeSelection)
+        XCTAssertFalse(canceled.shouldShowProgress)
+        XCTAssertNil(canceled.progressDisplayText)
+        XCTAssertNil(canceled.runtimeAction {})
     }
 
-    func testRetryControlActionMapsRetryButtonToRuntimeRetry() {
+    func testRetryControlsPresentationMapsRetryButtonToRuntimeRetry() {
+        let presentation = VoiceInkTranscriptPresentation.retryControls(for: .failed, isRetranscribing: false)
         var didRetry = false
 
-        let retryAction = VoiceInkTranscriptRetryControlAction.showRetryButton.runtimeAction {
+        let retryAction = presentation.runtimeAction {
             didRetry = true
         }
 
         XCTAssertTrue(retryAction != nil)
         retryAction?()
         XCTAssertTrue(didRetry)
-        XCTAssertNil(VoiceInkTranscriptRetryControlAction.hidden.runtimeAction {})
-        XCTAssertNil(VoiceInkTranscriptRetryControlAction.showProgress.runtimeAction {})
+
+        XCTAssertNil(VoiceInkTranscriptPresentation.retryControls(
+            for: .failed,
+            isRetranscribing: true
+        ).runtimeAction {})
+        XCTAssertNil(VoiceInkTranscriptPresentation.retryControls(
+            for: .pending,
+            isRetranscribing: false
+        ).runtimeAction {})
     }
 
     func testTranscriptTextVariantTitlesPreserveMacOSTabs() {

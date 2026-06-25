@@ -130,7 +130,7 @@ struct NoteDetailView: View {
             for: note.transcriptionStatus,
             isRetranscribing: isRetranscribing
         )
-        let retryAction = retryControls.action.runtimeAction(retry: retranscribe)
+        let retryAction = retryControls.runtimeAction(retry: retranscribe)
 
         if let statusPresentation {
             VStack(spacing: 12) {
@@ -161,31 +161,26 @@ struct NoteDetailView: View {
                     )
                 }
 
-                switch retryControls.action {
-                case .hidden:
-                    EmptyView()
-                case .showProgress:
+                if retryControls.shouldShowProgress {
                     HStack {
                         ProgressView()
                             .scaleEffect(0.8)
-                        Text(retryControls.progressText ?? VoiceInkTranscriptPresentation.retranscribingDisplayText)
+                        Text(retryControls.progressDisplayText ?? VoiceInkTranscriptPresentation.retranscribingDisplayText)
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }
-                case .showRetryButton:
-                    if let retryAction {
-                        Button(action: retryAction) {
-                            Label(
-                                VoiceInkTranscriptPresentation.retryTranscriptionButtonTitle,
-                                systemImage: VoiceInkTranscriptPresentation.retryTranscriptionSystemImageName
-                            )
-                                .fontWeight(.semibold)
-                                .frame(maxWidth: .infinity)
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .tint(.blue)
-                        .controlSize(.regular)
+                } else if let retryAction {
+                    Button(action: retryAction) {
+                        Label(
+                            VoiceInkTranscriptPresentation.retryTranscriptionButtonTitle,
+                            systemImage: VoiceInkTranscriptPresentation.retryTranscriptionSystemImageName
+                        )
+                            .fontWeight(.semibold)
+                            .frame(maxWidth: .infinity)
                     }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.blue)
+                    .controlSize(.regular)
                 }
             }
             .padding()

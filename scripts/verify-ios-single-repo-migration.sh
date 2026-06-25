@@ -2536,7 +2536,7 @@ require_patterns \
 
 require_pattern \
   "shared transcript retry controls presentation lives in VoiceInkCore" \
-  'VoiceInkTranscriptRetryControlsPresentation|VoiceInkTranscriptRetryControlAction|retryControls\(isRetranscribing:' \
+  'VoiceInkTranscriptRetryControlsPresentation|VoiceInkTranscriptRetryControlAction|shouldShowProgress|progressDisplayText|retryControls\(isRetranscribing:' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
 
 require_patterns \
@@ -2546,6 +2546,11 @@ require_patterns \
   'retry: @escaping \(\) -> Void' \
   'case \.showRetryButton:'
 
+reject_pattern \
+  "shared transcript retry controls avoid public raw action interface" \
+  'public enum VoiceInkTranscriptRetryControlAction\b|public let action: VoiceInkTranscriptRetryControlAction\b|public let progressText: String\?' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+
 require_pattern \
   "shared transcript status error detail visibility lives in VoiceInkCore" \
   'statusErrorDetail' \
@@ -2553,7 +2558,7 @@ require_pattern \
 
 require_pattern \
   "core checks execute transcript retry controls presentation tests" \
-  'testRetryControlsPresentationShows(RetryControlsWhenIdle|ProgressWhenRetranscribing)|testRetryControlActionMapsRetryButtonToRuntimeRetry|testStatusErrorDetailShowsOnlyNonEmptyErrors' \
+  'testRetryControlsPresentationShows(RetryControlsWhenIdle|ProgressWhenRetranscribing)|testRetryControlsPresentationMapsRetryButtonToRuntimeRetry|testStatusErrorDetailShowsOnlyNonEmptyErrors' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -2672,7 +2677,12 @@ require_pattern \
 
 require_pattern \
   "iOS note detail delegates retry action mapping to shared core" \
-  'retryControls\.action\.runtimeAction\(retry: retranscribe\)' \
+  'retryControls\.runtimeAction\(retry: retranscribe\)' \
+  iOS/VoiceInk-ios/NoteDetailView.swift
+
+require_pattern \
+  "iOS note detail uses shared retry progress presentation" \
+  'retryControls\.(shouldShowProgress|progressDisplayText)' \
   iOS/VoiceInk-ios/NoteDetailView.swift
 
 require_pattern \
@@ -2689,6 +2699,11 @@ reject_context_pattern \
   "iOS note detail avoids direct retry button closure" \
   'case \.showRetryButton:' \
   'Button +\{' \
+  iOS/VoiceInk-ios/NoteDetailView.swift
+
+reject_pattern \
+  "iOS note detail avoids direct retry control action access" \
+  'retryControls\.action\b|switch[[:space:]]+retryControls\.action|case \.(hidden|showProgress|showRetryButton):' \
   iOS/VoiceInk-ios/NoteDetailView.swift
 
 reject_pattern \

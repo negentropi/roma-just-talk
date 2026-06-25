@@ -60,12 +60,12 @@ public struct VoiceInkTranscriptStatusPresentation: Equatable, Sendable {
     }
 }
 
-public enum VoiceInkTranscriptRetryControlAction: Equatable, Sendable {
+enum VoiceInkTranscriptRetryControlAction: Equatable, Sendable {
     case hidden
     case showProgress
     case showRetryButton
 
-    public func runtimeAction(
+    func runtimeAction(
         retry: @escaping () -> Void
     ) -> (() -> Void)? {
         switch self {
@@ -80,10 +80,10 @@ public enum VoiceInkTranscriptRetryControlAction: Equatable, Sendable {
 
 public struct VoiceInkTranscriptRetryControlsPresentation: Equatable, Sendable {
     public let shouldShowModeSelection: Bool
-    public let action: VoiceInkTranscriptRetryControlAction
-    public let progressText: String?
+    let action: VoiceInkTranscriptRetryControlAction
+    let progressText: String?
 
-    public init(
+    init(
         shouldShowModeSelection: Bool,
         action: VoiceInkTranscriptRetryControlAction,
         progressText: String? = nil
@@ -91,6 +91,20 @@ public struct VoiceInkTranscriptRetryControlsPresentation: Equatable, Sendable {
         self.shouldShowModeSelection = shouldShowModeSelection
         self.action = action
         self.progressText = progressText
+    }
+
+    public var shouldShowProgress: Bool {
+        action == .showProgress
+    }
+
+    public var progressDisplayText: String? {
+        shouldShowProgress ? progressText : nil
+    }
+
+    public func runtimeAction(
+        retry: @escaping () -> Void
+    ) -> (() -> Void)? {
+        action.runtimeAction(retry: retry)
     }
 }
 

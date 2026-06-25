@@ -32,14 +32,14 @@ public struct VoiceInkGeneralSettingsBackupPreferences: Equatable, Sendable {
 }
 
 public struct VoiceInkGeneralSettingsBackupImportPlans: Equatable, Sendable {
-    public let recordingShortcut: VoiceInkRecordingShortcutBackupImportPlan
-    public let macOSShell: VoiceInkMacOSShellBackupImportPlan
-    public let transcriptionAutoCleanup: VoiceInkTranscriptionAutoCleanupBackupImportPlan
-    public let audioCleanup: VoiceInkAudioCleanupBackupImportPlan
-    public let recordingFeedback: VoiceInkRecordingFeedbackBackupImportPlan
-    public let transcriptionCleanup: VoiceInkTranscriptionCleanupBackupImportPlan
-    public let paste: VoiceInkPasteBackupImportPlan
-    public let rollingBuffer: VoiceInkRollingBufferBackupImportPlan
+    fileprivate let recordingShortcut: VoiceInkRecordingShortcutBackupImportPlan
+    fileprivate let macOSShell: VoiceInkMacOSShellBackupImportPlan
+    fileprivate let transcriptionAutoCleanup: VoiceInkTranscriptionAutoCleanupBackupImportPlan
+    fileprivate let audioCleanup: VoiceInkAudioCleanupBackupImportPlan
+    fileprivate let recordingFeedback: VoiceInkRecordingFeedbackBackupImportPlan
+    fileprivate let transcriptionCleanup: VoiceInkTranscriptionCleanupBackupImportPlan
+    fileprivate let paste: VoiceInkPasteBackupImportPlan
+    fileprivate let rollingBuffer: VoiceInkRollingBufferBackupImportPlan
 
     public init(
         recordingShortcut: VoiceInkRecordingShortcutBackupImportPlan,
@@ -59,6 +59,31 @@ public struct VoiceInkGeneralSettingsBackupImportPlans: Equatable, Sendable {
         self.transcriptionCleanup = transcriptionCleanup
         self.paste = paste
         self.rollingBuffer = rollingBuffer
+    }
+
+    @discardableResult
+    public func applyRuntimeState(
+        to defaults: UserDefaults = .standard,
+        applyRecordingShortcutImportPlan: (VoiceInkRecordingShortcutBackupImportPlan) -> Void,
+        applyMacOSShellImportPlan: (VoiceInkMacOSShellBackupImportPlan) -> Void,
+        applyRecordingFeedbackImportPlan: (VoiceInkRecordingFeedbackBackupImportPlan) -> Void,
+        postCorePreferenceSettingsDidChange: () -> Void,
+        reportImportedGeneralSettings: () -> Void
+    ) -> VoiceInkGeneralSettingsCorePreferenceImportResult {
+        applyRecordingShortcutImportPlan(recordingShortcut)
+        applyMacOSShellImportPlan(macOSShell)
+        applyRecordingFeedbackImportPlan(recordingFeedback)
+
+        let result = VoiceInkGeneralSettingsBackupPolicy.applyCorePreferenceImportPlans(
+            self,
+            to: defaults
+        )
+        if result.didImportRollingBufferSetting {
+            postCorePreferenceSettingsDidChange()
+        }
+
+        reportImportedGeneralSettings()
+        return result
     }
 }
 

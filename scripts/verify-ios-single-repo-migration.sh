@@ -6187,12 +6187,22 @@ require_pattern \
 
 require_pattern \
   "macOS general backup import uses shared general settings import plans" \
-  'VoiceInkGeneralSettingsBackupPolicy\.importPlans|generalImportPlans\.(recordingShortcut|macOSShell|transcriptionAutoCleanup|audioCleanup|recordingFeedback|transcriptionCleanup|paste|rollingBuffer)' \
+  'VoiceInkGeneralSettingsBackupPolicy\.importPlans|generalImportPlans\.applyRuntimeState' \
   VoiceInk/Services/BackupImporter.swift
 
 require_pattern \
-  "macOS general backup import delegates portable preference writes to shared policy" \
-  'VoiceInkGeneralSettingsBackupPolicy\.applyCorePreferenceImportPlans|corePreferenceImportResult\.didImportRollingBufferSetting' \
+  "shared general backup import plan applies runtime sequencing" \
+  'applyRuntimeState|postCorePreferenceSettingsDidChange|reportImportedGeneralSettings' \
+  VoiceInkCore/Sources/VoiceInkCore/GeneralSettingsBackupPolicy.swift
+
+reject_pattern \
+  "shared general settings import plan raw payload stays hidden" \
+  'public let +(recordingShortcut|macOSShell|transcriptionAutoCleanup|audioCleanup|recordingFeedback|transcriptionCleanup|paste|rollingBuffer): VoiceInk.*BackupImportPlan' \
+  VoiceInkCore/Sources/VoiceInkCore/GeneralSettingsBackupPolicy.swift
+
+reject_pattern \
+  "macOS general backup import avoids raw general import plan fields" \
+  'generalImportPlans\.(recordingShortcut|macOSShell|transcriptionAutoCleanup|audioCleanup|recordingFeedback|transcriptionCleanup|paste|rollingBuffer)|VoiceInkGeneralSettingsBackupPolicy\.applyCorePreferenceImportPlans|corePreferenceImportResult\.didImportRollingBufferSetting' \
   VoiceInk/Services/BackupImporter.swift
 
 reject_pattern \
@@ -10537,8 +10547,8 @@ require_pattern \
   VoiceInk/Services/BackupTypes.swift
 
 require_pattern \
-  "macOS backup import reads shared recording feedback plan from grouped general settings" \
-  'generalImportPlans\.recordingFeedback' \
+  "macOS backup import receives shared recording feedback plan from grouped runtime hook" \
+  'applyRecordingFeedbackImportPlan' \
   VoiceInk/Services/BackupImporter.swift
 
 require_pattern \
@@ -11289,8 +11299,8 @@ require_pattern \
   VoiceInk/Services/BackupTypes.swift
 
 require_pattern \
-  "macOS backup import reads shared recording shortcut plan from grouped general settings" \
-  'generalImportPlans\.recordingShortcut' \
+  "macOS backup import receives shared recording shortcut plan from grouped runtime hook" \
+  'applyRecordingShortcutImportPlan' \
   VoiceInk/Services/BackupImporter.swift
 
 require_pattern \
@@ -15408,8 +15418,8 @@ require_pattern \
   VoiceInk/Services/ImportExportService.swift
 
 require_pattern \
-  "macOS backup import reads shared macOS shell plan from grouped general settings" \
-  'generalImportPlans\.macOSShell' \
+  "macOS backup import receives shared macOS shell plan from grouped runtime hook" \
+  'applyMacOSShellImportPlan' \
   VoiceInk/Services/BackupImporter.swift
 
 reject_pattern \

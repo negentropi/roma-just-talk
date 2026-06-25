@@ -130,24 +130,30 @@ final class GeneralSettingsBackupPolicyTests: XCTestCase {
             )
         )
 
-        let plans = VoiceInkGeneralSettingsBackupPolicy.importPlans(from: preferences)
+        withIsolatedDefaults { defaults in
+            let plans = VoiceInkGeneralSettingsBackupPolicy.importPlans(from: preferences)
 
-        XCTAssertEqual(plans.recordingShortcut.primaryRecordingShortcut, .custom)
-        XCTAssertNil(plans.recordingShortcut.secondaryRecordingShortcut)
-        XCTAssertEqual(plans.recordingShortcut.primaryRecordingShortcutMode, .special)
-        XCTAssertNil(plans.recordingShortcut.secondaryRecordingShortcutMode)
-        XCTAssertEqual(plans.macOSShell.launchAtLoginEnabled, true)
-        XCTAssertNil(plans.macOSShell.isMenuBarOnly)
-        XCTAssertEqual(plans.transcriptionAutoCleanup.retentionMinutes, 60)
-        XCTAssertEqual(plans.audioCleanup.retentionDays, 14)
-        XCTAssertEqual(plans.recordingFeedback.systemMuteMode, .never)
-        XCTAssertTrue(plans.recordingFeedback.shouldDisablePauseMediaForExperimentalImport)
-        XCTAssertEqual(plans.transcriptionCleanup.punctuationCleanupMode, .removeTrailingPeriod)
-        XCTAssertEqual(plans.paste.clipboardRestoreDelay, 3.0)
-        XCTAssertEqual(plans.rollingBuffer.mode, .on)
-        XCTAssertEqual(plans.rollingBuffer.lowBatteryThresholdPercent, 100)
-        XCTAssertEqual(plans.rollingBuffer.bufferDurationSeconds, 30.0)
-        XCTAssertEqual(plans.rollingBuffer.vadModel, .silero)
+            XCTAssertEqual(
+                generalSettingsImportRuntimeEvents(for: plans, defaults: defaults),
+                [
+                    "recordingShortcut:custom:nil:special:nil:true:true:180",
+                    "macOSShell:true:nil:mini",
+                    "recordingFeedback:true:never:true:2.0:true",
+                    "postSettingsDidChange",
+                    "imported"
+                ]
+            )
+            XCTAssertEqual(VoiceInkTranscriptionAutoCleanupPreference.retentionMinutes(from: defaults), 60)
+            XCTAssertEqual(VoiceInkAudioCleanupPreference.retentionDays(from: defaults), 14)
+            XCTAssertEqual(PunctuationCleanupMode.current(in: defaults), .removeTrailingPeriod)
+            XCTAssertEqual(VoiceInkPastePreference.clipboardRestoreDelay(from: defaults), 3.0)
+
+            let rollingBufferConfiguration = VoiceInkRollingBufferPreloadSettings.configuration(in: defaults)
+            XCTAssertEqual(rollingBufferConfiguration.mode, .on)
+            XCTAssertEqual(rollingBufferConfiguration.lowBatteryThresholdPercent, 100)
+            XCTAssertEqual(rollingBufferConfiguration.bufferDurationSeconds, 30.0)
+            XCTAssertEqual(VoiceInkRollingBufferVADSettings.selectedModel(in: defaults), "silero")
+        }
     }
 
     func testApplyCorePreferenceImportPlansWritesPortablePreferences() {
@@ -322,5 +328,55 @@ final class GeneralSettingsBackupPolicyTests: XCTestCase {
         defaults.removePersistentDomain(forName: suiteName)
         run(defaults)
         defaults.removePersistentDomain(forName: suiteName)
+    }
+
+    private func generalSettingsImportRuntimeEvents(
+        for plans: VoiceInkGeneralSettingsBackupImportPlans,
+        defaults: UserDefaults
+    ) -> [String] {
+        var events = [String]()
+        let appendRecordingShortcut: (VoiceInkRecordingShortcutBackupImportPlan) -> Void = { plan in
+            let primaryShortcut = plan.primaryRecordingShortcut?.rawValue ?? "nil"
+            let secondaryShortcut = plan.secondaryRecordingShortcut?.rawValue ?? "nil"
+            let primaryMode = plan.primaryRecordingShortcutMode?.rawValue ?? "nil"
+            let secondaryMode = plan.secondaryRecordingShortcutMode?.rawValue ?? "nil"
+            let pasteLastTranscriptOnEmptyTap = plan.specialShortcutPasteLastTranscriptOnEmptyTap.map { String($0) } ?? "nil"
+            let middleClickEnabled = plan.isMiddleClickToggleEnabled.map { String($0) } ?? "nil"
+            let middleClickDelay = plan.middleClickActivationDelay.map { String($0) } ?? "nil"
+            events.append(
+                "recordingShortcut:\(primaryShortcut):\(secondaryShortcut):\(primaryMode):\(secondaryMode):\(pasteLastTranscriptOnEmptyTap):\(middleClickEnabled):\(middleClickDelay)"
+            )
+        }
+        let appendMacOSShell: (VoiceInkMacOSShellBackupImportPlan) -> Void = { plan in
+            let launchAtLogin = plan.launchAtLoginEnabled.map { String($0) } ?? "nil"
+            let menuOnly = plan.isMenuBarOnly.map { String($0) } ?? "nil"
+            let recorderType = plan.recorderType ?? "nil"
+            events.append("macOSShell:\(launchAtLogin):\(menuOnly):\(recorderType)")
+        }
+        let appendRecordingFeedback: (VoiceInkRecordingFeedbackBackupImportPlan) -> Void = { plan in
+            let soundFeedback = plan.isSoundFeedbackEnabled.map { String($0) } ?? "nil"
+            let systemMuteMode = plan.systemMuteMode?.rawValue ?? "nil"
+            let pauseMedia = plan.isPauseMediaEnabled.map { String($0) } ?? "nil"
+            let audioResumptionDelay = plan.audioResumptionDelay.map { String($0) } ?? "nil"
+            let disablesPauseMedia = String(plan.shouldDisablePauseMediaForExperimentalImport)
+            events.append(
+                "recordingFeedback:\(soundFeedback):\(systemMuteMode):\(pauseMedia):\(audioResumptionDelay):\(disablesPauseMedia)"
+            )
+        }
+
+        plans.applyRuntimeState(
+            to: defaults,
+            applyRecordingShortcutImportPlan: appendRecordingShortcut,
+            applyMacOSShellImportPlan: appendMacOSShell,
+            applyRecordingFeedbackImportPlan: appendRecordingFeedback,
+            postCorePreferenceSettingsDidChange: {
+                events.append("postSettingsDidChange")
+            },
+            reportImportedGeneralSettings: {
+                events.append("imported")
+            }
+        )
+
+        return events
     }
 }

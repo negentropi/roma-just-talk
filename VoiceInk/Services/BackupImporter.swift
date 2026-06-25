@@ -91,63 +91,65 @@ enum BackupImporter {
             from: general.generalSettingsBackupPreferences
         )
 
-        let recordingShortcutImportPlan = generalImportPlans.recordingShortcut
-        if let shortcut = recordingShortcutImportPlan.primaryRecordingShortcut {
-            recordingShortcutManager.primaryRecordingShortcut = shortcut
-        }
-        if let shortcut = recordingShortcutImportPlan.secondaryRecordingShortcut {
-            recordingShortcutManager.secondaryRecordingShortcut = shortcut
-        }
-        if let mode = recordingShortcutImportPlan.primaryRecordingShortcutMode {
-            recordingShortcutManager.primaryRecordingShortcutMode = mode
-        }
-        if let mode = recordingShortcutImportPlan.secondaryRecordingShortcutMode {
-            recordingShortcutManager.secondaryRecordingShortcutMode = mode
-        }
-        if let pasteLastTranscriptOnEmptyTap = recordingShortcutImportPlan.specialShortcutPasteLastTranscriptOnEmptyTap {
-            recordingShortcutManager.specialShortcutPasteLastTranscriptOnEmptyTap = pasteLastTranscriptOnEmptyTap
-        }
-        if let isMiddleClickToggleEnabled = recordingShortcutImportPlan.isMiddleClickToggleEnabled {
-            recordingShortcutManager.isMiddleClickToggleEnabled = isMiddleClickToggleEnabled
-        }
-        if let middleClickActivationDelay = recordingShortcutImportPlan.middleClickActivationDelay {
-            recordingShortcutManager.middleClickActivationDelay = middleClickActivationDelay
-        }
-        let macOSShellImportPlan = generalImportPlans.macOSShell
-        if let launch = macOSShellImportPlan.launchAtLoginEnabled {
-            LaunchAtLogin.isEnabled = launch
-        }
-        if let menuOnly = macOSShellImportPlan.isMenuBarOnly {
-            menuBarManager.isMenuBarOnly = menuOnly
-        }
-        if let recType = macOSShellImportPlan.recorderType {
-            recorderUIManager.recorderType = recType
-        }
-
-        let recordingFeedbackImportPlan = generalImportPlans.recordingFeedback
-        if let soundFeedback = recordingFeedbackImportPlan.isSoundFeedbackEnabled {
-            soundManager.isEnabled = soundFeedback
-        }
-        if let systemMuteMode = recordingFeedbackImportPlan.systemMuteMode {
-            mediaController.systemMuteMode = systemMuteMode
-        }
-        if let pauseMedia = recordingFeedbackImportPlan.isPauseMediaEnabled {
-            playbackController.isPauseMediaEnabled = pauseMedia
-        }
-        if let audioDelay = recordingFeedbackImportPlan.audioResumptionDelay {
-            mediaController.audioResumptionDelay = audioDelay
-        }
-        if recordingFeedbackImportPlan.shouldDisablePauseMediaForExperimentalImport {
-            playbackController.isPauseMediaEnabled = false
-        }
-        let corePreferenceImportResult = VoiceInkGeneralSettingsBackupPolicy.applyCorePreferenceImportPlans(
-            generalImportPlans
+        generalImportPlans.applyRuntimeState(
+            applyRecordingShortcutImportPlan: { recordingShortcutImportPlan in
+                if let shortcut = recordingShortcutImportPlan.primaryRecordingShortcut {
+                    recordingShortcutManager.primaryRecordingShortcut = shortcut
+                }
+                if let shortcut = recordingShortcutImportPlan.secondaryRecordingShortcut {
+                    recordingShortcutManager.secondaryRecordingShortcut = shortcut
+                }
+                if let mode = recordingShortcutImportPlan.primaryRecordingShortcutMode {
+                    recordingShortcutManager.primaryRecordingShortcutMode = mode
+                }
+                if let mode = recordingShortcutImportPlan.secondaryRecordingShortcutMode {
+                    recordingShortcutManager.secondaryRecordingShortcutMode = mode
+                }
+                if let pasteLastTranscriptOnEmptyTap = recordingShortcutImportPlan.specialShortcutPasteLastTranscriptOnEmptyTap {
+                    recordingShortcutManager.specialShortcutPasteLastTranscriptOnEmptyTap = pasteLastTranscriptOnEmptyTap
+                }
+                if let isMiddleClickToggleEnabled = recordingShortcutImportPlan.isMiddleClickToggleEnabled {
+                    recordingShortcutManager.isMiddleClickToggleEnabled = isMiddleClickToggleEnabled
+                }
+                if let middleClickActivationDelay = recordingShortcutImportPlan.middleClickActivationDelay {
+                    recordingShortcutManager.middleClickActivationDelay = middleClickActivationDelay
+                }
+            },
+            applyMacOSShellImportPlan: { macOSShellImportPlan in
+                if let launch = macOSShellImportPlan.launchAtLoginEnabled {
+                    LaunchAtLogin.isEnabled = launch
+                }
+                if let menuOnly = macOSShellImportPlan.isMenuBarOnly {
+                    menuBarManager.isMenuBarOnly = menuOnly
+                }
+                if let recType = macOSShellImportPlan.recorderType {
+                    recorderUIManager.recorderType = recType
+                }
+            },
+            applyRecordingFeedbackImportPlan: { recordingFeedbackImportPlan in
+                if let soundFeedback = recordingFeedbackImportPlan.isSoundFeedbackEnabled {
+                    soundManager.isEnabled = soundFeedback
+                }
+                if let systemMuteMode = recordingFeedbackImportPlan.systemMuteMode {
+                    mediaController.systemMuteMode = systemMuteMode
+                }
+                if let pauseMedia = recordingFeedbackImportPlan.isPauseMediaEnabled {
+                    playbackController.isPauseMediaEnabled = pauseMedia
+                }
+                if let audioDelay = recordingFeedbackImportPlan.audioResumptionDelay {
+                    mediaController.audioResumptionDelay = audioDelay
+                }
+                if recordingFeedbackImportPlan.shouldDisablePauseMediaForExperimentalImport {
+                    playbackController.isPauseMediaEnabled = false
+                }
+            },
+            postCorePreferenceSettingsDidChange: {
+                NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
+            },
+            reportImportedGeneralSettings: {
+                print(VoiceInkSettingsBackupImportDiagnostics.generalSettingsImportedMessage)
+            }
         )
-        if corePreferenceImportResult.didImportRollingBufferSetting {
-            NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
-        }
-
-        print(VoiceInkSettingsBackupImportDiagnostics.generalSettingsImportedMessage)
     }
 
     @MainActor

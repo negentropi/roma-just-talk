@@ -2467,7 +2467,12 @@ require_pattern \
 
 require_pattern \
   "shared transcript status metadata lives in VoiceInkCore" \
-  'panelSystemImageName|inlineAccessory|Tone' \
+  'panelSystemImageName|shouldShowInlineProgress|shouldShowInlineBadge|Tone' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+
+reject_pattern \
+  "shared transcript status presentation avoids public raw status/accessory enums" \
+  'public enum (Kind|InlineAccessory)\b|public let kind: Kind\b|public var inlineAccessory: InlineAccessory\b' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
 
 require_pattern \
@@ -2626,7 +2631,12 @@ reject_pattern \
 
 require_pattern \
   "iOS note row uses shared transcript status metadata" \
-  'inlineAccessory|\.tone' \
+  'shouldShowInlineProgress|shouldShowInlineBadge|\.tone' \
+  iOS/VoiceInk-ios/NoteRowView.swift
+
+reject_pattern \
+  "iOS note row avoids direct transcript inline accessory access" \
+  'statusPresentation\.inlineAccessory\b|switch[[:space:]]+statusPresentation\.inlineAccessory|case \.(progress|badge):' \
   iOS/VoiceInk-ios/NoteRowView.swift
 
 require_pattern \
@@ -3055,7 +3065,7 @@ reject_pattern \
 
 reject_pattern \
   "iOS note views avoid shell-only transcript status branching" \
-  'note\.transcriptionStatus *[!=]= *\.(pending|failed|completed|canceled)|transcriptionStatus\.needsTranscription|VoiceInkTranscriptPresentation\.status(Title|BadgeText)|statusPresentation\??\.(is(Failure|Processing)|shouldShow(InlineProgress|Badge))' \
+  'note\.transcriptionStatus *[!=]= *\.(pending|failed|completed|canceled)|transcriptionStatus\.needsTranscription|VoiceInkTranscriptPresentation\.status(Title|BadgeText)|statusPresentation\??\.is(Failure|Processing)' \
   iOS/VoiceInk-ios/NoteRowView.swift \
   iOS/VoiceInk-ios/NoteDetailView.swift
 

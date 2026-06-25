@@ -7,7 +7,7 @@ public extension VoiceInkTranscriptionStatus {
 }
 
 public struct VoiceInkTranscriptStatusPresentation: Equatable, Sendable {
-    public enum Kind: Equatable, Sendable {
+    enum Kind: Equatable, Sendable {
         case processing
         case failed
     }
@@ -17,12 +17,12 @@ public struct VoiceInkTranscriptStatusPresentation: Equatable, Sendable {
         case failure
     }
 
-    public enum InlineAccessory: Equatable, Sendable {
+    enum InlineAccessory: Equatable, Sendable {
         case progress
         case badge
     }
 
-    public let kind: Kind
+    let kind: Kind
     public let title: String
     public let badgeText: String
 
@@ -44,7 +44,7 @@ public struct VoiceInkTranscriptStatusPresentation: Equatable, Sendable {
         }
     }
 
-    public var inlineAccessory: InlineAccessory {
+    var inlineAccessory: InlineAccessory {
         switch kind {
         case .processing:
             return .progress
@@ -53,10 +53,18 @@ public struct VoiceInkTranscriptStatusPresentation: Equatable, Sendable {
         }
     }
 
-    public init(kind: Kind, title: String, badgeText: String) {
+    init(kind: Kind, title: String, badgeText: String) {
         self.kind = kind
         self.title = title
         self.badgeText = badgeText
+    }
+
+    public var shouldShowInlineProgress: Bool {
+        inlineAccessory == .progress
+    }
+
+    public var shouldShowInlineBadge: Bool {
+        inlineAccessory == .badge
     }
 }
 

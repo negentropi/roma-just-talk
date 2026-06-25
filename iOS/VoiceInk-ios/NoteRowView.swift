@@ -39,8 +39,7 @@ struct NoteRowView: View {
                 Spacer(minLength: 0)
 
                 if let statusPresentation {
-                    switch statusPresentation.inlineAccessory {
-                    case .progress:
+                    if statusPresentation.shouldShowInlineProgress {
                         HStack(spacing: 6) {
                             ProgressView()
                                 .scaleEffect(0.7)
@@ -48,7 +47,7 @@ struct NoteRowView: View {
                                 .font(.caption)
                         }
                         .foregroundStyle(.secondary)
-                    case .badge:
+                    } else if statusPresentation.shouldShowInlineBadge {
                         Text(statusPresentation.badgeText)
                             .font(.caption.weight(.semibold))
                             .foregroundStyle(statusPresentation.tone.badgeColor)

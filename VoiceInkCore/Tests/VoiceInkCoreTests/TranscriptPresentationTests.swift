@@ -691,20 +691,20 @@ final class TranscriptPresentationTests: XCTestCase {
 
     func testStatusPresentationReturnsRetryStateMetadata() {
         let pending = VoiceInkTranscriptPresentation.statusPresentation(for: .pending)
-        XCTAssertEqual(pending?.kind, .processing)
         XCTAssertEqual(pending?.title, "Transcription Pending")
         XCTAssertEqual(pending?.badgeText, "Processing")
         XCTAssertEqual(pending?.tone, .processing)
         XCTAssertEqual(pending?.panelSystemImageName, "clock.fill")
-        XCTAssertEqual(pending?.inlineAccessory, .progress)
+        XCTAssertEqual(pending?.shouldShowInlineProgress, true)
+        XCTAssertEqual(pending?.shouldShowInlineBadge, false)
 
         let failed = VoiceInkTranscriptPresentation.statusPresentation(for: .failed)
-        XCTAssertEqual(failed?.kind, .failed)
         XCTAssertEqual(failed?.title, "Transcription Failed")
         XCTAssertEqual(failed?.badgeText, "Failed")
         XCTAssertEqual(failed?.tone, .failure)
         XCTAssertEqual(failed?.panelSystemImageName, "exclamationmark.triangle.fill")
-        XCTAssertEqual(failed?.inlineAccessory, .badge)
+        XCTAssertEqual(failed?.shouldShowInlineProgress, false)
+        XCTAssertEqual(failed?.shouldShowInlineBadge, true)
     }
 
     func testStatusPresentationContentVisibilityMatchesTranscriptState() {

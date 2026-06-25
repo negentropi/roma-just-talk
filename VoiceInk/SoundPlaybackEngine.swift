@@ -5,7 +5,10 @@ import VoiceInkCore
 
 final class SoundPlaybackEngine: @unchecked Sendable {
     private let queue = DispatchQueue(label: "\(VoiceInkAppIdentity.loggingSubsystem).soundPlayback", qos: .userInitiated)
-    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "SoundPlaybackEngine")
+    private let logger = Logger(
+        subsystem: VoiceInkAppIdentity.loggingSubsystem,
+        category: VoiceInkMacOSLogCategory.soundPlaybackEngine
+    )
 
     private var players: [VoiceInkRecordingSoundPlayerSlot: AVAudioPlayer] = [:]
 
@@ -42,7 +45,10 @@ final class SoundPlaybackEngine: @unchecked Sendable {
             player.prepareToPlay()
             return player
         } catch {
-            logger.error("Failed to load sound: \(error.localizedDescription, privacy: .public)")
+            let message = VoiceInkRecordingSoundPlaybackDiagnostics.loadFailedMessage(
+                localizedDescription: error.localizedDescription
+            )
+            logger.error("\(message, privacy: .public)")
             return nil
         }
     }

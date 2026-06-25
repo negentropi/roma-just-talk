@@ -389,6 +389,12 @@ public enum VoiceInkRecordingSoundPlaybackPolicy {
     }
 }
 
+public enum VoiceInkRecordingSoundPlaybackDiagnostics {
+    public static func loadFailedMessage(localizedDescription: String) -> String {
+        "Failed to load sound: \(localizedDescription)"
+    }
+}
+
 public enum VoiceInkCustomSoundError: LocalizedError, Equatable, Sendable {
     case fileNotFound
     case invalidAudioFile

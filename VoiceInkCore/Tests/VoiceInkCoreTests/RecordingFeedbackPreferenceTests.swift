@@ -89,6 +89,13 @@ final class RecordingFeedbackPreferenceTests: XCTestCase {
         )
     }
 
+    func testRecordingSoundPlaybackDiagnosticsPreserveMacOSLogCopy() {
+        XCTAssertEqual(
+            VoiceInkRecordingSoundPlaybackDiagnostics.loadFailedMessage(localizedDescription: "bad file"),
+            "Failed to load sound: bad file"
+        )
+    }
+
     func testCustomSoundPreferencePreservesDefaultsAndNotificationName() {
         XCTAssertEqual(VoiceInkCustomSoundPreference.customSoundsRelativeDirectory, "VoiceInk/CustomSounds")
         XCTAssertEqual(VoiceInkCustomSoundPreference.changedNotificationName, "CustomSoundsChanged")

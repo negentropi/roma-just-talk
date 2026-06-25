@@ -10810,6 +10810,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
 
 require_pattern \
+  "shared recording sound playback diagnostics live in VoiceInkCore" \
+  'VoiceInkRecordingSoundPlaybackDiagnostics|loadFailedMessage|Failed to load sound:' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+
+require_pattern \
   "core checks cover custom sound URL and copy planning" \
   'RecordingFeedbackPreferenceTests\.testCustomSoundPreferenceBuildsCustomSoundURLs|RecordingFeedbackPreferenceTests\.testCustomSoundPreferencePlansCopyActions' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
@@ -10826,7 +10831,7 @@ require_pattern \
 
 require_pattern \
   "core checks cover recording sound playback policy" \
-  'RecordingFeedbackPreferenceTests\.testRecordingSoundPlaybackPolicyPreservesMacOSSlotsVolumesAndFallbacks' \
+  'RecordingFeedbackPreferenceTests\.testRecordingSoundPlaybackPolicyPreservesMacOSSlotsVolumesAndFallbacks|RecordingFeedbackPreferenceTests\.testRecordingSoundPlaybackDiagnosticsPreserveMacOSLogCopy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -10895,6 +10900,11 @@ require_pattern \
   VoiceInk/SoundPlaybackEngine.swift
 
 require_pattern \
+  "macOS sound playback engine uses shared playback diagnostics" \
+  'VoiceInkRecordingSoundPlaybackDiagnostics\.loadFailedMessage' \
+  VoiceInk/SoundPlaybackEngine.swift
+
+require_pattern \
   "macOS sound manager exposes shared recording sound cue playback" \
   'func play\(_ cue: VoiceInkRecordingSoundCue\)|playbackEngine\.play\(cue\)' \
   VoiceInk/SoundManager.swift
@@ -10946,8 +10956,8 @@ reject_pattern \
   VoiceInk/Views/Settings/CustomSoundSettingsView.swift
 
 reject_pattern \
-  "macOS sound playback engine avoids shell-owned cue fallback and volume policy" \
-  'private enum Sound|playStartSound|playStopSound|playEscSound|startSound|stopSound|escSound|customStartSound|customStopSound|customStartSound \?\? startSound|customStopSound \?\? stopSound|volume: 0\.[34]' \
+  "macOS sound playback engine avoids shell-owned cue fallback, volume policy, diagnostics, and log category" \
+  'private enum Sound|playStartSound|playStopSound|playEscSound|startSound|stopSound|escSound|customStartSound|customStopSound|customStartSound \?\? startSound|customStopSound \?\? stopSound|volume: 0\.[34]|"Failed to load sound:|category: "SoundPlaybackEngine"' \
   VoiceInk/SoundPlaybackEngine.swift
 
 require_pattern \
@@ -16805,7 +16815,8 @@ require_patterns \
   'sessionMetricMigrationService = "SessionMetricMigrationService"' \
   'modelPrewarm = "ModelPrewarm"' \
   'cursorPaster = "CursorPaster"' \
-  'sessionMetricRecorder = "SessionMetricRecorder"'
+  'sessionMetricRecorder = "SessionMetricRecorder"' \
+  'soundPlaybackEngine = "SoundPlaybackEngine"'
 
 require_pattern \
   "macOS window manager uses shared log category identity" \
@@ -16855,6 +16866,12 @@ require_patterns \
   VoiceInk/Paste/CursorPaster.swift \
   'Logger\(' \
   'category: VoiceInkMacOSLogCategory\.cursorPaster'
+
+require_patterns \
+  "macOS sound playback engine uses shared log category identity" \
+  VoiceInk/SoundPlaybackEngine.swift \
+  'Logger\(' \
+  'category: VoiceInkMacOSLogCategory\.soundPlaybackEngine'
 
 require_pattern \
   "core checks execute macOS window identity test" \

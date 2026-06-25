@@ -324,6 +324,7 @@ public enum VoiceInkMacOSLogCategory {
     public static let modelPrewarm = "ModelPrewarm"
     public static let cursorPaster = "CursorPaster"
     public static let sessionMetricRecorder = "SessionMetricRecorder"
+    public static let soundPlaybackEngine = "SoundPlaybackEngine"
 }
 
 public enum VoiceInkAppIdentity {

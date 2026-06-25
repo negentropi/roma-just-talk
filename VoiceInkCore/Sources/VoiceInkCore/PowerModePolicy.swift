@@ -622,6 +622,37 @@ public struct VoiceInkPowerModeTranscriptionSelection: Equatable, Sendable {
             )
         }
     }
+
+    public func modelChangePlan(
+        selectedModelFacts: VoiceInkPowerModeTranscriptionModelFacts?,
+        storedLanguage: String?
+    ) -> VoiceInkPowerModeTranscriptionModelChangePlan {
+        guard let selectedModelFacts else {
+            return VoiceInkPowerModeTranscriptionModelChangePlan(selectionToApply: nil)
+        }
+
+        return VoiceInkPowerModeTranscriptionModelChangePlan(
+            selectionToApply: selectingCompatibleLanguage(
+                for: selectedModelFacts,
+                storedLanguage: storedLanguage
+            )
+        )
+    }
+}
+
+public struct VoiceInkPowerModeTranscriptionModelChangePlan: Equatable, Sendable {
+    public let selectionToApply: VoiceInkPowerModeTranscriptionSelection?
+
+    public init(selectionToApply: VoiceInkPowerModeTranscriptionSelection?) {
+        self.selectionToApply = selectionToApply
+    }
+
+    public func applyRuntimeState(
+        applyTranscriptionSelection: (VoiceInkPowerModeTranscriptionSelection) -> Void
+    ) {
+        guard let selectionToApply else { return }
+        applyTranscriptionSelection(selectionToApply)
+    }
 }
 
 public struct VoiceInkPowerModeConfigurationFormAppearPlan: Equatable, Sendable {

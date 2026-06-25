@@ -310,14 +310,13 @@ struct ConfigurationView: View {
                             }
                         }
                         .onChange(of: selectedTranscriptionModelName) { _, _ in
-                            if let model = selectedTranscriptionModel {
-                                applyTranscriptionSelection(
-                                    transcriptionSelection.selectingCompatibleLanguage(
-                                        for: modelFacts(for: model),
-                                        storedLanguage: VoiceInkTranscriptionLanguagePreference.storedLanguage()
-                                    )
-                                )
-                            }
+                            transcriptionSelection.modelChangePlan(
+                                selectedModelFacts: selectedTranscriptionModel.map { modelFacts(for: $0) },
+                                storedLanguage: VoiceInkTranscriptionLanguagePreference.storedLanguage()
+                            )
+                            .applyRuntimeState(
+                                applyTranscriptionSelection: applyTranscriptionSelection
+                            )
                         }
                     }
 

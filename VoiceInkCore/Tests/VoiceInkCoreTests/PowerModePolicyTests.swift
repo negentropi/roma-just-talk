@@ -1264,6 +1264,56 @@ final class PowerModePolicyTests: XCTestCase {
         )
     }
 
+    func testPowerModeTranscriptionModelChangePlanAppliesCompatibleLanguageOnlyForSelectedModel() {
+        let selection = VoiceInkPowerModeTranscriptionSelection(
+            selectedModelName: "base",
+            selectedLanguage: nil
+        )
+        let disabledLanguageFacts = transcriptionModelFacts(disablesLanguageSelection: true)
+
+        XCTAssertEqual(
+            selection.modelChangePlan(
+                selectedModelFacts: transcriptionModelFacts(languageOptions: ["en": "English", "fr": "French"]),
+                storedLanguage: "fr"
+            ).selectionToApply,
+            VoiceInkPowerModeTranscriptionSelection(
+                selectedModelName: "base",
+                selectedLanguage: "fr"
+            )
+        )
+        XCTAssertEqual(
+            selection.modelChangePlan(
+                selectedModelFacts: disabledLanguageFacts,
+                storedLanguage: "fr"
+            ).selectionToApply?.selectedLanguage,
+            VoiceInkLanguageCatalog.autoDetectCode
+        )
+        XCTAssertNil(
+            selection.modelChangePlan(
+                selectedModelFacts: nil,
+                storedLanguage: "fr"
+            ).selectionToApply
+        )
+
+        var events = [String]()
+        selection.modelChangePlan(
+            selectedModelFacts: disabledLanguageFacts,
+            storedLanguage: "fr"
+        )
+        .applyRuntimeState {
+            events.append("\($0.selectedModelName ?? "nil"):\($0.selectedLanguage ?? "nil")")
+        }
+        selection.modelChangePlan(
+            selectedModelFacts: nil,
+            storedLanguage: "fr"
+        )
+        .applyRuntimeState {
+            events.append($0.selectedModelName ?? "nil")
+        }
+
+        XCTAssertEqual(events, ["base:auto"])
+    }
+
     func testPowerModeLanguageApplicationPlanSkipsMissingLanguage() {
         let plan = VoiceInkPowerModeLanguageApplicationPlan.plan(
             selectedLanguage: nil,

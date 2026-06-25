@@ -692,71 +692,61 @@ final class RecordingStatePolicyTests: XCTestCase {
 
     func testLaunchRecordingRequestStartsImmediatelyWhenOnboardingIsComplete() {
         var state = VoiceInkLaunchRecordingRequestState()
+        var events: [String] = []
 
-        XCTAssertEqual(
-            state.requestRecording(hasCompletedOnboarding: true),
-            .startRecordingAfterLaunchDelay
-        )
+        state.requestRecording(hasCompletedOnboarding: true).applyRuntimeState {
+            events.append("start")
+        }
+
+        XCTAssertEqual(events, ["start"])
         XCTAssertFalse(state.hasPendingRecordingAfterOnboarding)
     }
 
     func testLaunchRecordingRequestDefersUntilOnboardingCompletes() {
         var state = VoiceInkLaunchRecordingRequestState()
+        var events: [String] = []
 
-        XCTAssertEqual(
-            state.requestRecording(hasCompletedOnboarding: false),
-            .deferUntilOnboardingCompletes
-        )
+        state.requestRecording(hasCompletedOnboarding: false).applyRuntimeState {
+            events.append("start")
+        }
         XCTAssertTrue(state.hasPendingRecordingAfterOnboarding)
 
-        XCTAssertEqual(
-            state.consumePendingRecordingIfReady(hasCompletedOnboarding: false),
-            .none
-        )
+        state.consumePendingRecordingIfReady(hasCompletedOnboarding: false).applyRuntimeState {
+            events.append("start")
+        }
         XCTAssertTrue(state.hasPendingRecordingAfterOnboarding)
 
-        XCTAssertEqual(
-            state.consumePendingRecordingIfReady(hasCompletedOnboarding: true),
-            .startRecordingAfterLaunchDelay
-        )
+        state.consumePendingRecordingIfReady(hasCompletedOnboarding: true).applyRuntimeState {
+            events.append("start")
+        }
+
+        XCTAssertEqual(events, ["start"])
         XCTAssertFalse(state.hasPendingRecordingAfterOnboarding)
     }
 
     func testLaunchRecordingRequestNoOpsWhenNothingIsPending() {
         var state = VoiceInkLaunchRecordingRequestState()
+        var events: [String] = []
 
-        XCTAssertEqual(
-            state.consumePendingRecordingIfReady(hasCompletedOnboarding: true),
-            .none
-        )
+        state.consumePendingRecordingIfReady(hasCompletedOnboarding: true).applyRuntimeState {
+            events.append("start")
+        }
+
+        XCTAssertTrue(events.isEmpty)
     }
 
     func testLaunchRecordingRequestClearsPendingStateWhenRecordingCanStartNow() {
         var state = VoiceInkLaunchRecordingRequestState(
             hasPendingRecordingAfterOnboarding: true
         )
-
-        XCTAssertEqual(
-            state.requestRecording(hasCompletedOnboarding: true),
-            .startRecordingAfterLaunchDelay
-        )
-        XCTAssertFalse(state.hasPendingRecordingAfterOnboarding)
-    }
-
-    func testLaunchRecordingRequestActionAppliesRuntimeState() {
         var events: [String] = []
 
-        VoiceInkLaunchRecordingRequestAction.none.applyRuntimeState {
-            events.append("start")
-        }
-        VoiceInkLaunchRecordingRequestAction.deferUntilOnboardingCompletes.applyRuntimeState {
-            events.append("start")
-        }
-        VoiceInkLaunchRecordingRequestAction.startRecordingAfterLaunchDelay.applyRuntimeState {
+        state.requestRecording(hasCompletedOnboarding: true).applyRuntimeState {
             events.append("start")
         }
 
         XCTAssertEqual(events, ["start"])
+        XCTAssertFalse(state.hasPendingRecordingAfterOnboarding)
     }
 
     func testKeyboardRecordingButtonPresentationPreservesIOSCopyAndIcons() {

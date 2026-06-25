@@ -50,7 +50,7 @@ struct VoiceInk_iosApp: App {
                         handleURL(url)
                     }
                     .onAppear {
-                        applyLaunchRecordingAction(
+                        applyLaunchRecordingPlan(
                             launchRecordingRequestState.consumePendingRecordingIfReady(
                                 hasCompletedOnboarding: hasCompletedOnboarding
                             )
@@ -63,7 +63,7 @@ struct VoiceInk_iosApp: App {
                     }
                     .onChange(of: hasCompletedOnboarding) { _, completed in
                         if completed {
-                            applyLaunchRecordingAction(
+                            applyLaunchRecordingPlan(
                                 launchRecordingRequestState.consumePendingRecordingIfReady(
                                     hasCompletedOnboarding: hasCompletedOnboarding
                                 )
@@ -80,7 +80,7 @@ struct VoiceInk_iosApp: App {
 
         deepLink.applyRuntimeState {
             VoiceInkIOSLogger.app.notice("\(VoiceInkIOSRecordingCoordinationDiagnostics.recordDeepLinkOpenedMessage, privacy: .public)")
-            applyLaunchRecordingAction(
+            applyLaunchRecordingPlan(
                 launchRecordingRequestState.requestRecording(
                     hasCompletedOnboarding: hasCompletedOnboarding
                 )
@@ -89,8 +89,8 @@ struct VoiceInk_iosApp: App {
         }
     }
 
-    private func applyLaunchRecordingAction(_ action: VoiceInkLaunchRecordingRequestAction) {
-        action.applyRuntimeState(startRecordingAfterLaunchDelay: startRecordingAfterLaunchDelay)
+    private func applyLaunchRecordingPlan(_ plan: VoiceInkLaunchRecordingRequestPlan) {
+        plan.applyRuntimeState(startRecordingAfterLaunchDelay: startRecordingAfterLaunchDelay)
     }
 
     private func startRecordingAfterLaunchDelay() {

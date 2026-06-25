@@ -15447,15 +15447,22 @@ require_pattern \
   'testKeyboardRecordingTimingPreservesIOSAppAndKeyboardDelays' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
-require_pattern \
+require_patterns \
   "VoiceInkCore owns iOS launch recording request policy" \
-  'VoiceInkLaunchRecordingRequest(State|Action)|applyRuntimeState' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift \
+  'VoiceInkLaunchRecordingRequestState' \
+  'VoiceInkLaunchRecordingRequestPlan' \
+  'applyRuntimeState'
 
 require_pattern \
   "VoiceInkCore checks cover iOS launch recording request policy" \
-  'testLaunchRecordingRequest(StartsImmediatelyWhenOnboardingIsComplete|DefersUntilOnboardingCompletes|NoOpsWhenNothingIsPending|ClearsPendingStateWhenRecordingCanStartNow|ActionAppliesRuntimeState)' \
+  'testLaunchRecordingRequest(StartsImmediatelyWhenOnboardingIsComplete|DefersUntilOnboardingCompletes|NoOpsWhenNothingIsPending|ClearsPendingStateWhenRecordingCanStartNow)' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "VoiceInkCore launch recording request policy avoids public action-only helper" \
+  'public enum VoiceInkLaunchRecordingRequestAction' \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
 require_pattern \
   "VoiceInkCore owns iOS keyboard recording button presentation" \
@@ -15815,10 +15822,15 @@ require_pattern \
   'VoiceInkKeyboardRecordingTiming\.appLaunchRecordingStartDelay' \
   iOS/VoiceInk-ios/VoiceInk_iosApp.swift
 
-require_pattern \
+require_patterns \
   "iOS app deep-link recording uses shared launch request policy" \
-  'VoiceInkLaunchRecordingRequest(State|Action)|requestRecording\(hasCompletedOnboarding:|consumePendingRecordingIfReady\(hasCompletedOnboarding:|applyRuntimeState' \
-  iOS/VoiceInk-ios/VoiceInk_iosApp.swift
+  iOS/VoiceInk-ios/VoiceInk_iosApp.swift \
+  'VoiceInkLaunchRecordingRequestState' \
+  'VoiceInkLaunchRecordingRequestPlan' \
+  'requestRecording\(' \
+  'consumePendingRecordingIfReady\(' \
+  'hasCompletedOnboarding:' \
+  'applyRuntimeState'
 
 reject_pattern \
   "iOS app deep-link recording avoids shell-owned launch request action sequencing" \

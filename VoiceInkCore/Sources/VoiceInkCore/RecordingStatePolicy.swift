@@ -522,18 +522,30 @@ public enum VoiceInkKeyboardRecordingTiming {
     public static let openAppFallbackResetDelay: TimeInterval = 2.0
 }
 
-public enum VoiceInkLaunchRecordingRequestAction: Equatable, Sendable {
+enum VoiceInkLaunchRecordingRequestAction: Equatable, Sendable {
     case none
     case deferUntilOnboardingCompletes
     case startRecordingAfterLaunchDelay
 
-    public func applyRuntimeState(startRecordingAfterLaunchDelay: () -> Void) {
+    func applyRuntimeState(startRecordingAfterLaunchDelay: () -> Void) {
         switch self {
         case .none, .deferUntilOnboardingCompletes:
             return
         case .startRecordingAfterLaunchDelay:
             startRecordingAfterLaunchDelay()
         }
+    }
+}
+
+public struct VoiceInkLaunchRecordingRequestPlan: Sendable {
+    private let action: VoiceInkLaunchRecordingRequestAction
+
+    init(action: VoiceInkLaunchRecordingRequestAction) {
+        self.action = action
+    }
+
+    public func applyRuntimeState(startRecordingAfterLaunchDelay: () -> Void) {
+        action.applyRuntimeState(startRecordingAfterLaunchDelay: startRecordingAfterLaunchDelay)
     }
 }
 
@@ -546,25 +558,25 @@ public struct VoiceInkLaunchRecordingRequestState: Equatable, Sendable {
 
     public mutating func requestRecording(
         hasCompletedOnboarding: Bool
-    ) -> VoiceInkLaunchRecordingRequestAction {
+    ) -> VoiceInkLaunchRecordingRequestPlan {
         guard hasCompletedOnboarding else {
             hasPendingRecordingAfterOnboarding = true
-            return .deferUntilOnboardingCompletes
+            return VoiceInkLaunchRecordingRequestPlan(action: .deferUntilOnboardingCompletes)
         }
 
         hasPendingRecordingAfterOnboarding = false
-        return .startRecordingAfterLaunchDelay
+        return VoiceInkLaunchRecordingRequestPlan(action: .startRecordingAfterLaunchDelay)
     }
 
     public mutating func consumePendingRecordingIfReady(
         hasCompletedOnboarding: Bool
-    ) -> VoiceInkLaunchRecordingRequestAction {
+    ) -> VoiceInkLaunchRecordingRequestPlan {
         guard hasCompletedOnboarding, hasPendingRecordingAfterOnboarding else {
-            return .none
+            return VoiceInkLaunchRecordingRequestPlan(action: .none)
         }
 
         hasPendingRecordingAfterOnboarding = false
-        return .startRecordingAfterLaunchDelay
+        return VoiceInkLaunchRecordingRequestPlan(action: .startRecordingAfterLaunchDelay)
     }
 }
 

@@ -220,9 +220,15 @@ final class TranscriptPresentationTests: XCTestCase {
             id: \.id
         )
 
-        XCTAssertEqual(Set(plan.targets), Set([first, second]))
+        var deletedItems: [HistorySelectionItem] = []
+        plan.applyRuntimeState { item in
+            deletedItems.append(item)
+        }
+
+        XCTAssertEqual(Set(deletedItems), Set([first, second]))
         XCTAssertTrue(plan.remainingSelection.isEmpty)
-        XCTAssertEqual(plan.targetIDs, Set([1, 2]))
+        XCTAssertTrue(plan.deletesID(first.id))
+        XCTAssertTrue(plan.deletesID(second.id))
     }
 
     func testHistoryDeletionPolicyPreservesUnselectedItemsWhenDeletingSubset() {
@@ -235,9 +241,15 @@ final class TranscriptPresentationTests: XCTestCase {
             id: \.id
         )
 
-        XCTAssertEqual(plan.targets, [selected])
+        var deletedItems: [HistorySelectionItem] = []
+        plan.applyRuntimeState { item in
+            deletedItems.append(item)
+        }
+
+        XCTAssertEqual(deletedItems, [selected])
         XCTAssertEqual(plan.remainingSelection, Set([kept]))
-        XCTAssertEqual(plan.targetIDs, Set([selected.id]))
+        XCTAssertTrue(plan.deletesID(selected.id))
+        XCTAssertFalse(plan.deletesID(kept.id))
     }
 
     func testHistoryDeletionPolicyRepairsFocusedItemAndIDsSeparately() {
@@ -288,9 +300,16 @@ final class TranscriptPresentationTests: XCTestCase {
             id: \.id
         )
 
-        XCTAssertEqual(plan.targets, [latest, oldest])
+        var deletedItems: [HistorySelectionItem] = []
+        plan.applyRuntimeState { item in
+            deletedItems.append(item)
+        }
+
+        XCTAssertEqual(deletedItems, [latest, oldest])
         XCTAssertTrue(plan.remainingSelection.isEmpty)
-        XCTAssertEqual(plan.targetIDs, Set([latest.id, oldest.id]))
+        XCTAssertTrue(plan.deletesID(latest.id))
+        XCTAssertTrue(plan.deletesID(oldest.id))
+        XCTAssertFalse(plan.deletesID(hiddenBySearch.id))
     }
 
     func testHistoryRefreshPolicyReloadsForSearchTextChanges() {
@@ -574,23 +593,33 @@ final class TranscriptPresentationTests: XCTestCase {
     }
 
     func testHistoryDeletionPolicyUsesDisplayedListOffsets() {
-        XCTAssertEqual(
-            VoiceInkHistoryDeletionPolicy.targets(
-                atOffsets: IndexSet([0, 2]),
-                from: ["latest", "hidden-by-search", "oldest"]
-            ),
-            ["latest", "oldest"]
+        let plan = VoiceInkHistoryDeletionPolicy.offsetDeletionPlan(
+            atOffsets: IndexSet([0, 2]),
+            from: ["latest", "hidden-by-search", "oldest"],
+            id: \.self
         )
+
+        var deletedItems: [String] = []
+        plan.applyRuntimeState { item in
+            deletedItems.append(item)
+        }
+
+        XCTAssertEqual(deletedItems, ["latest", "oldest"])
     }
 
     func testHistoryDeletionPolicyIgnoresStaleOffsets() {
-        XCTAssertEqual(
-            VoiceInkHistoryDeletionPolicy.targets(
-                atOffsets: IndexSet([1, 5]),
-                from: ["latest", "oldest"]
-            ),
-            ["oldest"]
+        let plan = VoiceInkHistoryDeletionPolicy.offsetDeletionPlan(
+            atOffsets: IndexSet([1, 5]),
+            from: ["latest", "oldest"],
+            id: \.self
         )
+
+        var deletedItems: [String] = []
+        plan.applyRuntimeState { item in
+            deletedItems.append(item)
+        }
+
+        XCTAssertEqual(deletedItems, ["oldest"])
     }
 
     func testFailedTranscriptTextPreservesMacOSFailurePrefix() {

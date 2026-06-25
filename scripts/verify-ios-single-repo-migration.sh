@@ -3061,6 +3061,11 @@ require_patterns \
   'VoiceInkHistoryDeletionPlan' \
   'applyRuntimeState'
 
+reject_pattern \
+  "shared history deletion plan avoids public raw target payloads" \
+  'public let +(targets|targetIDs)|public static func targets' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+
 require_pattern \
   "macOS history views use shared refresh policy" \
   'VoiceInkHistoryRefreshPolicy\.(searchTextDidChange|latestItemDidChange)' \

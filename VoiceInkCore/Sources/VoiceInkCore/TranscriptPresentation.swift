@@ -465,9 +465,9 @@ public enum VoiceInkHistorySelectionPolicy {
 }
 
 public struct VoiceInkHistoryDeletionPlan<Item: Hashable, ID: Hashable> {
-    public let targets: [Item]
+    private let targets: [Item]
     public let remainingSelection: Set<Item>
-    public let targetIDs: Set<ID>
+    private let targetIDs: Set<ID>
     private let targetItems: Set<Item>
 
     init(
@@ -499,7 +499,7 @@ public struct VoiceInkHistoryDeletionPlan<Item: Hashable, ID: Hashable> {
 }
 
 public enum VoiceInkHistoryDeletionPolicy {
-    public static func targets<Item>(
+    private static func targets<Item>(
         atOffsets offsets: IndexSet,
         from displayedItems: [Item]
     ) -> [Item] {

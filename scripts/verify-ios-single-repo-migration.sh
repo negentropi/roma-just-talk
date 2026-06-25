@@ -3176,16 +3176,21 @@ require_pattern \
 
 require_pattern \
   "shared provider API-key form state owns iOS control presentation" \
-  'VoiceInkProviderAPIKeyFormControlPresentation|VoiceInkProviderAPIKeyVerificationControl|iOSControlPresentation\(storedRuntimeKey:|runtimeAction\(.*verify:' \
+  'VoiceInkProviderAPIKeyFormControlPresentation|VoiceInkProviderAPIKeyVerificationControl|iOSControlPresentation\(storedRuntimeKey:|verifyRuntimeAction' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
 
 require_patterns \
   "shared provider API-key verification control owns iOS runtime action mapping" \
   VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift \
-  'public func runtimeAction' \
+  'public func verifyRuntimeAction' \
   'verify: @escaping \(\) -> Void' \
   'isVerifyButtonDisabled' \
-  'isProgressVisible'
+  'isVerificationProgressVisible'
+
+reject_pattern \
+  "shared provider API-key form control avoids public raw verification control interface" \
+  'public enum VoiceInkProviderAPIKeyVerificationControl\b|public let verificationControl: VoiceInkProviderAPIKeyVerificationControl\b' \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
 
 require_patterns \
   "shared provider API-key form control owns iOS save runtime action mapping" \
@@ -3253,7 +3258,7 @@ require_patterns \
   "core checks execute provider API-key iOS control presentation test" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
   'ProviderAccessRequirementTests\.testProviderAPIKeyFormStateOwnsIOSControlPresentation' \
-  'ProviderAccessRequirementTests\.testProviderAPIKeyVerificationControlOwnsIOSRuntimeActionMapping' \
+  'ProviderAccessRequirementTests\.testProviderAPIKeyFormControlPresentationOwnsIOSVerifyRuntimeActionMapping' \
   'ProviderAccessRequirementTests\.testProviderAPIKeyFormControlPresentationOwnsIOSSaveRuntimeActionMapping'
 
 require_pattern \
@@ -3283,7 +3288,7 @@ require_pattern \
 
 require_pattern \
   "iOS API-key view uses shared progress presentation through form state" \
-  'apiKeyFormState\.(iOSControlPresentation|iOSVisibleResultFeedback)|controlPresentation\.saveRuntimeAction|verificationControl\.(isProgressVisible|runtimeAction|isVerifyButtonDisabled)|iOSVerifiedKeyFeedback|iOSResultFeedback|effectiveSystemImageName' \
+  'apiKeyFormState\.(iOSControlPresentation|iOSVisibleResultFeedback)|controlPresentation\.(saveRuntimeAction|isVerificationProgressVisible|verifyRuntimeAction|isVerifyButtonDisabled)|iOSVerifiedKeyFeedback|iOSResultFeedback|effectiveSystemImageName' \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
 reject_pattern \
@@ -3293,7 +3298,7 @@ reject_pattern \
 
 reject_pattern \
   "iOS API-key view avoids shell-owned verification control branching" \
-  'switch +controlPresentation\.verificationControl|case +\.verifyButton|case +\.progress' \
+  'controlPresentation\.verificationControl\b|switch +controlPresentation\.verificationControl|case +\.verifyButton|case +\.progress' \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
 reject_pattern \

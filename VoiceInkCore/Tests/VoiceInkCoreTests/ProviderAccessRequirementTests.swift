@@ -549,40 +549,31 @@ final class ProviderAccessRequirementTests: XCTestCase {
     }
 
     func testProviderAPIKeyFormStateOwnsIOSControlPresentation() {
-        XCTAssertEqual(
-            VoiceInkProviderAPIKeyFormState(enteredKey: " entered-key ")
-                .iOSControlPresentation(storedRuntimeKey: nil),
-            VoiceInkProviderAPIKeyFormControlPresentation(
-                isSaveButtonDisabled: false,
-                verificationControl: .verifyButton(isDisabled: false)
-            )
-        )
-        XCTAssertEqual(
-            VoiceInkProviderAPIKeyFormState(enteredKey: " \n\t ")
-                .iOSControlPresentation(storedRuntimeKey: "stored-key"),
-            VoiceInkProviderAPIKeyFormControlPresentation(
-                isSaveButtonDisabled: true,
-                verificationControl: .verifyButton(isDisabled: false)
-            )
-        )
-        XCTAssertEqual(
-            VoiceInkProviderAPIKeyFormState(enteredKey: " \n\t ")
-                .iOSControlPresentation(storedRuntimeKey: nil),
-            VoiceInkProviderAPIKeyFormControlPresentation(
-                isSaveButtonDisabled: true,
-                verificationControl: .verifyButton(isDisabled: true)
-            )
-        )
-        XCTAssertEqual(
-            VoiceInkProviderAPIKeyFormState(
-                enteredKey: "entered-key",
-                verificationProgress: .verifying
-            ).iOSControlPresentation(storedRuntimeKey: nil),
-            VoiceInkProviderAPIKeyFormControlPresentation(
-                isSaveButtonDisabled: false,
-                verificationControl: .progress
-            )
-        )
+        let enteredKey = VoiceInkProviderAPIKeyFormState(enteredKey: " entered-key ")
+            .iOSControlPresentation(storedRuntimeKey: nil)
+        XCTAssertFalse(enteredKey.isSaveButtonDisabled)
+        XCTAssertFalse(enteredKey.isVerificationProgressVisible)
+        XCTAssertFalse(enteredKey.isVerifyButtonDisabled)
+
+        let blankStoredKey = VoiceInkProviderAPIKeyFormState(enteredKey: " \n\t ")
+            .iOSControlPresentation(storedRuntimeKey: "stored-key")
+        XCTAssertTrue(blankStoredKey.isSaveButtonDisabled)
+        XCTAssertFalse(blankStoredKey.isVerificationProgressVisible)
+        XCTAssertFalse(blankStoredKey.isVerifyButtonDisabled)
+
+        let blankMissingStoredKey = VoiceInkProviderAPIKeyFormState(enteredKey: " \n\t ")
+            .iOSControlPresentation(storedRuntimeKey: nil)
+        XCTAssertTrue(blankMissingStoredKey.isSaveButtonDisabled)
+        XCTAssertFalse(blankMissingStoredKey.isVerificationProgressVisible)
+        XCTAssertTrue(blankMissingStoredKey.isVerifyButtonDisabled)
+
+        let verifying = VoiceInkProviderAPIKeyFormState(
+            enteredKey: "entered-key",
+            verificationProgress: .verifying
+        ).iOSControlPresentation(storedRuntimeKey: nil)
+        XCTAssertFalse(verifying.isSaveButtonDisabled)
+        XCTAssertTrue(verifying.isVerificationProgressVisible)
+        XCTAssertTrue(verifying.isVerifyButtonDisabled)
     }
 
     func testProviderAPIKeyFormStateOwnsMacOSCardControlPresentation() {
@@ -641,43 +632,48 @@ final class ProviderAccessRequirementTests: XCTestCase {
         )
     }
 
-    func testProviderAPIKeyVerificationControlOwnsIOSRuntimeActionMapping() {
+    func testProviderAPIKeyFormControlPresentationOwnsIOSVerifyRuntimeActionMapping() {
+        let enabledControl = VoiceInkProviderAPIKeyFormState(enteredKey: "entered-key")
+            .iOSControlPresentation(storedRuntimeKey: nil)
         var didVerify = false
-        let enabledAction = VoiceInkProviderAPIKeyVerificationControl.verifyButton(
-            isDisabled: false
-        ).runtimeAction {
+        let enabledAction = enabledControl.verifyRuntimeAction {
             didVerify = true
         }
 
         XCTAssertTrue(enabledAction != nil)
         enabledAction?()
         XCTAssertTrue(didVerify)
-        XCTAssertFalse(VoiceInkProviderAPIKeyVerificationControl.verifyButton(isDisabled: false).isProgressVisible)
-        XCTAssertFalse(VoiceInkProviderAPIKeyVerificationControl.verifyButton(isDisabled: false).isVerifyButtonDisabled)
-        XCTAssertTrue(VoiceInkProviderAPIKeyVerificationControl.verifyButton(isDisabled: true).isVerifyButtonDisabled)
-        XCTAssertNil(VoiceInkProviderAPIKeyVerificationControl.verifyButton(isDisabled: true).runtimeAction {})
-        XCTAssertTrue(VoiceInkProviderAPIKeyVerificationControl.progress.isProgressVisible)
-        XCTAssertTrue(VoiceInkProviderAPIKeyVerificationControl.progress.isVerifyButtonDisabled)
-        XCTAssertNil(VoiceInkProviderAPIKeyVerificationControl.progress.runtimeAction {})
+
+        let disabledControl = VoiceInkProviderAPIKeyFormState(enteredKey: "")
+            .iOSControlPresentation(storedRuntimeKey: nil)
+        XCTAssertFalse(disabledControl.isVerificationProgressVisible)
+        XCTAssertTrue(disabledControl.isVerifyButtonDisabled)
+        XCTAssertNil(disabledControl.verifyRuntimeAction {})
+
+        let progressControl = VoiceInkProviderAPIKeyFormState(
+            enteredKey: "entered-key",
+            verificationProgress: .verifying
+        ).iOSControlPresentation(storedRuntimeKey: nil)
+        XCTAssertTrue(progressControl.isVerificationProgressVisible)
+        XCTAssertTrue(progressControl.isVerifyButtonDisabled)
+        XCTAssertNil(progressControl.verifyRuntimeAction {})
     }
 
     func testProviderAPIKeyFormControlPresentationOwnsIOSSaveRuntimeActionMapping() {
         var didSave = false
 
-        let saveAction = VoiceInkProviderAPIKeyFormControlPresentation(
-            isSaveButtonDisabled: false,
-            verificationControl: .verifyButton(isDisabled: true)
-        ).saveRuntimeAction {
+        let saveAction = VoiceInkProviderAPIKeyFormState(enteredKey: "entered-key")
+            .iOSControlPresentation(storedRuntimeKey: nil)
+            .saveRuntimeAction {
             didSave = true
         }
 
         XCTAssertTrue(saveAction != nil)
         saveAction?()
         XCTAssertTrue(didSave)
-        XCTAssertNil(VoiceInkProviderAPIKeyFormControlPresentation(
-            isSaveButtonDisabled: true,
-            verificationControl: .verifyButton(isDisabled: false)
-        ).saveRuntimeAction {})
+        XCTAssertNil(VoiceInkProviderAPIKeyFormState(enteredKey: "")
+            .iOSControlPresentation(storedRuntimeKey: nil)
+            .saveRuntimeAction {})
     }
 
     func testProviderAPIKeyFormPresentationBuildsProviderCopy() {

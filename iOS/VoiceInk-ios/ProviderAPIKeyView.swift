@@ -30,17 +30,17 @@ struct ProviderAPIKeyView: View {
                         }
                         .disabled(saveAction == nil)
                         Spacer()
-                        if controlPresentation.verificationControl.isProgressVisible {
+                        if controlPresentation.isVerificationProgressVisible {
                             ProgressView().progressViewStyle(.circular)
                         } else {
-                            let verifyAction = controlPresentation.verificationControl.runtimeAction(verify: verifyKey)
+                            let verifyAction = controlPresentation.verifyRuntimeAction(verify: verifyKey)
                             Button(action: verifyAction ?? {}) {
                                 Label(
                                     presentation.verifyButtonTitle,
                                     systemImage: presentation.verifyButtonSystemImageName
                                 )
                             }
-                            .disabled(controlPresentation.verificationControl.isVerifyButtonDisabled)
+                            .disabled(controlPresentation.isVerifyButtonDisabled)
                         }
                     }
                 } else {

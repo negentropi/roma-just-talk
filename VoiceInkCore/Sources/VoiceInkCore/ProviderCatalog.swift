@@ -284,11 +284,11 @@ public extension VoiceInkProviderAPIKeyVerificationApplicationPlan {
     }
 }
 
-public enum VoiceInkProviderAPIKeyVerificationControl: Equatable, Sendable {
+enum VoiceInkProviderAPIKeyVerificationControl: Equatable, Sendable {
     case progress
     case verifyButton(isDisabled: Bool)
 
-    public var isProgressVisible: Bool {
+    var isProgressVisible: Bool {
         switch self {
         case .progress:
             return true
@@ -297,7 +297,7 @@ public enum VoiceInkProviderAPIKeyVerificationControl: Equatable, Sendable {
         }
     }
 
-    public var isVerifyButtonDisabled: Bool {
+    var isVerifyButtonDisabled: Bool {
         switch self {
         case .progress:
             return true
@@ -306,7 +306,7 @@ public enum VoiceInkProviderAPIKeyVerificationControl: Equatable, Sendable {
         }
     }
 
-    public func runtimeAction(
+    func runtimeAction(
         verify: @escaping () -> Void
     ) -> (() -> Void)? {
         switch self {
@@ -320,14 +320,28 @@ public enum VoiceInkProviderAPIKeyVerificationControl: Equatable, Sendable {
 
 public struct VoiceInkProviderAPIKeyFormControlPresentation: Equatable, Sendable {
     public let isSaveButtonDisabled: Bool
-    public let verificationControl: VoiceInkProviderAPIKeyVerificationControl
+    let verificationControl: VoiceInkProviderAPIKeyVerificationControl
 
-    public init(
+    init(
         isSaveButtonDisabled: Bool,
         verificationControl: VoiceInkProviderAPIKeyVerificationControl
     ) {
         self.isSaveButtonDisabled = isSaveButtonDisabled
         self.verificationControl = verificationControl
+    }
+
+    public var isVerificationProgressVisible: Bool {
+        verificationControl.isProgressVisible
+    }
+
+    public var isVerifyButtonDisabled: Bool {
+        verificationControl.isVerifyButtonDisabled
+    }
+
+    public func verifyRuntimeAction(
+        verify: @escaping () -> Void
+    ) -> (() -> Void)? {
+        verificationControl.runtimeAction(verify: verify)
     }
 
     public func saveRuntimeAction(

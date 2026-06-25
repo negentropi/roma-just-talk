@@ -13,12 +13,35 @@ public struct VoiceInkModeRuntimeConfiguration: Equatable, Sendable {
     }
 }
 
-public enum VoiceInkModeSelectionPresentation: Equatable, Sendable {
-    case hidden
-    case singleModeName(String)
-    case picker
+public struct VoiceInkModeSelectionPresentation: Equatable, Sendable {
+    enum Kind: Equatable, Sendable {
+        case hidden
+        case singleModeName(String)
+        case picker
+    }
 
+    let kind: Kind
     public static let controlTitle = "Mode"
+
+    init(kind: Kind) {
+        self.kind = kind
+    }
+
+    public var shouldShowControl: Bool {
+        kind != .hidden
+    }
+
+    public var shouldShowPicker: Bool {
+        kind == .picker
+    }
+
+    public var singleModeName: String? {
+        guard case .singleModeName(let name) = kind else {
+            return nil
+        }
+
+        return name
+    }
 }
 
 public struct VoiceInkModeSummaryPresentation: Equatable, Sendable {
@@ -582,13 +605,13 @@ public extension Collection where Element == Mode {
 
     var modeSelectionPresentation: VoiceInkModeSelectionPresentation {
         if count > 1 {
-            return .picker
+            return VoiceInkModeSelectionPresentation(kind: .picker)
         }
 
         guard let mode = first else {
-            return .hidden
+            return VoiceInkModeSelectionPresentation(kind: .hidden)
         }
 
-        return .singleModeName(mode.name)
+        return VoiceInkModeSelectionPresentation(kind: .singleModeName(mode.name))
     }
 }

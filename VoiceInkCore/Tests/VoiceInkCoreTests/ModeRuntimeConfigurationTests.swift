@@ -471,20 +471,30 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
     }
 
     func testModeSelectionPresentationHidesEmptyModeLists() {
-        XCTAssertEqual([Mode]().modeSelectionPresentation, .hidden)
+        let presentation = [Mode]().modeSelectionPresentation
+
+        XCTAssertFalse(presentation.shouldShowControl)
+        XCTAssertFalse(presentation.shouldShowPicker)
+        XCTAssertNil(presentation.singleModeName)
     }
 
     func testModeSelectionPresentationShowsSingleModeName() {
         let mode = Mode.defaultLocalWhisper(name: "Local")
+        let presentation = [mode].modeSelectionPresentation
 
-        XCTAssertEqual([mode].modeSelectionPresentation, .singleModeName("Local"))
+        XCTAssertTrue(presentation.shouldShowControl)
+        XCTAssertFalse(presentation.shouldShowPicker)
+        XCTAssertEqual(presentation.singleModeName, "Local")
     }
 
     func testModeSelectionPresentationUsesPickerForMultipleModes() {
         let local = Mode.defaultLocalWhisper(name: "Local")
         let cloud = Mode(name: "Cloud")
+        let presentation = [local, cloud].modeSelectionPresentation
 
-        XCTAssertEqual([local, cloud].modeSelectionPresentation, .picker)
+        XCTAssertTrue(presentation.shouldShowControl)
+        XCTAssertTrue(presentation.shouldShowPicker)
+        XCTAssertNil(presentation.singleModeName)
     }
 
     func testModeSelectionPresentationPreservesIOSControlTitle() {

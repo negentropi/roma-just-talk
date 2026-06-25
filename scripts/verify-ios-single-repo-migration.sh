@@ -1402,7 +1402,12 @@ require_pattern \
 
 require_pattern \
   "shared mode selection presentation lives in VoiceInkCore" \
-  'VoiceInkModeSelectionPresentation|controlTitle' \
+  'VoiceInkModeSelectionPresentation|controlTitle|shouldShowControl|shouldShowPicker|singleModeName' \
+  VoiceInkCore/Sources/VoiceInkCore/Mode.swift
+
+reject_pattern \
+  "shared mode selection presentation avoids public raw presentation cases" \
+  'public enum VoiceInkModeSelectionPresentation\b' \
   VoiceInkCore/Sources/VoiceInkCore/Mode.swift
 
 require_pattern \
@@ -1472,7 +1477,12 @@ require_pattern \
 
 require_pattern \
   "iOS mode selection adapter delegates picker-vs-label policy to shared core" \
-  'modeSelectionPresentation' \
+  'modeSelectionPresentation|shouldShowControl|shouldShowPicker|singleModeName' \
+  iOS/VoiceInk-ios/RecordingSheetView.swift
+
+reject_pattern \
+  "iOS mode selection adapter avoids direct presentation case switching" \
+  'switch +presentation|case \.(hidden|picker|singleModeName)' \
   iOS/VoiceInk-ios/RecordingSheetView.swift
 
 reject_pattern \

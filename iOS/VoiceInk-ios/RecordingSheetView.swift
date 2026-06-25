@@ -71,10 +71,7 @@ struct VoiceInkModeSelectionControlView: View {
     var body: some View {
         let presentation = modes.modeSelectionPresentation
 
-        switch presentation {
-        case .hidden:
-            EmptyView()
-        case .picker, .singleModeName(_):
+        if presentation.shouldShowControl {
             VStack(spacing: 8) {
                 if showsTitle {
                     Text(VoiceInkModeSelectionPresentation.controlTitle)
@@ -89,10 +86,7 @@ struct VoiceInkModeSelectionControlView: View {
 
     @ViewBuilder
     private func selectionControl(for presentation: VoiceInkModeSelectionPresentation) -> some View {
-        switch presentation {
-        case .hidden:
-            EmptyView()
-        case .picker:
+        if presentation.shouldShowPicker {
             Picker(VoiceInkModeSelectionPresentation.controlTitle, selection: $selectedModeId) {
                 ForEach(modes) { mode in
                     Text(mode.name).tag(mode.id as UUID?)
@@ -100,7 +94,7 @@ struct VoiceInkModeSelectionControlView: View {
             }
             .pickerStyle(.wheel)
             .frame(height: 80)
-        case .singleModeName(let name):
+        } else if let name = presentation.singleModeName {
             Text(name)
                 .font(.title2.bold())
                 .foregroundStyle(.primary)

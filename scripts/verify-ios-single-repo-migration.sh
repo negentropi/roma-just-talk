@@ -3206,7 +3206,12 @@ require_pattern \
 
 require_pattern \
   "shared provider API-key verification persistence action plan lives in VoiceInkCore" \
-  'VoiceInkProviderAPIKeyVerificationPersistenceAction|VoiceInkProviderAPIKeyVerificationPersistenceApplicationPlan|successPersistenceApplicationPlan' \
+  'VoiceInkProviderAPIKeyVerificationPersistenceApplicationPlan|successPersistenceApplicationPlan|applyRuntimeState' \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
+
+reject_pattern \
+  "shared provider API-key verification persistence plan avoids public raw action payloads" \
+  'public enum VoiceInkProviderAPIKeyVerificationPersistenceAction|public let actions: \[VoiceInkProviderAPIKeyVerificationPersistenceAction\]|public init\(actions: \[VoiceInkProviderAPIKeyVerificationPersistenceAction\]\)' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
 
 require_pattern \
@@ -3306,7 +3311,7 @@ require_pattern \
 
 require_pattern \
   "core checks execute provider API-key verification persistence action plan test" \
-  'ProviderAccessRequirementTests\.testProviderAPIKeyVerificationApplicationPlanBuildsOrderedPersistenceActions' \
+  'ProviderAccessRequirementTests\.testProviderAPIKeyVerificationApplicationPlanAppliesOrderedPersistenceRuntimeState' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -3457,18 +3462,13 @@ require_pattern \
 
 require_pattern \
   "shared provider API-key state mutation plans live in VoiceInkCore" \
-  'VoiceInkProviderAPIKeyStorageMutationPlan|VoiceInkProviderAPIKeyVerificationMutationPlan|VoiceInkProviderAPIKeyStatePersistenceAction|VoiceInkProviderAPIKeyStateUpdatePlan|applyStoredAPIKey|applyVerification|applyingStoredAPIKey|applyingVerification|persistenceActions|applyRuntimeState|applyPersistenceActions|verificationFlagToPersist|shouldPersistVerificationFlag' \
+  'VoiceInkProviderAPIKeyStorageMutationPlan|VoiceInkProviderAPIKeyVerificationMutationPlan|VoiceInkProviderAPIKeyStateUpdatePlan|applyStoredAPIKey|applyVerification|applyingStoredAPIKey|applyingVerification|applyRuntimeState|verificationFlagToPersist|shouldPersistVerificationFlag' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift
 
 reject_pattern \
   "shared provider API-key state update plan hides raw runtime payload fields" \
-  'public let state: VoiceInkProviderAPIKeyState|public let persistenceActions: \[VoiceInkProviderAPIKeyStatePersistenceAction\]' \
+  'public let state: VoiceInkProviderAPIKeyState|public let persistenceActions: \[VoiceInkProviderAPIKeyStatePersistenceAction\]|public enum VoiceInkProviderAPIKeyStatePersistenceAction|public func persistenceActions' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift
-
-require_pattern \
-  "core checks execute provider API-key state persistence action tests" \
-  'ProviderAccessRequirementTests\.testProviderAPIKeyState(Storage|Verification)MutationPlanBuildsPersistenceActions' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_patterns \
   "core checks execute provider API-key state update plan tests" \

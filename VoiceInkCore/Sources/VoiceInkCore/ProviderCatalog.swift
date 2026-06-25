@@ -230,15 +230,15 @@ public struct VoiceInkProviderAPIKeyVerificationPersistencePlan: Equatable, Send
     }
 }
 
-public enum VoiceInkProviderAPIKeyVerificationPersistenceAction: Equatable, Sendable {
+fileprivate enum VoiceInkProviderAPIKeyVerificationPersistenceAction: Equatable, Sendable {
     case saveKey(String)
     case persistVerificationFlag(Bool)
 }
 
 public struct VoiceInkProviderAPIKeyVerificationPersistenceApplicationPlan: Equatable, Sendable {
-    public let actions: [VoiceInkProviderAPIKeyVerificationPersistenceAction]
+    fileprivate let actions: [VoiceInkProviderAPIKeyVerificationPersistenceAction]
 
-    public init(actions: [VoiceInkProviderAPIKeyVerificationPersistenceAction]) {
+    fileprivate init(actions: [VoiceInkProviderAPIKeyVerificationPersistenceAction]) {
         self.actions = actions
     }
 }
@@ -254,19 +254,31 @@ public extension VoiceInkProviderAPIKeyVerificationPersistencePlan {
     }
 }
 
-public extension VoiceInkProviderAPIKeyVerificationPersistenceApplicationPlan {
-    func applySuccessPersistence(
-        saveKey: (String) -> Void
-    ) -> Bool {
-        var verificationFlagToPersist = false
+extension VoiceInkProviderAPIKeyVerificationPersistenceApplicationPlan {
+    func applyRuntimeState(
+        saveKey: (String) -> Void,
+        persistVerificationFlag: (Bool) -> Void
+    ) {
         for action in actions {
             switch action {
             case .saveKey(let key):
                 saveKey(key)
             case .persistVerificationFlag(let flag):
-                verificationFlagToPersist = flag
+                persistVerificationFlag(flag)
             }
         }
+    }
+}
+
+public extension VoiceInkProviderAPIKeyVerificationPersistenceApplicationPlan {
+    func applySuccessPersistence(
+        saveKey: (String) -> Void
+    ) -> Bool {
+        var verificationFlagToPersist = false
+        applyRuntimeState(
+            saveKey: saveKey,
+            persistVerificationFlag: { verificationFlagToPersist = $0 }
+        )
 
         return verificationFlagToPersist
     }

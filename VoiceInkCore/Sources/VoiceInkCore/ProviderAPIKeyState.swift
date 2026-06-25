@@ -39,7 +39,7 @@ public struct VoiceInkProviderAPIKeyStorageMutationPlan: Equatable, Sendable {
     }
 }
 
-public enum VoiceInkProviderAPIKeyStatePersistenceAction: Equatable, Sendable {
+fileprivate enum VoiceInkProviderAPIKeyStatePersistenceAction: Equatable, Sendable {
     case persistStoredKey(String)
     case persistVerificationFlag(Bool)
 }
@@ -76,7 +76,7 @@ public extension VoiceInkProviderAPIKeyStateUpdatePlan {
         )
     }
 
-    func applyPersistenceActions(
+    private func applyPersistenceActions(
         persistStoredKey: (String) -> Void,
         persistVerificationFlag: (Bool) -> Void
     ) {
@@ -91,7 +91,7 @@ public extension VoiceInkProviderAPIKeyStateUpdatePlan {
     }
 }
 
-public extension VoiceInkProviderAPIKeyStorageMutationPlan {
+fileprivate extension VoiceInkProviderAPIKeyStorageMutationPlan {
     func persistenceActions(storedKey: String) -> [VoiceInkProviderAPIKeyStatePersistenceAction] {
         guard shouldPersistStoredKey else { return [] }
 
@@ -113,7 +113,7 @@ public struct VoiceInkProviderAPIKeyVerificationMutationPlan: Equatable, Sendabl
     }
 }
 
-public extension VoiceInkProviderAPIKeyVerificationMutationPlan {
+fileprivate extension VoiceInkProviderAPIKeyVerificationMutationPlan {
     func persistenceActions(verificationFlag: Bool) -> [VoiceInkProviderAPIKeyStatePersistenceAction] {
         guard shouldPersistVerificationFlag else { return [] }
         return [.persistVerificationFlag(verificationFlag)]
@@ -312,16 +312,16 @@ public extension VoiceInkProviderAPIKeyState {
 
         var updatedState = self
         var persistenceActions: [VoiceInkProviderAPIKeyStatePersistenceAction] = []
-        for action in persistenceApplicationPlan.actions {
-            switch action {
-            case .saveKey(let key):
+        persistenceApplicationPlan.applyRuntimeState(
+            saveKey: { key in
                 let mutationPlan = updatedState.applyStoredAPIKey(key, for: provider)
                 persistenceActions.append(contentsOf: mutationPlan.persistenceActions(storedKey: key))
-            case .persistVerificationFlag(let flag):
+            },
+            persistVerificationFlag: { flag in
                 let mutationPlan = updatedState.applyVerification(flag, for: provider)
                 persistenceActions.append(contentsOf: mutationPlan.persistenceActions(verificationFlag: flag))
             }
-        }
+        )
 
         return VoiceInkProviderAPIKeyStateUpdatePlan(
             state: updatedState,

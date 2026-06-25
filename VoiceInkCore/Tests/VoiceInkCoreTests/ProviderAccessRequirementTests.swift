@@ -199,7 +199,7 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertNil(failurePlan.successPersistencePlan)
     }
 
-    func testProviderAPIKeyVerificationApplicationPlanBuildsOrderedPersistenceActions() {
+    func testProviderAPIKeyVerificationApplicationPlanAppliesOrderedPersistenceRuntimeState() {
         let enteredKeySuccessPlan = VoiceInkProviderAPIKeyVerificationApplicationPlan(
             progress: .success,
             keyToSave: "entered-key",
@@ -216,19 +216,20 @@ final class ProviderAccessRequirementTests: XCTestCase {
             shouldMarkKeyVerified: false
         )
 
-        XCTAssertEqual(
-            enteredKeySuccessPlan.successPersistenceApplicationPlan,
-            VoiceInkProviderAPIKeyVerificationPersistenceApplicationPlan(actions: [
-                .saveKey("entered-key"),
-                .persistVerificationFlag(true)
-            ])
+        var events: [String] = []
+        enteredKeySuccessPlan.successPersistenceApplicationPlan?.applyRuntimeState(
+            saveKey: { events.append("key:\($0)") },
+            persistVerificationFlag: { events.append("verified:\($0)") }
         )
-        XCTAssertEqual(
-            storedKeySuccessPlan.successPersistenceApplicationPlan,
-            VoiceInkProviderAPIKeyVerificationPersistenceApplicationPlan(actions: [
-                .persistVerificationFlag(true)
-            ])
+        XCTAssertEqual(events, ["key:entered-key", "verified:true"])
+
+        events = []
+        storedKeySuccessPlan.successPersistenceApplicationPlan?.applyRuntimeState(
+            saveKey: { events.append("key:\($0)") },
+            persistVerificationFlag: { events.append("verified:\($0)") }
         )
+        XCTAssertEqual(events, ["verified:true"])
+
         XCTAssertNil(failurePlan.successPersistenceApplicationPlan)
     }
 
@@ -936,54 +937,6 @@ final class ProviderAccessRequirementTests: XCTestCase {
             VoiceInkProviderAPIKeyVerificationMutationPlan(shouldPersistVerificationFlag: true)
         )
         XCTAssertFalse(state.isReady(for: .groq, localWhisperModelAvailable: false))
-    }
-
-    func testProviderAPIKeyStateStorageMutationPlanBuildsPersistenceActions() {
-        XCTAssertEqual(
-            VoiceInkProviderAPIKeyStorageMutationPlan(
-                shouldPersistStoredKey: true,
-                verificationFlagToPersist: nil
-            ).persistenceActions(storedKey: "same-key"),
-            [.persistStoredKey("same-key")]
-        )
-        XCTAssertEqual(
-            VoiceInkProviderAPIKeyStorageMutationPlan(
-                shouldPersistStoredKey: true,
-                verificationFlagToPersist: false
-            ).persistenceActions(storedKey: "new-key"),
-            [
-                .persistStoredKey("new-key"),
-                .persistVerificationFlag(false)
-            ]
-        )
-        XCTAssertEqual(
-            VoiceInkProviderAPIKeyStorageMutationPlan(
-                shouldPersistStoredKey: false,
-                verificationFlagToPersist: nil
-            ).persistenceActions(storedKey: "ignored"),
-            []
-        )
-    }
-
-    func testProviderAPIKeyStateVerificationMutationPlanBuildsPersistenceActions() {
-        XCTAssertEqual(
-            VoiceInkProviderAPIKeyVerificationMutationPlan(
-                shouldPersistVerificationFlag: true
-            ).persistenceActions(verificationFlag: true),
-            [.persistVerificationFlag(true)]
-        )
-        XCTAssertEqual(
-            VoiceInkProviderAPIKeyVerificationMutationPlan(
-                shouldPersistVerificationFlag: true
-            ).persistenceActions(verificationFlag: false),
-            [.persistVerificationFlag(false)]
-        )
-        XCTAssertEqual(
-            VoiceInkProviderAPIKeyVerificationMutationPlan(
-                shouldPersistVerificationFlag: false
-            ).persistenceActions(verificationFlag: true),
-            []
-        )
     }
 
     func testProviderAPIKeyStateBuildsStoredKeyUpdatePlan() {

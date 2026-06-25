@@ -87,24 +87,6 @@ public enum VoiceInkAudioPlaybackTimerTickAction: Equatable, Sendable {
     case none
     case markStopped
     case markStoppedAndSeek(TimeInterval)
-
-    public var shouldStopTimer: Bool {
-        switch self {
-        case .none:
-            return false
-        case .markStopped, .markStoppedAndSeek:
-            return true
-        }
-    }
-
-    public var playerSeekTime: TimeInterval? {
-        switch self {
-        case .none, .markStopped:
-            return nil
-        case .markStoppedAndSeek(let seekTime):
-            return seekTime
-        }
-    }
 }
 
 public struct VoiceInkAudioPlaybackTimerTickPlan: Equatable, Sendable {
@@ -119,23 +101,17 @@ public struct VoiceInkAudioPlaybackTimerTickPlan: Equatable, Sendable {
         self.action = action
     }
 
-    public var shouldStopTimer: Bool {
-        action.shouldStopTimer
-    }
-
-    public var playerSeekTime: TimeInterval? {
-        action.playerSeekTime
-    }
-
     public func applyRuntimeState(
         seekPlayer: (TimeInterval) -> Void,
         stopTimer: () -> Void
     ) {
-        if let seekTime = playerSeekTime {
+        switch action {
+        case .none:
+            break
+        case .markStopped:
+            stopTimer()
+        case .markStoppedAndSeek(let seekTime):
             seekPlayer(seekTime)
-        }
-
-        if shouldStopTimer {
             stopTimer()
         }
     }

@@ -11312,7 +11312,12 @@ require_pattern \
 
 require_pattern \
   "shared audio player tick plan owns shell side-effect ordering" \
-  'shouldStopTimer|playerSeekTime|applyRuntimeState' \
+  'VoiceInkAudioPlaybackTimerTickPlan|VoiceInkAudioPlaybackTimerTickAction|applyRuntimeState' \
+  VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
+
+reject_pattern \
+  "shared audio player tick plan avoids shallow public side-effect hints" \
+  'shouldStopTimer|playerSeekTime' \
   VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
 
 require_pattern \
@@ -11342,7 +11347,7 @@ require_pattern \
 
 require_pattern \
   "core checks execute audio player timer tick side-effect tests" \
-  'AudioPlaybackTimelineTests\.testTimerTickPlanExposesShellSideEffectHints|AudioPlaybackTimelineTests\.testPlaybackStateAppliesTimerTickPlanActions' \
+  'AudioPlaybackTimelineTests\.testPlaybackStateAppliesTimerTickPlanActions' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \

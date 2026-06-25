@@ -111,29 +111,6 @@ final class AudioPlaybackTimelineTests: XCTestCase {
         )
     }
 
-    func testTimerTickPlanExposesShellSideEffectHints() {
-        XCTAssertEqual(
-            VoiceInkAudioPlaybackTimerTickPlan(currentTime: 4, action: .none).shouldStopTimer,
-            false
-        )
-        XCTAssertNil(VoiceInkAudioPlaybackTimerTickPlan(currentTime: 4, action: .none).playerSeekTime)
-
-        XCTAssertEqual(
-            VoiceInkAudioPlaybackTimerTickPlan(currentTime: 9.5, action: .markStopped).shouldStopTimer,
-            true
-        )
-        XCTAssertNil(VoiceInkAudioPlaybackTimerTickPlan(currentTime: 9.5, action: .markStopped).playerSeekTime)
-
-        XCTAssertEqual(
-            VoiceInkAudioPlaybackTimerTickPlan(currentTime: 10, action: .markStoppedAndSeek(0)).shouldStopTimer,
-            true
-        )
-        XCTAssertEqual(
-            VoiceInkAudioPlaybackTimerTickPlan(currentTime: 10, action: .markStoppedAndSeek(0)).playerSeekTime,
-            0
-        )
-    }
-
     func testTimerTickPlanAppliesRuntimeStateInOrder() {
         var events: [String] = []
 

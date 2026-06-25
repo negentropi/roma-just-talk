@@ -315,7 +315,6 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testSampleProgressUsesStableWaveformPosition", run: { AudioPlaybackTimelineTests().testSampleProgressUsesStableWaveformPosition() }),
             VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testTimelineUpdateIntervalPreservesPlatformAudioPlayerCadence", run: { AudioPlaybackTimelineTests().testTimelineUpdateIntervalPreservesPlatformAudioPlayerCadence() }),
             VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testTimerTickPlanPreservesPlatformCompletionBehavior", run: { AudioPlaybackTimelineTests().testTimerTickPlanPreservesPlatformCompletionBehavior() }),
-            VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testTimerTickPlanExposesShellSideEffectHints", run: { AudioPlaybackTimelineTests().testTimerTickPlanExposesShellSideEffectHints() }),
             VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testTimerTickPlanAppliesRuntimeStateInOrder", run: { AudioPlaybackTimelineTests().testTimerTickPlanAppliesRuntimeStateInOrder() }),
             VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testPlaybackStateLoadPreservesPlatformResetBehavior", run: { AudioPlaybackTimelineTests().testPlaybackStateLoadPreservesPlatformResetBehavior() }),
             VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testPlaybackStatePlansPlayPauseStopAndTickUpdates", run: { AudioPlaybackTimelineTests().testPlaybackStatePlansPlayPauseStopAndTickUpdates() }),

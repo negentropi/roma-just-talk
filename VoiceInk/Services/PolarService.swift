@@ -58,15 +58,15 @@ class PolarService {
 
         if let httpResponse = httpResponse as? HTTPURLResponse {
             if let error = VoiceInkLicenseServicePolicy.error(forHTTPStatusCode: httpResponse.statusCode, operation: .validation) {
-                let errorMsg = String(data: data, encoding: .utf8) ?? "Unknown error"
+                let errorMsg = VoiceInkLicenseServicePolicy.errorResponseText(data: data)
                 logger.error("🔑 License validation failed [HTTP \(httpResponse.statusCode)]: \(errorMsg, privacy: .public)")
                 throw error
             }
         }
 
         // Log successful response
-        let rawResponse = String(data: data, encoding: .utf8) ?? "Unable to decode response"
-        let statusCode = (httpResponse as? HTTPURLResponse)?.statusCode ?? 0
+        let rawResponse = VoiceInkLicenseServicePolicy.successResponseText(data: data)
+        let statusCode = VoiceInkLicenseServicePolicy.httpStatusCode(from: httpResponse)
         logger.notice("🔑 License validation success [HTTP \(statusCode)]: \(rawResponse, privacy: .public)")
         
         let validationResponse = try JSONDecoder().decode(VoiceInkLicenseValidationResponse.self, from: data)
@@ -97,15 +97,15 @@ class PolarService {
         
         if let httpResponse = httpResponse as? HTTPURLResponse {
             if let error = VoiceInkLicenseServicePolicy.error(forHTTPStatusCode: httpResponse.statusCode, operation: .activation) {
-                let errorMsg = String(data: data, encoding: .utf8) ?? "Unknown error"
+                let errorMsg = VoiceInkLicenseServicePolicy.errorResponseText(data: data)
                 logger.error("🔑 License activation failed [HTTP \(httpResponse.statusCode)]: \(errorMsg, privacy: .public)")
                 throw error
             }
         }
         
         // Log successful response
-        let rawResponse = String(data: data, encoding: .utf8) ?? "Unable to decode response"
-        let statusCode = (httpResponse as? HTTPURLResponse)?.statusCode ?? 0
+        let rawResponse = VoiceInkLicenseServicePolicy.successResponseText(data: data)
+        let statusCode = VoiceInkLicenseServicePolicy.httpStatusCode(from: httpResponse)
         logger.notice("🔑 License activation success [HTTP \(statusCode)]: \(rawResponse, privacy: .public)")
         
         let activationResult = try JSONDecoder().decode(VoiceInkLicenseActivationResult.self, from: data)
@@ -128,15 +128,15 @@ class PolarService {
         
         if let httpResponse = httpResponse as? HTTPURLResponse {
             if let error = VoiceInkLicenseServicePolicy.error(forHTTPStatusCode: httpResponse.statusCode, operation: .validation) {
-                let errorMsg = String(data: data, encoding: .utf8) ?? "Unknown error"
+                let errorMsg = VoiceInkLicenseServicePolicy.errorResponseText(data: data)
                 logger.error("🔑 License validation with activation failed [HTTP \(httpResponse.statusCode)]: \(errorMsg, privacy: .public)")
                 throw error
             }
         }
 
         // Log successful response
-        let rawResponse = String(data: data, encoding: .utf8) ?? "Unable to decode response"
-        let statusCode = (httpResponse as? HTTPURLResponse)?.statusCode ?? 0
+        let rawResponse = VoiceInkLicenseServicePolicy.successResponseText(data: data)
+        let statusCode = VoiceInkLicenseServicePolicy.httpStatusCode(from: httpResponse)
         logger.notice("🔑 License validation with activation success [HTTP \(statusCode)]: \(rawResponse, privacy: .public)")
         
         let validationResponse = try JSONDecoder().decode(VoiceInkLicenseValidationResponse.self, from: data)

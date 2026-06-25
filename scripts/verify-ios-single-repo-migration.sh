@@ -16395,8 +16395,15 @@ reject_pattern \
 
 require_pattern \
   "macOS Polar adapter uses shared license service policy" \
-  'VoiceInkLicenseServicePolicy\.(requestURL|validationRequestBody|activationRequestBody|error)|VoiceInkLicensePreference\.deviceIdentifier|VoiceInkLicenseValidationResponse|VoiceInkLicenseActivationResult' \
+  'VoiceInkLicenseServicePolicy\.(requestURL|validationRequestBody|activationRequestBody|error|errorResponseText|successResponseText|httpStatusCode)|VoiceInkLicensePreference\.deviceIdentifier|VoiceInkLicenseValidationResponse|VoiceInkLicenseActivationResult' \
   VoiceInk/Services/PolarService.swift
+
+require_patterns \
+  "macOS Polar adapter uses shared license response text policy" \
+  VoiceInk/Services/PolarService.swift \
+  'VoiceInkLicenseServicePolicy\.errorResponseText\(data: data\)' \
+  'VoiceInkLicenseServicePolicy\.successResponseText\(data: data\)' \
+  'VoiceInkLicenseServicePolicy\.httpStatusCode\(from: httpResponse\)'
 
 require_pattern \
   "macOS license manager uses shared secure license storage policy" \
@@ -16520,12 +16527,12 @@ require_pattern \
 
 require_pattern \
   "core checks execute license preference tests" \
-  'LicensePolicyTests\.testLicensePreferenceKeysPreserveExistingStorageNames|LicensePolicyTests\.testLicenseStatusChangeRequestPreservesMacOSNotificationName|LicensePolicyTests\.testLicensePreferenceStorageRoundTripsNonSensitiveFlags|LicensePolicyTests\.testDeviceIdentifierCreatesAndStoresFallbackWhenMissing|LicensePolicyTests\.testStoredLicenseAccessPreservesExistingActivationRequirementPolicy|LicensePolicyTests\.testLicenseStartupPolicyPlansStoredLicenseAndTrialLifecycle|LicensePolicyTests\.testLicenseValidationPolicyPreservesMacOSFeedbackMessages|LicensePolicyTests\.testLicenseValidationApplicationPlansPreserveMacOSStorageWritesAndSuccessCopy|LicensePolicyTests\.testLicenseLinksPreservePurchaseAndManagementDestinations|LicensePolicyTests\.testLicenseManagementPresentationPreservesMacOSCopyAndResources|LicensePolicyTests\.testLicenseTrialBannerPresentationPreservesMacOSCopyAndThreshold|LicensePolicyTests\.testLicenseRemovalPolicyPreservesMacOSResetPlan|LicensePolicyTests\.testLicenseSecureStoragePolicyPreservesDeviceLocalAccountsAndTrialDateCodec|LicensePolicyTests\.testLicenseServicePolicyPreservesPolarEndpointsAndHeaders|LicensePolicyTests\.testLicenseHTTPStatusPolicyPreservesMacOSErrorMapping' \
+  'LicensePolicyTests\.testLicensePreferenceKeysPreserveExistingStorageNames|LicensePolicyTests\.testLicenseStatusChangeRequestPreservesMacOSNotificationName|LicensePolicyTests\.testLicensePreferenceStorageRoundTripsNonSensitiveFlags|LicensePolicyTests\.testDeviceIdentifierCreatesAndStoresFallbackWhenMissing|LicensePolicyTests\.testStoredLicenseAccessPreservesExistingActivationRequirementPolicy|LicensePolicyTests\.testLicenseStartupPolicyPlansStoredLicenseAndTrialLifecycle|LicensePolicyTests\.testLicenseValidationPolicyPreservesMacOSFeedbackMessages|LicensePolicyTests\.testLicenseValidationApplicationPlansPreserveMacOSStorageWritesAndSuccessCopy|LicensePolicyTests\.testLicenseLinksPreservePurchaseAndManagementDestinations|LicensePolicyTests\.testLicenseManagementPresentationPreservesMacOSCopyAndResources|LicensePolicyTests\.testLicenseTrialBannerPresentationPreservesMacOSCopyAndThreshold|LicensePolicyTests\.testLicenseRemovalPolicyPreservesMacOSResetPlan|LicensePolicyTests\.testLicenseSecureStoragePolicyPreservesDeviceLocalAccountsAndTrialDateCodec|LicensePolicyTests\.testLicenseServicePolicyPreservesPolarEndpointsAndHeaders|LicensePolicyTests\.testLicenseHTTPStatusPolicyPreservesMacOSErrorMapping|LicensePolicyTests\.testLicenseServicePolicyPreservesPolarResponseTextFallbacks' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "migration checklist tracks shared license secure storage policy" \
-  'license startup/trial lifecycle.*validation feedback/application planning.*purchase/management URL policy.*support-link metadata.*activation/deactivation copy.*trial-banner presentation.*VoiceInkLicenseStartupPolicy`/`VoiceInkLicenseValidationPolicy`/`VoiceInkLicenseLinks`/`VoiceInkLicenseManagementPresentation`/`VoiceInkLicenseTrialBannerPresentation`/`VoiceInkLicenseRemovalPolicy`/`VoiceInkLicenseSecureStorageAccount`/`VoiceInkLicenseSecureStoragePolicy' \
+  'license startup/trial lifecycle.*validation feedback/application planning.*purchase/management URL policy.*support-link metadata.*activation/deactivation copy.*trial-banner presentation.*response-body fallback text.*VoiceInkLicenseStartupPolicy`/`VoiceInkLicenseValidationPolicy`/`VoiceInkLicenseLinks`/`VoiceInkLicenseManagementPresentation`/`VoiceInkLicenseTrialBannerPresentation`/`VoiceInkLicenseRemovalPolicy`/`VoiceInkLicenseSecureStorageAccount`/`VoiceInkLicenseSecureStoragePolicy' \
   docs/ios-single-repo-migration.md
 
 reject_pattern \
@@ -16573,6 +16580,11 @@ reject_pattern \
   '"VoiceInkDeviceIdentifier"|"https://api\.polar\.sh"|"/v1/customer-portal/license-keys/(validate|activate)"|"6f3d781d-a630-4435-9dba-058486f2d936"|enum LicenseError|(^|[^A-Za-z0-9_])LicenseError\.' \
   VoiceInk/Services/PolarService.swift \
   VoiceInk/Models/LicenseViewModel.swift
+
+reject_pattern \
+  "macOS Polar adapter avoids shell-owned response text fallback policy" \
+  'String\(data: data, encoding: \.utf8\)|"(Unknown error|Unable to decode response)"|\(httpResponse as\? HTTPURLResponse\)\?\.statusCode \?\? 0' \
+  VoiceInk/Services/PolarService.swift
 
 require_pattern \
   "shared Keychain service uses shared app identity" \

@@ -596,6 +596,33 @@ final class LicensePolicyTests: XCTestCase {
         )
     }
 
+    func testLicenseServicePolicyPreservesPolarResponseTextFallbacks() throws {
+        let response = try XCTUnwrap(HTTPURLResponse(
+            url: VoiceInkLicenseServicePolicy.requestURL(for: .validation),
+            statusCode: 204,
+            httpVersion: nil,
+            headerFields: nil
+        ))
+
+        XCTAssertEqual(
+            VoiceInkLicenseServicePolicy.errorResponseText(data: Data("denied".utf8)),
+            "denied"
+        )
+        XCTAssertEqual(
+            VoiceInkLicenseServicePolicy.errorResponseText(data: Data([0xff])),
+            VoiceInkLicenseServicePolicy.unknownErrorResponseText
+        )
+        XCTAssertEqual(
+            VoiceInkLicenseServicePolicy.successResponseText(data: Data("ok".utf8)),
+            "ok"
+        )
+        XCTAssertEqual(
+            VoiceInkLicenseServicePolicy.successResponseText(data: Data([0xff])),
+            VoiceInkLicenseServicePolicy.undecodableSuccessResponseText
+        )
+        XCTAssertEqual(VoiceInkLicenseServicePolicy.httpStatusCode(from: response), 204)
+    }
+
     private func licenseStartupEvents(
         for plan: VoiceInkLicenseStartupPlan
     ) -> [LicenseStartupRuntimeEvent] {

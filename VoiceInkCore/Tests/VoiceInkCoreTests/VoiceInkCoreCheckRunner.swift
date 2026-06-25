@@ -75,6 +75,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "LicensePolicyTests.testLicenseValidationResponseDecodingOwnsGrantedAndActivationPolicy", run: { try LicensePolicyTests().testLicenseValidationResponseDecodingOwnsGrantedAndActivationPolicy() }),
             VoiceInkCoreCheck(name: "LicensePolicyTests.testLicenseActivationResultDecodingPreservesPolarFieldNames", run: { try LicensePolicyTests().testLicenseActivationResultDecodingPreservesPolarFieldNames() }),
             VoiceInkCoreCheck(name: "LicensePolicyTests.testLicenseHTTPStatusPolicyPreservesMacOSErrorMapping", run: { LicensePolicyTests().testLicenseHTTPStatusPolicyPreservesMacOSErrorMapping() }),
+            VoiceInkCoreCheck(name: "LicensePolicyTests.testLicenseServicePolicyPreservesPolarResponseTextFallbacks", run: { try LicensePolicyTests().testLicenseServicePolicyPreservesPolarResponseTextFallbacks() }),
             VoiceInkCoreCheck(name: "AppDataResetTests.testIOSResetPlanPreservesRecordFileAndSettingsResetOrder", run: { AppDataResetTests().testIOSResetPlanPreservesRecordFileAndSettingsResetOrder() }),
             VoiceInkCoreCheck(name: "AppDataResetTests.testIOSResetPlanAppliesRuntimeStateInOrder", run: { AppDataResetTests().testIOSResetPlanAppliesRuntimeStateInOrder() }),
             VoiceInkCoreCheck(name: "AppDataResetTests.testIOSResetFilePlanPreservesExistingDirectoryPolicy", run: { AppDataResetTests().testIOSResetFilePlanPreservesExistingDirectoryPolicy() }),

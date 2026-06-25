@@ -746,6 +746,8 @@ public enum VoiceInkLicenseServicePolicy {
     public static let contentTypeHeaderName = "Content-Type"
     public static let jsonContentType = "application/json"
     public static let activationDeviceIdMetaKey = "device_id"
+    public static let unknownErrorResponseText = "Unknown error"
+    public static let undecodableSuccessResponseText = "Unable to decode response"
 
     public static func requestURL(for operation: VoiceInkLicenseOperation) -> URL {
         let endpoint: String
@@ -793,6 +795,18 @@ public enum VoiceInkLicenseServicePolicy {
         (limitActivations ?? 0) > 0
     }
 
+    public static func errorResponseText(data: Data) -> String {
+        responseText(data: data, fallback: unknownErrorResponseText)
+    }
+
+    public static func successResponseText(data: Data) -> String {
+        responseText(data: data, fallback: undecodableSuccessResponseText)
+    }
+
+    public static func httpStatusCode(from response: URLResponse) -> Int {
+        (response as? HTTPURLResponse)?.statusCode ?? 0
+    }
+
     public static func error(
         forHTTPStatusCode statusCode: Int,
         operation: VoiceInkLicenseOperation
@@ -807,5 +821,9 @@ public enum VoiceInkLicenseServicePolicy {
         default:
             return .serverError(statusCode)
         }
+    }
+
+    private static func responseText(data: Data, fallback: String) -> String {
+        String(data: data, encoding: .utf8) ?? fallback
     }
 }

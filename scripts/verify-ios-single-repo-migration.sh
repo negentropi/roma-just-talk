@@ -10285,7 +10285,12 @@ reject_file VoiceInkCore/Sources/VoiceInkCore/PostProcessingRequest.swift
 
 require_pattern \
   "shared post-processing request policy lives with post-processing client" \
-  'VoiceInkPostProcessingRequest|finalizedTranscript|defaultTemperature' \
+  'VoiceInkPostProcessingRequest|finalizedTranscript|defaultTemperature|applyRuntimeState' \
+  VoiceInkCore/Sources/VoiceInkCore/PostProcessingClient.swift
+
+reject_pattern \
+  "shared post-processing request policy avoids public raw request payload fields" \
+  'public (struct VoiceInkPostProcessingRequest|let (messages|temperature))' \
   VoiceInkCore/Sources/VoiceInkCore/PostProcessingClient.swift
 
 reject_pattern \

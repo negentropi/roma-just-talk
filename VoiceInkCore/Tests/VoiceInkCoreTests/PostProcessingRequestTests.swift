@@ -6,7 +6,7 @@ final class PostProcessingRequestTests: XCTestCase {
         XCTAssertNil(VoiceInkPostProcessingRequest(prompt: " \n\t ", transcript: "raw text"))
     }
 
-    func testRequestBuildsLegacyIOSPostProcessingMessages() throws {
+    func testRequestBuildsLegacyIOSPostProcessingMessages() async throws {
         let request = try XCTUnwrap(
             VoiceInkPostProcessingRequest(
                 prompt: "Clean this",
@@ -14,9 +14,13 @@ final class PostProcessingRequestTests: XCTestCase {
             )
         )
 
-        XCTAssertEqual(request.temperature, 0.2)
+        let summary = try await request.applyRuntimeState { messages, temperature in
+            (messages, temperature)
+        }
+
+        XCTAssertEqual(summary.1, 0.2)
         XCTAssertEqual(
-            request.messages,
+            summary.0,
             [
                 VoiceInkOpenAICompatibleChatMessage(
                     role: "system",

@@ -1,12 +1,12 @@
 import Foundation
 
-public struct VoiceInkPostProcessingRequest: Equatable, Sendable {
-    public static let defaultTemperature = 0.2
+struct VoiceInkPostProcessingRequest: Equatable, Sendable {
+    static let defaultTemperature = 0.2
 
-    public let messages: [VoiceInkOpenAICompatibleChatMessage]
-    public let temperature: Double
+    private let messages: [VoiceInkOpenAICompatibleChatMessage]
+    private let temperature: Double
 
-    public init?(
+    init?(
         prompt: String,
         transcript: String,
         temperature: Double = Self.defaultTemperature
@@ -31,7 +31,13 @@ public struct VoiceInkPostProcessingRequest: Equatable, Sendable {
         self.temperature = temperature
     }
 
-    public static func finalizedTranscript(
+    func applyRuntimeState<Result>(
+        execute: ([VoiceInkOpenAICompatibleChatMessage], Double) async throws -> Result
+    ) async throws -> Result {
+        try await execute(messages, temperature)
+    }
+
+    static func finalizedTranscript(
         from responseText: String,
         fallbackTranscript: String
     ) -> String {
@@ -57,21 +63,23 @@ public struct VoiceInkPostProcessingClient: Sendable {
         guard let request = VoiceInkPostProcessingRequest(prompt: prompt, transcript: transcript) else {
             return transcript
         }
-        let requestParameters = VoiceInkAIReasoningConfig.chatRequestParameters(
-            for: provider.aiModelProvider,
-            modelName: model,
-            defaultTemperature: request.temperature
-        )
+        let result = try await request.applyRuntimeState { messages, temperature in
+            let requestParameters = VoiceInkAIReasoningConfig.chatRequestParameters(
+                for: provider.aiModelProvider,
+                modelName: model,
+                defaultTemperature: temperature
+            )
 
-        let result = try await client.chatCompletion(
-            baseURL: provider.apiBaseURL,
-            apiKey: apiKey,
-            model: model,
-            messages: request.messages,
-            temperature: requestParameters.temperature,
-            reasoningEffort: requestParameters.reasoningEffort,
-            extraBodyParameters: requestParameters.extraBodyParameters
-        )
+            return try await client.chatCompletion(
+                baseURL: provider.apiBaseURL,
+                apiKey: apiKey,
+                model: model,
+                messages: messages,
+                temperature: requestParameters.temperature,
+                reasoningEffort: requestParameters.reasoningEffort,
+                extraBodyParameters: requestParameters.extraBodyParameters
+            )
+        }
 
         return VoiceInkPostProcessingRequest.finalizedTranscript(
             from: result,

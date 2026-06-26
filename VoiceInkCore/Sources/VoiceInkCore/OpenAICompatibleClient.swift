@@ -42,7 +42,7 @@ public struct VoiceInkOpenAICompatibleClient: Sendable {
         apiKey: String,
         model: String,
         messages: [VoiceInkOpenAICompatibleChatMessage],
-        temperature: Double? = VoiceInkPostProcessingRequest.defaultTemperature,
+        temperature: Double? = 0.2,
         reasoningEffort: String? = nil,
         extraBodyParameters: [String: Any]? = nil
     ) async throws -> String {

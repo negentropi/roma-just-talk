@@ -71,12 +71,18 @@ public struct VoiceInkAIEnhancementRetryState: Equatable, Sendable {
 }
 
 public struct VoiceInkAIEnhancementNonEnhancementErrorRetryPlan: Equatable, Sendable {
-    public let decision: VoiceInkAIEnhancementRetryDecision
-    public let isTransportNetworkFailure: Bool
+    private let decision: VoiceInkAIEnhancementRetryDecision
+    private let isTransportNetworkFailure: Bool
 
-    public init(decision: VoiceInkAIEnhancementRetryDecision, isTransportNetworkFailure: Bool) {
+    init(decision: VoiceInkAIEnhancementRetryDecision, isTransportNetworkFailure: Bool) {
         self.decision = decision
         self.isTransportNetworkFailure = isTransportNetworkFailure
+    }
+
+    public func applyRuntimeState(
+        handleRetryDecision: (VoiceInkAIEnhancementRetryDecision, Bool) async throws -> Void
+    ) async throws {
+        try await handleRetryDecision(decision, isTransportNetworkFailure)
     }
 }
 

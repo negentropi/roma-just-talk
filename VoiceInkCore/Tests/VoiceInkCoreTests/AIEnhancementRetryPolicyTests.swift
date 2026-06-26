@@ -117,6 +117,23 @@ final class AIEnhancementRetryPolicyTests: XCTestCase {
         XCTAssertEqual(nonRetryableState.failedAttempts, 0)
     }
 
+    func testNonEnhancementErrorRetryPlanAppliesRuntimeState() async throws {
+        let plan = VoiceInkAIEnhancementNonEnhancementErrorRetryPlan(
+            decision: .retryAfterDelay(1),
+            isTransportNetworkFailure: true
+        )
+
+        var decisions: [VoiceInkAIEnhancementRetryDecision] = []
+        var transportNetworkFailures: [Bool] = []
+        try await plan.applyRuntimeState { decision, transportNetworkFailure in
+            decisions.append(decision)
+            transportNetworkFailures.append(transportNetworkFailure)
+        }
+
+        XCTAssertEqual(decisions, [.retryAfterDelay(1)])
+        XCTAssertEqual(transportNetworkFailures, [true])
+    }
+
     func testRateLimitPolicySkipsDelayWithoutLastRequest() {
         let policy = VoiceInkAIEnhancementRateLimitPolicy(minimumInterval: 1)
 

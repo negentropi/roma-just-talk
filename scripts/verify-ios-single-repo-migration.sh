@@ -10443,7 +10443,12 @@ require_pattern \
 
 require_pattern \
   "shared AI enhancement non-enhancement error retry plan lives in VoiceInkCore" \
-  'VoiceInkAIEnhancementNonEnhancementErrorRetryPlan|recordNonEnhancementError' \
+  'VoiceInkAIEnhancementNonEnhancementErrorRetryPlan|recordNonEnhancementError|applyRuntimeState' \
+  VoiceInkCore/Sources/VoiceInkCore/AIEnhancementRetryPolicy.swift
+
+reject_pattern \
+  "shared AI enhancement non-enhancement error retry plan avoids public raw decision fields" \
+  'public let (decision|isTransportNetworkFailure)' \
   VoiceInkCore/Sources/VoiceInkCore/AIEnhancementRetryPolicy.swift
 
 require_pattern \
@@ -10504,6 +10509,11 @@ require_pattern \
   'AIEnhancementRetryPolicyTests\.testNonEnhancementErrorRetryPlanHandlesOnlyRetryableTransportFailures' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
+require_pattern \
+  "core checks execute AI enhancement non-enhancement error retry runtime application test" \
+  'AIEnhancementRetryPolicyTests\.testNonEnhancementErrorRetryPlanAppliesRuntimeState' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
 reject_pattern \
   "macOS AI enhancement service avoids shell-owned request payload and output filtering" \
   'guard +!text\.isEmpty|guard +isConfigured|VoiceInkAIEnhancementRequestPayload\(transcript: text\)|VoiceInkAIRequestPrompts\.taggedTranscript|VoiceInkAIEnhancementOutputFilter\.filter' \
@@ -10516,7 +10526,12 @@ require_pattern \
 
 require_pattern \
   "macOS AI enhancement service uses shared non-enhancement error retry plan" \
-  'recordNonEnhancementError|retryPlan\.decision|retryPlan\.isTransportNetworkFailure' \
+  'recordNonEnhancementError|retryPlan\.applyRuntimeState|transportNetworkFailure' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+reject_pattern \
+  "macOS AI enhancement service avoids shell-owned non-enhancement retry plan field reads" \
+  'retryPlan\.(decision|isTransportNetworkFailure)' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
 reject_pattern \

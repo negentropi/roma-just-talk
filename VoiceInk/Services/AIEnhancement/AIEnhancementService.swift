@@ -276,11 +276,13 @@ class AIEnhancementService: ObservableObject {
                 )
             } catch {
                 if let retryPlan = retryState.recordNonEnhancementError(error) {
-                    try await handleRetryDecision(
-                        retryPlan.decision,
-                        state: retryState,
-                        transportNetworkFailure: retryPlan.isTransportNetworkFailure
-                    )
+                    try await retryPlan.applyRuntimeState { decision, transportNetworkFailure in
+                        try await handleRetryDecision(
+                            decision,
+                            state: retryState,
+                            transportNetworkFailure: transportNetworkFailure
+                        )
+                    }
                 } else {
                     throw error
                 }

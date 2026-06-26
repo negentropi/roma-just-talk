@@ -155,6 +155,44 @@ final class AIProviderCatalogTests: XCTestCase {
         )
     }
 
+    func testMacOSAIEnhancementCredentialStateResolutionPlanAppliesRuntimeState() {
+        var loadedProviders: [String] = []
+        var credentialStates: [VoiceInkAIEnhancementCredentialState] = []
+
+        VoiceInkAIEnhancementCredentialStateResolutionPlan.resolving(provider: .groq)
+            .applyRuntimeState(
+                loadSavedAPIKey: {
+                    loadedProviders.append($0)
+                    return "saved-groq-key"
+                },
+                isLocalCLIConfigured: false,
+                setCredentialState: { credentialStates.append($0) }
+            )
+
+        XCTAssertEqual(loadedProviders, [VoiceInkAIEnhancementProviderKind.groq.rawValue])
+        XCTAssertEqual(credentialStates, [
+            VoiceInkAIEnhancementCredentialState(apiKey: "saved-groq-key", isAPIKeyValid: true)
+        ])
+
+        loadedProviders = []
+        credentialStates = []
+
+        VoiceInkAIEnhancementCredentialStateResolutionPlan.resolving(provider: .localCLI)
+            .applyRuntimeState(
+                loadSavedAPIKey: {
+                    loadedProviders.append($0)
+                    return "ignored-key"
+                },
+                isLocalCLIConfigured: true,
+                setCredentialState: { credentialStates.append($0) }
+            )
+
+        XCTAssertTrue(loadedProviders.isEmpty)
+        XCTAssertEqual(credentialStates, [
+            VoiceInkAIEnhancementCredentialState(apiKey: "", isAPIKeyValid: true)
+        ])
+    }
+
     func testProviderAPIKeyVerificationProgressPresentsSharedFeedback() {
         XCTAssertTrue(VoiceInkProviderAPIKeyVerificationProgress.verifying.isVerifying)
         XCTAssertFalse(VoiceInkProviderAPIKeyVerificationProgress.idle.isVerifying)

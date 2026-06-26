@@ -9762,12 +9762,22 @@ reject_pattern \
 
 require_pattern \
   "shared AI enhancement credential-state policy lives in VoiceInkCore" \
-  'VoiceInkAIEnhancementCredentialState|VoiceInkAIEnhancementCredentialStateResolutionPlan|textEnhancementCredentialState|providerKeyStorageNameToLoad|userAPIKeyStorageName' \
+  'VoiceInkAIEnhancementCredentialState|VoiceInkAIEnhancementCredentialStateResolutionPlan|textEnhancementCredentialState|providerKeyStorageNameToLoad|userAPIKeyStorageName|applyRuntimeState' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+reject_pattern \
+  "shared AI enhancement credential-state resolution plan avoids public raw storage payload" \
+  'public let providerKeyStorageNameToLoad' \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 require_pattern \
   "core checks execute shared AI enhancement credential-state resolution plan test" \
   'AIProviderCatalogTests\.testMacOSAIEnhancementCredentialStateResolutionPlanIsShared' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute shared AI enhancement credential-state runtime application test" \
+  'AIProviderCatalogTests\.testMacOSAIEnhancementCredentialStateResolutionPlanAppliesRuntimeState' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -9824,12 +9834,12 @@ require_pattern \
 
 require_pattern \
   "macOS AI service credential-state selection uses shared policy" \
-  'VoiceInkAIEnhancementCredentialStateResolutionPlan\.resolving|providerKeyStorageNameToLoad|plan\.credentialState' \
+  'VoiceInkAIEnhancementCredentialStateResolutionPlan\.resolving|applyRuntimeState|loadSavedAPIKey|setCredentialState' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 reject_pattern \
   "macOS AI service avoids shell-owned credential-state key lookup policy" \
-  'selectedProvider\.requiresUserAPIKey|APIKeyManager\.shared\.getAPIKey\(forProvider: selectedProvider\.rawValue\)' \
+  'selectedProvider\.requiresUserAPIKey|APIKeyManager\.shared\.getAPIKey\(forProvider: selectedProvider\.rawValue\)|providerKeyStorageNameToLoad|plan\.credentialState' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 require_pattern \
@@ -9839,7 +9849,7 @@ require_pattern \
 
 require_pattern \
   "migration checklist tracks shared AI enhancement credential-state resolution planning" \
-  'credential-state resolution planning.*VoiceInkAIEnhancementCredentialStateResolutionPlan' \
+  'credential-state resolution planning/application.*VoiceInkAIEnhancementCredentialStateResolutionPlan' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

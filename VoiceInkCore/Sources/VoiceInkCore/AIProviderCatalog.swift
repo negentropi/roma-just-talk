@@ -863,7 +863,7 @@ public struct VoiceInkAIEnhancementCredentialState: Equatable, Sendable {
 
 public struct VoiceInkAIEnhancementCredentialStateResolutionPlan: Equatable, Sendable {
     public let provider: VoiceInkAIEnhancementProviderKind
-    public let providerKeyStorageNameToLoad: String?
+    private let providerKeyStorageNameToLoad: String?
 
     public init(
         provider: VoiceInkAIEnhancementProviderKind,
@@ -890,6 +890,18 @@ public struct VoiceInkAIEnhancementCredentialStateResolutionPlan: Equatable, Sen
             savedAPIKey: savedAPIKey,
             isLocalCLIConfigured: isLocalCLIConfigured
         )
+    }
+
+    public func applyRuntimeState(
+        loadSavedAPIKey: (String) -> String?,
+        isLocalCLIConfigured: Bool,
+        setCredentialState: (VoiceInkAIEnhancementCredentialState) -> Void
+    ) {
+        let savedAPIKey = providerKeyStorageNameToLoad.flatMap(loadSavedAPIKey)
+        setCredentialState(credentialState(
+            savedAPIKey: savedAPIKey,
+            isLocalCLIConfigured: isLocalCLIConfigured
+        ))
     }
 }
 

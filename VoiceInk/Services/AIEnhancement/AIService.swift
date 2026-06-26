@@ -105,19 +105,16 @@ class AIService: ObservableObject {
     }
 
     private func applyCredentialStateForSelectedProvider() {
-        let plan = VoiceInkAIEnhancementCredentialStateResolutionPlan.resolving(
+        VoiceInkAIEnhancementCredentialStateResolutionPlan.resolving(
             provider: selectedProvider
+        ).applyRuntimeState(
+            loadSavedAPIKey: { APIKeyManager.shared.getAPIKey(forProvider: $0) },
+            isLocalCLIConfigured: localCLIService.isConfigured,
+            setCredentialState: { [self] credentialState in
+                apiKey = credentialState.apiKey
+                isAPIKeyValid = credentialState.isAPIKeyValid
+            }
         )
-        let savedKey = plan.providerKeyStorageNameToLoad.flatMap {
-            APIKeyManager.shared.getAPIKey(forProvider: $0)
-        }
-        let credentialState = plan.credentialState(
-            savedAPIKey: savedKey,
-            isLocalCLIConfigured: localCLIService.isConfigured
-        )
-
-        apiKey = credentialState.apiKey
-        isAPIKeyValid = credentialState.isAPIKeyValid
     }
 
     func selectModel(_ model: String) {

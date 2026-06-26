@@ -790,6 +790,56 @@ final class AIProviderCatalogTests: XCTestCase {
         ])
     }
 
+    func testMacOSAIEnhancementAPIKeyVerificationPlanAppliesRuntimeState() {
+        let successPlan = VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan(
+            isValid: true,
+            runtimeAPIKey: "resolved-key",
+            keyToSave: "$GROQ_API_KEY",
+            providerKeyStorageNameToSave: VoiceInkAIEnhancementProviderKind.groq.rawValue,
+            errorMessage: nil
+        )
+        let failurePlan = VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan(
+            isValid: false,
+            runtimeAPIKey: nil,
+            keyToSave: nil,
+            providerKeyStorageNameToSave: nil,
+            errorMessage: "invalid"
+        )
+
+        var events: [String] = []
+
+        successPlan.applyRuntimeState(
+            saveKey: { key, provider in events.append("save:\(key):\(provider)") },
+            setAPIKey: { events.append("apiKey:\($0)") },
+            setAPIKeyValidity: { events.append("valid:\($0)") },
+            postProviderKeyChanged: { events.append("postProviderKeyChanged") },
+            complete: { events.append("complete:\($0.isValid):\($0.errorMessage ?? "nil")") }
+        )
+
+        XCTAssertEqual(events, [
+            "save:$GROQ_API_KEY:Groq",
+            "apiKey:resolved-key",
+            "valid:true",
+            "postProviderKeyChanged",
+            "complete:true:nil"
+        ])
+
+        events = []
+
+        failurePlan.applyRuntimeState(
+            saveKey: { key, provider in events.append("save:\(key):\(provider)") },
+            setAPIKey: { events.append("apiKey:\($0)") },
+            setAPIKeyValidity: { events.append("valid:\($0)") },
+            postProviderKeyChanged: { events.append("postProviderKeyChanged") },
+            complete: { events.append("complete:\($0.isValid):\($0.errorMessage ?? "nil")") }
+        )
+
+        XCTAssertEqual(events, [
+            "valid:false",
+            "complete:false:invalid"
+        ])
+    }
+
     func testMacOSAIEnhancementAPIKeyClearPlanIsShared() {
         XCTAssertEqual(
             VoiceInkAIEnhancementAPIKeyClearPlan.clearing(provider: .groq),

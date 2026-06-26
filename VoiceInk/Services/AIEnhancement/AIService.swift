@@ -162,8 +162,8 @@ class AIService: ObservableObject {
                             resolvedRuntimeKey: resolvedKey
                         )
 
-                        APIKeyManager.shared.applyAIEnhancementVerificationPlan(plan)
-                        plan.serviceStateApplicationPlan.apply(
+                        plan.applyRuntimeState(
+                            saveKey: { APIKeyManager.shared.saveAPIKey($0, forProvider: $1) },
                             setAPIKey: { self.apiKey = $0 },
                             setAPIKeyValidity: { self.isAPIKeyValid = $0 },
                             postProviderKeyChanged: {

@@ -518,13 +518,13 @@ public struct VoiceInkAIEnhancementAPIKeyVerificationRequestPlan: Equatable, Sen
 }
 
 public struct VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan: Equatable, Sendable {
-    public let isValid: Bool
-    public let runtimeAPIKey: String?
-    public let keyToSave: String?
-    public let providerKeyStorageNameToSave: String?
-    public let errorMessage: String?
+    private let isValid: Bool
+    private let runtimeAPIKey: String?
+    private let keyToSave: String?
+    private let providerKeyStorageNameToSave: String?
+    private let errorMessage: String?
 
-    public init(
+    init(
         isValid: Bool,
         runtimeAPIKey: String?,
         keyToSave: String?,
@@ -539,12 +539,12 @@ public struct VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan: Equatable,
     }
 }
 
-public struct VoiceInkAIEnhancementAPIKeyVerificationPersistencePlan: Equatable, Sendable {
-    public let runtimeAPIKey: String
-    public let keyToSave: String?
-    public let providerKeyStorageNameToSave: String?
+struct VoiceInkAIEnhancementAPIKeyVerificationPersistencePlan: Equatable, Sendable {
+    let runtimeAPIKey: String
+    let keyToSave: String?
+    let providerKeyStorageNameToSave: String?
 
-    public init(
+    init(
         runtimeAPIKey: String,
         keyToSave: String?,
         providerKeyStorageNameToSave: String?
@@ -555,13 +555,13 @@ public struct VoiceInkAIEnhancementAPIKeyVerificationPersistencePlan: Equatable,
     }
 }
 
-public struct VoiceInkAIEnhancementAPIKeyVerificationServiceStatePlan: Equatable, Sendable {
-    public let apiKeyToApply: String?
-    public let isAPIKeyValid: Bool
-    public let shouldPostProviderKeyChanged: Bool
-    public let completionResult: VoiceInkAPIKeyVerificationResult
+struct VoiceInkAIEnhancementAPIKeyVerificationServiceStatePlan: Equatable, Sendable {
+    private let apiKeyToApply: String?
+    private let isAPIKeyValid: Bool
+    private let shouldPostProviderKeyChanged: Bool
+    private let completionResult: VoiceInkAPIKeyVerificationResult
 
-    public init(
+    init(
         apiKeyToApply: String?,
         isAPIKeyValid: Bool,
         shouldPostProviderKeyChanged: Bool,
@@ -574,7 +574,7 @@ public struct VoiceInkAIEnhancementAPIKeyVerificationServiceStatePlan: Equatable
     }
 }
 
-public extension VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan {
+extension VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan {
     var successPersistencePlan: VoiceInkAIEnhancementAPIKeyVerificationPersistencePlan? {
         guard let runtimeAPIKey else { return nil }
         return VoiceInkAIEnhancementAPIKeyVerificationPersistencePlan(
@@ -610,7 +610,25 @@ public extension VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan {
     }
 }
 
-public extension VoiceInkAIEnhancementAPIKeyVerificationServiceStatePlan {
+public extension VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan {
+    func applyRuntimeState(
+        saveKey: (String, String) -> Void,
+        setAPIKey: (String) -> Void,
+        setAPIKeyValidity: (Bool) -> Void,
+        postProviderKeyChanged: () -> Void,
+        complete: (VoiceInkAPIKeyVerificationResult) -> Void
+    ) {
+        applySuccessPersistence(saveKey: saveKey)
+        serviceStateApplicationPlan.apply(
+            setAPIKey: setAPIKey,
+            setAPIKeyValidity: setAPIKeyValidity,
+            postProviderKeyChanged: postProviderKeyChanged,
+            complete: complete
+        )
+    }
+}
+
+extension VoiceInkAIEnhancementAPIKeyVerificationServiceStatePlan {
     func apply(
         setAPIKey: (String) -> Void,
         setAPIKeyValidity: (Bool) -> Void,

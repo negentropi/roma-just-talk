@@ -38,14 +38,6 @@ final class APIKeyManager {
         }
     }
 
-    func applyAIEnhancementVerificationPlan(
-        _ plan: VoiceInkAIEnhancementAPIKeyVerificationApplicationPlan
-    ) {
-        plan.applySuccessPersistence { [self] key, provider in
-            saveAPIKey(key, forProvider: provider)
-        }
-    }
-
     func applyAIEnhancementAPIKeyClearPlan(_ plan: VoiceInkAIEnhancementAPIKeyClearPlan) {
         plan.applyClearPersistence { [self] provider in
             deleteAPIKey(forProvider: provider)

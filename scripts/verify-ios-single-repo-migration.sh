@@ -9837,6 +9837,11 @@ require_pattern \
   'VoiceInkAIEnhancementProviderSelectionPlan|shouldRefreshOllamaRuntimeModels|selectedProviderToSave' \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
+reject_pattern \
+  "shared AI enhancement provider-selection plan avoids public raw execution fields" \
+  'public let (selectedProviderToSave|shouldRefreshOllamaRuntimeModels)' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
 require_pattern \
   "shared AI enhancement provider-selection runtime application lives in VoiceInkCore" \
   'extension VoiceInkAIEnhancementProviderSelectionPlan|refreshOllamaRuntimeModels|applyCredentialState' \
@@ -10127,6 +10132,11 @@ require_pattern \
   'VoiceInkAIEnhancementModelSelectionPlan|ollamaModelToApply|selectedModelToSave' \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
+reject_pattern \
+  "shared AI enhancement model-selection plan avoids public raw execution fields" \
+  'public let (selectedModels|selectedModelToSave|ollamaModelToApply)' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
 require_pattern \
   "shared AI enhancement model-selection runtime application lives in VoiceInkCore" \
   'applyRuntimeState|setSelectedModels|setOllamaRuntimeModel' \
@@ -10157,6 +10167,11 @@ require_pattern \
 require_pattern \
   "shared AI enhancement refresh model-selection policy lives in VoiceInkCore" \
   'VoiceInkAIEnhancementModelRefreshPlan|textEnhancementModelToSelectAfterRefresh' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+reject_pattern \
+  "shared AI enhancement refresh model-selection plan avoids public raw cache and selection fields" \
+  'public let (refreshedModelNames|selectedModelToSave)' \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 require_pattern \

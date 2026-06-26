@@ -117,10 +117,10 @@ public enum VoiceInkAIEnhancementSettingsSurface: Sendable, Equatable {
 }
 
 public struct VoiceInkAIEnhancementProviderSelectionPlan: Sendable, Equatable {
-    public let selectedProviderToSave: VoiceInkAIEnhancementProviderKind
-    public let shouldRefreshOllamaRuntimeModels: Bool
+    let selectedProviderToSave: VoiceInkAIEnhancementProviderKind
+    private let shouldRefreshOllamaRuntimeModels: Bool
 
-    public init(
+    init(
         selectedProviderToSave: VoiceInkAIEnhancementProviderKind,
         shouldRefreshOllamaRuntimeModels: Bool
     ) {
@@ -155,10 +155,10 @@ public extension VoiceInkAIEnhancementProviderSelectionPlan {
 }
 
 public struct VoiceInkAIEnhancementModelRefreshPlan: Sendable, Equatable {
-    public let refreshedModelNames: [String]
-    public let selectedModelToSave: String?
+    let refreshedModelNames: [String]
+    let selectedModelToSave: String?
 
-    public init(refreshedModelNames: [String], selectedModelToSave: String?) {
+    init(refreshedModelNames: [String], selectedModelToSave: String?) {
         self.refreshedModelNames = refreshedModelNames
         self.selectedModelToSave = selectedModelToSave
     }
@@ -203,12 +203,12 @@ public extension VoiceInkAIEnhancementModelRefreshPlan {
 }
 
 public struct VoiceInkAIEnhancementModelSelectionPlan: Sendable, Equatable {
-    public let selectedModels: [VoiceInkAIEnhancementProviderKind: String]
-    public let provider: VoiceInkAIEnhancementProviderKind
-    public let selectedModelToSave: String
-    public let ollamaModelToApply: String?
+    let selectedModels: [VoiceInkAIEnhancementProviderKind: String]
+    let provider: VoiceInkAIEnhancementProviderKind
+    let selectedModelToSave: String
+    let ollamaModelToApply: String?
 
-    public init(
+    init(
         selectedModels: [VoiceInkAIEnhancementProviderKind: String],
         provider: VoiceInkAIEnhancementProviderKind,
         selectedModelToSave: String,

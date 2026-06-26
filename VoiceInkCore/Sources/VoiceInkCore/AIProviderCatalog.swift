@@ -740,11 +740,11 @@ public extension VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan {
 }
 
 public struct VoiceInkAIEnhancementAPIKeyClearPlan: Equatable, Sendable {
-    public let provider: VoiceInkAIEnhancementProviderKind
-    public let providerKeyStorageNameToDelete: String
-    public let credentialStateAfterClear: VoiceInkAIEnhancementCredentialState
+    private let provider: VoiceInkAIEnhancementProviderKind
+    private let providerKeyStorageNameToDelete: String
+    private let credentialStateAfterClear: VoiceInkAIEnhancementCredentialState
 
-    public init(
+    init(
         provider: VoiceInkAIEnhancementProviderKind,
         providerKeyStorageNameToDelete: String,
         credentialStateAfterClear: VoiceInkAIEnhancementCredentialState
@@ -770,19 +770,19 @@ public struct VoiceInkAIEnhancementAPIKeyClearPlan: Equatable, Sendable {
     }
 }
 
-public struct VoiceInkAIEnhancementAPIKeyClearPersistencePlan: Equatable, Sendable {
-    public let providerKeyStorageNameToDelete: String
+struct VoiceInkAIEnhancementAPIKeyClearPersistencePlan: Equatable, Sendable {
+    let providerKeyStorageNameToDelete: String
 
-    public init(providerKeyStorageNameToDelete: String) {
+    init(providerKeyStorageNameToDelete: String) {
         self.providerKeyStorageNameToDelete = providerKeyStorageNameToDelete
     }
 }
 
-public struct VoiceInkAIEnhancementAPIKeyClearServiceStatePlan: Equatable, Sendable {
-    public let credentialStateAfterClear: VoiceInkAIEnhancementCredentialState
-    public let shouldPostProviderKeyChanged: Bool
+struct VoiceInkAIEnhancementAPIKeyClearServiceStatePlan: Equatable, Sendable {
+    private let credentialStateAfterClear: VoiceInkAIEnhancementCredentialState
+    private let shouldPostProviderKeyChanged: Bool
 
-    public init(
+    init(
         credentialStateAfterClear: VoiceInkAIEnhancementCredentialState,
         shouldPostProviderKeyChanged: Bool
     ) {
@@ -791,7 +791,7 @@ public struct VoiceInkAIEnhancementAPIKeyClearServiceStatePlan: Equatable, Senda
     }
 }
 
-public extension VoiceInkAIEnhancementAPIKeyClearPlan {
+extension VoiceInkAIEnhancementAPIKeyClearPlan {
     var persistencePlan: VoiceInkAIEnhancementAPIKeyClearPersistencePlan {
         VoiceInkAIEnhancementAPIKeyClearPersistencePlan(
             providerKeyStorageNameToDelete: providerKeyStorageNameToDelete
@@ -812,7 +812,21 @@ public extension VoiceInkAIEnhancementAPIKeyClearPlan {
     }
 }
 
-public extension VoiceInkAIEnhancementAPIKeyClearServiceStatePlan {
+public extension VoiceInkAIEnhancementAPIKeyClearPlan {
+    func applyRuntimeState(
+        deleteKey: (String) -> Void,
+        setCredentialState: (VoiceInkAIEnhancementCredentialState) -> Void,
+        postProviderKeyChanged: () -> Void
+    ) {
+        applyClearPersistence(deleteKey: deleteKey)
+        serviceStateApplicationPlan.apply(
+            setCredentialState: setCredentialState,
+            postProviderKeyChanged: postProviderKeyChanged
+        )
+    }
+}
+
+extension VoiceInkAIEnhancementAPIKeyClearServiceStatePlan {
     func apply(
         setCredentialState: (VoiceInkAIEnhancementCredentialState) -> Void,
         postProviderKeyChanged: () -> Void

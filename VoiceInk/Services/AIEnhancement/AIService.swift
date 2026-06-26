@@ -245,8 +245,8 @@ class AIService: ObservableObject {
     }
 
     private func applyTextEnhancementAPIKeyClearPlan(_ plan: VoiceInkAIEnhancementAPIKeyClearPlan) {
-        APIKeyManager.shared.applyAIEnhancementAPIKeyClearPlan(plan)
-        plan.serviceStateApplicationPlan.apply(
+        plan.applyRuntimeState(
+            deleteKey: { APIKeyManager.shared.deleteAPIKey(forProvider: $0) },
             setCredentialState: { [self] credentialState in
                 apiKey = credentialState.apiKey
                 isAPIKeyValid = credentialState.isAPIKeyValid

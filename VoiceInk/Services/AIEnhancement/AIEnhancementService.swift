@@ -226,17 +226,17 @@ class AIEnhancementService: ObservableObject {
                     )
                 }
             },
-            openAICompatibleChatCompletions: { modelName, requestPlan in
+            openAICompatibleChatCompletions: { modelName, requestURL, requestParameters in
                 try await executeCloudAIRequest {
                     try await OpenAILLMClient.chatCompletion(
-                        baseURL: requestPlan.requestURL,
+                        baseURL: requestURL,
                         apiKey: aiService.apiKey,
                         model: modelName,
                         messages: [.user(formattedText)],
                         systemPrompt: systemMessage,
-                        temperature: requestPlan.requestParameters.temperature,
-                        reasoningEffort: requestPlan.requestParameters.reasoningEffort,
-                        extraBody: requestPlan.requestParameters.extraBodyParameters,
+                        temperature: requestParameters.temperature,
+                        reasoningEffort: requestParameters.reasoningEffort,
+                        extraBody: requestParameters.extraBodyParameters,
                         timeout: VoiceInkAIEnhancementRequestPreference.timeoutSeconds()
                     )
                 }

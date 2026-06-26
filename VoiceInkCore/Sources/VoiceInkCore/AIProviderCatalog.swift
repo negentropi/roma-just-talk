@@ -18,9 +18,16 @@ public enum VoiceInkAIEnhancementExecutionRoute: Sendable, Equatable {
     case openAICompatibleChatCompletions
 }
 
-public struct VoiceInkAIEnhancementOpenAICompatibleRequestPlan {
-    public let requestURL: URL
-    public let requestParameters: VoiceInkAIChatRequestParameters
+struct VoiceInkAIEnhancementOpenAICompatibleRequestPlan {
+    let requestURL: URL
+    let requestParameters: VoiceInkAIChatRequestParameters
+
+    func applyRuntimeState<Result>(
+        modelName: String,
+        execute: (String, URL, VoiceInkAIChatRequestParameters) async throws -> Result
+    ) async throws -> Result {
+        try await execute(modelName, requestURL, requestParameters)
+    }
 }
 
 public struct VoiceInkAIEnhancementRequestExecutionPlan {
@@ -72,7 +79,7 @@ public struct VoiceInkAIEnhancementRequestExecutionPlan {
         ollama: (String) async throws -> Result,
         localCLI: (String) async throws -> Result,
         anthropicMessages: (String) async throws -> Result,
-        openAICompatibleChatCompletions: (String, VoiceInkAIEnhancementOpenAICompatibleRequestPlan) async throws -> Result
+        openAICompatibleChatCompletions: (String, URL, VoiceInkAIChatRequestParameters) async throws -> Result
     ) async throws -> Result {
         switch route {
         case .ollama:
@@ -82,9 +89,9 @@ public struct VoiceInkAIEnhancementRequestExecutionPlan {
         case .anthropicMessages:
             return try await anthropicMessages(modelName)
         case .openAICompatibleChatCompletions:
-            return try await openAICompatibleChatCompletions(
-                modelName,
-                openAICompatibleRequestOrThrow()
+            return try await openAICompatibleRequestOrThrow().applyRuntimeState(
+                modelName: modelName,
+                execute: openAICompatibleChatCompletions
             )
         }
     }

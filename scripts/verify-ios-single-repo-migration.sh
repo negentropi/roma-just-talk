@@ -10124,7 +10124,7 @@ require_pattern \
 
 require_pattern \
   "macOS AI enhancement service request URL selection uses shared policy" \
-  'openAICompatibleChatCompletions:|requestPlan\.requestURL' \
+  'openAICompatibleChatCompletions:|requestURL' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
 require_pattern \
@@ -10225,6 +10225,16 @@ reject_pattern \
   'public let route|public let modelName|public func openAICompatibleRequestOrThrow' \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
+reject_pattern \
+  "shared AI enhancement OpenAI-compatible request plan avoids public raw payload fields" \
+  'public (struct VoiceInkAIEnhancementOpenAICompatibleRequestPlan|let (requestURL|requestParameters))' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+require_pattern \
+  "shared AI enhancement OpenAI-compatible request plan application lives in VoiceInkCore" \
+  'VoiceInkAIEnhancementOpenAICompatibleRequestPlan|applyRuntimeState|requestParameters' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
 require_pattern \
   "macOS AI enhancement service execution routing uses shared policy" \
   'VoiceInkAIEnhancementRequestExecutionPlan\.planning|executionPlan\.applyRuntimeState|executeCloudAIRequest' \
@@ -10242,7 +10252,12 @@ require_pattern \
 
 require_pattern \
   "macOS AI enhancement request tuning uses shared execution plan" \
-  'requestPlan\.requestParameters\.(temperature|reasoningEffort|extraBodyParameters)' \
+  'requestParameters\.(temperature|reasoningEffort|extraBodyParameters)' \
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+
+reject_pattern \
+  "macOS AI enhancement service avoids shell-owned OpenAI-compatible request plan field reads" \
+  'requestPlan\.(requestURL|requestParameters)' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
 reject_pattern \

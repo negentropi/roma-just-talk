@@ -1764,7 +1764,7 @@ final class AIProviderCatalogTests: XCTestCase {
             )
 
             do {
-                _ = try await openAICompatibleRequestPlan(for: invalidCustomPlan)
+                _ = try await openAICompatibleRequestSummary(for: invalidCustomPlan)
                 XCTFail("Expected invalid custom endpoint to throw")
             } catch {
                 XCTAssertEqual(
@@ -1784,11 +1784,12 @@ final class AIProviderCatalogTests: XCTestCase {
             )
 
             do {
-                let customRequestPlan = try await openAICompatibleRequestPlan(for: customPlan)
-                XCTAssertEqual(customRequestPlan?.requestURL.absoluteString, "https://api.example.com/v1/chat/completions")
-                XCTAssertEqual(customRequestPlan?.requestParameters.temperature, 0.3)
-                XCTAssertNil(customRequestPlan?.requestParameters.reasoningEffort)
-                XCTAssertNil(customRequestPlan?.requestParameters.extraBodyParameters)
+                let customRequestSummary = try await openAICompatibleRequestSummary(for: customPlan)
+                XCTAssertEqual(customRequestSummary?.requestURL.absoluteString, "https://api.example.com/v1/chat/completions")
+                XCTAssertEqual(customRequestSummary?.temperature, 0.3)
+                XCTAssertNil(customRequestSummary?.reasoningEffort)
+                XCTAssertFalse(customRequestSummary?.hasExtraBodyParameters ?? true)
+                XCTAssertNil(customRequestSummary?.includeReasoning)
             } catch {
                 XCTFail("Expected valid custom endpoint to produce a request plan")
             }
@@ -2040,11 +2041,11 @@ final class AIProviderCatalogTests: XCTestCase {
             provider: .groq,
             modelName: "openai/gpt-oss-120b"
         )
-        let groqRequestPlan = try await openAICompatibleRequestPlan(for: groqPlan)
-        XCTAssertEqual(groqRequestPlan?.requestURL.absoluteString, VoiceInkAIModelProvider.groq.postProcessingRequestURL?.absoluteString)
-        XCTAssertEqual(groqRequestPlan?.requestParameters.temperature, 0.3)
-        XCTAssertEqual(groqRequestPlan?.requestParameters.reasoningEffort, "low")
-        XCTAssertEqual(groqRequestPlan?.requestParameters.extraBodyParameters?["include_reasoning"] as? Bool, false)
+        let groqRequestSummary = try await openAICompatibleRequestSummary(for: groqPlan)
+        XCTAssertEqual(groqRequestSummary?.requestURL.absoluteString, VoiceInkAIModelProvider.groq.postProcessingRequestURL?.absoluteString)
+        XCTAssertEqual(groqRequestSummary?.temperature, 0.3)
+        XCTAssertEqual(groqRequestSummary?.reasoningEffort, "low")
+        XCTAssertEqual(groqRequestSummary?.includeReasoning, false)
     }
 
     private func executionSummary(for plan: VoiceInkAIEnhancementRequestExecutionPlan) async throws -> String {
@@ -2052,20 +2053,36 @@ final class AIProviderCatalogTests: XCTestCase {
             ollama: { modelName in "ollama:\(modelName)" },
             localCLI: { modelName in "localCLI:\(modelName)" },
             anthropicMessages: { modelName in "anthropicMessages:\(modelName)" },
-            openAICompatibleChatCompletions: { modelName, requestPlan in
-                "openAICompatibleChatCompletions:\(modelName):\(requestPlan.requestURL.absoluteString)"
+            openAICompatibleChatCompletions: { modelName, requestURL, _ in
+                "openAICompatibleChatCompletions:\(modelName):\(requestURL.absoluteString)"
             }
         )
     }
 
-    private func openAICompatibleRequestPlan(
+    private struct OpenAICompatibleRequestSummary {
+        let requestURL: URL
+        let temperature: Double
+        let reasoningEffort: String?
+        let hasExtraBodyParameters: Bool
+        let includeReasoning: Bool?
+    }
+
+    private func openAICompatibleRequestSummary(
         for plan: VoiceInkAIEnhancementRequestExecutionPlan
-    ) async throws -> VoiceInkAIEnhancementOpenAICompatibleRequestPlan? {
+    ) async throws -> OpenAICompatibleRequestSummary? {
         try await plan.applyRuntimeState(
             ollama: { _ in nil },
             localCLI: { _ in nil },
             anthropicMessages: { _ in nil },
-            openAICompatibleChatCompletions: { _, requestPlan in requestPlan }
+            openAICompatibleChatCompletions: { _, requestURL, requestParameters in
+                OpenAICompatibleRequestSummary(
+                    requestURL: requestURL,
+                    temperature: requestParameters.temperature,
+                    reasoningEffort: requestParameters.reasoningEffort,
+                    hasExtraBodyParameters: requestParameters.extraBodyParameters != nil,
+                    includeReasoning: requestParameters.extraBodyParameters?["include_reasoning"] as? Bool
+                )
+            }
         )
     }
 

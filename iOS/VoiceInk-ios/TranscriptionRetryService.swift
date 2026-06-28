@@ -9,25 +9,16 @@ import Foundation
 import VoiceInkCore
 
 class TranscriptionRetryService {
-    typealias TranscribeFile = (URL) async throws -> VoiceInkTranscriptionRunResult
-
     private let runProcessor = VoiceInkTranscriptionRunProcessor()
     private let transcriptionServiceFactory = VoiceInkAudioTranscriptionServiceFactory {
         WhisperTranscriptionService()
     }
-    private let transcribeFileOverride: TranscribeFile?
-    
+
     static let shared = TranscriptionRetryService()
-    
-    init(transcribeFileOverride: TranscribeFile? = nil) {
-        self.transcribeFileOverride = transcribeFileOverride
-    }
+
+    private init() {}
 
     func transcribe(fileURL: URL) async throws -> VoiceInkTranscriptionRunResult {
-        if let transcribeFileOverride {
-            return try await transcribeFileOverride(fileURL)
-        }
-
         let settings = AppSettings.shared
         let runSettings = await settings.transcriptionRunSettings
 

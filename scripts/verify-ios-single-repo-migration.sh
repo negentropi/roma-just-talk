@@ -8401,6 +8401,11 @@ require_patterns \
   'let runSettings = await settings\.transcriptionRunSettings' \
   'try await runSettings\.transcribe\('
 
+reject_pattern \
+  "iOS retry transcription avoids unused override seam" \
+  'TranscribeFile|transcribeFileOverride|init\(transcribeFileOverride|if let transcribeFileOverride' \
+  iOS/VoiceInk-ios/TranscriptionRetryService.swift
+
 require_pattern \
   "core checks execute shared transcription run settings snapshot test" \
   'TranscriptionRunProcessorTests\.testTranscriptionRunSettingsApplySnapshotFieldsThroughSharedProcessor' \

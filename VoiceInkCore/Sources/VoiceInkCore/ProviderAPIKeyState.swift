@@ -26,11 +26,11 @@ public struct VoiceInkProviderAPIKeyListRow: Identifiable, Equatable, Sendable {
     }
 }
 
-public struct VoiceInkProviderAPIKeyStorageMutationPlan: Equatable, Sendable {
-    public let shouldPersistStoredKey: Bool
-    public let verificationFlagToPersist: Bool?
+private struct VoiceInkProviderAPIKeyStorageMutationPlan: Equatable, Sendable {
+    let shouldPersistStoredKey: Bool
+    let verificationFlagToPersist: Bool?
 
-    public init(
+    init(
         shouldPersistStoredKey: Bool,
         verificationFlagToPersist: Bool?
     ) {
@@ -91,7 +91,7 @@ public extension VoiceInkProviderAPIKeyStateUpdatePlan {
     }
 }
 
-fileprivate extension VoiceInkProviderAPIKeyStorageMutationPlan {
+private extension VoiceInkProviderAPIKeyStorageMutationPlan {
     func persistenceActions(storedKey: String) -> [VoiceInkProviderAPIKeyStatePersistenceAction] {
         guard shouldPersistStoredKey else { return [] }
 
@@ -105,15 +105,15 @@ fileprivate extension VoiceInkProviderAPIKeyStorageMutationPlan {
     }
 }
 
-public struct VoiceInkProviderAPIKeyVerificationMutationPlan: Equatable, Sendable {
-    public let shouldPersistVerificationFlag: Bool
+private struct VoiceInkProviderAPIKeyVerificationMutationPlan: Equatable, Sendable {
+    let shouldPersistVerificationFlag: Bool
 
-    public init(shouldPersistVerificationFlag: Bool) {
+    init(shouldPersistVerificationFlag: Bool) {
         self.shouldPersistVerificationFlag = shouldPersistVerificationFlag
     }
 }
 
-fileprivate extension VoiceInkProviderAPIKeyVerificationMutationPlan {
+private extension VoiceInkProviderAPIKeyVerificationMutationPlan {
     func persistenceActions(verificationFlag: Bool) -> [VoiceInkProviderAPIKeyStatePersistenceAction] {
         guard shouldPersistVerificationFlag else { return [] }
         return [.persistVerificationFlag(verificationFlag)]
@@ -221,7 +221,7 @@ public struct VoiceInkProviderAPIKeyState: Equatable, Sendable {
             }
     }
 
-    public mutating func applyStoredAPIKey(
+    fileprivate mutating func applyStoredAPIKey(
         _ key: String,
         for provider: VoiceInkProviderKind
     ) -> VoiceInkProviderAPIKeyStorageMutationPlan {
@@ -249,7 +249,7 @@ public struct VoiceInkProviderAPIKeyState: Equatable, Sendable {
         )
     }
 
-    public mutating func applyVerification(
+    fileprivate mutating func applyVerification(
         _ verified: Bool,
         for provider: VoiceInkProviderKind
     ) -> VoiceInkProviderAPIKeyVerificationMutationPlan {

@@ -3738,6 +3738,8 @@ reject_pattern \
   "provider API-key shells and tests avoid raw mutation internals" \
   'VoiceInkProviderAPIKey(Storage|Verification)MutationPlan|\.applyStoredAPIKey\(|\.applyVerification\(' \
   VoiceInk \
+  VoiceInkTests \
+  VoiceInkUITests \
   iOS \
   VoiceInkCore/Tests \
   --glob '*.swift'

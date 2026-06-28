@@ -3699,6 +3699,14 @@ require_pattern \
   'VoiceInkProviderAPIKeyStateUpdatePlan|applyingStoredAPIKey|applyingVerification|applyRuntimeState' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift
 
+require_patterns \
+  "shared provider API-key raw mutation internals stay private" \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift \
+  'private struct VoiceInkProviderAPIKeyStorageMutationPlan' \
+  'private struct VoiceInkProviderAPIKeyVerificationMutationPlan' \
+  'fileprivate mutating func applyStoredAPIKey' \
+  'fileprivate mutating func applyVerification'
+
 reject_pattern \
   "shared provider API-key state hides raw mutation internals" \
   'public struct VoiceInkProviderAPIKey(Storage|Verification)MutationPlan|public mutating func applyStoredAPIKey|public mutating func applyVerification|public let +(shouldPersistStoredKey|verificationFlagToPersist|shouldPersistVerificationFlag)' \
@@ -3725,6 +3733,14 @@ reject_pattern \
   "core provider API-key state tests avoid raw mutation internals" \
   'VoiceInkProviderAPIKey(Storage|Verification)MutationPlan|\.applyStoredAPIKey\(|\.applyVerification\(' \
   VoiceInkCore/Tests/VoiceInkCoreTests/ProviderAccessRequirementTests.swift
+
+reject_pattern \
+  "provider API-key shells and tests avoid raw mutation internals" \
+  'VoiceInkProviderAPIKey(Storage|Verification)MutationPlan|\.applyStoredAPIKey\(|\.applyVerification\(' \
+  VoiceInk \
+  iOS \
+  VoiceInkCore/Tests \
+  --glob '*.swift'
 
 require_pattern \
   "core checks execute provider access snapshot test" \

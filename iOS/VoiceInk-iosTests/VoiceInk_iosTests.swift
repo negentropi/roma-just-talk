@@ -83,33 +83,6 @@ final class VoiceInkIOSTests: XCTestCase {
         )
     }
 
-    func testRetryServiceMarksNoteFailedWhenRetranscriptionFails() async throws {
-        let audioFileURL = FileManager.default.temporaryDirectory
-            .appendingPathComponent(UUID().uuidString)
-            .appendingPathExtension("wav")
-        try Data([0]).write(to: audioFileURL)
-        defer { try? FileManager.default.removeItem(at: audioFileURL) }
-
-        let note = Transcription(
-            text: "old text",
-            duration: 1,
-            audioFileURL: audioFileURL.path,
-            transcriptionStatus: .pending
-        )
-        let service = TranscriptionRetryService { _ in
-            throw VoiceInkEngineError.transcriptionFailed
-        }
-
-        do {
-            _ = try await service.retranscribe(note: note)
-            XCTFail("Retranscription should throw")
-        } catch {
-            XCTAssertEqual(note.text, "old text")
-            XCTAssertEqual(note.transcriptionStatus, .failed)
-            XCTAssertEqual(note.transcriptionError, VoiceInkEngineError.transcriptionFailed.errorDescription)
-        }
-    }
-
     func testAppGroupRecordingBridgeKeepsFreshRecordingState() throws {
         let defaults = try makeIsolatedDefaults()
         let timestamp = Date(timeIntervalSince1970: 100)

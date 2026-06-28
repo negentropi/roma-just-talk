@@ -1510,6 +1510,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "TranscriptionRecordTests.testMarkTranscriptionCanceledPreservesDurationAndModelWhenNotProvided", run: { TranscriptionRecordTests().testMarkTranscriptionCanceledPreservesDurationAndModelWhenNotProvided() }),
             VoiceInkCoreCheck(name: "TranscriptionRecordTests.testRetranscribeStoredAudioAppliesCompletedResult", run: { try await TranscriptionRecordTests().testRetranscribeStoredAudioAppliesCompletedResult() }),
             VoiceInkCoreCheck(name: "TranscriptionRecordTests.testRetranscribeStoredAudioMarksMissingAudioFailure", run: { try await TranscriptionRecordTests().testRetranscribeStoredAudioMarksMissingAudioFailure() }),
+            VoiceInkCoreCheck(name: "TranscriptionRecordTests.testRetranscribeStoredAudioMarksTranscriptionFailure", run: { try await TranscriptionRecordTests().testRetranscribeStoredAudioMarksTranscriptionFailure() }),
             VoiceInkCoreCheck(name: "TranscriptionRecordTests.testApplyEnhancementResultStoresTextAndMetadata", run: { TranscriptionRecordTests().testApplyEnhancementResultStoresTextAndMetadata() }),
             VoiceInkCoreCheck(name: "TranscriptionRecordTests.testApplyEnhancementFailureStoresFailureTextAndClearsMetadata", run: { TranscriptionRecordTests().testApplyEnhancementFailureStoresFailureTextAndClearsMetadata() }),
             VoiceInkCoreCheck(name: "TranscriptionRecordTests.testApplyEnhancementFailureCanOmitEnhancedText", run: { TranscriptionRecordTests().testApplyEnhancementFailureCanOmitEnhancedText() }),

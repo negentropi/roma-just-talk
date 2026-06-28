@@ -216,6 +216,37 @@ final class TranscriptionRecordTests: XCTestCase {
         }
     }
 
+    func testRetranscribeStoredAudioMarksTranscriptionFailure() async throws {
+        let recordingsDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.TranscriptionRecordTests.\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: recordingsDirectory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: recordingsDirectory) }
+
+        let audioURL = recordingsDirectory.appendingPathComponent("recording.wav")
+        try Data("audio".utf8).write(to: audioURL)
+
+        let record = StubStoredTranscriptionRecord(
+            audioFileURL: audioURL.lastPathComponent,
+            storedAudioRecordingsDirectory: recordingsDirectory
+        )
+        record.text = "old text"
+        record.transcriptionStatus = .pending
+
+        do {
+            _ = try await record.retranscribeStoredAudio { fileURL in
+                XCTAssertEqual(fileURL, audioURL)
+                throw VoiceInkEngineError.transcriptionFailed
+            }
+            XCTFail("Expected transcription failure to throw")
+        } catch VoiceInkEngineError.transcriptionFailed {
+            XCTAssertEqual(record.text, "old text")
+            XCTAssertEqual(record.transcriptionStatus, .failed)
+            XCTAssertEqual(record.transcriptionError, VoiceInkEngineError.transcriptionFailed.errorDescription)
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+
     func testApplyEnhancementResultStoresTextAndMetadata() {
         let record = StubMutableTranscriptionEnhancementMetadataRecord()
         let result = VoiceInkAIEnhancementResult(

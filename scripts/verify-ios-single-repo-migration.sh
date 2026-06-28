@@ -8406,6 +8406,11 @@ reject_pattern \
   'TranscribeFile|transcribeFileOverride|init\(transcribeFileOverride|if let transcribeFileOverride' \
   iOS/VoiceInk-ios/TranscriptionRetryService.swift
 
+reject_pattern \
+  "iOS retry tests avoid shell-only retry service construction" \
+  'TranscriptionRetryService[[:space:]]*\{' \
+  iOS/VoiceInk-iosTests
+
 require_pattern \
   "core checks execute shared transcription run settings snapshot test" \
   'TranscriptionRunProcessorTests\.testTranscriptionRunSettingsApplySnapshotFieldsThroughSharedProcessor' \
@@ -8414,6 +8419,11 @@ require_pattern \
 require_pattern \
   "core checks execute iOS app settings snapshot policy test" \
   'TranscriptionRunProcessorTests\.testIOSAppSettingsSnapshotBuildsRunSettingsFromSharedPolicy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute stored-audio transcription failure test" \
+  'TranscriptionRecordTests\.testRetranscribeStoredAudioMarksTranscriptionFailure' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \

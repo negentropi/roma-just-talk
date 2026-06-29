@@ -106,8 +106,6 @@ final class ProviderModelSelectionTests: XCTestCase {
         XCTAssertNil(VoiceInkProviderKind.xai.postProcessingModels)
         XCTAssertNil(VoiceInkProviderKind.localWhisper.postProcessingDefaultModel)
         XCTAssertNil(VoiceInkProviderKind.localWhisper.postProcessingModels)
-        XCTAssertNil(VoiceInkProviderKind.voiceInk.postProcessingDefaultModel)
-        XCTAssertNil(VoiceInkProviderKind.voiceInk.postProcessingModels)
     }
 
     func testSelectedModelReturnsEmptyStringWhenUseHasNoModels() {

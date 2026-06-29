@@ -309,10 +309,10 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
     func testModeRepairReplacesUnavailableProvidersWithFirstAvailableProvider() {
         var mode = Mode(
             name: "Legacy",
-            transcriptionProvider: .voiceInk,
+            transcriptionProvider: .cerebras,
             transcriptionModel: "whisper-large-v3",
             isPostProcessingEnabled: true,
-            postProcessingProvider: .voiceInk,
+            postProcessingProvider: .deepgram,
             postProcessingModel: "openai/gpt-oss-120b"
         )
 
@@ -333,7 +333,7 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
             transcriptionProvider: .groq,
             transcriptionModel: VoiceInkProviderKind.groq.defaultModel(for: .transcription),
             isPostProcessingEnabled: false,
-            postProcessingProvider: .voiceInk,
+            postProcessingProvider: .deepgram,
             postProcessingModel: ""
         )
 
@@ -342,7 +342,7 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
             availablePostProcessingProviders: [.gemini]
         )
 
-        XCTAssertEqual(mode.postProcessingProvider, .voiceInk)
+        XCTAssertEqual(mode.postProcessingProvider, .deepgram)
     }
 
     func testRuntimeConfigurationUsesSelectedModeWhenAvailable() {
@@ -642,10 +642,10 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
         )
         var mode = Mode(
             name: "Legacy",
-            transcriptionProvider: .voiceInk,
+            transcriptionProvider: .cerebras,
             transcriptionModel: "stale-transcription-model",
             isPostProcessingEnabled: true,
-            postProcessingProvider: .voiceInk,
+            postProcessingProvider: .deepgram,
             postProcessingModel: "stale-post-processing-model"
         )
 
@@ -749,7 +749,7 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
             name: "Clean",
             transcriptionProvider: .localWhisper,
             isPostProcessingEnabled: false,
-            postProcessingProvider: .voiceInk,
+            postProcessingProvider: .deepgram,
             postProcessingModel: "stale-post-processing-model"
         )
 

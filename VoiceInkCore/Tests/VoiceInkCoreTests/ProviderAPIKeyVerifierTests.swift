@@ -50,15 +50,6 @@ final class ProviderAPIKeyVerifierTests: XCTestCase {
                 errorMessage: "Local (Whisper) does not support API key verification."
             )
         )
-
-        let bundledResult = await verifier.verifyAPIKeyDetailed("key", for: .voiceInk)
-        XCTAssertEqual(
-            bundledResult,
-            VoiceInkAPIKeyVerificationResult(
-                isValid: false,
-                errorMessage: "VoiceInk does not support API key verification."
-            )
-        )
     }
 
     func testStoredKeyVerifierRejectsProvidersWithoutVerificationTransport() async {

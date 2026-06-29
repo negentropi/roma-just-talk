@@ -1145,7 +1145,7 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
         case .localWhisperModel:
             return localWhisperModelAvailable
         case .bundledService:
-            return true
+            return false
         }
     }
 

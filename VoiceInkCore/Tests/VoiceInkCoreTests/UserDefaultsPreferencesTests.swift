@@ -2965,6 +2965,57 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         }
     }
 
+    func testModeStorageMigratesLegacyVoiceInkProvidersWithoutDroppingModeList() {
+        withIsolatedDefaults { defaults in
+            let legacyModeId = UUID(uuidString: "E9A2F4E2-6B2F-4E9D-A631-0D4640D74F3A")!
+            let cloudModeId = UUID(uuidString: "C3E1F5D0-539B-4D1B-9F7F-48989AF59056")!
+            let groqDefaultModel = VoiceInkAIModelCatalog.defaultModel(for: .groq)
+            let json = """
+            [
+              {
+                "id": "\(legacyModeId.uuidString)",
+                "name": "Legacy VoiceInk",
+                "transcriptionProvider": "VoiceInk",
+                "transcriptionModel": "whisper-large-v3",
+                "isPostProcessingEnabled": true,
+                "postProcessingProvider": "voiceInk",
+                "postProcessingModel": "llama-3.1-8b-instant",
+                "promptTemplate": {
+                  "type": "Summary",
+                  "customPrompt": ""
+                }
+              },
+              {
+                "id": "\(cloudModeId.uuidString)",
+                "name": "Cloud",
+                "transcriptionProvider": "Deepgram",
+                "transcriptionModel": "nova-3",
+                "isPostProcessingEnabled": false,
+                "postProcessingProvider": "Groq",
+                "postProcessingModel": "\(groqDefaultModel)",
+                "promptTemplate": {
+                  "type": "Summary",
+                  "customPrompt": ""
+                }
+              }
+            ]
+            """
+
+            defaults.set(Data(json.utf8), forKey: VoiceInkUserDefaultsKey.modes)
+
+            let modes = VoiceInkModeStorage.loadModes(from: defaults)
+
+            XCTAssertEqual(modes.map(\.id), [legacyModeId, cloudModeId])
+            XCTAssertEqual(modes.first?.name, "Legacy VoiceInk")
+            XCTAssertEqual(modes.first?.transcriptionProvider, .localWhisper)
+            XCTAssertEqual(modes.first?.transcriptionModel, VoiceInkTranscriptionModelCatalog.localBaseModel)
+            XCTAssertEqual(modes.first?.postProcessingProvider, .groq)
+            XCTAssertEqual(modes.first?.postProcessingModel, groqDefaultModel)
+            XCTAssertEqual(modes.last?.transcriptionProvider, .deepgram)
+            XCTAssertEqual(modes.last?.postProcessingProvider, .groq)
+        }
+    }
+
     func testModeStorageFallsBackToEmptyModesForMissingOrInvalidData() {
         withIsolatedDefaults { defaults in
             XCTAssertTrue(VoiceInkModeStorage.loadModes(from: defaults).isEmpty)
@@ -3262,13 +3313,13 @@ final class UserDefaultsPreferencesTests: XCTestCase {
     func testProviderAPIKeyVerificationStateFiltersVerifiedUserKeyProviders() {
         withIsolatedDefaults { defaults in
             VoiceInkProviderAPIKeyVerificationState.setVerified(true, for: .groq, in: defaults)
-            VoiceInkProviderAPIKeyVerificationState.setVerified(true, for: .voiceInk, in: defaults)
+            VoiceInkProviderAPIKeyVerificationState.setVerified(true, for: .localWhisper, in: defaults)
 
             XCTAssertEqual(
-                VoiceInkProviderAPIKeyVerificationState.verifiedProviders(from: [.groq, .deepgram, .voiceInk], in: defaults),
+                VoiceInkProviderAPIKeyVerificationState.verifiedProviders(from: [.groq, .deepgram, .localWhisper], in: defaults),
                 [.groq]
             )
-            XCTAssertFalse(VoiceInkProviderAPIKeyVerificationState.isVerified(.voiceInk, in: defaults))
+            XCTAssertFalse(VoiceInkProviderAPIKeyVerificationState.isVerified(.localWhisper, in: defaults))
         }
     }
 

@@ -13,7 +13,6 @@ final class ProviderAPIKeyStorageTests: XCTestCase {
             VoiceInkProviderAPIKeyAccount.elevenLabs
         )
         XCTAssertNil(VoiceInkProviderAPIKeyStorage.account(for: .localWhisper))
-        XCTAssertNil(VoiceInkProviderAPIKeyStorage.account(for: .voiceInk))
     }
 
     func testStoredKeyLoadsThroughProviderAccountAndDefaultsToEmpty() {
@@ -63,7 +62,7 @@ final class ProviderAPIKeyStorageTests: XCTestCase {
 
     func testSaveAndDeleteSkipProvidersWithoutUserKeyAccounts() {
         var didSave = false
-        let saveResult = VoiceInkProviderAPIKeyStorage.saveStoredKey("secret", for: .voiceInk) { _, _ in
+        let saveResult = VoiceInkProviderAPIKeyStorage.saveStoredKey("secret", for: .localWhisper) { _, _ in
             didSave = true
             return errSecSuccess
         }

@@ -395,6 +395,17 @@ public struct Mode: Identifiable, Codable {
     public var postProcessingModel: String
     public var promptTemplate: VoiceInkPostProcessingPromptTemplate
 
+    private enum CodingKeys: String, CodingKey {
+        case id
+        case name
+        case transcriptionProvider
+        case transcriptionModel
+        case isPostProcessingEnabled
+        case postProcessingProvider
+        case postProcessingModel
+        case promptTemplate
+    }
+
     public init(
         name: String,
         transcriptionProvider: VoiceInkProviderKind = .groq,
@@ -416,6 +427,48 @@ public struct Mode: Identifiable, Codable {
             ?? postProcessingProvider.defaultModel(for: .postProcessing)
             ?? VoiceInkAIModelCatalog.defaultModel(for: .groq)
         self.promptTemplate = promptTemplate ?? VoiceInkPostProcessingPromptTemplate(type: .summary)
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        name = try container.decode(String.self, forKey: .name)
+        isPostProcessingEnabled = try container.decode(Bool.self, forKey: .isPostProcessingEnabled)
+        promptTemplate = try container.decode(VoiceInkPostProcessingPromptTemplate.self, forKey: .promptTemplate)
+
+        let transcriptionProviderValue = try container.decode(String.self, forKey: .transcriptionProvider)
+        if Self.isLegacyVoiceInkProviderValue(transcriptionProviderValue) {
+            transcriptionProvider = .localWhisper
+            transcriptionModel = VoiceInkTranscriptionModelCatalog.localBaseModel
+        } else {
+            transcriptionProvider = try container.decode(VoiceInkProviderKind.self, forKey: .transcriptionProvider)
+            transcriptionModel = try container.decode(String.self, forKey: .transcriptionModel)
+        }
+
+        let postProcessingProviderValue = try container.decode(String.self, forKey: .postProcessingProvider)
+        if Self.isLegacyVoiceInkProviderValue(postProcessingProviderValue) {
+            postProcessingProvider = .groq
+            postProcessingModel = VoiceInkAIModelCatalog.defaultModel(for: .groq)
+        } else {
+            postProcessingProvider = try container.decode(VoiceInkProviderKind.self, forKey: .postProcessingProvider)
+            postProcessingModel = try container.decode(String.self, forKey: .postProcessingModel)
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(name, forKey: .name)
+        try container.encode(transcriptionProvider, forKey: .transcriptionProvider)
+        try container.encode(transcriptionModel, forKey: .transcriptionModel)
+        try container.encode(isPostProcessingEnabled, forKey: .isPostProcessingEnabled)
+        try container.encode(postProcessingProvider, forKey: .postProcessingProvider)
+        try container.encode(postProcessingModel, forKey: .postProcessingModel)
+        try container.encode(promptTemplate, forKey: .promptTemplate)
+    }
+
+    private static func isLegacyVoiceInkProviderValue(_ value: String) -> Bool {
+        value == "VoiceInk" || value == "voiceInk"
     }
 
     public var effectivePrompt: String {

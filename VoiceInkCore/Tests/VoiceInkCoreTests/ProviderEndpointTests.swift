@@ -41,6 +41,5 @@ final class ProviderEndpointTests: XCTestCase {
         XCTAssertNil(VoiceInkProviderKind.assemblyAI.postProcessingChatCompletionsURL)
         XCTAssertNil(VoiceInkProviderKind.xai.postProcessingChatCompletionsURL)
         XCTAssertNil(VoiceInkProviderKind.localWhisper.postProcessingChatCompletionsURL)
-        XCTAssertNil(VoiceInkProviderKind.voiceInk.postProcessingChatCompletionsURL)
     }
 }

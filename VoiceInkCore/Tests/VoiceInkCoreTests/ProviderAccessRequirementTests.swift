@@ -69,21 +69,45 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertNil(VoiceInkProviderKind.localWhisper.apiKeyVerificationStateKey)
         XCTAssertNil(VoiceInkProviderKind.localWhisper.apiKeyVerificationTransport)
         XCTAssertFalse(VoiceInkProviderKind.localWhisper.canVerifyAPIKey)
-
-        guard case .bundledService = VoiceInkProviderKind.voiceInk.accessRequirement else {
-            return XCTFail("VoiceInk should use bundled service access")
-        }
-        XCTAssertFalse(VoiceInkProviderKind.voiceInk.requiresUserAPIKey)
-        XCTAssertNil(VoiceInkProviderKind.voiceInk.apiKeyAccount)
-        XCTAssertNil(VoiceInkProviderKind.voiceInk.apiKeyVerificationStateKey)
-        XCTAssertNil(VoiceInkProviderKind.voiceInk.apiKeyVerificationTransport)
-        XCTAssertFalse(VoiceInkProviderKind.voiceInk.canVerifyAPIKey)
     }
 
     func testRuntimeAPIKeyFollowsProviderAccessPolicy() {
         XCTAssertEqual(VoiceInkProviderKind.groq.runtimeAPIKey(userAPIKey: "groq-key"), "groq-key")
         XCTAssertEqual(VoiceInkProviderKind.localWhisper.runtimeAPIKey(userAPIKey: ""), "local")
-        XCTAssertEqual(VoiceInkProviderKind.voiceInk.runtimeAPIKey(userAPIKey: "ignored"), "")
+    }
+
+    func testLegacyVoiceInkProviderValuesDecodeToLegacyProvider() throws {
+        let decoder = JSONDecoder()
+
+        XCTAssertEqual(
+            try decoder.decode(VoiceInkProviderKind.self, from: Data(#""VoiceInk""#.utf8)),
+            .voiceInk
+        )
+        XCTAssertEqual(
+            try decoder.decode(VoiceInkProviderKind.self, from: Data(#""voiceInk""#.utf8)),
+            .voiceInk
+        )
+    }
+
+    func testBundledVoiceInkProviderIsNotSelectableUntilAnAdapterExists() {
+        guard case .bundledService = VoiceInkProviderKind.voiceInk.accessRequirement else {
+            return XCTFail("Legacy VoiceInk provider should keep bundled-service compatibility")
+        }
+
+        XCTAssertFalse(VoiceInkProviderKind.voiceInk.requiresUserAPIKey)
+        XCTAssertNil(VoiceInkProviderKind.voiceInk.apiKeyAccount)
+        XCTAssertNil(VoiceInkProviderKind.voiceInk.apiKeyVerificationStateKey)
+        XCTAssertNil(VoiceInkProviderKind.voiceInk.apiKeyVerificationTransport)
+        XCTAssertFalse(VoiceInkProviderKind.voiceInk.canVerifyAPIKey)
+        XCTAssertEqual(VoiceInkProviderKind.voiceInk.runtimeAPIKey(userAPIKey: ""), "")
+        XCTAssertNil(VoiceInkProviderKind.voiceInk.runtimeAPIKeyIfAvailable(userAPIKey: ""))
+        XCTAssertFalse(VoiceInkProviderKind.voiceInk.isReady(
+            userAPIKey: "",
+            userAPIKeyVerified: false,
+            localWhisperModelAvailable: true
+        ))
+        XCTAssertFalse(VoiceInkProviderKind.voiceInk.isSelectable(for: .transcription))
+        XCTAssertFalse(VoiceInkProviderKind.voiceInk.isSelectable(for: .postProcessing))
     }
 
     func testProviderCredentialRejectsBlankKeysWithoutNormalizingUsableKeys() {
@@ -739,20 +763,18 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertEqual(state.storedAPIKey(for: .groq), " groq-key ")
         XCTAssertEqual(state.runtimeAPIKey(for: .groq), "groq-key")
         XCTAssertEqual(state.runtimeAPIKey(for: .localWhisper), "local")
-        XCTAssertNil(state.runtimeAPIKey(for: .voiceInk))
     }
 
     func testProviderAPIKeyStateLoadsStoredKeysForUserKeyProvidersOnly() {
         let state = VoiceInkProviderAPIKeyState.loadingStoredKeys(
-            for: [.groq, .localWhisper, .voiceInk, .deepgram],
-            verifiedProviders: [.groq, .localWhisper, .voiceInk],
+            for: [.groq, .localWhisper, .deepgram],
+            verifiedProviders: [.groq, .localWhisper],
             loadStoredAPIKey: { "\($0.rawValue)-stored" }
         )
 
         XCTAssertEqual(state.storedAPIKey(for: .groq), "groq-stored")
         XCTAssertEqual(state.storedAPIKey(for: .deepgram), "deepgram-stored")
         XCTAssertEqual(state.storedAPIKey(for: .localWhisper), "")
-        XCTAssertEqual(state.storedAPIKey(for: .voiceInk), "")
         XCTAssertTrue(state.isReady(for: .groq, localWhisperModelAvailable: false))
         XCTAssertFalse(state.isReady(for: .deepgram, localWhisperModelAvailable: false))
         XCTAssertTrue(state.isReady(for: .localWhisper, localWhisperModelAvailable: true))
@@ -768,7 +790,6 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertFalse(state.isReady(for: .deepgram, localWhisperModelAvailable: false))
         XCTAssertTrue(state.isReady(for: .localWhisper, localWhisperModelAvailable: true))
         XCTAssertFalse(state.isReady(for: .localWhisper, localWhisperModelAvailable: false))
-        XCTAssertTrue(state.isReady(for: .voiceInk, localWhisperModelAvailable: false))
     }
 
     func testProviderAPIKeyStateBuildsAvailableProvidersForModelUse() {
@@ -873,7 +894,7 @@ final class ProviderAccessRequirementTests: XCTestCase {
 
         XCTAssertEqual(
             state.listRows(
-                for: [.groq, .localWhisper, .voiceInk, .deepgram],
+                for: [.groq, .localWhisper, .deepgram],
                 localWhisperModelAvailable: false
             ),
             [
@@ -1095,19 +1116,18 @@ final class ProviderAccessRequirementTests: XCTestCase {
         let state = VoiceInkProviderAPIKeyState()
 
         let verificationPlan = state.applyingVerification(true, for: .localWhisper)
-        let storagePlan = state.applyingStoredAPIKey("ignored", for: .voiceInk)
+        let storagePlan = state.applyingStoredAPIKey("ignored", for: .localWhisper)
 
         XCTAssertFalse(verificationPlan.shouldApplyState)
         XCTAssertEqual(applyProviderAPIKeyStateUpdatePlan(verificationPlan, provider: .localWhisper).events, [])
         XCTAssertFalse(storagePlan.shouldApplyState)
-        XCTAssertEqual(applyProviderAPIKeyStateUpdatePlan(storagePlan, provider: .voiceInk).events, [])
+        XCTAssertEqual(applyProviderAPIKeyStateUpdatePlan(storagePlan, provider: .localWhisper).events, [])
     }
 
     func testRuntimeAPIKeyIfAvailableFollowsProviderAccessPolicyAndBlankRules() {
         XCTAssertEqual(VoiceInkProviderKind.groq.runtimeAPIKeyIfAvailable(userAPIKey: "groq-key"), "groq-key")
         XCTAssertNil(VoiceInkProviderKind.groq.runtimeAPIKeyIfAvailable(userAPIKey: " \n "))
         XCTAssertEqual(VoiceInkProviderKind.localWhisper.runtimeAPIKeyIfAvailable(userAPIKey: ""), "local")
-        XCTAssertNil(VoiceInkProviderKind.voiceInk.runtimeAPIKeyIfAvailable(userAPIKey: "ignored"))
     }
 
     func testTranscriptionServiceKindGroupsProvidersByRequiredAdapter() {
@@ -1203,15 +1223,10 @@ final class ProviderAccessRequirementTests: XCTestCase {
             localWhisperModelAvailable: false
         ))
 
-        XCTAssertTrue(VoiceInkProviderKind.voiceInk.isReady(
-            userAPIKey: "",
-            userAPIKeyVerified: false,
-            localWhisperModelAvailable: false
-        ))
     }
 
     func testAvailableProvidersFiltersByModelUseAndReadiness() {
-        let readyProviders: Set<VoiceInkProviderKind> = [.groq, .deepgram, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .localWhisper, .voiceInk]
+        let readyProviders: Set<VoiceInkProviderKind> = [.groq, .deepgram, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .localWhisper]
 
         XCTAssertEqual(
             VoiceInkProviderKind.availableProviders(for: .transcription) { readyProviders.contains($0) },
@@ -1224,33 +1239,11 @@ final class ProviderAccessRequirementTests: XCTestCase {
         )
     }
 
-    func testBundledVoiceInkProviderIsNotSelectableUntilAnAdapterExists() {
-        XCTAssertTrue(VoiceInkProviderKind.voiceInk.isReady(
-            userAPIKey: "",
-            userAPIKeyVerified: false,
-            localWhisperModelAvailable: false
-        ))
-        XCTAssertFalse(VoiceInkProviderKind.voiceInk.supportsModelUse(.transcription))
-        XCTAssertFalse(VoiceInkProviderKind.voiceInk.supportsModelUse(.postProcessing))
-        XCTAssertFalse(VoiceInkProviderKind.voiceInk.isSelectable(for: .transcription))
-        XCTAssertFalse(VoiceInkProviderKind.voiceInk.isSelectable(for: .postProcessing))
-        XCTAssertEqual(
-            VoiceInkProviderKind.availableProviders(for: .transcription) { $0 == .voiceInk },
-            []
-        )
-        XCTAssertEqual(
-            VoiceInkProviderKind.availableProviders(for: .postProcessing) { $0 == .voiceInk },
-            []
-        )
-    }
-
     func testProviderSelectabilityKeepsReadinessAndModelSupportSeparate() {
         XCTAssertTrue(VoiceInkProviderKind.groq.isSelectable(for: .transcription))
         XCTAssertTrue(VoiceInkProviderKind.groq.isSelectable(for: .postProcessing))
         XCTAssertTrue(VoiceInkProviderKind.localWhisper.isSelectable(for: .transcription))
         XCTAssertFalse(VoiceInkProviderKind.localWhisper.isSelectable(for: .postProcessing))
-        XCTAssertFalse(VoiceInkProviderKind.voiceInk.isSelectable(for: .transcription))
-        XCTAssertFalse(VoiceInkProviderKind.voiceInk.isSelectable(for: .postProcessing))
     }
 
     func testAvailableProvidersReturnsEmptyWhenNoProviderIsReady() {

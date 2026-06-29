@@ -877,6 +877,166 @@ final class TranscriptPresentationTests: XCTestCase {
         XCTAssertNil(negativeDuration.metadataSeparatorText)
     }
 
+    func testNoteDetailPresentationBuildsCompletedContentAndAudioSection() {
+        let audioURL = URL(fileURLWithPath: "/tmp/recording.wav")
+
+        let presentation = VoiceInkNoteDetailPresentation.make(
+            status: .completed,
+            rawText: "raw transcript",
+            enhancedText: "enhanced transcript",
+            transcriptionError: nil,
+            isRetranscribing: false,
+            audioAvailability: .available(audioURL),
+            duration: 0
+        )
+
+        XCTAssertEqual(presentation.navigationTitle, VoiceInkTranscriptPresentation.noteDetailNavigationTitle)
+        XCTAssertEqual(presentation.transcriptContent?.title, VoiceInkTranscriptPresentation.transcriptTitle)
+        XCTAssertEqual(presentation.transcriptContent?.text, "enhanced transcript")
+        XCTAssertEqual(
+            presentation.transcriptContent?.copySystemImageName,
+            VoiceInkTranscriptPresentation.copyTranscriptSystemImageName
+        )
+        XCTAssertNil(presentation.statusPanel)
+        XCTAssertEqual(presentation.audioAvailability, .available(audioURL))
+        XCTAssertTrue(presentation.shouldShowAudioSection)
+    }
+
+    func testNoteDetailPresentationUsesRawTextWhenEnhancedTextIsEmpty() {
+        let presentation = VoiceInkNoteDetailPresentation.make(
+            status: .completed,
+            rawText: "raw transcript",
+            enhancedText: "",
+            transcriptionError: nil,
+            isRetranscribing: false,
+            audioAvailability: .missingPath,
+            duration: 0
+        )
+
+        XCTAssertEqual(presentation.transcriptContent?.text, "raw transcript")
+    }
+
+    func testNoteDetailPresentationUsesEmptyCompletedContentFallback() {
+        let presentation = VoiceInkNoteDetailPresentation.make(
+            status: .completed,
+            rawText: "",
+            enhancedText: nil,
+            transcriptionError: nil,
+            isRetranscribing: false,
+            audioAvailability: .missingPath,
+            duration: 0
+        )
+
+        XCTAssertEqual(
+            presentation.transcriptContent?.text,
+            VoiceInkTranscriptPresentation.emptyPreferredText
+        )
+        XCTAssertNil(presentation.statusPanel)
+        XCTAssertFalse(presentation.shouldShowAudioSection)
+    }
+
+    func testNoteDetailPresentationHidesCanceledContentAndStatusPanel() {
+        let presentation = VoiceInkNoteDetailPresentation.make(
+            status: .canceled,
+            rawText: "raw transcript",
+            enhancedText: "enhanced transcript",
+            transcriptionError: "Canceled",
+            isRetranscribing: false,
+            audioAvailability: .missingPath,
+            duration: 0
+        )
+
+        XCTAssertNil(presentation.transcriptContent)
+        XCTAssertNil(presentation.statusPanel)
+        XCTAssertFalse(presentation.shouldShowAudioSection)
+    }
+
+    func testNoteDetailPresentationBuildsFailedStatusPanel() {
+        let presentation = VoiceInkNoteDetailPresentation.make(
+            status: .failed,
+            rawText: "raw transcript",
+            enhancedText: nil,
+            transcriptionError: "Missing audio file",
+            isRetranscribing: false,
+            audioAvailability: .missingPath,
+            duration: 12
+        )
+
+        XCTAssertNil(presentation.transcriptContent)
+        XCTAssertEqual(presentation.statusPanel?.statusPresentation.title, "Transcription Failed")
+        XCTAssertEqual(presentation.statusPanel?.errorDetail, "Missing audio file")
+        XCTAssertTrue(presentation.statusPanel?.retryControls.shouldShowModeSelection == true)
+        XCTAssertFalse(presentation.statusPanel?.retryControls.shouldShowProgress == true)
+        XCTAssertEqual(
+            presentation.statusPanel?.retryButtonTitle,
+            VoiceInkTranscriptPresentation.retryTranscriptionButtonTitle
+        )
+        XCTAssertEqual(
+            presentation.statusPanel?.retryButtonSystemImageName,
+            VoiceInkTranscriptPresentation.retryTranscriptionSystemImageName
+        )
+        XCTAssertTrue(presentation.shouldShowAudioSection)
+    }
+
+    func testNoteDetailPresentationPreservesMissingAudioAvailability() {
+        let missingURL = URL(fileURLWithPath: "/tmp/missing.wav")
+        let presentation = VoiceInkNoteDetailPresentation.make(
+            status: .failed,
+            rawText: "",
+            enhancedText: nil,
+            transcriptionError: nil,
+            isRetranscribing: false,
+            audioAvailability: .missingFile(missingURL),
+            duration: 0
+        )
+
+        XCTAssertEqual(presentation.audioAvailability, .missingFile(missingURL))
+        XCTAssertEqual(presentation.audioAvailability.unavailableTitle, "Audio Unavailable")
+        XCTAssertEqual(presentation.audioAvailability.unavailableDetail, "File not found")
+        XCTAssertTrue(presentation.shouldShowAudioSection)
+    }
+
+    func testNoteDetailPresentationBuildsPendingProgressPanel() {
+        let presentation = VoiceInkNoteDetailPresentation.make(
+            status: .pending,
+            rawText: "",
+            enhancedText: nil,
+            transcriptionError: nil,
+            isRetranscribing: false,
+            audioAvailability: .missingPath,
+            duration: 0
+        )
+
+        XCTAssertNil(presentation.transcriptContent)
+        XCTAssertEqual(presentation.statusPanel?.statusPresentation.title, "Transcription Pending")
+        XCTAssertFalse(presentation.statusPanel?.retryControls.shouldShowModeSelection == true)
+        XCTAssertTrue(presentation.statusPanel?.retryControls.shouldShowProgress == true)
+        XCTAssertEqual(
+            presentation.statusPanel?.retryControls.progressDisplayText,
+            VoiceInkTranscriptPresentation.transcribingDisplayText
+        )
+    }
+
+    func testNoteDetailPresentationUsesRetranscribingProgressPanel() {
+        let presentation = VoiceInkNoteDetailPresentation.make(
+            status: .failed,
+            rawText: "",
+            enhancedText: nil,
+            transcriptionError: "",
+            isRetranscribing: true,
+            audioAvailability: .missingPath,
+            duration: 0
+        )
+
+        XCTAssertNil(presentation.statusPanel?.errorDetail)
+        XCTAssertFalse(presentation.statusPanel?.retryControls.shouldShowModeSelection == true)
+        XCTAssertTrue(presentation.statusPanel?.retryControls.shouldShowProgress == true)
+        XCTAssertEqual(
+            presentation.statusPanel?.retryControls.progressDisplayText,
+            VoiceInkTranscriptPresentation.retranscribingDisplayText
+        )
+    }
+
     func testStatusTitleReturnsRetryStateTitles() {
         XCTAssertEqual(
             VoiceInkTranscriptPresentation.statusTitle(for: .pending),

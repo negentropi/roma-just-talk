@@ -2871,6 +2871,13 @@ require_pattern \
   'VoiceInkNoteRowPresentation' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
 
+require_patterns \
+  "shared iOS note detail presentation lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift \
+  'VoiceInkNoteDetailPresentation' \
+  'VoiceInkTranscriptContentPresentation' \
+  'VoiceInkNoteDetailStatusPanelPresentation'
+
 require_pattern \
   "shared transcript status metadata lives in VoiceInkCore" \
   'panelSystemImageName|shouldShowInlineProgress|shouldShowInlineBadge|Tone' \
@@ -2979,6 +2986,18 @@ require_patterns \
   'TranscriptPresentationTests\.testNoteRowPresentationUsesStatusFallbacksForRetryStates' \
   'TranscriptPresentationTests\.testNoteRowPresentationOmitsNonPositiveDuration'
 
+require_patterns \
+  "core checks execute iOS note detail presentation tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'TranscriptPresentationTests\.testNoteDetailPresentationBuildsCompletedContentAndAudioSection' \
+  'TranscriptPresentationTests\.testNoteDetailPresentationUsesRawTextWhenEnhancedTextIsEmpty' \
+  'TranscriptPresentationTests\.testNoteDetailPresentationUsesEmptyCompletedContentFallback' \
+  'TranscriptPresentationTests\.testNoteDetailPresentationHidesCanceledContentAndStatusPanel' \
+  'TranscriptPresentationTests\.testNoteDetailPresentationBuildsFailedStatusPanel' \
+  'TranscriptPresentationTests\.testNoteDetailPresentationPreservesMissingAudioAvailability' \
+  'TranscriptPresentationTests\.testNoteDetailPresentationBuildsPendingProgressPanel' \
+  'TranscriptPresentationTests\.testNoteDetailPresentationUsesRetranscribingProgressPanel'
+
 require_pattern \
   "core checks execute transcript action control presentation test" \
   'testTranscriptActionControlPresentationPreservesMacOSCopyAndSaveCopy' \
@@ -3058,8 +3077,8 @@ reject_pattern \
   iOS/VoiceInk-ios/NoteRowView.swift
 
 require_pattern \
-  "iOS note detail uses shared transcript status presentation" \
-  'VoiceInkTranscriptPresentation\.statusPresentation' \
+  "iOS note detail uses shared note detail presentation" \
+  'VoiceInkNoteDetailPresentation\.make' \
   iOS/VoiceInk-ios/NoteDetailView.swift
 
 reject_pattern \
@@ -3069,7 +3088,7 @@ reject_pattern \
 
 require_pattern \
   "iOS note detail uses shared transcript status metadata" \
-  'panelSystemImageName|\.tone' \
+  'panelSystemImageName|\.tone|statusPanel\.statusPresentation' \
   iOS/VoiceInk-ios/NoteDetailView.swift
 
 require_pattern \
@@ -3083,39 +3102,45 @@ reject_pattern \
   iOS/VoiceInk-ios/NoteRowView.swift \
   iOS/VoiceInk-ios/NoteDetailView.swift
 
-require_pattern \
-  "iOS note detail uses shared status panel visibility" \
-  'VoiceInkTranscriptPresentation\.shouldShowStatusPanel' \
-  iOS/VoiceInk-ios/NoteDetailView.swift
+require_patterns \
+  "iOS note detail uses shared status and content visibility" \
+  iOS/VoiceInk-ios/NoteDetailView.swift \
+  'presentation\.statusPanel' \
+  'presentation\.transcriptContent'
 
-require_pattern \
-  "iOS note detail uses shared completed transcript visibility" \
-  'VoiceInkTranscriptPresentation\.shouldShowCompletedContent' \
-  iOS/VoiceInk-ios/NoteDetailView.swift
-
-require_pattern \
+require_patterns \
   "iOS note detail uses shared transcript detail presentation copy" \
-  'VoiceInkTranscriptPresentation\.(noteDetailNavigationTitle|transcriptTitle|copyTranscriptSystemImageName|retranscribingDisplayText|retryTranscriptionButtonTitle|retryTranscriptionSystemImageName)' \
-  iOS/VoiceInk-ios/NoteDetailView.swift
+  iOS/VoiceInk-ios/NoteDetailView.swift \
+  'presentation\.navigationTitle' \
+  'content\.title' \
+  'content\.copySystemImageName' \
+  'statusPanel\.retryButtonTitle' \
+  'statusPanel\.retryButtonSystemImageName'
 
 require_pattern \
   "iOS note detail delegates retry control presentation to shared core" \
-  'VoiceInkTranscriptPresentation\.retryControls' \
+  'statusPanel\.retryControls' \
   iOS/VoiceInk-ios/NoteDetailView.swift
 
 require_pattern \
   "iOS note detail delegates retry action mapping to shared core" \
-  'retryControls\.runtimeAction\(retry: retranscribe\)' \
+  'statusPanel\.retryControls\.runtimeAction\(retry: retranscribe\)' \
   iOS/VoiceInk-ios/NoteDetailView.swift
 
-require_pattern \
+require_patterns \
   "iOS note detail uses shared retry progress presentation" \
-  'retryControls\.(shouldShowProgress|progressDisplayText)' \
-  iOS/VoiceInk-ios/NoteDetailView.swift
+  iOS/VoiceInk-ios/NoteDetailView.swift \
+  'statusPanel\.retryControls\.shouldShowProgress' \
+  'statusPanel\.retryControls\.progressDisplayText'
 
 require_pattern \
   "iOS note detail delegates status error visibility to shared core" \
-  'VoiceInkTranscriptPresentation\.statusErrorDetail' \
+  'statusPanel\.errorDetail' \
+  iOS/VoiceInk-ios/NoteDetailView.swift
+
+reject_pattern \
+  "iOS note detail avoids shell-owned detail presentation assembly" \
+  'VoiceInkTranscriptPresentation\.(statusPresentation|shouldShowStatusPanel|shouldShowCompletedContent|retryControls|statusErrorDetail|preferredTextOrEmptyContent|noteDetailNavigationTitle|transcriptTitle|copyTranscriptSystemImageName|retranscribingDisplayText|retryTranscriptionButtonTitle|retryTranscriptionSystemImageName)' \
   iOS/VoiceInk-ios/NoteDetailView.swift
 
 reject_pattern \

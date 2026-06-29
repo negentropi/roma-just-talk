@@ -11,8 +11,15 @@ struct NoteDetailView: View {
     @StateObject private var settings = AppSettings.shared
 
     var body: some View {
-        let audioAvailability = note.storedAudioAvailability()
-        let shouldShowAudioSection = audioAvailability.shouldShowAudioSection(duration: note.duration)
+        let presentation = VoiceInkNoteDetailPresentation.make(
+            status: note.transcriptionStatus,
+            rawText: note.text,
+            enhancedText: note.enhancedText,
+            transcriptionError: note.transcriptionError,
+            isRetranscribing: isRetranscribing,
+            audioAvailability: note.storedAudioAvailability(),
+            duration: note.duration
+        )
 
         GeometryReader { geometry in
             VStack(spacing: 0) {
@@ -20,17 +27,17 @@ struct NoteDetailView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 16) {
                         // Transcription status and retry button
-                        if VoiceInkTranscriptPresentation.shouldShowStatusPanel(for: note.transcriptionStatus) {
-                            transcriptionStatusView
+                        if let statusPanel = presentation.statusPanel {
+                            transcriptionStatusView(statusPanel)
                         }
 
                         // Transcript content
-                        if VoiceInkTranscriptPresentation.shouldShowCompletedContent(for: note.transcriptionStatus) {
-                            transcriptContentView
+                        if let transcriptContent = presentation.transcriptContent {
+                            transcriptContentView(transcriptContent)
                         }
                         
                         // Add bottom padding to account for audio player
-                        if shouldShowAudioSection {
+                        if presentation.shouldShowAudioSection {
                             Color.clear
                                 .frame(height: 100)
                         }
@@ -40,8 +47,8 @@ struct NoteDetailView: View {
                 .scrollIndicators(.hidden)
 
                 // Bottom audio player (web-form style)
-                if shouldShowAudioSection {
-                    bottomAudioPlayer(audioAvailability: audioAvailability)
+                if presentation.shouldShowAudioSection {
+                    bottomAudioPlayer(audioAvailability: presentation.audioAvailability)
                         .background(.ultraThinMaterial)
                         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                         .padding(.horizontal)
@@ -49,33 +56,27 @@ struct NoteDetailView: View {
                 }
             }
         }
-        .navigationTitle(VoiceInkTranscriptPresentation.noteDetailNavigationTitle)
+        .navigationTitle(presentation.navigationTitle)
         .navigationBarTitleDisplayMode(.inline)
         .background(Color(.systemGroupedBackground))
     }
     
-    private var transcriptContentView: some View {
+    private func transcriptContentView(_ content: VoiceInkTranscriptContentPresentation) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text(VoiceInkTranscriptPresentation.transcriptTitle)
+                Text(content.title)
                     .font(.headline)
                 Spacer()
                 Button(action: {
-                    copyToClipboard(VoiceInkTranscriptPresentation.preferredTextOrEmptyContent(
-                        rawText: note.text,
-                        enhancedText: note.enhancedText
-                    ))
+                    copyToClipboard(content.text)
                 }) {
-                    Image(systemName: VoiceInkTranscriptPresentation.copyTranscriptSystemImageName)
+                    Image(systemName: content.copySystemImageName)
                         .font(.system(size: 16))
                         .foregroundStyle(.blue)
                 }
             }
             
-            Text(VoiceInkTranscriptPresentation.preferredTextOrEmptyContent(
-                rawText: note.text,
-                enhancedText: note.enhancedText
-            ))
+            Text(content.text)
                 .font(.body)
                 .textSelection(.enabled)
                 .padding()
@@ -124,69 +125,62 @@ struct NoteDetailView: View {
     }
     
     @ViewBuilder
-    private var transcriptionStatusView: some View {
-        let statusPresentation = VoiceInkTranscriptPresentation.statusPresentation(for: note.transcriptionStatus)
-        let retryControls = VoiceInkTranscriptPresentation.retryControls(
-            for: note.transcriptionStatus,
-            isRetranscribing: isRetranscribing
-        )
-        let retryAction = retryControls.runtimeAction(retry: retranscribe)
+    private func transcriptionStatusView(_ statusPanel: VoiceInkNoteDetailStatusPanelPresentation) -> some View {
+        let retryAction = statusPanel.retryControls.runtimeAction(retry: retranscribe)
 
-        if let statusPresentation {
-            VStack(spacing: 12) {
-                HStack {
-                    Image(systemName: statusPresentation.panelSystemImageName)
-                        .foregroundStyle(statusPresentation.tone.statusColor)
+        VStack(spacing: 12) {
+            HStack {
+                Image(systemName: statusPanel.statusPresentation.panelSystemImageName)
+                    .foregroundStyle(statusPanel.statusPresentation.tone.statusColor)
 
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(statusPresentation.title)
-                            .font(.subheadline.weight(.medium))
-                        if let error = VoiceInkTranscriptPresentation.statusErrorDetail(note.transcriptionError) {
-                            Text(error)
-                                .font(.callout)
-                                .textSelection(.enabled)
-                                .foregroundStyle(.secondary)
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
-                    }
-
-                    Spacer()
-                }
-
-                // Mode selection for re-transcription
-                if retryControls.shouldShowModeSelection {
-                    VoiceInkModeSelectionControlView(
-                        modes: settings.modes,
-                        selectedModeId: $settings.selectedModeId
-                    )
-                }
-
-                if retryControls.shouldShowProgress {
-                    HStack {
-                        ProgressView()
-                            .scaleEffect(0.8)
-                        Text(retryControls.progressDisplayText ?? VoiceInkTranscriptPresentation.retranscribingDisplayText)
-                            .font(.subheadline)
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(statusPanel.statusPresentation.title)
+                        .font(.subheadline.weight(.medium))
+                    if let error = statusPanel.errorDetail {
+                        Text(error)
+                            .font(.callout)
+                            .textSelection(.enabled)
                             .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
-                } else if let retryAction {
-                    Button(action: retryAction) {
-                        Label(
-                            VoiceInkTranscriptPresentation.retryTranscriptionButtonTitle,
-                            systemImage: VoiceInkTranscriptPresentation.retryTranscriptionSystemImageName
-                        )
-                            .fontWeight(.semibold)
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.blue)
-                    .controlSize(.regular)
                 }
+
+                Spacer()
             }
-            .padding()
-            .background(Color(.secondarySystemGroupedBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 16))
+
+            // Mode selection for re-transcription
+            if statusPanel.retryControls.shouldShowModeSelection {
+                VoiceInkModeSelectionControlView(
+                    modes: settings.modes,
+                    selectedModeId: $settings.selectedModeId
+                )
+            }
+
+            if statusPanel.retryControls.shouldShowProgress {
+                HStack {
+                    ProgressView()
+                        .scaleEffect(0.8)
+                    Text(statusPanel.retryControls.progressDisplayText ?? "")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+            } else if let retryAction {
+                Button(action: retryAction) {
+                    Label(
+                        statusPanel.retryButtonTitle,
+                        systemImage: statusPanel.retryButtonSystemImageName
+                    )
+                        .fontWeight(.semibold)
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.blue)
+                .controlSize(.regular)
+            }
         }
+        .padding()
+        .background(Color(.secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
     private func retranscribe() {

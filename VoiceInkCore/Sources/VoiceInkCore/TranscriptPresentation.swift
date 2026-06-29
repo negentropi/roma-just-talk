@@ -120,6 +120,104 @@ public struct VoiceInkNoteRowPresentation: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkTranscriptContentPresentation: Equatable, Sendable {
+    public let title: String
+    public let text: String
+    public let copySystemImageName: String
+
+    public init(title: String, text: String, copySystemImageName: String) {
+        self.title = title
+        self.text = text
+        self.copySystemImageName = copySystemImageName
+    }
+}
+
+public struct VoiceInkNoteDetailStatusPanelPresentation: Equatable, Sendable {
+    public let statusPresentation: VoiceInkTranscriptStatusPresentation
+    public let errorDetail: String?
+    public let retryControls: VoiceInkTranscriptRetryControlsPresentation
+    public let retryButtonTitle: String
+    public let retryButtonSystemImageName: String
+
+    public init(
+        statusPresentation: VoiceInkTranscriptStatusPresentation,
+        errorDetail: String?,
+        retryControls: VoiceInkTranscriptRetryControlsPresentation,
+        retryButtonTitle: String,
+        retryButtonSystemImageName: String
+    ) {
+        self.statusPresentation = statusPresentation
+        self.errorDetail = errorDetail
+        self.retryControls = retryControls
+        self.retryButtonTitle = retryButtonTitle
+        self.retryButtonSystemImageName = retryButtonSystemImageName
+    }
+}
+
+public struct VoiceInkNoteDetailPresentation: Equatable, Sendable {
+    public let navigationTitle: String
+    public let transcriptContent: VoiceInkTranscriptContentPresentation?
+    public let statusPanel: VoiceInkNoteDetailStatusPanelPresentation?
+    public let audioAvailability: VoiceInkStoredAudioAvailability
+    public let shouldShowAudioSection: Bool
+
+    public init(
+        navigationTitle: String,
+        transcriptContent: VoiceInkTranscriptContentPresentation?,
+        statusPanel: VoiceInkNoteDetailStatusPanelPresentation?,
+        audioAvailability: VoiceInkStoredAudioAvailability,
+        shouldShowAudioSection: Bool
+    ) {
+        self.navigationTitle = navigationTitle
+        self.transcriptContent = transcriptContent
+        self.statusPanel = statusPanel
+        self.audioAvailability = audioAvailability
+        self.shouldShowAudioSection = shouldShowAudioSection
+    }
+
+    public static func make(
+        status: VoiceInkTranscriptionStatus,
+        rawText: String,
+        enhancedText: String?,
+        transcriptionError: String?,
+        isRetranscribing: Bool,
+        audioAvailability: VoiceInkStoredAudioAvailability,
+        duration: TimeInterval
+    ) -> VoiceInkNoteDetailPresentation {
+        let transcriptContent = VoiceInkTranscriptPresentation.shouldShowCompletedContent(for: status)
+            ? VoiceInkTranscriptContentPresentation(
+                title: VoiceInkTranscriptPresentation.transcriptTitle,
+                text: VoiceInkTranscriptPresentation.preferredTextOrEmptyContent(
+                    rawText: rawText,
+                    enhancedText: enhancedText
+                ),
+                copySystemImageName: VoiceInkTranscriptPresentation.copyTranscriptSystemImageName
+            )
+            : nil
+
+        let statusPanel = VoiceInkTranscriptPresentation.statusPresentation(for: status).map { statusPresentation in
+            VoiceInkNoteDetailStatusPanelPresentation(
+                statusPresentation: statusPresentation,
+                errorDetail: VoiceInkTranscriptPresentation.statusErrorDetail(transcriptionError),
+                retryControls: VoiceInkTranscriptPresentation.retryControls(
+                    for: status,
+                    isRetranscribing: isRetranscribing
+                ),
+                retryButtonTitle: VoiceInkTranscriptPresentation.retryTranscriptionButtonTitle,
+                retryButtonSystemImageName: VoiceInkTranscriptPresentation.retryTranscriptionSystemImageName
+            )
+        }
+
+        return VoiceInkNoteDetailPresentation(
+            navigationTitle: VoiceInkTranscriptPresentation.noteDetailNavigationTitle,
+            transcriptContent: transcriptContent,
+            statusPanel: statusPanel,
+            audioAvailability: audioAvailability,
+            shouldShowAudioSection: audioAvailability.shouldShowAudioSection(duration: duration)
+        )
+    }
+}
+
 enum VoiceInkTranscriptRetryControlAction: Equatable, Sendable {
     case hidden
     case showProgress

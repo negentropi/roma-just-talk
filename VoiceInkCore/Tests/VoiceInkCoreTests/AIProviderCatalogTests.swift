@@ -1971,81 +1971,169 @@ final class AIProviderCatalogTests: XCTestCase {
         ])
     }
 
-    func testMacOSAIEnhancementProviderVerificationRoutesAreShared() {
-        let expectedRoutes: [VoiceInkAIEnhancementProviderKind: VoiceInkAIEnhancementAPIKeyVerificationRoute?] = [
-            .anthropic: .anthropicMessages,
-            .assemblyAI: .sharedProvider(.assemblyAI),
-            .cerebras: .openAICompatibleModels,
-            .custom: .openAICompatibleModels,
-            .deepgram: .sharedProvider(.deepgram),
-            .elevenLabs: .sharedProvider(.elevenLabs),
-            .gemini: .sharedProvider(.gemini),
-            .groq: .openAICompatibleModels,
-            .localCLI: nil,
-            .mistral: .sharedProvider(.mistral),
-            .ollama: nil,
-            .openAI: .openAICompatibleModels,
-            .openRouter: .openRouterModels,
-            .soniox: .sharedProvider(.soniox),
-            .speechmatics: .sharedProvider(.speechmatics)
+    func testMacOSAIEnhancementProviderVerificationDispatchesAreShared() async {
+        let customRequestURL = URL(string: "https://api.example.com/v1/chat/completions")!
+        let expectedDispatches: [(VoiceInkAIEnhancementProviderKind, VoiceInkAPIKeyVerificationResult, [String])] = [
+            (.anthropic, VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: "anthropic"), ["anthropic:resolved-key"]),
+            (.assemblyAI, VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: "shared"), ["shared:resolved-key:assemblyAI"]),
+            (.cerebras, VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: "openai"), ["openai:https://api.example.com/v1/chat/completions:resolved-key:shared-model"]),
+            (.custom, VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: "openai"), ["openai:https://api.example.com/v1/chat/completions:resolved-key:shared-model"]),
+            (.deepgram, VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: "shared"), ["shared:resolved-key:deepgram"]),
+            (.elevenLabs, VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: "shared"), ["shared:resolved-key:elevenLabs"]),
+            (.gemini, VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: "shared"), ["shared:resolved-key:gemini"]),
+            (.groq, VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: "openai"), ["openai:https://api.example.com/v1/chat/completions:resolved-key:shared-model"]),
+            (.localCLI, VoiceInkAPIKeyVerificationResult(isValid: false, errorMessage: VoiceInkAIEnhancementProviderKind.localCLI.unsupportedAPIKeyVerificationMessage), []),
+            (.mistral, VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: "shared"), ["shared:resolved-key:mistral"]),
+            (.ollama, VoiceInkAPIKeyVerificationResult(isValid: false, errorMessage: VoiceInkAIEnhancementProviderKind.ollama.unsupportedAPIKeyVerificationMessage), []),
+            (.openAI, VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: "openai"), ["openai:https://api.example.com/v1/chat/completions:resolved-key:shared-model"]),
+            (.openRouter, VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: "openrouter"), ["openrouter:resolved-key:shared-model"]),
+            (.soniox, VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: "shared"), ["shared:resolved-key:soniox"]),
+            (.speechmatics, VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: "shared"), ["shared:resolved-key:speechmatics"])
         ]
 
-        XCTAssertEqual(VoiceInkAIEnhancementProviderKind.allCases.count, expectedRoutes.count)
+        XCTAssertEqual(VoiceInkAIEnhancementProviderKind.allCases.count, expectedDispatches.count)
 
-        for (provider, route) in expectedRoutes {
-            XCTAssertEqual(provider.apiKeyVerificationRoute, route)
+        for (provider, expectedResult, expectedCalls) in expectedDispatches {
+            await assertVerificationDispatch(
+                VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan.plan(
+                    provider: provider,
+                    currentModel: "shared-model",
+                    requestURL: customRequestURL
+                ),
+                expectedResult: expectedResult,
+                expectedCalls: expectedCalls
+            )
         }
     }
 
-    func testMacOSAIEnhancementExecutionRoutesAreShared() async throws {
-        let expectedRoutes: [VoiceInkAIEnhancementProviderKind: VoiceInkAIEnhancementExecutionRoute] = [
-            .anthropic: .anthropicMessages,
-            .assemblyAI: .openAICompatibleChatCompletions,
-            .cerebras: .openAICompatibleChatCompletions,
-            .custom: .openAICompatibleChatCompletions,
-            .deepgram: .openAICompatibleChatCompletions,
-            .elevenLabs: .openAICompatibleChatCompletions,
-            .gemini: .openAICompatibleChatCompletions,
-            .groq: .openAICompatibleChatCompletions,
-            .localCLI: .localCLI,
-            .mistral: .openAICompatibleChatCompletions,
-            .ollama: .ollama,
-            .openAI: .openAICompatibleChatCompletions,
-            .openRouter: .openAICompatibleChatCompletions,
-            .soniox: .openAICompatibleChatCompletions,
-            .speechmatics: .openAICompatibleChatCompletions
-        ]
+    func testMacOSAIEnhancementExecutionPlanAppliesAdapters() async throws {
+        try await withIsolatedDefaultsAsyncThrows { defaults in
+            VoiceInkDynamicAIProviderPreference.saveCustomProviderBaseURL(
+                "https://api.example.com/v1/chat/completions",
+                to: defaults
+            )
 
-        XCTAssertEqual(VoiceInkAIEnhancementProviderKind.allCases.count, expectedRoutes.count)
+            XCTAssertEqual(VoiceInkAIEnhancementProviderKind.selectableTextEnhancementProviders, [
+                .cerebras,
+                .groq,
+                .gemini,
+                .anthropic,
+                .openAI,
+                .openRouter,
+                .mistral,
+                .ollama,
+                .localCLI,
+                .custom
+            ])
 
-        for (provider, route) in expectedRoutes {
-            XCTAssertEqual(provider.textEnhancementExecutionRoute, route)
+            let localExpectations: [(VoiceInkAIEnhancementProviderKind, String, String)] = [
+                (.ollama, "mistral", "ollama:mistral"),
+                (.localCLI, "local-cli", "localCLI:local-cli"),
+                (.anthropic, "claude-sonnet-4-5", "anthropicMessages:claude-sonnet-4-5")
+            ]
+
+            for (provider, model, expectedSummary) in localExpectations {
+                let summary = try await executionSummary(
+                    for: VoiceInkAIEnhancementRequestExecutionPlan.planning(
+                        provider: provider,
+                        modelName: model,
+                        defaults: defaults
+                    )
+                )
+                XCTAssertEqual(summary, expectedSummary)
+            }
+
+            let openAICompatibleExpectations: [(VoiceInkAIEnhancementProviderKind, String, OpenAICompatibleRequestSummary)] = [
+                (
+                    .cerebras,
+                    "gpt-oss-120b",
+                    OpenAICompatibleRequestSummary(
+                        requestURL: VoiceInkAIModelProvider.cerebras.postProcessingRequestURL!,
+                        temperature: 0.3,
+                        reasoningEffort: "low",
+                        hasExtraBodyParameters: true,
+                        includeReasoning: nil
+                    )
+                ),
+                (
+                    .custom,
+                    "custom-model",
+                    OpenAICompatibleRequestSummary(
+                        requestURL: URL(string: "https://api.example.com/v1/chat/completions")!,
+                        temperature: 0.3,
+                        reasoningEffort: nil,
+                        hasExtraBodyParameters: false,
+                        includeReasoning: nil
+                    )
+                ),
+                (
+                    .gemini,
+                    "gemini-2.5-pro",
+                    OpenAICompatibleRequestSummary(
+                        requestURL: VoiceInkAIModelProvider.gemini.postProcessingRequestURL!,
+                        temperature: 0.3,
+                        reasoningEffort: "minimal",
+                        hasExtraBodyParameters: false,
+                        includeReasoning: nil
+                    )
+                ),
+                (
+                    .groq,
+                    "openai/gpt-oss-120b",
+                    OpenAICompatibleRequestSummary(
+                        requestURL: VoiceInkAIModelProvider.groq.postProcessingRequestURL!,
+                        temperature: 0.3,
+                        reasoningEffort: "low",
+                        hasExtraBodyParameters: true,
+                        includeReasoning: false
+                    )
+                ),
+                (
+                    .mistral,
+                    "mistral-large-latest",
+                    OpenAICompatibleRequestSummary(
+                        requestURL: VoiceInkAIModelProvider.mistral.postProcessingRequestURL!,
+                        temperature: 0.3,
+                        reasoningEffort: nil,
+                        hasExtraBodyParameters: false,
+                        includeReasoning: nil
+                    )
+                ),
+                (
+                    .openAI,
+                    "gpt-5.5",
+                    OpenAICompatibleRequestSummary(
+                        requestURL: VoiceInkAIModelProvider.openAI.postProcessingRequestURL!,
+                        temperature: 1.0,
+                        reasoningEffort: "none",
+                        hasExtraBodyParameters: false,
+                        includeReasoning: nil
+                    )
+                ),
+                (
+                    .openRouter,
+                    "openai/gpt-5.5",
+                    OpenAICompatibleRequestSummary(
+                        requestURL: VoiceInkAIModelProvider.openRouter.postProcessingRequestURL!,
+                        temperature: 0.3,
+                        reasoningEffort: nil,
+                        hasExtraBodyParameters: false,
+                        includeReasoning: nil
+                    )
+                )
+            ]
+
+            for (provider, model, expectedSummary) in openAICompatibleExpectations {
+                let summary = try await openAICompatibleRequestSummary(
+                    for: VoiceInkAIEnhancementRequestExecutionPlan.planning(
+                        provider: provider,
+                        modelName: model,
+                        defaults: defaults
+                    )
+                )
+                XCTAssertEqual(summary, expectedSummary)
+            }
         }
-
-        let ollamaSummary = try await executionSummary(
-            for: VoiceInkAIEnhancementRequestExecutionPlan.planning(provider: .ollama, modelName: "mistral")
-        )
-        XCTAssertEqual(ollamaSummary, "ollama:mistral")
-
-        let localCLISummary = try await executionSummary(
-            for: VoiceInkAIEnhancementRequestExecutionPlan.planning(provider: .localCLI, modelName: "local-cli")
-        )
-        XCTAssertEqual(localCLISummary, "localCLI:local-cli")
-
-        let anthropicSummary = try await executionSummary(
-            for: VoiceInkAIEnhancementRequestExecutionPlan.planning(provider: .anthropic, modelName: "claude-sonnet-4-5")
-        )
-        XCTAssertEqual(anthropicSummary, "anthropicMessages:claude-sonnet-4-5")
-
-        let groqPlan = VoiceInkAIEnhancementRequestExecutionPlan.planning(
-            provider: .groq,
-            modelName: "openai/gpt-oss-120b"
-        )
-        let groqRequestSummary = try await openAICompatibleRequestSummary(for: groqPlan)
-        XCTAssertEqual(groqRequestSummary?.requestURL.absoluteString, VoiceInkAIModelProvider.groq.postProcessingRequestURL?.absoluteString)
-        XCTAssertEqual(groqRequestSummary?.temperature, 0.3)
-        XCTAssertEqual(groqRequestSummary?.reasoningEffort, "low")
-        XCTAssertEqual(groqRequestSummary?.includeReasoning, false)
     }
 
     private func executionSummary(for plan: VoiceInkAIEnhancementRequestExecutionPlan) async throws -> String {
@@ -2059,7 +2147,7 @@ final class AIProviderCatalogTests: XCTestCase {
         )
     }
 
-    private struct OpenAICompatibleRequestSummary {
+    private struct OpenAICompatibleRequestSummary: Equatable {
         let requestURL: URL
         let temperature: Double
         let reasoningEffort: String?
@@ -2172,5 +2260,19 @@ final class AIProviderCatalogTests: XCTestCase {
         }
 
         await run(defaults)
+    }
+
+    private func withIsolatedDefaultsAsyncThrows(_ run: (UserDefaults) async throws -> Void) async rethrows {
+        let suiteName = "VoiceInkCore.AIProviderCatalogTests.\(UUID().uuidString)"
+        guard let defaults = UserDefaults(suiteName: suiteName) else {
+            XCTFail("Unable to create isolated defaults")
+            return
+        }
+
+        defer {
+            defaults.removePersistentDomain(forName: suiteName)
+        }
+
+        try await run(defaults)
     }
 }

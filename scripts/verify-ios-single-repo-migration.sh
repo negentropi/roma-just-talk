@@ -9576,6 +9576,11 @@ reject_pattern \
   'VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan\(|action: \.' \
   VoiceInkCore/Tests/VoiceInkCoreTests/AIProviderCatalogTests.swift
 
+reject_pattern \
+  "shared macOS AI API-key verification dispatch plan avoids public route metadata" \
+  'public enum VoiceInkAIEnhancementAPIKeyVerificationRoute|apiKeyVerificationRoute' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
 require_pattern \
   "core checks execute shared macOS AI API-key verification persistence plan test" \
   'AIProviderCatalogTests\.testMacOSAIEnhancementAPIKeyVerificationPlanBuildsSuccessPersistencePlan' \
@@ -9852,7 +9857,7 @@ reject_pattern \
 
 reject_pattern \
   "macOS AI service avoids shell-owned API-key verification dispatch failure policy" \
-  'selectedProvider\.unsupportedAPIKeyVerificationMessage|invalidOrMissingBaseURLConfigurationMessage|guard let route = selectedProvider\.apiKeyVerificationRoute' \
+  'apiKeyVerificationRoute|VoiceInkAIEnhancementAPIKeyVerificationRoute|dispatchPlan\.(action|route)|selectedProvider\.unsupportedAPIKeyVerificationMessage|invalidOrMissingBaseURLConfigurationMessage' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 require_pattern \
@@ -10258,14 +10263,22 @@ require_pattern \
   'VoiceInkDynamicAIProviderPreference\.applyOllamaModelRefreshPlan' \
   VoiceInk/Services/OllamaService.swift
 
-require_pattern \
-  "shared AI enhancement execution route policy lives in VoiceInkCore" \
-  'VoiceInkAIEnhancementExecutionRoute|VoiceInkAIEnhancementRequestExecutionPlan|textEnhancementExecutionRoute|applyRuntimeState' \
-  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+require_patterns \
+  "shared AI enhancement execution planning lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift \
+  'VoiceInkAIEnhancementRequestExecutionPlan' \
+  'VoiceInkAIEnhancementRequestExecutionAction' \
+  'planning\(' \
+  'applyRuntimeState'
 
 reject_pattern \
   "shared AI enhancement request execution plan hides raw route payload" \
   'public let route|public let modelName|public func openAICompatibleRequestOrThrow' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+reject_pattern \
+  "shared AI enhancement request execution plan avoids public route metadata" \
+  'public enum VoiceInkAIEnhancementExecutionRoute|textEnhancementExecutionRoute' \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 reject_pattern \
@@ -10283,9 +10296,25 @@ require_pattern \
   'VoiceInkAIEnhancementRequestExecutionPlan\.planning|executionPlan\.applyRuntimeState|executeCloudAIRequest' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
+require_pattern \
+  "core checks execute shared AI enhancement provider verification dispatch coverage" \
+  'AIProviderCatalogTests\.testMacOSAIEnhancementProviderVerificationDispatchesAreShared' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute shared AI enhancement execution plan adapter coverage" \
+  'AIProviderCatalogTests\.testMacOSAIEnhancementExecutionPlanAppliesAdapters' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "core AI enhancement route coverage avoids raw route assertions" \
+  'VoiceInkAIEnhancement(APIKeyVerification|Execution)Route|apiKeyVerificationRoute|textEnhancementExecutionRoute|ProviderVerificationRoutesAreShared|ExecutionRoutesAreShared' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AIProviderCatalogTests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
 reject_pattern \
   "macOS AI enhancement service avoids raw execution route switch" \
-  'switch executionPlan\.route|executionPlan\.route|openAICompatibleRequestOrThrow|preconditionFailure\("Local AI routes should return before cloud request execution\."\)' \
+  'executionPlan\.route|textEnhancementExecutionRoute|VoiceInkAIEnhancementExecutionRoute|openAICompatibleRequestOrThrow|preconditionFailure\("Local AI routes should return before cloud request execution\."\)' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
 require_pattern \

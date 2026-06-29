@@ -4,14 +4,7 @@ public enum VoiceInkAIEnhancementProviderKeyChangeRequest {
     public static let notificationName = Notification.Name("aiProviderKeyChanged")
 }
 
-public enum VoiceInkAIEnhancementAPIKeyVerificationRoute: Sendable, Equatable {
-    case sharedProvider(VoiceInkProviderKind)
-    case anthropicMessages
-    case openAICompatibleModels
-    case openRouterModels
-}
-
-public enum VoiceInkAIEnhancementExecutionRoute: Sendable, Equatable {
+private enum VoiceInkAIEnhancementRequestExecutionAction: Sendable, Equatable {
     case ollama
     case localCLI
     case anthropicMessages
@@ -31,7 +24,7 @@ struct VoiceInkAIEnhancementOpenAICompatibleRequestPlan {
 }
 
 public struct VoiceInkAIEnhancementRequestExecutionPlan {
-    private let route: VoiceInkAIEnhancementExecutionRoute
+    private let action: VoiceInkAIEnhancementRequestExecutionAction
     private let modelName: String
     private let openAICompatibleRequest: VoiceInkAIEnhancementOpenAICompatibleRequestPlan?
     private let requestPreparationError: VoiceInkAIEnhancementError?
@@ -41,11 +34,21 @@ public struct VoiceInkAIEnhancementRequestExecutionPlan {
         modelName: String,
         defaults: UserDefaults = .standard
     ) -> VoiceInkAIEnhancementRequestExecutionPlan {
-        let route = provider.textEnhancementExecutionRoute
+        let action: VoiceInkAIEnhancementRequestExecutionAction
+        switch provider {
+        case .ollama:
+            action = .ollama
+        case .localCLI:
+            action = .localCLI
+        case .anthropic:
+            action = .anthropicMessages
+        case .assemblyAI, .cerebras, .custom, .deepgram, .elevenLabs, .gemini, .groq, .mistral, .openAI, .openRouter, .soniox, .speechmatics:
+            action = .openAICompatibleChatCompletions
+        }
 
-        guard route == .openAICompatibleChatCompletions else {
+        guard action == .openAICompatibleChatCompletions else {
             return VoiceInkAIEnhancementRequestExecutionPlan(
-                route: route,
+                action: action,
                 modelName: modelName,
                 openAICompatibleRequest: nil,
                 requestPreparationError: nil
@@ -54,7 +57,7 @@ public struct VoiceInkAIEnhancementRequestExecutionPlan {
 
         guard let requestURL = provider.textEnhancementRequestURL(from: defaults) else {
             return VoiceInkAIEnhancementRequestExecutionPlan(
-                route: route,
+                action: action,
                 modelName: modelName,
                 openAICompatibleRequest: nil,
                 requestPreparationError: .customError(provider.invalidTextEnhancementRequestURLMessage)
@@ -62,7 +65,7 @@ public struct VoiceInkAIEnhancementRequestExecutionPlan {
         }
 
         return VoiceInkAIEnhancementRequestExecutionPlan(
-            route: route,
+            action: action,
             modelName: modelName,
             openAICompatibleRequest: VoiceInkAIEnhancementOpenAICompatibleRequestPlan(
                 requestURL: requestURL,
@@ -81,7 +84,7 @@ public struct VoiceInkAIEnhancementRequestExecutionPlan {
         anthropicMessages: (String) async throws -> Result,
         openAICompatibleChatCompletions: (String, URL, VoiceInkAIChatRequestParameters) async throws -> Result
     ) async throws -> Result {
-        switch route {
+        switch action {
         case .ollama:
             return try await ollama(modelName)
         case .localCLI:
@@ -678,7 +681,8 @@ public struct VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan: Equatable, Se
         currentModel: String,
         requestURL: URL?
     ) -> VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan {
-        guard let route = provider.apiKeyVerificationRoute else {
+        switch provider {
+        case .ollama, .localCLI:
             return VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan(
                 provider: provider,
                 action: .immediate(VoiceInkAPIKeyVerificationResult(
@@ -686,20 +690,47 @@ public struct VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan: Equatable, Se
                     errorMessage: provider.unsupportedAPIKeyVerificationMessage
                 ))
             )
-        }
-
-        switch route {
-        case .sharedProvider(let sharedProvider):
+        case .assemblyAI:
             return VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan(
                 provider: provider,
-                action: .sharedProvider(sharedProvider)
+                action: .sharedProvider(.assemblyAI)
             )
-        case .anthropicMessages:
+        case .deepgram:
+            return VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan(
+                provider: provider,
+                action: .sharedProvider(.deepgram)
+            )
+        case .elevenLabs:
+            return VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan(
+                provider: provider,
+                action: .sharedProvider(.elevenLabs)
+            )
+        case .gemini:
+            return VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan(
+                provider: provider,
+                action: .sharedProvider(.gemini)
+            )
+        case .mistral:
+            return VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan(
+                provider: provider,
+                action: .sharedProvider(.mistral)
+            )
+        case .soniox:
+            return VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan(
+                provider: provider,
+                action: .sharedProvider(.soniox)
+            )
+        case .speechmatics:
+            return VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan(
+                provider: provider,
+                action: .sharedProvider(.speechmatics)
+            )
+        case .anthropic:
             return VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan(
                 provider: provider,
                 action: .anthropicMessages
             )
-        case .openAICompatibleModels:
+        case .cerebras, .custom, .groq, .openAI:
             guard let requestURL else {
                 return VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan(
                     provider: provider,
@@ -714,7 +745,7 @@ public struct VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan: Equatable, Se
                 provider: provider,
                 action: .openAICompatibleModels(requestURL: requestURL, model: currentModel)
             )
-        case .openRouterModels:
+        case .openRouter:
             return VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan(
                 provider: provider,
                 action: .openRouterModels(model: currentModel)
@@ -1238,46 +1269,6 @@ public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
             return currentModel == defaultModel ? firstRefreshedModel : nil
         case .anthropic, .assemblyAI, .cerebras, .custom, .deepgram, .elevenLabs, .groq, .gemini, .localCLI, .mistral, .openAI, .soniox, .speechmatics:
             return nil
-        }
-    }
-
-    public var apiKeyVerificationRoute: VoiceInkAIEnhancementAPIKeyVerificationRoute? {
-        switch self {
-        case .assemblyAI:
-            return .sharedProvider(.assemblyAI)
-        case .deepgram:
-            return .sharedProvider(.deepgram)
-        case .elevenLabs:
-            return .sharedProvider(.elevenLabs)
-        case .gemini:
-            return .sharedProvider(.gemini)
-        case .mistral:
-            return .sharedProvider(.mistral)
-        case .soniox:
-            return .sharedProvider(.soniox)
-        case .speechmatics:
-            return .sharedProvider(.speechmatics)
-        case .anthropic:
-            return .anthropicMessages
-        case .cerebras, .custom, .groq, .openAI:
-            return .openAICompatibleModels
-        case .openRouter:
-            return .openRouterModels
-        case .ollama, .localCLI:
-            return nil
-        }
-    }
-
-    public var textEnhancementExecutionRoute: VoiceInkAIEnhancementExecutionRoute {
-        switch self {
-        case .ollama:
-            return .ollama
-        case .localCLI:
-            return .localCLI
-        case .anthropic:
-            return .anthropicMessages
-        case .assemblyAI, .cerebras, .custom, .deepgram, .elevenLabs, .gemini, .groq, .mistral, .openAI, .openRouter, .soniox, .speechmatics:
-            return .openAICompatibleChatCompletions
         }
     }
 

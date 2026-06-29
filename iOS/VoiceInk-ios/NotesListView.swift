@@ -12,13 +12,12 @@ struct NotesListView: View {
     @StateObject private var settings = AppSettings.shared
 
     var filteredNotes: [Transcription] {
-        notes.filter { note in
-            VoiceInkTranscriptPresentation.matchesSearch(
-                rawText: note.text,
-                enhancedText: note.enhancedText,
-                query: searchText
-            )
-        }
+        VoiceInkTranscriptPresentation.filteredItems(
+            notes,
+            query: searchText,
+            rawText: \.text,
+            enhancedText: \.enhancedText
+        )
     }
 
     init() {}

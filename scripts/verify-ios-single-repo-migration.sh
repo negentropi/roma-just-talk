@@ -3297,6 +3297,21 @@ require_pattern \
   VoiceInk/Views/History/TranscriptionHistoryQuery.swift
 
 require_pattern \
+  "shared transcript presentation owns note-list collection filtering" \
+  'filteredItems<Item>' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+
+require_pattern \
+  "iOS note-list delegates search filtering to shared core" \
+  'VoiceInkTranscriptPresentation\.filteredItems' \
+  iOS/VoiceInk-ios/NotesListView.swift
+
+reject_pattern \
+  "iOS note-list avoids shell-owned transcript search filtering" \
+  'notes\.filter|VoiceInkTranscriptPresentation\.matchesSearch|rawText: note\.text|enhancedText: note\.enhancedText' \
+  iOS/VoiceInk-ios/NotesListView.swift
+
+require_pattern \
   "macOS history views delegate SwiftData query construction" \
   'TranscriptionHistoryQuery\.(latestIndicatorDescriptor|cursorDescriptor|selectionDescriptor)' \
   VoiceInk/Views/History/TranscriptionHistoryView.swift \

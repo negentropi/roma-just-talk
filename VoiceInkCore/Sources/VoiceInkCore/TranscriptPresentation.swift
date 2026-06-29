@@ -699,6 +699,21 @@ public enum VoiceInkTranscriptPresentation {
             (enhancedText?.localizedStandardContains(query) ?? false)
     }
 
+    public static func filteredItems<Item>(
+        _ items: [Item],
+        query: String,
+        rawText: (Item) -> String,
+        enhancedText: (Item) -> String?
+    ) -> [Item] {
+        items.filter { item in
+            matchesSearch(
+                rawText: rawText(item),
+                enhancedText: enhancedText(item),
+                query: query
+            )
+        }
+    }
+
     public static func displayText(
         status: VoiceInkTranscriptionStatus,
         rawText: String,

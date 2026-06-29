@@ -690,6 +690,50 @@ final class TranscriptPresentationTests: XCTestCase {
         )
     }
 
+    func testFilteredItemsUsesSharedTranscriptSearchSemantics() {
+        let notes = [
+            TranscriptSearchItem(id: 1, rawText: "Cafe notes", enhancedText: nil),
+            TranscriptSearchItem(id: 2, rawText: "raw", enhancedText: "Follow up with design"),
+            TranscriptSearchItem(id: 3, rawText: "Budget review", enhancedText: nil)
+        ]
+
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.filteredItems(
+                notes,
+                query: "café",
+                rawText: \.rawText,
+                enhancedText: \.enhancedText
+            ).map(\.id),
+            [1]
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.filteredItems(
+                notes,
+                query: "DESIGN",
+                rawText: \.rawText,
+                enhancedText: \.enhancedText
+            ).map(\.id),
+            [2]
+        )
+    }
+
+    func testFilteredItemsKeepsOriginalOrderForEmptyQuery() {
+        let notes = [
+            TranscriptSearchItem(id: 1, rawText: "First", enhancedText: nil),
+            TranscriptSearchItem(id: 2, rawText: "Second", enhancedText: "Enhanced second")
+        ]
+
+        XCTAssertEqual(
+            VoiceInkTranscriptPresentation.filteredItems(
+                notes,
+                query: "",
+                rawText: \.rawText,
+                enhancedText: \.enhancedText
+            ).map(\.id),
+            [1, 2]
+        )
+    }
+
     func testDefaultDisplayTextUsesSharedFallbacks() {
         XCTAssertEqual(
             VoiceInkTranscriptPresentation.displayText(
@@ -991,4 +1035,10 @@ private struct HistoryItem: Hashable {
 private struct HistorySelectionItem: Hashable {
     let id: Int
     let label: String
+}
+
+private struct TranscriptSearchItem: Hashable {
+    let id: Int
+    let rawText: String
+    let enhancedText: String?
 }

@@ -1453,6 +1453,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "TranscriptPresentationTests.testMatchesSearchChecksEnhancedTextCaseInsensitively", run: { TranscriptPresentationTests().testMatchesSearchChecksEnhancedTextCaseInsensitively() }),
             VoiceInkCoreCheck(name: "TranscriptPresentationTests.testMatchesSearchUsesMacOSStandardSearchSemantics", run: { TranscriptPresentationTests().testMatchesSearchUsesMacOSStandardSearchSemantics() }),
             VoiceInkCoreCheck(name: "TranscriptPresentationTests.testMatchesSearchReturnsFalseWhenQueryIsAbsent", run: { TranscriptPresentationTests().testMatchesSearchReturnsFalseWhenQueryIsAbsent() }),
+            VoiceInkCoreCheck(name: "TranscriptPresentationTests.testFilteredItemsUsesSharedTranscriptSearchSemantics", run: { TranscriptPresentationTests().testFilteredItemsUsesSharedTranscriptSearchSemantics() }),
+            VoiceInkCoreCheck(name: "TranscriptPresentationTests.testFilteredItemsKeepsOriginalOrderForEmptyQuery", run: { TranscriptPresentationTests().testFilteredItemsKeepsOriginalOrderForEmptyQuery() }),
             VoiceInkCoreCheck(name: "TranscriptPresentationTests.testDefaultDisplayTextUsesSharedFallbacks", run: { TranscriptPresentationTests().testDefaultDisplayTextUsesSharedFallbacks() }),
             VoiceInkCoreCheck(name: "TranscriptPresentationTests.testCustomDisplayTextStillAllowsShellFallbacks", run: { TranscriptPresentationTests().testCustomDisplayTextStillAllowsShellFallbacks() }),
             VoiceInkCoreCheck(name: "TranscriptPresentationTests.testStatusTitleReturnsRetryStateTitles", run: { TranscriptPresentationTests().testStatusTitleReturnsRetryStateTitles() }),

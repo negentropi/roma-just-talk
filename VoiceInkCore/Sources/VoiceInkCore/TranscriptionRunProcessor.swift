@@ -166,25 +166,6 @@ public struct VoiceInkIOSAppSettingsRunSnapshot {
     }
 }
 
-public enum VoiceInkTranscriptionRunSettingsPolicy {
-    public static func iOSAppSettingsSnapshot(
-        modes: [Mode],
-        selectedModeId: UUID?,
-        selectedTranscriptionLanguage: String,
-        wordReplacementRules: [VoiceInkWordReplacementRule],
-        customVocabulary: [String],
-        defaults: UserDefaults = .standard
-    ) -> VoiceInkTranscriptionRunSettings {
-        VoiceInkIOSAppSettingsRunSnapshot(
-            modes: modes,
-            selectedModeId: selectedModeId,
-            selectedTranscriptionLanguage: selectedTranscriptionLanguage,
-            wordReplacementRules: wordReplacementRules,
-            customVocabulary: customVocabulary
-        ).transcriptionRunSettings(defaults: defaults)
-    }
-}
-
 public struct VoiceInkTranscriptionRunProcessor {
     public typealias APIKeyProvider = (VoiceInkProviderKind) async -> String
     public typealias TranscriptionServiceProvider = (VoiceInkProviderKind) -> any VoiceInkAudioTranscriptionService

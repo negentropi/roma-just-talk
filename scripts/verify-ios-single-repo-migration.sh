@@ -8826,8 +8826,6 @@ require_patterns \
   'VoiceInkTranscriptionRunSettings' \
   'VoiceInkIOSAppSettingsRunSnapshot' \
   'transcriptionRunSettings\(defaults:' \
-  'VoiceInkTranscriptionRunSettingsPolicy' \
-  'iOSAppSettingsSnapshot' \
   'VoiceInkTranscriptionCleanupConfiguration\.current' \
   'VoiceInkPostProcessingSkipConfiguration\.current' \
   'VoiceInkTranscriptionPromptPreference\.localWhisperPrompt' \
@@ -8835,6 +8833,13 @@ require_patterns \
   'customVocabulary' \
   'processor: VoiceInkTranscriptionRunProcessor' \
   'VoiceInkWordReplacementEngine\.apply\(wordReplacementRules'
+
+reject_pattern \
+  "shared transcription run settings snapshot avoids shallow policy wrapper" \
+  'VoiceInkTranscriptionRunSettingsPolicy|iOSAppSettingsSnapshot' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunProcessorTests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \
   "iOS AppSettings avoids shallow transcription run settings wrapper" \
@@ -8879,8 +8884,8 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
-  "core checks execute iOS app settings snapshot policy test" \
-  'TranscriptionRunProcessorTests\.testIOSAppSettingsSnapshotBuildsRunSettingsFromSharedPolicy' \
+  "core checks execute iOS app settings run snapshot test" \
+  'TranscriptionRunProcessorTests\.testIOSAppSettingsRunSnapshotBuildsRunSettings' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \

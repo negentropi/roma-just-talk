@@ -184,7 +184,7 @@ final class TranscriptionRunProcessorTests: XCTestCase {
         XCTAssertFalse(result.postProcessingSucceeded)
     }
 
-    func testIOSAppSettingsSnapshotBuildsRunSettingsFromSharedPolicy() {
+    func testIOSAppSettingsRunSnapshotBuildsRunSettings() {
         let suiteName = "VoiceInkCore.TranscriptionRunProcessorTests.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!
         defaults.removePersistentDomain(forName: suiteName)
@@ -204,16 +204,15 @@ final class TranscriptionRunProcessorTests: XCTestCase {
         VoiceInkLocalWhisperPromptCatalog.saveCustomPrompts(["fr": "French Roma style"], to: defaults)
 
         let expectedRuntimeConfiguration = [mode].runtimeConfiguration(selectedModeId: mode.id)
-        let settings = VoiceInkTranscriptionRunSettingsPolicy.iOSAppSettingsSnapshot(
+        let settings = VoiceInkIOSAppSettingsRunSnapshot(
             modes: [mode],
             selectedModeId: mode.id,
             selectedTranscriptionLanguage: "fr",
             wordReplacementRules: [
                 VoiceInkWordReplacementRule(originalText: "roma", replacementText: "Roma Just Talk")
             ],
-            customVocabulary: [" Roma ", "Felix", "roma", ""],
-            defaults: defaults
-        )
+            customVocabulary: [" Roma ", "Felix", "roma", ""]
+        ).transcriptionRunSettings(defaults: defaults)
 
         XCTAssertEqual(settings.configuration.transcriptionProvider, .assemblyAI)
         XCTAssertEqual(settings.configuration.transcriptionModel, expectedRuntimeConfiguration.transcriptionModel)

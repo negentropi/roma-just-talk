@@ -317,6 +317,17 @@ reject_pattern() {
   fi
 }
 
+reject_multiline_pattern() {
+  local description="$1"
+  local pattern="$2"
+  shift 2
+
+  section "$description"
+  if rg -n -U "$pattern" "$@"; then
+    fail "$description"
+  fi
+}
+
 reject_fixed_string() {
   local description="$1"
   local needle="$2"
@@ -735,7 +746,14 @@ reject_pattern \
 
 reject_pattern \
   "iOS shell avoids duplicate post-processing request/client construction" \
-  '\b(LLMPostProcessor|OAChatMessage|OAChatRequest|OAChatChoice|OAChatResponse|VoiceInkPostProcessingRequest|VoiceInkOpenAICompatibleClient|VoiceInkOpenAICompatibleChatMessage|VoiceInkOpenAICompatibleChatRequestBuilder|VoiceInkOpenAICompatibleChatCodec)\b|\bchatCompletion\(|postProcessingChatCompletionsURL|/v1/chat/completions|Prompt: .*Transcript:' \
+  '\b(LLMPostProcessor|OAChatMessage|OAChatRequest|OAChatChoice|OAChatResponse|VoiceInkPostProcessingRequest|VoiceInkOpenAICompatibleClient|VoiceInkOpenAICompatibleChatMessage|VoiceInkOpenAICompatibleChatRequestBuilder|VoiceInkOpenAICompatibleChatCodec)\b|\bchatCompletion\(|postProcessingChatCompletionsURL|/v1/chat/completions' \
+  iOS/VoiceInk-ios \
+  iOS/Shared \
+  iOS/VoiceInkKeyboard
+
+reject_multiline_pattern \
+  "iOS shell avoids duplicate raw post-processing prompt bodies" \
+  'Prompt:[\s\S]{0,1024}Transcript:' \
   iOS/VoiceInk-ios \
   iOS/Shared \
   iOS/VoiceInkKeyboard

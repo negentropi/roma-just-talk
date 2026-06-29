@@ -8328,7 +8328,7 @@ require_patterns \
 
 reject_pattern \
   "iOS dictionary adapters avoid shell-owned changed-list comparison" \
-  'guard let updated(Words|Terms|Rules)|updated(FillerWords|CustomVocabularyTerms|WordReplacements)IfChanged|updated(Words|Rules)IfChanged|plan\.applying|plan\.updated(Words|Rules)|settings\.(fillerWords|customVocabularyTerms|wordReplacements) !=|customVocabularyTerms != updatedTerms|wordReplacements != updatedRules' \
+  'guard let updated(Words|Terms|Rules)|updated(FillerWords|CustomVocabularyTerms|WordReplacements)IfChanged|updated(Words|Rules)IfChanged|plan\.applying|plan\.updated(Words|Rules)|settings\.(fillerWords|customVocabularyTerms|wordReplacements)[[:space:]]*(==|!=)|(fillerWords|customVocabularyTerms|wordReplacements)[[:space:]]*(==|!=)[[:space:]]*updated(Words|Terms|Rules)' \
   iOS/VoiceInk-ios/AppSettings.swift \
   iOS/VoiceInk-ios/SettingsView.swift
 

@@ -2163,14 +2163,24 @@ require_pattern \
   'VoiceInkStoredAudioFile\.timestampedRecordingFileURL' \
   iOS/VoiceInk-ios/AudioRecorder.swift
 
-require_pattern \
+require_patterns \
   "iOS note detail uses shared stored-audio availability presentation" \
-  'storedAudioAvailability\(\)|shouldShowAudioSection|unavailableTitle|unavailableDetail|unavailableSystemImageName' \
-  iOS/VoiceInk-ios/NoteDetailView.swift
+  iOS/VoiceInk-ios/NoteDetailView.swift \
+  'storedAudioAvailability\(\)' \
+  'presentation\.audioAvailability' \
+  'presentation\.shouldShowAudioSection' \
+  'unavailableTitle' \
+  'unavailableDetail' \
+  'unavailableSystemImageName'
 
 reject_pattern \
   "iOS note detail avoids shallow audio-section visibility wrappers" \
   'private var +(shouldShowAudioSection|audioAvailability)\b' \
+  iOS/VoiceInk-ios/NoteDetailView.swift
+
+reject_pattern \
+  "iOS note detail avoids shell-owned audio-section visibility calls" \
+  '\.shouldShowAudioSection\(duration:' \
   iOS/VoiceInk-ios/NoteDetailView.swift
 
 require_pattern \

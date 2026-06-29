@@ -13,7 +13,6 @@ struct ModelManagementView: View {
     @StateObject private var customModelManager = CustomCloudModelManager.shared
     @EnvironmentObject private var enhancementService: AIEnhancementService
     @Environment(\.modelContext) private var modelContext
-    @StateObject private var whisperPrompt = WhisperPrompt()
     @ObservedObject private var warmupCoordinator = WhisperModelWarmupCoordinator.shared
 
     @State private var selectedFilter: VoiceInkModelManagementFilter = .recommended
@@ -91,7 +90,7 @@ struct ModelManagementView: View {
             )
 
             // Content
-            ModelSettingsView(whisperPrompt: whisperPrompt)
+            ModelSettingsView()
         }
     }
     
@@ -111,7 +110,7 @@ struct ModelManagementView: View {
     }
 
     private var languageSelectionSection: some View {
-        LanguageSelectionView(transcriptionModelManager: transcriptionModelManager, displayMode: .full, whisperPrompt: whisperPrompt)
+        LanguageSelectionView(transcriptionModelManager: transcriptionModelManager, displayMode: .full)
     }
     
     private var availableModelsSection: some View {

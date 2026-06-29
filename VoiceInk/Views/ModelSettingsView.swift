@@ -2,7 +2,6 @@ import SwiftUI
 import VoiceInkCore
 
 struct ModelSettingsView: View {
-    @ObservedObject var whisperPrompt: WhisperPrompt
     @AppStorage(VoiceInkUserDefaultsKey.selectedTranscriptionLanguage)
     private var selectedLanguage = VoiceInkDefaultSettings.macOS.selectedTranscriptionLanguage
     @AppStorage(VoiceInkUserDefaultsKey.isTextFormattingEnabled)
@@ -22,6 +21,19 @@ struct ModelSettingsView: View {
     private let appendTrailingSpacePresentation = VoiceInkAppendTrailingSpacePreference.macOSSettingsPresentation
     private let cleanupPresentation = VoiceInkTranscriptionCleanupPresentation.macOS
     private let localWhisperPromptPresentation = VoiceInkLocalWhisperPromptCatalog.macOSSettingsPresentation
+
+    private func languagePrompt(for language: String) -> String {
+        VoiceInkLocalWhisperPromptCatalog.prompt(
+            for: language,
+            customPrompts: VoiceInkLocalWhisperPromptCatalog.storedCustomPrompts()
+        )
+    }
+
+    private func saveCustomPrompt(_ prompt: String, for language: String) {
+        VoiceInkLocalWhisperPromptCatalog.saveCustomPrompt(prompt, for: language)
+        VoiceInkTranscriptionPromptPreference.saveLocalWhisperPromptForSelectedLanguage()
+        UserDefaults.standard.synchronize()
+    }
 
     private var punctuationCleanupMode: Binding<PunctuationCleanupMode> {
         Binding(
@@ -47,18 +59,18 @@ struct ModelSettingsView: View {
                             .scrollContentBackground(.hidden)
 
                         Button(localWhisperPromptPresentation.saveButtonTitle) {
-                            whisperPrompt.setCustomPrompt(promptDraftState.text, for: selectedLanguage)
+                            saveCustomPrompt(promptDraftState.text, for: selectedLanguage)
                             promptDraftState = promptDraftState.saved()
                         }
                     } else {
-                        Text(whisperPrompt.getLanguagePrompt(for: selectedLanguage))
+                        Text(languagePrompt(for: selectedLanguage))
                             .font(.system(size: 12))
                             .foregroundColor(.secondary)
                             .frame(maxWidth: .infinity, alignment: .leading)
 
                         Button(localWhisperPromptPresentation.editButtonTitle) {
                             promptDraftState = promptDraftState.editing(
-                                prompt: whisperPrompt.getLanguagePrompt(for: selectedLanguage)
+                                prompt: languagePrompt(for: selectedLanguage)
                             )
                         }
                     }
@@ -153,7 +165,7 @@ struct ModelSettingsView: View {
         .scrollContentBackground(.hidden)
         .onChange(of: selectedLanguage) { _, _ in
             promptDraftState = promptDraftState.refreshingForSelectedLanguage(
-                prompt: whisperPrompt.getLanguagePrompt(for: selectedLanguage)
+                prompt: languagePrompt(for: selectedLanguage)
             )
         }
     }

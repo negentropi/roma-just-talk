@@ -108,6 +108,8 @@ class TranscriptionModelManager: ObservableObject {
 
         plan.applyRuntimeState { languageToSave in
             VoiceInkTranscriptionLanguagePreference.saveSelectedLanguage(languageToSave)
+            VoiceInkTranscriptionPromptPreference.saveLocalWhisperPromptForSelectedLanguage()
+            UserDefaults.standard.synchronize()
             NotificationCenter.default.post(name: .languageDidChange, object: nil)
         }
     }

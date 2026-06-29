@@ -123,6 +123,8 @@ struct CloudModelCardView: View {
         let plan = model.transcriptionLanguageSelectionFacts.repairPlan(for: selectedLanguage)
         plan.applyRuntimeState { languageToSave in
             selectedLanguage = languageToSave
+            VoiceInkTranscriptionPromptPreference.saveLocalWhisperPromptForSelectedLanguage()
+            UserDefaults.standard.synchronize()
             NotificationCenter.default.post(name: .languageDidChange, object: nil)
         }
     }

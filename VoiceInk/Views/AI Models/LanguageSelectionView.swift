@@ -13,7 +13,6 @@ struct LanguageSelectionView: View {
     private var selectedLanguage = VoiceInkDefaultSettings.macOS.selectedTranscriptionLanguage
     // Add display mode parameter with full as the default
     var displayMode: LanguageDisplayMode = .full
-    @ObservedObject var whisperPrompt: WhisperPrompt
 
     private func updateLanguage(_ language: String) {
         guard selectedLanguage != language else { return }
@@ -21,8 +20,8 @@ struct LanguageSelectionView: View {
         // Update UI state - the UserDefaults updating is now automatic with @AppStorage
         selectedLanguage = language
 
-        // Force the prompt to update for the new language
-        whisperPrompt.updateTranscriptionPrompt()
+        VoiceInkTranscriptionPromptPreference.saveLocalWhisperPromptForSelectedLanguage()
+        UserDefaults.standard.synchronize()
 
         // Post notification for language change
         NotificationCenter.default.post(name: .languageDidChange, object: nil)

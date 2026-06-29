@@ -13977,9 +13977,36 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/LocalWhisperPromptCatalog.swift
 
 require_pattern \
-  "macOS local Whisper prompt persists through shared prompt preference" \
+  "macOS model settings saves local Whisper prompts through shared prompt policy" \
   'VoiceInkTranscriptionPromptPreference\.saveLocalWhisperPromptForSelectedLanguage\(\)' \
-  VoiceInk/Transcription/Whisper/WhisperPrompt.swift
+  VoiceInk/Views/ModelSettingsView.swift
+
+require_pattern \
+  "macOS language selection persists local Whisper prompts through shared prompt policy" \
+  'VoiceInkTranscriptionPromptPreference\.saveLocalWhisperPromptForSelectedLanguage\(\)' \
+  VoiceInk/Views/AI\ Models/LanguageSelectionView.swift
+
+require_pattern \
+  "macOS cloud model card language repair persists local Whisper prompts through shared prompt policy" \
+  'VoiceInkTranscriptionPromptPreference\.saveLocalWhisperPromptForSelectedLanguage\(\)' \
+  VoiceInk/Views/AI\ Models/CloudModelCardView.swift
+
+require_pattern \
+  "macOS transcription model manager language repair persists local Whisper prompts through shared prompt policy" \
+  'VoiceInkTranscriptionPromptPreference\.saveLocalWhisperPromptForSelectedLanguage\(\)' \
+  VoiceInk/Transcription/Engine/TranscriptionModelManager.swift
+
+require_pattern \
+  "macOS Power Mode language application persists local Whisper prompts through shared prompt policy" \
+  'VoiceInkTranscriptionPromptPreference\.saveLocalWhisperPromptForSelectedLanguage\(\)' \
+  VoiceInk/PowerMode/PowerModeSessionManager.swift
+
+require_patterns \
+  "macOS model settings reads and saves local Whisper prompts through shared catalog" \
+  VoiceInk/Views/ModelSettingsView.swift \
+  'VoiceInkLocalWhisperPromptCatalog\.prompt' \
+  'VoiceInkLocalWhisperPromptCatalog\.saveCustomPrompt' \
+  'VoiceInkLocalWhisperPromptCatalog\.storedCustomPrompts'
 
 require_pattern \
   "macOS model settings uses shared local Whisper prompt presentation" \
@@ -13991,20 +14018,42 @@ require_pattern \
   'VoiceInkLocalWhisperPromptDraftState|promptDraftState\.(isEditing|saved|editing|refreshingForSelectedLanguage)|\$promptDraftState\.text' \
   VoiceInk/Views/ModelSettingsView.swift
 
-require_pattern \
-  "core checks execute local Whisper prompt draft state test" \
+require_patterns \
+  "core checks execute local Whisper prompt catalog coverage" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'LocalWhisperPromptCatalogTests\.testCustomLanguagePromptsKeyPreservesExistingMacOSStorageName' \
+  'LocalWhisperPromptCatalogTests\.testMacOSPromptSettingsPresentationPreservesExistingCopy' \
   'LocalWhisperPromptCatalogTests\.testPromptDraftStateOwnsMacOSEditSaveAndLanguageRefresh' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  'LocalWhisperPromptCatalogTests\.testDefaultPromptsPreserveExistingMacOSLanguageSeeds' \
+  'LocalWhisperPromptCatalogTests\.testPromptUsesCustomPromptWhenAvailable' \
+  'LocalWhisperPromptCatalogTests\.testPromptFallsBackToDefaultWhenCustomPromptIsEmptyOrLanguageIsMissing' \
+  'LocalWhisperPromptCatalogTests\.testPromptForSelectedLanguageUsesSharedLanguageKeyAndFallbackLanguage' \
+  'LocalWhisperPromptCatalogTests\.testStoredCustomPromptsRoundTrip' \
+  'LocalWhisperPromptCatalogTests\.testSaveCustomPromptUpdatesOneLanguageAndPreservesOthers' \
+  'LocalWhisperPromptCatalogTests\.testPromptForSelectedLanguageUsesStoredCustomPromptsByDefault'
+
+require_patterns \
+  "core checks execute local Whisper prompt preference coverage" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'UserDefaultsPreferencesTests\.testTranscriptionPromptPreferenceUsesFallbackOnlyWhenLocalWhisperPromptIsMissing' \
+  'UserDefaultsPreferencesTests\.testTranscriptionPromptPreferenceUsesSelectedLanguagePromptFallback' \
+  'UserDefaultsPreferencesTests\.testTranscriptionPromptPreferenceSavesSelectedLanguagePrompt' \
+  'UserDefaultsPreferencesTests\.testTranscriptionPromptPreferenceSavesCustomPromptForSelectedLanguage'
 
 reject_pattern \
   "macOS model settings avoids shell-owned prompt draft state" \
   '@State private var customPrompt|@State private var isEditing|customPrompt = whisperPrompt\.getLanguagePrompt|isEditing = (true|false)' \
   VoiceInk/Views/ModelSettingsView.swift
 
+reject_file VoiceInk/Transcription/Whisper/WhisperPrompt.swift
+
 reject_pattern \
-  "macOS Whisper model manager avoids owning local prompt object" \
-  'WhisperPrompt\(' \
-  VoiceInk/Transcription/Whisper/WhisperModelManager.swift
+  "macOS local Whisper prompt settings avoid obsolete prompt object wrapper" \
+  '\bWhisperPrompt\b|whisperPrompt\.' \
+  VoiceInk/Views/AI\ Models/ModelManagementView.swift \
+  VoiceInk/Views/MenuBarView.swift \
+  VoiceInk/Views/AI\ Models/LanguageSelectionView.swift \
+  VoiceInk/Views/ModelSettingsView.swift
 
 require_pattern \
   "migration checklist tracks shared local Whisper prompt settings presentation" \
@@ -15902,7 +15951,6 @@ reject_pattern \
   'selectedLanguage\(fallback: "(en|auto|en-US)"\)|selectedLanguage = "(en|auto)"' \
   VoiceInk/Transcription/Native/NativeAppleTranscriptionService.swift \
   VoiceInk/Transcription/Streaming/StreamingTranscriptionService.swift \
-  VoiceInk/Transcription/Whisper/WhisperPrompt.swift \
   VoiceInk/Services/SystemInfoService.swift \
   VoiceInk/PowerMode/PowerModeConfig.swift \
   VoiceInk/PowerMode/PowerModeConfigView.swift

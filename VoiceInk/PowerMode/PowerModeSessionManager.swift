@@ -172,6 +172,7 @@ class PowerModeSessionManager {
         plan.applyRuntimeState(
             saveSelectedLanguage: { language in
                 VoiceInkTranscriptionLanguagePreference.saveSelectedLanguage(language)
+                VoiceInkTranscriptionPromptPreference.saveLocalWhisperPromptForSelectedLanguage()
             },
             postLanguageDidChange: {
                 NotificationCenter.default.post(name: .languageDidChange, object: nil)

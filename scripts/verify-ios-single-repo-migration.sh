@@ -1384,9 +1384,9 @@ reject_pattern \
   '!VoiceInkRecorderStylePreference\.hasVisibleRecorder\(rawValue: recorderType\)|activeSessionToggleAction\(for:' \
   VoiceInk/Transcription/Engine/RecorderUIManager.swift
 
-reject_multiline_pattern \
-  "iOS recording manager avoids shallow active-recording wrapper" \
-  'var[[:space:]]+isRecording[[:space:]]*:[[:space:]]*Bool[[:space:]]*\{[[:space:]]*recordingState\.isActivelyRecording' \
+reject_swift_pattern \
+  "iOS recording manager avoids shallow isRecording wrapper" \
+  '\bvar[[:space:]]+isRecording[[:space:]]*:[[:space:]]*Bool\b' \
   iOS/VoiceInk-ios/RecordingManager.swift
 
 reject_swift_pattern \

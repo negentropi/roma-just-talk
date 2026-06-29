@@ -11,13 +11,37 @@ struct NotesListView: View {
     @EnvironmentObject private var recordingManager: RecordingManager
     @StateObject private var settings = AppSettings.shared
 
-    var filteredNotes: [Transcription] {
-        VoiceInkTranscriptPresentation.filteredItems(
-            notes,
+    private var noteListSnapshot: VoiceInkNoteListSnapshot<Transcription> {
+        VoiceInkNoteListSnapshot.make(
+            from: notes,
             query: searchText,
             rawText: \.text,
             enhancedText: \.enhancedText
         )
+    }
+
+    private var content: some View {
+        let snapshot = noteListSnapshot
+
+        return Group {
+            if snapshot.shouldShowEmptyState {
+                emptyState(snapshot.emptyStatePresentation)
+            } else {
+                List {
+                    Section(header: sectionHeader(snapshot.summaryPresentation)) {
+                        ForEach(snapshot.displayedItems) { note in
+                            NavigationLink(destination: NoteDetailView(note: note)) {
+                                NoteRowView(note: note)
+                            }
+                        }
+                        .onDelete(perform: deleteItems)
+                    }
+                }
+                .listStyle(.insetGrouped)
+                .scrollContentBackground(.hidden)
+                .background(Color(.systemGroupedBackground))
+            }
+        }
     }
 
     init() {}
@@ -70,31 +94,7 @@ struct NotesListView: View {
         }
     }
 
-    private var content: some View {
-        Group {
-            if filteredNotes.isEmpty {
-                emptyState
-            } else {
-                List {
-                    Section(header: sectionHeader) {
-                        ForEach(filteredNotes) { note in
-                            NavigationLink(destination: NoteDetailView(note: note)) {
-                                NoteRowView(note: note)
-                            }
-                        }
-                        .onDelete(perform: deleteItems)
-                    }
-                }
-                .listStyle(.insetGrouped)
-                .scrollContentBackground(.hidden)
-                .background(Color(.systemGroupedBackground))
-            }
-        }
-    }
-
-    private var sectionHeader: some View {
-        let summaryPresentation = VoiceInkNoteListSummaryPresentation.make(from: filteredNotes)
-
+    private func sectionHeader(_ summaryPresentation: VoiceInkNoteListSummaryPresentation) -> some View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
                 Text(VoiceInkNoteListPresentation.sectionTitle)
@@ -116,9 +116,7 @@ struct NotesListView: View {
         }
     }
 
-    private var emptyState: some View {
-        let presentation = VoiceInkHistoryPresentation.iOSNotesEmptyState
-
+    private func emptyState(_ presentation: VoiceInkHistoryEmptyStatePresentation) -> some View {
         VStack(spacing: 16) {
             ZStack {
                 Circle()
@@ -188,9 +186,8 @@ struct NotesListView: View {
     
     private func deleteItems(offsets: IndexSet) {
         withAnimation {
-            let deletionPlan = VoiceInkHistoryDeletionPolicy.offsetDeletionPlan(
+            let deletionPlan = noteListSnapshot.offsetDeletionPlan(
                 atOffsets: offsets,
-                from: filteredNotes,
                 id: \.id
             )
 

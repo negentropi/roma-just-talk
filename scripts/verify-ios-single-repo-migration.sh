@@ -3207,7 +3207,7 @@ require_pattern \
 
 require_pattern \
   "iOS note list uses shared deletion target selection" \
-  'VoiceInkHistoryDeletionPolicy\.offsetDeletionPlan' \
+  'noteListSnapshot\.offsetDeletionPlan' \
   iOS/VoiceInk-ios/NotesListView.swift
 
 require_pattern \
@@ -3247,7 +3247,7 @@ require_pattern \
 
 require_pattern \
   "iOS note list uses shared history empty-state presentation" \
-  'VoiceInkHistoryPresentation\.iOSNotesEmptyState' \
+  'snapshot\.emptyStatePresentation' \
   iOS/VoiceInk-ios/NotesListView.swift
 
 require_pattern \
@@ -3404,14 +3404,26 @@ require_pattern \
   'filteredItems<Item>' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
 
-require_pattern \
-  "iOS note-list delegates search filtering to shared core" \
+require_patterns \
+  "shared note-list snapshot owns iOS displayed-state derivation" \
+  VoiceInkCore/Sources/VoiceInkCore/DashboardMetrics.swift \
+  'VoiceInkNoteListSnapshot' \
   'VoiceInkTranscriptPresentation\.filteredItems' \
-  iOS/VoiceInk-ios/NotesListView.swift
+  'VoiceInkNoteListSummaryPresentation\.make' \
+  'VoiceInkHistoryPresentation\.iOSNotesEmptyState' \
+  'VoiceInkHistoryDeletionPolicy\.offsetDeletionPlan'
+
+require_patterns \
+  "iOS note-list delegates displayed-state derivation to shared snapshot" \
+  iOS/VoiceInk-ios/NotesListView.swift \
+  'VoiceInkNoteListSnapshot\.make' \
+  'snapshot\.displayedItems' \
+  'snapshot\.summaryPresentation' \
+  'noteListSnapshot\.offsetDeletionPlan'
 
 reject_pattern \
   "iOS note-list avoids shell-owned transcript search filtering" \
-  'notes\.filter|VoiceInkTranscriptPresentation\.matchesSearch|rawText: note\.text|enhancedText: note\.enhancedText' \
+  'notes\.filter|VoiceInkTranscriptPresentation\.(matchesSearch|filteredItems)|rawText: note\.text|enhancedText: note\.enhancedText|var filteredNotes' \
   iOS/VoiceInk-ios/NotesListView.swift
 
 require_pattern \
@@ -3559,7 +3571,7 @@ reject_pattern \
 require_patterns \
   "iOS note list applies shared offset deletion plan" \
   iOS/VoiceInk-ios/NotesListView.swift \
-  'VoiceInkHistoryDeletionPolicy\.offsetDeletionPlan' \
+  'noteListSnapshot\.offsetDeletionPlan' \
   'deletionPlan\.applyRuntimeState'
 
 reject_pattern \
@@ -16442,9 +16454,16 @@ require_pattern \
   'VoiceInkDashboardMetricsAccumulator' \
   VoiceInkCore/Sources/VoiceInkCore/DashboardMetrics.swift
 
-require_pattern \
-  "iOS note-list uses shared summary presentation" \
-  'VoiceInkNoteListSummaryPresentation\.make|summaryPresentation\.countText' \
+require_patterns \
+  "iOS note-list uses shared snapshot summary presentation" \
+  iOS/VoiceInk-ios/NotesListView.swift \
+  'snapshot\.summaryPresentation' \
+  'summaryPresentation\.countText' \
+  'summaryPresentation\.dashboardText'
+
+reject_pattern \
+  "iOS note-list avoids shell-owned summary construction" \
+  'VoiceInkNoteListSummaryPresentation\.make' \
   iOS/VoiceInk-ios/NotesListView.swift
 
 reject_pattern \

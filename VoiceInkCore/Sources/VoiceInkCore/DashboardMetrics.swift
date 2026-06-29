@@ -295,6 +295,58 @@ public struct VoiceInkNoteListSummaryPresentation: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkNoteListSnapshot<Item> {
+    public let displayedItems: [Item]
+    public let summaryPresentation: VoiceInkNoteListSummaryPresentation
+    public let emptyStatePresentation: VoiceInkHistoryEmptyStatePresentation
+
+    public var shouldShowEmptyState: Bool {
+        displayedItems.isEmpty
+    }
+
+    public init(
+        displayedItems: [Item],
+        summaryPresentation: VoiceInkNoteListSummaryPresentation,
+        emptyStatePresentation: VoiceInkHistoryEmptyStatePresentation = VoiceInkHistoryPresentation.iOSNotesEmptyState
+    ) {
+        self.displayedItems = displayedItems
+        self.summaryPresentation = summaryPresentation
+        self.emptyStatePresentation = emptyStatePresentation
+    }
+
+    public static func make(
+        from items: [Item],
+        query: String,
+        rawText: (Item) -> String,
+        enhancedText: (Item) -> String?
+    ) -> VoiceInkNoteListSnapshot<Item> where Item: VoiceInkDashboardMetricRecord, Item: VoiceInkPerformanceRecord {
+        let displayedItems = VoiceInkTranscriptPresentation.filteredItems(
+            items,
+            query: query,
+            rawText: rawText,
+            enhancedText: enhancedText
+        )
+
+        return VoiceInkNoteListSnapshot(
+            displayedItems: displayedItems,
+            summaryPresentation: VoiceInkNoteListSummaryPresentation.make(from: displayedItems)
+        )
+    }
+}
+
+public extension VoiceInkNoteListSnapshot where Item: Hashable {
+    func offsetDeletionPlan<ID: Hashable>(
+        atOffsets offsets: IndexSet,
+        id: (Item) -> ID
+    ) -> VoiceInkHistoryDeletionPlan<Item, ID> {
+        VoiceInkHistoryDeletionPolicy.offsetDeletionPlan(
+            atOffsets: offsets,
+            from: displayedItems,
+            id: id
+        )
+    }
+}
+
 public enum VoiceInkNoteListPresentation {
     public static let sectionTitle = "Recent"
     public static let settingsSystemImageName = "gearshape"

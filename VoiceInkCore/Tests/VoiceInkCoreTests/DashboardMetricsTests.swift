@@ -299,6 +299,80 @@ final class DashboardMetricsTests: XCTestCase {
         XCTAssertNil(presentation.fastestModelText)
     }
 
+    func testNoteListSnapshotFiltersRawAndEnhancedTextPreservingDisplayedOrder() {
+        let snapshot = VoiceInkNoteListSnapshot.make(
+            from: [
+                NoteListRecord(id: 1, rawText: "meeting recap", enhancedText: nil, wordCount: 5, audioDuration: 10, transcriptionModelName: nil, transcriptionDuration: nil),
+                NoteListRecord(id: 2, rawText: "plain draft", enhancedText: "Needle in enhanced text", wordCount: 8, audioDuration: 12, transcriptionModelName: nil, transcriptionDuration: nil),
+                NoteListRecord(id: 3, rawText: "needle in raw text", enhancedText: nil, wordCount: 13, audioDuration: 20, transcriptionModelName: nil, transcriptionDuration: nil)
+            ],
+            query: "needle",
+            rawText: \.rawText,
+            enhancedText: \.enhancedText
+        )
+
+        XCTAssertEqual(snapshot.displayedItems.map(\.id), [2, 3])
+        XCTAssertFalse(snapshot.shouldShowEmptyState)
+    }
+
+    func testNoteListSnapshotSummaryUsesDisplayedRecordsOnly() {
+        let snapshot = VoiceInkNoteListSnapshot.make(
+            from: [
+                NoteListRecord(id: 1, rawText: "hide", enhancedText: nil, wordCount: 200, audioDuration: 80, transcriptionModelName: "hidden", transcriptionDuration: 2),
+                NoteListRecord(id: 2, rawText: "needle", enhancedText: nil, wordCount: 120, audioDuration: 60, transcriptionModelName: "slow", transcriptionDuration: 10),
+                NoteListRecord(id: 3, rawText: "needle again", enhancedText: nil, wordCount: 80, audioDuration: 30, transcriptionModelName: "fast", transcriptionDuration: 3)
+            ],
+            query: "needle",
+            rawText: \.rawText,
+            enhancedText: \.enhancedText
+        )
+
+        XCTAssertEqual(
+            snapshot.summaryPresentation.summary,
+            VoiceInkDashboardMetricsSummary(totalCount: 2, totalWords: 200, totalDuration: 90)
+        )
+        XCTAssertEqual(snapshot.summaryPresentation.fastestModelText, "fast 10.0x realtime")
+    }
+
+    func testNoteListSnapshotExposesIOSNotesEmptyStateWhenNoRecordsMatch() {
+        let snapshot = VoiceInkNoteListSnapshot.make(
+            from: [
+                NoteListRecord(id: 1, rawText: "meeting recap", enhancedText: nil, wordCount: 5, audioDuration: 10, transcriptionModelName: nil, transcriptionDuration: nil)
+            ],
+            query: "missing",
+            rawText: \.rawText,
+            enhancedText: \.enhancedText
+        )
+
+        XCTAssertTrue(snapshot.shouldShowEmptyState)
+        XCTAssertEqual(snapshot.displayedItems, [])
+        XCTAssertEqual(snapshot.emptyStatePresentation, VoiceInkHistoryPresentation.iOSNotesEmptyState)
+        XCTAssertEqual(snapshot.summaryPresentation.countText, "0")
+    }
+
+    func testNoteListSnapshotBuildsOffsetDeletionPlanFromDisplayedRows() {
+        let records = [
+            NoteListRecord(id: 1, rawText: "needle first", enhancedText: nil, wordCount: 5, audioDuration: 10, transcriptionModelName: nil, transcriptionDuration: nil),
+            NoteListRecord(id: 2, rawText: "hide", enhancedText: nil, wordCount: 8, audioDuration: 12, transcriptionModelName: nil, transcriptionDuration: nil),
+            NoteListRecord(id: 3, rawText: "needle second", enhancedText: nil, wordCount: 13, audioDuration: 20, transcriptionModelName: nil, transcriptionDuration: nil)
+        ]
+        let snapshot = VoiceInkNoteListSnapshot.make(
+            from: records,
+            query: "needle",
+            rawText: \.rawText,
+            enhancedText: \.enhancedText
+        )
+
+        let deletionPlan = snapshot.offsetDeletionPlan(atOffsets: IndexSet(integer: 1), id: \.id)
+        var deletedIDs: [Int] = []
+        deletionPlan.applyRuntimeState { deletedIDs.append($0.id) }
+
+        XCTAssertEqual(deletedIDs, [3])
+        XCTAssertFalse(deletionPlan.deletesID(1))
+        XCTAssertFalse(deletionPlan.deletesID(2))
+        XCTAssertTrue(deletionPlan.deletesID(3))
+    }
+
     func testNoteListPresentationPreservesIOSChromeCopy() {
         XCTAssertEqual(VoiceInkNoteListPresentation.sectionTitle, "Recent")
         XCTAssertEqual(VoiceInkNoteListPresentation.settingsSystemImageName, "gearshape")
@@ -441,7 +515,10 @@ private struct SourceRecord: VoiceInkDashboardMetricRecord, VoiceInkSessionMetri
     let enhancementDuration: TimeInterval?
 }
 
-private struct NoteListRecord: VoiceInkDashboardMetricRecord, VoiceInkPerformanceRecord {
+private struct NoteListRecord: Hashable, VoiceInkDashboardMetricRecord, VoiceInkPerformanceRecord {
+    var id: Int = 0
+    var rawText: String = ""
+    var enhancedText: String? = nil
     let wordCount: Int
     let audioDuration: TimeInterval
     let transcriptionModelName: String?

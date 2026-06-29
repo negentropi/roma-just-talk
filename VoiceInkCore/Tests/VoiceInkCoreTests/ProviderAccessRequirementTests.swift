@@ -1127,7 +1127,6 @@ final class ProviderAccessRequirementTests: XCTestCase {
 
         let plan = state.applyingStoredAPIKey("new-key", for: .groq)
 
-        XCTAssertTrue(plan.shouldApplyState)
         let application = applyProviderAPIKeyStateUpdatePlan(plan)
         XCTAssertEqual(application.appliedState?.storedAPIKey(for: .groq), "new-key")
         XCTAssertFalse(application.appliedState?.isReady(for: .groq, localWhisperModelAvailable: false) ?? true)
@@ -1201,7 +1200,6 @@ final class ProviderAccessRequirementTests: XCTestCase {
 
         let plan = state.applyingVerification(true, for: .groq)
 
-        XCTAssertTrue(plan.shouldApplyState)
         let application = applyProviderAPIKeyStateUpdatePlan(plan)
         XCTAssertTrue(application.appliedState?.isReady(for: .groq, localWhisperModelAvailable: false) ?? false)
         XCTAssertEqual(application.events, [
@@ -1222,7 +1220,6 @@ final class ProviderAccessRequirementTests: XCTestCase {
 
         let plan = state.applyingEditPlan(editPlan, for: .groq)
 
-        XCTAssertTrue(plan.shouldApplyState)
         let application = applyProviderAPIKeyStateUpdatePlan(plan)
         XCTAssertFalse(application.appliedState?.isReady(for: .groq, localWhisperModelAvailable: false) ?? true)
         XCTAssertEqual(application.events, [
@@ -1250,7 +1247,6 @@ final class ProviderAccessRequirementTests: XCTestCase {
         let plan = state.applyingVerificationPlan(successPlan, for: .groq)
         let ignoredPlan = state.applyingVerificationPlan(failurePlan, for: .groq)
 
-        XCTAssertTrue(plan.shouldApplyState)
         let application = applyProviderAPIKeyStateUpdatePlan(plan)
         XCTAssertEqual(application.appliedState?.storedAPIKey(for: .groq), "new-key")
         XCTAssertTrue(application.appliedState?.isReady(for: .groq, localWhisperModelAvailable: false) ?? false)
@@ -1260,7 +1256,6 @@ final class ProviderAccessRequirementTests: XCTestCase {
             "verified:false",
             "verified:true"
         ])
-        XCTAssertFalse(ignoredPlan.shouldApplyState)
         XCTAssertNil(applyProviderAPIKeyStateUpdatePlan(ignoredPlan).appliedState)
     }
 
@@ -1270,9 +1265,7 @@ final class ProviderAccessRequirementTests: XCTestCase {
         let verificationPlan = state.applyingVerification(true, for: .localWhisper)
         let storagePlan = state.applyingStoredAPIKey("ignored", for: .localWhisper)
 
-        XCTAssertFalse(verificationPlan.shouldApplyState)
         XCTAssertEqual(applyProviderAPIKeyStateUpdatePlan(verificationPlan, provider: .localWhisper).events, [])
-        XCTAssertFalse(storagePlan.shouldApplyState)
         XCTAssertEqual(applyProviderAPIKeyStateUpdatePlan(storagePlan, provider: .localWhisper).events, [])
     }
 

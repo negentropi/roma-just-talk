@@ -108,9 +108,6 @@ public struct VoiceInkProviderAPIKeyStateUpdatePlan: Equatable, Sendable {
         self.persistenceActions = persistenceActions
     }
 
-    public var shouldApplyState: Bool {
-        !persistenceActions.isEmpty
-    }
 }
 
 public extension VoiceInkProviderAPIKeyStateUpdatePlan {
@@ -119,7 +116,7 @@ public extension VoiceInkProviderAPIKeyStateUpdatePlan {
         persistStoredKey: (String) -> Void,
         persistVerificationFlag: (Bool) -> Void
     ) {
-        guard shouldApplyState else { return }
+        guard !persistenceActions.isEmpty else { return }
 
         setAPIKeyState(state)
         applyPersistenceActions(

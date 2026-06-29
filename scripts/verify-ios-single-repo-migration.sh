@@ -4024,8 +4024,13 @@ reject_pattern \
 
 reject_pattern \
   "shared provider API-key state update plan hides raw runtime payload fields" \
-  'public let state: VoiceInkProviderAPIKeyState|public let persistenceActions: \[VoiceInkProviderAPIKeyStatePersistenceAction\]|public enum VoiceInkProviderAPIKeyStatePersistenceAction|public func persistenceActions' \
+  'public let state: VoiceInkProviderAPIKeyState|public let persistenceActions: \[VoiceInkProviderAPIKeyStatePersistenceAction\]|public enum VoiceInkProviderAPIKeyStatePersistenceAction|public func persistenceActions|public var shouldApplyState' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift
+
+reject_pattern \
+  "shared provider API-key state update tests avoid runtime shortcut flag reads" \
+  'shouldApplyState' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/ProviderAccessRequirementTests.swift
 
 require_patterns \
   "core checks execute provider API-key state update plan tests" \

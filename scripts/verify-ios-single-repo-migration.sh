@@ -387,6 +387,18 @@ reject_multiline_pattern() {
   fi
 }
 
+require_provider_key_reset_direct_delete_adapter() {
+  local file="$1"
+
+  section "iOS app settings reset deletes provider API keys directly in reset adapter"
+  if ! perl -0ne '
+    $ok = 1 if /deleteProviderAPIKeys:\s*\{\s*([A-Za-z_][A-Za-z0-9_]*)\s+in\s*\1\.forEach\s*\{\s*([A-Za-z_][A-Za-z0-9_]*)\s+in\s*VoiceInkProviderAPIKeyStorage\.deleteStoredKey\(for:\s*\2\)/s;
+    END { exit($ok ? 0 : 1) }
+  ' "$file"; then
+    fail "iOS app settings reset deletes provider API keys directly in reset adapter: missing direct reset delete adapter in $file"
+  fi
+}
+
 reject_fixed_string() {
   local description="$1"
   local needle="$2"
@@ -457,6 +469,7 @@ reject_context_pattern() {
 
 require_command fd
 require_command rg
+require_command perl
 require_command git
 require_command plutil
 require_command xmllint
@@ -14430,9 +14443,7 @@ require_patterns \
   'clearCoreUserSettings' \
   'deleteProviderAPIKeys'
 
-require_multiline_pattern \
-  "iOS app settings reset deletes provider API keys directly in reset adapter" \
-  'deleteProviderAPIKeys:[[:space:]]*\{[[:space:]]*[[:alpha:]_][[:alnum:]_]*[[:space:]]+in[[:space:]]*[[:alpha:]_][[:alnum:]_]*\.forEach[[:space:]]*\{[[:space:]]*[[:alpha:]_][[:alnum:]_]*[[:space:]]+in[[:space:]]*VoiceInkProviderAPIKeyStorage\.deleteStoredKey\(for:[[:space:]]*[[:alpha:]_][[:alnum:]_]*\)' \
+require_provider_key_reset_direct_delete_adapter \
   iOS/VoiceInk-ios/AppSettings.swift
 
 reject_multiline_pattern \

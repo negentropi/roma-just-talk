@@ -1995,10 +1995,11 @@ reject_pattern \
 
 reject_file iOS/VoiceInk-ios/TranscriptionRetryService.swift
 
-require_pattern \
-  "shared stored-audio retranscription runner owns retry orchestration" \
+require_patterns \
+  "shared stored-audio retranscription runner and facade own retry orchestration" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift \
   'VoiceInkStoredAudioRetranscriptionRunner' \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift
+  'VoiceInkStoredAudioRetranscription'
 
 require_pattern \
   "iOS recording manager delegates background retry to AppSettings adapter" \
@@ -2012,12 +2013,12 @@ require_pattern \
 
 reject_pattern \
   "iOS recording manager avoids direct stored-audio retry mutation seam" \
-  'existingAudioFileURL|markTranscriptionFailed|applyCompletedRunResult|TranscriptionRetryService|VoiceInkStoredAudioRetranscriptionRunner' \
+  'existingAudioFileURL|markTranscriptionFailed|applyCompletedRunResult|TranscriptionRetryService|VoiceInkStoredAudioRetranscriptionRunner|VoiceInkStoredAudioRetranscription' \
   iOS/VoiceInk-ios/RecordingManager.swift
 
 reject_pattern \
   "iOS note detail avoids direct stored-audio retry mutation seam" \
-  'existingAudioFileURL|markTranscriptionFailed|applyCompletedRunResult|TranscriptionRetryService|VoiceInkStoredAudioRetranscriptionRunner' \
+  'existingAudioFileURL|markTranscriptionFailed|applyCompletedRunResult|TranscriptionRetryService|VoiceInkStoredAudioRetranscriptionRunner|VoiceInkStoredAudioRetranscription' \
   iOS/VoiceInk-ios/NoteDetailView.swift
 
 section "obsolete standalone recording transcription draft module stays deleted"
@@ -8526,14 +8527,18 @@ require_pattern \
   'VoiceInkAudioTranscriptionServiceFactory' \
   VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift
 
-require_pattern \
-  "iOS AppSettings adapter uses shared audio transcription service factory" \
+require_patterns \
+  "shared stored-audio retranscription facade owns provider dispatch wiring" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift \
+  'VoiceInkStoredAudioRetranscription' \
   'VoiceInkAudioTranscriptionServiceFactory' \
-  iOS/VoiceInk-ios/AppSettings.swift
+  'localWhisperServiceFactory' \
+  'remoteServiceFactory' \
+  'serviceFactory\.service\(for: provider\)'
 
 reject_pattern \
-  "iOS AppSettings adapter avoids shell-only provider dispatch" \
-  'transcriptionServiceKind|VoiceInkRemoteTranscriptionService\(provider:' \
+  "iOS AppSettings adapter avoids shell-owned provider dispatch wiring" \
+  'transcriptionServiceKind|VoiceInkRemoteTranscriptionService\(provider:|VoiceInkAudioTranscriptionServiceFactory|VoiceInkStoredAudioRetranscriptionRunner|transcriptionServiceProvider:|remoteServiceFactory|serviceFactory\.service' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_patterns \
@@ -8567,17 +8572,16 @@ reject_context_pattern \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_patterns \
-  "iOS AppSettings adapter uses shared stored-audio retranscription runner" \
+  "iOS AppSettings adapter uses shared stored-audio retranscription facade" \
   iOS/VoiceInk-ios/AppSettings.swift \
-  'VoiceInkStoredAudioRetranscriptionRunner' \
+  'VoiceInkStoredAudioRetranscription\.retranscribe\(' \
   'runSettingsProvider:' \
   'await transcriptionRunSettings' \
   'apiKeyProvider:' \
   'await apiKey\(for: provider\)' \
-  'transcriptionServiceProvider:' \
-  'serviceFactory\.service\(for: provider\)' \
-  'func retranscribeStoredAudio\(_ note: Transcription\)' \
-  'storedAudioRetranscriptionRunner\.retranscribe\(note\)'
+  'localWhisperServiceFactory:' \
+  'WhisperTranscriptionService\(\)' \
+  'func retranscribeStoredAudio\(_ note: Transcription\)'
 
 reject_pattern \
   "iOS retry transcription avoids unused override seam" \
@@ -8610,6 +8614,13 @@ require_patterns \
   'TranscriptionRecordTests\.testStoredAudioRetranscriptionRunnerLoadsSettingsAndAppliesCompletedRecord' \
   'TranscriptionRecordTests\.testStoredAudioRetranscriptionRunnerMarksMissingAudioFailureBeforeLoadingSettings' \
   'TranscriptionRecordTests\.testStoredAudioRetranscriptionRunnerMarksTranscriptionFailure'
+
+require_patterns \
+  "core checks execute stored-audio retranscription facade tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'TranscriptionRecordTests\.testStoredAudioRetranscriptionFacadeRoutesRemoteProviderThroughSharedFactory' \
+  'TranscriptionRecordTests\.testStoredAudioRetranscriptionFacadeRoutesLocalWhisperProviderThroughSuppliedFactory' \
+  'TranscriptionRecordTests\.testStoredAudioRetranscriptionFacadeMarksMissingAudioBeforeBuildingServices'
 
 reject_pattern \
   "iOS stored-audio retranscription adapter avoids shell-owned run settings assembly" \

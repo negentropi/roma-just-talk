@@ -222,3 +222,76 @@ public struct VoiceInkStoredAudioRetranscriptionRunner {
         }
     }
 }
+
+public enum VoiceInkStoredAudioRetranscription {
+    public typealias RunSettingsProvider = VoiceInkStoredAudioRetranscriptionRunner.RunSettingsProvider
+    public typealias LocalWhisperServiceFactory = VoiceInkAudioTranscriptionServiceFactory.LocalWhisperServiceFactory
+    typealias RemoteServiceFactory = VoiceInkAudioTranscriptionServiceFactory.RemoteServiceFactory
+
+    @discardableResult
+    public static func retranscribe<Record: VoiceInkMutableTranscriptionRecord & VoiceInkStoredAudioRecord>(
+        _ record: Record,
+        relativeTo recordingsDirectory: URL? = nil,
+        fileManager: FileManager = .default,
+        runSettingsProvider: @escaping RunSettingsProvider,
+        apiKeyProvider: @escaping VoiceInkTranscriptionRunProcessor.APIKeyProvider,
+        localWhisperServiceFactory: @escaping LocalWhisperServiceFactory
+    ) async throws -> String {
+        try await retranscribe(
+            record,
+            relativeTo: recordingsDirectory,
+            fileManager: fileManager,
+            processor: VoiceInkTranscriptionRunProcessor(),
+            runSettingsProvider: runSettingsProvider,
+            apiKeyProvider: apiKeyProvider,
+            localWhisperServiceFactory: localWhisperServiceFactory,
+            remoteServiceFactory: { VoiceInkRemoteTranscriptionService(provider: $0) }
+        )
+    }
+
+    @discardableResult
+    static func retranscribe<Record: VoiceInkMutableTranscriptionRecord & VoiceInkStoredAudioRecord>(
+        _ record: Record,
+        relativeTo recordingsDirectory: URL? = nil,
+        fileManager: FileManager = .default,
+        processor: VoiceInkTranscriptionRunProcessor = VoiceInkTranscriptionRunProcessor(),
+        runSettingsProvider: @escaping RunSettingsProvider,
+        apiKeyProvider: @escaping VoiceInkTranscriptionRunProcessor.APIKeyProvider,
+        localWhisperServiceFactory: @escaping LocalWhisperServiceFactory,
+        remoteServiceFactory: @escaping RemoteServiceFactory = { VoiceInkRemoteTranscriptionService(provider: $0) }
+    ) async throws -> String {
+        try await runner(
+            processor: processor,
+            runSettingsProvider: runSettingsProvider,
+            apiKeyProvider: apiKeyProvider,
+            localWhisperServiceFactory: localWhisperServiceFactory,
+            remoteServiceFactory: remoteServiceFactory
+        ).retranscribe(
+            record,
+            relativeTo: recordingsDirectory,
+            fileManager: fileManager
+        )
+    }
+
+    private static func runner(
+        processor: VoiceInkTranscriptionRunProcessor = VoiceInkTranscriptionRunProcessor(),
+        runSettingsProvider: @escaping RunSettingsProvider,
+        apiKeyProvider: @escaping VoiceInkTranscriptionRunProcessor.APIKeyProvider,
+        localWhisperServiceFactory: @escaping LocalWhisperServiceFactory,
+        remoteServiceFactory: @escaping RemoteServiceFactory = { VoiceInkRemoteTranscriptionService(provider: $0) }
+    ) -> VoiceInkStoredAudioRetranscriptionRunner {
+        let serviceFactory = VoiceInkAudioTranscriptionServiceFactory(
+            localWhisperServiceFactory: localWhisperServiceFactory,
+            remoteServiceFactory: remoteServiceFactory
+        )
+
+        return VoiceInkStoredAudioRetranscriptionRunner(
+            processor: processor,
+            runSettingsProvider: runSettingsProvider,
+            apiKeyProvider: apiKeyProvider,
+            transcriptionServiceProvider: { provider in
+                serviceFactory.service(for: provider)
+            }
+        )
+    }
+}

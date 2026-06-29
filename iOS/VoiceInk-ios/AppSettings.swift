@@ -180,26 +180,19 @@ final class AppSettings: ObservableObject {
         )
     }
 
-    private var storedAudioRetranscriptionRunner: VoiceInkStoredAudioRetranscriptionRunner {
-        let serviceFactory = VoiceInkAudioTranscriptionServiceFactory {
-            WhisperTranscriptionService()
-        }
-
-        return VoiceInkStoredAudioRetranscriptionRunner(
+    func retranscribeStoredAudio(_ note: Transcription) async throws -> String {
+        try await VoiceInkStoredAudioRetranscription.retranscribe(
+            note,
             runSettingsProvider: { [self] in
                 await transcriptionRunSettings
             },
             apiKeyProvider: { [self] provider in
                 await apiKey(for: provider)
             },
-            transcriptionServiceProvider: { provider in
-                serviceFactory.service(for: provider)
+            localWhisperServiceFactory: {
+                WhisperTranscriptionService()
             }
         )
-    }
-
-    func retranscribeStoredAudio(_ note: Transcription) async throws -> String {
-        try await storedAudioRetranscriptionRunner.retranscribe(note)
     }
 
     func addMode(_ mode: Mode) {

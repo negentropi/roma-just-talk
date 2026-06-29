@@ -13169,11 +13169,10 @@ require_pattern \
   'VoiceInkAudioPlaybackState' \
   iOS/VoiceInk-ios/AudioPlayer.swift
 
-require_patterns \
+require_pattern \
   "iOS audio player publishes shared playback state plan" \
-  iOS/VoiceInk-ios/AudioPlayer.swift \
-  '@Published[[:space:]]+private[[:space:]]+var[[:space:]]+playbackState' \
-  'playbackState = VoiceInkAudioPlaybackState|playbackState: VoiceInkAudioPlaybackState'
+  '@Published[[:space:]]+private[[:space:]]+var[[:space:]]+playbackState([[:space:]]*:[[:space:]]*VoiceInkAudioPlaybackState|[[:space:]]*=[[:space:]]*VoiceInkAudioPlaybackState)' \
+  iOS/VoiceInk-ios/AudioPlayer.swift
 
 require_pattern \
   "iOS audio player shell applies shared play-pause plan" \

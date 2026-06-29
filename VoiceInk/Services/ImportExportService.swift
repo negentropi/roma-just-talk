@@ -222,12 +222,12 @@ class ImportExportService {
         let shortcutBackupRecords = VoiceInkShortcutBackupPolicy.generalBackupShortcutRecords { actionIdentifier in
             ShortcutStore.shortcut(for: actionIdentifier).map(ShortcutBackup.init)
         }
-        let generalSettingsToExport = GeneralBackup(
+        let generalSettingsToExport = VoiceInkGeneralSettingsBackupPayload<ShortcutBackup>(
             shortcutBackupRecords: shortcutBackupRecords,
             preferences: generalSettingsBackupPreferences
         )
 
-        let exportedSettings = BackupFile(
+        let exportedSettings = VoiceInkSettingsBackupFile<ShortcutBackup>(
             version: currentSettingsVersion,
             customPrompts: exportablePrompts,
             powerModeConfigs: powerModeConfigs,
@@ -307,7 +307,7 @@ class ImportExportService {
 
         do {
             let jsonData = try Data(contentsOf: url)
-            let backup: BackupFile = try VoiceInkSettingsBackupFileCodec.decode(from: jsonData)
+            let backup: VoiceInkSettingsBackupFile<ShortcutBackup> = try VoiceInkSettingsBackupFileCodec.decode(from: jsonData)
 
             VoiceInkSettingsBackupImportPolicy.versionReview(
                 importedVersion: backup.version,

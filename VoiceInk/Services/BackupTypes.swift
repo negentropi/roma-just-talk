@@ -1,9 +1,6 @@
 import Foundation
 import VoiceInkCore
 
-typealias GeneralBackup = VoiceInkGeneralSettingsBackupPayload<ShortcutBackup>
-typealias BackupFile = VoiceInkSettingsBackupFile<ShortcutBackup>
-
 extension VoiceInkCustomCloudModelBackup {
     init(model: CustomCloudModel) {
         self.init(

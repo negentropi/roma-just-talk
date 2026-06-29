@@ -5,7 +5,7 @@ import VoiceInkCore
 
 enum BackupImporter {
     @MainActor
-    static func apply(_ backup: BackupFile, categories: Set<VoiceInkSettingsBackupCategory>, enhancementService: AIEnhancementService, recordingShortcutManager: RecordingShortcutManager, menuBarManager: MenuBarManager, mediaController: MediaController, playbackController: PlaybackController, soundManager: SoundManager, recorderUIManager: RecorderUIManager, modelContext: ModelContext, transcriptionModelManager: TranscriptionModelManager) throws {
+    static func apply(_ backup: VoiceInkSettingsBackupFile<ShortcutBackup>, categories: Set<VoiceInkSettingsBackupCategory>, enhancementService: AIEnhancementService, recordingShortcutManager: RecordingShortcutManager, menuBarManager: MenuBarManager, mediaController: MediaController, playbackController: PlaybackController, soundManager: SoundManager, recorderUIManager: RecorderUIManager, modelContext: ModelContext, transcriptionModelManager: TranscriptionModelManager) throws {
         if categories.contains(.dictionary) {
             try importDictionary(from: backup, modelContext: modelContext)
         }
@@ -83,7 +83,7 @@ enum BackupImporter {
     }
 
     @MainActor
-    private static func importGeneral(_ general: GeneralBackup?, recordingShortcutManager: RecordingShortcutManager, menuBarManager: MenuBarManager, mediaController: MediaController, playbackController: PlaybackController, soundManager: SoundManager, recorderUIManager: RecorderUIManager) {
+    private static func importGeneral(_ general: VoiceInkGeneralSettingsBackupPayload<ShortcutBackup>?, recordingShortcutManager: RecordingShortcutManager, menuBarManager: MenuBarManager, mediaController: MediaController, playbackController: PlaybackController, soundManager: SoundManager, recorderUIManager: RecorderUIManager) {
         guard let general else {
             print(VoiceInkSettingsBackupImportDiagnostics.noGeneralSettingsMessage)
             return
@@ -174,7 +174,7 @@ enum BackupImporter {
     }
 
     @MainActor
-    private static func importDictionary(from backup: BackupFile, modelContext: ModelContext) throws {
+    private static func importDictionary(from backup: VoiceInkSettingsBackupFile<ShortcutBackup>, modelContext: ModelContext) throws {
         let existingWords: [String]
         if backup.vocabularyWords != nil {
             let descriptor = FetchDescriptor<VocabularyWord>()

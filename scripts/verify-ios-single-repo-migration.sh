@@ -6949,9 +6949,9 @@ require_patterns \
   'decoder\.decode\(VoiceInkSettingsBackupFile<ShortcutBackup>\.self, from: data\)'
 
 require_pattern \
-  "macOS backup file type adapts shared wire shape to shortcut adapter" \
-  'typealias BackupFile = VoiceInkSettingsBackupFile<ShortcutBackup>' \
-  VoiceInk/Services/BackupTypes.swift
+  "macOS import/export builds shared settings backup file with shortcut adapter" \
+  'VoiceInkSettingsBackupFile<ShortcutBackup>\(' \
+  VoiceInk/Services/ImportExportService.swift
 
 require_pattern \
   "macOS import/export consumes shared settings backup file codec" \
@@ -6960,12 +6960,12 @@ require_pattern \
 
 reject_pattern \
   "macOS import/export avoids shell-owned backup JSON codec" \
-  'JSONEncoder\(\)|JSONDecoder\(\)|outputFormatting = \.prettyPrinted|encoder\.encode\(exportedSettings\)|decoder\.decode\(BackupFile\.self' \
+  'JSONEncoder\(\)|JSONDecoder\(\)|outputFormatting = \.prettyPrinted|encoder\.encode\(exportedSettings\)|decoder\.decode\((BackupFile|VoiceInkSettingsBackupFile<ShortcutBackup>)\.self' \
   VoiceInk/Services/ImportExportService.swift
 
 reject_pattern \
   "macOS backup types avoid shell-owned top-level backup file wire shape" \
-  'struct +BackupFile|decodeIfPresent\(String\.self, forKey: \.version\) \?\? "0\.0\.0"|decodeIfPresent\(\[VoiceInkCustomPrompt\]\.self, forKey: \.customPrompts\) \?\? \[\]|decodeIfPresent\(\[PowerModeConfig\]\.self, forKey: \.powerModeConfigs\) \?\? \[\]' \
+  'typealias +BackupFile|struct +BackupFile|decodeIfPresent\(String\.self, forKey: \.version\) \?\? "0\.0\.0"|decodeIfPresent\(\[VoiceInkCustomPrompt\]\.self, forKey: \.customPrompts\) \?\? \[\]|decodeIfPresent\(\[PowerModeConfig\]\.self, forKey: \.powerModeConfigs\) \?\? \[\]' \
   VoiceInk/Services/BackupTypes.swift
 
 require_pattern \
@@ -7063,9 +7063,9 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/GeneralSettingsBackupPolicy.swift
 
 require_pattern \
-  "macOS general backup adapts to shared general settings preferences" \
-  'typealias GeneralBackup = VoiceInkGeneralSettingsBackupPayload<ShortcutBackup>' \
-  VoiceInk/Services/BackupTypes.swift
+  "macOS general backup export adapts to shared general settings preferences" \
+  'VoiceInkGeneralSettingsBackupPayload<ShortcutBackup>\(' \
+  VoiceInk/Services/ImportExportService.swift
 
 require_pattern \
   "macOS general backup export builds shared general settings preferences" \
@@ -7127,7 +7127,7 @@ reject_context_pattern \
 
 reject_pattern \
   "macOS general backup avoids shell-owned wire payload implementation" \
-  'struct GeneralBackup|extension GeneralBackup|primaryRecordingShortcutRawValue|rollingBufferPreloadModeRawValue|var generalSettingsBackupPreferences' \
+  'typealias GeneralBackup|struct GeneralBackup|extension GeneralBackup|primaryRecordingShortcutRawValue|rollingBufferPreloadModeRawValue|var generalSettingsBackupPreferences' \
   VoiceInk/Services/BackupTypes.swift
 
 reject_pattern \
@@ -7147,7 +7147,7 @@ reject_pattern \
 
 reject_context_pattern \
   "macOS backup export avoids shell-owned GeneralBackup field emission" \
-  'GeneralBackup\(' \
+  'VoiceInkGeneralSettingsBackupPayload<ShortcutBackup>\(' \
   'primaryRecordingShortcut:|primaryRecordingShortcutRawValue:|isTranscriptionCleanupEnabled:|isSoundFeedbackEnabled:|restoreClipboardAfterPaste:|rollingBufferPreloadModeRawValue:' \
   VoiceInk/Services/ImportExportService.swift
 
@@ -17521,7 +17521,7 @@ reject_pattern \
 
 reject_context_pattern \
   "macOS backup export avoids shell-owned macOS shell backup field emission" \
-  'GeneralBackup\(' \
+  'VoiceInkGeneralSettingsBackupPayload<ShortcutBackup>\(' \
   'launchAtLoginEnabled: LaunchAtLogin\.isEnabled|isMenuBarOnly: menuBarManager\.isMenuBarOnly|recorderType: recorderUIManager\.recorderType' \
   VoiceInk/Services/ImportExportService.swift
 

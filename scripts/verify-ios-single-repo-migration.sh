@@ -10092,8 +10092,8 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
-  "core checks execute shared AI enhancement model-option visibility coverage" \
-  'AIProviderCatalogTests\.testMacOSAIEnhancementModelOptionsVisibilityIsShared' \
+  "core checks execute shared Power Mode AI model display coverage" \
+  'PowerModePresentationTests\.testAIEnhancementEmptyStateTextPreservesMacOSFormCopy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -10121,9 +10121,9 @@ require_patterns \
   'modelPickerPresentation'
 
 require_pattern \
-  "shared AI enhancement model-option visibility policy lives in VoiceInkCore" \
-  'showsTextEnhancementModelOptions' \
-  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+  "shared Power Mode AI model display policy lives in VoiceInkCore" \
+  'shouldShowAIModelOptions' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
 
 reject_pattern \
   "shared AI enhancement settings-surface metadata stays hidden" \
@@ -10221,10 +10221,19 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
 
 require_pattern \
-  "macOS Power Mode model section display uses shared model-option visibility policy" \
-  'showsTextEnhancementModelOptions' \
-  VoiceInk/PowerMode/PowerModeConfigView.swift \
-  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+  "macOS Power Mode model section display uses shared presentation" \
+  'VoiceInkPowerModePresentation\.shouldShowAIModelOptions' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
+reject_pattern \
+  "shared Power Mode AI model display metadata stays hidden" \
+  'showsTextEnhancementModelOptions|ModelOptionsVisibilityIsShared' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AIProviderCatalogTests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/PowerModePresentationTests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
 
 require_pattern \
   "shared AI enhancement request URL selection lives in VoiceInkCore" \

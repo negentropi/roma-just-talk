@@ -276,6 +276,15 @@ public enum VoiceInkPowerModePresentation {
         shouldShowRefreshModelsButton(for: provider) ? noAIModelsLoadedText : noAIModelsAvailableText
     }
 
+    public static func shouldShowAIModelOptions(for provider: VoiceInkAIEnhancementProviderKind) -> Bool {
+        switch provider {
+        case .custom:
+            return false
+        case .anthropic, .assemblyAI, .cerebras, .deepgram, .elevenLabs, .groq, .gemini, .localCLI, .mistral, .ollama, .openAI, .openRouter, .soniox, .speechmatics:
+            return true
+        }
+    }
+
     public static func shouldShowRefreshModelsButton(for provider: VoiceInkAIEnhancementProviderKind) -> Bool {
         VoiceInkAIEnhancementProviderSettingsPresentation.macOS.modelPickerPresentation(
             provider: provider,

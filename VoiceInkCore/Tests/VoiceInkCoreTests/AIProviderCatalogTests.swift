@@ -1732,32 +1732,6 @@ final class AIProviderCatalogTests: XCTestCase {
         }
     }
 
-    func testMacOSAIEnhancementModelOptionsVisibilityIsShared() {
-        let expectedVisibility: [VoiceInkAIEnhancementProviderKind: Bool] = [
-            .anthropic: true,
-            .assemblyAI: true,
-            .cerebras: true,
-            .custom: false,
-            .deepgram: true,
-            .elevenLabs: true,
-            .gemini: true,
-            .groq: true,
-            .localCLI: true,
-            .mistral: true,
-            .ollama: true,
-            .openAI: true,
-            .openRouter: true,
-            .soniox: true,
-            .speechmatics: true
-        ]
-
-        XCTAssertEqual(VoiceInkAIEnhancementProviderKind.allCases.count, expectedVisibility.count)
-
-        for (provider, shouldShowOptions) in expectedVisibility {
-            XCTAssertEqual(provider.showsTextEnhancementModelOptions, shouldShowOptions, provider.rawValue)
-        }
-    }
-
     func testMacOSAIEnhancementRequestURLSelectionIsShared() async {
         await withIsolatedDefaultsAsync { defaults in
             XCTAssertEqual(

@@ -1197,15 +1197,6 @@ public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
         }
     }
 
-    public var showsTextEnhancementModelOptions: Bool {
-        switch self {
-        case .custom:
-            return false
-        case .anthropic, .assemblyAI, .cerebras, .deepgram, .elevenLabs, .groq, .gemini, .localCLI, .mistral, .ollama, .openAI, .openRouter, .soniox, .speechmatics:
-            return true
-        }
-    }
-
     public func textEnhancementAvailableModels(
         ollamaModels: [String],
         openRouterModels: [String]

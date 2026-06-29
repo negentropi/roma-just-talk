@@ -231,6 +231,13 @@ final class PowerModePresentationTests: XCTestCase {
         )
         for provider in VoiceInkAIEnhancementProviderKind.allCases {
             XCTAssertEqual(
+                VoiceInkPowerModePresentation.shouldShowAIModelOptions(for: provider),
+                provider != .custom,
+                provider.rawValue
+            )
+        }
+        for provider in VoiceInkAIEnhancementProviderKind.allCases {
+            XCTAssertEqual(
                 VoiceInkPowerModePresentation.shouldShowRefreshModelsButton(for: provider),
                 provider == .openRouter,
                 provider.rawValue

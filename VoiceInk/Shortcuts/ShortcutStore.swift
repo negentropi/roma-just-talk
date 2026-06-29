@@ -4,8 +4,6 @@ import VoiceInkCore
 enum ShortcutStore {
     static let shortcutDidChange = VoiceInkRecordingShortcutPreference.shortcutDidChangeNotificationName
 
-    typealias StoredState = VoiceInkShortcutStorageState
-
     static func rawShortcut(for action: ShortcutAction) -> Shortcut? {
         VoiceInkShortcutStoragePreference.shortcutData(for: action.userDefaultsKey)
             .flatMap { try? JSONDecoder().decode(Shortcut.self, from: $0) }
@@ -63,11 +61,11 @@ enum ShortcutStore {
         )
     }
 
-    static func storedState(for action: ShortcutAction) -> StoredState {
+    static func storedState(for action: ShortcutAction) -> VoiceInkShortcutStorageState {
         VoiceInkShortcutStoragePreference.storedState(for: action.userDefaultsKey)
     }
 
-    static func restoreStoredState(_ state: StoredState, for action: ShortcutAction) {
+    static func restoreStoredState(_ state: VoiceInkShortcutStorageState, for action: ShortcutAction) {
         guard action.isStored else {
             return
         }

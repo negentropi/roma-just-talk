@@ -12675,6 +12675,23 @@ require_pattern \
   'VoiceInkShortcutStoragePreference\.(shortcutData|saveShortcutData|markShortcutCleared|removeShortcutStorage|storedState|restoreStoredState|isShortcutCleared)' \
   VoiceInk/Shortcuts/ShortcutStore.swift
 
+require_patterns \
+  "macOS shortcut store uses shared shortcut storage state directly" \
+  VoiceInk/Shortcuts/ShortcutStore.swift \
+  'storedState\(for action: ShortcutAction\) -> VoiceInkShortcutStorageState' \
+  'restoreStoredState\(_ state: VoiceInkShortcutStorageState, for action: ShortcutAction\)'
+
+require_pattern \
+  "macOS shortcut recorder uses shared shortcut storage state directly" \
+  'shortcutStateBeforeRecording: VoiceInkShortcutStorageState\?' \
+  VoiceInk/Shortcuts/ShortcutRecorder.swift
+
+reject_pattern \
+  "macOS shortcut shells avoid shallow shortcut storage state alias" \
+  '\bStoredState\b|ShortcutStore\.StoredState' \
+  VoiceInk/Shortcuts/ShortcutStore.swift \
+  VoiceInk/Shortcuts/ShortcutRecorder.swift
+
 require_pattern \
   "macOS shortcut store uses shared shortcut-change notification name" \
   'shortcutDidChange = VoiceInkRecordingShortcutPreference\.shortcutDidChangeNotificationName' \

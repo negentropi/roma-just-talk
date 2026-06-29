@@ -174,7 +174,7 @@ final class ShortcutRecorderModel: ObservableObject {
     private var onCapture: ((Shortcut) -> Void)?
     private var onShortcutStorageChanged: (() -> Void)?
     private var activeAction: ShortcutAction?
-    private var shortcutStateBeforeRecording: ShortcutStore.StoredState?
+    private var shortcutStateBeforeRecording: VoiceInkShortcutStorageState?
     private var pendingModifierShortcut: Shortcut?
     private var peakModifierFlags: NSEvent.ModifierFlags = []
 

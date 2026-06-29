@@ -6,41 +6,38 @@ import VoiceInkCore
 
 @MainActor
 final class AudioPlayer: ObservableObject {
-    @Published var isPlaying: Bool = false
-    @Published var currentTime: TimeInterval = 0
-    @Published var duration: TimeInterval = 0
-    @Published var isLoading: Bool = false
-    @Published var playbackRate: Float = VoiceInkAudioPlaybackRate.current() {
-        didSet { VoiceInkAudioPlaybackRate.save(playbackRate) }
+    @Published private var playbackState = VoiceInkAudioPlaybackState(
+        isPlaying: false,
+        currentTime: 0,
+        duration: 0,
+        playbackRate: VoiceInkAudioPlaybackRate.current()
+    ) {
+        didSet {
+            if oldValue.playbackRate != playbackState.playbackRate {
+                VoiceInkAudioPlaybackRate.save(playbackState.playbackRate)
+            }
+        }
     }
+    @Published var isLoading: Bool = false
     
     private var audioPlayer: AVAudioPlayer?
     private var timer: Timer?
     private let sessionManager = AudioSessionManager.shared
 
-    private var playbackState: VoiceInkAudioPlaybackState {
-        get {
-            VoiceInkAudioPlaybackState(
-                isPlaying: isPlaying,
-                currentTime: currentTime,
-                duration: duration,
-                playbackRate: playbackRate
-            )
-        }
-        set {
-            if isPlaying != newValue.isPlaying {
-                isPlaying = newValue.isPlaying
-            }
-            if currentTime != newValue.currentTime {
-                currentTime = newValue.currentTime
-            }
-            if duration != newValue.duration {
-                duration = newValue.duration
-            }
-            if playbackRate != newValue.playbackRate {
-                playbackRate = newValue.playbackRate
-            }
-        }
+    var isPlaying: Bool {
+        playbackState.isPlaying
+    }
+
+    var currentTime: TimeInterval {
+        playbackState.currentTime
+    }
+
+    var duration: TimeInterval {
+        playbackState.duration
+    }
+
+    var playbackRate: Float {
+        playbackState.playbackRate
     }
     
     func loadAudio(from path: String) {

@@ -13170,6 +13170,11 @@ require_pattern \
   iOS/VoiceInk-ios/AudioPlayer.swift
 
 require_pattern \
+  "iOS audio player publishes shared playback state plan" \
+  '@Published private var playbackState = VoiceInkAudioPlaybackState' \
+  iOS/VoiceInk-ios/AudioPlayer.swift
+
+require_pattern \
   "iOS audio player shell applies shared play-pause plan" \
   'playPausePlan\.applyRuntimeState' \
   iOS/VoiceInk-ios/AudioPlayer.swift
@@ -13354,6 +13359,11 @@ reject_pattern \
   "platform audio player shells avoid duplicate seek and rate state policy" \
   'VoiceInkAudioPlaybackTimeline\.clampedTime|VoiceInkAudioPlaybackRate\.next' \
   VoiceInk/Views/AudioPlayerView.swift \
+  iOS/VoiceInk-ios/AudioPlayer.swift
+
+reject_pattern \
+  "iOS audio player avoids duplicate mutable playback state fields" \
+  '@Published var +(isPlaying|currentTime|duration|playbackRate)|private var playbackState: VoiceInkAudioPlaybackState \{' \
   iOS/VoiceInk-ios/AudioPlayer.swift
 
 reject_pattern \

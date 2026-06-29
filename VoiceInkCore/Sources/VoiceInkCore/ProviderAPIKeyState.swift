@@ -78,19 +78,6 @@ public struct VoiceInkProviderAPIKeyFormSnapshot: Equatable, Sendable {
     }
 }
 
-private struct VoiceInkProviderAPIKeyStorageMutationPlan: Equatable, Sendable {
-    let shouldPersistStoredKey: Bool
-    let verificationFlagToPersist: Bool?
-
-    init(
-        shouldPersistStoredKey: Bool,
-        verificationFlagToPersist: Bool?
-    ) {
-        self.shouldPersistStoredKey = shouldPersistStoredKey
-        self.verificationFlagToPersist = verificationFlagToPersist
-    }
-}
-
 fileprivate enum VoiceInkProviderAPIKeyStatePersistenceAction: Equatable, Sendable {
     case persistStoredKey(String)
     case persistVerificationFlag(Bool)
@@ -137,35 +124,6 @@ public extension VoiceInkProviderAPIKeyStateUpdatePlan {
                 persistVerificationFlag(flag)
             }
         }
-    }
-}
-
-private extension VoiceInkProviderAPIKeyStorageMutationPlan {
-    func persistenceActions(storedKey: String) -> [VoiceInkProviderAPIKeyStatePersistenceAction] {
-        guard shouldPersistStoredKey else { return [] }
-
-        var actions: [VoiceInkProviderAPIKeyStatePersistenceAction] = [
-            .persistStoredKey(storedKey)
-        ]
-        if let verificationFlagToPersist {
-            actions.append(.persistVerificationFlag(verificationFlagToPersist))
-        }
-        return actions
-    }
-}
-
-private struct VoiceInkProviderAPIKeyVerificationMutationPlan: Equatable, Sendable {
-    let shouldPersistVerificationFlag: Bool
-
-    init(shouldPersistVerificationFlag: Bool) {
-        self.shouldPersistVerificationFlag = shouldPersistVerificationFlag
-    }
-}
-
-private extension VoiceInkProviderAPIKeyVerificationMutationPlan {
-    func persistenceActions(verificationFlag: Bool) -> [VoiceInkProviderAPIKeyStatePersistenceAction] {
-        guard shouldPersistVerificationFlag else { return [] }
-        return [.persistVerificationFlag(verificationFlag)]
     }
 }
 
@@ -273,37 +231,31 @@ public struct VoiceInkProviderAPIKeyState: Equatable, Sendable {
     fileprivate mutating func applyStoredAPIKey(
         _ key: String,
         for provider: VoiceInkProviderKind
-    ) -> VoiceInkProviderAPIKeyStorageMutationPlan {
+    ) -> [VoiceInkProviderAPIKeyStatePersistenceAction] {
         guard provider.requiresUserAPIKey else {
-            return VoiceInkProviderAPIKeyStorageMutationPlan(
-                shouldPersistStoredKey: false,
-                verificationFlagToPersist: nil
-            )
+            return []
         }
 
         let oldKey = storedKeysByProvider[provider] ?? ""
         storedKeysByProvider[provider] = key
 
         guard oldKey != key else {
-            return VoiceInkProviderAPIKeyStorageMutationPlan(
-                shouldPersistStoredKey: true,
-                verificationFlagToPersist: nil
-            )
+            return [.persistStoredKey(key)]
         }
 
         verifiedProviders.remove(provider)
-        return VoiceInkProviderAPIKeyStorageMutationPlan(
-            shouldPersistStoredKey: true,
-            verificationFlagToPersist: false
-        )
+        return [
+            .persistStoredKey(key),
+            .persistVerificationFlag(false)
+        ]
     }
 
     fileprivate mutating func applyVerification(
         _ verified: Bool,
         for provider: VoiceInkProviderKind
-    ) -> VoiceInkProviderAPIKeyVerificationMutationPlan {
+    ) -> [VoiceInkProviderAPIKeyStatePersistenceAction] {
         guard provider.requiresUserAPIKey else {
-            return VoiceInkProviderAPIKeyVerificationMutationPlan(shouldPersistVerificationFlag: false)
+            return []
         }
 
         if verified {
@@ -311,7 +263,7 @@ public struct VoiceInkProviderAPIKeyState: Equatable, Sendable {
         } else {
             verifiedProviders.remove(provider)
         }
-        return VoiceInkProviderAPIKeyVerificationMutationPlan(shouldPersistVerificationFlag: true)
+        return [.persistVerificationFlag(verified)]
     }
 }
 
@@ -321,10 +273,10 @@ public extension VoiceInkProviderAPIKeyState {
         for provider: VoiceInkProviderKind
     ) -> VoiceInkProviderAPIKeyStateUpdatePlan {
         var updatedState = self
-        let mutationPlan = updatedState.applyStoredAPIKey(key, for: provider)
+        let persistenceActions = updatedState.applyStoredAPIKey(key, for: provider)
         return VoiceInkProviderAPIKeyStateUpdatePlan(
             state: updatedState,
-            persistenceActions: mutationPlan.persistenceActions(storedKey: key)
+            persistenceActions: persistenceActions
         )
     }
 
@@ -333,10 +285,10 @@ public extension VoiceInkProviderAPIKeyState {
         for provider: VoiceInkProviderKind
     ) -> VoiceInkProviderAPIKeyStateUpdatePlan {
         var updatedState = self
-        let mutationPlan = updatedState.applyVerification(verified, for: provider)
+        let persistenceActions = updatedState.applyVerification(verified, for: provider)
         return VoiceInkProviderAPIKeyStateUpdatePlan(
             state: updatedState,
-            persistenceActions: mutationPlan.persistenceActions(verificationFlag: verified)
+            persistenceActions: persistenceActions
         )
     }
 
@@ -363,12 +315,10 @@ public extension VoiceInkProviderAPIKeyState {
         var persistenceActions: [VoiceInkProviderAPIKeyStatePersistenceAction] = []
         persistenceApplicationPlan.applyRuntimeState(
             saveKey: { key in
-                let mutationPlan = updatedState.applyStoredAPIKey(key, for: provider)
-                persistenceActions.append(contentsOf: mutationPlan.persistenceActions(storedKey: key))
+                persistenceActions.append(contentsOf: updatedState.applyStoredAPIKey(key, for: provider))
             },
             persistVerificationFlag: { flag in
-                let mutationPlan = updatedState.applyVerification(flag, for: provider)
-                persistenceActions.append(contentsOf: mutationPlan.persistenceActions(verificationFlag: flag))
+                persistenceActions.append(contentsOf: updatedState.applyVerification(flag, for: provider))
             }
         )
 

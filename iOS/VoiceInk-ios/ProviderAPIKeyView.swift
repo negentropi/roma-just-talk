@@ -9,7 +9,7 @@ struct ProviderAPIKeyView: View {
 
     var body: some View {
         let presentation = provider.apiKeyFormPresentation
-        let isKeyVerified = settings.isKeyVerified(for: provider)
+        let isKeyVerified = settings.providerAccess.isKeyVerified(for: provider)
         let controlPresentation = apiKeyFormState.iOSControlPresentation(
             storedRuntimeKey: settings.apiKey(for: provider)
         )
@@ -91,7 +91,7 @@ struct ProviderAPIKeyView: View {
         .onAppear {
             apiKeyFormState = .loaded(
                 storedKey: settings.storedAPIKey(for: provider),
-                isVerified: settings.isKeyVerified(for: provider)
+                isVerified: settings.providerAccess.isKeyVerified(for: provider)
             )
         }
         .onChange(of: apiKeyFormState.enteredKey) { _, _ in

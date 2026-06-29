@@ -6,7 +6,7 @@ struct APIKeysView: View {
     
     var body: some View {
         List {
-            ForEach(settings.apiKeyListRows()) { row in
+            ForEach(settings.providerAccess.apiKeyListRows()) { row in
                 NavigationLink(destination: ProviderAPIKeyView(provider: row.provider)) {
                     HStack {
                         Text(row.presentation.title)

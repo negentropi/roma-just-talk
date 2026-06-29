@@ -14,13 +14,13 @@ struct ModeConfigurationView: View {
         self.settings = settings
         self.onSave = onSave
         self.isEditing = mode != nil
-        let initialMode = mode ?? settings.modeFormProviderAvailability.newModeDraft()
+        let initialMode = mode ?? settings.providerAccess.modeFormProviderAvailability.newModeDraft()
         self._mode = State(initialValue: initialMode)
     }
     
     var body: some View {
         let formPresentation = mode.formPresentation(isEditing: isEditing)
-        let providerAvailability = settings.modeFormProviderAvailability
+        let providerAvailability = settings.providerAccess.modeFormProviderAvailability
         let formStatePresentation = providerAvailability.formStatePresentation(for: mode)
 
         Form {

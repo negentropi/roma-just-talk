@@ -1745,8 +1745,8 @@ reject_pattern \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \
-  "iOS AppSettings exposes shared mode form provider availability" \
-  'VoiceInkModeFormProviderAvailability|modeFormProviderAvailability' \
+  "iOS AppSettings exposes shared provider access snapshot" \
+  'var providerAccess: VoiceInkProviderAccessSnapshot' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \
@@ -3935,18 +3935,23 @@ reject_pattern \
 
 require_pattern \
   "iOS app settings uses shared provider API-key list rows" \
-  'VoiceInkProviderAccessSnapshot|providerAccessSnapshot|apiKeyListRows' \
+  'var providerAccess: VoiceInkProviderAccessSnapshot' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 reject_pattern \
   "iOS app settings avoids shell-owned provider access derivation" \
-  'apiKeyState\.(isReady|listRows|availableProviders)' \
+  'apiKeyState\.(isReady|listRows|availableProviders)|func +isKeyVerified\(|func +apiKeyListRows\(|var +modeFormProviderAvailability' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \
   "iOS API-key list uses shared row list" \
-  'apiKeyListRows' \
+  'settings\.providerAccess\.apiKeyListRows\(\)' \
   iOS/VoiceInk-ios/APIKeysView.swift
+
+require_pattern \
+  "iOS provider API-key form reads shared verification state directly" \
+  'settings\.providerAccess\.isKeyVerified' \
+  iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
 reject_pattern \
   "iOS API-key list avoids shell-owned provider list and row presentation" \
@@ -13440,12 +13445,12 @@ reject_pattern \
 
 require_pattern \
   "iOS mode provider availability uses settings adapter" \
-  'settings\.modeFormProviderAvailability' \
+  'settings\.providerAccess\.modeFormProviderAvailability' \
   iOS/VoiceInk-ios/ModeConfigurationView.swift
 
 require_pattern \
   "iOS new-mode draft uses shared provider availability" \
-  'settings\.modeFormProviderAvailability\.newModeDraft\(\)' \
+  'settings\.providerAccess\.modeFormProviderAvailability\.newModeDraft\(\)' \
   iOS/VoiceInk-ios/ModeConfigurationView.swift
 
 reject_pattern \
@@ -13460,7 +13465,7 @@ reject_pattern \
 
 require_pattern \
   "iOS settings adapter builds mode provider availability from provider-key state" \
-  'providerAccessSnapshot\.modeFormProviderAvailability' \
+  'VoiceInkProviderAccessSnapshot' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 reject_pattern \

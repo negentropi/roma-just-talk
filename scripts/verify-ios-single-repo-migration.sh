@@ -4014,12 +4014,15 @@ require_pattern \
   'VoiceInkProviderAPIKeyStateUpdatePlan|applyingStoredAPIKey|applyingVerification|applyRuntimeState' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift
 
-require_patterns \
-  "shared provider API-key persistence actions stay in private mutators" \
-  VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift \
-  'fileprivate mutating func applyStoredAPIKey' \
-  'fileprivate mutating func applyVerification' \
-  '\[VoiceInkProviderAPIKeyStatePersistenceAction\]'
+require_multiline_pattern \
+  "shared provider API-key stored-key mutator returns persistence actions" \
+  'fileprivate mutating func applyStoredAPIKey\([[:space:]]+_ key: String,[[:space:]]+for provider: VoiceInkProviderKind[[:space:]]+\) -> \[VoiceInkProviderAPIKeyStatePersistenceAction\]' \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift
+
+require_multiline_pattern \
+  "shared provider API-key verification mutator returns persistence actions" \
+  'fileprivate mutating func applyVerification\([[:space:]]+_ verified: Bool,[[:space:]]+for provider: VoiceInkProviderKind[[:space:]]+\) -> \[VoiceInkProviderAPIKeyStatePersistenceAction\]' \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift
 
 reject_pattern \
   "shared provider API-key state hides raw mutation internals" \

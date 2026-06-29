@@ -199,6 +199,36 @@ public struct VoiceInkModeFormProviderAvailability: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkModeFormDraftState {
+    public var mode: Mode
+
+    public init(
+        existingMode: Mode?,
+        providerAvailability: VoiceInkModeFormProviderAvailability
+    ) {
+        self.mode = existingMode ?? providerAvailability.newModeDraft()
+    }
+
+    public mutating func repairProviderAvailability(_ availability: VoiceInkModeFormProviderAvailability) {
+        mode = availability.repairedMode(mode)
+    }
+
+    public mutating func selectTranscriptionProvider(_ provider: VoiceInkProviderKind) {
+        mode.selectTranscriptionProvider(provider)
+    }
+
+    public mutating func selectPostProcessingProvider(_ provider: VoiceInkProviderKind) {
+        mode.selectPostProcessingProvider(provider)
+    }
+
+    public mutating func setPostProcessingEnabled(
+        _ isEnabled: Bool,
+        providerAvailability: VoiceInkModeFormProviderAvailability
+    ) {
+        mode.setPostProcessingEnabled(isEnabled, providerAvailability: providerAvailability)
+    }
+}
+
 public struct VoiceInkModeListRepairPlan {
     public let modes: [Mode]
     public let selectedModeId: UUID?

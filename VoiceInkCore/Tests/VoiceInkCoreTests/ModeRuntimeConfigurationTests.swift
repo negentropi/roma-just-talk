@@ -740,6 +740,139 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
         XCTAssertEqual(repairedMode.transcriptionProvider, .deepgram)
     }
 
+    func testModeFormDraftStateCreatesNewDraftThroughProviderAvailability() {
+        let availability = VoiceInkModeFormProviderAvailability(
+            transcriptionProviders: [.localWhisper],
+            postProcessingProviders: [.gemini]
+        )
+
+        let draftState = VoiceInkModeFormDraftState(
+            existingMode: nil,
+            providerAvailability: availability
+        )
+
+        XCTAssertEqual(draftState.mode.name, "")
+        XCTAssertEqual(draftState.mode.transcriptionProvider, .localWhisper)
+        XCTAssertEqual(draftState.mode.transcriptionModel, VoiceInkTranscriptionModelCatalog.localBaseModel)
+        XCTAssertFalse(draftState.mode.isPostProcessingEnabled)
+        XCTAssertFalse(availability.canSave(draftState.mode))
+    }
+
+    func testModeFormDraftStatePreservesExistingDraftUntilRepair() {
+        let availability = VoiceInkModeFormProviderAvailability(
+            transcriptionProviders: [.localWhisper],
+            postProcessingProviders: [.gemini]
+        )
+        let existingMode = Mode(
+            name: "Legacy",
+            transcriptionProvider: .cerebras,
+            transcriptionModel: "stale-transcription-model",
+            isPostProcessingEnabled: true,
+            postProcessingProvider: .deepgram,
+            postProcessingModel: "stale-post-processing-model"
+        )
+
+        let draftState = VoiceInkModeFormDraftState(
+            existingMode: existingMode,
+            providerAvailability: availability
+        )
+
+        XCTAssertEqual(draftState.mode.transcriptionProvider, .cerebras)
+        XCTAssertEqual(draftState.mode.transcriptionModel, "stale-transcription-model")
+        XCTAssertEqual(draftState.mode.postProcessingProvider, .deepgram)
+        XCTAssertEqual(draftState.mode.postProcessingModel, "stale-post-processing-model")
+    }
+
+    func testModeFormDraftStateRepairsProvidersOnAvailabilityRepair() {
+        let availability = VoiceInkModeFormProviderAvailability(
+            transcriptionProviders: [.localWhisper],
+            postProcessingProviders: [.gemini]
+        )
+        let existingMode = Mode(
+            name: "Legacy",
+            transcriptionProvider: .cerebras,
+            transcriptionModel: "stale-transcription-model",
+            isPostProcessingEnabled: true,
+            postProcessingProvider: .deepgram,
+            postProcessingModel: "stale-post-processing-model"
+        )
+        var draftState = VoiceInkModeFormDraftState(
+            existingMode: existingMode,
+            providerAvailability: availability
+        )
+
+        draftState.repairProviderAvailability(availability)
+
+        XCTAssertEqual(draftState.mode.transcriptionProvider, .localWhisper)
+        XCTAssertEqual(draftState.mode.transcriptionModel, VoiceInkTranscriptionModelCatalog.localBaseModel)
+        XCTAssertEqual(draftState.mode.postProcessingProvider, .gemini)
+        XCTAssertEqual(draftState.mode.postProcessingModel, VoiceInkAIModelCatalog.defaultModel(for: .gemini))
+        XCTAssertTrue(availability.canSave(draftState.mode))
+    }
+
+    func testModeFormDraftStateRepairsTranscriptionModelOnProviderTransition() {
+        var draftState = VoiceInkModeFormDraftState(
+            existingMode: Mode(
+                name: "Cloud",
+                transcriptionProvider: .deepgram,
+                transcriptionModel: "stale-transcription-model"
+            ),
+            providerAvailability: VoiceInkModeFormProviderAvailability(
+                transcriptionProviders: [.deepgram, .localWhisper],
+                postProcessingProviders: [.groq]
+            )
+        )
+
+        draftState.selectTranscriptionProvider(.localWhisper)
+
+        XCTAssertEqual(draftState.mode.transcriptionProvider, .localWhisper)
+        XCTAssertEqual(draftState.mode.transcriptionModel, VoiceInkTranscriptionModelCatalog.localBaseModel)
+    }
+
+    func testModeFormDraftStateRepairsPostProcessingModelOnProviderTransition() {
+        var draftState = VoiceInkModeFormDraftState(
+            existingMode: Mode(
+                name: "Clean",
+                isPostProcessingEnabled: true,
+                postProcessingProvider: .groq,
+                postProcessingModel: "stale-post-processing-model"
+            ),
+            providerAvailability: VoiceInkModeFormProviderAvailability(
+                transcriptionProviders: [.localWhisper],
+                postProcessingProviders: [.groq, .gemini]
+            )
+        )
+
+        draftState.selectPostProcessingProvider(.gemini)
+
+        XCTAssertEqual(draftState.mode.postProcessingProvider, .gemini)
+        XCTAssertEqual(draftState.mode.postProcessingModel, VoiceInkAIModelCatalog.defaultModel(for: .gemini))
+    }
+
+    func testModeFormDraftStateRepairsPostProcessingToggleThroughAvailability() {
+        let availability = VoiceInkModeFormProviderAvailability(
+            transcriptionProviders: [.localWhisper],
+            postProcessingProviders: [.gemini]
+        )
+        var draftState = VoiceInkModeFormDraftState(
+            existingMode: Mode(
+                name: "Clean",
+                transcriptionProvider: .localWhisper,
+                isPostProcessingEnabled: false,
+                postProcessingProvider: .deepgram,
+                postProcessingModel: "stale-post-processing-model"
+            ),
+            providerAvailability: availability
+        )
+
+        draftState.setPostProcessingEnabled(true, providerAvailability: availability)
+
+        XCTAssertTrue(draftState.mode.isPostProcessingEnabled)
+        XCTAssertEqual(draftState.mode.postProcessingProvider, .gemini)
+        XCTAssertEqual(draftState.mode.postProcessingModel, VoiceInkAIModelCatalog.defaultModel(for: .gemini))
+        XCTAssertTrue(availability.canSave(draftState.mode))
+    }
+
     func testModePostProcessingToggleRepairsUnavailableProviderSelection() {
         let availability = VoiceInkModeFormProviderAvailability(
             transcriptionProviders: [.localWhisper],

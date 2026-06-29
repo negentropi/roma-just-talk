@@ -5,7 +5,7 @@ struct ModeConfigurationView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var settings: AppSettings
     
-    @State private var mode: Mode
+    @State private var draftState: VoiceInkModeFormDraftState
     private let isEditing: Bool
     
     let onSave: (Mode) -> Void
@@ -14,32 +14,40 @@ struct ModeConfigurationView: View {
         self.settings = settings
         self.onSave = onSave
         self.isEditing = mode != nil
-        let initialMode = mode ?? settings.providerAccess.modeFormProviderAvailability.newModeDraft()
-        self._mode = State(initialValue: initialMode)
+        self._draftState = State(initialValue: VoiceInkModeFormDraftState(
+            existingMode: mode,
+            providerAvailability: settings.providerAccess.modeFormProviderAvailability
+        ))
     }
     
     var body: some View {
-        let formPresentation = mode.formPresentation(isEditing: isEditing)
+        let formPresentation = draftState.mode.formPresentation(isEditing: isEditing)
         let providerAvailability = settings.providerAccess.modeFormProviderAvailability
-        let formStatePresentation = providerAvailability.formStatePresentation(for: mode)
+        let formStatePresentation = providerAvailability.formStatePresentation(for: draftState.mode)
 
         Form {
             Section(header: Text(formPresentation.modeDetailsSectionTitle)) {
-                TextField(formPresentation.modeNamePlaceholder, text: $mode.name)
+                TextField(formPresentation.modeNamePlaceholder, text: $draftState.mode.name)
                     .textInputAutocapitalization(.words)
             }
             
             Section(header: Text(formPresentation.transcriptionSectionTitle)) {
-                Picker(formPresentation.providerPickerTitle, selection: $mode.transcriptionProvider) {
+                Picker(
+                    formPresentation.providerPickerTitle,
+                    selection: Binding(
+                        get: { draftState.mode.transcriptionProvider },
+                        set: { draftState.selectTranscriptionProvider($0) }
+                    )
+                ) {
                     ForEach(providerAvailability.transcriptionProviders) { provider in
                         Text(provider.displayName).tag(provider)
                     }
                 }
 
                 ProviderModelSelectionView(
-                    provider: mode.transcriptionProvider,
+                    provider: draftState.mode.transcriptionProvider,
                     use: .transcription,
-                    selectedModel: $mode.transcriptionModel,
+                    selectedModel: $draftState.mode.transcriptionModel,
                     presentation: formPresentation
                 )
             }
@@ -51,9 +59,9 @@ struct ModeConfigurationView: View {
                 Toggle(
                     formPresentation.enablePostProcessingTitle,
                     isOn: Binding(
-                        get: { mode.isPostProcessingEnabled },
+                        get: { draftState.mode.isPostProcessingEnabled },
                         set: { isEnabled in
-                            mode.setPostProcessingEnabled(
+                            draftState.setPostProcessingEnabled(
                                 isEnabled,
                                 providerAvailability: providerAvailability
                             )
@@ -62,21 +70,27 @@ struct ModeConfigurationView: View {
                 )
                 
                 if formStatePresentation.shouldShowPostProcessingControls {
-                    Picker(formPresentation.providerPickerTitle, selection: $mode.postProcessingProvider) {
+                    Picker(
+                        formPresentation.providerPickerTitle,
+                        selection: Binding(
+                            get: { draftState.mode.postProcessingProvider },
+                            set: { draftState.selectPostProcessingProvider($0) }
+                        )
+                    ) {
                         ForEach(providerAvailability.postProcessingProviders) { provider in
                             Text(provider.displayName).tag(provider)
                         }
                     }
 
                     ProviderModelSelectionView(
-                        provider: mode.postProcessingProvider,
+                        provider: draftState.mode.postProcessingProvider,
                         use: .postProcessing,
-                        selectedModel: $mode.postProcessingModel,
+                        selectedModel: $draftState.mode.postProcessingModel,
                         presentation: formPresentation
                     )
                     
                     // Prompt Template Selection
-                    Picker(formPresentation.promptTemplatePickerTitle, selection: $mode.promptTemplate.type) {
+                    Picker(formPresentation.promptTemplatePickerTitle, selection: $draftState.mode.promptTemplate.type) {
                         ForEach(VoiceInkPostProcessingTemplateType.allCases, id: \.self) { templateType in
                             Text(templateType.displayName).tag(templateType)
                         }
@@ -85,7 +99,7 @@ struct ModeConfigurationView: View {
                     if formStatePresentation.shouldShowCustomPromptField {
                         TextField(
                             formPresentation.customPromptPlaceholder,
-                            text: $mode.promptTemplate.customPrompt,
+                            text: $draftState.mode.promptTemplate.customPrompt,
                             axis: .vertical
                         )
                             .lineLimit(4, reservesSpace: true)
@@ -98,23 +112,17 @@ struct ModeConfigurationView: View {
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Button(formPresentation.saveButtonTitle) {
-                    onSave(mode)
+                    onSave(draftState.mode)
                     dismiss()
                 }
                 .disabled(formStatePresentation.isSaveButtonDisabled)
             }
         }
         .onAppear {
-            mode = providerAvailability.repairedMode(mode)
+            draftState.repairProviderAvailability(providerAvailability)
         }
         .onChange(of: providerAvailability) { _, availability in
-            mode = availability.repairedMode(mode)
-        }
-        .onChange(of: mode.transcriptionProvider) { _, _ in
-            mode.selectTranscriptionProvider(mode.transcriptionProvider)
-        }
-        .onChange(of: mode.postProcessingProvider) { _, _ in
-            mode.selectPostProcessingProvider(mode.postProcessingProvider)
+            draftState.repairProviderAvailability(availability)
         }
     }
 }

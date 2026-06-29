@@ -1677,6 +1677,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/Mode.swift
 
 require_pattern \
+  "shared mode form draft state lives in VoiceInkCore" \
+  'VoiceInkModeFormDraftState|repairProviderAvailability|selectTranscriptionProvider|selectPostProcessingProvider' \
+  VoiceInkCore/Sources/VoiceInkCore/Mode.swift
+
+require_pattern \
   "shared mode state owns post-processing toggle repair" \
   'setPostProcessingEnabled\(' \
   VoiceInkCore/Sources/VoiceInkCore/Mode.swift
@@ -1705,6 +1710,16 @@ require_pattern \
   "core checks execute mode post-processing toggle repair test" \
   'ModeRuntimeConfigurationTests\.testModePostProcessingToggleRepairsUnavailableProviderSelection' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_patterns \
+  "core checks execute mode form draft state tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'ModeRuntimeConfigurationTests\.testModeFormDraftStateCreatesNewDraftThroughProviderAvailability' \
+  'ModeRuntimeConfigurationTests\.testModeFormDraftStatePreservesExistingDraftUntilRepair' \
+  'ModeRuntimeConfigurationTests\.testModeFormDraftStateRepairsProvidersOnAvailabilityRepair' \
+  'ModeRuntimeConfigurationTests\.testModeFormDraftStateRepairsTranscriptionModelOnProviderTransition' \
+  'ModeRuntimeConfigurationTests\.testModeFormDraftStateRepairsPostProcessingModelOnProviderTransition' \
+  'ModeRuntimeConfigurationTests\.testModeFormDraftStateRepairsPostProcessingToggleThroughAvailability'
 
 require_pattern \
   "iOS recording sheet uses shared mode selection presentation adapter" \
@@ -1774,8 +1789,13 @@ require_pattern \
   iOS/VoiceInk-ios/ModeConfigurationView.swift
 
 require_pattern \
+  "iOS mode configuration uses shared mode form draft state" \
+  'VoiceInkModeFormDraftState|draftState\.(repairProviderAvailability|selectTranscriptionProvider|selectPostProcessingProvider)' \
+  iOS/VoiceInk-ios/ModeConfigurationView.swift
+
+require_pattern \
   "iOS mode configuration delegates post-processing toggle repair to shared mode state" \
-  'mode\.setPostProcessingEnabled\(' \
+  'draftState\.setPostProcessingEnabled\(' \
   iOS/VoiceInk-ios/ModeConfigurationView.swift
 
 reject_pattern \
@@ -1791,6 +1811,11 @@ reject_pattern \
 reject_pattern \
   "iOS mode configuration avoids shell-owned post-processing toggle repair sequencing" \
   'onChange\(of: mode\.isPostProcessingEnabled\)|\$mode\.isPostProcessingEnabled' \
+  iOS/VoiceInk-ios/ModeConfigurationView.swift
+
+reject_pattern \
+  "iOS mode configuration avoids shell-owned draft repair and provider transition calls" \
+  'providerAvailability\.repairedMode\(|mode\.selectTranscriptionProvider\(|mode\.selectPostProcessingProvider\(|modeFormProviderAvailability\.newModeDraft\(\)' \
   iOS/VoiceInk-ios/ModeConfigurationView.swift
 
 require_pattern \
@@ -13504,8 +13529,8 @@ require_pattern \
   iOS/VoiceInk-ios/ModeConfigurationView.swift
 
 require_pattern \
-  "iOS new-mode draft uses shared provider availability" \
-  'settings\.providerAccess\.modeFormProviderAvailability\.newModeDraft\(\)' \
+  "iOS new-mode draft uses shared mode form draft state" \
+  'VoiceInkModeFormDraftState|providerAvailability: settings\.providerAccess\.modeFormProviderAvailability' \
   iOS/VoiceInk-ios/ModeConfigurationView.swift
 
 reject_pattern \
@@ -13562,7 +13587,7 @@ reject_swift_pattern \
 
 require_pattern \
   "iOS mode prompt-template editing uses shared mode state" \
-  '\$mode\.promptTemplate\.' \
+  '\$draftState\.mode\.promptTemplate\.' \
   iOS/VoiceInk-ios/ModeConfigurationView.swift
 
 section "obsolete standalone post-processing template module stays deleted"

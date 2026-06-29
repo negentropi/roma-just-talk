@@ -6,7 +6,7 @@ final class PostProcessingRequestTests: XCTestCase {
         XCTAssertNil(VoiceInkPostProcessingRequest(prompt: " \n\t ", transcript: "raw text"))
     }
 
-    func testRequestBuildsLegacyIOSPostProcessingMessages() async throws {
+    func testRequestBuildsSharedIOSPostProcessingMessages() async throws {
         let request = try XCTUnwrap(
             VoiceInkPostProcessingRequest(
                 prompt: "Clean this",

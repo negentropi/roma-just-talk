@@ -853,7 +853,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "PerformanceAnalysisTests.testPerformanceTimeFilterStartDatesPreserveMacOSPanelWindows", run: { PerformanceAnalysisTests().testPerformanceTimeFilterStartDatesPreserveMacOSPanelWindows() }),
             VoiceInkCoreCheck(name: "PerformanceAnalysisTests.testPerformancePresentationPreservesMacOSPanelCopyAndIcons", run: { PerformanceAnalysisTests().testPerformancePresentationPreservesMacOSPanelCopyAndIcons() }),
             VoiceInkCoreCheck(name: "PostProcessingRequestTests.testBlankPromptReturnsNilRequest", run: { PostProcessingRequestTests().testBlankPromptReturnsNilRequest() }),
-            VoiceInkCoreCheck(name: "PostProcessingRequestTests.testRequestBuildsLegacyIOSPostProcessingMessages", run: { try await PostProcessingRequestTests().testRequestBuildsLegacyIOSPostProcessingMessages() }),
+            VoiceInkCoreCheck(name: "PostProcessingRequestTests.testRequestBuildsSharedIOSPostProcessingMessages", run: { try await PostProcessingRequestTests().testRequestBuildsSharedIOSPostProcessingMessages() }),
             VoiceInkCoreCheck(name: "PostProcessingRequestTests.testFinalizedTranscriptFallsBackWhenResponseIsEmptyAfterFiltering", run: { PostProcessingRequestTests().testFinalizedTranscriptFallsBackWhenResponseIsEmptyAfterFiltering() }),
             VoiceInkCoreCheck(name: "PostProcessingRequestTests.testFinalizedTranscriptStripsReasoningTags", run: { PostProcessingRequestTests().testFinalizedTranscriptStripsReasoningTags() }),
             VoiceInkCoreCheck(name: "PostProcessingRequestTests.testFinalizedTranscriptStripsCodexFollowUpPayload", run: { PostProcessingRequestTests().testFinalizedTranscriptStripsCodexFollowUpPayload() }),

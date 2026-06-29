@@ -733,6 +733,13 @@ reject_pattern \
   iOS/VoiceInk-ios \
   iOS/VoiceInkKeyboard
 
+reject_pattern \
+  "iOS shell avoids duplicate post-processing request/client construction" \
+  '\b(LLMPostProcessor|OAChatMessage|OAChatRequest|OAChatChoice|OAChatResponse|VoiceInkPostProcessingRequest|VoiceInkOpenAICompatibleChatMessage|VoiceInkOpenAICompatibleChatRequestBuilder|VoiceInkOpenAICompatibleChatCodec)\b|chatCompletion\(baseURL:|postProcessingChatCompletionsURL|/v1/chat/completions|Prompt: .*Transcript:' \
+  iOS/VoiceInk-ios \
+  iOS/Shared \
+  iOS/VoiceInkKeyboard
+
 require_pattern \
   "shared transcript export owns localized date style" \
   'dateStyle = \.medium' \
@@ -10434,6 +10441,34 @@ require_pattern \
   "shared post-processing request policy lives with post-processing client" \
   'VoiceInkPostProcessingRequest|finalizedTranscript|defaultTemperature|applyRuntimeState' \
   VoiceInkCore/Sources/VoiceInkCore/PostProcessingClient.swift
+
+require_patterns \
+  "shared run processor delegates post-processing execution to core client" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift \
+  'postProcessingClient: VoiceInkPostProcessingClient = VoiceInkPostProcessingClient\(\)' \
+  'postProcessingClient\.postProcessTranscript\('
+
+require_patterns \
+  "iOS retry/background post-processing uses shared run processor client" \
+  iOS/VoiceInk-ios/TranscriptionRetryService.swift \
+  'private let runProcessor = VoiceInkTranscriptionRunProcessor\(\)' \
+  'processor: runProcessor'
+
+require_patterns \
+  "core checks execute shared post-processing request coverage" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'PostProcessingRequestTests\.testBlankPromptReturnsNilRequest' \
+  'PostProcessingRequestTests\.testRequestBuildsSharedIOSPostProcessingMessages' \
+  'PostProcessingRequestTests\.testFinalizedTranscriptFallsBackWhenResponseIsEmptyAfterFiltering' \
+  'PostProcessingRequestTests\.testFinalizedTranscriptStripsReasoningTags' \
+  'PostProcessingRequestTests\.testFinalizedTranscriptStripsCodexFollowUpPayload'
+
+require_patterns \
+  "core checks execute shared iOS post-processing run behavior" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'TranscriptionRunProcessorTests\.testTranscribeRunsPostProcessingWhenEnabledWithPromptAndKey' \
+  'TranscriptionRunProcessorTests\.testTranscribeKeepsCleanedTextWhenPostProcessingFails' \
+  'TranscriptionRunProcessorTests\.testTranscribeSkipsPostProcessingWhenPostProcessingAPIKeyIsWhitespace'
 
 reject_pattern \
   "shared post-processing request policy avoids public raw request payload fields" \

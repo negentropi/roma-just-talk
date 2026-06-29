@@ -14,9 +14,6 @@ public struct VoiceInkProviderModelSelectionPresentation: Equatable, Sendable {
         self.selectableModels = selectableModels
     }
 
-    public var shouldShowPicker: Bool {
-        fixedModelName == nil
-    }
 }
 
 public enum VoiceInkTranscriptionTransport: Sendable {

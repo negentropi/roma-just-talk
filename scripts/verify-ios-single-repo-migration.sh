@@ -13805,13 +13805,19 @@ reject_pattern \
 
 require_pattern \
   "shared provider model selection presentation lives in VoiceInkCore" \
-  'VoiceInkProviderModelSelectionPresentation|modelSelectionPresentation|fixedModelName|selectableModels|shouldShowPicker' \
+  'VoiceInkProviderModelSelectionPresentation|modelSelectionPresentation|fixedModelName|selectableModels' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
 
 reject_pattern \
   "shared provider model selection presentation avoids public raw selection cases" \
   'public enum VoiceInkProviderModelSelectionPresentation\b' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
+
+reject_pattern \
+  "shared provider model selection presentation avoids shallow picker predicate" \
+  'shouldShowPicker' \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/ProviderModelSelectionTests.swift
 
 require_pattern \
   "iOS mode model selection uses shared presentation adapter" \

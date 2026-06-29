@@ -17,7 +17,6 @@ final class ProviderModelSelectionTests: XCTestCase {
         let presentation = VoiceInkProviderKind.deepgram.modelSelectionPresentation(for: .transcription)
 
         XCTAssertNil(presentation.fixedModelName)
-        XCTAssertTrue(presentation.shouldShowPicker)
         XCTAssertEqual(presentation.selectableModels, VoiceInkProviderKind.deepgram.models(for: .transcription))
     }
 
@@ -25,19 +24,16 @@ final class ProviderModelSelectionTests: XCTestCase {
         let presentation = VoiceInkProviderKind.groq.modelSelectionPresentation(for: .postProcessing)
 
         XCTAssertNil(presentation.fixedModelName)
-        XCTAssertTrue(presentation.shouldShowPicker)
         XCTAssertEqual(presentation.selectableModels, VoiceInkAIModelCatalog.availableModels(for: .groq))
     }
 
     func testModelSelectionPresentationPreservesEmptyBundledProviderList() {
         let transcription = VoiceInkProviderKind.voiceInk.modelSelectionPresentation(for: .transcription)
         XCTAssertNil(transcription.fixedModelName)
-        XCTAssertTrue(transcription.shouldShowPicker)
         XCTAssertTrue(transcription.selectableModels.isEmpty)
 
         let postProcessing = VoiceInkProviderKind.voiceInk.modelSelectionPresentation(for: .postProcessing)
         XCTAssertNil(postProcessing.fixedModelName)
-        XCTAssertTrue(postProcessing.shouldShowPicker)
         XCTAssertTrue(postProcessing.selectableModels.isEmpty)
     }
 

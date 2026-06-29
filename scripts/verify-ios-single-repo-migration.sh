@@ -1216,6 +1216,11 @@ require_pattern \
   'VoiceInkAudioRecorderStopPolicy\.plan|applyStopPlan|plan\.applyRuntimeState' \
   iOS/VoiceInk-ios/AudioRecorder.swift
 
+reject_pattern \
+  "iOS audio recorder avoids unused AVAudioRecorder delegate shell" \
+  'NSObject, ObservableObject|audioRecorder\?\.delegate|AVAudioRecorderDelegate' \
+  iOS/VoiceInk-ios/AudioRecorder.swift
+
 require_pattern \
   "iOS audio recorder deletes discarded recordings through shared stored-audio helper" \
   'VoiceInkStoredAudioFile\.deleteExistingFile\(for: currentRecordingURL\?\.absoluteString\)' \

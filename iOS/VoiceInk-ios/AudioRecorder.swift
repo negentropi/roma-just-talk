@@ -9,7 +9,7 @@ import AVFoundation
 import VoiceInkCore
 
 @MainActor
-final class AudioRecorder: NSObject, ObservableObject {
+final class AudioRecorder: ObservableObject {
     @Published var isRecording: Bool = false
     @Published var currentRecordingURL: URL?
     @Published var levelsHistory: [Float] = [] // normalized 0...1
@@ -29,7 +29,6 @@ final class AudioRecorder: NSObject, ObservableObject {
         let configuration = VoiceInkIOSAudioRecorderConfiguration.voiceRecording
 
         audioRecorder = try AVAudioRecorder(url: url, settings: configuration.avAudioRecorderSettings)
-        audioRecorder?.delegate = self
         audioRecorder?.isMeteringEnabled = configuration.isMeteringEnabled
         guard audioRecorder?.record() == true else {
             throw VoiceInkAudioRecorderStartFailurePolicy.returnedFalseError()
@@ -86,8 +85,6 @@ final class AudioRecorder: NSObject, ObservableObject {
         )
     }
 }
-
-extension AudioRecorder: AVAudioRecorderDelegate {}
 
 private extension VoiceInkIOSAudioRecorderConfiguration {
     var avAudioRecorderSettings: [String: Any] {

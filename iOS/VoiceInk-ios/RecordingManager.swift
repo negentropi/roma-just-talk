@@ -204,7 +204,7 @@ final class RecordingManager: ObservableObject {
             }
 
             do {
-                _ = try await TranscriptionRetryService.shared.retranscribe(note: note)
+                _ = try await settings.retranscribeStoredAudio(note)
             } catch {
                 // Failure state is already applied by the shared record helper.
             }

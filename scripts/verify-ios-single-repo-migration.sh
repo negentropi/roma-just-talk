@@ -465,6 +465,7 @@ obsolete_ios_clone_files=(
   PromptTemplate.swift
   Provider.swift
   RiffWaveUtils.swift
+  TranscriptionRetryService.swift
   TranscriptionServiceFactory.swift
   VADModelManager.swift
   VoiceInk-ios/Transcription.swift
@@ -1992,20 +1993,27 @@ reject_pattern \
   '\b(existingAudioFileURL|markTranscriptionFailed|applyCompletedRunResult)\b' \
   iOS/VoiceInk-ios/RecordingManager.swift
 
-require_pattern \
-  "iOS retry adapter owns stored-audio retranscription record update" \
-  'retranscribeStoredAudio' \
-  iOS/VoiceInk-ios/TranscriptionRetryService.swift
+reject_file iOS/VoiceInk-ios/TranscriptionRetryService.swift
 
 require_pattern \
-  "iOS recording manager delegates background retry to retry adapter" \
-  'TranscriptionRetryService\.shared\.retranscribe\(note: note\)' \
+  "shared stored-audio retranscription runner owns retry orchestration" \
+  'VoiceInkStoredAudioRetranscriptionRunner' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift
+
+require_pattern \
+  "iOS recording manager delegates background retry to AppSettings adapter" \
+  'settings\.retranscribeStoredAudio\(note\)' \
   iOS/VoiceInk-ios/RecordingManager.swift
 
 reject_pattern \
   "iOS recording manager avoids direct stored-audio retry mutation seam" \
-  'retranscribeStoredAudio|TranscriptionRetryService\.shared\.transcribe\(fileURL:' \
+  'existingAudioFileURL|markTranscriptionFailed|applyCompletedRunResult|TranscriptionRetryService|VoiceInkStoredAudioRetranscriptionRunner' \
   iOS/VoiceInk-ios/RecordingManager.swift
+
+reject_pattern \
+  "iOS note detail avoids direct stored-audio retry mutation seam" \
+  'existingAudioFileURL|markTranscriptionFailed|applyCompletedRunResult|TranscriptionRetryService|VoiceInkStoredAudioRetranscriptionRunner' \
+  iOS/VoiceInk-ios/NoteDetailView.swift
 
 section "obsolete standalone recording transcription draft module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/RecordingTranscriptionDraft.swift
@@ -8406,8 +8414,7 @@ reject_pattern \
 reject_pattern \
   "iOS retry passes stored word replacements into shared engine" \
   'runtimeWordReplacementRules|VoiceInkWordReplacementEngine\.sortedRules' \
-  iOS/VoiceInk-ios/AppSettings.swift \
-  iOS/VoiceInk-ios/TranscriptionRetryService.swift
+  iOS/VoiceInk-ios/AppSettings.swift
 
 reject_pattern \
   "macOS word-replacement service leaves rule ordering to shared engine" \
@@ -8515,14 +8522,14 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift
 
 require_pattern \
-  "iOS retry transcription uses shared audio transcription service factory" \
+  "iOS AppSettings adapter uses shared audio transcription service factory" \
   'VoiceInkAudioTranscriptionServiceFactory' \
-  iOS/VoiceInk-ios/TranscriptionRetryService.swift
+  iOS/VoiceInk-ios/AppSettings.swift
 
 reject_pattern \
-  "iOS retry transcription avoids shell-only provider dispatch" \
+  "iOS AppSettings adapter avoids shell-only provider dispatch" \
   'transcriptionServiceKind|VoiceInkRemoteTranscriptionService\(provider:' \
-  iOS/VoiceInk-ios/TranscriptionRetryService.swift
+  iOS/VoiceInk-ios/AppSettings.swift
 
 require_patterns \
   "shared transcription run settings snapshot lives in VoiceInkCore" \
@@ -8555,15 +8562,22 @@ reject_context_pattern \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_patterns \
-  "iOS retry transcription uses shared run settings snapshot" \
-  iOS/VoiceInk-ios/TranscriptionRetryService.swift \
-  'let runSettings = await settings\.transcriptionRunSettings' \
-  'try await runSettings\.transcribe\('
+  "iOS AppSettings adapter uses shared stored-audio retranscription runner" \
+  iOS/VoiceInk-ios/AppSettings.swift \
+  'VoiceInkStoredAudioRetranscriptionRunner' \
+  'runSettingsProvider:' \
+  'await transcriptionRunSettings' \
+  'apiKeyProvider:' \
+  'await apiKey\(for: provider\)' \
+  'transcriptionServiceProvider:' \
+  'serviceFactory\.service\(for: provider\)' \
+  'func retranscribeStoredAudio\(_ note: Transcription\)' \
+  'storedAudioRetranscriptionRunner\.retranscribe\(note\)'
 
 reject_pattern \
   "iOS retry transcription avoids unused override seam" \
   'TranscribeFile|transcribeFileOverride|init\(transcribeFileOverride|if let transcribeFileOverride' \
-  iOS/VoiceInk-ios/TranscriptionRetryService.swift
+  iOS/VoiceInk-ios
 
 reject_pattern \
   "iOS retry tests avoid shell-only retry service construction" \
@@ -8585,10 +8599,15 @@ require_pattern \
   'TranscriptionRecordTests\.testRetranscribeStoredAudioMarksTranscriptionFailure' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
+require_pattern \
+  "core checks execute stored-audio retranscription runner tests" \
+  'TranscriptionRecordTests\.testStoredAudioRetranscriptionRunnerLoadsSettingsAndAppliesCompletedRecord|TranscriptionRecordTests\.testStoredAudioRetranscriptionRunnerMarksMissingAudioFailureBeforeLoadingSettings|TranscriptionRecordTests\.testStoredAudioRetranscriptionRunnerMarksTranscriptionFailure' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
 reject_pattern \
-  "iOS retry transcription avoids shell-owned run settings assembly" \
+  "iOS stored-audio retranscription adapter avoids shell-owned run settings assembly" \
   'let (modeConfiguration|cleanupConfiguration|transcriptionLanguage|transcriptionPrompt|wordReplacementRules|customVocabulary) = await settings\.|applyingWordReplacements:|VoiceInkPostProcessingSkipConfiguration\.current\(\)' \
-  iOS/VoiceInk-ios/TranscriptionRetryService.swift
+  iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \
   "shared run processor uses shared prompt use policy" \
@@ -10574,9 +10593,10 @@ require_patterns \
 
 require_patterns \
   "iOS retry/background post-processing uses shared run processor client" \
-  iOS/VoiceInk-ios/TranscriptionRetryService.swift \
-  'private let runProcessor = VoiceInkTranscriptionRunProcessor\(\)' \
-  'processor: runProcessor'
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift \
+  'VoiceInkStoredAudioRetranscriptionRunner' \
+  'processor: VoiceInkTranscriptionRunProcessor = VoiceInkTranscriptionRunProcessor\(\)' \
+  'processor: processor'
 
 require_patterns \
   "core checks execute shared post-processing request coverage" \

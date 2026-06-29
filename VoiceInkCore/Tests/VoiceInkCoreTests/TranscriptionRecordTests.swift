@@ -247,6 +247,127 @@ final class TranscriptionRecordTests: XCTestCase {
         }
     }
 
+    func testStoredAudioRetranscriptionRunnerLoadsSettingsAndAppliesCompletedRecord() async throws {
+        let recordingsDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.TranscriptionRecordTests.\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: recordingsDirectory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: recordingsDirectory) }
+
+        let audioURL = recordingsDirectory.appendingPathComponent("recording.wav")
+        try Data("audio".utf8).write(to: audioURL)
+
+        let capture = StoredAudioRetranscriptionCapture(text: "runner transcript")
+        let runner = VoiceInkStoredAudioRetranscriptionRunner(
+            runSettingsProvider: {
+                capture.didLoadSettings = true
+                return VoiceInkTranscriptionRunSettings(
+                    configuration: Mode(
+                        name: "Runner",
+                        transcriptionProvider: .groq,
+                        transcriptionModel: "whisper-large-v3-turbo",
+                        isPostProcessingEnabled: false,
+                        postProcessingProvider: .groq,
+                        postProcessingModel: VoiceInkAIModelCatalog.defaultModel(for: .groq)
+                    ).runtimeConfiguration
+                )
+            },
+            apiKeyProvider: { provider in
+                capture.apiKeyProviders.append(provider)
+                return "groq-key"
+            },
+            transcriptionServiceProvider: { provider in
+                capture.serviceProviders.append(provider)
+                return capture.service
+            }
+        )
+        let record = StubStoredTranscriptionRecord(
+            audioFileURL: audioURL.lastPathComponent,
+            storedAudioRecordingsDirectory: recordingsDirectory
+        )
+
+        let returnedText = try await runner.retranscribe(record)
+
+        XCTAssertEqual(returnedText, "runner transcript")
+        XCTAssertTrue(capture.didLoadSettings)
+        XCTAssertEqual(capture.apiKeyProviders, [.groq])
+        XCTAssertEqual(capture.serviceProviders, [.groq])
+        XCTAssertEqual(capture.service.capturedAPIKey, "groq-key")
+        XCTAssertEqual(capture.service.capturedModel, "whisper-large-v3-turbo")
+        XCTAssertEqual(capture.service.capturedFileURL, audioURL)
+        XCTAssertEqual(record.text, "runner transcript")
+        XCTAssertEqual(record.transcriptionModelName, "whisper-large-v3-turbo")
+        XCTAssertEqual(record.transcriptionStatus, .completed)
+        XCTAssertNil(record.transcriptionError)
+    }
+
+    func testStoredAudioRetranscriptionRunnerMarksMissingAudioFailureBeforeLoadingSettings() async throws {
+        var didLoadSettings = false
+        let runner = VoiceInkStoredAudioRetranscriptionRunner(
+            runSettingsProvider: {
+                didLoadSettings = true
+                return VoiceInkTranscriptionRunSettings(configuration: .fallback)
+            },
+            apiKeyProvider: { _ in "key" },
+            transcriptionServiceProvider: { _ in StoredAudioTranscriptionService(text: "") }
+        )
+        let record = StubStoredTranscriptionRecord(
+            audioFileURL: "missing.wav",
+            storedAudioRecordingsDirectory: URL(fileURLWithPath: "/tmp/VoiceInkCore/missing-runner-recording", isDirectory: true)
+        )
+
+        do {
+            _ = try await runner.retranscribe(record)
+            XCTFail("Expected missing audio to throw")
+        } catch VoiceInkEngineError.audioFileNotFound {
+            XCTAssertFalse(didLoadSettings)
+            XCTAssertEqual(record.transcriptionStatus, .failed)
+            XCTAssertEqual(record.transcriptionError, "Audio file not found")
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+
+    func testStoredAudioRetranscriptionRunnerMarksTranscriptionFailure() async throws {
+        let recordingsDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.TranscriptionRecordTests.\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: recordingsDirectory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: recordingsDirectory) }
+
+        let audioURL = recordingsDirectory.appendingPathComponent("recording.wav")
+        try Data("audio".utf8).write(to: audioURL)
+
+        let runner = VoiceInkStoredAudioRetranscriptionRunner(
+            runSettingsProvider: {
+                VoiceInkTranscriptionRunSettings(
+                    configuration: Mode(
+                        name: "Runner",
+                        transcriptionProvider: .groq,
+                        transcriptionModel: "whisper-large-v3-turbo",
+                        isPostProcessingEnabled: false,
+                        postProcessingProvider: .groq,
+                        postProcessingModel: VoiceInkAIModelCatalog.defaultModel(for: .groq)
+                    ).runtimeConfiguration
+                )
+            },
+            apiKeyProvider: { _ in "groq-key" },
+            transcriptionServiceProvider: { _ in ThrowingStoredAudioTranscriptionService() }
+        )
+        let record = StubStoredTranscriptionRecord(
+            audioFileURL: audioURL.lastPathComponent,
+            storedAudioRecordingsDirectory: recordingsDirectory
+        )
+
+        do {
+            _ = try await runner.retranscribe(record)
+            XCTFail("Expected transcription failure to throw")
+        } catch VoiceInkEngineError.transcriptionFailed {
+            XCTAssertEqual(record.transcriptionStatus, .failed)
+            XCTAssertEqual(record.transcriptionError, VoiceInkEngineError.transcriptionFailed.errorDescription)
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+
     func testApplyEnhancementResultStoresTextAndMetadata() {
         let record = StubMutableTranscriptionEnhancementMetadataRecord()
         let result = VoiceInkAIEnhancementResult(
@@ -354,6 +475,55 @@ private final class StubStoredTranscriptionRecord: StubMutableTranscriptionRecor
         self.audioFileURL = audioFileURL
         self.storedAudioRecordingsDirectory = storedAudioRecordingsDirectory
         super.init()
+    }
+}
+
+private final class StoredAudioRetranscriptionCapture {
+    var didLoadSettings = false
+    var apiKeyProviders: [VoiceInkProviderKind] = []
+    var serviceProviders: [VoiceInkProviderKind] = []
+    let service: StoredAudioTranscriptionService
+
+    init(text: String) {
+        self.service = StoredAudioTranscriptionService(text: text)
+    }
+}
+
+private final class StoredAudioTranscriptionService: VoiceInkAudioTranscriptionService {
+    let text: String
+    private(set) var capturedAPIKey: String?
+    private(set) var capturedModel: String?
+    private(set) var capturedFileURL: URL?
+
+    init(text: String) {
+        self.text = text
+    }
+
+    func transcribeAudioFile(
+        apiKey: String,
+        model: String,
+        fileURL: URL,
+        language: String?,
+        prompt: String?,
+        customVocabulary: [String]
+    ) async throws -> String {
+        capturedAPIKey = apiKey
+        capturedModel = model
+        capturedFileURL = fileURL
+        return text
+    }
+}
+
+private struct ThrowingStoredAudioTranscriptionService: VoiceInkAudioTranscriptionService {
+    func transcribeAudioFile(
+        apiKey: String,
+        model: String,
+        fileURL: URL,
+        language: String?,
+        prompt: String?,
+        customVocabulary: [String]
+    ) async throws -> String {
+        throw VoiceInkEngineError.transcriptionFailed
     }
 }
 

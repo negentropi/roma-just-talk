@@ -177,3 +177,48 @@ public extension VoiceInkMutableTranscriptionRecord where Self: VoiceInkStoredAu
         }
     }
 }
+
+public struct VoiceInkStoredAudioRetranscriptionRunner {
+    public typealias RunSettingsProvider = () async -> VoiceInkTranscriptionRunSettings
+
+    private let processor: VoiceInkTranscriptionRunProcessor
+    private let runSettingsProvider: RunSettingsProvider
+    private let apiKeyProvider: VoiceInkTranscriptionRunProcessor.APIKeyProvider
+    private let transcriptionServiceProvider: VoiceInkTranscriptionRunProcessor.TranscriptionServiceProvider
+
+    public init(
+        processor: VoiceInkTranscriptionRunProcessor = VoiceInkTranscriptionRunProcessor(),
+        runSettingsProvider: @escaping RunSettingsProvider,
+        apiKeyProvider: @escaping VoiceInkTranscriptionRunProcessor.APIKeyProvider,
+        transcriptionServiceProvider: @escaping VoiceInkTranscriptionRunProcessor.TranscriptionServiceProvider
+    ) {
+        self.processor = processor
+        self.runSettingsProvider = runSettingsProvider
+        self.apiKeyProvider = apiKeyProvider
+        self.transcriptionServiceProvider = transcriptionServiceProvider
+    }
+
+    public func transcribe(fileURL: URL) async throws -> VoiceInkTranscriptionRunResult {
+        let runSettings = await runSettingsProvider()
+        return try await runSettings.transcribe(
+            fileURL: fileURL,
+            processor: processor,
+            apiKeyProvider: apiKeyProvider,
+            transcriptionServiceProvider: transcriptionServiceProvider
+        )
+    }
+
+    @discardableResult
+    public func retranscribe<Record: VoiceInkMutableTranscriptionRecord & VoiceInkStoredAudioRecord>(
+        _ record: Record,
+        relativeTo recordingsDirectory: URL? = nil,
+        fileManager: FileManager = .default
+    ) async throws -> String {
+        try await record.retranscribeStoredAudio(
+            relativeTo: recordingsDirectory,
+            fileManager: fileManager
+        ) { fileURL in
+            try await transcribe(fileURL: fileURL)
+        }
+    }
+}

@@ -196,9 +196,9 @@ struct NoteDetailView: View {
             defer { isRetranscribing = false }
             
             do {
-                _ = try await TranscriptionRetryService.shared.retranscribe(note: note)
+                _ = try await settings.retranscribeStoredAudio(note)
             } catch {
-                // Failure state is already applied by the retry adapter.
+                // Failure state is already applied by the shared record helper.
             }
             try? modelContext.save()
         }

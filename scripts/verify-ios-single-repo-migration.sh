@@ -9255,10 +9255,12 @@ require_pattern \
   'VoiceInkTranscriptionEnhancementTextPlan' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunPreparation.swift
 
-require_pattern \
-  "shared audio-file transcription text plan aliases enhancement text plan" \
-  'VoiceInkAudioFileTranscriptionTextPlan' \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunPreparation.swift
+reject_swift_pattern \
+  "shared audio-file transcription uses enhancement text plan directly" \
+  '\bVoiceInkAudioFileTranscriptionTextPlan\b' \
+  VoiceInkCore \
+  VoiceInk \
+  iOS
 
 require_pattern \
   "shared transcription enhancement raw text preparation helper lives in VoiceInkCore" \

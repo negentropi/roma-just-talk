@@ -152,8 +152,6 @@ public struct VoiceInkTranscriptionEnhancementRequest: Equatable, Sendable {
     }
 }
 
-public typealias VoiceInkAudioFileTranscriptionTextPlan = VoiceInkTranscriptionEnhancementTextPlan
-
 public enum VoiceInkTranscriptionRunPreparation {
     public static func prepareRawText(
         _ rawText: String,
@@ -194,7 +192,7 @@ public enum VoiceInkTranscriptionRunPreparation {
         _ rawText: String,
         cleanupConfiguration: VoiceInkTranscriptionCleanupConfiguration,
         applyingWordReplacements wordReplacement: (String) -> String = { $0 }
-    ) -> VoiceInkAudioFileTranscriptionTextPlan {
+    ) -> VoiceInkTranscriptionEnhancementTextPlan {
         prepareRawTextForEnhancement(
             rawText,
             cleanupConfiguration: cleanupConfiguration,

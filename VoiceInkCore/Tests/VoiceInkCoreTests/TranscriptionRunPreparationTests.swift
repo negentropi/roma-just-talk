@@ -144,11 +144,11 @@ final class TranscriptionRunPreparationTests: XCTestCase {
             isEnabled: true,
             wordThreshold: 3
         )
-        let longEnhancementPlan = VoiceInkAudioFileTranscriptionTextPlan(
+        let longEnhancementPlan = VoiceInkTranscriptionEnhancementTextPlan(
             textForEnhancement: "one two three four",
             cleanedText: "one"
         )
-        let shortEnhancementPlan = VoiceInkAudioFileTranscriptionTextPlan(
+        let shortEnhancementPlan = VoiceInkTranscriptionEnhancementTextPlan(
             textForEnhancement: "one",
             cleanedText: "one two three four"
         )

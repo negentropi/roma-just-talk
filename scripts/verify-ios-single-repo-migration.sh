@@ -18498,6 +18498,11 @@ require_pattern \
   iOS/VoiceInkKeyboard/KeyboardViewController.swift
 
 reject_pattern \
+  "iOS keyboard controller avoids shallow open-app wrapper" \
+  'private func +openMainAppForRecording\b' \
+  iOS/VoiceInkKeyboard/KeyboardViewController.swift
+
+reject_pattern \
   "iOS keyboard controller avoids shell-owned URL opening fallback chain" \
   'extensionContext\??\.open|UIApplication\.value|sel_registerName\("openURL:"\)|openURL:' \
   iOS/VoiceInkKeyboard/KeyboardViewController.swift

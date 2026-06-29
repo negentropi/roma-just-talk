@@ -133,7 +133,17 @@ class KeyboardViewController: KeyboardInputViewController {
 
         tapPlan.applyRuntimeState(
             requestStopRecording: coordinator.requestStopRecording,
-            openMainAppForRecording: openMainAppForRecording,
+            openMainAppForRecording: { [weak self] in
+                guard let self = self else { return }
+                VoiceInkKeyboardURLOpener.openMainApp(
+                    url: VoiceInkAppDeepLink.record.url,
+                    extensionContext: self.extensionContext,
+                    responder: self,
+                    fallback: { [weak self] in
+                        self?.showUserMessage()
+                    }
+                )
+            },
             refreshButtonState: updateButtonAppearanceBasedOnState
         )
     }
@@ -147,17 +157,6 @@ class KeyboardViewController: KeyboardInputViewController {
                 self.recordButton.transform = CGAffineTransform.identity
             })
         }
-    }
-    
-    private func openMainAppForRecording() {
-        VoiceInkKeyboardURLOpener.openMainApp(
-            url: VoiceInkAppDeepLink.record.url,
-            extensionContext: extensionContext,
-            responder: self,
-            fallback: { [weak self] in
-                self?.showUserMessage()
-            }
-        )
     }
     
     private func showUserMessage() {

@@ -36,7 +36,7 @@ struct ModeConfigurationView: View {
                     formPresentation.providerPickerTitle,
                     selection: Binding(
                         get: { draftState.mode.transcriptionProvider },
-                        set: { draftState.selectTranscriptionProvider($0) }
+                        set: { draftState.mode.selectTranscriptionProvider($0) }
                     )
                 ) {
                     ForEach(providerAvailability.transcriptionProviders) { provider in
@@ -61,7 +61,7 @@ struct ModeConfigurationView: View {
                     isOn: Binding(
                         get: { draftState.mode.isPostProcessingEnabled },
                         set: { isEnabled in
-                            draftState.setPostProcessingEnabled(
+                            draftState.mode.setPostProcessingEnabled(
                                 isEnabled,
                                 providerAvailability: providerAvailability
                             )
@@ -74,7 +74,7 @@ struct ModeConfigurationView: View {
                         formPresentation.providerPickerTitle,
                         selection: Binding(
                             get: { draftState.mode.postProcessingProvider },
-                            set: { draftState.selectPostProcessingProvider($0) }
+                            set: { draftState.mode.selectPostProcessingProvider($0) }
                         )
                     ) {
                         ForEach(providerAvailability.postProcessingProviders) { provider in

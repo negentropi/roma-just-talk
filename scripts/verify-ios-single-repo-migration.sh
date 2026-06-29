@@ -1697,9 +1697,15 @@ require_pattern \
   'VoiceInkModeFormProviderAvailability|providerAvailability|newModeDraft' \
   VoiceInkCore/Sources/VoiceInkCore/Mode.swift
 
-require_pattern \
+require_patterns \
   "shared mode form draft state lives in VoiceInkCore" \
-  'VoiceInkModeFormDraftState|repairProviderAvailability|selectTranscriptionProvider|selectPostProcessingProvider' \
+  VoiceInkCore/Sources/VoiceInkCore/Mode.swift \
+  'VoiceInkModeFormDraftState' \
+  'repairProviderAvailability'
+
+reject_multiline_pattern \
+  "shared mode form draft state avoids shallow provider forwarding methods" \
+  'public[[:space:]]+mutating[[:space:]]+func[[:space:]]+(selectTranscriptionProvider|selectPostProcessingProvider|setPostProcessingEnabled)[^{]+\{[[:space:]]*(return[[:space:]]+)?(self\.)?mode\.(selectTranscriptionProvider|selectPostProcessingProvider|setPostProcessingEnabled)\(' \
   VoiceInkCore/Sources/VoiceInkCore/Mode.swift
 
 require_pattern \
@@ -1733,14 +1739,17 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_patterns \
-  "core checks execute mode form draft state tests" \
+  "core checks execute mode provider transition tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'ModeRuntimeConfigurationTests\.testSelectingTranscriptionProviderRepairsModelThroughSharedPolicy' \
+  'ModeRuntimeConfigurationTests\.testSelectingPostProcessingProviderRepairsModelThroughSharedPolicy'
+
+require_patterns \
+  "core checks execute mode form draft lifecycle tests" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
   'ModeRuntimeConfigurationTests\.testModeFormDraftStateCreatesNewDraftThroughProviderAvailability' \
   'ModeRuntimeConfigurationTests\.testModeFormDraftStatePreservesExistingDraftUntilRepair' \
-  'ModeRuntimeConfigurationTests\.testModeFormDraftStateRepairsProvidersOnAvailabilityRepair' \
-  'ModeRuntimeConfigurationTests\.testModeFormDraftStateRepairsTranscriptionModelOnProviderTransition' \
-  'ModeRuntimeConfigurationTests\.testModeFormDraftStateRepairsPostProcessingModelOnProviderTransition' \
-  'ModeRuntimeConfigurationTests\.testModeFormDraftStateRepairsPostProcessingToggleThroughAvailability'
+  'ModeRuntimeConfigurationTests\.testModeFormDraftStateRepairsProvidersOnAvailabilityRepair'
 
 require_pattern \
   "iOS recording sheet uses shared mode selection presentation adapter" \
@@ -1814,14 +1823,22 @@ require_pattern \
   'modeFormProviderAvailability|providerAvailability\.(canSave|repairedMode|transcriptionProviders|postProcessingProviders)' \
   iOS/VoiceInk-ios/ModeConfigurationView.swift
 
-require_pattern \
+require_patterns \
   "iOS mode configuration uses shared mode form draft state" \
-  'VoiceInkModeFormDraftState|draftState\.(repairProviderAvailability|selectTranscriptionProvider|selectPostProcessingProvider)' \
+  iOS/VoiceInk-ios/ModeConfigurationView.swift \
+  'VoiceInkModeFormDraftState' \
+  'draftState\.repairProviderAvailability' \
+  'draftState\.mode\.selectTranscriptionProvider' \
+  'draftState\.mode\.selectPostProcessingProvider'
+
+reject_pattern \
+  "iOS mode configuration avoids shallow draft provider forwarding calls" \
+  'draftState\.(selectTranscriptionProvider|selectPostProcessingProvider|setPostProcessingEnabled)\(' \
   iOS/VoiceInk-ios/ModeConfigurationView.swift
 
 require_pattern \
   "iOS mode configuration delegates post-processing toggle repair to shared mode state" \
-  'draftState\.setPostProcessingEnabled\(' \
+  'draftState\.mode\.setPostProcessingEnabled\(' \
   iOS/VoiceInk-ios/ModeConfigurationView.swift
 
 reject_pattern \
@@ -1841,7 +1858,7 @@ reject_pattern \
 
 reject_pattern \
   "iOS mode configuration avoids shell-owned draft repair and provider transition calls" \
-  'providerAvailability\.repairedMode\(|mode\.selectTranscriptionProvider\(|mode\.selectPostProcessingProvider\(|modeFormProviderAvailability\.newModeDraft\(\)' \
+  'providerAvailability\.repairedMode\(|(^|[^[:alnum:]_.])mode\.(selectTranscriptionProvider|selectPostProcessingProvider)\(|modeFormProviderAvailability\.newModeDraft\(\)' \
   iOS/VoiceInk-ios/ModeConfigurationView.swift
 
 require_pattern \

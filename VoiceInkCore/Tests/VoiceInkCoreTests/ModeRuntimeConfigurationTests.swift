@@ -810,69 +810,6 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
         XCTAssertTrue(availability.canSave(draftState.mode))
     }
 
-    func testModeFormDraftStateRepairsTranscriptionModelOnProviderTransition() {
-        var draftState = VoiceInkModeFormDraftState(
-            existingMode: Mode(
-                name: "Cloud",
-                transcriptionProvider: .deepgram,
-                transcriptionModel: "stale-transcription-model"
-            ),
-            providerAvailability: VoiceInkModeFormProviderAvailability(
-                transcriptionProviders: [.deepgram, .localWhisper],
-                postProcessingProviders: [.groq]
-            )
-        )
-
-        draftState.selectTranscriptionProvider(.localWhisper)
-
-        XCTAssertEqual(draftState.mode.transcriptionProvider, .localWhisper)
-        XCTAssertEqual(draftState.mode.transcriptionModel, VoiceInkTranscriptionModelCatalog.localBaseModel)
-    }
-
-    func testModeFormDraftStateRepairsPostProcessingModelOnProviderTransition() {
-        var draftState = VoiceInkModeFormDraftState(
-            existingMode: Mode(
-                name: "Clean",
-                isPostProcessingEnabled: true,
-                postProcessingProvider: .groq,
-                postProcessingModel: "stale-post-processing-model"
-            ),
-            providerAvailability: VoiceInkModeFormProviderAvailability(
-                transcriptionProviders: [.localWhisper],
-                postProcessingProviders: [.groq, .gemini]
-            )
-        )
-
-        draftState.selectPostProcessingProvider(.gemini)
-
-        XCTAssertEqual(draftState.mode.postProcessingProvider, .gemini)
-        XCTAssertEqual(draftState.mode.postProcessingModel, VoiceInkAIModelCatalog.defaultModel(for: .gemini))
-    }
-
-    func testModeFormDraftStateRepairsPostProcessingToggleThroughAvailability() {
-        let availability = VoiceInkModeFormProviderAvailability(
-            transcriptionProviders: [.localWhisper],
-            postProcessingProviders: [.gemini]
-        )
-        var draftState = VoiceInkModeFormDraftState(
-            existingMode: Mode(
-                name: "Clean",
-                transcriptionProvider: .localWhisper,
-                isPostProcessingEnabled: false,
-                postProcessingProvider: .deepgram,
-                postProcessingModel: "stale-post-processing-model"
-            ),
-            providerAvailability: availability
-        )
-
-        draftState.setPostProcessingEnabled(true, providerAvailability: availability)
-
-        XCTAssertTrue(draftState.mode.isPostProcessingEnabled)
-        XCTAssertEqual(draftState.mode.postProcessingProvider, .gemini)
-        XCTAssertEqual(draftState.mode.postProcessingModel, VoiceInkAIModelCatalog.defaultModel(for: .gemini))
-        XCTAssertTrue(availability.canSave(draftState.mode))
-    }
-
     func testModePostProcessingToggleRepairsUnavailableProviderSelection() {
         let availability = VoiceInkModeFormProviderAvailability(
             transcriptionProviders: [.localWhisper],

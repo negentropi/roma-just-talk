@@ -84,9 +84,7 @@ actor WhisperContext {
 
     static func createContext(path: String) async throws -> WhisperContext {
         let whisperContext = WhisperContext()
-        try await Task {
-            try await whisperContext.initializeModel(path: path)
-        }.value
+        try await whisperContext.initializeModel(path: path)
         
         // Load VAD model from bundle resources
         let vadModelPath = VoiceInkVADModelFiles.sileroPath()

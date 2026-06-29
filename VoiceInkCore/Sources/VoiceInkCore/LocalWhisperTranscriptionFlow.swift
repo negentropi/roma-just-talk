@@ -34,10 +34,6 @@ public enum VoiceInkLocalWhisperTranscriptionDiagnostics {
         "Using model at \(modelPath)"
     }
 
-    public static func iOSModelLoadFailedMessage(localizedDescription: String) -> String {
-        "Failed to load model: \(localizedDescription)"
-    }
-
     public static func iOSProcessedAudioSamplesMessage(count: Int) -> String {
         "Processed \(count) audio samples."
     }

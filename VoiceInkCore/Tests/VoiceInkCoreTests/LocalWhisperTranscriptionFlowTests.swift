@@ -79,10 +79,6 @@ final class LocalWhisperTranscriptionFlowTests: XCTestCase {
             "Using model at /tmp/model.bin"
         )
         XCTAssertEqual(
-            VoiceInkLocalWhisperTranscriptionDiagnostics.iOSModelLoadFailedMessage(localizedDescription: "missing"),
-            "Failed to load model: missing"
-        )
-        XCTAssertEqual(
             VoiceInkLocalWhisperTranscriptionDiagnostics.iOSAudioProcessingFailedMessage,
             "Audio processing failed."
         )

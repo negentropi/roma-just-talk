@@ -41,18 +41,10 @@ struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
 
                     logger.notice("\(VoiceInkLocalWhisperTranscriptionDiagnostics.iOSUsingModelMessage(modelPath: modelPath), privacy: .public)")
 
-                    do {
-                        return VoiceInkLocalWhisperContextPlan(
-                            context: try await WhisperContext.createContext(path: modelPath),
-                            shouldReleaseContext: true
-                        )
-                    } catch {
-                        logger.error("\(VoiceInkLocalWhisperTranscriptionDiagnostics.iOSModelLoadFailedMessage(localizedDescription: error.localizedDescription), privacy: .public)")
-                        throw VoiceInkLocalWhisperFailurePolicy.error(
-                            for: .modelLoadFailed,
-                            platform: request.failurePlatform
-                        )
-                    }
+                    return VoiceInkLocalWhisperContextPlan(
+                        context: try await WhisperContext.createContext(path: modelPath),
+                        shouldReleaseContext: true
+                    )
                 },
                 readAudioSamples: { audioURL in
                     do {

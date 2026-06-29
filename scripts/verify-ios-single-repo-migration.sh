@@ -8851,7 +8851,7 @@ require_patterns \
 
 reject_swift_pattern \
   "Swift sources avoid obsolete iOS run settings policy wrapper names" \
-  '\b(VoiceInkTranscriptionRunSettingsPolicy|iOSAppSettingsSnapshot)\b' \
+  'VoiceInkTranscriptionRunSettingsPolicy|iOSAppSettingsSnapshot' \
   VoiceInkCore/Sources \
   VoiceInkCore/Tests \
   VoiceInk \

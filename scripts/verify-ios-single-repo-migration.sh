@@ -4024,7 +4024,7 @@ reject_pattern \
 
 reject_pattern \
   "shared provider API-key state update plan hides raw runtime payload fields" \
-  'public let state: VoiceInkProviderAPIKeyState|public let persistenceActions: \[VoiceInkProviderAPIKeyStatePersistenceAction\]|public enum VoiceInkProviderAPIKeyStatePersistenceAction|public func persistenceActions|public var shouldApplyState' \
+  'public let state: VoiceInkProviderAPIKeyState|public let persistenceActions: \[VoiceInkProviderAPIKeyStatePersistenceAction\]|public enum VoiceInkProviderAPIKeyStatePersistenceAction|public func persistenceActions|shouldApplyState' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift
 
 reject_pattern \

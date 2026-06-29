@@ -735,7 +735,7 @@ reject_pattern \
 
 reject_pattern \
   "iOS shell avoids duplicate post-processing request/client construction" \
-  '\b(LLMPostProcessor|OAChatMessage|OAChatRequest|OAChatChoice|OAChatResponse|VoiceInkPostProcessingRequest|VoiceInkOpenAICompatibleChatMessage|VoiceInkOpenAICompatibleChatRequestBuilder|VoiceInkOpenAICompatibleChatCodec)\b|chatCompletion\(baseURL:|postProcessingChatCompletionsURL|/v1/chat/completions|Prompt: .*Transcript:' \
+  '\b(LLMPostProcessor|OAChatMessage|OAChatRequest|OAChatChoice|OAChatResponse|VoiceInkPostProcessingRequest|VoiceInkOpenAICompatibleClient|VoiceInkOpenAICompatibleChatMessage|VoiceInkOpenAICompatibleChatRequestBuilder|VoiceInkOpenAICompatibleChatCodec)\b|\bchatCompletion\(|postProcessingChatCompletionsURL|/v1/chat/completions|Prompt: .*Transcript:' \
   iOS/VoiceInk-ios \
   iOS/Shared \
   iOS/VoiceInkKeyboard

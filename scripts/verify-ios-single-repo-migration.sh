@@ -18499,7 +18499,7 @@ require_pattern \
 
 reject_multiline_pattern \
   "iOS keyboard controller avoids shallow open-app wrapper" \
-  'private[[:space:]]+func[[:space:]]+[[:alnum:]_]+[[:space:]]*\([[:space:]]*\)[[:space:]]*(->[[:space:]]*Void[[:space:]]*)?\{[^}]*VoiceInkKeyboardURLOpener\.openMainApp\([^)]*url:[[:space:]]*VoiceInkAppDeepLink\.record\.url' \
+  'private[[:space:]]+func[[:space:]]+[[:alnum:]_]+[[:space:]]*\([[:space:]]*\)[[:space:]]*(->[[:space:]]*Void[[:space:]]*)?\{([[:space:]]|//[^\n]*\n|guard[^\n]*else[[:space:]]*\{[[:space:]]*return[[:space:]]*\})*(return[[:space:]]+)?VoiceInkKeyboardURLOpener\.openMainApp\([^)]*url:[[:space:]]*VoiceInkAppDeepLink\.record\.url' \
   iOS/VoiceInkKeyboard/KeyboardViewController.swift
 
 reject_pattern \

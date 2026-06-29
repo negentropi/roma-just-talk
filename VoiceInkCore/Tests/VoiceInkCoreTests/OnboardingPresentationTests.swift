@@ -76,6 +76,13 @@ final class OnboardingPresentationTests: XCTestCase {
         XCTAssertEqual(step, .ready)
     }
 
+    func testIOSModelDownloadOnboardingDefaultModelUsesSharedBaseModel() {
+        XCTAssertEqual(
+            VoiceInkIOSOnboardingPresentation.defaultDownloadModel,
+            VoiceInkWhisperModelFiles.baseModel
+        )
+    }
+
     func testIOSWelcomeOnboardingPresentationPreservesCopyAndFeatureOrder() {
         let presentation = VoiceInkIOSOnboardingPresentation.welcome
 

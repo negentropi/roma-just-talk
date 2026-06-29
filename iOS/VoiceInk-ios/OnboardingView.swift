@@ -97,16 +97,15 @@ struct ModelDownloadOnboardingView: View {
     @StateObject private var modelManager = LocalModelManager.shared
     @State private var showDownloadConfirmation = false
     private let onboardingPresentation = VoiceInkIOSOnboardingPresentation.modelDownload
-    
-    private let baseModel = VoiceInkWhisperModelFiles.baseModel
+    private let downloadModel = VoiceInkIOSOnboardingPresentation.defaultDownloadModel
     
     var body: some View {
-        let row = modelManager.managementRow(for: baseModel)
+        let row = modelManager.managementRow(for: downloadModel)
         let presentation = row.presentation
         let primaryAction = onboardingPresentation.primaryAction(for: presentation)
         let confirmedDownloadAction = row.confirmedDownloadRuntimeAction {
             Task {
-                await modelManager.downloadModel(baseModel)
+                await modelManager.downloadModel(downloadModel)
             }
         }
         let primaryRuntimeAction = primaryAction.runtimeAction(

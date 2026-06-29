@@ -5063,9 +5063,21 @@ require_pattern \
   'alert\(item: +\$modelManager\.downloadError' \
   iOS/VoiceInk-ios/OnboardingView.swift
 
+require_patterns \
+  "iOS onboarding uses shared default download model policy" \
+  iOS/VoiceInk-ios/OnboardingView.swift \
+  'VoiceInkIOSOnboardingPresentation\.defaultDownloadModel' \
+  'modelManager\.managementRow\(for: downloadModel\)' \
+  'modelManager\.downloadModel\(downloadModel\)'
+
+reject_pattern \
+  "iOS onboarding avoids shell-owned default model selection" \
+  'VoiceInkWhisperModelFiles\.baseModel|WhisperModel\.baseModel|private +(let|var) +baseModel\b' \
+  iOS/VoiceInk-ios/OnboardingView.swift
+
 require_pattern \
   "iOS onboarding uses shared model management row" \
-  'modelManager\.managementRow\(for: baseModel\)|row\.presentation' \
+  'modelManager\.managementRow\(for: downloadModel\)|row\.presentation' \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 require_pattern \
@@ -5128,7 +5140,7 @@ reject_pattern \
 
 require_pattern \
   "shared iOS onboarding presentation lives in VoiceInkCore" \
-  'VoiceInkIOSOnboardingStep|VoiceInkIOSOnboardingPresentation|VoiceInkOnboardingFeaturePresentation|VoiceInkOnboardingStepPresentation|VoiceInkIOSAppIconSource|VoiceInkIOSAppIconPolicy|appIconFallbackSystemImageName|bundleIconFiles\(from infoDictionary:' \
+  'VoiceInkIOSOnboardingStep|VoiceInkIOSOnboardingPresentation|defaultDownloadModel|VoiceInkOnboardingFeaturePresentation|VoiceInkOnboardingStepPresentation|VoiceInkIOSAppIconSource|VoiceInkIOSAppIconPolicy|appIconFallbackSystemImageName|bundleIconFiles\(from infoDictionary:' \
   VoiceInkCore/Sources/VoiceInkCore/OnboardingPresentation.swift
 
 require_pattern \
@@ -5271,6 +5283,11 @@ require_pattern \
   'testIOSOnboardingStepOrderPreservesExistingFlow' \
   VoiceInkCore/Tests/VoiceInkCoreTests/OnboardingPresentationTests.swift
 
+require_pattern \
+  "core tests pin iOS onboarding default download model policy" \
+  'testIOSModelDownloadOnboardingDefaultModelUsesSharedBaseModel' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/OnboardingPresentationTests.swift
+
 require_patterns \
   "VoiceInkCore owns iOS onboarding primary action button state and runtime mapping" \
   VoiceInkCore/Sources/VoiceInkCore/OnboardingPresentation.swift \
@@ -5308,6 +5325,11 @@ require_pattern \
 require_pattern \
   "core check runner executes iOS onboarding step flow test" \
   'testIOSOnboardingStepOrderPreservesExistingFlow' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core check runner executes iOS onboarding default download model policy test" \
+  'testIOSModelDownloadOnboardingDefaultModelUsesSharedBaseModel' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \

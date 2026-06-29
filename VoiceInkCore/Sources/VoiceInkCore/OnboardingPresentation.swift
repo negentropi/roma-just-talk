@@ -503,6 +503,8 @@ public enum VoiceInkIOSOnboardingPresentation {
         continueButtonTitle: "Continue"
     )
 
+    public static let defaultDownloadModel: VoiceInkWhisperModelFileSpec = VoiceInkWhisperModelFiles.baseModel
+
     public static let ready = VoiceInkOnboardingReadyPresentation(
         iconSystemName: "checkmark.circle.fill",
         title: "You're All Set!",

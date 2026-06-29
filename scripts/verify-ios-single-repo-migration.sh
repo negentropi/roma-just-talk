@@ -317,6 +317,34 @@ reject_pattern() {
   fi
 }
 
+reject_swift_pattern() {
+  local description="$1"
+  local pattern="$2"
+  shift 2
+
+  section "$description"
+  local files=()
+  local path
+  local file
+  for path in "$@"; do
+    if [[ -f "$path" && "$path" == *.swift ]]; then
+      files+=("$path")
+    elif [[ -d "$path" ]]; then
+      while IFS= read -r file; do
+        files+=("$file")
+      done < <(fd -e swift -t f . "$path")
+    fi
+  done
+
+  if (( ${#files[@]} == 0 )); then
+    return
+  fi
+
+  if rg -n "$pattern" "${files[@]}"; then
+    fail "$description"
+  fi
+}
+
 reject_multiline_pattern() {
   local description="$1"
   local pattern="$2"
@@ -3943,7 +3971,7 @@ reject_pattern \
   VoiceInk/Services/KeychainService.swift \
   iOS/VoiceInk-ios/AppSettings.swift
 
-reject_pattern \
+reject_swift_pattern \
   "iOS shell avoids duplicate Keychain wrappers and direct SecItem policy" \
   'import Security|\bKeychainService\b|\bkSec[A-Za-z]+\b|SecItem(Add|CopyMatching|Delete|Update)|VoiceInkKeychain(Query|DataStore|ValueStore)\.' \
   iOS/VoiceInk-ios \
@@ -4361,9 +4389,9 @@ reject_pattern \
   'NSError|Invalid WAV file - too small' \
   iOS/VoiceInk-ios/WhisperTranscriptionService.swift
 
-reject_pattern \
+reject_swift_pattern \
   "iOS shell avoids renamed RiffWaveUtils and VAD model manager clones" \
-  'RiffWaveUtils|decodeWaveFile|stride\(from:[[:space:]]*44|VADModelManager|getModelPath\(|ggml-silero-v5\.1\.2|vad_(init|simple|segments)' \
+  'RiffWaveUtils|decodeWaveFile|stride\(from:[[:space:]]*44|Int16\(littleEndian:|Invalid WAV file|VADModelManager|getModelPath\(|Bundle\.main\.path\(forResource:|ggml-silero-v5\.1\.2|category:[[:space:]]*"VADModelManager"|vad_(init|simple|segments)' \
   iOS/VoiceInk-ios \
   iOS/Shared \
   iOS/VoiceInkKeyboard
@@ -5514,8 +5542,13 @@ require_patterns \
   'var +onboardingColor'
 
 require_pattern \
-  "migration docs document intentional iOS model tint adapter" \
-  'WhisperModelDownloadTint\+iOS\.swift.*intentional iOS shell adapters/model files' \
+  "migration docs document iOS model tint adapter filename" \
+  'WhisperModelDownloadTint\+iOS\.swift' \
+  docs/ios-single-repo-migration.md
+
+require_pattern \
+  "migration docs identify in-repo iOS extras as intentional shell adapters" \
+  'intentional iOS shell adapters/model files' \
   docs/ios-single-repo-migration.md
 
 reject_pattern \
@@ -13312,9 +13345,9 @@ reject_pattern \
   'fixedModel\(for:|models\(for:' \
   iOS/VoiceInk-ios/ModeConfigurationView.swift
 
-reject_pattern \
+reject_swift_pattern \
   "iOS shell avoids renamed obsolete mode provider prompt clones" \
-  'DefaultModeManager|struct +ModeSelectionView|struct +ModesView|enum +Provider:|struct +PromptTemplate|typealias +PromptTemplateType|selectedTemplateType|customPromptText|Mode\(name: +""\)|models\(for:' \
+  'DefaultModeManager|struct +ModeSelectionView|struct +ModesView|enum +Provider:|struct +PromptTemplate|typealias +PromptTemplateType|selectedTemplateType|customPromptText|Mode\(name: +""\)|models\(for:|transcriptionModel[[:space:]]*\?\?|postProcessingModel[[:space:]]*\?\?|whisper-large-v3|llama-3\.1-8b-instant|Picker\("Prompt Template"|TextField\("Custom Prompt"|mode\.promptTemplate = PromptTemplate' \
   iOS/VoiceInk-ios \
   iOS/Shared \
   iOS/VoiceInkKeyboard

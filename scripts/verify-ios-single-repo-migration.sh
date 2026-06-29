@@ -12766,10 +12766,12 @@ require_patterns \
   'userRecordingShortcutError\(for shortcut: Shortcut\) -> VoiceInkShortcutValidationIssue\?' \
   'VoiceInkShortcutValidationPresentation\.notificationTitle'
 
-reject_pattern \
+reject_swift_pattern \
   "macOS shortcut validator avoids shell-owned validation issue alias" \
   '\bShortcutValidationError\b' \
-  VoiceInk/Shortcuts/ShortcutValidator.swift
+  VoiceInk \
+  VoiceInkCore \
+  iOS
 
 require_patterns \
   "macOS recording shortcut manager uses shared notification presentation" \

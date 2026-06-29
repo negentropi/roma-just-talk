@@ -1229,6 +1229,16 @@ reject_pattern \
   'VoiceInkPCM16Audio\.(mono16kSampleRate|monoChannelCount|bitsPerSample|isBigEndian|isFloatingPoint)|isMeteringEnabled = true' \
   iOS/VoiceInk-ios/AudioRecorder.swift
 
+reject_pattern \
+  "iOS audio recorder avoids duplicate duration state" \
+  '@Published var currentDuration|currentDuration *(=|\+=)' \
+  iOS/VoiceInk-ios/AudioRecorder.swift
+
+reject_pattern \
+  "iOS audio recorder avoids shell-owned AVAudioRecorder settings literals" \
+  'AVFormatIDKey: Int\(kAudioFormatLinearPCM\)|AVSampleRateKey: 16000\.0|AVNumberOfChannelsKey: 1|AVEncoderAudioQualityKey: AVAudioQuality\.high\.rawValue' \
+  iOS/VoiceInk-ios/AudioRecorder.swift
+
 require_pattern \
   "migration docs track shared iOS audio recorder configuration policy" \
   'AudioRecorder\.swift` maps AVFoundation recorder settings from `VoiceInkIOSAudioRecorderConfiguration`' \
@@ -1428,6 +1438,11 @@ reject_pattern \
 reject_pattern \
   "iOS recording manager avoids shell-owned recording flow mutation" \
   '\b(recordingState|animate|isRecordingSheetPresented|currentDuration) *(=|\+=)|withTimeInterval: +0\.1' \
+  iOS/VoiceInk-ios/RecordingManager.swift
+
+reject_pattern \
+  "iOS recording manager avoids shell-owned selected-mode repair" \
+  'selectedModeId == nil|settings\.selectedModeId = settings\.modes\.first\?\.id' \
   iOS/VoiceInk-ios/RecordingManager.swift
 
 reject_pattern \
@@ -2532,6 +2547,11 @@ reject_pattern \
 reject_pattern \
   "iOS audio visualizer avoids duplicate accessibility copy" \
   '"Audio level visualizer"' \
+  iOS/VoiceInk-ios/AudioVisualizerView.swift
+
+reject_pattern \
+  "iOS audio visualizer avoids sibling-only CGFloat/color-scheme surface" \
+  'let levels: \[CGFloat\]|@Environment\(\\\.colorScheme\)|UIColor\.tertiaryLabel|private var barColor' \
   iOS/VoiceInk-ios/AudioVisualizerView.swift
 
 require_pattern \
@@ -13939,6 +13959,17 @@ reject_pattern \
 reject_pattern \
   "iOS audio-session manager avoids shell-owned diagnostic copy" \
   '"(Audio session activated for recording|Audio session activation failed:|Audio session deactivation scheduled in|Audio session deactivated|Failed to deactivate audio session:)' \
+  iOS/VoiceInk-ios/AudioSessionManager.swift
+
+reject_pattern \
+  "iOS audio-session manager avoids sibling-only debug/lifecycle helper surface" \
+  'func +(extendTimeout|forceDeactivate|handleAppDidEnterBackground|handleAppDidBecomeActive|handleAppWillTerminate)\b|var +debugInfo: +\[String: Any\]' \
+  iOS/VoiceInk-ios/AudioSessionManager.swift
+
+reject_pattern \
+  "iOS recording/audio-session shell avoids sibling print diagnostics" \
+  'print\(' \
+  iOS/VoiceInk-ios/RecordingManager.swift \
   iOS/VoiceInk-ios/AudioSessionManager.swift
 
 require_pattern \

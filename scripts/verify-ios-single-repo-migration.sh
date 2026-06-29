@@ -3933,9 +3933,25 @@ reject_pattern \
   'provider\.apiKeyAccount|VoiceInkKeychainValueStore\.(saveString|loadString|deleteValue)' \
   iOS/VoiceInk-ios/AppSettings.swift
 
-require_pattern \
-  "iOS app settings uses shared provider API-key list rows" \
+require_context_pattern_count_at_least \
+  "iOS app settings provider access builds shared snapshot" \
   'var providerAccess: VoiceInkProviderAccessSnapshot' \
+  'VoiceInkProviderAccessSnapshot\(' \
+  1 \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+require_context_pattern_count_at_least \
+  "iOS app settings provider access uses live provider API-key state" \
+  'var providerAccess: VoiceInkProviderAccessSnapshot' \
+  'apiKeyState: apiKeyState' \
+  1 \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+require_context_pattern_count_at_least \
+  "iOS app settings provider access uses live local model availability" \
+  'var providerAccess: VoiceInkProviderAccessSnapshot' \
+  'localWhisperModelAvailable: LocalModelManager\.shared\.hasAvailableModel' \
+  1 \
   iOS/VoiceInk-ios/AppSettings.swift
 
 reject_pattern \

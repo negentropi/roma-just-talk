@@ -947,6 +947,11 @@ require_pattern \
   'VoiceInkTranscriptionLanguagePresentation' \
   iOS/VoiceInk-ios/SettingsView.swift
 
+require_pattern \
+  "iOS settings language picker uses shared active-mode languages directly" \
+  'settings\.modes\.transcriptionLanguages\(selectedModeId: settings\.selectedModeId\)' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
 reject_pattern \
   "iOS language settings avoids shallow sorted-language wrapper" \
   'private var +sortedTranscriptionLanguages\b' \
@@ -1762,6 +1767,11 @@ require_patterns \
   'VoiceInkModeListPolicy\.appending' \
   'VoiceInkModeListPolicy\.replacing' \
   'VoiceInkModeListPolicy\.removing'
+
+reject_pattern \
+  "iOS AppSettings avoids shallow transcription language pass-through" \
+  'var +availableTranscriptionLanguages\b' \
+  iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \
   "iOS AppSettings delegates mode selection and language repair runtime application to shared core" \

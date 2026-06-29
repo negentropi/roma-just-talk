@@ -76,7 +76,7 @@ struct SettingsView: View {
                         set: { settings.setSelectedTranscriptionLanguage($0) }
                     )
                 ) {
-                    ForEach(VoiceInkLanguageCatalog.sortedOptions(settings.availableTranscriptionLanguages)) { language in
+                    ForEach(VoiceInkLanguageCatalog.sortedOptions(settings.modes.transcriptionLanguages(selectedModeId: settings.selectedModeId))) { language in
                         Text(language.name).tag(language.code)
                     }
                 }

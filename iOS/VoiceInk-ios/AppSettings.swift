@@ -206,10 +206,6 @@ final class AppSettings: ObservableObject {
         modes = VoiceInkModeListPolicy.removing(at: offsets, from: modes)
     }
 
-    var availableTranscriptionLanguages: [String: String] {
-        modes.transcriptionLanguages(selectedModeId: selectedModeId)
-    }
-
     func setSelectedTranscriptionLanguage(_ language: String) {
         selectedTranscriptionLanguage = language
         repairSelectedTranscriptionLanguage()

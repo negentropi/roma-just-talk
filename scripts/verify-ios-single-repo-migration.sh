@@ -9161,12 +9161,17 @@ reject_file VoiceInkCore/Sources/VoiceInkCore/CloudTranscriptionError.swift
 
 require_pattern \
   "shared cloud transcription error lives with audio transcription service" \
-  'VoiceInkCloudTranscriptionError|CloudTranscriptionError|VoiceInkCloudTranscriptionAudioFile|apiRequestFailure|apiStatusCodeRange|apiRequestFailed|networkError|noTranscriptionReturned' \
+  'VoiceInkCloudTranscriptionError|VoiceInkCloudTranscriptionAudioFile|apiRequestFailure|apiStatusCodeRange|apiRequestFailed|networkError|noTranscriptionReturned' \
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift
+
+reject_swift_pattern \
+  "legacy cloud transcription error alias stays deleted" \
+  'public[[:space:]]+typealias[[:space:]]+CloudTranscriptionError[[:space:]]*=' \
   VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift
 
 require_pattern \
   "shared cloud transcription error checks run in VoiceInkCore" \
-  'CloudTranscriptionErrorTests\.testErrorDescriptionsPreserveMacOSCloudTranscriptionCopy|CloudTranscriptionErrorTests\.testNoTranscriptionReturnedUsesSharedRunErrorDescription|CloudTranscriptionErrorTests\.testCloudTranscriptionAudioFileLoadsBytesAndFileName|CloudTranscriptionErrorTests\.testCloudTranscriptionAudioFileMapsMissingFile|CloudTranscriptionErrorTests\.testAPIRequestFailureMapsMatchingHTTPNSError|CloudTranscriptionErrorTests\.testAPIRequestFailureFallsBackToLocalizedDescription|CloudTranscriptionErrorTests\.testAPIRequestFailureRejectsWrongDomainMissingDomainAndNonHTTPStatus|CloudTranscriptionErrorTests\.testLegacyCloudTranscriptionErrorAliasResolvesToSharedCoreError' \
+  'CloudTranscriptionErrorTests\.testErrorDescriptionsPreserveMacOSCloudTranscriptionCopy|CloudTranscriptionErrorTests\.testNoTranscriptionReturnedUsesSharedRunErrorDescription|CloudTranscriptionErrorTests\.testCloudTranscriptionAudioFileLoadsBytesAndFileName|CloudTranscriptionErrorTests\.testCloudTranscriptionAudioFileMapsMissingFile|CloudTranscriptionErrorTests\.testAPIRequestFailureMapsMatchingHTTPNSError|CloudTranscriptionErrorTests\.testAPIRequestFailureFallsBackToLocalizedDescription|CloudTranscriptionErrorTests\.testAPIRequestFailureRejectsWrongDomainMissingDomainAndNonHTTPStatus' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -9176,7 +9181,12 @@ require_pattern \
 
 require_pattern \
   "macOS cloud batch transcription uses shared cloud transcription error" \
-  'CloudTranscriptionError\.(unsupportedProvider|missingAPIKey|audioFileNotFound|apiRequestFailure|networkError|noTranscriptionReturned)' \
+  'VoiceInkCloudTranscriptionError\.unsupportedProvider' \
+  VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift
+
+reject_pattern \
+  "macOS cloud batch transcription avoids legacy cloud error alias" \
+  '(^|[^[:alnum:]_])CloudTranscriptionError\.' \
   VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift
 
 require_pattern \

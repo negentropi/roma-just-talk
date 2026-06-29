@@ -534,7 +534,6 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "CloudTranscriptionErrorTests.testAPIRequestFailureMapsMatchingHTTPNSError", run: { CloudTranscriptionErrorTests().testAPIRequestFailureMapsMatchingHTTPNSError() }),
             VoiceInkCoreCheck(name: "CloudTranscriptionErrorTests.testAPIRequestFailureFallsBackToLocalizedDescription", run: { CloudTranscriptionErrorTests().testAPIRequestFailureFallsBackToLocalizedDescription() }),
             VoiceInkCoreCheck(name: "CloudTranscriptionErrorTests.testAPIRequestFailureRejectsWrongDomainMissingDomainAndNonHTTPStatus", run: { CloudTranscriptionErrorTests().testAPIRequestFailureRejectsWrongDomainMissingDomainAndNonHTTPStatus() }),
-            VoiceInkCoreCheck(name: "CloudTranscriptionErrorTests.testLegacyCloudTranscriptionErrorAliasResolvesToSharedCoreError", run: { CloudTranscriptionErrorTests().testLegacyCloudTranscriptionErrorAliasResolvesToSharedCoreError() }),
             VoiceInkCoreCheck(name: "DurationPresentationTests.testPositiveDurationVisibilityOnlyAllowsPositiveDurations", run: { DurationPresentationTests().testPositiveDurationVisibilityOnlyAllowsPositiveDurations() }),
             VoiceInkCoreCheck(name: "DurationPresentationTests.testMinutesSecondsUsesUnpaddedMinutesByDefault", run: { DurationPresentationTests().testMinutesSecondsUsesUnpaddedMinutesByDefault() }),
             VoiceInkCoreCheck(name: "DurationPresentationTests.testMinutesSecondsCanPadMinutesToTwoDigits", run: { DurationPresentationTests().testMinutesSecondsCanPadMinutesToTwoDigits() }),

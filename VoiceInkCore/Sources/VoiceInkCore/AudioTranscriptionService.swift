@@ -77,8 +77,6 @@ public enum VoiceInkCloudTranscriptionError: Error, LocalizedError {
     }
 }
 
-public typealias CloudTranscriptionError = VoiceInkCloudTranscriptionError
-
 public struct VoiceInkCloudTranscriptionAudioFile: Equatable, Sendable {
     public let data: Data
     public let fileName: String

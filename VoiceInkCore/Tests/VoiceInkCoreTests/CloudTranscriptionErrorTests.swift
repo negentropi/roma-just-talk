@@ -107,14 +107,6 @@ final class CloudTranscriptionErrorTests: XCTestCase {
         )
     }
 
-    func testLegacyCloudTranscriptionErrorAliasResolvesToSharedCoreError() {
-        let error: CloudTranscriptionError = .missingAPIKey
-
-        XCTAssertEqual(
-            error.errorDescription,
-            VoiceInkCloudTranscriptionError.missingAPIKey.errorDescription
-        )
-    }
 }
 
 private struct StubNetworkError: LocalizedError {

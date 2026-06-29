@@ -16,7 +16,7 @@ class CloudTranscriptionService: TranscriptionService {
 
         if model.provider == .custom {
             guard let customModel = model as? CustomCloudModel else {
-                throw CloudTranscriptionError.unsupportedProvider
+                throw VoiceInkCloudTranscriptionError.unsupportedProvider
             }
             return try await VoiceInkCustomCloudTranscriptionPolicy.transcribeAudioData(
                 apiEndpoint: customModel.apiEndpoint,

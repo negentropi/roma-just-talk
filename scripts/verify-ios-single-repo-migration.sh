@@ -1458,7 +1458,7 @@ reject_pattern \
 
 reject_multiline_pattern \
   "iOS recording manager avoids shallow recording flow property wrappers" \
-  'var[[:space:]]+(recordingState|animate|isRecordingSheetPresented|currentDuration)[[:space:]]*:[^{]+\{[[:space:]]*flowState\.(recordingState|animate|isRecordingSheetPresented|currentDuration)[[:space:]]*\}' \
+  'var[[:space:]]+(recordingState|animate|isRecordingSheetPresented|currentDuration)[[:space:]]*:[^{]+\{[[:space:]]*(return[[:space:]]+)?(self\.)?flowState\.(recordingState|animate|isRecordingSheetPresented|currentDuration)[[:space:]]*\}' \
   iOS/VoiceInk-ios/RecordingManager.swift
 
 reject_pattern \

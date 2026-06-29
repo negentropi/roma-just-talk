@@ -4077,6 +4077,11 @@ reject_pattern \
   'apiKeyState\.(isReady|listRows|availableProviders)|func +isProviderReady\(|func +isKeyVerified\(|func +apiKeyListRows\(|var +modeFormProviderAvailability' \
   iOS/VoiceInk-ios/AppSettings.swift
 
+reject_pattern \
+  "iOS app settings avoids shallow stored provider API-key pass-through" \
+  'func +storedAPIKey\(for +provider:|apiKeyState\.storedAPIKey\(for:' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
 require_pattern \
   "iOS API-key list uses shared row list" \
   'settings\.providerAccess\.apiKeyListRows\(\)' \

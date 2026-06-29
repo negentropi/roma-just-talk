@@ -92,10 +92,6 @@ final class AppSettings: ObservableObject {
         apiKeyState.runtimeAPIKey(for: provider) ?? ""
     }
 
-    func storedAPIKey(for provider: VoiceInkProviderKind) -> String {
-        apiKeyState.storedAPIKey(for: provider)
-    }
-
     var providerAccess: VoiceInkProviderAccessSnapshot {
         VoiceInkProviderAccessSnapshot(
             apiKeyState: apiKeyState,

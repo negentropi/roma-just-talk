@@ -8849,12 +8849,13 @@ require_patterns \
   'processor: VoiceInkTranscriptionRunProcessor' \
   'VoiceInkWordReplacementEngine\.apply\(wordReplacementRules'
 
-reject_pattern \
-  "shared transcription run settings snapshot avoids shallow policy wrapper" \
-  'VoiceInkTranscriptionRunSettingsPolicy|iOSAppSettingsSnapshot' \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift \
-  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunProcessorTests.swift \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+reject_swift_pattern \
+  "Swift sources avoid obsolete iOS run settings policy wrapper names" \
+  '\b(VoiceInkTranscriptionRunSettingsPolicy|iOSAppSettingsSnapshot)\b' \
+  VoiceInkCore/Sources \
+  VoiceInkCore/Tests \
+  VoiceInk \
+  iOS
 
 reject_pattern \
   "iOS AppSettings avoids shallow transcription run settings wrapper" \
@@ -8864,11 +8865,6 @@ reject_pattern \
 reject_pattern \
   "iOS AppSettings avoids shell-owned transcription run snapshot assembly" \
   'modes\.runtimeConfiguration|VoiceInkTranscriptionCleanupConfiguration\.current|VoiceInkPostProcessingSkipConfiguration\.current|VoiceInkTranscriptionPromptPreference\.localWhisperPrompt|VoiceInkLocalWhisperPromptCatalog\.(prompt|storedCustomPrompts)|VoiceInkTranscriptionRunSettings\(|configuration:|cleanupConfiguration:|postProcessingSkipConfiguration:' \
-  iOS/VoiceInk-ios/AppSettings.swift
-
-reject_pattern \
-  "iOS AppSettings avoids direct transcription run settings policy calls" \
-  'VoiceInkTranscriptionRunSettingsPolicy\.iOSAppSettingsSnapshot' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_multiline_pattern \

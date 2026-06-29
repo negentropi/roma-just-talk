@@ -180,16 +180,8 @@ class LocalModelManager: ObservableObject {
         managementSnapshot.hasAvailableModel()
     }
 
-    func downloadState(for model: VoiceInkWhisperModelFileSpec) -> VoiceInkWhisperModelDownloadState {
-        managementSnapshot.downloadState(for: model)
-    }
-
     func managementRows() -> [VoiceInkWhisperModelManagementRow] {
         managementSnapshot.managementRows()
-    }
-
-    func managementRow(for model: VoiceInkWhisperModelFileSpec) -> VoiceInkWhisperModelManagementRow {
-        managementSnapshot.managementRow(for: model)
     }
 
     func onboardingModelDownloadSnapshot() -> VoiceInkIOSOnboardingModelDownloadSnapshot {

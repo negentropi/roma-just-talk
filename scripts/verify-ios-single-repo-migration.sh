@@ -5163,7 +5163,7 @@ require_patterns \
 
 require_pattern \
   "iOS local model manager delegates snapshot queries to shared core" \
-  'VoiceInkWhisperModelManagementSnapshot|managementSnapshot\.(hasAvailableModel|modelPath|downloadState|managementRows|managementRow)' \
+  'VoiceInkWhisperModelManagementSnapshot|managementSnapshot\.(hasAvailableModel|modelPath|managementRows|iOSOnboardingModelDownloadSnapshot)' \
   iOS/VoiceInk-ios/LocalModelManager.swift
 
 require_pattern \
@@ -5199,7 +5199,12 @@ reject_pattern \
 
 require_pattern \
   "iOS local model manager exposes shared management snapshot rows" \
-  'managementSnapshot\.(managementRows|managementRow)' \
+  'managementSnapshot\.managementRows\(\)' \
+  iOS/VoiceInk-ios/LocalModelManager.swift
+
+reject_pattern \
+  "iOS local model manager avoids unused snapshot pass-through wrappers" \
+  'func +(downloadState|managementRow)\(for[[:space:]]+model:|managementSnapshot\.(downloadState|managementRow)\(for:[[:space:]]+model\)' \
   iOS/VoiceInk-ios/LocalModelManager.swift
 
 require_pattern \

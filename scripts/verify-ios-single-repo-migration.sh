@@ -2842,6 +2842,11 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
 
 require_pattern \
+  "shared iOS note row presentation lives in VoiceInkCore" \
+  'VoiceInkNoteRowPresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+
+require_pattern \
   "shared transcript status metadata lives in VoiceInkCore" \
   'panelSystemImageName|shouldShowInlineProgress|shouldShowInlineBadge|Tone' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
@@ -2942,6 +2947,13 @@ require_pattern \
   'testRetryControlsPresentationShows(RetryControlsWhenIdle|ProgressWhenRetranscribing)|testRetryControlsPresentationMapsRetryButtonToRuntimeRetry|testStatusErrorDetailShowsOnlyNonEmptyErrors' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
+require_patterns \
+  "core checks execute iOS note row presentation tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'TranscriptPresentationTests\.testNoteRowPresentationBuildsCompletedIOSRow' \
+  'TranscriptPresentationTests\.testNoteRowPresentationUsesStatusFallbacksForRetryStates' \
+  'TranscriptPresentationTests\.testNoteRowPresentationOmitsNonPositiveDuration'
+
 require_pattern \
   "core checks execute transcript action control presentation test" \
   'testTranscriptActionControlPresentationPreservesMacOSCopyAndSaveCopy' \
@@ -2996,8 +3008,13 @@ require_patterns \
   'LastTranscriptionPolicyTests\.testLastTranscriptionRetryNotificationPresentationsPreserveMacOSCopy'
 
 require_pattern \
-  "iOS note row uses shared transcript status presentation" \
-  'VoiceInkTranscriptPresentation\.statusPresentation' \
+  "iOS note row uses shared note row presentation" \
+  'VoiceInkNoteRowPresentation\.make' \
+  iOS/VoiceInk-ios/NoteRowView.swift
+
+reject_pattern \
+  "iOS note row avoids shell-owned row presentation assembly" \
+  'VoiceInkTranscriptPresentation\.displayText|VoiceInkTranscriptPresentation\.statusPresentation|VoiceInkDatePresentation\.relativeTimestamp|VoiceInkDurationPresentation\.(shouldShowPositiveDuration|minutesSeconds|metadataSeparatorText)' \
   iOS/VoiceInk-ios/NoteRowView.swift
 
 reject_pattern \
@@ -12989,15 +13006,24 @@ require_pattern \
   iOS/VoiceInk-ios/AudioPlayerView.swift
 
 require_pattern \
-  "iOS note row duration UI uses shared positive-duration visibility" \
+  "shared note row presentation uses shared positive-duration visibility" \
   'VoiceInkDurationPresentation\.shouldShowPositiveDuration' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+
+require_pattern \
+  "iOS note row renders shared note-row duration metadata" \
+  'presentation\.(durationText|metadataSeparatorText)' \
   iOS/VoiceInk-ios/NoteRowView.swift
 
 require_pattern \
-  "iOS duration metadata uses shared separator text" \
+  "iOS audio duration metadata uses shared separator text" \
   'VoiceInkDurationPresentation\.metadataSeparatorText' \
-  iOS/VoiceInk-ios/AudioPlayerView.swift \
-  iOS/VoiceInk-ios/NoteRowView.swift
+  iOS/VoiceInk-ios/AudioPlayerView.swift
+
+require_pattern \
+  "shared note row presentation uses shared separator text" \
+  'VoiceInkDurationPresentation\.metadataSeparatorText' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
 
 require_pattern \
   "shared playback-rate policy lives in VoiceInkCore" \

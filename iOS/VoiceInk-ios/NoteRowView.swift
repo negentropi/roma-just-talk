@@ -5,14 +5,16 @@ struct NoteRowView: View {
     let note: Transcription
 
     var body: some View {
-        let statusPresentation = VoiceInkTranscriptPresentation.statusPresentation(for: note.transcriptionStatus)
+        let presentation = VoiceInkNoteRowPresentation.make(
+            status: note.transcriptionStatus,
+            rawText: note.text,
+            enhancedText: note.enhancedText,
+            timestamp: note.timestamp,
+            duration: note.duration
+        )
 
         VStack(alignment: .leading, spacing: 8) {
-            Text(VoiceInkTranscriptPresentation.displayText(
-                status: note.transcriptionStatus,
-                rawText: note.text,
-                enhancedText: note.enhancedText
-            ))
+            Text(presentation.displayText)
                 .font(.body)
                 .foregroundStyle(.primary)
                 .lineSpacing(2)
@@ -20,25 +22,23 @@ struct NoteRowView: View {
                 .multilineTextAlignment(.leading)
 
             HStack(spacing: 8) {
-                Text(VoiceInkDatePresentation.relativeTimestamp(note.timestamp))
+                Text(presentation.timestampText)
                     .font(.caption)
                     .foregroundStyle(.secondary)
 
-                if VoiceInkDurationPresentation.shouldShowPositiveDuration(note.duration) {
-                    Text(VoiceInkDurationPresentation.metadataSeparatorText)
+                if let durationText = presentation.durationText,
+                   let metadataSeparatorText = presentation.metadataSeparatorText {
+                    Text(metadataSeparatorText)
                         .font(.caption)
                         .foregroundStyle(.tertiary)
-                    Text(VoiceInkDurationPresentation.minutesSeconds(
-                        note.duration,
-                        padMinutesToTwoDigits: true
-                    ))
+                    Text(durationText)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
 
                 Spacer(minLength: 0)
 
-                if let statusPresentation {
+                if let statusPresentation = presentation.statusPresentation {
                     if statusPresentation.shouldShowInlineProgress {
                         HStack(spacing: 6) {
                             ProgressView()

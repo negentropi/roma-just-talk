@@ -784,6 +784,99 @@ final class TranscriptPresentationTests: XCTestCase {
         )
     }
 
+    func testNoteRowPresentationBuildsCompletedIOSRow() {
+        let referenceDate = Date(timeIntervalSince1970: 1_700_000_000)
+        let timestamp = referenceDate.addingTimeInterval(-300)
+        let locale = Locale(identifier: "en_US_POSIX")
+
+        let presentation = VoiceInkNoteRowPresentation.make(
+            status: .completed,
+            rawText: "raw transcript",
+            enhancedText: "enhanced transcript",
+            timestamp: timestamp,
+            duration: 125,
+            referenceDate: referenceDate,
+            locale: locale
+        )
+
+        XCTAssertEqual(presentation.displayText, "enhanced transcript")
+        XCTAssertEqual(
+            presentation.timestampText,
+            VoiceInkDatePresentation.relativeTimestamp(timestamp, relativeTo: referenceDate, locale: locale)
+        )
+        XCTAssertEqual(presentation.durationText, "02:05")
+        XCTAssertEqual(presentation.metadataSeparatorText, VoiceInkDurationPresentation.metadataSeparatorText)
+        XCTAssertNil(presentation.statusPresentation)
+    }
+
+    func testNoteRowPresentationUsesStatusFallbacksForRetryStates() {
+        let referenceDate = Date(timeIntervalSince1970: 1_700_000_000)
+        let locale = Locale(identifier: "en_US_POSIX")
+
+        let pending = VoiceInkNoteRowPresentation.make(
+            status: .pending,
+            rawText: "raw transcript",
+            enhancedText: nil,
+            timestamp: referenceDate,
+            duration: 0,
+            referenceDate: referenceDate,
+            locale: locale
+        )
+        let failed = VoiceInkNoteRowPresentation.make(
+            status: .failed,
+            rawText: "raw transcript",
+            enhancedText: nil,
+            timestamp: referenceDate,
+            duration: 0,
+            referenceDate: referenceDate,
+            locale: locale
+        )
+        let canceled = VoiceInkNoteRowPresentation.make(
+            status: .canceled,
+            rawText: "raw transcript",
+            enhancedText: nil,
+            timestamp: referenceDate,
+            duration: 0,
+            referenceDate: referenceDate,
+            locale: locale
+        )
+
+        XCTAssertEqual(pending.displayText, VoiceInkTranscriptPresentation.pendingDisplayText)
+        XCTAssertTrue(pending.statusPresentation?.shouldShowInlineProgress == true)
+        XCTAssertEqual(failed.displayText, VoiceInkTranscriptPresentation.failedDisplayText)
+        XCTAssertTrue(failed.statusPresentation?.shouldShowInlineBadge == true)
+        XCTAssertEqual(canceled.displayText, VoiceInkTranscriptPresentation.canceledDisplayText)
+        XCTAssertNil(canceled.statusPresentation)
+    }
+
+    func testNoteRowPresentationOmitsNonPositiveDuration() {
+        let referenceDate = Date(timeIntervalSince1970: 1_700_000_000)
+
+        let zeroDuration = VoiceInkNoteRowPresentation.make(
+            status: .completed,
+            rawText: "raw transcript",
+            enhancedText: nil,
+            timestamp: referenceDate,
+            duration: 0,
+            referenceDate: referenceDate,
+            locale: Locale(identifier: "en_US_POSIX")
+        )
+        let negativeDuration = VoiceInkNoteRowPresentation.make(
+            status: .completed,
+            rawText: "raw transcript",
+            enhancedText: nil,
+            timestamp: referenceDate,
+            duration: -1,
+            referenceDate: referenceDate,
+            locale: Locale(identifier: "en_US_POSIX")
+        )
+
+        XCTAssertNil(zeroDuration.durationText)
+        XCTAssertNil(zeroDuration.metadataSeparatorText)
+        XCTAssertNil(negativeDuration.durationText)
+        XCTAssertNil(negativeDuration.metadataSeparatorText)
+    }
+
     func testStatusTitleReturnsRetryStateTitles() {
         XCTAssertEqual(
             VoiceInkTranscriptPresentation.statusTitle(for: .pending),

@@ -68,6 +68,58 @@ public struct VoiceInkTranscriptStatusPresentation: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkNoteRowPresentation: Equatable, Sendable {
+    public let displayText: String
+    public let timestampText: String
+    public let durationText: String?
+    public let metadataSeparatorText: String?
+    public let statusPresentation: VoiceInkTranscriptStatusPresentation?
+
+    public init(
+        displayText: String,
+        timestampText: String,
+        durationText: String?,
+        metadataSeparatorText: String?,
+        statusPresentation: VoiceInkTranscriptStatusPresentation?
+    ) {
+        self.displayText = displayText
+        self.timestampText = timestampText
+        self.durationText = durationText
+        self.metadataSeparatorText = metadataSeparatorText
+        self.statusPresentation = statusPresentation
+    }
+
+    public static func make(
+        status: VoiceInkTranscriptionStatus,
+        rawText: String,
+        enhancedText: String?,
+        timestamp: Date,
+        duration: TimeInterval,
+        referenceDate: Date = Date(),
+        locale: Locale = .current
+    ) -> VoiceInkNoteRowPresentation {
+        let durationText = VoiceInkDurationPresentation.shouldShowPositiveDuration(duration)
+            ? VoiceInkDurationPresentation.minutesSeconds(duration, padMinutesToTwoDigits: true)
+            : nil
+
+        return VoiceInkNoteRowPresentation(
+            displayText: VoiceInkTranscriptPresentation.displayText(
+                status: status,
+                rawText: rawText,
+                enhancedText: enhancedText
+            ),
+            timestampText: VoiceInkDatePresentation.relativeTimestamp(
+                timestamp,
+                relativeTo: referenceDate,
+                locale: locale
+            ),
+            durationText: durationText,
+            metadataSeparatorText: durationText == nil ? nil : VoiceInkDurationPresentation.metadataSeparatorText,
+            statusPresentation: VoiceInkTranscriptPresentation.statusPresentation(for: status)
+        )
+    }
+}
+
 enum VoiceInkTranscriptRetryControlAction: Equatable, Sendable {
     case hidden
     case showProgress

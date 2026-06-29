@@ -168,8 +168,8 @@ final class AppSettings: ObservableObject {
         )
     }
 
-    func retranscribeStoredAudio(_ note: Transcription) async throws -> String {
-        try await VoiceInkStoredAudioRetranscription.retranscribe(
+    func retranscribeStoredAudio(_ note: Transcription) async -> VoiceInkStoredAudioRetranscriptionOutcome {
+        await VoiceInkStoredAudioRetranscription.retranscribeWithOutcome(
             note,
             runSettingsProvider: { [self] in
                 await transcriptionRunSettings

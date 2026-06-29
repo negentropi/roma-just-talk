@@ -509,6 +509,122 @@ final class TranscriptionRecordTests: XCTestCase {
         }
     }
 
+    func testStoredAudioRetranscriptionFacadeOutcomeReturnsTextAndAppliesCompletedRecord() async throws {
+        let recordingsDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.TranscriptionRecordTests.\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: recordingsDirectory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: recordingsDirectory) }
+
+        let audioURL = recordingsDirectory.appendingPathComponent("recording.wav")
+        try Data("audio".utf8).write(to: audioURL)
+
+        let remoteService = StoredAudioTranscriptionService(text: "outcome transcript")
+        let record = StubStoredTranscriptionRecord(
+            audioFileURL: audioURL.lastPathComponent,
+            storedAudioRecordingsDirectory: recordingsDirectory
+        )
+
+        let outcome = await VoiceInkStoredAudioRetranscription.retranscribeWithOutcome(
+            record,
+            runSettingsProvider: {
+                VoiceInkTranscriptionRunSettings(
+                    configuration: Mode(
+                        name: "Remote",
+                        transcriptionProvider: .groq,
+                        transcriptionModel: "whisper-large-v3-turbo",
+                        isPostProcessingEnabled: false,
+                        postProcessingProvider: .groq,
+                        postProcessingModel: VoiceInkAIModelCatalog.defaultModel(for: .groq)
+                    ).runtimeConfiguration
+                )
+            },
+            apiKeyProvider: { _ in "groq-key" },
+            localWhisperServiceFactory: {
+                StoredAudioTranscriptionService(text: "local transcript")
+            },
+            remoteServiceFactory: { _ in remoteService }
+        )
+
+        XCTAssertEqual(outcome, .succeeded("outcome transcript"))
+        XCTAssertEqual(record.text, "outcome transcript")
+        XCTAssertEqual(record.transcriptionStatus, .completed)
+        XCTAssertNil(record.transcriptionError)
+    }
+
+    func testStoredAudioRetranscriptionFacadeOutcomeReturnsFailureAfterMissingAudioState() async {
+        var didLoadSettings = false
+        var didBuildLocalService = false
+        var didBuildRemoteService = false
+        let record = StubStoredTranscriptionRecord(
+            audioFileURL: "missing.wav",
+            storedAudioRecordingsDirectory: URL(fileURLWithPath: "/tmp/VoiceInkCore/missing-outcome-recording", isDirectory: true)
+        )
+
+        let outcome = await VoiceInkStoredAudioRetranscription.retranscribeWithOutcome(
+            record,
+            runSettingsProvider: {
+                didLoadSettings = true
+                return VoiceInkTranscriptionRunSettings(configuration: .fallback)
+            },
+            apiKeyProvider: { _ in "key" },
+            localWhisperServiceFactory: {
+                didBuildLocalService = true
+                return StoredAudioTranscriptionService(text: "local")
+            },
+            remoteServiceFactory: { _ in
+                didBuildRemoteService = true
+                return StoredAudioTranscriptionService(text: "remote")
+            }
+        )
+
+        XCTAssertEqual(outcome, .failed(reason: "Audio file not found"))
+        XCTAssertFalse(didLoadSettings)
+        XCTAssertFalse(didBuildLocalService)
+        XCTAssertFalse(didBuildRemoteService)
+        XCTAssertEqual(record.transcriptionStatus, .failed)
+        XCTAssertEqual(record.transcriptionError, "Audio file not found")
+    }
+
+    func testStoredAudioRetranscriptionFacadeOutcomeReturnsFailureAfterTranscriptionErrorState() async throws {
+        let recordingsDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.TranscriptionRecordTests.\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: recordingsDirectory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: recordingsDirectory) }
+
+        let audioURL = recordingsDirectory.appendingPathComponent("recording.wav")
+        try Data("audio".utf8).write(to: audioURL)
+
+        let record = StubStoredTranscriptionRecord(
+            audioFileURL: audioURL.lastPathComponent,
+            storedAudioRecordingsDirectory: recordingsDirectory
+        )
+
+        let outcome = await VoiceInkStoredAudioRetranscription.retranscribeWithOutcome(
+            record,
+            runSettingsProvider: {
+                VoiceInkTranscriptionRunSettings(
+                    configuration: Mode(
+                        name: "Remote",
+                        transcriptionProvider: .groq,
+                        transcriptionModel: "whisper-large-v3-turbo",
+                        isPostProcessingEnabled: false,
+                        postProcessingProvider: .groq,
+                        postProcessingModel: VoiceInkAIModelCatalog.defaultModel(for: .groq)
+                    ).runtimeConfiguration
+                )
+            },
+            apiKeyProvider: { _ in "groq-key" },
+            localWhisperServiceFactory: {
+                StoredAudioTranscriptionService(text: "local transcript")
+            },
+            remoteServiceFactory: { _ in ThrowingStoredAudioTranscriptionService() }
+        )
+
+        XCTAssertEqual(outcome, .failed(reason: VoiceInkErrorDescription.text(for: VoiceInkEngineError.transcriptionFailed)))
+        XCTAssertEqual(record.transcriptionStatus, .failed)
+        XCTAssertEqual(record.transcriptionError, VoiceInkErrorDescription.text(for: VoiceInkEngineError.transcriptionFailed))
+    }
+
     func testApplyEnhancementResultStoresTextAndMetadata() {
         let record = StubMutableTranscriptionEnhancementMetadataRecord()
         let result = VoiceInkAIEnhancementResult(

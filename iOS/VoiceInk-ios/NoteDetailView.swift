@@ -195,11 +195,7 @@ struct NoteDetailView: View {
         Task {
             defer { isRetranscribing = false }
             
-            do {
-                _ = try await settings.retranscribeStoredAudio(note)
-            } catch {
-                // Failure state is already applied by the shared record helper.
-            }
+            _ = await settings.retranscribeStoredAudio(note)
             try? modelContext.save()
         }
     }

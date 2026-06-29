@@ -2013,7 +2013,9 @@ require_patterns \
   "shared stored-audio retranscription runner and facade own retry orchestration" \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift \
   'VoiceInkStoredAudioRetranscriptionRunner' \
-  'VoiceInkStoredAudioRetranscription'
+  'VoiceInkStoredAudioRetranscription' \
+  'VoiceInkStoredAudioRetranscriptionOutcome' \
+  'retranscribeWithOutcome'
 
 require_pattern \
   "iOS recording manager delegates background retry to AppSettings adapter" \
@@ -2023,6 +2025,16 @@ require_pattern \
 require_pattern \
   "iOS note detail delegates retry to AppSettings adapter" \
   'settings\.retranscribeStoredAudio\(note\)' \
+  iOS/VoiceInk-ios/NoteDetailView.swift
+
+reject_pattern \
+  "iOS recording manager avoids duplicate stored-audio retry swallowing" \
+  'try await settings\.retranscribeStoredAudio\(note\)|Failure state is already applied by the shared record helper' \
+  iOS/VoiceInk-ios/RecordingManager.swift
+
+reject_pattern \
+  "iOS note detail avoids duplicate stored-audio retry swallowing" \
+  'try await settings\.retranscribeStoredAudio\(note\)|Failure state is already applied by the shared record helper' \
   iOS/VoiceInk-ios/NoteDetailView.swift
 
 reject_pattern \
@@ -8639,7 +8651,7 @@ reject_context_pattern \
 require_patterns \
   "iOS AppSettings adapter uses shared stored-audio retranscription facade" \
   iOS/VoiceInk-ios/AppSettings.swift \
-  'VoiceInkStoredAudioRetranscription\.retranscribe\(' \
+  'VoiceInkStoredAudioRetranscription\.retranscribeWithOutcome\(' \
   'runSettingsProvider:' \
   'await transcriptionRunSettings' \
   'apiKeyProvider:' \
@@ -8685,7 +8697,10 @@ require_patterns \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
   'TranscriptionRecordTests\.testStoredAudioRetranscriptionFacadeRoutesRemoteProviderThroughSharedFactory' \
   'TranscriptionRecordTests\.testStoredAudioRetranscriptionFacadeRoutesLocalWhisperProviderThroughSuppliedFactory' \
-  'TranscriptionRecordTests\.testStoredAudioRetranscriptionFacadeMarksMissingAudioBeforeBuildingServices'
+  'TranscriptionRecordTests\.testStoredAudioRetranscriptionFacadeMarksMissingAudioBeforeBuildingServices' \
+  'TranscriptionRecordTests\.testStoredAudioRetranscriptionFacadeOutcomeReturnsTextAndAppliesCompletedRecord' \
+  'TranscriptionRecordTests\.testStoredAudioRetranscriptionFacadeOutcomeReturnsFailureAfterMissingAudioState' \
+  'TranscriptionRecordTests\.testStoredAudioRetranscriptionFacadeOutcomeReturnsFailureAfterTranscriptionErrorState'
 
 reject_pattern \
   "iOS stored-audio retranscription adapter avoids shell-owned run settings assembly" \

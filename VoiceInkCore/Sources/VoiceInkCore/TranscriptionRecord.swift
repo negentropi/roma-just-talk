@@ -178,6 +178,11 @@ public extension VoiceInkMutableTranscriptionRecord where Self: VoiceInkStoredAu
     }
 }
 
+public enum VoiceInkStoredAudioRetranscriptionOutcome: Equatable, Sendable {
+    case succeeded(String)
+    case failed(reason: String)
+}
+
 public struct VoiceInkStoredAudioRetranscriptionRunner {
     public typealias RunSettingsProvider = () async -> VoiceInkTranscriptionRunSettings
 
@@ -221,6 +226,23 @@ public struct VoiceInkStoredAudioRetranscriptionRunner {
             try await transcribe(fileURL: fileURL)
         }
     }
+
+    @discardableResult
+    public func retranscribeWithOutcome<Record: VoiceInkMutableTranscriptionRecord & VoiceInkStoredAudioRecord>(
+        _ record: Record,
+        relativeTo recordingsDirectory: URL? = nil,
+        fileManager: FileManager = .default
+    ) async -> VoiceInkStoredAudioRetranscriptionOutcome {
+        do {
+            return .succeeded(try await retranscribe(
+                record,
+                relativeTo: recordingsDirectory,
+                fileManager: fileManager
+            ))
+        } catch {
+            return .failed(reason: VoiceInkErrorDescription.text(for: error))
+        }
+    }
 }
 
 public enum VoiceInkStoredAudioRetranscription {
@@ -250,6 +272,27 @@ public enum VoiceInkStoredAudioRetranscription {
     }
 
     @discardableResult
+    public static func retranscribeWithOutcome<Record: VoiceInkMutableTranscriptionRecord & VoiceInkStoredAudioRecord>(
+        _ record: Record,
+        relativeTo recordingsDirectory: URL? = nil,
+        fileManager: FileManager = .default,
+        runSettingsProvider: @escaping RunSettingsProvider,
+        apiKeyProvider: @escaping VoiceInkTranscriptionRunProcessor.APIKeyProvider,
+        localWhisperServiceFactory: @escaping LocalWhisperServiceFactory
+    ) async -> VoiceInkStoredAudioRetranscriptionOutcome {
+        await retranscribeWithOutcome(
+            record,
+            relativeTo: recordingsDirectory,
+            fileManager: fileManager,
+            processor: VoiceInkTranscriptionRunProcessor(),
+            runSettingsProvider: runSettingsProvider,
+            apiKeyProvider: apiKeyProvider,
+            localWhisperServiceFactory: localWhisperServiceFactory,
+            remoteServiceFactory: { VoiceInkRemoteTranscriptionService(provider: $0) }
+        )
+    }
+
+    @discardableResult
     static func retranscribe<Record: VoiceInkMutableTranscriptionRecord & VoiceInkStoredAudioRecord>(
         _ record: Record,
         relativeTo recordingsDirectory: URL? = nil,
@@ -267,6 +310,30 @@ public enum VoiceInkStoredAudioRetranscription {
             localWhisperServiceFactory: localWhisperServiceFactory,
             remoteServiceFactory: remoteServiceFactory
         ).retranscribe(
+            record,
+            relativeTo: recordingsDirectory,
+            fileManager: fileManager
+        )
+    }
+
+    @discardableResult
+    static func retranscribeWithOutcome<Record: VoiceInkMutableTranscriptionRecord & VoiceInkStoredAudioRecord>(
+        _ record: Record,
+        relativeTo recordingsDirectory: URL? = nil,
+        fileManager: FileManager = .default,
+        processor: VoiceInkTranscriptionRunProcessor = VoiceInkTranscriptionRunProcessor(),
+        runSettingsProvider: @escaping RunSettingsProvider,
+        apiKeyProvider: @escaping VoiceInkTranscriptionRunProcessor.APIKeyProvider,
+        localWhisperServiceFactory: @escaping LocalWhisperServiceFactory,
+        remoteServiceFactory: @escaping RemoteServiceFactory = { VoiceInkRemoteTranscriptionService(provider: $0) }
+    ) async -> VoiceInkStoredAudioRetranscriptionOutcome {
+        await runner(
+            processor: processor,
+            runSettingsProvider: runSettingsProvider,
+            apiKeyProvider: apiKeyProvider,
+            localWhisperServiceFactory: localWhisperServiceFactory,
+            remoteServiceFactory: remoteServiceFactory
+        ).retranscribeWithOutcome(
             record,
             relativeTo: recordingsDirectory,
             fileManager: fileManager

@@ -34,18 +34,12 @@ final class RecordingManager: ObservableObject {
     
     // MARK: - Coordinator Setup
     private func setupCoordinatorCallbacks() {
-        coordinator.onStopRecordingRequested = { [weak self] in
-            guard let self = self else { return }
-
-            VoiceInkKeyboardStopRecordingRequestPolicy.plan(recordingState: self.flowState.recordingState)
-                .applyRuntimeState {
-                    // We need modelContext, so the SwiftUI shell completes the stop from this notification.
-                    VoiceInkIOSLogger.recording.notice("\(VoiceInkIOSRecordingCoordinationDiagnostics.keyboardStopRecordingRequestedMessage, privacy: .public)")
-                    NotificationCenter.default.post(
-                        name: VoiceInkAppIdentity.iOSStopRecordingFromKeyboardNotificationName,
-                        object: nil
-                    )
-                }
+        coordinator.onStopRecordingRequested = {
+            VoiceInkIOSLogger.recording.notice("\(VoiceInkIOSRecordingCoordinationDiagnostics.keyboardStopRecordingRequestedMessage, privacy: .public)")
+            NotificationCenter.default.post(
+                name: VoiceInkAppIdentity.iOSStopRecordingFromKeyboardNotificationName,
+                object: nil
+            )
         }
     }
     

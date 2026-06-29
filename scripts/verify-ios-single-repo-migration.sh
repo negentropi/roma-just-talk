@@ -18736,11 +18736,10 @@ reject_pattern \
   'public (enum VoiceInkKeyboardStopRecordingRequestAction|static func action\(recordingState:)' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
-require_patterns \
-  "iOS recording manager delegates keyboard stop-request policy to shared core" \
-  iOS/VoiceInk-ios/RecordingManager.swift \
+reject_pattern \
+  "iOS recording manager avoids duplicate keyboard stop-request policy gate" \
   'VoiceInkKeyboardStopRecordingRequestPolicy\.plan' \
-  'applyRuntimeState'
+  iOS/VoiceInk-ios/RecordingManager.swift
 
 require_patterns \
   "iOS notes list delegates keyboard stop-request policy to shared core" \

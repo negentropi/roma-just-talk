@@ -326,13 +326,19 @@ reject_swift_pattern() {
   local files=()
   local path
   local file
+  local swift_files
   for path in "$@"; do
     if [[ -f "$path" && "$path" == *.swift ]]; then
       files+=("$path")
     elif [[ -d "$path" ]]; then
+      if ! swift_files="$(fd -e swift -t f . "$path")"; then
+        fail "$description: failed to list Swift files in $path"
+        return
+      fi
       while IFS= read -r file; do
+        [[ -n "$file" ]] || continue
         files+=("$file")
-      done < <(fd -e swift -t f . "$path")
+      done <<<"$swift_files"
     fi
   done
 
@@ -340,8 +346,19 @@ reject_swift_pattern() {
     return
   fi
 
-  if rg -n "$pattern" "${files[@]}"; then
+  local rg_output
+  local rg_status
+  set +e
+  rg_output="$(rg -n "$pattern" "${files[@]}")"
+  rg_status=$?
+  set -e
+
+  if (( rg_status == 0 )); then
+    printf '%s\n' "$rg_output"
     fail "$description"
+  elif (( rg_status > 1 )); then
+    printf '%s\n' "$rg_output" >&2
+    fail "$description: rg failed with status $rg_status"
   fi
 }
 
@@ -5542,13 +5559,8 @@ require_patterns \
   'var +onboardingColor'
 
 require_pattern \
-  "migration docs document iOS model tint adapter filename" \
-  'WhisperModelDownloadTint\+iOS\.swift' \
-  docs/ios-single-repo-migration.md
-
-require_pattern \
-  "migration docs identify in-repo iOS extras as intentional shell adapters" \
-  'intentional iOS shell adapters/model files' \
+  "migration docs classify iOS model tint adapter as intentional shell adapter" \
+  'WhisperModelDownloadTint\+iOS\.swift.*intentional iOS shell adapters/model files' \
   docs/ios-single-repo-migration.md
 
 reject_pattern \

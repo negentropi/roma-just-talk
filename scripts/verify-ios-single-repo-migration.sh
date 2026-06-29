@@ -306,6 +306,20 @@ require_context_pattern_count_at_least() {
   fi
 }
 
+require_multiline_pattern() {
+  local description="$1"
+  local pattern="$2"
+  shift 2
+
+  section "$description"
+  local file
+  for file in "$@"; do
+    if ! rg -Uq "$pattern" "$file"; then
+      fail "$description: missing multiline pattern in $file"
+    fi
+  done
+}
+
 reject_pattern() {
   local description="$1"
   local pattern="$2"
@@ -3933,25 +3947,9 @@ reject_pattern \
   'provider\.apiKeyAccount|VoiceInkKeychainValueStore\.(saveString|loadString|deleteValue)' \
   iOS/VoiceInk-ios/AppSettings.swift
 
-require_context_pattern_count_at_least \
-  "iOS app settings provider access builds shared snapshot" \
-  'var providerAccess: VoiceInkProviderAccessSnapshot' \
-  'VoiceInkProviderAccessSnapshot\(' \
-  1 \
-  iOS/VoiceInk-ios/AppSettings.swift
-
-require_context_pattern_count_at_least \
-  "iOS app settings provider access uses live provider API-key state" \
-  'var providerAccess: VoiceInkProviderAccessSnapshot' \
-  'apiKeyState: apiKeyState' \
-  1 \
-  iOS/VoiceInk-ios/AppSettings.swift
-
-require_context_pattern_count_at_least \
-  "iOS app settings provider access uses live local model availability" \
-  'var providerAccess: VoiceInkProviderAccessSnapshot' \
-  'localWhisperModelAvailable: LocalModelManager\.shared\.hasAvailableModel' \
-  1 \
+require_multiline_pattern \
+  "iOS app settings provider access builds live shared snapshot" \
+  'var[[:space:]]+providerAccess:[[:space:]]+VoiceInkProviderAccessSnapshot[[:space:]]*\{[[:space:]]*VoiceInkProviderAccessSnapshot\([[:space:]]*apiKeyState:[[:space:]]*apiKeyState,[[:space:]]*localWhisperModelAvailable:[[:space:]]*LocalModelManager\.shared\.hasAvailableModel[[:space:]]*\)[[:space:]]*\}' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 reject_pattern \

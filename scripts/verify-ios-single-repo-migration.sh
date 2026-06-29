@@ -5105,6 +5105,31 @@ require_pattern \
   'VoiceInkWhisperModelSimpleDownloadTrackingState|downloadTrackingState|downloadState\(for:' \
   iOS/VoiceInk-ios/LocalModelManager.swift
 
+require_pattern \
+  "shared local model management snapshot lives in VoiceInkCore" \
+  'VoiceInkWhisperModelManagementSnapshot|hasAvailableModel|modelPath\(forRuntimeModelName:|managementRows|managementRow' \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+
+require_pattern \
+  "core checks execute local model management snapshot test" \
+  'WhisperModelFilesTests\.testManagementSnapshotBuildsAvailabilityPathStateAndRows' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "iOS local model manager delegates snapshot queries to shared core" \
+  'VoiceInkWhisperModelManagementSnapshot|managementSnapshot\.(hasAvailableModel|modelPath|downloadState|managementRows|managementRow)' \
+  iOS/VoiceInk-ios/LocalModelManager.swift
+
+require_pattern \
+  "iOS local model manager publishes local availability revisions" \
+  'localModelAvailabilityRevision|localModelAvailabilityRevision \+=' \
+  iOS/VoiceInk-ios/LocalModelManager.swift
+
+require_pattern \
+  "iOS app settings observes local model availability for provider access refresh" \
+  'localModelAvailabilityCancellable|localModelAvailabilityRevision|objectWillChange\.send' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
 require_patterns \
   "iOS local model manager delegates lifecycle tracking to shared core state" \
   iOS/VoiceInk-ios/LocalModelManager.swift \
@@ -5125,8 +5150,8 @@ require_patterns \
   'downloadTaskIDs\[model\.id\] = nil'
 
 require_pattern \
-  "iOS local model manager exposes shared management rows" \
-  'VoiceInkWhisperModelManagementList\.(row|rows)|managementRow' \
+  "iOS local model manager exposes shared management snapshot rows" \
+  'managementSnapshot\.(managementRows|managementRow)' \
   iOS/VoiceInk-ios/LocalModelManager.swift
 
 require_pattern \
@@ -5147,6 +5172,11 @@ reject_pattern \
 reject_pattern \
   "iOS local model manager avoids shell-owned download state dictionaries" \
   '@Published var +(downloadProgress|isDownloading)|isDownloading\[[^]]+\]|downloadProgress\[[^]]+\]' \
+  iOS/VoiceInk-ios/LocalModelManager.swift
+
+reject_pattern \
+  "iOS local model manager avoids shell-owned management snapshot derivation" \
+  'VoiceInkWhisperModelFiles\.(availableBootstrapModelFileURL|availableModelFileURL)|downloadTrackingState\.downloadState\(for:|VoiceInkWhisperModelManagementList\.(row|rows)' \
   iOS/VoiceInk-ios/LocalModelManager.swift
 
 reject_pattern \

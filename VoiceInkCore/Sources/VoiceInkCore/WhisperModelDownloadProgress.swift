@@ -653,3 +653,64 @@ public struct VoiceInkWhisperModelSimpleDownloadTrackingState: Equatable, Sendab
         )
     }
 }
+
+public struct VoiceInkWhisperModelManagementSnapshot: Equatable, Sendable {
+    public let modelsDirectory: URL
+    private let downloadTrackingState: VoiceInkWhisperModelSimpleDownloadTrackingState
+    private let models: [VoiceInkWhisperModelFileSpec]
+
+    public init(
+        modelsDirectory: URL,
+        downloadTrackingState: VoiceInkWhisperModelSimpleDownloadTrackingState,
+        models: [VoiceInkWhisperModelFileSpec] = VoiceInkWhisperModelFiles.bootstrapModels
+    ) {
+        self.modelsDirectory = modelsDirectory
+        self.downloadTrackingState = downloadTrackingState
+        self.models = models
+    }
+
+    public func hasAvailableModel(fileManager: FileManager = .default) -> Bool {
+        VoiceInkWhisperModelFiles.availableBootstrapModelFileURL(
+            in: modelsDirectory,
+            fileManager: fileManager
+        ) != nil
+    }
+
+    public func modelPath(
+        forRuntimeModelName runtimeModelName: String,
+        fileManager: FileManager = .default
+    ) -> String? {
+        VoiceInkWhisperModelFiles.availableModelFileURL(
+            forRuntimeModelName: runtimeModelName,
+            in: modelsDirectory,
+            fileManager: fileManager
+        )?.path
+    }
+
+    public func downloadState(
+        for model: VoiceInkWhisperModelFileSpec,
+        fileManager: FileManager = .default
+    ) -> VoiceInkWhisperModelDownloadState {
+        downloadTrackingState.downloadState(
+            for: model,
+            modelsDirectory: modelsDirectory,
+            fileManager: fileManager
+        )
+    }
+
+    public func managementRow(
+        for model: VoiceInkWhisperModelFileSpec,
+        fileManager: FileManager = .default
+    ) -> VoiceInkWhisperModelManagementRow {
+        VoiceInkWhisperModelManagementList.row(
+            for: model,
+            downloadState: downloadState(for: model, fileManager: fileManager)
+        )
+    }
+
+    public func managementRows(fileManager: FileManager = .default) -> [VoiceInkWhisperModelManagementRow] {
+        VoiceInkWhisperModelManagementList.rows(for: models) { model in
+            downloadState(for: model, fileManager: fileManager)
+        }
+    }
+}

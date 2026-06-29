@@ -740,6 +740,51 @@ final class WhisperModelFilesTests: XCTestCase {
         )
     }
 
+    func testManagementSnapshotBuildsAvailabilityPathStateAndRows() throws {
+        let baseDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.WhisperModelManagementSnapshotTests.\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: baseDirectory) }
+
+        let modelsDirectory = try VoiceInkWhisperModelFiles.createModelsDirectory(in: baseDirectory)
+        let model = VoiceInkWhisperModelFiles.baseModel
+        var trackingState = VoiceInkWhisperModelSimpleDownloadTrackingState()
+        XCTAssertTrue(trackingState.startDownload(for: model))
+        trackingState.updateProgress(0.25, for: model)
+
+        let downloadingSnapshot = VoiceInkWhisperModelManagementSnapshot(
+            modelsDirectory: modelsDirectory,
+            downloadTrackingState: trackingState,
+            models: [model]
+        )
+
+        XCTAssertFalse(downloadingSnapshot.hasAvailableModel())
+        XCTAssertNil(downloadingSnapshot.modelPath(forRuntimeModelName: VoiceInkTranscriptionModelCatalog.localBaseModel))
+        XCTAssertEqual(
+            downloadingSnapshot.downloadState(for: model),
+            VoiceInkWhisperModelDownloadState(
+                isDownloaded: false,
+                progress: .simple(modelName: model.modelName, isDownloading: true, progress: 0.25)
+            )
+        )
+        XCTAssertEqual(downloadingSnapshot.managementRows(), [downloadingSnapshot.managementRow(for: model)])
+        XCTAssertEqual(downloadingSnapshot.managementRow(for: model).presentation.action, .downloading)
+
+        try Data().write(to: model.fileURL(in: modelsDirectory))
+        trackingState.finishDownload(for: model)
+        let downloadedSnapshot = VoiceInkWhisperModelManagementSnapshot(
+            modelsDirectory: modelsDirectory,
+            downloadTrackingState: trackingState,
+            models: [model]
+        )
+
+        XCTAssertTrue(downloadedSnapshot.hasAvailableModel())
+        XCTAssertEqual(
+            downloadedSnapshot.modelPath(forRuntimeModelName: VoiceInkTranscriptionModelCatalog.localBaseModel),
+            model.fileURL(in: modelsDirectory).path
+        )
+        XCTAssertEqual(downloadedSnapshot.managementRow(for: model).presentation.action, .downloaded)
+    }
+
     func testModelManagementDiagnosticsPreserveIOSLogCopy() {
         let downloadURL = URL(string: "https://example.com/ggml-base.bin")!
 

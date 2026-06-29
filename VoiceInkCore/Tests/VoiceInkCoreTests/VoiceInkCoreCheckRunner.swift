@@ -1767,6 +1767,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadTrackingStateOwnsIOSLifecycle", run: { try WhisperModelFilesTests().testSimpleDownloadTrackingStateOwnsIOSLifecycle() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadTrackingStateIgnoresInactiveProgress", run: { try WhisperModelFilesTests().testSimpleDownloadTrackingStateIgnoresInactiveProgress() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadTrackingStateCleansUpCancelledDownload", run: { try WhisperModelFilesTests().testSimpleDownloadTrackingStateCleansUpCancelledDownload() }),
+            VoiceInkCoreCheck(name: "WhisperModelFilesTests.testManagementSnapshotBuildsAvailabilityPathStateAndRows", run: { try WhisperModelFilesTests().testManagementSnapshotBuildsAvailabilityPathStateAndRows() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testModelManagementDiagnosticsPreserveIOSLogCopy", run: { WhisperModelFilesTests().testModelManagementDiagnosticsPreserveIOSLogCopy() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadStateBuildsSharedRowPresentation", run: { WhisperModelFilesTests().testSimpleDownloadStateBuildsSharedRowPresentation() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadRowPresentationBuildsDeferredRuntimeAction", run: { WhisperModelFilesTests().testSimpleDownloadRowPresentationBuildsDeferredRuntimeAction() }),

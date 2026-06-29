@@ -7,6 +7,8 @@ import VoiceInkCore
 final class AppSettings: ObservableObject {
     static let shared = AppSettings()
 
+    private var localModelAvailabilityCancellable: AnyCancellable?
+
     // Modes system
     @Published var modes: [Mode] {
         didSet {
@@ -82,6 +84,7 @@ final class AppSettings: ObservableObject {
         self.customVocabularyTerms = startupState.customVocabularyTerms
         self.selectedTranscriptionLanguage = startupState.selectedTranscriptionLanguage
 
+        observeLocalModelAvailability()
         repairModeSettingsSelection()
     }
 
@@ -98,6 +101,16 @@ final class AppSettings: ObservableObject {
             apiKeyState: apiKeyState,
             localWhisperModelAvailable: LocalModelManager.shared.hasAvailableModel
         )
+    }
+
+    private func observeLocalModelAvailability() {
+        localModelAvailabilityCancellable = LocalModelManager.shared.$localModelAvailabilityRevision
+            .dropFirst()
+            .sink { [weak self] _ in
+                Task { @MainActor in
+                    self?.objectWillChange.send()
+                }
+            }
     }
 
     func setAPIKey(_ key: String, for provider: VoiceInkProviderKind) {

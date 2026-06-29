@@ -12,6 +12,7 @@ import VoiceInkCore
 @MainActor
 class LocalModelManager: ObservableObject {
     @Published private var downloadTrackingState = VoiceInkWhisperModelSimpleDownloadTrackingState()
+    @Published var localModelAvailabilityRevision = 0
     @Published var downloadError: VoiceInkWhisperModelOperationAlertPresentation?
     
     private var downloadTasks: [String: URLSessionDownloadTask] = [:]
@@ -27,6 +28,13 @@ class LocalModelManager: ObservableObject {
     
     private init() {
         _ = Self.modelsDirectory
+    }
+
+    private var managementSnapshot: VoiceInkWhisperModelManagementSnapshot {
+        VoiceInkWhisperModelManagementSnapshot(
+            modelsDirectory: Self.modelsDirectory,
+            downloadTrackingState: downloadTrackingState
+        )
     }
     
     /// Download a specific model
@@ -115,6 +123,7 @@ class LocalModelManager: ObservableObject {
             
             logger.notice("\(VoiceInkWhisperModelManagementDiagnostics.downloadedMessage(modelName: model.modelName, finalPath: finalURL.path), privacy: .public)")
             downloadTrackingState.updateProgress(1.0, for: model)
+            localModelAvailabilityRevision += 1
             
         } catch {
             downloadError = .saveFailed(for: error)
@@ -148,6 +157,7 @@ class LocalModelManager: ObservableObject {
             deleteDownloadedFiles: {
                 try model.deleteDownloadedFiles(in: Self.modelsDirectory)
                 logger.notice("\(VoiceInkWhisperModelManagementDiagnostics.deletedMessage(modelName: model.modelName), privacy: .public)")
+                localModelAvailabilityRevision += 1
             },
             refreshAfterSuccessfulDelete: {
                 // The downloaded-state query is file-backed, so force SwiftUI to refresh the row.
@@ -163,32 +173,24 @@ class LocalModelManager: ObservableObject {
     }
     
     func modelPath(for runtimeModelName: String) -> String? {
-        VoiceInkWhisperModelFiles.availableModelFileURL(
-            forRuntimeModelName: runtimeModelName,
-            in: Self.modelsDirectory
-        )?.path
+        managementSnapshot.modelPath(forRuntimeModelName: runtimeModelName)
     }
     
     /// Check if any model is available for transcription
     var hasAvailableModel: Bool {
-        VoiceInkWhisperModelFiles.availableBootstrapModelFileURL(in: Self.modelsDirectory) != nil
+        managementSnapshot.hasAvailableModel()
     }
 
     func downloadState(for model: VoiceInkWhisperModelFileSpec) -> VoiceInkWhisperModelDownloadState {
-        downloadTrackingState.downloadState(for: model, modelsDirectory: Self.modelsDirectory)
+        managementSnapshot.downloadState(for: model)
     }
 
     func managementRows() -> [VoiceInkWhisperModelManagementRow] {
-        VoiceInkWhisperModelManagementList.rows { model in
-            downloadState(for: model)
-        }
+        managementSnapshot.managementRows()
     }
 
     func managementRow(for model: VoiceInkWhisperModelFileSpec) -> VoiceInkWhisperModelManagementRow {
-        VoiceInkWhisperModelManagementList.row(
-            for: model,
-            downloadState: downloadState(for: model)
-        )
+        managementSnapshot.managementRow(for: model)
     }
     
 }

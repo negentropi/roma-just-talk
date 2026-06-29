@@ -480,7 +480,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testDictionarySettingsSnapshotBuildsDisplayedRows", run: { DictionaryPolicyTests().testDictionarySettingsSnapshotBuildsDisplayedRows() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testDictionarySettingsSnapshotDeletesDisplayedRowsThroughOriginalStorageOrder", run: { DictionaryPolicyTests().testDictionarySettingsSnapshotDeletesDisplayedRowsThroughOriginalStorageOrder() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testDictionarySettingsSnapshotSubmitsAndAppliesDrafts", run: { DictionaryPolicyTests().testDictionarySettingsSnapshotSubmitsAndAppliesDrafts() }),
-            VoiceInkCoreCheck(name: "DictionaryPolicyTests.testDictionarySettingsSnapshotKeepsListsWhenDraftsDoNotChangeStorage", run: { DictionaryPolicyTests().testDictionarySettingsSnapshotKeepsListsWhenDraftsDoNotChangeStorage() }),
+            VoiceInkCoreCheck(name: "DictionaryPolicyTests.testDictionarySettingsSnapshotSkipsRuntimeSettersWhenDraftsDoNotChangeStorage", run: { DictionaryPolicyTests().testDictionarySettingsSnapshotSkipsRuntimeSettersWhenDraftsDoNotChangeStorage() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testVocabularyDraftUsesSharedTokenPolicy", run: { DictionaryPolicyTests().testVocabularyDraftUsesSharedTokenPolicy() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testVocabularyDraftStateUsesSharedTokenPolicy", run: { DictionaryPolicyTests().testVocabularyDraftStateUsesSharedTokenPolicy() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testVocabularyDraftStateSubmitsAndClearsAcceptedWords", run: { DictionaryPolicyTests().testVocabularyDraftStateSubmitsAndClearsAcceptedWords() }),

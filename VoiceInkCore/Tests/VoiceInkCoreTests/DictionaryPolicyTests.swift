@@ -421,36 +421,24 @@ final class DictionaryPolicyTests: XCTestCase {
         let fillerWordSubmission = snapshot.fillerWordSubmission(
             VoiceInkFillerWordDraftState(draft: " Ah ")
         )
-        XCTAssertEqual(
-            snapshot.updatedFillerWordsIfChanged(afterApplying: fillerWordSubmission.plan),
-            ["uh", "ah"]
-        )
-        XCTAssertEqual(snapshot.applyingFillerWordSubmission(fillerWordSubmission.plan), ["uh", "ah"])
+        var fillerWords = snapshot.fillerWords
+        snapshot.applyFillerWordSubmission(fillerWordSubmission.plan) { fillerWords = $0 }
+        XCTAssertEqual(fillerWords, ["uh", "ah"])
 
         let vocabularySubmission = snapshot.customVocabularySubmission(
             VoiceInkVocabularyDraftState(draft: "Roma, voice ink")
         )
-        XCTAssertEqual(
-            snapshot.updatedCustomVocabularyTermsIfChanged(afterApplying: vocabularySubmission.plan),
-            ["voice ink", "Roma"]
-        )
-        XCTAssertEqual(
-            snapshot.applyingCustomVocabularySubmission(vocabularySubmission.plan),
-            ["voice ink", "Roma"]
-        )
+        var customVocabularyTerms = snapshot.customVocabularyTerms
+        snapshot.applyCustomVocabularySubmission(vocabularySubmission.plan) { customVocabularyTerms = $0 }
+        XCTAssertEqual(customVocabularyTerms, ["voice ink", "Roma"])
 
         let wordReplacementSubmission = snapshot.wordReplacementSubmission(
             VoiceInkWordReplacementDraftState(original: "Roma", replacement: "Roma Just Talk")
         )
+        var wordReplacements = snapshot.wordReplacements
+        snapshot.applyWordReplacementSubmission(wordReplacementSubmission.plan) { wordReplacements = $0 }
         XCTAssertEqual(
-            snapshot.updatedWordReplacementsIfChanged(afterApplying: wordReplacementSubmission.plan),
-            [
-                VoiceInkWordReplacementRule(originalText: "cursor", replacementText: "Cursor"),
-                VoiceInkWordReplacementRule(originalText: "Roma", replacementText: "Roma Just Talk")
-            ]
-        )
-        XCTAssertEqual(
-            snapshot.applyingWordReplacementSubmission(wordReplacementSubmission.plan),
+            wordReplacements,
             [
                 VoiceInkWordReplacementRule(originalText: "cursor", replacementText: "Cursor"),
                 VoiceInkWordReplacementRule(originalText: "Roma", replacementText: "Roma Just Talk")
@@ -458,7 +446,7 @@ final class DictionaryPolicyTests: XCTestCase {
         )
     }
 
-    func testDictionarySettingsSnapshotKeepsListsWhenDraftsDoNotChangeStorage() {
+    func testDictionarySettingsSnapshotSkipsRuntimeSettersWhenDraftsDoNotChangeStorage() {
         let snapshot = VoiceInkDictionarySettingsSnapshot(
             fillerWords: ["uh"],
             customVocabularyTerms: ["voice ink"],
@@ -475,12 +463,18 @@ final class DictionaryPolicyTests: XCTestCase {
             VoiceInkWordReplacementDraftState(original: "Roma", replacement: "RJT")
         )
 
-        XCTAssertNil(snapshot.updatedFillerWordsIfChanged(afterApplying: duplicateFillerWord.plan))
-        XCTAssertNil(snapshot.updatedCustomVocabularyTermsIfChanged(afterApplying: duplicateVocabulary.plan))
-        XCTAssertNil(snapshot.updatedWordReplacementsIfChanged(afterApplying: duplicateReplacement.plan))
-        XCTAssertEqual(snapshot.applyingFillerWordSubmission(duplicateFillerWord.plan), snapshot.fillerWords)
-        XCTAssertEqual(snapshot.applyingCustomVocabularySubmission(duplicateVocabulary.plan), snapshot.customVocabularyTerms)
-        XCTAssertEqual(snapshot.applyingWordReplacementSubmission(duplicateReplacement.plan), snapshot.wordReplacements)
+        var appliedSetters = [String]()
+        snapshot.applyFillerWordSubmission(duplicateFillerWord.plan) { _ in
+            appliedSetters.append("fillerWords")
+        }
+        snapshot.applyCustomVocabularySubmission(duplicateVocabulary.plan) { _ in
+            appliedSetters.append("customVocabularyTerms")
+        }
+        snapshot.applyWordReplacementSubmission(duplicateReplacement.plan) { _ in
+            appliedSetters.append("wordReplacements")
+        }
+
+        XCTAssertEqual(appliedSetters, [])
     }
 
     func testVocabularyDraftUsesSharedTokenPolicy() {

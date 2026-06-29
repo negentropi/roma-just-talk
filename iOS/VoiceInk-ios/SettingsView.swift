@@ -246,9 +246,8 @@ struct SettingsView: View {
         snapshot
             .fillerWordSubmission(fillerWordDraftState)
             .applyRuntimeState(
-                applyPlan: { plan in
-                    guard let updatedWords = snapshot.updatedFillerWordsIfChanged(afterApplying: plan) else { return }
-                    settings.fillerWords = updatedWords
+                applyPlan: {
+                    snapshot.applyFillerWordSubmission($0) { settings.fillerWords = $0 }
                 },
                 setDraftState: { fillerWordDraftState = $0 },
                 setAlertPresentation: { dictionaryAlert = $0 }
@@ -260,11 +259,8 @@ struct SettingsView: View {
         snapshot
             .customVocabularySubmission(customVocabularyDraftState)
             .applyRuntimeState(
-                applyPlan: { plan in
-                    guard let updatedTerms = snapshot.updatedCustomVocabularyTermsIfChanged(afterApplying: plan) else {
-                        return
-                    }
-                    settings.customVocabularyTerms = updatedTerms
+                applyPlan: {
+                    snapshot.applyCustomVocabularySubmission($0) { settings.customVocabularyTerms = $0 }
                 },
                 setDraftState: { customVocabularyDraftState = $0 },
                 setAlertPresentation: { dictionaryAlert = $0 }
@@ -276,11 +272,8 @@ struct SettingsView: View {
         snapshot
             .wordReplacementSubmission(wordReplacementDraftState)
             .applyRuntimeState(
-                applyPlan: { plan in
-                    guard let updatedRules = snapshot.updatedWordReplacementsIfChanged(afterApplying: plan) else {
-                        return
-                    }
-                    settings.wordReplacements = updatedRules
+                applyPlan: {
+                    snapshot.applyWordReplacementSubmission($0) { settings.wordReplacements = $0 }
                 },
                 setDraftState: { wordReplacementDraftState = $0 },
                 setAlertPresentation: { dictionaryAlert = $0 }

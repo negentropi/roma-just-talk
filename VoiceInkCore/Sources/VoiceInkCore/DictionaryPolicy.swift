@@ -1056,40 +1056,25 @@ public struct VoiceInkDictionarySettingsSnapshot: Equatable, Sendable {
         draftState.submitting(existingRules: wordReplacements)
     }
 
-    public func updatedFillerWordsIfChanged(
-        afterApplying plan: VoiceInkFillerWordSubmissionPlan
-    ) -> [String]? {
-        plan.updatedWordsIfChanged(from: fillerWords)
+    public func applyFillerWordSubmission(
+        _ plan: VoiceInkFillerWordSubmissionPlan,
+        setWords: ([String]) -> Void
+    ) {
+        plan.applyRuntimeState(currentWords: fillerWords, setWords: setWords)
     }
 
-    public func updatedCustomVocabularyTermsIfChanged(
-        afterApplying plan: VoiceInkVocabularySubmissionPlan
-    ) -> [String]? {
-        plan.updatedWordsIfChanged(from: customVocabularyTerms)
+    public func applyCustomVocabularySubmission(
+        _ plan: VoiceInkVocabularySubmissionPlan,
+        setWords: ([String]) -> Void
+    ) {
+        plan.applyRuntimeState(currentWords: customVocabularyTerms, setWords: setWords)
     }
 
-    public func updatedWordReplacementsIfChanged(
-        afterApplying plan: VoiceInkWordReplacementSubmissionPlan
-    ) -> [VoiceInkWordReplacementRule]? {
-        plan.updatedRulesIfChanged(from: wordReplacements)
-    }
-
-    public func applyingFillerWordSubmission(
-        _ plan: VoiceInkFillerWordSubmissionPlan
-    ) -> [String] {
-        updatedFillerWordsIfChanged(afterApplying: plan) ?? fillerWords
-    }
-
-    public func applyingCustomVocabularySubmission(
-        _ plan: VoiceInkVocabularySubmissionPlan
-    ) -> [String] {
-        updatedCustomVocabularyTermsIfChanged(afterApplying: plan) ?? customVocabularyTerms
-    }
-
-    public func applyingWordReplacementSubmission(
-        _ plan: VoiceInkWordReplacementSubmissionPlan
-    ) -> [VoiceInkWordReplacementRule] {
-        updatedWordReplacementsIfChanged(afterApplying: plan) ?? wordReplacements
+    public func applyWordReplacementSubmission(
+        _ plan: VoiceInkWordReplacementSubmissionPlan,
+        setRules: ([VoiceInkWordReplacementRule]) -> Void
+    ) {
+        plan.applyRuntimeState(currentRules: wordReplacements, setRules: setRules)
     }
 
     public func removingFillerWords(at offsets: IndexSet) -> [String] {

@@ -1,0 +1,54 @@
+name: VoiceInk iOS single-repo migration
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/voiceink-ios-single-repo-migration.yml"
+      - "scripts/**"
+      - "docs/**"
+      - "VoiceInkCore/**"
+      - "iOS/**"
+      - "VoiceInk/**"
+      - "VoiceInk.xcodeproj/**"
+      - "VoiceInk.xcworkspace/**"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/voiceink-ios-single-repo-migration.yml"
+      - "scripts/**"
+      - "docs/**"
+      - "VoiceInkCore/**"
+      - "iOS/**"
+      - "VoiceInk/**"
+      - "VoiceInk.xcodeproj/**"
+      - "VoiceInk.xcworkspace/**"
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Verify single-repo migration
+    runs-on: macos-26
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install verifier tools
+        run: brew install fd ripgrep
+
+      - name: Show toolchain
+        run: |
+          xcode-select -p
+          xcodebuild -version
+          swift --version
+          xcrun --version
+          fd --version
+          rg --version
+
+      - name: Run migration verifier
+        run: bash scripts/verify-ios-single-repo-migration.sh

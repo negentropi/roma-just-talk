@@ -9169,10 +9169,16 @@ reject_swift_pattern \
   'public[[:space:]]+typealias[[:space:]]+CloudTranscriptionError[[:space:]]*=' \
   VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift
 
-require_pattern \
+require_patterns \
   "shared cloud transcription error checks run in VoiceInkCore" \
-  'CloudTranscriptionErrorTests\.testErrorDescriptionsPreserveMacOSCloudTranscriptionCopy|CloudTranscriptionErrorTests\.testNoTranscriptionReturnedUsesSharedRunErrorDescription|CloudTranscriptionErrorTests\.testCloudTranscriptionAudioFileLoadsBytesAndFileName|CloudTranscriptionErrorTests\.testCloudTranscriptionAudioFileMapsMissingFile|CloudTranscriptionErrorTests\.testAPIRequestFailureMapsMatchingHTTPNSError|CloudTranscriptionErrorTests\.testAPIRequestFailureFallsBackToLocalizedDescription|CloudTranscriptionErrorTests\.testAPIRequestFailureRejectsWrongDomainMissingDomainAndNonHTTPStatus' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'CloudTranscriptionErrorTests\.testErrorDescriptionsPreserveMacOSCloudTranscriptionCopy' \
+  'CloudTranscriptionErrorTests\.testNoTranscriptionReturnedUsesSharedRunErrorDescription' \
+  'CloudTranscriptionErrorTests\.testCloudTranscriptionAudioFileLoadsBytesAndFileName' \
+  'CloudTranscriptionErrorTests\.testCloudTranscriptionAudioFileMapsMissingFile' \
+  'CloudTranscriptionErrorTests\.testAPIRequestFailureMapsMatchingHTTPNSError' \
+  'CloudTranscriptionErrorTests\.testAPIRequestFailureFallsBackToLocalizedDescription' \
+  'CloudTranscriptionErrorTests\.testAPIRequestFailureRejectsWrongDomainMissingDomainAndNonHTTPStatus'
 
 require_pattern \
   "core checks execute shared remote audio file policy test" \

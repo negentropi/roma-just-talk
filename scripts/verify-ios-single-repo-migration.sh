@@ -14428,12 +14428,21 @@ require_patterns \
   'setModes' \
   'setTranscriptionCleanupSettings' \
   'clearCoreUserSettings' \
-  'deleteProviderAPIKeys' \
-  'VoiceInkProviderAPIKeyStorage\.deleteStoredKey\(for: provider\)'
+  'deleteProviderAPIKeys'
 
-reject_pattern \
-  "iOS app settings reset avoids shallow provider-key delete wrapper" \
-  'private static func +deleteAPIKey|Self\.deleteAPIKey|deleteAPIKey\(for:' \
+require_multiline_pattern \
+  "iOS app settings reset deletes provider API keys directly in reset adapter" \
+  'deleteProviderAPIKeys:[[:space:]]*\{[[:space:]]*[[:alpha:]_][[:alnum:]_]*[[:space:]]+in[[:space:]]*[[:alpha:]_][[:alnum:]_]*\.forEach[[:space:]]*\{[[:space:]]*[[:alpha:]_][[:alnum:]_]*[[:space:]]+in[[:space:]]*VoiceInkProviderAPIKeyStorage\.deleteStoredKey\(for:[[:space:]]*[[:alpha:]_][[:alnum:]_]*\)' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+reject_multiline_pattern \
+  "iOS app settings reset avoids shallow provider-key delete forwarding methods" \
+  'private[[:space:]]+(static[[:space:]]+)?func[[:space:]]+[[:alpha:]_][[:alnum:]_]*[^{]+\{[[:space:]]*(return[[:space:]]+)?VoiceInkProviderAPIKeyStorage\.deleteStoredKey\(for:' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+reject_multiline_pattern \
+  "iOS app settings reset avoids provider-key delete method references" \
+  'deleteProviderAPIKeys:[[:space:]]*\{[[:space:]]*[[:alpha:]_][[:alnum:]_]*[[:space:]]+in[[:space:]]*[[:alpha:]_][[:alnum:]_]*\.forEach\([[:space:]]*(Self\.)?[[:alpha:]_][[:alnum:]_]*[[:space:]]*\)' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 reject_pattern \

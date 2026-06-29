@@ -14428,7 +14428,13 @@ require_patterns \
   'setModes' \
   'setTranscriptionCleanupSettings' \
   'clearCoreUserSettings' \
-  'deleteProviderAPIKeys'
+  'deleteProviderAPIKeys' \
+  'VoiceInkProviderAPIKeyStorage\.deleteStoredKey\(for: provider\)'
+
+reject_pattern \
+  "iOS app settings reset avoids shallow provider-key delete wrapper" \
+  'private static func +deleteAPIKey|Self\.deleteAPIKey|deleteAPIKey\(for:' \
+  iOS/VoiceInk-ios/AppSettings.swift
 
 reject_pattern \
   "iOS app settings reset avoids shell-owned reset action sequencing" \

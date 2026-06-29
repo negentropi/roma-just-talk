@@ -241,10 +241,6 @@ final class AppSettings: ObservableObject {
         }
     }
 
-    private static func deleteAPIKey(for provider: VoiceInkProviderKind) {
-        VoiceInkProviderAPIKeyStorage.deleteStoredKey(for: provider)
-    }
-
     // MARK: - Debug Reset
     /// Remove all persisted preferences, API keys, and modes.
     func resetAll() {
@@ -267,7 +263,9 @@ final class AppSettings: ObservableObject {
                 VoiceInkSharedPreferenceReset.clearCoreUserSettings()
             },
             deleteProviderAPIKeys: { providers in
-                providers.forEach(Self.deleteAPIKey)
+                providers.forEach { provider in
+                    VoiceInkProviderAPIKeyStorage.deleteStoredKey(for: provider)
+                }
             }
         )
     }

@@ -5161,10 +5161,14 @@ require_patterns \
   'WhisperModelFilesTests\.testSimpleDownloadSessionStateIgnoresStaleCompletionAndCleansActiveCompletion' \
   'WhisperModelFilesTests\.testSimpleDownloadSessionStateCleansUpCancelledDownload'
 
-require_pattern \
+require_patterns \
   "iOS local model manager delegates snapshot queries to shared core" \
-  'VoiceInkWhisperModelManagementSnapshot|managementSnapshot\.(hasAvailableModel|modelPath|managementRows|iOSOnboardingModelDownloadSnapshot)' \
-  iOS/VoiceInk-ios/LocalModelManager.swift
+  iOS/VoiceInk-ios/LocalModelManager.swift \
+  'VoiceInkWhisperModelManagementSnapshot' \
+  'managementSnapshot\.modelPath\(forRuntimeModelName: runtimeModelName\)' \
+  'managementSnapshot\.hasAvailableModel\(\)' \
+  'managementSnapshot\.managementRows\(\)' \
+  'managementSnapshot\.iOSOnboardingModelDownloadSnapshot\(\)'
 
 require_pattern \
   "iOS local model manager publishes local availability revisions" \

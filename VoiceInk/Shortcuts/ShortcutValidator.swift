@@ -2,8 +2,6 @@ import AppKit
 import Carbon.HIToolbox
 import VoiceInkCore
 
-typealias ShortcutValidationError = VoiceInkShortcutValidationIssue
-
 extension VoiceInkShortcutValidationIssue {
     func notificationTitle(for shortcut: Shortcut) -> String {
         VoiceInkShortcutValidationPresentation.notificationTitle(
@@ -14,7 +12,7 @@ extension VoiceInkShortcutValidationIssue {
 }
 
 enum ShortcutValidator {
-    static func validationError(for shortcut: Shortcut, action: ShortcutAction) -> ShortcutValidationError? {
+    static func validationError(for shortcut: Shortcut, action: ShortcutAction) -> VoiceInkShortcutValidationIssue? {
         if let error = userRecordingShortcutError(for: shortcut) {
             return error
         }
@@ -34,7 +32,7 @@ enum ShortcutValidator {
         return nil
     }
 
-    private static func userRecordingShortcutError(for shortcut: Shortcut) -> ShortcutValidationError? {
+    private static func userRecordingShortcutError(for shortcut: Shortcut) -> VoiceInkShortcutValidationIssue? {
         switch shortcut.kind {
         case .modifierOnly:
             return shortcut.modifierFlags.isEmpty ? .plainKeyRequiresModifier : nil

@@ -24,15 +24,6 @@ struct CoreCloudProvider: CloudProvider {
     }
 }
 
-extension CloudProvider {
-    var models: [CloudModel] {
-        modelProvider
-            .cloudModelSpecs
-            .map { CloudModel(spec: $0, provider: modelProvider) }
-    }
-
-}
-
 enum CloudProviderRegistry {
     static let allProviders: [any CloudProvider] = [
         CoreCloudProvider(modelProvider: .groq),

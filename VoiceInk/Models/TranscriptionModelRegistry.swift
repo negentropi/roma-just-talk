@@ -18,7 +18,12 @@ enum TranscriptionModelRegistry {
         let localModels = VoiceInkWhisperModelFiles.downloadableModels.map(WhisperModel.init(spec:))
         let nonCloudModels = platformModels + localModels
 
-        let cloudModels: [any TranscriptionModel] = CloudProviderRegistry.allProviders.flatMap { $0.models }
+        let cloudModels: [any TranscriptionModel] = CloudProviderRegistry.allProviders.flatMap { provider in
+            let modelProvider = provider.modelProvider
+            return modelProvider.cloudModelSpecs.map { spec -> any TranscriptionModel in
+                CloudModel(spec: spec, provider: modelProvider)
+            }
+        }
         return nonCloudModels + cloudModels
     }()
 }

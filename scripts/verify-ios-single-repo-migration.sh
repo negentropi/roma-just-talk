@@ -6218,7 +6218,7 @@ reject_pattern \
 
 reject_pattern \
   "macOS cloud provider avoids unused shared fact pass-throughs" \
-  '^    var (languageCodes|includesAutoDetect|isStreamingOnly): ' \
+  '^    var (languageCodes|includesAutoDetect|models|isStreamingOnly): ' \
   VoiceInk/Transcription/Cloud/CloudProvider.swift
 
 reject_pattern \
@@ -6235,6 +6235,13 @@ require_pattern \
   "macOS CloudModel adapts shared cloud-model specs directly" \
   'init\(spec: VoiceInkCloudTranscriptionModelSpec, provider: ModelProvider\)' \
   VoiceInk/Models/TranscriptionModel.swift
+
+require_patterns \
+  "macOS transcription model registry builds cloud models from shared provider specs" \
+  VoiceInk/Models/TranscriptionModelRegistry.swift \
+  'CloudProviderRegistry\.allProviders\.flatMap' \
+  'modelProvider\.cloudModelSpecs' \
+  'CloudModel\(spec: spec, provider: modelProvider\)'
 
 reject_pattern \
   "macOS CloudModel avoids shell-owned literal cloud model initializer" \

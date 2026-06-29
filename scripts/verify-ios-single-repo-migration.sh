@@ -3692,7 +3692,7 @@ require_pattern \
 
 require_pattern \
   "shared provider API-key form state owns iOS result feedback visibility" \
-  'iOSVisibleResultFeedback\(isKeyVerified:' \
+  'iOSVisibleResultFeedback\(isProviderReady:' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
 
 require_pattern \
@@ -3814,7 +3814,7 @@ require_pattern \
 
 require_pattern \
   "iOS API-key view uses shared stored-key edit plan" \
-  'iOSStoredKeyEditPlan|editPlan\.formState|settings\.applyProviderAPIKeyEditPlan\(editPlan, for: provider\)' \
+  'snapshot\.storedKeyEditPlan|settings\.applyProviderAPIKeyEditPlan\(snapshot\.storedKeyEditPlan, for: provider\)' \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
 require_pattern \
@@ -3823,8 +3823,8 @@ require_pattern \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \
-  "iOS API-key view uses shared progress presentation through form state" \
-  'apiKeyFormState\.(iOSControlPresentation|iOSVisibleResultFeedback)|controlPresentation\.(saveRuntimeAction|isVerificationProgressVisible|verifyRuntimeAction|isVerifyButtonDisabled)|iOSVerifiedKeyFeedback|iOSResultFeedback|effectiveSystemImageName' \
+  "iOS API-key view uses shared progress presentation through form snapshot" \
+  'snapshot\.(controlPresentation|visibleResultFeedback)|controlPresentation\.(saveRuntimeAction|isVerificationProgressVisible|verifyRuntimeAction|isVerifyButtonDisabled)|effectiveSystemImageName' \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
 reject_pattern \
@@ -3844,7 +3844,7 @@ reject_pattern \
 
 reject_pattern \
   "iOS API-key view avoids shell-owned result feedback visibility gate" \
-  'iOSResultFeedback.*isKeyVerified|isKeyVerified.*iOSResultFeedback' \
+  'iOSResultFeedback.*isProviderReady|isProviderReady.*iOSResultFeedback|iOSResultFeedback.*isKeyVerified|isKeyVerified.*iOSResultFeedback' \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
 reject_pattern \
@@ -3874,7 +3874,7 @@ reject_pattern \
 
 require_pattern \
   "iOS API-key view uses shared form presentation" \
-  'apiKeyFormPresentation|VoiceInkProviderAPIKeyFormPresentation|saveButtonSystemImageName|verifyButtonSystemImageName|consoleLeadingSystemImageName|consoleTrailingSystemImageName' \
+  'snapshot\.presentation|saveButtonSystemImageName|verifyButtonSystemImageName|consoleLeadingSystemImageName|consoleTrailingSystemImageName' \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
 require_pattern \
@@ -3908,7 +3908,17 @@ require_pattern \
 
 require_pattern \
   "shared provider access snapshot lives in VoiceInkCore" \
-  'VoiceInkProviderAccessSnapshot|modeFormProviderAvailability|apiKeyListRows|availableProviders' \
+  'VoiceInkProviderAccessSnapshot|isProviderReady|modeFormProviderAvailability|apiKeyListRows|availableProviders' \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift
+
+require_pattern \
+  "shared provider API-key form snapshot lives in VoiceInkCore" \
+  'VoiceInkProviderAPIKeyFormSnapshot|apiKeyFormSnapshot|loadedFormState|storedKeyEditPlan|verificationStartPlan|isProviderReady' \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift
+
+reject_pattern \
+  "shared provider access snapshot avoids misleading key-verified naming" \
+  'func +isKeyVerified\(' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift
 
 require_pattern \
@@ -3970,6 +3980,15 @@ require_pattern \
   "core checks execute provider access snapshot test" \
   'ProviderAccessRequirementTests\.testProviderAccessSnapshotBuildsIOSAccessSurfacesFromLocalModelFact' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_patterns \
+  "core checks execute provider API-key form snapshot tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'ProviderAccessRequirementTests\.testProviderAccessSnapshotUsesProviderReadyNaming' \
+  'ProviderAccessRequirementTests\.testProviderAccessSnapshotBuildsProviderAPIKeyFormSnapshot' \
+  'ProviderAccessRequirementTests\.testProviderAPIKeyFormSnapshotBuildsLoadedFormStateFromProviderReadiness' \
+  'ProviderAccessRequirementTests\.testProviderAPIKeyFormSnapshotBuildsStoredKeyEditPlanFromStoredKey' \
+  'ProviderAccessRequirementTests\.testProviderAPIKeyFormSnapshotBuildsVerificationStartPlanFromRuntimeKey'
 
 require_pattern \
   "shared provider API-key storage lives in VoiceInkCore" \
@@ -4043,7 +4062,7 @@ require_multiline_pattern \
 
 reject_pattern \
   "iOS app settings avoids shell-owned provider access derivation" \
-  'apiKeyState\.(isReady|listRows|availableProviders)|func +isKeyVerified\(|func +apiKeyListRows\(|var +modeFormProviderAvailability' \
+  'apiKeyState\.(isReady|listRows|availableProviders)|func +isProviderReady\(|func +isKeyVerified\(|func +apiKeyListRows\(|var +modeFormProviderAvailability' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \
@@ -4052,8 +4071,13 @@ require_pattern \
   iOS/VoiceInk-ios/APIKeysView.swift
 
 require_pattern \
-  "iOS provider API-key form reads shared verification state directly" \
-  'settings\.providerAccess\.isKeyVerified' \
+  "iOS provider API-key form consumes shared form snapshot" \
+  'settings\.providerAccess\.apiKeyFormSnapshot|snapshot\.(controlPresentation|storedKeyPresentation|visibleResultFeedback|storedKeyEditPlan|loadedFormState)' \
+  iOS/VoiceInk-ios/ProviderAPIKeyView.swift
+
+reject_pattern \
+  "iOS provider API-key form avoids shell-owned provider key snapshot derivation" \
+  'provider\.apiKeyFormPresentation|settings\.(apiKey|storedAPIKey)\(|settings\.providerAccess\.is(KeyVerified|ProviderReady)|apiKeyFormState\.(iOSControlPresentation|iOSStoredKeyPresentation|iOSStoredKeyEditPlan|iOSVisibleResultFeedback)|\.loaded\(storedKey:' \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
 
 reject_pattern \

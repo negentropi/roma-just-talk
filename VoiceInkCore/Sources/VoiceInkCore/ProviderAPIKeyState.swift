@@ -26,6 +26,58 @@ public struct VoiceInkProviderAPIKeyListRow: Identifiable, Equatable, Sendable {
     }
 }
 
+public struct VoiceInkProviderAPIKeyFormSnapshot: Equatable, Sendable {
+    public let provider: VoiceInkProviderKind
+    public let presentation: VoiceInkProviderAPIKeyFormPresentation
+    public let isProviderReady: Bool
+    public let isEditing: Bool
+    public let enteredKey: String
+    public let controlPresentation: VoiceInkProviderAPIKeyFormControlPresentation
+    public let storedKeyPresentation: VoiceInkProviderAPIKeyStoredKeyPresentation?
+    public let visibleResultFeedback: VoiceInkProviderAPIKeyVerificationFeedback?
+
+    private let formState: VoiceInkProviderAPIKeyFormState
+    private let storedKey: String
+    private let storedRuntimeKey: String?
+
+    fileprivate init(
+        provider: VoiceInkProviderKind,
+        formState: VoiceInkProviderAPIKeyFormState,
+        storedKey: String,
+        storedRuntimeKey: String?,
+        isProviderReady: Bool
+    ) {
+        self.provider = provider
+        self.presentation = provider.apiKeyFormPresentation
+        self.isProviderReady = isProviderReady
+        self.isEditing = formState.isEditing
+        self.enteredKey = formState.enteredKey
+        self.controlPresentation = formState.iOSControlPresentation(storedRuntimeKey: storedRuntimeKey)
+        self.storedKeyPresentation = formState.iOSStoredKeyPresentation(storedKey: storedKey)
+        self.visibleResultFeedback = formState.iOSVisibleResultFeedback(isProviderReady: isProviderReady)
+        self.formState = formState
+        self.storedKey = storedKey
+        self.storedRuntimeKey = storedRuntimeKey
+    }
+
+    public var loadedFormState: VoiceInkProviderAPIKeyFormState {
+        .loaded(storedKey: storedKey, isVerified: isProviderReady)
+    }
+
+    public var storedKeyEditPlan: VoiceInkProviderAPIKeyEditPlan {
+        formState.iOSStoredKeyEditPlan(storedKey: storedKey)
+    }
+
+    public func verificationStartPlan(
+        missingCandidatePolicy: VoiceInkProviderAPIKeyMissingVerificationCandidatePolicy
+    ) -> VoiceInkProviderAPIKeyVerificationStartPlan {
+        formState.verificationStartPlan(
+            storedRuntimeKey: storedRuntimeKey,
+            missingCandidatePolicy: missingCandidatePolicy
+        )
+    }
+}
+
 private struct VoiceInkProviderAPIKeyStorageMutationPlan: Equatable, Sendable {
     let shouldPersistStoredKey: Bool
     let verificationFlagToPersist: Bool?
@@ -342,7 +394,7 @@ public struct VoiceInkProviderAccessSnapshot: Equatable, Sendable {
         self.localWhisperModelAvailable = localWhisperModelAvailable
     }
 
-    public func isKeyVerified(for provider: VoiceInkProviderKind) -> Bool {
+    public func isProviderReady(for provider: VoiceInkProviderKind) -> Bool {
         apiKeyState.isReady(
             for: provider,
             localWhisperModelAvailable: localWhisperModelAvailable
@@ -364,6 +416,19 @@ public struct VoiceInkProviderAccessSnapshot: Equatable, Sendable {
         VoiceInkModeFormProviderAvailability(
             transcriptionProviders: availableProviders(for: .transcription),
             postProcessingProviders: availableProviders(for: .postProcessing)
+        )
+    }
+
+    public func apiKeyFormSnapshot(
+        for provider: VoiceInkProviderKind,
+        formState: VoiceInkProviderAPIKeyFormState
+    ) -> VoiceInkProviderAPIKeyFormSnapshot {
+        VoiceInkProviderAPIKeyFormSnapshot(
+            provider: provider,
+            formState: formState,
+            storedKey: apiKeyState.storedAPIKey(for: provider),
+            storedRuntimeKey: apiKeyState.runtimeAPIKey(for: provider),
+            isProviderReady: isProviderReady(for: provider)
         )
     }
 }

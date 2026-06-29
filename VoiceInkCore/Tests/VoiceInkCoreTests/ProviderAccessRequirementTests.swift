@@ -553,16 +553,16 @@ final class ProviderAccessRequirementTests: XCTestCase {
     func testProviderAPIKeyFormStateOwnsIOSResultFeedbackVisibility() {
         XCTAssertNil(
             VoiceInkProviderAPIKeyFormState(verificationProgress: .idle)
-                .iOSVisibleResultFeedback(isKeyVerified: false)
+                .iOSVisibleResultFeedback(isProviderReady: false)
         )
         XCTAssertEqual(
             VoiceInkProviderAPIKeyFormState(verificationProgress: .success)
-                .iOSVisibleResultFeedback(isKeyVerified: false),
+                .iOSVisibleResultFeedback(isProviderReady: false),
             VoiceInkProviderAPIKeyVerificationProgress.iOSVerifiedKeyFeedback
         )
         XCTAssertEqual(
             VoiceInkProviderAPIKeyFormState(verificationProgress: .failure(message: "Forbidden"))
-                .iOSVisibleResultFeedback(isKeyVerified: false),
+                .iOSVisibleResultFeedback(isProviderReady: false),
             VoiceInkProviderAPIKeyVerificationFeedback(
                 text: "Verification failed",
                 systemImageName: "xmark.seal",
@@ -571,7 +571,7 @@ final class ProviderAccessRequirementTests: XCTestCase {
         )
         XCTAssertNil(
             VoiceInkProviderAPIKeyFormState(verificationProgress: .success)
-                .iOSVisibleResultFeedback(isKeyVerified: true)
+                .iOSVisibleResultFeedback(isProviderReady: true)
         )
     }
 
@@ -821,6 +821,42 @@ final class ProviderAccessRequirementTests: XCTestCase {
         )
     }
 
+    func testProviderAccessSnapshotUsesProviderReadyNaming() {
+        let readyKeyState = VoiceInkProviderAPIKeyState(
+            storedKeysByProvider: [.groq: "groq-key"],
+            verifiedProviders: [.groq]
+        )
+        let blankVerifiedKeyState = VoiceInkProviderAPIKeyState(
+            storedKeysByProvider: [.groq: " \n\t "],
+            verifiedProviders: [.groq]
+        )
+
+        XCTAssertTrue(
+            VoiceInkProviderAccessSnapshot(
+                apiKeyState: readyKeyState,
+                localWhisperModelAvailable: false
+            ).isProviderReady(for: .groq)
+        )
+        XCTAssertFalse(
+            VoiceInkProviderAccessSnapshot(
+                apiKeyState: blankVerifiedKeyState,
+                localWhisperModelAvailable: false
+            ).isProviderReady(for: .groq)
+        )
+        XCTAssertTrue(
+            VoiceInkProviderAccessSnapshot(
+                apiKeyState: readyKeyState,
+                localWhisperModelAvailable: true
+            ).isProviderReady(for: .localWhisper)
+        )
+        XCTAssertFalse(
+            VoiceInkProviderAccessSnapshot(
+                apiKeyState: readyKeyState,
+                localWhisperModelAvailable: false
+            ).isProviderReady(for: .localWhisper)
+        )
+    }
+
     func testProviderAccessSnapshotBuildsIOSAccessSurfacesFromLocalModelFact() {
         let state = VoiceInkProviderAPIKeyState(
             storedKeysByProvider: [.groq: "groq-key"],
@@ -835,9 +871,9 @@ final class ProviderAccessRequirementTests: XCTestCase {
             localWhisperModelAvailable: false
         )
 
-        XCTAssertTrue(snapshotWithLocalModel.isKeyVerified(for: .groq))
-        XCTAssertTrue(snapshotWithLocalModel.isKeyVerified(for: .localWhisper))
-        XCTAssertFalse(snapshotWithoutLocalModel.isKeyVerified(for: .localWhisper))
+        XCTAssertTrue(snapshotWithLocalModel.isProviderReady(for: .groq))
+        XCTAssertTrue(snapshotWithLocalModel.isProviderReady(for: .localWhisper))
+        XCTAssertFalse(snapshotWithoutLocalModel.isProviderReady(for: .localWhisper))
         XCTAssertEqual(snapshotWithLocalModel.apiKeyListRows().map(\.provider), VoiceInkProviderKind.userAPIKeyProviders)
         XCTAssertEqual(
             snapshotWithLocalModel.availableProviders(for: .transcription),
@@ -855,6 +891,122 @@ final class ProviderAccessRequirementTests: XCTestCase {
             snapshotWithLocalModel.modeFormProviderAvailability.postProcessingProviders,
             [.groq]
         )
+    }
+
+    func testProviderAccessSnapshotBuildsProviderAPIKeyFormSnapshot() {
+        let state = VoiceInkProviderAPIKeyState(
+            storedKeysByProvider: [.groq: " groq-key "],
+            verifiedProviders: [.groq]
+        )
+        let accessSnapshot = VoiceInkProviderAccessSnapshot(
+            apiKeyState: state,
+            localWhisperModelAvailable: false
+        )
+        let formState = VoiceInkProviderAPIKeyFormState(
+            enteredKey: " draft-key ",
+            verificationProgress: .success,
+            isEditing: true
+        )
+        let formSnapshot = accessSnapshot.apiKeyFormSnapshot(
+            for: .groq,
+            formState: formState
+        )
+
+        XCTAssertEqual(formSnapshot.provider, .groq)
+        XCTAssertEqual(formSnapshot.presentation, .make(for: .groq))
+        XCTAssertTrue(formSnapshot.isProviderReady)
+        XCTAssertTrue(formSnapshot.isEditing)
+        XCTAssertEqual(formSnapshot.enteredKey, " draft-key ")
+        XCTAssertFalse(formSnapshot.controlPresentation.isSaveButtonDisabled)
+        XCTAssertFalse(formSnapshot.controlPresentation.isVerifyButtonDisabled)
+        XCTAssertNil(formSnapshot.storedKeyPresentation)
+        XCTAssertNil(formSnapshot.visibleResultFeedback)
+    }
+
+    func testProviderAPIKeyFormSnapshotBuildsLoadedFormStateFromProviderReadiness() {
+        let blankVerifiedState = VoiceInkProviderAPIKeyState(
+            storedKeysByProvider: [.groq: " \n\t "],
+            verifiedProviders: [.groq]
+        )
+        let formSnapshot = VoiceInkProviderAccessSnapshot(
+            apiKeyState: blankVerifiedState,
+            localWhisperModelAvailable: false
+        ).apiKeyFormSnapshot(
+            for: .groq,
+            formState: VoiceInkProviderAPIKeyFormState()
+        )
+
+        XCTAssertFalse(formSnapshot.isProviderReady)
+        XCTAssertEqual(
+            formSnapshot.loadedFormState,
+            .loaded(storedKey: " \n\t ", isVerified: false)
+        )
+        XCTAssertTrue(formSnapshot.loadedFormState.isEditing)
+    }
+
+    func testProviderAPIKeyFormSnapshotBuildsStoredKeyEditPlanFromStoredKey() {
+        let formState = VoiceInkProviderAPIKeyFormState(isEditing: false)
+        let formSnapshot = VoiceInkProviderAccessSnapshot(
+            apiKeyState: VoiceInkProviderAPIKeyState(
+                storedKeysByProvider: [.groq: "stored-key"],
+                verifiedProviders: [.groq]
+            ),
+            localWhisperModelAvailable: false
+        ).apiKeyFormSnapshot(
+            for: .groq,
+            formState: formState
+        )
+
+        XCTAssertEqual(
+            formSnapshot.storedKeyEditPlan,
+            VoiceInkProviderAPIKeyEditPlan(
+                formState: formState.editingStoredKey("stored-key"),
+                verificationFlagToPersist: false
+            )
+        )
+    }
+
+    func testProviderAPIKeyFormSnapshotBuildsVerificationStartPlanFromRuntimeKey() {
+        let storedKeySnapshot = VoiceInkProviderAccessSnapshot(
+            apiKeyState: VoiceInkProviderAPIKeyState(storedKeysByProvider: [.groq: " stored-key "]),
+            localWhisperModelAvailable: false
+        ).apiKeyFormSnapshot(
+            for: .groq,
+            formState: VoiceInkProviderAPIKeyFormState(enteredKey: " \n\t ")
+        )
+        var verifiedCandidate: String?
+        let storedKeyResult = storedKeySnapshot
+            .verificationStartPlan(missingCandidatePolicy: .applyFailurePlan)
+            .applyRuntimeState(
+                setFormState: { state in
+                    XCTAssertEqual(state.verificationProgress, .verifying)
+                },
+                verifyCandidate: { candidate in
+                    verifiedCandidate = candidate
+                    return "verified"
+                }
+            )
+
+        XCTAssertEqual(storedKeyResult, "verified")
+        XCTAssertEqual(verifiedCandidate, "stored-key")
+
+        let missingKeySnapshot = VoiceInkProviderAccessSnapshot(
+            apiKeyState: VoiceInkProviderAPIKeyState(),
+            localWhisperModelAvailable: false
+        ).apiKeyFormSnapshot(
+            for: .groq,
+            formState: VoiceInkProviderAPIKeyFormState(enteredKey: " \n\t ")
+        )
+        let missingKeyResult = missingKeySnapshot
+            .verificationStartPlan(missingCandidatePolicy: .applyFailurePlan)
+            .applyRuntimeState(
+                setFormState: { state in
+                    XCTAssertEqual(state.verificationProgress, .failure(message: nil))
+                },
+                verifyCandidate: { _ in "unexpected" }
+            )
+
+        XCTAssertNil(missingKeyResult)
     }
 
     func testProviderAPIKeyStateBuildsListRowPresentation() {

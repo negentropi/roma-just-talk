@@ -8,17 +8,18 @@ struct ProviderAPIKeyView: View {
     @State private var apiKeyFormState = VoiceInkProviderAPIKeyFormState()
 
     var body: some View {
-        let presentation = provider.apiKeyFormPresentation
-        let isKeyVerified = settings.providerAccess.isKeyVerified(for: provider)
-        let controlPresentation = apiKeyFormState.iOSControlPresentation(
-            storedRuntimeKey: settings.apiKey(for: provider)
+        let snapshot = settings.providerAccess.apiKeyFormSnapshot(
+            for: provider,
+            formState: apiKeyFormState
         )
+        let presentation = snapshot.presentation
+        let controlPresentation = snapshot.controlPresentation
 
         Form {
             Section(header: Text(presentation.apiKeySectionTitle)) {
-                if apiKeyFormState.isEditing {
+                if snapshot.isEditing {
                     let saveAction = controlPresentation.saveRuntimeAction {
-                        settings.setAPIKey(apiKeyFormState.enteredKey, for: provider)
+                        settings.setAPIKey(snapshot.enteredKey, for: provider)
                     }
                     SecureField(presentation.apiKeyPlaceholder, text: $apiKeyFormState.enteredKey)
                         .textInputAutocapitalization(.never)
@@ -35,7 +36,12 @@ struct ProviderAPIKeyView: View {
                         if controlPresentation.isVerificationProgressVisible {
                             ProgressView().progressViewStyle(.circular)
                         } else {
-                            let verifyAction = controlPresentation.verifyRuntimeAction(verify: verifyKey)
+                            let startPlan = snapshot.verificationStartPlan(
+                                missingCandidatePolicy: .applyFailurePlan
+                            )
+                            let verifyAction = controlPresentation.verifyRuntimeAction {
+                                verifyKey(startPlan: startPlan)
+                            }
                             Button(action: verifyAction ?? {}) {
                                 Label(
                                     presentation.verifyButtonTitle,
@@ -46,20 +52,15 @@ struct ProviderAPIKeyView: View {
                         }
                     }
                 } else {
-                    if let storedKeyPresentation = apiKeyFormState.iOSStoredKeyPresentation(
-                        storedKey: settings.storedAPIKey(for: provider)
-                    ) {
+                    if let storedKeyPresentation = snapshot.storedKeyPresentation {
                         HStack {
                             let feedback = storedKeyPresentation.feedback
                             Label(feedback.text, systemImage: feedback.effectiveSystemImageName)
                                 .foregroundStyle(feedback.tone.statusColor)
                             Spacer()
                             Button(presentation.changeButtonTitle) {
-                                let editPlan = apiKeyFormState.iOSStoredKeyEditPlan(
-                                    settings.storedAPIKey(for: provider)
-                                )
-                                apiKeyFormState = editPlan.formState
-                                settings.applyProviderAPIKeyEditPlan(editPlan, for: provider)
+                                apiKeyFormState = snapshot.storedKeyEditPlan.formState
+                                settings.applyProviderAPIKeyEditPlan(snapshot.storedKeyEditPlan, for: provider)
                             }
                         }
                         if let existing = storedKeyPresentation.obfuscatedKey {
@@ -68,7 +69,7 @@ struct ProviderAPIKeyView: View {
                     }
                 }
 
-                if let feedback = apiKeyFormState.iOSVisibleResultFeedback(isKeyVerified: isKeyVerified) {
+                if let feedback = snapshot.visibleResultFeedback {
                     Label(feedback.text, systemImage: feedback.effectiveSystemImageName)
                         .foregroundStyle(feedback.tone.statusColor)
                 }
@@ -89,22 +90,15 @@ struct ProviderAPIKeyView: View {
         .navigationTitle(presentation.navigationTitle)
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
-            apiKeyFormState = .loaded(
-                storedKey: settings.storedAPIKey(for: provider),
-                isVerified: settings.providerAccess.isKeyVerified(for: provider)
-            )
+            apiKeyFormState = snapshot.loadedFormState
         }
         .onChange(of: apiKeyFormState.enteredKey) { _, _ in
             apiKeyFormState = apiKeyFormState.keyEdited()
         }
     }
 
-    private func verifyKey() {
+    private func verifyKey(startPlan: VoiceInkProviderAPIKeyVerificationStartPlan) {
         Task {
-            let startPlan = apiKeyFormState.verificationStartPlan(
-                storedRuntimeKey: settings.apiKey(for: provider),
-                missingCandidatePolicy: .applyFailurePlan
-            )
             guard let result = await startPlan.applyRuntimeState(
                 setFormState: { apiKeyFormState = $0 },
                 verifyCandidate: { keyToVerify in

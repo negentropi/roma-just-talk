@@ -574,8 +574,8 @@ public struct VoiceInkProviderAPIKeyFormState: Equatable, Sendable {
         )
     }
 
-    public func iOSVisibleResultFeedback(isKeyVerified: Bool) -> VoiceInkProviderAPIKeyVerificationFeedback? {
-        guard !isKeyVerified else {
+    public func iOSVisibleResultFeedback(isProviderReady: Bool) -> VoiceInkProviderAPIKeyVerificationFeedback? {
+        guard !isProviderReady else {
             return nil
         }
 

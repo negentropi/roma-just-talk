@@ -7569,7 +7569,8 @@ reject_pattern \
   "platform filler-word storage avoids shell-owned changed-list comparison" \
   'if let updatedWords = plan\.updatedWordsIfChanged|fillerWords != plan\.updatedWords|fillerWords = plan\.updatedWords' \
   VoiceInk/Transcription/Processing/FillerWordManager.swift \
-  iOS/VoiceInk-ios/AppSettings.swift
+  iOS/VoiceInk-ios/AppSettings.swift \
+  iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \
   "macOS filler-word view consumes shared draft state submission result" \
@@ -8327,7 +8328,7 @@ require_patterns \
 
 reject_pattern \
   "iOS dictionary adapters avoid shell-owned changed-list comparison" \
-  'guard let updated(Words|Terms|Rules)|updatedFillerWordsIfChanged|updatedCustomVocabularyTermsIfChanged|updatedWordReplacementsIfChanged|let updated(Rules|Terms) = plan\.applying|if let updated(Rules|Terms) = plan\.updated|wordReplacements != updatedRules|customVocabularyTerms != updatedTerms' \
+  'guard let updated(Words|Terms|Rules)|updated(FillerWords|CustomVocabularyTerms|WordReplacements)IfChanged|updated(Words|Rules)IfChanged|plan\.applying|plan\.updated(Words|Rules)|settings\.(fillerWords|customVocabularyTerms|wordReplacements) !=|customVocabularyTerms != updatedTerms|wordReplacements != updatedRules' \
   iOS/VoiceInk-ios/AppSettings.swift \
   iOS/VoiceInk-ios/SettingsView.swift
 

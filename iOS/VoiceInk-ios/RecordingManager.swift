@@ -29,10 +29,6 @@ final class RecordingManager: ObservableObject {
         flowState.isRecordingSheetPresented
     }
 
-    var isRecording: Bool {
-        recordingState.isActivelyRecording
-    }
-
     var currentDuration: TimeInterval {
         flowState.currentDuration
     }

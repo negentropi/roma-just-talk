@@ -1384,9 +1384,20 @@ reject_pattern \
   '!VoiceInkRecorderStylePreference\.hasVisibleRecorder\(rawValue: recorderType\)|activeSessionToggleAction\(for:' \
   VoiceInk/Transcription/Engine/RecorderUIManager.swift
 
-require_pattern \
-  "iOS recording manager uses shared active-recording predicate" \
-  'recordingState\.isActivelyRecording' \
+reject_multiline_pattern \
+  "iOS recording manager avoids shallow active-recording wrapper" \
+  'var[[:space:]]+isRecording[[:space:]]*:[[:space:]]*Bool[[:space:]]*\{[[:space:]]*recordingState\.isActivelyRecording' \
+  iOS/VoiceInk-ios/RecordingManager.swift
+
+reject_swift_pattern \
+  "iOS app and keyboard avoid RecordingManager.isRecording call sites" \
+  '\b(RecordingManager|recordingManager)\.isRecording\b' \
+  iOS/VoiceInk-ios \
+  iOS/VoiceInkKeyboard
+
+reject_pattern \
+  "iOS recording manager avoids self.isRecording alias call sites" \
+  '\bself\.isRecording\b' \
   iOS/VoiceInk-ios/RecordingManager.swift
 
 require_pattern \

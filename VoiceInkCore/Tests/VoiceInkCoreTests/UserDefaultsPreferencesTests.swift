@@ -3009,6 +3009,7 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             XCTAssertEqual(modes.first?.name, "Legacy VoiceInk")
             XCTAssertEqual(modes.first?.transcriptionProvider, .localWhisper)
             XCTAssertEqual(modes.first?.transcriptionModel, VoiceInkTranscriptionModelCatalog.localBaseModel)
+            XCTAssertEqual(modes.first?.isPostProcessingEnabled, false)
             XCTAssertEqual(modes.first?.postProcessingProvider, .groq)
             XCTAssertEqual(modes.first?.postProcessingModel, groqDefaultModel)
             XCTAssertEqual(modes.last?.transcriptionProvider, .deepgram)

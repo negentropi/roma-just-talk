@@ -447,6 +447,7 @@ public struct Mode: Identifiable, Codable {
 
         let postProcessingProviderValue = try container.decode(String.self, forKey: .postProcessingProvider)
         if Self.isLegacyVoiceInkProviderValue(postProcessingProviderValue) {
+            isPostProcessingEnabled = false
             postProcessingProvider = .groq
             postProcessingModel = VoiceInkAIModelCatalog.defaultModel(for: .groq)
         } else {

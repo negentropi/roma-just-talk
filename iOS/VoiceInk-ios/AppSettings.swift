@@ -216,66 +216,6 @@ final class AppSettings: ObservableObject {
         modes = VoiceInkModeListPolicy.removing(at: offsets, from: modes)
     }
 
-    func applyFillerWordSubmissionPlan(_ plan: VoiceInkFillerWordSubmissionPlan) {
-        plan.applyRuntimeState(currentWords: fillerWords) { fillerWords = $0 }
-    }
-
-    func removeFillerWords(at offsets: IndexSet) {
-        fillerWords = VoiceInkFillerWords.removing(at: offsets, from: fillerWords)
-    }
-
-    func applyWordReplacementSubmissionPlan(_ plan: VoiceInkWordReplacementSubmissionPlan) {
-        plan.applyRuntimeState(currentRules: wordReplacements) { wordReplacements = $0 }
-    }
-
-    func sortedWordReplacements(
-        mode: VoiceInkWordReplacementSortMode
-    ) -> [VoiceInkWordReplacementRule] {
-        VoiceInkDictionaryListSortPolicy.sortedWordReplacements(
-            wordReplacements,
-            mode: mode,
-            originalText: { $0.originalText },
-            replacementText: { $0.replacementText }
-        )
-    }
-
-    func removeWordReplacements(
-        atSortedOffsets offsets: IndexSet,
-        mode: VoiceInkWordReplacementSortMode
-    ) {
-        wordReplacements = VoiceInkDictionaryListSortPolicy.removingWordReplacements(
-            atSortedOffsets: offsets,
-            from: wordReplacements,
-            mode: mode,
-            originalText: { $0.originalText },
-            replacementText: { $0.replacementText }
-        )
-    }
-
-    func applyCustomVocabularySubmissionPlan(_ plan: VoiceInkVocabularySubmissionPlan) {
-        plan.applyRuntimeState(currentWords: customVocabularyTerms) { customVocabularyTerms = $0 }
-    }
-
-    func sortedCustomVocabularyTerms(mode: VoiceInkVocabularySortMode) -> [String] {
-        VoiceInkDictionaryListSortPolicy.sortedVocabulary(
-            customVocabularyTerms,
-            mode: mode,
-            word: { $0 }
-        )
-    }
-
-    func removeCustomVocabularyTerms(
-        atSortedOffsets offsets: IndexSet,
-        mode: VoiceInkVocabularySortMode
-    ) {
-        customVocabularyTerms = VoiceInkDictionaryListSortPolicy.removingVocabulary(
-            atSortedOffsets: offsets,
-            from: customVocabularyTerms,
-            mode: mode,
-            word: { $0 }
-        )
-    }
-
     var availableTranscriptionLanguages: [String: String] {
         modes.transcriptionLanguages(selectedModeId: selectedModeId)
     }

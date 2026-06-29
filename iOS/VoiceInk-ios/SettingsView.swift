@@ -22,6 +22,7 @@ struct SettingsView: View {
     }
     
     var body: some View {
+        let dictionarySnapshot = self.dictionarySnapshot
         let fillerWordEditorPresentation = VoiceInkFillerWords.editorPresentation(
             isEnabled: settings.removeFillerWords,
             words: settings.fillerWords
@@ -111,7 +112,9 @@ struct SettingsView: View {
                         ForEach(settings.fillerWords, id: \.self) { word in
                             Text(word)
                         }
-                        .onDelete(perform: settings.removeFillerWords)
+                        .onDelete { offsets in
+                            settings.fillerWords = dictionarySnapshot.removingFillerWords(at: offsets)
+                        }
                     }
                 }
             }
@@ -129,11 +132,13 @@ struct SettingsView: View {
                     .disabled(!customVocabularyDraftState.canSubmit)
                 }
 
-                ForEach(settings.sortedCustomVocabularyTerms(mode: vocabularySortMode), id: \.self) { term in
+                ForEach(dictionarySnapshot.sortedCustomVocabularyTerms, id: \.self) { term in
                     Text(term)
                 }
                 .onDelete { offsets in
-                    settings.removeCustomVocabularyTerms(atSortedOffsets: offsets, mode: vocabularySortMode)
+                    settings.customVocabularyTerms = dictionarySnapshot.removingCustomVocabularyTerms(
+                        atSortedOffsets: offsets
+                    )
                 }
 
                 TextField(dictionaryPresentation.originalTextPlaceholder, text: $wordReplacementDraftState.original)
@@ -154,7 +159,7 @@ struct SettingsView: View {
                 }
                 .disabled(!wordReplacementDraftState.canSubmit)
 
-                ForEach(Array(settings.sortedWordReplacements(mode: wordReplacementSortMode).enumerated()), id: \.offset) { _, rule in
+                ForEach(Array(dictionarySnapshot.sortedWordReplacements.enumerated()), id: \.offset) { _, rule in
                     HStack(spacing: 8) {
                         Text(rule.originalText)
                         Image(systemName: dictionaryPresentation.wordReplacementArrowSystemImageName)
@@ -164,7 +169,9 @@ struct SettingsView: View {
                     }
                 }
                 .onDelete { offsets in
-                    settings.removeWordReplacements(atSortedOffsets: offsets, mode: wordReplacementSortMode)
+                    settings.wordReplacements = dictionarySnapshot.removingWordReplacements(
+                        atSortedOffsets: offsets
+                    )
                 }
             }
             
@@ -224,31 +231,57 @@ struct SettingsView: View {
         }
     }
 
+    private var dictionarySnapshot: VoiceInkDictionarySettingsSnapshot {
+        VoiceInkDictionarySettingsSnapshot(
+            fillerWords: settings.fillerWords,
+            customVocabularyTerms: settings.customVocabularyTerms,
+            wordReplacements: settings.wordReplacements,
+            vocabularySortMode: vocabularySortMode,
+            wordReplacementSortMode: wordReplacementSortMode
+        )
+    }
+
     private func addFillerWord() {
-        fillerWordDraftState
-            .submitting(existingWords: settings.fillerWords)
+        let snapshot = dictionarySnapshot
+        snapshot
+            .fillerWordSubmission(fillerWordDraftState)
             .applyRuntimeState(
-                applyPlan: { settings.applyFillerWordSubmissionPlan($0) },
+                applyPlan: { plan in
+                    guard let updatedWords = snapshot.updatedFillerWordsIfChanged(afterApplying: plan) else { return }
+                    settings.fillerWords = updatedWords
+                },
                 setDraftState: { fillerWordDraftState = $0 },
                 setAlertPresentation: { dictionaryAlert = $0 }
             )
     }
 
     private func addCustomVocabularyTerm() {
-        customVocabularyDraftState
-            .submitting(existingWords: settings.customVocabularyTerms)
+        let snapshot = dictionarySnapshot
+        snapshot
+            .customVocabularySubmission(customVocabularyDraftState)
             .applyRuntimeState(
-                applyPlan: { settings.applyCustomVocabularySubmissionPlan($0) },
+                applyPlan: { plan in
+                    guard let updatedTerms = snapshot.updatedCustomVocabularyTermsIfChanged(afterApplying: plan) else {
+                        return
+                    }
+                    settings.customVocabularyTerms = updatedTerms
+                },
                 setDraftState: { customVocabularyDraftState = $0 },
                 setAlertPresentation: { dictionaryAlert = $0 }
             )
     }
 
     private func submitWordReplacement() {
-        wordReplacementDraftState
-            .submitting(existingRules: settings.wordReplacements)
+        let snapshot = dictionarySnapshot
+        snapshot
+            .wordReplacementSubmission(wordReplacementDraftState)
             .applyRuntimeState(
-                applyPlan: { settings.applyWordReplacementSubmissionPlan($0) },
+                applyPlan: { plan in
+                    guard let updatedRules = snapshot.updatedWordReplacementsIfChanged(afterApplying: plan) else {
+                        return
+                    }
+                    settings.wordReplacements = updatedRules
+                },
                 setDraftState: { wordReplacementDraftState = $0 },
                 setAlertPresentation: { dictionaryAlert = $0 }
             )

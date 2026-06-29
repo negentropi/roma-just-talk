@@ -363,6 +363,126 @@ final class DictionaryPolicyTests: XCTestCase {
         )
     }
 
+    func testDictionarySettingsSnapshotBuildsDisplayedRows() {
+        let snapshot = VoiceInkDictionarySettingsSnapshot(
+            fillerWords: ["uh"],
+            customVocabularyTerms: ["zeta", "Alpha", "beta"],
+            wordReplacements: [
+                VoiceInkWordReplacementRule(originalText: "voice ink", replacementText: "VoiceInk"),
+                VoiceInkWordReplacementRule(originalText: "roma", replacementText: "Roma Just Talk"),
+                VoiceInkWordReplacementRule(originalText: "alpha", replacementText: "Zed")
+            ],
+            vocabularySortMode: .wordAscending,
+            wordReplacementSortMode: .replacementDescending
+        )
+
+        XCTAssertEqual(snapshot.sortedCustomVocabularyTerms, ["Alpha", "beta", "zeta"])
+        XCTAssertEqual(snapshot.sortedWordReplacements.map(\.replacementText), ["Zed", "VoiceInk", "Roma Just Talk"])
+    }
+
+    func testDictionarySettingsSnapshotDeletesDisplayedRowsThroughOriginalStorageOrder() {
+        let snapshot = VoiceInkDictionarySettingsSnapshot(
+            fillerWords: ["uh", "um", "hmm"],
+            customVocabularyTerms: ["zeta", "Alpha", "beta", "delta"],
+            wordReplacements: [
+                VoiceInkWordReplacementRule(originalText: "voice ink", replacementText: "VoiceInk"),
+                VoiceInkWordReplacementRule(originalText: "roma", replacementText: "Roma Just Talk"),
+                VoiceInkWordReplacementRule(originalText: "alpha", replacementText: "Zed")
+            ],
+            vocabularySortMode: .wordAscending,
+            wordReplacementSortMode: .replacementDescending
+        )
+
+        XCTAssertEqual(snapshot.removingFillerWords(at: IndexSet([1])), ["uh", "hmm"])
+        XCTAssertEqual(
+            snapshot.removingCustomVocabularyTerms(atSortedOffsets: IndexSet([0, 2])),
+            ["zeta", "beta"]
+        )
+        XCTAssertEqual(
+            snapshot.removingWordReplacements(atSortedOffsets: IndexSet([0])),
+            [
+                VoiceInkWordReplacementRule(originalText: "voice ink", replacementText: "VoiceInk"),
+                VoiceInkWordReplacementRule(originalText: "roma", replacementText: "Roma Just Talk")
+            ]
+        )
+    }
+
+    func testDictionarySettingsSnapshotSubmitsAndAppliesDrafts() {
+        let snapshot = VoiceInkDictionarySettingsSnapshot(
+            fillerWords: ["uh"],
+            customVocabularyTerms: ["voice ink"],
+            wordReplacements: [
+                VoiceInkWordReplacementRule(originalText: "cursor", replacementText: "Cursor")
+            ],
+            vocabularySortMode: .wordAscending,
+            wordReplacementSortMode: .originalAscending
+        )
+
+        let fillerWordSubmission = snapshot.fillerWordSubmission(
+            VoiceInkFillerWordDraftState(draft: " Ah ")
+        )
+        XCTAssertEqual(
+            snapshot.updatedFillerWordsIfChanged(afterApplying: fillerWordSubmission.plan),
+            ["uh", "ah"]
+        )
+        XCTAssertEqual(snapshot.applyingFillerWordSubmission(fillerWordSubmission.plan), ["uh", "ah"])
+
+        let vocabularySubmission = snapshot.customVocabularySubmission(
+            VoiceInkVocabularyDraftState(draft: "Roma, voice ink")
+        )
+        XCTAssertEqual(
+            snapshot.updatedCustomVocabularyTermsIfChanged(afterApplying: vocabularySubmission.plan),
+            ["voice ink", "Roma"]
+        )
+        XCTAssertEqual(
+            snapshot.applyingCustomVocabularySubmission(vocabularySubmission.plan),
+            ["voice ink", "Roma"]
+        )
+
+        let wordReplacementSubmission = snapshot.wordReplacementSubmission(
+            VoiceInkWordReplacementDraftState(original: "Roma", replacement: "Roma Just Talk")
+        )
+        XCTAssertEqual(
+            snapshot.updatedWordReplacementsIfChanged(afterApplying: wordReplacementSubmission.plan),
+            [
+                VoiceInkWordReplacementRule(originalText: "cursor", replacementText: "Cursor"),
+                VoiceInkWordReplacementRule(originalText: "Roma", replacementText: "Roma Just Talk")
+            ]
+        )
+        XCTAssertEqual(
+            snapshot.applyingWordReplacementSubmission(wordReplacementSubmission.plan),
+            [
+                VoiceInkWordReplacementRule(originalText: "cursor", replacementText: "Cursor"),
+                VoiceInkWordReplacementRule(originalText: "Roma", replacementText: "Roma Just Talk")
+            ]
+        )
+    }
+
+    func testDictionarySettingsSnapshotKeepsListsWhenDraftsDoNotChangeStorage() {
+        let snapshot = VoiceInkDictionarySettingsSnapshot(
+            fillerWords: ["uh"],
+            customVocabularyTerms: ["voice ink"],
+            wordReplacements: [
+                VoiceInkWordReplacementRule(originalText: "roma", replacementText: "Roma Just Talk")
+            ],
+            vocabularySortMode: .wordAscending,
+            wordReplacementSortMode: .originalAscending
+        )
+
+        let duplicateFillerWord = snapshot.fillerWordSubmission(VoiceInkFillerWordDraftState(draft: "UH"))
+        let duplicateVocabulary = snapshot.customVocabularySubmission(VoiceInkVocabularyDraftState(draft: "Voice Ink"))
+        let duplicateReplacement = snapshot.wordReplacementSubmission(
+            VoiceInkWordReplacementDraftState(original: "Roma", replacement: "RJT")
+        )
+
+        XCTAssertNil(snapshot.updatedFillerWordsIfChanged(afterApplying: duplicateFillerWord.plan))
+        XCTAssertNil(snapshot.updatedCustomVocabularyTermsIfChanged(afterApplying: duplicateVocabulary.plan))
+        XCTAssertNil(snapshot.updatedWordReplacementsIfChanged(afterApplying: duplicateReplacement.plan))
+        XCTAssertEqual(snapshot.applyingFillerWordSubmission(duplicateFillerWord.plan), snapshot.fillerWords)
+        XCTAssertEqual(snapshot.applyingCustomVocabularySubmission(duplicateVocabulary.plan), snapshot.customVocabularyTerms)
+        XCTAssertEqual(snapshot.applyingWordReplacementSubmission(duplicateReplacement.plan), snapshot.wordReplacements)
+    }
+
     func testVocabularyDraftUsesSharedTokenPolicy() {
         XCTAssertFalse(VoiceInkDictionaryPolicy.hasVocabularyDraft(" , \n "))
         XCTAssertTrue(VoiceInkDictionaryPolicy.hasVocabularyDraft("Voice Ink, "))

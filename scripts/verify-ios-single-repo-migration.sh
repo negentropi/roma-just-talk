@@ -7546,14 +7546,14 @@ require_pattern \
   VoiceInk/Transcription/Processing/FillerWordManager.swift
 
 require_pattern \
-  "iOS filler-word storage receives shared submission plan" \
-  'func applyFillerWordSubmissionPlan\(_ plan: VoiceInkFillerWordSubmissionPlan\)' \
-  iOS/VoiceInk-ios/AppSettings.swift
+  "iOS filler-word settings uses shared dictionary snapshot submission plan" \
+  'fillerWordSubmission\(fillerWordDraftState\)' \
+  iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \
-  "iOS filler-word storage applies shared updated words" \
-  'plan\.applyRuntimeState\(currentWords: fillerWords\)' \
-  iOS/VoiceInk-ios/AppSettings.swift
+  "iOS filler-word settings applies shared dictionary snapshot updated words" \
+  'updatedFillerWordsIfChanged|settings\.fillerWords = updatedWords' \
+  iOS/VoiceInk-ios/SettingsView.swift
 
 reject_pattern \
   "platform filler-word insertion avoids shell-only insert-plan unpacking" \
@@ -7574,7 +7574,7 @@ require_pattern \
 
 require_pattern \
   "iOS filler-word view consumes shared draft state submission result" \
-  'VoiceInkFillerWordDraftState|fillerWordDraftState\.submitting|applyRuntimeState' \
+  'VoiceInkFillerWordDraftState|fillerWordSubmission\(fillerWordDraftState\)|applyRuntimeState' \
   iOS/VoiceInk-ios/SettingsView.swift
 
 reject_pattern \
@@ -8241,19 +8241,29 @@ require_pattern \
   iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \
-  "iOS vocabulary submission uses shared draft state" \
-  'VoiceInkVocabularyDraftState|customVocabularyDraftState\.submitting|draftStateAfterSubmit|alertPresentation' \
+  "shared dictionary settings snapshot owns iOS settings rows and submissions" \
+  'struct VoiceInkDictionarySettingsSnapshot|sortedCustomVocabularyTerms|sortedWordReplacements|customVocabularySubmission|wordReplacementSubmission|updatedCustomVocabularyTermsIfChanged|updatedWordReplacementsIfChanged|removingCustomVocabularyTerms|removingWordReplacements' \
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
+
+require_pattern \
+  "shared dictionary settings snapshot checks run in VoiceInkCore" \
+  'testDictionarySettingsSnapshotBuildsDisplayedRows|testDictionarySettingsSnapshotDeletesDisplayedRowsThroughOriginalStorageOrder|testDictionarySettingsSnapshotSubmitsAndAppliesDrafts|testDictionarySettingsSnapshotKeepsListsWhenDraftsDoNotChangeStorage' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "iOS AppSettings avoids dictionary settings adapter wrappers" \
+  'func (applyFillerWordSubmissionPlan|removeFillerWords\(at offsets|applyWordReplacementSubmissionPlan|sortedWordReplacements|removeWordReplacements|applyCustomVocabularySubmissionPlan|sortedCustomVocabularyTerms|removeCustomVocabularyTerms)' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+require_pattern \
+  "iOS vocabulary submission uses shared snapshot and draft state" \
+  'VoiceInkVocabularyDraftState|dictionarySnapshot|customVocabularySubmission\(customVocabularyDraftState\)|draftStateAfterSubmit|alertPresentation' \
   iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \
-  "iOS vocabulary adapter receives shared submission plan" \
-  'applyCustomVocabularySubmissionPlan\(_ plan: VoiceInkVocabularySubmissionPlan\)' \
-  iOS/VoiceInk-ios/AppSettings.swift
-
-require_pattern \
-  "iOS vocabulary adapter applies shared submission result" \
-  'plan\.applyRuntimeState\(currentWords: customVocabularyTerms\)' \
-  iOS/VoiceInk-ios/AppSettings.swift
+  "iOS vocabulary submission applies shared snapshot result" \
+  'updatedCustomVocabularyTermsIfChanged|settings\.customVocabularyTerms = updatedTerms' \
+  iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \
   "iOS vocabulary settings reads shared sort preference" \
@@ -8261,28 +8271,18 @@ require_pattern \
   iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \
-  "iOS vocabulary adapter sorts through shared list policy" \
-  'VoiceInkDictionaryListSortPolicy\.sortedVocabulary' \
-  iOS/VoiceInk-ios/AppSettings.swift
-
-require_pattern \
-  "iOS vocabulary adapter deletes displayed rows through shared list policy" \
-  'VoiceInkDictionaryListSortPolicy\.removingVocabulary' \
-  iOS/VoiceInk-ios/AppSettings.swift
-
-require_pattern \
   "iOS vocabulary view renders sorted settings rows" \
-  'settings\.sortedCustomVocabularyTerms\(mode: vocabularySortMode\)' \
+  'dictionarySnapshot\.sortedCustomVocabularyTerms' \
   iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \
   "iOS vocabulary view deletes displayed sorted rows" \
-  'removeCustomVocabularyTerms\(atSortedOffsets: offsets, mode: vocabularySortMode\)' \
+  'dictionarySnapshot\.removingCustomVocabularyTerms' \
   iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \
-  "iOS word-replacement submission uses shared draft state" \
-  'VoiceInkWordReplacementDraftState|wordReplacementDraftState\.submitting|existingRules: settings\.wordReplacements|draftStateAfterSubmit|alertPresentation' \
+  "iOS word-replacement submission uses shared snapshot and draft state" \
+  'VoiceInkWordReplacementDraftState|dictionarySnapshot|wordReplacementSubmission\(wordReplacementDraftState\)|draftStateAfterSubmit|alertPresentation' \
   iOS/VoiceInk-ios/SettingsView.swift
 
 reject_pattern \
@@ -8291,19 +8291,15 @@ reject_pattern \
   iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \
-  "iOS word-replacement adapter receives shared submission plan" \
-  'applyWordReplacementSubmissionPlan\(_ plan: VoiceInkWordReplacementSubmissionPlan\)' \
-  iOS/VoiceInk-ios/AppSettings.swift
-
-require_pattern \
-  "iOS word-replacement adapter applies shared submission result" \
-  'plan\.applyRuntimeState\(currentRules: wordReplacements\)' \
-  iOS/VoiceInk-ios/AppSettings.swift
+  "iOS word-replacement submission applies shared snapshot result" \
+  'updatedWordReplacementsIfChanged|settings\.wordReplacements = updatedRules' \
+  iOS/VoiceInk-ios/SettingsView.swift
 
 reject_pattern \
   "iOS dictionary adapters avoid shell-owned changed-list comparison" \
   'let updated(Rules|Terms) = plan\.applying|if let updated(Rules|Terms) = plan\.updated|wordReplacements != updatedRules|customVocabularyTerms != updatedTerms' \
-  iOS/VoiceInk-ios/AppSettings.swift
+  iOS/VoiceInk-ios/AppSettings.swift \
+  iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \
   "iOS word-replacement settings reads shared sort preference" \
@@ -8311,23 +8307,13 @@ require_pattern \
   iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \
-  "iOS word-replacement adapter sorts through shared list policy" \
-  'VoiceInkDictionaryListSortPolicy\.sortedWordReplacements' \
-  iOS/VoiceInk-ios/AppSettings.swift
-
-require_pattern \
-  "iOS word-replacement adapter deletes displayed rows through shared list policy" \
-  'VoiceInkDictionaryListSortPolicy\.removingWordReplacements' \
-  iOS/VoiceInk-ios/AppSettings.swift
-
-require_pattern \
   "iOS word-replacement view renders sorted settings rows" \
-  'settings\.sortedWordReplacements\(mode: wordReplacementSortMode\)' \
+  'dictionarySnapshot\.sortedWordReplacements' \
   iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \
   "iOS word-replacement view deletes displayed sorted rows" \
-  'removeWordReplacements\(atSortedOffsets: offsets, mode: wordReplacementSortMode\)' \
+  'dictionarySnapshot\.removingWordReplacements' \
   iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \

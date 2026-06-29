@@ -1000,6 +1000,126 @@ public enum VoiceInkDictionaryListSortPolicy {
     }
 }
 
+public struct VoiceInkDictionarySettingsSnapshot: Equatable, Sendable {
+    public let fillerWords: [String]
+    public let customVocabularyTerms: [String]
+    public let wordReplacements: [VoiceInkWordReplacementRule]
+    public let vocabularySortMode: VoiceInkVocabularySortMode
+    public let wordReplacementSortMode: VoiceInkWordReplacementSortMode
+
+    public init(
+        fillerWords: [String],
+        customVocabularyTerms: [String],
+        wordReplacements: [VoiceInkWordReplacementRule],
+        vocabularySortMode: VoiceInkVocabularySortMode,
+        wordReplacementSortMode: VoiceInkWordReplacementSortMode
+    ) {
+        self.fillerWords = fillerWords
+        self.customVocabularyTerms = customVocabularyTerms
+        self.wordReplacements = wordReplacements
+        self.vocabularySortMode = vocabularySortMode
+        self.wordReplacementSortMode = wordReplacementSortMode
+    }
+
+    public var sortedCustomVocabularyTerms: [String] {
+        VoiceInkDictionaryListSortPolicy.sortedVocabulary(
+            customVocabularyTerms,
+            mode: vocabularySortMode,
+            word: { $0 }
+        )
+    }
+
+    public var sortedWordReplacements: [VoiceInkWordReplacementRule] {
+        VoiceInkDictionaryListSortPolicy.sortedWordReplacements(
+            wordReplacements,
+            mode: wordReplacementSortMode,
+            originalText: { $0.originalText },
+            replacementText: { $0.replacementText }
+        )
+    }
+
+    public func fillerWordSubmission(
+        _ draftState: VoiceInkFillerWordDraftState
+    ) -> VoiceInkFillerWordDraftSubmission {
+        draftState.submitting(existingWords: fillerWords)
+    }
+
+    public func customVocabularySubmission(
+        _ draftState: VoiceInkVocabularyDraftState
+    ) -> VoiceInkVocabularyDraftSubmission {
+        draftState.submitting(existingWords: customVocabularyTerms)
+    }
+
+    public func wordReplacementSubmission(
+        _ draftState: VoiceInkWordReplacementDraftState
+    ) -> VoiceInkWordReplacementDraftSubmission {
+        draftState.submitting(existingRules: wordReplacements)
+    }
+
+    public func updatedFillerWordsIfChanged(
+        afterApplying plan: VoiceInkFillerWordSubmissionPlan
+    ) -> [String]? {
+        plan.updatedWordsIfChanged(from: fillerWords)
+    }
+
+    public func updatedCustomVocabularyTermsIfChanged(
+        afterApplying plan: VoiceInkVocabularySubmissionPlan
+    ) -> [String]? {
+        plan.updatedWordsIfChanged(from: customVocabularyTerms)
+    }
+
+    public func updatedWordReplacementsIfChanged(
+        afterApplying plan: VoiceInkWordReplacementSubmissionPlan
+    ) -> [VoiceInkWordReplacementRule]? {
+        plan.updatedRulesIfChanged(from: wordReplacements)
+    }
+
+    public func applyingFillerWordSubmission(
+        _ plan: VoiceInkFillerWordSubmissionPlan
+    ) -> [String] {
+        updatedFillerWordsIfChanged(afterApplying: plan) ?? fillerWords
+    }
+
+    public func applyingCustomVocabularySubmission(
+        _ plan: VoiceInkVocabularySubmissionPlan
+    ) -> [String] {
+        updatedCustomVocabularyTermsIfChanged(afterApplying: plan) ?? customVocabularyTerms
+    }
+
+    public func applyingWordReplacementSubmission(
+        _ plan: VoiceInkWordReplacementSubmissionPlan
+    ) -> [VoiceInkWordReplacementRule] {
+        updatedWordReplacementsIfChanged(afterApplying: plan) ?? wordReplacements
+    }
+
+    public func removingFillerWords(at offsets: IndexSet) -> [String] {
+        VoiceInkFillerWords.removing(at: offsets, from: fillerWords)
+    }
+
+    public func removingCustomVocabularyTerms(
+        atSortedOffsets offsets: IndexSet
+    ) -> [String] {
+        VoiceInkDictionaryListSortPolicy.removingVocabulary(
+            atSortedOffsets: offsets,
+            from: customVocabularyTerms,
+            mode: vocabularySortMode,
+            word: { $0 }
+        )
+    }
+
+    public func removingWordReplacements(
+        atSortedOffsets offsets: IndexSet
+    ) -> [VoiceInkWordReplacementRule] {
+        VoiceInkDictionaryListSortPolicy.removingWordReplacements(
+            atSortedOffsets: offsets,
+            from: wordReplacements,
+            mode: wordReplacementSortMode,
+            originalText: { $0.originalText },
+            replacementText: { $0.replacementText }
+        )
+    }
+}
+
 public enum VoiceInkDictionaryPolicy {
     public static func hasVocabularyDraft(_ input: String) -> Bool {
         !tokens(from: input).isEmpty

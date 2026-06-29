@@ -13,14 +13,14 @@ final class AppSettings: ObservableObject {
     @Published var modes: [Mode] {
         didSet {
             VoiceInkModeStorage.saveModes(modes)
-            repairModeSettingsSelection()
+            repairSelectedTranscriptionLanguage()
         }
     }
     
     @Published var selectedModeId: UUID? {
         didSet {
             VoiceInkModeStorage.saveSelectedModeId(selectedModeId)
-            repairModeSettingsSelection()
+            repairSelectedTranscriptionLanguage()
         }
     }
     
@@ -85,7 +85,7 @@ final class AppSettings: ObservableObject {
         self.selectedTranscriptionLanguage = startupState.selectedTranscriptionLanguage
 
         observeLocalModelAvailability()
-        repairModeSettingsSelection()
+        repairSelectedTranscriptionLanguage()
     }
 
     func apiKey(for provider: VoiceInkProviderKind) -> String {
@@ -154,17 +154,7 @@ final class AppSettings: ObservableObject {
     }
 
     // MARK: - Modes Management
-    
-    private func repairModeSettingsSelection() {
-        applyModeSettingsRepairPlan(
-            VoiceInkModeSettingsPolicy.repairPlan(
-                modes: modes,
-                selectedModeId: selectedModeId,
-                selectedTranscriptionLanguage: selectedTranscriptionLanguage
-            )
-        )
-    }
-    
+
     func retranscribeStoredAudio(_ note: Transcription) async -> VoiceInkStoredAudioRetranscriptionOutcome {
         await VoiceInkStoredAudioRetranscription.retranscribeWithOutcome(
             note,
@@ -212,7 +202,13 @@ final class AppSettings: ObservableObject {
     }
 
     func repairSelectedTranscriptionLanguage() {
-        repairModeSettingsSelection()
+        applyModeSettingsRepairPlan(
+            VoiceInkModeSettingsPolicy.repairPlan(
+                modes: modes,
+                selectedModeId: selectedModeId,
+                selectedTranscriptionLanguage: selectedTranscriptionLanguage
+            )
+        )
     }
 
     private func applyModeSettingsRepairPlan(_ plan: VoiceInkModeSettingsRepairPlan) {

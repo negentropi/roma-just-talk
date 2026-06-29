@@ -1770,7 +1770,7 @@ require_patterns \
 
 reject_pattern \
   "iOS AppSettings avoids shallow transcription language pass-through" \
-  'var +availableTranscriptionLanguages\b' \
+  'var +availableTranscriptionLanguages\b|private func +repairModeSettingsSelection\(|repairSelectedTranscriptionLanguage\(\)[[:space:]]*\{[[:space:]]*repairModeSettingsSelection\(\)' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \

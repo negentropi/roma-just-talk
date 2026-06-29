@@ -1613,7 +1613,7 @@ final class AIProviderCatalogTests: XCTestCase {
         XCTAssertEqual(VoiceInkAIEnhancementProviderKind.custom.staticTextEnhancementModels, [])
     }
 
-    func testMacOSAIEnhancementAvailableModelSourcesAreShared() {
+    func testMacOSAIEnhancementAvailableModelsResolveFromRuntimeAndStaticProviders() {
         let ollamaModels = ["llama3", "mistral"]
         let openRouterModels = ["anthropic/claude-3.5-sonnet", "openai/gpt-4o"]
 
@@ -1654,29 +1654,37 @@ final class AIProviderCatalogTests: XCTestCase {
         )
     }
 
-    func testMacOSAIEnhancementModelCatalogSourcePolicyIsShared() {
-        let expectedSources: [VoiceInkAIEnhancementProviderKind: VoiceInkAIEnhancementModelCatalogSource] = [
-            .anthropic: .staticModels,
-            .assemblyAI: .staticModels,
-            .cerebras: .staticModels,
-            .custom: .none,
-            .deepgram: .staticModels,
-            .elevenLabs: .staticModels,
-            .gemini: .staticModels,
-            .groq: .staticModels,
-            .localCLI: .none,
-            .mistral: .staticModels,
-            .ollama: .ollamaRuntime,
-            .openAI: .staticModels,
-            .openRouter: .openRouterRemote,
-            .soniox: .staticModels,
-            .speechmatics: .staticModels
+    func testMacOSAIEnhancementStaticModelPickerVisibilityIsShared() {
+        let expectedVisibility: [VoiceInkAIEnhancementProviderKind: Bool] = [
+            .anthropic: true,
+            .assemblyAI: true,
+            .cerebras: true,
+            .custom: false,
+            .deepgram: true,
+            .elevenLabs: true,
+            .gemini: true,
+            .groq: true,
+            .localCLI: false,
+            .mistral: true,
+            .ollama: false,
+            .openAI: true,
+            .openRouter: false,
+            .soniox: true,
+            .speechmatics: true
         ]
 
-        XCTAssertEqual(VoiceInkAIEnhancementProviderKind.allCases.count, expectedSources.count)
+        XCTAssertEqual(VoiceInkAIEnhancementProviderKind.allCases.count, expectedVisibility.count)
 
-        for (provider, source) in expectedSources {
-            XCTAssertEqual(provider.textEnhancementModelCatalogSource, source)
+        for (provider, shouldShowPicker) in expectedVisibility {
+            XCTAssertEqual(
+                provider.shouldShowStaticTextEnhancementModelPicker(availableModels: ["model"]),
+                shouldShowPicker,
+                provider.rawValue
+            )
+            XCTAssertFalse(
+                provider.shouldShowStaticTextEnhancementModelPicker(availableModels: []),
+                provider.rawValue
+            )
         }
     }
 

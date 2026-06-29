@@ -107,8 +107,9 @@ struct APIKeyManagementView: View {
                         }
                     }
                     
-                } else if aiService.selectedProvider.textEnhancementModelCatalogSource == .staticModels &&
-                            !aiService.availableModels.isEmpty {
+                } else if aiService.selectedProvider.shouldShowStaticTextEnhancementModelPicker(
+                    availableModels: aiService.availableModels
+                ) {
                     Picker(providerSettingsPresentation.modelPickerTitle, selection: Binding(
                         get: { aiService.currentModel },
                         set: { aiService.selectModel($0) }

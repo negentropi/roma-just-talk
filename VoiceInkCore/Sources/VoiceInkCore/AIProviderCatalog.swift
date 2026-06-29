@@ -112,13 +112,6 @@ public struct VoiceInkAIEnhancementRequestExecutionPlan {
     }
 }
 
-public enum VoiceInkAIEnhancementModelCatalogSource: Sendable, Equatable {
-    case staticModels
-    case ollamaRuntime
-    case openRouterRemote
-    case none
-}
-
 public enum VoiceInkAIEnhancementSettingsSurface: Sendable, Equatable {
     case apiKey
     case ollama
@@ -143,7 +136,7 @@ public struct VoiceInkAIEnhancementProviderSelectionPlan: Sendable, Equatable {
     ) -> VoiceInkAIEnhancementProviderSelectionPlan {
         VoiceInkAIEnhancementProviderSelectionPlan(
             selectedProviderToSave: provider,
-            shouldRefreshOllamaRuntimeModels: provider.textEnhancementModelCatalogSource == .ollamaRuntime
+            shouldRefreshOllamaRuntimeModels: provider == .ollama
         )
     }
 }
@@ -244,7 +237,7 @@ public struct VoiceInkAIEnhancementModelSelectionPlan: Sendable, Equatable {
             selectedModels: updatedSelectedModels,
             provider: provider,
             selectedModelToSave: model,
-            ollamaModelToApply: provider.textEnhancementModelCatalogSource == .ollamaRuntime ? model : nil
+            ollamaModelToApply: provider == .ollama ? model : nil
         )
     }
 }
@@ -1169,21 +1162,8 @@ public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
         }
     }
 
-    public var textEnhancementModelCatalogSource: VoiceInkAIEnhancementModelCatalogSource {
-        switch self {
-        case .ollama:
-            return .ollamaRuntime
-        case .openRouter:
-            return .openRouterRemote
-        case .localCLI, .custom:
-            return .none
-        case .anthropic, .assemblyAI, .cerebras, .deepgram, .elevenLabs, .groq, .gemini, .mistral, .openAI, .soniox, .speechmatics:
-            return .staticModels
-        }
-    }
-
     public var supportsUserInitiatedTextEnhancementModelRefresh: Bool {
-        textEnhancementModelCatalogSource == .openRouterRemote
+        self == .openRouter
     }
 
     public var textEnhancementSettingsSurface: VoiceInkAIEnhancementSettingsSurface {
@@ -1203,15 +1183,26 @@ public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
         ollamaModels: [String],
         openRouterModels: [String]
     ) -> [String] {
-        switch textEnhancementModelCatalogSource {
-        case .ollamaRuntime:
+        switch self {
+        case .ollama:
             return ollamaModels
-        case .openRouterRemote:
+        case .openRouter:
             return openRouterModels
-        case .staticModels:
+        case .anthropic, .assemblyAI, .cerebras, .deepgram, .elevenLabs, .groq, .gemini, .mistral, .openAI, .soniox, .speechmatics:
             return staticTextEnhancementModels
-        case .none:
+        case .localCLI, .custom:
             return []
+        }
+    }
+
+    public func shouldShowStaticTextEnhancementModelPicker(availableModels: [String]) -> Bool {
+        guard !availableModels.isEmpty else { return false }
+
+        switch self {
+        case .anthropic, .assemblyAI, .cerebras, .deepgram, .elevenLabs, .groq, .gemini, .mistral, .openAI, .soniox, .speechmatics:
+            return true
+        case .custom, .localCLI, .ollama, .openRouter:
+            return false
         }
     }
 

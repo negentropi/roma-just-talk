@@ -10064,10 +10064,32 @@ require_pattern \
   'staticTextEnhancementModels' \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
-require_pattern \
+require_patterns \
   "shared AI enhancement available-model source policy lives in VoiceInkCore" \
-  'VoiceInkAIEnhancementModelCatalogSource|textEnhancementModelCatalogSource|textEnhancementAvailableModels' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift \
+  'textEnhancementAvailableModels' \
+  'shouldShowStaticTextEnhancementModelPicker'
+
+reject_pattern \
+  "shared AI enhancement available-model policy avoids public source metadata" \
+  'VoiceInkAIEnhancementModelCatalogSource|textEnhancementModelCatalogSource' \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+reject_pattern \
+  "core AI enhancement available-model coverage avoids raw source metadata assertions" \
+  'VoiceInkAIEnhancementModelCatalogSource|textEnhancementModelCatalogSource|ModelCatalogSourcePolicyIsShared|AvailableModelSourcesAreShared' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AIProviderCatalogTests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute shared AI enhancement available-model behavior coverage" \
+  'AIProviderCatalogTests\.testMacOSAIEnhancementAvailableModelsResolveFromRuntimeAndStaticProviders' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute shared AI enhancement static model-picker coverage" \
+  'AIProviderCatalogTests\.testMacOSAIEnhancementStaticModelPickerVisibilityIsShared' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "macOS AI service available-model source selection uses shared policy" \
@@ -10075,14 +10097,15 @@ require_pattern \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 require_pattern \
-  "macOS AI service dynamic-provider orchestration uses shared classification policy" \
-  'textEnhancementModelCatalogSource|textEnhancementSettingsSurface' \
+  "macOS AI service Local CLI configuration refresh uses shared settings-surface policy" \
+  'textEnhancementSettingsSurface' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
-require_pattern \
-  "macOS AI settings model-source display uses shared policy" \
-  'supportsUserInitiatedTextEnhancementModelRefresh|textEnhancementModelCatalogSource' \
-  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
+require_patterns \
+  "macOS AI settings model-picker display uses shared policy" \
+  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift \
+  'supportsUserInitiatedTextEnhancementModelRefresh' \
+  'shouldShowStaticTextEnhancementModelPicker'
 
 require_pattern \
   "shared AI enhancement settings surface policy lives in VoiceInkCore" \
@@ -10383,7 +10406,7 @@ reject_pattern \
 
 reject_pattern \
   "macOS AI service avoids shell-owned selected-provider mutation policy" \
-  'VoiceInkAIEnhancementProviderPreference\.saveSelectedProvider\(|selectedProvider\.textEnhancementModelCatalogSource == \.ollamaRuntime|plan\.shouldRefreshOllamaRuntimeModels' \
+  'VoiceInkAIEnhancementProviderPreference\.saveSelectedProvider\(|selectedProvider\.textEnhancementModelCatalogSource == \.ollamaRuntime|textEnhancementModelCatalogSource|plan\.shouldRefreshOllamaRuntimeModels' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 reject_pattern \

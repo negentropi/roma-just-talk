@@ -2005,6 +2005,11 @@ require_pattern \
   'settings\.retranscribeStoredAudio\(note\)' \
   iOS/VoiceInk-ios/RecordingManager.swift
 
+require_pattern \
+  "iOS note detail delegates retry to AppSettings adapter" \
+  'settings\.retranscribeStoredAudio\(note\)' \
+  iOS/VoiceInk-ios/NoteDetailView.swift
+
 reject_pattern \
   "iOS recording manager avoids direct stored-audio retry mutation seam" \
   'existingAudioFileURL|markTranscriptionFailed|applyCompletedRunResult|TranscriptionRetryService|VoiceInkStoredAudioRetranscriptionRunner' \
@@ -8599,10 +8604,12 @@ require_pattern \
   'TranscriptionRecordTests\.testRetranscribeStoredAudioMarksTranscriptionFailure' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
-require_pattern \
+require_patterns \
   "core checks execute stored-audio retranscription runner tests" \
-  'TranscriptionRecordTests\.testStoredAudioRetranscriptionRunnerLoadsSettingsAndAppliesCompletedRecord|TranscriptionRecordTests\.testStoredAudioRetranscriptionRunnerMarksMissingAudioFailureBeforeLoadingSettings|TranscriptionRecordTests\.testStoredAudioRetranscriptionRunnerMarksTranscriptionFailure' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'TranscriptionRecordTests\.testStoredAudioRetranscriptionRunnerLoadsSettingsAndAppliesCompletedRecord' \
+  'TranscriptionRecordTests\.testStoredAudioRetranscriptionRunnerMarksMissingAudioFailureBeforeLoadingSettings' \
+  'TranscriptionRecordTests\.testStoredAudioRetranscriptionRunnerMarksTranscriptionFailure'
 
 reject_pattern \
   "iOS stored-audio retranscription adapter avoids shell-owned run settings assembly" \

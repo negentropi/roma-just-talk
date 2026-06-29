@@ -247,6 +247,7 @@ public struct VoiceInkStoredAudioRetranscriptionRunner {
 
 public enum VoiceInkStoredAudioRetranscription {
     public typealias RunSettingsProvider = VoiceInkStoredAudioRetranscriptionRunner.RunSettingsProvider
+    public typealias IOSAppSettingsRunSnapshotProvider = () async -> VoiceInkIOSAppSettingsRunSnapshot
     public typealias LocalWhisperServiceFactory = VoiceInkAudioTranscriptionServiceFactory.LocalWhisperServiceFactory
     typealias RemoteServiceFactory = VoiceInkAudioTranscriptionServiceFactory.RemoteServiceFactory
 
@@ -293,6 +294,29 @@ public enum VoiceInkStoredAudioRetranscription {
     }
 
     @discardableResult
+    public static func retranscribeWithOutcome<Record: VoiceInkMutableTranscriptionRecord & VoiceInkStoredAudioRecord>(
+        _ record: Record,
+        relativeTo recordingsDirectory: URL? = nil,
+        fileManager: FileManager = .default,
+        defaults: UserDefaults = .standard,
+        iOSAppSettingsRunSnapshotProvider: @escaping IOSAppSettingsRunSnapshotProvider,
+        apiKeyProvider: @escaping VoiceInkTranscriptionRunProcessor.APIKeyProvider,
+        localWhisperServiceFactory: @escaping LocalWhisperServiceFactory
+    ) async -> VoiceInkStoredAudioRetranscriptionOutcome {
+        await retranscribeWithOutcome(
+            record,
+            relativeTo: recordingsDirectory,
+            fileManager: fileManager,
+            processor: VoiceInkTranscriptionRunProcessor(),
+            defaults: defaults,
+            iOSAppSettingsRunSnapshotProvider: iOSAppSettingsRunSnapshotProvider,
+            apiKeyProvider: apiKeyProvider,
+            localWhisperServiceFactory: localWhisperServiceFactory,
+            remoteServiceFactory: { VoiceInkRemoteTranscriptionService(provider: $0) }
+        )
+    }
+
+    @discardableResult
     static func retranscribe<Record: VoiceInkMutableTranscriptionRecord & VoiceInkStoredAudioRecord>(
         _ record: Record,
         relativeTo recordingsDirectory: URL? = nil,
@@ -313,6 +337,33 @@ public enum VoiceInkStoredAudioRetranscription {
             record,
             relativeTo: recordingsDirectory,
             fileManager: fileManager
+        )
+    }
+
+    @discardableResult
+    static func retranscribeWithOutcome<Record: VoiceInkMutableTranscriptionRecord & VoiceInkStoredAudioRecord>(
+        _ record: Record,
+        relativeTo recordingsDirectory: URL? = nil,
+        fileManager: FileManager = .default,
+        processor: VoiceInkTranscriptionRunProcessor = VoiceInkTranscriptionRunProcessor(),
+        defaults: UserDefaults = .standard,
+        iOSAppSettingsRunSnapshotProvider: @escaping IOSAppSettingsRunSnapshotProvider,
+        apiKeyProvider: @escaping VoiceInkTranscriptionRunProcessor.APIKeyProvider,
+        localWhisperServiceFactory: @escaping LocalWhisperServiceFactory,
+        remoteServiceFactory: @escaping RemoteServiceFactory = { VoiceInkRemoteTranscriptionService(provider: $0) }
+    ) async -> VoiceInkStoredAudioRetranscriptionOutcome {
+        await retranscribeWithOutcome(
+            record,
+            relativeTo: recordingsDirectory,
+            fileManager: fileManager,
+            processor: processor,
+            runSettingsProvider: {
+                let snapshot = await iOSAppSettingsRunSnapshotProvider()
+                return snapshot.transcriptionRunSettings(defaults: defaults)
+            },
+            apiKeyProvider: apiKeyProvider,
+            localWhisperServiceFactory: localWhisperServiceFactory,
+            remoteServiceFactory: remoteServiceFactory
         )
     }
 

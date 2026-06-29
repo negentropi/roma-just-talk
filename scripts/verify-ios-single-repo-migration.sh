@@ -8824,6 +8824,8 @@ require_patterns \
   "shared transcription run settings snapshot lives in VoiceInkCore" \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift \
   'VoiceInkTranscriptionRunSettings' \
+  'VoiceInkIOSAppSettingsRunSnapshot' \
+  'transcriptionRunSettings\(defaults:' \
   'VoiceInkTranscriptionRunSettingsPolicy' \
   'iOSAppSettingsSnapshot' \
   'VoiceInkTranscriptionCleanupConfiguration\.current' \
@@ -8834,33 +8836,32 @@ require_patterns \
   'processor: VoiceInkTranscriptionRunProcessor' \
   'VoiceInkWordReplacementEngine\.apply\(wordReplacementRules'
 
-require_patterns \
-  "iOS AppSettings exposes shared transcription run settings snapshot" \
-  iOS/VoiceInk-ios/AppSettings.swift \
+reject_pattern \
+  "iOS AppSettings avoids shallow transcription run settings wrapper" \
   'var transcriptionRunSettings: VoiceInkTranscriptionRunSettings' \
-  'VoiceInkTranscriptionRunSettingsPolicy\.iOSAppSettingsSnapshot' \
-  'modes: modes' \
-  'selectedTranscriptionLanguage: selectedTranscriptionLanguage' \
-  'wordReplacementRules: wordReplacements' \
-  'customVocabulary: customVocabularyTerms'
+  iOS/VoiceInk-ios/AppSettings.swift
 
-reject_context_pattern \
+reject_pattern \
   "iOS AppSettings avoids shell-owned transcription run snapshot assembly" \
-  'var transcriptionRunSettings' \
-  'modes\.runtimeConfiguration|VoiceInkTranscriptionCleanupConfiguration\.current|VoiceInkPostProcessingSkipConfiguration\.current|VoiceInkTranscriptionPromptPreference\.localWhisperPromptForSelectedLanguage|configuration:|cleanupConfiguration:|postProcessingSkipConfiguration:' \
+  'modes\.runtimeConfiguration|VoiceInkTranscriptionCleanupConfiguration\.current|VoiceInkPostProcessingSkipConfiguration\.current|VoiceInkTranscriptionPromptPreference\.localWhisperPrompt|VoiceInkLocalWhisperPromptCatalog\.(prompt|storedCustomPrompts)|VoiceInkTranscriptionRunSettings\(|configuration:|cleanupConfiguration:|postProcessingSkipConfiguration:' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+reject_pattern \
+  "iOS AppSettings avoids direct transcription run settings policy calls" \
+  'VoiceInkTranscriptionRunSettingsPolicy\.iOSAppSettingsSnapshot' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+require_multiline_pattern \
+  "iOS AppSettings passes retry settings state to core stored-audio facade" \
+  'func[[:space:]]+retranscribeStoredAudio\(_ note: Transcription\)[[:space:]]+async[[:space:]]+->[[:space:]]+VoiceInkStoredAudioRetranscriptionOutcome[[:space:]]*\{[[:space:]]*await[[:space:]]+VoiceInkStoredAudioRetranscription\.retranscribeWithOutcome\([[:space:]]*note,[[:space:]]*iOSAppSettingsRunSnapshotProvider:[[:space:]]*\{[[:space:]]*\[self\][[:space:]]+in[[:space:]]*await[[:space:]]+VoiceInkIOSAppSettingsRunSnapshot\([[:space:]]*modes:[[:space:]]*modes,[[:space:]]*selectedModeId:[[:space:]]*selectedModeId,[[:space:]]*selectedTranscriptionLanguage:[[:space:]]*selectedTranscriptionLanguage,[[:space:]]*wordReplacementRules:[[:space:]]*wordReplacements,[[:space:]]*customVocabulary:[[:space:]]*customVocabularyTerms[[:space:]]*\)[[:space:]]*\},[[:space:]]*apiKeyProvider:[[:space:]]*\{[[:space:]]*\[self\][[:space:]]+provider[[:space:]]+in[[:space:]]*await[[:space:]]+apiKey\(for: provider\)[[:space:]]*\},[[:space:]]*localWhisperServiceFactory:[[:space:]]*\{[[:space:]]*WhisperTranscriptionService\(\)[[:space:]]*\}' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_patterns \
-  "iOS AppSettings adapter uses shared stored-audio retranscription facade" \
-  iOS/VoiceInk-ios/AppSettings.swift \
-  'VoiceInkStoredAudioRetranscription\.retranscribeWithOutcome\(' \
-  'runSettingsProvider:' \
-  'await transcriptionRunSettings' \
-  'apiKeyProvider:' \
-  'await apiKey\(for: provider\)' \
-  'localWhisperServiceFactory:' \
-  'WhisperTranscriptionService\(\)' \
-  'func retranscribeStoredAudio\(_ note: Transcription\)'
+  "shared stored-audio retranscription facade owns iOS run snapshot conversion" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift \
+  'IOSAppSettingsRunSnapshotProvider' \
+  'iOSAppSettingsRunSnapshotProvider:' \
+  'snapshot\.transcriptionRunSettings\(defaults: defaults\)'
 
 reject_pattern \
   "iOS retry transcription avoids unused override seam" \
@@ -8902,6 +8903,7 @@ require_patterns \
   'TranscriptionRecordTests\.testStoredAudioRetranscriptionFacadeMarksMissingAudioBeforeBuildingServices' \
   'TranscriptionRecordTests\.testStoredAudioRetranscriptionFacadeOutcomeReturnsTextAndAppliesCompletedRecord' \
   'TranscriptionRecordTests\.testStoredAudioRetranscriptionFacadeOutcomeReturnsFailureAfterMissingAudioState' \
+  'TranscriptionRecordTests\.testStoredAudioRetranscriptionFacadeBuildsIOSAppSettingsSnapshotInCoreLazily' \
   'TranscriptionRecordTests\.testStoredAudioRetranscriptionFacadeOutcomeReturnsFailureAfterTranscriptionErrorState'
 
 reject_pattern \

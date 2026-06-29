@@ -585,6 +585,107 @@ final class TranscriptionRecordTests: XCTestCase {
         XCTAssertEqual(record.transcriptionError, "Audio file not found")
     }
 
+    func testStoredAudioRetranscriptionFacadeBuildsIOSAppSettingsSnapshotInCoreLazily() async throws {
+        let suiteName = "VoiceInkCore.TranscriptionRecordTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defaults.removePersistentDomain(forName: suiteName)
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let mode = Mode(
+            name: "Remote",
+            transcriptionProvider: .assemblyAI,
+            transcriptionModel: "slam-1",
+            isPostProcessingEnabled: false,
+            postProcessingProvider: .openAI,
+            postProcessingModel: "gpt-4o-mini"
+        )
+        VoiceInkLocalWhisperPromptCatalog.saveCustomPrompts(["fr": "French retry prompt"], to: defaults)
+
+        var snapshotLoadCount = 0
+        let snapshotProvider: VoiceInkStoredAudioRetranscription.IOSAppSettingsRunSnapshotProvider = {
+            snapshotLoadCount += 1
+            return VoiceInkIOSAppSettingsRunSnapshot(
+                modes: [mode],
+                selectedModeId: mode.id,
+                selectedTranscriptionLanguage: "fr",
+                wordReplacementRules: [],
+                customVocabulary: [" Roma ", "Felix", "roma", ""]
+            )
+        }
+
+        var didBuildLocalService = false
+        var didBuildRemoteServiceForMissingAudio = false
+        let missingRecord = StubStoredTranscriptionRecord(
+            audioFileURL: "missing.wav",
+            storedAudioRecordingsDirectory: URL(fileURLWithPath: "/tmp/VoiceInkCore/missing-ios-snapshot-recording", isDirectory: true)
+        )
+
+        let missingOutcome = await VoiceInkStoredAudioRetranscription.retranscribeWithOutcome(
+            missingRecord,
+            defaults: defaults,
+            iOSAppSettingsRunSnapshotProvider: snapshotProvider,
+            apiKeyProvider: { _ in "key" },
+            localWhisperServiceFactory: {
+                didBuildLocalService = true
+                return StoredAudioTranscriptionService(text: "local")
+            },
+            remoteServiceFactory: { _ in
+                didBuildRemoteServiceForMissingAudio = true
+                return StoredAudioTranscriptionService(text: "remote")
+            }
+        )
+
+        XCTAssertEqual(missingOutcome, .failed(reason: "Audio file not found"))
+        XCTAssertEqual(snapshotLoadCount, 0)
+        XCTAssertFalse(didBuildLocalService)
+        XCTAssertFalse(didBuildRemoteServiceForMissingAudio)
+
+        let recordingsDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.TranscriptionRecordTests.\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: recordingsDirectory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: recordingsDirectory) }
+
+        let audioURL = recordingsDirectory.appendingPathComponent("recording.wav")
+        try Data("audio".utf8).write(to: audioURL)
+
+        var remoteProviders: [VoiceInkProviderKind] = []
+        let remoteService = StoredAudioTranscriptionService(text: "ios snapshot transcript")
+        let record = StubStoredTranscriptionRecord(
+            audioFileURL: audioURL.lastPathComponent,
+            storedAudioRecordingsDirectory: recordingsDirectory
+        )
+
+        let outcome = await VoiceInkStoredAudioRetranscription.retranscribeWithOutcome(
+            record,
+            defaults: defaults,
+            iOSAppSettingsRunSnapshotProvider: snapshotProvider,
+            apiKeyProvider: { provider in
+                XCTAssertEqual(provider, .assemblyAI)
+                return "assembly-key"
+            },
+            localWhisperServiceFactory: {
+                XCTFail("Remote retry should not build the local Whisper service")
+                return StoredAudioTranscriptionService(text: "local")
+            },
+            remoteServiceFactory: { provider in
+                remoteProviders.append(provider)
+                return remoteService
+            }
+        )
+
+        XCTAssertEqual(outcome, .succeeded("ios snapshot transcript"))
+        XCTAssertEqual(snapshotLoadCount, 1)
+        XCTAssertEqual(remoteProviders, [.assemblyAI])
+        XCTAssertEqual(remoteService.capturedAPIKey, "assembly-key")
+        XCTAssertEqual(remoteService.capturedModel, mode.runtimeConfiguration.transcriptionModel)
+        XCTAssertEqual(remoteService.capturedFileURL, audioURL)
+        XCTAssertEqual(remoteService.capturedLanguage, "fr")
+        XCTAssertEqual(remoteService.capturedPrompt, "French retry prompt")
+        XCTAssertEqual(remoteService.capturedCustomVocabulary, ["Roma", "Felix"])
+        XCTAssertEqual(record.text, "ios snapshot transcript")
+        XCTAssertEqual(record.transcriptionStatus, .completed)
+    }
+
     func testStoredAudioRetranscriptionFacadeOutcomeReturnsFailureAfterTranscriptionErrorState() async throws {
         let recordingsDirectory = FileManager.default.temporaryDirectory
             .appendingPathComponent("VoiceInkCore.TranscriptionRecordTests.\(UUID().uuidString)", isDirectory: true)
@@ -751,6 +852,9 @@ private final class StoredAudioTranscriptionService: VoiceInkAudioTranscriptionS
     private(set) var capturedAPIKey: String?
     private(set) var capturedModel: String?
     private(set) var capturedFileURL: URL?
+    private(set) var capturedLanguage: String?
+    private(set) var capturedPrompt: String?
+    private(set) var capturedCustomVocabulary: [String] = []
 
     init(text: String) {
         self.text = text
@@ -767,6 +871,9 @@ private final class StoredAudioTranscriptionService: VoiceInkAudioTranscriptionS
         capturedAPIKey = apiKey
         capturedModel = model
         capturedFileURL = fileURL
+        capturedLanguage = language
+        capturedPrompt = prompt
+        capturedCustomVocabulary = customVocabulary
         return text
     }
 }

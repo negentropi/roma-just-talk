@@ -169,23 +169,17 @@ final class AppSettings: ObservableObject {
         )
     }
     
-    // MARK: - Mode-based Settings
-
-    var transcriptionRunSettings: VoiceInkTranscriptionRunSettings {
-        VoiceInkTranscriptionRunSettingsPolicy.iOSAppSettingsSnapshot(
-            modes: modes,
-            selectedModeId: selectedModeId,
-            selectedTranscriptionLanguage: selectedTranscriptionLanguage,
-            wordReplacementRules: wordReplacements,
-            customVocabulary: customVocabularyTerms
-        )
-    }
-
     func retranscribeStoredAudio(_ note: Transcription) async -> VoiceInkStoredAudioRetranscriptionOutcome {
         await VoiceInkStoredAudioRetranscription.retranscribeWithOutcome(
             note,
-            runSettingsProvider: { [self] in
-                await transcriptionRunSettings
+            iOSAppSettingsRunSnapshotProvider: { [self] in
+                await VoiceInkIOSAppSettingsRunSnapshot(
+                    modes: modes,
+                    selectedModeId: selectedModeId,
+                    selectedTranscriptionLanguage: selectedTranscriptionLanguage,
+                    wordReplacementRules: wordReplacements,
+                    customVocabulary: customVocabularyTerms
+                )
             },
             apiKeyProvider: { [self] provider in
                 await apiKey(for: provider)

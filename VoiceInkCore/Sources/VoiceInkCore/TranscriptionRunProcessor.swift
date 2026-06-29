@@ -126,15 +126,28 @@ public struct VoiceInkTranscriptionRunSettings: Equatable, Sendable {
     }
 }
 
-public enum VoiceInkTranscriptionRunSettingsPolicy {
-    public static func iOSAppSettingsSnapshot(
+public struct VoiceInkIOSAppSettingsRunSnapshot {
+    public let modes: [Mode]
+    public let selectedModeId: UUID?
+    public let selectedTranscriptionLanguage: String
+    public let wordReplacementRules: [VoiceInkWordReplacementRule]
+    public let customVocabulary: [String]
+
+    public init(
         modes: [Mode],
         selectedModeId: UUID?,
         selectedTranscriptionLanguage: String,
         wordReplacementRules: [VoiceInkWordReplacementRule],
-        customVocabulary: [String],
-        defaults: UserDefaults = .standard
-    ) -> VoiceInkTranscriptionRunSettings {
+        customVocabulary: [String]
+    ) {
+        self.modes = modes
+        self.selectedModeId = selectedModeId
+        self.selectedTranscriptionLanguage = selectedTranscriptionLanguage
+        self.wordReplacementRules = wordReplacementRules
+        self.customVocabulary = customVocabulary
+    }
+
+    public func transcriptionRunSettings(defaults: UserDefaults = .standard) -> VoiceInkTranscriptionRunSettings {
         VoiceInkTranscriptionRunSettings(
             configuration: modes.runtimeConfiguration(selectedModeId: selectedModeId),
             cleanupConfiguration: VoiceInkTranscriptionCleanupConfiguration.current(in: defaults),
@@ -150,6 +163,25 @@ public enum VoiceInkTranscriptionRunSettingsPolicy {
             wordReplacementRules: wordReplacementRules,
             customVocabulary: customVocabulary
         )
+    }
+}
+
+public enum VoiceInkTranscriptionRunSettingsPolicy {
+    public static func iOSAppSettingsSnapshot(
+        modes: [Mode],
+        selectedModeId: UUID?,
+        selectedTranscriptionLanguage: String,
+        wordReplacementRules: [VoiceInkWordReplacementRule],
+        customVocabulary: [String],
+        defaults: UserDefaults = .standard
+    ) -> VoiceInkTranscriptionRunSettings {
+        VoiceInkIOSAppSettingsRunSnapshot(
+            modes: modes,
+            selectedModeId: selectedModeId,
+            selectedTranscriptionLanguage: selectedTranscriptionLanguage,
+            wordReplacementRules: wordReplacementRules,
+            customVocabulary: customVocabulary
+        ).transcriptionRunSettings(defaults: defaults)
     }
 }
 

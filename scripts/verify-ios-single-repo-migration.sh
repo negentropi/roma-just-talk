@@ -3944,6 +3944,13 @@ reject_pattern \
   iOS/VoiceInk-ios/AppSettings.swift
 
 reject_pattern \
+  "iOS shell avoids duplicate Keychain wrappers and direct SecItem policy" \
+  'import Security|\bKeychainService\b|\bkSec[A-Za-z]+\b|SecItem(Add|CopyMatching|Delete|Update)|VoiceInkKeychain(Query|DataStore|ValueStore)\.' \
+  iOS/VoiceInk-ios \
+  iOS/Shared \
+  iOS/VoiceInkKeyboard
+
+reject_pattern \
   "iOS API-key view avoids shell-only verification state and copy" \
   '@State private var isVerifying|verifyResult|Key verified|Verification failed|keyToSaveAfterSuccessfulVerification|verificationProgress = ok \?|result\.isValid' \
   iOS/VoiceInk-ios/ProviderAPIKeyView.swift
@@ -4353,6 +4360,13 @@ reject_pattern \
   "iOS local Whisper uses shared engine errors for audio processing failures" \
   'NSError|Invalid WAV file - too small' \
   iOS/VoiceInk-ios/WhisperTranscriptionService.swift
+
+reject_pattern \
+  "iOS shell avoids renamed RiffWaveUtils and VAD model manager clones" \
+  'RiffWaveUtils|decodeWaveFile|stride\(from:[[:space:]]*44|VADModelManager|getModelPath\(|ggml-silero-v5\.1\.2|vad_(init|simple|segments)' \
+  iOS/VoiceInk-ios \
+  iOS/Shared \
+  iOS/VoiceInkKeyboard
 
 require_pattern \
   "macOS quick-release duration uses shared PCM16 policy" \
@@ -5498,6 +5512,11 @@ require_patterns \
   'extension +VoiceInkWhisperModelDownloadRowActionTint' \
   'var +iOSColor' \
   'var +onboardingColor'
+
+require_pattern \
+  "migration docs document intentional iOS model tint adapter" \
+  'WhisperModelDownloadTint\+iOS\.swift.*intentional iOS shell adapters/model files' \
+  docs/ios-single-repo-migration.md
 
 reject_pattern \
   "iOS local model screens avoid duplicate tint adapters" \
@@ -13292,6 +13311,13 @@ reject_pattern \
   "iOS mode model selection avoids duplicate provider model branching" \
   'fixedModel\(for:|models\(for:' \
   iOS/VoiceInk-ios/ModeConfigurationView.swift
+
+reject_pattern \
+  "iOS shell avoids renamed obsolete mode provider prompt clones" \
+  'DefaultModeManager|struct +ModeSelectionView|struct +ModesView|enum +Provider:|struct +PromptTemplate|typealias +PromptTemplateType|selectedTemplateType|customPromptText|Mode\(name: +""\)|models\(for:' \
+  iOS/VoiceInk-ios \
+  iOS/Shared \
+  iOS/VoiceInkKeyboard
 
 require_pattern \
   "iOS mode prompt-template editing uses shared mode state" \

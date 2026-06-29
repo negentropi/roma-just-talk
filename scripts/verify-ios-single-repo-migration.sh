@@ -1705,10 +1705,20 @@ require_pattern \
   'VoiceInkModeFormPresentation|formPresentation' \
   VoiceInkCore/Sources/VoiceInkCore/Mode.swift
 
-require_pattern \
+require_patterns \
   "shared mode form provider availability lives in VoiceInkCore" \
-  'VoiceInkModeFormProviderAvailability|providerAvailability|newModeDraft' \
-  VoiceInkCore/Sources/VoiceInkCore/Mode.swift
+  VoiceInkCore/Sources/VoiceInkCore/Mode.swift \
+  'VoiceInkModeFormProviderAvailability' \
+  'func canSave' \
+  'func repairedMode' \
+  'func formStatePresentation'
+
+reject_pattern \
+  "shared mode form provider availability avoids shallow new-mode draft helper" \
+  'newModeDraft' \
+  VoiceInkCore/Sources/VoiceInkCore/Mode.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/ModeRuntimeConfigurationTests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_patterns \
   "shared mode form draft state lives in VoiceInkCore" \
@@ -1871,7 +1881,7 @@ reject_pattern \
 
 reject_pattern \
   "iOS mode configuration avoids shell-owned draft repair and provider transition calls" \
-  'providerAvailability\.repairedMode\(|(^|[^[:alnum:]_.])mode\.(selectTranscriptionProvider|selectPostProcessingProvider)\(|modeFormProviderAvailability\.newModeDraft\(\)' \
+  'providerAvailability\.repairedMode\(|(^|[^[:alnum:]_.])mode\.(selectTranscriptionProvider|selectPostProcessingProvider)\(' \
   iOS/VoiceInk-ios/ModeConfigurationView.swift
 
 require_pattern \

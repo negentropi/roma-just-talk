@@ -186,10 +186,6 @@ public struct VoiceInkModeFormProviderAvailability: Equatable, Sendable {
         return repairedMode
     }
 
-    public func newModeDraft(name: String = "") -> Mode {
-        repairedMode(Mode(name: name))
-    }
-
     public func formStatePresentation(for mode: Mode) -> VoiceInkModeFormStatePresentation {
         VoiceInkModeFormStatePresentation(
             shouldShowPostProcessingControls: mode.isPostProcessingEnabled,
@@ -206,7 +202,7 @@ public struct VoiceInkModeFormDraftState {
         existingMode: Mode?,
         providerAvailability: VoiceInkModeFormProviderAvailability
     ) {
-        self.mode = existingMode ?? providerAvailability.newModeDraft()
+        self.mode = existingMode ?? providerAvailability.repairedMode(Mode(name: ""))
     }
 
     public mutating func repairProviderAvailability(_ availability: VoiceInkModeFormProviderAvailability) {

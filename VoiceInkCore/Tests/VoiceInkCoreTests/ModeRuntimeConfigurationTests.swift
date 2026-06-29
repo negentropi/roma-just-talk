@@ -660,21 +660,6 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
         XCTAssertTrue(availability.canSave(mode))
     }
 
-    func testModeFormProviderAvailabilityCreatesRepairedNewModeDraft() {
-        let availability = VoiceInkModeFormProviderAvailability(
-            transcriptionProviders: [.localWhisper],
-            postProcessingProviders: [.gemini]
-        )
-
-        let draft = availability.newModeDraft()
-
-        XCTAssertEqual(draft.name, "")
-        XCTAssertEqual(draft.transcriptionProvider, .localWhisper)
-        XCTAssertEqual(draft.transcriptionModel, VoiceInkTranscriptionModelCatalog.localBaseModel)
-        XCTAssertEqual(draft.postProcessingProvider, .groq)
-        XCTAssertFalse(availability.canSave(draft))
-    }
-
     func testModeFormProviderAvailabilityOwnsFormStatePresentation() {
         let availability = VoiceInkModeFormProviderAvailability(
             transcriptionProviders: [.localWhisper],
@@ -754,6 +739,9 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
         XCTAssertEqual(draftState.mode.name, "")
         XCTAssertEqual(draftState.mode.transcriptionProvider, .localWhisper)
         XCTAssertEqual(draftState.mode.transcriptionModel, VoiceInkTranscriptionModelCatalog.localBaseModel)
+        XCTAssertEqual(draftState.mode.postProcessingProvider, .groq)
+        XCTAssertEqual(draftState.mode.postProcessingModel, VoiceInkAIModelCatalog.defaultModel(for: .groq))
+        XCTAssertEqual(draftState.mode.promptTemplate.type, .summary)
         XCTAssertFalse(draftState.mode.isPostProcessingEnabled)
         XCTAssertFalse(availability.canSave(draftState.mode))
     }

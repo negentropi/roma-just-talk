@@ -112,13 +112,6 @@ public struct VoiceInkAIEnhancementRequestExecutionPlan {
     }
 }
 
-public enum VoiceInkAIEnhancementSettingsSurface: Sendable, Equatable {
-    case apiKey
-    case ollama
-    case localCLI
-    case custom
-}
-
 public struct VoiceInkAIEnhancementProviderSelectionPlan: Sendable, Equatable {
     let selectedProviderToSave: VoiceInkAIEnhancementProviderKind
     private let shouldRefreshOllamaRuntimeModels: Bool
@@ -340,12 +333,12 @@ public struct VoiceInkAIEnhancementProviderSettingsPresentation: Sendable, Equat
     )
 
     public func connectionStatus(
-        surface: VoiceInkAIEnhancementSettingsSurface,
+        provider: VoiceInkAIEnhancementProviderKind,
         isAPIKeyValid: Bool,
         isCheckingOllama: Bool,
         hasOllamaModels: Bool
     ) -> VoiceInkAIEnhancementConnectionStatusPresentation? {
-        switch surface {
+        switch provider {
         case .ollama:
             if isCheckingOllama {
                 return .checking
@@ -354,7 +347,7 @@ public struct VoiceInkAIEnhancementProviderSettingsPresentation: Sendable, Equat
             return hasOllamaModels
                 ? .status(text: connectedText, tone: .connected)
                 : .status(text: disconnectedText, tone: .disconnected)
-        case .apiKey, .localCLI, .custom:
+        case .anthropic, .assemblyAI, .cerebras, .custom, .deepgram, .elevenLabs, .gemini, .groq, .localCLI, .mistral, .openAI, .openRouter, .soniox, .speechmatics:
             return isAPIKeyValid
                 ? .status(text: connectedText, tone: .connected)
                 : nil
@@ -1166,16 +1159,12 @@ public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
         self == .openRouter
     }
 
-    public var textEnhancementSettingsSurface: VoiceInkAIEnhancementSettingsSurface {
+    public var showsTextEnhancementModelOptions: Bool {
         switch self {
-        case .ollama:
-            return .ollama
-        case .localCLI:
-            return .localCLI
         case .custom:
-            return .custom
-        case .anthropic, .assemblyAI, .cerebras, .deepgram, .elevenLabs, .groq, .gemini, .mistral, .openAI, .openRouter, .soniox, .speechmatics:
-            return .apiKey
+            return false
+        case .anthropic, .assemblyAI, .cerebras, .deepgram, .elevenLabs, .groq, .gemini, .localCLI, .mistral, .ollama, .openAI, .openRouter, .soniox, .speechmatics:
+            return true
         }
     }
 

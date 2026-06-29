@@ -22,9 +22,8 @@ struct APIKeyManagementView: View {
     private let localCLIPresentation = VoiceInkLocalCLIPreference.macOSSettingsPresentation
 
     var body: some View {
-        let selectedProviderSettingsSurface = aiService.selectedProvider.textEnhancementSettingsSurface
         let connectionStatusPresentation = providerSettingsPresentation.connectionStatus(
-            surface: selectedProviderSettingsSurface,
+            provider: aiService.selectedProvider,
             isAPIKeyValid: aiService.isAPIKeyValid,
             isCheckingOllama: isCheckingOllama,
             hasOllamaModels: !ollamaModels.isEmpty
@@ -65,7 +64,7 @@ struct APIKeyManagementView: View {
                 }
             }
             .onChange(of: aiService.selectedProvider) { _, _ in
-                syncSelectedProviderSettingsSurface()
+                syncSelectedProviderRuntimeState()
             }
 
             VStack(alignment: .leading, spacing: 12) {
@@ -120,7 +119,7 @@ struct APIKeyManagementView: View {
                     }
                 }
 
-                if selectedProviderSettingsSurface == .ollama {
+                if aiService.selectedProvider == .ollama {
                     if isEditingURL {
                         HStack {
                             TextField(providerSettingsPresentation.ollamaBaseURLFieldTitle, text: $ollamaBaseURL)
@@ -161,7 +160,7 @@ struct APIKeyManagementView: View {
                         }
                     }
 
-                } else if selectedProviderSettingsSurface == .localCLI {
+                } else if aiService.selectedProvider == .localCLI {
                     VStack(alignment: .leading, spacing: 6) {
                         HStack {
                             Text(localCLIPresentation.commandTitle)
@@ -218,7 +217,7 @@ struct APIKeyManagementView: View {
                             .foregroundColor(.orange)
                     }
 
-                } else if selectedProviderSettingsSurface == .custom {
+                } else if aiService.selectedProvider == .custom {
                     TextField(
                         providerSettingsPresentation.customProviderBaseURLFieldTitle,
                         text: $aiService.customBaseURL,
@@ -313,17 +312,17 @@ struct APIKeyManagementView: View {
             Text(alertMessage)
         }
         .onAppear {
-            syncSelectedProviderSettingsSurface()
+            syncSelectedProviderRuntimeState()
         }
     }
 
-    private func syncSelectedProviderSettingsSurface() {
-        switch aiService.selectedProvider.textEnhancementSettingsSurface {
+    private func syncSelectedProviderRuntimeState() {
+        switch aiService.selectedProvider {
         case .ollama:
             checkOllamaConnection()
         case .localCLI:
             syncLocalCLIStateFromService()
-        case .apiKey, .custom:
+        case .anthropic, .assemblyAI, .cerebras, .custom, .deepgram, .elevenLabs, .gemini, .groq, .mistral, .openAI, .openRouter, .soniox, .speechmatics:
             break
         }
     }

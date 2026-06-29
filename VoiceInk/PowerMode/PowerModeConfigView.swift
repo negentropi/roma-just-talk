@@ -467,7 +467,7 @@ struct ConfigurationView: View {
                         }
 
                         if let provider = enhancementSelection.selectedProviderForModelOptions(currentProvider: aiService.selectedProvider),
-                           provider.textEnhancementSettingsSurface != .custom {
+                           provider.showsTextEnhancementModelOptions {
                             let models = aiService.availableModels(for: provider)
                             if models.isEmpty {
                                 LabeledContent(VoiceInkPowerModePresentation.aiModelFormTitle) {

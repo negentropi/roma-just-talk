@@ -10092,13 +10092,18 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
+  "core checks execute shared AI enhancement model-option visibility coverage" \
+  'AIProviderCatalogTests\.testMacOSAIEnhancementModelOptionsVisibilityIsShared' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
   "macOS AI service available-model source selection uses shared policy" \
   'textEnhancementAvailableModels' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 require_pattern \
-  "macOS AI service Local CLI configuration refresh uses shared settings-surface policy" \
-  'textEnhancementSettingsSurface' \
+  "macOS AI service Local CLI configuration refresh uses provider identity" \
+  'selectedProvider == \.localCLI' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 require_patterns \
@@ -10108,14 +10113,24 @@ require_patterns \
   'shouldShowStaticTextEnhancementModelPicker'
 
 require_pattern \
-  "shared AI enhancement settings surface policy lives in VoiceInkCore" \
-  'VoiceInkAIEnhancementSettingsSurface|textEnhancementSettingsSurface' \
+  "shared AI enhancement model-option visibility policy lives in VoiceInkCore" \
+  'showsTextEnhancementModelOptions' \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
-require_pattern \
-  "macOS AI settings provider surfaces use shared policy" \
-  'textEnhancementSettingsSurface|selectedProviderSettingsSurface' \
-  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
+reject_pattern \
+  "shared AI enhancement settings-surface metadata stays hidden" \
+  'VoiceInkAIEnhancementSettingsSurface|textEnhancementSettingsSurface|selectedProviderSettingsSurface' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AIProviderCatalogTests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift \
+  VoiceInk/Services/AIEnhancement/AIService.swift \
+  VoiceInk/PowerMode/PowerModeConfigView.swift
+
+reject_pattern \
+  "migration docs avoid stale AI settings-surface classification wording" \
+  'settings-surface classification' \
+  docs/ios-single-repo-migration.md
 
 require_pattern \
   "shared AI enhancement provider connection status presentation lives in VoiceInkCore" \
@@ -10179,9 +10194,10 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
 
 require_pattern \
-  "macOS Power Mode model section display uses shared AI settings surface policy" \
-  'textEnhancementSettingsSurface' \
-  VoiceInk/PowerMode/PowerModeConfigView.swift
+  "macOS Power Mode model section display uses shared model-option visibility policy" \
+  'showsTextEnhancementModelOptions' \
+  VoiceInk/PowerMode/PowerModeConfigView.swift \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 require_pattern \
   "shared AI enhancement request URL selection lives in VoiceInkCore" \
@@ -10451,8 +10467,8 @@ reject_pattern \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 reject_pattern \
-  "macOS AI service avoids duplicate dynamic-provider classification policy" \
-  'selectedProvider == \.(ollama|localCLI)' \
+  "macOS AI service avoids duplicate dynamic-provider model-source policy" \
+  'selectedProvider == \.ollama' \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 reject_pattern \
@@ -10478,8 +10494,8 @@ reject_pattern \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
 
 reject_pattern \
-  "macOS AI settings avoid duplicate provider settings-surface policy" \
-  'selectedProvider (==|!=) \.(ollama|localCLI|custom)' \
+  "macOS AI settings avoid stale provider settings-surface policy" \
+  'selectedProviderSettingsSurface|textEnhancementSettingsSurface' \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
 
 reject_pattern \

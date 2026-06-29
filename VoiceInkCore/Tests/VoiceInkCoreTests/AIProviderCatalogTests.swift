@@ -1127,7 +1127,7 @@ final class AIProviderCatalogTests: XCTestCase {
         XCTAssertEqual(presentation.disconnectedText, "Disconnected")
         XCTAssertEqual(
             presentation.connectionStatus(
-                surface: .apiKey,
+                provider: .groq,
                 isAPIKeyValid: true,
                 isCheckingOllama: false,
                 hasOllamaModels: false
@@ -1136,7 +1136,7 @@ final class AIProviderCatalogTests: XCTestCase {
         )
         XCTAssertNil(
             presentation.connectionStatus(
-                surface: .apiKey,
+                provider: .groq,
                 isAPIKeyValid: false,
                 isCheckingOllama: false,
                 hasOllamaModels: false
@@ -1144,7 +1144,7 @@ final class AIProviderCatalogTests: XCTestCase {
         )
         XCTAssertEqual(
             presentation.connectionStatus(
-                surface: .ollama,
+                provider: .ollama,
                 isAPIKeyValid: false,
                 isCheckingOllama: true,
                 hasOllamaModels: false
@@ -1153,7 +1153,7 @@ final class AIProviderCatalogTests: XCTestCase {
         )
         XCTAssertEqual(
             presentation.connectionStatus(
-                surface: .ollama,
+                provider: .ollama,
                 isAPIKeyValid: false,
                 isCheckingOllama: false,
                 hasOllamaModels: true
@@ -1162,7 +1162,7 @@ final class AIProviderCatalogTests: XCTestCase {
         )
         XCTAssertEqual(
             presentation.connectionStatus(
-                surface: .ollama,
+                provider: .ollama,
                 isAPIKeyValid: false,
                 isCheckingOllama: false,
                 hasOllamaModels: false
@@ -1171,13 +1171,35 @@ final class AIProviderCatalogTests: XCTestCase {
         )
         XCTAssertEqual(
             presentation.connectionStatus(
-                surface: .localCLI,
+                provider: .localCLI,
                 isAPIKeyValid: true,
                 isCheckingOllama: false,
                 hasOllamaModels: false
             ),
             .status(text: "Connected", tone: .connected)
         )
+
+        for provider in VoiceInkAIEnhancementProviderKind.allCases where provider != .ollama {
+            XCTAssertEqual(
+                presentation.connectionStatus(
+                    provider: provider,
+                    isAPIKeyValid: true,
+                    isCheckingOllama: true,
+                    hasOllamaModels: true
+                ),
+                .status(text: "Connected", tone: .connected),
+                provider.rawValue
+            )
+            XCTAssertNil(
+                presentation.connectionStatus(
+                    provider: provider,
+                    isAPIKeyValid: false,
+                    isCheckingOllama: true,
+                    hasOllamaModels: true
+                ),
+                provider.rawValue
+            )
+        }
     }
 
     func testMacOSAIEnhancementSettingsChromeAndOllamaPresentationIsShared() {
@@ -1695,29 +1717,29 @@ final class AIProviderCatalogTests: XCTestCase {
         XCTAssertFalse(VoiceInkAIEnhancementProviderKind.custom.supportsUserInitiatedTextEnhancementModelRefresh)
     }
 
-    func testMacOSAIEnhancementSettingsSurfacesAreShared() {
-        let expectedSurfaces: [VoiceInkAIEnhancementProviderKind: VoiceInkAIEnhancementSettingsSurface] = [
-            .anthropic: .apiKey,
-            .assemblyAI: .apiKey,
-            .cerebras: .apiKey,
-            .custom: .custom,
-            .deepgram: .apiKey,
-            .elevenLabs: .apiKey,
-            .gemini: .apiKey,
-            .groq: .apiKey,
-            .localCLI: .localCLI,
-            .mistral: .apiKey,
-            .ollama: .ollama,
-            .openAI: .apiKey,
-            .openRouter: .apiKey,
-            .soniox: .apiKey,
-            .speechmatics: .apiKey
+    func testMacOSAIEnhancementModelOptionsVisibilityIsShared() {
+        let expectedVisibility: [VoiceInkAIEnhancementProviderKind: Bool] = [
+            .anthropic: true,
+            .assemblyAI: true,
+            .cerebras: true,
+            .custom: false,
+            .deepgram: true,
+            .elevenLabs: true,
+            .gemini: true,
+            .groq: true,
+            .localCLI: true,
+            .mistral: true,
+            .ollama: true,
+            .openAI: true,
+            .openRouter: true,
+            .soniox: true,
+            .speechmatics: true
         ]
 
-        XCTAssertEqual(VoiceInkAIEnhancementProviderKind.allCases.count, expectedSurfaces.count)
+        XCTAssertEqual(VoiceInkAIEnhancementProviderKind.allCases.count, expectedVisibility.count)
 
-        for (provider, surface) in expectedSurfaces {
-            XCTAssertEqual(provider.textEnhancementSettingsSurface, surface)
+        for (provider, shouldShowOptions) in expectedVisibility {
+            XCTAssertEqual(provider.showsTextEnhancementModelOptions, shouldShowOptions, provider.rawValue)
         }
     }
 

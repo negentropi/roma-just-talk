@@ -304,7 +304,7 @@ class AIService: ObservableObject {
     }
 
     private func refreshLocalCLIConfigurationState() {
-        if selectedProvider.textEnhancementSettingsSurface == .localCLI {
+        if selectedProvider == .localCLI {
             applyCredentialStateForSelectedProvider()
         }
         objectWillChange.send()

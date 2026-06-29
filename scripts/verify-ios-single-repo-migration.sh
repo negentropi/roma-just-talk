@@ -5113,8 +5113,8 @@ require_pattern \
   iOS/VoiceInk-ios/APIKeysView.swift
 
 require_pattern \
-  "iOS local model manager uses shared download tracking state" \
-  'VoiceInkWhisperModelSimpleDownloadTrackingState|downloadTrackingState|downloadState\(for:' \
+  "iOS local model manager uses shared download session state" \
+  'VoiceInkWhisperModelSimpleDownloadSessionState|downloadSessionState|downloadState\(for:' \
   iOS/VoiceInk-ios/LocalModelManager.swift
 
 require_pattern \
@@ -5122,10 +5122,29 @@ require_pattern \
   'VoiceInkWhisperModelManagementSnapshot|hasAvailableModel|modelPath\(forRuntimeModelName:|managementRows|managementRow' \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
 
+require_patterns \
+  "shared simple download session state owns active download identity" \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift \
+  'public struct VoiceInkWhisperModelSimpleDownloadSessionID' \
+  'public struct VoiceInkWhisperModelSimpleDownloadSessionState' \
+  'activeSessionIDsByModelID' \
+  'isCurrentDownload' \
+  'updateProgress' \
+  'finishDownload' \
+  'cancelDownload'
+
 require_pattern \
   "core checks execute local model management snapshot test" \
   'WhisperModelFilesTests\.testManagementSnapshotBuildsAvailabilityPathStateAndRows' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_patterns \
+  "core checks execute local model download session state tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'WhisperModelFilesTests\.testSimpleDownloadSessionStateRejectsDuplicateStartsAndExposesTrackingState' \
+  'WhisperModelFilesTests\.testSimpleDownloadSessionStateIgnoresStaleProgress' \
+  'WhisperModelFilesTests\.testSimpleDownloadSessionStateIgnoresStaleCompletionAndCleansActiveCompletion' \
+  'WhisperModelFilesTests\.testSimpleDownloadSessionStateCleansUpCancelledDownload'
 
 require_pattern \
   "iOS local model manager delegates snapshot queries to shared core" \
@@ -5145,21 +5164,23 @@ require_pattern \
 require_patterns \
   "iOS local model manager delegates lifecycle tracking to shared core state" \
   iOS/VoiceInk-ios/LocalModelManager.swift \
-  'downloadTrackingState\.startDownload\(for: model\)' \
-  'downloadTrackingState\.updateProgress\(progress\.fractionCompleted, for: model\)' \
-  'downloadTrackingState\.finishDownload\(for: model\)' \
-  'downloadTrackingState\.cancelDownload\(for: model\)'
+  'downloadSessionState\.startDownload\(for: model\)' \
+  'downloadSessionState\.updateProgress' \
+  'downloadSessionState\.finishDownload\(for: model, sessionID: downloadSessionID\)' \
+  'downloadSessionState\.cancelDownload\(for: model\)'
 
 require_patterns \
-  "iOS local model manager guards URLSession callbacks by active download identity" \
+  "iOS local model manager delegates URLSession identity guards to shared core" \
   iOS/VoiceInk-ios/LocalModelManager.swift \
-  'private var downloadTaskIDs: \[String: UUID\] = \[:\]' \
-  'let downloadTaskID = UUID\(\)' \
-  'downloadTaskIDs\[model\.id\] = downloadTaskID' \
-  'guard let self = self, self\.downloadTaskIDs\[model\.id\] == downloadTaskID else \{ return \}' \
-  'downloadTaskID: UUID' \
-  'guard downloadTaskIDs\[model\.id\] == downloadTaskID else \{ return \}' \
-  'downloadTaskIDs\[model\.id\] = nil'
+  'guard let downloadSessionID = downloadSessionState\.startDownload\(for: model\)' \
+  'downloadSessionID: downloadSessionID' \
+  'sessionID: downloadSessionID' \
+  'downloadSessionState\.isCurrentDownload\(for: model, sessionID: downloadSessionID\)'
+
+reject_pattern \
+  "iOS local model manager avoids shell-owned download identity dictionaries" \
+  'downloadTaskIDs|downloadTaskID|UUID\(\)' \
+  iOS/VoiceInk-ios/LocalModelManager.swift
 
 require_pattern \
   "iOS local model manager exposes shared management snapshot rows" \

@@ -11,12 +11,11 @@ import VoiceInkCore
 
 @MainActor
 class LocalModelManager: ObservableObject {
-    @Published private var downloadTrackingState = VoiceInkWhisperModelSimpleDownloadTrackingState()
+    @Published private var downloadSessionState = VoiceInkWhisperModelSimpleDownloadSessionState()
     @Published var localModelAvailabilityRevision = 0
     @Published var downloadError: VoiceInkWhisperModelOperationAlertPresentation?
     
     private var downloadTasks: [String: URLSessionDownloadTask] = [:]
-    private var downloadTaskIDs: [String: UUID] = [:]
     private var progressObservations: [String: NSKeyValueObservation] = [:]
     private let logger = VoiceInkIOSLogger.localModelManagement
     
@@ -33,13 +32,13 @@ class LocalModelManager: ObservableObject {
     private var managementSnapshot: VoiceInkWhisperModelManagementSnapshot {
         VoiceInkWhisperModelManagementSnapshot(
             modelsDirectory: Self.modelsDirectory,
-            downloadTrackingState: downloadTrackingState
+            downloadTrackingState: downloadSessionState.downloadTrackingState
         )
     }
     
     /// Download a specific model
     func downloadModel(_ model: VoiceInkWhisperModelFileSpec) async {
-        guard downloadTrackingState.startDownload(for: model) else {
+        guard let downloadSessionID = downloadSessionState.startDownload(for: model) else {
             logger.notice("\(VoiceInkWhisperModelManagementDiagnostics.alreadyDownloadingMessage(modelName: model.modelName), privacy: .public)")
             return
         }
@@ -47,14 +46,13 @@ class LocalModelManager: ObservableObject {
         logger.notice("\(VoiceInkWhisperModelManagementDiagnostics.startingDownloadMessage(modelName: model.modelName, downloadURL: model.downloadURL), privacy: .public)")
         
         downloadError = nil
-        let downloadTaskID = UUID()
         
         let downloadTask = URLSession.shared.downloadTask(with: model.downloadURL) { [weak self] temporaryURL, response, error in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.handleDownloadCompletion(
                     for: model,
-                    downloadTaskID: downloadTaskID,
+                    downloadSessionID: downloadSessionID,
                     temporaryURL: temporaryURL,
                     response: response,
                     error: error
@@ -65,12 +63,14 @@ class LocalModelManager: ObservableObject {
         // Track progress
         let progressObservation = downloadTask.progress.observe(\.fractionCompleted) { [weak self] progress, _ in
             Task { @MainActor in
-                guard let self = self, self.downloadTaskIDs[model.id] == downloadTaskID else { return }
-                self.downloadTrackingState.updateProgress(progress.fractionCompleted, for: model)
+                self?.downloadSessionState.updateProgress(
+                    progress.fractionCompleted,
+                    for: model,
+                    sessionID: downloadSessionID
+                )
             }
         }
 
-        downloadTaskIDs[model.id] = downloadTaskID
         downloadTasks[model.id] = downloadTask
         progressObservations[model.id] = progressObservation
         downloadTask.resume()
@@ -78,17 +78,16 @@ class LocalModelManager: ObservableObject {
     
     private func handleDownloadCompletion(
         for model: VoiceInkWhisperModelFileSpec,
-        downloadTaskID: UUID,
+        downloadSessionID: VoiceInkWhisperModelSimpleDownloadSessionID,
         temporaryURL: URL?,
         response: URLResponse?,
         error: Error?
     ) {
-        guard downloadTaskIDs[model.id] == downloadTaskID else { return }
+        guard downloadSessionState.isCurrentDownload(for: model, sessionID: downloadSessionID) else { return }
 
         defer {
-            downloadTrackingState.finishDownload(for: model)
+            downloadSessionState.finishDownload(for: model, sessionID: downloadSessionID)
             downloadTasks[model.id] = nil
-            downloadTaskIDs[model.id] = nil
             progressObservations[model.id] = nil
         }
         
@@ -98,7 +97,7 @@ class LocalModelManager: ObservableObject {
             error: error
         ).applyRuntimeState(
             installTemporaryFile: { temporaryURL in
-                installDownloadedModel(model, from: temporaryURL)
+                installDownloadedModel(model, from: temporaryURL, downloadSessionID: downloadSessionID)
             },
             presentFailure: { alert in
                 downloadError = alert
@@ -112,7 +111,8 @@ class LocalModelManager: ObservableObject {
 
     private func installDownloadedModel(
         _ model: VoiceInkWhisperModelFileSpec,
-        from temporaryURL: URL
+        from temporaryURL: URL,
+        downloadSessionID: VoiceInkWhisperModelSimpleDownloadSessionID
     ) {
         do {
             let finalURL = try VoiceInkWhisperModelFiles.installDownloadedModelFile(
@@ -122,7 +122,7 @@ class LocalModelManager: ObservableObject {
             )
             
             logger.notice("\(VoiceInkWhisperModelManagementDiagnostics.downloadedMessage(modelName: model.modelName, finalPath: finalURL.path), privacy: .public)")
-            downloadTrackingState.updateProgress(1.0, for: model)
+            downloadSessionState.updateProgress(1.0, for: model, sessionID: downloadSessionID)
             localModelAvailabilityRevision += 1
             
         } catch {
@@ -138,9 +138,8 @@ class LocalModelManager: ObservableObject {
         }
         downloadTasks[model.id]?.cancel()
         downloadTasks[model.id] = nil
-        downloadTaskIDs[model.id] = nil
         progressObservations[model.id] = nil
-        downloadTrackingState.cancelDownload(for: model)
+        downloadSessionState.cancelDownload(for: model)
     }
     
     /// Delete a downloaded model

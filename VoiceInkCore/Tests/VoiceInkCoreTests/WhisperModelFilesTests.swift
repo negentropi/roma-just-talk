@@ -740,6 +740,95 @@ final class WhisperModelFilesTests: XCTestCase {
         )
     }
 
+    func testSimpleDownloadSessionStateRejectsDuplicateStartsAndExposesTrackingState() throws {
+        let baseDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.WhisperModelDownloadSessionStartTests.\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: baseDirectory) }
+
+        let modelsDirectory = try VoiceInkWhisperModelFiles.createModelsDirectory(in: baseDirectory)
+        let model = VoiceInkWhisperModelFiles.baseModel
+        var sessionState = VoiceInkWhisperModelSimpleDownloadSessionState()
+        let sessionID = try XCTUnwrap(sessionState.startDownload(for: model))
+
+        XCTAssertNil(sessionState.startDownload(for: model))
+        XCTAssertTrue(sessionState.isDownloading(model))
+        XCTAssertTrue(sessionState.isCurrentDownload(for: model, sessionID: sessionID))
+
+        let startedState = sessionState.downloadTrackingState.downloadState(
+            for: model,
+            modelsDirectory: modelsDirectory
+        )
+        XCTAssertTrue(startedState.isDownloading)
+        XCTAssertEqual(startedState.progress.fraction, 0)
+    }
+
+    func testSimpleDownloadSessionStateIgnoresStaleProgress() throws {
+        let baseDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.WhisperModelDownloadSessionProgressTests.\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: baseDirectory) }
+
+        let modelsDirectory = try VoiceInkWhisperModelFiles.createModelsDirectory(in: baseDirectory)
+        let model = VoiceInkWhisperModelFiles.baseModel
+        var sessionState = VoiceInkWhisperModelSimpleDownloadSessionState()
+        let activeSessionID = try XCTUnwrap(sessionState.startDownload(for: model))
+        let staleSessionID = VoiceInkWhisperModelSimpleDownloadSessionID(
+            rawValue: try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000001"))
+        )
+
+        XCTAssertFalse(sessionState.updateProgress(0.75, for: model, sessionID: staleSessionID))
+        XCTAssertEqual(
+            sessionState.downloadTrackingState.downloadState(for: model, modelsDirectory: modelsDirectory).progress.fraction,
+            0
+        )
+
+        XCTAssertTrue(sessionState.updateProgress(0.42, for: model, sessionID: activeSessionID))
+        XCTAssertEqual(
+            sessionState.downloadTrackingState.downloadState(for: model, modelsDirectory: modelsDirectory).progress.fraction,
+            0.42
+        )
+    }
+
+    func testSimpleDownloadSessionStateIgnoresStaleCompletionAndCleansActiveCompletion() throws {
+        let model = VoiceInkWhisperModelFiles.baseModel
+        var sessionState = VoiceInkWhisperModelSimpleDownloadSessionState()
+        let activeSessionID = try XCTUnwrap(sessionState.startDownload(for: model))
+        let staleSessionID = VoiceInkWhisperModelSimpleDownloadSessionID(
+            rawValue: try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000002"))
+        )
+
+        XCTAssertFalse(sessionState.finishDownload(for: model, sessionID: staleSessionID))
+        XCTAssertTrue(sessionState.isDownloading(model))
+        XCTAssertTrue(sessionState.isCurrentDownload(for: model, sessionID: activeSessionID))
+
+        XCTAssertTrue(sessionState.finishDownload(for: model, sessionID: activeSessionID))
+        XCTAssertFalse(sessionState.isDownloading(model))
+        XCTAssertFalse(sessionState.isCurrentDownload(for: model, sessionID: activeSessionID))
+        XCTAssertFalse(sessionState.updateProgress(0.9, for: model, sessionID: activeSessionID))
+    }
+
+    func testSimpleDownloadSessionStateCleansUpCancelledDownload() throws {
+        let baseDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.WhisperModelDownloadSessionCancelTests.\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: baseDirectory) }
+
+        let modelsDirectory = try VoiceInkWhisperModelFiles.createModelsDirectory(in: baseDirectory)
+        let model = VoiceInkWhisperModelFiles.baseModel
+        var sessionState = VoiceInkWhisperModelSimpleDownloadSessionState()
+        let activeSessionID = try XCTUnwrap(sessionState.startDownload(for: model))
+        XCTAssertTrue(sessionState.updateProgress(0.5, for: model, sessionID: activeSessionID))
+
+        XCTAssertTrue(sessionState.cancelDownload(for: model))
+
+        XCTAssertFalse(sessionState.isDownloading(model))
+        XCTAssertFalse(sessionState.isCurrentDownload(for: model, sessionID: activeSessionID))
+        XCTAssertFalse(sessionState.updateProgress(0.9, for: model, sessionID: activeSessionID))
+        XCTAssertEqual(
+            sessionState.downloadTrackingState.downloadState(for: model, modelsDirectory: modelsDirectory).progress.fraction,
+            0
+        )
+        XCTAssertFalse(sessionState.cancelDownload(for: model))
+    }
+
     func testManagementSnapshotBuildsAvailabilityPathStateAndRows() throws {
         let baseDirectory = FileManager.default.temporaryDirectory
             .appendingPathComponent("VoiceInkCore.WhisperModelManagementSnapshotTests.\(UUID().uuidString)", isDirectory: true)

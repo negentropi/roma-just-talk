@@ -654,6 +654,87 @@ public struct VoiceInkWhisperModelSimpleDownloadTrackingState: Equatable, Sendab
     }
 }
 
+public struct VoiceInkWhisperModelSimpleDownloadSessionID: Equatable, Hashable, Sendable {
+    private let rawValue: UUID
+
+    public init(rawValue: UUID = UUID()) {
+        self.rawValue = rawValue
+    }
+}
+
+public struct VoiceInkWhisperModelSimpleDownloadSessionState: Equatable, Sendable {
+    public private(set) var downloadTrackingState: VoiceInkWhisperModelSimpleDownloadTrackingState
+    private var activeSessionIDsByModelID: [String: VoiceInkWhisperModelSimpleDownloadSessionID]
+
+    public init(
+        downloadTrackingState: VoiceInkWhisperModelSimpleDownloadTrackingState = VoiceInkWhisperModelSimpleDownloadTrackingState()
+    ) {
+        self.downloadTrackingState = downloadTrackingState
+        self.activeSessionIDsByModelID = [:]
+    }
+
+    public func isDownloading(_ model: VoiceInkWhisperModelFileSpec) -> Bool {
+        downloadTrackingState.isDownloading(model)
+    }
+
+    public func isCurrentDownload(
+        for model: VoiceInkWhisperModelFileSpec,
+        sessionID: VoiceInkWhisperModelSimpleDownloadSessionID
+    ) -> Bool {
+        activeSessionIDsByModelID[model.id] == sessionID
+    }
+
+    @discardableResult
+    public mutating func startDownload(
+        for model: VoiceInkWhisperModelFileSpec
+    ) -> VoiceInkWhisperModelSimpleDownloadSessionID? {
+        guard activeSessionIDsByModelID[model.id] == nil,
+              downloadTrackingState.startDownload(for: model) else {
+            return nil
+        }
+
+        let sessionID = VoiceInkWhisperModelSimpleDownloadSessionID()
+        activeSessionIDsByModelID[model.id] = sessionID
+        return sessionID
+    }
+
+    @discardableResult
+    public mutating func updateProgress(
+        _ progress: Double,
+        for model: VoiceInkWhisperModelFileSpec,
+        sessionID: VoiceInkWhisperModelSimpleDownloadSessionID
+    ) -> Bool {
+        guard isCurrentDownload(for: model, sessionID: sessionID) else {
+            return false
+        }
+
+        downloadTrackingState.updateProgress(progress, for: model)
+        return true
+    }
+
+    @discardableResult
+    public mutating func finishDownload(
+        for model: VoiceInkWhisperModelFileSpec,
+        sessionID: VoiceInkWhisperModelSimpleDownloadSessionID
+    ) -> Bool {
+        guard isCurrentDownload(for: model, sessionID: sessionID) else {
+            return false
+        }
+
+        activeSessionIDsByModelID[model.id] = nil
+        downloadTrackingState.finishDownload(for: model)
+        return true
+    }
+
+    @discardableResult
+    public mutating func cancelDownload(for model: VoiceInkWhisperModelFileSpec) -> Bool {
+        let hadActiveSession = activeSessionIDsByModelID[model.id] != nil
+        activeSessionIDsByModelID[model.id] = nil
+        downloadTrackingState.cancelDownload(for: model)
+        return hadActiveSession
+    }
+}
+
 public struct VoiceInkWhisperModelManagementSnapshot: Equatable, Sendable {
     public let modelsDirectory: URL
     private let downloadTrackingState: VoiceInkWhisperModelSimpleDownloadTrackingState

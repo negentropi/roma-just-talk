@@ -15,6 +15,7 @@ class LocalModelManager: ObservableObject {
     @Published var downloadError: VoiceInkWhisperModelOperationAlertPresentation?
     
     private var downloadTasks: [String: URLSessionDownloadTask] = [:]
+    private var downloadTaskIDs: [String: UUID] = [:]
     private var progressObservations: [String: NSKeyValueObservation] = [:]
     private let logger = VoiceInkIOSLogger.localModelManagement
     
@@ -38,11 +39,14 @@ class LocalModelManager: ObservableObject {
         logger.notice("\(VoiceInkWhisperModelManagementDiagnostics.startingDownloadMessage(modelName: model.modelName, downloadURL: model.downloadURL), privacy: .public)")
         
         downloadError = nil
+        let downloadTaskID = UUID()
         
         let downloadTask = URLSession.shared.downloadTask(with: model.downloadURL) { [weak self] temporaryURL, response, error in
             Task { @MainActor in
-                self?.handleDownloadCompletion(
+                guard let self = self else { return }
+                self.handleDownloadCompletion(
                     for: model,
+                    downloadTaskID: downloadTaskID,
                     temporaryURL: temporaryURL,
                     response: response,
                     error: error
@@ -53,10 +57,12 @@ class LocalModelManager: ObservableObject {
         // Track progress
         let progressObservation = downloadTask.progress.observe(\.fractionCompleted) { [weak self] progress, _ in
             Task { @MainActor in
-                self?.downloadTrackingState.updateProgress(progress.fractionCompleted, for: model)
+                guard let self = self, self.downloadTaskIDs[model.id] == downloadTaskID else { return }
+                self.downloadTrackingState.updateProgress(progress.fractionCompleted, for: model)
             }
         }
 
+        downloadTaskIDs[model.id] = downloadTaskID
         downloadTasks[model.id] = downloadTask
         progressObservations[model.id] = progressObservation
         downloadTask.resume()
@@ -64,13 +70,17 @@ class LocalModelManager: ObservableObject {
     
     private func handleDownloadCompletion(
         for model: VoiceInkWhisperModelFileSpec,
+        downloadTaskID: UUID,
         temporaryURL: URL?,
         response: URLResponse?,
         error: Error?
     ) {
+        guard downloadTaskIDs[model.id] == downloadTaskID else { return }
+
         defer {
             downloadTrackingState.finishDownload(for: model)
             downloadTasks[model.id] = nil
+            downloadTaskIDs[model.id] = nil
             progressObservations[model.id] = nil
         }
         
@@ -114,8 +124,12 @@ class LocalModelManager: ObservableObject {
     
     /// Cancel download for a specific model
     func cancelDownload(for model: VoiceInkWhisperModelFileSpec) {
+        if downloadTasks[model.id] != nil {
+            logger.notice("\(VoiceInkWhisperModelManagementDiagnostics.downloadCancelledMessage(modelName: model.modelName), privacy: .public)")
+        }
         downloadTasks[model.id]?.cancel()
         downloadTasks[model.id] = nil
+        downloadTaskIDs[model.id] = nil
         progressObservations[model.id] = nil
         downloadTrackingState.cancelDownload(for: model)
     }

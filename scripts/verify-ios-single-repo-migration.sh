@@ -4966,6 +4966,17 @@ require_patterns \
   'downloadTrackingState\.finishDownload\(for: model\)' \
   'downloadTrackingState\.cancelDownload\(for: model\)'
 
+require_patterns \
+  "iOS local model manager guards URLSession callbacks by active download identity" \
+  iOS/VoiceInk-ios/LocalModelManager.swift \
+  'private var downloadTaskIDs: \[String: UUID\] = \[:\]' \
+  'let downloadTaskID = UUID\(\)' \
+  'downloadTaskIDs\[model\.id\] = downloadTaskID' \
+  'guard let self = self, self\.downloadTaskIDs\[model\.id\] == downloadTaskID else \{ return \}' \
+  'downloadTaskID: UUID' \
+  'guard downloadTaskIDs\[model\.id\] == downloadTaskID else \{ return \}' \
+  'downloadTaskIDs\[model\.id\] = nil'
+
 require_pattern \
   "iOS local model manager exposes shared management rows" \
   'VoiceInkWhisperModelManagementList\.(row|rows)|managementRow' \

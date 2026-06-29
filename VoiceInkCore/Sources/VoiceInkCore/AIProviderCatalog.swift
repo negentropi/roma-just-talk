@@ -263,6 +263,22 @@ public enum VoiceInkAIEnhancementConnectionStatusPresentation: Sendable, Equatab
     case status(text: String, tone: VoiceInkAIEnhancementConnectionStatusTone)
 }
 
+public struct VoiceInkAIEnhancementModelPickerPresentation: Sendable, Equatable {
+    public let isModelPickerVisible: Bool
+    public let isRefreshButtonVisible: Bool
+    public let emptyStateText: String?
+
+    public init(
+        isModelPickerVisible: Bool,
+        isRefreshButtonVisible: Bool,
+        emptyStateText: String?
+    ) {
+        self.isModelPickerVisible = isModelPickerVisible
+        self.isRefreshButtonVisible = isRefreshButtonVisible
+        self.emptyStateText = emptyStateText
+    }
+}
+
 public struct VoiceInkAIEnhancementAPIKeyControlPresentation: Sendable, Equatable {
     public let isVerificationProgressVisible: Bool
     public let isDefaultVerifyAndSaveButtonDisabled: Bool
@@ -351,6 +367,32 @@ public struct VoiceInkAIEnhancementProviderSettingsPresentation: Sendable, Equat
             return isAPIKeyValid
                 ? .status(text: connectedText, tone: .connected)
                 : nil
+        }
+    }
+
+    public func modelPickerPresentation(
+        provider: VoiceInkAIEnhancementProviderKind,
+        availableModels: [String]
+    ) -> VoiceInkAIEnhancementModelPickerPresentation {
+        switch provider {
+        case .openRouter:
+            return VoiceInkAIEnhancementModelPickerPresentation(
+                isModelPickerVisible: !availableModels.isEmpty,
+                isRefreshButtonVisible: true,
+                emptyStateText: availableModels.isEmpty ? noModelsLoadedText : nil
+            )
+        case .anthropic, .assemblyAI, .cerebras, .deepgram, .elevenLabs, .groq, .gemini, .mistral, .openAI, .soniox, .speechmatics:
+            return VoiceInkAIEnhancementModelPickerPresentation(
+                isModelPickerVisible: !availableModels.isEmpty,
+                isRefreshButtonVisible: false,
+                emptyStateText: nil
+            )
+        case .custom, .localCLI, .ollama:
+            return VoiceInkAIEnhancementModelPickerPresentation(
+                isModelPickerVisible: false,
+                isRefreshButtonVisible: false,
+                emptyStateText: nil
+            )
         }
     }
 
@@ -1155,10 +1197,6 @@ public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
         }
     }
 
-    public var supportsUserInitiatedTextEnhancementModelRefresh: Bool {
-        self == .openRouter
-    }
-
     public var showsTextEnhancementModelOptions: Bool {
         switch self {
         case .custom:
@@ -1181,17 +1219,6 @@ public enum VoiceInkAIEnhancementProviderKind: String, CaseIterable, Sendable {
             return staticTextEnhancementModels
         case .localCLI, .custom:
             return []
-        }
-    }
-
-    public func shouldShowStaticTextEnhancementModelPicker(availableModels: [String]) -> Bool {
-        guard !availableModels.isEmpty else { return false }
-
-        switch self {
-        case .anthropic, .assemblyAI, .cerebras, .deepgram, .elevenLabs, .groq, .gemini, .mistral, .openAI, .soniox, .speechmatics:
-            return true
-        case .custom, .localCLI, .ollama, .openRouter:
-            return false
         }
     }
 

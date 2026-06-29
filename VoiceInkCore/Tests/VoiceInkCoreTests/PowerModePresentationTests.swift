@@ -229,6 +229,13 @@ final class PowerModePresentationTests: XCTestCase {
             VoiceInkPowerModePresentation.noAIModelsAvailableText(for: .gemini),
             "No models available"
         )
+        for provider in VoiceInkAIEnhancementProviderKind.allCases {
+            XCTAssertEqual(
+                VoiceInkPowerModePresentation.shouldShowRefreshModelsButton(for: provider),
+                provider == .openRouter,
+                provider.rawValue
+            )
+        }
         XCTAssertEqual(VoiceInkPowerModePresentation.noEnhancementPromptsAvailableText, "No prompts available")
         XCTAssertEqual(VoiceInkPowerModePresentation.appTriggerSystemImageName, "app.fill")
         XCTAssertEqual(VoiceInkPowerModePresentation.websiteTriggerSystemImageName, "globe")

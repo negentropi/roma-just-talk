@@ -34,6 +34,10 @@ struct APIKeyManagementView: View {
             customProviderBaseURL: aiService.customBaseURL,
             customProviderModelName: aiService.customModel
         )
+        let modelPickerPresentation = providerSettingsPresentation.modelPickerPresentation(
+            provider: aiService.selectedProvider,
+            availableModels: aiService.availableModels
+        )
 
         Section(providerSettingsPresentation.sectionTitle) {
             HStack {
@@ -69,21 +73,21 @@ struct APIKeyManagementView: View {
 
             VStack(alignment: .leading, spacing: 12) {
                 // Model Selection
-                if aiService.selectedProvider.supportsUserInitiatedTextEnhancementModelRefresh {
-                    if aiService.availableModels.isEmpty {
-                        HStack {
-                            Text(providerSettingsPresentation.noModelsLoadedText)
-                                .foregroundColor(.secondary)
-                            Spacer()
+                if let emptyStateText = modelPickerPresentation.emptyStateText {
+                    HStack {
+                        Text(emptyStateText)
+                            .foregroundColor(.secondary)
+                        Spacer()
+                        if modelPickerPresentation.isRefreshButtonVisible {
                             Button(action: {
-                                Task {
-                                    await aiService.fetchOpenRouterModels()
-                                }
+                                Task { await aiService.fetchOpenRouterModels() }
                             }) {
                                 Label(providerSettingsPresentation.refreshButtonTitle, systemImage: "arrow.clockwise")
                             }
                         }
-                    } else {
+                    }
+                } else if modelPickerPresentation.isModelPickerVisible {
+                    if modelPickerPresentation.isRefreshButtonVisible {
                         HStack {
                             Picker(providerSettingsPresentation.modelPickerTitle, selection: Binding(
                                 get: { aiService.currentModel },
@@ -104,17 +108,14 @@ struct APIKeyManagementView: View {
                                 Label(providerSettingsPresentation.refreshButtonTitle, systemImage: "arrow.clockwise")
                             }
                         }
-                    }
-                    
-                } else if aiService.selectedProvider.shouldShowStaticTextEnhancementModelPicker(
-                    availableModels: aiService.availableModels
-                ) {
-                    Picker(providerSettingsPresentation.modelPickerTitle, selection: Binding(
-                        get: { aiService.currentModel },
-                        set: { aiService.selectModel($0) }
-                    )) {
-                        ForEach(aiService.availableModels, id: \.self) { model in
-                            Text(model).tag(model)
+                    } else {
+                        Picker(providerSettingsPresentation.modelPickerTitle, selection: Binding(
+                            get: { aiService.currentModel },
+                            set: { aiService.selectModel($0) }
+                        )) {
+                            ForEach(aiService.availableModels, id: \.self) { model in
+                                Text(model).tag(model)
+                            }
                         }
                     }
                 }

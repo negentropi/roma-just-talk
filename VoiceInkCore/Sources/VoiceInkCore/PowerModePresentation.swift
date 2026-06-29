@@ -273,7 +273,14 @@ public enum VoiceInkPowerModePresentation {
     }
 
     public static func noAIModelsAvailableText(for provider: VoiceInkAIEnhancementProviderKind) -> String {
-        provider.supportsUserInitiatedTextEnhancementModelRefresh ? noAIModelsLoadedText : noAIModelsAvailableText
+        shouldShowRefreshModelsButton(for: provider) ? noAIModelsLoadedText : noAIModelsAvailableText
+    }
+
+    public static func shouldShowRefreshModelsButton(for provider: VoiceInkAIEnhancementProviderKind) -> Bool {
+        VoiceInkAIEnhancementProviderSettingsPresentation.macOS.modelPickerPresentation(
+            provider: provider,
+            availableModels: []
+        ).isRefreshButtonVisible
     }
 
     public static func recorderButtonIcon(

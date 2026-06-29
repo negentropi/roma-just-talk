@@ -1676,45 +1676,60 @@ final class AIProviderCatalogTests: XCTestCase {
         )
     }
 
-    func testMacOSAIEnhancementStaticModelPickerVisibilityIsShared() {
-        let expectedVisibility: [VoiceInkAIEnhancementProviderKind: Bool] = [
-            .anthropic: true,
-            .assemblyAI: true,
-            .cerebras: true,
-            .custom: false,
-            .deepgram: true,
-            .elevenLabs: true,
-            .gemini: true,
-            .groq: true,
-            .localCLI: false,
-            .mistral: true,
-            .ollama: false,
-            .openAI: true,
-            .openRouter: false,
-            .soniox: true,
-            .speechmatics: true
+    func testMacOSAIEnhancementModelPickerPresentationIsShared() {
+        let presentation = VoiceInkAIEnhancementProviderSettingsPresentation.macOS
+        let hidden = VoiceInkAIEnhancementModelPickerPresentation(
+            isModelPickerVisible: false,
+            isRefreshButtonVisible: false,
+            emptyStateText: nil
+        )
+        let staticPicker = VoiceInkAIEnhancementModelPickerPresentation(
+            isModelPickerVisible: true,
+            isRefreshButtonVisible: false,
+            emptyStateText: nil
+        )
+        let refreshablePicker = VoiceInkAIEnhancementModelPickerPresentation(
+            isModelPickerVisible: true,
+            isRefreshButtonVisible: true,
+            emptyStateText: nil
+        )
+        let refreshableEmptyState = VoiceInkAIEnhancementModelPickerPresentation(
+            isModelPickerVisible: false,
+            isRefreshButtonVisible: true,
+            emptyStateText: "No models loaded"
+        )
+        let expectedLoadedPresentations: [VoiceInkAIEnhancementProviderKind: VoiceInkAIEnhancementModelPickerPresentation] = [
+            .anthropic: staticPicker,
+            .assemblyAI: staticPicker,
+            .cerebras: staticPicker,
+            .custom: hidden,
+            .deepgram: staticPicker,
+            .elevenLabs: staticPicker,
+            .gemini: staticPicker,
+            .groq: staticPicker,
+            .localCLI: hidden,
+            .mistral: staticPicker,
+            .ollama: hidden,
+            .openAI: staticPicker,
+            .openRouter: refreshablePicker,
+            .soniox: staticPicker,
+            .speechmatics: staticPicker
         ]
 
-        XCTAssertEqual(VoiceInkAIEnhancementProviderKind.allCases.count, expectedVisibility.count)
+        XCTAssertEqual(VoiceInkAIEnhancementProviderKind.allCases.count, expectedLoadedPresentations.count)
 
-        for (provider, shouldShowPicker) in expectedVisibility {
+        for (provider, expectedPresentation) in expectedLoadedPresentations {
             XCTAssertEqual(
-                provider.shouldShowStaticTextEnhancementModelPicker(availableModels: ["model"]),
-                shouldShowPicker,
+                presentation.modelPickerPresentation(provider: provider, availableModels: ["model"]),
+                expectedPresentation,
                 provider.rawValue
             )
-            XCTAssertFalse(
-                provider.shouldShowStaticTextEnhancementModelPicker(availableModels: []),
+            XCTAssertEqual(
+                presentation.modelPickerPresentation(provider: provider, availableModels: []),
+                provider == .openRouter ? refreshableEmptyState : hidden,
                 provider.rawValue
             )
         }
-    }
-
-    func testMacOSAIEnhancementUserInitiatedModelRefreshPolicyIsShared() {
-        XCTAssertTrue(VoiceInkAIEnhancementProviderKind.openRouter.supportsUserInitiatedTextEnhancementModelRefresh)
-        XCTAssertFalse(VoiceInkAIEnhancementProviderKind.ollama.supportsUserInitiatedTextEnhancementModelRefresh)
-        XCTAssertFalse(VoiceInkAIEnhancementProviderKind.groq.supportsUserInitiatedTextEnhancementModelRefresh)
-        XCTAssertFalse(VoiceInkAIEnhancementProviderKind.custom.supportsUserInitiatedTextEnhancementModelRefresh)
     }
 
     func testMacOSAIEnhancementModelOptionsVisibilityIsShared() {

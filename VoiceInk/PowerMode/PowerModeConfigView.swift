@@ -491,7 +491,7 @@ struct ConfigurationView: View {
                                     }
                                 }
 
-                                if provider.supportsUserInitiatedTextEnhancementModelRefresh {
+                                if VoiceInkPowerModePresentation.shouldShowRefreshModelsButton(for: provider) {
                                     Button(VoiceInkPowerModePresentation.refreshModelsButtonTitle) {
                                         Task { await aiService.fetchOpenRouterModels() }
                                     }

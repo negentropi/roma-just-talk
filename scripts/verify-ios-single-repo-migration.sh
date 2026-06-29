@@ -10065,10 +10065,10 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 require_patterns \
-  "shared AI enhancement available-model source policy lives in VoiceInkCore" \
+  "shared AI enhancement available-model and picker presentation policy lives in VoiceInkCore" \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift \
   'textEnhancementAvailableModels' \
-  'shouldShowStaticTextEnhancementModelPicker'
+  'modelPickerPresentation'
 
 reject_pattern \
   "shared AI enhancement available-model policy avoids public source metadata" \
@@ -10087,8 +10087,8 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
-  "core checks execute shared AI enhancement static model-picker coverage" \
-  'AIProviderCatalogTests\.testMacOSAIEnhancementStaticModelPickerVisibilityIsShared' \
+  "core checks execute shared AI enhancement model-picker presentation coverage" \
+  'AIProviderCatalogTests\.testMacOSAIEnhancementModelPickerPresentationIsShared' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -10107,10 +10107,18 @@ require_pattern \
   VoiceInk/Services/AIEnhancement/AIService.swift
 
 require_patterns \
-  "macOS AI settings model-picker display uses shared policy" \
+  "macOS AI settings model-picker display uses shared presentation" \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift \
-  'supportsUserInitiatedTextEnhancementModelRefresh' \
-  'shouldShowStaticTextEnhancementModelPicker'
+  'modelPickerPresentation' \
+  'isModelPickerVisible' \
+  'isRefreshButtonVisible' \
+  'emptyStateText'
+
+require_patterns \
+  "shared AI enhancement model-picker presentation lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift \
+  'VoiceInkAIEnhancementModelPickerPresentation' \
+  'modelPickerPresentation'
 
 require_pattern \
   "shared AI enhancement model-option visibility policy lives in VoiceInkCore" \
@@ -10130,6 +10138,21 @@ reject_pattern \
 reject_pattern \
   "migration docs avoid stale AI settings-surface classification wording" \
   'settings-surface classification' \
+  docs/ios-single-repo-migration.md
+
+reject_pattern \
+  "shared AI enhancement model-picker raw metadata stays hidden" \
+  'supportsUserInitiatedTextEnhancementModelRefresh|shouldShowStaticTextEnhancementModelPicker|UserInitiatedModelRefreshPolicyIsShared|StaticModelPickerVisibilityIsShared' \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AIProviderCatalogTests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  VoiceInk/Views/AI\ Models/APIKeyManagementView.swift \
+  VoiceInk/PowerMode/PowerModeConfigView.swift \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
+
+reject_pattern \
+  "migration docs avoid stale static model-picker wording" \
+  'static model-picker visibility' \
   docs/ios-single-repo-migration.md
 
 require_pattern \
@@ -10187,10 +10210,14 @@ reject_pattern \
   '"(API Endpoint URL|Model Name|API Key Set|API Key|Remove Key|Verify and Save)"|"e\.g\. https://api\.openai\.com/v1/chat/completions"|"e\.g\. gemini-3\.1-pro-preview, gpt-5\.5"|customBaseURL\.isEmpty \|\| aiService\.customModel\.isEmpty' \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift
 
-require_pattern \
-  "macOS Power Mode model refresh display uses shared policy" \
-  'supportsUserInitiatedTextEnhancementModelRefresh' \
+require_patterns \
+  "macOS Power Mode model refresh display uses shared presentation" \
   VoiceInk/PowerMode/PowerModeConfigView.swift \
+  'VoiceInkPowerModePresentation\.shouldShowRefreshModelsButton'
+
+require_pattern \
+  "shared Power Mode model refresh display presentation lives in VoiceInkCore" \
+  'shouldShowRefreshModelsButton' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
 
 require_pattern \

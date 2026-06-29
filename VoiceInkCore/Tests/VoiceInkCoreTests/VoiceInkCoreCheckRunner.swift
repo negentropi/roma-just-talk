@@ -1738,6 +1738,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadProgressFormatsIOSProgress", run: { WhisperModelFilesTests().testSimpleDownloadProgressFormatsIOSProgress() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadStateCombinesIOSDownloadedAndProgressState", run: { try WhisperModelFilesTests().testSimpleDownloadStateCombinesIOSDownloadedAndProgressState() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadTrackingStateOwnsIOSLifecycle", run: { try WhisperModelFilesTests().testSimpleDownloadTrackingStateOwnsIOSLifecycle() }),
+            VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadTrackingStateIgnoresInactiveProgress", run: { try WhisperModelFilesTests().testSimpleDownloadTrackingStateIgnoresInactiveProgress() }),
+            VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadTrackingStateCleansUpCancelledDownload", run: { try WhisperModelFilesTests().testSimpleDownloadTrackingStateCleansUpCancelledDownload() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testModelManagementDiagnosticsPreserveIOSLogCopy", run: { WhisperModelFilesTests().testModelManagementDiagnosticsPreserveIOSLogCopy() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadStateBuildsSharedRowPresentation", run: { WhisperModelFilesTests().testSimpleDownloadStateBuildsSharedRowPresentation() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSimpleDownloadRowPresentationBuildsDeferredRuntimeAction", run: { WhisperModelFilesTests().testSimpleDownloadRowPresentationBuildsDeferredRuntimeAction() }),

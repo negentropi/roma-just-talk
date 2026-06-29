@@ -695,6 +695,49 @@ final class WhisperModelFilesTests: XCTestCase {
         XCTAssertTrue(downloadedState.isDownloaded)
         XCTAssertFalse(downloadedState.isDownloading)
         XCTAssertFalse(trackingState.isDownloading(model))
+
+        trackingState.updateProgress(0.9, for: model)
+        XCTAssertFalse(trackingState.downloadState(for: model, modelsDirectory: modelsDirectory).isDownloading)
+    }
+
+    func testSimpleDownloadTrackingStateIgnoresInactiveProgress() throws {
+        let baseDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.WhisperModelDownloadInactiveProgressTests.\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: baseDirectory) }
+
+        let modelsDirectory = try VoiceInkWhisperModelFiles.createModelsDirectory(in: baseDirectory)
+        let model = VoiceInkWhisperModelFiles.baseModel
+        var trackingState = VoiceInkWhisperModelSimpleDownloadTrackingState()
+
+        trackingState.updateProgress(0.5, for: model)
+
+        let inactiveState = trackingState.downloadState(for: model, modelsDirectory: modelsDirectory)
+        XCTAssertFalse(inactiveState.isDownloading)
+        XCTAssertEqual(inactiveState.progress.fraction, 0)
+    }
+
+    func testSimpleDownloadTrackingStateCleansUpCancelledDownload() throws {
+        let baseDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.WhisperModelDownloadCancelTests.\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: baseDirectory) }
+
+        let modelsDirectory = try VoiceInkWhisperModelFiles.createModelsDirectory(in: baseDirectory)
+        let model = VoiceInkWhisperModelFiles.baseModel
+        var trackingState = VoiceInkWhisperModelSimpleDownloadTrackingState()
+
+        XCTAssertTrue(trackingState.startDownload(for: model))
+        trackingState.updateProgress(0.5, for: model)
+        XCTAssertTrue(trackingState.downloadState(for: model, modelsDirectory: modelsDirectory).isDownloading)
+
+        trackingState.cancelDownload(for: model)
+
+        XCTAssertFalse(trackingState.isDownloading(model))
+        XCTAssertFalse(trackingState.downloadState(for: model, modelsDirectory: modelsDirectory).isDownloading)
+        trackingState.updateProgress(0.9, for: model)
+        XCTAssertEqual(
+            trackingState.downloadState(for: model, modelsDirectory: modelsDirectory).progress.fraction,
+            0
+        )
     }
 
     func testModelManagementDiagnosticsPreserveIOSLogCopy() {

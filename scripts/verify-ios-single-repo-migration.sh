@@ -4500,8 +4500,15 @@ require_pattern \
 
 require_pattern \
   "shared Whisper simple download tracking state lives in VoiceInkCore" \
-  'VoiceInkWhisperModelSimpleDownloadTrackingState|startDownload\(for:|finishDownload\(for:|downloadState\(for:' \
+  'VoiceInkWhisperModelSimpleDownloadTrackingState|startDownload\(for:|updateProgress\(|finishDownload\(for:|cancelDownload\(for:|downloadState\(for:' \
   VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+
+require_patterns \
+  "core checks execute simple download tracking lifecycle tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'WhisperModelFilesTests\.testSimpleDownloadTrackingStateOwnsIOSLifecycle' \
+  'WhisperModelFilesTests\.testSimpleDownloadTrackingStateIgnoresInactiveProgress' \
+  'WhisperModelFilesTests\.testSimpleDownloadTrackingStateCleansUpCancelledDownload'
 
 require_pattern \
   "shared Whisper model download row presentation lives in VoiceInkCore" \
@@ -4951,6 +4958,14 @@ require_pattern \
   'VoiceInkWhisperModelSimpleDownloadTrackingState|downloadTrackingState|downloadState\(for:' \
   iOS/VoiceInk-ios/LocalModelManager.swift
 
+require_patterns \
+  "iOS local model manager delegates lifecycle tracking to shared core state" \
+  iOS/VoiceInk-ios/LocalModelManager.swift \
+  'downloadTrackingState\.startDownload\(for: model\)' \
+  'downloadTrackingState\.updateProgress\(progress\.fractionCompleted, for: model\)' \
+  'downloadTrackingState\.finishDownload\(for: model\)' \
+  'downloadTrackingState\.cancelDownload\(for: model\)'
+
 require_pattern \
   "iOS local model manager exposes shared management rows" \
   'VoiceInkWhisperModelManagementList\.(row|rows)|managementRow' \
@@ -4974,6 +4989,11 @@ reject_pattern \
 reject_pattern \
   "iOS local model manager avoids shell-owned download state dictionaries" \
   '@Published var +(downloadProgress|isDownloading)|isDownloading\[[^]]+\]|downloadProgress\[[^]]+\]' \
+  iOS/VoiceInk-ios/LocalModelManager.swift
+
+reject_pattern \
+  "iOS local model manager avoids shallow download tracking wrappers" \
+  'private func +(startDownloadTracking|updateDownloadProgress|finishDownloadTracking)\(|var +trackingState += +downloadTrackingState' \
   iOS/VoiceInk-ios/LocalModelManager.swift
 
 reject_pattern \

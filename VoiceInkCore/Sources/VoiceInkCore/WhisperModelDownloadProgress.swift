@@ -631,8 +631,12 @@ public struct VoiceInkWhisperModelSimpleDownloadTrackingState: Equatable, Sendab
     }
 
     public mutating func finishDownload(for model: VoiceInkWhisperModelFileSpec) {
-        isDownloadingByModelID[model.id] = false
+        isDownloadingByModelID[model.id] = nil
         downloadProgressByModelID[model.id] = nil
+    }
+
+    public mutating func cancelDownload(for model: VoiceInkWhisperModelFileSpec) {
+        finishDownload(for: model)
     }
 
     public func downloadState(

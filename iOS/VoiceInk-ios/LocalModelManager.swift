@@ -30,7 +30,7 @@ class LocalModelManager: ObservableObject {
     
     /// Download a specific model
     func downloadModel(_ model: VoiceInkWhisperModelFileSpec) async {
-        guard startDownloadTracking(for: model) else {
+        guard downloadTrackingState.startDownload(for: model) else {
             logger.notice("\(VoiceInkWhisperModelManagementDiagnostics.alreadyDownloadingMessage(modelName: model.modelName), privacy: .public)")
             return
         }
@@ -53,7 +53,7 @@ class LocalModelManager: ObservableObject {
         // Track progress
         let progressObservation = downloadTask.progress.observe(\.fractionCompleted) { [weak self] progress, _ in
             Task { @MainActor in
-                self?.updateDownloadProgress(progress.fractionCompleted, for: model)
+                self?.downloadTrackingState.updateProgress(progress.fractionCompleted, for: model)
             }
         }
 
@@ -69,7 +69,7 @@ class LocalModelManager: ObservableObject {
         error: Error?
     ) {
         defer {
-            finishDownloadTracking(for: model)
+            downloadTrackingState.finishDownload(for: model)
             downloadTasks[model.id] = nil
             progressObservations[model.id] = nil
         }
@@ -104,7 +104,7 @@ class LocalModelManager: ObservableObject {
             )
             
             logger.notice("\(VoiceInkWhisperModelManagementDiagnostics.downloadedMessage(modelName: model.modelName, finalPath: finalURL.path), privacy: .public)")
-            updateDownloadProgress(1.0, for: model)
+            downloadTrackingState.updateProgress(1.0, for: model)
             
         } catch {
             downloadError = .saveFailed(for: error)
@@ -117,7 +117,7 @@ class LocalModelManager: ObservableObject {
         downloadTasks[model.id]?.cancel()
         downloadTasks[model.id] = nil
         progressObservations[model.id] = nil
-        finishDownloadTracking(for: model)
+        downloadTrackingState.cancelDownload(for: model)
     }
     
     /// Delete a downloaded model
@@ -175,31 +175,6 @@ class LocalModelManager: ObservableObject {
             for: model,
             downloadState: downloadState(for: model)
         )
-    }
-
-    private func startDownloadTracking(for model: VoiceInkWhisperModelFileSpec) -> Bool {
-        var trackingState = downloadTrackingState
-        guard trackingState.startDownload(for: model) else {
-            return false
-        }
-
-        downloadTrackingState = trackingState
-        return true
-    }
-
-    private func updateDownloadProgress(
-        _ progress: Double,
-        for model: VoiceInkWhisperModelFileSpec
-    ) {
-        var trackingState = downloadTrackingState
-        trackingState.updateProgress(progress, for: model)
-        downloadTrackingState = trackingState
-    }
-
-    private func finishDownloadTracking(for model: VoiceInkWhisperModelFileSpec) {
-        var trackingState = downloadTrackingState
-        trackingState.finishDownload(for: model)
-        downloadTrackingState = trackingState
     }
     
 }

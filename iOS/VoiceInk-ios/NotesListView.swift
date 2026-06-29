@@ -64,7 +64,7 @@ struct NotesListView: View {
                 }
                 .sheet(
                     isPresented: Binding(
-                        get: { recordingManager.isRecordingSheetPresented },
+                        get: { recordingManager.flowState.isRecordingSheetPresented },
                         set: { recordingManager.setRecordingSheetPresented($0) }
                     )
                 ) {
@@ -86,7 +86,7 @@ struct NotesListView: View {
                     for: VoiceInkAppIdentity.iOSStopRecordingFromKeyboardNotificationName
                 )) { _ in
                     VoiceInkKeyboardStopRecordingRequestPolicy.plan(
-                        recordingState: recordingManager.recordingState
+                        recordingState: recordingManager.flowState.recordingState
                     ).applyRuntimeState {
                         recordingManager.stopRecording(modelContext: modelContext)
                     }

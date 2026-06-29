@@ -16,7 +16,7 @@ struct RecordingSheetView: View {
                     .font(.body)
                 Spacer()
                 Text(VoiceInkDurationPresentation.minutesSeconds(
-                    recordingManager.currentDuration,
+                    recordingManager.flowState.currentDuration,
                     padMinutesToTwoDigits: true
                 ))
                     .font(.title2.monospacedDigit())

@@ -1456,6 +1456,11 @@ reject_pattern \
   '@Published var +(recordingState|animate|isRecordingSheetPresented|currentDuration)' \
   iOS/VoiceInk-ios/RecordingManager.swift
 
+reject_multiline_pattern \
+  "iOS recording manager avoids shallow recording flow property wrappers" \
+  'var[[:space:]]+(recordingState|animate|isRecordingSheetPresented|currentDuration)[[:space:]]*:[^{]+\{[[:space:]]*flowState\.(recordingState|animate|isRecordingSheetPresented|currentDuration)[[:space:]]*\}' \
+  iOS/VoiceInk-ios/RecordingManager.swift
+
 reject_pattern \
   "iOS recording manager avoids shell-owned microphone permission action enum" \
   'private enum MicrophonePermissionStatus|case granted, denied, undetermined' \

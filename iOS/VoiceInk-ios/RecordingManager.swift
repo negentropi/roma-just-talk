@@ -9,7 +9,7 @@ import VoiceInkCore
 @MainActor
 final class RecordingManager: ObservableObject {
     @Published var activeRecordingAlert: VoiceInkRecordingAlertPresentation?
-    @Published private var flowState = VoiceInkRecordingFlowState()
+    @Published private(set) var flowState = VoiceInkRecordingFlowState()
     
     private let recorder = AudioRecorder()
     private let settings = AppSettings.shared
@@ -17,22 +17,6 @@ final class RecordingManager: ObservableObject {
 
     private let coordinator = AppGroupCoordinator.shared
     
-    var recordingState: VoiceInkRecordingState {
-        flowState.recordingState
-    }
-
-    var animate: Bool {
-        flowState.animate
-    }
-
-    var isRecordingSheetPresented: Bool {
-        flowState.isRecordingSheetPresented
-    }
-
-    var currentDuration: TimeInterval {
-        flowState.currentDuration
-    }
-
     var currentAudioLevels: [Float] {
         recorder.levelsHistory
     }
@@ -53,7 +37,7 @@ final class RecordingManager: ObservableObject {
         coordinator.onStopRecordingRequested = { [weak self] in
             guard let self = self else { return }
 
-            VoiceInkKeyboardStopRecordingRequestPolicy.plan(recordingState: self.recordingState)
+            VoiceInkKeyboardStopRecordingRequestPolicy.plan(recordingState: self.flowState.recordingState)
                 .applyRuntimeState {
                     // We need modelContext, so the SwiftUI shell completes the stop from this notification.
                     VoiceInkIOSLogger.recording.notice("\(VoiceInkIOSRecordingCoordinationDiagnostics.keyboardStopRecordingRequestedMessage, privacy: .public)")

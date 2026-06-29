@@ -96,16 +96,15 @@ struct ModelDownloadOnboardingView: View {
     @Binding var currentStep: VoiceInkIOSOnboardingStep
     @StateObject private var modelManager = LocalModelManager.shared
     @State private var showDownloadConfirmation = false
-    private let onboardingPresentation = VoiceInkIOSOnboardingPresentation.modelDownload
-    private let downloadModel = VoiceInkIOSOnboardingPresentation.defaultDownloadModel
     
     var body: some View {
-        let row = modelManager.managementRow(for: downloadModel)
-        let presentation = row.presentation
-        let primaryAction = onboardingPresentation.primaryAction(for: presentation)
-        let confirmedDownloadAction = row.confirmedDownloadRuntimeAction {
+        let snapshot = modelManager.onboardingModelDownloadSnapshot()
+        let onboardingPresentation = snapshot.onboardingPresentation
+        let presentation = snapshot.rowPresentation
+        let primaryAction = snapshot.primaryAction
+        let confirmedDownloadAction = snapshot.confirmedDownloadRuntimeAction {
             Task {
-                await modelManager.downloadModel(downloadModel)
+                await modelManager.downloadModel(snapshot.model)
             }
         }
         let primaryRuntimeAction = primaryAction.runtimeAction(
@@ -219,11 +218,11 @@ struct ModelDownloadOnboardingView: View {
                 }
             )
         }
-        .alert(row.downloadConfirmation.title, isPresented: $showDownloadConfirmation) {
-            Button(row.downloadConfirmation.primaryButtonTitle, action: confirmedDownloadAction ?? {})
-            Button(row.downloadConfirmation.cancelButtonTitle, role: .cancel) { }
+        .alert(snapshot.downloadConfirmation.title, isPresented: $showDownloadConfirmation) {
+            Button(snapshot.downloadConfirmation.primaryButtonTitle, action: confirmedDownloadAction ?? {})
+            Button(snapshot.downloadConfirmation.cancelButtonTitle, role: .cancel) { }
         } message: {
-            Text(row.downloadConfirmation.message)
+            Text(snapshot.downloadConfirmation.message)
         }
     }
 }

@@ -154,6 +154,49 @@ public struct VoiceInkOnboardingModelDownloadPrimaryAction: Equatable, Sendable 
     }
 }
 
+public struct VoiceInkIOSOnboardingModelDownloadSnapshot: Equatable, Sendable {
+    public let onboardingPresentation: VoiceInkOnboardingModelDownloadPresentation
+    public let model: VoiceInkWhisperModelFileSpec
+    public let row: VoiceInkWhisperModelManagementRow
+    public let rowPresentation: VoiceInkWhisperModelDownloadRowPresentation
+    public let primaryAction: VoiceInkOnboardingModelDownloadPrimaryAction
+
+    public var downloadConfirmation: VoiceInkWhisperModelOperationConfirmationPresentation {
+        row.downloadConfirmation
+    }
+
+    public init(
+        onboardingPresentation: VoiceInkOnboardingModelDownloadPresentation = VoiceInkIOSOnboardingPresentation.modelDownload,
+        model: VoiceInkWhisperModelFileSpec = VoiceInkIOSOnboardingPresentation.defaultDownloadModel,
+        row: VoiceInkWhisperModelManagementRow
+    ) {
+        self.onboardingPresentation = onboardingPresentation
+        self.model = model
+        self.row = row
+        self.rowPresentation = row.presentation
+        self.primaryAction = onboardingPresentation.primaryAction(for: row.presentation)
+    }
+
+    public func confirmedDownloadRuntimeAction(
+        startDownload: @escaping () -> Void
+    ) -> (() -> Void)? {
+        row.confirmedDownloadRuntimeAction(startDownload: startDownload)
+    }
+}
+
+public extension VoiceInkWhisperModelManagementSnapshot {
+    func iOSOnboardingModelDownloadSnapshot(
+        fileManager: FileManager = .default
+    ) -> VoiceInkIOSOnboardingModelDownloadSnapshot {
+        let model = VoiceInkIOSOnboardingPresentation.defaultDownloadModel
+        return VoiceInkIOSOnboardingModelDownloadSnapshot(
+            onboardingPresentation: VoiceInkIOSOnboardingPresentation.modelDownload,
+            model: model,
+            row: managementRow(for: model, fileManager: fileManager)
+        )
+    }
+}
+
 public struct VoiceInkMacOSOnboardingModelDownloadPresentation: Equatable, Sendable {
     public let title: String
     public let subtitle: String

@@ -5318,35 +5318,56 @@ require_pattern \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 require_patterns \
-  "iOS onboarding uses shared default download model policy" \
-  iOS/VoiceInk-ios/OnboardingView.swift \
+  "shared iOS onboarding model-download snapshot owns default model row and actions" \
+  VoiceInkCore/Sources/VoiceInkCore/OnboardingPresentation.swift \
+  'VoiceInkIOSOnboardingModelDownloadSnapshot' \
   'VoiceInkIOSOnboardingPresentation\.defaultDownloadModel' \
-  'modelManager\.managementRow\(for: downloadModel\)' \
-  'modelManager\.downloadModel\(downloadModel\)'
+  'VoiceInkIOSOnboardingPresentation\.modelDownload' \
+  'managementRow\(for: model' \
+  'onboardingPresentation\.primaryAction\(for: row\.presentation\)' \
+  'row\.confirmedDownloadRuntimeAction'
+
+require_patterns \
+  "core checks execute iOS onboarding model-download snapshot test" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'OnboardingPresentationTests\.testIOSModelDownloadOnboardingSnapshotBuildsDefaultModelRowAndActions'
+
+require_pattern \
+  "iOS local model manager exposes shared onboarding model-download snapshot" \
+  'managementSnapshot\.iOSOnboardingModelDownloadSnapshot' \
+  iOS/VoiceInk-ios/LocalModelManager.swift
+
+require_patterns \
+  "iOS onboarding uses shared model-download snapshot" \
+  iOS/VoiceInk-ios/OnboardingView.swift \
+  'modelManager\.onboardingModelDownloadSnapshot\(\)' \
+  'snapshot\.rowPresentation' \
+  'snapshot\.primaryAction' \
+  'modelManager\.downloadModel\(snapshot\.model\)'
 
 reject_pattern \
   "iOS onboarding avoids shell-owned default model selection" \
-  'VoiceInkWhisperModelFiles\.baseModel|WhisperModel\.baseModel|private +(let|var) +baseModel\b' \
+  'VoiceInkIOSOnboardingPresentation\.defaultDownloadModel|VoiceInkWhisperModelFiles\.baseModel|WhisperModel\.baseModel|private +(let|var) +baseModel\b' \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 require_pattern \
   "iOS onboarding uses shared model management row" \
-  'modelManager\.managementRow\(for: downloadModel\)|row\.presentation' \
+  'snapshot\.rowPresentation' \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 require_pattern \
   "iOS onboarding uses shared model download confirmation" \
-  'row\.downloadConfirmation' \
+  'snapshot\.downloadConfirmation' \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 require_pattern \
   "iOS onboarding delegates download confirmation action mapping to shared core" \
-  'row\.confirmedDownloadRuntimeAction' \
+  'snapshot\.confirmedDownloadRuntimeAction' \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 reject_context_pattern \
   "iOS onboarding avoids direct download confirmation task wiring" \
-  'row\.downloadConfirmation\.title' \
+  'snapshot\.downloadConfirmation\.title' \
   'Task +\{' \
   iOS/VoiceInk-ios/OnboardingView.swift
 
@@ -5357,7 +5378,7 @@ require_pattern \
 
 require_pattern \
   "iOS onboarding uses shared model row presentation" \
-  'row\.presentation|actionSystemImageName|downloadButtonSystemImageName' \
+  'snapshot\.rowPresentation|actionSystemImageName|downloadButtonSystemImageName' \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 reject_pattern \
@@ -5379,12 +5400,12 @@ reject_pattern \
 
 reject_pattern \
   "iOS onboarding avoids shell-owned primary-action sequencing" \
-  'switch primaryAction|case \.waitForDownload|case \.continueSetup|case \.requestDownload' \
+  'switch primaryAction|case \.waitForDownload|case \.continueSetup|case \.requestDownload|\.primaryAction\(for:' \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 reject_pattern \
   "iOS onboarding avoids shell-owned model row assembly" \
-  'baseModelDownloadState|private var +(downloadConfirmation|rowPresentation)|VoiceInkWhisperModel(OperationConfirmation|DownloadRow)Presentation' \
+  'baseModelDownloadState|modelManager\.managementRow\(for:|private var +(downloadConfirmation|rowPresentation)|VoiceInkWhisperModel(OperationConfirmation|DownloadRow)Presentation' \
   iOS/VoiceInk-ios/OnboardingView.swift
 
 reject_pattern \

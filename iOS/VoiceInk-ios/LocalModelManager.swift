@@ -192,5 +192,9 @@ class LocalModelManager: ObservableObject {
     func managementRow(for model: VoiceInkWhisperModelFileSpec) -> VoiceInkWhisperModelManagementRow {
         managementSnapshot.managementRow(for: model)
     }
+
+    func onboardingModelDownloadSnapshot() -> VoiceInkIOSOnboardingModelDownloadSnapshot {
+        managementSnapshot.iOSOnboardingModelDownloadSnapshot()
+    }
     
 }

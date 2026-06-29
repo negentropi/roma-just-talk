@@ -210,6 +210,57 @@ final class OnboardingPresentationTests: XCTestCase {
         XCTAssertEqual(events, ["continue", "download"])
     }
 
+    func testIOSModelDownloadOnboardingSnapshotBuildsDefaultModelRowAndActions() throws {
+        let baseDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("VoiceInkCore.OnboardingModelDownloadSnapshotTests.\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: baseDirectory) }
+
+        let modelsDirectory = try VoiceInkWhisperModelFiles.createModelsDirectory(in: baseDirectory)
+        let model = VoiceInkIOSOnboardingPresentation.defaultDownloadModel
+        var trackingState = VoiceInkWhisperModelSimpleDownloadTrackingState()
+
+        let idleSnapshot = VoiceInkWhisperModelManagementSnapshot(
+            modelsDirectory: modelsDirectory,
+            downloadTrackingState: trackingState
+        ).iOSOnboardingModelDownloadSnapshot()
+
+        XCTAssertEqual(idleSnapshot.onboardingPresentation, VoiceInkIOSOnboardingPresentation.modelDownload)
+        XCTAssertEqual(idleSnapshot.model, model)
+        XCTAssertEqual(idleSnapshot.row.model, model)
+        XCTAssertEqual(idleSnapshot.rowPresentation.action, .download)
+        XCTAssertEqual(
+            idleSnapshot.primaryAction,
+            .requestDownload(title: "Download Model (142 MB)", systemImageName: "arrow.down.circle.fill")
+        )
+        XCTAssertEqual(idleSnapshot.downloadConfirmation, .download(for: model))
+
+        var events: [String] = []
+        idleSnapshot.confirmedDownloadRuntimeAction { events.append("download") }?()
+        XCTAssertEqual(events, ["download"])
+
+        XCTAssertTrue(trackingState.startDownload(for: model))
+        trackingState.updateProgress(0.42, for: model)
+        let downloadingSnapshot = VoiceInkWhisperModelManagementSnapshot(
+            modelsDirectory: modelsDirectory,
+            downloadTrackingState: trackingState
+        ).iOSOnboardingModelDownloadSnapshot()
+
+        XCTAssertEqual(downloadingSnapshot.rowPresentation.action, .downloading)
+        XCTAssertEqual(downloadingSnapshot.primaryAction, .waitForDownload(title: "Downloading..."))
+        XCTAssertNil(downloadingSnapshot.confirmedDownloadRuntimeAction { events.append("download") })
+
+        try Data().write(to: model.fileURL(in: modelsDirectory))
+        trackingState.finishDownload(for: model)
+        let downloadedSnapshot = VoiceInkWhisperModelManagementSnapshot(
+            modelsDirectory: modelsDirectory,
+            downloadTrackingState: trackingState
+        ).iOSOnboardingModelDownloadSnapshot()
+
+        XCTAssertEqual(downloadedSnapshot.rowPresentation.action, .downloaded)
+        XCTAssertEqual(downloadedSnapshot.primaryAction, .continueSetup(title: "Continue"))
+        XCTAssertNil(downloadedSnapshot.confirmedDownloadRuntimeAction { events.append("download") })
+    }
+
     func testMacOSModelDownloadOnboardingPresentationPreservesCopyAndButtonPolicy() {
         let presentation = VoiceInkMacOSOnboardingPresentation.modelDownload
 

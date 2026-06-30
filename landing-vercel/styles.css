@@ -136,8 +136,9 @@ a {
   width: min(1180px, calc(100% - 40px));
   margin: 0 auto;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 24px 0 30px;
+  justify-content: flex-start;
+  gap: clamp(38px, 7vh, 68px);
+  padding: 18px 0 30px;
 }
 
 .topline {
@@ -182,7 +183,7 @@ a {
 
 .hero-copy {
   max-width: 900px;
-  padding-top: 48px;
+  padding-top: 0;
 }
 
 .kicker {
@@ -603,7 +604,8 @@ h1 .before-word {
   .hero-inner {
     min-height: 82svh;
     width: min(100% - 28px, 1180px);
-    padding-top: 18px;
+    gap: 34px;
+    padding-top: 14px;
   }
 
   .topline {
@@ -615,7 +617,7 @@ h1 .before-word {
   }
 
   .hero-copy {
-    padding-top: 40px;
+    padding-top: 0;
   }
 
   h1 {

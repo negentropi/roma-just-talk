@@ -6481,10 +6481,23 @@ reject_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionClient.swift \
   VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionClient.swift
 
-require_pattern \
-  "shared API-key verification policy owns common verification result mapping" \
-  'VoiceInkAPIKeyVerificationPolicy|missingAPIKeyResult|verificationResult|missingHTTPResponseMessage|failureResult|errorMessage\(data:' \
-  VoiceInkCore/Sources/VoiceInkCore/APIKeyVerificationPolicy.swift
+section "obsolete standalone API-key verification policy module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/APIKeyVerificationPolicy.swift
+
+require_patterns \
+  "shared provider verifier owns API-key verification result policy" \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyVerifier.swift \
+  'public struct VoiceInkAPIKeyVerificationResult' \
+  'enum VoiceInkAPIKeyVerificationPolicy' \
+  'static let missingAPIKeyMessage = "API key is missing or empty\."' \
+  'static let missingHTTPResponseMessage = "No HTTP response received\."' \
+  'static func verify\(' \
+  'static func blankAPIKeyResultIfNeeded' \
+  'static var missingAPIKeyResult' \
+  'static func verificationResult\(data: Data, response: URLResponse\)' \
+  'VoiceInkRemoteHTTPResponsePolicy\.successStatusCodeRange' \
+  'static func failureResult' \
+  'static func errorMessage\(data: Data, statusCode: Int\)'
 
 require_pattern \
   "shared provider verification clients use shared API-key verification policy" \
@@ -6533,13 +6546,19 @@ require_patterns \
   'Authorization' \
   'VoiceInkOpenAICompatibleClient'
 
-require_pattern \
+require_patterns \
   "core checks execute API-key verification policy tests" \
-  'APIKeyVerificationPolicyTests\.testLegacyResultInitializerPreservesBoolAndMessage|APIKeyVerificationPolicyTests\.testBlankAPIKeyResultPreservesSharedFailureCopy|APIKeyVerificationPolicyTests\.testVerificationResultRejectsMissingHTTPResponse|APIKeyVerificationPolicyTests\.testVerificationResultAcceptsHTTP2xxResponses|APIKeyVerificationPolicyTests\.testVerificationResultReturnsHTTPBodyForFailure|APIKeyVerificationPolicyTests\.testVerificationResultFallsBackToHTTPStatusForNonUTF8FailureBody|APIKeyVerificationPolicyTests\.testFailureResultUsesLocalizedDescription' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'APIKeyVerificationPolicyTests\.testLegacyResultInitializerPreservesBoolAndMessage' \
+  'APIKeyVerificationPolicyTests\.testBlankAPIKeyResultPreservesSharedFailureCopy' \
+  'APIKeyVerificationPolicyTests\.testVerificationResultRejectsMissingHTTPResponse' \
+  'APIKeyVerificationPolicyTests\.testVerificationResultAcceptsHTTP2xxResponses' \
+  'APIKeyVerificationPolicyTests\.testVerificationResultReturnsHTTPBodyForFailure' \
+  'APIKeyVerificationPolicyTests\.testVerificationResultFallsBackToHTTPStatusForNonUTF8FailureBody' \
+  'APIKeyVerificationPolicyTests\.testFailureResultUsesLocalizedDescription'
 
 reject_pattern \
-  "shared provider verification clients avoid duplicate API-key verification result mapping" \
+  "shared remote provider verification clients avoid duplicate API-key verification result mapping" \
   'API key is missing or empty\.|No HTTP response received\.|String\(data: data, encoding: \.utf8\) \?\? "HTTP \(http\.statusCode\)"|guard !apiKey\.trimmingCharacters' \
   VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleClient.swift \
   VoiceInkCore/Sources/VoiceInkCore/DeepgramTranscriptionClient.swift \
@@ -6549,8 +6568,7 @@ reject_pattern \
   VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionClient.swift \
   VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionClient.swift \
   VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionClient.swift \
-  VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionClient.swift \
-  VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyVerifier.swift
+  VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionClient.swift
 
 require_pattern \
   "shared remote HTTP response policy owns success, retry, and provider-domain errors" \

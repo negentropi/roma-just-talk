@@ -5058,8 +5058,10 @@ require_patterns \
 
 reject_swift_pattern \
   "macOS ModelProvider alias stays deleted" \
-  '^typealias[[:space:]]+ModelProvider[[:space:]]*=' \
-  VoiceInk/Models/TranscriptionModel.swift
+  '(^|[[:space:]])typealias[[:space:]]+ModelProvider[[:space:]]*=' \
+  VoiceInk \
+  VoiceInkTests \
+  VoiceInkUITests
 
 require_patterns \
   "macOS transcription model uses shared macOS provider directly" \
@@ -6326,7 +6328,7 @@ require_patterns \
 
 reject_pattern \
   "macOS CloudModel avoids shell-owned literal cloud model initializer" \
-  'init\(id: UUID = UUID\(\), name: String, displayName: String, description: String, provider: VoiceInkMacOSTranscriptionModelProvider, speed: Double' \
+  'init\(id: UUID = UUID\(\), name: String, displayName: String, description: String, provider: [^,]+, speed: Double' \
   VoiceInk/Models/TranscriptionModel.swift
 
 reject_pattern \

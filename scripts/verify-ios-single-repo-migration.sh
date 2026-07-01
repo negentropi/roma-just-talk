@@ -15935,9 +15935,11 @@ require_pattern \
   'resolvedPowerModeConfiguration' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
+reject_file VoiceInkCore/Sources/VoiceInkCore/PowerModeBrowser.swift
+
 require_patterns \
   "shared Power Mode browser metadata lives in VoiceInkCore" \
-  VoiceInkCore/Sources/VoiceInkCore/PowerModeBrowser.swift \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift \
   'VoiceInkPowerModeBrowser' \
   'VoiceInkPowerModeBrowserURLDiagnostics' \
   'VoiceInkPowerModeBrowserDetectionDiagnostics' \
@@ -15953,10 +15955,13 @@ require_patterns \
   'executionFailedMessage' \
   'runningStatusMessage'
 
-require_pattern \
+require_patterns \
   "core checks execute Power Mode browser metadata and diagnostics tests" \
-  'PowerModePolicyTests\.testPowerModeBrowserCatalogPreservesMacOSMetadata|PowerModePolicyTests\.testPowerModeBrowserCatalogPreservesCurrentDetectionSet|PowerModePolicyTests\.testPowerModeBrowserURLDiagnosticsPreserveMacOSLogCopy|PowerModePolicyTests\.testPowerModeBrowserDetectionDiagnosticsPreserveMacOSLogCopy' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'PowerModePolicyTests\.testPowerModeBrowserCatalogPreservesMacOSMetadata' \
+  'PowerModePolicyTests\.testPowerModeBrowserCatalogPreservesCurrentDetectionSet' \
+  'PowerModePolicyTests\.testPowerModeBrowserURLDiagnosticsPreserveMacOSLogCopy' \
+  'PowerModePolicyTests\.testPowerModeBrowserDetectionDiagnosticsPreserveMacOSLogCopy'
 
 require_patterns \
   "shared Power Mode automatic resolution plan consumes browser catalog and diagnostics" \
@@ -15986,7 +15991,16 @@ require_patterns \
   'getCurrentURL\(from browser: VoiceInkPowerModeBrowser\)' \
   'isRunning\(_ browser: VoiceInkPowerModeBrowser\)' \
   'VoiceInkPowerModeBrowserURLDiagnostics\.loggerCategory' \
-  'VoiceInkPowerModeBrowserURLDiagnostics\.(scriptNotFoundMessage|attemptingExecutionMessage|browserNotRunningMessage|executingScriptMessage|emptyOutputMessage|scriptErrorMessage|successMessage|outputDecodeFailedMessage|executionFailedMessage|runningStatusMessage)' \
+  'VoiceInkPowerModeBrowserURLDiagnostics\.scriptNotFoundMessage' \
+  'VoiceInkPowerModeBrowserURLDiagnostics\.attemptingExecutionMessage' \
+  'VoiceInkPowerModeBrowserURLDiagnostics\.browserNotRunningMessage' \
+  'VoiceInkPowerModeBrowserURLDiagnostics\.executingScriptMessage' \
+  'VoiceInkPowerModeBrowserURLDiagnostics\.emptyOutputMessage' \
+  'VoiceInkPowerModeBrowserURLDiagnostics\.scriptErrorMessage' \
+  'VoiceInkPowerModeBrowserURLDiagnostics\.successMessage' \
+  'VoiceInkPowerModeBrowserURLDiagnostics\.outputDecodeFailedMessage' \
+  'VoiceInkPowerModeBrowserURLDiagnostics\.executionFailedMessage' \
+  'VoiceInkPowerModeBrowserURLDiagnostics\.runningStatusMessage' \
   'browser\.scriptName' \
   'browser\.bundleIdentifier' \
   'browser\.displayName'

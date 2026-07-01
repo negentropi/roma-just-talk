@@ -18950,14 +18950,14 @@ reject_pattern \
 require_patterns \
   "core checks execute app identity storage startup tests" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'AppIdentityTests\.testMacOSStorageAlertPresentationPreservesStartupCopy' \
-  'AppIdentityTests\.testStorageStartupDiagnosticsPreserveAppStartupCopy'
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "AppIdentityTests\.testMacOSStorageAlertPresentationPreservesStartupCopy", run: \{ AppIdentityTests\(\)\.testMacOSStorageAlertPresentationPreservesStartupCopy\(\) \}\),$' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "AppIdentityTests\.testStorageStartupDiagnosticsPreserveAppStartupCopy", run: \{ AppIdentityTests\(\)\.testStorageStartupDiagnosticsPreserveAppStartupCopy\(\) \}\),$'
 
 require_patterns \
   "core checks execute MiniRecorder AppIntent presentation tests from app identity" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'AppIdentityTests\.testMiniRecorderIntentPresentationPreservesMacOSShortcutCopy' \
-  'AppIdentityTests\.testMiniRecorderRequestPreservesMacOSNotificationNames'
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "AppIdentityTests\.testMiniRecorderIntentPresentationPreservesMacOSShortcutCopy", run: \{ AppIdentityTests\(\)\.testMiniRecorderIntentPresentationPreservesMacOSShortcutCopy\(\) \}\),$' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "AppIdentityTests\.testMiniRecorderRequestPreservesMacOSNotificationNames", run: \{ AppIdentityTests\(\)\.testMiniRecorderRequestPreservesMacOSNotificationNames\(\) \}\),$'
 
 reject_pattern \
   "core check runner avoids obsolete AppIntent presentation test suite references" \

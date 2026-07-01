@@ -2930,10 +2930,13 @@ section "obsolete standalone temporal presentation modules stay deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/DatePresentation.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/DurationPresentation.swift
 
-require_pattern \
+require_patterns \
   "shared date and duration presentation live with transcript presentation policy" \
-  'VoiceInkDatePresentation|VoiceInkDurationPresentation|relativeTimestamp|minutesSeconds' \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift \
+  'VoiceInkDatePresentation' \
+  'VoiceInkDurationPresentation' \
+  'relativeTimestamp' \
+  'minutesSeconds'
 
 require_pattern \
   "macOS transcription details use shared timestamp presentation" \
@@ -13648,10 +13651,11 @@ reject_pattern \
   'static let canceledTranscriptionText' \
   VoiceInk/Models/Transcription.swift
 
-require_pattern \
+require_patterns \
   "shared duration presentation owns positive-duration visibility" \
-  'shouldShowPositiveDuration|metadataSeparatorText' \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift \
+  'shouldShowPositiveDuration' \
+  'metadataSeparatorText'
 
 require_pattern \
   "shared stored-audio presentation uses shared positive-duration visibility" \

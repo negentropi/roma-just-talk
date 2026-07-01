@@ -13062,18 +13062,18 @@ reject_pattern \
 require_patterns \
   "core checks execute shared recording shortcut timing policy tests" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'SpecialShortcutEmptyFallbackPolicyTests\.testRecordingShortcutTimingPolicyPreservesMacOSThresholds' \
-  'SpecialShortcutEmptyFallbackPolicyTests\.testRecordingShortcutTimingPolicyDetectsPressCooldown' \
-  'SpecialShortcutEmptyFallbackPolicyTests\.testRecordingShortcutTimingPolicyHybridStopRequiresThresholdAndRecordingState' \
-  'SpecialShortcutEmptyFallbackPolicyTests\.testRecordingShortcutTimingPolicyConvertsSleepDelaySafely'
+  'VoiceInkCoreCheck\(name: "SpecialShortcutEmptyFallbackPolicyTests\.testRecordingShortcutTimingPolicyPreservesMacOSThresholds", run: \{ SpecialShortcutEmptyFallbackPolicyTests\(\)\.testRecordingShortcutTimingPolicyPreservesMacOSThresholds\(\) \}\)' \
+  'VoiceInkCoreCheck\(name: "SpecialShortcutEmptyFallbackPolicyTests\.testRecordingShortcutTimingPolicyDetectsPressCooldown", run: \{ SpecialShortcutEmptyFallbackPolicyTests\(\)\.testRecordingShortcutTimingPolicyDetectsPressCooldown\(\) \}\)' \
+  'VoiceInkCoreCheck\(name: "SpecialShortcutEmptyFallbackPolicyTests\.testRecordingShortcutTimingPolicyHybridStopRequiresThresholdAndRecordingState", run: \{ SpecialShortcutEmptyFallbackPolicyTests\(\)\.testRecordingShortcutTimingPolicyHybridStopRequiresThresholdAndRecordingState\(\) \}\)' \
+  'VoiceInkCoreCheck\(name: "SpecialShortcutEmptyFallbackPolicyTests\.testRecordingShortcutTimingPolicyConvertsSleepDelaySafely", run: \{ SpecialShortcutEmptyFallbackPolicyTests\(\)\.testRecordingShortcutTimingPolicyConvertsSleepDelaySafely\(\) \}\)'
 
 require_patterns \
   "core checks execute folded special shortcut key-evidence policy tests" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'SpecialShortcutEmptyFallbackPolicyTests\.testReliablePressContextAllowsSpecialShortcutCommit' \
-  'SpecialShortcutEmptyFallbackPolicyTests\.testTypingEvidenceDiscardsSpecialShortcut' \
-  'SpecialShortcutEmptyFallbackPolicyTests\.testUnreliableKeyEvidenceFailsClosed' \
-  'SpecialShortcutEmptyFallbackPolicyTests\.testShortcutInterruptionPolicyPreservesMacOSWindow'
+  'VoiceInkCoreCheck\(name: "SpecialShortcutEmptyFallbackPolicyTests\.testReliablePressContextAllowsSpecialShortcutCommit", run: \{ SpecialShortcutEmptyFallbackPolicyTests\(\)\.testReliablePressContextAllowsSpecialShortcutCommit\(\) \}\)' \
+  'VoiceInkCoreCheck\(name: "SpecialShortcutEmptyFallbackPolicyTests\.testTypingEvidenceDiscardsSpecialShortcut", run: \{ SpecialShortcutEmptyFallbackPolicyTests\(\)\.testTypingEvidenceDiscardsSpecialShortcut\(\) \}\)' \
+  'VoiceInkCoreCheck\(name: "SpecialShortcutEmptyFallbackPolicyTests\.testUnreliableKeyEvidenceFailsClosed", run: \{ SpecialShortcutEmptyFallbackPolicyTests\(\)\.testUnreliableKeyEvidenceFailsClosed\(\) \}\)' \
+  'VoiceInkCoreCheck\(name: "SpecialShortcutEmptyFallbackPolicyTests\.testShortcutInterruptionPolicyPreservesMacOSWindow", run: \{ SpecialShortcutEmptyFallbackPolicyTests\(\)\.testShortcutInterruptionPolicyPreservesMacOSWindow\(\) \}\)'
 
 require_pattern \
   "migration docs track shared recording shortcut timing policy" \

@@ -10016,8 +10016,9 @@ require_patterns \
   'VoiceInkStreamingKeysMigration.*from the shared streaming-preference module' \
   'VoiceInkTranscriptionStreamingPreference'
 
-section "obsolete standalone streaming final-commit timeout module stays deleted"
+section "obsolete standalone streaming final-commit timeout module/tests stay deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/StreamingFinalCommitTimeout.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/StreamingFinalCommitTimeoutTests.swift
 
 require_patterns \
   "streaming final-commit timeout lives with route planning" \
@@ -10025,6 +10026,20 @@ require_patterns \
   'VoiceInkStreamingFinalCommitSource' \
   'VoiceInkStreamingFinalCommitTimeout' \
   'VoiceInkTranscriptionSessionRoutePlan'
+
+require_patterns \
+  "streaming final-commit timeout tests live with transcription streaming preference tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionStreamingPreferenceTests.swift \
+  'testStreamingFinalCommitTimeoutPreservesCloudDefault' \
+  'testStreamingFinalCommitTimeoutPreservesLocalFluidAudioFastCommit' \
+  'VoiceInkStreamingFinalCommitTimeout\.cloudNanoseconds' \
+  'VoiceInkStreamingFinalCommitTimeout\.localFluidAudioNanoseconds'
+
+require_patterns \
+  "core checks execute streaming final-commit timeout tests through transcription streaming preference suite" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'TranscriptionStreamingPreferenceTests\(\)\.testStreamingFinalCommitTimeoutPreservesCloudDefault\(\)' \
+  'TranscriptionStreamingPreferenceTests\(\)\.testStreamingFinalCommitTimeoutPreservesLocalFluidAudioFastCommit\(\)'
 
 require_pattern \
   "shared core owns transcription session execution planning" \
@@ -10412,10 +10427,11 @@ reject_pattern \
   'fatalError\("Streaming route plan missing streaming adapter details\."\)|guard let streamingAdapterKind = routePlan\.streamingAdapterKind|routePlan\.usesStreaming' \
   VoiceInk/Transcription/Engine/TranscriptionServiceRegistry.swift
 
-require_pattern \
+require_patterns \
   "core checks execute transcription session execution plan tests" \
-  'TranscriptionStreamingPreferenceTests\.testSessionRouteExecutionPlanUsesFileServiceWhenStreamingDisabled|TranscriptionStreamingPreferenceTests\.testSessionRouteExecutionPlanPackagesStreamingAdapterPreloadAndTimeout' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'TranscriptionStreamingPreferenceTests\.testSessionRouteExecutionPlanUsesFileServiceWhenStreamingDisabled' \
+  'TranscriptionStreamingPreferenceTests\.testSessionRouteExecutionPlanPackagesStreamingAdapterPreloadAndTimeout'
 
 require_pattern \
   "core checks execute transcription route diagnostics test" \

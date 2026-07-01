@@ -3155,6 +3155,9 @@ require_patterns \
 reject_file \
   VoiceInkCore/Sources/VoiceInkCore/LastTranscriptionPolicy.swift
 
+reject_file \
+  VoiceInkCore/Tests/VoiceInkCoreTests/LastTranscriptionPolicyTests.swift
+
 require_patterns \
   "shared last-transcription policy lives with transcript presentation" \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift \
@@ -3175,7 +3178,7 @@ require_patterns \
 
 require_patterns \
   "core tests pin last-transcription policy" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/LastTranscriptionPolicyTests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptPresentationTests.swift \
   'testFirstPasteableCandidateSkipsExcludedPendingBlankAndCanceledCandidates' \
   'testFirstPasteableCandidatePreservesCandidateOrder' \
   'testPasteTextUsesOriginalOrEnhancedFallbackPolicy' \
@@ -3187,13 +3190,13 @@ require_patterns \
 require_patterns \
   "core check runner executes last-transcription policy tests" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'LastTranscriptionPolicyTests\.testFirstPasteableCandidateSkipsExcludedPendingBlankAndCanceledCandidates' \
-  'LastTranscriptionPolicyTests\.testFirstPasteableCandidatePreservesCandidateOrder' \
-  'LastTranscriptionPolicyTests\.testPasteTextUsesOriginalOrEnhancedFallbackPolicy' \
-  'LastTranscriptionPolicyTests\.testFetchLimitPreservesMacOSLastTranscriptionFetchWindow' \
-  'LastTranscriptionPolicyTests\.testFetchFailureDiagnosticPreservesMacOSCopy' \
-  'LastTranscriptionPolicyTests\.testLastTranscriptionNotificationPresentationsPreserveCopyOutcomes' \
-  'LastTranscriptionPolicyTests\.testLastTranscriptionRetryNotificationPresentationsPreserveMacOSCopy'
+  'TranscriptPresentationTests\.testFirstPasteableCandidateSkipsExcludedPendingBlankAndCanceledCandidates' \
+  'TranscriptPresentationTests\.testFirstPasteableCandidatePreservesCandidateOrder' \
+  'TranscriptPresentationTests\.testPasteTextUsesOriginalOrEnhancedFallbackPolicy' \
+  'TranscriptPresentationTests\.testFetchLimitPreservesMacOSLastTranscriptionFetchWindow' \
+  'TranscriptPresentationTests\.testFetchFailureDiagnosticPreservesMacOSCopy' \
+  'TranscriptPresentationTests\.testLastTranscriptionNotificationPresentationsPreserveCopyOutcomes' \
+  'TranscriptPresentationTests\.testLastTranscriptionRetryNotificationPresentationsPreserveMacOSCopy'
 
 require_pattern \
   "iOS note row uses shared note row presentation" \

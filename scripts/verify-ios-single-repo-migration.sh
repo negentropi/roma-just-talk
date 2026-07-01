@@ -7694,7 +7694,9 @@ require_pattern \
   docs/ios-single-repo-migration.md
 
 section "obsolete standalone predefined prompts module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/PredefinedPrompt.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/PredefinedPrompts.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/PredefinedPromptTests.swift
 
 section "obsolete standalone prompt templates module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/PromptTemplates.swift
@@ -7724,6 +7726,10 @@ require_patterns \
 require_patterns \
   "core checks execute prompt template catalog tests" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'CustomPromptTests\.testStablePromptIdsPreserveMacOSStorageIdentity' \
+  'CustomPromptTests\.testPromptOrderKeepsDefaultBeforeAssistant' \
+  'CustomPromptTests\.testDefaultPromptUsesSystemDefaultTemplateAndSystemInstructions' \
+  'CustomPromptTests\.testAssistantPromptUsesAssistantModeWithoutSystemInstructions' \
   'CustomPromptTests\.testPromptTemplateCatalogPreservesMacOSTemplateOrderAndMetadata' \
   'CustomPromptTests\.testPromptTemplateCatalogPreservesMacOSPromptBodies' \
   'CustomPromptTests\.testPromptTemplateLookupUsesTitleAndRejectsMissingTitle'

@@ -11120,6 +11120,7 @@ require_patterns \
   "core checks execute shared iOS post-processing run behavior" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
   'TranscriptionRunProcessorTests\.testTranscribeRunsPostProcessingWhenEnabledWithPromptAndKey' \
+  'TranscriptionRunProcessorTests\.testTranscribeRecordsTranscriptionAndEnhancementDurations' \
   'TranscriptionRunProcessorTests\.testTranscribeKeepsCleanedTextWhenPostProcessingFails' \
   'TranscriptionRunProcessorTests\.testTranscribeSkipsPostProcessingWhenPostProcessingAPIKeyIsWhitespace'
 
@@ -11434,15 +11435,30 @@ reject_pattern \
   'timeIntervalSince\(startTime\)' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
-require_pattern \
-  "shared AI enhancement result construction lives in VoiceInkCore" \
-  'static func completed|endDate\.timeIntervalSince\(startDate\)' \
-  VoiceInkCore/Sources/VoiceInkCore/AIEnhancementResult.swift
+section "obsolete standalone AI enhancement result module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/AIEnhancementResult.swift
 
-require_pattern \
-  "core checks execute shared AI enhancement result construction test" \
-  'AIEnhancementResultTests\.testCompletedResultDerivesDurationAndPreservesMetadata' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+require_patterns \
+  "shared AI enhancement result API and construction live with transcription run processor" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift \
+  'public struct VoiceInkAIEnhancementResult: Equatable, Sendable' \
+  'public let text: String' \
+  'public let duration: TimeInterval' \
+  'public let modelName: String\?' \
+  'public let promptName: String\?' \
+  'public let requestSystemMessage: String\?' \
+  'public let requestUserMessage: String\?' \
+  'public init\(' \
+  'public static func completed\(' \
+  'startedAt startDate: Date' \
+  'endedAt endDate: Date' \
+  'endDate\.timeIntervalSince\(startDate\)'
+
+require_patterns \
+  "core checks execute shared AI enhancement result API tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'AIEnhancementResultTests\.testResultCarriesMacOSPostProcessingMetadata' \
+  'AIEnhancementResultTests\.testCompletedResultDerivesDurationAndPreservesMetadata'
 
 require_pattern \
   "macOS AI enhancement service saves enabled state through shared preference" \

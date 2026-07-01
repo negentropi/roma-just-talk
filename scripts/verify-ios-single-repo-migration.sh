@@ -6326,9 +6326,9 @@ require_patterns \
   'modelProvider\.cloudModelSpecs' \
   'CloudModel\(spec: spec, provider: modelProvider\)'
 
-reject_pattern \
+reject_multiline_pattern \
   "macOS CloudModel avoids shell-owned literal cloud model initializer" \
-  'init\(id: UUID = UUID\(\), name: String, displayName: String, description: String, provider: [^,]+, speed: Double' \
+  'init\([[:space:]]*id:[[:space:]]*UUID = UUID\(\),[[:space:]]*name:[[:space:]]*String,[[:space:]]*displayName:[[:space:]]*String,[[:space:]]*description:[[:space:]]*String,[[:space:]]*provider:[[:space:]]*[^,]+,[[:space:]]*speed:[[:space:]]*Double' \
   VoiceInk/Models/TranscriptionModel.swift
 
 reject_pattern \

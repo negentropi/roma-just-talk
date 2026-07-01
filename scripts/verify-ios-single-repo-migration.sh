@@ -8749,13 +8749,35 @@ reject_pattern \
 section "obsolete standalone transcript text normalizer module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/TranscriptTextNormalizer.swift
 
+section "obsolete standalone transcription output filter module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/TranscriptionOutputFilter.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionOutputFilterTests.swift
+
 require_patterns \
-  "transcript text normalizer lives with output filtering" \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptionOutputFilter.swift \
+  "transcription output filter lives with cleanup preferences" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionCleanupPreferences.swift \
   'VoiceInkTranscriptTextNormalizer' \
   'collapseWhitespaceRunsAndTrim' \
   'normalizeParagraphSpacing' \
   'VoiceInkTranscriptionOutputFilter'
+
+require_patterns \
+  "core checks execute moved transcription output filter tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'TranscriptionCleanupPreferencesTests\.testDefaultFillerWordsMatchMacOSCleanupDefaults' \
+  'TranscriptionCleanupPreferencesTests\.testFilterRemovesTagBlocksAndBracketedHallucinations' \
+  'TranscriptionCleanupPreferencesTests\.testFilterCanRemoveConfiguredFillerWordsCaseInsensitively' \
+  'TranscriptionCleanupPreferencesTests\.testDefaultWhitespacePolicyCollapsesAllRunsForMacOSOutputFilterCompatibility' \
+  'TranscriptionCleanupPreferencesTests\.testPreserveParagraphsPolicyKeepsParagraphBreaksForRunProcessor'
+
+require_patterns \
+  "transcription cleanup tests cover output filtering behavior" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionCleanupPreferencesTests.swift \
+  'func testDefaultFillerWordsMatchMacOSCleanupDefaults' \
+  'func testFilterRemovesTagBlocksAndBracketedHallucinations' \
+  'func testFilterCanRemoveConfiguredFillerWordsCaseInsensitively' \
+  'func testDefaultWhitespacePolicyCollapsesAllRunsForMacOSOutputFilterCompatibility' \
+  'func testPreserveParagraphsPolicyKeepsParagraphBreaksForRunProcessor'
 
 reject_pattern \
   "macOS audio cleanup settings avoid shell-only presentation copy" \

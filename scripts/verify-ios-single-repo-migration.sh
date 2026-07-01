@@ -17556,8 +17556,14 @@ require_patterns \
   'NLTokenizer\(unit: \.word\)' \
   'tokenizer\.setLanguage'
 
-section "obsolete standalone word counter module stays deleted"
+section "obsolete standalone word counter module/tests stay deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/WordCounter.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/WordCounterTests.swift
+
+reject_swift_pattern \
+  "core tests avoid obsolete word-counter test suite references" \
+  '\bWordCounterTests\b' \
+  VoiceInkCore/Tests/VoiceInkCoreTests
 
 reject_pattern \
   "shared transcript paragraph formatter avoids duplicate word tokenizer" \
@@ -17576,12 +17582,28 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/SessionMetricPolicy.swift
 
 require_patterns \
-  "core checks execute word counter tests" \
+  "word-counter behavior tests live with transcription run preparation tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunPreparationTests.swift \
+  'testWordCounterCountsNaturalLanguageWords' \
+  'testWordCounterIgnoresWhitespaceOnlyText' \
+  'testWordCounterCountsWordsAcrossPunctuation' \
+  'testWordCounterCountsWordsWithExplicitLanguageAcrossPunctuation' \
+  'VoiceInkWordCounter\.count\(in: "quick release wins"\)' \
+  'VoiceInkWordCounter\.count\(in: " \\n\\t "\)' \
+  'VoiceInkWordCounter\.count\(in: "Yes, Roma works\."\)' \
+  'VoiceInkWordCounter\.count\(in: "Yes, Roma works\.", language: \.english\)'
+
+require_patterns \
+  "core checks execute word-counter tests through transcription run preparation suite" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'WordCounterTests\.testCountsNaturalLanguageWords' \
-  'WordCounterTests\.testIgnoresWhitespaceOnlyText' \
-  'WordCounterTests\.testCountsWordsAcrossPunctuation' \
-  'WordCounterTests\.testCountsWordsWithExplicitLanguageAcrossPunctuation'
+  'TranscriptionRunPreparationTests\.testWordCounterCountsNaturalLanguageWords' \
+  'TranscriptionRunPreparationTests\(\)\.testWordCounterCountsNaturalLanguageWords\(\)' \
+  'TranscriptionRunPreparationTests\.testWordCounterIgnoresWhitespaceOnlyText' \
+  'TranscriptionRunPreparationTests\(\)\.testWordCounterIgnoresWhitespaceOnlyText\(\)' \
+  'TranscriptionRunPreparationTests\.testWordCounterCountsWordsAcrossPunctuation' \
+  'TranscriptionRunPreparationTests\(\)\.testWordCounterCountsWordsAcrossPunctuation\(\)' \
+  'TranscriptionRunPreparationTests\.testWordCounterCountsWordsWithExplicitLanguageAcrossPunctuation' \
+  'TranscriptionRunPreparationTests\(\)\.testWordCounterCountsWordsWithExplicitLanguageAcrossPunctuation\(\)'
 
 require_pattern \
   "shared session metric migration preference lives in VoiceInkCore" \

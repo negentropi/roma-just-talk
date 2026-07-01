@@ -1,7 +1,27 @@
 import Foundation
+import NaturalLanguage
 @testable import VoiceInkCore
 
 final class TranscriptionRunPreparationTests: XCTestCase {
+    func testWordCounterCountsNaturalLanguageWords() {
+        XCTAssertEqual(VoiceInkWordCounter.count(in: "quick release wins"), 3)
+    }
+
+    func testWordCounterIgnoresWhitespaceOnlyText() {
+        XCTAssertEqual(VoiceInkWordCounter.count(in: " \n\t "), 0)
+    }
+
+    func testWordCounterCountsWordsAcrossPunctuation() {
+        XCTAssertEqual(VoiceInkWordCounter.count(in: "Yes, Roma works."), 3)
+    }
+
+    func testWordCounterCountsWordsWithExplicitLanguageAcrossPunctuation() {
+        XCTAssertEqual(
+            VoiceInkWordCounter.count(in: "Yes, Roma works.", language: .english),
+            3
+        )
+    }
+
     func testPrepareRawTextFiltersThenPreparesTranscriptText() {
         let configuration = VoiceInkTranscriptionCleanupConfiguration(
             punctuationMode: .removeTrailingPeriod,

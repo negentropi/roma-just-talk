@@ -3142,23 +3142,31 @@ require_pattern \
   'testTranscriptFileExportPreservesMacOSFileExtensions' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
-require_pattern \
+require_patterns \
   "shared last-transcription notification copy lives in VoiceInkCore" \
-  'noTranscriptionAvailableTitle|lastTranscriptionCopiedTitle|failedToCopyTranscriptionTitle|cannotRetryTitle|retryFailedTitle' \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift \
+  'noTranscriptionAvailableTitle' \
+  'lastTranscriptionCopiedTitle' \
+  'failedToCopyTranscriptionTitle' \
+  'copiedToClipboardTitle' \
+  'cannotRetryTitle' \
+  'retryFailedTitle'
 
-require_file \
+reject_file \
   VoiceInkCore/Sources/VoiceInkCore/LastTranscriptionPolicy.swift
 
 require_patterns \
-  "shared last-transcription policy lives in VoiceInkCore" \
-  VoiceInkCore/Sources/VoiceInkCore/LastTranscriptionPolicy.swift \
+  "shared last-transcription policy lives with transcript presentation" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift \
   'VoiceInkLastTranscriptionPolicy' \
+  'VoiceInkLastTranscriptionCandidate' \
   'firstPasteableCandidate' \
   'VoiceInkLastTranscriptionTextPreference' \
   'VoiceInkLastTranscriptionNotificationPresentation' \
   'VoiceInkLastTranscriptionRetryPreflightFailure' \
+  'fetchLimit' \
   'fetchFailedDiagnosticMessage' \
+  'pasteText' \
   'noTranscriptionNotification' \
   'copyCompletionNotification' \
   'retryPreflightFailureNotification' \
@@ -3169,6 +3177,7 @@ require_patterns \
   "core tests pin last-transcription policy" \
   VoiceInkCore/Tests/VoiceInkCoreTests/LastTranscriptionPolicyTests.swift \
   'testFirstPasteableCandidateSkipsExcludedPendingBlankAndCanceledCandidates' \
+  'testFirstPasteableCandidatePreservesCandidateOrder' \
   'testPasteTextUsesOriginalOrEnhancedFallbackPolicy' \
   'testFetchLimitPreservesMacOSLastTranscriptionFetchWindow' \
   'testFetchFailureDiagnosticPreservesMacOSCopy' \
@@ -3179,6 +3188,7 @@ require_patterns \
   "core check runner executes last-transcription policy tests" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
   'LastTranscriptionPolicyTests\.testFirstPasteableCandidateSkipsExcludedPendingBlankAndCanceledCandidates' \
+  'LastTranscriptionPolicyTests\.testFirstPasteableCandidatePreservesCandidateOrder' \
   'LastTranscriptionPolicyTests\.testPasteTextUsesOriginalOrEnhancedFallbackPolicy' \
   'LastTranscriptionPolicyTests\.testFetchLimitPreservesMacOSLastTranscriptionFetchWindow' \
   'LastTranscriptionPolicyTests\.testFetchFailureDiagnosticPreservesMacOSCopy' \
@@ -13735,10 +13745,12 @@ reject_pattern \
   'VoiceInkTranscriptPresentation\.preferredText\(' \
   VoiceInk/Services/LastTranscriptionService.swift
 
-require_pattern \
+require_patterns \
   "macOS last-transcription notifications adapt shared notification presentation" \
-  'showNotification\(_ presentation: VoiceInkLastTranscriptionNotificationPresentation\)|title: presentation\.title|type: presentation\.kind' \
-  VoiceInk/Services/LastTranscriptionService.swift
+  VoiceInk/Services/LastTranscriptionService.swift \
+  'showNotification\(_ presentation: VoiceInkLastTranscriptionNotificationPresentation\)' \
+  'title: presentation\.title' \
+  'type: presentation\.kind'
 
 require_pattern \
   "macOS audio player retranscribe no-model failure uses shared banner presentation" \
@@ -13757,7 +13769,7 @@ reject_pattern \
 
 require_pattern \
   "migration checklist tracks shared last-transcription policy gate" \
-  'last-transcription candidate selection, fetch window, fetch-failure diagnostic copy, original-vs-preferred copy/paste text selection, copy/retry notification presentation, and retry-preflight error presentation route through `VoiceInkLastTranscriptionPolicy`' \
+  'last-transcription candidate selection, fetch window, fetch-failure diagnostic copy, original-vs-preferred copy/paste text selection, copy/retry notification presentation, and retry-preflight error presentation route through `VoiceInkLastTranscriptionPolicy` colocated in `TranscriptPresentation\.swift`; standalone `LastTranscriptionPolicy\.swift` stays deleted' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

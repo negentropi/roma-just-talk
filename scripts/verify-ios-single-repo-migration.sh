@@ -17296,11 +17296,11 @@ reject_pattern \
   VoiceInk/EmailSupport.swift
 
 require_file VoiceInkCore/Sources/VoiceInkCore/SystemInformationReport.swift
-require_file VoiceInkCore/Sources/VoiceInkCore/SystemArchitecture.swift
+reject_file VoiceInkCore/Sources/VoiceInkCore/SystemArchitecture.swift
 
 require_patterns \
   "shared system architecture policy lives in VoiceInkCore" \
-  VoiceInkCore/Sources/VoiceInkCore/SystemArchitecture.swift \
+  VoiceInkCore/Sources/VoiceInkCore/SystemInformationReport.swift \
   'VoiceInkSystemArchitecture' \
   'isIntelMac' \
   'macOSDisplayName' \
@@ -17388,8 +17388,8 @@ reject_pattern \
 require_patterns \
   "core checks execute system information report tests" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'SystemArchitectureTests\.testSystemArchitecturePreservesMacOSDisplayNameForCompileTarget' \
-  'SystemArchitectureTests\.testSystemArchitectureIntelMacPredicateMatchesCompileTarget' \
+  'SystemInformationReportTests\.testSystemArchitecturePreservesMacOSDisplayNameForCompileTarget' \
+  'SystemInformationReportTests\.testSystemArchitectureIntelMacPredicateMatchesCompileTarget' \
   'SystemInformationReportTests\.testMacOSSystemInformationReportPreservesSectionOrderAndLabels' \
   'SystemInformationReportTests\.testMacOSSystemInformationReportKeepsRollingBufferBlockVerbatim' \
   'SystemInformationReportTests\.testAvailableAudioDevicesTextPreservesMacOSDiagnosticsListPolicy' \
@@ -17398,6 +17398,8 @@ require_patterns \
   'SystemInformationReportTests\.testPermissionStatusPresentationPreservesMacOSDiagnosticsCopy' \
   'SystemInformationReportTests\.testLicenseStatusPresentationPreservesMacOSDiagnosticsCopy' \
   'SystemInformationReportTests\.testSystemInformationCopyPresentationPreservesDashboardButtonPolicy'
+
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/SystemArchitectureTests.swift
 
 require_patterns \
   "migration docs describe shared macOS system information presentation" \

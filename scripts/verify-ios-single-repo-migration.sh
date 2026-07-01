@@ -9711,25 +9711,75 @@ reject_pattern \
   VoiceInk/Services/AudioFileTranscriptionManager.swift \
   VoiceInk/Services/AudioFileTranscriptionService.swift
 
-require_pattern \
-  "shared enhancement settings presentation lives in VoiceInkCore" \
-  'VoiceInkEnhancementSettingsPresentation|generalSectionTitle|enableEnhancementTitle|enableEnhancementHelp|enableEnhancementLearnMoreURLString|settingsButtonSystemImageName|settingsButtonHelp|promptsSectionTitle|toggleEnhancementShortcutTitle|toggleEnhancementShortcutHelp|switchPromptShortcutTitle|switchPromptShortcutHelp|shortcutLearnMoreURLString|switchPromptKeyChipTitles|shortEnhancementWordOptions|timeoutRetryOptions' \
-  VoiceInkCore/Sources/VoiceInkCore/EnhancementSettingsPresentation.swift
+section "obsolete standalone enhancement settings presentation modules stay deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/EnhancementSettingsPresentation.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/EnhancementSettingsPresentationTests.swift
 
-require_pattern \
+require_patterns \
+  "shared enhancement settings presentation is colocated with UserDefaults preferences" \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift \
+  'public struct VoiceInkEnhancementIntegerOption' \
+  'public struct VoiceInkEnhancementRetryOption' \
+  'public struct VoiceInkEnhancementSettingsPresentation' \
+  'public static let macOS = VoiceInkEnhancementSettingsPresentation\(' \
+  'shortEnhancementWordOptions: \(1\.\.\.15\)\.map' \
+  'timeoutOptions: \[3, 5, 7, 10, 15, 20, 30, 40, 50, 60\]\.map' \
+  'VoiceInkEnhancementRetryOption\(title: "Fail immediately", value: false\)' \
+  'VoiceInkEnhancementRetryOption\(title: "Retry", value: true\)' \
+  'switchPromptKeyChipTitles: \["⌘", "1 – 0"\]'
+
+require_patterns \
   "macOS enhancement settings outer view uses shared presentation" \
-  'VoiceInkEnhancementSettingsPresentation\.macOS|presentation\.(generalSectionTitle|enableEnhancementTitle|enableEnhancementHelp|enableEnhancementLearnMoreURLString|settingsButtonSystemImageName|settingsButtonHelp|promptsSectionTitle)' \
-  VoiceInk/Views/EnhancementSettingsView.swift
+  VoiceInk/Views/EnhancementSettingsView.swift \
+  'presentation = VoiceInkEnhancementSettingsPresentation\.macOS' \
+  'presentation\.generalSectionTitle' \
+  'presentation\.enableEnhancementTitle' \
+  'presentation\.enableEnhancementHelp' \
+  'presentation\.enableEnhancementLearnMoreURLString' \
+  'presentation\.settingsButtonSystemImageName' \
+  'presentation\.settingsButtonHelp' \
+  'presentation\.promptsSectionTitle'
 
-require_pattern \
+require_patterns \
   "macOS enhancement shortcuts use shared presentation" \
-  'VoiceInkEnhancementSettingsPresentation\.macOS|presentation\.(toggleEnhancementShortcutTitle|toggleEnhancementShortcutHelp|switchPromptShortcutTitle|switchPromptShortcutHelp|shortcutLearnMoreURLString|switchPromptKeyChipTitles)' \
-  VoiceInk/Views/Settings/EnhancementShortcutsView.swift
+  VoiceInk/Views/Settings/EnhancementShortcutsView.swift \
+  'presentation = VoiceInkEnhancementSettingsPresentation\.macOS' \
+  'presentation\.toggleEnhancementShortcutTitle' \
+  'presentation\.toggleEnhancementShortcutHelp' \
+  'presentation\.switchPromptShortcutTitle' \
+  'presentation\.switchPromptShortcutHelp' \
+  'presentation\.shortcutLearnMoreURLString' \
+  'presentation\.switchPromptKeyChipTitles'
 
-require_pattern \
-  "macOS enhancement settings use shared presentation" \
-  'VoiceInkEnhancementSettingsPresentation\.macOS|presentation\.(skipShortEnhancementTitle|timeoutOptions|timeoutRetryOptions)' \
-  VoiceInk/Views/Components/EnhancementSettingsPanel.swift
+require_patterns \
+  "macOS enhancement settings panel uses shared presentation" \
+  VoiceInk/Views/Components/EnhancementSettingsPanel.swift \
+  'presentation = VoiceInkEnhancementSettingsPresentation\.macOS' \
+  'presentation\.title' \
+  'presentation\.closeButtonHelp' \
+  'presentation\.contextSectionTitle' \
+  'presentation\.clipboardContextTitle' \
+  'presentation\.clipboardContextHelp' \
+  'presentation\.screenContextTitle' \
+  'presentation\.screenContextHelp' \
+  'presentation\.skipShortEnhancementTitle' \
+  'presentation\.skipShortEnhancementHelp' \
+  'presentation\.disclosureSystemImageName' \
+  'presentation\.minimumWordsPickerTitle' \
+  'presentation\.shortEnhancementWordOptions' \
+  'presentation\.timeoutPickerTitle' \
+  'presentation\.timeoutOptions' \
+  'presentation\.timeoutRetryPickerTitle' \
+  'presentation\.timeoutRetryOptions' \
+  'presentation\.requestTimeoutSectionTitle' \
+  'presentation\.requestTimeoutHelp' \
+  'presentation\.shortcutsSectionTitle'
+
+require_patterns \
+  "core check runner executes colocated enhancement settings presentation tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'UserDefaultsPreferencesTests\.testMacOSEnhancementSettingsPresentationPreservesCopy' \
+  'UserDefaultsPreferencesTests\.testMacOSEnhancementSettingsPresentationPreservesOptions'
 
 reject_pattern \
   "macOS enhancement settings avoid shell-only presentation copy and option ranges" \

@@ -7229,20 +7229,55 @@ require_pattern \
   'general settings backup.*VoiceInkGeneralSettingsBackupPayload.*VoiceInkGeneralSettingsBackupPolicy' \
   docs/ios-single-repo-migration.md
 
-require_pattern \
+section "obsolete standalone custom prompt presentation module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/CustomPromptPresentation.swift
+
+require_patterns \
   "shared custom prompt presentation owns icon catalog and copy" \
-  'VoiceInkCustomPromptPresentation|iconSystemNames|promptGridInfoSystemImageName|promptGridHelpText|deletePromptConfirmationMessage|triggerSummary|addPromptSystemImageName|editActionSystemImageName|deleteActionSystemImageName|closeSystemImageName|addTriggerWordSystemImageName|removeTriggerWordSystemImageName' \
-  VoiceInkCore/Sources/VoiceInkCore/CustomPromptPresentation.swift
+  VoiceInkCore/Sources/VoiceInkCore/CustomPrompt.swift \
+  'VoiceInkCustomPromptTriggerSummary' \
+  'VoiceInkCustomPromptPresentation' \
+  'defaultIconSystemName' \
+  'defaultPromptFallbackIconSystemName' \
+  'iconSystemNames' \
+  'promptGridInfoSystemImageName' \
+  'promptGridHelpText' \
+  'deletePromptConfirmationMessage' \
+  'triggerSummary' \
+  'addPromptSystemImageName' \
+  'editActionSystemImageName' \
+  'deleteActionSystemImageName' \
+  'closeSystemImageName' \
+  'addTriggerWordSystemImageName' \
+  'removeTriggerWordSystemImageName'
 
-require_pattern \
+require_patterns \
   "macOS custom prompt cards use shared presentation" \
-  'VoiceInkCustomPromptPresentation\.(triggerSummary|editActionTitle|editActionSystemImageName|deletePromptConfirmationTitle|deletePromptConfirmationMessage|deleteActionTitle|deleteActionSystemImageName|cancelActionTitle|addPromptTitle|addPromptSystemImageName)' \
-  VoiceInk/Models/CustomPrompt.swift
+  VoiceInk/Models/CustomPrompt.swift \
+  'VoiceInkCustomPromptPresentation\.triggerSummary' \
+  'VoiceInkCustomPromptPresentation\.editActionTitle' \
+  'VoiceInkCustomPromptPresentation\.editActionSystemImageName' \
+  'VoiceInkCustomPromptPresentation\.deletePromptConfirmationTitle' \
+  'VoiceInkCustomPromptPresentation\.deletePromptConfirmationMessage' \
+  'VoiceInkCustomPromptPresentation\.deleteActionTitle' \
+  'VoiceInkCustomPromptPresentation\.deleteActionSystemImageName' \
+  'VoiceInkCustomPromptPresentation\.cancelActionTitle' \
+  'VoiceInkCustomPromptPresentation\.addPromptTitle' \
+  'VoiceInkCustomPromptPresentation\.addPromptSystemImageName'
 
-require_pattern \
+require_patterns \
   "macOS prompt editor uses shared presentation" \
-  'VoiceInkCustomPromptPresentation\.(editorTitle|closeSystemImageName|defaultIconSystemName|promptNamePlaceholder|promptInstructionsPlaceholder|useSystemTemplateTitle|startWithTemplateTitle|triggerWordPlaceholder|addTriggerWordSystemImageName|removeTriggerWordSystemImageName|noTriggerWordsText|iconSystemNames)' \
-  VoiceInk/Views/PromptEditorView.swift
+  VoiceInk/Views/PromptEditorView.swift \
+  'VoiceInkCustomPromptPresentation\.closeSystemImageName' \
+  'VoiceInkCustomPromptPresentation\.promptNamePlaceholder' \
+  'VoiceInkCustomPromptPresentation\.promptInstructionsPlaceholder' \
+  'VoiceInkCustomPromptPresentation\.useSystemTemplateTitle' \
+  'VoiceInkCustomPromptPresentation\.startWithTemplateTitle' \
+  'VoiceInkCustomPromptPresentation\.triggerWordPlaceholder' \
+  'VoiceInkCustomPromptPresentation\.addTriggerWordSystemImageName' \
+  'VoiceInkCustomPromptPresentation\.removeTriggerWordSystemImageName' \
+  'VoiceInkCustomPromptPresentation\.noTriggerWordsText' \
+  'VoiceInkCustomPromptPresentation\.iconSystemNames'
 
 require_pattern \
   "shared prompt trigger-word draft validation lives in VoiceInkCore" \
@@ -7361,6 +7396,13 @@ require_pattern \
   "core checks execute enhancement prompt settings state test" \
   'CustomPromptTests\.testCustomPromptPolicyPlansPromptSelectionWhenEnablingEnhancement' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_patterns \
+  "core checks execute custom prompt presentation tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'CustomPromptTests\.testCustomPromptPresentationPreservesIconCatalogAndGridCopy' \
+  'CustomPromptTests\.testCustomPromptPresentationPreservesEditorCopy' \
+  'CustomPromptTests\.testCustomPromptPresentationFormatsTriggerSummaryAndDeleteAlert'
 
 require_patterns \
   "core checks execute custom prompt draft editor-state tests" \
@@ -7496,15 +7538,21 @@ reject_pattern \
   '!self\.aiService\.isAPIKeyValid|self\.isEnhancementEnabled = false' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
-require_pattern \
+require_patterns \
   "macOS prompt grids use shared presentation" \
-  'VoiceInkCustomPromptPresentation\.(promptGridEmptyText|promptGridInfoSystemImageName|promptGridHelpText|addPromptHelpText)' \
-  VoiceInk/Views/Components/PromptSelectionGrid.swift
+  VoiceInk/Views/Components/PromptSelectionGrid.swift \
+  'VoiceInkCustomPromptPresentation\.promptGridEmptyText' \
+  'VoiceInkCustomPromptPresentation\.promptGridInfoSystemImageName' \
+  'VoiceInkCustomPromptPresentation\.promptGridHelpText' \
+  'VoiceInkCustomPromptPresentation\.addPromptHelpText'
 
-require_pattern \
+require_patterns \
   "macOS enhancement prompt grid uses shared presentation" \
-  'VoiceInkCustomPromptPresentation\.(promptGridEmptyText|promptGridInfoSystemImageName|promptGridHelpText|addPromptSystemImageName)' \
-  VoiceInk/Views/EnhancementSettingsView.swift
+  VoiceInk/Views/EnhancementSettingsView.swift \
+  'VoiceInkCustomPromptPresentation\.promptGridEmptyText' \
+  'VoiceInkCustomPromptPresentation\.promptGridInfoSystemImageName' \
+  'VoiceInkCustomPromptPresentation\.promptGridHelpText' \
+  'VoiceInkCustomPromptPresentation\.addPromptSystemImageName'
 
 reject_pattern \
   "macOS custom prompt shell avoids local icon catalog" \

@@ -755,10 +755,22 @@ reject_pattern \
   VoiceInkCore/Sources/VoiceInkCore \
   VoiceInkCore/Tests/VoiceInkCoreTests
 
+require_patterns \
+  "shared API-key reference resolution lives with provider catalog" \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift \
+  'VoiceInkAPIKeyReference' \
+  'resolvedValue' \
+  'VoiceInkProviderAPIKeyLookup' \
+  'fallbackEnvironmentKey\(forProviderName:' \
+  'VoiceInkProviderCredential\.nonBlank'
+
 require_pattern \
   "shared custom model API-key account identifier lives with provider catalog" \
   'customModelAccountIdentifier\(forModelId:|customModel_.*_APIKey' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
+
+section "obsolete standalone API-key reference module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/APIKeyReference.swift
 
 section "obsolete standalone provider API-key account module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyAccounts.swift
@@ -4044,7 +4056,9 @@ reject_pattern \
 require_patterns \
   "core checks execute provider API-key state update plan tests" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'ProviderAccessRequirementTests\.testProviderAPIKeyStateBuilds(StoredKey|Verification)UpdatePlan|ProviderAccessRequirementTests\.testProviderAPIKeyStateUpdatePlanIgnoresNonUserKeyProviders' \
+  'ProviderAccessRequirementTests\.testProviderAPIKeyStateBuildsStoredKeyUpdatePlan' \
+  'ProviderAccessRequirementTests\.testProviderAPIKeyStateBuildsVerificationUpdatePlan' \
+  'ProviderAccessRequirementTests\.testProviderAPIKeyStateUpdatePlanIgnoresNonUserKeyProviders' \
   'ProviderAccessRequirementTests\.testProviderAPIKeyStateUpdatePlanAppliesRuntimeStateInOrder' \
   'ProviderAccessRequirementTests\.testProviderAPIKeyStateUpdatePlanSkipsRuntimeApplicationWhenNoPersistenceActions'
 

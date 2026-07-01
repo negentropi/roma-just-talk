@@ -13000,6 +13000,12 @@ require_pattern \
 
 section "obsolete standalone special shortcut key-evidence policy module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/SpecialShortcutKeyEvidencePolicy.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/SpecialShortcutKeyEvidencePolicyTests.swift
+
+reject_swift_pattern \
+  "VoiceInkCore tests avoid stale standalone special shortcut key-evidence test references" \
+  'SpecialShortcutKeyEvidencePolicyTests' \
+  VoiceInkCore/Tests/VoiceInkCoreTests
 
 require_patterns \
   "special shortcut key-evidence policy lives with empty-tap fallback policy" \
@@ -13015,6 +13021,21 @@ require_patterns \
   'shouldStopHybridRecording' \
   'sleepNanoseconds' \
   'VoiceInkSpecialShortcutEmptyFallbackPolicy'
+
+require_patterns \
+  "special shortcut empty fallback tests cover key-evidence and interruption policy" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/SpecialShortcutEmptyFallbackPolicyTests.swift \
+  'final class SpecialShortcutEmptyFallbackPolicyTests: XCTestCase' \
+  'func testReliablePressContextAllowsSpecialShortcutCommit\(' \
+  'func testTypingEvidenceDiscardsSpecialShortcut\(' \
+  'func testUnreliableKeyEvidenceFailsClosed\(' \
+  'func testShortcutInterruptionPolicyPreservesMacOSWindow\(' \
+  'VoiceInkSpecialShortcutKeyEvidencePolicy\.shouldDiscardShortcut' \
+  'VoiceInkShortcutPressContext\(didPressOtherKeyDuringPress: true\)' \
+  'VoiceInkShortcutPressContext\(didReleaseOtherKeyDuringPress: true\)' \
+  'VoiceInkShortcutPressContext\(hasReliableKeyEvidence: false\)' \
+  'VoiceInkShortcutInterruptionPolicy\.interruptionWindow' \
+  'VoiceInkShortcutInterruptionPolicy\.isWithinInterruptionWindow'
 
 require_pattern \
   "macOS shortcut monitor delegates interruption timing to shared policy" \
@@ -13038,15 +13059,21 @@ reject_pattern \
   'shortcutPressCooldown|hybridPressThreshold|1_000_000_000|pressDuration >=|Date\(\)\.timeIntervalSince\(lastTrigger\)' \
   VoiceInk/Shortcuts/RecordingShortcutManager.swift
 
-require_pattern \
+require_patterns \
   "core checks execute shared recording shortcut timing policy tests" \
-  'SpecialShortcutEmptyFallbackPolicyTests\.testRecordingShortcutTimingPolicy(PreservesMacOSThresholds|DetectsPressCooldown|HybridStopRequiresThresholdAndRecordingState|ConvertsSleepDelaySafely)' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'SpecialShortcutEmptyFallbackPolicyTests\.testRecordingShortcutTimingPolicyPreservesMacOSThresholds' \
+  'SpecialShortcutEmptyFallbackPolicyTests\.testRecordingShortcutTimingPolicyDetectsPressCooldown' \
+  'SpecialShortcutEmptyFallbackPolicyTests\.testRecordingShortcutTimingPolicyHybridStopRequiresThresholdAndRecordingState' \
+  'SpecialShortcutEmptyFallbackPolicyTests\.testRecordingShortcutTimingPolicyConvertsSleepDelaySafely'
 
-require_pattern \
-  "core checks execute shared shortcut interruption policy tests" \
-  'SpecialShortcutKeyEvidencePolicyTests\.testShortcutInterruptionPolicyPreservesMacOSWindow' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+require_patterns \
+  "core checks execute folded special shortcut key-evidence policy tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'SpecialShortcutEmptyFallbackPolicyTests\.testReliablePressContextAllowsSpecialShortcutCommit' \
+  'SpecialShortcutEmptyFallbackPolicyTests\.testTypingEvidenceDiscardsSpecialShortcut' \
+  'SpecialShortcutEmptyFallbackPolicyTests\.testUnreliableKeyEvidenceFailsClosed' \
+  'SpecialShortcutEmptyFallbackPolicyTests\.testShortcutInterruptionPolicyPreservesMacOSWindow'
 
 require_pattern \
   "migration docs track shared recording shortcut timing policy" \

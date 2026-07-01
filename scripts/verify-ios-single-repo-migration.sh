@@ -1903,10 +1903,21 @@ reject_pattern \
   'providerAvailability\.repairedMode\(|(^|[^[:alnum:]_.])mode\.(selectTranscriptionProvider|selectPostProcessingProvider)\(' \
   iOS/VoiceInk-ios/ModeConfigurationView.swift
 
-require_pattern \
-  "shared settings presentation lives in VoiceInkCore" \
-  'VoiceInkSettingsPresentation|VoiceInkMacOSSettingsPresentation|addModeButtonTitle|resetAllAppDataButtonTitle|checkForUpdatesButtonTitle|backupFooterText' \
-  VoiceInkCore/Sources/VoiceInkCore/SettingsPresentation.swift
+section "obsolete standalone settings presentation modules stay deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/SettingsPresentation.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/SettingsPresentationTests.swift
+
+require_patterns \
+  "shared settings presentation lives with UserDefaults preference policy" \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift \
+  'public struct VoiceInkSettingsPresentation' \
+  'public static let iOS = VoiceInkSettingsPresentation\(' \
+  'addModeButtonTitle: "Add New Mode"' \
+  'resetAllAppDataSystemImageName: "trash"' \
+  'public struct VoiceInkMacOSSettingsPresentation' \
+  'public static let macOS = VoiceInkMacOSSettingsPresentation\(' \
+  'checkForUpdatesButtonTitle: "Check for Updates"' \
+  'backupFooterText: "Export all settings, or choose specific categories when importing a backup\."'
 
 require_pattern \
   "iOS settings uses shared settings presentation" \
@@ -1918,10 +1929,11 @@ require_pattern \
   'VoiceInkMacOSSettingsPresentation\.macOS|settingsPresentation\.(generalSectionTitle|showMenuBarIconTitle|hideDockIconTitle|launchAtLoginTitle|autoCheckUpdatesTitle|showAnnouncementsTitle|checkForUpdatesButtonTitle|privacySectionTitle|privacyFooterText|backupSectionTitle|backupFooterText|exportSettingsLabel|exportButtonTitle|importSettingsLabel|importButtonTitle|diagnosticsSectionTitle)' \
   VoiceInk/Views/Settings/SettingsView.swift
 
-require_pattern \
+require_patterns \
   "core checks execute settings presentation tests" \
-  'SettingsPresentationTests\.testIOSSettingsPresentationPreservesSettingsChromeCopy|SettingsPresentationTests\.testMacOSSettingsPresentationPreservesSettingsChromeCopy' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'UserDefaultsPreferencesTests\.testIOSSettingsPresentationPreservesSettingsChromeCopy' \
+  'UserDefaultsPreferencesTests\.testMacOSSettingsPresentationPreservesSettingsChromeCopy'
 
 require_file VoiceInkCore/Sources/VoiceInkCore/AnnouncementsPolicy.swift
 

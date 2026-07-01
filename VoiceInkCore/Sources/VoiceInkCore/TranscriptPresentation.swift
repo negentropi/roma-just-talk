@@ -1,5 +1,107 @@
 import Foundation
 
+public enum VoiceInkDatePresentation {
+    public static func abbreviatedTimestamp(
+        _ date: Date,
+        locale: Locale = .current,
+        calendar: Calendar = .current,
+        timeZone: TimeZone = .current
+    ) -> String {
+        date.formatted(Date.FormatStyle(
+            date: .abbreviated,
+            time: .shortened,
+            locale: locale,
+            calendar: calendar,
+            timeZone: timeZone
+        ))
+    }
+
+    public static func compactTimestamp(
+        _ date: Date,
+        locale: Locale = .current,
+        calendar: Calendar = .current,
+        timeZone: TimeZone = .current
+    ) -> String {
+        date.formatted(Date.FormatStyle(
+            locale: locale,
+            calendar: calendar,
+            timeZone: timeZone
+        )
+        .month(.abbreviated)
+        .day()
+        .hour()
+        .minute())
+    }
+
+    public static func relativeTimestamp(
+        _ date: Date,
+        relativeTo referenceDate: Date = Date(),
+        locale: Locale = .current
+    ) -> String {
+        let formatter = RelativeDateTimeFormatter()
+        formatter.locale = locale
+        formatter.unitsStyle = .short
+        return formatter.localizedString(for: date, relativeTo: referenceDate)
+    }
+}
+
+public enum VoiceInkDurationPresentation {
+    public static let metadataSeparatorText = "•"
+
+    public static func shouldShowPositiveDuration(_ duration: TimeInterval) -> Bool {
+        duration > 0
+    }
+
+    public static func minutesSeconds(
+        _ duration: TimeInterval,
+        padMinutesToTwoDigits: Bool = false
+    ) -> String {
+        let totalSeconds = Int(duration)
+        let minutes = totalSeconds / 60
+        let seconds = totalSeconds % 60
+        let format = padMinutesToTwoDigits ? "%02d:%02d" : "%d:%02d"
+        return String(format: format, minutes, seconds)
+    }
+
+    public static func abbreviatedMinutesSeconds(
+        _ duration: TimeInterval,
+        fallback: String = "0s"
+    ) -> String {
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = [.minute, .second]
+        formatter.unitsStyle = .abbreviated
+        return formatter.string(from: duration) ?? fallback
+    }
+
+    public static func positiveDuration(
+        _ duration: TimeInterval,
+        style: DateComponentsFormatter.UnitsStyle,
+        fallback: String = "–"
+    ) -> String {
+        guard duration > 0 else { return fallback }
+
+        let formatter = DateComponentsFormatter()
+        formatter.maximumUnitCount = 2
+        formatter.unitsStyle = style
+        formatter.allowedUnits = duration >= 3600 ? [.hour, .minute] : [.minute, .second]
+        return formatter.string(from: duration) ?? fallback
+    }
+
+    public static func compactElapsed(_ duration: TimeInterval) -> String {
+        if duration < 1 {
+            return String(format: "%.0fms", duration * 1000)
+        }
+
+        if duration < 60 {
+            return String(format: "%.1fs", duration)
+        }
+
+        let minutes = Int(duration) / 60
+        let seconds = duration.truncatingRemainder(dividingBy: 60)
+        return String(format: "%dm %.0fs", minutes, seconds)
+    }
+}
+
 public extension VoiceInkTranscriptionStatus {
     var needsTranscription: Bool {
         self == .pending || self == .failed

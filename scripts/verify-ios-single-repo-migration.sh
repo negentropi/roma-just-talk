@@ -18186,6 +18186,7 @@ require_patterns \
 
 section "obsolete standalone app notification presentation module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/AppNotificationPresentation.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/AppNotificationPresentationTests.swift
 
 require_patterns \
   "shared app notification presentation lives with app identity" \
@@ -18202,20 +18203,51 @@ require_patterns \
   'checkmark\.circle\.fill' \
   'playsFailureSound'
 
-require_pattern \
+reject_swift_pattern \
+  "VoiceInkCore tests avoid stale AppNotificationPresentationTests references" \
+  '\bAppNotificationPresentationTests\b' \
+  VoiceInkCore/Tests/VoiceInkCoreTests
+
+require_patterns \
+  "app identity tests cover app notification kind presentation" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AppIdentityTests.swift \
+  'func testAppNotificationKindsPreserveCasesAndDefaultDuration' \
+  'VoiceInkAppNotificationKind\.allCases\.map' \
+  'VoiceInkAppNotificationKind\.defaultDisplayDuration, 3\.0' \
+  'func testAppNotificationKindsPreserveSystemImages' \
+  'VoiceInkAppNotificationKind\.error\.systemImageName, "xmark\.octagon\.fill"' \
+  'VoiceInkAppNotificationKind\.warning\.systemImageName, "exclamationmark\.triangle\.fill"' \
+  'VoiceInkAppNotificationKind\.info\.systemImageName, "info\.circle\.fill"' \
+  'VoiceInkAppNotificationKind\.success\.systemImageName, "checkmark\.circle\.fill"' \
+  'func testOnlyErrorNotificationsPlayFailureSound' \
+  'XCTAssertTrue\(VoiceInkAppNotificationKind\.error\.playsFailureSound\)' \
+  'XCTAssertFalse\(VoiceInkAppNotificationKind\.warning\.playsFailureSound\)' \
+  'XCTAssertFalse\(VoiceInkAppNotificationKind\.info\.playsFailureSound\)' \
+  'XCTAssertFalse\(VoiceInkAppNotificationKind\.success\.playsFailureSound\)'
+
+require_patterns \
   "macOS app notification view adapts shared notification kind" \
-  'VoiceInkAppNotificationKind|type\.systemImageName|private extension VoiceInkAppNotificationKind' \
-  VoiceInk/Notifications/AppNotificationView.swift
+  VoiceInk/Notifications/AppNotificationView.swift \
+  'type: VoiceInkAppNotificationKind' \
+  'type\.systemImageName' \
+  'private extension VoiceInkAppNotificationKind'
 
-require_pattern \
+require_patterns \
   "macOS notification manager adapts shared notification kind" \
-  'VoiceInkAppNotificationKind|defaultDisplayDuration|type\.playsFailureSound' \
-  VoiceInk/Notifications/NotificationManager.swift
+  VoiceInk/Notifications/NotificationManager.swift \
+  'type: VoiceInkAppNotificationKind' \
+  'duration: TimeInterval = VoiceInkAppNotificationKind\.defaultDisplayDuration' \
+  'type\.playsFailureSound'
 
-require_pattern \
-  "core checks execute app notification presentation tests" \
-  'AppNotificationPresentationTests\.testAppNotificationKindsPreserveCasesAndDefaultDuration|AppNotificationPresentationTests\.testAppNotificationKindsPreserveSystemImages|AppNotificationPresentationTests\.testOnlyErrorNotificationsPlayFailureSound' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+require_patterns \
+  "core checks execute app notification kind tests through app identity" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'AppIdentityTests\.testAppNotificationKindsPreserveCasesAndDefaultDuration' \
+  'AppIdentityTests\(\)\.testAppNotificationKindsPreserveCasesAndDefaultDuration\(\)' \
+  'AppIdentityTests\.testAppNotificationKindsPreserveSystemImages' \
+  'AppIdentityTests\(\)\.testAppNotificationKindsPreserveSystemImages\(\)' \
+  'AppIdentityTests\.testOnlyErrorNotificationsPlayFailureSound' \
+  'AppIdentityTests\(\)\.testOnlyErrorNotificationsPlayFailureSound\(\)'
 
 reject_pattern \
   "macOS notification shell avoids shell-owned notification kind policy" \

@@ -1919,15 +1919,38 @@ require_patterns \
   'checkForUpdatesButtonTitle: "Check for Updates"' \
   'backupFooterText: "Export all settings, or choose specific categories when importing a backup\."'
 
-require_pattern \
+require_patterns \
   "iOS settings uses shared settings presentation" \
-  'VoiceInkSettingsPresentation\.iOS|settingsPresentation\.(navigationTitle|modesSectionTitle|addModeButtonTitle|addActionSystemImageName|debugSectionTitle|resetAllAppDataButtonTitle|resetAllAppDataSystemImageName)' \
-  iOS/VoiceInk-ios/SettingsView.swift
+  iOS/VoiceInk-ios/SettingsView.swift \
+  'settingsPresentation = VoiceInkSettingsPresentation\.iOS' \
+  'settingsPresentation\.navigationTitle' \
+  'settingsPresentation\.modesSectionTitle' \
+  'settingsPresentation\.addModeButtonTitle' \
+  'settingsPresentation\.addActionSystemImageName' \
+  'settingsPresentation\.debugSectionTitle' \
+  'settingsPresentation\.resetAllAppDataButtonTitle' \
+  'settingsPresentation\.resetAllAppDataSystemImageName'
 
-require_pattern \
+require_patterns \
   "macOS settings uses shared top-level settings presentation" \
-  'VoiceInkMacOSSettingsPresentation\.macOS|settingsPresentation\.(generalSectionTitle|showMenuBarIconTitle|hideDockIconTitle|launchAtLoginTitle|autoCheckUpdatesTitle|showAnnouncementsTitle|checkForUpdatesButtonTitle|privacySectionTitle|privacyFooterText|backupSectionTitle|backupFooterText|exportSettingsLabel|exportButtonTitle|importSettingsLabel|importButtonTitle|diagnosticsSectionTitle)' \
-  VoiceInk/Views/Settings/SettingsView.swift
+  VoiceInk/Views/Settings/SettingsView.swift \
+  'settingsPresentation = VoiceInkMacOSSettingsPresentation\.macOS' \
+  'Self\.settingsPresentation\.generalSectionTitle' \
+  'Self\.settingsPresentation\.showMenuBarIconTitle' \
+  'Self\.settingsPresentation\.hideDockIconTitle' \
+  'Self\.settingsPresentation\.launchAtLoginTitle' \
+  'Self\.settingsPresentation\.autoCheckUpdatesTitle' \
+  'Self\.settingsPresentation\.showAnnouncementsTitle' \
+  'Self\.settingsPresentation\.checkForUpdatesButtonTitle' \
+  'Self\.settingsPresentation\.privacySectionTitle' \
+  'Self\.settingsPresentation\.privacyFooterText' \
+  'Self\.settingsPresentation\.backupSectionTitle' \
+  'Self\.settingsPresentation\.backupFooterText' \
+  'Self\.settingsPresentation\.exportSettingsLabel' \
+  'Self\.settingsPresentation\.exportButtonTitle' \
+  'Self\.settingsPresentation\.importSettingsLabel' \
+  'Self\.settingsPresentation\.importButtonTitle' \
+  'Self\.settingsPresentation\.diagnosticsSectionTitle'
 
 require_patterns \
   "core checks execute settings presentation tests" \

@@ -1,4 +1,5 @@
 import Foundation
+import NaturalLanguage
 @testable import VoiceInkCore
 
 final class WordCounterTests: XCTestCase {
@@ -12,5 +13,12 @@ final class WordCounterTests: XCTestCase {
 
     func testCountsWordsAcrossPunctuation() {
         XCTAssertEqual(VoiceInkWordCounter.count(in: "Yes, Roma works."), 3)
+    }
+
+    func testCountsWordsWithExplicitLanguageAcrossPunctuation() {
+        XCTAssertEqual(
+            VoiceInkWordCounter.count(in: "Yes, Roma works.", language: .english),
+            3
+        )
     }
 }

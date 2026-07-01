@@ -16813,6 +16813,42 @@ reject_pattern \
   'VoiceInkWordCounter|VoiceInkSessionMetricPolicy|VoiceInkDashboardMetricsAccumulator|dashboardWordCount|dashboardAudioDuration|summary\.totalWords|summary\.totalDuration|words -|reduce\(' \
   iOS/VoiceInk-ios/NotesListView.swift
 
+require_patterns \
+  "shared transcription run preparation owns word-count policy" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunPreparation.swift \
+  'public enum VoiceInkWordCounter' \
+  'public static func count\(in text: String\) -> Int' \
+  'static func count\(in text: String, language: NLLanguage\?\) -> Int' \
+  'NLTokenizer\(unit: \.word\)' \
+  'tokenizer\.setLanguage'
+
+section "obsolete standalone word counter module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/WordCounter.swift
+
+reject_pattern \
+  "shared transcript paragraph formatter avoids duplicate word tokenizer" \
+  'private static func wordCount|NLTokenizer\(unit: \.word\)' \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptParagraphFormatter.swift
+
+require_patterns \
+  "shared transcript paragraph formatter uses shared word counter" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptParagraphFormatter.swift \
+  'VoiceInkWordCounter\.count\(in: sentence, language: tokenizerLanguage\)' \
+  'VoiceInkWordCounter\.count\(in: sentence, language: language\)'
+
+require_pattern \
+  "shared session metric policy uses shared word counter" \
+  'VoiceInkWordCounter\.count\(in: textForCounting\(from: source\)\)' \
+  VoiceInkCore/Sources/VoiceInkCore/SessionMetricPolicy.swift
+
+require_patterns \
+  "core checks execute word counter tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'WordCounterTests\.testCountsNaturalLanguageWords' \
+  'WordCounterTests\.testIgnoresWhitespaceOnlyText' \
+  'WordCounterTests\.testCountsWordsAcrossPunctuation' \
+  'WordCounterTests\.testCountsWordsWithExplicitLanguageAcrossPunctuation'
+
 require_pattern \
   "shared session metric migration preference lives in VoiceInkCore" \
   'VoiceInkSessionMetricDraft|recorderSource = "recorder"|completedTranscriptionStatusRawValue|VoiceInkSessionMetricMigrationPreference|completionKey = "HasCompletedStatsMigration"' \

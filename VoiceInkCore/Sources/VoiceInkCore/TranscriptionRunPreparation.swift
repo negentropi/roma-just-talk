@@ -1,4 +1,5 @@
 import Foundation
+import NaturalLanguage
 
 public struct VoiceInkPostProcessingSkipConfiguration: Equatable, Sendable {
     public static func current(in defaults: UserDefaults = .standard) -> VoiceInkPostProcessingSkipConfiguration {
@@ -32,6 +33,21 @@ public enum VoiceInkPostProcessingSkipPolicy {
         }
 
         return VoiceInkWordCounter.count(in: transcript) <= configuration.wordThreshold
+    }
+}
+
+public enum VoiceInkWordCounter {
+    public static func count(in text: String) -> Int {
+        count(in: text, language: nil)
+    }
+
+    static func count(in text: String, language: NLLanguage?) -> Int {
+        let tokenizer = NLTokenizer(unit: .word)
+        tokenizer.string = text
+        if let language {
+            tokenizer.setLanguage(language)
+        }
+        return tokenizer.tokens(for: text.startIndex..<text.endIndex).count
     }
 }
 

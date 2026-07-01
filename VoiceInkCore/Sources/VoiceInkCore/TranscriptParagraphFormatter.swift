@@ -25,7 +25,7 @@ public enum VoiceInkTranscriptParagraphFormatter {
 
             for index in processedSentenceIndex..<allSentences.count {
                 let sentence = allSentences[index]
-                let wordsInSentence = wordCount(in: sentence, language: tokenizerLanguage)
+                let wordsInSentence = VoiceInkWordCounter.count(in: sentence, language: tokenizerLanguage)
 
                 tentativeSentences.append(sentence)
                 tentativeWordCount += wordsInSentence
@@ -91,7 +91,7 @@ public enum VoiceInkTranscriptParagraphFormatter {
         for sentence in sentences {
             result.append(sentence)
 
-            if wordCount(in: sentence, language: language) >= minimumWordCount {
+            if VoiceInkWordCounter.count(in: sentence, language: language) >= minimumWordCount {
                 significantCount += 1
                 if significantCount >= limit {
                     break
@@ -100,18 +100,5 @@ public enum VoiceInkTranscriptParagraphFormatter {
         }
 
         return result
-    }
-
-    private static func wordCount(in text: String, language: NLLanguage) -> Int {
-        let tokenizer = NLTokenizer(unit: .word)
-        tokenizer.string = text
-        tokenizer.setLanguage(language)
-
-        var count = 0
-        tokenizer.enumerateTokens(in: text.startIndex..<text.endIndex) { _, _ in
-            count += 1
-            return true
-        }
-        return count
     }
 }

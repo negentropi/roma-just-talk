@@ -18071,8 +18071,10 @@ require_patterns \
   'VoiceInkSupportContactPolicy\.commonIssuesURLString, "https://tryvoiceink\.com/common-issues"' \
   'func testSupportEmailBodyPreservesMacOSSupportCopyAndSystemInformationSlot' \
   'VoiceInkSupportContactPolicy\.emailBody\(systemInformation: "macOS: test\\nApp: roma just talk"\)' \
-  'SCREEN RECORDING HIGHLY RECOMMENDED' \
-  'COMMON ISSUES' \
+  '✨ \*\*SCREEN RECORDING HIGHLY RECOMMENDED\*\* ✨' \
+  '▶️ Create a quick screen recording showing the issue!' \
+  '📝 ISSUE DETAILS:' \
+  '## 📋 COMMON ISSUES:' \
   'System Information:\\nmacOS: test\\nApp: roma just talk' \
   'body\.hasSuffix\("\\n\\n"\)' \
   'func testSupportMailtoURLPreservesRecipientAndEncodesSubject' \

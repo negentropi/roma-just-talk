@@ -1206,10 +1206,12 @@ reject_pattern \
   'public let should(StopRecorder|InvalidateMeterTimer|ClearAudioLevels|DeleteCurrentRecordingFile|ClearCurrentRecordingURL|ScheduleSessionDeactivation)|public let isRecordingAfterStop|public init\([[:space:]]*shouldStopRecorder' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
-require_pattern \
+require_patterns \
   "shared audio-recorder stop cleanup checks run in VoiceInkCore" \
-  'testAudioRecorderStopPolicyPreservesIOSStopCleanup|testAudioRecorderStopPolicyPreservesIOSDiscardCleanup|testAudioRecorderStopPlanAppliesRuntimeStateInOrder' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'RecordingStatePolicyTests\.testAudioRecorderStopPolicyPreservesIOSStopCleanup' \
+  'RecordingStatePolicyTests\.testAudioRecorderStopPolicyPreservesIOSDiscardCleanup' \
+  'RecordingStatePolicyTests\.testAudioRecorderStopPlanAppliesRuntimeStateInOrder'
 
 require_pattern \
   "iOS audio recorder applies shared stop cleanup plan" \
@@ -16915,10 +16917,13 @@ reject_pattern \
   '"(Completed stats migration with|Stats migration failed:)' \
   VoiceInk/Services/SessionMetricMigrationService.swift
 
-require_pattern \
+require_patterns \
   "core checks execute session metric draft and migration preference tests" \
-  'SessionMetricPolicyTests\.testRecorderDraftPreservesSourceAndMetricFields|SessionMetricPolicyTests\.testMigrationPreferencePreservesCompletionStorageKey|SessionMetricPolicyTests\.testMigrationDiagnosticsPreserveMacOSLogCopy|SessionMetricPolicyTests\.testRecorderDiagnosticsPreserveMacOSLogCopy' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'SessionMetricPolicyTests\.testRecorderDraftPreservesSourceAndMetricFields' \
+  'SessionMetricPolicyTests\.testMigrationPreferencePreservesCompletionStorageKey' \
+  'SessionMetricPolicyTests\.testMigrationDiagnosticsPreserveMacOSLogCopy' \
+  'SessionMetricPolicyTests\.testRecorderDiagnosticsPreserveMacOSLogCopy'
 
 require_pattern \
   "migration checklist tracks shared session metric migration preference" \
@@ -18502,10 +18507,17 @@ require_patterns \
   'recordingManagerInitializedMessage' \
   'keyboardStopRecordingRequestedMessage'
 
-require_pattern \
+require_patterns \
   "VoiceInkCore checks cover iOS App Group recording state policy" \
-  'testAppGroupRecordingStatePolicy(PreservesIOSStorageKeysAndTimeout|KeepsFreshRecordingActive|ClearsStaleRecording|DoesNotClearInactiveRecording)|testAppGroupRecordingState(WritePlansPreserveIOSBridgeWrites|MutationPlansPreserveIOSBridgeNotifications)|testAppGroupRecordingStateReadPlan(DoesNotRepairFreshRecording|OwnsStaleRepairMutation)' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'RecordingStatePolicyTests\.testAppGroupRecordingStatePolicyPreservesIOSStorageKeysAndTimeout' \
+  'RecordingStatePolicyTests\.testAppGroupRecordingStatePolicyKeepsFreshRecordingActive' \
+  'RecordingStatePolicyTests\.testAppGroupRecordingStatePolicyClearsStaleRecording' \
+  'RecordingStatePolicyTests\.testAppGroupRecordingStatePolicyDoesNotClearInactiveRecording' \
+  'RecordingStatePolicyTests\.testAppGroupRecordingStateWritePlansPreserveIOSBridgeWrites' \
+  'RecordingStatePolicyTests\.testAppGroupRecordingStateMutationPlansPreserveIOSBridgeNotifications' \
+  'RecordingStatePolicyTests\.testAppGroupRecordingStateReadPlanDoesNotRepairFreshRecording' \
+  'RecordingStatePolicyTests\.testAppGroupRecordingStateReadPlanOwnsStaleRepairMutation'
 
 require_pattern \
   "VoiceInkCore checks cover iOS App Group write-plan runtime application" \
@@ -18549,10 +18561,13 @@ require_patterns \
   'VoiceInkLaunchRecordingRequestPlan' \
   'applyRuntimeState'
 
-require_pattern \
+require_patterns \
   "VoiceInkCore checks cover iOS launch recording request policy" \
-  'testLaunchRecordingRequest(StartsImmediatelyWhenOnboardingIsComplete|DefersUntilOnboardingCompletes|NoOpsWhenNothingIsPending|ClearsPendingStateWhenRecordingCanStartNow)' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'RecordingStatePolicyTests\.testLaunchRecordingRequestStartsImmediatelyWhenOnboardingIsComplete' \
+  'RecordingStatePolicyTests\.testLaunchRecordingRequestDefersUntilOnboardingCompletes' \
+  'RecordingStatePolicyTests\.testLaunchRecordingRequestNoOpsWhenNothingIsPending' \
+  'RecordingStatePolicyTests\.testLaunchRecordingRequestClearsPendingStateWhenRecordingCanStartNow'
 
 reject_pattern \
   "VoiceInkCore launch recording request policy avoids public action-only helper" \
@@ -18594,10 +18609,11 @@ require_pattern \
   'systemImageName: "app"' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
-require_pattern \
+require_patterns \
   "VoiceInkCore checks cover iOS keyboard recording button presentation" \
-  'testKeyboardRecordingButtonPresentation(PreservesIOSCopyAndIcons|SelectsCurrentState)' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'RecordingStatePolicyTests\.testKeyboardRecordingButtonPresentationPreservesIOSCopyAndIcons' \
+  'RecordingStatePolicyTests\.testKeyboardRecordingButtonPresentationSelectsCurrentState'
 
 require_patterns \
   "VoiceInkCore owns iOS keyboard open-app fallback policy and diagnostics" \

@@ -9909,6 +9909,42 @@ require_pattern \
   'VoiceInkTranscription(SessionRouteFacts|SessionRoutePlan)|VoiceInkTranscriptionStreamingAdapterKind' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionStreamingPreference.swift
 
+section "obsolete standalone streaming keys migration module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/StreamingKeysMigration.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/StreamingKeysMigrationTests.swift
+
+require_patterns \
+  "streaming keys migration lives with transcription streaming preference" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionStreamingPreference.swift \
+  'public enum VoiceInkStreamingKeysMigration' \
+  'public static let didMigrateKey = "streaming-keys-migrated"' \
+  'public static let legacyParakeetStreamingEnabledKey = "parakeet-streaming-enabled"' \
+  'public static let defaultPowerModeConfigurationsKey = VoiceInkUserDefaultsKey\.powerModeConfigurations' \
+  'public static let powerModeSelectedTranscriptionModelNameKey = "selectedTranscriptionModelName"' \
+  'public static let removedModelReplacements' \
+  '"stt-rt-v4": "stt-async-v4"' \
+  '"voxtral-mini-transcribe-realtime-2602": "voxtral-mini-latest"' \
+  'migrateLegacyStreamingPreferenceKeys' \
+  'VoiceInkTranscriptionStreamingPreference\.key' \
+  'migrateCurrentTranscriptionModel' \
+  'VoiceInkCurrentTranscriptionModelPreference\.saveModelName' \
+  'migratePowerModeTranscriptionModels'
+
+require_patterns \
+  "core checks execute streaming keys migration tests through transcription streaming preference suite" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'TranscriptionStreamingPreferenceTests\.testMigrationKeysPreserveExistingStorageNames' \
+  'TranscriptionStreamingPreferenceTests\.testRunMigratesLegacyParakeetStreamingSettingToCurrentModels' \
+  'TranscriptionStreamingPreferenceTests\.testRunRepairsRemovedCurrentAndPowerModeTranscriptionModels' \
+  'TranscriptionStreamingPreferenceTests\.testRunLeavesInvalidPowerModeJSONAloneButStillMarksMigrationComplete' \
+  'TranscriptionStreamingPreferenceTests\.testRunSkipsAllWorkAfterMigrationFlagIsSet'
+
+require_patterns \
+  "migration checklist tracks shared streaming key migration and streaming preference ownership" \
+  docs/ios-single-repo-migration.md \
+  'VoiceInkStreamingKeysMigration' \
+  'VoiceInkTranscriptionStreamingPreference'
+
 section "obsolete standalone streaming final-commit timeout module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/StreamingFinalCommitTimeout.swift
 

@@ -8919,6 +8919,18 @@ require_pattern \
   'VoiceInkTranscriptionPromptUse\.recordedFileTranscription' \
   VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift
 
+require_patterns \
+  "shared transcription run preparation owns prompt use policy" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunPreparation.swift \
+  'VoiceInkTranscriptionPromptUse' \
+  'case recordedFileTranscription' \
+  'case streamingTranscription' \
+  'case directTranscription' \
+  'nonBlankRequestPrompt'
+
+section "obsolete standalone transcription prompt-use module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/TranscriptionPromptUse.swift
+
 require_pattern \
   "shared audio transcription service factory owns provider dispatch" \
   'VoiceInkAudioTranscriptionServiceFactory' \
@@ -9034,6 +9046,15 @@ require_pattern \
   "shared run processor uses shared prompt use policy" \
   'VoiceInkTranscriptionPromptUse\.recordedFileTranscription' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift
+
+require_patterns \
+  "core checks execute transcription prompt-use tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'TranscriptionPromptUseTests\.testNonBlankRequestPromptDropsBlankAndPreservesOriginalText' \
+  'TranscriptionPromptUseTests\.testRecordedFilePromptUseKeepsSupportedProviderPrompts' \
+  'TranscriptionPromptUseTests\.testRecordedFilePromptUseDropsUnsupportedProviderPrompts' \
+  'TranscriptionPromptUseTests\.testStreamingPromptUseKeepsOnlyAssemblyAIPrompts' \
+  'TranscriptionPromptUseTests\.testDirectTranscriptionPromptUseKeepsPrompt'
 
 require_pattern \
   "macOS AssemblyAI streaming uses shared prompt use policy" \

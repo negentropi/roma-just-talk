@@ -6487,7 +6487,11 @@ reject_file VoiceInkCore/Sources/VoiceInkCore/APIKeyVerificationPolicy.swift
 require_patterns \
   "shared provider verifier owns API-key verification result policy" \
   VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyVerifier.swift \
-  'public struct VoiceInkAPIKeyVerificationResult' \
+  'public struct VoiceInkAPIKeyVerificationResult: Equatable, Sendable' \
+  'public let isValid: Bool' \
+  'public let errorMessage: String\?' \
+  'public init\(isValid: Bool, errorMessage: String\?\)' \
+  'public init\(legacyResult: \(Bool, String\?\)\)' \
   'enum VoiceInkAPIKeyVerificationPolicy' \
   'static let missingAPIKeyMessage = "API key is missing or empty\."' \
   'static let missingHTTPResponseMessage = "No HTTP response received\."' \

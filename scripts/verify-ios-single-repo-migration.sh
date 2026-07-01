@@ -5827,15 +5827,36 @@ require_pattern \
   'macOS onboarding welcome presentation|VoiceInkMacOSOnboardingPresentation\.welcome' \
   docs/ios-single-repo-migration.md
 
-require_pattern \
+require_patterns \
   "shared macOS onboarding permission presentation lives in VoiceInkCore" \
-  'VoiceInkMacOSOnboardingPermissionPresentation|VoiceInkMacOSOnboardingPermissionKind|VoiceInkMacOSOnboardingAudioDeviceSelectionPresentation|audioDeviceSelectionPresentation|skipButtonTitle|relaunchRequiredMessage|canSkipWhenNotGranted|buttonTitle' \
-  VoiceInkCore/Sources/VoiceInkCore/OnboardingPresentation.swift
+  VoiceInkCore/Sources/VoiceInkCore/OnboardingPresentation.swift \
+  'public enum VoiceInkMacOSOnboardingPermissionKind' \
+  'public struct VoiceInkMacOSOnboardingAudioDeviceSelectionPresentation' \
+  'public struct VoiceInkMacOSOnboardingPermissionPresentation' \
+  'public static let relaunchRequiredMessage' \
+  'public static let skipButtonTitle' \
+  'public static let audioDeviceSelectionPresentation' \
+  'public static let screenContextInfoHelpMessage' \
+  'public static let all' \
+  'public var canSkipWhenNotGranted' \
+  'public func buttonTitle\(isGranted: Bool, requiresRelaunch: Bool\)'
 
-require_pattern \
+require_patterns \
   "macOS onboarding permissions use shared permission presentation" \
-  'VoiceInkMacOSOnboardingPermissionPresentation\.all|audioDeviceSelectionPresentation\.(emptyStateTitle|pickerLabel|selectedDevicePlaceholder|unknownDeviceName|recommendationText)|skipButtonTitle|canSkipWhenNotGranted|buttonTitle\(isGranted:|screenContextInfoMessage' \
-  VoiceInk/Views/Onboarding/OnboardingPermissionsView.swift
+  VoiceInk/Views/Onboarding/OnboardingPermissionsView.swift \
+  'VoiceInkMacOSOnboardingPermissionPresentation\.all' \
+  'VoiceInkMacOSOnboardingPermissionPresentation\.audioDeviceSelectionPresentation' \
+  'audioDeviceSelectionPresentation\.emptyStateTitle' \
+  'audioDeviceSelectionPresentation\.pickerLabel' \
+  'audioDeviceSelectionPresentation\.selectedDevicePlaceholder' \
+  'audioDeviceSelectionPresentation\.unknownDeviceName' \
+  'audioDeviceSelectionPresentation\.recommendationText' \
+  'permissions\[currentPermissionIndex\]\.buttonTitle\(' \
+  'isGranted: permissionStates\[currentPermissionIndex\]' \
+  'requiresRelaunch: relaunchRequiredStates\[currentPermissionIndex\]' \
+  'permissions\[currentPermissionIndex\]\.canSkipWhenNotGranted' \
+  'VoiceInkMacOSOnboardingPermissionPresentation\.skipButtonTitle' \
+  'screenContextInfoMessage'
 
 require_patterns \
   "macOS onboarding permissions use shared permission timing policy" \
@@ -5853,20 +5874,46 @@ reject_pattern \
   'private func +getButtonTitle\(' \
   VoiceInk/Views/Onboarding/OnboardingPermissionsView.swift
 
-require_pattern \
-  "shared macOS permission settings presentation lives in VoiceInkCore" \
-  'VoiceInkMacOSPermissionSettingsPresentation|VoiceInkMacOSPermissionSettingsCardPresentation|VoiceInkMacOSPermissionTimingPolicy|VoiceInkMacOSPermissionPollingState|headerIconSystemName|inputMonitoringCard|screenContextCard|dashboardAccessibilityCallout|relaunchRequiredMessage|pollingInterval|refreshPollLimit|consumePollAndShouldStop' \
-  VoiceInkCore/Sources/VoiceInkCore/PermissionPresentation.swift
+section "obsolete standalone permission presentation module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/PermissionPresentation.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/PermissionPresentationTests.swift
+
+require_patterns \
+  "shared macOS permission settings presentation lives with onboarding presentation policy" \
+  VoiceInkCore/Sources/VoiceInkCore/OnboardingPresentation.swift \
+  'public enum VoiceInkMacOSPermissionSettingsCardKind' \
+  'public struct VoiceInkMacOSPermissionSettingsCardPresentation' \
+  'public enum VoiceInkMacOSPermissionSettingsPresentation' \
+  'public struct VoiceInkMacOSPermissionPollingState' \
+  'public enum VoiceInkMacOSPermissionTimingPolicy' \
+  'headerIconSystemName' \
+  'inputMonitoringCard' \
+  'microphoneCard' \
+  'accessibilityCard' \
+  'screenContextCard' \
+  'dashboardAccessibilityCallout' \
+  'relaunchRequiredMessage' \
+  'pollingInterval' \
+  'refreshPollLimit' \
+  'manualRefreshAnimationResetDelay' \
+  'floatingAuthorizationPanelDelay' \
+  'openPermissionsGrantMicrophoneDelay' \
+  'consumePollAndShouldStop'
 
 reject_pattern \
   "shared macOS permission polling avoids public raw action enum" \
   'VoiceInkMacOSPermissionPollingAction|continuePolling|stopPolling' \
-  VoiceInkCore/Sources/VoiceInkCore/PermissionPresentation.swift
+  VoiceInkCore/Sources/VoiceInkCore/OnboardingPresentation.swift
 
-require_pattern \
+require_patterns \
   "macOS permissions settings uses shared presentation" \
-  'VoiceInkMacOSPermissionSettingsPresentation\.(headerIconSystemName|inputMonitoringCard|microphoneCard|accessibilityCard|screenContextCard)|presentation\.buttonTitle\(requiresRelaunch:' \
-  VoiceInk/Views/PermissionsView.swift
+  VoiceInk/Views/PermissionsView.swift \
+  'VoiceInkMacOSPermissionSettingsPresentation\.headerIconSystemName' \
+  'VoiceInkMacOSPermissionSettingsPresentation\.inputMonitoringCard' \
+  'VoiceInkMacOSPermissionSettingsPresentation\.microphoneCard' \
+  'VoiceInkMacOSPermissionSettingsPresentation\.accessibilityCard' \
+  'VoiceInkMacOSPermissionSettingsPresentation\.screenContextCard' \
+  'presentation\.buttonTitle\(requiresRelaunch:'
 
 require_patterns \
   "macOS metrics dashboard uses shared accessibility permission callout" \
@@ -5903,17 +5950,19 @@ reject_pattern \
   VoiceInk/Views/PermissionsView.swift
 
 require_patterns \
-  "core checks execute permission presentation tests" \
+  "core checks execute onboarding permission settings presentation tests" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'PermissionPresentationTests\.testMacOSPermissionSettingsCardsPreserveCopyAndButtonPolicy' \
-  'PermissionPresentationTests\.testMacOSDashboardAccessibilityCalloutPreservesMetricsCopy' \
-  'PermissionPresentationTests\.testMacOSPermissionTimingPolicyPreservesPollingAndRelaunchDelays' \
-  'PermissionPresentationTests\.testMacOSPermissionPollingStateStopsAfterConfiguredPollLimit'
+  'OnboardingPresentationTests\.testMacOSPermissionSettingsPresentationPreservesHeaderAndStatusIcons' \
+  'OnboardingPresentationTests\.testMacOSPermissionSettingsCardsPreserveCopyAndButtonPolicy' \
+  'OnboardingPresentationTests\.testMacOSDashboardAccessibilityCalloutPreservesMetricsCopy' \
+  'OnboardingPresentationTests\.testMacOSPermissionTimingPolicyPreservesPollingAndRelaunchDelays' \
+  'OnboardingPresentationTests\.testMacOSPermissionPollingStateStopsAfterConfiguredPollLimit'
 
-require_pattern \
+require_patterns \
   "migration checklist tracks shared permission timing and polling policy" \
-  'macOS permission polling countdown/timing policy|VoiceInkMacOSPermissionPollingState' \
-  docs/ios-single-repo-migration.md
+  docs/ios-single-repo-migration.md \
+  'macOS permission polling countdown/timing policy' \
+  'VoiceInkMacOSPermissionPollingState'
 
 require_pattern \
   "migration checklist tracks shared dashboard accessibility callout presentation" \

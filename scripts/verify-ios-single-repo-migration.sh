@@ -6543,6 +6543,16 @@ require_pattern \
   'VoiceInkRemoteHTTPResponsePolicy|successStatusCodeRange|retryableStatusCode|apiError|responseBodyText|URLError\(\.badServerResponse\)' \
   VoiceInkCore/Sources/VoiceInkCore/RemoteTransport.swift
 
+require_patterns \
+  "shared multipart form-data builder lives with remote transport" \
+  VoiceInkCore/Sources/VoiceInkCore/RemoteTransport.swift \
+  'struct VoiceInkMultipartFormData' \
+  'multipart/form-data; boundary=' \
+  'mutating func addField' \
+  'mutating func addFile' \
+  'Content-Disposition: form-data; name=' \
+  'Content-Type:'
+
 require_pattern \
   "direct remote clients use shared validated request helper" \
   'VoiceInkRetriedRequest\.validatedData' \
@@ -6574,6 +6584,7 @@ require_pattern \
 reject_file VoiceInkCore/Sources/VoiceInkCore/RemoteHTTPResponsePolicy.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/RemotePollingPolicy.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/RetriedUpload.swift
+reject_file VoiceInkCore/Sources/VoiceInkCore/MultipartFormData.swift
 
 require_pattern \
   "shared long-running remote transcription clients use shared polling policy" \

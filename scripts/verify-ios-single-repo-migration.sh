@@ -4470,13 +4470,31 @@ require_pattern \
   'VoiceInkLocalWhisperFailurePolicy|VoiceInkLocalWhisperFailure|VoiceInkLocalWhisperPlatform' \
   VoiceInkCore/Sources/VoiceInkCore/WhisperRuntimeDefaults.swift
 
-section "obsolete standalone error-description module stays deleted"
+section "obsolete standalone error-description module/tests stay deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/ErrorDescription.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/ErrorDescriptionTests.swift
 
-require_pattern \
+require_patterns \
   "shared error-description fallback lives with engine error vocabulary" \
-  'VoiceInkErrorDescription|LocalizedError|localizedDescription' \
-  VoiceInkCore/Sources/VoiceInkCore/VoiceInkEngineError.swift
+  VoiceInkCore/Sources/VoiceInkCore/VoiceInkEngineError.swift \
+  'public enum VoiceInkErrorDescription' \
+  'public static func text\(for error: Error\) -> String' \
+  'LocalizedError\)\?\.errorDescription \?\? error\.localizedDescription'
+
+require_patterns \
+  "engine error tests cover shared error-description fallback" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkEngineErrorTests.swift \
+  'testPrefersLocalizedErrorDescription' \
+  'testFallsBackToLocalizedDescription' \
+  'VoiceInkErrorDescription\.text\(for: StubDescribedError' \
+  'VoiceInkErrorDescription\.text\(for: error\)' \
+  'error\.localizedDescription'
+
+require_patterns \
+  "core checks execute shared error-description fallback tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'VoiceInkEngineErrorTests\.testPrefersLocalizedErrorDescription' \
+  'VoiceInkEngineErrorTests\.testFallsBackToLocalizedDescription'
 
 require_pattern \
   "shared local Whisper transcription flow lives in VoiceInkCore" \

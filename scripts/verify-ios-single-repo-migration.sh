@@ -15273,20 +15273,47 @@ require_pattern \
   'VoiceInkPowerModePresentation\.(autoSendFormTitle|autoSendHelpText|keyboardShortcutFormTitle|keyboardShortcutHelpText)' \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
+reject_file VoiceInkCore/Sources/VoiceInkCore/PowerModeEmojiPolicy.swift
+
 require_pattern \
   "shared Power Mode emoji catalog and input policy lives in VoiceInkCore" \
   'VoiceInkPowerModeEmojiCatalog|customEmojisKey = "userAddedEmojis"|defaultEmojis|addCustomEmoji|removeCustomEmoji|firstValidEmojiCharacter|VoiceInkPowerModeEmojiInputPresentation|VoiceInkPowerModeEmojiInputDraft|inputDraft|submitFeedbackMessage|addedEmoji|customEmojiFieldPlaceholder|addButtonTitle|cancelButtonTitle|tipText|addEmojiAccessibilityLabel|addEmojiSystemImageName|addCustomEmojiHelpText|removeCustomEmojiSystemImageName|isErrorMessage|VoiceInkPowerModeEmojiRemovalAlertPresentation|inUseAlert' \
-  VoiceInkCore/Sources/VoiceInkCore/PowerModeEmojiPolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
   "shared Power Mode emoji input draft policy lives in VoiceInkCore" \
   'VoiceInkPowerModeEmojiInputDraft|inputDraft\(' \
-  VoiceInkCore/Sources/VoiceInkCore/PowerModeEmojiPolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
   "shared Power Mode emoji submit feedback policy lives in VoiceInkCore" \
   'addedEmoji|submitFeedbackMessage' \
-  VoiceInkCore/Sources/VoiceInkCore/PowerModeEmojiPolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "core checks execute Power Mode emoji catalog defaults test" \
+  'PowerModePolicyTests\.testPowerModeEmojiCatalogPreservesDefaultsStorageKeyAndCopy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute Power Mode emoji add validation test" \
+  'PowerModePolicyTests\.testPowerModeEmojiCatalogValidatesAndAddsCustomEmojis' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute Power Mode emoji input draft test" \
+  'PowerModePolicyTests\.testPowerModeEmojiInputDraftBuildsPreviewFeedback' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute Power Mode emoji add result presentation test" \
+  'PowerModePolicyTests\.testPowerModeEmojiAddResultPresentation' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "core checks execute Power Mode emoji storage mutation test" \
+  'PowerModePolicyTests\.testPowerModeEmojiCatalogReadsSavesAndRemovesCustomEmojis' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "macOS Power Mode emoji manager consumes shared emoji policy" \

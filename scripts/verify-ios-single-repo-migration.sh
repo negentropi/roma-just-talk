@@ -18045,6 +18045,12 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift
 
 reject_file VoiceInkCore/Sources/VoiceInkCore/SupportContactPolicy.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/SupportContactPolicyTests.swift
+
+reject_swift_pattern \
+  "VoiceInkCore tests avoid stale SupportContactPolicyTests references" \
+  '\bSupportContactPolicyTests\b' \
+  VoiceInkCore/Tests/VoiceInkCoreTests
 
 require_patterns \
   "shared support contact policy lives with app identity in VoiceInkCore" \
@@ -18056,15 +18062,42 @@ require_patterns \
   'emailBody\(systemInformation:' \
   'mailtoURL\(subject:'
 
-require_pattern \
-  "macOS email support adapts shared support contact policy" \
-  'VoiceInkSupportContactPolicy\.(emailAddress|emailSubject|emailBody|mailtoURL)' \
-  VoiceInk/EmailSupport.swift
+require_patterns \
+  "app identity tests cover support contact policy" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AppIdentityTests.swift \
+  'func testSupportContactPolicyPreservesEmailIdentityAndSubject' \
+  'VoiceInkSupportContactPolicy\.emailAddress, "support@tryvoiceink\.com"' \
+  'VoiceInkSupportContactPolicy\.emailSubject, "VoiceInk Support Request"' \
+  'VoiceInkSupportContactPolicy\.commonIssuesURLString, "https://tryvoiceink\.com/common-issues"' \
+  'func testSupportEmailBodyPreservesMacOSSupportCopyAndSystemInformationSlot' \
+  'VoiceInkSupportContactPolicy\.emailBody\(systemInformation: "macOS: test\\nApp: roma just talk"\)' \
+  'SCREEN RECORDING HIGHLY RECOMMENDED' \
+  'COMMON ISSUES' \
+  'System Information:\\nmacOS: test\\nApp: roma just talk' \
+  'body\.hasSuffix\("\\n\\n"\)' \
+  'func testSupportMailtoURLPreservesRecipientAndEncodesSubject' \
+  'VoiceInkSupportContactPolicy\.mailtoURL\(\)' \
+  'components\.path, VoiceInkSupportContactPolicy\.emailAddress' \
+  'URLQueryItem\(name: "subject", value: VoiceInkSupportContactPolicy\.emailSubject\)' \
+  'mailto:support@tryvoiceink\.com\?subject=VoiceInk%20Support%20Request'
 
-require_pattern \
-  "core checks execute support contact policy tests" \
-  'SupportContactPolicyTests\.testSupportContactPolicyPreservesEmailIdentityAndSubject|SupportContactPolicyTests\.testSupportEmailBodyPreservesMacOSSupportCopyAndSystemInformationSlot|SupportContactPolicyTests\.testSupportMailtoURLPreservesRecipientAndEncodesSubject' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+require_patterns \
+  "macOS email support adapts shared support contact policy" \
+  VoiceInk/EmailSupport.swift \
+  'VoiceInkSupportContactPolicy\.emailBody\(systemInformation: systemInfo\)' \
+  'VoiceInkSupportContactPolicy\.mailtoURL\(\)' \
+  'VoiceInkSupportContactPolicy\.emailAddress' \
+  'VoiceInkSupportContactPolicy\.emailSubject'
+
+require_patterns \
+  "core checks execute support contact policy tests through app identity" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'AppIdentityTests\.testSupportContactPolicyPreservesEmailIdentityAndSubject' \
+  'AppIdentityTests\(\)\.testSupportContactPolicyPreservesEmailIdentityAndSubject\(\)' \
+  'AppIdentityTests\.testSupportEmailBodyPreservesMacOSSupportCopyAndSystemInformationSlot' \
+  'AppIdentityTests\(\)\.testSupportEmailBodyPreservesMacOSSupportCopyAndSystemInformationSlot\(\)' \
+  'AppIdentityTests\.testSupportMailtoURLPreservesRecipientAndEncodesSubject' \
+  'AppIdentityTests\(\)\.testSupportMailtoURLPreservesRecipientAndEncodesSubject\(\)'
 
 reject_pattern \
   "macOS EmailSupport avoids shell-owned support contact policy" \

@@ -4728,8 +4728,9 @@ reject_pattern \
   VoiceInk/Transcription/Whisper/LibWhisper.swift \
   iOS/VoiceInk-ios/LibWhisper.swift
 
-section "obsolete standalone VAD model resource module stays deleted"
+section "obsolete standalone VAD model resource module/tests stay deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/VADModelFiles.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/VADModelFilesTests.swift
 
 require_patterns \
   "VAD resource helper lives with Whisper model-file policy" \
@@ -4737,6 +4738,25 @@ require_patterns \
   'VoiceInkVADModelFiles' \
   'ggml-silero-v5\.1\.2' \
   'VoiceInkWhisperModelFiles'
+
+require_patterns \
+  "VAD resource helper tests live with Whisper model-file tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/WhisperModelFilesTests.swift \
+  'testSileroFilenameUsesSharedResourceNameAndExtension' \
+  'VoiceInkVADModelFiles\.sileroResourceName' \
+  'VoiceInkVADModelFiles\.sileroFileExtension' \
+  'VoiceInkVADModelFiles\.sileroFilename'
+
+require_patterns \
+  "core checks execute VAD resource helper test through Whisper model-file suite" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'WhisperModelFilesTests\.testSileroFilenameUsesSharedResourceNameAndExtension' \
+  'WhisperModelFilesTests\(\)\.testSileroFilenameUsesSharedResourceNameAndExtension\(\)'
+
+reject_pattern \
+  "core checks avoid obsolete VAD resource helper test suite" \
+  '\bVADModelFilesTests\b' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "macOS local Whisper uses shared VAD resource policy" \

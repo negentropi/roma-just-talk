@@ -1706,7 +1706,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "TranscriptionRunProcessorTests.testTranscribeRejectsEmptyRemoteTranscriptionUsingProviderPolicy", run: { await TranscriptionRunProcessorTests().testTranscribeRejectsEmptyRemoteTranscriptionUsingProviderPolicy() }),
             VoiceInkCoreCheck(name: "TranscriptionRunProcessorTests.testTranscribeAllowsEmptyLocalWhisperTranscriptionUsingProviderPolicy", run: { try await TranscriptionRunProcessorTests().testTranscribeAllowsEmptyLocalWhisperTranscriptionUsingProviderPolicy() }),
             VoiceInkCoreCheck(name: "TranscriptionRunProcessorTests.testTranscribeSkipsPostProcessingWhenPostProcessingAPIKeyIsWhitespace", run: { try await TranscriptionRunProcessorTests().testTranscribeSkipsPostProcessingWhenPostProcessingAPIKeyIsWhitespace() }),
-            VoiceInkCoreCheck(name: "VADModelFilesTests.testSileroFilenameUsesSharedResourceNameAndExtension", run: { VADModelFilesTests().testSileroFilenameUsesSharedResourceNameAndExtension() }),
+            VoiceInkCoreCheck(name: "WhisperModelFilesTests.testSileroFilenameUsesSharedResourceNameAndExtension", run: { WhisperModelFilesTests().testSileroFilenameUsesSharedResourceNameAndExtension() }),
             VoiceInkCoreCheck(name: "VoiceInkEngineErrorTests.testPrefersLocalizedErrorDescription", run: { VoiceInkEngineErrorTests().testPrefersLocalizedErrorDescription() }),
             VoiceInkCoreCheck(name: "VoiceInkEngineErrorTests.testFallsBackToLocalizedDescription", run: { VoiceInkEngineErrorTests().testFallsBackToLocalizedDescription() }),
             VoiceInkCoreCheck(name: "VoiceInkEngineErrorTests.testMacOSErrorDescriptionsStayStable", run: { VoiceInkEngineErrorTests().testMacOSErrorDescriptionsStayStable() }),

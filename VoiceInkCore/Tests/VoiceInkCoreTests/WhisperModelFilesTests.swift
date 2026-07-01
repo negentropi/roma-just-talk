@@ -2,6 +2,12 @@ import Foundation
 @testable import VoiceInkCore
 
 final class WhisperModelFilesTests: XCTestCase {
+    func testSileroFilenameUsesSharedResourceNameAndExtension() {
+        XCTAssertEqual(VoiceInkVADModelFiles.sileroResourceName, "ggml-silero-v5.1.2")
+        XCTAssertEqual(VoiceInkVADModelFiles.sileroFileExtension, "bin")
+        XCTAssertEqual(VoiceInkVADModelFiles.sileroFilename, "ggml-silero-v5.1.2.bin")
+    }
+
     func testBootstrapModelsContainBaseModelSpec() {
         XCTAssertEqual(VoiceInkWhisperModelFiles.bootstrapModels, [VoiceInkWhisperModelFiles.baseModel])
         XCTAssertEqual(VoiceInkWhisperModelFiles.bootstrapModels.first?.id, VoiceInkTranscriptionModelCatalog.localBaseModel)

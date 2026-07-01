@@ -15276,18 +15276,173 @@ require_pattern \
 reject_file VoiceInkCore/Sources/VoiceInkCore/PowerModeEmojiPolicy.swift
 
 require_pattern \
-  "shared Power Mode emoji catalog and input policy lives in VoiceInkCore" \
-  'VoiceInkPowerModeEmojiCatalog|customEmojisKey = "userAddedEmojis"|defaultEmojis|addCustomEmoji|removeCustomEmoji|firstValidEmojiCharacter|VoiceInkPowerModeEmojiInputPresentation|VoiceInkPowerModeEmojiInputDraft|inputDraft|submitFeedbackMessage|addedEmoji|customEmojiFieldPlaceholder|addButtonTitle|cancelButtonTitle|tipText|addEmojiAccessibilityLabel|addEmojiSystemImageName|addCustomEmojiHelpText|removeCustomEmojiSystemImageName|isErrorMessage|VoiceInkPowerModeEmojiRemovalAlertPresentation|inUseAlert' \
+  "shared Power Mode emoji add result policy lives in VoiceInkCore" \
+  'public enum VoiceInkPowerModeCustomEmojiAddResult' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode emoji add result exposes added emoji" \
+  'public var addedEmoji' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode emoji removal alert presentation lives in VoiceInkCore" \
+  'public struct VoiceInkPowerModeEmojiRemovalAlertPresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode emoji input draft type lives in VoiceInkCore" \
+  'public struct VoiceInkPowerModeEmojiInputDraft' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode emoji catalog type lives in VoiceInkCore" \
+  'public enum VoiceInkPowerModeEmojiCatalog' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode emoji catalog preserves custom storage key" \
+  'customEmojisKey = "userAddedEmojis"' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode emoji catalog preserves default catalog" \
+  'defaultEmojis =' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode emoji catalog reads custom emojis" \
+  'func customEmojis\(from defaults: UserDefaults' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode emoji catalog saves custom emojis" \
+  'func saveCustomEmojis\(' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode emoji catalog combines default and custom emojis" \
+  'func allEmojis\(customEmojis: \[String\]\)' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode emoji catalog detects custom emojis" \
+  'func isCustomEmoji\(_ emoji: String' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode emoji catalog adds custom emojis" \
+  'func addCustomEmoji\(' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode emoji catalog removes custom emojis" \
+  'func removeCustomEmoji\(' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode emoji catalog validates emojis" \
+  'func isValidEmoji\(_ value: String\)' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode emoji catalog extracts first valid emoji" \
+  'func firstValidEmojiCharacter\(in value: String\)' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode emoji input presentation type lives in VoiceInkCore" \
+  'public enum VoiceInkPowerModeEmojiInputPresentation' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode emoji input preserves placeholder copy" \
+  'customEmojiFieldPlaceholder' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode emoji input preserves add button copy" \
+  'addButtonTitle' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode emoji input preserves cancel button copy" \
+  'cancelButtonTitle' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode emoji input preserves tip copy" \
+  'tipText' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode emoji input preserves add accessibility copy" \
+  'addEmojiAccessibilityLabel' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode emoji input preserves add icon" \
+  'addEmojiSystemImageName' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode emoji input preserves add help copy" \
+  'addCustomEmojiHelpText' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode emoji input preserves remove icon" \
+  'removeCustomEmojiSystemImageName' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode emoji input preserves empty feedback copy" \
+  'emptySubmitMessage' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode emoji input preserves invalid preview copy" \
+  'invalidPreviewMessage' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode emoji input preserves invalid submit copy" \
+  'invalidSubmitMessage' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode emoji input preserves duplicate feedback copy" \
+  'duplicateMessage' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode emoji input preserves in-use alert title" \
+  'inUseAlertTitle' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode emoji input preserves in-use alert button" \
+  'inUseAlertButtonTitle' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode emoji input classifies feedback severity" \
+  'func isErrorMessage\(' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
   "shared Power Mode emoji input draft policy lives in VoiceInkCore" \
-  'VoiceInkPowerModeEmojiInputDraft|inputDraft\(' \
+  'func inputDraft\(' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
   "shared Power Mode emoji submit feedback policy lives in VoiceInkCore" \
-  'addedEmoji|submitFeedbackMessage' \
+  'func submitFeedbackMessage\(for result: VoiceInkPowerModeCustomEmojiAddResult\)' \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
+
+require_pattern \
+  "shared Power Mode emoji blocked-removal alert policy lives in VoiceInkCore" \
+  'func inUseAlert\(emoji: String\)' \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \

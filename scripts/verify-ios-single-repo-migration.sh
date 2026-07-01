@@ -5091,10 +5091,12 @@ require_patterns \
   'coreTranscriptionModelProviderRole\.streamingConnectionModelName' \
   'coreTranscriptionModelProviderRole\.mapsStreamingTransportTimeoutToFinalTimeout'
 
-require_pattern \
+require_patterns \
   "core checks execute transcription model provider role tests" \
-  'TranscriptionModelCatalogTests\.testProviderRoleOwnsModelCategoryRouteAvailabilityAndLanguageSource|TranscriptionModelCatalogTests\.testMacOSTranscriptionModelProviderRoleMappingIsShared|TranscriptionModelCatalogTests\.testMacOSTranscriptionModelFactsDeriveSharedModelPolicy' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'TranscriptionModelCatalogTests\.testProviderRoleOwnsModelCategoryRouteAvailabilityAndLanguageSource' \
+  'TranscriptionModelCatalogTests\.testMacOSTranscriptionModelProviderRoleMappingIsShared' \
+  'TranscriptionModelCatalogTests\.testMacOSTranscriptionModelFactsDeriveSharedModelPolicy'
 
 reject_pattern \
   "macOS ModelProvider avoids shell-owned enum and role mapping" \
@@ -6497,10 +6499,12 @@ require_patterns \
   'macOSProvider\.coreTranscriptionModelProvider' \
   'unsupportedProviderFailureMessage'
 
-require_pattern \
+require_patterns \
   "core checks execute macOS transcription provider verification tests" \
-  'ProviderAPIKeyVerifierTests\.testVerifierRoutesMacOSTranscriptionModelProvidersWithoutNetworkForBlankKeys|ProviderAPIKeyVerifierTests\.testStoredKeyVerifierRejectsMissingMacOSTranscriptionModelProviderKeyWithoutNetwork|ProviderAPIKeyVerifierTests\.testVerifierRejectsLocalMacOSTranscriptionModelProviderWithoutVerificationTransport' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'ProviderAPIKeyVerifierTests\.testVerifierRoutesMacOSTranscriptionModelProvidersWithoutNetworkForBlankKeys' \
+  'ProviderAPIKeyVerifierTests\.testStoredKeyVerifierRejectsMissingMacOSTranscriptionModelProviderKeyWithoutNetwork' \
+  'ProviderAPIKeyVerifierTests\.testVerifierRejectsLocalMacOSTranscriptionModelProviderWithoutVerificationTransport'
 
 section "obsolete standalone OpenAI-compatible models request module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleModelsRequest.swift

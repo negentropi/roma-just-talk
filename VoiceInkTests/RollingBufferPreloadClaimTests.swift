@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+import VoiceInkCore
 @testable import VoiceInk
 
 private struct ClaimTestModel: TranscriptionModel {
@@ -7,7 +8,7 @@ private struct ClaimTestModel: TranscriptionModel {
     let name: String
     let displayName: String
     let description = "Claim test model"
-    let provider: ModelProvider = .fluidAudio
+    let provider: VoiceInkMacOSTranscriptionModelProvider = .fluidAudio
     let isMultilingualModel = true
     let supportsStreaming = true
     let supportedLanguages: [String: String] = [:]

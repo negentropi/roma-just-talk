@@ -12,7 +12,7 @@ private struct TestPreloadModel: TranscriptionModel {
     let name: String
     let displayName: String
     let description = "Streaming preload test model"
-    let provider: ModelProvider
+    let provider: VoiceInkMacOSTranscriptionModelProvider
     let isMultilingualModel = true
     let supportsStreaming: Bool
     let supportedLanguages: [String: String] = [:]
@@ -899,7 +899,7 @@ struct RollingBufferPreloadCoordinatorTests {
         )
     }
 
-    private func streamingModel(provider: ModelProvider = .fluidAudio) -> TestPreloadModel {
+    private func streamingModel(provider: VoiceInkMacOSTranscriptionModelProvider = .fluidAudio) -> TestPreloadModel {
         TestPreloadModel(
             name: "test-preload-\(UUID().uuidString)",
             displayName: "Test Preload",

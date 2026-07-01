@@ -1,15 +1,13 @@
 import Foundation
 import VoiceInkCore
 
-typealias ModelProvider = VoiceInkMacOSTranscriptionModelProvider
-
 // A unified protocol for any transcription model
 protocol TranscriptionModel: Identifiable, Hashable {
     var id: UUID { get }
     var name: String { get }
     var displayName: String { get }
     var description: String { get }
-    var provider: ModelProvider { get }
+    var provider: VoiceInkMacOSTranscriptionModelProvider { get }
     
     // Language capabilities
     var isMultilingualModel: Bool { get }
@@ -108,7 +106,7 @@ struct NativeAppleModel: TranscriptionModel {
     let name: String
     let displayName: String
     let description: String
-    let provider: ModelProvider = .nativeApple
+    let provider: VoiceInkMacOSTranscriptionModelProvider = .nativeApple
     let isMultilingualModel: Bool
     let supportedLanguages: [String: String]
 
@@ -127,7 +125,7 @@ struct FluidAudioModel: TranscriptionModel {
     let name: String
     let displayName: String
     let description: String
-    let provider: ModelProvider = .fluidAudio
+    let provider: VoiceInkMacOSTranscriptionModelProvider = .fluidAudio
     let size: String
     let speed: Double
     let accuracy: Double
@@ -157,14 +155,14 @@ struct CloudModel: TranscriptionModel {
     let name: String
     let displayName: String
     let description: String
-    let provider: ModelProvider
+    let provider: VoiceInkMacOSTranscriptionModelProvider
     let speed: Double
     let accuracy: Double
     let isMultilingualModel: Bool
     let supportsStreaming: Bool
     let supportedLanguages: [String: String]
 
-    init(spec: VoiceInkCloudTranscriptionModelSpec, provider: ModelProvider) {
+    init(spec: VoiceInkCloudTranscriptionModelSpec, provider: VoiceInkMacOSTranscriptionModelProvider) {
         self.id = UUID()
         self.name = spec.name
         self.displayName = spec.displayName
@@ -184,7 +182,7 @@ struct CustomCloudModel: TranscriptionModel, Codable {
     let name: String
     let displayName: String
     let description: String
-    let provider: ModelProvider = .custom
+    let provider: VoiceInkMacOSTranscriptionModelProvider = .custom
     let apiEndpoint: String
     let modelName: String
     let isMultilingualModel: Bool
@@ -203,7 +201,7 @@ struct CustomCloudModel: TranscriptionModel, Codable {
         self.apiEndpoint = apiEndpoint
         self.modelName = modelName
         self.isMultilingualModel = isMultilingual
-        self.supportedLanguages = supportedLanguages ?? ModelProvider.whisper.supportedLanguages(isMultilingual: isMultilingual)
+        self.supportedLanguages = supportedLanguages ?? VoiceInkMacOSTranscriptionModelProvider.whisper.supportedLanguages(isMultilingual: isMultilingual)
     }
 
     init(from decoder: Decoder) throws {
@@ -246,7 +244,7 @@ struct WhisperModel: TranscriptionModel {
     let speed: Double
     let accuracy: Double
     let ramUsage: Double
-    let provider: ModelProvider = .whisper
+    let provider: VoiceInkMacOSTranscriptionModelProvider = .whisper
 
     var isMultilingualModel: Bool {
         supportedLanguages.count > 1
@@ -256,7 +254,7 @@ struct WhisperModel: TranscriptionModel {
         self.name = spec.modelName
         self.displayName = spec.displayName
         self.size = spec.size
-        self.supportedLanguages = ModelProvider.whisper.supportedLanguages(isMultilingual: spec.isMultilingual)
+        self.supportedLanguages = VoiceInkMacOSTranscriptionModelProvider.whisper.supportedLanguages(isMultilingual: spec.isMultilingual)
         self.description = spec.description
         self.speed = spec.speed
         self.accuracy = spec.accuracy
@@ -270,7 +268,7 @@ struct ImportedWhisperModel: TranscriptionModel {
     let name: String
     let displayName: String
     let description: String
-    let provider: ModelProvider = .whisper
+    let provider: VoiceInkMacOSTranscriptionModelProvider = .whisper
     let isMultilingualModel: Bool
     let supportedLanguages: [String: String]
 
@@ -279,6 +277,6 @@ struct ImportedWhisperModel: TranscriptionModel {
         self.displayName = fileBaseName
         self.description = VoiceInkModelManagementPresentation.importedLocalModelDescription
         self.isMultilingualModel = true
-        self.supportedLanguages = ModelProvider.whisper.supportedLanguages(isMultilingual: true)
+        self.supportedLanguages = VoiceInkMacOSTranscriptionModelProvider.whisper.supportedLanguages(isMultilingual: true)
     }
 }

@@ -8,7 +8,7 @@ private struct CapabilityTestModel: TranscriptionModel {
     let name: String
     let displayName: String
     let description = "Capability test model"
-    let provider: ModelProvider
+    let provider: VoiceInkMacOSTranscriptionModelProvider
     let isMultilingualModel = true
     let supportedLanguages: [String: String] = [:]
 }

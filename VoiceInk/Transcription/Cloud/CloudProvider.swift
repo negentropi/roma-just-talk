@@ -2,17 +2,17 @@ import SwiftData
 import VoiceInkCore
 
 protocol CloudProvider {
-    var modelProvider: ModelProvider { get }
+    var modelProvider: VoiceInkMacOSTranscriptionModelProvider { get }
 
     func makeStreamingProvider(modelContext: ModelContext) -> (any StreamingTranscriptionProvider)?
 }
 
 struct CoreCloudProvider: CloudProvider {
-    let modelProvider: ModelProvider
+    let modelProvider: VoiceInkMacOSTranscriptionModelProvider
     private let streamingProviderFactory: ((ModelContext) -> (any StreamingTranscriptionProvider)?)?
 
     init(
-        modelProvider: ModelProvider,
+        modelProvider: VoiceInkMacOSTranscriptionModelProvider,
         streamingProviderFactory: ((ModelContext) -> (any StreamingTranscriptionProvider)?)? = nil
     ) {
         self.modelProvider = modelProvider
@@ -38,7 +38,7 @@ enum CloudProviderRegistry {
         CoreCloudProvider(modelProvider: .cartesia) { CartesiaStreamingProvider(modelContext: $0) }
     ]
 
-    static func provider(for modelProvider: ModelProvider) -> (any CloudProvider)? {
+    static func provider(for modelProvider: VoiceInkMacOSTranscriptionModelProvider) -> (any CloudProvider)? {
         allProviders.first { $0.modelProvider == modelProvider }
     }
 }

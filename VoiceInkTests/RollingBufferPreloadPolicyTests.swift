@@ -12,7 +12,7 @@ private struct TestTranscriptionModel: TranscriptionModel {
     let name: String
     let displayName: String
     let description: String
-    let provider: ModelProvider
+    let provider: VoiceInkMacOSTranscriptionModelProvider
     let isMultilingualModel = true
     let supportsStreaming: Bool
     let supportedLanguages: [String: String] = [:]
@@ -214,7 +214,7 @@ struct RollingBufferPreloadPolicyTests {
         defaults.removePersistentDomain(forName: suiteName)
     }
 
-    private func streamingModel(provider: ModelProvider) -> TestTranscriptionModel {
+    private func streamingModel(provider: VoiceInkMacOSTranscriptionModelProvider) -> TestTranscriptionModel {
         TestTranscriptionModel(
             name: "\(provider.rawValue)-streaming",
             displayName: "\(provider.rawValue) Streaming",

@@ -5,7 +5,7 @@ import VoiceInkCore
 @Suite(.serialized)
 struct CloudProviderVerificationTests {
     @Test func coreBackedCloudProvidersShareCoreAPIKeyVerifier() async throws {
-        let expectedMappings: [(ModelProvider, VoiceInkProviderKind)] = [
+        let expectedMappings: [(VoiceInkMacOSTranscriptionModelProvider, VoiceInkProviderKind)] = [
             (.groq, .groq),
             (.deepgram, .deepgram),
             (.elevenLabs, .elevenLabs),
@@ -31,8 +31,8 @@ struct CloudProviderVerificationTests {
     }
 
     @Test func cartesiaKeepsStreamingOnlyVerificationAdapter() async throws {
-        #expect(ModelProvider.cartesia.coreTranscriptionModelProvider == .cartesia)
-        #expect(ModelProvider.cartesia.coreTranscriptionModelProvider?.providerKind == nil)
+        #expect(VoiceInkMacOSTranscriptionModelProvider.cartesia.coreTranscriptionModelProvider == .cartesia)
+        #expect(VoiceInkMacOSTranscriptionModelProvider.cartesia.coreTranscriptionModelProvider?.providerKind == nil)
 
         #expect(CloudProviderRegistry.provider(for: .cartesia) != nil)
         let result = await VoiceInkProviderAPIKeyVerifier().verifyAPIKeyDetailed(" \n\t ", for: .cartesia)

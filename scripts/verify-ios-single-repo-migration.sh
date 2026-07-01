@@ -5056,10 +5056,23 @@ require_patterns \
   'apiKeyProviderName' \
   'supportedLanguages\(isMultilingual:'
 
-require_pattern \
-  "macOS ModelProvider aliases shared transcription model provider" \
-  'typealias ModelProvider = VoiceInkMacOSTranscriptionModelProvider' \
+reject_swift_pattern \
+  "macOS ModelProvider alias stays deleted" \
+  '^typealias[[:space:]]+ModelProvider[[:space:]]*=' \
   VoiceInk/Models/TranscriptionModel.swift
+
+require_patterns \
+  "macOS transcription model uses shared macOS provider directly" \
+  VoiceInk/Models/TranscriptionModel.swift \
+  'var provider: VoiceInkMacOSTranscriptionModelProvider' \
+  'provider: VoiceInkMacOSTranscriptionModelProvider' \
+  'VoiceInkMacOSTranscriptionModelProvider\.whisper\.supportedLanguages'
+
+require_patterns \
+  "macOS cloud provider uses shared macOS provider directly" \
+  VoiceInk/Transcription/Cloud/CloudProvider.swift \
+  'var modelProvider: VoiceInkMacOSTranscriptionModelProvider' \
+  'provider\(for modelProvider: VoiceInkMacOSTranscriptionModelProvider\)'
 
 require_pattern \
   "macOS TranscriptionModel uses shared provider language options" \
@@ -6301,7 +6314,7 @@ reject_pattern \
 
 require_pattern \
   "macOS CloudModel adapts shared cloud-model specs directly" \
-  'init\(spec: VoiceInkCloudTranscriptionModelSpec, provider: ModelProvider\)' \
+  'init\(spec: VoiceInkCloudTranscriptionModelSpec, provider: VoiceInkMacOSTranscriptionModelProvider\)' \
   VoiceInk/Models/TranscriptionModel.swift
 
 require_patterns \
@@ -6313,7 +6326,7 @@ require_patterns \
 
 reject_pattern \
   "macOS CloudModel avoids shell-owned literal cloud model initializer" \
-  'init\(id: UUID = UUID\(\), name: String, displayName: String, description: String, provider: ModelProvider, speed: Double' \
+  'init\(id: UUID = UUID\(\), name: String, displayName: String, description: String, provider: VoiceInkMacOSTranscriptionModelProvider, speed: Double' \
   VoiceInk/Models/TranscriptionModel.swift
 
 reject_pattern \

@@ -17301,9 +17301,9 @@ reject_file VoiceInkCore/Sources/VoiceInkCore/SystemArchitecture.swift
 require_patterns \
   "shared system architecture policy lives in VoiceInkCore" \
   VoiceInkCore/Sources/VoiceInkCore/SystemInformationReport.swift \
-  'VoiceInkSystemArchitecture' \
-  'isIntelMac' \
-  'macOSDisplayName' \
+  'public enum VoiceInkSystemArchitecture' \
+  'public static var isIntelMac' \
+  'public static var macOSDisplayName' \
   'Apple Silicon \(ARM64\)' \
   'Intel \(x86_64\)'
 

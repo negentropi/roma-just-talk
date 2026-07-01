@@ -9115,25 +9115,97 @@ reject_pattern \
   'prompt: VoiceInkTranscriptionPromptPreference\.requestPrompt\(\)' \
   VoiceInk/Transcription/Streaming/AssemblyAIStreamingProvider.swift
 
-require_pattern \
-  "macOS Deepgram streaming uses shared vocabulary use policy" \
-  'VoiceInkCustomVocabularyUse\.streamingTranscription\(\.deepgram\)|\.streamingTranscription\(\.deepgram\)' \
-  VoiceInk/Transcription/Streaming/DeepgramStreamingProvider.swift
+require_patterns \
+  "macOS Deepgram streaming names shared custom-vocabulary use" \
+  VoiceInk/Transcription/Streaming/DeepgramStreamingProvider.swift \
+  'CustomVocabularyService\.shared\.getCustomVocabularyTerms' \
+  'for: \.streamingTranscription\(\.deepgram\)'
 
-require_pattern \
-  "macOS Soniox streaming uses shared vocabulary use policy" \
-  'VoiceInkCustomVocabularyUse\.streamingTranscription\(\.soniox\)|\.streamingTranscription\(\.soniox\)' \
-  VoiceInk/Transcription/Streaming/SonioxStreamingProvider.swift
+require_patterns \
+  "macOS Soniox streaming names shared custom-vocabulary use" \
+  VoiceInk/Transcription/Streaming/SonioxStreamingProvider.swift \
+  'CustomVocabularyService\.shared\.getCustomVocabularyTerms' \
+  'for: \.streamingTranscription\(\.soniox\)'
 
-require_pattern \
-  "macOS Speechmatics streaming uses shared vocabulary use policy" \
-  'VoiceInkCustomVocabularyUse\.streamingTranscription\(\.speechmatics\)|\.streamingTranscription\(\.speechmatics\)' \
-  VoiceInk/Transcription/Streaming/SpeechmaticsStreamingProvider.swift
+require_patterns \
+  "macOS Speechmatics streaming names shared custom-vocabulary use" \
+  VoiceInk/Transcription/Streaming/SpeechmaticsStreamingProvider.swift \
+  'CustomVocabularyService\.shared\.getCustomVocabularyTerms' \
+  'for: \.streamingTranscription\(\.speechmatics\)'
 
-require_pattern \
-  "macOS AssemblyAI streaming uses shared vocabulary use policy" \
-  'VoiceInkCustomVocabularyUse\.streamingTranscription\(\.assemblyAI\)|\.streamingTranscription\(\.assemblyAI\)' \
-  VoiceInk/Transcription/Streaming/AssemblyAIStreamingProvider.swift
+require_patterns \
+  "macOS AssemblyAI streaming names shared custom-vocabulary use" \
+  VoiceInk/Transcription/Streaming/AssemblyAIStreamingProvider.swift \
+  'CustomVocabularyService\.shared\.getCustomVocabularyTerms' \
+  'for: \.streamingTranscription\(\.assemblyAI\)'
+
+section "obsolete standalone custom vocabulary terms module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/CustomVocabularyTerms.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/CustomVocabularyTermsTests.swift
+
+require_patterns \
+  "shared custom vocabulary terms API lives with dictionary policy" \
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift \
+  'public enum VoiceInkCustomVocabularyTerms' \
+  'public static func normalized\(_ terms: \[String\], limit: Int\? = nil\) -> \[String\]' \
+  'public static func normalized\(_ terms: \[String\], for use: VoiceInkCustomVocabularyUse\) -> \[String\]' \
+  'public enum VoiceInkCustomVocabularyUse: Equatable, Sendable' \
+  'case batchTranscription\(VoiceInkProviderKind\)' \
+  'case streamingTranscription\(VoiceInkProviderKind\)' \
+  'case postProcessingContext' \
+  'fileprivate var acceptsTerms: Bool' \
+  'case \.streamingTranscription\(\.deepgram\):' \
+  'return 50'
+
+require_patterns \
+  "core checks execute shared custom vocabulary term tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'DictionaryPolicyTests\.testCustomVocabularyTermsTrimDropBlankAndDeduplicateCaseInsensitively' \
+  'DictionaryPolicyTests\.testCustomVocabularyTermsApplyOptionalLimitAfterFiltering' \
+  'DictionaryPolicyTests\.testCustomVocabularyTermsApplyDeepgramStreamingLimitFromSharedUsePolicy' \
+  'DictionaryPolicyTests\.testCustomVocabularyTermsKeepTermsForSupportedUses' \
+  'DictionaryPolicyTests\.testCustomVocabularyTermsDropTermsForUnsupportedTranscriptionUses'
+
+require_patterns \
+  "macOS custom vocabulary service delegates normalization to shared policy" \
+  VoiceInk/Services/CustomVocabularyService.swift \
+  'func getCustomVocabularyTerms\(from context: ModelContext, for use: VoiceInkCustomVocabularyUse\) -> \[String\]' \
+  'VoiceInkCustomVocabularyTerms\.normalized\(rawCustomVocabularyTerms\(from: context\), for: use\)'
+
+reject_pattern \
+  "macOS custom vocabulary service avoids local normalization details" \
+  'trimmingCharacters\(in: \.whitespacesAndNewlines\)|lowercased\(\)|Set<String>|prefix\(50\)|limit: 50' \
+  VoiceInk/Services/CustomVocabularyService.swift
+
+reject_pattern \
+  "platform shells avoid redeclaring shared custom vocabulary term policy" \
+  '\b(enum|struct|typealias) +VoiceInkCustomVocabulary(Terms|Use)\b' \
+  VoiceInk \
+  iOS
+
+require_patterns \
+  "iOS retry passes stored custom vocabulary into shared run snapshot" \
+  iOS/VoiceInk-ios/AppSettings.swift \
+  'VoiceInkIOSAppSettingsRunSnapshot' \
+  'customVocabulary: customVocabularyTerms'
+
+require_patterns \
+  "shared run processor normalizes batch custom vocabulary in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift \
+  'VoiceInkCustomVocabularyTerms\.normalized' \
+  'for: \.batchTranscription\(provider\)'
+
+reject_pattern \
+  "platform shells avoid duplicate custom-vocabulary normalization logic" \
+  'trimmingCharacters\(in: \.whitespacesAndNewlines\)|lowercased\(\)|Set<String>|prefix\(50\)|limit: 50' \
+  VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift \
+  VoiceInk/Transcription/Streaming/AssemblyAIStreamingProvider.swift \
+  VoiceInk/Transcription/Streaming/SonioxStreamingProvider.swift \
+  VoiceInk/Transcription/Streaming/DeepgramStreamingProvider.swift \
+  VoiceInk/Transcription/Streaming/SpeechmaticsStreamingProvider.swift \
+  iOS/VoiceInk-ios/AppSettings.swift \
+  iOS/VoiceInk-ios/SettingsView.swift \
+  iOS/VoiceInk-ios/WhisperTranscriptionService.swift
 
 section "obsolete standalone streaming event module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/StreamingTranscriptionEvent.swift

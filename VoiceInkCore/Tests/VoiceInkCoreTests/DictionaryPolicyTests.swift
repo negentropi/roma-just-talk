@@ -477,6 +477,73 @@ final class DictionaryPolicyTests: XCTestCase {
         XCTAssertEqual(appliedSetters, [])
     }
 
+    func testCustomVocabularyTermsTrimDropBlankAndDeduplicateCaseInsensitively() {
+        XCTAssertEqual(
+            VoiceInkCustomVocabularyTerms.normalized([
+                "  Roma  ",
+                "",
+                "roma",
+                "VoiceInk",
+                " voiceink ",
+                "Cursor"
+            ]),
+            ["Roma", "VoiceInk", "Cursor"]
+        )
+    }
+
+    func testCustomVocabularyTermsApplyOptionalLimitAfterFiltering() {
+        XCTAssertEqual(
+            VoiceInkCustomVocabularyTerms.normalized(
+                ["", " Roma ", "roma", "Cursor", "SwiftData"],
+                limit: 2
+            ),
+            ["Roma", "Cursor"]
+        )
+    }
+
+    func testCustomVocabularyTermsApplyDeepgramStreamingLimitFromSharedUsePolicy() {
+        let terms = (1...55).map { "term-\($0)" }
+
+        XCTAssertEqual(
+            VoiceInkCustomVocabularyTerms.normalized(terms, for: .streamingTranscription(.deepgram)),
+            Array(terms.prefix(50))
+        )
+    }
+
+    func testCustomVocabularyTermsKeepTermsForSupportedUses() {
+        let terms = (1...55).map { "term-\($0)" }
+
+        XCTAssertEqual(
+            VoiceInkCustomVocabularyTerms.normalized(terms, for: .batchTranscription(.soniox)),
+            terms
+        )
+        XCTAssertEqual(
+            VoiceInkCustomVocabularyTerms.normalized(terms, for: .streamingTranscription(.soniox)),
+            terms
+        )
+        XCTAssertEqual(
+            VoiceInkCustomVocabularyTerms.normalized(terms, for: .postProcessingContext),
+            terms
+        )
+    }
+
+    func testCustomVocabularyTermsDropTermsForUnsupportedTranscriptionUses() {
+        let terms = ["Roma", "Felix"]
+
+        XCTAssertEqual(
+            VoiceInkCustomVocabularyTerms.normalized(terms, for: .batchTranscription(.groq)),
+            []
+        )
+        XCTAssertEqual(
+            VoiceInkCustomVocabularyTerms.normalized(terms, for: .batchTranscription(.deepgram)),
+            []
+        )
+        XCTAssertEqual(
+            VoiceInkCustomVocabularyTerms.normalized(terms, for: .streamingTranscription(.mistral)),
+            []
+        )
+    }
+
     func testVocabularyDraftUsesSharedTokenPolicy() {
         XCTAssertFalse(VoiceInkDictionaryPolicy.hasVocabularyDraft(" , \n "))
         XCTAssertTrue(VoiceInkDictionaryPolicy.hasVocabularyDraft("Voice Ink, "))

@@ -17933,6 +17933,7 @@ require_pattern \
 
 section "obsolete standalone AppIntent presentation module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/AppIntentPresentation.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/AppIntentPresentationTests.swift
 
 section "obsolete standalone mini-recorder request module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/MiniRecorderRequest.swift
@@ -17955,6 +17956,27 @@ require_patterns \
   'VoiceInkMiniRecorderRequest' \
   'toggleNotificationName = Notification\.Name\("toggleMiniRecorder"\)' \
   'dismissNotificationName = Notification\.Name\("dismissMiniRecorder"\)'
+
+require_patterns \
+  "app identity tests cover MiniRecorder AppIntent presentation copy" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AppIdentityTests.swift \
+  'func testMiniRecorderIntentPresentationPreservesMacOSShortcutCopy' \
+  'VoiceInkMiniRecorderAppIntentPresentation\.toggle' \
+  'VoiceInkAppIntentPresentation\(' \
+  '"Toggle VoiceInk Recorder"' \
+  '"Start or stop the VoiceInk mini recorder for voice transcription\."' \
+  '"VoiceInk recorder toggled"' \
+  'VoiceInkMiniRecorderAppIntentPresentation\.dismiss' \
+  '"Dismiss VoiceInk Recorder"' \
+  '"Dismiss the VoiceInk mini recorder and cancel any active recording\."' \
+  '"VoiceInk recorder dismissed"'
+
+require_patterns \
+  "app identity tests cover MiniRecorder request notification names" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AppIdentityTests.swift \
+  'func testMiniRecorderRequestPreservesMacOSNotificationNames' \
+  'VoiceInkMiniRecorderRequest\.toggleNotificationName\.rawValue, "toggleMiniRecorder"' \
+  'VoiceInkMiniRecorderRequest\.dismissNotificationName\.rawValue, "dismissMiniRecorder"'
 
 require_patterns \
   "macOS mini-recorder intents use shared presentation" \
@@ -18780,10 +18802,15 @@ require_patterns \
   'AppIdentityTests\.testStorageStartupDiagnosticsPreserveAppStartupCopy'
 
 require_patterns \
-  "core checks execute AppIntent presentation tests" \
+  "core checks execute MiniRecorder AppIntent presentation tests from app identity" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'AppIntentPresentationTests\.testMiniRecorderIntentPresentationPreservesMacOSShortcutCopy' \
-  'AppIntentPresentationTests\.testMiniRecorderRequestPreservesMacOSNotificationNames'
+  'AppIdentityTests\.testMiniRecorderIntentPresentationPreservesMacOSShortcutCopy' \
+  'AppIdentityTests\.testMiniRecorderRequestPreservesMacOSNotificationNames'
+
+reject_pattern \
+  "core check runner avoids obsolete AppIntent presentation test suite references" \
+  'AppIntentPresentationTests\.' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "core checks execute macOS navigation request contract tests" \

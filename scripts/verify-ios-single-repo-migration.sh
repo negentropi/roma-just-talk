@@ -7681,10 +7681,41 @@ require_pattern \
 section "obsolete standalone predefined prompts module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/PredefinedPrompts.swift
 
-require_pattern \
+section "obsolete standalone prompt templates module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/PromptTemplates.swift
+
+require_patterns \
+  "prompt template catalog lives with custom prompt policy" \
+  VoiceInkCore/Sources/VoiceInkCore/CustomPrompt.swift \
+  'public struct VoiceInkTemplatePrompt: Identifiable, Equatable, Sendable' \
+  'public enum VoiceInkPromptTemplates' \
+  'public static var macTemplates: \[VoiceInkTemplatePrompt\]' \
+  'id: "system-default"' \
+  'id: "chat"' \
+  'id: "email"' \
+  'id: "rewrite"' \
+  'public static func macTemplate\(named title: String\) -> VoiceInkTemplatePrompt\?'
+
+require_patterns \
   "predefined prompt metadata lives with custom prompt policy" \
-  'VoiceInkPredefinedPrompt|VoiceInkPredefinedPrompts|defaultPromptId|assistantPromptId|VoiceInkPromptTemplates\.macTemplate|VoiceInkAIPrompts\.assistantMode' \
-  VoiceInkCore/Sources/VoiceInkCore/CustomPrompt.swift
+  VoiceInkCore/Sources/VoiceInkCore/CustomPrompt.swift \
+  'public struct VoiceInkPredefinedPrompt' \
+  'public enum VoiceInkPredefinedPrompts' \
+  'defaultPromptId' \
+  'assistantPromptId' \
+  'VoiceInkPromptTemplates\.macTemplate\(named: "System Default"\)' \
+  'VoiceInkAIPrompts\.assistantMode'
+
+require_patterns \
+  "core checks execute prompt template catalog tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'CustomPromptTests\.testPromptTemplateCatalogPreservesMacOSTemplateOrderAndMetadata' \
+  'CustomPromptTests\.testPromptTemplateLookupUsesTitleAndRejectsMissingTitle'
+
+require_pattern \
+  "migration checklist tracks prompt template colocation" \
+  'prompt template catalog.*VoiceInkTemplatePrompt.*VoiceInkPromptTemplates.*CustomPrompt\.swift' \
+  docs/ios-single-repo-migration.md
 
 require_pattern \
   "shared custom prompt policy owns startup prompt-store repair" \

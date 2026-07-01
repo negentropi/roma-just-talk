@@ -73,6 +73,35 @@ final class CustomPromptTests: XCTestCase {
         XCTAssertTrue(prompt.triggerWords.isEmpty)
     }
 
+    func testPromptTemplateCatalogPreservesMacOSTemplateOrderAndMetadata() {
+        let templates = VoiceInkPromptTemplates.macTemplates
+
+        XCTAssertEqual(templates.map(\.id), ["system-default", "chat", "email", "rewrite"])
+        XCTAssertEqual(templates.map(\.title), ["System Default", "Chat", "Email", "Rewrite"])
+        XCTAssertEqual(
+            templates.map(\.icon),
+            ["checkmark.seal.fill", "bubble.left.and.bubble.right.fill", "envelope.fill", "pencil.circle.fill"]
+        )
+        XCTAssertEqual(
+            templates.map(\.description),
+            [
+                "Default system prompt",
+                "Casual chat-style formatting",
+                "Professional email formatting",
+                "Rewrites with better clarity."
+            ]
+        )
+    }
+
+    func testPromptTemplateLookupUsesTitleAndRejectsMissingTitle() throws {
+        let emailTemplate = try XCTUnwrap(VoiceInkPromptTemplates.macTemplate(named: "Email"))
+
+        XCTAssertEqual(emailTemplate.id, "email")
+        XCTAssertEqual(emailTemplate.title, "Email")
+        XCTAssertNil(VoiceInkPromptTemplates.macTemplate(named: "email"))
+        XCTAssertNil(VoiceInkPromptTemplates.macTemplate(named: "Missing"))
+    }
+
     func testCustomPromptPolicyRepairsExistingPredefinedPromptMetadata() {
         let staleDefaultPrompt = VoiceInkCustomPrompt(
             id: VoiceInkPredefinedPrompts.defaultPromptId,

@@ -9506,6 +9506,12 @@ reject_pattern \
 section "obsolete standalone streaming event module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/StreamingTranscriptionEvent.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/StreamingTranscriptionError.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/StreamingTranscriptionErrorTests.swift
+
+reject_swift_pattern \
+  "VoiceInkCore tests avoid stale StreamingTranscriptionErrorTests references" \
+  '\bStreamingTranscriptionErrorTests\b' \
+  VoiceInkCore/Tests/VoiceInkCoreTests
 
 require_patterns \
   "shared streaming event and error taxonomy live with streaming route policy in VoiceInkCore" \
@@ -9524,6 +9530,32 @@ require_patterns \
   'timeout' \
   'serverError' \
   'notConnected'
+
+require_patterns \
+  "streaming transcription event tests cover moved error cases" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/StreamingTranscriptionEventTests.swift \
+  'final class StreamingTranscriptionEventTests: XCTestCase' \
+  'func testErrorDescriptionsPreserveExistingMacOSStreamingMessages' \
+  'VoiceInkStreamingTranscriptionError\.missingAPIKey\.errorDescription' \
+  '"API key not configured for streaming transcription"' \
+  'VoiceInkStreamingTranscriptionError\.connectionFailed\("socket closed"\)\.errorDescription' \
+  '"Streaming connection failed: socket closed"' \
+  'VoiceInkStreamingTranscriptionError\.timeout\.errorDescription' \
+  '"Streaming transcription timed out waiting for final result"' \
+  'VoiceInkStreamingTranscriptionError\.serverError\("bad request"\)\.errorDescription' \
+  '"Streaming server error: bad request"' \
+  'VoiceInkStreamingTranscriptionError\.notConnected\.errorDescription' \
+  '"Not connected to streaming transcription service"' \
+  'func testUnknownServerErrorFallbackPreservesExistingText' \
+  'VoiceInkStreamingTranscriptionError\.unknownServerErrorMessage, "Unknown error"'
+
+require_patterns \
+  "core checks execute moved streaming transcription error tests through event tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'StreamingTranscriptionEventTests\.testErrorDescriptionsPreserveExistingMacOSStreamingMessages' \
+  'StreamingTranscriptionEventTests\(\)\.testErrorDescriptionsPreserveExistingMacOSStreamingMessages\(\)' \
+  'StreamingTranscriptionEventTests\.testUnknownServerErrorFallbackPreservesExistingText' \
+  'StreamingTranscriptionEventTests\(\)\.testUnknownServerErrorFallbackPreservesExistingText\(\)'
 
 require_pattern \
   "shared streaming connection model policy lives in VoiceInkCore" \

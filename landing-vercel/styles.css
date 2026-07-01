@@ -137,8 +137,8 @@ a {
   margin: 0 auto;
   flex-direction: column;
   justify-content: flex-start;
-  gap: clamp(38px, 7vh, 68px);
-  padding: 18px 0 30px;
+  gap: clamp(18px, 3.5vh, 30px);
+  padding: 12px 0 30px;
 }
 
 .topline {
@@ -604,8 +604,8 @@ h1 .before-word {
   .hero-inner {
     min-height: 82svh;
     width: min(100% - 28px, 1180px);
-    gap: 34px;
-    padding-top: 14px;
+    gap: 18px;
+    padding-top: 10px;
   }
 
   .topline {

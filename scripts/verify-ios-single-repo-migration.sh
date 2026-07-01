@@ -11939,6 +11939,12 @@ reject_pattern \
 
 section "obsolete standalone AI enhancement result module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/AIEnhancementResult.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/AIEnhancementResultTests.swift
+
+reject_swift_pattern \
+  "core tests avoid obsolete AI enhancement result test suite references" \
+  '\bAIEnhancementResultTests\b' \
+  VoiceInkCore/Tests/VoiceInkCoreTests
 
 require_patterns \
   "shared AI enhancement result API and construction live with transcription run processor" \
@@ -11957,10 +11963,30 @@ require_patterns \
   'endDate\.timeIntervalSince\(startDate\)'
 
 require_patterns \
-  "core checks execute shared AI enhancement result API tests" \
+  "transcription run processor tests cover shared AI enhancement result API" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunProcessorTests.swift \
+  'func testAIEnhancementResultCarriesMacOSPostProcessingMetadata\(\)' \
+  'VoiceInkAIEnhancementResult\(' \
+  'duration: 1\.25' \
+  'modelName: "gpt-4\.1"' \
+  'promptName: "Meeting notes"' \
+  'requestUserMessage: "<transcript>raw</transcript>"' \
+  'XCTAssertEqual\(result\.duration, 1\.25\)' \
+  'func testCompletedAIEnhancementResultDerivesDurationAndPreservesMetadata\(\)' \
+  'VoiceInkAIEnhancementResult\.completed\(' \
+  'startedAt: Date\(timeIntervalSince1970: 10\)' \
+  'endedAt: Date\(timeIntervalSince1970: 12\.5\)' \
+  'modelName: "gpt-5\.4"' \
+  'promptName: "Polish"' \
+  'XCTAssertEqual\(result\.duration, 2\.5\)'
+
+require_patterns \
+  "core checks execute shared AI enhancement result API tests through transcription run processor suite" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'AIEnhancementResultTests\.testResultCarriesMacOSPostProcessingMetadata' \
-  'AIEnhancementResultTests\.testCompletedResultDerivesDurationAndPreservesMetadata'
+  'TranscriptionRunProcessorTests\.testAIEnhancementResultCarriesMacOSPostProcessingMetadata' \
+  'TranscriptionRunProcessorTests\(\)\.testAIEnhancementResultCarriesMacOSPostProcessingMetadata\(\)' \
+  'TranscriptionRunProcessorTests\.testCompletedAIEnhancementResultDerivesDurationAndPreservesMetadata' \
+  'TranscriptionRunProcessorTests\(\)\.testCompletedAIEnhancementResultDerivesDurationAndPreservesMetadata\(\)'
 
 require_pattern \
   "macOS AI enhancement service saves enabled state through shared preference" \

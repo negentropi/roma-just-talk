@@ -1264,9 +1264,33 @@ require_patterns \
   'quality: \.high' \
   'isMeteringEnabled: true'
 
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/AudioRecorderConfigurationTests.swift
+
+require_patterns \
+  "iOS audio recorder configuration tests live with iOS audio-session lifecycle tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AudioSessionLifecycleStateTests.swift \
+  'testIOSAudioRecorderConfigurationUsesMono16kPCM16Policy' \
+  'VoiceInkIOSAudioRecorderConfiguration\.voiceRecording' \
+  'VoiceInkPCM16Audio\.mono16kSampleRate' \
+  'VoiceInkPCM16Audio\.monoChannelCount' \
+  'VoiceInkPCM16Audio\.bitsPerSample' \
+  'VoiceInkPCM16Audio\.isBigEndian' \
+  'VoiceInkPCM16Audio\.isFloatingPoint' \
+  'isMeteringEnabled: true'
+
 require_pattern \
   "VoiceInkCore checks cover iOS audio recorder configuration policy" \
-  'AudioRecorderConfigurationTests\.testIOSAudioRecorderConfigurationUsesMono16kPCM16Policy' \
+  'AudioSessionLifecycleStateTests\.testIOSAudioRecorderConfigurationUsesMono16kPCM16Policy' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_pattern \
+  "VoiceInkCore check runner invokes iOS audio recorder configuration proof" \
+  'AudioSessionLifecycleStateTests\(\)\.testIOSAudioRecorderConfigurationUsesMono16kPCM16Policy\(\)' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "VoiceInkCore check runner avoids obsolete iOS audio recorder configuration suite" \
+  'AudioRecorderConfigurationTests\.' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_patterns \

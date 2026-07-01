@@ -98,7 +98,7 @@ struct ModelDownloadOnboardingView: View {
     @State private var showDownloadConfirmation = false
     
     var body: some View {
-        let snapshot = modelManager.onboardingModelDownloadSnapshot()
+        let snapshot = modelManager.managementSnapshot.iOSOnboardingModelDownloadSnapshot()
         let onboardingPresentation = snapshot.onboardingPresentation
         let presentation = snapshot.rowPresentation
         let primaryAction = snapshot.primaryAction

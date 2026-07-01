@@ -32,7 +32,9 @@ struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
             actions: VoiceInkLocalWhisperTranscriptionActions<WhisperContext>(
                 resolveContext: {
                     let modelManager = LocalModelManager.shared
-                    guard let modelPath = await modelManager.modelPath(for: model) else {
+                    guard let modelPath = await modelManager.managementSnapshot.modelPath(
+                        forRuntimeModelName: model
+                    ) else {
                         throw VoiceInkLocalWhisperFailurePolicy.error(
                             for: .modelUnavailable,
                             platform: request.failurePlatform

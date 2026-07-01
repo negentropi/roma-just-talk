@@ -95,7 +95,7 @@ final class AppSettings: ObservableObject {
     var providerAccess: VoiceInkProviderAccessSnapshot {
         VoiceInkProviderAccessSnapshot(
             apiKeyState: apiKeyState,
-            localWhisperModelAvailable: LocalModelManager.shared.hasAvailableModel
+            localWhisperModelAvailable: LocalModelManager.shared.managementSnapshot.hasAvailableModel()
         )
     }
 

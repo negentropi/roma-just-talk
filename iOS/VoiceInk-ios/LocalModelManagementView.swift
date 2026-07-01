@@ -15,7 +15,7 @@ struct LocalModelManagementView: View {
     
     var body: some View {
         List {
-            ForEach(modelManager.managementRows()) { row in
+            ForEach(modelManager.managementSnapshot.managementRows()) { row in
                 ModelRowView(row: row, modelManager: modelManager)
             }
         }

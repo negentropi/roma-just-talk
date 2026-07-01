@@ -29,7 +29,7 @@ class LocalModelManager: ObservableObject {
         _ = Self.modelsDirectory
     }
 
-    private var managementSnapshot: VoiceInkWhisperModelManagementSnapshot {
+    var managementSnapshot: VoiceInkWhisperModelManagementSnapshot {
         VoiceInkWhisperModelManagementSnapshot(
             modelsDirectory: Self.modelsDirectory,
             downloadTrackingState: downloadSessionState.downloadTrackingState
@@ -169,23 +169,6 @@ class LocalModelManager: ObservableObject {
                 logger.error("\(VoiceInkWhisperModelManagementDiagnostics.deleteFailedMessage(modelName: model.modelName, localizedDescription: error.localizedDescription), privacy: .public)")
             }
         )
-    }
-    
-    func modelPath(for runtimeModelName: String) -> String? {
-        managementSnapshot.modelPath(forRuntimeModelName: runtimeModelName)
-    }
-    
-    /// Check if any model is available for transcription
-    var hasAvailableModel: Bool {
-        managementSnapshot.hasAvailableModel()
-    }
-
-    func managementRows() -> [VoiceInkWhisperModelManagementRow] {
-        managementSnapshot.managementRows()
-    }
-
-    func onboardingModelDownloadSnapshot() -> VoiceInkIOSOnboardingModelDownloadSnapshot {
-        managementSnapshot.iOSOnboardingModelDownloadSnapshot()
     }
     
 }

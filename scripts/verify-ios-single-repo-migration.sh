@@ -4202,7 +4202,7 @@ reject_pattern \
 
 require_multiline_pattern \
   "iOS app settings provider access builds live shared snapshot" \
-  'var[[:space:]]+providerAccess:[[:space:]]+VoiceInkProviderAccessSnapshot[[:space:]]*\{[[:space:]]*VoiceInkProviderAccessSnapshot\([[:space:]]*apiKeyState:[[:space:]]*apiKeyState,[[:space:]]*localWhisperModelAvailable:[[:space:]]*LocalModelManager\.shared\.hasAvailableModel[[:space:]]*\)[[:space:]]*\}' \
+  'var[[:space:]]+providerAccess:[[:space:]]+VoiceInkProviderAccessSnapshot[[:space:]]*\{[[:space:]]*VoiceInkProviderAccessSnapshot\([[:space:]]*apiKeyState:[[:space:]]*apiKeyState,[[:space:]]*localWhisperModelAvailable:[[:space:]]*LocalModelManager\.shared\.managementSnapshot\.hasAvailableModel\(\)[[:space:]]*\)[[:space:]]*\}' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 reject_pattern \
@@ -5302,13 +5302,20 @@ require_patterns \
   'WhisperModelFilesTests\.testSimpleDownloadSessionStateCleansUpCancelledDownload'
 
 require_patterns \
-  "iOS local model manager delegates snapshot queries to shared core" \
+  "iOS local model manager exposes shared management snapshot" \
   iOS/VoiceInk-ios/LocalModelManager.swift \
-  'VoiceInkWhisperModelManagementSnapshot' \
-  'managementSnapshot\.modelPath\(forRuntimeModelName: runtimeModelName\)' \
-  'managementSnapshot\.hasAvailableModel\(\)' \
-  'managementSnapshot\.managementRows\(\)' \
-  'managementSnapshot\.iOSOnboardingModelDownloadSnapshot\(\)'
+  'var managementSnapshot: VoiceInkWhisperModelManagementSnapshot' \
+  'downloadTrackingState: downloadSessionState\.downloadTrackingState'
+
+require_multiline_pattern \
+  "iOS local Whisper resolves model path through shared management snapshot" \
+  'modelManager\.managementSnapshot\.modelPath\([[:space:]]*forRuntimeModelName: model' \
+  iOS/VoiceInk-ios/WhisperTranscriptionService.swift
+
+require_pattern \
+  "iOS provider access reads local availability through shared management snapshot" \
+  'LocalModelManager\.shared\.managementSnapshot\.hasAvailableModel\(\)' \
+  iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \
   "iOS local model manager publishes local availability revisions" \
@@ -5342,13 +5349,13 @@ reject_pattern \
   iOS/VoiceInk-ios/LocalModelManager.swift
 
 require_pattern \
-  "iOS local model manager exposes shared management snapshot rows" \
+  "iOS local model management uses shared management snapshot rows directly" \
   'managementSnapshot\.managementRows\(\)' \
-  iOS/VoiceInk-ios/LocalModelManager.swift
+  iOS/VoiceInk-ios/LocalModelManagementView.swift
 
 reject_pattern \
   "iOS local model manager avoids unused snapshot pass-through wrappers" \
-  'func +(downloadState|managementRow)\(for[[:space:]]+model:|managementSnapshot\.(downloadState|managementRow)\(for:[[:space:]]+model\)' \
+  'func +(downloadState|managementRow|modelPath|managementRows|onboardingModelDownloadSnapshot)\(|var +hasAvailableModel|managementSnapshot\.(downloadState|managementRow)\(for:[[:space:]]+model\)' \
   iOS/VoiceInk-ios/LocalModelManager.swift
 
 require_pattern \
@@ -5387,8 +5394,8 @@ reject_pattern \
   iOS/VoiceInk-ios/LocalModelManager.swift
 
 require_pattern \
-  "iOS local model management uses shared management rows" \
-  'modelManager\.managementRows\(\)' \
+  "iOS local model management reads shared management snapshot rows" \
+  'modelManager\.managementSnapshot\.managementRows\(\)' \
   iOS/VoiceInk-ios/LocalModelManagementView.swift
 
 require_pattern \
@@ -5517,15 +5524,10 @@ require_patterns \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
   'OnboardingPresentationTests\.testIOSModelDownloadOnboardingSnapshotBuildsDefaultModelRowAndActions'
 
-require_pattern \
-  "iOS local model manager exposes shared onboarding model-download snapshot" \
-  'managementSnapshot\.iOSOnboardingModelDownloadSnapshot' \
-  iOS/VoiceInk-ios/LocalModelManager.swift
-
 require_patterns \
   "iOS onboarding uses shared model-download snapshot" \
   iOS/VoiceInk-ios/OnboardingView.swift \
-  'modelManager\.onboardingModelDownloadSnapshot\(\)' \
+  'modelManager\.managementSnapshot\.iOSOnboardingModelDownloadSnapshot\(\)' \
   'snapshot\.rowPresentation' \
   'snapshot\.primaryAction' \
   'modelManager\.downloadModel\(snapshot\.model\)'

@@ -2053,13 +2053,36 @@ reject_pattern \
   'private func +deleteMode\b' \
   iOS/VoiceInk-ios/SettingsView.swift
 
-section "obsolete standalone preference-list module stays deleted"
+section "obsolete standalone preference-list module/tests stay deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/PreferenceList.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/PreferenceListTests.swift
 
-require_pattern \
+require_patterns \
   "shared preference-list policy lives with UserDefaults preference policy" \
-  'VoiceInkPreferenceList|changedElements|removing<Element>' \
-  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift \
+  'VoiceInkPreferenceList' \
+  'changedElements' \
+  'removing<Element>'
+
+require_patterns \
+  "preference-list policy tests live with UserDefaults preference tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/UserDefaultsPreferencesTests.swift \
+  'testPreferenceListRemovingAtOffsetsPreservesRemainingOrder' \
+  'testPreferenceListRemovingAtOffsetsIgnoresOutOfRangeIndexes' \
+  'VoiceInkPreferenceList\.removing'
+
+require_patterns \
+  "core checks execute preference-list tests through UserDefaults preference suite" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'UserDefaultsPreferencesTests\.testPreferenceListRemovingAtOffsetsPreservesRemainingOrder' \
+  'UserDefaultsPreferencesTests\.testPreferenceListRemovingAtOffsetsIgnoresOutOfRangeIndexes' \
+  'UserDefaultsPreferencesTests\(\)\.testPreferenceListRemovingAtOffsetsPreservesRemainingOrder\(\)' \
+  'UserDefaultsPreferencesTests\(\)\.testPreferenceListRemovingAtOffsetsIgnoresOutOfRangeIndexes\(\)'
+
+reject_pattern \
+  "core checks avoid obsolete preference-list test suite" \
+  'PreferenceListTests\.' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \
   "iOS recording sheet avoids shell-only recording controls copy" \

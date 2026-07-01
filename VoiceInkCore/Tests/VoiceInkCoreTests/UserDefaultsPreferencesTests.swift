@@ -170,6 +170,20 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(VoiceInkUserDefaultsKey.didApplyLaunchAtLoginDefault, "DidApplyLaunchAtLoginDefault")
     }
 
+    func testPreferenceListRemovingAtOffsetsPreservesRemainingOrder() {
+        XCTAssertEqual(
+            VoiceInkPreferenceList.removing(at: IndexSet([1, 3]), from: ["zero", "one", "two", "three"]),
+            ["zero", "two"]
+        )
+    }
+
+    func testPreferenceListRemovingAtOffsetsIgnoresOutOfRangeIndexes() {
+        XCTAssertEqual(
+            VoiceInkPreferenceList.removing(at: IndexSet([1, 9]), from: ["zero", "one", "two"]),
+            ["zero", "two"]
+        )
+    }
+
     func testAIProviderModelSelectionKeyPreservesExistingProviderRawValuePattern() {
         XCTAssertEqual(VoiceInkUserDefaultsKey.selectedAIProviderModel("Groq"), "GroqSelectedModel")
         XCTAssertEqual(VoiceInkUserDefaultsKey.selectedAIProviderModel("Local CLI"), "Local CLISelectedModel")

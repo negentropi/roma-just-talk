@@ -9942,7 +9942,7 @@ require_patterns \
 require_patterns \
   "migration checklist tracks shared streaming key migration and streaming preference ownership" \
   docs/ios-single-repo-migration.md \
-  'VoiceInkStreamingKeysMigration' \
+  'VoiceInkStreamingKeysMigration.*from the shared streaming-preference module' \
   'VoiceInkTranscriptionStreamingPreference'
 
 section "obsolete standalone streaming final-commit timeout module stays deleted"

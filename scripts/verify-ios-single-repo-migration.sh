@@ -7710,6 +7710,7 @@ require_patterns \
   "core checks execute prompt template catalog tests" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
   'CustomPromptTests\.testPromptTemplateCatalogPreservesMacOSTemplateOrderAndMetadata' \
+  'CustomPromptTests\.testPromptTemplateCatalogPreservesMacOSPromptBodies' \
   'CustomPromptTests\.testPromptTemplateLookupUsesTitleAndRejectsMissingTitle'
 
 require_pattern \

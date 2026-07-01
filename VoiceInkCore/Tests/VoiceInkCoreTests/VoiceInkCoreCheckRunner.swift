@@ -400,6 +400,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "CustomPromptTests.testCustomPromptFinalPromptTextRespectsSystemInstructionFlag", run: { CustomPromptTests().testCustomPromptFinalPromptTextRespectsSystemInstructionFlag() }),
             VoiceInkCoreCheck(name: "CustomPromptTests.testCustomPromptBuildsFromPredefinedPrompt", run: { try CustomPromptTests().testCustomPromptBuildsFromPredefinedPrompt() }),
             VoiceInkCoreCheck(name: "CustomPromptTests.testPromptTemplateCatalogPreservesMacOSTemplateOrderAndMetadata", run: { CustomPromptTests().testPromptTemplateCatalogPreservesMacOSTemplateOrderAndMetadata() }),
+            VoiceInkCoreCheck(name: "CustomPromptTests.testPromptTemplateCatalogPreservesMacOSPromptBodies", run: { CustomPromptTests().testPromptTemplateCatalogPreservesMacOSPromptBodies() }),
             VoiceInkCoreCheck(name: "CustomPromptTests.testPromptTemplateLookupUsesTitleAndRejectsMissingTitle", run: { try CustomPromptTests().testPromptTemplateLookupUsesTitleAndRejectsMissingTitle() }),
             VoiceInkCoreCheck(name: "CustomPromptTests.testCustomPromptPolicyRepairsExistingPredefinedPromptMetadata", run: { CustomPromptTests().testCustomPromptPolicyRepairsExistingPredefinedPromptMetadata() }),
             VoiceInkCoreCheck(name: "CustomPromptTests.testCustomPromptPolicyLeavesCustomPromptsInPlaceAndAppendsMissingPredefinedPrompts", run: { CustomPromptTests().testCustomPromptPolicyLeavesCustomPromptsInPlaceAndAppendsMissingPredefinedPrompts() }),

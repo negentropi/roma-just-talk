@@ -6972,6 +6972,7 @@ reject_file VoiceInkCore/Sources/VoiceInkCore/RetriedUpload.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/MultipartFormData.swift
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/RemoteHTTPResponsePolicyTests.swift
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/RemotePollingPolicyTests.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/RetriedRequestTests.swift
 
 require_pattern \
   "shared long-running remote transcription clients use shared polling policy" \
@@ -7007,10 +7008,19 @@ require_patterns \
   '^[[:space:]]*VoiceInkCoreCheck\(name: "RemoteTransportTests\.testAPIErrorUsesEmptyMessageForNonUTF8Body", run: \{ RemoteTransportTests\(\)\.testAPIErrorUsesEmptyMessageForNonUTF8Body\(\) \}\),$' \
   '^[[:space:]]*VoiceInkCoreCheck\(name: "RemoteTransportTests\.testRetryableStatusCodeMatchesSharedRemoteRetryPolicy", run: \{ try RemoteTransportTests\(\)\.testRetryableStatusCodeMatchesSharedRemoteRetryPolicy\(\) \}\),$'
 
-require_pattern \
-  "core checks execute validated retried request tests" \
-  'RetriedRequestTests\.testValidatedDataReturnsBodyAfterHTTP2xx|RetriedRequestTests\.testValidatedDataThrowsProviderNSErrorForNon2xx' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+require_patterns \
+  "remote transport tests cover shared retried request helper" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteTransportTests.swift \
+  'func testValidatedDataReturnsBodyAfterHTTP2xx' \
+  'func testValidatedDataThrowsProviderNSErrorForNon2xx' \
+  'VoiceInkRetriedRequest\.validatedData' \
+  'RetriedRequestCapturingURLProtocol'
+
+require_patterns \
+  "core checks execute validated retried request tests through remote transport" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RemoteTransportTests\.testValidatedDataReturnsBodyAfterHTTP2xx", run: \{ try await RemoteTransportTests\(\)\.testValidatedDataReturnsBodyAfterHTTP2xx\(\) \}\),$' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RemoteTransportTests\.testValidatedDataThrowsProviderNSErrorForNon2xx", run: \{ try await RemoteTransportTests\(\)\.testValidatedDataThrowsProviderNSErrorForNon2xx\(\) \}\),$'
 
 require_patterns \
   "remote transport tests cover shared remote polling policy" \
@@ -7031,7 +7041,7 @@ require_patterns \
 
 reject_pattern \
   "core tests and project metadata avoid obsolete standalone remote transport policy test suites" \
-  'RemoteHTTPResponsePolicyTests|RemotePollingPolicyTests' \
+  'RemoteHTTPResponsePolicyTests|RemotePollingPolicyTests|RetriedRequestTests' \
   VoiceInkCore/Tests/VoiceInkCoreTests \
   VoiceInkCore/Package.swift \
   VoiceInk.xcodeproj/project.pbxproj \

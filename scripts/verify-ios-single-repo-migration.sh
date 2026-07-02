@@ -5252,8 +5252,8 @@ require_patterns \
   'TranscriptionModelCatalogTests\.testMacOSTranscriptionModelFactsDeriveSharedModelPolicy'
 
 reject_pattern \
-  "macOS ModelProvider avoids shell-owned enum and role mapping" \
-  'enum ModelProvider|case fluidAudio = "Parakeet"|Invalid ModelProvider|switch self' \
+  "macOS transcription model avoids shell-owned provider enum and role mapping" \
+  'enum ModelProvider|case fluidAudio = "Parakeet"|switch self' \
   VoiceInk/Models/TranscriptionModel.swift
 
 reject_pattern \
@@ -14552,7 +14552,16 @@ reject_pattern \
   "shared provider model selection presentation avoids shallow picker predicate" \
   'shouldShowPicker' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift \
-  VoiceInkCore/Tests/VoiceInkCoreTests/ProviderModelSelectionTests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/ProviderAccessRequirementTests.swift
+
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/ProviderModelSelectionTests.swift
+
+require_patterns \
+  "core checks execute provider model selection policy through provider access suite" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'ProviderAccessRequirementTests\.testModelSelectionPresentationUsesTranscriptionModelList' \
+  'ProviderAccessRequirementTests\.testModelSelectionPresentationUsesPostProcessingModelList' \
+  'ProviderAccessRequirementTests\.testSelectedModelFallsBackToProviderDefaultWhenCurrentModelIsUnavailable'
 
 require_pattern \
   "iOS mode model selection uses shared presentation adapter" \

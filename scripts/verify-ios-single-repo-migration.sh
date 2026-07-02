@@ -4520,14 +4520,35 @@ require_pattern \
   'VoiceInkWhisperTranscriptSegments|joinedText\(segmentCount:' \
   VoiceInkCore/Sources/VoiceInkCore/WhisperRuntimeDefaults.swift
 
-require_pattern \
-  "core tests cover shared local Whisper transcript segment policy" \
-  'testJoinedTextFromSegmentLookupPreservesRawOrderAndSkipsMissingSegments|testJoinedTextFromSegmentLookupReturnsEmptyForNonPositiveCounts' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/WhisperTranscriptSegmentsTests.swift
+section "obsolete standalone Whisper transcript segment test suite stays deleted"
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/WhisperTranscriptSegmentsTests.swift
 
-require_pattern \
+require_patterns \
+  "core tests cover shared local Whisper transcript segment policy" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/WhisperRuntimeDefaultsTests.swift \
+  'testJoinedTextConcatenatesSegmentsWithoutSeparator' \
+  'testJoinedTextPreservesMacOSRawWhitespacePolicy' \
+  'testJoinedTextReturnsEmptyForNoSegments' \
+  'testJoinedTextFromSegmentLookupPreservesRawOrderAndSkipsMissingSegments' \
+  'testJoinedTextFromSegmentLookupReturnsEmptyForNonPositiveCounts'
+
+require_patterns \
   "core check runner executes shared local Whisper transcript segment policy tests" \
-  'testJoinedTextFromSegmentLookupPreservesRawOrderAndSkipsMissingSegments|testJoinedTextFromSegmentLookupReturnsEmptyForNonPositiveCounts' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'WhisperRuntimeDefaultsTests\.testJoinedTextConcatenatesSegmentsWithoutSeparator' \
+  'WhisperRuntimeDefaultsTests\(\)\.testJoinedTextConcatenatesSegmentsWithoutSeparator\(\)' \
+  'WhisperRuntimeDefaultsTests\.testJoinedTextPreservesMacOSRawWhitespacePolicy' \
+  'WhisperRuntimeDefaultsTests\(\)\.testJoinedTextPreservesMacOSRawWhitespacePolicy\(\)' \
+  'WhisperRuntimeDefaultsTests\.testJoinedTextReturnsEmptyForNoSegments' \
+  'WhisperRuntimeDefaultsTests\(\)\.testJoinedTextReturnsEmptyForNoSegments\(\)' \
+  'WhisperRuntimeDefaultsTests\.testJoinedTextFromSegmentLookupPreservesRawOrderAndSkipsMissingSegments' \
+  'WhisperRuntimeDefaultsTests\(\)\.testJoinedTextFromSegmentLookupPreservesRawOrderAndSkipsMissingSegments\(\)' \
+  'WhisperRuntimeDefaultsTests\.testJoinedTextFromSegmentLookupReturnsEmptyForNonPositiveCounts' \
+  'WhisperRuntimeDefaultsTests\(\)\.testJoinedTextFromSegmentLookupReturnsEmptyForNonPositiveCounts\(\)'
+
+reject_pattern \
+  "core check runner avoids obsolete Whisper transcript segment suite references" \
+  'WhisperTranscriptSegmentsTests' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \

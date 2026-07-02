@@ -327,7 +327,7 @@ h1 .before-word {
 #download-button {
   --button-layer: var(--download-layer);
 
-  border-color: rgba(255, 248, 231, 0.78);
+  border-color: var(--download-layer);
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.82), rgba(221, 221, 221, 0.94)),
     #ddd;
@@ -342,7 +342,7 @@ h1 .before-word {
 #download-button:hover {
   --button-layer: var(--download-hover-layer);
 
-  border-color: var(--coral);
+  border-color: var(--download-hover-layer);
   box-shadow:
     4px 4px 0 var(--button-layer),
     0 24px 66px rgba(255, 107, 74, 0.2),

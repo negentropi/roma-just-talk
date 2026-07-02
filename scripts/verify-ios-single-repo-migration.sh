@@ -6970,6 +6970,8 @@ reject_file VoiceInkCore/Sources/VoiceInkCore/RemoteHTTPResponsePolicy.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/RemotePollingPolicy.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/RetriedUpload.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/MultipartFormData.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/RemoteHTTPResponsePolicyTests.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/RemotePollingPolicyTests.swift
 
 require_pattern \
   "shared long-running remote transcription clients use shared polling policy" \
@@ -6983,20 +6985,57 @@ require_pattern \
   'VoiceInkRetriedRequest\.validatedData' \
   VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleTranscriptionClient.swift
 
-require_pattern \
-  "core checks execute remote HTTP response policy tests" \
-  'RemoteHTTPResponsePolicyTests\.testValidateSuccessAcceptsHTTP2xxResponses|RemoteHTTPResponsePolicyTests\.testValidateSuccessRejectsNonHTTPResponses|RemoteHTTPResponsePolicyTests\.testValidateSuccessThrowsProviderNSErrorForNon2xxBody|RemoteHTTPResponsePolicyTests\.testAPIErrorUsesEmptyMessageForNonUTF8Body|RemoteHTTPResponsePolicyTests\.testRetryableStatusCodeMatchesSharedRemoteRetryPolicy' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+require_patterns \
+  "remote transport tests cover shared HTTP response policy" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteTransportTests.swift \
+  'final class RemoteTransportTests: XCTestCase' \
+  'func testValidateSuccessAcceptsHTTP2xxResponses' \
+  'func testValidateSuccessRejectsNonHTTPResponses' \
+  'func testValidateSuccessThrowsProviderNSErrorForNon2xxBody' \
+  'func testAPIErrorUsesEmptyMessageForNonUTF8Body' \
+  'func testRetryableStatusCodeMatchesSharedRemoteRetryPolicy' \
+  'VoiceInkRemoteHTTPResponsePolicy\.validateSuccess' \
+  'VoiceInkRemoteHTTPResponsePolicy\.apiError' \
+  'VoiceInkRemoteHTTPResponsePolicy\.retryableStatusCode'
+
+require_patterns \
+  "core checks execute remote HTTP response policy tests through remote transport" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RemoteTransportTests\.testValidateSuccessAcceptsHTTP2xxResponses", run: \{ try RemoteTransportTests\(\)\.testValidateSuccessAcceptsHTTP2xxResponses\(\) \}\),$' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RemoteTransportTests\.testValidateSuccessRejectsNonHTTPResponses", run: \{ try RemoteTransportTests\(\)\.testValidateSuccessRejectsNonHTTPResponses\(\) \}\),$' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RemoteTransportTests\.testValidateSuccessThrowsProviderNSErrorForNon2xxBody", run: \{ try RemoteTransportTests\(\)\.testValidateSuccessThrowsProviderNSErrorForNon2xxBody\(\) \}\),$' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RemoteTransportTests\.testAPIErrorUsesEmptyMessageForNonUTF8Body", run: \{ RemoteTransportTests\(\)\.testAPIErrorUsesEmptyMessageForNonUTF8Body\(\) \}\),$' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RemoteTransportTests\.testRetryableStatusCodeMatchesSharedRemoteRetryPolicy", run: \{ try RemoteTransportTests\(\)\.testRetryableStatusCodeMatchesSharedRemoteRetryPolicy\(\) \}\),$'
 
 require_pattern \
   "core checks execute validated retried request tests" \
   'RetriedRequestTests\.testValidatedDataReturnsBodyAfterHTTP2xx|RetriedRequestTests\.testValidatedDataThrowsProviderNSErrorForNon2xx' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
-require_pattern \
-  "core checks execute remote polling policy tests" \
-  'RemotePollingPolicyTests\.testPollReturnsFinishedResultWithoutSleeping|RemotePollingPolicyTests\.testPollSleepsAndRetriesUntilFinished|RemotePollingPolicyTests\.testPollTimesOutAfterPendingDecision' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+require_patterns \
+  "remote transport tests cover shared remote polling policy" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteTransportTests.swift \
+  'func testPollReturnsFinishedResultWithoutSleeping' \
+  'func testPollSleepsAndRetriesUntilFinished' \
+  'func testPollTimesOutAfterPendingDecision' \
+  'VoiceInkRemotePollingPolicy\.poll' \
+  'VoiceInkRemotePollingPolicy\.defaultIntervalNanoseconds' \
+  'URLError\.timedOut'
+
+require_patterns \
+  "core checks execute remote polling policy tests through remote transport" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RemoteTransportTests\.testPollReturnsFinishedResultWithoutSleeping", run: \{ try await RemoteTransportTests\(\)\.testPollReturnsFinishedResultWithoutSleeping\(\) \}\),$' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RemoteTransportTests\.testPollSleepsAndRetriesUntilFinished", run: \{ try await RemoteTransportTests\(\)\.testPollSleepsAndRetriesUntilFinished\(\) \}\),$' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RemoteTransportTests\.testPollTimesOutAfterPendingDecision", run: \{ try await RemoteTransportTests\(\)\.testPollTimesOutAfterPendingDecision\(\) \}\),$'
+
+reject_pattern \
+  "core tests and project metadata avoid obsolete standalone remote transport policy test suites" \
+  'RemoteHTTPResponsePolicyTests|RemotePollingPolicyTests' \
+  VoiceInkCore/Tests/VoiceInkCoreTests \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
 
 require_pattern \
   "core checks execute OpenAI-compatible transcription retry helper test" \

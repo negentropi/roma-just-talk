@@ -1,13 +1,15 @@
-@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,700..900,100,1&family=IBM+Plex+Mono:wght@500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap");
 
 :root {
   color-scheme: light dark;
   --ink: #171412;
   --paper: #f4efe5;
   --paper-deep: #e6d7bd;
+  --accent: #b8ff3d;
   --acid: #b8ff3d;
   --coral: #ff6b4a;
   --cyan: #46d9ff;
+  --cream: #fff8e7;
   --body-dot: rgba(23, 20, 18, 0.12);
   --body-warm: rgba(255, 107, 74, 0.16);
   --body-cool: rgba(70, 217, 255, 0.18);
@@ -21,9 +23,15 @@
   --idea: #78301f;
   --mark-bg: #171412;
   --mark-fg: #fff8e7;
-  --hero-overlay: linear-gradient(90deg, rgba(244, 239, 229, 0.98), rgba(244, 239, 229, 0.7) 60%, rgba(244, 239, 229, 0.22));
+  --hero-overlay: linear-gradient(90deg, rgba(244, 239, 229, 0.98), rgba(244, 239, 229, 0.74) 54%, rgba(244, 239, 229, 0.22));
   --hero-overlay-mobile: linear-gradient(180deg, rgba(244, 239, 229, 0.98), rgba(244, 239, 229, 0.78));
   --button-ink: #171412;
+  --ghost-ink: rgba(23, 20, 18, 0.86);
+  --ghost-border: rgba(23, 20, 18, 0.42);
+  --ghost-inner: rgba(23, 20, 18, 0.12);
+  --ghost-hover-bg: rgba(23, 20, 18, 0.04);
+  --ghost-hover-border: rgba(120, 48, 31, 0.58);
+  --ghost-hover-inner: rgba(120, 48, 31, 0.16);
   --inline-code: rgba(23, 20, 18, 0.08);
   --pre-bg: #211d1a;
   --pre-fg: #fff8e7;
@@ -36,9 +44,11 @@
     --ink: #f7efdf;
     --paper: #11100e;
     --paper-deep: #1d1916;
+    --accent: #bbff35;
     --acid: #bbff35;
     --coral: #ff785e;
     --cyan: #42d9ff;
+    --cream: #fff8e7;
     --body-dot: rgba(255, 248, 231, 0.09);
     --body-warm: rgba(255, 107, 74, 0.11);
     --body-cool: rgba(70, 217, 255, 0.12);
@@ -52,8 +62,14 @@
     --idea: #ff9a78;
     --mark-bg: #f7efdf;
     --mark-fg: #171412;
-    --hero-overlay: linear-gradient(90deg, rgba(17, 16, 14, 0.98), rgba(17, 16, 14, 0.76) 60%, rgba(17, 16, 14, 0.2));
-    --hero-overlay-mobile: linear-gradient(180deg, rgba(17, 16, 14, 0.97), rgba(17, 16, 14, 0.82));
+    --hero-overlay: linear-gradient(90deg, rgba(17, 16, 14, 0.98), rgba(17, 16, 14, 0.84) 48%, rgba(17, 16, 14, 0.34) 78%, rgba(17, 16, 14, 0.18));
+    --hero-overlay-mobile: linear-gradient(180deg, rgba(17, 16, 14, 0.98), rgba(17, 16, 14, 0.88) 72%, rgba(17, 16, 14, 0.74));
+    --ghost-ink: #fff8e7;
+    --ghost-border: rgba(255, 248, 231, 0.72);
+    --ghost-inner: rgba(255, 248, 231, 0.1);
+    --ghost-hover-bg: rgba(255, 248, 231, 0.045);
+    --ghost-hover-border: rgba(255, 120, 94, 0.74);
+    --ghost-hover-inner: rgba(255, 120, 94, 0.12);
     --inline-code: rgba(255, 248, 231, 0.12);
     --pre-bg: #050505;
     --pre-fg: #fff8e7;
@@ -77,8 +93,9 @@ body {
   min-width: 320px;
   background:
     radial-gradient(circle at 24px 24px, var(--body-dot) 1px, transparent 1px),
-    linear-gradient(135deg, var(--body-warm), transparent 38%),
-    linear-gradient(210deg, var(--body-cool), transparent 42%),
+    radial-gradient(circle at 68% 28%, rgba(184, 255, 61, 0.18), transparent 26rem),
+    linear-gradient(135deg, var(--body-warm), transparent 34%),
+    linear-gradient(210deg, var(--body-cool), transparent 40%),
     var(--paper);
   background-size: 48px 48px, auto, auto, auto;
   color: var(--ink);
@@ -100,7 +117,7 @@ a {
 
 .hero {
   position: relative;
-  min-height: 76svh;
+  min-height: min(76svh, 980px);
   overflow: hidden;
   border-bottom: 1px solid var(--line);
 }
@@ -114,6 +131,24 @@ a {
   pointer-events: none;
 }
 
+.hero::after {
+  position: absolute;
+  z-index: 1;
+  right: max(-90px, 2vw);
+  bottom: clamp(32px, 7vw, 110px);
+  width: min(64vw, 680px);
+  aspect-ratio: 1.55;
+  border-radius: 999px;
+  background:
+    radial-gradient(ellipse at 48% 58%, rgba(187, 255, 53, 0.3), transparent 38%),
+    radial-gradient(ellipse at 62% 42%, rgba(255, 120, 94, 0.16), transparent 36%),
+    radial-gradient(ellipse at 36% 46%, rgba(66, 217, 255, 0.12), transparent 32%);
+  content: "";
+  filter: blur(26px);
+  opacity: 0.92;
+  pointer-events: none;
+}
+
 .hero-bg-logo {
   position: absolute;
   z-index: 0;
@@ -123,8 +158,13 @@ a {
   height: auto;
   border-radius: clamp(22px, 3vw, 46px);
   clip-path: inset(7% round clamp(22px, 3vw, 46px));
+  filter: saturate(1.18) contrast(1.1);
   object-fit: cover;
+  opacity: 0.78;
   pointer-events: none;
+  box-shadow:
+    0 38px 110px rgba(0, 0, 0, 0.42),
+    0 0 70px rgba(184, 255, 61, 0.14);
   transform: translateY(-50%);
 }
 
@@ -132,7 +172,7 @@ a {
   position: relative;
   z-index: 2;
   display: flex;
-  min-height: 76svh;
+  min-height: min(76svh, 980px);
   width: min(1180px, calc(100% - 40px));
   margin: 0 auto;
   flex-direction: column;
@@ -164,7 +204,9 @@ a {
   background: var(--paper);
   clip-path: inset(7% round 8px);
   object-fit: cover;
-  box-shadow: 0 8px 18px var(--shadow);
+  box-shadow:
+    0 8px 18px var(--shadow),
+    0 0 26px rgba(184, 255, 61, 0.14);
 }
 
 .top-actions {
@@ -179,6 +221,14 @@ a {
 .top-actions a {
   text-decoration-thickness: 2px;
   text-underline-offset: 4px;
+  transition:
+    color 160ms ease,
+    text-decoration-color 160ms ease;
+}
+
+.top-actions a:hover {
+  color: var(--accent);
+  text-decoration-color: var(--accent);
 }
 
 .hero-copy {
@@ -187,23 +237,31 @@ a {
 }
 
 .kicker {
+  position: relative;
+  overflow: hidden;
   width: fit-content;
   margin: 0 0 18px;
-  border: 1px solid var(--line);
+  border: 1px solid rgba(255, 248, 231, 0.18);
   border-radius: 8px;
-  background: #2f2f2f;
-  color: #fff8e7;
+  background:
+    linear-gradient(90deg, rgba(184, 255, 61, 0.2), transparent 18%),
+    #2f2f2f;
+  color: var(--cream);
   padding: 8px 12px;
   font-family: "IBM Plex Mono", monospace;
   font-size: 0.85rem;
   font-weight: 600;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 248, 231, 0.13),
+    0 12px 36px rgba(0, 0, 0, 0.22);
 }
 
 h1 {
   max-width: 900px;
   margin: 0;
-  font-size: 4rem;
-  line-height: 1;
+  font-size: clamp(4rem, 8vw, 6.8rem);
+  letter-spacing: -0.045em;
+  line-height: 0.94;
   font-weight: 800;
 }
 
@@ -213,13 +271,15 @@ h1 .before-word {
   background: var(--mark-bg);
   border: 2px solid var(--mark-bg);
   border-radius: 8px;
-  padding: 0 0.16em 0.08em;
-  font-family: "Fraunces", serif;
-  font-style: italic;
-  font-variation-settings:
-    "SOFT" 100,
-    "WONK" 1,
-    "opsz" 72;
+  padding: 0 0.18em 0.1em;
+  font-family: "Space Grotesk", sans-serif;
+  font-style: oblique 10deg;
+  letter-spacing: -0.04em;
+  line-height: 1.08;
+  transform: rotate(-1.5deg);
+  box-shadow:
+    0 10px 0 rgba(184, 255, 61, 0.16),
+    0 20px 52px rgba(0, 0, 0, 0.24);
 }
 
 .idea-line {
@@ -227,13 +287,14 @@ h1 .before-word {
   max-width: 13.5ch;
   margin-top: 0.1em;
   color: var(--idea);
-  font-family: "Instrument Serif", Georgia, serif;
-  font-size: clamp(3rem, 6vw, 5.25rem);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(3rem, 6vw, 5.15rem);
   font-style: normal;
-  font-weight: 400;
-  letter-spacing: 0;
-  line-height: 0.92;
+  font-weight: 500;
+  letter-spacing: -0.055em;
+  line-height: 0.95;
   text-wrap: balance;
+  text-shadow: 0 18px 44px rgba(255, 120, 94, 0.12);
 }
 
 .body-copy {
@@ -264,11 +325,14 @@ h1 .before-word {
   transition:
     transform 160ms ease,
     box-shadow 160ms ease,
-    background-color 160ms ease;
+    border-color 160ms ease,
+    background-color 160ms ease,
+    color 160ms ease;
 }
 
 .button {
   display: inline-flex;
+  position: relative;
   align-items: center;
   justify-content: center;
   gap: 12px;
@@ -276,12 +340,21 @@ h1 .before-word {
   color: var(--button-ink);
   padding: 0 16px;
   font-weight: 800;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
+  isolation: isolate;
+  box-shadow:
+    0 18px 44px rgba(0, 0, 0, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
 .button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.26);
+  box-shadow:
+    0 22px 52px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+
+.button:active {
+  transform: translateY(1px);
 }
 
 .social-button:hover {
@@ -294,7 +367,23 @@ h1 .before-word {
 }
 
 #download-button {
-  background: #ddd;
+  border-color: rgba(255, 248, 231, 0.78);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.82), rgba(221, 221, 221, 0.94)),
+    #ddd;
+  color: #11100e;
+  box-shadow:
+    0 24px 58px rgba(184, 255, 61, 0.14),
+    0 18px 44px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+#download-button:hover {
+  border-color: var(--acid);
+  box-shadow:
+    0 24px 66px rgba(184, 255, 61, 0.24),
+    0 18px 44px rgba(0, 0, 0, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.88);
 }
 
 .secondary {
@@ -302,9 +391,19 @@ h1 .before-word {
 }
 
 #github-button {
-  border-color: #11100e;
-  background: #11100e;
-  color: #fff8e7;
+  border-color: rgba(255, 248, 231, 0.13);
+  background:
+    linear-gradient(135deg, rgba(255, 248, 231, 0.06), transparent 38%),
+    #11100e;
+  color: var(--cream);
+  box-shadow:
+    0 18px 44px rgba(0, 0, 0, 0.36),
+    inset 0 1px 0 rgba(255, 248, 231, 0.1);
+}
+
+#github-button:hover {
+  border-color: rgba(184, 255, 61, 0.58);
+  color: var(--cream);
 }
 
 .talk {
@@ -314,21 +413,26 @@ h1 .before-word {
 
 #talk-button {
   background: transparent;
-  border-color: rgba(255, 248, 231, 0.86);
-  color: #fff8e7;
-  box-shadow: none;
+  border-color: var(--ghost-border);
+  color: var(--ghost-ink);
+  box-shadow:
+    inset 0 0 0 1px var(--ghost-inner),
+    0 18px 42px rgba(0, 0, 0, 0.2);
 }
 
 #talk-button .icon,
 #talk-button .keycap,
 #talk-button .command-symbol {
-  border-color: rgba(255, 248, 231, 0.86);
-  color: #fff8e7;
+  border-color: var(--ghost-border);
+  color: var(--ghost-ink);
 }
 
 #talk-button:hover {
-  background: rgba(255, 248, 231, 0.06);
-  box-shadow: none;
+  border-color: var(--ghost-hover-border);
+  background: var(--ghost-hover-bg);
+  box-shadow:
+    inset 0 0 0 1px var(--ghost-hover-inner),
+    0 18px 48px rgba(255, 120, 94, 0.08);
 }
 
 .icon {
@@ -369,7 +473,7 @@ h1 .before-word {
   justify-content: center;
   border: 1.5px solid currentColor;
   border-radius: 6px;
-  background: var(--key-surface);
+  background: rgba(255, 248, 231, 0.08);
   padding: 2px 6px;
   font-family: "IBM Plex Mono", monospace;
   font-size: 0.74rem;
@@ -392,7 +496,7 @@ h1 .before-word {
   justify-content: center;
   border: 1.5px solid currentColor;
   border-radius: 6px;
-  background: var(--key-surface);
+  background: rgba(255, 248, 231, 0.08);
   font-family: "IBM Plex Mono", monospace;
   font-size: 1.18rem;
   font-weight: 700;

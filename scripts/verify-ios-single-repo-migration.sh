@@ -3009,6 +3009,7 @@ reject_file VoiceInkCore/Sources/VoiceInkCore/DurationPresentation.swift
 
 section "obsolete standalone temporal presentation test suites stay folded"
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/DatePresentationTests.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/DurationPresentationTests.swift
 
 require_patterns \
   "shared date and duration presentation live with transcript presentation policy" \
@@ -3026,6 +3027,21 @@ require_patterns \
   'testRelativeTimestampUsesShortRelativeStyle'
 
 require_patterns \
+  "transcript presentation tests cover shared duration presentation formats" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptPresentationTests.swift \
+  'testPositiveDurationVisibilityOnlyAllowsPositiveDurations' \
+  'testMinutesSecondsUsesUnpaddedMinutesByDefault' \
+  'testMinutesSecondsCanPadMinutesToTwoDigits' \
+  'testMinutesSecondsTruncatesFractionalSeconds' \
+  'testAbbreviatedMinutesSecondsMatchesMetricsFormatting' \
+  'testPositiveDurationReturnsFallbackForZeroOrNegativeDurations' \
+  'testPositiveDurationUsesMinuteSecondUnitsBelowOneHour' \
+  'testPositiveDurationUsesHourMinuteUnitsFromOneHour' \
+  'testCompactElapsedUsesMillisecondsForSubsecondDurations' \
+  'testCompactElapsedUsesOneDecimalSecondsUnderOneMinute' \
+  'testCompactElapsedUsesMinutesAndRoundedSecondsFromOneMinute'
+
+require_patterns \
   "core checks execute folded transcript date presentation tests" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
   'TranscriptPresentationTests\.testAbbreviatedTimestampPreservesMacOSDetailFormat' \
@@ -3035,10 +3051,39 @@ require_patterns \
   'TranscriptPresentationTests\.testRelativeTimestampUsesShortRelativeStyle' \
   'TranscriptPresentationTests\(\)\.testRelativeTimestampUsesShortRelativeStyle'
 
+require_patterns \
+  "core checks execute folded transcript duration presentation tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'TranscriptPresentationTests\.testPositiveDurationVisibilityOnlyAllowsPositiveDurations' \
+  'TranscriptPresentationTests\(\)\.testPositiveDurationVisibilityOnlyAllowsPositiveDurations' \
+  'TranscriptPresentationTests\.testMinutesSecondsUsesUnpaddedMinutesByDefault' \
+  'TranscriptPresentationTests\(\)\.testMinutesSecondsUsesUnpaddedMinutesByDefault' \
+  'TranscriptPresentationTests\.testMinutesSecondsCanPadMinutesToTwoDigits' \
+  'TranscriptPresentationTests\(\)\.testMinutesSecondsCanPadMinutesToTwoDigits' \
+  'TranscriptPresentationTests\.testMinutesSecondsTruncatesFractionalSeconds' \
+  'TranscriptPresentationTests\(\)\.testMinutesSecondsTruncatesFractionalSeconds' \
+  'TranscriptPresentationTests\.testAbbreviatedMinutesSecondsMatchesMetricsFormatting' \
+  'TranscriptPresentationTests\(\)\.testAbbreviatedMinutesSecondsMatchesMetricsFormatting' \
+  'TranscriptPresentationTests\.testPositiveDurationReturnsFallbackForZeroOrNegativeDurations' \
+  'TranscriptPresentationTests\(\)\.testPositiveDurationReturnsFallbackForZeroOrNegativeDurations' \
+  'TranscriptPresentationTests\.testPositiveDurationUsesMinuteSecondUnitsBelowOneHour' \
+  'TranscriptPresentationTests\(\)\.testPositiveDurationUsesMinuteSecondUnitsBelowOneHour' \
+  'TranscriptPresentationTests\.testPositiveDurationUsesHourMinuteUnitsFromOneHour' \
+  'TranscriptPresentationTests\(\)\.testPositiveDurationUsesHourMinuteUnitsFromOneHour' \
+  'TranscriptPresentationTests\.testCompactElapsedUsesMillisecondsForSubsecondDurations' \
+  'TranscriptPresentationTests\(\)\.testCompactElapsedUsesMillisecondsForSubsecondDurations' \
+  'TranscriptPresentationTests\.testCompactElapsedUsesOneDecimalSecondsUnderOneMinute' \
+  'TranscriptPresentationTests\(\)\.testCompactElapsedUsesOneDecimalSecondsUnderOneMinute' \
+  'TranscriptPresentationTests\.testCompactElapsedUsesMinutesAndRoundedSecondsFromOneMinute' \
+  'TranscriptPresentationTests\(\)\.testCompactElapsedUsesMinutesAndRoundedSecondsFromOneMinute'
+
 reject_pattern \
-  "core checks avoid obsolete standalone date presentation test suite" \
-  'DatePresentationTests\.' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  "core tests and project metadata avoid obsolete standalone temporal presentation test suites" \
+  'DatePresentationTests|DurationPresentationTests' \
+  VoiceInkCore/Tests/VoiceInkCoreTests \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
 
 require_pattern \
   "macOS transcription details use shared timestamp presentation" \

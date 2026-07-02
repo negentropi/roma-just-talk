@@ -125,6 +125,41 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertEqual(VoiceInkProviderCredential.nonBlank(" key-with-space "), " key-with-space ")
     }
 
+    func testSecretPresentationReturnsNilForEmptyOrWhitespaceOnlyKeys() {
+        XCTAssertNil(VoiceInkSecretPresentation.obfuscatedAPIKey(""))
+        XCTAssertNil(VoiceInkSecretPresentation.obfuscatedAPIKey("   \n"))
+    }
+
+    func testSecretPresentationMasksShortKeysCompletely() {
+        XCTAssertEqual(VoiceInkSecretPresentation.obfuscatedAPIKey("abc123"), "••••••")
+    }
+
+    func testSecretPresentationShowsPrefixAndSuffixForLongKeys() {
+        XCTAssertEqual(
+            VoiceInkSecretPresentation.obfuscatedAPIKey("sk-1234567890"),
+            "sk-1•••••7890"
+        )
+    }
+
+    func testSecretPresentationTrimsWhitespaceBeforeMasking() {
+        XCTAssertEqual(
+            VoiceInkSecretPresentation.obfuscatedAPIKey("  abc123  "),
+            "••••••"
+        )
+    }
+
+    func testSecretPresentationPreservesCurrentSevenCharacterEdgeCase() {
+        XCTAssertEqual(
+            VoiceInkSecretPresentation.obfuscatedAPIKey("abcdefg"),
+            "abcd••••efg"
+        )
+    }
+
+    func testSecretPresentationOrPlaceholderPreservesMacOSFallback() {
+        XCTAssertEqual(VoiceInkSecretPresentation.obfuscatedAPIKeyOrPlaceholder(""), "••••••••")
+        XCTAssertEqual(VoiceInkSecretPresentation.obfuscatedAPIKeyOrPlaceholder("abc123"), "••••••")
+    }
+
     func testProviderAPIKeyDraftUsesTrimmedEnteredKeyBeforeStoredRuntimeKey() {
         let draft = VoiceInkProviderAPIKeyDraft(
             enteredKey: " entered-key \n",

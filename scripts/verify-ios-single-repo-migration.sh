@@ -4097,6 +4097,46 @@ require_pattern \
   'VoiceInkSecretPresentation|obfuscatedAPIKey|obfuscatedAPIKeyOrPlaceholder' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
 
+section "obsolete standalone secret presentation tests stay deleted"
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/SecretPresentationTests.swift
+
+reject_swift_pattern \
+  "core tests avoid obsolete secret presentation test suite references" \
+  '\bSecretPresentationTests\b' \
+  VoiceInkCore/Tests/VoiceInkCoreTests
+
+require_patterns \
+  "secret presentation behavior tests live with provider access requirements" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/ProviderAccessRequirementTests.swift \
+  'testSecretPresentationReturnsNilForEmptyOrWhitespaceOnlyKeys' \
+  'testSecretPresentationMasksShortKeysCompletely' \
+  'testSecretPresentationShowsPrefixAndSuffixForLongKeys' \
+  'testSecretPresentationTrimsWhitespaceBeforeMasking' \
+  'testSecretPresentationPreservesCurrentSevenCharacterEdgeCase' \
+  'testSecretPresentationOrPlaceholderPreservesMacOSFallback' \
+  'VoiceInkSecretPresentation\.obfuscatedAPIKey\(""\)' \
+  'VoiceInkSecretPresentation\.obfuscatedAPIKey\("abc123"\)' \
+  'VoiceInkSecretPresentation\.obfuscatedAPIKey\("sk-1234567890"\)' \
+  'VoiceInkSecretPresentation\.obfuscatedAPIKey\("  abc123  "\)' \
+  'VoiceInkSecretPresentation\.obfuscatedAPIKey\("abcdefg"\)' \
+  'VoiceInkSecretPresentation\.obfuscatedAPIKeyOrPlaceholder\(""\)'
+
+require_patterns \
+  "core checks execute secret presentation behavior through provider access requirement suite" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'ProviderAccessRequirementTests\.testSecretPresentationReturnsNilForEmptyOrWhitespaceOnlyKeys' \
+  'ProviderAccessRequirementTests\(\)\.testSecretPresentationReturnsNilForEmptyOrWhitespaceOnlyKeys\(\)' \
+  'ProviderAccessRequirementTests\.testSecretPresentationMasksShortKeysCompletely' \
+  'ProviderAccessRequirementTests\(\)\.testSecretPresentationMasksShortKeysCompletely\(\)' \
+  'ProviderAccessRequirementTests\.testSecretPresentationShowsPrefixAndSuffixForLongKeys' \
+  'ProviderAccessRequirementTests\(\)\.testSecretPresentationShowsPrefixAndSuffixForLongKeys\(\)' \
+  'ProviderAccessRequirementTests\.testSecretPresentationTrimsWhitespaceBeforeMasking' \
+  'ProviderAccessRequirementTests\(\)\.testSecretPresentationTrimsWhitespaceBeforeMasking\(\)' \
+  'ProviderAccessRequirementTests\.testSecretPresentationPreservesCurrentSevenCharacterEdgeCase' \
+  'ProviderAccessRequirementTests\(\)\.testSecretPresentationPreservesCurrentSevenCharacterEdgeCase\(\)' \
+  'ProviderAccessRequirementTests\.testSecretPresentationOrPlaceholderPreservesMacOSFallback' \
+  'ProviderAccessRequirementTests\(\)\.testSecretPresentationOrPlaceholderPreservesMacOSFallback\(\)'
+
 require_pattern \
   "shared provider API-key list row presentation lives in VoiceInkCore" \
   'VoiceInkProviderAPIKeyListRow|VoiceInkProviderAPIKeyListRowPresentation|listRows|listRowPresentation' \

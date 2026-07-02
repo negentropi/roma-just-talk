@@ -24,6 +24,8 @@ struct ModeConfigurationView: View {
         let formPresentation = draftState.mode.formPresentation(isEditing: isEditing)
         let providerAvailability = settings.providerAccess.modeFormProviderAvailability
         let formStatePresentation = providerAvailability.formStatePresentation(for: draftState.mode)
+        let transcriptionModelSelection = draftState.mode.transcriptionProvider.modelSelectionPresentation(for: .transcription)
+        let postProcessingModelSelection = draftState.mode.postProcessingProvider.modelSelectionPresentation(for: .postProcessing)
 
         Form {
             Section(header: Text(formPresentation.modeDetailsSectionTitle)) {
@@ -44,12 +46,20 @@ struct ModeConfigurationView: View {
                     }
                 }
 
-                ProviderModelSelectionView(
-                    provider: draftState.mode.transcriptionProvider,
-                    use: .transcription,
-                    selectedModel: $draftState.mode.transcriptionModel,
-                    presentation: formPresentation
-                )
+                if let model = transcriptionModelSelection.fixedModelName {
+                    HStack {
+                        Text(formPresentation.modelFieldTitle)
+                        Spacer()
+                        Text(model)
+                            .foregroundColor(.secondary)
+                    }
+                } else {
+                    Picker(formPresentation.modelFieldTitle, selection: $draftState.mode.transcriptionModel) {
+                        ForEach(transcriptionModelSelection.selectableModels, id: \.self) { model in
+                            Text(model).tag(model)
+                        }
+                    }
+                }
             }
             
             Section(
@@ -82,12 +92,20 @@ struct ModeConfigurationView: View {
                         }
                     }
 
-                    ProviderModelSelectionView(
-                        provider: draftState.mode.postProcessingProvider,
-                        use: .postProcessing,
-                        selectedModel: $draftState.mode.postProcessingModel,
-                        presentation: formPresentation
-                    )
+                    if let model = postProcessingModelSelection.fixedModelName {
+                        HStack {
+                            Text(formPresentation.modelFieldTitle)
+                            Spacer()
+                            Text(model)
+                                .foregroundColor(.secondary)
+                        }
+                    } else {
+                        Picker(formPresentation.modelFieldTitle, selection: $draftState.mode.postProcessingModel) {
+                            ForEach(postProcessingModelSelection.selectableModels, id: \.self) { model in
+                                Text(model).tag(model)
+                            }
+                        }
+                    }
                     
                     // Prompt Template Selection
                     Picker(formPresentation.promptTemplatePickerTitle, selection: $draftState.mode.promptTemplate.type) {
@@ -123,32 +141,6 @@ struct ModeConfigurationView: View {
         }
         .onChange(of: providerAvailability) { _, availability in
             draftState.repairProviderAvailability(availability)
-        }
-    }
-}
-
-private struct ProviderModelSelectionView: View {
-    let provider: VoiceInkProviderKind
-    let use: VoiceInkProviderModelUse
-    @Binding var selectedModel: String
-    let presentation: VoiceInkModeFormPresentation
-
-    var body: some View {
-        let modelSelection = provider.modelSelectionPresentation(for: use)
-
-        if let model = modelSelection.fixedModelName {
-            HStack {
-                Text(presentation.modelFieldTitle)
-                Spacer()
-                Text(model)
-                    .foregroundColor(.secondary)
-            }
-        } else {
-            Picker(presentation.modelFieldTitle, selection: $selectedModel) {
-                ForEach(modelSelection.selectableModels, id: \.self) { model in
-                    Text(model).tag(model)
-                }
-            }
         }
     }
 }

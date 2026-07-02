@@ -14555,6 +14555,13 @@ reject_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/ProviderAccessRequirementTests.swift
 
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/ProviderModelSelectionTests.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/ProviderEndpointTests.swift
+
+require_patterns \
+  "core checks execute provider endpoint policy through provider access suite" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'ProviderAccessRequirementTests\.testConsoleURLsMatchMacOSProviderSettings' \
+  'ProviderAccessRequirementTests\.testPostProcessingChatCompletionsURLsOnlyExistForPostProcessingProviders'
 
 require_patterns \
   "core checks execute provider model selection policy through provider access suite" \
@@ -14563,9 +14570,17 @@ require_patterns \
   'ProviderAccessRequirementTests\.testModelSelectionPresentationUsesPostProcessingModelList' \
   'ProviderAccessRequirementTests\.testSelectedModelFallsBackToProviderDefaultWhenCurrentModelIsUnavailable'
 
-require_pattern \
-  "iOS mode model selection uses shared presentation adapter" \
-  'ProviderModelSelectionView|modelSelectionPresentation|fixedModelName|selectableModels' \
+require_patterns \
+  "iOS mode model selection uses shared presentation directly" \
+  iOS/VoiceInk-ios/ModeConfigurationView.swift \
+  'modelSelectionPresentation\(for: \.transcription\)' \
+  'modelSelectionPresentation\(for: \.postProcessing\)' \
+  'fixedModelName' \
+  'selectableModels'
+
+reject_pattern \
+  "iOS mode model selection avoids shallow wrapper view" \
+  'ProviderModelSelectionView' \
   iOS/VoiceInk-ios/ModeConfigurationView.swift
 
 reject_pattern \

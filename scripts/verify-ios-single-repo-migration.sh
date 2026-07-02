@@ -9691,6 +9691,7 @@ section "obsolete standalone streaming event module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/StreamingTranscriptionEvent.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/StreamingTranscriptionError.swift
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/StreamingTranscriptionErrorTests.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/StreamingTranscriptionEventTests.swift
 
 reject_swift_pattern \
   "VoiceInkCore tests avoid stale StreamingTranscriptionErrorTests references" \
@@ -9716,9 +9717,16 @@ require_patterns \
   'notConnected'
 
 require_patterns \
-  "streaming transcription event tests cover moved error cases" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/StreamingTranscriptionEventTests.swift \
-  'final class StreamingTranscriptionEventTests: XCTestCase' \
+  "streaming preference tests cover folded streaming event and error cases" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionStreamingPreferenceTests.swift \
+  'final class TranscriptionStreamingPreferenceTests: XCTestCase' \
+  'func testStreamingEventsCarrySessionAndTextUpdates' \
+  'assertSessionStarted\(\.sessionStarted\)' \
+  'assertText\(\.partial\(text: "draft"\), expectedText: "draft"\)' \
+  'assertText\(\.committed\(text: "final"\), expectedText: "final"\)' \
+  'func testStreamingErrorEventCarriesOriginalError' \
+  'VoiceInkStreamingTranscriptionEvent\.error\(error\)' \
+  '"Streaming server error: closed"' \
   'func testErrorDescriptionsPreserveExistingMacOSStreamingMessages' \
   'VoiceInkStreamingTranscriptionError\.missingAPIKey\.errorDescription' \
   '"API key not configured for streaming transcription"' \
@@ -9734,12 +9742,20 @@ require_patterns \
   'VoiceInkStreamingTranscriptionError\.unknownServerErrorMessage, "Unknown error"'
 
 require_patterns \
-  "core checks execute moved streaming transcription error tests through event tests" \
+  "core checks execute folded streaming event and error tests" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'StreamingTranscriptionEventTests\.testErrorDescriptionsPreserveExistingMacOSStreamingMessages' \
-  'StreamingTranscriptionEventTests\(\)\.testErrorDescriptionsPreserveExistingMacOSStreamingMessages\(\)' \
-  'StreamingTranscriptionEventTests\.testUnknownServerErrorFallbackPreservesExistingText' \
-  'StreamingTranscriptionEventTests\(\)\.testUnknownServerErrorFallbackPreservesExistingText\(\)'
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "TranscriptionStreamingPreferenceTests\.testStreamingEventsCarrySessionAndTextUpdates", run: \{ TranscriptionStreamingPreferenceTests\(\)\.testStreamingEventsCarrySessionAndTextUpdates\(\) \}\),$' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "TranscriptionStreamingPreferenceTests\.testStreamingErrorEventCarriesOriginalError", run: \{ TranscriptionStreamingPreferenceTests\(\)\.testStreamingErrorEventCarriesOriginalError\(\) \}\),$' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "TranscriptionStreamingPreferenceTests\.testErrorDescriptionsPreserveExistingMacOSStreamingMessages", run: \{ TranscriptionStreamingPreferenceTests\(\)\.testErrorDescriptionsPreserveExistingMacOSStreamingMessages\(\) \}\),$' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "TranscriptionStreamingPreferenceTests\.testUnknownServerErrorFallbackPreservesExistingText", run: \{ TranscriptionStreamingPreferenceTests\(\)\.testUnknownServerErrorFallbackPreservesExistingText\(\) \}\),$'
+
+reject_pattern \
+  "core tests and project metadata avoid obsolete standalone streaming event test suite" \
+  'StreamingTranscriptionEventTests' \
+  VoiceInkCore/Tests/VoiceInkCoreTests \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
 
 require_pattern \
   "shared streaming connection model policy lives in VoiceInkCore" \

@@ -9661,7 +9661,7 @@ reject_swift_pattern \
 
 reject_swift_pattern \
   "core tests avoid obsolete cloud transcription error test suite references" \
-  '\bCloudTranscriptionErrorTests\b' \
+  '\bCloudTranscriptionError''Tests\b' \
   VoiceInkCore/Tests/VoiceInkCoreTests
 
 require_patterns \

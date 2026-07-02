@@ -6,7 +6,7 @@ import VoiceInkCore
 
 @MainActor
 final class AudioPlayer: ObservableObject {
-    @Published private var playbackState = VoiceInkAudioPlaybackState(
+    @Published private(set) var playbackState = VoiceInkAudioPlaybackState(
         isPlaying: false,
         currentTime: 0,
         duration: 0,
@@ -23,22 +23,6 @@ final class AudioPlayer: ObservableObject {
     private var audioPlayer: AVAudioPlayer?
     private var timer: Timer?
     private let sessionManager = AudioSessionManager.shared
-
-    var isPlaying: Bool {
-        playbackState.isPlaying
-    }
-
-    var currentTime: TimeInterval {
-        playbackState.currentTime
-    }
-
-    var duration: TimeInterval {
-        playbackState.duration
-    }
-
-    var playbackRate: Float {
-        playbackState.playbackRate
-    }
     
     func loadAudio(from path: String) {
         isLoading = true
@@ -66,7 +50,7 @@ final class AudioPlayer: ObservableObject {
         do {
             try sessionManager.activateSessionForPlayback()
 
-            player.rate = playbackRate
+            player.rate = playbackState.playbackRate
             player.play()
             playbackState = playbackState.playing()
             startTimer()
@@ -115,7 +99,7 @@ final class AudioPlayer: ObservableObject {
                 let plan = VoiceInkAudioPlaybackTimerTickPlan.iOS(
                     currentTime: player.currentTime,
                     playerIsPlaying: player.isPlaying,
-                    shellIsPlaying: self.isPlaying
+                    shellIsPlaying: self.playbackState.isPlaying
                 )
                 self.playbackState = self.playbackState.applyingTimerTickPlan(plan)
                 plan.applyRuntimeState(

@@ -55,10 +55,10 @@ struct AudioPlayerView: View {
                             .fill(.blue)
                             .frame(width: 44, height: 44)
                             .overlay(
-                                Image(systemName: VoiceInkAudioPlaybackPresentation.playPauseSystemImageName(isPlaying: player.isPlaying))
+                                Image(systemName: VoiceInkAudioPlaybackPresentation.playPauseSystemImageName(isPlaying: player.playbackState.isPlaying))
                                     .font(.system(size: 16, weight: .semibold))
                                     .foregroundStyle(.white)
-                                    .offset(x: player.isPlaying ? 0 : 1)
+                                    .offset(x: player.playbackState.isPlaying ? 0 : 1)
                             )
                     }
                     .buttonStyle(.plain)
@@ -70,7 +70,7 @@ struct AudioPlayerView: View {
                             .fill(Color(.tertiarySystemFill))
                             .frame(width: 44, height: 44)
                             .overlay(
-                                Text(VoiceInkAudioPlaybackRate.label(for: player.playbackRate))
+                                Text(VoiceInkAudioPlaybackRate.label(for: player.playbackState.playbackRate))
                                     .font(.caption.weight(.semibold))
                                     .monospacedDigit()
                                     .foregroundStyle(.primary)
@@ -94,8 +94,8 @@ struct AudioPlayerView: View {
                                     .fill(.blue)
                                     .frame(
                                         width: geometry.size.width * CGFloat(VoiceInkAudioPlaybackTimeline.progress(
-                                            currentTime: player.currentTime,
-                                            duration: player.duration
+                                            currentTime: player.playbackState.currentTime,
+                                            duration: player.playbackState.duration
                                         )),
                                         height: 4
                                     )
@@ -107,7 +107,7 @@ struct AudioPlayerView: View {
                                         let seekTime = VoiceInkAudioPlaybackTimeline.time(
                                             atLocationX: Double(value.location.x),
                                             width: Double(geometry.size.width),
-                                            duration: player.duration
+                                            duration: player.playbackState.duration
                                         )
                                         player.seek(to: seekTime)
                                     }
@@ -117,13 +117,13 @@ struct AudioPlayerView: View {
                         
                         // Time display
                         HStack {
-                            Text(VoiceInkDurationPresentation.minutesSeconds(player.currentTime))
+                            Text(VoiceInkDurationPresentation.minutesSeconds(player.playbackState.currentTime))
                                 .font(.caption.monospacedDigit())
                                 .foregroundStyle(.primary)
                             
                             Spacer()
                             
-                            Text(VoiceInkDurationPresentation.minutesSeconds(player.duration))
+                            Text(VoiceInkDurationPresentation.minutesSeconds(player.playbackState.duration))
                                 .font(.caption.monospacedDigit())
                                 .foregroundStyle(.secondary)
                         }

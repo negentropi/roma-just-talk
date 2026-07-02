@@ -14296,8 +14296,26 @@ require_pattern \
 
 require_pattern \
   "iOS audio player publishes shared playback state plan" \
-  '@Published[[:space:]]+private[[:space:]]+var[[:space:]]+playbackState([[:space:]]*:[[:space:]]*VoiceInkAudioPlaybackState|[[:space:]]*=[[:space:]]*VoiceInkAudioPlaybackState)' \
+  '@Published[[:space:]]+private\(set\)[[:space:]]+var[[:space:]]+playbackState([[:space:]]*:[[:space:]]*VoiceInkAudioPlaybackState|[[:space:]]*=[[:space:]]*VoiceInkAudioPlaybackState)' \
   iOS/VoiceInk-ios/AudioPlayer.swift
+
+reject_pattern \
+  "iOS audio player avoids shallow playback-state accessors" \
+  'var[[:space:]]+(isPlaying|currentTime|duration|playbackRate)[[:space:]]*:[^{]+\{[[:space:]]*(return[[:space:]]+)?playbackState\.(isPlaying|currentTime|duration|playbackRate)[[:space:]]*\}' \
+  iOS/VoiceInk-ios/AudioPlayer.swift
+
+reject_pattern \
+  "iOS audio player view avoids shallow playback-state accessors" \
+  'player\.(isPlaying|currentTime|duration|playbackRate)\b' \
+  iOS/VoiceInk-ios/AudioPlayerView.swift
+
+require_patterns \
+  "iOS audio player view reads shared playback state directly" \
+  iOS/VoiceInk-ios/AudioPlayerView.swift \
+  'player\.playbackState\.isPlaying' \
+  'player\.playbackState\.currentTime' \
+  'player\.playbackState\.duration' \
+  'player\.playbackState\.playbackRate'
 
 require_pattern \
   "iOS audio player shell applies shared play-pause plan" \

@@ -14299,7 +14299,7 @@ require_pattern \
   '@Published[[:space:]]+private\(set\)[[:space:]]+var[[:space:]]+playbackState([[:space:]]*:[[:space:]]*VoiceInkAudioPlaybackState|[[:space:]]*=[[:space:]]*VoiceInkAudioPlaybackState)' \
   iOS/VoiceInk-ios/AudioPlayer.swift
 
-reject_pattern \
+reject_multiline_pattern \
   "iOS audio player avoids shallow playback-state accessors" \
   'var[[:space:]]+(isPlaying|currentTime|duration|playbackRate)[[:space:]]*:[^{]+\{[[:space:]]*(return[[:space:]]+)?playbackState\.(isPlaying|currentTime|duration|playbackRate)[[:space:]]*\}' \
   iOS/VoiceInk-ios/AudioPlayer.swift

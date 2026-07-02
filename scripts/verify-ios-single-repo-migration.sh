@@ -2980,6 +2980,9 @@ section "obsolete standalone temporal presentation modules stay deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/DatePresentation.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/DurationPresentation.swift
 
+section "obsolete standalone temporal presentation test suites stay folded"
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/DatePresentationTests.swift
+
 require_patterns \
   "shared date and duration presentation live with transcript presentation policy" \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift \
@@ -2987,6 +2990,28 @@ require_patterns \
   'VoiceInkDurationPresentation' \
   'relativeTimestamp' \
   'minutesSeconds'
+
+require_patterns \
+  "transcript presentation tests cover shared date presentation formats" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptPresentationTests.swift \
+  'testAbbreviatedTimestampPreservesMacOSDetailFormat' \
+  'testCompactTimestampPreservesMacOSHistoryListFormat' \
+  'testRelativeTimestampUsesShortRelativeStyle'
+
+require_patterns \
+  "core checks execute folded transcript date presentation tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'TranscriptPresentationTests\.testAbbreviatedTimestampPreservesMacOSDetailFormat' \
+  'TranscriptPresentationTests\(\)\.testAbbreviatedTimestampPreservesMacOSDetailFormat' \
+  'TranscriptPresentationTests\.testCompactTimestampPreservesMacOSHistoryListFormat' \
+  'TranscriptPresentationTests\(\)\.testCompactTimestampPreservesMacOSHistoryListFormat' \
+  'TranscriptPresentationTests\.testRelativeTimestampUsesShortRelativeStyle' \
+  'TranscriptPresentationTests\(\)\.testRelativeTimestampUsesShortRelativeStyle'
+
+reject_pattern \
+  "core checks avoid obsolete standalone date presentation test suite" \
+  'DatePresentationTests\.' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "macOS transcription details use shared timestamp presentation" \

@@ -10,8 +10,8 @@
   --cyan: #46d9ff;
   --cream: #fff8e7;
   --button-layer: rgba(255, 248, 231, 0.78);
-  --download-layer: rgba(255, 248, 231, 0.78);
-  --download-hover-layer: rgba(255, 107, 74, 0.78);
+  --download-layer: rgba(255, 107, 74, 0.78);
+  --download-hover-layer: rgba(255, 248, 231, 0.78);
   --github-outline: rgba(255, 248, 231, 0.86);
   --talk-ink: #171412;
   --talk-outline: rgba(34, 159, 208, 0.78);
@@ -50,8 +50,8 @@
     --cyan: #42d9ff;
     --cream: #fff8e7;
     --button-layer: rgba(255, 248, 231, 0.78);
-    --download-layer: rgba(255, 248, 231, 0.78);
-    --download-hover-layer: rgba(255, 120, 94, 0.88);
+    --download-layer: rgba(255, 120, 94, 0.88);
+    --download-hover-layer: rgba(255, 248, 231, 0.78);
     --github-outline: rgba(255, 248, 231, 0.86);
     --talk-ink: #fff8e7;
     --talk-outline: rgba(70, 217, 255, 0.86);

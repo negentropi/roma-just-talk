@@ -17702,6 +17702,34 @@ require_patterns \
   'VoiceInkWordCounter\.count\(in: sentence, language: tokenizerLanguage\)' \
   'VoiceInkWordCounter\.count\(in: sentence, language: language\)'
 
+section "obsolete standalone transcript paragraph formatter tests stay deleted"
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptParagraphFormatterTests.swift
+
+reject_swift_pattern \
+  "core tests avoid obsolete transcript paragraph formatter test suite references" \
+  '\bTranscriptParagraphFormatterTests\b' \
+  VoiceInkCore/Tests/VoiceInkCoreTests
+
+require_patterns \
+  "transcript paragraph formatter behavior tests live with cleanup preferences" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionCleanupPreferencesTests.swift \
+  'testTranscriptParagraphFormatterReturnsEmptyForWhitespaceOnlyInput' \
+  'testTranscriptParagraphFormatterTrimsAndKeepsShortTextInOneParagraph' \
+  'testTranscriptParagraphFormatterSplitsAfterFourSignificantSentencesWhenChunkHitsWordTarget' \
+  'VoiceInkTranscriptParagraphFormatter\.format\(" \\n\\t "\)' \
+  'VoiceInkTranscriptParagraphFormatter\.format\("  This is one sentence\. This is another sentence\.  "\)' \
+  'VoiceInkTranscriptParagraphFormatter\.format\(input\)'
+
+require_patterns \
+  "core checks execute transcript paragraph formatter behavior through cleanup preferences suite" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'TranscriptionCleanupPreferencesTests\.testTranscriptParagraphFormatterReturnsEmptyForWhitespaceOnlyInput' \
+  'TranscriptionCleanupPreferencesTests\(\)\.testTranscriptParagraphFormatterReturnsEmptyForWhitespaceOnlyInput\(\)' \
+  'TranscriptionCleanupPreferencesTests\.testTranscriptParagraphFormatterTrimsAndKeepsShortTextInOneParagraph' \
+  'TranscriptionCleanupPreferencesTests\(\)\.testTranscriptParagraphFormatterTrimsAndKeepsShortTextInOneParagraph\(\)' \
+  'TranscriptionCleanupPreferencesTests\.testTranscriptParagraphFormatterSplitsAfterFourSignificantSentencesWhenChunkHitsWordTarget' \
+  'TranscriptionCleanupPreferencesTests\(\)\.testTranscriptParagraphFormatterSplitsAfterFourSignificantSentencesWhenChunkHitsWordTarget\(\)'
+
 require_pattern \
   "shared session metric policy uses shared word counter" \
   'VoiceInkWordCounter\.count\(in: textForCounting\(from: source\)\)' \

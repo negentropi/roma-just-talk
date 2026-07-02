@@ -9,7 +9,9 @@
   --coral: #ff6b4a;
   --cyan: #46d9ff;
   --cream: #fff8e7;
-  --button-layer: rgba(255, 107, 74, 0.78);
+  --button-layer: rgba(255, 248, 231, 0.78);
+  --download-layer: rgba(255, 248, 231, 0.78);
+  --download-hover-layer: rgba(255, 107, 74, 0.78);
   --github-outline: rgba(255, 248, 231, 0.86);
   --talk-ink: #171412;
   --talk-outline: rgba(34, 159, 208, 0.78);
@@ -47,7 +49,9 @@
     --coral: #ff785e;
     --cyan: #42d9ff;
     --cream: #fff8e7;
-    --button-layer: rgba(255, 120, 94, 0.88);
+    --button-layer: rgba(255, 248, 231, 0.78);
+    --download-layer: rgba(255, 248, 231, 0.78);
+    --download-hover-layer: rgba(255, 120, 94, 0.88);
     --github-outline: rgba(255, 248, 231, 0.86);
     --talk-ink: #fff8e7;
     --talk-outline: rgba(70, 217, 255, 0.86);
@@ -321,6 +325,8 @@ h1 .before-word {
 }
 
 #download-button {
+  --button-layer: var(--download-layer);
+
   border-color: rgba(255, 248, 231, 0.78);
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.82), rgba(221, 221, 221, 0.94)),
@@ -334,6 +340,8 @@ h1 .before-word {
 }
 
 #download-button:hover {
+  --button-layer: var(--download-hover-layer);
+
   border-color: var(--coral);
   box-shadow:
     4px 4px 0 var(--button-layer),
@@ -347,6 +355,8 @@ h1 .before-word {
 }
 
 #github-button {
+  --button-layer: var(--github-outline);
+
   border-color: var(--github-outline);
   background:
     linear-gradient(135deg, rgba(255, 248, 231, 0.06), transparent 38%),
@@ -369,6 +379,8 @@ h1 .before-word {
 }
 
 #talk-button {
+  --button-layer: var(--talk-outline);
+
   background: transparent;
   border-color: var(--talk-outline);
   color: var(--talk-ink);

@@ -18964,10 +18964,13 @@ reject_pattern \
   'AppIntentPresentationTests\.' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
-require_pattern \
-  "core checks execute macOS navigation request contract tests" \
-  'AppIdentityTests\.testMacOSNavigationRequestPreservesDestinationContract|AppIdentityTests\.testMacOSMainViewItemsPreserveSidebarPresentation|AppIdentityTests\.testMacOSMainViewItemsMapNavigationDestinationsAndLegacyTitles|AppIdentityTests\.testMacOSFileTranscriptionRequestPreservesPayloadContract' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+require_patterns \
+  "core checks execute macOS navigation and file transcription contract tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "AppIdentityTests\.testMacOSNavigationRequestPreservesDestinationContract", run: \{ AppIdentityTests\(\)\.testMacOSNavigationRequestPreservesDestinationContract\(\) \}\),$' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "AppIdentityTests\.testMacOSMainViewItemsPreserveSidebarPresentation", run: \{ AppIdentityTests\(\)\.testMacOSMainViewItemsPreserveSidebarPresentation\(\) \}\),$' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "AppIdentityTests\.testMacOSMainViewItemsMapNavigationDestinationsAndLegacyTitles", run: \{ AppIdentityTests\(\)\.testMacOSMainViewItemsMapNavigationDestinationsAndLegacyTitles\(\) \}\),$' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "AppIdentityTests\.testMacOSFileTranscriptionRequestPreservesPayloadContract", run: \{ try AppIdentityTests\(\)\.testMacOSFileTranscriptionRequestPreservesPayloadContract\(\) \}\),$'
 
 require_patterns \
   "macOS windows use shared app identity presentation" \

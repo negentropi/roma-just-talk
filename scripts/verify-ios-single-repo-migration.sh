@@ -14566,11 +14566,43 @@ reject_pattern \
 
 section "obsolete standalone post-processing failure presentation module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/PostProcessingFailurePresentation.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/PostProcessingFailurePresentationTests.swift
 
 require_pattern \
   "post-processing failure presentation lives with transcript presentation" \
   'VoiceInkPostProcessingFailurePresentation' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
+
+require_patterns \
+  "transcript presentation tests cover post-processing failure presentation" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptPresentationTests.swift \
+  'testPostProcessingFailureTextPreservesExistingIOSRetryPrefix' \
+  'testEnhancementFailureTextPreservesExistingMacOSPrefix' \
+  'testEnhancementUnavailableMessagePreservesMacOSGuardCopy' \
+  'testEnhancementFailureNotificationTitlePreservesEightyCharacterReasonLimit' \
+  'testEnhancementFailureNotificationTitleClampsNegativeReasonLimit'
+
+require_patterns \
+  "core checks execute folded post-processing failure presentation tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'TranscriptPresentationTests\.testPostProcessingFailureTextPreservesExistingIOSRetryPrefix' \
+  'TranscriptPresentationTests\(\)\.testPostProcessingFailureTextPreservesExistingIOSRetryPrefix' \
+  'TranscriptPresentationTests\.testEnhancementFailureTextPreservesExistingMacOSPrefix' \
+  'TranscriptPresentationTests\(\)\.testEnhancementFailureTextPreservesExistingMacOSPrefix' \
+  'TranscriptPresentationTests\.testEnhancementUnavailableMessagePreservesMacOSGuardCopy' \
+  'TranscriptPresentationTests\(\)\.testEnhancementUnavailableMessagePreservesMacOSGuardCopy' \
+  'TranscriptPresentationTests\.testEnhancementFailureNotificationTitlePreservesEightyCharacterReasonLimit' \
+  'TranscriptPresentationTests\(\)\.testEnhancementFailureNotificationTitlePreservesEightyCharacterReasonLimit' \
+  'TranscriptPresentationTests\.testEnhancementFailureNotificationTitleClampsNegativeReasonLimit' \
+  'TranscriptPresentationTests\(\)\.testEnhancementFailureNotificationTitleClampsNegativeReasonLimit'
+
+reject_pattern \
+  "core tests and project metadata avoid obsolete standalone post-processing failure presentation test suite" \
+  'PostProcessingFailurePresentationTests' \
+  VoiceInkCore/Tests/VoiceInkCoreTests \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
 
 reject_pattern \
   "macOS enhancement record callers avoid shell-owned enhancement metadata mutation" \

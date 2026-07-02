@@ -9,12 +9,11 @@
   --coral: #ff6b4a;
   --cyan: #46d9ff;
   --cream: #fff8e7;
-  --button-layer: rgba(255, 248, 231, 0.78);
-  --download-layer: rgba(255, 107, 74, 0.78);
-  --download-hover-layer: rgba(255, 248, 231, 0.78);
-  --github-outline: rgba(255, 248, 231, 0.86);
+  --download-accent: rgba(255, 107, 74, 0.78);
+  --download-hover-accent: rgba(255, 248, 231, 0.78);
+  --github-accent: rgba(255, 248, 231, 0.86);
   --talk-ink: #171412;
-  --talk-outline: rgba(34, 159, 208, 0.78);
+  --talk-accent: rgba(34, 159, 208, 0.78);
   --talk-inner: rgba(34, 159, 208, 0.2);
   --talk-shadow: rgba(34, 159, 208, 0.1);
   --body-dot: rgba(23, 20, 18, 0.12);
@@ -49,12 +48,11 @@
     --coral: #ff785e;
     --cyan: #42d9ff;
     --cream: #fff8e7;
-    --button-layer: rgba(255, 248, 231, 0.78);
-    --download-layer: rgba(255, 120, 94, 0.88);
-    --download-hover-layer: rgba(255, 248, 231, 0.78);
-    --github-outline: rgba(255, 248, 231, 0.86);
+    --download-accent: rgba(255, 120, 94, 0.88);
+    --download-hover-accent: rgba(255, 248, 231, 0.78);
+    --github-accent: rgba(255, 248, 231, 0.86);
     --talk-ink: #fff8e7;
-    --talk-outline: rgba(70, 217, 255, 0.86);
+    --talk-accent: rgba(70, 217, 255, 0.86);
     --talk-inner: rgba(70, 217, 255, 0.22);
     --talk-shadow: rgba(70, 217, 255, 0.1);
     --body-dot: rgba(255, 248, 231, 0.09);
@@ -287,18 +285,20 @@ h1 .before-word {
 }
 
 .button {
+  --button-accent: var(--button-ink);
+
   display: inline-flex;
   position: relative;
   align-items: center;
   justify-content: center;
   gap: 12px;
-  border-color: var(--button-ink);
+  border-color: var(--button-accent);
   color: var(--button-ink);
   padding: 0 16px;
   font-weight: 800;
   isolation: isolate;
   box-shadow:
-    4px 4px 0 var(--button-layer),
+    4px 4px 0 var(--button-accent),
     0 18px 44px rgba(0, 0, 0, 0.24),
     inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
@@ -306,7 +306,7 @@ h1 .before-word {
 .button:hover {
   transform: translateY(-1px);
   box-shadow:
-    4px 4px 0 var(--button-layer),
+    4px 4px 0 var(--button-accent),
     0 22px 52px rgba(0, 0, 0, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.28);
 }
@@ -325,26 +325,24 @@ h1 .before-word {
 }
 
 #download-button {
-  --button-layer: var(--download-layer);
+  --button-accent: var(--download-accent);
 
-  border-color: var(--download-layer);
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.82), rgba(221, 221, 221, 0.94)),
     #ddd;
   color: #11100e;
   box-shadow:
-    4px 4px 0 var(--button-layer),
+    4px 4px 0 var(--button-accent),
     0 24px 58px rgba(184, 255, 61, 0.14),
     0 18px 44px rgba(0, 0, 0, 0.32),
     inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 #download-button:hover {
-  --button-layer: var(--download-hover-layer);
+  --button-accent: var(--download-hover-accent);
 
-  border-color: var(--download-hover-layer);
   box-shadow:
-    4px 4px 0 var(--button-layer),
+    4px 4px 0 var(--button-accent),
     0 24px 66px rgba(255, 107, 74, 0.2),
     0 18px 44px rgba(0, 0, 0, 0.34),
     inset 0 1px 0 rgba(255, 255, 255, 0.88);
@@ -355,21 +353,19 @@ h1 .before-word {
 }
 
 #github-button {
-  --button-layer: var(--github-outline);
+  --button-accent: var(--github-accent);
 
-  border-color: var(--github-outline);
   background:
     linear-gradient(135deg, rgba(255, 248, 231, 0.06), transparent 38%),
     #11100e;
   color: var(--cream);
   box-shadow:
-    4px 4px 0 var(--button-layer),
+    4px 4px 0 var(--button-accent),
     0 18px 44px rgba(0, 0, 0, 0.36),
     inset 0 1px 0 rgba(255, 248, 231, 0.1);
 }
 
 #github-button:hover {
-  border-color: var(--github-outline);
   color: var(--cream);
 }
 
@@ -379,13 +375,12 @@ h1 .before-word {
 }
 
 #talk-button {
-  --button-layer: var(--talk-outline);
+  --button-accent: var(--talk-accent);
 
   background: transparent;
-  border-color: var(--talk-outline);
   color: var(--talk-ink);
   box-shadow:
-    4px 4px 0 var(--button-layer),
+    4px 4px 0 var(--button-accent),
     inset 0 0 0 1px var(--talk-inner),
     0 18px 42px var(--talk-shadow);
 }
@@ -393,15 +388,14 @@ h1 .before-word {
 #talk-button .icon,
 #talk-button .keycap,
 #talk-button .command-symbol {
-  border-color: var(--talk-outline);
+  border-color: var(--button-accent);
   color: var(--talk-ink);
 }
 
 #talk-button:hover {
-  border-color: var(--talk-outline);
   background: transparent;
   box-shadow:
-    4px 4px 0 var(--button-layer),
+    4px 4px 0 var(--button-accent),
     inset 0 0 0 1px var(--talk-inner),
     0 18px 42px var(--talk-shadow);
 }

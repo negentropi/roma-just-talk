@@ -554,10 +554,13 @@ require_patterns \
   'VoiceInkWhisperModelFiles\.createModelsDirectory' \
   'FileManager\.default\.urls\(for: \.(documentDirectory|cachesDirectory),'
 
-require_pattern \
+require_patterns \
   "core checks execute iOS storage directory tests" \
-  'testIOSStorageDirectoriesUseDocumentsDirectoryForRecordingsAndModels|testIOSStorageDirectoriesPrepareRecordingAndModelDirectories' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'StoredAudioFileTests\.testIOSStorageDirectoriesUseDocumentsDirectoryForRecordingsAndModels' \
+  'StoredAudioFileTests\(\)\.testIOSStorageDirectoriesUseDocumentsDirectoryForRecordingsAndModels\(\)' \
+  'StoredAudioFileTests\.testIOSStorageDirectoriesPrepareRecordingAndModelDirectories' \
+  'try[[:space:]]+StoredAudioFileTests\(\)\.testIOSStorageDirectoriesPrepareRecordingAndModelDirectories\(\)'
 
 reject_ios_storage_duplicate_pattern \
   "iOS shell avoids duplicate Documents/Caches directory roots" \

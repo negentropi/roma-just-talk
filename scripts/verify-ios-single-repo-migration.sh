@@ -19134,12 +19134,12 @@ require_patterns \
 
 require_pattern \
   "core checks execute macOS window identity test" \
-  'AppIdentityTests\.testMacOSWindowIdentityPreservesIdentifiersTitlesAndFrameNames' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "AppIdentityTests\.testMacOSWindowIdentityPreservesIdentifiersTitlesAndFrameNames", run: \{ AppIdentityTests\(\)\.testMacOSWindowIdentityPreservesIdentifiersTitlesAndFrameNames\(\) \}\),$' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "core checks execute macOS log category identity test" \
-  'AppIdentityTests\.testMacOSLogCategoriesPreserveDiagnosticsIdentity' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "AppIdentityTests\.testMacOSLogCategoriesPreserveDiagnosticsIdentity", run: \{ AppIdentityTests\(\)\.testMacOSLogCategoriesPreserveDiagnosticsIdentity\(\) \}\),$' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \
@@ -19263,14 +19263,20 @@ require_patterns \
   "VoiceInkCore owns iOS shell logging categories" \
   VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift \
   'VoiceInkIOSLogCategory' \
+  'iOSApp' \
   'iOSAppGroup' \
+  'iOSAudioPlayback' \
   'iOSAudioSession' \
+  'iOSKeyboard' \
   'iOSLocalWhisper' \
-  'iOSLocalModelManagement'
+  'iOSLocalModelManagement' \
+  'iOSNotes' \
+  'iOSRecording' \
+  'iOSSettings'
 
 require_pattern \
   "VoiceInkCore checks cover iOS shell logging categories" \
-  'AppIdentityTests\.testIOSLogCategoriesPreserveDiagnosticsIdentity' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "AppIdentityTests\.testIOSLogCategoriesPreserveDiagnosticsIdentity", run: \{ AppIdentityTests\(\)\.testIOSLogCategoriesPreserveDiagnosticsIdentity\(\) \}\),$' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \

@@ -3,9 +3,12 @@ const repoBranch = "without/no-adhoc-macos-tcc";
 const latestReleaseUrl = `${repoUrl}/releases/latest`;
 const releasesApi = "https://api.github.com/repos/happyf-weallareeuropean/roma-just-talk/releases";
 const latestReleaseApi = `${releasesApi}/latest`;
+const releasesPageUrl = `${repoUrl}/releases`;
 const rawBase = `https://raw.githubusercontent.com/happyf-weallareeuropean/roma-just-talk/${repoBranch}/`;
+const readmeMarkdownUrl = `${rawBase}README.md`;
 const discordId = "freedom_uuuuuuuuuuuuuuunion.p.f";
 const waitlistEmail = "happyfumd@icloud.com";
+const fetchTimeoutMs = 8000;
 
 function detectOs() {
   const ua = navigator.userAgent.toLowerCase();
@@ -29,9 +32,19 @@ function repoContentUrl(url, mode) {
   return mode === "raw" ? `${rawBase}${cleanUrl}` : `${repoUrl}/blob/${repoBranch}/${cleanUrl}`;
 }
 
+async function fetchWithTimeout(url, options = {}) {
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), fetchTimeoutMs);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    window.clearTimeout(timeout);
+  }
+}
+
 async function resolveMacDownloadUrl() {
   try {
-    const response = await fetch(latestReleaseApi, {
+    const response = await fetchWithTimeout(latestReleaseApi, {
       headers: { Accept: "application/vnd.github+json" },
     });
     if (!response.ok) throw new Error(`release fetch failed: ${response.status}`);
@@ -222,7 +235,7 @@ function releaseAssetLinks(release) {
       return `<a class="release-link release-download" href="${escapeHtml(asset.browser_download_url)}">${escapeHtml(label)}</a>`;
     });
 
-  links.unshift(`<a class="release-link" href="${escapeHtml(release.html_url || `${repoUrl}/releases`)}">view release</a>`);
+  links.unshift(`<a class="release-link" href="${escapeHtml(release.html_url || releasesPageUrl)}">view release</a>`);
   return `<div class="release-actions">${links.join("")}</div>`;
 }
 
@@ -247,21 +260,36 @@ function releaseToHtml(release, index) {
   `;
 }
 
+async function loadReadme() {
+  const target = document.getElementById("readme-content");
+  if (!target) return;
+
+  try {
+    const response = await fetchWithTimeout(readmeMarkdownUrl);
+    if (!response.ok) throw new Error(`README fetch failed: ${response.status}`);
+    target.innerHTML = markdownToHtml(await response.text());
+  } catch (_error) {
+    target.innerHTML = `<p>readme failed to load. open the <a href="${repoUrl}#readme" target="_blank" rel="noreferrer">github readme</a>.</p>`;
+  }
+}
+
 async function loadChangelog() {
   const target = document.getElementById("changelog-content");
   if (!target) return;
 
   try {
-    const response = await fetch(releasesApi, {
+    const response = await fetchWithTimeout(releasesApi, {
       headers: { Accept: "application/vnd.github+json" },
+      cache: "no-store",
     });
     if (!response.ok) throw new Error(`releases fetch failed: ${response.status}`);
     const releases = await response.json();
+    if (!Array.isArray(releases)) throw new Error("releases response was not a list");
     const visibleReleases = releases.filter((release) => !release.draft).slice(0, 8);
     if (!visibleReleases.length) throw new Error("no published releases");
     target.innerHTML = `<div class="release-list">${visibleReleases.map(releaseToHtml).join("")}</div>`;
   } catch (_error) {
-    target.innerHTML = `<p>changelog failed to load. open <a href="${repoUrl}/releases" target="_blank" rel="noreferrer">github releases</a>.</p>`;
+    target.innerHTML = `<p>changelog could not reach github releases right now. open <a href="${releasesPageUrl}" target="_blank" rel="noreferrer">github releases</a>.</p>`;
   }
 }
 
@@ -271,6 +299,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("talk-button")?.addEventListener("click", toggleContact);
   document.getElementById("discord-button")?.addEventListener("click", copyDiscord);
   document.getElementById("download-button")?.addEventListener("click", downloadMac);
+  loadReadme();
   loadChangelog();
 });
 

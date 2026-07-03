@@ -447,14 +447,24 @@ h1 .before-word {
 }
 
 .keycap[aria-label="enter"] {
-  font-family: "Apple Symbols", "Segoe UI Symbol", "Noto Sans Symbols", sans-serif;
+  padding: 2px;
 }
 
-.keycap[aria-label="enter"],
 .keycap[aria-label="shift"] {
   font-size: 1.18rem;
   font-weight: 700;
   line-height: 1;
+}
+
+.keycap-symbol {
+  display: block;
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.65;
 }
 
 .command-symbol {
@@ -585,10 +595,12 @@ h1 .before-word {
   font-size: clamp(3.2rem, 11vw, 7rem);
 }
 
+.readme-section,
 .changelog-section {
   padding: 34px 0 70px;
 }
 
+.readme-shell,
 .changelog-shell {
   width: min(1040px, calc(100% - 40px));
   margin: 0 auto;
@@ -602,6 +614,7 @@ h1 .before-word {
   text-transform: uppercase;
 }
 
+.readme-card,
 .changelog-card {
   border: 2px solid var(--ink);
   border-radius: 8px;
@@ -611,6 +624,10 @@ h1 .before-word {
   padding: clamp(18px, 4vw, 34px);
 }
 
+.readme-card h2,
+.readme-card h3,
+.readme-card h4,
+.readme-card h5,
 .changelog-card h2,
 .changelog-card h3,
 .changelog-card h4,
@@ -619,21 +636,27 @@ h1 .before-word {
   line-height: 1.12;
 }
 
+.readme-card h2:first-child,
+.readme-card h3:first-child,
 .changelog-card h2:first-child,
 .changelog-card h3:first-child {
   margin-top: 0;
 }
 
+.readme-card p,
+.readme-card li,
 .changelog-card p,
 .changelog-card li {
   line-height: 1.62;
 }
 
+.readme-card img,
 .changelog-card img {
   max-width: 100%;
   border-radius: 8px;
 }
 
+.readme-card code,
 .changelog-card code {
   border-radius: 5px;
   background: var(--inline-code);
@@ -643,6 +666,7 @@ h1 .before-word {
   word-break: break-word;
 }
 
+.readme-card pre,
 .changelog-card pre {
   overflow: auto;
   border-radius: 8px;

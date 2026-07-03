@@ -5,6 +5,7 @@ import ApplicationServices
 import Carbon.HIToolbox
 import CoreGraphics
 import Foundation
+import IOKit
 import IOKit.hid
 
 private struct Options {
@@ -147,6 +148,66 @@ private func hidUsageClass(page: UInt32, usage: UInt32) -> String {
     }
 }
 
+private func asciiToken(_ value: String) -> String {
+    let chars = value.unicodeScalars.map { scalar -> Character in
+        switch scalar.value {
+        case 48...57, 65...90, 97...122:
+            return Character(UnicodeScalar(scalar.value)!)
+        case 45, 46, 95:
+            return Character(UnicodeScalar(scalar.value)!)
+        default:
+            return "_"
+        }
+    }
+    let token = String(chars).trimmingCharacters(in: CharacterSet(charactersIn: "_"))
+    return token.isEmpty ? "unknown" : token
+}
+
+private func hidIntProperty(_ device: IOHIDDevice, _ key: CFString) -> Int? {
+    guard let value = IOHIDDeviceGetProperty(device, key) else { return nil }
+    return (value as? NSNumber)?.intValue
+}
+
+private func hidStringProperty(_ device: IOHIDDevice, _ key: CFString) -> String? {
+    guard let value = IOHIDDeviceGetProperty(device, key) else { return nil }
+    return value as? String
+}
+
+private func registryID(_ device: IOHIDDevice) -> UInt64? {
+    let service = IOHIDDeviceGetService(device)
+    guard service != 0 else { return nil }
+
+    var entryID: UInt64 = 0
+    let result = IORegistryEntryGetRegistryEntryID(service, &entryID)
+    return result == KERN_SUCCESS ? entryID : nil
+}
+
+private func appendDeviceFields(_ fields: inout [String], device: IOHIDDevice?) {
+    guard let device else { return }
+
+    if let entryID = registryID(device) {
+        fields.append("registry=0x\(String(entryID, radix: 16))")
+    }
+    if let vendorID = hidIntProperty(device, kIOHIDVendorIDKey as CFString) {
+        fields.append("vendor=0x\(String(vendorID, radix: 16))")
+    }
+    if let productID = hidIntProperty(device, kIOHIDProductIDKey as CFString) {
+        fields.append("productID=0x\(String(productID, radix: 16))")
+    }
+    if let locationID = hidIntProperty(device, kIOHIDLocationIDKey as CFString) {
+        fields.append("location=0x\(String(locationID, radix: 16))")
+    }
+    if let transport = hidStringProperty(device, kIOHIDTransportKey as CFString) {
+        fields.append("transport=\(asciiToken(transport))")
+    }
+    if let manufacturer = hidStringProperty(device, kIOHIDManufacturerKey as CFString) {
+        fields.append("maker=\(asciiToken(manufacturer))")
+    }
+    if let product = hidStringProperty(device, kIOHIDProductKey as CFString) {
+        fields.append("product=\(asciiToken(product))")
+    }
+}
+
 private func pressedStateSummary() -> String {
     let pressed = interestingStateCodes.filter {
         CGEventSource.keyState(.combinedSessionState, key: $0)
@@ -163,6 +224,7 @@ private func emit(
     flags: String = "n/a",
     hidPage: UInt32? = nil,
     hidUsage: UInt32? = nil,
+    device: IOHIDDevice? = nil,
     subtype: Int? = nil,
     data1: Int? = nil,
     data2: Int? = nil,
@@ -187,6 +249,7 @@ private func emit(
     if let keyCode { fields.append("keyCode=\(keyCode)") }
     if let hidPage { fields.append("hidPage=0x\(String(hidPage, radix: 16))") }
     if let hidUsage { fields.append("hidUsage=0x\(String(hidUsage, radix: 16))") }
+    appendDeviceFields(&fields, device: device)
     if let subtype { fields.append("subtype=\(subtype)") }
     if let data1 { fields.append("data1=\(data1)") }
     if let data2 { fields.append("data2=\(data2)") }
@@ -361,6 +424,7 @@ private func hidMatchingDictionaries() -> CFArray {
 
 private func emitHIDValue(layer: String, value: IOHIDValue) {
     let element = IOHIDValueGetElement(value)
+    let device = IOHIDElementGetDevice(element)
     let page = IOHIDElementGetUsagePage(element)
     let usage = IOHIDElementGetUsage(element)
     let intValue = IOHIDValueGetIntegerValue(value)
@@ -378,6 +442,7 @@ private func emitHIDValue(layer: String, value: IOHIDValue) {
         cls: cls,
         hidPage: page,
         hidUsage: usage,
+        device: device,
         value: intValue,
         throttleMs: throttleMs
     )
@@ -393,11 +458,11 @@ private let hidDeviceValueCallback: IOHIDValueCallback = { _, _, _, value in
 
 private let hidDeviceMatchingCallback: IOHIDDeviceCallback = { _, result, _, device in
     retainedHIDDevices.append(device)
-    emit(layer: "IOHIDDevice", event: "matched", cls: "device", value: Int(result))
+    emit(layer: "IOHIDDevice", event: "matched", cls: "device", device: device, value: Int(result))
     IOHIDDeviceRegisterInputValueCallback(device, hidDeviceValueCallback, nil)
     IOHIDDeviceScheduleWithRunLoop(device, CFRunLoopGetCurrent(), CFRunLoopMode.commonModes.rawValue)
     let openResult = IOHIDDeviceOpen(device, IOOptionBits(kIOHIDOptionsTypeNone))
-    emit(layer: "IOHIDDevice", event: "open", cls: "device", value: Int(openResult))
+    emit(layer: "IOHIDDevice", event: "open", cls: "device", device: device, value: Int(openResult))
 }
 
 private func installIOHID() -> IOHIDManager? {

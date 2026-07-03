@@ -443,6 +443,10 @@ h1 .before-word {
   white-space: nowrap;
 }
 
+.keycap[aria-label="enter"] {
+  font-family: "Apple Symbols", "Segoe UI Symbol", "Noto Sans Symbols", sans-serif;
+}
+
 .keycap[aria-label="enter"],
 .keycap[aria-label="shift"] {
   font-size: 1.18rem;
@@ -559,11 +563,30 @@ h1 .before-word {
   border-radius: 8px;
 }
 
-.readme-section {
+.subpage-hero {
+  border-bottom: 1px solid var(--line);
+}
+
+.subpage-inner {
+  width: min(1180px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 12px 0 clamp(28px, 7vw, 76px);
+}
+
+.subpage-copy {
+  max-width: 900px;
+  padding-top: clamp(42px, 9vw, 100px);
+}
+
+.subpage-copy h1 {
+  font-size: clamp(3.2rem, 11vw, 7rem);
+}
+
+.changelog-section {
   padding: 34px 0 70px;
 }
 
-.readme-shell {
+.changelog-shell {
   width: min(1040px, calc(100% - 40px));
   margin: 0 auto;
 }
@@ -576,51 +599,141 @@ h1 .before-word {
   text-transform: uppercase;
 }
 
-.readme-card {
+.changelog-card {
   border: 2px solid var(--ink);
   border-radius: 8px;
   background: var(--surface);
   box-shadow: 6px 6px 0 var(--ink);
+  overflow-wrap: anywhere;
   padding: clamp(18px, 4vw, 34px);
 }
 
-.readme-card h2,
-.readme-card h3,
-.readme-card h4,
-.readme-card h5 {
+.changelog-card h2,
+.changelog-card h3,
+.changelog-card h4,
+.changelog-card h5 {
   margin: 1.4em 0 0.5em;
   line-height: 1.12;
 }
 
-.readme-card h2:first-child,
-.readme-card h3:first-child {
+.changelog-card h2:first-child,
+.changelog-card h3:first-child {
   margin-top: 0;
 }
 
-.readme-card p,
-.readme-card li {
+.changelog-card p,
+.changelog-card li {
   line-height: 1.62;
 }
 
-.readme-card img {
+.changelog-card img {
   max-width: 100%;
   border-radius: 8px;
 }
 
-.readme-card code {
+.changelog-card code {
   border-radius: 5px;
   background: var(--inline-code);
   padding: 0.12em 0.34em;
   font-family: "IBM Plex Mono", monospace;
   font-size: 0.9em;
+  word-break: break-word;
 }
 
-.readme-card pre {
+.changelog-card pre {
   overflow: auto;
   border-radius: 8px;
   background: var(--pre-bg);
   color: var(--pre-fg);
   padding: 16px;
+}
+
+.release-list {
+  display: grid;
+  min-width: 0;
+}
+
+.release-entry {
+  border-top: 1px solid var(--line);
+  min-width: 0;
+  padding: 22px 0;
+}
+
+.release-entry:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.release-entry:last-child {
+  padding-bottom: 0;
+}
+
+.release-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px 18px;
+  min-width: 0;
+}
+
+.release-heading h3 {
+  margin: 0;
+  min-width: 0;
+  font-size: clamp(1.35rem, 2.4vw, 2rem);
+}
+
+.release-meta {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  min-width: 0;
+  color: var(--muted);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.release-meta span {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--key-surface);
+  padding: 3px 7px;
+}
+
+.release-notes {
+  margin-top: 12px;
+  min-width: 0;
+}
+
+.release-notes > :first-child {
+  margin-top: 0;
+}
+
+.release-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-width: 0;
+  margin-top: 14px;
+}
+
+.release-link {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  border: 1.5px solid currentColor;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+  text-decoration: none;
+}
+
+.release-download {
+  color: var(--coral);
 }
 
 .thanks-page {

@@ -1,7 +1,8 @@
 const repoUrl = "https://github.com/happyf-weallareeuropean/roma-just-talk";
 const repoBranch = "without/no-adhoc-macos-tcc";
 const latestReleaseUrl = `${repoUrl}/releases/latest`;
-const latestReleaseApi = "https://api.github.com/repos/happyf-weallareeuropean/roma-just-talk/releases/latest";
+const releasesApi = "https://api.github.com/repos/happyf-weallareeuropean/roma-just-talk/releases";
+const latestReleaseApi = `${releasesApi}/latest`;
 const rawBase = `https://raw.githubusercontent.com/happyf-weallareeuropean/roma-just-talk/${repoBranch}/`;
 const discordId = "freedom_uuuuuuuuuuuuuuunion.p.f";
 const waitlistEmail = "happyfumd@icloud.com";
@@ -15,14 +16,14 @@ function detectOs() {
 }
 
 function escapeHtml(value) {
-  return value
+  return String(value)
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;");
 }
 
-function readmeUrl(url, mode) {
+function repoContentUrl(url, mode) {
   if (/^(https?:|mailto:|#)/.test(url)) return url;
   const cleanUrl = url.replace(/^.\//, "");
   return mode === "raw" ? `${rawBase}${cleanUrl}` : `${repoUrl}/blob/${repoBranch}/${cleanUrl}`;
@@ -52,10 +53,10 @@ async function downloadMac(event) {
 function inlineMarkdown(value) {
   return escapeHtml(value)
     .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_match, alt, url) => {
-      return `<img src="${readmeUrl(url, "raw")}" alt="${alt}" loading="lazy" />`;
+      return `<img src="${repoContentUrl(url, "raw")}" alt="${alt}" loading="lazy" />`;
     })
     .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_match, label, url) => {
-      return `<a href="${readmeUrl(url, "blob")}" target="_blank" rel="noreferrer">${label}</a>`;
+      return `<a href="${repoContentUrl(url, "blob")}" target="_blank" rel="noreferrer">${label}</a>`;
     })
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
     .replace(/`([^`]+)`/g, "<code>$1</code>");
@@ -182,6 +183,7 @@ function toggleContact() {
 
 async function copyDiscord() {
   const state = document.getElementById("contact-state");
+  if (!state) return;
   try {
     await navigator.clipboard.writeText(discordId);
     state.textContent = "saved my discord id in clipboard. ⌘V to paste.";
@@ -191,14 +193,75 @@ async function copyDiscord() {
   window.open("https://discord.com/channels/@me/", "_blank", "noopener,noreferrer");
 }
 
-async function loadReadme() {
-  const target = document.getElementById("readme-content");
+function formatReleaseDate(value) {
+  if (!value) return "release date pending";
+  return new Intl.DateTimeFormat("en", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(new Date(value));
+}
+
+function releaseNotesToHtml(release) {
+  const body = release.body?.trim();
+  if (!body) return "<p>No release notes yet.</p>";
+  const lines = body.split("\n");
+  const firstLine = lines[0]?.trim() || "";
+  const startsWithReleaseTitle = /^#{1,4}\s+/.test(firstLine) && firstLine.includes(release.tag_name);
+  const notes = startsWithReleaseTitle ? lines.slice(1).join("\n").trim() : body;
+  return markdownToHtml(notes || body);
+}
+
+function releaseAssetLinks(release) {
+  const links = (release.assets || [])
+    .filter((asset) => asset.browser_download_url)
+    .slice(0, 3)
+    .map((asset) => {
+      const isAppZip = asset.name?.endsWith(".app.zip");
+      const label = isAppZip ? "download app" : `download ${asset.name || "asset"}`;
+      return `<a class="release-link release-download" href="${escapeHtml(asset.browser_download_url)}">${escapeHtml(label)}</a>`;
+    });
+
+  links.unshift(`<a class="release-link" href="${escapeHtml(release.html_url || `${repoUrl}/releases`)}">view release</a>`);
+  return `<div class="release-actions">${links.join("")}</div>`;
+}
+
+function releaseToHtml(release, index) {
+  const title = release.name || release.tag_name || `release ${index + 1}`;
+  const badge = release.prerelease ? "pre-release" : "release";
+  return `
+    <section class="release-entry">
+      <div class="release-heading">
+        <h3>${escapeHtml(title)}</h3>
+        <div class="release-meta">
+          <span>${escapeHtml(formatReleaseDate(release.published_at || release.created_at))}</span>
+          <span>${escapeHtml(release.tag_name || badge)}</span>
+          <span>${badge}</span>
+        </div>
+      </div>
+      <div class="release-notes">
+        ${releaseNotesToHtml(release)}
+      </div>
+      ${releaseAssetLinks(release)}
+    </section>
+  `;
+}
+
+async function loadChangelog() {
+  const target = document.getElementById("changelog-content");
+  if (!target) return;
+
   try {
-    const response = await fetch(`${rawBase}README.md`);
-    if (!response.ok) throw new Error(`README fetch failed: ${response.status}`);
-    target.innerHTML = markdownToHtml(await response.text());
+    const response = await fetch(releasesApi, {
+      headers: { Accept: "application/vnd.github+json" },
+    });
+    if (!response.ok) throw new Error(`releases fetch failed: ${response.status}`);
+    const releases = await response.json();
+    const visibleReleases = releases.filter((release) => !release.draft).slice(0, 8);
+    if (!visibleReleases.length) throw new Error("no published releases");
+    target.innerHTML = `<div class="release-list">${visibleReleases.map(releaseToHtml).join("")}</div>`;
   } catch (_error) {
-    target.innerHTML = `<p>readme failed to load. open it on <a href="${repoUrl}" target="_blank" rel="noreferrer">github</a>.</p>`;
+    target.innerHTML = `<p>changelog failed to load. open <a href="${repoUrl}/releases" target="_blank" rel="noreferrer">github releases</a>.</p>`;
   }
 }
 
@@ -208,11 +271,14 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("talk-button")?.addEventListener("click", toggleContact);
   document.getElementById("discord-button")?.addEventListener("click", copyDiscord);
   document.getElementById("download-button")?.addEventListener("click", downloadMac);
-  loadReadme();
+  loadChangelog();
 });
 
 document.addEventListener("keydown", (event) => {
   const key = event.key.toLowerCase();
+  const hasHeroShortcuts = document.getElementById("download-button") || document.getElementById("talk-button");
+  if (!hasHeroShortcuts) return;
+
   if (event.key === "Enter" && event.shiftKey) {
     event.preventDefault();
     window.open(repoUrl, "_blank", "noopener,noreferrer");
@@ -225,7 +291,7 @@ document.addEventListener("keydown", (event) => {
   }
   if (event.key === "Enter") {
     const waitlist = document.getElementById("waitlist-form");
-    if (!waitlist.classList.contains("hidden")) return;
+    if (waitlist && !waitlist.classList.contains("hidden")) return;
     event.preventDefault();
     void downloadMac();
     return;

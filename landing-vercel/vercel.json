@@ -1,4 +1,10 @@
 {
+  "rewrites": [
+    {
+      "source": "/changelogs",
+      "destination": "/changelogs/index.html"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",

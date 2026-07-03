@@ -3,6 +3,10 @@
     {
       "source": "/changelogs",
       "destination": "/changelogs/index.html"
+    },
+    {
+      "source": "/readme",
+      "destination": "/readme/index.html"
     }
   ],
   "headers": [

@@ -675,6 +675,49 @@ h1 .before-word {
   padding: 16px;
 }
 
+.release-jump {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  border-bottom: 1px solid var(--line);
+  margin: 0 0 20px;
+  padding: 0 0 14px;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+.release-jump::-webkit-scrollbar {
+  height: 9px;
+}
+
+.release-jump::-webkit-scrollbar-track {
+  border-radius: 999px;
+  background: var(--inline-code);
+}
+
+.release-jump::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: var(--muted);
+  background-clip: content-box;
+}
+
+.release-jump a {
+  display: inline-flex;
+  flex: 0 0 auto;
+  min-height: 32px;
+  align-items: center;
+  border: 1.5px solid currentColor;
+  border-radius: 6px;
+  background: var(--key-surface);
+  padding: 5px 10px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
 .release-list {
   display: grid;
   min-width: 0;
@@ -684,6 +727,7 @@ h1 .before-word {
   border-top: 1px solid var(--line);
   min-width: 0;
   padding: 22px 0;
+  scroll-margin-top: 18px;
 }
 
 .release-entry:first-child {

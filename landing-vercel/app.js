@@ -239,11 +239,30 @@ function releaseAssetLinks(release) {
   return `<div class="release-actions">${links.join("")}</div>`;
 }
 
+function releaseAnchorId(release, index) {
+  const label = release.tag_name || release.name || `release-${index + 1}`;
+  const slug = label
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+  return `release-${slug || index + 1}`;
+}
+
+function releaseJumpToHtml(releases) {
+  const links = releases
+    .map((release, index) => {
+      const label = release.tag_name || release.name || `release ${index + 1}`;
+      return `<a href="#${releaseAnchorId(release, index)}">${escapeHtml(label)}</a>`;
+    })
+    .join("");
+  return `<nav class="release-jump" aria-label="Jump to release">${links}</nav>`;
+}
+
 function releaseToHtml(release, index) {
   const title = release.name || release.tag_name || `release ${index + 1}`;
   const badge = release.prerelease ? "pre-release" : "release";
   return `
-    <section class="release-entry">
+    <section class="release-entry" id="${releaseAnchorId(release, index)}">
       <div class="release-heading">
         <h3>${escapeHtml(title)}</h3>
         <div class="release-meta">
@@ -287,7 +306,7 @@ async function loadChangelog() {
     if (!Array.isArray(releases)) throw new Error("releases response was not a list");
     const visibleReleases = releases.filter((release) => !release.draft).slice(0, 8);
     if (!visibleReleases.length) throw new Error("no published releases");
-    target.innerHTML = `<div class="release-list">${visibleReleases.map(releaseToHtml).join("")}</div>`;
+    target.innerHTML = `${releaseJumpToHtml(visibleReleases)}<div class="release-list">${visibleReleases.map(releaseToHtml).join("")}</div>`;
   } catch (_error) {
     target.innerHTML = `<p>changelog could not reach github releases right now. open <a href="${releasesPageUrl}" target="_blank" rel="noreferrer">github releases</a>.</p>`;
   }

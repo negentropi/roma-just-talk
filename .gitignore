@@ -33,6 +33,7 @@ playground.xcworkspace
 build/
 .local-build/
 .vercel/
+/landing-vercel/alts/*
 
 # CocoaPods
 #

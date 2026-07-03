@@ -325,8 +325,8 @@ h1 .before-word {
   --button-accent: var(--download-accent);
 
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.82), rgba(221, 221, 221, 0.94)),
-    #ddd;
+    linear-gradient(135deg, rgba(255, 255, 255, 0.62), rgba(204, 204, 204, 0.96)),
+    #ccc;
   color: #11100e;
   box-shadow:
     4px 4px 0 var(--button-accent),

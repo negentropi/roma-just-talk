@@ -257,13 +257,17 @@ h1 .before-word {
   color: var(--muted);
 }
 
-.cta-row,
+.action-row,
 .waitlist-cta {
   display: flex;
   flex-wrap: wrap;
   align-items: stretch;
   gap: 12px;
   margin-top: 24px;
+}
+
+.cta-row {
+  display: contents;
 }
 
 .button,
@@ -367,7 +371,6 @@ h1 .before-word {
 }
 
 .talk {
-  margin-top: 12px;
   background: var(--coral);
 }
 

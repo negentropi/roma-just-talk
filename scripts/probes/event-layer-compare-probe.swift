@@ -163,6 +163,9 @@ private func emit(
     flags: String = "n/a",
     hidPage: UInt32? = nil,
     hidUsage: UInt32? = nil,
+    subtype: Int? = nil,
+    data1: Int? = nil,
+    data2: Int? = nil,
     value: Int? = nil,
     throttleMs: Double = 0
 ) {
@@ -184,6 +187,9 @@ private func emit(
     if let keyCode { fields.append("keyCode=\(keyCode)") }
     if let hidPage { fields.append("hidPage=0x\(String(hidPage, radix: 16))") }
     if let hidUsage { fields.append("hidUsage=0x\(String(hidUsage, radix: 16))") }
+    if let subtype { fields.append("subtype=\(subtype)") }
+    if let data1 { fields.append("data1=\(data1)") }
+    if let data2 { fields.append("data2=\(data2)") }
     if let value { fields.append("value=\(value)") }
     fields.append(pressedStateSummary())
     writeLine(fields.joined(separator: " "))
@@ -246,6 +252,19 @@ private func emitNSEvent(layer: String, event: NSEvent) {
     case .systemDefined:
         eventName = "systemDefined"
     default:
+        return
+    }
+
+    if event.type == .systemDefined {
+        emit(
+            layer: layer,
+            event: eventName,
+            cls: "system",
+            flags: nsFlagsSummary(event.modifierFlags),
+            subtype: Int(event.subtype.rawValue),
+            data1: event.data1,
+            data2: event.data2
+        )
         return
     }
 

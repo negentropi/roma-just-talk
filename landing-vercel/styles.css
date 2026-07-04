@@ -446,14 +446,9 @@ h1 .before-word {
   white-space: nowrap;
 }
 
-.keycap[aria-label="enter"] {
-  padding: 2px;
-}
-
+.keycap[aria-label="enter"],
 .keycap[aria-label="shift"] {
-  font-size: 1.18rem;
-  font-weight: 700;
-  line-height: 1;
+  padding: 2px;
 }
 
 .keycap-symbol {

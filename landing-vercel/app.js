@@ -314,6 +314,8 @@ async function loadChangelog() {
 
 function initFeatureTabs() {
   const bar = document.querySelector(".feature-tabs");
+  const shell = bar?.closest(".features-shell");
+  const mirror = bar?.querySelector(".feature-rail-mirror");
   const scroller = document.querySelector(".feature-tabs-scroll") || bar;
   const tabs = Array.from(document.querySelectorAll(".feature-tab"));
   if (!bar || !tabs.length) return;
@@ -322,6 +324,13 @@ function initFeatureTabs() {
     .map((tab) => document.querySelector(tab.getAttribute("href")))
     .filter(Boolean);
   let activeId = "";
+  const clamp = (value) => Math.max(0, Math.min(1, value));
+  const smoothstep = (value) => value * value * (3 - 2 * value);
+
+  const panelAccent = (panel) => {
+    const styles = getComputedStyle(panel);
+    return styles.getPropertyValue("--panel-accent").trim() || styles.borderTopColor;
+  };
 
   const setActive = (id) => {
     if (id === activeId) return;
@@ -337,6 +346,40 @@ function initFeatureTabs() {
         });
       }
     });
+  };
+
+  const syncMirror = () => {
+    if (!shell || !mirror || panels.length < 2) return;
+
+    const barRect = bar.getBoundingClientRect();
+    const railStyle = getComputedStyle(bar, "::after");
+    const panelStyle = getComputedStyle(panels[0]);
+    const shellStyle = getComputedStyle(shell);
+    const railTop = barRect.top + parseFloat(railStyle.top || 0);
+    const railBottom =
+      railTop +
+      parseFloat(railStyle.height || 0) +
+      parseFloat(railStyle.borderTopWidth || 0);
+    const radius = parseFloat(panelStyle.borderTopLeftRadius) || 16;
+    const backingOffset = parseFloat(shellStyle.getPropertyValue("--panel-offset")) || 8;
+
+    let mirrorAmount = 0;
+    let mirrorAccent = "";
+    panels.slice(0, -1).forEach((panel) => {
+      const rect = panel.getBoundingClientRect();
+      const borderBottom = rect.bottom;
+      const backingBottom = borderBottom + backingOffset;
+      const enter = clamp((railBottom + radius - borderBottom) / radius);
+      const exit = clamp((backingBottom - railTop) / radius);
+      const amount = Math.min(smoothstep(enter), smoothstep(exit));
+      if (amount > mirrorAmount) {
+        mirrorAmount = amount;
+        mirrorAccent = panelAccent(panel);
+      }
+    });
+
+    shell.style.setProperty("--rail-mirror-amount", mirrorAmount.toFixed(3));
+    if (mirrorAccent) shell.style.setProperty("--rail-mirror-accent", mirrorAccent);
   };
 
   // active = the panel currently under the sticky tab bar
@@ -356,6 +399,7 @@ function initFeatureTabs() {
     if (panels[0]) {
       bar.classList.toggle("stuck", panels[0].getBoundingClientRect().top < barBottom - 4);
     }
+    syncMirror();
   };
 
   let ticking = false;

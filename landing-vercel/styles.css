@@ -580,6 +580,9 @@ h1 .before-word {
 
 .features-shell {
   --active-accent: var(--coral);
+  --rail-mirror-accent: var(--coral);
+  --rail-mirror-amount: 0;
+  --rail-cover-depth: 22px;
   --panel-offset: 8px;
   --rail-mask-bleed: calc(var(--panel-offset) + 2px);
   width: min(1040px, calc(100% - 40px));
@@ -617,7 +620,7 @@ h1 .before-word {
   content: "";
   position: absolute;
   z-index: 0;
-  inset: 0 calc(-1 * var(--rail-mask-bleed));
+  inset: 0 calc(-1 * var(--rail-mask-bleed)) calc(-1 * var(--rail-cover-depth));
   background: transparent;
   pointer-events: none;
   transition: background-color 0.2s ease;
@@ -628,6 +631,7 @@ h1 .before-word {
 .feature-tabs::after {
   content: "";
   position: absolute;
+  z-index: 2;
   top: 60px;
   left: 0;
   right: 0;
@@ -637,6 +641,27 @@ h1 .before-word {
   border-radius: 16px 16px 0 0;
   pointer-events: none;
   transition: border-color 0.25s ease;
+}
+
+.feature-rail-mirror {
+  position: absolute;
+  z-index: 1;
+  top: 60px;
+  left: 0;
+  right: 0;
+  height: 20px;
+  opacity: var(--rail-mirror-amount);
+  pointer-events: none;
+  transition: opacity 0.08s linear, border-color 0.12s linear;
+}
+
+.feature-rail-mirror::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--rail-mirror-accent);
+  border-top: 0;
+  border-radius: 0 0 16px 16px;
 }
 
 /* solid mask once content scrolls beneath it, so previous panel borders and
@@ -653,7 +678,7 @@ h1 .before-word {
 
 .feature-tabs-scroll {
   position: relative;
-  z-index: 1;
+  z-index: 3;
   display: flex;
   align-items: flex-end;
   gap: 8px;

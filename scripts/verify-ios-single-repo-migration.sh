@@ -7801,10 +7801,30 @@ reject_context_pattern \
   'primaryRecordingShortcut:|primaryRecordingShortcutRawValue:|isTranscriptionCleanupEnabled:|isSoundFeedbackEnabled:|restoreClipboardAfterPaste:|rollingBufferPreloadModeRawValue:' \
   VoiceInk/Services/ImportExportService.swift
 
-require_pattern \
-  "core checks execute general settings backup policy tests" \
-  'GeneralSettingsBackupPolicyTests\.testGeneralSettingsBackupPayloadPreservesWireShapeAndGroupedPreferences|GeneralSettingsBackupPolicyTests\.testBackupPreferencesPreserveGroupedExportShape|GeneralSettingsBackupPolicyTests\.testImportPlansApplySharedSubPolicies|GeneralSettingsBackupPolicyTests\.testApplyCorePreferenceImportPlansWritesPortablePreferences|GeneralSettingsBackupPolicyTests\.testApplyCorePreferenceImportPlansIgnoresMissingFields' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+require_patterns \
+  "settings backup tests cover folded general settings backup policy behavior" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/SettingsBackupPolicyTests.swift \
+  'testGeneralSettingsBackupPayloadPreservesWireShapeAndGroupedPreferences' \
+  'testBackupPreferencesPreserveGroupedExportShape' \
+  'testImportPlansApplySharedSubPolicies' \
+  'testApplyCorePreferenceImportPlansWritesPortablePreferences' \
+  'testApplyCorePreferenceImportPlansIgnoresMissingFields'
+
+require_patterns \
+  "core checks execute folded general settings backup tests through settings backup suite" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'name: "SettingsBackupPolicyTests\.testGeneralSettingsBackupPayloadPreservesWireShapeAndGroupedPreferences"' \
+  'SettingsBackupPolicyTests\(\)\.testGeneralSettingsBackupPayloadPreservesWireShapeAndGroupedPreferences\(\)' \
+  'name: "SettingsBackupPolicyTests\.testBackupPreferencesPreserveGroupedExportShape"' \
+  'SettingsBackupPolicyTests\(\)\.testBackupPreferencesPreserveGroupedExportShape\(\)' \
+  'name: "SettingsBackupPolicyTests\.testImportPlansApplySharedSubPolicies"' \
+  'SettingsBackupPolicyTests\(\)\.testImportPlansApplySharedSubPolicies\(\)' \
+  'name: "SettingsBackupPolicyTests\.testApplyCorePreferenceImportPlansWritesPortablePreferences"' \
+  'SettingsBackupPolicyTests\(\)\.testApplyCorePreferenceImportPlansWritesPortablePreferences\(\)' \
+  'name: "SettingsBackupPolicyTests\.testApplyCorePreferenceImportPlansIgnoresMissingFields"' \
+  'SettingsBackupPolicyTests\(\)\.testApplyCorePreferenceImportPlansIgnoresMissingFields\(\)'
+
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/GeneralSettingsBackupPolicyTests.swift
 
 require_pattern \
   "migration checklist tracks shared general settings backup policy" \

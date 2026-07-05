@@ -2959,6 +2959,16 @@ require_pattern \
   'testAudioImportPresentationPreservesMacOSQueueCopyAndActions|testAudioFileQueueProcessingPhasesPreserveCopy|testAudioFileQueueStatusCancelingProcessingResetsOnlyProcessingItems|testAudioFileQueuePolicyKeepsOnlyExistingSupportedNonActivePaths|testAudioFileQueuePolicyPreservesMutationDecisions|testAudioFileQueueDiagnosticsPreserveMacOSLogCopy|testAudioFileQueuePresentationPreservesRowCopyAndIcons' \
   VoiceInkCore/Tests/VoiceInkCoreTests/StoredAudioFileTests.swift
 
+require_pattern \
+  "stored-audio tests exercise public VoiceInkCore API surface" \
+  '^import VoiceInkCore$' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/StoredAudioFileTests.swift
+
+reject_pattern \
+  "stored-audio tests avoid testable import after folding supported-media public API" \
+  '@testable import VoiceInkCore' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/StoredAudioFileTests.swift
+
 require_voiceink_core_check_runner_invocations \
   "core checks execute folded supported-media and audio-file queue policy tests" \
   "StoredAudioFileTests" \

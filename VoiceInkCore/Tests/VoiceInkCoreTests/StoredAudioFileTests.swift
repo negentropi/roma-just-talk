@@ -1,6 +1,6 @@
 import Foundation
 import UniformTypeIdentifiers
-@testable import VoiceInkCore
+import VoiceInkCore
 
 final class StoredAudioFileTests: XCTestCase {
     func testRecordingsDirectoryNameMatchesExistingStoragePath() {

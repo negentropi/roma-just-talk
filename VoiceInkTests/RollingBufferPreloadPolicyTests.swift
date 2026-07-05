@@ -6,6 +6,8 @@ import VoiceInkCore
 private typealias RollingBufferPreloadMode = VoiceInkRollingBufferPreloadMode
 private typealias RollingBufferPreloadPolicy = VoiceInkRollingBufferPreloadPolicy
 private typealias RollingBufferPreloadSettings = VoiceInkRollingBufferPreloadSettings
+private typealias RollingBufferVADSettings = VoiceInkRollingBufferVADSettings
+private typealias RollingBufferBufferedSnapshotTranscriptionPolicy = VoiceInkRollingBufferBufferedSnapshotTranscriptionPolicy
 
 private struct TestTranscriptionModel: TranscriptionModel {
     let id = UUID()

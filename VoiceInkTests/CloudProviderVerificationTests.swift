@@ -35,7 +35,10 @@ struct CloudProviderVerificationTests {
         #expect(VoiceInkMacOSTranscriptionModelProvider.cartesia.coreTranscriptionModelProvider?.providerKind == nil)
 
         #expect(CloudProviderRegistry.provider(for: .cartesia) != nil)
-        let result = await VoiceInkProviderAPIKeyVerifier().verifyAPIKeyDetailed(" \n\t ", for: VoiceInkProviderKind.cartesia)
+        let result = await VoiceInkProviderAPIKeyVerifier().verifyAPIKeyDetailed(
+            " \n\t ",
+            for: VoiceInkTranscriptionModelProvider.cartesia
+        )
 
         #expect(result.isValid == false)
         #expect(result.errorMessage == "API key is missing or empty.")

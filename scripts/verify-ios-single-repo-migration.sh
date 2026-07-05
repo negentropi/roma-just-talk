@@ -387,17 +387,6 @@ reject_multiline_pattern() {
   fi
 }
 
-require_multiline_pattern() {
-  local description="$1"
-  local pattern="$2"
-  shift 2
-
-  section "$description"
-  if ! rg -q -U "$pattern" "$@"; then
-    fail "$description"
-  fi
-}
-
 require_provider_key_reset_direct_delete_adapter() {
   local file="$1"
 
@@ -20863,18 +20852,23 @@ reject_pattern \
   iOS/Shared/VoiceInkKeyboardURLOpener.swift
 
 reject_multiline_pattern \
-  "iOS keyboard URL opener avoids open-result branching inside result handlers" \
-  '(?s)private static func applyExtensionContextOpenResult\([^{]*\{[^}]*(\b(if|guard|switch)\b|\?[^:]*:)|private static func applyApplicationOpenResult\([^{]*\{[^}]*(\b(if|guard|switch)\b|\?[^:]*:)' \
+  "iOS keyboard URL opener avoids extension-context result branching inside result handler" \
+  '(?s)private static func applyExtensionContextOpenResult\([^{]*\{.*(\b(if|guard|switch)\b|\?[^:]*:).*\n    \}\n\n    private static func openThroughApplicationOrResponderChain' \
+  iOS/Shared/VoiceInkKeyboardURLOpener.swift
+
+reject_multiline_pattern \
+  "iOS keyboard URL opener avoids application result branching inside result handler" \
+  '(?s)private static func applyApplicationOpenResult\([^{]*\{.*(\b(if|guard|switch)\b|\?[^:]*:).*\n    \}\n\n    private static func openURLViaResponderChain' \
   iOS/Shared/VoiceInkKeyboardURLOpener.swift
 
 require_multiline_pattern \
   "iOS keyboard URL opener routes extension-context open result through shared policy" \
-  '(?s)private static func applyExtensionContextOpenResult\([^{]*succeeded: Bool[^{]*\{.*VoiceInkKeyboardOpenAppPolicy\.actionPlanAfterExtensionContextOpen\([[:space:]]*succeeded: succeeded' \
+  '(?s)private static func applyExtensionContextOpenResult\([^{]*succeeded: Bool[^{]*\{.*VoiceInkKeyboardOpenAppPolicy\.actionPlanAfterExtensionContextOpen\([[:space:]]*succeeded: succeeded.*\n    \}\n\n    private static func openThroughApplicationOrResponderChain' \
   iOS/Shared/VoiceInkKeyboardURLOpener.swift
 
 require_multiline_pattern \
   "iOS keyboard URL opener routes application open result through shared policy" \
-  '(?s)private static func applyApplicationOpenResult\([^{]*succeeded: Bool[^{]*\{.*VoiceInkKeyboardOpenAppPolicy\.actionPlanAfterApplicationOpen\([[:space:]]*succeeded: succeeded' \
+  '(?s)private static func applyApplicationOpenResult\([^{]*succeeded: Bool[^{]*\{.*VoiceInkKeyboardOpenAppPolicy\.actionPlanAfterApplicationOpen\([[:space:]]*succeeded: succeeded.*\n    \}\n\n    private static func openURLViaResponderChain' \
   iOS/Shared/VoiceInkKeyboardURLOpener.swift
 
 require_pattern \

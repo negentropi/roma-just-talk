@@ -281,7 +281,6 @@ public protocol VoiceInkWhisperRuntimeFullParameterSink {
     var single_segment: Bool { get set }
     var temperature: Float { get set }
     var vad: Bool { get set }
-    var vad_model_path: UnsafePointer<CChar>? { get set }
     var vad_params: VADParameters { get set }
 }
 
@@ -303,7 +302,6 @@ public extension VoiceInkWhisperRuntimeConfiguration {
 
         guard let vad else {
             params.vad = false
-            params.vad_model_path = nil
             return
         }
 

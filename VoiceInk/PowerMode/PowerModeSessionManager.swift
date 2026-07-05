@@ -145,9 +145,9 @@ class PowerModeSessionManager {
             setSelectedPromptId: { enhancementService.selectedPromptId = $0 },
             setSelectedAIProvider: { aiService.selectedProvider = $0 },
             selectAIModel: { aiService.selectModel($0) },
-            saveTextFormattingEnabled: VoiceInkTranscriptionCleanupPreferenceStorage.saveTextFormattingEnabled,
-            setPunctuationCleanupMode: PunctuationCleanupMode.setCurrent,
-            saveLowercaseTranscription: VoiceInkTranscriptionCleanupPreferenceStorage.saveLowercaseTranscription
+            saveTextFormattingEnabled: { VoiceInkTranscriptionCleanupPreferenceStorage.saveTextFormattingEnabled($0) },
+            setPunctuationCleanupMode: { PunctuationCleanupMode.setCurrent($0) },
+            saveLowercaseTranscription: { VoiceInkTranscriptionCleanupPreferenceStorage.saveLowercaseTranscription($0) }
         )
     }
 

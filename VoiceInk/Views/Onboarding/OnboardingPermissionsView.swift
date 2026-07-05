@@ -81,10 +81,11 @@ struct OnboardingPermissionsView: View {
                                         .foregroundColor(.white)
                                     
                                     if let infoMessage = permissions[currentPermissionIndex].screenContextInfoMessage {
-                                        InfoTip(
-                                            infoMessage,
-                                            learnMoreURL: permissions[currentPermissionIndex].screenContextInfoURLString
-                                        )
+                                        if let infoURL = permissions[currentPermissionIndex].screenContextInfoURLString {
+                                            InfoTip(infoMessage, learnMoreURL: infoURL)
+                                        } else {
+                                            InfoTip(infoMessage)
+                                        }
                                     }
                                 }
                                 

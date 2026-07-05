@@ -267,7 +267,7 @@ class TranscriptionPipeline {
         } catch {
             let errorDescription = VoiceInkErrorDescription.text(for: error)
 
-            if let nativeAppleError = error as? NativeAppleTranscriptionService.ServiceError,
+            if let nativeAppleError = error as? VoiceInkNativeAppleTranscriptionFailureKind,
                case .assetDownloadRequired = nativeAppleError {
                 await MainActor.run {
                     NotificationManager.shared.showNotification(

@@ -46,8 +46,8 @@ final class SessionMetricMigrationService {
                     let draft = VoiceInkSessionMetricPolicy.recorderDraft(
                         transcriptionId: transcription.id,
                         timestamp: transcription.timestamp,
-                        transcriptionModelName: transcription.transcriptionModelName,
                         source: transcription,
+                        transcriptionModelName: transcription.transcriptionModelName,
                         powerModeName: transcription.powerModeName,
                         aiEnhancementModelName: transcription.aiEnhancementModelName
                     )

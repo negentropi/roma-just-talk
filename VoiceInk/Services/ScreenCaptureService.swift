@@ -17,8 +17,8 @@ class ScreenCaptureService: ObservableObject {
 
         guard let index = VoiceInkAIEnhancementScreenContext.preferredWindowIndex(
             in: windowFacts,
-            currentProcessID: currentPID,
-            frontmostProcessID: frontmostPID
+            currentProcessID: Int(currentPID),
+            frontmostProcessID: frontmostPID.map { Int($0) }
         ) else {
             return nil
         }
@@ -102,7 +102,7 @@ class ScreenCaptureService: ObservableObject {
 private extension SCWindow {
     var voiceInkScreenCaptureWindowFacts: VoiceInkScreenCaptureWindowFacts {
         VoiceInkScreenCaptureWindowFacts(
-            processID: owningApplication?.processID,
+            processID: owningApplication.map { Int($0.processID) },
             layer: windowLayer,
             isOnScreen: isOnScreen,
             title: title,

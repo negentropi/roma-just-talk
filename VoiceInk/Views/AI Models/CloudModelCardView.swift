@@ -83,7 +83,7 @@ struct CloudModelCardView: View {
             isPreloadEnabled: preloadEnabled
         )
 
-        HStack(spacing: 8) {
+        return HStack(spacing: 8) {
             Toggle(
                 streamingModePresentation.streamingToggleTitle,
                 isOn: streamingModePresentation.isStreamingToggleForcedOn ? .constant(true) : $streamingEnabled
@@ -297,8 +297,10 @@ struct CloudModelCardView: View {
             storedRuntimeKey: APIKeyManager.shared.getAPIKey(forProvider: model.provider.apiKeyProviderName),
             missingCandidatePolicy: .keepCurrentState
         )
-        apiKeyFormState = startPlan.formState
-        guard let keyToVerify = startPlan.candidate else { return }
+        guard let keyToVerify = startPlan.applyRuntimeState(
+            setFormState: { apiKeyFormState = $0 },
+            verifyCandidate: { $0 }
+        ) else { return }
 
         Task {
             let result = await apiKeyVerifier.verifyStoredAPIKeyDetailed(keyToVerify, for: model.provider)

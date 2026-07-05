@@ -163,15 +163,11 @@ struct MetricsContent: View {
     private var accessibilityPermissionCallout: some View {
         let presentation = VoiceInkMacOSPermissionSettingsPresentation.dashboardAccessibilityCallout
 
-        PermissionCard(
-            icon: presentation.iconSystemName,
-            title: presentation.title,
-            description: presentation.description,
+        return PermissionCard(
+            presentation: presentation,
             isGranted: isAccessibilityEnabled,
-            buttonTitle: presentation.buttonTitle(requiresRelaunch: false),
             buttonAction: grantAccessibilityPermission,
-            checkPermission: refreshAccessibilityStatus,
-            infoTipMessage: presentation.infoTipMessage
+            checkPermission: refreshAccessibilityStatus
         )
     }
 
@@ -295,7 +291,7 @@ struct MetricsContent: View {
             summary: dashboardMetrics.summary
         )
 
-        HStack(spacing: 10) {
+        return HStack(spacing: 10) {
             ForEach(heroPills) { pill in
                 heroPill(title: pill.title, value: pill.value)
             }
@@ -326,7 +322,7 @@ struct MetricsContent: View {
             metrics: dashboardMetrics
         )
 
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 210), spacing: 14)], spacing: 14) {
+        return LazyVGrid(columns: [GridItem(.adaptive(minimum: 210), spacing: 14)], spacing: 14) {
             ForEach(metricCardPresentations) { card in
                 MetricCard(
                     icon: card.iconSystemName,

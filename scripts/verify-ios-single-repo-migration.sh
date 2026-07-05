@@ -62,6 +62,11 @@ require_plist_value() {
 }
 
 reject_file() {
+  if (( $# != 1 )); then
+    fail "reject_file expects exactly one path, got $#"
+    return
+  fi
+
   if [[ -e "$1" ]]; then
     fail "obsolete duplicate should stay deleted: $1"
   fi
@@ -287,6 +292,28 @@ require_patterns() {
   for pattern in "$@"; do
     if ! rg -q "$pattern" "$file"; then
       fail "$description: missing pattern '$pattern' in $file"
+    fi
+  done
+}
+
+require_voiceink_core_check_runner_invocations() {
+  if (( $# < 3 )); then
+    fail "require_voiceink_core_check_runner_invocations expects a description, suite, and at least one test, got $# arguments"
+    return
+  fi
+
+  local description="$1"
+  local suite="$2"
+  local runner="VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift"
+  shift 2
+
+  section "$description"
+  local test
+  local pattern
+  for test in "$@"; do
+    pattern="^[[:space:]]*VoiceInkCoreCheck\\(name: \"${suite}\\.${test}\", run: \\{ (try[[:space:]]+)?(await[[:space:]]+)?${suite}\\(\\)\\.${test}\\(\\) \\}\\),$"
+    if ! rg -q "$pattern" "$runner"; then
+      fail "$description: missing $suite.$test in $runner"
     fi
   done
 }
@@ -1465,25 +1492,17 @@ reject_pattern \
   'public let should(ClearDeferredStopRequest|RequestRecordingCancellation|FinishActiveRecorderCancellation|ClearPartialTranscript|ClearCancelFlag|FinishRecorderSessionImmediately)|public let recordingStateAfterImmediateCancel|public init\([[:space:]]*shouldClearDeferredStopRequest' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
-require_pattern \
+require_voiceink_core_check_runner_invocations \
   "shared recorder processing and cancellation checks run in VoiceInkCore" \
-  'testRecorderCaptureStatePolicyPreservesMacOSCancellationPath|testPostRecordingProcessingStatePolicyPreservesMacOSProcessingStates|testRecorderDismissCancelableStatePolicyPreservesMacOSWindowBehavior|testPipelineFinishIdleRepairStatePolicyPreservesMacOSEngineBehavior|testRecorderProcessingPresentationPreservesMacOSCopyAndTiming|testMacOSRecordingCancellationPlanFinishesActiveCaptureImmediately|testMacOSRecordingCancellationPlanCancelsProcessingWithoutFinishingSession|testMacOSRecordingCancellationPlanRepairsIdleAndBusyState' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
-
-require_pattern \
-  "shared macOS active-capture cancellation check runs in VoiceInkCore" \
-  'testMacOSRecordingCancellationPlanFinishesActiveCaptureImmediately' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
-
-require_pattern \
-  "shared macOS processing cancellation check runs in VoiceInkCore" \
-  'testMacOSRecordingCancellationPlanCancelsProcessingWithoutFinishingSession' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
-
-require_pattern \
-  "shared macOS idle cancellation repair check runs in VoiceInkCore" \
-  'testMacOSRecordingCancellationPlanRepairsIdleAndBusyState' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  RecordingStatePolicyTests \
+  testRecorderCaptureStatePolicyPreservesMacOSCancellationPath \
+  testPostRecordingProcessingStatePolicyPreservesMacOSProcessingStates \
+  testRecorderDismissCancelableStatePolicyPreservesMacOSWindowBehavior \
+  testPipelineFinishIdleRepairStatePolicyPreservesMacOSEngineBehavior \
+  testRecorderProcessingPresentationPreservesMacOSCopyAndTiming \
+  testMacOSRecordingCancellationPlanFinishesActiveCaptureImmediately \
+  testMacOSRecordingCancellationPlanCancelsProcessingWithoutFinishingSession \
+  testMacOSRecordingCancellationPlanRepairsIdleAndBusyState
 
 require_pattern \
   "shared recording flow state lives in VoiceInkCore" \
@@ -15814,20 +15833,20 @@ require_patterns \
   '^[[:space:]]*public static func assemblyAITranscriptURL\(' \
   '^[[:space:]]*public static func cartesiaVoicesURL\('
 
-require_patterns \
+require_voiceink_core_check_runner_invocations \
   "core checks execute provider endpoint policy through provider access suite" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'ProviderAccessRequirementTests\.testRemoteTranscriptionProvidersUseSharedTransportAndEndpoints' \
-  'ProviderAccessRequirementTests\.testGeminiUsesNativeTranscriptionEndpointButOpenAICompatiblePostProcessingEndpoint' \
-  'ProviderAccessRequirementTests\.testConsoleURLsMatchMacOSProviderSettings' \
-  'ProviderAccessRequirementTests\.testPostProcessingChatCompletionsURLsOnlyExistForPostProcessingProviders'
+  ProviderAccessRequirementTests \
+  testRemoteTranscriptionProvidersUseSharedTransportAndEndpoints \
+  testGeminiUsesNativeTranscriptionEndpointButOpenAICompatiblePostProcessingEndpoint \
+  testConsoleURLsMatchMacOSProviderSettings \
+  testPostProcessingChatCompletionsURLsOnlyExistForPostProcessingProviders
 
-require_patterns \
+require_voiceink_core_check_runner_invocations \
   "core checks execute provider model selection policy through provider access suite" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'ProviderAccessRequirementTests\.testModelSelectionPresentationUsesTranscriptionModelList' \
-  'ProviderAccessRequirementTests\.testModelSelectionPresentationUsesPostProcessingModelList' \
-  'ProviderAccessRequirementTests\.testSelectedModelFallsBackToProviderDefaultWhenCurrentModelIsUnavailable'
+  ProviderAccessRequirementTests \
+  testModelSelectionPresentationUsesTranscriptionModelList \
+  testModelSelectionPresentationUsesPostProcessingModelList \
+  testSelectedModelFallsBackToProviderDefaultWhenCurrentModelIsUnavailable
 
 require_patterns \
   "iOS mode model selection uses shared presentation directly" \

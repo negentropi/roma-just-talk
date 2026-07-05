@@ -10474,9 +10474,17 @@ reject_swift_pattern \
   '\bCloudTranscriptionError''Tests\b' \
   VoiceInkCore/Tests/VoiceInkCoreTests
 
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/AudioTranscriptionServiceFactoryTests.swift
+
 require_patterns \
-  "audio transcription service factory tests cover folded cloud transcription error behavior" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/AudioTranscriptionServiceFactoryTests.swift \
+  "transcription record tests cover folded audio transcription service factory dispatch" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRecordTests.swift \
+  'func +testAudioTranscriptionServiceFactoryRemoteProvidersUseRemoteFactory\(' \
+  'func +testAudioTranscriptionServiceFactoryLocalWhisperProviderUsesLocalFactory\('
+
+require_patterns \
+  "remote transport tests cover folded cloud transcription error behavior" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteTransportTests.swift \
   'func +testErrorDescriptionsPreserveMacOSCloudTranscriptionCopy\(' \
   'func +testNoTranscriptionReturnedUsesSharedRunErrorDescription\(' \
   'func +testCloudTranscriptionAudioFileLoadsBytesAndFileName\(' \
@@ -10486,15 +10494,26 @@ require_patterns \
   'func +testAPIRequestFailureRejectsWrongDomainMissingDomainAndNonHTTPStatus\('
 
 require_patterns \
-  "core checks execute folded audio transcription service factory cloud error tests" \
+  "core checks execute folded audio transcription service factory dispatch tests" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'AudioTranscriptionServiceFactoryTests\.testErrorDescriptionsPreserveMacOSCloudTranscriptionCopy' \
-  'AudioTranscriptionServiceFactoryTests\.testNoTranscriptionReturnedUsesSharedRunErrorDescription' \
-  'AudioTranscriptionServiceFactoryTests\.testCloudTranscriptionAudioFileLoadsBytesAndFileName' \
-  'AudioTranscriptionServiceFactoryTests\.testCloudTranscriptionAudioFileMapsMissingFile' \
-  'AudioTranscriptionServiceFactoryTests\.testAPIRequestFailureMapsMatchingHTTPNSError' \
-  'AudioTranscriptionServiceFactoryTests\.testAPIRequestFailureFallsBackToLocalizedDescription' \
-  'AudioTranscriptionServiceFactoryTests\.testAPIRequestFailureRejectsWrongDomainMissingDomainAndNonHTTPStatus'
+  'TranscriptionRecordTests\.testAudioTranscriptionServiceFactoryRemoteProvidersUseRemoteFactory' \
+  'TranscriptionRecordTests\.testAudioTranscriptionServiceFactoryLocalWhisperProviderUsesLocalFactory'
+
+require_patterns \
+  "core checks execute folded cloud transcription error tests through remote transport suite" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'RemoteTransportTests\.testErrorDescriptionsPreserveMacOSCloudTranscriptionCopy' \
+  'RemoteTransportTests\.testNoTranscriptionReturnedUsesSharedRunErrorDescription' \
+  'RemoteTransportTests\.testCloudTranscriptionAudioFileLoadsBytesAndFileName' \
+  'RemoteTransportTests\.testCloudTranscriptionAudioFileMapsMissingFile' \
+  'RemoteTransportTests\.testAPIRequestFailureMapsMatchingHTTPNSError' \
+  'RemoteTransportTests\.testAPIRequestFailureFallsBackToLocalizedDescription' \
+  'RemoteTransportTests\.testAPIRequestFailureRejectsWrongDomainMissingDomainAndNonHTTPStatus'
+
+reject_pattern \
+  "core check runner avoids obsolete audio transcription service factory suite entries" \
+  'AudioTranscriptionServiceFactoryTests' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "core checks execute shared remote audio file policy test" \

@@ -145,6 +145,59 @@ final class TranscriptionRecordTests: XCTestCase {
         XCTAssertEqual(record.transcriptionStatus, .canceled)
     }
 
+    func testAudioTranscriptionServiceFactoryRemoteProvidersUseRemoteFactory() async throws {
+        var capturedProviders: [VoiceInkProviderKind] = []
+        let factory = VoiceInkAudioTranscriptionServiceFactory(
+            localWhisperServiceFactory: { StoredAudioTranscriptionService(text: "local") },
+            remoteServiceFactory: { provider in
+                capturedProviders.append(provider)
+                return StoredAudioTranscriptionService(text: "remote-\(provider.rawValue)")
+            }
+        )
+
+        let service = factory.service(for: .groq)
+        let transcript = try await service.transcribeAudioFile(
+            apiKey: "key",
+            model: "model",
+            fileURL: URL(fileURLWithPath: "/tmp/audio.wav"),
+            language: nil,
+            prompt: nil,
+            customVocabulary: []
+        )
+
+        XCTAssertEqual(capturedProviders, [.groq])
+        XCTAssertEqual(transcript, "remote-groq")
+    }
+
+    func testAudioTranscriptionServiceFactoryLocalWhisperProviderUsesLocalFactory() async throws {
+        var localFactoryCallCount = 0
+        var capturedRemoteProviders: [VoiceInkProviderKind] = []
+        let factory = VoiceInkAudioTranscriptionServiceFactory(
+            localWhisperServiceFactory: {
+                localFactoryCallCount += 1
+                return StoredAudioTranscriptionService(text: "local")
+            },
+            remoteServiceFactory: { provider in
+                capturedRemoteProviders.append(provider)
+                return StoredAudioTranscriptionService(text: "remote")
+            }
+        )
+
+        let service = factory.service(for: .localWhisper)
+        let transcript = try await service.transcribeAudioFile(
+            apiKey: "key",
+            model: "model",
+            fileURL: URL(fileURLWithPath: "/tmp/audio.wav"),
+            language: nil,
+            prompt: nil,
+            customVocabulary: []
+        )
+
+        XCTAssertEqual(localFactoryCallCount, 1)
+        XCTAssertEqual(capturedRemoteProviders, [])
+        XCTAssertEqual(transcript, "local")
+    }
+
     func testRetranscribeStoredAudioAppliesCompletedResult() async throws {
         let recordingsDirectory = FileManager.default.temporaryDirectory
             .appendingPathComponent("VoiceInkCore.TranscriptionRecordTests.\(UUID().uuidString)", isDirectory: true)

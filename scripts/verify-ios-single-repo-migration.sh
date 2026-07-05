@@ -6914,6 +6914,19 @@ reject_file VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionClient.swif
 reject_file VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleTranscriptionClient.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionClient.swift
 
+section "obsolete standalone OpenAI-compatible transcription codec module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleTranscriptionCodec.swift
+
+require_patterns \
+  "OpenAI-compatible transcription request owns codec and response decoding" \
+  VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleTranscriptionRequest.swift \
+  'VoiceInkOpenAICompatibleTranscriptionResponse' \
+  'VoiceInkOpenAICompatibleTranscriptionCodec' \
+  'multipartContentType' \
+  'requestBody\(' \
+  'textIfPresent' \
+  'transcriptionText'
+
 section "obsolete standalone API-key verification policy module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/APIKeyVerificationPolicy.swift
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/APIKeyVerificationPolicyTests.swift

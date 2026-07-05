@@ -15983,20 +15983,35 @@ require_pattern \
   'VoiceInkDefaultSettings\.macOS\.selectedTranscriptionLanguage' \
   VoiceInk/Views/ModelSettingsView.swift
 
-require_pattern \
+require_patterns \
   "shared local Whisper prompt catalog uses shared selected-language fallback" \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift \
+  'public enum VoiceInkLocalWhisperPromptCatalog' \
+  'promptForSelectedLanguage' \
   'VoiceInkTranscriptionLanguagePreference\.selectedLanguage\(' \
-  VoiceInkCore/Sources/VoiceInkCore/LocalWhisperPromptCatalog.swift
+  'storedCustomPrompts\(from: defaults\)'
 
-require_pattern \
+require_patterns \
   "shared local Whisper prompt settings presentation lives in VoiceInkCore" \
-  'VoiceInkMacOSLocalWhisperPromptSettingsPresentation|macOSSettingsPresentation' \
-  VoiceInkCore/Sources/VoiceInkCore/LocalWhisperPromptCatalog.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift \
+  'VoiceInkMacOSLocalWhisperPromptSettingsPresentation' \
+  'macOSSettingsPresentation'
 
-require_pattern \
+require_patterns \
   "shared local Whisper prompt draft state lives in VoiceInkCore" \
-  'VoiceInkLocalWhisperPromptDraftState|refreshingForSelectedLanguage|editing\(prompt:' \
-  VoiceInkCore/Sources/VoiceInkCore/LocalWhisperPromptCatalog.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift \
+  'VoiceInkLocalWhisperPromptDraftState' \
+  'refreshingForSelectedLanguage' \
+  'editing\(prompt:'
+
+section "obsolete standalone local Whisper prompt catalog module/tests stay deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/LocalWhisperPromptCatalog.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/LocalWhisperPromptCatalogTests.swift
+
+reject_swift_pattern \
+  "core tests avoid obsolete local Whisper prompt catalog test suite references" \
+  '\bLocalWhisperPromptCatalogTests\b' \
+  VoiceInkCore/Tests/VoiceInkCoreTests
 
 require_pattern \
   "macOS model settings saves local Whisper prompts through shared prompt policy" \
@@ -16041,18 +16056,28 @@ require_pattern \
   VoiceInk/Views/ModelSettingsView.swift
 
 require_patterns \
-  "core checks execute local Whisper prompt catalog coverage" \
+  "core checks execute local Whisper prompt catalog coverage through preferences suite" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'LocalWhisperPromptCatalogTests\.testCustomLanguagePromptsKeyPreservesExistingMacOSStorageName' \
-  'LocalWhisperPromptCatalogTests\.testMacOSPromptSettingsPresentationPreservesExistingCopy' \
-  'LocalWhisperPromptCatalogTests\.testPromptDraftStateOwnsMacOSEditSaveAndLanguageRefresh' \
-  'LocalWhisperPromptCatalogTests\.testDefaultPromptsPreserveExistingMacOSLanguageSeeds' \
-  'LocalWhisperPromptCatalogTests\.testPromptUsesCustomPromptWhenAvailable' \
-  'LocalWhisperPromptCatalogTests\.testPromptFallsBackToDefaultWhenCustomPromptIsEmptyOrLanguageIsMissing' \
-  'LocalWhisperPromptCatalogTests\.testPromptForSelectedLanguageUsesSharedLanguageKeyAndFallbackLanguage' \
-  'LocalWhisperPromptCatalogTests\.testStoredCustomPromptsRoundTrip' \
-  'LocalWhisperPromptCatalogTests\.testSaveCustomPromptUpdatesOneLanguageAndPreservesOthers' \
-  'LocalWhisperPromptCatalogTests\.testPromptForSelectedLanguageUsesStoredCustomPromptsByDefault'
+  'UserDefaultsPreferencesTests\.testCustomLanguagePromptsKeyPreservesExistingMacOSStorageName' \
+  'UserDefaultsPreferencesTests\(\)\.testCustomLanguagePromptsKeyPreservesExistingMacOSStorageName\(\)' \
+  'UserDefaultsPreferencesTests\.testMacOSPromptSettingsPresentationPreservesExistingCopy' \
+  'UserDefaultsPreferencesTests\(\)\.testMacOSPromptSettingsPresentationPreservesExistingCopy\(\)' \
+  'UserDefaultsPreferencesTests\.testPromptDraftStateOwnsMacOSEditSaveAndLanguageRefresh' \
+  'UserDefaultsPreferencesTests\(\)\.testPromptDraftStateOwnsMacOSEditSaveAndLanguageRefresh\(\)' \
+  'UserDefaultsPreferencesTests\.testDefaultPromptsPreserveExistingMacOSLanguageSeeds' \
+  'UserDefaultsPreferencesTests\(\)\.testDefaultPromptsPreserveExistingMacOSLanguageSeeds\(\)' \
+  'UserDefaultsPreferencesTests\.testPromptUsesCustomPromptWhenAvailable' \
+  'UserDefaultsPreferencesTests\(\)\.testPromptUsesCustomPromptWhenAvailable\(\)' \
+  'UserDefaultsPreferencesTests\.testPromptFallsBackToDefaultWhenCustomPromptIsEmptyOrLanguageIsMissing' \
+  'UserDefaultsPreferencesTests\(\)\.testPromptFallsBackToDefaultWhenCustomPromptIsEmptyOrLanguageIsMissing\(\)' \
+  'UserDefaultsPreferencesTests\.testPromptForSelectedLanguageUsesSharedLanguageKeyAndFallbackLanguage' \
+  'UserDefaultsPreferencesTests\(\)\.testPromptForSelectedLanguageUsesSharedLanguageKeyAndFallbackLanguage\(\)' \
+  'UserDefaultsPreferencesTests\.testStoredCustomPromptsRoundTrip' \
+  'UserDefaultsPreferencesTests\(\)\.testStoredCustomPromptsRoundTrip\(\)' \
+  'UserDefaultsPreferencesTests\.testSaveCustomPromptUpdatesOneLanguageAndPreservesOthers' \
+  'UserDefaultsPreferencesTests\(\)\.testSaveCustomPromptUpdatesOneLanguageAndPreservesOthers\(\)' \
+  'UserDefaultsPreferencesTests\.testPromptForSelectedLanguageUsesStoredCustomPromptsByDefault' \
+  'UserDefaultsPreferencesTests\(\)\.testPromptForSelectedLanguageUsesStoredCustomPromptsByDefault\(\)'
 
 require_patterns \
   "core checks execute local Whisper prompt preference coverage" \
@@ -18441,20 +18466,30 @@ require_patterns \
   'TranscriptionRunPreparationTests\.testWordCounterCountsWordsWithExplicitLanguageAcrossPunctuation' \
   'TranscriptionRunPreparationTests\(\)\.testWordCounterCountsWordsWithExplicitLanguageAcrossPunctuation\(\)'
 
-require_pattern \
+require_patterns \
   "shared session metric migration preference lives in VoiceInkCore" \
-  'VoiceInkSessionMetricDraft|recorderSource = "recorder"|completedTranscriptionStatusRawValue|VoiceInkSessionMetricMigrationPreference|completionKey = "HasCompletedStatsMigration"' \
-  VoiceInkCore/Sources/VoiceInkCore/DashboardMetrics.swift
+  VoiceInkCore/Sources/VoiceInkCore/DashboardMetrics.swift \
+  'VoiceInkSessionMetricDraft' \
+  'recorderSource = "recorder"' \
+  'completedTranscriptionStatusRawValue' \
+  'VoiceInkSessionMetricMigrationPreference' \
+  'completionKey = "HasCompletedStatsMigration"'
 
-require_pattern \
+require_patterns \
   "shared session metric migration diagnostics live in VoiceInkCore" \
-  'VoiceInkSessionMetricMigrationDiagnostics|completedMessage|failedMessage|Completed stats migration with|Stats migration failed:' \
-  VoiceInkCore/Sources/VoiceInkCore/DashboardMetrics.swift
+  VoiceInkCore/Sources/VoiceInkCore/DashboardMetrics.swift \
+  'VoiceInkSessionMetricMigrationDiagnostics' \
+  'completedMessage' \
+  'failedMessage' \
+  'Completed stats migration with' \
+  'Stats migration failed:'
 
-require_pattern \
+require_patterns \
   "shared session metric recorder diagnostics live in VoiceInkCore" \
-  'VoiceInkSessionMetricRecorderDiagnostics|recordedSessionMetricMessage|Recorded session metric for transcription' \
-  VoiceInkCore/Sources/VoiceInkCore/DashboardMetrics.swift
+  VoiceInkCore/Sources/VoiceInkCore/DashboardMetrics.swift \
+  'VoiceInkSessionMetricRecorderDiagnostics' \
+  'recordedSessionMetricMessage' \
+  'Recorded session metric for transcription'
 
 require_pattern \
   "macOS session metric model adapts shared draft" \
@@ -18487,15 +18522,17 @@ reject_pattern \
   '"Recorded session metric for transcription|category: "SessionMetricRecorder"' \
   VoiceInk/Services/SessionMetricRecorder.swift
 
-require_pattern \
+require_patterns \
   "macOS stats migration uses shared completion preference" \
-  'VoiceInkSessionMetricMigrationPreference\.(isCompleted|markCompleted)' \
-  VoiceInk/Services/SessionMetricMigrationService.swift
+  VoiceInk/Services/SessionMetricMigrationService.swift \
+  'VoiceInkSessionMetricMigrationPreference\.isCompleted' \
+  'VoiceInkSessionMetricMigrationPreference\.markCompleted'
 
-require_pattern \
+require_patterns \
   "macOS stats migration uses shared diagnostics" \
-  'VoiceInkSessionMetricMigrationDiagnostics\.(completedMessage|failedMessage)' \
-  VoiceInk/Services/SessionMetricMigrationService.swift
+  VoiceInk/Services/SessionMetricMigrationService.swift \
+  'VoiceInkSessionMetricMigrationDiagnostics\.completedMessage' \
+  'VoiceInkSessionMetricMigrationDiagnostics\.failedMessage'
 
 reject_pattern \
   "macOS stats migration avoids raw completion preference and status" \
@@ -18508,12 +18545,30 @@ reject_pattern \
   VoiceInk/Services/SessionMetricMigrationService.swift
 
 require_patterns \
-  "core checks execute session metric draft and migration preference tests" \
+  "core checks execute session metric and performance bridge tests" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'DashboardMetricsTests\.testAccumulatorBuildsSummaryFromMetricRecords' \
+  'DashboardMetricsTests\(\)\.testAccumulatorBuildsSummaryFromMetricRecords\(\)' \
+  'DashboardMetricsTests\.testMetricSourceRecordGetsDashboardValuesFromSessionMetricPolicy' \
+  'DashboardMetricsTests\(\)\.testMetricSourceRecordGetsDashboardValuesFromSessionMetricPolicy\(\)' \
+  'DashboardMetricsTests\.testValuesUseEnhancedTextForWordCountWhenEnhancementWasAttempted' \
+  'DashboardMetricsTests\(\)\.testValuesUseEnhancedTextForWordCountWhenEnhancementWasAttempted\(\)' \
+  'DashboardMetricsTests\.testValuesUseRawTextWhenEnhancementDurationIsMissing' \
+  'DashboardMetricsTests\(\)\.testValuesUseRawTextWhenEnhancementDurationIsMissing\(\)' \
+  'DashboardMetricsTests\.testValuesClampNonPositiveDurationsAndSkipSpeedFactor' \
+  'DashboardMetricsTests\(\)\.testValuesClampNonPositiveDurationsAndSkipSpeedFactor\(\)' \
   'DashboardMetricsTests\.testRecorderDraftPreservesSourceAndMetricFields' \
+  'DashboardMetricsTests\(\)\.testRecorderDraftPreservesSourceAndMetricFields\(\)' \
   'DashboardMetricsTests\.testMigrationPreferencePreservesCompletionStorageKey' \
+  'DashboardMetricsTests\(\)\.testMigrationPreferencePreservesCompletionStorageKey\(\)' \
   'DashboardMetricsTests\.testMigrationDiagnosticsPreserveMacOSLogCopy' \
-  'DashboardMetricsTests\.testRecorderDiagnosticsPreserveMacOSLogCopy'
+  'DashboardMetricsTests\(\)\.testMigrationDiagnosticsPreserveMacOSLogCopy\(\)' \
+  'DashboardMetricsTests\.testRecorderDiagnosticsPreserveMacOSLogCopy' \
+  'DashboardMetricsTests\(\)\.testRecorderDiagnosticsPreserveMacOSLogCopy\(\)' \
+  'PerformanceAnalysisTests\.testStatsCanRequirePositiveDurationsForSessionMetricPanels' \
+  'PerformanceAnalysisTests\(\)\.testStatsCanRequirePositiveDurationsForSessionMetricPanels\(\)' \
+  'PerformanceAnalysisTests\.testSessionMetricSourceDefaultsPerformanceRecordFields' \
+  'PerformanceAnalysisTests\(\)\.testSessionMetricSourceDefaultsPerformanceRecordFields\(\)'
 
 require_pattern \
   "migration checklist tracks shared session metric migration preference" \

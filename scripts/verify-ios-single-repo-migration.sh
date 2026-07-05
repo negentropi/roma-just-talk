@@ -8226,32 +8226,47 @@ reject_pattern \
 require_pattern \
   "shared filler-word insert policy owns duplicate message" \
   'duplicateWordMessage = "This filler word is already in the list\."' \
-  VoiceInkCore/Sources/VoiceInkCore/FillerWords.swift
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
 
-require_pattern \
+require_patterns \
   "shared filler-word submission policy owns draft and alert plan" \
-  'VoiceInkFillerWordSubmissionPlan|submissionPlan|draftAfterSubmit|alertPresentation' \
-  VoiceInkCore/Sources/VoiceInkCore/FillerWords.swift
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift \
+  'VoiceInkFillerWordSubmissionPlan' \
+  'submissionPlan' \
+  'draftAfterSubmit' \
+  'alertPresentation'
 
-require_pattern \
+require_patterns \
   "shared filler-word submission policy owns changed-list application" \
-  'func updatedWordsIfChanged\(from currentWords: \[String\]\)|func applyRuntimeState\([[:space:]]*currentWords: \[String\]' \
-  VoiceInkCore/Sources/VoiceInkCore/FillerWords.swift
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift \
+  'func updatedWordsIfChanged\(from currentWords: \[String\]\)' \
+  'func applyRuntimeState\(' \
+  'currentWords: \[String\]'
 
-require_pattern \
+section "obsolete standalone filler-word policy module/tests stay deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/FillerWords.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/FillerWordsTests.swift
+
+reject_swift_pattern \
+  "core tests avoid obsolete filler-word test suite references" \
+  '\bFillerWordsTests\b' \
+  VoiceInkCore/Tests/VoiceInkCoreTests
+
+require_patterns \
   "core checks execute filler-word runtime application test" \
-  'FillerWordsTests\.testSubmissionPlanAppliesAcceptedWordsToRuntimeState' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'DictionaryPolicyTests\.testSubmissionPlanAppliesAcceptedWordsToRuntimeState' \
+  'DictionaryPolicyTests\(\)\.testSubmissionPlanAppliesAcceptedWordsToRuntimeState\(\)'
 
 require_pattern \
   "shared filler-word draft state lives in core" \
   'public struct VoiceInkFillerWordDraftState' \
-  VoiceInkCore/Sources/VoiceInkCore/FillerWords.swift
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
 
 require_pattern \
   "shared filler-word draft submission lives in core" \
   'public struct VoiceInkFillerWordDraftSubmission' \
-  VoiceInkCore/Sources/VoiceInkCore/FillerWords.swift
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
 
 require_pattern \
   "shared dictionary draft submissions own runtime state application" \
@@ -8261,12 +8276,12 @@ require_pattern \
 require_pattern \
   "shared filler-word draft state owns submit availability" \
   'public var canSubmit: Bool' \
-  VoiceInkCore/Sources/VoiceInkCore/FillerWords.swift
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
 
 require_pattern \
   "shared filler-word draft state owns submission" \
   'public func submitting\(existingWords: \[String\]\) -> VoiceInkFillerWordDraftSubmission' \
-  VoiceInkCore/Sources/VoiceInkCore/FillerWords.swift
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
 
 require_pattern \
   "macOS filler-word storage receives shared submission plan" \

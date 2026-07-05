@@ -9426,15 +9426,52 @@ reject_pattern \
   VoiceInk/Views/Dictionary/EditReplacementSheet.swift \
   iOS/VoiceInk-ios/SettingsView.swift
 
-require_pattern \
-  "shared word-replacement engine owns rule ordering" \
+section "obsolete standalone word-replacement engine module/tests stay folded"
+reject_file VoiceInkCore/Sources/VoiceInkCore/WordReplacementEngine.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/WordReplacementEngineTests.swift
+
+require_patterns \
+  "shared dictionary policy owns word-replacement rule and engine ordering" \
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift \
+  'public struct VoiceInkWordReplacementRule: Codable, Equatable, Sendable' \
+  'public enum VoiceInkWordReplacementEngine' \
   'for rule in orderedRules\(rules\)' \
-  VoiceInkCore/Sources/VoiceInkCore/WordReplacementEngine.swift
+  'rules\.sorted \{ \$0\.originalText\.count > \$1\.originalText\.count \}' \
+  'NSRegularExpression\.escapedPattern\(for: original\)' \
+  '0x3040\.\.\.0x309F'
 
 reject_pattern \
   "shared word-replacement engine does not expose shell ordering helper" \
   'public static func sortedRules' \
-  VoiceInkCore/Sources/VoiceInkCore/WordReplacementEngine.swift
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
+
+require_patterns \
+  "dictionary policy tests cover folded word-replacement engine behavior" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/DictionaryPolicyTests.swift \
+  'testWordReplacementEngineApplyReturnsInputForNoRules' \
+  'testWordReplacementEngineApplySortsRulesByLongerOriginalText' \
+  'testWordReplacementEngineApplyUsesCaseInsensitiveWordBoundariesForSpacedText' \
+  'testWordReplacementEngineApplySortsCommaSeparatedVariantsByLength' \
+  'testWordReplacementEngineApplyUsesSubstringReplacementForNonSpacedScripts' \
+  'testWordReplacementRuleCodableRoundTripsIOSPreferenceShape'
+
+require_patterns \
+  "core checks execute folded word-replacement engine behavior through dictionary policy suite" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'DictionaryPolicyTests\.testWordReplacementEngineApplyReturnsInputForNoRules' \
+  'DictionaryPolicyTests\.testWordReplacementEngineApplySortsRulesByLongerOriginalText' \
+  'DictionaryPolicyTests\.testWordReplacementEngineApplyUsesCaseInsensitiveWordBoundariesForSpacedText' \
+  'DictionaryPolicyTests\.testWordReplacementEngineApplySortsCommaSeparatedVariantsByLength' \
+  'DictionaryPolicyTests\.testWordReplacementEngineApplyUsesSubstringReplacementForNonSpacedScripts' \
+  'DictionaryPolicyTests\.testWordReplacementRuleCodableRoundTripsIOSPreferenceShape'
+
+reject_pattern \
+  "core tests and project metadata avoid obsolete standalone word-replacement engine suite" \
+  'WordReplacementEngineTests|WordReplacementEngine\.swift|WordReplacementEngineTests\.swift' \
+  VoiceInkCore/Tests/VoiceInkCoreTests \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
 
 reject_pattern \
   "iOS retry passes stored word replacements into shared engine" \

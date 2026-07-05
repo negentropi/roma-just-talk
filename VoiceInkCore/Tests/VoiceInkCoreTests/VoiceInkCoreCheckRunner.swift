@@ -475,6 +475,12 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementEditPresentationPreservesMacOSCopy", run: { DictionaryPolicyTests().testWordReplacementEditPresentationPreservesMacOSCopy() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testVocabularyListPresentationPreservesMacOSCopy", run: { DictionaryPolicyTests().testVocabularyListPresentationPreservesMacOSCopy() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementListPresentationPreservesMacOSCopy", run: { DictionaryPolicyTests().testWordReplacementListPresentationPreservesMacOSCopy() }),
+            VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementEngineApplyReturnsInputForNoRules", run: { DictionaryPolicyTests().testWordReplacementEngineApplyReturnsInputForNoRules() }),
+            VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementEngineApplySortsRulesByLongerOriginalText", run: { DictionaryPolicyTests().testWordReplacementEngineApplySortsRulesByLongerOriginalText() }),
+            VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementEngineApplyUsesCaseInsensitiveWordBoundariesForSpacedText", run: { DictionaryPolicyTests().testWordReplacementEngineApplyUsesCaseInsensitiveWordBoundariesForSpacedText() }),
+            VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementEngineApplySortsCommaSeparatedVariantsByLength", run: { DictionaryPolicyTests().testWordReplacementEngineApplySortsCommaSeparatedVariantsByLength() }),
+            VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementEngineApplyUsesSubstringReplacementForNonSpacedScripts", run: { DictionaryPolicyTests().testWordReplacementEngineApplyUsesSubstringReplacementForNonSpacedScripts() }),
+            VoiceInkCoreCheck(name: "DictionaryPolicyTests.testWordReplacementRuleCodableRoundTripsIOSPreferenceShape", run: { try DictionaryPolicyTests().testWordReplacementRuleCodableRoundTripsIOSPreferenceShape() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testDictionaryListSortModesPreserveStorageAndIndicatorValues", run: { DictionaryPolicyTests().testDictionaryListSortModesPreserveStorageAndIndicatorValues() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testDictionaryListSortPreferencesReadDefaultsAndSaveModes", run: { DictionaryPolicyTests().testDictionaryListSortPreferencesReadDefaultsAndSaveModes() }),
             VoiceInkCoreCheck(name: "DictionaryPolicyTests.testDictionaryListSortPolicySortsVocabularyAndWordReplacements", run: { DictionaryPolicyTests().testDictionaryListSortPolicySortsVocabularyAndWordReplacements() }),
@@ -1806,12 +1812,6 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "WordAgreementEngineTests.testLowBoundaryWordConfidencePreventsConfirmation", run: { WordAgreementEngineTests().testLowBoundaryWordConfidencePreventsConfirmation() }),
             VoiceInkCoreCheck(name: "WordAgreementEngineTests.testResetClearsAgreementState", run: { WordAgreementEngineTests().testResetClearsAgreementState() }),
             VoiceInkCoreCheck(name: "WordAgreementEngineTests.testRollingPreloadConfigPreservesExistingStreamingValues", run: { WordAgreementEngineTests().testRollingPreloadConfigPreservesExistingStreamingValues() }),
-            VoiceInkCoreCheck(name: "WordReplacementEngineTests.testApplyReturnsInputForNoRules", run: { WordReplacementEngineTests().testApplyReturnsInputForNoRules() }),
-            VoiceInkCoreCheck(name: "WordReplacementEngineTests.testApplySortsRulesByLongerOriginalText", run: { WordReplacementEngineTests().testApplySortsRulesByLongerOriginalText() }),
-            VoiceInkCoreCheck(name: "WordReplacementEngineTests.testApplyUsesCaseInsensitiveWordBoundariesForSpacedText", run: { WordReplacementEngineTests().testApplyUsesCaseInsensitiveWordBoundariesForSpacedText() }),
-            VoiceInkCoreCheck(name: "WordReplacementEngineTests.testApplySortsCommaSeparatedVariantsByLength", run: { WordReplacementEngineTests().testApplySortsCommaSeparatedVariantsByLength() }),
-            VoiceInkCoreCheck(name: "WordReplacementEngineTests.testApplyUsesSubstringReplacementForNonSpacedScripts", run: { WordReplacementEngineTests().testApplyUsesSubstringReplacementForNonSpacedScripts() }),
-            VoiceInkCoreCheck(name: "WordReplacementEngineTests.testRuleCodableRoundTripsIOSPreferenceShape", run: { try WordReplacementEngineTests().testRuleCodableRoundTripsIOSPreferenceShape() }),
         ]
 
         for check in checks {

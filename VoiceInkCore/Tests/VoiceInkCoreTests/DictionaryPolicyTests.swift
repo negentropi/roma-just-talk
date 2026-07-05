@@ -220,6 +220,69 @@ final class DictionaryPolicyTests: XCTestCase {
         XCTAssertEqual(presentation.removeButtonHelp, "Remove replacement")
     }
 
+    func testWordReplacementEngineApplyReturnsInputForNoRules() {
+        XCTAssertEqual(
+            VoiceInkWordReplacementEngine.apply([], to: "Keep this text"),
+            "Keep this text"
+        )
+    }
+
+    func testWordReplacementEngineApplySortsRulesByLongerOriginalText() {
+        let rules = [
+            VoiceInkWordReplacementRule(originalText: "voice", replacementText: "v"),
+            VoiceInkWordReplacementRule(originalText: "voice ink", replacementText: "roma")
+        ]
+
+        XCTAssertEqual(
+            VoiceInkWordReplacementEngine.apply(rules, to: "voice ink and voice"),
+            "roma and v"
+        )
+    }
+
+    func testWordReplacementEngineApplyUsesCaseInsensitiveWordBoundariesForSpacedText() {
+        let rules = [
+            VoiceInkWordReplacementRule(originalText: "voice ink", replacementText: "roma")
+        ]
+
+        XCTAssertEqual(
+            VoiceInkWordReplacementEngine.apply(rules, to: "Use Voice Ink, not voice inking."),
+            "Use roma, not voice inking."
+        )
+    }
+
+    func testWordReplacementEngineApplySortsCommaSeparatedVariantsByLength() {
+        let rules = [
+            VoiceInkWordReplacementRule(originalText: "voice, voice ink", replacementText: "roma")
+        ]
+
+        XCTAssertEqual(
+            VoiceInkWordReplacementEngine.apply(rules, to: "voice ink and voice"),
+            "roma and roma"
+        )
+    }
+
+    func testWordReplacementEngineApplyUsesSubstringReplacementForNonSpacedScripts() {
+        let rules = [
+            VoiceInkWordReplacementRule(originalText: "東京", replacementText: "Tokyo")
+        ]
+
+        XCTAssertEqual(
+            VoiceInkWordReplacementEngine.apply(rules, to: "東京都 and 東京"),
+            "Tokyo都 and Tokyo"
+        )
+    }
+
+    func testWordReplacementRuleCodableRoundTripsIOSPreferenceShape() throws {
+        let rules = [
+            VoiceInkWordReplacementRule(originalText: "roma", replacementText: "Roma Just Talk")
+        ]
+
+        let data = try JSONEncoder().encode(rules)
+        let decoded = try JSONDecoder().decode([VoiceInkWordReplacementRule].self, from: data)
+
+        XCTAssertEqual(decoded, rules)
+    }
+
     func testDictionaryListSortModesPreserveStorageAndIndicatorValues() {
         XCTAssertEqual(VoiceInkVocabularySortMode.wordAscending.rawValue, "wordAsc")
         XCTAssertEqual(VoiceInkVocabularySortMode.wordDescending.rawValue, "wordDesc")

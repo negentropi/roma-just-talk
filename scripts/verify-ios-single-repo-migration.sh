@@ -18404,19 +18404,21 @@ reject_swift_pattern \
   '\bWordCounterTests\b' \
   VoiceInkCore/Tests/VoiceInkCoreTests
 
+section "obsolete standalone transcript paragraph formatter module/tests stay deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/TranscriptParagraphFormatter.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptParagraphFormatterTests.swift
+
 reject_pattern \
-  "shared transcript paragraph formatter avoids duplicate word tokenizer" \
+  "shared transcription cleanup preferences avoid duplicate word tokenizer" \
   'private static func wordCount|NLTokenizer\(unit: \.word\)' \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptParagraphFormatter.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionCleanupPreferences.swift
 
 require_patterns \
-  "shared transcript paragraph formatter uses shared word counter" \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptParagraphFormatter.swift \
+  "shared transcription cleanup preferences own transcript paragraph formatting through shared word counter" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionCleanupPreferences.swift \
+  'public enum VoiceInkTranscriptParagraphFormatter' \
   'VoiceInkWordCounter\.count\(in: sentence, language: tokenizerLanguage\)' \
   'VoiceInkWordCounter\.count\(in: sentence, language: language\)'
-
-section "obsolete standalone transcript paragraph formatter tests stay deleted"
-reject_file VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptParagraphFormatterTests.swift
 
 reject_swift_pattern \
   "core tests avoid obsolete transcript paragraph formatter test suite references" \

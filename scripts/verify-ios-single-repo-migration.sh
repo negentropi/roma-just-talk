@@ -7799,20 +7799,24 @@ require_patterns \
   'VoiceInkCustomPromptPresentation\.noTriggerWordsText' \
   'VoiceInkCustomPromptPresentation\.iconSystemNames'
 
+section "obsolete standalone prompt-trigger policy module/tests stay deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/PromptTriggerPolicy.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/PromptTriggerPolicyTests.swift
+
 require_pattern \
-  "shared prompt trigger-word draft validation lives in VoiceInkCore" \
+  "shared prompt trigger-word draft validation lives with custom prompt policy" \
   'VoiceInkPromptTriggerDraftState|hasTriggerWordDraft|canSubmit' \
-  VoiceInkCore/Sources/VoiceInkCore/PromptTriggerPolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/CustomPrompt.swift
 
 require_pattern \
-  "shared prompt trigger-word add policy lives in VoiceInkCore" \
+  "shared prompt trigger-word add policy lives with custom prompt policy" \
   'VoiceInkPromptTriggerDraftSubmission|addingTriggerWord|applyRuntimeState' \
-  VoiceInkCore/Sources/VoiceInkCore/PromptTriggerPolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/CustomPrompt.swift
 
 require_pattern \
-  "shared prompt trigger-word removal policy lives in VoiceInkCore" \
+  "shared prompt trigger-word removal policy lives with custom prompt policy" \
   'removingTriggerWord' \
-  VoiceInkCore/Sources/VoiceInkCore/PromptTriggerPolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/CustomPrompt.swift
 
 require_pattern \
   "shared prompt-trigger settings application state lives in VoiceInkCore" \
@@ -7847,7 +7851,7 @@ require_pattern \
 require_pattern \
   "shared prompt-trigger detection settings application uses shared prompt state" \
   'applyingSettingsState|restoringSettingsState|VoiceInkAIEnhancementPromptSettingsState' \
-  VoiceInkCore/Sources/VoiceInkCore/PromptTriggerPolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/CustomPrompt.swift
 
 require_pattern \
   "macOS prompt editor consumes shared trigger-word draft state" \
@@ -7899,17 +7903,17 @@ reject_pattern \
 
 require_pattern \
   "core checks execute prompt trigger-word removal policy test" \
-  'PromptTriggerPolicyTests\.testRemovingTriggerWordPreservesExactMacOSEditingRule' \
+  'CustomPromptTests\.testRemovingTriggerWordPreservesExactMacOSEditingRule' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "core checks execute prompt trigger-word draft state tests" \
-  'PromptTriggerPolicyTests\.testTriggerWordDraftState(SubmitsAndClearsAcceptedWord|KeepsRejectedDraft)|PromptTriggerPolicyTests\.testTriggerWordDraftSubmissionAppliesRuntimeState' \
+  'CustomPromptTests\.testTriggerWordDraftState(SubmitsAndClearsAcceptedWord|KeepsRejectedDraft)|CustomPromptTests\.testTriggerWordDraftSubmissionAppliesRuntimeState' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "core checks execute prompt-trigger settings state tests" \
-  'PromptTriggerPolicyTests\.testDetectedPromptResultAppliesSettingsState|PromptTriggerPolicyTests\.testDetectedPromptResultRestoresSettingsStateIncludingNilPrompt|PromptTriggerPolicyTests\.testNoMatchPromptResultReturnsNoSettingsState' \
+  'CustomPromptTests\.testDetectedPromptResultAppliesSettingsState|CustomPromptTests\.testDetectedPromptResultRestoresSettingsStateIncludingNilPrompt|CustomPromptTests\.testNoMatchPromptResultReturnsNoSettingsState' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \

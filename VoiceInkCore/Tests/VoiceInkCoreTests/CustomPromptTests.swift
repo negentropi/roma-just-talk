@@ -1297,4 +1297,280 @@ final class CustomPromptTests: XCTestCase {
             "Are you sure you want to delete 'Email' prompt? This action cannot be undone."
         )
     }
+
+    func testPromptDetectionPolicyReturnsNoMatchResultWithOriginalState() {
+        let originalPromptId = UUID()
+        let prompt = VoiceInkCustomPrompt(
+            title: "Email",
+            promptText: "Write an email.",
+            triggerWords: ["email"]
+        )
+
+        let result = VoiceInkPromptDetectionPolicy.analyzeText(
+            "please write this normally",
+            prompts: [prompt],
+            isEnhancementEnabled: true,
+            selectedPromptId: originalPromptId
+        )
+
+        XCTAssertFalse(result.shouldEnableAI)
+        XCTAssertNil(result.selectedPromptId)
+        XCTAssertEqual(result.processedText, "please write this normally")
+        XCTAssertNil(result.detectedTriggerWord)
+        XCTAssertTrue(result.originalEnhancementState)
+        XCTAssertEqual(result.originalPromptId, originalPromptId)
+    }
+
+    func testPromptDetectionPolicyBuildsDetectedEnhancementResult() {
+        let originalPromptId = UUID()
+        let emailPromptId = UUID()
+        let emailPrompt = VoiceInkCustomPrompt(
+            id: emailPromptId,
+            title: "Email",
+            promptText: "Write an email.",
+            triggerWords: ["email"]
+        )
+
+        let result = VoiceInkPromptDetectionPolicy.analyzeText(
+            "email, send a follow up",
+            prompts: [emailPrompt],
+            isEnhancementEnabled: false,
+            selectedPromptId: originalPromptId
+        )
+
+        XCTAssertTrue(result.shouldEnableAI)
+        XCTAssertEqual(result.selectedPromptId, emailPromptId)
+        XCTAssertEqual(result.processedText, "Send a follow up")
+        XCTAssertEqual(result.detectedTriggerWord, "email")
+        XCTAssertFalse(result.originalEnhancementState)
+        XCTAssertEqual(result.originalPromptId, originalPromptId)
+    }
+
+    func testDetectedPromptResultAppliesSettingsState() throws {
+        let detectedPromptId = UUID()
+        let currentPromptId = UUID()
+        let result = VoiceInkPromptDetectionResult(
+            shouldEnableAI: true,
+            selectedPromptId: detectedPromptId,
+            processedText: "send a follow up",
+            detectedTriggerWord: "email",
+            originalEnhancementState: false,
+            originalPromptId: nil
+        )
+
+        let state = try XCTUnwrap(result.applyingSettingsState(
+            current: VoiceInkAIEnhancementPromptSettingsState(
+                isEnhancementEnabled: false,
+                selectedPromptId: currentPromptId
+            )
+        ))
+
+        XCTAssertEqual(
+            state,
+            VoiceInkAIEnhancementPromptSettingsState(
+                isEnhancementEnabled: true,
+                selectedPromptId: detectedPromptId
+            )
+        )
+    }
+
+    func testDetectedPromptResultRestoresSettingsStateIncludingNilPrompt() throws {
+        let detectedPromptId = UUID()
+        let result = VoiceInkPromptDetectionResult(
+            shouldEnableAI: true,
+            selectedPromptId: detectedPromptId,
+            processedText: "send a follow up",
+            detectedTriggerWord: "email",
+            originalEnhancementState: false,
+            originalPromptId: nil
+        )
+
+        let state = try XCTUnwrap(result.restoringSettingsState(
+            current: VoiceInkAIEnhancementPromptSettingsState(
+                isEnhancementEnabled: true,
+                selectedPromptId: detectedPromptId
+            )
+        ))
+
+        XCTAssertEqual(
+            state,
+            VoiceInkAIEnhancementPromptSettingsState(
+                isEnhancementEnabled: false,
+                selectedPromptId: nil
+            )
+        )
+    }
+
+    func testNoMatchPromptResultReturnsNoSettingsState() {
+        let currentPromptId = UUID()
+        let originalPromptId = UUID()
+        let result = VoiceInkPromptDetectionResult(
+            shouldEnableAI: false,
+            selectedPromptId: nil,
+            processedText: "plain text",
+            detectedTriggerWord: nil,
+            originalEnhancementState: false,
+            originalPromptId: originalPromptId
+        )
+
+        let currentState = VoiceInkAIEnhancementPromptSettingsState(
+            isEnhancementEnabled: true,
+            selectedPromptId: currentPromptId
+        )
+
+        XCTAssertNil(result.applyingSettingsState(current: currentState))
+        XCTAssertNil(result.restoringSettingsState(current: currentState))
+    }
+
+    func testPromptDetectionPolicyIgnoresPromptsWithoutTriggerWords() {
+        let prompt = VoiceInkCustomPrompt(
+            title: "Blank",
+            promptText: "No trigger.",
+            triggerWords: [" ", "\n"]
+        )
+
+        let result = VoiceInkPromptDetectionPolicy.analyzeText(
+            "blank, should not match",
+            prompts: [prompt],
+            isEnhancementEnabled: false,
+            selectedPromptId: nil
+        )
+
+        XCTAssertFalse(result.shouldEnableAI)
+        XCTAssertNil(result.selectedPromptId)
+        XCTAssertEqual(result.processedText, "blank, should not match")
+        XCTAssertNil(result.detectedTriggerWord)
+        XCTAssertFalse(result.originalEnhancementState)
+        XCTAssertNil(result.originalPromptId)
+    }
+
+    func testAddingTriggerWordTrimsAndRejectsBlankAndCaseInsensitiveDuplicate() {
+        XCTAssertEqual(
+            VoiceInkPromptTriggerPolicy.addingTriggerWord("  Roma  ", to: ["Dictate"]),
+            ["Dictate", "Roma"]
+        )
+        XCTAssertNil(VoiceInkPromptTriggerPolicy.addingTriggerWord(" \n\t ", to: ["Dictate"]))
+        XCTAssertNil(VoiceInkPromptTriggerPolicy.addingTriggerWord("dictate", to: ["Dictate"]))
+    }
+
+    func testRemovingTriggerWordPreservesExactMacOSEditingRule() {
+        XCTAssertEqual(
+            VoiceInkPromptTriggerPolicy.removingTriggerWord("Email", from: ["email", "Email", "Reply"]),
+            ["email", "Reply"]
+        )
+    }
+
+    func testTriggerWordDraftUsesSharedBlankPolicy() {
+        XCTAssertFalse(VoiceInkPromptTriggerPolicy.hasTriggerWordDraft(" \n\t "))
+        XCTAssertTrue(VoiceInkPromptTriggerPolicy.hasTriggerWordDraft("  Roma  "))
+    }
+
+    func testTriggerWordDraftStateUsesSharedBlankPolicy() {
+        XCTAssertFalse(VoiceInkPromptTriggerDraftState(draft: " \n\t ").canSubmit)
+        XCTAssertTrue(VoiceInkPromptTriggerDraftState(draft: "  Roma  ").canSubmit)
+    }
+
+    func testTriggerWordDraftStateSubmitsAndClearsAcceptedWord() {
+        let submission = VoiceInkPromptTriggerDraftState(draft: "  Roma  ")
+            .submitting(existingWords: ["Dictate"])
+
+        XCTAssertEqual(submission.updatedWords, ["Dictate", "Roma"])
+        XCTAssertEqual(submission.draftStateAfterSubmit, VoiceInkPromptTriggerDraftState())
+    }
+
+    func testTriggerWordDraftStateKeepsRejectedDraft() {
+        let submission = VoiceInkPromptTriggerDraftState(draft: "dictate")
+            .submitting(existingWords: ["Dictate"])
+
+        XCTAssertNil(submission.updatedWords)
+        XCTAssertEqual(submission.draftStateAfterSubmit, VoiceInkPromptTriggerDraftState(draft: "dictate"))
+    }
+
+    func testTriggerWordDraftSubmissionAppliesRuntimeState() {
+        let submission = VoiceInkPromptTriggerDraftState(draft: "  Roma  ")
+            .submitting(existingWords: ["Dictate"])
+        var triggerWords = ["Dictate"]
+        var draftState = VoiceInkPromptTriggerDraftState(draft: "  Roma  ")
+
+        let returnedSubmission = submission.applyRuntimeState(
+            setTriggerWords: { triggerWords = $0 },
+            setDraftState: { draftState = $0 }
+        )
+
+        XCTAssertEqual(returnedSubmission, submission)
+        XCTAssertEqual(triggerWords, ["Dictate", "Roma"])
+        XCTAssertEqual(draftState, VoiceInkPromptTriggerDraftState())
+    }
+
+    func testDetectStripsLeadingTriggerAndCapitalizesRemainingText() throws {
+        let promptId = UUID()
+        let match = try XCTUnwrap(
+            VoiceInkPromptTriggerPolicy.detect(
+                in: " email, send this",
+                triggers: [
+                    VoiceInkPromptTrigger(promptId: promptId, triggerWords: ["email"])
+                ]
+            )
+        )
+
+        XCTAssertEqual(match.promptId, promptId)
+        XCTAssertEqual(match.triggerWord, "email")
+        XCTAssertEqual(match.processedText, "Send this")
+    }
+
+    func testDetectStripsTrailingTriggerBeforeLeadingAndKeepsPromptOrder() throws {
+        let notePromptId = UUID()
+        let emailPromptId = UUID()
+        let match = try XCTUnwrap(
+            VoiceInkPromptTriggerPolicy.detect(
+                in: "please send, email!",
+                triggers: [
+                    VoiceInkPromptTrigger(promptId: notePromptId, triggerWords: ["note"]),
+                    VoiceInkPromptTrigger(promptId: emailPromptId, triggerWords: ["email"])
+                ]
+            )
+        )
+
+        XCTAssertEqual(match.promptId, emailPromptId)
+        XCTAssertEqual(match.triggerWord, "email")
+        XCTAssertEqual(match.processedText, "Please send")
+    }
+
+    func testDetectUsesLongestTriggerAndRejectsWordPrefix() throws {
+        let promptId = UUID()
+        let match = try XCTUnwrap(
+            VoiceInkPromptTriggerPolicy.detect(
+                in: "do it now",
+                triggers: [
+                    VoiceInkPromptTrigger(promptId: promptId, triggerWords: ["do", "do it"])
+                ]
+            )
+        )
+
+        XCTAssertEqual(match.triggerWord, "do it")
+        XCTAssertEqual(match.processedText, "Now")
+        XCTAssertNil(
+            VoiceInkPromptTriggerPolicy.detect(
+                in: "domain update",
+                triggers: [
+                    VoiceInkPromptTrigger(promptId: promptId, triggerWords: ["do"])
+                ]
+            )
+        )
+    }
+
+    func testDetectStripsSameTriggerFromBothEnds() throws {
+        let promptId = UUID()
+        let match = try XCTUnwrap(
+            VoiceInkPromptTriggerPolicy.detect(
+                in: "email, send this email",
+                triggers: [
+                    VoiceInkPromptTrigger(promptId: promptId, triggerWords: ["email"])
+                ]
+            )
+        )
+
+        XCTAssertEqual(match.triggerWord, "email")
+        XCTAssertEqual(match.processedText, "Send this")
+    }
 }

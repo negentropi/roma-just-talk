@@ -11507,6 +11507,29 @@ reject_pattern \
   'defaultTemperature|temperature: +0\.3' \
   VoiceInk/Services/OllamaService.swift
 
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/AIModelCatalogTests.swift
+
+reject_pattern \
+  "core AI model catalog coverage stays in provider catalog suite" \
+  'AIModelCatalogTests' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AIProviderCatalogTests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_patterns \
+  "core provider catalog suite owns shared AI model catalog coverage" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AIProviderCatalogTests.swift \
+  'testMacOSAIEnhancementProviderDefaultsAreShared' \
+  'testMacOSAIEnhancementProviderModelListsAreShared' \
+  'testOpenRouterKeepsDynamicModelListWithSharedDefault' \
+  'VoiceInkAIModelCatalog'
+
+require_patterns \
+  "core checks execute shared AI model catalog coverage through provider catalog suite" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'AIProviderCatalogTests\.testMacOSAIEnhancementProviderDefaultsAreShared' \
+  'AIProviderCatalogTests\.testMacOSAIEnhancementProviderModelListsAreShared' \
+  'AIProviderCatalogTests\.testOpenRouterKeepsDynamicModelListWithSharedDefault'
+
 require_pattern \
   "shared AI enhancement static text model list policy lives in VoiceInkCore" \
   'staticTextEnhancementModels' \

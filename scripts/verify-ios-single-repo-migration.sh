@@ -20630,10 +20630,15 @@ require_plist_value \
   group.com.prakashjoshipax.VoiceInk \
   iOS/VoiceInkKeyboard/VoiceInkKeyboard.entitlements
 
-require_pattern \
+require_patterns \
   "VoiceInkCore owns iOS App Group recording state policy" \
-  'VoiceInkAppGroupRecordingStatePolicy|staleRecordingInterval|UserDefaultsKey|VoiceInkAppGroupRecordingStateReadPlan|staleStateRepairMutationPlan|applyRuntimeState' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift \
+  'public enum VoiceInkAppGroupRecordingStatePolicy' \
+  'public static let staleRecordingInterval' \
+  'public enum UserDefaultsKey' \
+  'VoiceInkAppGroupRecordingStateReadPlan' \
+  'staleStateRepairMutationPlan' \
+  'public func applyRuntimeState'
 
 require_patterns \
   "VoiceInkCore owns iOS App Group recording diagnostics" \
@@ -20689,10 +20694,13 @@ require_pattern \
   'testIOSRecordingCoordinationDiagnosticsPreserveIOSLogCopy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
-require_pattern \
+require_patterns \
   "VoiceInkCore owns iOS keyboard recording timing" \
-  'VoiceInkKeyboardRecordingTiming|appLaunchRecordingStartDelay|recordingStatusPollingInterval|openAppFallbackResetDelay' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift \
+  'VoiceInkKeyboardRecordingTiming' \
+  'appLaunchRecordingStartDelay' \
+  'recordingStatusPollingInterval' \
+  'openAppFallbackResetDelay'
 
 require_pattern \
   "VoiceInkCore checks cover iOS keyboard recording timing" \
@@ -20840,7 +20848,7 @@ reject_pattern \
 
 reject_pattern \
   "iOS keyboard URL opener avoids shell-owned open-result branching" \
-  'if +success|guard +let +extensionContext' \
+  'if +success|if +succeeded|if +!succeeded|switch +success|switch +succeeded|guard +success|guard +succeeded|success +\?|succeeded +\?|guard +let +extensionContext' \
   iOS/Shared/VoiceInkKeyboardURLOpener.swift
 
 require_pattern \
@@ -20868,10 +20876,13 @@ require_pattern \
   'static let appGroupIdentifier = VoiceInkAppIdentity\.iOSAppGroupIdentifier' \
   iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
 
-require_pattern \
-  "iOS App Group bridge adapts shared recording state policy" \
-  'VoiceInkAppGroupRecordingStatePolicy\.(readPlan|stopRequestedMutationPlan|recordingStateMutationPlan)' \
-  iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
+require_patterns \
+  "iOS App Group bridge adapts shared recording state read and write plans" \
+  iOS/Shared/VoiceInkAppGroupRecordingBridge.swift \
+  'VoiceInkAppGroupRecordingStatePolicy\.readPlan' \
+  'UserDefaultsKey\.isRecording' \
+  'UserDefaultsKey\.lastRecordingTimestamp' \
+  'plan\.applyRuntimeState'
 
 require_pattern \
   "iOS App Group bridge applies shared write-plan runtime order" \
@@ -20896,25 +20907,30 @@ require_patterns \
   'mutationPlan\.applyRuntimeState' \
   'applyWritePlan'
 
-require_pattern \
+require_patterns \
   "iOS App Group coordinator adapts shared recording diagnostics" \
-  'VoiceInkAppGroupRecordingDiagnostics\.(staleRecordingStateClearedMessage|updatedRecordingStateMessage)' \
-  iOS/Shared/AppGroupCoordinator.swift
+  iOS/Shared/AppGroupCoordinator.swift \
+  'VoiceInkAppGroupRecordingDiagnostics\.staleRecordingStateClearedMessage' \
+  'VoiceInkAppGroupRecordingDiagnostics\.updatedRecordingStateMessage'
 
-require_pattern \
+require_patterns \
   "VoiceInkCore owns App Group recording mutation notification plan" \
-  'VoiceInkAppGroupRecordingStateMutationPlan|darwinNotificationName' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift \
+  'VoiceInkAppGroupRecordingStateMutationPlan' \
+  'darwinNotificationName'
 
 reject_pattern \
   "VoiceInkCore App Group recording plans avoid public raw mutation internals" \
   'public let (writePlan|darwinNotificationName|staleStateRepairMutationPlan)\b|public let isRecording: Bool\?|public let lastRecordingTimestamp' \
   VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
-require_pattern \
+require_patterns \
   "iOS App Group bridge tests use shared recording state policy" \
-  'VoiceInkAppGroupRecordingStatePolicy\.(staleRecordingInterval|UserDefaultsKey|recordingStateMutationPlan)' \
-  iOS/VoiceInk-iosTests/VoiceInk_iosTests.swift
+  iOS/VoiceInk-iosTests/VoiceInk_iosTests.swift \
+  'VoiceInkAppGroupRecordingStatePolicy\.staleRecordingInterval' \
+  'VoiceInkAppGroupRecordingStatePolicy\.UserDefaultsKey' \
+  'VoiceInkAppGroupRecordingStatePolicy\.recordingStateMutationPlan' \
+  'VoiceInkAppGroupRecordingStatePolicy\.stopRequestedMutationPlan'
 
 require_pattern \
   "iOS App Group bridge tests apply shared read-plan runtime state" \
@@ -20987,14 +21003,17 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift
 
 require_pattern \
-  "VoiceInkCore checks cover app-local keyboard stop notification" \
+  "app identity tests cover app-local keyboard stop notification" \
   'iOSStopRecordingFromKeyboardNotificationName' \
   VoiceInkCore/Tests/VoiceInkCoreTests/AppIdentityTests.swift
 
-require_pattern \
+require_patterns \
   "iOS keyboard controller uses shared button presentation" \
-  'VoiceInkKeyboardRecordingButtonPresentation\.(idle|recording|openAppFallback|current)' \
-  iOS/VoiceInkKeyboard/KeyboardViewController.swift
+  iOS/VoiceInkKeyboard/KeyboardViewController.swift \
+  'VoiceInkKeyboardRecordingButtonPresentation\.current' \
+  'VoiceInkKeyboardRecordingButtonPresentation\.openAppFallback' \
+  'VoiceInkKeyboardRecordingButtonPresentation\.idle' \
+  'presentation == \.recording'
 
 require_patterns \
   "VoiceInkCore owns iOS keyboard recording button tap policy" \
@@ -21006,8 +21025,8 @@ require_patterns \
 
 require_pattern \
   "VoiceInkCore checks cover iOS keyboard recording button tap policy" \
-  'testKeyboardRecordingButtonTapPlanAppliesRuntimeState' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RecordingStatePolicyTests.swift
+  'RecordingStatePolicyTests\.testKeyboardRecordingButtonTapPlanAppliesRuntimeState' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \
   "VoiceInkCore keyboard recording button tap policy avoids public action storage" \
@@ -21034,10 +21053,10 @@ require_patterns \
   'recordingState:' \
   'applyRuntimeState'
 
-require_patterns \
+require_pattern \
   "VoiceInkCore checks cover iOS keyboard stop-request policy" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RecordingStatePolicyTests.swift \
-  'testKeyboardStopRecordingRequestPlanHandlesOnlyActiveRecording'
+  'RecordingStatePolicyTests\.testKeyboardStopRecordingRequestPlanHandlesOnlyActiveRecording' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \
   "VoiceInkCore keyboard stop-request policy avoids public action-only helper" \
@@ -21061,10 +21080,11 @@ reject_pattern \
   iOS/VoiceInk-ios/RecordingManager.swift \
   iOS/VoiceInk-ios/NotesListView.swift
 
-require_pattern \
+require_patterns \
   "iOS keyboard controller uses shared recording timing" \
-  'VoiceInkKeyboardRecordingTiming\.(recordingStatusPollingInterval|openAppFallbackResetDelay)' \
-  iOS/VoiceInkKeyboard/KeyboardViewController.swift
+  iOS/VoiceInkKeyboard/KeyboardViewController.swift \
+  'VoiceInkKeyboardRecordingTiming\.recordingStatusPollingInterval' \
+  'VoiceInkKeyboardRecordingTiming\.openAppFallbackResetDelay'
 
 require_patterns \
   "iOS app deep-link recording uses shared core deep-link contract" \
@@ -21112,8 +21132,9 @@ reject_pattern \
   iOS/VoiceInk-ios/VoiceInk_iosApp.swift
 
 require_patterns \
-  "iOS app launch recording adapts shared coordination diagnostics" \
+  "iOS app startup and record deep-link adapt shared coordination diagnostics" \
   iOS/VoiceInk-ios/VoiceInk_iosApp.swift \
+  'AppGroupCoordinator\.shared\.updateRecordingState\(false\)' \
   'VoiceInkIOSRecordingCoordinationDiagnostics\.clearedStaleRecordingStateOnLaunchMessage' \
   'VoiceInkIOSRecordingCoordinationDiagnostics\.recordDeepLinkOpenedMessage' \
   'VoiceInkIOSRecordingCoordinationDiagnostics\.keyboardRecordingRequestOpenedMessage'

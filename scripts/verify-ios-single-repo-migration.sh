@@ -12912,12 +12912,12 @@ reject_pattern \
 
 require_pattern \
   "core checks execute preference-backed cursor paste plan test" \
-  'TranscriptionPasteOutputPolicyTests\.testCursorPasteTextPlanReadsLowercaseCleanupPreference' \
+  'PastePreferencesTests\.testCursorPasteTextPlanReadsLowercaseCleanupPreference' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_patterns \
   "paste output tests cover folded contextual capitalization formatter behavior" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionPasteOutputPolicyTests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/PastePreferencesTests.swift \
   'testLowercasesTitlecaseTextAfterMidSentencePrefix' \
   'testKeepsTitlecaseTextAfterSentenceBoundary' \
   'testCapitalizesLowercaseTextAtDocumentStart' \
@@ -12926,25 +12926,30 @@ require_patterns \
   'testReadsCursorContextWhenTextCanChange'
 
 require_patterns \
-  "core checks execute folded contextual capitalization formatter tests through paste output suite" \
+  "core checks execute folded contextual capitalization formatter tests through paste preference suite" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'name: "TranscriptionPasteOutputPolicyTests\.testLowercasesTitlecaseTextAfterMidSentencePrefix"' \
-  'TranscriptionPasteOutputPolicyTests\(\)\.testLowercasesTitlecaseTextAfterMidSentencePrefix\(\)' \
-  'name: "TranscriptionPasteOutputPolicyTests\.testKeepsTitlecaseTextAfterSentenceBoundary"' \
-  'TranscriptionPasteOutputPolicyTests\(\)\.testKeepsTitlecaseTextAfterSentenceBoundary\(\)' \
-  'name: "TranscriptionPasteOutputPolicyTests\.testCapitalizesLowercaseTextAtDocumentStart"' \
-  'TranscriptionPasteOutputPolicyTests\(\)\.testCapitalizesLowercaseTextAtDocumentStart\(\)' \
-  'name: "TranscriptionPasteOutputPolicyTests\.testPreservesAcronymsAfterMidSentencePrefix"' \
-  'TranscriptionPasteOutputPolicyTests\(\)\.testPreservesAcronymsAfterMidSentencePrefix\(\)' \
-  'name: "TranscriptionPasteOutputPolicyTests\.testSkipsCursorContextWhenTextCannotChange"' \
-  'TranscriptionPasteOutputPolicyTests\(\)\.testSkipsCursorContextWhenTextCannotChange\(\)' \
-  'name: "TranscriptionPasteOutputPolicyTests\.testReadsCursorContextWhenTextCanChange"' \
-  'TranscriptionPasteOutputPolicyTests\(\)\.testReadsCursorContextWhenTextCanChange\(\)'
+  'name: "PastePreferencesTests\.testLowercasesTitlecaseTextAfterMidSentencePrefix"' \
+  'PastePreferencesTests\(\)\.testLowercasesTitlecaseTextAfterMidSentencePrefix\(\)' \
+  'name: "PastePreferencesTests\.testKeepsTitlecaseTextAfterSentenceBoundary"' \
+  'PastePreferencesTests\(\)\.testKeepsTitlecaseTextAfterSentenceBoundary\(\)' \
+  'name: "PastePreferencesTests\.testCapitalizesLowercaseTextAtDocumentStart"' \
+  'PastePreferencesTests\(\)\.testCapitalizesLowercaseTextAtDocumentStart\(\)' \
+  'name: "PastePreferencesTests\.testPreservesAcronymsAfterMidSentencePrefix"' \
+  'PastePreferencesTests\(\)\.testPreservesAcronymsAfterMidSentencePrefix\(\)' \
+  'name: "PastePreferencesTests\.testSkipsCursorContextWhenTextCannotChange"' \
+  'PastePreferencesTests\(\)\.testSkipsCursorContextWhenTextCannotChange\(\)' \
+  'name: "PastePreferencesTests\.testReadsCursorContextWhenTextCanChange"' \
+  'PastePreferencesTests\(\)\.testReadsCursorContextWhenTextCanChange\(\)'
 
-require_pattern \
+require_patterns \
   "core checks execute cursor text context policy tests" \
-  'TranscriptionPasteOutputPolicyTests\.testCursorTextContextPolicyPreservesMacOSAccessibilityReadBounds|TranscriptionPasteOutputPolicyTests\.testCursorTextContextPolicyOwnsTextInputRoles|TranscriptionPasteOutputPolicyTests\.testCursorTextContextPolicyBoundsPrefixLength|TranscriptionPasteOutputPolicyTests\.testCursorTextContextPolicyBoundsValueSuffixToTextInputRoles' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'PastePreferencesTests\.testCursorTextContextPolicyPreservesMacOSAccessibilityReadBounds' \
+  'PastePreferencesTests\.testCursorTextContextPolicyOwnsTextInputRoles' \
+  'PastePreferencesTests\.testCursorTextContextPolicyBoundsPrefixLength' \
+  'PastePreferencesTests\.testCursorTextContextPolicyBoundsValueSuffixToTextInputRoles'
+
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionPasteOutputPolicyTests.swift
 
 require_pattern \
   "macOS transcription pipeline uses CursorPaster paste preparation" \

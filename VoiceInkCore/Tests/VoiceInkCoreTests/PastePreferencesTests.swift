@@ -2,6 +2,232 @@ import Foundation
 @testable import VoiceInkCore
 
 final class PastePreferencesTests: XCTestCase {
+    func testFinalPastedTextReturnsTranscriptWithoutTrailingSpace() {
+        let pastedText = VoiceInkTranscriptionPasteOutputPolicy.finalPastedText(
+            "hello",
+            appendTrailingSpace: false,
+            isTrialExpired: false
+        )
+
+        XCTAssertEqual(pastedText, "hello")
+    }
+
+    func testFinalPastedTextAppendsTrailingSpaceWhenEnabled() {
+        let pastedText = VoiceInkTranscriptionPasteOutputPolicy.finalPastedText(
+            "hello",
+            appendTrailingSpace: true,
+            isTrialExpired: false
+        )
+
+        XCTAssertEqual(pastedText, "hello ")
+    }
+
+    func testFinalPastedTextPreservesTrialExpiredPrefixAndBlankLine() {
+        let pastedText = VoiceInkTranscriptionPasteOutputPolicy.finalPastedText(
+            "hello",
+            appendTrailingSpace: false,
+            isTrialExpired: true
+        )
+
+        XCTAssertEqual(
+            pastedText,
+            "Your trial has expired. Upgrade to VoiceInk Pro at tryvoiceink.com/buy\n\nhello"
+        )
+    }
+
+    func testCursorPasteTextPlanSkipsCursorReadWhenLowercaseCleanupIsEnabled() {
+        let plan = VoiceInkTranscriptionPasteOutputPolicy.cursorPasteTextPlan(
+            "Hello there",
+            shouldLowercase: true
+        )
+
+        XCTAssertFalse(plan.shouldReadCursorContext)
+        XCTAssertEqual(plan.text(beforeCursor: "mid sentence "), "Hello there")
+    }
+
+    func testCursorPasteTextPlanSkipsCursorReadForUncasedText() {
+        let plan = VoiceInkTranscriptionPasteOutputPolicy.cursorPasteTextPlan(
+            "12345",
+            shouldLowercase: false
+        )
+
+        XCTAssertFalse(plan.shouldReadCursorContext)
+        XCTAssertEqual(plan.text(beforeCursor: "mid sentence "), "12345")
+    }
+
+    func testCursorPasteTextPlanAppliesSharedCapitalizationWithCursorContext() {
+        let plan = VoiceInkTranscriptionPasteOutputPolicy.cursorPasteTextPlan(
+            "Hello there",
+            shouldLowercase: false
+        )
+
+        XCTAssertTrue(plan.shouldReadCursorContext)
+        XCTAssertEqual(plan.text(beforeCursor: "mid sentence "), "hello there")
+        XCTAssertEqual(plan.text(beforeCursor: "Sentence ended. "), "Hello there")
+    }
+
+    func testLowercasesTitlecaseTextAfterMidSentencePrefix() {
+        let result = VoiceInkContextualCapitalizationFormatter.format(
+            "Model output",
+            beforeCursor: "this is the "
+        )
+
+        XCTAssertEqual(result, "model output")
+    }
+
+    func testKeepsTitlecaseTextAfterSentenceBoundary() {
+        let result = VoiceInkContextualCapitalizationFormatter.format(
+            "Model output",
+            beforeCursor: "this is done. "
+        )
+
+        XCTAssertEqual(result, "Model output")
+    }
+
+    func testCapitalizesLowercaseTextAtDocumentStart() {
+        let result = VoiceInkContextualCapitalizationFormatter.format(
+            "model output",
+            beforeCursor: ""
+        )
+
+        XCTAssertEqual(result, "Model output")
+    }
+
+    func testPreservesAcronymsAfterMidSentencePrefix() {
+        let result = VoiceInkContextualCapitalizationFormatter.format(
+            "API response",
+            beforeCursor: "call the "
+        )
+
+        XCTAssertEqual(result, "API response")
+    }
+
+    func testSkipsCursorContextWhenTextCannotChange() {
+        XCTAssertFalse(VoiceInkContextualCapitalizationFormatter.needsCursorContext("API response"))
+        XCTAssertFalse(VoiceInkContextualCapitalizationFormatter.needsCursorContext("iPhone setup"))
+        XCTAssertFalse(VoiceInkContextualCapitalizationFormatter.needsCursorContext("1234"))
+    }
+
+    func testReadsCursorContextWhenTextCanChange() {
+        XCTAssertTrue(VoiceInkContextualCapitalizationFormatter.needsCursorContext("Model output"))
+        XCTAssertTrue(VoiceInkContextualCapitalizationFormatter.needsCursorContext("model output"))
+    }
+
+    func testCursorPasteTextPlanReadsLowercaseCleanupPreference() {
+        withTemporaryDefaults { defaults in
+            VoiceInkTranscriptionCleanupPreferenceStorage.clearTextPreferences(from: defaults)
+
+            XCTAssertTrue(
+                VoiceInkTranscriptionPasteOutputPolicy.cursorPasteTextPlan(
+                    "Hello there",
+                    from: defaults
+                ).shouldReadCursorContext
+            )
+
+            VoiceInkTranscriptionCleanupPreferenceStorage.saveLowercaseTranscription(true, to: defaults)
+
+            XCTAssertFalse(
+                VoiceInkTranscriptionPasteOutputPolicy.cursorPasteTextPlan(
+                    "Hello there",
+                    from: defaults
+                ).shouldReadCursorContext
+            )
+        }
+    }
+
+    func testAppendTrailingSpacePreferencePreservesStorageAndDefault() {
+        withTemporaryDefaults { defaults in
+            VoiceInkAppendTrailingSpacePreference.clear(from: defaults)
+
+            XCTAssertEqual(VoiceInkUserDefaultsKey.appendTrailingSpace, "AppendTrailingSpace")
+            XCTAssertEqual(VoiceInkAppendTrailingSpacePreference.userDefaultsKey, "AppendTrailingSpace")
+            XCTAssertTrue(VoiceInkAppendTrailingSpacePreference.defaultIsEnabled)
+            XCTAssertEqual(
+                VoiceInkAppendTrailingSpacePreference.registeredDefaults[
+                    VoiceInkAppendTrailingSpacePreference.userDefaultsKey
+                ] as? Bool,
+                true
+            )
+            XCTAssertTrue(VoiceInkAppendTrailingSpacePreference.isEnabled(from: defaults))
+
+            VoiceInkAppendTrailingSpacePreference.saveIsEnabled(false, to: defaults)
+            XCTAssertFalse(VoiceInkAppendTrailingSpacePreference.isEnabled(from: defaults))
+        }
+    }
+
+    func testAppendTrailingSpacePreferencePreservesMacOSSettingsPresentation() {
+        let presentation = VoiceInkAppendTrailingSpacePreference.macOSSettingsPresentation
+
+        XCTAssertEqual(presentation.toggleTitle, "Add Space After Paste")
+        XCTAssertEqual(presentation.helpText, "Add a trailing space after pasted transcription output.")
+    }
+
+    func testCursorTextContextPolicyPreservesMacOSAccessibilityReadBounds() {
+        XCTAssertEqual(VoiceInkCursorTextContextPolicy.defaultMaximumLength, 240)
+        XCTAssertEqual(VoiceInkCursorTextContextPolicy.parentTraversalLimit, 4)
+        XCTAssertTrue(VoiceInkCursorTextContextPolicy.shouldAttemptRead(maximumLength: 1))
+        XCTAssertFalse(VoiceInkCursorTextContextPolicy.shouldAttemptRead(maximumLength: 0))
+        XCTAssertFalse(VoiceInkCursorTextContextPolicy.shouldAttemptRead(maximumLength: -1))
+    }
+
+    func testCursorTextContextPolicyOwnsTextInputRoles() {
+        XCTAssertTrue(VoiceInkCursorTextContextPolicy.isTextInputRole("AXTextField"))
+        XCTAssertTrue(VoiceInkCursorTextContextPolicy.isTextInputRole("AXTextArea"))
+        XCTAssertTrue(VoiceInkCursorTextContextPolicy.isTextInputRole("AXComboBox"))
+        XCTAssertFalse(VoiceInkCursorTextContextPolicy.isTextInputRole("AXButton"))
+        XCTAssertFalse(VoiceInkCursorTextContextPolicy.isTextInputRole(nil))
+    }
+
+    func testCursorTextContextPolicyBoundsPrefixLength() {
+        XCTAssertEqual(
+            VoiceInkCursorTextContextPolicy.prefixLength(cursorLocation: 120, maximumLength: 240),
+            120
+        )
+        XCTAssertEqual(
+            VoiceInkCursorTextContextPolicy.prefixLength(cursorLocation: 300, maximumLength: 240),
+            240
+        )
+        XCTAssertEqual(
+            VoiceInkCursorTextContextPolicy.prefixLength(cursorLocation: 0, maximumLength: 240),
+            0
+        )
+        XCTAssertNil(VoiceInkCursorTextContextPolicy.prefixLength(cursorLocation: -1, maximumLength: 240))
+        XCTAssertNil(VoiceInkCursorTextContextPolicy.prefixLength(cursorLocation: 1, maximumLength: 0))
+    }
+
+    func testCursorTextContextPolicyBoundsValueSuffixToTextInputRoles() {
+        XCTAssertEqual(
+            VoiceInkCursorTextContextPolicy.valueSuffix(
+                from: "hello",
+                role: "AXTextField",
+                maximumLength: 10
+            ),
+            "hello"
+        )
+        XCTAssertEqual(
+            VoiceInkCursorTextContextPolicy.valueSuffix(
+                from: "hello world",
+                role: "AXTextArea",
+                maximumLength: 5
+            ),
+            "world"
+        )
+        XCTAssertNil(
+            VoiceInkCursorTextContextPolicy.valueSuffix(
+                from: "hello",
+                role: "AXButton",
+                maximumLength: 10
+            )
+        )
+        XCTAssertNil(
+            VoiceInkCursorTextContextPolicy.valueSuffix(
+                from: "hello",
+                role: "AXTextField",
+                maximumLength: 0
+            )
+        )
+    }
+
     func testPasteMethodPreservesRawValuesAndDisplayNames() {
         XCTAssertEqual(VoiceInkPasteMethod.standard.rawValue, "default")
         XCTAssertEqual(VoiceInkPasteMethod.appleScript.rawValue, "appleScript")

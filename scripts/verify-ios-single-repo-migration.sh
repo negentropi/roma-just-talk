@@ -19873,19 +19873,31 @@ reject_pattern \
   '"(Copy System Info|Copied!|doc\.on\.doc|checkmark)"|deadline: \.now\(\) \+ 1\.5' \
   VoiceInk/Views/Metrics/MetricsContent.swift
 
-require_patterns \
+require_voiceink_core_check_runner_invocations \
   "core checks execute system information report tests" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'SystemInformationReportTests\.testSystemArchitecturePreservesMacOSDisplayNameForCompileTarget' \
-  'SystemInformationReportTests\.testSystemArchitectureIntelMacPredicateMatchesCompileTarget' \
-  'SystemInformationReportTests\.testMacOSSystemInformationReportPreservesSectionOrderAndLabels' \
-  'SystemInformationReportTests\.testMacOSSystemInformationReportKeepsRollingBufferBlockVerbatim' \
-  'SystemInformationReportTests\.testAvailableAudioDevicesTextPreservesMacOSDiagnosticsListPolicy' \
-  'SystemInformationReportTests\.testKnownTextPreservesMacOSUnknownFallback' \
-  'SystemInformationReportTests\.testGeneratedDateTextPreservesMacOSFormattingStyle' \
-  'SystemInformationReportTests\.testPermissionStatusPresentationPreservesMacOSDiagnosticsCopy' \
-  'SystemInformationReportTests\.testLicenseStatusPresentationPreservesMacOSDiagnosticsCopy' \
-  'SystemInformationReportTests\.testSystemInformationCopyPresentationPreservesDashboardButtonPolicy'
+  SystemInformationReportTests \
+  testSystemArchitecturePreservesMacOSDisplayNameForCompileTarget \
+  testSystemArchitectureIntelMacPredicateMatchesCompileTarget \
+  testMacOSSystemInformationReportPreservesSectionOrderAndLabels \
+  testMacOSSystemInformationReportKeepsRollingBufferBlockVerbatim \
+  testAvailableAudioDevicesTextPreservesMacOSDiagnosticsListPolicy \
+  testKnownTextPreservesMacOSUnknownFallback \
+  testGeneratedDateTextPreservesMacOSFormattingStyle \
+  testPermissionStatusPresentationPreservesMacOSDiagnosticsCopy \
+  testLicenseStatusPresentationPreservesMacOSDiagnosticsCopy \
+  testSystemInformationCopyPresentationPreservesDashboardButtonPolicy \
+  testDiagnosticsSettingsPresentationPreservesMacOSCopyAndIcons \
+  testDiagnosticLogExportPolicyPreservesMacOSStorageAndFormattingConstants \
+  testDiagnosticLogExportPolicyLoadsAndSavesStoredSessionStartDates \
+  testDiagnosticLogExportPolicyFallsBackToEmptyStoredSessionsForInvalidData \
+  testDiagnosticLogExportPolicyPrependsCurrentSessionAndKeepsThreeMostRecent \
+  testDiagnosticLogExportPolicyBuildsSessionRangesWithCurrentMiddleAndOldestLabels \
+  testDiagnosticLogExportPolicyBuildsSingleSessionRangeLabel \
+  testDiagnosticLogExportPolicyBuildsHeaderSessionHeaderAndLogLines \
+  testDiagnosticLogExportPolicyBuildsExportContentWithLineBreaks \
+  testDiagnosticLogExportPolicyOwnsOSLogLevelLabels \
+  testDiagnosticLogExportPolicyBuildsMacOSExportFileName \
+  testDiagnosticLogExportPolicyBuildsDownloadsUnavailableError
 
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/SystemArchitectureTests.swift
 
@@ -20041,12 +20053,43 @@ reject_pattern \
   VoiceInk/Views/AudioTranscribeView.swift \
   VoiceInk/VoiceInk.swift
 
-require_file VoiceInkCore/Sources/VoiceInkCore/DiagnosticLogExportPolicy.swift
+section "obsolete standalone diagnostic log export policy module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/DiagnosticLogExportPolicy.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/DiagnosticLogExportPolicyTests.swift
+
+reject_pattern \
+  "core package/project metadata and runner avoid obsolete diagnostic log export files/tests" \
+  'DiagnosticLogExportPolicy(Tests)?\.swift|DiagnosticLogExportPolicyTests' \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_swift_pattern \
+  "VoiceInkCore tests avoid stale DiagnosticLogExportPolicyTests references" \
+  '\bDiagnosticLogExportPolicyTests\b' \
+  VoiceInkCore/Tests/VoiceInkCoreTests
 
 require_pattern \
-  "shared diagnostic log export policy lives in VoiceInkCore" \
+  "shared diagnostic log export policy lives with system information in VoiceInkCore" \
   'VoiceInkDiagnosticsSettingsPresentation|VoiceInkDiagnosticLogExportPolicy|VoiceInkDiagnosticLogSessionRange|sessionStartDatesKey = "logExporter\.sessionStartDates\.v1"|maxSessionStartDatesToKeep = 3|timestampDateFormat = "yyyy-MM-dd HH:mm:ss\.SSS"|fileNameDateFormat = "yyyy-MM-dd_HH-mm-ss"|fileNamePrefix = "VoiceInk_Logs_"|headerTitle = "=== VoiceInk Diagnostic Logs ==="|noLogsFoundMessage = "No logs found for this session\."|exporterErrorDomain = "LogExporter"|downloadsDirectoryUnavailableErrorCode = 1|downloadsDirectoryUnavailableDescription = "Downloads directory unavailable"|sessionRanges|headerLines|logEntryLine|exportContent|logLevelLabel|fileName|downloadsDirectoryUnavailableError|rollingBufferLastClaimLabel|exportFailedAlertTitle|exportedLogSuccessSystemImageName' \
-  VoiceInkCore/Sources/VoiceInkCore/DiagnosticLogExportPolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/SystemInformationReport.swift
+
+require_patterns \
+  "system information report tests cover diagnostic log export policy" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/SystemInformationReportTests.swift \
+  'func testDiagnosticsSettingsPresentationPreservesMacOSCopyAndIcons' \
+  'func testDiagnosticLogExportPolicyPreservesMacOSStorageAndFormattingConstants' \
+  'func testDiagnosticLogExportPolicyLoadsAndSavesStoredSessionStartDates' \
+  'func testDiagnosticLogExportPolicyFallsBackToEmptyStoredSessionsForInvalidData' \
+  'func testDiagnosticLogExportPolicyPrependsCurrentSessionAndKeepsThreeMostRecent' \
+  'func testDiagnosticLogExportPolicyBuildsSessionRangesWithCurrentMiddleAndOldestLabels' \
+  'func testDiagnosticLogExportPolicyBuildsSingleSessionRangeLabel' \
+  'func testDiagnosticLogExportPolicyBuildsHeaderSessionHeaderAndLogLines' \
+  'func testDiagnosticLogExportPolicyBuildsExportContentWithLineBreaks' \
+  'func testDiagnosticLogExportPolicyOwnsOSLogLevelLabels' \
+  'func testDiagnosticLogExportPolicyBuildsMacOSExportFileName' \
+  'func testDiagnosticLogExportPolicyBuildsDownloadsUnavailableError'
 
 require_patterns \
   "macOS diagnostics settings uses shared diagnostics presentation" \
@@ -20070,13 +20113,8 @@ require_pattern \
   VoiceInk/Services/LogExporter.swift
 
 require_pattern \
-  "core checks execute diagnostic log export policy tests" \
-  'DiagnosticLogExportPolicyTests\.testDiagnosticsSettingsPresentationPreservesMacOSCopyAndIcons|DiagnosticLogExportPolicyTests\.testDiagnosticLogExportPolicyPreservesMacOSStorageAndFormattingConstants|DiagnosticLogExportPolicyTests\.testDiagnosticLogExportPolicyBuildsSessionRangesWithCurrentMiddleAndOldestLabels|DiagnosticLogExportPolicyTests\.testDiagnosticLogExportPolicyBuildsExportContentWithLineBreaks|DiagnosticLogExportPolicyTests\.testDiagnosticLogExportPolicyOwnsOSLogLevelLabels|DiagnosticLogExportPolicyTests\.testDiagnosticLogExportPolicyBuildsMacOSExportFileName|DiagnosticLogExportPolicyTests\.testDiagnosticLogExportPolicyBuildsDownloadsUnavailableError' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
-
-require_pattern \
   "migration checklist tracks shared diagnostics settings presentation" \
-  'diagnostic log session storage/range/header/file-content/filename/error policy, diagnostic settings copy/icons.*VoiceInkDiagnosticLogExportPolicy`/`VoiceInkDiagnosticsSettingsPresentation' \
+  'diagnostic log session storage/range/header/file-content/filename/error policy, diagnostic settings copy/icons.*VoiceInkDiagnosticLogExportPolicy`/`VoiceInkDiagnosticsSettingsPresentation.*standalone `DiagnosticLogExportPolicy\.swift` stays deleted' \
   docs/ios-single-repo-migration.md
 
 reject_pattern \

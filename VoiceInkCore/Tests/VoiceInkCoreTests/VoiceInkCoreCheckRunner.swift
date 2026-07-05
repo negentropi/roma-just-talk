@@ -1807,13 +1807,13 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testModelOperationAlertPreservesIOSServerAndMissingFileCopy", run: { WhisperModelFilesTests().testModelOperationAlertPreservesIOSServerAndMissingFileCopy() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testModelOperationAlertPreservesIOSSaveAndDeleteFailureCopy", run: { WhisperModelFilesTests().testModelOperationAlertPreservesIOSSaveAndDeleteFailureCopy() }),
             VoiceInkCoreCheck(name: "WhisperModelFilesTests.testDownloadableModelsMatchMacOSLocalWhisperCatalog", run: { WhisperModelFilesTests().testDownloadableModelsMatchMacOSLocalWhisperCatalog() }),
-            VoiceInkCoreCheck(name: "WordAgreementEngineTests.testTimedWordNormalizesCaseHyphenAndPunctuationForAgreement", run: { WordAgreementEngineTests().testTimedWordNormalizesCaseHyphenAndPunctuationForAgreement() }),
-            VoiceInkCoreCheck(name: "WordAgreementEngineTests.testFirstPassReturnsHypothesisWithoutConfirmation", run: { WordAgreementEngineTests().testFirstPassReturnsHypothesisWithoutConfirmation() }),
-            VoiceInkCoreCheck(name: "WordAgreementEngineTests.testStableAgreementConfirmsThroughThirdLatestSentenceBoundary", run: { WordAgreementEngineTests().testStableAgreementConfirmsThroughThirdLatestSentenceBoundary() }),
-            VoiceInkCoreCheck(name: "WordAgreementEngineTests.testLowConfidencePassDoesNotCountTowardConfirmation", run: { WordAgreementEngineTests().testLowConfidencePassDoesNotCountTowardConfirmation() }),
-            VoiceInkCoreCheck(name: "WordAgreementEngineTests.testLowBoundaryWordConfidencePreventsConfirmation", run: { WordAgreementEngineTests().testLowBoundaryWordConfidencePreventsConfirmation() }),
-            VoiceInkCoreCheck(name: "WordAgreementEngineTests.testResetClearsAgreementState", run: { WordAgreementEngineTests().testResetClearsAgreementState() }),
-            VoiceInkCoreCheck(name: "WordAgreementEngineTests.testRollingPreloadConfigPreservesExistingStreamingValues", run: { WordAgreementEngineTests().testRollingPreloadConfigPreservesExistingStreamingValues() }),
+            VoiceInkCoreCheck(name: "TranscriptionStreamingPreferenceTests.testTimedWordNormalizesCaseHyphenAndPunctuationForAgreement", run: { TranscriptionStreamingPreferenceTests().testTimedWordNormalizesCaseHyphenAndPunctuationForAgreement() }),
+            VoiceInkCoreCheck(name: "TranscriptionStreamingPreferenceTests.testFirstPassReturnsHypothesisWithoutConfirmation", run: { TranscriptionStreamingPreferenceTests().testFirstPassReturnsHypothesisWithoutConfirmation() }),
+            VoiceInkCoreCheck(name: "TranscriptionStreamingPreferenceTests.testStableAgreementConfirmsThroughThirdLatestSentenceBoundary", run: { TranscriptionStreamingPreferenceTests().testStableAgreementConfirmsThroughThirdLatestSentenceBoundary() }),
+            VoiceInkCoreCheck(name: "TranscriptionStreamingPreferenceTests.testLowConfidencePassDoesNotCountTowardConfirmation", run: { TranscriptionStreamingPreferenceTests().testLowConfidencePassDoesNotCountTowardConfirmation() }),
+            VoiceInkCoreCheck(name: "TranscriptionStreamingPreferenceTests.testLowBoundaryWordConfidencePreventsConfirmation", run: { TranscriptionStreamingPreferenceTests().testLowBoundaryWordConfidencePreventsConfirmation() }),
+            VoiceInkCoreCheck(name: "TranscriptionStreamingPreferenceTests.testResetClearsAgreementState", run: { TranscriptionStreamingPreferenceTests().testResetClearsAgreementState() }),
+            VoiceInkCoreCheck(name: "TranscriptionStreamingPreferenceTests.testRollingPreloadConfigPreservesExistingStreamingValues", run: { TranscriptionStreamingPreferenceTests().testRollingPreloadConfigPreservesExistingStreamingValues() }),
         ]
 
         for check in checks {

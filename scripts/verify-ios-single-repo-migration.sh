@@ -11231,6 +11231,54 @@ require_pattern \
   'VoiceInkFluidAudioTranscriptionPolicy\.(shouldScheduleImmediatePass|shouldRunTranscriptionPass|seekSample|bufferRelativeSeek|paddedSamplesForTranscription|cachedFinalTextPlan)' \
   VoiceInk/Transcription/Streaming/FluidAudioStreamingProvider.swift
 
+section "obsolete standalone FluidAudio word agreement source and tests stay folded"
+reject_file VoiceInkCore/Sources/VoiceInkCore/WordAgreementEngine.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/WordAgreementEngineTests.swift
+
+reject_pattern \
+  "core package/project metadata avoid obsolete standalone word agreement files" \
+  'WordAgreementEngine(Tests)?\.swift|WordAgreementEngineTests' \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
+
+require_patterns \
+  "shared FluidAudio word agreement policy lives with streaming preference" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionStreamingPreference.swift \
+  'public struct TimedWord: Equatable, Sendable' \
+  'public struct AgreementConfig: Equatable, Sendable' \
+  'public static var rollingPreload: AgreementConfig' \
+  'public struct AgreementResult: Equatable, Sendable' \
+  'public final class WordAgreementEngine' \
+  'public func processTranscriptionResult\(words: \[TimedWord\], resultConfidence: Float = 1\.0\) -> AgreementResult'
+
+require_patterns \
+  "streaming preference tests cover FluidAudio word agreement policy" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionStreamingPreferenceTests.swift \
+  'func testTimedWordNormalizesCaseHyphenAndPunctuationForAgreement' \
+  'func testFirstPassReturnsHypothesisWithoutConfirmation' \
+  'func testStableAgreementConfirmsThroughThirdLatestSentenceBoundary' \
+  'func testLowConfidencePassDoesNotCountTowardConfirmation' \
+  'func testLowBoundaryWordConfidencePreventsConfirmation' \
+  'func testResetClearsAgreementState' \
+  'func testRollingPreloadConfigPreservesExistingStreamingValues'
+
+require_voiceink_core_check_runner_invocations \
+  "core checks execute FluidAudio word agreement policy through streaming preference suite" \
+  TranscriptionStreamingPreferenceTests \
+  testTimedWordNormalizesCaseHyphenAndPunctuationForAgreement \
+  testFirstPassReturnsHypothesisWithoutConfirmation \
+  testStableAgreementConfirmsThroughThirdLatestSentenceBoundary \
+  testLowConfidencePassDoesNotCountTowardConfirmation \
+  testLowBoundaryWordConfidencePreventsConfirmation \
+  testResetClearsAgreementState \
+  testRollingPreloadConfigPreservesExistingStreamingValues
+
+reject_swift_pattern \
+  "core checks avoid obsolete FluidAudio word agreement suite references" \
+  '\bWordAgreementEngineTests\b' \
+  VoiceInkCore/Tests/VoiceInkCoreTests
+
 reject_swift_pattern \
   "core checks avoid obsolete FluidAudio transcription policy suite references" \
   '\bFluidAudioTranscriptionPolicyTests\b' \
@@ -11262,7 +11310,7 @@ require_patterns \
 
 require_pattern \
   "migration checklist tracks shared FluidAudio local ASR policy" \
-  'FluidAudio batch/streaming adapters consume shared local ASR pass scheduling, seek, cached-final, trailing-silence padding policy, and download status presentation' \
+  'FluidAudio local ASR transcription policy, including `TimedWord`, `AgreementConfig`, `AgreementResult`, and `WordAgreementEngine` stable partial-transcript confirmation, streaming pass scheduling, seek math, cached-final hypothesis freshness, trailing-silence padding, and model-download status/percent presentation, lives in the shared streaming-preference module' \
   docs/ios-single-repo-migration.md
 
 reject_pattern \

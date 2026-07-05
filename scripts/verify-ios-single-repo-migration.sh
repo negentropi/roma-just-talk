@@ -12061,9 +12061,7 @@ require_pattern \
   'VoiceInkMacOSLocalCLISettingsPresentation|macOSSettingsPresentation|VoiceInkLocalCLITemplate|VoiceInkLocalCLIExecutionError|VoiceInkLocalCLIPreference|commandTemplateKey = "localCLICommandTemplate"|selectedTemplateKey = "localCLISelectedTemplate"|timeoutSecondsKey = "localCLITimeoutSeconds"|defaultTimeoutSeconds|timeoutOptions|boundedTimeoutSeconds|isCommandConfigured|cleanedOutput|commandFailureError|fullPrompt' \
   VoiceInkCore/Sources/VoiceInkCore/LocalCLIConfiguration.swift
 
-reject_file \
-  "obsolete standalone Local CLI configuration suite stays deleted" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/LocalCLIConfigurationTests.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/LocalCLIConfigurationTests.swift
 
 require_patterns \
   "core AI provider catalog suite owns Local CLI configuration coverage" \

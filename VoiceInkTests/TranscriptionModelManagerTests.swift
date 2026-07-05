@@ -3,13 +3,11 @@ import Testing
 @testable import VoiceInk
 
 private final class ModelChangeNotificationRecorder: NSObject {
-    private(set) var modelNames: [String] = []
+    private(set) var modelChangeCount = 0
     private(set) var settingsChangeCount = 0
 
     @objc func modelDidChange(_ notification: Notification) {
-        if let modelName = notification.userInfo?["modelName"] as? String {
-            modelNames.append(modelName)
-        }
+        modelChangeCount += 1
     }
 
     @objc func settingsDidChange(_ notification: Notification) {
@@ -56,7 +54,7 @@ struct TranscriptionModelManagerTests {
         modelManager.loadCurrentTranscriptionModel()
 
         #expect(modelManager.currentTranscriptionModel?.name == "ggml-tiny")
-        #expect(recorder.modelNames.contains("ggml-tiny"))
+        #expect(recorder.modelChangeCount >= 1)
         #expect(recorder.settingsChangeCount >= 1)
     }
 

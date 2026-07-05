@@ -93,15 +93,11 @@ class TranscriptionModelManager: ObservableObject {
             .modelSelectionLocalWhisperRuntimeUpdate
         applyLocalWhisperRuntimeUpdate(localWhisperRuntimeUpdate)
 
-        notifyCurrentModelDidChange(model)
+        notifyCurrentModelDidChange()
     }
 
-    private func notifyCurrentModelDidChange(_ model: any TranscriptionModel) {
-        NotificationCenter.default.post(
-            name: .didChangeModel,
-            object: nil,
-            userInfo: ["modelName": model.name]
-        )
+    private func notifyCurrentModelDidChange() {
+        NotificationCenter.default.post(name: .didChangeModel, object: nil)
         NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
     }
 

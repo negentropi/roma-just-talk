@@ -18978,24 +18978,24 @@ require_patterns \
   'VoiceInkMiniRecorderRequest\.dismissNotificationName\.rawValue, "dismissMiniRecorder"'
 
 require_patterns \
-  "macOS mini-recorder intents use shared presentation" \
+  "macOS toggle-recorder intent keeps metadata literals aligned with shared presentation" \
   VoiceInk/AppIntents/ToggleMiniRecorderIntent.swift \
   'VoiceInkMiniRecorderAppIntentPresentation\.toggle' \
-  'LocalizedStringResource\(stringLiteral: presentation\.title\)' \
-  'IntentDescription\(stringLiteral: presentation\.description\)' \
+  'static var title: LocalizedStringResource = "Toggle VoiceInk Recorder"' \
+  'static var description = IntentDescription\("Start or stop the VoiceInk mini recorder for voice transcription\."\)' \
   'IntentDialog\(stringLiteral: Self\.presentation\.successDialog\)'
 
 require_patterns \
-  "macOS dismiss-recorder intent uses shared presentation" \
+  "macOS dismiss-recorder intent keeps metadata literals aligned with shared presentation" \
   VoiceInk/AppIntents/DismissMiniRecorderIntent.swift \
   'VoiceInkMiniRecorderAppIntentPresentation\.dismiss' \
-  'LocalizedStringResource\(stringLiteral: presentation\.title\)' \
-  'IntentDescription\(stringLiteral: presentation\.description\)' \
+  'static var title: LocalizedStringResource = "Dismiss VoiceInk Recorder"' \
+  'static var description = IntentDescription\("Dismiss the VoiceInk mini recorder and cancel any active recording\."\)' \
   'IntentDialog\(stringLiteral: Self\.presentation\.successDialog\)'
 
 reject_pattern \
-  "macOS mini-recorder intents avoid shell-owned presentation copy and stale error wrapper" \
-  '"(Toggle VoiceInk Recorder|Start or stop the VoiceInk mini recorder for voice transcription\.|VoiceInk recorder toggled|Dismiss VoiceInk Recorder|Dismiss the VoiceInk mini recorder and cancel any active recording\.|VoiceInk recorder dismissed|VoiceInk app is not available|VoiceInk recording service is not available)"|enum +IntentError|import AppKit' \
+  "macOS mini-recorder intents avoid shell-owned success copy and stale error wrapper" \
+  '"(VoiceInk recorder toggled|VoiceInk recorder dismissed|VoiceInk app is not available|VoiceInk recording service is not available)"|enum +IntentError|import AppKit' \
   VoiceInk/AppIntents/ToggleMiniRecorderIntent.swift \
   VoiceInk/AppIntents/DismissMiniRecorderIntent.swift
 

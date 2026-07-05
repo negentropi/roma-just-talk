@@ -6796,10 +6796,14 @@ require_patterns \
   'modelProvider\.acceptsRemoteTranscriptionText' \
   'modelProvider\.apiErrorDomain'
 
-require_pattern \
+require_patterns \
   "core checks execute macOS cloud transcription policy tests" \
-  'RemoteProviderRequestTests\.testMacOSCloudTranscriptionPolicyBuildsSharedTransportRequest|RemoteProviderRequestTests\.testMacOSCloudTranscriptionPolicyRejectsBlankAPIKeyBeforeTransport|RemoteProviderRequestTests\.testMacOSCloudTranscriptionPolicyRejectsUnsupportedBatchProvider|RemoteProviderRequestTests\.testMacOSCloudTranscriptionPolicyMapsProviderHTTPNSError|RemoteProviderRequestTests\.testMacOSCloudTranscriptionPolicyMapsUnknownErrorsToNetworkError' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'RemoteProviderRequestTests\.testMacOSCloudTranscriptionPolicyBuildsSharedTransportRequest' \
+  'RemoteProviderRequestTests\.testMacOSCloudTranscriptionPolicyRejectsBlankAPIKeyBeforeTransport' \
+  'RemoteProviderRequestTests\.testMacOSCloudTranscriptionPolicyRejectsUnsupportedBatchProvider' \
+  'RemoteProviderRequestTests\.testMacOSCloudTranscriptionPolicyMapsProviderHTTPNSError' \
+  'RemoteProviderRequestTests\.testMacOSCloudTranscriptionPolicyMapsUnknownErrorsToNetworkError'
 
 require_pattern \
   "macOS batch cloud transcription uses shared execution policy" \
@@ -7324,10 +7328,12 @@ require_pattern \
   'VoiceInkCustomCloudTranscriptionPolicy\.transcribeAudioData' \
   VoiceInk/Transcription/Cloud/CloudTranscriptionService.swift
 
-require_pattern \
+require_patterns \
   "core checks execute custom cloud transcription policy tests" \
-  'CustomCloudModelPolicyTests\.testCustomCloudTranscriptionPolicyPreservesOpenAICompatibleRequestDefaults|CustomCloudModelPolicyTests\.testCustomCloudTranscriptionPolicyClassifiesEndpointAndText|CustomCloudModelPolicyTests\.testCustomCloudTranscriptionPolicyMapsInvalidEndpointToNetworkError' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'CustomCloudModelPolicyTests\.testCustomCloudTranscriptionPolicyPreservesOpenAICompatibleRequestDefaults' \
+  'CustomCloudModelPolicyTests\.testCustomCloudTranscriptionPolicyClassifiesEndpointAndText' \
+  'CustomCloudModelPolicyTests\.testCustomCloudTranscriptionPolicyMapsInvalidEndpointToNetworkError'
 
 require_pattern \
   "core checks execute custom cloud model storage round-trip test" \
@@ -7344,10 +7350,11 @@ require_pattern \
   'CustomCloudModelPolicyTests\.testCustomCloudModelStorageDiagnosticsPreserveMacOSLogCopy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
-require_pattern \
+require_patterns \
   "core checks execute custom cloud model backup import plan tests" \
-  'CustomCloudModelPolicyTests\.testBackupImportCollectionPlanAppliesRuntimeStateInMacOSOrder|CustomCloudModelPolicyTests\.testBackupImportCollectionPlanReportsMissingCustomModelsOnly' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'CustomCloudModelPolicyTests\.testBackupImportCollectionPlanAppliesRuntimeStateInMacOSOrder' \
+  'CustomCloudModelPolicyTests\.testBackupImportCollectionPlanReportsMissingCustomModelsOnly'
 
 reject_pattern \
   "macOS custom cloud transcription avoids shell-owned request policy" \
@@ -10124,10 +10131,14 @@ require_patterns \
   'VoiceInkCloudTranscriptionError\.remoteExecutionFailure' \
   'VoiceInkCloudTranscriptionError\.networkError'
 
-require_pattern \
+require_patterns \
   "core checks execute custom cloud transcription execution tests" \
-  'CustomCloudModelPolicyTests\.testCustomCloudTranscriptionPolicyBuildsSharedTransportRequest|CustomCloudModelPolicyTests\.testCustomCloudTranscriptionPolicyRejectsEmptyTransportText|CustomCloudModelPolicyTests\.testCustomCloudTranscriptionPolicyMapsHTTPNSError|CustomCloudModelPolicyTests\.testCustomCloudTranscriptionPolicyMapsUnknownErrorsToNetworkError|CustomCloudModelPolicyTests\.testCustomCloudTranscriptionPolicyMapsInvalidEndpointToNetworkError' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'CustomCloudModelPolicyTests\.testCustomCloudTranscriptionPolicyBuildsSharedTransportRequest' \
+  'CustomCloudModelPolicyTests\.testCustomCloudTranscriptionPolicyRejectsEmptyTransportText' \
+  'CustomCloudModelPolicyTests\.testCustomCloudTranscriptionPolicyMapsHTTPNSError' \
+  'CustomCloudModelPolicyTests\.testCustomCloudTranscriptionPolicyMapsUnknownErrorsToNetworkError' \
+  'CustomCloudModelPolicyTests\.testCustomCloudTranscriptionPolicyMapsInvalidEndpointToNetworkError'
 
 require_pattern \
   "macOS custom cloud transcription uses shared execution policy" \

@@ -18406,7 +18406,16 @@ require_patterns \
 require_pattern \
   "shared session metric policy uses shared word counter" \
   'VoiceInkWordCounter\.count\(in: textForCounting\(from: source\)\)' \
-  VoiceInkCore/Sources/VoiceInkCore/SessionMetricPolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/DashboardMetrics.swift
+
+section "obsolete standalone session metric policy module/tests stay deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/SessionMetricPolicy.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/SessionMetricPolicyTests.swift
+
+reject_swift_pattern \
+  "core tests avoid obsolete session metric policy test suite references" \
+  '\bSessionMetricPolicyTests\b' \
+  VoiceInkCore/Tests/VoiceInkCoreTests
 
 require_patterns \
   "word-counter behavior tests live with transcription run preparation tests" \
@@ -18435,17 +18444,17 @@ require_patterns \
 require_pattern \
   "shared session metric migration preference lives in VoiceInkCore" \
   'VoiceInkSessionMetricDraft|recorderSource = "recorder"|completedTranscriptionStatusRawValue|VoiceInkSessionMetricMigrationPreference|completionKey = "HasCompletedStatsMigration"' \
-  VoiceInkCore/Sources/VoiceInkCore/SessionMetricPolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/DashboardMetrics.swift
 
 require_pattern \
   "shared session metric migration diagnostics live in VoiceInkCore" \
   'VoiceInkSessionMetricMigrationDiagnostics|completedMessage|failedMessage|Completed stats migration with|Stats migration failed:' \
-  VoiceInkCore/Sources/VoiceInkCore/SessionMetricPolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/DashboardMetrics.swift
 
 require_pattern \
   "shared session metric recorder diagnostics live in VoiceInkCore" \
   'VoiceInkSessionMetricRecorderDiagnostics|recordedSessionMetricMessage|Recorded session metric for transcription' \
-  VoiceInkCore/Sources/VoiceInkCore/SessionMetricPolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/DashboardMetrics.swift
 
 require_pattern \
   "macOS session metric model adapts shared draft" \
@@ -18501,10 +18510,10 @@ reject_pattern \
 require_patterns \
   "core checks execute session metric draft and migration preference tests" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'SessionMetricPolicyTests\.testRecorderDraftPreservesSourceAndMetricFields' \
-  'SessionMetricPolicyTests\.testMigrationPreferencePreservesCompletionStorageKey' \
-  'SessionMetricPolicyTests\.testMigrationDiagnosticsPreserveMacOSLogCopy' \
-  'SessionMetricPolicyTests\.testRecorderDiagnosticsPreserveMacOSLogCopy'
+  'DashboardMetricsTests\.testRecorderDraftPreservesSourceAndMetricFields' \
+  'DashboardMetricsTests\.testMigrationPreferencePreservesCompletionStorageKey' \
+  'DashboardMetricsTests\.testMigrationDiagnosticsPreserveMacOSLogCopy' \
+  'DashboardMetricsTests\.testRecorderDiagnosticsPreserveMacOSLogCopy'
 
 require_pattern \
   "migration checklist tracks shared session metric migration preference" \

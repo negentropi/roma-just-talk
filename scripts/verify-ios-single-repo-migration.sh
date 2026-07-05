@@ -12408,44 +12408,28 @@ require_pattern \
   'AIProviderCatalogTests\.testMacOSAIEnhancementModelPickerPresentationIsShared' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
-require_patterns \
+require_voiceink_core_check_runner_invocations \
   "core checks execute folded Power Mode presentation tests through policy suite" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'name: "PowerModePolicyTests\.testDisplayNameTrimsAndCombinesEmojiAndName"' \
-  'PowerModePolicyTests\(\)\.testDisplayNameTrimsAndCombinesEmojiAndName\(\)' \
-  'name: "PowerModePolicyTests\.testSelectedLanguageDisplayTextPreservesPowerModeRowFallbacks"' \
-  'PowerModePolicyTests\(\)\.testSelectedLanguageDisplayTextPreservesPowerModeRowFallbacks\(\)' \
-  'name: "PowerModePolicyTests\.testTriggerCountTextPreservesPowerModeRowPluralization"' \
-  'PowerModePolicyTests\(\)\.testTriggerCountTextPreservesPowerModeRowPluralization\(\)' \
-  'name: "PowerModePolicyTests\.testPanelAndSidebarChromePreservesMacOSCopy"' \
-  'PowerModePolicyTests\(\)\.testPanelAndSidebarChromePreservesMacOSCopy\(\)' \
-  'name: "PowerModePolicyTests\.testPopoverAndRowActionChromePreservesMacOSCopy"' \
-  'PowerModePolicyTests\(\)\.testPopoverAndRowActionChromePreservesMacOSCopy\(\)' \
-  'name: "PowerModePolicyTests\.testRecorderButtonIconPreservesActiveEmojiFallbacks"' \
-  'PowerModePolicyTests\(\)\.testRecorderButtonIconPreservesActiveEmojiFallbacks\(\)' \
-  'name: "PowerModePolicyTests\.testConfigurationFormChromePreservesMacOSCopy"' \
-  'PowerModePolicyTests\(\)\.testConfigurationFormChromePreservesMacOSCopy\(\)' \
-  'name: "PowerModePolicyTests\.testDeleteConfirmationPreservesPowerModeCopy"' \
-  'PowerModePolicyTests\(\)\.testDeleteConfirmationPreservesPowerModeCopy\(\)' \
-  'name: "PowerModePolicyTests\.testValidationAlertPreservesFirstPowerModeErrorCopy"' \
-  'PowerModePolicyTests\(\)\.testValidationAlertPreservesFirstPowerModeErrorCopy\(\)' \
-  'name: "PowerModePolicyTests\.testValidationAlertPreservesFallbackCopy"' \
-  'PowerModePolicyTests\(\)\.testValidationAlertPreservesFallbackCopy\(\)' \
-  'name: "PowerModePolicyTests\.testNoTranscriptionModelsAvailableTextPreservesMacOSFormCopy"' \
-  'PowerModePolicyTests\(\)\.testNoTranscriptionModelsAvailableTextPreservesMacOSFormCopy\(\)' \
-  'name: "PowerModePolicyTests\.testAIEnhancementEmptyStateTextPreservesMacOSFormCopy"' \
-  'PowerModePolicyTests\(\)\.testAIEnhancementEmptyStateTextPreservesMacOSFormCopy\(\)' \
-  'name: "PowerModePolicyTests\.testAIEnhancementFormChromePreservesMacOSCopy"' \
-  'PowerModePolicyTests\(\)\.testAIEnhancementFormChromePreservesMacOSCopy\(\)' \
-  'name: "PowerModePolicyTests\.testAdvancedFormChromePreservesMacOSCopy"' \
-  'PowerModePolicyTests\(\)\.testAdvancedFormChromePreservesMacOSCopy\(\)' \
-  'name: "PowerModePolicyTests\.testRowDetailPresentationPreservesDefaultBandWithoutVisibleChips"' \
-  'PowerModePolicyTests\(\)\.testRowDetailPresentationPreservesDefaultBandWithoutVisibleChips\(\)' \
-  'name: "PowerModePolicyTests\.testRowDetailPresentationPreservesMacOSChipOrderAndText"' \
-  'PowerModePolicyTests\(\)\.testRowDetailPresentationPreservesMacOSChipOrderAndText\(\)' \
-  'name: "PowerModePolicyTests\.testRowDetailPresentationFallsBackToDefaultPromptAndSkipsBlankAIModel"' \
-  'PowerModePolicyTests\(\)\.testRowDetailPresentationFallsBackToDefaultPromptAndSkipsBlankAIModel\(\)'
+  PowerModePolicyTests \
+  testDisplayNameTrimsAndCombinesEmojiAndName \
+  testSelectedLanguageDisplayTextPreservesPowerModeRowFallbacks \
+  testTriggerCountTextPreservesPowerModeRowPluralization \
+  testPanelAndSidebarChromePreservesMacOSCopy \
+  testPopoverAndRowActionChromePreservesMacOSCopy \
+  testRecorderButtonIconPreservesActiveEmojiFallbacks \
+  testConfigurationFormChromePreservesMacOSCopy \
+  testDeleteConfirmationPreservesPowerModeCopy \
+  testValidationAlertPreservesFirstPowerModeErrorCopy \
+  testValidationAlertPreservesFallbackCopy \
+  testNoTranscriptionModelsAvailableTextPreservesMacOSFormCopy \
+  testAIEnhancementEmptyStateTextPreservesMacOSFormCopy \
+  testAIEnhancementFormChromePreservesMacOSCopy \
+  testAdvancedFormChromePreservesMacOSCopy \
+  testRowDetailPresentationPreservesDefaultBandWithoutVisibleChips \
+  testRowDetailPresentationPreservesMacOSChipOrderAndText \
+  testRowDetailPresentationFallsBackToDefaultPromptAndSkipsBlankAIModel
 
+reject_file VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/PowerModePresentationTests.swift
 
 require_pattern \
@@ -12475,7 +12459,7 @@ require_patterns \
 require_pattern \
   "shared Power Mode AI model display policy lives in VoiceInkCore" \
   'shouldShowAIModelOptions' \
-  VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 reject_pattern \
   "shared AI enhancement settings-surface metadata stays hidden" \
@@ -12500,7 +12484,7 @@ reject_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift \
   VoiceInk/PowerMode/PowerModeConfigView.swift \
-  VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 reject_pattern \
   "migration docs avoid stale static model-picker wording" \
@@ -12570,7 +12554,7 @@ require_patterns \
 require_pattern \
   "shared Power Mode model refresh display presentation lives in VoiceInkCore" \
   'shouldShowRefreshModelsButton' \
-  VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
   "macOS Power Mode model section display uses shared presentation" \
@@ -12581,7 +12565,7 @@ reject_pattern \
   "shared Power Mode AI model display metadata stays hidden" \
   'showsTextEnhancementModelOptions|ModelOptionsVisibilityIsShared' \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift \
-  VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift \
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift \
   VoiceInkCore/Tests/VoiceInkCoreTests/AIProviderCatalogTests.swift \
   VoiceInkCore/Tests/VoiceInkCoreTests/PowerModePolicyTests.swift \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
@@ -12980,7 +12964,7 @@ reject_pattern \
   'selectedProvider == \.openRouter|selectedProvider != \.custom|provider == \.openRouter' \
   VoiceInk/Views/AI\ Models/APIKeyManagementView.swift \
   VoiceInk/PowerMode/PowerModeConfigView.swift \
-  VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 reject_pattern \
   "macOS AI settings avoid stale provider settings-surface policy" \
@@ -16901,47 +16885,47 @@ require_pattern \
 require_pattern \
   "shared Power Mode selected-language display formatting lives in VoiceInkCore" \
   'selectedLanguageDisplayText|defaultOverrideDisplayText|autoLanguageDisplayText|englishLanguageDisplayText' \
-  VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
   "shared Power Mode trigger-count display formatting lives in VoiceInkCore" \
   'appTriggerCountText|websiteTriggerCountText' \
-  VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
   "shared Power Mode delete confirmation copy lives in VoiceInkCore" \
   'deleteConfirmationTitle|deleteConfirmation\(configName:' \
-  VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
   "shared Power Mode validation alert copy lives in VoiceInkCore" \
   'validationAlertTitle|validationAlert\(errors:' \
-  VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
   "shared Power Mode no-transcription-models form copy lives in VoiceInkCore" \
   'noTranscriptionModelsAvailableText' \
-  VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
   "shared Power Mode AI-enhancement empty-state copy lives in VoiceInkCore" \
   'noAIProvidersConnectedText|noAIModelsAvailableText|noEnhancementPromptsAvailableText' \
-  VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
   "shared Power Mode row detail presentation lives in VoiceInkCore" \
   'VoiceInkPowerModeRowDetailPresentation|rowDetailPresentation|systemImageName|usesAccentStyle' \
-  VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
   "shared Power Mode panel sidebar popover chrome copy lives in VoiceInkCore" \
   'panelTitle|panelSubtitle|panelInfoTipText|panelLearnMoreURLString|settingsSectionTitle|settingsToggleHelpText|persistConfiguredPreferencesTitle|persistConfiguredPreferencesHelpText|settingsDisableAlertTitle|settingsDisableAlertButtonTitle|settingsDisableAlertMessage|addButtonSystemImageName|reorderButtonTitle|reorderButtonSystemImageName|reorderPanelTitle|reorderPanelCloseHelpText|reorderPanelCloseSystemImageName|reorderHandleSystemImageName|defaultBadgeTitle|disabledBadgeTitle|emptyPanelTitle|emptyPanelSystemImageName|sidebarEmptyTitle|sidebarEmptyButtonTitle|sidebarEmptySystemImageName|addIconButtonSystemImageName|popoverTitle|popoverEmptyTitle|popoverEmptySystemImageName|popoverSelectedSystemImageName|rowEditActionTitle|rowEditActionSystemImageName|rowDeleteActionTitle|rowDeleteActionSystemImageName|appTriggerSystemImageName|websiteTriggerSystemImageName' \
-  VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
   "shared Power Mode config form chrome copy lives in VoiceInkCore" \
   'formCloseSystemImageName|generalSectionTitle|nameFieldPlaceholder|triggerScenariosSectionTitle|applicationsSectionTitle|addApplicationHelpText|noApplicationsText|appPickerSearchPlaceholder|appPickerSearchSystemImageName|appPickerClearSearchSystemImageName|appPickerSelectedSystemImageName|websitesSectionTitle|websiteURLFieldPlaceholder|addWebsiteHelpText|noWebsitesText|appTriggerSystemImageName|websiteTriggerSystemImageName|removeTriggerSystemImageName|transcriptionSectionTitle|transcriptionModelPickerTitle|transcriptionLanguageTitle|autodetectedLanguageText|transcriptFormattingDisclosureSystemImageName|aiEnhancementSectionTitle|advancedSectionTitle|formSaveButtonTitle' \
-  VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
   "shared Power Mode app trigger selection policy lives in VoiceInkCore" \
@@ -17162,7 +17146,7 @@ require_pattern \
 require_pattern \
   "shared Power Mode AI-enhancement form chrome copy lives in VoiceInkCore" \
   'aiProviderFormTitle|aiModelFormTitle|enhancementPromptFormTitle|refreshModelsButtonTitle|refreshModelsButtonHelp|setAsDefaultToggleTitle|setAsDefaultHelpText' \
-  VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
   "macOS Power Mode edit form uses shared AI-enhancement form chrome copy" \
@@ -17172,7 +17156,7 @@ require_pattern \
 require_pattern \
   "shared Power Mode advanced form chrome copy lives in VoiceInkCore" \
   'autoSendFormTitle|autoSendHelpText|keyboardShortcutFormTitle|keyboardShortcutHelpText' \
-  VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
+  VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift
 
 require_pattern \
   "macOS Power Mode edit form uses shared advanced form chrome copy" \

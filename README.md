@@ -54,11 +54,13 @@ Download the latest fork release from [GitHub Releases](https://github.com/happy
 The source app icon now uses the roma-just-talk split-keyboard mark. Published downloads may still show older assets until the next release.
 
 #### Homebrew
-Upstream VoiceInk can also be installed via `brew`:
+Install the fork release via Homebrew:
 
 ```shell
-brew install --cask voiceink
+brew install --cask happyf-weallareeuropean/roma-just-talk/roma-just-talk
 ```
+
+The upstream `voiceink` cask installs upstream VoiceInk, not this fork.
 
 ### Build from Source
 You can build the app yourself by following [BUILDING.md](BUILDING.md).

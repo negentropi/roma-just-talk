@@ -27,31 +27,23 @@ public enum VoiceInkOpenAICompatibleTranscriptionCodec {
         responseFormat: String? = nil,
         temperature: String? = nil
     ) -> Data {
-        let crlf = "\r\n"
-        var body = Data()
-
-        append("--\(boundary)\(crlf)", to: &body)
-        append("Content-Disposition: form-data; name=\"file\"; filename=\"\(fileName)\"\(crlf)", to: &body)
-        append("Content-Type: audio/wav\(crlf)\(crlf)", to: &body)
-        body.append(audioData)
-        append(crlf, to: &body)
-
-        appendField("model", model, boundary: boundary, crlf: crlf, to: &body)
+        var form = VoiceInkMultipartFormData(boundary: boundary)
+        form.addFile(name: "file", fileName: fileName, mimeType: "audio/wav", fileData: audioData)
+        form.addField(name: "model", value: model)
         if let responseFormat, !responseFormat.isEmpty {
-            appendField("response_format", responseFormat, boundary: boundary, crlf: crlf, to: &body)
+            form.addField(name: "response_format", value: responseFormat)
         }
         if let temperature, !temperature.isEmpty {
-            appendField("temperature", temperature, boundary: boundary, crlf: crlf, to: &body)
+            form.addField(name: "temperature", value: temperature)
         }
         if let language, !language.isEmpty {
-            appendField("language", language, boundary: boundary, crlf: crlf, to: &body)
+            form.addField(name: "language", value: language)
         }
         if let prompt, !prompt.isEmpty {
-            appendField("prompt", prompt, boundary: boundary, crlf: crlf, to: &body)
+            form.addField(name: "prompt", value: prompt)
         }
 
-        append("--\(boundary)--\(crlf)", to: &body)
-        return body
+        return form.data
     }
 
     public static func textIfPresent(from data: Data) throws -> String? {
@@ -70,22 +62,6 @@ public enum VoiceInkOpenAICompatibleTranscriptionCodec {
         return String(data: data, encoding: .utf8) ?? ""
     }
 
-    private static func appendField(
-        _ name: String,
-        _ value: String,
-        boundary: String,
-        crlf: String,
-        to body: inout Data
-    ) {
-        append("--\(boundary)\(crlf)", to: &body)
-        append("Content-Disposition: form-data; name=\"\(name)\"\(crlf)\(crlf)", to: &body)
-        append(value, to: &body)
-        append(crlf, to: &body)
-    }
-
-    private static func append(_ string: String, to body: inout Data) {
-        body.append(Data(string.utf8))
-    }
 }
 
 public struct VoiceInkOpenAICompatibleTranscriptionClient: Sendable {

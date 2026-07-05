@@ -6927,6 +6927,49 @@ require_patterns \
   'textIfPresent' \
   'transcriptionText'
 
+require_patterns \
+  "OpenAI-compatible transcription request uses shared multipart form-data builder" \
+  VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleTranscriptionRequest.swift \
+  'VoiceInkMultipartFormData\(boundary: boundary\)' \
+  'form\.addFile\(name: "file", fileName: fileName, mimeType: "audio/wav", fileData: audioData\)' \
+  'form\.addField\(name: "model", value: model\)' \
+  'form\.addField\(name: "response_format", value: responseFormat\)' \
+  'form\.addField\(name: "temperature", value: temperature\)' \
+  'form\.addField\(name: "language", value: language\)' \
+  'form\.addField\(name: "prompt", value: prompt\)' \
+  'return form\.data'
+
+reject_pattern \
+  "OpenAI-compatible transcription request avoids bespoke multipart assembly" \
+  'appendField|private static func append\(|^[[:space:]]*let crlf = "\\r\\n"|^[[:space:]]*var body = Data\(\)|body\.append\(audioData\)|Content-Disposition: form-data; name=|Content-Type: audio/wav' \
+  VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleTranscriptionRequest.swift
+
+require_patterns \
+  "OpenAI-compatible transcription tests lock multipart body order" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift \
+  'testOpenAICompatibleTranscriptionRequestBuilderUsesMultipartAudioRequest' \
+  'testOpenAICompatibleTranscriptionRequestBuilderIncludesOptionalFields' \
+  'testOpenAICompatibleTranscriptionRequestBuilderOmitsOnlyNilAndEmptyOptionalFields' \
+  'testOpenAICompatibleTranscriptionRequestBuilderUsesDirectURLForCustomEndpoints' \
+  'joined\(separator: "\\r\\n"\)' \
+  'Content-Disposition: form-data; name="file"; filename="sample\.wav"' \
+  'Content-Disposition: form-data; name="model"' \
+  'Content-Disposition: form-data; name="response_format"' \
+  'Content-Disposition: form-data; name="temperature"' \
+  'Content-Disposition: form-data; name="language"' \
+  'Content-Disposition: form-data; name="prompt"' \
+  'XCTAssertFalse\(body\.contains\(#"name="response_format""#\)\)' \
+  'XCTAssertFalse\(body\.contains\(#"name="prompt""#\)\)' \
+  '"--Boundary-test--"'
+
+require_patterns \
+  "core checks execute OpenAI-compatible transcription multipart tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RemoteProviderRequestTests\.testOpenAICompatibleTranscriptionRequestBuilderUsesMultipartAudioRequest", run: \{ try RemoteProviderRequestTests\(\)\.testOpenAICompatibleTranscriptionRequestBuilderUsesMultipartAudioRequest\(\) \}\),$' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RemoteProviderRequestTests\.testOpenAICompatibleTranscriptionRequestBuilderIncludesOptionalFields", run: \{ try RemoteProviderRequestTests\(\)\.testOpenAICompatibleTranscriptionRequestBuilderIncludesOptionalFields\(\) \}\),$' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RemoteProviderRequestTests\.testOpenAICompatibleTranscriptionRequestBuilderOmitsOnlyNilAndEmptyOptionalFields", run: \{ try RemoteProviderRequestTests\(\)\.testOpenAICompatibleTranscriptionRequestBuilderOmitsOnlyNilAndEmptyOptionalFields\(\) \}\),$' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RemoteProviderRequestTests\.testOpenAICompatibleTranscriptionRequestBuilderUsesDirectURLForCustomEndpoints", run: \{ try RemoteProviderRequestTests\(\)\.testOpenAICompatibleTranscriptionRequestBuilderUsesDirectURLForCustomEndpoints\(\) \}\),$'
+
 section "obsolete standalone API-key verification policy module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/APIKeyVerificationPolicy.swift
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/APIKeyVerificationPolicyTests.swift
@@ -7056,6 +7099,22 @@ require_patterns \
   'mutating func addFile' \
   'Content-Disposition: form-data; name=' \
   'Content-Type:'
+
+require_patterns \
+  "remote transport tests cover shared multipart form-data builder" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteTransportTests.swift \
+  'func testMultipartFormDataBuildsContentTypeAndCRLFBody' \
+  'VoiceInkMultipartFormData\(boundary: "Boundary-test"\)' \
+  'form\.contentType' \
+  'form\.addField\(name: "model", value: "whisper-large-v3"\)' \
+  'form\.addFile\(name: "file", fileName: "sample\.wav", mimeType: "audio/wav", fileData: Data\("WAVDATA"\.utf8\)\)' \
+  'joined\(separator: "\\r\\n"\)' \
+  '"--Boundary-test--"'
+
+require_patterns \
+  "core checks execute shared multipart form-data builder test" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RemoteTransportTests\.testMultipartFormDataBuildsContentTypeAndCRLFBody", run: \{ try RemoteTransportTests\(\)\.testMultipartFormDataBuildsContentTypeAndCRLFBody\(\) \}\),$'
 
 require_pattern \
   "direct remote clients use shared validated request helper" \

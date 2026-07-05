@@ -60,6 +60,30 @@ final class RemoteTransportTests: XCTestCase {
         XCTAssertEqual(error.userInfo[NSLocalizedDescriptionKey] as? String, "")
     }
 
+    func testMultipartFormDataBuildsContentTypeAndCRLFBody() throws {
+        var form = VoiceInkMultipartFormData(boundary: "Boundary-test")
+        form.addField(name: "model", value: "whisper-large-v3")
+        form.addFile(name: "file", fileName: "sample.wav", mimeType: "audio/wav", fileData: Data("WAVDATA".utf8))
+
+        XCTAssertEqual(form.contentType, "multipart/form-data; boundary=Boundary-test")
+        XCTAssertEqual(
+            try XCTUnwrap(String(data: form.data, encoding: .utf8)),
+            [
+                "--Boundary-test",
+                #"Content-Disposition: form-data; name="model""#,
+                "",
+                "whisper-large-v3",
+                "--Boundary-test",
+                #"Content-Disposition: form-data; name="file"; filename="sample.wav""#,
+                "Content-Type: audio/wav",
+                "",
+                "WAVDATA",
+                "--Boundary-test--",
+                ""
+            ].joined(separator: "\r\n")
+        )
+    }
+
     func testRetryableStatusCodeMatchesSharedRemoteRetryPolicy() throws {
         XCTAssertEqual(
             VoiceInkRemoteHTTPResponsePolicy.retryableStatusCode(in: response(statusCode: 429)),

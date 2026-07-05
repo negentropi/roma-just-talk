@@ -134,14 +134,26 @@ final class RemoteProviderRequestTests: XCTestCase {
         )
 
         let body = try XCTUnwrap(String(data: preparedRequest.body, encoding: .utf8))
-        XCTAssertTrue(body.contains("Content-Disposition: form-data; name=\"file\"; filename=\"sample.wav\""))
-        XCTAssertTrue(body.contains("Content-Type: audio/wav"))
-        XCTAssertTrue(body.contains("WAVDATA"))
-        XCTAssertTrue(body.contains("Content-Disposition: form-data; name=\"model\""))
-        XCTAssertTrue(body.contains("whisper-large-v3"))
-        XCTAssertTrue(body.contains("Content-Disposition: form-data; name=\"language\""))
-        XCTAssertTrue(body.contains("en"))
-        XCTAssertTrue(body.contains("--Boundary-test--"))
+        XCTAssertEqual(
+            body,
+            [
+                "--Boundary-test",
+                #"Content-Disposition: form-data; name="file"; filename="sample.wav""#,
+                "Content-Type: audio/wav",
+                "",
+                "WAVDATA",
+                "--Boundary-test",
+                #"Content-Disposition: form-data; name="model""#,
+                "",
+                "whisper-large-v3",
+                "--Boundary-test",
+                #"Content-Disposition: form-data; name="language""#,
+                "",
+                "en",
+                "--Boundary-test--",
+                ""
+            ].joined(separator: "\r\n")
+        )
     }
 
     func testOpenAICompatibleTranscriptionRequestBuilderIncludesOptionalFields() throws {
@@ -159,12 +171,61 @@ final class RemoteProviderRequestTests: XCTestCase {
         )
 
         let body = try XCTUnwrap(String(data: preparedRequest.body, encoding: .utf8))
-        XCTAssertTrue(body.contains("Content-Disposition: form-data; name=\"prompt\""))
-        XCTAssertTrue(body.contains("spell project names correctly"))
-        XCTAssertTrue(body.contains("Content-Disposition: form-data; name=\"response_format\""))
-        XCTAssertTrue(body.contains("json"))
-        XCTAssertTrue(body.contains("Content-Disposition: form-data; name=\"temperature\""))
-        XCTAssertTrue(body.contains("0"))
+        XCTAssertEqual(
+            body,
+            [
+                "--Boundary-test",
+                #"Content-Disposition: form-data; name="file"; filename="sample.wav""#,
+                "Content-Type: audio/wav",
+                "",
+                "WAVDATA",
+                "--Boundary-test",
+                #"Content-Disposition: form-data; name="model""#,
+                "",
+                "whisper-large-v3",
+                "--Boundary-test",
+                #"Content-Disposition: form-data; name="response_format""#,
+                "",
+                "json",
+                "--Boundary-test",
+                #"Content-Disposition: form-data; name="temperature""#,
+                "",
+                "0",
+                "--Boundary-test",
+                #"Content-Disposition: form-data; name="language""#,
+                "",
+                "en",
+                "--Boundary-test",
+                #"Content-Disposition: form-data; name="prompt""#,
+                "",
+                "spell project names correctly",
+                "--Boundary-test--",
+                ""
+            ].joined(separator: "\r\n")
+        )
+    }
+
+    func testOpenAICompatibleTranscriptionRequestBuilderOmitsOnlyNilAndEmptyOptionalFields() throws {
+        let preparedRequest = VoiceInkOpenAICompatibleTranscriptionRequestBuilder.make(
+            baseURL: try XCTUnwrap(URL(string: "https://api.groq.com/openai")),
+            apiKey: "stt-key",
+            audioData: Data("WAVDATA".utf8),
+            fileName: "sample.wav",
+            model: "whisper-large-v3",
+            boundary: "Boundary-test",
+            language: " ",
+            prompt: "",
+            responseFormat: nil,
+            temperature: "  "
+        )
+
+        let body = try XCTUnwrap(String(data: preparedRequest.body, encoding: .utf8))
+        XCTAssertFalse(body.contains(#"name="response_format""#))
+        XCTAssertFalse(body.contains(#"name="prompt""#))
+        XCTAssertTrue(body.contains(#"Content-Disposition: form-data; name="language""#))
+        XCTAssertTrue(body.contains("\r\n \r\n"))
+        XCTAssertTrue(body.contains(#"Content-Disposition: form-data; name="temperature""#))
+        XCTAssertTrue(body.contains("\r\n  \r\n"))
     }
 
     func testOpenAICompatibleTranscriptionRequestBuilderUsesDirectURLForCustomEndpoints() throws {
@@ -185,11 +246,46 @@ final class RemoteProviderRequestTests: XCTestCase {
             preparedRequest.request.url?.absoluteString,
             "https://custom.example.test/v1/audio/transcriptions"
         )
+        XCTAssertEqual(preparedRequest.request.httpMethod, "POST")
         XCTAssertEqual(preparedRequest.request.value(forHTTPHeaderField: "Authorization"), "Bearer custom-key")
+        XCTAssertEqual(
+            preparedRequest.request.value(forHTTPHeaderField: "Content-Type"),
+            "multipart/form-data; boundary=Boundary-test"
+        )
 
         let body = try XCTUnwrap(String(data: preparedRequest.body, encoding: .utf8))
-        XCTAssertTrue(body.contains("custom-whisper"))
-        XCTAssertTrue(body.contains("Content-Disposition: form-data; name=\"prompt\""))
+        XCTAssertEqual(
+            body,
+            [
+                "--Boundary-test",
+                #"Content-Disposition: form-data; name="file"; filename="sample.wav""#,
+                "Content-Type: audio/wav",
+                "",
+                "WAVDATA",
+                "--Boundary-test",
+                #"Content-Disposition: form-data; name="model""#,
+                "",
+                "custom-whisper",
+                "--Boundary-test",
+                #"Content-Disposition: form-data; name="response_format""#,
+                "",
+                "json",
+                "--Boundary-test",
+                #"Content-Disposition: form-data; name="temperature""#,
+                "",
+                "0",
+                "--Boundary-test",
+                #"Content-Disposition: form-data; name="language""#,
+                "",
+                "en",
+                "--Boundary-test",
+                #"Content-Disposition: form-data; name="prompt""#,
+                "",
+                "spell project names correctly",
+                "--Boundary-test--",
+                ""
+            ].joined(separator: "\r\n")
+        )
     }
 
     func testOpenAICompatibleTranscriptionCodecReturnsTextWhenPresent() throws {

@@ -15515,17 +15515,42 @@ require_pattern \
   'UserDefaultsPreferencesTests\.testIOSFirstTimeSetupPolicySeedsDefaultModeAndCompletionIntent' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
-require_pattern \
-  "shared app data reset plan lives in VoiceInkCore" \
-  'VoiceInkAppDataResetPlan|VoiceInkAppDataResetStep|VoiceInkAppDataResetFilePlan|VoiceInkAppDataResetDiagnostics|applyRuntimeState|deleteTranscriptionRecords|cleanFiles|resetAppSettings|swiftDataResetFailedMessage' \
-  VoiceInkCore/Sources/VoiceInkCore/AppDataReset.swift
+reject_file VoiceInkCore/Sources/VoiceInkCore/AppDataReset.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/AppDataResetTests.swift
+
+require_patterns \
+  "shared app data reset plan lives with stored-audio file lifecycle" \
+  VoiceInkCore/Sources/VoiceInkCore/StoredAudioFile.swift \
+  '^[[:space:]]*public enum VoiceInkAppDataResetStep:' \
+  '^[[:space:]]*case deleteTranscriptionRecords' \
+  '^[[:space:]]*case cleanFiles\(VoiceInkAppDataResetFilePlan\)' \
+  '^[[:space:]]*case resetAppSettings' \
+  '^[[:space:]]*public struct VoiceInkAppDataResetPlan:' \
+  '^[[:space:]]*public static func iOS\(' \
+  '^[[:space:]]*func applyRuntimeState\(' \
+  '^[[:space:]]*public struct VoiceInkAppDataResetFilePlan:' \
+  '^[[:space:]]*public func performBestEffort\(' \
+  '^[[:space:]]*public enum VoiceInkAppDataResetDiagnostics' \
+  'swiftDataResetFailedMessage'
 
 require_patterns \
   "core checks execute iOS app data reset tests" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'AppDataResetTests\.testIOSResetPlanPreservesRecordFileAndSettingsResetOrder' \
-  'AppDataResetTests\.testIOSResetPlanAppliesRuntimeStateInOrder' \
-  'AppDataResetTests\.testAppDataResetDiagnosticsPreserveIOSLogCopy'
+  'StoredAudioFileTests\.testIOSResetPlanPreservesRecordFileAndSettingsResetOrder' \
+  'StoredAudioFileTests\.testIOSResetPlanAppliesRuntimeStateInOrder' \
+  'StoredAudioFileTests\.testIOSResetFilePlanPreservesExistingDirectoryPolicy' \
+  'StoredAudioFileTests\.testResetFilePlanRemovesDirectoriesAndEmptiesCacheDirectoriesBestEffort' \
+  'StoredAudioFileTests\.testAppDataResetDiagnosticsPreserveIOSLogCopy' \
+  'StoredAudioFileTests\(\)\.testIOSResetPlanPreservesRecordFileAndSettingsResetOrder\(\)' \
+  'StoredAudioFileTests\(\)\.testIOSResetPlanAppliesRuntimeStateInOrder\(\)' \
+  'StoredAudioFileTests\(\)\.testIOSResetFilePlanPreservesExistingDirectoryPolicy\(\)' \
+  'try[[:space:]]+StoredAudioFileTests\(\)\.testResetFilePlanRemovesDirectoriesAndEmptiesCacheDirectoriesBestEffort\(\)' \
+  'StoredAudioFileTests\(\)\.testAppDataResetDiagnosticsPreserveIOSLogCopy\(\)'
+
+reject_pattern \
+  "core checks avoid obsolete app data reset suite references" \
+  'AppDataResetTests' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "shared current-model preference remembers legacy macOS model key" \

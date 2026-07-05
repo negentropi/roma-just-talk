@@ -7803,25 +7803,30 @@ section "obsolete standalone prompt-trigger policy module/tests stay deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/PromptTriggerPolicy.swift
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/PromptTriggerPolicyTests.swift
 
-require_pattern \
+require_patterns \
   "shared prompt trigger-word draft validation lives with custom prompt policy" \
-  'VoiceInkPromptTriggerDraftState|hasTriggerWordDraft|canSubmit' \
-  VoiceInkCore/Sources/VoiceInkCore/CustomPrompt.swift
+  VoiceInkCore/Sources/VoiceInkCore/CustomPrompt.swift \
+  'VoiceInkPromptTriggerDraftState' \
+  'hasTriggerWordDraft' \
+  'canSubmit'
 
-require_pattern \
+require_patterns \
   "shared prompt trigger-word add policy lives with custom prompt policy" \
-  'VoiceInkPromptTriggerDraftSubmission|addingTriggerWord|applyRuntimeState' \
-  VoiceInkCore/Sources/VoiceInkCore/CustomPrompt.swift
+  VoiceInkCore/Sources/VoiceInkCore/CustomPrompt.swift \
+  'VoiceInkPromptTriggerDraftSubmission' \
+  'addingTriggerWord' \
+  'applyRuntimeState'
 
 require_pattern \
   "shared prompt trigger-word removal policy lives with custom prompt policy" \
   'removingTriggerWord' \
   VoiceInkCore/Sources/VoiceInkCore/CustomPrompt.swift
 
-require_pattern \
+require_patterns \
   "shared prompt-trigger settings application state lives in VoiceInkCore" \
-  'VoiceInkAIEnhancementPromptSettingsState|settingsStateAfterEnhancementEnabledChange' \
-  VoiceInkCore/Sources/VoiceInkCore/CustomPrompt.swift
+  VoiceInkCore/Sources/VoiceInkCore/CustomPrompt.swift \
+  'VoiceInkAIEnhancementPromptSettingsState' \
+  'settingsStateAfterEnhancementEnabledChange'
 
 require_patterns \
   "shared custom prompt draft owns editor state helpers" \
@@ -7848,15 +7853,22 @@ require_pattern \
   'settingsStateAfterAPIKeyValidityChange' \
   VoiceInkCore/Sources/VoiceInkCore/CustomPrompt.swift
 
-require_pattern \
+require_patterns \
   "shared prompt-trigger detection settings application uses shared prompt state" \
-  'applyingSettingsState|restoringSettingsState|VoiceInkAIEnhancementPromptSettingsState' \
-  VoiceInkCore/Sources/VoiceInkCore/CustomPrompt.swift
+  VoiceInkCore/Sources/VoiceInkCore/CustomPrompt.swift \
+  'VoiceInkPromptDetectionResult' \
+  'applyingSettingsState' \
+  'restoringSettingsState' \
+  'VoiceInkAIEnhancementPromptSettingsState'
 
-require_pattern \
+require_patterns \
   "macOS prompt editor consumes shared trigger-word draft state" \
-  'VoiceInkPromptTriggerDraftState|triggerWordDraftState\.(draft|canSubmit|submitting)|applyRuntimeState' \
-  VoiceInk/Views/PromptEditorView.swift
+  VoiceInk/Views/PromptEditorView.swift \
+  'VoiceInkPromptTriggerDraftState' \
+  'triggerWordDraftState\.draft' \
+  'triggerWordDraftState\.canSubmit' \
+  'submitting\(existingWords: triggerWords\)' \
+  'applyRuntimeState'
 
 require_patterns \
   "macOS prompt editor consumes shared custom prompt draft state" \
@@ -7876,10 +7888,13 @@ require_patterns \
   '\.savePlan\(for: draft\)' \
   'applyRuntimeState'
 
-require_pattern \
+require_patterns \
   "macOS prompt editor consumes shared trigger-word add submission" \
-  'triggerWordDraftState\.submitting|setTriggerWords|setDraftState' \
-  VoiceInk/Views/PromptEditorView.swift
+  VoiceInk/Views/PromptEditorView.swift \
+  'triggerWordDraftState' \
+  'submitting\(existingWords: triggerWords\)' \
+  'setTriggerWords' \
+  'setDraftState'
 
 require_pattern \
   "macOS prompt editor consumes shared trigger-word removal policy" \
@@ -7906,15 +7921,40 @@ require_pattern \
   'CustomPromptTests\.testRemovingTriggerWordPreservesExactMacOSEditingRule' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
-require_pattern \
-  "core checks execute prompt trigger-word draft state tests" \
-  'CustomPromptTests\.testTriggerWordDraftState(SubmitsAndClearsAcceptedWord|KeepsRejectedDraft)|CustomPromptTests\.testTriggerWordDraftSubmissionAppliesRuntimeState' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+require_patterns \
+  "custom prompt tests own moved prompt-trigger behavior" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/CustomPromptTests.swift \
+  'func testPromptDetectionPolicyReturnsNoMatchResultWithOriginalState' \
+  'func testPromptDetectionPolicyBuildsDetectedEnhancementResult' \
+  'func testDetectedPromptResultAppliesSettingsState' \
+  'func testDetectedPromptResultRestoresSettingsStateIncludingNilPrompt' \
+  'func testNoMatchPromptResultReturnsNoSettingsState' \
+  'func testPromptDetectionPolicyIgnoresPromptsWithoutTriggerWords' \
+  'func testAddingTriggerWordTrimsAndRejectsBlankAndCaseInsensitiveDuplicate' \
+  'func testRemovingTriggerWordPreservesExactMacOSEditingRule' \
+  'func testTriggerWordDraftUsesSharedBlankPolicy' \
+  'func testTriggerWordDraftStateUsesSharedBlankPolicy' \
+  'func testTriggerWordDraftStateSubmitsAndClearsAcceptedWord' \
+  'func testTriggerWordDraftStateKeepsRejectedDraft' \
+  'func testTriggerWordDraftSubmissionAppliesRuntimeState' \
+  'func testDetectStripsLeadingTriggerAndCapitalizesRemainingText' \
+  'func testDetectStripsTrailingTriggerBeforeLeadingAndKeepsPromptOrder' \
+  'func testDetectUsesLongestTriggerAndRejectsWordPrefix' \
+  'func testDetectStripsSameTriggerFromBothEnds'
 
-require_pattern \
+require_patterns \
+  "core checks execute prompt trigger-word draft state tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'CustomPromptTests\.testTriggerWordDraftStateSubmitsAndClearsAcceptedWord' \
+  'CustomPromptTests\.testTriggerWordDraftStateKeepsRejectedDraft' \
+  'CustomPromptTests\.testTriggerWordDraftSubmissionAppliesRuntimeState'
+
+require_patterns \
   "core checks execute prompt-trigger settings state tests" \
-  'CustomPromptTests\.testDetectedPromptResultAppliesSettingsState|CustomPromptTests\.testDetectedPromptResultRestoresSettingsStateIncludingNilPrompt|CustomPromptTests\.testNoMatchPromptResultReturnsNoSettingsState' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'CustomPromptTests\.testDetectedPromptResultAppliesSettingsState' \
+  'CustomPromptTests\.testDetectedPromptResultRestoresSettingsStateIncludingNilPrompt' \
+  'CustomPromptTests\.testNoMatchPromptResultReturnsNoSettingsState'
 
 require_pattern \
   "core checks execute enhancement prompt settings state test" \

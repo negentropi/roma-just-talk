@@ -6898,9 +6898,9 @@ reject_pattern \
   VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/MistralTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/ElevenLabsTranscriptionRequest.swift \
-  VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionClient.swift \
-  VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionClient.swift \
-  VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift \
+  VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift \
+  VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionRequest.swift
 
 section "obsolete standalone direct remote transcription client modules stay deleted"
@@ -6908,6 +6908,9 @@ reject_file VoiceInkCore/Sources/VoiceInkCore/DeepgramTranscriptionClient.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionClient.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/MistralTranscriptionClient.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/ElevenLabsTranscriptionClient.swift
+reject_file VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionClient.swift
+reject_file VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionClient.swift
+reject_file VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionClient.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionClient.swift
 
 section "obsolete standalone API-key verification policy module stays deleted"
@@ -6941,9 +6944,9 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/MistralTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/ElevenLabsTranscriptionRequest.swift \
-  VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionClient.swift \
-  VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionClient.swift \
-  VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift \
+  VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift \
+  VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyVerifier.swift
 
@@ -7019,9 +7022,9 @@ reject_pattern \
   VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/MistralTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/ElevenLabsTranscriptionRequest.swift \
-  VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionClient.swift \
-  VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionClient.swift \
-  VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift \
+  VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift \
+  VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionRequest.swift
 
 require_pattern \
@@ -7057,9 +7060,9 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleTranscriptionClient.swift \
   VoiceInkCore/Sources/VoiceInkCore/MistralTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/ElevenLabsTranscriptionRequest.swift \
-  VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionClient.swift \
-  VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionClient.swift \
-  VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift \
+  VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift \
+  VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionRequest.swift
 
 require_pattern \
@@ -7078,9 +7081,9 @@ reject_file VoiceInkCore/Tests/VoiceInkCoreTests/RetriedRequestTests.swift
 require_pattern \
   "shared long-running remote transcription clients use shared polling policy" \
   'VoiceInkRemotePollingPolicy\.pollValidatedData' \
-  VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionClient.swift \
-  VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionClient.swift \
-  VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionClient.swift
+  VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift \
+  VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift \
+  VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift
 
 require_pattern \
   "shared OpenAI-compatible transcription client uses shared retry helper" \
@@ -7176,24 +7179,24 @@ reject_pattern \
   VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleTranscriptionClient.swift \
   VoiceInkCore/Sources/VoiceInkCore/MistralTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/ElevenLabsTranscriptionRequest.swift \
-  VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionClient.swift \
-  VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionClient.swift \
-  VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift \
+  VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift \
+  VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionRequest.swift
 
 reject_pattern \
   "shared remote transcription clients avoid provider-local HTTP response validators" \
   'private static func validate\(' \
-  VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionClient.swift \
-  VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionClient.swift \
-  VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionClient.swift
+  VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift \
+  VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift \
+  VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift
 
 reject_pattern \
   "long-running remote transcription clients avoid provider-local polling loops" \
   'while true|let start = Date\(\)|Date\(\)\.timeIntervalSince\(start\)|Task\.sleep\(nanoseconds: 1_000_000_000\)|URLSession\.shared\.data\(for: request\)' \
-  VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionClient.swift \
-  VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionClient.swift \
-  VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionClient.swift
+  VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift \
+  VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift \
+  VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift
 
 reject_pattern \
   "shared remote retry helpers avoid duplicate retry status sets" \

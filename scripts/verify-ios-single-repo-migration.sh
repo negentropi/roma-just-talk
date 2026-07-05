@@ -544,9 +544,10 @@ reject_pattern \
 
 section "iOS storage directories live in shared core"
 reject_file iOS/VoiceInk-ios/VoiceInkIOSStorageDirectories.swift
+reject_file VoiceInkCore/Sources/VoiceInkCore/PlatformStorageDirectories.swift
 require_patterns \
   "shared iOS storage directories live in VoiceInkCore" \
-  VoiceInkCore/Sources/VoiceInkCore/PlatformStorageDirectories.swift \
+  VoiceInkCore/Sources/VoiceInkCore/StoredAudioFile.swift \
   'public enum VoiceInkIOSStorageDirectories' \
   'VoiceInkStoredAudioFile\.recordingsDirectory\(in: documentsDirectory\)' \
   'VoiceInkStoredAudioFile\.createRecordingsDirectory' \
@@ -574,7 +575,7 @@ section "macOS storage directories live in shared core"
 reject_file VoiceInk/VoiceInkMacOSStorageDirectories.swift
 require_patterns \
   "shared macOS storage directories live in VoiceInkCore" \
-  VoiceInkCore/Sources/VoiceInkCore/PlatformStorageDirectories.swift \
+  VoiceInkCore/Sources/VoiceInkCore/StoredAudioFile.swift \
   'public enum VoiceInkMacOSStorageDirectories' \
   'VoiceInkAppIdentity\.macOSApplicationSupportDirectory\(in: applicationSupportBaseDirectory\)' \
   'VoiceInkStoredAudioFile\.recordingsDirectory\(in: appSupportDirectory\)' \

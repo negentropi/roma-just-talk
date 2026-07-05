@@ -2878,30 +2878,41 @@ require_pattern \
   'deleteExistingAudioFileAndClearReference' \
   VoiceInkCore/Sources/VoiceInkCore/StoredAudioFile.swift
 
-require_pattern \
-  "shared supported-media presentation lives in VoiceInkCore" \
-  'displayFileExtensions|supportedFileTypesText|openPanelContentTypes|dropContentTypes|dropProviderTypeIdentifiers' \
-  VoiceInkCore/Sources/VoiceInkCore/SupportedMedia.swift
+reject_file VoiceInkCore/Sources/VoiceInkCore/SupportedMedia.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/SupportedMediaTests.swift
+
+reject_pattern \
+  "VoiceInkCore metadata and checks avoid stale standalone supported-media references" \
+  'SupportedMedia\.swift|SupportedMediaTests\.swift|SupportedMediaTests' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
 
 require_pattern \
-  "shared audio-file queue status and presentation live in VoiceInkCore" \
+  "shared supported-media presentation lives with stored-audio policy in VoiceInkCore" \
+  'displayFileExtensions|supportedFileTypesText|openPanelContentTypes|dropContentTypes|dropProviderTypeIdentifiers' \
+  VoiceInkCore/Sources/VoiceInkCore/StoredAudioFile.swift
+
+require_pattern \
+  "shared audio-file queue status and presentation live with stored-audio policy in VoiceInkCore" \
   'VoiceInkAudioFileQueue(Status|ProcessingPhase|Policy|Diagnostics|Presentation)|VoiceInkAudioImportPresentation' \
-  VoiceInkCore/Sources/VoiceInkCore/SupportedMedia.swift
+  VoiceInkCore/Sources/VoiceInkCore/StoredAudioFile.swift
 
 require_pattern \
   "shared audio-file queue policy owns mutation decisions" \
   'VoiceInkAudioFileQueuePolicy|eligibleAdditionURLs|canRemoveItem|statusAfterRetryRequest|nextPendingItemID|hasPendingItems|statusesAfterCancelingProcessing' \
-  VoiceInkCore/Sources/VoiceInkCore/SupportedMedia.swift
+  VoiceInkCore/Sources/VoiceInkCore/StoredAudioFile.swift
 
 require_pattern \
   "shared audio-file queue diagnostics live in VoiceInkCore" \
   'VoiceInkAudioFileQueueDiagnostics|enhancementFailedMessage|transcriptionErrorMessage|Enhancement failed:|Transcription error:' \
-  VoiceInkCore/Sources/VoiceInkCore/SupportedMedia.swift
+  VoiceInkCore/Sources/VoiceInkCore/StoredAudioFile.swift
 
 reject_pattern \
   "shared audio-file queue status avoids public predicate helpers" \
   'public +var +(isTerminal|isPending|isProcessing|canRemoveFromQueue|canRetry) *: *Bool' \
-  VoiceInkCore/Sources/VoiceInkCore/SupportedMedia.swift
+  VoiceInkCore/Sources/VoiceInkCore/StoredAudioFile.swift
 
 require_pattern \
   "macOS audio import help uses shared supported-media presentation" \
@@ -2941,22 +2952,30 @@ require_pattern \
 require_pattern \
   "core tests pin supported-media presentation copy" \
   'testSupportedMediaDisplayExtensionsPreserveMacOSImportCopyOrder|testSupportedMediaImportTypePoliciesPreserveMacOSShellIdentifiers|testSupportedMediaDisplayExtensionsMatchAcceptedExtensions' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/SupportedMediaTests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/StoredAudioFileTests.swift
 
 require_pattern \
   "core tests pin audio-file queue status and presentation" \
   'testAudioImportPresentationPreservesMacOSQueueCopyAndActions|testAudioFileQueueProcessingPhasesPreserveCopy|testAudioFileQueueStatusCancelingProcessingResetsOnlyProcessingItems|testAudioFileQueuePolicyKeepsOnlyExistingSupportedNonActivePaths|testAudioFileQueuePolicyPreservesMutationDecisions|testAudioFileQueueDiagnosticsPreserveMacOSLogCopy|testAudioFileQueuePresentationPreservesRowCopyAndIcons' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/SupportedMediaTests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/StoredAudioFileTests.swift
 
-require_pattern \
-  "core check runner executes supported-media presentation tests" \
-  'testSupportedMediaDisplayExtensionsPreserveMacOSImportCopyOrder|testSupportedMediaImportTypePoliciesPreserveMacOSShellIdentifiers|testSupportedMediaDisplayExtensionsMatchAcceptedExtensions' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
-
-require_pattern \
-  "core check runner executes audio-file queue status and presentation tests" \
-  'testAudioImportPresentationPreservesMacOSQueueCopyAndActions|testAudioFileQueueProcessingPhasesPreserveCopy|testAudioFileQueueStatusCancelingProcessingResetsOnlyProcessingItems|testAudioFileQueuePolicyKeepsOnlyExistingSupportedNonActivePaths|testAudioFileQueuePolicyPreservesMutationDecisions|testAudioFileQueueDiagnosticsPreserveMacOSLogCopy|testAudioFileQueuePresentationPreservesRowCopyAndIcons' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+require_voiceink_core_check_runner_invocations \
+  "core checks execute folded supported-media and audio-file queue policy tests" \
+  "StoredAudioFileTests" \
+  "testSupportedMediaDisplayExtensionsPreserveMacOSImportCopyOrder" \
+  "testSupportedMediaImportTypePoliciesPreserveMacOSShellIdentifiers" \
+  "testAudioImportPresentationPreservesMacOSQueueCopyAndActions" \
+  "testAudioFileQueueProcessingPhasesPreserveCopy" \
+  "testAudioFileQueueStatusCancelingProcessingResetsOnlyProcessingItems" \
+  "testAudioFileQueuePolicyKeepsOnlyExistingSupportedNonActivePaths" \
+  "testAudioFileQueuePolicyPreservesMutationDecisions" \
+  "testAudioFileQueueDiagnosticsPreserveMacOSLogCopy" \
+  "testAudioFileQueuePresentationPreservesRowCopyAndIcons" \
+  "testSupportedFileExtensionsPreserveMacOSImportPolicy" \
+  "testSupportedMediaDisplayExtensionsMatchAcceptedExtensions" \
+  "testSupportedFileExtensionLookupIsCaseInsensitive" \
+  "testSupportedURLAcceptsKnownExtensions" \
+  "testSupportedURLRejectsUnknownExtensionWithoutContentType"
 
 reject_pattern \
   "macOS audio import view avoids shell-owned supported-media list copy" \

@@ -6242,9 +6242,9 @@ require_patterns \
   "macOS metrics dashboard uses shared accessibility permission callout" \
   VoiceInk/Views/Metrics/MetricsContent.swift \
   'VoiceInkMacOSPermissionSettingsPresentation\.dashboardAccessibilityCallout' \
-  'presentation\.iconSystemName' \
-  'presentation\.buttonTitle\(requiresRelaunch: false\)' \
-  'presentation\.infoTipMessage'
+  'PermissionCard\(' \
+  'presentation: presentation' \
+  'isGranted: isAccessibilityEnabled'
 
 require_patterns \
   "macOS permissions settings uses shared permission timing and polling state" \

@@ -6891,13 +6891,16 @@ reject_pattern \
   "shared remote transcription clients avoid provider API error-domain literals" \
   '"(DeepgramAPI|GeminiAPI|MistralAPI|ElevenLabsAPI|SonioxAPI|SpeechmaticsAPI|AssemblyAIAPI|XAIAPI)"' \
   VoiceInkCore/Sources/VoiceInkCore/DeepgramTranscriptionClient.swift \
-  VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/MistralTranscriptionClient.swift \
   VoiceInkCore/Sources/VoiceInkCore/ElevenLabsTranscriptionClient.swift \
   VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionClient.swift \
   VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionClient.swift \
   VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionClient.swift \
   VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionClient.swift
+
+section "obsolete standalone Gemini transcription client module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionClient.swift
 
 section "obsolete standalone API-key verification policy module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/APIKeyVerificationPolicy.swift
@@ -6927,7 +6930,7 @@ require_pattern \
   'VoiceInkAPIKeyVerificationPolicy\.verify' \
   VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleClient.swift \
   VoiceInkCore/Sources/VoiceInkCore/DeepgramTranscriptionClient.swift \
-  VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/MistralTranscriptionClient.swift \
   VoiceInkCore/Sources/VoiceInkCore/ElevenLabsTranscriptionClient.swift \
   VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionClient.swift \
@@ -7005,7 +7008,7 @@ reject_pattern \
   'API key is missing or empty\.|No HTTP response received\.|String\(data: data, encoding: \.utf8\) \?\? "HTTP \(http\.statusCode\)"|guard !apiKey\.trimmingCharacters' \
   VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleClient.swift \
   VoiceInkCore/Sources/VoiceInkCore/DeepgramTranscriptionClient.swift \
-  VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/MistralTranscriptionClient.swift \
   VoiceInkCore/Sources/VoiceInkCore/ElevenLabsTranscriptionClient.swift \
   VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionClient.swift \
@@ -7032,7 +7035,7 @@ require_pattern \
   "direct remote clients use shared validated request helper" \
   'VoiceInkRetriedRequest\.validatedData' \
   VoiceInkCore/Sources/VoiceInkCore/DeepgramTranscriptionClient.swift \
-  VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleClient.swift
 
 require_pattern \
@@ -7151,7 +7154,7 @@ reject_pattern \
   "direct remote clients avoid duplicate HTTP response validation" \
   'URLSession\.shared\.data\(for: request\)|VoiceInkRemoteHTTPResponsePolicy\.validateSuccess|guard let http = response as\? HTTPURLResponse|guard \(200..<300\)\.contains\(http\.statusCode\)|String\(data: data, encoding: \.utf8\) \?\? ""|NSError\(' \
   VoiceInkCore/Sources/VoiceInkCore/DeepgramTranscriptionClient.swift \
-  VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionClient.swift \
+  VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleClient.swift
 
 reject_pattern \

@@ -12061,14 +12061,41 @@ require_pattern \
   'VoiceInkMacOSLocalCLISettingsPresentation|macOSSettingsPresentation|VoiceInkLocalCLITemplate|VoiceInkLocalCLIExecutionError|VoiceInkLocalCLIPreference|commandTemplateKey = "localCLICommandTemplate"|selectedTemplateKey = "localCLISelectedTemplate"|timeoutSecondsKey = "localCLITimeoutSeconds"|defaultTimeoutSeconds|timeoutOptions|boundedTimeoutSeconds|isCommandConfigured|cleanedOutput|commandFailureError|fullPrompt' \
   VoiceInkCore/Sources/VoiceInkCore/LocalCLIConfiguration.swift
 
+reject_file \
+  "obsolete standalone Local CLI configuration suite stays deleted" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/LocalCLIConfigurationTests.swift
+
+require_patterns \
+  "core AI provider catalog suite owns Local CLI configuration coverage" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AIProviderCatalogTests.swift \
+  'func testLocalCLISettingsPresentationPreservesMacOSCopy\(' \
+  'func testLocalCLITemplatesPreserveRawValuesDisplayNamesAndCommands\(' \
+  'func testLocalCLIPreferencePreservesKeysDefaultsAndRoundTrips\(' \
+  'func testLocalCLICommandConfigurationAndPromptPolicy\(' \
+  'func testLocalCLIExecutionErrorsPreserveMacOSCopyAndFailureClassification\('
+
+reject_pattern \
+  "core AI provider catalog tests avoid obsolete standalone Local CLI suite" \
+  'final class LocalCLIConfigurationTests\b|LocalCLIConfigurationTests\(\)|VoiceInkCore\.LocalCLIConfigurationTests' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AIProviderCatalogTests.swift
+
 require_pattern \
   "macOS Local CLI service uses shared configuration policy" \
   'VoiceInkLocalCLIPreference\.(saveCommandTemplate|saveSelectedTemplate|boundedTimeoutSeconds|saveTimeoutSeconds|isCommandConfigured|selectedTemplate|commandTemplate|timeoutSeconds|fullPrompt|cleanedOutput|commandFailureError)|VoiceInkLocalCLIExecutionError' \
   VoiceInk/Services/AIEnhancement/LocalCLIService.swift
 
-require_pattern \
-  "core checks execute Local CLI execution error tests" \
-  'LocalCLIConfigurationTests\.testLocalCLIExecutionErrorsPreserveMacOSCopyAndFailureClassification' \
+require_patterns \
+  "core checks execute Local CLI configuration coverage through provider catalog suite" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'AIProviderCatalogTests\.testLocalCLISettingsPresentationPreservesMacOSCopy' \
+  'AIProviderCatalogTests\.testLocalCLITemplatesPreserveRawValuesDisplayNamesAndCommands' \
+  'AIProviderCatalogTests\.testLocalCLIPreferencePreservesKeysDefaultsAndRoundTrips' \
+  'AIProviderCatalogTests\.testLocalCLICommandConfigurationAndPromptPolicy' \
+  'AIProviderCatalogTests\.testLocalCLIExecutionErrorsPreserveMacOSCopyAndFailureClassification'
+
+reject_pattern \
+  "core check runner avoids obsolete Local CLI configuration suite entries" \
+  'LocalCLIConfigurationTests' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_patterns \

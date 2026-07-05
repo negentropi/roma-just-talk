@@ -1003,10 +1003,15 @@ require_pattern \
   'VoiceInkNativeAppleLanguageAsset(State|Display|Presentation|Diagnostics)|presentation\(for state: VoiceInkNativeAppleLanguageAssetState\)|downloadUnavailableRequiresMacOS26Message|reservationReturnedFalseMessage|downloadFailedMessage|downloadUnavailableFeatureFlagMessage' \
   VoiceInkCore/Sources/VoiceInkCore/LanguageCatalog.swift
 
-require_pattern \
+require_patterns \
   "core checks execute Native Apple language asset presentation and diagnostics tests" \
-  'LanguageCatalogTests\.testNativeAppleLanguageAssetPresentationPreservesProgressAndIconStates|LanguageCatalogTests\.testNativeAppleLanguageAssetPresentationPreservesActionStates|LanguageCatalogTests\.testNativeAppleLanguageAssetDiagnosticsPreserveMacOSLogCopy' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'name: "LanguageCatalogTests\.testNativeAppleLanguageAssetPresentationPreservesProgressAndIconStates"' \
+  'LanguageCatalogTests\(\)\.testNativeAppleLanguageAssetPresentationPreservesProgressAndIconStates\(\)' \
+  'name: "LanguageCatalogTests\.testNativeAppleLanguageAssetPresentationPreservesActionStates"' \
+  'LanguageCatalogTests\(\)\.testNativeAppleLanguageAssetPresentationPreservesActionStates\(\)' \
+  'name: "LanguageCatalogTests\.testNativeAppleLanguageAssetDiagnosticsPreserveMacOSLogCopy"' \
+  'LanguageCatalogTests\(\)\.testNativeAppleLanguageAssetDiagnosticsPreserveMacOSLogCopy\(\)'
 
 require_pattern \
   "macOS language picker uses shared language display fallback" \
@@ -19957,10 +19962,51 @@ require_pattern \
   'VoiceInkLicensePreference\.hasUsableStoredLicense' \
   VoiceInk/Services/SystemInfoService.swift
 
-require_pattern \
-  "core checks execute license preference tests" \
-  'LicensePolicyTests\.testLicensePreferenceKeysPreserveExistingStorageNames|LicensePolicyTests\.testLicenseStatusChangeRequestPreservesMacOSNotificationName|LicensePolicyTests\.testLicensePreferenceStorageRoundTripsNonSensitiveFlags|LicensePolicyTests\.testDeviceIdentifierCreatesAndStoresFallbackWhenMissing|LicensePolicyTests\.testStoredLicenseAccessPreservesExistingActivationRequirementPolicy|LicensePolicyTests\.testLicenseStartupPolicyPlansStoredLicenseAndTrialLifecycle|LicensePolicyTests\.testLicenseValidationPolicyPreservesMacOSFeedbackMessages|LicensePolicyTests\.testLicenseValidationApplicationPlansPreserveMacOSStorageWritesAndSuccessCopy|LicensePolicyTests\.testLicenseLinksPreservePurchaseAndManagementDestinations|LicensePolicyTests\.testLicenseManagementPresentationPreservesMacOSCopyAndResources|LicensePolicyTests\.testLicenseTrialBannerPresentationPreservesMacOSCopyAndThreshold|LicensePolicyTests\.testLicenseRemovalPolicyPreservesMacOSResetPlan|LicensePolicyTests\.testLicenseSecureStoragePolicyPreservesDeviceLocalAccountsAndTrialDateCodec|LicensePolicyTests\.testLicenseServicePolicyPreservesPolarEndpointsAndHeaders|LicensePolicyTests\.testLicenseHTTPStatusPolicyPreservesMacOSErrorMapping|LicensePolicyTests\.testLicenseServicePolicyPreservesPolarResponseTextFallbacks' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+require_patterns \
+  "core checks execute license policy tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'name: "LicensePolicyTests\.testLicensePreferenceKeysPreserveExistingStorageNames"' \
+  'LicensePolicyTests\(\)\.testLicensePreferenceKeysPreserveExistingStorageNames\(\)' \
+  'name: "LicensePolicyTests\.testLicenseStatusChangeRequestPreservesMacOSNotificationName"' \
+  'LicensePolicyTests\(\)\.testLicenseStatusChangeRequestPreservesMacOSNotificationName\(\)' \
+  'name: "LicensePolicyTests\.testLicensePreferenceStorageRoundTripsNonSensitiveFlags"' \
+  'LicensePolicyTests\(\)\.testLicensePreferenceStorageRoundTripsNonSensitiveFlags\(\)' \
+  'name: "LicensePolicyTests\.testDeviceIdentifierReusesStoredValueBeforeCreatingFallback"' \
+  'LicensePolicyTests\(\)\.testDeviceIdentifierReusesStoredValueBeforeCreatingFallback\(\)' \
+  'name: "LicensePolicyTests\.testDeviceIdentifierCreatesAndStoresFallbackWhenMissing"' \
+  'LicensePolicyTests\(\)\.testDeviceIdentifierCreatesAndStoresFallbackWhenMissing\(\)' \
+  'name: "LicensePolicyTests\.testStoredLicenseAccessPreservesExistingActivationRequirementPolicy"' \
+  'LicensePolicyTests\(\)\.testStoredLicenseAccessPreservesExistingActivationRequirementPolicy\(\)' \
+  'name: "LicensePolicyTests\.testLicenseStartupPolicyPlansStoredLicenseAndTrialLifecycle"' \
+  'LicensePolicyTests\(\)\.testLicenseStartupPolicyPlansStoredLicenseAndTrialLifecycle\(\)' \
+  'name: "LicensePolicyTests\.testLicenseValidationPolicyPreservesMacOSFeedbackMessages"' \
+  'LicensePolicyTests\(\)\.testLicenseValidationPolicyPreservesMacOSFeedbackMessages\(\)' \
+  'name: "LicensePolicyTests\.testLicenseValidationApplicationPlansPreserveMacOSStorageWritesAndSuccessCopy"' \
+  'LicensePolicyTests\(\)\.testLicenseValidationApplicationPlansPreserveMacOSStorageWritesAndSuccessCopy\(\)' \
+  'name: "LicensePolicyTests\.testLicenseLinksPreservePurchaseAndManagementDestinations"' \
+  'LicensePolicyTests\(\)\.testLicenseLinksPreservePurchaseAndManagementDestinations\(\)' \
+  'name: "LicensePolicyTests\.testLicenseManagementPresentationPreservesMacOSCopyAndResources"' \
+  'LicensePolicyTests\(\)\.testLicenseManagementPresentationPreservesMacOSCopyAndResources\(\)' \
+  'name: "LicensePolicyTests\.testLicenseTrialBannerPresentationPreservesMacOSCopyAndThreshold"' \
+  'LicensePolicyTests\(\)\.testLicenseTrialBannerPresentationPreservesMacOSCopyAndThreshold\(\)' \
+  'name: "LicensePolicyTests\.testLicenseRemovalPolicyPreservesMacOSResetPlan"' \
+  'LicensePolicyTests\(\)\.testLicenseRemovalPolicyPreservesMacOSResetPlan\(\)' \
+  'name: "LicensePolicyTests\.testLicenseSecureStoragePolicyPreservesDeviceLocalAccountsAndTrialDateCodec"' \
+  'LicensePolicyTests\(\)\.testLicenseSecureStoragePolicyPreservesDeviceLocalAccountsAndTrialDateCodec\(\)' \
+  'name: "LicensePolicyTests\.testLicenseServicePolicyPreservesPolarEndpointsAndHeaders"' \
+  'LicensePolicyTests\(\)\.testLicenseServicePolicyPreservesPolarEndpointsAndHeaders\(\)' \
+  'name: "LicensePolicyTests\.testLicenseValidationRequestBodiesPreservePolarFieldNames"' \
+  'LicensePolicyTests\(\)\.testLicenseValidationRequestBodiesPreservePolarFieldNames\(\)' \
+  'name: "LicensePolicyTests\.testLicenseActivationRequestBodyEncodesPolarFieldNames"' \
+  'LicensePolicyTests\(\)\.testLicenseActivationRequestBodyEncodesPolarFieldNames\(\)' \
+  'name: "LicensePolicyTests\.testLicenseValidationResponseDecodingOwnsGrantedAndActivationPolicy"' \
+  'LicensePolicyTests\(\)\.testLicenseValidationResponseDecodingOwnsGrantedAndActivationPolicy\(\)' \
+  'name: "LicensePolicyTests\.testLicenseActivationResultDecodingPreservesPolarFieldNames"' \
+  'LicensePolicyTests\(\)\.testLicenseActivationResultDecodingPreservesPolarFieldNames\(\)' \
+  'name: "LicensePolicyTests\.testLicenseHTTPStatusPolicyPreservesMacOSErrorMapping"' \
+  'LicensePolicyTests\(\)\.testLicenseHTTPStatusPolicyPreservesMacOSErrorMapping\(\)' \
+  'name: "LicensePolicyTests\.testLicenseServicePolicyPreservesPolarResponseTextFallbacks"' \
+  'LicensePolicyTests\(\)\.testLicenseServicePolicyPreservesPolarResponseTextFallbacks\(\)'
 
 require_pattern \
   "migration checklist tracks shared license secure storage policy" \

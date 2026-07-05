@@ -11946,6 +11946,7 @@ require_pattern \
 
 section "obsolete standalone post-processing request module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/PostProcessingRequest.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/PostProcessingRequestTests.swift
 
 require_pattern \
   "shared post-processing request policy lives with post-processing client" \
@@ -11968,11 +11969,35 @@ require_patterns \
 require_patterns \
   "core checks execute shared post-processing request coverage" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'PostProcessingRequestTests\.testBlankPromptReturnsNilRequest' \
-  'PostProcessingRequestTests\.testRequestBuildsSharedIOSPostProcessingMessages' \
-  'PostProcessingRequestTests\.testFinalizedTranscriptFallsBackWhenResponseIsEmptyAfterFiltering' \
-  'PostProcessingRequestTests\.testFinalizedTranscriptStripsReasoningTags' \
-  'PostProcessingRequestTests\.testFinalizedTranscriptStripsCodexFollowUpPayload'
+  'AIPromptsTests\.testPostProcessingRequestRejectsBlankPrompt' \
+  'AIPromptsTests\(\)\.testPostProcessingRequestRejectsBlankPrompt\(\)' \
+  'AIPromptsTests\.testPostProcessingRequestBuildsSharedIOSMessages' \
+  'AIPromptsTests\(\)\.testPostProcessingRequestBuildsSharedIOSMessages\(\)' \
+  'AIPromptsTests\.testPostProcessingFinalizedTranscriptFallsBackWhenFilteredResponseIsEmpty' \
+  'AIPromptsTests\(\)\.testPostProcessingFinalizedTranscriptFallsBackWhenFilteredResponseIsEmpty\(\)' \
+  'AIPromptsTests\.testPostProcessingFinalizedTranscriptStripsReasoningTags' \
+  'AIPromptsTests\(\)\.testPostProcessingFinalizedTranscriptStripsReasoningTags\(\)' \
+  'AIPromptsTests\.testPostProcessingFinalizedTranscriptStripsCodexFollowUpPayload' \
+  'AIPromptsTests\(\)\.testPostProcessingFinalizedTranscriptStripsCodexFollowUpPayload\(\)'
+
+reject_pattern \
+  "core post-processing request coverage stays in AI prompts suite" \
+  'PostProcessingRequestTests' \
+  VoiceInkCore/Tests/VoiceInkCoreTests \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
+
+require_patterns \
+  "core AI prompts suite owns post-processing request coverage" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AIPromptsTests.swift \
+  'testPostProcessingRequestRejectsBlankPrompt' \
+  'testPostProcessingRequestBuildsSharedIOSMessages' \
+  'testPostProcessingFinalizedTranscriptFallsBackWhenFilteredResponseIsEmpty' \
+  'testPostProcessingFinalizedTranscriptStripsReasoningTags' \
+  'testPostProcessingFinalizedTranscriptStripsCodexFollowUpPayload' \
+  'VoiceInkPostProcessingRequest' \
+  'VoiceInkPostProcessingRequest\.finalizedTranscript'
 
 require_patterns \
   "core checks execute shared iOS post-processing run behavior" \

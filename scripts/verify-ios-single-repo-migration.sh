@@ -6240,12 +6240,17 @@ require_patterns \
 
 require_multiline_pattern \
   "macOS metrics dashboard uses shared accessibility permission callout" \
-  'let presentation = VoiceInkMacOSPermissionSettingsPresentation\.dashboardAccessibilityCallout[[:space:]]+return PermissionCard\([[:space:]]+presentation: presentation,[[:space:]]+isGranted: isAccessibilityEnabled' \
+  'private var accessibilityPermissionCallout: some View[[:space:]]*\{[[:space:]]+let presentation = VoiceInkMacOSPermissionSettingsPresentation\.dashboardAccessibilityCallout[[:space:]]+return PermissionCard\([[:space:]]+presentation: presentation,[[:space:]]+isGranted: isAccessibilityEnabled' \
   VoiceInk/Views/Metrics/MetricsContent.swift
 
 reject_pattern \
-  "macOS metrics dashboard avoids shell-owned permission callout construction" \
-  'VoiceInkMacOSPermissionSettingsCardPresentation\(' \
+  "macOS metrics dashboard avoids direct shell-owned permission callout construction" \
+  'VoiceInkMacOSPermissionSettingsCardPresentation[[:space:]]*\(' \
+  VoiceInk/Views/Metrics/MetricsContent.swift
+
+reject_multiline_pattern \
+  "macOS metrics dashboard avoids typed shell-owned permission callout init" \
+  ':[[:space:]]*VoiceInkMacOSPermissionSettingsCardPresentation[[:space:]]*=[[:space:]]*\.init[[:space:]]*\(' \
   VoiceInk/Views/Metrics/MetricsContent.swift
 
 require_patterns \

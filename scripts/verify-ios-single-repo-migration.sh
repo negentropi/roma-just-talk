@@ -15246,12 +15246,32 @@ reject_pattern \
   VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift \
   VoiceInkCore/Tests/VoiceInkCoreTests/ProviderAccessRequirementTests.swift
 
+reject_file VoiceInkCore/Sources/VoiceInkCore/ProviderEndpoints.swift
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/ProviderModelSelectionTests.swift
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/ProviderEndpointTests.swift
 
 require_patterns \
+  "shared provider endpoint policy lives with provider catalog" \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift \
+  '^[[:space:]]*public enum VoiceInkProviderEndpoint:' \
+  '^[[:space:]]*public var apiBaseURL: URL' \
+  '^[[:space:]]*public static var geminiNativeAPIBaseURL: URL' \
+  '^[[:space:]]*public var consoleURL: URL' \
+  '^[[:space:]]*public static func openAICompatibleAudioTranscriptionsURL\(' \
+  '^[[:space:]]*public static func deepgramProjectsURL\(' \
+  '^[[:space:]]*public static func geminiGenerateContentURL\(' \
+  '^[[:space:]]*public static func mistralAudioTranscriptionsURL\(' \
+  '^[[:space:]]*public static func elevenLabsSpeechToTextURL\(' \
+  '^[[:space:]]*public static func sonioxTranscriptionURL\(' \
+  '^[[:space:]]*public static func speechmaticsTranscriptURL\(' \
+  '^[[:space:]]*public static func assemblyAITranscriptURL\(' \
+  '^[[:space:]]*public static func cartesiaVoicesURL\('
+
+require_patterns \
   "core checks execute provider endpoint policy through provider access suite" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'ProviderAccessRequirementTests\.testRemoteTranscriptionProvidersUseSharedTransportAndEndpoints' \
+  'ProviderAccessRequirementTests\.testGeminiUsesNativeTranscriptionEndpointButOpenAICompatiblePostProcessingEndpoint' \
   'ProviderAccessRequirementTests\.testConsoleURLsMatchMacOSProviderSettings' \
   'ProviderAccessRequirementTests\.testPostProcessingChatCompletionsURLsOnlyExistForPostProcessingProviders'
 

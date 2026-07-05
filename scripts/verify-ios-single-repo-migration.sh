@@ -10674,12 +10674,12 @@ require_pattern \
 require_patterns \
   "shared FluidAudio transcription policy owns local ASR helper interface" \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionStreamingPreference.swift \
-  'paddedSamplesForTranscription' \
-  'shouldScheduleImmediatePass' \
-  'shouldRunTranscriptionPass' \
-  'seekSample' \
-  'bufferRelativeSeek' \
-  'cachedFinalTextPlan'
+  '^[[:space:]]*public static func paddedSamplesForTranscription\(' \
+  '^[[:space:]]*public static func shouldScheduleImmediatePass\(' \
+  '^[[:space:]]*public static func shouldRunTranscriptionPass\(' \
+  '^[[:space:]]*public static func seekSample\(' \
+  '^[[:space:]]*public static func bufferRelativeSeek\(' \
+  '^[[:space:]]*public static func cachedFinalTextPlan\('
 
 require_pattern \
   "shared FluidAudio model runtime version policy lives in VoiceInkCore" \
@@ -10704,12 +10704,12 @@ require_pattern \
 require_patterns \
   "shared FluidAudio download status presentation lives in VoiceInkCore" \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift \
-  'VoiceInkFluidAudioDownloadStatus' \
-  'VoiceInkFluidAudioDownloadPhase' \
-  'compactDownloadingStatusText' \
-  'preparingDownload' \
-  'downloadingFiles' \
-  'percentText'
+  '^[[:space:]]*public enum VoiceInkFluidAudioDownloadPhase:' \
+  '^[[:space:]]*case preparingDownload' \
+  '^[[:space:]]*case downloadingFiles\(' \
+  '^[[:space:]]*public struct VoiceInkFluidAudioDownloadStatus:' \
+  '^[[:space:]]*public static let compactDownloadingStatusText' \
+  '^[[:space:]]*public let percentText:'
 
 require_pattern \
   "macOS model registry adapts shared FluidAudio default model" \

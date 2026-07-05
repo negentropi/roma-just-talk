@@ -7306,7 +7306,7 @@ require_patterns \
 require_pattern \
   "shared provider verification clients use shared API-key verification policy" \
   'VoiceInkAPIKeyVerificationPolicy\.verify' \
-  VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleChatDTOs.swift \
+  VoiceInkCore/Sources/VoiceInkCore/RemoteTransport.swift \
   VoiceInkCore/Sources/VoiceInkCore/DeepgramTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/MistralTranscriptionRequest.swift \
@@ -7340,16 +7340,21 @@ require_patterns \
   'ProviderAPIKeyVerifierTests\.testVerifierRejectsLocalMacOSTranscriptionModelProviderWithoutVerificationTransport'
 
 section "obsolete standalone OpenAI-compatible models request/client modules stay deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleChatDTOs.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleModelsRequest.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleClient.swift
 
 require_patterns \
-  "OpenAI-compatible models request builder lives with chat request owner" \
-  VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleChatDTOs.swift \
+  "OpenAI-compatible models and chat request policy lives with remote transport" \
+  VoiceInkCore/Sources/VoiceInkCore/RemoteTransport.swift \
   'VoiceInkOpenAICompatibleModelsRequestBuilder' \
   'openAICompatibleModelsURL' \
   'Authorization' \
-  'VoiceInkOpenAICompatibleClient'
+  'VoiceInkOpenAICompatibleClient' \
+  'VoiceInkOpenAICompatibleChatMessage' \
+  'VoiceInkOpenAICompatibleChatRequestBuilder' \
+  'VoiceInkOpenAICompatibleChatCodec' \
+  'openAICompatibleChatCompletionsURL'
 
 require_patterns \
   "provider verifier tests cover API-key verification result policy" \
@@ -7385,7 +7390,7 @@ reject_pattern \
 reject_pattern \
   "shared remote provider verification clients avoid duplicate API-key verification result mapping" \
   'API key is missing or empty\.|No HTTP response received\.|String\(data: data, encoding: \.utf8\) \?\? "HTTP \(http\.statusCode\)"|guard !apiKey\.trimmingCharacters' \
-  VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleChatDTOs.swift \
+  VoiceInkCore/Sources/VoiceInkCore/RemoteTransport.swift \
   VoiceInkCore/Sources/VoiceInkCore/DeepgramTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/MistralTranscriptionRequest.swift \
@@ -7431,7 +7436,7 @@ require_pattern \
   'VoiceInkRetriedRequest\.validatedData' \
   VoiceInkCore/Sources/VoiceInkCore/DeepgramTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionRequest.swift \
-  VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleChatDTOs.swift
+  VoiceInkCore/Sources/VoiceInkCore/RemoteTransport.swift
 
 require_pattern \
   "shared remote retry helper owns retry classification and validated responses" \
@@ -7535,22 +7540,29 @@ reject_pattern \
   VoiceInk.xcodeproj/project.pbxproj \
   iOS/VoiceInk-ios.xcodeproj/project.pbxproj
 
-require_pattern \
-  "core checks execute OpenAI-compatible transcription retry helper test" \
-  'RemoteProviderRequestTests\.testOpenAICompatibleTranscriptionClientUsesSharedRetryRequest' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
-
-require_pattern \
-  "core checks execute OpenAI-compatible chat HTTP response validation test" \
-  'RemoteProviderRequestTests\.testOpenAICompatibleClientUsesSharedHTTPResponseValidationForChatErrors' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+require_voiceink_core_check_runner_invocations \
+  "core checks execute OpenAI-compatible chat and models request tests" \
+  RemoteProviderRequestTests \
+  testChatRequestBuilderUsesOpenAICompatibleEndpointAndBody \
+  testChatRequestBuilderIncludesReasoningAndExtraBodyParameters \
+  testChatCodecReturnsFirstMessageContentOrEmptyString \
+  testOpenAICompatibleClientUsesSharedHTTPResponseValidationForChatErrors \
+  testOpenAICompatibleModelsRequestBuilderCanSetTimeout \
+  testOpenAICompatibleTranscriptionClientUsesSharedRetryRequest
 
 reject_pattern \
   "direct remote clients avoid duplicate HTTP response validation" \
   'URLSession\.shared\.data\(for: request\)|VoiceInkRemoteHTTPResponsePolicy\.validateSuccess|guard let http = response as\? HTTPURLResponse|guard \(200..<300\)\.contains\(http\.statusCode\)|String\(data: data, encoding: \.utf8\) \?\? ""|NSError\(' \
   VoiceInkCore/Sources/VoiceInkCore/DeepgramTranscriptionRequest.swift \
-  VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionRequest.swift \
-  VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleChatDTOs.swift
+  VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionRequest.swift
+
+require_patterns \
+  "OpenAI-compatible chat client uses shared validated request helper" \
+  VoiceInkCore/Sources/VoiceInkCore/RemoteTransport.swift \
+  'VoiceInkOpenAICompatibleClient' \
+  'chatCompletion\(' \
+  'VoiceInkRetriedRequest\.validatedData' \
+  'errorDomain: "LLMPostProcessing"'
 
 reject_pattern \
   "shared OpenAI-compatible transcription client avoids duplicate retry loop" \

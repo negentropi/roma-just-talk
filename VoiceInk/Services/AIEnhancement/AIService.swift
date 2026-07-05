@@ -37,7 +37,7 @@ class AIService: ObservableObject {
             }
         )
 
-        VoiceInkAIEnhancementProviderKind.connectedTextEnhancementProviders(
+        return VoiceInkAIEnhancementProviderKind.connectedTextEnhancementProviders(
             providerKeyStorageNamesWithKeys: providerKeyStorageNamesWithKeys,
             isOllamaConnected: ollamaService.isConnected,
             isLocalCLIConfigured: localCLIService.isConfigured

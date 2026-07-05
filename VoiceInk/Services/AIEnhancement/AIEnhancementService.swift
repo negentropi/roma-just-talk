@@ -86,13 +86,14 @@ class AIEnhancementService: ObservableObject {
         self.screenCaptureService = ScreenCaptureService()
         self.customVocabularyService = CustomVocabularyService.shared
 
-        self.isEnhancementEnabled = VoiceInkAIEnhancementPreference.isEnabled()
+        let storedIsEnhancementEnabled = VoiceInkAIEnhancementPreference.isEnabled()
+        self.isEnhancementEnabled = storedIsEnhancementEnabled
         self.useClipboardContext = VoiceInkAIEnhancementContextPreference.useClipboardContext()
         self.useScreenCaptureContext = VoiceInkAIEnhancementContextPreference.useScreenCaptureContext()
         let promptStoreState = VoiceInkCustomPromptPolicy.startupStoreState(
             loadedPrompts: VoiceInkCustomPromptStorage.loadPrompts(),
             selectedPromptId: VoiceInkCustomPromptStorage.loadSelectedPromptId(),
-            isEnhancementEnabled: isEnhancementEnabled
+            isEnhancementEnabled: storedIsEnhancementEnabled
         )
         self.customPrompts = promptStoreState.prompts
         self.selectedPromptId = promptStoreState.selectedPromptId

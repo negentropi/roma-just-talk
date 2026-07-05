@@ -124,7 +124,7 @@ class TranscriptionModelManager: ObservableObject {
             in: whisperModelManager?.availableModels ?? []
         )
 
-        model.transcriptionModelAvailabilityFacts(
+        return model.transcriptionModelAvailabilityFacts(
             hasConfiguredAPIKey: hasConfiguredAPIKey(for: model),
             isAvailableOnCurrentOS: isAvailableOnCurrentOS,
             isLocalFluidAudioModelDownloaded: fluidAudioModelManager?.isFluidAudioModelDownloaded(named: model.name) ?? false,

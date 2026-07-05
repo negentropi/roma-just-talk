@@ -88,6 +88,99 @@ final class TranscriptionRunPreparationTests: XCTestCase {
         )
     }
 
+    func testPostProcessingSkipCurrentConfigurationUsesSharedDefaultsWhenUnset() {
+        withIsolatedDefaults { defaults in
+            XCTAssertEqual(
+                VoiceInkPostProcessingSkipConfiguration.current(in: defaults),
+                VoiceInkPostProcessingSkipConfiguration(
+                    isEnabled: VoiceInkPreferenceDefault.skipShortEnhancement,
+                    wordThreshold: VoiceInkPreferenceDefault.shortEnhancementWordThreshold
+                )
+            )
+        }
+    }
+
+    func testPostProcessingSkipCurrentConfigurationReadsSharedStorageKeys() {
+        withIsolatedDefaults { defaults in
+            defaults.set(false, forKey: VoiceInkUserDefaultsKey.skipShortEnhancement)
+            defaults.set(7, forKey: VoiceInkUserDefaultsKey.shortEnhancementWordThreshold)
+
+            XCTAssertEqual(
+                VoiceInkPostProcessingSkipConfiguration.current(in: defaults),
+                VoiceInkPostProcessingSkipConfiguration(isEnabled: false, wordThreshold: 7)
+            )
+        }
+    }
+
+    func testPostProcessingSkipDisabledPolicyNeverSkipsPostProcessing() {
+        let configuration = VoiceInkPostProcessingSkipConfiguration(
+            isEnabled: false,
+            wordThreshold: 3
+        )
+
+        XCTAssertFalse(VoiceInkPostProcessingSkipPolicy.shouldSkipPostProcessing(
+            transcript: "yes",
+            configuration: configuration,
+            promptTriggerForcesPostProcessing: false
+        ))
+    }
+
+    func testPostProcessingSkipEnabledPolicySkipsAtOrBelowThreshold() {
+        let configuration = VoiceInkPostProcessingSkipConfiguration(
+            isEnabled: true,
+            wordThreshold: 3
+        )
+
+        XCTAssertTrue(VoiceInkPostProcessingSkipPolicy.shouldSkipPostProcessing(
+            transcript: "yes thank you",
+            configuration: configuration,
+            promptTriggerForcesPostProcessing: false
+        ))
+    }
+
+    func testPostProcessingSkipEnabledPolicyKeepsPostProcessingAboveThreshold() {
+        let configuration = VoiceInkPostProcessingSkipConfiguration(
+            isEnabled: true,
+            wordThreshold: 3
+        )
+
+        XCTAssertFalse(VoiceInkPostProcessingSkipPolicy.shouldSkipPostProcessing(
+            transcript: "please summarize this longer note",
+            configuration: configuration,
+            promptTriggerForcesPostProcessing: false
+        ))
+    }
+
+    func testPostProcessingSkipPromptTriggerForcesPostProcessingForShortTranscript() {
+        let configuration = VoiceInkPostProcessingSkipConfiguration(
+            isEnabled: true,
+            wordThreshold: 3
+        )
+
+        XCTAssertFalse(VoiceInkPostProcessingSkipPolicy.shouldSkipPostProcessing(
+            transcript: "email john",
+            configuration: configuration,
+            promptTriggerForcesPostProcessing: true
+        ))
+    }
+
+    func testPostProcessingSkipNonPositiveThresholdFallsBackToExistingDefault() {
+        let configuration = VoiceInkPostProcessingSkipConfiguration(
+            isEnabled: true,
+            wordThreshold: 0
+        )
+
+        XCTAssertEqual(
+            configuration.wordThreshold,
+            VoiceInkPreferenceDefault.shortEnhancementWordThreshold
+        )
+        XCTAssertTrue(VoiceInkPostProcessingSkipPolicy.shouldSkipPostProcessing(
+            transcript: "yes thank you",
+            configuration: configuration,
+            promptTriggerForcesPostProcessing: false
+        ))
+    }
+
     func testPrepareRawTextFiltersThenPreparesTranscriptText() {
         let configuration = VoiceInkTranscriptionCleanupConfiguration(
             punctuationMode: .removeTrailingPeriod,
@@ -309,5 +402,13 @@ final class TranscriptionRunPreparationTests: XCTestCase {
             promptDetectionResult: promptDetectionResult,
             skipConfiguration: configuration
         )?.text, "without trigger")
+    }
+
+    private func withIsolatedDefaults(_ run: (UserDefaults) -> Void) {
+        let suiteName = "VoiceInkCore.TranscriptionRunPreparationTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defaults.removePersistentDomain(forName: suiteName)
+        run(defaults)
+        defaults.removePersistentDomain(forName: suiteName)
     }
 }

@@ -5962,17 +5962,17 @@ reject_pattern \
 
 require_pattern \
   "shared macOS model-download onboarding presentation lives in VoiceInkCore" \
-  'VoiceInkMacOSOnboardingPresentation|VoiceInkMacOSOnboardingModelDownloadPresentation|modelDownload|skipButtonTitle|speedLabel|ramLabel|buttonTitle|ramUsageText' \
+  'VoiceInkMacOSOnboardingPresentation|VoiceInkMacOSOnboardingModelDownloadPresentation|modelDownload|nextButtonTitle|skipButtonTitle' \
   VoiceInkCore/Sources/VoiceInkCore/OnboardingPresentation.swift
 
 require_pattern \
   "macOS model-download onboarding uses shared presentation" \
-  'VoiceInkMacOSOnboardingPresentation\.modelDownload|presentation\.(title|subtitle|skipButtonTitle|speedLabel|accuracyLabel|ramLabel|ramUsageText)|buttonTitle\(isModelSet:' \
+  'VoiceInkMacOSOnboardingPresentation\.modelDownload|presentation\.(title|subtitle|nextButtonTitle|skipButtonTitle)' \
   VoiceInk/Views/Onboarding/OnboardingModelDownloadView.swift
 
 require_pattern \
-  "macOS model-download onboarding uses shared default FluidAudio model" \
-  'TranscriptionModelRegistry\.defaultMacOSFluidAudioModel' \
+  "macOS model-download onboarding embeds shared model management" \
+  'ModelManagementView\(contentPadding: 24, minimumHeight: 420\)|transcriptionModelManager\.usableModels' \
   VoiceInk/Views/Onboarding/OnboardingModelDownloadView.swift
 
 reject_pattern \
@@ -10117,6 +10117,12 @@ require_pattern \
 
 section "obsolete standalone post-processing skip policy module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/PostProcessingSkipPolicy.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/PostProcessingSkipPolicyTests.swift
+
+reject_swift_pattern \
+  "core checks avoid stale post-processing skip policy test suite" \
+  '\bPostProcessingSkipPolicyTests\b' \
+  VoiceInkCore/Tests/VoiceInkCoreTests
 
 require_pattern \
   "shared post-processing skip policy lives with transcription run preparation" \
@@ -10207,6 +10213,17 @@ require_pattern \
   'testAudioFileTextPlanSkipUsesEnhancementTextAndPromptTrigger' \
   VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunPreparationTests.swift
 
+require_patterns \
+  "core tests pin folded post-processing skip policy coverage" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunPreparationTests.swift \
+  'testPostProcessingSkipCurrentConfigurationUsesSharedDefaultsWhenUnset' \
+  'testPostProcessingSkipCurrentConfigurationReadsSharedStorageKeys' \
+  'testPostProcessingSkipDisabledPolicyNeverSkipsPostProcessing' \
+  'testPostProcessingSkipEnabledPolicySkipsAtOrBelowThreshold' \
+  'testPostProcessingSkipEnabledPolicyKeepsPostProcessingAboveThreshold' \
+  'testPostProcessingSkipPromptTriggerForcesPostProcessingForShortTranscript' \
+  'testPostProcessingSkipNonPositiveThresholdFallsBackToExistingDefault'
+
 require_pattern \
   "core check runner executes Power Mode transcription metadata selection test" \
   'testTranscriptionMetadataUsesOnlyEnabledPowerModeConfig' \
@@ -10226,6 +10243,24 @@ require_pattern \
   "core check runner executes audio-file transcription text plan skip policy test" \
   'testAudioFileTextPlanSkipUsesEnhancementTextAndPromptTrigger' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_patterns \
+  "core check runner executes folded post-processing skip policy tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'TranscriptionRunPreparationTests\.testPostProcessingSkipCurrentConfigurationUsesSharedDefaultsWhenUnset' \
+  'TranscriptionRunPreparationTests\.testPostProcessingSkipCurrentConfigurationReadsSharedStorageKeys' \
+  'TranscriptionRunPreparationTests\.testPostProcessingSkipDisabledPolicyNeverSkipsPostProcessing' \
+  'TranscriptionRunPreparationTests\.testPostProcessingSkipEnabledPolicySkipsAtOrBelowThreshold' \
+  'TranscriptionRunPreparationTests\.testPostProcessingSkipEnabledPolicyKeepsPostProcessingAboveThreshold' \
+  'TranscriptionRunPreparationTests\.testPostProcessingSkipPromptTriggerForcesPostProcessingForShortTranscript' \
+  'TranscriptionRunPreparationTests\.testPostProcessingSkipNonPositiveThresholdFallsBackToExistingDefault' \
+  'TranscriptionRunPreparationTests\(\)\.testPostProcessingSkipCurrentConfigurationUsesSharedDefaultsWhenUnset' \
+  'TranscriptionRunPreparationTests\(\)\.testPostProcessingSkipCurrentConfigurationReadsSharedStorageKeys' \
+  'TranscriptionRunPreparationTests\(\)\.testPostProcessingSkipDisabledPolicyNeverSkipsPostProcessing' \
+  'TranscriptionRunPreparationTests\(\)\.testPostProcessingSkipEnabledPolicySkipsAtOrBelowThreshold' \
+  'TranscriptionRunPreparationTests\(\)\.testPostProcessingSkipEnabledPolicyKeepsPostProcessingAboveThreshold' \
+  'TranscriptionRunPreparationTests\(\)\.testPostProcessingSkipPromptTriggerForcesPostProcessingForShortTranscript' \
+  'TranscriptionRunPreparationTests\(\)\.testPostProcessingSkipNonPositiveThresholdFallsBackToExistingDefault'
 
 reject_pattern \
   "macOS transcription callers avoid shell-only Power Mode metadata selection" \
@@ -10625,9 +10660,9 @@ require_pattern \
   VoiceInk/Views/AI\ Models/FluidAudioModelCardView.swift
 
 require_pattern \
-  "macOS onboarding model download uses shared FluidAudio percent presentation" \
-  'status\.percentText' \
-  VoiceInk/Views/Onboarding/OnboardingModelDownloadView.swift
+  "macOS model management card uses shared FluidAudio percent presentation" \
+  'status\.percentText|VoiceInkFluidAudioDownloadStatus\.compactDownloadingStatusText' \
+  VoiceInk/Views/AI\ Models/FluidAudioModelCardView.swift
 
 require_pattern \
   "macOS FluidAudio batch transcription uses shared local ASR policy" \

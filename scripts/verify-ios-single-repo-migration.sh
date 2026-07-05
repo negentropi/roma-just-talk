@@ -6238,13 +6238,15 @@ require_patterns \
   'VoiceInkMacOSPermissionSettingsPresentation\.screenContextCard' \
   'presentation\.buttonTitle\(requiresRelaunch:'
 
-require_patterns \
+require_multiline_pattern \
   "macOS metrics dashboard uses shared accessibility permission callout" \
-  VoiceInk/Views/Metrics/MetricsContent.swift \
-  'VoiceInkMacOSPermissionSettingsPresentation\.dashboardAccessibilityCallout' \
-  'PermissionCard\(' \
-  'presentation: presentation' \
-  'isGranted: isAccessibilityEnabled'
+  'let presentation = VoiceInkMacOSPermissionSettingsPresentation\.dashboardAccessibilityCallout[[:space:]]+return PermissionCard\([[:space:]]+presentation: presentation,[[:space:]]+isGranted: isAccessibilityEnabled' \
+  VoiceInk/Views/Metrics/MetricsContent.swift
+
+reject_pattern \
+  "macOS metrics dashboard avoids shell-owned permission callout construction" \
+  'VoiceInkMacOSPermissionSettingsCardPresentation\(' \
+  VoiceInk/Views/Metrics/MetricsContent.swift
 
 require_patterns \
   "macOS permissions settings uses shared permission timing and polling state" \

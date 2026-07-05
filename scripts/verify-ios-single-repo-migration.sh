@@ -12512,10 +12512,37 @@ require_pattern \
   'public struct CursorPasteTextPlan|public static func cursorPasteTextPlan|shouldReadCursorContext|VoiceInkTranscriptionCleanupPreferenceStorage\.shouldLowercase' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionPasteOutputPolicy.swift
 
+require_patterns \
+  "shared paste output policy owns contextual capitalization formatter" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionPasteOutputPolicy.swift \
+  'public enum VoiceInkContextualCapitalizationFormatter' \
+  'needsCursorContext\(_ text: String\)' \
+  'format\(_ text: String, beforeCursor: String\?\)' \
+  'sentenceTerminators = Set<Character>' \
+  'wordInternalCharacters = Set<Character>' \
+  'shouldUppercaseFirstCasedCharacter' \
+  'shouldLowercaseFirstCasedCharacter'
+
 require_pattern \
   "shared cursor text context policy owns macOS reader bounds and role filtering" \
   'VoiceInkCursorTextContextPolicy|defaultMaximumLength = 240|parentTraversalLimit = 4|textInputRoleNames|prefixLength|valueSuffix' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionPasteOutputPolicy.swift
+
+section "obsolete standalone contextual capitalization module and tests stay deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/ContextualCapitalizationFormatter.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/ContextualCapitalizationFormatterTests.swift
+
+reject_swift_pattern \
+  "core tests avoid obsolete contextual capitalization test suite" \
+  '\bContextualCapitalizationFormatterTests\b' \
+  VoiceInkCore/Tests/VoiceInkCoreTests
+
+reject_pattern \
+  "core project metadata avoids obsolete contextual capitalization files" \
+  'ContextualCapitalizationFormatter(Tests)?\.swift' \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
 
 require_pattern \
   "shared trailing-space preference owns user-defaults key" \
@@ -12576,6 +12603,32 @@ require_pattern \
   "core checks execute preference-backed cursor paste plan test" \
   'TranscriptionPasteOutputPolicyTests\.testCursorPasteTextPlanReadsLowercaseCleanupPreference' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_patterns \
+  "paste output tests cover folded contextual capitalization formatter behavior" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionPasteOutputPolicyTests.swift \
+  'testLowercasesTitlecaseTextAfterMidSentencePrefix' \
+  'testKeepsTitlecaseTextAfterSentenceBoundary' \
+  'testCapitalizesLowercaseTextAtDocumentStart' \
+  'testPreservesAcronymsAfterMidSentencePrefix' \
+  'testSkipsCursorContextWhenTextCannotChange' \
+  'testReadsCursorContextWhenTextCanChange'
+
+require_patterns \
+  "core checks execute folded contextual capitalization formatter tests through paste output suite" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'name: "TranscriptionPasteOutputPolicyTests\.testLowercasesTitlecaseTextAfterMidSentencePrefix"' \
+  'TranscriptionPasteOutputPolicyTests\(\)\.testLowercasesTitlecaseTextAfterMidSentencePrefix\(\)' \
+  'name: "TranscriptionPasteOutputPolicyTests\.testKeepsTitlecaseTextAfterSentenceBoundary"' \
+  'TranscriptionPasteOutputPolicyTests\(\)\.testKeepsTitlecaseTextAfterSentenceBoundary\(\)' \
+  'name: "TranscriptionPasteOutputPolicyTests\.testCapitalizesLowercaseTextAtDocumentStart"' \
+  'TranscriptionPasteOutputPolicyTests\(\)\.testCapitalizesLowercaseTextAtDocumentStart\(\)' \
+  'name: "TranscriptionPasteOutputPolicyTests\.testPreservesAcronymsAfterMidSentencePrefix"' \
+  'TranscriptionPasteOutputPolicyTests\(\)\.testPreservesAcronymsAfterMidSentencePrefix\(\)' \
+  'name: "TranscriptionPasteOutputPolicyTests\.testSkipsCursorContextWhenTextCannotChange"' \
+  'TranscriptionPasteOutputPolicyTests\(\)\.testSkipsCursorContextWhenTextCannotChange\(\)' \
+  'name: "TranscriptionPasteOutputPolicyTests\.testReadsCursorContextWhenTextCanChange"' \
+  'TranscriptionPasteOutputPolicyTests\(\)\.testReadsCursorContextWhenTextCanChange\(\)'
 
 require_pattern \
   "core checks execute cursor text context policy tests" \

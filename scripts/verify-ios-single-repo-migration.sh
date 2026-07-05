@@ -2666,11 +2666,21 @@ reject_pattern \
 
 section "obsolete standalone recording transcription draft module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/RecordingTranscriptionDraft.swift
+reject_file VoiceInkCore/Sources/VoiceInkCore/CompletedTranscriptionDraft.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/CompletedTranscriptionDraftTests.swift
+
+reject_pattern \
+  "VoiceInkCore metadata and checks avoid stale standalone completed transcription draft references" \
+  'CompletedTranscriptionDraftTests|CompletedTranscriptionDraft\.swift|CompletedTranscriptionDraftTests\.swift' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
 
 require_pattern \
-  "shared recording transcription draft lives with completed transcription drafts" \
+  "shared recording transcription draft lives with transcription record policy" \
   'VoiceInkRecordingTranscriptionDraft' \
-  VoiceInkCore/Sources/VoiceInkCore/CompletedTranscriptionDraft.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift
 
 section "obsolete standalone transcription status module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/TranscriptionStatus.swift
@@ -10712,12 +10722,12 @@ require_pattern \
 require_pattern \
   "shared audio-file transcription draft plan lives in VoiceInkCore" \
   'VoiceInkAudioFileTranscriptionDraftContext|VoiceInkAudioFileTranscriptionEnhancementOutcome|VoiceInkAudioFileTranscriptionDraft' \
-  VoiceInkCore/Sources/VoiceInkCore/CompletedTranscriptionDraft.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift
 
 require_pattern \
   "shared audio-file retry diagnostics live in VoiceInkCore" \
   'VoiceInkAudioFileTranscriptionDiagnostics|wordReplacementsAppliedMessage|permanentCopyFailedMessage|transcriptionFailedMessage|saveFailedMessage|Word replacements applied|Failed to create permanent copy of audio|Failed to save transcription' \
-  VoiceInkCore/Sources/VoiceInkCore/CompletedTranscriptionDraft.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift
 
 require_pattern \
   "shared transcription enhancement text plan type lives in VoiceInkCore" \
@@ -15124,17 +15134,28 @@ require_pattern \
 require_pattern \
   "shared completed transcription draft stores request metadata from shared result" \
   'enhancementResult\.requestSystemMessage' \
-  VoiceInkCore/Sources/VoiceInkCore/CompletedTranscriptionDraft.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift
 
 require_pattern \
   "core tests pin audio-file enhancement completion policy" \
   'testAudioFileTranscriptionCompletionSkipsMissingEnhancementRequest|testAudioFileTranscriptionCompletionStoresSuccessfulEnhancement|testAudioFileTranscriptionCompletionMapsEnhancementFailureToDraftAndReason|testAudioFileTranscriptionDiagnosticsPreserveMacOSRetryLogCopy' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/CompletedTranscriptionDraftTests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRecordTests.swift
 
-require_pattern \
-  "core check runner executes audio-file enhancement completion policy tests" \
-  'testAudioFileTranscriptionCompletionSkipsMissingEnhancementRequest|testAudioFileTranscriptionCompletionStoresSuccessfulEnhancement|testAudioFileTranscriptionCompletionMapsEnhancementFailureToDraftAndReason|testAudioFileTranscriptionDiagnosticsPreserveMacOSRetryLogCopy' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+require_voiceink_core_check_runner_invocations \
+  "core checks execute folded completed transcription draft policy tests" \
+  "TranscriptionRecordTests" \
+  testDraftStoresSuccessfulEnhancementMetadata \
+  testFailurePolicyCanStoreSharedFailureTextAndClearEnhancementMetadata \
+  testFailurePolicyCanOmitEnhancedText \
+  testAudioFileTranscriptionDraftBuildsCompletedDraftWithoutEnhancement \
+  testAudioFileTranscriptionDraftStoresSuccessfulEnhancement \
+  testAudioFileTranscriptionDraftAppliesFailurePolicy \
+  testAudioFileTranscriptionCompletionSkipsMissingEnhancementRequest \
+  testAudioFileTranscriptionCompletionStoresSuccessfulEnhancement \
+  testAudioFileTranscriptionCompletionMapsEnhancementFailureToDraftAndReason \
+  testAudioFileTranscriptionDiagnosticsPreserveMacOSRetryLogCopy \
+  testRecordingPendingDraftBuildsSharedPendingRow \
+  testRecordingCanceledDraftUsesSharedCanceledText
 
 require_pattern \
   "macOS re-enhance action stores request metadata through shared record mutation" \

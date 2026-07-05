@@ -3088,15 +3088,26 @@ require_pattern \
   'VoiceInkAudioMeterLevel\.iOSMeterHistoryUpdatePlan' \
   iOS/VoiceInk-ios/AudioRecorder.swift
 
+reject_file VoiceInkCore/Sources/VoiceInkCore/AudioMeterLevel.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/AudioMeterLevelTests.swift
+
+reject_pattern \
+  "VoiceInkCore metadata and checks avoid stale standalone audio-meter references" \
+  'AudioMeterLevel\.swift|AudioMeterLevelTests\.swift|AudioMeterLevelTests' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
+
 require_pattern \
   "shared audio-meter update plans live in VoiceInkCore" \
   'VoiceInk(MacOSAudioMeterUpdatePlan|IOSAudioMeterHistoryUpdatePlan)|macOSMeterUpdatePlan|iOSMeterHistoryUpdatePlan' \
-  VoiceInkCore/Sources/VoiceInkCore/AudioMeterLevel.swift
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
 require_pattern \
   "shared audio-meter update cadences live in VoiceInkCore" \
   'macOSUpdateIntervalMilliseconds|iOSUpdateInterval' \
-  VoiceInkCore/Sources/VoiceInkCore/AudioMeterLevel.swift
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
 require_pattern \
   "macOS audio-meter timer uses shared update cadence" \
@@ -3121,32 +3132,39 @@ require_pattern \
 require_pattern \
   "shared audio-meter visualizer accessibility label lives in VoiceInkCore" \
   'VoiceInkAudioMeterLevel|visualizerAccessibilityLabel' \
-  VoiceInkCore/Sources/VoiceInkCore/AudioMeterLevel.swift
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
 require_pattern \
   "shared audio-meter visualizer bar policy lives in VoiceInkCore" \
   'iOSVisualizerBarCount|iOSVisualizerBarSpacing|iOSVisualizerBarMinimumWidth|iOSVisualizerHorizontalPadding|iOSVisualizerWidthInset|iOSVisualizerFrameHeight|iOSVisualizerMinimumBarHeight|iOSVisualizerAnimationDuration|visualizerLevel|iOSVisualizerBarWidth|iOSVisualizerBarHeight' \
-  VoiceInkCore/Sources/VoiceInkCore/AudioMeterLevel.swift
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
 require_pattern \
   "shared macOS audio-meter visualizer policy lives in VoiceInkCore" \
   'macOSVisualizerBarCount|macOSVisualizerAnimationMinimumInterval|macOSVisualizerBarHeight' \
-  VoiceInkCore/Sources/VoiceInkCore/AudioMeterLevel.swift
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
 
-require_pattern \
-  "shared audio-meter visualizer checks run in VoiceInkCore" \
-  'testIOSVisualizer(Level|BarPolicy|BarWidth|BarHeight)' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
-
-require_pattern \
-  "shared macOS audio-meter visualizer checks run in VoiceInkCore" \
-  'testMacOSVisualizer(Geometry|BarHeight)' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
-
-require_pattern \
-  "shared audio-meter update plan checks run in VoiceInkCore" \
-  'AudioMeterLevelTests\.test(MacOSMeterUpdatePlanNormalizesAndSmoothsAverageAndPeak|IOSMeterHistoryUpdatePlanNormalizesAndBoundsHistory)' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+require_voiceink_core_check_runner_invocations \
+  "core checks execute folded audio-meter policy tests" \
+  "RecordingStatePolicyTests" \
+  "testVisualizerAccessibilityLabelPreservesIOSCopy" \
+  "testNormalizedLevelClampsBelowAndAboveVisibleDecibelRange" \
+  "testNormalizedLevelPreservesExistingMinusSixtyToZeroDecibelMapping" \
+  "testSmoothedLevelPreservesMacOSExponentialMovingAverageWeights" \
+  "testSmoothedLevelClampsCustomPreviousWeight" \
+  "testBoundedHistoryKeepsMostRecentLevels" \
+  "testBoundedHistoryRejectsNonPositiveLimit" \
+  "testMacOSMeterUpdatePlanNormalizesAndSmoothsAverageAndPeak" \
+  "testIOSMeterHistoryUpdatePlanNormalizesAndBoundsHistory" \
+  "testUpdateCadencesPreservePlatformAudioMeterBehavior" \
+  "testMacOSVisualizerGeometryPreservesExistingRecorderShape" \
+  "testMacOSVisualizerBarHeightPreservesExistingWaveAndCenterBoost" \
+  "testMacOSVisualizerBarHeightUsesMinimumForIdleOrInvalidBars" \
+  "testIOSVisualizerBarPolicyPreservesGeometryInputs" \
+  "testIOSVisualizerLevelSamplesRecentHistoryAndClampsLevels" \
+  "testIOSVisualizerLevelHandlesEmptyHistoryAndNonPositiveBarCount" \
+  "testIOSVisualizerBarWidthPreservesExistingLayoutMath" \
+  "testIOSVisualizerBarHeightPreservesExistingLevelMapping"
 
 require_pattern \
   "macOS audio visualizer uses shared geometry policy" \

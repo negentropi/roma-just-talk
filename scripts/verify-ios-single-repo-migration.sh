@@ -2351,22 +2351,72 @@ require_patterns \
   'UserDefaultsPreferencesTests\.testIOSSettingsPresentationPreservesSettingsChromeCopy' \
   'UserDefaultsPreferencesTests\.testMacOSSettingsPresentationPreservesSettingsChromeCopy'
 
-require_file VoiceInkCore/Sources/VoiceInkCore/AnnouncementsPolicy.swift
+section "obsolete standalone announcements policy module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/AnnouncementsPolicy.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/AnnouncementsPolicyTests.swift
 
-require_pattern \
-  "shared announcement policy owns feed and storage defaults" \
-  'VoiceInkAnnouncementPreference|isEnabledKey = VoiceInkUserDefaultsKey\.enableAnnouncements|dismissedIdsKey = "dismissedAnnouncementIds"|announcementsURLString = "https://beingpax\.github\.io/VoiceInk/announcements\.json"|refreshInterval|initialFetchDelay|requestTimeout|maxDismissedIdsToKeep' \
-  VoiceInkCore/Sources/VoiceInkCore/AnnouncementsPolicy.swift
+reject_pattern \
+  "core package/project metadata and runner avoid obsolete announcements policy files/tests" \
+  'AnnouncementsPolicy(Tests)?\.swift|AnnouncementsPolicyTests' \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
-require_pattern \
-  "shared announcement policy owns dismissal and active selection" \
-  'dismissedIds\(afterDismissing|nextAnnouncement|isActive|VoiceInkAnnouncementPresentation|VoiceInkRemoteAnnouncement|closeButtonSystemImageName|learnMoreButtonTitle|dismissButtonTitle|shouldShowDescription' \
-  VoiceInkCore/Sources/VoiceInkCore/AnnouncementsPolicy.swift
+reject_swift_pattern \
+  "VoiceInkCore tests avoid stale AnnouncementsPolicyTests references" \
+  '\bAnnouncementsPolicyTests\b' \
+  VoiceInkCore/Tests/VoiceInkCoreTests
 
-require_pattern \
+require_patterns \
+  "shared announcement policy owns feed and storage defaults with app identity" \
+  VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift \
+  'VoiceInkAnnouncementPreference' \
+  'isEnabledKey = VoiceInkUserDefaultsKey\.enableAnnouncements' \
+  'dismissedIdsKey = "dismissedAnnouncementIds"' \
+  'defaultIsEnabled = VoiceInkPreferenceDefault\.enableAnnouncements' \
+  'maxDismissedIdsToKeep = 2' \
+  'announcementsURLString = "https://beingpax\.github\.io/VoiceInk/announcements\.json"' \
+  'refreshInterval: TimeInterval = 4 \* 60 \* 60' \
+  'initialFetchDelay: TimeInterval = 5' \
+  'requestTimeout: TimeInterval = 10'
+
+require_patterns \
+  "shared announcement policy owns dismissal and active selection with app identity" \
+  VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift \
+  'VoiceInkRemoteAnnouncement' \
+  'VoiceInkAnnouncementPresentation' \
+  'VoiceInkAnnouncementPolicy' \
+  'dismissedIds\(afterDismissing' \
+  'nextAnnouncement' \
+  'isActive' \
+  'closeButtonSystemImageName' \
+  'learnMoreButtonTitle' \
+  'dismissButtonTitle' \
+  'shouldShowDescription'
+
+require_patterns \
+  "app identity tests cover announcement policy" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AppIdentityTests.swift \
+  'func testAnnouncementPreferencePreservesMacOSStorageAndFetchDefaults' \
+  'func testAnnouncementPreferenceReadsAndSavesEnabledFlagAndDismissedIds' \
+  'func testDismissedIdsPlanAvoidsDuplicatesAndKeepsMostRecentTwo' \
+  'func testAnnouncementActiveWindowPreservesOpenEndedAndInvalidDateBehavior' \
+  'func testNextAnnouncementSkipsDismissedAndInactiveThenReturnsFirstValidPresentation' \
+  'func testAnnouncementPresentationPreservesMacOSActionCopyAndDescriptionVisibility' \
+  'func testNextAnnouncementReturnsNilWhenNothingIsEligible'
+
+require_patterns \
   "macOS announcements service uses shared announcement policy" \
-  'VoiceInkAnnouncementPreference\.(announcementsURL|refreshInterval|initialFetchDelay|requestTimeout|dismissedIds|saveDismissedIds)|VoiceInkAnnouncementPolicy\.nextAnnouncement|VoiceInkRemoteAnnouncement' \
-  VoiceInk/Services/AnnouncementsService.swift
+  VoiceInk/Services/AnnouncementsService.swift \
+  'VoiceInkAnnouncementPreference\.announcementsURL' \
+  'VoiceInkAnnouncementPreference\.refreshInterval' \
+  'VoiceInkAnnouncementPreference\.initialFetchDelay' \
+  'VoiceInkAnnouncementPreference\.requestTimeout' \
+  'VoiceInkAnnouncementPreference\.dismissedIds' \
+  'VoiceInkAnnouncementPreference\.saveDismissedIds' \
+  'VoiceInkAnnouncementPolicy\.nextAnnouncement' \
+  'VoiceInkRemoteAnnouncement'
 
 require_patterns \
   "macOS announcements service passes shared announcement presentation through shell" \
@@ -2405,14 +2455,20 @@ require_pattern \
   'VoiceInkAnnouncementPreference\.registeredDefaults' \
   VoiceInk/AppDefaults.swift
 
-require_pattern \
+require_voiceink_core_check_runner_invocations \
   "core checks execute announcement policy tests" \
-  'AnnouncementsPolicyTests\.testAnnouncementPreferencePreservesMacOSStorageAndFetchDefaults|AnnouncementsPolicyTests\.testNextAnnouncementSkipsDismissedAndInactiveThenReturnsFirstValidPresentation|AnnouncementsPolicyTests\.testAnnouncementPresentationPreservesMacOSActionCopyAndDescriptionVisibility' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  AppIdentityTests \
+  testAnnouncementPreferencePreservesMacOSStorageAndFetchDefaults \
+  testAnnouncementPreferenceReadsAndSavesEnabledFlagAndDismissedIds \
+  testDismissedIdsPlanAvoidsDuplicatesAndKeepsMostRecentTwo \
+  testAnnouncementActiveWindowPreservesOpenEndedAndInvalidDateBehavior \
+  testNextAnnouncementSkipsDismissedAndInactiveThenReturnsFirstValidPresentation \
+  testAnnouncementPresentationPreservesMacOSActionCopyAndDescriptionVisibility \
+  testNextAnnouncementReturnsNilWhenNothingIsEligible
 
 require_pattern \
   "migration checklist tracks shared announcement presentation copy" \
-  'announcements enablement.*next-announcement presentation, action copy, close icon, and description visibility.*VoiceInkAnnouncementPreference`/`VoiceInkAnnouncementPolicy' \
+  'announcements enablement.*next-announcement presentation, action copy, close icon, and description visibility.*VoiceInkAnnouncementPreference`/`VoiceInkAnnouncementPolicy.*standalone `AnnouncementsPolicy\.swift` stays deleted' \
   docs/ios-single-repo-migration.md
 
 reject_pattern \

@@ -825,6 +825,7 @@ h1 .before-word {
      exactly ON the bar's frame-top so the two coincide as one outline */
   scroll-margin-top: 60px;
   text-align: center;
+  box-shadow: 8px 8px 0 var(--panel-accent);
   transition: border-color 0.25s ease;
 }
 
@@ -843,10 +844,6 @@ h1 .before-word {
 /* tuck 2px up so the first card's top border coincides with the bar's frame-top */
 .feature-panel:first-child {
   margin-top: -2px;
-}
-
-.feature-panel:last-child {
-  box-shadow: 6px 6px 0 color-mix(in srgb, var(--panel-accent) 78%, transparent);
 }
 
 .feature-panel h2 {

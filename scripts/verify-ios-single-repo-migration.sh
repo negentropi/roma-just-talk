@@ -11957,10 +11957,45 @@ require_pattern \
   'AIProviderCatalogTests\.testMacOSAIEnhancementModelPickerPresentationIsShared' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
-require_pattern \
-  "core checks execute shared Power Mode AI model display coverage" \
-  'PowerModePresentationTests\.testAIEnhancementEmptyStateTextPreservesMacOSFormCopy' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+require_patterns \
+  "core checks execute folded Power Mode presentation tests through policy suite" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'name: "PowerModePolicyTests\.testDisplayNameTrimsAndCombinesEmojiAndName"' \
+  'PowerModePolicyTests\(\)\.testDisplayNameTrimsAndCombinesEmojiAndName\(\)' \
+  'name: "PowerModePolicyTests\.testSelectedLanguageDisplayTextPreservesPowerModeRowFallbacks"' \
+  'PowerModePolicyTests\(\)\.testSelectedLanguageDisplayTextPreservesPowerModeRowFallbacks\(\)' \
+  'name: "PowerModePolicyTests\.testTriggerCountTextPreservesPowerModeRowPluralization"' \
+  'PowerModePolicyTests\(\)\.testTriggerCountTextPreservesPowerModeRowPluralization\(\)' \
+  'name: "PowerModePolicyTests\.testPanelAndSidebarChromePreservesMacOSCopy"' \
+  'PowerModePolicyTests\(\)\.testPanelAndSidebarChromePreservesMacOSCopy\(\)' \
+  'name: "PowerModePolicyTests\.testPopoverAndRowActionChromePreservesMacOSCopy"' \
+  'PowerModePolicyTests\(\)\.testPopoverAndRowActionChromePreservesMacOSCopy\(\)' \
+  'name: "PowerModePolicyTests\.testRecorderButtonIconPreservesActiveEmojiFallbacks"' \
+  'PowerModePolicyTests\(\)\.testRecorderButtonIconPreservesActiveEmojiFallbacks\(\)' \
+  'name: "PowerModePolicyTests\.testConfigurationFormChromePreservesMacOSCopy"' \
+  'PowerModePolicyTests\(\)\.testConfigurationFormChromePreservesMacOSCopy\(\)' \
+  'name: "PowerModePolicyTests\.testDeleteConfirmationPreservesPowerModeCopy"' \
+  'PowerModePolicyTests\(\)\.testDeleteConfirmationPreservesPowerModeCopy\(\)' \
+  'name: "PowerModePolicyTests\.testValidationAlertPreservesFirstPowerModeErrorCopy"' \
+  'PowerModePolicyTests\(\)\.testValidationAlertPreservesFirstPowerModeErrorCopy\(\)' \
+  'name: "PowerModePolicyTests\.testValidationAlertPreservesFallbackCopy"' \
+  'PowerModePolicyTests\(\)\.testValidationAlertPreservesFallbackCopy\(\)' \
+  'name: "PowerModePolicyTests\.testNoTranscriptionModelsAvailableTextPreservesMacOSFormCopy"' \
+  'PowerModePolicyTests\(\)\.testNoTranscriptionModelsAvailableTextPreservesMacOSFormCopy\(\)' \
+  'name: "PowerModePolicyTests\.testAIEnhancementEmptyStateTextPreservesMacOSFormCopy"' \
+  'PowerModePolicyTests\(\)\.testAIEnhancementEmptyStateTextPreservesMacOSFormCopy\(\)' \
+  'name: "PowerModePolicyTests\.testAIEnhancementFormChromePreservesMacOSCopy"' \
+  'PowerModePolicyTests\(\)\.testAIEnhancementFormChromePreservesMacOSCopy\(\)' \
+  'name: "PowerModePolicyTests\.testAdvancedFormChromePreservesMacOSCopy"' \
+  'PowerModePolicyTests\(\)\.testAdvancedFormChromePreservesMacOSCopy\(\)' \
+  'name: "PowerModePolicyTests\.testRowDetailPresentationPreservesDefaultBandWithoutVisibleChips"' \
+  'PowerModePolicyTests\(\)\.testRowDetailPresentationPreservesDefaultBandWithoutVisibleChips\(\)' \
+  'name: "PowerModePolicyTests\.testRowDetailPresentationPreservesMacOSChipOrderAndText"' \
+  'PowerModePolicyTests\(\)\.testRowDetailPresentationPreservesMacOSChipOrderAndText\(\)' \
+  'name: "PowerModePolicyTests\.testRowDetailPresentationFallsBackToDefaultPromptAndSkipsBlankAIModel"' \
+  'PowerModePolicyTests\(\)\.testRowDetailPresentationFallsBackToDefaultPromptAndSkipsBlankAIModel\(\)'
+
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/PowerModePresentationTests.swift
 
 require_pattern \
   "macOS AI service available-model source selection uses shared policy" \
@@ -12097,7 +12132,7 @@ reject_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift \
   VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift \
   VoiceInkCore/Tests/VoiceInkCoreTests/AIProviderCatalogTests.swift \
-  VoiceInkCore/Tests/VoiceInkCoreTests/PowerModePresentationTests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/PowerModePolicyTests.swift \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
   VoiceInk/PowerMode/PowerModeConfigView.swift
 
@@ -16513,7 +16548,7 @@ require_pattern \
 
 require_pattern \
   "core checks execute recorder Power Mode button icon fallback test" \
-  'PowerModePresentationTests\.testRecorderButtonIconPreservesActiveEmojiFallbacks' \
+  'PowerModePolicyTests\.testRecorderButtonIconPreservesActiveEmojiFallbacks' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \

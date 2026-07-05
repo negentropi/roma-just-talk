@@ -12910,24 +12910,44 @@ reject_pattern \
   'Your trial has expired|"AppendTrailingSpace"|textToPaste \+ \(appendSpace \? " " : ""\)|VoiceInkContextualCapitalizationFormatter\.(needsCursorContext|format)|VoiceInkTranscriptionPasteOutputPolicy\.cursorPasteTextPlan' \
   VoiceInk/Transcription/Engine/TranscriptionPipeline.swift
 
-require_pattern \
-  "core checks execute preference-backed cursor paste plan test" \
-  'PastePreferencesTests\.testCursorPasteTextPlanReadsLowercaseCleanupPreference' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
-
 require_patterns \
-  "paste output tests cover folded contextual capitalization formatter behavior" \
+  "paste preference tests cover folded paste output policy behavior" \
   VoiceInkCore/Tests/VoiceInkCoreTests/PastePreferencesTests.swift \
+  'testFinalPastedTextReturnsTranscriptWithoutTrailingSpace' \
+  'testFinalPastedTextAppendsTrailingSpaceWhenEnabled' \
+  'testFinalPastedTextPreservesTrialExpiredPrefixAndBlankLine' \
+  'testCursorPasteTextPlanSkipsCursorReadWhenLowercaseCleanupIsEnabled' \
+  'testCursorPasteTextPlanSkipsCursorReadForUncasedText' \
+  'testCursorPasteTextPlanAppliesSharedCapitalizationWithCursorContext' \
   'testLowercasesTitlecaseTextAfterMidSentencePrefix' \
   'testKeepsTitlecaseTextAfterSentenceBoundary' \
   'testCapitalizesLowercaseTextAtDocumentStart' \
   'testPreservesAcronymsAfterMidSentencePrefix' \
   'testSkipsCursorContextWhenTextCannotChange' \
-  'testReadsCursorContextWhenTextCanChange'
+  'testReadsCursorContextWhenTextCanChange' \
+  'testCursorPasteTextPlanReadsLowercaseCleanupPreference' \
+  'testAppendTrailingSpacePreferencePreservesStorageAndDefault' \
+  'testAppendTrailingSpacePreferencePreservesMacOSSettingsPresentation' \
+  'testCursorTextContextPolicyPreservesMacOSAccessibilityReadBounds' \
+  'testCursorTextContextPolicyOwnsTextInputRoles' \
+  'testCursorTextContextPolicyBoundsPrefixLength' \
+  'testCursorTextContextPolicyBoundsValueSuffixToTextInputRoles'
 
 require_patterns \
-  "core checks execute folded contextual capitalization formatter tests through paste preference suite" \
+  "core checks execute folded paste output tests through paste preference suite" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'name: "PastePreferencesTests\.testFinalPastedTextReturnsTranscriptWithoutTrailingSpace"' \
+  'PastePreferencesTests\(\)\.testFinalPastedTextReturnsTranscriptWithoutTrailingSpace\(\)' \
+  'name: "PastePreferencesTests\.testFinalPastedTextAppendsTrailingSpaceWhenEnabled"' \
+  'PastePreferencesTests\(\)\.testFinalPastedTextAppendsTrailingSpaceWhenEnabled\(\)' \
+  'name: "PastePreferencesTests\.testFinalPastedTextPreservesTrialExpiredPrefixAndBlankLine"' \
+  'PastePreferencesTests\(\)\.testFinalPastedTextPreservesTrialExpiredPrefixAndBlankLine\(\)' \
+  'name: "PastePreferencesTests\.testCursorPasteTextPlanSkipsCursorReadWhenLowercaseCleanupIsEnabled"' \
+  'PastePreferencesTests\(\)\.testCursorPasteTextPlanSkipsCursorReadWhenLowercaseCleanupIsEnabled\(\)' \
+  'name: "PastePreferencesTests\.testCursorPasteTextPlanSkipsCursorReadForUncasedText"' \
+  'PastePreferencesTests\(\)\.testCursorPasteTextPlanSkipsCursorReadForUncasedText\(\)' \
+  'name: "PastePreferencesTests\.testCursorPasteTextPlanAppliesSharedCapitalizationWithCursorContext"' \
+  'PastePreferencesTests\(\)\.testCursorPasteTextPlanAppliesSharedCapitalizationWithCursorContext\(\)' \
   'name: "PastePreferencesTests\.testLowercasesTitlecaseTextAfterMidSentencePrefix"' \
   'PastePreferencesTests\(\)\.testLowercasesTitlecaseTextAfterMidSentencePrefix\(\)' \
   'name: "PastePreferencesTests\.testKeepsTitlecaseTextAfterSentenceBoundary"' \
@@ -12939,15 +12959,21 @@ require_patterns \
   'name: "PastePreferencesTests\.testSkipsCursorContextWhenTextCannotChange"' \
   'PastePreferencesTests\(\)\.testSkipsCursorContextWhenTextCannotChange\(\)' \
   'name: "PastePreferencesTests\.testReadsCursorContextWhenTextCanChange"' \
-  'PastePreferencesTests\(\)\.testReadsCursorContextWhenTextCanChange\(\)'
-
-require_patterns \
-  "core checks execute cursor text context policy tests" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'PastePreferencesTests\.testCursorTextContextPolicyPreservesMacOSAccessibilityReadBounds' \
-  'PastePreferencesTests\.testCursorTextContextPolicyOwnsTextInputRoles' \
-  'PastePreferencesTests\.testCursorTextContextPolicyBoundsPrefixLength' \
-  'PastePreferencesTests\.testCursorTextContextPolicyBoundsValueSuffixToTextInputRoles'
+  'PastePreferencesTests\(\)\.testReadsCursorContextWhenTextCanChange\(\)' \
+  'name: "PastePreferencesTests\.testCursorPasteTextPlanReadsLowercaseCleanupPreference"' \
+  'PastePreferencesTests\(\)\.testCursorPasteTextPlanReadsLowercaseCleanupPreference\(\)' \
+  'name: "PastePreferencesTests\.testAppendTrailingSpacePreferencePreservesStorageAndDefault"' \
+  'PastePreferencesTests\(\)\.testAppendTrailingSpacePreferencePreservesStorageAndDefault\(\)' \
+  'name: "PastePreferencesTests\.testAppendTrailingSpacePreferencePreservesMacOSSettingsPresentation"' \
+  'PastePreferencesTests\(\)\.testAppendTrailingSpacePreferencePreservesMacOSSettingsPresentation\(\)' \
+  'name: "PastePreferencesTests\.testCursorTextContextPolicyPreservesMacOSAccessibilityReadBounds"' \
+  'PastePreferencesTests\(\)\.testCursorTextContextPolicyPreservesMacOSAccessibilityReadBounds\(\)' \
+  'name: "PastePreferencesTests\.testCursorTextContextPolicyOwnsTextInputRoles"' \
+  'PastePreferencesTests\(\)\.testCursorTextContextPolicyOwnsTextInputRoles\(\)' \
+  'name: "PastePreferencesTests\.testCursorTextContextPolicyBoundsPrefixLength"' \
+  'PastePreferencesTests\(\)\.testCursorTextContextPolicyBoundsPrefixLength\(\)' \
+  'name: "PastePreferencesTests\.testCursorTextContextPolicyBoundsValueSuffixToTextInputRoles"' \
+  'PastePreferencesTests\(\)\.testCursorTextContextPolicyBoundsValueSuffixToTextInputRoles\(\)'
 
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionPasteOutputPolicyTests.swift
 

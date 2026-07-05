@@ -12660,7 +12660,7 @@ require_pattern \
 require_pattern \
   "iOS post-processing request tuning uses shared policy" \
   'chatRequestParameters' \
-  VoiceInkCore/Sources/VoiceInkCore/PostProcessingClient.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift
 
 section "obsolete standalone AI reasoning config module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/AIReasoningConfig.swift
@@ -12705,13 +12705,14 @@ require_patterns \
   'AIProviderCatalogTests\.testMacOSExtraAIProvidersUseNoSharedReasoningOverrides'
 
 section "obsolete standalone post-processing request module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/PostProcessingClient.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/PostProcessingRequest.swift
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/PostProcessingRequestTests.swift
 
 require_pattern \
-  "shared post-processing request policy lives with post-processing client" \
+  "shared post-processing request policy lives with transcription run processor" \
   'VoiceInkPostProcessingRequest|finalizedTranscript|defaultTemperature|applyRuntimeState' \
-  VoiceInkCore/Sources/VoiceInkCore/PostProcessingClient.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift
 
 require_patterns \
   "shared run processor delegates post-processing execution to core client" \
@@ -12770,7 +12771,7 @@ require_patterns \
 reject_pattern \
   "shared post-processing request policy avoids public raw request payload fields" \
   'public (struct VoiceInkPostProcessingRequest|let (messages|temperature))' \
-  VoiceInkCore/Sources/VoiceInkCore/PostProcessingClient.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift
 
 reject_pattern \
   "macOS AI API-key path avoids shell-only key-reference and blank-key policy" \
@@ -12923,7 +12924,7 @@ reject_pattern \
   "macOS/iOS AI request tuning avoids duplicate reasoning parameter assembly" \
   'VoiceInkAIReasoningConfig\.(temperature|reasoningEffort|extraBodyParameters)' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift \
-  VoiceInkCore/Sources/VoiceInkCore/PostProcessingClient.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift
 
 reject_pattern \
   "macOS AI API-key view avoids duplicate verification failure copy" \

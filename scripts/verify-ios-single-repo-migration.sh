@@ -10757,6 +10757,25 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift
 
 reject_file VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelAvailability.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionModelAvailabilityTests.swift
+
+reject_swift_pattern \
+  "shared core avoids stale transcription model availability test suite" \
+  '\bTranscriptionModelAvailabilityTests\b' \
+  VoiceInkCore/Tests/VoiceInkCoreTests
+
+require_patterns \
+  "shared catalog tests own folded transcription model availability coverage" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionModelCatalogTests.swift \
+  'func testAvailabilityRequirementPredicatesIdentifyShellFactsNeeded' \
+  'func testConfiguredAPIKeyRequirementUsesConfiguredKeyFact' \
+  'func testCurrentOSRequirementUsesCurrentOSFact' \
+  'func testLocalModelRequirementsUseDownloadedFacts' \
+  'func testAlwaysAvailableAndUnavailableRequirementsStayExplicit' \
+  'func testNativeAppleTranscriptionPolicyPreservesMacOSErrorCopy' \
+  'func testNativeAppleFailureKindIsSharedThrowableLocalizedError' \
+  'func testNativeAppleTranscriptionPolicyPreservesSelectionAndTimeoutCopy' \
+  'func testNativeAppleTranscriptionDiagnosticsPreserveMacOSLogCopy'
 
 require_pattern \
   "macOS model adapts shared transcription model availability facts" \
@@ -10771,10 +10790,27 @@ require_patterns \
   'requiresConfiguredAPIKey' \
   'requiresCurrentOSSupport'
 
-require_pattern \
-  "core checks execute transcription availability requirement predicate tests" \
-  'TranscriptionModelAvailabilityTests\.testAvailabilityRequirementPredicatesIdentifyShellFactsNeeded' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+require_patterns \
+  "core checks execute folded transcription model catalog tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'name: "TranscriptionModelCatalogTests\.testAvailabilityRequirementPredicatesIdentifyShellFactsNeeded"' \
+  'TranscriptionModelCatalogTests\(\)\.testAvailabilityRequirementPredicatesIdentifyShellFactsNeeded\(\)' \
+  'name: "TranscriptionModelCatalogTests\.testConfiguredAPIKeyRequirementUsesConfiguredKeyFact"' \
+  'TranscriptionModelCatalogTests\(\)\.testConfiguredAPIKeyRequirementUsesConfiguredKeyFact\(\)' \
+  'name: "TranscriptionModelCatalogTests\.testCurrentOSRequirementUsesCurrentOSFact"' \
+  'TranscriptionModelCatalogTests\(\)\.testCurrentOSRequirementUsesCurrentOSFact\(\)' \
+  'name: "TranscriptionModelCatalogTests\.testLocalModelRequirementsUseDownloadedFacts"' \
+  'TranscriptionModelCatalogTests\(\)\.testLocalModelRequirementsUseDownloadedFacts\(\)' \
+  'name: "TranscriptionModelCatalogTests\.testAlwaysAvailableAndUnavailableRequirementsStayExplicit"' \
+  'TranscriptionModelCatalogTests\(\)\.testAlwaysAvailableAndUnavailableRequirementsStayExplicit\(\)' \
+  'name: "TranscriptionModelCatalogTests\.testNativeAppleTranscriptionPolicyPreservesMacOSErrorCopy"' \
+  'TranscriptionModelCatalogTests\(\)\.testNativeAppleTranscriptionPolicyPreservesMacOSErrorCopy\(\)' \
+  'name: "TranscriptionModelCatalogTests\.testNativeAppleFailureKindIsSharedThrowableLocalizedError"' \
+  'TranscriptionModelCatalogTests\(\)\.testNativeAppleFailureKindIsSharedThrowableLocalizedError\(\)' \
+  'name: "TranscriptionModelCatalogTests\.testNativeAppleTranscriptionPolicyPreservesSelectionAndTimeoutCopy"' \
+  'TranscriptionModelCatalogTests\(\)\.testNativeAppleTranscriptionPolicyPreservesSelectionAndTimeoutCopy\(\)' \
+  'name: "TranscriptionModelCatalogTests\.testNativeAppleTranscriptionDiagnosticsPreserveMacOSLogCopy"' \
+  'TranscriptionModelCatalogTests\(\)\.testNativeAppleTranscriptionDiagnosticsPreserveMacOSLogCopy\(\)'
 
 require_pattern \
   "macOS transcription model manager uses shared Native Apple transcription policy" \
@@ -10801,14 +10837,6 @@ require_patterns \
   VoiceInk/Transcription/Native/NativeAppleTranscriptionService.swift \
   'VoiceInkNativeAppleTranscriptionPolicy\.(unsupportedOSDiagnosticMessage|unsupportedLocaleDiagnosticMessage|missingAssetDiagnosticMessage|emptyAudioDiagnosticMessage|assetReservationReturnedFalseDiagnosticMessage|assetReservationFailedDiagnosticMessage|resultWaitFailedDiagnosticMessage)' \
   'category: VoiceInkMacOSLogCategory\.nativeAppleTranscriptionService'
-
-require_patterns \
-  "core checks execute Native Apple transcription policy tests" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'TranscriptionModelAvailabilityTests\.testNativeAppleTranscriptionPolicyPreservesMacOSErrorCopy' \
-  'TranscriptionModelAvailabilityTests\.testNativeAppleFailureKindIsSharedThrowableLocalizedError' \
-  'TranscriptionModelAvailabilityTests\.testNativeAppleTranscriptionPolicyPreservesSelectionAndTimeoutCopy' \
-  'TranscriptionModelAvailabilityTests\.testNativeAppleTranscriptionDiagnosticsPreserveMacOSLogCopy'
 
 require_patterns \
   "macOS transcription model manager applies shared local Whisper runtime update" \

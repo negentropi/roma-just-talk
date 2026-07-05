@@ -5,8 +5,8 @@ import VoiceInkCore
 struct ToggleMiniRecorderIntent: AppIntent {
     private static let presentation = VoiceInkMiniRecorderAppIntentPresentation.toggle
 
-    static var title = LocalizedStringResource(stringLiteral: presentation.title)
-    static var description = IntentDescription(stringLiteral: presentation.description)
+    static var title: LocalizedStringResource = "Toggle VoiceInk Recorder"
+    static var description = IntentDescription("Start or stop the VoiceInk mini recorder for voice transcription.")
     
     static var openAppWhenRun: Bool = false
     

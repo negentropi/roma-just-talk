@@ -774,6 +774,7 @@ require_pattern \
 
 section "obsolete standalone API-key reference module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/APIKeyReference.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/APIKeyReferenceTests.swift
 
 section "obsolete standalone provider API-key account module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyAccounts.swift
@@ -782,6 +783,51 @@ require_pattern \
   "shared provider API-key accounts live with provider access requirements" \
   'VoiceInkProviderAPIKeyAccount|VoiceInkProviderAccessRequirement|fallbackEnvironmentKey\(forProviderName:' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift
+
+reject_pattern \
+  "core API-key reference coverage stays in provider access suite" \
+  'APIKeyReferenceTests' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/ProviderAccessRequirementTests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
+
+require_patterns \
+  "core provider access suite owns API-key reference coverage" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/ProviderAccessRequirementTests.swift \
+  'testResolvedValueReturnsTrimmedLiteralKeys' \
+  'testResolvedValueResolvesDollarEnvironmentReference' \
+  'testResolvedValueResolvesBracedEnvironmentReference' \
+  'testResolvedValueRejectsMissingBlankAndInvalidReferences' \
+  'testProviderAPIKeyLookupUsesResolvedStoredKeyFirst' \
+  'testProviderAPIKeyLookupUsesProviderEnvironmentFallbackWhenStoredKeyIsMissingOrInvalid' \
+  'testProviderAPIKeyLookupAcceptsTypedProviderKind' \
+  'testProviderAPIKeyLookupRejectsBlankAndProvidersWithoutEnvironmentFallback' \
+  'VoiceInkAPIKeyReference' \
+  'VoiceInkAPIKeyReference\.resolvedValue' \
+  'VoiceInkProviderAPIKeyLookup' \
+  'VoiceInkProviderAPIKeyLookup\.usableAPIKey'
+
+require_patterns \
+  "core checks execute API-key reference coverage through provider access suite" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'ProviderAccessRequirementTests\.testResolvedValueReturnsTrimmedLiteralKeys' \
+  'ProviderAccessRequirementTests\(\)\.testResolvedValueReturnsTrimmedLiteralKeys\(\)' \
+  'ProviderAccessRequirementTests\.testResolvedValueResolvesDollarEnvironmentReference' \
+  'ProviderAccessRequirementTests\(\)\.testResolvedValueResolvesDollarEnvironmentReference\(\)' \
+  'ProviderAccessRequirementTests\.testResolvedValueResolvesBracedEnvironmentReference' \
+  'ProviderAccessRequirementTests\(\)\.testResolvedValueResolvesBracedEnvironmentReference\(\)' \
+  'ProviderAccessRequirementTests\.testResolvedValueRejectsMissingBlankAndInvalidReferences' \
+  'ProviderAccessRequirementTests\(\)\.testResolvedValueRejectsMissingBlankAndInvalidReferences\(\)' \
+  'ProviderAccessRequirementTests\.testProviderAPIKeyLookupUsesResolvedStoredKeyFirst' \
+  'ProviderAccessRequirementTests\(\)\.testProviderAPIKeyLookupUsesResolvedStoredKeyFirst\(\)' \
+  'ProviderAccessRequirementTests\.testProviderAPIKeyLookupUsesProviderEnvironmentFallbackWhenStoredKeyIsMissingOrInvalid' \
+  'ProviderAccessRequirementTests\(\)\.testProviderAPIKeyLookupUsesProviderEnvironmentFallbackWhenStoredKeyIsMissingOrInvalid\(\)' \
+  'ProviderAccessRequirementTests\.testProviderAPIKeyLookupAcceptsTypedProviderKind' \
+  'ProviderAccessRequirementTests\(\)\.testProviderAPIKeyLookupAcceptsTypedProviderKind\(\)' \
+  'ProviderAccessRequirementTests\.testProviderAPIKeyLookupRejectsBlankAndProvidersWithoutEnvironmentFallback' \
+  'ProviderAccessRequirementTests\(\)\.testProviderAPIKeyLookupRejectsBlankAndProvidersWithoutEnvironmentFallback\(\)'
 
 require_pattern \
   "macOS API-key manager uses shared custom model account identifier" \

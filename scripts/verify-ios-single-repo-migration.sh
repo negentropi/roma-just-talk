@@ -5274,9 +5274,11 @@ reject_pattern \
   'public static let recommendedModelNames|public func +(includes|sortRank)' \
   VoiceInkCore/Sources/VoiceInkCore/ModelManagementPresentation.swift
 
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/ModelManagementPresentationTests.swift
+
 require_pattern \
   "core checks execute model management list filtering policy" \
-  'ModelManagementPresentationTests\.testModelManagementFiltersOwnListFilteringAndRecommendedOrder' \
+  'TranscriptionModelCatalogTests\.testModelManagementFiltersOwnListFilteringAndRecommendedOrder' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \

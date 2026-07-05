@@ -2473,7 +2473,7 @@ require_pattern \
 
 reject_pattern \
   "macOS announcement shell avoids raw announcement policy" \
-  '"(enableAnnouncements|dismissedAnnouncementIds|https://beingpax\.github\.io/VoiceInk/announcements\.json)"|private struct RemoteAnnouncement|ISO8601DateFormatter|maxDismissedToKeep|refreshInterval: TimeInterval = 4|DispatchQueue\.main\.asyncAfter\(deadline: \.now\(\) \+ 5\)' \
+  '"(enableAnnouncements|dismissedAnnouncementIds|https://beingpax\.github\.io/VoiceInk/announcements\.json)"|private struct RemoteAnnouncement|ISO8601DateFormatter|maxDismissedIdsToKeep|refreshInterval: TimeInterval = 4|DispatchQueue\.main\.asyncAfter\(deadline: \.now\(\) \+ 5\)' \
   VoiceInk/Services/AnnouncementsService.swift \
   VoiceInk/AppDefaults.swift \
   VoiceInk/VoiceInk.swift \

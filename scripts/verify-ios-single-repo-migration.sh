@@ -4382,9 +4382,11 @@ require_patterns \
   'ProviderAccessRequirementTests\.testProviderAPIKeyFormSnapshotBuildsVerificationStartPlanFromRuntimeKey'
 
 require_pattern \
-  "shared provider API-key storage lives in VoiceInkCore" \
+  "shared provider API-key storage is folded into provider API-key state" \
   'VoiceInkProviderAPIKeyStorage|storedKey\(|saveStoredKey|deleteStoredKey|shouldReportFailure|VoiceInkProviderAPIKeyStorageDiagnostics|saveFailureMessage|savedProviderAPIKeyMessage|deletedProviderAPIKeyMessage|savedCustomModelAPIKeyMessage|deletedCustomModelAPIKeyMessage' \
-  VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyStorage.swift
+  VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift
+
+reject_file VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyStorage.swift
 
 require_pattern \
   "iOS app settings consumes shared startup provider API-key state" \
@@ -4515,12 +4517,25 @@ require_pattern \
 require_pattern \
   "shared provider API-key storage uses shared string value policy" \
   'VoiceInkKeychainValueStore\.(saveString|loadString|deleteValue)' \
-  VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyStorage.swift
+  VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift
 
-require_pattern \
-  "core checks execute provider API-key storage tests" \
-  'ProviderAPIKeyStorageTests\.test(AccountUsesSharedProviderAccessRequirement|StoredKeyLoadsThroughProviderAccountAndDefaultsToEmpty|SaveStoredKeyTargetsProviderAccountAndReportsFailureStatus|ProviderAPIKeyStorageDiagnosticsPreserveIOSLogCopy|ProviderAPIKeyStorageDiagnosticsPreserveMacOSSuccessLogCopy)' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+require_patterns \
+  "core checks execute folded provider API-key storage tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'ProviderAccessRequirementTests\.testAccountUsesSharedProviderAccessRequirement' \
+  'ProviderAccessRequirementTests\.testStoredKeyLoadsThroughProviderAccountAndDefaultsToEmpty' \
+  'ProviderAccessRequirementTests\.testStoredKeySkipsProvidersWithoutUserKeyAccounts' \
+  'ProviderAccessRequirementTests\.testSaveStoredKeyTargetsProviderAccountAndReportsFailureStatus' \
+  'ProviderAccessRequirementTests\.testSaveAndDeleteSkipProvidersWithoutUserKeyAccounts' \
+  'ProviderAccessRequirementTests\.testProviderAPIKeyStorageDiagnosticsPreserveIOSLogCopy' \
+  'ProviderAccessRequirementTests\.testProviderAPIKeyStorageDiagnosticsPreserveMacOSSuccessLogCopy'
+
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/ProviderAPIKeyStorageTests.swift
+
+reject_swift_pattern \
+  "core tests avoid obsolete provider API-key storage test suite references" \
+  '\bProviderAPIKeyStorageTests\b' \
+  VoiceInkCore/Tests/VoiceInkCoreTests
 
 require_pattern \
   "core checks execute Keychain diagnostics test" \

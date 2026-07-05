@@ -19,12 +19,19 @@ struct ModelManagementView: View {
     @State private var isShowingSettings = false
 
     private let settingsPanelWidth: CGFloat = 400
+    private let contentPadding: CGFloat
+    private let minimumHeight: CGFloat
 
     // State for the unified alert
     @State private var isShowingDeleteAlert = false
     @State private var alertTitle = ""
     @State private var alertMessage = ""
     @State private var deleteActionClosure: () -> Void = {}
+
+    init(contentPadding: CGFloat = 40, minimumHeight: CGFloat = 500) {
+        self.contentPadding = contentPadding
+        self.minimumHeight = minimumHeight
+    }
 
     private func closeSettings() {
         withAnimation(.smooth(duration: 0.3)) {
@@ -43,9 +50,9 @@ struct ModelManagementView: View {
                 languageSelectionSection
                 availableModelsSection
             }
-            .padding(40)
+            .padding(contentPadding)
         }
-        .frame(minWidth: 600, minHeight: 500)
+        .frame(minWidth: 600, minHeight: minimumHeight)
         .background(Color(NSColor.controlBackgroundColor))
         .slidingPanel(isPresented: $isShowingSettings, width: settingsPanelWidth) {
             settingsPanelContent

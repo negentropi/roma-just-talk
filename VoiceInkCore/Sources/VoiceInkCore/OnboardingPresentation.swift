@@ -200,58 +200,19 @@ public extension VoiceInkWhisperModelManagementSnapshot {
 public struct VoiceInkMacOSOnboardingModelDownloadPresentation: Equatable, Sendable {
     public let title: String
     public let subtitle: String
-    public let continueButtonTitle: String
+    public let nextButtonTitle: String
     public let skipButtonTitle: String
-    public let downloadingButtonTitle: String
-    public let setAsDefaultButtonTitle: String
-    public let downloadButtonTitle: String
-    public let speedLabel: String
-    public let accuracyLabel: String
-    public let ramLabel: String
 
     public init(
         title: String,
         subtitle: String,
-        continueButtonTitle: String,
-        skipButtonTitle: String,
-        downloadingButtonTitle: String,
-        setAsDefaultButtonTitle: String,
-        downloadButtonTitle: String,
-        speedLabel: String,
-        accuracyLabel: String,
-        ramLabel: String
+        nextButtonTitle: String,
+        skipButtonTitle: String
     ) {
         self.title = title
         self.subtitle = subtitle
-        self.continueButtonTitle = continueButtonTitle
+        self.nextButtonTitle = nextButtonTitle
         self.skipButtonTitle = skipButtonTitle
-        self.downloadingButtonTitle = downloadingButtonTitle
-        self.setAsDefaultButtonTitle = setAsDefaultButtonTitle
-        self.downloadButtonTitle = downloadButtonTitle
-        self.speedLabel = speedLabel
-        self.accuracyLabel = accuracyLabel
-        self.ramLabel = ramLabel
-    }
-
-    public func buttonTitle(
-        isModelSet: Bool,
-        isDownloading: Bool,
-        isModelDownloaded: Bool
-    ) -> String {
-        if isModelSet {
-            return continueButtonTitle
-        }
-        if isDownloading {
-            return downloadingButtonTitle
-        }
-        if isModelDownloaded {
-            return setAsDefaultButtonTitle
-        }
-        return downloadButtonTitle
-    }
-
-    public func ramUsageText(gb: Double) -> String {
-        String(format: "%.1f GB", gb)
     }
 }
 
@@ -395,15 +356,9 @@ public enum VoiceInkMacOSOnboardingPresentation {
 
     public static let modelDownload = VoiceInkMacOSOnboardingModelDownloadPresentation(
         title: "Download AI Model",
-        subtitle: "We'll download the optimized model to get you started.",
-        continueButtonTitle: "Continue",
-        skipButtonTitle: "Skip for now",
-        downloadingButtonTitle: "Downloading...",
-        setAsDefaultButtonTitle: VoiceInkModelManagementPresentation.setAsDefaultButtonTitle,
-        downloadButtonTitle: "Download Model",
-        speedLabel: "Speed",
-        accuracyLabel: "Accuracy",
-        ramLabel: "RAM"
+        subtitle: "Your default model starts downloading automatically. You can wait here, choose another model, or skip setup for now.",
+        nextButtonTitle: "Next",
+        skipButtonTitle: "Skip for now"
     )
 
     public static let tutorial = VoiceInkMacOSOnboardingTutorialPresentation(

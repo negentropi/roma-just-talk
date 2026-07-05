@@ -265,33 +265,12 @@ final class OnboardingPresentationTests: XCTestCase {
         let presentation = VoiceInkMacOSOnboardingPresentation.modelDownload
 
         XCTAssertEqual(presentation.title, "Download AI Model")
-        XCTAssertEqual(presentation.subtitle, "We'll download the optimized model to get you started.")
-        XCTAssertEqual(presentation.continueButtonTitle, "Continue")
+        XCTAssertEqual(
+            presentation.subtitle,
+            "Your default model starts downloading automatically. You can wait here, choose another model, or skip setup for now."
+        )
+        XCTAssertEqual(presentation.nextButtonTitle, "Next")
         XCTAssertEqual(presentation.skipButtonTitle, "Skip for now")
-        XCTAssertEqual(presentation.downloadingButtonTitle, "Downloading...")
-        XCTAssertEqual(presentation.setAsDefaultButtonTitle, "Set as Default")
-        XCTAssertEqual(presentation.downloadButtonTitle, "Download Model")
-        XCTAssertEqual(presentation.speedLabel, "Speed")
-        XCTAssertEqual(presentation.accuracyLabel, "Accuracy")
-        XCTAssertEqual(presentation.ramLabel, "RAM")
-        XCTAssertEqual(
-            presentation.buttonTitle(isModelSet: true, isDownloading: true, isModelDownloaded: true),
-            "Continue"
-        )
-        XCTAssertEqual(
-            presentation.buttonTitle(isModelSet: false, isDownloading: true, isModelDownloaded: true),
-            "Downloading..."
-        )
-        XCTAssertEqual(
-            presentation.buttonTitle(isModelSet: false, isDownloading: false, isModelDownloaded: true),
-            "Set as Default"
-        )
-        XCTAssertEqual(
-            presentation.buttonTitle(isModelSet: false, isDownloading: false, isModelDownloaded: false),
-            "Download Model"
-        )
-        XCTAssertEqual(presentation.ramUsageText(gb: 3), "3.0 GB")
-        XCTAssertEqual(presentation.ramUsageText(gb: 3.25), "3.2 GB")
     }
 
     func testMacOSOnboardingTutorialPresentationPreservesCopyAndStepOrder() {

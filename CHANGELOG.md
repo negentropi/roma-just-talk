@@ -2,6 +2,7 @@
 
 ## v1.96 - Unreleased
 
+- Reused the model management panel in macOS onboarding's model step, keeping launch auto-download while limiting onboarding navigation to Next and Skip.
 - Added a first-run setup skip action for the keyboard-shortcut step so setup can continue without configuring a shortcut immediately.
 - Added a Homebrew cask for installing the fork from the repo tap and aligned CI packaging with the release asset URL.
 - Added an opt-in visible-text latency harness for measuring real hotkey-release-to-target-text timing in everyday macOS apps.

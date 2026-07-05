@@ -10974,9 +10974,13 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/AIEnhancementRetryPolicyTests.swift
 
 require_voiceink_core_check_runner_invocations \
-  "core check runner executes shared AI enhancement transport failure policy test" \
+  "core check runner executes shared AI enhancement error and transport policy tests" \
   AIEnhancementRetryPolicyTests \
-  testTransportFailureMappingPreservesMacOSLLMKitCategories
+  testErrorDescriptionsPreserveExistingMacOSMessages \
+  testHTTPErrorMappingPreservesMacOSRetryCategories \
+  testTransportFailureMappingPreservesMacOSLLMKitCategories \
+  testTransportNetworkErrorMapsRetryableFoundationErrors \
+  testTransportNetworkErrorRejectsNonRetryableFoundationErrors
 
 require_pattern \
   "macOS AI enhancement service adapts LLMKit transport failures through shared policy" \
@@ -13078,10 +13082,18 @@ require_voiceink_core_check_runner_invocations \
   "core checks execute AI enhancement retry policy coverage" \
   AIEnhancementRetryPolicyTests \
   testDefaultRetryStatePreservesMacOSAttemptAndDelayDefaults \
-  testRetryFailurePresentationPreservesMacOSLogMessages \
-  testRetryProgressPresentationPreservesMacOSLogMessages \
+  testBackoffFailuresRetryUntilAttemptLimit \
+  testTimeoutRetriesImmediatelyWhenEnabled \
+  testTimeoutFailsImmediatelyWhenDisabled \
+  testNonRetryableEnhancementErrorsFailWithoutCountingAttempt \
+  testTransportNetworkFailureMapsToSharedNetworkError \
   testNonEnhancementErrorRetryPlanHandlesOnlyRetryableTransportFailures \
-  testNonEnhancementErrorRetryPlanAppliesRuntimeState
+  testNonEnhancementErrorRetryPlanAppliesRuntimeState \
+  testRateLimitPolicySkipsDelayWithoutLastRequest \
+  testRateLimitPolicyReturnsRemainingDelay \
+  testRateLimitPolicySkipsDelayAfterIntervalExpires \
+  testRetryProgressPresentationPreservesMacOSLogMessages \
+  testRetryFailurePresentationPreservesMacOSLogMessages
 
 require_pattern \
   "shared AI enhancement request payload lives in VoiceInkCore" \

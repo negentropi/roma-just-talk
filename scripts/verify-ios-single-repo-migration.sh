@@ -10671,10 +10671,15 @@ require_pattern \
   'maxSingleChunkSamples = 240_000' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionStreamingPreference.swift
 
-require_pattern \
+require_patterns \
   "shared FluidAudio transcription policy owns local ASR helper interface" \
-  'paddedSamplesForTranscription|shouldScheduleImmediatePass|shouldRunTranscriptionPass|seekSample|bufferRelativeSeek|cachedFinalTextPlan' \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptionStreamingPreference.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionStreamingPreference.swift \
+  'paddedSamplesForTranscription' \
+  'shouldScheduleImmediatePass' \
+  'shouldRunTranscriptionPass' \
+  'seekSample' \
+  'bufferRelativeSeek' \
+  'cachedFinalTextPlan'
 
 require_pattern \
   "shared FluidAudio model runtime version policy lives in VoiceInkCore" \
@@ -10696,10 +10701,15 @@ require_pattern \
   'defaultMacOSFluidAudioModelName|defaultMacOSFluidAudioModel' \
   VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionModelCatalogTests.swift
 
-require_pattern \
+require_patterns \
   "shared FluidAudio download status presentation lives in VoiceInkCore" \
-  'VoiceInkFluidAudioDownloadStatus|VoiceInkFluidAudioDownloadPhase|preparingDownload|downloadingFiles|percentText' \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift \
+  'VoiceInkFluidAudioDownloadStatus' \
+  'VoiceInkFluidAudioDownloadPhase' \
+  'compactDownloadingStatusText' \
+  'preparingDownload' \
+  'downloadingFiles' \
+  'percentText'
 
 require_pattern \
   "macOS model registry adapts shared FluidAudio default model" \

@@ -580,6 +580,8 @@ h1 .before-word {
 
 .features-shell {
   --active-accent: var(--coral);
+  --panel-offset: 8px;
+  --rail-mask-bleed: calc(var(--panel-offset) + 2px);
   width: min(1040px, calc(100% - 40px));
   margin: 0 auto;
 }
@@ -611,6 +613,16 @@ h1 .before-word {
   transition: background-color 0.2s ease;
 }
 
+.feature-tabs::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 0 calc(-1 * var(--rail-mask-bleed));
+  background: transparent;
+  pointer-events: none;
+  transition: background-color 0.2s ease;
+}
+
 /* the frame's top edge — line, rounded corners, and short side stubs — lives
    permanently on the sticky bar, so the outline is identical at rest and stuck */
 .feature-tabs::after {
@@ -627,15 +639,21 @@ h1 .before-word {
   transition: border-color 0.25s ease;
 }
 
-/* frosted toolbar once content actually scrolls beneath it; opaque enough
-   that card borders passing behind don't read as crisp stubs */
+/* solid mask once content scrolls beneath it, so previous panel borders and
+   backing layers cannot leak through the sticky rail */
 .feature-tabs.stuck {
-  background: color-mix(in srgb, var(--paper) 92%, transparent);
+  background: transparent;
   -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
 }
 
+.feature-tabs.stuck::before {
+  background: var(--paper);
+}
+
 .feature-tabs-scroll {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: flex-end;
   gap: 8px;
@@ -810,6 +828,8 @@ h1 .before-word {
 
 .feature-panel {
   --panel-accent: var(--coral);
+  position: relative;
+  z-index: 0;
   display: grid;
   min-height: clamp(420px, 72svh, 640px);
   align-content: center;
@@ -825,8 +845,19 @@ h1 .before-word {
      exactly ON the bar's frame-top so the two coincide as one outline */
   scroll-margin-top: 60px;
   text-align: center;
-  box-shadow: 8px 8px 0 var(--panel-accent);
   transition: border-color 0.25s ease;
+}
+
+.feature-panel::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: var(--panel-offset) calc(-1 * var(--panel-offset)) calc(-1 * var(--panel-offset)) var(--panel-offset);
+  border-radius: inherit;
+  background:
+    linear-gradient(var(--panel-accent) 0 0) right top / var(--panel-offset) 100% no-repeat,
+    linear-gradient(var(--panel-accent) 0 0) left bottom / 100% var(--panel-offset) no-repeat;
+  pointer-events: none;
 }
 
 #feature-shift {

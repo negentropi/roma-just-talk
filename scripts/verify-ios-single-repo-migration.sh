@@ -5016,15 +5016,27 @@ require_pattern \
 
 section "obsolete standalone error-description module/tests stay deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/ErrorDescription.swift
+reject_file VoiceInkCore/Sources/VoiceInkCore/VoiceInkEngineError.swift
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/ErrorDescriptionTests.swift
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkEngineErrorTests.swift
 
 require_patterns \
-  "shared error-description fallback lives with engine error vocabulary" \
-  VoiceInkCore/Sources/VoiceInkCore/VoiceInkEngineError.swift \
+  "transcription run processor owns shared engine-error vocabulary" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift \
   'public enum VoiceInkErrorDescription' \
+  'public enum VoiceInkEngineError' \
   'public static func text\(for error: Error\) -> String' \
-  'LocalizedError\)\?\.errorDescription \?\? error\.localizedDescription'
+  'LocalizedError\)\?\.errorDescription \?\? error\.localizedDescription' \
+  'Failed to load the transcription model\.' \
+  'No local Whisper model is available\. Please download a model first\.' \
+  'Select a transcription model before importing audio\.'
+
+reject_pattern \
+  "core package/project metadata avoid obsolete standalone engine-error files" \
+  'VoiceInkEngineError(Tests)?\.swift|VoiceInkEngineErrorTests' \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
 
 require_patterns \
   "transcription run processor tests cover shared error-description fallback" \

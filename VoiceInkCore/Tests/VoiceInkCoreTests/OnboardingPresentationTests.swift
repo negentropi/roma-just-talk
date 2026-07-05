@@ -551,8 +551,8 @@ final class OnboardingPresentationTests: XCTestCase {
 
         XCTAssertTrue(microphone.canSkipWhenNotGranted)
         XCTAssertTrue(screenRecording.canSkipWhenNotGranted)
+        XCTAssertTrue(keyboardShortcut.canSkipWhenNotGranted)
         XCTAssertFalse(audioDeviceSelection.canSkipWhenNotGranted)
-        XCTAssertFalse(keyboardShortcut.canSkipWhenNotGranted)
         XCTAssertEqual(VoiceInkMacOSOnboardingPermissionPresentation.skipButtonTitle, "Skip for now")
         XCTAssertEqual(
             VoiceInkMacOSOnboardingPermissionPresentation.relaunchRequiredMessage,

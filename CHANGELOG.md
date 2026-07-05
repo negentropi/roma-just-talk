@@ -2,6 +2,7 @@
 
 ## v1.96 - Unreleased
 
+- Added a first-run setup skip action for the keyboard-shortcut step so setup can continue without configuring a shortcut immediately.
 - Added a Homebrew cask for installing the fork from the repo tap and aligned CI packaging with the release asset URL.
 - Added an opt-in visible-text latency harness for measuring real hotkey-release-to-target-text timing in everyday macOS apps.
 - Kept the dictated text on the clipboard when the paste command cannot be posted, so failed target-app pastes do not immediately restore over the transcript.

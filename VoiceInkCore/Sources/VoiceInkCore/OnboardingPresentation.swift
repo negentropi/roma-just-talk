@@ -725,7 +725,7 @@ public struct VoiceInkMacOSOnboardingPermissionPresentation: Identifiable, Equat
     }
 
     public var canSkipWhenNotGranted: Bool {
-        kind != .keyboardShortcut && kind != .audioDeviceSelection
+        kind != .audioDeviceSelection
     }
 
     public func buttonTitle(isGranted: Bool, requiresRelaunch: Bool) -> String {

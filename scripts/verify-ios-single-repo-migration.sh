@@ -10652,25 +10652,29 @@ require_pattern \
   'VoiceInkStreamingTranscriptAssembly\.(committedText|previewText)' \
   VoiceInk/Transcription/Streaming/StreamingTranscriptionService.swift
 
+section "obsolete standalone FluidAudio transcription policy module/tests stay deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/FluidAudioTranscriptionPolicy.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/FluidAudioTranscriptionPolicyTests.swift
+
 require_pattern \
-  "shared FluidAudio transcription policy lives in VoiceInkCore" \
+  "shared FluidAudio transcription policy lives with streaming preferences" \
   'VoiceInkFluidAudioTranscriptionPolicy' \
-  VoiceInkCore/Sources/VoiceInkCore/FluidAudioTranscriptionPolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionStreamingPreference.swift
 
 require_pattern \
   "shared FluidAudio transcription policy owns trailing-silence default" \
   'trailingSilenceSeconds: Double = 1' \
-  VoiceInkCore/Sources/VoiceInkCore/FluidAudioTranscriptionPolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionStreamingPreference.swift
 
 require_pattern \
   "shared FluidAudio transcription policy owns max chunk limit" \
   'maxSingleChunkSamples = 240_000' \
-  VoiceInkCore/Sources/VoiceInkCore/FluidAudioTranscriptionPolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionStreamingPreference.swift
 
 require_pattern \
   "shared FluidAudio transcription policy owns local ASR helper interface" \
   'paddedSamplesForTranscription|shouldScheduleImmediatePass|shouldRunTranscriptionPass|seekSample|bufferRelativeSeek|cachedFinalTextPlan' \
-  VoiceInkCore/Sources/VoiceInkCore/FluidAudioTranscriptionPolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionStreamingPreference.swift
 
 require_pattern \
   "shared FluidAudio model runtime version policy lives in VoiceInkCore" \
@@ -10695,7 +10699,7 @@ require_pattern \
 require_pattern \
   "shared FluidAudio download status presentation lives in VoiceInkCore" \
   'VoiceInkFluidAudioDownloadStatus|VoiceInkFluidAudioDownloadPhase|preparingDownload|downloadingFiles|percentText' \
-  VoiceInkCore/Sources/VoiceInkCore/FluidAudioTranscriptionPolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift
 
 require_pattern \
   "macOS model registry adapts shared FluidAudio default model" \
@@ -10742,10 +10746,34 @@ require_pattern \
   'VoiceInkFluidAudioTranscriptionPolicy\.(shouldScheduleImmediatePass|shouldRunTranscriptionPass|seekSample|bufferRelativeSeek|paddedSamplesForTranscription|cachedFinalTextPlan)' \
   VoiceInk/Transcription/Streaming/FluidAudioStreamingProvider.swift
 
-require_pattern \
-  "core checks execute FluidAudio transcription policy tests" \
-  'FluidAudioTranscriptionPolicyTests\.testDownloadStatusPresentationPreservesFluidAudioDownloadCopy|FluidAudioTranscriptionPolicyTests\.testTrailingSilenceDefaultsPreserveFluidAudioChunkPolicy|FluidAudioTranscriptionPolicyTests\.testImmediatePassSchedulingRequiresEnabledConfigNoInFlightTaskAndEnoughNewAudio|FluidAudioTranscriptionPolicyTests\.testCachedFinalTextPlanRejectsBlankAndStaleHypotheses' \
+reject_swift_pattern \
+  "core checks avoid obsolete FluidAudio transcription policy suite references" \
+  '\bFluidAudioTranscriptionPolicyTests\b' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_patterns \
+  "core checks execute FluidAudio transcription policy through owner test suites" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'TranscriptionModelCatalogTests\.testDownloadStatusPresentationPreservesFluidAudioDownloadCopy' \
+  'TranscriptionModelCatalogTests\(\)\.testDownloadStatusPresentationPreservesFluidAudioDownloadCopy\(\)' \
+  'TranscriptionStreamingPreferenceTests\.testTrailingSilenceDefaultsPreserveFluidAudioChunkPolicy' \
+  'TranscriptionStreamingPreferenceTests\(\)\.testTrailingSilenceDefaultsPreserveFluidAudioChunkPolicy\(\)' \
+  'TranscriptionStreamingPreferenceTests\.testPaddedSamplesAppendTrailingSilenceWhenChunkFits' \
+  'TranscriptionStreamingPreferenceTests\(\)\.testPaddedSamplesAppendTrailingSilenceWhenChunkFits\(\)' \
+  'TranscriptionStreamingPreferenceTests\.testPaddedSamplesPreserveChunkWhenSilenceWouldExceedLimit' \
+  'TranscriptionStreamingPreferenceTests\(\)\.testPaddedSamplesPreserveChunkWhenSilenceWouldExceedLimit\(\)' \
+  'TranscriptionStreamingPreferenceTests\.testImmediatePassSchedulingRequiresEnabledConfigNoInFlightTaskAndEnoughNewAudio' \
+  'TranscriptionStreamingPreferenceTests\(\)\.testImmediatePassSchedulingRequiresEnabledConfigNoInFlightTaskAndEnoughNewAudio\(\)' \
+  'TranscriptionStreamingPreferenceTests\.testTranscriptionPassSchedulingRequiresMinimumTotalAndNewAudio' \
+  'TranscriptionStreamingPreferenceTests\(\)\.testTranscriptionPassSchedulingRequiresMinimumTotalAndNewAudio\(\)' \
+  'TranscriptionStreamingPreferenceTests\.testSeekSamplePrefersHypothesisStartAndFallsBackToConfirmedEnd' \
+  'TranscriptionStreamingPreferenceTests\(\)\.testSeekSamplePrefersHypothesisStartAndFallsBackToConfirmedEnd\(\)' \
+  'TranscriptionStreamingPreferenceTests\.testBufferRelativeSeekAccountsForTrimmedSamples' \
+  'TranscriptionStreamingPreferenceTests\(\)\.testBufferRelativeSeekAccountsForTrimmedSamples\(\)' \
+  'TranscriptionStreamingPreferenceTests\.testCachedFinalTextPlanReturnsFreshTrimmedHypothesis' \
+  'TranscriptionStreamingPreferenceTests\(\)\.testCachedFinalTextPlanReturnsFreshTrimmedHypothesis\(\)' \
+  'TranscriptionStreamingPreferenceTests\.testCachedFinalTextPlanRejectsBlankAndStaleHypotheses' \
+  'TranscriptionStreamingPreferenceTests\(\)\.testCachedFinalTextPlanRejectsBlankAndStaleHypotheses\(\)'
 
 require_pattern \
   "migration checklist tracks shared FluidAudio local ASR policy" \

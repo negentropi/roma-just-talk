@@ -219,6 +219,51 @@ final class TranscriptionModelCatalogTests: XCTestCase {
         )
     }
 
+    func testDownloadStatusPresentationPreservesFluidAudioDownloadCopy() {
+        XCTAssertEqual(VoiceInkFluidAudioDownloadStatus.compactDownloadingStatusText, "Downloading...")
+
+        let preparing = VoiceInkFluidAudioDownloadStatus(
+            fractionCompleted: -0.2,
+            phase: .preparingDownload
+        )
+        XCTAssertEqual(preparing.fractionCompleted, 0)
+        XCTAssertEqual(preparing.message, "Preparing FluidAudio download...")
+        XCTAssertEqual(preparing.percentText, "0%")
+
+        let listing = VoiceInkFluidAudioDownloadStatus(
+            fractionCompleted: 0.1,
+            phase: .listingFiles
+        )
+        XCTAssertEqual(listing.message, "Listing files from repository...")
+
+        let checkingCache = VoiceInkFluidAudioDownloadStatus(
+            fractionCompleted: 0.2,
+            phase: .checkingCachedModels
+        )
+        XCTAssertEqual(checkingCache.message, "Checking cached models...")
+
+        let downloading = VoiceInkFluidAudioDownloadStatus(
+            fractionCompleted: 0.427,
+            phase: .downloadingFiles(completedFiles: 3, totalFiles: 7)
+        )
+        XCTAssertEqual(downloading.message, "Downloading models: 3/7 files")
+        XCTAssertEqual(downloading.percentText, "42%")
+
+        let finalizing = VoiceInkFluidAudioDownloadStatus(
+            fractionCompleted: 1.4,
+            phase: .finalizingModels
+        )
+        XCTAssertEqual(finalizing.fractionCompleted, 1)
+        XCTAssertEqual(finalizing.message, "Finalizing models...")
+        XCTAssertEqual(finalizing.percentText, "100%")
+
+        let compiling = VoiceInkFluidAudioDownloadStatus(
+            fractionCompleted: 0.8,
+            phase: .compiling(modelComponentName: "Parakeet.mlmodelc")
+        )
+        XCTAssertEqual(compiling.message, "Compiling Parakeet")
+    }
+
     func testDeepgramLanguageCapabilityIsSharedProviderMetadata() {
         XCTAssertEqual(VoiceInkTranscriptionModelProvider.deepgram.languageCodes?.first, "ar")
         XCTAssertEqual(VoiceInkTranscriptionModelProvider.deepgram.languageCodes?.last, "zh")

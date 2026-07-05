@@ -387,6 +387,83 @@ reject_multiline_pattern() {
   fi
 }
 
+swift_static_function_body_pattern_status() {
+  local file="$1"
+  local function_name="$2"
+  local pattern="$3"
+
+  perl -0Mstrict -Mwarnings -e '
+    my ($function_name, $pattern, $file) = @ARGV;
+    open my $fh, "<", $file or die "open $file: $!";
+    local $/;
+    my $source = <$fh>;
+    my $signature = qr/(?:private\s+)?static\s+func\s+\Q$function_name\E\s*\(/x;
+    if ($source !~ /$signature/g) {
+      exit 2;
+    }
+
+    my $open_brace = index($source, "{", pos($source));
+    exit 2 if $open_brace < 0;
+
+    my $depth = 0;
+    my $close_brace;
+    for (my $index = $open_brace; $index < length($source); $index++) {
+      my $char = substr($source, $index, 1);
+      if ($char eq "{") {
+        $depth++;
+      } elsif ($char eq "}") {
+        $depth--;
+        if ($depth == 0) {
+          $close_brace = $index;
+          last;
+        }
+      }
+    }
+
+    exit 2 unless defined $close_brace;
+    my $body = substr($source, $open_brace + 1, $close_brace - $open_brace - 1);
+    exit($body =~ /$pattern/s ? 0 : 1);
+  ' "$function_name" "$pattern" "$file"
+}
+
+require_swift_static_function_body_pattern() {
+  local description="$1"
+  local file="$2"
+  local function_name="$3"
+  local pattern="$4"
+
+  section "$description"
+  set +e
+  swift_static_function_body_pattern_status "$file" "$function_name" "$pattern"
+  local status=$?
+  set -e
+
+  if (( status == 1 )); then
+    fail "$description: missing expected pattern in $function_name body"
+  elif (( status != 0 )); then
+    fail "$description: failed to inspect $function_name body in $file"
+  fi
+}
+
+reject_swift_static_function_body_pattern() {
+  local description="$1"
+  local file="$2"
+  local function_name="$3"
+  local pattern="$4"
+
+  section "$description"
+  set +e
+  swift_static_function_body_pattern_status "$file" "$function_name" "$pattern"
+  local status=$?
+  set -e
+
+  if (( status == 0 )); then
+    fail "$description: rejected pattern found in $function_name body"
+  elif (( status > 1 )); then
+    fail "$description: failed to inspect $function_name body in $file"
+  fi
+}
+
 require_provider_key_reset_direct_delete_adapter() {
   local file="$1"
 
@@ -20851,25 +20928,29 @@ reject_pattern \
   'if +success|if +succeeded|if +!succeeded|switch +success|switch +succeeded|guard +success|guard +succeeded|success +\?|succeeded +\?|guard +let +extensionContext' \
   iOS/Shared/VoiceInkKeyboardURLOpener.swift
 
-reject_multiline_pattern \
+reject_swift_static_function_body_pattern \
   "iOS keyboard URL opener avoids extension-context result branching inside result handler" \
-  '(?s)private static func applyExtensionContextOpenResult\([^{]*\{.*(\b(if|guard|switch)\b|\?[^:]*:).*\n    \}\n\n    private static func openThroughApplicationOrResponderChain' \
-  iOS/Shared/VoiceInkKeyboardURLOpener.swift
+  iOS/Shared/VoiceInkKeyboardURLOpener.swift \
+  applyExtensionContextOpenResult \
+  '\b(if|guard|switch)\b|\?[^:]*:'
 
-reject_multiline_pattern \
+reject_swift_static_function_body_pattern \
   "iOS keyboard URL opener avoids application result branching inside result handler" \
-  '(?s)private static func applyApplicationOpenResult\([^{]*\{.*(\b(if|guard|switch)\b|\?[^:]*:).*\n    \}\n\n    private static func openURLViaResponderChain' \
-  iOS/Shared/VoiceInkKeyboardURLOpener.swift
+  iOS/Shared/VoiceInkKeyboardURLOpener.swift \
+  applyApplicationOpenResult \
+  '\b(if|guard|switch)\b|\?[^:]*:'
 
-require_multiline_pattern \
+require_swift_static_function_body_pattern \
   "iOS keyboard URL opener routes extension-context open result through shared policy" \
-  '(?s)private static func applyExtensionContextOpenResult\([^{]*succeeded: Bool[^{]*\{.*VoiceInkKeyboardOpenAppPolicy\.actionPlanAfterExtensionContextOpen\([[:space:]]*succeeded: succeeded.*\n    \}\n\n    private static func openThroughApplicationOrResponderChain' \
-  iOS/Shared/VoiceInkKeyboardURLOpener.swift
+  iOS/Shared/VoiceInkKeyboardURLOpener.swift \
+  applyExtensionContextOpenResult \
+  'VoiceInkKeyboardOpenAppPolicy\.actionPlanAfterExtensionContextOpen\(\s*succeeded:\s*succeeded\s*\)\s*\.applyRuntimeState\('
 
-require_multiline_pattern \
+require_swift_static_function_body_pattern \
   "iOS keyboard URL opener routes application open result through shared policy" \
-  '(?s)private static func applyApplicationOpenResult\([^{]*succeeded: Bool[^{]*\{.*VoiceInkKeyboardOpenAppPolicy\.actionPlanAfterApplicationOpen\([[:space:]]*succeeded: succeeded.*\n    \}\n\n    private static func openURLViaResponderChain' \
-  iOS/Shared/VoiceInkKeyboardURLOpener.swift
+  iOS/Shared/VoiceInkKeyboardURLOpener.swift \
+  applyApplicationOpenResult \
+  'VoiceInkKeyboardOpenAppPolicy\.actionPlanAfterApplicationOpen\(\s*succeeded:\s*succeeded\s*\)\s*\.applyRuntimeState\('
 
 require_pattern \
   "iOS keyboard controller delegates record deep-link opening to shared adapter" \

@@ -17588,10 +17588,29 @@ require_pattern \
 
 reject_file VoiceInkCore/Sources/VoiceInkCore/RollingAudioBuffer.swift
 
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/RollingAudioBufferTests.swift
+
+reject_swift_pattern \
+  "core checks avoid stale rolling audio buffer test suite" \
+  '\bRollingAudioBufferTests\b' \
+  VoiceInkCore/Tests/VoiceInkCoreTests \
+  VoiceInkTests
+
 require_pattern \
   "shared rolling-buffer lead-in buffer lives with preload policy" \
   'VoiceInkRollingAudioBuffer' \
   VoiceInkCore/Sources/VoiceInkCore/RollingBufferPreloadPolicy.swift
+
+require_patterns \
+  "shared rolling-buffer lead-in buffer tests live with preload policy tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RollingBufferPreloadPolicyTests.swift \
+  'VoiceInkRollingAudioBuffer' \
+  'testRollingAudioBufferAppendKeepsChunksWithinMaxBytes' \
+  'testRollingAudioBufferAppendDropsWholeOldestChunksWhenOverflowCoversChunk' \
+  'testRollingAudioBufferAppendPartiallyTrimsOldestChunkWhenOverflowIsSmallerThanChunk' \
+  'testRollingAudioBufferUpdateMaxBytesTrimsAndClampsNegativeCapacity' \
+  'testRollingAudioBufferAppendIgnoresEmptyChunksAndZeroCapacity' \
+  'testRollingAudioBufferRemoveAllClearsChunksAndBytes'
 
 require_patterns \
   "shared rolling-buffer partial transcript request lives in VoiceInkCore" \
@@ -17659,6 +17678,22 @@ require_pattern \
   "core checks execute buffered snapshot strategy test" \
   'RollingBufferPreloadPolicyTests\.testBufferedSnapshotTranscriptionStrategyUsesRecordedFileCapability' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_patterns \
+  "core checks execute rolling-buffer lead-in buffer tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'RollingBufferPreloadPolicyTests\.testRollingAudioBufferAppendKeepsChunksWithinMaxBytes' \
+  'RollingBufferPreloadPolicyTests\.testRollingAudioBufferAppendDropsWholeOldestChunksWhenOverflowCoversChunk' \
+  'RollingBufferPreloadPolicyTests\.testRollingAudioBufferAppendPartiallyTrimsOldestChunkWhenOverflowIsSmallerThanChunk' \
+  'RollingBufferPreloadPolicyTests\.testRollingAudioBufferUpdateMaxBytesTrimsAndClampsNegativeCapacity' \
+  'RollingBufferPreloadPolicyTests\.testRollingAudioBufferAppendIgnoresEmptyChunksAndZeroCapacity' \
+  'RollingBufferPreloadPolicyTests\.testRollingAudioBufferRemoveAllClearsChunksAndBytes' \
+  'RollingBufferPreloadPolicyTests\(\)\.testRollingAudioBufferAppendKeepsChunksWithinMaxBytes' \
+  'RollingBufferPreloadPolicyTests\(\)\.testRollingAudioBufferAppendDropsWholeOldestChunksWhenOverflowCoversChunk' \
+  'RollingBufferPreloadPolicyTests\(\)\.testRollingAudioBufferAppendPartiallyTrimsOldestChunkWhenOverflowIsSmallerThanChunk' \
+  'RollingBufferPreloadPolicyTests\(\)\.testRollingAudioBufferUpdateMaxBytesTrimsAndClampsNegativeCapacity' \
+  'RollingBufferPreloadPolicyTests\(\)\.testRollingAudioBufferAppendIgnoresEmptyChunksAndZeroCapacity' \
+  'RollingBufferPreloadPolicyTests\(\)\.testRollingAudioBufferRemoveAllClearsChunksAndBytes'
 
 require_patterns \
   "shared rolling-buffer quick-release diagnostics presentation lives in VoiceInkCore" \

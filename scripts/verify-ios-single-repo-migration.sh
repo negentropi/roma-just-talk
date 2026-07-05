@@ -11616,7 +11616,18 @@ reject_pattern \
   'defaultTemperature|temperature: +0\.3' \
   VoiceInk/Services/OllamaService.swift
 
+section "obsolete standalone AI model catalog module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/AIModelCatalog.swift
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/AIModelCatalogTests.swift
+
+require_patterns \
+  "shared AI model catalog lives with AI provider catalog" \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift \
+  'public enum VoiceInkAIModelProvider' \
+  'public enum VoiceInkAIModelCatalog' \
+  'defaultModel\(for provider: VoiceInkAIModelProvider\)' \
+  'firstAvailableModel\(for provider: VoiceInkAIModelProvider\)' \
+  'availableModels\(for provider: VoiceInkAIModelProvider\)'
 
 reject_pattern \
   "core AI model catalog coverage stays in provider catalog suite" \

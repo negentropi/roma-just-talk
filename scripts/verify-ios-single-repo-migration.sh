@@ -5047,17 +5047,13 @@ require_patterns \
   'VoiceInkErrorDescription\.text\(for: error\)' \
   'error\.localizedDescription'
 
-require_patterns \
+require_voiceink_core_check_runner_invocations \
   "core checks execute folded engine-error tests through transcription run processor suite" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'name: "TranscriptionRunProcessorTests\.testPrefersLocalizedErrorDescription"' \
-  'TranscriptionRunProcessorTests\(\)\.testPrefersLocalizedErrorDescription\(\)' \
-  'name: "TranscriptionRunProcessorTests\.testFallsBackToLocalizedDescription"' \
-  'TranscriptionRunProcessorTests\(\)\.testFallsBackToLocalizedDescription\(\)' \
-  'name: "TranscriptionRunProcessorTests\.testMacOSErrorDescriptionsStayStable"' \
-  'TranscriptionRunProcessorTests\(\)\.testMacOSErrorDescriptionsStayStable\(\)' \
-  'name: "TranscriptionRunProcessorTests\.testIOSLocalWhisperDescriptionsStayStable"' \
-  'TranscriptionRunProcessorTests\(\)\.testIOSLocalWhisperDescriptionsStayStable\(\)'
+  TranscriptionRunProcessorTests \
+  testPrefersLocalizedErrorDescription \
+  testFallsBackToLocalizedDescription \
+  testMacOSErrorDescriptionsStayStable \
+  testIOSLocalWhisperDescriptionsStayStable
 
 require_pattern \
   "shared local Whisper transcription flow lives in VoiceInkCore" \

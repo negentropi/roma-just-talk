@@ -928,7 +928,7 @@ reject_pattern \
 
 require_patterns \
   "transcript file export tests cover folded CSV export behavior" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptFileExportTests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptPresentationTests.swift \
   'testCSVExportPresentationPreservesMacOSFilenameAndFailureCopy' \
   'testCSVStringPreservesMacOSHeaderAndColumnOrder' \
   'testCSVStringUsesMacOSOptionalFallbacks' \
@@ -938,16 +938,16 @@ require_patterns \
 require_patterns \
   "core checks execute folded CSV export tests" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'TranscriptFileExportTests\.testCSVExportPresentationPreservesMacOSFilenameAndFailureCopy' \
-  'TranscriptFileExportTests\(\)\.testCSVExportPresentationPreservesMacOSFilenameAndFailureCopy' \
-  'TranscriptFileExportTests\.testCSVStringPreservesMacOSHeaderAndColumnOrder' \
-  'TranscriptFileExportTests\(\)\.testCSVStringPreservesMacOSHeaderAndColumnOrder' \
-  'TranscriptFileExportTests\.testCSVStringUsesMacOSOptionalFallbacks' \
-  'TranscriptFileExportTests\(\)\.testCSVStringUsesMacOSOptionalFallbacks' \
-  'TranscriptFileExportTests\.testEscapeCSVStringPreservesExistingMacOSQuotingPolicy' \
-  'TranscriptFileExportTests\(\)\.testEscapeCSVStringPreservesExistingMacOSQuotingPolicy' \
-  'TranscriptFileExportTests\.testCSVStringUsesSharedPowerModeDisplayName' \
-  'TranscriptFileExportTests\(\)\.testCSVStringUsesSharedPowerModeDisplayName'
+  'TranscriptPresentationTests\.testCSVExportPresentationPreservesMacOSFilenameAndFailureCopy' \
+  'TranscriptPresentationTests\(\)\.testCSVExportPresentationPreservesMacOSFilenameAndFailureCopy' \
+  'TranscriptPresentationTests\.testCSVStringPreservesMacOSHeaderAndColumnOrder' \
+  'TranscriptPresentationTests\(\)\.testCSVStringPreservesMacOSHeaderAndColumnOrder' \
+  'TranscriptPresentationTests\.testCSVStringUsesMacOSOptionalFallbacks' \
+  'TranscriptPresentationTests\(\)\.testCSVStringUsesMacOSOptionalFallbacks' \
+  'TranscriptPresentationTests\.testEscapeCSVStringPreservesExistingMacOSQuotingPolicy' \
+  'TranscriptPresentationTests\(\)\.testEscapeCSVStringPreservesExistingMacOSQuotingPolicy' \
+  'TranscriptPresentationTests\.testCSVStringUsesSharedPowerModeDisplayName' \
+  'TranscriptPresentationTests\(\)\.testCSVStringUsesSharedPowerModeDisplayName'
 
 reject_pattern \
   "core test and project metadata avoid obsolete standalone CSV export test suite" \
@@ -959,6 +959,7 @@ reject_pattern \
 
 reject_file VoiceInkCore/Sources/VoiceInkCore/TranscriptFileExport.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/TranscriptionCSVExport.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptFileExportTests.swift
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionCSVExportTests.swift
 
 require_pattern \

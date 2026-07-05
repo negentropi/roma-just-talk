@@ -1095,11 +1095,15 @@ struct VoiceInkTests {
         let monitor = ShortcutMonitor()
         var contexts: [VoiceInkShortcutPressContext] = []
 
+        ShortcutMonitor.configureSecureEventInputClientForTesting(
+            SecureEventInputState.Client(isEnabled: { false })
+        )
         ShortcutMonitor.configureKeyboardStateClientForTesting(
             KeyboardState.Client(isKeyPressed: { keyCode in keyCode == UInt16(kVK_ANSI_X) })
         )
         defer {
             monitor.stop()
+            ShortcutMonitor.resetSecureEventInputClientForTesting()
             ShortcutMonitor.resetKeyboardStateClientForTesting()
         }
 
@@ -1175,6 +1179,18 @@ struct VoiceInkTests {
     @Test func modifierOnlyShortcutMarksOtherKeyUpAsTyping() async throws {
         let monitor = ShortcutMonitor()
         var contexts: [VoiceInkShortcutPressContext] = []
+
+        ShortcutMonitor.configureSecureEventInputClientForTesting(
+            SecureEventInputState.Client(isEnabled: { false })
+        )
+        ShortcutMonitor.configureKeyboardStateClientForTesting(
+            KeyboardState.Client(isKeyPressed: { _ in false })
+        )
+        defer {
+            monitor.stop()
+            ShortcutMonitor.resetSecureEventInputClientForTesting()
+            ShortcutMonitor.resetKeyboardStateClientForTesting()
+        }
 
         monitor.configureForTesting(
             shortcuts: [

@@ -1172,25 +1172,34 @@ reject_multiline_pattern \
 require_pattern \
   "shared transcript export owns localized date style" \
   'dateStyle = \.medium' \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptExport.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
 
 require_pattern \
   "shared transcript export owns localized time style" \
   'timeStyle = \.short' \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptExport.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift
 
 require_patterns \
-  "shared transcript export owns macOS file extensions" \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptExport.swift \
+  "shared transcript presentation owns macOS file export policy" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift \
+  'VoiceInkTranscriptFileExport' \
+  'defaultBaseFilename = "transcription"' \
   'plainTextFileExtension = "txt"' \
-  'markdownFileExtension = "md"'
+  'markdownFileExtension = "md"' \
+  'suggestedBaseFilename' \
+  'markdownContent'
 
 require_patterns \
-  "shared CSV export owns macOS filename and failure copy" \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptExport.swift \
+  "shared transcript presentation owns CSV export policy" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift \
+  'VoiceInkTranscriptionCSVRecord' \
+  'VoiceInkTranscriptionCSVExporter' \
   'defaultFilename = "VoiceInk-transcription\.csv"' \
+  'header = "Original Transcript,Enhanced Transcript,Enhancement Model,Prompt Name,Transcription Model,Power Mode,Enhancement Time,Transcription Time,Timestamp,Duration"' \
   'writeFailureDiagnosticMessage' \
-  'Error writing CSV file:'
+  'Error writing CSV file:' \
+  'escapeCSVString' \
+  'VoiceInkPowerModePresentation\.displayName'
 
 require_pattern \
   "macOS CSV export service uses shared CSV export presentation" \
@@ -1205,29 +1214,38 @@ reject_pattern \
 require_patterns \
   "transcript file export tests cover folded CSV export behavior" \
   VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptPresentationTests.swift \
+  'testTranscriptFileExportPreservesMacOSFileExtensions' \
+  'testSuggestedBaseFilenameUsesFallbackForBlankOrPunctuationOnlyText' \
+  'testSuggestedBaseFilenamePreservesMacOSWordSelectionPolicy' \
+  'testSuggestedBaseFilenameSanitizesAndLimitsLength' \
+  'testMarkdownContentPreservesMacOSBodyShape' \
+  'testMarkdownContentFormatsTimestampInSharedCore' \
   'testCSVExportPresentationPreservesMacOSFilenameAndFailureCopy' \
   'testCSVStringPreservesMacOSHeaderAndColumnOrder' \
   'testCSVStringUsesMacOSOptionalFallbacks' \
   'testEscapeCSVStringPreservesExistingMacOSQuotingPolicy' \
   'testCSVStringUsesSharedPowerModeDisplayName'
 
-require_patterns \
-  "core checks execute folded CSV export tests" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'TranscriptPresentationTests\.testCSVExportPresentationPreservesMacOSFilenameAndFailureCopy' \
-  'TranscriptPresentationTests\(\)\.testCSVExportPresentationPreservesMacOSFilenameAndFailureCopy' \
-  'TranscriptPresentationTests\.testCSVStringPreservesMacOSHeaderAndColumnOrder' \
-  'TranscriptPresentationTests\(\)\.testCSVStringPreservesMacOSHeaderAndColumnOrder' \
-  'TranscriptPresentationTests\.testCSVStringUsesMacOSOptionalFallbacks' \
-  'TranscriptPresentationTests\(\)\.testCSVStringUsesMacOSOptionalFallbacks' \
-  'TranscriptPresentationTests\.testEscapeCSVStringPreservesExistingMacOSQuotingPolicy' \
-  'TranscriptPresentationTests\(\)\.testEscapeCSVStringPreservesExistingMacOSQuotingPolicy' \
-  'TranscriptPresentationTests\.testCSVStringUsesSharedPowerModeDisplayName' \
-  'TranscriptPresentationTests\(\)\.testCSVStringUsesSharedPowerModeDisplayName'
+require_voiceink_core_check_runner_invocations \
+  "core checks execute folded transcript export tests" \
+  TranscriptPresentationTests \
+  testTranscriptFileExportPreservesMacOSFileExtensions \
+  testSuggestedBaseFilenameUsesFallbackForBlankOrPunctuationOnlyText \
+  testSuggestedBaseFilenamePreservesMacOSWordSelectionPolicy \
+  testSuggestedBaseFilenameSanitizesAndLimitsLength \
+  testMarkdownContentPreservesMacOSBodyShape \
+  testMarkdownContentFormatsTimestampInSharedCore \
+  testCSVExportPresentationPreservesMacOSFilenameAndFailureCopy \
+  testCSVStringPreservesMacOSHeaderAndColumnOrder \
+  testCSVStringUsesMacOSOptionalFallbacks \
+  testEscapeCSVStringPreservesExistingMacOSQuotingPolicy \
+  testCSVStringUsesSharedPowerModeDisplayName
+
+reject_file VoiceInkCore/Sources/VoiceInkCore/TranscriptExport.swift
 
 reject_pattern \
-  "core test and project metadata avoid obsolete standalone CSV export test suite" \
-  'TranscriptionCSVExportTests' \
+  "core test and project metadata avoid obsolete standalone transcript export files" \
+  'TranscriptExport\.swift|TranscriptionCSVExportTests' \
   VoiceInkCore/Tests/VoiceInkCoreTests \
   VoiceInkCore/Package.swift \
   VoiceInk.xcodeproj/project.pbxproj \

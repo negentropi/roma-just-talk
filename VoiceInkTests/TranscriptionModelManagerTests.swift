@@ -4,10 +4,12 @@ import Testing
 
 private final class ModelChangeNotificationRecorder: NSObject {
     private(set) var modelChangeCount = 0
+    private(set) var modelChangeUserInfos: [[AnyHashable: Any]?] = []
     private(set) var settingsChangeCount = 0
 
     @objc func modelDidChange(_ notification: Notification) {
         modelChangeCount += 1
+        modelChangeUserInfos.append(notification.userInfo)
     }
 
     @objc func settingsDidChange(_ notification: Notification) {
@@ -55,6 +57,7 @@ struct TranscriptionModelManagerTests {
 
         #expect(modelManager.currentTranscriptionModel?.name == "ggml-tiny")
         #expect(recorder.modelChangeCount >= 1)
+        #expect(recorder.modelChangeUserInfos.allSatisfy { $0?.isEmpty ?? true })
         #expect(recorder.settingsChangeCount >= 1)
     }
 

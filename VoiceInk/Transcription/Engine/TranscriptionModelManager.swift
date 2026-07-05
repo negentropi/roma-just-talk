@@ -66,7 +66,7 @@ class TranscriptionModelManager: ObservableObject {
                 guard let savedModel else { return }
                 currentTranscriptionModel = savedModel
                 ensureSelectedLanguageIsSupported(by: savedModel)
-                notifyCurrentModelDidChange(savedModel)
+                notifyCurrentModelDidChange()
             }
         )
     }

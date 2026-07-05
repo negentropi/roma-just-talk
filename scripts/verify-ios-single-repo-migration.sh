@@ -6832,6 +6832,7 @@ reject_pattern \
 
 section "obsolete standalone API-key verification policy module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/APIKeyVerificationPolicy.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/APIKeyVerificationPolicyTests.swift
 
 require_patterns \
   "shared provider verifier owns API-key verification result policy" \
@@ -6900,15 +6901,35 @@ require_patterns \
   'VoiceInkOpenAICompatibleClient'
 
 require_patterns \
-  "core checks execute API-key verification policy tests" \
+  "provider verifier tests cover API-key verification result policy" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/ProviderAPIKeyVerifierTests.swift \
+  'func testLegacyResultInitializerPreservesBoolAndMessage' \
+  'func testBlankAPIKeyResultPreservesSharedFailureCopy' \
+  'func testVerificationResultRejectsMissingHTTPResponse' \
+  'func testVerificationResultAcceptsHTTP2xxResponses' \
+  'func testVerificationResultReturnsHTTPBodyForFailure' \
+  'func testVerificationResultFallsBackToHTTPStatusForNonUTF8FailureBody' \
+  'func testFailureResultUsesLocalizedDescription' \
+  'VoiceInkAPIKeyVerificationPolicy'
+
+require_patterns \
+  "core checks execute API-key verification policy tests through provider verifier" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'APIKeyVerificationPolicyTests\.testLegacyResultInitializerPreservesBoolAndMessage' \
-  'APIKeyVerificationPolicyTests\.testBlankAPIKeyResultPreservesSharedFailureCopy' \
-  'APIKeyVerificationPolicyTests\.testVerificationResultRejectsMissingHTTPResponse' \
-  'APIKeyVerificationPolicyTests\.testVerificationResultAcceptsHTTP2xxResponses' \
-  'APIKeyVerificationPolicyTests\.testVerificationResultReturnsHTTPBodyForFailure' \
-  'APIKeyVerificationPolicyTests\.testVerificationResultFallsBackToHTTPStatusForNonUTF8FailureBody' \
-  'APIKeyVerificationPolicyTests\.testFailureResultUsesLocalizedDescription'
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "ProviderAPIKeyVerifierTests\.testLegacyResultInitializerPreservesBoolAndMessage", run: \{ ProviderAPIKeyVerifierTests\(\)\.testLegacyResultInitializerPreservesBoolAndMessage\(\) \}\),$' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "ProviderAPIKeyVerifierTests\.testBlankAPIKeyResultPreservesSharedFailureCopy", run: \{ ProviderAPIKeyVerifierTests\(\)\.testBlankAPIKeyResultPreservesSharedFailureCopy\(\) \}\),$' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "ProviderAPIKeyVerifierTests\.testVerificationResultRejectsMissingHTTPResponse", run: \{ try ProviderAPIKeyVerifierTests\(\)\.testVerificationResultRejectsMissingHTTPResponse\(\) \}\),$' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "ProviderAPIKeyVerifierTests\.testVerificationResultAcceptsHTTP2xxResponses", run: \{ ProviderAPIKeyVerifierTests\(\)\.testVerificationResultAcceptsHTTP2xxResponses\(\) \}\),$' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "ProviderAPIKeyVerifierTests\.testVerificationResultReturnsHTTPBodyForFailure", run: \{ ProviderAPIKeyVerifierTests\(\)\.testVerificationResultReturnsHTTPBodyForFailure\(\) \}\),$' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "ProviderAPIKeyVerifierTests\.testVerificationResultFallsBackToHTTPStatusForNonUTF8FailureBody", run: \{ ProviderAPIKeyVerifierTests\(\)\.testVerificationResultFallsBackToHTTPStatusForNonUTF8FailureBody\(\) \}\),$' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "ProviderAPIKeyVerifierTests\.testFailureResultUsesLocalizedDescription", run: \{ ProviderAPIKeyVerifierTests\(\)\.testFailureResultUsesLocalizedDescription\(\) \}\),$'
+
+reject_pattern \
+  "core tests and project metadata avoid obsolete API-key verification policy test suite" \
+  'APIKeyVerificationPolicyTests' \
+  VoiceInkCore/Tests/VoiceInkCoreTests \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
 
 reject_pattern \
   "shared remote provider verification clients avoid duplicate API-key verification result mapping" \

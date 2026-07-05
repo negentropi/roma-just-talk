@@ -19295,27 +19295,27 @@ reject_pattern \
 require_pattern \
   "shared performance stat owns realtime presentation text" \
   'speedFactorRealtimeText|realTimeComparisonText' \
-  VoiceInkCore/Sources/VoiceInkCore/PerformanceAnalysis.swift
+  VoiceInkCore/Sources/VoiceInkCore/DashboardMetrics.swift
 
 require_pattern \
   "shared performance time filter lives in VoiceInkCore" \
   'VoiceInkPerformanceTimeFilter' \
-  VoiceInkCore/Sources/VoiceInkCore/PerformanceAnalysis.swift
+  VoiceInkCore/Sources/VoiceInkCore/DashboardMetrics.swift
 
 require_pattern \
   "shared performance time filter owns macOS panel storage and windows" \
   'userDefaultsKey = "modelPerfPanelFilter"|defaultFilter|storedFilter|startDate' \
-  VoiceInkCore/Sources/VoiceInkCore/PerformanceAnalysis.swift
+  VoiceInkCore/Sources/VoiceInkCore/DashboardMetrics.swift
 
 require_pattern \
   "shared performance panel presentation lives in VoiceInkCore" \
   'VoiceInkPerformancePresentation|modelPerformancePanelTitle|performanceAnalysisPanelTitle|totalTranscriptsText|totalWithTranscriptionDataText|totalEnhancedFilesText|averageEnhancementTimeLabel|transcriptSampleCountText|physicalMemoryText' \
-  VoiceInkCore/Sources/VoiceInkCore/PerformanceAnalysis.swift
+  VoiceInkCore/Sources/VoiceInkCore/DashboardMetrics.swift
 
 require_pattern \
   "shared performance presentation owns physical-memory text" \
   'physicalMemoryText\(byteCount: UInt64\)|ByteCountFormatter\.string\(fromByteCount: Int64\(clamping: byteCount\), countStyle: \.memory\)' \
-  VoiceInkCore/Sources/VoiceInkCore/PerformanceAnalysis.swift
+  VoiceInkCore/Sources/VoiceInkCore/DashboardMetrics.swift
 
 require_pattern \
   "macOS model performance panel uses shared time filter" \
@@ -19343,6 +19343,7 @@ require_pattern \
   VoiceInk/Views/Metrics/PerformanceAnalysisView.swift
 
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/PerformanceAnalysisTests.swift
+reject_file VoiceInkCore/Sources/VoiceInkCore/PerformanceAnalysis.swift
 
 require_pattern \
   "core tests pin macOS performance panel presentation" \

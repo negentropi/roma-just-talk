@@ -422,7 +422,7 @@ swift_static_function_body_pattern_status() {
 
     sub find_private_static_function_open_brace {
       my ($code, $function_name) = @_;
-      my $signature = qr/private\s+static\s+func\s+\Q$function_name\E\s*\(/x;
+      my $signature = qr/(?<![A-Za-z0-9_])private\s+static\s+func\s+\Q$function_name\E\s*\(/x;
       while ($code =~ /$signature/g) {
         my $open_paren = pos($code) - 1;
         my $close_paren = find_balanced_close($code, $open_paren, "(", ")");

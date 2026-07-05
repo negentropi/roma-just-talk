@@ -18,9 +18,9 @@ import os
 struct VoiceInkTests {
 
     @Test func freshDefaultsHideMenuBarIcon() async throws {
-        #expect(AppDefaults.registeredDefaults[AppDefaults.Keys.showMenuBarIcon] as? Bool == false)
+        #expect(AppDefaults.registeredDefaults[VoiceInkMenuBarPreference.showMenuBarIconKey] as? Bool == false)
         #expect(AppDefaults.registeredDefaults["IsMenuBarOnly"] as? Bool == true)
-        #expect(AppDefaults.registeredDefaults[SpecialShortcutSettings.pasteLastTranscriptOnEmptyTapKey] as? Bool == true)
+        #expect(AppDefaults.registeredDefaults[VoiceInkUserDefaultsKey.specialShortcutPasteLastTranscriptOnEmptyTap] as? Bool == true)
     }
 
     @Test func rollingBufferPreloadPreviewStaysVisibleDuringRecording() {
@@ -138,14 +138,17 @@ struct VoiceInkTests {
         service.warmCache(using: context)
         #expect(service.applyReplacements(to: "voice ink", using: context) == "voice ink")
 
-        let error = DictionaryService.addWordReplacement(
+        let submission = VoiceInkWordReplacementDraftState(
             original: "voice ink",
-            replacement: "roma",
-            existing: [],
+            replacement: "roma"
+        ).submitting(existingRules: [])
+        let appliedSubmission = DictionaryService.applyWordReplacementSubmission(
+            submission,
             context: context
         )
 
-        #expect(error == nil)
+        #expect(appliedSubmission.alertPresentation == nil)
+        #expect(appliedSubmission.plan.shouldComplete)
         #expect(service.applyReplacements(to: "voice ink", using: context) == "roma")
     }
 
@@ -277,14 +280,31 @@ struct VoiceInkTests {
     }
 
     @Test @MainActor func activeRecorderToggleDefersStopInsteadOfCancelingWhileStarting() async throws {
-        let manager = RecorderUIManager()
+        var events: [String] = []
 
-        #expect(manager.activeSessionToggleAction(for: .starting) == .toggleRecord)
-        #expect(manager.activeSessionToggleAction(for: .recording) == .toggleRecord)
-        #expect(manager.activeSessionToggleAction(for: .transcribing) == .cancelRecording)
-        #expect(manager.activeSessionToggleAction(for: .enhancing) == .cancelRecording)
-        #expect(manager.activeSessionToggleAction(for: .idle) == .dismissRecorder)
-        #expect(manager.activeSessionToggleAction(for: .busy) == .dismissRecorder)
+        for state in [
+            VoiceInkRecordingState.starting,
+            .recording,
+            .transcribing,
+            .enhancing,
+            .idle,
+            .busy,
+        ] {
+            await state.applyRecorderUIToggleRuntimeState(
+                toggleRecord: { events.append("toggle") },
+                cancelRecording: { events.append("cancel") },
+                dismissRecorder: { events.append("dismiss") }
+            )
+        }
+
+        #expect(events == [
+            "toggle",
+            "toggle",
+            "cancel",
+            "cancel",
+            "dismiss",
+            "dismiss",
+        ])
     }
 
     @Test @MainActor func pushToTalkUsesActiveSessionWhenRecorderWindowIsNone() async throws {

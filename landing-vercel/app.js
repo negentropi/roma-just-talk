@@ -312,12 +312,74 @@ async function loadChangelog() {
   }
 }
 
+function initFeatureTabs() {
+  const bar = document.querySelector(".feature-tabs");
+  const scroller = document.querySelector(".feature-tabs-scroll") || bar;
+  const tabs = Array.from(document.querySelectorAll(".feature-tab"));
+  if (!bar || !tabs.length) return;
+
+  const panels = tabs
+    .map((tab) => document.querySelector(tab.getAttribute("href")))
+    .filter(Boolean);
+  let activeId = "";
+
+  const setActive = (id) => {
+    if (id === activeId) return;
+    activeId = id;
+    tabs.forEach((tab) => {
+      const isActive = tab.getAttribute("href") === `#${id}`;
+      tab.classList.toggle("active", isActive);
+      if (isActive && scroller.scrollWidth > scroller.clientWidth) {
+        const target = tab.closest(".feature-tab-group") || tab;
+        scroller.scrollTo({
+          left: target.offsetLeft - (scroller.clientWidth - target.offsetWidth) / 2,
+          behavior: "smooth",
+        });
+      }
+    });
+  };
+
+  // active = the panel currently under the sticky tab bar
+  const syncActive = () => {
+    const barBottom = bar.getBoundingClientRect().bottom;
+    const line = barBottom + 26;
+    let current = panels[0];
+    panels.forEach((panel) => {
+      if (panel.getBoundingClientRect().top <= line) current = panel;
+    });
+    // the last panel can never reach the bar when the page bottom is in view
+    if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) {
+      current = panels[panels.length - 1];
+    }
+    if (current) setActive(current.id);
+    // Add glass only after content scrolls under the sticky rail.
+    if (panels[0]) {
+      bar.classList.toggle("stuck", panels[0].getBoundingClientRect().top < barBottom - 4);
+    }
+  };
+
+  let ticking = false;
+  const requestSync = () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      ticking = false;
+      syncActive();
+    });
+  };
+
+  window.addEventListener("scroll", requestSync, { passive: true });
+  window.addEventListener("resize", requestSync, { passive: true });
+  syncActive();
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   if (detectOs() === "windows") setWindowsMode();
   document.getElementById("waitlist-form")?.addEventListener("submit", submitWaitlist);
   document.getElementById("talk-button")?.addEventListener("click", toggleContact);
   document.getElementById("discord-button")?.addEventListener("click", copyDiscord);
   document.getElementById("download-button")?.addEventListener("click", downloadMac);
+  initFeatureTabs();
   loadReadme();
   loadChangelog();
 });

@@ -37,6 +37,7 @@
   --pre-fg: #fff8e7;
   --line: rgba(23, 20, 18, 0.16);
   --shadow: rgba(23, 20, 18, 0.28);
+  --tab-face: #fcfaf5;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -72,6 +73,7 @@
     --pre-fg: #fff8e7;
     --line: rgba(255, 248, 231, 0.2);
     --shadow: rgba(0, 0, 0, 0.6);
+    --tab-face: #1b1815;
   }
 }
 
@@ -577,51 +579,170 @@ h1 .before-word {
 }
 
 .features-shell {
+  --active-accent: var(--coral);
   width: min(1040px, calc(100% - 40px));
   margin: 0 auto;
+}
+
+.features-shell:has(.tab-coral.active) {
+  --active-accent: var(--coral);
+}
+
+.features-shell:has(.tab-cyan.active) {
+  --active-accent: var(--cyan);
+}
+
+.features-shell:has(.tab-green.active) {
+  --active-accent: #35b75c;
+}
+
+.features-shell:has(.tab-acid.active) {
+  --active-accent: var(--acid);
 }
 
 .feature-tabs {
   position: sticky;
   z-index: 6;
   top: 0;
+  height: 62px; /* fixed: tab morph animations must never move the bar's bottom edge */
+  /* transparent at rest — tabs sit directly on the page and the frame border
+     passes beneath them, so tab + frame read as one outline */
+  background: transparent;
+  transition: background-color 0.2s ease;
+}
+
+/* the frame's top edge — line, rounded corners, and short side stubs — lives
+   permanently on the sticky bar, so the outline is identical at rest and stuck */
+.feature-tabs::after {
+  content: "";
+  position: absolute;
+  top: 60px;
+  left: 0;
+  right: 0;
+  height: 18px;
+  border: 2px solid var(--active-accent);
+  border-bottom: 0;
+  border-radius: 16px 16px 0 0;
+  pointer-events: none;
+  transition: border-color 0.25s ease;
+}
+
+/* frosted toolbar once content actually scrolls beneath it; opaque enough
+   that card borders passing behind don't read as crisp stubs */
+.feature-tabs.stuck {
+  background: color-mix(in srgb, var(--paper) 92%, transparent);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+
+.feature-tabs-scroll {
   display: flex;
-  align-items: flex-start;
-  gap: 10px;
+  align-items: flex-end;
+  gap: 8px;
+  height: 100%;
   overflow-x: auto;
-  border-bottom: 1px solid var(--line);
-  background:
-    linear-gradient(180deg, var(--paper) 70%, transparent),
-    var(--paper);
-  padding: 12px 0 14px;
-  scrollbar-width: thin;
+  /* runway: frame corner curve (16px) + straight segment + flare (10px) before the first tab */
+  padding: 0 44px;
+  scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
 }
 
-.feature-tab,
-.feature-tab-group {
-  min-height: 36px;
-  border: 1.5px dashed currentColor;
-  border-radius: 8px;
-  background: var(--surface);
-  color: var(--ink);
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.82rem;
-  font-weight: 800;
+.feature-tabs-scroll::-webkit-scrollbar {
+  display: none;
 }
 
 .feature-tab {
+  --tab-accent: var(--ink);
   display: inline-flex;
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  padding: 6px 10px;
+  margin-bottom: 12px;
+  min-height: 34px;
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--muted);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+  padding: 4px 14px;
   text-decoration: none;
+  transition: color 0.18s ease, border-color 0.18s ease, background-color 0.18s ease,
+    margin 0.18s ease, border-radius 0.18s ease, padding 0.18s ease, transform 0.18s ease;
 }
 
-.feature-tab.hot {
-  border-style: solid;
-  color: var(--coral);
+.feature-tab:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+  transform: translateY(-1px);
+}
+
+/* active tab drops down and fuses with the panel frame below, browser-tab style */
+.feature-tab.active {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 0;
+  min-height: 48px;
+  border: 2px solid var(--active-accent);
+  border-bottom: 0;
+  border-radius: 14px 14px 0 0;
+  background: var(--tab-face);
+  color: var(--ink);
+  font-weight: 800;
+  padding: 8px 18px 10px;
+  transform: none;
+}
+
+/* concave flares where the tab base sweeps into the panel line */
+.feature-tab.active::before,
+.feature-tab.active::after,
+.feature-tab-group:has(.feature-tab.active)::before,
+.feature-tab-group:has(.feature-tab.active)::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  width: 12px;
+  height: 10px;
+}
+
+.feature-tab.active::before,
+.feature-tab-group:has(.feature-tab.active)::before {
+  left: -10px;
+  background: radial-gradient(
+    circle at 0 0,
+    transparent 7.5px,
+    var(--active-accent) 8px 10px,
+    var(--tab-face) 10.5px
+  );
+}
+
+.feature-tab.active::after,
+.feature-tab-group:has(.feature-tab.active)::after {
+  right: -10px;
+  background: radial-gradient(
+    circle at 100% 0,
+    transparent 7.5px,
+    var(--active-accent) 8px 10px,
+    var(--tab-face) 10.5px
+  );
+}
+
+.tab-coral {
+  --tab-accent: var(--coral);
+}
+
+.tab-cyan {
+  --tab-accent: var(--cyan);
+}
+
+.tab-green {
+  --tab-accent: #35b75c;
+}
+
+.tab-acid {
+  --tab-accent: var(--acid);
 }
 
 .feature-tab-group {
@@ -629,23 +750,58 @@ h1 .before-word {
   flex: 0 0 auto;
   align-items: center;
   gap: 8px;
-  border-style: solid;
-  border-color: #35b75c;
-  color: #35b75c;
-  padding: 7px;
+  margin-bottom: 8px;
+  border: 2px solid #35b75c;
+  border-radius: 999px;
+  background: color-mix(in srgb, #35b75c 10%, var(--surface));
+  padding: 4px 5px 4px 14px;
+  transition: border-color 0.18s ease, background-color 0.18s ease, margin 0.18s ease,
+    border-radius 0.18s ease, padding 0.18s ease;
 }
 
 .feature-tab-group > span {
-  padding: 0 4px;
+  color: #35b75c;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
   white-space: nowrap;
 }
 
 .feature-tab-group .feature-tab {
-  min-height: 28px;
-  border-color: currentColor;
-  background: transparent;
-  color: var(--ink);
-  padding: 3px 8px;
+  margin-bottom: 0;
+  min-height: 30px;
+  padding: 2px 12px;
+  font-size: 0.76rem;
+}
+
+/* when a grouped tab is active, the whole capsule fuses with the panel frame */
+.feature-tab-group:has(.feature-tab.active) {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 0;
+  min-height: 48px;
+  border-color: var(--active-accent);
+  border-bottom: 0;
+  border-radius: 16px 16px 0 0;
+  background: var(--tab-face);
+  padding: 8px 8px 10px 16px;
+}
+
+.feature-tab-group .feature-tab.active {
+  min-height: 30px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: var(--tab-accent);
+  color: #171412;
+  padding: 2px 12px;
+}
+
+/* flares belong to the fused container, not the pill inside the group */
+.feature-tab-group .feature-tab.active::before,
+.feature-tab-group .feature-tab.active::after {
+  content: none;
 }
 
 .feature-flow {
@@ -653,28 +809,44 @@ h1 .before-word {
 }
 
 .feature-panel {
+  --panel-accent: var(--coral);
   display: grid;
   min-height: clamp(420px, 72svh, 640px);
   align-content: center;
   justify-items: center;
-  border: 2px solid var(--ink);
-  border-top: 0;
+  margin-top: 14px;
+  border: 2px solid var(--panel-accent);
+  border-radius: 16px;
   background:
     radial-gradient(circle at 50% 55%, var(--body-cool), transparent 34%),
-    var(--surface);
+    var(--tab-face);
   padding: clamp(24px, 6vw, 64px);
-  scroll-margin-top: 76px;
+  /* 60px = bar frame-top position: anchor landings put the card's rounded top
+     exactly ON the bar's frame-top so the two coincide as one outline */
+  scroll-margin-top: 60px;
   text-align: center;
+  transition: border-color 0.25s ease;
 }
 
+#feature-shift {
+  --panel-accent: var(--cyan);
+}
+
+#feature-accuracy {
+  --panel-accent: #35b75c;
+}
+
+#feature-polish {
+  --panel-accent: var(--acid);
+}
+
+/* tuck 2px up so the first card's top border coincides with the bar's frame-top */
 .feature-panel:first-child {
-  border-top: 2px solid var(--ink);
-  border-radius: 8px 8px 0 0;
+  margin-top: -2px;
 }
 
 .feature-panel:last-child {
-  border-radius: 0 0 8px 8px;
-  box-shadow: 6px 6px 0 var(--ink);
+  box-shadow: 6px 6px 0 color-mix(in srgb, var(--panel-accent) 78%, transparent);
 }
 
 .feature-panel h2 {
@@ -699,22 +871,6 @@ h1 .before-word {
   font-size: 0.82rem !important;
   font-weight: 800;
   text-transform: uppercase;
-}
-
-.coral-panel {
-  box-shadow: inset 6px 0 0 var(--coral);
-}
-
-.cyan-panel {
-  box-shadow: inset 6px 0 0 var(--cyan);
-}
-
-.green-panel {
-  box-shadow: inset 6px 0 0 #35b75c;
-}
-
-.cream-panel {
-  box-shadow: inset 6px 0 0 var(--cream);
 }
 
 .subpage-hero {

@@ -133,9 +133,21 @@ struct RollingBufferPreloadPolicyTests {
         let cloudBatchModel = streamingModel(provider: .deepgram)
         let streamingOnlyModel = streamingModel(provider: .cartesia)
 
-        #expect(RollingBufferBufferedSnapshotTranscriptionPolicy.strategy(for: localStreamingModel) == .recordedFile)
-        #expect(RollingBufferBufferedSnapshotTranscriptionPolicy.strategy(for: cloudBatchModel) == .recordedFile)
-        #expect(RollingBufferBufferedSnapshotTranscriptionPolicy.strategy(for: streamingOnlyModel) == .unavailable)
+        #expect(
+            RollingBufferBufferedSnapshotTranscriptionPolicy.strategy(
+                for: localStreamingModel.rollingBufferPreloadSnapshot
+            ) == .recordedFile
+        )
+        #expect(
+            RollingBufferBufferedSnapshotTranscriptionPolicy.strategy(
+                for: cloudBatchModel.rollingBufferPreloadSnapshot
+            ) == .recordedFile
+        )
+        #expect(
+            RollingBufferBufferedSnapshotTranscriptionPolicy.strategy(
+                for: streamingOnlyModel.rollingBufferPreloadSnapshot
+            ) == .unavailable
+        )
     }
 
     @Test func runtimeDiagnosticsKeepLatestQuickReleaseClaim() {

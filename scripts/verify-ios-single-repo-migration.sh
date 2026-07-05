@@ -387,6 +387,17 @@ reject_multiline_pattern() {
   fi
 }
 
+require_multiline_pattern() {
+  local description="$1"
+  local pattern="$2"
+  shift 2
+
+  section "$description"
+  if ! rg -q -U "$pattern" "$@"; then
+    fail "$description"
+  fi
+}
+
 require_provider_key_reset_direct_delete_adapter() {
   local file="$1"
 
@@ -20660,38 +20671,38 @@ require_patterns \
 require_patterns \
   "VoiceInkCore checks cover iOS App Group recording state policy" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'RecordingStatePolicyTests\.testAppGroupRecordingStatePolicyPreservesIOSStorageKeysAndTimeout' \
-  'RecordingStatePolicyTests\.testAppGroupRecordingStatePolicyKeepsFreshRecordingActive' \
-  'RecordingStatePolicyTests\.testAppGroupRecordingStatePolicyClearsStaleRecording' \
-  'RecordingStatePolicyTests\.testAppGroupRecordingStatePolicyDoesNotClearInactiveRecording' \
-  'RecordingStatePolicyTests\.testAppGroupRecordingStateWritePlansPreserveIOSBridgeWrites' \
-  'RecordingStatePolicyTests\.testAppGroupRecordingStateMutationPlansPreserveIOSBridgeNotifications' \
-  'RecordingStatePolicyTests\.testAppGroupRecordingStateReadPlanDoesNotRepairFreshRecording' \
-  'RecordingStatePolicyTests\.testAppGroupRecordingStateReadPlanOwnsStaleRepairMutation'
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RecordingStatePolicyTests\.testAppGroupRecordingStatePolicyPreservesIOSStorageKeysAndTimeout", run: \{ RecordingStatePolicyTests\(\)\.testAppGroupRecordingStatePolicyPreservesIOSStorageKeysAndTimeout\(\) \}\)' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RecordingStatePolicyTests\.testAppGroupRecordingStatePolicyKeepsFreshRecordingActive", run: \{ RecordingStatePolicyTests\(\)\.testAppGroupRecordingStatePolicyKeepsFreshRecordingActive\(\) \}\)' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RecordingStatePolicyTests\.testAppGroupRecordingStatePolicyClearsStaleRecording", run: \{ RecordingStatePolicyTests\(\)\.testAppGroupRecordingStatePolicyClearsStaleRecording\(\) \}\)' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RecordingStatePolicyTests\.testAppGroupRecordingStatePolicyDoesNotClearInactiveRecording", run: \{ RecordingStatePolicyTests\(\)\.testAppGroupRecordingStatePolicyDoesNotClearInactiveRecording\(\) \}\)' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RecordingStatePolicyTests\.testAppGroupRecordingStateWritePlansPreserveIOSBridgeWrites", run: \{ RecordingStatePolicyTests\(\)\.testAppGroupRecordingStateWritePlansPreserveIOSBridgeWrites\(\) \}\)' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RecordingStatePolicyTests\.testAppGroupRecordingStateMutationPlansPreserveIOSBridgeNotifications", run: \{ RecordingStatePolicyTests\(\)\.testAppGroupRecordingStateMutationPlansPreserveIOSBridgeNotifications\(\) \}\)' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RecordingStatePolicyTests\.testAppGroupRecordingStateReadPlanDoesNotRepairFreshRecording", run: \{ RecordingStatePolicyTests\(\)\.testAppGroupRecordingStateReadPlanDoesNotRepairFreshRecording\(\) \}\)' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RecordingStatePolicyTests\.testAppGroupRecordingStateReadPlanOwnsStaleRepairMutation", run: \{ RecordingStatePolicyTests\(\)\.testAppGroupRecordingStateReadPlanOwnsStaleRepairMutation\(\) \}\)'
 
 require_pattern \
   "VoiceInkCore checks cover iOS App Group write-plan runtime application" \
-  'testAppGroupRecordingStateWritePlanAppliesRuntimeStateInOrder' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RecordingStatePolicyTests\.testAppGroupRecordingStateWritePlanAppliesRuntimeStateInOrder", run: \{ RecordingStatePolicyTests\(\)\.testAppGroupRecordingStateWritePlanAppliesRuntimeStateInOrder\(\) \}\)' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "VoiceInkCore checks cover iOS App Group read-plan stale repair runtime application" \
-  'testAppGroupRecordingStateReadPlanAppliesStaleRepairRuntimeState' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RecordingStatePolicyTests\.testAppGroupRecordingStateReadPlanAppliesStaleRepairRuntimeState", run: \{ RecordingStatePolicyTests\(\)\.testAppGroupRecordingStateReadPlanAppliesStaleRepairRuntimeState\(\) \}\)' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "VoiceInkCore checks cover iOS App Group mutation write/notification runtime application" \
-  'testAppGroupRecordingStateMutationPlanAppliesRuntimeWriteBeforeNotification' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RecordingStatePolicyTests\.testAppGroupRecordingStateMutationPlanAppliesRuntimeWriteBeforeNotification", run: \{ RecordingStatePolicyTests\(\)\.testAppGroupRecordingStateMutationPlanAppliesRuntimeWriteBeforeNotification\(\) \}\)' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "VoiceInkCore checks cover iOS App Group recording diagnostics" \
-  'testAppGroupRecordingDiagnosticsPreserveIOSLogCopy' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RecordingStatePolicyTests\.testAppGroupRecordingDiagnosticsPreserveIOSLogCopy", run: \{ RecordingStatePolicyTests\(\)\.testAppGroupRecordingDiagnosticsPreserveIOSLogCopy\(\) \}\)' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "VoiceInkCore checks cover iOS recording coordination diagnostics" \
-  'testIOSRecordingCoordinationDiagnosticsPreserveIOSLogCopy' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RecordingStatePolicyTests\.testIOSRecordingCoordinationDiagnosticsPreserveIOSLogCopy", run: \{ RecordingStatePolicyTests\(\)\.testIOSRecordingCoordinationDiagnosticsPreserveIOSLogCopy\(\) \}\)' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_patterns \
@@ -20704,7 +20715,7 @@ require_patterns \
 
 require_pattern \
   "VoiceInkCore checks cover iOS keyboard recording timing" \
-  'testKeyboardRecordingTimingPreservesIOSAppAndKeyboardDelays' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RecordingStatePolicyTests\.testKeyboardRecordingTimingPreservesIOSAppAndKeyboardDelays", run: \{ RecordingStatePolicyTests\(\)\.testKeyboardRecordingTimingPreservesIOSAppAndKeyboardDelays\(\) \}\)' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_patterns \
@@ -20717,10 +20728,10 @@ require_patterns \
 require_patterns \
   "VoiceInkCore checks cover iOS launch recording request policy" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'RecordingStatePolicyTests\.testLaunchRecordingRequestStartsImmediatelyWhenOnboardingIsComplete' \
-  'RecordingStatePolicyTests\.testLaunchRecordingRequestDefersUntilOnboardingCompletes' \
-  'RecordingStatePolicyTests\.testLaunchRecordingRequestNoOpsWhenNothingIsPending' \
-  'RecordingStatePolicyTests\.testLaunchRecordingRequestClearsPendingStateWhenRecordingCanStartNow'
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RecordingStatePolicyTests\.testLaunchRecordingRequestStartsImmediatelyWhenOnboardingIsComplete", run: \{ RecordingStatePolicyTests\(\)\.testLaunchRecordingRequestStartsImmediatelyWhenOnboardingIsComplete\(\) \}\)' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RecordingStatePolicyTests\.testLaunchRecordingRequestDefersUntilOnboardingCompletes", run: \{ RecordingStatePolicyTests\(\)\.testLaunchRecordingRequestDefersUntilOnboardingCompletes\(\) \}\)' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RecordingStatePolicyTests\.testLaunchRecordingRequestNoOpsWhenNothingIsPending", run: \{ RecordingStatePolicyTests\(\)\.testLaunchRecordingRequestNoOpsWhenNothingIsPending\(\) \}\)' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RecordingStatePolicyTests\.testLaunchRecordingRequestClearsPendingStateWhenRecordingCanStartNow", run: \{ RecordingStatePolicyTests\(\)\.testLaunchRecordingRequestClearsPendingStateWhenRecordingCanStartNow\(\) \}\)'
 
 reject_pattern \
   "VoiceInkCore launch recording request policy avoids public action-only helper" \
@@ -20765,8 +20776,8 @@ require_pattern \
 require_patterns \
   "VoiceInkCore checks cover iOS keyboard recording button presentation" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'RecordingStatePolicyTests\.testKeyboardRecordingButtonPresentationPreservesIOSCopyAndIcons' \
-  'RecordingStatePolicyTests\.testKeyboardRecordingButtonPresentationSelectsCurrentState'
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RecordingStatePolicyTests\.testKeyboardRecordingButtonPresentationPreservesIOSCopyAndIcons", run: \{ RecordingStatePolicyTests\(\)\.testKeyboardRecordingButtonPresentationPreservesIOSCopyAndIcons\(\) \}\)' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RecordingStatePolicyTests\.testKeyboardRecordingButtonPresentationSelectsCurrentState", run: \{ RecordingStatePolicyTests\(\)\.testKeyboardRecordingButtonPresentationSelectsCurrentState\(\) \}\)'
 
 require_patterns \
   "VoiceInkCore owns iOS keyboard open-app fallback policy and diagnostics" \
@@ -20785,8 +20796,8 @@ require_patterns \
 require_patterns \
   "VoiceInkCore checks cover iOS keyboard open-app fallback policy and diagnostics" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'testKeyboardOpenAppPlansApplyDiagnosticsAndRuntimeState' \
-  'testKeyboardOpenAppDiagnosticsPreserveIOSLogCopy'
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RecordingStatePolicyTests\.testKeyboardOpenAppPlansApplyDiagnosticsAndRuntimeState", run: \{ RecordingStatePolicyTests\(\)\.testKeyboardOpenAppPlansApplyDiagnosticsAndRuntimeState\(\) \}\)' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RecordingStatePolicyTests\.testKeyboardOpenAppDiagnosticsPreserveIOSLogCopy", run: \{ RecordingStatePolicyTests\(\)\.testKeyboardOpenAppDiagnosticsPreserveIOSLogCopy\(\) \}\)'
 
 reject_pattern \
   "VoiceInkCore keyboard open-app policy avoids public action-only helpers" \
@@ -20849,6 +20860,21 @@ reject_pattern \
 reject_pattern \
   "iOS keyboard URL opener avoids shell-owned open-result branching" \
   'if +success|if +succeeded|if +!succeeded|switch +success|switch +succeeded|guard +success|guard +succeeded|success +\?|succeeded +\?|guard +let +extensionContext' \
+  iOS/Shared/VoiceInkKeyboardURLOpener.swift
+
+reject_multiline_pattern \
+  "iOS keyboard URL opener avoids open-result branching inside result handlers" \
+  '(?s)private static func applyExtensionContextOpenResult\([^{]*\{[^}]*(\b(if|guard|switch)\b|\?[^:]*:)|private static func applyApplicationOpenResult\([^{]*\{[^}]*(\b(if|guard|switch)\b|\?[^:]*:)' \
+  iOS/Shared/VoiceInkKeyboardURLOpener.swift
+
+require_multiline_pattern \
+  "iOS keyboard URL opener routes extension-context open result through shared policy" \
+  '(?s)private static func applyExtensionContextOpenResult\([^{]*succeeded: Bool[^{]*\{.*VoiceInkKeyboardOpenAppPolicy\.actionPlanAfterExtensionContextOpen\([[:space:]]*succeeded: succeeded' \
+  iOS/Shared/VoiceInkKeyboardURLOpener.swift
+
+require_multiline_pattern \
+  "iOS keyboard URL opener routes application open result through shared policy" \
+  '(?s)private static func applyApplicationOpenResult\([^{]*succeeded: Bool[^{]*\{.*VoiceInkKeyboardOpenAppPolicy\.actionPlanAfterApplicationOpen\([[:space:]]*succeeded: succeeded' \
   iOS/Shared/VoiceInkKeyboardURLOpener.swift
 
 require_pattern \
@@ -21025,7 +21051,7 @@ require_patterns \
 
 require_pattern \
   "VoiceInkCore checks cover iOS keyboard recording button tap policy" \
-  'RecordingStatePolicyTests\.testKeyboardRecordingButtonTapPlanAppliesRuntimeState' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RecordingStatePolicyTests\.testKeyboardRecordingButtonTapPlanAppliesRuntimeState", run: \{ RecordingStatePolicyTests\(\)\.testKeyboardRecordingButtonTapPlanAppliesRuntimeState\(\) \}\)' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \
@@ -21055,7 +21081,7 @@ require_patterns \
 
 require_pattern \
   "VoiceInkCore checks cover iOS keyboard stop-request policy" \
-  'RecordingStatePolicyTests\.testKeyboardStopRecordingRequestPlanHandlesOnlyActiveRecording' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RecordingStatePolicyTests\.testKeyboardStopRecordingRequestPlanHandlesOnlyActiveRecording", run: \{ RecordingStatePolicyTests\(\)\.testKeyboardStopRecordingRequestPlanHandlesOnlyActiveRecording\(\) \}\)' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \

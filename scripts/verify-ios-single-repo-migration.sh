@@ -19212,10 +19212,10 @@ require_patterns \
   'DashboardMetricsTests\(\)\.testMigrationDiagnosticsPreserveMacOSLogCopy\(\)' \
   'DashboardMetricsTests\.testRecorderDiagnosticsPreserveMacOSLogCopy' \
   'DashboardMetricsTests\(\)\.testRecorderDiagnosticsPreserveMacOSLogCopy\(\)' \
-  'PerformanceAnalysisTests\.testStatsCanRequirePositiveDurationsForSessionMetricPanels' \
-  'PerformanceAnalysisTests\(\)\.testStatsCanRequirePositiveDurationsForSessionMetricPanels\(\)' \
-  'PerformanceAnalysisTests\.testSessionMetricSourceDefaultsPerformanceRecordFields' \
-  'PerformanceAnalysisTests\(\)\.testSessionMetricSourceDefaultsPerformanceRecordFields\(\)'
+  'DashboardMetricsTests\.testStatsCanRequirePositiveDurationsForSessionMetricPanels' \
+  'DashboardMetricsTests\(\)\.testStatsCanRequirePositiveDurationsForSessionMetricPanels\(\)' \
+  'DashboardMetricsTests\.testSessionMetricSourceDefaultsPerformanceRecordFields' \
+  'DashboardMetricsTests\(\)\.testSessionMetricSourceDefaultsPerformanceRecordFields\(\)'
 
 require_pattern \
   "migration checklist tracks shared session metric migration preference" \
@@ -19342,20 +19342,28 @@ require_pattern \
   'VoiceInkPerformancePresentation\.physicalMemoryText\(byteCount: totalMemory\)' \
   VoiceInk/Views/Metrics/PerformanceAnalysisView.swift
 
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/PerformanceAnalysisTests.swift
+
 require_pattern \
   "core tests pin macOS performance panel presentation" \
   'testPerformancePresentationPreservesMacOSPanelCopyAndIcons|totalTranscriptsText|totalWithTranscriptionDataText|totalEnhancedFilesText' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/PerformanceAnalysisTests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/DashboardMetricsTests.swift
 
 require_pattern \
   "core tests pin physical-memory presentation" \
   'physicalMemoryText\(byteCount: 1_073_741_824\)' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/PerformanceAnalysisTests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/DashboardMetricsTests.swift
 
 require_pattern \
   "core check runner executes performance panel presentation tests" \
-  'PerformanceAnalysisTests\.testPerformancePresentationPreservesMacOSPanelCopyAndIcons' \
+  'DashboardMetricsTests\.testPerformancePresentationPreservesMacOSPanelCopyAndIcons' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "core checks avoid obsolete standalone performance analysis suite" \
+  'PerformanceAnalysisTests' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/DashboardMetricsTests.swift
 
 reject_pattern \
   "macOS model performance panel avoids shell-only time filter policy" \

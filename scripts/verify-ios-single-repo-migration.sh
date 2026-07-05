@@ -14392,15 +14392,25 @@ require_pattern \
 section "obsolete standalone special shortcut key-evidence policy module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/SpecialShortcutKeyEvidencePolicy.swift
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/SpecialShortcutKeyEvidencePolicyTests.swift
+reject_file VoiceInkCore/Sources/VoiceInkCore/SpecialShortcutEmptyFallbackPolicy.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/SpecialShortcutEmptyFallbackPolicyTests.swift
 
 reject_swift_pattern \
   "VoiceInkCore tests avoid stale standalone special shortcut key-evidence test references" \
   'SpecialShortcutKeyEvidencePolicyTests' \
   VoiceInkCore/Tests/VoiceInkCoreTests
 
+reject_pattern \
+  "VoiceInkCore metadata and checks avoid stale standalone special shortcut empty fallback references" \
+  'SpecialShortcutEmptyFallbackPolicyTests|SpecialShortcutEmptyFallbackPolicy\.swift|SpecialShortcutEmptyFallbackPolicyTests\.swift' \
+  VoiceInkCore/Tests/VoiceInkCoreTests \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
+
 require_patterns \
-  "special shortcut key-evidence policy lives with empty-tap fallback policy" \
-  VoiceInkCore/Sources/VoiceInkCore/SpecialShortcutEmptyFallbackPolicy.swift \
+  "special shortcut key-evidence and empty-tap fallback policy live with UserDefaults shortcut preferences" \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift \
   'VoiceInkShortcutPressContext' \
   'VoiceInkSpecialShortcutKeyEvidencePolicy' \
   'VoiceInkShortcutInterruptionPolicy' \
@@ -14414,9 +14424,9 @@ require_patterns \
   'VoiceInkSpecialShortcutEmptyFallbackPolicy'
 
 require_patterns \
-  "special shortcut empty fallback tests cover key-evidence and interruption policy" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/SpecialShortcutEmptyFallbackPolicyTests.swift \
-  'final class SpecialShortcutEmptyFallbackPolicyTests: XCTestCase' \
+  "UserDefaults preference tests cover special shortcut key-evidence and empty fallback policy" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/UserDefaultsPreferencesTests.swift \
+  'final class UserDefaultsPreferencesTests: XCTestCase' \
   'func testReliablePressContextAllowsSpecialShortcutCommit\(' \
   'func testTypingEvidenceDiscardsSpecialShortcut\(' \
   'func testUnreliableKeyEvidenceFailsClosed\(' \
@@ -14450,25 +14460,24 @@ reject_pattern \
   'shortcutPressCooldown|hybridPressThreshold|1_000_000_000|pressDuration >=|Date\(\)\.timeIntervalSince\(lastTrigger\)' \
   VoiceInk/Shortcuts/RecordingShortcutManager.swift
 
-require_patterns \
-  "core checks execute shared recording shortcut timing policy tests" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'VoiceInkCoreCheck\(name: "SpecialShortcutEmptyFallbackPolicyTests\.testRecordingShortcutTimingPolicyPreservesMacOSThresholds", run: \{ SpecialShortcutEmptyFallbackPolicyTests\(\)\.testRecordingShortcutTimingPolicyPreservesMacOSThresholds\(\) \}\)' \
-  'VoiceInkCoreCheck\(name: "SpecialShortcutEmptyFallbackPolicyTests\.testRecordingShortcutTimingPolicyDetectsPressCooldown", run: \{ SpecialShortcutEmptyFallbackPolicyTests\(\)\.testRecordingShortcutTimingPolicyDetectsPressCooldown\(\) \}\)' \
-  'VoiceInkCoreCheck\(name: "SpecialShortcutEmptyFallbackPolicyTests\.testRecordingShortcutTimingPolicyHybridStopRequiresThresholdAndRecordingState", run: \{ SpecialShortcutEmptyFallbackPolicyTests\(\)\.testRecordingShortcutTimingPolicyHybridStopRequiresThresholdAndRecordingState\(\) \}\)' \
-  'VoiceInkCoreCheck\(name: "SpecialShortcutEmptyFallbackPolicyTests\.testRecordingShortcutTimingPolicyConvertsSleepDelaySafely", run: \{ SpecialShortcutEmptyFallbackPolicyTests\(\)\.testRecordingShortcutTimingPolicyConvertsSleepDelaySafely\(\) \}\)'
-
-require_patterns \
-  "core checks execute folded special shortcut key-evidence policy tests" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'VoiceInkCoreCheck\(name: "SpecialShortcutEmptyFallbackPolicyTests\.testReliablePressContextAllowsSpecialShortcutCommit", run: \{ SpecialShortcutEmptyFallbackPolicyTests\(\)\.testReliablePressContextAllowsSpecialShortcutCommit\(\) \}\)' \
-  'VoiceInkCoreCheck\(name: "SpecialShortcutEmptyFallbackPolicyTests\.testTypingEvidenceDiscardsSpecialShortcut", run: \{ SpecialShortcutEmptyFallbackPolicyTests\(\)\.testTypingEvidenceDiscardsSpecialShortcut\(\) \}\)' \
-  'VoiceInkCoreCheck\(name: "SpecialShortcutEmptyFallbackPolicyTests\.testUnreliableKeyEvidenceFailsClosed", run: \{ SpecialShortcutEmptyFallbackPolicyTests\(\)\.testUnreliableKeyEvidenceFailsClosed\(\) \}\)' \
-  'VoiceInkCoreCheck\(name: "SpecialShortcutEmptyFallbackPolicyTests\.testShortcutInterruptionPolicyPreservesMacOSWindow", run: \{ SpecialShortcutEmptyFallbackPolicyTests\(\)\.testShortcutInterruptionPolicyPreservesMacOSWindow\(\) \}\)'
+require_voiceink_core_check_runner_invocations \
+  "core checks execute folded special shortcut preference policy tests" \
+  "UserDefaultsPreferencesTests" \
+  testReliablePressContextAllowsSpecialShortcutCommit \
+  testTypingEvidenceDiscardsSpecialShortcut \
+  testUnreliableKeyEvidenceFailsClosed \
+  testShortcutInterruptionPolicyPreservesMacOSWindow \
+  testRecordingShortcutTimingPolicyPreservesMacOSThresholds \
+  testRecordingShortcutTimingPolicyDetectsPressCooldown \
+  testRecordingShortcutTimingPolicyHybridStopRequiresThresholdAndRecordingState \
+  testRecordingShortcutTimingPolicyConvertsSleepDelaySafely \
+  testShortPressSchedulesEmptyTapFallbackOnlyBelowThreshold \
+  testConsumeFallbackRequiresFreshCompletedEmptyTranscription \
+  testConsumeFallbackRejectsStalePendingOrNonEmptyTranscriptions
 
 require_pattern \
   "migration docs track shared recording shortcut timing policy" \
-  'shortcut interruption timing to `VoiceInkShortcutInterruptionPolicy`.*recording shortcut mode handling delegates cooldown, hybrid push-to-talk threshold, and hold-delay sleep conversion to `VoiceInkRecordingShortcutTimingPolicy`' \
+  'special shortcut empty-tap fallback, key-evidence discard, interruption timing, cooldown, hybrid push-to-talk threshold, and hold-delay sleep conversion policies are colocated with shared recording shortcut/UserDefaults preference policy' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

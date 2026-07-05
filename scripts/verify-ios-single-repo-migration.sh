@@ -4749,6 +4749,7 @@ require_pattern \
 section "obsolete standalone error-description module/tests stay deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/ErrorDescription.swift
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/ErrorDescriptionTests.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkEngineErrorTests.swift
 
 require_patterns \
   "shared error-description fallback lives with engine error vocabulary" \
@@ -4758,19 +4759,25 @@ require_patterns \
   'LocalizedError\)\?\.errorDescription \?\? error\.localizedDescription'
 
 require_patterns \
-  "engine error tests cover shared error-description fallback" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkEngineErrorTests.swift \
+  "transcription run processor tests cover shared error-description fallback" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunProcessorTests.swift \
   'testPrefersLocalizedErrorDescription' \
   'testFallsBackToLocalizedDescription' \
-  'VoiceInkErrorDescription\.text\(for: StubDescribedError' \
+  'VoiceInkErrorDescription\.text\(for: StubLocalizedError' \
   'VoiceInkErrorDescription\.text\(for: error\)' \
   'error\.localizedDescription'
 
 require_patterns \
-  "core checks execute shared error-description fallback tests" \
+  "core checks execute folded engine-error tests through transcription run processor suite" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'VoiceInkEngineErrorTests\.testPrefersLocalizedErrorDescription' \
-  'VoiceInkEngineErrorTests\.testFallsBackToLocalizedDescription'
+  'name: "TranscriptionRunProcessorTests\.testPrefersLocalizedErrorDescription"' \
+  'TranscriptionRunProcessorTests\(\)\.testPrefersLocalizedErrorDescription\(\)' \
+  'name: "TranscriptionRunProcessorTests\.testFallsBackToLocalizedDescription"' \
+  'TranscriptionRunProcessorTests\(\)\.testFallsBackToLocalizedDescription\(\)' \
+  'name: "TranscriptionRunProcessorTests\.testMacOSErrorDescriptionsStayStable"' \
+  'TranscriptionRunProcessorTests\(\)\.testMacOSErrorDescriptionsStayStable\(\)' \
+  'name: "TranscriptionRunProcessorTests\.testIOSLocalWhisperDescriptionsStayStable"' \
+  'TranscriptionRunProcessorTests\(\)\.testIOSLocalWhisperDescriptionsStayStable\(\)'
 
 require_pattern \
   "shared local Whisper transcription flow lives in VoiceInkCore" \

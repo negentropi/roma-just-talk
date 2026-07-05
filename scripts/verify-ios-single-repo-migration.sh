@@ -398,13 +398,8 @@ swift_static_function_body_pattern_status() {
     local $/;
     my $source = <$fh>;
     my $code = mask_swift_non_code($source);
-    my $signature = qr/(?:private\s+)?static\s+func\s+\Q$function_name\E\s*\(/x;
-    if ($code !~ /$signature/g) {
-      exit 2;
-    }
-
-    my $open_brace = index($code, "{", pos($code));
-    exit 2 if $open_brace < 0;
+    my $open_brace = find_private_static_function_open_brace($code, $function_name);
+    exit 2 unless defined $open_brace;
 
     my $depth = 0;
     my $close_brace;
@@ -425,6 +420,36 @@ swift_static_function_body_pattern_status() {
     my $body = substr($code, $open_brace + 1, $close_brace - $open_brace - 1);
     exit($body =~ /$pattern/s ? 0 : 1);
 
+    sub find_private_static_function_open_brace {
+      my ($code, $function_name) = @_;
+      my $signature = qr/private\s+static\s+func\s+\Q$function_name\E\s*\(/x;
+      while ($code =~ /$signature/g) {
+        my $open_paren = pos($code) - 1;
+        my $close_paren = find_balanced_close($code, $open_paren, "(", ")");
+        next unless defined $close_paren;
+        my $index = $close_paren + 1;
+        $index++ while $index < length($code) && substr($code, $index, 1) =~ /\s/;
+        return $index if substr($code, $index, 1) eq "{";
+      }
+      return;
+    }
+
+    sub find_balanced_close {
+      my ($text, $index, $open, $close) = @_;
+      my $length = length($text);
+      my $depth = 0;
+      for (; $index < $length; $index++) {
+        my $char = substr($text, $index, 1);
+        if ($char eq $open) {
+          $depth++;
+        } elsif ($char eq $close) {
+          $depth--;
+          return $index if $depth == 0;
+        }
+      }
+      return;
+    }
+
     sub mask_swift_non_code {
       my ($text) = @_;
       my $masked = $text;
@@ -441,20 +466,7 @@ swift_static_function_body_pattern_status() {
         }
         if ($pair eq "/*") {
           my $start = $index;
-          my $depth = 1;
-          $index += 2;
-          while ($index < $length && $depth > 0) {
-            my $comment_pair = substr($text, $index, 2);
-            if ($comment_pair eq "/*") {
-              $depth++;
-              $index += 2;
-            } elsif ($comment_pair eq "*/") {
-              $depth--;
-              $index += 2;
-            } else {
-              $index++;
-            }
-          }
+          $index = find_swift_block_comment_end($text, $index + 2);
           mask_span(\$masked, $start, $index);
           next;
         }
@@ -484,6 +496,11 @@ swift_static_function_body_pattern_status() {
       my $length = length($text);
       while ($index < $length) {
         my $char = substr($text, $index, 1);
+        my $interpolation = "\\" . ("#" x $hash_count) . "(";
+        if (substr($text, $index, length($interpolation)) eq $interpolation) {
+          $index = find_swift_interpolation_end($text, $index + length($interpolation));
+          next;
+        }
         if ($hash_count == 0 && $char eq "\\") {
           $index += 2;
           next;
@@ -500,8 +517,76 @@ swift_static_function_body_pattern_status() {
       my ($text, $index, $hash_count) = @_;
       my $length = length($text);
       my $close = "\"\"\"" . ("#" x $hash_count);
-      my $found = index($text, $close, $index);
-      return $found < 0 ? $length : $found + length($close);
+      my $interpolation = "\\" . ("#" x $hash_count) . "(";
+      while ($index < $length) {
+        if (substr($text, $index, length($interpolation)) eq $interpolation) {
+          $index = find_swift_interpolation_end($text, $index + length($interpolation));
+          next;
+        }
+        if (substr($text, $index, length($close)) eq $close) {
+          return $index + length($close);
+        }
+        $index++;
+      }
+      return $length;
+    }
+
+    sub find_swift_interpolation_end {
+      my ($text, $index) = @_;
+      my $length = length($text);
+      my $depth = 1;
+      while ($index < $length && $depth > 0) {
+        my $pair = substr($text, $index, 2);
+        if ($pair eq "//") {
+          $index += 2;
+          $index++ while $index < $length && substr($text, $index, 1) ne "\n";
+          next;
+        }
+        if ($pair eq "/*") {
+          $index = find_swift_block_comment_end($text, $index + 2);
+          next;
+        }
+
+        my $hash_count = 0;
+        $hash_count++ while substr($text, $index + $hash_count, 1) eq "#";
+        my $quote_start = $index + $hash_count;
+        if (substr($text, $quote_start, 1) eq "\"") {
+          if (substr($text, $quote_start, 3) eq "\"\"\"") {
+            $index = find_swift_multiline_string_end($text, $quote_start + 3, $hash_count);
+          } else {
+            $index = find_swift_string_end($text, $quote_start + 1, $hash_count);
+          }
+          next;
+        }
+
+        my $char = substr($text, $index, 1);
+        if ($char eq "(") {
+          $depth++;
+        } elsif ($char eq ")") {
+          $depth--;
+        }
+        $index++;
+      }
+      return $index;
+    }
+
+    sub find_swift_block_comment_end {
+      my ($text, $index) = @_;
+      my $length = length($text);
+      my $depth = 1;
+      while ($index < $length && $depth > 0) {
+        my $pair = substr($text, $index, 2);
+        if ($pair eq "/*") {
+          $depth++;
+          $index += 2;
+        } elsif ($pair eq "*/") {
+          $depth--;
+          $index += 2;
+        } else {
+          $index++;
+        }
+      }
+      return $index;
     }
 
     sub mask_span {

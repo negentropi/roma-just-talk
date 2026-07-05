@@ -5524,18 +5524,19 @@ require_pattern \
 require_pattern \
   "shared model management filter lives in VoiceInkCore" \
   'enum VoiceInkModelManagementFilter' \
-  VoiceInkCore/Sources/VoiceInkCore/ModelManagementPresentation.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift
 
 require_pattern \
   "shared model management filter owns model facts and recommended order" \
   'VoiceInkModelManagementModelFacts|VoiceInkModelManagementModelCategory|private static let recommendedModelNames|private func +includes|private func +sortRank|filteredModels' \
-  VoiceInkCore/Sources/VoiceInkCore/ModelManagementPresentation.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift
 
 reject_pattern \
   "shared model management filter hides recommended ordering internals" \
   'public static let recommendedModelNames|public func +(includes|sortRank)' \
-  VoiceInkCore/Sources/VoiceInkCore/ModelManagementPresentation.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift
 
+reject_file VoiceInkCore/Sources/VoiceInkCore/ModelManagementPresentation.swift
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/ModelManagementPresentationTests.swift
 
 require_pattern \
@@ -5546,7 +5547,7 @@ require_pattern \
 require_pattern \
   "shared model management copy presentation lives in VoiceInkCore" \
   'enum VoiceInkModelManagementPresentation|downloadButtonTitle|editModelButtonTitle|deleteModelButtonTitle|deleteButtonTitle|deleteCustomModelAlertTitle|deleteCustomModelAlertMessage|deleteModelAlertMessage|showInFinderButtonTitle|speedLabel|accuracyLabel|scoreText|languageLabel|multilingualLanguageLabel|englishOnlyLanguageLabel|importedLocalModelDescription|customProviderLabel|openAICompatibleLabel|nativeAppleProviderLabel|onDeviceLabel|macOS26RequiredLabel|importLocalModelHelpText|importLocalModelLearnMoreURLString|importLocalModelPanelTitle|intelMacLocalModelsWarningText|intelMacUseCloudButtonTitle|importedLocalModelFailureTitle' \
-  VoiceInkCore/Sources/VoiceInkCore/ModelManagementPresentation.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift
 
 require_pattern \
   "macOS transcription models use shared model language and imported-local copy" \

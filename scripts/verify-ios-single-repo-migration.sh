@@ -11972,15 +11972,18 @@ reject_pattern \
   'executionPlan\.route|textEnhancementExecutionRoute|VoiceInkAIEnhancementExecutionRoute|openAICompatibleRequestOrThrow|preconditionFailure\("Local AI routes should return before cloud request execution\."\)' \
   VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
 
-require_pattern \
+require_patterns \
   "shared AI chat request parameter planning lives in VoiceInkCore" \
-  'VoiceInkAIChatRequestParameters|chatRequestParameters' \
-  VoiceInkCore/Sources/VoiceInkCore/AIReasoningConfig.swift
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift \
+  'VoiceInkAIChatRequestParameters' \
+  'chatRequestParameters'
 
-require_pattern \
+require_patterns \
   "macOS AI enhancement request tuning uses shared execution plan" \
-  'requestParameters\.(temperature|reasoningEffort|extraBodyParameters)' \
-  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift
+  VoiceInk/Services/AIEnhancement/AIEnhancementService.swift \
+  'requestParameters\.temperature' \
+  'requestParameters\.reasoningEffort' \
+  'requestParameters\.extraBodyParameters'
 
 reject_pattern \
   "macOS AI enhancement service avoids shell-owned OpenAI-compatible request plan field reads" \
@@ -12006,6 +12009,48 @@ require_pattern \
   "iOS post-processing request tuning uses shared policy" \
   'chatRequestParameters' \
   VoiceInkCore/Sources/VoiceInkCore/PostProcessingClient.swift
+
+section "obsolete standalone AI reasoning config module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/AIReasoningConfig.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/AIReasoningConfigTests.swift
+
+reject_swift_pattern \
+  "core AI provider catalog tests avoid obsolete standalone reasoning suite" \
+  'final class AIReasoningConfigTests\b|AIReasoningConfigTests\(\)' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AIProviderCatalogTests.swift
+
+reject_pattern \
+  "core check runner avoids obsolete AI reasoning config suite entries" \
+  'AIReasoningConfigTests\.' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_patterns \
+  "shared AI chat request parameter planning lives with AI provider catalog" \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift \
+  'public struct VoiceInkAIChatRequestParameters' \
+  'public enum VoiceInkAIReasoningConfig' \
+  'temperature\(forModelName:' \
+  'chatRequestParameters\(' \
+  'reasoningEffort\(for:' \
+  'extraBodyParameters\(for:'
+
+require_patterns \
+  "core AI provider catalog tests cover reasoning request parameter policy" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AIProviderCatalogTests.swift \
+  'func testTemperatureUsesRequiredGPT5Temperature\(' \
+  'func testReasoningEffortMatchesProviderModelPolicy\(' \
+  'func testExtraBodyParametersMatchProviderModelPolicy\(' \
+  'func testChatRequestParametersCombineTemperatureAndReasoningPolicy\(' \
+  'func testMacOSExtraAIProvidersUseNoSharedReasoningOverrides\('
+
+require_patterns \
+  "core check runner executes AI provider catalog reasoning request parameter tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'AIProviderCatalogTests\.testTemperatureUsesRequiredGPT5Temperature' \
+  'AIProviderCatalogTests\.testReasoningEffortMatchesProviderModelPolicy' \
+  'AIProviderCatalogTests\.testExtraBodyParametersMatchProviderModelPolicy' \
+  'AIProviderCatalogTests\.testChatRequestParametersCombineTemperatureAndReasoningPolicy' \
+  'AIProviderCatalogTests\.testMacOSExtraAIProvidersUseNoSharedReasoningOverrides'
 
 section "obsolete standalone post-processing request module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/PostProcessingRequest.swift

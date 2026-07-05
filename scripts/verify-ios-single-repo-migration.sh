@@ -10631,14 +10631,16 @@ require_pattern \
   'VoiceInkAIEnhancementTransportFailure|transportFailure|missingAPIKey|noResultReturned|invalidRequest' \
   VoiceInkCore/Sources/VoiceInkCore/AIEnhancementError.swift
 
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/AIEnhancementErrorTests.swift
+
 require_pattern \
   "core tests pin shared AI enhancement transport failure policy" \
   'testTransportFailureMappingPreservesMacOSLLMKitCategories' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/AIEnhancementErrorTests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/AIEnhancementRetryPolicyTests.swift
 
 require_pattern \
   "core check runner executes shared AI enhancement transport failure policy test" \
-  'AIEnhancementErrorTests\.testTransportFailureMappingPreservesMacOSLLMKitCategories' \
+  'AIEnhancementRetryPolicyTests\.testTransportFailureMappingPreservesMacOSLLMKitCategories' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -10656,15 +10658,19 @@ require_pattern \
   'VoiceInkOllamaEnhancementFailure|VoiceInkOllamaTransportFailure|transportFailure|httpFailure|enhancementError|VoiceInkOllamaServiceDiagnostics|modelFetchFailedMessage|Ollama request timed out' \
   VoiceInkCore/Sources/VoiceInkCore/AIEnhancementError.swift
 
-require_pattern \
+require_patterns \
   "core tests pin shared Ollama enhancement failure policy" \
-  'testOllamaEnhancementFailurePolicyPreservesMacOSMessagesAndRetryShape|testOllamaTransportFailuresMapToSharedFailurePolicy|testOllamaServiceDiagnosticsPreserveMacOSConsoleCopy' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/AIEnhancementErrorTests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/AIEnhancementRetryPolicyTests.swift \
+  'testOllamaEnhancementFailurePolicyPreservesMacOSMessagesAndRetryShape' \
+  'testOllamaTransportFailuresMapToSharedFailurePolicy' \
+  'testOllamaServiceDiagnosticsPreserveMacOSConsoleCopy'
 
-require_pattern \
+require_patterns \
   "core check runner executes shared Ollama enhancement failure policy test" \
-  'testOllamaEnhancementFailurePolicyPreservesMacOSMessagesAndRetryShape|testOllamaTransportFailuresMapToSharedFailurePolicy|testOllamaServiceDiagnosticsPreserveMacOSConsoleCopy' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'AIEnhancementRetryPolicyTests\.testOllamaEnhancementFailurePolicyPreservesMacOSMessagesAndRetryShape' \
+  'AIEnhancementRetryPolicyTests\.testOllamaTransportFailuresMapToSharedFailurePolicy' \
+  'AIEnhancementRetryPolicyTests\.testOllamaServiceDiagnosticsPreserveMacOSConsoleCopy'
 
 require_pattern \
   "macOS Ollama service uses shared enhancement failure policy" \
@@ -11825,7 +11831,7 @@ require_patterns \
 
 require_pattern \
   "core checks execute Local CLI enhancement error mapping test" \
-  'AIEnhancementErrorTests\.testLocalCLIExecutionFailureMapsCoreErrorsAndGenericFallbacks' \
+  'AIEnhancementRetryPolicyTests\.testLocalCLIExecutionFailureMapsCoreErrorsAndGenericFallbacks' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \

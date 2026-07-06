@@ -606,6 +606,9 @@ h1 .before-word {
 }
 
 .feature-tabs {
+  --rail-y: 60px;
+  --rail-height: 20px;
+  --rail-radius: 16px;
   position: sticky;
   z-index: 6;
   top: 0;
@@ -620,48 +623,46 @@ h1 .before-word {
   content: "";
   position: absolute;
   z-index: 0;
-  inset: 0 calc(-1 * var(--rail-mask-bleed)) calc(-1 * var(--rail-cover-depth));
+  inset: 0 calc(-1 * var(--rail-mask-bleed));
   background: transparent;
   pointer-events: none;
   transition: background-color 0.2s ease;
 }
 
-/* the frame's top edge — line, rounded corners, and short side stubs — lives
-   permanently on the sticky bar, so the outline is identical at rest and stuck */
-.feature-tabs::after {
-  content: "";
+.feature-rail-svg {
   position: absolute;
   z-index: 2;
-  top: 60px;
+  top: 0;
   left: 0;
   right: 0;
-  height: 18px;
-  border: 2px solid var(--active-accent);
-  border-bottom: 0;
-  border-radius: 16px 16px 0 0;
+  height: calc(var(--rail-y) + var(--rail-height) + 2px);
+  overflow: visible;
   pointer-events: none;
-  transition: border-color 0.25s ease;
 }
 
-.feature-rail-mirror {
-  position: absolute;
-  z-index: 1;
-  top: 60px;
-  left: 0;
-  right: 0;
-  height: 20px;
+.feature-rail-cover {
+  fill: var(--paper);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.feature-rail-top-path,
+.feature-rail-mirror-path {
+  fill: none;
+  stroke-linejoin: round;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.feature-rail-top-path {
+  stroke: var(--active-accent);
+  transition: stroke 0.25s ease;
+}
+
+.feature-rail-mirror-path {
   opacity: var(--rail-mirror-amount);
-  pointer-events: none;
-  transition: opacity 0.08s linear, border-color 0.12s linear;
-}
-
-.feature-rail-mirror::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border: 2px solid var(--rail-mirror-accent);
-  border-top: 0;
-  border-radius: 0 0 16px 16px;
+  stroke: var(--rail-mirror-accent);
+  transition: opacity 0.08s linear, stroke 0.12s linear;
 }
 
 /* solid mask once content scrolls beneath it, so previous panel borders and
@@ -674,6 +675,10 @@ h1 .before-word {
 
 .feature-tabs.stuck::before {
   background: var(--paper);
+}
+
+.feature-tabs.stuck .feature-rail-cover {
+  opacity: 1;
 }
 
 .feature-tabs-scroll {

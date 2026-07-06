@@ -315,7 +315,10 @@ async function loadChangelog() {
 function initFeatureTabs() {
   const bar = document.querySelector(".feature-tabs");
   const shell = bar?.closest(".features-shell");
-  const mirror = bar?.querySelector(".feature-rail-mirror");
+  const railSvg = bar?.querySelector(".feature-rail-svg");
+  const railCoverPath = railSvg?.querySelector("[data-rail-cover]");
+  const railMirrorPath = railSvg?.querySelector("[data-rail-mirror]");
+  const railTopPath = railSvg?.querySelector("[data-rail-top]");
   const scroller = document.querySelector(".feature-tabs-scroll") || bar;
   const tabs = Array.from(document.querySelectorAll(".feature-tab"));
   if (!bar || !tabs.length) return;
@@ -326,10 +329,53 @@ function initFeatureTabs() {
   let activeId = "";
   const clamp = (value) => Math.max(0, Math.min(1, value));
   const smoothstep = (value) => value * value * (3 - 2 * value);
+  const cssPx = (styles, name, fallback) => parseFloat(styles.getPropertyValue(name)) || fallback;
 
   const panelAccent = (panel) => {
     const styles = getComputedStyle(panel);
     return styles.getPropertyValue("--panel-accent").trim() || styles.borderTopColor;
+  };
+
+  const railPathData = ({ width, y, height, radius }) => {
+    const bottom = y + height;
+    const right = width;
+    const r = Math.min(radius, height, width / 2);
+    const topRail = `M0 ${bottom} L0 ${y + r} Q0 ${y} ${r} ${y} L${right - r} ${y} Q${right} ${y} ${right} ${y + r} L${right} ${bottom}`;
+    const mirrorRail = `M0 ${y} L0 ${bottom - r} Q0 ${bottom} ${r} ${bottom} L${right - r} ${bottom} Q${right} ${bottom} ${right} ${bottom - r} L${right} ${y}`;
+    return {
+      cover: `${topRail} L0 ${bottom} Z`,
+      topRail,
+      mirrorRail,
+      svgHeight: bottom + 2,
+    };
+  };
+
+  const syncRailSvg = () => {
+    if (!railSvg || !railCoverPath || !railMirrorPath || !railTopPath) return null;
+
+    const barRect = bar.getBoundingClientRect();
+    const barStyle = getComputedStyle(bar);
+    const railY = cssPx(barStyle, "--rail-y", 60);
+    const railHeight = cssPx(barStyle, "--rail-height", 20);
+    const railRadius = cssPx(barStyle, "--rail-radius", 16);
+    const width = Math.max(1, barRect.width);
+    const paths = railPathData({
+      width: Math.round(width * 10) / 10,
+      y: railY,
+      height: railHeight,
+      radius: railRadius,
+    });
+
+    railSvg.setAttribute("viewBox", `0 0 ${Math.round(width * 10) / 10} ${paths.svgHeight}`);
+    railCoverPath.setAttribute("d", paths.cover);
+    railTopPath.setAttribute("d", paths.topRail);
+    railMirrorPath.setAttribute("d", paths.mirrorRail);
+
+    return {
+      top: barRect.top + railY,
+      bottom: barRect.top + railY + railHeight,
+      radius: railRadius,
+    };
   };
 
   const setActive = (id) => {
@@ -349,18 +395,10 @@ function initFeatureTabs() {
   };
 
   const syncMirror = () => {
-    if (!shell || !mirror || panels.length < 2) return;
+    const rail = syncRailSvg();
+    if (!shell || !rail || panels.length < 2) return;
 
-    const barRect = bar.getBoundingClientRect();
-    const railStyle = getComputedStyle(bar, "::after");
-    const panelStyle = getComputedStyle(panels[0]);
     const shellStyle = getComputedStyle(shell);
-    const railTop = barRect.top + parseFloat(railStyle.top || 0);
-    const railBottom =
-      railTop +
-      parseFloat(railStyle.height || 0) +
-      parseFloat(railStyle.borderTopWidth || 0);
-    const radius = parseFloat(panelStyle.borderTopLeftRadius) || 16;
     const backingOffset = parseFloat(shellStyle.getPropertyValue("--panel-offset")) || 8;
 
     let mirrorAmount = 0;
@@ -369,8 +407,8 @@ function initFeatureTabs() {
       const rect = panel.getBoundingClientRect();
       const borderBottom = rect.bottom;
       const backingBottom = borderBottom + backingOffset;
-      const enter = clamp((railBottom + radius - borderBottom) / radius);
-      const exit = clamp((backingBottom - railTop) / radius);
+      const enter = clamp((rail.bottom + rail.radius - borderBottom) / rail.radius);
+      const exit = clamp((backingBottom - rail.top) / rail.radius);
       const amount = Math.min(smoothstep(enter), smoothstep(exit));
       if (amount > mirrorAmount) {
         mirrorAmount = amount;

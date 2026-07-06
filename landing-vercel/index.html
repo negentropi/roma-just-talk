@@ -14,7 +14,7 @@
       href="https://raw.githubusercontent.com/happyf-weallareeuropean/roma-just-talk/without/no-adhoc-macos-tcc/docs/assets/roma-just-talk-logo.png"
       type="image/png"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260705-rail-mirror" />
+    <link rel="stylesheet" href="./styles.css?v=20260706-svg-rail" />
     <script>
       window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
     </script>
@@ -155,7 +155,11 @@
       <section class="features-section" id="features" aria-label="Roma Just Talk features">
         <div class="features-shell">
           <nav class="feature-tabs" aria-label="Feature tabs">
-            <div class="feature-rail-mirror" aria-hidden="true"></div>
+            <svg class="feature-rail-svg" aria-hidden="true" focusable="false">
+              <path class="feature-rail-cover" data-rail-cover></path>
+              <path class="feature-rail-mirror-path" data-rail-mirror></path>
+              <path class="feature-rail-top-path" data-rail-top></path>
+            </svg>
             <div class="feature-tabs-scroll">
               <a class="feature-tab tab-coral active" href="#feature-no-delay">no actuation delay</a>
               <a class="feature-tab tab-cyan" href="#feature-shift">left shift</a>
@@ -193,6 +197,6 @@
       </section>
 
     </main>
-    <script src="./app.js?v=20260705-rail-mirror" defer></script>
+    <script src="./app.js?v=20260706-svg-rail" defer></script>
   </body>
 </html>

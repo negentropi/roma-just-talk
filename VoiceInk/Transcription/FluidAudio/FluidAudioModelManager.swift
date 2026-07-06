@@ -8,6 +8,8 @@ import VoiceInkCore
 class FluidAudioModelManager: ObservableObject {
     @Published private var downloadStatuses: [String: VoiceInkFluidAudioDownloadStatus] = [:]
     private var activeDownloadIDs: [String: UUID] = [:]
+    private var lastLoggedDownloadPercents: [String: Int] = [:]
+    private var lastLoggedDownloadMessages: [String: String] = [:]
 
     var onModelDeleted: ((String) -> Void)?
     var onModelsChanged: (() -> Void)?
@@ -50,17 +52,26 @@ class FluidAudioModelManager: ObservableObject {
     // MARK: - Download
 
     func downloadFluidAudioModel(_ model: FluidAudioModel) async {
-        if isFluidAudioModelDownloaded(model) || isFluidAudioModelDownloading(model) {
+        if isFluidAudioModelDownloaded(model) {
+            logger.notice("FluidAudio download skipped; model already downloaded: \(model.name, privacy: .public)")
+            return
+        }
+
+        if isFluidAudioModelDownloading(model) {
+            logger.notice("FluidAudio download skipped; download already active: \(model.name, privacy: .public)")
             return
         }
 
         let modelName = model.name
         let downloadID = UUID()
+        logger.notice("FluidAudio download starting: \(modelName, privacy: .public)")
         activeDownloadIDs[modelName] = downloadID
-        downloadStatuses[modelName] = VoiceInkFluidAudioDownloadStatus(
+        let initialStatus = VoiceInkFluidAudioDownloadStatus(
             fractionCompleted: 0.0,
             phase: .preparingDownload
         )
+        downloadStatuses[modelName] = initialStatus
+        logDownloadProgressIfNeeded(initialStatus, for: modelName)
         defer {
             clearDownloadStatus(for: modelName, downloadID: downloadID)
             onModelsChanged?()
@@ -77,6 +88,9 @@ class FluidAudioModelManager: ObservableObject {
             _ = try await AsrModels.downloadAndLoad(
                 version: version,
                 progressHandler: progressHandler
+            )
+            logger.notice(
+                "FluidAudio download finished: \(modelName, privacy: .public), downloaded=\(self.isFluidAudioModelDownloaded(named: modelName), privacy: .public)"
             )
         } catch {
             logger.error("❌ FluidAudio download failed for \(modelName, privacy: .public): \(error.localizedDescription, privacy: .public)")
@@ -124,14 +138,36 @@ class FluidAudioModelManager: ObservableObject {
         guard activeDownloadIDs[modelName] == downloadID else { return }
         activeDownloadIDs[modelName] = nil
         downloadStatuses[modelName] = nil
+        lastLoggedDownloadPercents[modelName] = nil
+        lastLoggedDownloadMessages[modelName] = nil
     }
 
     private func updateDownloadProgress(_ progress: DownloadUtils.DownloadProgress, for modelName: String, downloadID: UUID) {
         guard activeDownloadIDs[modelName] == downloadID else { return }
 
-        downloadStatuses[modelName] = VoiceInkFluidAudioDownloadStatus(
+        let status = VoiceInkFluidAudioDownloadStatus(
             fractionCompleted: progress.fractionCompleted,
             phase: FluidAudioModelManager.downloadPhase(for: progress)
+        )
+        downloadStatuses[modelName] = status
+        logDownloadProgressIfNeeded(status, for: modelName)
+    }
+
+    private func logDownloadProgressIfNeeded(_ status: VoiceInkFluidAudioDownloadStatus, for modelName: String) {
+        let percent = Int(status.fractionCompleted * 100)
+        let previousPercent = lastLoggedDownloadPercents[modelName]
+        let previousMessage = lastLoggedDownloadMessages[modelName]
+        let shouldLog = previousPercent == nil
+            || previousMessage != status.message
+            || percent >= (previousPercent ?? 0) + 5
+            || percent == 100
+
+        guard shouldLog else { return }
+
+        lastLoggedDownloadPercents[modelName] = percent
+        lastLoggedDownloadMessages[modelName] = status.message
+        logger.notice(
+            "FluidAudio download progress: \(modelName, privacy: .public), percent=\(percent, privacy: .public), message=\(status.message, privacy: .public)"
         )
     }
 

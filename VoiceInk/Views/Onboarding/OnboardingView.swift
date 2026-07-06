@@ -5,12 +5,19 @@ struct OnboardingView: View {
     @Binding var hasCompletedOnboarding: Bool
     @State private var textOpacity: CGFloat = 0
     @State private var showSecondaryElements = false
-    @State private var showPermissions = false
+    @State private var showPermissions: Bool
     private let presentation = VoiceInkMacOSOnboardingPresentation.welcome
     
     // Animation timing
     private let animationDelay = 0.2
     private let textAnimationDuration = 0.6
+
+    init(hasCompletedOnboarding: Binding<Bool>) {
+        self._hasCompletedOnboarding = hasCompletedOnboarding
+        self._showPermissions = State(
+            initialValue: MacOnboardingProgressStore.stage().resumesPermissionsView
+        )
+    }
     
     var body: some View {
         ZStack {
@@ -59,6 +66,7 @@ struct OnboardingView: View {
                             if showSecondaryElements {
                                 VStack(spacing: 20) {
                                     Button(action: {
+                                        MacOnboardingProgressStore.saveStage(.permissions)
                                         withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
                                             showPermissions = true
                                         }
@@ -71,8 +79,9 @@ struct OnboardingView: View {
                                             .cornerRadius(25)
                                     }
                                     .buttonStyle(ScaleButtonStyle())
-                                    
+
                                     SkipButton(text: presentation.skipButtonTitle) {
+                                        MacOnboardingProgressStore.reset()
                                         hasCompletedOnboarding = true
                                     }
                                 }

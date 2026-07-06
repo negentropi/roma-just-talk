@@ -50,17 +50,19 @@ class WindowManager: NSObject {
             window.identifier = Self.onboardingWindowIdentifier
         }
         
-        let requiredStyleMask: NSWindow.StyleMask = [.titled, .fullSizeContentView, .resizable]
+        NSApplication.shared.setActivationPolicy(.regular)
+
+        let requiredStyleMask: NSWindow.StyleMask = [.titled, .closable, .miniaturizable, .fullSizeContentView, .resizable]
         window.styleMask.formUnion(requiredStyleMask)
         window.titlebarAppearsTransparent = true
         window.titleVisibility = .hidden
         window.isMovableByWindowBackground = true
         window.level = .normal
-        window.backgroundColor = .clear
+        window.backgroundColor = .windowBackgroundColor
         window.isReleasedWhenClosed = false
-        window.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
+        window.collectionBehavior = [.fullScreenPrimary]
         window.title = VoiceInkMacOSWindowIdentity.onboardingTitle
-        window.isOpaque = false
+        window.isOpaque = true
         window.minSize = NSSize(width: 900, height: 780)
         window.makeKeyAndOrderFront(nil)
     }

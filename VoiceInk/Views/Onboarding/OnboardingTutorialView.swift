@@ -1,9 +1,14 @@
+import AppKit
+import AVFoundation
 import SwiftUI
+import os
 import VoiceInkCore
 
 struct OnboardingTutorialView: View {
     @Binding var hasCompletedOnboarding: Bool
+    @EnvironmentObject private var engine: VoiceInkEngine
     @EnvironmentObject private var recordingShortcutManager: RecordingShortcutManager
+    @EnvironmentObject private var transcriptionModelManager: TranscriptionModelManager
     @State private var scale: CGFloat = 0.8
     @State private var opacity: CGFloat = 0
     @State private var transcribedText: String = ""
@@ -11,6 +16,7 @@ struct OnboardingTutorialView: View {
     @State private var showingShortcutHint: Bool = true
     @FocusState private var isFocused: Bool
     private let presentation = VoiceInkMacOSOnboardingPresentation.tutorial
+    private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "OnboardingTutorial")
     
     var body: some View {
         GeometryReader { geometry in
@@ -58,7 +64,7 @@ struct OnboardingTutorialView: View {
                         
                         // Continue button
                         Button(action: {
-                            hasCompletedOnboarding = true
+                            completeOnboarding()
                         }) {
                             Text(presentation.completeButtonTitle)
                                 .font(.system(size: 18, weight: .semibold, design: .rounded))
@@ -70,9 +76,9 @@ struct OnboardingTutorialView: View {
                         .buttonStyle(ScaleButtonStyle())
                         .opacity(transcribedText.isEmpty ? 0.5 : 1)
                         .disabled(transcribedText.isEmpty)
-                        
+
                         SkipButton(text: presentation.skipButtonTitle) {
-                            hasCompletedOnboarding = true
+                            completeOnboarding()
                         }
                     }
                     .padding(60)
@@ -150,8 +156,22 @@ struct OnboardingTutorialView: View {
             }
         }
         .onAppear {
+            MacOnboardingProgressStore.saveStage(.tutorial)
             animateIn()
             isFocused = true
+            recordingShortcutManager.updateShortcutStatus()
+            logTryItOutState(reason: "appear")
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            recordingShortcutManager.updateShortcutStatus()
+            logTryItOutState(reason: "appActive")
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .appPermissionsDidChange)) { _ in
+            recordingShortcutManager.updateShortcutStatus()
+            logTryItOutState(reason: "permissionsChanged")
+        }
+        .onChange(of: transcribedText) { _, newValue in
+            logger.notice("Onboarding try-it-out text changed: characterCount=\(newValue.count, privacy: .public)")
         }
     }
 
@@ -179,5 +199,23 @@ struct OnboardingTutorialView: View {
             scale = 1
             opacity = 1
         }
+    }
+
+    private func completeOnboarding() {
+        MacOnboardingProgressStore.reset()
+        hasCompletedOnboarding = true
+    }
+
+    private func logTryItOutState(reason: String) {
+        let microphoneStatus = AVCaptureDevice.authorizationStatus(for: .audio)
+        let shortcut = ShortcutStore.shortcut(for: .primaryRecording)?.displayString ?? "none"
+        let modelName = transcriptionModelManager.currentTranscriptionModel?.name ?? "none"
+        let recordingState = String(describing: engine.recordingState)
+
+        logger.notice(
+            """
+            Onboarding try-it-out state: reason=\(reason, privacy: .public), microphone=\(String(describing: microphoneStatus), privacy: .public), inputMonitoring=\(ShortcutMonitor.preflightListenEventAccess(), privacy: .public), accessibility=\(AXIsProcessTrusted(), privacy: .public), shortcutConfigured=\(recordingShortcutManager.isShortcutConfigured, privacy: .public), shortcut=\(shortcut, privacy: .public), model=\(modelName, privacy: .public), recordingState=\(recordingState, privacy: .public), textCount=\(transcribedText.count, privacy: .public)
+            """
+        )
     }
 }

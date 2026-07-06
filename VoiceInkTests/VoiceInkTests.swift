@@ -913,6 +913,28 @@ struct VoiceInkTests {
         #expect(!suppression.isSuppressingPermissionPrompts)
     }
 
+    @Test func macOnboardingProgressStorePersistsStageAndPermissionCursor() {
+        let defaults = UserDefaults(suiteName: "MacOnboardingProgressStoreTests")!
+        defaults.removePersistentDomain(forName: "MacOnboardingProgressStoreTests")
+        defer {
+            defaults.removePersistentDomain(forName: "MacOnboardingProgressStoreTests")
+        }
+
+        #expect(MacOnboardingProgressStore.stage(in: defaults) == .welcome)
+        #expect(MacOnboardingProgressStore.permissionKind(in: defaults) == nil)
+
+        MacOnboardingProgressStore.saveStage(.permissions, in: defaults)
+        MacOnboardingProgressStore.savePermissionKind(.inputMonitoring, in: defaults)
+
+        #expect(MacOnboardingProgressStore.stage(in: defaults) == .permissions)
+        #expect(MacOnboardingProgressStore.permissionKind(in: defaults) == .inputMonitoring)
+
+        MacOnboardingProgressStore.reset(in: defaults)
+
+        #expect(MacOnboardingProgressStore.stage(in: defaults) == .welcome)
+        #expect(MacOnboardingProgressStore.permissionKind(in: defaults) == nil)
+    }
+
     @Test func modifierOnlyShortcutsUseNSEventMonitorPath() async throws {
         let monitor = ShortcutMonitor()
         var keyDownCount = 0

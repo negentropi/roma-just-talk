@@ -137,14 +137,23 @@ struct FluidAudioModelCardView: View {
 
                         Spacer()
 
-                        Text(status.percentText)
-                            .fontDesign(.monospaced)
+                        if status.fractionCompleted > 0 {
+                            Text(status.percentText)
+                                .fontDesign(.monospaced)
+                        } else {
+                            Text("Active")
+                        }
                     }
                     .font(.system(size: 11, weight: .medium))
                     .foregroundColor(Color(.secondaryLabelColor))
 
-                    ProgressView(value: status.fractionCompleted)
-                        .progressViewStyle(LinearProgressViewStyle())
+                    if status.fractionCompleted > 0 {
+                        ProgressView(value: status.fractionCompleted)
+                            .progressViewStyle(LinearProgressViewStyle())
+                    } else {
+                        ProgressView()
+                            .progressViewStyle(LinearProgressViewStyle())
+                    }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.top, 8)

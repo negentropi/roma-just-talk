@@ -16,7 +16,7 @@ struct OnboardingPermissionsView: View {
     @State private var showAnimation = false
     @State private var scale: CGFloat = 0.8
     @State private var opacity: CGFloat = 0
-    @State private var showModelDownload = false
+    @State private var showModelDownload: Bool
     @State private var relaunchRequiredStates = Array(
         repeating: false,
         count: VoiceInkMacOSOnboardingPermissionPresentation.all.count
@@ -24,6 +24,13 @@ struct OnboardingPermissionsView: View {
     @StateObject private var permissionFlowGuide = PermissionFlowGuide()
     
     private let permissions = VoiceInkMacOSOnboardingPermissionPresentation.all
+
+    init(hasCompletedOnboarding: Binding<Bool>) {
+        self._hasCompletedOnboarding = hasCompletedOnboarding
+        self._showModelDownload = State(
+            initialValue: MacOnboardingProgressStore.stage().resumesModelDownload
+        )
+    }
 
     private var audioDeviceSelectionPresentation: VoiceInkMacOSOnboardingAudioDeviceSelectionPresentation {
         permissions[currentPermissionIndex].audioDeviceSelection
@@ -212,10 +219,17 @@ struct OnboardingPermissionsView: View {
             }
         }
         .onAppear {
-            checkExistingPermissions()
+            refreshPermissionStates()
+            resumeSavedPermissionProgress()
             animateIn()
             // Ensure audio devices are loaded
             audioDeviceManager.loadAvailableDevices()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            refreshPermissionStates()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .appPermissionsDidChange)) { _ in
+            refreshPermissionStates()
         }
     }
     
@@ -232,7 +246,7 @@ struct OnboardingPermissionsView: View {
         animateIn()
     }
     
-    private func checkExistingPermissions() {
+    private func refreshPermissionStates() {
         // Check microphone permission
         permissionStates[0] = AVCaptureDevice.authorizationStatus(for: .audio) == .authorized
         if permissionStates[0] { relaunchRequiredStates[0] = false }
@@ -257,8 +271,36 @@ struct OnboardingPermissionsView: View {
         permissionStates[5] = recordingShortcutManager.isShortcutConfigured
         if permissionStates[5] { relaunchRequiredStates[5] = false }
     }
+
+    private func resumeSavedPermissionProgress() {
+        guard !showModelDownload else { return }
+
+        let savedIndex = MacOnboardingProgressStore.permissionKind().flatMap { savedKind in
+            permissions.firstIndex { $0.kind == savedKind }
+        } ?? currentPermissionIndex
+
+        currentPermissionIndex = firstUnfinishedPermissionIndex(startingAt: savedIndex)
+        saveCurrentPermissionProgress()
+    }
+
+    private func firstUnfinishedPermissionIndex(startingAt index: Int) -> Int {
+        var index = min(max(index, 0), permissions.count - 1)
+
+        while index < permissions.count - 1, permissionStates[index] {
+            index += 1
+        }
+
+        return index
+    }
+
+    private func saveCurrentPermissionProgress() {
+        MacOnboardingProgressStore.saveStage(.permissions)
+        MacOnboardingProgressStore.savePermissionKind(permissions[currentPermissionIndex].kind)
+    }
     
     private func requestPermission() {
+        saveCurrentPermissionProgress()
+
         if relaunchRequiredStates[currentPermissionIndex] {
             AppRelauncher.relaunch()
             return
@@ -271,9 +313,10 @@ struct OnboardingPermissionsView: View {
         
         switch permissions[currentPermissionIndex].kind {
         case .microphone:
+            let permissionIndex = currentPermissionIndex
             PermissionGrantCoordinator.grantMicrophone { status in
                 let granted = status == .authorized
-                permissionStates[currentPermissionIndex] = granted
+                permissionStates[permissionIndex] = granted
                 if granted {
                     withAnimation {
                         showAnimation = true
@@ -304,8 +347,9 @@ struct OnboardingPermissionsView: View {
                 }
             }
             moveToNext()
-            
+
         case .accessibility:
+            let permissionIndex = currentPermissionIndex
             let options: NSDictionary = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true]
             _ = AXIsProcessTrustedWithOptions(options)
             permissionFlowGuide.open(.accessibility)
@@ -317,7 +361,7 @@ struct OnboardingPermissionsView: View {
             ) { timer in
                 if AXIsProcessTrusted() {
                     timer.invalidate()
-                    permissionStates[currentPermissionIndex] = true
+                    permissionStates[permissionIndex] = true
                     withAnimation {
                         showAnimation = true
                     }
@@ -383,9 +427,11 @@ struct OnboardingPermissionsView: View {
         if currentPermissionIndex < permissions.count - 1 {
             withAnimation {
                 currentPermissionIndex += 1
+                saveCurrentPermissionProgress()
                 resetAnimation()
             }
         } else {
+            MacOnboardingProgressStore.saveStage(.modelDownload)
             withAnimation {
                 showModelDownload = true
             }

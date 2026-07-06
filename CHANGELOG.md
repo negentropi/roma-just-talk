@@ -2,6 +2,10 @@
 
 ## v1.96 - Unreleased
 
+- Fixed macOS onboarding permission setup so microphone and other grants refresh when the app becomes active or permission state changes, and onboarding resumes at the saved setup step after relaunch.
+- Added FluidAudio onboarding download lifecycle logs and changed zero-fraction active downloads to show an indeterminate progress state instead of a dead-looking `0%`.
+- Added Try It Out onboarding diagnostics for permission state, shortcut setup, selected model, recording state, and resulting text length while forcing a shortcut monitor refresh when the step appears.
+- Made the macOS onboarding window use regular app/window behavior instead of auxiliary all-spaces panel behavior.
 - Suppressed redundant shortcut permission banners while macOS onboarding or setup permission screens are already guiding the user through the same grants.
 - Increased the macOS onboarding skip button contrast so "Skip for now" stays legible on the dark setup background.
 - Reused the model management panel in macOS onboarding's model step, keeping launch auto-download while limiting onboarding navigation to Next and Skip.

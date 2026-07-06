@@ -6,9 +6,16 @@ struct OnboardingModelDownloadView: View {
     @EnvironmentObject private var transcriptionModelManager: TranscriptionModelManager
     @State private var scale: CGFloat = 0.8
     @State private var opacity: CGFloat = 0
-    @State private var showTutorial = false
+    @State private var showTutorial: Bool
 
     private let presentation = VoiceInkMacOSOnboardingPresentation.modelDownload
+
+    init(hasCompletedOnboarding: Binding<Bool>) {
+        self._hasCompletedOnboarding = hasCompletedOnboarding
+        self._showTutorial = State(
+            initialValue: MacOnboardingProgressStore.stage().resumesTutorial
+        )
+    }
 
     private var canContinue: Bool {
         guard let currentModel = transcriptionModelManager.currentTranscriptionModel else {
@@ -67,6 +74,7 @@ struct OnboardingModelDownloadView: View {
 
                         VStack(spacing: 16) {
                             Button {
+                                MacOnboardingProgressStore.saveStage(.tutorial)
                                 withAnimation {
                                     showTutorial = true
                                 }
@@ -82,6 +90,7 @@ struct OnboardingModelDownloadView: View {
                             .disabled(!canContinue)
 
                             SkipButton(text: presentation.skipButtonTitle) {
+                                MacOnboardingProgressStore.saveStage(.tutorial)
                                 withAnimation {
                                     showTutorial = true
                                 }

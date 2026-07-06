@@ -92,6 +92,7 @@ struct OnboardingView: View {
         .onAppear {
             startAnimations()
         }
+        .suppressesPermissionPromptNotifications()
     }
     
     private func startAnimations() {

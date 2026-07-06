@@ -67,6 +67,7 @@ struct MetricsSetupView: View {
         .onReceive(NotificationCenter.default.publisher(for: .appPermissionsDidChange)) { _ in
             refreshPermissionStates()
         }
+        .suppressesPermissionPromptNotifications()
     }
     
     private func setupStep(_ step: VoiceInkMacOSSetupStepPresentation) -> some View {

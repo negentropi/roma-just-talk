@@ -336,6 +336,7 @@ class RecordingShortcutManager: ObservableObject {
         }
 
         if !ShortcutMonitor.preflightListenEventAccess() {
+            guard !PermissionNotificationSuppression.shared.isSuppressingPermissionPrompts else { return }
             guard !hasShownInputMonitoringPermissionNotification else { return }
             hasShownInputMonitoringPermissionNotification = true
             showShortcutSettingsNotification(
@@ -346,6 +347,7 @@ class RecordingShortcutManager: ObservableObject {
         }
 
         if !ShortcutMonitor.preflightAccessibilityAccess() {
+            guard !PermissionNotificationSuppression.shared.isSuppressingPermissionPrompts else { return }
             guard !hasShownAccessibilityPermissionNotification else { return }
             hasShownAccessibilityPermissionNotification = true
             showShortcutSettingsNotification(

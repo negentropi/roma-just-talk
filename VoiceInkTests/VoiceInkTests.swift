@@ -896,6 +896,23 @@ struct VoiceInkTests {
         #expect(didRequestAccess)
     }
 
+    @Test @MainActor func permissionNotificationSuppressionScopesNestUntilLastScopeEnds() {
+        let suppression = PermissionNotificationSuppression()
+
+        #expect(!suppression.isSuppressingPermissionPrompts)
+
+        let firstScope = suppression.beginScope()
+        let secondScope = suppression.beginScope()
+
+        #expect(suppression.isSuppressingPermissionPrompts)
+
+        suppression.endScope(firstScope)
+        #expect(suppression.isSuppressingPermissionPrompts)
+
+        suppression.endScope(secondScope)
+        #expect(!suppression.isSuppressingPermissionPrompts)
+    }
+
     @Test func modifierOnlyShortcutsUseNSEventMonitorPath() async throws {
         let monitor = ShortcutMonitor()
         var keyDownCount = 0

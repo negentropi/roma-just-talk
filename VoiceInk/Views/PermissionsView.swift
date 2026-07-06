@@ -354,6 +354,7 @@ struct PermissionsView: View {
         .onAppear {
             permissionManager.checkAllPermissions()
         }
+        .suppressesPermissionPromptNotifications()
     }
 }
 

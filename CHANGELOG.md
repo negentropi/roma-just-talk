@@ -2,6 +2,7 @@
 
 ## v1.96 - Unreleased
 
+- Increased the macOS onboarding skip button contrast so "Skip for now" stays legible on the dark setup background.
 - Reused the model management panel in macOS onboarding's model step, keeping launch auto-download while limiting onboarding navigation to Next and Skip.
 - Added a first-run setup skip action for the keyboard-shortcut step so setup can continue without configuring a shortcut immediately.
 - Added a Homebrew cask for installing the fork from the repo tap and aligned CI packaging with the release asset URL.

@@ -234,7 +234,7 @@ struct SkipButton: View {
     var body: some View {
         Text(text)
             .font(.system(size: 13, weight: .regular))
-            .foregroundColor(.white.opacity(0.2))
+            .foregroundColor(.white.opacity(0.65))
             .onTapGesture(perform: action)
     }
 }

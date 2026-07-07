@@ -8182,8 +8182,9 @@ require_patterns \
 
 require_patterns \
   "Gemini public API proof uses normal VoiceInkCore import" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/GeminiPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
   '^import VoiceInkCore$' \
+  'final class RemoteProviderPublicAPITests' \
   'VoiceInkGeminiTranscriptionCodec\.defaultPrompt' \
   'VoiceInkGeminiRequestBuilder\.makeTranscriptionRequest' \
   'VoiceInkGeminiRequestBuilder\.makeModelsRequest' \
@@ -8207,22 +8208,33 @@ require_patterns \
 reject_pattern \
   "Gemini public API proof avoids conditional compilation snippets" \
   '^[[:space:]]*#(if|elseif|else|endif)\b' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/GeminiPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
 
 require_swift_static_function_body_pattern \
   "Gemini public API proof keeps defaulted transcribe call short" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/GeminiPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
   testGeminiRequestClientAndCodecExposePublicAPI \
   'let\s+transcribeWithDefaultedLabels\s*=\s*\{\s*try\s+await\s+client\.transcribeAudioData\s*\((?:(?!\b(?:mimeType|prompt|errorDomain|timeout)\s*:).)*\bbaseURL\s*:(?:(?!\b(?:mimeType|prompt|errorDomain|timeout)\s*:).)*\bapiKey\s*:(?:(?!\b(?:mimeType|prompt|errorDomain|timeout)\s*:).)*\bmodel\s*:(?:(?!\b(?:mimeType|prompt|errorDomain|timeout)\s*:).)*\baudioData\s*:(?:(?!\b(?:mimeType|prompt|errorDomain|timeout)\s*:).)*\)\s*\}'
 
 reject_pattern \
   "Gemini public API proof avoids testable import" \
   '@testable import VoiceInkCore' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/GeminiPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
+
+section "obsolete standalone Gemini public API proof stays deleted"
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/GeminiPublicAPITests.swift
+
+reject_pattern \
+  "VoiceInkCore metadata and runner avoid stale standalone Gemini public API proof" \
+  'GeminiPublicAPITests' \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_voiceink_core_check_runner_invocations \
   "core checks execute Gemini public API proof" \
-  GeminiPublicAPITests \
+  RemoteProviderPublicAPITests \
   testGeminiRequestClientAndCodecExposePublicAPI
 
 require_voiceink_core_check_runner_invocations \
@@ -8259,8 +8271,9 @@ require_patterns \
 
 require_patterns \
   "Mistral public API proof uses normal VoiceInkCore import" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/MistralPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
   '^import VoiceInkCore$' \
+  'final class RemoteProviderPublicAPITests' \
   'VoiceInkPreparedMistralTranscriptionRequest' \
   'VoiceInkMistralRequestBuilder\.makeTranscriptionRequest' \
   'VoiceInkMistralRequestBuilder\.makeModelsRequest' \
@@ -8284,22 +8297,33 @@ require_patterns \
 reject_pattern \
   "Mistral public API proof avoids conditional compilation snippets" \
   '^[[:space:]]*#(if|elseif|else|endif)\b' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/MistralPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
 
 require_swift_static_function_body_pattern \
   "Mistral public API proof keeps defaulted transcribe call short" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/MistralPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
   testMistralRequestClientAndCodecExposePublicAPI \
   'let\s+transcribeWithDefaultedLabels\s*=\s*\{\s*try\s+await\s+client\.transcribeAudioData\s*\((?:(?!\b(?:fileName|errorDomain|timeout|maxRetries)\s*:).)*\bbaseURL\s*:(?:(?!\b(?:fileName|errorDomain|timeout|maxRetries)\s*:).)*\bapiKey\s*:(?:(?!\b(?:fileName|errorDomain|timeout|maxRetries)\s*:).)*\bmodel\s*:(?:(?!\b(?:fileName|errorDomain|timeout|maxRetries)\s*:).)*\baudioData\s*:(?:(?!\b(?:fileName|errorDomain|timeout|maxRetries)\s*:).)*\)\s*\}'
 
 reject_pattern \
   "Mistral public API proof avoids testable import" \
   '@testable import VoiceInkCore' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/MistralPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
+
+section "obsolete standalone Mistral public API proof stays deleted"
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/MistralPublicAPITests.swift
+
+reject_pattern \
+  "VoiceInkCore metadata and runner avoid stale standalone Mistral public API proof" \
+  'MistralPublicAPITests' \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_voiceink_core_check_runner_invocations \
   "core checks execute Mistral public API proof" \
-  MistralPublicAPITests \
+  RemoteProviderPublicAPITests \
   testMistralRequestClientAndCodecExposePublicAPI
 
 require_voiceink_core_check_runner_invocations \

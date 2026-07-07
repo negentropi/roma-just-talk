@@ -8030,7 +8030,7 @@ require_patterns \
   'model: "custom-whisper"' \
   'responseFormat: "json"' \
   'temperature: "0"' \
-  'errorDomain: "OpenAICompatiblePublicAPITests"' \
+  'errorDomain: "RemoteProviderPublicAPITests\.OpenAICompatibleTranscription"' \
   'allowPlainTextFallback: false' \
   'client\.verifyAPIKey\(' \
   'client\.verifyAPIKeyDetailed\(' \
@@ -8064,6 +8064,7 @@ reject_file VoiceInkCore/Tests/VoiceInkCoreTests/OpenAICompatiblePublicAPITests.
 reject_pattern \
   "VoiceInkCore metadata and runner avoid stale standalone OpenAI-compatible public API proof" \
   'OpenAICompatiblePublicAPITests' \
+  VoiceInkCore/Tests/VoiceInkCoreTests \
   VoiceInkCore/Package.swift \
   VoiceInk.xcodeproj/project.pbxproj \
   iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
@@ -8147,7 +8148,7 @@ require_patterns \
   'paragraphs: true' \
   'diarize: false' \
   'customVocabulary: \["Roma"\]' \
-  'errorDomain: "DeepgramPublicAPITests"' \
+  'errorDomain: "RemoteProviderPublicAPITests\.Deepgram"' \
   'timeout: 30' \
   'client\.verifyAPIKey\(' \
   'client\.verifyAPIKeyDetailed\(' \
@@ -8176,6 +8177,7 @@ reject_file VoiceInkCore/Tests/VoiceInkCoreTests/DeepgramPublicAPITests.swift
 reject_pattern \
   "VoiceInkCore metadata and runner avoid stale standalone Deepgram public API proof" \
   'DeepgramPublicAPITests' \
+  VoiceInkCore/Tests/VoiceInkCoreTests \
   VoiceInkCore/Package.swift \
   VoiceInk.xcodeproj/project.pbxproj \
   iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
@@ -8233,7 +8235,7 @@ require_patterns \
   'audioData: Data\("WAVDATA"\.utf8\)' \
   'mimeType: "audio/wav"' \
   'prompt: VoiceInkGeminiTranscriptionCodec\.defaultPrompt' \
-  'errorDomain: "GeminiPublicAPITests"' \
+  'errorDomain: "RemoteProviderPublicAPITests\.Gemini"' \
   'timeout: 60' \
   'client\.verifyAPIKey\(' \
   'client\.verifyAPIKeyDetailed\(' \
@@ -8262,6 +8264,7 @@ reject_file VoiceInkCore/Tests/VoiceInkCoreTests/GeminiPublicAPITests.swift
 reject_pattern \
   "VoiceInkCore metadata and runner avoid stale standalone Gemini public API proof" \
   'GeminiPublicAPITests' \
+  VoiceInkCore/Tests/VoiceInkCoreTests \
   VoiceInkCore/Package.swift \
   VoiceInk.xcodeproj/project.pbxproj \
   iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
@@ -8321,7 +8324,7 @@ require_patterns \
   'model: "voxtral-mini-latest"' \
   'audioData: Data\("WAVDATA"\.utf8\)' \
   'fileName: "sample\.wav"' \
-  'errorDomain: "MistralPublicAPITests"' \
+  'errorDomain: "RemoteProviderPublicAPITests\.Mistral"' \
   'timeout: 30' \
   'maxRetries: 2' \
   'client\.verifyAPIKey\(' \
@@ -8351,6 +8354,7 @@ reject_file VoiceInkCore/Tests/VoiceInkCoreTests/MistralPublicAPITests.swift
 reject_pattern \
   "VoiceInkCore metadata and runner avoid stale standalone Mistral public API proof" \
   'MistralPublicAPITests' \
+  VoiceInkCore/Tests/VoiceInkCoreTests \
   VoiceInkCore/Package.swift \
   VoiceInk.xcodeproj/project.pbxproj \
   iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
@@ -8409,7 +8413,7 @@ require_patterns \
   'audioData: Data\("WAVDATA"\.utf8\)' \
   'fileName: "sample\.wav"' \
   'language: "en"' \
-  'errorDomain: "ElevenLabsPublicAPITests"' \
+  'errorDomain: "RemoteProviderPublicAPITests\.ElevenLabs"' \
   'timeout: 30' \
   'maxRetries: 2' \
   'client\.verifyAPIKey\(' \
@@ -8439,6 +8443,7 @@ reject_file VoiceInkCore/Tests/VoiceInkCoreTests/ElevenLabsPublicAPITests.swift
 reject_pattern \
   "VoiceInkCore metadata and runner avoid stale standalone ElevenLabs public API proof" \
   'ElevenLabsPublicAPITests' \
+  VoiceInkCore/Tests/VoiceInkCoreTests \
   VoiceInkCore/Package.swift \
   VoiceInk.xcodeproj/project.pbxproj \
   iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
@@ -8555,7 +8560,7 @@ require_patterns \
   'customVocabulary: \["Roma", "Felix"\]' \
   'maxWaitSeconds: 300' \
   'timeout: 30' \
-  'errorDomain: "SonioxPublicAPITests"' \
+  'errorDomain: "RemoteProviderPublicAPITests\.Soniox"' \
   'client\.verifyAPIKey\(' \
   'client\.verifyAPIKeyDetailed\(' \
   'VoiceInkAPIKeyVerificationResult' \
@@ -8586,6 +8591,7 @@ reject_file VoiceInkCore/Tests/VoiceInkCoreTests/SonioxPublicAPITests.swift
 reject_pattern \
   "VoiceInkCore metadata and runner avoid stale standalone Soniox public API proof" \
   'SonioxPublicAPITests' \
+  VoiceInkCore/Tests/VoiceInkCoreTests \
   VoiceInkCore/Package.swift \
   VoiceInk.xcodeproj/project.pbxproj \
   iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
@@ -8659,7 +8665,7 @@ require_patterns \
   'maxWaitSeconds: 300' \
   'timeout: 30' \
   'maxRetries: 2' \
-  'errorDomain: "SpeechmaticsPublicAPITests"' \
+  'errorDomain: "RemoteProviderPublicAPITests\.Speechmatics"' \
   'client\.verifyAPIKey\(' \
   'client\.verifyAPIKeyDetailed\(' \
   'VoiceInkAPIKeyVerificationResult' \
@@ -8690,6 +8696,7 @@ reject_file VoiceInkCore/Tests/VoiceInkCoreTests/SpeechmaticsPublicAPITests.swif
 reject_pattern \
   "VoiceInkCore metadata and runner avoid stale standalone Speechmatics public API proof" \
   'SpeechmaticsPublicAPITests' \
+  VoiceInkCore/Tests/VoiceInkCoreTests \
   VoiceInkCore/Package.swift \
   VoiceInk.xcodeproj/project.pbxproj \
   iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
@@ -8816,7 +8823,7 @@ require_patterns \
   'maxWaitSeconds: 300' \
   'timeout: 30' \
   'maxRetries: 2' \
-  'errorDomain: "AssemblyAIPublicAPITests"' \
+  'errorDomain: "RemoteProviderPublicAPITests\.AssemblyAI"' \
   'client\.verifyAPIKey\(' \
   'client\.verifyAPIKeyDetailed\(' \
   'VoiceInkAPIKeyVerificationResult' \
@@ -8850,6 +8857,7 @@ reject_file VoiceInkCore/Tests/VoiceInkCoreTests/AssemblyAIPublicAPITests.swift
 reject_pattern \
   "VoiceInkCore metadata and runner avoid stale standalone AssemblyAI public API proof" \
   'AssemblyAIPublicAPITests' \
+  VoiceInkCore/Tests/VoiceInkCoreTests \
   VoiceInkCore/Package.swift \
   VoiceInk.xcodeproj/project.pbxproj \
   iOS/VoiceInk-ios.xcodeproj/project.pbxproj \

@@ -218,7 +218,7 @@ final class RemoteProviderPublicAPITests: XCTestCase {
                 prompt: "spell project names correctly",
                 responseFormat: "json",
                 temperature: "0",
-                errorDomain: "OpenAICompatiblePublicAPITests",
+                errorDomain: "RemoteProviderPublicAPITests.OpenAICompatibleTranscription",
                 timeout: 30,
                 maxRetries: 1,
                 allowPlainTextFallback: false
@@ -235,7 +235,7 @@ final class RemoteProviderPublicAPITests: XCTestCase {
                 prompt: "spell project names correctly",
                 responseFormat: "json",
                 temperature: "0",
-                errorDomain: "OpenAICompatiblePublicAPITests",
+                errorDomain: "RemoteProviderPublicAPITests.OpenAICompatibleTranscription",
                 timeout: 30,
                 maxRetries: 1,
                 allowPlainTextFallback: false
@@ -331,7 +331,7 @@ final class RemoteProviderPublicAPITests: XCTestCase {
                 paragraphs: true,
                 diarize: false,
                 customVocabulary: ["Roma"],
-                errorDomain: "DeepgramPublicAPITests",
+                errorDomain: "RemoteProviderPublicAPITests.Deepgram",
                 timeout: 30
             )
         }
@@ -407,7 +407,7 @@ final class RemoteProviderPublicAPITests: XCTestCase {
                 audioData: Data("WAVDATA".utf8),
                 mimeType: "audio/wav",
                 prompt: VoiceInkGeminiTranscriptionCodec.defaultPrompt,
-                errorDomain: "GeminiPublicAPITests",
+                errorDomain: "RemoteProviderPublicAPITests.Gemini",
                 timeout: 60
             )
         }
@@ -479,7 +479,7 @@ final class RemoteProviderPublicAPITests: XCTestCase {
                 model: "voxtral-mini-latest",
                 audioData: Data("WAVDATA".utf8),
                 fileName: "sample.wav",
-                errorDomain: "MistralPublicAPITests",
+                errorDomain: "RemoteProviderPublicAPITests.Mistral",
                 timeout: 30,
                 maxRetries: 2
             )
@@ -554,7 +554,7 @@ final class RemoteProviderPublicAPITests: XCTestCase {
                 audioData: Data("WAVDATA".utf8),
                 fileName: "sample.wav",
                 language: "en",
-                errorDomain: "ElevenLabsPublicAPITests",
+                errorDomain: "RemoteProviderPublicAPITests.ElevenLabs",
                 timeout: 30,
                 maxRetries: 2
             )
@@ -672,7 +672,7 @@ final class RemoteProviderPublicAPITests: XCTestCase {
                 customVocabulary: ["Roma", "Felix"],
                 maxWaitSeconds: 300,
                 timeout: 30,
-                errorDomain: "SonioxPublicAPITests"
+                errorDomain: "RemoteProviderPublicAPITests.Soniox"
             )
         }
         let transcribeWithDefaultedLabels = {
@@ -793,7 +793,7 @@ final class RemoteProviderPublicAPITests: XCTestCase {
                 maxWaitSeconds: 300,
                 timeout: 30,
                 maxRetries: 2,
-                errorDomain: "SpeechmaticsPublicAPITests"
+                errorDomain: "RemoteProviderPublicAPITests.Speechmatics"
             )
         }
         let transcribeWithDefaultedLabels = {
@@ -914,7 +914,7 @@ final class RemoteProviderPublicAPITests: XCTestCase {
                 maxWaitSeconds: 300,
                 timeout: 30,
                 maxRetries: 2,
-                errorDomain: "AssemblyAIPublicAPITests"
+                errorDomain: "RemoteProviderPublicAPITests.AssemblyAI"
             )
         }
         let transcribeWithDefaultedLabels = {

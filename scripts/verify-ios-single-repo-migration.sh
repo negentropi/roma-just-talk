@@ -1636,8 +1636,8 @@ require_patterns \
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/AudioRecorderConfigurationTests.swift
 
 require_patterns \
-  "iOS audio recorder configuration tests live with iOS audio-session lifecycle tests" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/AudioSessionLifecycleStateTests.swift \
+  "iOS audio recorder configuration tests live with audio playback tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AudioPlaybackTimelineTests.swift \
   'testIOSAudioRecorderConfigurationUsesMono16kPCM16Policy' \
   'VoiceInkIOSAudioRecorderConfiguration\.voiceRecording' \
   'VoiceInkPCM16Audio\.mono16kSampleRate' \
@@ -1648,18 +1648,28 @@ require_patterns \
   'isMeteringEnabled: true'
 
 require_pattern \
+  "audio playback tests exercise public VoiceInkCore API surface after folding audio-session lifecycle tests" \
+  '^import VoiceInkCore$' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AudioPlaybackTimelineTests.swift
+
+reject_pattern \
+  "audio playback tests avoid testable import after folding audio-session lifecycle public API" \
+  '@testable import VoiceInkCore' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AudioPlaybackTimelineTests.swift
+
+require_pattern \
   "VoiceInkCore checks cover iOS audio recorder configuration policy" \
-  'AudioSessionLifecycleStateTests\.testIOSAudioRecorderConfigurationUsesMono16kPCM16Policy' \
+  'AudioPlaybackTimelineTests\.testIOSAudioRecorderConfigurationUsesMono16kPCM16Policy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "VoiceInkCore check runner invokes iOS audio recorder configuration proof" \
-  'AudioSessionLifecycleStateTests\(\)\.testIOSAudioRecorderConfigurationUsesMono16kPCM16Policy\(\)' \
+  'AudioPlaybackTimelineTests\(\)\.testIOSAudioRecorderConfigurationUsesMono16kPCM16Policy\(\)' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \
   "VoiceInkCore check runner avoids obsolete iOS audio recorder configuration suite" \
-  'AudioRecorderConfigurationTests\.' \
+  'AudioRecorderConfigurationTests\.|AudioSessionLifecycleStateTests\.' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_patterns \
@@ -15690,7 +15700,7 @@ require_pattern \
 
 require_pattern \
   "core checks execute iOS playback session lifecycle test" \
-  'AudioSessionLifecycleStateTests\.testAudioSessionLifecycleState(CancelsPendingDeactivationForPlayback|PlansPlaybackActivationSideEffects)' \
+  'AudioPlaybackTimelineTests\.testAudioSessionLifecycleState(CancelsPendingDeactivationForPlayback|PlansPlaybackActivationSideEffects)' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
@@ -16542,7 +16552,7 @@ reject_pattern \
   "core audio-session deactivation execution tests avoid raw action cases" \
   'VoiceInkAudioSessionDeactivationExecutionPlan\.|== \.(deactivateSession|runCountdownTimer)' \
   VoiceInkCore/Tests/VoiceInkCoreTests/UserDefaultsPreferencesTests.swift \
-  VoiceInkCore/Tests/VoiceInkCoreTests/AudioSessionLifecycleStateTests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/AudioPlaybackTimelineTests.swift
 
 require_pattern \
   "shared audio-session timeout presentation lives in VoiceInkCore" \
@@ -16581,6 +16591,20 @@ reject_pattern \
 
 section "obsolete standalone audio-session lifecycle state module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/AudioSessionLifecycleState.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/AudioSessionLifecycleStateTests.swift
+
+reject_pattern \
+  "core package/project metadata and runner avoid obsolete audio-session lifecycle tests" \
+  'AudioSessionLifecycleStateTests|AudioSessionLifecycleStateTests\.swift' \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_swift_pattern \
+  "VoiceInkCore tests avoid stale AudioSessionLifecycleStateTests suite" \
+  '\bAudioSessionLifecycleStateTests\b' \
+  VoiceInkCore/Tests/VoiceInkCoreTests
 
 require_pattern \
   "shared audio-session lifecycle state uses shared deactivation plan" \
@@ -16634,33 +16658,48 @@ require_pattern \
 
 require_pattern \
   "VoiceInkCore check runner executes iOS audio-session recording configuration proof" \
-  'testIOSAudioSessionRecordingConfigurationPreservesRecordingPolicy' \
+  'AudioPlaybackTimelineTests\.testIOSAudioSessionRecordingConfigurationPreservesRecordingPolicy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "VoiceInkCore check runner executes audio-session diagnostics proof" \
-  'testAudioSessionDiagnosticsPreserveIOSLogCopy' \
+  'AudioPlaybackTimelineTests\.testAudioSessionDiagnosticsPreserveIOSLogCopy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "VoiceInkCore check runner executes audio-session immediate deactivation proof" \
-  'testAudioSessionLifecycleStatePlansImmediateDeactivationSideEffects' \
+  'AudioPlaybackTimelineTests\.testAudioSessionLifecycleStatePlansImmediateDeactivationSideEffects' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "VoiceInkCore check runner executes audio-session immediate deactivation runtime application proof" \
-  'testAudioSessionImmediateDeactivationPlanAppliesRuntimeStateInOrder' \
+  'AudioPlaybackTimelineTests\.testAudioSessionImmediateDeactivationPlanAppliesRuntimeStateInOrder' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "VoiceInkCore check runner executes audio-session playback runtime application proof" \
-  'testAudioSessionPlaybackActivationPlanAppliesRuntimeStateInOrder' \
+  'AudioPlaybackTimelineTests\.testAudioSessionPlaybackActivationPlanAppliesRuntimeStateInOrder' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_voiceink_core_check_runner_invocations \
+  "VoiceInkCore check runner invokes folded audio-session lifecycle proofs" \
+  "AudioPlaybackTimelineTests" \
+  "testIOSAudioSessionRecordingConfigurationPreservesRecordingPolicy" \
+  "testAudioSessionDiagnosticsPreserveIOSLogCopy" \
+  "testAudioSessionLifecycleStatePreservesIOSActivationAndTimeoutFlow" \
+  "testAudioSessionLifecycleStateCancelsPendingDeactivationForPlayback" \
+  "testAudioSessionLifecycleStatePlansPlaybackActivationSideEffects" \
+  "testAudioSessionPlaybackActivationPlanAppliesRuntimeStateInOrder" \
+  "testAudioSessionLifecycleStatePlansImmediateDeactivationSideEffects" \
+  "testAudioSessionImmediateDeactivationPlanAppliesRuntimeStateInOrder" \
+  "testAudioSessionLifecycleStateRequestsDeactivationWhenCountdownExpires" \
+  "testAudioSessionLifecycleStateReturnsShellExecutionPlans" \
+  "testIOSAudioRecorderConfigurationUsesMono16kPCM16Policy"
 
 reject_pattern \
   "core audio-session lifecycle tests avoid raw activation-plan construction" \
   'VoiceInkAudioSessionPlaybackActivationPlan\(|VoiceInkAudioSessionImmediateDeactivationPlan\(|shouldCancelScheduledDeactivation|shouldDeactivateCurrentSession|shouldDeactivateSession' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/AudioSessionLifecycleStateTests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/AudioPlaybackTimelineTests.swift
 
 require_pattern \
   "iOS audio-session manager uses shared lifecycle state" \

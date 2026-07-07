@@ -358,6 +358,216 @@ public enum VoiceInkAIEnhancementRetryFailurePresentation {
     }
 }
 
+public enum VoiceInkAIEnhancementOutputFilter {
+    public static func filter(_ text: String) -> String {
+        var processedText = text
+        let patterns = [
+            #"(?s)<thinking>(.*?)</thinking>"#,
+            #"(?s)<think>(.*?)</think>"#,
+            #"(?s)<reasoning>(.*?)</reasoning>"#,
+            #"(?s)\s*```json\s*\{.*?"codex_follow_up"\s*:\s*true.*?\}\s*```\s*$"#,
+            #"(?s)\s*\{\s*"codex_follow_up"\s*:\s*true.*\}\s*$"#
+        ]
+
+        for pattern in patterns {
+            if let regex = try? NSRegularExpression(pattern: pattern) {
+                let range = NSRange(processedText.startIndex..., in: processedText)
+                processedText = regex.stringByReplacingMatches(in: processedText, options: [], range: range, withTemplate: "")
+            }
+        }
+
+        return processedText.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+}
+
+public struct VoiceInkAIEnhancementRequestPayload: Equatable, Sendable {
+    public let userMessage: String
+
+    public init?(transcript: String) {
+        guard !transcript.isEmpty else {
+            return nil
+        }
+
+        self.userMessage = VoiceInkAIRequestPrompts.taggedTranscript(transcript)
+    }
+
+    public static func enhancedText(from providerOutput: String) -> String {
+        VoiceInkAIEnhancementOutputFilter.filter(providerOutput)
+    }
+}
+
+public enum VoiceInkAIEnhancementRequestPreparation: Equatable, Sendable {
+    case skipEmptyTranscript
+    case execute(VoiceInkAIEnhancementRequestPayload)
+
+    public static func preparing(
+        transcript: String,
+        isConfigured: Bool
+    ) throws -> VoiceInkAIEnhancementRequestPreparation {
+        guard isConfigured else {
+            throw VoiceInkAIEnhancementError.notConfigured
+        }
+
+        guard let requestPayload = VoiceInkAIEnhancementRequestPayload(transcript: transcript) else {
+            return .skipEmptyTranscript
+        }
+
+        return .execute(requestPayload)
+    }
+}
+
+public struct VoiceInkAIEnhancementPromptContext: Equatable, Sendable {
+    public let selectedText: String?
+    public let clipboardText: String?
+    public let currentWindowText: String?
+    public let customVocabulary: String
+
+    public init(
+        selectedText: String? = nil,
+        clipboardText: String? = nil,
+        currentWindowText: String? = nil,
+        customVocabulary: String = ""
+    ) {
+        self.selectedText = selectedText
+        self.clipboardText = clipboardText
+        self.currentWindowText = currentWindowText
+        self.customVocabulary = customVocabulary
+    }
+}
+
+public enum VoiceInkSelectedTextDiagnostics {
+    public static func fetchFailedMessage(errorDescription: String) -> String {
+        "Failed to get selected text: \(errorDescription)"
+    }
+}
+
+public enum VoiceInkAIEnhancementPromptBuilder {
+    public static func systemMessage(
+        basePrompt: String,
+        context: VoiceInkAIEnhancementPromptContext = VoiceInkAIEnhancementPromptContext()
+    ) -> String {
+        basePrompt
+            + taggedSection("CURRENTLY_SELECTED_TEXT", text: context.selectedText)
+            + taggedSection("CLIPBOARD_CONTEXT", text: context.clipboardText)
+            + taggedSection("CURRENT_WINDOW_CONTEXT", text: context.currentWindowText)
+            + customVocabularySection(context.customVocabulary)
+    }
+
+    private static func taggedSection(_ tag: String, text: String?) -> String {
+        guard let text, !text.isEmpty else {
+            return ""
+        }
+
+        return "\n\n<\(tag)>\n\(text)\n</\(tag)>"
+    }
+
+    private static func customVocabularySection(_ customVocabulary: String) -> String {
+        guard !customVocabulary.isEmpty else {
+            return ""
+        }
+
+        return """
+
+
+        The following are important vocabulary words, proper nouns, and technical terms. When these words or similar-sounding words appear in the <TRANSCRIPT>, ensure they are spelled EXACTLY as shown below:
+        <CUSTOM_VOCABULARY>
+        \(customVocabulary)
+        </CUSTOM_VOCABULARY>
+        """
+    }
+}
+
+public enum VoiceInkAIEnhancementVocabularyContext {
+    public static func formatted(from terms: [String]) -> String {
+        let normalizedTerms = VoiceInkCustomVocabularyTerms.normalized(terms, for: .postProcessingContext)
+        guard !normalizedTerms.isEmpty else {
+            return ""
+        }
+
+        return "Important Vocabulary: \(normalizedTerms.joined(separator: ", "))"
+    }
+}
+
+public struct VoiceInkScreenCaptureWindowFacts: Equatable, Sendable {
+    public let processID: Int?
+    public let layer: Int
+    public let isOnScreen: Bool
+    public let title: String?
+    public let applicationName: String?
+
+    public init(
+        processID: Int?,
+        layer: Int,
+        isOnScreen: Bool,
+        title: String?,
+        applicationName: String?
+    ) {
+        self.processID = processID
+        self.layer = layer
+        self.isOnScreen = isOnScreen
+        self.title = title
+        self.applicationName = applicationName
+    }
+}
+
+public enum VoiceInkAIEnhancementScreenContext {
+    public static let unknownWindowValue = "Unknown"
+    public static let noTextDetectedMessage = "No text detected via OCR"
+
+    public static func preferredWindowIndex(
+        in windows: [VoiceInkScreenCaptureWindowFacts],
+        currentProcessID: Int,
+        frontmostProcessID: Int?
+    ) -> Int? {
+        if let frontmostProcessID,
+           let frontmostIndex = windows.firstIndex(where: {
+               isCaptureCandidate($0, currentProcessID: currentProcessID)
+                   && $0.processID == frontmostProcessID
+           }) {
+            return frontmostIndex
+        }
+
+        return windows.firstIndex {
+            isCaptureCandidate($0, currentProcessID: currentProcessID)
+        }
+    }
+
+    public static func contextText(
+        window: VoiceInkScreenCaptureWindowFacts,
+        extractedText: String?
+    ) -> String {
+        let title = window.title ?? window.applicationName ?? unknownWindowValue
+        let appName = window.applicationName ?? unknownWindowValue
+        let content = if let extractedText, !extractedText.isEmpty {
+            extractedText
+        } else {
+            noTextDetectedMessage
+        }
+
+        return """
+        Active Window: \(title)
+        Application: \(appName)
+
+        Window Content:
+        \(content)
+        """
+    }
+
+    public static func extractedText(fromRecognizedCandidates candidates: [String]) -> String? {
+        let text = candidates.joined(separator: "\n")
+        return text.isEmpty ? nil : text
+    }
+
+    private static func isCaptureCandidate(
+        _ window: VoiceInkScreenCaptureWindowFacts,
+        currentProcessID: Int
+    ) -> Bool {
+        window.processID != currentProcessID
+            && window.layer == 0
+            && window.isOnScreen
+    }
+}
+
 public enum VoiceInkAIEnhancementProviderKeyChangeRequest {
     public static let notificationName = Notification.Name("aiProviderKeyChanged")
 }

@@ -1574,3 +1574,117 @@ final class CustomPromptTests: XCTestCase {
         XCTAssertEqual(match.processedText, "Send this")
     }
 }
+
+extension CustomPromptTests {
+    func testFinalPromptTextReturnsRawPromptWithoutSystemInstructions() {
+        XCTAssertEqual(
+            VoiceInkAIPrompts.finalPromptText("Answer the user directly.", useSystemInstructions: false),
+            "Answer the user directly."
+        )
+    }
+
+    func testFinalPromptTextWrapsPromptWithSystemInstructions() {
+        let finalPrompt = VoiceInkAIPrompts.finalPromptText(
+            "Clean this transcript.",
+            useSystemInstructions: true
+        )
+
+        XCTAssertTrue(finalPrompt.contains("Clean this transcript."))
+        XCTAssertTrue(finalPrompt.contains("[FINAL WARNING]"))
+        XCTAssertTrue(finalPrompt.contains("OUTPUT ONLY THE CLEANED UP TEXT"))
+    }
+
+    func testPostProcessingRequestRejectsBlankPrompt() {
+        XCTAssertNil(VoiceInkPostProcessingRequest(prompt: " \n\t ", transcript: "raw text"))
+    }
+
+    func testPostProcessingRequestBuildsSharedIOSMessages() async throws {
+        let request = try XCTUnwrap(
+            VoiceInkPostProcessingRequest(
+                prompt: "Clean this",
+                transcript: "raw text"
+            )
+        )
+
+        let summary = try await request.applyRuntimeState { messages, temperature in
+            (messages, temperature)
+        }
+
+        XCTAssertEqual(summary.1, 0.2)
+        XCTAssertEqual(
+            summary.0,
+            [
+                VoiceInkOpenAICompatibleChatMessage(
+                    role: "system",
+                    content: "You are a helpful assistant that rewrites raw speech-to-text transcripts to be concise, well-punctuated, and readable notes, preserving meaning."
+                ),
+                VoiceInkOpenAICompatibleChatMessage(
+                    role: "user",
+                    content: "Prompt: Clean this\n\nTranscript:\nraw text"
+                )
+            ]
+        )
+    }
+
+    func testPostProcessingFinalizedTranscriptFallsBackWhenFilteredResponseIsEmpty() {
+        let fallbackTranscript = "raw text"
+
+        XCTAssertEqual(
+            VoiceInkPostProcessingRequest.finalizedTranscript(
+                from: "",
+                fallbackTranscript: fallbackTranscript
+            ),
+            fallbackTranscript
+        )
+        XCTAssertEqual(
+            VoiceInkPostProcessingRequest.finalizedTranscript(
+                from: "   \n ",
+                fallbackTranscript: fallbackTranscript
+            ),
+            fallbackTranscript
+        )
+        XCTAssertEqual(
+            VoiceInkPostProcessingRequest.finalizedTranscript(
+                from: "<think>hidden reasoning</think>",
+                fallbackTranscript: fallbackTranscript
+            ),
+            fallbackTranscript
+        )
+    }
+
+    func testPostProcessingFinalizedTranscriptStripsReasoningTags() {
+        XCTAssertEqual(
+            VoiceInkPostProcessingRequest.finalizedTranscript(
+                from: "<thinking>draft</thinking>\nClean text\n<reasoning>notes</reasoning>",
+                fallbackTranscript: "raw text"
+            ),
+            "Clean text"
+        )
+    }
+
+    func testPostProcessingFinalizedTranscriptStripsCodexFollowUpPayload() {
+        let response = """
+        Regards.
+
+        ```json
+        {
+          "codex_follow_up": true,
+          "title": "Follow-up",
+          "items": [
+            {
+              "prompt": "Clean up another short transcript"
+            }
+          ]
+        }
+        ```
+        """
+
+        XCTAssertEqual(
+            VoiceInkPostProcessingRequest.finalizedTranscript(
+                from: response,
+                fallbackTranscript: "raw text"
+            ),
+            "Regards."
+        )
+    }
+}

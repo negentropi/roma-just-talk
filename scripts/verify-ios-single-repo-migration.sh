@@ -11902,7 +11902,70 @@ reject_pattern \
 require_pattern \
   "shared AI enhancement vocabulary context normalizes post-processing terms" \
   'VoiceInkCustomVocabularyTerms\.normalized\(terms, for: \.postProcessingContext\)' \
-  VoiceInkCore/Sources/VoiceInkCore/AIPrompts.swift
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+section "obsolete standalone AI prompts module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/AIPrompts.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/AIPromptsTests.swift
+
+reject_pattern \
+  "core tests, runner, and project metadata avoid obsolete AI prompts suite and file" \
+  'AIPromptsTests|AIPrompts\.swift' \
+  VoiceInkCore/Tests/VoiceInkCoreTests \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
+
+require_patterns \
+  "custom prompt module owns shared AI prompt templates after folding" \
+  VoiceInkCore/Sources/VoiceInkCore/CustomPrompt.swift \
+  'public enum VoiceInkAIPrompts' \
+  'customPromptTemplate' \
+  'assistantMode' \
+  'public static func finalPromptText' \
+  'public enum VoiceInkAIRequestPrompts' \
+  'postProcessingSystemPrompt' \
+  'taggedTranscript' \
+  'postProcessingUserPrompt'
+
+require_patterns \
+  "AI provider catalog owns AI enhancement prompt request and context policy after folding" \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift \
+  'public enum VoiceInkAIEnhancementOutputFilter' \
+  'codex_follow_up' \
+  'public struct VoiceInkAIEnhancementRequestPayload' \
+  'public enum VoiceInkAIEnhancementRequestPreparation' \
+  'public struct VoiceInkAIEnhancementPromptContext' \
+  'public enum VoiceInkAIEnhancementPromptBuilder' \
+  'public enum VoiceInkAIEnhancementVocabularyContext' \
+  'public enum VoiceInkSelectedTextDiagnostics' \
+  'public struct VoiceInkScreenCaptureWindowFacts' \
+  'public enum VoiceInkAIEnhancementScreenContext'
+
+require_patterns \
+  "AI prompt public API proof uses normal VoiceInkCore import" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AIPromptPublicAPITests.swift \
+  '^import VoiceInkCore$' \
+  'final class AIPromptPublicAPITests' \
+  'VoiceInkAIPrompts\.finalPromptText' \
+  'VoiceInkAIRequestPrompts\.taggedTranscript' \
+  'VoiceInkAIEnhancementRequestPayload' \
+  'VoiceInkAIEnhancementRequestPreparation\.preparing' \
+  'VoiceInkAIEnhancementPromptBuilder\.systemMessage' \
+  'VoiceInkAIEnhancementPromptContext' \
+  'VoiceInkScreenCaptureWindowFacts' \
+  'VoiceInkAIEnhancementScreenContext\.contextText' \
+  'VoiceInkSelectedTextDiagnostics\.fetchFailedMessage'
+
+reject_pattern \
+  "AI prompt public API proof avoids testable import" \
+  '@testable import VoiceInkCore' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AIPromptPublicAPITests.swift
+
+require_voiceink_core_check_runner_invocations \
+  "core checks execute AI prompt public API proof" \
+  AIPromptPublicAPITests \
+  testMovedAIPromptSymbolsExposePublicAPI
 
 require_pattern \
   "shared run processor uses shared transcription run preparation" \
@@ -14208,16 +14271,16 @@ require_patterns \
 require_patterns \
   "core checks execute shared post-processing request coverage" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'AIPromptsTests\.testPostProcessingRequestRejectsBlankPrompt' \
-  'AIPromptsTests\(\)\.testPostProcessingRequestRejectsBlankPrompt\(\)' \
-  'AIPromptsTests\.testPostProcessingRequestBuildsSharedIOSMessages' \
-  'AIPromptsTests\(\)\.testPostProcessingRequestBuildsSharedIOSMessages\(\)' \
-  'AIPromptsTests\.testPostProcessingFinalizedTranscriptFallsBackWhenFilteredResponseIsEmpty' \
-  'AIPromptsTests\(\)\.testPostProcessingFinalizedTranscriptFallsBackWhenFilteredResponseIsEmpty\(\)' \
-  'AIPromptsTests\.testPostProcessingFinalizedTranscriptStripsReasoningTags' \
-  'AIPromptsTests\(\)\.testPostProcessingFinalizedTranscriptStripsReasoningTags\(\)' \
-  'AIPromptsTests\.testPostProcessingFinalizedTranscriptStripsCodexFollowUpPayload' \
-  'AIPromptsTests\(\)\.testPostProcessingFinalizedTranscriptStripsCodexFollowUpPayload\(\)'
+  'CustomPromptTests\.testPostProcessingRequestRejectsBlankPrompt' \
+  'CustomPromptTests\(\)\.testPostProcessingRequestRejectsBlankPrompt\(\)' \
+  'CustomPromptTests\.testPostProcessingRequestBuildsSharedIOSMessages' \
+  'CustomPromptTests\(\)\.testPostProcessingRequestBuildsSharedIOSMessages\(\)' \
+  'CustomPromptTests\.testPostProcessingFinalizedTranscriptFallsBackWhenFilteredResponseIsEmpty' \
+  'CustomPromptTests\(\)\.testPostProcessingFinalizedTranscriptFallsBackWhenFilteredResponseIsEmpty\(\)' \
+  'CustomPromptTests\.testPostProcessingFinalizedTranscriptStripsReasoningTags' \
+  'CustomPromptTests\(\)\.testPostProcessingFinalizedTranscriptStripsReasoningTags\(\)' \
+  'CustomPromptTests\.testPostProcessingFinalizedTranscriptStripsCodexFollowUpPayload' \
+  'CustomPromptTests\(\)\.testPostProcessingFinalizedTranscriptStripsCodexFollowUpPayload\(\)'
 
 reject_pattern \
   "core post-processing request coverage stays in AI prompts suite" \
@@ -14228,8 +14291,8 @@ reject_pattern \
   iOS/VoiceInk-ios.xcodeproj/project.pbxproj
 
 require_patterns \
-  "core AI prompts suite owns post-processing request coverage" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/AIPromptsTests.swift \
+  "custom prompt tests own folded post-processing request coverage" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/CustomPromptTests.swift \
   'testPostProcessingRequestRejectsBlankPrompt' \
   'testPostProcessingRequestBuildsSharedIOSMessages' \
   'testPostProcessingFinalizedTranscriptFallsBackWhenFilteredResponseIsEmpty' \
@@ -14459,7 +14522,7 @@ require_voiceink_core_check_runner_invocations \
 require_pattern \
   "shared AI enhancement request payload lives in VoiceInkCore" \
   'VoiceInkAIEnhancementRequestPayload|VoiceInkAIEnhancementRequestPreparation|taggedTranscript|enhancedText' \
-  VoiceInkCore/Sources/VoiceInkCore/AIPrompts.swift
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 section "obsolete standalone AI request prompts module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/AIRequestPrompts.swift
@@ -14471,7 +14534,7 @@ require_pattern \
 
 require_pattern \
   "core checks execute AI enhancement request preparation test" \
-  'AIPromptsTests\.testEnhancementRequestPreparationPreservesMacOSPreflightPolicy' \
+  'AIProviderCatalogTests\.testEnhancementRequestPreparationPreservesMacOSPreflightPolicy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 section "obsolete standalone AI enhancement output filter module stays deleted"
@@ -14479,7 +14542,7 @@ reject_file VoiceInkCore/Sources/VoiceInkCore/AIEnhancementOutputFilter.swift
 
 require_patterns \
   "AI enhancement output filter lives with request preparation policy" \
-  VoiceInkCore/Sources/VoiceInkCore/AIPrompts.swift \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift \
   'VoiceInkAIEnhancementOutputFilter' \
   'codex_follow_up' \
   'VoiceInkAIEnhancementRequestPayload'
@@ -14628,21 +14691,21 @@ reject_pattern \
 require_pattern \
   "shared AI enhancement screen-context policy lives in VoiceInkCore" \
   'VoiceInkAIEnhancementScreenContext|VoiceInkScreenCaptureWindowFacts|preferredWindowIndex|contextText|extractedText\(fromRecognizedCandidates:' \
-  VoiceInkCore/Sources/VoiceInkCore/AIPrompts.swift
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 require_pattern \
   "core checks execute shared AI enhancement screen-context policy tests" \
-  'AIPromptsTests\.testScreenContextPrefersFrontmostVisibleNonSelfWindow|AIPromptsTests\.testScreenContextFallsBackToFirstVisibleNonSelfWindow|AIPromptsTests\.testScreenContextTextPreservesMacOSCaptureCopy|AIPromptsTests\.testScreenContextTextUsesExistingFallbacks|AIPromptsTests\.testScreenContextExtractedTextPreservesMacOSOCRAssembly' \
+  'AIProviderCatalogTests\.testScreenContextPrefersFrontmostVisibleNonSelfWindow|AIProviderCatalogTests\.testScreenContextFallsBackToFirstVisibleNonSelfWindow|AIProviderCatalogTests\.testScreenContextTextPreservesMacOSCaptureCopy|AIProviderCatalogTests\.testScreenContextTextUsesExistingFallbacks|AIProviderCatalogTests\.testScreenContextExtractedTextPreservesMacOSOCRAssembly' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "shared selected-text diagnostics live with AI prompt context policy" \
   'VoiceInkSelectedTextDiagnostics|fetchFailedMessage|Failed to get selected text:' \
-  VoiceInkCore/Sources/VoiceInkCore/AIPrompts.swift
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 require_pattern \
   "core checks execute selected-text diagnostics test" \
-  'AIPromptsTests\.testSelectedTextDiagnosticsPreservesMacOSFailureCopy' \
+  'AIProviderCatalogTests\.testSelectedTextDiagnosticsPreservesMacOSFailureCopy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \

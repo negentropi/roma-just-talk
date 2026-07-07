@@ -118,18 +118,8 @@ struct VocabularyView: View {
     }
 
     private func removeWord(_ word: VocabularyWord) {
-        modelContext.delete(word)
-
-        do {
-            try modelContext.save()
-        } catch {
-            // Rollback the delete to restore UI consistency
-            modelContext.rollback()
-            alertPresentation = .vocabulary(
-                message: VoiceInkDictionaryAlertPresentation.failedToRemoveVocabularyWord(
-                    localizedDescription: error.localizedDescription
-                )
-            )
+        if let alert = DictionaryService.removeVocabularyWord(word, context: modelContext) {
+            alertPresentation = alert
         }
     }
 }

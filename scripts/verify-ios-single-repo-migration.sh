@@ -11563,7 +11563,17 @@ reject_pattern \
 
 require_pattern \
   "macOS vocabulary view uses shared dictionary alert presentation" \
-  'VoiceInkDictionaryAlertPresentation|\.vocabulary|failedToRemoveVocabularyWord' \
+  'VoiceInkDictionaryAlertPresentation|\.vocabulary' \
+  VoiceInk/Views/Dictionary/VocabularyView.swift
+
+require_pattern \
+  "macOS vocabulary view deletes through DictionaryService" \
+  'DictionaryService\.removeVocabularyWord\(word, context: modelContext\)' \
+  VoiceInk/Views/Dictionary/VocabularyView.swift
+
+reject_pattern \
+  "macOS vocabulary view avoids shell-owned delete persistence" \
+  'modelContext\.delete\(word\)|try modelContext\.save\(\)|failedToRemoveVocabularyWord' \
   VoiceInk/Views/Dictionary/VocabularyView.swift
 
 require_pattern \
@@ -11658,7 +11668,7 @@ require_pattern \
 
 require_pattern \
   "macOS dictionary persistence failures use shared dictionary alert copy" \
-  'VoiceInkDictionaryAlertPresentation\.(failedToAddVocabularyWord|failedToAddVocabularyWords|failedToAddWordReplacement|failedToSaveWordReplacementChanges|failedToRemoveWordReplacement)' \
+  'VoiceInkDictionaryAlertPresentation\.(failedToAddVocabularyWord|failedToAddVocabularyWords|failedToRemoveVocabularyWord|failedToAddWordReplacement|failedToSaveWordReplacementChanges|failedToRemoveWordReplacement)' \
   VoiceInk/Services/DictionaryService.swift
 
 reject_pattern \

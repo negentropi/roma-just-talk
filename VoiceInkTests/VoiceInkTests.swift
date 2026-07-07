@@ -167,6 +167,22 @@ struct VoiceInkTests {
         #expect(DictionaryService.applyWordReplacements(to: "voice ink", using: context) == "voice ink")
     }
 
+    @Test @MainActor func dictionaryServiceVocabularyRemovalDeletesWord() throws {
+        let container = try makeVocabularyContainer()
+        let context = container.mainContext
+        let word = VocabularyWord(word: "roma")
+        context.insert(word)
+        context.insert(VocabularyWord(word: "voice ink"))
+        try context.save()
+
+        #expect(DictionaryService.removeVocabularyWord(word, context: context) == nil)
+
+        let words = try context.fetch(FetchDescriptor<VocabularyWord>())
+            .map(\.word)
+            .sorted()
+        #expect(words == ["voice ink"])
+    }
+
     @Test @MainActor func aiEnhancementServiceCachesPromptTriggerEligibility() throws {
         let savedPrompts = UserDefaults.standard.data(forKey: "customPrompts")
         let savedPromptId = UserDefaults.standard.string(forKey: "selectedPromptId")
@@ -1376,6 +1392,12 @@ struct VoiceInkTests {
 
     private func makeWordReplacementContainer() throws -> ModelContainer {
         let schema = Schema([WordReplacement.self])
+        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+        return try ModelContainer(for: schema, configurations: [configuration])
+    }
+
+    private func makeVocabularyContainer() throws -> ModelContainer {
+        let schema = Schema([VocabularyWord.self])
         let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
         return try ModelContainer(for: schema, configurations: [configuration])
     }

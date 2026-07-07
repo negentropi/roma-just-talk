@@ -30,6 +30,25 @@ enum DictionaryService {
         }
     }
 
+    static func removeVocabularyWord(
+        _ word: VocabularyWord,
+        context: ModelContext
+    ) -> VoiceInkDictionaryAlertPresentation? {
+        context.delete(word)
+
+        do {
+            try context.save()
+            return nil
+        } catch {
+            context.rollback()
+            return .vocabulary(
+                message: VoiceInkDictionaryAlertPresentation.failedToRemoveVocabularyWord(
+                    localizedDescription: error.localizedDescription
+                )
+            )
+        }
+    }
+
     // MARK: - Word Replacement
 
     @discardableResult

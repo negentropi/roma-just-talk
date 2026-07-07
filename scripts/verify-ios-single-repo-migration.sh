@@ -8484,6 +8484,70 @@ require_patterns \
   'VoiceInkRetriedRequest\.validatedUpload' \
   'VoiceInkAPIKeyVerificationPolicy\.verify'
 
+require_patterns \
+  "xAI public API proof uses normal VoiceInkCore import" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
+  '^import VoiceInkCore$' \
+  'final class RemoteProviderPublicAPITests' \
+  'VoiceInkXAIRequestBuilder\.makeTranscriptionRequest' \
+  'VoiceInkPreparedXAITranscriptionRequest' \
+  'VoiceInkXAIRequestBuilder\.makeAPIKeyRequest' \
+  'VoiceInkXAITranscriptionClient\(\)' \
+  'transcribeWithAllLabels' \
+  'transcribeWithDefaultedLabels' \
+  'client\.transcribeAudioData\(' \
+  'baseURL: VoiceInkProviderEndpoint\.xaiAPIBaseURL' \
+  'apiKey: "xai-key"' \
+  'audioData: Data\("WAVDATA"\.utf8\)' \
+  'fileName: "sample\.wav"' \
+  'language: "en"' \
+  'format: true' \
+  'errorDomain: "RemoteProviderPublicAPITests\.XAI"' \
+  'timeout: 60' \
+  'maxRetries: 2' \
+  'client\.verifyAPIKey\(' \
+  'client\.verifyAPIKeyDetailed\(' \
+  'VoiceInkAPIKeyVerificationResult' \
+  'VoiceInkXAITranscriptionCodec\.transcript'
+
+reject_pattern \
+  "xAI public API proof avoids conditional compilation snippets" \
+  '^[[:space:]]*#(if|elseif|else|endif)\b' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
+
+reject_pattern \
+  "xAI public API proof avoids testable import" \
+  '@testable import VoiceInkCore' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
+
+require_swift_static_function_body_pattern \
+  "xAI public API proof keeps defaulted transcribe call short" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
+  testXAIRequestClientAndCodecExposePublicAPI \
+  'let\s+transcribeWithDefaultedLabels\s*=\s*\{\s*try\s+await\s+client\.transcribeAudioData\s*\((?:(?!\b(?:fileName|language|format|errorDomain|timeout|maxRetries)\s*:).)*\bbaseURL\s*:(?:(?!\b(?:fileName|language|format|errorDomain|timeout|maxRetries)\s*:).)*\bapiKey\s*:(?:(?!\b(?:fileName|language|format|errorDomain|timeout|maxRetries)\s*:).)*\baudioData\s*:(?:(?!\b(?:fileName|language|format|errorDomain|timeout|maxRetries)\s*:).)*\)\s*\}'
+
+require_voiceink_core_check_runner_invocations \
+  "core checks execute xAI public API proof" \
+  RemoteProviderPublicAPITests \
+  testXAIRequestClientAndCodecExposePublicAPI
+
+require_multiline_pattern \
+  "xAI public API proof asserts multipart body anchors" \
+  '(?s)func testXAIRequestClientAndCodecExposePublicAPI\(\).*Content-Disposition: form-data; name="language".*Content-Disposition: form-data; name="format".*Content-Disposition: form-data; name="file"; filename="sample\.wav"' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
+
+section "obsolete standalone xAI public API proof stays deleted"
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/XAIPublicAPITests.swift
+
+reject_pattern \
+  "VoiceInkCore metadata and runner avoid stale standalone xAI public API proof" \
+  'XAIPublicAPITests' \
+  VoiceInkCore/Tests/VoiceInkCoreTests \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
 require_voiceink_core_check_runner_invocations \
   "core checks execute xAI remote provider request tests" \
   RemoteProviderRequestTests \

@@ -593,6 +593,93 @@ final class RemoteProviderPublicAPITests: XCTestCase {
         )
     }
 
+    func testXAIRequestClientAndCodecExposePublicAPI() async throws {
+        let preparedRequest = VoiceInkXAIRequestBuilder.makeTranscriptionRequest(
+            baseURL: VoiceInkProviderEndpoint.xaiAPIBaseURL,
+            apiKey: "xai-key",
+            audioData: Data("WAVDATA".utf8),
+            fileName: "sample.wav",
+            language: "en",
+            format: true,
+            boundary: "Boundary-test",
+            timeout: 60
+        )
+        let publicPreparedRequest = VoiceInkPreparedXAITranscriptionRequest(
+            request: preparedRequest.request,
+            body: preparedRequest.body
+        )
+
+        XCTAssertEqual(publicPreparedRequest.request.url?.absoluteString, "https://api.x.ai/v1/stt")
+        XCTAssertEqual(publicPreparedRequest.request.httpMethod, "POST")
+        XCTAssertEqual(publicPreparedRequest.request.value(forHTTPHeaderField: "Authorization"), "Bearer xai-key")
+        XCTAssertEqual(publicPreparedRequest.request.value(forHTTPHeaderField: "Accept"), "application/json")
+        XCTAssertEqual(
+            publicPreparedRequest.request.value(forHTTPHeaderField: "Content-Type"),
+            "multipart/form-data; boundary=Boundary-test"
+        )
+        XCTAssertEqual(publicPreparedRequest.request.timeoutInterval, 60)
+        XCTAssertEqual(publicPreparedRequest.body, preparedRequest.body)
+        let body = try XCTUnwrap(String(data: publicPreparedRequest.body, encoding: .utf8))
+        XCTAssertTrue(body.contains(#"Content-Disposition: form-data; name="language""#))
+        XCTAssertTrue(body.contains(#"Content-Disposition: form-data; name="format""#))
+        XCTAssertTrue(body.contains(#"Content-Disposition: form-data; name="file"; filename="sample.wav""#))
+
+        let apiKeyRequest = VoiceInkXAIRequestBuilder.makeAPIKeyRequest(
+            baseURL: VoiceInkProviderEndpoint.xaiAPIBaseURL,
+            apiKey: "xai-key",
+            timeout: 10
+        )
+        XCTAssertEqual(apiKeyRequest.url?.absoluteString, "https://api.x.ai/v1/api-key")
+        XCTAssertEqual(apiKeyRequest.value(forHTTPHeaderField: "Authorization"), "Bearer xai-key")
+        XCTAssertEqual(apiKeyRequest.timeoutInterval, 10)
+
+        let client = VoiceInkXAITranscriptionClient()
+        let transcribeWithAllLabels = {
+            try await client.transcribeAudioData(
+                baseURL: VoiceInkProviderEndpoint.xaiAPIBaseURL,
+                apiKey: "xai-key",
+                audioData: Data("WAVDATA".utf8),
+                fileName: "sample.wav",
+                language: "en",
+                format: true,
+                errorDomain: "RemoteProviderPublicAPITests.XAI",
+                timeout: 60,
+                maxRetries: 2
+            )
+        }
+        let transcribeWithDefaultedLabels = {
+            try await client.transcribeAudioData(
+                baseURL: VoiceInkProviderEndpoint.xaiAPIBaseURL,
+                apiKey: "xai-key",
+                audioData: Data("WAVDATA".utf8)
+            )
+        }
+        _ = transcribeWithAllLabels
+        _ = transcribeWithDefaultedLabels
+
+        let blankAPIKeyIsValid = await client.verifyAPIKey(
+            baseURL: VoiceInkProviderEndpoint.xaiAPIBaseURL,
+            apiKey: " \n\t "
+        )
+        XCTAssertFalse(blankAPIKeyIsValid)
+
+        let blankAPIKeyResult = await client.verifyAPIKeyDetailed(
+            baseURL: VoiceInkProviderEndpoint.xaiAPIBaseURL,
+            apiKey: " \n\t "
+        )
+        XCTAssertEqual(
+            blankAPIKeyResult,
+            VoiceInkAPIKeyVerificationResult(
+                isValid: false,
+                errorMessage: "API key is missing or empty."
+            )
+        )
+        XCTAssertEqual(
+            try VoiceInkXAITranscriptionCodec.transcript(from: Data(#"{"text":"xai text"}"#.utf8)),
+            "xai text"
+        )
+    }
+
     func testSonioxRequestClientAndCodecExposePublicAPI() async throws {
         let preparedRequest = VoiceInkSonioxRequestBuilder.makeUploadFileRequest(
             baseURL: VoiceInkProviderEndpoint.sonioxAPIBaseURL,

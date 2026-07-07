@@ -19974,12 +19974,26 @@ reject_pattern \
   '"support@tryvoiceink\.com"|"VoiceInk Support Request"|SCREEN RECORDING HIGHLY RECOMMENDED|COMMON ISSUES|tryvoiceink\.com/common-issues|URL\(string: "mailto:' \
   VoiceInk/EmailSupport.swift
 
-require_file VoiceInkCore/Sources/VoiceInkCore/SystemInformationReport.swift
+reject_file VoiceInkCore/Sources/VoiceInkCore/SystemInformationReport.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/SystemInformationReportTests.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/SystemArchitecture.swift
+
+reject_pattern \
+  "VoiceInkCore metadata and checks avoid stale standalone system information report references" \
+  'SystemInformationReport\.swift|SystemInformationReportTests\.swift|SystemInformationReportTests' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
+
+reject_swift_pattern \
+  "VoiceInkCore tests avoid stale system information report suite references" \
+  '\bSystemInformationReportTests\b' \
+  VoiceInkCore/Tests/VoiceInkCoreTests
 
 require_patterns \
   "shared system architecture policy lives in VoiceInkCore" \
-  VoiceInkCore/Sources/VoiceInkCore/SystemInformationReport.swift \
+  VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift \
   'public enum VoiceInkSystemArchitecture' \
   'public static var isIntelMac' \
   'public static var macOSDisplayName' \
@@ -20000,7 +20014,7 @@ reject_file VoiceInk/Services/SystemArchitecture.swift
 
 require_patterns \
   "shared macOS system information report formatting lives in VoiceInkCore" \
-  VoiceInkCore/Sources/VoiceInkCore/SystemInformationReport.swift \
+  VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift \
   'VoiceInkMacOSSystemInformationFacts' \
   'VoiceInkSystemInformationReport' \
   'generatedDateText' \
@@ -20021,7 +20035,7 @@ require_patterns \
 
 require_patterns \
   "shared system information copy presentation lives in VoiceInkCore" \
-  VoiceInkCore/Sources/VoiceInkCore/SystemInformationReport.swift \
+  VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift \
   'VoiceInkSystemInformationCopyPresentation' \
   'VoiceInkSystemInformationCopyButtonPresentation' \
   'idleSystemImageName = "doc\.on\.doc"' \
@@ -20066,7 +20080,7 @@ reject_pattern \
 
 require_voiceink_core_check_runner_invocations \
   "core checks execute system information report tests" \
-  SystemInformationReportTests \
+  AppIdentityTests \
   testSystemArchitecturePreservesMacOSDisplayNameForCompileTarget \
   testSystemArchitectureIntelMacPredicateMatchesCompileTarget \
   testMacOSSystemInformationReportPreservesSectionOrderAndLabels \
@@ -20089,6 +20103,16 @@ require_voiceink_core_check_runner_invocations \
   testDiagnosticLogExportPolicyOwnsOSLogLevelLabels \
   testDiagnosticLogExportPolicyBuildsMacOSExportFileName \
   testDiagnosticLogExportPolicyBuildsDownloadsUnavailableError
+
+require_pattern \
+  "app identity tests exercise public VoiceInkCore API surface after folding system information report" \
+  '^import VoiceInkCore$' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AppIdentityTests.swift
+
+reject_pattern \
+  "app identity tests avoid testable import after folding system information public API" \
+  '@testable import VoiceInkCore' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AppIdentityTests.swift
 
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/SystemArchitectureTests.swift
 
@@ -20262,13 +20286,13 @@ reject_swift_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests
 
 require_pattern \
-  "shared diagnostic log export policy lives with system information in VoiceInkCore" \
+  "shared diagnostic log export policy lives with app identity in VoiceInkCore" \
   'VoiceInkDiagnosticsSettingsPresentation|VoiceInkDiagnosticLogExportPolicy|VoiceInkDiagnosticLogSessionRange|sessionStartDatesKey = "logExporter\.sessionStartDates\.v1"|maxSessionStartDatesToKeep = 3|timestampDateFormat = "yyyy-MM-dd HH:mm:ss\.SSS"|fileNameDateFormat = "yyyy-MM-dd_HH-mm-ss"|fileNamePrefix = "VoiceInk_Logs_"|headerTitle = "=== VoiceInk Diagnostic Logs ==="|noLogsFoundMessage = "No logs found for this session\."|exporterErrorDomain = "LogExporter"|downloadsDirectoryUnavailableErrorCode = 1|downloadsDirectoryUnavailableDescription = "Downloads directory unavailable"|sessionRanges|headerLines|logEntryLine|exportContent|logLevelLabel|fileName|downloadsDirectoryUnavailableError|rollingBufferLastClaimLabel|exportFailedAlertTitle|exportedLogSuccessSystemImageName' \
-  VoiceInkCore/Sources/VoiceInkCore/SystemInformationReport.swift
+  VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift
 
 require_patterns \
   "system information report tests cover diagnostic log export policy" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/SystemInformationReportTests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AppIdentityTests.swift \
   'func testDiagnosticsSettingsPresentationPreservesMacOSCopyAndIcons' \
   'func testDiagnosticLogExportPolicyPreservesMacOSStorageAndFormattingConstants' \
   'func testDiagnosticLogExportPolicyLoadsAndSavesStoredSessionStartDates' \

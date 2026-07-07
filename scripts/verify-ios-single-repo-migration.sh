@@ -4903,12 +4903,22 @@ reject_pattern \
 require_pattern \
   "shared Keychain query and data-store policy lives in VoiceInkCore" \
   'VoiceInkKeychainQuery|VoiceInkKeychainDataStore|VoiceInkKeychainValueStore|VoiceInkKeychainDiagnostics|SecItem(Add|CopyMatching|Delete)' \
-  VoiceInkCore/Sources/VoiceInkCore/KeychainQuery.swift
+  VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift
 
 require_pattern \
   "shared Keychain string value policy lives in VoiceInkCore" \
   'VoiceInkKeychainValueStore|VoiceInkKeychainStringLoadResult|data\(forString:|string\(from:|isSuccessfulDeleteStatus' \
-  VoiceInkCore/Sources/VoiceInkCore/KeychainQuery.swift
+  VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift
+
+require_patterns \
+  "shared Keychain policy declarations remain public after folding into provider API-key state" \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift \
+  'public enum VoiceInkKeychainQuery' \
+  'public struct VoiceInkKeychainLoadResult' \
+  'public struct VoiceInkKeychainStringLoadResult' \
+  'public enum VoiceInkKeychainDataStore' \
+  'public enum VoiceInkKeychainValueStore' \
+  'public enum VoiceInkKeychainDiagnostics'
 
 require_pattern \
   "macOS Keychain adapter uses shared data-store policy" \
@@ -4947,15 +4957,60 @@ require_patterns \
   'ProviderAccessRequirementTests\.testProviderAPIKeyStorageDiagnosticsPreserveMacOSSuccessLogCopy'
 
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/ProviderAPIKeyStorageTests.swift
+reject_file VoiceInkCore/Sources/VoiceInkCore/KeychainQuery.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/KeychainQueryTests.swift
 
 reject_swift_pattern \
   "core tests avoid obsolete provider API-key storage test suite references" \
   '\bProviderAPIKeyStorageTests\b' \
   VoiceInkCore/Tests/VoiceInkCoreTests
 
+reject_swift_pattern \
+  "core tests avoid stale KeychainQueryTests suite" \
+  '\bKeychainQueryTests\b' \
+  VoiceInkCore/Tests/VoiceInkCoreTests
+
+reject_pattern \
+  "core package/project metadata and runner avoid obsolete Keychain query files/tests" \
+  'KeychainQuery(Tests)?\.swift|KeychainQueryTests' \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_patterns \
+  "provider access tests own folded Keychain query and value-store coverage" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/ProviderAccessRequirementTests.swift \
+  'func testBaseQueryPreservesSharedAppServiceAndAccount' \
+  'func testBaseQueryCanDisableSyncableForMacOSCallers' \
+  'func testAddQueryAddsValueData' \
+  'func testCopyDataQueryRequestsOneDataResult' \
+  'func testDeleteQueryUsesBaseLookupShape' \
+  'func testExistsQuerySuppressesDataReturn' \
+  'func testLoadResultReportsSuccessStatus' \
+  'func testStringLoadResultDecodesUTF8Values' \
+  'func testStringLoadResultRejectsInvalidUTF8DataButKeepsStatus' \
+  'func testValueStoreStringEncodingAndDeleteStatusPolicy' \
+  'func testKeychainDiagnosticsPreserveMacOSAdapterLogCopy'
+
+require_voiceink_core_check_runner_invocations \
+  "core checks execute folded Keychain query and value-store tests" \
+  ProviderAccessRequirementTests \
+  testBaseQueryPreservesSharedAppServiceAndAccount \
+  testBaseQueryCanDisableSyncableForMacOSCallers \
+  testAddQueryAddsValueData \
+  testCopyDataQueryRequestsOneDataResult \
+  testDeleteQueryUsesBaseLookupShape \
+  testExistsQuerySuppressesDataReturn \
+  testLoadResultReportsSuccessStatus \
+  testStringLoadResultDecodesUTF8Values \
+  testStringLoadResultRejectsInvalidUTF8DataButKeepsStatus \
+  testValueStoreStringEncodingAndDeleteStatusPolicy \
+  testKeychainDiagnosticsPreserveMacOSAdapterLogCopy
+
 require_pattern \
   "core checks execute Keychain diagnostics test" \
-  'KeychainQueryTests\.testKeychainDiagnosticsPreserveMacOSAdapterLogCopy' \
+  'ProviderAccessRequirementTests\.testKeychainDiagnosticsPreserveMacOSAdapterLogCopy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_pattern \
@@ -20826,7 +20881,7 @@ reject_pattern \
 require_pattern \
   "shared Keychain service uses shared app identity" \
   'service = VoiceInkAppIdentity\.bundleIdentifier' \
-  VoiceInkCore/Sources/VoiceInkCore/KeychainQuery.swift
+  VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift
 
 require_pattern \
   "macOS dictionary CloudKit uses shared app identity container" \
@@ -21343,7 +21398,7 @@ reject_pattern \
 reject_pattern \
   "storage, Keychain, and platform shell paths avoid duplicate bundle identifier literals" \
   '"com\.prakashjoshipax\.VoiceInk"|appendingPathComponent\("com\.prakashjoshipax\.VoiceInk|iCloud\.com\.prakashjoshipax\.VoiceInk' \
-  VoiceInkCore/Sources/VoiceInkCore/KeychainQuery.swift \
+  VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift \
   VoiceInk/VoiceInk.swift \
   VoiceInk/Transcription/Engine/VoiceInkEngine.swift \
   VoiceInk/Services/AudioFileTranscriptionService.swift \

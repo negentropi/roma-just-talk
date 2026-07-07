@@ -9663,11 +9663,14 @@ reject_context_pattern \
 
 require_patterns \
   "settings backup tests cover folded general settings backup policy behavior" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/UserDefaultsPreferencesTests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/UserDefaultsSettingsBackupPolicyTests.swift \
+  '^import VoiceInkCore$' \
   'final class UserDefaultsSettingsBackupPolicyTests' \
   'testGeneralSettingsBackupPayloadPreservesWireShapeAndGroupedPreferences' \
   'testBackupPreferencesPreserveGroupedExportShape' \
   'testImportPlansApplySharedSubPolicies' \
+  'testSettingsBackupFileCodecRoundTripsGeneralSettingsPublicSurface' \
+  'testImportPlansPublicSurfaceAppliesRuntimeStateWithoutRollingBufferImport' \
   'testApplyCorePreferenceImportPlansWritesPortablePreferences' \
   'testApplyCorePreferenceImportPlansIgnoresMissingFields'
 
@@ -9680,16 +9683,20 @@ require_patterns \
   'UserDefaultsSettingsBackupPolicyTests\(\)\.testBackupPreferencesPreserveGroupedExportShape\(\)' \
   'name: "UserDefaultsSettingsBackupPolicyTests\.testImportPlansApplySharedSubPolicies"' \
   'UserDefaultsSettingsBackupPolicyTests\(\)\.testImportPlansApplySharedSubPolicies\(\)' \
+  'name: "UserDefaultsSettingsBackupPolicyTests\.testSettingsBackupFileCodecRoundTripsGeneralSettingsPublicSurface"' \
+  'UserDefaultsSettingsBackupPolicyTests\(\)\.testSettingsBackupFileCodecRoundTripsGeneralSettingsPublicSurface\(\)' \
+  'name: "UserDefaultsSettingsBackupPolicyTests\.testImportPlansPublicSurfaceAppliesRuntimeStateWithoutRollingBufferImport"' \
+  'UserDefaultsSettingsBackupPolicyTests\(\)\.testImportPlansPublicSurfaceAppliesRuntimeStateWithoutRollingBufferImport\(\)' \
   'name: "UserDefaultsSettingsBackupPolicyTests\.testApplyCorePreferenceImportPlansWritesPortablePreferences"' \
   'UserDefaultsSettingsBackupPolicyTests\(\)\.testApplyCorePreferenceImportPlansWritesPortablePreferences\(\)' \
   'name: "UserDefaultsSettingsBackupPolicyTests\.testApplyCorePreferenceImportPlansIgnoresMissingFields"' \
   'UserDefaultsSettingsBackupPolicyTests\(\)\.testApplyCorePreferenceImportPlansIgnoresMissingFields\(\)'
 
 require_patterns \
-  "settings backup public API proof uses normal VoiceInkCore import" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/SettingsBackupPolicyPublicAPITests.swift \
+  "settings backup public API proof is folded into normal VoiceInkCore import suite" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/UserDefaultsSettingsBackupPolicyTests.swift \
   '^import VoiceInkCore$' \
-  'final class SettingsBackupPolicyPublicAPITests' \
+  'final class UserDefaultsSettingsBackupPolicyTests' \
   'VoiceInkSettingsBackupCategory' \
   'VoiceInkSettingsBackupImportPolicy' \
   'VoiceInkSettingsBackupVersionReview' \
@@ -9706,15 +9713,20 @@ require_patterns \
   'VoiceInkGeneralSettingsBackupPolicy' \
   'VoiceInkSettingsBackupPresentation'
 
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/SettingsBackupPolicyPublicAPITests.swift
+
 reject_pattern \
   "settings backup public API proof avoids testable import" \
   '@testable import VoiceInkCore' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/SettingsBackupPolicyPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/UserDefaultsSettingsBackupPolicyTests.swift
 
-require_pattern \
-  "core checks execute settings backup public API proof" \
-  'SettingsBackupPolicyPublicAPITests\.testMovedSettingsBackupPolicySymbolsExposePublicAPI' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+reject_pattern \
+  "core checks avoid deleted settings backup public API proof suite" \
+  'SettingsBackupPolicyPublicAPITests|testMovedSettingsBackupPolicySymbolsExposePublicAPI' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
 
 reject_pattern \
   "folded settings backup tests avoid deleted suite name" \

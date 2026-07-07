@@ -18451,11 +18451,13 @@ require_patterns \
   "shared app data reset plan lives with stored-audio file lifecycle" \
   VoiceInkCore/Sources/VoiceInkCore/StoredAudioFile.swift \
   '^[[:space:]]*public static var temporaryDirectory:' \
-  '^[[:space:]]*public enum VoiceInkAppDataResetStep:' \
+  '^[[:space:]]*(private|fileprivate) enum VoiceInkAppDataResetStep:' \
   '^[[:space:]]*case deleteTranscriptionRecords' \
   '^[[:space:]]*case cleanFiles\(VoiceInkAppDataResetFilePlan\)' \
   '^[[:space:]]*case resetAppSettings' \
   '^[[:space:]]*public struct VoiceInkAppDataResetPlan:' \
+  '^[[:space:]]*private let steps: \[VoiceInkAppDataResetStep\]' \
+  '^[[:space:]]*private init\(steps: \[VoiceInkAppDataResetStep\]\)' \
   '^[[:space:]]*public static func iOS\(' \
   '^[[:space:]]*public static func iOS\(\) -> Self' \
   'VoiceInkIOSStorageDirectories\.temporaryDirectory' \
@@ -18464,6 +18466,11 @@ require_patterns \
   '^[[:space:]]*public func performBestEffort\(' \
   '^[[:space:]]*public enum VoiceInkAppDataResetDiagnostics' \
   'swiftDataResetFailedMessage'
+
+reject_pattern \
+  "shared app data reset plan avoids public raw step API" \
+  'public enum VoiceInkAppDataResetStep|public let steps: \[VoiceInkAppDataResetStep\]|public init\(steps:' \
+  VoiceInkCore/Sources/VoiceInkCore/StoredAudioFile.swift
 
 require_patterns \
   "core checks execute iOS app data reset tests" \
@@ -18483,6 +18490,11 @@ reject_pattern \
   "core checks avoid obsolete app data reset suite references" \
   'AppDataResetTests' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "core app data reset tests avoid raw reset step assertions" \
+  'VoiceInkAppDataResetStep|\.steps\b|\.(deleteTranscriptionRecords|cleanFiles|resetAppSettings)' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/StoredAudioFileTests.swift
 
 require_pattern \
   "shared current-model preference remembers legacy macOS model key" \
@@ -19014,7 +19026,7 @@ reject_pattern \
 
 reject_pattern \
   "iOS app settings reset avoids shell-only file reset sequence" \
-  'VoiceInkAppDataResetFilePlan\.iOS|for step in resetPlan\.steps|applyResetStep|VoiceInkAppDataResetStep|let +recordingsDir|let +modelsDir|let +cachesURL|let +tmpPath|contentsOfDirectory|removeItem\(atPath:' \
+  'VoiceInkAppDataResetFilePlan\.iOS|for step in resetPlan\.steps|resetPlan\.steps|VoiceInkAppDataResetPlan\(steps:|applyResetStep|VoiceInkAppDataResetStep|let +recordingsDir|let +modelsDir|let +cachesURL|let +tmpPath|contentsOfDirectory|removeItem\(atPath:' \
   iOS/VoiceInk-ios/SettingsView.swift
 
 reject_pattern \

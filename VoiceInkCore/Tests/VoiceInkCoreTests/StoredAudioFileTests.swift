@@ -99,16 +99,16 @@ final class StoredAudioFileTests: XCTestCase {
         )
 
         XCTAssertEqual(
-            VoiceInkAppDataResetPlan.iOS(
+            appDataResetRuntimeEvents(for: VoiceInkAppDataResetPlan.iOS(
                 recordingsDirectory: recordingsDirectory,
                 modelsDirectory: modelsDirectory,
                 cachesDirectory: cachesDirectory,
                 temporaryDirectory: temporaryDirectory
-            ).steps,
+            )),
             [
-                .deleteTranscriptionRecords,
-                .cleanFiles(filePlan),
-                .resetAppSettings
+                "deleteTranscriptionRecords",
+                cleanFilesEvent(for: filePlan),
+                "resetAppSettings"
             ]
         )
 
@@ -120,11 +120,11 @@ final class StoredAudioFileTests: XCTestCase {
         )
 
         XCTAssertEqual(
-            VoiceInkAppDataResetPlan.iOS().steps,
+            appDataResetRuntimeEvents(for: VoiceInkAppDataResetPlan.iOS()),
             [
-                .deleteTranscriptionRecords,
-                .cleanFiles(defaultFilePlan),
-                .resetAppSettings
+                "deleteTranscriptionRecords",
+                cleanFilesEvent(for: defaultFilePlan),
+                "resetAppSettings"
             ]
         )
         XCTAssertEqual(
@@ -166,6 +166,30 @@ final class StoredAudioFileTests: XCTestCase {
             "cleanFiles:recordings,models",
             "resetAppSettings"
         ])
+    }
+
+    private func appDataResetRuntimeEvents(for plan: VoiceInkAppDataResetPlan) -> [String] {
+        var events: [String] = []
+
+        plan.applyRuntimeState(
+            deleteTranscriptionRecords: {
+                events.append("deleteTranscriptionRecords")
+            },
+            cleanFiles: { filePlan in
+                events.append(cleanFilesEvent(for: filePlan))
+            },
+            resetAppSettings: {
+                events.append("resetAppSettings")
+            }
+        )
+
+        return events
+    }
+
+    private func cleanFilesEvent(for filePlan: VoiceInkAppDataResetFilePlan) -> String {
+        let removed = filePlan.directoriesToRemove.map(\.lastPathComponent).joined(separator: ",")
+        let emptied = filePlan.directoriesToEmpty.map(\.lastPathComponent).joined(separator: ",")
+        return "cleanFiles:\(removed):\(emptied)"
     }
 
     func testIOSResetFilePlanPreservesExistingDirectoryPolicy() {

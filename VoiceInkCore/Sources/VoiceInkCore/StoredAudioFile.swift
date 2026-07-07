@@ -534,16 +534,16 @@ public enum VoiceInkMacOSStorageDirectories {
     }
 }
 
-public enum VoiceInkAppDataResetStep: Equatable, Sendable {
+fileprivate enum VoiceInkAppDataResetStep: Equatable, Sendable {
     case deleteTranscriptionRecords
     case cleanFiles(VoiceInkAppDataResetFilePlan)
     case resetAppSettings
 }
 
 public struct VoiceInkAppDataResetPlan: Equatable, Sendable {
-    public let steps: [VoiceInkAppDataResetStep]
+    private let steps: [VoiceInkAppDataResetStep]
 
-    public init(steps: [VoiceInkAppDataResetStep]) {
+    private init(steps: [VoiceInkAppDataResetStep]) {
         self.steps = steps
     }
 

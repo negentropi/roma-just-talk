@@ -177,6 +177,56 @@ build_voiceink_core_library() {
     VoiceInkCore/Sources/VoiceInkCore/*.swift
 }
 
+voiceink_core_public_import_tests=(
+  VoiceInkCore/Tests/VoiceInkCoreTests/PastePreferencesTests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/PowerModePolicyTests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/LocalWhisperTranscriptionFlowTests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/AudioPlaybackTimelineTests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/AppIdentityTests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/StoredAudioFileTests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/UserDefaultsSettingsBackupPolicyTests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunPreparationTests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RecordingFeedbackPreferenceTests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionModelCatalogTests.swift
+)
+
+voiceink_core_public_import_proofs=(
+  "${voiceink_core_public_import_tests[@]}"
+  VoiceInkCore/Sources/VoiceInkAudioProof/main.swift
+)
+
+build_voiceink_core_public_module() {
+  local build_dir="$1"
+
+  xcrun swiftc -emit-module \
+    -module-name VoiceInkCore \
+    -emit-module-path "$build_dir/VoiceInkCore.swiftmodule" \
+    VoiceInkCore/Sources/VoiceInkCore/*.swift
+}
+
+run_voiceink_core_public_import_proofs() {
+  local build_dir
+  build_dir="$(mktemp -d "${TMPDIR:-/tmp}/voiceink-core-public-import.XXXXXX")"
+  local rc=0
+
+  build_voiceink_core_public_module "$build_dir" || rc=$?
+  if (( rc == 0 )); then
+    xcrun swiftc -typecheck \
+      -I "$build_dir" \
+      VoiceInkCore/Tests/VoiceInkCoreTests/TestSupport.swift \
+      "${voiceink_core_public_import_tests[@]}" || rc=$?
+  fi
+  if (( rc == 0 )); then
+    xcrun swiftc -typecheck -parse-as-library \
+      -I "$build_dir" \
+      VoiceInkCore/Sources/VoiceInkAudioProof/main.swift || rc=$?
+  fi
+
+  rm -rf "$build_dir"
+  return "$rc"
+}
+
 run_direct_voiceink_core_checks() {
   local build_dir
   build_dir="$(mktemp -d "${TMPDIR:-/tmp}/voiceink-core-checks.XXXXXX")"
@@ -24151,6 +24201,15 @@ run_required "VoiceInkCore sources typecheck" xcrun swiftc -emit-module \
   VoiceInkCore/Sources/VoiceInkCore/*.swift
 
 run_required "VoiceInkCore tests typecheck" xcrun swiftc -typecheck -I /tmp VoiceInkCore/Tests/VoiceInkCoreTests/*.swift
+require_pattern \
+  "VoiceInkCore public import proofs use normal imports" \
+  '^import VoiceInkCore$' \
+  "${voiceink_core_public_import_proofs[@]}"
+reject_pattern \
+  "VoiceInkCore public import proofs avoid testable imports" \
+  '@testable import VoiceInkCore' \
+  "${voiceink_core_public_import_proofs[@]}"
+run_required "VoiceInkCore public import proofs" run_voiceink_core_public_import_proofs
 
 require_voiceink_core_check_runner_complete
 run_required "VoiceInkCoreChecks" run_voiceink_core_checks

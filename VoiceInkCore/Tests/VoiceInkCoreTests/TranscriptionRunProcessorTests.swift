@@ -1,7 +1,15 @@
 import Foundation
+import NaturalLanguage
 @testable import VoiceInkCore
 
 final class TranscriptionRunProcessorTests: XCTestCase {
+    func testWordCounterCountsWordsWithExplicitLanguageAcrossPunctuation() {
+        XCTAssertEqual(
+            VoiceInkWordCounter.count(in: "Yes, Roma works.", language: .english),
+            3
+        )
+    }
+
     func testAIEnhancementResultCarriesMacOSPostProcessingMetadata() {
         let result = VoiceInkAIEnhancementResult(
             text: "enhanced",

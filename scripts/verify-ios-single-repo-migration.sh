@@ -12452,9 +12452,9 @@ require_patterns \
 
 require_patterns \
   "public API tests cover folded transcription run preparation surface" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunPreparationPublicAPITests.swift \
-  'import VoiceInkCore' \
-  'final class TranscriptionRunPreparationPublicAPITests' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunPreparationTests.swift \
+  '^import VoiceInkCore$' \
+  'final class TranscriptionRunPreparationTests' \
   'VoiceInkPostProcessingSkipConfiguration' \
   'VoiceInkPostProcessingSkipPolicy\.shouldSkipPostProcessing' \
   'VoiceInkWordCounter\.count' \
@@ -12464,9 +12464,20 @@ require_patterns \
   'VoiceInkTranscriptionEnhancementRequest'
 
 reject_pattern \
-  "public API test avoids testable import" \
+  "folded transcription run preparation public API proof avoids testable import" \
   '@testable import VoiceInkCore' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunPreparationPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunPreparationTests.swift
+
+section "obsolete standalone transcription run preparation public API proof stays deleted"
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunPreparationPublicAPITests.swift
+
+reject_pattern \
+  "VoiceInkCore metadata and runner avoid stale standalone transcription run preparation public API proof" \
+  'TranscriptionRunPreparationPublicAPITests' \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "core check runner executes Power Mode transcription metadata selection test" \
@@ -12509,8 +12520,8 @@ require_patterns \
 require_patterns \
   "core check runner executes folded transcription run public API proof" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'TranscriptionRunPreparationPublicAPITests\.testMovedTranscriptionRunPreparationSymbolsExposePublicAPI' \
-  'TranscriptionRunPreparationPublicAPITests\(\)\.testMovedTranscriptionRunPreparationSymbolsExposePublicAPI\(\)'
+  'TranscriptionRunPreparationTests\.testMovedTranscriptionRunPreparationSymbolsExposePublicAPI' \
+  'TranscriptionRunPreparationTests\(\)\.testMovedTranscriptionRunPreparationSymbolsExposePublicAPI\(\)'
 
 reject_pattern \
   "macOS transcription callers avoid shell-only Power Mode metadata selection" \
@@ -21079,10 +21090,16 @@ require_patterns \
   'testWordCounterCountsNaturalLanguageWords' \
   'testWordCounterIgnoresWhitespaceOnlyText' \
   'testWordCounterCountsWordsAcrossPunctuation' \
-  'testWordCounterCountsWordsWithExplicitLanguageAcrossPunctuation' \
   'VoiceInkWordCounter\.count\(in: "quick release wins"\)' \
   'VoiceInkWordCounter\.count\(in: " \\n\\t "\)' \
-  'VoiceInkWordCounter\.count\(in: "Yes, Roma works\."\)' \
+  'VoiceInkWordCounter\.count\(in: "Yes, Roma works\."\)'
+
+require_patterns \
+  "internal explicit-language word-counter test lives with transcription run processor tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunProcessorTests.swift \
+  '^import NaturalLanguage$' \
+  '@testable import VoiceInkCore' \
+  'testWordCounterCountsWordsWithExplicitLanguageAcrossPunctuation' \
   'VoiceInkWordCounter\.count\(in: "Yes, Roma works\.", language: \.english\)'
 
 require_patterns \
@@ -21093,9 +21110,13 @@ require_patterns \
   'TranscriptionRunPreparationTests\.testWordCounterIgnoresWhitespaceOnlyText' \
   'TranscriptionRunPreparationTests\(\)\.testWordCounterIgnoresWhitespaceOnlyText\(\)' \
   'TranscriptionRunPreparationTests\.testWordCounterCountsWordsAcrossPunctuation' \
-  'TranscriptionRunPreparationTests\(\)\.testWordCounterCountsWordsAcrossPunctuation\(\)' \
-  'TranscriptionRunPreparationTests\.testWordCounterCountsWordsWithExplicitLanguageAcrossPunctuation' \
-  'TranscriptionRunPreparationTests\(\)\.testWordCounterCountsWordsWithExplicitLanguageAcrossPunctuation\(\)'
+  'TranscriptionRunPreparationTests\(\)\.testWordCounterCountsWordsAcrossPunctuation\(\)'
+
+require_patterns \
+  "core checks execute explicit-language word-counter test through transcription run processor suite" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'TranscriptionRunProcessorTests\.testWordCounterCountsWordsWithExplicitLanguageAcrossPunctuation' \
+  'TranscriptionRunProcessorTests\(\)\.testWordCounterCountsWordsWithExplicitLanguageAcrossPunctuation\(\)'
 
 require_patterns \
   "shared session metric migration preference lives in VoiceInkCore" \

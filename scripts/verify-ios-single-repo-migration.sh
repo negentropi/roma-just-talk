@@ -12681,18 +12681,46 @@ require_voiceink_core_check_runner_invocations \
   testTransportNetworkErrorRejectsNonRetryableFoundationErrors
 
 require_pattern \
-  "AI enhancement retry public API tests exercise normal VoiceInkCore import" \
+  "AI enhancement retry folded public API proof uses normal VoiceInkCore import" \
   '^import VoiceInkCore$' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/AIEnhancementRetryPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/AIPromptPublicAPITests.swift
 
 reject_pattern \
-  "AI enhancement retry public API tests avoid testable import" \
+  "AI enhancement retry folded public API proof avoids testable import" \
   '@testable import VoiceInkCore' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/AIEnhancementRetryPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/AIPromptPublicAPITests.swift
+
+require_patterns \
+  "AI enhancement retry folded public API proof preserves moved symbols" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AIPromptPublicAPITests.swift \
+  'func testMovedAIEnhancementRetrySymbolsExposePublicAPI\(\) async throws' \
+  'VoiceInkAIEnhancementError\.transportFailure\(\.missingAPIKey\)' \
+  'VoiceInkAIEnhancementError\.localCLIExecutionFailure' \
+  'VoiceInkLocalCLIExecutionError\.timeout\(seconds: 45\.9\)' \
+  'VoiceInkOllamaEnhancementFailure\.transportFailure\(\.httpStatus\(404\)\)' \
+  'VoiceInkOllamaServiceDiagnostics\.modelFetchFailedMessage' \
+  'VoiceInkAIEnhancementRetryState\(maxAttempts: 2\)' \
+  'recordNonEnhancementError' \
+  'VoiceInkAIEnhancementRetryDecision' \
+  'applyRuntimeState' \
+  'VoiceInkAIEnhancementRateLimitPolicy\(minimumInterval: 1\)' \
+  'VoiceInkAIEnhancementRetryProgressPresentation\.diagnosticMessage' \
+  'VoiceInkAIEnhancementRetryFailurePresentation\.diagnosticMessage'
+
+section "obsolete standalone AI enhancement retry public API proof stays deleted"
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/AIEnhancementRetryPublicAPITests.swift
+
+reject_pattern \
+  "VoiceInkCore metadata and runner avoid stale standalone AI enhancement retry public API proof" \
+  'AIEnhancementRetryPublicAPITests(\.swift)?' \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_voiceink_core_check_runner_invocations \
-  "core check runner executes AI enhancement retry public API proof" \
-  AIEnhancementRetryPublicAPITests \
+  "core check runner executes folded AI enhancement retry public API proof" \
+  AIPromptPublicAPITests \
   testMovedAIEnhancementRetrySymbolsExposePublicAPI
 
 require_pattern \

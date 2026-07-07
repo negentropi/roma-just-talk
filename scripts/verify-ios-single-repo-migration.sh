@@ -12280,9 +12280,9 @@ require_patterns \
 
 require_patterns \
   "AI prompt public API proof uses normal VoiceInkCore import" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/AIPromptPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunPreparationTests.swift \
   '^import VoiceInkCore$' \
-  'final class AIPromptPublicAPITests' \
+  'final class TranscriptionRunPreparationTests' \
   'VoiceInkAIPrompts\.customPromptTemplate' \
   'VoiceInkAIPrompts\.finalPromptText' \
   'VoiceInkAIRequestPrompts\.postProcessingSystemPrompt' \
@@ -12301,11 +12301,11 @@ require_patterns \
 reject_pattern \
   "AI prompt public API proof avoids testable import" \
   '@testable import VoiceInkCore' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/AIPromptPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunPreparationTests.swift
 
 require_voiceink_core_check_runner_invocations \
   "core checks execute AI prompt public API proof" \
-  AIPromptPublicAPITests \
+  TranscriptionRunPreparationTests \
   testMovedAIPromptSymbolsExposePublicAPI
 
 require_pattern \
@@ -12697,16 +12697,16 @@ require_voiceink_core_check_runner_invocations \
 require_pattern \
   "AI enhancement retry folded public API proof uses normal VoiceInkCore import" \
   '^import VoiceInkCore$' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/AIPromptPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunPreparationTests.swift
 
 reject_pattern \
   "AI enhancement retry folded public API proof avoids testable import" \
   '@testable import VoiceInkCore' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/AIPromptPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunPreparationTests.swift
 
 require_patterns \
   "AI enhancement retry folded public API proof preserves moved symbols" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/AIPromptPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunPreparationTests.swift \
   'func testMovedAIEnhancementRetrySymbolsExposePublicAPI\(\) async throws' \
   'VoiceInkAIEnhancementError\.transportFailure\(\.missingAPIKey\)' \
   'VoiceInkAIEnhancementError\.localCLIExecutionFailure' \
@@ -12734,8 +12734,19 @@ reject_pattern \
 
 require_voiceink_core_check_runner_invocations \
   "core check runner executes folded AI enhancement retry public API proof" \
-  AIPromptPublicAPITests \
+  TranscriptionRunPreparationTests \
   testMovedAIEnhancementRetrySymbolsExposePublicAPI
+
+section "obsolete standalone AI prompt public API proof stays deleted"
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/AIPromptPublicAPITests.swift
+
+reject_pattern \
+  "VoiceInkCore metadata and runner avoid stale standalone AI prompt public API proof" \
+  'AIPromptPublicAPITests(\.swift)?' \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "macOS AI enhancement service adapts LLMKit transport failures through shared policy" \

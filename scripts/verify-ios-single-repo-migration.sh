@@ -8510,8 +8510,9 @@ reject_swift_static_function_body_pattern \
 
 require_patterns \
   "Soniox public API proof uses normal VoiceInkCore import" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/SonioxPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
   '^import VoiceInkCore$' \
+  'final class RemoteProviderPublicAPITests' \
   'VoiceInkSonioxRequestBuilder\.makeUploadFileRequest' \
   'VoiceInkPreparedSonioxUploadRequest' \
   'VoiceInkSonioxRequestBuilder\.makeCreateTranscriptionRequest' \
@@ -8543,22 +8544,33 @@ require_patterns \
 reject_pattern \
   "Soniox public API proof avoids conditional compilation snippets" \
   '^[[:space:]]*#(if|elseif|else|endif)\b' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/SonioxPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
 
 require_swift_static_function_body_pattern \
   "Soniox public API proof keeps defaulted transcribe call short" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/SonioxPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
   testSonioxRequestClientAndCodecExposePublicAPI \
   'let\s+transcribeWithDefaultedLabels\s*=\s*\{\s*try\s+await\s+client\.transcribeAudioData\s*\((?:(?!\b(?:fileName|language|customVocabulary|maxWaitSeconds|timeout|errorDomain)\s*:).)*\bbaseURL\s*:(?:(?!\b(?:fileName|language|customVocabulary|maxWaitSeconds|timeout|errorDomain)\s*:).)*\bapiKey\s*:(?:(?!\b(?:fileName|language|customVocabulary|maxWaitSeconds|timeout|errorDomain)\s*:).)*\bmodel\s*:(?:(?!\b(?:fileName|language|customVocabulary|maxWaitSeconds|timeout|errorDomain)\s*:).)*\baudioData\s*:(?:(?!\b(?:fileName|language|customVocabulary|maxWaitSeconds|timeout|errorDomain)\s*:).)*\)\s*\}'
 
 reject_pattern \
   "Soniox public API proof avoids testable import" \
   '@testable import VoiceInkCore' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/SonioxPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
+
+section "obsolete standalone Soniox public API proof stays deleted"
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/SonioxPublicAPITests.swift
+
+reject_pattern \
+  "VoiceInkCore metadata and runner avoid stale standalone Soniox public API proof" \
+  'SonioxPublicAPITests' \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_voiceink_core_check_runner_invocations \
   "core checks execute Soniox public API proof" \
-  SonioxPublicAPITests \
+  RemoteProviderPublicAPITests \
   testSonioxRequestClientAndCodecExposePublicAPI
 
 require_voiceink_core_check_runner_invocations \
@@ -8602,8 +8614,9 @@ require_patterns \
 
 require_patterns \
   "Speechmatics public API proof uses normal VoiceInkCore import" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/SpeechmaticsPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
   '^import VoiceInkCore$' \
+  'final class RemoteProviderPublicAPITests' \
   'VoiceInkSpeechmaticsRequestBuilder\.makeSubmitJobRequest' \
   'VoiceInkPreparedSpeechmaticsUploadRequest' \
   'VoiceInkSpeechmaticsRequestBuilder\.makeJobStatusRequest' \
@@ -8635,22 +8648,33 @@ require_patterns \
 reject_pattern \
   "Speechmatics public API proof avoids conditional compilation snippets" \
   '^[[:space:]]*#(if|elseif|else|endif)\b' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/SpeechmaticsPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
 
 require_swift_static_function_body_pattern \
   "Speechmatics public API proof keeps defaulted transcribe call short" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/SpeechmaticsPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
   testSpeechmaticsRequestClientAndCodecExposePublicAPI \
   'let\s+transcribeWithDefaultedLabels\s*=\s*\{\s*try\s+await\s+client\.transcribeAudioData\s*\((?:(?!\b(?:fileName|language|operatingPoint|customVocabulary|maxWaitSeconds|timeout|maxRetries|errorDomain)\s*:).)*\bbaseURL\s*:(?:(?!\b(?:fileName|language|operatingPoint|customVocabulary|maxWaitSeconds|timeout|maxRetries|errorDomain)\s*:).)*\bapiKey\s*:(?:(?!\b(?:fileName|language|operatingPoint|customVocabulary|maxWaitSeconds|timeout|maxRetries|errorDomain)\s*:).)*\baudioData\s*:(?:(?!\b(?:fileName|language|operatingPoint|customVocabulary|maxWaitSeconds|timeout|maxRetries|errorDomain)\s*:).)*\)\s*\}'
 
 reject_pattern \
   "Speechmatics public API proof avoids testable import" \
   '@testable import VoiceInkCore' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/SpeechmaticsPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
+
+section "obsolete standalone Speechmatics public API proof stays deleted"
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/SpeechmaticsPublicAPITests.swift
+
+reject_pattern \
+  "VoiceInkCore metadata and runner avoid stale standalone Speechmatics public API proof" \
+  'SpeechmaticsPublicAPITests' \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_voiceink_core_check_runner_invocations \
   "core checks execute Speechmatics public API proof" \
-  SpeechmaticsPublicAPITests \
+  RemoteProviderPublicAPITests \
   testSpeechmaticsRequestClientAndCodecExposePublicAPI
 
 require_voiceink_core_check_runner_invocations \

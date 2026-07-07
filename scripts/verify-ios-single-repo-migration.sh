@@ -326,15 +326,19 @@ use warnings;
 
 my $runner_path = 'VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift';
 open my $runner_fh, '<', $runner_path or die "Unable to read $runner_path: $!\n";
+my $runner_source = do { local $/; <$runner_fh> };
+$runner_source =~ s{/\*.*?\*/}{}gs;
 
 my %runner_tests;
 my %duplicate_runner_tests;
 my %mismatched_runner_tests;
 my @unparsed_runner_lines;
-while (my $line = <$runner_fh>) {
+my $runner_line_number = 0;
+for my $line (split /\n/, $runner_source) {
+    $runner_line_number++;
     next unless $line =~ /^\s*VoiceInkCoreCheck\s*\(/;
     if ($line !~ /^\s*VoiceInkCoreCheck\s*\(\s*name:\s*"([A-Za-z0-9_]+)\.(test[A-Za-z0-9_]+)"\s*,\s*run:\s*\{\s*(?:try\s+)?(?:await\s+)?([A-Za-z0-9_]+)\(\)\.(test[A-Za-z0-9_]+)\(\)\s*\}\s*\),/) {
-        push @unparsed_runner_lines, $.;
+        push @unparsed_runner_lines, $runner_line_number;
         next;
     }
 

@@ -9485,7 +9485,7 @@ require_pattern \
 require_pattern \
   "shared recording feedback import plan applies runtime state" \
   'setSoundFeedbackEnabled|disablePauseMediaForExperimentalImport' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 reject_pattern \
   "shared general settings import plan raw payload stays hidden" \
@@ -9508,7 +9508,7 @@ reject_context_pattern \
   "shared recording feedback import plan raw payload stays hidden" \
   'struct VoiceInkRecordingFeedbackBackupImportPlan' \
   'public let +(isSoundFeedbackEnabled|systemMuteMode|isPauseMediaEnabled|audioResumptionDelay|isExperimentalFeaturesEnabled)' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 reject_pattern \
   "macOS general backup avoids shell-owned wire payload implementation" \
@@ -15343,38 +15343,45 @@ require_pattern \
   'macOS paste method and clipboard restore settings route through `VoiceInkPasteMethod`/`VoiceInkPastePreference`/`VoiceInkPasteDiagnostics`, including stored selection repair, paste diagnostics, settings labels/options/help, and backup import/export plans' \
   docs/ios-single-repo-migration.md
 
-require_file \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+section "obsolete standalone recording feedback preferences module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+
+reject_pattern \
+  "VoiceInkCore metadata avoids stale standalone recording feedback preferences file" \
+  'RecordingFeedbackPreferences\.swift' \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
 
 require_pattern \
   "shared recording feedback preference owns system mute mode raw values" \
   'enum VoiceInkSystemMuteMode: String, CaseIterable, Identifiable' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared recording feedback preference owns display labels" \
   'public var displayName' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared macOS recording feedback settings presentation lives in VoiceInkCore" \
   'VoiceInkMacOSRecordingFeedbackSettingsPresentation|VoiceInkRecordingFeedbackDelayOption|macOSSettingsPresentation|audioResumptionDelayOptions|pauseMediaInfoMessage' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared recording feedback preference owns macOS storage keys" \
   'systemMuteModeKey = "systemMuteMode"|isPauseMediaEnabledKey = "isPauseMediaEnabled"|isSoundFeedbackEnabledKey = "isSoundFeedbackEnabled"|experimentalFeaturesEnabledKey = "isExperimentalFeaturesEnabled"' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared recording feedback preference owns system mute schedule delay" \
   'defaultSystemMuteScheduleDelayNanoseconds' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared recording feedback preference owns pause-media command delay" \
   'defaultPauseMediaCommandDelayNanoseconds' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "macOS playback controller consumes shared pause-media command delay" \
@@ -15404,66 +15411,66 @@ reject_pattern \
 require_pattern \
   "shared recording feedback preference preserves legacy mute boolean compatibility" \
   'legacyIsSystemMuteEnabledKey = "isSystemMuteEnabled"|saveSystemMuteEnabled' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared recording feedback backup preferences live in VoiceInkCore" \
   'struct VoiceInkRecordingFeedbackBackupPreferences' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared recording feedback backup preferences carry experimental flag" \
   'isExperimentalFeaturesEnabled: Bool\?' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared recording feedback backup import plan lives in VoiceInkCore" \
   'struct VoiceInkRecordingFeedbackBackupImportPlan' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared recording feedback backup export policy lives in VoiceInkCore" \
   'static func backupPreferences' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared recording feedback backup import policy lives in VoiceInkCore" \
   'static func backupImportPlan' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared recording feedback backup import policy maps legacy mute boolean" \
   'systemMuteMode: preferences\.isSystemMuteEnabled\.map' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared recording feedback backup import policy handles experimental pause-media fallback" \
   'shouldDisablePauseMediaForExperimentalImport' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared recording feedback backup import policy reads experimental flag from preferences" \
   'preferences\.isExperimentalFeaturesEnabled' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared custom recording sound catalog lives in VoiceInkCore" \
   'enum VoiceInkBuiltInRecordingSound: String, CaseIterable, Identifiable|case sound1|case sound7|fileExtension|displayName' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared custom recording sound preference owns storage keys and defaults" \
   'enum VoiceInkCustomSoundType: String, CaseIterable|isUsingKey|filenameKey|builtInSoundKey|defaultBuiltInSound|recordingSoundCue|VoiceInkCustomSoundPreference|registeredDefaults|customSoundsRelativeDirectory|changedNotificationName' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared custom recording sound selection state owns menu and transition policy" \
   'VoiceInkCustomSoundSelectionState|menuSelection|usingExistingCustomSound|settingCustomFilename|resettingToDefault|selectionState' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_patterns \
   "shared custom recording sound settings presentation lives in VoiceInkCore" \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift \
   'VoiceInkCustomSoundMenuSelection' \
   'VoiceInkCustomSoundSettingsPresentation' \
   'label\(for type:' \
@@ -15477,27 +15484,37 @@ require_patterns \
 require_pattern \
   "shared custom recording sound validation and file-operation planning lives in VoiceInkCore" \
   'enum VoiceInkCustomSoundError: LocalizedError|durationTooLong|preflightValidationError|maxDuration|copiedFilename|customSoundURL|storedCustomSoundURL|VoiceInkCustomSoundCopyPlan|copyPlan|applyRuntimeState|Audio file is' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared custom sound copy runtime application lives in VoiceInkCore" \
   'removeExistingDestination|copyToDestination|fileCopyFailed' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 reject_pattern \
   "shared custom sound copy action payload stays hidden" \
   'public enum VoiceInkCustomSoundCopyAction|public let action: VoiceInkCustomSoundCopyAction|public init\([^)]*action: VoiceInkCustomSoundCopyAction' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared recording sound playback policy lives in VoiceInkCore" \
   'VoiceInkRecordingSoundCue|VoiceInkRecordingSoundPlayerSlot|VoiceInkRecordingSoundPlaybackPolicy|setupSlots|playbackSlots|volume' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared recording sound playback diagnostics live in VoiceInkCore" \
   'VoiceInkRecordingSoundPlaybackDiagnostics|loadFailedMessage|Failed to load sound:' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingFeedbackPreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+require_pattern \
+  "recording feedback preference tests exercise public VoiceInkCore API surface" \
+  '^import VoiceInkCore$' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RecordingFeedbackPreferenceTests.swift
+
+reject_pattern \
+  "recording feedback preference tests avoid testable import after source fold" \
+  '@testable import VoiceInkCore' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RecordingFeedbackPreferenceTests.swift
 
 require_pattern \
   "core checks cover custom sound URL and copy planning" \
@@ -15735,7 +15752,7 @@ reject_pattern \
 
 require_pattern \
   "migration checklist tracks shared recording feedback preference gate" \
-  'macOS recording feedback preferences route through `VoiceInkSystemMuteMode`/`VoiceInkRecordingFeedbackPreference`, including experimental-feature backup import/export, pause-media fallback.*VoiceInkCustomSoundPreference' \
+  'macOS recording feedback preferences route through `VoiceInkSystemMuteMode`/`VoiceInkRecordingFeedbackPreference`, colocated in `UserDefaultsPreferences\.swift`, including experimental-feature backup import/export, pause-media fallback.*VoiceInkCustomSoundPreference' \
   docs/ios-single-repo-migration.md
 
 require_pattern \

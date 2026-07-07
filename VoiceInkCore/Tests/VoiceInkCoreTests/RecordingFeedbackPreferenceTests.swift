@@ -1,5 +1,5 @@
 import Foundation
-@testable import VoiceInkCore
+import VoiceInkCore
 
 final class RecordingFeedbackPreferenceTests: XCTestCase {
     func testBuiltInRecordingSoundsPreserveCatalogNamesAndExtensions() {

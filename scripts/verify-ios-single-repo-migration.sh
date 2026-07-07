@@ -8105,8 +8105,9 @@ require_patterns \
 
 require_patterns \
   "Deepgram public API proof uses normal VoiceInkCore import" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/DeepgramPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
   '^import VoiceInkCore$' \
+  'final class RemoteProviderPublicAPITests' \
   'VoiceInkDeepgramRequestBuilder\.makeTranscriptionRequest' \
   'VoiceInkDeepgramRequestBuilder\.makeProjectsRequest' \
   'VoiceInkDeepgramTranscriptionClient\(\)' \
@@ -8133,22 +8134,33 @@ require_patterns \
 reject_pattern \
   "Deepgram public API proof avoids conditional compilation snippets" \
   '^[[:space:]]*#(if|elseif|else|endif)\b' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/DeepgramPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
 
 require_swift_static_function_body_pattern \
   "Deepgram public API proof keeps defaulted transcribe call short" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/DeepgramPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
   testDeepgramRequestClientAndCodecExposePublicAPI \
   'let\s+transcribeWithDefaultedLabels\s*=\s*\{\s*try\s+await\s+client\.transcribeAudioData\s*\((?:(?!\b(?:language|smartFormat|punctuate|paragraphs|diarize|customVocabulary|errorDomain|timeout)\s*:).)*\bbaseURL\s*:(?:(?!\b(?:language|smartFormat|punctuate|paragraphs|diarize|customVocabulary|errorDomain|timeout)\s*:).)*\bapiKey\s*:(?:(?!\b(?:language|smartFormat|punctuate|paragraphs|diarize|customVocabulary|errorDomain|timeout)\s*:).)*\bmodel\s*:(?:(?!\b(?:language|smartFormat|punctuate|paragraphs|diarize|customVocabulary|errorDomain|timeout)\s*:).)*\baudioData\s*:(?:(?!\b(?:language|smartFormat|punctuate|paragraphs|diarize|customVocabulary|errorDomain|timeout)\s*:).)*\)\s*\}'
 
 reject_pattern \
   "Deepgram public API proof avoids testable import" \
   '@testable import VoiceInkCore' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/DeepgramPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
+
+section "obsolete standalone Deepgram public API proof stays deleted"
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/DeepgramPublicAPITests.swift
+
+reject_pattern \
+  "VoiceInkCore metadata and runner avoid stale standalone Deepgram public API proof" \
+  'DeepgramPublicAPITests' \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_voiceink_core_check_runner_invocations \
   "core checks execute Deepgram public API proof" \
-  DeepgramPublicAPITests \
+  RemoteProviderPublicAPITests \
   testDeepgramRequestClientAndCodecExposePublicAPI
 
 require_voiceink_core_check_runner_invocations \
@@ -8358,8 +8370,9 @@ require_patterns \
 
 require_patterns \
   "ElevenLabs public API proof uses normal VoiceInkCore import" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/ElevenLabsPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
   '^import VoiceInkCore$' \
+  'final class RemoteProviderPublicAPITests' \
   'VoiceInkPreparedElevenLabsTranscriptionRequest' \
   'VoiceInkElevenLabsRequestBuilder\.makeTranscriptionRequest' \
   'VoiceInkElevenLabsRequestBuilder\.makeUserRequest' \
@@ -8384,22 +8397,33 @@ require_patterns \
 reject_pattern \
   "ElevenLabs public API proof avoids conditional compilation snippets" \
   '^[[:space:]]*#(if|elseif|else|endif)\b' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/ElevenLabsPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
 
 require_swift_static_function_body_pattern \
   "ElevenLabs public API proof keeps defaulted transcribe call short" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/ElevenLabsPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
   testElevenLabsRequestClientAndCodecExposePublicAPI \
   'let\s+transcribeWithDefaultedLabels\s*=\s*\{\s*try\s+await\s+client\.transcribeAudioData\s*\((?:(?!\b(?:fileName|language|errorDomain|timeout|maxRetries)\s*:).)*\bbaseURL\s*:(?:(?!\b(?:fileName|language|errorDomain|timeout|maxRetries)\s*:).)*\bapiKey\s*:(?:(?!\b(?:fileName|language|errorDomain|timeout|maxRetries)\s*:).)*\bmodel\s*:(?:(?!\b(?:fileName|language|errorDomain|timeout|maxRetries)\s*:).)*\baudioData\s*:(?:(?!\b(?:fileName|language|errorDomain|timeout|maxRetries)\s*:).)*\)\s*\}'
 
 reject_pattern \
   "ElevenLabs public API proof avoids testable import" \
   '@testable import VoiceInkCore' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/ElevenLabsPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
+
+section "obsolete standalone ElevenLabs public API proof stays deleted"
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/ElevenLabsPublicAPITests.swift
+
+reject_pattern \
+  "VoiceInkCore metadata and runner avoid stale standalone ElevenLabs public API proof" \
+  'ElevenLabsPublicAPITests' \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_voiceink_core_check_runner_invocations \
   "core checks execute ElevenLabs public API proof" \
-  ElevenLabsPublicAPITests \
+  RemoteProviderPublicAPITests \
   testElevenLabsRequestClientAndCodecExposePublicAPI
 
 require_voiceink_core_check_runner_invocations \

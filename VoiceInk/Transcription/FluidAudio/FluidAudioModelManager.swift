@@ -154,7 +154,7 @@ class FluidAudioModelManager: ObservableObject {
     }
 
     private func logDownloadProgressIfNeeded(_ status: VoiceInkFluidAudioDownloadStatus, for modelName: String) {
-        let percent = Int(status.fractionCompleted * 100)
+        let percent = status.percent
         let previousPercent = lastLoggedDownloadPercents[modelName]
         let previousMessage = lastLoggedDownloadMessages[modelName]
         let shouldLog = previousPercent == nil

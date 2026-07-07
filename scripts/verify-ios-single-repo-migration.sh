@@ -11497,9 +11497,25 @@ reject_pattern \
   VoiceInk/Transcription/FluidAudio/FluidAudioTranscriptionService.swift \
   VoiceInk/Transcription/Streaming/FluidAudioStreamingProvider.swift
 
+reject_file VoiceInkCore/Sources/VoiceInkCore/TranscriptionRuntimeResourcePolicy.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRuntimeResourcePolicyTests.swift
+
+reject_pattern \
+  "VoiceInkCore metadata and checks avoid stale standalone transcription runtime resource references" \
+  'TranscriptionRuntimeResourcePolicy\.swift|TranscriptionRuntimeResourcePolicyTests\.swift|TranscriptionRuntimeResourcePolicyTests' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
+
+reject_swift_pattern \
+  "shared core avoids stale transcription runtime resource policy test suite" \
+  '\bTranscriptionRuntimeResourcePolicyTests\b' \
+  VoiceInkCore/Tests/VoiceInkCoreTests
+
 require_patterns \
-  "shared core owns transcription runtime resource planning" \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRuntimeResourcePolicy.swift \
+  "shared core owns transcription runtime resource planning with model catalog" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift \
   'VoiceInkTranscriptionRuntimeResourcePlan' \
   'VoiceInkTranscriptionRecordingStartupLoadAction' \
   'VoiceInkLocalWhisperRuntimeUpdate' \
@@ -11510,12 +11526,12 @@ require_patterns \
 reject_pattern \
   "shared core avoids public model-selection resource action interface" \
   'public enum VoiceInkTranscriptionModelSelectionResourceAction|public let modelSelectionResourceAction|public var localWhisperRuntimeUpdate' \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRuntimeResourcePolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift
 
 reject_pattern \
   "shared core avoids public recording-startup resource action interface" \
   'public enum VoiceInkTranscriptionRecordingStartupLoadAction|public let recordingStartupLoadAction' \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRuntimeResourcePolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift
 
 require_pattern \
   "macOS model adapts shared transcription runtime resource plan" \
@@ -11648,7 +11664,7 @@ require_patterns \
 reject_pattern \
   "shared transcription runtime resource plans avoid public raw execution flags" \
   'public let shouldClearLoadedModel|public let isModelLoadedAfterUpdate|public let shouldClearCurrentModel|public let localWhisperRuntimeUpdate|public init\([[:space:]]*shouldClearLoadedModel' \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRuntimeResourcePolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift
 
 reject_pattern \
   "macOS transcription model manager avoids raw runtime resource plan flags" \
@@ -11656,11 +11672,44 @@ reject_pattern \
   VoiceInk/Transcription/Engine/TranscriptionModelManager.swift
 
 require_patterns \
-  "core checks execute transcription runtime resource update tests" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'TranscriptionRuntimeResourcePolicyTests\.testModelSelectionResourcePlanOwnsLocalWhisperRuntimeUpdate' \
-  'TranscriptionRuntimeResourcePolicyTests\.testDeletedCurrentModelPlanClearsSelectionAndMarksLocalWhisperUnloaded' \
-  'TranscriptionRuntimeResourcePolicyTests\.testDeletedNonCurrentModelPlanPreservesSelectionAndLocalWhisperRuntime'
+  "shared catalog tests own folded transcription runtime resource coverage" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionModelCatalogTests.swift \
+  'func testLocalWhisperRoutePrewarmsAndLoadsWhisperAtRecordingStartup' \
+  'func testLocalFluidAudioRoutePrewarmsAndLoadsFluidAudioAtRecordingStartup' \
+  'func testCloudRouteSkipsLocalRuntimeWork' \
+  'func testNativeAppleRouteSkipsLocalRuntimeWork' \
+  'func testModelSelectionResourcePlanOwnsLocalWhisperRuntimeUpdate' \
+  'func testDeletedCurrentModelPlanClearsSelectionAndMarksLocalWhisperUnloaded' \
+  'func testDeletedNonCurrentModelPlanPreservesSelectionAndLocalWhisperRuntime' \
+  'func testModelPrewarmSamplePolicyPreservesMacOSLookupOrder' \
+  'func testModelPrewarmPlanPreservesMacOSSkipOrderAndDiagnostics' \
+  'func testWhisperModelWarmupPolicySchedulesOnlyCoreMLModelsNotAlreadyWarming' \
+  'func testModelPrewarmDiagnosticsPreserveMacOSLogCopy'
+
+require_pattern \
+  "transcription model catalog tests exercise public VoiceInkCore API surface" \
+  '^import VoiceInkCore$' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionModelCatalogTests.swift
+
+reject_pattern \
+  "transcription model catalog tests avoid testable import after folding runtime resource public API" \
+  '@testable import VoiceInkCore' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionModelCatalogTests.swift
+
+require_voiceink_core_check_runner_invocations \
+  "core checks execute folded transcription runtime resource tests" \
+  "TranscriptionModelCatalogTests" \
+  "testLocalWhisperRoutePrewarmsAndLoadsWhisperAtRecordingStartup" \
+  "testLocalFluidAudioRoutePrewarmsAndLoadsFluidAudioAtRecordingStartup" \
+  "testCloudRouteSkipsLocalRuntimeWork" \
+  "testNativeAppleRouteSkipsLocalRuntimeWork" \
+  "testModelSelectionResourcePlanOwnsLocalWhisperRuntimeUpdate" \
+  "testDeletedCurrentModelPlanClearsSelectionAndMarksLocalWhisperUnloaded" \
+  "testDeletedNonCurrentModelPlanPreservesSelectionAndLocalWhisperRuntime" \
+  "testModelPrewarmSamplePolicyPreservesMacOSLookupOrder" \
+  "testModelPrewarmPlanPreservesMacOSSkipOrderAndDiagnostics" \
+  "testWhisperModelWarmupPolicySchedulesOnlyCoreMLModelsNotAlreadyWarming" \
+  "testModelPrewarmDiagnosticsPreserveMacOSLogCopy"
 
 reject_pattern \
   "macOS transcription model manager avoids shell-owned selection resource case check" \
@@ -14245,8 +14294,8 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_patterns \
-  "shared model prewarm and warmup policy lives in VoiceInkCore" \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRuntimeResourcePolicy.swift \
+  "shared model prewarm and warmup policy lives with transcription model catalog in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift \
   'VoiceInkModelPrewarmSamplePolicy' \
   'VoiceInkModelPrewarmPlan' \
   'VoiceInkModelPrewarmSkipReason' \
@@ -14257,7 +14306,7 @@ require_patterns \
 require_pattern \
   "shared model prewarm diagnostics own completion duration formatting" \
   'completedMessage\(duration: TimeInterval\)|String\(format: +"%\.2f", duration\)' \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRuntimeResourcePolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift
 
 require_pattern \
   "core checks execute model prewarm and warmup policy tests" \

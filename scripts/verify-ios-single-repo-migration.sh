@@ -6072,9 +6072,9 @@ require_pattern \
 
 require_patterns \
   "moved Whisper model management public API has normal import proof" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/WhisperModelManagementPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionModelCatalogTests.swift \
   '^import VoiceInkCore$' \
-  'final class WhisperModelManagementPublicAPITests' \
+  'final class TranscriptionModelCatalogTests' \
   'VoiceInkWhisperModelDownloadProgress\.simple' \
   'VoiceInkWhisperModelDownloadState' \
   'VoiceInkWhisperModelManagementList\.row' \
@@ -6090,11 +6090,22 @@ require_patterns \
 reject_pattern \
   "moved Whisper model management public API proof avoids testable import" \
   '@testable import VoiceInkCore' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/WhisperModelManagementPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionModelCatalogTests.swift
+
+section "obsolete standalone Whisper model management public API test stays deleted"
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/WhisperModelManagementPublicAPITests.swift
+
+reject_pattern \
+  "VoiceInkCore metadata and runner avoid stale standalone Whisper model management public API test" \
+  'WhisperModelManagementPublicAPITests' \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \
   "core check runner executes moved Whisper model management public API proof" \
-  'WhisperModelManagementPublicAPITests\.testMovedWhisperModelManagementSymbolsExposePublicAPI' \
+  'TranscriptionModelCatalogTests\.testMovedWhisperModelManagementSymbolsExposePublicAPI' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_pattern \

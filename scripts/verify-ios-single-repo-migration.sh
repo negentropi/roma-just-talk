@@ -1135,7 +1135,6 @@ reject_pattern \
 
 section "iOS ported assets and resources"
 require_file iOS/Shared/AppGroupCoordinator.swift
-require_file iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
 require_file iOS/Shared/VoiceInkIOSLogger.swift
 require_file iOS/Shared/VoiceInkKeyboardURLOpener.swift
 require_file iOS/VoiceInk-ios/Transcription.swift
@@ -1148,6 +1147,14 @@ for icon in 20.png 29.png 40.png 50.png 57.png 58.png 60.png 72.png 76.png 80.pn
 done
 reject_file iOS/.github/workflows/deploy.yml
 reject_file iOS/.nojekyll
+reject_file iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
+
+reject_pattern \
+  "project metadata avoids obsolete standalone iOS App Group bridge file" \
+  'VoiceInkAppGroupRecordingBridge\.swift' \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
 reject_file iOS/tasks.md
 reject_file iOS/index.html
 reject_file iOS/PRIVACY.html
@@ -23156,11 +23163,11 @@ reject_pattern \
 require_pattern \
   "iOS App Group bridge uses entitlement group" \
   'static let appGroupIdentifier = VoiceInkAppIdentity\.iOSAppGroupIdentifier' \
-  iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
+  iOS/Shared/AppGroupCoordinator.swift
 
 require_patterns \
   "iOS App Group bridge adapts shared recording state read and write plans" \
-  iOS/Shared/VoiceInkAppGroupRecordingBridge.swift \
+  iOS/Shared/AppGroupCoordinator.swift \
   'VoiceInkAppGroupRecordingStatePolicy\.readPlan' \
   'UserDefaultsKey\.isRecording' \
   'UserDefaultsKey\.lastRecordingTimestamp' \
@@ -23169,7 +23176,7 @@ require_patterns \
 require_pattern \
   "iOS App Group bridge applies shared write-plan runtime order" \
   'plan\.applyRuntimeState' \
-  iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
+  iOS/Shared/AppGroupCoordinator.swift
 
 require_patterns \
   "iOS App Group coordinator applies shared stale repair runtime plan" \
@@ -23222,22 +23229,22 @@ require_pattern \
 reject_pattern \
   "iOS App Group bridge avoids shell-owned recording state policy" \
   'struct VoiceInkAppGroupRecordingState|staleRecordingInterval|enum UserDefaultsKey|static let (isRecording|lastRecordingTimestamp) = "|shouldClearStaleState' \
-  iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
+  iOS/Shared/AppGroupCoordinator.swift
 
 reject_pattern \
   "iOS App Group bridge avoids state-only read helper" \
   'static func recordingState\(' \
-  iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
+  iOS/Shared/AppGroupCoordinator.swift
 
 reject_pattern \
   "iOS App Group bridge avoids shell-owned write-plan optional branching" \
   'if +let +isRecording += +plan\.isRecording|plan\.lastRecordingTimestamp' \
-  iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
+  iOS/Shared/AppGroupCoordinator.swift
 
 reject_pattern \
   "iOS App Group bridge avoids shell-owned mutation helper sequencing" \
-  'markStopRequested|writeRecordingState|VoiceInkAppGroupRecordingStateMutationPlan|mutationPlan\.writePlan' \
-  iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
+  'markStopRequested|writeRecordingState|mutationPlan\.writePlan' \
+  iOS/Shared/AppGroupCoordinator.swift
 
 reject_pattern \
   "iOS App Group coordinator avoids shell-owned read-plan optional branching" \
@@ -23277,7 +23284,7 @@ require_pattern \
 reject_pattern \
   "iOS shared bridge avoids duplicate app identity literals" \
   '"(voiceink|record|group\.com\.prakashjoshipax\.VoiceInk|com\.prakashjoshipax\.VoiceInk\.(stopRecording|recordingStateChanged))"' \
-  iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
+  iOS/Shared/AppGroupCoordinator.swift
 
 require_pattern \
   "VoiceInkCore owns app-local keyboard stop notification" \

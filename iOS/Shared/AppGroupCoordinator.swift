@@ -2,6 +2,49 @@ import Foundation
 import OSLog
 import VoiceInkCore
 
+enum VoiceInkAppGroupRecordingBridge {
+    static let appGroupIdentifier = VoiceInkAppIdentity.iOSAppGroupIdentifier
+
+    static func sharedDefaults() -> UserDefaults? {
+        UserDefaults(suiteName: appGroupIdentifier)
+    }
+
+    static func recordingStateReadPlan(
+        in defaults: UserDefaults?,
+        now: Date = Date()
+    ) -> VoiceInkAppGroupRecordingStateReadPlan {
+        VoiceInkAppGroupRecordingStatePolicy.readPlan(
+            storedIsRecording: defaults?.bool(
+                forKey: VoiceInkAppGroupRecordingStatePolicy.UserDefaultsKey.isRecording
+            ) ?? false,
+            lastRecordingTimestamp: defaults?.double(
+                forKey: VoiceInkAppGroupRecordingStatePolicy.UserDefaultsKey.lastRecordingTimestamp
+            ) ?? 0,
+            now: now
+        )
+    }
+
+    static func apply(
+        _ plan: VoiceInkAppGroupRecordingStateWritePlan,
+        to defaults: UserDefaults?
+    ) {
+        plan.applyRuntimeState(
+            setIsRecording: {
+                defaults?.set(
+                    $0,
+                    forKey: VoiceInkAppGroupRecordingStatePolicy.UserDefaultsKey.isRecording
+                )
+            },
+            setLastRecordingTimestamp: {
+                defaults?.set(
+                    $0,
+                    forKey: VoiceInkAppGroupRecordingStatePolicy.UserDefaultsKey.lastRecordingTimestamp
+                )
+            }
+        )
+    }
+}
+
 /// Handles communication between the main VoiceInk app and the keyboard extension
 /// Uses App Groups + Darwin Notifications for reliable iOS-native communication
 final class AppGroupCoordinator {

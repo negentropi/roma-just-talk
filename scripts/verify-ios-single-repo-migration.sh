@@ -11958,10 +11958,12 @@ reject_swift_pattern \
   '\bPostProcessingSkipPolicyTests\b' \
   VoiceInkCore/Tests/VoiceInkCoreTests
 
-require_pattern \
-  "shared post-processing skip policy lives with transcription run processor" \
-  'VoiceInkPostProcessingSkipConfiguration|VoiceInkPostProcessingSkipPolicy|shouldSkipPostProcessing' \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift
+require_patterns \
+  "shared post-processing skip policy declarations live with transcription run processor" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift \
+  'public struct VoiceInkPostProcessingSkipConfiguration' \
+  'public enum VoiceInkPostProcessingSkipPolicy' \
+  'public static func shouldSkipPostProcessing'
 
 require_pattern \
   "shared transcription enhancement request planning lives in VoiceInkCore" \
@@ -12058,6 +12060,24 @@ require_patterns \
   'testPostProcessingSkipPromptTriggerForcesPostProcessingForShortTranscript' \
   'testPostProcessingSkipNonPositiveThresholdFallsBackToExistingDefault'
 
+require_patterns \
+  "public API tests cover folded transcription run preparation surface" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunPreparationPublicAPITests.swift \
+  'import VoiceInkCore' \
+  'final class TranscriptionRunPreparationPublicAPITests' \
+  'VoiceInkPostProcessingSkipConfiguration' \
+  'VoiceInkPostProcessingSkipPolicy\.shouldSkipPostProcessing' \
+  'VoiceInkWordCounter\.count' \
+  'VoiceInkTranscriptionPromptUse\.directTranscription' \
+  'VoiceInkTranscriptionRunPreparation\.prepareRawText' \
+  'VoiceInkTranscriptionRunPreparation\.prepareAudioFileText' \
+  'VoiceInkTranscriptionEnhancementRequest'
+
+reject_pattern \
+  "public API test avoids testable import" \
+  '@testable import VoiceInkCore' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunPreparationPublicAPITests.swift
+
 require_pattern \
   "core check runner executes Power Mode transcription metadata selection test" \
   'testTranscriptionMetadataUsesOnlyEnabledPowerModeConfig' \
@@ -12095,6 +12115,12 @@ require_patterns \
   'TranscriptionRunPreparationTests\(\)\.testPostProcessingSkipEnabledPolicyKeepsPostProcessingAboveThreshold' \
   'TranscriptionRunPreparationTests\(\)\.testPostProcessingSkipPromptTriggerForcesPostProcessingForShortTranscript' \
   'TranscriptionRunPreparationTests\(\)\.testPostProcessingSkipNonPositiveThresholdFallsBackToExistingDefault'
+
+require_patterns \
+  "core check runner executes folded transcription run public API proof" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
+  'TranscriptionRunPreparationPublicAPITests\.testMovedTranscriptionRunPreparationSymbolsExposePublicAPI' \
+  'TranscriptionRunPreparationPublicAPITests\(\)\.testMovedTranscriptionRunPreparationSymbolsExposePublicAPI\(\)'
 
 reject_pattern \
   "macOS transcription callers avoid shell-only Power Mode metadata selection" \

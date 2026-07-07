@@ -1,5 +1,4 @@
 import Foundation
-import AppKit
 import VoiceInkCore
 
 @MainActor
@@ -156,16 +155,10 @@ class PowerModeSessionManager {
     ) -> VoiceInkPowerModeSessionApplicationFacts {
         VoiceInkPowerModeSessionApplicationFacts(
             currentModelName: stateProvider.currentTranscriptionModel?.name,
-            availableModelResourceFacts: stateProvider.allAvailableModels.map(modelResourceFacts(for:)),
-            availableLanguageModelFacts: stateProvider.allAvailableModels.map(transcriptionModelFacts(for:)),
+            availableModelResourceFacts: stateProvider.allAvailableModels.map { $0.powerModeTranscriptionModelResourceFacts },
+            availableLanguageModelFacts: stateProvider.allAvailableModels.map { $0.powerModeTranscriptionModelFacts },
             availableLocalModelNames: Set(stateProvider.availableModels.map(\.name))
         )
-    }
-
-    private func transcriptionModelFacts(
-        for model: any TranscriptionModel
-    ) -> VoiceInkPowerModeTranscriptionModelFacts {
-        model.powerModeTranscriptionModelFacts
     }
 
     private func applyLanguageApplicationPlan(_ plan: VoiceInkPowerModeLanguageApplicationPlan) {
@@ -178,12 +171,6 @@ class PowerModeSessionManager {
                 NotificationCenter.default.post(name: .languageDidChange, object: nil)
             }
         )
-    }
-
-    private func modelResourceFacts(
-        for model: any TranscriptionModel
-    ) -> VoiceInkPowerModeTranscriptionModelResourceFacts {
-        model.powerModeTranscriptionModelResourceFacts
     }
 
     private func applyModelResourcePlan(

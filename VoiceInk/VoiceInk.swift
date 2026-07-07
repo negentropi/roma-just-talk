@@ -173,7 +173,7 @@ struct VoiceInkApp: App {
         Task {
             await recorderUIManager.resetOnLaunch()
             await engine.recorder.startPreRollBuffering()
-            WordReplacementService.shared.warmCache(using: resolvedContainer.mainContext)
+            DictionaryService.warmWordReplacementCache(using: resolvedContainer.mainContext)
         }
 
         AppShortcuts.updateAppShortcutParameters()

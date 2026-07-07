@@ -1,7 +1,9 @@
 import SwiftData
 import VoiceInkCore
 
+@MainActor
 enum DictionaryService {
+    private static var cachedWordReplacementRules: [VoiceInkWordReplacementRule]?
 
     // MARK: - Vocabulary
 
@@ -40,7 +42,7 @@ enum DictionaryService {
             context.insert(entry)
             do {
                 try context.save()
-                WordReplacementService.shared.invalidateCache()
+                Self.invalidateWordReplacementCache()
                 return nil
             } catch {
                 context.delete(entry)
@@ -81,7 +83,7 @@ enum DictionaryService {
 
         do {
             try context.save()
-            WordReplacementService.shared.invalidateCache()
+            Self.invalidateWordReplacementCache()
             return submission
         } catch {
             return VoiceInkWordReplacementEditSubmission(
@@ -95,5 +97,33 @@ enum DictionaryService {
                 )
             )
         }
+    }
+
+    static func warmWordReplacementCache(using context: ModelContext) {
+        _ = replacementRules(using: context)
+    }
+
+    static func invalidateWordReplacementCache() {
+        cachedWordReplacementRules = nil
+    }
+
+    static func applyWordReplacements(to text: String, using context: ModelContext) -> String {
+        let replacements = replacementRules(using: context)
+        return VoiceInkWordReplacementEngine.apply(replacements, to: text)
+    }
+
+    private static func replacementRules(using context: ModelContext) -> [VoiceInkWordReplacementRule] {
+        if let cachedWordReplacementRules {
+            return cachedWordReplacementRules
+        }
+
+        let descriptor = FetchDescriptor<WordReplacement>(
+            predicate: #Predicate { $0.isEnabled }
+        )
+
+        let rules = (try? context.fetch(descriptor))?.map(\.voiceInkRule) ?? []
+
+        cachedWordReplacementRules = rules
+        return rules
     }
 }

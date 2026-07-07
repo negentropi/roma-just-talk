@@ -183,7 +183,7 @@ struct WordReplacementView: View {
 
         do {
             try modelContext.save()
-            WordReplacementService.shared.invalidateCache()
+            DictionaryService.invalidateWordReplacementCache()
         } catch {
             // Rollback the delete to restore UI consistency
             modelContext.rollback()

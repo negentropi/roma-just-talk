@@ -216,7 +216,7 @@ enum BackupImporter {
                     print(VoiceInkSettingsBackupImportDiagnostics.noDictionaryEntriesImportedMessage)
                 },
                 save: modelContext.save,
-                invalidateWordReplacementCache: WordReplacementService.shared.invalidateCache,
+                invalidateWordReplacementCache: DictionaryService.invalidateWordReplacementCache,
                 reportImportedEntryCounts: { vocabularyWordCount, wordReplacementCount in
                     print(
                         VoiceInkSettingsBackupImportDiagnostics.dictionaryEntriesImportedMessage(

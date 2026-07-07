@@ -11282,8 +11282,7 @@ require_pattern \
   VoiceInk/Views/Dictionary/WordReplacementView.swift \
   VoiceInk/Views/Dictionary/DictionaryQuickAddPanel.swift \
   VoiceInk/Services/DictionaryService.swift \
-  VoiceInk/Services/ImportExportService.swift \
-  VoiceInk/Transcription/Processing/WordReplacementService.swift
+  VoiceInk/Services/ImportExportService.swift
 
 reject_pattern \
   "macOS word-replacement adapters avoid shell-owned shared-rule construction" \
@@ -11291,8 +11290,48 @@ reject_pattern \
   VoiceInk/Views/Dictionary/WordReplacementView.swift \
   VoiceInk/Views/Dictionary/DictionaryQuickAddPanel.swift \
   VoiceInk/Services/DictionaryService.swift \
-  VoiceInk/Services/ImportExportService.swift \
-  VoiceInk/Transcription/Processing/WordReplacementService.swift
+  VoiceInk/Services/ImportExportService.swift
+
+section "obsolete standalone macOS word-replacement service stays folded"
+reject_file VoiceInk/Transcription/Processing/WordReplacementService.swift
+
+require_patterns \
+  "macOS DictionaryService owns word-replacement cache/apply shell" \
+  VoiceInk/Services/DictionaryService.swift \
+  'private static var cachedWordReplacementRules: \[VoiceInkWordReplacementRule\]\?' \
+  'static func warmWordReplacementCache\(using context: ModelContext\)' \
+  'static func invalidateWordReplacementCache\(\)' \
+  'static func applyWordReplacements\(to text: String, using context: ModelContext\) -> String' \
+  'FetchDescriptor<WordReplacement>\(' \
+  'predicate: #Predicate \{ \$0\.isEnabled \}' \
+  '\.map\(\\\.voiceInkRule\)' \
+  'VoiceInkWordReplacementEngine\.apply'
+
+reject_pattern \
+  "macOS source/tests avoid obsolete word-replacement service references" \
+  '\bWordReplacementService\b|WordReplacementService\.swift|Transcription/Processing/WordReplacementService' \
+  VoiceInk \
+  VoiceInkTests \
+  VoiceInk.xcodeproj/project.pbxproj
+
+require_pattern \
+  "macOS transcription paths apply word replacements through DictionaryService" \
+  'DictionaryService\.applyWordReplacements\(to: .*using: modelContext\)' \
+  VoiceInk/Transcription/Engine/TranscriptionPipeline.swift \
+  VoiceInk/Services/AudioFileTranscriptionManager.swift \
+  VoiceInk/Services/AudioFileTranscriptionService.swift
+
+require_pattern \
+  "macOS app warms word-replacement cache through DictionaryService" \
+  'DictionaryService\.warmWordReplacementCache\(using: resolvedContainer\.mainContext\)' \
+  VoiceInk/VoiceInk.swift
+
+require_pattern \
+  "macOS dictionary mutation paths invalidate DictionaryService word-replacement cache" \
+  'DictionaryService\.invalidateWordReplacementCache|Self\.invalidateWordReplacementCache' \
+  VoiceInk/Services/DictionaryService.swift \
+  VoiceInk/Services/BackupImporter.swift \
+  VoiceInk/Views/Dictionary/WordReplacementView.swift
 
 require_pattern \
   "iOS settings uses shared dictionary alert presentation" \
@@ -11834,15 +11873,15 @@ reject_pattern \
   iOS/VoiceInk-ios/AppSettings.swift
 
 reject_pattern \
-  "macOS word-replacement service leaves rule ordering to shared engine" \
+  "macOS dictionary service leaves rule ordering to shared engine" \
   'VoiceInkWordReplacementEngine\.sortedRules|let sortedRules' \
-  VoiceInk/Transcription/Processing/WordReplacementService.swift
+  VoiceInk/Services/DictionaryService.swift
 
 reject_pattern \
   "macOS dictionary adapters leave empty input behavior to shared modules" \
   'guard !customWords\.isEmpty|guard !replacements\.isEmpty' \
   VoiceInk/Services/CustomVocabularyService.swift \
-  VoiceInk/Transcription/Processing/WordReplacementService.swift
+  VoiceInk/Services/DictionaryService.swift
 
 require_pattern \
   "shared dictionary backup import plan lives in VoiceInkCore" \

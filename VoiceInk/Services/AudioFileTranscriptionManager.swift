@@ -171,7 +171,7 @@ class AudioTranscriptionManager: ObservableObject {
                 rawText,
                 cleanupConfiguration: cleanupConfiguration
             ) { text in
-                WordReplacementService.shared.applyReplacements(to: text, using: modelContext)
+                DictionaryService.applyWordReplacements(to: text, using: modelContext)
             }
             let cleanedText = textPlan.cleanedText
             try Task.checkCancellation()

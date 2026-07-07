@@ -656,6 +656,20 @@ final class OnboardingPresentationTests: XCTestCase {
         XCTAssertTrue(VoiceInkMacOSOnboardingStage.tutorial.resumesTutorial)
     }
 
+    func testMacOSOnboardingProgressPersistedRawValuesStayStable() {
+        XCTAssertEqual(VoiceInkMacOSOnboardingStage.welcome.rawValue, "welcome")
+        XCTAssertEqual(VoiceInkMacOSOnboardingStage.permissions.rawValue, "permissions")
+        XCTAssertEqual(VoiceInkMacOSOnboardingStage.modelDownload.rawValue, "modelDownload")
+        XCTAssertEqual(VoiceInkMacOSOnboardingStage.tutorial.rawValue, "tutorial")
+
+        XCTAssertEqual(VoiceInkMacOSOnboardingPermissionKind.microphone.rawValue, "microphone")
+        XCTAssertEqual(VoiceInkMacOSOnboardingPermissionKind.audioDeviceSelection.rawValue, "audioDeviceSelection")
+        XCTAssertEqual(VoiceInkMacOSOnboardingPermissionKind.accessibility.rawValue, "accessibility")
+        XCTAssertEqual(VoiceInkMacOSOnboardingPermissionKind.inputMonitoring.rawValue, "inputMonitoring")
+        XCTAssertEqual(VoiceInkMacOSOnboardingPermissionKind.screenRecording.rawValue, "screenRecording")
+        XCTAssertEqual(VoiceInkMacOSOnboardingPermissionKind.keyboardShortcut.rawValue, "keyboardShortcut")
+    }
+
     func testMacOSOnboardingProgressStoreDefaultsAndIgnoresMalformedValues() {
         let suiteName = "VoiceInkCore.OnboardingPresentationTests.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!

@@ -7205,6 +7205,7 @@ require_voiceink_core_check_runner_invocations \
   "core check runner executes macOS onboarding progress storage proofs" \
   OnboardingPresentationTests \
   testMacOSOnboardingStageResumeFlagsPreserveExistingFlow \
+  testMacOSOnboardingProgressPersistedRawValuesStayStable \
   testMacOSOnboardingProgressStoreDefaultsAndIgnoresMalformedValues \
   testMacOSOnboardingProgressStoreRoundTripsStageAndPermissionKind \
   testMacOSOnboardingProgressStoreResetClearsStageAndPermissionKind

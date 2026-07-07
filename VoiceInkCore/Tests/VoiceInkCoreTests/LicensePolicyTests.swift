@@ -1,5 +1,5 @@
 import Foundation
-@testable import VoiceInkCore
+import VoiceInkCore
 
 final class LicensePolicyTests: XCTestCase {
     private enum LicenseStartupRuntimeEvent: Equatable {

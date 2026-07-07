@@ -183,7 +183,12 @@ voiceink_core_public_import_tests=(
   VoiceInkCore/Tests/VoiceInkCoreTests/LocalWhisperTranscriptionFlowTests.swift
   VoiceInkCore/Tests/VoiceInkCoreTests/AudioPlaybackTimelineTests.swift
   VoiceInkCore/Tests/VoiceInkCoreTests/AppIdentityTests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/DictionaryPolicyTests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/LicensePolicyTests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RollingBufferPreloadPolicyTests.swift
   VoiceInkCore/Tests/VoiceInkCoreTests/StoredAudioFileTests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptPresentationTests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionStreamingPreferenceTests.swift
   VoiceInkCore/Tests/VoiceInkCoreTests/UserDefaultsSettingsBackupPolicyTests.swift
   VoiceInkCore/Tests/VoiceInkCoreTests/RecordingFeedbackPreferenceTests.swift
   VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift

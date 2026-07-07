@@ -425,7 +425,7 @@ swift_static_function_body_pattern_status() {
     local $/;
     my $source = <$fh>;
     my $code = mask_swift_non_code($source);
-    my $open_brace = find_private_static_function_open_brace($code, $function_name);
+    my $open_brace = find_swift_function_open_brace($code, $function_name);
     exit 2 unless defined $open_brace;
 
     my $depth = 0;
@@ -447,16 +447,16 @@ swift_static_function_body_pattern_status() {
     my $body = substr($code, $open_brace + 1, $close_brace - $open_brace - 1);
     exit($body =~ /$pattern/s ? 0 : 1);
 
-    sub find_private_static_function_open_brace {
+    sub find_swift_function_open_brace {
       my ($code, $function_name) = @_;
-      my $signature = qr/(?<![A-Za-z0-9_])private\s+static\s+func\s+\Q$function_name\E\s*\(/x;
+      my $signature = qr/(?<![A-Za-z0-9_])(?:[A-Za-z_][A-Za-z0-9_]*\s+)*func\s+\Q$function_name\E\s*\(/x;
       while ($code =~ /$signature/g) {
         my $open_paren = pos($code) - 1;
         my $close_paren = find_balanced_close($code, $open_paren, "(", ")");
         next unless defined $close_paren;
         my $index = $close_paren + 1;
-        $index++ while $index < length($code) && substr($code, $index, 1) =~ /\s/;
-        return $index if substr($code, $index, 1) eq "{";
+        $index++ while $index < length($code) && substr($code, $index, 1) ne "{";
+        return $index if $index < length($code);
       }
       return;
     }
@@ -7635,10 +7635,16 @@ require_patterns \
   'VoiceInkAPIKeyVerificationResult' \
   'VoiceInkElevenLabsTranscriptionCodec\.transcript'
 
-require_multiline_pattern \
-  "ElevenLabs public API proof keeps defaulted transcribe call short" \
-  'let transcribeWithDefaultedLabels = \{\s*try await client\.transcribeAudioData\(\s*baseURL: VoiceInkProviderEndpoint\.elevenLabsAPIBaseURL,\s*apiKey: "eleven-key",\s*model: "scribe_v2",\s*audioData: Data\("WAVDATA"\.utf8\)\s*\)\s*\}' \
+reject_pattern \
+  "ElevenLabs public API proof avoids conditional compilation snippets" \
+  '^[[:space:]]*#(if|elseif|else|endif)\b' \
   VoiceInkCore/Tests/VoiceInkCoreTests/ElevenLabsPublicAPITests.swift
+
+require_swift_static_function_body_pattern \
+  "ElevenLabs public API proof keeps defaulted transcribe call short" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/ElevenLabsPublicAPITests.swift \
+  testElevenLabsRequestClientAndCodecExposePublicAPI \
+  'let\s+transcribeWithDefaultedLabels\s*=\s*\{\s*try\s+await\s+client\.transcribeAudioData\s*\((?:(?!\b(?:fileName|language|errorDomain|timeout|maxRetries)\s*:).)*\bbaseURL\s*:(?:(?!\b(?:fileName|language|errorDomain|timeout|maxRetries)\s*:).)*\bapiKey\s*:(?:(?!\b(?:fileName|language|errorDomain|timeout|maxRetries)\s*:).)*\bmodel\s*:(?:(?!\b(?:fileName|language|errorDomain|timeout|maxRetries)\s*:).)*\baudioData\s*:(?:(?!\b(?:fileName|language|errorDomain|timeout|maxRetries)\s*:).)*\)\s*\}'
 
 reject_pattern \
   "ElevenLabs public API proof avoids testable import" \

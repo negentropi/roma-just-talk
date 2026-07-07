@@ -8888,8 +8888,11 @@ require_patterns \
 require_patterns \
   "core checks execute macOS transcription provider verification tests" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'ProviderAPIKeyVerifierPublicAPITests\.testProviderAPIKeyVerifierPublicRoutesRejectMissingKeysWithoutNetwork' \
-  'ProviderAPIKeyVerifierPublicAPITests\.testCartesiaRequestClientAndProviderVerifierExposePublicAPI'
+  'RemoteProviderPublicAPITests\.testProviderAPIKeyVerifierPublicRoutesRejectMissingKeysWithoutNetwork' \
+  'RemoteProviderPublicAPITests\.testCartesiaRequestClientAndProviderVerifierExposePublicAPI'
+
+section "obsolete standalone provider API-key verifier public suite stays deleted"
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/ProviderAPIKeyVerifierPublicAPITests.swift
 
 section "obsolete standalone OpenAI-compatible models request/client modules stay deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleChatDTOs.swift
@@ -8920,8 +8923,10 @@ require_patterns \
 
 require_patterns \
   "provider verifier public API proof uses normal VoiceInkCore import" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/ProviderAPIKeyVerifierPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
   '^import VoiceInkCore$' \
+  'func testProviderAPIKeyVerifierPublicRoutesRejectMissingKeysWithoutNetwork\(\) async' \
+  'func testCartesiaRequestClientAndProviderVerifierExposePublicAPI\(\) async' \
   'VoiceInkAPIKeyVerificationResult\(legacyResult:' \
   'VoiceInkProviderAPIKeyVerifier\(' \
   'verifyAPIKeyDetailed' \
@@ -8930,6 +8935,7 @@ require_patterns \
   'VoiceInkProviderKind\.userAPIKeyProviders' \
   'VoiceInkTranscriptionModelProvider\.cartesia' \
   'VoiceInkMacOSTranscriptionModelProvider\.groq' \
+  'VoiceInkMacOSTranscriptionModelProvider\.whisper' \
   'VoiceInkCartesiaRequestBuilder\.makeVoicesRequest' \
   'VoiceInkCartesiaClient\(\)' \
   'VoiceInkProviderEndpoint\.cartesiaAPIBaseURL'
@@ -8937,13 +8943,13 @@ require_patterns \
 reject_pattern \
   "provider verifier public API proof avoids testable import" \
   '@testable import VoiceInkCore' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/ProviderAPIKeyVerifierPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
 
 require_patterns \
   "core checks execute API-key verification policy tests through remote transport" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  '^[[:space:]]*VoiceInkCoreCheck\(name: "ProviderAPIKeyVerifierPublicAPITests\.testProviderAPIKeyVerifierPublicRoutesRejectMissingKeysWithoutNetwork", run: \{ await ProviderAPIKeyVerifierPublicAPITests\(\)\.testProviderAPIKeyVerifierPublicRoutesRejectMissingKeysWithoutNetwork\(\) \}\),$' \
-  '^[[:space:]]*VoiceInkCoreCheck\(name: "ProviderAPIKeyVerifierPublicAPITests\.testCartesiaRequestClientAndProviderVerifierExposePublicAPI", run: \{ await ProviderAPIKeyVerifierPublicAPITests\(\)\.testCartesiaRequestClientAndProviderVerifierExposePublicAPI\(\) \}\),$' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RemoteProviderPublicAPITests\.testProviderAPIKeyVerifierPublicRoutesRejectMissingKeysWithoutNetwork", run: \{ await RemoteProviderPublicAPITests\(\)\.testProviderAPIKeyVerifierPublicRoutesRejectMissingKeysWithoutNetwork\(\) \}\),$' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RemoteProviderPublicAPITests\.testCartesiaRequestClientAndProviderVerifierExposePublicAPI", run: \{ await RemoteProviderPublicAPITests\(\)\.testCartesiaRequestClientAndProviderVerifierExposePublicAPI\(\) \}\),$' \
   '^[[:space:]]*VoiceInkCoreCheck\(name: "RemoteTransportTests\.testAPIKeyVerificationPolicyRejectsBlankKeys", run: \{ RemoteTransportTests\(\)\.testAPIKeyVerificationPolicyRejectsBlankKeys\(\) \}\),$' \
   '^[[:space:]]*VoiceInkCoreCheck\(name: "RemoteTransportTests\.testAPIKeyVerificationPolicyRejectsMissingHTTPResponse", run: \{ try RemoteTransportTests\(\)\.testAPIKeyVerificationPolicyRejectsMissingHTTPResponse\(\) \}\),$' \
   '^[[:space:]]*VoiceInkCoreCheck\(name: "RemoteTransportTests\.testAPIKeyVerificationPolicyAcceptsHTTP2xxResponses", run: \{ RemoteTransportTests\(\)\.testAPIKeyVerificationPolicyAcceptsHTTP2xxResponses\(\) \}\),$' \
@@ -8961,6 +8967,14 @@ reject_pattern \
 reject_pattern \
   "core tests and project metadata avoid obsolete provider API-key verifier suite" \
   'ProviderAPIKeyVerifierTests' \
+  VoiceInkCore/Tests/VoiceInkCoreTests \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
+
+reject_pattern \
+  "core tests and project metadata avoid obsolete provider API-key verifier public suite" \
+  'ProviderAPIKeyVerifierPublicAPITests' \
   VoiceInkCore/Tests/VoiceInkCoreTests \
   VoiceInkCore/Package.swift \
   VoiceInk.xcodeproj/project.pbxproj \

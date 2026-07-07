@@ -13,7 +13,7 @@ struct OnboardingModelDownloadView: View {
     init(hasCompletedOnboarding: Binding<Bool>) {
         self._hasCompletedOnboarding = hasCompletedOnboarding
         self._showTutorial = State(
-            initialValue: MacOnboardingProgressStore.stage().resumesTutorial
+            initialValue: VoiceInkMacOSOnboardingProgressStore.stage().resumesTutorial
         )
     }
 
@@ -74,7 +74,7 @@ struct OnboardingModelDownloadView: View {
 
                         VStack(spacing: 16) {
                             Button {
-                                MacOnboardingProgressStore.saveStage(.tutorial)
+                                VoiceInkMacOSOnboardingProgressStore.saveStage(.tutorial)
                                 withAnimation {
                                     showTutorial = true
                                 }
@@ -90,7 +90,7 @@ struct OnboardingModelDownloadView: View {
                             .disabled(!canContinue)
 
                             SkipButton(text: presentation.skipButtonTitle) {
-                                MacOnboardingProgressStore.saveStage(.tutorial)
+                                VoiceInkMacOSOnboardingProgressStore.saveStage(.tutorial)
                                 withAnimation {
                                     showTutorial = true
                                 }

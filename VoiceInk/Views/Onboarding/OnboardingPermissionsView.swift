@@ -28,7 +28,7 @@ struct OnboardingPermissionsView: View {
     init(hasCompletedOnboarding: Binding<Bool>) {
         self._hasCompletedOnboarding = hasCompletedOnboarding
         self._showModelDownload = State(
-            initialValue: MacOnboardingProgressStore.stage().resumesModelDownload
+            initialValue: VoiceInkMacOSOnboardingProgressStore.stage().resumesModelDownload
         )
     }
 
@@ -275,7 +275,7 @@ struct OnboardingPermissionsView: View {
     private func resumeSavedPermissionProgress() {
         guard !showModelDownload else { return }
 
-        let savedIndex = MacOnboardingProgressStore.permissionKind().flatMap { savedKind in
+        let savedIndex = VoiceInkMacOSOnboardingProgressStore.permissionKind().flatMap { savedKind in
             permissions.firstIndex { $0.kind == savedKind }
         } ?? currentPermissionIndex
 
@@ -294,8 +294,8 @@ struct OnboardingPermissionsView: View {
     }
 
     private func saveCurrentPermissionProgress() {
-        MacOnboardingProgressStore.saveStage(.permissions)
-        MacOnboardingProgressStore.savePermissionKind(permissions[currentPermissionIndex].kind)
+        VoiceInkMacOSOnboardingProgressStore.saveStage(.permissions)
+        VoiceInkMacOSOnboardingProgressStore.savePermissionKind(permissions[currentPermissionIndex].kind)
     }
     
     private func requestPermission() {
@@ -431,7 +431,7 @@ struct OnboardingPermissionsView: View {
                 resetAnimation()
             }
         } else {
-            MacOnboardingProgressStore.saveStage(.modelDownload)
+            VoiceInkMacOSOnboardingProgressStore.saveStage(.modelDownload)
             withAnimation {
                 showModelDownload = true
             }

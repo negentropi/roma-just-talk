@@ -15,7 +15,7 @@ struct OnboardingView: View {
     init(hasCompletedOnboarding: Binding<Bool>) {
         self._hasCompletedOnboarding = hasCompletedOnboarding
         self._showPermissions = State(
-            initialValue: MacOnboardingProgressStore.stage().resumesPermissionsView
+            initialValue: VoiceInkMacOSOnboardingProgressStore.stage().resumesPermissionsView
         )
     }
     
@@ -66,7 +66,7 @@ struct OnboardingView: View {
                             if showSecondaryElements {
                                 VStack(spacing: 20) {
                                     Button(action: {
-                                        MacOnboardingProgressStore.saveStage(.permissions)
+                                        VoiceInkMacOSOnboardingProgressStore.saveStage(.permissions)
                                         withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
                                             showPermissions = true
                                         }
@@ -81,7 +81,7 @@ struct OnboardingView: View {
                                     .buttonStyle(ScaleButtonStyle())
 
                                     SkipButton(text: presentation.skipButtonTitle) {
-                                        MacOnboardingProgressStore.reset()
+                                        VoiceInkMacOSOnboardingProgressStore.reset()
                                         hasCompletedOnboarding = true
                                     }
                                 }

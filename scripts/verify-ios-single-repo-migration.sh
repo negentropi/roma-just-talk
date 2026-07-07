@@ -7162,6 +7162,53 @@ require_pattern \
   'macOS onboarding welcome presentation|VoiceInkMacOSOnboardingPresentation\.welcome' \
   docs/ios-single-repo-migration.md
 
+require_pattern \
+  "migration checklist tracks shared macOS onboarding progress storage" \
+  'macOS onboarding progress stage and resumed permission-kind storage|VoiceInkMacOSOnboardingProgressStore' \
+  docs/ios-single-repo-migration.md
+
+section "obsolete macOS onboarding progress shell store stays deleted"
+reject_file VoiceInk/Views/Onboarding/MacOnboardingProgressStore.swift
+
+reject_pattern \
+  "macOS onboarding avoids shell-only progress store types" \
+  'enum +MacOnboarding(Stage|ProgressStore)|MacOnboardingProgressStore' \
+  VoiceInk/Views/Onboarding \
+  VoiceInk.xcodeproj/project.pbxproj
+
+require_patterns \
+  "shared macOS onboarding progress storage lives in VoiceInkCore" \
+  VoiceInkCore/Sources/VoiceInkCore/OnboardingPresentation.swift \
+  'public enum VoiceInkMacOSOnboardingStage' \
+  'public enum VoiceInkMacOSOnboardingProgressStore' \
+  'macOSOnboardingStage' \
+  'macOSOnboardingPermissionKind' \
+  'public var resumesPermissionsView' \
+  'public var resumesModelDownload' \
+  'public var resumesTutorial' \
+  'public static func stage' \
+  'public static func saveStage' \
+  'public static func permissionKind' \
+  'public static func savePermissionKind' \
+  'public static func reset'
+
+require_pattern \
+  "macOS onboarding surfaces use shared progress storage" \
+  'VoiceInkMacOSOnboardingProgressStore' \
+  VoiceInk/Views/Onboarding/OnboardingView.swift \
+  VoiceInk/Views/Onboarding/OnboardingPermissionsView.swift \
+  VoiceInk/Views/Onboarding/OnboardingModelDownloadView.swift \
+  VoiceInk/Views/Onboarding/OnboardingTutorialView.swift \
+  VoiceInk/Views/Settings/SettingsView.swift
+
+require_voiceink_core_check_runner_invocations \
+  "core check runner executes macOS onboarding progress storage proofs" \
+  OnboardingPresentationTests \
+  testMacOSOnboardingStageResumeFlagsPreserveExistingFlow \
+  testMacOSOnboardingProgressStoreDefaultsAndIgnoresMalformedValues \
+  testMacOSOnboardingProgressStoreRoundTripsStageAndPermissionKind \
+  testMacOSOnboardingProgressStoreResetClearsStageAndPermissionKind
+
 require_patterns \
   "shared macOS onboarding permission presentation lives in VoiceInkCore" \
   VoiceInkCore/Sources/VoiceInkCore/OnboardingPresentation.swift \

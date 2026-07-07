@@ -156,7 +156,7 @@ struct OnboardingTutorialView: View {
             }
         }
         .onAppear {
-            MacOnboardingProgressStore.saveStage(.tutorial)
+            VoiceInkMacOSOnboardingProgressStore.saveStage(.tutorial)
             animateIn()
             isFocused = true
             recordingShortcutManager.updateShortcutStatus()
@@ -202,7 +202,7 @@ struct OnboardingTutorialView: View {
     }
 
     private func completeOnboarding() {
-        MacOnboardingProgressStore.reset()
+        VoiceInkMacOSOnboardingProgressStore.reset()
         hasCompletedOnboarding = true
     }
 

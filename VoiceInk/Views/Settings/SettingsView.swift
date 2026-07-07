@@ -344,7 +344,7 @@ struct SettingsView: View {
             Button(Self.resetOnboardingPresentation.cancelButtonTitle, role: .cancel) { }
             Button(Self.resetOnboardingPresentation.confirmButtonTitle, role: .destructive) {
                 DispatchQueue.main.async {
-                    MacOnboardingProgressStore.reset()
+                    VoiceInkMacOSOnboardingProgressStore.reset()
                     hasCompletedOnboarding = false
                 }
             }

@@ -568,6 +568,61 @@ public enum VoiceInkMacOSOnboardingPermissionKind: String, Equatable, Sendable {
     case keyboardShortcut
 }
 
+public enum VoiceInkMacOSOnboardingStage: String, Equatable, Sendable {
+    case welcome
+    case permissions
+    case modelDownload
+    case tutorial
+
+    public var resumesPermissionsView: Bool {
+        self != .welcome
+    }
+
+    public var resumesModelDownload: Bool {
+        self == .modelDownload || self == .tutorial
+    }
+
+    public var resumesTutorial: Bool {
+        self == .tutorial
+    }
+}
+
+public enum VoiceInkMacOSOnboardingProgressStore {
+    private static let stageKey = "macOSOnboardingStage"
+    private static let permissionKindKey = "macOSOnboardingPermissionKind"
+
+    public static func stage(in defaults: UserDefaults = .standard) -> VoiceInkMacOSOnboardingStage {
+        defaults.string(forKey: stageKey)
+            .flatMap(VoiceInkMacOSOnboardingStage.init(rawValue:)) ?? .welcome
+    }
+
+    public static func saveStage(
+        _ stage: VoiceInkMacOSOnboardingStage,
+        in defaults: UserDefaults = .standard
+    ) {
+        defaults.set(stage.rawValue, forKey: stageKey)
+    }
+
+    public static func permissionKind(
+        in defaults: UserDefaults = .standard
+    ) -> VoiceInkMacOSOnboardingPermissionKind? {
+        defaults.string(forKey: permissionKindKey)
+            .flatMap(VoiceInkMacOSOnboardingPermissionKind.init(rawValue:))
+    }
+
+    public static func savePermissionKind(
+        _ kind: VoiceInkMacOSOnboardingPermissionKind,
+        in defaults: UserDefaults = .standard
+    ) {
+        defaults.set(kind.rawValue, forKey: permissionKindKey)
+    }
+
+    public static func reset(in defaults: UserDefaults = .standard) {
+        defaults.removeObject(forKey: stageKey)
+        defaults.removeObject(forKey: permissionKindKey)
+    }
+}
+
 public struct VoiceInkMacOSOnboardingAudioDeviceSelectionPresentation: Equatable, Sendable {
     public let emptyStateTitle: String
     public let pickerLabel: String

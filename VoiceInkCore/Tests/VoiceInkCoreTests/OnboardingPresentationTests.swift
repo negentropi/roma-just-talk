@@ -637,4 +637,69 @@ final class OnboardingPresentationTests: XCTestCase {
         XCTAssertFalse(negativeState.isActive)
         XCTAssertEqual(negativeState.pollsRemaining, 0)
     }
+
+    func testMacOSOnboardingStageResumeFlagsPreserveExistingFlow() {
+        XCTAssertFalse(VoiceInkMacOSOnboardingStage.welcome.resumesPermissionsView)
+        XCTAssertFalse(VoiceInkMacOSOnboardingStage.welcome.resumesModelDownload)
+        XCTAssertFalse(VoiceInkMacOSOnboardingStage.welcome.resumesTutorial)
+
+        XCTAssertTrue(VoiceInkMacOSOnboardingStage.permissions.resumesPermissionsView)
+        XCTAssertFalse(VoiceInkMacOSOnboardingStage.permissions.resumesModelDownload)
+        XCTAssertFalse(VoiceInkMacOSOnboardingStage.permissions.resumesTutorial)
+
+        XCTAssertTrue(VoiceInkMacOSOnboardingStage.modelDownload.resumesPermissionsView)
+        XCTAssertTrue(VoiceInkMacOSOnboardingStage.modelDownload.resumesModelDownload)
+        XCTAssertFalse(VoiceInkMacOSOnboardingStage.modelDownload.resumesTutorial)
+
+        XCTAssertTrue(VoiceInkMacOSOnboardingStage.tutorial.resumesPermissionsView)
+        XCTAssertTrue(VoiceInkMacOSOnboardingStage.tutorial.resumesModelDownload)
+        XCTAssertTrue(VoiceInkMacOSOnboardingStage.tutorial.resumesTutorial)
+    }
+
+    func testMacOSOnboardingProgressStoreDefaultsAndIgnoresMalformedValues() {
+        let suiteName = "VoiceInkCore.OnboardingPresentationTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defaults.removePersistentDomain(forName: suiteName)
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        XCTAssertEqual(VoiceInkMacOSOnboardingProgressStore.stage(in: defaults), .welcome)
+        XCTAssertNil(VoiceInkMacOSOnboardingProgressStore.permissionKind(in: defaults))
+
+        defaults.set("unknown", forKey: "macOSOnboardingStage")
+        defaults.set("unknown", forKey: "macOSOnboardingPermissionKind")
+
+        XCTAssertEqual(VoiceInkMacOSOnboardingProgressStore.stage(in: defaults), .welcome)
+        XCTAssertNil(VoiceInkMacOSOnboardingProgressStore.permissionKind(in: defaults))
+    }
+
+    func testMacOSOnboardingProgressStoreRoundTripsStageAndPermissionKind() {
+        let suiteName = "VoiceInkCore.OnboardingPresentationTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defaults.removePersistentDomain(forName: suiteName)
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        VoiceInkMacOSOnboardingProgressStore.saveStage(.modelDownload, in: defaults)
+        VoiceInkMacOSOnboardingProgressStore.savePermissionKind(.screenRecording, in: defaults)
+
+        XCTAssertEqual(defaults.string(forKey: "macOSOnboardingStage"), "modelDownload")
+        XCTAssertEqual(defaults.string(forKey: "macOSOnboardingPermissionKind"), "screenRecording")
+        XCTAssertEqual(VoiceInkMacOSOnboardingProgressStore.stage(in: defaults), .modelDownload)
+        XCTAssertEqual(VoiceInkMacOSOnboardingProgressStore.permissionKind(in: defaults), .screenRecording)
+    }
+
+    func testMacOSOnboardingProgressStoreResetClearsStageAndPermissionKind() {
+        let suiteName = "VoiceInkCore.OnboardingPresentationTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defaults.removePersistentDomain(forName: suiteName)
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        VoiceInkMacOSOnboardingProgressStore.saveStage(.tutorial, in: defaults)
+        VoiceInkMacOSOnboardingProgressStore.savePermissionKind(.keyboardShortcut, in: defaults)
+        VoiceInkMacOSOnboardingProgressStore.reset(in: defaults)
+
+        XCTAssertNil(defaults.string(forKey: "macOSOnboardingStage"))
+        XCTAssertNil(defaults.string(forKey: "macOSOnboardingPermissionKind"))
+        XCTAssertEqual(VoiceInkMacOSOnboardingProgressStore.stage(in: defaults), .welcome)
+        XCTAssertNil(VoiceInkMacOSOnboardingProgressStore.permissionKind(in: defaults))
+    }
 }

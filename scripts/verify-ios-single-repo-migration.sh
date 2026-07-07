@@ -428,6 +428,52 @@ require_multiline_pattern() {
   done
 }
 
+require_swift_function_pattern() {
+  local description="$1"
+  local file="$2"
+  local signature_pattern="$3"
+  local body_pattern="$4"
+
+  section "$description"
+  if ! perl -e '
+use strict;
+use warnings;
+
+my ($signature_pattern, $body_pattern, $file) = @ARGV;
+open my $fh, "<", $file or die "Unable to read $file: $!\n";
+my $source = do { local $/; <$fh> };
+
+if ($source !~ /$signature_pattern/g) {
+    exit 1;
+}
+
+my $signature_end = pos($source);
+my $open_brace = index($source, "{", $signature_end);
+exit 1 if $open_brace < 0;
+
+my $depth = 0;
+my $close_brace = -1;
+for (my $index = $open_brace; $index < length($source); $index++) {
+    my $character = substr($source, $index, 1);
+    if ($character eq "{") {
+        $depth++;
+    } elsif ($character eq "}") {
+        $depth--;
+        if ($depth == 0) {
+            $close_brace = $index + 1;
+            last;
+        }
+    }
+}
+exit 1 if $close_brace < 0;
+
+my $body = substr($source, $open_brace, $close_brace - $open_brace);
+exit($body =~ /$body_pattern/s ? 0 : 1);
+' "$signature_pattern" "$body_pattern" "$file"; then
+    fail "$description: missing function-body pattern in $file"
+  fi
+}
+
 reject_pattern() {
   local description="$1"
   local pattern="$2"
@@ -11571,10 +11617,11 @@ require_pattern \
   'DictionaryService\.removeVocabularyWord\(word, context: modelContext\)' \
   VoiceInk/Views/Dictionary/VocabularyView.swift
 
-require_multiline_pattern \
+require_swift_function_pattern \
   "macOS DictionaryService preserves vocabulary delete persistence semantics" \
-  '(?s)static func removeVocabularyWord\(.*context\.delete\(word\).*try context\.save\(\).*context\.rollback\(\).*VoiceInkDictionaryAlertPresentation\.failedToRemoveVocabularyWord' \
-  VoiceInk/Services/DictionaryService.swift
+  VoiceInk/Services/DictionaryService.swift \
+  'static func removeVocabularyWord\(' \
+  'context\.delete\(word\).*try context\.save\(\).*context\.rollback\(\).*VoiceInkDictionaryAlertPresentation\.failedToRemoveVocabularyWord'
 
 reject_pattern \
   "macOS vocabulary view avoids shell-owned delete persistence" \

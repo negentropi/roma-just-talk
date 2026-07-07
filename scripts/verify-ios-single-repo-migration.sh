@@ -3600,10 +3600,10 @@ require_patterns \
 
 require_patterns \
   "audio input public API proof uses normal VoiceInkCore import" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/AudioInputPolicyPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AudioPlaybackTimelineTests.swift \
   '^import VoiceInkCore$' \
-  'final class AudioInputPolicyPublicAPITests' \
-  'testFoldedAudioInputPolicySymbolsExposePublicAPI' \
+  'final class AudioPlaybackTimelineTests' \
+  'testAudioInputPolicySymbolsExposePublicAPI' \
   'VoiceInkAudioInputMode\.defaultMode' \
   'VoiceInkAudioInputPriorityPolicy\.firstAvailablePriorityDeviceID' \
   'VoiceInkAudioInputSelectionPolicy\.currentDeviceID' \
@@ -3614,15 +3614,17 @@ require_patterns \
   'VoiceInkAudioInputDiagnostics\.autoSelectingNewDeviceMessage' \
   'VoiceInkMacOSAudioInputSettingsPresentation\.macOS'
 
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/AudioInputPolicyPublicAPITests.swift
+
 reject_pattern \
   "audio input public API proof avoids testable import" \
   '@testable import VoiceInkCore' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/AudioInputPolicyPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/AudioPlaybackTimelineTests.swift
 
 require_voiceink_core_check_runner_invocations \
   "core checks execute audio input public API proof" \
-  AudioInputPolicyPublicAPITests \
-  testFoldedAudioInputPolicySymbolsExposePublicAPI
+  AudioPlaybackTimelineTests \
+  testAudioInputPolicySymbolsExposePublicAPI
 
 require_voiceink_core_check_runner_invocations \
   "core audio input automatic selection tests are in runner" \

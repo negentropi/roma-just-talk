@@ -289,7 +289,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "RecordingStatePolicyTests.testSelectionPolicyResolvesCurrentDeviceByMode", run: { RecordingStatePolicyTests().testSelectionPolicyResolvesCurrentDeviceByMode() }),
             VoiceInkCoreCheck(name: "RecordingStatePolicyTests.testSelectionPolicyPreservesModeChangeSelectionBehavior", run: { RecordingStatePolicyTests().testSelectionPolicyPreservesModeChangeSelectionBehavior() }),
             VoiceInkCoreCheck(name: "RecordingStatePolicyTests.testSelectionPolicyPlansRecordingDeviceSwitches", run: { RecordingStatePolicyTests().testSelectionPolicyPlansRecordingDeviceSwitches() }),
-            VoiceInkCoreCheck(name: "AudioInputPolicyPublicAPITests.testFoldedAudioInputPolicySymbolsExposePublicAPI", run: { AudioInputPolicyPublicAPITests().testFoldedAudioInputPolicySymbolsExposePublicAPI() }),
+            VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testAudioInputPolicySymbolsExposePublicAPI", run: { AudioPlaybackTimelineTests().testAudioInputPolicySymbolsExposePublicAPI() }),
             VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testIOSAudioSessionRecordingConfigurationPreservesRecordingPolicy", run: { AudioPlaybackTimelineTests().testIOSAudioSessionRecordingConfigurationPreservesRecordingPolicy() }),
             VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testAudioSessionDiagnosticsPreserveIOSLogCopy", run: { AudioPlaybackTimelineTests().testAudioSessionDiagnosticsPreserveIOSLogCopy() }),
             VoiceInkCoreCheck(name: "AudioPlaybackTimelineTests.testAudioSessionLifecycleStatePreservesIOSActivationAndTimeoutFlow", run: { AudioPlaybackTimelineTests().testAudioSessionLifecycleStatePreservesIOSActivationAndTimeoutFlow() }),

@@ -11947,12 +11947,17 @@ require_patterns \
   VoiceInkCore/Tests/VoiceInkCoreTests/AIPromptPublicAPITests.swift \
   '^import VoiceInkCore$' \
   'final class AIPromptPublicAPITests' \
+  'VoiceInkAIPrompts\.customPromptTemplate' \
   'VoiceInkAIPrompts\.finalPromptText' \
+  'VoiceInkAIRequestPrompts\.postProcessingSystemPrompt' \
+  'VoiceInkAIRequestPrompts\.postProcessingUserPrompt' \
   'VoiceInkAIRequestPrompts\.taggedTranscript' \
+  'VoiceInkAIEnhancementOutputFilter\.filter' \
   'VoiceInkAIEnhancementRequestPayload' \
   'VoiceInkAIEnhancementRequestPreparation\.preparing' \
   'VoiceInkAIEnhancementPromptBuilder\.systemMessage' \
   'VoiceInkAIEnhancementPromptContext' \
+  'VoiceInkAIEnhancementVocabularyContext\.formatted' \
   'VoiceInkScreenCaptureWindowFacts' \
   'VoiceInkAIEnhancementScreenContext\.contextText' \
   'VoiceInkSelectedTextDiagnostics\.fetchFailedMessage'

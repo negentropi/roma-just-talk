@@ -7635,6 +7635,11 @@ require_patterns \
   'VoiceInkAPIKeyVerificationResult' \
   'VoiceInkElevenLabsTranscriptionCodec\.transcript'
 
+require_multiline_pattern \
+  "ElevenLabs public API proof keeps defaulted transcribe call short" \
+  'let transcribeWithDefaultedLabels = \{\s*try await client\.transcribeAudioData\(\s*baseURL: VoiceInkProviderEndpoint\.elevenLabsAPIBaseURL,\s*apiKey: "eleven-key",\s*model: "scribe_v2",\s*audioData: Data\("WAVDATA"\.utf8\)\s*\)\s*\}' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/ElevenLabsPublicAPITests.swift
+
 reject_pattern \
   "ElevenLabs public API proof avoids testable import" \
   '@testable import VoiceInkCore' \

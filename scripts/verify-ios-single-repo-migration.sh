@@ -11350,8 +11350,8 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift
 
 require_patterns \
-  "shared transcription run preparation owns prompt use policy" \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunPreparation.swift \
+  "shared transcription run processor owns prompt use policy" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift \
   'VoiceInkTranscriptionPromptUse' \
   'case recordedFileTranscription' \
   'case streamingTranscription' \
@@ -11909,6 +11909,9 @@ require_pattern \
   'VoiceInkTranscriptionRunPreparation\.prepareRawText' \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift
 
+section "obsolete standalone transcription run preparation module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunPreparation.swift
+
 require_pattern \
   "shared audio-file transcription draft plan lives in VoiceInkCore" \
   'VoiceInkAudioFileTranscriptionDraftContext|VoiceInkAudioFileTranscriptionEnhancementOutcome|VoiceInkAudioFileTranscriptionDraft' \
@@ -11922,7 +11925,7 @@ require_pattern \
 require_pattern \
   "shared transcription enhancement text plan type lives in VoiceInkCore" \
   'VoiceInkTranscriptionEnhancementTextPlan' \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunPreparation.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift
 
 reject_swift_pattern \
   "shared audio-file transcription uses enhancement text plan directly" \
@@ -11934,17 +11937,17 @@ reject_swift_pattern \
 require_pattern \
   "shared transcription enhancement raw text preparation helper lives in VoiceInkCore" \
   'prepareRawTextForEnhancement' \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunPreparation.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift
 
 require_pattern \
   "shared audio-file transcription text preparation helper lives in VoiceInkCore" \
   'prepareAudioFileText' \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunPreparation.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift
 
 require_pattern \
   "shared audio-file transcription enhancement skip helper lives in VoiceInkCore" \
   'shouldSkipEnhancement' \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunPreparation.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift
 
 section "obsolete standalone post-processing skip policy module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/PostProcessingSkipPolicy.swift
@@ -11956,14 +11959,14 @@ reject_swift_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests
 
 require_pattern \
-  "shared post-processing skip policy lives with transcription run preparation" \
+  "shared post-processing skip policy lives with transcription run processor" \
   'VoiceInkPostProcessingSkipConfiguration|VoiceInkPostProcessingSkipPolicy|shouldSkipPostProcessing' \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunPreparation.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift
 
 require_pattern \
   "shared transcription enhancement request planning lives in VoiceInkCore" \
   'VoiceInkTranscriptionEnhancementRequest' \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunPreparation.swift
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift
 
 require_pattern \
   "macOS live recording uses shared enhancement text plan" \
@@ -20525,8 +20528,8 @@ reject_pattern \
   iOS/VoiceInk-ios/NotesListView.swift
 
 require_patterns \
-  "shared transcription run preparation owns word-count policy" \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunPreparation.swift \
+  "shared transcription run processor owns word-count policy" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift \
   'public enum VoiceInkWordCounter' \
   'public static func count\(in text: String\) -> Int' \
   'static func count\(in text: String, language: NLLanguage\?\) -> Int' \

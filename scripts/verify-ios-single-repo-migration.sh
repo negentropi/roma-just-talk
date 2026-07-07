@@ -20285,10 +20285,32 @@ reject_swift_pattern \
   '\bDiagnosticLogExportPolicyTests\b' \
   VoiceInkCore/Tests/VoiceInkCoreTests
 
-require_pattern \
+require_patterns \
   "shared diagnostic log export policy lives with app identity in VoiceInkCore" \
-  'VoiceInkDiagnosticsSettingsPresentation|VoiceInkDiagnosticLogExportPolicy|VoiceInkDiagnosticLogSessionRange|sessionStartDatesKey = "logExporter\.sessionStartDates\.v1"|maxSessionStartDatesToKeep = 3|timestampDateFormat = "yyyy-MM-dd HH:mm:ss\.SSS"|fileNameDateFormat = "yyyy-MM-dd_HH-mm-ss"|fileNamePrefix = "VoiceInk_Logs_"|headerTitle = "=== VoiceInk Diagnostic Logs ==="|noLogsFoundMessage = "No logs found for this session\."|exporterErrorDomain = "LogExporter"|downloadsDirectoryUnavailableErrorCode = 1|downloadsDirectoryUnavailableDescription = "Downloads directory unavailable"|sessionRanges|headerLines|logEntryLine|exportContent|logLevelLabel|fileName|downloadsDirectoryUnavailableError|rollingBufferLastClaimLabel|exportFailedAlertTitle|exportedLogSuccessSystemImageName' \
-  VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift
+  VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift \
+  'VoiceInkDiagnosticsSettingsPresentation' \
+  'VoiceInkDiagnosticLogExportPolicy' \
+  'VoiceInkDiagnosticLogSessionRange' \
+  'sessionStartDatesKey = "logExporter\.sessionStartDates\.v1"' \
+  'maxSessionStartDatesToKeep = 3' \
+  'timestampDateFormat = "yyyy-MM-dd HH:mm:ss\.SSS"' \
+  'fileNameDateFormat = "yyyy-MM-dd_HH-mm-ss"' \
+  'fileNamePrefix = "VoiceInk_Logs_"' \
+  'headerTitle = "=== VoiceInk Diagnostic Logs ==="' \
+  'noLogsFoundMessage = "No logs found for this session\."' \
+  'exporterErrorDomain = "LogExporter"' \
+  'downloadsDirectoryUnavailableErrorCode = 1' \
+  'downloadsDirectoryUnavailableDescription = "Downloads directory unavailable"' \
+  'sessionRanges' \
+  'headerLines' \
+  'logEntryLine' \
+  'exportContent' \
+  'logLevelLabel' \
+  'fileName' \
+  'downloadsDirectoryUnavailableError' \
+  'rollingBufferLastClaimLabel' \
+  'exportFailedAlertTitle' \
+  'exportedLogSuccessSystemImageName'
 
 require_patterns \
   "system information report tests cover diagnostic log export policy" \

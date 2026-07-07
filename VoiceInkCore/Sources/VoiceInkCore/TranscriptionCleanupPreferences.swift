@@ -295,10 +295,10 @@ public enum VoiceInkTranscriptionCleanupPreferenceStorage {
 }
 
 public struct VoiceInkTranscriptionCleanupSettings: Equatable, Sendable {
-    public let punctuationMode: PunctuationCleanupMode
-    public let isTextFormattingEnabled: Bool
-    public let lowercaseTranscription: Bool
-    public let removeFillerWords: Bool
+    public var punctuationMode: PunctuationCleanupMode
+    public var isTextFormattingEnabled: Bool
+    public var lowercaseTranscription: Bool
+    public var removeFillerWords: Bool
 
     public var removesAllPunctuation: Bool {
         punctuationMode == .removeAll
@@ -316,6 +316,15 @@ public struct VoiceInkTranscriptionCleanupSettings: Equatable, Sendable {
         self.removeFillerWords = removeFillerWords
     }
 
+    public func updating<Value>(
+        _ keyPath: WritableKeyPath<VoiceInkTranscriptionCleanupSettings, Value>,
+        to value: Value
+    ) -> VoiceInkTranscriptionCleanupSettings {
+        var settings = self
+        settings[keyPath: keyPath] = value
+        return settings
+    }
+
     public static func current(in defaults: UserDefaults = .standard) -> VoiceInkTranscriptionCleanupSettings {
         VoiceInkTranscriptionCleanupSettings(
             punctuationMode: PunctuationCleanupMode.current(in: defaults),
@@ -330,6 +339,24 @@ public struct VoiceInkTranscriptionCleanupSettings: Equatable, Sendable {
         VoiceInkTranscriptionCleanupPreferenceStorage.saveTextFormattingEnabled(isTextFormattingEnabled, to: defaults)
         VoiceInkTranscriptionCleanupPreferenceStorage.saveLowercaseTranscription(lowercaseTranscription, to: defaults)
         VoiceInkTranscriptionCleanupPreferenceStorage.saveRemoveFillerWords(removeFillerWords, to: defaults)
+    }
+
+    public func saveChangedValues(
+        from previous: VoiceInkTranscriptionCleanupSettings,
+        to defaults: UserDefaults = .standard
+    ) {
+        if punctuationMode != previous.punctuationMode {
+            PunctuationCleanupMode.setCurrent(punctuationMode, in: defaults)
+        }
+        if isTextFormattingEnabled != previous.isTextFormattingEnabled {
+            VoiceInkTranscriptionCleanupPreferenceStorage.saveTextFormattingEnabled(isTextFormattingEnabled, to: defaults)
+        }
+        if lowercaseTranscription != previous.lowercaseTranscription {
+            VoiceInkTranscriptionCleanupPreferenceStorage.saveLowercaseTranscription(lowercaseTranscription, to: defaults)
+        }
+        if removeFillerWords != previous.removeFillerWords {
+            VoiceInkTranscriptionCleanupPreferenceStorage.saveRemoveFillerWords(removeFillerWords, to: defaults)
+        }
     }
 
     public func runtimeConfiguration(

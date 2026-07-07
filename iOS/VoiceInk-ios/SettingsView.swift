@@ -24,7 +24,7 @@ struct SettingsView: View {
     var body: some View {
         let dictionarySnapshot = self.dictionarySnapshot
         let fillerWordEditorPresentation = VoiceInkFillerWords.editorPresentation(
-            isEnabled: settings.removeFillerWords,
+            isEnabled: settings.transcriptionCleanupSettings.removeFillerWords,
             words: settings.fillerWords
         )
 
@@ -83,17 +83,17 @@ struct SettingsView: View {
             }
 
             Section(header: Text(cleanupPresentation.sectionTitle)) {
-                Picker(cleanupPresentation.punctuationPickerTitle, selection: $settings.punctuationCleanupMode) {
+                Picker(cleanupPresentation.punctuationPickerTitle, selection: cleanupBinding(\.punctuationMode)) {
                     ForEach(PunctuationCleanupMode.allCases) { mode in
                         Text(mode.displayName).tag(mode)
                     }
                 }
 
-                Toggle(cleanupPresentation.paragraphBreaksToggleTitle, isOn: $settings.isTextFormattingEnabled)
+                Toggle(cleanupPresentation.paragraphBreaksToggleTitle, isOn: cleanupBinding(\.isTextFormattingEnabled))
 
-                Toggle(cleanupPresentation.lowercaseToggleTitle, isOn: $settings.lowercaseTranscription)
+                Toggle(cleanupPresentation.lowercaseToggleTitle, isOn: cleanupBinding(\.lowercaseTranscription))
 
-                Toggle(cleanupPresentation.removeFillerWordsToggleTitle, isOn: $settings.removeFillerWords)
+                Toggle(cleanupPresentation.removeFillerWordsToggleTitle, isOn: cleanupBinding(\.removeFillerWords))
 
                 if fillerWordEditorPresentation.shouldShowEditor {
                     HStack {
@@ -229,6 +229,15 @@ struct SettingsView: View {
                 dismissButton: .cancel(Text(alert.primaryButtonTitle))
             )
         }
+    }
+
+    private func cleanupBinding<Value>(
+        _ keyPath: WritableKeyPath<VoiceInkTranscriptionCleanupSettings, Value>
+    ) -> Binding<Value> {
+        Binding(
+            get: { settings.transcriptionCleanupSettings[keyPath: keyPath] },
+            set: { settings.transcriptionCleanupSettings[keyPath: keyPath] = $0 }
+        )
     }
 
     private var dictionarySnapshot: VoiceInkDictionarySettingsSnapshot {

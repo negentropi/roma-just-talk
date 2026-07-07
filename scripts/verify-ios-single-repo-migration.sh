@@ -10590,6 +10590,11 @@ require_pattern \
 section "obsolete macOS filler-word storage manager stays deleted"
 reject_file VoiceInk/Transcription/Processing/FillerWordManager.swift
 
+reject_fixed_string \
+  "macOS project metadata avoids obsolete filler-word storage manager" \
+  "FillerWordManager.swift" \
+  VoiceInk.xcodeproj/project.pbxproj
+
 require_patterns \
   "macOS filler-word settings receives and persists shared submission plan directly" \
   VoiceInk/Views/Components/FillerWordsSettingsView.swift \
@@ -10733,8 +10738,8 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionCleanupPreferences.swift
 
 require_pattern \
-  "macOS model settings uses shared punctuation cleanup stored selection fallback" \
-  'PunctuationCleanupMode\.selection\(fromStoredRawValue: punctuationCleanupModeRaw\)' \
+  "macOS model settings reads shared aggregate cleanup settings from defaults" \
+  'VoiceInkTranscriptionCleanupSettings\.current\(\)' \
   VoiceInk/Views/ModelSettingsView.swift
 
 reject_pattern \
@@ -11645,6 +11650,22 @@ require_patterns \
   'collapseWhitespaceRunsAndTrim' \
   'normalizeParagraphSpacing' \
   'VoiceInkTranscriptionOutputFilter'
+
+require_patterns \
+  "aggregate transcription cleanup setting updates live with cleanup preferences" \
+  VoiceInkCore/Sources/VoiceInkCore/TranscriptionCleanupPreferences.swift \
+  'public func updating<Value>' \
+  'public func saveChangedValues' \
+  'PunctuationCleanupMode\.setCurrent\(punctuationMode' \
+  'VoiceInkTranscriptionCleanupPreferenceStorage\.saveTextFormattingEnabled' \
+  'VoiceInkTranscriptionCleanupPreferenceStorage\.saveLowercaseTranscription' \
+  'VoiceInkTranscriptionCleanupPreferenceStorage\.saveRemoveFillerWords'
+
+require_voiceink_core_check_runner_invocations \
+  "core check runner executes aggregate cleanup settings proofs" \
+  TranscriptionCleanupPreferencesTests \
+  testCleanupSettingsUpdateHelperChangesOneFieldAndPreservesOthers \
+  testCleanupSettingsChangedValueSaveWritesOnlyChangedPreferences
 
 require_patterns \
   "core checks execute moved transcription output filter tests" \
@@ -18753,6 +18774,51 @@ require_pattern \
   "iOS app settings reset consumes shared reset state" \
   'VoiceInkDefaultSettings\.iOS\.appSettingsResetState\.applyRuntimeState' \
   iOS/VoiceInk-ios/AppSettings.swift
+
+require_patterns \
+  "iOS app settings owns one aggregate cleanup settings value" \
+  iOS/VoiceInk-ios/AppSettings.swift \
+  '@Published var transcriptionCleanupSettings: VoiceInkTranscriptionCleanupSettings' \
+  'transcriptionCleanupSettings\.saveChangedValues\(from: oldValue\)' \
+  'transcriptionCleanupSettings = startupState\.transcriptionCleanupSettings' \
+  'setTranscriptionCleanupSettings: \{ \[self\] in transcriptionCleanupSettings = \$0 \}'
+
+reject_pattern \
+  "iOS app settings avoids cleanup preference fan-out" \
+  '@Published var +(punctuationCleanupMode|isTextFormattingEnabled|lowercaseTranscription|removeFillerWords)|VoiceInkTranscriptionCleanupPreferenceStorage\.save(TextFormattingEnabled|LowercaseTranscription|RemoveFillerWords)|PunctuationCleanupMode\.setCurrent\(punctuationCleanupMode\)' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+require_patterns \
+  "iOS settings binds cleanup controls through aggregate settings" \
+  iOS/VoiceInk-ios/SettingsView.swift \
+  'settings\.transcriptionCleanupSettings\.removeFillerWords' \
+  'private func cleanupBinding<Value>' \
+  'settings\.transcriptionCleanupSettings\[keyPath: keyPath\]'
+
+reject_pattern \
+  "iOS settings avoids direct cleanup field bindings" \
+  '\$settings\.(punctuationCleanupMode|isTextFormattingEnabled|lowercaseTranscription|removeFillerWords)' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
+require_patterns \
+  "macOS cleanup settings controls use defaults-backed aggregate settings bindings" \
+  VoiceInk/Views/ModelSettingsView.swift \
+  'VoiceInkTranscriptionCleanupSettings\.current\(\)' \
+  'private func cleanupBinding<Value: Equatable>' \
+  'updatedSettings\.saveChangedValues\(from: previousSettings\)' \
+  'UserDefaults\.didChangeNotification'
+
+require_patterns \
+  "macOS filler-word settings receives cleanup toggle binding" \
+  VoiceInk/Views/Components/FillerWordsSettingsView.swift \
+  '@Binding private var removeFillerWords: Bool' \
+  'init\(removeFillerWords: Binding<Bool>\)'
+
+reject_pattern \
+  "macOS cleanup settings avoids direct cleanup AppStorage fan-out" \
+  '@AppStorage\((VoiceInkUserDefaultsKey\.(isTextFormattingEnabled|lowercaseTranscription|removeFillerWords)|PunctuationCleanupMode\.userDefaultsKey)' \
+  VoiceInk/Views/ModelSettingsView.swift \
+  VoiceInk/Views/Components/FillerWordsSettingsView.swift
 
 require_patterns \
   "iOS app settings initializer consumes shared startup state" \

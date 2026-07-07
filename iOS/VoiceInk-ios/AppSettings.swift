@@ -31,20 +31,8 @@ final class AppSettings: ObservableObject {
         didSet { VoiceInkAudioSessionTimeoutPreference.saveTimeoutSeconds(audioSessionTimeoutSeconds) }
     }
 
-    @Published var punctuationCleanupMode: PunctuationCleanupMode {
-        didSet { PunctuationCleanupMode.setCurrent(punctuationCleanupMode) }
-    }
-
-    @Published var isTextFormattingEnabled: Bool {
-        didSet { VoiceInkTranscriptionCleanupPreferenceStorage.saveTextFormattingEnabled(isTextFormattingEnabled) }
-    }
-
-    @Published var lowercaseTranscription: Bool {
-        didSet { VoiceInkTranscriptionCleanupPreferenceStorage.saveLowercaseTranscription(lowercaseTranscription) }
-    }
-
-    @Published var removeFillerWords: Bool {
-        didSet { VoiceInkTranscriptionCleanupPreferenceStorage.saveRemoveFillerWords(removeFillerWords) }
+    @Published var transcriptionCleanupSettings: VoiceInkTranscriptionCleanupSettings {
+        didSet { transcriptionCleanupSettings.saveChangedValues(from: oldValue) }
     }
 
     @Published var fillerWords: [String] {
@@ -75,10 +63,7 @@ final class AppSettings: ObservableObject {
         self.selectedModeId = startupState.selectedModeId
         self.apiKeyState = startupState.apiKeyState
         self.audioSessionTimeoutSeconds = startupState.audioSessionTimeoutSeconds
-        self.punctuationCleanupMode = startupState.transcriptionCleanupSettings.punctuationMode
-        self.isTextFormattingEnabled = startupState.transcriptionCleanupSettings.isTextFormattingEnabled
-        self.lowercaseTranscription = startupState.transcriptionCleanupSettings.lowercaseTranscription
-        self.removeFillerWords = startupState.transcriptionCleanupSettings.removeFillerWords
+        self.transcriptionCleanupSettings = startupState.transcriptionCleanupSettings
         self.fillerWords = startupState.fillerWords
         self.wordReplacements = startupState.wordReplacements
         self.customVocabularyTerms = startupState.customVocabularyTerms
@@ -249,12 +234,7 @@ final class AppSettings: ObservableObject {
             setSelectedModeId: { [self] in selectedModeId = $0 },
             setAPIKeyState: { [self] in apiKeyState = $0 },
             setAudioSessionTimeoutSeconds: { [self] in audioSessionTimeoutSeconds = $0 },
-            setTranscriptionCleanupSettings: { [self] cleanupSettings in
-                punctuationCleanupMode = cleanupSettings.punctuationMode
-                isTextFormattingEnabled = cleanupSettings.isTextFormattingEnabled
-                lowercaseTranscription = cleanupSettings.lowercaseTranscription
-                removeFillerWords = cleanupSettings.removeFillerWords
-            },
+            setTranscriptionCleanupSettings: { [self] in transcriptionCleanupSettings = $0 },
             setFillerWords: { [self] in fillerWords = $0 },
             setWordReplacements: { [self] in wordReplacements = $0 },
             setCustomVocabularyTerms: { [self] in customVocabularyTerms = $0 },

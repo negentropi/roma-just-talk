@@ -4,10 +4,6 @@ import VoiceInkCore
 struct ModelSettingsView: View {
     @AppStorage(VoiceInkUserDefaultsKey.selectedTranscriptionLanguage)
     private var selectedLanguage = VoiceInkDefaultSettings.macOS.selectedTranscriptionLanguage
-    @AppStorage(VoiceInkUserDefaultsKey.isTextFormattingEnabled)
-    private var isTextFormattingEnabled = VoiceInkPreferenceDefault.isTextFormattingEnabled
-    @AppStorage(PunctuationCleanupMode.userDefaultsKey) private var punctuationCleanupModeRaw = PunctuationCleanupMode.current().rawValue
-    @AppStorage(VoiceInkUserDefaultsKey.lowercaseTranscription) private var lowercaseTranscription = false
     @AppStorage(VoiceInkVADPreference.userDefaultsKey)
     private var isVADEnabled = VoiceInkVADPreference.defaultIsEnabled
     @AppStorage(VoiceInkAppendTrailingSpacePreference.userDefaultsKey)
@@ -17,6 +13,7 @@ struct ModelSettingsView: View {
     @AppStorage(VoiceInkRecorderPreviewPreference.userDefaultsKey)
     private var showLiveTextPreview = VoiceInkRecorderPreviewPreference.defaultIsLiveTextPreviewEnabled
     @State private var promptDraftState = VoiceInkLocalWhisperPromptDraftState()
+    @State private var cleanupSettingsRevision = 0
     private let advancedSettingsPresentation = VoiceInkMacOSAdvancedTranscriptionSettingsPresentation.macOS
     private let appendTrailingSpacePresentation = VoiceInkAppendTrailingSpacePreference.macOSSettingsPresentation
     private let cleanupPresentation = VoiceInkTranscriptionCleanupPresentation.macOS
@@ -35,14 +32,23 @@ struct ModelSettingsView: View {
         UserDefaults.standard.synchronize()
     }
 
-    private var punctuationCleanupMode: Binding<PunctuationCleanupMode> {
+    private var currentCleanupSettings: VoiceInkTranscriptionCleanupSettings {
+        _ = cleanupSettingsRevision
+        return VoiceInkTranscriptionCleanupSettings.current()
+    }
+
+    private func cleanupBinding<Value: Equatable>(
+        _ keyPath: WritableKeyPath<VoiceInkTranscriptionCleanupSettings, Value>
+    ) -> Binding<Value> {
         Binding(
-            get: {
-                PunctuationCleanupMode.selection(fromStoredRawValue: punctuationCleanupModeRaw)
-            },
-            set: { newMode in
-                punctuationCleanupModeRaw = newMode.rawValue
-                PunctuationCleanupMode.setCurrent(newMode)
+            get: { currentCleanupSettings[keyPath: keyPath] },
+            set: { newValue in
+                let previousSettings = VoiceInkTranscriptionCleanupSettings.current()
+                guard previousSettings[keyPath: keyPath] != newValue else { return }
+
+                let updatedSettings = previousSettings.updating(keyPath, to: newValue)
+                updatedSettings.saveChangedValues(from: previousSettings)
+                cleanupSettingsRevision &+= 1
             }
         )
     }
@@ -86,7 +92,7 @@ struct ModelSettingsView: View {
             }
 
             Section {
-                Toggle(isOn: $isTextFormattingEnabled) {
+                Toggle(isOn: cleanupBinding(\.isTextFormattingEnabled)) {
                     HStack(spacing: 4) {
                         Text(cleanupPresentation.paragraphBreaksToggleTitle)
                         if let helpText = cleanupPresentation.paragraphBreaksHelpText {
@@ -96,7 +102,7 @@ struct ModelSettingsView: View {
                 }
                 .toggleStyle(.switch)
 
-                Picker(selection: punctuationCleanupMode) {
+                Picker(selection: cleanupBinding(\.punctuationMode)) {
                     ForEach(PunctuationCleanupMode.allCases) { mode in
                         Text(mode.displayName).tag(mode)
                     }
@@ -110,7 +116,7 @@ struct ModelSettingsView: View {
                 }
                 .pickerStyle(.menu)
 
-                Toggle(isOn: $lowercaseTranscription) {
+                Toggle(isOn: cleanupBinding(\.lowercaseTranscription)) {
                     HStack(spacing: 4) {
                         Text(cleanupPresentation.lowercaseToggleTitle)
                         if let helpText = cleanupPresentation.lowercaseHelpText {
@@ -120,7 +126,7 @@ struct ModelSettingsView: View {
                 }
                 .toggleStyle(.switch)
 
-                FillerWordsSettingsView()
+                FillerWordsSettingsView(removeFillerWords: cleanupBinding(\.removeFillerWords))
             } header: {
                 Text(cleanupPresentation.sectionTitle)
             }
@@ -167,6 +173,9 @@ struct ModelSettingsView: View {
             promptDraftState = promptDraftState.refreshingForSelectedLanguage(
                 prompt: languagePrompt(for: selectedLanguage)
             )
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)) { _ in
+            cleanupSettingsRevision &+= 1
         }
     }
 }

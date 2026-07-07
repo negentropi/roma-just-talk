@@ -39,12 +39,15 @@ struct FillerWordChip: View {
 }
 
 struct FillerWordsSettingsView: View {
-    @AppStorage(VoiceInkUserDefaultsKey.removeFillerWords)
-    private var removeFillerWords = VoiceInkPreferenceDefault.removeFillerWords
+    @Binding private var removeFillerWords: Bool
     @State private var fillerWords = VoiceInkFillerWordPreference.words()
     @State private var draftState = VoiceInkFillerWordDraftState()
     @State private var alertPresentation: VoiceInkDictionaryAlertPresentation?
     private let cleanupPresentation = VoiceInkTranscriptionCleanupPresentation.macOS
+
+    init(removeFillerWords: Binding<Bool>) {
+        self._removeFillerWords = removeFillerWords
+    }
 
     var body: some View {
         let editorPresentation = VoiceInkFillerWords.editorPresentation(

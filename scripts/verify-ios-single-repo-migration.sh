@@ -332,8 +332,8 @@ my %duplicate_runner_tests;
 my %mismatched_runner_tests;
 my @unparsed_runner_lines;
 while (my $line = <$runner_fh>) {
-    next unless $line =~ /VoiceInkCoreCheck\(name: "/;
-    if ($line !~ /VoiceInkCoreCheck\(name: "([A-Za-z0-9_]+)\.(test[A-Za-z0-9_]+)", run: \{ (?:try\s+)?(?:await\s+)?([A-Za-z0-9_]+)\(\)\.(test[A-Za-z0-9_]+)\(\) \}\),/) {
+    next unless $line =~ /VoiceInkCoreCheck\s*\(/;
+    if ($line !~ /VoiceInkCoreCheck\s*\(\s*name:\s*"([A-Za-z0-9_]+)\.(test[A-Za-z0-9_]+)"\s*,\s*run:\s*\{\s*(?:try\s+)?(?:await\s+)?([A-Za-z0-9_]+)\(\)\.(test[A-Za-z0-9_]+)\(\)\s*\}\s*\),/) {
         push @unparsed_runner_lines, $.;
         next;
     }

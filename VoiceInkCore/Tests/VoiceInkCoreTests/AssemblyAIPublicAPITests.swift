@@ -117,15 +117,17 @@ final class AssemblyAIPublicAPITests: XCTestCase {
             try VoiceInkAssemblyAITranscriptionCodec.createdTranscriptID(from: Data(#"{"id":"tx-123"}"#.utf8)),
             "tx-123"
         )
-        XCTAssertEqual(
-            try VoiceInkAssemblyAITranscriptionCodec.transcriptStatus(
-                from: Data(#"{"status":"completed","text":"assemblyai text","error":null}"#.utf8)
-            ),
-            VoiceInkAssemblyAITranscriptStatus(
-                status: "completed",
-                text: "assemblyai text",
-                error: nil
-            )
+        let publicTranscriptStatus = VoiceInkAssemblyAITranscriptStatus(
+            status: "completed",
+            text: "assemblyai text",
+            error: nil
         )
+        let decodedTranscriptStatus = try VoiceInkAssemblyAITranscriptionCodec.transcriptStatus(
+            from: Data(#"{"status":"completed","text":"assemblyai text","error":null}"#.utf8)
+        )
+        XCTAssertEqual(decodedTranscriptStatus, publicTranscriptStatus)
+        XCTAssertEqual(publicTranscriptStatus.status, "completed")
+        XCTAssertEqual(publicTranscriptStatus.text, "assemblyai text")
+        XCTAssertNil(publicTranscriptStatus.error)
     }
 }

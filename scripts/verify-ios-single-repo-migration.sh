@@ -663,6 +663,78 @@ reject_swift_static_function_body_pattern() {
   fi
 }
 
+swift_declaration_body_pattern_status() {
+  local file="$1"
+  local declaration_name="$2"
+  local pattern="$3"
+
+  perl -0Mstrict -Mwarnings -e '
+    my ($declaration_name, $pattern, $file) = @ARGV;
+    open my $fh, "<", $file or die "open $file: $!";
+    local $/;
+    my $source = <$fh>;
+    my $declaration = qr/\b(?:(?:public|private|fileprivate|internal|open|final|indirect|nonisolated|\@MainActor|\@unchecked|\@preconcurrency)\s+)*(?:struct|enum|class|actor)\s+\Q$declaration_name\E\b[^{]*\{/;
+    exit 2 unless $source =~ /$declaration/g;
+    my $open_brace = pos($source) - 1;
+    my $depth = 0;
+    my $close_brace;
+    for (my $index = $open_brace; $index < length($source); $index++) {
+      my $char = substr($source, $index, 1);
+      if ($char eq "{") {
+        $depth++;
+      } elsif ($char eq "}") {
+        $depth--;
+        if ($depth == 0) {
+          $close_brace = $index;
+          last;
+        }
+      }
+    }
+
+    exit 2 unless defined $close_brace;
+    my $body = substr($source, $open_brace + 1, $close_brace - $open_brace - 1);
+    exit($body =~ /$pattern/s ? 0 : 1);
+  ' "$declaration_name" "$pattern" "$file"
+}
+
+require_swift_declaration_body_pattern() {
+  local description="$1"
+  local file="$2"
+  local declaration_name="$3"
+  local pattern="$4"
+
+  section "$description"
+  set +e
+  swift_declaration_body_pattern_status "$file" "$declaration_name" "$pattern"
+  local status=$?
+  set -e
+
+  if (( status == 1 )); then
+    fail "$description: missing expected pattern in $declaration_name body"
+  elif (( status != 0 )); then
+    fail "$description: failed to inspect $declaration_name body in $file"
+  fi
+}
+
+reject_swift_declaration_body_pattern() {
+  local description="$1"
+  local file="$2"
+  local declaration_name="$3"
+  local pattern="$4"
+
+  section "$description"
+  set +e
+  swift_declaration_body_pattern_status "$file" "$declaration_name" "$pattern"
+  local status=$?
+  set -e
+
+  if (( status == 0 )); then
+    fail "$description: rejected pattern found in $declaration_name body"
+  elif (( status > 1 )); then
+    fail "$description: failed to inspect $declaration_name body in $file"
+  fi
+}
+
 require_provider_key_reset_direct_delete_adapter() {
   local file="$1"
 
@@ -8180,6 +8252,48 @@ require_patterns \
   'VoiceInkRemotePollingPolicy\.pollValidatedData' \
   'VoiceInkAPIKeyVerificationPolicy\.verify'
 
+require_swift_declaration_body_pattern \
+  "AssemblyAI folded client owns upload, create, poll, and verification orchestration" \
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift \
+  VoiceInkAssemblyAITranscriptionClient \
+  'public\s+func\s+transcribeAudioData.*uploadAudio.*createTranscript.*pollTranscript.*public\s+func\s+verifyAPIKeyDetailed.*VoiceInkAPIKeyVerificationPolicy\.verify.*VoiceInkAssemblyAIRequestBuilder\.makeTranscriptsRequest'
+
+reject_swift_declaration_body_pattern \
+  "AssemblyAI folded client avoids provider-local validators and polling loops" \
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift \
+  VoiceInkAssemblyAITranscriptionClient \
+  'private\s+static\s+func\s+validate|while true|Task\.sleep|URLSession\.shared\.data'
+
+require_swift_declaration_body_pattern \
+  "AssemblyAI folded builder owns upload, create, status, and verification request shape" \
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift \
+  VoiceInkAssemblyAIRequestBuilder \
+  'makeUploadAudioRequest.*VoiceInkProviderEndpoint\.assemblyAIUploadURL.*Authorization.*application/octet-stream.*makeCreateTranscriptRequest.*speechModels.*language_code.*language_detection.*prompt.*keyterms_prompt.*makeTranscriptStatusRequest.*VoiceInkProviderEndpoint\.assemblyAITranscriptURL.*makeTranscriptsRequest.*VoiceInkProviderEndpoint\.assemblyAITranscriptsURL'
+
+reject_swift_declaration_body_pattern \
+  "AssemblyAI folded builder avoids provider-local validators" \
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift \
+  VoiceInkAssemblyAIRequestBuilder \
+  'private\s+static\s+func\s+validate'
+
+require_swift_declaration_body_pattern \
+  "AssemblyAI folded transcript status keeps public fields and initializer" \
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift \
+  VoiceInkAssemblyAITranscriptStatus \
+  'public\s+let\s+status:\s*String.*public\s+let\s+text:\s*String\?.*public\s+let\s+error:\s*String\?.*public\s+init\(status:\s*String,\s*text:\s*String\?,\s*error:\s*String\?\)'
+
+require_swift_declaration_body_pattern \
+  "AssemblyAI folded codec returns public transcript status type" \
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift \
+  VoiceInkAssemblyAITranscriptionCodec \
+  'uploadedAudioURL.*VoiceInkAssemblyAIUploadResponse.*createdTranscriptID.*VoiceInkAssemblyAITranscriptCreateResponse.*transcriptStatus.*VoiceInkAssemblyAITranscriptStatusResponse.*VoiceInkAssemblyAITranscriptStatus'
+
+reject_swift_declaration_body_pattern \
+  "AssemblyAI folded codec avoids provider-local validators" \
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift \
+  VoiceInkAssemblyAITranscriptionCodec \
+  'private\s+static\s+func\s+validate'
+
 require_swift_static_function_body_pattern \
   "AssemblyAI folded polling path uses shared remote polling policy" \
   VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift \
@@ -8221,7 +8335,11 @@ require_patterns \
   'VoiceInkAPIKeyVerificationResult' \
   'VoiceInkAssemblyAITranscriptionCodec\.uploadedAudioURL' \
   'VoiceInkAssemblyAITranscriptionCodec\.createdTranscriptID' \
-  'VoiceInkAssemblyAITranscriptionCodec\.transcriptStatus'
+  'VoiceInkAssemblyAITranscriptionCodec\.transcriptStatus' \
+  'VoiceInkAssemblyAITranscriptStatus\(' \
+  'publicTranscriptStatus\.status' \
+  'publicTranscriptStatus\.text' \
+  'publicTranscriptStatus\.error'
 
 reject_pattern \
   "AssemblyAI public API proof avoids conditional compilation snippets" \

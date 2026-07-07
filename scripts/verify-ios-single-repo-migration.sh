@@ -5101,22 +5101,41 @@ require_pattern \
 require_pattern \
   "shared local Whisper runtime invocation plan lives in VoiceInkCore" \
   'VoiceInkWhisperRuntimeInvocationPlan|withUnsafeCStringPointers|VoiceInkWhisperRuntimeConfiguration\.current' \
-  VoiceInkCore/Sources/VoiceInkCore/WhisperRuntimeDefaults.swift
+  VoiceInkCore/Sources/VoiceInkCore/LocalWhisperTranscriptionFlow.swift
 
 require_pattern \
   "shared local Whisper runtime parameter sink lives in VoiceInkCore" \
   'VoiceInkWhisperRuntimeFullParameterSink|VoiceInkWhisperRuntimeVADParameterSink|func apply<Parameters: VoiceInkWhisperRuntimeFullParameterSink>' \
-  VoiceInkCore/Sources/VoiceInkCore/WhisperRuntimeDefaults.swift
+  VoiceInkCore/Sources/VoiceInkCore/LocalWhisperTranscriptionFlow.swift
+
+require_patterns \
+  "folded local Whisper runtime declarations remain public" \
+  VoiceInkCore/Sources/VoiceInkCore/LocalWhisperTranscriptionFlow.swift \
+  'public enum VoiceInkWhisperTranscriptSegments' \
+  'public enum VoiceInkWhisperRuntimeDefaults' \
+  'public enum VoiceInkWhisperRuntimeDiagnostics' \
+  'public enum VoiceInkWhisperContextEnvironment' \
+  'public struct VoiceInkWhisperContextRuntimePlan' \
+  'public protocol VoiceInkWhisperContextParameterSink' \
+  'public struct VoiceInkWhisperRuntimeOptions' \
+  'public struct VoiceInkWhisperVADRuntimeConfiguration' \
+  'public struct VoiceInkWhisperRuntimeConfiguration' \
+  'public protocol VoiceInkWhisperRuntimeVADParameterSink' \
+  'public protocol VoiceInkWhisperRuntimeFullParameterSink' \
+  'public struct VoiceInkWhisperRuntimeInvocationPlan' \
+  'public enum VoiceInkLocalWhisperFailure' \
+  'public enum VoiceInkLocalWhisperPlatform' \
+  'public enum VoiceInkLocalWhisperFailurePolicy'
 
 require_pattern \
   "core tests cover shared local Whisper runtime invocation plan" \
   'testRuntimeInvocationPlanKeepsWhisperCStringInputsAlive|testRuntimeInvocationPlanOmitsDisabledWhisperInputs' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/WhisperRuntimeDefaultsTests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/LocalWhisperTranscriptionFlowTests.swift
 
 require_pattern \
   "core tests cover shared local Whisper runtime parameter sink" \
   'testRuntimeConfigurationAppliesSharedWhisperFullParameterSink|testRuntimeConfigurationAppliesSharedWhisperVADParameterSink' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/WhisperRuntimeDefaultsTests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/LocalWhisperTranscriptionFlowTests.swift
 
 require_pattern \
   "core check runner executes shared local Whisper runtime invocation tests" \
@@ -5146,18 +5165,20 @@ reject_pattern \
 
 section "obsolete standalone Whisper transcript segments module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/WhisperTranscriptSegments.swift
+reject_file VoiceInkCore/Sources/VoiceInkCore/WhisperRuntimeDefaults.swift
 
 require_pattern \
-  "shared local Whisper transcript segment policy lives with runtime policy" \
+  "shared local Whisper transcript segment policy lives with transcription flow" \
   'VoiceInkWhisperTranscriptSegments|joinedText\(segmentCount:' \
-  VoiceInkCore/Sources/VoiceInkCore/WhisperRuntimeDefaults.swift
+  VoiceInkCore/Sources/VoiceInkCore/LocalWhisperTranscriptionFlow.swift
 
 section "obsolete standalone Whisper transcript segment test suite stays deleted"
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/WhisperTranscriptSegmentsTests.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/WhisperRuntimeDefaultsTests.swift
 
 require_patterns \
   "core tests cover shared local Whisper transcript segment policy" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/WhisperRuntimeDefaultsTests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/LocalWhisperTranscriptionFlowTests.swift \
   'testJoinedTextConcatenatesSegmentsWithoutSeparator' \
   'testJoinedTextPreservesMacOSRawWhitespacePolicy' \
   'testJoinedTextReturnsEmptyForNoSegments' \
@@ -5167,21 +5188,77 @@ require_patterns \
 require_patterns \
   "core check runner executes shared local Whisper transcript segment policy tests" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'WhisperRuntimeDefaultsTests\.testJoinedTextConcatenatesSegmentsWithoutSeparator' \
-  'WhisperRuntimeDefaultsTests\(\)\.testJoinedTextConcatenatesSegmentsWithoutSeparator\(\)' \
-  'WhisperRuntimeDefaultsTests\.testJoinedTextPreservesMacOSRawWhitespacePolicy' \
-  'WhisperRuntimeDefaultsTests\(\)\.testJoinedTextPreservesMacOSRawWhitespacePolicy\(\)' \
-  'WhisperRuntimeDefaultsTests\.testJoinedTextReturnsEmptyForNoSegments' \
-  'WhisperRuntimeDefaultsTests\(\)\.testJoinedTextReturnsEmptyForNoSegments\(\)' \
-  'WhisperRuntimeDefaultsTests\.testJoinedTextFromSegmentLookupPreservesRawOrderAndSkipsMissingSegments' \
-  'WhisperRuntimeDefaultsTests\(\)\.testJoinedTextFromSegmentLookupPreservesRawOrderAndSkipsMissingSegments\(\)' \
-  'WhisperRuntimeDefaultsTests\.testJoinedTextFromSegmentLookupReturnsEmptyForNonPositiveCounts' \
-  'WhisperRuntimeDefaultsTests\(\)\.testJoinedTextFromSegmentLookupReturnsEmptyForNonPositiveCounts\(\)'
+  'LocalWhisperTranscriptionFlowTests\.testJoinedTextConcatenatesSegmentsWithoutSeparator' \
+  'LocalWhisperTranscriptionFlowTests\(\)\.testJoinedTextConcatenatesSegmentsWithoutSeparator\(\)' \
+  'LocalWhisperTranscriptionFlowTests\.testJoinedTextPreservesMacOSRawWhitespacePolicy' \
+  'LocalWhisperTranscriptionFlowTests\(\)\.testJoinedTextPreservesMacOSRawWhitespacePolicy\(\)' \
+  'LocalWhisperTranscriptionFlowTests\.testJoinedTextReturnsEmptyForNoSegments' \
+  'LocalWhisperTranscriptionFlowTests\(\)\.testJoinedTextReturnsEmptyForNoSegments\(\)' \
+  'LocalWhisperTranscriptionFlowTests\.testJoinedTextFromSegmentLookupPreservesRawOrderAndSkipsMissingSegments' \
+  'LocalWhisperTranscriptionFlowTests\(\)\.testJoinedTextFromSegmentLookupPreservesRawOrderAndSkipsMissingSegments\(\)' \
+  'LocalWhisperTranscriptionFlowTests\.testJoinedTextFromSegmentLookupReturnsEmptyForNonPositiveCounts' \
+  'LocalWhisperTranscriptionFlowTests\(\)\.testJoinedTextFromSegmentLookupReturnsEmptyForNonPositiveCounts\(\)'
 
 reject_pattern \
-  "core check runner avoids obsolete Whisper transcript segment suite references" \
-  'WhisperTranscriptSegmentsTests' \
+  "core check runner avoids obsolete Whisper runtime and segment suite references" \
+  'WhisperTranscriptSegmentsTests|WhisperRuntimeDefaultsTests' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "core package/project metadata and runner avoid obsolete Whisper runtime files/tests" \
+  'WhisperRuntimeDefaults(Tests)?\.swift|WhisperRuntimeDefaultsTests' \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_swift_pattern \
+  "core tests avoid stale WhisperRuntimeDefaults suite" \
+  '\bWhisperRuntimeDefaultsTests\b' \
+  VoiceInkCore/Tests/VoiceInkCoreTests
+
+reject_pattern \
+  "local Whisper flow tests exercise public VoiceInkCore surface" \
+  '@testable import VoiceInkCore' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/LocalWhisperTranscriptionFlowTests.swift
+
+require_pattern \
+  "local Whisper flow tests import VoiceInkCore as public API" \
+  '^import VoiceInkCore$' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/LocalWhisperTranscriptionFlowTests.swift
+
+require_voiceink_core_check_runner_invocations \
+  "core checks execute folded local Whisper runtime and flow tests through flow suite" \
+  LocalWhisperTranscriptionFlowTests \
+  testRequestBuildersPreservePlatformDefaults \
+  testTranscriptionDiagnosticsPreservePlatformLogCopy \
+  testFlowRunsTranscriptionAndReleasesOwnedContext \
+  testFlowLeavesBorrowedContextLoaded \
+  testFlowMapsMissingSamplesToPlatformAudioFailureAndReleasesContext \
+  testFlowMapsFailedTranscriptionToPlatformFailureAndReleasesContext \
+  testFlowCanPreserveShellThrownSampleErrorsAndFailureLifetime \
+  testThreadCountKeepsExistingBounds \
+  testRuntimeConstantsMatchExistingWhisperWrappers \
+  testRuntimeDiagnosticsPreserveExistingWhisperWrapperLogText \
+  testContextRuntimePlanPreservesSimulatorAndDeviceInitializationPolicy \
+  testContextRuntimePlanAppliesSimulatorParametersWithoutOverwritingFlashAttention \
+  testContextRuntimePlanAppliesDeviceParametersWithoutOverwritingGPUDefault \
+  testVADRuntimeConfigurationRequiresEnabledPreferenceAndModelPath \
+  testRuntimeOptionsPreserveExistingWhisperCppFlags \
+  testRuntimeConfigurationBuildsSharedWhisperInputs \
+  testRuntimeConfigurationAppliesSharedWhisperFullParameterSink \
+  testRuntimeConfigurationAppliesSharedWhisperVADParameterSink \
+  testRuntimeConfigurationNormalizesWhisperRequestLanguage \
+  testRuntimeConfigurationDisablesVADWhenPreferenceIsOff \
+  testRuntimeInvocationPlanKeepsWhisperCStringInputsAlive \
+  testRuntimeInvocationPlanOmitsDisabledWhisperInputs \
+  testLocalWhisperFailurePolicyPreservesMacOSMapping \
+  testLocalWhisperFailurePolicyPreservesIOSMapping \
+  testJoinedTextConcatenatesSegmentsWithoutSeparator \
+  testJoinedTextPreservesMacOSRawWhitespacePolicy \
+  testJoinedTextReturnsEmptyForNoSegments \
+  testJoinedTextFromSegmentLookupPreservesRawOrderAndSkipsMissingSegments \
+  testJoinedTextFromSegmentLookupReturnsEmptyForNonPositiveCounts
 
 require_pattern \
   "macOS local Whisper delegates raw segment lookup to shared core" \
@@ -5208,7 +5285,7 @@ reject_pattern \
 require_pattern \
   "shared local Whisper failure policy lives in VoiceInkCore" \
   'VoiceInkLocalWhisperFailurePolicy|VoiceInkLocalWhisperFailure|VoiceInkLocalWhisperPlatform' \
-  VoiceInkCore/Sources/VoiceInkCore/WhisperRuntimeDefaults.swift
+  VoiceInkCore/Sources/VoiceInkCore/LocalWhisperTranscriptionFlow.swift
 
 section "obsolete standalone error-description module/tests stay deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/ErrorDescription.swift
@@ -5400,12 +5477,12 @@ reject_pattern \
 require_pattern \
   "shared local Whisper context runtime plan lives in VoiceInkCore" \
   'VoiceInkWhisperContextRuntimePlan|VoiceInkWhisperContextParameterSink|func apply<Parameters: VoiceInkWhisperContextParameterSink>' \
-  VoiceInkCore/Sources/VoiceInkCore/WhisperRuntimeDefaults.swift
+  VoiceInkCore/Sources/VoiceInkCore/LocalWhisperTranscriptionFlow.swift
 
 require_pattern \
   "core tests cover shared local Whisper context parameter sink" \
   'testContextRuntimePlanAppliesSimulatorParametersWithoutOverwritingFlashAttention|testContextRuntimePlanAppliesDeviceParametersWithoutOverwritingGPUDefault' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/WhisperRuntimeDefaultsTests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/LocalWhisperTranscriptionFlowTests.swift
 
 require_pattern \
   "core check runner executes shared local Whisper context parameter sink tests" \
@@ -5447,11 +5524,11 @@ reject_pattern \
 require_pattern \
   "shared local Whisper diagnostics live in VoiceInkCore" \
   'VoiceInkWhisperRuntimeDiagnostics|logCategory = "WhisperContext"|simulatorCPUModeMessage = "Running on the simulator, using CPU"|metalFlashAttentionMessage = "Flash attention enabled for Metal"|vadBundleModelLoadedMessage = "VAD model loaded from bundle resources"|vadModelPathMissingWarningMessage = "VAD model path not found, VAD will be disabled\."|transcriptionFailedMessage|modelLoadFailedMessagePrefix' \
-  VoiceInkCore/Sources/VoiceInkCore/WhisperRuntimeDefaults.swift
+  VoiceInkCore/Sources/VoiceInkCore/LocalWhisperTranscriptionFlow.swift
 
 require_patterns \
   "core tests cover shared local Whisper runtime failure diagnostics" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/WhisperRuntimeDefaultsTests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/LocalWhisperTranscriptionFlowTests.swift \
   'VoiceInkWhisperRuntimeDiagnostics\.transcriptionFailedMessage' \
   'VoiceInkWhisperRuntimeDiagnostics\.modelLoadFailedMessagePrefix'
 

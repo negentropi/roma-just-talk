@@ -486,6 +486,10 @@ public enum VoiceInkIOSStorageDirectories {
     public static var cachesDirectory: URL {
         FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
     }
+
+    public static var temporaryDirectory: URL {
+        URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+    }
 }
 
 public enum VoiceInkMacOSStorageDirectories {
@@ -559,6 +563,15 @@ public struct VoiceInkAppDataResetPlan: Equatable, Sendable {
             )),
             .resetAppSettings
         ])
+    }
+
+    public static func iOS() -> Self {
+        iOS(
+            recordingsDirectory: VoiceInkIOSStorageDirectories.recordingsDirectory,
+            modelsDirectory: VoiceInkIOSStorageDirectories.modelsDirectory,
+            cachesDirectory: VoiceInkIOSStorageDirectories.cachesDirectory,
+            temporaryDirectory: VoiceInkIOSStorageDirectories.temporaryDirectory
+        )
     }
 }
 

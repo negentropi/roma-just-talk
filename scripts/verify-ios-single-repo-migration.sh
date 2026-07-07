@@ -18450,12 +18450,15 @@ reject_file VoiceInkCore/Tests/VoiceInkCoreTests/AppDataResetTests.swift
 require_patterns \
   "shared app data reset plan lives with stored-audio file lifecycle" \
   VoiceInkCore/Sources/VoiceInkCore/StoredAudioFile.swift \
+  '^[[:space:]]*public static var temporaryDirectory:' \
   '^[[:space:]]*public enum VoiceInkAppDataResetStep:' \
   '^[[:space:]]*case deleteTranscriptionRecords' \
   '^[[:space:]]*case cleanFiles\(VoiceInkAppDataResetFilePlan\)' \
   '^[[:space:]]*case resetAppSettings' \
   '^[[:space:]]*public struct VoiceInkAppDataResetPlan:' \
   '^[[:space:]]*public static func iOS\(' \
+  '^[[:space:]]*public static func iOS\(\) -> Self' \
+  'VoiceInkIOSStorageDirectories\.temporaryDirectory' \
   '^[[:space:]]*func applyRuntimeState\(' \
   '^[[:space:]]*public struct VoiceInkAppDataResetFilePlan:' \
   '^[[:space:]]*public func performBestEffort\(' \
@@ -18991,10 +18994,13 @@ reject_pattern \
   'resetState\.apiKeyProvidersToDelete' \
   iOS/VoiceInk-ios/AppSettings.swift
 
-require_pattern \
+require_patterns \
   "iOS app settings reset consumes shared app data reset plan" \
-  'VoiceInkAppDataResetPlan\.iOS|resetPlan\.applyRuntimeState|deleteTranscriptionRecords|resetAppSettings' \
-  iOS/VoiceInk-ios/SettingsView.swift
+  iOS/VoiceInk-ios/SettingsView.swift \
+  'VoiceInkAppDataResetPlan\.iOS\(\)' \
+  'resetPlan\.applyRuntimeState' \
+  'deleteTranscriptionRecords' \
+  'resetAppSettings'
 
 require_pattern \
   "iOS app settings reset adapts shared app data reset diagnostics" \
@@ -19009,6 +19015,11 @@ reject_pattern \
 reject_pattern \
   "iOS app settings reset avoids shell-only file reset sequence" \
   'VoiceInkAppDataResetFilePlan\.iOS|for step in resetPlan\.steps|applyResetStep|VoiceInkAppDataResetStep|let +recordingsDir|let +modelsDir|let +cachesURL|let +tmpPath|contentsOfDirectory|removeItem\(atPath:' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
+reject_pattern \
+  "iOS app settings reset avoids shell-owned reset directory assembly" \
+  'VoiceInkIOSStorageDirectories\.(recordingsDirectory|modelsDirectory|cachesDirectory|temporaryDirectory)|NSTemporaryDirectory\(\)' \
   iOS/VoiceInk-ios/SettingsView.swift
 
 reject_pattern \

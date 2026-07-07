@@ -111,6 +111,26 @@ final class StoredAudioFileTests: XCTestCase {
                 .resetAppSettings
             ]
         )
+
+        let defaultFilePlan = VoiceInkAppDataResetFilePlan.iOS(
+            recordingsDirectory: VoiceInkIOSStorageDirectories.recordingsDirectory,
+            modelsDirectory: VoiceInkIOSStorageDirectories.modelsDirectory,
+            cachesDirectory: VoiceInkIOSStorageDirectories.cachesDirectory,
+            temporaryDirectory: VoiceInkIOSStorageDirectories.temporaryDirectory
+        )
+
+        XCTAssertEqual(
+            VoiceInkAppDataResetPlan.iOS().steps,
+            [
+                .deleteTranscriptionRecords,
+                .cleanFiles(defaultFilePlan),
+                .resetAppSettings
+            ]
+        )
+        XCTAssertEqual(
+            VoiceInkIOSStorageDirectories.temporaryDirectory,
+            URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+        )
     }
 
     func testIOSResetPlanAppliesRuntimeStateInOrder() {

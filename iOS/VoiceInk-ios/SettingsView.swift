@@ -282,12 +282,7 @@ struct SettingsView: View {
 
     #if DEBUG
     private func resetAppData() {
-        let resetPlan = VoiceInkAppDataResetPlan.iOS(
-            recordingsDirectory: VoiceInkIOSStorageDirectories.recordingsDirectory,
-            modelsDirectory: VoiceInkIOSStorageDirectories.modelsDirectory,
-            cachesDirectory: VoiceInkIOSStorageDirectories.cachesDirectory,
-            temporaryDirectory: URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
-        )
+        let resetPlan = VoiceInkAppDataResetPlan.iOS()
 
         resetPlan.applyRuntimeState(
             deleteTranscriptionRecords: deleteTranscriptionRecords,

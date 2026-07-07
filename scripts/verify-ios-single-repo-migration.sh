@@ -1840,7 +1840,7 @@ reject_pattern \
 
 require_patterns \
   "shared iOS audio recorder configuration lives in VoiceInkCore" \
-  VoiceInkCore/Sources/VoiceInkCore/IOSAudioConfiguration.swift \
+  VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift \
   'VoiceInkIOSAudioRecorderConfiguration' \
   'voiceRecording' \
   'linearPCM' \
@@ -16736,9 +16736,12 @@ require_pattern \
   'VoiceInkAudioPlaybackRate' \
   VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
 
+section "obsolete standalone iOS audio configuration module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/IOSAudioConfiguration.swift
+
 require_patterns \
   "shared iOS audio playback session configuration lives in VoiceInkCore" \
-  VoiceInkCore/Sources/VoiceInkCore/IOSAudioConfiguration.swift \
+  VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift \
   'VoiceInkIOSAudioPlaybackSessionConfiguration' \
   'notePlayback' \
   'playback' \
@@ -17786,7 +17789,7 @@ reject_swift_pattern \
 require_pattern \
   "shared audio-session lifecycle state uses shared deactivation plan" \
   'VoiceInkAudioSessionTimeoutPreference\.deactivationPlan' \
-  VoiceInkCore/Sources/VoiceInkCore/IOSAudioConfiguration.swift
+  VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
 
 require_pattern \
   "shared audio-session timeout owns countdown update interval" \
@@ -17801,11 +17804,11 @@ require_pattern \
 require_pattern \
   "shared audio-session lifecycle state lives in VoiceInkCore" \
   'VoiceInkAudioSessionLifecycleState|VoiceInkAudioSessionPlaybackActivationPlan|VoiceInkAudioSessionImmediateDeactivationPlan|markActivatedForRecording|beginPlaybackActivation|beginImmediateDeactivation|scheduleDeactivationExecution|advanceCountdownExecution|applyRuntimeState|markDeactivated' \
-  VoiceInkCore/Sources/VoiceInkCore/IOSAudioConfiguration.swift
+  VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
 
 require_patterns \
   "shared audio-session activation plans hide raw shell side-effect fields" \
-  VoiceInkCore/Sources/VoiceInkCore/IOSAudioConfiguration.swift \
+  VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift \
   'private let shouldCancelScheduledDeactivation' \
   'private let shouldDeactivateCurrentSession' \
   'private let shouldDeactivateSession' \
@@ -17814,11 +17817,11 @@ require_patterns \
 reject_pattern \
   "shared audio-session activation plans avoid public raw shell side-effect fields" \
   'public let shouldCancelScheduledDeactivation|public let shouldDeactivateCurrentSession|public let shouldDeactivateSession' \
-  VoiceInkCore/Sources/VoiceInkCore/IOSAudioConfiguration.swift
+  VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
 
 require_patterns \
   "shared iOS audio-session recording configuration lives in VoiceInkCore" \
-  VoiceInkCore/Sources/VoiceInkCore/IOSAudioConfiguration.swift \
+  VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift \
   'VoiceInkIOSAudioSessionRecordingConfiguration' \
   'voiceRecording' \
   'playAndRecord' \
@@ -17831,7 +17834,7 @@ require_patterns \
 require_pattern \
   "shared audio-session diagnostics live in VoiceInkCore" \
   'VoiceInkAudioSessionDiagnostics|activatedForRecordingMessage|activationFailedMessage|deactivationScheduledMessage|deactivatedMessage|deactivationFailedMessage' \
-  VoiceInkCore/Sources/VoiceInkCore/IOSAudioConfiguration.swift
+  VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift
 
 require_pattern \
   "VoiceInkCore check runner executes iOS audio-session recording configuration proof" \

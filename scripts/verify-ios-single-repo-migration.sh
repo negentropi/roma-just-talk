@@ -5887,20 +5887,23 @@ require_pattern \
   'VoiceInkWhisperModelSimpleDownloadCompletionPlan\.completion\(|applyRuntimeState' \
   iOS/VoiceInk-ios/LocalModelManager.swift
 
+section "obsolete standalone Whisper model download progress module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+
 require_pattern \
   "shared Whisper model download progress policy lives in VoiceInkCore" \
   'VoiceInkWhisperModelDownloadProgress|VoiceInkWhisperModelDownloadState' \
-  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift
 
 require_pattern \
   "shared Whisper model download state policy lives in VoiceInkCore" \
   'VoiceInkWhisperModelDownloadState' \
-  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift
 
 require_pattern \
   "shared Whisper simple download tracking state lives in VoiceInkCore" \
   'VoiceInkWhisperModelSimpleDownloadTrackingState|startDownload\(for:|updateProgress\(|finishDownload\(for:|cancelDownload\(for:|downloadState\(for:' \
-  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift
 
 require_patterns \
   "core checks execute simple download tracking lifecycle tests" \
@@ -5912,43 +5915,43 @@ require_patterns \
 require_pattern \
   "shared Whisper model download row presentation lives in VoiceInkCore" \
   'VoiceInkWhisperModelDownloadRowPresentation|rowPresentation|actionSystemImageName|downloadButtonSystemImageName' \
-  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift
 
 require_pattern \
   "shared Whisper model management rows live in VoiceInkCore" \
   'VoiceInkWhisperModelManagement(Row|List)|downloadConfirmation|deleteConfirmation' \
-  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift
 
 require_pattern \
   "shared Whisper model operation alert presentation lives in VoiceInkCore" \
   'VoiceInkWhisperModelOperationAlertPresentation' \
-  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift
 
 require_pattern \
   "shared Whisper model management diagnostics live in VoiceInkCore" \
   'VoiceInkWhisperModelManagementDiagnostics|alreadyDownloadingMessage|startingDownloadMessage|downloadFailedMessage|downloadCancelledMessage|downloadedMessage|saveFailedMessage|notDownloadedMessage|deletedMessage|deleteFailedMessage' \
-  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift
 
 require_pattern \
   "shared Whisper simple download completion plan lives in VoiceInkCore" \
   'VoiceInkWhisperModelSimpleDownloadCompletionPlan|installTemporaryFile|presentFailure|ignoreCancellation|applyRuntimeState' \
-  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift
 
 require_patterns \
   "shared Whisper simple download completion plan hides raw action payload" \
-  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift \
   'private enum VoiceInkWhisperModelSimpleDownloadCompletionAction' \
   'private let action: VoiceInkWhisperModelSimpleDownloadCompletionAction'
 
 reject_pattern \
   "shared Whisper simple download completion plan avoids public raw action cases" \
   'public enum VoiceInkWhisperModelSimpleDownloadCompletionPlan|public enum VoiceInkWhisperModelSimpleDownloadCompletionAction|public let action: VoiceInkWhisperModelSimpleDownloadCompletionAction' \
-  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift
 
 require_pattern \
   "shared Whisper simple download completion plan owns cancellation outcome" \
   'ignoreCancellation|NSURLErrorCancelled|CancellationError' \
-  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift
 
 require_pattern \
   "core checks cover iOS download cancellation completion planning" \
@@ -5970,10 +5973,37 @@ require_pattern \
   'WhisperModelFilesTests\.testModelManagementDiagnosticsPreserveIOSLogCopy' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
+require_patterns \
+  "moved Whisper model management public API has normal import proof" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/WhisperModelManagementPublicAPITests.swift \
+  '^import VoiceInkCore$' \
+  'final class WhisperModelManagementPublicAPITests' \
+  'VoiceInkWhisperModelDownloadProgress\.simple' \
+  'VoiceInkWhisperModelDownloadState' \
+  'VoiceInkWhisperModelManagementList\.row' \
+  'VoiceInkWhisperModelSimpleDownloadCompletionPlan\.completion' \
+  'VoiceInkWhisperModelSimpleDownloadTrackingState' \
+  'VoiceInkWhisperModelSimpleDownloadSessionState' \
+  'VoiceInkWhisperModelManagementSnapshot' \
+  'VoiceInkWhisperModelDeletionPolicy\.plan' \
+  'VoiceInkWhisperModelOperationConfirmationPresentation\.download' \
+  'VoiceInkWhisperModelOperationAlertPresentation\.noFileReceived' \
+  'VoiceInkWhisperModelManagementDiagnostics\.alreadyDownloadingMessage'
+
+reject_pattern \
+  "moved Whisper model management public API proof avoids testable import" \
+  '@testable import VoiceInkCore' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/WhisperModelManagementPublicAPITests.swift
+
+require_pattern \
+  "core check runner executes moved Whisper model management public API proof" \
+  'WhisperModelManagementPublicAPITests\.testMovedWhisperModelManagementSymbolsExposePublicAPI' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
 require_pattern \
   "shared Whisper model operation confirmation presentation lives in VoiceInkCore" \
   'VoiceInkWhisperModelOperationConfirmationPresentation' \
-  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift
 
 require_pattern \
   "shared Whisper local model import extension policy lives in VoiceInkCore" \
@@ -6081,7 +6111,7 @@ reject_pattern \
 require_pattern \
   "shared Whisper compact download status text lives in VoiceInkCore" \
   'compactStatusText' \
-  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift
 
 require_pattern \
   "macOS Whisper downloads use shared progress keys" \
@@ -6380,11 +6410,11 @@ require_pattern \
 require_pattern \
   "shared local model management snapshot lives in VoiceInkCore" \
   'VoiceInkWhisperModelManagementSnapshot|hasAvailableModel|modelPath\(forRuntimeModelName:|managementRows|managementRow' \
-  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift
 
 require_patterns \
   "shared simple download session state owns active download identity" \
-  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift \
   'public struct VoiceInkWhisperModelSimpleDownloadSessionID' \
   'public struct VoiceInkWhisperModelSimpleDownloadSessionState' \
   'activeSessionIDsByModelID' \
@@ -6536,7 +6566,7 @@ require_pattern \
 reject_pattern \
   "shared local model management row avoids public raw delete-action boolean" \
   'public var shouldShowDeleteAction' \
-  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift
 
 reject_pattern \
   "iOS local model management avoids direct delete-action visibility branching" \
@@ -7114,7 +7144,7 @@ reject_pattern \
 
 require_patterns \
   "shared local model row presentation hides row action behind runtime interface" \
-  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift \
   'VoiceInkWhisperModelDownloadRowAction' \
   'runtimeAction' \
   'VoiceInkWhisperModelDownloadRowActionTint' \
@@ -7129,11 +7159,11 @@ require_pattern \
 reject_pattern \
   "shared local model row presentation avoids public row action enum" \
   'public enum VoiceInkWhisperModelDownloadRowAction\b|public let action: VoiceInkWhisperModelDownloadRowAction\b' \
-  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift
 
 require_patterns \
   "shared local model management row owns confirmation runtime actions" \
-  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift \
   'deleteRequestRuntimeAction' \
   'confirmedDeleteRuntimeAction' \
   'confirmedDownloadRuntimeAction'
@@ -7146,23 +7176,23 @@ require_pattern \
 require_pattern \
   "shared local model deletion policy lives in VoiceInkCore" \
   'VoiceInkWhisperModelDeletion(Policy|Plan|Action)|applyRuntimeState' \
-  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift
 
 require_patterns \
   "shared local model deletion plan hides raw action payload" \
-  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift \
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift \
   'private enum VoiceInkWhisperModelDeletionAction' \
   'private let action: VoiceInkWhisperModelDeletionAction'
 
 reject_pattern \
   "shared local model deletion plan avoids public raw action and refresh flags" \
   'public enum VoiceInkWhisperModelDeletionAction|public let action: VoiceInkWhisperModelDeletionAction|shouldRefreshAfterSuccessfulDelete' \
-  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift
 
 require_pattern \
   "shared local model deletion policy owns downloaded-state lookup" \
   'for model: VoiceInkWhisperModelFileSpec' \
-  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift
 
 require_pattern \
   "core check runner executes local model deletion policy test" \
@@ -7182,7 +7212,7 @@ reject_pattern \
 reject_pattern \
   "shared local model row presentation avoids shallow action booleans" \
   'public var +(isDownloaded|canStartDownload|canCancelDownload|canDeleteDownloadedModel)\b' \
-  VoiceInkCore/Sources/VoiceInkCore/WhisperModelDownloadProgress.swift
+  VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift
 
 require_patterns \
   "iOS model download views render shared row action tint and accessory presentation" \

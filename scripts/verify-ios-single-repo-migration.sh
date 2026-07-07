@@ -7730,11 +7730,11 @@ require_patterns \
 require_patterns \
   "core checks execute macOS cloud transcription policy tests" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'RemoteProviderRequestTests\.testMacOSCloudTranscriptionPolicyBuildsSharedTransportRequest' \
-  'RemoteProviderRequestTests\.testMacOSCloudTranscriptionPolicyRejectsBlankAPIKeyBeforeTransport' \
-  'RemoteProviderRequestTests\.testMacOSCloudTranscriptionPolicyRejectsUnsupportedBatchProvider' \
-  'RemoteProviderRequestTests\.testMacOSCloudTranscriptionPolicyMapsProviderHTTPNSError' \
-  'RemoteProviderRequestTests\.testMacOSCloudTranscriptionPolicyMapsUnknownErrorsToNetworkError'
+  'RemoteTransportTests\.testMacOSCloudTranscriptionPolicyBuildsSharedTransportRequest' \
+  'RemoteTransportTests\.testMacOSCloudTranscriptionPolicyRejectsBlankAPIKeyBeforeTransport' \
+  'RemoteTransportTests\.testMacOSCloudTranscriptionPolicyRejectsUnsupportedBatchProvider' \
+  'RemoteTransportTests\.testMacOSCloudTranscriptionPolicyMapsProviderHTTPNSError' \
+  'RemoteTransportTests\.testMacOSCloudTranscriptionPolicyMapsUnknownErrorsToNetworkError'
 
 require_pattern \
   "macOS batch cloud transcription uses shared execution policy" \
@@ -8009,9 +8009,9 @@ require_patterns \
 
 require_patterns \
   "OpenAI-compatible transcription public API proof uses normal VoiceInkCore import" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift \
   '^import VoiceInkCore$' \
-  'final class RemoteProviderPublicAPITests' \
+  'final class RemoteProviderRequestTests' \
   'VoiceInkOpenAICompatibleTranscriptionResponse\(' \
   'VoiceInkOpenAICompatibleTranscriptionCodec\.multipartContentType' \
   'VoiceInkOpenAICompatibleTranscriptionCodec\.requestBody' \
@@ -8030,7 +8030,7 @@ require_patterns \
   'model: "custom-whisper"' \
   'responseFormat: "json"' \
   'temperature: "0"' \
-  'errorDomain: "RemoteProviderPublicAPITests\.OpenAICompatibleTranscription"' \
+  'errorDomain: "RemoteProviderRequestTests\.OpenAICompatibleTranscription"' \
   'allowPlainTextFallback: false' \
   'client\.verifyAPIKey\(' \
   'client\.verifyAPIKeyDetailed\(' \
@@ -8039,24 +8039,36 @@ require_patterns \
 reject_pattern \
   "OpenAI-compatible transcription public API proof avoids conditional compilation snippets" \
   '^[[:space:]]*#(if|elseif|else|endif)\b' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift
 
 reject_pattern \
   "OpenAI-compatible transcription public API proof avoids testable import" \
   '@testable import VoiceInkCore' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift
 
 require_swift_static_function_body_pattern \
   "OpenAI-compatible public API proof keeps defaulted transcribe call short" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift \
   testOpenAICompatibleTranscriptionRequestClientAndCodecExposePublicAPI \
   'let\s+transcribeWithDefaultedLabels\s*=\s*\{\s*try\s+await\s+client\.transcribeAudioData\s*\((?:(?!\b(?:language|prompt|responseFormat|temperature|errorDomain|timeout|maxRetries|allowPlainTextFallback)\s*:).)*\bbaseURL\s*:(?:(?!\b(?:language|prompt|responseFormat|temperature|errorDomain|timeout|maxRetries|allowPlainTextFallback)\s*:).)*\bapiKey\s*:(?:(?!\b(?:language|prompt|responseFormat|temperature|errorDomain|timeout|maxRetries|allowPlainTextFallback)\s*:).)*\bmodel\s*:(?:(?!\b(?:language|prompt|responseFormat|temperature|errorDomain|timeout|maxRetries|allowPlainTextFallback)\s*:).)*\baudioData\s*:(?:(?!\b(?:language|prompt|responseFormat|temperature|errorDomain|timeout|maxRetries|allowPlainTextFallback)\s*:).)*\bfileName\s*:(?:(?!\b(?:language|prompt|responseFormat|temperature|errorDomain|timeout|maxRetries|allowPlainTextFallback)\s*:).)*\)\s*\}'
 
 require_swift_static_function_body_pattern \
   "OpenAI-compatible public API proof keeps direct URL transcribe coverage" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift \
   testOpenAICompatibleTranscriptionRequestClientAndCodecExposePublicAPI \
   'let\s+transcribeWithDirectURL\s*:\s*\(\)\s*async\s+throws\s*->\s*String\s*=\s*\{\s*try\s+await\s+client\.transcribeAudioData\s*\((?:(?!\bbaseURL\s*:).)*\burl\s*:\s*try\s+XCTUnwrap\(URL\(string:\s*\)\)(?:(?!\bbaseURL\s*:).)*\bapiKey\s*:(?:(?!\bbaseURL\s*:).)*\bmodel\s*:(?:(?!\bbaseURL\s*:).)*\ballowPlainTextFallback\s*:\s*false(?:(?!\bbaseURL\s*:).)*\)\s*\}'
+
+section "obsolete consolidated remote provider public API suite stays deleted"
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
+
+reject_pattern \
+  "VoiceInkCore tests and metadata avoid stale consolidated remote provider public API suite" \
+  'RemoteProviderPublicAPITests' \
+  VoiceInkCore/Tests/VoiceInkCoreTests \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 section "obsolete standalone OpenAI-compatible public API proof stays deleted"
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/OpenAICompatiblePublicAPITests.swift
@@ -8072,7 +8084,7 @@ reject_pattern \
 
 require_voiceink_core_check_runner_invocations \
   "core checks execute OpenAI-compatible transcription public API proof" \
-  RemoteProviderPublicAPITests \
+  RemoteProviderRequestTests \
   testOpenAICompatibleTranscriptionRequestClientAndCodecExposePublicAPI
 
 section "obsolete standalone API-key verification policy module stays deleted"
@@ -8129,9 +8141,9 @@ require_patterns \
 
 require_patterns \
   "Deepgram public API proof uses normal VoiceInkCore import" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift \
   '^import VoiceInkCore$' \
-  'final class RemoteProviderPublicAPITests' \
+  'final class RemoteProviderRequestTests' \
   'VoiceInkDeepgramRequestBuilder\.makeTranscriptionRequest' \
   'VoiceInkDeepgramRequestBuilder\.makeProjectsRequest' \
   'VoiceInkDeepgramTranscriptionClient\(\)' \
@@ -8148,7 +8160,7 @@ require_patterns \
   'paragraphs: true' \
   'diarize: false' \
   'customVocabulary: \["Roma"\]' \
-  'errorDomain: "RemoteProviderPublicAPITests\.Deepgram"' \
+  'errorDomain: "RemoteProviderRequestTests\.Deepgram"' \
   'timeout: 30' \
   'client\.verifyAPIKey\(' \
   'client\.verifyAPIKeyDetailed\(' \
@@ -8158,18 +8170,18 @@ require_patterns \
 reject_pattern \
   "Deepgram public API proof avoids conditional compilation snippets" \
   '^[[:space:]]*#(if|elseif|else|endif)\b' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift
 
 require_swift_static_function_body_pattern \
   "Deepgram public API proof keeps defaulted transcribe call short" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift \
   testDeepgramRequestClientAndCodecExposePublicAPI \
   'let\s+transcribeWithDefaultedLabels\s*=\s*\{\s*try\s+await\s+client\.transcribeAudioData\s*\((?:(?!\b(?:language|smartFormat|punctuate|paragraphs|diarize|customVocabulary|errorDomain|timeout)\s*:).)*\bbaseURL\s*:(?:(?!\b(?:language|smartFormat|punctuate|paragraphs|diarize|customVocabulary|errorDomain|timeout)\s*:).)*\bapiKey\s*:(?:(?!\b(?:language|smartFormat|punctuate|paragraphs|diarize|customVocabulary|errorDomain|timeout)\s*:).)*\bmodel\s*:(?:(?!\b(?:language|smartFormat|punctuate|paragraphs|diarize|customVocabulary|errorDomain|timeout)\s*:).)*\baudioData\s*:(?:(?!\b(?:language|smartFormat|punctuate|paragraphs|diarize|customVocabulary|errorDomain|timeout)\s*:).)*\)\s*\}'
 
 reject_pattern \
   "Deepgram public API proof avoids testable import" \
   '@testable import VoiceInkCore' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift
 
 section "obsolete standalone Deepgram public API proof stays deleted"
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/DeepgramPublicAPITests.swift
@@ -8185,7 +8197,7 @@ reject_pattern \
 
 require_voiceink_core_check_runner_invocations \
   "core checks execute Deepgram public API proof" \
-  RemoteProviderPublicAPITests \
+  RemoteProviderRequestTests \
   testDeepgramRequestClientAndCodecExposePublicAPI
 
 require_voiceink_core_check_runner_invocations \
@@ -8219,9 +8231,9 @@ require_patterns \
 
 require_patterns \
   "Gemini public API proof uses normal VoiceInkCore import" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift \
   '^import VoiceInkCore$' \
-  'final class RemoteProviderPublicAPITests' \
+  'final class RemoteProviderRequestTests' \
   'VoiceInkGeminiTranscriptionCodec\.defaultPrompt' \
   'VoiceInkGeminiRequestBuilder\.makeTranscriptionRequest' \
   'VoiceInkGeminiRequestBuilder\.makeModelsRequest' \
@@ -8235,7 +8247,7 @@ require_patterns \
   'audioData: Data\("WAVDATA"\.utf8\)' \
   'mimeType: "audio/wav"' \
   'prompt: VoiceInkGeminiTranscriptionCodec\.defaultPrompt' \
-  'errorDomain: "RemoteProviderPublicAPITests\.Gemini"' \
+  'errorDomain: "RemoteProviderRequestTests\.Gemini"' \
   'timeout: 60' \
   'client\.verifyAPIKey\(' \
   'client\.verifyAPIKeyDetailed\(' \
@@ -8245,18 +8257,18 @@ require_patterns \
 reject_pattern \
   "Gemini public API proof avoids conditional compilation snippets" \
   '^[[:space:]]*#(if|elseif|else|endif)\b' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift
 
 require_swift_static_function_body_pattern \
   "Gemini public API proof keeps defaulted transcribe call short" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift \
   testGeminiRequestClientAndCodecExposePublicAPI \
   'let\s+transcribeWithDefaultedLabels\s*=\s*\{\s*try\s+await\s+client\.transcribeAudioData\s*\((?:(?!\b(?:mimeType|prompt|errorDomain|timeout)\s*:).)*\bbaseURL\s*:(?:(?!\b(?:mimeType|prompt|errorDomain|timeout)\s*:).)*\bapiKey\s*:(?:(?!\b(?:mimeType|prompt|errorDomain|timeout)\s*:).)*\bmodel\s*:(?:(?!\b(?:mimeType|prompt|errorDomain|timeout)\s*:).)*\baudioData\s*:(?:(?!\b(?:mimeType|prompt|errorDomain|timeout)\s*:).)*\)\s*\}'
 
 reject_pattern \
   "Gemini public API proof avoids testable import" \
   '@testable import VoiceInkCore' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift
 
 section "obsolete standalone Gemini public API proof stays deleted"
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/GeminiPublicAPITests.swift
@@ -8272,7 +8284,7 @@ reject_pattern \
 
 require_voiceink_core_check_runner_invocations \
   "core checks execute Gemini public API proof" \
-  RemoteProviderPublicAPITests \
+  RemoteProviderRequestTests \
   testGeminiRequestClientAndCodecExposePublicAPI
 
 require_voiceink_core_check_runner_invocations \
@@ -8309,9 +8321,9 @@ require_patterns \
 
 require_patterns \
   "Mistral public API proof uses normal VoiceInkCore import" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift \
   '^import VoiceInkCore$' \
-  'final class RemoteProviderPublicAPITests' \
+  'final class RemoteProviderRequestTests' \
   'VoiceInkPreparedMistralTranscriptionRequest' \
   'VoiceInkMistralRequestBuilder\.makeTranscriptionRequest' \
   'VoiceInkMistralRequestBuilder\.makeModelsRequest' \
@@ -8324,7 +8336,7 @@ require_patterns \
   'model: "voxtral-mini-latest"' \
   'audioData: Data\("WAVDATA"\.utf8\)' \
   'fileName: "sample\.wav"' \
-  'errorDomain: "RemoteProviderPublicAPITests\.Mistral"' \
+  'errorDomain: "RemoteProviderRequestTests\.Mistral"' \
   'timeout: 30' \
   'maxRetries: 2' \
   'client\.verifyAPIKey\(' \
@@ -8335,18 +8347,18 @@ require_patterns \
 reject_pattern \
   "Mistral public API proof avoids conditional compilation snippets" \
   '^[[:space:]]*#(if|elseif|else|endif)\b' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift
 
 require_swift_static_function_body_pattern \
   "Mistral public API proof keeps defaulted transcribe call short" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift \
   testMistralRequestClientAndCodecExposePublicAPI \
   'let\s+transcribeWithDefaultedLabels\s*=\s*\{\s*try\s+await\s+client\.transcribeAudioData\s*\((?:(?!\b(?:fileName|errorDomain|timeout|maxRetries)\s*:).)*\bbaseURL\s*:(?:(?!\b(?:fileName|errorDomain|timeout|maxRetries)\s*:).)*\bapiKey\s*:(?:(?!\b(?:fileName|errorDomain|timeout|maxRetries)\s*:).)*\bmodel\s*:(?:(?!\b(?:fileName|errorDomain|timeout|maxRetries)\s*:).)*\baudioData\s*:(?:(?!\b(?:fileName|errorDomain|timeout|maxRetries)\s*:).)*\)\s*\}'
 
 reject_pattern \
   "Mistral public API proof avoids testable import" \
   '@testable import VoiceInkCore' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift
 
 section "obsolete standalone Mistral public API proof stays deleted"
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/MistralPublicAPITests.swift
@@ -8362,7 +8374,7 @@ reject_pattern \
 
 require_voiceink_core_check_runner_invocations \
   "core checks execute Mistral public API proof" \
-  RemoteProviderPublicAPITests \
+  RemoteProviderRequestTests \
   testMistralRequestClientAndCodecExposePublicAPI
 
 require_voiceink_core_check_runner_invocations \
@@ -8397,9 +8409,9 @@ require_patterns \
 
 require_patterns \
   "ElevenLabs public API proof uses normal VoiceInkCore import" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift \
   '^import VoiceInkCore$' \
-  'final class RemoteProviderPublicAPITests' \
+  'final class RemoteProviderRequestTests' \
   'VoiceInkPreparedElevenLabsTranscriptionRequest' \
   'VoiceInkElevenLabsRequestBuilder\.makeTranscriptionRequest' \
   'VoiceInkElevenLabsRequestBuilder\.makeUserRequest' \
@@ -8413,7 +8425,7 @@ require_patterns \
   'audioData: Data\("WAVDATA"\.utf8\)' \
   'fileName: "sample\.wav"' \
   'language: "en"' \
-  'errorDomain: "RemoteProviderPublicAPITests\.ElevenLabs"' \
+  'errorDomain: "RemoteProviderRequestTests\.ElevenLabs"' \
   'timeout: 30' \
   'maxRetries: 2' \
   'client\.verifyAPIKey\(' \
@@ -8424,18 +8436,18 @@ require_patterns \
 reject_pattern \
   "ElevenLabs public API proof avoids conditional compilation snippets" \
   '^[[:space:]]*#(if|elseif|else|endif)\b' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift
 
 require_swift_static_function_body_pattern \
   "ElevenLabs public API proof keeps defaulted transcribe call short" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift \
   testElevenLabsRequestClientAndCodecExposePublicAPI \
   'let\s+transcribeWithDefaultedLabels\s*=\s*\{\s*try\s+await\s+client\.transcribeAudioData\s*\((?:(?!\b(?:fileName|language|errorDomain|timeout|maxRetries)\s*:).)*\bbaseURL\s*:(?:(?!\b(?:fileName|language|errorDomain|timeout|maxRetries)\s*:).)*\bapiKey\s*:(?:(?!\b(?:fileName|language|errorDomain|timeout|maxRetries)\s*:).)*\bmodel\s*:(?:(?!\b(?:fileName|language|errorDomain|timeout|maxRetries)\s*:).)*\baudioData\s*:(?:(?!\b(?:fileName|language|errorDomain|timeout|maxRetries)\s*:).)*\)\s*\}'
 
 reject_pattern \
   "ElevenLabs public API proof avoids testable import" \
   '@testable import VoiceInkCore' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift
 
 section "obsolete standalone ElevenLabs public API proof stays deleted"
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/ElevenLabsPublicAPITests.swift
@@ -8451,7 +8463,7 @@ reject_pattern \
 
 require_voiceink_core_check_runner_invocations \
   "core checks execute ElevenLabs public API proof" \
-  RemoteProviderPublicAPITests \
+  RemoteProviderRequestTests \
   testElevenLabsRequestClientAndCodecExposePublicAPI
 
 require_voiceink_core_check_runner_invocations \
@@ -8486,9 +8498,9 @@ require_patterns \
 
 require_patterns \
   "xAI public API proof uses normal VoiceInkCore import" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift \
   '^import VoiceInkCore$' \
-  'final class RemoteProviderPublicAPITests' \
+  'final class RemoteProviderRequestTests' \
   'VoiceInkXAIRequestBuilder\.makeTranscriptionRequest' \
   'VoiceInkPreparedXAITranscriptionRequest' \
   'VoiceInkXAIRequestBuilder\.makeAPIKeyRequest' \
@@ -8502,7 +8514,7 @@ require_patterns \
   'fileName: "sample\.wav"' \
   'language: "en"' \
   'format: true' \
-  'errorDomain: "RemoteProviderPublicAPITests\.XAI"' \
+  'errorDomain: "RemoteProviderRequestTests\.XAI"' \
   'timeout: 60' \
   'maxRetries: 2' \
   'client\.verifyAPIKey\(' \
@@ -8513,28 +8525,28 @@ require_patterns \
 reject_pattern \
   "xAI public API proof avoids conditional compilation snippets" \
   '^[[:space:]]*#(if|elseif|else|endif)\b' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift
 
 reject_pattern \
   "xAI public API proof avoids testable import" \
   '@testable import VoiceInkCore' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift
 
 require_swift_static_function_body_pattern \
   "xAI public API proof keeps defaulted transcribe call short" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift \
   testXAIRequestClientAndCodecExposePublicAPI \
   'let\s+transcribeWithDefaultedLabels\s*=\s*\{\s*try\s+await\s+client\.transcribeAudioData\s*\((?:(?!\b(?:fileName|language|format|errorDomain|timeout|maxRetries)\s*:).)*\bbaseURL\s*:(?:(?!\b(?:fileName|language|format|errorDomain|timeout|maxRetries)\s*:).)*\bapiKey\s*:(?:(?!\b(?:fileName|language|format|errorDomain|timeout|maxRetries)\s*:).)*\baudioData\s*:(?:(?!\b(?:fileName|language|format|errorDomain|timeout|maxRetries)\s*:).)*\)\s*\}'
 
 require_voiceink_core_check_runner_invocations \
   "core checks execute xAI public API proof" \
-  RemoteProviderPublicAPITests \
+  RemoteProviderRequestTests \
   testXAIRequestClientAndCodecExposePublicAPI
 
 require_multiline_pattern \
   "xAI public API proof asserts multipart body anchors" \
   '(?s)func testXAIRequestClientAndCodecExposePublicAPI\(\).*Content-Disposition: form-data; name="language".*Content-Disposition: form-data; name="format".*Content-Disposition: form-data; name="file"; filename="sample\.wav"' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift
 
 section "obsolete standalone xAI public API proof stays deleted"
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/XAIPublicAPITests.swift
@@ -8602,9 +8614,9 @@ reject_swift_static_function_body_pattern \
 
 require_patterns \
   "Soniox public API proof uses normal VoiceInkCore import" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift \
   '^import VoiceInkCore$' \
-  'final class RemoteProviderPublicAPITests' \
+  'final class RemoteProviderRequestTests' \
   'VoiceInkSonioxRequestBuilder\.makeUploadFileRequest' \
   'VoiceInkPreparedSonioxUploadRequest' \
   'VoiceInkSonioxRequestBuilder\.makeCreateTranscriptionRequest' \
@@ -8624,7 +8636,7 @@ require_patterns \
   'customVocabulary: \["Roma", "Felix"\]' \
   'maxWaitSeconds: 300' \
   'timeout: 30' \
-  'errorDomain: "RemoteProviderPublicAPITests\.Soniox"' \
+  'errorDomain: "RemoteProviderRequestTests\.Soniox"' \
   'client\.verifyAPIKey\(' \
   'client\.verifyAPIKeyDetailed\(' \
   'VoiceInkAPIKeyVerificationResult' \
@@ -8636,18 +8648,18 @@ require_patterns \
 reject_pattern \
   "Soniox public API proof avoids conditional compilation snippets" \
   '^[[:space:]]*#(if|elseif|else|endif)\b' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift
 
 require_swift_static_function_body_pattern \
   "Soniox public API proof keeps defaulted transcribe call short" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift \
   testSonioxRequestClientAndCodecExposePublicAPI \
   'let\s+transcribeWithDefaultedLabels\s*=\s*\{\s*try\s+await\s+client\.transcribeAudioData\s*\((?:(?!\b(?:fileName|language|customVocabulary|maxWaitSeconds|timeout|errorDomain)\s*:).)*\bbaseURL\s*:(?:(?!\b(?:fileName|language|customVocabulary|maxWaitSeconds|timeout|errorDomain)\s*:).)*\bapiKey\s*:(?:(?!\b(?:fileName|language|customVocabulary|maxWaitSeconds|timeout|errorDomain)\s*:).)*\bmodel\s*:(?:(?!\b(?:fileName|language|customVocabulary|maxWaitSeconds|timeout|errorDomain)\s*:).)*\baudioData\s*:(?:(?!\b(?:fileName|language|customVocabulary|maxWaitSeconds|timeout|errorDomain)\s*:).)*\)\s*\}'
 
 reject_pattern \
   "Soniox public API proof avoids testable import" \
   '@testable import VoiceInkCore' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift
 
 section "obsolete standalone Soniox public API proof stays deleted"
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/SonioxPublicAPITests.swift
@@ -8663,7 +8675,7 @@ reject_pattern \
 
 require_voiceink_core_check_runner_invocations \
   "core checks execute Soniox public API proof" \
-  RemoteProviderPublicAPITests \
+  RemoteProviderRequestTests \
   testSonioxRequestClientAndCodecExposePublicAPI
 
 require_voiceink_core_check_runner_invocations \
@@ -8707,9 +8719,9 @@ require_patterns \
 
 require_patterns \
   "Speechmatics public API proof uses normal VoiceInkCore import" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift \
   '^import VoiceInkCore$' \
-  'final class RemoteProviderPublicAPITests' \
+  'final class RemoteProviderRequestTests' \
   'VoiceInkSpeechmaticsRequestBuilder\.makeSubmitJobRequest' \
   'VoiceInkPreparedSpeechmaticsUploadRequest' \
   'VoiceInkSpeechmaticsRequestBuilder\.makeJobStatusRequest' \
@@ -8729,7 +8741,7 @@ require_patterns \
   'maxWaitSeconds: 300' \
   'timeout: 30' \
   'maxRetries: 2' \
-  'errorDomain: "RemoteProviderPublicAPITests\.Speechmatics"' \
+  'errorDomain: "RemoteProviderRequestTests\.Speechmatics"' \
   'client\.verifyAPIKey\(' \
   'client\.verifyAPIKeyDetailed\(' \
   'VoiceInkAPIKeyVerificationResult' \
@@ -8741,18 +8753,18 @@ require_patterns \
 reject_pattern \
   "Speechmatics public API proof avoids conditional compilation snippets" \
   '^[[:space:]]*#(if|elseif|else|endif)\b' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift
 
 require_swift_static_function_body_pattern \
   "Speechmatics public API proof keeps defaulted transcribe call short" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift \
   testSpeechmaticsRequestClientAndCodecExposePublicAPI \
   'let\s+transcribeWithDefaultedLabels\s*=\s*\{\s*try\s+await\s+client\.transcribeAudioData\s*\((?:(?!\b(?:fileName|language|operatingPoint|customVocabulary|maxWaitSeconds|timeout|maxRetries|errorDomain)\s*:).)*\bbaseURL\s*:(?:(?!\b(?:fileName|language|operatingPoint|customVocabulary|maxWaitSeconds|timeout|maxRetries|errorDomain)\s*:).)*\bapiKey\s*:(?:(?!\b(?:fileName|language|operatingPoint|customVocabulary|maxWaitSeconds|timeout|maxRetries|errorDomain)\s*:).)*\baudioData\s*:(?:(?!\b(?:fileName|language|operatingPoint|customVocabulary|maxWaitSeconds|timeout|maxRetries|errorDomain)\s*:).)*\)\s*\}'
 
 reject_pattern \
   "Speechmatics public API proof avoids testable import" \
   '@testable import VoiceInkCore' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift
 
 section "obsolete standalone Speechmatics public API proof stays deleted"
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/SpeechmaticsPublicAPITests.swift
@@ -8768,7 +8780,7 @@ reject_pattern \
 
 require_voiceink_core_check_runner_invocations \
   "core checks execute Speechmatics public API proof" \
-  RemoteProviderPublicAPITests \
+  RemoteProviderRequestTests \
   testSpeechmaticsRequestClientAndCodecExposePublicAPI
 
 require_voiceink_core_check_runner_invocations \
@@ -8865,9 +8877,9 @@ reject_swift_static_function_body_pattern \
 
 require_patterns \
   "AssemblyAI public API proof uses normal VoiceInkCore import" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift \
   '^import VoiceInkCore$' \
-  'final class RemoteProviderPublicAPITests' \
+  'final class RemoteProviderRequestTests' \
   'VoiceInkAssemblyAIRequestBuilder\.makeUploadAudioRequest' \
   'VoiceInkPreparedAssemblyAIUploadRequest' \
   'VoiceInkAssemblyAIRequestBuilder\.makeCreateTranscriptRequest' \
@@ -8887,7 +8899,7 @@ require_patterns \
   'maxWaitSeconds: 300' \
   'timeout: 30' \
   'maxRetries: 2' \
-  'errorDomain: "RemoteProviderPublicAPITests\.AssemblyAI"' \
+  'errorDomain: "RemoteProviderRequestTests\.AssemblyAI"' \
   'client\.verifyAPIKey\(' \
   'client\.verifyAPIKeyDetailed\(' \
   'VoiceInkAPIKeyVerificationResult' \
@@ -8902,18 +8914,18 @@ require_patterns \
 reject_pattern \
   "AssemblyAI public API proof avoids conditional compilation snippets" \
   '^[[:space:]]*#(if|elseif|else|endif)\b' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift
 
 require_swift_static_function_body_pattern \
   "AssemblyAI public API proof keeps defaulted transcribe call short" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift \
   testAssemblyAIRequestClientAndCodecExposePublicAPI \
   'let\s+transcribeWithDefaultedLabels\s*=\s*\{\s*try\s+await\s+client\.transcribeAudioData\s*\((?:(?!\b(?:language|prompt|customVocabulary|maxWaitSeconds|timeout|maxRetries|errorDomain)\s*:).)*\bbaseURL\s*:(?:(?!\b(?:language|prompt|customVocabulary|maxWaitSeconds|timeout|maxRetries|errorDomain)\s*:).)*\bapiKey\s*:(?:(?!\b(?:language|prompt|customVocabulary|maxWaitSeconds|timeout|maxRetries|errorDomain)\s*:).)*\bmodel\s*:(?:(?!\b(?:language|prompt|customVocabulary|maxWaitSeconds|timeout|maxRetries|errorDomain)\s*:).)*\baudioData\s*:(?:(?!\b(?:language|prompt|customVocabulary|maxWaitSeconds|timeout|maxRetries|errorDomain)\s*:).)*\)\s*\}'
 
 reject_pattern \
   "AssemblyAI public API proof avoids testable import" \
   '@testable import VoiceInkCore' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift
 
 section "obsolete standalone AssemblyAI public API proof stays deleted"
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/AssemblyAIPublicAPITests.swift
@@ -8929,7 +8941,7 @@ reject_pattern \
 
 require_voiceink_core_check_runner_invocations \
   "core checks execute AssemblyAI public API proof" \
-  RemoteProviderPublicAPITests \
+  RemoteProviderRequestTests \
   testAssemblyAIRequestClientAndCodecExposePublicAPI
 
 require_patterns \
@@ -8960,8 +8972,8 @@ require_patterns \
 require_patterns \
   "core checks execute macOS transcription provider verification tests" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'RemoteProviderPublicAPITests\.testProviderAPIKeyVerifierPublicRoutesRejectMissingKeysWithoutNetwork' \
-  'RemoteProviderPublicAPITests\.testCartesiaRequestClientAndProviderVerifierExposePublicAPI'
+  'RemoteProviderRequestTests\.testProviderAPIKeyVerifierPublicRoutesRejectMissingKeysWithoutNetwork' \
+  'RemoteProviderRequestTests\.testCartesiaRequestClientAndProviderVerifierExposePublicAPI'
 
 section "obsolete standalone provider API-key verifier public suite stays deleted"
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/ProviderAPIKeyVerifierPublicAPITests.swift
@@ -8995,7 +9007,7 @@ require_patterns \
 
 require_patterns \
   "provider verifier public API proof uses normal VoiceInkCore import" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift \
   '^import VoiceInkCore$' \
   'func testProviderAPIKeyVerifierPublicRoutesRejectMissingKeysWithoutNetwork\(\) async' \
   'func testCartesiaRequestClientAndProviderVerifierExposePublicAPI\(\) async' \
@@ -9015,13 +9027,13 @@ require_patterns \
 reject_pattern \
   "provider verifier public API proof avoids testable import" \
   '@testable import VoiceInkCore' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift
 
 require_patterns \
   "core checks execute API-key verification policy tests through remote transport" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  '^[[:space:]]*VoiceInkCoreCheck\(name: "RemoteProviderPublicAPITests\.testProviderAPIKeyVerifierPublicRoutesRejectMissingKeysWithoutNetwork", run: \{ await RemoteProviderPublicAPITests\(\)\.testProviderAPIKeyVerifierPublicRoutesRejectMissingKeysWithoutNetwork\(\) \}\),$' \
-  '^[[:space:]]*VoiceInkCoreCheck\(name: "RemoteProviderPublicAPITests\.testCartesiaRequestClientAndProviderVerifierExposePublicAPI", run: \{ await RemoteProviderPublicAPITests\(\)\.testCartesiaRequestClientAndProviderVerifierExposePublicAPI\(\) \}\),$' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RemoteProviderRequestTests\.testProviderAPIKeyVerifierPublicRoutesRejectMissingKeysWithoutNetwork", run: \{ await RemoteProviderRequestTests\(\)\.testProviderAPIKeyVerifierPublicRoutesRejectMissingKeysWithoutNetwork\(\) \}\),$' \
+  '^[[:space:]]*VoiceInkCoreCheck\(name: "RemoteProviderRequestTests\.testCartesiaRequestClientAndProviderVerifierExposePublicAPI", run: \{ await RemoteProviderRequestTests\(\)\.testCartesiaRequestClientAndProviderVerifierExposePublicAPI\(\) \}\),$' \
   '^[[:space:]]*VoiceInkCoreCheck\(name: "RemoteTransportTests\.testAPIKeyVerificationPolicyRejectsBlankKeys", run: \{ RemoteTransportTests\(\)\.testAPIKeyVerificationPolicyRejectsBlankKeys\(\) \}\),$' \
   '^[[:space:]]*VoiceInkCoreCheck\(name: "RemoteTransportTests\.testAPIKeyVerificationPolicyRejectsMissingHTTPResponse", run: \{ try RemoteTransportTests\(\)\.testAPIKeyVerificationPolicyRejectsMissingHTTPResponse\(\) \}\),$' \
   '^[[:space:]]*VoiceInkCoreCheck\(name: "RemoteTransportTests\.testAPIKeyVerificationPolicyAcceptsHTTP2xxResponses", run: \{ RemoteTransportTests\(\)\.testAPIKeyVerificationPolicyAcceptsHTTP2xxResponses\(\) \}\),$' \

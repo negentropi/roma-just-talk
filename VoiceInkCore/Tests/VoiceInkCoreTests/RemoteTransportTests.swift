@@ -391,6 +391,219 @@ final class RemoteTransportTests: XCTestCase {
         XCTAssertEqual(operationCount, 2)
     }
 
+    func testRemoteTranscriptionServiceFileOptionsUseProviderBatchDefaults() throws {
+        let groq = VoiceInkRemoteTranscriptionService(provider: .groq)
+            .fileTranscriptionOptions(prompt: "spell Roma correctly")
+        XCTAssertEqual(groq.prompt, "spell Roma correctly")
+        XCTAssertEqual(groq.openAICompatibleResponseFormat, "json")
+        XCTAssertEqual(groq.openAICompatibleTemperature, "0")
+        XCTAssertEqual(groq.openAICompatibleTimeout, 60)
+        XCTAssertEqual(groq.openAICompatibleMaxRetries, 2)
+
+        let deepgram = VoiceInkRemoteTranscriptionService(provider: .deepgram)
+            .fileTranscriptionOptions(prompt: "ignored")
+        XCTAssertNil(deepgram.prompt)
+        XCTAssertEqual(deepgram.deepgramParagraphs, true)
+        XCTAssertNil(deepgram.deepgramDiarize)
+        XCTAssertEqual(deepgram.deepgramTimeout, 30)
+
+        let soniox = VoiceInkRemoteTranscriptionService(provider: .soniox)
+            .fileTranscriptionOptions(
+                prompt: "ignored",
+                customVocabulary: [" Roma ", "Felix", "roma", ""]
+            )
+        XCTAssertEqual(soniox.customVocabulary, ["Roma", "Felix"])
+
+        let directTransport = VoiceInkRemoteTranscriptionService(
+            transport: .openAICompatible,
+            apiBaseURL: try XCTUnwrap(URL(string: "https://custom.example.test"))
+        )
+            .fileTranscriptionOptions(
+                prompt: "custom prompt",
+                customVocabulary: ["Roma"]
+            )
+        XCTAssertEqual(directTransport.prompt, "custom prompt")
+        XCTAssertEqual(directTransport.customVocabulary, ["Roma"])
+        XCTAssertNil(directTransport.openAICompatibleResponseFormat)
+        XCTAssertNil(directTransport.openAICompatibleTimeout)
+    }
+
+    func testMacOSCloudTranscriptionPolicyBuildsSharedTransportRequest() async throws {
+        let requestCapture = MacOSCloudTranscriptionRequestCapture()
+
+        let text = try await VoiceInkMacOSCloudTranscriptionPolicy.transcribeAudioData(
+            modelProvider: .soniox,
+            apiKey: "soniox-key",
+            modelName: "stt-async-v4",
+            audioData: Data([4, 5, 6]),
+            fileName: "clip.wav",
+            language: "en",
+            prompt: "ignored",
+            customVocabulary: [" Roma ", "Felix", "roma", ""]
+        ) { request in
+            await requestCapture.store(request)
+            return "remote transcript"
+        }
+
+        let capturedRequest = await requestCapture.value
+        let request = try XCTUnwrap(capturedRequest)
+        XCTAssertEqual(text, "remote transcript")
+        XCTAssertEqual(request.provider, .soniox)
+        XCTAssertEqual(request.apiKey, "soniox-key")
+        XCTAssertEqual(request.modelName, "stt-async-v4")
+        XCTAssertEqual(request.audioData, Data([4, 5, 6]))
+        XCTAssertEqual(request.fileName, "clip.wav")
+        XCTAssertEqual(request.language, "en")
+        XCTAssertNil(request.options.prompt)
+        XCTAssertEqual(request.options.customVocabulary, ["Roma", "Felix"])
+    }
+
+    func testMacOSCloudTranscriptionPolicyRejectsBlankAPIKeyBeforeTransport() async {
+        do {
+            _ = try await VoiceInkMacOSCloudTranscriptionPolicy.transcribeAudioData(
+                modelProvider: .soniox,
+                apiKey: " \n\t ",
+                modelName: "stt-async-v4",
+                audioData: Data(),
+                fileName: "clip.wav",
+                language: nil,
+                prompt: nil,
+                customVocabulary: []
+            ) { _ in
+                XCTFail("Blank API keys should not call transport")
+                return "unexpected"
+            }
+            XCTFail("Expected missing API key error")
+        } catch VoiceInkCloudTranscriptionError.missingAPIKey {
+            // Expected.
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+
+    func testMacOSCloudTranscriptionPolicyRejectsUnsupportedBatchProvider() async {
+        do {
+            _ = try await VoiceInkMacOSCloudTranscriptionPolicy.transcribeAudioData(
+                modelProvider: .cartesia,
+                apiKey: "cartesia-key",
+                modelName: "ink-whisper",
+                audioData: Data(),
+                fileName: "clip.wav",
+                language: nil,
+                prompt: nil,
+                customVocabulary: []
+            ) { _ in
+                XCTFail("Unsupported provider should not call transport")
+                return "unexpected"
+            }
+            XCTFail("Expected unsupported provider error")
+        } catch VoiceInkCloudTranscriptionError.unsupportedProvider {
+            // Expected.
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+
+    func testMacOSCloudTranscriptionPolicyMapsProviderHTTPNSError() async {
+        do {
+            _ = try await VoiceInkMacOSCloudTranscriptionPolicy.transcribeAudioData(
+                modelProvider: .assemblyAI,
+                apiKey: "assembly-key",
+                modelName: "universal-3-pro",
+                audioData: Data(),
+                fileName: "clip.wav",
+                language: nil,
+                prompt: nil,
+                customVocabulary: []
+            ) { _ in
+                throw NSError(
+                    domain: try XCTUnwrap(VoiceInkMacOSTranscriptionModelProvider.assemblyAI.apiErrorDomain),
+                    code: 500,
+                    userInfo: [NSLocalizedDescriptionKey: "server failed"]
+                )
+            }
+            XCTFail("Expected API request failure")
+        } catch VoiceInkCloudTranscriptionError.apiRequestFailed(let statusCode, let message) {
+            XCTAssertEqual(statusCode, 500)
+            XCTAssertEqual(message, "server failed")
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+
+    func testMacOSCloudTranscriptionPolicyMapsUnknownErrorsToNetworkError() async {
+        do {
+            _ = try await VoiceInkMacOSCloudTranscriptionPolicy.transcribeAudioData(
+                modelProvider: .soniox,
+                apiKey: "soniox-key",
+                modelName: "stt-async-v4",
+                audioData: Data(),
+                fileName: "clip.wav",
+                language: nil,
+                prompt: nil,
+                customVocabulary: []
+            ) { _ in
+                throw NSError(
+                    domain: "Transport",
+                    code: -42,
+                    userInfo: [NSLocalizedDescriptionKey: "socket closed"]
+                )
+            }
+            XCTFail("Expected network error")
+        } catch VoiceInkCloudTranscriptionError.networkError(let error) {
+            let nsError = error as NSError
+            XCTAssertEqual(nsError.domain, "Transport")
+            XCTAssertEqual(nsError.code, -42)
+            XCTAssertEqual(nsError.localizedDescription, "socket closed")
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+
+    func testRemoteTranscriptionServiceUsesSharedProviderErrorDomainsForProviderTransports() throws {
+        let providers: [(VoiceInkProviderKind, VoiceInkTranscriptionModelProvider)] = [
+            (.mistral, .mistral),
+            (.assemblyAI, .assemblyAI),
+            (.xai, .xai)
+        ]
+
+        for (provider, modelProvider) in providers {
+            XCTAssertEqual(
+                VoiceInkRemoteTranscriptionService(provider: provider)
+                    .providerAPIErrorDomain(defaultingTo: modelProvider),
+                try XCTUnwrap(provider.transcriptionModelProvider?.apiErrorDomain)
+            )
+        }
+
+        let directMistral = VoiceInkRemoteTranscriptionService(
+            transport: .mistral,
+            apiBaseURL: try XCTUnwrap(URL(string: "https://api.mistral.ai"))
+        )
+        XCTAssertEqual(
+            directMistral.providerAPIErrorDomain(defaultingTo: .mistral),
+            VoiceInkTranscriptionModelProvider.mistral.apiErrorDomain
+        )
+    }
+
+    func testOpenAICompatibleTranscriptionCodecCanDisablePlainTextFallback() throws {
+        let plainTextData = Data("plain transcription".utf8)
+
+        XCTAssertEqual(
+            VoiceInkOpenAICompatibleTranscriptionCodec.transcriptionText(
+                from: plainTextData,
+                allowPlainTextFallback: true
+            ),
+            "plain transcription"
+        )
+        XCTAssertEqual(
+            VoiceInkOpenAICompatibleTranscriptionCodec.transcriptionText(
+                from: plainTextData,
+                allowPlainTextFallback: false
+            ),
+            ""
+        )
+    }
+
     private func response(statusCode: Int) -> HTTPURLResponse {
         HTTPURLResponse(
             url: URL(string: "https://api.example.test")!,
@@ -398,6 +611,18 @@ final class RemoteTransportTests: XCTestCase {
             httpVersion: nil,
             headerFields: nil
         )!
+    }
+}
+
+private actor MacOSCloudTranscriptionRequestCapture {
+    private var storedValue: VoiceInkMacOSCloudTranscriptionRequest?
+
+    var value: VoiceInkMacOSCloudTranscriptionRequest? {
+        storedValue
+    }
+
+    func store(_ request: VoiceInkMacOSCloudTranscriptionRequest) {
+        storedValue = request
     }
 }
 

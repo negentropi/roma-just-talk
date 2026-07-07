@@ -12240,7 +12240,19 @@ reject_pattern \
 require_pattern \
   "shared AI enhancement transport failure policy lives in VoiceInkCore" \
   'VoiceInkAIEnhancementTransportFailure|transportFailure|missingAPIKey|noResultReturned|invalidRequest' \
-  VoiceInkCore/Sources/VoiceInkCore/AIEnhancementRetryPolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
+
+section "obsolete standalone AI enhancement retry policy module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/AIEnhancementRetryPolicy.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/AIEnhancementRetryPolicyTests.swift
+
+reject_pattern \
+  "core package/project metadata and runner avoid obsolete AI enhancement retry policy files/tests" \
+  'AIEnhancementRetryPolicy(Tests)?\.swift|AIEnhancementRetryPolicyTests' \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 reject_file VoiceInkCore/Sources/VoiceInkCore/AIEnhancementError.swift
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/AIEnhancementErrorTests.swift
@@ -12256,16 +12268,31 @@ reject_pattern \
 require_pattern \
   "core tests pin shared AI enhancement transport failure policy" \
   'testTransportFailureMappingPreservesMacOSLLMKitCategories' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/AIEnhancementRetryPolicyTests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/AIProviderCatalogTests.swift
 
 require_voiceink_core_check_runner_invocations \
   "core check runner executes shared AI enhancement error and transport policy tests" \
-  AIEnhancementRetryPolicyTests \
+  AIProviderCatalogTests \
   testErrorDescriptionsPreserveExistingMacOSMessages \
   testHTTPErrorMappingPreservesMacOSRetryCategories \
   testTransportFailureMappingPreservesMacOSLLMKitCategories \
   testTransportNetworkErrorMapsRetryableFoundationErrors \
   testTransportNetworkErrorRejectsNonRetryableFoundationErrors
+
+require_pattern \
+  "AI enhancement retry public API tests exercise normal VoiceInkCore import" \
+  '^import VoiceInkCore$' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AIEnhancementRetryPublicAPITests.swift
+
+reject_pattern \
+  "AI enhancement retry public API tests avoid testable import" \
+  '@testable import VoiceInkCore' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AIEnhancementRetryPublicAPITests.swift
+
+require_voiceink_core_check_runner_invocations \
+  "core check runner executes AI enhancement retry public API proof" \
+  AIEnhancementRetryPublicAPITests \
+  testMovedAIEnhancementRetrySymbolsExposePublicAPI
 
 require_pattern \
   "macOS AI enhancement service adapts LLMKit transport failures through shared policy" \
@@ -12280,18 +12307,18 @@ reject_pattern \
 require_pattern \
   "shared Ollama enhancement failure policy lives in VoiceInkCore" \
   'VoiceInkOllamaEnhancementFailure|VoiceInkOllamaTransportFailure|transportFailure|httpFailure|enhancementError|VoiceInkOllamaServiceDiagnostics|modelFetchFailedMessage|Ollama request timed out' \
-  VoiceInkCore/Sources/VoiceInkCore/AIEnhancementRetryPolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 require_patterns \
   "core tests pin shared Ollama enhancement failure policy" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/AIEnhancementRetryPolicyTests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AIProviderCatalogTests.swift \
   'testOllamaEnhancementFailurePolicyPreservesMacOSMessagesAndRetryShape' \
   'testOllamaTransportFailuresMapToSharedFailurePolicy' \
   'testOllamaServiceDiagnosticsPreserveMacOSConsoleCopy'
 
 require_voiceink_core_check_runner_invocations \
   "core check runner executes shared Ollama enhancement failure policy test" \
-  AIEnhancementRetryPolicyTests \
+  AIProviderCatalogTests \
   testOllamaEnhancementFailurePolicyPreservesMacOSMessagesAndRetryShape \
   testOllamaTransportFailuresMapToSharedFailurePolicy \
   testOllamaServiceDiagnosticsPreserveMacOSConsoleCopy
@@ -13553,7 +13580,7 @@ require_patterns \
 
 require_patterns \
   "shared Local CLI execution errors live with AI enhancement errors" \
-  VoiceInkCore/Sources/VoiceInkCore/AIEnhancementRetryPolicy.swift \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift \
   'VoiceInkLocalCLIExecutionError' \
   'Local CLI command is not configured' \
   'Local CLI command was not found' \
@@ -13604,14 +13631,14 @@ reject_pattern \
 
 require_patterns \
   "shared AI enhancement error maps Local CLI execution failures" \
-  VoiceInkCore/Sources/VoiceInkCore/AIEnhancementRetryPolicy.swift \
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift \
   'localCLIExecutionFailure' \
   'VoiceInkLocalCLIExecutionError' \
   'An unknown Local CLI error occurred'
 
 require_voiceink_core_check_runner_invocations \
   "core checks execute Local CLI enhancement error mapping test" \
-  AIEnhancementRetryPolicyTests \
+  AIProviderCatalogTests \
   testLocalCLIExecutionFailureMapsCoreErrorsAndGenericFallbacks
 
 require_pattern \
@@ -13636,7 +13663,7 @@ require_pattern \
 
 require_pattern \
   "migration checklist tracks shared Local CLI configuration gate" \
-  'macOS Local CLI template identity, settings labels/help, command template catalog, command/selected-template/timeout storage, timeout default/options/clamp, configured-command predicate, full-prompt wrapper, stdout/stderr cleanup, command-failure classification, AI-enhancement error mapping, and execution error copy route through shared provider-catalog types `VoiceInkLocalCLITemplate`/`VoiceInkLocalCLIPreference` plus shared error-policy types `VoiceInkLocalCLIExecutionError`/`VoiceInkAIEnhancementError`' \
+  'macOS Local CLI template identity, settings labels/help, command template catalog, command/selected-template/timeout storage, timeout default/options/clamp, configured-command predicate, full-prompt wrapper, stdout/stderr cleanup, command-failure classification, AI-enhancement error mapping, and execution error copy route through shared provider-catalog types `VoiceInkLocalCLITemplate`/`VoiceInkLocalCLIPreference`/`VoiceInkLocalCLIExecutionError`/`VoiceInkAIEnhancementError`' \
   docs/ios-single-repo-migration.md
 
 require_pattern \
@@ -14390,31 +14417,31 @@ reject_pattern \
 require_pattern \
   "shared AI enhancement rate-limit policy lives in VoiceInkCore" \
   'VoiceInkAIEnhancementRateLimitPolicy|delaySinceLastRequest' \
-  VoiceInkCore/Sources/VoiceInkCore/AIEnhancementRetryPolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 require_pattern \
   "shared AI enhancement non-enhancement error retry plan lives in VoiceInkCore" \
   'VoiceInkAIEnhancementNonEnhancementErrorRetryPlan|recordNonEnhancementError|applyRuntimeState' \
-  VoiceInkCore/Sources/VoiceInkCore/AIEnhancementRetryPolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 reject_pattern \
   "shared AI enhancement non-enhancement error retry plan avoids public raw decision fields" \
   'public let (decision|isTransportNetworkFailure)' \
-  VoiceInkCore/Sources/VoiceInkCore/AIEnhancementRetryPolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 require_pattern \
   "shared AI enhancement retry-failure presentation lives in VoiceInkCore" \
   'VoiceInkAIEnhancementRetryFailurePresentation|diagnosticMessage' \
-  VoiceInkCore/Sources/VoiceInkCore/AIEnhancementRetryPolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 require_pattern \
   "shared AI enhancement retry-progress presentation lives in VoiceInkCore" \
   'VoiceInkAIEnhancementRetryProgressPresentation|diagnosticMessage' \
-  VoiceInkCore/Sources/VoiceInkCore/AIEnhancementRetryPolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift
 
 require_voiceink_core_check_runner_invocations \
   "core checks execute AI enhancement retry policy coverage" \
-  AIEnhancementRetryPolicyTests \
+  AIProviderCatalogTests \
   testDefaultRetryStatePreservesMacOSAttemptAndDelayDefaults \
   testBackoffFailuresRetryUntilAttemptLimit \
   testTimeoutRetriesImmediatelyWhenEnabled \

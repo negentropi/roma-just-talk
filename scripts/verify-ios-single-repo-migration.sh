@@ -8771,8 +8771,9 @@ reject_swift_static_function_body_pattern \
 
 require_patterns \
   "AssemblyAI public API proof uses normal VoiceInkCore import" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/AssemblyAIPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
   '^import VoiceInkCore$' \
+  'final class RemoteProviderPublicAPITests' \
   'VoiceInkAssemblyAIRequestBuilder\.makeUploadAudioRequest' \
   'VoiceInkPreparedAssemblyAIUploadRequest' \
   'VoiceInkAssemblyAIRequestBuilder\.makeCreateTranscriptRequest' \
@@ -8807,22 +8808,33 @@ require_patterns \
 reject_pattern \
   "AssemblyAI public API proof avoids conditional compilation snippets" \
   '^[[:space:]]*#(if|elseif|else|endif)\b' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/AssemblyAIPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
 
 require_swift_static_function_body_pattern \
   "AssemblyAI public API proof keeps defaulted transcribe call short" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/AssemblyAIPublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
   testAssemblyAIRequestClientAndCodecExposePublicAPI \
   'let\s+transcribeWithDefaultedLabels\s*=\s*\{\s*try\s+await\s+client\.transcribeAudioData\s*\((?:(?!\b(?:language|prompt|customVocabulary|maxWaitSeconds|timeout|maxRetries|errorDomain)\s*:).)*\bbaseURL\s*:(?:(?!\b(?:language|prompt|customVocabulary|maxWaitSeconds|timeout|maxRetries|errorDomain)\s*:).)*\bapiKey\s*:(?:(?!\b(?:language|prompt|customVocabulary|maxWaitSeconds|timeout|maxRetries|errorDomain)\s*:).)*\bmodel\s*:(?:(?!\b(?:language|prompt|customVocabulary|maxWaitSeconds|timeout|maxRetries|errorDomain)\s*:).)*\baudioData\s*:(?:(?!\b(?:language|prompt|customVocabulary|maxWaitSeconds|timeout|maxRetries|errorDomain)\s*:).)*\)\s*\}'
 
 reject_pattern \
   "AssemblyAI public API proof avoids testable import" \
   '@testable import VoiceInkCore' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/AssemblyAIPublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
+
+section "obsolete standalone AssemblyAI public API proof stays deleted"
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/AssemblyAIPublicAPITests.swift
+
+reject_pattern \
+  "VoiceInkCore metadata and runner avoid stale standalone AssemblyAI public API proof" \
+  'AssemblyAIPublicAPITests' \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
 require_voiceink_core_check_runner_invocations \
   "core checks execute AssemblyAI public API proof" \
-  AssemblyAIPublicAPITests \
+  RemoteProviderPublicAPITests \
   testAssemblyAIRequestClientAndCodecExposePublicAPI
 
 require_patterns \

@@ -3516,42 +3516,130 @@ reject_pattern \
   'AudioInputPriorityPolicyTests' \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
 
-require_pattern \
+require_patterns \
   "shared audio input priority policy lives in recording state policy" \
-  'VoiceInkAudioInputMode|VoiceInkAudioInputPriorityDevice|VoiceInkAudioInputAvailableDevice|VoiceInkAudioInputPriorityPolicy|VoiceInkAudioInputPriorityMoveDirection|firstAvailablePriorityDevice|firstAvailablePriorityDeviceID|VoiceInkAudioInputSelectionPolicy|VoiceInkAudioInputRecordingSwitchPlan|currentDeviceID|deviceIDToSelectWhenChangingMode|recordingSwitchPlan|reindexed|defaultMode|iconSystemName|VoiceInkAudioInputAutomaticSelectionPolicy|VoiceInkAudioInputAutomaticDevice|VoiceInkAudioInputAutomaticSelection|isSafeAutomaticDevice|builtInUIDMarker|unsafeAirPodsNameMarker' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
-
-require_pattern \
-  "shared audio input preference storage lives in recording state policy" \
-  'VoiceInkAudioInputPreference|inputModeKey = "audioInputMode"|selectedDeviceUIDKey = "selectedAudioDeviceUID"|prioritizedDevicesKey = "prioritizedDevices"|lastUsedMicrophoneDeviceIDKey = "lastUsedMicrophoneDeviceID"|saveInputMode|saveSelectedDeviceUID|savePrioritizedDevices|saveLastUsedMicrophoneDeviceID|shouldAnnounceMicrophoneChange' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
-
-require_pattern \
-  "shared macOS audio device change request lives in recording state policy" \
-  'VoiceInkMacOSAudioDeviceChangeRequest|deviceChangedNotificationName = Notification\.Name\("AudioDeviceChanged"\)|switchRequiredNotificationName = Notification\.Name\("audioDeviceSwitchRequired"\)|newDeviceIDUserInfoKey = "newDeviceID"|switchRequiredUserInfo|newDeviceID\(from notification: Notification\)' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
-
-require_pattern \
-  "shared macOS audio input diagnostics live in recording state policy" \
-  'VoiceInkAudioInputDiagnostics|systemDefaultDeviceLookupFailedMessage|savedDeviceUnavailableMessage|autoSelectingNewDeviceMessage|audioDevicesLoadFailedMessage|inputCapabilityCheckFailedMessage|streamConfigurationLoadFailedMessage|safeFallbackDeviceSelectedMessage|unsafeAutomaticDeviceRefusedMessage|recordingDeviceUnavailableMessage|devicePropertyLookupFailedMessage|transportTypeLookupFailedMessage' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
-
-require_pattern \
-  "shared macOS audio input settings presentation lives in recording state policy" \
-  'VoiceInkMacOSAudioInputSettingsPresentation|heroTitle|prioritizedDevicesDescription|priorityDisplayText|switchedDeviceNotificationTitle|usingDeviceNotificationTitle' \
-  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift \
+  'VoiceInkAudioInputMode' \
+  'VoiceInkAudioInputPriorityDevice' \
+  'VoiceInkAudioInputAvailableDevice' \
+  'VoiceInkAudioInputPriorityPolicy' \
+  'VoiceInkAudioInputPriorityMoveDirection' \
+  'firstAvailablePriorityDevice' \
+  'firstAvailablePriorityDeviceID' \
+  'VoiceInkAudioInputSelectionPolicy' \
+  'VoiceInkAudioInputRecordingSwitchPlan' \
+  'currentDeviceID' \
+  'deviceIDToSelectWhenChangingMode' \
+  'recordingSwitchPlan' \
+  'reindexed' \
+  'defaultMode' \
+  'iconSystemName' \
+  'VoiceInkAudioInputAutomaticSelectionPolicy' \
+  'VoiceInkAudioInputAutomaticDevice' \
+  'VoiceInkAudioInputAutomaticSelection' \
+  'isSafeAutomaticDevice' \
+  'builtInUIDMarker' \
+  'unsafeAirPodsNameMarker'
 
 require_patterns \
+  "shared audio input preference storage lives in recording state policy" \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift \
+  'VoiceInkAudioInputPreference' \
+  'inputModeKey = "audioInputMode"' \
+  'selectedDeviceUIDKey = "selectedAudioDeviceUID"' \
+  'prioritizedDevicesKey = "prioritizedDevices"' \
+  'lastUsedMicrophoneDeviceIDKey = "lastUsedMicrophoneDeviceID"' \
+  'saveInputMode' \
+  'saveSelectedDeviceUID' \
+  'savePrioritizedDevices' \
+  'saveLastUsedMicrophoneDeviceID' \
+  'shouldAnnounceMicrophoneChange'
+
+require_patterns \
+  "shared macOS audio device change request lives in recording state policy" \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift \
+  'VoiceInkMacOSAudioDeviceChangeRequest' \
+  'deviceChangedNotificationName = Notification\.Name\("AudioDeviceChanged"\)' \
+  'switchRequiredNotificationName = Notification\.Name\("audioDeviceSwitchRequired"\)' \
+  'newDeviceIDUserInfoKey = "newDeviceID"' \
+  'switchRequiredUserInfo' \
+  'newDeviceID\(from notification: Notification\)'
+
+require_patterns \
+  "shared macOS audio input diagnostics live in recording state policy" \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift \
+  'VoiceInkAudioInputDiagnostics' \
+  'systemDefaultDeviceLookupFailedMessage' \
+  'savedDeviceUnavailableMessage' \
+  'autoSelectingNewDeviceMessage' \
+  'audioDevicesLoadFailedMessage' \
+  'inputCapabilityCheckFailedMessage' \
+  'streamConfigurationLoadFailedMessage' \
+  'safeFallbackDeviceSelectedMessage' \
+  'unsafeAutomaticDeviceRefusedMessage' \
+  'recordingDeviceUnavailableMessage' \
+  'devicePropertyLookupFailedMessage' \
+  'transportTypeLookupFailedMessage'
+
+require_patterns \
+  "shared macOS audio input settings presentation lives in recording state policy" \
+  VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift \
+  'VoiceInkMacOSAudioInputSettingsPresentation' \
+  'heroTitle' \
+  'prioritizedDevicesDescription' \
+  'priorityDisplayText' \
+  'switchedDeviceNotificationTitle' \
+  'usingDeviceNotificationTitle'
+
+require_patterns \
+  "audio input public API proof uses normal VoiceInkCore import" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AudioInputPolicyPublicAPITests.swift \
+  '^import VoiceInkCore$' \
+  'final class AudioInputPolicyPublicAPITests' \
+  'testFoldedAudioInputPolicySymbolsExposePublicAPI' \
+  'VoiceInkAudioInputMode\.defaultMode' \
+  'VoiceInkAudioInputPriorityPolicy\.firstAvailablePriorityDeviceID' \
+  'VoiceInkAudioInputSelectionPolicy\.currentDeviceID' \
+  'VoiceInkAudioInputSelectionPolicy\.recordingSwitchPlan' \
+  'VoiceInkAudioInputAutomaticSelectionPolicy\.selection' \
+  'VoiceInkAudioInputPreference\.registeredDefaults' \
+  'VoiceInkMacOSAudioDeviceChangeRequest\.switchRequiredUserInfo' \
+  'VoiceInkAudioInputDiagnostics\.autoSelectingNewDeviceMessage' \
+  'VoiceInkMacOSAudioInputSettingsPresentation\.macOS'
+
+reject_pattern \
+  "audio input public API proof avoids testable import" \
+  '@testable import VoiceInkCore' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/AudioInputPolicyPublicAPITests.swift
+
+require_voiceink_core_check_runner_invocations \
+  "core checks execute audio input public API proof" \
+  AudioInputPolicyPublicAPITests \
+  testFoldedAudioInputPolicySymbolsExposePublicAPI
+
+require_voiceink_core_check_runner_invocations \
   "core audio input automatic selection tests are in runner" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'testMacOSAudioDeviceChangeRequestPreservesNotificationContract' \
-  'testAudioInputDiagnosticsPreserveMacOSLogCopy' \
-  'testMacOSAudioInputSettingsPresentationPreservesCopyAndIcons' \
-  'testAutomaticSelectionPolicyPreservesBuiltInDetection' \
-  'testAutomaticSelectionPolicyRefusesUnsafeAutomaticDevices' \
-  'testSelectionPolicyResolvesCurrentDeviceByMode' \
-  'testSelectionPolicyPreservesModeChangeSelectionBehavior' \
-  'testSelectionPolicyPlansRecordingDeviceSwitches'
+  RecordingStatePolicyTests \
+  testAudioInputModePreservesRawValuesDefaultAndOrder \
+  testAudioInputPreferencePreservesStorageKeysDefaultsAndRoundTrips \
+  testMacOSAudioDeviceChangeRequestPreservesNotificationContract \
+  testAudioInputDiagnosticsPreserveMacOSLogCopy \
+  testAudioInputModePreservesSettingsPresentation \
+  testMacOSAudioInputSettingsPresentationPreservesCopyAndIcons \
+  testMacOSAudioInputSettingsPresentationFormatsPriorityDisplay \
+  testAddingPriorityDeviceAppendsNextPriorityAndKeepsDuplicatesNoOp \
+  testRemovingPriorityDeviceReindexesRemainingDevices \
+  testMovingPriorityDeviceSwapsAndReindexesWithinBounds \
+  testFirstAvailablePriorityDeviceUsesPriorityOrder \
+  testAutomaticSelectionPolicyPreservesBuiltInDetection \
+  testAutomaticSelectionPolicyPreservesSafeDeviceClassification \
+  testAutomaticSelectionPolicyPrefersSafePreferredDevice \
+  testAutomaticSelectionPolicyFallsBackToBuiltInBeforeOtherSafeDevices \
+  testAutomaticSelectionPolicyUsesSafeFallbackWhenBuiltInUnavailable \
+  testAutomaticSelectionPolicyRefusesUnsafeAutomaticDevices \
+  testSelectionPolicyResolvesCurrentDeviceByMode \
+  testSelectionPolicyPreservesModeChangeSelectionBehavior \
+  testSelectionPolicyPlansRecordingDeviceSwitches
 
 require_pattern \
   "macOS audio device manager uses shared input mode" \

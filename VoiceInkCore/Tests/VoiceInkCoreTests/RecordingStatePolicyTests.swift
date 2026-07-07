@@ -1516,6 +1516,7 @@ final class RecordingStatePolicyTests: XCTestCase {
 
         run(defaults)
     }
+
     func testAudioInputModePreservesRawValuesDefaultAndOrder() {
         XCTAssertEqual(VoiceInkAudioInputMode.systemDefault.rawValue, "System Default")
         XCTAssertEqual(VoiceInkAudioInputMode.custom.rawValue, "Custom Device")

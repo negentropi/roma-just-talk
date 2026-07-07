@@ -318,6 +318,65 @@ require_voiceink_core_check_runner_invocations() {
   done
 }
 
+require_voiceink_core_check_runner_complete() {
+  section "VoiceInkCoreCheckRunner covers every VoiceInkCore test method exactly once"
+  if ! perl <<'PERL'
+use strict;
+use warnings;
+
+my $runner_path = 'VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift';
+open my $runner_fh, '<', $runner_path or die "Unable to read $runner_path: $!\n";
+
+my %runner_tests;
+my %duplicate_runner_tests;
+while (my $line = <$runner_fh>) {
+    next unless $line =~ /VoiceInkCoreCheck\(name: "([A-Za-z0-9_]+\.test[A-Za-z0-9_]+)"/;
+    my $test = $1;
+    $runner_tests{$test}++;
+    $duplicate_runner_tests{$test} = 1 if $runner_tests{$test} > 1;
+}
+
+my %declared_tests;
+for my $path (sort glob 'VoiceInkCore/Tests/VoiceInkCoreTests/*Tests.swift') {
+    next if $path eq $runner_path;
+    open my $fh, '<', $path or die "Unable to read $path: $!\n";
+    my $suite = '';
+    while (my $line = <$fh>) {
+        if ($line =~ /^\s*(?:(?:@\w+(?:\([^)]*\))?)\s+)*(?:final\s+)?class\s+([A-Za-z0-9_]+)\s*:/) {
+            $suite = $1;
+            next;
+        }
+        next unless $suite ne '';
+        next unless $line =~ /^\s*(?:(?:@\w+(?:\([^)]*\))?)\s+)*func\s+(test[A-Za-z0-9_]+)\s*\(/;
+        $declared_tests{"$suite.$1"} = 1;
+    }
+}
+
+my @missing = grep { !exists $runner_tests{$_} } sort keys %declared_tests;
+my @stale = grep { !exists $declared_tests{$_} } sort keys %runner_tests;
+my @duplicates = sort keys %duplicate_runner_tests;
+
+if (@missing || @stale || @duplicates) {
+    if (@missing) {
+        print STDERR "Missing VoiceInkCoreCheckRunner entries:\n";
+        print STDERR "  $_\n" for @missing;
+    }
+    if (@stale) {
+        print STDERR "Stale VoiceInkCoreCheckRunner entries:\n";
+        print STDERR "  $_\n" for @stale;
+    }
+    if (@duplicates) {
+        print STDERR "Duplicate VoiceInkCoreCheckRunner entries:\n";
+        print STDERR "  $_\n" for @duplicates;
+    }
+    exit 1;
+}
+PERL
+  then
+    fail "VoiceInkCoreCheckRunner coverage parity"
+  fi
+}
+
 require_context_pattern_count_at_least() {
   local description="$1"
   local anchor="$2"
@@ -14228,6 +14287,11 @@ require_pattern \
   'defaultSelectedProvider = VoiceInkAIEnhancementProviderKind\.gemini' \
   VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
+require_voiceink_core_check_runner_invocations \
+  "core checks execute shared AI enhancement selected-provider save test" \
+  UserDefaultsPreferencesTests \
+  testAIEnhancementProviderPreferenceSavesEnumProvider
+
 require_pattern \
   "macOS AI service reads selected provider through shared default policy" \
   'VoiceInkAIEnhancementProviderPreference\.selectedProvider\(from: userDefaults\)' \
@@ -14354,6 +14418,16 @@ require_voiceink_core_check_runner_invocations \
   testRowDetailPresentationPreservesDefaultBandWithoutVisibleChips \
   testRowDetailPresentationPreservesMacOSChipOrderAndText \
   testRowDetailPresentationFallsBackToDefaultPromptAndSkipsBlankAIModel
+
+require_pattern \
+  "Power Mode policy tests exercise public VoiceInkCore API after folding presentation" \
+  '^import VoiceInkCore$' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/PowerModePolicyTests.swift
+
+reject_pattern \
+  "Power Mode policy tests avoid testable import after folding presentation public API" \
+  '@testable import VoiceInkCore' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/PowerModePolicyTests.swift
 
 reject_file VoiceInkCore/Sources/VoiceInkCore/PowerModePresentation.swift
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/PowerModePresentationTests.swift
@@ -14538,6 +14612,11 @@ require_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests/AIProviderCatalogTests.swift \
   VoiceInkCore/Tests/VoiceInkCoreTests/UserDefaultsPreferencesTests.swift \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+require_voiceink_core_check_runner_invocations \
+  "core checks execute shared AI enhancement selected-model map test" \
+  UserDefaultsPreferencesTests \
+  testAIEnhancementProviderPreferenceLoadsSelectedModelsByProvider
 
 require_pattern \
   "macOS AI service selected-model mutation uses shared plan" \
@@ -16722,6 +16801,11 @@ require_pattern \
   "macOS recording settings uses shared shortcut presentation" \
   'VoiceInkRecordingShortcutPreference\.macOSSettingsPresentation|recordingShortcutPresentation\.(sectionTitle|primaryShortcutLabel|secondaryShortcutLabel|addSecondaryShortcutButtonTitle|emptyTapPasteLastTranscriptLabel|additionalSectionTitle|pasteLastTranscriptionOriginalLabel|pasteLastTranscriptionEnhancedLabel|retryLastTranscriptionLabel|cancelRecordingLabel|resetToDefaultHelp|middleClickRecordingLabel|activationDelayLabel|activationDelayUnitLabel)' \
   VoiceInk/Views/Settings/SettingsView.swift
+
+require_voiceink_core_check_runner_invocations \
+  "core checks execute recording shortcut settings presentation test" \
+  UserDefaultsPreferencesTests \
+  testRecordingShortcutPreferencePreservesMacOSSettingsPresentation
 
 require_patterns \
   "macOS shortcut recorder uses shared recorder presentation" \
@@ -23808,6 +23892,7 @@ run_required "VoiceInkCore sources typecheck" xcrun swiftc -emit-module \
 
 run_required "VoiceInkCore tests typecheck" xcrun swiftc -typecheck -I /tmp VoiceInkCore/Tests/VoiceInkCoreTests/*.swift
 
+require_voiceink_core_check_runner_complete
 run_required "VoiceInkCoreChecks" run_voiceink_core_checks
 run_required "VoiceInkAudioProof builds" run_voiceink_audio_proof_help
 

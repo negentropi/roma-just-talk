@@ -8007,8 +8007,9 @@ require_patterns \
 
 require_patterns \
   "OpenAI-compatible transcription public API proof uses normal VoiceInkCore import" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/OpenAICompatiblePublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
   '^import VoiceInkCore$' \
+  'final class RemoteProviderPublicAPITests' \
   'VoiceInkOpenAICompatibleTranscriptionResponse\(' \
   'VoiceInkOpenAICompatibleTranscriptionCodec\.multipartContentType' \
   'VoiceInkOpenAICompatibleTranscriptionCodec\.requestBody' \
@@ -8023,8 +8024,11 @@ require_patterns \
   'client\.transcribeAudioData\(' \
   'baseURL: VoiceInkProviderEndpoint\.groq\.apiBaseURL' \
   'url: try XCTUnwrap\(URL\(string: "https://custom\.example\.test/v1/audio/transcriptions"\)\)' \
+  'apiKey: "custom-key"' \
+  'model: "custom-whisper"' \
   'responseFormat: "json"' \
   'temperature: "0"' \
+  'errorDomain: "OpenAICompatiblePublicAPITests"' \
   'allowPlainTextFallback: false' \
   'client\.verifyAPIKey\(' \
   'client\.verifyAPIKeyDetailed\(' \
@@ -8033,22 +8037,39 @@ require_patterns \
 reject_pattern \
   "OpenAI-compatible transcription public API proof avoids conditional compilation snippets" \
   '^[[:space:]]*#(if|elseif|else|endif)\b' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/OpenAICompatiblePublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
 
 reject_pattern \
   "OpenAI-compatible transcription public API proof avoids testable import" \
   '@testable import VoiceInkCore' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/OpenAICompatiblePublicAPITests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift
 
 require_swift_static_function_body_pattern \
   "OpenAI-compatible public API proof keeps defaulted transcribe call short" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/OpenAICompatiblePublicAPITests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
   testOpenAICompatibleTranscriptionRequestClientAndCodecExposePublicAPI \
   'let\s+transcribeWithDefaultedLabels\s*=\s*\{\s*try\s+await\s+client\.transcribeAudioData\s*\((?:(?!\b(?:language|prompt|responseFormat|temperature|errorDomain|timeout|maxRetries|allowPlainTextFallback)\s*:).)*\bbaseURL\s*:(?:(?!\b(?:language|prompt|responseFormat|temperature|errorDomain|timeout|maxRetries|allowPlainTextFallback)\s*:).)*\bapiKey\s*:(?:(?!\b(?:language|prompt|responseFormat|temperature|errorDomain|timeout|maxRetries|allowPlainTextFallback)\s*:).)*\bmodel\s*:(?:(?!\b(?:language|prompt|responseFormat|temperature|errorDomain|timeout|maxRetries|allowPlainTextFallback)\s*:).)*\baudioData\s*:(?:(?!\b(?:language|prompt|responseFormat|temperature|errorDomain|timeout|maxRetries|allowPlainTextFallback)\s*:).)*\bfileName\s*:(?:(?!\b(?:language|prompt|responseFormat|temperature|errorDomain|timeout|maxRetries|allowPlainTextFallback)\s*:).)*\)\s*\}'
 
+require_swift_static_function_body_pattern \
+  "OpenAI-compatible public API proof keeps direct URL transcribe coverage" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderPublicAPITests.swift \
+  testOpenAICompatibleTranscriptionRequestClientAndCodecExposePublicAPI \
+  'let\s+transcribeWithDirectURL\s*:\s*\(\)\s*async\s+throws\s*->\s*String\s*=\s*\{\s*try\s+await\s+client\.transcribeAudioData\s*\((?:(?!\bbaseURL\s*:).)*\burl\s*:\s*try\s+XCTUnwrap\(URL\(string:\s*\)\)(?:(?!\bbaseURL\s*:).)*\bapiKey\s*:(?:(?!\bbaseURL\s*:).)*\bmodel\s*:(?:(?!\bbaseURL\s*:).)*\ballowPlainTextFallback\s*:\s*false(?:(?!\bbaseURL\s*:).)*\)\s*\}'
+
+section "obsolete standalone OpenAI-compatible public API proof stays deleted"
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/OpenAICompatiblePublicAPITests.swift
+
+reject_pattern \
+  "VoiceInkCore metadata and runner avoid stale standalone OpenAI-compatible public API proof" \
+  'OpenAICompatiblePublicAPITests' \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
 require_voiceink_core_check_runner_invocations \
   "core checks execute OpenAI-compatible transcription public API proof" \
-  OpenAICompatiblePublicAPITests \
+  RemoteProviderPublicAPITests \
   testOpenAICompatibleTranscriptionRequestClientAndCodecExposePublicAPI
 
 section "obsolete standalone API-key verification policy module stays deleted"

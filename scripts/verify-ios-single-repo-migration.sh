@@ -7986,6 +7986,18 @@ require_patterns \
   'VoiceInkRemotePollingPolicy\.pollValidatedData' \
   'VoiceInkAPIKeyVerificationPolicy\.verify'
 
+require_swift_static_function_body_pattern \
+  "Soniox folded polling path uses shared remote polling policy" \
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift \
+  pollTranscriptionStatus \
+  'VoiceInkRemotePollingPolicy\.pollValidatedData(?:(?!\b(?:while true|Task\.sleep|URLSession\.shared\.data)\b).)*VoiceInkSonioxRequestBuilder\.makeTranscriptionStatusRequest'
+
+reject_swift_static_function_body_pattern \
+  "Soniox folded polling path avoids provider-local polling loop" \
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift \
+  pollTranscriptionStatus \
+  'while true|Task\.sleep|URLSession\.shared\.data'
+
 require_patterns \
   "Soniox public API proof uses normal VoiceInkCore import" \
   VoiceInkCore/Tests/VoiceInkCoreTests/SonioxPublicAPITests.swift \

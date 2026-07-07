@@ -1305,6 +1305,21 @@ public struct VoiceInkDictionarySettingsSnapshot: Equatable, Sendable {
         self.wordReplacementSortMode = wordReplacementSortMode
     }
 
+    public init(
+        fillerWords: [String],
+        customVocabularyTerms: [String],
+        wordReplacements: [VoiceInkWordReplacementRule],
+        defaults: UserDefaults = .standard
+    ) {
+        self.init(
+            fillerWords: fillerWords,
+            customVocabularyTerms: customVocabularyTerms,
+            wordReplacements: wordReplacements,
+            vocabularySortMode: VoiceInkDictionaryListSortPreference.vocabularySortMode(from: defaults),
+            wordReplacementSortMode: VoiceInkDictionaryListSortPreference.wordReplacementSortMode(from: defaults)
+        )
+    }
+
     public var sortedCustomVocabularyTerms: [String] {
         VoiceInkDictionaryListSortPolicy.sortedVocabulary(
             customVocabularyTerms,

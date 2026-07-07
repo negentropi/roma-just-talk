@@ -443,6 +443,29 @@ final class DictionaryPolicyTests: XCTestCase {
         XCTAssertEqual(snapshot.sortedWordReplacements.map(\.replacementText), ["Zed", "VoiceInk", "Roma Just Talk"])
     }
 
+    func testDictionarySettingsSnapshotReadsStoredSortPreferences() {
+        withIsolatedDefaults { defaults in
+            VoiceInkDictionaryListSortPreference.saveVocabularySortMode(.wordDescending, to: defaults)
+            VoiceInkDictionaryListSortPreference.saveWordReplacementSortMode(.replacementAscending, to: defaults)
+
+            let snapshot = VoiceInkDictionarySettingsSnapshot(
+                fillerWords: ["uh"],
+                customVocabularyTerms: ["zeta", "Alpha", "beta"],
+                wordReplacements: [
+                    VoiceInkWordReplacementRule(originalText: "voice ink", replacementText: "VoiceInk"),
+                    VoiceInkWordReplacementRule(originalText: "roma", replacementText: "Roma Just Talk"),
+                    VoiceInkWordReplacementRule(originalText: "alpha", replacementText: "Zed")
+                ],
+                defaults: defaults
+            )
+
+            XCTAssertEqual(snapshot.vocabularySortMode, .wordDescending)
+            XCTAssertEqual(snapshot.wordReplacementSortMode, .replacementAscending)
+            XCTAssertEqual(snapshot.sortedCustomVocabularyTerms, ["zeta", "beta", "Alpha"])
+            XCTAssertEqual(snapshot.sortedWordReplacements.map(\.replacementText), ["Roma Just Talk", "VoiceInk", "Zed"])
+        }
+    }
+
     func testDictionarySettingsSnapshotDeletesDisplayedRowsThroughOriginalStorageOrder() {
         let snapshot = VoiceInkDictionarySettingsSnapshot(
             fillerWords: ["uh", "um", "hmm"],

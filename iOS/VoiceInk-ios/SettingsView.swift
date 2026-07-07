@@ -8,18 +8,11 @@ struct SettingsView: View {
     @State private var fillerWordDraftState = VoiceInkFillerWordDraftState()
     @State private var customVocabularyDraftState = VoiceInkVocabularyDraftState()
     @State private var wordReplacementDraftState = VoiceInkWordReplacementDraftState()
-    @State private var vocabularySortMode: VoiceInkVocabularySortMode
-    @State private var wordReplacementSortMode: VoiceInkWordReplacementSortMode
     @State private var dictionaryAlert: VoiceInkDictionaryAlertPresentation?
     private let cleanupPresentation = VoiceInkTranscriptionCleanupPresentation.iOS
     private let dictionaryPresentation = VoiceInkDictionarySettingsPresentation.iOS
     private let audioTimeoutPresentation = VoiceInkAudioSessionTimeoutPreference.settingsPresentation
     private let settingsPresentation = VoiceInkSettingsPresentation.iOS
-
-    init() {
-        _vocabularySortMode = State(initialValue: VoiceInkDictionaryListSortPreference.vocabularySortMode())
-        _wordReplacementSortMode = State(initialValue: VoiceInkDictionaryListSortPreference.wordReplacementSortMode())
-    }
     
     var body: some View {
         let dictionarySnapshot = self.dictionarySnapshot
@@ -244,9 +237,7 @@ struct SettingsView: View {
         VoiceInkDictionarySettingsSnapshot(
             fillerWords: settings.fillerWords,
             customVocabularyTerms: settings.customVocabularyTerms,
-            wordReplacements: settings.wordReplacements,
-            vocabularySortMode: vocabularySortMode,
-            wordReplacementSortMode: wordReplacementSortMode
+            wordReplacements: settings.wordReplacements
         )
     }
 

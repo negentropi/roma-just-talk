@@ -11386,9 +11386,21 @@ require_patterns \
   'applyCustomVocabularySubmission' \
   'settings\.customVocabularyTerms = \$0'
 
+require_patterns \
+  "shared dictionary settings snapshot reads sort preferences" \
+  VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift \
+  'VoiceInkDictionarySettingsSnapshot' \
+  'VoiceInkDictionaryListSortPreference\.vocabularySortMode\(from: defaults\)' \
+  'VoiceInkDictionaryListSortPreference\.wordReplacementSortMode\(from: defaults\)'
+
 require_pattern \
-  "iOS vocabulary settings reads shared sort preference" \
-  'VoiceInkDictionaryListSortPreference\.vocabularySortMode' \
+  "core checks execute dictionary snapshot sort preference test" \
+  'DictionaryPolicyTests\.testDictionarySettingsSnapshotReadsStoredSortPreferences' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift
+
+reject_pattern \
+  "iOS dictionary settings avoids shell-owned sort preference state and reads" \
+  '@State private var (vocabularySortMode|wordReplacementSortMode)|VoiceInkDictionaryListSortPreference\.(vocabularySortMode|wordReplacementSortMode)' \
   iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \
@@ -11425,11 +11437,6 @@ reject_pattern \
   "iOS dictionary adapters avoid shell-owned changed-list comparison" \
   'guard let updated(Words|Terms|Rules)|updated(FillerWords|CustomVocabularyTerms|WordReplacements)IfChanged|updated(Words|Rules)IfChanged|plan\.applying|plan\.updated(Words|Rules)|settings\.(fillerWords|customVocabularyTerms|wordReplacements)[[:space:]]*(==|!=)|(fillerWords|customVocabularyTerms|wordReplacements)[[:space:]]*(==|!=)[[:space:]]*updated(Words|Terms|Rules)' \
   iOS/VoiceInk-ios/AppSettings.swift \
-  iOS/VoiceInk-ios/SettingsView.swift
-
-require_pattern \
-  "iOS word-replacement settings reads shared sort preference" \
-  'VoiceInkDictionaryListSortPreference\.wordReplacementSortMode' \
   iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \

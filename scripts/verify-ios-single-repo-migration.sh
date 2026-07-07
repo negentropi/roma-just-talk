@@ -11387,6 +11387,14 @@ require_patterns \
   'settings\.customVocabularyTerms = \$0'
 
 require_patterns \
+  "iOS dictionary settings builds shared snapshot from persisted settings" \
+  iOS/VoiceInk-ios/SettingsView.swift \
+  'VoiceInkDictionarySettingsSnapshot\(' \
+  'fillerWords: settings\.fillerWords' \
+  'customVocabularyTerms: settings\.customVocabularyTerms' \
+  'wordReplacements: settings\.wordReplacements'
+
+require_patterns \
   "shared dictionary settings snapshot reads sort preferences" \
   VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift \
   'VoiceInkDictionarySettingsSnapshot' \
@@ -11401,6 +11409,11 @@ require_pattern \
 reject_pattern \
   "iOS dictionary settings avoids shell-owned sort preference state and reads" \
   '@State private var (vocabularySortMode|wordReplacementSortMode)|VoiceInkDictionaryListSortPreference\.(vocabularySortMode|wordReplacementSortMode)' \
+  iOS/VoiceInk-ios/SettingsView.swift
+
+reject_pattern \
+  "iOS dictionary settings snapshot avoids explicit shell sort modes" \
+  'vocabularySortMode:|wordReplacementSortMode:' \
   iOS/VoiceInk-ios/SettingsView.swift
 
 require_pattern \

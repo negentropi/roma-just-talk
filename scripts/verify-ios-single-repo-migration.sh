@@ -963,15 +963,15 @@ reject_swift_declaration_body_pattern() {
   fi
 }
 
-require_provider_key_reset_direct_delete_adapter() {
+require_provider_key_reset_batch_delete_adapter() {
   local file="$1"
 
-  section "iOS app settings reset deletes provider API keys directly in reset adapter"
+  section "iOS app settings reset deletes provider API keys through shared batch adapter"
   if ! perl -0ne '
-    $ok = 1 if /deleteProviderAPIKeys:\s*\{\s*([A-Za-z_][A-Za-z0-9_]*)\s+in\s*\1\.forEach\s*\{\s*([A-Za-z_][A-Za-z0-9_]*)\s+in\s*VoiceInkProviderAPIKeyStorage\.deleteStoredKey\(for:\s*\2\)/s;
+    $ok = 1 if /deleteProviderAPIKeys:\s*\{\s*([A-Za-z_][A-Za-z0-9_]*)\s+in\s*VoiceInkProviderAPIKeyStorage\.deleteStoredKeys\(for:\s*\1\)/s;
     END { exit($ok ? 0 : 1) }
   ' "$file"; then
-    fail "iOS app settings reset deletes provider API keys directly in reset adapter: missing direct reset delete adapter in $file"
+    fail "iOS app settings reset deletes provider API keys through shared batch adapter: missing shared batch reset delete adapter in $file"
   fi
 }
 
@@ -5205,7 +5205,7 @@ require_patterns \
 
 require_pattern \
   "shared provider API-key storage is folded into provider API-key state" \
-  'VoiceInkProviderAPIKeyStorage|storedKey\(|saveStoredKey|deleteStoredKey|shouldReportFailure|VoiceInkProviderAPIKeyStorageDiagnostics|saveFailureMessage|savedProviderAPIKeyMessage|deletedProviderAPIKeyMessage|savedCustomModelAPIKeyMessage|deletedCustomModelAPIKeyMessage' \
+  'VoiceInkProviderAPIKeyStorage|storedKey\(|saveStoredKey|deleteStoredKey|deleteStoredKeys|shouldReportFailure|VoiceInkProviderAPIKeyStorageDiagnostics|saveFailureMessage|savedProviderAPIKeyMessage|deletedProviderAPIKeyMessage|savedCustomModelAPIKeyMessage|deletedCustomModelAPIKeyMessage' \
   VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift
 
 reject_file VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyStorage.swift
@@ -5247,7 +5247,7 @@ reject_pattern \
 
 require_pattern \
   "iOS app settings delegates provider API-key storage to shared core" \
-  'VoiceInkProviderAPIKeyStorage\.(storedKey|saveStoredKey|deleteStoredKey)' \
+  'VoiceInkProviderAPIKeyStorage\.(storedKey|saveStoredKey|deleteStoredKeys?)' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 require_pattern \
@@ -5359,6 +5359,7 @@ require_patterns \
   'ProviderAccessRequirementTests\.testStoredKeySkipsProvidersWithoutUserKeyAccounts' \
   'ProviderAccessRequirementTests\.testSaveStoredKeyTargetsProviderAccountAndReportsFailureStatus' \
   'ProviderAccessRequirementTests\.testSaveAndDeleteSkipProvidersWithoutUserKeyAccounts' \
+  'ProviderAccessRequirementTests\.testDeleteStoredKeysTargetsProviderAccountsAndSkipsProvidersWithoutUserKeyAccounts' \
   'ProviderAccessRequirementTests\.testProviderAPIKeyStorageDiagnosticsPreserveIOSLogCopy' \
   'ProviderAccessRequirementTests\.testProviderAPIKeyStorageDiagnosticsPreserveMacOSSuccessLogCopy'
 
@@ -18951,12 +18952,17 @@ require_patterns \
   'clearCoreUserSettings' \
   'deleteProviderAPIKeys'
 
-require_provider_key_reset_direct_delete_adapter \
+require_provider_key_reset_batch_delete_adapter \
   iOS/VoiceInk-ios/AppSettings.swift
 
 reject_multiline_pattern \
   "iOS app settings reset avoids shallow provider-key delete forwarding methods" \
   'private[[:space:]]+(static[[:space:]]+)?func[[:space:]]+[[:alpha:]_][[:alnum:]_]*[^{]+\{[[:space:]]*(return[[:space:]]+)?VoiceInkProviderAPIKeyStorage\.deleteStoredKey\(for:' \
+  iOS/VoiceInk-ios/AppSettings.swift
+
+reject_multiline_pattern \
+  "iOS app settings reset avoids shell-owned provider-key delete loops" \
+  'deleteProviderAPIKeys:[[:space:]]*\{[[:space:]]*[[:alpha:]_][[:alnum:]_]*[[:space:]]+in[[:space:]]*[[:alpha:]_][[:alnum:]_]*\.forEach[[:space:]]*\{[[:space:]]*[[:alpha:]_][[:alnum:]_]*[[:space:]]+in[[:space:]]*VoiceInkProviderAPIKeyStorage\.deleteStoredKey\(for:' \
   iOS/VoiceInk-ios/AppSettings.swift
 
 reject_multiline_pattern \

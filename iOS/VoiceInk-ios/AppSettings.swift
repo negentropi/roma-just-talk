@@ -243,9 +243,7 @@ final class AppSettings: ObservableObject {
                 VoiceInkSharedPreferenceReset.clearCoreUserSettings()
             },
             deleteProviderAPIKeys: { providers in
-                providers.forEach { provider in
-                    VoiceInkProviderAPIKeyStorage.deleteStoredKey(for: provider)
-                }
+                VoiceInkProviderAPIKeyStorage.deleteStoredKeys(for: providers)
             }
         )
     }

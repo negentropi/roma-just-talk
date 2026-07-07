@@ -270,6 +270,18 @@ public enum VoiceInkProviderAPIKeyStorage {
             status: deleteStoredKey(account)
         )
     }
+
+    @discardableResult
+    public static func deleteStoredKeys(
+        for providers: [VoiceInkProviderKind],
+        deleteStoredKey: (String) -> OSStatus = {
+            VoiceInkKeychainValueStore.deleteValue(account: $0)
+        }
+    ) -> [VoiceInkProviderAPIKeyStorageMutationResult] {
+        providers.map { provider in
+            self.deleteStoredKey(for: provider, deleteStoredKey: deleteStoredKey)
+        }
+    }
 }
 
 public enum VoiceInkProviderAPIKeyStorageDiagnostics {

@@ -193,6 +193,31 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertFalse(didDelete)
     }
 
+    func testDeleteStoredKeysTargetsProviderAccountsAndSkipsProvidersWithoutUserKeyAccounts() {
+        var deletedAccounts: [String] = []
+        let results = VoiceInkProviderAPIKeyStorage.deleteStoredKeys(
+            for: [.groq, .localWhisper, .elevenLabs]
+        ) { account in
+            deletedAccounts.append(account)
+            return account == VoiceInkProviderAPIKeyAccount.groq ? errSecSuccess : errSecAuthFailed
+        }
+
+        XCTAssertEqual(deletedAccounts, [
+            VoiceInkProviderAPIKeyAccount.groq,
+            VoiceInkProviderAPIKeyAccount.elevenLabs
+        ])
+        XCTAssertEqual(results.map(\.account), [
+            VoiceInkProviderAPIKeyAccount.groq,
+            nil,
+            VoiceInkProviderAPIKeyAccount.elevenLabs
+        ])
+        XCTAssertEqual(results.map(\.status), [
+            errSecSuccess,
+            nil,
+            errSecAuthFailed
+        ])
+    }
+
     func testProviderAPIKeyStorageDiagnosticsPreserveIOSLogCopy() {
         XCTAssertEqual(
             VoiceInkProviderAPIKeyStorageDiagnostics.saveFailureMessage(status: errSecAuthFailed),

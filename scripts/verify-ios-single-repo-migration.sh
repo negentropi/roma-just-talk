@@ -7460,7 +7460,6 @@ reject_pattern \
   "shared remote transcription clients avoid provider API error-domain literals" \
   '"(DeepgramAPI|GeminiAPI|MistralAPI|ElevenLabsAPI|SonioxAPI|SpeechmaticsAPI|AssemblyAIAPI|XAIAPI)"' \
   VoiceInkCore/Sources/VoiceInkCore/DeepgramTranscriptionRequest.swift \
-  VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift \
@@ -7476,9 +7475,18 @@ reject_file VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionClient.sw
 reject_file VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionClient.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleTranscriptionClient.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionClient.swift
+reject_file VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionRequest.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/MistralTranscriptionRequest.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/ElevenLabsTranscriptionRequest.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionRequest.swift
+
+reject_pattern \
+  "core tests and project metadata avoid obsolete Gemini transcription request files/tests" \
+  'GeminiTranscriptionRequest\.swift|GeminiTranscriptionRequestTests' \
+  VoiceInkCore/Tests/VoiceInkCoreTests \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
 
 reject_pattern \
   "core tests and project metadata avoid obsolete Mistral transcription request files/tests" \
@@ -7588,12 +7596,84 @@ require_pattern \
   'VoiceInkAPIKeyVerificationPolicy\.verify' \
   VoiceInkCore/Sources/VoiceInkCore/RemoteTransport.swift \
   VoiceInkCore/Sources/VoiceInkCore/DeepgramTranscriptionRequest.swift \
-  VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift \
   VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyVerifier.swift
+
+require_patterns \
+  "shared Gemini transcription request and client live with remote transcription service" \
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift \
+  'public enum VoiceInkGeminiTranscriptionCodec' \
+  'public static let defaultPrompt' \
+  'public static func requestBody' \
+  'public static func transcript\(from data: Data\) throws -> String' \
+  'public enum VoiceInkGeminiRequestBuilder' \
+  'public static func makeTranscriptionRequest' \
+  'public static func makeModelsRequest' \
+  'public struct VoiceInkGeminiTranscriptionClient' \
+  'public init\(\)' \
+  'public func transcribeAudioData' \
+  'public func verifyAPIKey\(baseURL: URL, apiKey: String\) async -> Bool' \
+  'public func verifyAPIKeyDetailed' \
+  'VoiceInkProviderEndpoint\.geminiGenerateContentURL' \
+  'VoiceInkProviderEndpoint\.geminiModelsURL' \
+  'VoiceInkRetriedRequest\.validatedData' \
+  'VoiceInkAPIKeyVerificationPolicy\.verify'
+
+require_patterns \
+  "Gemini public API proof uses normal VoiceInkCore import" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/GeminiPublicAPITests.swift \
+  '^import VoiceInkCore$' \
+  'VoiceInkGeminiTranscriptionCodec\.defaultPrompt' \
+  'VoiceInkGeminiRequestBuilder\.makeTranscriptionRequest' \
+  'VoiceInkGeminiRequestBuilder\.makeModelsRequest' \
+  'VoiceInkGeminiTranscriptionClient\(\)' \
+  'transcribeWithAllLabels' \
+  'transcribeWithDefaultedLabels' \
+  'client\.transcribeAudioData\(' \
+  'baseURL: VoiceInkProviderEndpoint\.geminiNativeAPIBaseURL' \
+  'apiKey: "gemini-key"' \
+  'model: "gemini-2\.5-flash"' \
+  'audioData: Data\("WAVDATA"\.utf8\)' \
+  'mimeType: "audio/wav"' \
+  'prompt: VoiceInkGeminiTranscriptionCodec\.defaultPrompt' \
+  'errorDomain: "GeminiPublicAPITests"' \
+  'timeout: 60' \
+  'client\.verifyAPIKey\(' \
+  'client\.verifyAPIKeyDetailed\(' \
+  'VoiceInkAPIKeyVerificationResult' \
+  'VoiceInkGeminiTranscriptionCodec\.transcript'
+
+reject_pattern \
+  "Gemini public API proof avoids conditional compilation snippets" \
+  '^[[:space:]]*#(if|elseif|else|endif)\b' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/GeminiPublicAPITests.swift
+
+require_swift_static_function_body_pattern \
+  "Gemini public API proof keeps defaulted transcribe call short" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/GeminiPublicAPITests.swift \
+  testGeminiRequestClientAndCodecExposePublicAPI \
+  'let\s+transcribeWithDefaultedLabels\s*=\s*\{\s*try\s+await\s+client\.transcribeAudioData\s*\((?:(?!\b(?:mimeType|prompt|errorDomain|timeout)\s*:).)*\bbaseURL\s*:(?:(?!\b(?:mimeType|prompt|errorDomain|timeout)\s*:).)*\bapiKey\s*:(?:(?!\b(?:mimeType|prompt|errorDomain|timeout)\s*:).)*\bmodel\s*:(?:(?!\b(?:mimeType|prompt|errorDomain|timeout)\s*:).)*\baudioData\s*:(?:(?!\b(?:mimeType|prompt|errorDomain|timeout)\s*:).)*\)\s*\}'
+
+reject_pattern \
+  "Gemini public API proof avoids testable import" \
+  '@testable import VoiceInkCore' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/GeminiPublicAPITests.swift
+
+require_voiceink_core_check_runner_invocations \
+  "core checks execute Gemini public API proof" \
+  GeminiPublicAPITests \
+  testGeminiRequestClientAndCodecExposePublicAPI
+
+require_voiceink_core_check_runner_invocations \
+  "core checks execute Gemini remote provider request tests" \
+  RemoteProviderRequestTests \
+  testGeminiTranscriptionRequestBuilderUsesGenerateContentEndpointAndBody \
+  testGeminiModelsRequestBuilderUsesNativeModelsEndpoint \
+  testGeminiClientRejectsBlankAPIKeyWithoutNetwork \
+  testGeminiTranscriptionCodecReturnsTrimmedFirstPartOrEmptyString
 
 require_patterns \
   "shared Mistral transcription request and client live with remote transcription service" \
@@ -7780,11 +7860,11 @@ require_voiceink_core_check_runner_invocations \
   testXAITranscriptionCodecReturnsText
 
 require_patterns \
-  "migration docs record Mistral, ElevenLabs, and xAI request helper colocation" \
+  "migration docs record Gemini, Mistral, ElevenLabs, and xAI request helper colocation" \
   docs/ios-single-repo-migration.md \
-  'Mistral, ElevenLabs, and xAI request/client helpers colocated in the remote transcription service module' \
+  'Gemini, Mistral, ElevenLabs, and xAI request/client helpers colocated in the remote transcription service module' \
   'xAI request/client helpers colocated in the remote transcription service module' \
-  'standalone `MistralTranscriptionRequest\.swift`, `ElevenLabsTranscriptionRequest\.swift`, and `XAITranscriptionRequest\.swift` stay deleted'
+  'standalone `GeminiTranscriptionRequest\.swift`, `MistralTranscriptionRequest\.swift`, `ElevenLabsTranscriptionRequest\.swift`, and `XAITranscriptionRequest\.swift` stay deleted'
 
 section "obsolete standalone Cartesia API-key client module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/CartesiaAPIKeyClient.swift
@@ -7861,7 +7941,6 @@ reject_pattern \
   'API key is missing or empty\.|No HTTP response received\.|String\(data: data, encoding: \.utf8\) \?\? "HTTP \(http\.statusCode\)"|guard !apiKey\.trimmingCharacters' \
   VoiceInkCore/Sources/VoiceInkCore/RemoteTransport.swift \
   VoiceInkCore/Sources/VoiceInkCore/DeepgramTranscriptionRequest.swift \
-  VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift \
@@ -7902,7 +7981,7 @@ require_pattern \
   "direct remote clients use shared validated request helper" \
   'VoiceInkRetriedRequest\.validatedData' \
   VoiceInkCore/Sources/VoiceInkCore/DeepgramTranscriptionRequest.swift \
-  VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionRequest.swift \
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift \
   VoiceInkCore/Sources/VoiceInkCore/RemoteTransport.swift
 
 require_pattern \
@@ -8019,7 +8098,7 @@ reject_pattern \
   "direct remote clients avoid duplicate HTTP response validation" \
   'URLSession\.shared\.data\(for: request\)|VoiceInkRemoteHTTPResponsePolicy\.validateSuccess|guard let http = response as\? HTTPURLResponse|guard \(200..<300\)\.contains\(http\.statusCode\)|String\(data: data, encoding: \.utf8\) \?\? ""|NSError\(' \
   VoiceInkCore/Sources/VoiceInkCore/DeepgramTranscriptionRequest.swift \
-  VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionRequest.swift
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift
 
 require_patterns \
   "OpenAI-compatible chat client uses shared validated request helper" \

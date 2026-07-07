@@ -1231,8 +1231,8 @@ reject_file iOS/.nojekyll
 reject_file iOS/Shared/VoiceInkAppGroupRecordingBridge.swift
 
 reject_pattern \
-  "project metadata avoids obsolete standalone iOS App Group bridge file" \
-  'VoiceInkAppGroupRecordingBridge\.swift' \
+  "project metadata avoids obsolete standalone iOS shared wrapper files" \
+  'VoiceInk(AppGroupRecordingBridge|AppDeepLink|KeyboardRecording(ButtonPresentation|Timing))\.swift' \
   VoiceInkCore/Package.swift \
   VoiceInk.xcodeproj/project.pbxproj \
   iOS/VoiceInk-ios.xcodeproj/project.pbxproj

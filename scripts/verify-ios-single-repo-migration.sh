@@ -14935,21 +14935,21 @@ reject_pattern \
 require_pattern \
   "shared transcription paste output owns trial-expired prefix" \
   'trialExpiredPrefix = "Your trial has expired\. Upgrade to VoiceInk Pro at \\\(VoiceInkLicenseLinks\.purchaseDisplayURLString\)"' \
-  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared transcription paste output owns trailing-space preference" \
   'VoiceInkAppendTrailingSpacePreference' \
-  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared transcription paste output owns cursor-context planning" \
   'public struct CursorPasteTextPlan|public static func cursorPasteTextPlan|shouldReadCursorContext|VoiceInkTranscriptionCleanupPreferenceStorage\.shouldLowercase' \
-  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_patterns \
   "shared paste output policy owns contextual capitalization formatter" \
-  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift \
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift \
   'public enum VoiceInkContextualCapitalizationFormatter' \
   'needsCursorContext\(_ text: String\)' \
   'format\(_ text: String, beforeCursor: String\?\)' \
@@ -14961,7 +14961,17 @@ require_patterns \
 require_pattern \
   "shared cursor text context policy owns macOS reader bounds and role filtering" \
   'VoiceInkCursorTextContextPolicy|defaultMaximumLength = 240|parentTraversalLimit = 4|textInputRoleNames|prefixLength|valueSuffix' \
-  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
+
+section "obsolete standalone paste preferences module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+
+reject_pattern \
+  "VoiceInkCore metadata avoids stale standalone paste preferences file" \
+  'PastePreferences\.swift' \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
 
 section "obsolete standalone transcription paste output policy module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/TranscriptionPasteOutputPolicy.swift
@@ -14998,22 +15008,22 @@ reject_pattern \
 require_pattern \
   "shared trailing-space preference owns user-defaults key" \
   'userDefaultsKey' \
-  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared trailing-space preference owns default value" \
   'defaultIsEnabled' \
-  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared trailing-space preference owns registered defaults" \
   'registeredDefaults' \
-  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared trailing-space preference owns macOS settings presentation" \
   'VoiceInkMacOSAppendTrailingSpaceSettingsPresentation|macOSSettingsPresentation' \
-  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "macOS transcription pipeline uses shared paste output policy" \
@@ -15158,78 +15168,78 @@ reject_pattern \
 
 require_pattern \
   "migration checklist tracks shared paste output gate" \
-  'macOS final paste text assembly routes cursor-context capitalization planning, cursor-context reader bounds/text-input role filtering, lowercase-cleanup preference gating, trial-expired prefix, trailing-space storage/default registration, and trailing-space settings labels/help through `VoiceInkTranscriptionPasteOutputPolicy`/`VoiceInkCursorTextContextPolicy`/`VoiceInkAppendTrailingSpacePreference`, colocated in `PastePreferences\.swift`; standalone `TranscriptionPasteOutputPolicy\.swift` stays deleted' \
+  'macOS final paste text assembly routes cursor-context capitalization planning, cursor-context reader bounds/text-input role filtering, lowercase-cleanup preference gating, trial-expired prefix, trailing-space storage/default registration, and trailing-space settings labels/help through `VoiceInkTranscriptionPasteOutputPolicy`/`VoiceInkCursorTextContextPolicy`/`VoiceInkAppendTrailingSpacePreference`, colocated in `UserDefaultsPreferences\.swift`; standalone `TranscriptionPasteOutputPolicy\.swift` stays deleted' \
   docs/ios-single-repo-migration.md
 
 require_pattern \
   "shared paste method preference owns raw storage key" \
   'userDefaultsKey = "pasteMethod"' \
-  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared paste method preference owns legacy AppleScript migration key" \
   'legacyAppleScriptPasteKey = "useAppleScriptPaste"' \
-  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared paste method preference owns display labels" \
   'public var displayName' \
-  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared paste method stored selection fallback lives in VoiceInkCore" \
   'fromStoredRawValue storedRawValue' \
-  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared paste method stored selection fallback reuses current defaults" \
   'return current\(in: defaults\)' \
-  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared clipboard restore preference owns enabled storage key" \
   'restoreClipboardAfterPasteKey = "restoreClipboardAfterPaste"' \
-  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared clipboard restore preference owns delay storage key" \
   'clipboardRestoreDelayKey = "clipboardRestoreDelay"' \
-  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared clipboard restore preference owns bounded delay" \
   'minimumClipboardRestoreDelay' \
-  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared paste backup preferences live in VoiceInkCore" \
   'struct VoiceInkPasteBackupPreferences' \
-  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared paste backup import plan lives in VoiceInkCore" \
   'struct VoiceInkPasteBackupImportPlan' \
-  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared paste backup export policy lives in VoiceInkCore" \
   'static func backupPreferences' \
-  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared paste backup import policy lives in VoiceInkCore" \
   'static func backupImportPlan' \
-  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared macOS paste settings presentation lives in VoiceInkCore" \
   'VoiceInkMacOSPasteSettingsPresentation|VoiceInkPasteDelayOption|macOSSettingsPresentation|restoreDelayOptions|pasteMethodHelpMessage' \
-  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "shared paste diagnostics live in VoiceInkCore" \
   'VoiceInkPasteDiagnostics|failedToPrepareClipboardMessage|skippedClipboardRestoreCommandNotPostedMessage|appleScriptPasteScriptUnavailableMessage|appleScriptPasteFailedMessage|accessibilityPermissionRequiredForSimulatedPasteMessage|failedToCreateCommandVPasteEventsMessage' \
-  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 require_pattern \
   "macOS paste adapter uses shared paste method preference" \
@@ -22274,7 +22284,7 @@ reject_pattern \
   VoiceInk/Models/LicenseViewModel.swift \
   VoiceInk/Views/LicenseManagementView.swift \
   VoiceInk/Views/Components/TrialMessageView.swift \
-  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+  VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift
 
 reject_pattern \
   "macOS license view model avoids shell-owned removal reset policy" \

@@ -7698,6 +7698,7 @@ reject_file VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionRequest.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift
+reject_file VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleTranscriptionRequest.swift
 
 reject_pattern \
   "core tests and project metadata avoid obsolete Deepgram transcription request files/tests" \
@@ -7755,22 +7756,33 @@ reject_pattern \
   VoiceInk.xcodeproj/project.pbxproj \
   iOS/VoiceInk-ios.xcodeproj/project.pbxproj
 
+reject_pattern \
+  "core tests and project metadata avoid obsolete OpenAI-compatible transcription request files/tests" \
+  'OpenAICompatibleTranscriptionRequest\.swift|OpenAICompatibleTranscriptionRequestTests' \
+  VoiceInkCore/Tests/VoiceInkCoreTests \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
+
 section "obsolete standalone OpenAI-compatible transcription codec module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleTranscriptionCodec.swift
 
 require_patterns \
-  "OpenAI-compatible transcription request owns codec and response decoding" \
-  VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleTranscriptionRequest.swift \
+  "OpenAI-compatible transcription request and client live with remote transcription service" \
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift \
   'VoiceInkOpenAICompatibleTranscriptionResponse' \
   'VoiceInkOpenAICompatibleTranscriptionCodec' \
   'multipartContentType' \
   'requestBody\(' \
   'textIfPresent' \
-  'transcriptionText'
+  'transcriptionText' \
+  'VoiceInkOpenAICompatibleTranscriptionClient' \
+  'VoiceInkPreparedOpenAICompatibleTranscriptionRequest' \
+  'VoiceInkOpenAICompatibleTranscriptionRequestBuilder'
 
 require_patterns \
   "OpenAI-compatible transcription request uses shared multipart form-data builder" \
-  VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleTranscriptionRequest.swift \
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift \
   'VoiceInkMultipartFormData\(boundary: boundary\)' \
   'form\.addFile\(name: "file", fileName: fileName, mimeType: "audio/wav", fileData: audioData\)' \
   'form\.addField\(name: "model", value: model\)' \
@@ -7780,10 +7792,47 @@ require_patterns \
   'form\.addField\(name: "prompt", value: prompt\)' \
   'return form\.data'
 
-reject_pattern \
-  "OpenAI-compatible transcription request avoids bespoke multipart assembly" \
-  'appendField|private static func append\(|^[[:space:]]*let crlf = "\\r\\n"|^[[:space:]]*var body = Data\(\)|body\.append\(audioData\)|Content-Disposition: form-data; name=|Content-Type: audio/wav' \
-  VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleTranscriptionRequest.swift
+require_swift_declaration_body_pattern \
+  "OpenAI-compatible folded response keeps public fields and initializer" \
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift \
+  VoiceInkOpenAICompatibleTranscriptionResponse \
+  'public\s+let\s+text:\s*String\?.*public\s+let\s+language:\s*String\?.*public\s+let\s+duration:\s*Double\?.*public\s+init\(text:\s*String\?,\s*language:\s*String\?\s*=\s*nil,\s*duration:\s*Double\?\s*=\s*nil\)'
+
+require_swift_declaration_body_pattern \
+  "OpenAI-compatible folded codec owns multipart body order and response decoding" \
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift \
+  VoiceInkOpenAICompatibleTranscriptionCodec \
+  'multipartContentType.*requestBody.*VoiceInkMultipartFormData\(boundary:\s*boundary\).*form\.addFile.*form\.addField.*responseFormat.*form\.addField.*temperature.*form\.addField.*language.*form\.addField.*prompt.*form\.addField.*return\s+form\.data.*textIfPresent.*VoiceInkOpenAICompatibleTranscriptionResponse.*transcriptionText.*allowPlainTextFallback'
+
+require_swift_declaration_body_pattern \
+  "OpenAI-compatible folded client uses direct URL builder and shared retry helper" \
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift \
+  VoiceInkOpenAICompatibleTranscriptionClient \
+  'modelsClient.*transcribeAudioData.*VoiceInkProviderEndpoint\.openAICompatibleAudioTranscriptionsURL.*transcribeAudioData.*VoiceInkOpenAICompatibleTranscriptionRequestBuilder\.make.*VoiceInkRetriedRequest\.validatedData.*preparedRequest\.requestWithHTTPBody\(\).*VoiceInkOpenAICompatibleTranscriptionCodec\.transcriptionText.*verifyAPIKey.*modelsClient\.verifyAPIKey.*verifyAPIKeyDetailed.*modelsClient\.verifyAPIKeyDetailed'
+
+reject_swift_declaration_body_pattern \
+  "OpenAI-compatible folded client avoids duplicate retry loops and raw response validation" \
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift \
+  VoiceInkOpenAICompatibleTranscriptionClient \
+  'private\s+static\s+func\s+data|Task\.sleep|pow\(2\.0|URLSessionConfiguration\.ephemeral|VoiceInkRemoteHTTPResponsePolicy\.(retryableStatusCode|apiError|validateSuccess)|URLSession\.shared\.data'
+
+require_swift_declaration_body_pattern \
+  "OpenAI-compatible folded prepared request keeps deferred HTTP body attachment" \
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift \
+  VoiceInkPreparedOpenAICompatibleTranscriptionRequest \
+  'public\s+let\s+request:\s*URLRequest.*public\s+let\s+body:\s*Data.*public\s+init\(request:\s*URLRequest,\s*body:\s*Data\).*public\s+func\s+requestWithHTTPBody\(\)\s*->\s*URLRequest.*copy\.httpBody\s*=\s*body'
+
+require_swift_declaration_body_pattern \
+  "OpenAI-compatible folded builder owns baseURL and direct URL request construction" \
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift \
+  VoiceInkOpenAICompatibleTranscriptionRequestBuilder \
+  'public\s+static\s+func\s+make\(\s*baseURL:.*VoiceInkProviderEndpoint\.openAICompatibleAudioTranscriptionsURL.*public\s+static\s+func\s+make\(\s*url:.*URLRequest\(url:\s*url\).*httpMethod\s*=.*setValue.*VoiceInkOpenAICompatibleTranscriptionCodec\.multipartContentType.*setValue.*VoiceInkOpenAICompatibleTranscriptionCodec\.requestBody.*VoiceInkPreparedOpenAICompatibleTranscriptionRequest'
+
+reject_swift_declaration_body_pattern \
+  "OpenAI-compatible folded builder avoids bespoke multipart assembly" \
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift \
+  VoiceInkOpenAICompatibleTranscriptionRequestBuilder \
+  'appendField|private\s+static\s+func\s+append|var\s+body\s*=\s*Data\(\)|body\.append\(audioData\)'
 
 require_patterns \
   "OpenAI-compatible transcription tests lock multipart body order" \
@@ -7810,6 +7859,52 @@ require_patterns \
   '^[[:space:]]*VoiceInkCoreCheck\(name: "RemoteProviderRequestTests\.testOpenAICompatibleTranscriptionRequestBuilderIncludesOptionalFields", run: \{ try RemoteProviderRequestTests\(\)\.testOpenAICompatibleTranscriptionRequestBuilderIncludesOptionalFields\(\) \}\),$' \
   '^[[:space:]]*VoiceInkCoreCheck\(name: "RemoteProviderRequestTests\.testOpenAICompatibleTranscriptionRequestBuilderOmitsOnlyNilAndEmptyOptionalFields", run: \{ try RemoteProviderRequestTests\(\)\.testOpenAICompatibleTranscriptionRequestBuilderOmitsOnlyNilAndEmptyOptionalFields\(\) \}\),$' \
   '^[[:space:]]*VoiceInkCoreCheck\(name: "RemoteProviderRequestTests\.testOpenAICompatibleTranscriptionRequestBuilderUsesDirectURLForCustomEndpoints", run: \{ try RemoteProviderRequestTests\(\)\.testOpenAICompatibleTranscriptionRequestBuilderUsesDirectURLForCustomEndpoints\(\) \}\),$'
+
+require_patterns \
+  "OpenAI-compatible transcription public API proof uses normal VoiceInkCore import" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/OpenAICompatiblePublicAPITests.swift \
+  '^import VoiceInkCore$' \
+  'VoiceInkOpenAICompatibleTranscriptionResponse\(' \
+  'VoiceInkOpenAICompatibleTranscriptionCodec\.multipartContentType' \
+  'VoiceInkOpenAICompatibleTranscriptionCodec\.requestBody' \
+  'VoiceInkOpenAICompatibleTranscriptionCodec\.textIfPresent' \
+  'VoiceInkOpenAICompatibleTranscriptionRequestBuilder\.make' \
+  'VoiceInkPreparedOpenAICompatibleTranscriptionRequest' \
+  'requestWithHTTPBody\(\)' \
+  'VoiceInkOpenAICompatibleTranscriptionClient\(\)' \
+  'transcribeWithAllLabels' \
+  'transcribeWithDirectURL' \
+  'transcribeWithDefaultedLabels' \
+  'client\.transcribeAudioData\(' \
+  'baseURL: VoiceInkProviderEndpoint\.groq\.apiBaseURL' \
+  'url: try XCTUnwrap\(URL\(string: "https://custom\.example\.test/v1/audio/transcriptions"\)\)' \
+  'responseFormat: "json"' \
+  'temperature: "0"' \
+  'allowPlainTextFallback: false' \
+  'client\.verifyAPIKey\(' \
+  'client\.verifyAPIKeyDetailed\(' \
+  'VoiceInkAPIKeyVerificationResult'
+
+reject_pattern \
+  "OpenAI-compatible transcription public API proof avoids conditional compilation snippets" \
+  '^[[:space:]]*#(if|elseif|else|endif)\b' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/OpenAICompatiblePublicAPITests.swift
+
+reject_pattern \
+  "OpenAI-compatible transcription public API proof avoids testable import" \
+  '@testable import VoiceInkCore' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/OpenAICompatiblePublicAPITests.swift
+
+require_swift_static_function_body_pattern \
+  "OpenAI-compatible public API proof keeps defaulted transcribe call short" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/OpenAICompatiblePublicAPITests.swift \
+  testOpenAICompatibleTranscriptionRequestClientAndCodecExposePublicAPI \
+  'let\s+transcribeWithDefaultedLabels\s*=\s*\{\s*try\s+await\s+client\.transcribeAudioData\s*\((?:(?!\b(?:language|prompt|responseFormat|temperature|errorDomain|timeout|maxRetries|allowPlainTextFallback)\s*:).)*\bbaseURL\s*:(?:(?!\b(?:language|prompt|responseFormat|temperature|errorDomain|timeout|maxRetries|allowPlainTextFallback)\s*:).)*\bapiKey\s*:(?:(?!\b(?:language|prompt|responseFormat|temperature|errorDomain|timeout|maxRetries|allowPlainTextFallback)\s*:).)*\bmodel\s*:(?:(?!\b(?:language|prompt|responseFormat|temperature|errorDomain|timeout|maxRetries|allowPlainTextFallback)\s*:).)*\baudioData\s*:(?:(?!\b(?:language|prompt|responseFormat|temperature|errorDomain|timeout|maxRetries|allowPlainTextFallback)\s*:).)*\bfileName\s*:(?:(?!\b(?:language|prompt|responseFormat|temperature|errorDomain|timeout|maxRetries|allowPlainTextFallback)\s*:).)*\)\s*\}'
+
+require_voiceink_core_check_runner_invocations \
+  "core checks execute OpenAI-compatible transcription public API proof" \
+  OpenAICompatiblePublicAPITests \
+  testOpenAICompatibleTranscriptionRequestClientAndCodecExposePublicAPI
 
 section "obsolete standalone API-key verification policy module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/APIKeyVerificationPolicy.swift
@@ -8510,11 +8605,11 @@ require_voiceink_core_check_runner_invocations \
   testAssemblyAIRequestClientAndCodecExposePublicAPI
 
 require_patterns \
-  "migration docs record Deepgram, Gemini, Mistral, ElevenLabs, xAI, Speechmatics, Soniox, and AssemblyAI request helper colocation" \
+  "migration docs record OpenAI-compatible, Deepgram, Gemini, Mistral, ElevenLabs, xAI, Speechmatics, Soniox, and AssemblyAI request helper colocation" \
   docs/ios-single-repo-migration.md \
-  'Deepgram, Gemini, Mistral, ElevenLabs, xAI, Speechmatics, Soniox, and AssemblyAI request/client helpers colocated in the remote transcription service module' \
-  'Deepgram, Gemini, Mistral, ElevenLabs, xAI, Speechmatics, Soniox, and AssemblyAI request/client helpers colocated with that remote transcription service' \
-  'standalone `DeepgramTranscriptionRequest\.swift`, `GeminiTranscriptionRequest\.swift`, `MistralTranscriptionRequest\.swift`, `ElevenLabsTranscriptionRequest\.swift`, `XAITranscriptionRequest\.swift`, `SpeechmaticsTranscriptionRequest\.swift`, `SonioxTranscriptionRequest\.swift`, and `AssemblyAITranscriptionRequest\.swift` stay deleted'
+  'OpenAI-compatible, Deepgram, Gemini, Mistral, ElevenLabs, xAI, Speechmatics, Soniox, and AssemblyAI remote transcription request/client helpers colocated in the remote transcription service module' \
+  'OpenAI-compatible, Deepgram, Gemini, Mistral, ElevenLabs, xAI, Speechmatics, Soniox, and AssemblyAI request/client helpers colocated with that remote transcription service' \
+  'standalone `OpenAICompatibleTranscriptionRequest\.swift`, `DeepgramTranscriptionRequest\.swift`, `GeminiTranscriptionRequest\.swift`, `MistralTranscriptionRequest\.swift`, `ElevenLabsTranscriptionRequest\.swift`, `XAITranscriptionRequest\.swift`, `SpeechmaticsTranscriptionRequest\.swift`, `SonioxTranscriptionRequest\.swift`, and `AssemblyAITranscriptionRequest\.swift` stay deleted'
 
 section "obsolete standalone Cartesia API-key client module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/CartesiaAPIKeyClient.swift
@@ -8637,7 +8732,6 @@ require_pattern \
 require_pattern \
   "shared retried remote transcription clients use validated retry helper" \
   'VoiceInkRetriedRequest\.validated(Data|Upload)' \
-  VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift
 
 require_pattern \
@@ -8661,7 +8755,7 @@ require_pattern \
 require_pattern \
   "shared OpenAI-compatible transcription client uses shared retry helper" \
   'VoiceInkRetriedRequest\.validatedData' \
-  VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleTranscriptionRequest.swift
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift
 
 require_patterns \
   "remote transport tests cover shared HTTP response policy" \
@@ -8748,21 +8842,10 @@ require_patterns \
   'errorDomain: "LLMPostProcessing"'
 
 reject_pattern \
-  "shared OpenAI-compatible transcription client avoids duplicate retry loop" \
-  'private static func data\(|Task\.sleep|pow\(2\.0|URLSessionConfiguration\.ephemeral|VoiceInkRemoteHTTPResponsePolicy\.(retryableStatusCode|apiError)' \
-  VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleTranscriptionRequest.swift
-
-reject_pattern \
-  "retried remote transcription clients avoid raw retried response handling" \
-  'VoiceInkRetriedRequest\.(data|upload)\(|VoiceInkRemoteHTTPResponsePolicy\.validateSuccess' \
-  VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleTranscriptionRequest.swift \
-  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift
-
-reject_pattern \
   "shared remote retry helpers avoid duplicate retry status sets" \
   'private static let retryableStatusCodes' \
   VoiceInkCore/Sources/VoiceInkCore/RemoteTransport.swift \
-  VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleTranscriptionRequest.swift
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift
 
 require_pattern \
   "shared custom cloud model backup record owns export/import shape" \

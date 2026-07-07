@@ -7466,7 +7466,7 @@ reject_pattern \
   VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift \
-  VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionRequest.swift
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift
 
 section "obsolete standalone direct remote transcription client modules stay deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/DeepgramTranscriptionClient.swift
@@ -7478,6 +7478,15 @@ reject_file VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionClient.sw
 reject_file VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionClient.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleTranscriptionClient.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionClient.swift
+reject_file VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionRequest.swift
+
+reject_pattern \
+  "core tests and project metadata avoid obsolete xAI transcription request files/tests" \
+  'XAITranscriptionRequest\.swift|XAITranscriptionRequestTests' \
+  VoiceInkCore/Tests/VoiceInkCoreTests \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
 
 section "obsolete standalone OpenAI-compatible transcription codec module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleTranscriptionCodec.swift
@@ -7569,8 +7578,45 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift \
-  VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionRequest.swift \
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift \
   VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyVerifier.swift
+
+require_patterns \
+  "shared xAI transcription request and client live with remote transcription service" \
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift \
+  'public struct VoiceInkPreparedXAITranscriptionRequest' \
+  'public let request: URLRequest' \
+  'public let body: Data' \
+  'public init\(request: URLRequest, body: Data\)' \
+  'public enum VoiceInkXAITranscriptionCodec' \
+  'public static func transcript\(from data: Data\) throws -> String' \
+  'public enum VoiceInkXAIRequestBuilder' \
+  'public static func makeTranscriptionRequest' \
+  'public static func makeAPIKeyRequest' \
+  'public struct VoiceInkXAITranscriptionClient' \
+  'public init\(\)' \
+  'public func transcribeAudioData' \
+  'public func verifyAPIKey\(baseURL: URL, apiKey: String\) async -> Bool' \
+  'public func verifyAPIKeyDetailed' \
+  'VoiceInkProviderEndpoint\.xaiSpeechToTextURL' \
+  'VoiceInkProviderEndpoint\.xaiAPIKeyURL' \
+  'VoiceInkRetriedRequest\.validatedUpload' \
+  'VoiceInkAPIKeyVerificationPolicy\.verify'
+
+require_voiceink_core_check_runner_invocations \
+  "core checks execute xAI remote provider request tests" \
+  RemoteProviderRequestTests \
+  testXAITranscriptionRequestBuilderUsesMultipartAudioRequestWithFileLast \
+  testXAITranscriptionRequestBuilderSkipsLanguageAndFormatForAutoDetect \
+  testXAIAPIKeyRequestBuilderUsesAPIKeyEndpoint \
+  testXAIClientRejectsBlankAPIKeyWithoutNetwork \
+  testXAITranscriptionCodecReturnsText
+
+require_patterns \
+  "migration docs record xAI request helper colocation" \
+  docs/ios-single-repo-migration.md \
+  'xAI request/client helper colocated in the remote transcription service module' \
+  'standalone `XAITranscriptionRequest\.swift` stays deleted'
 
 section "obsolete standalone Cartesia API-key client module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/CartesiaAPIKeyClient.swift
@@ -7653,7 +7699,7 @@ reject_pattern \
   VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift \
-  VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionRequest.swift
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift
 
 require_pattern \
   "shared remote HTTP response policy owns success, retry, and provider-domain errors" \
@@ -7707,7 +7753,7 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift \
-  VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionRequest.swift
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift
 
 require_pattern \
   "shared remote polling policy owns timeout, cadence, and HTTP validation" \
@@ -7833,7 +7879,7 @@ reject_pattern \
   VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift \
-  VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionRequest.swift
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift
 
 reject_pattern \
   "shared remote transcription clients avoid provider-local HTTP response validators" \

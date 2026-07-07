@@ -8,7 +8,8 @@
   ![Platform](https://img.shields.io/badge/platform-macOS%2014.0%2B-brightgreen)
   [![GitHub release (latest by date)](https://img.shields.io/github/v/release/happyf-weallareeuropean/roma-just-talk)](https://github.com/happyf-weallareeuropean/roma-just-talk/releases)
   ![GitHub all releases](https://img.shields.io/github/downloads/happyf-weallareeuropean/roma-just-talk/total)
-  ![GitHub stars](https://img.shields.io/github/stars/happyf-weallareeuropean/roma-just-talk?style=social)
+  ![GitHub stars](https://img.shields.io/github/stars/happyf-weallareeuropean/roma-just-talk?style=for-the-badge&logo=github&logoColor=white&label=Stars&labelColor=000000&color=111111)
+  <a href="https://x.com/Hft_freedom"><img src="https://img.shields.io/twitter/follow/TastyIgniter.svg?label=Follow&style=for-the-badge&logo=x&logoColor=white&labelColor=000000&color=111111" alt="Twitter"></a>
  
   <a href="https://github.com/happyf-weallareeuropean/roma-just-talk/releases/latest">
     <img src="https://img.shields.io/badge/Download%20Latest-macOS%20App-blue?style=for-the-badge&logo=apple" alt="Download roma-just-talk" width="250"/>

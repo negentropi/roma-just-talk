@@ -13666,21 +13666,21 @@ reject_pattern \
 require_pattern \
   "shared transcription paste output owns trial-expired prefix" \
   'trialExpiredPrefix = "Your trial has expired\. Upgrade to VoiceInk Pro at \\\(VoiceInkLicenseLinks\.purchaseDisplayURLString\)"' \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptionPasteOutputPolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
 
 require_pattern \
   "shared transcription paste output owns trailing-space preference" \
   'VoiceInkAppendTrailingSpacePreference' \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptionPasteOutputPolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
 
 require_pattern \
   "shared transcription paste output owns cursor-context planning" \
   'public struct CursorPasteTextPlan|public static func cursorPasteTextPlan|shouldReadCursorContext|VoiceInkTranscriptionCleanupPreferenceStorage\.shouldLowercase' \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptionPasteOutputPolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
 
 require_patterns \
   "shared paste output policy owns contextual capitalization formatter" \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptionPasteOutputPolicy.swift \
+  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift \
   'public enum VoiceInkContextualCapitalizationFormatter' \
   'needsCursorContext\(_ text: String\)' \
   'format\(_ text: String, beforeCursor: String\?\)' \
@@ -13692,7 +13692,23 @@ require_patterns \
 require_pattern \
   "shared cursor text context policy owns macOS reader bounds and role filtering" \
   'VoiceInkCursorTextContextPolicy|defaultMaximumLength = 240|parentTraversalLimit = 4|textInputRoleNames|prefixLength|valueSuffix' \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptionPasteOutputPolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
+
+section "obsolete standalone transcription paste output policy module stays deleted"
+reject_file VoiceInkCore/Sources/VoiceInkCore/TranscriptionPasteOutputPolicy.swift
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionPasteOutputPolicyTests.swift
+
+reject_pattern \
+  "VoiceInkCore metadata avoids stale standalone transcription paste output policy files" \
+  'TranscriptionPasteOutputPolicy(Tests)?\.swift' \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
+
+reject_swift_pattern \
+  "core tests and runner avoid obsolete transcription paste output policy suite" \
+  '\bTranscriptionPasteOutputPolicyTests\b' \
+  VoiceInkCore/Tests/VoiceInkCoreTests
 
 section "obsolete standalone contextual capitalization module and tests stay deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/ContextualCapitalizationFormatter.swift
@@ -13713,22 +13729,22 @@ reject_pattern \
 require_pattern \
   "shared trailing-space preference owns user-defaults key" \
   'userDefaultsKey' \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptionPasteOutputPolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
 
 require_pattern \
   "shared trailing-space preference owns default value" \
   'defaultIsEnabled' \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptionPasteOutputPolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
 
 require_pattern \
   "shared trailing-space preference owns registered defaults" \
   'registeredDefaults' \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptionPasteOutputPolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
 
 require_pattern \
   "shared trailing-space preference owns macOS settings presentation" \
   'VoiceInkMacOSAppendTrailingSpaceSettingsPresentation|macOSSettingsPresentation' \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptionPasteOutputPolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
 
 require_pattern \
   "macOS transcription pipeline uses shared paste output policy" \
@@ -13788,6 +13804,16 @@ require_patterns \
   'testCursorTextContextPolicyBoundsPrefixLength' \
   'testCursorTextContextPolicyBoundsValueSuffixToTextInputRoles'
 
+require_pattern \
+  "paste preferences tests exercise public VoiceInkCore API surface after folding paste output policy" \
+  '^import VoiceInkCore$' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/PastePreferencesTests.swift
+
+reject_pattern \
+  "paste preferences tests avoid testable import after folding paste output public API" \
+  '@testable import VoiceInkCore' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/PastePreferencesTests.swift
+
 require_patterns \
   "core checks execute folded paste output tests through paste preference suite" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
@@ -13830,8 +13856,6 @@ require_patterns \
   'name: "PastePreferencesTests\.testCursorTextContextPolicyBoundsValueSuffixToTextInputRoles"' \
   'PastePreferencesTests\(\)\.testCursorTextContextPolicyBoundsValueSuffixToTextInputRoles\(\)'
 
-reject_file VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionPasteOutputPolicyTests.swift
-
 require_pattern \
   "macOS transcription pipeline uses CursorPaster paste preparation" \
   'CursorPaster\.preparedTextForPaste' \
@@ -13865,7 +13889,7 @@ reject_pattern \
 
 require_pattern \
   "migration checklist tracks shared paste output gate" \
-  'macOS final paste text assembly routes cursor-context capitalization planning, cursor-context reader bounds/text-input role filtering, lowercase-cleanup preference gating, trial-expired prefix, trailing-space storage/default registration, and trailing-space settings labels/help through `VoiceInkTranscriptionPasteOutputPolicy`/`VoiceInkCursorTextContextPolicy`/`VoiceInkAppendTrailingSpacePreference`' \
+  'macOS final paste text assembly routes cursor-context capitalization planning, cursor-context reader bounds/text-input role filtering, lowercase-cleanup preference gating, trial-expired prefix, trailing-space storage/default registration, and trailing-space settings labels/help through `VoiceInkTranscriptionPasteOutputPolicy`/`VoiceInkCursorTextContextPolicy`/`VoiceInkAppendTrailingSpacePreference`, colocated in `PastePreferences\.swift`; standalone `TranscriptionPasteOutputPolicy\.swift` stays deleted' \
   docs/ios-single-repo-migration.md
 
 require_pattern \
@@ -20978,7 +21002,7 @@ reject_pattern \
   VoiceInk/Models/LicenseViewModel.swift \
   VoiceInk/Views/LicenseManagementView.swift \
   VoiceInk/Views/Components/TrialMessageView.swift \
-  VoiceInkCore/Sources/VoiceInkCore/TranscriptionPasteOutputPolicy.swift
+  VoiceInkCore/Sources/VoiceInkCore/PastePreferences.swift
 
 reject_pattern \
   "macOS license view model avoids shell-owned removal reset policy" \

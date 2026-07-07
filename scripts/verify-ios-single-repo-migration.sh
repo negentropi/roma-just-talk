@@ -329,11 +329,20 @@ open my $runner_fh, '<', $runner_path or die "Unable to read $runner_path: $!\n"
 
 my %runner_tests;
 my %duplicate_runner_tests;
+my %mismatched_runner_tests;
+my @unparsed_runner_lines;
 while (my $line = <$runner_fh>) {
-    next unless $line =~ /VoiceInkCoreCheck\(name: "([A-Za-z0-9_]+\.test[A-Za-z0-9_]+)"/;
-    my $test = $1;
-    $runner_tests{$test}++;
-    $duplicate_runner_tests{$test} = 1 if $runner_tests{$test} > 1;
+    next unless $line =~ /VoiceInkCoreCheck\(name: "/;
+    if ($line !~ /VoiceInkCoreCheck\(name: "([A-Za-z0-9_]+)\.(test[A-Za-z0-9_]+)", run: \{ (?:try\s+)?(?:await\s+)?([A-Za-z0-9_]+)\(\)\.(test[A-Za-z0-9_]+)\(\) \}\),/) {
+        push @unparsed_runner_lines, $.;
+        next;
+    }
+
+    my $label = "$1.$2";
+    my $invocation = "$3.$4";
+    $runner_tests{$label}++;
+    $duplicate_runner_tests{$label} = 1 if $runner_tests{$label} > 1;
+    $mismatched_runner_tests{$label} = $invocation if $label ne $invocation;
 }
 
 my %declared_tests;
@@ -342,7 +351,7 @@ for my $path (sort glob 'VoiceInkCore/Tests/VoiceInkCoreTests/*Tests.swift') {
     open my $fh, '<', $path or die "Unable to read $path: $!\n";
     my $suite = '';
     while (my $line = <$fh>) {
-        if ($line =~ /^\s*(?:(?:@\w+(?:\([^)]*\))?)\s+)*(?:final\s+)?class\s+([A-Za-z0-9_]+)\s*:/) {
+        if ($line =~ /^\s*(?:(?:@\w+(?:\([^)]*\))?)\s+)*(?:final\s+)?(?:class|extension)\s+([A-Za-z0-9_]+)\b/) {
             $suite = $1;
             next;
         }
@@ -355,8 +364,9 @@ for my $path (sort glob 'VoiceInkCore/Tests/VoiceInkCoreTests/*Tests.swift') {
 my @missing = grep { !exists $runner_tests{$_} } sort keys %declared_tests;
 my @stale = grep { !exists $declared_tests{$_} } sort keys %runner_tests;
 my @duplicates = sort keys %duplicate_runner_tests;
+my @mismatches = sort keys %mismatched_runner_tests;
 
-if (@missing || @stale || @duplicates) {
+if (@missing || @stale || @duplicates || @mismatches || @unparsed_runner_lines) {
     if (@missing) {
         print STDERR "Missing VoiceInkCoreCheckRunner entries:\n";
         print STDERR "  $_\n" for @missing;
@@ -368,6 +378,14 @@ if (@missing || @stale || @duplicates) {
     if (@duplicates) {
         print STDERR "Duplicate VoiceInkCoreCheckRunner entries:\n";
         print STDERR "  $_\n" for @duplicates;
+    }
+    if (@mismatches) {
+        print STDERR "Mismatched VoiceInkCoreCheckRunner names and invocations:\n";
+        print STDERR "  $_ runs $mismatched_runner_tests{$_}\n" for @mismatches;
+    }
+    if (@unparsed_runner_lines) {
+        print STDERR "Unparsed VoiceInkCoreCheckRunner entries at lines:\n";
+        print STDERR "  $_\n" for @unparsed_runner_lines;
     }
     exit 1;
 }

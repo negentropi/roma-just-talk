@@ -7610,6 +7610,30 @@ require_patterns \
   'VoiceInkRetriedRequest\.validatedUpload' \
   'VoiceInkAPIKeyVerificationPolicy\.verify'
 
+require_patterns \
+  "ElevenLabs public API proof uses normal VoiceInkCore import" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/ElevenLabsPublicAPITests.swift \
+  '^import VoiceInkCore$' \
+  'VoiceInkPreparedElevenLabsTranscriptionRequest' \
+  'VoiceInkElevenLabsRequestBuilder\.makeTranscriptionRequest' \
+  'VoiceInkElevenLabsRequestBuilder\.makeUserRequest' \
+  'VoiceInkElevenLabsTranscriptionClient\(\)' \
+  'client\.transcribeAudioData' \
+  'client\.verifyAPIKey\(' \
+  'client\.verifyAPIKeyDetailed\(' \
+  'VoiceInkAPIKeyVerificationResult' \
+  'VoiceInkElevenLabsTranscriptionCodec\.transcript'
+
+reject_pattern \
+  "ElevenLabs public API proof avoids testable import" \
+  '@testable import VoiceInkCore' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/ElevenLabsPublicAPITests.swift
+
+require_voiceink_core_check_runner_invocations \
+  "core checks execute ElevenLabs public API proof" \
+  ElevenLabsPublicAPITests \
+  testElevenLabsRequestClientAndCodecExposePublicAPI
+
 require_voiceink_core_check_runner_invocations \
   "core checks execute ElevenLabs remote provider request tests" \
   RemoteProviderRequestTests \

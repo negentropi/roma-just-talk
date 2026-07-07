@@ -7459,7 +7459,6 @@ reject_pattern \
 reject_pattern \
   "shared remote transcription clients avoid provider API error-domain literals" \
   '"(DeepgramAPI|GeminiAPI|MistralAPI|ElevenLabsAPI|SonioxAPI|SpeechmaticsAPI|AssemblyAIAPI|XAIAPI)"' \
-  VoiceInkCore/Sources/VoiceInkCore/DeepgramTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift \
@@ -7475,10 +7474,19 @@ reject_file VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionClient.sw
 reject_file VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionClient.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleTranscriptionClient.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionClient.swift
+reject_file VoiceInkCore/Sources/VoiceInkCore/DeepgramTranscriptionRequest.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionRequest.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/MistralTranscriptionRequest.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/ElevenLabsTranscriptionRequest.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionRequest.swift
+
+reject_pattern \
+  "core tests and project metadata avoid obsolete Deepgram transcription request files/tests" \
+  'DeepgramTranscriptionRequest\.swift|DeepgramTranscriptionRequestTests' \
+  VoiceInkCore/Tests/VoiceInkCoreTests \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
 
 reject_pattern \
   "core tests and project metadata avoid obsolete Gemini transcription request files/tests" \
@@ -7595,12 +7603,86 @@ require_pattern \
   "shared provider verification clients use shared API-key verification policy" \
   'VoiceInkAPIKeyVerificationPolicy\.verify' \
   VoiceInkCore/Sources/VoiceInkCore/RemoteTransport.swift \
-  VoiceInkCore/Sources/VoiceInkCore/DeepgramTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift \
   VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyVerifier.swift
+
+require_patterns \
+  "shared Deepgram transcription request and client live with remote transcription service" \
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift \
+  'public enum VoiceInkDeepgramTranscriptionCodec' \
+  'public static func transcript\(from data: Data\) throws -> String' \
+  'public enum VoiceInkDeepgramRequestBuilder' \
+  'public static func makeTranscriptionRequest' \
+  'public static func makeProjectsRequest' \
+  'public struct VoiceInkDeepgramTranscriptionClient' \
+  'public init\(\)' \
+  'public func transcribeAudioData' \
+  'public func verifyAPIKey\(baseURL: URL, apiKey: String\) async -> Bool' \
+  'public func verifyAPIKeyDetailed' \
+  'VoiceInkProviderEndpoint\.deepgramListenURL' \
+  'VoiceInkProviderEndpoint\.deepgramProjectsURL' \
+  'VoiceInkRetriedRequest\.validatedData' \
+  'VoiceInkAPIKeyVerificationPolicy\.verify'
+
+require_patterns \
+  "Deepgram public API proof uses normal VoiceInkCore import" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/DeepgramPublicAPITests.swift \
+  '^import VoiceInkCore$' \
+  'VoiceInkDeepgramRequestBuilder\.makeTranscriptionRequest' \
+  'VoiceInkDeepgramRequestBuilder\.makeProjectsRequest' \
+  'VoiceInkDeepgramTranscriptionClient\(\)' \
+  'transcribeWithAllLabels' \
+  'transcribeWithDefaultedLabels' \
+  'client\.transcribeAudioData\(' \
+  'baseURL: VoiceInkProviderEndpoint\.deepgram\.apiBaseURL' \
+  'apiKey: "deepgram-key"' \
+  'model: "nova-3"' \
+  'audioData: Data\("WAVDATA"\.utf8\)' \
+  'language: "en-US"' \
+  'smartFormat: true' \
+  'punctuate: true' \
+  'paragraphs: true' \
+  'diarize: false' \
+  'customVocabulary: \["Roma"\]' \
+  'errorDomain: "DeepgramPublicAPITests"' \
+  'timeout: 30' \
+  'client\.verifyAPIKey\(' \
+  'client\.verifyAPIKeyDetailed\(' \
+  'VoiceInkAPIKeyVerificationResult' \
+  'VoiceInkDeepgramTranscriptionCodec\.transcript'
+
+reject_pattern \
+  "Deepgram public API proof avoids conditional compilation snippets" \
+  '^[[:space:]]*#(if|elseif|else|endif)\b' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/DeepgramPublicAPITests.swift
+
+require_swift_static_function_body_pattern \
+  "Deepgram public API proof keeps defaulted transcribe call short" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/DeepgramPublicAPITests.swift \
+  testDeepgramRequestClientAndCodecExposePublicAPI \
+  'let\s+transcribeWithDefaultedLabels\s*=\s*\{\s*try\s+await\s+client\.transcribeAudioData\s*\((?:(?!\b(?:language|smartFormat|punctuate|paragraphs|diarize|customVocabulary|errorDomain|timeout)\s*:).)*\bbaseURL\s*:(?:(?!\b(?:language|smartFormat|punctuate|paragraphs|diarize|customVocabulary|errorDomain|timeout)\s*:).)*\bapiKey\s*:(?:(?!\b(?:language|smartFormat|punctuate|paragraphs|diarize|customVocabulary|errorDomain|timeout)\s*:).)*\bmodel\s*:(?:(?!\b(?:language|smartFormat|punctuate|paragraphs|diarize|customVocabulary|errorDomain|timeout)\s*:).)*\baudioData\s*:(?:(?!\b(?:language|smartFormat|punctuate|paragraphs|diarize|customVocabulary|errorDomain|timeout)\s*:).)*\)\s*\}'
+
+reject_pattern \
+  "Deepgram public API proof avoids testable import" \
+  '@testable import VoiceInkCore' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/DeepgramPublicAPITests.swift
+
+require_voiceink_core_check_runner_invocations \
+  "core checks execute Deepgram public API proof" \
+  DeepgramPublicAPITests \
+  testDeepgramRequestClientAndCodecExposePublicAPI
+
+require_voiceink_core_check_runner_invocations \
+  "core checks execute Deepgram remote provider request tests" \
+  RemoteProviderRequestTests \
+  testDeepgramTranscriptionRequestBuilderUsesListenEndpointAndBody \
+  testDeepgramTranscriptionRequestBuilderCanMatchMacOSLLMkitOptions \
+  testDeepgramProjectsRequestBuilderUsesProjectsEndpoint \
+  testDeepgramClientRejectsBlankAPIKeyWithoutNetwork \
+  testDeepgramTranscriptionCodecReturnsFirstTranscriptOrEmptyString
 
 require_patterns \
   "shared Gemini transcription request and client live with remote transcription service" \
@@ -7860,11 +7942,11 @@ require_voiceink_core_check_runner_invocations \
   testXAITranscriptionCodecReturnsText
 
 require_patterns \
-  "migration docs record Gemini, Mistral, ElevenLabs, and xAI request helper colocation" \
+  "migration docs record Deepgram, Gemini, Mistral, ElevenLabs, and xAI request helper colocation" \
   docs/ios-single-repo-migration.md \
-  'Gemini, Mistral, ElevenLabs, and xAI request/client helpers colocated in the remote transcription service module' \
-  'xAI request/client helpers colocated in the remote transcription service module' \
-  'standalone `GeminiTranscriptionRequest\.swift`, `MistralTranscriptionRequest\.swift`, `ElevenLabsTranscriptionRequest\.swift`, and `XAITranscriptionRequest\.swift` stay deleted'
+  'Deepgram, Gemini, Mistral, ElevenLabs, and xAI request/client helpers colocated in the remote transcription service module' \
+  'Deepgram, Gemini, Mistral, ElevenLabs, and xAI request/client helpers colocated with that remote transcription service' \
+  'standalone `DeepgramTranscriptionRequest\.swift`, `GeminiTranscriptionRequest\.swift`, `MistralTranscriptionRequest\.swift`, `ElevenLabsTranscriptionRequest\.swift`, and `XAITranscriptionRequest\.swift` stay deleted'
 
 section "obsolete standalone Cartesia API-key client module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/CartesiaAPIKeyClient.swift
@@ -7940,7 +8022,6 @@ reject_pattern \
   "shared remote provider verification clients avoid duplicate API-key verification result mapping" \
   'API key is missing or empty\.|No HTTP response received\.|String\(data: data, encoding: \.utf8\) \?\? "HTTP \(http\.statusCode\)"|guard !apiKey\.trimmingCharacters' \
   VoiceInkCore/Sources/VoiceInkCore/RemoteTransport.swift \
-  VoiceInkCore/Sources/VoiceInkCore/DeepgramTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift \
@@ -7980,7 +8061,6 @@ require_patterns \
 require_pattern \
   "direct remote clients use shared validated request helper" \
   'VoiceInkRetriedRequest\.validatedData' \
-  VoiceInkCore/Sources/VoiceInkCore/DeepgramTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift \
   VoiceInkCore/Sources/VoiceInkCore/RemoteTransport.swift
 
@@ -8097,7 +8177,6 @@ require_voiceink_core_check_runner_invocations \
 reject_pattern \
   "direct remote clients avoid duplicate HTTP response validation" \
   'URLSession\.shared\.data\(for: request\)|VoiceInkRemoteHTTPResponsePolicy\.validateSuccess|guard let http = response as\? HTTPURLResponse|guard \(200..<300\)\.contains\(http\.statusCode\)|String\(data: data, encoding: \.utf8\) \?\? ""|NSError\(' \
-  VoiceInkCore/Sources/VoiceInkCore/DeepgramTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift
 
 require_patterns \

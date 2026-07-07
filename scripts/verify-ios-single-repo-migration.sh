@@ -7460,7 +7460,6 @@ reject_pattern \
   "shared remote transcription clients avoid provider API error-domain literals" \
   '"(DeepgramAPI|GeminiAPI|MistralAPI|ElevenLabsAPI|SonioxAPI|SpeechmaticsAPI|AssemblyAIAPI|XAIAPI)"' \
   VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift \
-  VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift
 
@@ -7479,6 +7478,7 @@ reject_file VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionRequest.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/MistralTranscriptionRequest.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/ElevenLabsTranscriptionRequest.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionRequest.swift
+reject_file VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift
 
 reject_pattern \
   "core tests and project metadata avoid obsolete Deepgram transcription request files/tests" \
@@ -7515,6 +7515,14 @@ reject_pattern \
 reject_pattern \
   "core tests and project metadata avoid obsolete xAI transcription request files/tests" \
   'XAITranscriptionRequest\.swift|XAITranscriptionRequestTests' \
+  VoiceInkCore/Tests/VoiceInkCoreTests \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
+
+reject_pattern \
+  "core tests and project metadata avoid obsolete Speechmatics transcription request files/tests" \
+  'SpeechmaticsTranscriptionRequest\.swift|SpeechmaticsTranscriptionRequestTests' \
   VoiceInkCore/Tests/VoiceInkCoreTests \
   VoiceInkCore/Package.swift \
   VoiceInk.xcodeproj/project.pbxproj \
@@ -7604,7 +7612,6 @@ require_pattern \
   'VoiceInkAPIKeyVerificationPolicy\.verify' \
   VoiceInkCore/Sources/VoiceInkCore/RemoteTransport.swift \
   VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift \
-  VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift \
   VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyVerifier.swift
@@ -7942,11 +7949,102 @@ require_voiceink_core_check_runner_invocations \
   testXAITranscriptionCodecReturnsText
 
 require_patterns \
-  "migration docs record Deepgram, Gemini, Mistral, ElevenLabs, and xAI request helper colocation" \
+  "shared Speechmatics transcription request and client live with remote transcription service" \
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift \
+  'public struct VoiceInkSpeechmaticsTranscriptionClient' \
+  'public init\(\)' \
+  'public func transcribeAudioData' \
+  'public func verifyAPIKey\(baseURL: URL, apiKey: String\) async -> Bool' \
+  'public func verifyAPIKeyDetailed' \
+  'public struct VoiceInkPreparedSpeechmaticsUploadRequest' \
+  'public let request: URLRequest' \
+  'public let body: Data' \
+  'public enum VoiceInkSpeechmaticsTranscriptionCodec' \
+  'public static func submittedJobID' \
+  'public static func jobStatus' \
+  'public static func transcript\(from data: Data\) -> String' \
+  'public static func speechmaticsLanguage\(from language: String\?\) -> String' \
+  'public enum VoiceInkSpeechmaticsRequestBuilder' \
+  'public static func makeSubmitJobRequest' \
+  'public static func makeJobStatusRequest' \
+  'public static func makeTranscriptRequest' \
+  'public static func makeJobsRequest' \
+  'VoiceInkProviderEndpoint\.speechmaticsJobsURL' \
+  'VoiceInkProviderEndpoint\.speechmaticsJobURL' \
+  'VoiceInkProviderEndpoint\.speechmaticsTranscriptURL' \
+  'VoiceInkRetriedRequest\.validatedUpload' \
+  'VoiceInkRetriedRequest\.validatedData' \
+  'VoiceInkRemotePollingPolicy\.pollValidatedData' \
+  'VoiceInkAPIKeyVerificationPolicy\.verify'
+
+require_patterns \
+  "Speechmatics public API proof uses normal VoiceInkCore import" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/SpeechmaticsPublicAPITests.swift \
+  '^import VoiceInkCore$' \
+  'VoiceInkSpeechmaticsRequestBuilder\.makeSubmitJobRequest' \
+  'VoiceInkPreparedSpeechmaticsUploadRequest' \
+  'VoiceInkSpeechmaticsRequestBuilder\.makeJobStatusRequest' \
+  'VoiceInkSpeechmaticsRequestBuilder\.makeTranscriptRequest' \
+  'VoiceInkSpeechmaticsRequestBuilder\.makeJobsRequest' \
+  'VoiceInkSpeechmaticsTranscriptionClient\(\)' \
+  'transcribeWithAllLabels' \
+  'transcribeWithDefaultedLabels' \
+  'client\.transcribeAudioData\(' \
+  'baseURL: VoiceInkProviderEndpoint\.speechmaticsAPIBaseURL' \
+  'apiKey: "speechmatics-key"' \
+  'audioData: Data\("WAVDATA"\.utf8\)' \
+  'fileName: "sample\.wav"' \
+  'language: "zh"' \
+  'operatingPoint: "enhanced"' \
+  'customVocabulary: \["Roma", "Felix"\]' \
+  'maxWaitSeconds: 300' \
+  'timeout: 30' \
+  'maxRetries: 2' \
+  'errorDomain: "SpeechmaticsPublicAPITests"' \
+  'client\.verifyAPIKey\(' \
+  'client\.verifyAPIKeyDetailed\(' \
+  'VoiceInkAPIKeyVerificationResult' \
+  'VoiceInkSpeechmaticsTranscriptionCodec\.submittedJobID' \
+  'VoiceInkSpeechmaticsTranscriptionCodec\.jobStatus' \
+  'VoiceInkSpeechmaticsTranscriptionCodec\.speechmaticsLanguage' \
+  'VoiceInkSpeechmaticsTranscriptionCodec\.transcript'
+
+reject_pattern \
+  "Speechmatics public API proof avoids conditional compilation snippets" \
+  '^[[:space:]]*#(if|elseif|else|endif)\b' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/SpeechmaticsPublicAPITests.swift
+
+require_swift_static_function_body_pattern \
+  "Speechmatics public API proof keeps defaulted transcribe call short" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/SpeechmaticsPublicAPITests.swift \
+  testSpeechmaticsRequestClientAndCodecExposePublicAPI \
+  'let\s+transcribeWithDefaultedLabels\s*=\s*\{\s*try\s+await\s+client\.transcribeAudioData\s*\((?:(?!\b(?:fileName|language|operatingPoint|customVocabulary|maxWaitSeconds|timeout|maxRetries|errorDomain)\s*:).)*\bbaseURL\s*:(?:(?!\b(?:fileName|language|operatingPoint|customVocabulary|maxWaitSeconds|timeout|maxRetries|errorDomain)\s*:).)*\bapiKey\s*:(?:(?!\b(?:fileName|language|operatingPoint|customVocabulary|maxWaitSeconds|timeout|maxRetries|errorDomain)\s*:).)*\baudioData\s*:(?:(?!\b(?:fileName|language|operatingPoint|customVocabulary|maxWaitSeconds|timeout|maxRetries|errorDomain)\s*:).)*\)\s*\}'
+
+reject_pattern \
+  "Speechmatics public API proof avoids testable import" \
+  '@testable import VoiceInkCore' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/SpeechmaticsPublicAPITests.swift
+
+require_voiceink_core_check_runner_invocations \
+  "core checks execute Speechmatics public API proof" \
+  SpeechmaticsPublicAPITests \
+  testSpeechmaticsRequestClientAndCodecExposePublicAPI
+
+require_voiceink_core_check_runner_invocations \
+  "core checks execute Speechmatics remote provider request tests" \
+  RemoteProviderRequestTests \
+  testSpeechmaticsSubmitJobRequestBuilderUsesJobsEndpointAndMultipartBody \
+  testSpeechmaticsSubmitJobRequestBuilderDefaultsAutoLanguage \
+  testSpeechmaticsStatusTranscriptAndVerificationRequestBuilders \
+  testSpeechmaticsClientRejectsBlankAPIKeyWithoutNetwork \
+  testSpeechmaticsTranscriptionCodecReturnsIdStatusLanguageAndTranscript
+
+require_patterns \
+  "migration docs record Deepgram, Gemini, Mistral, ElevenLabs, xAI, and Speechmatics request helper colocation" \
   docs/ios-single-repo-migration.md \
-  'Deepgram, Gemini, Mistral, ElevenLabs, and xAI request/client helpers colocated in the remote transcription service module' \
-  'Deepgram, Gemini, Mistral, ElevenLabs, and xAI request/client helpers colocated with that remote transcription service' \
-  'standalone `DeepgramTranscriptionRequest\.swift`, `GeminiTranscriptionRequest\.swift`, `MistralTranscriptionRequest\.swift`, `ElevenLabsTranscriptionRequest\.swift`, and `XAITranscriptionRequest\.swift` stay deleted'
+  'Deepgram, Gemini, Mistral, ElevenLabs, xAI, and Speechmatics request/client helpers colocated in the remote transcription service module' \
+  'Deepgram, Gemini, Mistral, ElevenLabs, xAI, and Speechmatics request/client helpers colocated with that remote transcription service' \
+  'standalone `DeepgramTranscriptionRequest\.swift`, `GeminiTranscriptionRequest\.swift`, `MistralTranscriptionRequest\.swift`, `ElevenLabsTranscriptionRequest\.swift`, `XAITranscriptionRequest\.swift`, and `SpeechmaticsTranscriptionRequest\.swift` stay deleted'
 
 section "obsolete standalone Cartesia API-key client module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/CartesiaAPIKeyClient.swift
@@ -8023,7 +8121,6 @@ reject_pattern \
   'API key is missing or empty\.|No HTTP response received\.|String\(data: data, encoding: \.utf8\) \?\? "HTTP \(http\.statusCode\)"|guard !apiKey\.trimmingCharacters' \
   VoiceInkCore/Sources/VoiceInkCore/RemoteTransport.swift \
   VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift \
-  VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift
 
@@ -8074,7 +8171,6 @@ require_pattern \
   'VoiceInkRetriedRequest\.validated(Data|Upload)' \
   VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift \
-  VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift
 
@@ -8095,7 +8191,6 @@ require_pattern \
   "shared long-running remote transcription clients use shared polling policy" \
   'VoiceInkRemotePollingPolicy\.pollValidatedData' \
   VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift \
-  VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift
 
 require_pattern \
@@ -8176,7 +8271,7 @@ require_voiceink_core_check_runner_invocations \
 
 reject_pattern \
   "direct remote clients avoid duplicate HTTP response validation" \
-  'URLSession\.shared\.data\(for: request\)|VoiceInkRemoteHTTPResponsePolicy\.validateSuccess|guard let http = response as\? HTTPURLResponse|guard \(200..<300\)\.contains\(http\.statusCode\)|String\(data: data, encoding: \.utf8\) \?\? ""|NSError\(' \
+  'URLSession\.shared\.data\(for: request\)|VoiceInkRemoteHTTPResponsePolicy\.validateSuccess|guard let http = response as\? HTTPURLResponse|guard \(200..<300\)\.contains\(http\.statusCode\)' \
   VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift
 
 require_patterns \
@@ -8197,7 +8292,6 @@ reject_pattern \
   'VoiceInkRetriedRequest\.(data|upload)\(|VoiceInkRemoteHTTPResponsePolicy\.validateSuccess' \
   VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift \
-  VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift
 
@@ -8205,14 +8299,12 @@ reject_pattern \
   "shared remote transcription clients avoid provider-local HTTP response validators" \
   'private static func validate\(' \
   VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift \
-  VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift
 
 reject_pattern \
   "long-running remote transcription clients avoid provider-local polling loops" \
   'while true|let start = Date\(\)|Date\(\)\.timeIntervalSince\(start\)|Task\.sleep\(nanoseconds: 1_000_000_000\)|URLSession\.shared\.data\(for: request\)' \
   VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift \
-  VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift
 
 reject_pattern \

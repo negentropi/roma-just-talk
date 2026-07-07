@@ -7462,7 +7462,6 @@ reject_pattern \
   VoiceInkCore/Sources/VoiceInkCore/DeepgramTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/MistralTranscriptionRequest.swift \
-  VoiceInkCore/Sources/VoiceInkCore/ElevenLabsTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift \
@@ -7478,7 +7477,16 @@ reject_file VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionClient.sw
 reject_file VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionClient.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleTranscriptionClient.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionClient.swift
+reject_file VoiceInkCore/Sources/VoiceInkCore/ElevenLabsTranscriptionRequest.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionRequest.swift
+
+reject_pattern \
+  "core tests and project metadata avoid obsolete ElevenLabs transcription request files/tests" \
+  'ElevenLabsTranscriptionRequest\.swift|ElevenLabsTranscriptionRequestTests' \
+  VoiceInkCore/Tests/VoiceInkCoreTests \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
 
 reject_pattern \
   "core tests and project metadata avoid obsolete xAI transcription request files/tests" \
@@ -7574,12 +7582,41 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/DeepgramTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/MistralTranscriptionRequest.swift \
-  VoiceInkCore/Sources/VoiceInkCore/ElevenLabsTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift \
   VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyVerifier.swift
+
+require_patterns \
+  "shared ElevenLabs transcription request and client live with remote transcription service" \
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift \
+  'public struct VoiceInkPreparedElevenLabsTranscriptionRequest' \
+  'public let request: URLRequest' \
+  'public let body: Data' \
+  'public init\(request: URLRequest, body: Data\)' \
+  'public enum VoiceInkElevenLabsTranscriptionCodec' \
+  'public static func transcript\(from data: Data\) throws -> String' \
+  'public enum VoiceInkElevenLabsRequestBuilder' \
+  'public static func makeTranscriptionRequest' \
+  'public static func makeUserRequest' \
+  'public struct VoiceInkElevenLabsTranscriptionClient' \
+  'public init\(\)' \
+  'public func transcribeAudioData' \
+  'public func verifyAPIKey\(baseURL: URL, apiKey: String\) async -> Bool' \
+  'public func verifyAPIKeyDetailed' \
+  'VoiceInkProviderEndpoint\.elevenLabsSpeechToTextURL' \
+  'VoiceInkProviderEndpoint\.elevenLabsUserURL' \
+  'VoiceInkRetriedRequest\.validatedUpload' \
+  'VoiceInkAPIKeyVerificationPolicy\.verify'
+
+require_voiceink_core_check_runner_invocations \
+  "core checks execute ElevenLabs remote provider request tests" \
+  RemoteProviderRequestTests \
+  testElevenLabsTranscriptionRequestBuilderUsesMultipartAudioRequest \
+  testElevenLabsUserRequestBuilderUsesUserEndpoint \
+  testElevenLabsClientRejectsBlankAPIKeyWithoutNetwork \
+  testElevenLabsTranscriptionCodecReturnsText
 
 require_patterns \
   "shared xAI transcription request and client live with remote transcription service" \
@@ -7613,10 +7650,11 @@ require_voiceink_core_check_runner_invocations \
   testXAITranscriptionCodecReturnsText
 
 require_patterns \
-  "migration docs record xAI request helper colocation" \
+  "migration docs record ElevenLabs and xAI request helper colocation" \
   docs/ios-single-repo-migration.md \
-  'xAI request/client helper colocated in the remote transcription service module' \
-  'standalone `XAITranscriptionRequest\.swift` stays deleted'
+  'ElevenLabs and xAI request/client helpers colocated in the remote transcription service module' \
+  'xAI request/client helpers colocated in the remote transcription service module' \
+  'standalone `ElevenLabsTranscriptionRequest\.swift` and `XAITranscriptionRequest\.swift` stay deleted'
 
 section "obsolete standalone Cartesia API-key client module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/CartesiaAPIKeyClient.swift
@@ -7695,7 +7733,6 @@ reject_pattern \
   VoiceInkCore/Sources/VoiceInkCore/DeepgramTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/MistralTranscriptionRequest.swift \
-  VoiceInkCore/Sources/VoiceInkCore/ElevenLabsTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift \
@@ -7749,7 +7786,6 @@ require_pattern \
   'VoiceInkRetriedRequest\.validated(Data|Upload)' \
   VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/MistralTranscriptionRequest.swift \
-  VoiceInkCore/Sources/VoiceInkCore/ElevenLabsTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift \
@@ -7875,7 +7911,6 @@ reject_pattern \
   'VoiceInkRetriedRequest\.(data|upload)\(|VoiceInkRemoteHTTPResponsePolicy\.validateSuccess' \
   VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/MistralTranscriptionRequest.swift \
-  VoiceInkCore/Sources/VoiceInkCore/ElevenLabsTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift \

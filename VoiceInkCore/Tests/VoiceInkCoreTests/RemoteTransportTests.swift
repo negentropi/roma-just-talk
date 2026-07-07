@@ -60,6 +60,77 @@ final class RemoteTransportTests: XCTestCase {
         XCTAssertEqual(error.userInfo[NSLocalizedDescriptionKey] as? String, "")
     }
 
+    func testAPIKeyVerificationPolicyRejectsBlankKeys() {
+        XCTAssertEqual(
+            VoiceInkAPIKeyVerificationPolicy.blankAPIKeyResultIfNeeded(" \n\t "),
+            VoiceInkAPIKeyVerificationResult(
+                isValid: false,
+                errorMessage: "API key is missing or empty."
+            )
+        )
+        XCTAssertNil(VoiceInkAPIKeyVerificationPolicy.blankAPIKeyResultIfNeeded("key"))
+    }
+
+    func testAPIKeyVerificationPolicyRejectsMissingHTTPResponse() throws {
+        let response = URLResponse(
+            url: try XCTUnwrap(URL(string: "https://api.example.test")),
+            mimeType: nil,
+            expectedContentLength: 0,
+            textEncodingName: nil
+        )
+
+        XCTAssertEqual(
+            VoiceInkAPIKeyVerificationPolicy.verificationResult(data: Data(), response: response),
+            VoiceInkAPIKeyVerificationResult(
+                isValid: false,
+                errorMessage: "No HTTP response received."
+            )
+        )
+    }
+
+    func testAPIKeyVerificationPolicyAcceptsHTTP2xxResponses() {
+        XCTAssertEqual(
+            VoiceInkAPIKeyVerificationPolicy.verificationResult(
+                data: Data("ok".utf8),
+                response: response(statusCode: 204)
+            ),
+            VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: nil)
+        )
+    }
+
+    func testAPIKeyVerificationPolicyReturnsHTTPBodyOrStatusForFailures() {
+        XCTAssertEqual(
+            VoiceInkAPIKeyVerificationPolicy.verificationResult(
+                data: Data("invalid key".utf8),
+                response: response(statusCode: 401)
+            ),
+            VoiceInkAPIKeyVerificationResult(
+                isValid: false,
+                errorMessage: "invalid key"
+            )
+        )
+        XCTAssertEqual(
+            VoiceInkAPIKeyVerificationPolicy.verificationResult(
+                data: Data([0xFF]),
+                response: response(statusCode: 500)
+            ),
+            VoiceInkAPIKeyVerificationResult(
+                isValid: false,
+                errorMessage: "HTTP 500"
+            )
+        )
+    }
+
+    func testAPIKeyVerificationPolicyFailureResultUsesLocalizedDescription() {
+        XCTAssertEqual(
+            VoiceInkAPIKeyVerificationPolicy.failureResult(StubVerificationError()),
+            VoiceInkAPIKeyVerificationResult(
+                isValid: false,
+                errorMessage: "network offline"
+            )
+        )
+    }
+
     func testErrorDescriptionsPreserveMacOSCloudTranscriptionCopy() {
         XCTAssertEqual(
             VoiceInkCloudTranscriptionError.unsupportedProvider.errorDescription,
@@ -357,6 +428,12 @@ private final class RetriedRequestCapturingURLProtocol: URLProtocol {
 }
 
 private struct StubNetworkError: LocalizedError {
+    var errorDescription: String? {
+        "network offline"
+    }
+}
+
+private struct StubVerificationError: LocalizedError {
     var errorDescription: String? {
         "network offline"
     }

@@ -150,6 +150,23 @@ struct VoiceInkTests {
         #expect(DictionaryService.applyWordReplacements(to: "voice ink", using: context) == "roma")
     }
 
+    @Test @MainActor func dictionaryServiceWordReplacementRemovalInvalidatesWarmedWordReplacementCache() throws {
+        let container = try makeWordReplacementContainer()
+        let context = container.mainContext
+        DictionaryService.invalidateWordReplacementCache()
+        defer { DictionaryService.invalidateWordReplacementCache() }
+
+        let replacement = WordReplacement(originalText: "voice ink", replacementText: "roma")
+        context.insert(replacement)
+        try context.save()
+
+        DictionaryService.warmWordReplacementCache(using: context)
+        #expect(DictionaryService.applyWordReplacements(to: "voice ink", using: context) == "roma")
+
+        #expect(DictionaryService.removeWordReplacement(replacement, context: context) == nil)
+        #expect(DictionaryService.applyWordReplacements(to: "voice ink", using: context) == "voice ink")
+    }
+
     @Test @MainActor func aiEnhancementServiceCachesPromptTriggerEligibility() throws {
         let savedPrompts = UserDefaults.standard.data(forKey: "customPrompts")
         let savedPromptId = UserDefaults.standard.string(forKey: "selectedPromptId")

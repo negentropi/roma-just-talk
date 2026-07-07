@@ -99,6 +99,26 @@ enum DictionaryService {
         }
     }
 
+    static func removeWordReplacement(
+        _ replacement: WordReplacement,
+        context: ModelContext
+    ) -> VoiceInkDictionaryAlertPresentation? {
+        context.delete(replacement)
+
+        do {
+            try context.save()
+            Self.invalidateWordReplacementCache()
+            return nil
+        } catch {
+            context.rollback()
+            return .wordReplacement(
+                message: VoiceInkDictionaryAlertPresentation.failedToRemoveWordReplacement(
+                    localizedDescription: error.localizedDescription
+                )
+            )
+        }
+    }
+
     static func warmWordReplacementCache(using context: ModelContext) {
         _ = replacementRules(using: context)
     }

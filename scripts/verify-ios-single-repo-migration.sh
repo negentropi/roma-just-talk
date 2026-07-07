@@ -11330,8 +11330,7 @@ require_pattern \
   "macOS dictionary mutation paths invalidate DictionaryService word-replacement cache" \
   'DictionaryService\.invalidateWordReplacementCache|Self\.invalidateWordReplacementCache' \
   VoiceInk/Services/DictionaryService.swift \
-  VoiceInk/Services/BackupImporter.swift \
-  VoiceInk/Views/Dictionary/WordReplacementView.swift
+  VoiceInk/Services/BackupImporter.swift
 
 require_pattern \
   "iOS settings uses shared dictionary alert presentation" \
@@ -11584,7 +11583,17 @@ require_pattern \
 
 require_pattern \
   "macOS word-replacement view uses shared dictionary alert presentation" \
-  'VoiceInkDictionaryAlertPresentation|\.wordReplacement|failedToRemoveWordReplacement' \
+  'VoiceInkDictionaryAlertPresentation|\.wordReplacement' \
+  VoiceInk/Views/Dictionary/WordReplacementView.swift
+
+require_pattern \
+  "macOS word-replacement view deletes through DictionaryService" \
+  'DictionaryService\.removeWordReplacement\(replacement, context: modelContext\)' \
+  VoiceInk/Views/Dictionary/WordReplacementView.swift
+
+reject_pattern \
+  "macOS word-replacement view avoids shell-owned delete persistence" \
+  'modelContext\.delete\(replacement\)|try modelContext\.save\(\)|DictionaryService\.invalidateWordReplacementCache\(\)|failedToRemoveWordReplacement' \
   VoiceInk/Views/Dictionary/WordReplacementView.swift
 
 require_pattern \
@@ -11649,7 +11658,7 @@ require_pattern \
 
 require_pattern \
   "macOS dictionary persistence failures use shared dictionary alert copy" \
-  'VoiceInkDictionaryAlertPresentation\.(failedToAddVocabularyWord|failedToAddVocabularyWords|failedToAddWordReplacement|failedToSaveWordReplacementChanges)' \
+  'VoiceInkDictionaryAlertPresentation\.(failedToAddVocabularyWord|failedToAddVocabularyWords|failedToAddWordReplacement|failedToSaveWordReplacementChanges|failedToRemoveWordReplacement)' \
   VoiceInk/Services/DictionaryService.swift
 
 reject_pattern \

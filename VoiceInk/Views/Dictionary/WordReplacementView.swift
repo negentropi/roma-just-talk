@@ -179,19 +179,8 @@ struct WordReplacementView: View {
     }
 
     private func removeReplacement(_ replacement: WordReplacement) {
-        modelContext.delete(replacement)
-
-        do {
-            try modelContext.save()
-            DictionaryService.invalidateWordReplacementCache()
-        } catch {
-            // Rollback the delete to restore UI consistency
-            modelContext.rollback()
-            alertPresentation = .wordReplacement(
-                message: VoiceInkDictionaryAlertPresentation.failedToRemoveWordReplacement(
-                    localizedDescription: error.localizedDescription
-                )
-            )
+        if let alert = DictionaryService.removeWordReplacement(replacement, context: modelContext) {
+            alertPresentation = alert
         }
     }
 }

@@ -10539,15 +10539,15 @@ require_pattern \
   'public func submitting\(existingWords: \[String\]\) -> VoiceInkFillerWordDraftSubmission' \
   VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift
 
-require_pattern \
-  "macOS filler-word storage receives shared submission plan" \
-  'func applySubmissionPlan\(_ plan: VoiceInkFillerWordSubmissionPlan\)' \
-  VoiceInk/Transcription/Processing/FillerWordManager.swift
+section "obsolete macOS filler-word storage manager stays deleted"
+reject_file VoiceInk/Transcription/Processing/FillerWordManager.swift
 
-require_pattern \
-  "macOS filler-word storage applies shared updated words" \
-  'plan\.applyRuntimeState\(currentWords: fillerWords\)' \
-  VoiceInk/Transcription/Processing/FillerWordManager.swift
+require_patterns \
+  "macOS filler-word settings receives and persists shared submission plan directly" \
+  VoiceInk/Views/Components/FillerWordsSettingsView.swift \
+  'func applySubmissionPlan\(_ plan: VoiceInkFillerWordSubmissionPlan\)' \
+  'plan\.applyRuntimeState\(currentWords: fillerWords, setWords: setFillerWords\)' \
+  'VoiceInkFillerWordPreference\.saveWords\(words\)'
 
 require_patterns \
   "iOS filler-word settings uses shared dictionary snapshot submission plan" \
@@ -10566,13 +10566,13 @@ require_patterns \
 reject_pattern \
   "platform filler-word insertion avoids shell-only insert-plan unpacking" \
   'VoiceInkFillerWords\.insertPlan\(|wordToInsert|duplicateWordMessage' \
-  VoiceInk/Transcription/Processing/FillerWordManager.swift \
+  VoiceInk/Views/Components/FillerWordsSettingsView.swift \
   iOS/VoiceInk-ios/AppSettings.swift
 
 reject_pattern \
   "platform filler-word storage avoids shell-owned changed-list comparison" \
   'if let updatedWords = plan\.updatedWordsIfChanged|fillerWords != plan\.updatedWords|fillerWords = plan\.updatedWords' \
-  VoiceInk/Transcription/Processing/FillerWordManager.swift \
+  VoiceInk/Views/Components/FillerWordsSettingsView.swift \
   iOS/VoiceInk-ios/AppSettings.swift \
   iOS/VoiceInk-ios/SettingsView.swift
 

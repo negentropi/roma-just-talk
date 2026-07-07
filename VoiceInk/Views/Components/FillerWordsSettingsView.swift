@@ -41,7 +41,7 @@ struct FillerWordChip: View {
 struct FillerWordsSettingsView: View {
     @AppStorage(VoiceInkUserDefaultsKey.removeFillerWords)
     private var removeFillerWords = VoiceInkPreferenceDefault.removeFillerWords
-    @StateObject private var fillerWordManager = FillerWordManager.shared
+    @State private var fillerWords = VoiceInkFillerWordPreference.words()
     @State private var draftState = VoiceInkFillerWordDraftState()
     @State private var alertPresentation: VoiceInkDictionaryAlertPresentation?
     private let cleanupPresentation = VoiceInkTranscriptionCleanupPresentation.macOS
@@ -49,7 +49,7 @@ struct FillerWordsSettingsView: View {
     var body: some View {
         let editorPresentation = VoiceInkFillerWords.editorPresentation(
             isEnabled: removeFillerWords,
-            words: fillerWordManager.fillerWords
+            words: fillerWords
         )
 
         VStack(alignment: .leading, spacing: 10) {
@@ -86,10 +86,10 @@ struct FillerWordsSettingsView: View {
 
                     if editorPresentation.shouldShowWordList {
                         FlowLayout(spacing: 6) {
-                            ForEach(fillerWordManager.fillerWords, id: \.self) { word in
+                            ForEach(fillerWords, id: \.self) { word in
                                 FillerWordChip(word: word) {
                                     withAnimation(.easeInOut(duration: 0.2)) {
-                                        fillerWordManager.removeWord(word)
+                                        removeWord(word)
                                     }
                                 }
                             }
@@ -109,11 +109,24 @@ struct FillerWordsSettingsView: View {
 
     private func addWord() {
         draftState
-            .submitting(existingWords: fillerWordManager.fillerWords)
+            .submitting(existingWords: fillerWords)
             .applyRuntimeState(
-                applyPlan: { fillerWordManager.applySubmissionPlan($0) },
+                applyPlan: applySubmissionPlan,
                 setDraftState: { draftState = $0 },
                 setAlertPresentation: { alertPresentation = $0 }
             )
+    }
+
+    private func applySubmissionPlan(_ plan: VoiceInkFillerWordSubmissionPlan) {
+        plan.applyRuntimeState(currentWords: fillerWords, setWords: setFillerWords)
+    }
+
+    private func removeWord(_ word: String) {
+        setFillerWords(VoiceInkFillerWords.removing(word, from: fillerWords))
+    }
+
+    private func setFillerWords(_ words: [String]) {
+        fillerWords = words
+        VoiceInkFillerWordPreference.saveWords(words)
     }
 }

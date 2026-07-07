@@ -7461,7 +7461,6 @@ reject_pattern \
   '"(DeepgramAPI|GeminiAPI|MistralAPI|ElevenLabsAPI|SonioxAPI|SpeechmaticsAPI|AssemblyAIAPI|XAIAPI)"' \
   VoiceInkCore/Sources/VoiceInkCore/DeepgramTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionRequest.swift \
-  VoiceInkCore/Sources/VoiceInkCore/MistralTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift \
@@ -7477,8 +7476,17 @@ reject_file VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionClient.sw
 reject_file VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionClient.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleTranscriptionClient.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionClient.swift
+reject_file VoiceInkCore/Sources/VoiceInkCore/MistralTranscriptionRequest.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/ElevenLabsTranscriptionRequest.swift
 reject_file VoiceInkCore/Sources/VoiceInkCore/XAITranscriptionRequest.swift
+
+reject_pattern \
+  "core tests and project metadata avoid obsolete Mistral transcription request files/tests" \
+  'MistralTranscriptionRequest\.swift|MistralTranscriptionRequestTests' \
+  VoiceInkCore/Tests/VoiceInkCoreTests \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
 
 reject_pattern \
   "core tests and project metadata avoid obsolete ElevenLabs transcription request files/tests" \
@@ -7581,12 +7589,88 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/RemoteTransport.swift \
   VoiceInkCore/Sources/VoiceInkCore/DeepgramTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionRequest.swift \
-  VoiceInkCore/Sources/VoiceInkCore/MistralTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift \
   VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyVerifier.swift
+
+require_patterns \
+  "shared Mistral transcription request and client live with remote transcription service" \
+  VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift \
+  'public struct VoiceInkPreparedMistralTranscriptionRequest' \
+  'public let request: URLRequest' \
+  'public let body: Data' \
+  'public init\(request: URLRequest, body: Data\)' \
+  'public enum VoiceInkMistralTranscriptionCodec' \
+  'public static func multipartContentType\(boundary: String\) -> String' \
+  'public static func requestBody' \
+  'public static func transcript\(from data: Data\) throws -> String' \
+  'public enum VoiceInkMistralRequestBuilder' \
+  'public static func makeTranscriptionRequest' \
+  'public static func makeModelsRequest' \
+  'public struct VoiceInkMistralTranscriptionClient' \
+  'public init\(\)' \
+  'public func transcribeAudioData' \
+  'public func verifyAPIKey\(baseURL: URL, apiKey: String\) async -> Bool' \
+  'public func verifyAPIKeyDetailed' \
+  'VoiceInkProviderEndpoint\.mistralAudioTranscriptionsURL' \
+  'VoiceInkProviderEndpoint\.mistralModelsURL' \
+  'VoiceInkRetriedRequest\.validatedUpload' \
+  'VoiceInkAPIKeyVerificationPolicy\.verify'
+
+require_patterns \
+  "Mistral public API proof uses normal VoiceInkCore import" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/MistralPublicAPITests.swift \
+  '^import VoiceInkCore$' \
+  'VoiceInkPreparedMistralTranscriptionRequest' \
+  'VoiceInkMistralRequestBuilder\.makeTranscriptionRequest' \
+  'VoiceInkMistralRequestBuilder\.makeModelsRequest' \
+  'VoiceInkMistralTranscriptionClient\(\)' \
+  'transcribeWithAllLabels' \
+  'transcribeWithDefaultedLabels' \
+  'client\.transcribeAudioData\(' \
+  'baseURL: VoiceInkProviderEndpoint\.mistralAPIBaseURL' \
+  'apiKey: "mistral-key"' \
+  'model: "voxtral-mini-latest"' \
+  'audioData: Data\("WAVDATA"\.utf8\)' \
+  'fileName: "sample\.wav"' \
+  'errorDomain: "MistralPublicAPITests"' \
+  'timeout: 30' \
+  'maxRetries: 2' \
+  'client\.verifyAPIKey\(' \
+  'client\.verifyAPIKeyDetailed\(' \
+  'VoiceInkAPIKeyVerificationResult' \
+  'VoiceInkMistralTranscriptionCodec\.transcript'
+
+reject_pattern \
+  "Mistral public API proof avoids conditional compilation snippets" \
+  '^[[:space:]]*#(if|elseif|else|endif)\b' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/MistralPublicAPITests.swift
+
+require_swift_static_function_body_pattern \
+  "Mistral public API proof keeps defaulted transcribe call short" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/MistralPublicAPITests.swift \
+  testMistralRequestClientAndCodecExposePublicAPI \
+  'let\s+transcribeWithDefaultedLabels\s*=\s*\{\s*try\s+await\s+client\.transcribeAudioData\s*\((?:(?!\b(?:fileName|errorDomain|timeout|maxRetries)\s*:).)*\bbaseURL\s*:(?:(?!\b(?:fileName|errorDomain|timeout|maxRetries)\s*:).)*\bapiKey\s*:(?:(?!\b(?:fileName|errorDomain|timeout|maxRetries)\s*:).)*\bmodel\s*:(?:(?!\b(?:fileName|errorDomain|timeout|maxRetries)\s*:).)*\baudioData\s*:(?:(?!\b(?:fileName|errorDomain|timeout|maxRetries)\s*:).)*\)\s*\}'
+
+reject_pattern \
+  "Mistral public API proof avoids testable import" \
+  '@testable import VoiceInkCore' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/MistralPublicAPITests.swift
+
+require_voiceink_core_check_runner_invocations \
+  "core checks execute Mistral public API proof" \
+  MistralPublicAPITests \
+  testMistralRequestClientAndCodecExposePublicAPI
+
+require_voiceink_core_check_runner_invocations \
+  "core checks execute Mistral remote provider request tests" \
+  RemoteProviderRequestTests \
+  testMistralTranscriptionRequestBuilderUsesMultipartAudioRequest \
+  testMistralModelsRequestBuilderUsesModelsEndpoint \
+  testMistralClientRejectsBlankAPIKeyWithoutNetwork \
+  testMistralTranscriptionCodecReturnsTextIncludingEmptyString
 
 require_patterns \
   "shared ElevenLabs transcription request and client live with remote transcription service" \
@@ -7696,11 +7780,11 @@ require_voiceink_core_check_runner_invocations \
   testXAITranscriptionCodecReturnsText
 
 require_patterns \
-  "migration docs record ElevenLabs and xAI request helper colocation" \
+  "migration docs record Mistral, ElevenLabs, and xAI request helper colocation" \
   docs/ios-single-repo-migration.md \
-  'ElevenLabs and xAI request/client helpers colocated in the remote transcription service module' \
+  'Mistral, ElevenLabs, and xAI request/client helpers colocated in the remote transcription service module' \
   'xAI request/client helpers colocated in the remote transcription service module' \
-  'standalone `ElevenLabsTranscriptionRequest\.swift` and `XAITranscriptionRequest\.swift` stay deleted'
+  'standalone `MistralTranscriptionRequest\.swift`, `ElevenLabsTranscriptionRequest\.swift`, and `XAITranscriptionRequest\.swift` stay deleted'
 
 section "obsolete standalone Cartesia API-key client module stays deleted"
 reject_file VoiceInkCore/Sources/VoiceInkCore/CartesiaAPIKeyClient.swift
@@ -7778,7 +7862,6 @@ reject_pattern \
   VoiceInkCore/Sources/VoiceInkCore/RemoteTransport.swift \
   VoiceInkCore/Sources/VoiceInkCore/DeepgramTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/GeminiTranscriptionRequest.swift \
-  VoiceInkCore/Sources/VoiceInkCore/MistralTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift \
@@ -7831,7 +7914,6 @@ require_pattern \
   "shared retried remote transcription clients use validated retry helper" \
   'VoiceInkRetriedRequest\.validated(Data|Upload)' \
   VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleTranscriptionRequest.swift \
-  VoiceInkCore/Sources/VoiceInkCore/MistralTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift \
@@ -7956,7 +8038,6 @@ reject_pattern \
   "retried remote transcription clients avoid raw retried response handling" \
   'VoiceInkRetriedRequest\.(data|upload)\(|VoiceInkRemoteHTTPResponsePolicy\.validateSuccess' \
   VoiceInkCore/Sources/VoiceInkCore/OpenAICompatibleTranscriptionRequest.swift \
-  VoiceInkCore/Sources/VoiceInkCore/MistralTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SonioxTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/SpeechmaticsTranscriptionRequest.swift \
   VoiceInkCore/Sources/VoiceInkCore/AssemblyAITranscriptionRequest.swift \

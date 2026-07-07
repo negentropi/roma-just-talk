@@ -30,18 +30,29 @@ final class ElevenLabsPublicAPITests: XCTestCase {
         XCTAssertEqual(userRequest.url?.absoluteString, "https://api.elevenlabs.io/v1/user")
 
         let client = VoiceInkElevenLabsTranscriptionClient()
-        let transcribeAudioData: (
-            URL,
-            String,
-            String,
-            Data,
-            String,
-            String?,
-            String,
-            TimeInterval,
-            Int
-        ) async throws -> String = client.transcribeAudioData
-        _ = transcribeAudioData
+        let transcribeWithAllLabels = {
+            try await client.transcribeAudioData(
+                baseURL: VoiceInkProviderEndpoint.elevenLabsAPIBaseURL,
+                apiKey: "eleven-key",
+                model: "scribe_v2",
+                audioData: Data("WAVDATA".utf8),
+                fileName: "sample.wav",
+                language: "en",
+                errorDomain: "ElevenLabsPublicAPITests",
+                timeout: 30,
+                maxRetries: 2
+            )
+        }
+        let transcribeWithDefaultedLabels = {
+            try await client.transcribeAudioData(
+                baseURL: VoiceInkProviderEndpoint.elevenLabsAPIBaseURL,
+                apiKey: "eleven-key",
+                model: "scribe_v2",
+                audioData: Data("WAVDATA".utf8)
+            )
+        }
+        _ = transcribeWithAllLabels
+        _ = transcribeWithDefaultedLabels
 
         let blankAPIKeyIsValid = await client.verifyAPIKey(
             baseURL: VoiceInkProviderEndpoint.elevenLabsAPIBaseURL,

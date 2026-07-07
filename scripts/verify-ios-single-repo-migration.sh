@@ -673,13 +673,14 @@ swift_declaration_body_pattern_status() {
     open my $fh, "<", $file or die "open $file: $!";
     local $/;
     my $source = <$fh>;
+    my $code = mask_swift_non_code($source);
     my $declaration = qr/\b(?:(?:public|private|fileprivate|internal|open|final|indirect|nonisolated|\@MainActor|\@unchecked|\@preconcurrency)\s+)*(?:struct|enum|class|actor)\s+\Q$declaration_name\E\b[^{]*\{/;
-    exit 2 unless $source =~ /$declaration/g;
-    my $open_brace = pos($source) - 1;
+    exit 2 unless $code =~ /$declaration/g;
+    my $open_brace = pos($code) - 1;
     my $depth = 0;
     my $close_brace;
-    for (my $index = $open_brace; $index < length($source); $index++) {
-      my $char = substr($source, $index, 1);
+    for (my $index = $open_brace; $index < length($code); $index++) {
+      my $char = substr($code, $index, 1);
       if ($char eq "{") {
         $depth++;
       } elsif ($char eq "}") {
@@ -692,8 +693,154 @@ swift_declaration_body_pattern_status() {
     }
 
     exit 2 unless defined $close_brace;
-    my $body = substr($source, $open_brace + 1, $close_brace - $open_brace - 1);
+    my $body = substr($code, $open_brace + 1, $close_brace - $open_brace - 1);
     exit($body =~ /$pattern/s ? 0 : 1);
+
+    sub mask_swift_non_code {
+      my ($text) = @_;
+      my $masked = $text;
+      my $length = length($text);
+      my $index = 0;
+      while ($index < $length) {
+        my $pair = substr($text, $index, 2);
+        if ($pair eq "//") {
+          my $start = $index;
+          $index += 2;
+          $index++ while $index < $length && substr($text, $index, 1) ne "\n";
+          mask_span(\$masked, $start, $index);
+          next;
+        }
+        if ($pair eq "/*") {
+          my $start = $index;
+          $index = find_swift_block_comment_end($text, $index + 2);
+          mask_span(\$masked, $start, $index);
+          next;
+        }
+
+        my $hash_count = 0;
+        $hash_count++ while substr($text, $index + $hash_count, 1) eq "#";
+        my $quote_start = $index + $hash_count;
+        my $quote = substr($text, $quote_start, 1);
+        if ($quote eq "\"") {
+          my $start = $index;
+          if (substr($text, $quote_start, 3) eq "\"\"\"") {
+            $index = find_swift_multiline_string_end($text, $quote_start + 3, $hash_count);
+          } else {
+            $index = find_swift_string_end($text, $quote_start + 1, $hash_count);
+          }
+          mask_span(\$masked, $start, $index);
+          next;
+        }
+
+        $index++;
+      }
+      return $masked;
+    }
+
+    sub find_swift_string_end {
+      my ($text, $index, $hash_count) = @_;
+      my $length = length($text);
+      while ($index < $length) {
+        my $char = substr($text, $index, 1);
+        my $interpolation = "\\" . ("#" x $hash_count) . "(";
+        if (substr($text, $index, length($interpolation)) eq $interpolation) {
+          $index = find_swift_interpolation_end($text, $index + length($interpolation));
+          next;
+        }
+        if ($hash_count == 0 && $char eq "\\") {
+          $index += 2;
+          next;
+        }
+        if ($char eq "\"" && substr($text, $index + 1, $hash_count) eq ("#" x $hash_count)) {
+          return $index + 1 + $hash_count;
+        }
+        $index++;
+      }
+      return $length;
+    }
+
+    sub find_swift_multiline_string_end {
+      my ($text, $index, $hash_count) = @_;
+      my $length = length($text);
+      my $close = "\"\"\"" . ("#" x $hash_count);
+      my $interpolation = "\\" . ("#" x $hash_count) . "(";
+      while ($index < $length) {
+        if (substr($text, $index, length($interpolation)) eq $interpolation) {
+          $index = find_swift_interpolation_end($text, $index + length($interpolation));
+          next;
+        }
+        if (substr($text, $index, length($close)) eq $close) {
+          return $index + length($close);
+        }
+        $index++;
+      }
+      return $length;
+    }
+
+    sub find_swift_interpolation_end {
+      my ($text, $index) = @_;
+      my $length = length($text);
+      my $depth = 1;
+      while ($index < $length && $depth > 0) {
+        my $pair = substr($text, $index, 2);
+        if ($pair eq "//") {
+          $index += 2;
+          $index++ while $index < $length && substr($text, $index, 1) ne "\n";
+          next;
+        }
+        if ($pair eq "/*") {
+          $index = find_swift_block_comment_end($text, $index + 2);
+          next;
+        }
+
+        my $hash_count = 0;
+        $hash_count++ while substr($text, $index + $hash_count, 1) eq "#";
+        my $quote_start = $index + $hash_count;
+        if (substr($text, $quote_start, 1) eq "\"") {
+          if (substr($text, $quote_start, 3) eq "\"\"\"") {
+            $index = find_swift_multiline_string_end($text, $quote_start + 3, $hash_count);
+          } else {
+            $index = find_swift_string_end($text, $quote_start + 1, $hash_count);
+          }
+          next;
+        }
+
+        my $char = substr($text, $index, 1);
+        if ($char eq "(") {
+          $depth++;
+        } elsif ($char eq ")") {
+          $depth--;
+        }
+        $index++;
+      }
+      return $index;
+    }
+
+    sub find_swift_block_comment_end {
+      my ($text, $index) = @_;
+      my $length = length($text);
+      my $depth = 1;
+      while ($index < $length && $depth > 0) {
+        my $pair = substr($text, $index, 2);
+        if ($pair eq "/*") {
+          $depth++;
+          $index += 2;
+        } elsif ($pair eq "*/") {
+          $depth--;
+          $index += 2;
+        } else {
+          $index++;
+        }
+      }
+      return $index;
+    }
+
+    sub mask_span {
+      my ($target, $start, $end) = @_;
+      my $span = substr($$target, $start, $end - $start);
+      $span =~ s/[^\n]/ /g;
+      substr($$target, $start, $end - $start) = $span;
+    }
   ' "$declaration_name" "$pattern" "$file"
 }
 
@@ -8268,7 +8415,7 @@ require_swift_declaration_body_pattern \
   "AssemblyAI folded builder owns upload, create, status, and verification request shape" \
   VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift \
   VoiceInkAssemblyAIRequestBuilder \
-  'makeUploadAudioRequest.*VoiceInkProviderEndpoint\.assemblyAIUploadURL.*Authorization.*application/octet-stream.*makeCreateTranscriptRequest.*speechModels.*language_code.*language_detection.*prompt.*keyterms_prompt.*makeTranscriptStatusRequest.*VoiceInkProviderEndpoint\.assemblyAITranscriptURL.*makeTranscriptsRequest.*VoiceInkProviderEndpoint\.assemblyAITranscriptsURL'
+  'makeUploadAudioRequest.*VoiceInkProviderEndpoint\.assemblyAIUploadURL.*setValue.*makeCreateTranscriptRequest.*speechModels.*normalizedKeyterms.*supportsPrompt.*appendedKeyterms.*makeTranscriptStatusRequest.*VoiceInkProviderEndpoint\.assemblyAITranscriptURL.*makeTranscriptsRequest.*VoiceInkProviderEndpoint\.assemblyAITranscriptsURL'
 
 reject_swift_declaration_body_pattern \
   "AssemblyAI folded builder avoids provider-local validators" \

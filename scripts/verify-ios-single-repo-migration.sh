@@ -185,7 +185,6 @@ voiceink_core_public_import_tests=(
   VoiceInkCore/Tests/VoiceInkCoreTests/AppIdentityTests.swift
   VoiceInkCore/Tests/VoiceInkCoreTests/StoredAudioFileTests.swift
   VoiceInkCore/Tests/VoiceInkCoreTests/UserDefaultsSettingsBackupPolicyTests.swift
-  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunPreparationTests.swift
   VoiceInkCore/Tests/VoiceInkCoreTests/RecordingFeedbackPreferenceTests.swift
   VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift
   VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionModelCatalogTests.swift
@@ -12204,8 +12203,8 @@ require_pattern \
   VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift
 
 require_patterns \
-  "transcription run preparation tests cover folded prompt-use policy" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunPreparationTests.swift \
+  "transcription run processor tests cover folded prompt-use policy" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunProcessorTests.swift \
   'testNonBlankRequestPromptDropsBlankAndPreservesOriginalText' \
   'testRecordedFilePromptUseKeepsSupportedProviderPrompts' \
   'testRecordedFilePromptUseDropsUnsupportedProviderPrompts' \
@@ -12215,16 +12214,16 @@ require_patterns \
 require_patterns \
   "core checks execute folded transcription prompt-use tests" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'TranscriptionRunPreparationTests\.testNonBlankRequestPromptDropsBlankAndPreservesOriginalText' \
-  'TranscriptionRunPreparationTests\(\)\.testNonBlankRequestPromptDropsBlankAndPreservesOriginalText\(\)' \
-  'TranscriptionRunPreparationTests\.testRecordedFilePromptUseKeepsSupportedProviderPrompts' \
-  'TranscriptionRunPreparationTests\(\)\.testRecordedFilePromptUseKeepsSupportedProviderPrompts\(\)' \
-  'TranscriptionRunPreparationTests\.testRecordedFilePromptUseDropsUnsupportedProviderPrompts' \
-  'TranscriptionRunPreparationTests\(\)\.testRecordedFilePromptUseDropsUnsupportedProviderPrompts\(\)' \
-  'TranscriptionRunPreparationTests\.testStreamingPromptUseKeepsOnlyAssemblyAIPrompts' \
-  'TranscriptionRunPreparationTests\(\)\.testStreamingPromptUseKeepsOnlyAssemblyAIPrompts\(\)' \
-  'TranscriptionRunPreparationTests\.testDirectTranscriptionPromptUseKeepsPrompt' \
-  'TranscriptionRunPreparationTests\(\)\.testDirectTranscriptionPromptUseKeepsPrompt\(\)'
+  'TranscriptionRunProcessorTests\.testNonBlankRequestPromptDropsBlankAndPreservesOriginalText' \
+  'TranscriptionRunProcessorTests\(\)\.testNonBlankRequestPromptDropsBlankAndPreservesOriginalText\(\)' \
+  'TranscriptionRunProcessorTests\.testRecordedFilePromptUseKeepsSupportedProviderPrompts' \
+  'TranscriptionRunProcessorTests\(\)\.testRecordedFilePromptUseKeepsSupportedProviderPrompts\(\)' \
+  'TranscriptionRunProcessorTests\.testRecordedFilePromptUseDropsUnsupportedProviderPrompts' \
+  'TranscriptionRunProcessorTests\(\)\.testRecordedFilePromptUseDropsUnsupportedProviderPrompts\(\)' \
+  'TranscriptionRunProcessorTests\.testStreamingPromptUseKeepsOnlyAssemblyAIPrompts' \
+  'TranscriptionRunProcessorTests\(\)\.testStreamingPromptUseKeepsOnlyAssemblyAIPrompts\(\)' \
+  'TranscriptionRunProcessorTests\.testDirectTranscriptionPromptUseKeepsPrompt' \
+  'TranscriptionRunProcessorTests\(\)\.testDirectTranscriptionPromptUseKeepsPrompt\(\)'
 
 reject_pattern \
   "core tests and project metadata avoid obsolete standalone transcription prompt-use test suite" \
@@ -12669,9 +12668,10 @@ require_patterns \
 
 require_patterns \
   "AI prompt public API proof uses normal VoiceInkCore import" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunPreparationTests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift \
   '^import VoiceInkCore$' \
-  'final class TranscriptionRunPreparationTests' \
+  'final class RemoteProviderRequestTests' \
+  'func testAIPromptSymbolsExposePublicAPI\(\) throws' \
   'VoiceInkAIPrompts\.customPromptTemplate' \
   'VoiceInkAIPrompts\.finalPromptText' \
   'VoiceInkAIRequestPrompts\.postProcessingSystemPrompt' \
@@ -12690,12 +12690,12 @@ require_patterns \
 reject_pattern \
   "AI prompt public API proof avoids testable import" \
   '@testable import VoiceInkCore' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunPreparationTests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift
 
 require_voiceink_core_check_runner_invocations \
   "core checks execute AI prompt public API proof" \
-  TranscriptionRunPreparationTests \
-  testMovedAIPromptSymbolsExposePublicAPI
+  RemoteProviderRequestTests \
+  testAIPromptSymbolsExposePublicAPI
 
 require_pattern \
   "shared run processor uses shared transcription run preparation" \
@@ -12830,21 +12830,21 @@ require_pattern \
 require_pattern \
   "core tests pin shared enhancement text plan output" \
   'testEnhancementTextPlanFiltersPreparesAndSelectsEnhancementText|testEnhancementTextPlanCanUseAlreadyFilteredText' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunPreparationTests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunProcessorTests.swift
 
 require_pattern \
   "core tests pin audio-file transcription text plan output" \
   'testAudioFileTextPlanFiltersPreparesAndSelectsEnhancementText' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunPreparationTests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunProcessorTests.swift
 
 require_pattern \
   "core tests pin audio-file transcription text plan skip policy" \
   'testAudioFileTextPlanSkipUsesEnhancementTextAndPromptTrigger' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunPreparationTests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunProcessorTests.swift
 
 require_patterns \
   "core tests pin folded post-processing skip policy coverage" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunPreparationTests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunProcessorTests.swift \
   'testPostProcessingSkipCurrentConfigurationUsesSharedDefaultsWhenUnset' \
   'testPostProcessingSkipCurrentConfigurationReadsSharedStorageKeys' \
   'testPostProcessingSkipDisabledPolicyNeverSkipsPostProcessing' \
@@ -12855,9 +12855,10 @@ require_patterns \
 
 require_patterns \
   "public API tests cover folded transcription run preparation surface" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunPreparationTests.swift \
+  VoiceInkCore/Tests/VoiceInkCoreTests/LocalWhisperTranscriptionFlowTests.swift \
   '^import VoiceInkCore$' \
-  'final class TranscriptionRunPreparationTests' \
+  'final class LocalWhisperTranscriptionFlowTests' \
+  'func testTranscriptionRunPreparationSymbolsExposePublicAPI\(\)' \
   'VoiceInkPostProcessingSkipConfiguration' \
   'VoiceInkPostProcessingSkipPolicy\.shouldSkipPostProcessing' \
   'VoiceInkWordCounter\.count' \
@@ -12869,10 +12870,21 @@ require_patterns \
 reject_pattern \
   "folded transcription run preparation public API proof avoids testable import" \
   '@testable import VoiceInkCore' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunPreparationTests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/LocalWhisperTranscriptionFlowTests.swift
 
 section "obsolete standalone transcription run preparation public API proof stays deleted"
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunPreparationPublicAPITests.swift
+
+section "obsolete mixed transcription run preparation test suite stays deleted"
+reject_file VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunPreparationTests.swift
+
+reject_pattern \
+  "VoiceInkCore tests and metadata avoid stale mixed transcription run preparation suite" \
+  'TranscriptionRunPreparationTests(\.swift)?' \
+  VoiceInkCore/Tests/VoiceInkCoreTests \
+  VoiceInkCore/Package.swift \
+  VoiceInk.xcodeproj/project.pbxproj \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj
 
 reject_pattern \
   "VoiceInkCore metadata and runner avoid stale standalone transcription run preparation public API proof" \
@@ -12905,26 +12917,26 @@ require_pattern \
 require_patterns \
   "core check runner executes folded post-processing skip policy tests" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'TranscriptionRunPreparationTests\.testPostProcessingSkipCurrentConfigurationUsesSharedDefaultsWhenUnset' \
-  'TranscriptionRunPreparationTests\.testPostProcessingSkipCurrentConfigurationReadsSharedStorageKeys' \
-  'TranscriptionRunPreparationTests\.testPostProcessingSkipDisabledPolicyNeverSkipsPostProcessing' \
-  'TranscriptionRunPreparationTests\.testPostProcessingSkipEnabledPolicySkipsAtOrBelowThreshold' \
-  'TranscriptionRunPreparationTests\.testPostProcessingSkipEnabledPolicyKeepsPostProcessingAboveThreshold' \
-  'TranscriptionRunPreparationTests\.testPostProcessingSkipPromptTriggerForcesPostProcessingForShortTranscript' \
-  'TranscriptionRunPreparationTests\.testPostProcessingSkipNonPositiveThresholdFallsBackToExistingDefault' \
-  'TranscriptionRunPreparationTests\(\)\.testPostProcessingSkipCurrentConfigurationUsesSharedDefaultsWhenUnset' \
-  'TranscriptionRunPreparationTests\(\)\.testPostProcessingSkipCurrentConfigurationReadsSharedStorageKeys' \
-  'TranscriptionRunPreparationTests\(\)\.testPostProcessingSkipDisabledPolicyNeverSkipsPostProcessing' \
-  'TranscriptionRunPreparationTests\(\)\.testPostProcessingSkipEnabledPolicySkipsAtOrBelowThreshold' \
-  'TranscriptionRunPreparationTests\(\)\.testPostProcessingSkipEnabledPolicyKeepsPostProcessingAboveThreshold' \
-  'TranscriptionRunPreparationTests\(\)\.testPostProcessingSkipPromptTriggerForcesPostProcessingForShortTranscript' \
-  'TranscriptionRunPreparationTests\(\)\.testPostProcessingSkipNonPositiveThresholdFallsBackToExistingDefault'
+  'TranscriptionRunProcessorTests\.testPostProcessingSkipCurrentConfigurationUsesSharedDefaultsWhenUnset' \
+  'TranscriptionRunProcessorTests\.testPostProcessingSkipCurrentConfigurationReadsSharedStorageKeys' \
+  'TranscriptionRunProcessorTests\.testPostProcessingSkipDisabledPolicyNeverSkipsPostProcessing' \
+  'TranscriptionRunProcessorTests\.testPostProcessingSkipEnabledPolicySkipsAtOrBelowThreshold' \
+  'TranscriptionRunProcessorTests\.testPostProcessingSkipEnabledPolicyKeepsPostProcessingAboveThreshold' \
+  'TranscriptionRunProcessorTests\.testPostProcessingSkipPromptTriggerForcesPostProcessingForShortTranscript' \
+  'TranscriptionRunProcessorTests\.testPostProcessingSkipNonPositiveThresholdFallsBackToExistingDefault' \
+  'TranscriptionRunProcessorTests\(\)\.testPostProcessingSkipCurrentConfigurationUsesSharedDefaultsWhenUnset' \
+  'TranscriptionRunProcessorTests\(\)\.testPostProcessingSkipCurrentConfigurationReadsSharedStorageKeys' \
+  'TranscriptionRunProcessorTests\(\)\.testPostProcessingSkipDisabledPolicyNeverSkipsPostProcessing' \
+  'TranscriptionRunProcessorTests\(\)\.testPostProcessingSkipEnabledPolicySkipsAtOrBelowThreshold' \
+  'TranscriptionRunProcessorTests\(\)\.testPostProcessingSkipEnabledPolicyKeepsPostProcessingAboveThreshold' \
+  'TranscriptionRunProcessorTests\(\)\.testPostProcessingSkipPromptTriggerForcesPostProcessingForShortTranscript' \
+  'TranscriptionRunProcessorTests\(\)\.testPostProcessingSkipNonPositiveThresholdFallsBackToExistingDefault'
 
 require_patterns \
   "core check runner executes folded transcription run public API proof" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'TranscriptionRunPreparationTests\.testMovedTranscriptionRunPreparationSymbolsExposePublicAPI' \
-  'TranscriptionRunPreparationTests\(\)\.testMovedTranscriptionRunPreparationSymbolsExposePublicAPI\(\)'
+  'LocalWhisperTranscriptionFlowTests\.testTranscriptionRunPreparationSymbolsExposePublicAPI' \
+  'LocalWhisperTranscriptionFlowTests\(\)\.testTranscriptionRunPreparationSymbolsExposePublicAPI\(\)'
 
 reject_pattern \
   "macOS transcription callers avoid shell-only Power Mode metadata selection" \
@@ -13086,17 +13098,17 @@ require_voiceink_core_check_runner_invocations \
 require_pattern \
   "AI enhancement retry folded public API proof uses normal VoiceInkCore import" \
   '^import VoiceInkCore$' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunPreparationTests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift
 
 reject_pattern \
   "AI enhancement retry folded public API proof avoids testable import" \
   '@testable import VoiceInkCore' \
-  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunPreparationTests.swift
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift
 
 require_patterns \
   "AI enhancement retry folded public API proof preserves moved symbols" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunPreparationTests.swift \
-  'func testMovedAIEnhancementRetrySymbolsExposePublicAPI\(\) async throws' \
+  VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift \
+  'func testAIEnhancementRetrySymbolsExposePublicAPI\(\) async throws' \
   'VoiceInkAIEnhancementError\.transportFailure\(\.missingAPIKey\)' \
   'VoiceInkAIEnhancementError\.localCLIExecutionFailure' \
   'VoiceInkLocalCLIExecutionError\.timeout\(seconds: 45\.9\)' \
@@ -13123,8 +13135,8 @@ reject_pattern \
 
 require_voiceink_core_check_runner_invocations \
   "core check runner executes folded AI enhancement retry public API proof" \
-  TranscriptionRunPreparationTests \
-  testMovedAIEnhancementRetrySymbolsExposePublicAPI
+  RemoteProviderRequestTests \
+  testAIEnhancementRetrySymbolsExposePublicAPI
 
 section "obsolete standalone AI prompt public API proof stays deleted"
 reject_file VoiceInkCore/Tests/VoiceInkCoreTests/AIPromptPublicAPITests.swift
@@ -21630,8 +21642,8 @@ reject_swift_pattern \
   VoiceInkCore/Tests/VoiceInkCoreTests
 
 require_patterns \
-  "word-counter behavior tests live with transcription run preparation tests" \
-  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunPreparationTests.swift \
+  "word-counter behavior tests live with transcription run processor tests" \
+  VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunProcessorTests.swift \
   'testWordCounterCountsNaturalLanguageWords' \
   'testWordCounterIgnoresWhitespaceOnlyText' \
   'testWordCounterCountsWordsAcrossPunctuation' \
@@ -21648,14 +21660,14 @@ require_patterns \
   'VoiceInkWordCounter\.count\(in: "Yes, Roma works\.", language: \.english\)'
 
 require_patterns \
-  "core checks execute word-counter tests through transcription run preparation suite" \
+  "core checks execute word-counter tests through transcription run processor suite" \
   VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift \
-  'TranscriptionRunPreparationTests\.testWordCounterCountsNaturalLanguageWords' \
-  'TranscriptionRunPreparationTests\(\)\.testWordCounterCountsNaturalLanguageWords\(\)' \
-  'TranscriptionRunPreparationTests\.testWordCounterIgnoresWhitespaceOnlyText' \
-  'TranscriptionRunPreparationTests\(\)\.testWordCounterIgnoresWhitespaceOnlyText\(\)' \
-  'TranscriptionRunPreparationTests\.testWordCounterCountsWordsAcrossPunctuation' \
-  'TranscriptionRunPreparationTests\(\)\.testWordCounterCountsWordsAcrossPunctuation\(\)'
+  'TranscriptionRunProcessorTests\.testWordCounterCountsNaturalLanguageWords' \
+  'TranscriptionRunProcessorTests\(\)\.testWordCounterCountsNaturalLanguageWords\(\)' \
+  'TranscriptionRunProcessorTests\.testWordCounterIgnoresWhitespaceOnlyText' \
+  'TranscriptionRunProcessorTests\(\)\.testWordCounterIgnoresWhitespaceOnlyText\(\)' \
+  'TranscriptionRunProcessorTests\.testWordCounterCountsWordsAcrossPunctuation' \
+  'TranscriptionRunProcessorTests\(\)\.testWordCounterCountsWordsAcrossPunctuation\(\)'
 
 require_patterns \
   "core checks execute explicit-language word-counter test through transcription run processor suite" \

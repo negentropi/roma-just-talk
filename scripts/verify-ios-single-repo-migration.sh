@@ -11571,6 +11571,11 @@ require_pattern \
   'DictionaryService\.removeVocabularyWord\(word, context: modelContext\)' \
   VoiceInk/Views/Dictionary/VocabularyView.swift
 
+require_multiline_pattern \
+  "macOS DictionaryService preserves vocabulary delete persistence semantics" \
+  '(?s)static func removeVocabularyWord\(.*context\.delete\(word\).*try context\.save\(\).*context\.rollback\(\).*VoiceInkDictionaryAlertPresentation\.failedToRemoveVocabularyWord' \
+  VoiceInk/Services/DictionaryService.swift
+
 reject_pattern \
   "macOS vocabulary view avoids shell-owned delete persistence" \
   'modelContext\.delete\(word\)|try modelContext\.save\(\)|failedToRemoveVocabularyWord' \

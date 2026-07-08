@@ -12,6 +12,6 @@ The macOS app remains behavior source-of-truth. iOS imports this package only fo
 The detailed shared-module inventory and deletion gates live in `docs/ios-single-repo-migration.md`.
 
 Verification:
-- From the repo root, run `scripts/verify-ios-single-repo-migration.sh` for the shared-core plus macOS/iOS static gates.
-- For only the package checks, run `swift run VoiceInkCoreChecks`.
+- From the repo root, run `scripts/verify-ios-single-repo-migration.sh` for migration config gates.
+- For shared behavior checks, run `swift run --package-path VoiceInkCore VoiceInkCoreChecks`.
 - On the current Command Line Tools-only setup, `swift test` builds but cannot import XCTest or Swift Testing, so it does not execute the core checks.

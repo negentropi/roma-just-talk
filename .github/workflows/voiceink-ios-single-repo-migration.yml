@@ -32,23 +32,36 @@ jobs:
   verify:
     name: Verify single-repo migration
     runs-on: macos-26
-    timeout-minutes: 30
+    timeout-minutes: 90
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Install verifier tools
-        run: brew install fd ripgrep
 
       - name: Show toolchain
         run: |
           xcode-select -p
           xcodebuild -version
           swift --version
-          xcrun --version
-          fd --version
-          rg --version
 
-      - name: Run migration verifier
+      - name: Run config verifier
         run: bash scripts/verify-ios-single-repo-migration.sh
+
+      - name: Run VoiceInkCore checks
+        run: swift run --package-path VoiceInkCore VoiceInkCoreChecks
+
+      - name: Prepare local Whisper framework
+        run: make setup
+
+      - name: Build macOS app
+        run: make local CONFIGURATION=Release
+
+      - name: Build iOS app
+        run: |
+          xcodebuild build \
+            -workspace VoiceInk.xcworkspace \
+            -scheme VoiceInk-ios \
+            -configuration Debug \
+            -destination "generic/platform=iOS Simulator" \
+            -derivedDataPath "$PWD/.local-build-ios" \
+            CODE_SIGNING_ALLOWED=NO

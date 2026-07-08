@@ -349,7 +349,7 @@ macOS app-local storage roots are provided by `VoiceInkMacOSStorageDirectories` 
 
 ## Sibling Clone Status
 
-The remaining Swift files present in `../VoiceInk-iOS/VoiceInk-ios` but not in `VoiceInk/iOS/VoiceInk-ios` are old clone-side sources, except where noted. `scripts/verify-ios-single-repo-migration.sh` now fails if any of these obsolete app-target duplicates are copied back under `iOS/VoiceInk-ios/` or named by `iOS/VoiceInk-ios.xcodeproj/project.pbxproj`; the sibling keyboard, unit-test, and UI-test target folders must have no sibling-only Swift files except the documented obsolete UI-test launch screenshot template.
+The remaining Swift files present in `../VoiceInk-iOS/VoiceInk-ios` but not in `VoiceInk/iOS/VoiceInk-ios` are old clone-side sources, except where noted. Do not copy these obsolete app-target duplicates back under `iOS/VoiceInk-ios/`; the sibling keyboard, unit-test, and UI-test target folders must have no sibling-only Swift files except the documented obsolete UI-test launch screenshot template.
 
 - `AppGroupCoordinator.swift`: moved into `iOS/Shared/AppGroupCoordinator.swift`; start-recording requests now use `VoiceInkAppDeepLink` from `VoiceInkCore`, while `VoiceInkAppGroupRecordingStatePolicy` supplies App Group recording state decisions, read-plan stale-repair runtime application, stale-state repair mutation plans, write-plan runtime application/order, mutation notification names, mutation write/notification runtime ordering, and diagnostic copy, and the iOS shared shell still handles stop requests, UserDefaults access, URL opening, OSLog delivery, and keyboard recording-state notification delivery.
 
@@ -377,16 +377,18 @@ Do not copy these files back into `VoiceInk/iOS`. If behavior from one appears m
 
 Before treating `../VoiceInk-iOS` as obsolete, verify current state from `VoiceInk/`:
 
-Run the bundled static verifier first:
+Run the bundled config verifier first:
 
 ```bash
 scripts/verify-ios-single-repo-migration.sh
 ```
 
-When real Xcode, app dependencies, and the iOS platform are installed, run the same verifier with app builds enabled:
+Then run the compiler checks and app builds as separate proof commands:
 
 ```bash
-scripts/verify-ios-single-repo-migration.sh --full-build
+swift run --package-path VoiceInkCore VoiceInkCoreChecks
+make local CONFIGURATION=Release
+xcodebuild build -workspace VoiceInk.xcworkspace -scheme VoiceInk-ios -configuration Debug -destination "generic/platform=iOS Simulator" CODE_SIGNING_ALLOWED=NO
 ```
 
 1. `VoiceInk.xcworkspace` includes `iOS/VoiceInk-ios.xcodeproj`, the shared iOS scheme includes the unit-test and UI-test bundles, and Xcode metadata does not reference the sibling `VoiceInk-iOS` clone.
@@ -462,4 +464,4 @@ scripts/verify-ios-single-repo-migration.sh --full-build
 69. macOS license startup, diagnostics, Polar adapter, secure-storage adapter, and license-management presentation route non-sensitive license preference keys, license startup/trial lifecycle, validation feedback/application planning/runtime application, purchase/management URL policy, support-link metadata, activation/deactivation copy, trial-banner presentation, feature copy/icons, removal/reset planning, activation-required storage, first-launch storage, activation-limit storage, fallback device-id storage, stored-license access predicates, license Keychain account names, trial-start timestamp coding, device-local syncability, Polar endpoint/request DTOs, granted/activation-required response policy, HTTP error mapping, response-body fallback text, and response status-code extraction through `VoiceInkLicensePreference`/`VoiceInkLicenseStartupPolicy`/`VoiceInkLicenseValidationPolicy`/`VoiceInkLicenseLinks`/`VoiceInkLicenseManagementPresentation`/`VoiceInkLicenseTrialBannerPresentation`/`VoiceInkLicenseRemovalPolicy`/`VoiceInkLicenseSecureStorageAccount`/`VoiceInkLicenseSecureStoragePolicy`/`VoiceInkLicenseServicePolicy`, with Keychain execution, serial-number lookup, `URLSession`, AppKit URL opening, notification posting, SwiftUI colors/layout, and UI state remaining in the macOS shell. The obsolete raw-copy `LicenseView.swift` stays deleted so license UI enters through the shared-presentation `LicenseManagementView`.
 70. A real Xcode toolchain is selected and both app targets build.
 
-Current full-build blockers: `xcode-select -p` points to `/Library/Developer/CommandLineTools`, no `Xcode.app` is visible under `/Applications` or `/Volumes`, `/Users/atalphalnmomhappyhouse/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework` is missing, and the iphonesimulator SDK is unavailable. Full target builds are still environment-blocked until a real Xcode is selected, the shared Whisper framework exists, and the iOS simulator platform is installed. Until those are present, `scripts/verify-ios-single-repo-migration.sh` is the local proof gate; `--full-build` preflights those prerequisites before running app builds, and when SwiftPM is blocked by `sandbox-exec`, the script builds and runs `VoiceInkCoreChecks` and `VoiceInkAudioProof` through direct `swiftc` fallback paths.
+Current local build blockers: `xcode-select -p` points to `/Library/Developer/CommandLineTools`, no `Xcode.app` is visible under `/Applications` or `/Volumes`, `/Users/atalphalnmomhappyhouse/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework` is missing, and the iphonesimulator SDK is unavailable. Full target builds are still environment-blocked locally until a real Xcode is selected, the shared Whisper framework exists, and the iOS simulator platform is installed. The migration verifier is intentionally config-only; `VoiceInkCoreChecks` and app builds run as separate commands and CI steps.

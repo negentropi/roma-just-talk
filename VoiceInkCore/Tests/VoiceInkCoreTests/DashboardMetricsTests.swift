@@ -1,5 +1,5 @@
 import Foundation
-@testable import VoiceInkCore
+import VoiceInkCore
 
 final class DashboardMetricsTests: XCTestCase {
     func testValuesUseEnhancedTextForWordCountWhenEnhancementWasAttempted() {
@@ -684,14 +684,15 @@ final class DashboardMetricsTests: XCTestCase {
     }
 
     func testModelStatFormatsSharedPresentationText() {
-        let stat = VoiceInkPerformanceModelStat(
-            name: "fast",
-            sampleCount: 1,
-            totalProcessingTime: 2,
-            avgProcessingTime: 2.34,
-            avgAudioDuration: 10,
-            speedFactor: 5.04
-        )
+        let stat = VoiceInkPerformanceAnalyzer.transcriptionModelStats(
+            from: [
+                PerformanceAnalysisRecord(
+                    audioDuration: 11.7936,
+                    transcriptionModelName: "fast",
+                    transcriptionDuration: 2.34
+                )
+            ]
+        )[0]
 
         XCTAssertEqual(stat.speedFactorText, "5.0x")
         XCTAssertEqual(stat.speedFactorRealtimeText, "5.0x realtime")
@@ -699,14 +700,15 @@ final class DashboardMetricsTests: XCTestCase {
         XCTAssertEqual(stat.avgProcessingTimeCompactText, "2.34s")
         XCTAssertEqual(stat.avgProcessingTimeSpacedText, "2.34 s")
 
-        let slowerStat = VoiceInkPerformanceModelStat(
-            name: "slow",
-            sampleCount: 1,
-            totalProcessingTime: 10,
-            avgProcessingTime: 10,
-            avgAudioDuration: 5,
-            speedFactor: 0.5
-        )
+        let slowerStat = VoiceInkPerformanceAnalyzer.transcriptionModelStats(
+            from: [
+                PerformanceAnalysisRecord(
+                    audioDuration: 5,
+                    transcriptionModelName: "slow",
+                    transcriptionDuration: 10
+                )
+            ]
+        )[0]
 
         XCTAssertEqual(slowerStat.realTimeComparisonText, "Slower than Real-time")
     }

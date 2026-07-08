@@ -1,5 +1,5 @@
 import Foundation
-@testable import VoiceInkCore
+import VoiceInkCore
 
 final class TranscriptionCleanupPreferencesTests: XCTestCase {
     func testPunctuationModeDisplayNamesMatchMacOSSettingsLabels() {
@@ -57,14 +57,18 @@ final class TranscriptionCleanupPreferencesTests: XCTestCase {
         )
         XCTAssertEqual(presentation.transcriptRetentionPickerTitle, "Delete After")
         XCTAssertEqual(
-            presentation.transcriptRetentionOptions,
+            presentation.transcriptRetentionOptions.map(\.title),
             [
-                VoiceInkCleanupRetentionOption(title: "Immediately", value: 0),
-                VoiceInkCleanupRetentionOption(title: "1 hour", value: 60),
-                VoiceInkCleanupRetentionOption(title: "1 day", value: 24 * 60),
-                VoiceInkCleanupRetentionOption(title: "3 days", value: 3 * 24 * 60),
-                VoiceInkCleanupRetentionOption(title: "7 days", value: 7 * 24 * 60)
+                "Immediately",
+                "1 hour",
+                "1 day",
+                "3 days",
+                "7 days"
             ]
+        )
+        XCTAssertEqual(
+            presentation.transcriptRetentionOptions.map(\.value),
+            [0, 60, 24 * 60, 3 * 24 * 60, 7 * 24 * 60]
         )
         XCTAssertEqual(presentation.manualCleanupButtonTitle, "Run Cleanup Now")
         XCTAssertEqual(presentation.transcriptCleanupAlertTitle, "Transcript Cleanup")
@@ -76,14 +80,18 @@ final class TranscriptionCleanupPreferencesTests: XCTestCase {
         )
         XCTAssertEqual(presentation.audioRetentionPickerTitle, "Keep Audio For")
         XCTAssertEqual(
-            presentation.audioRetentionOptions,
+            presentation.audioRetentionOptions.map(\.title),
             [
-                VoiceInkCleanupRetentionOption(title: "1 day", value: 1),
-                VoiceInkCleanupRetentionOption(title: "3 days", value: 3),
-                VoiceInkCleanupRetentionOption(title: "7 days", value: 7),
-                VoiceInkCleanupRetentionOption(title: "14 days", value: 14),
-                VoiceInkCleanupRetentionOption(title: "30 days", value: 30)
+                "1 day",
+                "3 days",
+                "7 days",
+                "14 days",
+                "30 days"
             ]
+        )
+        XCTAssertEqual(
+            presentation.audioRetentionOptions.map(\.value),
+            [1, 3, 7, 14, 30]
         )
         XCTAssertEqual(presentation.audioCleanupAnalyzingButtonTitle, "Analyzing...")
         XCTAssertEqual(presentation.audioCleanupAlertTitle, "Audio Cleanup")

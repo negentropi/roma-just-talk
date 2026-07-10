@@ -314,11 +314,6 @@ async function loadChangelog() {
 
 function initFeatureTabs() {
   const bar = document.querySelector(".feature-tabs");
-  const shell = bar?.closest(".features-shell");
-  const railSvg = bar?.querySelector(".feature-rail-svg");
-  const railCoverPath = railSvg?.querySelector("[data-rail-cover]");
-  const railMirrorPath = railSvg?.querySelector("[data-rail-mirror]");
-  const railTopPath = railSvg?.querySelector("[data-rail-top]");
   const scroller = document.querySelector(".feature-tabs-scroll") || bar;
   const tabs = Array.from(document.querySelectorAll(".feature-tab"));
   if (!bar || !tabs.length) return;
@@ -326,56 +321,61 @@ function initFeatureTabs() {
   const panels = tabs
     .map((tab) => document.querySelector(tab.getAttribute("href")))
     .filter(Boolean);
+  const outlines = panels.map((panel) => ({
+    panel,
+    svg: panel.querySelector(".feature-panel-outline"),
+    path: panel.querySelector("[data-panel-outline]"),
+  }));
   let activeId = "";
-  const clamp = (value) => Math.max(0, Math.min(1, value));
-  const smoothstep = (value) => value * value * (3 - 2 * value);
-  const cssPx = (styles, name, fallback) => parseFloat(styles.getPropertyValue(name)) || fallback;
+  const round = (value) => Math.round(value * 10) / 10;
 
-  const panelAccent = (panel) => {
-    const styles = getComputedStyle(panel);
-    return styles.getPropertyValue("--panel-accent").trim() || styles.borderTopColor;
+  const roundedRectPath = ({ width, height, top, radius, inset }) => {
+    const left = inset;
+    const right = width - inset;
+    const y1 = top + inset;
+    const bottom = height - inset;
+    const visibleHeight = bottom - y1;
+    if (visibleHeight <= 0 || right <= left) return "";
+
+    const r = Math.min(radius, visibleHeight / 2, (right - left) / 2);
+    return [
+      `M${left + r} ${y1}`,
+      `H${right - r}`,
+      `Q${right} ${y1} ${right} ${y1 + r}`,
+      `V${bottom - r}`,
+      `Q${right} ${bottom} ${right - r} ${bottom}`,
+      `H${left + r}`,
+      `Q${left} ${bottom} ${left} ${bottom - r}`,
+      `V${y1 + r}`,
+      `Q${left} ${y1} ${left + r} ${y1}`,
+      "Z",
+    ].join(" ");
   };
 
-  const railPathData = ({ width, y, height, radius }) => {
-    const bottom = y + height;
-    const right = width;
-    const r = Math.min(radius, height, width / 2);
-    const topRail = `M0 ${bottom} L0 ${y + r} Q0 ${y} ${r} ${y} L${right - r} ${y} Q${right} ${y} ${right} ${y + r} L${right} ${bottom}`;
-    const mirrorRail = `M0 ${y} L0 ${bottom - r} Q0 ${bottom} ${r} ${bottom} L${right - r} ${bottom} Q${right} ${bottom} ${right} ${bottom - r} L${right} ${y}`;
-    return {
-      cover: `${topRail} L0 ${bottom} Z`,
-      topRail,
-      mirrorRail,
-      svgHeight: bottom + 2,
-    };
+  const frameTop = () => {
+    const rect = bar.getBoundingClientRect();
+    const offset = parseFloat(getComputedStyle(bar).getPropertyValue("--frame-edge-y")) || 60;
+    return rect.top + offset;
   };
 
-  const syncRailSvg = () => {
-    if (!railSvg || !railCoverPath || !railMirrorPath || !railTopPath) return null;
+  const syncPanelOutlines = (edgeTop) => {
+    outlines.forEach(({ panel, svg, path }) => {
+      if (!svg || !path) return;
 
-    const barRect = bar.getBoundingClientRect();
-    const barStyle = getComputedStyle(bar);
-    const railY = cssPx(barStyle, "--rail-y", 60);
-    const railHeight = cssPx(barStyle, "--rail-height", 20);
-    const railRadius = cssPx(barStyle, "--rail-radius", 16);
-    const width = Math.max(1, barRect.width);
-    const paths = railPathData({
-      width: Math.round(width * 10) / 10,
-      y: railY,
-      height: railHeight,
-      radius: railRadius,
+      const rect = panel.getBoundingClientRect();
+      const width = round(rect.width);
+      const height = round(rect.height);
+      // Increase the path's panel-local top as the panel leaves the viewport;
+      // its unchanged local bottom remains physically attached to that panel.
+      const localTop = round(Math.max(0, edgeTop - rect.top));
+      const radius = parseFloat(getComputedStyle(panel).borderTopLeftRadius) || 16;
+      const d = roundedRectPath({ width, height, top: localTop, radius, inset: 1 });
+
+      svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+      svg.dataset.outlineTop = String(localTop);
+      path.setAttribute("d", d);
+      path.hidden = !d;
     });
-
-    railSvg.setAttribute("viewBox", `0 0 ${Math.round(width * 10) / 10} ${paths.svgHeight}`);
-    railCoverPath.setAttribute("d", paths.cover);
-    railTopPath.setAttribute("d", paths.topRail);
-    railMirrorPath.setAttribute("d", paths.mirrorRail);
-
-    return {
-      top: barRect.top + railY,
-      bottom: barRect.top + railY + railHeight,
-      radius: railRadius,
-    };
   };
 
   const setActive = (id) => {
@@ -394,50 +394,20 @@ function initFeatureTabs() {
     });
   };
 
-  const syncMirror = () => {
-    const rail = syncRailSvg();
-    if (!shell || !rail || panels.length < 2) return;
-
-    const shellStyle = getComputedStyle(shell);
-    const backingOffset = parseFloat(shellStyle.getPropertyValue("--panel-offset")) || 8;
-
-    let mirrorAmount = 0;
-    let mirrorAccent = "";
-    panels.slice(0, -1).forEach((panel) => {
-      const rect = panel.getBoundingClientRect();
-      const borderBottom = rect.bottom;
-      const backingBottom = borderBottom + backingOffset;
-      const enter = clamp((rail.bottom + rail.radius - borderBottom) / rail.radius);
-      const exit = clamp((backingBottom - rail.top) / rail.radius);
-      const amount = Math.min(smoothstep(enter), smoothstep(exit));
-      if (amount > mirrorAmount) {
-        mirrorAmount = amount;
-        mirrorAccent = panelAccent(panel);
-      }
-    });
-
-    shell.style.setProperty("--rail-mirror-amount", mirrorAmount.toFixed(3));
-    if (mirrorAccent) shell.style.setProperty("--rail-mirror-accent", mirrorAccent);
-  };
-
-  // active = the panel currently under the sticky tab bar
-  const syncActive = () => {
-    const barBottom = bar.getBoundingClientRect().bottom;
-    const line = barBottom + 26;
+  const sync = () => {
+    const edgeTop = frameTop();
     let current = panels[0];
     panels.forEach((panel) => {
-      if (panel.getBoundingClientRect().top <= line) current = panel;
+      if (panel.getBoundingClientRect().top <= edgeTop) current = panel;
     });
-    // the last panel can never reach the bar when the page bottom is in view
     if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) {
       current = panels[panels.length - 1];
     }
     if (current) setActive(current.id);
-    // Add glass only after content scrolls under the sticky rail.
     if (panels[0]) {
-      bar.classList.toggle("stuck", panels[0].getBoundingClientRect().top < barBottom - 4);
+      bar.classList.toggle("stuck", panels[0].getBoundingClientRect().top < edgeTop);
     }
-    syncMirror();
+    syncPanelOutlines(edgeTop);
   };
 
   let ticking = false;
@@ -446,13 +416,18 @@ function initFeatureTabs() {
     ticking = true;
     requestAnimationFrame(() => {
       ticking = false;
-      syncActive();
+      sync();
     });
   };
 
   window.addEventListener("scroll", requestSync, { passive: true });
   window.addEventListener("resize", requestSync, { passive: true });
-  syncActive();
+  if ("ResizeObserver" in window) {
+    const resizeObserver = new ResizeObserver(requestSync);
+    resizeObserver.observe(bar);
+    panels.forEach((panel) => resizeObserver.observe(panel));
+  }
+  sync();
 }
 
 document.addEventListener("DOMContentLoaded", () => {

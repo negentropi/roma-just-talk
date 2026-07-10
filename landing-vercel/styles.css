@@ -580,11 +580,9 @@ h1 .before-word {
 
 .features-shell {
   --active-accent: var(--coral);
-  --rail-mirror-accent: var(--coral);
-  --rail-mirror-amount: 0;
-  --rail-cover-depth: 22px;
+  --frame-edge-y: 60px;
   --panel-offset: 8px;
-  --rail-mask-bleed: calc(var(--panel-offset) + 2px);
+  --toolbar-bleed: calc(var(--panel-offset) + 2px);
   width: min(1040px, calc(100% - 40px));
   margin: 0 auto;
 }
@@ -606,15 +604,10 @@ h1 .before-word {
 }
 
 .feature-tabs {
-  --rail-y: 60px;
-  --rail-height: 20px;
-  --rail-radius: 16px;
   position: sticky;
   z-index: 6;
   top: 0;
-  height: 62px; /* fixed: tab morph animations must never move the bar's bottom edge */
-  /* transparent at rest — tabs sit directly on the page and the frame border
-     passes beneath them, so tab + frame read as one outline */
+  height: 62px;
   background: transparent;
   transition: background-color 0.2s ease;
 }
@@ -623,50 +616,14 @@ h1 .before-word {
   content: "";
   position: absolute;
   z-index: 0;
-  inset: 0 calc(-1 * var(--rail-mask-bleed));
+  inset: 0 calc(-1 * var(--toolbar-bleed));
   background: transparent;
   pointer-events: none;
   transition: background-color 0.2s ease;
 }
 
-.feature-rail-svg {
-  position: absolute;
-  z-index: 2;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: calc(var(--rail-y) + var(--rail-height) + 2px);
-  overflow: visible;
-  pointer-events: none;
-}
-
-.feature-rail-cover {
-  fill: var(--paper);
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.feature-rail-top-path,
-.feature-rail-mirror-path {
-  fill: none;
-  stroke-linejoin: round;
-  stroke-width: 2;
-  vector-effect: non-scaling-stroke;
-}
-
-.feature-rail-top-path {
-  stroke: var(--active-accent);
-  transition: stroke 0.25s ease;
-}
-
-.feature-rail-mirror-path {
-  opacity: var(--rail-mirror-amount);
-  stroke: var(--rail-mirror-accent);
-  transition: opacity 0.08s linear, stroke 0.12s linear;
-}
-
-/* solid mask once content scrolls beneath it, so previous panel borders and
-   backing layers cannot leak through the sticky rail */
+/* Keep scrolling panel content behind the controls while the panel outline
+   itself remains visible at the frame edge below. */
 .feature-tabs.stuck {
   background: transparent;
   -webkit-backdrop-filter: blur(16px);
@@ -675,10 +632,6 @@ h1 .before-word {
 
 .feature-tabs.stuck::before {
   background: var(--paper);
-}
-
-.feature-tabs.stuck .feature-rail-cover {
-  opacity: 1;
 }
 
 .feature-tabs-scroll {
@@ -865,17 +818,32 @@ h1 .before-word {
   align-content: center;
   justify-items: center;
   margin-top: 14px;
-  border: 2px solid var(--panel-accent);
+  border: 2px solid transparent;
   border-radius: 16px;
   background:
     radial-gradient(circle at 50% 55%, var(--body-cool), transparent 34%),
     var(--tab-face);
   padding: clamp(24px, 6vw, 64px);
-  /* 60px = bar frame-top position: anchor landings put the card's rounded top
-     exactly ON the bar's frame-top so the two coincide as one outline */
-  scroll-margin-top: 60px;
+  scroll-margin-top: var(--frame-edge-y);
   text-align: center;
-  transition: border-color 0.25s ease;
+}
+
+.feature-panel-outline {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.feature-panel-outline path {
+  fill: none;
+  stroke: var(--panel-accent);
+  stroke-linejoin: round;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
 }
 
 .feature-panel::before {

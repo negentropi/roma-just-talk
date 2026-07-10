@@ -131,9 +131,7 @@ struct FluidAudioModel: TranscriptionModel {
     let accuracy: Double
     let ramUsage: Double
     let supportsStreaming: Bool
-    var isMultilingualModel: Bool {
-        supportedLanguages.count > 1
-    }
+    let isMultilingualModel: Bool
     let supportedLanguages: [String: String]
 
     init(spec: VoiceInkFluidAudioTranscriptionModelSpec) {
@@ -145,6 +143,7 @@ struct FluidAudioModel: TranscriptionModel {
         self.accuracy = spec.accuracy
         self.ramUsage = spec.ramUsage
         self.supportsStreaming = spec.supportsStreaming
+        self.isMultilingualModel = spec.isMultilingual
         self.supportedLanguages = spec.supportedLanguages
     }
 }
@@ -245,15 +244,13 @@ struct WhisperModel: TranscriptionModel {
     let accuracy: Double
     let ramUsage: Double
     let provider: VoiceInkMacOSTranscriptionModelProvider = .whisper
-
-    var isMultilingualModel: Bool {
-        supportedLanguages.count > 1
-    }
+    let isMultilingualModel: Bool
 
     init(spec: VoiceInkWhisperModelFileSpec) {
         self.name = spec.modelName
         self.displayName = spec.displayName
         self.size = spec.size
+        self.isMultilingualModel = spec.isMultilingual
         self.supportedLanguages = VoiceInkMacOSTranscriptionModelProvider.whisper.supportedLanguages(isMultilingual: spec.isMultilingual)
         self.description = spec.description
         self.speed = spec.speed

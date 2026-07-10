@@ -7,9 +7,9 @@ struct AudioCleanupSettingsView: View {
     private let presentation = VoiceInkMacOSCleanupSettingsPresentation.macOS
 
     // Audio cleanup settings
-    @AppStorage(VoiceInkUserDefaultsKey.isTranscriptionCleanupEnabled) private var isTranscriptionCleanupEnabled = false
+    @AppStorage(VoiceInkUserDefaultsKey.isTranscriptionCleanupEnabled) private var isTranscriptionCleanupEnabled = VoiceInkDefaultSettings.macOS.isTranscriptionCleanupEnabled
     @AppStorage(VoiceInkUserDefaultsKey.transcriptionRetentionMinutes) private var transcriptionRetentionMinutes = VoiceInkPreferenceDefault.transcriptionRetentionMinutes
-    @AppStorage(VoiceInkUserDefaultsKey.isAudioCleanupEnabled) private var isAudioCleanupEnabled = false
+    @AppStorage(VoiceInkUserDefaultsKey.isAudioCleanupEnabled) private var isAudioCleanupEnabled = VoiceInkDefaultSettings.macOS.isAudioCleanupEnabled
     @AppStorage(VoiceInkUserDefaultsKey.audioRetentionPeriodDays) private var audioRetentionPeriod = VoiceInkPreferenceDefault.audioRetentionDays
     @State private var isPerformingCleanup = false
     @State private var isShowingConfirmation = false

@@ -969,19 +969,19 @@ struct VoiceInkTests {
             defaults.removePersistentDomain(forName: "MacOnboardingProgressStoreTests")
         }
 
-        #expect(MacOnboardingProgressStore.stage(in: defaults) == .welcome)
-        #expect(MacOnboardingProgressStore.permissionKind(in: defaults) == nil)
+        #expect(VoiceInkMacOSOnboardingProgressStore.stage(in: defaults) == .welcome)
+        #expect(VoiceInkMacOSOnboardingProgressStore.permissionKind(in: defaults) == nil)
 
-        MacOnboardingProgressStore.saveStage(.permissions, in: defaults)
-        MacOnboardingProgressStore.savePermissionKind(.inputMonitoring, in: defaults)
+        VoiceInkMacOSOnboardingProgressStore.saveStage(.permissions, in: defaults)
+        VoiceInkMacOSOnboardingProgressStore.savePermissionKind(.inputMonitoring, in: defaults)
 
-        #expect(MacOnboardingProgressStore.stage(in: defaults) == .permissions)
-        #expect(MacOnboardingProgressStore.permissionKind(in: defaults) == .inputMonitoring)
+        #expect(VoiceInkMacOSOnboardingProgressStore.stage(in: defaults) == .permissions)
+        #expect(VoiceInkMacOSOnboardingProgressStore.permissionKind(in: defaults) == .inputMonitoring)
 
-        MacOnboardingProgressStore.reset(in: defaults)
+        VoiceInkMacOSOnboardingProgressStore.reset(in: defaults)
 
-        #expect(MacOnboardingProgressStore.stage(in: defaults) == .welcome)
-        #expect(MacOnboardingProgressStore.permissionKind(in: defaults) == nil)
+        #expect(VoiceInkMacOSOnboardingProgressStore.stage(in: defaults) == .welcome)
+        #expect(VoiceInkMacOSOnboardingProgressStore.permissionKind(in: defaults) == nil)
     }
 
     @Test func modifierOnlyShortcutsUseNSEventMonitorPath() async throws {

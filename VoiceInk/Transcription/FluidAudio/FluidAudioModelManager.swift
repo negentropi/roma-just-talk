@@ -34,7 +34,7 @@ enum FluidAudioModelDownloadIssue: Equatable {
 
 struct FluidAudioModelDownloadClient {
     typealias ProgressHandler = @Sendable (VoiceInkFluidAudioDownloadStatus) -> Void
-    typealias DownloadOperation = (AsrModelVersion, Bool, ProgressHandler) async throws -> Void
+    typealias DownloadOperation = (AsrModelVersion, Bool, @escaping ProgressHandler) async throws -> Void
 
     let modelsExist: (AsrModelVersion) -> Bool
     let cacheDirectoryExists: (AsrModelVersion) -> Bool

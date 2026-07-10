@@ -57,7 +57,7 @@ struct WordReplacementView: View {
                     .textFieldStyle(.roundedBorder)
                     .font(.system(size: 13))
 
-                Image(systemName: "arrow.right")
+                Image(systemName: dictionaryPresentation.wordReplacementArrowSystemImageName)
                     .foregroundColor(.secondary)
                     .font(.system(size: 10))
                     .frame(width: 10)
@@ -101,7 +101,7 @@ struct WordReplacementView: View {
                         .buttonStyle(.plain)
                         .help(listPresentation.sortOriginalHelpText)
 
-                        Image(systemName: "arrow.right")
+                        Image(systemName: dictionaryPresentation.wordReplacementArrowSystemImageName)
                             .foregroundColor(.secondary)
                             .font(.system(size: 10))
                             .frame(width: 10)
@@ -242,7 +242,7 @@ private struct WordReplacementInfoExampleRow: View {
                     .font(.callout)
             }
 
-            Image(systemName: "arrow.right")
+            Image(systemName: VoiceInkDictionarySettingsPresentation.macOS.wordReplacementArrowSystemImageName)
                 .font(.caption)
                 .foregroundColor(.secondary)
 
@@ -278,7 +278,7 @@ struct ReplacementRow: View {
                 .lineLimit(2)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-            Image(systemName: "arrow.right")
+            Image(systemName: VoiceInkDictionarySettingsPresentation.macOS.wordReplacementArrowSystemImageName)
                 .foregroundColor(.secondary)
                 .font(.system(size: 10))
                 .frame(width: 10)

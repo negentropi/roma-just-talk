@@ -776,9 +776,11 @@ public struct VoiceInkHistoryPaginationPlan<Item> {
 }
 
 public enum VoiceInkHistoryPaginationPolicy {
+    public static let defaultPageSize = 20
+
     public static func initialPage<Item>(
         _ items: [Item],
-        pageSize: Int,
+        pageSize: Int = VoiceInkHistoryPaginationPolicy.defaultPageSize,
         timestamp: (Item) -> Date?
     ) -> VoiceInkHistoryPaginationPlan<Item> {
         VoiceInkHistoryPaginationPlan(
@@ -792,7 +794,7 @@ public enum VoiceInkHistoryPaginationPolicy {
     public static func appendingPage<Item>(
         currentItems: [Item],
         newItems: [Item],
-        pageSize: Int,
+        pageSize: Int = VoiceInkHistoryPaginationPolicy.defaultPageSize,
         timestamp: (Item) -> Date?
     ) -> VoiceInkHistoryPaginationPlan<Item> {
         VoiceInkHistoryPaginationPlan(

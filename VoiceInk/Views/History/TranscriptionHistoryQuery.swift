@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import VoiceInkCore
 
 enum TranscriptionHistoryQuery {
     static func latestIndicatorDescriptor() -> FetchDescriptor<Transcription> {
@@ -12,8 +13,7 @@ enum TranscriptionHistoryQuery {
 
     static func cursorDescriptor(
         after timestamp: Date? = nil,
-        searchText: String,
-        pageSize: Int
+        searchText: String
     ) -> FetchDescriptor<Transcription> {
         var descriptor = FetchDescriptor<Transcription>(
             sortBy: [SortDescriptor(\Transcription.timestamp, order: .reverse)]
@@ -38,7 +38,7 @@ enum TranscriptionHistoryQuery {
             }
         }
 
-        descriptor.fetchLimit = pageSize
+        descriptor.fetchLimit = VoiceInkHistoryPaginationPolicy.defaultPageSize
         return descriptor
     }
 

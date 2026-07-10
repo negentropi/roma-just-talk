@@ -18,15 +18,13 @@ struct InlineHistoryView: View {
     @State private var isViewCurrentlyVisible = false
 
     private let exportService = VoiceInkCSVExportService()
-    private let pageSize = 20
 
     @Query(TranscriptionHistoryQuery.latestIndicatorDescriptor()) private var latestTranscriptionIndicator: [Transcription]
 
     private func cursorQueryDescriptor(after timestamp: Date? = nil) -> FetchDescriptor<Transcription> {
         TranscriptionHistoryQuery.cursorDescriptor(
             after: timestamp,
-            searchText: searchText,
-            pageSize: pageSize
+            searchText: searchText
         )
     }
 
@@ -361,7 +359,6 @@ struct InlineHistoryView: View {
             applyPaginationPlan(
                 VoiceInkHistoryPaginationPolicy.initialPage(
                     items,
-                    pageSize: pageSize,
                     timestamp: \.timestamp
                 )
             )
@@ -389,7 +386,6 @@ struct InlineHistoryView: View {
                 VoiceInkHistoryPaginationPolicy.appendingPage(
                     currentItems: displayedTranscriptions,
                     newItems: newItems,
-                    pageSize: pageSize,
                     timestamp: \.timestamp
                 )
             )

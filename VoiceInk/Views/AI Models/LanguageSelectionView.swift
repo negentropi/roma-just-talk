@@ -54,9 +54,6 @@ struct LanguageSelectionView: View {
                 .foregroundColor(.secondary)
         }
         .disabled(true)
-        .onAppear {
-            updateLanguage("en")
-        }
     }
 
     var body: some View {
@@ -146,10 +143,6 @@ struct LanguageSelectionView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                     }
-                    .onAppear {
-                        // Ensure English is set when viewing English-only model
-                        updateLanguage("en")
-                    }
                 }
             } else {
                 Text(VoiceInkModelManagementPresentation.noModelSelectedText)
@@ -214,6 +207,9 @@ struct LanguageSelectionView: View {
                 }
             } else {
                 englishOnlyMenuButton
+                    .onAppear {
+                        updateLanguage(VoiceInkDefaultSettings.macOS.selectedTranscriptionLanguage)
+                    }
             }
         }
     }

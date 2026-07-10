@@ -818,7 +818,7 @@ h1 .before-word {
   align-content: center;
   justify-items: center;
   margin-top: 14px;
-  border: 2px solid transparent;
+  border: 2px solid var(--panel-accent);
   border-radius: 16px;
   background:
     radial-gradient(circle at 50% 55%, var(--body-cool), transparent 34%),
@@ -829,21 +829,7 @@ h1 .before-word {
 }
 
 .feature-panel-outline {
-  position: absolute;
-  z-index: 2;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  pointer-events: none;
-}
-
-.feature-panel-outline path {
-  fill: none;
-  stroke: var(--panel-accent);
-  stroke-linejoin: round;
-  stroke-width: 2;
-  vector-effect: non-scaling-stroke;
+  display: none;
 }
 
 .feature-panel::before {
@@ -856,6 +842,53 @@ h1 .before-word {
     linear-gradient(var(--panel-accent) 0 0) right top / var(--panel-offset) 100% no-repeat,
     linear-gradient(var(--panel-accent) 0 0) left bottom / 100% var(--panel-offset) no-repeat;
   pointer-events: none;
+}
+
+@keyframes squeeze-panel-outline {
+  0% {
+    top: -2px;
+    visibility: visible;
+  }
+
+  99.999% {
+    visibility: visible;
+  }
+
+  100% {
+    top: calc(100% + 2px);
+    visibility: hidden;
+  }
+}
+
+@supports (animation-timeline: view()) and
+  (animation-range: exit-crossing 0% exit-crossing 100%) {
+  .feature-panel {
+    border-color: transparent;
+    view-timeline: --panel-outline block;
+    view-timeline-inset: var(--frame-edge-y) 0px;
+  }
+
+  .feature-panel::before {
+    display: none;
+  }
+
+  .feature-panel-outline {
+    position: absolute;
+    z-index: 2;
+    display: block;
+    top: -2px;
+    right: -2px;
+    bottom: -2px;
+    left: -2px;
+    box-sizing: border-box;
+    border: 2px solid var(--panel-accent);
+    border-radius: inherit;
+    box-shadow: var(--panel-offset) var(--panel-offset) 0 var(--panel-accent);
+    pointer-events: none;
+    animation: squeeze-panel-outline 1ms linear both;
+    animation-timeline: --panel-outline;
+    animation-range: exit-crossing 0% exit-crossing 100%;
+  }
 }
 
 #feature-shift {

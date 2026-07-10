@@ -321,61 +321,12 @@ function initFeatureTabs() {
   const panels = tabs
     .map((tab) => document.querySelector(tab.getAttribute("href")))
     .filter(Boolean);
-  const outlines = panels.map((panel) => ({
-    panel,
-    svg: panel.querySelector(".feature-panel-outline"),
-    path: panel.querySelector("[data-panel-outline]"),
-  }));
   let activeId = "";
-  const round = (value) => Math.round(value * 10) / 10;
-
-  const roundedRectPath = ({ width, height, top, radius, inset }) => {
-    const left = inset;
-    const right = width - inset;
-    const y1 = top + inset;
-    const bottom = height - inset;
-    const visibleHeight = bottom - y1;
-    if (visibleHeight <= 0 || right <= left) return "";
-
-    const r = Math.min(radius, visibleHeight / 2, (right - left) / 2);
-    return [
-      `M${left + r} ${y1}`,
-      `H${right - r}`,
-      `Q${right} ${y1} ${right} ${y1 + r}`,
-      `V${bottom - r}`,
-      `Q${right} ${bottom} ${right - r} ${bottom}`,
-      `H${left + r}`,
-      `Q${left} ${bottom} ${left} ${bottom - r}`,
-      `V${y1 + r}`,
-      `Q${left} ${y1} ${left + r} ${y1}`,
-      "Z",
-    ].join(" ");
-  };
 
   const frameTop = () => {
     const rect = bar.getBoundingClientRect();
     const offset = parseFloat(getComputedStyle(bar).getPropertyValue("--frame-edge-y")) || 60;
     return rect.top + offset;
-  };
-
-  const syncPanelOutlines = (edgeTop) => {
-    outlines.forEach(({ panel, svg, path }) => {
-      if (!svg || !path) return;
-
-      const rect = panel.getBoundingClientRect();
-      const width = round(rect.width);
-      const height = round(rect.height);
-      // Increase the path's panel-local top as the panel leaves the viewport;
-      // its unchanged local bottom remains physically attached to that panel.
-      const localTop = round(Math.max(0, edgeTop - rect.top));
-      const radius = parseFloat(getComputedStyle(panel).borderTopLeftRadius) || 16;
-      const d = roundedRectPath({ width, height, top: localTop, radius, inset: 1 });
-
-      svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
-      svg.dataset.outlineTop = String(localTop);
-      path.setAttribute("d", d);
-      path.hidden = !d;
-    });
   };
 
   const setActive = (id) => {
@@ -407,7 +358,6 @@ function initFeatureTabs() {
     if (panels[0]) {
       bar.classList.toggle("stuck", panels[0].getBoundingClientRect().top < edgeTop);
     }
-    syncPanelOutlines(edgeTop);
   };
 
   let ticking = false;
@@ -422,11 +372,6 @@ function initFeatureTabs() {
 
   window.addEventListener("scroll", requestSync, { passive: true });
   window.addEventListener("resize", requestSync, { passive: true });
-  if ("ResizeObserver" in window) {
-    const resizeObserver = new ResizeObserver(requestSync);
-    resizeObserver.observe(bar);
-    panels.forEach((panel) => resizeObserver.observe(panel));
-  }
   sync();
 }
 

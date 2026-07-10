@@ -5,8 +5,10 @@ import VoiceInkCore
 struct DismissMiniRecorderIntent: AppIntent {
     private static let presentation = VoiceInkMiniRecorderAppIntentPresentation.dismiss
 
-    static var title: LocalizedStringResource = "Dismiss VoiceInk Recorder"
-    static var description = IntentDescription("Dismiss the VoiceInk mini recorder and cancel any active recording.")
+    static var title = LocalizedStringResource(stringLiteral: presentation.title)
+    static var description = IntentDescription(
+        LocalizedStringResource(stringLiteral: presentation.description)
+    )
     
     static var openAppWhenRun: Bool = false
     

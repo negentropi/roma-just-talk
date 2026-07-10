@@ -3,12 +3,8 @@ import Foundation
 import VoiceInkCore
 
 struct DismissMiniRecorderIntent: AppIntent {
-    private static let presentation = VoiceInkMiniRecorderAppIntentPresentation.dismiss
-
-    static var title = LocalizedStringResource(stringLiteral: presentation.title)
-    static var description = IntentDescription(
-        LocalizedStringResource(stringLiteral: presentation.description)
-    )
+    static var title: LocalizedStringResource = "Dismiss VoiceInk Recorder"
+    static var description = IntentDescription("Dismiss the VoiceInk mini recorder and cancel any active recording.")
     
     static var openAppWhenRun: Bool = false
     
@@ -16,7 +12,9 @@ struct DismissMiniRecorderIntent: AppIntent {
     func perform() async throws -> some IntentResult & ProvidesDialog {
         NotificationCenter.default.post(name: .dismissMiniRecorder, object: nil)
         
-        let dialog = IntentDialog(stringLiteral: Self.presentation.successDialog)
+        let dialog = IntentDialog(
+            stringLiteral: VoiceInkMiniRecorderAppIntentPresentation.dismissSuccessDialog
+        )
         return .result(dialog: dialog)
     }
 }

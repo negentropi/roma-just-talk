@@ -235,7 +235,8 @@ class FluidAudioModelManager: ObservableObject {
         logDownloadProgressIfNeeded(initialStatus, for: modelName)
 
         let task = Task { @MainActor [weak self] in
-            await self?.runDownload(model, downloadID: downloadID, force: force)
+            guard let self else { return }
+            await self.runDownload(model, downloadID: downloadID, force: force)
         }
         activeDownloads[modelName] = ActiveDownload(id: downloadID, task: task)
         startWatchdog(for: modelName, downloadID: downloadID)

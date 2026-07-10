@@ -15,6 +15,7 @@ on:
   push:
     branches:
       - main
+      - "ci/**" # Temporary CI transport branches during the migration.
     paths:
       - ".github/workflows/voiceink-ios-single-repo-migration.yml"
       - "scripts/**"

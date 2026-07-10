@@ -187,7 +187,7 @@ struct LanguageSelectionView: View {
                                     HStack {
                                         Text(option.name)
                                         if selectedLanguage == option.code {
-                                            Image(systemName: "checkmark")
+                                            Image(systemName: VoiceInkMacOSMenuBarPresentation.selectionCheckmarkSystemImageName)
                                         }
                                     }
                                 }
@@ -200,7 +200,7 @@ struct LanguageSelectionView: View {
                                         languages: facts.languageOptions
                                     )
                                 )
-                                Image(systemName: "chevron.up.chevron.down")
+                                Image(systemName: VoiceInkMacOSMenuBarPresentation.pickerSystemImageName)
                                     .font(.system(size: 10))
                             }
                         }

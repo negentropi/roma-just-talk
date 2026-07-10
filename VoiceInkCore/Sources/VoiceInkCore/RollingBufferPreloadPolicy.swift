@@ -754,8 +754,26 @@ public struct VoiceInkRollingBufferPreloadPolicy {
         for model: VoiceInkRollingBufferPreloadModelSnapshot,
         perModelEnabled: Bool
     ) -> Bool {
-        guard model.supportsStreaming else { return false }
-        guard perModelEnabled else { return false }
+        Self.allowsPreload(
+            configuration: configuration,
+            supportsStreaming: { model.supportsStreaming },
+            perModelEnabled: { perModelEnabled },
+            modelSnapshot: { model },
+            powerState: { powerState }
+        )
+    }
+
+    public static func allowsPreload(
+        configuration: VoiceInkRollingBufferPreloadConfiguration,
+        supportsStreaming: () -> Bool,
+        perModelEnabled: () -> Bool,
+        modelSnapshot: () -> VoiceInkRollingBufferPreloadModelSnapshot,
+        powerState: () -> VoiceInkRollingBufferPowerState
+    ) -> Bool {
+        guard configuration.mode != .off else { return false }
+        guard supportsStreaming() else { return false }
+        guard perModelEnabled() else { return false }
+        let model = modelSnapshot()
 
         switch configuration.mode {
         case .on:
@@ -767,10 +785,14 @@ public struct VoiceInkRollingBufferPreloadPolicy {
                 return false
             }
 
-            if configuration.autoDisablesLowBatteryLocalModels,
-               model.isLocalTranscriptionProvider,
-               powerState.isOnBattery,
-               let batteryLevel = powerState.batteryLevelPercent,
+            guard configuration.autoDisablesLowBatteryLocalModels,
+                  model.isLocalTranscriptionProvider else {
+                return true
+            }
+
+            let currentPowerState = powerState()
+            if currentPowerState.isOnBattery,
+               let batteryLevel = currentPowerState.batteryLevelPercent,
                batteryLevel < configuration.lowBatteryThresholdPercent {
                 return false
             }

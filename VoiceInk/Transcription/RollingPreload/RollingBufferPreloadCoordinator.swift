@@ -329,55 +329,23 @@ final class RollingBufferPreloadCoordinator {
             return cachedPlan
         }
 
-        if configuration.mode == .off || !configuration.preRunFinalization || !model.supportsStreaming {
+        guard configuration.preRunFinalization else {
             return cachePlan(nil, for: model.name, language: language, now: now)
         }
 
-        let perModelEnabled = VoiceInkRollingBufferPreloadSettings.perModelPreloadEnabled(for: model)
-        guard perModelEnabled else {
-            return cachePlan(nil, for: model.name, language: language, now: now)
-        }
-
-        if !allowsPreloadBeforeDetector(
-            for: model,
+        guard VoiceInkRollingBufferPreloadPolicy.allowsPreload(
             configuration: configuration,
-            perModelEnabled: perModelEnabled
-        ) {
+            supportsStreaming: { model.supportsStreaming },
+            perModelEnabled: {
+                VoiceInkRollingBufferPreloadSettings.perModelPreloadEnabled(for: model)
+            },
+            modelSnapshot: { model.rollingBufferPreloadSnapshot },
+            powerState: { powerStateProvider.currentPowerState() }
+        ) else {
             return cachePlan(nil, for: model.name, language: language, now: now)
         }
 
         return cachePlan(Plan(model: model, language: language), for: model.name, language: language, now: now)
-    }
-
-    private func allowsPreloadBeforeDetector(
-        for model: any TranscriptionModel,
-        configuration: VoiceInkRollingBufferPreloadConfiguration,
-        perModelEnabled: Bool
-    ) -> Bool {
-        let snapshot = model.rollingBufferPreloadSnapshot
-        switch configuration.mode {
-        case .on:
-            return true
-        case .off:
-            return false
-        case .auto:
-            if configuration.autoDisablesCloudModels, snapshot.isCloudTranscriptionProvider {
-                return false
-            }
-
-            guard configuration.autoDisablesLowBatteryLocalModels,
-                  snapshot.isLocalTranscriptionProvider else {
-                return true
-            }
-        }
-
-        return VoiceInkRollingBufferPreloadPolicy(
-            configuration: configuration,
-            powerState: powerStateProvider.currentPowerState()
-        ).allowsPreload(
-            for: snapshot,
-            perModelEnabled: perModelEnabled
-        )
     }
 
     private func staleUnclaimedPreloadReason(afterAdding chunk: Data) -> String? {

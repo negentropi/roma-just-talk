@@ -817,7 +817,7 @@ h1 .before-word {
   min-height: clamp(420px, 72svh, 640px);
   align-content: center;
   justify-items: center;
-  margin-top: 14px;
+  margin-top: 18px;
   border: 2px solid var(--panel-accent);
   border-radius: 16px;
   background:

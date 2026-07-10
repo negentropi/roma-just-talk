@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import OSLog
 import VoiceInkCore
 
 struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {

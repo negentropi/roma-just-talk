@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import OSLog
 import VoiceInkCore
 
 @MainActor

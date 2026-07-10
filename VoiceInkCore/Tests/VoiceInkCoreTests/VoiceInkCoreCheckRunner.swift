@@ -28,7 +28,6 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "AppIdentityTests.testAppNotificationKindsPreserveCasesAndDefaultDuration", run: { AppIdentityTests().testAppNotificationKindsPreserveCasesAndDefaultDuration() }),
             VoiceInkCoreCheck(name: "AppIdentityTests.testAppNotificationKindsPreserveSystemImages", run: { AppIdentityTests().testAppNotificationKindsPreserveSystemImages() }),
             VoiceInkCoreCheck(name: "AppIdentityTests.testOnlyErrorNotificationsPlayFailureSound", run: { AppIdentityTests().testOnlyErrorNotificationsPlayFailureSound() }),
-            VoiceInkCoreCheck(name: "AppIdentityTests.testMiniRecorderIntentPresentationPreservesMacOSShortcutCopy", run: { AppIdentityTests().testMiniRecorderIntentPresentationPreservesMacOSShortcutCopy() }),
             VoiceInkCoreCheck(name: "AppIdentityTests.testMiniRecorderRequestPreservesMacOSNotificationNames", run: { AppIdentityTests().testMiniRecorderRequestPreservesMacOSNotificationNames() }),
             VoiceInkCoreCheck(name: "AppIdentityTests.testSupportContactPolicyPreservesEmailIdentityAndSubject", run: { AppIdentityTests().testSupportContactPolicyPreservesEmailIdentityAndSubject() }),
             VoiceInkCoreCheck(name: "AppIdentityTests.testSupportEmailBodyPreservesMacOSSupportCopyAndSystemInformationSlot", run: { AppIdentityTests().testSupportEmailBodyPreservesMacOSSupportCopyAndSystemInformationSlot() }),

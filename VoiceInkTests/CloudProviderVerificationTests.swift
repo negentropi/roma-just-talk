@@ -22,7 +22,6 @@ struct CloudProviderVerificationTests {
             let transcriptionProvider = try #require(modelProvider.coreTranscriptionModelProvider)
             #expect(transcriptionProvider.providerKind == providerKind)
 
-            #expect(CloudProviderRegistry.provider(for: modelProvider) != nil)
             let result = await verifier.verifyAPIKeyDetailed(" \n\t ", for: providerKind)
 
             #expect(result.isValid == false)

@@ -127,6 +127,24 @@ struct VoiceInkTests {
         #expect(DictionaryService.applyWordReplacements(to: "quick release", using: context) == "instant paste")
     }
 
+    @Test @MainActor func dictionaryServiceIgnoresDisabledWordReplacements() throws {
+        let container = try makeWordReplacementContainer()
+        let context = container.mainContext
+        DictionaryService.invalidateWordReplacementCache()
+        defer { DictionaryService.invalidateWordReplacementCache() }
+
+        context.insert(
+            WordReplacement(
+                originalText: "voice ink",
+                replacementText: "roma",
+                isEnabled: false
+            )
+        )
+        try context.save()
+
+        #expect(DictionaryService.applyWordReplacements(to: "voice ink", using: context) == "voice ink")
+    }
+
     @Test @MainActor func dictionaryServiceWordReplacementSaveInvalidatesWarmedWordReplacementCache() throws {
         let container = try makeWordReplacementContainer()
         let context = container.mainContext

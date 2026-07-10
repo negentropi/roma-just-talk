@@ -156,11 +156,10 @@ enum DictionaryService {
             return cachedWordReplacementRules
         }
 
-        let descriptor = FetchDescriptor<WordReplacement>(
-            predicate: #Predicate { $0.isEnabled }
-        )
-
-        let rules = (try? context.fetch(descriptor))?.map(\.voiceInkRule) ?? []
+        let descriptor = FetchDescriptor<WordReplacement>()
+        let rules = (try? context.fetch(descriptor))?
+            .filter(\.isEnabled)
+            .map(\.voiceInkRule) ?? []
 
         cachedWordReplacementRules = rules
         return rules

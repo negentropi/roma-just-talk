@@ -4,16 +4,98 @@ import AppKit
 import os
 import VoiceInkCore
 
+enum FluidAudioModelDownloadIssue: Equatable {
+    case stalled
+    case failed(String)
+    case cancelled
+
+    var message: String {
+        switch self {
+        case .stalled:
+            return "No progress recently. You can keep waiting, cancel, or retry."
+        case .failed(let message):
+            return "Download failed: \(message)"
+        case .cancelled:
+            return "Download canceled."
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .stalled:
+            return "exclamationmark.triangle"
+        case .failed:
+            return "exclamationmark.triangle"
+        case .cancelled:
+            return "xmark.circle"
+        }
+    }
+}
+
+struct FluidAudioModelDownloadClient {
+    typealias ProgressHandler = @Sendable (VoiceInkFluidAudioDownloadStatus) -> Void
+    typealias DownloadOperation = (AsrModelVersion, Bool, ProgressHandler) async throws -> Void
+
+    let modelsExist: (AsrModelVersion) -> Bool
+    let cacheDirectoryExists: (AsrModelVersion) -> Bool
+    let validateCache: (AsrModelVersion) async throws -> Bool
+    let downloadAndLoad: DownloadOperation
+
+    static let live = FluidAudioModelDownloadClient(
+        modelsExist: { version in
+            AsrModels.modelsExist(
+                at: AsrModels.defaultCacheDirectory(for: version),
+                version: version
+            )
+        },
+        cacheDirectoryExists: { version in
+            FileManager.default.fileExists(
+                atPath: AsrModels.defaultCacheDirectory(for: version).path
+            )
+        },
+        validateCache: { version in
+            try await AsrModels.isModelValid(version: version)
+        },
+        downloadAndLoad: { version, force, reportProgress in
+            let progressHandler: DownloadUtils.ProgressHandler = { progress in
+                reportProgress(VoiceInkFluidAudioDownloadStatus(progress: progress))
+            }
+            let directory = try await AsrModels.download(
+                force: force,
+                version: version,
+                progressHandler: progressHandler
+            )
+            _ = try await AsrModels.load(
+                from: directory,
+                version: version,
+                progressHandler: progressHandler
+            )
+        }
+    )
+}
+
 @MainActor
 class FluidAudioModelManager: ObservableObject {
+    private struct ActiveDownload {
+        let id: UUID
+        let task: Task<Void, Never>
+    }
+
     @Published private var downloadStatuses: [String: VoiceInkFluidAudioDownloadStatus] = [:]
-    private var activeDownloadIDs: [String: UUID] = [:]
+    @Published private var downloadIssues: [String: FluidAudioModelDownloadIssue] = [:]
+    private var activeDownloads: [String: ActiveDownload] = [:]
+    private var watchdogTasks: [String: Task<Void, Never>] = [:]
+    private var downloadStartedAt: [String: Date] = [:]
+    private var lastProgressAt: [String: Date] = [:]
     private var lastLoggedDownloadPercents: [String: Int] = [:]
     private var lastLoggedDownloadMessages: [String: String] = [:]
 
     var onModelDeleted: ((String) -> Void)?
     var onModelsChanged: (() -> Void)?
 
+    private let client: FluidAudioModelDownloadClient
+    private let staleAfter: TimeInterval
+    private let now: () -> Date
     private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "FluidAudioModelManager")
 
     nonisolated static func asrVersion(for modelName: String) -> AsrModelVersion {
@@ -28,13 +110,24 @@ class FluidAudioModelManager: ObservableObject {
             .flatMap(Language.init(rawValue:))
     }
 
-    init() {}
+    init(
+        client: FluidAudioModelDownloadClient = .live,
+        staleAfter: TimeInterval = 5 * 60,
+        now: @escaping () -> Date = Date.init
+    ) {
+        self.client = client
+        self.staleAfter = staleAfter
+        self.now = now
+    }
 
     // MARK: - Query helpers
 
     func isFluidAudioModelDownloaded(named modelName: String) -> Bool {
-        let version = FluidAudioModelManager.asrVersion(for: modelName)
-        return AsrModels.modelsExist(at: cacheDirectory(for: version), version: version)
+        guard activeDownloads[modelName] == nil,
+              downloadIssues[modelName] == nil else {
+            return false
+        }
+        return client.modelsExist(FluidAudioModelManager.asrVersion(for: modelName))
     }
 
     func isFluidAudioModelDownloaded(_ model: FluidAudioModel) -> Bool {
@@ -42,59 +135,189 @@ class FluidAudioModelManager: ObservableObject {
     }
 
     func isFluidAudioModelDownloading(_ model: FluidAudioModel) -> Bool {
-        downloadStatuses[model.name] != nil
+        activeDownloads[model.name] != nil
     }
 
     func downloadStatus(for model: FluidAudioModel) -> VoiceInkFluidAudioDownloadStatus? {
         downloadStatuses[model.name]
     }
 
+    func downloadIssue(for model: FluidAudioModel) -> FluidAudioModelDownloadIssue? {
+        downloadIssues[model.name]
+    }
+
     // MARK: - Download
 
     func downloadFluidAudioModel(_ model: FluidAudioModel) async {
+        let modelName = model.name
         if isFluidAudioModelDownloaded(model) {
-            logger.notice("FluidAudio download skipped; model already downloaded: \(model.name, privacy: .public)")
+            logger.notice("FluidAudio download skipped; model already downloaded: \(modelName, privacy: .public)")
+            clearDownloadPresentation(for: modelName)
+            onModelsChanged?()
             return
         }
 
-        if isFluidAudioModelDownloading(model) {
-            logger.notice("FluidAudio download skipped; download already active: \(model.name, privacy: .public)")
+        if let activeDownload = activeDownloads[modelName] {
+            logger.notice("FluidAudio download joined existing task: \(modelName, privacy: .public)")
+            await activeDownload.task.value
             return
         }
 
+        await startDownload(model, force: false)
+    }
+
+    func cancelFluidAudioModelDownload(_ model: FluidAudioModel) {
+        guard let activeDownload = activeDownloads[model.name] else { return }
+        logger.notice("FluidAudio download cancellation requested: \(model.name, privacy: .public)")
+        activeDownload.task.cancel()
+    }
+
+    func retryFluidAudioModelDownload(_ model: FluidAudioModel) async {
+        let modelName = model.name
+        if let activeDownload = activeDownloads[modelName] {
+            logger.notice("FluidAudio download retry cancelling existing task: \(modelName, privacy: .public)")
+            activeDownload.task.cancel()
+            await activeDownload.task.value
+        }
+
+        let version = FluidAudioModelManager.asrVersion(for: modelName)
+        let cacheExists = client.cacheDirectoryExists(version)
+        if cacheExists {
+            do {
+                if try await client.validateCache(version) {
+                    logger.notice("FluidAudio retry found a valid completed cache: \(modelName, privacy: .public)")
+                    clearDownloadPresentation(for: modelName)
+                    onModelsChanged?()
+                    return
+                }
+            } catch {
+                logger.error(
+                    "FluidAudio cache validation failed for \(modelName, privacy: .public): \(error.localizedDescription, privacy: .public)"
+                )
+            }
+        }
+
+        await startDownload(model, force: cacheExists)
+    }
+
+    func checkForStalledDownloads(at date: Date? = nil) {
+        let checkDate = date ?? now()
+        for (modelName, activeDownload) in activeDownloads {
+            guard let progressDate = lastProgressAt[modelName],
+                  checkDate.timeIntervalSince(progressDate) >= staleAfter,
+                  downloadIssues[modelName] != .stalled else {
+                continue
+            }
+
+            downloadIssues[modelName] = .stalled
+            logger.error(
+                "FluidAudio download has made no progress: \(modelName, privacy: .public), downloadID=\(activeDownload.id.uuidString, privacy: .public), silentSeconds=\(Int(checkDate.timeIntervalSince(progressDate)), privacy: .public)"
+            )
+        }
+    }
+
+    private func startDownload(_ model: FluidAudioModel, force: Bool) async {
         let modelName = model.name
         let downloadID = UUID()
-        logger.notice("FluidAudio download starting: \(modelName, privacy: .public)")
-        activeDownloadIDs[modelName] = downloadID
+        let startedAt = now()
+        logger.notice(
+            "FluidAudio download starting: \(modelName, privacy: .public), downloadID=\(downloadID.uuidString, privacy: .public), force=\(force, privacy: .public)"
+        )
+
+        downloadStartedAt[modelName] = startedAt
+        lastProgressAt[modelName] = startedAt
+        downloadIssues[modelName] = nil
         let initialStatus = VoiceInkFluidAudioDownloadStatus(
             fractionCompleted: 0.0,
             phase: .preparingDownload
         )
         downloadStatuses[modelName] = initialStatus
         logDownloadProgressIfNeeded(initialStatus, for: modelName)
-        defer {
-            clearDownloadStatus(for: modelName, downloadID: downloadID)
-            onModelsChanged?()
-        }
 
+        let task = Task { @MainActor [weak self] in
+            await self?.runDownload(model, downloadID: downloadID, force: force)
+        }
+        activeDownloads[modelName] = ActiveDownload(id: downloadID, task: task)
+        startWatchdog(for: modelName, downloadID: downloadID)
+        await task.value
+    }
+
+    private func runDownload(_ model: FluidAudioModel, downloadID: UUID, force: Bool) async {
+        let modelName = model.name
         let version = FluidAudioModelManager.asrVersion(for: modelName)
-        let progressHandler: DownloadUtils.ProgressHandler = { [weak self] progress in
+        let reportProgress: FluidAudioModelDownloadClient.ProgressHandler = { [weak self] status in
             Task { @MainActor [weak self] in
-                self?.updateDownloadProgress(progress, for: modelName, downloadID: downloadID)
+                self?.updateDownloadProgress(status, for: modelName, downloadID: downloadID)
             }
         }
 
         do {
-            _ = try await AsrModels.downloadAndLoad(
-                version: version,
-                progressHandler: progressHandler
-            )
-            logger.notice(
-                "FluidAudio download finished: \(modelName, privacy: .public), downloaded=\(self.isFluidAudioModelDownloaded(named: modelName), privacy: .public)"
-            )
+            try await client.downloadAndLoad(version, force, reportProgress)
+            try Task.checkCancellation()
+            guard client.modelsExist(version) else {
+                throw FluidAudioModelManagerError.completedWithoutModels
+            }
+            finishDownload(modelName: modelName, downloadID: downloadID, result: .success(()))
+        } catch is CancellationError {
+            let result: Result<Void, Error> = client.modelsExist(version)
+                ? .success(())
+                : .failure(CancellationError())
+            finishDownload(modelName: modelName, downloadID: downloadID, result: result)
         } catch {
-            logger.error("❌ FluidAudio download failed for \(modelName, privacy: .public): \(error.localizedDescription, privacy: .public)")
+            finishDownload(modelName: modelName, downloadID: downloadID, result: .failure(error))
         }
+    }
+
+    private func startWatchdog(for modelName: String, downloadID: UUID) {
+        watchdogTasks[modelName]?.cancel()
+        watchdogTasks[modelName] = Task { @MainActor [weak self] in
+            while !Task.isCancelled {
+                try? await Task.sleep(nanoseconds: 30_000_000_000)
+                guard !Task.isCancelled,
+                      self?.activeDownloads[modelName]?.id == downloadID else {
+                    return
+                }
+                self?.checkForStalledDownloads()
+            }
+        }
+    }
+
+    private func finishDownload(
+        modelName: String,
+        downloadID: UUID,
+        result: Result<Void, Error>
+    ) {
+        guard activeDownloads[modelName]?.id == downloadID else { return }
+
+        watchdogTasks[modelName]?.cancel()
+        watchdogTasks[modelName] = nil
+        activeDownloads[modelName] = nil
+        lastProgressAt[modelName] = nil
+
+        let elapsed = Int(now().timeIntervalSince(downloadStartedAt[modelName] ?? now()))
+        switch result {
+        case .success:
+            logger.notice(
+                "FluidAudio download finished: \(modelName, privacy: .public), downloadID=\(downloadID.uuidString, privacy: .public), elapsedSeconds=\(elapsed, privacy: .public)"
+            )
+            clearDownloadPresentation(for: modelName)
+        case .failure(let error) where error is CancellationError:
+            logger.notice(
+                "FluidAudio download cancelled: \(modelName, privacy: .public), downloadID=\(downloadID.uuidString, privacy: .public), elapsedSeconds=\(elapsed, privacy: .public)"
+            )
+            downloadStatuses[modelName] = nil
+            downloadIssues[modelName] = .cancelled
+            clearDownloadLogState(for: modelName)
+        case .failure(let error):
+            logger.error(
+                "FluidAudio download failed: \(modelName, privacy: .public), downloadID=\(downloadID.uuidString, privacy: .public), elapsedSeconds=\(elapsed, privacy: .public), error=\(error.localizedDescription, privacy: .public)"
+            )
+            downloadIssues[modelName] = .failed(error.localizedDescription)
+            clearDownloadLogState(for: modelName)
+        }
+
+        downloadStartedAt[modelName] = nil
+        onModelsChanged?()
     }
 
     // MARK: - Delete
@@ -107,10 +330,12 @@ class FluidAudioModelManager: ObservableObject {
                 try FileManager.default.removeItem(at: cacheDirectory)
             }
         } catch {
-            // Silently ignore removal errors
+            logger.error(
+                "FluidAudio model deletion failed for \(model.name, privacy: .public): \(error.localizedDescription, privacy: .public)"
+            )
         }
 
-        // Notify TranscriptionModelManager to clear currentTranscriptionModel if it matches
+        clearDownloadPresentation(for: model.name)
         onModelDeleted?(model.name)
     }
 
@@ -134,22 +359,30 @@ class FluidAudioModelManager: ObservableObject {
         AsrModels.defaultCacheDirectory(for: version)
     }
 
-    private func clearDownloadStatus(for modelName: String, downloadID: UUID) {
-        guard activeDownloadIDs[modelName] == downloadID else { return }
-        activeDownloadIDs[modelName] = nil
+    private func clearDownloadPresentation(for modelName: String) {
         downloadStatuses[modelName] = nil
+        downloadIssues[modelName] = nil
+        clearDownloadLogState(for: modelName)
+    }
+
+    private func clearDownloadLogState(for modelName: String) {
         lastLoggedDownloadPercents[modelName] = nil
         lastLoggedDownloadMessages[modelName] = nil
     }
 
-    private func updateDownloadProgress(_ progress: DownloadUtils.DownloadProgress, for modelName: String, downloadID: UUID) {
-        guard activeDownloadIDs[modelName] == downloadID else { return }
+    private func updateDownloadProgress(
+        _ status: VoiceInkFluidAudioDownloadStatus,
+        for modelName: String,
+        downloadID: UUID
+    ) {
+        guard activeDownloads[modelName]?.id == downloadID else { return }
 
-        let status = VoiceInkFluidAudioDownloadStatus(
-            fractionCompleted: progress.fractionCompleted,
-            phase: FluidAudioModelManager.downloadPhase(for: progress)
-        )
         downloadStatuses[modelName] = status
+        lastProgressAt[modelName] = now()
+        if downloadIssues[modelName] == .stalled {
+            downloadIssues[modelName] = nil
+            logger.notice("FluidAudio download resumed after a silent interval: \(modelName, privacy: .public)")
+        }
         logDownloadProgressIfNeeded(status, for: modelName)
     }
 
@@ -166,12 +399,31 @@ class FluidAudioModelManager: ObservableObject {
 
         lastLoggedDownloadPercents[modelName] = percent
         lastLoggedDownloadMessages[modelName] = status.message
+        let elapsed = Int(now().timeIntervalSince(downloadStartedAt[modelName] ?? now()))
+        let downloadID = activeDownloads[modelName]?.id.uuidString ?? "unknown"
         logger.notice(
-            "FluidAudio download progress: \(modelName, privacy: .public), percent=\(percent, privacy: .public), message=\(status.message, privacy: .public)"
+            "FluidAudio download progress: \(modelName, privacy: .public), downloadID=\(downloadID, privacy: .public), percent=\(percent, privacy: .public), message=\(status.message, privacy: .public), elapsedSeconds=\(elapsed, privacy: .public)"
+        )
+    }
+}
+
+private enum FluidAudioModelManagerError: LocalizedError {
+    case completedWithoutModels
+
+    var errorDescription: String? {
+        "The download completed, but the required model files are missing."
+    }
+}
+
+private extension VoiceInkFluidAudioDownloadStatus {
+    init(progress: DownloadUtils.DownloadProgress) {
+        self.init(
+            fractionCompleted: progress.fractionCompleted,
+            phase: Self.downloadPhase(for: progress)
         )
     }
 
-    private static func downloadPhase(for progress: DownloadUtils.DownloadProgress) -> VoiceInkFluidAudioDownloadPhase {
+    static func downloadPhase(for progress: DownloadUtils.DownloadProgress) -> VoiceInkFluidAudioDownloadPhase {
         switch progress.phase {
         case .listing:
             return .listingFiles

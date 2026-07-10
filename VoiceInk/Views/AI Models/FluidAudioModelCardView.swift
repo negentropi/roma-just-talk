@@ -30,6 +30,10 @@ struct FluidAudioModelCardView: View {
         fluidAudioModelManager.isFluidAudioModelDownloading(model)
     }
 
+    var downloadIssue: FluidAudioModelDownloadIssue? {
+        fluidAudioModelManager.downloadIssue(for: model)
+    }
+
     var body: some View {
         HStack(alignment: .top, spacing: 16) {
             VStack(alignment: .leading, spacing: 6) {
@@ -128,7 +132,7 @@ struct FluidAudioModelCardView: View {
     }
 
     private var progressSection: some View {
-        Group {
+        VStack(alignment: .leading, spacing: 6) {
             if let status = fluidAudioModelManager.downloadStatus(for: model) {
                 VStack(alignment: .leading, spacing: 6) {
                     HStack {
@@ -159,12 +163,58 @@ struct FluidAudioModelCardView: View {
                 .padding(.top, 8)
                 .animation(.smooth, value: status.fractionCompleted)
             }
+
+            if let downloadIssue {
+                Label(downloadIssue.message, systemImage: downloadIssue.systemImage)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(downloadIssue == .stalled ? Color.orange : Color.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.top, 4)
+            }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var actionSection: some View {
         HStack(spacing: 8) {
-            if isCurrent {
+            if isDownloading {
+                if downloadIssue == .stalled {
+                    Button {
+                        Task {
+                            await fluidAudioModelManager.retryFluidAudioModelDownload(model)
+                        }
+                    } label: {
+                        Label("Retry", systemImage: "arrow.clockwise")
+                            .font(.system(size: 12, weight: .medium))
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.small)
+                } else {
+                    Text(VoiceInkFluidAudioDownloadStatus.compactDownloadingStatusText)
+                        .font(.system(size: 12))
+                        .foregroundColor(Color(.secondaryLabelColor))
+                }
+
+                Button {
+                    fluidAudioModelManager.cancelFluidAudioModelDownload(model)
+                } label: {
+                    Image(systemName: "xmark.circle")
+                        .font(.system(size: 14))
+                }
+                .buttonStyle(.borderless)
+                .help("Cancel download")
+            } else if downloadIssue != nil {
+                Button {
+                    Task {
+                        await fluidAudioModelManager.retryFluidAudioModelDownload(model)
+                    }
+                } label: {
+                    Label("Retry", systemImage: "arrow.clockwise")
+                        .font(.system(size: 12, weight: .medium))
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.small)
+            } else if isCurrent {
                 Text(VoiceInkModelManagementPresentation.defaultModelTitle)
                     .font(.system(size: 12))
                     .foregroundColor(Color(.secondaryLabelColor))
@@ -187,9 +237,7 @@ struct FluidAudioModelCardView: View {
                 }) {
                     HStack(spacing: 4) {
                         Text(
-                            isDownloading
-                                ? VoiceInkFluidAudioDownloadStatus.compactDownloadingStatusText
-                                : VoiceInkModelManagementPresentation.downloadButtonTitle
+                            VoiceInkModelManagementPresentation.downloadButtonTitle
                         )
                         Image(systemName: "arrow.down.circle")
                     }
@@ -200,10 +248,9 @@ struct FluidAudioModelCardView: View {
                     .background(Capsule().fill(Color.accentColor))
                 }
                 .buttonStyle(.plain)
-                .disabled(isDownloading)
             }
 
-            if isDownloaded {
+            if isDownloaded && !isDownloading {
                 Menu {
                     Button(action: {
                         fluidAudioModelManager.deleteFluidAudioModel(model)

@@ -4,7 +4,7 @@ import os
 import VoiceInkCore
 
 struct SpecialShortcutOptions: Equatable {
-    var pasteLastTranscriptOnEmptyTap = true
+    var pasteLastTranscriptOnEmptyTap = VoiceInkPreferenceDefault.specialShortcutPasteLastTranscriptOnEmptyTap
 }
 
 @MainActor

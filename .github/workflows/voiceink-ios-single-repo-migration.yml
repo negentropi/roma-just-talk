@@ -113,6 +113,16 @@ jobs:
           if-no-files-found: warn
           retention-days: 3
 
+      - name: Print iOS crash reports
+        if: steps.ios_tests.outcome == 'failure'
+        run: |
+          shopt -s nullglob
+          reports=("$HOME"/Library/Logs/DiagnosticReports/roma\ just\ talk*.ips)
+          for report in "${reports[@]}"; do
+            echo "Crash report: $report"
+            sed -n '1,360p' "$report"
+          done
+
       - name: Fail when focused iOS parity tests fail
         if: steps.ios_tests.outcome == 'failure'
         run: exit 1

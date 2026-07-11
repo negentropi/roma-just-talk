@@ -57,6 +57,10 @@ struct SettingsView: View {
                     Label("AI Enhancement", systemImage: "wand.and.stars")
                 }
 
+                NavigationLink(destination: IOSRecordingFeedbackView()) {
+                    Label("Recording Feedback", systemImage: "speaker.wave.2")
+                }
+
                 NavigationLink(destination: IOSHelpSupportView(
                     announcementsStore: .shared
                 )) {

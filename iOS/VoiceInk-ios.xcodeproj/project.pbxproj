@@ -17,6 +17,13 @@
 		B30000062FC0000000000001 /* FluidAudioModelManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30000052FC0000000000001 /* FluidAudioModelManager.swift */; };
 		B30000082FC0000000000001 /* FluidAudioStreamingProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30000072FC0000000000001 /* FluidAudioStreamingProvider.swift */; };
 		B30000102FC0000000000001 /* FluidAudioWordTimingAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30000092FC0000000000001 /* FluidAudioWordTimingAdapter.swift */; };
+		C10000012FD0000000000001 /* sound1.wav in Resources */ = {isa = PBXBuildFile; fileRef = C11000012FD0000000000001 /* sound1.wav */; };
+		C10000022FD0000000000001 /* sound2.wav in Resources */ = {isa = PBXBuildFile; fileRef = C11000022FD0000000000001 /* sound2.wav */; };
+		C10000032FD0000000000001 /* sound3.wav in Resources */ = {isa = PBXBuildFile; fileRef = C11000032FD0000000000001 /* sound3.wav */; };
+		C10000042FD0000000000001 /* sound4.wav in Resources */ = {isa = PBXBuildFile; fileRef = C11000042FD0000000000001 /* sound4.wav */; };
+		C10000052FD0000000000001 /* sound5.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = C11000052FD0000000000001 /* sound5.mp3 */; };
+		C10000062FD0000000000001 /* sound6.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = C11000062FD0000000000001 /* sound6.mp3 */; };
+		C10000072FD0000000000001 /* sound7.wav in Resources */ = {isa = PBXBuildFile; fileRef = C11000072FD0000000000001 /* sound7.wav */; };
 		E14E276F2E5F5B5D00143372 /* whisper.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = E14E276E2E5F5B5D00143372 /* whisper.xcframework */; };
 		E14E27702E5F5B5D00143372 /* whisper.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E14E276E2E5F5B5D00143372 /* whisper.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E18B9A542E600F9F0068773A /* VoiceInkKeyboard.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E18B9A4D2E600F9F0068773A /* VoiceInkKeyboard.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -76,6 +83,13 @@
 		B30000052FC0000000000001 /* FluidAudioModelManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../VoiceInk/Transcription/FluidAudio/FluidAudioModelManager.swift; sourceTree = SOURCE_ROOT; };
 		B30000072FC0000000000001 /* FluidAudioStreamingProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../VoiceInk/Transcription/Streaming/FluidAudioStreamingProvider.swift; sourceTree = SOURCE_ROOT; };
 		B30000092FC0000000000001 /* FluidAudioWordTimingAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../VoiceInk/Transcription/Streaming/FluidAudioWordTimingAdapter.swift; sourceTree = SOURCE_ROOT; };
+		C11000012FD0000000000001 /* sound1.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ../VoiceInk/Resources/Sounds/sound1.wav; sourceTree = SOURCE_ROOT; };
+		C11000022FD0000000000001 /* sound2.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ../VoiceInk/Resources/Sounds/sound2.wav; sourceTree = SOURCE_ROOT; };
+		C11000032FD0000000000001 /* sound3.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ../VoiceInk/Resources/Sounds/sound3.wav; sourceTree = SOURCE_ROOT; };
+		C11000042FD0000000000001 /* sound4.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ../VoiceInk/Resources/Sounds/sound4.wav; sourceTree = SOURCE_ROOT; };
+		C11000052FD0000000000001 /* sound5.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = ../VoiceInk/Resources/Sounds/sound5.mp3; sourceTree = SOURCE_ROOT; };
+		C11000062FD0000000000001 /* sound6.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = ../VoiceInk/Resources/Sounds/sound6.mp3; sourceTree = SOURCE_ROOT; };
+		C11000072FD0000000000001 /* sound7.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ../VoiceInk/Resources/Sounds/sound7.wav; sourceTree = SOURCE_ROOT; };
 		E14E276E2E5F5B5D00143372 /* whisper.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = whisper.xcframework; path = "$(HOME)/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework"; sourceTree = "<group>"; };
 		E168DF072E4B464B00F133D2 /* roma just talk.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "roma just talk.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E168DF182E4B464C00F133D2 /* VoiceInk-iosTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "VoiceInk-iosTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -375,6 +389,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C10000012FD0000000000001 /* sound1.wav in Resources */,
+				C10000022FD0000000000001 /* sound2.wav in Resources */,
+				C10000032FD0000000000001 /* sound3.wav in Resources */,
+				C10000042FD0000000000001 /* sound4.wav in Resources */,
+				C10000052FD0000000000001 /* sound5.mp3 in Resources */,
+				C10000062FD0000000000001 /* sound6.mp3 in Resources */,
+				C10000072FD0000000000001 /* sound7.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

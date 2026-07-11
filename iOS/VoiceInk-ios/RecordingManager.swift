@@ -14,6 +14,7 @@ final class RecordingManager: ObservableObject {
     @Published private(set) var liveTranscriptionFallbackMessage: String?
     
     private let recorder = AudioRecorder()
+    private let recordingFeedback = IOSRecordingFeedbackManager.shared
     private let settings = AppSettings.shared
     private let transcriptionTasks = IOSTranscriptionTaskCoordinator.shared
     private var durationTimer: Timer?
@@ -24,6 +25,7 @@ final class RecordingManager: ObservableObject {
     private var activeStreamingStartedAt: Date?
     private var streamingTranscriptCancellable: AnyCancellable?
     private var streamingStartupTask: Task<Void, Never>?
+    private var recordingStartTask: Task<Void, Never>?
 
     private let coordinator = AppGroupCoordinator.shared
     
@@ -40,6 +42,7 @@ final class RecordingManager: ObservableObject {
     
     deinit {
         durationTimer?.invalidate()
+        recordingStartTask?.cancel()
     }
     
     // MARK: - Coordinator Setup
@@ -160,20 +163,28 @@ final class RecordingManager: ObservableObject {
     }
 
     private func startRecorder(streamingService: IOSStreamingTranscriptionService?) {
-        do {
-            try recorder.startRecording { data in
-                streamingService?.sendAudioChunk(data)
+        recordingStartTask?.cancel()
+        recordingStartTask = Task { [weak self] in
+            guard let self else { return }
+            await recordingFeedback.playStartFeedback()
+            guard !Task.isCancelled else { return }
+            do {
+                try recorder.startRecording { data in
+                    streamingService?.sendAudioChunk(data)
+                }
+                recordingStartTask = nil
+                updateFlowState { $0.completeRecordingStart() }
+                startDurationTimer()
+            } catch {
+                recordingStartTask = nil
+                let alert = VoiceInkRecordingAlertPresentation.recordingStartFailure(for: error)
+                activeRecordingAlert = alert
+                updateFlowState { $0.failRecordingStart() }
+                coordinator.updateRecordingState(false)
+                streamingService?.cancel()
+                clearStreamingState()
+                failActiveKeyboardDictation(message: alert.message)
             }
-            updateFlowState { $0.completeRecordingStart() }
-            startDurationTimer()
-        } catch {
-            let alert = VoiceInkRecordingAlertPresentation.recordingStartFailure(for: error)
-            activeRecordingAlert = alert
-            updateFlowState { $0.failRecordingStart() }
-            coordinator.updateRecordingState(false)
-            streamingService?.cancel()
-            clearStreamingState()
-            failActiveKeyboardDictation(message: alert.message)
         }
     }
     
@@ -216,6 +227,10 @@ final class RecordingManager: ObservableObject {
                 recorder.currentRecordingURL = nil
             }
         )
+
+        if stopPlan.pendingDraft != nil {
+            recordingFeedback.playStopFeedback()
+        }
 
         clearStreamingState(cancelService: false)
 
@@ -295,6 +310,8 @@ final class RecordingManager: ObservableObject {
     }
 
     private func clearStreamingState(cancelService: Bool = true) {
+        recordingStartTask?.cancel()
+        recordingStartTask = nil
         streamingStartupTask?.cancel()
         streamingStartupTask = nil
         if cancelService {

@@ -6,7 +6,38 @@ public struct VoiceInkModeRuntimeConfiguration: Equatable, Sendable {
     public let postProcessingProvider: VoiceInkProviderKind
     public let postProcessingModel: String
     public let prompt: String
+    public let promptName: String?
     public let isPostProcessingEnabled: Bool
+
+    public init(
+        transcriptionProvider: VoiceInkProviderKind,
+        transcriptionModel: String,
+        postProcessingProvider: VoiceInkProviderKind,
+        postProcessingModel: String,
+        prompt: String,
+        promptName: String? = nil,
+        isPostProcessingEnabled: Bool
+    ) {
+        self.transcriptionProvider = transcriptionProvider
+        self.transcriptionModel = transcriptionModel
+        self.postProcessingProvider = postProcessingProvider
+        self.postProcessingModel = postProcessingModel
+        self.prompt = prompt
+        self.promptName = promptName
+        self.isPostProcessingEnabled = isPostProcessingEnabled
+    }
+
+    public func applyingPrompt(_ prompt: VoiceInkCustomPrompt?, forceEnablement: Bool = false) -> Self {
+        return VoiceInkModeRuntimeConfiguration(
+            transcriptionProvider: transcriptionProvider,
+            transcriptionModel: transcriptionModel,
+            postProcessingProvider: postProcessingProvider,
+            postProcessingModel: postProcessingModel,
+            prompt: prompt?.finalPromptText ?? self.prompt,
+            promptName: prompt?.title ?? promptName,
+            isPostProcessingEnabled: isPostProcessingEnabled || forceEnablement
+        )
+    }
 
     public static var fallback: VoiceInkModeRuntimeConfiguration {
         Mode.defaultLocalWhisper().runtimeConfiguration
@@ -405,6 +436,7 @@ public struct Mode: Identifiable, Codable {
     public var postProcessingProvider: VoiceInkProviderKind
     public var postProcessingModel: String
     public var promptTemplate: VoiceInkPostProcessingPromptTemplate
+    public var selectedPromptId: UUID?
 
     private enum CodingKeys: String, CodingKey {
         case id
@@ -415,6 +447,7 @@ public struct Mode: Identifiable, Codable {
         case postProcessingProvider
         case postProcessingModel
         case promptTemplate
+        case selectedPromptId
     }
 
     public init(
@@ -424,7 +457,8 @@ public struct Mode: Identifiable, Codable {
         isPostProcessingEnabled: Bool = false,
         postProcessingProvider: VoiceInkProviderKind = .groq,
         postProcessingModel: String? = nil,
-        promptTemplate: VoiceInkPostProcessingPromptTemplate? = nil
+        promptTemplate: VoiceInkPostProcessingPromptTemplate? = nil,
+        selectedPromptId: UUID? = nil
     ) {
         self.id = UUID()
         self.name = name
@@ -438,6 +472,7 @@ public struct Mode: Identifiable, Codable {
             ?? postProcessingProvider.defaultModel(for: .postProcessing)
             ?? VoiceInkAIModelCatalog.defaultModel(for: .groq)
         self.promptTemplate = promptTemplate ?? VoiceInkPostProcessingPromptTemplate(type: .summary)
+        self.selectedPromptId = selectedPromptId
     }
 
     public init(from decoder: Decoder) throws {
@@ -446,6 +481,7 @@ public struct Mode: Identifiable, Codable {
         name = try container.decode(String.self, forKey: .name)
         isPostProcessingEnabled = try container.decode(Bool.self, forKey: .isPostProcessingEnabled)
         promptTemplate = try container.decode(VoiceInkPostProcessingPromptTemplate.self, forKey: .promptTemplate)
+        selectedPromptId = try container.decodeIfPresent(UUID.self, forKey: .selectedPromptId)
 
         let transcriptionProviderValue = try container.decode(String.self, forKey: .transcriptionProvider)
         if Self.isLegacyVoiceInkProviderValue(transcriptionProviderValue) {
@@ -477,6 +513,7 @@ public struct Mode: Identifiable, Codable {
         try container.encode(postProcessingProvider, forKey: .postProcessingProvider)
         try container.encode(postProcessingModel, forKey: .postProcessingModel)
         try container.encode(promptTemplate, forKey: .promptTemplate)
+        try container.encodeIfPresent(selectedPromptId, forKey: .selectedPromptId)
     }
 
     private static func isLegacyVoiceInkProviderValue(_ value: String) -> Bool {
@@ -582,16 +619,23 @@ public struct Mode: Identifiable, Codable {
     }
 
     public func runtimeConfiguration(
-        additionalLocalWhisperModelNames: [String]
+        additionalLocalWhisperModelNames: [String],
+        prompts: [VoiceInkCustomPrompt] = [],
+        recordingPromptOverrideId: UUID? = nil
     ) -> VoiceInkModeRuntimeConfiguration {
-        VoiceInkModeRuntimeConfiguration(
+        let prompt = VoiceInkCustomPromptPolicy.activePrompt(
+            selectedPromptId: recordingPromptOverrideId ?? selectedPromptId,
+            prompts: prompts
+        )
+        return VoiceInkModeRuntimeConfiguration(
             transcriptionProvider: transcriptionProvider,
             transcriptionModel: effectiveTranscriptionModel(
                 additionalLocalWhisperModelNames: additionalLocalWhisperModelNames
             ),
             postProcessingProvider: postProcessingProvider,
             postProcessingModel: effectivePostProcessingModel,
-            prompt: effectivePrompt,
+            prompt: prompt?.finalPromptText ?? effectivePrompt,
+            promptName: prompt?.title,
             isPostProcessingEnabled: isPostProcessingEnabled
         )
     }
@@ -660,7 +704,7 @@ public struct Mode: Identifiable, Codable {
             return false
         }
 
-        if promptTemplate.type == .custom {
+        if selectedPromptId == nil, promptTemplate.type == .custom {
             return !promptTemplate.customPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         }
 
@@ -689,10 +733,14 @@ public extension Collection where Element == Mode {
 
     func runtimeConfiguration(
         selectedModeId: UUID?,
-        additionalLocalWhisperModelNames: [String] = []
+        additionalLocalWhisperModelNames: [String] = [],
+        prompts: [VoiceInkCustomPrompt] = [],
+        recordingPromptOverrideId: UUID? = nil
     ) -> VoiceInkModeRuntimeConfiguration {
         activeMode(selectedModeId: selectedModeId)?.runtimeConfiguration(
-            additionalLocalWhisperModelNames: additionalLocalWhisperModelNames
+            additionalLocalWhisperModelNames: additionalLocalWhisperModelNames,
+            prompts: prompts,
+            recordingPromptOverrideId: recordingPromptOverrideId
         ) ?? .fallback
     }
 

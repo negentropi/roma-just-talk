@@ -612,6 +612,8 @@ public struct VoiceInkTranscriptionRunSettings: Equatable, Sendable {
     public let transcriptionPrompt: String?
     public let wordReplacementRules: [VoiceInkWordReplacementRule]
     public let customVocabulary: [String]
+    public let promptLibrary: [VoiceInkCustomPrompt]
+    public let selectedPromptId: UUID?
 
     public init(
         configuration: VoiceInkModeRuntimeConfiguration,
@@ -620,7 +622,9 @@ public struct VoiceInkTranscriptionRunSettings: Equatable, Sendable {
         transcriptionLanguage: String? = nil,
         transcriptionPrompt: String? = nil,
         wordReplacementRules: [VoiceInkWordReplacementRule] = [],
-        customVocabulary: [String] = []
+        customVocabulary: [String] = [],
+        promptLibrary: [VoiceInkCustomPrompt] = [],
+        selectedPromptId: UUID? = nil
     ) {
         self.configuration = configuration
         self.cleanupConfiguration = cleanupConfiguration
@@ -629,6 +633,26 @@ public struct VoiceInkTranscriptionRunSettings: Equatable, Sendable {
         self.transcriptionPrompt = transcriptionPrompt
         self.wordReplacementRules = wordReplacementRules
         self.customVocabulary = customVocabulary
+        self.promptLibrary = promptLibrary
+        self.selectedPromptId = selectedPromptId
+    }
+
+    public func selectingPrompt(_ promptId: UUID?, from prompts: [VoiceInkCustomPrompt]) -> Self {
+        let prompt = VoiceInkCustomPromptPolicy.activePrompt(
+            selectedPromptId: promptId,
+            prompts: prompts
+        )
+        return VoiceInkTranscriptionRunSettings(
+            configuration: configuration.applyingPrompt(prompt),
+            cleanupConfiguration: cleanupConfiguration,
+            postProcessingSkipConfiguration: postProcessingSkipConfiguration,
+            transcriptionLanguage: transcriptionLanguage,
+            transcriptionPrompt: transcriptionPrompt,
+            wordReplacementRules: wordReplacementRules,
+            customVocabulary: customVocabulary,
+            promptLibrary: prompts,
+            selectedPromptId: promptId
+        )
     }
 
     public func transcribe(
@@ -645,6 +669,8 @@ public struct VoiceInkTranscriptionRunSettings: Equatable, Sendable {
                 VoiceInkWordReplacementEngine.apply(wordReplacementRules, to: text)
             },
             postProcessingSkipConfiguration: postProcessingSkipConfiguration,
+            promptLibrary: promptLibrary,
+            selectedPromptId: selectedPromptId,
             transcriptionLanguage: transcriptionLanguage,
             transcriptionPrompt: transcriptionPrompt,
             customVocabulary: customVocabulary,
@@ -669,6 +695,8 @@ public struct VoiceInkTranscriptionRunSettings: Equatable, Sendable {
                 VoiceInkWordReplacementEngine.apply(wordReplacementRules, to: text)
             },
             postProcessingSkipConfiguration: postProcessingSkipConfiguration,
+            promptLibrary: promptLibrary,
+            selectedPromptId: selectedPromptId,
             apiKeyProvider: apiKeyProvider
         )
     }
@@ -681,6 +709,8 @@ public struct VoiceInkIOSAppSettingsRunSnapshot {
     public let wordReplacementRules: [VoiceInkWordReplacementRule]
     public let customVocabulary: [String]
     public let additionalLocalWhisperModelNames: [String]
+    public let promptLibrary: [VoiceInkCustomPrompt]
+    public let recordingPromptOverrideId: UUID?
 
     public init(
         modes: [Mode],
@@ -688,7 +718,9 @@ public struct VoiceInkIOSAppSettingsRunSnapshot {
         selectedTranscriptionLanguage: String,
         wordReplacementRules: [VoiceInkWordReplacementRule],
         customVocabulary: [String],
-        additionalLocalWhisperModelNames: [String] = []
+        additionalLocalWhisperModelNames: [String] = [],
+        promptLibrary: [VoiceInkCustomPrompt] = [],
+        recordingPromptOverrideId: UUID? = nil
     ) {
         self.modes = modes
         self.selectedModeId = selectedModeId
@@ -696,13 +728,17 @@ public struct VoiceInkIOSAppSettingsRunSnapshot {
         self.wordReplacementRules = wordReplacementRules
         self.customVocabulary = customVocabulary
         self.additionalLocalWhisperModelNames = additionalLocalWhisperModelNames
+        self.promptLibrary = promptLibrary
+        self.recordingPromptOverrideId = recordingPromptOverrideId
     }
 
     public func transcriptionRunSettings(defaults: UserDefaults = .standard) -> VoiceInkTranscriptionRunSettings {
         VoiceInkTranscriptionRunSettings(
             configuration: modes.runtimeConfiguration(
                 selectedModeId: selectedModeId,
-                additionalLocalWhisperModelNames: additionalLocalWhisperModelNames
+                additionalLocalWhisperModelNames: additionalLocalWhisperModelNames,
+                prompts: promptLibrary,
+                recordingPromptOverrideId: recordingPromptOverrideId
             ),
             cleanupConfiguration: VoiceInkTranscriptionCleanupConfiguration.current(in: defaults),
             postProcessingSkipConfiguration: VoiceInkPostProcessingSkipConfiguration.current(in: defaults),
@@ -712,7 +748,10 @@ public struct VoiceInkIOSAppSettingsRunSnapshot {
                 customPrompts: VoiceInkLocalWhisperPromptCatalog.storedCustomPrompts(from: defaults)
             ),
             wordReplacementRules: wordReplacementRules,
-            customVocabulary: customVocabulary
+            customVocabulary: customVocabulary,
+            promptLibrary: promptLibrary,
+            selectedPromptId: recordingPromptOverrideId
+                ?? modes.activeMode(selectedModeId: selectedModeId)?.selectedPromptId
         )
     }
 }
@@ -757,6 +796,8 @@ public struct VoiceInkTranscriptionRunProcessor {
         cleanupConfiguration: VoiceInkTranscriptionCleanupConfiguration = .disabled,
         applyingWordReplacements wordReplacement: (String) -> String = { $0 },
         postProcessingSkipConfiguration: VoiceInkPostProcessingSkipConfiguration? = nil,
+        promptLibrary: [VoiceInkCustomPrompt] = [],
+        selectedPromptId: UUID? = nil,
         promptTriggerForcesPostProcessing: Bool = false,
         transcriptionLanguage: String? = nil,
         transcriptionPrompt: String? = nil,
@@ -798,6 +839,8 @@ public struct VoiceInkTranscriptionRunProcessor {
             cleanupConfiguration: cleanupConfiguration,
             applyingWordReplacements: wordReplacement,
             postProcessingSkipConfiguration: postProcessingSkipConfiguration,
+            promptLibrary: promptLibrary,
+            selectedPromptId: selectedPromptId,
             promptTriggerForcesPostProcessing: promptTriggerForcesPostProcessing,
             apiKeyProvider: apiKeyProvider
         )
@@ -811,6 +854,8 @@ public struct VoiceInkTranscriptionRunProcessor {
         cleanupConfiguration: VoiceInkTranscriptionCleanupConfiguration = .disabled,
         applyingWordReplacements wordReplacement: (String) -> String = { $0 },
         postProcessingSkipConfiguration: VoiceInkPostProcessingSkipConfiguration? = nil,
+        promptLibrary: [VoiceInkCustomPrompt] = [],
+        selectedPromptId: UUID? = nil,
         promptTriggerForcesPostProcessing: Bool = false,
         apiKeyProvider: APIKeyProvider
     ) async throws -> VoiceInkTranscriptionRunResult {
@@ -827,25 +872,40 @@ public struct VoiceInkTranscriptionRunProcessor {
             applyingWordReplacements: wordReplacement
         )
         let cleanedText = preparedRunText.cleanedText
+        let promptDetection = VoiceInkPromptDetectionPolicy.analyzeText(
+            cleanedText,
+            prompts: promptLibrary,
+            isEnhancementEnabled: configuration.isPostProcessingEnabled,
+            selectedPromptId: selectedPromptId
+        )
+        let selectedPrompt = VoiceInkCustomPromptPolicy.activePrompt(
+            selectedPromptId: promptDetection.selectedPromptId ?? selectedPromptId,
+            prompts: promptLibrary
+        )
+        let effectiveConfiguration = configuration.applyingPrompt(
+            selectedPrompt,
+            forceEnablement: promptDetection.shouldEnableAI
+        )
+        let shouldForcePostProcessing = promptTriggerForcesPostProcessing || promptDetection.shouldEnableAI
         let shouldSkipPostProcessing = preparedRunText.shouldSkipPostProcessing(
             configuration: postProcessingSkipConfiguration,
-            promptTriggerForcesPostProcessing: promptTriggerForcesPostProcessing
+            promptTriggerForcesPostProcessing: shouldForcePostProcessing
         )
-        let aiEnhancementModelName = configuration.isPostProcessingEnabled && !shouldSkipPostProcessing
-            ? configuration.postProcessingModel
+        let aiEnhancementModelName = effectiveConfiguration.isPostProcessingEnabled && !shouldSkipPostProcessing
+            ? effectiveConfiguration.postProcessingModel
             : nil
 
         var finalText = cleanedText
         var postProcessingResult: VoiceInkAIEnhancementResult? = nil
         var postProcessingError: String? = nil
 
-        if configuration.isPostProcessingEnabled, !shouldSkipPostProcessing {
-            let prompt = configuration.prompt
+        if effectiveConfiguration.isPostProcessingEnabled, !shouldSkipPostProcessing {
+            let prompt = effectiveConfiguration.prompt
             if !prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                let llmProvider = configuration.postProcessingProvider
+                let llmProvider = effectiveConfiguration.postProcessingProvider
                 let llmKey = await apiKeyProvider(llmProvider)
                 try Task.checkCancellation()
-                let llmModel = configuration.postProcessingModel
+                let llmModel = effectiveConfiguration.postProcessingModel
 
                 if let usableLLMKey = VoiceInkProviderCredential.nonBlank(llmKey) {
                     do {
@@ -855,7 +915,7 @@ public struct VoiceInkTranscriptionRunProcessor {
                             apiKey: usableLLMKey,
                             model: llmModel,
                             prompt: prompt,
-                            transcript: cleanedText
+                            transcript: promptDetection.processedText
                         ))
                         try Task.checkCancellation()
                         let enhancementEnd = currentDate()
@@ -864,7 +924,7 @@ public struct VoiceInkTranscriptionRunProcessor {
                             startedAt: enhancementStart,
                             endedAt: enhancementEnd,
                             modelName: llmModel,
-                            promptName: nil,
+                            promptName: effectiveConfiguration.promptName,
                             requestSystemMessage: nil,
                             requestUserMessage: nil
                         )

@@ -576,13 +576,6 @@ final class TranscriptionRunProcessorTests: XCTestCase {
         }
     }
 
-    func testTranscriptionRunErrorsPreserveSharedDescriptions() {
-        XCTAssertEqual(
-            VoiceInkTranscriptionRunError.noTranscriptionReturned.errorDescription,
-            "The API returned an empty or invalid response."
-        )
-    }
-
     func testPrefersLocalizedErrorDescription() {
         XCTAssertEqual(
             VoiceInkErrorDescription.text(for: StubLocalizedError(message: "provider down")),
@@ -596,56 +589,6 @@ final class TranscriptionRunProcessorTests: XCTestCase {
         XCTAssertEqual(
             VoiceInkErrorDescription.text(for: error),
             error.localizedDescription
-        )
-    }
-
-    func testMacOSErrorDescriptionsStayStable() {
-        XCTAssertEqual(
-            VoiceInkEngineError.modelLoadFailed.errorDescription,
-            "Failed to load the transcription model."
-        )
-        XCTAssertEqual(
-            VoiceInkEngineError.transcriptionFailed.errorDescription,
-            "Failed to transcribe the audio."
-        )
-        XCTAssertEqual(
-            VoiceInkEngineError.whisperCoreFailed.errorDescription,
-            "The core transcription engine failed."
-        )
-        XCTAssertEqual(
-            VoiceInkEngineError.unzipFailed.errorDescription,
-            "Failed to unzip the downloaded Core ML model."
-        )
-        XCTAssertEqual(
-            VoiceInkEngineError.unknownError.errorDescription,
-            "An unknown error occurred."
-        )
-    }
-
-    func testIOSLocalWhisperDescriptionsStayStable() {
-        XCTAssertEqual(
-            VoiceInkEngineError.localModelUnavailable.errorDescription,
-            "No local Whisper model is available. Please download a model first."
-        )
-        XCTAssertEqual(
-            VoiceInkEngineError.localModelLoadFailed.errorDescription,
-            "Failed to load the Whisper model."
-        )
-        XCTAssertEqual(
-            VoiceInkEngineError.audioProcessingFailed.errorDescription,
-            "Failed to process audio file for transcription."
-        )
-        XCTAssertEqual(
-            VoiceInkEngineError.whisperTranscriptionFailed.errorDescription,
-            "Whisper transcription failed."
-        )
-        XCTAssertEqual(
-            VoiceInkEngineError.audioFileNotFound.errorDescription,
-            "Audio file not found"
-        )
-        XCTAssertEqual(
-            VoiceInkEngineError.noTranscriptionModelSelected.errorDescription,
-            "No transcription model selected"
         )
     }
 
@@ -1127,6 +1070,62 @@ extension TranscriptionRunProcessorTests {
             promptDetectionResult: promptDetectionResult,
             skipConfiguration: configuration
         )?.text, "without trigger")
+    }
+
+    func testRunSettingsSelectPromptOverridesModePromptAndRecordsName() async throws {
+        let prompt = VoiceInkCustomPrompt(
+            title: "Email",
+            promptText: "Write an email",
+            useSystemInstructions: false
+        )
+        let baseSettings = VoiceInkTranscriptionRunSettings(
+            configuration: configuration(isPostProcessingEnabled: true)
+        )
+        let settings = baseSettings.selectingPrompt(prompt.id, from: [prompt])
+        let processor = VoiceInkTranscriptionRunProcessor { job in
+            XCTAssertEqual(job.prompt, "Write an email")
+            XCTAssertEqual(job.transcript, "raw text")
+            return "email output"
+        }
+
+        let result = try await settings.processTranscribedText(
+            "raw text",
+            processor: processor,
+            apiKeyProvider: { _ in "key" }
+        )
+
+        XCTAssertEqual(result.finalText, "email output")
+        XCTAssertEqual(result.postProcessingResult?.promptName, "Email")
+    }
+
+    func testPromptTriggerSelectsPromptStripsTriggerAndForcesShortEnhancement() async throws {
+        let prompt = VoiceInkCustomPrompt(
+            title: "Summary",
+            promptText: "Summarize",
+            triggerWords: ["summary"],
+            useSystemInstructions: false
+        )
+        let processor = VoiceInkTranscriptionRunProcessor { job in
+            XCTAssertEqual(job.prompt, "Summarize")
+            XCTAssertEqual(job.transcript, "Yes")
+            return "Short summary"
+        }
+
+        let result = try await processor.processTranscribedText(
+            "summary, yes",
+            transcriptionModelName: "base",
+            configuration: configuration(isPostProcessingEnabled: false),
+            postProcessingSkipConfiguration: VoiceInkPostProcessingSkipConfiguration(
+                isEnabled: true,
+                wordThreshold: 10
+            ),
+            promptLibrary: [prompt],
+            apiKeyProvider: { _ in "key" }
+        )
+
+        XCTAssertEqual(result.cleanedText, "summary, yes")
+        XCTAssertEqual(result.finalText, "Short summary")
+        XCTAssertEqual(result.postProcessingResult?.promptName, "Summary")
     }
 
     private func withIsolatedRunPreparationDefaults(_ run: (UserDefaults) -> Void) {

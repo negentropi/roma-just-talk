@@ -49,6 +49,12 @@ final class AppSettings: ObservableObject {
         didSet { VoiceInkCustomVocabularyPreference.saveTerms(customVocabularyTerms) }
     }
 
+    @Published var customPrompts: [VoiceInkCustomPrompt] {
+        didSet { VoiceInkCustomPromptStorage.savePrompts(customPrompts) }
+    }
+
+    @Published var recordingPromptOverrideId: UUID?
+
     @Published var selectedTranscriptionLanguage: String {
         didSet {
             VoiceInkTranscriptionLanguagePreference.saveSelectedLanguage(selectedTranscriptionLanguage)
@@ -69,6 +75,12 @@ final class AppSettings: ObservableObject {
         self.fillerWords = startupState.fillerWords
         self.wordReplacements = startupState.wordReplacements
         self.customVocabularyTerms = startupState.customVocabularyTerms
+        self.customPrompts = VoiceInkCustomPromptPolicy.startupStoreState(
+            loadedPrompts: VoiceInkCustomPromptStorage.loadPrompts(),
+            selectedPromptId: nil,
+            isEnhancementEnabled: false
+        ).prompts
+        self.recordingPromptOverrideId = nil
         self.selectedTranscriptionLanguage = startupState.selectedTranscriptionLanguage
 
         observeLocalModelAvailability()
@@ -300,7 +312,9 @@ final class AppSettings: ObservableObject {
             selectedTranscriptionLanguage: selectedTranscriptionLanguage,
             wordReplacementRules: wordReplacements,
             customVocabulary: customVocabularyTerms,
-            additionalLocalWhisperModelNames: LocalModelManager.shared.importedModelNames
+            additionalLocalWhisperModelNames: LocalModelManager.shared.importedModelNames,
+            promptLibrary: customPrompts,
+            recordingPromptOverrideId: recordingPromptOverrideId
         ).transcriptionRunSettings()
     }
 
@@ -356,7 +370,8 @@ final class AppSettings: ObservableObject {
                     selectedTranscriptionLanguage: selectedTranscriptionLanguage,
                     wordReplacementRules: wordReplacements,
                     customVocabulary: customVocabularyTerms,
-                    additionalLocalWhisperModelNames: LocalModelManager.shared.importedModelNames
+                    additionalLocalWhisperModelNames: LocalModelManager.shared.importedModelNames,
+                    promptLibrary: customPrompts
                 )
             },
             apiKeyProvider: { [self] provider in
@@ -381,6 +396,45 @@ final class AppSettings: ObservableObject {
 
     func addMode(_ mode: Mode) {
         modes = VoiceInkModeListPolicy.appending(mode, to: modes)
+    }
+
+    func addPrompt(_ prompt: VoiceInkCustomPrompt) {
+        customPrompts = VoiceInkCustomPromptPolicy.addingPrompt(
+            prompt,
+            to: customPrompts,
+            selectedPromptId: nil
+        ).prompts
+    }
+
+    func updatePrompt(_ prompt: VoiceInkCustomPrompt) {
+        customPrompts = VoiceInkCustomPromptPolicy.updatingPrompt(
+            prompt,
+            in: customPrompts,
+            selectedPromptId: nil
+        ).prompts
+    }
+
+    func removePrompt(_ prompt: VoiceInkCustomPrompt) {
+        guard !prompt.isPredefined else { return }
+        customPrompts = VoiceInkCustomPromptPolicy.deletingPrompt(
+            prompt,
+            from: customPrompts,
+            selectedPromptId: nil
+        ).prompts
+        for index in modes.indices where modes[index].selectedPromptId == prompt.id {
+            modes[index].selectedPromptId = nil
+        }
+        if recordingPromptOverrideId == prompt.id {
+            recordingPromptOverrideId = nil
+        }
+    }
+
+    func movePrompts(from source: IndexSet, to destination: Int) {
+        customPrompts = VoiceInkCustomPromptPolicy.movingPrompts(
+            customPrompts,
+            from: source,
+            to: destination
+        )
     }
 
     func updateMode(_ updatedMode: Mode, replacing modeId: UUID) {
@@ -483,5 +537,7 @@ final class AppSettings: ObservableObject {
                 IOSCustomCloudModelManager.shared.removeAll()
             }
         )
+        customPrompts = VoiceInkCustomPromptPolicy.repairedPredefinedPrompts(in: [])
+        recordingPromptOverrideId = nil
     }
 }

@@ -34,6 +34,21 @@ struct RecordingSheetView: View {
                 showsTitle: true
             )
 
+            if settings.modes.activeMode(selectedModeId: settings.selectedModeId)?.isPostProcessingEnabled == true {
+                Picker(
+                    "Prompt",
+                    selection: Binding(
+                        get: { settings.recordingPromptOverrideId },
+                        set: { recordingManager.selectPromptForActiveRecording($0) }
+                    )
+                ) {
+                    Text("Mode Prompt").tag(nil as UUID?)
+                    ForEach(settings.customPrompts) { prompt in
+                        Text(prompt.title).tag(prompt.id as UUID?)
+                    }
+                }
+            }
+
             if !recordingManager.livePartialTranscript.isEmpty {
                 Text(recordingManager.livePartialTranscript)
                     .font(.callout)

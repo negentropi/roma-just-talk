@@ -62,6 +62,10 @@ struct SettingsView: View {
             }
 
             Section(header: Text(settingsPresentation.modesSectionTitle)) {
+                NavigationLink(destination: IOSPromptLibraryView(settings: settings)) {
+                    Label("Prompt Library", systemImage: "text.badge.plus")
+                }
+
                 ForEach(settings.modes) { mode in
                     NavigationLink(destination: ModeConfigurationView(
                         mode: mode,

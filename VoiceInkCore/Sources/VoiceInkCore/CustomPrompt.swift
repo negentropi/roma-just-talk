@@ -693,6 +693,21 @@ public enum VoiceInkCustomPromptPolicy {
         return VoiceInkCustomPromptStoreState(prompts: updatedPrompts, selectedPromptId: updatedSelectedPromptId)
     }
 
+    public static func movingPrompts(
+        _ prompts: [VoiceInkCustomPrompt],
+        from source: IndexSet,
+        to destination: Int
+    ) -> [VoiceInkCustomPrompt] {
+        let moving = source.sorted().map { prompts[$0] }
+        var remaining = prompts.enumerated()
+            .filter { !source.contains($0.offset) }
+            .map(\.element)
+        let removedBeforeDestination = source.filter { $0 < destination }.count
+        let insertionIndex = min(max(0, destination - removedBeforeDestination), remaining.count)
+        remaining.insert(contentsOf: moving, at: insertionIndex)
+        return remaining
+    }
+
     public static func exportedCustomPrompts(from prompts: [VoiceInkCustomPrompt]) -> [VoiceInkCustomPrompt] {
         prompts.filter { !$0.isPredefined }
     }

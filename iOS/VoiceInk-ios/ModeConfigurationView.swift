@@ -148,20 +148,28 @@ struct ModeConfigurationView: View {
                         }
                     }
                     
-                    // Prompt Template Selection
-                    Picker(formPresentation.promptTemplatePickerTitle, selection: $draftState.mode.promptTemplate.type) {
-                        ForEach(VoiceInkPostProcessingTemplateType.allCases, id: \.self) { templateType in
-                            Text(templateType.displayName).tag(templateType)
+                    Picker("Prompt", selection: $draftState.mode.selectedPromptId) {
+                        Text("Mode Template").tag(nil as UUID?)
+                        ForEach(settings.customPrompts) { prompt in
+                            Text(prompt.title).tag(prompt.id as UUID?)
                         }
                     }
-                    
-                    if formStatePresentation.shouldShowCustomPromptField {
-                        TextField(
-                            formPresentation.customPromptPlaceholder,
-                            text: $draftState.mode.promptTemplate.customPrompt,
-                            axis: .vertical
-                        )
-                            .lineLimit(4, reservesSpace: true)
+
+                    if draftState.mode.selectedPromptId == nil {
+                        Picker(formPresentation.promptTemplatePickerTitle, selection: $draftState.mode.promptTemplate.type) {
+                            ForEach(VoiceInkPostProcessingTemplateType.allCases, id: \.self) { templateType in
+                                Text(templateType.displayName).tag(templateType)
+                            }
+                        }
+
+                        if formStatePresentation.shouldShowCustomPromptField {
+                            TextField(
+                                formPresentation.customPromptPlaceholder,
+                                text: $draftState.mode.promptTemplate.customPrompt,
+                                axis: .vertical
+                            )
+                                .lineLimit(4, reservesSpace: true)
+                        }
                     }
                 }
             }

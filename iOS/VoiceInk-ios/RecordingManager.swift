@@ -211,6 +211,11 @@ final class RecordingManager: ObservableObject {
             completion?(.failed(reason: message))
         }
     }
+
+    func selectPromptForActiveRecording(_ promptId: UUID?) {
+        settings.recordingPromptOverrideId = promptId
+        activeRunSettings = settings.currentTranscriptionRunSettings()
+    }
     
     func cancelRecording() {
         flowState.cancelRecordingPlan().applyRuntimeState(
@@ -272,6 +277,7 @@ final class RecordingManager: ObservableObject {
         activeStreamingService = nil
         activeStreamingRequest = nil
         activeRunSettings = nil
+        settings.recordingPromptOverrideId = nil
         activeStreamingStartedAt = nil
         streamingTranscriptCancellable = nil
         livePartialTranscript = ""

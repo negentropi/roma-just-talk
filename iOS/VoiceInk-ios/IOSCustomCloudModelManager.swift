@@ -154,17 +154,9 @@ final class IOSCustomCloudModelManager: ObservableObject {
 
     func replaceDefinitions(_ definitions: [VoiceInkIOSCustomModelDefinition]) throws {
         let records = definitions.map(\.storedRecord)
-        let names = records.map { $0.name.trimmingCharacters(in: .whitespacesAndNewlines) }
-        guard names.allSatisfy({ !$0.isEmpty }), Set(names).count == names.count else {
-            throw IOSCustomCloudModelMutationError.validation(["Custom model names must be unique and non-empty."])
-        }
-        guard records.allSatisfy({ record in
-            guard let endpoint = URL(string: record.apiEndpoint) else { return false }
-            return endpoint.scheme != nil
-                && endpoint.host != nil
-                && !record.modelName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-        }) else {
-            throw IOSCustomCloudModelMutationError.validation(["Custom model endpoints and model names must be valid."])
+        let errors = VoiceInkCustomCloudModelPolicy.storedRecordValidationErrors(records)
+        guard errors.isEmpty else {
+            throw IOSCustomCloudModelMutationError.validation(errors)
         }
 
         do {

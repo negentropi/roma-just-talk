@@ -395,6 +395,9 @@ public enum VoiceInkCustomCloudModelStorage {
 }
 
 public enum VoiceInkCustomCloudModelPolicy {
+    public static let invalidStoredNamesMessage = "Custom model names must be unique and non-empty."
+    public static let invalidStoredConfigurationMessage = "Custom model endpoints and model names must be valid."
+
     public static func generatedName(fromDisplayName displayName: String) -> String {
         displayName.lowercased().replacingOccurrences(of: " ", with: "-")
     }
@@ -475,6 +478,24 @@ public enum VoiceInkCustomCloudModelPolicy {
             return false
         }
         return url.scheme != nil && url.host != nil
+    }
+
+    public static func storedRecordValidationErrors(
+        _ records: [VoiceInkCustomCloudModelStoredRecord]
+    ) -> [String] {
+        let names = records.map { $0.name.trimmingCharacters(in: .whitespacesAndNewlines) }
+        guard names.allSatisfy({ !$0.isEmpty }), Set(names).count == names.count else {
+            return [invalidStoredNamesMessage]
+        }
+
+        guard records.allSatisfy({ record in
+            isValidEndpoint(record.apiEndpoint)
+                && !record.modelName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        }) else {
+            return [invalidStoredConfigurationMessage]
+        }
+
+        return []
     }
 }
 

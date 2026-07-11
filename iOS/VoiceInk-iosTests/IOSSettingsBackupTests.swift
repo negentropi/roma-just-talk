@@ -120,6 +120,51 @@ final class IOSSettingsBackupTests: XCTestCase {
         ))
     }
 
+    func testCustomModelBackupValidationUsesSharedPolicy() {
+        let valid = VoiceInkCustomCloudModelStoredRecord(
+            id: UUID(),
+            name: "private-model",
+            displayName: "Private Model",
+            description: "Portable metadata",
+            apiEndpoint: "https://example.com/transcribe",
+            modelName: "whisper-private",
+            isMultilingualModel: true,
+            supportedLanguages: [:]
+        )
+
+        XCTAssertEqual(VoiceInkCustomCloudModelPolicy.storedRecordValidationErrors([valid]), [])
+
+        let duplicate = VoiceInkCustomCloudModelStoredRecord(
+            id: UUID(),
+            name: valid.name,
+            displayName: "Duplicate",
+            description: "Duplicate metadata",
+            apiEndpoint: valid.apiEndpoint,
+            modelName: valid.modelName,
+            isMultilingualModel: false,
+            supportedLanguages: [:]
+        )
+        XCTAssertEqual(
+            VoiceInkCustomCloudModelPolicy.storedRecordValidationErrors([valid, duplicate]),
+            [VoiceInkCustomCloudModelPolicy.invalidStoredNamesMessage]
+        )
+
+        let invalid = VoiceInkCustomCloudModelStoredRecord(
+            id: UUID(),
+            name: "invalid-model",
+            displayName: "Invalid",
+            description: "Invalid metadata",
+            apiEndpoint: "relative/path",
+            modelName: " ",
+            isMultilingualModel: false,
+            supportedLanguages: [:]
+        )
+        XCTAssertEqual(
+            VoiceInkCustomCloudModelPolicy.storedRecordValidationErrors([invalid]),
+            [VoiceInkCustomCloudModelPolicy.invalidStoredConfigurationMessage]
+        )
+    }
+
     private var sampleGeneral: VoiceInkIOSGeneralSettingsBackup {
         VoiceInkIOSGeneralSettingsBackup(
             audioSessionTimeoutSeconds: 30,

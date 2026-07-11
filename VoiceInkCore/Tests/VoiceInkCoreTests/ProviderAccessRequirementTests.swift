@@ -1240,7 +1240,7 @@ final class ProviderAccessRequirementTests: XCTestCase {
         )
         XCTAssertEqual(
             state.availableProviders(for: .postProcessing, localWhisperModelAvailable: true),
-            [.groq]
+            [.groq, .mistral]
         )
     }
 
@@ -1794,8 +1794,11 @@ final class ProviderAccessRequirementTests: XCTestCase {
             VoiceInkProviderKind.gemini.postProcessingChatCompletionsURL?.absoluteString,
             "https://generativelanguage.googleapis.com/v1beta/openai/v1/chat/completions"
         )
+        XCTAssertEqual(
+            VoiceInkProviderKind.mistral.postProcessingChatCompletionsURL?.absoluteString,
+            "https://api.mistral.ai/v1/chat/completions"
+        )
         XCTAssertNil(VoiceInkProviderKind.deepgram.postProcessingChatCompletionsURL)
-        XCTAssertNil(VoiceInkProviderKind.mistral.postProcessingChatCompletionsURL)
         XCTAssertNil(VoiceInkProviderKind.elevenLabs.postProcessingChatCompletionsURL)
         XCTAssertNil(VoiceInkProviderKind.soniox.postProcessingChatCompletionsURL)
         XCTAssertNil(VoiceInkProviderKind.speechmatics.postProcessingChatCompletionsURL)
@@ -1850,7 +1853,7 @@ final class ProviderAccessRequirementTests: XCTestCase {
 
         XCTAssertEqual(
             VoiceInkProviderKind.availableProviders(for: .postProcessing) { readyProviders.contains($0) },
-            [.groq]
+            [.groq, .mistral]
         )
     }
 
@@ -1933,13 +1936,15 @@ final class ProviderAccessRequirementTests: XCTestCase {
             VoiceInkProviderKind.gemini.postProcessingModels,
             VoiceInkAIModelCatalog.availableModels(for: .gemini)
         )
+        XCTAssertEqual(
+            VoiceInkProviderKind.mistral.postProcessingModels,
+            VoiceInkAIModelCatalog.availableModels(for: .mistral)
+        )
     }
 
     func testPostProcessingModelsAreNilForNonPostProcessingProviders() {
         XCTAssertNil(VoiceInkProviderKind.deepgram.postProcessingDefaultModel)
         XCTAssertNil(VoiceInkProviderKind.deepgram.postProcessingModels)
-        XCTAssertNil(VoiceInkProviderKind.mistral.postProcessingDefaultModel)
-        XCTAssertNil(VoiceInkProviderKind.mistral.postProcessingModels)
         XCTAssertNil(VoiceInkProviderKind.elevenLabs.postProcessingDefaultModel)
         XCTAssertNil(VoiceInkProviderKind.elevenLabs.postProcessingModels)
         XCTAssertNil(VoiceInkProviderKind.soniox.postProcessingDefaultModel)

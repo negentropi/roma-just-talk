@@ -1557,7 +1557,9 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return .cerebras
         case .gemini:
             return .gemini
-        case .deepgram, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .cartesia, .customCloud, .localWhisper, .localFluidAudio, .nativeApple, .voiceInk:
+        case .mistral:
+            return .mistral
+        case .deepgram, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .cartesia, .customCloud, .localWhisper, .localFluidAudio, .nativeApple, .voiceInk:
             return nil
         }
     }

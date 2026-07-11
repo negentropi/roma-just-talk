@@ -272,29 +272,15 @@ final class RecordingManager: ObservableObject {
     
     // MARK: - Permissions
     private func checkPermissionStatus() -> VoiceInkRecordingPermissionStatus {
-        switch AVAudioSession.sharedInstance().recordPermission {
-        case .granted: return .granted
-        case .denied: return .denied
-        case .undetermined: return .undetermined
-        @unknown default: return .undetermined
-        }
+        IOSMicrophonePermissionAdapter.currentStatus()
     }
     
     private func requestPermission(completion: @escaping (Bool) -> Void) {
-        AVAudioSession.sharedInstance().requestRecordPermission { granted in
-            DispatchQueue.main.async {
-                completion(granted)
-            }
-        }
+        IOSMicrophonePermissionAdapter.requestAccess(completion: completion)
     }
     
     func openSettings() {
-        VoiceInkRecordingPermissionPolicy.settingsOpenPlan(
-            settingsURL: URL(string: UIApplication.openSettingsURLString),
-            canOpenURL: UIApplication.shared.canOpenURL
-        ).applyRuntimeState { url in
-            UIApplication.shared.open(url)
-        }
+        IOSMicrophonePermissionAdapter.openSettings()
     }
     
     // MARK: - Duration Timer

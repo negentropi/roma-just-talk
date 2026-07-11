@@ -487,6 +487,7 @@ public enum VoiceInkMacOSSetupPresentation {
 
 public enum VoiceInkIOSOnboardingStep: CaseIterable, Equatable, Sendable {
     case welcome
+    case microphoneSetup
     case modelDownload
     case keyboardSetup
     case ready
@@ -496,6 +497,8 @@ public enum VoiceInkIOSOnboardingStep: CaseIterable, Equatable, Sendable {
     public var nextStep: VoiceInkIOSOnboardingStep? {
         switch self {
         case .welcome:
+            return .microphoneSetup
+        case .microphoneSetup:
             return .modelDownload
         case .modelDownload:
             return .keyboardSetup

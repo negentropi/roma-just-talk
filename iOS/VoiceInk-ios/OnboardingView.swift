@@ -19,6 +19,9 @@ struct OnboardingView: View {
             case .welcome:
                 WelcomeOnboardingView(currentStep: $currentStep)
                     .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading)))
+            case .microphoneSetup:
+                IOSMicrophonePermissionOnboardingView(currentStep: $currentStep)
+                    .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading)))
             case .modelDownload:
                 ModelDownloadOnboardingView(currentStep: $currentStep)
                     .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading)))

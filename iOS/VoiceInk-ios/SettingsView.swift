@@ -34,6 +34,13 @@ struct SettingsView: View {
 
         List {
             Section {
+                NavigationLink(destination: IOSMicrophonePermissionView()) {
+                    Label(
+                        VoiceInkIOSMicrophonePermissionPresentation.settingsRowTitle,
+                        systemImage: VoiceInkIOSMicrophonePermissionPresentation.settingsRowSystemImageName
+                    )
+                }
+
                 NavigationLink(destination: KeyboardSetupView()) {
                     Label(
                         VoiceInkIOSKeyboardSetupPresentation.settingsRowTitle,

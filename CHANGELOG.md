@@ -2,6 +2,7 @@
 
 ## v1.96 - Unreleased
 
+- Added iOS microphone permission setup during onboarding plus a refreshable Settings recovery screen that reuses the recording permission path.
 - Added iOS local Whisper model import, selection, persistence, and deletion using the existing shared model-file and runtime policies.
 - Added iOS Shortcuts actions to start, stop, and cancel recording through the existing recording flow.
 - Added iOS 26 Native Apple transcription with mode selection, BCP-47 language handling, Speech asset status/download controls, and recorded-file SpeechAnalyzer routing.

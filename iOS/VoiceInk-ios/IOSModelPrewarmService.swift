@@ -1,5 +1,6 @@
 import Combine
 import Foundation
+import OSLog
 import UIKit
 import VoiceInkCore
 

@@ -33,20 +33,15 @@ struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
             actions: VoiceInkLocalWhisperTranscriptionActions<WhisperContext>(
                 resolveContext: {
                     let modelManager = LocalModelManager.shared
-                    guard let modelPath = await modelManager.managementSnapshot.modelPath(
+                    let retained = try await modelManager.retainedContext(
                         forRuntimeModelName: model
-                    ) else {
-                        throw VoiceInkLocalWhisperFailurePolicy.error(
-                            for: .modelUnavailable,
-                            platform: request.failurePlatform
-                        )
-                    }
+                    )
 
-                    logger.notice("\(VoiceInkLocalWhisperTranscriptionDiagnostics.iOSUsingModelMessage(modelPath: modelPath), privacy: .public)")
+                    logger.notice("\(VoiceInkLocalWhisperTranscriptionDiagnostics.iOSUsingModelMessage(modelPath: retained.modelPath), privacy: .public)")
 
                     return VoiceInkLocalWhisperContextPlan(
-                        context: try await WhisperContext.createContext(path: modelPath),
-                        shouldReleaseContext: true
+                        context: retained.context,
+                        shouldReleaseContext: false
                     )
                 },
                 readAudioSamples: { audioURL in

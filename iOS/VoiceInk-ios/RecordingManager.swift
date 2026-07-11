@@ -91,6 +91,7 @@ final class RecordingManager: ObservableObject {
     }
     
     private func proceedToStartRecording() {
+        IOSModelPrewarmService.shared.cancelPrewarm()
         updateFlowState { $0.prepareRecordingStart() }
         coordinator.updateRecordingState(true)
 

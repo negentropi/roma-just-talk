@@ -7,6 +7,8 @@ struct SettingsView: View {
     @StateObject private var settings = AppSettings.shared
     @AppStorage(VoiceInkVADPreference.userDefaultsKey)
     private var isVADEnabled = VoiceInkVADPreference.defaultIsEnabled
+    @AppStorage(VoiceInkModelRuntimePreference.userDefaultsKey)
+    private var shouldPrewarmModel = VoiceInkModelRuntimePreference.defaultShouldPrewarmModelOnWake
     @State private var fillerWordDraftState = VoiceInkFillerWordDraftState()
     @State private var customVocabularyDraftState = VoiceInkVocabularyDraftState()
     @State private var wordReplacementDraftState = VoiceInkWordReplacementDraftState()
@@ -16,6 +18,7 @@ struct SettingsView: View {
     private let audioTimeoutPresentation = VoiceInkAudioSessionTimeoutPreference.settingsPresentation
     private let settingsPresentation = VoiceInkSettingsPresentation.iOS
     private let vadPresentation = VoiceInkVADPreference.settingsPresentation
+    private let prewarmPresentation = VoiceInkModelRuntimePreference.settingsPresentation
     
     var body: some View {
         let dictionarySnapshot = self.dictionarySnapshot
@@ -69,6 +72,12 @@ struct SettingsView: View {
                 Toggle(vadPresentation.title, isOn: $isVADEnabled)
 
                 Text(vadPresentation.helpText)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                Toggle(prewarmPresentation.title, isOn: $shouldPrewarmModel)
+
+                Text(prewarmPresentation.helpText)
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

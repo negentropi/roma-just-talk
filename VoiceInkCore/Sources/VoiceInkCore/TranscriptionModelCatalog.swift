@@ -270,6 +270,7 @@ public enum VoiceInkModelPrewarmSamplePolicy {
     public static let sampleResourceName = "sound7"
     public static let sampleFileExtension = "wav"
     public static let sampleDisplayName = "sound7.wav"
+    public static let generatedSilenceSampleCount = Int(VoiceInkPCM16Audio.mono16kSampleRate)
 
     public static let lookupCandidates = [
         VoiceInkModelPrewarmSampleResource(
@@ -374,6 +375,7 @@ public enum VoiceInkModelPrewarmDiagnostics {
     public static let initializedMessage = "ModelPrewarmService initialized - listening for wake and app launch"
     public static let appLaunchScheduledMessage = "App launched, scheduling prewarm"
     public static let macActivityScheduledMessage = "Mac activity detected (wake/unlock), scheduling prewarm"
+    public static let iOSActivityScheduledMessage = "iOS app became active, scheduling prewarm"
     public static let disabledByUserMessage = "Prewarm disabled by user"
     public static let unsupportedRuntimeMessage = "Skipping prewarm - cloud models don't need it"
     public static let deinitializedMessage = "ModelPrewarmService deinitialized"

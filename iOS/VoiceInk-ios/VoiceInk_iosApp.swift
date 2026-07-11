@@ -15,6 +15,7 @@ struct VoiceInk_iosApp: App {
     @State private var hasCompletedOnboarding = VoiceInkOnboardingPreference.hasCompletedOnboarding()
     @State private var launchRecordingRequestState = VoiceInkLaunchRecordingRequestState()
     @StateObject private var recordingManager = RecordingManager()
+    @StateObject private var modelPrewarmService = IOSModelPrewarmService.shared
     
     init() {
         VoiceInkDefaultSettings.iOS.registerUserDefaults()

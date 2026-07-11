@@ -19,6 +19,10 @@ class LocalModelManager: ObservableObject {
     private var downloadTasks: [String: URLSessionDownloadTask] = [:]
     private var progressObservations: [String: NSKeyValueObservation] = [:]
     private let logger = VoiceInkIOSLogger.localModelManagement
+    private let contextCache = IOSRetainedContextCache<WhisperContext>(
+        factory: { try await WhisperContext.createContext(path: $0) },
+        release: { await $0.releaseResources() }
+    )
     
     static let shared = LocalModelManager()
     
@@ -35,6 +39,57 @@ class LocalModelManager: ObservableObject {
             modelsDirectory: Self.modelsDirectory,
             downloadTrackingState: downloadSessionState.downloadTrackingState
         )
+    }
+
+    func retainedContext(
+        forRuntimeModelName modelName: String
+    ) async throws -> (context: WhisperContext, modelPath: String) {
+        guard let modelPath = managementSnapshot.modelPath(
+            forRuntimeModelName: modelName
+        ) else {
+            throw VoiceInkLocalWhisperFailurePolicy.error(
+                for: .modelUnavailable,
+                platform: .iOS
+            )
+        }
+        return (
+            try await contextCache.context(forModelPath: modelPath),
+            modelPath
+        )
+    }
+
+    func prewarmContext(forRuntimeModelName modelName: String) async throws {
+        let retained = try await retainedContext(
+            forRuntimeModelName: modelName
+        )
+        let context = retained.context
+        let cancellationToken = VoiceInkWhisperCancellationToken()
+        let success = await withTaskCancellationHandler {
+            if Task.isCancelled {
+                cancellationToken.cancel()
+            }
+            return await context.fullTranscribe(
+                samples: [Float](
+                    repeating: 0,
+                    count: VoiceInkModelPrewarmSamplePolicy.generatedSilenceSampleCount
+                ),
+                language: nil,
+                cancellationToken: cancellationToken
+            )
+        } onCancel: {
+            cancellationToken.cancel()
+        }
+        try Task.checkCancellation()
+        guard success else {
+            throw VoiceInkLocalWhisperFailurePolicy.error(
+                for: .transcriptionFailed,
+                platform: .iOS
+            )
+        }
+    }
+
+    func releaseRetainedContext() async {
+        await contextCache.releaseRetainedContext()
     }
     
     /// Download a specific model
@@ -145,6 +200,7 @@ class LocalModelManager: ObservableObject {
     
     /// Delete a downloaded model
     func deleteModel(_ model: VoiceInkWhisperModelFileSpec) {
+        let deletedModelPath = model.fileURL(in: Self.modelsDirectory).path
         let deletionPlan = VoiceInkWhisperModelDeletionPolicy.plan(
             for: model,
             in: Self.modelsDirectory
@@ -160,6 +216,11 @@ class LocalModelManager: ObservableObject {
                 localModelAvailabilityRevision += 1
             },
             refreshAfterSuccessfulDelete: {
+                Task {
+                    if await self.contextCache.retainedModelPath() == deletedModelPath {
+                        await self.contextCache.releaseRetainedContext()
+                    }
+                }
                 // The downloaded-state query is file-backed, so force SwiftUI to refresh the row.
                 DispatchQueue.main.async {
                     self.objectWillChange.send()

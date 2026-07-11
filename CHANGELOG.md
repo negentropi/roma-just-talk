@@ -2,6 +2,7 @@
 
 ## v1.96 - Unreleased
 
+- Added retained iOS local Whisper contexts with coalesced model loading, launch/foreground prewarm, recording-time cancellation, model-deletion and memory-warning release, and a shared prewarm setting.
 - Added an iOS local Whisper VAD control backed by the same shared preference and whisper.cpp runtime configuration as macOS batch transcription.
 - Added iOS live transcription for streaming-capable cloud models, including per-model control, ordered PCM streaming, live partial preview, shared cleanup/enhancement of committed text, cancellation, and saved-file batch fallback after connection or finalization failure.
 - Added iOS audio/video file import with multi-file queueing, 16 kHz WAV preparation, mode selection, background-safe transcription, cancel/retry controls, persistent history, detail navigation, external file opening, and transcript sharing.

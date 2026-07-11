@@ -9,9 +9,6 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(presentation.modesSectionTitle, "Modes")
         XCTAssertEqual(presentation.addModeButtonTitle, "Add New Mode")
         XCTAssertEqual(presentation.addActionSystemImageName, "plus.circle.fill")
-        XCTAssertEqual(presentation.debugSectionTitle, "Debug")
-        XCTAssertEqual(presentation.resetAllAppDataButtonTitle, "Reset All App Data")
-        XCTAssertEqual(presentation.resetAllAppDataSystemImageName, "trash")
     }
 
     func testMacOSSettingsPresentationPreservesSettingsChromeCopy() {

@@ -5,6 +5,7 @@ import VoiceInkCore
 
 struct NotesListView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.scenePhase) private var scenePhase
     @Query(sort: [SortDescriptor(\Transcription.timestamp, order: .reverse)]) private var notes: [Transcription]
 
     @State private var searchText: String = ""
@@ -103,7 +104,18 @@ struct NotesListView: View {
                         recordingManager.stopRecording(modelContext: modelContext)
                     }
                 }
+                .onReceive(NotificationCenter.default.publisher(
+                    for: IOSRecordingAppIntentRequestStore.requestNotification
+                )) { _ in
+                    handleRecordingAppIntentRequest()
+                }
+                .onChange(of: scenePhase) { _, phase in
+                    if phase == .active {
+                        handleRecordingAppIntentRequest()
+                    }
+                }
                 .onAppear {
+                    handleRecordingAppIntentRequest()
                     transcriptionTasks.recoverInterruptedTranscriptions(
                         notes,
                         persist: { try? modelContext.save() }
@@ -175,6 +187,24 @@ struct NotesListView: View {
         .controlSize(.large)
         .padding(.horizontal, 32)
         .padding(.bottom, 12)
+    }
+
+    private func handleRecordingAppIntentRequest() {
+        guard let request = IOSRecordingAppIntentRequestStore.consume() else { return }
+
+        switch IOSRecordingAppIntentPolicy.runtimeAction(
+            for: request,
+            recordingState: recordingManager.flowState.recordingState
+        ) {
+        case .start:
+            recordingManager.startRecordingFlow()
+        case .stop:
+            recordingManager.stopRecording(modelContext: modelContext)
+        case .cancel:
+            recordingManager.cancelRecording()
+        case .ignore:
+            return
+        }
     }
 
     // MARK: - Helper Functions

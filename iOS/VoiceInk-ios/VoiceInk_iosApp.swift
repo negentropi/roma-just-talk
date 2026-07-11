@@ -72,6 +72,13 @@ struct VoiceInk_iosApp: App {
     }
     
     private func handleURL(_ url: URL) {
+        if url.isFileURL, VoiceInkSupportedMedia.isSupported(url: url) {
+            Task {
+                await IOSAudioImportManager.shared.add(urls: [url])
+            }
+            return
+        }
+
         guard let deepLink = VoiceInkAppDeepLink(url: url) else { return }
 
         deepLink.applyRuntimeState {

@@ -2,6 +2,7 @@
 
 ## v1.96 - Unreleased
 
+- Added iOS audio/video file import with multi-file queueing, 16 kHz WAV preparation, mode selection, background-safe transcription, cancel/retry controls, persistent history, detail navigation, external file opening, and transcript sharing.
 - Added tracked iOS post-record transcription tasks with balanced background execution, retryable expiration/relaunch recovery, user cancellation, keyboard result completion, and whisper.cpp abort support for local inference.
 - Added iOS keyboard setup to onboarding and Settings, with installation guidance, a verification field, fresh activation and Full Access status, recovery through system Settings, and a setup-later path.
 - Added document-bound iOS keyboard result handoff so completed dictation returns through the App Group and inserts exactly once when the original text field becomes active again.

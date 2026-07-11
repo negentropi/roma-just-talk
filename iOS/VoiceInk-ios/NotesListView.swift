@@ -11,6 +11,7 @@ struct NotesListView: View {
     @EnvironmentObject private var recordingManager: RecordingManager
     @StateObject private var settings = AppSettings.shared
     @StateObject private var transcriptionTasks = IOSTranscriptionTaskCoordinator.shared
+    @StateObject private var audioImport = IOSAudioImportManager.shared
 
     private var noteListSnapshot: VoiceInkNoteListSnapshot<Transcription> {
         VoiceInkNoteListSnapshot.make(
@@ -53,7 +54,14 @@ struct NotesListView: View {
                 .navigationTitle(VoiceInkAppIdentity.displayName)
                 .navigationBarTitleDisplayMode(.large)
                 .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) {
+                    ToolbarItemGroup(placement: .topBarTrailing) {
+                        Button {
+                            audioImport.isPresented = true
+                        } label: {
+                            Image(systemName: "waveform.badge.plus")
+                        }
+                        .accessibilityLabel("Import audio files")
+
                         NavigationLink(destination: SettingsView()) {
                             Image(systemName: VoiceInkNoteListPresentation.settingsSystemImageName)
                         }
@@ -79,6 +87,9 @@ struct NotesListView: View {
                     .presentationDragIndicator(.visible)
                     .presentationCornerRadius(16)
                     .interactiveDismissDisabled(true)
+                }
+                .sheet(isPresented: $audioImport.isPresented) {
+                    AudioImportView()
                 }
                 .alert(item: $recordingManager.activeRecordingAlert) { alertType in
                     alert(for: alertType)

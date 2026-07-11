@@ -9,6 +9,7 @@ final class IOSTranscriptionTaskCoordinatorTests: XCTestCase {
         let background = BackgroundExecutionHarness()
         let keyboardRequestID = UUID()
         var keyboardCompletions: [(UUID, String)] = []
+        var runOutcome: VoiceInkStoredAudioRetranscriptionOutcome?
         var persistCount = 0
         let note = Transcription(text: "", duration: 1, transcriptionStatus: .pending)
         let coordinator = IOSTranscriptionTaskCoordinator(
@@ -25,7 +26,8 @@ final class IOSTranscriptionTaskCoordinatorTests: XCTestCase {
         XCTAssertTrue(coordinator.start(
             note: note,
             keyboardRequestID: keyboardRequestID,
-            persist: { persistCount += 1 }
+            persist: { persistCount += 1 },
+            completion: { runOutcome = $0 }
         ))
         let didFinish = await waitUntil { !coordinator.isActive(noteID: note.id) }
 
@@ -37,11 +39,13 @@ final class IOSTranscriptionTaskCoordinatorTests: XCTestCase {
         XCTAssertEqual(background.beginCount, 1)
         XCTAssertEqual(background.endCount, 1)
         XCTAssertEqual(persistCount, 2)
+        XCTAssertEqual(runOutcome, .succeeded("Completed text"))
     }
 
     func testUserCancellationMarksRecordCanceledAndEndsBackgroundTime() {
         let background = BackgroundExecutionHarness()
         var keyboardFailure: String?
+        var runOutcome: VoiceInkStoredAudioRetranscriptionOutcome?
         var persistCount = 0
         let note = Transcription(text: "", duration: 1, transcriptionStatus: .pending)
         let coordinator = IOSTranscriptionTaskCoordinator(
@@ -61,7 +65,8 @@ final class IOSTranscriptionTaskCoordinatorTests: XCTestCase {
         XCTAssertTrue(coordinator.start(
             note: note,
             keyboardRequestID: UUID(),
-            persist: { persistCount += 1 }
+            persist: { persistCount += 1 },
+            completion: { runOutcome = $0 }
         ))
         XCTAssertTrue(coordinator.cancel(noteID: note.id))
 
@@ -71,11 +76,13 @@ final class IOSTranscriptionTaskCoordinatorTests: XCTestCase {
         XCTAssertFalse(coordinator.isActive(noteID: note.id))
         XCTAssertEqual(background.endCount, 1)
         XCTAssertEqual(persistCount, 2)
+        XCTAssertEqual(runOutcome, .canceled)
     }
 
     func testBackgroundExpirationCreatesRetryableFailureAndEndsBackgroundTime() {
         let background = BackgroundExecutionHarness()
         var keyboardFailure: String?
+        var runOutcome: VoiceInkStoredAudioRetranscriptionOutcome?
         let note = Transcription(text: "", duration: 1, transcriptionStatus: .pending)
         let coordinator = IOSTranscriptionTaskCoordinator(
             backgroundExecution: background.execution,
@@ -94,7 +101,8 @@ final class IOSTranscriptionTaskCoordinatorTests: XCTestCase {
         XCTAssertTrue(coordinator.start(
             note: note,
             keyboardRequestID: UUID(),
-            persist: {}
+            persist: {},
+            completion: { runOutcome = $0 }
         ))
         background.expire()
 
@@ -109,6 +117,10 @@ final class IOSTranscriptionTaskCoordinatorTests: XCTestCase {
         )
         XCTAssertFalse(coordinator.isActive(noteID: note.id))
         XCTAssertEqual(background.endCount, 1)
+        XCTAssertEqual(
+            runOutcome,
+            .failed(reason: VoiceInkTranscriptPresentation.backgroundProcessingExpiredError)
+        )
     }
 
     func testImmediateBackgroundExpirationDoesNotStartWorkAndBalancesReturnedToken() {
@@ -249,6 +261,19 @@ final class IOSTranscriptionTaskCoordinatorTests: XCTestCase {
         token.cancel()
         XCTAssertTrue(token.isCanceled)
         XCTAssertTrue(voiceInkWhisperAbortCallback(userData))
+    }
+
+    func testImportedAudioWAVHeaderDescribesPCM16MonoAudio() {
+        let header = VoiceInkIOSAudioImportPreparer.wavHeader(audioByteCount: 32_000)
+
+        XCTAssertEqual(header.count, 44)
+        XCTAssertEqual(String(data: header[0..<4], encoding: .ascii), "RIFF")
+        XCTAssertEqual(String(data: header[8..<12], encoding: .ascii), "WAVE")
+        XCTAssertEqual(String(data: header[36..<40], encoding: .ascii), "data")
+        XCTAssertEqual(header.withUnsafeBytes { $0.loadUnaligned(fromByteOffset: 22, as: UInt16.self) }, 1)
+        XCTAssertEqual(header.withUnsafeBytes { $0.loadUnaligned(fromByteOffset: 24, as: UInt32.self) }, 16_000)
+        XCTAssertEqual(header.withUnsafeBytes { $0.loadUnaligned(fromByteOffset: 34, as: UInt16.self) }, 16)
+        XCTAssertEqual(header.withUnsafeBytes { $0.loadUnaligned(fromByteOffset: 40, as: UInt32.self) }, 32_000)
     }
 
     private static let completedResult = VoiceInkTranscriptionRunResult(

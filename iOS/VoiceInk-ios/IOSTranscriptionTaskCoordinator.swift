@@ -35,6 +35,7 @@ final class IOSTranscriptionTaskCoordinator: ObservableObject {
     typealias Retranscribe = @MainActor (Transcription) async -> VoiceInkStoredAudioRetranscriptionOutcome
     typealias KeyboardCompletion = @MainActor (_ requestID: UUID, _ text: String) -> Void
     typealias KeyboardFailure = @MainActor (_ requestID: UUID, _ message: String) -> Void
+    typealias RunCompletion = @MainActor (VoiceInkStoredAudioRetranscriptionOutcome) -> Void
 
     @Published private(set) var activeNoteIDs: Set<UUID> = []
 
@@ -43,17 +44,20 @@ final class IOSTranscriptionTaskCoordinator: ObservableObject {
         let note: Transcription
         let keyboardRequestID: UUID?
         let persist: @MainActor () -> Void
+        let completion: RunCompletion?
         var task: Task<Void, Never>?
         var backgroundToken: VoiceInkIOSBackgroundExecution.Token?
 
         init(
             note: Transcription,
             keyboardRequestID: UUID?,
-            persist: @escaping @MainActor () -> Void
+            persist: @escaping @MainActor () -> Void,
+            completion: RunCompletion?
         ) {
             self.note = note
             self.keyboardRequestID = keyboardRequestID
             self.persist = persist
+            self.completion = completion
         }
     }
 
@@ -91,7 +95,8 @@ final class IOSTranscriptionTaskCoordinator: ObservableObject {
     func start(
         note: Transcription,
         keyboardRequestID: UUID? = nil,
-        persist: @escaping @MainActor () -> Void
+        persist: @escaping @MainActor () -> Void,
+        completion: RunCompletion? = nil
     ) -> Bool {
         guard runs[note.id] == nil else { return false }
 
@@ -102,7 +107,8 @@ final class IOSTranscriptionTaskCoordinator: ObservableObject {
         let run = ActiveRun(
             note: note,
             keyboardRequestID: keyboardRequestID,
-            persist: persist
+            persist: persist,
+            completion: completion
         )
         runs[note.id] = run
         activeNoteIDs.insert(note.id)
@@ -143,6 +149,7 @@ final class IOSTranscriptionTaskCoordinator: ObservableObject {
         run.task?.cancel()
         run.note.markTranscriptionCanceled()
         run.persist()
+        run.completion?(.canceled)
         failKeyboardIfNeeded(
             run,
             message: VoiceInkTranscriptPresentation.canceledTranscriptionText
@@ -191,6 +198,7 @@ final class IOSTranscriptionTaskCoordinator: ObservableObject {
         }
 
         run.persist()
+        run.completion?(outcome)
         finish(run)
     }
 
@@ -201,6 +209,7 @@ final class IOSTranscriptionTaskCoordinator: ObservableObject {
         let message = VoiceInkTranscriptPresentation.backgroundProcessingExpiredError
         run.note.markTranscriptionFailed(message)
         run.persist()
+        run.completion?(.failed(reason: message))
         failKeyboardIfNeeded(run, message: message)
         finish(run)
     }

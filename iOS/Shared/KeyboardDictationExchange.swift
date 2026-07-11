@@ -1,4 +1,5 @@
 import Foundation
+import VoiceInkCore
 
 struct VoiceInkKeyboardDictationDelivery: Equatable, Sendable {
     let requestID: UUID

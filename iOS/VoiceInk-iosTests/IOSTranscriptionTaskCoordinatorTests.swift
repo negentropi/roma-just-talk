@@ -141,10 +141,11 @@ final class IOSTranscriptionTaskCoordinatorTests: XCTestCase {
     }
 
     func testRelaunchRecoveryTurnsOrphanedPendingRecordIntoRetryableFailure() {
+        let background = BackgroundExecutionHarness()
         let note = Transcription(text: "", duration: 1, transcriptionStatus: .pending)
         var persistCount = 0
         let coordinator = IOSTranscriptionTaskCoordinator(
-            backgroundExecution: BackgroundExecutionHarness().execution,
+            backgroundExecution: background.execution,
             retranscribe: { _ in .failed(reason: "unused") },
             completeKeyboard: { _, _ in },
             failKeyboard: { _, _ in }

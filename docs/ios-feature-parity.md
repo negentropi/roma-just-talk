@@ -1,0 +1,134 @@
+# iOS Feature Parity
+
+This matrix answers a different question from
+[`ios-single-repo-migration.md`](ios-single-repo-migration.md): not only whether
+logic is shared, but whether the iOS product contains every intended macOS and
+Roma Just Talk feature.
+
+## Audit Basis
+
+- Audited macOS/iOS source: `bb48ed94a88571eff08b98f8b8aeb6c39ca5b667`.
+- Fork comparison: `origin/main` at `ad022c62`, merge base `0df2a9ab`.
+- Exact-HEAD CI: [single-repo gates](https://github.com/happyf-weallareeuropean/roma-just-talk/actions/runs/29111970026) and [macOS tests](https://github.com/happyf-weallareeuropean/roma-just-talk/actions/runs/29111974233).
+- CI proves shared checks and compilation. It does not prove a user workflow.
+- `source-present` means a reachable implementation was found, but runtime proof
+  is still required unless the row names separate runtime evidence.
+
+## Classification
+
+- `shared/iOS`: portable product behavior intended on iOS. A platform shell may
+  differ, but the user outcome must exist.
+- `macOS-only`: the exact behavior depends on a macOS-only system capability.
+- `not-applicable`: an iOS equivalent would not serve the same workflow.
+- `decision`: technically possible or partially substitutable, but product scope
+  must be chosen explicitly. A decision row blocks completion.
+
+## Recording And Entry
+
+| ID | Capability | macOS evidence | iOS state and implementation | Class | Verification |
+|---|---|---|---|---|---|
+| R01 | In-app start, stop, cancel, meter, and duration | [`RecorderUIManager`](../VoiceInk/Transcription/Engine/RecorderUIManager.swift), [`TranscriptionPipeline`](../VoiceInk/Transcription/Engine/TranscriptionPipeline.swift) | `source-present`: [`RecordingManager`](../iOS/VoiceInk-ios/RecordingManager.swift), [`RecordingSheetView`](../iOS/VoiceInk-ios/RecordingSheetView.swift) | shared/iOS | Permission, recording, persistence, success, and failure need simulator/device proof. |
+| R02 | Keyboard entry starts/stops dictation | Global shortcut path plus [`VoiceInkEngine`](../VoiceInk/Transcription/Engine/VoiceInkEngine.swift) | `partial`: [`KeyboardViewController`](../iOS/VoiceInkKeyboard/KeyboardViewController.swift) opens `voiceink://record`, polls App Group state, and requests stop | shared/iOS | Opening the app and stop coordination need runtime proof. |
+| R03 | Dictated text returns to the originating field | [`TranscriptionPipeline`](../VoiceInk/Transcription/Engine/TranscriptionPipeline.swift), [`CursorPaster`](../VoiceInk/Paste/CursorPaster.swift) | `missing`: [`AppGroupCoordinator`](../iOS/Shared/AppGroupCoordinator.swift) carries recording state only; the keyboard has no result/error payload or `textDocumentProxy.insertText` path | shared/iOS | Must prove app result publication, host-app return, one-time insertion, and failure/retry behavior. |
+| R04 | Microphone permission and denied-state recovery | [`PermissionsView`](../VoiceInk/Views/PermissionsView.swift), onboarding permission flow | `partial`: the recording path requests microphone access and can open Settings after denial | shared/iOS | Initial grant, denial, later grant, and recording retry need runtime proof. |
+| R05 | Keyboard installation, Full Access, and readiness setup | macOS onboarding proves required shortcut/permission readiness | `missing`: [`OnboardingView`](../iOS/VoiceInk-ios/OnboardingView.swift) covers welcome, model download, and ready only | shared/iOS | Must prove installation guidance, Full Access status, keyboard selection, and recovery. |
+| R06 | Completion after leaving the app | macOS process owns the whole recording/transcription pipeline | `partial`: background audio mode exists, but post-stop work has no background task, completion delivery, or interruption recovery | shared/iOS | Background app, stop from keyboard, finish STT/enhancement, and result delivery need device proof. |
+| R07 | Cancel active STT or enhancement | [`VoiceInkEngine`](../VoiceInk/Transcription/Engine/VoiceInkEngine.swift) tracks and cancels processing | `missing`: iOS starts untracked post-record work after stop | shared/iOS | Must prove cancellation stops runtime work and persists a coherent canceled state. |
+| R08 | Manual audio-file import and transcription queue | [`AudioTranscribeView`](../VoiceInk/Views/AudioTranscribeView.swift) | `missing`: no iOS document picker, share import, queue, item cancellation, retry, or enhancement selection | shared/iOS | Import supported files, queue multiple files, transcribe, retry/cancel, persist, and share results. |
+| R09 | Pre-roll and rolling-buffer STT preload | [`Recorder`](../VoiceInk/Recorder.swift), [`RollingBufferPreloadCoordinator`](../VoiceInk/Transcription/RollingPreload/RollingBufferPreloadCoordinator.swift) | `missing`: iOS capture begins only after explicit start | decision | Continuous/background microphone policy and the foreground iOS equivalent must be chosen, then runtime-proven. |
+| R10 | Active streaming and live partial transcript | [`StreamingTranscriptionService`](../VoiceInk/Transcription/Streaming/StreamingTranscriptionService.swift), [`MiniRecorderView`](../VoiceInk/Views/Recorder/MiniRecorderView.swift) | `missing`: iOS records a complete file before transcription | shared/iOS | Must prove partial updates, final commit, disconnect/error behavior, and batch fallback. |
+| R11 | Batch Whisper VAD | [`ModelSettingsView`](../VoiceInk/Views/ModelSettingsView.swift) | `partial`: iOS local runtime can consume VAD, but no reachable control exists | shared/iOS | Setting persistence and speech/silence behavior need proof. |
+| R12 | Model prewarm and retained local context | [`ModelPrewarmService`](../VoiceInk/Services/ModelPrewarmService.swift) | `missing`: iOS creates and releases a local context per run | shared/iOS | Measure first-run/repeat latency and memory lifecycle on device. |
+| R13 | Choose mode/prompt during recording | [`MiniRecorderShortcutManager`](../VoiceInk/Shortcuts/MiniRecorderShortcutManager.swift) | `partial`: iOS recording sheet selects a mode, but not a reusable prompt | shared/iOS | Selection must affect the same recording and persist only where intended. |
+| R14 | Start/stop/custom recording feedback | [`SoundManager`](../VoiceInk/SoundManager.swift) | `partial`: timer, waveform, and keyboard haptic; no sound choice or custom sound | shared/iOS | Audio-session coexistence and silent/custom choices need device proof. |
+| R15 | Input-device selection and priority | [`AudioDeviceManager`](../VoiceInk/Services/AudioDeviceManager.swift), [`AudioInputSettingsView`](../VoiceInk/Views/Settings/AudioInputSettingsView.swift) | `missing`: iOS accepts system/Bluetooth routing but exposes no preferred input | decision | Choose system-only routing or an iOS route picker; test wired/Bluetooth/built-in fallback. |
+| R16 | Global hotkey and middle-click triggers | [`RecordingShortcutManager`](../VoiceInk/Shortcuts/RecordingShortcutManager.swift) | Keyboard extension is the iOS entry adaptation | macOS-only | macOS event taps/global input do not exist for normal iOS apps. |
+| R17 | Toggle, push-to-talk, hybrid, and Special Shift modes | [`UserDefaultsPreferences`](../VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift), shortcut managers | iOS keyboard exposes a tap-toggle interaction | not-applicable | These modes describe a physical global-key lifecycle; iOS needs its own keyboard-button interaction, not mirrored key events. |
+| R18 | System mute and targeted media pause/resume | [`MediaController`](../VoiceInk/MediaController.swift), [`PlaybackController`](../VoiceInk/PlaybackController.swift) | iOS uses `AVAudioSession` mixing/routing behavior | macOS-only | Exact system-wide media control is not available to a normal iOS app. |
+| R19 | None, notch, and mini recorder windows | [`RecordingStatePolicy`](../VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift), recorder views | iOS uses an in-app recording sheet | macOS-only | `NSPanel`, notch placement, and floating desktop windows are macOS-only. |
+| R20 | App Intents / Shortcuts start, stop, and dismiss | [`AppShortcuts`](../VoiceInk/AppIntents/AppShortcuts.swift) | `missing`: no iOS App Intent target source | shared/iOS | Must prove Shortcuts discovery, invocation, permission handling, and state transitions. |
+| R21 | Cursor-aware capitalization, trailing space, clipboard restore, and auto-send | [`CursorPaster`](../VoiceInk/Paste/CursorPaster.swift), [`CursorTextContextReader`](../VoiceInk/Services/CursorTextContextReader.swift) | `missing` at the keyboard outcome: cleanup policy is shared, but there is no host-field context, insertion, or optional Return action | shared/iOS for field-aware formatting and auto-send; not-applicable for clipboard restoration when insertion uses `textDocumentProxy` | Prove sentence/mid-sentence insertion, spacing, one-time optional Return, and no unrelated clipboard mutation. |
+
+## Transcription, Models, And Enhancement
+
+| ID | Capability | macOS evidence | iOS state and implementation | Class | Verification |
+|---|---|---|---|---|---|
+| M01 | Bundled/local Whisper model management | [`ModelManagementView`](../VoiceInk/Views/AI%20Models/ModelManagementView.swift) | `source-present`: [`LocalModelManagementView`](../iOS/VoiceInk-ios/LocalModelManagementView.swift), [`LocalModelManager`](../iOS/VoiceInk-ios/LocalModelManager.swift) download, cancel, delete, and refresh | shared/iOS | Download/cancel/delete and offline transcription need device proof. |
+| M02 | Fixed cloud batch transcription providers | [`TranscriptionModelCatalog`](../VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift) | `source-present` for the current iOS provider subset through shared catalog/runtime dispatch | shared/iOS | Each selectable provider needs credential, request, success, empty output, retry, and failure proof. |
+| M03 | Native Apple transcription | [`NativeAppleTranscriptionService`](../VoiceInk/Transcription/Native/NativeAppleTranscriptionService.swift) | `missing`: no iOS adapter or model choice | shared/iOS | Availability, permission, locale, offline/online behavior, timeout, and errors need proof. |
+| M04 | FluidAudio / Parakeet local transcription | [`FluidAudioTranscriptionService`](../VoiceInk/Transcription/FluidAudio/FluidAudioTranscriptionService.swift) | `missing`: no iOS adapter, download UI, or model choice | shared/iOS | Model lifecycle, memory, batch/streaming output, cancellation, and errors need device proof. |
+| M05 | Import a local Whisper model | macOS local-model import in model management | `missing`: iOS only downloads catalog models | shared/iOS | Security-scoped import, duplicate handling, persistence, selection, transcription, and deletion. |
+| M06 | Cartesia and custom cloud STT endpoints | [`CustomCloudModelManager`](../VoiceInk/Transcription/Cloud/CustomCloudModelManager.swift), shared catalog | `missing`: no iOS custom model CRUD/runtime; Cartesia is not selectable | shared/iOS | CRUD, secret handling, request shape, streaming/batch capability, and failure proof. |
+| M07 | Language selection and request normalization | [`ModelSettingsView`](../VoiceInk/Views/ModelSettingsView.swift) | `source-present`: iOS language picker feeds shared local/remote normalization | shared/iOS | Local and every remote provider need non-English runtime samples. |
+| M08 | Per-language Whisper prompt, trailing space, VAD, prewarm, preview controls | [`ModelSettingsView`](../VoiceInk/Views/ModelSettingsView.swift) | `partial`: shared defaults can be consumed, but iOS exposes no complete controls | shared/iOS | Persistence and observable runtime effect for each setting. |
+| M09 | Vocabulary, replacements, and cleanup | [`DictionarySettingsView`](../VoiceInk/Views/Dictionary/DictionarySettingsView.swift) | `partial`: iOS can add/delete vocabulary and replacements and configure punctuation, paragraphs, lowercase, and fillers; no edit-existing or quick-add | shared/iOS | Edit, delete, replacement order, transcription application, and persistence need proof. |
+| M10 | Mode CRUD with transcription and enhancement selection | [`PowerModeConfigView`](../VoiceInk/PowerMode/PowerModeConfigView.swift) | `source-present`: [`ModeConfigurationView`](../iOS/VoiceInk-ios/ModeConfigurationView.swift) adds, edits, deletes, repairs, and selects manual modes | shared/iOS | CRUD persistence and recording-time execution need runtime proof. |
+| M11 | Fixed AI enhancement providers | [`AIProviderCatalog`](../VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift) | `partial`: iOS supports only its current shared provider subset | shared/iOS | Every displayed provider/model needs verification and enhancement success/failure proof. |
+| M12 | Anthropic, OpenRouter, Ollama, and generic custom enhancement | macOS provider settings and [`AIService`](../VoiceInk/Services/AIEnhancement/AIService.swift) | `missing`: no complete iOS UI/runtime for these providers | shared/iOS | Provider-specific configuration, local-network permission where relevant, request, retry, and output filtering. |
+| M13 | Local CLI enhancement | [`LocalCLIService`](../VoiceInk/Services/AIEnhancement/LocalCLIService.swift) | No iOS process/shell execution equivalent | macOS-only | Arbitrary `/bin/zsh` command execution is unavailable to iOS apps. |
+| M14 | Reusable prompt library, reorder, trigger words, per-recording choice | [`EnhancementSettingsView`](../VoiceInk/Views/EnhancementSettingsView.swift), [`AIEnhancementService`](../VoiceInk/Services/AIEnhancement/AIEnhancementService.swift) | `partial`: iOS mode templates/custom text exist; library CRUD/order/triggers/recording picker do not | shared/iOS | CRUD, persistence, trigger selection, selected prompt, and enhancement request proof. |
+| M15 | Clipboard, selected-text, screen, and surrounding-text context | [`AIEnhancementService`](../VoiceInk/Services/AIEnhancement/AIEnhancementService.swift) | `missing`: keyboard document context is unused; cross-app screen capture is unavailable | shared/iOS for keyboard surrounding text; macOS-only for system-wide screen/selection capture | Prove bounded keyboard context capture and enhancement use without retaining unrelated text. |
+| M16 | Automatic Power Mode by foreground app/browser URL | [`ActiveWindowService`](../VoiceInk/PowerMode/ActiveWindowService.swift) | Manual iOS modes are present; no system-wide app/URL inspection | macOS-only | Normal iOS apps cannot inspect another foreground app or browser URL globally. |
+| M17 | Provider API-key entry, verification, and Keychain storage | [`APIKeyManagementView`](../VoiceInk/Views/AI%20Models/APIKeyManagementView.swift) | `source-present`: [`APIKeysView`](../iOS/VoiceInk-ios/APIKeysView.swift), [`ProviderAPIKeyView`](../iOS/VoiceInk-ios/ProviderAPIKeyView.swift) | shared/iOS | Save/change/delete, verification, fallback, and failed-storage behavior need device proof. |
+| M18 | Enhancement context, minimum-length, timeout, retry, and fallback controls | macOS enhancement settings and [`AIEnhancementService`](../VoiceInk/Services/AIEnhancement/AIEnhancementService.swift) | `partial`: iOS mode post-processing uses shared execution defaults but exposes no complete control surface | shared/iOS | Persist each control and prove skip, timeout, retry progress, fallback, and final user-visible error behavior. |
+
+## History, Metrics, And Data
+
+| ID | Capability | macOS evidence | iOS state and implementation | Class | Verification |
+|---|---|---|---|---|---|
+| H01 | Searchable transcription history | [`InlineHistoryView`](../VoiceInk/Views/History/InlineHistoryView.swift) | `source-present`: [`NotesListView`](../iOS/VoiceInk-ios/NotesListView.swift) searches raw/enhanced text and deletes rows/audio | shared/iOS | Search, persistence, deletion, missing file, and large-history behavior need runtime proof. |
+| H02 | Transcript detail, copy, audio playback, seek, and speed | macOS history/audio player views | `source-present`: [`NoteDetailView`](../iOS/VoiceInk-ios/NoteDetailView.swift), [`AudioPlayerView`](../iOS/VoiceInk-ios/AudioPlayerView.swift) | shared/iOS | Clipboard, route changes, interruption, seek/rate, and missing-audio behavior need device proof. |
+| H03 | Retry, retranscribe, and re-enhance | [`LastTranscriptionService`](../VoiceInk/Services/LastTranscriptionService.swift), macOS audio player | `partial`: iOS retries failed stored audio, but cannot retranscribe/re-enhance completed records with a chosen prompt | shared/iOS | Original preservation, selected settings, status transitions, and failure recovery. |
+| H04 | Bulk selection/delete, CSV export, and share | [`InlineHistoryView`](../VoiceInk/Views/History/InlineHistoryView.swift) | `missing`: iOS supports single-row deletion and transcript copy only | shared/iOS | Selection, cancel, export contents, share sheet, and destructive confirmation. |
+| H05 | Full metrics and model-performance dashboard | [`MetricsContent`](../VoiceInk/Views/Metrics/MetricsContent.swift) | `partial`: iOS notes summary shows words/audio/count/fastest model only | shared/iOS | Time range, totals, time saved, model comparison, empty data, and large data proof. |
+| H06 | Transcript/audio retention and manual cleanup | [`AudioCleanupSettingsView`](../VoiceInk/Views/Settings/AudioCleanupSettingsView.swift) | `missing`: no retention UI/service, size preview, or orphan cleanup | shared/iOS | Scheduled/manual cleanup, retention boundaries, active-file safety, size reporting, and failure behavior. |
+| H07 | Selective settings backup/export/import | macOS settings import/export services | `missing`: no iOS export/import surface | shared/iOS | Round trip, selective scope, invalid/old payload, secrets exclusion, and rollback behavior. |
+| H08 | Diagnostic log/support bundle export | [`DiagnosticsSettingsView`](../VoiceInk/Views/Settings/DiagnosticsSettingsView.swift) | `missing`: no iOS log export or support bundle | shared/iOS | Date range, redaction, empty/failure behavior, and share sheet proof. |
+| H09 | Cross-device persistence/sync | macOS CloudKit-backed dictionary and local history | `partial`: iOS notes/preferences persist locally; no dictionary/history sync | decision | Choose local-only versus CloudKit scope and conflict policy before implementation. |
+
+## Onboarding, Settings, And Product Shell
+
+| ID | Capability | macOS evidence | iOS state and implementation | Class | Verification |
+|---|---|---|---|---|---|
+| S01 | Resumable onboarding with permission, model, tutorial, skip, and reset | macOS onboarding views and shared presentation/state | `partial`: [`OnboardingView`](../iOS/VoiceInk-ios/OnboardingView.swift) has welcome/model/ready; no permission/keyboard tutorial, persisted resume, or normal reset entry | shared/iOS | Kill/resume at each step, skip, permission failure, model failure, tutorial, and reset. |
+| S02 | Dedicated permission status and recovery screen | [`PermissionsView`](../VoiceInk/Views/PermissionsView.swift) | `missing`: only recording-time microphone handling exists | shared/iOS | Microphone and keyboard readiness must refresh after returning from Settings. |
+| S03 | Help, support, common issues, and announcements | macOS general settings, support policy, announcement manager | `missing`: APNs entitlement exists but no reachable support/announcement UI | shared/iOS | Link/mail/share behavior, announcement lifecycle, dismissal, offline/error behavior. |
+| S04 | Trial, license, and purchase management | [`LicenseManagementView`](../VoiceInk/Views/LicenseManagementView.swift) | `missing`: no iOS licensing or purchase flow | decision | Choose App Store/IAP versus shared account/license policy before implementation. |
+| S05 | In-app update checking | Sparkle integration | App Store update distribution is the iOS equivalent | not-applicable | Sparkle must not be ported to iOS. |
+| S06 | Menu bar, Dock visibility, launch at login, quit | [`MenuBarView`](../VoiceInk/Views/MenuBarView.swift), macOS settings | No iOS equivalent | macOS-only | These are desktop process/window lifecycle controls. |
+| S07 | Reset app data/settings | macOS reset controls | `source-present`: iOS Debug settings reset app data, preferences, files, and credentials | shared/iOS | Confirmation, cancellation, restart state, and partial-failure behavior need proof; move out of Debug if it is a shipping feature. |
+| S08 | Roma Just Talk identity | [`VoiceInkAppIdentity`](../VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift), macOS bundle | `source-present`: iOS bundle display/product name is `roma just talk` and uses shared identity | shared/iOS | Installed app, keyboard label, onboarding, settings, and system permission surfaces need visual proof. |
+
+## Fork Delta Ledger
+
+The fork diverged from the audited upstream merge base at `0df2a9ab`. These
+user-visible additions are not allowed to disappear from the parity audit.
+
+| Fork addition | Commit evidence | Current iOS disposition |
+|---|---|---|
+| Voice recording pre-roll and buffer-first defaults | `8285be3d` | Missing; R09 is an unresolved iOS platform/product decision. |
+| Special Shift recording mode and its subsettings | `a759c710`, `f19564b5` | Exact global-key mechanics are macOS-only (R16-R17); the iOS keyboard still needs complete dictation outcome parity (R02-R06). |
+| Live-transcription auto policy | `3e8d9556` | Missing; R10 and R11 are intended on iOS. |
+| Rolling-buffer preload engine and quick-release path | `3000a89a` plus the v1.93-v1.96 latency/fallback fixes | Missing; R09 remains undecided and R10/R12 remain intended. |
+| Cursor-context capitalization | `6dcff513` | Shared formatting exists, but iOS cannot use originating-field context until R03 and M15 are implemented. |
+| Guided, refreshable permission setup | `7e6f0e28` plus v1.80/v1.96 fixes | iOS setup is incomplete; R04, R05, S01, and S02 are intended. |
+| Roma Just Talk identity, fresh defaults, and hidden menu-bar default | `ec2bd29f`, `99666799` | Identity is source-present (S08); desktop menu/default behavior is macOS-only (S06); Parakeet default depends on missing FluidAudio (M04). |
+| Quiet-local-audio level repair | v1.96 changelog and shared PCM policy | Implemented through shared core for macOS/iOS local Whisper; runtime audio proof remains required. |
+| Failed-paste clipboard preservation and measured quick-release latency behavior | v1.96 changelog | Exact macOS paste behavior is platform-specific; iOS must prove one-time result delivery and insertion through R03/R06. |
+
+## Confirmed Work Queue
+
+Order follows user outcome dependencies, not implementation convenience.
+
+1. Keyboard result IPC and one-time insertion into the originating field (R03).
+2. Keyboard installation/Full Access onboarding and recovery (R05, S01-S02).
+3. Background-safe completion, result delivery, and cancellation (R06-R07).
+4. Manual audio-file import/transcription vertical slice (R08).
+5. Active streaming/live preview and controls (R10-R12).
+6. Portable model/provider gaps (M03-M06, M08, M11-M12).
+7. Prompt library and keyboard context (M14-M15).
+8. History/export, metrics, retention, backup, and diagnostics (H03-H08).
+9. Support/announcements and App Intents (S03, R20).
+
+The goal cannot be marked complete while any `missing`, `partial`, `decision`,
+or runtime-unverified `shared/iOS` row remains.

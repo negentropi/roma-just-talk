@@ -74,13 +74,14 @@ final class RecordingManager: ObservableObject {
             return
         }
         keyboardDictationRequestID = request.requestID
-        if let surroundingTextBeforeCursor = request.surroundingTextBeforeCursor {
+        if VoiceInkIOSKeyboardEnhancementContextPreference.isEnabled(),
+           let surroundingTextBeforeCursor = request.surroundingTextBeforeCursor {
             activeRunSettings = settings.currentTranscriptionRunSettings().applyingEnhancementContext(
                 VoiceInkAIEnhancementPromptContext(
                     surroundingTextBeforeCursor: surroundingTextBeforeCursor
                 )
             )
-        } else if activeRunSettings == nil {
+        } else {
             activeRunSettings = settings.currentTranscriptionRunSettings()
         }
     }

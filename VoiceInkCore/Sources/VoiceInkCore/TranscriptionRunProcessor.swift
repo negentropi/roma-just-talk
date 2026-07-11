@@ -473,19 +473,22 @@ public struct VoiceInkPostProcessingJob: Equatable, Sendable {
     public let model: String
     public let prompt: String
     public let transcript: String
+    public let executionConfiguration: VoiceInkPostProcessingExecutionConfiguration
 
     public init(
         provider: VoiceInkProviderKind,
         apiKey: String,
         model: String,
         prompt: String,
-        transcript: String
+        transcript: String,
+        executionConfiguration: VoiceInkPostProcessingExecutionConfiguration = .default
     ) {
         self.provider = provider
         self.apiKey = apiKey
         self.model = model
         self.prompt = prompt
         self.transcript = transcript
+        self.executionConfiguration = executionConfiguration
     }
 }
 
@@ -552,31 +555,46 @@ public struct VoiceInkPostProcessingClient: Sendable {
         apiKey: String,
         model: String,
         prompt: String,
-        transcript: String
+        transcript: String,
+        executionConfiguration: VoiceInkPostProcessingExecutionConfiguration = .default
     ) async throws -> String {
         guard let request = VoiceInkPostProcessingRequest(prompt: prompt, transcript: transcript) else {
             return transcript
         }
-        let result = try await request.applyRuntimeState { messages, temperature in
-            let requestParameters = VoiceInkAIReasoningConfig.chatRequestParameters(
-                for: provider.aiModelProvider,
-                modelName: model,
-                defaultTemperature: temperature
-            )
-
-            if provider == .anthropic {
-                return try await anthropicClient.chatCompletion(
-                    baseURL: provider.apiBaseURL,
-                    apiKey: apiKey,
-                    model: model,
-                    messages: messages
+        let result = try await VoiceInkPostProcessingExecutionPolicy.execute(
+            configuration: executionConfiguration
+        ) {
+            try await request.applyRuntimeState { messages, temperature in
+                let requestParameters = VoiceInkAIReasoningConfig.chatRequestParameters(
+                    for: provider.aiModelProvider,
+                    modelName: model,
+                    defaultTemperature: temperature
                 )
-            }
 
-            if provider == .customAI,
-               let requestURL = provider.postProcessingChatCompletionsURL {
+                if provider == .anthropic {
+                    return try await anthropicClient.chatCompletion(
+                        baseURL: provider.apiBaseURL,
+                        apiKey: apiKey,
+                        model: model,
+                        messages: messages
+                    )
+                }
+
+                if provider == .customAI,
+                   let requestURL = provider.postProcessingChatCompletionsURL {
+                    return try await client.chatCompletion(
+                        requestURL: requestURL,
+                        apiKey: apiKey,
+                        model: model,
+                        messages: messages,
+                        temperature: requestParameters.temperature,
+                        reasoningEffort: requestParameters.reasoningEffort,
+                        extraBodyParameters: requestParameters.extraBodyParameters
+                    )
+                }
+
                 return try await client.chatCompletion(
-                    requestURL: requestURL,
+                    baseURL: provider.apiBaseURL,
                     apiKey: apiKey,
                     model: model,
                     messages: messages,
@@ -585,16 +603,6 @@ public struct VoiceInkPostProcessingClient: Sendable {
                     extraBodyParameters: requestParameters.extraBodyParameters
                 )
             }
-
-            return try await client.chatCompletion(
-                baseURL: provider.apiBaseURL,
-                apiKey: apiKey,
-                model: model,
-                messages: messages,
-                temperature: requestParameters.temperature,
-                reasoningEffort: requestParameters.reasoningEffort,
-                extraBodyParameters: requestParameters.extraBodyParameters
-            )
         }
 
         return VoiceInkPostProcessingRequest.finalizedTranscript(
@@ -608,6 +616,7 @@ public struct VoiceInkTranscriptionRunSettings: Equatable, Sendable {
     public let configuration: VoiceInkModeRuntimeConfiguration
     public let cleanupConfiguration: VoiceInkTranscriptionCleanupConfiguration
     public let postProcessingSkipConfiguration: VoiceInkPostProcessingSkipConfiguration?
+    public let postProcessingExecutionConfiguration: VoiceInkPostProcessingExecutionConfiguration
     public let transcriptionLanguage: String?
     public let transcriptionPrompt: String?
     public let wordReplacementRules: [VoiceInkWordReplacementRule]
@@ -620,6 +629,7 @@ public struct VoiceInkTranscriptionRunSettings: Equatable, Sendable {
         configuration: VoiceInkModeRuntimeConfiguration,
         cleanupConfiguration: VoiceInkTranscriptionCleanupConfiguration = .disabled,
         postProcessingSkipConfiguration: VoiceInkPostProcessingSkipConfiguration? = nil,
+        postProcessingExecutionConfiguration: VoiceInkPostProcessingExecutionConfiguration = .default,
         transcriptionLanguage: String? = nil,
         transcriptionPrompt: String? = nil,
         wordReplacementRules: [VoiceInkWordReplacementRule] = [],
@@ -631,6 +641,7 @@ public struct VoiceInkTranscriptionRunSettings: Equatable, Sendable {
         self.configuration = configuration
         self.cleanupConfiguration = cleanupConfiguration
         self.postProcessingSkipConfiguration = postProcessingSkipConfiguration
+        self.postProcessingExecutionConfiguration = postProcessingExecutionConfiguration
         self.transcriptionLanguage = transcriptionLanguage
         self.transcriptionPrompt = transcriptionPrompt
         self.wordReplacementRules = wordReplacementRules
@@ -649,6 +660,7 @@ public struct VoiceInkTranscriptionRunSettings: Equatable, Sendable {
             configuration: configuration.applyingPrompt(prompt),
             cleanupConfiguration: cleanupConfiguration,
             postProcessingSkipConfiguration: postProcessingSkipConfiguration,
+            postProcessingExecutionConfiguration: postProcessingExecutionConfiguration,
             transcriptionLanguage: transcriptionLanguage,
             transcriptionPrompt: transcriptionPrompt,
             wordReplacementRules: wordReplacementRules,
@@ -664,6 +676,7 @@ public struct VoiceInkTranscriptionRunSettings: Equatable, Sendable {
             configuration: configuration,
             cleanupConfiguration: cleanupConfiguration,
             postProcessingSkipConfiguration: postProcessingSkipConfiguration,
+            postProcessingExecutionConfiguration: postProcessingExecutionConfiguration,
             transcriptionLanguage: transcriptionLanguage,
             transcriptionPrompt: transcriptionPrompt,
             wordReplacementRules: wordReplacementRules,
@@ -688,6 +701,7 @@ public struct VoiceInkTranscriptionRunSettings: Equatable, Sendable {
                 VoiceInkWordReplacementEngine.apply(wordReplacementRules, to: text)
             },
             postProcessingSkipConfiguration: postProcessingSkipConfiguration,
+            postProcessingExecutionConfiguration: postProcessingExecutionConfiguration,
             promptLibrary: promptLibrary,
             selectedPromptId: selectedPromptId,
             enhancementContext: enhancementContext,
@@ -716,6 +730,7 @@ public struct VoiceInkTranscriptionRunSettings: Equatable, Sendable {
                 VoiceInkWordReplacementEngine.apply(wordReplacementRules, to: text)
             },
             postProcessingSkipConfiguration: postProcessingSkipConfiguration,
+            postProcessingExecutionConfiguration: postProcessingExecutionConfiguration,
             promptLibrary: promptLibrary,
             selectedPromptId: selectedPromptId,
             enhancementContext: enhancementContext,
@@ -765,6 +780,7 @@ public struct VoiceInkIOSAppSettingsRunSnapshot {
             ),
             cleanupConfiguration: VoiceInkTranscriptionCleanupConfiguration.current(in: defaults),
             postProcessingSkipConfiguration: VoiceInkPostProcessingSkipConfiguration.current(in: defaults),
+            postProcessingExecutionConfiguration: VoiceInkPostProcessingExecutionConfiguration.current(in: defaults),
             transcriptionLanguage: selectedTranscriptionLanguage,
             transcriptionPrompt: VoiceInkLocalWhisperPromptCatalog.prompt(
                 for: selectedTranscriptionLanguage,
@@ -808,7 +824,8 @@ public struct VoiceInkTranscriptionRunProcessor {
                 apiKey: job.apiKey,
                 model: job.model,
                 prompt: job.prompt,
-                transcript: job.transcript
+                transcript: job.transcript,
+                executionConfiguration: job.executionConfiguration
             )
         }
     }
@@ -819,6 +836,7 @@ public struct VoiceInkTranscriptionRunProcessor {
         cleanupConfiguration: VoiceInkTranscriptionCleanupConfiguration = .disabled,
         applyingWordReplacements wordReplacement: (String) -> String = { $0 },
         postProcessingSkipConfiguration: VoiceInkPostProcessingSkipConfiguration? = nil,
+        postProcessingExecutionConfiguration: VoiceInkPostProcessingExecutionConfiguration = .default,
         promptLibrary: [VoiceInkCustomPrompt] = [],
         selectedPromptId: UUID? = nil,
         enhancementContext: VoiceInkAIEnhancementPromptContext = VoiceInkAIEnhancementPromptContext(),
@@ -863,6 +881,7 @@ public struct VoiceInkTranscriptionRunProcessor {
             cleanupConfiguration: cleanupConfiguration,
             applyingWordReplacements: wordReplacement,
             postProcessingSkipConfiguration: postProcessingSkipConfiguration,
+            postProcessingExecutionConfiguration: postProcessingExecutionConfiguration,
             promptLibrary: promptLibrary,
             selectedPromptId: selectedPromptId,
             enhancementContext: enhancementContext,
@@ -879,6 +898,7 @@ public struct VoiceInkTranscriptionRunProcessor {
         cleanupConfiguration: VoiceInkTranscriptionCleanupConfiguration = .disabled,
         applyingWordReplacements wordReplacement: (String) -> String = { $0 },
         postProcessingSkipConfiguration: VoiceInkPostProcessingSkipConfiguration? = nil,
+        postProcessingExecutionConfiguration: VoiceInkPostProcessingExecutionConfiguration = .default,
         promptLibrary: [VoiceInkCustomPrompt] = [],
         selectedPromptId: UUID? = nil,
         enhancementContext: VoiceInkAIEnhancementPromptContext = VoiceInkAIEnhancementPromptContext(),
@@ -944,7 +964,8 @@ public struct VoiceInkTranscriptionRunProcessor {
                             apiKey: usableLLMKey,
                             model: llmModel,
                             prompt: prompt,
-                            transcript: promptDetection.processedText
+                            transcript: promptDetection.processedText,
+                            executionConfiguration: postProcessingExecutionConfiguration
                         ))
                         try Task.checkCancellation()
                         let enhancementEnd = currentDate()

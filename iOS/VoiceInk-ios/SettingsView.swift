@@ -53,6 +53,10 @@ struct SettingsView: View {
                     )
                 }
 
+                NavigationLink(destination: IOSEnhancementBehaviorView()) {
+                    Label("AI Enhancement", systemImage: "wand.and.stars")
+                }
+
                 NavigationLink(destination: IOSHelpSupportView(
                     announcementsStore: .shared
                 )) {

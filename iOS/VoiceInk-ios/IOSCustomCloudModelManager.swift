@@ -61,6 +61,9 @@ final class IOSCustomCloudModelManager: ObservableObject {
         }
     }
 
+    // Xcode 26.1-26.3 corrupts actor-isolated deinit back-deployment on Simulator.
+    nonisolated deinit {}
+
     var modelNames: [String] {
         models.map(\.name)
     }

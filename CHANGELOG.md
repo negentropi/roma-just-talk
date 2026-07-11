@@ -27,6 +27,7 @@
 - Added bounded iOS keyboard surrounding-text context for enhancement and cursor-aware capitalization, clearing the shared exchange copy as soon as the app captures the request.
 - Added completed-record retranscription and re-enhancement on iOS with mode/prompt selection, cancellation, preserved prior results on failure, and persisted enhancement metadata.
 - Added iOS history edit mode with select all, confirmed multi-delete, recording-file cleanup, and shared CSV export through the system share sheet.
+- Added a full iOS metrics dashboard with persisted time filters, time-saved and dictation totals, empty-state handling, and transcription/enhancement model comparisons.
 - Added iOS audio/video file import with multi-file queueing, 16 kHz WAV preparation, mode selection, background-safe transcription, cancel/retry controls, persistent history, detail navigation, external file opening, and transcript sharing.
 - Added tracked iOS post-record transcription tasks with balanced background execution, retryable expiration/relaunch recovery, user cancellation, keyboard result completion, and whisper.cpp abort support for local inference.
 - Added iOS keyboard setup to onboarding and Settings, with installation guidance, a verification field, fresh activation and Full Access status, recovery through system Settings, and a setup-later path.

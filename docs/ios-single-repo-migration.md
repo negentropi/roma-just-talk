@@ -144,7 +144,7 @@ No shared code should be added at the parent `faster-wisperflow/` workspace leve
 - shared remote transcription provider dispatch plus batch request option defaults for provider/use-specific prompt, vocabulary, timeout, retry, and formatting parameters
 - shared API-key verification result policy, provider API-key verifier, and Cartesia API-key verification request/client helper folded into `RemoteTransport.swift`
 - shared multipart form-data construction for remote transcription clients
-- shared remote HTTP response validation, provider-domain error construction, retryable status-code classification, direct and retried validated request helpers, OpenAI-compatible models/chat request policy, and long-running polling loop policy for remote transcription clients plus OpenAI-compatible chat completion
+- shared remote HTTP response validation, provider-domain error construction, retryable status-code classification, direct and retried validated request helpers, OpenAI-compatible models/chat request policy including nonblank stable model-ID de-duplication, and long-running polling loop policy for remote transcription clients plus OpenAI-compatible chat completion
 
 Current macOS consumers of shared remote transport:
 

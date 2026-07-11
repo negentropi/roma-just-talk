@@ -575,6 +575,17 @@ public struct VoiceInkAppDataResetPlan: Equatable, Sendable {
     }
 }
 
+public enum VoiceInkIOSAppDataResetPresentation {
+    public static let sectionTitle = "Data"
+    public static let buttonTitle = "Reset All App Data"
+    public static let buttonSystemImageName = "trash"
+    public static let confirmationTitle = "Reset All App Data?"
+    public static let confirmationMessage =
+        "This permanently deletes your recordings, downloaded models, settings, and saved API keys. Onboarding starts again after you relaunch the app."
+    public static let confirmButtonTitle = "Reset All Data"
+    public static let cancelButtonTitle = "Cancel"
+}
+
 public extension VoiceInkAppDataResetPlan {
     func applyRuntimeState(
         deleteTranscriptionRecords: () -> Void,

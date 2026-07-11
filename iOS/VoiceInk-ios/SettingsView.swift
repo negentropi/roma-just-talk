@@ -16,6 +16,7 @@ struct SettingsView: View {
     @State private var customVocabularyDraftState = VoiceInkVocabularyDraftState()
     @State private var wordReplacementDraftState = VoiceInkWordReplacementDraftState()
     @State private var dictionaryAlert: VoiceInkDictionaryAlertPresentation?
+    @State private var isResetConfirmationPresented = false
     private let cleanupPresentation = VoiceInkTranscriptionCleanupPresentation.iOS
     private let dictionaryPresentation = VoiceInkDictionarySettingsPresentation.iOS
     private let audioTimeoutPresentation = VoiceInkAudioSessionTimeoutPreference.settingsPresentation
@@ -271,18 +272,16 @@ struct SettingsView: View {
                 .padding(.vertical, 4)
             }
 
-            #if DEBUG
-            Section(header: Text(settingsPresentation.debugSectionTitle)) {
+            Section(header: Text(VoiceInkIOSAppDataResetPresentation.sectionTitle)) {
                 Button(role: .destructive) {
-                    resetAppData()
+                    isResetConfirmationPresented = true
                 } label: {
                     Label(
-                        settingsPresentation.resetAllAppDataButtonTitle,
-                        systemImage: settingsPresentation.resetAllAppDataSystemImageName
+                        VoiceInkIOSAppDataResetPresentation.buttonTitle,
+                        systemImage: VoiceInkIOSAppDataResetPresentation.buttonSystemImageName
                     )
                 }
             }
-            #endif
         }
         .navigationTitle(settingsPresentation.navigationTitle)
         .onAppear {
@@ -299,6 +298,18 @@ struct SettingsView: View {
                 message: Text(alert.message),
                 dismissButton: .cancel(Text(alert.primaryButtonTitle))
             )
+        }
+        .confirmationDialog(
+            VoiceInkIOSAppDataResetPresentation.confirmationTitle,
+            isPresented: $isResetConfirmationPresented,
+            titleVisibility: .visible
+        ) {
+            Button(VoiceInkIOSAppDataResetPresentation.confirmButtonTitle, role: .destructive) {
+                resetAppData()
+            }
+            Button(VoiceInkIOSAppDataResetPresentation.cancelButtonTitle, role: .cancel) { }
+        } message: {
+            Text(VoiceInkIOSAppDataResetPresentation.confirmationMessage)
         }
     }
 
@@ -377,7 +388,6 @@ struct SettingsView: View {
             )
     }
 
-    #if DEBUG
     private func resetAppData() {
         let resetPlan = VoiceInkAppDataResetPlan.iOS()
 
@@ -401,7 +411,6 @@ struct SettingsView: View {
             VoiceInkIOSLogger.settings.error("\(VoiceInkAppDataResetDiagnostics.swiftDataResetFailedMessage(errorDescription: String(describing: error)), privacy: .public)")
         }
     }
-    #endif
 }
 
 

@@ -4,6 +4,7 @@
 
 - Added iOS microphone permission setup during onboarding plus a refreshable Settings recovery screen that reuses the recording permission path.
 - Resumed incomplete iOS onboarding at its last saved setup step after relaunch, clearing the saved step on completion or app-data reset.
+- Exposed iOS app-data reset in shipping Settings with destructive confirmation before deleting recordings, models, preferences, and credentials.
 - Added iOS local Whisper model import, selection, persistence, and deletion using the existing shared model-file and runtime policies.
 - Added iOS Shortcuts actions to start, stop, and cancel recording through the existing recording flow.
 - Added iOS 26 Native Apple transcription with mode selection, BCP-47 language handling, Speech asset status/download controls, and recorded-file SpeechAnalyzer routing.

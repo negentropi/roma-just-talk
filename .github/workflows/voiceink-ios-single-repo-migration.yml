@@ -34,8 +34,6 @@ jobs:
     name: Verify single-repo migration
     runs-on: namespace-profile-roma-jt
     timeout-minutes: 90
-    env:
-      DEVELOPER_DIR: /Applications/Xcode_26.5.app/Contents/Developer
 
     steps:
       - name: Checkout
@@ -43,6 +41,7 @@ jobs:
 
       - name: Show toolchain
         run: |
+          ls -d /Applications/Xcode*.app
           xcode-select -p
           xcodebuild -version
           swift --version

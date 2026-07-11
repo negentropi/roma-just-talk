@@ -32,6 +32,7 @@
 - Added selective iOS settings backup/export/import for general settings, modes, prompts, dictionary entries, and custom model definitions, excluding API keys and preserving current settings when validation or storage fails.
 - Added iOS diagnostic support-bundle export with selectable log ranges, compact device/configuration facts, empty-range handling, secret/email/home-path redaction, and system sharing.
 - Added an optional iOS keyboard auto-send setting that captures the preference with each completed dictation and inserts one Return after one-time text delivery.
+- Added iOS AI-enhancement behavior controls for keyboard context, short-transcript skipping, request timeout, retry, and original-transcript fallback.
 - Added iOS audio/video file import with multi-file queueing, 16 kHz WAV preparation, mode selection, background-safe transcription, cancel/retry controls, persistent history, detail navigation, external file opening, and transcript sharing.
 - Added tracked iOS post-record transcription tasks with balanced background execution, retryable expiration/relaunch recovery, user cancellation, keyboard result completion, and whisper.cpp abort support for local inference.
 - Added iOS keyboard setup to onboarding and Settings, with installation guidance, a verification field, fresh activation and Full Access status, recovery through system Settings, and a setup-later path.

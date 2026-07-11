@@ -1,4 +1,5 @@
 import AVFoundation
+import Combine
 import SwiftUI
 import UIKit
 import VoiceInkCore
@@ -109,7 +110,16 @@ struct IOSMicrophonePermissionView: View {
     private let skipAction: (() -> Void)?
 
     init(
-        model: IOSMicrophonePermissionModel = .live(),
+        continueAction: (() -> Void)? = nil,
+        skipAction: (() -> Void)? = nil
+    ) {
+        _model = StateObject(wrappedValue: .live())
+        self.continueAction = continueAction
+        self.skipAction = skipAction
+    }
+
+    init(
+        model: IOSMicrophonePermissionModel,
         continueAction: (() -> Void)? = nil,
         skipAction: (() -> Void)? = nil
     ) {

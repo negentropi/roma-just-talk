@@ -140,6 +140,58 @@ final class AppSettings: ObservableObject {
 
     // MARK: - Modes Management
 
+    func currentTranscriptionRunSettings() -> VoiceInkTranscriptionRunSettings {
+        VoiceInkIOSAppSettingsRunSnapshot(
+            modes: modes,
+            selectedModeId: selectedModeId,
+            selectedTranscriptionLanguage: selectedTranscriptionLanguage,
+            wordReplacementRules: wordReplacements,
+            customVocabulary: customVocabularyTerms
+        ).transcriptionRunSettings()
+    }
+
+    func liveTranscriptionRequest() -> VoiceInkLiveTranscriptionRequest? {
+        VoiceInkLiveTranscriptionPolicy.request(
+            for: currentTranscriptionRunSettings().configuration
+        )
+    }
+
+    func isLiveTranscriptionEnabled(for modelName: String) -> Bool {
+        VoiceInkTranscriptionStreamingPreference.isEnabled(forModelName: modelName)
+    }
+
+    func setLiveTranscriptionEnabled(_ isEnabled: Bool, for modelName: String) {
+        VoiceInkTranscriptionStreamingPreference.saveIsEnabled(
+            isEnabled,
+            forModelName: modelName
+        )
+        objectWillChange.send()
+    }
+
+    func finalizeStreamingTranscript(
+        _ rawText: String,
+        for note: Transcription,
+        runSettings: VoiceInkTranscriptionRunSettings,
+        transcriptionDuration: TimeInterval?
+    ) async -> VoiceInkStoredAudioRetranscriptionOutcome {
+        do {
+            let result = try await runSettings.processTranscribedText(
+                rawText,
+                transcriptionDuration: transcriptionDuration,
+                processor: VoiceInkTranscriptionRunProcessor(),
+                apiKeyProvider: { [self] provider in
+                    await apiKey(for: provider)
+                }
+            )
+            note.applyCompletedRunResult(result)
+            return .succeeded(result.finalText)
+        } catch is CancellationError {
+            return .canceled
+        } catch {
+            return .failed(reason: VoiceInkErrorDescription.text(for: error))
+        }
+    }
+
     func retranscribeStoredAudio(_ note: Transcription) async -> VoiceInkStoredAudioRetranscriptionOutcome {
         await VoiceInkStoredAudioRetranscription.retranscribeWithOutcome(
             note,

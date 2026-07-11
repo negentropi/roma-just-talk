@@ -24,6 +24,112 @@ public enum VoiceInkStreamingTranscriptAssembly {
     }
 }
 
+public struct VoiceInkStreamingTranscriptAccumulator {
+    public private(set) var committedSegments: [String] = []
+
+    public init() {}
+
+    public mutating func appendCommitted(_ text: String) -> Bool {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return false }
+        committedSegments.append(trimmed)
+        return true
+    }
+
+    public func preview(partialText: String) -> String {
+        VoiceInkStreamingTranscriptAssembly.previewText(
+            committedSegments: committedSegments,
+            partialText: partialText
+        )
+    }
+
+    public var committedText: String {
+        VoiceInkStreamingTranscriptAssembly.committedText(committedSegments)
+    }
+
+    public mutating func reset() {
+        committedSegments.removeAll()
+    }
+}
+
+public struct VoiceInkLiveTranscriptionRequest: Equatable, Sendable {
+    public let provider: VoiceInkProviderKind
+    public let selectedModel: String
+    public let connectionModel: String
+
+    public init(
+        provider: VoiceInkProviderKind,
+        selectedModel: String,
+        connectionModel: String
+    ) {
+        self.provider = provider
+        self.selectedModel = selectedModel
+        self.connectionModel = connectionModel
+    }
+}
+
+public enum VoiceInkLiveTranscriptionPolicy {
+    public static func capability(
+        for configuration: VoiceInkModeRuntimeConfiguration
+    ) -> VoiceInkLiveTranscriptionRequest? {
+        guard let modelProvider = configuration.transcriptionProvider.transcriptionModelProvider,
+              modelProvider != .local,
+              let model = VoiceInkTranscriptionModelCatalog.cloudModels(for: modelProvider)
+                .first(where: { $0.name == configuration.transcriptionModel })
+        else { return nil }
+
+        guard model.supportsStreaming else { return nil }
+
+        return VoiceInkLiveTranscriptionRequest(
+            provider: configuration.transcriptionProvider,
+            selectedModel: model.name,
+            connectionModel: modelProvider.streamingConnectionModelName(
+                for: model.name
+            )
+        )
+    }
+
+    public static func request(
+        for configuration: VoiceInkModeRuntimeConfiguration,
+        defaults: UserDefaults = .standard
+    ) -> VoiceInkLiveTranscriptionRequest? {
+        guard let request = capability(for: configuration) else { return nil }
+        let snapshot = VoiceInkTranscriptionStreamingModelSnapshot(
+            name: request.selectedModel,
+            supportsStreaming: true
+        )
+        return VoiceInkTranscriptionStreamingPreference.shouldUseStreaming(
+            for: snapshot,
+            in: defaults
+        ) ? request : nil
+    }
+}
+
+public enum VoiceInkStreamingFallbackPolicy {
+    public static func run<Result>(
+        streamingFailed: Bool,
+        streaming: () async throws -> Result,
+        onStreamingFailure: (Error) async -> Void = { _ in },
+        cancelStreaming: () async -> Void,
+        prepareFallback: () async throws -> Void = {},
+        fallback: () async throws -> Result
+    ) async throws -> Result {
+        if !streamingFailed {
+            do {
+                return try await streaming()
+            } catch {
+                await onStreamingFailure(error)
+                await cancelStreaming()
+            }
+        } else {
+            await cancelStreaming()
+        }
+
+        try await prepareFallback()
+        return try await fallback()
+    }
+}
+
 public enum VoiceInkStreamingTranscriptionError: LocalizedError, Equatable, Sendable {
     public static let unknownServerErrorMessage = "Unknown error"
 

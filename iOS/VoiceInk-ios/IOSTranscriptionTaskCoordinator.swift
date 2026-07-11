@@ -36,6 +36,7 @@ final class IOSTranscriptionTaskCoordinator: ObservableObject {
     typealias KeyboardCompletion = @MainActor (_ requestID: UUID, _ text: String) -> Void
     typealias KeyboardFailure = @MainActor (_ requestID: UUID, _ message: String) -> Void
     typealias RunCompletion = @MainActor (VoiceInkStoredAudioRetranscriptionOutcome) -> Void
+    typealias RunOperation = @MainActor (Transcription) async -> VoiceInkStoredAudioRetranscriptionOutcome
 
     @Published private(set) var activeNoteIDs: Set<UUID> = []
 
@@ -96,6 +97,7 @@ final class IOSTranscriptionTaskCoordinator: ObservableObject {
         note: Transcription,
         keyboardRequestID: UUID? = nil,
         persist: @escaping @MainActor () -> Void,
+        operation: RunOperation? = nil,
         completion: RunCompletion? = nil
     ) -> Bool {
         guard runs[note.id] == nil else { return false }
@@ -130,9 +132,10 @@ final class IOSTranscriptionTaskCoordinator: ObservableObject {
         }
         run.backgroundToken = backgroundToken
 
+        let operation = operation ?? retranscribe
         run.task = Task { [weak self, weak run] in
             guard let self, let run else { return }
-            let outcome = await self.retranscribe(run.note)
+            let outcome = await operation(run.note)
             self.complete(run: run, outcome: outcome)
         }
         return true

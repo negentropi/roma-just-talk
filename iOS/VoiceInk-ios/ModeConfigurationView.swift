@@ -60,6 +60,27 @@ struct ModeConfigurationView: View {
                         }
                     }
                 }
+
+                if let liveCapability = VoiceInkLiveTranscriptionPolicy.capability(
+                    for: draftState.mode.runtimeConfiguration
+                ) {
+                    Toggle(
+                        "Live Transcript",
+                        isOn: Binding(
+                            get: {
+                                settings.isLiveTranscriptionEnabled(
+                                    for: liveCapability.selectedModel
+                                )
+                            },
+                            set: {
+                                settings.setLiveTranscriptionEnabled(
+                                    $0,
+                                    for: liveCapability.selectedModel
+                                )
+                            }
+                        )
+                    )
+                }
             }
             
             Section(

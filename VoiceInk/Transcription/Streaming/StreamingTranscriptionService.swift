@@ -85,7 +85,7 @@ class StreamingTranscriptionService {
     private var eventConsumerTask: Task<Void, Never>?
     private let chunkSource = AudioChunkSource()
     private var state: StreamingState = .idle
-    private var committedSegments: [String] = []
+    private var transcriptAccumulator = VoiceInkStreamingTranscriptAccumulator()
     private let modelContext: ModelContext
     private let streamingAdapterKind: VoiceInkTranscriptionStreamingAdapterKind
     private let fluidAudioService: FluidAudioTranscriptionService?
@@ -131,7 +131,7 @@ class StreamingTranscriptionService {
     func startStreaming(model: any TranscriptionModel) async throws {
         let start = Date()
         state = .connecting
-        committedSegments = []
+        transcriptAccumulator.reset()
         metrics.reset()
         firstPartialLogged = false
         firstCommitLogged = false
@@ -227,7 +227,7 @@ class StreamingTranscriptionService {
             await providerToDisconnect?.disconnect()
         }
 
-        committedSegments = []
+        transcriptAccumulator.reset()
         logger.notice("Streaming cancelled")
     }
 
@@ -300,15 +300,11 @@ class StreamingTranscriptionService {
                             let elapsed = self.stopStartedAt.map { Date().timeIntervalSince($0) } ?? 0
                             self.logger.notice("Streaming first committed event chars=\(trimmed.count, privacy: .public) stopElapsed=\(elapsed, format: .fixed(precision: 3), privacy: .public)s")
                         }
-                        if !trimmed.isEmpty {
-                            self.committedSegments.append(trimmed)
-                        }
+                        _ = self.transcriptAccumulator.appendCommitted(trimmed)
                         // Refresh the live preview so it keeps showing the full running transcript
                         // after a commit (instead of resetting to empty until the next partial).
                         if self.state == .streaming {
-                            self.onPartialTranscript?(
-                                VoiceInkStreamingTranscriptAssembly.committedText(self.committedSegments)
-                            )
+                            self.onPartialTranscript?(self.transcriptAccumulator.committedText)
                         }
                         if self.state == .committing {
                             self.commitSignal?.yield()
@@ -321,10 +317,7 @@ class StreamingTranscriptionService {
                             self.logger.notice("Streaming first partial event chars=\(text.count, privacy: .public)")
                         }
                         if self.state == .streaming {
-                            let display = VoiceInkStreamingTranscriptAssembly.previewText(
-                                committedSegments: self.committedSegments,
-                                partialText: text
-                            )
+                            let display = self.transcriptAccumulator.preview(partialText: text)
                             self.onPartialTranscript?(display)
                         }
                     }
@@ -359,17 +352,17 @@ class StreamingTranscriptionService {
             group.cancelAll()
             return result
         }
-        logger.notice("Streaming final wait finished received=\(receivedInTime, privacy: .public) segments=\(self.committedSegments.count, privacy: .public)")
+        logger.notice("Streaming final wait finished received=\(receivedInTime, privacy: .public) segments=\(self.transcriptAccumulator.committedSegments.count, privacy: .public)")
 
         // Clean up the signal
         commitSignal?.finish()
         commitSignal = nil
 
-        if !receivedInTime && committedSegments.isEmpty {
+        if !receivedInTime && transcriptAccumulator.committedSegments.isEmpty {
             logger.warning("No transcript received from streaming")
         }
 
-        return VoiceInkStreamingTranscriptAssembly.committedText(committedSegments)
+        return transcriptAccumulator.committedText
     }
 
     private func cleanupStreaming() async {
@@ -384,6 +377,6 @@ class StreamingTranscriptionService {
         await provider?.disconnect()
         provider = nil
         state = .idle
-        committedSegments = []
+        transcriptAccumulator.reset()
     }
 }

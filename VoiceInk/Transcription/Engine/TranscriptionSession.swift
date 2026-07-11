@@ -123,34 +123,38 @@ final class StreamingTranscriptionSession: TranscriptionSession {
             logger.notice("Streaming startup wait finished elapsed=\(Date().timeIntervalSince(waitStart), format: .fixed(precision: 3), privacy: .public)s")
         }
 
-        if !streamingFailed {
-            do {
+        return try await VoiceInkStreamingFallbackPolicy.run(
+            streamingFailed: streamingFailed,
+            streaming: {
                 let start = Date()
-                logger.notice("Streaming stop/transcribe started model=\(model.displayName, privacy: .public)")
+                self.logger.notice("Streaming stop/transcribe started model=\(model.displayName, privacy: .public)")
                 let text = try await streamingService.stopAndGetFinalText()
-                logger.notice("Streaming transcript received elapsed=\(Date().timeIntervalSince(start), format: .fixed(precision: 3), privacy: .public)s chars=\(text.count, privacy: .public)")
+                self.logger.notice("Streaming transcript received elapsed=\(Date().timeIntervalSince(start), format: .fixed(precision: 3), privacy: .public)s chars=\(text.count, privacy: .public)")
                 return text
-            } catch {
-                logger.error("❌ Streaming failed, falling back to batch: \(error.localizedDescription, privacy: .public)")
+            },
+            onStreamingFailure: { error in
+                self.logger.error("❌ Streaming failed, falling back to batch: \(error.localizedDescription, privacy: .public)")
+            },
+            cancelStreaming: {
                 streamingService.cancel()
+            },
+            prepareFallback: {
+                if let fallbackAudioReadyTask = self.fallbackAudioReadyTask {
+                    let waitStart = Date()
+                    self.logger.notice("Waiting for deferred audio file before batch fallback")
+                    try await fallbackAudioReadyTask.value
+                    self.fallbackAudioReadyTask = nil
+                    self.logger.notice("Deferred audio file ready for batch fallback elapsed=\(Date().timeIntervalSince(waitStart), format: .fixed(precision: 3), privacy: .public)s")
+                }
+            },
+            fallback: {
+                let fallbackStart = Date()
+                self.logger.notice("Using batch fallback for \(model.displayName, privacy: .public) file=\(audioURL.lastPathComponent, privacy: .public)")
+                let text = try await self.fallbackService.transcribe(audioURL: audioURL, model: model)
+                self.logger.notice("Batch fallback completed elapsed=\(Date().timeIntervalSince(fallbackStart), format: .fixed(precision: 3), privacy: .public)s chars=\(text.count, privacy: .public)")
+                return text
             }
-        } else {
-            streamingService.cancel()
-        }
-
-        if let fallbackAudioReadyTask {
-            let waitStart = Date()
-            logger.notice("Waiting for deferred audio file before batch fallback")
-            try await fallbackAudioReadyTask.value
-            self.fallbackAudioReadyTask = nil
-            logger.notice("Deferred audio file ready for batch fallback elapsed=\(Date().timeIntervalSince(waitStart), format: .fixed(precision: 3), privacy: .public)s")
-        }
-
-        let fallbackStart = Date()
-        logger.notice("Using batch fallback for \(model.displayName, privacy: .public) file=\(audioURL.lastPathComponent, privacy: .public)")
-        let text = try await fallbackService.transcribe(audioURL: audioURL, model: model)
-        logger.notice("Batch fallback completed elapsed=\(Date().timeIntervalSince(fallbackStart), format: .fixed(precision: 3), privacy: .public)s chars=\(text.count, privacy: .public)")
-        return text
+        )
     }
 
     func cancel() {

@@ -625,6 +625,26 @@ public struct VoiceInkTranscriptionRunSettings: Equatable, Sendable {
             transcriptionServiceProvider: transcriptionServiceProvider
         )
     }
+
+    public func processTranscribedText(
+        _ rawText: String,
+        transcriptionDuration: TimeInterval? = nil,
+        processor: VoiceInkTranscriptionRunProcessor,
+        apiKeyProvider: VoiceInkTranscriptionRunProcessor.APIKeyProvider
+    ) async throws -> VoiceInkTranscriptionRunResult {
+        try await processor.processTranscribedText(
+            rawText,
+            transcriptionModelName: configuration.transcriptionModel,
+            transcriptionDuration: transcriptionDuration,
+            configuration: configuration,
+            cleanupConfiguration: cleanupConfiguration,
+            applyingWordReplacements: { text in
+                VoiceInkWordReplacementEngine.apply(wordReplacementRules, to: text)
+            },
+            postProcessingSkipConfiguration: postProcessingSkipConfiguration,
+            apiKeyProvider: apiKeyProvider
+        )
+    }
 }
 
 public struct VoiceInkIOSAppSettingsRunSnapshot {
@@ -740,7 +760,32 @@ public struct VoiceInkTranscriptionRunProcessor {
         try Task.checkCancellation()
         let transcriptionDuration = currentDate().timeIntervalSince(transcriptionStart)
 
-        guard provider.transcriptionEmptyTextPolicy.accepts(rawText) else {
+        return try await processTranscribedText(
+            rawText,
+            transcriptionModelName: model,
+            transcriptionDuration: transcriptionDuration,
+            configuration: configuration,
+            cleanupConfiguration: cleanupConfiguration,
+            applyingWordReplacements: wordReplacement,
+            postProcessingSkipConfiguration: postProcessingSkipConfiguration,
+            promptTriggerForcesPostProcessing: promptTriggerForcesPostProcessing,
+            apiKeyProvider: apiKeyProvider
+        )
+    }
+
+    public func processTranscribedText(
+        _ rawText: String,
+        transcriptionModelName: String,
+        transcriptionDuration: TimeInterval? = nil,
+        configuration: VoiceInkModeRuntimeConfiguration,
+        cleanupConfiguration: VoiceInkTranscriptionCleanupConfiguration = .disabled,
+        applyingWordReplacements wordReplacement: (String) -> String = { $0 },
+        postProcessingSkipConfiguration: VoiceInkPostProcessingSkipConfiguration? = nil,
+        promptTriggerForcesPostProcessing: Bool = false,
+        apiKeyProvider: APIKeyProvider
+    ) async throws -> VoiceInkTranscriptionRunResult {
+        try Task.checkCancellation()
+        guard configuration.transcriptionProvider.transcriptionEmptyTextPolicy.accepts(rawText) else {
             throw VoiceInkTranscriptionRunError.noTranscriptionReturned
         }
 
@@ -813,7 +858,7 @@ public struct VoiceInkTranscriptionRunProcessor {
         return VoiceInkTranscriptionRunResult(
             cleanedText: cleanedText,
             finalText: finalText,
-            transcriptionModelName: model,
+            transcriptionModelName: transcriptionModelName,
             aiEnhancementModelName: aiEnhancementModelName,
             transcriptionDuration: transcriptionDuration,
             postProcessingResult: postProcessingResult,

@@ -2,6 +2,15 @@
   "originHash" : "e73c4125af8b019ecb5e4d8b92ecd0bfbd454ea2065453b96594b17e436333de",
   "pins" : [
     {
+      "identity" : "llmkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Beingpax/LLMkit.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "adc2239e2a3c586fd442a8ec1d96dec8e9ae8917"
+      }
+    },
+    {
       "identity" : "keyboardkit",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/KeyboardKit/KeyboardKit",

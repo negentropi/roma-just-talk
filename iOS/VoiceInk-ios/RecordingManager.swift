@@ -10,12 +10,20 @@ import VoiceInkCore
 final class RecordingManager: ObservableObject {
     @Published var activeRecordingAlert: VoiceInkRecordingAlertPresentation?
     @Published private(set) var flowState = VoiceInkRecordingFlowState()
+    @Published private(set) var livePartialTranscript = ""
+    @Published private(set) var liveTranscriptionFallbackMessage: String?
     
     private let recorder = AudioRecorder()
     private let settings = AppSettings.shared
     private let transcriptionTasks = IOSTranscriptionTaskCoordinator.shared
     private var durationTimer: Timer?
     private var keyboardDictationRequestID: UUID?
+    private var activeStreamingService: IOSStreamingTranscriptionService?
+    private var activeStreamingRequest: VoiceInkLiveTranscriptionRequest?
+    private var activeRunSettings: VoiceInkTranscriptionRunSettings?
+    private var activeStreamingStartedAt: Date?
+    private var streamingTranscriptCancellable: AnyCancellable?
+    private var streamingStartupTask: Task<Void, Never>?
 
     private let coordinator = AppGroupCoordinator.shared
     
@@ -84,25 +92,81 @@ final class RecordingManager: ObservableObject {
     
     private func proceedToStartRecording() {
         updateFlowState { $0.prepareRecordingStart() }
-        
-        // Update coordinator state
         coordinator.updateRecordingState(true)
-        
+
+        let runSettings = settings.currentTranscriptionRunSettings()
+        activeRunSettings = runSettings
+        livePartialTranscript = ""
+        liveTranscriptionFallbackMessage = nil
+
+        guard let request = VoiceInkLiveTranscriptionPolicy.request(
+            for: runSettings.configuration
+        ) else {
+            startRecorder(streamingService: nil)
+            return
+        }
+
+        let service = IOSStreamingTranscriptionService()
+        activeStreamingService = service
+        activeStreamingRequest = request
+        streamingTranscriptCancellable = service.$partialTranscript
+            .sink { [weak self] transcript in
+                self?.livePartialTranscript = transcript
+            }
+
+        streamingStartupTask = Task { [weak self] in
+            guard let self else { return }
+            do {
+                try await service.start(
+                    request: request,
+                    apiKey: settings.apiKey(for: request.provider),
+                    language: runSettings.transcriptionLanguage,
+                    customVocabulary: VoiceInkCustomVocabularyTerms.normalized(
+                        runSettings.customVocabulary,
+                        for: .streamingTranscription(request.provider)
+                    )
+                )
+                try Task.checkCancellation()
+                activeStreamingStartedAt = Date()
+                streamingStartupTask = nil
+                startRecorder(streamingService: service)
+            } catch is CancellationError {
+                service.cancel()
+            } catch {
+                service.cancel()
+                activeStreamingService = nil
+                activeStreamingRequest = nil
+                streamingStartupTask = nil
+                streamingTranscriptCancellable = nil
+                liveTranscriptionFallbackMessage = "Live transcript unavailable. Saved audio will be transcribed after you stop."
+                startRecorder(streamingService: nil)
+            }
+        }
+    }
+
+    private func startRecorder(streamingService: IOSStreamingTranscriptionService?) {
         do {
-            try recorder.startRecording()
+            try recorder.startRecording { data in
+                streamingService?.sendAudioChunk(data)
+            }
             updateFlowState { $0.completeRecordingStart() }
             startDurationTimer()
         } catch {
             let alert = VoiceInkRecordingAlertPresentation.recordingStartFailure(for: error)
             activeRecordingAlert = alert
             updateFlowState { $0.failRecordingStart() }
-            // Update coordinator state on error
             coordinator.updateRecordingState(false)
+            streamingService?.cancel()
+            clearStreamingState()
             failActiveKeyboardDictation(message: alert.message)
         }
     }
     
     func stopRecording(modelContext: ModelContext) {
+        let streamingService = activeStreamingService
+        let streamingRequest = activeStreamingRequest
+        let runSettings = activeRunSettings
+        let streamingStartedAt = activeStreamingStartedAt
         let stopPlan = flowState.stopRecordingPlan(
             audioFileURL: recorder.currentRecordingURL?.lastPathComponent
         )
@@ -122,11 +186,19 @@ final class RecordingManager: ObservableObject {
                 transcriptionTasks.start(
                     note: note,
                     keyboardRequestID: keyboardRequestID,
-                    persist: { try? modelContext.save() }
+                    persist: { try? modelContext.save() },
+                    operation: streamingOperation(
+                        service: streamingService,
+                        request: streamingRequest,
+                        runSettings: runSettings,
+                        startedAt: streamingStartedAt
+                    )
                 )
                 recorder.currentRecordingURL = nil
             }
         )
+
+        clearStreamingState(cancelService: false)
 
         if stopPlan.pendingDraft == nil {
             failActiveKeyboardDictation(message: "The recording file is unavailable.")
@@ -140,7 +212,61 @@ final class RecordingManager: ObservableObject {
             setFlowState: { flowState = $0 },
             updateRecordingState: coordinator.updateRecordingState
         )
+        clearStreamingState()
         failActiveKeyboardDictation(message: "Recording canceled.")
+    }
+
+    private func streamingOperation(
+        service: IOSStreamingTranscriptionService?,
+        request: VoiceInkLiveTranscriptionRequest?,
+        runSettings: VoiceInkTranscriptionRunSettings?,
+        startedAt: Date?
+    ) -> IOSTranscriptionTaskCoordinator.RunOperation? {
+        guard let service, let request, let runSettings else { return nil }
+
+        return { [settings] note in
+            do {
+                return try await VoiceInkStreamingFallbackPolicy.run(
+                    streamingFailed: false,
+                    streaming: {
+                        let finalText = try await service.stopAndGetFinalText()
+                        return await settings.finalizeStreamingTranscript(
+                            finalText,
+                            for: note,
+                            runSettings: runSettings,
+                            transcriptionDuration: startedAt.map {
+                                Date().timeIntervalSince($0)
+                            }
+                        )
+                    },
+                    cancelStreaming: {
+                        service.cancel()
+                    },
+                    fallback: {
+                        await settings.retranscribeStoredAudio(note)
+                    }
+                )
+            } catch is CancellationError {
+                return .canceled
+            } catch {
+                return .failed(reason: VoiceInkErrorDescription.text(for: error))
+            }
+        }
+    }
+
+    private func clearStreamingState(cancelService: Bool = true) {
+        streamingStartupTask?.cancel()
+        streamingStartupTask = nil
+        if cancelService {
+            activeStreamingService?.cancel()
+        }
+        activeStreamingService = nil
+        activeStreamingRequest = nil
+        activeRunSettings = nil
+        activeStreamingStartedAt = nil
+        streamingTranscriptCancellable = nil
+        livePartialTranscript = ""
+        liveTranscriptionFallbackMessage = nil
     }
     
     // MARK: - Permissions

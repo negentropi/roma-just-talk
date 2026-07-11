@@ -33,6 +33,21 @@ struct RecordingSheetView: View {
                 selectedModeId: $settings.selectedModeId,
                 showsTitle: true
             )
+
+            if !recordingManager.livePartialTranscript.isEmpty {
+                Text(recordingManager.livePartialTranscript)
+                    .font(.callout)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .lineLimit(3)
+                    .padding(10)
+                    .background(Color(.secondarySystemBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+            } else if let fallback = recordingManager.liveTranscriptionFallbackMessage {
+                Text(fallback)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
             
             // Stop Button - Matching main button style
             Button(action: onStop) {

@@ -11,6 +11,8 @@
 		B10000042FA0000000000001 /* VoiceInkCore in Frameworks */ = {isa = PBXBuildFile; productRef = B10000032FA0000000000001 /* VoiceInkCore */; };
 		B10000052FA0000000000001 /* VoiceInkCore in Frameworks */ = {isa = PBXBuildFile; productRef = B10000032FA0000000000001 /* VoiceInkCore */; };
 		B10000062FA0000000000001 /* VoiceInkCore in Frameworks */ = {isa = PBXBuildFile; productRef = B10000032FA0000000000001 /* VoiceInkCore */; };
+		B20000012FB0000000000001 /* LLMkit in Frameworks */ = {isa = PBXBuildFile; productRef = B20000032FB0000000000001 /* LLMkit */; };
+		B20000042FB0000000000001 /* LLMkit in Frameworks */ = {isa = PBXBuildFile; productRef = B20000032FB0000000000001 /* LLMkit */; };
 		E14E276F2E5F5B5D00143372 /* whisper.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = E14E276E2E5F5B5D00143372 /* whisper.xcframework */; };
 		E14E27702E5F5B5D00143372 /* whisper.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E14E276E2E5F5B5D00143372 /* whisper.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E18B9A542E600F9F0068773A /* VoiceInkKeyboard.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E18B9A4D2E600F9F0068773A /* VoiceInkKeyboard.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -131,6 +133,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E14E276F2E5F5B5D00143372 /* whisper.xcframework in Frameworks */,
+				B20000012FB0000000000001 /* LLMkit in Frameworks */,
 				B10000012FA0000000000001 /* VoiceInkCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -139,6 +142,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B20000042FB0000000000001 /* LLMkit in Frameworks */,
 				B10000052FA0000000000001 /* VoiceInkCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -220,6 +224,7 @@
 			name = "VoiceInk-ios";
 			packageProductDependencies = (
 				B10000032FA0000000000001 /* VoiceInkCore */,
+				B20000032FB0000000000001 /* LLMkit */,
 			);
 			productName = "roma just talk";
 			productReference = E168DF072E4B464B00F133D2 /* roma just talk.app */;
@@ -244,6 +249,7 @@
 			name = "VoiceInk-iosTests";
 			packageProductDependencies = (
 				B10000032FA0000000000001 /* VoiceInkCore */,
+				B20000032FB0000000000001 /* LLMkit */,
 			);
 			productName = "VoiceInk-iosTests";
 			productReference = E168DF182E4B464C00F133D2 /* VoiceInk-iosTests.xctest */;
@@ -335,6 +341,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				E18B9A5E2E600FFB0068773A /* XCRemoteSwiftPackageReference "KeyboardKit" */,
+				B20000022FB0000000000001 /* XCRemoteSwiftPackageReference "LLMkit" */,
 				B10000022FA0000000000001 /* XCLocalSwiftPackageReference "VoiceInkCore" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -817,6 +824,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		B20000022FB0000000000001 /* XCRemoteSwiftPackageReference "LLMkit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Beingpax/LLMkit.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		E18B9A5E2E600FFB0068773A /* XCRemoteSwiftPackageReference "KeyboardKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/KeyboardKit/KeyboardKit";
@@ -835,6 +850,11 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		B20000032FB0000000000001 /* LLMkit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B20000022FB0000000000001 /* XCRemoteSwiftPackageReference "LLMkit" */;
+			productName = LLMkit;
+		};
 		B10000032FA0000000000001 /* VoiceInkCore */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = B10000022FA0000000000001 /* XCLocalSwiftPackageReference "VoiceInkCore" */;

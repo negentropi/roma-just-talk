@@ -481,6 +481,7 @@
 				);
 				MARKETING_VERSION = 1.93;
 				PRODUCT_BUNDLE_IDENTIFIER = com.prakashjoshipax.VoiceInk;
+				PRODUCT_MODULE_NAME = VoiceInk_ios;
 				PRODUCT_NAME = "roma just talk";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -522,6 +523,7 @@
 				);
 				MARKETING_VERSION = 1.93;
 				PRODUCT_BUNDLE_IDENTIFIER = com.prakashjoshipax.VoiceInk;
+				PRODUCT_MODULE_NAME = VoiceInk_ios;
 				PRODUCT_NAME = "roma just talk";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";

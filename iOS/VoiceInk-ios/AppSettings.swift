@@ -99,14 +99,18 @@ final class AppSettings: ObservableObject {
 
             VoiceInkDynamicAIProviderPreference.saveOpenRouterModels(models)
             var repairedModes = modes
+            var didRepairSelection = false
             for index in repairedModes.indices
             where repairedModes[index].postProcessingProvider == .openRouter {
-                repairedModes[index].postProcessingModel = VoiceInkProviderKind.openRouter.selectedModel(
+                let repairedModel = VoiceInkProviderKind.openRouter.selectedModel(
                     repairedModes[index].postProcessingModel,
                     for: .postProcessing
                 )
+                didRepairSelection = didRepairSelection
+                    || repairedModel != repairedModes[index].postProcessingModel
+                repairedModes[index].postProcessingModel = repairedModel
             }
-            if repairedModes != modes {
+            if didRepairSelection {
                 modes = repairedModes
             } else {
                 objectWillChange.send()

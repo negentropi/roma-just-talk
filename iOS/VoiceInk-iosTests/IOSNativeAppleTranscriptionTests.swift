@@ -28,7 +28,7 @@ final class IOSNativeAppleTranscriptionTests: XCTestCase {
             VoiceInkTranscriptionModelCatalog.nativeAppleModel.name
         )
         XCTAssertEqual(
-            VoiceInkLanguageCatalog.languages(for: .nativeApple)["en-US"],
+            VoiceInkLanguageCatalog.languages(for: VoiceInkTranscriptionModelProvider.nativeApple)["en-US"],
             VoiceInkLanguageCatalog.nativeApple["en-US"]
         )
         XCTAssertEqual(

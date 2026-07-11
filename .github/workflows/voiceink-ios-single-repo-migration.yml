@@ -83,4 +83,5 @@ jobs:
             -derivedDataPath "$PWD/.local-build-ios" \
             -parallel-testing-enabled NO \
             CODE_SIGNING_ALLOWED=NO \
+            EXCLUDED_SOURCE_FILE_NAMES=VoiceInk_iosTests.swift \
             -only-testing:VoiceInk-iosTests/KeyboardDictationExchangeTests

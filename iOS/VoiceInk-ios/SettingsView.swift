@@ -5,6 +5,8 @@ import VoiceInkCore
 
 struct SettingsView: View {
     @StateObject private var settings = AppSettings.shared
+    @AppStorage(VoiceInkVADPreference.userDefaultsKey)
+    private var isVADEnabled = VoiceInkVADPreference.defaultIsEnabled
     @State private var fillerWordDraftState = VoiceInkFillerWordDraftState()
     @State private var customVocabularyDraftState = VoiceInkVocabularyDraftState()
     @State private var wordReplacementDraftState = VoiceInkWordReplacementDraftState()
@@ -13,6 +15,7 @@ struct SettingsView: View {
     private let dictionaryPresentation = VoiceInkDictionarySettingsPresentation.iOS
     private let audioTimeoutPresentation = VoiceInkAudioSessionTimeoutPreference.settingsPresentation
     private let settingsPresentation = VoiceInkSettingsPresentation.iOS
+    private let vadPresentation = VoiceInkVADPreference.settingsPresentation
     
     var body: some View {
         let dictionarySnapshot = self.dictionarySnapshot
@@ -62,6 +65,12 @@ struct SettingsView: View {
                 NavigationLink(destination: LocalModelManagementView()) {
                     Text(VoiceInkModelManagementFilter.local.manageSettingsTitle)
                 }
+
+                Toggle(vadPresentation.title, isOn: $isVADEnabled)
+
+                Text(vadPresentation.helpText)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
             
             Section(header: Text(VoiceInkModelManagementFilter.cloud.settingsSectionTitle)) {

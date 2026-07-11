@@ -87,4 +87,5 @@ jobs:
             -only-testing:VoiceInk-iosTests/KeyboardDictationExchangeTests \
             -only-testing:VoiceInk-iosTests/KeyboardReadinessTests \
             -only-testing:VoiceInk-iosTests/IOSTranscriptionTaskCoordinatorTests \
-            -only-testing:VoiceInk-iosTests/IOSStreamingTranscriptionTests
+            -only-testing:VoiceInk-iosTests/IOSStreamingTranscriptionTests \
+            -only-testing:VoiceInk-iosTests/IOSLocalWhisperSettingsTests

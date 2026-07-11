@@ -3046,7 +3046,8 @@ public struct VoiceInkMacOSAdvancedTranscriptionSettingsPresentation: Equatable,
 public enum VoiceInkVADPreference {
     public static let userDefaultsKey = VoiceInkUserDefaultsKey.isVADEnabled
     public static let defaultIsEnabled = VoiceInkPreferenceDefault.isVADEnabled
-    public static let macOSSettingsPresentation = VoiceInkMacOSAdvancedTranscriptionSettingsPresentation.macOS.vad
+    public static let settingsPresentation = VoiceInkMacOSAdvancedTranscriptionSettingsPresentation.macOS.vad
+    public static let macOSSettingsPresentation = settingsPresentation
 
     public static func isEnabled(from defaults: UserDefaults = .standard) -> Bool {
         defaults.object(forKey: userDefaultsKey) as? Bool ?? defaultIsEnabled

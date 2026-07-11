@@ -174,9 +174,9 @@ struct NotesListView: View {
         ToolbarItemGroup(placement: .topBarTrailing) {
             if !editMode.isEditing {
                 NavigationLink(destination: IOSMetricsView()) {
-                    Image(systemName: VoiceInkPerformancePresentation.modelPerformanceSystemImageName)
+                    Image(systemName: VoiceInkDashboardPresentation.modelPerformanceSystemImageName)
                 }
-                .accessibilityLabel(VoiceInkPerformancePresentation.modelPerformanceButtonTitle)
+                .accessibilityLabel(VoiceInkDashboardPresentation.modelPerformanceButtonTitle)
 
                 Button {
                     audioImport.isPresented = true

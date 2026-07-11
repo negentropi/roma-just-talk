@@ -205,14 +205,18 @@ final class IOSTranscriptionTaskCoordinatorTests: XCTestCase {
         let processor = VoiceInkTranscriptionRunProcessor { _ in
             try await gate.waitUntilCanceled()
         }
-        let configuration = VoiceInkModeRuntimeConfiguration(
+        let configuration = Mode(
+            name: "Cancellation test",
             transcriptionProvider: .groq,
             transcriptionModel: "whisper-large-v3",
+            isPostProcessingEnabled: true,
             postProcessingProvider: .gemini,
             postProcessingModel: "gemini-2.5-flash",
-            prompt: "Clean this",
-            isPostProcessingEnabled: true
-        )
+            promptTemplate: VoiceInkPostProcessingPromptTemplate(
+                type: .custom,
+                customPrompt: "Clean this"
+            )
+        ).runtimeConfiguration
         let task = Task {
             try await processor.transcribe(
                 fileURL: URL(fileURLWithPath: "/tmp/audio.wav"),

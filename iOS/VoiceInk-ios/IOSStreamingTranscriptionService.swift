@@ -3,7 +3,7 @@ import Foundation
 import LLMkit
 import VoiceInkCore
 
-private final class VoiceInkIOSAudioChunkSource: @unchecked Sendable {
+private nonisolated final class VoiceInkIOSAudioChunkSource: @unchecked Sendable {
     let stream: AsyncStream<Data>
     private let continuation: AsyncStream<Data>.Continuation
 
@@ -23,7 +23,7 @@ private final class VoiceInkIOSAudioChunkSource: @unchecked Sendable {
     }
 }
 
-private final class VoiceInkIOSAudioChunkRelay: @unchecked Sendable {
+private nonisolated final class VoiceInkIOSAudioChunkRelay: @unchecked Sendable {
     private let lock = NSLock()
     private var source: VoiceInkIOSAudioChunkSource?
 
@@ -114,14 +114,12 @@ final class IOSStreamingTranscriptionService: ObservableObject {
             throw error
         }
 
-        sendTask = Task.detached { [weak self, client] in
+        sendTask = Task { [weak self, client] in
             for await chunk in source.stream {
                 do {
                     try await client.sendAudioChunk(chunk)
                 } catch {
-                    await MainActor.run {
-                        self?.recordTerminalError(error)
-                    }
+                    self?.recordTerminalError(error)
                     break
                 }
             }

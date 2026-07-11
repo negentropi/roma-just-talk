@@ -119,9 +119,9 @@ final class AudioRecorder: ObservableObject {
             onAveragePower: { [weak self] averagePower in
                 Task { @MainActor in
                     guard let self else { return }
-                    levelsHistory = VoiceInkAudioMeterLevel.iOSMeterHistoryUpdatePlan(
+                    self.levelsHistory = VoiceInkAudioMeterLevel.iOSMeterHistoryUpdatePlan(
                         averageDecibels: averagePower,
-                        previousHistory: levelsHistory
+                        previousHistory: self.levelsHistory
                     ).levelsHistory
                 }
             }
@@ -140,7 +140,7 @@ final class AudioRecorder: ObservableObject {
             try engine.start()
         } catch {
             inputNode.removeTap(onBus: 0)
-            try? VoiceInkStoredAudioFile.deleteExistingFile(for: url.absoluteString)
+            _ = try? VoiceInkStoredAudioFile.deleteExistingFile(for: url.absoluteString)
             throw error
         }
 
@@ -170,7 +170,7 @@ final class AudioRecorder: ObservableObject {
             setIsRecording: { isRecording = $0 },
             clearAudioLevels: { levelsHistory.removeAll() },
             deleteCurrentRecordingFile: {
-                try? VoiceInkStoredAudioFile.deleteExistingFile(
+                _ = try? VoiceInkStoredAudioFile.deleteExistingFile(
                     for: currentRecordingURL?.absoluteString
                 )
             },

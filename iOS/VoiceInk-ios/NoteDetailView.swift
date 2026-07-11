@@ -9,6 +9,10 @@ struct NoteDetailView: View {
     
     @StateObject private var settings = AppSettings.shared
     @StateObject private var transcriptionTasks = IOSTranscriptionTaskCoordinator.shared
+    @State private var selectedReprocessingPromptId: UUID?
+    @State private var isReEnhancing = false
+    @State private var reEnhancementTask: Task<Void, Never>?
+    @State private var actionBanner: VoiceInkAudioPlaybackActionBannerPresentation?
 
     var body: some View {
         let isTranscriptionActive = transcriptionTasks.isActive(noteID: note.id)
@@ -31,6 +35,10 @@ struct NoteDetailView: View {
                         // Transcription status and retry button
                         if let statusPanel = presentation.statusPanel {
                             transcriptionStatusView(statusPanel)
+                        }
+
+                        if note.transcriptionStatus == .completed && !isTranscriptionActive {
+                            historyReprocessingView(audioAvailability: presentation.audioAvailability)
                         }
 
                         // Transcript content
@@ -66,6 +74,9 @@ struct NoteDetailView: View {
                 [note],
                 persist: { try? modelContext.save() }
             )
+        }
+        .onDisappear {
+            reEnhancementTask?.cancel()
         }
     }
     
@@ -203,11 +214,153 @@ struct NoteDetailView: View {
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
+    private func historyReprocessingView(
+        audioAvailability: VoiceInkStoredAudioAvailability
+    ) -> some View {
+        let runSettings = settings.historyReprocessingRunSettings(
+            promptOverrideId: selectedReprocessingPromptId
+        )
+        let reEnhancementControl = VoiceInkAudioPlaybackReEnhancementControlPresentation(
+            isOperationInProgress: isReEnhancing,
+            isEnhancementEnabled: runSettings.configuration.isPostProcessingEnabled,
+            isEnhancementConfigured: VoiceInkProviderCredential.nonBlank(
+                settings.apiKey(for: runSettings.configuration.postProcessingProvider)
+            ) != nil
+        )
+
+        return VStack(alignment: .leading, spacing: 12) {
+            Text(VoiceInkAudioPlaybackPresentation.historyReprocessingTitle)
+                .font(.headline)
+
+            VoiceInkModeSelectionControlView(
+                modes: settings.modes,
+                selectedModeId: $settings.selectedModeId
+            )
+
+            if runSettings.configuration.isPostProcessingEnabled {
+                Picker(
+                    VoiceInkAudioPlaybackPresentation.selectEnhancementPromptHelpText,
+                    selection: $selectedReprocessingPromptId
+                ) {
+                    Text(VoiceInkAudioPlaybackPresentation.modePromptTitle).tag(nil as UUID?)
+                    ForEach(settings.customPrompts) { prompt in
+                        Text(prompt.title).tag(prompt.id as UUID?)
+                    }
+                }
+            }
+
+            HStack(spacing: 12) {
+                Button {
+                    retranscribeCompletedRecord(runSettings: runSettings)
+                } label: {
+                    Label(
+                        VoiceInkAudioPlaybackPresentation.retranscribeButtonTitle,
+                        systemImage: "arrow.clockwise"
+                    )
+                }
+                .disabled(audioAvailability.existingURL == nil || isReEnhancing)
+
+                Button {
+                    reEnhance(runSettings: runSettings)
+                } label: {
+                    if isReEnhancing {
+                        ProgressView()
+                    } else {
+                        Label(
+                            VoiceInkAudioPlaybackPresentation.reEnhanceButtonTitle,
+                            systemImage: "wand.and.stars"
+                        )
+                    }
+                }
+                .disabled(reEnhancementControl.isActionDisabled)
+            }
+            .buttonStyle(.bordered)
+
+            if isReEnhancing {
+                Button(role: .destructive) {
+                    reEnhancementTask?.cancel()
+                } label: {
+                    Label(
+                        VoiceInkTranscriptPresentation.cancelTranscriptionButtonTitle,
+                        systemImage: VoiceInkTranscriptPresentation.cancelTranscriptionSystemImageName
+                    )
+                }
+                .buttonStyle(.bordered)
+            } else if let actionBanner {
+                Label(
+                    actionBanner.message,
+                    systemImage: actionBanner.isError ? "exclamationmark.triangle.fill" : "checkmark.circle.fill"
+                )
+                .font(.callout)
+                .foregroundStyle(actionBanner.isError ? Color.red : Color.green)
+            } else if let unavailable = reEnhancementControl.unavailableBannerPresentation {
+                Text(unavailable.message)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding()
+        .background(Color(.secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+
     private func retranscribe() {
         transcriptionTasks.start(
             note: note,
             persist: { try? modelContext.save() }
         )
+    }
+
+    private func retranscribeCompletedRecord(
+        runSettings: VoiceInkTranscriptionRunSettings
+    ) {
+        let originalError = note.transcriptionError
+        actionBanner = nil
+        transcriptionTasks.start(
+            note: note,
+            persist: { try? modelContext.save() },
+            operation: { note in
+                await settings.retranscribeStoredAudio(note, runSettings: runSettings)
+            },
+            completion: { outcome in
+                switch outcome {
+                case .succeeded:
+                    actionBanner = .retranscriptionSuccess
+                case .failed(let reason):
+                    note.transcriptionStatus = .completed
+                    note.transcriptionError = originalError
+                    try? modelContext.save()
+                    actionBanner = .retranscriptionFailure(errorDescription: reason)
+                case .canceled:
+                    note.transcriptionStatus = .completed
+                    note.transcriptionError = originalError
+                    try? modelContext.save()
+                }
+            }
+        )
+    }
+
+    private func reEnhance(runSettings: VoiceInkTranscriptionRunSettings) {
+        actionBanner = nil
+        isReEnhancing = true
+        reEnhancementTask = Task {
+            let outcome = await settings.reEnhanceStoredTranscription(
+                note,
+                runSettings: runSettings
+            )
+
+            switch outcome {
+            case .succeeded:
+                try? modelContext.save()
+                actionBanner = .reEnhancementSuccess
+            case .failed(let reason):
+                actionBanner = .reEnhancementFailure(errorDescription: reason)
+            case .canceled:
+                break
+            }
+            isReEnhancing = false
+            reEnhancementTask = nil
+        }
     }
     
     private func copyToClipboard(_ text: String) {

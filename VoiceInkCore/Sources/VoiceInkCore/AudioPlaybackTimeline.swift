@@ -565,6 +565,10 @@ public enum VoiceInkAudioPlaybackPresentation {
     public static let enhancementPromptFallbackSystemImageName = "sparkles"
     public static let retranscribeAudioHelpText = "Retranscribe this audio"
     public static let reEnhanceWithSelectedPromptHelpText = "Re-enhance with selected prompt"
+    public static let historyReprocessingTitle = "Process Again"
+    public static let modePromptTitle = "Mode Prompt"
+    public static let retranscribeButtonTitle = "Retranscribe"
+    public static let reEnhanceButtonTitle = "Re-enhance"
     public static let viewDetailsHelpText = "View details"
 
     public static func playPauseSystemImageName(isPlaying: Bool) -> String {

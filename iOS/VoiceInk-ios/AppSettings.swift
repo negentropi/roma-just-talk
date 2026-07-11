@@ -318,6 +318,21 @@ final class AppSettings: ObservableObject {
         ).transcriptionRunSettings()
     }
 
+    func historyReprocessingRunSettings(
+        promptOverrideId: UUID?
+    ) -> VoiceInkTranscriptionRunSettings {
+        VoiceInkIOSAppSettingsRunSnapshot(
+            modes: modes,
+            selectedModeId: selectedModeId,
+            selectedTranscriptionLanguage: selectedTranscriptionLanguage,
+            wordReplacementRules: wordReplacements,
+            customVocabulary: customVocabularyTerms,
+            additionalLocalWhisperModelNames: LocalModelManager.shared.importedModelNames,
+            promptLibrary: customPrompts,
+            recordingPromptOverrideId: promptOverrideId
+        ).transcriptionRunSettings()
+    }
+
     func liveTranscriptionRequest() -> VoiceInkLiveTranscriptionRequest? {
         VoiceInkLiveTranscriptionPolicy.request(
             for: currentTranscriptionRunSettings().configuration
@@ -417,6 +432,20 @@ final class AppSettings: ObservableObject {
                 IOSCustomCloudTranscriptionService(
                     models: IOSCustomCloudModelManager.shared.models
                 )
+            }
+        )
+    }
+
+    func reEnhanceStoredTranscription(
+        _ note: Transcription,
+        runSettings: VoiceInkTranscriptionRunSettings
+    ) async -> VoiceInkStoredTranscriptionReEnhancementOutcome {
+        await VoiceInkStoredTranscriptionReEnhancement.run(
+            note,
+            rawText: note.text,
+            runSettings: runSettings,
+            apiKeyProvider: { [self] provider in
+                await apiKey(for: provider)
             }
         )
     }

@@ -381,6 +381,50 @@ public extension VoiceInkMutableTranscriptionEnhancementRecord {
     }
 }
 
+public enum VoiceInkStoredTranscriptionReEnhancementOutcome: Equatable, Sendable {
+    case succeeded(String)
+    case failed(reason: String)
+    case canceled
+}
+
+public enum VoiceInkStoredTranscriptionReEnhancement {
+    public static func run<Record: VoiceInkMutableTranscriptionEnhancementRecord>(
+        _ record: Record,
+        rawText: String,
+        runSettings: VoiceInkTranscriptionRunSettings,
+        processor: VoiceInkTranscriptionRunProcessor = VoiceInkTranscriptionRunProcessor(),
+        apiKeyProvider: VoiceInkTranscriptionRunProcessor.APIKeyProvider
+    ) async -> VoiceInkStoredTranscriptionReEnhancementOutcome {
+        guard runSettings.configuration.isPostProcessingEnabled else {
+            return .failed(
+                reason: VoiceInkPostProcessingFailurePresentation.enhancementUnavailableFallbackText
+            )
+        }
+
+        do {
+            let result = try await runSettings.processTranscribedText(
+                rawText,
+                forcePostProcessing: true,
+                processor: processor,
+                apiKeyProvider: apiKeyProvider
+            )
+            guard let enhancement = result.postProcessingResult else {
+                return .failed(
+                    reason: result.postProcessingError
+                        ?? VoiceInkPostProcessingFailurePresentation.enhancementUnavailableFallbackText
+                )
+            }
+
+            record.applyEnhancementResult(enhancement)
+            return .succeeded(enhancement.text)
+        } catch is CancellationError {
+            return .canceled
+        } catch {
+            return .failed(reason: VoiceInkErrorDescription.text(for: error))
+        }
+    }
+}
+
 public extension VoiceInkMutableTranscriptionRecord {
     func applyCompletedRunResult(_ result: VoiceInkTranscriptionRunResult) {
         text = result.cleanedText
@@ -391,6 +435,14 @@ public extension VoiceInkMutableTranscriptionRecord {
         enhancementDuration = result.enhancementDuration
         transcriptionStatus = .completed
         transcriptionError = result.postProcessingError
+
+        if let enhancement = result.postProcessingResult {
+            applyEnhancementResult(enhancement)
+        } else if let metadataRecord = self as? any VoiceInkMutableTranscriptionEnhancementMetadataRecord {
+            metadataRecord.promptName = nil
+            metadataRecord.aiRequestSystemMessage = nil
+            metadataRecord.aiRequestUserMessage = nil
+        }
     }
 
     func markTranscriptionFailed(_ errorDescription: String) {

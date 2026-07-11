@@ -702,6 +702,7 @@ public struct VoiceInkTranscriptionRunSettings: Equatable, Sendable {
     public func processTranscribedText(
         _ rawText: String,
         transcriptionDuration: TimeInterval? = nil,
+        forcePostProcessing: Bool = false,
         processor: VoiceInkTranscriptionRunProcessor,
         apiKeyProvider: VoiceInkTranscriptionRunProcessor.APIKeyProvider
     ) async throws -> VoiceInkTranscriptionRunResult {
@@ -718,6 +719,7 @@ public struct VoiceInkTranscriptionRunSettings: Equatable, Sendable {
             promptLibrary: promptLibrary,
             selectedPromptId: selectedPromptId,
             enhancementContext: enhancementContext,
+            promptTriggerForcesPostProcessing: forcePostProcessing,
             apiKeyProvider: apiKeyProvider
         )
     }

@@ -297,6 +297,7 @@ final class AppSettings: ObservableObject {
             applyModeSettingsRepair: applyModeSettingsRepairPlan,
             saveHasCompletedOnboarding: {
                 VoiceInkOnboardingPreference.saveHasCompletedOnboarding()
+                VoiceInkIOSOnboardingProgressStore.reset()
             }
         )
     }
@@ -323,6 +324,7 @@ final class AppSettings: ObservableObject {
             setSelectedTranscriptionLanguage: { [self] in selectedTranscriptionLanguage = $0 },
             clearCoreUserSettings: {
                 VoiceInkSharedPreferenceReset.clearCoreUserSettings()
+                VoiceInkIOSOnboardingProgressStore.reset()
             },
             deleteProviderAPIKeys: { providers in
                 VoiceInkProviderAPIKeyStorage.deleteStoredKeys(for: providers)

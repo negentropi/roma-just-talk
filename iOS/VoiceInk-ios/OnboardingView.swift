@@ -9,8 +9,13 @@ import SwiftUI
 import VoiceInkCore
 
 struct OnboardingView: View {
-    @State private var currentStep = VoiceInkIOSOnboardingStep.initial
+    @State private var currentStep: VoiceInkIOSOnboardingStep
     @Binding var isOnboardingComplete: Bool
+
+    init(isOnboardingComplete: Binding<Bool>) {
+        _isOnboardingComplete = isOnboardingComplete
+        _currentStep = State(initialValue: VoiceInkIOSOnboardingProgressStore.step())
+    }
     
     var body: some View {
         ZStack {
@@ -34,6 +39,9 @@ struct OnboardingView: View {
             }
         }
         .ignoresSafeArea(.all)
+        .onChange(of: currentStep) { _, step in
+            VoiceInkIOSOnboardingProgressStore.save(step)
+        }
     }
 }
 

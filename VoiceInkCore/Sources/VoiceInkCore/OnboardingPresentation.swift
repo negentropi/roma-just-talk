@@ -485,7 +485,7 @@ public enum VoiceInkMacOSSetupPresentation {
     }
 }
 
-public enum VoiceInkIOSOnboardingStep: CaseIterable, Equatable, Sendable {
+public enum VoiceInkIOSOnboardingStep: String, CaseIterable, Equatable, Sendable {
     case welcome
     case microphoneSetup
     case modelDownload
@@ -512,6 +512,26 @@ public enum VoiceInkIOSOnboardingStep: CaseIterable, Equatable, Sendable {
     public mutating func advance() {
         guard let followingStep = nextStep else { return }
         self = followingStep
+    }
+}
+
+public enum VoiceInkIOSOnboardingProgressStore {
+    private static let stepKey = "iOSOnboardingStep"
+
+    public static func step(in defaults: UserDefaults = .standard) -> VoiceInkIOSOnboardingStep {
+        defaults.string(forKey: stepKey)
+            .flatMap(VoiceInkIOSOnboardingStep.init(rawValue:)) ?? .initial
+    }
+
+    public static func save(
+        _ step: VoiceInkIOSOnboardingStep,
+        in defaults: UserDefaults = .standard
+    ) {
+        defaults.set(step.rawValue, forKey: stepKey)
+    }
+
+    public static func reset(in defaults: UserDefaults = .standard) {
+        defaults.removeObject(forKey: stepKey)
     }
 }
 

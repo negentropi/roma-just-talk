@@ -282,7 +282,7 @@ final class IOSStreamingTranscriptionService: ObservableObject {
             return LLMkit.SpeechmaticsStreamingClient()
         case .xai:
             return LLMkit.XAIStreamingClient()
-        case .groq, .openAI, .cerebras, .gemini, .localWhisper, .voiceInk:
+        case .groq, .openAI, .cerebras, .gemini, .localWhisper, .nativeApple, .voiceInk:
             throw VoiceInkIOSStreamingError.unsupportedProvider(provider)
         }
     }

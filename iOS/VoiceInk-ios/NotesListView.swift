@@ -13,6 +13,9 @@ struct NotesListView: View {
     @StateObject private var settings = AppSettings.shared
     @StateObject private var transcriptionTasks = IOSTranscriptionTaskCoordinator.shared
     @StateObject private var audioImport = IOSAudioImportManager.shared
+    @State private var editMode: EditMode = .inactive
+    @State private var selectedNoteIDs: Set<UUID> = []
+    @State private var showBulkDeleteConfirmation = false
 
     private var noteListSnapshot: VoiceInkNoteListSnapshot<Transcription> {
         VoiceInkNoteListSnapshot.make(
@@ -23,6 +26,17 @@ struct NotesListView: View {
         )
     }
 
+    private var selectedNotes: [Transcription] {
+        notes.filter { selectedNoteIDs.contains($0.id) }
+    }
+
+    private var areAllDisplayedNotesSelected: Bool {
+        VoiceInkHistorySelectionPolicy.areAllDisplayedItemsSelected(
+            displayedItems: noteListSnapshot.displayedItems.map(\.id),
+            selectedItems: selectedNoteIDs
+        )
+    }
+
     private var content: some View {
         let snapshot = noteListSnapshot
 
@@ -30,12 +44,13 @@ struct NotesListView: View {
             if snapshot.shouldShowEmptyState {
                 emptyState(snapshot.emptyStatePresentation)
             } else {
-                List {
+                List(selection: $selectedNoteIDs) {
                     Section(header: sectionHeader(snapshot.summaryPresentation)) {
                         ForEach(snapshot.displayedItems) { note in
                             NavigationLink(destination: NoteDetailView(note: note)) {
                                 NoteRowView(note: note)
                             }
+                            .tag(note.id)
                         }
                         .onDelete(perform: deleteItems)
                     }
@@ -54,7 +69,13 @@ struct NotesListView: View {
             content
                 .navigationTitle(VoiceInkAppIdentity.displayName)
                 .navigationBarTitleDisplayMode(.large)
+                .environment(\.editMode, $editMode)
                 .toolbar {
+                    ToolbarItem(placement: .topBarLeading) {
+                        if !notes.isEmpty {
+                            EditButton()
+                        }
+                    }
                     ToolbarItemGroup(placement: .topBarTrailing) {
                         Button {
                             audioImport.isPresented = true
@@ -69,8 +90,12 @@ struct NotesListView: View {
                     }
                 }
                 .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .automatic))
-                .safeAreaInset(edge: .bottom) { 
-                    unifiedRecordingComponent
+                .safeAreaInset(edge: .bottom) {
+                    if editMode.isEditing {
+                        historySelectionBar
+                    } else {
+                        unifiedRecordingComponent
+                    }
                 }
                 .sheet(
                     isPresented: Binding(
@@ -94,6 +119,22 @@ struct NotesListView: View {
                 }
                 .alert(item: $recordingManager.activeRecordingAlert) { alertType in
                     alert(for: alertType)
+                }
+                .alert(
+                    VoiceInkHistoryPresentation.deleteConfirmationTitle,
+                    isPresented: $showBulkDeleteConfirmation
+                ) {
+                    Button(
+                        VoiceInkHistoryPresentation.deleteConfirmationPrimaryButtonTitle,
+                        role: .destructive,
+                        action: deleteSelectedNotes
+                    )
+                    Button(
+                        VoiceInkHistoryPresentation.deleteConfirmationCancelButtonTitle,
+                        role: .cancel
+                    ) {}
+                } message: {
+                    Text(VoiceInkHistoryPresentation.selectedCountText(selectedNoteIDs.count))
                 }
                 .onReceive(NotificationCenter.default.publisher(
                     for: VoiceInkAppIdentity.iOSStopRecordingFromKeyboardNotificationName
@@ -120,6 +161,11 @@ struct NotesListView: View {
                         notes,
                         persist: { try? modelContext.save() }
                     )
+                }
+                .onChange(of: editMode) { _, newValue in
+                    if !newValue.isEditing {
+                        selectedNoteIDs.removeAll()
+                    }
                 }
         }
     }
@@ -189,6 +235,52 @@ struct NotesListView: View {
         .padding(.bottom, 12)
     }
 
+    private var historySelectionBar: some View {
+        HStack(spacing: 18) {
+            Button(
+                areAllDisplayedNotesSelected
+                    ? VoiceInkHistoryPresentation.deselectAllButtonTitle
+                    : VoiceInkHistoryPresentation.selectAllButtonTitle
+            ) {
+                if areAllDisplayedNotesSelected {
+                    selectedNoteIDs.removeAll()
+                } else {
+                    selectedNoteIDs = VoiceInkHistorySelectionPolicy.selectingAll(
+                        displayedItems: noteListSnapshot.displayedItems.map(\.id),
+                        allItems: notes.map(\.id),
+                        id: { $0 }
+                    )
+                }
+            }
+
+            Spacer()
+
+            Text(VoiceInkHistoryPresentation.selectedCountText(selectedNoteIDs.count))
+                .font(.callout)
+                .foregroundStyle(.secondary)
+
+            ShareLink(
+                item: VoiceInkIOSCSVExport(transcriptions: selectedNotes),
+                preview: SharePreview(VoiceInkTranscriptionCSVExporter.defaultFilename)
+            ) {
+                Image(systemName: VoiceInkHistoryPresentation.exportAction.systemImageName)
+            }
+            .disabled(selectedNoteIDs.isEmpty)
+            .accessibilityLabel(VoiceInkHistoryPresentation.exportAction.title)
+
+            Button(role: .destructive) {
+                showBulkDeleteConfirmation = true
+            } label: {
+                Image(systemName: VoiceInkHistoryPresentation.deleteAction.systemImageName)
+            }
+            .disabled(selectedNoteIDs.isEmpty)
+            .accessibilityLabel(VoiceInkHistoryPresentation.deleteAction.title)
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 12)
+        .background(.ultraThinMaterial)
+    }
+
     private func handleRecordingAppIntentRequest() {
         guard let request = IOSRecordingAppIntentRequestStore.consume() else { return }
 
@@ -220,13 +312,35 @@ struct NotesListView: View {
             )
 
             deletionPlan.applyRuntimeState { note in
-                transcriptionTasks.cancel(noteID: note.id)
-                note.deleteExistingAudioFileReportingFailure { message in
-                    VoiceInkIOSLogger.notes.error("\(message, privacy: .public)")
-                }
-                modelContext.delete(note)
+                delete(note)
             }
         }
+    }
+
+    private func deleteSelectedNotes() {
+        withAnimation {
+            let deletionPlan = VoiceInkHistoryDeletionPolicy.selectedItemsDeletionPlan(
+                selectedItems: selectedNoteIDs,
+                id: { $0 }
+            )
+            let notesByID = Dictionary(uniqueKeysWithValues: notes.map { ($0.id, $0) })
+
+            deletionPlan.applyRuntimeState { id in
+                guard let note = notesByID[id] else { return }
+                delete(note)
+            }
+            selectedNoteIDs = deletionPlan.remainingSelection
+            editMode = .inactive
+            try? modelContext.save()
+        }
+    }
+
+    private func delete(_ note: Transcription) {
+        transcriptionTasks.cancel(noteID: note.id)
+        note.deleteExistingAudioFileReportingFailure { message in
+            VoiceInkIOSLogger.notes.error("\(message, privacy: .public)")
+        }
+        modelContext.delete(note)
     }
 }
 

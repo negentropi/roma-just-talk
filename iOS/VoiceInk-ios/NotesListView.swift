@@ -66,114 +66,129 @@ struct NotesListView: View {
 
     var body: some View {
         NavigationStack {
-            content
-                .navigationTitle(VoiceInkAppIdentity.displayName)
-                .navigationBarTitleDisplayMode(.large)
-                .environment(\.editMode, $editMode)
-                .toolbar {
-                    ToolbarItem(placement: .topBarLeading) {
-                        if !notes.isEmpty {
-                            EditButton()
-                        }
-                    }
-                    ToolbarItemGroup(placement: .topBarTrailing) {
-                        if !editMode.isEditing {
-                            NavigationLink(destination: IOSMetricsView()) {
-                                Image(systemName: VoiceInkPerformancePresentation.modelPerformanceSystemImageName)
-                            }
-                            .accessibilityLabel(VoiceInkPerformancePresentation.modelPerformanceButtonTitle)
+            lifecycleContent
+        }
+    }
 
-                            Button {
-                                audioImport.isPresented = true
-                            } label: {
-                                Image(systemName: "waveform.badge.plus")
-                            }
-                            .accessibilityLabel("Import audio files")
+    private var navigationContent: some View {
+        content
+            .navigationTitle(VoiceInkAppIdentity.displayName)
+            .navigationBarTitleDisplayMode(.large)
+            .environment(\.editMode, $editMode)
+            .toolbar { navigationToolbar }
+            .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .automatic))
+            .safeAreaInset(edge: .bottom) {
+                if editMode.isEditing {
+                    historySelectionBar
+                } else {
+                    unifiedRecordingComponent
+                }
+            }
+    }
 
-                            NavigationLink(destination: SettingsView()) {
-                                Image(systemName: VoiceInkNoteListPresentation.settingsSystemImageName)
-                            }
-                        }
-                    }
+    private var presentedContent: some View {
+        navigationContent
+            .sheet(
+                isPresented: Binding(
+                    get: { recordingManager.flowState.isRecordingSheetPresented },
+                    set: { recordingManager.setRecordingSheetPresented($0) }
+                )
+            ) {
+                RecordingSheetView(
+                    recordingManager: recordingManager,
+                    settings: settings,
+                    onCancel: { recordingManager.cancelRecording() },
+                    onStop: { recordingManager.stopRecording(modelContext: modelContext) }
+                )
+                .presentationDetents([.height(360)])
+                .presentationDragIndicator(.visible)
+                .presentationCornerRadius(16)
+                .interactiveDismissDisabled(true)
+            }
+            .sheet(isPresented: $audioImport.isPresented) {
+                AudioImportView()
+            }
+            .alert(item: $recordingManager.activeRecordingAlert) { alertType in
+                alert(for: alertType)
+            }
+            .alert(
+                VoiceInkHistoryPresentation.deleteConfirmationTitle,
+                isPresented: $showBulkDeleteConfirmation
+            ) {
+                Button(
+                    VoiceInkHistoryPresentation.deleteConfirmationPrimaryButtonTitle,
+                    role: .destructive,
+                    action: deleteSelectedNotes
+                )
+                Button(
+                    VoiceInkHistoryPresentation.deleteConfirmationCancelButtonTitle,
+                    role: .cancel
+                ) {}
+            } message: {
+                Text(VoiceInkHistoryPresentation.selectedCountText(selectedNoteIDs.count))
+            }
+    }
+
+    private var lifecycleContent: some View {
+        presentedContent
+            .onReceive(NotificationCenter.default.publisher(
+                for: VoiceInkAppIdentity.iOSStopRecordingFromKeyboardNotificationName
+            )) { _ in
+                VoiceInkKeyboardStopRecordingRequestPolicy.plan(
+                    recordingState: recordingManager.flowState.recordingState
+                ).applyRuntimeState {
+                    recordingManager.stopRecording(modelContext: modelContext)
                 }
-                .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .automatic))
-                .safeAreaInset(edge: .bottom) {
-                    if editMode.isEditing {
-                        historySelectionBar
-                    } else {
-                        unifiedRecordingComponent
-                    }
-                }
-                .sheet(
-                    isPresented: Binding(
-                        get: { recordingManager.flowState.isRecordingSheetPresented },
-                        set: { recordingManager.setRecordingSheetPresented($0) }
-                    )
-                ) {
-                    RecordingSheetView(
-                        recordingManager: recordingManager,
-                        settings: settings,
-                        onCancel: { recordingManager.cancelRecording() },
-                        onStop: { recordingManager.stopRecording(modelContext: modelContext) }
-                    )
-                    .presentationDetents([.height(360)])
-                    .presentationDragIndicator(.visible)
-                    .presentationCornerRadius(16)
-                    .interactiveDismissDisabled(true)
-                }
-                .sheet(isPresented: $audioImport.isPresented) {
-                    AudioImportView()
-                }
-                .alert(item: $recordingManager.activeRecordingAlert) { alertType in
-                    alert(for: alertType)
-                }
-                .alert(
-                    VoiceInkHistoryPresentation.deleteConfirmationTitle,
-                    isPresented: $showBulkDeleteConfirmation
-                ) {
-                    Button(
-                        VoiceInkHistoryPresentation.deleteConfirmationPrimaryButtonTitle,
-                        role: .destructive,
-                        action: deleteSelectedNotes
-                    )
-                    Button(
-                        VoiceInkHistoryPresentation.deleteConfirmationCancelButtonTitle,
-                        role: .cancel
-                    ) {}
-                } message: {
-                    Text(VoiceInkHistoryPresentation.selectedCountText(selectedNoteIDs.count))
-                }
-                .onReceive(NotificationCenter.default.publisher(
-                    for: VoiceInkAppIdentity.iOSStopRecordingFromKeyboardNotificationName
-                )) { _ in
-                    VoiceInkKeyboardStopRecordingRequestPolicy.plan(
-                        recordingState: recordingManager.flowState.recordingState
-                    ).applyRuntimeState {
-                        recordingManager.stopRecording(modelContext: modelContext)
-                    }
-                }
-                .onReceive(NotificationCenter.default.publisher(
-                    for: IOSRecordingAppIntentRequestStore.requestNotification
-                )) { _ in
+            }
+            .onReceive(NotificationCenter.default.publisher(
+                for: IOSRecordingAppIntentRequestStore.requestNotification
+            )) { _ in
+                handleRecordingAppIntentRequest()
+            }
+            .onChange(of: scenePhase) { _, phase in
+                if phase == .active {
                     handleRecordingAppIntentRequest()
                 }
-                .onChange(of: scenePhase) { _, phase in
-                    if phase == .active {
-                        handleRecordingAppIntentRequest()
-                    }
+            }
+            .onAppear {
+                handleRecordingAppIntentRequest()
+                transcriptionTasks.recoverInterruptedTranscriptions(
+                    notes,
+                    persist: { try? modelContext.save() }
+                )
+            }
+            .onChange(of: editMode) { _, newValue in
+                if !newValue.isEditing {
+                    selectedNoteIDs.removeAll()
                 }
-                .onAppear {
-                    handleRecordingAppIntentRequest()
-                    transcriptionTasks.recoverInterruptedTranscriptions(
-                        notes,
-                        persist: { try? modelContext.save() }
-                    )
+            }
+    }
+
+    @ToolbarContentBuilder
+    private var navigationToolbar: some ToolbarContent {
+        ToolbarItem(placement: .topBarLeading) {
+            if !notes.isEmpty {
+                EditButton()
+            }
+        }
+        ToolbarItemGroup(placement: .topBarTrailing) {
+            if !editMode.isEditing {
+                NavigationLink(destination: IOSMetricsView()) {
+                    Image(systemName: VoiceInkPerformancePresentation.modelPerformanceSystemImageName)
                 }
-                .onChange(of: editMode) { _, newValue in
-                    if !newValue.isEditing {
-                        selectedNoteIDs.removeAll()
-                    }
+                .accessibilityLabel(VoiceInkPerformancePresentation.modelPerformanceButtonTitle)
+
+                Button {
+                    audioImport.isPresented = true
+                } label: {
+                    Image(systemName: "waveform.badge.plus")
                 }
+                .accessibilityLabel("Import audio files")
+
+                NavigationLink(destination: SettingsView()) {
+                    Image(systemName: VoiceInkNoteListPresentation.settingsSystemImageName)
+                }
+            }
         }
     }
 

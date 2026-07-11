@@ -15,10 +15,12 @@ struct SettingsView: View {
     @State private var fillerWordDraftState = VoiceInkFillerWordDraftState()
     @State private var customVocabularyDraftState = VoiceInkVocabularyDraftState()
     @State private var wordReplacementDraftState = VoiceInkWordReplacementDraftState()
+    @State private var editingWordReplacement: IOSWordReplacementEditSelection?
     @State private var dictionaryAlert: VoiceInkDictionaryAlertPresentation?
     @State private var isResetConfirmationPresented = false
     private let cleanupPresentation = VoiceInkTranscriptionCleanupPresentation.iOS
     private let dictionaryPresentation = VoiceInkDictionarySettingsPresentation.iOS
+    private let wordReplacementListPresentation = VoiceInkWordReplacementListPresentation.iOS
     private let audioTimeoutPresentation = VoiceInkAudioSessionTimeoutPreference.settingsPresentation
     private let settingsPresentation = VoiceInkSettingsPresentation.iOS
     private let vadPresentation = VoiceInkVADPreference.settingsPresentation
@@ -240,13 +242,22 @@ struct SettingsView: View {
                 .disabled(!wordReplacementDraftState.canSubmit)
 
                 ForEach(Array(dictionarySnapshot.sortedWordReplacements.enumerated()), id: \.offset) { _, rule in
-                    HStack(spacing: 8) {
-                        Text(rule.originalText)
-                        Image(systemName: dictionaryPresentation.wordReplacementArrowSystemImageName)
-                            .foregroundStyle(.secondary)
-                        Text(rule.replacementText)
-                            .foregroundStyle(.secondary)
+                    Button {
+                        editingWordReplacement = IOSWordReplacementEditSelection(rule: rule)
+                    } label: {
+                        HStack(spacing: 8) {
+                            Text(rule.originalText)
+                            Image(systemName: dictionaryPresentation.wordReplacementArrowSystemImageName)
+                                .foregroundStyle(.secondary)
+                            Text(rule.replacementText)
+                                .foregroundStyle(.secondary)
+                            Spacer()
+                            Image(systemName: "pencil")
+                                .foregroundStyle(.secondary)
+                        }
                     }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(wordReplacementListPresentation.editButtonHelp)
                 }
                 .onDelete { offsets in
                     settings.wordReplacements = dictionarySnapshot.removingWordReplacements(
@@ -297,6 +308,13 @@ struct SettingsView: View {
             }
         }
         .navigationTitle(settingsPresentation.navigationTitle)
+        .sheet(item: $editingWordReplacement) { selection in
+            IOSWordReplacementEditView(
+                selection: selection,
+                snapshot: dictionarySnapshot,
+                setRules: { settings.wordReplacements = $0 }
+            )
+        }
         .onAppear {
             settings.repairSelectedTranscriptionLanguage()
         }

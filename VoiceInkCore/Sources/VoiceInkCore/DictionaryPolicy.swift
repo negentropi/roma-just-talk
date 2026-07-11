@@ -1058,6 +1058,8 @@ public struct VoiceInkWordReplacementEditPresentation: Equatable, Sendable {
         originalPlaceholder: "Enter word or phrase to replace (use commas for multiple)",
         replacementFieldTitle: "Replacement Text"
     )
+
+    public static let iOS = macOS
 }
 
 public struct VoiceInkVocabularyListPresentation: Equatable, Sendable {
@@ -1092,6 +1094,8 @@ public struct VoiceInkWordReplacementListPresentation: Equatable, Sendable {
         editButtonHelp: "Edit replacement",
         removeButtonHelp: "Remove replacement"
     )
+
+    public static let iOS = macOS
 }
 
 public enum VoiceInkVocabularySortMode: String, CaseIterable, Sendable {
@@ -1355,6 +1359,17 @@ public struct VoiceInkDictionarySettingsSnapshot: Equatable, Sendable {
         draftState.submitting(existingRules: wordReplacements)
     }
 
+    public func wordReplacementEditSubmission(
+        _ editState: VoiceInkWordReplacementEditState,
+        replacing rule: VoiceInkWordReplacementRule
+    ) -> VoiceInkWordReplacementEditSubmission {
+        var existingRules = wordReplacements
+        if let index = existingRules.firstIndex(of: rule) {
+            existingRules.remove(at: index)
+        }
+        return editState.submitting(existingRules: existingRules)
+    }
+
     public func applyFillerWordSubmission(
         _ plan: VoiceInkFillerWordSubmissionPlan,
         setWords: ([String]) -> Void
@@ -1374,6 +1389,27 @@ public struct VoiceInkDictionarySettingsSnapshot: Equatable, Sendable {
         setRules: ([VoiceInkWordReplacementRule]) -> Void
     ) {
         plan.applyRuntimeState(currentRules: wordReplacements, setRules: setRules)
+    }
+
+    public func applyWordReplacementEditSubmission(
+        _ submission: VoiceInkWordReplacementEditSubmission,
+        replacing rule: VoiceInkWordReplacementRule,
+        setRules: ([VoiceInkWordReplacementRule]) -> Void
+    ) {
+        guard submission.shouldUpdate,
+              let index = wordReplacements.firstIndex(of: rule) else {
+            return
+        }
+
+        let updatedRule = VoiceInkWordReplacementRule(
+            originalText: submission.plan.originalText,
+            replacementText: submission.plan.replacementText
+        )
+        guard updatedRule != rule else { return }
+
+        var updatedRules = wordReplacements
+        updatedRules[index] = updatedRule
+        setRules(updatedRules)
     }
 
     public func removingFillerWords(at offsets: IndexSet) -> [String] {

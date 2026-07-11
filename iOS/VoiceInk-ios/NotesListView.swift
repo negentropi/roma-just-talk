@@ -77,15 +77,22 @@ struct NotesListView: View {
                         }
                     }
                     ToolbarItemGroup(placement: .topBarTrailing) {
-                        Button {
-                            audioImport.isPresented = true
-                        } label: {
-                            Image(systemName: "waveform.badge.plus")
-                        }
-                        .accessibilityLabel("Import audio files")
+                        if !editMode.isEditing {
+                            NavigationLink(destination: IOSMetricsView()) {
+                                Image(systemName: VoiceInkPerformancePresentation.modelPerformanceSystemImageName)
+                            }
+                            .accessibilityLabel(VoiceInkPerformancePresentation.modelPerformanceButtonTitle)
 
-                        NavigationLink(destination: SettingsView()) {
-                            Image(systemName: VoiceInkNoteListPresentation.settingsSystemImageName)
+                            Button {
+                                audioImport.isPresented = true
+                            } label: {
+                                Image(systemName: "waveform.badge.plus")
+                            }
+                            .accessibilityLabel("Import audio files")
+
+                            NavigationLink(destination: SettingsView()) {
+                                Image(systemName: VoiceInkNoteListPresentation.settingsSystemImageName)
+                            }
                         }
                     }
                 }

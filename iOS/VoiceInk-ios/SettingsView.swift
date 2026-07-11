@@ -67,6 +67,10 @@ struct SettingsView: View {
                 NavigationLink(destination: IOSSettingsBackupView()) {
                     Label("Settings Backup", systemImage: "externaldrive")
                 }
+
+                NavigationLink(destination: IOSDiagnosticsView()) {
+                    Label("Diagnostics", systemImage: "stethoscope")
+                }
             }
 
             Section(header: Text(settingsPresentation.modesSectionTitle)) {

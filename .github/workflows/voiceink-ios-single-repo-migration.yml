@@ -116,7 +116,8 @@ jobs:
             -only-testing:VoiceInk-iosTests/IOSHistoryBulkActionsTests \
             -only-testing:VoiceInk-iosTests/IOSMetricsTests \
             -only-testing:VoiceInk-iosTests/IOSHistoryCleanupTests \
-            -only-testing:VoiceInk-iosTests/IOSSettingsBackupTests
+            -only-testing:VoiceInk-iosTests/IOSSettingsBackupTests \
+            -only-testing:VoiceInk-iosTests/IOSDiagnosticsTests
 
       - name: Upload iOS test diagnostics
         if: steps.ios_tests.outcome == 'failure'

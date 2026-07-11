@@ -18,9 +18,9 @@ enum IOSMicrophonePermissionAdapter {
         }
     }
 
-    static func requestAccess(completion: @escaping (Bool) -> Void) {
+    static func requestAccess(completion: @escaping @MainActor (Bool) -> Void) {
         AVAudioSession.sharedInstance().requestRecordPermission { granted in
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 completion(granted)
             }
         }
@@ -41,12 +41,12 @@ final class IOSMicrophonePermissionModel: ObservableObject {
     @Published private(set) var status: VoiceInkRecordingPermissionStatus
 
     private let statusProvider: () -> VoiceInkRecordingPermissionStatus
-    private let requestAccess: (@escaping (Bool) -> Void) -> Void
+    private let requestAccess: (@escaping @MainActor (Bool) -> Void) -> Void
     private let openSettings: () -> Void
 
     init(
         statusProvider: @escaping () -> VoiceInkRecordingPermissionStatus,
-        requestAccess: @escaping (@escaping (Bool) -> Void) -> Void,
+        requestAccess: @escaping (@escaping @MainActor (Bool) -> Void) -> Void,
         openSettings: @escaping () -> Void
     ) {
         self.statusProvider = statusProvider
@@ -70,10 +70,8 @@ final class IOSMicrophonePermissionModel: ObservableObject {
     func performRecoveryAction() {
         switch VoiceInkIOSMicrophonePermissionPresentation.status(status).recoveryAction {
         case .requestAccess:
-            requestAccess { [weak self] _ in
-                Task { @MainActor in
-                    self?.refresh()
-                }
+            requestAccess { [weak self] granted in
+                self?.status = granted ? .granted : .denied
             }
         case .openSettings:
             openSettings()

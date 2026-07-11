@@ -152,6 +152,31 @@ final class IOSCustomCloudModelManager: ObservableObject {
         VoiceInkCustomCloudModelStorage.clear(from: defaults)
     }
 
+    func replaceDefinitions(_ definitions: [VoiceInkIOSCustomModelDefinition]) throws {
+        let records = definitions.map(\.storedRecord)
+        let names = records.map { $0.name.trimmingCharacters(in: .whitespacesAndNewlines) }
+        guard names.allSatisfy({ !$0.isEmpty }), Set(names).count == names.count else {
+            throw IOSCustomCloudModelMutationError.validation(["Custom model names must be unique and non-empty."])
+        }
+        guard records.allSatisfy({ record in
+            guard let endpoint = URL(string: record.apiEndpoint) else { return false }
+            return endpoint.scheme != nil
+                && endpoint.host != nil
+                && !record.modelName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        }) else {
+            throw IOSCustomCloudModelMutationError.validation(["Custom model endpoints and model names must be valid."])
+        }
+
+        do {
+            try VoiceInkCustomCloudModelStorage.saveModels(records, to: defaults)
+            let affectedIDs = Set(models.map(\.id) + records.map(\.id))
+            affectedIDs.forEach(deleteAPIKey)
+            models = records
+        } catch {
+            throw IOSCustomCloudModelMutationError.storage(error)
+        }
+    }
+
     private func migrateLegacyAPIKeysIfNeeded() {
         var didMigrate = false
         for model in models {

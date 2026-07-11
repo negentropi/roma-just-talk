@@ -63,6 +63,10 @@ struct SettingsView: View {
                 NavigationLink(destination: IOSHistoryCleanupView()) {
                     Label("History Retention", systemImage: "clock.arrow.circlepath")
                 }
+
+                NavigationLink(destination: IOSSettingsBackupView()) {
+                    Label("Settings Backup", systemImage: "externaldrive")
+                }
             }
 
             Section(header: Text(settingsPresentation.modesSectionTitle)) {

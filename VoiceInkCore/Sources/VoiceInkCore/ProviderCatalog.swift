@@ -33,6 +33,7 @@ public enum VoiceInkTranscriptionTransport: Sendable {
 
 public enum VoiceInkTranscriptionServiceKind: Equatable, Sendable {
     case remote
+    case streamingOnly
     case localWhisper
     case localFluidAudio
     case nativeApple
@@ -65,6 +66,7 @@ public enum VoiceInkAPIKeyVerificationTransport: Sendable, Equatable {
     case speechmaticsJobs
     case assemblyAITranscripts
     case xaiAPIKey
+    case cartesiaVoices
 }
 
 public enum VoiceInkProviderAccessRequirement: Sendable {
@@ -1099,6 +1101,7 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
     case speechmatics
     case assemblyAI
     case xai
+    case cartesia
     case localWhisper
     case localFluidAudio
     case nativeApple
@@ -1138,6 +1141,8 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return "AssemblyAI"
         case .xai:
             return "xAI"
+        case .cartesia:
+            return "Cartesia"
         case .localWhisper:
             return "Local (Whisper)"
         case .localFluidAudio:
@@ -1196,6 +1201,8 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return VoiceInkProviderEndpoint.assemblyAIAPIBaseURL
         case .xai:
             return VoiceInkProviderEndpoint.xaiAPIBaseURL
+        case .cartesia:
+            return VoiceInkProviderEndpoint.cartesiaAPIBaseURL
         case .localWhisper:
             return URL(string: "http://localhost")!
         case .localFluidAudio:
@@ -1211,7 +1218,7 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
         switch self {
         case .gemini:
             return VoiceInkProviderEndpoint.geminiNativeAPIBaseURL
-        case .groq, .openAI, .deepgram, .cerebras, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .localWhisper, .localFluidAudio, .nativeApple, .voiceInk:
+        case .groq, .openAI, .deepgram, .cerebras, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .cartesia, .localWhisper, .localFluidAudio, .nativeApple, .voiceInk:
             return apiBaseURL
         }
     }
@@ -1240,6 +1247,8 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return URL(string: "https://www.assemblyai.com/dashboard/api-keys")!
         case .xai:
             return URL(string: "https://console.x.ai/")!
+        case .cartesia:
+            return URL(string: "https://play.cartesia.ai/keys")!
         case .localWhisper:
             return URL(string: "https://github.com/ggerganov/whisper.cpp")!
         case .localFluidAudio:
@@ -1269,6 +1278,8 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return .assemblyAI
         case .xai:
             return .xai
+        case .cartesia:
+            return .openAICompatible
         case .localWhisper:
             return .localWhisper
         case .localFluidAudio:
@@ -1281,6 +1292,10 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
     }
 
     public var transcriptionServiceKind: VoiceInkTranscriptionServiceKind {
+        if self == .cartesia {
+            return .streamingOnly
+        }
+
         switch transcriptionTransport {
         case .openAICompatible, .deepgram, .geminiGenerateContent, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai:
             return .remote
@@ -1299,7 +1314,7 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return .rejectEmpty
         case .soniox, .speechmatics, .assemblyAI, .localFluidAudio, .nativeApple:
             return .rejectWhitespace
-        case .openAI, .cerebras, .mistral, .elevenLabs, .xai, .localWhisper, .voiceInk:
+        case .openAI, .cerebras, .mistral, .elevenLabs, .xai, .cartesia, .localWhisper, .voiceInk:
             return .allow
         }
     }
@@ -1371,6 +1386,12 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
                 account: VoiceInkProviderAPIKeyAccount.xAI,
                 verificationStateKey: "xaiKeyVerified",
                 verificationTransport: .xaiAPIKey
+            )
+        case .cartesia:
+            return .userAPIKey(
+                account: VoiceInkProviderAPIKeyAccount.cartesia,
+                verificationStateKey: "cartesiaKeyVerified",
+                verificationTransport: .cartesiaVoices
             )
         case .localWhisper:
             return .localWhisperModel
@@ -1490,6 +1511,8 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return .assemblyAI
         case .xai:
             return .xai
+        case .cartesia:
+            return .cartesia
         case .localWhisper:
             return .local
         case .localFluidAudio:
@@ -1513,7 +1536,7 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return .cerebras
         case .gemini:
             return .gemini
-        case .deepgram, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .localWhisper, .localFluidAudio, .nativeApple, .voiceInk:
+        case .deepgram, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .cartesia, .localWhisper, .localFluidAudio, .nativeApple, .voiceInk:
             return nil
         }
     }

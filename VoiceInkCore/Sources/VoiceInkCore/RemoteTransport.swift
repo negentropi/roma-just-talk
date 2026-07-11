@@ -312,6 +312,11 @@ public struct VoiceInkProviderAPIKeyVerifier: Sendable {
                 baseURL: provider.apiBaseURL,
                 apiKey: apiKey
             )
+        case .cartesiaVoices:
+            return await cartesiaClient.verifyAPIKeyDetailed(
+                baseURL: provider.apiBaseURL,
+                apiKey: apiKey
+            )
         }
     }
 

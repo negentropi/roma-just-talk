@@ -56,15 +56,18 @@ public struct VoiceInkLiveTranscriptionRequest: Equatable, Sendable {
     public let provider: VoiceInkProviderKind
     public let selectedModel: String
     public let connectionModel: String
+    public let isStreamingOnly: Bool
 
     public init(
         provider: VoiceInkProviderKind,
         selectedModel: String,
-        connectionModel: String
+        connectionModel: String,
+        isStreamingOnly: Bool = false
     ) {
         self.provider = provider
         self.selectedModel = selectedModel
         self.connectionModel = connectionModel
+        self.isStreamingOnly = isStreamingOnly
     }
 
     public var finalCommitTimeoutNanoseconds: UInt64 {
@@ -103,7 +106,8 @@ public enum VoiceInkLiveTranscriptionPolicy {
             selectedModel: model.name,
             connectionModel: modelProvider.streamingConnectionModelName(
                 for: model.name
-            )
+            ),
+            isStreamingOnly: modelProvider.isStreamingOnly
         )
     }
 
@@ -114,7 +118,8 @@ public enum VoiceInkLiveTranscriptionPolicy {
         guard let request = capability(for: configuration) else { return nil }
         let snapshot = VoiceInkTranscriptionStreamingModelSnapshot(
             name: request.selectedModel,
-            supportsStreaming: true
+            supportsStreaming: true,
+            isStreamingOnly: request.isStreamingOnly
         )
         return VoiceInkTranscriptionStreamingPreference.shouldUseStreaming(
             for: snapshot,

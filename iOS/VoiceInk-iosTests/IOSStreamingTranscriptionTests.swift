@@ -42,6 +42,36 @@ final class IOSStreamingTranscriptionTests: XCTestCase {
         ))
     }
 
+    func testCartesiaIsSelectableVerifiedAndForcedToStreaming() throws {
+        let suiteName = "IOSStreamingTranscriptionTests.\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        let configuration = Mode(
+            name: "Cartesia live",
+            transcriptionProvider: .cartesia,
+            transcriptionModel: "ink-whisper"
+        ).runtimeConfiguration
+
+        VoiceInkTranscriptionStreamingPreference.saveIsEnabled(
+            false,
+            forModelName: "ink-whisper",
+            to: defaults
+        )
+
+        XCTAssertEqual(
+            VoiceInkLiveTranscriptionPolicy.request(for: configuration, defaults: defaults),
+            VoiceInkLiveTranscriptionRequest(
+                provider: .cartesia,
+                selectedModel: "ink-whisper",
+                connectionModel: "ink-whisper",
+                isStreamingOnly: true
+            )
+        )
+        XCTAssertNoThrow(try IOSStreamingTranscriptionService.makeClient(provider: .cartesia))
+        XCTAssertEqual(.cartesia.transcriptionServiceKind, .streamingOnly)
+        XCTAssertEqual(.cartesia.models(for: .transcription), ["ink-whisper"])
+    }
+
     func testStreamingServicePublishesPartialAndReturnsCommittedText() async throws {
         let client = StreamingClientHarness()
         let service = IOSStreamingTranscriptionService { _ in client }

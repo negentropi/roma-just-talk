@@ -74,11 +74,12 @@ struct ModeConfigurationView: View {
                         "Live Transcript",
                         isOn: Binding(
                             get: {
-                                settings.isLiveTranscriptionEnabled(
+                                liveCapability.isStreamingOnly || settings.isLiveTranscriptionEnabled(
                                     for: liveCapability.selectedModel
                                 )
                             },
                             set: {
+                                guard !liveCapability.isStreamingOnly else { return }
                                 settings.setLiveTranscriptionEnabled(
                                     $0,
                                     for: liveCapability.selectedModel
@@ -86,6 +87,7 @@ struct ModeConfigurationView: View {
                             }
                         )
                     )
+                    .disabled(liveCapability.isStreamingOnly)
                 }
             }
             

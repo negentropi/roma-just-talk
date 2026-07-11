@@ -344,6 +344,8 @@ final class IOSStreamingTranscriptionService: ObservableObject {
         switch provider {
         case .assemblyAI:
             return LLMkit.AssemblyAIStreamingClient()
+        case .cartesia:
+            return LLMkit.CartesiaStreamingClient()
         case .deepgram:
             return LLMkit.DeepgramStreamingClient()
         case .elevenLabs:

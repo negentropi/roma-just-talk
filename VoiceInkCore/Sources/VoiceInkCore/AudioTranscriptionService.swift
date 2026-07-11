@@ -144,6 +144,8 @@ public struct VoiceInkAudioTranscriptionServiceFactory {
         switch provider.transcriptionServiceKind {
         case .remote:
             return remoteServiceFactory(provider)
+        case .streamingOnly:
+            return VoiceInkUnsupportedAudioTranscriptionService()
         case .localWhisper:
             return localWhisperServiceFactory()
         case .localFluidAudio:

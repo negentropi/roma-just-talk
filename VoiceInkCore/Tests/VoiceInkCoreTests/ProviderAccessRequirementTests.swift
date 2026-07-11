@@ -252,7 +252,7 @@ final class ProviderAccessRequirementTests: XCTestCase {
     func testUserAPIKeyProvidersExposeDerivedCredentialMetadata() {
         XCTAssertEqual(
             VoiceInkProviderKind.userAPIKeyProviders,
-            [.groq, .openAI, .deepgram, .cerebras, .gemini, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai]
+            [.groq, .openAI, .deepgram, .cerebras, .gemini, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .cartesia]
         )
 
         let expected: [VoiceInkProviderKind: (account: String, verificationKey: String, transport: VoiceInkAPIKeyVerificationTransport)] = [
@@ -266,7 +266,8 @@ final class ProviderAccessRequirementTests: XCTestCase {
             .soniox: (VoiceInkProviderAPIKeyAccount.soniox, "sonioxKeyVerified", .sonioxFiles),
             .speechmatics: (VoiceInkProviderAPIKeyAccount.speechmatics, "speechmaticsKeyVerified", .speechmaticsJobs),
             .assemblyAI: (VoiceInkProviderAPIKeyAccount.assemblyAI, "assemblyAIKeyVerified", .assemblyAITranscripts),
-            .xai: (VoiceInkProviderAPIKeyAccount.xAI, "xaiKeyVerified", .xaiAPIKey)
+            .xai: (VoiceInkProviderAPIKeyAccount.xAI, "xaiKeyVerified", .xaiAPIKey),
+            .cartesia: (VoiceInkProviderAPIKeyAccount.cartesia, "cartesiaKeyVerified", .cartesiaVoices)
         ]
 
         for (provider, policy) in expected {
@@ -1709,6 +1710,7 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertEqual(VoiceInkProviderKind.speechmatics.transcriptionServiceKind, .remote)
         XCTAssertEqual(VoiceInkProviderKind.assemblyAI.transcriptionServiceKind, .remote)
         XCTAssertEqual(VoiceInkProviderKind.xai.transcriptionServiceKind, .remote)
+        XCTAssertEqual(VoiceInkProviderKind.cartesia.transcriptionServiceKind, .streamingOnly)
         XCTAssertEqual(VoiceInkProviderKind.localWhisper.transcriptionServiceKind, .localWhisper)
     }
 
@@ -1748,6 +1750,7 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertEqual(VoiceInkProviderKind.assemblyAI.transcriptionAPIBaseURL.absoluteString, "https://api.assemblyai.com")
         XCTAssertEqual(VoiceInkProviderKind.xai.transcriptionTransport, .xai)
         XCTAssertEqual(VoiceInkProviderKind.xai.transcriptionAPIBaseURL.absoluteString, "https://api.x.ai")
+        XCTAssertEqual(VoiceInkProviderKind.cartesia.transcriptionAPIBaseURL.absoluteString, "https://api.cartesia.ai")
     }
 
     func testConsoleURLsMatchMacOSProviderSettings() {
@@ -1762,6 +1765,7 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertEqual(VoiceInkProviderKind.speechmatics.consoleURL.absoluteString, "https://portal.speechmatics.com/manage-access/")
         XCTAssertEqual(VoiceInkProviderKind.assemblyAI.consoleURL.absoluteString, "https://www.assemblyai.com/dashboard/api-keys")
         XCTAssertEqual(VoiceInkProviderKind.xai.consoleURL.absoluteString, "https://console.x.ai/")
+        XCTAssertEqual(VoiceInkProviderKind.cartesia.consoleURL.absoluteString, "https://play.cartesia.ai/keys")
     }
 
     func testGeminiUsesNativeTranscriptionEndpointButOpenAICompatiblePostProcessingEndpoint() {
@@ -1795,6 +1799,7 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertNil(VoiceInkProviderKind.speechmatics.postProcessingChatCompletionsURL)
         XCTAssertNil(VoiceInkProviderKind.assemblyAI.postProcessingChatCompletionsURL)
         XCTAssertNil(VoiceInkProviderKind.xai.postProcessingChatCompletionsURL)
+        XCTAssertNil(VoiceInkProviderKind.cartesia.postProcessingChatCompletionsURL)
         XCTAssertNil(VoiceInkProviderKind.localWhisper.postProcessingChatCompletionsURL)
     }
 
@@ -1834,11 +1839,11 @@ final class ProviderAccessRequirementTests: XCTestCase {
     }
 
     func testAvailableProvidersFiltersByModelUseAndReadiness() {
-        let readyProviders: Set<VoiceInkProviderKind> = [.groq, .deepgram, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .localWhisper]
+        let readyProviders: Set<VoiceInkProviderKind> = [.groq, .deepgram, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .cartesia, .localWhisper]
 
         XCTAssertEqual(
             VoiceInkProviderKind.availableProviders(for: .transcription) { readyProviders.contains($0) },
-            [.groq, .deepgram, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .localWhisper]
+            [.groq, .deepgram, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .cartesia, .localWhisper]
         )
 
         XCTAssertEqual(

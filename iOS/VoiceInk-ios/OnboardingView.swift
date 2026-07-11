@@ -11,10 +11,15 @@ import VoiceInkCore
 struct OnboardingView: View {
     @State private var currentStep: VoiceInkIOSOnboardingStep
     @Binding var isOnboardingComplete: Bool
+    private let recordingManager: RecordingManager
 
-    init(isOnboardingComplete: Binding<Bool>) {
+    init(
+        isOnboardingComplete: Binding<Bool>,
+        recordingManager: RecordingManager
+    ) {
         _isOnboardingComplete = isOnboardingComplete
         _currentStep = State(initialValue: VoiceInkIOSOnboardingProgressStore.step())
+        self.recordingManager = recordingManager
     }
     
     var body: some View {
@@ -33,6 +38,12 @@ struct OnboardingView: View {
             case .keyboardSetup:
                 KeyboardSetupOnboardingView(currentStep: $currentStep)
                     .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading)))
+            case .tutorial:
+                IOSOnboardingTutorialView(
+                    currentStep: $currentStep,
+                    recordingManager: recordingManager
+                )
+                .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading)))
             case .ready:
                 ReadyOnboardingView(isOnboardingComplete: $isOnboardingComplete)
                     .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading)))
@@ -411,5 +422,8 @@ struct AppIconView: View {
 }
 
 #Preview {
-    OnboardingView(isOnboardingComplete: .constant(false))
+    OnboardingView(
+        isOnboardingComplete: .constant(false),
+        recordingManager: RecordingManager()
+    )
 }

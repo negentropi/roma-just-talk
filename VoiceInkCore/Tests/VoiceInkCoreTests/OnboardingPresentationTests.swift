@@ -64,12 +64,13 @@ final class OnboardingPresentationTests: XCTestCase {
         XCTAssertEqual(VoiceInkIOSOnboardingStep.initial, .welcome)
         XCTAssertEqual(
             Array(VoiceInkIOSOnboardingStep.allCases),
-            [.welcome, .microphoneSetup, .modelDownload, .keyboardSetup, .ready]
+            [.welcome, .microphoneSetup, .modelDownload, .keyboardSetup, .tutorial, .ready]
         )
         XCTAssertEqual(VoiceInkIOSOnboardingStep.welcome.nextStep, .microphoneSetup)
         XCTAssertEqual(VoiceInkIOSOnboardingStep.microphoneSetup.nextStep, .modelDownload)
         XCTAssertEqual(VoiceInkIOSOnboardingStep.modelDownload.nextStep, .keyboardSetup)
-        XCTAssertEqual(VoiceInkIOSOnboardingStep.keyboardSetup.nextStep, .ready)
+        XCTAssertEqual(VoiceInkIOSOnboardingStep.keyboardSetup.nextStep, .tutorial)
+        XCTAssertEqual(VoiceInkIOSOnboardingStep.tutorial.nextStep, .ready)
         XCTAssertNil(VoiceInkIOSOnboardingStep.ready.nextStep)
 
         var step = VoiceInkIOSOnboardingStep.initial
@@ -79,6 +80,8 @@ final class OnboardingPresentationTests: XCTestCase {
         XCTAssertEqual(step, .modelDownload)
         step.advance()
         XCTAssertEqual(step, .keyboardSetup)
+        step.advance()
+        XCTAssertEqual(step, .tutorial)
         step.advance()
         XCTAssertEqual(step, .ready)
         step.advance()

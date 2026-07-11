@@ -7,6 +7,7 @@ final class IOSOnboardingProgressStoreTests: XCTestCase {
         XCTAssertEqual(VoiceInkIOSOnboardingStep.microphoneSetup.rawValue, "microphoneSetup")
         XCTAssertEqual(VoiceInkIOSOnboardingStep.modelDownload.rawValue, "modelDownload")
         XCTAssertEqual(VoiceInkIOSOnboardingStep.keyboardSetup.rawValue, "keyboardSetup")
+        XCTAssertEqual(VoiceInkIOSOnboardingStep.tutorial.rawValue, "tutorial")
         XCTAssertEqual(VoiceInkIOSOnboardingStep.ready.rawValue, "ready")
     }
 

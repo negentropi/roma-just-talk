@@ -90,6 +90,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "IOSOnboardingProgressStoreTests.testDefaultsAndIgnoresMalformedValues", run: { IOSOnboardingProgressStoreTests().testDefaultsAndIgnoresMalformedValues() }),
             VoiceInkCoreCheck(name: "IOSOnboardingProgressStoreTests.testRoundTripsCurrentStep", run: { IOSOnboardingProgressStoreTests().testRoundTripsCurrentStep() }),
             VoiceInkCoreCheck(name: "IOSOnboardingProgressStoreTests.testResetReturnsToWelcome", run: { IOSOnboardingProgressStoreTests().testResetReturnsToWelcome() }),
+            VoiceInkCoreCheck(name: "IOSOnboardingTutorialStateTests.testCompletionRequiresNonEmptySuccessfulTranscript", run: { IOSOnboardingTutorialStateTests().testCompletionRequiresNonEmptySuccessfulTranscript() }),
+            VoiceInkCoreCheck(name: "IOSOnboardingTutorialStateTests.testOutcomeMapsToVisibleTutorialState", run: { IOSOnboardingTutorialStateTests().testOutcomeMapsToVisibleTutorialState() }),
             VoiceInkCoreCheck(name: "IOSMicrophonePermissionPresentationTests.testMicrophonePermissionPresentationMapsRecoveryActions", run: { IOSMicrophonePermissionPresentationTests().testMicrophonePermissionPresentationMapsRecoveryActions() }),
             VoiceInkCoreCheck(name: "OnboardingPresentationTests.testIOSModelDownloadOnboardingDefaultModelUsesSharedBaseModel", run: { OnboardingPresentationTests().testIOSModelDownloadOnboardingDefaultModelUsesSharedBaseModel() }),
             VoiceInkCoreCheck(name: "OnboardingPresentationTests.testIOSWelcomeOnboardingPresentationPreservesCopyAndFeatureOrder", run: { OnboardingPresentationTests().testIOSWelcomeOnboardingPresentationPreservesCopyAndFeatureOrder() }),

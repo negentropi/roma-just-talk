@@ -56,7 +56,10 @@ struct VoiceInk_iosApp: App {
                         ).applyRuntimeState(startRecordingAfterLaunchDelay: startRecordingAfterLaunchDelay)
                     }
             } else {
-                OnboardingView(isOnboardingComplete: $hasCompletedOnboarding)
+                OnboardingView(
+                    isOnboardingComplete: $hasCompletedOnboarding,
+                    recordingManager: recordingManager
+                )
                     .onOpenURL { url in
                         handleURL(url)
                     }

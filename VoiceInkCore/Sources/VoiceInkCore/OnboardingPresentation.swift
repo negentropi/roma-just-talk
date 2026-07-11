@@ -247,6 +247,56 @@ public struct VoiceInkMacOSOnboardingTutorialPresentation: Equatable, Sendable {
     }
 }
 
+public enum VoiceInkIOSOnboardingTutorialPresentation {
+    public static let iconSystemName = "wand.and.stars"
+    public static let title = "Try It Out"
+    public static let subtitle = "Record a short phrase and confirm that transcription works before finishing setup."
+    public static let instructionSteps = [
+        VoiceInkOnboardingStepPresentation(number: "1", title: "Start", description: "Tap Start Recording."),
+        VoiceInkOnboardingStepPresentation(number: "2", title: "Speak", description: "Say a short phrase clearly."),
+        VoiceInkOnboardingStepPresentation(number: "3", title: "Stop", description: "Tap Stop Recording."),
+        VoiceInkOnboardingStepPresentation(number: "4", title: "Confirm", description: "Wait for your transcript to appear.")
+    ]
+    public static let startButtonTitle = "Start Recording"
+    public static let retryButtonTitle = "Try Again"
+    public static let continueButtonTitle = "Continue"
+    public static let skipButtonTitle = "Skip for now"
+    public static let readyTitle = "Ready to test"
+    public static let readyDetail = "Your recording uses the same mode and transcription pipeline as the app."
+    public static let processingTitle = "Transcribing…"
+    public static let processingDetail = "Keep the app open while your test recording is processed."
+    public static let successTitle = "Transcription works"
+    public static let failureTitle = "Transcription failed"
+    public static let emptyTranscriptMessage = "No speech was transcribed. Try recording again."
+}
+
+public enum VoiceInkIOSOnboardingTutorialState: Equatable, Sendable {
+    case ready
+    case processing
+    case succeeded(String)
+    case failed(String)
+
+    public static func completed(
+        with outcome: VoiceInkStoredAudioRetranscriptionOutcome
+    ) -> Self {
+        switch outcome {
+        case .succeeded(let text):
+            return text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                ? .failed(VoiceInkIOSOnboardingTutorialPresentation.emptyTranscriptMessage)
+                : .succeeded(text)
+        case .failed(let reason):
+            return .failed(reason)
+        case .canceled:
+            return .failed(VoiceInkTranscriptPresentation.canceledTranscriptionText)
+        }
+    }
+
+    public var canComplete: Bool {
+        guard case .succeeded(let text) = self else { return false }
+        return !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+}
+
 public struct VoiceInkMacOSResetOnboardingPresentation: Equatable, Sendable {
     public let buttonTitle: String
     public let alertTitle: String
@@ -490,6 +540,7 @@ public enum VoiceInkIOSOnboardingStep: String, CaseIterable, Equatable, Sendable
     case microphoneSetup
     case modelDownload
     case keyboardSetup
+    case tutorial
     case ready
 
     public static let initial = VoiceInkIOSOnboardingStep.welcome
@@ -503,6 +554,8 @@ public enum VoiceInkIOSOnboardingStep: String, CaseIterable, Equatable, Sendable
         case .modelDownload:
             return .keyboardSetup
         case .keyboardSetup:
+            return .tutorial
+        case .tutorial:
             return .ready
         case .ready:
             return nil

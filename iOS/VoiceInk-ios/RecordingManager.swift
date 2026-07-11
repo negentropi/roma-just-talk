@@ -163,7 +163,10 @@ final class RecordingManager: ObservableObject {
         }
     }
     
-    func stopRecording(modelContext: ModelContext) {
+    func stopRecording(
+        modelContext: ModelContext,
+        completion: IOSTranscriptionTaskCoordinator.RunCompletion? = nil
+    ) {
         let streamingService = activeStreamingService
         let streamingRequest = activeStreamingRequest
         let runSettings = activeRunSettings
@@ -193,7 +196,8 @@ final class RecordingManager: ObservableObject {
                         request: streamingRequest,
                         runSettings: runSettings,
                         startedAt: streamingStartedAt
-                    )
+                    ),
+                    completion: completion
                 )
                 recorder.currentRecordingURL = nil
             }
@@ -202,7 +206,9 @@ final class RecordingManager: ObservableObject {
         clearStreamingState(cancelService: false)
 
         if stopPlan.pendingDraft == nil {
-            failActiveKeyboardDictation(message: "The recording file is unavailable.")
+            let message = "The recording file is unavailable."
+            failActiveKeyboardDictation(message: message)
+            completion?(.failed(reason: message))
         }
     }
     

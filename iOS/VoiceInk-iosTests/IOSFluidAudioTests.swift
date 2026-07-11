@@ -115,14 +115,12 @@ final class IOSFluidAudioTests: XCTestCase {
     func testLocalFluidAudioLiveCapabilityUsesSelectedModel() {
         let modelName = VoiceInkTranscriptionModelCatalog.fluidAudioModels[0].name
         let request = VoiceInkLiveTranscriptionPolicy.capability(for:
-            VoiceInkModeRuntimeConfiguration(
+            Mode(
+                name: "Parakeet",
                 transcriptionProvider: .localFluidAudio,
                 transcriptionModel: modelName,
-                postProcessingProvider: .groq,
-                postProcessingModel: "",
-                prompt: "",
                 isPostProcessingEnabled: false
-            )
+            ).runtimeConfiguration
         )
 
         XCTAssertEqual(request?.provider, .localFluidAudio)

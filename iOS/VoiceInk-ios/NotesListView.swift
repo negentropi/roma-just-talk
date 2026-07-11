@@ -191,6 +191,7 @@ struct NotesListView: View {
                 NavigationLink(destination: SettingsView()) {
                     Image(systemName: VoiceInkNoteListPresentation.settingsSystemImageName)
                 }
+                .accessibilityLabel("Settings")
             }
         }
     }

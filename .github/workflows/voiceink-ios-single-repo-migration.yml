@@ -119,7 +119,17 @@ jobs:
             -only-testing:VoiceInk-iosTests/IOSSettingsBackupTests \
             -only-testing:VoiceInk-iosTests/IOSDiagnosticsTests \
             -only-testing:VoiceInk-iosTests/IOSEnhancementBehaviorTests \
-            -only-testing:VoiceInk-iosTests/IOSRecordingFeedbackTests
+            -only-testing:VoiceInk-iosTests/IOSRecordingFeedbackTests \
+            -only-testing:VoiceInk-iosUITests/VoiceInkIOSUITests
+
+      - name: Upload iOS runtime proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-runtime-proof
+          path: .local-build-ios/Logs/Test/*.xcresult
+          if-no-files-found: warn
+          retention-days: 7
 
       - name: Upload iOS test diagnostics
         if: steps.ios_tests.outcome == 'failure'

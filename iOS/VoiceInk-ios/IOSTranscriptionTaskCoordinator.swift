@@ -73,6 +73,8 @@ final class IOSTranscriptionTaskCoordinator: ObservableObject {
             self.persist = persist
             self.completion = completion
         }
+
+        nonisolated deinit {}
     }
 
     private let backgroundExecution: VoiceInkIOSBackgroundExecution
@@ -104,6 +106,9 @@ final class IOSTranscriptionTaskCoordinator: ObservableObject {
         self.completeKeyboard = completeKeyboard
         self.failKeyboard = failKeyboard
     }
+
+    // Xcode 26.1-26.3 corrupts actor-isolated deinit back-deployment on Simulator.
+    nonisolated deinit {}
 
     @discardableResult
     func start(

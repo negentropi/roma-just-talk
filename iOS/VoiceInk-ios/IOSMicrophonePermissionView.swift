@@ -55,6 +55,9 @@ final class IOSMicrophonePermissionModel: ObservableObject {
         self.status = statusProvider()
     }
 
+    // Xcode 26.1-26.3 corrupts actor-isolated deinit back-deployment on Simulator.
+    nonisolated deinit {}
+
     static func live() -> IOSMicrophonePermissionModel {
         IOSMicrophonePermissionModel(
             statusProvider: IOSMicrophonePermissionAdapter.currentStatus,

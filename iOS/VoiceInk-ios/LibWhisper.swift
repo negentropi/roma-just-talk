@@ -33,6 +33,9 @@ final class VoiceInkWhisperCancellationToken: @unchecked Sendable {
         canceled = true
         lock.unlock()
     }
+
+    // Xcode 26.1-26.3 corrupts actor-isolated deinit back-deployment on Simulator.
+    nonisolated deinit {}
 }
 
 let voiceInkWhisperAbortCallback: @convention(c) (UnsafeMutableRawPointer?) -> Bool = { userData in

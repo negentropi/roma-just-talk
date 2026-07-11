@@ -1,3 +1,4 @@
+import Combine
 import Foundation
 import LLMkit
 import VoiceInkCore
@@ -6,18 +7,18 @@ private final class VoiceInkIOSAudioChunkSource: @unchecked Sendable {
     let stream: AsyncStream<Data>
     private let continuation: AsyncStream<Data>.Continuation
 
-    init() {
+    nonisolated init() {
         (stream, continuation) = AsyncStream.makeStream(
             of: Data.self,
             bufferingPolicy: .unbounded
         )
     }
 
-    func send(_ data: Data) {
+    nonisolated func send(_ data: Data) {
         continuation.yield(data)
     }
 
-    func finish() {
+    nonisolated func finish() {
         continuation.finish()
     }
 }
@@ -26,19 +27,21 @@ private final class VoiceInkIOSAudioChunkRelay: @unchecked Sendable {
     private let lock = NSLock()
     private var source: VoiceInkIOSAudioChunkSource?
 
-    func activate(_ source: VoiceInkIOSAudioChunkSource) {
+    nonisolated init() {}
+
+    nonisolated func activate(_ source: VoiceInkIOSAudioChunkSource) {
         lock.lock()
         self.source = source
         lock.unlock()
     }
 
-    func deactivate() {
+    nonisolated func deactivate() {
         lock.lock()
         source = nil
         lock.unlock()
     }
 
-    func send(_ data: Data) {
+    nonisolated func send(_ data: Data) {
         lock.lock()
         let source = source
         lock.unlock()
@@ -62,7 +65,7 @@ enum VoiceInkIOSStreamingError: LocalizedError {
 
 @MainActor
 final class IOSStreamingTranscriptionService: ObservableObject {
-    typealias ClientFactory = (VoiceInkProviderKind) throws -> any LLMkit.StreamingTranscriptionProvider
+    typealias ClientFactory = @MainActor (VoiceInkProviderKind) throws -> any LLMkit.StreamingTranscriptionProvider
 
     @Published private(set) var partialTranscript = ""
 

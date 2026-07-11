@@ -66,3 +66,21 @@ jobs:
             -destination "generic/platform=iOS Simulator" \
             -derivedDataPath "$PWD/.local-build-ios" \
             CODE_SIGNING_ALLOWED=NO
+
+      - name: Run keyboard dictation exchange tests
+        run: |
+          SIMULATOR_UDID="$(
+            xcrun simctl list devices available --json \
+              | jq -r '[.devices[][] | select(.name | startswith("iPhone"))][0].udid'
+          )"
+          test -n "$SIMULATOR_UDID"
+          test "$SIMULATOR_UDID" != "null"
+          xcodebuild test \
+            -workspace VoiceInk.xcworkspace \
+            -scheme VoiceInk-ios \
+            -configuration Debug \
+            -destination "platform=iOS Simulator,id=$SIMULATOR_UDID" \
+            -derivedDataPath "$PWD/.local-build-ios" \
+            -parallel-testing-enabled NO \
+            CODE_SIGNING_ALLOWED=NO \
+            -only-testing:VoiceInk-iosTests/KeyboardDictationExchangeTests

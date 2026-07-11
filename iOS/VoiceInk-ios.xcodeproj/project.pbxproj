@@ -14,7 +14,6 @@
 		B20000012FB0000000000001 /* LLMkit in Frameworks */ = {isa = PBXBuildFile; productRef = B20000032FB0000000000001 /* LLMkit */; };
 		B20000042FB0000000000001 /* LLMkit in Frameworks */ = {isa = PBXBuildFile; productRef = B20000032FB0000000000001 /* LLMkit */; };
 		B30000012FC0000000000001 /* FluidAudio in Frameworks */ = {isa = PBXBuildFile; productRef = B30000032FC0000000000001 /* FluidAudio */; };
-		B30000042FC0000000000001 /* FluidAudio in Frameworks */ = {isa = PBXBuildFile; productRef = B30000032FC0000000000001 /* FluidAudio */; };
 		B30000062FC0000000000001 /* FluidAudioModelManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30000052FC0000000000001 /* FluidAudioModelManager.swift */; };
 		B30000082FC0000000000001 /* FluidAudioStreamingProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30000072FC0000000000001 /* FluidAudioStreamingProvider.swift */; };
 		B30000102FC0000000000001 /* FluidAudioWordTimingAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30000092FC0000000000001 /* FluidAudioWordTimingAdapter.swift */; };
@@ -151,7 +150,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B30000042FC0000000000001 /* FluidAudio in Frameworks */,
 				B20000042FB0000000000001 /* LLMkit in Frameworks */,
 				B10000052FA0000000000001 /* VoiceInkCore in Frameworks */,
 			);
@@ -264,7 +262,6 @@
 			packageProductDependencies = (
 				B10000032FA0000000000001 /* VoiceInkCore */,
 				B20000032FB0000000000001 /* LLMkit */,
-				B30000032FC0000000000001 /* FluidAudio */,
 			);
 			productName = "VoiceInk-iosTests";
 			productReference = E168DF182E4B464C00F133D2 /* VoiceInk-iosTests.xctest */;

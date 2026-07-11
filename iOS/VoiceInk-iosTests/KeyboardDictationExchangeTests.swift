@@ -1,6 +1,6 @@
 import Foundation
 import XCTest
-@testable import VoiceInk_ios
+@testable import roma_just_talk
 
 final class KeyboardDictationExchangeTests: XCTestCase {
     private var suiteName: String!

@@ -22,6 +22,9 @@ struct OnboardingView: View {
             case .modelDownload:
                 ModelDownloadOnboardingView(currentStep: $currentStep)
                     .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading)))
+            case .keyboardSetup:
+                KeyboardSetupOnboardingView(currentStep: $currentStep)
+                    .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading)))
             case .ready:
                 ReadyOnboardingView(isOnboardingComplete: $isOnboardingComplete)
                     .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading)))

@@ -340,6 +340,47 @@ public struct VoiceInkOnboardingReadyPresentation: Equatable, Sendable {
     }
 }
 
+public struct VoiceInkIOSKeyboardReadinessObservation: Equatable, Sendable {
+    public let hasFullAccess: Bool
+    public let observedAt: Date
+
+    public init(hasFullAccess: Bool, observedAt: Date) {
+        self.hasFullAccess = hasFullAccess
+        self.observedAt = observedAt
+    }
+}
+
+public enum VoiceInkIOSKeyboardReadinessStatus: Equatable, Sendable {
+    case unverified
+    case fullAccessRequired
+    case ready
+}
+
+public enum VoiceInkIOSKeyboardReadinessPolicy {
+    public static func status(
+        observation: VoiceInkIOSKeyboardReadinessObservation?,
+        verificationStartedAt: Date
+    ) -> VoiceInkIOSKeyboardReadinessStatus {
+        guard let observation, observation.observedAt >= verificationStartedAt else {
+            return .unverified
+        }
+
+        return observation.hasFullAccess ? .ready : .fullAccessRequired
+    }
+}
+
+public struct VoiceInkIOSKeyboardReadinessStatusPresentation: Equatable, Sendable {
+    public let iconSystemName: String
+    public let title: String
+    public let detail: String
+
+    public init(iconSystemName: String, title: String, detail: String) {
+        self.iconSystemName = iconSystemName
+        self.title = title
+        self.detail = detail
+    }
+}
+
 public enum VoiceInkMacOSOnboardingPresentation {
     public static let welcome = VoiceInkMacOSOnboardingWelcomePresentation(
         title: "Welcome to the Future of Typing",
@@ -447,6 +488,7 @@ public enum VoiceInkMacOSSetupPresentation {
 public enum VoiceInkIOSOnboardingStep: CaseIterable, Equatable, Sendable {
     case welcome
     case modelDownload
+    case keyboardSetup
     case ready
 
     public static let initial = VoiceInkIOSOnboardingStep.welcome
@@ -456,6 +498,8 @@ public enum VoiceInkIOSOnboardingStep: CaseIterable, Equatable, Sendable {
         case .welcome:
             return .modelDownload
         case .modelDownload:
+            return .keyboardSetup
+        case .keyboardSetup:
             return .ready
         case .ready:
             return nil
@@ -526,6 +570,64 @@ public enum VoiceInkIOSOnboardingPresentation {
         ],
         primaryButtonTitle: VoiceInkAppIdentity.startUsingTitle
     )
+}
+
+public enum VoiceInkIOSKeyboardSetupPresentation {
+    public static let navigationTitle = "Keyboard Setup"
+    public static let iconSystemName = "keyboard"
+    public static let title = "Enable the Keyboard"
+    public static let subtitle = "Add roma just talk as a keyboard and allow Full Access so dictation can return text to the field where you started."
+    public static let openSettingsButtonTitle = "Open App Settings"
+    public static let openSettingsButtonSystemImageName = "gear"
+    public static let testFieldTitle = "Verify Keyboard"
+    public static let testFieldPlaceholder = "Tap here, then select roma just talk"
+    public static let testFieldHelp = "Use the globe key to select roma just talk. Readiness updates when the keyboard appears."
+    public static let continueButtonTitle = "Continue"
+    public static let skipButtonTitle = "Set Up Later"
+    public static let settingsRowTitle = "Keyboard Setup"
+    public static let settingsRowSystemImageName = "keyboard"
+    public static let instructions = [
+        VoiceInkOnboardingStepPresentation(
+            number: "1",
+            title: "Add the Keyboard",
+            description: "In Settings, open General > Keyboard > Keyboards > Add New Keyboard and choose roma just talk."
+        ),
+        VoiceInkOnboardingStepPresentation(
+            number: "2",
+            title: "Allow Full Access",
+            description: "Open roma just talk in the keyboard list and turn on Allow Full Access."
+        ),
+        VoiceInkOnboardingStepPresentation(
+            number: "3",
+            title: "Verify Here",
+            description: "Return to this screen, tap the test field, and select roma just talk with the globe key."
+        )
+    ]
+
+    public static func status(
+        _ readiness: VoiceInkIOSKeyboardReadinessStatus
+    ) -> VoiceInkIOSKeyboardReadinessStatusPresentation {
+        switch readiness {
+        case .unverified:
+            return VoiceInkIOSKeyboardReadinessStatusPresentation(
+                iconSystemName: "keyboard",
+                title: "Keyboard Not Verified",
+                detail: "Complete the steps below, then activate roma just talk in the test field."
+            )
+        case .fullAccessRequired:
+            return VoiceInkIOSKeyboardReadinessStatusPresentation(
+                iconSystemName: "exclamationmark.triangle.fill",
+                title: "Full Access Is Off",
+                detail: "Turn on Allow Full Access in Settings, then activate the keyboard here again."
+            )
+        case .ready:
+            return VoiceInkIOSKeyboardReadinessStatusPresentation(
+                iconSystemName: "checkmark.circle.fill",
+                title: "Keyboard Ready",
+                detail: "roma just talk was activated with Full Access on this screen."
+            )
+        }
+    }
 }
 
 public enum VoiceInkIOSAppIconSource: Equatable, Sendable {

@@ -22,6 +22,15 @@ struct SettingsView: View {
         )
 
         List {
+            Section {
+                NavigationLink(destination: KeyboardSetupView()) {
+                    Label(
+                        VoiceInkIOSKeyboardSetupPresentation.settingsRowTitle,
+                        systemImage: VoiceInkIOSKeyboardSetupPresentation.settingsRowSystemImageName
+                    )
+                }
+            }
+
             Section(header: Text(settingsPresentation.modesSectionTitle)) {
                 ForEach(settings.modes) { mode in
                     NavigationLink(destination: ModeConfigurationView(

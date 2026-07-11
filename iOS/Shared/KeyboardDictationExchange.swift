@@ -39,10 +39,6 @@ struct VoiceInkKeyboardDictationExchangeStore {
         self.defaults = defaults
     }
 
-    var isAvailable: Bool {
-        defaults != nil
-    }
-
     @discardableResult
     func begin(
         documentIdentifier: UUID,

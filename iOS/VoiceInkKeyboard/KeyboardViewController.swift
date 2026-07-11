@@ -90,6 +90,7 @@ class KeyboardViewController: KeyboardInputViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        coordinator.reportKeyboardReadiness(hasFullAccess: hasFullAccess)
         
         // Re-add and ensure record button stays on top after KeyboardKit layout
         if let button = recordButton {
@@ -129,6 +130,12 @@ class KeyboardViewController: KeyboardInputViewController {
         // Provide haptic feedback
         let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
         impactFeedback.impactOccurred()
+
+        guard hasFullAccess else {
+            coordinator.reportKeyboardReadiness(hasFullAccess: false)
+            updateButtonAppearanceBasedOnState()
+            return
+        }
         
         let isRecording = coordinator.isRecording
         if !isRecording {
@@ -219,7 +226,7 @@ class KeyboardViewController: KeyboardInputViewController {
         let backgroundColor: UIColor
         let isEnabled: Bool
 
-        if !coordinator.canExchangeKeyboardDictation {
+        if !hasFullAccess {
             presentation = .fullAccessRequired
             backgroundColor = .systemOrange
             isEnabled = false

@@ -1017,6 +1017,14 @@ public enum VoiceInkAppIdentity {
         "\(bundleIdentifier).recordingStateChanged"
     }
 
+    public static var iOSKeyboardActivatedDarwinNotificationName: String {
+        "\(bundleIdentifier).keyboardActivated"
+    }
+
+    public static var iOSKeyboardActivatedWithFullAccessDarwinNotificationName: String {
+        "\(bundleIdentifier).keyboardActivatedWithFullAccess"
+    }
+
     public static let iOSStopRecordingFromKeyboardNotificationName = Notification.Name("stopRecordingFromKeyboard")
 
     public static var welcomeTitle: String {

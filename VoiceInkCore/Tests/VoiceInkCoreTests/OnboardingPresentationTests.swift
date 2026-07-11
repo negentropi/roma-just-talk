@@ -62,14 +62,20 @@ final class OnboardingPresentationTests: XCTestCase {
 
     func testIOSOnboardingStepOrderPreservesExistingFlow() {
         XCTAssertEqual(VoiceInkIOSOnboardingStep.initial, .welcome)
-        XCTAssertEqual(Array(VoiceInkIOSOnboardingStep.allCases), [.welcome, .modelDownload, .ready])
+        XCTAssertEqual(
+            Array(VoiceInkIOSOnboardingStep.allCases),
+            [.welcome, .modelDownload, .keyboardSetup, .ready]
+        )
         XCTAssertEqual(VoiceInkIOSOnboardingStep.welcome.nextStep, .modelDownload)
-        XCTAssertEqual(VoiceInkIOSOnboardingStep.modelDownload.nextStep, .ready)
+        XCTAssertEqual(VoiceInkIOSOnboardingStep.modelDownload.nextStep, .keyboardSetup)
+        XCTAssertEqual(VoiceInkIOSOnboardingStep.keyboardSetup.nextStep, .ready)
         XCTAssertNil(VoiceInkIOSOnboardingStep.ready.nextStep)
 
         var step = VoiceInkIOSOnboardingStep.initial
         step.advance()
         XCTAssertEqual(step, .modelDownload)
+        step.advance()
+        XCTAssertEqual(step, .keyboardSetup)
         step.advance()
         XCTAssertEqual(step, .ready)
         step.advance()

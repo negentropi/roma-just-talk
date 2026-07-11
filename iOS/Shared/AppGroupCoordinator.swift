@@ -56,6 +56,7 @@ final class AppGroupCoordinator {
     private let notificationCenter = CFNotificationCenterGetDarwinNotifyCenter()
     
     var onStopRecordingRequested: (() -> Void)?
+    var onKeyboardReadinessReported: ((VoiceInkIOSKeyboardReadinessObservation) -> Void)?
     
     // MARK: - Initialization
     private init() {
@@ -90,12 +91,16 @@ final class AppGroupCoordinator {
         return state.isRecording
     }
 
-    var canExchangeKeyboardDictation: Bool {
-        keyboardDictationStore.isAvailable
-    }
-
     func beginKeyboardDictation(documentIdentifier: UUID) -> UUID? {
         keyboardDictationStore.begin(documentIdentifier: documentIdentifier)
+    }
+
+    func reportKeyboardReadiness(hasFullAccess: Bool) {
+        postDarwinNotification(
+            hasFullAccess
+                ? VoiceInkAppIdentity.iOSKeyboardActivatedWithFullAccessDarwinNotificationName
+                : VoiceInkAppIdentity.iOSKeyboardActivatedDarwinNotificationName
+        )
     }
 
     func pendingKeyboardDictationRequestID() -> UUID? {
@@ -170,6 +175,32 @@ final class AppGroupCoordinator {
             nil,
             .deliverImmediately
         )
+
+        CFNotificationCenterAddObserver(
+            center,
+            Unmanaged.passUnretained(self).toOpaque(),
+            { (_, observer, _, _, _) in
+                guard let observer else { return }
+                let coordinator = Unmanaged<AppGroupCoordinator>.fromOpaque(observer).takeUnretainedValue()
+                coordinator.handleKeyboardReadinessNotification(hasFullAccess: false)
+            },
+            VoiceInkAppIdentity.iOSKeyboardActivatedDarwinNotificationName as CFString,
+            nil,
+            .deliverImmediately
+        )
+
+        CFNotificationCenterAddObserver(
+            center,
+            Unmanaged.passUnretained(self).toOpaque(),
+            { (_, observer, _, _, _) in
+                guard let observer else { return }
+                let coordinator = Unmanaged<AppGroupCoordinator>.fromOpaque(observer).takeUnretainedValue()
+                coordinator.handleKeyboardReadinessNotification(hasFullAccess: true)
+            },
+            VoiceInkAppIdentity.iOSKeyboardActivatedWithFullAccessDarwinNotificationName as CFString,
+            nil,
+            .deliverImmediately
+        )
     }
     
     private func removeNotificationObservers() {
@@ -193,6 +224,17 @@ final class AppGroupCoordinator {
     private func handleStopRecordingNotification() {
         DispatchQueue.main.async { [weak self] in
             self?.onStopRecordingRequested?()
+        }
+    }
+
+    private func handleKeyboardReadinessNotification(hasFullAccess: Bool) {
+        DispatchQueue.main.async { [weak self] in
+            self?.onKeyboardReadinessReported?(
+                VoiceInkIOSKeyboardReadinessObservation(
+                    hasFullAccess: hasFullAccess,
+                    observedAt: Date()
+                )
+            )
         }
     }
     

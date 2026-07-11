@@ -4,10 +4,12 @@ import os
 import VoiceInkCore
 
 /// Agreement-based on-device streaming transcription using FluidAudio ASR.
-final class FluidAudioStreamingProvider: StreamingTranscriptionProvider {
+final class FluidAudioStreamingProvider {
+
+    typealias ModelLoader = (String) async throws -> AsrModels
 
     private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "FluidAudioStreaming")
-    private let fluidAudioService: FluidAudioTranscriptionService
+    private let loadModels: ModelLoader
     private var eventsContinuation: AsyncStream<VoiceInkStreamingTranscriptionEvent>.Continuation?
 
     private(set) var transcriptionEvents: AsyncStream<VoiceInkStreamingTranscriptionEvent>
@@ -35,8 +37,8 @@ final class FluidAudioStreamingProvider: StreamingTranscriptionProvider {
     private let minNewSamples = ASRConstants.minimumRequiredSamples(forSampleRate: ASRConstants.sampleRate)
     private let maxCachedFinalizationLagSamples: Int
 
-    init(fluidAudioService: FluidAudioTranscriptionService, config: AgreementConfig = AgreementConfig()) {
-        self.fluidAudioService = fluidAudioService
+    init(loadModels: @escaping ModelLoader, config: AgreementConfig = AgreementConfig()) {
+        self.loadModels = loadModels
         self.config = config
         self.agreementEngine = WordAgreementEngine(config: config)
         self.maxCachedFinalizationLagSamples = VoiceInkPCM16Audio.sampleCount(
@@ -48,21 +50,39 @@ final class FluidAudioStreamingProvider: StreamingTranscriptionProvider {
         eventsContinuation = continuation
     }
 
+    #if os(macOS)
+    convenience init(
+        fluidAudioService: FluidAudioTranscriptionService,
+        config: AgreementConfig = AgreementConfig()
+    ) {
+        self.init(
+            loadModels: { modelName in
+                try await fluidAudioService.getOrLoadModels(
+                    for: FluidAudioModelManager.asrVersion(for: modelName)
+                )
+            },
+            config: config
+        )
+    }
+    #endif
+
     deinit {
         transcriptionTask?.cancel()
         immediateTranscriptionTask?.cancel()
         eventsContinuation?.finish()
     }
 
-    func connect(model: any TranscriptionModel, language: String?) async throws {
-        let version: AsrModelVersion = FluidAudioModelManager.asrVersion(for: model.name)
-        let models = try await fluidAudioService.getOrLoadModels(for: version)
+    func connect(modelName: String, language: String?) async throws {
+        let models = try await loadModels(modelName)
 
         let manager = AsrManager(config: .default)
         try await manager.loadModels(models)
         self.asrManager = manager
         self.decoderLayerCount = await manager.decoderLayerCount
-        self.languageHint = FluidAudioTranscriptionService.languageHint(from: language, model: model)
+        self.languageHint = FluidAudioModelManager.languageHint(
+            from: language,
+            for: modelName
+        )
 
         agreementEngine.reset()
         audioBuffer = []
@@ -75,7 +95,7 @@ final class FluidAudioStreamingProvider: StreamingTranscriptionProvider {
         startTranscriptionLoop()
 
         eventsContinuation?.yield(.sessionStarted)
-        logger.notice("FluidAudio agreement streaming started for \(model.displayName, privacy: .public)")
+        logger.notice("FluidAudio agreement streaming started for \(modelName, privacy: .public)")
     }
 
     func sendAudioChunk(_ data: Data) async throws {
@@ -328,3 +348,11 @@ final class FluidAudioStreamingProvider: StreamingTranscriptionProvider {
         return cachedText
     }
 }
+
+#if os(macOS)
+extension FluidAudioStreamingProvider: StreamingTranscriptionProvider {
+    func connect(model: any TranscriptionModel, language: String?) async throws {
+        try await connect(modelName: model.name, language: language)
+    }
+}
+#endif

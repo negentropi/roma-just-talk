@@ -471,6 +471,10 @@ public enum VoiceInkLanguageCatalog {
             return englishOnly
         }
 
+        if provider == .localFluidAudio {
+            return fluidAudioLanguages()
+        }
+
         guard let modelProvider = provider.transcriptionModelProvider else {
             return all
         }

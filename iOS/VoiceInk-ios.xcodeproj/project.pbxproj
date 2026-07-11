@@ -13,6 +13,11 @@
 		B10000062FA0000000000001 /* VoiceInkCore in Frameworks */ = {isa = PBXBuildFile; productRef = B10000032FA0000000000001 /* VoiceInkCore */; };
 		B20000012FB0000000000001 /* LLMkit in Frameworks */ = {isa = PBXBuildFile; productRef = B20000032FB0000000000001 /* LLMkit */; };
 		B20000042FB0000000000001 /* LLMkit in Frameworks */ = {isa = PBXBuildFile; productRef = B20000032FB0000000000001 /* LLMkit */; };
+		B30000012FC0000000000001 /* FluidAudio in Frameworks */ = {isa = PBXBuildFile; productRef = B30000032FC0000000000001 /* FluidAudio */; };
+		B30000042FC0000000000001 /* FluidAudio in Frameworks */ = {isa = PBXBuildFile; productRef = B30000032FC0000000000001 /* FluidAudio */; };
+		B30000062FC0000000000001 /* FluidAudioModelManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30000052FC0000000000001 /* FluidAudioModelManager.swift */; };
+		B30000082FC0000000000001 /* FluidAudioStreamingProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30000072FC0000000000001 /* FluidAudioStreamingProvider.swift */; };
+		B30000102FC0000000000001 /* FluidAudioWordTimingAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30000092FC0000000000001 /* FluidAudioWordTimingAdapter.swift */; };
 		E14E276F2E5F5B5D00143372 /* whisper.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = E14E276E2E5F5B5D00143372 /* whisper.xcframework */; };
 		E14E27702E5F5B5D00143372 /* whisper.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E14E276E2E5F5B5D00143372 /* whisper.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E18B9A542E600F9F0068773A /* VoiceInkKeyboard.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E18B9A4D2E600F9F0068773A /* VoiceInkKeyboard.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -69,6 +74,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		B30000052FC0000000000001 /* FluidAudioModelManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../VoiceInk/Transcription/FluidAudio/FluidAudioModelManager.swift; sourceTree = SOURCE_ROOT; };
+		B30000072FC0000000000001 /* FluidAudioStreamingProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../VoiceInk/Transcription/Streaming/FluidAudioStreamingProvider.swift; sourceTree = SOURCE_ROOT; };
+		B30000092FC0000000000001 /* FluidAudioWordTimingAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../VoiceInk/Transcription/Streaming/FluidAudioWordTimingAdapter.swift; sourceTree = SOURCE_ROOT; };
 		E14E276E2E5F5B5D00143372 /* whisper.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = whisper.xcframework; path = "$(HOME)/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework"; sourceTree = "<group>"; };
 		E168DF072E4B464B00F133D2 /* roma just talk.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "roma just talk.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E168DF182E4B464C00F133D2 /* VoiceInk-iosTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "VoiceInk-iosTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -133,6 +141,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E14E276F2E5F5B5D00143372 /* whisper.xcframework in Frameworks */,
+				B30000012FC0000000000001 /* FluidAudio in Frameworks */,
 				B20000012FB0000000000001 /* LLMkit in Frameworks */,
 				B10000012FA0000000000001 /* VoiceInkCore in Frameworks */,
 			);
@@ -142,6 +151,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B30000042FC0000000000001 /* FluidAudio in Frameworks */,
 				B20000042FB0000000000001 /* LLMkit in Frameworks */,
 				B10000052FA0000000000001 /* VoiceInkCore in Frameworks */,
 			);
@@ -178,6 +188,9 @@
 		E168DEFE2E4B464B00F133D2 = {
 			isa = PBXGroup;
 			children = (
+				B30000052FC0000000000001 /* FluidAudioModelManager.swift */,
+				B30000072FC0000000000001 /* FluidAudioStreamingProvider.swift */,
+				B30000092FC0000000000001 /* FluidAudioWordTimingAdapter.swift */,
 				E168DF092E4B464B00F133D2 /* VoiceInk-ios */,
 				B10000102FA0000000000001 /* Shared */,
 				E168DF1B2E4B464C00F133D2 /* VoiceInk-iosTests */,
@@ -225,6 +238,7 @@
 			packageProductDependencies = (
 				B10000032FA0000000000001 /* VoiceInkCore */,
 				B20000032FB0000000000001 /* LLMkit */,
+				B30000032FC0000000000001 /* FluidAudio */,
 			);
 			productName = "roma just talk";
 			productReference = E168DF072E4B464B00F133D2 /* roma just talk.app */;
@@ -250,6 +264,7 @@
 			packageProductDependencies = (
 				B10000032FA0000000000001 /* VoiceInkCore */,
 				B20000032FB0000000000001 /* LLMkit */,
+				B30000032FC0000000000001 /* FluidAudio */,
 			);
 			productName = "VoiceInk-iosTests";
 			productReference = E168DF182E4B464C00F133D2 /* VoiceInk-iosTests.xctest */;
@@ -342,6 +357,7 @@
 			packageReferences = (
 				E18B9A5E2E600FFB0068773A /* XCRemoteSwiftPackageReference "KeyboardKit" */,
 				B20000022FB0000000000001 /* XCRemoteSwiftPackageReference "LLMkit" */,
+				B30000022FC0000000000001 /* XCRemoteSwiftPackageReference "FluidAudio" */,
 				B10000022FA0000000000001 /* XCLocalSwiftPackageReference "VoiceInkCore" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -393,6 +409,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B30000062FC0000000000001 /* FluidAudioModelManager.swift in Sources */,
+				B30000082FC0000000000001 /* FluidAudioStreamingProvider.swift in Sources */,
+				B30000102FC0000000000001 /* FluidAudioWordTimingAdapter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -826,6 +845,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		B30000022FC0000000000001 /* XCRemoteSwiftPackageReference "FluidAudio" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/FluidInference/FluidAudio.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		B20000022FB0000000000001 /* XCRemoteSwiftPackageReference "LLMkit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Beingpax/LLMkit.git";
@@ -852,6 +879,11 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		B30000032FC0000000000001 /* FluidAudio */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B30000022FC0000000000001 /* XCRemoteSwiftPackageReference "FluidAudio" */;
+			productName = FluidAudio;
+		};
 		B20000032FB0000000000001 /* LLMkit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = B20000022FB0000000000001 /* XCRemoteSwiftPackageReference "LLMkit" */;

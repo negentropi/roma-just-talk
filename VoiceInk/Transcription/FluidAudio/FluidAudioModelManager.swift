@@ -1,6 +1,9 @@
 import Foundation
+import Combine
 import FluidAudio
+#if os(macOS)
 import AppKit
+#endif
 import os
 import VoiceInkCore
 
@@ -76,6 +79,8 @@ struct FluidAudioModelDownloadClient {
 
 @MainActor
 class FluidAudioModelManager: ObservableObject {
+    static let shared = FluidAudioModelManager()
+
     private struct ActiveDownload {
         let id: UUID
         let task: Task<Void, Never>
@@ -130,27 +135,40 @@ class FluidAudioModelManager: ObservableObject {
         return client.modelsExist(FluidAudioModelManager.asrVersion(for: modelName))
     }
 
+    func isFluidAudioModelDownloading(named modelName: String) -> Bool {
+        activeDownloads[modelName] != nil
+    }
+
+    func downloadStatus(forModelNamed modelName: String) -> VoiceInkFluidAudioDownloadStatus? {
+        downloadStatuses[modelName]
+    }
+
+    func downloadIssue(forModelNamed modelName: String) -> FluidAudioModelDownloadIssue? {
+        downloadIssues[modelName]
+    }
+
+    #if os(macOS)
     func isFluidAudioModelDownloaded(_ model: FluidAudioModel) -> Bool {
         isFluidAudioModelDownloaded(named: model.name)
     }
 
     func isFluidAudioModelDownloading(_ model: FluidAudioModel) -> Bool {
-        activeDownloads[model.name] != nil
+        isFluidAudioModelDownloading(named: model.name)
     }
 
     func downloadStatus(for model: FluidAudioModel) -> VoiceInkFluidAudioDownloadStatus? {
-        downloadStatuses[model.name]
+        downloadStatus(forModelNamed: model.name)
     }
 
     func downloadIssue(for model: FluidAudioModel) -> FluidAudioModelDownloadIssue? {
-        downloadIssues[model.name]
+        downloadIssue(forModelNamed: model.name)
     }
+    #endif
 
     // MARK: - Download
 
-    func downloadFluidAudioModel(_ model: FluidAudioModel) async {
-        let modelName = model.name
-        if isFluidAudioModelDownloaded(model) {
+    func downloadFluidAudioModel(named modelName: String) async {
+        if isFluidAudioModelDownloaded(named: modelName) {
             logger.notice("FluidAudio download skipped; model already downloaded: \(modelName, privacy: .public)")
             clearDownloadPresentation(for: modelName)
             onModelsChanged?()
@@ -163,17 +181,28 @@ class FluidAudioModelManager: ObservableObject {
             return
         }
 
-        await startDownload(model, force: false)
+        await startDownload(modelName: modelName, force: false)
     }
 
-    func cancelFluidAudioModelDownload(_ model: FluidAudioModel) {
-        guard let activeDownload = activeDownloads[model.name] else { return }
-        logger.notice("FluidAudio download cancellation requested: \(model.name, privacy: .public)")
+    #if os(macOS)
+    func downloadFluidAudioModel(_ model: FluidAudioModel) async {
+        await downloadFluidAudioModel(named: model.name)
+    }
+    #endif
+
+    func cancelFluidAudioModelDownload(named modelName: String) {
+        guard let activeDownload = activeDownloads[modelName] else { return }
+        logger.notice("FluidAudio download cancellation requested: \(modelName, privacy: .public)")
         activeDownload.task.cancel()
     }
 
-    func retryFluidAudioModelDownload(_ model: FluidAudioModel) async {
-        let modelName = model.name
+    #if os(macOS)
+    func cancelFluidAudioModelDownload(_ model: FluidAudioModel) {
+        cancelFluidAudioModelDownload(named: model.name)
+    }
+    #endif
+
+    func retryFluidAudioModelDownload(named modelName: String) async {
         if let activeDownload = activeDownloads[modelName] {
             logger.notice("FluidAudio download retry cancelling existing task: \(modelName, privacy: .public)")
             activeDownload.task.cancel()
@@ -197,8 +226,14 @@ class FluidAudioModelManager: ObservableObject {
             }
         }
 
-        await startDownload(model, force: cacheExists)
+        await startDownload(modelName: modelName, force: cacheExists)
     }
+
+    #if os(macOS)
+    func retryFluidAudioModelDownload(_ model: FluidAudioModel) async {
+        await retryFluidAudioModelDownload(named: model.name)
+    }
+    #endif
 
     func checkForStalledDownloads(at date: Date? = nil) {
         let checkDate = date ?? now()
@@ -216,8 +251,7 @@ class FluidAudioModelManager: ObservableObject {
         }
     }
 
-    private func startDownload(_ model: FluidAudioModel, force: Bool) async {
-        let modelName = model.name
+    private func startDownload(modelName: String, force: Bool) async {
         let downloadID = UUID()
         let startedAt = now()
         logger.notice(
@@ -236,15 +270,14 @@ class FluidAudioModelManager: ObservableObject {
 
         let task = Task { @MainActor [weak self] in
             guard let self else { return }
-            await self.runDownload(model, downloadID: downloadID, force: force)
+            await self.runDownload(modelName: modelName, downloadID: downloadID, force: force)
         }
         activeDownloads[modelName] = ActiveDownload(id: downloadID, task: task)
         startWatchdog(for: modelName, downloadID: downloadID)
         await task.value
     }
 
-    private func runDownload(_ model: FluidAudioModel, downloadID: UUID, force: Bool) async {
-        let modelName = model.name
+    private func runDownload(modelName: String, downloadID: UUID, force: Bool) async {
         let version = FluidAudioModelManager.asrVersion(for: modelName)
         let reportProgress: FluidAudioModelDownloadClient.ProgressHandler = { [weak self] status in
             Task { @MainActor [weak self] in
@@ -323,8 +356,8 @@ class FluidAudioModelManager: ObservableObject {
 
     // MARK: - Delete
 
-    func deleteFluidAudioModel(_ model: FluidAudioModel) {
-        let cacheDirectory = cacheDirectory(for: model)
+    func deleteFluidAudioModel(named modelName: String) {
+        let cacheDirectory = cacheDirectory(forModelNamed: modelName)
 
         do {
             if FileManager.default.fileExists(atPath: cacheDirectory.path) {
@@ -332,28 +365,40 @@ class FluidAudioModelManager: ObservableObject {
             }
         } catch {
             logger.error(
-                "FluidAudio model deletion failed for \(model.name, privacy: .public): \(error.localizedDescription, privacy: .public)"
+                "FluidAudio model deletion failed for \(modelName, privacy: .public): \(error.localizedDescription, privacy: .public)"
             )
         }
 
-        clearDownloadPresentation(for: model.name)
-        onModelDeleted?(model.name)
+        clearDownloadPresentation(for: modelName)
+        onModelDeleted?(modelName)
     }
+
+    #if os(macOS)
+    func deleteFluidAudioModel(_ model: FluidAudioModel) {
+        deleteFluidAudioModel(named: model.name)
+    }
+    #endif
 
     // MARK: - Finder
 
+    #if os(macOS)
     func showFluidAudioModelInFinder(_ model: FluidAudioModel) {
-        let cacheDirectory = cacheDirectory(for: model)
+        showFluidAudioModelInFinder(named: model.name)
+    }
+
+    func showFluidAudioModelInFinder(named modelName: String) {
+        let cacheDirectory = cacheDirectory(forModelNamed: modelName)
 
         if FileManager.default.fileExists(atPath: cacheDirectory.path) {
             NSWorkspace.shared.selectFile(cacheDirectory.path, inFileViewerRootedAtPath: "")
         }
     }
+    #endif
 
     // MARK: - Private helpers
 
-    private func cacheDirectory(for model: FluidAudioModel) -> URL {
-        cacheDirectory(for: FluidAudioModelManager.asrVersion(for: model.name))
+    private func cacheDirectory(forModelNamed modelName: String) -> URL {
+        cacheDirectory(for: FluidAudioModelManager.asrVersion(for: modelName))
     }
 
     private func cacheDirectory(for version: AsrModelVersion) -> URL {

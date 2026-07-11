@@ -101,8 +101,11 @@ class FluidAudioTranscriptionService: TranscriptionService {
         let isVADEnabled = VoiceInkVADPreference.isEnabled()
 
         var speechAudio = audioSamples
-        if durationSeconds >= 20.0, isVADEnabled {
-            let vadConfig = VadConfig(defaultThreshold: 0.7)
+        if durationSeconds >= VoiceInkFluidAudioTranscriptionPolicy.batchVADMinimumDurationSeconds,
+           isVADEnabled {
+            let vadConfig = VadConfig(
+                defaultThreshold: VoiceInkFluidAudioTranscriptionPolicy.batchVADThreshold
+            )
             if vadManager == nil {
                 do {
                     vadManager = try await VadManager(config: vadConfig)

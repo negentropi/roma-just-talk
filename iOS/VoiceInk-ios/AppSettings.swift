@@ -8,6 +8,7 @@ final class AppSettings: ObservableObject {
     static let shared = AppSettings()
 
     private var localModelAvailabilityCancellable: AnyCancellable?
+    private var fluidAudioAvailabilityCancellable: AnyCancellable?
 
     // Modes system
     @Published var modes: [Mode] {
@@ -70,6 +71,7 @@ final class AppSettings: ObservableObject {
         self.selectedTranscriptionLanguage = startupState.selectedTranscriptionLanguage
 
         observeLocalModelAvailability()
+        observeFluidAudioModelAvailability()
         repairLocalWhisperModelSelections()
         repairSelectedTranscriptionLanguage()
     }
@@ -82,6 +84,9 @@ final class AppSettings: ObservableObject {
         VoiceInkProviderAccessSnapshot(
             apiKeyState: apiKeyState,
             localWhisperModelAvailable: LocalModelManager.shared.managementSnapshot.hasAvailableModel(),
+            localFluidAudioModelAvailable: VoiceInkTranscriptionModelCatalog.fluidAudioModels.contains {
+                FluidAudioModelManager.shared.isFluidAudioModelDownloaded(named: $0.name)
+            },
             nativeAppleSpeechAvailable: {
                 if #available(iOS 26.0, *) {
                     return true
@@ -100,6 +105,29 @@ final class AppSettings: ObservableObject {
                     self?.objectWillChange.send()
                 }
             }
+    }
+
+    private func observeFluidAudioModelAvailability() {
+        FluidAudioModelManager.shared.onModelDeleted = { [weak self] _ in
+            self?.repairUnavailableProviders()
+        }
+        fluidAudioAvailabilityCancellable = FluidAudioModelManager.shared.objectWillChange
+            .sink { [weak self] _ in
+                Task { @MainActor in
+                    self?.objectWillChange.send()
+                }
+            }
+    }
+
+    private func repairUnavailableProviders() {
+        let availability = providerAccess.modeFormProviderAvailability
+        var repairedModes = modes
+        for index in repairedModes.indices {
+            repairedModes[index].repairProviderSelection(
+                providerAvailability: availability
+            )
+        }
+        modes = repairedModes
     }
 
     private func repairLocalWhisperModelSelections() {
@@ -236,6 +264,9 @@ final class AppSettings: ObservableObject {
             },
             localWhisperServiceFactory: {
                 WhisperTranscriptionService()
+            },
+            localFluidAudioServiceFactory: {
+                IOSFluidAudioTranscriptionService()
             },
             nativeAppleServiceFactory: {
                 IOSNativeAppleTranscriptionService()

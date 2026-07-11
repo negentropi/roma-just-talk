@@ -236,7 +236,9 @@ final class RecordingManager: ObservableObject {
                 return try await VoiceInkStreamingFallbackPolicy.run(
                     streamingFailed: false,
                     streaming: {
-                        let finalText = try await service.stopAndGetFinalText()
+                        let finalText = try await service.stopAndGetFinalText(
+                            timeoutNanoseconds: request.finalCommitTimeoutNanoseconds
+                        )
                         return await settings.finalizeStreamingTranscript(
                             finalText,
                             for: note,

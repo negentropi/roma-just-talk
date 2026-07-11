@@ -116,20 +116,26 @@ public struct VoiceInkCloudTranscriptionAudioFile: Equatable, Sendable {
 public struct VoiceInkAudioTranscriptionServiceFactory {
     public typealias RemoteServiceFactory = (VoiceInkProviderKind) -> any VoiceInkAudioTranscriptionService
     public typealias LocalWhisperServiceFactory = () -> any VoiceInkAudioTranscriptionService
+    public typealias LocalFluidAudioServiceFactory = () -> any VoiceInkAudioTranscriptionService
     public typealias NativeAppleServiceFactory = () -> any VoiceInkAudioTranscriptionService
 
     private let remoteServiceFactory: RemoteServiceFactory
     private let localWhisperServiceFactory: LocalWhisperServiceFactory
+    private let localFluidAudioServiceFactory: LocalFluidAudioServiceFactory
     private let nativeAppleServiceFactory: NativeAppleServiceFactory
 
     public init(
         localWhisperServiceFactory: @escaping LocalWhisperServiceFactory,
+        localFluidAudioServiceFactory: @escaping LocalFluidAudioServiceFactory = {
+            VoiceInkUnsupportedAudioTranscriptionService()
+        },
         nativeAppleServiceFactory: @escaping NativeAppleServiceFactory = {
             VoiceInkUnsupportedAudioTranscriptionService()
         },
         remoteServiceFactory: @escaping RemoteServiceFactory = { VoiceInkRemoteTranscriptionService(provider: $0) }
     ) {
         self.localWhisperServiceFactory = localWhisperServiceFactory
+        self.localFluidAudioServiceFactory = localFluidAudioServiceFactory
         self.nativeAppleServiceFactory = nativeAppleServiceFactory
         self.remoteServiceFactory = remoteServiceFactory
     }
@@ -140,6 +146,8 @@ public struct VoiceInkAudioTranscriptionServiceFactory {
             return remoteServiceFactory(provider)
         case .localWhisper:
             return localWhisperServiceFactory()
+        case .localFluidAudio:
+            return localFluidAudioServiceFactory()
         case .nativeApple:
             return nativeAppleServiceFactory()
         }
@@ -2526,7 +2534,7 @@ public struct VoiceInkRemoteTranscriptionService: VoiceInkAudioTranscriptionServ
                 timeout: 60,
                 maxRetries: 2
             )
-        case .localWhisper:
+        case .localWhisper, .localFluidAudio:
             throw URLError(.unsupportedURL)
         case .nativeApple:
             throw VoiceInkCloudTranscriptionError.unsupportedProvider

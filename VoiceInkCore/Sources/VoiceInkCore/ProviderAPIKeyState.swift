@@ -479,12 +479,14 @@ public struct VoiceInkProviderAPIKeyState: Equatable, Sendable {
     public func isReady(
         for provider: VoiceInkProviderKind,
         localWhisperModelAvailable: Bool,
+        localFluidAudioModelAvailable: Bool = false,
         nativeAppleSpeechAvailable: Bool = false
     ) -> Bool {
         provider.isReady(
             userAPIKey: runtimeAPIKey(for: provider) ?? "",
             userAPIKeyVerified: verifiedProviders.contains(provider),
             localWhisperModelAvailable: localWhisperModelAvailable,
+            localFluidAudioModelAvailable: localFluidAudioModelAvailable,
             nativeAppleSpeechAvailable: nativeAppleSpeechAvailable
         )
     }
@@ -492,12 +494,14 @@ public struct VoiceInkProviderAPIKeyState: Equatable, Sendable {
     public func availableProviders(
         for use: VoiceInkProviderModelUse,
         localWhisperModelAvailable: Bool,
+        localFluidAudioModelAvailable: Bool = false,
         nativeAppleSpeechAvailable: Bool = false
     ) -> [VoiceInkProviderKind] {
         VoiceInkProviderKind.availableProviders(for: use) { provider in
             isReady(
                 for: provider,
                 localWhisperModelAvailable: localWhisperModelAvailable,
+                localFluidAudioModelAvailable: localFluidAudioModelAvailable,
                 nativeAppleSpeechAvailable: nativeAppleSpeechAvailable
             )
         }
@@ -642,15 +646,18 @@ public extension VoiceInkProviderAPIKeyState {
 public struct VoiceInkProviderAccessSnapshot: Equatable, Sendable {
     public let apiKeyState: VoiceInkProviderAPIKeyState
     public let localWhisperModelAvailable: Bool
+    public let localFluidAudioModelAvailable: Bool
     public let nativeAppleSpeechAvailable: Bool
 
     public init(
         apiKeyState: VoiceInkProviderAPIKeyState,
         localWhisperModelAvailable: Bool,
+        localFluidAudioModelAvailable: Bool = false,
         nativeAppleSpeechAvailable: Bool = false
     ) {
         self.apiKeyState = apiKeyState
         self.localWhisperModelAvailable = localWhisperModelAvailable
+        self.localFluidAudioModelAvailable = localFluidAudioModelAvailable
         self.nativeAppleSpeechAvailable = nativeAppleSpeechAvailable
     }
 
@@ -658,6 +665,7 @@ public struct VoiceInkProviderAccessSnapshot: Equatable, Sendable {
         apiKeyState.isReady(
             for: provider,
             localWhisperModelAvailable: localWhisperModelAvailable,
+            localFluidAudioModelAvailable: localFluidAudioModelAvailable,
             nativeAppleSpeechAvailable: nativeAppleSpeechAvailable
         )
     }
@@ -670,6 +678,7 @@ public struct VoiceInkProviderAccessSnapshot: Equatable, Sendable {
         apiKeyState.availableProviders(
             for: use,
             localWhisperModelAvailable: localWhisperModelAvailable,
+            localFluidAudioModelAvailable: localFluidAudioModelAvailable,
             nativeAppleSpeechAvailable: nativeAppleSpeechAvailable
         )
     }

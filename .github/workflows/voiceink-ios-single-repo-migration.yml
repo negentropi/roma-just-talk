@@ -93,4 +93,5 @@ jobs:
             -only-testing:VoiceInk-iosTests/IOSMicrophonePermissionTests \
             -only-testing:VoiceInk-iosTests/IOSNativeAppleTranscriptionTests \
             -only-testing:VoiceInk-iosTests/IOSRecordingAppIntentTests \
-            -only-testing:VoiceInk-iosTests/IOSAnnouncementsStoreTests
+            -only-testing:VoiceInk-iosTests/IOSAnnouncementsStoreTests \
+            -only-testing:VoiceInk-iosTests/IOSFluidAudioTests

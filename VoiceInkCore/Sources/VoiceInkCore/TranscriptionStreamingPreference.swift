@@ -66,12 +66,30 @@ public struct VoiceInkLiveTranscriptionRequest: Equatable, Sendable {
         self.selectedModel = selectedModel
         self.connectionModel = connectionModel
     }
+
+    public var finalCommitTimeoutNanoseconds: UInt64 {
+        VoiceInkStreamingFinalCommitTimeout.nanoseconds(
+            for: provider == .localFluidAudio ? .localFluidAudio : .cloud
+        )
+    }
 }
 
 public enum VoiceInkLiveTranscriptionPolicy {
     public static func capability(
         for configuration: VoiceInkModeRuntimeConfiguration
     ) -> VoiceInkLiveTranscriptionRequest? {
+        if configuration.transcriptionProvider == .localFluidAudio,
+           let model = VoiceInkTranscriptionModelCatalog.fluidAudioModels.first(where: {
+               $0.name == configuration.transcriptionModel
+           }),
+           model.supportsStreaming {
+            return VoiceInkLiveTranscriptionRequest(
+                provider: .localFluidAudio,
+                selectedModel: model.name,
+                connectionModel: model.name
+            )
+        }
+
         guard let modelProvider = configuration.transcriptionProvider.transcriptionModelProvider,
               modelProvider != .local,
               let model = VoiceInkTranscriptionModelCatalog.cloudModels(for: modelProvider)
@@ -448,6 +466,8 @@ public final class WordAgreementEngine {
 }
 
 public enum VoiceInkFluidAudioTranscriptionPolicy {
+    public static let batchVADMinimumDurationSeconds: TimeInterval = 20
+    public static let batchVADThreshold: Float = 0.7
     public static let trailingSilenceSeconds: Double = 1
     public static let maxSingleChunkSamples = 240_000
 

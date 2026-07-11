@@ -13,6 +13,7 @@ import UniformTypeIdentifiers
 
 struct LocalModelManagementView: View {
     @StateObject private var modelManager = LocalModelManager.shared
+    @StateObject private var fluidAudioModelManager = FluidAudioModelManager.shared
     @State private var showingModelImporter = false
     
     var body: some View {
@@ -36,6 +37,10 @@ struct LocalModelManagementView: View {
             ForEach(modelManager.managementSnapshot.managementRows()) { row in
                 ModelRowView(row: row, modelManager: modelManager)
             }
+
+            IOSFluidAudioModelManagementSection(
+                modelManager: fluidAudioModelManager
+            )
         }
         .navigationTitle(VoiceInkModelManagementFilter.local.settingsSectionTitle)
         .navigationBarTitleDisplayMode(.inline)

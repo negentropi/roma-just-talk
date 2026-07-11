@@ -34,6 +34,7 @@ final class IOSModelPrewarmService: ObservableObject {
             Task { @MainActor in
                 self?.cancelPrewarm()
                 await self?.modelManager.releaseRetainedContext()
+                await IOSFluidAudioRuntime.shared.release()
             }
         }
         .store(in: &cancellables)
@@ -72,13 +73,23 @@ final class IOSModelPrewarmService: ObservableObject {
         let configuration = settings.currentTranscriptionRunSettings().configuration
         let modelName = configuration.transcriptionModel
         let isLocalWhisper = configuration.transcriptionProvider == .localWhisper
-        let hasModel = isLocalWhisper && modelManager.managementSnapshot.modelPath(
-            forRuntimeModelName: modelName
-        ) != nil
+        let isLocalFluidAudio = configuration.transcriptionProvider == .localFluidAudio
+        let hasModel: Bool
+        if isLocalWhisper {
+            hasModel = modelManager.managementSnapshot.modelPath(
+                forRuntimeModelName: modelName
+            ) != nil
+        } else if isLocalFluidAudio {
+            hasModel = FluidAudioModelManager.shared.isFluidAudioModelDownloaded(
+                named: modelName
+            )
+        } else {
+            hasModel = true
+        }
         let plan = VoiceInkModelPrewarmPlan.plan(
             isEnabled: VoiceInkModelRuntimePreference.shouldPrewarmModelOnWake(),
-            hasCurrentModel: isLocalWhisper ? hasModel : true,
-            shouldPrewarmModel: isLocalWhisper,
+            hasCurrentModel: hasModel,
+            shouldPrewarmModel: isLocalWhisper || isLocalFluidAudio,
             hasSampleAudio: true
         )
 
@@ -92,9 +103,13 @@ final class IOSModelPrewarmService: ObservableObject {
         logger.notice("\(VoiceInkModelPrewarmDiagnostics.prewarmingMessage(modelDisplayName: modelName), privacy: .public)")
         let startedAt = Date()
         do {
-            try await modelManager.prewarmContext(
-                forRuntimeModelName: modelName
-            )
+            if isLocalFluidAudio {
+                try await IOSFluidAudioRuntime.shared.prewarm(modelName: modelName)
+            } else {
+                try await modelManager.prewarmContext(
+                    forRuntimeModelName: modelName
+                )
+            }
             logger.notice("\(VoiceInkModelPrewarmDiagnostics.completedMessage(duration: Date().timeIntervalSince(startedAt)), privacy: .public)")
         } catch is CancellationError {
         } catch {

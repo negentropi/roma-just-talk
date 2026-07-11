@@ -1,4 +1,5 @@
 import Combine
+import FluidAudio
 import Foundation
 import LLMkit
 import VoiceInkCore
@@ -63,6 +64,61 @@ enum VoiceInkIOSStreamingError: LocalizedError {
     }
 }
 
+private struct VoiceInkIOSStreamingClient {
+    let events: AsyncStream<VoiceInkStreamingTranscriptionEvent>
+    let connect: (_ apiKey: String, _ model: String, _ language: String?, _ customVocabulary: [String]) async throws -> Void
+    let sendAudioChunk: (Data) async throws -> Void
+    let commit: () async throws -> Void
+    let disconnect: () async -> Void
+    let cancelEvents: () -> Void
+
+    init(remote client: any LLMkit.StreamingTranscriptionProvider) {
+        var eventTask: Task<Void, Never>?
+        events = AsyncStream { continuation in
+            eventTask = Task {
+                for await event in client.transcriptionEvents {
+                    switch event {
+                    case .sessionStarted:
+                        continuation.yield(.sessionStarted)
+                    case .partial(let text):
+                        continuation.yield(.partial(text: text))
+                    case .committed(let text):
+                        continuation.yield(.committed(text: text))
+                    case .error(let message):
+                        continuation.yield(.error(
+                            VoiceInkStreamingTranscriptionError.serverError(message)
+                        ))
+                    }
+                }
+                continuation.finish()
+            }
+        }
+        connect = { apiKey, model, language, customVocabulary in
+            try await client.connect(
+                apiKey: apiKey,
+                model: model,
+                language: language,
+                customVocabulary: customVocabulary
+            )
+        }
+        sendAudioChunk = { try await client.sendAudioChunk($0) }
+        commit = { try await client.commit() }
+        disconnect = { await client.disconnect() }
+        cancelEvents = { eventTask?.cancel() }
+    }
+
+    init(fluidAudio client: FluidAudioStreamingProvider) {
+        events = client.transcriptionEvents
+        connect = { _, model, language, _ in
+            try await client.connect(modelName: model, language: language)
+        }
+        sendAudioChunk = { try await client.sendAudioChunk($0) }
+        commit = { try await client.commit() }
+        disconnect = { await client.disconnect() }
+        cancelEvents = { }
+    }
+}
+
 @MainActor
 final class IOSStreamingTranscriptionService: ObservableObject {
     typealias ClientFactory = @MainActor (VoiceInkProviderKind) throws -> any LLMkit.StreamingTranscriptionProvider
@@ -71,7 +127,7 @@ final class IOSStreamingTranscriptionService: ObservableObject {
 
     private let clientFactory: ClientFactory
     private nonisolated let chunkRelay = VoiceInkIOSAudioChunkRelay()
-    private var client: (any LLMkit.StreamingTranscriptionProvider)?
+    private var client: VoiceInkIOSStreamingClient?
     private var chunkSource: VoiceInkIOSAudioChunkSource?
     private var sendTask: Task<Void, Never>?
     private var eventTask: Task<Void, Never>?
@@ -91,7 +147,7 @@ final class IOSStreamingTranscriptionService: ObservableObject {
         customVocabulary: [String]
     ) async throws {
         cancel()
-        let client = try clientFactory(request.provider)
+        let client = try makeStreamingClient(request: request)
         let source = VoiceInkIOSAudioChunkSource()
         self.client = client
         self.chunkSource = source
@@ -101,13 +157,13 @@ final class IOSStreamingTranscriptionService: ObservableObject {
         partialTranscript = ""
         isCommitting = false
 
-        startEventConsumer(client.transcriptionEvents)
+        startEventConsumer(client.events)
         do {
             try await client.connect(
-                apiKey: apiKey,
-                model: request.connectionModel,
-                language: VoiceInkTranscriptionLanguageSupport.requestLanguage(language),
-                customVocabulary: customVocabulary
+                apiKey,
+                request.connectionModel,
+                VoiceInkTranscriptionLanguageSupport.requestLanguage(language),
+                customVocabulary
             )
         } catch {
             cancel()
@@ -190,13 +246,14 @@ final class IOSStreamingTranscriptionService: ObservableObject {
         partialTranscript = ""
         isCommitting = false
 
+        client?.cancelEvents()
         Task {
             await client?.disconnect()
         }
     }
 
     private func startEventConsumer(
-        _ events: AsyncStream<LLMkit.StreamingTranscriptionEvent>
+        _ events: AsyncStream<VoiceInkStreamingTranscriptionEvent>
     ) {
         eventTask = Task { [weak self] in
             for await event in events {
@@ -214,10 +271,8 @@ final class IOSStreamingTranscriptionService: ObservableObject {
                     if isCommitting {
                         commitSignal?.yield()
                     }
-                case .error(let message):
-                    recordTerminalError(
-                        VoiceInkStreamingTranscriptionError.serverError(message)
-                    )
+                case .error(let error):
+                    recordTerminalError(error)
                 }
             }
         }
@@ -261,7 +316,26 @@ final class IOSStreamingTranscriptionService: ObservableObject {
         commitSignal?.finish()
         commitSignal = nil
         isCommitting = false
+        client?.cancelEvents()
         await client?.disconnect()
+    }
+
+    private func makeStreamingClient(
+        request: VoiceInkLiveTranscriptionRequest
+    ) throws -> VoiceInkIOSStreamingClient {
+        if request.provider == .localFluidAudio {
+            let provider = FluidAudioStreamingProvider(loadModels: { modelName in
+                let version = FluidAudioModelManager.asrVersion(for: modelName)
+                let directory = AsrModels.defaultCacheDirectory(for: version)
+                guard AsrModels.modelsExist(at: directory, version: version) else {
+                    throw IOSFluidAudioTranscriptionError.modelNotDownloaded
+                }
+                return try await AsrModels.load(from: directory, version: version)
+            })
+            return VoiceInkIOSStreamingClient(fluidAudio: provider)
+        }
+
+        return VoiceInkIOSStreamingClient(remote: try clientFactory(request.provider))
     }
 
     static func makeClient(
@@ -282,7 +356,7 @@ final class IOSStreamingTranscriptionService: ObservableObject {
             return LLMkit.SpeechmaticsStreamingClient()
         case .xai:
             return LLMkit.XAIStreamingClient()
-        case .groq, .openAI, .cerebras, .gemini, .localWhisper, .nativeApple, .voiceInk:
+        case .groq, .openAI, .cerebras, .gemini, .localWhisper, .localFluidAudio, .nativeApple, .voiceInk:
             throw VoiceInkIOSStreamingError.unsupportedProvider(provider)
         }
     }

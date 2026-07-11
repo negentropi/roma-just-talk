@@ -313,20 +313,181 @@ async function loadChangelog() {
 }
 
 function initFeatureTabs() {
+  const shell = document.querySelector(".features-shell");
   const bar = document.querySelector(".feature-tabs");
   const scroller = document.querySelector(".feature-tabs-scroll") || bar;
   const tabs = Array.from(document.querySelectorAll(".feature-tab"));
-  if (!bar || !tabs.length) return;
+  if (!shell || !bar || !tabs.length) return;
 
   const panels = tabs
     .map((tab) => document.querySelector(tab.getAttribute("href")))
     .filter(Boolean);
+  const clamp = (value, minimum, maximum) => Math.min(maximum, Math.max(minimum, value));
+  const smoothstep = (value) => value * value * (3 - 2 * value);
+  const point = (value) => Number(value.toFixed(3));
+  const edgeTolerance = 1;
+  const panelTabRise = 48;
   let activeId = "";
+  let shapeTarget = null;
+
+  const roundedRectPath = ({ left, right, top, bottom, radius }) => {
+    const visibleHeight = bottom - top;
+    if (visibleHeight <= 1 || right - left <= 1) return "";
+
+    const r = Math.min(radius, visibleHeight / 2, (right - left) / 2);
+    return [
+      `M${point(left + r)} ${point(top)}`,
+      `H${point(right - r)}`,
+      `Q${point(right)} ${point(top)} ${point(right)} ${point(top + r)}`,
+      `V${point(bottom - r)}`,
+      `Q${point(right)} ${point(bottom)} ${point(right - r)} ${point(bottom)}`,
+      `H${point(left + r)}`,
+      `Q${point(left)} ${point(bottom)} ${point(left)} ${point(bottom - r)}`,
+      `V${point(top + r)}`,
+      `Q${point(left)} ${point(top)} ${point(left + r)} ${point(top)}`,
+      "Z",
+    ].join(" ");
+  };
+
+  // The tab protrusion and panel frame are one closed path. Reducing available
+  // height tightens the same curves instead of swapping to another shape.
+  const folderPath = ({ width, bodyTop, bottom, tabLeft, tabRight, tabRise, radius, inset }) => {
+    const left = inset;
+    const right = width - inset;
+    const top = bodyTop + inset;
+    const lower = bottom - inset;
+    const visibleHeight = lower - top;
+    if (visibleHeight <= 1 || right - left <= 1) return "";
+
+    const bodyRadius = Math.min(radius, visibleHeight / 2, (right - left) / 2);
+    if (tabRise < 0.75) {
+      return roundedRectPath({ left, right, top, bottom: lower, radius: bodyRadius });
+    }
+
+    const shoulder = Math.min(12, tabRise / 2, bodyRadius);
+    const minimumTabWidth = 36;
+    const safeTabLeft = clamp(
+      tabLeft,
+      left + bodyRadius + shoulder,
+      right - bodyRadius - shoulder - minimumTabWidth,
+    );
+    const safeTabRight = clamp(tabRight, safeTabLeft + minimumTabWidth, right - bodyRadius - shoulder);
+    const tabRadius = Math.min(14, tabRise / 2, (safeTabRight - safeTabLeft) / 2);
+    const tabTop = top - tabRise;
+
+    return [
+      `M${point(left + bodyRadius)} ${point(top)}`,
+      `H${point(safeTabLeft - shoulder)}`,
+      `Q${point(safeTabLeft)} ${point(top)} ${point(safeTabLeft)} ${point(top - shoulder)}`,
+      `V${point(tabTop + tabRadius)}`,
+      `Q${point(safeTabLeft)} ${point(tabTop)} ${point(safeTabLeft + tabRadius)} ${point(tabTop)}`,
+      `H${point(safeTabRight - tabRadius)}`,
+      `Q${point(safeTabRight)} ${point(tabTop)} ${point(safeTabRight)} ${point(tabTop + tabRadius)}`,
+      `V${point(top - shoulder)}`,
+      `Q${point(safeTabRight)} ${point(top)} ${point(safeTabRight + shoulder)} ${point(top)}`,
+      `H${point(right - bodyRadius)}`,
+      `Q${point(right)} ${point(top)} ${point(right)} ${point(top + bodyRadius)}`,
+      `V${point(lower - bodyRadius)}`,
+      `Q${point(right)} ${point(lower)} ${point(right - bodyRadius)} ${point(lower)}`,
+      `H${point(left + bodyRadius)}`,
+      `Q${point(left)} ${point(lower)} ${point(left)} ${point(lower - bodyRadius)}`,
+      `V${point(top + bodyRadius)}`,
+      `Q${point(left)} ${point(top)} ${point(left + bodyRadius)} ${point(top)}`,
+      "Z",
+    ].join(" ");
+  };
+
+  const outlines = tabs
+    .map((tab) => {
+      const panel = document.querySelector(tab.getAttribute("href"));
+      if (!panel) return null;
+      const target = tab.closest(".feature-tab-group") || tab;
+      const svg = panel.querySelector(".feature-panel-outline");
+      const paths = {
+        backing: panel.querySelector("[data-panel-backing]"),
+        surface: panel.querySelector("[data-panel-surface]"),
+        stroke: panel.querySelector("[data-panel-outline]"),
+      };
+      if (!svg || Object.values(paths).some((path) => !path)) return null;
+      return { panel, target, svg, paths };
+    })
+    .filter(Boolean);
 
   const frameTop = () => {
     const rect = bar.getBoundingClientRect();
     const offset = parseFloat(getComputedStyle(bar).getPropertyValue("--frame-edge-y")) || 60;
     return rect.top + offset;
+  };
+
+  const renderOutlines = (edgeTop) => {
+    const panelOffset = parseFloat(getComputedStyle(shell).getPropertyValue("--panel-offset")) || 8;
+    const measurements = outlines.map((outline) => {
+      const panelRect = outline.panel.getBoundingClientRect();
+      const targetRect = outline.target.getBoundingClientRect();
+      const baseTabRise = panelTabRise;
+      const squeeze = clamp(edgeTop - panelRect.top, 0, panelRect.height);
+      const availableHeight = panelRect.height - squeeze;
+      const approachRatio = clamp((edgeTop + baseTabRise - panelRect.top) / baseTabRise, 0, 1);
+      const remainingRatio = clamp(availableHeight / (baseTabRise * 1.5), 0, 1);
+      const profile = smoothstep(Math.min(approachRatio, remainingRatio));
+      return { ...outline, panelRect, targetRect, baseTabRise, squeeze, profile };
+    });
+    const edgeOutline = [...measurements].reverse().find(
+      ({ panelRect, baseTabRise }) =>
+        panelRect.top <= edgeTop + baseTabRise + edgeTolerance && panelRect.bottom > edgeTop - edgeTolerance,
+    );
+
+    const edgeShapeTarget = edgeOutline && edgeOutline.profile >= 0.6 ? edgeOutline.target : null;
+    if (edgeShapeTarget !== shapeTarget) {
+      shapeTarget?.classList.remove("panel-shape-active");
+      edgeShapeTarget?.classList.add("panel-shape-active");
+      shapeTarget = edgeShapeTarget;
+    }
+    bar.classList.toggle("has-panel-edge", Boolean(edgeShapeTarget));
+
+    measurements.forEach(({ panel, target, svg, paths, panelRect, targetRect, baseTabRise, squeeze, profile }) => {
+      const width = panelRect.width;
+      const height = panelRect.height;
+      const currentTabRise = baseTabRise * profile;
+      const targetPadding = target.classList.contains("feature-tab-group") ? 0 : 4;
+      const tabLeft = targetRect.left - panelRect.left - targetPadding;
+      const tabRight = targetRect.right - panelRect.left + targetPadding;
+      const bodyTop = baseTabRise + squeeze;
+      const bottom = baseTabRise + height;
+      const radius = parseFloat(getComputedStyle(panel).borderTopLeftRadius) || 16;
+      const d = folderPath({
+        width,
+        bodyTop,
+        bottom,
+        tabLeft,
+        tabRight,
+        tabRise: currentTabRise,
+        radius,
+        inset: 1,
+      });
+
+      const viewBox = `0 0 ${width} ${height + baseTabRise}`;
+      const backingTransform = `translate(${panelOffset} ${panelOffset})`;
+      const squeezeValue = `${squeeze}px`;
+      if (svg.getAttribute("viewBox") !== viewBox) svg.setAttribute("viewBox", viewBox);
+      if (svg.hidden === Boolean(d)) svg.hidden = !d;
+      if (paths.stroke.getAttribute("d") !== d) {
+        Object.values(paths).forEach((path) => path.setAttribute("d", d));
+      }
+      if (paths.backing.getAttribute("transform") !== backingTransform) {
+        paths.backing.setAttribute("transform", backingTransform);
+      }
+
+      const tabRiseValue = `${baseTabRise}px`;
+      if (panel.style.getPropertyValue("--panel-tab-rise") !== tabRiseValue) {
+        panel.style.setProperty("--panel-tab-rise", tabRiseValue);
+      }
+      if (panel.style.getPropertyValue("--panel-squeeze") !== squeezeValue) {
+        panel.style.setProperty("--panel-squeeze", squeezeValue);
+      }
+    });
+
+    shell.classList.add("feature-outlines-ready");
   };
 
   const setActive = (id) => {
@@ -349,15 +510,13 @@ function initFeatureTabs() {
     const edgeTop = frameTop();
     let current = panels[0];
     panels.forEach((panel) => {
-      if (panel.getBoundingClientRect().top <= edgeTop) current = panel;
+      if (panel.getBoundingClientRect().top <= edgeTop + panelTabRise + edgeTolerance) current = panel;
     });
     if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) {
       current = panels[panels.length - 1];
     }
     if (current) setActive(current.id);
-    if (panels[0]) {
-      bar.classList.toggle("stuck", panels[0].getBoundingClientRect().top < edgeTop);
-    }
+    renderOutlines(edgeTop);
   };
 
   let ticking = false;
@@ -372,6 +531,12 @@ function initFeatureTabs() {
 
   window.addEventListener("scroll", requestSync, { passive: true });
   window.addEventListener("resize", requestSync, { passive: true });
+  scroller.addEventListener("scroll", requestSync, { passive: true });
+  if ("ResizeObserver" in window) {
+    const resizeObserver = new ResizeObserver(requestSync);
+    resizeObserver.observe(bar);
+    panels.forEach((panel) => resizeObserver.observe(panel));
+  }
   sync();
 }
 

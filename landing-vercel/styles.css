@@ -582,7 +582,6 @@ h1 .before-word {
   --active-accent: var(--coral);
   --frame-edge-y: 60px;
   --panel-offset: 8px;
-  --toolbar-bleed: calc(var(--panel-offset) + 2px);
   width: min(1040px, calc(100% - 40px));
   margin: 0 auto;
 }
@@ -609,29 +608,6 @@ h1 .before-word {
   top: 0;
   height: 62px;
   background: transparent;
-  transition: background-color 0.2s ease;
-}
-
-.feature-tabs::before {
-  content: "";
-  position: absolute;
-  z-index: 0;
-  inset: 0 calc(-1 * var(--toolbar-bleed));
-  background: transparent;
-  pointer-events: none;
-  transition: background-color 0.2s ease;
-}
-
-/* Keep scrolling panel content behind the controls while the panel outline
-   itself remains visible at the frame edge below. */
-.feature-tabs.stuck {
-  background: transparent;
-  -webkit-backdrop-filter: blur(16px);
-  backdrop-filter: blur(16px);
-}
-
-.feature-tabs.stuck::before {
-  background: var(--paper);
 }
 
 .feature-tabs-scroll {
@@ -694,6 +670,20 @@ h1 .before-word {
   font-weight: 800;
   padding: 8px 18px 10px;
   transform: none;
+}
+
+/* The panel-owned SVG supplies the active tab's outer edge while the panel
+   occupies the sticky frame. The original control stays in place for layout
+   and pointer handling. */
+.feature-tabs.has-panel-edge .feature-tab.panel-shape-active {
+  border-color: transparent;
+  background: transparent;
+  color: var(--ink);
+}
+
+.feature-tabs.has-panel-edge .feature-tab.panel-shape-active::before,
+.feature-tabs.has-panel-edge .feature-tab.panel-shape-active::after {
+  content: none;
 }
 
 /* concave flares where the tab base sweeps into the panel line */
@@ -805,14 +795,27 @@ h1 .before-word {
   content: none;
 }
 
+.feature-tabs.has-panel-edge .feature-tab-group.panel-shape-active {
+  border-color: transparent;
+  background: transparent;
+}
+
+.feature-tabs.has-panel-edge .feature-tab-group.panel-shape-active::before,
+.feature-tabs.has-panel-edge .feature-tab-group.panel-shape-active::after {
+  content: none;
+}
+
 .feature-flow {
   display: grid;
 }
 
 .feature-panel {
   --panel-accent: var(--coral);
+  --panel-tab-rise: 48px;
+  --panel-squeeze: 0px;
   position: relative;
   z-index: 0;
+  isolation: isolate;
   display: grid;
   min-height: clamp(420px, 72svh, 640px);
   align-content: center;
@@ -823,9 +826,20 @@ h1 .before-word {
   background:
     radial-gradient(circle at 50% 55%, var(--body-cool), transparent 34%),
     var(--tab-face);
-  padding: clamp(24px, 6vw, 64px);
+  padding: 0;
   scroll-margin-top: var(--frame-edge-y);
   text-align: center;
+}
+
+.feature-panel-content {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  overflow: hidden;
+  padding: clamp(24px, 6vw, 64px);
+  clip-path: inset(var(--panel-squeeze) 0 0);
 }
 
 .feature-panel-outline {
@@ -844,51 +858,47 @@ h1 .before-word {
   pointer-events: none;
 }
 
-@keyframes squeeze-panel-outline {
-  0% {
-    top: -2px;
-    visibility: visible;
-  }
-
-  99.999% {
-    visibility: visible;
-  }
-
-  100% {
-    top: calc(100% + 2px);
-    visibility: hidden;
-  }
+.features-shell.feature-outlines-ready .feature-panel {
+  border-color: transparent;
+  background: transparent;
 }
 
-@supports (animation-timeline: view()) and
-  (animation-range: exit-crossing 0% exit-crossing 100%) {
-  .feature-panel {
-    border-color: transparent;
-    view-timeline: --panel-outline block;
-    view-timeline-inset: var(--frame-edge-y) 0px;
-  }
+.features-shell.feature-outlines-ready .feature-panel::before {
+  display: none;
+}
 
-  .feature-panel::before {
-    display: none;
-  }
+.features-shell.feature-outlines-ready .feature-panel-outline {
+  position: absolute;
+  z-index: 0;
+  top: calc(-1 * var(--panel-tab-rise));
+  left: 0;
+  display: block;
+  width: 100%;
+  height: calc(100% + var(--panel-tab-rise));
+  overflow: visible;
+  pointer-events: none;
+}
 
-  .feature-panel-outline {
-    position: absolute;
-    z-index: 2;
-    display: block;
-    top: -2px;
-    right: -2px;
-    bottom: -2px;
-    left: -2px;
-    box-sizing: border-box;
-    border: 2px solid var(--panel-accent);
-    border-radius: inherit;
-    box-shadow: var(--panel-offset) var(--panel-offset) 0 var(--panel-accent);
-    pointer-events: none;
-    animation: squeeze-panel-outline 1ms linear both;
-    animation-timeline: --panel-outline;
-    animation-range: exit-crossing 0% exit-crossing 100%;
-  }
+.feature-panel-backing {
+  fill: var(--panel-accent);
+}
+
+.feature-panel-surface {
+  fill: var(--tab-face);
+}
+
+.feature-panel-stroke {
+  fill: none;
+  stroke: var(--panel-accent);
+  stroke-linejoin: round;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.features-shell.feature-outlines-ready .feature-panel-content {
+  position: absolute;
+  z-index: 2;
+  background: radial-gradient(circle at 50% 55%, var(--body-cool), transparent 34%);
 }
 
 #feature-shift {

@@ -77,6 +77,10 @@ jobs:
           )"
           test -n "$SIMULATOR_UDID"
           test "$SIMULATOR_UDID" != "null"
+          xcrun simctl shutdown "$SIMULATOR_UDID" || true
+          xcrun simctl erase "$SIMULATOR_UDID"
+          xcrun simctl boot "$SIMULATOR_UDID"
+          xcrun simctl bootstatus "$SIMULATOR_UDID" -b
           xcodebuild test \
             -workspace VoiceInk.xcworkspace \
             -scheme VoiceInk-ios \

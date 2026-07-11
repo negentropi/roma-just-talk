@@ -48,6 +48,15 @@ struct SettingsView: View {
                         systemImage: VoiceInkIOSKeyboardSetupPresentation.settingsRowSystemImageName
                     )
                 }
+
+                NavigationLink(destination: IOSHelpSupportView(
+                    announcementsStore: .shared
+                )) {
+                    Label(
+                        VoiceInkIOSHelpSupportPresentation.settingsRowTitle,
+                        systemImage: VoiceInkIOSHelpSupportPresentation.settingsRowSystemImageName
+                    )
+                }
             }
 
             Section(header: Text(settingsPresentation.modesSectionTitle)) {

@@ -16,9 +16,13 @@ struct VoiceInk_iosApp: App {
     @State private var launchRecordingRequestState = VoiceInkLaunchRecordingRequestState()
     @StateObject private var recordingManager = RecordingManager()
     @StateObject private var modelPrewarmService = IOSModelPrewarmService.shared
+    @StateObject private var announcementsStore = IOSAnnouncementsStore.shared
+    @AppStorage(VoiceInkAnnouncementPreference.isEnabledKey)
+    private var announcementsEnabled = VoiceInkAnnouncementPreference.defaultIsEnabled
     
     init() {
         VoiceInkDefaultSettings.iOS.registerUserDefaults()
+        UserDefaults.standard.register(defaults: VoiceInkAnnouncementPreference.registeredDefaults)
         VoiceInkStartupPreferenceMigration.migrateLegacyPreferences(for: .iOS)
 
         // Clear any stale recording state on app launch
@@ -44,8 +48,9 @@ struct VoiceInk_iosApp: App {
 
     var body: some Scene {
         WindowGroup {
-            if hasCompletedOnboarding {
-                NotesListView()
+            Group {
+                if hasCompletedOnboarding {
+                    NotesListView()
                     .environmentObject(recordingManager)
                     .onOpenURL { url in
                         handleURL(url)
@@ -55,11 +60,11 @@ struct VoiceInk_iosApp: App {
                             hasCompletedOnboarding: hasCompletedOnboarding
                         ).applyRuntimeState(startRecordingAfterLaunchDelay: startRecordingAfterLaunchDelay)
                     }
-            } else {
-                OnboardingView(
-                    isOnboardingComplete: $hasCompletedOnboarding,
-                    recordingManager: recordingManager
-                )
+                } else {
+                    OnboardingView(
+                        isOnboardingComplete: $hasCompletedOnboarding,
+                        recordingManager: recordingManager
+                    )
                     .onOpenURL { url in
                         handleURL(url)
                     }
@@ -70,6 +75,26 @@ struct VoiceInk_iosApp: App {
                             ).applyRuntimeState(startRecordingAfterLaunchDelay: startRecordingAfterLaunchDelay)
                         }
                     }
+                }
+            }
+            .overlay(alignment: .top) {
+                if hasCompletedOnboarding,
+                   let announcement = announcementsStore.currentAnnouncement {
+                    IOSAnnouncementBannerView(
+                        presentation: announcement,
+                        onDismiss: announcementsStore.dismissCurrentAnnouncement
+                    )
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                    .zIndex(1)
+                }
+            }
+            .task {
+                if announcementsEnabled {
+                    announcementsStore.start()
+                }
+            }
+            .onChange(of: announcementsEnabled) { _, enabled in
+                announcementsStore.setEnabled(enabled)
             }
         }
         .modelContainer(sharedModelContainer)

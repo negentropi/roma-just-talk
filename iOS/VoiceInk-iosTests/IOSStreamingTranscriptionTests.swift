@@ -68,8 +68,14 @@ final class IOSStreamingTranscriptionTests: XCTestCase {
             )
         )
         XCTAssertNoThrow(try IOSStreamingTranscriptionService.makeClient(provider: .cartesia))
-        XCTAssertEqual(.cartesia.transcriptionServiceKind, .streamingOnly)
-        XCTAssertEqual(.cartesia.models(for: .transcription), ["ink-whisper"])
+        XCTAssertEqual(
+            VoiceInkProviderKind.cartesia.transcriptionServiceKind,
+            VoiceInkTranscriptionServiceKind.streamingOnly
+        )
+        XCTAssertEqual(
+            VoiceInkProviderKind.cartesia.models(for: VoiceInkProviderModelUse.transcription),
+            ["ink-whisper"]
+        )
     }
 
     func testStreamingServicePublishesPartialAndReturnsCommittedText() async throws {

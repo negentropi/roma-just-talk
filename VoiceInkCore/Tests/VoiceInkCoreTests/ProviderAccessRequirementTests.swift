@@ -252,7 +252,7 @@ final class ProviderAccessRequirementTests: XCTestCase {
     func testUserAPIKeyProvidersExposeDerivedCredentialMetadata() {
         XCTAssertEqual(
             VoiceInkProviderKind.userAPIKeyProviders,
-            [.groq, .openAI, .deepgram, .cerebras, .gemini, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .cartesia]
+            [.groq, .openAI, .deepgram, .cerebras, .gemini, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .cartesia, .anthropic]
         )
 
         let expected: [VoiceInkProviderKind: (account: String, verificationKey: String, transport: VoiceInkAPIKeyVerificationTransport)] = [
@@ -267,7 +267,8 @@ final class ProviderAccessRequirementTests: XCTestCase {
             .speechmatics: (VoiceInkProviderAPIKeyAccount.speechmatics, "speechmaticsKeyVerified", .speechmaticsJobs),
             .assemblyAI: (VoiceInkProviderAPIKeyAccount.assemblyAI, "assemblyAIKeyVerified", .assemblyAITranscripts),
             .xai: (VoiceInkProviderAPIKeyAccount.xAI, "xaiKeyVerified", .xaiAPIKey),
-            .cartesia: (VoiceInkProviderAPIKeyAccount.cartesia, "cartesiaKeyVerified", .cartesiaVoices)
+            .cartesia: (VoiceInkProviderAPIKeyAccount.cartesia, "cartesiaKeyVerified", .cartesiaVoices),
+            .anthropic: (VoiceInkProviderAPIKeyAccount.anthropic, "anthropicKeyVerified", .anthropicMessages)
         ]
 
         for (provider, policy) in expected {
@@ -1225,9 +1226,10 @@ final class ProviderAccessRequirementTests: XCTestCase {
                 .soniox: "soniox-key",
                 .speechmatics: "speechmatics-key",
                 .assemblyAI: "assemblyai-key",
-                .xai: "xai-key"
+                .xai: "xai-key",
+                .anthropic: "anthropic-key"
             ],
-            verifiedProviders: [.groq, .deepgram, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai]
+            verifiedProviders: [.groq, .deepgram, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .anthropic]
         )
 
         XCTAssertEqual(
@@ -1240,7 +1242,7 @@ final class ProviderAccessRequirementTests: XCTestCase {
         )
         XCTAssertEqual(
             state.availableProviders(for: .postProcessing, localWhisperModelAvailable: true),
-            [.groq, .mistral]
+            [.groq, .mistral, .anthropic]
         )
     }
 
@@ -1798,6 +1800,10 @@ final class ProviderAccessRequirementTests: XCTestCase {
             VoiceInkProviderKind.mistral.postProcessingChatCompletionsURL?.absoluteString,
             "https://api.mistral.ai/v1/chat/completions"
         )
+        XCTAssertEqual(
+            VoiceInkProviderKind.anthropic.postProcessingChatCompletionsURL?.absoluteString,
+            "https://api.anthropic.com/v1/messages"
+        )
         XCTAssertNil(VoiceInkProviderKind.deepgram.postProcessingChatCompletionsURL)
         XCTAssertNil(VoiceInkProviderKind.elevenLabs.postProcessingChatCompletionsURL)
         XCTAssertNil(VoiceInkProviderKind.soniox.postProcessingChatCompletionsURL)
@@ -1844,7 +1850,7 @@ final class ProviderAccessRequirementTests: XCTestCase {
     }
 
     func testAvailableProvidersFiltersByModelUseAndReadiness() {
-        let readyProviders: Set<VoiceInkProviderKind> = [.groq, .deepgram, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .cartesia, .localWhisper]
+        let readyProviders: Set<VoiceInkProviderKind> = [.groq, .deepgram, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .cartesia, .anthropic, .localWhisper]
 
         XCTAssertEqual(
             VoiceInkProviderKind.availableProviders(for: .transcription) { readyProviders.contains($0) },
@@ -1853,7 +1859,7 @@ final class ProviderAccessRequirementTests: XCTestCase {
 
         XCTAssertEqual(
             VoiceInkProviderKind.availableProviders(for: .postProcessing) { readyProviders.contains($0) },
-            [.groq, .mistral]
+            [.groq, .mistral, .anthropic]
         )
     }
 
@@ -1939,6 +1945,10 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertEqual(
             VoiceInkProviderKind.mistral.postProcessingModels,
             VoiceInkAIModelCatalog.availableModels(for: .mistral)
+        )
+        XCTAssertEqual(
+            VoiceInkProviderKind.anthropic.postProcessingModels,
+            VoiceInkAIModelCatalog.availableModels(for: .anthropic)
         )
     }
 

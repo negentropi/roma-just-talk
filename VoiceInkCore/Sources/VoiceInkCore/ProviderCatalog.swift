@@ -59,6 +59,7 @@ public enum VoiceInkTranscriptionEmptyTextPolicy: Sendable, Equatable {
 
 public enum VoiceInkAPIKeyVerificationTransport: Sendable, Equatable {
     case openAICompatibleModels
+    case anthropicMessages
     case deepgramProjects
     case geminiModels
     case mistralModels
@@ -953,6 +954,10 @@ public enum VoiceInkProviderEndpoint: String, CaseIterable, Sendable {
         URL(string: "https://api.cartesia.ai")!
     }
 
+    public static var anthropicAPIBaseURL: URL {
+        URL(string: "https://api.anthropic.com")!
+    }
+
     public var chatCompletionsURL: URL? {
         switch self {
         case .groq, .openAI, .cerebras, .gemini:
@@ -1104,6 +1109,7 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
     case assemblyAI
     case xai
     case cartesia
+    case anthropic
     case customCloud
     case localWhisper
     case localFluidAudio
@@ -1146,6 +1152,8 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return "xAI"
         case .cartesia:
             return "Cartesia"
+        case .anthropic:
+            return "Anthropic"
         case .customCloud:
             return "Custom Cloud"
         case .localWhisper:
@@ -1208,6 +1216,8 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return VoiceInkProviderEndpoint.xaiAPIBaseURL
         case .cartesia:
             return VoiceInkProviderEndpoint.cartesiaAPIBaseURL
+        case .anthropic:
+            return VoiceInkProviderEndpoint.anthropicAPIBaseURL
         case .customCloud:
             return URL(string: "http://localhost")!
         case .localWhisper:
@@ -1225,7 +1235,7 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
         switch self {
         case .gemini:
             return VoiceInkProviderEndpoint.geminiNativeAPIBaseURL
-        case .groq, .openAI, .deepgram, .cerebras, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .cartesia, .customCloud, .localWhisper, .localFluidAudio, .nativeApple, .voiceInk:
+        case .groq, .openAI, .deepgram, .cerebras, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .cartesia, .anthropic, .customCloud, .localWhisper, .localFluidAudio, .nativeApple, .voiceInk:
             return apiBaseURL
         }
     }
@@ -1256,6 +1266,8 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return URL(string: "https://console.x.ai/")!
         case .cartesia:
             return URL(string: "https://play.cartesia.ai/keys")!
+        case .anthropic:
+            return URL(string: "https://console.anthropic.com/settings/keys")!
         case .customCloud:
             return URL(string: "https://voiceink.app")!
         case .localWhisper:
@@ -1287,7 +1299,7 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return .assemblyAI
         case .xai:
             return .xai
-        case .cartesia, .customCloud:
+        case .cartesia, .customCloud, .anthropic:
             return .openAICompatible
         case .localWhisper:
             return .localWhisper
@@ -1326,7 +1338,7 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return .rejectEmpty
         case .soniox, .speechmatics, .assemblyAI, .localFluidAudio, .nativeApple:
             return .rejectWhitespace
-        case .openAI, .cerebras, .mistral, .elevenLabs, .xai, .cartesia, .customCloud, .localWhisper, .voiceInk:
+        case .openAI, .cerebras, .mistral, .elevenLabs, .xai, .cartesia, .anthropic, .customCloud, .localWhisper, .voiceInk:
             return .allow
         }
     }
@@ -1404,6 +1416,12 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
                 account: VoiceInkProviderAPIKeyAccount.cartesia,
                 verificationStateKey: "cartesiaKeyVerified",
                 verificationTransport: .cartesiaVoices
+            )
+        case .anthropic:
+            return .userAPIKey(
+                account: VoiceInkProviderAPIKeyAccount.anthropic,
+                verificationStateKey: "anthropicKeyVerified",
+                verificationTransport: .anthropicMessages
             )
         case .customCloud:
             return .customCloudModel
@@ -1532,7 +1550,7 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return .xai
         case .cartesia:
             return .cartesia
-        case .customCloud:
+        case .anthropic, .customCloud:
             return nil
         case .localWhisper:
             return .local
@@ -1559,6 +1577,8 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return .gemini
         case .mistral:
             return .mistral
+        case .anthropic:
+            return .anthropic
         case .deepgram, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .cartesia, .customCloud, .localWhisper, .localFluidAudio, .nativeApple, .voiceInk:
             return nil
         }
@@ -1567,6 +1587,9 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
     public var postProcessingChatCompletionsURL: URL? {
         guard supportsModelUse(.postProcessing) else {
             return nil
+        }
+        if self == .anthropic {
+            return aiModelProvider?.postProcessingRequestURL
         }
         return VoiceInkProviderEndpoint.openAICompatibleChatCompletionsURL(from: apiBaseURL)
     }

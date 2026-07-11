@@ -537,9 +537,14 @@ struct VoiceInkPostProcessingRequest: Equatable, Sendable {
 
 public struct VoiceInkPostProcessingClient: Sendable {
     private let client: VoiceInkOpenAICompatibleClient
+    private let anthropicClient: VoiceInkAnthropicClient
 
-    public init(client: VoiceInkOpenAICompatibleClient = VoiceInkOpenAICompatibleClient()) {
+    public init(
+        client: VoiceInkOpenAICompatibleClient = VoiceInkOpenAICompatibleClient(),
+        anthropicClient: VoiceInkAnthropicClient = VoiceInkAnthropicClient()
+    ) {
         self.client = client
+        self.anthropicClient = anthropicClient
     }
 
     public func postProcessTranscript(
@@ -558,6 +563,15 @@ public struct VoiceInkPostProcessingClient: Sendable {
                 modelName: model,
                 defaultTemperature: temperature
             )
+
+            if provider == .anthropic {
+                return try await anthropicClient.chatCompletion(
+                    baseURL: provider.apiBaseURL,
+                    apiKey: apiKey,
+                    model: model,
+                    messages: messages
+                )
+            }
 
             return try await client.chatCompletion(
                 baseURL: provider.apiBaseURL,

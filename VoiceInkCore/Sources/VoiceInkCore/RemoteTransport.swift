@@ -183,6 +183,163 @@ public struct VoiceInkCartesiaClient: Sendable {
     }
 }
 
+public struct VoiceInkAnthropicMessage: Codable, Equatable, Sendable {
+    public let role: String
+    public let content: String
+
+    public init(role: String, content: String) {
+        self.role = role
+        self.content = content
+    }
+}
+
+public struct VoiceInkAnthropicMessagesRequest: Codable, Equatable, Sendable {
+    public let model: String
+    public let maxTokens: Int
+    public let system: String?
+    public let messages: [VoiceInkAnthropicMessage]
+
+    enum CodingKeys: String, CodingKey {
+        case model
+        case maxTokens = "max_tokens"
+        case system
+        case messages
+    }
+
+    public init(
+        model: String,
+        maxTokens: Int,
+        system: String?,
+        messages: [VoiceInkAnthropicMessage]
+    ) {
+        self.model = model
+        self.maxTokens = maxTokens
+        self.system = system
+        self.messages = messages
+    }
+}
+
+public struct VoiceInkAnthropicContentBlock: Codable, Equatable, Sendable {
+    public let type: String
+    public let text: String?
+
+    public init(type: String, text: String?) {
+        self.type = type
+        self.text = text
+    }
+}
+
+public struct VoiceInkAnthropicMessagesResponse: Codable, Equatable, Sendable {
+    public let content: [VoiceInkAnthropicContentBlock]
+
+    public init(content: [VoiceInkAnthropicContentBlock]) {
+        self.content = content
+    }
+}
+
+public enum VoiceInkAnthropicMessagesCodec {
+    public static func requestBody(
+        model: String,
+        messages: [VoiceInkOpenAICompatibleChatMessage],
+        maxTokens: Int
+    ) throws -> Data {
+        let system = messages
+            .filter { $0.role == "system" }
+            .map(\.content)
+            .joined(separator: "\n\n")
+        let request = VoiceInkAnthropicMessagesRequest(
+            model: model,
+            maxTokens: maxTokens,
+            system: system.isEmpty ? nil : system,
+            messages: messages
+                .filter { $0.role != "system" }
+                .map { VoiceInkAnthropicMessage(role: $0.role, content: $0.content) }
+        )
+        return try JSONEncoder().encode(request)
+    }
+
+    public static func firstText(from data: Data) throws -> String {
+        let response = try JSONDecoder().decode(VoiceInkAnthropicMessagesResponse.self, from: data)
+        return response.content.first { $0.type == "text" }?.text ?? ""
+    }
+}
+
+public enum VoiceInkAnthropicRequestBuilder {
+    public static let apiVersion = "2023-06-01"
+
+    public static func makeMessagesRequest(
+        baseURL: URL,
+        apiKey: String,
+        model: String,
+        messages: [VoiceInkOpenAICompatibleChatMessage],
+        maxTokens: Int = 4096,
+        timeout: TimeInterval? = nil
+    ) throws -> URLRequest {
+        var request = URLRequest(url: baseURL.appendingPathComponent("v1/messages"))
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue(apiKey, forHTTPHeaderField: "x-api-key")
+        request.setValue(apiVersion, forHTTPHeaderField: "anthropic-version")
+        request.httpBody = try VoiceInkAnthropicMessagesCodec.requestBody(
+            model: model,
+            messages: messages,
+            maxTokens: maxTokens
+        )
+        if let timeout {
+            request.timeoutInterval = timeout
+        }
+        return request
+    }
+}
+
+public struct VoiceInkAnthropicClient: Sendable {
+    public init() {}
+
+    public func chatCompletion(
+        baseURL: URL,
+        apiKey: String,
+        model: String,
+        messages: [VoiceInkOpenAICompatibleChatMessage],
+        maxTokens: Int = 4096
+    ) async throws -> String {
+        let request = try VoiceInkAnthropicRequestBuilder.makeMessagesRequest(
+            baseURL: baseURL,
+            apiKey: apiKey,
+            model: model,
+            messages: messages,
+            maxTokens: maxTokens
+        )
+        let data = try await VoiceInkRetriedRequest.validatedData(
+            for: request,
+            timeout: nil,
+            maxRetries: 0,
+            errorDomain: "AnthropicPostProcessing"
+        )
+        return try VoiceInkAnthropicMessagesCodec.firstText(from: data)
+    }
+
+    public func verifyAPIKeyDetailed(
+        baseURL: URL,
+        apiKey: String,
+        timeout: TimeInterval = 10
+    ) async -> VoiceInkAPIKeyVerificationResult {
+        guard let request = try? VoiceInkAnthropicRequestBuilder.makeMessagesRequest(
+            baseURL: baseURL,
+            apiKey: apiKey,
+            model: VoiceInkAIModelCatalog.defaultModel(for: .anthropic),
+            messages: [VoiceInkOpenAICompatibleChatMessage(role: "user", content: "Hello")],
+            maxTokens: 1,
+            timeout: timeout
+        ) else {
+            return VoiceInkAPIKeyVerificationResult(
+                isValid: false,
+                errorMessage: "Could not build Anthropic verification request."
+            )
+        }
+        return await VoiceInkAPIKeyVerificationPolicy.verify(apiKey: apiKey, request: request)
+    }
+}
+
 public struct VoiceInkProviderAPIKeyVerifier: Sendable {
     private let openAICompatibleClient: VoiceInkOpenAICompatibleClient
     private let deepgramClient: VoiceInkDeepgramTranscriptionClient
@@ -194,6 +351,7 @@ public struct VoiceInkProviderAPIKeyVerifier: Sendable {
     private let assemblyAIClient: VoiceInkAssemblyAITranscriptionClient
     private let xaiClient: VoiceInkXAITranscriptionClient
     private let cartesiaClient: VoiceInkCartesiaClient
+    private let anthropicClient: VoiceInkAnthropicClient
 
     public init(
         openAICompatibleClient: VoiceInkOpenAICompatibleClient = VoiceInkOpenAICompatibleClient(),
@@ -205,7 +363,8 @@ public struct VoiceInkProviderAPIKeyVerifier: Sendable {
         speechmaticsClient: VoiceInkSpeechmaticsTranscriptionClient = VoiceInkSpeechmaticsTranscriptionClient(),
         assemblyAIClient: VoiceInkAssemblyAITranscriptionClient = VoiceInkAssemblyAITranscriptionClient(),
         xaiClient: VoiceInkXAITranscriptionClient = VoiceInkXAITranscriptionClient(),
-        cartesiaClient: VoiceInkCartesiaClient = VoiceInkCartesiaClient()
+        cartesiaClient: VoiceInkCartesiaClient = VoiceInkCartesiaClient(),
+        anthropicClient: VoiceInkAnthropicClient = VoiceInkAnthropicClient()
     ) {
         self.openAICompatibleClient = openAICompatibleClient
         self.deepgramClient = deepgramClient
@@ -217,6 +376,7 @@ public struct VoiceInkProviderAPIKeyVerifier: Sendable {
         self.assemblyAIClient = assemblyAIClient
         self.xaiClient = xaiClient
         self.cartesiaClient = cartesiaClient
+        self.anthropicClient = anthropicClient
     }
 
     public func verifyAPIKey(_ apiKey: String, for provider: VoiceInkProviderKind) async -> Bool {
@@ -314,6 +474,11 @@ public struct VoiceInkProviderAPIKeyVerifier: Sendable {
             )
         case .cartesiaVoices:
             return await cartesiaClient.verifyAPIKeyDetailed(
+                baseURL: provider.apiBaseURL,
+                apiKey: apiKey
+            )
+        case .anthropicMessages:
+            return await anthropicClient.verifyAPIKeyDetailed(
                 baseURL: provider.apiBaseURL,
                 apiKey: apiKey
             )

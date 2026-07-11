@@ -10,6 +10,7 @@ struct NotesListView: View {
     @State private var searchText: String = ""
     @EnvironmentObject private var recordingManager: RecordingManager
     @StateObject private var settings = AppSettings.shared
+    @StateObject private var transcriptionTasks = IOSTranscriptionTaskCoordinator.shared
 
     private var noteListSnapshot: VoiceInkNoteListSnapshot<Transcription> {
         VoiceInkNoteListSnapshot.make(
@@ -90,6 +91,12 @@ struct NotesListView: View {
                     ).applyRuntimeState {
                         recordingManager.stopRecording(modelContext: modelContext)
                     }
+                }
+                .onAppear {
+                    transcriptionTasks.recoverInterruptedTranscriptions(
+                        notes,
+                        persist: { try? modelContext.save() }
+                    )
                 }
         }
     }
@@ -192,6 +199,7 @@ struct NotesListView: View {
             )
 
             deletionPlan.applyRuntimeState { note in
+                transcriptionTasks.cancel(noteID: note.id)
                 note.deleteExistingAudioFileReportingFailure { message in
                     VoiceInkIOSLogger.notes.error("\(message, privacy: .public)")
                 }

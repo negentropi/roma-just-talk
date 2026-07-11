@@ -714,8 +714,10 @@ public struct VoiceInkTranscriptionRunProcessor {
         apiKeyProvider: APIKeyProvider,
         transcriptionServiceProvider: TranscriptionServiceProvider
     ) async throws -> VoiceInkTranscriptionRunResult {
+        try Task.checkCancellation()
         let provider = configuration.transcriptionProvider
         let apiKey = await apiKeyProvider(provider)
+        try Task.checkCancellation()
         let model = configuration.transcriptionModel
 
         guard let usableAPIKey = VoiceInkProviderCredential.nonBlank(apiKey) else {
@@ -735,6 +737,7 @@ public struct VoiceInkTranscriptionRunProcessor {
                 for: .batchTranscription(provider)
             )
         )
+        try Task.checkCancellation()
         let transcriptionDuration = currentDate().timeIntervalSince(transcriptionStart)
 
         guard provider.transcriptionEmptyTextPolicy.accepts(rawText) else {
@@ -766,6 +769,7 @@ public struct VoiceInkTranscriptionRunProcessor {
             if !prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 let llmProvider = configuration.postProcessingProvider
                 let llmKey = await apiKeyProvider(llmProvider)
+                try Task.checkCancellation()
                 let llmModel = configuration.postProcessingModel
 
                 if let usableLLMKey = VoiceInkProviderCredential.nonBlank(llmKey) {
@@ -778,6 +782,7 @@ public struct VoiceInkTranscriptionRunProcessor {
                             prompt: prompt,
                             transcript: cleanedText
                         ))
+                        try Task.checkCancellation()
                         let enhancementEnd = currentDate()
                         postProcessingResult = VoiceInkAIEnhancementResult.completed(
                             text: enhancedText,
@@ -789,7 +794,12 @@ public struct VoiceInkTranscriptionRunProcessor {
                             requestUserMessage: nil
                         )
                         finalText = enhancedText
+                    } catch is CancellationError {
+                        throw CancellationError()
                     } catch {
+                        if Task.isCancelled {
+                            throw CancellationError()
+                        }
                         postProcessingError = VoiceInkPostProcessingFailurePresentation.postProcessingFailureText(
                             reason: VoiceInkErrorDescription.text(for: error)
                         )
@@ -799,6 +809,7 @@ public struct VoiceInkTranscriptionRunProcessor {
             }
         }
 
+        try Task.checkCancellation()
         return VoiceInkTranscriptionRunResult(
             cleanedText: cleanedText,
             finalText: finalText,

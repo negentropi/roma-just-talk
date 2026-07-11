@@ -428,6 +428,7 @@ public struct VoiceInkNoteDetailPresentation: Equatable, Sendable {
         enhancedText: String?,
         transcriptionError: String?,
         isRetranscribing: Bool,
+        canCancel: Bool = false,
         audioAvailability: VoiceInkStoredAudioAvailability,
         duration: TimeInterval
     ) -> VoiceInkNoteDetailPresentation {
@@ -448,7 +449,8 @@ public struct VoiceInkNoteDetailPresentation: Equatable, Sendable {
                 errorDetail: VoiceInkTranscriptPresentation.statusErrorDetail(transcriptionError),
                 retryControls: VoiceInkTranscriptPresentation.retryControls(
                     for: status,
-                    isRetranscribing: isRetranscribing
+                    isRetranscribing: isRetranscribing,
+                    canCancel: canCancel
                 ),
                 retryButtonTitle: VoiceInkTranscriptPresentation.retryTranscriptionButtonTitle,
                 retryButtonSystemImageName: VoiceInkTranscriptPresentation.retryTranscriptionSystemImageName
@@ -485,15 +487,18 @@ enum VoiceInkTranscriptRetryControlAction: Equatable, Sendable {
 
 public struct VoiceInkTranscriptRetryControlsPresentation: Equatable, Sendable {
     public let shouldShowModeSelection: Bool
+    public let shouldShowCancelButton: Bool
     let action: VoiceInkTranscriptRetryControlAction
     let progressText: String?
 
     init(
         shouldShowModeSelection: Bool,
+        shouldShowCancelButton: Bool = false,
         action: VoiceInkTranscriptRetryControlAction,
         progressText: String? = nil
     ) {
         self.shouldShowModeSelection = shouldShowModeSelection
+        self.shouldShowCancelButton = shouldShowCancelButton
         self.action = action
         self.progressText = progressText
     }
@@ -1016,6 +1021,8 @@ public enum VoiceInkTranscriptPresentation {
     public static let emptyCompletedDisplayText = "No audible content detected."
     public static let emptyPreferredText = "No content available."
     public static let canceledTranscriptionText = "The transcription was canceled."
+    public static let backgroundProcessingExpiredError = "iOS ended background processing before transcription finished. Retry using the saved audio."
+    public static let interruptedProcessingError = "Transcription stopped when the app was terminated. Retry using the saved audio."
     public static let noteDetailNavigationTitle = "Note"
     public static let transcriptTitle = "Transcript"
     public static let copyTranscriptSystemImageName = "doc.on.doc"
@@ -1031,6 +1038,8 @@ public enum VoiceInkTranscriptPresentation {
     public static let retranscribingDisplayText = "Retranscribing..."
     public static let retryTranscriptionButtonTitle = "Retry Transcription"
     public static let retryTranscriptionSystemImageName = "arrow.clockwise"
+    public static let cancelTranscriptionButtonTitle = "Cancel"
+    public static let cancelTranscriptionSystemImageName = "xmark.circle"
     public static let noTranscriptionAvailableTitle = "No transcription available"
     public static let lastTranscriptionCopiedTitle = "Last transcription copied"
     public static let failedToCopyTranscriptionTitle = "Failed to copy transcription"
@@ -1197,11 +1206,13 @@ public enum VoiceInkTranscriptPresentation {
 
     public static func retryControls(
         for status: VoiceInkTranscriptionStatus,
-        isRetranscribing: Bool
+        isRetranscribing: Bool,
+        canCancel: Bool = false
     ) -> VoiceInkTranscriptRetryControlsPresentation {
         if isRetranscribing {
             return VoiceInkTranscriptRetryControlsPresentation(
                 shouldShowModeSelection: false,
+                shouldShowCancelButton: canCancel,
                 action: .showProgress,
                 progressText: retranscribingDisplayText
             )
@@ -1211,6 +1222,7 @@ public enum VoiceInkTranscriptPresentation {
         case .pending:
             return VoiceInkTranscriptRetryControlsPresentation(
                 shouldShowModeSelection: false,
+                shouldShowCancelButton: canCancel,
                 action: .showProgress,
                 progressText: transcribingDisplayText
             )

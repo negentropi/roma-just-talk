@@ -564,13 +564,16 @@ public enum VoiceInkLocalWhisperTranscriptionFlow {
         request: VoiceInkLocalWhisperTranscriptionRequest,
         actions: VoiceInkLocalWhisperTranscriptionActions<Context>
     ) async throws -> String {
+        try Task.checkCancellation()
         let contextPlan = try await actions.resolveContext()
 
         do {
+            try Task.checkCancellation()
             let samples = try readSamples(
                 request: request,
                 actions: actions
             )
+            try Task.checkCancellation()
 
             let success = await actions.runTranscription(
                 contextPlan.context,
@@ -578,6 +581,7 @@ public enum VoiceInkLocalWhisperTranscriptionFlow {
                 request.language,
                 request.prompt
             )
+            try Task.checkCancellation()
             guard success else {
                 throw VoiceInkLocalWhisperFailurePolicy.error(
                     for: .transcriptionFailed,
@@ -586,6 +590,7 @@ public enum VoiceInkLocalWhisperTranscriptionFlow {
             }
 
             let text = await actions.transcriptionText(contextPlan.context)
+            try Task.checkCancellation()
             await releaseIfNeeded(contextPlan, afterFailure: false, actions: actions)
             return text
         } catch {

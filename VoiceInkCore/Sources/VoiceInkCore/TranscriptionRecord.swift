@@ -433,6 +433,8 @@ public extension VoiceInkMutableTranscriptionRecord where Self: VoiceInkStoredAu
         fileManager: FileManager = .default,
         transcribe: (URL) async throws -> VoiceInkTranscriptionRunResult
     ) async throws -> String {
+        try Task.checkCancellation()
+
         guard let fileURL = existingAudioFileURL(relativeTo: recordingsDirectory, fileManager: fileManager) else {
             let error = VoiceInkEngineError.audioFileNotFound
             markTranscriptionFailed(VoiceInkErrorDescription.text(for: error))
@@ -441,9 +443,15 @@ public extension VoiceInkMutableTranscriptionRecord where Self: VoiceInkStoredAu
 
         do {
             let result = try await transcribe(fileURL)
+            try Task.checkCancellation()
             applyCompletedRunResult(result)
             return result.finalText
+        } catch is CancellationError {
+            throw CancellationError()
         } catch {
+            if Task.isCancelled {
+                throw CancellationError()
+            }
             markTranscriptionFailed(VoiceInkErrorDescription.text(for: error))
             throw error
         }
@@ -453,6 +461,7 @@ public extension VoiceInkMutableTranscriptionRecord where Self: VoiceInkStoredAu
 public enum VoiceInkStoredAudioRetranscriptionOutcome: Equatable, Sendable {
     case succeeded(String)
     case failed(reason: String)
+    case canceled
 }
 
 public struct VoiceInkStoredAudioRetranscriptionRunner {
@@ -511,6 +520,8 @@ public struct VoiceInkStoredAudioRetranscriptionRunner {
                 relativeTo: recordingsDirectory,
                 fileManager: fileManager
             ))
+        } catch is CancellationError {
+            return .canceled
         } catch {
             return .failed(reason: VoiceInkErrorDescription.text(for: error))
         }

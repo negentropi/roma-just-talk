@@ -7,16 +7,18 @@ struct NoteDetailView: View {
     @Environment(\.modelContext) private var modelContext
     let note: Transcription
     
-    @State private var isRetranscribing = false
     @StateObject private var settings = AppSettings.shared
+    @StateObject private var transcriptionTasks = IOSTranscriptionTaskCoordinator.shared
 
     var body: some View {
+        let isTranscriptionActive = transcriptionTasks.isActive(noteID: note.id)
         let presentation = VoiceInkNoteDetailPresentation.make(
             status: note.transcriptionStatus,
             rawText: note.text,
             enhancedText: note.enhancedText,
             transcriptionError: note.transcriptionError,
-            isRetranscribing: isRetranscribing,
+            isRetranscribing: isTranscriptionActive,
+            canCancel: isTranscriptionActive,
             audioAvailability: note.storedAudioAvailability(),
             duration: note.duration
         )
@@ -59,6 +61,12 @@ struct NoteDetailView: View {
         .navigationTitle(presentation.navigationTitle)
         .navigationBarTitleDisplayMode(.inline)
         .background(Color(.systemGroupedBackground))
+        .onAppear {
+            transcriptionTasks.recoverInterruptedTranscriptions(
+                [note],
+                persist: { try? modelContext.save() }
+            )
+        }
     }
     
     private func transcriptContentView(_ content: VoiceInkTranscriptContentPresentation) -> some View {
@@ -163,6 +171,18 @@ struct NoteDetailView: View {
                     Text(statusPanel.retryControls.progressDisplayText ?? "")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
+                    Spacer()
+                    if statusPanel.retryControls.shouldShowCancelButton {
+                        Button(role: .destructive) {
+                            transcriptionTasks.cancel(noteID: note.id)
+                        } label: {
+                            Label(
+                                VoiceInkTranscriptPresentation.cancelTranscriptionButtonTitle,
+                                systemImage: VoiceInkTranscriptPresentation.cancelTranscriptionSystemImageName
+                            )
+                        }
+                        .buttonStyle(.bordered)
+                    }
                 }
             } else if let retryAction {
                 Button(action: retryAction) {
@@ -184,14 +204,10 @@ struct NoteDetailView: View {
     }
 
     private func retranscribe() {
-        isRetranscribing = true
-        
-        Task {
-            defer { isRetranscribing = false }
-            
-            _ = await settings.retranscribeStoredAudio(note)
-            try? modelContext.save()
-        }
+        transcriptionTasks.start(
+            note: note,
+            persist: { try? modelContext.save() }
+        )
     }
     
     private func copyToClipboard(_ text: String) {

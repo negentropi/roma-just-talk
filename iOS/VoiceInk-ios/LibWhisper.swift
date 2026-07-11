@@ -18,6 +18,31 @@ extension whisper_context_params: VoiceInkWhisperContextParameterSink {}
 extension whisper_full_params: VoiceInkWhisperRuntimeFullParameterSink {}
 extension whisper_vad_params: VoiceInkWhisperRuntimeVADParameterSink {}
 
+final class VoiceInkWhisperCancellationToken: @unchecked Sendable {
+    private let lock = NSLock()
+    private var canceled = false
+
+    var isCanceled: Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        return canceled
+    }
+
+    func cancel() {
+        lock.lock()
+        canceled = true
+        lock.unlock()
+    }
+}
+
+let voiceInkWhisperAbortCallback: @convention(c) (UnsafeMutableRawPointer?) -> Bool = { userData in
+    guard let userData else { return false }
+    return Unmanaged<VoiceInkWhisperCancellationToken>
+        .fromOpaque(userData)
+        .takeUnretainedValue()
+        .isCanceled
+}
+
 // Meet Whisper C++ constraint: Don't access from more than one thread at a time.
 actor WhisperContext {
     private var context: OpaquePointer?
@@ -39,7 +64,12 @@ actor WhisperContext {
         }
     }
 
-    func fullTranscribe(samples: [Float], language: String?, prompt: String? = nil) -> Bool {
+    func fullTranscribe(
+        samples: [Float],
+        language: String?,
+        prompt: String? = nil,
+        cancellationToken: VoiceInkWhisperCancellationToken? = nil
+    ) -> Bool {
         guard let context = context else { return false }
         
         var params = whisper_full_default_params(WHISPER_SAMPLING_GREEDY)
@@ -50,6 +80,11 @@ actor WhisperContext {
         )
         let runtimeConfiguration = invocationPlan.configuration
         runtimeConfiguration.apply(to: &params, makeVADParameters: whisper_vad_default_params)
+
+        if let cancellationToken {
+            params.abort_callback = voiceInkWhisperAbortCallback
+            params.abort_callback_user_data = Unmanaged.passUnretained(cancellationToken).toOpaque()
+        }
 
         whisper_reset_timings(context)
 

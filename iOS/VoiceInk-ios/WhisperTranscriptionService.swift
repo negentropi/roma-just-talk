@@ -63,11 +63,20 @@ struct WhisperTranscriptionService: VoiceInkAudioTranscriptionService {
                     }
                 },
                 runTranscription: { context, samples, language, prompt in
-                    let success = await context.fullTranscribe(
-                        samples: samples,
-                        language: language,
-                        prompt: prompt
-                    )
+                    let cancellationToken = VoiceInkWhisperCancellationToken()
+                    let success = await withTaskCancellationHandler {
+                        if Task.isCancelled {
+                            cancellationToken.cancel()
+                        }
+                        return await context.fullTranscribe(
+                            samples: samples,
+                            language: language,
+                            prompt: prompt,
+                            cancellationToken: cancellationToken
+                        )
+                    } onCancel: {
+                        cancellationToken.cancel()
+                    }
                     if !success {
                         logger.error("\(VoiceInkLocalWhisperTranscriptionDiagnostics.iOSTranscriptionFailedMessage, privacy: .public)")
                     }

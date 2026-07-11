@@ -13,6 +13,7 @@ final class RecordingManager: ObservableObject {
     
     private let recorder = AudioRecorder()
     private let settings = AppSettings.shared
+    private let transcriptionTasks = IOSTranscriptionTaskCoordinator.shared
     private var durationTimer: Timer?
     private var keyboardDictationRequestID: UUID?
 
@@ -118,11 +119,12 @@ final class RecordingManager: ObservableObject {
 
                 let keyboardRequestID = keyboardDictationRequestID
                 keyboardDictationRequestID = nil
-                transcribeInBackground(
+                transcriptionTasks.start(
                     note: note,
-                    modelContext: modelContext,
-                    keyboardRequestID: keyboardRequestID
+                    keyboardRequestID: keyboardRequestID,
+                    persist: { try? modelContext.save() }
                 )
+                recorder.currentRecordingURL = nil
             }
         )
 
@@ -192,41 +194,6 @@ final class RecordingManager: ObservableObject {
         flowState = updatedState
     }
     
-    // MARK: - Transcription
-    private func transcribeInBackground(
-        note: Transcription,
-        modelContext: ModelContext,
-        keyboardRequestID: UUID?
-    ) {
-        Task {
-            defer { 
-                // Clean up recorder state
-                recorder.currentRecordingURL = nil
-            }
-
-            let outcome = await settings.retranscribeStoredAudio(note)
-
-            if let keyboardRequestID {
-                switch outcome {
-                case .succeeded(let text):
-                    coordinator.completeKeyboardDictation(
-                        requestID: keyboardRequestID,
-                        text: text
-                    )
-                case .failed(let reason):
-                    coordinator.failKeyboardDictation(
-                        requestID: keyboardRequestID,
-                        message: reason
-                    )
-                }
-            }
-
-            await MainActor.run {
-                try? modelContext.save()
-            }
-        }
-    }
-
     private func failActiveKeyboardDictation(message: String) {
         guard let requestID = keyboardDictationRequestID else { return }
         keyboardDictationRequestID = nil

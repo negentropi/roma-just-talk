@@ -67,7 +67,7 @@ jobs:
             -derivedDataPath "$PWD/.local-build-ios" \
             CODE_SIGNING_ALLOWED=NO
 
-      - name: Run iOS keyboard parity tests
+      - name: Run focused iOS parity tests
         run: |
           SIMULATOR_UDID="$(
             xcrun simctl list devices available --json \
@@ -85,4 +85,5 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             EXCLUDED_SOURCE_FILE_NAMES=VoiceInk_iosTests.swift \
             -only-testing:VoiceInk-iosTests/KeyboardDictationExchangeTests \
-            -only-testing:VoiceInk-iosTests/KeyboardReadinessTests
+            -only-testing:VoiceInk-iosTests/KeyboardReadinessTests \
+            -only-testing:VoiceInk-iosTests/IOSTranscriptionTaskCoordinatorTests

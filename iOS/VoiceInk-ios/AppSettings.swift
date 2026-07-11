@@ -104,14 +104,17 @@ final class AppSettings: ObservableObject {
 
     private func repairLocalWhisperModelSelections() {
         let importedModelNames = LocalModelManager.shared.importedModelNames
+        var didRepairSelection = false
         let repairedModes = modes.map { mode in
             var repairedMode = mode
             repairedMode.repairLocalWhisperModelSelection(
                 additionalLocalWhisperModelNames: importedModelNames
             )
+            didRepairSelection = didRepairSelection
+                || repairedMode.transcriptionModel != mode.transcriptionModel
             return repairedMode
         }
-        if repairedModes != modes {
+        if didRepairSelection {
             modes = repairedModes
         }
     }

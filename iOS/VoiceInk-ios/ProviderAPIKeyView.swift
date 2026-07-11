@@ -6,6 +6,9 @@ struct ProviderAPIKeyView: View {
     @StateObject private var settings = AppSettings.shared
     private let apiKeyVerifier = VoiceInkProviderAPIKeyVerifier()
     @State private var apiKeyFormState = VoiceInkProviderAPIKeyFormState()
+    @State private var customBaseURL = ""
+    @State private var customModel = ""
+    private let providerSettingsPresentation = VoiceInkAIEnhancementProviderSettingsPresentation.iOS
 
     var body: some View {
         let snapshot = settings.providerAccess.apiKeyFormSnapshot(
@@ -16,6 +19,33 @@ struct ProviderAPIKeyView: View {
         let controlPresentation = snapshot.controlPresentation
 
         Form {
+            if provider == .customAI {
+                Section(header: Text(providerSettingsPresentation.sectionTitle)) {
+                    TextField(
+                        providerSettingsPresentation.customProviderBaseURLPlaceholder,
+                        text: $customBaseURL
+                    )
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .keyboardType(.URL)
+
+                    TextField(
+                        providerSettingsPresentation.customProviderModelPlaceholder,
+                        text: $customModel
+                    )
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+
+                    Button(providerSettingsPresentation.ollamaSaveButtonTitle) {
+                        settings.updateCustomEnhancementConfiguration(
+                            baseURL: customBaseURL,
+                            model: customModel
+                        )
+                    }
+                    .disabled(!canSaveCustomConfiguration)
+                }
+            }
+
             Section(header: Text(presentation.apiKeySectionTitle)) {
                 if snapshot.isEditing {
                     let saveAction = controlPresentation.saveRuntimeAction {
@@ -91,6 +121,10 @@ struct ProviderAPIKeyView: View {
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             apiKeyFormState = snapshot.loadedFormState
+            if provider == .customAI {
+                customBaseURL = VoiceInkDynamicAIProviderPreference.customProviderBaseURL()
+                customModel = VoiceInkDynamicAIProviderPreference.customProviderModel()
+            }
         }
         .onChange(of: apiKeyFormState.enteredKey) { _, _ in
             apiKeyFormState = apiKeyFormState.keyEdited()
@@ -123,6 +157,11 @@ struct ProviderAPIKeyView: View {
                 await settings.refreshOpenRouterModels()
             }
         }
+    }
+
+    private var canSaveCustomConfiguration: Bool {
+        URL(string: customBaseURL.trimmingCharacters(in: .whitespacesAndNewlines)) != nil
+            && VoiceInkProviderCredential.nonBlank(customModel) != nil
     }
 
 }

@@ -252,7 +252,7 @@ final class ProviderAccessRequirementTests: XCTestCase {
     func testUserAPIKeyProvidersExposeDerivedCredentialMetadata() {
         XCTAssertEqual(
             VoiceInkProviderKind.userAPIKeyProviders,
-            [.groq, .openAI, .deepgram, .cerebras, .gemini, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .cartesia, .anthropic, .openRouter]
+            [.groq, .openAI, .deepgram, .cerebras, .gemini, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .cartesia, .anthropic, .openRouter, .customAI]
         )
 
         let expected: [VoiceInkProviderKind: (account: String, verificationKey: String, transport: VoiceInkAPIKeyVerificationTransport)] = [
@@ -269,7 +269,8 @@ final class ProviderAccessRequirementTests: XCTestCase {
             .xai: (VoiceInkProviderAPIKeyAccount.xAI, "xaiKeyVerified", .xaiAPIKey),
             .cartesia: (VoiceInkProviderAPIKeyAccount.cartesia, "cartesiaKeyVerified", .cartesiaVoices),
             .anthropic: (VoiceInkProviderAPIKeyAccount.anthropic, "anthropicKeyVerified", .anthropicMessages),
-            .openRouter: (VoiceInkProviderAPIKeyAccount.openRouter, "openRouterKeyVerified", .openAICompatibleModels)
+            .openRouter: (VoiceInkProviderAPIKeyAccount.openRouter, "openRouterKeyVerified", .openAICompatibleModels),
+            .customAI: (VoiceInkProviderAPIKeyAccount.customAI, "customAIKeyVerified", .customAIChat)
         ]
 
         for (provider, policy) in expected {

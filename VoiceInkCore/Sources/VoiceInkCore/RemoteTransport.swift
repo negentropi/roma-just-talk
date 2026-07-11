@@ -419,6 +419,9 @@ public struct VoiceInkProviderAPIKeyVerifier: Sendable {
         _ apiKey: String,
         for provider: VoiceInkProviderKind
     ) async -> VoiceInkAPIKeyVerificationResult {
+        guard VoiceInkProviderCredential.nonBlank(apiKey) != nil else {
+            return VoiceInkAPIKeyVerificationPolicy.missingAPIKeyResult
+        }
         guard let transport = provider.apiKeyVerificationTransport else {
             return VoiceInkAPIKeyVerificationResult(
                 isValid: false,
@@ -432,6 +435,22 @@ public struct VoiceInkProviderAPIKeyVerifier: Sendable {
                 baseURL: provider.apiBaseURL,
                 apiKey: apiKey
             )
+        case .customAIChat:
+            guard let requestURL = provider.postProcessingChatCompletionsURL,
+                  let model = provider.postProcessingDefaultModel,
+                  let request = try? VoiceInkOpenAICompatibleChatRequestBuilder.make(
+                    requestURL: requestURL,
+                    apiKey: apiKey,
+                    model: model,
+                    messages: [VoiceInkOpenAICompatibleChatMessage(role: "user", content: "Hello")],
+                    temperature: 0.2
+                  ) else {
+                return VoiceInkAPIKeyVerificationResult(
+                    isValid: false,
+                    errorMessage: "Custom provider endpoint and model are required."
+                )
+            }
+            return await VoiceInkAPIKeyVerificationPolicy.verify(apiKey: apiKey, request: request)
         case .deepgramProjects:
             return await deepgramClient.verifyAPIKeyDetailed(
                 baseURL: provider.apiBaseURL,
@@ -810,6 +829,33 @@ public struct VoiceInkOpenAICompatibleClient: Sendable {
 
         return try VoiceInkOpenAICompatibleChatCodec.firstMessageContent(from: data)
     }
+
+    public func chatCompletion(
+        requestURL: URL,
+        apiKey: String,
+        model: String,
+        messages: [VoiceInkOpenAICompatibleChatMessage],
+        temperature: Double? = 0.2,
+        reasoningEffort: String? = nil,
+        extraBodyParameters: [String: Any]? = nil
+    ) async throws -> String {
+        let request = try VoiceInkOpenAICompatibleChatRequestBuilder.make(
+            requestURL: requestURL,
+            apiKey: apiKey,
+            model: model,
+            messages: messages,
+            temperature: temperature,
+            reasoningEffort: reasoningEffort,
+            extraBodyParameters: extraBodyParameters
+        )
+        let data = try await VoiceInkRetriedRequest.validatedData(
+            for: request,
+            timeout: nil,
+            maxRetries: 0,
+            errorDomain: "LLMPostProcessing"
+        )
+        return try VoiceInkOpenAICompatibleChatCodec.firstMessageContent(from: data)
+    }
 }
 
 public struct VoiceInkOpenAICompatibleChatMessage: Codable, Equatable, Sendable {
@@ -903,7 +949,27 @@ public enum VoiceInkOpenAICompatibleChatRequestBuilder {
         reasoningEffort: String? = nil,
         extraBodyParameters: [String: Any]? = nil
     ) throws -> URLRequest {
-        var request = URLRequest(url: VoiceInkProviderEndpoint.openAICompatibleChatCompletionsURL(from: baseURL))
+        try make(
+            requestURL: VoiceInkProviderEndpoint.openAICompatibleChatCompletionsURL(from: baseURL),
+            apiKey: apiKey,
+            model: model,
+            messages: messages,
+            temperature: temperature,
+            reasoningEffort: reasoningEffort,
+            extraBodyParameters: extraBodyParameters
+        )
+    }
+
+    public static func make(
+        requestURL: URL,
+        apiKey: String,
+        model: String,
+        messages: [VoiceInkOpenAICompatibleChatMessage],
+        temperature: Double?,
+        reasoningEffort: String? = nil,
+        extraBodyParameters: [String: Any]? = nil
+    ) throws -> URLRequest {
+        var request = URLRequest(url: requestURL)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")

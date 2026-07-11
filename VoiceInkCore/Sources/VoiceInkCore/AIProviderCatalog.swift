@@ -1302,6 +1302,8 @@ public struct VoiceInkAIEnhancementProviderSettingsPresentation: Sendable, Equat
         customProviderRemoveKeyButtonTitle: "Remove Key"
     )
 
+    public static let iOS = macOS
+
     public func connectionStatus(
         provider: VoiceInkAIEnhancementProviderKind,
         isAPIKeyValid: Bool,

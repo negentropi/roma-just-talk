@@ -122,6 +122,17 @@ final class AppSettings: ObservableObject {
         }
     }
 
+    func updateCustomEnhancementConfiguration(baseURL: String, model: String) {
+        VoiceInkDynamicAIProviderPreference.saveCustomProviderBaseURL(
+            baseURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        )
+        VoiceInkDynamicAIProviderPreference.saveCustomProviderModel(
+            model.trimmingCharacters(in: .whitespacesAndNewlines)
+        )
+        repairUnavailableProviders()
+        objectWillChange.send()
+    }
+
     var providerAccess: VoiceInkProviderAccessSnapshot {
         VoiceInkProviderAccessSnapshot(
             apiKeyState: apiKeyState,

@@ -573,6 +573,19 @@ public struct VoiceInkPostProcessingClient: Sendable {
                 )
             }
 
+            if provider == .customAI,
+               let requestURL = provider.postProcessingChatCompletionsURL {
+                return try await client.chatCompletion(
+                    requestURL: requestURL,
+                    apiKey: apiKey,
+                    model: model,
+                    messages: messages,
+                    temperature: requestParameters.temperature,
+                    reasoningEffort: requestParameters.reasoningEffort,
+                    extraBodyParameters: requestParameters.extraBodyParameters
+                )
+            }
+
             return try await client.chatCompletion(
                 baseURL: provider.apiBaseURL,
                 apiKey: apiKey,

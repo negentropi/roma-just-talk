@@ -534,6 +534,7 @@ public enum VoiceInkStoredAudioRetranscription {
     public typealias LocalWhisperServiceFactory = VoiceInkAudioTranscriptionServiceFactory.LocalWhisperServiceFactory
     public typealias LocalFluidAudioServiceFactory = VoiceInkAudioTranscriptionServiceFactory.LocalFluidAudioServiceFactory
     public typealias NativeAppleServiceFactory = VoiceInkAudioTranscriptionServiceFactory.NativeAppleServiceFactory
+    public typealias CustomCloudServiceFactory = VoiceInkAudioTranscriptionServiceFactory.CustomCloudServiceFactory
     typealias RemoteServiceFactory = VoiceInkAudioTranscriptionServiceFactory.RemoteServiceFactory
 
     @discardableResult
@@ -592,6 +593,9 @@ public enum VoiceInkStoredAudioRetranscription {
         },
         nativeAppleServiceFactory: @escaping NativeAppleServiceFactory = {
             VoiceInkUnsupportedAudioTranscriptionService()
+        },
+        customCloudServiceFactory: @escaping CustomCloudServiceFactory = {
+            VoiceInkUnsupportedAudioTranscriptionService()
         }
     ) async -> VoiceInkStoredAudioRetranscriptionOutcome {
         await retranscribeWithOutcome(
@@ -605,6 +609,7 @@ public enum VoiceInkStoredAudioRetranscription {
             localWhisperServiceFactory: localWhisperServiceFactory,
             localFluidAudioServiceFactory: localFluidAudioServiceFactory,
             nativeAppleServiceFactory: nativeAppleServiceFactory,
+            customCloudServiceFactory: customCloudServiceFactory,
             remoteServiceFactory: { VoiceInkRemoteTranscriptionService(provider: $0) }
         )
     }
@@ -624,6 +629,9 @@ public enum VoiceInkStoredAudioRetranscription {
         nativeAppleServiceFactory: @escaping NativeAppleServiceFactory = {
             VoiceInkUnsupportedAudioTranscriptionService()
         },
+        customCloudServiceFactory: @escaping CustomCloudServiceFactory = {
+            VoiceInkUnsupportedAudioTranscriptionService()
+        },
         remoteServiceFactory: @escaping RemoteServiceFactory = { VoiceInkRemoteTranscriptionService(provider: $0) }
     ) async throws -> String {
         try await runner(
@@ -633,6 +641,7 @@ public enum VoiceInkStoredAudioRetranscription {
             localWhisperServiceFactory: localWhisperServiceFactory,
             localFluidAudioServiceFactory: localFluidAudioServiceFactory,
             nativeAppleServiceFactory: nativeAppleServiceFactory,
+            customCloudServiceFactory: customCloudServiceFactory,
             remoteServiceFactory: remoteServiceFactory
         ).retranscribe(
             record,
@@ -657,6 +666,9 @@ public enum VoiceInkStoredAudioRetranscription {
         nativeAppleServiceFactory: @escaping NativeAppleServiceFactory = {
             VoiceInkUnsupportedAudioTranscriptionService()
         },
+        customCloudServiceFactory: @escaping CustomCloudServiceFactory = {
+            VoiceInkUnsupportedAudioTranscriptionService()
+        },
         remoteServiceFactory: @escaping RemoteServiceFactory = { VoiceInkRemoteTranscriptionService(provider: $0) }
     ) async -> VoiceInkStoredAudioRetranscriptionOutcome {
         await retranscribeWithOutcome(
@@ -672,6 +684,7 @@ public enum VoiceInkStoredAudioRetranscription {
             localWhisperServiceFactory: localWhisperServiceFactory,
             localFluidAudioServiceFactory: localFluidAudioServiceFactory,
             nativeAppleServiceFactory: nativeAppleServiceFactory,
+            customCloudServiceFactory: customCloudServiceFactory,
             remoteServiceFactory: remoteServiceFactory
         )
     }
@@ -691,6 +704,9 @@ public enum VoiceInkStoredAudioRetranscription {
         nativeAppleServiceFactory: @escaping NativeAppleServiceFactory = {
             VoiceInkUnsupportedAudioTranscriptionService()
         },
+        customCloudServiceFactory: @escaping CustomCloudServiceFactory = {
+            VoiceInkUnsupportedAudioTranscriptionService()
+        },
         remoteServiceFactory: @escaping RemoteServiceFactory = { VoiceInkRemoteTranscriptionService(provider: $0) }
     ) async -> VoiceInkStoredAudioRetranscriptionOutcome {
         await runner(
@@ -700,6 +716,7 @@ public enum VoiceInkStoredAudioRetranscription {
             localWhisperServiceFactory: localWhisperServiceFactory,
             localFluidAudioServiceFactory: localFluidAudioServiceFactory,
             nativeAppleServiceFactory: nativeAppleServiceFactory,
+            customCloudServiceFactory: customCloudServiceFactory,
             remoteServiceFactory: remoteServiceFactory
         ).retranscribeWithOutcome(
             record,
@@ -719,12 +736,16 @@ public enum VoiceInkStoredAudioRetranscription {
         nativeAppleServiceFactory: @escaping NativeAppleServiceFactory = {
             VoiceInkUnsupportedAudioTranscriptionService()
         },
+        customCloudServiceFactory: @escaping CustomCloudServiceFactory = {
+            VoiceInkUnsupportedAudioTranscriptionService()
+        },
         remoteServiceFactory: @escaping RemoteServiceFactory = { VoiceInkRemoteTranscriptionService(provider: $0) }
     ) -> VoiceInkStoredAudioRetranscriptionRunner {
         let serviceFactory = VoiceInkAudioTranscriptionServiceFactory(
             localWhisperServiceFactory: localWhisperServiceFactory,
             localFluidAudioServiceFactory: localFluidAudioServiceFactory,
             nativeAppleServiceFactory: nativeAppleServiceFactory,
+            customCloudServiceFactory: customCloudServiceFactory,
             remoteServiceFactory: remoteServiceFactory
         )
 

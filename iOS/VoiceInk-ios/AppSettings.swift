@@ -9,6 +9,7 @@ final class AppSettings: ObservableObject {
 
     private var localModelAvailabilityCancellable: AnyCancellable?
     private var fluidAudioAvailabilityCancellable: AnyCancellable?
+    private var customCloudModelCancellable: AnyCancellable?
 
     // Modes system
     @Published var modes: [Mode] {
@@ -72,7 +73,9 @@ final class AppSettings: ObservableObject {
 
         observeLocalModelAvailability()
         observeFluidAudioModelAvailability()
+        observeCustomCloudModels()
         repairLocalWhisperModelSelections()
+        repairCustomCloudModelSelections()
         repairSelectedTranscriptionLanguage()
     }
 
@@ -92,7 +95,8 @@ final class AppSettings: ObservableObject {
                     return true
                 }
                 return false
-            }()
+            }(),
+            customCloudModelAvailable: !IOSCustomCloudModelManager.shared.models.isEmpty
         )
     }
 
@@ -119,6 +123,19 @@ final class AppSettings: ObservableObject {
             }
     }
 
+    private func observeCustomCloudModels() {
+        customCloudModelCancellable = IOSCustomCloudModelManager.shared.$models
+            .dropFirst()
+            .sink { [weak self] _ in
+                Task { @MainActor in
+                    self?.repairCustomCloudModelSelections()
+                    self?.repairUnavailableProviders()
+                    self?.repairSelectedTranscriptionLanguage()
+                    self?.objectWillChange.send()
+                }
+            }
+    }
+
     private func repairUnavailableProviders() {
         let availability = providerAccess.modeFormProviderAvailability
         var repairedModes = modes
@@ -137,6 +154,23 @@ final class AppSettings: ObservableObject {
             var repairedMode = mode
             repairedMode.repairLocalWhisperModelSelection(
                 additionalLocalWhisperModelNames: importedModelNames
+            )
+            didRepairSelection = didRepairSelection
+                || repairedMode.transcriptionModel != mode.transcriptionModel
+            return repairedMode
+        }
+        if didRepairSelection {
+            modes = repairedModes
+        }
+    }
+
+    private func repairCustomCloudModelSelections() {
+        let availableModelNames = IOSCustomCloudModelManager.shared.modelNames
+        var didRepairSelection = false
+        let repairedModes = modes.map { mode in
+            var repairedMode = mode
+            repairedMode.repairCustomCloudModelSelection(
+                availableModelNames: availableModelNames
             )
             didRepairSelection = didRepairSelection
                 || repairedMode.transcriptionModel != mode.transcriptionModel
@@ -270,6 +304,11 @@ final class AppSettings: ObservableObject {
             },
             nativeAppleServiceFactory: {
                 IOSNativeAppleTranscriptionService()
+            },
+            customCloudServiceFactory: {
+                IOSCustomCloudTranscriptionService(
+                    models: IOSCustomCloudModelManager.shared.models
+                )
             }
         )
     }
@@ -299,6 +338,15 @@ final class AppSettings: ObservableObject {
         repairSelectedTranscriptionLanguage()
     }
 
+    var transcriptionLanguages: [String: String] {
+        guard let mode = modes.activeMode(selectedModeId: selectedModeId),
+              mode.transcriptionProvider == .customCloud,
+              let model = IOSCustomCloudModelManager.shared.model(named: mode.transcriptionModel) else {
+            return modes.transcriptionLanguages(selectedModeId: selectedModeId)
+        }
+        return model.supportedLanguages
+    }
+
     func repairSelectedTranscriptionLanguage() {
         applyModeSettingsRepairPlan(
             VoiceInkModeSettingsPolicy.repairPlan(
@@ -307,6 +355,13 @@ final class AppSettings: ObservableObject {
                 selectedTranscriptionLanguage: selectedTranscriptionLanguage
             )
         )
+        let repairedLanguage = VoiceInkTranscriptionLanguageSupport.validLanguageOrFallback(
+            selectedTranscriptionLanguage,
+            languages: transcriptionLanguages
+        )
+        if repairedLanguage != selectedTranscriptionLanguage {
+            selectedTranscriptionLanguage = repairedLanguage
+        }
     }
 
     private func applyModeSettingsRepairPlan(_ plan: VoiceInkModeSettingsRepairPlan) {
@@ -359,6 +414,7 @@ final class AppSettings: ObservableObject {
             },
             deleteProviderAPIKeys: { providers in
                 VoiceInkProviderAPIKeyStorage.deleteStoredKeys(for: providers)
+                IOSCustomCloudModelManager.shared.removeAll()
             }
         )
     }

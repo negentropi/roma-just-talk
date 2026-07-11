@@ -522,8 +522,15 @@ public struct Mode: Identifiable, Codable {
         )
     }
 
-    public mutating func selectTranscriptionProvider(_ provider: VoiceInkProviderKind) {
+    public mutating func selectTranscriptionProvider(
+        _ provider: VoiceInkProviderKind,
+        preferredModel: String? = nil
+    ) {
         transcriptionProvider = provider
+        if provider == .customCloud, let preferredModel {
+            transcriptionModel = preferredModel
+            return
+        }
         transcriptionModel = provider.selectedModel(transcriptionModel, for: .transcription)
     }
 
@@ -560,6 +567,14 @@ public struct Mode: Identifiable, Codable {
         transcriptionModel = effectiveTranscriptionModel(
             additionalLocalWhisperModelNames: additionalLocalWhisperModelNames
         )
+    }
+
+    public mutating func repairCustomCloudModelSelection(
+        availableModelNames: [String]
+    ) {
+        guard transcriptionProvider == .customCloud,
+              !availableModelNames.contains(transcriptionModel) else { return }
+        transcriptionModel = availableModelNames.first ?? ""
     }
 
     public var runtimeConfiguration: VoiceInkModeRuntimeConfiguration {

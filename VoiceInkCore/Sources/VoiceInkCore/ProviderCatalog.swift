@@ -34,6 +34,7 @@ public enum VoiceInkTranscriptionTransport: Sendable {
 public enum VoiceInkTranscriptionServiceKind: Equatable, Sendable {
     case remote
     case streamingOnly
+    case customCloud
     case localWhisper
     case localFluidAudio
     case nativeApple
@@ -74,6 +75,7 @@ public enum VoiceInkProviderAccessRequirement: Sendable {
     case localWhisperModel
     case localFluidAudioModel
     case nativeAppleSpeech
+    case customCloudModel
     case bundledService
 }
 
@@ -1102,6 +1104,7 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
     case assemblyAI
     case xai
     case cartesia
+    case customCloud
     case localWhisper
     case localFluidAudio
     case nativeApple
@@ -1143,6 +1146,8 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return "xAI"
         case .cartesia:
             return "Cartesia"
+        case .customCloud:
+            return "Custom Cloud"
         case .localWhisper:
             return "Local (Whisper)"
         case .localFluidAudio:
@@ -1203,6 +1208,8 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return VoiceInkProviderEndpoint.xaiAPIBaseURL
         case .cartesia:
             return VoiceInkProviderEndpoint.cartesiaAPIBaseURL
+        case .customCloud:
+            return URL(string: "http://localhost")!
         case .localWhisper:
             return URL(string: "http://localhost")!
         case .localFluidAudio:
@@ -1218,7 +1225,7 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
         switch self {
         case .gemini:
             return VoiceInkProviderEndpoint.geminiNativeAPIBaseURL
-        case .groq, .openAI, .deepgram, .cerebras, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .cartesia, .localWhisper, .localFluidAudio, .nativeApple, .voiceInk:
+        case .groq, .openAI, .deepgram, .cerebras, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .cartesia, .customCloud, .localWhisper, .localFluidAudio, .nativeApple, .voiceInk:
             return apiBaseURL
         }
     }
@@ -1249,6 +1256,8 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return URL(string: "https://console.x.ai/")!
         case .cartesia:
             return URL(string: "https://play.cartesia.ai/keys")!
+        case .customCloud:
+            return URL(string: "https://voiceink.app")!
         case .localWhisper:
             return URL(string: "https://github.com/ggerganov/whisper.cpp")!
         case .localFluidAudio:
@@ -1278,7 +1287,7 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return .assemblyAI
         case .xai:
             return .xai
-        case .cartesia:
+        case .cartesia, .customCloud:
             return .openAICompatible
         case .localWhisper:
             return .localWhisper
@@ -1294,6 +1303,9 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
     public var transcriptionServiceKind: VoiceInkTranscriptionServiceKind {
         if self == .cartesia {
             return .streamingOnly
+        }
+        if self == .customCloud {
+            return .customCloud
         }
 
         switch transcriptionTransport {
@@ -1314,7 +1326,7 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return .rejectEmpty
         case .soniox, .speechmatics, .assemblyAI, .localFluidAudio, .nativeApple:
             return .rejectWhitespace
-        case .openAI, .cerebras, .mistral, .elevenLabs, .xai, .cartesia, .localWhisper, .voiceInk:
+        case .openAI, .cerebras, .mistral, .elevenLabs, .xai, .cartesia, .customCloud, .localWhisper, .voiceInk:
             return .allow
         }
     }
@@ -1393,6 +1405,8 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
                 verificationStateKey: "cartesiaKeyVerified",
                 verificationTransport: .cartesiaVoices
             )
+        case .customCloud:
+            return .customCloudModel
         case .localWhisper:
             return .localWhisperModel
         case .localFluidAudio:
@@ -1435,6 +1449,8 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return "local-fluidaudio"
         case .nativeAppleSpeech:
             return "native-apple"
+        case .customCloudModel:
+            return "custom-cloud"
         case .bundledService:
             return ""
         }
@@ -1449,7 +1465,8 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
         userAPIKeyVerified: Bool,
         localWhisperModelAvailable: Bool,
         localFluidAudioModelAvailable: Bool = false,
-        nativeAppleSpeechAvailable: Bool = false
+        nativeAppleSpeechAvailable: Bool = false,
+        customCloudModelAvailable: Bool = false
     ) -> Bool {
         switch accessRequirement {
         case .userAPIKey:
@@ -1460,6 +1477,8 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return localFluidAudioModelAvailable
         case .nativeAppleSpeech:
             return nativeAppleSpeechAvailable
+        case .customCloudModel:
+            return customCloudModelAvailable
         case .bundledService:
             return false
         }
@@ -1513,6 +1532,8 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return .xai
         case .cartesia:
             return .cartesia
+        case .customCloud:
+            return nil
         case .localWhisper:
             return .local
         case .localFluidAudio:
@@ -1536,7 +1557,7 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return .cerebras
         case .gemini:
             return .gemini
-        case .deepgram, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .cartesia, .localWhisper, .localFluidAudio, .nativeApple, .voiceInk:
+        case .deepgram, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .cartesia, .customCloud, .localWhisper, .localFluidAudio, .nativeApple, .voiceInk:
             return nil
         }
     }
@@ -1575,14 +1596,17 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
     }
 
     public func supportsModelUse(_ use: VoiceInkProviderModelUse) -> Bool {
-        fixedModel(for: use) != nil || !models(for: use).isEmpty
+        if self == .customCloud {
+            return use == .transcription
+        }
+        return fixedModel(for: use) != nil || !models(for: use).isEmpty
     }
 
     public func isSelectable(for use: VoiceInkProviderModelUse) -> Bool {
         switch accessRequirement {
         case .bundledService:
             return false
-        case .userAPIKey, .localWhisperModel, .localFluidAudioModel, .nativeAppleSpeech:
+        case .userAPIKey, .localWhisperModel, .localFluidAudioModel, .nativeAppleSpeech, .customCloudModel:
             return supportsModelUse(use)
         }
     }
@@ -1597,6 +1621,9 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
     }
 
     public func selectedModel(_ currentModel: String, for use: VoiceInkProviderModelUse) -> String {
+        if self == .customCloud, use == .transcription {
+            return currentModel
+        }
         if let fixedModel = fixedModel(for: use) {
             return fixedModel
         }

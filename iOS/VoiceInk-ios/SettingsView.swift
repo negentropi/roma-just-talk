@@ -108,6 +108,10 @@ struct SettingsView: View {
                 NavigationLink(destination: APIKeysView()) {
                     Text(VoiceInkModelManagementFilter.cloud.manageSettingsTitle)
                 }
+
+                NavigationLink(destination: IOSCustomCloudModelsView()) {
+                    Text(VoiceInkModelManagementFilter.custom.manageSettingsTitle)
+                }
             }
 
             Section(header: Text(VoiceInkTranscriptionLanguagePresentation.sectionTitle)) {
@@ -118,7 +122,7 @@ struct SettingsView: View {
                         set: { settings.setSelectedTranscriptionLanguage($0) }
                     )
                 ) {
-                    ForEach(VoiceInkLanguageCatalog.sortedOptions(settings.modes.transcriptionLanguages(selectedModeId: settings.selectedModeId))) { language in
+                    ForEach(VoiceInkLanguageCatalog.sortedOptions(settings.transcriptionLanguages)) { language in
                         Text(language.name).tag(language.code)
                     }
                 }

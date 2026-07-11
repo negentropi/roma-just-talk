@@ -118,11 +118,13 @@ public struct VoiceInkAudioTranscriptionServiceFactory {
     public typealias LocalWhisperServiceFactory = () -> any VoiceInkAudioTranscriptionService
     public typealias LocalFluidAudioServiceFactory = () -> any VoiceInkAudioTranscriptionService
     public typealias NativeAppleServiceFactory = () -> any VoiceInkAudioTranscriptionService
+    public typealias CustomCloudServiceFactory = () -> any VoiceInkAudioTranscriptionService
 
     private let remoteServiceFactory: RemoteServiceFactory
     private let localWhisperServiceFactory: LocalWhisperServiceFactory
     private let localFluidAudioServiceFactory: LocalFluidAudioServiceFactory
     private let nativeAppleServiceFactory: NativeAppleServiceFactory
+    private let customCloudServiceFactory: CustomCloudServiceFactory
 
     public init(
         localWhisperServiceFactory: @escaping LocalWhisperServiceFactory,
@@ -132,11 +134,15 @@ public struct VoiceInkAudioTranscriptionServiceFactory {
         nativeAppleServiceFactory: @escaping NativeAppleServiceFactory = {
             VoiceInkUnsupportedAudioTranscriptionService()
         },
+        customCloudServiceFactory: @escaping CustomCloudServiceFactory = {
+            VoiceInkUnsupportedAudioTranscriptionService()
+        },
         remoteServiceFactory: @escaping RemoteServiceFactory = { VoiceInkRemoteTranscriptionService(provider: $0) }
     ) {
         self.localWhisperServiceFactory = localWhisperServiceFactory
         self.localFluidAudioServiceFactory = localFluidAudioServiceFactory
         self.nativeAppleServiceFactory = nativeAppleServiceFactory
+        self.customCloudServiceFactory = customCloudServiceFactory
         self.remoteServiceFactory = remoteServiceFactory
     }
 
@@ -146,6 +152,8 @@ public struct VoiceInkAudioTranscriptionServiceFactory {
             return remoteServiceFactory(provider)
         case .streamingOnly:
             return VoiceInkUnsupportedAudioTranscriptionService()
+        case .customCloud:
+            return customCloudServiceFactory()
         case .localWhisper:
             return localWhisperServiceFactory()
         case .localFluidAudio:

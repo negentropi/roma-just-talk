@@ -480,14 +480,16 @@ public struct VoiceInkProviderAPIKeyState: Equatable, Sendable {
         for provider: VoiceInkProviderKind,
         localWhisperModelAvailable: Bool,
         localFluidAudioModelAvailable: Bool = false,
-        nativeAppleSpeechAvailable: Bool = false
+        nativeAppleSpeechAvailable: Bool = false,
+        customCloudModelAvailable: Bool = false
     ) -> Bool {
         provider.isReady(
             userAPIKey: runtimeAPIKey(for: provider) ?? "",
             userAPIKeyVerified: verifiedProviders.contains(provider),
             localWhisperModelAvailable: localWhisperModelAvailable,
             localFluidAudioModelAvailable: localFluidAudioModelAvailable,
-            nativeAppleSpeechAvailable: nativeAppleSpeechAvailable
+            nativeAppleSpeechAvailable: nativeAppleSpeechAvailable,
+            customCloudModelAvailable: customCloudModelAvailable
         )
     }
 
@@ -495,14 +497,16 @@ public struct VoiceInkProviderAPIKeyState: Equatable, Sendable {
         for use: VoiceInkProviderModelUse,
         localWhisperModelAvailable: Bool,
         localFluidAudioModelAvailable: Bool = false,
-        nativeAppleSpeechAvailable: Bool = false
+        nativeAppleSpeechAvailable: Bool = false,
+        customCloudModelAvailable: Bool = false
     ) -> [VoiceInkProviderKind] {
         VoiceInkProviderKind.availableProviders(for: use) { provider in
             isReady(
                 for: provider,
                 localWhisperModelAvailable: localWhisperModelAvailable,
                 localFluidAudioModelAvailable: localFluidAudioModelAvailable,
-                nativeAppleSpeechAvailable: nativeAppleSpeechAvailable
+                nativeAppleSpeechAvailable: nativeAppleSpeechAvailable,
+                customCloudModelAvailable: customCloudModelAvailable
             )
         }
     }
@@ -648,17 +652,20 @@ public struct VoiceInkProviderAccessSnapshot: Equatable, Sendable {
     public let localWhisperModelAvailable: Bool
     public let localFluidAudioModelAvailable: Bool
     public let nativeAppleSpeechAvailable: Bool
+    public let customCloudModelAvailable: Bool
 
     public init(
         apiKeyState: VoiceInkProviderAPIKeyState,
         localWhisperModelAvailable: Bool,
         localFluidAudioModelAvailable: Bool = false,
-        nativeAppleSpeechAvailable: Bool = false
+        nativeAppleSpeechAvailable: Bool = false,
+        customCloudModelAvailable: Bool = false
     ) {
         self.apiKeyState = apiKeyState
         self.localWhisperModelAvailable = localWhisperModelAvailable
         self.localFluidAudioModelAvailable = localFluidAudioModelAvailable
         self.nativeAppleSpeechAvailable = nativeAppleSpeechAvailable
+        self.customCloudModelAvailable = customCloudModelAvailable
     }
 
     public func isProviderReady(for provider: VoiceInkProviderKind) -> Bool {
@@ -666,7 +673,8 @@ public struct VoiceInkProviderAccessSnapshot: Equatable, Sendable {
             for: provider,
             localWhisperModelAvailable: localWhisperModelAvailable,
             localFluidAudioModelAvailable: localFluidAudioModelAvailable,
-            nativeAppleSpeechAvailable: nativeAppleSpeechAvailable
+            nativeAppleSpeechAvailable: nativeAppleSpeechAvailable,
+            customCloudModelAvailable: customCloudModelAvailable
         )
     }
 
@@ -679,7 +687,8 @@ public struct VoiceInkProviderAccessSnapshot: Equatable, Sendable {
             for: use,
             localWhisperModelAvailable: localWhisperModelAvailable,
             localFluidAudioModelAvailable: localFluidAudioModelAvailable,
-            nativeAppleSpeechAvailable: nativeAppleSpeechAvailable
+            nativeAppleSpeechAvailable: nativeAppleSpeechAvailable,
+            customCloudModelAvailable: customCloudModelAvailable
         )
     }
 

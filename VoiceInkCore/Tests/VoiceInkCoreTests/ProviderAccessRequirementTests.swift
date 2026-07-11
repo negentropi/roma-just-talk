@@ -1696,6 +1696,7 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertEqual(VoiceInkProviderKind.groq.runtimeAPIKeyIfAvailable(userAPIKey: "groq-key"), "groq-key")
         XCTAssertNil(VoiceInkProviderKind.groq.runtimeAPIKeyIfAvailable(userAPIKey: " \n "))
         XCTAssertEqual(VoiceInkProviderKind.localWhisper.runtimeAPIKeyIfAvailable(userAPIKey: ""), "local")
+        XCTAssertEqual(VoiceInkProviderKind.customCloud.runtimeAPIKeyIfAvailable(userAPIKey: ""), "custom-cloud")
     }
 
     func testTranscriptionServiceKindGroupsProvidersByRequiredAdapter() {
@@ -1711,6 +1712,7 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertEqual(VoiceInkProviderKind.assemblyAI.transcriptionServiceKind, .remote)
         XCTAssertEqual(VoiceInkProviderKind.xai.transcriptionServiceKind, .remote)
         XCTAssertEqual(VoiceInkProviderKind.cartesia.transcriptionServiceKind, .streamingOnly)
+        XCTAssertEqual(VoiceInkProviderKind.customCloud.transcriptionServiceKind, .customCloud)
         XCTAssertEqual(VoiceInkProviderKind.localWhisper.transcriptionServiceKind, .localWhisper)
     }
 
@@ -1857,6 +1859,8 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertTrue(VoiceInkProviderKind.groq.isSelectable(for: .postProcessing))
         XCTAssertTrue(VoiceInkProviderKind.localWhisper.isSelectable(for: .transcription))
         XCTAssertFalse(VoiceInkProviderKind.localWhisper.isSelectable(for: .postProcessing))
+        XCTAssertTrue(VoiceInkProviderKind.customCloud.isSelectable(for: .transcription))
+        XCTAssertFalse(VoiceInkProviderKind.customCloud.isSelectable(for: .postProcessing))
     }
 
     func testModelSelectionPresentationUsesTranscriptionModelList() {

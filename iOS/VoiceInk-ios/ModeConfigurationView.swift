@@ -5,6 +5,7 @@ struct ModeConfigurationView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var settings: AppSettings
     @StateObject private var localModelManager = LocalModelManager.shared
+    @StateObject private var customCloudModelManager = IOSCustomCloudModelManager.shared
     
     @State private var draftState: VoiceInkModeFormDraftState
     private let isEditing: Bool
@@ -26,11 +27,15 @@ struct ModeConfigurationView: View {
         let providerAvailability = settings.providerAccess.modeFormProviderAvailability
         let formStatePresentation = providerAvailability.formStatePresentation(for: draftState.mode)
         let transcriptionModelSelection = draftState.mode.transcriptionProvider.modelSelectionPresentation(for: .transcription)
-        let selectableTranscriptionModels = draftState.mode.transcriptionProvider == .localWhisper
-            ? localModelManager.selectableLocalModelNames(
+        let selectableTranscriptionModels: [String] = if draftState.mode.transcriptionProvider == .localWhisper {
+            localModelManager.selectableLocalModelNames(
                 catalogModelNames: transcriptionModelSelection.selectableModels
             )
-            : transcriptionModelSelection.selectableModels
+        } else if draftState.mode.transcriptionProvider == .customCloud {
+            customCloudModelManager.modelNames
+        } else {
+            transcriptionModelSelection.selectableModels
+        }
         let postProcessingModelSelection = draftState.mode.postProcessingProvider.modelSelectionPresentation(for: .postProcessing)
 
         Form {
@@ -44,7 +49,14 @@ struct ModeConfigurationView: View {
                     formPresentation.providerPickerTitle,
                     selection: Binding(
                         get: { draftState.mode.transcriptionProvider },
-                        set: { draftState.mode.selectTranscriptionProvider($0) }
+                        set: { provider in
+                            draftState.mode.selectTranscriptionProvider(
+                                provider,
+                                preferredModel: provider == .customCloud
+                                    ? customCloudModelManager.modelNames.first
+                                    : nil
+                            )
+                        }
                     )
                 ) {
                     ForEach(providerAvailability.transcriptionProviders) { provider in

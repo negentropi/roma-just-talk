@@ -17,7 +17,7 @@ on:
 jobs:
   build:
     name: Build release macOS app
-    runs-on: macos-26
+    runs-on: namespace-profile-roma-jt
     timeout-minutes: 60
 
     steps:

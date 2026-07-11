@@ -32,7 +32,7 @@ permissions:
 jobs:
   verify:
     name: Verify single-repo migration
-    runs-on: macos-26
+    runs-on: namespace-profile-roma-jt
     timeout-minutes: 90
 
     steps:

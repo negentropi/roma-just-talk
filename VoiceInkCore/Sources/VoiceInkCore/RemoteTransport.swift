@@ -754,10 +754,12 @@ public struct VoiceInkOpenAICompatibleModelsResponse: Codable, Equatable, Sendab
 
 public enum VoiceInkOpenAICompatibleModelsCodec {
     public static func modelIDs(from data: Data) throws -> [String] {
-        try JSONDecoder().decode(VoiceInkOpenAICompatibleModelsResponse.self, from: data)
+        let modelIDs = try JSONDecoder().decode(VoiceInkOpenAICompatibleModelsResponse.self, from: data)
             .data
             .map(\.id)
             .filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+        var seenModelIDs = Set<String>()
+        return modelIDs.filter { seenModelIDs.insert($0).inserted }
     }
 }
 

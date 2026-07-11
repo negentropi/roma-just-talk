@@ -101,12 +101,10 @@ final class AppSettings: ObservableObject {
         }
 
         do {
-            let fetchedModels = try await VoiceInkOpenAICompatibleClient().fetchModelIDs(
+            let models = try await VoiceInkOpenAICompatibleClient().fetchModelIDs(
                 baseURL: VoiceInkProviderKind.openRouter.apiBaseURL,
                 apiKey: apiKey
             )
-            var seenModels = Set<String>()
-            let models = fetchedModels.filter { seenModels.insert($0).inserted }
             guard !models.isEmpty else { return }
 
             VoiceInkDynamicAIProviderPreference.saveOpenRouterModels(models)

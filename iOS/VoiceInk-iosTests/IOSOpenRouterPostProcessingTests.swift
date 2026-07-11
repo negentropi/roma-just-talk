@@ -39,6 +39,7 @@ final class IOSOpenRouterPostProcessingTests: XCTestCase {
         let data = try JSONEncoder().encode(VoiceInkOpenAICompatibleModelsResponse(data: [
             VoiceInkOpenAICompatibleModelRecord(id: "model/b"),
             VoiceInkOpenAICompatibleModelRecord(id: " "),
+            VoiceInkOpenAICompatibleModelRecord(id: "model/b"),
             VoiceInkOpenAICompatibleModelRecord(id: "model/a")
         ]))
 

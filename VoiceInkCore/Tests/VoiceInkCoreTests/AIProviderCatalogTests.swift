@@ -2592,6 +2592,7 @@ extension AIProviderCatalogTests {
         let systemMessage = VoiceInkAIEnhancementPromptBuilder.systemMessage(
             basePrompt: "Clean this transcript.",
             context: VoiceInkAIEnhancementPromptContext(
+                surroundingTextBeforeCursor: "before cursor",
                 selectedText: "selected text",
                 clipboardText: "clipboard text",
                 currentWindowText: "window text",
@@ -2603,6 +2604,10 @@ extension AIProviderCatalogTests {
             systemMessage,
             """
             Clean this transcript.
+
+            <SURROUNDING_TEXT_BEFORE_CURSOR>
+            before cursor
+            </SURROUNDING_TEXT_BEFORE_CURSOR>
 
             <CURRENTLY_SELECTED_TEXT>
             selected text

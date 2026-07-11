@@ -584,6 +584,37 @@ public enum VoiceInkStoredAudioRetranscription {
         _ record: Record,
         relativeTo recordingsDirectory: URL? = nil,
         fileManager: FileManager = .default,
+        runSettings: VoiceInkTranscriptionRunSettings,
+        apiKeyProvider: @escaping VoiceInkTranscriptionRunProcessor.APIKeyProvider,
+        localWhisperServiceFactory: @escaping LocalWhisperServiceFactory,
+        localFluidAudioServiceFactory: @escaping LocalFluidAudioServiceFactory = {
+            VoiceInkUnsupportedAudioTranscriptionService()
+        },
+        nativeAppleServiceFactory: @escaping NativeAppleServiceFactory = {
+            VoiceInkUnsupportedAudioTranscriptionService()
+        },
+        customCloudServiceFactory: @escaping CustomCloudServiceFactory = {
+            VoiceInkUnsupportedAudioTranscriptionService()
+        }
+    ) async -> VoiceInkStoredAudioRetranscriptionOutcome {
+        await retranscribeWithOutcome(
+            record,
+            relativeTo: recordingsDirectory,
+            fileManager: fileManager,
+            runSettingsProvider: { runSettings },
+            apiKeyProvider: apiKeyProvider,
+            localWhisperServiceFactory: localWhisperServiceFactory,
+            localFluidAudioServiceFactory: localFluidAudioServiceFactory,
+            nativeAppleServiceFactory: nativeAppleServiceFactory,
+            customCloudServiceFactory: customCloudServiceFactory
+        )
+    }
+
+    @discardableResult
+    public static func retranscribeWithOutcome<Record: VoiceInkMutableTranscriptionRecord & VoiceInkStoredAudioRecord>(
+        _ record: Record,
+        relativeTo recordingsDirectory: URL? = nil,
+        fileManager: FileManager = .default,
         defaults: UserDefaults = .standard,
         iOSAppSettingsRunSnapshotProvider: @escaping IOSAppSettingsRunSnapshotProvider,
         apiKeyProvider: @escaping VoiceInkTranscriptionRunProcessor.APIKeyProvider,

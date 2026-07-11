@@ -91,7 +91,8 @@ final class IOSTranscriptionTaskCoordinator: ObservableObject {
         completeKeyboard: @escaping KeyboardCompletion = { requestID, text in
             AppGroupCoordinator.shared.completeKeyboardDictation(
                 requestID: requestID,
-                text: IOSKeyboardDictationDeliveryText.text(text)
+                text: IOSKeyboardDictationDeliveryText.text(text),
+                shouldLowercase: AppSettings.shared.transcriptionCleanupSettings.lowercaseTranscription
             )
         },
         failKeyboard: @escaping KeyboardFailure = { requestID, message in

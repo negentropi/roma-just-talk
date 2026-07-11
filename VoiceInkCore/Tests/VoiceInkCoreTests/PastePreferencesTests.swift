@@ -197,6 +197,13 @@ final class PastePreferencesTests: XCTestCase {
 
     func testCursorTextContextPolicyBoundsValueSuffixToTextInputRoles() {
         XCTAssertEqual(
+            VoiceInkCursorTextContextPolicy.boundedSuffix("hello world", maximumLength: 5),
+            "world"
+        )
+        XCTAssertNil(VoiceInkCursorTextContextPolicy.boundedSuffix(nil, maximumLength: 5))
+        XCTAssertNil(VoiceInkCursorTextContextPolicy.boundedSuffix("hello", maximumLength: 0))
+
+        XCTAssertEqual(
             VoiceInkCursorTextContextPolicy.valueSuffix(
                 from: "hello",
                 role: "AXTextField",

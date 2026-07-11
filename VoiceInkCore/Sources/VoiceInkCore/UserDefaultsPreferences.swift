@@ -1362,6 +1362,19 @@ public enum VoiceInkCursorTextContextPolicy {
 
         return String(text.suffix(maximumLength))
     }
+
+    public static func boundedSuffix(
+        _ text: String?,
+        maximumLength: Int = defaultMaximumLength
+    ) -> String? {
+        guard shouldAttemptRead(maximumLength: maximumLength),
+              let text,
+              !text.isEmpty else {
+            return nil
+        }
+
+        return String(text.suffix(maximumLength))
+    }
 }
 
 public enum VoiceInkPreferenceList {

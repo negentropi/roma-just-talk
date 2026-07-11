@@ -160,7 +160,8 @@ class KeyboardViewController: KeyboardInputViewController {
             openMainAppForRecording: { [weak self] in
                 guard let self = self else { return }
                 guard let requestID = self.coordinator.beginKeyboardDictation(
-                    documentIdentifier: self.textDocumentProxy.documentIdentifier
+                    documentIdentifier: self.textDocumentProxy.documentIdentifier,
+                    surroundingTextBeforeCursor: self.textDocumentProxy.documentContextBeforeInput
                 ) else {
                     self.updateButtonAppearanceBasedOnState()
                     return
@@ -275,7 +276,15 @@ class KeyboardViewController: KeyboardInputViewController {
             return false
         }
 
-        textDocumentProxy.insertText(delivery.text)
+        let plan = VoiceInkTranscriptionPasteOutputPolicy.cursorPasteTextPlan(
+            delivery.text,
+            shouldLowercase: delivery.shouldLowercase
+        )
+        textDocumentProxy.insertText(plan.text(
+            beforeCursor: VoiceInkCursorTextContextPolicy.boundedSuffix(
+                textDocumentProxy.documentContextBeforeInput
+            )
+        ))
         UINotificationFeedbackGenerator().notificationOccurred(.success)
         return true
     }

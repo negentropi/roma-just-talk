@@ -614,6 +614,7 @@ public struct VoiceInkTranscriptionRunSettings: Equatable, Sendable {
     public let customVocabulary: [String]
     public let promptLibrary: [VoiceInkCustomPrompt]
     public let selectedPromptId: UUID?
+    public let enhancementContext: VoiceInkAIEnhancementPromptContext
 
     public init(
         configuration: VoiceInkModeRuntimeConfiguration,
@@ -624,7 +625,8 @@ public struct VoiceInkTranscriptionRunSettings: Equatable, Sendable {
         wordReplacementRules: [VoiceInkWordReplacementRule] = [],
         customVocabulary: [String] = [],
         promptLibrary: [VoiceInkCustomPrompt] = [],
-        selectedPromptId: UUID? = nil
+        selectedPromptId: UUID? = nil,
+        enhancementContext: VoiceInkAIEnhancementPromptContext = VoiceInkAIEnhancementPromptContext()
     ) {
         self.configuration = configuration
         self.cleanupConfiguration = cleanupConfiguration
@@ -635,6 +637,7 @@ public struct VoiceInkTranscriptionRunSettings: Equatable, Sendable {
         self.customVocabulary = customVocabulary
         self.promptLibrary = promptLibrary
         self.selectedPromptId = selectedPromptId
+        self.enhancementContext = enhancementContext
     }
 
     public func selectingPrompt(_ promptId: UUID?, from prompts: [VoiceInkCustomPrompt]) -> Self {
@@ -651,7 +654,23 @@ public struct VoiceInkTranscriptionRunSettings: Equatable, Sendable {
             wordReplacementRules: wordReplacementRules,
             customVocabulary: customVocabulary,
             promptLibrary: prompts,
-            selectedPromptId: promptId
+            selectedPromptId: promptId,
+            enhancementContext: enhancementContext
+        )
+    }
+
+    public func applyingEnhancementContext(_ context: VoiceInkAIEnhancementPromptContext) -> Self {
+        VoiceInkTranscriptionRunSettings(
+            configuration: configuration,
+            cleanupConfiguration: cleanupConfiguration,
+            postProcessingSkipConfiguration: postProcessingSkipConfiguration,
+            transcriptionLanguage: transcriptionLanguage,
+            transcriptionPrompt: transcriptionPrompt,
+            wordReplacementRules: wordReplacementRules,
+            customVocabulary: customVocabulary,
+            promptLibrary: promptLibrary,
+            selectedPromptId: selectedPromptId,
+            enhancementContext: context
         )
     }
 
@@ -671,6 +690,7 @@ public struct VoiceInkTranscriptionRunSettings: Equatable, Sendable {
             postProcessingSkipConfiguration: postProcessingSkipConfiguration,
             promptLibrary: promptLibrary,
             selectedPromptId: selectedPromptId,
+            enhancementContext: enhancementContext,
             transcriptionLanguage: transcriptionLanguage,
             transcriptionPrompt: transcriptionPrompt,
             customVocabulary: customVocabulary,
@@ -697,6 +717,7 @@ public struct VoiceInkTranscriptionRunSettings: Equatable, Sendable {
             postProcessingSkipConfiguration: postProcessingSkipConfiguration,
             promptLibrary: promptLibrary,
             selectedPromptId: selectedPromptId,
+            enhancementContext: enhancementContext,
             apiKeyProvider: apiKeyProvider
         )
     }
@@ -798,6 +819,7 @@ public struct VoiceInkTranscriptionRunProcessor {
         postProcessingSkipConfiguration: VoiceInkPostProcessingSkipConfiguration? = nil,
         promptLibrary: [VoiceInkCustomPrompt] = [],
         selectedPromptId: UUID? = nil,
+        enhancementContext: VoiceInkAIEnhancementPromptContext = VoiceInkAIEnhancementPromptContext(),
         promptTriggerForcesPostProcessing: Bool = false,
         transcriptionLanguage: String? = nil,
         transcriptionPrompt: String? = nil,
@@ -841,6 +863,7 @@ public struct VoiceInkTranscriptionRunProcessor {
             postProcessingSkipConfiguration: postProcessingSkipConfiguration,
             promptLibrary: promptLibrary,
             selectedPromptId: selectedPromptId,
+            enhancementContext: enhancementContext,
             promptTriggerForcesPostProcessing: promptTriggerForcesPostProcessing,
             apiKeyProvider: apiKeyProvider
         )
@@ -856,6 +879,7 @@ public struct VoiceInkTranscriptionRunProcessor {
         postProcessingSkipConfiguration: VoiceInkPostProcessingSkipConfiguration? = nil,
         promptLibrary: [VoiceInkCustomPrompt] = [],
         selectedPromptId: UUID? = nil,
+        enhancementContext: VoiceInkAIEnhancementPromptContext = VoiceInkAIEnhancementPromptContext(),
         promptTriggerForcesPostProcessing: Bool = false,
         apiKeyProvider: APIKeyProvider
     ) async throws -> VoiceInkTranscriptionRunResult {
@@ -900,7 +924,10 @@ public struct VoiceInkTranscriptionRunProcessor {
         var postProcessingError: String? = nil
 
         if effectiveConfiguration.isPostProcessingEnabled, !shouldSkipPostProcessing {
-            let prompt = effectiveConfiguration.prompt
+            let prompt = VoiceInkAIEnhancementPromptBuilder.systemMessage(
+                basePrompt: effectiveConfiguration.prompt,
+                context: enhancementContext
+            )
             if !prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 let llmProvider = effectiveConfiguration.postProcessingProvider
                 let llmKey = await apiKeyProvider(llmProvider)

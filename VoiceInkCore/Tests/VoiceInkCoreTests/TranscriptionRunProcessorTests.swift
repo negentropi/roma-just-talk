@@ -1136,11 +1136,17 @@ extension TranscriptionRunProcessorTests {
             useSystemInstructions: false
         )
         let baseSettings = VoiceInkTranscriptionRunSettings(
-            configuration: configuration(isPostProcessingEnabled: true)
+            configuration: configuration(isPostProcessingEnabled: true),
+            enhancementContext: VoiceInkAIEnhancementPromptContext(
+                surroundingTextBeforeCursor: "Previous sentence."
+            )
         )
         let settings = baseSettings.selectingPrompt(prompt.id, from: [prompt])
         let processor = VoiceInkTranscriptionRunProcessor { job in
-            XCTAssertEqual(job.prompt, "Write an email")
+            XCTAssertEqual(
+                job.prompt,
+                "Write an email\n\n<SURROUNDING_TEXT_BEFORE_CURSOR>\nPrevious sentence.\n</SURROUNDING_TEXT_BEFORE_CURSOR>"
+            )
             XCTAssertEqual(job.transcript, "raw text")
             return "email output"
         }

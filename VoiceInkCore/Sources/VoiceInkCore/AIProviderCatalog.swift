@@ -417,17 +417,20 @@ public enum VoiceInkAIEnhancementRequestPreparation: Equatable, Sendable {
 }
 
 public struct VoiceInkAIEnhancementPromptContext: Equatable, Sendable {
+    public let surroundingTextBeforeCursor: String?
     public let selectedText: String?
     public let clipboardText: String?
     public let currentWindowText: String?
     public let customVocabulary: String
 
     public init(
+        surroundingTextBeforeCursor: String? = nil,
         selectedText: String? = nil,
         clipboardText: String? = nil,
         currentWindowText: String? = nil,
         customVocabulary: String = ""
     ) {
+        self.surroundingTextBeforeCursor = surroundingTextBeforeCursor
         self.selectedText = selectedText
         self.clipboardText = clipboardText
         self.currentWindowText = currentWindowText
@@ -447,6 +450,7 @@ public enum VoiceInkAIEnhancementPromptBuilder {
         context: VoiceInkAIEnhancementPromptContext = VoiceInkAIEnhancementPromptContext()
     ) -> String {
         basePrompt
+            + taggedSection("SURROUNDING_TEXT_BEFORE_CURSOR", text: context.surroundingTextBeforeCursor)
             + taggedSection("CURRENTLY_SELECTED_TEXT", text: context.selectedText)
             + taggedSection("CLIPBOARD_CONTEXT", text: context.clipboardText)
             + taggedSection("CURRENT_WINDOW_CONTEXT", text: context.currentWindowText)

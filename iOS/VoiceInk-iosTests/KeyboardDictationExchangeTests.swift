@@ -44,7 +44,8 @@ final class KeyboardDictationExchangeTests: XCTestCase {
             ),
             VoiceInkKeyboardDictationDelivery(
                 requestID: requestID,
-                text: "Delivered transcript"
+                text: "Delivered transcript",
+                shouldLowercase: false
             )
         )
         XCTAssertNil(store.takeCompletedResult(
@@ -112,8 +113,65 @@ final class KeyboardDictationExchangeTests: XCTestCase {
             now: requestedAt.addingTimeInterval(2)
         ))
         XCTAssertEqual(
-            store.pendingRequestID(now: requestedAt.addingTimeInterval(2)),
+            store.takePendingRequest(now: requestedAt.addingTimeInterval(2))?.requestID,
             newRequestID
+        )
+    }
+
+    func testPendingRequestBoundsAndConsumesSurroundingContext() throws {
+        let store = VoiceInkKeyboardDictationExchangeStore(defaults: defaults)
+        let requestID = UUID()
+        let documentID = UUID()
+        let requestedAt = Date(timeIntervalSince1970: 100)
+        let context = String(repeating: "a", count: 260)
+
+        store.begin(
+            documentIdentifier: documentID,
+            surroundingTextBeforeCursor: context,
+            requestID: requestID,
+            now: requestedAt
+        )
+
+        XCTAssertEqual(
+            store.takePendingRequest(now: requestedAt.addingTimeInterval(1)),
+            VoiceInkKeyboardDictationRequest(
+                requestID: requestID,
+                surroundingTextBeforeCursor: String(repeating: "a", count: 240)
+            )
+        )
+        XCTAssertEqual(
+            store.takePendingRequest(now: requestedAt.addingTimeInterval(2)),
+            VoiceInkKeyboardDictationRequest(
+                requestID: requestID,
+                surroundingTextBeforeCursor: nil
+            )
+        )
+    }
+
+    func testCompletedDeliveryPreservesLowercaseIntent() throws {
+        let store = VoiceInkKeyboardDictationExchangeStore(defaults: defaults)
+        let requestID = UUID()
+        let documentID = UUID()
+        let requestedAt = Date(timeIntervalSince1970: 100)
+
+        store.begin(
+            documentIdentifier: documentID,
+            requestID: requestID,
+            now: requestedAt
+        )
+        XCTAssertTrue(store.complete(
+            requestID: requestID,
+            text: "lowercase transcript",
+            shouldLowercase: true,
+            now: requestedAt.addingTimeInterval(1)
+        ))
+
+        XCTAssertEqual(
+            store.takeCompletedResult(
+                for: documentID,
+                now: requestedAt.addingTimeInterval(2)
+            )?.shouldLowercase,
+            true
         )
     }
 

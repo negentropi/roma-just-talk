@@ -3,6 +3,12 @@ import Foundation
 struct VoiceInkKeyboardDictationDelivery: Equatable, Sendable {
     let requestID: UUID
     let text: String
+    let shouldLowercase: Bool
+}
+
+struct VoiceInkKeyboardDictationRequest: Equatable, Sendable {
+    let requestID: UUID
+    let surroundingTextBeforeCursor: String?
 }
 
 enum VoiceInkKeyboardDictationExchangeStatus: Equatable, Sendable {
@@ -28,7 +34,9 @@ struct VoiceInkKeyboardDictationExchangeStore {
         let requestedAt: Date
         var updatedAt: Date
         var state: State
+        var surroundingTextBeforeCursor: String?
         var text: String?
+        var shouldLowercase: Bool?
         var failureMessage: String?
     }
 
@@ -42,6 +50,7 @@ struct VoiceInkKeyboardDictationExchangeStore {
     @discardableResult
     func begin(
         documentIdentifier: UUID,
+        surroundingTextBeforeCursor: String? = nil,
         requestID: UUID = UUID(),
         now: Date = Date()
     ) -> UUID? {
@@ -51,25 +60,36 @@ struct VoiceInkKeyboardDictationExchangeStore {
             requestedAt: now,
             updatedAt: now,
             state: .requested,
+            surroundingTextBeforeCursor: VoiceInkCursorTextContextPolicy.boundedSuffix(
+                surroundingTextBeforeCursor
+            ),
             text: nil,
+            shouldLowercase: nil,
             failureMessage: nil
         )
 
         return write(exchange) ? requestID : nil
     }
 
-    func pendingRequestID(now: Date = Date()) -> UUID? {
-        guard let exchange = read(now: now), exchange.state == .requested else {
+    func takePendingRequest(now: Date = Date()) -> VoiceInkKeyboardDictationRequest? {
+        guard var exchange = read(now: now), exchange.state == .requested else {
             return nil
         }
 
-        return exchange.requestID
+        let request = VoiceInkKeyboardDictationRequest(
+            requestID: exchange.requestID,
+            surroundingTextBeforeCursor: exchange.surroundingTextBeforeCursor
+        )
+        exchange.surroundingTextBeforeCursor = nil
+        exchange.updatedAt = now
+        return write(exchange) ? request : nil
     }
 
     @discardableResult
     func complete(
         requestID: UUID,
         text: String,
+        shouldLowercase: Bool = false,
         now: Date = Date()
     ) -> Bool {
         guard var exchange = read(now: now),
@@ -88,7 +108,9 @@ struct VoiceInkKeyboardDictationExchangeStore {
 
         exchange.updatedAt = now
         exchange.state = .succeeded
+        exchange.surroundingTextBeforeCursor = nil
         exchange.text = text
+        exchange.shouldLowercase = shouldLowercase
         exchange.failureMessage = nil
         return write(exchange)
     }
@@ -108,7 +130,9 @@ struct VoiceInkKeyboardDictationExchangeStore {
         let trimmedMessage = message.trimmingCharacters(in: .whitespacesAndNewlines)
         exchange.updatedAt = now
         exchange.state = .failed
+        exchange.surroundingTextBeforeCursor = nil
         exchange.text = nil
+        exchange.shouldLowercase = nil
         exchange.failureMessage = trimmedMessage.isEmpty ? "Transcription failed." : trimmedMessage
         return write(exchange)
     }
@@ -152,7 +176,8 @@ struct VoiceInkKeyboardDictationExchangeStore {
         defaults?.removeObject(forKey: Self.storageKey)
         return VoiceInkKeyboardDictationDelivery(
             requestID: exchange.requestID,
-            text: text
+            text: text,
+            shouldLowercase: exchange.shouldLowercase ?? false
         )
     }
 

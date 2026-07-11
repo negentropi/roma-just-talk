@@ -394,6 +394,33 @@ final class AppSettings: ObservableObject {
         )
     }
 
+    func retranscribeStoredAudio(
+        _ note: Transcription,
+        runSettings: VoiceInkTranscriptionRunSettings
+    ) async -> VoiceInkStoredAudioRetranscriptionOutcome {
+        await VoiceInkStoredAudioRetranscription.retranscribeWithOutcome(
+            note,
+            runSettings: runSettings,
+            apiKeyProvider: { [self] provider in
+                await apiKey(for: provider)
+            },
+            localWhisperServiceFactory: {
+                WhisperTranscriptionService()
+            },
+            localFluidAudioServiceFactory: {
+                IOSFluidAudioTranscriptionService()
+            },
+            nativeAppleServiceFactory: {
+                IOSNativeAppleTranscriptionService()
+            },
+            customCloudServiceFactory: {
+                IOSCustomCloudTranscriptionService(
+                    models: IOSCustomCloudModelManager.shared.models
+                )
+            }
+        )
+    }
+
     func addMode(_ mode: Mode) {
         modes = VoiceInkModeListPolicy.appending(mode, to: modes)
     }

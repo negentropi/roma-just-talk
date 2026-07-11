@@ -91,8 +91,14 @@ final class AppGroupCoordinator {
         return state.isRecording
     }
 
-    func beginKeyboardDictation(documentIdentifier: UUID) -> UUID? {
-        keyboardDictationStore.begin(documentIdentifier: documentIdentifier)
+    func beginKeyboardDictation(
+        documentIdentifier: UUID,
+        surroundingTextBeforeCursor: String?
+    ) -> UUID? {
+        keyboardDictationStore.begin(
+            documentIdentifier: documentIdentifier,
+            surroundingTextBeforeCursor: surroundingTextBeforeCursor
+        )
     }
 
     func reportKeyboardReadiness(hasFullAccess: Bool) {
@@ -103,8 +109,8 @@ final class AppGroupCoordinator {
         )
     }
 
-    func pendingKeyboardDictationRequestID() -> UUID? {
-        keyboardDictationStore.pendingRequestID()
+    func takePendingKeyboardDictationRequest() -> VoiceInkKeyboardDictationRequest? {
+        keyboardDictationStore.takePendingRequest()
     }
 
     func keyboardDictationStatus(
@@ -120,8 +126,16 @@ final class AppGroupCoordinator {
     }
 
     @discardableResult
-    func completeKeyboardDictation(requestID: UUID, text: String) -> Bool {
-        keyboardDictationStore.complete(requestID: requestID, text: text)
+    func completeKeyboardDictation(
+        requestID: UUID,
+        text: String,
+        shouldLowercase: Bool
+    ) -> Bool {
+        keyboardDictationStore.complete(
+            requestID: requestID,
+            text: text,
+            shouldLowercase: shouldLowercase
+        )
     }
 
     @discardableResult

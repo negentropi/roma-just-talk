@@ -69,7 +69,20 @@ final class RecordingManager: ObservableObject {
     }
 
     func prepareKeyboardDictationRequest() {
-        keyboardDictationRequestID = coordinator.pendingKeyboardDictationRequestID()
+        guard let request = coordinator.takePendingKeyboardDictationRequest() else {
+            keyboardDictationRequestID = nil
+            return
+        }
+        keyboardDictationRequestID = request.requestID
+        if let surroundingTextBeforeCursor = request.surroundingTextBeforeCursor {
+            activeRunSettings = settings.currentTranscriptionRunSettings().applyingEnhancementContext(
+                VoiceInkAIEnhancementPromptContext(
+                    surroundingTextBeforeCursor: surroundingTextBeforeCursor
+                )
+            )
+        } else if activeRunSettings == nil {
+            activeRunSettings = settings.currentTranscriptionRunSettings()
+        }
     }
 
     private func startRecordingWithPermissionCheck() {
@@ -95,7 +108,7 @@ final class RecordingManager: ObservableObject {
         updateFlowState { $0.prepareRecordingStart() }
         coordinator.updateRecordingState(true)
 
-        let runSettings = settings.currentTranscriptionRunSettings()
+        let runSettings = activeRunSettings ?? settings.currentTranscriptionRunSettings()
         activeRunSettings = runSettings
         livePartialTranscript = ""
         liveTranscriptionFallbackMessage = nil
@@ -191,7 +204,7 @@ final class RecordingManager: ObservableObject {
                     note: note,
                     keyboardRequestID: keyboardRequestID,
                     persist: { try? modelContext.save() },
-                    operation: streamingOperation(
+                    operation: transcriptionOperation(
                         service: streamingService,
                         request: streamingRequest,
                         runSettings: runSettings,
@@ -213,8 +226,11 @@ final class RecordingManager: ObservableObject {
     }
 
     func selectPromptForActiveRecording(_ promptId: UUID?) {
+        let enhancementContext = activeRunSettings?.enhancementContext
+            ?? VoiceInkAIEnhancementPromptContext()
         settings.recordingPromptOverrideId = promptId
         activeRunSettings = settings.currentTranscriptionRunSettings()
+            .applyingEnhancementContext(enhancementContext)
     }
     
     func cancelRecording() {
@@ -228,15 +244,21 @@ final class RecordingManager: ObservableObject {
         failActiveKeyboardDictation(message: "Recording canceled.")
     }
 
-    private func streamingOperation(
+    private func transcriptionOperation(
         service: IOSStreamingTranscriptionService?,
         request: VoiceInkLiveTranscriptionRequest?,
         runSettings: VoiceInkTranscriptionRunSettings?,
         startedAt: Date?
     ) -> IOSTranscriptionTaskCoordinator.RunOperation? {
-        guard let service, let request, let runSettings else { return nil }
+        guard let runSettings else { return nil }
 
         return { [settings] note in
+            guard let service, let request else {
+                return await settings.retranscribeStoredAudio(
+                    note,
+                    runSettings: runSettings
+                )
+            }
             do {
                 return try await VoiceInkStreamingFallbackPolicy.run(
                     streamingFailed: false,
@@ -257,7 +279,10 @@ final class RecordingManager: ObservableObject {
                         service.cancel()
                     },
                     fallback: {
-                        await settings.retranscribeStoredAudio(note)
+                        await settings.retranscribeStoredAudio(
+                            note,
+                            runSettings: runSettings
+                        )
                     }
                 )
             } catch is CancellationError {

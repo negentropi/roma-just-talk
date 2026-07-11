@@ -114,6 +114,10 @@ struct SettingsView: View {
                 NavigationLink(destination: IOSCustomCloudModelsView()) {
                     Text(VoiceInkModelManagementFilter.custom.manageSettingsTitle)
                 }
+
+                NavigationLink(destination: IOSOllamaSettingsView(settings: settings)) {
+                    Text("Ollama")
+                }
             }
 
             Section(header: Text(VoiceInkTranscriptionLanguagePresentation.sectionTitle)) {

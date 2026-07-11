@@ -481,7 +481,8 @@ public struct VoiceInkProviderAPIKeyState: Equatable, Sendable {
         localWhisperModelAvailable: Bool,
         localFluidAudioModelAvailable: Bool = false,
         nativeAppleSpeechAvailable: Bool = false,
-        customCloudModelAvailable: Bool = false
+        customCloudModelAvailable: Bool = false,
+        localEnhancementServiceAvailable: Bool = false
     ) -> Bool {
         provider.isReady(
             userAPIKey: runtimeAPIKey(for: provider) ?? "",
@@ -489,7 +490,8 @@ public struct VoiceInkProviderAPIKeyState: Equatable, Sendable {
             localWhisperModelAvailable: localWhisperModelAvailable,
             localFluidAudioModelAvailable: localFluidAudioModelAvailable,
             nativeAppleSpeechAvailable: nativeAppleSpeechAvailable,
-            customCloudModelAvailable: customCloudModelAvailable
+            customCloudModelAvailable: customCloudModelAvailable,
+            localEnhancementServiceAvailable: localEnhancementServiceAvailable
         )
     }
 
@@ -498,7 +500,8 @@ public struct VoiceInkProviderAPIKeyState: Equatable, Sendable {
         localWhisperModelAvailable: Bool,
         localFluidAudioModelAvailable: Bool = false,
         nativeAppleSpeechAvailable: Bool = false,
-        customCloudModelAvailable: Bool = false
+        customCloudModelAvailable: Bool = false,
+        localEnhancementServiceAvailable: Bool = false
     ) -> [VoiceInkProviderKind] {
         VoiceInkProviderKind.availableProviders(for: use) { provider in
             isReady(
@@ -506,7 +509,8 @@ public struct VoiceInkProviderAPIKeyState: Equatable, Sendable {
                 localWhisperModelAvailable: localWhisperModelAvailable,
                 localFluidAudioModelAvailable: localFluidAudioModelAvailable,
                 nativeAppleSpeechAvailable: nativeAppleSpeechAvailable,
-                customCloudModelAvailable: customCloudModelAvailable
+                customCloudModelAvailable: customCloudModelAvailable,
+                localEnhancementServiceAvailable: localEnhancementServiceAvailable
             )
         }
     }
@@ -653,19 +657,22 @@ public struct VoiceInkProviderAccessSnapshot: Equatable, Sendable {
     public let localFluidAudioModelAvailable: Bool
     public let nativeAppleSpeechAvailable: Bool
     public let customCloudModelAvailable: Bool
+    public let localEnhancementServiceAvailable: Bool
 
     public init(
         apiKeyState: VoiceInkProviderAPIKeyState,
         localWhisperModelAvailable: Bool,
         localFluidAudioModelAvailable: Bool = false,
         nativeAppleSpeechAvailable: Bool = false,
-        customCloudModelAvailable: Bool = false
+        customCloudModelAvailable: Bool = false,
+        localEnhancementServiceAvailable: Bool = false
     ) {
         self.apiKeyState = apiKeyState
         self.localWhisperModelAvailable = localWhisperModelAvailable
         self.localFluidAudioModelAvailable = localFluidAudioModelAvailable
         self.nativeAppleSpeechAvailable = nativeAppleSpeechAvailable
         self.customCloudModelAvailable = customCloudModelAvailable
+        self.localEnhancementServiceAvailable = localEnhancementServiceAvailable
     }
 
     public func isProviderReady(for provider: VoiceInkProviderKind) -> Bool {
@@ -674,7 +681,8 @@ public struct VoiceInkProviderAccessSnapshot: Equatable, Sendable {
             localWhisperModelAvailable: localWhisperModelAvailable,
             localFluidAudioModelAvailable: localFluidAudioModelAvailable,
             nativeAppleSpeechAvailable: nativeAppleSpeechAvailable,
-            customCloudModelAvailable: customCloudModelAvailable
+            customCloudModelAvailable: customCloudModelAvailable,
+            localEnhancementServiceAvailable: localEnhancementServiceAvailable
         )
     }
 
@@ -688,7 +696,8 @@ public struct VoiceInkProviderAccessSnapshot: Equatable, Sendable {
             localWhisperModelAvailable: localWhisperModelAvailable,
             localFluidAudioModelAvailable: localFluidAudioModelAvailable,
             nativeAppleSpeechAvailable: nativeAppleSpeechAvailable,
-            customCloudModelAvailable: customCloudModelAvailable
+            customCloudModelAvailable: customCloudModelAvailable,
+            localEnhancementServiceAvailable: localEnhancementServiceAvailable
         )
     }
 

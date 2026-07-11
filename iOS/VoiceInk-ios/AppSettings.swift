@@ -133,6 +133,17 @@ final class AppSettings: ObservableObject {
         objectWillChange.send()
     }
 
+    func updateOllamaConfiguration(baseURL: String, model: String) {
+        VoiceInkDynamicAIProviderPreference.saveOllamaBaseURL(
+            baseURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        )
+        VoiceInkDynamicAIProviderPreference.saveOllamaSelectedModel(
+            model.trimmingCharacters(in: .whitespacesAndNewlines)
+        )
+        repairUnavailableProviders()
+        objectWillChange.send()
+    }
+
     var providerAccess: VoiceInkProviderAccessSnapshot {
         VoiceInkProviderAccessSnapshot(
             apiKeyState: apiKeyState,
@@ -146,7 +157,12 @@ final class AppSettings: ObservableObject {
                 }
                 return false
             }(),
-            customCloudModelAvailable: !IOSCustomCloudModelManager.shared.models.isEmpty
+            customCloudModelAvailable: !IOSCustomCloudModelManager.shared.models.isEmpty,
+            localEnhancementServiceAvailable: URL(
+                string: VoiceInkDynamicAIProviderPreference.ollamaBaseURL()
+            ) != nil && VoiceInkProviderCredential.nonBlank(
+                VoiceInkDynamicAIProviderPreference.ollamaRuntimeSelectedModel()
+            ) != nil
         )
     }
 

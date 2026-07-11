@@ -78,6 +78,7 @@ public enum VoiceInkProviderAccessRequirement: Sendable {
     case localFluidAudioModel
     case nativeAppleSpeech
     case customCloudModel
+    case localEnhancementService
     case bundledService
 }
 
@@ -1119,6 +1120,7 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
     case anthropic
     case openRouter
     case customAI
+    case ollama
     case customCloud
     case localWhisper
     case localFluidAudio
@@ -1167,6 +1169,8 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return "OpenRouter"
         case .customAI:
             return "Custom"
+        case .ollama:
+            return "Ollama"
         case .customCloud:
             return "Custom Cloud"
         case .localWhisper:
@@ -1237,6 +1241,10 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return URL(
                 string: VoiceInkDynamicAIProviderPreference.customProviderBaseURL()
             ) ?? URL(string: "http://localhost")!
+        case .ollama:
+            return URL(
+                string: VoiceInkDynamicAIProviderPreference.ollamaBaseURL()
+            ) ?? URL(string: VoiceInkDynamicAIProviderPreference.defaultOllamaBaseURL)!
         case .customCloud:
             return URL(string: "http://localhost")!
         case .localWhisper:
@@ -1254,7 +1262,7 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
         switch self {
         case .gemini:
             return VoiceInkProviderEndpoint.geminiNativeAPIBaseURL
-        case .groq, .openAI, .deepgram, .cerebras, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .cartesia, .anthropic, .openRouter, .customAI, .customCloud, .localWhisper, .localFluidAudio, .nativeApple, .voiceInk:
+        case .groq, .openAI, .deepgram, .cerebras, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .cartesia, .anthropic, .openRouter, .customAI, .ollama, .customCloud, .localWhisper, .localFluidAudio, .nativeApple, .voiceInk:
             return apiBaseURL
         }
     }
@@ -1291,6 +1299,8 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return URL(string: "https://openrouter.ai/settings/keys")!
         case .customAI:
             return URL(string: "https://voiceink.app")!
+        case .ollama:
+            return URL(string: "https://ollama.com")!
         case .customCloud:
             return URL(string: "https://voiceink.app")!
         case .localWhisper:
@@ -1322,7 +1332,7 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return .assemblyAI
         case .xai:
             return .xai
-        case .cartesia, .customCloud, .anthropic, .openRouter, .customAI:
+        case .cartesia, .customCloud, .anthropic, .openRouter, .customAI, .ollama:
             return .openAICompatible
         case .localWhisper:
             return .localWhisper
@@ -1361,7 +1371,7 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return .rejectEmpty
         case .soniox, .speechmatics, .assemblyAI, .localFluidAudio, .nativeApple:
             return .rejectWhitespace
-        case .openAI, .cerebras, .mistral, .elevenLabs, .xai, .cartesia, .anthropic, .openRouter, .customAI, .customCloud, .localWhisper, .voiceInk:
+        case .openAI, .cerebras, .mistral, .elevenLabs, .xai, .cartesia, .anthropic, .openRouter, .customAI, .ollama, .customCloud, .localWhisper, .voiceInk:
             return .allow
         }
     }
@@ -1458,6 +1468,8 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
                 verificationStateKey: "customAIKeyVerified",
                 verificationTransport: .customAIChat
             )
+        case .ollama:
+            return .localEnhancementService
         case .customCloud:
             return .customCloudModel
         case .localWhisper:
@@ -1504,6 +1516,8 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return "native-apple"
         case .customCloudModel:
             return "custom-cloud"
+        case .localEnhancementService:
+            return "local-ollama"
         case .bundledService:
             return ""
         }
@@ -1519,7 +1533,8 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
         localWhisperModelAvailable: Bool,
         localFluidAudioModelAvailable: Bool = false,
         nativeAppleSpeechAvailable: Bool = false,
-        customCloudModelAvailable: Bool = false
+        customCloudModelAvailable: Bool = false,
+        localEnhancementServiceAvailable: Bool = false
     ) -> Bool {
         switch accessRequirement {
         case .userAPIKey:
@@ -1532,6 +1547,8 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return nativeAppleSpeechAvailable
         case .customCloudModel:
             return customCloudModelAvailable
+        case .localEnhancementService:
+            return localEnhancementServiceAvailable
         case .bundledService:
             return false
         }
@@ -1585,7 +1602,7 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return .xai
         case .cartesia:
             return .cartesia
-        case .anthropic, .openRouter, .customAI, .customCloud:
+        case .anthropic, .openRouter, .customAI, .ollama, .customCloud:
             return nil
         case .localWhisper:
             return .local
@@ -1618,6 +1635,8 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return .openRouter
         case .customAI:
             return nil
+        case .ollama:
+            return nil
         case .deepgram, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .cartesia, .customCloud, .localWhisper, .localFluidAudio, .nativeApple, .voiceInk:
             return nil
         }
@@ -1637,6 +1656,11 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
     }
 
     public var postProcessingDefaultModel: String? {
+        if self == .ollama {
+            return VoiceInkProviderCredential.nonBlank(
+                VoiceInkDynamicAIProviderPreference.ollamaRuntimeSelectedModel()
+            )
+        }
         if self == .customAI {
             return VoiceInkProviderCredential.nonBlank(
                 VoiceInkDynamicAIProviderPreference.customProviderModel()
@@ -1653,6 +1677,9 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
     }
 
     public var postProcessingModels: [String]? {
+        if self == .ollama {
+            return postProcessingDefaultModel.map { [$0] } ?? []
+        }
         if self == .customAI {
             return postProcessingDefaultModel.map { [$0] } ?? []
         }
@@ -1687,7 +1714,7 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
         switch accessRequirement {
         case .bundledService:
             return false
-        case .userAPIKey, .localWhisperModel, .localFluidAudioModel, .nativeAppleSpeech, .customCloudModel:
+        case .userAPIKey, .localWhisperModel, .localFluidAudioModel, .nativeAppleSpeech, .customCloudModel, .localEnhancementService:
             return supportsModelUse(use)
         }
     }

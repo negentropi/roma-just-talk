@@ -59,6 +59,10 @@ struct SettingsView: View {
                         systemImage: VoiceInkIOSHelpSupportPresentation.settingsRowSystemImageName
                     )
                 }
+
+                NavigationLink(destination: IOSHistoryCleanupView()) {
+                    Label("History Retention", systemImage: "clock.arrow.circlepath")
+                }
             }
 
             Section(header: Text(settingsPresentation.modesSectionTitle)) {

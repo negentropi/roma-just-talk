@@ -13,6 +13,7 @@ struct NotesListView: View {
     @StateObject private var settings = AppSettings.shared
     @StateObject private var transcriptionTasks = IOSTranscriptionTaskCoordinator.shared
     @StateObject private var audioImport = IOSAudioImportManager.shared
+    @StateObject private var historyCleanup = IOSHistoryCleanupManager.shared
     @State private var editMode: EditMode = .inactive
     @State private var selectedNoteIDs: Set<UUID> = []
     @State private var showBulkDeleteConfirmation = false
@@ -148,6 +149,7 @@ struct NotesListView: View {
             .onChange(of: scenePhase) { _, phase in
                 if phase == .active {
                     handleRecordingAppIntentRequest()
+                    runScheduledHistoryCleanup()
                 }
             }
             .onAppear {
@@ -156,6 +158,7 @@ struct NotesListView: View {
                     notes,
                     persist: { try? modelContext.save() }
                 )
+                runScheduledHistoryCleanup()
             }
             .onChange(of: editMode) { _, newValue in
                 if !newValue.isEditing {
@@ -319,6 +322,14 @@ struct NotesListView: View {
         case .ignore:
             return
         }
+    }
+
+    private func runScheduledHistoryCleanup() {
+        historyCleanup.runScheduledCleanupIfNeeded(
+            notes: notes,
+            modelContext: modelContext,
+            activeNoteIDs: transcriptionTasks.activeNoteIDs
+        )
     }
 
     // MARK: - Helper Functions

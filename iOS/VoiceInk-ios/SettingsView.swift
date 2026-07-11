@@ -9,6 +9,9 @@ struct SettingsView: View {
     private var isVADEnabled = VoiceInkVADPreference.defaultIsEnabled
     @AppStorage(VoiceInkModelRuntimePreference.userDefaultsKey)
     private var shouldPrewarmModel = VoiceInkModelRuntimePreference.defaultShouldPrewarmModelOnWake
+    @AppStorage(VoiceInkAppendTrailingSpacePreference.userDefaultsKey)
+    private var appendTrailingSpace = VoiceInkAppendTrailingSpacePreference.defaultIsEnabled
+    @State private var promptDraftState = VoiceInkLocalWhisperPromptDraftState()
     @State private var fillerWordDraftState = VoiceInkFillerWordDraftState()
     @State private var customVocabularyDraftState = VoiceInkVocabularyDraftState()
     @State private var wordReplacementDraftState = VoiceInkWordReplacementDraftState()
@@ -19,6 +22,8 @@ struct SettingsView: View {
     private let settingsPresentation = VoiceInkSettingsPresentation.iOS
     private let vadPresentation = VoiceInkVADPreference.settingsPresentation
     private let prewarmPresentation = VoiceInkModelRuntimePreference.settingsPresentation
+    private let promptPresentation = VoiceInkLocalWhisperPromptCatalog.settingsPresentation
+    private let trailingSpacePresentation = VoiceInkAppendTrailingSpacePreference.settingsPresentation
     
     var body: some View {
         let dictionarySnapshot = self.dictionarySnapshot
@@ -100,6 +105,34 @@ struct SettingsView: View {
                         Text(language.name).tag(language.code)
                     }
                 }
+            }
+
+            Section(header: Text(promptPresentation.sectionTitle)) {
+                if promptDraftState.isEditing {
+                    TextEditor(text: $promptDraftState.text)
+                        .frame(minHeight: 88)
+
+                    Button {
+                        saveLanguagePrompt()
+                    } label: {
+                        Label(promptPresentation.saveButtonTitle, systemImage: "checkmark")
+                    }
+                } else {
+                    Text(languagePrompt)
+                        .foregroundStyle(.secondary)
+
+                    Button {
+                        promptDraftState = promptDraftState.editing(prompt: languagePrompt)
+                    } label: {
+                        Label(promptPresentation.editButtonTitle, systemImage: "pencil")
+                    }
+                }
+
+                Toggle(trailingSpacePresentation.toggleTitle, isOn: $appendTrailingSpace)
+
+                Text(trailingSpacePresentation.helpText)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
 
             Section(header: Text(cleanupPresentation.sectionTitle)) {
@@ -242,6 +275,11 @@ struct SettingsView: View {
         .onAppear {
             settings.repairSelectedTranscriptionLanguage()
         }
+        .onChange(of: settings.selectedTranscriptionLanguage) { _, _ in
+            promptDraftState = promptDraftState.refreshingForSelectedLanguage(
+                prompt: languagePrompt
+            )
+        }
         .alert(item: $dictionaryAlert) { alert in
             Alert(
                 title: Text(alert.title),
@@ -266,6 +304,21 @@ struct SettingsView: View {
             customVocabularyTerms: settings.customVocabularyTerms,
             wordReplacements: settings.wordReplacements
         )
+    }
+
+    private var languagePrompt: String {
+        VoiceInkLocalWhisperPromptCatalog.prompt(
+            for: settings.selectedTranscriptionLanguage,
+            customPrompts: VoiceInkLocalWhisperPromptCatalog.storedCustomPrompts()
+        )
+    }
+
+    private func saveLanguagePrompt() {
+        VoiceInkLocalWhisperPromptCatalog.saveCustomPrompt(
+            promptDraftState.text,
+            for: settings.selectedTranscriptionLanguage
+        )
+        promptDraftState = promptDraftState.saved()
     }
 
     private func addFillerWord() {

@@ -118,6 +118,54 @@ final class IOSLocalWhisperSettingsTests: XCTestCase {
             16_000
         )
     }
+
+    func testPerLanguagePromptFeedsIOSRunSettings() throws {
+        let suiteName = "IOSLocalWhisperSettingsTests.\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        let mode = Mode(
+            name: "Local",
+            transcriptionProvider: .localWhisper,
+            transcriptionModel: "ggml-base"
+        )
+
+        VoiceInkTranscriptionLanguagePreference.saveSelectedLanguage("fr", to: defaults)
+        VoiceInkLocalWhisperPromptCatalog.saveCustomPrompt(
+            "Bonjour Roma Just Talk.",
+            for: "fr",
+            to: defaults
+        )
+        VoiceInkTranscriptionPromptPreference.savePrompt("Stale English prompt", to: defaults)
+
+        let runSettings = VoiceInkIOSAppSettingsRunSnapshot(
+            modes: [mode],
+            selectedModeId: mode.id,
+            selectedTranscriptionLanguage: "fr",
+            wordReplacementRules: [],
+            customVocabulary: []
+        ).transcriptionRunSettings(defaults: defaults)
+
+        XCTAssertEqual(runSettings.transcriptionLanguage, "fr")
+        XCTAssertEqual(runSettings.transcriptionPrompt, "Bonjour Roma Just Talk.")
+    }
+
+    func testKeyboardDeliveryAppliesTrailingSpacePreference() throws {
+        let suiteName = "IOSLocalWhisperSettingsTests.\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        VoiceInkAppendTrailingSpacePreference.saveIsEnabled(false, to: defaults)
+        XCTAssertEqual(
+            IOSKeyboardDictationDeliveryText.text("Hello", defaults: defaults),
+            "Hello"
+        )
+
+        VoiceInkAppendTrailingSpacePreference.saveIsEnabled(true, to: defaults)
+        XCTAssertEqual(
+            IOSKeyboardDictationDeliveryText.text("Hello", defaults: defaults),
+            "Hello "
+        )
+    }
 }
 
 private actor RetainedContextHarness {

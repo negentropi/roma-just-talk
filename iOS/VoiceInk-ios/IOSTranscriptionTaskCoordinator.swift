@@ -3,6 +3,19 @@ import Foundation
 import UIKit
 import VoiceInkCore
 
+enum IOSKeyboardDictationDeliveryText {
+    static func text(
+        _ text: String,
+        defaults: UserDefaults = .standard
+    ) -> String {
+        VoiceInkContextualCapitalizationFormatter.finalPastedText(
+            text,
+            appendTrailingSpace: VoiceInkAppendTrailingSpacePreference.isEnabled(from: defaults),
+            isTrialExpired: false
+        )
+    }
+}
+
 struct VoiceInkIOSBackgroundExecution {
     struct Token: Equatable {
         let identifier: UIBackgroundTaskIdentifier
@@ -76,7 +89,7 @@ final class IOSTranscriptionTaskCoordinator: ObservableObject {
         completeKeyboard: @escaping KeyboardCompletion = { requestID, text in
             AppGroupCoordinator.shared.completeKeyboardDictation(
                 requestID: requestID,
-                text: text
+                text: IOSKeyboardDictationDeliveryText.text(text)
             )
         },
         failKeyboard: @escaping KeyboardFailure = { requestID, message in

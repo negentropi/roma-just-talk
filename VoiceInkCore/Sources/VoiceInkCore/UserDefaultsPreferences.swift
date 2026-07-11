@@ -1083,7 +1083,8 @@ public struct VoiceInkMacOSAppendTrailingSpaceSettingsPresentation: Equatable, S
 public enum VoiceInkAppendTrailingSpacePreference {
     public static let userDefaultsKey = VoiceInkUserDefaultsKey.appendTrailingSpace
     public static let defaultIsEnabled = VoiceInkPreferenceDefault.appendTrailingSpace
-    public static let macOSSettingsPresentation = VoiceInkMacOSAppendTrailingSpaceSettingsPresentation.macOS
+    public static let settingsPresentation = VoiceInkMacOSAppendTrailingSpaceSettingsPresentation.macOS
+    public static let macOSSettingsPresentation = settingsPresentation
 
     public static var registeredDefaults: [String: Any] {
         [
@@ -3110,7 +3111,8 @@ public struct VoiceInkLocalWhisperPromptDraftState: Equatable, Sendable {
 
 public enum VoiceInkLocalWhisperPromptCatalog {
     public static let customLanguagePromptsKey = "CustomLanguagePrompts"
-    public static let macOSSettingsPresentation = VoiceInkMacOSLocalWhisperPromptSettingsPresentation.macOS
+    public static let settingsPresentation = VoiceInkMacOSLocalWhisperPromptSettingsPresentation.macOS
+    public static let macOSSettingsPresentation = settingsPresentation
 
     public static func promptForSelectedLanguage(
         from defaults: UserDefaults = .standard,

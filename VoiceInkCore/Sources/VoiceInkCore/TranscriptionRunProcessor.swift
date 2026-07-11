@@ -674,12 +674,9 @@ public struct VoiceInkIOSAppSettingsRunSnapshot {
             cleanupConfiguration: VoiceInkTranscriptionCleanupConfiguration.current(in: defaults),
             postProcessingSkipConfiguration: VoiceInkPostProcessingSkipConfiguration.current(in: defaults),
             transcriptionLanguage: selectedTranscriptionLanguage,
-            transcriptionPrompt: VoiceInkTranscriptionPromptPreference.localWhisperPrompt(
-                from: defaults,
-                fallback: VoiceInkLocalWhisperPromptCatalog.prompt(
-                    for: selectedTranscriptionLanguage,
-                    customPrompts: VoiceInkLocalWhisperPromptCatalog.storedCustomPrompts(from: defaults)
-                )
+            transcriptionPrompt: VoiceInkLocalWhisperPromptCatalog.prompt(
+                for: selectedTranscriptionLanguage,
+                customPrompts: VoiceInkLocalWhisperPromptCatalog.storedCustomPrompts(from: defaults)
             ),
             wordReplacementRules: wordReplacementRules,
             customVocabulary: customVocabulary

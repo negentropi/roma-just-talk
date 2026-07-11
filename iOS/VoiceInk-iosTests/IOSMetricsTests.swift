@@ -34,7 +34,10 @@ final class IOSMetricsTests: XCTestCase {
 
         XCTAssertEqual(snapshot.records.map(\.id), [recent.id])
         XCTAssertEqual(snapshot.dashboardMetrics.summary.totalCount, 1)
-        XCTAssertEqual(snapshot.dashboardMetrics.summary.totalWords, 4)
+        XCTAssertEqual(
+            snapshot.dashboardMetrics.summary.totalWords,
+            VoiceInkSessionMetricPolicy.values(for: recent).wordCount
+        )
         XCTAssertEqual(snapshot.performance.totalEnhancedFiles, 1)
         XCTAssertEqual(snapshot.performance.transcriptionModels.map(\.name), ["small"])
         XCTAssertEqual(snapshot.performance.enhancementModels.map(\.name), ["gpt-5"])

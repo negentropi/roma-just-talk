@@ -92,7 +92,8 @@ final class IOSTranscriptionTaskCoordinator: ObservableObject {
             AppGroupCoordinator.shared.completeKeyboardDictation(
                 requestID: requestID,
                 text: IOSKeyboardDictationDeliveryText.text(text),
-                shouldLowercase: AppSettings.shared.transcriptionCleanupSettings.lowercaseTranscription
+                shouldLowercase: AppSettings.shared.transcriptionCleanupSettings.lowercaseTranscription,
+                shouldInsertReturn: VoiceInkIOSKeyboardAutoSendPreference.isEnabled()
             )
         },
         failKeyboard: @escaping KeyboardFailure = { requestID, message in

@@ -11,6 +11,8 @@ struct SettingsView: View {
     private var shouldPrewarmModel = VoiceInkModelRuntimePreference.defaultShouldPrewarmModelOnWake
     @AppStorage(VoiceInkAppendTrailingSpacePreference.userDefaultsKey)
     private var appendTrailingSpace = VoiceInkAppendTrailingSpacePreference.defaultIsEnabled
+    @AppStorage(VoiceInkIOSKeyboardAutoSendPreference.userDefaultsKey)
+    private var keyboardAutoSendReturn = VoiceInkIOSKeyboardAutoSendPreference.defaultIsEnabled
     @State private var promptDraftState = VoiceInkLocalWhisperPromptDraftState()
     @State private var fillerWordDraftState = VoiceInkFillerWordDraftState()
     @State private var customVocabularyDraftState = VoiceInkVocabularyDraftState()
@@ -180,6 +182,12 @@ struct SettingsView: View {
                 Toggle(trailingSpacePresentation.toggleTitle, isOn: $appendTrailingSpace)
 
                 Text(trailingSpacePresentation.helpText)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                Toggle("Press Return After Dictation", isOn: $keyboardAutoSendReturn)
+
+                Text("After the keyboard inserts a completed dictation, send one Return key to submit compatible text fields.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

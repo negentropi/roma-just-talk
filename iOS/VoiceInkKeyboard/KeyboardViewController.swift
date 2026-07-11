@@ -276,15 +276,18 @@ class KeyboardViewController: KeyboardInputViewController {
             return false
         }
 
-        let plan = VoiceInkTranscriptionPasteOutputPolicy.cursorPasteTextPlan(
-            delivery.text,
-            shouldLowercase: delivery.shouldLowercase
-        )
-        textDocumentProxy.insertText(plan.text(
+        let plan = VoiceInkIOSKeyboardDeliveryPolicy.plan(
+            text: delivery.text,
+            shouldLowercase: delivery.shouldLowercase,
+            shouldInsertReturn: delivery.shouldInsertReturn,
             beforeCursor: VoiceInkCursorTextContextPolicy.boundedSuffix(
                 textDocumentProxy.documentContextBeforeInput
             )
-        ))
+        )
+        textDocumentProxy.insertText(plan.text)
+        if plan.shouldInsertReturn {
+            textDocumentProxy.insertText(VoiceInkIOSKeyboardDeliveryPolicy.returnText)
+        }
         UINotificationFeedbackGenerator().notificationOccurred(.success)
         return true
     }

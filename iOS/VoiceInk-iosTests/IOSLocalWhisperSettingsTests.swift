@@ -166,6 +166,26 @@ final class IOSLocalWhisperSettingsTests: XCTestCase {
             "Hello "
         )
     }
+
+    func testKeyboardAutoSendPreferenceAndDeliveryPlan() throws {
+        let suiteName = "IOSLocalWhisperSettingsTests.\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        XCTAssertFalse(VoiceInkIOSKeyboardAutoSendPreference.isEnabled(from: defaults))
+        VoiceInkIOSKeyboardAutoSendPreference.saveIsEnabled(true, to: defaults)
+        XCTAssertTrue(VoiceInkIOSKeyboardAutoSendPreference.isEnabled(from: defaults))
+        XCTAssertEqual(
+            VoiceInkIOSKeyboardDeliveryPolicy.plan(
+                text: "Hello",
+                shouldLowercase: false,
+                shouldInsertReturn: true,
+                beforeCursor: nil
+            ),
+            VoiceInkIOSKeyboardDeliveryPlan(text: "Hello", shouldInsertReturn: true)
+        )
+        XCTAssertEqual(VoiceInkIOSKeyboardDeliveryPolicy.returnText, "\n")
+    }
 }
 
 private actor RetainedContextHarness {

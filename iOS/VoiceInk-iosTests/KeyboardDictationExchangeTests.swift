@@ -45,7 +45,8 @@ final class KeyboardDictationExchangeTests: XCTestCase {
             VoiceInkKeyboardDictationDelivery(
                 requestID: requestID,
                 text: "Delivered transcript",
-                shouldLowercase: false
+                shouldLowercase: false,
+                shouldInsertReturn: false
             )
         )
         XCTAssertNil(store.takeCompletedResult(
@@ -163,16 +164,16 @@ final class KeyboardDictationExchangeTests: XCTestCase {
             requestID: requestID,
             text: "lowercase transcript",
             shouldLowercase: true,
+            shouldInsertReturn: true,
             now: requestedAt.addingTimeInterval(1)
         ))
 
-        XCTAssertEqual(
-            store.takeCompletedResult(
-                for: documentID,
-                now: requestedAt.addingTimeInterval(2)
-            )?.shouldLowercase,
-            true
+        let delivery = store.takeCompletedResult(
+            for: documentID,
+            now: requestedAt.addingTimeInterval(2)
         )
+        XCTAssertTrue(delivery?.shouldLowercase == true)
+        XCTAssertTrue(delivery?.shouldInsertReturn == true)
     }
 
     func testFailureRemainsVisibleUntilClearedForRetry() throws {

@@ -5,6 +5,7 @@ struct VoiceInkKeyboardDictationDelivery: Equatable, Sendable {
     let requestID: UUID
     let text: String
     let shouldLowercase: Bool
+    let shouldInsertReturn: Bool
 }
 
 struct VoiceInkKeyboardDictationRequest: Equatable, Sendable {
@@ -38,6 +39,7 @@ struct VoiceInkKeyboardDictationExchangeStore {
         var surroundingTextBeforeCursor: String?
         var text: String?
         var shouldLowercase: Bool?
+        var shouldInsertReturn: Bool?
         var failureMessage: String?
     }
 
@@ -66,6 +68,7 @@ struct VoiceInkKeyboardDictationExchangeStore {
             ),
             text: nil,
             shouldLowercase: nil,
+            shouldInsertReturn: nil,
             failureMessage: nil
         )
 
@@ -91,6 +94,7 @@ struct VoiceInkKeyboardDictationExchangeStore {
         requestID: UUID,
         text: String,
         shouldLowercase: Bool = false,
+        shouldInsertReturn: Bool = false,
         now: Date = Date()
     ) -> Bool {
         guard var exchange = read(now: now),
@@ -112,6 +116,7 @@ struct VoiceInkKeyboardDictationExchangeStore {
         exchange.surroundingTextBeforeCursor = nil
         exchange.text = text
         exchange.shouldLowercase = shouldLowercase
+        exchange.shouldInsertReturn = shouldInsertReturn
         exchange.failureMessage = nil
         return write(exchange)
     }
@@ -134,6 +139,7 @@ struct VoiceInkKeyboardDictationExchangeStore {
         exchange.surroundingTextBeforeCursor = nil
         exchange.text = nil
         exchange.shouldLowercase = nil
+        exchange.shouldInsertReturn = nil
         exchange.failureMessage = trimmedMessage.isEmpty ? "Transcription failed." : trimmedMessage
         return write(exchange)
     }
@@ -178,7 +184,8 @@ struct VoiceInkKeyboardDictationExchangeStore {
         return VoiceInkKeyboardDictationDelivery(
             requestID: exchange.requestID,
             text: text,
-            shouldLowercase: exchange.shouldLowercase ?? false
+            shouldLowercase: exchange.shouldLowercase ?? false,
+            shouldInsertReturn: exchange.shouldInsertReturn ?? false
         )
     }
 

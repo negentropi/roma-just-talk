@@ -129,12 +129,14 @@ final class AppGroupCoordinator {
     func completeKeyboardDictation(
         requestID: UUID,
         text: String,
-        shouldLowercase: Bool
+        shouldLowercase: Bool,
+        shouldInsertReturn: Bool
     ) -> Bool {
         keyboardDictationStore.complete(
             requestID: requestID,
             text: text,
-            shouldLowercase: shouldLowercase
+            shouldLowercase: shouldLowercase,
+            shouldInsertReturn: shouldInsertReturn
         )
     }
 

@@ -1,6 +1,6 @@
 import XCTest
 import VoiceInkCore
-@testable import VoiceInk_ios
+@testable import roma_just_talk
 
 @MainActor
 final class IOSAnnouncementsStoreTests: XCTestCase {

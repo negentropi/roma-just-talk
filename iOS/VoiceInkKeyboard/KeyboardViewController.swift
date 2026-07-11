@@ -69,7 +69,8 @@ class KeyboardViewController: KeyboardInputViewController {
     
     private func configureButton(
         _ presentation: VoiceInkKeyboardRecordingButtonPresentation,
-        backgroundColor: UIColor
+        backgroundColor: UIColor,
+        isEnabled: Bool = true
     ) {
         let imageConfig = UIImage.SymbolConfiguration(pointSize: 14, weight: .semibold)
         let image = UIImage(systemName: presentation.systemImageName, withConfiguration: imageConfig)
@@ -79,6 +80,8 @@ class KeyboardViewController: KeyboardInputViewController {
         recordButton.backgroundColor = backgroundColor
         recordButton.setTitleColor(.white, for: .normal)
         recordButton.tintColor = .white
+        recordButton.isEnabled = isEnabled
+        recordButton.alpha = isEnabled ? 1 : 0.75
 
         recordButton.semanticContentAttribute = .forceLeftToRight
         recordButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 4)
@@ -127,19 +130,41 @@ class KeyboardViewController: KeyboardInputViewController {
         let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
         impactFeedback.impactOccurred()
         
-        let tapPlan = VoiceInkKeyboardRecordingButtonTapPolicy.plan(
-            isRecording: coordinator.isRecording
-        )
+        let isRecording = coordinator.isRecording
+        if !isRecording {
+            _ = deliverCompletedDictationIfAvailable()
+
+            switch coordinator.keyboardDictationStatus(
+                documentIdentifier: textDocumentProxy.documentIdentifier
+            ) {
+            case .requested, .ready, .waitingForOriginalDocument:
+                return
+            case .failed(let requestID, _):
+                coordinator.clearKeyboardDictation(requestID: requestID)
+            case .none:
+                break
+            }
+        }
+
+        let tapPlan = VoiceInkKeyboardRecordingButtonTapPolicy.plan(isRecording: isRecording)
 
         tapPlan.applyRuntimeState(
             requestStopRecording: coordinator.requestStopRecording,
             openMainAppForRecording: { [weak self] in
                 guard let self = self else { return }
+                guard let requestID = self.coordinator.beginKeyboardDictation(
+                    documentIdentifier: self.textDocumentProxy.documentIdentifier
+                ) else {
+                    self.updateButtonAppearanceBasedOnState()
+                    return
+                }
+
                 VoiceInkKeyboardURLOpener.openMainApp(
                     url: VoiceInkAppDeepLink.record.url,
                     extensionContext: self.extensionContext,
                     responder: self,
                     fallback: { [weak self] in
+                        self?.coordinator.clearKeyboardDictation(requestID: requestID)
                         self?.showUserMessage()
                     }
                 )
@@ -187,21 +212,65 @@ class KeyboardViewController: KeyboardInputViewController {
     }
     
     private func updateButtonAppearanceBasedOnState() {
-        let presentation = VoiceInkKeyboardRecordingButtonPresentation.current(
-            isRecording: coordinator.isRecording
-        )
+        _ = deliverCompletedDictationIfAvailable()
+
+        let isRecording = coordinator.isRecording
+        let presentation: VoiceInkKeyboardRecordingButtonPresentation
+        let backgroundColor: UIColor
+        let isEnabled: Bool
+
+        if !coordinator.canExchangeKeyboardDictation {
+            presentation = .fullAccessRequired
+            backgroundColor = .systemOrange
+            isEnabled = false
+        } else {
+            switch coordinator.keyboardDictationStatus(
+                documentIdentifier: textDocumentProxy.documentIdentifier
+            ) {
+            case .none:
+                presentation = .current(isRecording: isRecording)
+                backgroundColor = isRecording ? .systemRed : .systemBlue
+                isEnabled = true
+            case .requested, .ready:
+                presentation = isRecording ? .recording : .transcribing
+                backgroundColor = isRecording ? .systemRed : .systemGray
+                isEnabled = isRecording
+            case .failed:
+                presentation = .transcriptionFailed
+                backgroundColor = .systemOrange
+                isEnabled = true
+            case .waitingForOriginalDocument:
+                presentation = .returnToOriginalField
+                backgroundColor = .systemOrange
+                isEnabled = false
+            }
+        }
         
         DispatchQueue.main.async { [weak self] in
             guard let self = self, let button = self.recordButton else { return }
             
             self.configureButton(
                 presentation,
-                backgroundColor: presentation == .recording ? .systemRed : .systemBlue
+                backgroundColor: backgroundColor,
+                isEnabled: isEnabled
             )
             
             // Ensure capsule shape is maintained
             button.layer.cornerRadius = button.frame.height / 2
         }
+    }
+
+    @discardableResult
+    private func deliverCompletedDictationIfAvailable() -> Bool {
+        guard let delivery = coordinator.takeCompletedKeyboardDictation(
+            documentIdentifier: textDocumentProxy.documentIdentifier
+        ) else {
+            return false
+        }
+
+        textDocumentProxy.insertText(delivery.text)
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        return true
     }
     
     override func textWillChange(_ textInput: UITextInput?) {
@@ -212,5 +281,6 @@ class KeyboardViewController: KeyboardInputViewController {
     override func textDidChange(_ textInput: UITextInput?) {
         // The app has just changed the document's contents
         super.textDidChange(textInput)
+        updateButtonAppearanceBasedOnState()
     }
 }

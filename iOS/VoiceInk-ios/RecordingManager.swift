@@ -14,6 +14,7 @@ final class RecordingManager: ObservableObject {
     private let recorder = AudioRecorder()
     private let settings = AppSettings.shared
     private var durationTimer: Timer?
+    private var keyboardDictationRequestID: UUID?
 
     private let coordinator = AppGroupCoordinator.shared
     
@@ -51,8 +52,15 @@ final class RecordingManager: ObservableObject {
     func startRecordingFlow() {
         VoiceInkRecordingStartPolicy.plan(modeCount: settings.modes.count).applyRuntimeState(
             startRecording: startRecordingWithPermissionCheck,
-            presentAlert: { activeRecordingAlert = $0 }
+            presentAlert: { [weak self] alert in
+                self?.activeRecordingAlert = alert
+                self?.failActiveKeyboardDictation(message: alert.message)
+            }
         )
+    }
+
+    func prepareKeyboardDictationRequest() {
+        keyboardDictationRequestID = coordinator.pendingKeyboardDictationRequestID()
     }
 
     private func startRecordingWithPermissionCheck() {
@@ -61,7 +69,9 @@ final class RecordingManager: ObservableObject {
                 self?.proceedToStartRecording()
             },
             presentPermissionDenied: { [weak self] in
-                self?.activeRecordingAlert = VoiceInkRecordingAlertPresentation.microphonePermissionDenied
+                let alert = VoiceInkRecordingAlertPresentation.microphonePermissionDenied
+                self?.activeRecordingAlert = alert
+                self?.failActiveKeyboardDictation(message: alert.message)
             },
             requestPermission: { [weak self] completion in
                 self?.requestPermission { granted in
@@ -82,10 +92,12 @@ final class RecordingManager: ObservableObject {
             updateFlowState { $0.completeRecordingStart() }
             startDurationTimer()
         } catch {
-            activeRecordingAlert = VoiceInkRecordingAlertPresentation.recordingStartFailure(for: error)
+            let alert = VoiceInkRecordingAlertPresentation.recordingStartFailure(for: error)
+            activeRecordingAlert = alert
             updateFlowState { $0.failRecordingStart() }
             // Update coordinator state on error
             coordinator.updateRecordingState(false)
+            failActiveKeyboardDictation(message: alert.message)
         }
     }
     
@@ -99,14 +111,24 @@ final class RecordingManager: ObservableObject {
             stopDurationTimer: stopDurationTimer,
             setFlowState: { flowState = $0 },
             updateRecordingState: coordinator.updateRecordingState,
-            insertPendingDraft: { draft in
+            insertPendingDraft: { [self] draft in
                 let note = Transcription(recordingDraft: draft)
                 modelContext.insert(note)
                 try? modelContext.save()
 
-                transcribeInBackground(note: note, modelContext: modelContext)
+                let keyboardRequestID = keyboardDictationRequestID
+                keyboardDictationRequestID = nil
+                transcribeInBackground(
+                    note: note,
+                    modelContext: modelContext,
+                    keyboardRequestID: keyboardRequestID
+                )
             }
         )
+
+        if stopPlan.pendingDraft == nil {
+            failActiveKeyboardDictation(message: "The recording file is unavailable.")
+        }
     }
     
     func cancelRecording() {
@@ -116,6 +138,7 @@ final class RecordingManager: ObservableObject {
             setFlowState: { flowState = $0 },
             updateRecordingState: coordinator.updateRecordingState
         )
+        failActiveKeyboardDictation(message: "Recording canceled.")
     }
     
     // MARK: - Permissions
@@ -170,18 +193,43 @@ final class RecordingManager: ObservableObject {
     }
     
     // MARK: - Transcription
-    private func transcribeInBackground(note: Transcription, modelContext: ModelContext) {
+    private func transcribeInBackground(
+        note: Transcription,
+        modelContext: ModelContext,
+        keyboardRequestID: UUID?
+    ) {
         Task {
             defer { 
                 // Clean up recorder state
                 recorder.currentRecordingURL = nil
             }
 
-            _ = await settings.retranscribeStoredAudio(note)
+            let outcome = await settings.retranscribeStoredAudio(note)
+
+            if let keyboardRequestID {
+                switch outcome {
+                case .succeeded(let text):
+                    coordinator.completeKeyboardDictation(
+                        requestID: keyboardRequestID,
+                        text: text
+                    )
+                case .failed(let reason):
+                    coordinator.failKeyboardDictation(
+                        requestID: keyboardRequestID,
+                        message: reason
+                    )
+                }
+            }
 
             await MainActor.run {
                 try? modelContext.save()
             }
         }
+    }
+
+    private func failActiveKeyboardDictation(message: String) {
+        guard let requestID = keyboardDictationRequestID else { return }
+        keyboardDictationRequestID = nil
+        coordinator.failKeyboardDictation(requestID: requestID, message: message)
     }
 }

@@ -52,13 +52,16 @@ final class AppGroupCoordinator {
     
     // MARK: - Properties
     private let sharedDefaults: UserDefaults?
+    private let keyboardDictationStore: VoiceInkKeyboardDictationExchangeStore
     private let notificationCenter = CFNotificationCenterGetDarwinNotifyCenter()
     
     var onStopRecordingRequested: (() -> Void)?
     
     // MARK: - Initialization
     private init() {
-        sharedDefaults = VoiceInkAppGroupRecordingBridge.sharedDefaults()
+        let sharedDefaults = VoiceInkAppGroupRecordingBridge.sharedDefaults()
+        self.sharedDefaults = sharedDefaults
+        self.keyboardDictationStore = VoiceInkKeyboardDictationExchangeStore(defaults: sharedDefaults)
         setupNotificationObservers()
     }
     
@@ -85,6 +88,45 @@ final class AppGroupCoordinator {
         }
 
         return state.isRecording
+    }
+
+    var canExchangeKeyboardDictation: Bool {
+        keyboardDictationStore.isAvailable
+    }
+
+    func beginKeyboardDictation(documentIdentifier: UUID) -> UUID? {
+        keyboardDictationStore.begin(documentIdentifier: documentIdentifier)
+    }
+
+    func pendingKeyboardDictationRequestID() -> UUID? {
+        keyboardDictationStore.pendingRequestID()
+    }
+
+    func keyboardDictationStatus(
+        documentIdentifier: UUID
+    ) -> VoiceInkKeyboardDictationExchangeStatus {
+        keyboardDictationStore.status(for: documentIdentifier)
+    }
+
+    func takeCompletedKeyboardDictation(
+        documentIdentifier: UUID
+    ) -> VoiceInkKeyboardDictationDelivery? {
+        keyboardDictationStore.takeCompletedResult(for: documentIdentifier)
+    }
+
+    @discardableResult
+    func completeKeyboardDictation(requestID: UUID, text: String) -> Bool {
+        keyboardDictationStore.complete(requestID: requestID, text: text)
+    }
+
+    @discardableResult
+    func failKeyboardDictation(requestID: UUID, message: String) -> Bool {
+        keyboardDictationStore.fail(requestID: requestID, message: message)
+    }
+
+    @discardableResult
+    func clearKeyboardDictation(requestID: UUID) -> Bool {
+        keyboardDictationStore.clear(requestID: requestID)
     }
     
     // MARK: - Public Interface for Main App

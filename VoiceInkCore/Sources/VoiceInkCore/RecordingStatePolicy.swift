@@ -1494,6 +1494,26 @@ public struct VoiceInkKeyboardRecordingButtonPresentation: Equatable, Sendable {
         systemImageName: "app"
     )
 
+    public static let transcribing = VoiceInkKeyboardRecordingButtonPresentation(
+        title: " Transcribing",
+        systemImageName: "ellipsis"
+    )
+
+    public static let returnToOriginalField = VoiceInkKeyboardRecordingButtonPresentation(
+        title: " Return to Text Field",
+        systemImageName: "arrow.uturn.backward"
+    )
+
+    public static let transcriptionFailed = VoiceInkKeyboardRecordingButtonPresentation(
+        title: " Try Again",
+        systemImageName: "exclamationmark.triangle.fill"
+    )
+
+    public static let fullAccessRequired = VoiceInkKeyboardRecordingButtonPresentation(
+        title: " Enable Full Access",
+        systemImageName: "lock.fill"
+    )
+
     public static func current(isRecording: Bool) -> VoiceInkKeyboardRecordingButtonPresentation {
         isRecording ? recording : idle
     }

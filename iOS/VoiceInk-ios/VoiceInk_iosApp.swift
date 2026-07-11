@@ -76,6 +76,7 @@ struct VoiceInk_iosApp: App {
 
         deepLink.applyRuntimeState {
             VoiceInkIOSLogger.app.notice("\(VoiceInkIOSRecordingCoordinationDiagnostics.recordDeepLinkOpenedMessage, privacy: .public)")
+            recordingManager.prepareKeyboardDictationRequest()
             launchRecordingRequestState.requestRecording(
                 hasCompletedOnboarding: hasCompletedOnboarding
             ).applyRuntimeState(startRecordingAfterLaunchDelay: startRecordingAfterLaunchDelay)

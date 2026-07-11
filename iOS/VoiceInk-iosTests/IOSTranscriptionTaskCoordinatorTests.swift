@@ -1,7 +1,7 @@
 import Foundation
 import XCTest
 import VoiceInkCore
-@testable import roma_just_talk
+@testable import VoiceInk_ios
 
 @MainActor
 final class IOSTranscriptionTaskCoordinatorTests: XCTestCase {

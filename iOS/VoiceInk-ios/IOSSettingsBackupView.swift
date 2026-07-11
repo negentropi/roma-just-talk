@@ -9,23 +9,16 @@ struct IOSSettingsBackupView: View {
 
     var body: some View {
         Form {
-            Section("Export") {
+            Section {
                 categoryToggles(selection: $exportCategories)
-
-                if let exportItem = try? manager.exportItem(categories: exportCategories),
-                   !exportCategories.isEmpty {
-                    ShareLink(
-                        item: exportItem,
-                        preview: SharePreview(VoiceInkIOSSettingsBackupCodec.defaultFilename)
-                    ) {
-                        Label("Export Settings", systemImage: "square.and.arrow.up")
-                    }
-                }
+                exportControl
+            } header: {
+                Text("Export")
             } footer: {
                 Text("API keys, recordings, transcripts, and downloaded model files are never exported.")
             }
 
-            Section("Import") {
+            Section {
                 Button {
                     isFileImporterPresented = true
                 } label: {
@@ -47,6 +40,8 @@ struct IOSSettingsBackupView: View {
                         manager.cancelImport()
                     }
                 }
+            } header: {
+                Text("Import")
             } footer: {
                 Text("Import replaces only the selected categories. Invalid files or storage failures leave the current settings unchanged.")
             }
@@ -71,6 +66,19 @@ struct IOSSettingsBackupView: View {
             Button("OK") { manager.statusMessage = nil }
         } message: {
             Text(manager.statusMessage ?? "")
+        }
+    }
+
+    @ViewBuilder
+    private var exportControl: some View {
+        if !exportCategories.isEmpty,
+           let exportItem = try? manager.exportItem(categories: exportCategories) {
+            ShareLink(
+                item: exportItem,
+                preview: SharePreview(VoiceInkIOSSettingsBackupCodec.defaultFilename)
+            ) {
+                Label("Export Settings", systemImage: "square.and.arrow.up")
+            }
         }
     }
 

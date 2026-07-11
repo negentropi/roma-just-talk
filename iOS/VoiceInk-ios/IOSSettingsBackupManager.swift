@@ -28,13 +28,17 @@ final class IOSSettingsBackupManager: ObservableObject {
     private let defaults: UserDefaults
 
     init(
-        settings: AppSettings = .shared,
-        customModelManager: IOSCustomCloudModelManager = .shared,
+        settings: AppSettings,
+        customModelManager: IOSCustomCloudModelManager,
         defaults: UserDefaults = .standard
     ) {
         self.settings = settings
         self.customModelManager = customModelManager
         self.defaults = defaults
+    }
+
+    convenience init() {
+        self.init(settings: .shared, customModelManager: .shared)
     }
 
     var availableImportCategories: [VoiceInkIOSSettingsBackupCategory] {

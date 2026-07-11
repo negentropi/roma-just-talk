@@ -83,6 +83,41 @@ final class AppSettings: ObservableObject {
         apiKeyState.runtimeAPIKey(for: provider) ?? ""
     }
 
+    func refreshOpenRouterModels() async {
+        guard let apiKey = VoiceInkProviderCredential.nonBlank(apiKey(for: .openRouter)) else {
+            return
+        }
+
+        do {
+            let fetchedModels = try await VoiceInkOpenAICompatibleClient().fetchModelIDs(
+                baseURL: VoiceInkProviderKind.openRouter.apiBaseURL,
+                apiKey: apiKey
+            )
+            var seenModels = Set<String>()
+            let models = fetchedModels.filter { seenModels.insert($0).inserted }
+            guard !models.isEmpty else { return }
+
+            VoiceInkDynamicAIProviderPreference.saveOpenRouterModels(models)
+            var repairedModes = modes
+            for index in repairedModes.indices
+            where repairedModes[index].postProcessingProvider == .openRouter {
+                repairedModes[index].postProcessingModel = VoiceInkProviderKind.openRouter.selectedModel(
+                    repairedModes[index].postProcessingModel,
+                    for: .postProcessing
+                )
+            }
+            if repairedModes != modes {
+                modes = repairedModes
+            } else {
+                objectWillChange.send()
+            }
+        } catch {
+            VoiceInkIOSLogger.settings.error(
+                "OpenRouter model refresh failed: \(VoiceInkErrorDescription.text(for: error), privacy: .public)"
+            )
+        }
+    }
+
     var providerAccess: VoiceInkProviderAccessSnapshot {
         VoiceInkProviderAccessSnapshot(
             apiKeyState: apiKeyState,

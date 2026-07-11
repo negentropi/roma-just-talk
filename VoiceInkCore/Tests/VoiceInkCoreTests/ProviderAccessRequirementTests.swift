@@ -252,7 +252,7 @@ final class ProviderAccessRequirementTests: XCTestCase {
     func testUserAPIKeyProvidersExposeDerivedCredentialMetadata() {
         XCTAssertEqual(
             VoiceInkProviderKind.userAPIKeyProviders,
-            [.groq, .openAI, .deepgram, .cerebras, .gemini, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .cartesia, .anthropic]
+            [.groq, .openAI, .deepgram, .cerebras, .gemini, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .cartesia, .anthropic, .openRouter]
         )
 
         let expected: [VoiceInkProviderKind: (account: String, verificationKey: String, transport: VoiceInkAPIKeyVerificationTransport)] = [
@@ -268,7 +268,8 @@ final class ProviderAccessRequirementTests: XCTestCase {
             .assemblyAI: (VoiceInkProviderAPIKeyAccount.assemblyAI, "assemblyAIKeyVerified", .assemblyAITranscripts),
             .xai: (VoiceInkProviderAPIKeyAccount.xAI, "xaiKeyVerified", .xaiAPIKey),
             .cartesia: (VoiceInkProviderAPIKeyAccount.cartesia, "cartesiaKeyVerified", .cartesiaVoices),
-            .anthropic: (VoiceInkProviderAPIKeyAccount.anthropic, "anthropicKeyVerified", .anthropicMessages)
+            .anthropic: (VoiceInkProviderAPIKeyAccount.anthropic, "anthropicKeyVerified", .anthropicMessages),
+            .openRouter: (VoiceInkProviderAPIKeyAccount.openRouter, "openRouterKeyVerified", .openAICompatibleModels)
         ]
 
         for (provider, policy) in expected {
@@ -1227,9 +1228,10 @@ final class ProviderAccessRequirementTests: XCTestCase {
                 .speechmatics: "speechmatics-key",
                 .assemblyAI: "assemblyai-key",
                 .xai: "xai-key",
-                .anthropic: "anthropic-key"
+                .anthropic: "anthropic-key",
+                .openRouter: "openrouter-key"
             ],
-            verifiedProviders: [.groq, .deepgram, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .anthropic]
+            verifiedProviders: [.groq, .deepgram, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .anthropic, .openRouter]
         )
 
         XCTAssertEqual(
@@ -1242,7 +1244,7 @@ final class ProviderAccessRequirementTests: XCTestCase {
         )
         XCTAssertEqual(
             state.availableProviders(for: .postProcessing, localWhisperModelAvailable: true),
-            [.groq, .mistral, .anthropic]
+            [.groq, .mistral, .anthropic, .openRouter]
         )
     }
 
@@ -1804,6 +1806,10 @@ final class ProviderAccessRequirementTests: XCTestCase {
             VoiceInkProviderKind.anthropic.postProcessingChatCompletionsURL?.absoluteString,
             "https://api.anthropic.com/v1/messages"
         )
+        XCTAssertEqual(
+            VoiceInkProviderKind.openRouter.postProcessingChatCompletionsURL?.absoluteString,
+            "https://openrouter.ai/api/v1/chat/completions"
+        )
         XCTAssertNil(VoiceInkProviderKind.deepgram.postProcessingChatCompletionsURL)
         XCTAssertNil(VoiceInkProviderKind.elevenLabs.postProcessingChatCompletionsURL)
         XCTAssertNil(VoiceInkProviderKind.soniox.postProcessingChatCompletionsURL)
@@ -1850,7 +1856,7 @@ final class ProviderAccessRequirementTests: XCTestCase {
     }
 
     func testAvailableProvidersFiltersByModelUseAndReadiness() {
-        let readyProviders: Set<VoiceInkProviderKind> = [.groq, .deepgram, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .cartesia, .anthropic, .localWhisper]
+        let readyProviders: Set<VoiceInkProviderKind> = [.groq, .deepgram, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .cartesia, .anthropic, .openRouter, .localWhisper]
 
         XCTAssertEqual(
             VoiceInkProviderKind.availableProviders(for: .transcription) { readyProviders.contains($0) },
@@ -1859,7 +1865,7 @@ final class ProviderAccessRequirementTests: XCTestCase {
 
         XCTAssertEqual(
             VoiceInkProviderKind.availableProviders(for: .postProcessing) { readyProviders.contains($0) },
-            [.groq, .mistral, .anthropic]
+            [.groq, .mistral, .anthropic, .openRouter]
         )
     }
 
@@ -1949,6 +1955,10 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertEqual(
             VoiceInkProviderKind.anthropic.postProcessingModels,
             VoiceInkAIModelCatalog.availableModels(for: .anthropic)
+        )
+        XCTAssertEqual(
+            VoiceInkProviderKind.openRouter.postProcessingModels,
+            [VoiceInkAIModelCatalog.defaultModel(for: .openRouter)]
         )
     }
 

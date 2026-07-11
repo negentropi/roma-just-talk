@@ -95,6 +95,11 @@ struct ProviderAPIKeyView: View {
         .onChange(of: apiKeyFormState.enteredKey) { _, _ in
             apiKeyFormState = apiKeyFormState.keyEdited()
         }
+        .task {
+            if provider == .openRouter {
+                await settings.refreshOpenRouterModels()
+            }
+        }
     }
 
     private func verifyKey(startPlan: VoiceInkProviderAPIKeyVerificationStartPlan) {
@@ -114,6 +119,9 @@ struct ProviderAPIKeyView: View {
                     setFormState: { apiKeyFormState = $0 },
                     applyVerificationPlan: { settings.applyAPIKeyVerificationPlan($0, for: provider) }
                 )
+            if provider == .openRouter, result.isValid {
+                await settings.refreshOpenRouterModels()
+            }
         }
     }
 

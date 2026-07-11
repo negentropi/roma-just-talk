@@ -717,6 +717,31 @@ public enum VoiceInkOpenAICompatibleModelsRequestBuilder {
     }
 }
 
+public struct VoiceInkOpenAICompatibleModelRecord: Codable, Equatable, Sendable {
+    public let id: String
+
+    public init(id: String) {
+        self.id = id
+    }
+}
+
+public struct VoiceInkOpenAICompatibleModelsResponse: Codable, Equatable, Sendable {
+    public let data: [VoiceInkOpenAICompatibleModelRecord]
+
+    public init(data: [VoiceInkOpenAICompatibleModelRecord]) {
+        self.data = data
+    }
+}
+
+public enum VoiceInkOpenAICompatibleModelsCodec {
+    public static func modelIDs(from data: Data) throws -> [String] {
+        try JSONDecoder().decode(VoiceInkOpenAICompatibleModelsResponse.self, from: data)
+            .data
+            .map(\.id)
+            .filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+    }
+}
+
 public struct VoiceInkOpenAICompatibleClient: Sendable {
     public init() {}
 
@@ -737,6 +762,25 @@ public struct VoiceInkOpenAICompatibleClient: Sendable {
                 timeout: timeout
             )
         )
+    }
+
+    public func fetchModelIDs(
+        baseURL: URL,
+        apiKey: String,
+        timeout: TimeInterval = 15
+    ) async throws -> [String] {
+        let request = VoiceInkOpenAICompatibleModelsRequestBuilder.make(
+            baseURL: baseURL,
+            apiKey: apiKey,
+            timeout: timeout
+        )
+        let data = try await VoiceInkRetriedRequest.validatedData(
+            for: request,
+            timeout: timeout,
+            maxRetries: 0,
+            errorDomain: "OpenAICompatibleModels"
+        )
+        return try VoiceInkOpenAICompatibleModelsCodec.modelIDs(from: data)
     }
 
     public func chatCompletion(

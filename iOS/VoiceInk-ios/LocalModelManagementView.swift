@@ -9,12 +9,30 @@ import SwiftUI
 import Combine
 import OSLog
 import VoiceInkCore
+import UniformTypeIdentifiers
 
 struct LocalModelManagementView: View {
     @StateObject private var modelManager = LocalModelManager.shared
+    @State private var showingModelImporter = false
     
     var body: some View {
         List {
+            Section {
+                Button(VoiceInkModelManagementPresentation.importLocalModelTitle) {
+                    showingModelImporter = true
+                }
+            } footer: {
+                Text(VoiceInkModelManagementPresentation.importLocalModelHelpText)
+            }
+
+            if !modelManager.importedModels.isEmpty {
+                Section("Imported Models") {
+                    ForEach(modelManager.importedModels) { model in
+                        ImportedModelRowView(model: model, modelManager: modelManager)
+                    }
+                }
+            }
+
             ForEach(modelManager.managementSnapshot.managementRows()) { row in
                 ModelRowView(row: row, modelManager: modelManager)
             }
@@ -22,8 +40,23 @@ struct LocalModelManagementView: View {
         .navigationTitle(VoiceInkModelManagementFilter.local.settingsSectionTitle)
         .navigationBarTitleDisplayMode(.inline)
         .refreshable {
-            // Refresh model status
+            modelManager.refreshImportedModels()
             modelManager.objectWillChange.send()
+        }
+        .fileImporter(
+            isPresented: $showingModelImporter,
+            allowedContentTypes: [.data],
+            allowsMultipleSelection: false
+        ) { result in
+            switch result {
+            case .success(let urls):
+                guard let sourceURL = urls.first else { return }
+                Task {
+                    await modelManager.importModel(from: sourceURL)
+                }
+            case .failure(let error):
+                modelManager.importAlert = .failure(message: error.localizedDescription)
+            }
         }
         .alert(item: $modelManager.downloadError) { alert in
             Alert(
@@ -34,9 +67,57 @@ struct LocalModelManagementView: View {
                 }
             )
         }
+        .alert(item: $modelManager.importAlert) { alert in
+            Alert(
+                title: Text(alert.title),
+                message: alert.message.map { Text($0) },
+                dismissButton: .default(Text("OK")) {
+                    modelManager.importAlert = nil
+                }
+            )
+        }
     }
     
 
+}
+
+private struct ImportedModelRowView: View {
+    let model: VoiceInkWhisperLocalModelFile
+    @ObservedObject var modelManager: LocalModelManager
+    @State private var showingDeleteAlert = false
+
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(model.name)
+                    .font(.headline)
+                Text(VoiceInkModelManagementPresentation.importedLocalModelDescription)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer()
+            Image(systemName: "checkmark.circle.fill")
+                .foregroundStyle(.green)
+        }
+        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+            Button(VoiceInkModelManagementPresentation.deleteButtonTitle, role: .destructive) {
+                showingDeleteAlert = true
+            }
+        }
+        .alert(
+            VoiceInkModelManagementPresentation.deleteModelButtonTitle,
+            isPresented: $showingDeleteAlert
+        ) {
+            Button(VoiceInkModelManagementPresentation.deleteButtonTitle, role: .destructive) {
+                modelManager.deleteImportedModel(model)
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text(VoiceInkModelManagementPresentation.deleteModelAlertMessage(
+                modelName: model.name
+            ))
+        }
+    }
 }
 
 struct ModelRowView: View {

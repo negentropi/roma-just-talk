@@ -89,5 +89,6 @@ jobs:
             -only-testing:VoiceInk-iosTests/IOSTranscriptionTaskCoordinatorTests \
             -only-testing:VoiceInk-iosTests/IOSStreamingTranscriptionTests \
             -only-testing:VoiceInk-iosTests/IOSLocalWhisperSettingsTests \
+            -only-testing:VoiceInk-iosTests/IOSLocalWhisperModelImporterTests \
             -only-testing:VoiceInk-iosTests/IOSNativeAppleTranscriptionTests \
             -only-testing:VoiceInk-iosTests/IOSRecordingAppIntentTests

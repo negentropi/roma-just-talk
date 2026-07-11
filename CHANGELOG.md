@@ -2,6 +2,7 @@
 
 ## v1.96 - Unreleased
 
+- Added iOS local Whisper model import, selection, persistence, and deletion using the existing shared model-file and runtime policies.
 - Added iOS Shortcuts actions to start, stop, and cancel recording through the existing recording flow.
 - Added iOS 26 Native Apple transcription with mode selection, BCP-47 language handling, Speech asset status/download controls, and recorded-file SpeechAnalyzer routing.
 - Added iOS per-language local Whisper prompt editing and trailing-space keyboard delivery using the existing shared preferences and runtime policy.

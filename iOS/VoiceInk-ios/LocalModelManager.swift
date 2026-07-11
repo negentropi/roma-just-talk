@@ -15,6 +15,8 @@ class LocalModelManager: ObservableObject {
     @Published private var downloadSessionState = VoiceInkWhisperModelSimpleDownloadSessionState()
     @Published var localModelAvailabilityRevision = 0
     @Published var downloadError: VoiceInkWhisperModelOperationAlertPresentation?
+    @Published private(set) var importedModels: [VoiceInkWhisperLocalModelFile] = []
+    @Published var importAlert: IOSLocalWhisperModelImportAlert?
     
     private var downloadTasks: [String: URLSessionDownloadTask] = [:]
     private var progressObservations: [String: NSKeyValueObservation] = [:]
@@ -32,6 +34,7 @@ class LocalModelManager: ObservableObject {
     
     private init() {
         _ = Self.modelsDirectory
+        refreshImportedModels()
     }
 
     var managementSnapshot: VoiceInkWhisperModelManagementSnapshot {
@@ -90,6 +93,77 @@ class LocalModelManager: ObservableObject {
 
     func releaseRetainedContext() async {
         await contextCache.releaseRetainedContext()
+    }
+
+    var importedModelNames: [String] {
+        importedModels.map(\.name)
+    }
+
+    func selectableLocalModelNames(catalogModelNames: [String]) -> [String] {
+        catalogModelNames + VoiceInkWhisperModelFiles.importedLocalModelNamesToAdd(
+            downloadedLocalModels: importedModels,
+            existingModelNames: catalogModelNames
+        )
+    }
+
+    func importModel(from sourceURL: URL) async {
+        let modelsDirectory = Self.modelsDirectory
+        let outcome = await Task.detached {
+            IOSLocalWhisperModelImporter.importModel(
+                from: sourceURL,
+                into: modelsDirectory
+            )
+        }.value
+
+        switch outcome {
+        case .imported(let model):
+            refreshImportedModels()
+            localModelAvailabilityRevision += 1
+            importAlert = .success(filename: model.url.lastPathComponent)
+        case .duplicate(let filename):
+            importAlert = .duplicate(filename: filename)
+        case .unsupportedFile:
+            importAlert = .unsupportedFile
+        case .failed(let message):
+            importAlert = .failure(message: message)
+        }
+    }
+
+    func deleteImportedModel(_ model: VoiceInkWhisperLocalModelFile) {
+        do {
+            try VoiceInkWhisperModelFiles.deleteModelFiles(
+                forModelName: model.name,
+                modelFileURL: model.url,
+                coreMLEncoderURL: model.coreMLEncoderURL,
+                in: Self.modelsDirectory
+            )
+            refreshImportedModels()
+            localModelAvailabilityRevision += 1
+            Task {
+                if await contextCache.retainedModelPath() == model.url.path {
+                    await contextCache.releaseRetainedContext()
+                }
+            }
+        } catch {
+            importAlert = .failure(message: error.localizedDescription)
+        }
+    }
+
+    func refreshImportedModels(fileManager: FileManager = .default) {
+        let localModels = (try? VoiceInkWhisperModelFiles.localModelFiles(
+            in: Self.modelsDirectory,
+            fileManager: fileManager
+        )) ?? []
+        let catalogModelNames = VoiceInkWhisperModelFiles.downloadableModels.map(\.modelName)
+        let importedModelNames = Set(
+            VoiceInkWhisperModelFiles.importedLocalModelNamesToAdd(
+                downloadedLocalModels: localModels,
+                existingModelNames: catalogModelNames
+            )
+        )
+        importedModels = localModels
+            .filter { importedModelNames.contains($0.name) }
+            .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
     }
     
     /// Download a specific model

@@ -4,6 +4,7 @@ import VoiceInkCore
 struct ModeConfigurationView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var settings: AppSettings
+    @StateObject private var localModelManager = LocalModelManager.shared
     
     @State private var draftState: VoiceInkModeFormDraftState
     private let isEditing: Bool
@@ -25,6 +26,11 @@ struct ModeConfigurationView: View {
         let providerAvailability = settings.providerAccess.modeFormProviderAvailability
         let formStatePresentation = providerAvailability.formStatePresentation(for: draftState.mode)
         let transcriptionModelSelection = draftState.mode.transcriptionProvider.modelSelectionPresentation(for: .transcription)
+        let selectableTranscriptionModels = draftState.mode.transcriptionProvider == .localWhisper
+            ? localModelManager.selectableLocalModelNames(
+                catalogModelNames: transcriptionModelSelection.selectableModels
+            )
+            : transcriptionModelSelection.selectableModels
         let postProcessingModelSelection = draftState.mode.postProcessingProvider.modelSelectionPresentation(for: .postProcessing)
 
         Form {
@@ -55,7 +61,7 @@ struct ModeConfigurationView: View {
                     }
                 } else {
                     Picker(formPresentation.modelFieldTitle, selection: $draftState.mode.transcriptionModel) {
-                        ForEach(transcriptionModelSelection.selectableModels, id: \.self) { model in
+                        ForEach(selectableTranscriptionModels, id: \.self) { model in
                             Text(model).tag(model)
                         }
                     }

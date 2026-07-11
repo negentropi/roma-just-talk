@@ -491,6 +491,16 @@ public struct Mode: Identifiable, Codable {
         transcriptionProvider.selectedModel(transcriptionModel, for: .transcription)
     }
 
+    public func effectiveTranscriptionModel(
+        additionalLocalWhisperModelNames: [String]
+    ) -> String {
+        if transcriptionProvider == .localWhisper,
+           additionalLocalWhisperModelNames.contains(transcriptionModel) {
+            return transcriptionModel
+        }
+        return effectiveTranscriptionModel
+    }
+
     public var effectivePostProcessingModel: String {
         postProcessingProvider.selectedModel(postProcessingModel, for: .postProcessing)
     }
@@ -531,14 +541,39 @@ public struct Mode: Identifiable, Codable {
     }
 
     public mutating func repairModelSelection() {
-        transcriptionModel = effectiveTranscriptionModel
+        repairModelSelection(additionalLocalWhisperModelNames: [])
+    }
+
+    public mutating func repairModelSelection(
+        additionalLocalWhisperModelNames: [String]
+    ) {
+        transcriptionModel = effectiveTranscriptionModel(
+            additionalLocalWhisperModelNames: additionalLocalWhisperModelNames
+        )
         postProcessingModel = effectivePostProcessingModel
     }
 
+    public mutating func repairLocalWhisperModelSelection(
+        additionalLocalWhisperModelNames: [String]
+    ) {
+        guard transcriptionProvider == .localWhisper else { return }
+        transcriptionModel = effectiveTranscriptionModel(
+            additionalLocalWhisperModelNames: additionalLocalWhisperModelNames
+        )
+    }
+
     public var runtimeConfiguration: VoiceInkModeRuntimeConfiguration {
+        runtimeConfiguration(additionalLocalWhisperModelNames: [])
+    }
+
+    public func runtimeConfiguration(
+        additionalLocalWhisperModelNames: [String]
+    ) -> VoiceInkModeRuntimeConfiguration {
         VoiceInkModeRuntimeConfiguration(
             transcriptionProvider: transcriptionProvider,
-            transcriptionModel: effectiveTranscriptionModel,
+            transcriptionModel: effectiveTranscriptionModel(
+                additionalLocalWhisperModelNames: additionalLocalWhisperModelNames
+            ),
             postProcessingProvider: postProcessingProvider,
             postProcessingModel: effectivePostProcessingModel,
             prompt: effectivePrompt,
@@ -637,8 +672,13 @@ public extension Collection where Element == Mode {
         return first
     }
 
-    func runtimeConfiguration(selectedModeId: UUID?) -> VoiceInkModeRuntimeConfiguration {
-        activeMode(selectedModeId: selectedModeId)?.runtimeConfiguration ?? .fallback
+    func runtimeConfiguration(
+        selectedModeId: UUID?,
+        additionalLocalWhisperModelNames: [String] = []
+    ) -> VoiceInkModeRuntimeConfiguration {
+        activeMode(selectedModeId: selectedModeId)?.runtimeConfiguration(
+            additionalLocalWhisperModelNames: additionalLocalWhisperModelNames
+        ) ?? .fallback
     }
 
     func transcriptionLanguages(selectedModeId: UUID?) -> [String: String] {

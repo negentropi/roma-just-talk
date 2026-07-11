@@ -70,6 +70,7 @@ final class AppSettings: ObservableObject {
         self.selectedTranscriptionLanguage = startupState.selectedTranscriptionLanguage
 
         observeLocalModelAvailability()
+        repairLocalWhisperModelSelections()
         repairSelectedTranscriptionLanguage()
     }
 
@@ -95,9 +96,24 @@ final class AppSettings: ObservableObject {
             .dropFirst()
             .sink { [weak self] _ in
                 Task { @MainActor in
+                    self?.repairLocalWhisperModelSelections()
                     self?.objectWillChange.send()
                 }
             }
+    }
+
+    private func repairLocalWhisperModelSelections() {
+        let importedModelNames = LocalModelManager.shared.importedModelNames
+        let repairedModes = modes.map { mode in
+            var repairedMode = mode
+            repairedMode.repairLocalWhisperModelSelection(
+                additionalLocalWhisperModelNames: importedModelNames
+            )
+            return repairedMode
+        }
+        if repairedModes != modes {
+            modes = repairedModes
+        }
     }
 
     func setAPIKey(_ key: String, for provider: VoiceInkProviderKind) {
@@ -152,7 +168,8 @@ final class AppSettings: ObservableObject {
             selectedModeId: selectedModeId,
             selectedTranscriptionLanguage: selectedTranscriptionLanguage,
             wordReplacementRules: wordReplacements,
-            customVocabulary: customVocabularyTerms
+            customVocabulary: customVocabularyTerms,
+            additionalLocalWhisperModelNames: LocalModelManager.shared.importedModelNames
         ).transcriptionRunSettings()
     }
 
@@ -207,7 +224,8 @@ final class AppSettings: ObservableObject {
                     selectedModeId: selectedModeId,
                     selectedTranscriptionLanguage: selectedTranscriptionLanguage,
                     wordReplacementRules: wordReplacements,
-                    customVocabulary: customVocabularyTerms
+                    customVocabulary: customVocabularyTerms,
+                    additionalLocalWhisperModelNames: LocalModelManager.shared.importedModelNames
                 )
             },
             apiKeyProvider: { [self] provider in

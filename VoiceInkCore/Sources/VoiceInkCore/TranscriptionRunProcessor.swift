@@ -653,24 +653,30 @@ public struct VoiceInkIOSAppSettingsRunSnapshot {
     public let selectedTranscriptionLanguage: String
     public let wordReplacementRules: [VoiceInkWordReplacementRule]
     public let customVocabulary: [String]
+    public let additionalLocalWhisperModelNames: [String]
 
     public init(
         modes: [Mode],
         selectedModeId: UUID?,
         selectedTranscriptionLanguage: String,
         wordReplacementRules: [VoiceInkWordReplacementRule],
-        customVocabulary: [String]
+        customVocabulary: [String],
+        additionalLocalWhisperModelNames: [String] = []
     ) {
         self.modes = modes
         self.selectedModeId = selectedModeId
         self.selectedTranscriptionLanguage = selectedTranscriptionLanguage
         self.wordReplacementRules = wordReplacementRules
         self.customVocabulary = customVocabulary
+        self.additionalLocalWhisperModelNames = additionalLocalWhisperModelNames
     }
 
     public func transcriptionRunSettings(defaults: UserDefaults = .standard) -> VoiceInkTranscriptionRunSettings {
         VoiceInkTranscriptionRunSettings(
-            configuration: modes.runtimeConfiguration(selectedModeId: selectedModeId),
+            configuration: modes.runtimeConfiguration(
+                selectedModeId: selectedModeId,
+                additionalLocalWhisperModelNames: additionalLocalWhisperModelNames
+            ),
             cleanupConfiguration: VoiceInkTranscriptionCleanupConfiguration.current(in: defaults),
             postProcessingSkipConfiguration: VoiceInkPostProcessingSkipConfiguration.current(in: defaults),
             transcriptionLanguage: selectedTranscriptionLanguage,

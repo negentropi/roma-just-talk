@@ -8,6 +8,8 @@ enum VoiceInkIOSLogger {
     static let audioSession = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: VoiceInkIOSLogCategory.audioSession)
     static let keyboard = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: VoiceInkIOSLogCategory.keyboard)
     static let localWhisper = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: VoiceInkIOSLogCategory.localWhisper)
+    static let nativeAppleTranscription = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: VoiceInkIOSLogCategory.nativeAppleTranscription)
+    static let nativeAppleLanguageAssets = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: VoiceInkIOSLogCategory.nativeAppleLanguageAssets)
     static let localModelManagement = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: VoiceInkIOSLogCategory.localModelManagement)
     static let notes = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: VoiceInkIOSLogCategory.notes)
     static let recording = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: VoiceInkIOSLogCategory.recording)

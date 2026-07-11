@@ -1082,6 +1082,8 @@ public enum VoiceInkIOSLogCategory {
     public static let audioSession = "iOSAudioSession"
     public static let keyboard = "iOSKeyboard"
     public static let localWhisper = "iOSLocalWhisper"
+    public static let nativeAppleTranscription = "iOSNativeAppleTranscription"
+    public static let nativeAppleLanguageAssets = "iOSNativeAppleLanguageAssets"
     public static let localModelManagement = "iOSLocalModelManagement"
     public static let notes = "iOSNotes"
     public static let recording = "iOSRecording"

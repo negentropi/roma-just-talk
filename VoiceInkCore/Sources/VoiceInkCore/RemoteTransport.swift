@@ -319,6 +319,10 @@ public struct VoiceInkProviderAPIKeyVerifier: Sendable {
         _ apiKey: String,
         for transcriptionProvider: VoiceInkTranscriptionModelProvider
     ) async -> VoiceInkAPIKeyVerificationResult {
+        guard VoiceInkProviderCredential.nonBlank(apiKey) != nil else {
+            return VoiceInkAPIKeyVerificationPolicy.missingAPIKeyResult
+        }
+
         if transcriptionProvider == .cartesia {
             return await cartesiaClient.verifyAPIKeyDetailed(
                 baseURL: VoiceInkProviderEndpoint.cartesiaAPIBaseURL,

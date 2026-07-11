@@ -448,6 +448,10 @@ public enum VoiceInkLanguageCatalog {
             return whisperLanguages()
         }
 
+        if provider == .nativeApple {
+            return nativeApple
+        }
+
         guard let codes = provider.languageCodes else {
             return all
         }

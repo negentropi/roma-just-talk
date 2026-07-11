@@ -11,6 +11,21 @@ public protocol VoiceInkAudioTranscriptionService {
     ) async throws -> String
 }
 
+public struct VoiceInkUnsupportedAudioTranscriptionService: VoiceInkAudioTranscriptionService {
+    public init() {}
+
+    public func transcribeAudioFile(
+        apiKey: String,
+        model: String,
+        fileURL: URL,
+        language: String?,
+        prompt: String?,
+        customVocabulary: [String]
+    ) async throws -> String {
+        throw VoiceInkCloudTranscriptionError.unsupportedProvider
+    }
+}
+
 public enum VoiceInkCloudTranscriptionError: Error, LocalizedError {
     public static let apiStatusCodeRange: ClosedRange<Int> = 100...599
 
@@ -101,15 +116,21 @@ public struct VoiceInkCloudTranscriptionAudioFile: Equatable, Sendable {
 public struct VoiceInkAudioTranscriptionServiceFactory {
     public typealias RemoteServiceFactory = (VoiceInkProviderKind) -> any VoiceInkAudioTranscriptionService
     public typealias LocalWhisperServiceFactory = () -> any VoiceInkAudioTranscriptionService
+    public typealias NativeAppleServiceFactory = () -> any VoiceInkAudioTranscriptionService
 
     private let remoteServiceFactory: RemoteServiceFactory
     private let localWhisperServiceFactory: LocalWhisperServiceFactory
+    private let nativeAppleServiceFactory: NativeAppleServiceFactory
 
     public init(
         localWhisperServiceFactory: @escaping LocalWhisperServiceFactory,
+        nativeAppleServiceFactory: @escaping NativeAppleServiceFactory = {
+            VoiceInkUnsupportedAudioTranscriptionService()
+        },
         remoteServiceFactory: @escaping RemoteServiceFactory = { VoiceInkRemoteTranscriptionService(provider: $0) }
     ) {
         self.localWhisperServiceFactory = localWhisperServiceFactory
+        self.nativeAppleServiceFactory = nativeAppleServiceFactory
         self.remoteServiceFactory = remoteServiceFactory
     }
 
@@ -119,6 +140,8 @@ public struct VoiceInkAudioTranscriptionServiceFactory {
             return remoteServiceFactory(provider)
         case .localWhisper:
             return localWhisperServiceFactory()
+        case .nativeApple:
+            return nativeAppleServiceFactory()
         }
     }
 }
@@ -206,7 +229,7 @@ public struct VoiceInkRemoteTranscriptionOptions: Equatable, Sendable {
                 prompt: requestPrompt,
                 customVocabulary: normalizedCustomVocabulary
             )
-        case .cartesia, .elevenLabs, .gemini, .mistral, .xai, .local:
+        case .cartesia, .elevenLabs, .gemini, .mistral, .xai, .local, .nativeApple:
             return Self()
         }
     }
@@ -2505,6 +2528,8 @@ public struct VoiceInkRemoteTranscriptionService: VoiceInkAudioTranscriptionServ
             )
         case .localWhisper:
             throw URLError(.unsupportedURL)
+        case .nativeApple:
+            throw VoiceInkCloudTranscriptionError.unsupportedProvider
         }
     }
 

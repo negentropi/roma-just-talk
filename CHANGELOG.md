@@ -2,6 +2,7 @@
 
 ## v1.96 - Unreleased
 
+- Added iOS 26 Native Apple transcription with mode selection, BCP-47 language handling, Speech asset status/download controls, and recorded-file SpeechAnalyzer routing.
 - Added iOS per-language local Whisper prompt editing and trailing-space keyboard delivery using the existing shared preferences and runtime policy.
 - Added retained iOS local Whisper contexts with coalesced model loading, launch/foreground prewarm, recording-time cancellation, model-deletion and memory-warning release, and a shared prewarm setting.
 - Added an iOS local Whisper VAD control backed by the same shared preference and whisper.cpp runtime configuration as macOS batch transcription.

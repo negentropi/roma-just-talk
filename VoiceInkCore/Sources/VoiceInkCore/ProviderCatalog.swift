@@ -27,11 +27,13 @@ public enum VoiceInkTranscriptionTransport: Sendable {
     case assemblyAI
     case xai
     case localWhisper
+    case nativeApple
 }
 
-public enum VoiceInkTranscriptionServiceKind: Sendable {
+public enum VoiceInkTranscriptionServiceKind: Equatable, Sendable {
     case remote
     case localWhisper
+    case nativeApple
 }
 
 public enum VoiceInkTranscriptionEmptyTextPolicy: Sendable, Equatable {
@@ -66,6 +68,7 @@ public enum VoiceInkAPIKeyVerificationTransport: Sendable, Equatable {
 public enum VoiceInkProviderAccessRequirement: Sendable {
     case userAPIKey(account: String, verificationStateKey: String, verificationTransport: VoiceInkAPIKeyVerificationTransport)
     case localWhisperModel
+    case nativeAppleSpeech
     case bundledService
 }
 
@@ -1094,6 +1097,7 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
     case assemblyAI
     case xai
     case localWhisper
+    case nativeApple
     case voiceInk
 
     public var id: String { rawValue }
@@ -1132,6 +1136,8 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return "xAI"
         case .localWhisper:
             return "Local (Whisper)"
+        case .nativeApple:
+            return "Native Apple"
         case .voiceInk:
             return "VoiceInk"
         }
@@ -1186,6 +1192,8 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return VoiceInkProviderEndpoint.xaiAPIBaseURL
         case .localWhisper:
             return URL(string: "http://localhost")!
+        case .nativeApple:
+            return URL(string: "https://developer.apple.com/documentation/speech")!
         case .voiceInk:
             return VoiceInkProviderEndpoint.groq.apiBaseURL
         }
@@ -1195,7 +1203,7 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
         switch self {
         case .gemini:
             return VoiceInkProviderEndpoint.geminiNativeAPIBaseURL
-        case .groq, .openAI, .deepgram, .cerebras, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .localWhisper, .voiceInk:
+        case .groq, .openAI, .deepgram, .cerebras, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .localWhisper, .nativeApple, .voiceInk:
             return apiBaseURL
         }
     }
@@ -1226,6 +1234,8 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return URL(string: "https://console.x.ai/")!
         case .localWhisper:
             return URL(string: "https://github.com/ggerganov/whisper.cpp")!
+        case .nativeApple:
+            return URL(string: "https://developer.apple.com/documentation/speech")!
         case .voiceInk:
             return URL(string: "https://voiceink.app")!
         }
@@ -1251,6 +1261,8 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return .xai
         case .localWhisper:
             return .localWhisper
+        case .nativeApple:
+            return .nativeApple
         case .groq, .openAI, .cerebras, .voiceInk:
             return .openAICompatible
         }
@@ -1262,6 +1274,8 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return .remote
         case .localWhisper:
             return .localWhisper
+        case .nativeApple:
+            return .nativeApple
         }
     }
 
@@ -1269,7 +1283,7 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
         switch self {
         case .groq, .deepgram, .gemini:
             return .rejectEmpty
-        case .soniox, .speechmatics, .assemblyAI:
+        case .soniox, .speechmatics, .assemblyAI, .nativeApple:
             return .rejectWhitespace
         case .openAI, .cerebras, .mistral, .elevenLabs, .xai, .localWhisper, .voiceInk:
             return .allow
@@ -1346,6 +1360,8 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             )
         case .localWhisper:
             return .localWhisperModel
+        case .nativeApple:
+            return .nativeAppleSpeech
         case .voiceInk:
             return .bundledService
         }
@@ -1378,6 +1394,8 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return userAPIKey
         case .localWhisperModel:
             return "local"
+        case .nativeAppleSpeech:
+            return "native-apple"
         case .bundledService:
             return ""
         }
@@ -1390,13 +1408,16 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
     public func isReady(
         userAPIKey: String,
         userAPIKeyVerified: Bool,
-        localWhisperModelAvailable: Bool
+        localWhisperModelAvailable: Bool,
+        nativeAppleSpeechAvailable: Bool = false
     ) -> Bool {
         switch accessRequirement {
         case .userAPIKey:
             return userAPIKeyVerified && VoiceInkProviderCredential.nonBlank(userAPIKey) != nil
         case .localWhisperModel:
             return localWhisperModelAvailable
+        case .nativeAppleSpeech:
+            return nativeAppleSpeechAvailable
         case .bundledService:
             return false
         }
@@ -1450,6 +1471,8 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return .xai
         case .localWhisper:
             return .local
+        case .nativeApple:
+            return .nativeApple
         case .voiceInk:
             return nil
         case .cerebras:
@@ -1467,7 +1490,7 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
             return .cerebras
         case .gemini:
             return .gemini
-        case .deepgram, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .localWhisper, .voiceInk:
+        case .deepgram, .mistral, .elevenLabs, .soniox, .speechmatics, .assemblyAI, .xai, .localWhisper, .nativeApple, .voiceInk:
             return nil
         }
     }
@@ -1513,7 +1536,7 @@ public enum VoiceInkProviderKind: String, CaseIterable, Codable, Identifiable, S
         switch accessRequirement {
         case .bundledService:
             return false
-        case .userAPIKey, .localWhisperModel:
+        case .userAPIKey, .localWhisperModel, .nativeAppleSpeech:
             return supportsModelUse(use)
         }
     }

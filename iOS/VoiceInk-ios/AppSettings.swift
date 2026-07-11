@@ -80,7 +80,13 @@ final class AppSettings: ObservableObject {
     var providerAccess: VoiceInkProviderAccessSnapshot {
         VoiceInkProviderAccessSnapshot(
             apiKeyState: apiKeyState,
-            localWhisperModelAvailable: LocalModelManager.shared.managementSnapshot.hasAvailableModel()
+            localWhisperModelAvailable: LocalModelManager.shared.managementSnapshot.hasAvailableModel(),
+            nativeAppleSpeechAvailable: {
+                if #available(iOS 26.0, *) {
+                    return true
+                }
+                return false
+            }()
         )
     }
 
@@ -209,6 +215,9 @@ final class AppSettings: ObservableObject {
             },
             localWhisperServiceFactory: {
                 WhisperTranscriptionService()
+            },
+            nativeAppleServiceFactory: {
+                IOSNativeAppleTranscriptionService()
             }
         )
     }

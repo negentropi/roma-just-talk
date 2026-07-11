@@ -532,6 +532,7 @@ public enum VoiceInkStoredAudioRetranscription {
     public typealias RunSettingsProvider = VoiceInkStoredAudioRetranscriptionRunner.RunSettingsProvider
     public typealias IOSAppSettingsRunSnapshotProvider = () async -> VoiceInkIOSAppSettingsRunSnapshot
     public typealias LocalWhisperServiceFactory = VoiceInkAudioTranscriptionServiceFactory.LocalWhisperServiceFactory
+    public typealias NativeAppleServiceFactory = VoiceInkAudioTranscriptionServiceFactory.NativeAppleServiceFactory
     typealias RemoteServiceFactory = VoiceInkAudioTranscriptionServiceFactory.RemoteServiceFactory
 
     @discardableResult
@@ -584,7 +585,10 @@ public enum VoiceInkStoredAudioRetranscription {
         defaults: UserDefaults = .standard,
         iOSAppSettingsRunSnapshotProvider: @escaping IOSAppSettingsRunSnapshotProvider,
         apiKeyProvider: @escaping VoiceInkTranscriptionRunProcessor.APIKeyProvider,
-        localWhisperServiceFactory: @escaping LocalWhisperServiceFactory
+        localWhisperServiceFactory: @escaping LocalWhisperServiceFactory,
+        nativeAppleServiceFactory: @escaping NativeAppleServiceFactory = {
+            VoiceInkUnsupportedAudioTranscriptionService()
+        }
     ) async -> VoiceInkStoredAudioRetranscriptionOutcome {
         await retranscribeWithOutcome(
             record,
@@ -595,6 +599,7 @@ public enum VoiceInkStoredAudioRetranscription {
             iOSAppSettingsRunSnapshotProvider: iOSAppSettingsRunSnapshotProvider,
             apiKeyProvider: apiKeyProvider,
             localWhisperServiceFactory: localWhisperServiceFactory,
+            nativeAppleServiceFactory: nativeAppleServiceFactory,
             remoteServiceFactory: { VoiceInkRemoteTranscriptionService(provider: $0) }
         )
     }
@@ -608,6 +613,9 @@ public enum VoiceInkStoredAudioRetranscription {
         runSettingsProvider: @escaping RunSettingsProvider,
         apiKeyProvider: @escaping VoiceInkTranscriptionRunProcessor.APIKeyProvider,
         localWhisperServiceFactory: @escaping LocalWhisperServiceFactory,
+        nativeAppleServiceFactory: @escaping NativeAppleServiceFactory = {
+            VoiceInkUnsupportedAudioTranscriptionService()
+        },
         remoteServiceFactory: @escaping RemoteServiceFactory = { VoiceInkRemoteTranscriptionService(provider: $0) }
     ) async throws -> String {
         try await runner(
@@ -615,6 +623,7 @@ public enum VoiceInkStoredAudioRetranscription {
             runSettingsProvider: runSettingsProvider,
             apiKeyProvider: apiKeyProvider,
             localWhisperServiceFactory: localWhisperServiceFactory,
+            nativeAppleServiceFactory: nativeAppleServiceFactory,
             remoteServiceFactory: remoteServiceFactory
         ).retranscribe(
             record,
@@ -633,6 +642,9 @@ public enum VoiceInkStoredAudioRetranscription {
         iOSAppSettingsRunSnapshotProvider: @escaping IOSAppSettingsRunSnapshotProvider,
         apiKeyProvider: @escaping VoiceInkTranscriptionRunProcessor.APIKeyProvider,
         localWhisperServiceFactory: @escaping LocalWhisperServiceFactory,
+        nativeAppleServiceFactory: @escaping NativeAppleServiceFactory = {
+            VoiceInkUnsupportedAudioTranscriptionService()
+        },
         remoteServiceFactory: @escaping RemoteServiceFactory = { VoiceInkRemoteTranscriptionService(provider: $0) }
     ) async -> VoiceInkStoredAudioRetranscriptionOutcome {
         await retranscribeWithOutcome(
@@ -646,6 +658,7 @@ public enum VoiceInkStoredAudioRetranscription {
             },
             apiKeyProvider: apiKeyProvider,
             localWhisperServiceFactory: localWhisperServiceFactory,
+            nativeAppleServiceFactory: nativeAppleServiceFactory,
             remoteServiceFactory: remoteServiceFactory
         )
     }
@@ -659,6 +672,9 @@ public enum VoiceInkStoredAudioRetranscription {
         runSettingsProvider: @escaping RunSettingsProvider,
         apiKeyProvider: @escaping VoiceInkTranscriptionRunProcessor.APIKeyProvider,
         localWhisperServiceFactory: @escaping LocalWhisperServiceFactory,
+        nativeAppleServiceFactory: @escaping NativeAppleServiceFactory = {
+            VoiceInkUnsupportedAudioTranscriptionService()
+        },
         remoteServiceFactory: @escaping RemoteServiceFactory = { VoiceInkRemoteTranscriptionService(provider: $0) }
     ) async -> VoiceInkStoredAudioRetranscriptionOutcome {
         await runner(
@@ -666,6 +682,7 @@ public enum VoiceInkStoredAudioRetranscription {
             runSettingsProvider: runSettingsProvider,
             apiKeyProvider: apiKeyProvider,
             localWhisperServiceFactory: localWhisperServiceFactory,
+            nativeAppleServiceFactory: nativeAppleServiceFactory,
             remoteServiceFactory: remoteServiceFactory
         ).retranscribeWithOutcome(
             record,
@@ -679,10 +696,14 @@ public enum VoiceInkStoredAudioRetranscription {
         runSettingsProvider: @escaping RunSettingsProvider,
         apiKeyProvider: @escaping VoiceInkTranscriptionRunProcessor.APIKeyProvider,
         localWhisperServiceFactory: @escaping LocalWhisperServiceFactory,
+        nativeAppleServiceFactory: @escaping NativeAppleServiceFactory = {
+            VoiceInkUnsupportedAudioTranscriptionService()
+        },
         remoteServiceFactory: @escaping RemoteServiceFactory = { VoiceInkRemoteTranscriptionService(provider: $0) }
     ) -> VoiceInkStoredAudioRetranscriptionRunner {
         let serviceFactory = VoiceInkAudioTranscriptionServiceFactory(
             localWhisperServiceFactory: localWhisperServiceFactory,
+            nativeAppleServiceFactory: nativeAppleServiceFactory,
             remoteServiceFactory: remoteServiceFactory
         )
 

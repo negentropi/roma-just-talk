@@ -58,6 +58,7 @@ public struct VoiceInkTranscriptionModelAvailabilityFacts: Equatable, Sendable {
 
 public enum VoiceInkNativeAppleTranscriptionFailureKind: Error, LocalizedError, Equatable, Sendable {
     case unsupportedOS
+    case unsupportedIOS
     case transcriptionFailed
     case localeNotSupported
     case invalidModel
@@ -74,6 +75,7 @@ public enum VoiceInkNativeAppleTranscriptionPolicy {
     public static let resultStreamTimeoutMultiplier = 4.0
     public static let resultStreamTimeoutPadding: TimeInterval = 10.0
     public static let unsupportedOSDiagnosticMessage = "SpeechAnalyzer is not available on this macOS version"
+    public static let unsupportedIOSDiagnosticMessage = "SpeechAnalyzer is not available on this iOS version"
 
     public static func requiresMacOS26Title(modelDisplayName: String) -> String {
         "\(modelDisplayName) requires macOS 26 or later"
@@ -83,6 +85,8 @@ public enum VoiceInkNativeAppleTranscriptionPolicy {
         switch failure {
         case .unsupportedOS:
             return "SpeechAnalyzer requires macOS 26 or later."
+        case .unsupportedIOS:
+            return "SpeechAnalyzer requires iOS 26 or later."
         case .transcriptionFailed:
             return "Transcription failed using SpeechAnalyzer."
         case .localeNotSupported:
@@ -416,6 +420,7 @@ public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
     case speechmatics
     case xai
     case local
+    case nativeApple
 
     public var providerKind: VoiceInkProviderKind? {
         switch self {
@@ -441,6 +446,8 @@ public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
             return .xai
         case .local:
             return .localWhisper
+        case .nativeApple:
+            return .nativeApple
         case .cartesia:
             return nil
         }
@@ -511,7 +518,7 @@ public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
                 "nl", "no", "pl", "pt", "ro", "ru", "sk", "sl", "sr", "sv",
                 "ta", "te", "th", "tl", "tr", "uk", "ur", "vi", "zh"
             ]
-        case .groq, .openAI, .gemini, .local:
+        case .groq, .openAI, .gemini, .local, .nativeApple:
             return nil
         }
     }
@@ -520,7 +527,7 @@ public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
         switch self {
         case .assemblyAI, .deepgram, .elevenLabs, .mistral, .soniox, .speechmatics, .xai:
             return true
-        case .cartesia, .groq, .openAI, .gemini, .local:
+        case .cartesia, .groq, .openAI, .gemini, .local, .nativeApple:
             return false
         }
     }
@@ -529,7 +536,7 @@ public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
         switch self {
         case .cartesia:
             return false
-        case .assemblyAI, .deepgram, .elevenLabs, .mistral, .soniox, .speechmatics, .xai, .groq, .openAI, .gemini, .local:
+        case .assemblyAI, .deepgram, .elevenLabs, .mistral, .soniox, .speechmatics, .xai, .groq, .openAI, .gemini, .local, .nativeApple:
             return true
         }
     }
@@ -558,7 +565,7 @@ public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
             return "AssemblyAIAPI"
         case .xai:
             return "XAIAPI"
-        case .openAI, .cartesia, .local:
+        case .openAI, .cartesia, .local, .nativeApple:
             return nil
         }
     }
@@ -580,7 +587,7 @@ public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
             return selectedModelName.contains("standard") ? "standard" : "enhanced"
         case .mistral:
             return "voxtral-mini-transcribe-realtime-2602"
-        case .assemblyAI, .cartesia, .deepgram, .gemini, .groq, .openAI, .xai, .local:
+        case .assemblyAI, .cartesia, .deepgram, .gemini, .groq, .openAI, .xai, .local, .nativeApple:
             return selectedModelName
         }
     }
@@ -589,7 +596,7 @@ public enum VoiceInkTranscriptionModelProvider: String, CaseIterable, Sendable {
         switch self {
         case .assemblyAI:
             return true
-        case .cartesia, .deepgram, .elevenLabs, .gemini, .groq, .mistral, .openAI, .soniox, .speechmatics, .xai, .local:
+        case .cartesia, .deepgram, .elevenLabs, .gemini, .groq, .mistral, .openAI, .soniox, .speechmatics, .xai, .local, .nativeApple:
             return false
         }
     }
@@ -1347,6 +1354,8 @@ public enum VoiceInkTranscriptionModelCatalog {
             ]
         case .local:
             return [localBaseModel]
+        case .nativeApple:
+            return [nativeAppleModel.name]
         }
     }
 
@@ -1520,7 +1529,7 @@ public enum VoiceInkTranscriptionModelCatalog {
                     supportsStreaming: true
                 )
             ]
-        case .openAI, .local:
+        case .openAI, .local, .nativeApple:
             return []
         }
     }

@@ -105,6 +105,12 @@ struct SettingsView: View {
                         Text(language.name).tag(language.code)
                     }
                 }
+
+                if selectedTranscriptionProvider == .nativeApple {
+                    IOSNativeAppleLanguageAssetView(
+                        localeIdentifier: settings.selectedTranscriptionLanguage
+                    )
+                }
             }
 
             Section(header: Text(promptPresentation.sectionTitle)) {
@@ -304,6 +310,10 @@ struct SettingsView: View {
             customVocabularyTerms: settings.customVocabularyTerms,
             wordReplacements: settings.wordReplacements
         )
+    }
+
+    private var selectedTranscriptionProvider: VoiceInkProviderKind? {
+        settings.modes.activeMode(selectedModeId: settings.selectedModeId)?.transcriptionProvider
     }
 
     private var languagePrompt: String {

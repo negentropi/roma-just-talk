@@ -1,0 +1,138 @@
+name: Prepare remote E2E stage
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Desktop surfaces to prepare
+        required: true
+        default: both
+        type: choice
+        options:
+          - both
+          - macos
+          - ios
+      macos_artifact_run_id:
+        description: Build run ID containing the macOS app; blank uses latest green build
+        required: false
+        type: string
+      ios_artifact_run_id:
+        description: Migration run ID containing the iOS Simulator app; blank uses latest green run
+        required: false
+        type: string
+      hold_minutes:
+        description: Time available for VNC or future Computer Use interaction
+        required: true
+        default: "30"
+        type: choice
+        options:
+          - "15"
+          - "30"
+          - "45"
+          - "60"
+  push:
+    branches:
+      - "ci/remote-e2e-stage-*"
+    paths:
+      - ".github/workflows/voiceink-remote-e2e-stage.yml"
+      - "scripts/open-remote-e2e-stage.sh"
+      - "scripts/prepare-remote-e2e-stage.sh"
+      - "docs/remote-e2e-stage.md"
+
+permissions:
+  actions: read
+  contents: read
+
+env:
+  DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
+  STAGE_TARGET: ${{ inputs.target || 'macos' }}
+  STAGE_HOLD_MINUTES: ${{ inputs.hold_minutes || '10' }}
+
+jobs:
+  stage:
+    name: Remote desktop ready
+    runs-on: namespace-profile-roma-jt
+    timeout-minutes: 75
+
+    steps:
+      - name: Checkout stage tooling
+        uses: actions/checkout@v4
+
+      - name: Show toolchain
+        run: |
+          xcode-select -p
+          xcodebuild -version
+          swift --version
+
+      - name: Download macOS app artifact
+        if: env.STAGE_TARGET != 'ios'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REQUESTED_RUN_ID: ${{ inputs.macos_artifact_run_id }}
+        run: |
+          RUN_ID="$REQUESTED_RUN_ID"
+          if [ -z "$RUN_ID" ]; then
+            RUN_ID="$(
+              gh run list \
+                --repo "$GITHUB_REPOSITORY" \
+                --workflow voiceink-build.yml \
+                --status success \
+                --limit 1 \
+                --json databaseId \
+                --jq '.[0].databaseId'
+            )"
+          fi
+          test -n "$RUN_ID"
+          mkdir -p "$RUNNER_TEMP/remote-e2e-inputs/macos"
+          gh run download "$RUN_ID" \
+            --repo "$GITHUB_REPOSITORY" \
+            --name roma.just.talk.app \
+            --dir "$RUNNER_TEMP/remote-e2e-inputs/macos"
+          test -f "$RUNNER_TEMP/remote-e2e-inputs/macos/roma.just.talk.app.zip"
+          echo "$RUN_ID" > "$RUNNER_TEMP/remote-e2e-inputs/macos/build-run-id.txt"
+          echo "Using macOS artifact from run $RUN_ID"
+
+      - name: Download iOS Simulator app artifact
+        if: env.STAGE_TARGET != 'macos'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REQUESTED_RUN_ID: ${{ inputs.ios_artifact_run_id }}
+        run: |
+          RUN_ID="$REQUESTED_RUN_ID"
+          if [ -z "$RUN_ID" ]; then
+            RUN_ID="$(
+              gh run list \
+                --repo "$GITHUB_REPOSITORY" \
+                --workflow voiceink-ios-single-repo-migration.yml \
+                --status success \
+                --limit 1 \
+                --json databaseId \
+                --jq '.[0].databaseId'
+            )"
+          fi
+          test -n "$RUN_ID"
+          mkdir -p "$RUNNER_TEMP/remote-e2e-inputs/ios"
+          gh run download "$RUN_ID" \
+            --repo "$GITHUB_REPOSITORY" \
+            --name roma.just.talk.ios-simulator.app \
+            --dir "$RUNNER_TEMP/remote-e2e-inputs/ios"
+          test -f "$RUNNER_TEMP/remote-e2e-inputs/ios/roma.just.talk.ios-simulator.app.zip"
+          echo "$RUN_ID" > "$RUNNER_TEMP/remote-e2e-inputs/ios/build-run-id.txt"
+          echo "Using iOS artifact from run $RUN_ID"
+
+      - name: Prepare desktop and hold for Remote Display
+        run: |
+          bash scripts/prepare-remote-e2e-stage.sh \
+            "$STAGE_TARGET" \
+            "$STAGE_HOLD_MINUTES" \
+            "$RUNNER_TEMP/remote-e2e-inputs" \
+            "$RUNNER_TEMP/voiceink-remote-e2e-stage"
+
+      - name: Upload stage evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: remote-e2e-stage-evidence
+          path: ${{ runner.temp }}/voiceink-remote-e2e-stage/evidence
+          if-no-files-found: warn
+          retention-days: 7

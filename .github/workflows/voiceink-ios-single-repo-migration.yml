@@ -70,6 +70,20 @@ jobs:
             -derivedDataPath "$PWD/.local-build-ios" \
             CODE_SIGNING_ALLOWED=NO
 
+      - name: Package iOS Simulator app
+        run: |
+          APP="$PWD/.local-build-ios/Build/Products/Debug-iphonesimulator/roma just talk.app"
+          test -d "$APP"
+          ditto -c -k --keepParent "$APP" roma.just.talk.ios-simulator.app.zip
+
+      - name: Upload iOS Simulator app
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.just.talk.ios-simulator.app
+          path: roma.just.talk.ios-simulator.app.zip
+          if-no-files-found: error
+          retention-days: 7
+
       - name: Run focused iOS parity tests
         id: ios_tests
         continue-on-error: true

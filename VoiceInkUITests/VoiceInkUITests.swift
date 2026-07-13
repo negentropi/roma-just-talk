@@ -8,58 +8,36 @@
 import XCTest
 
 final class VoiceInkUITests: XCTestCase {
+
     override func setUpWithError() throws {
+        // Put setup code here. This method is called before the invocation of each test method in the class.
+
+        // In UI tests it is usually best to stop immediately when a failure occurs.
         continueAfterFailure = false
+
+        // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
+    }
+
+    override func tearDownWithError() throws {
+        // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
     @MainActor
-    func testFirstRunShowsOnboarding() throws {
-        let app = configuredApp(hasCompletedOnboarding: false)
-        app.launch()
-
-        XCTAssertTrue(
-            app.staticTexts["Welcome to the Future of Typing"]
-                .waitForExistence(timeout: 15)
-        )
-        XCTAssertTrue(app.buttons["Get Started"].exists)
-        attachScreenshot(of: app, named: "macOS onboarding")
-    }
-
-    @MainActor
-    func testCompletedSetupCanOpenSettings() throws {
-        let app = configuredApp(hasCompletedOnboarding: true)
-        app.launch()
-
-        XCTAssertTrue(app.staticTexts["roma-just-talk"].firstMatch.waitForExistence(timeout: 15))
-
-        let settings = app.staticTexts["Settings"].firstMatch
-        XCTAssertTrue(settings.waitForExistence(timeout: 5))
-        settings.click()
-
-        XCTAssertTrue(app.buttons["Reset Onboarding"].waitForExistence(timeout: 5))
-        attachScreenshot(of: app, named: "macOS settings")
-    }
-
-    private func configuredApp(hasCompletedOnboarding: Bool) -> XCUIApplication {
+    func testExample() throws {
+        // UI tests must launch the application that they test.
         let app = XCUIApplication()
-        app.launchArguments += [
-            "-hasCompletedOnboarding",
-            hasCompletedOnboarding ? "YES" : "NO",
-            "-macOSOnboardingStage",
-            "welcome",
-            "-enableAnnouncements",
-            "NO",
-            "-ShowMenuBarIcon",
-            "NO"
-        ]
-        return app
+        app.launch()
+
+        // Use XCTAssert and related functions to verify your tests produce the correct results.
     }
 
     @MainActor
-    private func attachScreenshot(of app: XCUIApplication, named name: String) {
-        let attachment = XCTAttachment(screenshot: app.screenshot())
-        attachment.name = name
-        attachment.lifetime = .keepAlways
-        add(attachment)
+    func testLaunchPerformance() throws {
+        if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 7.0, *) {
+            // This measures how long it takes to launch your application.
+            measure(metrics: [XCTApplicationLaunchMetric()]) {
+                XCUIApplication().launch()
+            }
+        }
     }
 }

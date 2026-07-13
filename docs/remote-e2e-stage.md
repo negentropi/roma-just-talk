@@ -65,10 +65,11 @@ Provisioning remains owned by this workflow. Interaction prompts and judgment re
 
 The workflow uploads `remote-e2e-stage-evidence` containing:
 
-- remote desktop screenshots before and after the hold window;
 - Simulator screenshots when iOS is selected;
 - macOS and iOS application logs;
 - macOS, Xcode, and Simulator inventory.
+
+Namespace VNC can be active while `screencapture` remains unable to see that display from the runner shell. The workflow records this condition instead of silently claiming a desktop screenshot. The VNC controller or future Computer Use skill owns macOS desktop screenshots.
 
 ## Boundaries
 

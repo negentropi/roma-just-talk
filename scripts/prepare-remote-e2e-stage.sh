@@ -36,6 +36,17 @@ stop_logs() {
 }
 trap stop_logs EXIT
 
+capture_desktop() {
+  local phase="$1"
+  local image="$evidence/desktop-$phase.png"
+  local error_log="$evidence/desktop-$phase-screencapture.err"
+
+  if ! /usr/sbin/screencapture -x "$image" 2> "$error_log"; then
+    echo "Namespace VNC is available, but screencapture cannot see its display from the runner shell." \
+      > "$evidence/desktop-$phase-controller-capture-required.txt"
+  fi
+}
+
 prepare_macos() {
   local archive="$inputs_root/macos/roma.just.talk.app.zip"
   local app="$HOME/Applications/roma just talk.app"
@@ -150,7 +161,7 @@ cat > "$stage_root/stage-manifest.json" <<EOF
 EOF
 
 touch "$ready_file"
-/usr/sbin/screencapture -x "$evidence/desktop-ready.png" 2>/dev/null || true
+capture_desktop ready
 if [ -n "$simulator_udid" ]; then
   xcrun simctl io "$simulator_udid" screenshot "$evidence/ios-ready.png" 2>/dev/null || true
 fi
@@ -168,7 +179,7 @@ while (( SECONDS < deadline )) && [ ! -f "$done_file" ]; do
   sleep 30
 done
 
-/usr/sbin/screencapture -x "$evidence/desktop-final.png" 2>/dev/null || true
+capture_desktop final
 if [ -n "$simulator_udid" ]; then
   xcrun simctl io "$simulator_udid" screenshot "$evidence/ios-final.png" 2>/dev/null || true
 fi

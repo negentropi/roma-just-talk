@@ -45,7 +45,7 @@ permissions:
 
 env:
   DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
-  STAGE_TARGET: ${{ inputs.target || 'macos' }}
+  STAGE_TARGET: ${{ inputs.target || 'ios' }}
   STAGE_HOLD_MINUTES: ${{ inputs.hold_minutes || '10' }}
 
 jobs:

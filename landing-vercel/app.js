@@ -323,31 +323,11 @@ function initFeatureTabs() {
     .map((tab) => document.querySelector(tab.getAttribute("href")))
     .filter(Boolean);
   const clamp = (value, minimum, maximum) => Math.min(maximum, Math.max(minimum, value));
-  const smoothstep = (value) => value * value * (3 - 2 * value);
   const point = (value) => Number(value.toFixed(3));
   const edgeTolerance = 1;
   const panelTabRise = 48;
   let activeId = "";
   let shapeTarget = null;
-
-  const roundedRectPath = ({ left, right, top, bottom, radius }) => {
-    const visibleHeight = bottom - top;
-    if (visibleHeight <= 1 || right - left <= 1) return "";
-
-    const r = Math.min(radius, visibleHeight / 2, (right - left) / 2);
-    return [
-      `M${point(left + r)} ${point(top)}`,
-      `H${point(right - r)}`,
-      `Q${point(right)} ${point(top)} ${point(right)} ${point(top + r)}`,
-      `V${point(bottom - r)}`,
-      `Q${point(right)} ${point(bottom)} ${point(right - r)} ${point(bottom)}`,
-      `H${point(left + r)}`,
-      `Q${point(left)} ${point(bottom)} ${point(left)} ${point(bottom - r)}`,
-      `V${point(top + r)}`,
-      `Q${point(left)} ${point(top)} ${point(left + r)} ${point(top)}`,
-      "Z",
-    ].join(" ");
-  };
 
   // The tab protrusion and panel frame are one closed path. Reducing available
   // height tightens the same curves instead of swapping to another shape.
@@ -360,10 +340,6 @@ function initFeatureTabs() {
     if (visibleHeight <= 1 || right - left <= 1) return "";
 
     const bodyRadius = Math.min(radius, visibleHeight / 2, (right - left) / 2);
-    if (tabRise < 0.75) {
-      return roundedRectPath({ left, right, top, bottom: lower, radius: bodyRadius });
-    }
-
     const shoulder = Math.min(12, tabRise / 2, bodyRadius);
     const minimumTabWidth = 36;
     const safeTabLeft = clamp(
@@ -421,23 +397,19 @@ function initFeatureTabs() {
 
   const renderOutlines = (edgeTop) => {
     const panelOffset = parseFloat(getComputedStyle(shell).getPropertyValue("--panel-offset")) || 8;
+    const viewportHeight = window.innerHeight;
     const measurements = outlines.map((outline) => {
       const panelRect = outline.panel.getBoundingClientRect();
       const targetRect = outline.target.getBoundingClientRect();
-      const baseTabRise = panelTabRise;
       const squeeze = clamp(edgeTop - panelRect.top, 0, panelRect.height);
-      const availableHeight = panelRect.height - squeeze;
-      const approachRatio = clamp((edgeTop + baseTabRise - panelRect.top) / baseTabRise, 0, 1);
-      const remainingRatio = clamp(availableHeight / (baseTabRise * 1.5), 0, 1);
-      const profile = smoothstep(Math.min(approachRatio, remainingRatio));
-      return { ...outline, panelRect, targetRect, baseTabRise, squeeze, profile };
+      return { ...outline, panelRect, targetRect, squeeze };
     });
     const edgeOutline = [...measurements].reverse().find(
-      ({ panelRect, baseTabRise }) =>
-        panelRect.top <= edgeTop + baseTabRise + edgeTolerance && panelRect.bottom > edgeTop - edgeTolerance,
+      ({ panelRect }) =>
+        panelRect.top <= edgeTop + edgeTolerance && panelRect.bottom > edgeTop - edgeTolerance,
     );
 
-    const edgeShapeTarget = edgeOutline && edgeOutline.profile >= 0.6 ? edgeOutline.target : null;
+    const edgeShapeTarget = edgeOutline?.target || null;
     if (edgeShapeTarget !== shapeTarget) {
       shapeTarget?.classList.remove("panel-shape-active");
       edgeShapeTarget?.classList.add("panel-shape-active");
@@ -445,15 +417,15 @@ function initFeatureTabs() {
     }
     bar.classList.toggle("has-panel-edge", Boolean(edgeShapeTarget));
 
-    measurements.forEach(({ panel, target, svg, paths, panelRect, targetRect, baseTabRise, squeeze, profile }) => {
+    measurements.forEach(({ panel, target, svg, paths, panelRect, targetRect, squeeze }) => {
       const width = panelRect.width;
-      const height = panelRect.height;
-      const currentTabRise = baseTabRise * profile;
       const targetPadding = target.classList.contains("feature-tab-group") ? 0 : 4;
       const tabLeft = targetRect.left - panelRect.left - targetPadding;
       const tabRight = targetRect.right - panelRect.left + targetPadding;
-      const bodyTop = baseTabRise + squeeze;
-      const bottom = baseTabRise + height;
+      // Viewport-space constraint: the top stops at the frame while the real
+      // scrolling bottom keeps closing the same panel body.
+      const bodyTop = Math.max(panelRect.top, edgeTop);
+      const bottom = panelRect.bottom;
       const radius = parseFloat(getComputedStyle(panel).borderTopLeftRadius) || 16;
       const d = folderPath({
         width,
@@ -461,12 +433,12 @@ function initFeatureTabs() {
         bottom,
         tabLeft,
         tabRight,
-        tabRise: currentTabRise,
+        tabRise: panelTabRise,
         radius,
         inset: 1,
       });
 
-      const viewBox = `0 0 ${width} ${height + baseTabRise}`;
+      const viewBox = `0 0 ${width} ${viewportHeight}`;
       const backingTransform = `translate(${panelOffset} ${panelOffset})`;
       const squeezeValue = `${squeeze}px`;
       if (svg.getAttribute("viewBox") !== viewBox) svg.setAttribute("viewBox", viewBox);
@@ -478,10 +450,12 @@ function initFeatureTabs() {
         paths.backing.setAttribute("transform", backingTransform);
       }
 
-      const tabRiseValue = `${baseTabRise}px`;
-      if (panel.style.getPropertyValue("--panel-tab-rise") !== tabRiseValue) {
-        panel.style.setProperty("--panel-tab-rise", tabRiseValue);
-      }
+      const leftValue = `${panelRect.left}px`;
+      const widthValue = `${width}px`;
+      const heightValue = `${viewportHeight}px`;
+      if (svg.style.left !== leftValue) svg.style.left = leftValue;
+      if (svg.style.width !== widthValue) svg.style.width = widthValue;
+      if (svg.style.height !== heightValue) svg.style.height = heightValue;
       if (panel.style.getPropertyValue("--panel-squeeze") !== squeezeValue) {
         panel.style.setProperty("--panel-squeeze", squeezeValue);
       }
@@ -510,7 +484,7 @@ function initFeatureTabs() {
     const edgeTop = frameTop();
     let current = panels[0];
     panels.forEach((panel) => {
-      if (panel.getBoundingClientRect().top <= edgeTop + panelTabRise + edgeTolerance) current = panel;
+      if (panel.getBoundingClientRect().top <= edgeTop + edgeTolerance) current = panel;
     });
     if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) {
       current = panels[panels.length - 1];

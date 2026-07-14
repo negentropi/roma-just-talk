@@ -325,7 +325,7 @@ function initFeatureTabs() {
   const clamp = (value, minimum, maximum) => Math.min(maximum, Math.max(minimum, value));
   const point = (value) => Number(value.toFixed(3));
   const edgeTolerance = 1;
-  const panelTabRise = parseFloat(getComputedStyle(shell).getPropertyValue("--panel-tab-rise")) || 48;
+  const panelTabRise = 48;
   let activeId = "";
   let shapeTarget = null;
 

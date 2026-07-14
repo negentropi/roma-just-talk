@@ -582,8 +582,6 @@ h1 .before-word {
   --active-accent: var(--coral);
   --frame-edge-y: 60px;
   --panel-offset: 8px;
-  --panel-tab-rise: 48px;
-  --panel-gap: 18px;
   width: min(1040px, calc(100% - 40px));
   margin: 0 auto;
 }
@@ -821,7 +819,7 @@ h1 .before-word {
   min-height: clamp(420px, 72svh, 640px);
   align-content: center;
   justify-items: center;
-  margin-top: calc(var(--panel-tab-rise) + var(--panel-gap));
+  margin-top: 18px;
   border: 2px solid var(--panel-accent);
   border-radius: 16px;
   background:

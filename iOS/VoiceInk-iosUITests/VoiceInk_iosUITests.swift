@@ -58,6 +58,42 @@ final class VoiceInkIOSUITests: XCTestCase {
         attachScreenshot(named: "Recording feedback behavior")
     }
 
+    @MainActor
+    func testAudioRoutingSettingsDefaultToSystemManagedAndRevealPreferredMicrophoneControls() throws {
+        let app = configuredApp(hasCompletedOnboarding: true)
+        app.launch()
+
+        let settingsButton = app.buttons["Settings"]
+        XCTAssertTrue(settingsButton.waitForExistence(timeout: 8))
+        settingsButton.tap()
+
+        let audioRoutingRow = app.staticTexts["Audio Routing"]
+        XCTAssertTrue(audioRoutingRow.waitForExistence(timeout: 5))
+        audioRoutingRow.tap()
+
+        XCTAssertTrue(app.navigationBars["Audio Routing"].waitForExistence(timeout: 5))
+        let systemRoutingSwitch = app.switches["Follow System Audio Routing"]
+        XCTAssertTrue(systemRoutingSwitch.waitForExistence(timeout: 5))
+        XCTAssertTrue(waitForSwitchValue("1", in: systemRoutingSwitch))
+        addTeardownBlock { [weak self] in
+            guard systemRoutingSwitch.exists,
+                  systemRoutingSwitch.value as? String != "1" else { return }
+
+            systemRoutingSwitch.tap()
+            XCTAssertTrue(self?.waitForSwitchValue("1", in: systemRoutingSwitch) == true)
+        }
+        attachScreenshot(named: "System-managed audio routing")
+
+        systemRoutingSwitch.tap()
+
+        XCTAssertTrue(waitForSwitchValue("0", in: systemRoutingSwitch))
+        XCTAssertTrue(app.staticTexts["Preferred Microphone"].waitForExistence(timeout: 5))
+        attachScreenshot(named: "Preferred microphone controls")
+
+        systemRoutingSwitch.tap()
+        XCTAssertTrue(waitForSwitchValue("1", in: systemRoutingSwitch))
+    }
+
     private func configuredApp(hasCompletedOnboarding: Bool) -> XCUIApplication {
         let app = XCUIApplication()
         app.launchArguments += [
@@ -67,6 +103,16 @@ final class VoiceInkIOSUITests: XCTestCase {
             "NO"
         ]
         return app
+    }
+
+    private func waitForSwitchValue(
+        _ value: String,
+        in element: XCUIElement,
+        timeout: TimeInterval = 5
+    ) -> Bool {
+        let predicate = NSPredicate(format: "value == %@", value)
+        let expectation = XCTNSPredicateExpectation(predicate: predicate, object: element)
+        return XCTWaiter.wait(for: [expectation], timeout: timeout) == .completed
     }
 
     @MainActor

@@ -71,6 +71,21 @@ final class RecordingManager: ObservableObject {
         )
     }
 
+    func preparePreRollIfPermitted() {
+        guard checkPermissionStatus() == .granted else { return }
+        do {
+            try recorder.startPreRollBuffering()
+        } catch {
+            VoiceInkIOSLogger.recording.error(
+                "Could not start audio pre-roll: \(VoiceInkErrorDescription.text(for: error), privacy: .public)"
+            )
+        }
+    }
+
+    func suspendPreRollIfIdle() {
+        recorder.suspendPreRollBufferingIfIdle()
+    }
+
     func prepareKeyboardDictationRequest() {
         guard let request = coordinator.takePendingKeyboardDictationRequest() else {
             keyboardDictationRequestID = nil
@@ -109,6 +124,7 @@ final class RecordingManager: ObservableObject {
     
     private func proceedToStartRecording() {
         IOSModelPrewarmService.shared.cancelPrewarm()
+        preparePreRollIfPermitted()
         updateFlowState { $0.prepareRecordingStart() }
         coordinator.updateRecordingState(true)
 

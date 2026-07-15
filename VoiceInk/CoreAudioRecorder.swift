@@ -5,109 +5,6 @@ import AVFoundation
 import os
 import VoiceInkCore
 
-final class PCMPreRollBuffer: @unchecked Sendable {
-    private let lock = NSLock()
-    private var samples: UnsafeMutablePointer<Int16>
-    private var capacity: Int
-    private var writeIndex = 0
-    private var availableSamples = 0
-
-    init(sampleRate: Int, seconds: Double) {
-        capacity = max(Int((Double(sampleRate) * seconds).rounded()), 1)
-        samples = UnsafeMutablePointer<Int16>.allocate(capacity: capacity)
-        samples.initialize(repeating: 0, count: capacity)
-    }
-
-    deinit {
-        samples.deallocate()
-    }
-
-    func append(_ input: UnsafePointer<Int16>, sampleCount: Int) {
-        guard sampleCount > 0 else { return }
-
-        lock.lock()
-        defer { lock.unlock() }
-
-        if sampleCount >= capacity {
-            input.advanced(by: sampleCount - capacity).withMemoryRebound(to: Int16.self, capacity: capacity) { source in
-                samples.update(from: source, count: capacity)
-            }
-            writeIndex = 0
-            availableSamples = capacity
-            return
-        }
-
-        let firstCopyCount = min(sampleCount, capacity - writeIndex)
-        samples.advanced(by: writeIndex).update(from: input, count: firstCopyCount)
-
-        let remaining = sampleCount - firstCopyCount
-        if remaining > 0 {
-            samples.update(from: input.advanced(by: firstCopyCount), count: remaining)
-        }
-
-        writeIndex = (writeIndex + sampleCount) % capacity
-        availableSamples = min(capacity, availableSamples + sampleCount)
-    }
-
-    func snapshotData() -> Data {
-        lock.lock()
-        defer { lock.unlock() }
-
-        guard availableSamples > 0 else { return Data() }
-
-        let byteCount = availableSamples * VoiceInkPCM16Audio.bytesPerSample
-        let start = (writeIndex - availableSamples + capacity) % capacity
-        let firstSampleCount = min(availableSamples, capacity - start)
-        let secondSampleCount = availableSamples - firstSampleCount
-
-        var data = Data(count: byteCount)
-        data.withUnsafeMutableBytes { rawBuffer in
-            guard let destination = rawBuffer.baseAddress else { return }
-
-            let firstByteCount = firstSampleCount * VoiceInkPCM16Audio.bytesPerSample
-            destination.copyMemory(
-                from: UnsafeRawPointer(samples.advanced(by: start)),
-                byteCount: firstByteCount
-            )
-
-            if secondSampleCount > 0 {
-                destination.advanced(by: firstByteCount).copyMemory(
-                    from: UnsafeRawPointer(samples),
-                    byteCount: secondSampleCount * VoiceInkPCM16Audio.bytesPerSample
-                )
-            }
-        }
-        return data
-    }
-
-    func resize(sampleRate: Int, seconds: Double) {
-        let newCapacity = max(Int((Double(sampleRate) * seconds).rounded()), 1)
-
-        lock.lock()
-        guard newCapacity != capacity else {
-            lock.unlock()
-            return
-        }
-
-        let oldSamples = samples
-        samples = UnsafeMutablePointer<Int16>.allocate(capacity: newCapacity)
-        samples.initialize(repeating: 0, count: newCapacity)
-        oldSamples.deallocate()
-
-        capacity = newCapacity
-        writeIndex = 0
-        availableSamples = 0
-        lock.unlock()
-    }
-
-    func clear() {
-        lock.lock()
-        writeIndex = 0
-        availableSamples = 0
-        lock.unlock()
-    }
-}
-
 struct PreRollStreamingEmissionGate {
     private var isActive = false
     private var queuedLiveChunks: [Data] = []
@@ -219,9 +116,9 @@ final class CoreAudioRecorder: @unchecked Sendable {
     private var currentDeviceID: AudioDeviceID = 0
     private var recordingURL: URL?
     private let preRollSampleRate = VoiceInkPCM16Audio.mono16kSampleRateHz
-    private let preRollBuffer = PCMPreRollBuffer(
+    private let preRollBuffer = VoiceInkPCM16PreRollBuffer(
         sampleRate: VoiceInkPCM16Audio.mono16kSampleRateHz,
-        seconds: VoiceInkRollingBufferPreloadSettings.defaultBufferDurationSeconds
+        durationSeconds: VoiceInkRollingBufferPreloadSettings.defaultBufferDurationSeconds
     )
     private let preRollStreamingChunkBytes = VoiceInkPCM16Audio.byteCount(forMono16kDuration: 0.1)
     private var preRollStreamingGate = PreRollStreamingEmissionGate()
@@ -1005,7 +902,7 @@ final class CoreAudioRecorder: @unchecked Sendable {
 
     func reloadPreRollBufferSettings() {
         let duration = VoiceInkRollingBufferPreloadSettings.configuration().bufferDurationSeconds
-        preRollBuffer.resize(sampleRate: preRollSampleRate, seconds: duration)
+        preRollBuffer.resize(sampleRate: preRollSampleRate, durationSeconds: duration)
     }
 
     private func writePCMDataToFile(_ data: Data) throws {

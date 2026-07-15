@@ -12,6 +12,7 @@ import VoiceInkCore
 
 @main
 struct VoiceInk_iosApp: App {
+    @Environment(\.scenePhase) private var scenePhase
     @State private var hasCompletedOnboarding = VoiceInkOnboardingPreference.hasCompletedOnboarding()
     @State private var launchRecordingRequestState = VoiceInkLaunchRecordingRequestState()
     @StateObject private var recordingManager = RecordingManager()
@@ -56,6 +57,7 @@ struct VoiceInk_iosApp: App {
                         handleURL(url)
                     }
                     .onAppear {
+                        recordingManager.preparePreRollIfPermitted()
                         launchRecordingRequestState.consumePendingRecordingIfReady(
                             hasCompletedOnboarding: hasCompletedOnboarding
                         ).applyRuntimeState(startRecordingAfterLaunchDelay: startRecordingAfterLaunchDelay)
@@ -70,6 +72,7 @@ struct VoiceInk_iosApp: App {
                     }
                     .onChange(of: hasCompletedOnboarding) { _, completed in
                         if completed {
+                            recordingManager.preparePreRollIfPermitted()
                             launchRecordingRequestState.consumePendingRecordingIfReady(
                                 hasCompletedOnboarding: hasCompletedOnboarding
                             ).applyRuntimeState(startRecordingAfterLaunchDelay: startRecordingAfterLaunchDelay)
@@ -95,6 +98,18 @@ struct VoiceInk_iosApp: App {
             }
             .onChange(of: announcementsEnabled) { _, enabled in
                 announcementsStore.setEnabled(enabled)
+            }
+            .onChange(of: scenePhase) { _, phase in
+                switch phase {
+                case .active:
+                    if hasCompletedOnboarding {
+                        recordingManager.preparePreRollIfPermitted()
+                    }
+                case .inactive, .background:
+                    recordingManager.suspendPreRollIfIdle()
+                @unknown default:
+                    break
+                }
             }
         }
         .modelContainer(sharedModelContainer)

@@ -10,6 +10,10 @@ struct VoiceInkCoreCheck {
 struct VoiceInkCoreCheckRunner {
     static func main() async {
         let checks: [VoiceInkCoreCheck] = [
+            VoiceInkCoreCheck(name: "AudioPreRollTests.testPreRollKeepsNewestSamplesInChronologicalOrder", run: { AudioPreRollTests().testPreRollKeepsNewestSamplesInChronologicalOrder() }),
+            VoiceInkCoreCheck(name: "AudioPreRollTests.testPreRollReplacesBufferWhenChunkExceedsCapacity", run: { AudioPreRollTests().testPreRollReplacesBufferWhenChunkExceedsCapacity() }),
+            VoiceInkCoreCheck(name: "AudioPreRollTests.testPreRollClearStartsFreshCaptureWindow", run: { AudioPreRollTests().testPreRollClearStartsFreshCaptureWindow() }),
+            VoiceInkCoreCheck(name: "AudioPreRollTests.testPreRollResizeClearsExistingWindowAndUsesNewCapacity", run: { AudioPreRollTests().testPreRollResizeClearsExistingWindowAndUsesNewCapacity() }),
             VoiceInkCoreCheck(name: "AppIdentityTests.testAppIdentityPreservesSharedVisibleNames", run: { AppIdentityTests().testAppIdentityPreservesSharedVisibleNames() }),
             VoiceInkCoreCheck(name: "AppIdentityTests.testIOSLogCategoriesPreserveDiagnosticsIdentity", run: { AppIdentityTests().testIOSLogCategoriesPreserveDiagnosticsIdentity() }),
             VoiceInkCoreCheck(name: "AppIdentityTests.testMacOSLogCategoriesPreserveDiagnosticsIdentity", run: { AppIdentityTests().testMacOSLogCategoriesPreserveDiagnosticsIdentity() }),

@@ -10,6 +10,9 @@ struct VoiceInkCoreCheck {
 struct VoiceInkCoreCheckRunner {
     static func main() async {
         let checks: [VoiceInkCoreCheck] = [
+            VoiceInkCoreCheck(name: "AudioRoutingPolicyTests.testPlatformDefaultsKeepPhoneSystemManagedAndMacCustom", run: { AudioRoutingPolicyTests().testPlatformDefaultsKeepPhoneSystemManagedAndMacCustom() }),
+            VoiceInkCoreCheck(name: "AudioRoutingPolicyTests.testIOSNormalizesUnsupportedPrioritizedModeToSystemManaged", run: { AudioRoutingPolicyTests().testIOSNormalizesUnsupportedPrioritizedModeToSystemManaged() }),
+            VoiceInkCoreCheck(name: "AudioRoutingPolicyTests.testIOSCustomRouteUsesAvailableSelectionAndFallsBackWhenUnavailable", run: { AudioRoutingPolicyTests().testIOSCustomRouteUsesAvailableSelectionAndFallsBackWhenUnavailable() }),
             VoiceInkCoreCheck(name: "AudioPreRollTests.testPreRollKeepsNewestSamplesInChronologicalOrder", run: { AudioPreRollTests().testPreRollKeepsNewestSamplesInChronologicalOrder() }),
             VoiceInkCoreCheck(name: "AudioPreRollTests.testPreRollReplacesBufferWhenChunkExceedsCapacity", run: { AudioPreRollTests().testPreRollReplacesBufferWhenChunkExceedsCapacity() }),
             VoiceInkCoreCheck(name: "AudioPreRollTests.testPreRollClearStartsFreshCaptureWindow", run: { AudioPreRollTests().testPreRollClearStartsFreshCaptureWindow() }),

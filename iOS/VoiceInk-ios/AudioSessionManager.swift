@@ -12,16 +12,42 @@ import AVFoundation
 import OSLog
 import VoiceInkCore
 
+extension Notification.Name {
+    static let voiceInkIOSAudioRoutingPreferenceDidChange = Notification.Name(
+        "voiceInkIOSAudioRoutingPreferenceDidChange"
+    )
+}
+
+struct VoiceInkIOSAudioInputRoute: Identifiable, Equatable {
+    let id: String
+    let name: String
+    let kind: String
+}
+
 @MainActor
 final class AudioSessionManager: ObservableObject {
     static let shared = AudioSessionManager()
     
     @Published private var lifecycleState = VoiceInkAudioSessionLifecycleState()
+    @Published private(set) var inputMode: VoiceInkAudioInputMode
+    @Published private(set) var availableInputs: [VoiceInkIOSAudioInputRoute] = []
+    @Published private(set) var currentInputUID: String?
+    @Published private(set) var routeFallbackMessage: String?
     
     private var deactivationTimer: Timer?
+    private var routeChangeCancellable: AnyCancellable?
     private let settings = AppSettings.shared
     
-    private init() {}
+    private init() {
+        inputMode = VoiceInkPlatformAudioInputPolicy.inputMode(for: .iOS)
+        routeChangeCancellable = NotificationCenter.default.publisher(
+            for: AVAudioSession.routeChangeNotification
+        ).sink { [weak self] _ in
+            Task { @MainActor in
+                self?.reconcileRouteAfterChange()
+            }
+        }
+    }
     
     // MARK: - Public Interface
     
@@ -39,6 +65,8 @@ final class AudioSessionManager: ObservableObject {
             
             // Activate the session
             try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
+            refreshRouteState(session: audioSession)
+            try applyConfiguredInput(to: audioSession)
             
             lifecycleState.markActivatedForRecording()
             cancelScheduledDeactivation()
@@ -49,6 +77,34 @@ final class AudioSessionManager: ObservableObject {
             VoiceInkIOSLogger.audioSession.error("\(VoiceInkAudioSessionDiagnostics.activationFailedMessage(localizedDescription: error.localizedDescription, code: error.code), privacy: .public)")
             throw error
         }
+    }
+
+    func setUsesSystemManagedRouting(_ usesSystemManagedRouting: Bool) {
+        inputMode = usesSystemManagedRouting ? .systemDefault : .custom
+        VoiceInkAudioInputPreference.saveInputMode(inputMode)
+        if !usesSystemManagedRouting,
+           VoiceInkAudioInputPreference.selectedDeviceUID() == nil,
+           let currentInputUID {
+            VoiceInkAudioInputPreference.saveSelectedDeviceUID(currentInputUID)
+        }
+        NotificationCenter.default.post(
+            name: .voiceInkIOSAudioRoutingPreferenceDidChange,
+            object: nil
+        )
+    }
+
+    func selectInput(uid: String) {
+        VoiceInkAudioInputPreference.saveSelectedDeviceUID(uid)
+        inputMode = .custom
+        VoiceInkAudioInputPreference.saveInputMode(.custom)
+        NotificationCenter.default.post(
+            name: .voiceInkIOSAudioRoutingPreferenceDidChange,
+            object: nil
+        )
+    }
+
+    func refreshRouteState() {
+        refreshRouteState(session: .sharedInstance())
     }
 
     /// Activates audio session for note playback and cancels stale recording cleanup.
@@ -144,6 +200,59 @@ final class AudioSessionManager: ObservableObject {
     private func invalidateDeactivationTimer() {
         deactivationTimer?.invalidate()
         deactivationTimer = nil
+    }
+
+    private func applyConfiguredInput(to audioSession: AVAudioSession) throws {
+        refreshRouteState(session: audioSession)
+        let inputs = audioSession.availableInputs ?? []
+        let selection = VoiceInkIOSAudioRouteSelectionPolicy.selection(
+            inputMode: inputMode,
+            selectedInputUID: VoiceInkAudioInputPreference.selectedDeviceUID(),
+            availableInputUIDs: inputs.map(\.uid)
+        )
+        let preferredInput = selection.preferredInputUID.flatMap { uid in
+            inputs.first { $0.uid == uid }
+        }
+        try audioSession.setPreferredInput(preferredInput)
+        routeFallbackMessage = selection.usedSystemFallback
+            ? "The selected microphone is unavailable. iOS is choosing the input until it reconnects."
+            : nil
+        refreshRouteState(session: audioSession)
+    }
+
+    private func refreshRouteState(session: AVAudioSession) {
+        availableInputs = (session.availableInputs ?? []).map {
+            VoiceInkIOSAudioInputRoute(
+                id: $0.uid,
+                name: $0.portName,
+                kind: $0.portType.rawValue
+            )
+        }
+        currentInputUID = session.currentRoute.inputs.first?.uid
+    }
+
+    private func reconcileRouteAfterChange() {
+        let audioSession = AVAudioSession.sharedInstance()
+        refreshRouteState(session: audioSession)
+        let inputs = audioSession.availableInputs ?? []
+        let selection = VoiceInkIOSAudioRouteSelectionPolicy.selection(
+            inputMode: inputMode,
+            selectedInputUID: VoiceInkAudioInputPreference.selectedDeviceUID(),
+            availableInputUIDs: inputs.map(\.uid)
+        )
+        routeFallbackMessage = selection.usedSystemFallback
+            ? "The selected microphone is unavailable. iOS is choosing the input until it reconnects."
+            : nil
+
+        guard let preferredInputUID = selection.preferredInputUID,
+              audioSession.preferredInput?.uid != preferredInputUID,
+              inputs.contains(where: { $0.uid == preferredInputUID }) else {
+            return
+        }
+        NotificationCenter.default.post(
+            name: .voiceInkIOSAudioRoutingPreferenceDidChange,
+            object: nil
+        )
     }
 }
 

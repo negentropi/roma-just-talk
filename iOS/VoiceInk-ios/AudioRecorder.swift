@@ -198,7 +198,26 @@ final class AudioRecorder: ObservableObject {
 
     private var audioEngine: AVAudioEngine?
     private var captureSink: VoiceInkIOSAudioCaptureSink?
+    private var routingPreferenceCancellable: AnyCancellable?
+    private var shouldRestartCaptureAfterRecording = false
     private let sessionManager = AudioSessionManager.shared
+
+    init() {
+        routingPreferenceCancellable = NotificationCenter.default.publisher(
+            for: .voiceInkIOSAudioRoutingPreferenceDidChange
+        ).sink { [weak self] _ in
+            Task { @MainActor in
+                guard let self else { return }
+                if self.isRecording {
+                    self.shouldRestartCaptureAfterRecording = true
+                    return
+                }
+                guard self.audioEngine != nil else { return }
+                self.tearDownCapture()
+                try? self.ensureCaptureRunning()
+            }
+        }
+    }
 
     var isPreRollBuffering: Bool {
         audioEngine?.isRunning == true && !isRecording
@@ -254,6 +273,7 @@ final class AudioRecorder: ObservableObject {
             clearCurrentRecordingURL: { currentRecordingURL = nil },
             scheduleSessionDeactivation: {}
         )
+        restartCaptureForPendingRouteChangeIfNeeded()
     }
 
     func suspendPreRollBufferingIfIdle() {
@@ -323,5 +343,12 @@ final class AudioRecorder: ObservableObject {
         audioEngine.stop()
         self.audioEngine = nil
         captureSink = nil
+    }
+
+    private func restartCaptureForPendingRouteChangeIfNeeded() {
+        guard shouldRestartCaptureAfterRecording else { return }
+        shouldRestartCaptureAfterRecording = false
+        tearDownCapture()
+        try? ensureCaptureRunning()
     }
 }

@@ -46,6 +46,10 @@ struct SettingsView: View {
                     )
                 }
 
+                NavigationLink(destination: IOSAudioInputSettingsView()) {
+                    Label("Audio Routing", systemImage: "waveform.badge.mic")
+                }
+
                 NavigationLink(destination: KeyboardSetupView()) {
                     Label(
                         VoiceInkIOSKeyboardSetupPresentation.settingsRowTitle,

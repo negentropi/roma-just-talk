@@ -23,6 +23,9 @@ struct VoiceInk_iosApp: App {
     
     init() {
         VoiceInkDefaultSettings.iOS.registerUserDefaults()
+        UserDefaults.standard.register(
+            defaults: VoiceInkPlatformAudioInputPolicy.registeredDefaults(for: .iOS)
+        )
         UserDefaults.standard.register(defaults: VoiceInkAnnouncementPreference.registeredDefaults)
         VoiceInkStartupPreferenceMigration.migrateLegacyPreferences(for: .iOS)
 

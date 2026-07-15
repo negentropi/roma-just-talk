@@ -100,6 +100,84 @@ final class VoiceInkIOSUITests: XCTestCase {
         XCTAssertTrue(waitForSwitchValue("1", in: systemRoutingSwitch))
     }
 
+    @MainActor
+    func testResetAllAppDataCancelPreservesSettingsAndConfirmedResetRestartsOnboarding() throws {
+        let app = XCUIApplication()
+        app.launchArguments = [
+            "-iOSOnboardingStep",
+            VoiceInkIOSOnboardingStep.ready.rawValue,
+            "-\(VoiceInkAnnouncementPreference.isEnabledKey)",
+            "NO"
+        ]
+        app.launch()
+
+        let finishOnboardingButton = app.buttons[
+            VoiceInkIOSOnboardingPresentation.ready.primaryButtonTitle
+        ]
+        XCTAssertTrue(finishOnboardingButton.waitForExistence(timeout: 8))
+        finishOnboardingButton.tap()
+        XCTAssertTrue(
+            app.navigationBars[VoiceInkAppIdentity.displayName]
+                .waitForExistence(timeout: 8)
+        )
+
+        let settingsButton = app.buttons["Settings"]
+        XCTAssertTrue(settingsButton.waitForExistence(timeout: 8))
+        settingsButton.tap()
+
+        let timeoutSlider = app.sliders.firstMatch
+        scrollToHittable(timeoutSlider, in: app)
+        let changedTimeoutText = VoiceInkAudioSessionTimeoutPreference.displayText(
+            for: VoiceInkAudioSessionTimeoutPreference.maximumSeconds
+        )
+        timeoutSlider.adjust(toNormalizedSliderPosition: 1)
+        XCTAssertTrue(app.staticTexts[changedTimeoutText].waitForExistence(timeout: 5))
+
+        let resetButton = app.buttons[VoiceInkIOSAppDataResetPresentation.buttonTitle]
+        scrollToHittable(resetButton, in: app)
+        resetButton.tap()
+
+        let confirmationTitle = app.staticTexts[
+            VoiceInkIOSAppDataResetPresentation.confirmationTitle
+        ]
+        let confirmationMessage = app.staticTexts[
+            VoiceInkIOSAppDataResetPresentation.confirmationMessage
+        ]
+        let cancelButton = app.buttons[VoiceInkIOSAppDataResetPresentation.cancelButtonTitle]
+        XCTAssertTrue(confirmationTitle.waitForExistence(timeout: 5))
+        XCTAssertTrue(confirmationMessage.exists)
+        XCTAssertTrue(cancelButton.exists)
+        attachScreenshot(named: "Reset app data confirmation")
+
+        cancelButton.tap()
+        XCTAssertTrue(confirmationTitle.waitForNonExistence(timeout: 5))
+        XCTAssertTrue(app.navigationBars["Settings"].exists)
+        XCTAssertTrue(app.staticTexts[changedTimeoutText].exists)
+
+        resetButton.tap()
+        let confirmButton = app.buttons[VoiceInkIOSAppDataResetPresentation.confirmButtonTitle]
+        XCTAssertTrue(confirmButton.waitForExistence(timeout: 5))
+        confirmButton.tap()
+        XCTAssertTrue(confirmButton.waitForNonExistence(timeout: 5))
+        let defaultTimeoutText = VoiceInkAudioSessionTimeoutPreference.displayText(
+            for: VoiceInkPreferenceDefault.audioSessionTimeoutSeconds
+        )
+        XCTAssertTrue(app.staticTexts[defaultTimeoutText].waitForExistence(timeout: 5))
+
+        app.terminate()
+        app.launchArguments = [
+            "-\(VoiceInkAnnouncementPreference.isEnabledKey)",
+            "NO"
+        ]
+        app.launch()
+
+        XCTAssertTrue(
+            app.staticTexts[VoiceInkIOSOnboardingPresentation.welcome.title]
+                .waitForExistence(timeout: 8)
+        )
+        attachScreenshot(named: "Onboarding after app data reset")
+    }
+
     private func configuredApp(hasCompletedOnboarding: Bool) -> XCUIApplication {
         let app = XCUIApplication()
         app.launchArguments += [
@@ -123,6 +201,19 @@ final class VoiceInkIOSUITests: XCTestCase {
 
     private func tapTrailingControl(of element: XCUIElement) {
         element.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5)).tap()
+    }
+
+    private func scrollToHittable(
+        _ element: XCUIElement,
+        in app: XCUIApplication,
+        maxSwipes: Int = 12
+    ) {
+        var remainingSwipes = maxSwipes
+        while !element.isHittable && remainingSwipes > 0 {
+            app.swipeUp()
+            remainingSwipes -= 1
+        }
+        XCTAssertTrue(element.isHittable)
     }
 
     @MainActor

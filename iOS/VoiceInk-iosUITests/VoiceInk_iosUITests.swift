@@ -140,9 +140,12 @@ final class VoiceInkIOSUITests: XCTestCase {
         let confirmationTitle = app.staticTexts[
             VoiceInkIOSAppDataResetPresentation.confirmationTitle
         ]
-        let confirmationMessage = app.staticTexts[
-            VoiceInkIOSAppDataResetPresentation.confirmationMessage
-        ]
+        let confirmationMessage = app.staticTexts.matching(
+            NSPredicate(
+                format: "label == %@",
+                VoiceInkIOSAppDataResetPresentation.confirmationMessage
+            )
+        ).firstMatch
         let cancelButton = app.buttons[VoiceInkIOSAppDataResetPresentation.cancelButtonTitle]
         XCTAssertTrue(confirmationTitle.waitForExistence(timeout: 5))
         XCTAssertTrue(confirmationMessage.exists)

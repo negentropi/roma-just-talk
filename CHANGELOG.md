@@ -50,6 +50,8 @@
 - Added a Homebrew cask for installing the fork from the repo tap and aligned CI packaging with the release asset URL.
 - Added an opt-in visible-text latency harness for measuring real hotkey-release-to-target-text timing in everyday macOS apps.
 - Kept the dictated text on the clipboard when the paste command cannot be posted, so failed target-app pastes do not immediately restore over the transcript.
+- Added up to three seconds of audio pre-roll to iOS after capture has warmed, using the shared PCM pre-roll buffer without carrying over speculative transcription preload.
+- Added configurable iOS microphone routing with system-managed routing on by default, optional preferred-input selection with system fallback, deferred preference-driven capture restarts during active recording, and the existing custom-device default preserved on macOS.
 - Kept buffered-snapshot quick releases on the recorded-file transcription path instead of starting a fresh streaming session after key-up, removing a measured post-key-up startup wait before text can paste.
 - Let held Special shortcuts promote to active recording after the rolling-buffer window, so holding the hotkey records beyond the default 3 seconds while short clean taps still use quick-release preload.
 - Boosted quiet macOS and iOS local Whisper recordings before transcription while leaving silence, noise-floor, continuous-noise, and sparse click-like audio unchanged, improving low-volume/privacy dictation without changing saved audio.

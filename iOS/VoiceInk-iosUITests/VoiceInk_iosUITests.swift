@@ -75,22 +75,28 @@ final class VoiceInkIOSUITests: XCTestCase {
         let systemRoutingSwitch = app.switches["Follow System Audio Routing"]
         XCTAssertTrue(systemRoutingSwitch.waitForExistence(timeout: 5))
         XCTAssertTrue(waitForSwitchValue("1", in: systemRoutingSwitch))
+        let preferredMicrophoneSection = app.staticTexts["Preferred Microphone"]
+        XCTAssertTrue(preferredMicrophoneSection.waitForNonExistence(timeout: 2))
         addTeardownBlock { [weak self] in
-            guard systemRoutingSwitch.exists,
-                  systemRoutingSwitch.value as? String != "1" else { return }
+            guard let self, systemRoutingSwitch.exists else { return }
 
-            systemRoutingSwitch.tap()
-            XCTAssertTrue(self?.waitForSwitchValue("1", in: systemRoutingSwitch) == true)
+            let switchValue = systemRoutingSwitch.value as? String
+            if switchValue == "0"
+                || (switchValue == nil && preferredMicrophoneSection.exists) {
+                self.tapTrailingControl(of: systemRoutingSwitch)
+                XCTAssertTrue(self.waitForSwitchValue("1", in: systemRoutingSwitch))
+            }
+            XCTAssertTrue(preferredMicrophoneSection.waitForNonExistence(timeout: 5))
         }
         attachScreenshot(named: "System-managed audio routing")
 
-        systemRoutingSwitch.tap()
+        tapTrailingControl(of: systemRoutingSwitch)
 
-        XCTAssertTrue(waitForSwitchValue("0", in: systemRoutingSwitch))
-        XCTAssertTrue(app.staticTexts["Preferred Microphone"].waitForExistence(timeout: 5))
+        XCTAssertTrue(preferredMicrophoneSection.waitForExistence(timeout: 5))
         attachScreenshot(named: "Preferred microphone controls")
 
-        systemRoutingSwitch.tap()
+        tapTrailingControl(of: systemRoutingSwitch)
+        XCTAssertTrue(preferredMicrophoneSection.waitForNonExistence(timeout: 5))
         XCTAssertTrue(waitForSwitchValue("1", in: systemRoutingSwitch))
     }
 
@@ -113,6 +119,10 @@ final class VoiceInkIOSUITests: XCTestCase {
         let predicate = NSPredicate(format: "value == %@", value)
         let expectation = XCTNSPredicateExpectation(predicate: predicate, object: element)
         return XCTWaiter.wait(for: [expectation], timeout: timeout) == .completed
+    }
+
+    private func tapTrailingControl(of element: XCUIElement) {
+        element.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5)).tap()
     }
 
     @MainActor

@@ -75,7 +75,7 @@ The scenario:
 2. atomically downloads, verifies, and copies the pinned `ggml-base.bin` model into the app container;
 3. generates a 16 kHz mono speech fixture with macOS `say`;
 4. launches the actual app with onboarding complete and opens the fixture through the app's external-file route;
-5. uses AXe accessibility labels to start transcription and open transcript detail;
+5. lets fresh-Simulator system banners settle, then uses AXe accessibility labels to start transcription and open transcript detail;
 6. requires the normalized expected phrase and `Completed` state in the visible UI;
 7. verifies a non-empty canonical WAV header and matching declared data length; and
 8. uploads provenance, success or failure state, screenshots, accessibility trees, hashes, and logs.

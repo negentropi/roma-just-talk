@@ -9,6 +9,7 @@ expected_phrase="${VOICEINK_IOS_E2E_PHRASE:-The quick brown fox confirms this iP
 model_url="${VOICEINK_IOS_E2E_MODEL_URL:-https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.bin}"
 model_sha256="${VOICEINK_IOS_E2E_MODEL_SHA256:-60ed5bc3dd14eea856493d334349b405782ddcaf0028d4b5df4088345fba2efe}"
 timeout_seconds="${VOICEINK_IOS_E2E_TIMEOUT_SECONDS:-120}"
+interaction_settle_seconds="${VOICEINK_IOS_E2E_INTERACTION_SETTLE_SECONDS:-8}"
 temporary_root="${RUNNER_TEMP:-/tmp}/voiceink-ios-stt-e2e"
 model_cache="${VOICEINK_IOS_E2E_MODEL_PATH:-$temporary_root/ggml-base.bin}"
 model_download="$model_cache.download.$$"
@@ -65,6 +66,11 @@ trap 'capture_failure_evidence "$?"' EXIT
 
 if ! [[ "$timeout_seconds" =~ ^[0-9]+$ ]] || (( timeout_seconds < 1 )); then
   echo "VOICEINK_IOS_E2E_TIMEOUT_SECONDS must be a positive integer" >&2
+  exit 2
+fi
+if ! [[ "$interaction_settle_seconds" =~ ^[0-9]+$ ]] \
+  || (( interaction_settle_seconds > 30 )); then
+  echo "VOICEINK_IOS_E2E_INTERACTION_SETTLE_SECONDS must be between 0 and 30" >&2
   exit 2
 fi
 
@@ -202,6 +208,10 @@ xcrun simctl launch \
   > "$evidence/stt-app-launch.txt"
 
 xcrun simctl openurl "$simulator_udid" "file://$fixture_in_container"
+wait_for_label "Start" "$evidence/stt-import-ready.json"
+# Fresh Simulator boots can place a transient system banner over the app's
+# navigation-bar action even though AXe already sees the underlying control.
+sleep "$interaction_settle_seconds"
 wait_for_label "Start" "$evidence/stt-import-ready.json"
 axe screenshot \
   --output "$evidence/stt-import-ready.png" \

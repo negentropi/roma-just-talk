@@ -1,4 +1,5 @@
 import Foundation
+import VoiceInkCore
 import XCTest
 @testable import roma_just_talk
 

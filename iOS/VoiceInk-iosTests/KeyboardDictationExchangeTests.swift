@@ -17,6 +17,18 @@ final class KeyboardDictationExchangeTests: XCTestCase {
         suiteName = nil
     }
 
+    func testDocumentIdentifierPolicyHandlesUnavailableProxyValue() {
+        XCTAssertNil(VoiceInkKeyboardDocumentIdentifierPolicy.resolve(nil))
+
+        let documentID = UUID()
+        XCTAssertEqual(
+            VoiceInkKeyboardDocumentIdentifierPolicy.resolve(
+                NSUUID(uuidString: documentID.uuidString)
+            ),
+            documentID
+        )
+    }
+
     func testMatchingDocumentTakesCompletedTextExactlyOnce() throws {
         let store = VoiceInkKeyboardDictationExchangeStore(defaults: defaults)
         let requestID = UUID()

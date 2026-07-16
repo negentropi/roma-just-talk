@@ -38,6 +38,7 @@
 - Added tracked iOS post-record transcription tasks with balanced background execution, retryable expiration/relaunch recovery, user cancellation, keyboard result completion, and whisper.cpp abort support for local inference.
 - Added iOS keyboard setup to onboarding and Settings, with installation guidance, a verification field, fresh activation and Full Access status, recovery through system Settings, and a setup-later path.
 - Added document-bound iOS keyboard result handoff so completed dictation returns through the App Group and inserts exactly once when the original text field becomes active again.
+- Fixed the iOS keyboard extension crash when a text document identifier is temporarily unavailable during startup.
 - Fixed macOS onboarding permission setup so microphone and other grants refresh when the app becomes active or permission state changes, and onboarding resumes at the saved setup step after relaunch.
 - Added FluidAudio onboarding download lifecycle logs and changed zero-fraction active downloads to show an indeterminate progress state instead of a dead-looking `0%`.
 - Added shared FluidAudio download task control, stale-progress detection, cache-aware retry, cancellation, and persistent failure feedback so onboarding can recover from silent model-download stalls.

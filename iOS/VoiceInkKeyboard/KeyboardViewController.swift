@@ -14,6 +14,21 @@ class KeyboardViewController: KeyboardInputViewController {
     var recordButton: UIButton!
     private let coordinator = AppGroupCoordinator.shared
     private var recordingStatusTimer: Timer?
+
+    private var currentDocumentIdentifier: UUID? {
+        guard let proxy = textDocumentProxy as? NSObject else {
+            return nil
+        }
+
+        let selector = NSSelectorFromString("documentIdentifier")
+        guard proxy.responds(to: selector) else {
+            return nil
+        }
+
+        return VoiceInkKeyboardDocumentIdentifierPolicy.resolve(
+            proxy.value(forKey: "documentIdentifier")
+        )
+    }
     
     deinit {
         recordingStatusTimer?.invalidate()
@@ -91,6 +106,7 @@ class KeyboardViewController: KeyboardInputViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         coordinator.reportKeyboardReadiness(hasFullAccess: hasFullAccess)
+        updateButtonAppearanceBasedOnState()
         
         // Re-add and ensure record button stays on top after KeyboardKit layout
         if let button = recordButton {
@@ -141,15 +157,17 @@ class KeyboardViewController: KeyboardInputViewController {
         if !isRecording {
             _ = deliverCompletedDictationIfAvailable()
 
-            switch coordinator.keyboardDictationStatus(
-                documentIdentifier: textDocumentProxy.documentIdentifier
-            ) {
-            case .requested, .ready, .waitingForOriginalDocument:
-                return
-            case .failed(let requestID, _):
-                coordinator.clearKeyboardDictation(requestID: requestID)
-            case .none:
-                break
+            if let documentIdentifier = currentDocumentIdentifier {
+                switch coordinator.keyboardDictationStatus(
+                    documentIdentifier: documentIdentifier
+                ) {
+                case .requested, .ready, .waitingForOriginalDocument:
+                    return
+                case .failed(let requestID, _):
+                    coordinator.clearKeyboardDictation(requestID: requestID)
+                case .none:
+                    break
+                }
             }
         }
 
@@ -159,8 +177,12 @@ class KeyboardViewController: KeyboardInputViewController {
             requestStopRecording: coordinator.requestStopRecording,
             openMainAppForRecording: { [weak self] in
                 guard let self = self else { return }
+                guard let documentIdentifier = self.currentDocumentIdentifier else {
+                    self.updateButtonAppearanceBasedOnState()
+                    return
+                }
                 guard let requestID = self.coordinator.beginKeyboardDictation(
-                    documentIdentifier: self.textDocumentProxy.documentIdentifier,
+                    documentIdentifier: documentIdentifier,
                     surroundingTextBeforeCursor: self.textDocumentProxy.documentContextBeforeInput
                 ) else {
                     self.updateButtonAppearanceBasedOnState()
@@ -231,9 +253,9 @@ class KeyboardViewController: KeyboardInputViewController {
             presentation = .fullAccessRequired
             backgroundColor = .systemOrange
             isEnabled = false
-        } else {
+        } else if let documentIdentifier = currentDocumentIdentifier {
             switch coordinator.keyboardDictationStatus(
-                documentIdentifier: textDocumentProxy.documentIdentifier
+                documentIdentifier: documentIdentifier
             ) {
             case .none:
                 presentation = .current(isRecording: isRecording)
@@ -252,6 +274,10 @@ class KeyboardViewController: KeyboardInputViewController {
                 backgroundColor = .systemOrange
                 isEnabled = false
             }
+        } else {
+            presentation = .idle
+            backgroundColor = .systemGray
+            isEnabled = false
         }
         
         DispatchQueue.main.async { [weak self] in
@@ -270,8 +296,12 @@ class KeyboardViewController: KeyboardInputViewController {
 
     @discardableResult
     private func deliverCompletedDictationIfAvailable() -> Bool {
+        guard let documentIdentifier = currentDocumentIdentifier else {
+            return false
+        }
+
         guard let delivery = coordinator.takeCompletedKeyboardDictation(
-            documentIdentifier: textDocumentProxy.documentIdentifier
+            documentIdentifier: documentIdentifier
         ) else {
             return false
         }

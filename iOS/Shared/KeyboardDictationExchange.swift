@@ -1,6 +1,12 @@
 import Foundation
 import VoiceInkCore
 
+enum VoiceInkKeyboardDocumentIdentifierPolicy {
+    static func resolve(_ rawValue: Any?) -> UUID? {
+        rawValue as? UUID
+    }
+}
+
 struct VoiceInkKeyboardDictationDelivery: Equatable, Sendable {
     let requestID: UUID
     let text: String

@@ -225,6 +225,28 @@ axe screenshot \
 
 axe tap --label "View transcript" --udid "$simulator_udid"
 wait_for_label "Retranscribe" "$evidence/stt-detail.json"
+# List rows with sibling controls must not forward the navigation tap into ShareLink.
+sleep 1
+overlay_probe_point="$(
+  jq -r \
+    'first(.. | objects | select(.role? == "AXApplication")
+      | "\((.frame.width * 0.75 | floor)),\((.frame.height * 0.80 | floor))")' \
+    "$evidence/stt-detail.json"
+)"
+if ! [[ "$overlay_probe_point" =~ ^[0-9]+,[0-9]+$ ]]; then
+  echo "Could not derive the Simulator share-sheet probe point" >&2
+  exit 1
+fi
+axe describe-ui \
+  --point "$overlay_probe_point" \
+  --udid "$simulator_udid" \
+  > "$evidence/stt-detail-overlay-probe.json"
+if jq -e \
+  '.. | objects | select(.AXUniqueId? == "shareCell")' \
+  "$evidence/stt-detail-overlay-probe.json" >/dev/null; then
+  echo "Share sheet opened while navigating to transcript detail" >&2
+  exit 1
+fi
 jq -e \
   '.. | objects | select(.AXLabel? == "Transcript")' \
   "$evidence/stt-detail.json" >/dev/null

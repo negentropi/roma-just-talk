@@ -146,10 +146,12 @@ struct AudioImportView: View {
                     ShareLink(item: preferredText(note)) {
                         Image(systemName: "square.and.arrow.up")
                     }
+                    .buttonStyle(.borderless)
                     .accessibilityLabel("Share transcript")
                     NavigationLink(destination: NoteDetailView(note: note)) {
                         Image(systemName: "chevron.right")
                     }
+                    .buttonStyle(.borderless)
                     .accessibilityLabel("View transcript")
                 }
             case .failed:

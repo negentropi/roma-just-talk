@@ -1,3 +1,4 @@
+import CryptoKit
 import Foundation
 import VoiceInkCore
 
@@ -23,6 +24,7 @@ enum VoiceInkKeyboardDictationExchangeStatus: Equatable, Sendable {
     case none
     case requested(requestID: UUID)
     case ready(requestID: UUID)
+    case readyForManualInsertion(requestID: UUID)
     case failed(requestID: UUID, message: String)
     case waitingForOriginalDocument(requestID: UUID)
 }
@@ -43,6 +45,7 @@ struct VoiceInkKeyboardDictationExchangeStore {
         var updatedAt: Date
         var state: State
         var surroundingTextBeforeCursor: String?
+        var documentContextFingerprint: Data?
         var text: String?
         var shouldLowercase: Bool?
         var shouldInsertReturn: Bool?
@@ -60,17 +63,24 @@ struct VoiceInkKeyboardDictationExchangeStore {
     func begin(
         documentIdentifier: UUID,
         surroundingTextBeforeCursor: String? = nil,
+        surroundingTextAfterCursor: String? = nil,
         requestID: UUID = UUID(),
         now: Date = Date()
     ) -> UUID? {
+        let boundedContextBeforeCursor = VoiceInkCursorTextContextPolicy.boundedSuffix(
+            surroundingTextBeforeCursor
+        )
         let exchange = Exchange(
             requestID: requestID,
             documentIdentifier: documentIdentifier,
             requestedAt: now,
             updatedAt: now,
             state: .requested,
-            surroundingTextBeforeCursor: VoiceInkCursorTextContextPolicy.boundedSuffix(
-                surroundingTextBeforeCursor
+            surroundingTextBeforeCursor: boundedContextBeforeCursor,
+            documentContextFingerprint: Self.documentContextFingerprint(
+                requestID: requestID,
+                beforeCursor: boundedContextBeforeCursor,
+                afterCursor: Self.boundedPrefix(surroundingTextAfterCursor)
             ),
             text: nil,
             shouldLowercase: nil,
@@ -152,13 +162,21 @@ struct VoiceInkKeyboardDictationExchangeStore {
 
     func status(
         for documentIdentifier: UUID,
+        surroundingTextBeforeCursor: String? = nil,
+        surroundingTextAfterCursor: String? = nil,
         now: Date = Date()
     ) -> VoiceInkKeyboardDictationExchangeStatus {
         guard let exchange = read(now: now) else {
             return .none
         }
 
-        guard exchange.documentIdentifier == documentIdentifier else {
+        let documentMatch = documentMatch(
+            exchange,
+            documentIdentifier: documentIdentifier,
+            surroundingTextBeforeCursor: surroundingTextBeforeCursor,
+            surroundingTextAfterCursor: surroundingTextAfterCursor
+        )
+        guard documentMatch != .mismatch else {
             return .waitingForOriginalDocument(requestID: exchange.requestID)
         }
 
@@ -166,6 +184,9 @@ struct VoiceInkKeyboardDictationExchangeStore {
         case .requested:
             return .requested(requestID: exchange.requestID)
         case .succeeded:
+            if documentMatch == .manualConfirmationRequired {
+                return .readyForManualInsertion(requestID: exchange.requestID)
+            }
             return .ready(requestID: exchange.requestID)
         case .failed:
             return .failed(
@@ -177,12 +198,28 @@ struct VoiceInkKeyboardDictationExchangeStore {
 
     func takeCompletedResult(
         for documentIdentifier: UUID,
+        surroundingTextBeforeCursor: String? = nil,
+        surroundingTextAfterCursor: String? = nil,
+        confirmDocumentChange: Bool = false,
         now: Date = Date()
     ) -> VoiceInkKeyboardDictationDelivery? {
         guard let exchange = read(now: now),
-              exchange.documentIdentifier == documentIdentifier,
               exchange.state == .succeeded,
               let text = exchange.text else {
+            return nil
+        }
+
+        switch documentMatch(
+            exchange,
+            documentIdentifier: documentIdentifier,
+            surroundingTextBeforeCursor: surroundingTextBeforeCursor,
+            surroundingTextAfterCursor: surroundingTextAfterCursor
+        ) {
+        case .automatic:
+            break
+        case .manualConfirmationRequired where confirmDocumentChange:
+            break
+        case .manualConfirmationRequired, .mismatch:
             return nil
         }
 
@@ -203,6 +240,79 @@ struct VoiceInkKeyboardDictationExchangeStore {
 
         defaults?.removeObject(forKey: Self.storageKey)
         return true
+    }
+
+    private enum DocumentMatch: Equatable {
+        case automatic
+        case manualConfirmationRequired
+        case mismatch
+    }
+
+    private func documentMatch(
+        _ exchange: Exchange,
+        documentIdentifier: UUID,
+        surroundingTextBeforeCursor: String?,
+        surroundingTextAfterCursor: String?
+    ) -> DocumentMatch {
+        if exchange.documentIdentifier == documentIdentifier {
+            return .automatic
+        }
+
+        let originalFingerprint = exchange.documentContextFingerprint
+            ?? Self.documentContextFingerprint(
+                requestID: exchange.requestID,
+                beforeCursor: exchange.surroundingTextBeforeCursor,
+                afterCursor: nil
+            )
+        let currentFingerprint = Self.documentContextFingerprint(
+            requestID: exchange.requestID,
+            beforeCursor: VoiceInkCursorTextContextPolicy.boundedSuffix(
+                surroundingTextBeforeCursor
+            ),
+            afterCursor: Self.boundedPrefix(surroundingTextAfterCursor)
+        )
+
+        guard let originalFingerprint else {
+            return currentFingerprint == nil ? .manualConfirmationRequired : .mismatch
+        }
+
+        return originalFingerprint == currentFingerprint ? .automatic : .mismatch
+    }
+
+    private static func documentContextFingerprint(
+        requestID: UUID,
+        beforeCursor: String?,
+        afterCursor: String?
+    ) -> Data? {
+        let hasMeaningfulContext = [beforeCursor, afterCursor]
+            .compactMap { $0 }
+            .contains { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+        guard hasMeaningfulContext else {
+            return nil
+        }
+
+        var payload = Data(requestID.uuidString.utf8)
+        append(beforeCursor, to: &payload)
+        append(afterCursor, to: &payload)
+        return Data(SHA256.hash(data: payload))
+    }
+
+    private static func append(_ value: String?, to data: inout Data) {
+        let bytes = Data((value ?? "").utf8)
+        data.append(value == nil ? 0 : 1)
+        var length = UInt64(bytes.count).bigEndian
+        withUnsafeBytes(of: &length) {
+            data.append(contentsOf: $0)
+        }
+        data.append(bytes)
+    }
+
+    private static func boundedPrefix(_ value: String?) -> String? {
+        guard let value, !value.isEmpty else {
+            return nil
+        }
+
+        return String(value.prefix(VoiceInkCursorTextContextPolicy.defaultMaximumLength))
     }
 
     private func read(now: Date) -> Exchange? {

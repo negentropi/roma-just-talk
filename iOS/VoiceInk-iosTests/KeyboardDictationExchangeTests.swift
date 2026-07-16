@@ -82,7 +82,7 @@ final class KeyboardDictationExchangeTests: XCTestCase {
         ))
     }
 
-    func testDifferentDocumentCannotTakeCompletedText() throws {
+    func testDifferentDocumentWithDifferentContextCannotTakeCompletedText() throws {
         let store = VoiceInkKeyboardDictationExchangeStore(defaults: defaults)
         let requestID = UUID()
         let originalDocumentID = UUID()
@@ -90,6 +90,7 @@ final class KeyboardDictationExchangeTests: XCTestCase {
 
         store.begin(
             documentIdentifier: originalDocumentID,
+            surroundingTextBeforeCursor: "Original field",
             requestID: requestID,
             now: requestedAt
         )
@@ -103,18 +104,137 @@ final class KeyboardDictationExchangeTests: XCTestCase {
         XCTAssertEqual(
             store.status(
                 for: otherDocumentID,
+                surroundingTextBeforeCursor: "Other field",
                 now: requestedAt.addingTimeInterval(2)
             ),
             .waitingForOriginalDocument(requestID: requestID)
         )
         XCTAssertNil(store.takeCompletedResult(
             for: otherDocumentID,
+            surroundingTextBeforeCursor: "Other field",
             now: requestedAt.addingTimeInterval(2)
         ))
         XCTAssertNotNil(store.takeCompletedResult(
             for: originalDocumentID,
             now: requestedAt.addingTimeInterval(2)
         ))
+    }
+
+    func testChangedDocumentWithMatchingCursorContextTakesCompletedText() throws {
+        let store = VoiceInkKeyboardDictationExchangeStore(defaults: defaults)
+        let requestID = UUID()
+        let originalDocumentID = UUID()
+        let returnedDocumentID = UUID()
+        let requestedAt = Date(timeIntervalSince1970: 100)
+
+        store.begin(
+            documentIdentifier: originalDocumentID,
+            surroundingTextBeforeCursor: "Draft prefix ",
+            surroundingTextAfterCursor: "draft suffix",
+            requestID: requestID,
+            now: requestedAt
+        )
+        _ = store.takePendingRequest(now: requestedAt.addingTimeInterval(1))
+        XCTAssertTrue(store.complete(
+            requestID: requestID,
+            text: "returned transcript",
+            now: requestedAt.addingTimeInterval(2)
+        ))
+
+        XCTAssertEqual(
+            store.status(
+                for: returnedDocumentID,
+                surroundingTextBeforeCursor: "Draft prefix ",
+                surroundingTextAfterCursor: "draft suffix",
+                now: requestedAt.addingTimeInterval(3)
+            ),
+            .ready(requestID: requestID)
+        )
+        XCTAssertEqual(
+            store.takeCompletedResult(
+                for: returnedDocumentID,
+                surroundingTextBeforeCursor: "Draft prefix ",
+                surroundingTextAfterCursor: "draft suffix",
+                now: requestedAt.addingTimeInterval(3)
+            )?.text,
+            "returned transcript"
+        )
+    }
+
+    func testChangedDocumentWithDifferentCursorSuffixCannotTakeCompletedText() throws {
+        let store = VoiceInkKeyboardDictationExchangeStore(defaults: defaults)
+        let requestID = UUID()
+        let originalDocumentID = UUID()
+        let returnedDocumentID = UUID()
+        let requestedAt = Date(timeIntervalSince1970: 100)
+
+        store.begin(
+            documentIdentifier: originalDocumentID,
+            surroundingTextBeforeCursor: "Same prefix",
+            surroundingTextAfterCursor: "original suffix",
+            requestID: requestID,
+            now: requestedAt
+        )
+        XCTAssertTrue(store.complete(
+            requestID: requestID,
+            text: "Private transcript",
+            now: requestedAt.addingTimeInterval(1)
+        ))
+
+        XCTAssertEqual(
+            store.status(
+                for: returnedDocumentID,
+                surroundingTextBeforeCursor: "Same prefix",
+                surroundingTextAfterCursor: "different suffix",
+                now: requestedAt.addingTimeInterval(2)
+            ),
+            .waitingForOriginalDocument(requestID: requestID)
+        )
+        XCTAssertNil(store.takeCompletedResult(
+            for: returnedDocumentID,
+            surroundingTextBeforeCursor: "Same prefix",
+            surroundingTextAfterCursor: "different suffix",
+            now: requestedAt.addingTimeInterval(2)
+        ))
+    }
+
+    func testChangedEmptyDocumentRequiresExplicitInsertion() throws {
+        let store = VoiceInkKeyboardDictationExchangeStore(defaults: defaults)
+        let requestID = UUID()
+        let originalDocumentID = UUID()
+        let returnedDocumentID = UUID()
+        let requestedAt = Date(timeIntervalSince1970: 100)
+
+        store.begin(
+            documentIdentifier: originalDocumentID,
+            requestID: requestID,
+            now: requestedAt
+        )
+        XCTAssertTrue(store.complete(
+            requestID: requestID,
+            text: "Explicit transcript",
+            now: requestedAt.addingTimeInterval(1)
+        ))
+
+        XCTAssertEqual(
+            store.status(
+                for: returnedDocumentID,
+                now: requestedAt.addingTimeInterval(2)
+            ),
+            .readyForManualInsertion(requestID: requestID)
+        )
+        XCTAssertNil(store.takeCompletedResult(
+            for: returnedDocumentID,
+            now: requestedAt.addingTimeInterval(2)
+        ))
+        XCTAssertEqual(
+            store.takeCompletedResult(
+                for: returnedDocumentID,
+                confirmDocumentChange: true,
+                now: requestedAt.addingTimeInterval(2)
+            )?.text,
+            "Explicit transcript"
+        )
     }
 
     func testNewRequestSupersedesOldCompletion() throws {

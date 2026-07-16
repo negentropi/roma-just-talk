@@ -93,11 +93,13 @@ final class AppGroupCoordinator {
 
     func beginKeyboardDictation(
         documentIdentifier: UUID,
-        surroundingTextBeforeCursor: String?
+        surroundingTextBeforeCursor: String?,
+        surroundingTextAfterCursor: String?
     ) -> UUID? {
         keyboardDictationStore.begin(
             documentIdentifier: documentIdentifier,
-            surroundingTextBeforeCursor: surroundingTextBeforeCursor
+            surroundingTextBeforeCursor: surroundingTextBeforeCursor,
+            surroundingTextAfterCursor: surroundingTextAfterCursor
         )
     }
 
@@ -114,15 +116,29 @@ final class AppGroupCoordinator {
     }
 
     func keyboardDictationStatus(
-        documentIdentifier: UUID
+        documentIdentifier: UUID,
+        surroundingTextBeforeCursor: String?,
+        surroundingTextAfterCursor: String?
     ) -> VoiceInkKeyboardDictationExchangeStatus {
-        keyboardDictationStore.status(for: documentIdentifier)
+        keyboardDictationStore.status(
+            for: documentIdentifier,
+            surroundingTextBeforeCursor: surroundingTextBeforeCursor,
+            surroundingTextAfterCursor: surroundingTextAfterCursor
+        )
     }
 
     func takeCompletedKeyboardDictation(
-        documentIdentifier: UUID
+        documentIdentifier: UUID,
+        surroundingTextBeforeCursor: String?,
+        surroundingTextAfterCursor: String?,
+        confirmDocumentChange: Bool = false
     ) -> VoiceInkKeyboardDictationDelivery? {
-        keyboardDictationStore.takeCompletedResult(for: documentIdentifier)
+        keyboardDictationStore.takeCompletedResult(
+            for: documentIdentifier,
+            surroundingTextBeforeCursor: surroundingTextBeforeCursor,
+            surroundingTextAfterCursor: surroundingTextAfterCursor,
+            confirmDocumentChange: confirmDocumentChange
+        )
     }
 
     @discardableResult

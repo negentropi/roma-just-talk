@@ -99,6 +99,7 @@ enum VoiceInkIOSAudioImportPreparer {
         FileManager.default.createFile(atPath: destinationURL.path, contents: Data(count: 44))
         let handle = try FileHandle(forWritingTo: destinationURL)
         defer { try? handle.close() }
+        try handle.seekToEnd()
 
         guard reader.startReading() else {
             throw VoiceInkIOSAudioImportError.readerFailed(

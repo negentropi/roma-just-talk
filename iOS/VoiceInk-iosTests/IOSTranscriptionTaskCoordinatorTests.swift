@@ -276,6 +276,37 @@ final class IOSTranscriptionTaskCoordinatorTests: XCTestCase {
         XCTAssertEqual(header.withUnsafeBytes { $0.loadUnaligned(fromByteOffset: 40, as: UInt32.self) }, 32_000)
     }
 
+    func testImportedAudioWAVAppendsDecodedSamplesAfterReservedHeader() async throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(
+            at: directory,
+            withIntermediateDirectories: true
+        )
+        defer { try? FileManager.default.removeItem(at: directory) }
+
+        var sourcePCM = Data()
+        for sampleIndex in 0..<1_600 {
+            var sample = Int16((sampleIndex % 512) - 256).littleEndian
+            Swift.withUnsafeBytes(of: &sample) { sourcePCM.append(contentsOf: $0) }
+        }
+        let sourceURL = directory.appendingPathComponent("source.wav")
+        try VoiceInkPCM16Audio.wavData(fromLittleEndianPCM16Data: sourcePCM).write(to: sourceURL)
+
+        let prepared = try await VoiceInkIOSAudioImportPreparer.prepare(sourceURL)
+        defer { try? FileManager.default.removeItem(at: prepared.storedURL) }
+
+        let storedData = try Data(contentsOf: prepared.storedURL)
+        let declaredAudioByteCount = storedData.withUnsafeBytes {
+            $0.loadUnaligned(fromByteOffset: 40, as: UInt32.self)
+        }
+        XCTAssertEqual(
+            storedData.count,
+            VoiceInkPCM16Audio.wavHeaderByteCount + Int(declaredAudioByteCount)
+        )
+        XCTAssertNotNil(VoiceInkWhisperAudioSamples.floatSamples(fromWAVData: storedData))
+    }
+
     private static let completedResult = VoiceInkTranscriptionRunResult(
         cleanedText: "Completed text",
         finalText: "Completed text",

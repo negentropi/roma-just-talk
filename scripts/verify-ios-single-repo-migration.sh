@@ -341,10 +341,28 @@ require_json_array_value \
   "$expected_app_group"
 
 require_file_string_count \
-  "iOS CI keeps Simulator entitlements in unsigned builds and tests" \
+  "iOS CI allows Simulator signing for builds and tests" \
+  .github/workflows/voiceink-ios-single-repo-migration.yml \
+  "CODE_SIGNING_ALLOWED=YES" \
+  2
+
+require_file_string_count \
+  "iOS CI uses the ad-hoc Simulator signing identity" \
+  .github/workflows/voiceink-ios-single-repo-migration.yml \
+  "CODE_SIGN_IDENTITY=-" \
+  2
+
+require_file_string_count \
+  "iOS CI keeps Simulator entitlements in builds and tests" \
   .github/workflows/voiceink-ios-single-repo-migration.yml \
   "ENTITLEMENTS_ALLOWED=YES" \
   2
+
+require_file_string_count \
+  "iOS CI does not disable signing for Simulator artifacts" \
+  .github/workflows/voiceink-ios-single-repo-migration.yml \
+  "CODE_SIGNING_ALLOWED=NO" \
+  0
 
 require_project_string \
   "macOS project references VoiceInkCore" \

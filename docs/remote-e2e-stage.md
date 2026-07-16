@@ -22,7 +22,7 @@ Inputs:
 - `ios_scenario`: `none` or `local-whisper-import`.
 - `hold_minutes`: 0 to 60 minutes after setup/scenario. Use `0` to upload evidence immediately.
 
-The stage performs no build. It downloads the macOS artifact unchanged and does not re-sign it. The existing iOS migration workflow packages its unsigned, Simulator-entitled application as `roma.just.talk.ios-simulator.app`, preserving App Group exchange between the app and keyboard extension.
+The stage performs no build. It downloads the macOS artifact unchanged and does not re-sign it. The existing iOS migration workflow packages its Xcode-signed Simulator application as `roma.just.talk.ios-simulator.app`, preserving App Group exchange between the app and keyboard extension.
 
 Wait for the `Remote desktop ready` job to print `REMOTE E2E STAGE READY`. In Namespace, open that GitHub job and select **Remote Display**.
 

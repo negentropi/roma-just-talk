@@ -275,14 +275,15 @@ class RecordingShortcutManager: ObservableObject {
             }
         }
 
-        let tracksKeyUpEvidence = shortcuts.keys.contains {
+        let evidenceTrackedActions = Set(shortcuts.keys.filter {
             recordingMode(for: $0)?.tracksKeyUpEvidence == true
-        }
+        })
 
         let isMonitoring = shortcutMonitor.start(
             shortcuts: shortcuts,
             interruptibleActions: interruptibleRecordingActions,
-            tracksKeyUpEvidence: tracksKeyUpEvidence,
+            secureInputBlockedActions: evidenceTrackedActions,
+            tracksKeyUpEvidence: !evidenceTrackedActions.isEmpty,
             onKeyDown: { [weak self] action, eventTime in
                 Task { @MainActor in
                     guard let self else { return }

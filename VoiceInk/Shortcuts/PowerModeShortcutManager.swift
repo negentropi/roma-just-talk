@@ -79,6 +79,7 @@ class PowerModeShortcutManager {
         shortcutMonitor.start(
             shortcuts: shortcuts,
             interruptibleActions: mode.allowsShortcutInterruption ? Set(shortcuts.keys) : [],
+            secureInputBlockedActions: mode.tracksKeyUpEvidence ? Set(shortcuts.keys) : [],
             tracksKeyUpEvidence: mode.tracksKeyUpEvidence,
             onKeyDown: { [weak self] action, eventTime in
                 Task { @MainActor in

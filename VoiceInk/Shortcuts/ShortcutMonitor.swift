@@ -105,6 +105,7 @@ final class ShortcutMonitor {
     private struct ShortcutState {
         var shortcut: Shortcut
         var isDown = false
+        var isBlockedBySecureInput = false
         var pressedAt: TimeInterval?
         var isInterrupted = false
         var pressContext = VoiceInkShortcutPressContext()
@@ -112,6 +113,7 @@ final class ShortcutMonitor {
 
     private var shortcuts: [ShortcutAction: ShortcutState] = [:]
     private var interruptibleActions: Set<ShortcutAction> = []
+    private var secureInputBlockedActions: Set<ShortcutAction> = []
     private var onKeyDown: ((ShortcutAction, TimeInterval) -> Void)?
     private var onKeyUp: ((ShortcutAction, TimeInterval, VoiceInkShortcutPressContext) -> Void)?
     private var onPressContextChanged: ((ShortcutAction, VoiceInkShortcutPressContext) -> Void)?
@@ -141,6 +143,7 @@ final class ShortcutMonitor {
     func start(
         shortcuts: [ShortcutAction: Shortcut],
         interruptibleActions: Set<ShortcutAction> = [],
+        secureInputBlockedActions: Set<ShortcutAction> = [],
         tracksKeyUpEvidence: Bool = false,
         onKeyDown: @escaping (ShortcutAction, TimeInterval) -> Void,
         onKeyUp: @escaping (ShortcutAction, TimeInterval, VoiceInkShortcutPressContext) -> Void,
@@ -159,6 +162,7 @@ final class ShortcutMonitor {
         }
 
         self.interruptibleActions = interruptibleActions
+        self.secureInputBlockedActions = secureInputBlockedActions
         self.onKeyDown = onKeyDown
         self.onKeyUp = onKeyUp
         self.onPressContextChanged = onPressContextChanged
@@ -191,6 +195,7 @@ final class ShortcutMonitor {
 
         shortcuts = [:]
         interruptibleActions = []
+        secureInputBlockedActions = []
         onKeyDown = nil
         onKeyUp = nil
         onPressContextChanged = nil
@@ -396,13 +401,19 @@ final class ShortcutMonitor {
         for action in pressedActions {
             if var state = shortcuts[action] {
                 var context = state.pressContext
-                context.hasReliableKeyEvidence = false
+                let shouldDispatchKeyUp = !state.isBlockedBySecureInput
+                if shouldDispatchKeyUp {
+                    context.hasReliableKeyEvidence = false
+                }
                 state.isDown = false
+                state.isBlockedBySecureInput = false
                 state.pressedAt = nil
                 state.isInterrupted = false
                 state.pressContext = VoiceInkShortcutPressContext()
                 shortcuts[action] = state
-                dispatchKeyUp(for: action, eventTime: eventTime, context: context)
+                if shouldDispatchKeyUp {
+                    dispatchKeyUp(for: action, eventTime: eventTime, context: context)
+                }
             }
         }
     }
@@ -415,8 +426,9 @@ final class ShortcutMonitor {
         scope: ShortcutHandlingScope = .all
     ) -> Bool {
         var shouldSuppress = false
+        let isSecureInputEnabled = Self.isSecureEventInputEnabled()
 
-        if Self.isSecureEventInputEnabled() {
+        if isSecureInputEnabled {
             recordUnreliableKeyEvidenceDuringActiveShortcuts()
         }
 
@@ -462,7 +474,8 @@ final class ShortcutMonitor {
                     kind: kind,
                     keyCode: keyCode,
                     modifierFlags: modifierFlags,
-                    eventTime: eventTime
+                    eventTime: eventTime,
+                    isSecureInputEnabled: isSecureInputEnabled
                 )
                 continue
             }
@@ -506,7 +519,8 @@ final class ShortcutMonitor {
     private func recordUnreliableKeyEvidenceDuringActiveShortcuts() {
         for action in Array(shortcuts.keys) {
             guard var state = shortcuts[action],
-                  state.isDown
+                  state.isDown,
+                  !state.isBlockedBySecureInput
             else {
                 continue
             }
@@ -529,6 +543,7 @@ final class ShortcutMonitor {
         for action in Array(shortcuts.keys) {
             guard var state = shortcuts[action],
                   state.isDown,
+                  !state.isBlockedBySecureInput,
                   !state.shortcut.representsPressEvent(kind: kind, keyCode: keyCode, modifierFlags: modifierFlags)
             else {
                 continue
@@ -552,6 +567,7 @@ final class ShortcutMonitor {
         for action in Array(shortcuts.keys) {
             guard var state = shortcuts[action],
                   state.isDown,
+                  !state.isBlockedBySecureInput,
                   !state.shortcut.representsReleaseEvent(kind: kind, keyCode: keyCode, modifierFlags: modifierFlags)
             else {
                 continue
@@ -639,7 +655,8 @@ final class ShortcutMonitor {
         kind: EventKind,
         keyCode: UInt16,
         modifierFlags: NSEvent.ModifierFlags,
-        eventTime: TimeInterval
+        eventTime: TimeInterval,
+        isSecureInputEnabled: Bool
     ) {
         var state = state
 
@@ -650,15 +667,19 @@ final class ShortcutMonitor {
         if state.isDown {
             if state.shortcut.shouldReleaseModifierEvent(keyCode: keyCode, modifierFlags: modifierFlags) {
                 var context = state.pressContext
-                if Self.hasPressedNonModifierKey() {
+                let shouldDispatchKeyUp = !state.isBlockedBySecureInput
+                if shouldDispatchKeyUp, Self.hasPressedNonModifierKey() {
                     context.didPressOtherKeyDuringPress = true
                 }
                 state.isDown = false
+                state.isBlockedBySecureInput = false
                 state.pressedAt = nil
                 state.isInterrupted = false
                 state.pressContext = VoiceInkShortcutPressContext()
                 shortcuts[action] = state
-                dispatchKeyUp(for: action, eventTime: eventTime, context: context)
+                if shouldDispatchKeyUp {
+                    dispatchKeyUp(for: action, eventTime: eventTime, context: context)
+                }
             }
 
             return
@@ -669,6 +690,14 @@ final class ShortcutMonitor {
             state.pressedAt = eventTime
             state.isInterrupted = false
             state.pressContext = VoiceInkShortcutPressContext()
+            if secureInputBlockedActions.contains(action), isSecureInputEnabled {
+                state.isBlockedBySecureInput = true
+                shortcuts[action] = state
+                logger.notice("handleModifierOnlyShortcut: blocking shortcut until release; Secure Input active")
+                return
+            }
+
+            state.isBlockedBySecureInput = false
             shortcuts[action] = state
             dispatchKeyDown(for: action, eventTime: eventTime)
         }
@@ -810,6 +839,7 @@ extension ShortcutMonitor {
     func configureForTesting(
         shortcuts: [ShortcutAction: Shortcut],
         interruptibleActions: Set<ShortcutAction> = [],
+        secureInputBlockedActions: Set<ShortcutAction> = [],
         handlesModifierOnlyShortcutsInEventTap: Bool = false,
         onKeyDown: @escaping (ShortcutAction, TimeInterval) -> Void,
         onKeyUp: @escaping (ShortcutAction, TimeInterval, VoiceInkShortcutPressContext) -> Void,
@@ -823,6 +853,7 @@ extension ShortcutMonitor {
         }
 
         self.interruptibleActions = interruptibleActions
+        self.secureInputBlockedActions = secureInputBlockedActions
         self.handlesModifierOnlyShortcutsInEventTap = handlesModifierOnlyShortcutsInEventTap
         self.onKeyDown = onKeyDown
         self.onKeyUp = onKeyUp

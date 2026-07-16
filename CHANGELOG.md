@@ -2,6 +2,7 @@
 
 ## v1.96 - Unreleased
 
+- Prevented Special modifier-only shortcuts from arming while macOS Secure Input is already active.
 - Added iOS microphone permission setup during onboarding plus a refreshable Settings recovery screen that reuses the recording permission path.
 - Resumed incomplete iOS onboarding at its last saved setup step after relaunch, clearing the saved step on completion or app-data reset.
 - Exposed iOS app-data reset in shipping Settings with destructive confirmation before deleting recordings, models, preferences, and credentials.

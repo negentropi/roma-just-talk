@@ -43,4 +43,11 @@ final class IOSMicrophonePermissionTests: XCTestCase {
 
         XCTAssertEqual(events, [])
     }
+
+    func testAudioInputFormatPolicyRejectsUnavailableSimulatorFormat() {
+        XCTAssertFalse(VoiceInkIOSAudioInputFormatPolicy.isUsable(sampleRate: 0, channelCount: 2))
+        XCTAssertFalse(VoiceInkIOSAudioInputFormatPolicy.isUsable(sampleRate: 48_000, channelCount: 0))
+        XCTAssertFalse(VoiceInkIOSAudioInputFormatPolicy.isUsable(sampleRate: .nan, channelCount: 1))
+        XCTAssertTrue(VoiceInkIOSAudioInputFormatPolicy.isUsable(sampleRate: 48_000, channelCount: 2))
+    }
 }

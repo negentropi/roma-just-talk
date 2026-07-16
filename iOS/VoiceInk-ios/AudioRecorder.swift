@@ -3,6 +3,12 @@ import Combine
 import Foundation
 import VoiceInkCore
 
+enum VoiceInkIOSAudioInputFormatPolicy {
+    static func isUsable(sampleRate: Double, channelCount: Int) -> Bool {
+        sampleRate.isFinite && sampleRate > 0 && channelCount > 0
+    }
+}
+
 private final class VoiceInkIOSAudioCaptureSink: @unchecked Sendable {
     private static let deliveryQueueKey = DispatchSpecificKey<UInt8>()
 
@@ -293,6 +299,13 @@ final class AudioRecorder: ObservableObject {
         let engine = AVAudioEngine()
         let inputNode = engine.inputNode
         let inputFormat = inputNode.outputFormat(forBus: 0)
+        guard VoiceInkIOSAudioInputFormatPolicy.isUsable(
+            sampleRate: inputFormat.sampleRate,
+            channelCount: Int(inputFormat.channelCount)
+        ) else {
+            sessionManager.deactivateSession()
+            throw VoiceInkAudioRecorderStartFailurePolicy.returnedFalseError()
+        }
         let sink: VoiceInkIOSAudioCaptureSink
         do {
             sink = try VoiceInkIOSAudioCaptureSink(

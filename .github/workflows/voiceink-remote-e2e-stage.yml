@@ -20,12 +20,21 @@ on:
         description: Migration run ID containing the iOS Simulator app; blank uses latest green run
         required: false
         type: string
+      ios_scenario:
+        description: Optional deterministic iOS interaction scenario
+        required: true
+        default: none
+        type: choice
+        options:
+          - none
+          - local-whisper-import
       hold_minutes:
-        description: Time available for VNC or future Computer Use interaction
+        description: Time available after setup/scenario; 0 uploads evidence immediately
         required: true
         default: "30"
         type: choice
         options:
+          - "0"
           - "15"
           - "30"
           - "45"
@@ -37,6 +46,7 @@ on:
       - ".github/workflows/voiceink-remote-e2e-stage.yml"
       - "scripts/open-remote-e2e-stage.sh"
       - "scripts/prepare-remote-e2e-stage.sh"
+      - "scripts/run-ios-remote-stt-e2e.sh"
       - "docs/remote-e2e-stage.md"
 
 permissions:
@@ -47,6 +57,7 @@ env:
   DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
   STAGE_TARGET: ${{ inputs.target || 'ios' }}
   STAGE_HOLD_MINUTES: ${{ inputs.hold_minutes || '10' }}
+  STAGE_IOS_SCENARIO: ${{ inputs.ios_scenario || 'none' }}
 
 jobs:
   stage:
@@ -126,7 +137,8 @@ jobs:
             "$STAGE_TARGET" \
             "$STAGE_HOLD_MINUTES" \
             "$RUNNER_TEMP/remote-e2e-inputs" \
-            "$RUNNER_TEMP/voiceink-remote-e2e-stage"
+            "$RUNNER_TEMP/voiceink-remote-e2e-stage" \
+            "$STAGE_IOS_SCENARIO"
 
       - name: Upload stage evidence
         if: always()

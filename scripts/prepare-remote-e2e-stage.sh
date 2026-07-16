@@ -5,6 +5,7 @@ target="${1:?target required}"
 hold_minutes="${2:?hold minutes required}"
 inputs_root="${3:?inputs root required}"
 stage_root="${4:?stage root required}"
+ios_scenario="${5:-none}"
 
 case "$target" in
   both|macos|ios) ;;
@@ -14,8 +15,21 @@ case "$target" in
     ;;
 esac
 
-if ! [[ "$hold_minutes" =~ ^[0-9]+$ ]] || (( hold_minutes < 1 || hold_minutes > 60 )); then
-  echo "Hold minutes must be between 1 and 60" >&2
+if ! [[ "$hold_minutes" =~ ^[0-9]+$ ]] || (( hold_minutes < 0 || hold_minutes > 60 )); then
+  echo "Hold minutes must be between 0 and 60" >&2
+  exit 2
+fi
+
+case "$ios_scenario" in
+  none|local-whisper-import) ;;
+  *)
+    echo "Unsupported iOS scenario: $ios_scenario" >&2
+    exit 2
+    ;;
+esac
+
+if [ "$target" = "macos" ] && [ "$ios_scenario" != "none" ]; then
+  echo "An iOS scenario requires the ios or both target" >&2
   exit 2
 fi
 
@@ -24,6 +38,8 @@ evidence="$stage_root/evidence"
 done_file="/tmp/voiceink-remote-e2e-stage-done"
 ready_file="$stage_root/READY"
 simulator_udid=""
+macos_artifact_run_id=""
+ios_artifact_run_id=""
 log_pids=()
 
 mkdir -p "$desktop" "$evidence"
@@ -54,6 +70,7 @@ prepare_macos() {
   local preferences_backup="$HOME/Library/Preferences/ccom.prakashjoshipax.VoiceInk.plist"
 
   test -f "$archive"
+  read -r macos_artifact_run_id < "$inputs_root/macos/build-run-id.txt"
   mkdir -p "$HOME/Applications" "$stage_root/macos"
   ditto -x -k "$archive" "$stage_root/macos"
   test -d "$stage_root/macos/roma just talk.app"
@@ -84,6 +101,7 @@ prepare_ios() {
   local app="$unpacked/roma just talk.app"
 
   test -f "$archive"
+  read -r ios_artifact_run_id < "$inputs_root/ios/build-run-id.txt"
   mkdir -p "$unpacked"
   ditto -x -k "$archive" "$unpacked"
   test -d "$app"
@@ -125,15 +143,54 @@ case "$target" in
     ;;
 esac
 
+write_manifest() {
+  local status="$1"
+
+  cat > "$stage_root/stage-manifest.json" <<EOF
+{
+  "schemaVersion": 1,
+  "status": "$status",
+  "target": "$target",
+  "iOSScenario": "$ios_scenario",
+  "githubRunId": "${GITHUB_RUN_ID:-local}",
+  "githubSha": "${GITHUB_SHA:-local}",
+  "githubRef": "${GITHUB_REF:-local}",
+  "macOSArtifactRunId": "$macos_artifact_run_id",
+  "iOSArtifactRunId": "$ios_artifact_run_id",
+  "doneFile": "$done_file",
+  "evidenceDirectory": "$evidence",
+  "macOSBundleIdentifier": "com.prakashjoshipax.VoiceInk",
+  "iOSBundleIdentifier": "com.prakashjoshipax.VoiceInk",
+  "simulatorUDID": "$simulator_udid"
+}
+EOF
+  cp "$stage_root/stage-manifest.json" "$evidence/stage-manifest.json"
+}
+
+write_manifest scenario-running
+
+if [ "$ios_scenario" = "local-whisper-import" ]; then
+  bash "$(dirname "$0")/run-ios-remote-stt-e2e.sh" \
+    "$simulator_udid" \
+    "$evidence"
+fi
+
+if [ "$ios_scenario" = "none" ]; then
+  scenario_summary="No scripted scenario ran."
+else
+  scenario_summary="The requested scripted scenario completed successfully."
+fi
+
 cat > "$desktop/REMOTE E2E STAGE READY.txt" <<EOF
 roma just talk remote E2E stage
 
 Target: $target
+Scenario: $ios_scenario
 GitHub run: ${GITHUB_RUN_ID:-local}
 Stage root: $stage_root
 
-The desktop is ready for manual VNC or future Computer Use interaction.
-No scripted scenario is running.
+$scenario_summary
+The desktop is ready for manual VNC or Computer Use interaction during the remaining hold.
 
 To finish early, double-click:
 Finish Remote E2E Stage.command
@@ -146,19 +203,7 @@ EOF
 chmod +x "$desktop/Finish Remote E2E Stage.command"
 ln -sfn "$stage_root" "$desktop/Remote E2E Stage"
 
-cat > "$stage_root/stage-manifest.json" <<EOF
-{
-  "schemaVersion": 1,
-  "status": "ready",
-  "target": "$target",
-  "githubRunId": "${GITHUB_RUN_ID:-local}",
-  "doneFile": "$done_file",
-  "evidenceDirectory": "$evidence",
-  "macOSBundleIdentifier": "com.prakashjoshipax.VoiceInk",
-  "iOSBundleIdentifier": "com.prakashjoshipax.VoiceInk",
-  "simulatorUDID": "$simulator_udid"
-}
-EOF
+write_manifest ready
 
 touch "$ready_file"
 capture_desktop ready

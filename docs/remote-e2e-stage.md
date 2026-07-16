@@ -1,6 +1,7 @@
 # Remote E2E Stage
 
-This workflow prepares the remote computer. It does not define or execute an interaction scenario.
+This workflow prepares the remote computer. Manual interaction remains the default,
+and an optional deterministic iOS local-Whisper scenario can run before the hold.
 
 The intended split:
 
@@ -18,7 +19,8 @@ Inputs:
 - `target`: `macos`, `ios`, or `both`.
 - `macos_artifact_run_id`: successful `Build roma just talk` workflow run containing the exact macOS artifact to exercise. Blank selects the latest green build.
 - `ios_artifact_run_id`: successful `VoiceInk iOS single-repo migration` workflow run containing the exact Simulator artifact. Blank selects the latest green run.
-- `hold_minutes`: 15 to 60 minutes of Remote Display availability.
+- `ios_scenario`: `none` or `local-whisper-import`.
+- `hold_minutes`: 0 to 60 minutes after setup/scenario. Use `0` to upload evidence immediately.
 
 The stage performs no build. It downloads the macOS artifact unchanged and does not re-sign it. The existing iOS migration workflow packages its already-built Simulator application as `roma.just.talk.ios-simulator.app`.
 
@@ -59,7 +61,28 @@ The stable future-agent contract is:
 5. Save additional evidence into the manifest's `evidenceDirectory`.
 6. Run `Finish Remote E2E Stage.command`.
 
-Provisioning remains owned by this workflow. Interaction prompts and judgment remain owned by the future Computer Use skill.
+Provisioning remains owned by this workflow. Manual interaction prompts and judgment
+remain owned by Computer Use; the optional local-STT path is owned by the deterministic script.
+
+## Deterministic iOS local STT scenario
+
+Choose `target=ios`, set `ios_artifact_run_id` to the exact green build, choose
+`ios_scenario=local-whisper-import`, and use `hold_minutes=0` for a fully scripted run.
+
+The scenario:
+
+1. installs AXe on the ephemeral Namespace runner when needed;
+2. atomically downloads, verifies, and copies the pinned `ggml-base.bin` model into the app container;
+3. generates a 16 kHz mono speech fixture with macOS `say`;
+4. launches the actual app with onboarding complete and opens the fixture through the app's external-file route;
+5. uses AXe accessibility labels to start transcription and open transcript detail;
+6. requires the normalized expected phrase and `Completed` state in the visible UI;
+7. verifies a non-empty canonical WAV header and matching declared data length; and
+8. uploads provenance, success or failure state, screenshots, accessibility trees, hashes, and logs.
+
+This proves the built Simulator app's external-open, import, WAV preparation,
+local Whisper, persistence, queue completion, and transcript-detail path. It does
+not prove live microphone capture, recorder pre-roll, keyboard handoff, or physical-device routing.
 
 ## Evidence
 
@@ -74,7 +97,7 @@ Namespace VNC can be active while `screencapture` remains unable to see that dis
 ## Boundaries
 
 - iOS means iOS Simulator on the remote Mac, not a physical iPhone.
-- Microphone availability is not assumed.
+- Microphone availability is not assumed; the deterministic STT scenario uses a generated audio file.
 - Accessibility, Input Monitoring, Screen Recording, and other TCC permissions are not pre-granted.
 - Global-shortcut and audio-input proof need a separately prepared permission and hardware strategy.
-- The stage intentionally performs no scripted UI assertions. XCUITest can remain a separate fast gate if wanted later.
+- The optional local-STT scenario performs narrow AXe UI assertions; XCUITest remains a separate fast gate.

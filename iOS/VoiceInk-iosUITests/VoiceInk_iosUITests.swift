@@ -146,13 +146,16 @@ final class VoiceInkIOSUITests: XCTestCase {
                 VoiceInkIOSAppDataResetPresentation.confirmationMessage
             )
         ).firstMatch
-        let cancelButton = app.buttons[VoiceInkIOSAppDataResetPresentation.cancelButtonTitle]
+        let dismissPopup = app.otherElements["dismiss popup"]
         XCTAssertTrue(confirmationTitle.waitForExistence(timeout: 5))
         XCTAssertTrue(confirmationMessage.exists)
-        XCTAssertTrue(cancelButton.exists)
+        XCTAssertTrue(dismissPopup.exists)
         attachScreenshot(named: "Reset app data confirmation")
 
-        cancelButton.tap()
+        // iOS 26 exposes cancellation as a backdrop control without a Cancel button.
+        dismissPopup.coordinate(
+            withNormalizedOffset: CGVector(dx: 0.5, dy: 0.75)
+        ).tap()
         XCTAssertTrue(confirmationTitle.waitForNonExistence(timeout: 5))
         XCTAssertTrue(app.navigationBars["Settings"].exists)
         XCTAssertTrue(app.staticTexts[changedTimeoutText].exists)

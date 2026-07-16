@@ -123,7 +123,7 @@ Order follows user outcome dependencies, not implementation convenience.
 1. Runtime-prove keyboard result IPC and one-time insertion into the originating field (R03).
 2. Keyboard installation/Full Access onboarding and recovery (R05, S01-S02).
 3. Runtime-prove background completion, result delivery, expiration recovery, and cancellation (R06-R07).
-4. Runtime-prove manual audio-file import/transcription, external-open intake, queue controls, and sharing (R08).
+4. Finish manual-import proof: picker/Files share intake, long and multiple-file queues, remote/enhanced transcription, cancel/retry, relaunch persistence, and result sharing (R08).
 5. Runtime-prove active streaming/live preview and continue VAD/prewarm controls (R10-R12).
 6. Portable model/provider gaps (M03-M06, M08, M11-M12).
 7. Prompt library and keyboard context (M14-M15).

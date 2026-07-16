@@ -29,6 +29,20 @@ final class KeyboardDictationExchangeTests: XCTestCase {
         )
     }
 
+    func testDismissOnlyRecordingAlertStillProvidesEnabledIOSAction() {
+        var openedSettings = false
+
+        VoiceInkRecordingAlertPresentation.noModesAvailable.iOSPrimaryButtonAction {
+            openedSettings = true
+        }()
+        XCTAssertFalse(openedSettings)
+
+        VoiceInkRecordingAlertPresentation.microphonePermissionDenied.iOSPrimaryButtonAction {
+            openedSettings = true
+        }()
+        XCTAssertTrue(openedSettings)
+    }
+
     func testMatchingDocumentTakesCompletedTextExactlyOnce() throws {
         let store = VoiceInkKeyboardDictationExchangeStore(defaults: defaults)
         let requestID = UUID()

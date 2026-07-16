@@ -85,8 +85,12 @@ struct RecordingSheetView: View {
 }
 
 extension VoiceInkRecordingAlertPresentation {
+    func iOSPrimaryButtonAction(openSettings: @escaping () -> Void) -> () -> Void {
+        runtimeAction(openSettings: openSettings) ?? {}
+    }
+
     func iOSAlert(openSettings: @escaping () -> Void) -> Alert {
-        let primaryAction = runtimeAction(openSettings: openSettings)
+        let primaryAction = iOSPrimaryButtonAction(openSettings: openSettings)
         if let secondaryButtonTitle {
             return Alert(
                 title: Text(title),

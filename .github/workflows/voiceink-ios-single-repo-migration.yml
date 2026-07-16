@@ -68,7 +68,8 @@ jobs:
             -configuration Debug \
             -destination "generic/platform=iOS Simulator" \
             -derivedDataPath "$PWD/.local-build-ios" \
-            CODE_SIGNING_ALLOWED=NO
+            CODE_SIGNING_ALLOWED=NO \
+            ENTITLEMENTS_ALLOWED=YES
 
       - name: Package iOS Simulator app
         run: |
@@ -106,6 +107,7 @@ jobs:
             -derivedDataPath "$PWD/.local-build-ios" \
             -parallel-testing-enabled NO \
             CODE_SIGNING_ALLOWED=NO \
+            ENTITLEMENTS_ALLOWED=YES \
             EXCLUDED_SOURCE_FILE_NAMES=VoiceInk_iosTests.swift \
             -only-testing:VoiceInk-iosTests/KeyboardDictationExchangeTests \
             -only-testing:VoiceInk-iosTests/KeyboardReadinessTests \

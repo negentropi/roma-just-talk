@@ -42,6 +42,24 @@ require_file() {
   fi
 }
 
+require_file_string_count() {
+  local description="$1"
+  local file="$2"
+  local needle="$3"
+  local expected="$4"
+
+  section "$description"
+  local actual
+  if ! actual="$(ruby -e 'path, needle = ARGV; print File.read(path).scan(needle).length' "$file" "$needle")"; then
+    fail "$description"
+    return
+  fi
+
+  if [[ "$actual" != "$expected" ]]; then
+    fail "$description: expected $expected occurrence(s), got $actual"
+  fi
+}
+
 require_dir() {
   if [[ ! -d "$1" ]]; then
     fail "missing directory: $1"
@@ -204,6 +222,7 @@ require_file iOS/VoiceInk-ios.xcodeproj/project.xcworkspace/contents.xcworkspace
 require_file VoiceInkCore/Package.swift
 require_file Makefile
 require_file LocalBuild.xcconfig
+require_file .github/workflows/voiceink-ios-single-repo-migration.yml
 
 section "required app configuration files"
 require_file VoiceInk/Info.plist
@@ -320,6 +339,12 @@ require_json_array_value \
   "com.apple.security.application-groups" \
   0 \
   "$expected_app_group"
+
+require_file_string_count \
+  "iOS CI keeps Simulator entitlements in unsigned builds and tests" \
+  .github/workflows/voiceink-ios-single-repo-migration.yml \
+  "ENTITLEMENTS_ALLOWED=YES" \
+  2
 
 require_project_string \
   "macOS project references VoiceInkCore" \

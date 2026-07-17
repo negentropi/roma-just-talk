@@ -1054,11 +1054,13 @@ struct VoiceInkTests {
 
     private func eventually(_ predicate: () -> Bool) async -> Bool {
         for _ in 0..<20 {
+            await drainMainQueue()
             if predicate() {
                 return true
             }
             try? await Task.sleep(nanoseconds: 5_000_000)
         }
+        await drainMainQueue()
         return predicate()
     }
 

@@ -19,6 +19,9 @@ jobs:
           xcodebuild -version
           swift --version
 
+      - name: Prepare local Whisper framework
+        run: make setup
+
       - name: Run isolated test and print xcresult
         shell: bash
         run: |

@@ -1,24 +1,13 @@
-name: Build roma just talk
+name: Diagnose VoiceInk modifier monitor test
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - ".github/workflows/voiceink-build.yml"
-      - "LocalBuild.xcconfig"
-      - "Makefile"
-      - "Tools/**"
-      - "VoiceInk/**"
-      - "VoiceInkTests/**"
-      - "VoiceInk.xcodeproj/**"
 
 jobs:
-  build:
-    name: Build release macOS app
+  diagnose:
+    name: Diagnose modifier monitor test
     runs-on: namespace-profile-roma-jt
-    timeout-minutes: 60
+    timeout-minutes: 15
 
     steps:
       - name: Checkout
@@ -30,24 +19,18 @@ jobs:
           xcodebuild -version
           swift --version
 
-      - name: Compile visible text latency harness helper
-        run: make latency-harness-app
-
-      - name: Verify latency helper run target
-        run: make latency-harness-check
-
-      - name: Build release app
-        run: make local CONFIGURATION=Release
-
-      - name: Run Debug unit tests
-        timeout-minutes: 15
+      - name: Run isolated test and print xcresult
+        shell: bash
         run: |
+          set +e
+          RESULT_BUNDLE="$PWD/.local-build/ModifierMonitorTest.xcresult"
           xcodebuild test \
             -project VoiceInk.xcodeproj \
             -scheme VoiceInk \
             -configuration Debug \
             -destination 'platform=macOS' \
             -derivedDataPath "$PWD/.local-build" \
+            -resultBundlePath "$RESULT_BUNDLE" \
             -xcconfig LocalBuild.xcconfig \
             CODE_SIGN_IDENTITY="-" \
             CODE_SIGNING_REQUIRED=NO \
@@ -55,23 +38,14 @@ jobs:
             DEVELOPMENT_TEAM="" \
             CODE_SIGN_ENTITLEMENTS="$PWD/VoiceInk/VoiceInk.local.entitlements" \
             SWIFT_ACTIVE_COMPILATION_CONDITIONS='$(inherited) LOCAL_BUILD' \
-            -only-testing:VoiceInkTests
+            -only-testing:VoiceInkTests/VoiceInkTests/modifierOnlyShortcutsUseNSEventMonitorPath
+          TEST_EXIT=$?
+          set -e
 
-      - name: Reject debug-only release payload
-        run: |
-          APP="$HOME/Applications/roma just talk.app"
-          if [ -e "$APP/Contents/MacOS/roma just talk.debug.dylib" ] || [ -e "$APP/Contents/MacOS/__preview.dylib" ]; then
-            echo "Release artifact contains debug-only binaries:"
-            ls -la "$APP/Contents/MacOS"
-            exit 1
+          if ! xcrun xcresulttool get test-results tests \
+            --path "$RESULT_BUNDLE" \
+            --format json; then
+            echo "xcresulttool could not decode test results"
           fi
 
-      - name: Package app
-        run: ditto -c -k --keepParent "$HOME/Applications/roma just talk.app" "roma.just.talk.app.zip"
-
-      - name: Upload app artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: roma.just.talk.app
-          path: roma.just.talk.app.zip
-          if-no-files-found: error
+          exit "$TEST_EXIT"

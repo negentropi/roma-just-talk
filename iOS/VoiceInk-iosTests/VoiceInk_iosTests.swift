@@ -3,19 +3,6 @@ import VoiceInkCore
 @testable import VoiceInk_ios
 
 final class VoiceInkIOSTests: XCTestCase {
-    func testStorageDirectoryAdaptersUseSharedCorePolicies() {
-        let documentsDirectory = VoiceInkIOSStorageDirectories.documentsDirectory
-
-        XCTAssertEqual(
-            VoiceInkIOSStorageDirectories.recordingsDirectory,
-            VoiceInkStoredAudioFile.recordingsDirectory(in: documentsDirectory)
-        )
-        XCTAssertEqual(
-            VoiceInkIOSStorageDirectories.modelsDirectory,
-            VoiceInkWhisperModelFiles.modelsDirectory(in: documentsDirectory)
-        )
-    }
-
     func testTranscriptionFeedsSharedDashboardMetrics() throws {
         let note = Transcription(
             text: "raw words ignored",

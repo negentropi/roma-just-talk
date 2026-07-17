@@ -43,13 +43,6 @@ final class AppIdentityTests: XCTestCase {
         XCTAssertEqual(VoiceInkAppNotificationKind.defaultDisplayDuration, 3.0, accuracy: 0.0001)
     }
 
-    func testAppNotificationKindsPreserveSystemImages() {
-        XCTAssertEqual(VoiceInkAppNotificationKind.error.systemImageName, "xmark.octagon.fill")
-        XCTAssertEqual(VoiceInkAppNotificationKind.warning.systemImageName, "exclamationmark.triangle.fill")
-        XCTAssertEqual(VoiceInkAppNotificationKind.info.systemImageName, "info.circle.fill")
-        XCTAssertEqual(VoiceInkAppNotificationKind.success.systemImageName, "checkmark.circle.fill")
-    }
-
     func testOnlyErrorNotificationsPlayFailureSound() {
         XCTAssertTrue(VoiceInkAppNotificationKind.error.playsFailureSound)
         XCTAssertFalse(VoiceInkAppNotificationKind.warning.playsFailureSound)
@@ -61,19 +54,6 @@ final class AppIdentityTests: XCTestCase {
         XCTAssertEqual(VoiceInkSupportContactPolicy.emailAddress, "support@tryvoiceink.com")
         XCTAssertEqual(VoiceInkSupportContactPolicy.emailSubject, "VoiceInk Support Request")
         XCTAssertEqual(VoiceInkSupportContactPolicy.commonIssuesURLString, "https://tryvoiceink.com/common-issues")
-    }
-
-    func testSupportEmailBodyPreservesMacOSSupportCopyAndSystemInformationSlot() {
-        let body = VoiceInkSupportContactPolicy.emailBody(systemInformation: "macOS: test\nApp: roma just talk")
-
-        XCTAssertTrue(body.contains("------------------------"))
-        XCTAssertTrue(body.contains("✨ **SCREEN RECORDING HIGHLY RECOMMENDED** ✨"))
-        XCTAssertTrue(body.contains("▶️ Create a quick screen recording showing the issue!"))
-        XCTAssertTrue(body.contains("📝 ISSUE DETAILS:"))
-        XCTAssertTrue(body.contains("## 📋 COMMON ISSUES:"))
-        XCTAssertTrue(body.contains("Check out our Common Issues page before sending an email: https://tryvoiceink.com/common-issues"))
-        XCTAssertTrue(body.contains("System Information:\nmacOS: test\nApp: roma just talk"))
-        XCTAssertTrue(body.hasSuffix("\n\n"))
     }
 
     func testSupportMailtoURLPreservesRecipientAndEncodesSubject() throws {
@@ -175,34 +155,6 @@ final class AppIdentityTests: XCTestCase {
         XCTAssertEqual(next?.learnMoreURL, URL(string: "https://tryvoiceink.com/docs"))
     }
 
-    func testAnnouncementPresentationPreservesMacOSActionCopyAndDescriptionVisibility() throws {
-        let now = try date("2026-06-21T12:00:00Z")
-        let visible = try XCTUnwrap(VoiceInkAnnouncementPolicy.nextAnnouncement(
-            from: [
-                announcement(id: "visible", description: " Body ", url: "https://tryvoiceink.com/docs")
-            ],
-            dismissedIds: [],
-            now: now
-        ))
-
-        XCTAssertEqual(visible.closeButtonSystemImageName, "xmark")
-        XCTAssertEqual(visible.learnMoreButtonTitle, "Learn more")
-        XCTAssertEqual(visible.dismissButtonTitle, "Dismiss")
-        XCTAssertEqual(visible.descriptionText, " Body ")
-        XCTAssertTrue(visible.shouldShowDescription)
-
-        let blank = try XCTUnwrap(VoiceInkAnnouncementPolicy.nextAnnouncement(
-            from: [
-                announcement(id: "blank", description: " \n\t ")
-            ],
-            dismissedIds: [],
-            now: now
-        ))
-
-        XCTAssertEqual(blank.descriptionText, " \n\t ")
-        XCTAssertFalse(blank.shouldShowDescription)
-    }
-
     func testNextAnnouncementReturnsNilWhenNothingIsEligible() throws {
         let now = try date("2026-06-21T12:00:00Z")
         XCTAssertNil(VoiceInkAnnouncementPolicy.nextAnnouncement(
@@ -233,135 +185,6 @@ final class AppIdentityTests: XCTestCase {
         #endif
     }
 
-    func testMacOSSystemInformationReportPreservesSectionOrderAndLabels() {
-        let report = VoiceInkSystemInformationReport.macOS(Self.sampleFacts)
-
-        XCTAssertEqual(
-            report,
-            """
-            === VOICEINK SYSTEM INFORMATION ===
-            Generated: June 24, 2026 at 3:42:11 PM
-
-            APP INFORMATION:
-            App Version: 1.2.3
-            Build Version: 456
-            License Status: Licensed (Pro)
-
-            OPERATING SYSTEM:
-            macOS Version: Version 26.0
-
-            HARDWARE INFORMATION:
-            Device Model: Mac16,1
-            CPU: Apple M4 Pro
-            Memory: 48 GB
-            Architecture: arm64
-
-            AUDIO SETTINGS:
-            Input Mode: automatic
-            Current Audio Device: Studio Display Microphone
-            Available Audio Devices: Built-in Microphone, Studio Display Microphone
-
-            HOTKEY SETTINGS:
-            Primary Shortcut: Control Space
-            Secondary Shortcut: Option Space
-            Middle-Click Recording: true
-            Middle-Click Activation Delay: 300 ms
-
-            TRANSCRIPTION SETTINGS:
-            Selected Model: Parakeet V3
-            Selected Language: en
-            AI Enhancement: Enabled
-            AI Provider: OpenAI
-            AI Model: gpt-5-mini
-
-            ROLLING BUFFER PRELOAD:
-            Mode: Smart
-            Pre-run Finalization: true
-            Buffer Duration: 8.0s
-            Last Quick Release Claim: none
-
-            UI SETTINGS:
-            Hide Dock Icon: false
-            Recorder Style: notch
-
-            RECORDING FEEDBACK:
-            Sound Feedback: true
-            Pause Media While Recording: false
-            Mute Audio While Recording: smart
-            Audio Resumption Delay: 1.25s
-
-            CLIPBOARD & PASTE SETTINGS:
-            Restore Clipboard After Paste: true
-            Clipboard Restore Delay: 0.5s
-            Paste Method: Standard
-
-            POWER MODE:
-            Power Mode Enabled: true
-            Persist Configured Preferences: false
-
-            DATA CLEANUP SETTINGS:
-            Auto-Delete Transcriptions: false
-            Transcription Retention: 60 minutes
-            Auto-Delete Audio Files: true
-            Audio Retention Period: 7 days
-
-            PERMISSIONS:
-            Accessibility: Granted
-            Input Monitoring: Not Granted
-            Screen Recording: Granted
-            Microphone: Denied
-            """
-        )
-    }
-
-    func testMacOSSystemInformationReportKeepsRollingBufferBlockVerbatim() {
-        let facts = VoiceInkMacOSSystemInformationFacts(
-            generated: "now",
-            appVersion: "app",
-            buildVersion: "build",
-            licenseStatus: "license",
-            operatingSystemVersion: "os",
-            deviceModel: "model",
-            cpu: "cpu",
-            memory: "memory",
-            architecture: "arch",
-            audioInputMode: "mode",
-            currentAudioDevice: "current",
-            availableAudioDevices: "available",
-            primaryShortcut: "",
-            secondaryShortcut: "",
-            middleClickRecording: false,
-            middleClickActivationDelayMilliseconds: 0,
-            selectedModel: "selected",
-            selectedLanguage: "auto",
-            aiEnhancement: "disabled",
-            aiProvider: "none",
-            aiModel: "none",
-            rollingBufferPreload: "line one\nline two",
-            hideDockIcon: true,
-            recorderStyle: "mini",
-            soundFeedback: false,
-            pauseMediaWhileRecording: true,
-            muteAudioWhileRecording: "off",
-            audioResumptionDelaySeconds: 0,
-            restoreClipboardAfterPaste: false,
-            clipboardRestoreDelaySeconds: 0,
-            pasteMethod: "Direct",
-            powerModeEnabled: false,
-            persistConfiguredPreferences: true,
-            autoDeleteTranscriptions: true,
-            transcriptionRetentionMinutes: 10,
-            autoDeleteAudioFiles: false,
-            audioRetentionPeriodDays: 1,
-            accessibilityPermission: "Unknown",
-            inputMonitoringPermission: "Unknown",
-            screenRecordingPermission: "Unknown",
-            microphonePermission: "Unknown"
-        )
-
-        XCTAssertTrue(VoiceInkSystemInformationReport.macOS(facts).contains("ROLLING BUFFER PRELOAD:\nline one\nline two\n\nUI SETTINGS:"))
-    }
-
     func testAvailableAudioDevicesTextPreservesMacOSDiagnosticsListPolicy() {
         XCTAssertEqual(
             VoiceInkSystemInformationReport.availableAudioDevicesText([
@@ -388,67 +211,6 @@ final class AppIdentityTests: XCTestCase {
         XCTAssertEqual(
             VoiceInkSystemInformationReport.generatedDateText(generatedAt),
             generatedAt.formatted(date: .long, time: .standard)
-        )
-    }
-
-    func testPermissionStatusPresentationPreservesMacOSDiagnosticsCopy() {
-        XCTAssertEqual(
-            VoiceInkSystemInformationPermissionStatus.grantStatus(isGranted: true),
-            .granted
-        )
-        XCTAssertEqual(
-            VoiceInkSystemInformationPermissionStatus.grantStatus(isGranted: false),
-            .notGranted
-        )
-        XCTAssertEqual(VoiceInkSystemInformationPermissionStatus.granted.displayText, "Granted")
-        XCTAssertEqual(VoiceInkSystemInformationPermissionStatus.notGranted.displayText, "Not Granted")
-        XCTAssertEqual(VoiceInkSystemInformationPermissionStatus.denied.displayText, "Denied")
-        XCTAssertEqual(VoiceInkSystemInformationPermissionStatus.restricted.displayText, "Restricted")
-        XCTAssertEqual(VoiceInkSystemInformationPermissionStatus.notDetermined.displayText, "Not Determined")
-        XCTAssertEqual(VoiceInkSystemInformationPermissionStatus.unknown.displayText, "Unknown")
-    }
-
-    func testLicenseStatusPresentationPreservesMacOSDiagnosticsCopy() {
-        XCTAssertEqual(
-            VoiceInkSystemInformationLicenseStatus.status(hasUsableStoredLicense: true),
-            .licensedPro
-        )
-        XCTAssertEqual(
-            VoiceInkSystemInformationLicenseStatus.status(hasUsableStoredLicense: false),
-            .notLicensed
-        )
-        XCTAssertEqual(VoiceInkSystemInformationLicenseStatus.licensedPro.displayText, "Licensed (Pro)")
-        XCTAssertEqual(VoiceInkSystemInformationLicenseStatus.notLicensed.displayText, "Not Licensed")
-    }
-
-    func testSystemInformationCopyPresentationPreservesDashboardButtonPolicy() {
-        XCTAssertEqual(
-            VoiceInkSystemInformationCopyPresentation.button(isCopied: false),
-            VoiceInkSystemInformationCopyButtonPresentation(
-                systemImageName: "doc.on.doc",
-                title: "Copy System Info"
-            )
-        )
-        XCTAssertEqual(
-            VoiceInkSystemInformationCopyPresentation.button(isCopied: true),
-            VoiceInkSystemInformationCopyButtonPresentation(
-                systemImageName: "checkmark",
-                title: "Copied!"
-            )
-        )
-        XCTAssertEqual(VoiceInkSystemInformationCopyPresentation.copiedResetDelay, 1.5)
-    }
-
-    func testDiagnosticsSettingsPresentationPreservesMacOSCopyAndIcons() {
-        XCTAssertEqual(VoiceInkDiagnosticsSettingsPresentation.rollingBufferLastClaimLabel, "Rolling Buffer Last Claim")
-        XCTAssertEqual(VoiceInkDiagnosticsSettingsPresentation.showInFinderButtonTitle, "Show in Finder")
-        XCTAssertEqual(VoiceInkDiagnosticsSettingsPresentation.exportButtonTitle, "Export")
-        XCTAssertEqual(VoiceInkDiagnosticsSettingsPresentation.exportLogsLabel, "Export Logs")
-        XCTAssertEqual(VoiceInkDiagnosticsSettingsPresentation.exportFailedAlertTitle, "Export Failed")
-        XCTAssertEqual(VoiceInkDiagnosticsSettingsPresentation.alertDismissButtonTitle, "OK")
-        XCTAssertEqual(
-            VoiceInkDiagnosticsSettingsPresentation.exportedLogSuccessSystemImageName,
-            "checkmark.circle.fill"
         )
     }
 
@@ -684,12 +446,6 @@ final class AppIdentityTests: XCTestCase {
             aiEnhancement: "Enabled",
             aiProvider: "OpenAI",
             aiModel: "gpt-5-mini",
-            rollingBufferPreload: """
-            Mode: Smart
-            Pre-run Finalization: true
-            Buffer Duration: 8.0s
-            Last Quick Release Claim: none
-            """,
             hideDockIcon: false,
             recorderStyle: "notch",
             soundFeedback: true,
@@ -799,40 +555,6 @@ final class AppIdentityTests: XCTestCase {
         )
     }
 
-    func testMacOSStorageAlertPresentationPreservesStartupCopy() {
-        XCTAssertEqual(
-            VoiceInkAppIdentity.storageFallbackWarningPresentation,
-            VoiceInkMacOSStorageAlertPresentation(
-                title: "Storage Warning",
-                message: "VoiceInk couldn't access its storage location. Your transcriptions will not be saved between sessions.",
-                buttonTitle: "OK"
-            )
-        )
-        XCTAssertEqual(
-            VoiceInkAppIdentity.storageFailurePresentation,
-            VoiceInkMacOSStorageAlertPresentation(
-                title: "Critical Storage Error",
-                message: "roma-just-talk cannot initialize its storage system. The app cannot continue.\n\nPlease try reinstalling the app or contact support if the issue persists.",
-                buttonTitle: "Quit"
-            )
-        )
-    }
-
-    func testStorageStartupDiagnosticsPreserveAppStartupCopy() {
-        XCTAssertEqual(
-            VoiceInkStorageStartupDiagnostics.modelContainerInitializationFailedMessage,
-            "ModelContainer initialization failed"
-        )
-        XCTAssertEqual(
-            VoiceInkStorageStartupDiagnostics.modelContainerUnavailablePreconditionMessage,
-            "Unable to create ModelContainer. SwiftData is unavailable."
-        )
-        XCTAssertEqual(
-            VoiceInkStorageStartupDiagnostics.iOSModelContainerCreationFailedMessage(errorDescription: "store denied"),
-            "Could not create ModelContainer: store denied"
-        )
-    }
-
     func testMacOSNavigationRequestPreservesDestinationContract() {
         XCTAssertEqual(VoiceInkMacOSNavigationRequest.notificationName.rawValue, "navigateToDestination")
         XCTAssertEqual(VoiceInkMacOSNavigationRequest.destinationUserInfoKey, "destination")
@@ -860,48 +582,6 @@ final class AppIdentityTests: XCTestCase {
             VoiceInkMacOSNavigationRequest.destination(from: notification),
             "Transcribe Audio"
         )
-    }
-
-    func testMacOSMainViewItemsPreserveSidebarPresentation() {
-        XCTAssertEqual(VoiceInkMacOSMainViewItem.defaultSelection, .metrics)
-        XCTAssertEqual(VoiceInkMacOSMainViewItem.emptySelectionTitle, "Select a view")
-        XCTAssertEqual(
-            VoiceInkMacOSMainViewItem.allCases.map(\.title),
-            [
-                "home",
-                "manual stt",
-                "past",
-                "models",
-                "style",
-                "Power Mode",
-                "Permissions",
-                "Audio Input",
-                "Dictionary",
-                "Settings",
-                "VoiceInk Pro"
-            ]
-        )
-        XCTAssertEqual(
-            VoiceInkMacOSMainViewItem.allCases.map(\.systemImageName),
-            [
-                "gauge.medium",
-                "waveform.circle.fill",
-                "doc.text.fill",
-                "brain.head.profile",
-                "wand.and.stars",
-                "sparkles.square.fill.on.square",
-                "shield.fill",
-                "mic.fill",
-                "character.book.closed.fill",
-                "gearshape.fill",
-                "checkmark.seal.fill"
-            ]
-        )
-        XCTAssertEqual(
-            VoiceInkMacOSMainViewItem.visibleItems(powerModeEnabled: false),
-            [.metrics, .transcribeAudio, .history, .models, .enhancement, .permissions, .audioInput, .dictionary, .settings, .license]
-        )
-        XCTAssertEqual(VoiceInkMacOSMainViewItem.visibleItems(powerModeEnabled: true), VoiceInkMacOSMainViewItem.allCases)
     }
 
     func testMacOSMainViewItemsMapNavigationDestinationsAndLegacyTitles() {

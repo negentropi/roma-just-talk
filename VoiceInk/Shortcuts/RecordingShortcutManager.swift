@@ -132,15 +132,6 @@ class RecordingShortcutManager: ObservableObject {
             toggleMiniRecorder: { powerModeId in
                 await recorderUIManager.toggleMiniRecorder(powerModeId: powerModeId)
             },
-            prepareQuickReleaseContext: { powerModeId in
-                engine.prepareQuickReleaseContext(powerModeId: powerModeId)
-            },
-            discardQuickReleaseContext: {
-                engine.discardPreparedQuickReleaseContext()
-            },
-            commitReadyRollingBufferPreload: { powerModeId in
-                await engine.commitReadyRollingBufferPreload(powerModeId: powerModeId)
-            },
             cancelRecording: {
                 await recorderUIManager.cancelRecording()
             }
@@ -310,18 +301,6 @@ class RecordingShortcutManager: ObservableObject {
                     } else {
                         await self.handleGlobalShortcut(action)
                     }
-                }
-            },
-            onPressContextChanged: { [weak self] action, context in
-                Task { @MainActor in
-                    guard let self,
-                          self.recordingMode(for: action)?.tracksKeyUpEvidence == true else {
-                        return
-                    }
-                    self.shortcutModeHandler.handlePressContextChanged(
-                        action: action,
-                        context: context
-                    )
                 }
             },
             onShortcutInterrupted: { [weak self] action, _ in
@@ -498,11 +477,7 @@ final class RecordingShortcutModeHandler {
     private let isRecorderVisible: @MainActor () -> Bool
     private let recordingState: @MainActor () -> VoiceInkRecordingState
     private let toggleMiniRecorder: @MainActor (UUID?) async -> Void
-    private let prepareQuickReleaseContext: @MainActor (UUID?) -> Void
-    private let discardQuickReleaseContext: @MainActor () -> Void
-    private let commitReadyRollingBufferPreload: @MainActor (UUID?) async -> Bool
     private let cancelRecording: @MainActor () async -> Void
-    private let specialHoldToRecordDelay: @MainActor () -> TimeInterval
 
     private var shortcutPressStartTime: TimeInterval?
     private var isHandsFreeRecording = false
@@ -510,11 +485,8 @@ final class RecordingShortcutModeHandler {
     private var activeRecordingShortcutAction: ShortcutAction?
     private var interruptedRecordingActions = Set<ShortcutAction>()
     private var activeShortcutCanCancelAccidentalStart = false
-    private var activeSpecialHoldRecordingAction: ShortcutAction?
     private var activeSpecialOptions = SpecialShortcutOptions()
-    private var activeShortcutPressContext = VoiceInkShortcutPressContext()
     private var lastShortcutPressTime: Date?
-    private var specialHoldToRecordTask: Task<Void, Never>?
 
     init(
         logger: Logger,
@@ -522,39 +494,24 @@ final class RecordingShortcutModeHandler {
         isRecorderVisible: @escaping @MainActor () -> Bool,
         recordingState: @escaping @MainActor () -> VoiceInkRecordingState,
         toggleMiniRecorder: @escaping @MainActor (UUID?) async -> Void,
-        prepareQuickReleaseContext: @escaping @MainActor (UUID?) -> Void = { _ in },
-        discardQuickReleaseContext: @escaping @MainActor () -> Void = {},
-        commitReadyRollingBufferPreload: @escaping @MainActor (UUID?) async -> Bool = { _ in false },
-        cancelRecording: @escaping @MainActor () async -> Void,
-        specialHoldToRecordDelay: @escaping @MainActor () -> TimeInterval = {
-            VoiceInkRollingBufferPreloadSettings.configuration().bufferDurationSeconds
-        }
+        cancelRecording: @escaping @MainActor () async -> Void
     ) {
         self.logger = logger
         self.canHandleShortcutAction = canHandleShortcutAction
         self.isRecorderVisible = isRecorderVisible
         self.recordingState = recordingState
         self.toggleMiniRecorder = toggleMiniRecorder
-        self.prepareQuickReleaseContext = prepareQuickReleaseContext
-        self.discardQuickReleaseContext = discardQuickReleaseContext
-        self.commitReadyRollingBufferPreload = commitReadyRollingBufferPreload
         self.cancelRecording = cancelRecording
-        self.specialHoldToRecordDelay = specialHoldToRecordDelay
     }
 
     func reset() {
-        specialHoldToRecordTask?.cancel()
-        specialHoldToRecordTask = nil
-        discardQuickReleaseContext()
         isShortcutPressed = false
         shortcutPressStartTime = nil
         isHandsFreeRecording = false
         activeRecordingShortcutAction = nil
         interruptedRecordingActions.removeAll()
         activeShortcutCanCancelAccidentalStart = false
-        activeSpecialHoldRecordingAction = nil
         activeSpecialOptions = SpecialShortcutOptions()
-        activeShortcutPressContext = VoiceInkShortcutPressContext()
     }
 
     func handleKeyDown(
@@ -581,17 +538,12 @@ final class RecordingShortcutModeHandler {
         activeRecordingShortcutAction = action
         activeShortcutCanCancelAccidentalStart = canCurrentShortcutPressCancelAccidentalStart
         activeSpecialOptions = specialOptions
-        activeShortcutPressContext = VoiceInkShortcutPressContext()
         lastShortcutPressTime = now
         shortcutPressStartTime = eventTime
 
         switch mode {
         case .special:
-            if canHandleShortcutAction(), !isRecorderVisible() {
-                prepareQuickReleaseContext(powerModeId)
-                scheduleSpecialHoldToRecord(action: action, powerModeId: powerModeId)
-            }
-            logger.notice("handleShortcutKeyDown: preloading special shortcut without starting recording")
+            await startRecordingIfNeeded(mode: mode, powerModeId: powerModeId)
 
         case .pushToTalk:
             await startRecordingIfNeeded(mode: mode, powerModeId: powerModeId)
@@ -625,19 +577,14 @@ final class RecordingShortcutModeHandler {
         isShortcutPressed = false
         activeRecordingShortcutAction = nil
         activeShortcutCanCancelAccidentalStart = false
-        specialHoldToRecordTask?.cancel()
-        specialHoldToRecordTask = nil
-
         switch mode {
         case .special:
             let pressDuration = shortcutPressStartTime.map { eventTime - $0 } ?? 0
             let options = activeSpecialOptions
-            activeShortcutPressContext = context
 
             if VoiceInkSpecialShortcutKeyEvidencePolicy.shouldDiscardShortcut(for: context) {
-                discardQuickReleaseContext()
-                if activeSpecialHoldRecordingAction == action, isRecorderVisible() {
-                    logger.notice("handleShortcutKeyUp: cancelling special hold recording; unsafe key evidence")
+                if isRecorderVisible() {
+                    logger.notice("handleShortcutKeyUp: cancelling special recording; unsafe key evidence")
                     await cancelRecording()
                 }
                 logger.notice("handleShortcutKeyUp: discarding special shortcut; unsafe key evidence")
@@ -649,13 +596,6 @@ final class RecordingShortcutModeHandler {
                 }
                 logger.notice("handleShortcutKeyUp: stopping recording (special shortcut, duration=\(pressDuration, privacy: .public)s)")
                 await toggleMiniRecorder(powerModeId)
-            } else {
-                if options.pasteLastTranscriptOnEmptyTap,
-                   VoiceInkSpecialShortcutEmptyFallbackPolicy.shouldScheduleFallback(pressDuration: pressDuration) {
-                    SpecialShortcutEmptyTranscriptionFallback.scheduleFallback()
-                }
-                logger.notice("handleShortcutKeyUp: committing preloaded special shortcut")
-                await commitPreloadedSpecialShortcut(powerModeId: powerModeId)
             }
 
         case .toggle:
@@ -683,21 +623,7 @@ final class RecordingShortcutModeHandler {
         }
 
         shortcutPressStartTime = nil
-        activeSpecialHoldRecordingAction = nil
         activeSpecialOptions = SpecialShortcutOptions()
-        activeShortcutPressContext = VoiceInkShortcutPressContext()
-    }
-
-    func handlePressContextChanged(action: ShortcutAction, context: VoiceInkShortcutPressContext) {
-        guard isShortcutPressed, activeRecordingShortcutAction == action else {
-            return
-        }
-
-        activeShortcutPressContext = context
-        if VoiceInkSpecialShortcutKeyEvidencePolicy.shouldDiscardShortcut(for: context) {
-            specialHoldToRecordTask?.cancel()
-            specialHoldToRecordTask = nil
-        }
     }
 
     func handleInterruption(action: ShortcutAction) async {
@@ -727,47 +653,4 @@ final class RecordingShortcutModeHandler {
         }
     }
 
-    private func scheduleSpecialHoldToRecord(action: ShortcutAction, powerModeId: UUID?) {
-        specialHoldToRecordTask?.cancel()
-
-        let delayNanoseconds = VoiceInkRecordingShortcutTimingPolicy.sleepNanoseconds(
-            delaySeconds: specialHoldToRecordDelay()
-        )
-        specialHoldToRecordTask = Task { @MainActor [weak self] in
-            do {
-                try await Task.sleep(nanoseconds: delayNanoseconds)
-            } catch {
-                return
-            }
-
-            await self?.startSpecialHoldRecordingIfNeeded(action: action, powerModeId: powerModeId)
-        }
-    }
-
-    private func startSpecialHoldRecordingIfNeeded(action: ShortcutAction, powerModeId: UUID?) async {
-        guard isShortcutPressed,
-              activeRecordingShortcutAction == action,
-              !isRecorderVisible(),
-              recordingState() == .idle,
-              canHandleShortcutAction(),
-              !VoiceInkSpecialShortcutKeyEvidencePolicy.shouldDiscardShortcut(for: activeShortcutPressContext) else {
-            return
-        }
-
-        logger.notice("handleShortcutHoldDelay: starting recording after special hold exceeded rolling buffer duration")
-        activeSpecialHoldRecordingAction = action
-        await toggleMiniRecorder(powerModeId)
-    }
-
-    private func commitPreloadedSpecialShortcut(powerModeId: UUID?) async {
-        guard canHandleShortcutAction() else {
-            discardQuickReleaseContext()
-            return
-        }
-        if await commitReadyRollingBufferPreload(powerModeId) {
-            return
-        }
-
-        discardQuickReleaseContext()
-    }
 }

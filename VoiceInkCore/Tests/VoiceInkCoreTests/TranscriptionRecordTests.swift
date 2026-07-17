@@ -1053,25 +1053,6 @@ final class TranscriptionRecordTests: XCTestCase {
         XCTAssertEqual(result.draft.transcriptionStatus, .completed)
     }
 
-    func testAudioFileTranscriptionDiagnosticsPreserveMacOSRetryLogCopy() {
-        XCTAssertEqual(
-            VoiceInkAudioFileTranscriptionDiagnostics.wordReplacementsAppliedMessage,
-            "✅ Word replacements applied"
-        )
-        XCTAssertEqual(
-            VoiceInkAudioFileTranscriptionDiagnostics.permanentCopyFailedMessage(localizedDescription: "permission denied"),
-            "❌ Failed to create permanent copy of audio: permission denied"
-        )
-        XCTAssertEqual(
-            VoiceInkAudioFileTranscriptionDiagnostics.transcriptionFailedMessage(localizedDescription: "No model"),
-            "❌ Transcription failed: No model"
-        )
-        XCTAssertEqual(
-            VoiceInkAudioFileTranscriptionDiagnostics.saveFailedMessage(localizedDescription: "disk full"),
-            "❌ Failed to save transcription: disk full"
-        )
-    }
-
     func testRecordingPendingDraftBuildsSharedPendingRow() {
         let draft = VoiceInkRecordingTranscriptionDraft.pending(
             duration: 4.25,

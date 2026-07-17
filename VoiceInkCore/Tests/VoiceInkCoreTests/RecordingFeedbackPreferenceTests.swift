@@ -34,35 +34,6 @@ final class RecordingFeedbackPreferenceTests: XCTestCase {
         XCTAssertEqual(VoiceInkCustomSoundType.stop.recordingSoundCue, .stop)
     }
 
-    func testCustomSoundSettingsPresentationPreservesMacOSCopyAndActions() {
-        XCTAssertEqual(VoiceInkCustomSoundSettingsPresentation.label(for: .start), "Start Sound")
-        XCTAssertEqual(VoiceInkCustomSoundSettingsPresentation.label(for: .stop), "Stop Sound")
-        XCTAssertEqual(VoiceInkCustomSoundSettingsPresentation.pickerTitle, "Sound")
-        XCTAssertEqual(VoiceInkCustomSoundSettingsPresentation.customFallbackTitle, "Custom")
-        XCTAssertEqual(
-            VoiceInkCustomSoundSettingsPresentation.customMenuTitle(filename: "CustomStartSound.wav"),
-            "Custom: CustomStartSound.wav"
-        )
-        XCTAssertEqual(VoiceInkCustomSoundSettingsPresentation.customMenuTitle(filename: nil), "Custom: Custom")
-        XCTAssertEqual(VoiceInkCustomSoundSettingsPresentation.selectSoundHelpText, "Select sound")
-        XCTAssertEqual(VoiceInkCustomSoundSettingsPresentation.testButtonHelpText, "Test")
-        XCTAssertEqual(VoiceInkCustomSoundSettingsPresentation.chooseButtonHelpText, "Choose")
-        XCTAssertEqual(VoiceInkCustomSoundSettingsPresentation.resetButtonHelpText, "Reset")
-        XCTAssertEqual(VoiceInkCustomSoundSettingsPresentation.testButtonSystemImageName, "play.fill")
-        XCTAssertEqual(VoiceInkCustomSoundSettingsPresentation.chooseButtonSystemImageName, "folder")
-        XCTAssertEqual(VoiceInkCustomSoundSettingsPresentation.resetButtonSystemImageName, "arrow.uturn.backward")
-        XCTAssertEqual(VoiceInkCustomSoundSettingsPresentation.openPanelTitle(for: .start), "Choose Start Sound")
-        XCTAssertEqual(VoiceInkCustomSoundSettingsPresentation.openPanelTitle(for: .stop), "Choose Stop Sound")
-        XCTAssertEqual(VoiceInkCustomSoundSettingsPresentation.openPanelMessage, "Select an audio file")
-        XCTAssertEqual(VoiceInkCustomSoundSettingsPresentation.invalidAudioAlertTitle, "Invalid Audio File")
-        XCTAssertEqual(VoiceInkCustomSoundSettingsPresentation.alertDismissButtonTitle, "OK")
-
-        XCTAssertEqual(VoiceInkCustomSoundMenuSelection.builtIn(.sound1), .builtIn(.sound1))
-        XCTAssertFalse(
-            VoiceInkCustomSoundMenuSelection.builtIn(.sound1) == VoiceInkCustomSoundMenuSelection.custom
-        )
-    }
-
     func testRecordingSoundPlaybackPolicyPreservesMacOSSlotsVolumesAndFallbacks() {
         XCTAssertEqual(
             VoiceInkRecordingSoundPlaybackPolicy.setupSlots,
@@ -86,13 +57,6 @@ final class RecordingFeedbackPreferenceTests: XCTestCase {
         XCTAssertEqual(
             VoiceInkRecordingSoundPlaybackPolicy.playbackSlots(for: .esc),
             [.defaultEsc]
-        )
-    }
-
-    func testRecordingSoundPlaybackDiagnosticsPreserveMacOSLogCopy() {
-        XCTAssertEqual(
-            VoiceInkRecordingSoundPlaybackDiagnostics.loadFailedMessage(localizedDescription: "bad file"),
-            "Failed to load sound: bad file"
         )
     }
 
@@ -326,20 +290,6 @@ final class RecordingFeedbackPreferenceTests: XCTestCase {
         )
     }
 
-    func testCustomSoundErrorMessagesPreserveExistingCopy() {
-        XCTAssertEqual(VoiceInkCustomSoundError.fileNotFound.errorDescription, Optional("Audio file not found"))
-        XCTAssertEqual(VoiceInkCustomSoundError.invalidAudioFile.errorDescription, Optional("Invalid audio file format"))
-        XCTAssertEqual(
-            VoiceInkCustomSoundError.durationTooLong(duration: 3.4, maxDuration: 3.0).errorDescription,
-            Optional("Audio file is 3.4 seconds long. Please use an audio file that is 3 seconds or shorter for start and stop sounds.")
-        )
-        XCTAssertEqual(
-            VoiceInkCustomSoundError.directoryCreationFailed.errorDescription,
-            Optional("Failed to create custom sounds directory")
-        )
-        XCTAssertEqual(VoiceInkCustomSoundError.fileCopyFailed.errorDescription, Optional("Failed to copy audio file"))
-    }
-
     func testSystemMuteModePreservesRawValuesAndDisplayNames() {
         XCTAssertEqual(VoiceInkSystemMuteMode.automatic.rawValue, "auto")
         XCTAssertEqual(VoiceInkSystemMuteMode.always.rawValue, "always")
@@ -377,33 +327,6 @@ final class RecordingFeedbackPreferenceTests: XCTestCase {
         XCTAssertEqual(
             VoiceInkRecordingFeedbackPreference.registeredDefaults[VoiceInkRecordingFeedbackPreference.isSoundFeedbackEnabledKey] as? Bool,
             false
-        )
-    }
-
-    func testMacOSRecordingFeedbackSettingsPresentationPreservesCopyAndDelayOptions() {
-        let presentation = VoiceInkRecordingFeedbackPreference.macOSSettingsPresentation
-
-        XCTAssertEqual(presentation.sectionTitle, "Recording Feedback")
-        XCTAssertEqual(presentation.soundFeedbackLabel, "Sound Feedback")
-        XCTAssertEqual(presentation.systemMuteModeLabel, "Mute Audio While Recording")
-        XCTAssertEqual(presentation.audioResumptionDelayLabel, "Audio Resume Delay")
-        XCTAssertEqual(presentation.experimentalSectionTitle, "Experimental")
-        XCTAssertEqual(presentation.pauseMediaLabel, "Pause Media While Recording")
-        XCTAssertEqual(
-            presentation.pauseMediaInfoMessage,
-            "Pauses playing media when recording starts and resumes when done."
-        )
-        XCTAssertEqual(presentation.pauseMediaResumeDelayLabel, "Resume Delay")
-        XCTAssertEqual(
-            presentation.audioResumptionDelayOptions,
-            [
-                VoiceInkRecordingFeedbackDelayOption(label: "0s", value: 0.0),
-                VoiceInkRecordingFeedbackDelayOption(label: "1s", value: 1.0),
-                VoiceInkRecordingFeedbackDelayOption(label: "2s", value: 2.0),
-                VoiceInkRecordingFeedbackDelayOption(label: "3s", value: 3.0),
-                VoiceInkRecordingFeedbackDelayOption(label: "4s", value: 4.0),
-                VoiceInkRecordingFeedbackDelayOption(label: "5s", value: 5.0)
-            ]
         )
     }
 

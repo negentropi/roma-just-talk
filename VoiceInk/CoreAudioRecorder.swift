@@ -33,73 +33,8 @@ struct PreRollStreamingEmissionGate {
     }
 }
 
-enum PCM16WAVFileWriter {
-    static func writeMono16k(_ data: Data, to url: URL) throws {
-        if FileManager.default.fileExists(atPath: url.path) {
-            try FileManager.default.removeItem(at: url)
-        }
-
-        var outputFormat = AudioStreamBasicDescription(
-            mSampleRate: VoiceInkPCM16Audio.mono16kSampleRate,
-            mFormatID: kAudioFormatLinearPCM,
-            mFormatFlags: kAudioFormatFlagIsSignedInteger | kAudioFormatFlagIsPacked,
-            mBytesPerPacket: UInt32(VoiceInkPCM16Audio.bytesPerSample),
-            mFramesPerPacket: 1,
-            mBytesPerFrame: UInt32(VoiceInkPCM16Audio.bytesPerSample),
-            mChannelsPerFrame: UInt32(VoiceInkPCM16Audio.monoChannelCount),
-            mBitsPerChannel: UInt32(VoiceInkPCM16Audio.bitsPerSample),
-            mReserved: 0
-        )
-
-        var fileRef: ExtAudioFileRef?
-        var status = ExtAudioFileCreateWithURL(
-            url as CFURL,
-            kAudioFileWAVEType,
-            &outputFormat,
-            nil,
-            AudioFileFlags.eraseFile.rawValue,
-            &fileRef
-        )
-        guard status == noErr, let fileRef else {
-            throw CoreAudioRecorderError.failedToCreateFile(status: status)
-        }
-
-        defer { ExtAudioFileDispose(fileRef) }
-
-        status = ExtAudioFileSetProperty(
-            fileRef,
-            kExtAudioFileProperty_ClientDataFormat,
-            UInt32(MemoryLayout<AudioStreamBasicDescription>.size),
-            &outputFormat
-        )
-        guard status == noErr else {
-            throw CoreAudioRecorderError.failedToSetFileFormat(status: status)
-        }
-
-        guard data.count >= VoiceInkPCM16Audio.bytesPerSample else { return }
-        let frameCount = UInt32(VoiceInkPCM16Audio.sampleCount(inData: data))
-        var mutableData = data
-        let writeStatus: OSStatus = mutableData.withUnsafeMutableBytes { rawBuffer in
-            var outputBufferList = AudioBufferList(
-                mNumberBuffers: 1,
-                mBuffers: AudioBuffer(
-                    mNumberChannels: UInt32(VoiceInkPCM16Audio.monoChannelCount),
-                    mDataByteSize: frameCount * UInt32(VoiceInkPCM16Audio.bytesPerSample),
-                    mData: rawBuffer.baseAddress
-                )
-            )
-            return ExtAudioFileWrite(fileRef, frameCount, &outputBufferList)
-        }
-
-        guard writeStatus == noErr else {
-            throw CoreAudioRecorderError.failedToWriteFile(status: writeStatus)
-        }
-    }
-}
-
 // MARK: - Core Audio Recorder (AUHAL-based, does not change system default device)
 final class CoreAudioRecorder: @unchecked Sendable {
-
     // MARK: - Properties
 
     private let logger = Logger(
@@ -115,10 +50,9 @@ final class CoreAudioRecorder: @unchecked Sendable {
     private var isRecording = false
     private var currentDeviceID: AudioDeviceID = 0
     private var recordingURL: URL?
-    private let preRollSampleRate = VoiceInkPCM16Audio.mono16kSampleRateHz
     private let preRollBuffer = VoiceInkPCM16PreRollBuffer(
         sampleRate: VoiceInkPCM16Audio.mono16kSampleRateHz,
-        durationSeconds: VoiceInkRollingBufferPreloadSettings.defaultBufferDurationSeconds
+        durationSeconds: VoiceInkAudioPreRollPolicy.durationSeconds
     )
     private let preRollStreamingChunkBytes = VoiceInkPCM16Audio.byteCount(forMono16kDuration: 0.1)
     private var preRollStreamingGate = PreRollStreamingEmissionGate()
@@ -155,8 +89,6 @@ final class CoreAudioRecorder: @unchecked Sendable {
 
     /// Called on the audio thread with raw PCM data (16-bit, 16kHz, mono) for streaming.
     var onAudioChunk: ((_ data: Data) -> Void)?
-    /// Called on the audio thread with raw PCM data while the rolling buffer is warm.
-    var onRollingAudioChunk: ((_ data: Data) -> Void)?
 
     // MARK: - Initialization
 
@@ -191,7 +123,6 @@ final class CoreAudioRecorder: @unchecked Sendable {
         }
 
         currentDeviceID = deviceID
-        reloadPreRollBufferSettings()
         preRollBuffer.clear()
 
         logger.notice("🎙️ Starting pre-roll buffering from device \(deviceID, privacy: .public)")
@@ -225,8 +156,6 @@ final class CoreAudioRecorder: @unchecked Sendable {
 
         if !isCapturing || currentDeviceID != deviceID {
             try startPreBuffering(deviceID: deviceID)
-        } else {
-            reloadPreRollBufferSettings()
         }
 
         logger.notice("🎙️ Starting recording from device \(deviceID, privacy: .public)")
@@ -863,7 +792,6 @@ final class CoreAudioRecorder: @unchecked Sendable {
         )
 
         preRollBuffer.append(outputBuffer, sampleCount: Int(outputFrameCount))
-        let rollingAudioChunkHandler = onRollingAudioChunk
         var audioChunkData: Data?
         var audioChunkHandler: ((_ data: Data) -> Void)?
         var queuedForPreRollStreaming = false
@@ -892,17 +820,7 @@ final class CoreAudioRecorder: @unchecked Sendable {
             if !queuedForPreRollStreaming {
                 audioChunkHandler?(audioChunkData)
             }
-            rollingAudioChunkHandler?(audioChunkData)
-        } else if let rollingAudioChunkHandler {
-            let byteCount = Int(outputFrameCount) * VoiceInkPCM16Audio.bytesPerSample
-            let data = Data(bytes: outputBuffer, count: byteCount)
-            rollingAudioChunkHandler(data)
         }
-    }
-
-    func reloadPreRollBufferSettings() {
-        let duration = VoiceInkRollingBufferPreloadSettings.configuration().bufferDurationSeconds
-        preRollBuffer.resize(sampleRate: preRollSampleRate, durationSeconds: duration)
     }
 
     private func writePCMDataToFile(_ data: Data) throws {

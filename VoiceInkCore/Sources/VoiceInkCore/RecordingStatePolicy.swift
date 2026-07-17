@@ -2282,10 +2282,6 @@ public extension VoiceInkRecordingState {
         self == .starting || self == .recording
     }
 
-    var acceptsRollingBufferPreloadPreview: Bool {
-        self == .idle || self == .recording
-    }
-
     var acceptsRecordingShortcutAction: Bool {
         self != .transcribing &&
         self != .enhancing &&

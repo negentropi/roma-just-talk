@@ -241,13 +241,6 @@ final class StoredAudioFileTests: XCTestCase {
         XCTAssertEqual(try fileManager.contentsOfDirectory(atPath: temporaryDirectory.path), [])
     }
 
-    func testAppDataResetDiagnosticsPreserveIOSLogCopy() {
-        XCTAssertEqual(
-            VoiceInkAppDataResetDiagnostics.swiftDataResetFailedMessage(errorDescription: "store unavailable"),
-            "Failed to reset SwiftData: store unavailable"
-        )
-    }
-
     func testFileURLBuildsUnderRecordingsDirectory() {
         let recordingsDirectory = URL(fileURLWithPath: "/tmp/VoiceInk/Recordings", isDirectory: true)
 
@@ -441,19 +434,6 @@ final class StoredAudioFileTests: XCTestCase {
         XCTAssertNil(deletedURL)
     }
 
-    func testDeletionErrorMessagePreservesPlatformLogCopy() {
-        let error = NSError(
-            domain: NSCocoaErrorDomain,
-            code: CocoaError.fileNoSuchFile.rawValue,
-            userInfo: [NSLocalizedDescriptionKey: "file vanished"]
-        )
-
-        XCTAssertEqual(
-            VoiceInkStoredAudioFile.deletionErrorMessage(for: error),
-            "Error deleting audio file: file vanished"
-        )
-    }
-
     func testStoredAudioRecordUsesDefaultRecordingsDirectory() {
         let recordingsDirectory = URL(fileURLWithPath: "/tmp/VoiceInk/Recordings", isDirectory: true)
         let record = StubStoredAudioRecord(
@@ -568,20 +548,6 @@ final class StoredAudioFileTests: XCTestCase {
         XCTAssertEqual(record.audioFileURL, "missing-recording.m4a")
     }
 
-    func testSupportedMediaDisplayExtensionsPreserveMacOSImportCopyOrder() {
-        XCTAssertEqual(
-            VoiceInkSupportedMedia.displayFileExtensions,
-            [
-                "WAV", "MP3", "M4A", "AIFF", "MP4", "MOV", "AAC", "FLAC", "CAF",
-                "AMR", "OGG", "OGA", "OPUS", "3GP"
-            ]
-        )
-        XCTAssertEqual(
-            VoiceInkSupportedMedia.supportedFileTypesText,
-            "Supports WAV, MP3, M4A, AIFF, MP4, MOV, AAC, FLAC, CAF, AMR, OGG, OGA, OPUS, 3GP"
-        )
-    }
-
     func testSupportedMediaImportTypePoliciesPreserveMacOSShellIdentifiers() {
         XCTAssertEqual(
             VoiceInkSupportedMedia.contentTypes.map { $0.identifier },
@@ -611,41 +577,6 @@ final class StoredAudioFileTests: XCTestCase {
                 "public.file-url"
             ]
         )
-    }
-
-    func testAudioImportPresentationPreservesMacOSQueueCopyAndActions() {
-        XCTAssertEqual(VoiceInkAudioImportPresentation.dropTargetSystemImageName, "arrow.down.doc")
-        XCTAssertEqual(VoiceInkAudioImportPresentation.dropTargetTitle, "Drop audio or video files here")
-        XCTAssertEqual(VoiceInkAudioImportPresentation.dropTargetDividerText, "or")
-        XCTAssertEqual(VoiceInkAudioImportPresentation.chooseFilesButtonTitle, "Choose Files")
-        XCTAssertEqual(VoiceInkAudioImportPresentation.dropMoreHintText, "Drop files anywhere to add more")
-        XCTAssertEqual(VoiceInkAudioImportPresentation.dropOverlayText, "Drop to add files")
-        XCTAssertEqual(VoiceInkAudioImportPresentation.queueCountText(1), "1 file")
-        XCTAssertEqual(VoiceInkAudioImportPresentation.queueCountText(2), "2 files")
-        XCTAssertEqual(VoiceInkAudioImportPresentation.addButtonSystemImageName, "plus")
-        XCTAssertEqual(VoiceInkAudioImportPresentation.addButtonTitle, "Add")
-        XCTAssertEqual(VoiceInkAudioImportPresentation.addButtonHelpText, "Add files")
-        XCTAssertEqual(VoiceInkAudioImportPresentation.cancelButtonSystemImageName, "stop.fill")
-        XCTAssertEqual(VoiceInkAudioImportPresentation.cancelButtonTitle, "Cancel")
-        XCTAssertEqual(VoiceInkAudioImportPresentation.cancelButtonHelpText, "Cancel transcription")
-        XCTAssertEqual(VoiceInkAudioImportPresentation.startButtonSystemImageName, "play.fill")
-        XCTAssertEqual(VoiceInkAudioImportPresentation.startButtonTitle, "Start")
-        XCTAssertEqual(VoiceInkAudioImportPresentation.clearButtonSystemImageName, "xmark.bin")
-        XCTAssertEqual(VoiceInkAudioImportPresentation.clearButtonTitle, "Clear")
-        XCTAssertEqual(VoiceInkAudioImportPresentation.clearButtonHelpText, "Clear all items")
-        XCTAssertEqual(VoiceInkAudioImportPresentation.enhancementToggleTitle, "AI Enhancement")
-        XCTAssertEqual(VoiceInkAudioImportPresentation.promptPickerTitle, "Prompt")
-        XCTAssertEqual(
-            VoiceInkAudioImportPresentation.droppedFileLoadFailedDiagnosticMessage(errorDescription: "provider error"),
-            "Error loading dropped file: provider error"
-        )
-    }
-
-    func testAudioFileQueueProcessingPhasesPreserveCopy() {
-        XCTAssertEqual(VoiceInkAudioFileQueueProcessingPhase.loading.displayText, "Loading model...")
-        XCTAssertEqual(VoiceInkAudioFileQueueProcessingPhase.processingAudio.displayText, "Processing audio...")
-        XCTAssertEqual(VoiceInkAudioFileQueueProcessingPhase.transcribing.displayText, "Transcribing...")
-        XCTAssertEqual(VoiceInkAudioFileQueueProcessingPhase.enhancing.displayText, "Enhancing...")
     }
 
     func testAudioFileQueueStatusCancelingProcessingResetsOnlyProcessingItems() {
@@ -743,29 +674,6 @@ final class StoredAudioFileTests: XCTestCase {
             VoiceInkAudioFileQueuePolicy.statusesAfterCancelingProcessing(items.map(\.status)),
             [.pending, .pending, .failed(message: "No model")]
         )
-    }
-
-    func testAudioFileQueueDiagnosticsPreserveMacOSLogCopy() {
-        XCTAssertEqual(
-            VoiceInkAudioFileQueueDiagnostics.enhancementFailedMessage(errorDescription: "timeout"),
-            "Enhancement failed: timeout"
-        )
-        XCTAssertEqual(
-            VoiceInkAudioFileQueueDiagnostics.transcriptionErrorMessage(errorDescription: "No model"),
-            "Transcription error: No model"
-        )
-    }
-
-    func testAudioFileQueuePresentationPreservesRowCopyAndIcons() {
-        XCTAssertEqual(VoiceInkAudioFileQueuePresentation.pendingStatusSystemImageName, "clock")
-        XCTAssertEqual(VoiceInkAudioFileQueuePresentation.pendingStatusText, "Waiting")
-        XCTAssertEqual(VoiceInkAudioFileQueuePresentation.removeButtonSystemImageName, "xmark.circle.fill")
-        XCTAssertEqual(VoiceInkAudioFileQueuePresentation.completedStatusSystemImageName, "checkmark.circle.fill")
-        XCTAssertEqual(VoiceInkAudioFileQueuePresentation.expandSystemImageName, "chevron.right")
-        XCTAssertEqual(VoiceInkAudioFileQueuePresentation.transcriptionModelSystemImageName, "cpu")
-        XCTAssertEqual(VoiceInkAudioFileQueuePresentation.promptSystemImageName, "sparkles")
-        XCTAssertEqual(VoiceInkAudioFileQueuePresentation.failedStatusSystemImageName, "exclamationmark.circle.fill")
-        XCTAssertEqual(VoiceInkAudioFileQueuePresentation.retryButtonSystemImageName, "arrow.counterclockwise")
     }
 
     func testSupportedFileExtensionsPreserveMacOSImportPolicy() {

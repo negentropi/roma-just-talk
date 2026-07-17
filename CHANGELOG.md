@@ -56,8 +56,7 @@
 - Added up to three seconds of audio pre-roll to iOS after capture has warmed, using the shared PCM pre-roll buffer without carrying over speculative transcription preload.
 - Prevented iOS from crashing after onboarding when the active audio route exposes no usable microphone format, returning a recorder-start failure before installing the AVAudioEngine tap.
 - Added configurable iOS microphone routing with system-managed routing on by default, optional preferred-input selection with system fallback, deferred preference-driven capture restarts during active recording, and the existing custom-device default preserved on macOS.
-- Kept buffered-snapshot quick releases on the recorded-file transcription path instead of starting a fresh streaming session after key-up, removing a measured post-key-up startup wait before text can paste.
-- Let held Special shortcuts promote to active recording after the rolling-buffer window, so holding the hotkey records beyond the default 3 seconds while short clean taps still use quick-release preload.
+- Removed the Preload feature—the speculative rolling-buffer VAD/STT and quick-release path—including its forced-streaming and cached-finalization shortcuts. Special shortcuts now start ordinary recording immediately on key-down, FluidAudio performs its normal final ASR pass, and the recorder retains its fixed 3-second audio pre-roll.
 - Boosted quiet macOS and iOS local Whisper recordings before transcription while leaving silence, noise-floor, continuous-noise, and sparse click-like audio unchanged, improving low-volume/privacy dictation without changing saved audio.
 - Reported malformed macOS local Whisper audio as an audio-processing failure instead of silently sending an empty sample buffer to Whisper.
 - Preserved existing shortcut settings when shortcut recording is canceled, rejected, interrupted by another recorder, or dismissed before a replacement is captured.
@@ -68,7 +67,6 @@
 - Kept imported iOS pending notes in a processing state instead of showing retry controls before transcription fails.
 - Prevented the completed iOS audio-import row from opening Share while navigating to transcript detail.
 - Stripped Codex follow-up JSON payloads from Local CLI enhancement output so transcript cleanup cannot paste assistant metadata into the target app.
-- Reworked Special shortcuts so Shift-down only arms the rolling-buffer commit path; Shift+typing, secure-input, and other unreliable key evidence now discard without starting audio, canceling, saving history, or writing recorder files.
 - Removed the unsafe Special Key Down and Special Flex settings that could start recording before the app knew whether the Shift press was just normal typing.
 - Fixed imported iOS note playback after recording so AirPods and other Bluetooth outputs keep a playback-owned audio session instead of being cut off by stale recording-session cleanup.
 - Moved the macOS first-launch Launch at Login default decision into shared core while leaving the LaunchAtLogin execution in the macOS shell.

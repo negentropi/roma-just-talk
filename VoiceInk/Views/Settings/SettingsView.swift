@@ -35,7 +35,6 @@ struct SettingsView: View {
     private static let recorderStylePresentation = VoiceInkRecorderStylePreference.macOSSettingsPresentation
     private static let recordingFeedbackPresentation = VoiceInkRecordingFeedbackPreference.macOSSettingsPresentation
     private static let pasteSettingsPresentation = VoiceInkPastePreference.macOSSettingsPresentation
-    private static let rollingBufferPresentation = VoiceInkRollingBufferPreloadSettings.macOSSettingsPresentation
     private static let resetOnboardingPresentation = VoiceInkMacOSOnboardingPresentation.resetSettingsAlert
     private static let settingsPresentation = VoiceInkMacOSSettingsPresentation.macOS
 
@@ -227,11 +226,6 @@ struct SettingsView: View {
                     }
                 }
                 .pickerStyle(.menu)
-            }
-
-            // MARK: - Rolling Buffer
-            Section(Self.rollingBufferPresentation.sectionTitle) {
-                RollingBufferPreloadSettingsControls()
             }
 
             // MARK: - Power Mode

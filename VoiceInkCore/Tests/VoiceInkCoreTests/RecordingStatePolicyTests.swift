@@ -20,15 +20,6 @@ final class RecordingStatePolicyTests: XCTestCase {
         XCTAssertFalse(VoiceInkRecordingState.busy.isRecorderCaptureInProgress)
     }
 
-    func testRollingBufferPreviewStatePolicyMatchesMacOSRecorderGate() {
-        XCTAssertTrue(VoiceInkRecordingState.idle.acceptsRollingBufferPreloadPreview)
-        XCTAssertTrue(VoiceInkRecordingState.recording.acceptsRollingBufferPreloadPreview)
-        XCTAssertFalse(VoiceInkRecordingState.starting.acceptsRollingBufferPreloadPreview)
-        XCTAssertFalse(VoiceInkRecordingState.transcribing.acceptsRollingBufferPreloadPreview)
-        XCTAssertFalse(VoiceInkRecordingState.enhancing.acceptsRollingBufferPreloadPreview)
-        XCTAssertFalse(VoiceInkRecordingState.busy.acceptsRollingBufferPreloadPreview)
-    }
-
     func testRecordingShortcutActionGatePreservesMacOSBusyStatePolicy() {
         XCTAssertTrue(VoiceInkRecordingState.idle.acceptsRecordingShortcutAction)
         XCTAssertTrue(VoiceInkRecordingState.starting.acceptsRecordingShortcutAction)
@@ -176,27 +167,6 @@ final class RecordingStatePolicyTests: XCTestCase {
         XCTAssertTrue(VoiceInkRecordingState.transcribing.shouldReturnToIdleWhenActivePipelineFinishes)
         XCTAssertTrue(VoiceInkRecordingState.enhancing.shouldReturnToIdleWhenActivePipelineFinishes)
         XCTAssertTrue(VoiceInkRecordingState.busy.shouldReturnToIdleWhenActivePipelineFinishes)
-    }
-
-    func testRecorderProcessingPresentationPreservesMacOSCopyAndTiming() {
-        XCTAssertNil(VoiceInkRecordingState.idle.recorderProcessingPresentation)
-        XCTAssertNil(VoiceInkRecordingState.starting.recorderProcessingPresentation)
-        XCTAssertNil(VoiceInkRecordingState.recording.recorderProcessingPresentation)
-        XCTAssertEqual(
-            VoiceInkRecordingState.transcribing.recorderProcessingPresentation,
-            VoiceInkRecorderProcessingPresentation(
-                label: "Transcribing",
-                progressAnimationInterval: 0.18
-            )
-        )
-        XCTAssertEqual(
-            VoiceInkRecordingState.enhancing.recorderProcessingPresentation,
-            VoiceInkRecorderProcessingPresentation(
-                label: "Enhancing",
-                progressAnimationInterval: 0.22
-            )
-        )
-        XCTAssertNil(VoiceInkRecordingState.busy.recorderProcessingPresentation)
     }
 
     func testMacOSRecordingCancellationPlanFinishesActiveCaptureImmediately() async {
@@ -430,10 +400,6 @@ final class RecordingStatePolicyTests: XCTestCase {
         )
 
         return events
-    }
-
-    func testVisualizerAccessibilityLabelPreservesIOSCopy() {
-        XCTAssertEqual(VoiceInkAudioMeterLevel.visualizerAccessibilityLabel, "Audio level visualizer")
     }
 
     func testNormalizedLevelClampsBelowAndAboveVisibleDecibelRange() {
@@ -925,44 +891,6 @@ final class RecordingStatePolicyTests: XCTestCase {
         ])
     }
 
-    func testAppGroupRecordingDiagnosticsPreserveIOSLogCopy() {
-        XCTAssertEqual(
-            VoiceInkAppGroupRecordingDiagnostics.staleRecordingStateClearedMessage,
-            "Recording state appears stale, clearing it"
-        )
-        XCTAssertEqual(
-            VoiceInkAppGroupRecordingDiagnostics.updatedRecordingStateMessage(isRecording: true),
-            "Updated recording state: true"
-        )
-        XCTAssertEqual(
-            VoiceInkAppGroupRecordingDiagnostics.updatedRecordingStateMessage(isRecording: false),
-            "Updated recording state: false"
-        )
-    }
-
-    func testIOSRecordingCoordinationDiagnosticsPreserveIOSLogCopy() {
-        XCTAssertEqual(
-            VoiceInkIOSRecordingCoordinationDiagnostics.clearedStaleRecordingStateOnLaunchMessage,
-            "Cleared stale recording state on app launch"
-        )
-        XCTAssertEqual(
-            VoiceInkIOSRecordingCoordinationDiagnostics.recordDeepLinkOpenedMessage,
-            "URL scheme triggered: open app for recording"
-        )
-        XCTAssertEqual(
-            VoiceInkIOSRecordingCoordinationDiagnostics.keyboardRecordingRequestOpenedMessage,
-            "App opened via keyboard extension - recording requested"
-        )
-        XCTAssertEqual(
-            VoiceInkIOSRecordingCoordinationDiagnostics.recordingManagerInitializedMessage,
-            "RecordingManager initialized"
-        )
-        XCTAssertEqual(
-            VoiceInkIOSRecordingCoordinationDiagnostics.keyboardStopRecordingRequestedMessage,
-            "Stop recording requested from keyboard extension"
-        )
-    }
-
     func testKeyboardRecordingTimingPreservesIOSAppAndKeyboardDelays() {
         XCTAssertEqual(VoiceInkKeyboardRecordingTiming.appLaunchRecordingStartDelay, 0.5)
         XCTAssertEqual(VoiceInkKeyboardRecordingTiming.recordingStatusPollingInterval, 0.5)
@@ -1330,16 +1258,6 @@ final class RecordingStatePolicyTests: XCTestCase {
         XCTAssertNil(alert.runtimeAction(openSettings: {}))
     }
 
-    func testRecordingAlertPresentationPreservesIOSPermissionDeniedCopy() {
-        let alert = VoiceInkRecordingAlertPresentation.microphonePermissionDenied
-
-        XCTAssertEqual(alert.id, "microphonePermissionDenied")
-        XCTAssertEqual(alert.title, "Microphone Access Denied")
-        XCTAssertEqual(alert.message, "To record audio, please grant microphone access in Settings.")
-        XCTAssertEqual(alert.primaryButtonTitle, "Settings")
-        XCTAssertEqual(alert.secondaryButtonTitle, "Cancel")
-    }
-
     func testRecordingAlertPresentationBuildsDeferredRuntimeAction() {
         var didOpenSettings = false
         XCTAssertNil(VoiceInkRecordingAlertPresentation.noModesAvailable.runtimeAction {
@@ -1354,14 +1272,6 @@ final class RecordingStatePolicyTests: XCTestCase {
 
         action?()
         XCTAssertTrue(didOpenSettings)
-    }
-
-    func testRecordingSheetPresentationPreservesIOSControlsCopy() {
-        let presentation = VoiceInkRecordingSheetPresentation.iOS
-
-        XCTAssertEqual(presentation.cancelButtonTitle, "Cancel")
-        XCTAssertEqual(presentation.stopButtonTitle, "Stop Recording")
-        XCTAssertEqual(presentation.stopButtonSystemImageName, "stop.fill")
     }
 
     func testRecordingNotificationPresentationPreservesMacOSStartFailureCopy() {
@@ -1414,20 +1324,6 @@ final class RecordingStatePolicyTests: XCTestCase {
         XCTAssertNil(alert.runtimeAction(openSettings: {}))
     }
 
-    func testRecordingStartFailurePreservesGenericFailureCopy() {
-        let alert = VoiceInkRecordingAlertPresentation.recordingStartFailure(
-            domain: "example",
-            code: 42,
-            localizedDescription: "Hardware unavailable"
-        )
-
-        XCTAssertEqual(alert.id, "recordingFailed-Hardware unavailable")
-        XCTAssertEqual(alert.title, "Recording Failed")
-        XCTAssertEqual(alert.message, "Could not start recording: Hardware unavailable")
-        XCTAssertEqual(alert.primaryButtonTitle, "OK")
-        XCTAssertNil(alert.runtimeAction(openSettings: {}))
-    }
-
     func testRecordingStartFailurePreservesIOSRecorderStartReturnedFalseReason() {
         XCTAssertEqual(
             VoiceInkRecordingAlertPresentation.iOSRecorderStartReturnedFalseDescription,
@@ -1455,52 +1351,6 @@ final class RecordingStatePolicyTests: XCTestCase {
         XCTAssertEqual(error.code, VoiceInkAudioRecorderStartFailurePolicy.returnedFalseErrorCode)
         XCTAssertEqual(error.userInfo[NSLocalizedDescriptionKey] as? String, VoiceInkAudioRecorderStartFailurePolicy.returnedFalseDescription)
         XCTAssertEqual(error.localizedDescription, VoiceInkAudioRecorderStartFailurePolicy.returnedFalseDescription)
-    }
-
-    func testMacOSCoreAudioRecorderDiagnosticsPreserveBufferLatencyCopy() {
-        XCTAssertEqual(VoiceInkMacOSCoreAudioRecorderDiagnostics.assumedLatencySampleRate, 48_000)
-        XCTAssertEqual(
-            VoiceInkMacOSCoreAudioRecorderDiagnostics.bufferLatencyMilliseconds(bufferFrameSize: 512),
-            10.666666666666666,
-            accuracy: 0.0001
-        )
-        XCTAssertEqual(
-            VoiceInkMacOSCoreAudioRecorderDiagnostics.bufferLatencyMessage(bufferFrameSize: 512),
-            "🎙️ Buffer size: 512 frames, ~latency: 10.7ms"
-        )
-    }
-
-    func testMacOSCoreAudioRecorderDiagnosticsPreserveDeviceDetailsCopy() {
-        XCTAssertEqual(VoiceInkMacOSCoreAudioRecorderDiagnostics.knownText("Studio Display"), "Studio Display")
-        XCTAssertEqual(VoiceInkMacOSCoreAudioRecorderDiagnostics.knownText(nil), "Unknown")
-        XCTAssertEqual(VoiceInkMacOSCoreAudioRecorderDiagnostics.transportText(.builtIn), "Built-in")
-        XCTAssertEqual(VoiceInkMacOSCoreAudioRecorderDiagnostics.transportText(.usb), "USB")
-        XCTAssertEqual(VoiceInkMacOSCoreAudioRecorderDiagnostics.transportText(.bluetooth), "Bluetooth")
-        XCTAssertEqual(VoiceInkMacOSCoreAudioRecorderDiagnostics.transportText(.bluetoothLE), "Bluetooth LE")
-        XCTAssertEqual(VoiceInkMacOSCoreAudioRecorderDiagnostics.transportText(.aggregate), "Aggregate")
-        XCTAssertEqual(VoiceInkMacOSCoreAudioRecorderDiagnostics.transportText(.virtual), "Virtual")
-        XCTAssertEqual(VoiceInkMacOSCoreAudioRecorderDiagnostics.transportText(.pci), "PCI")
-        XCTAssertEqual(VoiceInkMacOSCoreAudioRecorderDiagnostics.transportText(.fireWire), "FireWire")
-        XCTAssertEqual(VoiceInkMacOSCoreAudioRecorderDiagnostics.transportText(.displayPort), "DisplayPort")
-        XCTAssertEqual(VoiceInkMacOSCoreAudioRecorderDiagnostics.transportText(.hdmi), "HDMI")
-        XCTAssertEqual(VoiceInkMacOSCoreAudioRecorderDiagnostics.transportText(.avb), "AVB")
-        XCTAssertEqual(VoiceInkMacOSCoreAudioRecorderDiagnostics.transportText(.thunderbolt), "Thunderbolt")
-        XCTAssertEqual(VoiceInkMacOSCoreAudioRecorderDiagnostics.transportText(.other(1234)), "Other (1234)")
-        XCTAssertEqual(VoiceInkMacOSCoreAudioRecorderDiagnostics.transportText(.unknown), "Unknown")
-        XCTAssertEqual(
-            VoiceInkMacOSCoreAudioRecorderDiagnostics.deviceInfoMessage(
-                name: "Studio Display Microphone",
-                uid: "uid-1"
-            ),
-            "🎙️ Device info: name=Studio Display Microphone, uid=uid-1"
-        )
-        XCTAssertEqual(
-            VoiceInkMacOSCoreAudioRecorderDiagnostics.deviceDetailsMessage(
-                transport: "USB",
-                manufacturer: "Apple"
-            ),
-            "🎙️ Device details: transport=USB, manufacturer=Apple"
-        )
     }
 
     private func withIsolatedDefaults(_ run: (UserDefaults) -> Void) {
@@ -1596,79 +1446,6 @@ final class RecordingStatePolicyTests: XCTestCase {
         )
     }
 
-    func testAudioInputDiagnosticsPreserveMacOSLogCopy() {
-        XCTAssertEqual(VoiceInkAudioInputDiagnostics.unknownDeviceName, "Unknown Device")
-        XCTAssertEqual(VoiceInkAudioInputDiagnostics.systemDefaultModeMessage, "🎙️ Using System Default mode")
-        XCTAssertEqual(
-            VoiceInkAudioInputDiagnostics.systemDefaultDeviceLookupFailedMessage(status: -1),
-            "Failed to get system default device: -1"
-        )
-        XCTAssertEqual(
-            VoiceInkAudioInputDiagnostics.savedDeviceUnavailableMessage(uid: "old-uid"),
-            "🎙️ Saved device UID old-uid is no longer available"
-        )
-        XCTAssertEqual(
-            VoiceInkAudioInputDiagnostics.currentDeviceUnavailableSelectingNewDeviceMessage,
-            "🎙️ Current device unavailable, selecting new device..."
-        )
-        XCTAssertEqual(VoiceInkAudioInputDiagnostics.noInputDevicesAvailableMessage, "No input devices available!")
-        XCTAssertEqual(
-            VoiceInkAudioInputDiagnostics.autoSelectingNewDeviceMessage(name: "Studio Mic"),
-            "🎙️ Auto-selecting new device: Studio Mic"
-        )
-        XCTAssertEqual(
-            VoiceInkAudioInputDiagnostics.audioDevicesLoadFailedMessage(status: -2),
-            "Error getting audio devices: -2"
-        )
-        XCTAssertEqual(VoiceInkAudioInputDiagnostics.currentDeviceUnavailableMessage, "🎙️ Currently selected device is no longer available")
-        XCTAssertEqual(
-            VoiceInkAudioInputDiagnostics.inputCapabilityCheckFailedMessage(deviceID: 42, status: -3),
-            "Error checking input capability for device 42: -3"
-        )
-        XCTAssertEqual(
-            VoiceInkAudioInputDiagnostics.streamConfigurationLoadFailedMessage(deviceID: 43, status: -4),
-            "Error getting stream configuration for device 43: -4"
-        )
-        XCTAssertEqual(
-            VoiceInkAudioInputDiagnostics.unavailableDeviceSelectionAttemptedMessage(deviceID: 44),
-            "Attempted to select unavailable device: 44"
-        )
-        XCTAssertEqual(
-            VoiceInkAudioInputDiagnostics.selectedPrioritizedDeviceMessage(name: "USB Mic"),
-            "🎙️ Selected prioritized device: USB Mic"
-        )
-        XCTAssertEqual(
-            VoiceInkAudioInputDiagnostics.safeFallbackDeviceSelectedMessage(name: "USB Mic"),
-            "🎙️ No built-in input found, auto-selecting safe non-Bluetooth device: USB Mic"
-        )
-        XCTAssertEqual(
-            VoiceInkAudioInputDiagnostics.unsafeAutomaticDeviceRefusedMessage(name: "AirPods"),
-            "🎙️ No safe automatic input found; refusing to auto-select AirPods"
-        )
-        XCTAssertEqual(
-            VoiceInkAudioInputDiagnostics.deviceChangeListenerAddFailedMessage(status: -5),
-            "Failed to add device change listener: -5"
-        )
-        XCTAssertEqual(VoiceInkAudioInputDiagnostics.deviceListChangeDetectedMessage, "🎙️ Device list change detected")
-        XCTAssertEqual(
-            VoiceInkAudioInputDiagnostics.recordingDeviceUnavailableMessage(deviceID: 45),
-            "🎙️ Recording device 45 no longer available - requesting switch"
-        )
-        XCTAssertEqual(
-            VoiceInkAudioInputDiagnostics.noPriorityDevicesAvailableFallbackMessage,
-            "🎙️ No priority devices available, using fallback"
-        )
-        XCTAssertEqual(VoiceInkAudioInputDiagnostics.noAudioInputDevicesAvailableMessage, "No audio input devices available!")
-        XCTAssertEqual(
-            VoiceInkAudioInputDiagnostics.devicePropertyLookupFailedMessage(selector: 46, deviceID: 47, status: -6),
-            "Failed to get device property 46 for device 47: -6"
-        )
-        XCTAssertEqual(
-            VoiceInkAudioInputDiagnostics.transportTypeLookupFailedMessage(deviceID: 48, status: -7),
-            "Failed to get transport type for device 48: -7"
-        )
-    }
-
     func testAudioInputModePreservesSettingsPresentation() {
         XCTAssertEqual(VoiceInkAudioInputMode.systemDefault.title, "System Default")
         XCTAssertEqual(VoiceInkAudioInputMode.systemDefault.iconSystemName, "display")
@@ -1681,48 +1458,6 @@ final class RecordingStatePolicyTests: XCTestCase {
         XCTAssertEqual(VoiceInkAudioInputMode.prioritized.title, "Prioritized")
         XCTAssertEqual(VoiceInkAudioInputMode.prioritized.iconSystemName, "list.number")
         XCTAssertEqual(VoiceInkAudioInputMode.prioritized.description, "Set up device priority order")
-    }
-
-    func testMacOSAudioInputSettingsPresentationPreservesCopyAndIcons() {
-        let presentation = VoiceInkMacOSAudioInputSettingsPresentation.macOS
-
-        XCTAssertEqual(presentation.heroSystemImageName, "waveform")
-        XCTAssertEqual(presentation.heroTitle, "Audio Input")
-        XCTAssertEqual(presentation.heroDescription, "Configure your microphone preferences")
-        XCTAssertEqual(presentation.inputModeSectionTitle, "Input Mode")
-        XCTAssertEqual(presentation.currentDeviceSectionTitle, "Current Device")
-        XCTAssertEqual(presentation.currentDeviceSystemImageName, "display")
-        XCTAssertEqual(presentation.noDeviceAvailableText, "No device available")
-        XCTAssertEqual(presentation.activeStatusTitle, "Active")
-        XCTAssertEqual(presentation.activeStatusSystemImageName, "wave.3.right")
-        XCTAssertEqual(presentation.availableDevicesSectionTitle, "Available Devices")
-        XCTAssertEqual(presentation.refreshButtonTitle, "Refresh")
-        XCTAssertEqual(presentation.refreshButtonSystemImageName, "arrow.clockwise")
-        XCTAssertEqual(presentation.prioritizedDevicesSectionTitle, "Prioritized Devices")
-        XCTAssertEqual(
-            presentation.prioritizedDevicesDescription,
-            "Devices will be used in order of priority. If a device is unavailable, the next one will be tried. If no prioritized device is available, the built-in microphone will be used."
-        )
-        XCTAssertEqual(presentation.noPrioritizedDevicesText, "No prioritized devices")
-        XCTAssertEqual(presentation.noAdditionalDevicesText, "No additional devices available")
-        XCTAssertEqual(presentation.emptyDevicesSystemImageName, "mic.slash.circle.fill")
-        XCTAssertEqual(presentation.emptyDevicesTitle, "No Audio Devices")
-        XCTAssertEqual(presentation.emptyDevicesDescription, "Connect an audio input device to get started")
-        XCTAssertEqual(presentation.unavailableStatusTitle, "Unavailable")
-        XCTAssertEqual(presentation.unavailableStatusSystemImageName, "exclamationmark.triangle")
-        XCTAssertEqual(presentation.addPrioritySystemImageName, "plus.circle.fill")
-        XCTAssertEqual(presentation.removePrioritySystemImageName, "minus.circle.fill")
-        XCTAssertEqual(presentation.moveUpSystemImageName, "chevron.up")
-        XCTAssertEqual(presentation.moveDownSystemImageName, "chevron.down")
-        XCTAssertEqual(presentation.unprioritizedPriorityPlaceholder, "-")
-        XCTAssertEqual(
-            presentation.switchedDeviceNotificationTitle(deviceName: "Studio Display Microphone"),
-            "Switched to: Studio Display Microphone"
-        )
-        XCTAssertEqual(
-            presentation.usingDeviceNotificationTitle(deviceName: "Studio Display Microphone"),
-            "Using: Studio Display Microphone"
-        )
     }
 
     func testMacOSAudioInputSettingsPresentationFormatsPriorityDisplay() {

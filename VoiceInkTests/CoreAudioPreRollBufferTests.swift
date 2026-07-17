@@ -1,5 +1,4 @@
 import Foundation
-import AVFoundation
 import Testing
 @testable import VoiceInk
 
@@ -38,23 +37,5 @@ struct CoreAudioPreRollBufferTests {
 
         #expect(flushedChunks.isEmpty)
         #expect(!queuedAfterCancel)
-    }
-
-    @Test func pcmWriterCreatesReadableWAVFile() throws {
-        let url = FileManager.default.temporaryDirectory
-            .appendingPathComponent("voiceink-pcm-writer-\(UUID().uuidString).wav")
-        defer { try? FileManager.default.removeItem(at: url) }
-
-        let values: [Int16] = [0, 1_000, -1_000, 0]
-        let data = values.withUnsafeBytes { rawBuffer in
-            Data(bytes: rawBuffer.baseAddress!, count: rawBuffer.count)
-        }
-
-        try PCM16WAVFileWriter.writeMono16k(data, to: url)
-
-        let file = try AVAudioFile(forReading: url)
-        #expect(file.fileFormat.sampleRate == 16_000)
-        #expect(file.fileFormat.channelCount == 1)
-        #expect(file.length == AVAudioFramePosition(values.count))
     }
 }

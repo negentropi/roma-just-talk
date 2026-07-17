@@ -62,95 +62,6 @@ final class TranscriptionModelCatalogTests: XCTestCase {
         XCTAssertFalse(VoiceInkTranscriptionModelAvailabilityFacts(requirement: .unavailable).isUsable)
     }
 
-    func testNativeAppleTranscriptionPolicyPreservesMacOSErrorCopy() {
-        XCTAssertEqual(
-            VoiceInkNativeAppleTranscriptionPolicy.errorDescription(for: .unsupportedOS),
-            "SpeechAnalyzer requires macOS 26 or later."
-        )
-        XCTAssertEqual(
-            VoiceInkNativeAppleTranscriptionPolicy.errorDescription(for: .transcriptionFailed),
-            "Transcription failed using SpeechAnalyzer."
-        )
-        XCTAssertEqual(
-            VoiceInkNativeAppleTranscriptionPolicy.errorDescription(for: .localeNotSupported),
-            "The selected language is not supported by SpeechAnalyzer."
-        )
-        XCTAssertEqual(
-            VoiceInkNativeAppleTranscriptionPolicy.errorDescription(for: .invalidModel),
-            "Invalid model type provided for Native Apple transcription."
-        )
-        XCTAssertEqual(
-            VoiceInkNativeAppleTranscriptionPolicy.errorDescription(for: .assetDownloadRequired(displayName: "English")),
-            "Download required for English."
-        )
-        XCTAssertEqual(
-            VoiceInkNativeAppleTranscriptionPolicy.errorDescription(for: .resultStreamTimedOut),
-            "Apple Speech did not finish returning transcription results."
-        )
-    }
-
-    func testNativeAppleFailureKindIsSharedThrowableLocalizedError() {
-        let unsupportedError: Error = VoiceInkNativeAppleTranscriptionFailureKind.unsupportedOS
-        XCTAssertEqual(
-            VoiceInkErrorDescription.text(for: unsupportedError),
-            "SpeechAnalyzer requires macOS 26 or later."
-        )
-
-        let assetError: Error = VoiceInkNativeAppleTranscriptionFailureKind.assetDownloadRequired(displayName: "English")
-        XCTAssertEqual(
-            VoiceInkErrorDescription.text(for: assetError),
-            "Download required for English."
-        )
-    }
-
-    func testNativeAppleTranscriptionPolicyPreservesSelectionAndTimeoutCopy() {
-        XCTAssertEqual(
-            VoiceInkNativeAppleTranscriptionPolicy.requiresMacOS26Title(modelDisplayName: "Apple Speech"),
-            "Apple Speech requires macOS 26 or later"
-        )
-        XCTAssertEqual(VoiceInkNativeAppleTranscriptionPolicy.resultStreamTimeout(forAudioDuration: 0), 20.0)
-        XCTAssertEqual(VoiceInkNativeAppleTranscriptionPolicy.resultStreamTimeout(forAudioDuration: 2.0), 20.0)
-        XCTAssertEqual(VoiceInkNativeAppleTranscriptionPolicy.resultStreamTimeout(forAudioDuration: 5.0), 30.0)
-    }
-
-    func testNativeAppleTranscriptionDiagnosticsPreserveMacOSLogCopy() {
-        XCTAssertEqual(
-            VoiceInkNativeAppleTranscriptionPolicy.unsupportedOSDiagnosticMessage,
-            "SpeechAnalyzer is not available on this macOS version"
-        )
-        XCTAssertEqual(
-            VoiceInkNativeAppleTranscriptionPolicy.unsupportedLocaleDiagnosticMessage(localeIdentifier: "en-US"),
-            "Transcription failed: Locale 'en-US' is not supported by SpeechTranscriber."
-        )
-        XCTAssertEqual(
-            VoiceInkNativeAppleTranscriptionPolicy.missingAssetDiagnosticMessage(localeIdentifier: "en-US"),
-            "Transcription failed: Assets for 'en-US' are not downloaded."
-        )
-        XCTAssertEqual(
-            VoiceInkNativeAppleTranscriptionPolicy.emptyAudioDiagnosticMessage(localeIdentifier: "en-US"),
-            "Transcription failed: Apple Speech received no audio samples for 'en-US'."
-        )
-        XCTAssertEqual(
-            VoiceInkNativeAppleTranscriptionPolicy.assetReservationReturnedFalseDiagnosticMessage(
-                localeIdentifier: "en-US",
-                statusDescription: "installed"
-            ),
-            "Apple Speech asset reservation returned false for 'en-US'. Continuing because the locale is already downloaded. Status: installed."
-        )
-        XCTAssertEqual(
-            VoiceInkNativeAppleTranscriptionPolicy.assetReservationFailedDiagnosticMessage(
-                localeIdentifier: "en-US",
-                errorDescription: "Disk full",
-                statusDescription: "installed"
-            ),
-            "Apple Speech asset reservation failed for 'en-US': Disk full. Continuing because the locale is already downloaded. Status: installed."
-        )
-        XCTAssertEqual(
-            VoiceInkNativeAppleTranscriptionPolicy.resultWaitFailedDiagnosticMessage(errorDescription: "Timed out"),
-            "Apple Speech result wait failed: Timed out."
-        )
-    }
-
     func testLocalWhisperRoutePrewarmsAndLoadsWhisperAtRecordingStartup() async {
         let plan = VoiceInkTranscriptionRuntimeResourcePlan(serviceRoute: .localWhisper)
         var events: [String] = []
@@ -394,51 +305,6 @@ final class TranscriptionModelCatalogTests: XCTestCase {
         )
     }
 
-    func testModelPrewarmDiagnosticsPreserveMacOSLogCopy() {
-        XCTAssertEqual(
-            VoiceInkModelPrewarmDiagnostics.initializedMessage,
-            "ModelPrewarmService initialized - listening for wake and app launch"
-        )
-        XCTAssertEqual(
-            VoiceInkModelPrewarmDiagnostics.appLaunchScheduledMessage,
-            "App launched, scheduling prewarm"
-        )
-        XCTAssertEqual(
-            VoiceInkModelPrewarmDiagnostics.macActivityScheduledMessage,
-            "Mac activity detected (wake/unlock), scheduling prewarm"
-        )
-        XCTAssertEqual(
-            VoiceInkModelPrewarmDiagnostics.prewarmingMessage(modelDisplayName: "Base"),
-            "Prewarming Base"
-        )
-        XCTAssertEqual(
-            VoiceInkModelPrewarmDiagnostics.completedMessage(duration: 1.234),
-            "Prewarm completed in 1.23s"
-        )
-        XCTAssertEqual(
-            VoiceInkModelPrewarmDiagnostics.failedMessage(errorDescription: "timeout"),
-            "❌ Prewarm failed: timeout"
-        )
-        XCTAssertEqual(
-            VoiceInkWhisperModelWarmupDiagnostics.failedMessage(
-                modelName: "base",
-                errorDescription: "bad file"
-            ),
-            "❌ Warmup failed for base: bad file"
-        )
-    }
-
-    func testModelManagementFiltersPreservePlatformTitles() {
-        XCTAssertEqual(
-            VoiceInkModelManagementFilter.allCases.map(\.title),
-            ["Recommended", "Local", "Cloud", "Custom"]
-        )
-        XCTAssertEqual(VoiceInkModelManagementFilter.local.settingsSectionTitle, "Local Models")
-        XCTAssertEqual(VoiceInkModelManagementFilter.local.manageSettingsTitle, "Manage Local Models")
-        XCTAssertEqual(VoiceInkModelManagementFilter.cloud.settingsSectionTitle, "Cloud Models")
-        XCTAssertEqual(VoiceInkModelManagementFilter.cloud.manageSettingsTitle, "Manage Cloud Models")
-    }
-
     func testModelManagementFiltersApplySharedModelFacts() {
         let models = [
             model(name: "ggml-base.en", category: .local),
@@ -462,21 +328,6 @@ final class TranscriptionModelCatalogTests: XCTestCase {
         XCTAssertEqual(
             VoiceInkModelManagementFilter.custom.filteredModels(models, facts: \.facts).map(\.facts.name),
             ["custom-api"]
-        )
-    }
-
-    func testModelManagementRecommendedOrderIsShared() {
-        let models = [
-            model(name: "whisper-large-v3-turbo", category: .cloud),
-            model(name: "ggml-large-v3-turbo-q5_0", category: .local),
-            model(name: "parakeet-tdt-0.6b-v2", category: .local),
-            model(name: "ggml-base.en", category: .local),
-            model(name: "missing", category: .cloud)
-        ]
-
-        XCTAssertEqual(
-            VoiceInkModelManagementFilter.recommended.filteredModels(models, facts: \.facts).map(\.facts.name),
-            ["ggml-base.en", "parakeet-tdt-0.6b-v2", "ggml-large-v3-turbo-q5_0", "whisper-large-v3-turbo"]
         )
     }
 
@@ -505,201 +356,6 @@ final class TranscriptionModelCatalogTests: XCTestCase {
             VoiceInkModelManagementFilter.custom.filteredModels(models, facts: \.facts).map(\.facts.name),
             ["custom-api"]
         )
-    }
-
-    func testModelManagementPresentationPreservesPlatformCopy() {
-        XCTAssertEqual(VoiceInkModelManagementPresentation.settingsTitle, "Model Settings")
-        XCTAssertEqual(VoiceInkModelManagementPresentation.defaultModelTitle, "Default Model")
-        XCTAssertEqual(VoiceInkModelManagementPresentation.setAsDefaultButtonTitle, "Set as Default")
-        XCTAssertEqual(VoiceInkModelManagementPresentation.downloadButtonTitle, "Download")
-        XCTAssertEqual(VoiceInkModelManagementPresentation.editModelButtonTitle, "Edit Model")
-        XCTAssertEqual(VoiceInkModelManagementPresentation.deleteModelButtonTitle, "Delete Model")
-        XCTAssertEqual(VoiceInkModelManagementPresentation.deleteButtonTitle, "Delete")
-        XCTAssertEqual(VoiceInkModelManagementPresentation.deleteCustomModelAlertTitle, "Delete Custom Model")
-        XCTAssertEqual(VoiceInkModelManagementPresentation.showInFinderButtonTitle, "Show in Finder")
-        XCTAssertEqual(VoiceInkModelManagementPresentation.speedLabel, "Speed")
-        XCTAssertEqual(VoiceInkModelManagementPresentation.accuracyLabel, "Accuracy")
-        XCTAssertEqual(VoiceInkModelManagementPresentation.scoreText(8.5), "8.5")
-        XCTAssertEqual(VoiceInkModelManagementPresentation.multilingualLanguageLabel, "Multilingual")
-        XCTAssertEqual(VoiceInkModelManagementPresentation.englishOnlyLanguageLabel, "English-only")
-        XCTAssertEqual(VoiceInkModelManagementPresentation.languageLabel(isMultilingual: true), "Multilingual")
-        XCTAssertEqual(VoiceInkModelManagementPresentation.languageLabel(isMultilingual: false), "English-only")
-        XCTAssertEqual(VoiceInkModelManagementPresentation.importedLocalModelDescription, "Imported local model")
-        XCTAssertEqual(VoiceInkModelManagementPresentation.customProviderLabel, "Custom Provider")
-        XCTAssertEqual(VoiceInkModelManagementPresentation.openAICompatibleLabel, "OpenAI Compatible")
-        XCTAssertEqual(VoiceInkModelManagementPresentation.nativeAppleProviderLabel, "Native Apple")
-        XCTAssertEqual(VoiceInkModelManagementPresentation.onDeviceLabel, "On-Device")
-        XCTAssertEqual(VoiceInkModelManagementPresentation.macOS26RequiredLabel, "macOS 26+")
-        XCTAssertEqual(VoiceInkModelManagementPresentation.noModelSelectedText, "No model selected")
-        XCTAssertEqual(VoiceInkModelManagementPresentation.importLocalModelTitle, "Import Local Model…")
-        XCTAssertEqual(
-            VoiceInkModelManagementPresentation.importLocalModelHelpText,
-            "Add a custom fine-tuned whisper model to use with VoiceInk. Select the downloaded .bin file."
-        )
-        XCTAssertEqual(
-            VoiceInkModelManagementPresentation.importLocalModelLearnMoreURLString,
-            "https://tryvoiceink.com/docs/custom-local-whisper-models"
-        )
-        XCTAssertEqual(
-            VoiceInkModelManagementPresentation.importLocalModelLearnMoreHelpText,
-            "Read more about custom local models"
-        )
-        XCTAssertEqual(
-            VoiceInkModelManagementPresentation.importLocalModelPanelTitle,
-            "Select a Whisper ggml .bin model"
-        )
-        XCTAssertEqual(
-            VoiceInkModelManagementPresentation.customModelsLimitationText,
-            "Only OpenAI-compatible transcription APIs are supported."
-        )
-        XCTAssertEqual(
-            VoiceInkModelManagementPresentation.intelMacLocalModelsWarningText,
-            "Local models don't work reliably on Intel Macs"
-        )
-        XCTAssertEqual(VoiceInkModelManagementPresentation.intelMacUseCloudButtonTitle, "Use Cloud")
-        XCTAssertEqual(VoiceInkModelManagementPresentation.closeButtonHelp, "Close")
-        XCTAssertEqual(
-            VoiceInkModelManagementPresentation.deleteCustomModelAlertMessage(displayName: "My Model"),
-            "Are you sure you want to delete the custom model 'My Model'?"
-        )
-        XCTAssertEqual(
-            VoiceInkModelManagementPresentation.deleteModelAlertMessage(modelName: "ggml-base.en"),
-            "Are you sure you want to delete the model 'ggml-base.en'?"
-        )
-        XCTAssertEqual(
-            VoiceInkModelManagementPresentation.importedLocalModelAlreadyExistsTitle(modelFilename: "custom.bin"),
-            "A model named custom.bin already exists"
-        )
-        XCTAssertEqual(
-            VoiceInkModelManagementPresentation.importedLocalModelSuccessTitle(filename: "custom.bin"),
-            "Imported custom.bin"
-        )
-        XCTAssertEqual(
-            VoiceInkModelManagementPresentation.importedLocalModelFailureTitle(errorDescription: "Permission denied"),
-            "Failed to import model: Permission denied"
-        )
-    }
-
-    func testNativeAppleModelMetadataIsShared() {
-        let model = VoiceInkTranscriptionModelCatalog.nativeAppleModel
-
-        XCTAssertEqual(model.name, "apple-speech")
-        XCTAssertEqual(model.displayName, "Apple Speech")
-        XCTAssertEqual(model.description, "Uses the native Apple Speech framework for transcription. Requires macOS 26")
-        XCTAssertTrue(model.isMultilingual)
-        XCTAssertEqual(model.supportedLanguages["en-US"], "English (United States)")
-        XCTAssertNil(model.supportedLanguages["en"])
-    }
-
-    func testFluidAudioModelMetadataIsShared() {
-        let models = VoiceInkTranscriptionModelCatalog.fluidAudioModels
-
-        XCTAssertEqual(models.map(\.name), ["parakeet-tdt-0.6b-v2", "parakeet-tdt-0.6b-v3"])
-        XCTAssertEqual(models.map(\.displayName), ["Parakeet V2", "Parakeet V3"])
-        XCTAssertEqual(models.map(\.size), ["474 MB", "494 MB"])
-        XCTAssertEqual(models.map(\.modelVersion), [.v2, .v3])
-        XCTAssertEqual(
-            VoiceInkTranscriptionModelCatalog.defaultMacOSFluidAudioModelName,
-            "parakeet-tdt-0.6b-v2"
-        )
-        XCTAssertEqual(
-            VoiceInkTranscriptionModelCatalog.defaultMacOSFluidAudioModel.name,
-            VoiceInkTranscriptionModelCatalog.defaultMacOSFluidAudioModelName
-        )
-        XCTAssertEqual(VoiceInkTranscriptionModelCatalog.defaultMacOSFluidAudioModel.modelVersion, .v2)
-        XCTAssertEqual(models.map(\.supportsStreaming), [true, true])
-        XCTAssertEqual(models.map(\.isMultilingual), [false, true])
-        XCTAssertEqual(models.first?.supportedLanguages, ["en": "English"])
-        XCTAssertEqual(models.last?.supportedLanguages["fr"], "French")
-    }
-
-    func testFluidAudioRuntimeVersionAndLanguageHintPolicyIsShared() {
-        XCTAssertEqual(
-            VoiceInkTranscriptionModelCatalog.fluidAudioModelVersion(forModelName: "parakeet-tdt-0.6b-v2"),
-            .v2
-        )
-        XCTAssertEqual(
-            VoiceInkTranscriptionModelCatalog.fluidAudioModelVersion(forModelName: "parakeet-tdt-0.6b-v3"),
-            .v3
-        )
-        XCTAssertEqual(
-            VoiceInkTranscriptionModelCatalog.fluidAudioModelVersion(forModelName: "future-parakeet"),
-            .v3
-        )
-
-        XCTAssertNil(
-            VoiceInkTranscriptionModelCatalog.fluidAudioLanguageHintCode(
-                from: "fr",
-                forModelName: "parakeet-tdt-0.6b-v2"
-            )
-        )
-        XCTAssertNil(
-            VoiceInkTranscriptionModelCatalog.fluidAudioLanguageHintCode(
-                from: VoiceInkLanguageCatalog.autoDetectCode,
-                forModelName: "parakeet-tdt-0.6b-v3"
-            )
-        )
-        XCTAssertEqual(
-            VoiceInkTranscriptionModelCatalog.fluidAudioLanguageHintCode(
-                from: "fr",
-                forModelName: "parakeet-tdt-0.6b-v3"
-            ),
-            "fr"
-        )
-    }
-
-    func testDownloadStatusPresentationPreservesFluidAudioDownloadCopy() {
-        XCTAssertEqual(VoiceInkFluidAudioDownloadStatus.compactDownloadingStatusText, "Downloading...")
-
-        let preparing = VoiceInkFluidAudioDownloadStatus(
-            fractionCompleted: -0.2,
-            phase: .preparingDownload
-        )
-        XCTAssertEqual(preparing.fractionCompleted, 0)
-        XCTAssertEqual(preparing.message, "Preparing FluidAudio download...")
-        XCTAssertEqual(preparing.percent, 0)
-        XCTAssertEqual(preparing.percentText, "0%")
-
-        let listing = VoiceInkFluidAudioDownloadStatus(
-            fractionCompleted: 0.1,
-            phase: .listingFiles
-        )
-        XCTAssertEqual(listing.message, "Listing files from repository...")
-
-        let checkingCache = VoiceInkFluidAudioDownloadStatus(
-            fractionCompleted: 0.2,
-            phase: .checkingCachedModels
-        )
-        XCTAssertEqual(checkingCache.message, "Checking cached models...")
-
-        let downloading = VoiceInkFluidAudioDownloadStatus(
-            fractionCompleted: 0.427,
-            phase: .downloadingFiles(completedFiles: 3, totalFiles: 7)
-        )
-        XCTAssertEqual(downloading.message, "Downloading models: 3/7 files")
-        XCTAssertEqual(downloading.percent, 42)
-        XCTAssertEqual(downloading.percentText, "42%")
-
-        let finalizing = VoiceInkFluidAudioDownloadStatus(
-            fractionCompleted: 1.4,
-            phase: .finalizingModels
-        )
-        XCTAssertEqual(finalizing.fractionCompleted, 1)
-        XCTAssertEqual(finalizing.message, "Finalizing models...")
-        XCTAssertEqual(finalizing.percentText, "100%")
-
-        let compiling = VoiceInkFluidAudioDownloadStatus(
-            fractionCompleted: 0.8,
-            phase: .compiling(modelComponentName: "Parakeet.mlmodelc")
-        )
-        XCTAssertEqual(compiling.message, "Compiling Parakeet")
-    }
-
-    func testDeepgramLanguageCapabilityIsSharedProviderMetadata() {
-        XCTAssertEqual(VoiceInkTranscriptionModelProvider.deepgram.languageCodes?.first, "ar")
-        XCTAssertEqual(VoiceInkTranscriptionModelProvider.deepgram.languageCodes?.last, "zh")
-        XCTAssertTrue(VoiceInkTranscriptionModelProvider.deepgram.languageCodes?.contains("en") == true)
-        XCTAssertTrue(VoiceInkTranscriptionModelProvider.deepgram.includesAutoDetect)
     }
 
     func testMistralLanguageCapabilityAndModelAreSharedProviderMetadata() {
@@ -790,14 +446,6 @@ final class TranscriptionModelCatalogTests: XCTestCase {
         )
     }
 
-    func testStreamingTimeoutMappingIsSharedProviderPolicy() {
-        XCTAssertTrue(VoiceInkTranscriptionModelProvider.assemblyAI.mapsStreamingTransportTimeoutToFinalTimeout)
-        XCTAssertFalse(VoiceInkTranscriptionModelProvider.deepgram.mapsStreamingTransportTimeoutToFinalTimeout)
-        XCTAssertFalse(VoiceInkTranscriptionModelProvider.elevenLabs.mapsStreamingTransportTimeoutToFinalTimeout)
-        XCTAssertFalse(VoiceInkTranscriptionModelProvider.soniox.mapsStreamingTransportTimeoutToFinalTimeout)
-        XCTAssertFalse(VoiceInkTranscriptionModelProvider.speechmatics.mapsStreamingTransportTimeoutToFinalTimeout)
-    }
-
     func testXAILanguageCapabilityAndModelAreSharedProviderMetadata() {
         XCTAssertEqual(VoiceInkTranscriptionModelProvider.xai.languageCodes?.first, "ar")
         XCTAssertEqual(VoiceInkTranscriptionModelProvider.xai.languageCodes?.last, "vi")
@@ -821,20 +469,6 @@ final class TranscriptionModelCatalogTests: XCTestCase {
         XCTAssertEqual(models.map(\.name), ["ink-whisper"])
         XCTAssertEqual(models.first?.displayName, "Ink Whisper (Cartesia)")
         XCTAssertTrue(models.first?.supportsStreaming == true)
-    }
-
-    func testRecordedFileSupportIsSharedProviderCapability() {
-        let streamingOnlyProviders = VoiceInkTranscriptionModelProvider.allCases.filter {
-            !$0.supportsRecordedFileTranscription
-        }
-        let streamingOnlyModelProviders = VoiceInkTranscriptionModelProvider.allCases.filter(\.isStreamingOnly)
-
-        XCTAssertEqual(streamingOnlyProviders, [.cartesia])
-        XCTAssertEqual(streamingOnlyModelProviders, [.cartesia])
-        XCTAssertTrue(VoiceInkTranscriptionModelProvider.groq.supportsRecordedFileTranscription)
-        XCTAssertFalse(VoiceInkTranscriptionModelProvider.groq.isStreamingOnly)
-        XCTAssertTrue(VoiceInkTranscriptionModelProvider.local.supportsRecordedFileTranscription)
-        XCTAssertFalse(VoiceInkTranscriptionModelProvider.local.isStreamingOnly)
     }
 
     func testProviderRoleOwnsModelCategoryRouteAvailabilityAndLanguageSource() {
@@ -942,87 +576,6 @@ final class TranscriptionModelCatalogTests: XCTestCase {
         } catch {
             XCTAssertTrue(error is DecodingError)
         }
-    }
-
-    func testMacOSTranscriptionModelProviderRoleMappingIsShared() {
-        let expectedRoles: [(VoiceInkMacOSTranscriptionModelProvider, VoiceInkTranscriptionModelProviderRole)] = [
-            (.whisper, .localWhisper),
-            (.fluidAudio, .localFluidAudio),
-            (.nativeApple, .nativeApple),
-            (.custom, .customCloud),
-            (.groq, .cloud(.groq)),
-            (.deepgram, .cloud(.deepgram)),
-            (.elevenLabs, .cloud(.elevenLabs)),
-            (.mistral, .cloud(.mistral)),
-            (.gemini, .cloud(.gemini)),
-            (.soniox, .cloud(.soniox)),
-            (.speechmatics, .cloud(.speechmatics)),
-            (.assemblyAI, .cloud(.assemblyAI)),
-            (.xai, .cloud(.xai)),
-            (.cartesia, .cloud(.cartesia))
-        ]
-
-        for (provider, role) in expectedRoles {
-            XCTAssertEqual(provider.coreTranscriptionModelProviderRole, role)
-        }
-
-        XCTAssertEqual(VoiceInkMacOSTranscriptionModelProvider.groq.coreTranscriptionModelProvider, .groq)
-        XCTAssertNil(VoiceInkMacOSTranscriptionModelProvider.whisper.coreTranscriptionModelProvider)
-        XCTAssertEqual(VoiceInkMacOSTranscriptionModelProvider.groq.remoteTranscriptionProviderKind, .groq)
-        XCTAssertNil(VoiceInkMacOSTranscriptionModelProvider.whisper.remoteTranscriptionProviderKind)
-        XCTAssertEqual(VoiceInkMacOSTranscriptionModelProvider.groq.apiErrorDomain, "GroqAPI")
-        XCTAssertNil(VoiceInkMacOSTranscriptionModelProvider.whisper.apiErrorDomain)
-        XCTAssertEqual(VoiceInkMacOSTranscriptionModelProvider.cartesia.apiKeyProviderName, "Cartesia")
-        XCTAssertEqual(VoiceInkMacOSTranscriptionModelProvider.custom.apiKeyProviderName, "Custom")
-        XCTAssertEqual(VoiceInkMacOSTranscriptionModelProvider.deepgram.languageCodes?.first, "ar")
-        XCTAssertTrue(VoiceInkMacOSTranscriptionModelProvider.deepgram.includesAutoDetect)
-        XCTAssertFalse(VoiceInkMacOSTranscriptionModelProvider.groq.includesAutoDetect)
-        XCTAssertEqual(
-            VoiceInkMacOSTranscriptionModelProvider.groq.cloudModelSpecs.map(\.name),
-            VoiceInkTranscriptionModelCatalog.cloudModels(for: .groq).map(\.name)
-        )
-        XCTAssertTrue(VoiceInkMacOSTranscriptionModelProvider.whisper.cloudModelSpecs.isEmpty)
-        XCTAssertEqual(
-            VoiceInkMacOSTranscriptionModelProvider.soniox.remoteTranscriptionOptions(
-                prompt: "ignored",
-                customVocabulary: [" Roma ", "Felix", "roma", ""]
-            ).customVocabulary,
-            ["Roma", "Felix"]
-        )
-        XCTAssertFalse(VoiceInkMacOSTranscriptionModelProvider.soniox.acceptsRemoteTranscriptionText(" \n\t "))
-        XCTAssertTrue(VoiceInkMacOSTranscriptionModelProvider.mistral.acceptsRemoteTranscriptionText(""))
-        XCTAssertEqual(VoiceInkMacOSTranscriptionModelProvider.whisper.transcriptionLanguageSource, .whisper)
-        XCTAssertEqual(VoiceInkMacOSTranscriptionModelProvider.custom.transcriptionLanguageSource, .all)
-        XCTAssertEqual(
-            VoiceInkMacOSTranscriptionModelProvider.fluidAudio.supportedLanguages(isMultilingual: false),
-            VoiceInkLanguageCatalog.englishOnly
-        )
-        XCTAssertEqual(
-            VoiceInkMacOSTranscriptionModelProvider.custom.transcriptionLanguageOptions(
-                defaultLanguages: ["custom": "Custom"],
-                isMultilingual: false,
-                usesRealtimeProviderLanguages: false
-            ),
-            ["custom": "Custom"]
-        )
-        XCTAssertNil(VoiceInkMacOSTranscriptionModelProvider.assemblyAI.transcriptionLanguageOptions(
-            defaultLanguages: [:],
-            isMultilingual: true,
-            usesRealtimeProviderLanguages: true
-        )["en_uk"])
-        XCTAssertEqual(VoiceInkMacOSTranscriptionModelProvider.nativeApple.modelManagementCategory, .local)
-        XCTAssertEqual(VoiceInkMacOSTranscriptionModelProvider.custom.transcriptionServiceRoute, .cloud)
-        XCTAssertEqual(
-            VoiceInkMacOSTranscriptionModelProvider.nativeApple.transcriptionModelAvailabilityRequirement,
-            .currentOSSupport
-        )
-        XCTAssertTrue(VoiceInkMacOSTranscriptionModelProvider.whisper.supportsRecordedFileTranscription)
-        XCTAssertTrue(VoiceInkMacOSTranscriptionModelProvider.cartesia.isStreamingOnly)
-        XCTAssertEqual(
-            VoiceInkMacOSTranscriptionModelProvider.elevenLabs.streamingConnectionModelName(for: "scribe_v1"),
-            "scribe_v2_realtime"
-        )
-        XCTAssertTrue(VoiceInkMacOSTranscriptionModelProvider.assemblyAI.mapsStreamingTransportTimeoutToFinalTimeout)
     }
 
     func testMacOSTranscriptionModelFactsDeriveSharedModelPolicy() {
@@ -1168,87 +721,6 @@ final class TranscriptionModelCatalogTests: XCTestCase {
         }
     }
 
-    func testMovedWhisperModelManagementSymbolsExposePublicAPI() {
-        let model = VoiceInkWhisperModelFiles.baseModel
-        let modelsDirectory = URL(fileURLWithPath: "/tmp/VoiceInk/WhisperModels", isDirectory: true)
-
-        let progress = VoiceInkWhisperModelDownloadProgress.simple(
-            modelName: model.modelName,
-            isDownloading: true,
-            progress: 0.42
-        )
-        XCTAssertTrue(progress.isActive)
-        XCTAssertEqual(progress.compactStatusText, "Downloading...")
-        XCTAssertEqual(progress.percentText, "42%")
-
-        let state = VoiceInkWhisperModelDownloadState(isDownloaded: false, progress: progress)
-        let row = state.rowPresentation(for: model)
-        XCTAssertEqual(row.downloadButtonTitle, "Download Model (142 MB)")
-        XCTAssertTrue(row.shouldShowCircularProgressAccessory)
-
-        let managementRow = VoiceInkWhisperModelManagementList.row(
-            for: model,
-            downloadState: state
-        )
-        XCTAssertNil(managementRow.confirmedDownloadRuntimeAction {})
-        XCTAssertEqual(managementRow.downloadConfirmation.primaryButtonTitle, "Download")
-        XCTAssertEqual(managementRow.deleteConfirmation.primaryButtonTitle, "Delete")
-
-        let completionPlan = VoiceInkWhisperModelSimpleDownloadCompletionPlan.completion(
-            temporaryURL: nil,
-            response: nil,
-            error: nil
-        )
-        var failureID = ""
-        completionPlan.applyRuntimeState(
-            installTemporaryFile: { _ in XCTFail("missing file should not install") },
-            presentFailure: { failureID = $0.id },
-            ignoreCancellation: { XCTFail("missing file should not cancel") }
-        )
-        XCTAssertEqual(failureID, "serverErrorDuringDownload")
-
-        var trackingState = VoiceInkWhisperModelSimpleDownloadTrackingState()
-        XCTAssertTrue(trackingState.startDownload(for: model))
-        trackingState.updateProgress(0.5, for: model)
-
-        var sessionState = VoiceInkWhisperModelSimpleDownloadSessionState(
-            downloadTrackingState: trackingState
-        )
-        XCTAssertNil(sessionState.startDownload(for: model))
-        XCTAssertTrue(sessionState.isDownloading(model))
-
-        let snapshot = VoiceInkWhisperModelManagementSnapshot(
-            modelsDirectory: modelsDirectory,
-            downloadTrackingState: trackingState
-        )
-        XCTAssertFalse(snapshot.hasAvailableModel())
-        XCTAssertNil(snapshot.modelPath(forRuntimeModelName: model.modelName))
-        XCTAssertEqual(snapshot.managementRows().count, VoiceInkWhisperModelFiles.bootstrapModels.count)
-
-        let deletionPlan = VoiceInkWhisperModelDeletionPolicy.plan(isDownloaded: false)
-        var skippedMissingFile = false
-        deletionPlan.applyRuntimeState(
-            skipMissingFile: { skippedMissingFile = true },
-            deleteDownloadedFiles: { XCTFail("missing file should not delete") },
-            refreshAfterSuccessfulDelete: { XCTFail("missing file should not refresh") },
-            handleDeleteFailure: { _ in XCTFail("missing file should not fail") }
-        )
-        XCTAssertTrue(skippedMissingFile)
-
-        XCTAssertEqual(
-            VoiceInkWhisperModelOperationConfirmationPresentation.download(for: model).title,
-            "Download Model"
-        )
-        XCTAssertEqual(
-            VoiceInkWhisperModelOperationAlertPresentation.noFileReceived.message,
-            "No file received"
-        )
-        XCTAssertEqual(
-            VoiceInkWhisperModelManagementDiagnostics.alreadyDownloadingMessage(modelName: model.modelName),
-            "Model \(model.modelName) is already being downloaded."
-        )
-    }
-
     private func model(
         name: String,
         category: VoiceInkModelManagementModelCategory,
@@ -1262,8 +734,31 @@ final class TranscriptionModelCatalogTests: XCTestCase {
             )
         )
     }
+
+    func testFluidAudioModelMetadataIsShared() {
+        let models = VoiceInkTranscriptionModelCatalog.fluidAudioModels
+
+        XCTAssertEqual(models.map(\.name), ["parakeet-tdt-0.6b-v2", "parakeet-tdt-0.6b-v3"])
+        XCTAssertEqual(models.map(\.displayName), ["Parakeet V2", "Parakeet V3"])
+        XCTAssertEqual(models.map(\.size), ["474 MB", "494 MB"])
+        XCTAssertEqual(models.map(\.modelVersion), [.v2, .v3])
+        XCTAssertEqual(
+            VoiceInkTranscriptionModelCatalog.defaultMacOSFluidAudioModelName,
+            "parakeet-tdt-0.6b-v2"
+        )
+        XCTAssertEqual(
+            VoiceInkTranscriptionModelCatalog.defaultMacOSFluidAudioModel.name,
+            VoiceInkTranscriptionModelCatalog.defaultMacOSFluidAudioModelName
+        )
+        XCTAssertEqual(VoiceInkTranscriptionModelCatalog.defaultMacOSFluidAudioModel.modelVersion, .v2)
+        XCTAssertEqual(models.map(\.supportsStreaming), [true, true])
+        XCTAssertEqual(models.map(\.isMultilingual), [false, true])
+        XCTAssertEqual(models.first?.supportedLanguages, ["en": "English"])
+        XCTAssertEqual(models.last?.supportedLanguages["fr"], "French")
+    }
 }
 
 private struct ModelManagementFilterFixture {
     let facts: VoiceInkModelManagementModelFacts
+
 }

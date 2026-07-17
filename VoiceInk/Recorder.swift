@@ -31,10 +31,6 @@ class Recorder: NSObject, ObservableObject {
         didSet { recorder?.onAudioChunk = onAudioChunk }
     }
 
-    var onRollingAudioChunk: ((_ data: Data) -> Void)? {
-        didSet { recorder?.onRollingAudioChunk = onRollingAudioChunk }
-    }
-    
     enum RecorderError: Error {
         case couldNotStartRecording
     }
@@ -142,7 +138,6 @@ class Recorder: NSObject, ObservableObject {
         let coreAudioRecorder = recorder ?? CoreAudioRecorder()
         recorder = coreAudioRecorder
         coreAudioRecorder.onAudioChunk = nil
-        coreAudioRecorder.onRollingAudioChunk = onRollingAudioChunk
 
         do {
             try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
@@ -188,7 +183,6 @@ class Recorder: NSObject, ObservableObject {
 
         let coreAudioRecorder = recorder ?? CoreAudioRecorder()
         coreAudioRecorder.onAudioChunk = onAudioChunk
-        coreAudioRecorder.onRollingAudioChunk = onRollingAudioChunk
         recorder = coreAudioRecorder
 
         do {
@@ -225,13 +219,10 @@ class Recorder: NSObject, ObservableObject {
         audioMeterUpdateTimer = nil
 
         let currentRecorder = self.recorder
-        let rollingAudioChunkHandler = onRollingAudioChunk
-
         await withCheckedContinuation { continuation in
             audioSetupQueue.async {
                 currentRecorder?.finishRecording()
                 currentRecorder?.onAudioChunk = nil
-                currentRecorder?.onRollingAudioChunk = rollingAudioChunkHandler
                 continuation.resume()
             }
         }
@@ -249,16 +240,6 @@ class Recorder: NSObject, ObservableObject {
             await playbackController.resumeMedia()
         }
         deviceManager.isRecordingActive = false
-    }
-
-    func reloadRollingBufferSettings() async {
-        let currentRecorder = recorder
-        await withCheckedContinuation { continuation in
-            audioSetupQueue.async {
-                currentRecorder?.reloadPreRollBufferSettings()
-                continuation.resume()
-            }
-        }
     }
 
     private func handleRecordingError(_ error: Error) async {

@@ -180,112 +180,6 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
         XCTAssertEqual(events, ["navigate"])
     }
 
-    func testBackupImportDiagnosticsPreserveMacOSStatusCopy() {
-        XCTAssertEqual(
-            VoiceInkSettingsBackupImportDiagnostics.noGeneralSettingsMessage,
-            "No general settings found in the imported file."
-        )
-        XCTAssertEqual(
-            VoiceInkSettingsBackupImportDiagnostics.noVocabularyWordsMessage,
-            "No vocabulary words found in the imported file. Existing items remain unchanged."
-        )
-        XCTAssertEqual(
-            VoiceInkSettingsBackupImportDiagnostics.noWordReplacementsMessage,
-            "No word replacements found in the imported file. Existing replacements remain unchanged."
-        )
-        XCTAssertEqual(
-            VoiceInkSettingsBackupImportDiagnostics.noDictionaryEntriesImportedMessage,
-            "No new dictionary entries were imported."
-        )
-        XCTAssertEqual(
-            VoiceInkSettingsBackupImportDiagnostics.generalSettingsImportedMessage,
-            "Successfully imported general settings."
-        )
-        XCTAssertEqual(
-            VoiceInkSettingsBackupImportDiagnostics.noCustomModelsMessage,
-            "No custom models found in the imported file."
-        )
-        XCTAssertEqual(
-            VoiceInkSettingsBackupImportDiagnostics.saveFailedDescription(
-                item: "dictionary entries",
-                localizedDescription: "disk full"
-            ),
-            "Failed to save imported dictionary entries: disk full"
-        )
-        XCTAssertEqual(
-            VoiceInkSettingsBackupImportDiagnostics.customPromptsImportedMessage(count: 3),
-            "Successfully imported 3 custom prompts."
-        )
-        XCTAssertEqual(
-            VoiceInkSettingsBackupImportDiagnostics.powerModeConfigurationsImportedMessage(count: 2),
-            "Successfully imported 2 Power Mode configurations."
-        )
-        XCTAssertEqual(
-            VoiceInkSettingsBackupImportDiagnostics.skippedInvalidReplacementsMessage(count: 4),
-            "Skipped 4 invalid word replacements from the imported file."
-        )
-        XCTAssertEqual(
-            VoiceInkSettingsBackupImportDiagnostics.dictionaryEntriesImportedMessage(
-                vocabularyWordCount: 2,
-                wordReplacementCount: 1
-            ),
-            "Successfully imported 2 vocabulary words and 1 word replacements to SwiftData."
-        )
-        XCTAssertEqual(
-            VoiceInkSettingsBackupImportDiagnostics.customModelsImportedMessage(count: 5),
-            "Successfully imported 5 custom model definitions."
-        )
-        XCTAssertEqual(
-            VoiceInkSettingsBackupImportDiagnostics.customModelsImportedMessage(count: 2),
-            "Successfully imported 2 custom model definitions."
-        )
-    }
-
-    func testBackupImportErrorPreservesMacOSSaveFailureCopy() {
-        let error = VoiceInkSettingsBackupImportError.saveFailed(
-            item: "dictionary entries",
-            localizedDescription: "disk full"
-        )
-
-        XCTAssertEqual(
-            VoiceInkErrorDescription.text(for: error),
-            "Failed to save imported dictionary entries: disk full"
-        )
-        XCTAssertEqual(error.errorDescription, "Failed to save imported dictionary entries: disk full")
-        XCTAssertEqual(
-            VoiceInkSettingsBackupImportError.saveFailed(
-                item: "settings",
-                localizedDescription: "disk full"
-            ).errorDescription,
-            "Failed to save imported settings: disk full"
-        )
-    }
-
-    func testBackupPresentationPreservesMacOSPanelAndAlertCopy() {
-        let presentation = VoiceInkSettingsBackupPresentation.macOS
-
-        XCTAssertEqual(presentation.defaultFileName, "VoiceInk_Settings_Backup.json")
-        XCTAssertEqual(presentation.exportPanelTitle, "Export VoiceInk Settings")
-        XCTAssertEqual(presentation.exportPanelMessage, "Choose a location to save your settings.")
-        XCTAssertEqual(presentation.importPanelTitle, "Import VoiceInk Settings")
-        XCTAssertEqual(presentation.importPanelMessage, "Choose a settings backup, then select what you want to import.")
-        XCTAssertEqual(presentation.importSelectionTitle, "Import Settings")
-        XCTAssertEqual(presentation.importSelectionMessage, "Choose what to import from this backup.")
-        XCTAssertEqual(presentation.allCategoriesTitle, "All")
-        XCTAssertEqual(presentation.individualCategoriesTitle, "Individual categories")
-        XCTAssertEqual(presentation.importActionTitle, "Import")
-        XCTAssertEqual(presentation.cancelActionTitle, "Cancel")
-        XCTAssertEqual(presentation.okActionTitle, "OK")
-        XCTAssertEqual(presentation.configureAPIKeysActionTitle, "Configure API Keys")
-        XCTAssertEqual(presentation.exportSuccessTitle, "Export Successful")
-        XCTAssertEqual(presentation.exportErrorTitle, "Export Error")
-        XCTAssertEqual(presentation.exportCanceledTitle, "Export Canceled")
-        XCTAssertEqual(presentation.importCanceledTitle, "Import Canceled")
-        XCTAssertEqual(presentation.importErrorTitle, "Import Error")
-        XCTAssertEqual(presentation.versionMismatchTitle, "Version Mismatch")
-        XCTAssertEqual(presentation.importSuccessTitle, "Import Successful")
-    }
-
     func testBackupPresentationBuildsDynamicExportAndImportMessages() {
         let presentation = VoiceInkSettingsBackupPresentation.macOS
 
@@ -498,8 +392,6 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
         XCTAssertEqual(json["secondaryRecordingShortcutModeRawValue"] as? String, "hybrid")
         XCTAssertEqual(json["launchAtLoginEnabled"] as? Bool, true)
         XCTAssertEqual(json["isSoundFeedbackEnabled"] as? Bool, true)
-        XCTAssertEqual(json["rollingBufferVADModel"] as? String, "silero")
-
         let decoded = try JSONDecoder().decode(
             VoiceInkGeneralSettingsBackupPayload<String>.self,
             from: data
@@ -555,17 +447,6 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
             shouldRestoreClipboardAfterPaste: false,
             clipboardRestoreDelay: 1.25
         )
-        let rollingBuffer = VoiceInkRollingBufferBackupPreferences(
-            preloadModeRawValue: VoiceInkRollingBufferPreloadMode.on.rawValue,
-            autoDisablesCloudModels: true,
-            autoDisablesLowBatteryLocalModels: false,
-            lowBatteryThresholdPercent: 55,
-            bufferDurationSeconds: 4.5,
-            preRunFinalization: true,
-            vadModelRawValue: VoiceInkRollingBufferVADModel.silero.rawValue,
-            perModelPreloadEnabled: ["parakeet": false]
-        )
-
         XCTAssertEqual(
             VoiceInkGeneralSettingsBackupPolicy.backupPreferences(
                 recordingShortcut: recordingShortcut,
@@ -574,8 +455,7 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
                 audioCleanup: audioCleanup,
                 recordingFeedback: recordingFeedback,
                 transcriptionCleanup: transcriptionCleanup,
-                paste: paste,
-                rollingBuffer: rollingBuffer
+                paste: paste
             ),
             VoiceInkGeneralSettingsBackupPreferences(
                 recordingShortcut: recordingShortcut,
@@ -584,8 +464,7 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
                 audioCleanup: audioCleanup,
                 recordingFeedback: recordingFeedback,
                 transcriptionCleanup: transcriptionCleanup,
-                paste: paste,
-                rollingBuffer: rollingBuffer
+                paste: paste
             )
         )
     }
@@ -630,16 +509,6 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
             paste: VoiceInkPasteBackupPreferences(
                 shouldRestoreClipboardAfterPaste: true,
                 clipboardRestoreDelay: 3.0
-            ),
-            rollingBuffer: VoiceInkRollingBufferBackupPreferences(
-                preloadModeRawValue: VoiceInkRollingBufferPreloadMode.on.rawValue,
-                autoDisablesCloudModels: false,
-                autoDisablesLowBatteryLocalModels: true,
-                lowBatteryThresholdPercent: 150,
-                bufferDurationSeconds: 60,
-                preRunFinalization: false,
-                vadModelRawValue: VoiceInkRollingBufferVADModel.silero.rawValue,
-                perModelPreloadEnabled: ["parakeet": false]
             )
         )
 
@@ -652,7 +521,6 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
                     "recordingShortcut:custom:nil:special:nil:true:true:180",
                     "macOSShell:true:nil:mini",
                     "recordingFeedback:true:never:true:2.0:true",
-                    "postSettingsDidChange",
                     "imported"
                 ]
             )
@@ -660,16 +528,10 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
             XCTAssertEqual(VoiceInkAudioCleanupPreference.retentionDays(from: defaults), 14)
             XCTAssertEqual(PunctuationCleanupMode.current(in: defaults), .removeTrailingPeriod)
             XCTAssertEqual(VoiceInkPastePreference.clipboardRestoreDelay(from: defaults), 3.0)
-
-            let rollingBufferConfiguration = VoiceInkRollingBufferPreloadSettings.configuration(in: defaults)
-            XCTAssertEqual(rollingBufferConfiguration.mode, .on)
-            XCTAssertEqual(rollingBufferConfiguration.lowBatteryThresholdPercent, 100)
-            XCTAssertEqual(rollingBufferConfiguration.bufferDurationSeconds, 30.0)
-            XCTAssertEqual(VoiceInkRollingBufferVADSettings.selectedModel(in: defaults), "silero")
         }
     }
 
-    func testImportPlansPublicSurfaceAppliesRuntimeStateWithoutRollingBufferImport() {
+    func testImportPlansPublicSurfaceAppliesRuntimeState() {
         let preferences = generalSettingsPublicSurfaceBackupPreferences()
 
         withIsolatedDefaults { defaults in
@@ -677,20 +539,15 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
                 from: preferences
             )
             var events = [String]()
-            let result = importPlans.applyRuntimeState(
+            importPlans.applyRuntimeState(
                 to: defaults,
                 applyRecordingShortcutImportPlan: { _ in events.append("shortcut") },
                 applyMacOSShellImportPlan: { _ in events.append("shell") },
                 applyRecordingFeedbackImportPlan: { _ in events.append("feedback") },
-                postCorePreferenceSettingsDidChange: { events.append("rolling") },
                 reportImportedGeneralSettings: { events.append("imported") }
             )
 
             XCTAssertEqual(events, ["shortcut", "shell", "feedback", "imported"])
-            XCTAssertEqual(
-                result,
-                VoiceInkGeneralSettingsCorePreferenceImportResult(didImportRollingBufferSetting: false)
-            )
         }
     }
 
@@ -702,7 +559,7 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
             VoiceInkRecordingFeedbackPreference.savePauseMediaEnabled(false, to: defaults)
             VoiceInkRecordingFeedbackPreference.saveAudioResumptionDelay(0, to: defaults)
 
-            let result = VoiceInkGeneralSettingsBackupPolicy.applyCorePreferenceImportPlans(
+            VoiceInkGeneralSettingsBackupPolicy.applyCorePreferenceImportPlans(
                 VoiceInkGeneralSettingsBackupImportPlans(
                     recordingShortcut: VoiceInkRecordingShortcutBackupImportPlan(
                         primaryRecordingShortcut: .custom,
@@ -741,26 +598,10 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
                     paste: VoiceInkPasteBackupImportPlan(
                         shouldRestoreClipboardAfterPaste: false,
                         clipboardRestoreDelay: 1.5
-                    ),
-                    rollingBuffer: VoiceInkRollingBufferBackupImportPlan(
-                        mode: .on,
-                        autoDisablesCloudModels: false,
-                        autoDisablesLowBatteryLocalModels: true,
-                        lowBatteryThresholdPercent: 33,
-                        bufferDurationSeconds: 6.5,
-                        preRunFinalization: true,
-                        vadModel: .silero,
-                        perModelPreloadEnabled: ["parakeet": false]
                     )
                 ),
                 to: defaults
             )
-
-            XCTAssertEqual(
-                result,
-                VoiceInkGeneralSettingsCorePreferenceImportResult(didImportRollingBufferSetting: true)
-            )
-            XCTAssertTrue(result.didImportRollingBufferSetting)
             XCTAssertTrue(VoiceInkTranscriptionAutoCleanupPreference.isEnabled(from: defaults))
             XCTAssertEqual(VoiceInkTranscriptionAutoCleanupPreference.retentionMinutes(from: defaults), 45)
             XCTAssertTrue(VoiceInkAudioCleanupPreference.isEnabled(from: defaults))
@@ -775,21 +616,6 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
             XCTAssertTrue(VoiceInkTranscriptionCleanupPreferenceStorage.shouldLowercase(from: defaults))
             XCTAssertFalse(VoiceInkPastePreference.shouldRestoreClipboardAfterPaste(from: defaults))
             XCTAssertEqual(VoiceInkPastePreference.clipboardRestoreDelay(from: defaults), 1.5)
-
-            let rollingBufferConfiguration = VoiceInkRollingBufferPreloadSettings.configuration(in: defaults)
-            XCTAssertEqual(rollingBufferConfiguration.mode, .on)
-            XCTAssertFalse(rollingBufferConfiguration.autoDisablesCloudModels)
-            XCTAssertTrue(rollingBufferConfiguration.autoDisablesLowBatteryLocalModels)
-            XCTAssertEqual(rollingBufferConfiguration.lowBatteryThresholdPercent, 33)
-            XCTAssertEqual(rollingBufferConfiguration.bufferDurationSeconds, 6.5)
-            XCTAssertTrue(rollingBufferConfiguration.preRunFinalization)
-            XCTAssertEqual(VoiceInkRollingBufferVADSettings.selectedModel(in: defaults), "silero")
-            XCTAssertFalse(
-                VoiceInkRollingBufferPreloadSettings.perModelPreloadEnabled(
-                    forModelName: "parakeet",
-                    in: defaults
-                )
-            )
         }
     }
 
@@ -799,7 +625,7 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
             VoiceInkAudioCleanupPreference.saveRetentionDays(3, to: defaults)
             VoiceInkPastePreference.saveClipboardRestoreDelay(2.5, to: defaults)
 
-            let result = VoiceInkGeneralSettingsBackupPolicy.applyCorePreferenceImportPlans(
+            VoiceInkGeneralSettingsBackupPolicy.applyCorePreferenceImportPlans(
                 VoiceInkGeneralSettingsBackupImportPlans(
                     recordingShortcut: VoiceInkRecordingShortcutBackupImportPlan(
                         primaryRecordingShortcut: nil,
@@ -838,22 +664,10 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
                     paste: VoiceInkPasteBackupImportPlan(
                         shouldRestoreClipboardAfterPaste: nil,
                         clipboardRestoreDelay: nil
-                    ),
-                    rollingBuffer: VoiceInkRollingBufferBackupImportPlan(
-                        mode: nil,
-                        autoDisablesCloudModels: nil,
-                        autoDisablesLowBatteryLocalModels: nil,
-                        lowBatteryThresholdPercent: nil,
-                        bufferDurationSeconds: nil,
-                        preRunFinalization: nil,
-                        vadModel: nil,
-                        perModelPreloadEnabled: nil
                     )
                 ),
                 to: defaults
             )
-
-            XCTAssertFalse(result.didImportRollingBufferSetting)
             XCTAssertEqual(VoiceInkTranscriptionAutoCleanupPreference.retentionMinutes(from: defaults), 30)
             XCTAssertEqual(VoiceInkAudioCleanupPreference.retentionDays(from: defaults), 3)
             XCTAssertEqual(VoiceInkPastePreference.clipboardRestoreDelay(from: defaults), 2.5)
@@ -912,16 +726,6 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
             paste: VoiceInkPasteBackupPreferences(
                 shouldRestoreClipboardAfterPaste: false,
                 clipboardRestoreDelay: 1.25
-            ),
-            rollingBuffer: VoiceInkRollingBufferBackupPreferences(
-                preloadModeRawValue: VoiceInkRollingBufferPreloadMode.on.rawValue,
-                autoDisablesCloudModels: true,
-                autoDisablesLowBatteryLocalModels: false,
-                lowBatteryThresholdPercent: 55,
-                bufferDurationSeconds: 4.5,
-                preRunFinalization: true,
-                vadModelRawValue: VoiceInkRollingBufferVADModel.silero.rawValue,
-                perModelPreloadEnabled: ["parakeet": false]
             )
         )
     }
@@ -966,16 +770,6 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
             paste: VoiceInkPasteBackupPreferences(
                 shouldRestoreClipboardAfterPaste: false,
                 clipboardRestoreDelay: 1.25
-            ),
-            rollingBuffer: VoiceInkRollingBufferBackupPreferences(
-                preloadModeRawValue: nil,
-                autoDisablesCloudModels: nil,
-                autoDisablesLowBatteryLocalModels: nil,
-                lowBatteryThresholdPercent: nil,
-                bufferDurationSeconds: nil,
-                preRunFinalization: nil,
-                vadModelRawValue: nil,
-                perModelPreloadEnabled: nil
             )
         )
     }
@@ -1042,9 +836,6 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
             applyRecordingShortcutImportPlan: appendRecordingShortcut,
             applyMacOSShellImportPlan: appendMacOSShell,
             applyRecordingFeedbackImportPlan: appendRecordingFeedback,
-            postCorePreferenceSettingsDidChange: {
-                events.append("postSettingsDidChange")
-            },
             reportImportedGeneralSettings: {
                 events.append("imported")
             }

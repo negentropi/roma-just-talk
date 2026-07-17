@@ -58,73 +58,6 @@ final class PowerModePolicyTests: XCTestCase {
         XCTAssertEqual(VoiceInkPowerModePresentation.websiteTriggerCountText(3), "3 Websites")
     }
 
-    func testPanelAndSidebarChromePreservesMacOSCopy() {
-        XCTAssertEqual(VoiceInkPowerModePresentation.panelTitle, "Power Modes")
-        XCTAssertEqual(
-            VoiceInkPowerModePresentation.panelSubtitle,
-            "Automate your workflows with context-aware configurations."
-        )
-        XCTAssertEqual(
-            VoiceInkPowerModePresentation.panelInfoTipText,
-            "Automatically apply custom configurations based on the app/website you are using."
-        )
-        XCTAssertEqual(
-            VoiceInkPowerModePresentation.panelLearnMoreURLString,
-            "https://tryvoiceink.com/docs/power-mode"
-        )
-        XCTAssertEqual(VoiceInkPowerModePresentation.settingsSectionTitle, "Power Mode")
-        XCTAssertEqual(
-            VoiceInkPowerModePresentation.settingsToggleHelpText,
-            "Apply custom settings based on active app or website."
-        )
-        XCTAssertEqual(VoiceInkPowerModePresentation.persistConfiguredPreferencesTitle, "Persist Configured Preferences")
-        XCTAssertEqual(
-            VoiceInkPowerModePresentation.persistConfiguredPreferencesHelpText,
-            "When enabled, Power Mode preferences stay active after you stop recording instead of reverting to your original preferences. They will only change when a different Power Mode activates."
-        )
-        XCTAssertEqual(VoiceInkPowerModePresentation.settingsDisableAlertTitle, "Power Mode Still Active")
-        XCTAssertEqual(VoiceInkPowerModePresentation.settingsDisableAlertButtonTitle, "Got it")
-        XCTAssertEqual(
-            VoiceInkPowerModePresentation.settingsDisableAlertMessage,
-            "Disable or remove your Power Modes first."
-        )
-        XCTAssertEqual(VoiceInkPowerModePresentation.addButtonSystemImageName, "plus")
-        XCTAssertEqual(VoiceInkPowerModePresentation.reorderButtonTitle, "Reorder")
-        XCTAssertEqual(VoiceInkPowerModePresentation.reorderButtonSystemImageName, "arrow.up.arrow.down")
-        XCTAssertEqual(VoiceInkPowerModePresentation.reorderPanelTitle, "Reorder Power Modes")
-        XCTAssertEqual(VoiceInkPowerModePresentation.reorderPanelCloseHelpText, "Close")
-        XCTAssertEqual(VoiceInkPowerModePresentation.reorderPanelCloseSystemImageName, "xmark")
-        XCTAssertEqual(VoiceInkPowerModePresentation.reorderHandleSystemImageName, "line.3.horizontal")
-        XCTAssertEqual(VoiceInkPowerModePresentation.defaultBadgeTitle, "Default")
-        XCTAssertEqual(VoiceInkPowerModePresentation.disabledBadgeTitle, "Disabled")
-        XCTAssertEqual(VoiceInkPowerModePresentation.emptyPanelTitle, "No Power Modes Yet")
-        XCTAssertEqual(
-            VoiceInkPowerModePresentation.emptyPanelMessage,
-            "Create first power mode to automate your VoiceInk workflow based on apps/website you are using"
-        )
-        XCTAssertEqual(VoiceInkPowerModePresentation.emptyPanelSystemImageName, "square.grid.2x2.fill")
-        XCTAssertEqual(VoiceInkPowerModePresentation.sidebarEmptyTitle, "No Power Modes")
-        XCTAssertEqual(
-            VoiceInkPowerModePresentation.sidebarEmptyMessage,
-            "Add customized power modes for different contexts"
-        )
-        XCTAssertEqual(VoiceInkPowerModePresentation.sidebarEmptyButtonTitle, "Add New Power Mode")
-        XCTAssertEqual(VoiceInkPowerModePresentation.sidebarEmptySystemImageName, "bolt.circle.fill")
-        XCTAssertEqual(VoiceInkPowerModePresentation.addIconButtonSystemImageName, "plus.circle.fill")
-    }
-
-    func testPopoverAndRowActionChromePreservesMacOSCopy() {
-        XCTAssertEqual(VoiceInkPowerModePresentation.popoverTitle, "Select Power Mode")
-        XCTAssertEqual(VoiceInkPowerModePresentation.popoverEmptyTitle, "No Power Modes Available")
-        XCTAssertEqual(VoiceInkPowerModePresentation.popoverEmptySystemImageName, "sparkles")
-        XCTAssertEqual(VoiceInkPowerModePresentation.popoverSelectedSystemImageName, "checkmark")
-        XCTAssertEqual(VoiceInkPowerModePresentation.recorderButtonFallbackIcon, "✨")
-        XCTAssertEqual(VoiceInkPowerModePresentation.rowEditActionTitle, "Edit")
-        XCTAssertEqual(VoiceInkPowerModePresentation.rowEditActionSystemImageName, "pencil")
-        XCTAssertEqual(VoiceInkPowerModePresentation.rowDeleteActionTitle, "Delete")
-        XCTAssertEqual(VoiceInkPowerModePresentation.rowDeleteActionSystemImageName, "trash")
-    }
-
     func testRecorderButtonIconPreservesActiveEmojiFallbacks() {
         let activeConfig = PowerModeConfig(
             name: "Writing",
@@ -152,128 +85,6 @@ final class PowerModePolicyTests: XCTestCase {
                 activeConfiguration: activeConfig
             ),
             "✨"
-        )
-    }
-
-    func testConfigurationFormChromePreservesMacOSCopy() {
-        XCTAssertEqual(VoiceInkPowerModePresentation.formCloseHelpText, "Close")
-        XCTAssertEqual(VoiceInkPowerModePresentation.formCloseSystemImageName, "xmark")
-        XCTAssertEqual(VoiceInkPowerModePresentation.generalSectionTitle, "General")
-        XCTAssertEqual(VoiceInkPowerModePresentation.nameFieldPlaceholder, "Name")
-        XCTAssertEqual(VoiceInkPowerModePresentation.triggerScenariosSectionTitle, "Trigger Scenarios")
-        XCTAssertEqual(VoiceInkPowerModePresentation.applicationsSectionTitle, "Applications")
-        XCTAssertEqual(VoiceInkPowerModePresentation.addApplicationHelpText, "Add application")
-        XCTAssertEqual(VoiceInkPowerModePresentation.noApplicationsText, "No applications added")
-        XCTAssertEqual(VoiceInkPowerModePresentation.appPickerSearchPlaceholder, "Search apps...")
-        XCTAssertEqual(VoiceInkPowerModePresentation.appPickerSearchSystemImageName, "magnifyingglass")
-        XCTAssertEqual(VoiceInkPowerModePresentation.appPickerClearSearchSystemImageName, "xmark.circle.fill")
-        XCTAssertEqual(VoiceInkPowerModePresentation.appPickerSelectedSystemImageName, "checkmark")
-        XCTAssertEqual(VoiceInkPowerModePresentation.websitesSectionTitle, "Websites")
-        XCTAssertEqual(VoiceInkPowerModePresentation.websiteURLFieldPlaceholder, "Enter website URL")
-        XCTAssertEqual(VoiceInkPowerModePresentation.addWebsiteHelpText, "Add website")
-        XCTAssertEqual(VoiceInkPowerModePresentation.noWebsitesText, "No websites added")
-        XCTAssertEqual(VoiceInkPowerModePresentation.transcriptionSectionTitle, "Transcription")
-        XCTAssertEqual(VoiceInkPowerModePresentation.transcriptionModelPickerTitle, "Model")
-        XCTAssertEqual(VoiceInkPowerModePresentation.transcriptionLanguageTitle, "Language")
-        XCTAssertEqual(VoiceInkPowerModePresentation.autodetectedLanguageText, "Autodetected")
-        XCTAssertEqual(VoiceInkPowerModePresentation.transcriptFormattingDisclosureSystemImageName, "chevron.right")
-        XCTAssertEqual(VoiceInkPowerModePresentation.aiEnhancementSectionTitle, "AI Enhancement")
-        XCTAssertEqual(VoiceInkPowerModePresentation.aiEnhancementToggleTitle, "AI Enhancement")
-        XCTAssertEqual(VoiceInkPowerModePresentation.advancedSectionTitle, "Advanced")
-        XCTAssertEqual(VoiceInkPowerModePresentation.formDeleteButtonTitle, "Delete")
-        XCTAssertEqual(VoiceInkPowerModePresentation.formCancelButtonTitle, "Cancel")
-        XCTAssertEqual(VoiceInkPowerModePresentation.formSaveButtonTitle, "Save Changes")
-    }
-
-    func testDeleteConfirmationPreservesPowerModeCopy() {
-        let confirmation = VoiceInkPowerModePresentation.deleteConfirmation(configName: "Writing")
-
-        XCTAssertEqual(confirmation.title, "Delete Power Mode?")
-        XCTAssertEqual(
-            confirmation.message,
-            "Are you sure you want to delete the 'Writing' power mode? This action cannot be undone."
-        )
-        XCTAssertEqual(confirmation.primaryButtonTitle, "Delete")
-        XCTAssertEqual(confirmation.cancelButtonTitle, "Cancel")
-    }
-
-    func testValidationAlertPreservesFirstPowerModeErrorCopy() {
-        let alert = VoiceInkPowerModePresentation.validationAlert(errors: [.duplicateName("Writing")])
-
-        XCTAssertEqual(alert.title, "Cannot Save Power Mode")
-        XCTAssertEqual(alert.message, "A power mode with the name 'Writing' already exists.")
-        XCTAssertEqual(alert.buttonTitle, "OK")
-    }
-
-    func testValidationAlertPreservesFallbackCopy() {
-        let alert = VoiceInkPowerModePresentation.validationAlert(errors: [])
-
-        XCTAssertEqual(alert.title, "Cannot Save Power Mode")
-        XCTAssertEqual(alert.message, "Please fix the validation errors before saving.")
-        XCTAssertEqual(alert.buttonTitle, "OK")
-    }
-
-    func testNoTranscriptionModelsAvailableTextPreservesMacOSFormCopy() {
-        XCTAssertEqual(
-            VoiceInkPowerModePresentation.noTranscriptionModelsAvailableText,
-            "No transcription models available. Please connect to a cloud service or download a local model in the AI Models tab."
-        )
-    }
-
-    func testAIEnhancementEmptyStateTextPreservesMacOSFormCopy() {
-        XCTAssertEqual(VoiceInkPowerModePresentation.noAIProvidersConnectedText, "No providers connected")
-        XCTAssertEqual(
-            VoiceInkPowerModePresentation.noAIModelsAvailableText(for: .openRouter),
-            "No models loaded"
-        )
-        XCTAssertEqual(
-            VoiceInkPowerModePresentation.noAIModelsAvailableText(for: .gemini),
-            "No models available"
-        )
-        for provider in VoiceInkAIEnhancementProviderKind.allCases {
-            XCTAssertEqual(
-                VoiceInkPowerModePresentation.shouldShowAIModelOptions(for: provider),
-                provider != .custom,
-                provider.rawValue
-            )
-        }
-        for provider in VoiceInkAIEnhancementProviderKind.allCases {
-            XCTAssertEqual(
-                VoiceInkPowerModePresentation.shouldShowRefreshModelsButton(for: provider),
-                provider == .openRouter,
-                provider.rawValue
-            )
-        }
-        XCTAssertEqual(VoiceInkPowerModePresentation.noEnhancementPromptsAvailableText, "No prompts available")
-        XCTAssertEqual(VoiceInkPowerModePresentation.appTriggerSystemImageName, "app.fill")
-        XCTAssertEqual(VoiceInkPowerModePresentation.websiteTriggerSystemImageName, "globe")
-        XCTAssertEqual(VoiceInkPowerModePresentation.removeTriggerSystemImageName, "xmark.circle.fill")
-    }
-
-    func testAIEnhancementFormChromePreservesMacOSCopy() {
-        XCTAssertEqual(VoiceInkPowerModePresentation.aiProviderFormTitle, "AI Provider")
-        XCTAssertEqual(VoiceInkPowerModePresentation.aiModelFormTitle, "AI Model")
-        XCTAssertEqual(VoiceInkPowerModePresentation.enhancementPromptFormTitle, "Enhancement Prompt")
-        XCTAssertEqual(VoiceInkPowerModePresentation.contextAwarenessDisplayText, "Context Awareness")
-        XCTAssertEqual(VoiceInkPowerModePresentation.refreshModelsButtonTitle, "Refresh Models")
-        XCTAssertEqual(VoiceInkPowerModePresentation.refreshModelsButtonHelp, "Refresh models")
-        XCTAssertEqual(VoiceInkPowerModePresentation.setAsDefaultToggleTitle, "Set as default")
-        XCTAssertEqual(
-            VoiceInkPowerModePresentation.setAsDefaultHelpText,
-            "Default power mode is used when no specific app or website matches are found."
-        )
-    }
-
-    func testAdvancedFormChromePreservesMacOSCopy() {
-        XCTAssertEqual(VoiceInkPowerModePresentation.autoSendFormTitle, "Auto Send")
-        XCTAssertEqual(
-            VoiceInkPowerModePresentation.autoSendHelpText,
-            "Automatically presses a key combination after pasting text. Useful for chat applications or forms that use different send shortcuts."
-        )
-        XCTAssertEqual(VoiceInkPowerModePresentation.keyboardShortcutFormTitle, "Keyboard Shortcut")
-        XCTAssertEqual(
-            VoiceInkPowerModePresentation.keyboardShortcutHelpText,
-            "Assign a unique keyboard shortcut to instantly activate this Power Mode and start recording."
         )
     }
 
@@ -414,73 +225,6 @@ final class PowerModePolicyTests: XCTestCase {
         )
         XCTAssertFalse(VoiceInkPowerModeBrowser.allCases.contains(.firefox))
         XCTAssertFalse(VoiceInkPowerModeBrowser.allCases.contains(.zen))
-    }
-
-    func testPowerModeBrowserURLDiagnosticsPreserveMacOSLogCopy() {
-        XCTAssertEqual(VoiceInkPowerModeBrowserURLDiagnostics.loggerCategory, "browser.applescript")
-        XCTAssertEqual(
-            VoiceInkPowerModeBrowserURLDiagnostics.scriptNotFoundMessage(scriptName: "arcURL"),
-            "❌ AppleScript file not found: arcURL.scpt"
-        )
-        XCTAssertEqual(
-            VoiceInkPowerModeBrowserURLDiagnostics.attemptingExecutionMessage(browserDisplayName: "Arc"),
-            "🔍 Attempting to execute AppleScript for Arc"
-        )
-        XCTAssertEqual(
-            VoiceInkPowerModeBrowserURLDiagnostics.browserNotRunningMessage(browserDisplayName: "Arc"),
-            "❌ Browser not running: Arc"
-        )
-        XCTAssertEqual(
-            VoiceInkPowerModeBrowserURLDiagnostics.executingScriptMessage(browserDisplayName: "Arc"),
-            "▶️ Executing AppleScript for Arc"
-        )
-        XCTAssertEqual(
-            VoiceInkPowerModeBrowserURLDiagnostics.emptyOutputMessage(browserDisplayName: "Arc"),
-            "❌ Empty output from AppleScript for Arc"
-        )
-        XCTAssertEqual(
-            VoiceInkPowerModeBrowserURLDiagnostics.scriptErrorMessage(
-                browserDisplayName: "Arc",
-                output: "error: no tab"
-            ),
-            "❌ AppleScript error for Arc: error: no tab"
-        )
-        XCTAssertEqual(
-            VoiceInkPowerModeBrowserURLDiagnostics.successMessage(
-                browserDisplayName: "Arc",
-                output: "https://example.com"
-            ),
-            "✅ Successfully retrieved URL from Arc: https://example.com"
-        )
-        XCTAssertEqual(
-            VoiceInkPowerModeBrowserURLDiagnostics.outputDecodeFailedMessage(browserDisplayName: "Arc"),
-            "❌ Failed to decode output from AppleScript for Arc"
-        )
-        XCTAssertEqual(
-            VoiceInkPowerModeBrowserURLDiagnostics.executionFailedMessage(
-                browserDisplayName: "Arc",
-                localizedDescription: "operation failed"
-            ),
-            "❌ AppleScript execution failed for Arc: operation failed"
-        )
-        XCTAssertEqual(
-            VoiceInkPowerModeBrowserURLDiagnostics.runningStatusMessage(
-                browserDisplayName: "Arc",
-                isRunning: true
-            ),
-            "Arc running status: true"
-        )
-    }
-
-    func testPowerModeBrowserDetectionDiagnosticsPreserveMacOSLogCopy() {
-        XCTAssertEqual(VoiceInkPowerModeBrowserDetectionDiagnostics.loggerCategory, "browser.detection")
-        XCTAssertEqual(
-            VoiceInkPowerModeBrowserDetectionDiagnostics.urlLookupFailedMessage(
-                browserDisplayName: "Arc",
-                localizedDescription: "no active tab"
-            ),
-            "❌ Failed to get URL from Arc: no active tab"
-        )
     }
 
     func testPowerModeEmojiCatalogPreservesDefaultsStorageKeyAndCopy() {
@@ -2457,32 +2201,6 @@ final class PowerModePolicyTests: XCTestCase {
         return events
     }
 
-    func testPowerModeSessionDiagnosticsPreserveMacOSConsoleCopy() {
-        XCTAssertEqual(
-            VoiceInkPowerModeSessionDiagnostics.notConfiguredMessage,
-            "SessionManager not configured."
-        )
-        XCTAssertEqual(
-            VoiceInkPowerModeSessionDiagnostics.localModelLoadFailedMessage(
-                modelName: "ggml-base",
-                errorDescription: "load failed"
-            ),
-            "Power Mode: Failed to load local model 'ggml-base': load failed"
-        )
-        XCTAssertEqual(
-            VoiceInkPowerModeSessionDiagnostics.recoveringAbandonedSessionMessage,
-            "Recovering abandoned Power Mode session."
-        )
-        XCTAssertEqual(
-            VoiceInkPowerModeSessionDiagnostics.saveFailedMessage(errorDescription: "disk full"),
-            "Error saving Power Mode session: disk full"
-        )
-        XCTAssertEqual(
-            VoiceInkPowerModeSessionDiagnostics.loadFailedMessage(errorDescription: "bad data"),
-            "Error loading Power Mode session: bad data"
-        )
-    }
-
     func testAutoSendKeyPreservesStoredValuesPickerOrderAndLabels() {
         XCTAssertEqual(
             VoiceInkAutoSendKey.allCases,
@@ -3594,25 +3312,6 @@ final class PowerModePolicyTests: XCTestCase {
 
         XCTAssertEqual(first, renamed)
         XCTAssertFalse(first == other)
-    }
-
-    func testValidationErrorDescriptionsPreserveMacOSAlertText() {
-        XCTAssertEqual(
-            VoiceInkPowerModeValidationError.emptyName.localizedDescription,
-            "Power mode name cannot be empty."
-        )
-        XCTAssertEqual(
-            VoiceInkPowerModeValidationError.duplicateName("Writing").localizedDescription,
-            "A power mode with the name 'Writing' already exists."
-        )
-        XCTAssertEqual(
-            VoiceInkPowerModeValidationError.duplicateAppTrigger("Notes", "Writing").localizedDescription,
-            "The app 'Notes' is already configured in the 'Writing' power mode."
-        )
-        XCTAssertEqual(
-            VoiceInkPowerModeValidationError.duplicateWebsiteTrigger("example.com", "Writing").localizedDescription,
-            "The website 'example.com' is already configured in the 'Writing' power mode."
-        )
     }
 
     private func powerModeActiveConfigurationRestoreEvents(

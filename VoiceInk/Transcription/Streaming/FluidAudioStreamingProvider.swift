@@ -27,23 +27,15 @@ final class FluidAudioStreamingProvider {
     private let config: AgreementConfig
 
     private var transcriptionTask: Task<Void, Never>?
-    private var immediateTranscriptionTask: Task<Void, Never>?
     private var isTranscribing = false
     private var lastTranscribedSampleCount = 0
-    private var lastImmediatePassScheduledSampleCount = 0
-    private var latestHypothesisText = ""
-    private var latestHypothesisSampleCount = 0
     private let minimumAudioSamples = ASRConstants.minimumRequiredSamples(forSampleRate: ASRConstants.sampleRate)
     private let minNewSamples = ASRConstants.minimumRequiredSamples(forSampleRate: ASRConstants.sampleRate)
-    private let maxCachedFinalizationLagSamples: Int
 
     init(loadModels: @escaping ModelLoader, config: AgreementConfig = AgreementConfig()) {
         self.loadModels = loadModels
         self.config = config
         self.agreementEngine = WordAgreementEngine(config: config)
-        self.maxCachedFinalizationLagSamples = VoiceInkPCM16Audio.sampleCount(
-            forMono16kDuration: config.cachedFinalizationMaxLagSeconds
-        )
 
         var continuation: AsyncStream<VoiceInkStreamingTranscriptionEvent>.Continuation!
         transcriptionEvents = AsyncStream { continuation = $0 }
@@ -68,7 +60,6 @@ final class FluidAudioStreamingProvider {
 
     deinit {
         transcriptionTask?.cancel()
-        immediateTranscriptionTask?.cancel()
         eventsContinuation?.finish()
     }
 
@@ -88,9 +79,6 @@ final class FluidAudioStreamingProvider {
         audioBuffer = []
         trimmedSampleCount = 0
         lastTranscribedSampleCount = 0
-        lastImmediatePassScheduledSampleCount = 0
-        latestHypothesisText = ""
-        latestHypothesisSampleCount = 0
 
         startTranscriptionLoop()
 
@@ -100,29 +88,9 @@ final class FluidAudioStreamingProvider {
 
     func sendAudioChunk(_ data: Data) async throws {
         let samples = VoiceInkPCM16Audio.floatSamples(fromLittleEndianData: data)
-        let shouldRunImmediatePass: Bool
         bufferLock.lock()
         audioBuffer.append(contentsOf: samples)
-        let absoluteSampleCount = trimmedSampleCount + audioBuffer.count
-        shouldRunImmediatePass = VoiceInkFluidAudioTranscriptionPolicy.shouldScheduleImmediatePass(
-            config: config,
-            hasImmediatePassInFlight: immediateTranscriptionTask != nil,
-            absoluteSampleCount: absoluteSampleCount,
-            lastScheduledSampleCount: lastImmediatePassScheduledSampleCount,
-            minimumAudioSamples: minimumAudioSamples,
-            minimumNewSamples: minNewSamples
-        )
-        if shouldRunImmediatePass {
-            lastImmediatePassScheduledSampleCount = absoluteSampleCount
-        }
         bufferLock.unlock()
-
-        if shouldRunImmediatePass {
-            immediateTranscriptionTask = Task { [weak self] in
-                await self?.runTranscriptionPass()
-                self?.immediateTranscriptionTask = nil
-            }
-        }
     }
 
     func commit() async throws {
@@ -130,14 +98,6 @@ final class FluidAudioStreamingProvider {
         transcriptionTask?.cancel()
         await transcriptionTask?.value
         transcriptionTask = nil
-        await immediateTranscriptionTask?.value
-        immediateTranscriptionTask = nil
-
-        if let cachedText = cachedFinalTextIfCurrentEnough() {
-            logger.notice("FluidAudio commit used cached hypothesis elapsed=\(Date().timeIntervalSince(commitStartedAt), format: .fixed(precision: 3), privacy: .public)s chars=\(cachedText.count, privacy: .public)")
-            eventsContinuation?.yield(.committed(text: cachedText))
-            return
-        }
 
         let remainingText = await transcribeRemainingAudio() ?? ""
         logger.notice("FluidAudio commit ran final ASR elapsed=\(Date().timeIntervalSince(commitStartedAt), format: .fixed(precision: 3), privacy: .public)s chars=\(remainingText.count, privacy: .public)")
@@ -148,9 +108,6 @@ final class FluidAudioStreamingProvider {
         transcriptionTask?.cancel()
         await transcriptionTask?.value
         transcriptionTask = nil
-        immediateTranscriptionTask?.cancel()
-        await immediateTranscriptionTask?.value
-        immediateTranscriptionTask = nil
 
         await asrManager?.cleanup()
         asrManager = nil
@@ -160,9 +117,6 @@ final class FluidAudioStreamingProvider {
         bufferLock.lock()
         audioBuffer = []
         trimmedSampleCount = 0
-        lastImmediatePassScheduledSampleCount = 0
-        latestHypothesisText = ""
-        latestHypothesisSampleCount = 0
         bufferLock.unlock()
         agreementEngine.reset()
 
@@ -241,8 +195,6 @@ final class FluidAudioStreamingProvider {
             guard let tokenTimings = result.tokenTimings, !tokenTimings.isEmpty else {
                 let text = TextNormalizer.shared.normalizeSentence(result.text.trimmingCharacters(in: .whitespacesAndNewlines))
                 if !text.isEmpty {
-                    latestHypothesisText = text
-                    latestHypothesisSampleCount = absoluteSampleCount
                     eventsContinuation?.yield(.partial(text: text))
                 }
                 return
@@ -253,8 +205,6 @@ final class FluidAudioStreamingProvider {
             guard !words.isEmpty else { return }
 
             let agreementResult = agreementEngine.processTranscriptionResult(words: words, resultConfidence: result.confidence)
-            latestHypothesisText = TextNormalizer.shared.normalizeSentence(agreementResult.hypothesisText)
-            latestHypothesisSampleCount = absoluteSampleCount
 
             if !agreementResult.newlyConfirmedText.isEmpty {
                 let normalizedConfirmed = TextNormalizer.shared.normalizeSentence(agreementResult.newlyConfirmedText)
@@ -326,27 +276,6 @@ final class FluidAudioStreamingProvider {
         }
     }
 
-    private func cachedFinalTextIfCurrentEnough() -> String? {
-        bufferLock.lock()
-        let absoluteSampleCount = trimmedSampleCount + audioBuffer.count
-        bufferLock.unlock()
-
-        let plan = VoiceInkFluidAudioTranscriptionPolicy.cachedFinalTextPlan(
-            latestHypothesisText: latestHypothesisText,
-            latestHypothesisSampleCount: latestHypothesisSampleCount,
-            absoluteSampleCount: absoluteSampleCount,
-            maxCachedFinalizationLagSamples: maxCachedFinalizationLagSamples
-        )
-
-        guard let cachedText = plan.text else {
-            if plan.isTooStale {
-                logger.notice("FluidAudio cached hypothesis too stale pendingSamples=\(plan.pendingSamples, privacy: .public) limit=\(self.maxCachedFinalizationLagSamples, privacy: .public)")
-            }
-            return nil
-        }
-
-        return cachedText
-    }
 }
 
 #if os(macOS)

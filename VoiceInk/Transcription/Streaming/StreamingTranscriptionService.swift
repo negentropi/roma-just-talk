@@ -89,7 +89,6 @@ class StreamingTranscriptionService {
     private let modelContext: ModelContext
     private let streamingAdapterKind: VoiceInkTranscriptionStreamingAdapterKind
     private let fluidAudioService: FluidAudioTranscriptionService?
-    private let fluidAudioStreamingConfig: AgreementConfig?
     private let finalCommitTimeoutNanoseconds: UInt64
     private var onPartialTranscript: ((String) -> Void)?
     private let metrics = StreamingMetrics()
@@ -101,14 +100,12 @@ class StreamingTranscriptionService {
         modelContext: ModelContext,
         streamingAdapterKind: VoiceInkTranscriptionStreamingAdapterKind,
         fluidAudioService: FluidAudioTranscriptionService? = nil,
-        fluidAudioStreamingConfig: AgreementConfig? = nil,
         finalCommitTimeoutNanoseconds: UInt64 = VoiceInkStreamingFinalCommitTimeout.cloudNanoseconds,
         onPartialTranscript: ((String) -> Void)? = nil
     ) {
         self.modelContext = modelContext
         self.streamingAdapterKind = streamingAdapterKind
         self.fluidAudioService = fluidAudioService
-        self.fluidAudioStreamingConfig = fluidAudioStreamingConfig
         self.finalCommitTimeoutNanoseconds = finalCommitTimeoutNanoseconds
         self.onPartialTranscript = onPartialTranscript
     }
@@ -239,10 +236,7 @@ class StreamingTranscriptionService {
             guard let fluidAudioService else {
                 fatalError("FluidAudioTranscriptionService required for FluidAudio streaming. Ensure it is passed to StreamingTranscriptionService.")
             }
-            return FluidAudioStreamingProvider(
-                fluidAudioService: fluidAudioService,
-                config: fluidAudioStreamingConfig ?? AgreementConfig()
-            )
+            return FluidAudioStreamingProvider(fluidAudioService: fluidAudioService)
         case .cloud:
             guard let cloudProvider = CloudProviderRegistry.provider(for: model.provider),
                   let streamingProvider = cloudProvider.makeStreamingProvider(modelContext: modelContext) else {

@@ -21,29 +21,6 @@ final class TranscriptionStreamingPreferenceTests: XCTestCase {
         )
     }
 
-    func testErrorDescriptionsPreserveExistingMacOSStreamingMessages() {
-        XCTAssertEqual(
-            VoiceInkStreamingTranscriptionError.missingAPIKey.errorDescription,
-            "API key not configured for streaming transcription"
-        )
-        XCTAssertEqual(
-            VoiceInkStreamingTranscriptionError.connectionFailed("socket closed").errorDescription,
-            "Streaming connection failed: socket closed"
-        )
-        XCTAssertEqual(
-            VoiceInkStreamingTranscriptionError.timeout.errorDescription,
-            "Streaming transcription timed out waiting for final result"
-        )
-        XCTAssertEqual(
-            VoiceInkStreamingTranscriptionError.serverError("bad request").errorDescription,
-            "Streaming server error: bad request"
-        )
-        XCTAssertEqual(
-            VoiceInkStreamingTranscriptionError.notConnected.errorDescription,
-            "Not connected to streaming transcription service"
-        )
-    }
-
     func testUnknownServerErrorFallbackPreservesExistingText() {
         XCTAssertEqual(VoiceInkStreamingTranscriptionError.unknownServerErrorMessage, "Unknown error")
     }
@@ -65,16 +42,6 @@ final class TranscriptionStreamingPreferenceTests: XCTestCase {
         XCTAssertTrue(VoiceInkTranscriptionServiceRoute.localFluidAudio.isLocalTranscriptionProvider)
         XCTAssertFalse(VoiceInkTranscriptionServiceRoute.nativeApple.isCloudTranscriptionProvider)
         XCTAssertTrue(VoiceInkTranscriptionServiceRoute.nativeApple.isLocalTranscriptionProvider)
-    }
-
-    func testTranscriptionServiceRouteDiagnosticsPreservesRuntimeLogCopy() {
-        XCTAssertEqual(
-            VoiceInkTranscriptionServiceRouteDiagnostics.transcribingMessage(
-                modelDisplayName: "nova-3",
-                serviceTypeDescription: "CloudTranscriptionService"
-            ),
-            "Transcribing with nova-3 using CloudTranscriptionService"
-        )
     }
 
     func testStreamingTranscriptAssemblyPreservesCommittedPreviewAndFinalText() {
@@ -278,8 +245,7 @@ final class TranscriptionStreamingPreferenceTests: XCTestCase {
     func testStreamingModePresentationForStreamingOnlyModelsForcesStreamingToggle() {
         let presentation = VoiceInkTranscriptionStreamingModePresentation(
             isStreamingEnabled: false,
-            isStreamingOnly: true,
-            isPreloadEnabled: false
+            isStreamingOnly: true
         )
 
         XCTAssertEqual(presentation.streamingToggleTitle, "Streaming")
@@ -291,8 +257,7 @@ final class TranscriptionStreamingPreferenceTests: XCTestCase {
     func testStreamingModePresentationForEnabledBatchCapableModelUsesStreamingHelp() {
         let presentation = VoiceInkTranscriptionStreamingModePresentation(
             isStreamingEnabled: true,
-            isStreamingOnly: false,
-            isPreloadEnabled: false
+            isStreamingOnly: false
         )
 
         XCTAssertFalse(presentation.isStreamingToggleForcedOn)
@@ -306,8 +271,7 @@ final class TranscriptionStreamingPreferenceTests: XCTestCase {
     func testStreamingModePresentationForDisabledBatchCapableModelUsesBatchHelp() {
         let presentation = VoiceInkTranscriptionStreamingModePresentation(
             isStreamingEnabled: false,
-            isStreamingOnly: false,
-            isPreloadEnabled: false
+            isStreamingOnly: false
         )
 
         XCTAssertFalse(presentation.isStreamingToggleForcedOn)
@@ -316,39 +280,6 @@ final class TranscriptionStreamingPreferenceTests: XCTestCase {
             presentation.streamingToggleHelp,
             "Saved-file batch mode; click to stream active-recording audio"
         )
-    }
-
-    func testStreamingModePresentationPreservesPreloadHelp() {
-        let enabled = VoiceInkTranscriptionStreamingModePresentation(
-            isStreamingEnabled: true,
-            isStreamingOnly: false,
-            isPreloadEnabled: true
-        )
-        let disabled = VoiceInkTranscriptionStreamingModePresentation(
-            isStreamingEnabled: true,
-            isStreamingOnly: false,
-            isPreloadEnabled: false
-        )
-
-        XCTAssertEqual(enabled.preloadToggleTitle, "Buffer Preload")
-        XCTAssertEqual(
-            enabled.preloadToggleHelp,
-            "Rolling buffer can pre-run this model when global policy allows it"
-        )
-        XCTAssertEqual(disabled.preloadToggleTitle, "Buffer Preload")
-        XCTAssertEqual(disabled.preloadToggleHelp, "Rolling buffer preload disabled for this model")
-    }
-
-    func testStreamingModePresentationPreservesFluidAudioPreloadHelp() {
-        let enabled = VoiceInkTranscriptionStreamingModePresentation(
-            isStreamingEnabled: true,
-            isStreamingOnly: false,
-            isPreloadEnabled: true,
-            preloadHelpContext: .localFluidAudio
-        )
-
-        XCTAssertEqual(enabled.preloadToggleTitle, "Buffer Preload")
-        XCTAssertEqual(enabled.preloadToggleHelp, "Rolling buffer can pre-run this model")
     }
 
     func testTrailingSilenceDefaultsPreserveFluidAudioChunkPolicy() {
@@ -379,52 +310,6 @@ final class TranscriptionStreamingPreferenceTests: XCTestCase {
         )
 
         XCTAssertEqual(padded, samples)
-    }
-
-    func testImmediatePassSchedulingRequiresEnabledConfigNoInFlightTaskAndEnoughNewAudio() {
-        let disabledConfig = AgreementConfig(runsImmediatePassOnBufferedAudio: false)
-        let enabledConfig = AgreementConfig(runsImmediatePassOnBufferedAudio: true)
-
-        XCTAssertFalse(VoiceInkFluidAudioTranscriptionPolicy.shouldScheduleImmediatePass(
-            config: disabledConfig,
-            hasImmediatePassInFlight: false,
-            absoluteSampleCount: 32_000,
-            lastScheduledSampleCount: 0,
-            minimumAudioSamples: 16_000,
-            minimumNewSamples: 16_000
-        ))
-        XCTAssertFalse(VoiceInkFluidAudioTranscriptionPolicy.shouldScheduleImmediatePass(
-            config: enabledConfig,
-            hasImmediatePassInFlight: true,
-            absoluteSampleCount: 32_000,
-            lastScheduledSampleCount: 0,
-            minimumAudioSamples: 16_000,
-            minimumNewSamples: 16_000
-        ))
-        XCTAssertFalse(VoiceInkFluidAudioTranscriptionPolicy.shouldScheduleImmediatePass(
-            config: enabledConfig,
-            hasImmediatePassInFlight: false,
-            absoluteSampleCount: 15_999,
-            lastScheduledSampleCount: 0,
-            minimumAudioSamples: 16_000,
-            minimumNewSamples: 16_000
-        ))
-        XCTAssertFalse(VoiceInkFluidAudioTranscriptionPolicy.shouldScheduleImmediatePass(
-            config: enabledConfig,
-            hasImmediatePassInFlight: false,
-            absoluteSampleCount: 20_000,
-            lastScheduledSampleCount: 8_000,
-            minimumAudioSamples: 16_000,
-            minimumNewSamples: 16_000
-        ))
-        XCTAssertTrue(VoiceInkFluidAudioTranscriptionPolicy.shouldScheduleImmediatePass(
-            config: enabledConfig,
-            hasImmediatePassInFlight: false,
-            absoluteSampleCount: 24_000,
-            lastScheduledSampleCount: 8_000,
-            minimumAudioSamples: 16_000,
-            minimumNewSamples: 16_000
-        ))
     }
 
     func testTranscriptionPassSchedulingRequiresMinimumTotalAndNewAudio() {
@@ -490,41 +375,6 @@ final class TranscriptionStreamingPreferenceTests: XCTestCase {
             ),
             0
         )
-    }
-
-    func testCachedFinalTextPlanReturnsFreshTrimmedHypothesis() {
-        let plan = VoiceInkFluidAudioTranscriptionPolicy.cachedFinalTextPlan(
-            latestHypothesisText: " hello world ",
-            latestHypothesisSampleCount: 10_000,
-            absoluteSampleCount: 12_000,
-            maxCachedFinalizationLagSamples: 4_000
-        )
-
-        XCTAssertEqual(plan.text, "hello world")
-        XCTAssertEqual(plan.pendingSamples, 2_000)
-        XCTAssertFalse(plan.isTooStale)
-    }
-
-    func testCachedFinalTextPlanRejectsBlankAndStaleHypotheses() {
-        let blankPlan = VoiceInkFluidAudioTranscriptionPolicy.cachedFinalTextPlan(
-            latestHypothesisText: " ",
-            latestHypothesisSampleCount: 10_000,
-            absoluteSampleCount: 12_000,
-            maxCachedFinalizationLagSamples: 4_000
-        )
-        XCTAssertNil(blankPlan.text)
-        XCTAssertEqual(blankPlan.pendingSamples, 0)
-        XCTAssertFalse(blankPlan.isTooStale)
-
-        let stalePlan = VoiceInkFluidAudioTranscriptionPolicy.cachedFinalTextPlan(
-            latestHypothesisText: "old",
-            latestHypothesisSampleCount: 10_000,
-            absoluteSampleCount: 15_001,
-            maxCachedFinalizationLagSamples: 5_000
-        )
-        XCTAssertNil(stalePlan.text)
-        XCTAssertEqual(stalePlan.pendingSamples, 5_001)
-        XCTAssertTrue(stalePlan.isTooStale)
     }
 
     func testTimedWordNormalizesCaseHyphenAndPunctuationForAgreement() {
@@ -604,18 +454,6 @@ final class TranscriptionStreamingPreferenceTests: XCTestCase {
         XCTAssertEqual(engine.processTranscriptionResult(words: words).newlyConfirmedText, "")
     }
 
-    func testRollingPreloadConfigPreservesExistingStreamingValues() {
-        let config = AgreementConfig.rollingPreload
-
-        XCTAssertEqual(config.transcribeIntervalSeconds, 0.35)
-        XCTAssertEqual(config.tokenConfirmationsNeeded, 3)
-        XCTAssertEqual(config.minWordsToConfirm, 5)
-        XCTAssertEqual(config.minPassConfidence, 0.15, accuracy: 0.0001)
-        XCTAssertEqual(config.minWordConfidence, 0.6, accuracy: 0.0001)
-        XCTAssertEqual(config.cachedFinalizationMaxLagSeconds, 0.25)
-        XCTAssertTrue(config.runsImmediatePassOnBufferedAudio)
-    }
-
     func testStreamingFinalCommitTimeoutPreservesCloudDefault() {
         XCTAssertEqual(VoiceInkStreamingFinalCommitTimeout.cloudNanoseconds, 10_000_000_000)
         XCTAssertEqual(
@@ -641,12 +479,11 @@ final class TranscriptionStreamingPreferenceTests: XCTestCase {
                 to: defaults
             )
 
-            let plan = facts.plan(forceStreaming: false, defaults: defaults)
+            let plan = facts.plan(defaults: defaults)
 
             XCTAssertFalse(plan.usesStreaming)
             XCTAssertEqual(plan.serviceRoute, .cloud)
             XCTAssertNil(plan.streamingAdapterKind)
-            XCTAssertFalse(plan.usesRollingPreload)
             XCTAssertNil(plan.finalCommitSource)
             XCTAssertNil(plan.finalCommitTimeoutNanoseconds)
         }
@@ -656,11 +493,10 @@ final class TranscriptionStreamingPreferenceTests: XCTestCase {
         withIsolatedDefaults { defaults in
             let facts = routeFacts(serviceRoute: .cloud, modelName: "nova-3")
 
-            let plan = facts.plan(forceStreaming: false, defaults: defaults)
+            let plan = facts.plan(defaults: defaults)
 
             XCTAssertTrue(plan.usesStreaming)
             XCTAssertEqual(plan.streamingAdapterKind, .cloud)
-            XCTAssertFalse(plan.usesRollingPreload)
             XCTAssertEqual(plan.finalCommitSource, .cloud)
             XCTAssertEqual(plan.finalCommitTimeoutNanoseconds, VoiceInkStreamingFinalCommitTimeout.cloudNanoseconds)
         }
@@ -670,11 +506,10 @@ final class TranscriptionStreamingPreferenceTests: XCTestCase {
         withIsolatedDefaults { defaults in
             let facts = routeFacts(serviceRoute: .localFluidAudio, modelName: "parakeet-tdt-0.6b-v3")
 
-            let plan = facts.plan(forceStreaming: false, defaults: defaults)
+            let plan = facts.plan(defaults: defaults)
 
             XCTAssertTrue(plan.usesStreaming)
             XCTAssertEqual(plan.streamingAdapterKind, .localFluidAudio)
-            XCTAssertFalse(plan.usesRollingPreload)
             XCTAssertEqual(plan.finalCommitSource, .localFluidAudio)
             XCTAssertEqual(
                 plan.finalCommitTimeoutNanoseconds,
@@ -683,25 +518,7 @@ final class TranscriptionStreamingPreferenceTests: XCTestCase {
         }
     }
 
-    func testSessionRoutePlanEnablesRollingPreloadOnlyForForcedLocalFluidAudioStreaming() {
-        withIsolatedDefaults { defaults in
-            let facts = routeFacts(serviceRoute: .localFluidAudio, modelName: "parakeet-tdt-0.6b-v3")
-            VoiceInkTranscriptionStreamingPreference.saveIsEnabled(
-                false,
-                forModelName: "parakeet-tdt-0.6b-v3",
-                to: defaults
-            )
-
-            let plan = facts.plan(forceStreaming: true, defaults: defaults)
-
-            XCTAssertTrue(plan.usesStreaming)
-            XCTAssertEqual(plan.streamingAdapterKind, .localFluidAudio)
-            XCTAssertTrue(plan.usesRollingPreload)
-            XCTAssertEqual(plan.finalCommitSource, .localFluidAudio)
-        }
-    }
-
-    func testSessionRoutePlanRejectsForcedStreamingForUnsupportedModels() {
+    func testSessionRoutePlanRejectsStreamingForUnsupportedModels() {
         let facts = VoiceInkTranscriptionSessionRouteFacts(
             serviceRoute: .localWhisper,
             streamingSnapshot: VoiceInkTranscriptionStreamingModelSnapshot(
@@ -710,7 +527,7 @@ final class TranscriptionStreamingPreferenceTests: XCTestCase {
             )
         )
 
-        let plan = facts.plan(forceStreaming: true)
+        let plan = facts.plan()
 
         XCTAssertFalse(plan.usesStreaming)
         XCTAssertEqual(plan.serviceRoute, .localWhisper)
@@ -727,7 +544,7 @@ final class TranscriptionStreamingPreferenceTests: XCTestCase {
                 to: defaults
             )
 
-            let plan = facts.plan(forceStreaming: false, defaults: defaults)
+            let plan = facts.plan(defaults: defaults)
 
             XCTAssertEqual(
                 executionSummary(for: plan.executionPlan),
@@ -736,21 +553,20 @@ final class TranscriptionStreamingPreferenceTests: XCTestCase {
         }
     }
 
-    func testSessionRouteExecutionPlanPackagesStreamingAdapterPreloadAndTimeout() {
+    func testSessionRouteExecutionPlanPackagesStreamingAdapterAndTimeout() {
         withIsolatedDefaults { defaults in
             let facts = routeFacts(serviceRoute: .localFluidAudio, modelName: "parakeet-tdt-0.6b-v3")
             VoiceInkTranscriptionStreamingPreference.saveIsEnabled(
-                false,
+                true,
                 forModelName: "parakeet-tdt-0.6b-v3",
                 to: defaults
             )
 
-            let plan = facts.plan(forceStreaming: true, defaults: defaults)
+            let plan = facts.plan(defaults: defaults)
             let expectedSummary = [
                 "streaming",
                 "localFluidAudio",
                 "localFluidAudio",
-                "true",
                 "\(VoiceInkStreamingFinalCommitTimeout.localFluidAudioNanoseconds)"
             ].joined(separator: ":")
 
@@ -771,7 +587,6 @@ final class TranscriptionStreamingPreferenceTests: XCTestCase {
                     "streaming",
                     "\(request.serviceRoute)",
                     "\(request.adapterKind)",
-                    "\(request.usesRollingPreload)",
                     "\(request.finalCommitTimeoutNanoseconds)"
                 ].joined(separator: ":")
             }
@@ -824,9 +639,7 @@ final class TranscriptionStreamingPreferenceTests: XCTestCase {
             tokenConfirmationsNeeded: 1,
             minWordsToConfirm: 3,
             minPassConfidence: 0.15,
-            minWordConfidence: 0.6,
-            cachedFinalizationMaxLagSeconds: 0.35,
-            runsImmediatePassOnBufferedAudio: false
+            minWordConfidence: 0.6
         )
     }
 

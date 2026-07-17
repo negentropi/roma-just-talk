@@ -3,23 +3,6 @@ import SwiftData
 import os
 import VoiceInkCore
 
-typealias TranscriptionPipelineDeferredWork = @MainActor () -> Void
-
-struct TranscriptionLatencyTrace: Sendable {
-    static let rollingPreloadQuickReleaseOperation = "rolling-preload-quick-release"
-
-    let operation: String
-    let startedAt: Date
-
-    var elapsed: TimeInterval {
-        Date().timeIntervalSince(startedAt)
-    }
-
-    var isRollingPreloadQuickRelease: Bool {
-        operation == Self.rollingPreloadQuickReleaseOperation
-    }
-}
-
 /// Handles the full post-recording pipeline:
 /// transcribe → filter → format → word-replace → prompt-detect → AI enhance → start paste + dismiss → save
 @MainActor
@@ -52,10 +35,6 @@ class TranscriptionPipeline {
     ///   - shouldCancel: Returns true if the user requested cancellation.
     ///   - onCancel: Called when cancellation is detected to cancel active session state.
     ///   - onDismiss: Called as soon as paste is initiated to dismiss the recorder panel.
-    ///   - deferHistoryInsertUntilSave: Inserts the history record only at the final save boundary.
-    ///   - powerModeApplyTask: Applies active-window Power Mode config before paste while STT can run first.
-    ///   - preparedCursorTextContext: Pre-read cursor text context for quick-release paste capitalization.
-    ///   - preparedPasteContext: Pre-read clipboard context for quick-release clipboard restore.
     func run(
         transcription: Transcription,
         audioURL: URL,
@@ -64,80 +43,15 @@ class TranscriptionPipeline {
         onStateChange: @escaping (VoiceInkRecordingState) -> Void,
         shouldCancel: () -> Bool,
         onCancel: @escaping () async -> Void,
-        onDismiss: @escaping () async -> Void,
-        audioFileReadyTask: Task<Void, Error>? = nil,
-        latencyTrace: TranscriptionLatencyTrace? = nil,
-        deferHistoryInsertUntilSave: Bool = false,
-        powerModeApplyTask: Task<Void, Never>? = nil,
-        preparedCursorTextContext: Task<String?, Never>? = nil,
-        preparedPasteContext: Task<CursorPaster.PreparedPasteContext?, Never>? = nil
-    ) async -> TranscriptionPipelineDeferredWork? {
+        onDismiss: @escaping () async -> Void
+    ) async {
         var finalPastedText: String?
         var promptDetectionResult: VoiceInkPromptDetectionResult?
-        var didResolveAudioFileReadiness = false
-        var audioFileIsReady = audioFileReadyTask == nil
-        var shouldInsertHistoryRecordBeforeSave = deferHistoryInsertUntilSave
-        var didResolvePowerModeApply = false
-
-        if let latencyTrace {
-            logger.notice("Latency trace pipeline started operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
-        }
-
-        func insertHistoryRecordBeforeSaveIfNeeded() {
-            guard shouldInsertHistoryRecordBeforeSave else { return }
-            modelContext.insert(transcription)
-            shouldInsertHistoryRecordBeforeSave = false
-        }
-
-        func waitForAudioFileReadyIfNeeded() async -> Bool {
-            guard !didResolveAudioFileReadiness else {
-                return audioFileIsReady
-            }
-
-            didResolveAudioFileReadiness = true
-            guard let audioFileReadyTask else {
-                audioFileIsReady = true
-                return true
-            }
-
-            let waitStart = Date()
-            do {
-                try await audioFileReadyTask.value
-                audioFileIsReady = true
-                logger.notice("Deferred audio file ready elapsed=\(Date().timeIntervalSince(waitStart), format: .fixed(precision: 3), privacy: .public)s")
-                if let latencyTrace {
-                    logger.notice("Latency trace audio file ready operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
-                }
-            } catch {
-                audioFileIsReady = false
-                transcription.audioFileURL = nil
-                logger.error("Deferred audio file write failed: \(error.localizedDescription, privacy: .public)")
-            }
-
-            return audioFileIsReady
-        }
 
         func restorePromptDetectionSettingsIfNeeded() async {
             if let result = promptDetectionResult,
                let enhancementService {
                 enhancementService.restorePromptDetectionSettings(result)
-            }
-        }
-
-        func waitForPowerModeApplyIfNeeded() async {
-            guard !didResolvePowerModeApply else { return }
-            didResolvePowerModeApply = true
-            guard let powerModeApplyTask else { return }
-
-            let waitStart = Date()
-            if let latencyTrace {
-                logger.notice("Latency trace waiting for active-window config operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
-            }
-            await powerModeApplyTask.value
-            logger.notice("Power Mode active-window config ready elapsed=\(Date().timeIntervalSince(waitStart), format: .fixed(precision: 3), privacy: .public)s")
-            if let latencyTrace {
-                logger.notice("Latency trace active-window config ready operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
-                recordRollingPreloadTiming(latencyTrace, stage: .activeWindowReady)
             }
         }
 
@@ -155,8 +69,7 @@ class TranscriptionPipeline {
             if transcription.duration > 0 {
                 canceledDuration = nil
             } else {
-                let audioFileReady = await waitForAudioFileReadyIfNeeded()
-                let duration = audioFileReady ? await AudioFileMetadata.duration(for: audioURL) : 0
+                let duration = await AudioFileMetadata.duration(for: audioURL)
                 canceledDuration = duration > 0 ? duration : nil
             }
 
@@ -166,7 +79,6 @@ class TranscriptionPipeline {
             )
 
             do {
-                insertHistoryRecordBeforeSaveIfNeeded()
                 try modelContext.save()
                 NotificationCenter.default.post(name: .transcriptionCreated, object: transcription)
             } catch {
@@ -176,7 +88,7 @@ class TranscriptionPipeline {
 
         if shouldCancel() {
             await finishCanceledTranscription()
-            return nil
+            return
         }
 
         do {
@@ -197,12 +109,7 @@ class TranscriptionPipeline {
             }
             let text = textPlan.textForEnhancement
             let cleanedText = textPlan.cleanedText
-            if let latencyTrace {
-                logger.notice("Latency trace transcription ready operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s transcriptionElapsed=\(transcriptionDuration, format: .fixed(precision: 3), privacy: .public)s chars=\((textPlan.filteredText ?? rawText).count, privacy: .public)")
-                recordRollingPreloadTiming(latencyTrace, stage: .transcriptionReady)
-            }
-
-            if shouldCancel() { await finishCanceledTranscription(); return nil }
+            if shouldCancel() { await finishCanceledTranscription(); return }
 
             transcription.text = cleanedText
             transcription.transcriptionModelName = model.displayName
@@ -228,7 +135,7 @@ class TranscriptionPipeline {
 
             if let enhancementService,
                let enhancementRequest {
-                if shouldCancel() { await finishCanceledTranscription(); return nil }
+                if shouldCancel() { await finishCanceledTranscription(); return }
 
                 onStateChange(.enhancing)
 
@@ -247,7 +154,7 @@ class TranscriptionPipeline {
                             type: .warning
                         )
                     }
-                    if shouldCancel() { await finishCanceledTranscription(); return nil }
+                    if shouldCancel() { await finishCanceledTranscription(); return }
                 }
             }
 
@@ -281,29 +188,10 @@ class TranscriptionPipeline {
             transcription.markAsFailedTranscription(reason: errorDescription)
         }
 
-        func recordSessionMetricAndNotifyIfNeeded(modelDisplayName: String?) {
-            do {
-                let didInsertSessionMetric = try SessionMetricRecorder.recordRecorderSession(
-                    transcription: transcription,
-                    modelDisplayName: modelDisplayName,
-                    in: modelContext
-                )
-                guard didInsertSessionMetric else { return }
-
-                try modelContext.save()
-                NotificationCenter.default.post(name: .sessionMetricsDidChange, object: nil)
-            } catch {
-                logger.error("Failed to record session metric: \(error.localizedDescription, privacy: .public)")
-            }
-        }
-
         func saveTranscriptionAndPostCompletion() {
-            insertHistoryRecordBeforeSaveIfNeeded()
-
             let shouldRecordSessionMetric = transcription.transcriptionState == .completed
-            let shouldDeferSessionMetric = shouldRecordSessionMetric && latencyTrace?.isRollingPreloadQuickRelease == true
             let didInsertSessionMetric: Bool
-            if shouldRecordSessionMetric, !shouldDeferSessionMetric {
+            if shouldRecordSessionMetric {
                 do {
                     didInsertSessionMetric = try SessionMetricRecorder.recordRecorderSession(
                         transcription: transcription,
@@ -331,50 +219,19 @@ class TranscriptionPipeline {
                 logger.error("Failed to save transcription: \(error.localizedDescription, privacy: .public)")
             }
 
-            if shouldDeferSessionMetric, didSaveTranscription {
-                let modelDisplayName = model.displayName
-                Task { @MainActor in
-                    recordSessionMetricAndNotifyIfNeeded(modelDisplayName: modelDisplayName)
-                }
-            }
-        }
-
-        func deferredSaveTranscriptionAndPostCompletion() -> TranscriptionPipelineDeferredWork? {
-            guard latencyTrace?.isRollingPreloadQuickRelease == true else {
-                saveTranscriptionAndPostCompletion()
-                if let latencyTrace {
-                    logger.notice("Latency trace pipeline saved operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
-                    recordRollingPreloadTiming(latencyTrace, stage: .saved)
-                }
-                return nil
-            }
-
-            let trace = latencyTrace
-            return {
-                saveTranscriptionAndPostCompletion()
-                if let trace {
-                    self.logger.notice("Latency trace deferred pipeline saved operation=\(trace.operation, privacy: .public) elapsed=\(trace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
-                    self.recordRollingPreloadTiming(trace, stage: .saved)
-                }
-            }
         }
 
         if shouldCancel() {
             await finishCanceledTranscription()
-            return nil
+            return
         }
-
-        await waitForPowerModeApplyIfNeeded()
 
         if SpecialShortcutEmptyTranscriptionFallback.consumeIfNeeded(for: transcription, modelContext: modelContext) {
             SoundManager.shared.play(.stop)
             await restorePromptDetectionSettingsAndDismiss()
         } else if var textToPaste = finalPastedText,
            transcription.transcriptionState == .completed {
-            textToPaste = await CursorPaster.preparedTextForPaste(
-                textToPaste,
-                preparedCursorTextContext: preparedCursorTextContext
-            )
+            textToPaste = CursorPaster.preparedTextForPaste(textToPaste)
 
             let isTrialExpired: Bool
             if case .trialExpired = licenseViewModel.licenseState {
@@ -387,20 +244,7 @@ class TranscriptionPipeline {
                 appendTrailingSpace: VoiceInkAppendTrailingSpacePreference.isEnabled(),
                 isTrialExpired: isTrialExpired
             )
-            if let latencyTrace {
-                logger.notice("Latency trace paste starting operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s chars=\(pastedText.count, privacy: .public)")
-                recordRollingPreloadTiming(latencyTrace, stage: .pasteStarting)
-            }
-            let pasteContext: CursorPaster.PreparedPasteContext? = if let preparedPasteContext {
-                await preparedPasteContext.value
-            } else {
-                nil
-            }
-            _ = await CursorPaster.startPasteAtCursor(pastedText, preparedContext: pasteContext).value
-            if let latencyTrace {
-                logger.notice("Latency trace paste completed operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s chars=\(pastedText.count, privacy: .public)")
-                recordRollingPreloadTiming(latencyTrace, stage: .pasteCompleted)
-            }
+            _ = await CursorPaster.startPasteAtCursor(pastedText).value
             let autoSendKey = PowerModeManager.shared.activeConfiguration?.autoSendKey
             SoundManager.shared.play(.stop)
             await restorePromptDetectionSettingsAndDismiss {
@@ -418,23 +262,9 @@ class TranscriptionPipeline {
 
         if transcription.transcriptionState == .completed,
            transcription.duration <= 0 {
-            let audioFileReady = await waitForAudioFileReadyIfNeeded()
-            if audioFileReady {
-                transcription.duration = await AudioFileMetadata.duration(for: audioURL)
-            }
+            transcription.duration = await AudioFileMetadata.duration(for: audioURL)
         }
 
-        return deferredSaveTranscriptionAndPostCompletion()
-    }
-
-    private func recordRollingPreloadTiming(
-        _ latencyTrace: TranscriptionLatencyTrace,
-        stage: VoiceInkRollingBufferQuickReleaseTimingStage
-    ) {
-        guard latencyTrace.isRollingPreloadQuickRelease else { return }
-        RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseTiming(
-            stage: stage,
-            elapsedSeconds: latencyTrace.elapsed
-        )
+        saveTranscriptionAndPostCompletion()
     }
 }

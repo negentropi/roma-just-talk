@@ -138,7 +138,11 @@ final class CoreAudioRecorder: @unchecked Sendable {
     }
 
     /// Starts recording from the specified device to the given URL (WAV format)
-    func startRecording(toOutputFile url: URL, deviceID: AudioDeviceID) throws {
+    func startRecording(
+        toOutputFile url: URL,
+        deviceID: AudioDeviceID,
+        latencyTraceToken: VoiceInkLatencyTrace.Token? = nil
+    ) throws {
         if deviceID == 0 {
             logger.error("Cannot start recording - no valid audio device (deviceID is 0)")
             throw CoreAudioRecorderError.failedToSetDevice(status: 0)
@@ -151,7 +155,7 @@ final class CoreAudioRecorder: @unchecked Sendable {
         }
 
         if isRecording {
-            finishRecording()
+            finishRecording(latencyTraceToken: latencyTraceToken)
         }
 
         if !isCapturing || currentDeviceID != deviceID {
@@ -161,9 +165,27 @@ final class CoreAudioRecorder: @unchecked Sendable {
         logger.notice("🎙️ Starting recording from device \(deviceID, privacy: .public)")
 
         recordingURL = url
-        let fileRef = try createOutputFile(at: url)
+        let outputFileSpan = VoiceInkLatencyTrace.shared.begin(
+            "core_audio.output_file.create",
+            token: latencyTraceToken
+        )
+        let fileRef: ExtAudioFileRef
+        do {
+            fileRef = try createOutputFile(at: url)
+            VoiceInkLatencyTrace.shared.end(outputFileSpan, details: "result=success")
+        } catch {
+            VoiceInkLatencyTrace.shared.end(
+                outputFileSpan,
+                details: "result=failure error=\(String(describing: type(of: error)))"
+            )
+            throw error
+        }
 
         var preRollData = Data()
+        let preRollSnapshotSpan = VoiceInkLatencyTrace.shared.begin(
+            "core_audio.pre_roll.snapshot_and_write",
+            token: latencyTraceToken
+        )
         fileAccessLock.lock()
         do {
             audioFile = fileRef
@@ -181,20 +203,43 @@ final class CoreAudioRecorder: @unchecked Sendable {
             preRollStreamingGate.cancel()
             fileAccessLock.unlock()
             ExtAudioFileDispose(fileRef)
+            VoiceInkLatencyTrace.shared.end(
+                preRollSnapshotSpan,
+                details: "result=failure bytes=\(preRollData.count) error=\(String(describing: type(of: error)))"
+            )
             throw error
         }
+        VoiceInkLatencyTrace.shared.end(
+            preRollSnapshotSpan,
+            details: "result=success bytes=\(preRollData.count)"
+        )
 
         if !preRollData.isEmpty {
+            let preRollEmitSpan = VoiceInkLatencyTrace.shared.begin(
+                "core_audio.pre_roll.emit_to_stream",
+                token: latencyTraceToken
+            )
             emitPreRollDataToStreaming(preRollData)
             finishPreRollStreamingEmission()
+            VoiceInkLatencyTrace.shared.end(
+                preRollEmitSpan,
+                details: "bytes=\(preRollData.count)"
+            )
             logger.notice("🎙️ Wrote pre-roll buffer bytes=\(preRollData.count, privacy: .public)")
         }
     }
 
     /// Finishes the WAV file while leaving the AudioUnit open so the next hotkey has pre-roll.
-    func finishRecording(keepCapturing: Bool = true) {
+    func finishRecording(
+        keepCapturing: Bool = true,
+        latencyTraceToken: VoiceInkLatencyTrace.Token? = nil
+    ) {
         guard isRecording || audioFile != nil else { return }
 
+        let latencySpan = VoiceInkLatencyTrace.shared.begin(
+            "core_audio.finish_recording",
+            token: latencyTraceToken
+        )
         let start = Date()
 
         fileAccessLock.lock()
@@ -209,6 +254,10 @@ final class CoreAudioRecorder: @unchecked Sendable {
 
         recordingURL = nil
         preRollBuffer.clear()
+        VoiceInkLatencyTrace.shared.end(
+            latencySpan,
+            details: "keepCapturing=\(keepCapturing)"
+        )
         logger.notice("finishRecording completed keepCapturing=\(keepCapturing, privacy: .public) elapsed=\(Date().timeIntervalSince(start), format: .fixed(precision: 3), privacy: .public)s")
     }
 

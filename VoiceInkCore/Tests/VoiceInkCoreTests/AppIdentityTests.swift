@@ -494,6 +494,7 @@ final class AppIdentityTests: XCTestCase {
         XCTAssertEqual(VoiceInkMacOSLogCategory.transcriptionAutoCleanupService, "TranscriptionAutoCleanupService")
         XCTAssertEqual(VoiceInkMacOSLogCategory.sessionMetricMigrationService, "SessionMetricMigrationService")
         XCTAssertEqual(VoiceInkMacOSLogCategory.modelPrewarm, "ModelPrewarm")
+        XCTAssertEqual(VoiceInkMacOSLogCategory.latencyTrace, "LatencyTrace")
         XCTAssertEqual(VoiceInkMacOSLogCategory.cursorPaster, "CursorPaster")
         XCTAssertEqual(VoiceInkMacOSLogCategory.sessionMetricRecorder, "SessionMetricRecorder")
         XCTAssertEqual(VoiceInkMacOSLogCategory.soundPlaybackEngine, "SoundPlaybackEngine")

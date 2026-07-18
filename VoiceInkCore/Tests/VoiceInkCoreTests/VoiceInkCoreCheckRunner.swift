@@ -23,6 +23,8 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "AppIdentityTests.testAppIdentityPreservesSharedVisibleNames", run: { AppIdentityTests().testAppIdentityPreservesSharedVisibleNames() }),
             VoiceInkCoreCheck(name: "AppIdentityTests.testIOSLogCategoriesPreserveDiagnosticsIdentity", run: { AppIdentityTests().testIOSLogCategoriesPreserveDiagnosticsIdentity() }),
             VoiceInkCoreCheck(name: "AppIdentityTests.testMacOSLogCategoriesPreserveDiagnosticsIdentity", run: { AppIdentityTests().testMacOSLogCategoriesPreserveDiagnosticsIdentity() }),
+            VoiceInkCoreCheck(name: "LatencyTraceTests.testOldTokenCannotFinishReplacementTrace", run: { LatencyTraceTests().testOldTokenCannotFinishReplacementTrace() }),
+            VoiceInkCoreCheck(name: "LatencyTraceTests.testLateEventCannotReactivateFinishedTrace", run: { LatencyTraceTests().testLateEventCannotReactivateFinishedTrace() }),
             VoiceInkCoreCheck(name: "AppIdentityTests.testMacOSWindowIdentityPreservesIdentifiersTitlesAndFrameNames", run: { AppIdentityTests().testMacOSWindowIdentityPreservesIdentifiersTitlesAndFrameNames() }),
             VoiceInkCoreCheck(name: "AppIdentityTests.testMacOSNavigationRequestPreservesDestinationContract", run: { AppIdentityTests().testMacOSNavigationRequestPreservesDestinationContract() }),
             VoiceInkCoreCheck(name: "AppIdentityTests.testMacOSMainViewItemsMapNavigationDestinationsAndLegacyTitles", run: { AppIdentityTests().testMacOSMainViewItemsMapNavigationDestinationsAndLegacyTitles() }),

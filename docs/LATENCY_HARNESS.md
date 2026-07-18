@@ -18,6 +18,29 @@ real target app such as TextEdit, Notes, Safari, Slack, or Zed.
 
 Shared-core checks lock the startup-resolution and direct-prewarm policies. This harness is the end-to-end proof that those policies still produce visible text within the latency budget.
 
+## Deep Runtime Trace
+
+Every recording emits a bounded `LatencyTrace` timeline. Events share one trace ID,
+monotonic milliseconds from shortcut key-down, time since the previous event, and
+an ordered sequence number. The trace includes recorder startup/stop, Power Mode
+resolution, streaming connection and backlog drain, final ASR, cleanup, paste
+event posting, clipboard-restore execution, and persistence. Shortcut events also
+report physical-event-to-main-callback and main-callback-to-handler delay, so queued
+key-up work cannot disappear before the first handler timestamp. Trace tokens reject
+late events from older recordings; replacing an unfinished trace emits
+`trace.replaced`. Counts and state only are recorded, never transcript, URL, or
+clipboard contents.
+
+```bash
+log stream --style compact \
+  --predicate 'subsystem == "com.prakashjoshipax.voiceink" && category == "LatencyTrace"'
+```
+
+Use this trace before changing latency behavior. A green build, successful prewarm,
+or fast ASR alone does not prove the key-up-to-visible-text path is fast.
+`paste_event_posted` is only the app-to-macOS handoff. The visible-text harness below
+supplies the terminal timestamp after the focused app actually exposes the new text.
+
 ## Build
 
 ```bash

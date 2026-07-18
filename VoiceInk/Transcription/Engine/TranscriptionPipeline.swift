@@ -40,11 +40,19 @@ class TranscriptionPipeline {
         audioURL: URL,
         model: any TranscriptionModel,
         session: TranscriptionSession?,
+        latencyTraceToken: VoiceInkLatencyTrace.Token?,
         onStateChange: @escaping (VoiceInkRecordingState) -> Void,
         shouldCancel: () -> Bool,
         onCancel: @escaping () async -> Void,
         onDismiss: @escaping () async -> Void
     ) async {
+        let latencyTrace = VoiceInkLatencyTrace.shared
+        let traceToken = latencyTraceToken
+        latencyTrace.event(
+            "pipeline.enter",
+            details: "model=\(model.displayName) hasStreamingSession=\(session != nil)",
+            token: traceToken
+        )
         var finalPastedText: String?
         var promptDetectionResult: VoiceInkPromptDetectionResult?
 
@@ -84,6 +92,11 @@ class TranscriptionPipeline {
             } catch {
                 logger.error("Failed to save canceled transcription: \(error.localizedDescription, privacy: .public)")
             }
+            latencyTrace.finish(
+                event: "pipeline.cancelled",
+                details: "model=\(model.displayName)",
+                token: traceToken
+            )
         }
 
         if shouldCancel() {
@@ -94,11 +107,25 @@ class TranscriptionPipeline {
         do {
             let transcriptionStart = Date()
             let rawText: String
-            if let session {
-                rawText = try await session.transcribe(audioURL: audioURL)
-            } else {
-                rawText = try await serviceRegistry.transcribe(audioURL: audioURL, model: model)
+            let transcriptionSpan = latencyTrace.begin("pipeline.transcribe", token: traceToken)
+            do {
+                if let session {
+                    rawText = try await session.transcribe(audioURL: audioURL)
+                } else {
+                    rawText = try await serviceRegistry.transcribe(audioURL: audioURL, model: model)
+                }
+                latencyTrace.end(
+                    transcriptionSpan,
+                    details: "result=success rawChars=\(rawText.count)"
+                )
+            } catch {
+                latencyTrace.end(
+                    transcriptionSpan,
+                    details: "result=failure error=\(String(describing: type(of: error)))"
+                )
+                throw error
             }
+            let cleanupSpan = latencyTrace.begin("pipeline.cleanup", token: traceToken)
             let cleanupConfiguration = VoiceInkTranscriptionCleanupConfiguration.current()
             let transcriptionDuration = Date().timeIntervalSince(transcriptionStart)
             let textPlan = VoiceInkTranscriptionRunPreparation.prepareRawTextForEnhancement(
@@ -109,6 +136,10 @@ class TranscriptionPipeline {
             }
             let text = textPlan.textForEnhancement
             let cleanedText = textPlan.cleanedText
+            latencyTrace.end(
+                cleanupSpan,
+                details: "cleanedChars=\(cleanedText.count) enhancementInputChars=\(text.count)"
+            )
             if shouldCancel() { await finishCanceledTranscription(); return }
 
             transcription.text = cleanedText
@@ -139,11 +170,20 @@ class TranscriptionPipeline {
 
                 onStateChange(.enhancing)
 
+                let enhancementSpan = latencyTrace.begin("pipeline.enhancement", token: traceToken)
                 do {
                     let enhancement = try await enhancementService.enhance(enhancementRequest.text)
+                    latencyTrace.end(
+                        enhancementSpan,
+                        details: "result=success chars=\(enhancement.text.count)"
+                    )
                     enhancementResult = enhancement
                     finalPastedText = enhancement.text
                 } catch {
+                    latencyTrace.end(
+                        enhancementSpan,
+                        details: "result=failure error=\(String(describing: type(of: error)))"
+                    )
                     let errorDescription = VoiceInkErrorDescription.text(for: error)
                     enhancementFailureReason = errorDescription
                     await MainActor.run {
@@ -172,6 +212,11 @@ class TranscriptionPipeline {
             )
             transcription.applyCompletedDraft(completedDraft)
         } catch {
+            latencyTrace.event(
+                "pipeline.transcription_failed",
+                details: "error=\(String(describing: type(of: error)))",
+                token: traceToken
+            )
             let errorDescription = VoiceInkErrorDescription.text(for: error)
 
             if let nativeAppleError = error as? VoiceInkNativeAppleTranscriptionFailureKind,
@@ -227,10 +272,12 @@ class TranscriptionPipeline {
         }
 
         if SpecialShortcutEmptyTranscriptionFallback.consumeIfNeeded(for: transcription, modelContext: modelContext) {
+            latencyTrace.event("pipeline.empty_transcription_fallback", token: traceToken)
             SoundManager.shared.play(.stop)
             await restorePromptDetectionSettingsAndDismiss()
         } else if var textToPaste = finalPastedText,
            transcription.transcriptionState == .completed {
+            let pastePreparationSpan = latencyTrace.begin("pipeline.paste_prepare", token: traceToken)
             textToPaste = CursorPaster.preparedTextForPaste(textToPaste)
 
             let isTrialExpired: Bool
@@ -244,9 +291,21 @@ class TranscriptionPipeline {
                 appendTrailingSpace: VoiceInkAppendTrailingSpacePreference.isEnabled(),
                 isTrialExpired: isTrialExpired
             )
-            _ = await CursorPaster.startPasteAtCursor(pastedText).value
+            latencyTrace.end(pastePreparationSpan, details: "chars=\(pastedText.count)")
+            let pasteSpan = latencyTrace.begin("pipeline.paste_command", token: traceToken)
+            let pasteResult = await CursorPaster.startPasteAtCursor(
+                pastedText,
+                latencyTraceToken: traceToken
+            ).value
+            latencyTrace.end(
+                pasteSpan,
+                details: "eventPosted=\(pasteResult.didPostPasteCommand)"
+            )
             let autoSendKey = PowerModeManager.shared.activeConfiguration?.autoSendKey
+            let stopSoundSpan = latencyTrace.begin("pipeline.stop_sound", token: traceToken)
             SoundManager.shared.play(.stop)
+            latencyTrace.end(stopSoundSpan)
+            let dismissSpan = latencyTrace.begin("pipeline.dismiss_recorder", token: traceToken)
             await restorePromptDetectionSettingsAndDismiss {
                 if let autoSendKey,
                    let delayAfterPaste = VoiceInkAutoSendPolicy.delayAfterPasteNanoseconds(for: autoSendKey) {
@@ -256,15 +315,30 @@ class TranscriptionPipeline {
                     }
                 }
             }
+            latencyTrace.end(dismissSpan)
         } else {
+            latencyTrace.event(
+                "pipeline.no_paste",
+                details: "state=\(transcription.transcriptionState) hasText=\(finalPastedText != nil)",
+                token: traceToken
+            )
             await restorePromptDetectionSettingsAndDismiss()
         }
 
         if transcription.transcriptionState == .completed,
            transcription.duration <= 0 {
+            let durationSpan = latencyTrace.begin("pipeline.audio_duration", token: traceToken)
             transcription.duration = await AudioFileMetadata.duration(for: audioURL)
+            latencyTrace.end(durationSpan)
         }
 
+        let saveSpan = latencyTrace.begin("pipeline.save", token: traceToken)
         saveTranscriptionAndPostCompletion()
+        latencyTrace.end(saveSpan)
+        latencyTrace.finish(
+            event: "pipeline.complete",
+            details: "state=\(transcription.transcriptionState) finalChars=\(finalPastedText?.count ?? 0)",
+            token: traceToken
+        )
     }
 }

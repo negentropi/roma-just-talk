@@ -276,24 +276,28 @@ class RecordingShortcutManager: ObservableObject {
             secureInputBlockedActions: evidenceTrackedActions,
             tracksKeyUpEvidence: !evidenceTrackedActions.isEmpty,
             onKeyDown: { [weak self] action, eventTime in
+                let callbackReceivedAt = ProcessInfo.processInfo.systemUptime
                 Task { @MainActor in
                     guard let self else { return }
                     guard let mode = self.recordingMode(for: action) else { return }
                     await self.shortcutModeHandler.handleKeyDown(
                         action: action,
                         eventTime: eventTime,
+                        callbackReceivedAt: callbackReceivedAt,
                         mode: mode,
                         specialOptions: self.specialOptions
                     )
                 }
             },
             onKeyUp: { [weak self] action, eventTime, context in
+                let callbackReceivedAt = ProcessInfo.processInfo.systemUptime
                 Task { @MainActor in
                     guard let self else { return }
                     if let mode = self.recordingMode(for: action) {
                         await self.shortcutModeHandler.handleKeyUp(
                             action: action,
                             eventTime: eventTime,
+                            callbackReceivedAt: callbackReceivedAt,
                             mode: mode,
                             context: context,
                             specialOptions: self.specialOptions
@@ -487,6 +491,7 @@ final class RecordingShortcutModeHandler {
     private var activeShortcutCanCancelAccidentalStart = false
     private var activeSpecialOptions = SpecialShortcutOptions()
     private var lastShortcutPressTime: Date?
+    private var activeLatencyTraceToken: VoiceInkLatencyTrace.Token?
 
     init(
         logger: Logger,
@@ -512,11 +517,13 @@ final class RecordingShortcutModeHandler {
         interruptedRecordingActions.removeAll()
         activeShortcutCanCancelAccidentalStart = false
         activeSpecialOptions = SpecialShortcutOptions()
+        activeLatencyTraceToken = nil
     }
 
     func handleKeyDown(
         action: ShortcutAction,
         eventTime: TimeInterval,
+        callbackReceivedAt: TimeInterval? = nil,
         mode: RecordingShortcutManager.Mode,
         specialOptions: SpecialShortcutOptions = SpecialShortcutOptions(),
         powerModeId: UUID? = nil
@@ -543,43 +550,76 @@ final class RecordingShortcutModeHandler {
 
         switch mode {
         case .special:
-            await startRecordingIfNeeded(mode: mode, powerModeId: powerModeId)
+            await startRecordingIfNeeded(
+                mode: mode,
+                eventTime: eventTime,
+                callbackReceivedAt: callbackReceivedAt ?? eventTime,
+                powerModeId: powerModeId
+            )
 
         case .pushToTalk:
-            await startRecordingIfNeeded(mode: mode, powerModeId: powerModeId)
+            await startRecordingIfNeeded(
+                mode: mode,
+                eventTime: eventTime,
+                callbackReceivedAt: callbackReceivedAt ?? eventTime,
+                powerModeId: powerModeId
+            )
 
         case .toggle, .hybrid:
             if isHandsFreeRecording {
                 isHandsFreeRecording = false
                 guard canHandleShortcutAction() else { return }
+                let traceToken = activeLatencyTraceToken ?? VoiceInkLatencyTrace.shared.currentToken()
+                activeLatencyTraceToken = traceToken
+                let handlerEnteredAt = ProcessInfo.processInfo.systemUptime
+                VoiceInkLatencyTrace.shared.event(
+                    "shortcut.key_down_stop_handler",
+                    details: shortcutDispatchDetails(
+                        eventTime: eventTime,
+                        callbackReceivedAt: callbackReceivedAt ?? eventTime,
+                        handlerEnteredAt: handlerEnteredAt,
+                        traceToken: traceToken
+                    ),
+                    token: traceToken
+                )
                 logger.notice("handleShortcutKeyDown: toggling mini recorder (hands-free toggle)")
                 await toggleMiniRecorder(powerModeId)
                 return
             }
 
-            if !isRecorderVisible() {
-                guard canHandleShortcutAction() else { return }
-                logger.notice("handleShortcutKeyDown: toggling mini recorder (key down while not visible)")
-                await toggleMiniRecorder(powerModeId)
-            }
+            await startRecordingIfNeeded(
+                mode: mode,
+                eventTime: eventTime,
+                callbackReceivedAt: callbackReceivedAt ?? eventTime,
+                powerModeId: powerModeId
+            )
         }
     }
 
     func handleKeyUp(
         action: ShortcutAction,
         eventTime: TimeInterval,
+        callbackReceivedAt: TimeInterval? = nil,
         mode: RecordingShortcutManager.Mode,
         context: VoiceInkShortcutPressContext = VoiceInkShortcutPressContext(),
         specialOptions: SpecialShortcutOptions = SpecialShortcutOptions(),
         powerModeId: UUID? = nil
     ) async {
         guard isShortcutPressed, activeRecordingShortcutAction == action else { return }
+        let handlerEnteredAt = ProcessInfo.processInfo.systemUptime
+        let callbackTime = callbackReceivedAt ?? eventTime
+        let pressDuration = shortcutPressStartTime.map { eventTime - $0 } ?? 0
+        let pressDurationMilliseconds = String(format: "%.1f", pressDuration * 1_000)
+        VoiceInkLatencyTrace.shared.event(
+            "shortcut.key_up_handler",
+            details: "action=\(action.storageName) mode=\(mode.rawValue) sourceTMs=\(pressDurationMilliseconds) sourceToCallbackMs=\(String(format: "%.1f", max(0, callbackTime - eventTime) * 1_000)) callbackToHandlerMs=\(String(format: "%.1f", max(0, handlerEnteredAt - callbackTime) * 1_000)) state=\(String(describing: recordingState()))",
+            token: activeLatencyTraceToken
+        )
         isShortcutPressed = false
         activeRecordingShortcutAction = nil
         activeShortcutCanCancelAccidentalStart = false
         switch mode {
         case .special:
-            let pressDuration = shortcutPressStartTime.map { eventTime - $0 } ?? 0
             let options = activeSpecialOptions
 
             if VoiceInkSpecialShortcutKeyEvidencePolicy.shouldDiscardShortcut(for: context) {
@@ -624,6 +664,9 @@ final class RecordingShortcutModeHandler {
 
         shortcutPressStartTime = nil
         activeSpecialOptions = SpecialShortcutOptions()
+        if !isHandsFreeRecording {
+            activeLatencyTraceToken = nil
+        }
     }
 
     func handleInterruption(action: ShortcutAction) async {
@@ -645,12 +688,49 @@ final class RecordingShortcutModeHandler {
         !isRecorderVisible() && recordingState() == .idle
     }
 
-    private func startRecordingIfNeeded(mode: RecordingShortcutManager.Mode, powerModeId: UUID?) async {
+    private func startRecordingIfNeeded(
+        mode: RecordingShortcutManager.Mode,
+        eventTime: TimeInterval,
+        callbackReceivedAt: TimeInterval,
+        powerModeId: UUID?
+    ) async {
         if !isRecorderVisible() {
             guard canHandleShortcutAction() else { return }
+            let handlerEnteredAt = ProcessInfo.processInfo.systemUptime
+            let traceToken = VoiceInkLatencyTrace.shared.start(
+                event: "shortcut.key_down_physical",
+                details: "mode=\(mode.rawValue) state=\(String(describing: recordingState()))",
+                originTimestamp: eventTime
+            )
+            activeLatencyTraceToken = traceToken
+            VoiceInkLatencyTrace.shared.event(
+                "shortcut.key_down_handler",
+                details: shortcutDispatchDetails(
+                    eventTime: eventTime,
+                    callbackReceivedAt: callbackReceivedAt,
+                    handlerEnteredAt: handlerEnteredAt,
+                    traceToken: traceToken
+                ),
+                token: traceToken
+            )
             logger.notice("handleShortcutKeyDown: starting recording (\(mode.rawValue, privacy: .public) key down)")
+            let span = VoiceInkLatencyTrace.shared.begin("shortcut.start_handler", token: traceToken)
             await toggleMiniRecorder(powerModeId)
+            VoiceInkLatencyTrace.shared.end(span)
         }
+    }
+
+    private func shortcutDispatchDetails(
+        eventTime: TimeInterval,
+        callbackReceivedAt: TimeInterval,
+        handlerEnteredAt: TimeInterval,
+        traceToken: VoiceInkLatencyTrace.Token?
+    ) -> String {
+        let sourceTMilliseconds = VoiceInkLatencyTrace.shared.elapsedMilliseconds(
+            token: traceToken,
+            at: eventTime
+        ) ?? 0
+        return "sourceTMs=\(String(format: "%.1f", sourceTMilliseconds)) sourceToCallbackMs=\(String(format: "%.1f", max(0, callbackReceivedAt - eventTime) * 1_000)) callbackToHandlerMs=\(String(format: "%.1f", max(0, handlerEnteredAt - callbackReceivedAt) * 1_000))"
     }
 
 }

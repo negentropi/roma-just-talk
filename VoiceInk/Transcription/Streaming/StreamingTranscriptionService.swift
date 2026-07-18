@@ -120,26 +120,50 @@ class StreamingTranscriptionService {
 
     /// Signal used to notify `waitForFinalCommit` when a new committed segment arrives.
     private var commitSignal: AsyncStream<Void>.Continuation?
+    private var latencyTraceToken: VoiceInkLatencyTrace.Token?
 
     /// Whether the streaming connection is fully established and actively sending.
     var isActive: Bool { state == .streaming || state == .committing }
 
     /// Start a streaming transcription session for the given model.
-    func startStreaming(model: any TranscriptionModel) async throws {
+    func startStreaming(
+        model: any TranscriptionModel,
+        latencyTraceToken: VoiceInkLatencyTrace.Token? = nil
+    ) async throws {
         let start = Date()
+        let latencyTrace = VoiceInkLatencyTrace.shared
+        let traceToken = latencyTraceToken ?? latencyTrace.currentToken()
+        self.latencyTraceToken = traceToken
+        latencyTrace.event(
+            "streaming_service.start.enter",
+            details: "model=\(model.displayName) adapter=\(String(describing: streamingAdapterKind))",
+            token: traceToken
+        )
         state = .connecting
         transcriptAccumulator.reset()
         metrics.reset()
+        latencyTrace.event("streaming_service.metrics.reset", token: traceToken)
         firstPartialLogged = false
         firstCommitLogged = false
 
         let provider = createProvider(for: model)
+        provider.setLatencyTraceToken(traceToken)
         self.provider = provider
 
         let selectedLanguage = VoiceInkTranscriptionLanguagePreference.selectedLanguage()
         logger.notice("Streaming start requested model=\(model.displayName, privacy: .public) language=\(selectedLanguage, privacy: .public)")
 
-        try await provider.connect(model: model, language: selectedLanguage)
+        let providerConnectSpan = latencyTrace.begin("streaming_provider.connect", token: traceToken)
+        do {
+            try await provider.connect(model: model, language: selectedLanguage)
+            latencyTrace.end(providerConnectSpan, details: "result=success")
+        } catch {
+            latencyTrace.end(
+                providerConnectSpan,
+                details: "result=failure error=\(String(describing: type(of: error)))"
+            )
+            throw error
+        }
 
         // If cancel() was called while we were awaiting the connection, tear down immediately.
         if state == .cancelled {
@@ -149,8 +173,9 @@ class StreamingTranscriptionService {
         }
 
         state = .streaming
-        startSendLoop()
-        startEventConsumer()
+        startSendLoop(latencyTraceToken: traceToken)
+        startEventConsumer(latencyTraceToken: traceToken)
+        latencyTrace.event("streaming_service.state.streaming", token: traceToken)
 
         logger.notice("Streaming connected model=\(model.displayName, privacy: .public) elapsed=\(Date().timeIntervalSince(start), format: .fixed(precision: 3), privacy: .public)s")
     }
@@ -162,27 +187,48 @@ class StreamingTranscriptionService {
     }
 
     /// Stops streaming, commits remaining audio, and returns the final transcribed text.
-    func stopAndGetFinalText() async throws -> String {
+    func stopAndGetFinalText(
+        latencyTraceToken: VoiceInkLatencyTrace.Token? = nil
+    ) async throws -> String {
         guard let provider = provider, state == .streaming else {
             throw VoiceInkStreamingTranscriptionError.notConnected
         }
+        let latencyTrace = VoiceInkLatencyTrace.shared
+        let traceToken = latencyTraceToken ?? self.latencyTraceToken
 
         state = .committing
         stopStartedAt = Date()
         let beforeDrain = metrics.snapshot()
+        latencyTrace.event(
+            "streaming_service.stop.enter",
+            details: "receivedChunks=\(beforeDrain.receivedChunks) sentChunks=\(beforeDrain.sentChunks) receivedBytes=\(beforeDrain.receivedBytes) sentBytes=\(beforeDrain.sentBytes)",
+            token: traceToken
+        )
         logger.notice("Streaming stop requested receivedChunks=\(beforeDrain.receivedChunks, privacy: .public) sentChunks=\(beforeDrain.sentChunks, privacy: .public) receivedBytes=\(beforeDrain.receivedBytes, privacy: .public) sentBytes=\(beforeDrain.sentBytes, privacy: .public)")
 
         // Finish the chunk source so the send loop drains remaining chunks and exits naturally.
+        let drainSpan = latencyTrace.begin("streaming_service.drain", token: traceToken)
         await drainRemainingChunks()
+        let afterDrain = metrics.snapshot()
+        latencyTrace.end(
+            drainSpan,
+            details: "receivedChunks=\(afterDrain.receivedChunks) sentChunks=\(afterDrain.sentChunks) receivedBytes=\(afterDrain.receivedBytes) sentBytes=\(afterDrain.sentBytes)"
+        )
 
         // Set up the commit signal BEFORE sending commit to avoid a race with the response.
         let (signalStream, signalContinuation) = AsyncStream.makeStream(of: Void.self)
         self.commitSignal = signalContinuation
 
         // Send commit to finalize any remaining audio
+        let commitSpan = latencyTrace.begin("streaming_provider.commit", token: traceToken)
         do {
             try await provider.commit()
+            latencyTrace.end(commitSpan, details: "result=success")
         } catch {
+            latencyTrace.end(
+                commitSpan,
+                details: "result=failure error=\(String(describing: type(of: error)))"
+            )
             commitSignal?.finish()
             commitSignal = nil
             logger.error("Failed to send commit: \(error.localizedDescription, privacy: .public)")
@@ -192,7 +238,9 @@ class StreamingTranscriptionService {
         }
 
         // Wait for the server to acknowledge our commit (or timeout)
+        let finalWaitSpan = latencyTrace.begin("streaming_service.final_wait", token: traceToken)
         let finalText = await waitForFinalCommit(signalStream: signalStream)
+        latencyTrace.end(finalWaitSpan, details: "chars=\(finalText.count)")
         if let stopStartedAt {
             logger.notice("Streaming stop completed elapsed=\(Date().timeIntervalSince(stopStartedAt), format: .fixed(precision: 3), privacy: .public)s finalChars=\(finalText.count, privacy: .public)")
         }
@@ -204,7 +252,14 @@ class StreamingTranscriptionService {
     }
 
     /// Cancels the streaming session without waiting for results.
-    func cancel() {
+    func cancel(latencyTraceToken: VoiceInkLatencyTrace.Token? = nil) {
+        let latencyTrace = VoiceInkLatencyTrace.shared
+        let traceToken = latencyTraceToken ?? self.latencyTraceToken
+        latencyTrace.event(
+            "streaming_service.cancel",
+            details: "state=\(String(describing: state))",
+            token: traceToken
+        )
         state = .cancelled
         onPartialTranscript = nil
         eventConsumerTask?.cancel()
@@ -247,12 +302,16 @@ class StreamingTranscriptionService {
     }
 
     /// Consumes audio chunks from the AsyncStream and sends them to the provider.
-    private func startSendLoop() {
+    private func startSendLoop(latencyTraceToken: VoiceInkLatencyTrace.Token?) {
         let source = chunkSource
         let provider = provider
         let metrics = metrics
 
         sendTask = Task.detached { [weak self] in
+            VoiceInkLatencyTrace.shared.event(
+                "streaming_send_loop.enter",
+                token: latencyTraceToken
+            )
             for await chunk in source.stream {
                 do {
                     try await provider?.sendAudioChunk(chunk)
@@ -264,6 +323,12 @@ class StreamingTranscriptionService {
                     }
                 }
             }
+            let snapshot = metrics.snapshot()
+            VoiceInkLatencyTrace.shared.event(
+                "streaming_send_loop.exit",
+                details: "sentChunks=\(snapshot.sentChunks) sentBytes=\(snapshot.sentBytes)",
+                token: latencyTraceToken
+            )
         }
     }
 
@@ -278,7 +343,7 @@ class StreamingTranscriptionService {
     }
 
     /// Consumes transcription events throughout the session, accumulating committed segments.
-    private func startEventConsumer() {
+    private func startEventConsumer(latencyTraceToken: VoiceInkLatencyTrace.Token?) {
         guard let provider = provider else { return }
         let events = provider.transcriptionEvents
 
@@ -291,6 +356,11 @@ class StreamingTranscriptionService {
                     await MainActor.run {
                         if !self.firstCommitLogged {
                             self.firstCommitLogged = true
+                            VoiceInkLatencyTrace.shared.event(
+                                "streaming_event.first_commit",
+                                details: "chars=\(trimmed.count)",
+                                token: latencyTraceToken
+                            )
                             let elapsed = self.stopStartedAt.map { Date().timeIntervalSince($0) } ?? 0
                             self.logger.notice("Streaming first committed event chars=\(trimmed.count, privacy: .public) stopElapsed=\(elapsed, format: .fixed(precision: 3), privacy: .public)s")
                         }
@@ -308,6 +378,11 @@ class StreamingTranscriptionService {
                     await MainActor.run {
                         if !self.firstPartialLogged {
                             self.firstPartialLogged = true
+                            VoiceInkLatencyTrace.shared.event(
+                                "streaming_event.first_partial",
+                                details: "chars=\(text.count)",
+                                token: latencyTraceToken
+                            )
                             self.logger.notice("Streaming first partial event chars=\(text.count, privacy: .public)")
                         }
                         if self.state == .streaming {

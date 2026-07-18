@@ -10,6 +10,7 @@ final class FluidAudioStreamingProvider {
 
     private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "FluidAudioStreaming")
     private let loadModels: ModelLoader
+    private var latencyTraceToken: VoiceInkLatencyTrace.Token?
     private var eventsContinuation: AsyncStream<VoiceInkStreamingTranscriptionEvent>.Continuation?
 
     private(set) var transcriptionEvents: AsyncStream<VoiceInkStreamingTranscriptionEvent>
@@ -63,15 +64,38 @@ final class FluidAudioStreamingProvider {
         eventsContinuation?.finish()
     }
 
+    func setLatencyTraceToken(_ token: VoiceInkLatencyTrace.Token?) {
+        latencyTraceToken = token
+    }
+
     func connect(modelName: String, language: String?) async throws {
-        let models = try await loadModels(modelName)
+        let latencyTrace = VoiceInkLatencyTrace.shared
+        let traceToken = latencyTraceToken
+        let modelDataSpan = latencyTrace.begin("fluid_streaming.load_model_data", token: traceToken)
+        let models: AsrModels
+        do {
+            models = try await loadModels(modelName)
+            latencyTrace.end(modelDataSpan, details: "result=success")
+        } catch {
+            latencyTrace.end(
+                modelDataSpan,
+                details: "result=failure error=\(String(describing: type(of: error)))"
+            )
+            throw error
+        }
         try Task.checkCancellation()
 
         let manager = AsrManager(config: .default)
+        let managerLoadSpan = latencyTrace.begin("fluid_streaming.manager_load", token: traceToken)
         do {
             try await manager.loadModels(models)
+            latencyTrace.end(managerLoadSpan, details: "result=success")
             try Task.checkCancellation()
         } catch {
+            latencyTrace.end(
+                managerLoadSpan,
+                details: "result=failure error=\(String(describing: type(of: error)))"
+            )
             await manager.cleanup()
             throw error
         }
@@ -102,11 +126,17 @@ final class FluidAudioStreamingProvider {
 
     func commit() async throws {
         let commitStartedAt = Date()
+        let latencyTrace = VoiceInkLatencyTrace.shared
+        let traceToken = latencyTraceToken
+        let loopStopSpan = latencyTrace.begin("fluid_streaming.stop_background_loop", token: traceToken)
         transcriptionTask?.cancel()
         await transcriptionTask?.value
         transcriptionTask = nil
+        latencyTrace.end(loopStopSpan)
 
+        let finalASRSpan = latencyTrace.begin("fluid_streaming.final_asr", token: traceToken)
         let remainingText = await transcribeRemainingAudio() ?? ""
+        latencyTrace.end(finalASRSpan, details: "chars=\(remainingText.count)")
         logger.notice("FluidAudio commit ran final ASR elapsed=\(Date().timeIntervalSince(commitStartedAt), format: .fixed(precision: 3), privacy: .public)s chars=\(remainingText.count, privacy: .public)")
         eventsContinuation?.yield(.committed(text: remainingText))
     }
@@ -262,6 +292,12 @@ final class FluidAudioStreamingProvider {
         }
         var samples = Array(audioBuffer[bufferRelativeSeek...])
         bufferLock.unlock()
+
+        VoiceInkLatencyTrace.shared.event(
+            "fluid_streaming.final_audio",
+            details: "samples=\(samples.count) seek=\(bufferRelativeSeek) trimmed=\(trimmedSampleCount)",
+            token: latencyTraceToken
+        )
 
         guard samples.count >= minimumAudioSamples else { return nil }
 

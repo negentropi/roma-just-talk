@@ -115,6 +115,16 @@ class RecorderUIManager: ObservableObject {
 
     func toggleMiniRecorder(powerModeId: UUID? = nil) async {
         guard let engine = engine else { return }
+        let latencyTrace = VoiceInkLatencyTrace.shared
+        let traceToken = latencyTrace.ensureStarted(
+            event: "ui.toggle_requested",
+            details: "source=non_shortcut state=\(String(describing: engine.recordingState))"
+        )
+        latencyTrace.event(
+            "ui.toggle.enter",
+            details: "sessionActive=\(isRecorderSessionActive) visible=\(isMiniRecorderVisible) state=\(String(describing: engine.recordingState))",
+            token: traceToken
+        )
         logger.notice("toggleMiniRecorder called – sessionActive=\(self.isRecorderSessionActive, privacy: .public), visible=\(self.isMiniRecorderVisible, privacy: .public), state=\(String(describing: engine.recordingState), privacy: .public)")
 
         if VoiceInkRecorderUISessionPolicy.shouldClearStaleHiddenRecorderSession(
@@ -134,7 +144,9 @@ class RecorderUIManager: ObservableObject {
                     } else {
                         logger.notice("toggleMiniRecorder: stopping recording (was recording)")
                     }
+                    let span = latencyTrace.begin("ui.engine_toggle", token: traceToken)
                     await engine.toggleRecord(powerModeId: powerModeId)
+                    latencyTrace.end(span)
                 },
                 cancelRecording: {
                     logger.notice("toggleMiniRecorder: cancelling active recorder work")
@@ -146,9 +158,14 @@ class RecorderUIManager: ObservableObject {
                 }
             )
         } else {
+            let soundSpan = latencyTrace.begin("ui.start_sound", token: traceToken)
             SoundManager.shared.play(.start)
+            latencyTrace.end(soundSpan)
             beginRecorderSession()
+            latencyTrace.event("ui.recorder_session.begin", token: traceToken)
+            let span = latencyTrace.begin("ui.engine_toggle", token: traceToken)
             await engine.toggleRecord(powerModeId: powerModeId)
+            latencyTrace.end(span)
         }
     }
 

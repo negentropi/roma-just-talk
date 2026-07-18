@@ -480,6 +480,7 @@ public enum VoiceInkMacOSLogCategory {
     public static let transcriptionAutoCleanupService = "TranscriptionAutoCleanupService"
     public static let sessionMetricMigrationService = "SessionMetricMigrationService"
     public static let modelPrewarm = "ModelPrewarm"
+    public static let latencyTrace = "LatencyTrace"
     public static let cursorPaster = "CursorPaster"
     public static let sessionMetricRecorder = "SessionMetricRecorder"
     public static let soundPlaybackEngine = "SoundPlaybackEngine"

@@ -73,7 +73,7 @@ class CursorPaster {
         latencyTraceToken: VoiceInkLatencyTrace.Token? = nil
     ) -> Task<PasteResult, Never> {
         let traceToken = latencyTraceToken ?? VoiceInkLatencyTrace.shared.currentToken()
-        Task { @MainActor in
+        return Task { @MainActor in
             await performPasteSession(
                 text,
                 preparedContext: preparedContext,

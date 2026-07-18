@@ -65,9 +65,16 @@ final class FluidAudioStreamingProvider {
 
     func connect(modelName: String, language: String?) async throws {
         let models = try await loadModels(modelName)
+        try Task.checkCancellation()
 
         let manager = AsrManager(config: .default)
-        try await manager.loadModels(models)
+        do {
+            try await manager.loadModels(models)
+            try Task.checkCancellation()
+        } catch {
+            await manager.cleanup()
+            throw error
+        }
         self.asrManager = manager
         self.decoderLayerCount = await manager.decoderLayerCount
         self.languageHint = FluidAudioModelManager.languageHint(

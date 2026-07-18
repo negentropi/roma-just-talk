@@ -244,74 +244,28 @@ public struct VoiceInkTranscriptionRuntimeResourcePlan: Equatable, Sendable {
     }
 
     public func applyRecordingStartupRuntimeState(
-        loadLocalWhisperModel: () async -> Void,
-        loadLocalFluidAudioModel: () async -> Void
-    ) async {
+        loadLocalWhisperModel: () async throws -> Void,
+        loadLocalFluidAudioModel: () async throws -> Void
+    ) async rethrows {
         switch recordingStartupLoadAction {
         case .none:
             break
         case .loadLocalWhisperModel:
-            await loadLocalWhisperModel()
+            try await loadLocalWhisperModel()
         case .loadLocalFluidAudioModel:
-            await loadLocalFluidAudioModel()
+            try await loadLocalFluidAudioModel()
         }
-    }
-}
-
-public struct VoiceInkModelPrewarmSampleResource: Equatable, Sendable {
-    public let name: String
-    public let fileExtension: String
-    public let subdirectory: String?
-
-    public init(name: String, fileExtension: String, subdirectory: String?) {
-        self.name = name
-        self.fileExtension = fileExtension
-        self.subdirectory = subdirectory
     }
 }
 
 public enum VoiceInkModelPrewarmSamplePolicy {
-    public static let sampleResourceName = "sound7"
-    public static let sampleFileExtension = "wav"
-    public static let sampleDisplayName = "sound7.wav"
     public static let generatedSilenceSampleCount = Int(VoiceInkPCM16Audio.mono16kSampleRate)
-
-    public static let lookupCandidates = [
-        VoiceInkModelPrewarmSampleResource(
-            name: sampleResourceName,
-            fileExtension: sampleFileExtension,
-            subdirectory: "Resources/Sounds"
-        ),
-        VoiceInkModelPrewarmSampleResource(
-            name: sampleResourceName,
-            fileExtension: sampleFileExtension,
-            subdirectory: "Sounds"
-        ),
-        VoiceInkModelPrewarmSampleResource(
-            name: sampleResourceName,
-            fileExtension: sampleFileExtension,
-            subdirectory: nil
-        )
-    ]
-
-    public static func firstAvailableURL(
-        lookup: (VoiceInkModelPrewarmSampleResource) -> URL?
-    ) -> URL? {
-        for candidate in lookupCandidates {
-            if let url = lookup(candidate) {
-                return url
-            }
-        }
-
-        return nil
-    }
 }
 
 public enum VoiceInkModelPrewarmSkipReason: Equatable, Sendable {
     case disabledByUser
     case missingCurrentModel
     case unsupportedRuntime
-    case missingSampleAudio
 }
 
 public struct VoiceInkModelPrewarmPlan: Equatable, Sendable {
@@ -329,8 +283,6 @@ public struct VoiceInkModelPrewarmPlan: Equatable, Sendable {
             return nil
         case .unsupportedRuntime:
             return VoiceInkModelPrewarmDiagnostics.unsupportedRuntimeMessage
-        case .missingSampleAudio:
-            return VoiceInkModelPrewarmDiagnostics.sampleAudioMissingMessage
         case .none:
             return nil
         }
@@ -343,8 +295,7 @@ public struct VoiceInkModelPrewarmPlan: Equatable, Sendable {
     public static func plan(
         isEnabled: Bool,
         hasCurrentModel: Bool,
-        shouldPrewarmModel: Bool,
-        hasSampleAudio: Bool
+        shouldPrewarmModel: Bool
     ) -> Self {
         guard isEnabled else {
             return Self(skipReason: .disabledByUser)
@@ -356,10 +307,6 @@ public struct VoiceInkModelPrewarmPlan: Equatable, Sendable {
 
         guard shouldPrewarmModel else {
             return Self(skipReason: .unsupportedRuntime)
-        }
-
-        guard hasSampleAudio else {
-            return Self(skipReason: .missingSampleAudio)
         }
 
         return Self(skipReason: nil)
@@ -383,10 +330,6 @@ public enum VoiceInkModelPrewarmDiagnostics {
     public static let disabledByUserMessage = "Prewarm disabled by user"
     public static let unsupportedRuntimeMessage = "Skipping prewarm - cloud models don't need it"
     public static let deinitializedMessage = "ModelPrewarmService deinitialized"
-
-    public static var sampleAudioMissingMessage: String {
-        "❌ Prewarm audio file (\(VoiceInkModelPrewarmSamplePolicy.sampleDisplayName)) not found"
-    }
 
     public static func prewarmingMessage(modelDisplayName: String) -> String {
         "Prewarming \(modelDisplayName)"

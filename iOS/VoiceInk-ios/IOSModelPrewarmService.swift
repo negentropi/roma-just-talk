@@ -89,8 +89,7 @@ final class IOSModelPrewarmService: ObservableObject {
         let plan = VoiceInkModelPrewarmPlan.plan(
             isEnabled: VoiceInkModelRuntimePreference.shouldPrewarmModelOnWake(),
             hasCurrentModel: hasModel,
-            shouldPrewarmModel: isLocalWhisper || isLocalFluidAudio,
-            hasSampleAudio: true
+            shouldPrewarmModel: isLocalWhisper || isLocalFluidAudio
         )
 
         guard plan.shouldRun else {

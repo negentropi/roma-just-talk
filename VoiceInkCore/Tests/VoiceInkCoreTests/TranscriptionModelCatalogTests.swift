@@ -198,43 +198,19 @@ final class TranscriptionModelCatalogTests: XCTestCase {
         return events
     }
 
-    func testModelPrewarmSamplePolicyPreservesMacOSLookupOrder() {
+    func testModelPrewarmUsesOneSecondMono16kSilence() {
         XCTAssertEqual(
-            VoiceInkModelPrewarmSamplePolicy.lookupCandidates,
-            [
-                VoiceInkModelPrewarmSampleResource(
-                    name: "sound7",
-                    fileExtension: "wav",
-                    subdirectory: "Resources/Sounds"
-                ),
-                VoiceInkModelPrewarmSampleResource(
-                    name: "sound7",
-                    fileExtension: "wav",
-                    subdirectory: "Sounds"
-                ),
-                VoiceInkModelPrewarmSampleResource(
-                    name: "sound7",
-                    fileExtension: "wav",
-                    subdirectory: nil
-                )
-            ]
+            VoiceInkModelPrewarmSamplePolicy.generatedSilenceSampleCount,
+            VoiceInkPCM16Audio.mono16kSampleRateHz
         )
-
-        let secondCandidateURL = URL(fileURLWithPath: "/tmp/sound7.wav")
-        let resolvedURL = VoiceInkModelPrewarmSamplePolicy.firstAvailableURL { resource in
-            resource.subdirectory == "Sounds" ? secondCandidateURL : nil
-        }
-
-        XCTAssertEqual(resolvedURL, secondCandidateURL)
     }
 
-    func testModelPrewarmPlanPreservesMacOSSkipOrderAndDiagnostics() {
+    func testModelPrewarmPlanUsesRuntimeAvailabilityWithoutAudioFixture() {
         XCTAssertEqual(
             VoiceInkModelPrewarmPlan.plan(
                 isEnabled: false,
                 hasCurrentModel: false,
-                shouldPrewarmModel: false,
-                hasSampleAudio: false
+                shouldPrewarmModel: false
             ).skipReason,
             .disabledByUser
         )
@@ -242,8 +218,7 @@ final class TranscriptionModelCatalogTests: XCTestCase {
             VoiceInkModelPrewarmPlan.plan(
                 isEnabled: true,
                 hasCurrentModel: false,
-                shouldPrewarmModel: false,
-                hasSampleAudio: false
+                shouldPrewarmModel: false
             ).skipReason,
             .missingCurrentModel
         )
@@ -251,35 +226,23 @@ final class TranscriptionModelCatalogTests: XCTestCase {
             VoiceInkModelPrewarmPlan.plan(
                 isEnabled: true,
                 hasCurrentModel: false,
-                shouldPrewarmModel: false,
-                hasSampleAudio: false
+                shouldPrewarmModel: false
             ).diagnosticMessage
         )
         XCTAssertEqual(
             VoiceInkModelPrewarmPlan.plan(
                 isEnabled: true,
                 hasCurrentModel: true,
-                shouldPrewarmModel: false,
-                hasSampleAudio: false
+                shouldPrewarmModel: false
             ).diagnosticMessage,
             "Skipping prewarm - cloud models don't need it"
-        )
-        XCTAssertEqual(
-            VoiceInkModelPrewarmPlan.plan(
-                isEnabled: true,
-                hasCurrentModel: true,
-                shouldPrewarmModel: true,
-                hasSampleAudio: false
-            ).diagnosticMessage,
-            "❌ Prewarm audio file (sound7.wav) not found"
         )
 
         XCTAssertTrue(
             VoiceInkModelPrewarmPlan.plan(
                 isEnabled: true,
                 hasCurrentModel: true,
-                shouldPrewarmModel: true,
-                hasSampleAudio: true
+                shouldPrewarmModel: true
             ).shouldRun
         )
     }

@@ -57,6 +57,7 @@
 - Prevented iOS from crashing after onboarding when the active audio route exposes no usable microphone format, returning a recorder-start failure before installing the AVAudioEngine tap.
 - Added configurable iOS microphone routing with system-managed routing on by default, optional preferred-input selection with system fallback, deferred preference-driven capture restarts during active recording, and the existing custom-device default preserved on macOS.
 - Removed the Preload feature—the speculative rolling-buffer VAD/STT and quick-release path—including its forced-streaming and cached-finalization shortcuts. Special shortcuts now start ordinary recording immediately on key-down, FluidAudio performs its normal final ASR pass, and the recorder retains its fixed 3-second audio pre-roll.
+- Restored low-latency ordinary recording after Preload removal: local model prewarm now loads the selected runtime directly, and batch-capable key-up falls back to the recorded file instead of waiting for pending streaming startup.
 - Boosted quiet macOS and iOS local Whisper recordings before transcription while leaving silence, noise-floor, continuous-noise, and sparse click-like audio unchanged, improving low-volume/privacy dictation without changing saved audio.
 - Reported malformed macOS local Whisper audio as an audio-processing failure instead of silently sending an empty sample buffer to Whisper.
 - Preserved existing shortcut settings when shortcut recording is canceled, rejected, interrupted by another recorder, or dismissed before a replacement is captured.

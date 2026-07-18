@@ -71,6 +71,21 @@ class WhisperModelManager: ObservableObject {
         }
     }
 
+    func prewarmModel(_ model: VoiceInkWhisperLocalModelFile) async throws {
+        try await loadModel(model)
+        guard let whisperContext else {
+            throw VoiceInkEngineError.modelLoadFailed
+        }
+
+        let samples = [Float](
+            repeating: 0,
+            count: VoiceInkModelPrewarmSamplePolicy.generatedSilenceSampleCount
+        )
+        guard await whisperContext.fullTranscribe(samples: samples) else {
+            throw VoiceInkEngineError.transcriptionFailed
+        }
+    }
+
     // MARK: - Model Download & Management
 
     private func downloadFileWithProgress(from url: URL, progressKey: String) async throws -> Data {

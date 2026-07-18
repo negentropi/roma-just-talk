@@ -55,7 +55,6 @@ final class StreamingTranscriptionSession: TranscriptionSession {
     private var streamingFailed = false
     private var startupTask: Task<Void, Never>?
     private var startupTaskID: UUID?
-    private var fallbackAudioReadyTask: Task<Void, Error>?
     private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "StreamingTranscriptionSession")
 
     init(streamingService: StreamingTranscriptionService, fallbackService: TranscriptionService) {
@@ -107,20 +106,31 @@ final class StreamingTranscriptionSession: TranscriptionSession {
         return callback
     }
 
-    func setFallbackAudioReadyTask(_ task: Task<Void, Error>) {
-        fallbackAudioReadyTask = task
-    }
-
     func transcribe(audioURL: URL) async throws -> String {
         guard let model = model else {
             throw VoiceInkEngineError.transcriptionFailed
         }
 
-        if let startupTask, !streamingFailed {
+        switch VoiceInkStreamingStartupResolutionPolicy.plan(
+            hasPendingStartup: startupTask != nil,
+            streamingFailed: streamingFailed,
+            supportsRecordedFileTranscription: model.supportsRecordedFileTranscription
+        ) {
+        case .proceed:
+            break
+        case .cancelStartupAndUseRecordedFileFallback:
+            logger.notice("Streaming startup still pending at commit; using recorded-file fallback without waiting model=\(model.displayName, privacy: .public)")
+            startupTask?.cancel()
+            startupTask = nil
+            startupTaskID = nil
+            streamingFailed = true
+            streamingService.cancel()
+        case .waitForStreamingStartup:
+            guard let startupTask else { break }
             let waitStart = Date()
-            logger.notice("Streaming transcribe waiting for startup model=\(model.displayName, privacy: .public)")
+            logger.notice("Streaming-only transcribe waiting for startup model=\(model.displayName, privacy: .public)")
             await startupTask.value
-            logger.notice("Streaming startup wait finished elapsed=\(Date().timeIntervalSince(waitStart), format: .fixed(precision: 3), privacy: .public)s")
+            logger.notice("Streaming-only startup wait finished elapsed=\(Date().timeIntervalSince(waitStart), format: .fixed(precision: 3), privacy: .public)s")
         }
 
         return try await VoiceInkStreamingFallbackPolicy.run(
@@ -137,15 +147,6 @@ final class StreamingTranscriptionSession: TranscriptionSession {
             },
             cancelStreaming: {
                 streamingService.cancel()
-            },
-            prepareFallback: {
-                if let fallbackAudioReadyTask = self.fallbackAudioReadyTask {
-                    let waitStart = Date()
-                    self.logger.notice("Waiting for deferred audio file before batch fallback")
-                    try await fallbackAudioReadyTask.value
-                    self.fallbackAudioReadyTask = nil
-                    self.logger.notice("Deferred audio file ready for batch fallback elapsed=\(Date().timeIntervalSince(waitStart), format: .fixed(precision: 3), privacy: .public)s")
-                }
             },
             fallback: {
                 let fallbackStart = Date()

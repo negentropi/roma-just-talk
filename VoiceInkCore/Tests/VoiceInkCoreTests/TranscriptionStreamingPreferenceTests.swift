@@ -44,6 +44,47 @@ final class TranscriptionStreamingPreferenceTests: XCTestCase {
         XCTAssertTrue(VoiceInkTranscriptionServiceRoute.nativeApple.isLocalTranscriptionProvider)
     }
 
+    func testPendingStreamingStartupUsesRecordedFileFallbackWithoutWaiting() {
+        XCTAssertEqual(
+            VoiceInkStreamingStartupResolutionPolicy.plan(
+                hasPendingStartup: true,
+                streamingFailed: false,
+                supportsRecordedFileTranscription: true
+            ),
+            .cancelStartupAndUseRecordedFileFallback
+        )
+    }
+
+    func testPendingStreamingOnlyStartupStillWaitsForConnection() {
+        XCTAssertEqual(
+            VoiceInkStreamingStartupResolutionPolicy.plan(
+                hasPendingStartup: true,
+                streamingFailed: false,
+                supportsRecordedFileTranscription: false
+            ),
+            .waitForStreamingStartup
+        )
+    }
+
+    func testResolvedOrFailedStreamingStartupProceedsNormally() {
+        XCTAssertEqual(
+            VoiceInkStreamingStartupResolutionPolicy.plan(
+                hasPendingStartup: false,
+                streamingFailed: false,
+                supportsRecordedFileTranscription: true
+            ),
+            .proceed
+        )
+        XCTAssertEqual(
+            VoiceInkStreamingStartupResolutionPolicy.plan(
+                hasPendingStartup: true,
+                streamingFailed: true,
+                supportsRecordedFileTranscription: true
+            ),
+            .proceed
+        )
+    }
+
     func testStreamingTranscriptAssemblyPreservesCommittedPreviewAndFinalText() {
         XCTAssertEqual(VoiceInkStreamingTranscriptAssembly.committedText(["hello", "world"]), "hello world")
         XCTAssertEqual(VoiceInkStreamingTranscriptAssembly.committedText([]), "")

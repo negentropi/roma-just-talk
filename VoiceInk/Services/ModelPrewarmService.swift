@@ -14,15 +14,6 @@ final class ModelPrewarmService: ObservableObject {
         category: VoiceInkMacOSLogCategory.modelPrewarm
     )
     private let serviceRegistry: TranscriptionServiceRegistry
-    private var prewarmAudioURL: URL? {
-        VoiceInkModelPrewarmSamplePolicy.firstAvailableURL { resource in
-            Bundle.main.url(
-                forResource: resource.name,
-                withExtension: resource.fileExtension,
-                subdirectory: resource.subdirectory
-            )
-        }
-    }
 
     init(
         transcriptionModelManager: TranscriptionModelManager,
@@ -83,12 +74,10 @@ final class ModelPrewarmService: ObservableObject {
 
     private func performPrewarm() async {
         let currentModel = transcriptionModelManager.currentTranscriptionModel
-        let audioURL = prewarmAudioURL
         let prewarmPlan = VoiceInkModelPrewarmPlan.plan(
             isEnabled: VoiceInkModelRuntimePreference.shouldPrewarmModelOnWake(),
             hasCurrentModel: currentModel != nil,
-            shouldPrewarmModel: currentModel?.transcriptionRuntimeResourcePlan.shouldPrewarmModel ?? false,
-            hasSampleAudio: audioURL != nil
+            shouldPrewarmModel: currentModel?.transcriptionRuntimeResourcePlan.shouldPrewarmModel ?? false
         )
 
         guard prewarmPlan.shouldRun else {
@@ -97,17 +86,33 @@ final class ModelPrewarmService: ObservableObject {
             }
             return
         }
-        guard let currentModel, let audioURL else { return }
+        guard let currentModel else { return }
 
         logger.notice("\(VoiceInkModelPrewarmDiagnostics.prewarmingMessage(modelDisplayName: currentModel.displayName), privacy: .public)")
         let startTime = Date()
 
         do {
-            let _ = try await serviceRegistry.transcribe(audioURL: audioURL, model: currentModel)
+            try await currentModel.transcriptionRuntimeResourcePlan.applyRecordingStartupRuntimeState(
+                loadLocalWhisperModel: {
+                    guard let localModel = VoiceInkWhisperModelFiles.downloadedLocalModelFile(
+                        forModelName: currentModel.name,
+                        in: self.whisperModelManager.availableModels
+                    ) else {
+                        throw VoiceInkEngineError.modelLoadFailed
+                    }
+                    try await self.whisperModelManager.prewarmModel(localModel)
+                },
+                loadLocalFluidAudioModel: {
+                    guard let fluidAudioModel = currentModel as? FluidAudioModel else {
+                        throw VoiceInkEngineError.modelLoadFailed
+                    }
+                    try await self.serviceRegistry.fluidAudioTranscriptionService.loadModel(for: fluidAudioModel)
+                }
+            )
             let duration = Date().timeIntervalSince(startTime)
 
             logger.notice("\(VoiceInkModelPrewarmDiagnostics.completedMessage(duration: duration), privacy: .public)")
-
+        } catch is CancellationError {
         } catch {
             logger.error("\(VoiceInkModelPrewarmDiagnostics.failedMessage(errorDescription: error.localizedDescription), privacy: .public)")
         }

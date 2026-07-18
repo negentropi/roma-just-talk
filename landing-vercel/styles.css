@@ -961,6 +961,257 @@ h1 .before-word {
   font-size: clamp(3.2rem, 11vw, 7rem);
 }
 
+.pricing-hero {
+  overflow: hidden;
+}
+
+.pricing-hero-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 0.48fr);
+  align-items: end;
+  gap: clamp(24px, 7vw, 92px);
+}
+
+.pricing-copy {
+  padding-bottom: clamp(4px, 1.5vw, 18px);
+}
+
+.pricing-copy .body-copy {
+  max-width: 560px;
+}
+
+.pricing-hero-logo {
+  width: min(100%, 360px);
+  height: auto;
+  justify-self: end;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  background: var(--paper);
+  clip-path: inset(7% round 8px);
+  object-fit: cover;
+  box-shadow: 10px 10px 0 var(--coral);
+  transform: rotate(2deg);
+}
+
+.pricing-section {
+  padding: clamp(52px, 8vw, 96px) 0 76px;
+}
+
+.pricing-shell {
+  width: min(1120px, calc(100% - 40px));
+  margin: 0 auto;
+}
+
+.pricing-intro {
+  max-width: 680px;
+  margin-bottom: clamp(28px, 5vw, 52px);
+}
+
+.pricing-intro h2,
+.pricing-access h2 {
+  margin: 0;
+  font-size: clamp(2.25rem, 5vw, 4.3rem);
+  line-height: 0.98;
+}
+
+.pricing-intro p,
+.pricing-access p {
+  max-width: 620px;
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 1.08rem;
+  line-height: 1.55;
+}
+
+.pricing-intro .pricing-status {
+  max-width: 650px;
+  border-left: 4px solid var(--coral);
+  margin-top: 24px;
+  background: var(--surface);
+  color: var(--ink);
+  padding: 14px 16px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.86rem;
+}
+
+.pricing-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  align-items: stretch;
+  gap: 24px;
+}
+
+.pricing-start-plans {
+  display: grid;
+  gap: 24px;
+}
+
+.plan-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: 6px 6px 0 var(--ink);
+  padding: clamp(22px, 4vw, 36px);
+}
+
+.plan-card-featured {
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--coral) 18%, transparent), transparent 46%),
+    var(--surface-strong);
+  box-shadow: 9px 9px 0 var(--coral);
+}
+
+.plan-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px 24px;
+}
+
+.plan-heading h3 {
+  margin: 0;
+  font-size: clamp(2rem, 4.8vw, 4.2rem);
+  line-height: 0.95;
+}
+
+.plan-price {
+  display: grid;
+  justify-items: end;
+  margin: 0;
+}
+
+.plan-price span {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  font-weight: 800;
+  letter-spacing: -0.08em;
+  line-height: 0.9;
+}
+
+.plan-price small {
+  margin-top: 7px;
+  color: var(--muted);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.plan-summary {
+  max-width: 32ch;
+  margin: clamp(30px, 6vw, 78px) 0 0;
+  color: var(--muted);
+  font-size: clamp(1.15rem, 2.3vw, 1.5rem);
+  line-height: 1.45;
+}
+
+.plan-features {
+  display: grid;
+  gap: 13px;
+  margin: 30px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.plan-features li {
+  position: relative;
+  padding-left: 24px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.plan-features li::before {
+  position: absolute;
+  top: 0.64em;
+  left: 0;
+  width: 10px;
+  height: 3px;
+  background: var(--coral);
+  content: "";
+}
+
+.plan-detail {
+  margin-top: 24px;
+  color: var(--muted);
+}
+
+.plan-detail summary {
+  width: fit-content;
+  color: var(--ink);
+  cursor: pointer;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+.plan-detail p {
+  max-width: 42ch;
+  margin: 12px 0 0;
+  line-height: 1.55;
+}
+
+.plan-availability {
+  margin: auto 0 0;
+  padding-top: 30px;
+  color: var(--muted);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.plan-button {
+  align-self: flex-start;
+  margin-top: 28px;
+  white-space: nowrap;
+}
+
+.plan-download,
+.plan-contact {
+  --button-accent: var(--ink);
+
+  background: var(--coral);
+  color: #171412;
+}
+
+.pricing-access {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 28px;
+  border-top: 2px solid var(--ink);
+  margin-top: clamp(54px, 9vw, 104px);
+  padding-top: clamp(30px, 5vw, 52px);
+}
+
+.pricing-access h2 {
+  font-size: clamp(2rem, 4.8vw, 3.8rem);
+}
+
+.pricing-access .plan-button {
+  margin-top: 0;
+}
+
+.pricing-footnote {
+  margin: 24px 0 0;
+  color: var(--muted);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.pricing-page a:focus-visible,
+.pricing-page summary:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 4px;
+}
+
 .readme-section,
 .changelog-section {
   padding: 34px 0 70px;
@@ -1229,7 +1480,48 @@ h1 .before-word {
   }
 
   .top-actions {
+    max-width: 170px;
     font-size: 0.85rem;
+  }
+
+  .pricing-hero-layout,
+  .pricing-layout,
+  .pricing-access {
+    grid-template-columns: 1fr;
+  }
+
+  .pricing-hero-logo {
+    width: min(76vw, 300px);
+    justify-self: start;
+    margin-top: 28px;
+  }
+
+  .pricing-copy {
+    padding-bottom: 0;
+  }
+
+  .pricing-start-plans {
+    gap: 18px;
+  }
+
+  .pricing-layout {
+    gap: 18px;
+  }
+
+  .plan-price {
+    justify-items: start;
+  }
+
+  .plan-summary {
+    margin-top: 30px;
+  }
+
+  .pricing-access {
+    align-items: start;
+  }
+
+  .pricing-access .plan-button {
+    width: 100%;
   }
 
   .hero-copy {

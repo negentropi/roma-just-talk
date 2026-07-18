@@ -2,6 +2,7 @@
 
 ## v1.96 - Unreleased
 
+- Added a landing-site pricing preview for the planned Freemium, Italy, and Roma monthly tiers, clearly marking billing, usage tracking, and entitlement enforcement as not yet live.
 - Prevented Special modifier-only shortcuts from arming while macOS Secure Input is already active.
 - Added iOS microphone permission setup during onboarding plus a refreshable Settings recovery screen that reuses the recording permission path.
 - Resumed incomplete iOS onboarding at its last saved setup step after relaunch, clearing the saved step on completion or app-data reset.

@@ -82,7 +82,7 @@ final class StreamingTranscriptionSession: TranscriptionSession {
         streamingFailed = false
         let latencyTrace = VoiceInkLatencyTrace.shared
         let traceToken = latencyTraceToken
-        latencyTraceToken = traceToken
+        self.latencyTraceToken = traceToken
         latencyTrace.event(
             "streaming_session.prepare.enter",
             details: "model=\(model.displayName) supportsBatch=\(model.supportsRecordedFileTranscription)",

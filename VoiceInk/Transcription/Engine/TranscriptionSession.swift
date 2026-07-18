@@ -63,7 +63,13 @@ final class StreamingTranscriptionSession: TranscriptionSession {
     }
 
     func prepare(model: any TranscriptionModel) async throws -> ((Data) -> Void)? {
+        // Sessions own one recording lifecycle. Reuse would require a fresh streaming
+        // service because cancellation permanently closes its audio chunk stream.
+        guard self.model == nil else {
+            throw VoiceInkEngineError.transcriptionFailed
+        }
         self.model = model
+        streamingFailed = false
         logger.notice("Streaming session prepare model=\(model.displayName, privacy: .public)")
 
         // Return callback immediately; WebSocket connects in background
@@ -72,7 +78,6 @@ final class StreamingTranscriptionSession: TranscriptionSession {
             service?.sendAudioChunk(data)
         }
 
-        startupTask?.cancel()
         let taskID = UUID()
         startupTaskID = taskID
         startupTask = Task { [weak self] in

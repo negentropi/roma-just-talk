@@ -13,6 +13,7 @@ real target app such as TextEdit, Notes, Safari, Slack, or Zed.
 - Key-up commits an established stream when ready. If startup is still pending and the model supports recorded-file transcription, cancel that startup and use the recorded-file fallback without waiting.
 - Streaming-only models may wait for their connection because no recorded-file fallback exists.
 - Local model prewarm loads the selected runtime directly; it must not depend on transcribing a bundled UI sound.
+- Whisper prewarm reuses a loaded context only when it belongs to the currently selected model.
 - A cached speculative hypothesis must never replace the normal final ASR pass.
 
 Shared-core checks lock the startup-resolution and direct-prewarm policies. This harness is the end-to-end proof that those policies still produce visible text within the latency budget.

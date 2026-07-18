@@ -56,14 +56,19 @@ class WhisperModelManager: ObservableObject {
     // MARK: - Model Loading
 
     func loadModel(_ model: VoiceInkWhisperLocalModelFile) async throws {
-        guard whisperContext == nil else { return }
+        guard !VoiceInkWhisperModelLoadPolicy.shouldReuseLoadedContext(
+            hasContext: whisperContext != nil,
+            loadedModelName: loadedWhisperModel?.name,
+            requestedModelName: model.name
+        ) else { return }
 
         isModelLoading = true
         defer { isModelLoading = false }
 
         do {
-            whisperContext = try await WhisperContext.createContext(path: model.url.path)
+            let context = try await WhisperContext.createContext(path: model.url.path)
 
+            whisperContext = context
             isModelLoaded = true
             loadedWhisperModel = model
         } catch {

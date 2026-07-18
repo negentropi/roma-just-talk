@@ -205,6 +205,30 @@ final class TranscriptionModelCatalogTests: XCTestCase {
         )
     }
 
+    func testWhisperModelPrewarmOnlyReusesMatchingLoadedContext() {
+        XCTAssertTrue(
+            VoiceInkWhisperModelLoadPolicy.shouldReuseLoadedContext(
+                hasContext: true,
+                loadedModelName: "ggml-base.en.bin",
+                requestedModelName: "ggml-base.en.bin"
+            )
+        )
+        XCTAssertFalse(
+            VoiceInkWhisperModelLoadPolicy.shouldReuseLoadedContext(
+                hasContext: false,
+                loadedModelName: "ggml-base.en.bin",
+                requestedModelName: "ggml-base.en.bin"
+            )
+        )
+        XCTAssertFalse(
+            VoiceInkWhisperModelLoadPolicy.shouldReuseLoadedContext(
+                hasContext: true,
+                loadedModelName: "ggml-base.en.bin",
+                requestedModelName: "ggml-small.en.bin"
+            )
+        )
+    }
+
     func testModelPrewarmPlanUsesRuntimeAvailabilityWithoutAudioFixture() {
         XCTAssertEqual(
             VoiceInkModelPrewarmPlan.plan(

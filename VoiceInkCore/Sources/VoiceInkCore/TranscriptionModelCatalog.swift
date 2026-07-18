@@ -262,6 +262,16 @@ public enum VoiceInkModelPrewarmSamplePolicy {
     public static let generatedSilenceSampleCount = Int(VoiceInkPCM16Audio.mono16kSampleRate)
 }
 
+public enum VoiceInkWhisperModelLoadPolicy {
+    public static func shouldReuseLoadedContext(
+        hasContext: Bool,
+        loadedModelName: String?,
+        requestedModelName: String
+    ) -> Bool {
+        hasContext && loadedModelName == requestedModelName
+    }
+}
+
 public enum VoiceInkModelPrewarmSkipReason: Equatable, Sendable {
     case disabledByUser
     case missingCurrentModel

@@ -139,15 +139,15 @@ class VoiceInkEngine: NSObject, ObservableObject {
                         let startID = UUID()
                         self.activeRecordingStartID = startID
                         var powerModeConfigTask: Task<PowerModeConfig?, Never>?
+                        let startupAudioRelay = RecordingStartupAudioRelay(
+                            latencyTraceToken: traceToken
+                        )
+                        latencyTrace.event("engine.audio_relay.created", token: traceToken)
 
                         do {
                             let permanentURL = VoiceInkStoredAudioFile.recordingFileURL(in: self.recordingsDirectory)
                             self.recordedFile = permanentURL
 
-                            let startupAudioRelay = RecordingStartupAudioRelay(
-                                latencyTraceToken: traceToken
-                            )
-                            latencyTrace.event("engine.audio_relay.created", token: traceToken)
                             self.currentSession?.cancel()
                             self.currentSession = nil
                             self.recorder.onAudioChunk = { data in

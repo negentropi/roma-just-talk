@@ -2,6 +2,7 @@
 
 ## v1.96 - Unreleased
 
+- Routed macOS in-app update checks to a fork-owned informational appcast backed by Roma Just Talk GitHub releases, avoiding the upstream VoiceInk feed until signed fork updates are available.
 - Added a landing-site pricing preview for the planned Freemium, Italy, and Roma monthly tiers, clearly marking billing, usage tracking, and entitlement enforcement as not yet live.
 - Prevented Special modifier-only shortcuts from arming while macOS Secure Input is already active.
 - Added iOS microphone permission setup during onboarding plus a refreshable Settings recovery screen that reuses the recording permission path.

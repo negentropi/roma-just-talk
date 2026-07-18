@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/appcast.xml",
+      "destination": "/api/appcast"
+    },
+    {
       "source": "/changelogs",
       "destination": "/changelogs/index.html"
     },

@@ -21,6 +21,7 @@ class Recorder: NSObject, ObservableObject {
     private let audioSetupQueue = DispatchQueue(label: "\(VoiceInkAppIdentity.loggingSubsystem).audioSetup", qos: .userInitiated)
     private var audioMuteTask: Task<Void, Never>?
     private var audioRestorationTask: Task<Void, Never>?
+    private var activeLatencyTraceToken: VoiceInkLatencyTrace.Token?
     private let smoothedValuesLock = NSLock()
     private var smoothedAverage: Float = 0
     private var smoothedPeak: Float = 0
@@ -31,10 +32,6 @@ class Recorder: NSObject, ObservableObject {
         didSet { recorder?.onAudioChunk = onAudioChunk }
     }
 
-    var onRollingAudioChunk: ((_ data: Data) -> Void)? {
-        didSet { recorder?.onRollingAudioChunk = onRollingAudioChunk }
-    }
-    
     enum RecorderError: Error {
         case couldNotStartRecording
     }
@@ -142,7 +139,6 @@ class Recorder: NSObject, ObservableObject {
         let coreAudioRecorder = recorder ?? CoreAudioRecorder()
         recorder = coreAudioRecorder
         coreAudioRecorder.onAudioChunk = nil
-        coreAudioRecorder.onRollingAudioChunk = onRollingAudioChunk
 
         do {
             try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
@@ -161,11 +157,20 @@ class Recorder: NSObject, ObservableObject {
         }
     }
 
-    func startRecording(toOutputFile url: URL) async throws {
+    func startRecording(
+        toOutputFile url: URL,
+        latencyTraceToken: VoiceInkLatencyTrace.Token?
+    ) async throws {
+        let latencyTrace = VoiceInkLatencyTrace.shared
+        let traceToken = latencyTraceToken
+        activeLatencyTraceToken = traceToken
+        latencyTrace.event("recorder.start.enter", token: traceToken)
         logger.notice("startRecording called – deviceID=\(self.deviceManager.getCurrentDevice(), privacy: .public), file=\(url.lastPathComponent, privacy: .public)")
         deviceManager.isRecordingActive = true
 
+        let deviceLookupSpan = latencyTrace.begin("recorder.device_lookup", token: traceToken)
         let currentDeviceID = deviceManager.getCurrentDevice()
+        latencyTrace.end(deviceLookupSpan, details: "deviceID=\(currentDeviceID)")
         let currentDeviceIdentifier = String(currentDeviceID)
         if VoiceInkAudioInputPreference.shouldAnnounceMicrophoneChange(to: currentDeviceIdentifier) {
             if let deviceName = deviceManager.availableDevices.first(where: { $0.id == currentDeviceID })?.name {
@@ -188,36 +193,52 @@ class Recorder: NSObject, ObservableObject {
 
         let coreAudioRecorder = recorder ?? CoreAudioRecorder()
         coreAudioRecorder.onAudioChunk = onAudioChunk
-        coreAudioRecorder.onRollingAudioChunk = onRollingAudioChunk
         recorder = coreAudioRecorder
 
         do {
             // Offload initialization to avoid shortcut lag.
+            latencyTrace.event("recorder.audio_setup_queue.schedule_start", token: traceToken)
             try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
                 audioSetupQueue.async {
+                    let queueSpan = latencyTrace.begin("recorder.audio_setup_queue.start", token: traceToken)
                     do {
-                        try coreAudioRecorder.startRecording(toOutputFile: url, deviceID: deviceID)
+                        try coreAudioRecorder.startRecording(
+                            toOutputFile: url,
+                            deviceID: deviceID,
+                            latencyTraceToken: traceToken
+                        )
+                        latencyTrace.end(queueSpan, details: "result=success")
                         continuation.resume()
                     } catch {
+                        latencyTrace.end(
+                            queueSpan,
+                            details: "result=failure error=\(String(describing: type(of: error)))"
+                        )
                         continuation.resume(throwing: error)
                     }
                 }
             }
+            latencyTrace.event("recorder.audio_setup_queue.start_resumed", token: traceToken)
             logger.notice("startRecording: CoreAudioRecorder started successfully")
 
             startAudioMeterTimer()
             Task { [weak self] in
                 guard let self else { return }
+                let span = latencyTrace.begin("recorder.pause_media", token: traceToken)
                 await self.playbackController.pauseMedia()
+                latencyTrace.end(span)
             }
         } catch {
             logger.error("Failed to start recording: \(error.localizedDescription, privacy: .public)")
-            await stopRecording()
+            await stopRecording(latencyTraceToken: traceToken)
             throw RecorderError.couldNotStartRecording
         }
     }
 
-    func stopRecording() async {
+    func stopRecording(latencyTraceToken: VoiceInkLatencyTrace.Token? = nil) async {
+        let latencyTrace = VoiceInkLatencyTrace.shared
+        let traceToken = latencyTraceToken ?? activeLatencyTraceToken
+        latencyTrace.event("recorder.stop.enter", token: traceToken)
         logger.notice("stopRecording called")
         audioMuteTask?.cancel()
         audioMuteTask = nil
@@ -225,16 +246,16 @@ class Recorder: NSObject, ObservableObject {
         audioMeterUpdateTimer = nil
 
         let currentRecorder = self.recorder
-        let rollingAudioChunkHandler = onRollingAudioChunk
-
-        await withCheckedContinuation { continuation in
-            audioSetupQueue.async {
-                currentRecorder?.finishRecording()
-                currentRecorder?.onAudioChunk = nil
-                currentRecorder?.onRollingAudioChunk = rollingAudioChunkHandler
-                continuation.resume()
-            }
+        latencyTrace.event("recorder.audio_setup_queue.schedule_stop", token: traceToken)
+        // The hardware stop is already serialized and measured as sub-millisecond.
+        // Finish inline so key-up does not pay a MainActor continuation-resume delay.
+        audioSetupQueue.sync {
+            let queueSpan = latencyTrace.begin("recorder.audio_setup_queue.stop", token: traceToken)
+            currentRecorder?.finishRecording(latencyTraceToken: traceToken)
+            currentRecorder?.onAudioChunk = nil
+            latencyTrace.end(queueSpan)
         }
+        latencyTrace.event("recorder.audio_setup_queue.stop_completed", token: traceToken)
         onAudioChunk = nil
 
         smoothedValuesLock.lock()
@@ -245,20 +266,13 @@ class Recorder: NSObject, ObservableObject {
         audioMeter = AudioMeter(averagePower: 0, peakPower: 0)
 
         audioRestorationTask = Task {
+            let span = latencyTrace.begin("recorder.restore_audio", token: traceToken)
             await mediaController.unmuteSystemAudio()
             await playbackController.resumeMedia()
+            latencyTrace.end(span)
         }
+        activeLatencyTraceToken = nil
         deviceManager.isRecordingActive = false
-    }
-
-    func reloadRollingBufferSettings() async {
-        let currentRecorder = recorder
-        await withCheckedContinuation { continuation in
-            audioSetupQueue.async {
-                currentRecorder?.reloadPreRollBufferSettings()
-                continuation.resume()
-            }
-        }
     }
 
     private func handleRecordingError(_ error: Error) async {

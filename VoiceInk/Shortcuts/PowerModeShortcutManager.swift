@@ -82,6 +82,7 @@ class PowerModeShortcutManager {
             secureInputBlockedActions: mode.tracksKeyUpEvidence ? Set(shortcuts.keys) : [],
             tracksKeyUpEvidence: mode.tracksKeyUpEvidence,
             onKeyDown: { [weak self] action, eventTime in
+                let callbackReceivedAt = ProcessInfo.processInfo.systemUptime
                 Task { @MainActor in
                     guard let self,
                           let powerModeId = self.powerModeId(for: action) else {
@@ -91,6 +92,7 @@ class PowerModeShortcutManager {
                     await self.shortcutModeHandler.handleKeyDown(
                         action: action,
                         eventTime: eventTime,
+                        callbackReceivedAt: callbackReceivedAt,
                         mode: self.modeProvider(),
                         specialOptions: self.specialOptionsProvider(),
                         powerModeId: powerModeId
@@ -98,6 +100,7 @@ class PowerModeShortcutManager {
                 }
             },
             onKeyUp: { [weak self] action, eventTime, context in
+                let callbackReceivedAt = ProcessInfo.processInfo.systemUptime
                 Task { @MainActor in
                     guard let self,
                           case .powerMode(let powerModeId) = action else {
@@ -107,23 +110,11 @@ class PowerModeShortcutManager {
                     await self.shortcutModeHandler.handleKeyUp(
                         action: action,
                         eventTime: eventTime,
+                        callbackReceivedAt: callbackReceivedAt,
                         mode: self.modeProvider(),
                         context: context,
                         specialOptions: self.specialOptionsProvider(),
                         powerModeId: powerModeId
-                    )
-                }
-            },
-            onPressContextChanged: { [weak self] action, context in
-                Task { @MainActor in
-                    guard let self,
-                          case .powerMode = action,
-                          self.modeProvider().tracksKeyUpEvidence else {
-                        return
-                    }
-                    self.shortcutModeHandler.handlePressContextChanged(
-                        action: action,
-                        context: context
                     )
                 }
             },

@@ -281,10 +281,6 @@ public enum VoiceInkPCM16Audio {
         Int((seconds * Double(mono16kSampleRateHz) * Double(bytesPerSample)).rounded())
     }
 
-    public static func duration(forMono16kData data: Data) -> TimeInterval {
-        TimeInterval(sampleCount(inData: data)) / Double(mono16kSampleRateHz)
-    }
-
     public static func monoPCM16Chunks(from data: Data, maxByteCount: Int) -> [Data] {
         guard !data.isEmpty, maxByteCount >= bytesPerSample else { return [] }
 

@@ -2273,6 +2273,31 @@ public enum VoiceInkMacOSRecordingCancellationPolicy {
     }
 }
 
+public struct VoiceInkMacOSRecordingStartupOrchestrationPlan: Equatable, Sendable {
+    public let shouldResolvePowerMode: Bool
+    public let shouldPrepareTranscriptionSessionBeforeRecorder: Bool
+
+    public init(
+        shouldResolvePowerMode: Bool,
+        shouldPrepareTranscriptionSessionBeforeRecorder: Bool
+    ) {
+        self.shouldResolvePowerMode = shouldResolvePowerMode
+        self.shouldPrepareTranscriptionSessionBeforeRecorder = shouldPrepareTranscriptionSessionBeforeRecorder
+    }
+}
+
+public enum VoiceInkMacOSRecordingStartupOrchestrationPolicy {
+    public static func plan(
+        powerModeConfigurationCount: Int
+    ) -> VoiceInkMacOSRecordingStartupOrchestrationPlan {
+        let shouldResolvePowerMode = powerModeConfigurationCount > 0
+        return VoiceInkMacOSRecordingStartupOrchestrationPlan(
+            shouldResolvePowerMode: shouldResolvePowerMode,
+            shouldPrepareTranscriptionSessionBeforeRecorder: !shouldResolvePowerMode
+        )
+    }
+}
+
 public extension VoiceInkRecordingState {
     var isActivelyRecording: Bool {
         self == .recording
@@ -2280,10 +2305,6 @@ public extension VoiceInkRecordingState {
 
     var isRecorderCaptureInProgress: Bool {
         self == .starting || self == .recording
-    }
-
-    var acceptsRollingBufferPreloadPreview: Bool {
-        self == .idle || self == .recording
     }
 
     var acceptsRecordingShortcutAction: Bool {

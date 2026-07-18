@@ -19,7 +19,6 @@ extension Notification.Name {
     static let transcriptionCreated = VoiceInkMacOSAppEventRequest.transcriptionCreatedNotificationName
     static let transcriptionCompleted = VoiceInkMacOSAppEventRequest.transcriptionCompletedNotificationName
     static let transcriptionDeleted = VoiceInkMacOSAppEventRequest.transcriptionDeletedNotificationName
-    static let rollingBufferPreloadPartialTranscript = VoiceInkRollingBufferPreloadPartialTranscriptRequest.notificationName
     static let sessionMetricsDidChange = VoiceInkMacOSAppEventRequest.sessionMetricsDidChangeNotificationName
     static let enhancementToggleChanged = VoiceInkMacOSAppEventRequest.enhancementToggleChangedNotificationName
     static let openFileForTranscription = VoiceInkMacOSFileTranscriptionRequest.notificationName

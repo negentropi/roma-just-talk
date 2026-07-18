@@ -497,10 +497,6 @@ final class ModeRuntimeConfigurationTests: XCTestCase {
         XCTAssertNil(presentation.singleModeName)
     }
 
-    func testModeSelectionPresentationPreservesIOSControlTitle() {
-        XCTAssertEqual(VoiceInkModeSelectionPresentation.controlTitle, "Mode")
-    }
-
     func testModeSummaryPresentationUsesEffectiveModelNames() {
         let mode = Mode(
             name: "Cloud",

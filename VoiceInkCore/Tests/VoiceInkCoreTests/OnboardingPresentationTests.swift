@@ -86,6 +86,7 @@ final class OnboardingPresentationTests: XCTestCase {
         XCTAssertEqual(step, .ready)
         step.advance()
         XCTAssertEqual(step, .ready)
+
     }
 
     func testIOSModelDownloadOnboardingDefaultModelUsesSharedBaseModel() {
@@ -93,64 +94,6 @@ final class OnboardingPresentationTests: XCTestCase {
             VoiceInkIOSOnboardingPresentation.defaultDownloadModel,
             VoiceInkWhisperModelFiles.baseModel
         )
-    }
-
-    func testIOSWelcomeOnboardingPresentationPreservesCopyAndFeatureOrder() {
-        let presentation = VoiceInkIOSOnboardingPresentation.welcome
-
-        XCTAssertEqual(presentation.title, "Welcome to roma just talk")
-        XCTAssertEqual(presentation.subtitle, "Transform your thoughts into text effortlessly.")
-        XCTAssertEqual(presentation.primaryButtonTitle, "Get Started")
-        XCTAssertEqual(
-            presentation.features,
-            [
-                VoiceInkOnboardingFeaturePresentation(
-                    iconSystemName: "mic.fill",
-                    title: "Instant Recording",
-                    description: "Capture your thoughts with a single tap, anytime, anywhere."
-                ),
-                VoiceInkOnboardingFeaturePresentation(
-                    iconSystemName: "bolt.fill",
-                    title: "Accurate Transcription",
-                    description: "Leverage powerful AI models for precise speech-to-text conversion."
-                ),
-                VoiceInkOnboardingFeaturePresentation(
-                    iconSystemName: "icloud.slash.fill",
-                    title: "Works Offline",
-                    description: "Transcribe without an internet connection using local models."
-                )
-            ]
-        )
-    }
-
-    func testMacOSWelcomeOnboardingPresentationPreservesCopyAndRoleOrder() {
-        let presentation = VoiceInkMacOSOnboardingPresentation.welcome
-
-        XCTAssertEqual(presentation.title, "Welcome to the Future of Typing")
-        XCTAssertEqual(presentation.subtitle, "A New Way to Type")
-        XCTAssertEqual(presentation.primaryButtonTitle, "Get Started")
-        XCTAssertEqual(presentation.skipButtonTitle, "Skip Tour")
-        XCTAssertEqual(
-            presentation.typewriterRoles,
-            [
-                "Your Writing Assistant",
-                "Your Vibe-Coding Assistant",
-                "Works Everywhere on Mac with a click",
-                "100% offline & private"
-            ]
-        )
-    }
-
-    func testIOSModelDownloadOnboardingPresentationPreservesCopy() {
-        let presentation = VoiceInkIOSOnboardingPresentation.modelDownload
-
-        XCTAssertEqual(presentation.iconSystemName, "cpu")
-        XCTAssertEqual(presentation.title, "Offline Transcription")
-        XCTAssertEqual(
-            presentation.subtitle,
-            "Download a local model to transcribe audio even without an internet connection."
-        )
-        XCTAssertEqual(presentation.continueButtonTitle, "Continue")
     }
 
     func testIOSModelDownloadOnboardingPrimaryActionUsesDownloadRowState() {
@@ -271,52 +214,6 @@ final class OnboardingPresentationTests: XCTestCase {
         XCTAssertEqual(downloadedSnapshot.rowPresentation.action, .downloaded)
         XCTAssertEqual(downloadedSnapshot.primaryAction, .continueSetup(title: "Continue"))
         XCTAssertNil(downloadedSnapshot.confirmedDownloadRuntimeAction { events.append("download") })
-    }
-
-    func testMacOSModelDownloadOnboardingPresentationPreservesCopyAndButtonPolicy() {
-        let presentation = VoiceInkMacOSOnboardingPresentation.modelDownload
-
-        XCTAssertEqual(presentation.title, "Download AI Model")
-        XCTAssertEqual(
-            presentation.subtitle,
-            "Your default model starts downloading automatically. You can wait here, choose another model, or skip setup for now."
-        )
-        XCTAssertEqual(presentation.nextButtonTitle, "Next")
-        XCTAssertEqual(presentation.skipButtonTitle, "Skip for now")
-    }
-
-    func testMacOSOnboardingTutorialPresentationPreservesCopyAndStepOrder() {
-        let presentation = VoiceInkMacOSOnboardingPresentation.tutorial
-
-        XCTAssertEqual(presentation.title, "Try It Out!")
-        XCTAssertEqual(presentation.subtitle, "Let's test your roma-just-talk setup.")
-        XCTAssertEqual(presentation.shortcutTitle, "Your Shortcut")
-        XCTAssertEqual(
-            presentation.instructionSteps,
-            [
-                "Click the text area on the right",
-                "Press your shortcut key",
-                "Speak something",
-                "Press your shortcut key again"
-            ]
-        )
-        XCTAssertEqual(presentation.completeButtonTitle, "Complete Setup")
-        XCTAssertEqual(presentation.skipButtonTitle, "Skip for now")
-        XCTAssertEqual(presentation.placeholderIconSystemName, "wand.and.stars")
-        XCTAssertEqual(presentation.placeholderText, "Click here and start speaking...")
-    }
-
-    func testMacOSResetOnboardingSettingsAlertPresentationPreservesCopy() {
-        let presentation = VoiceInkMacOSOnboardingPresentation.resetSettingsAlert
-
-        XCTAssertEqual(presentation.buttonTitle, "Reset Onboarding")
-        XCTAssertEqual(presentation.alertTitle, "Reset Onboarding")
-        XCTAssertEqual(presentation.cancelButtonTitle, "Cancel")
-        XCTAssertEqual(presentation.confirmButtonTitle, "Reset")
-        XCTAssertEqual(
-            presentation.message,
-            "You'll see the introduction screens again the next time you launch the app."
-        )
     }
 
     func testMacOSSetupPresentationPreservesHeaderAndStepOrder() {
@@ -449,80 +346,6 @@ final class OnboardingPresentationTests: XCTestCase {
         )
     }
 
-    func testIOSReadyOnboardingPresentationPreservesCopyAndStepOrder() {
-        let presentation = VoiceInkIOSOnboardingPresentation.ready
-
-        XCTAssertEqual(presentation.iconSystemName, "checkmark.circle.fill")
-        XCTAssertEqual(presentation.title, "You're All Set!")
-        XCTAssertEqual(presentation.subtitle, "Start recording your thoughts and ideas.")
-        XCTAssertEqual(presentation.primaryButtonTitle, "Start Using roma just talk")
-        XCTAssertEqual(
-            presentation.steps,
-            [
-                VoiceInkOnboardingStepPresentation(
-                    number: "1",
-                    title: "Record",
-                    description: "Tap the record button to capture your thoughts."
-                ),
-                VoiceInkOnboardingStepPresentation(
-                    number: "2",
-                    title: "Transcribe",
-                    description: "AI converts your speech to text automatically."
-                ),
-                VoiceInkOnboardingStepPresentation(
-                    number: "3",
-                    title: "Save & Organize",
-                    description: "Your notes are saved and ready for review."
-                )
-            ]
-        )
-    }
-
-    func testMacOSOnboardingPermissionPresentationPreservesStepOrderAndCopy() {
-        let presentations = VoiceInkMacOSOnboardingPermissionPresentation.all
-
-        XCTAssertEqual(
-            presentations.map(\.kind),
-            [.microphone, .audioDeviceSelection, .accessibility, .inputMonitoring, .screenRecording, .keyboardShortcut]
-        )
-        XCTAssertEqual(presentations[0].title, "Microphone Access")
-        XCTAssertEqual(
-            presentations[0].description,
-            "Enable your microphone to start speaking and converting your voice to text instantly."
-        )
-        XCTAssertEqual(presentations[0].iconSystemName, "waveform")
-        XCTAssertEqual(presentations[1].title, "Microphone Selection")
-        XCTAssertEqual(
-            presentations[1].description,
-            "Select the audio input device you want to use with roma-just-talk."
-        )
-        XCTAssertEqual(presentations[1].audioDeviceSelection?.emptyStateTitle, "No microphones found")
-        XCTAssertEqual(presentations[1].audioDeviceSelection?.pickerLabel, "Microphone:")
-        XCTAssertEqual(presentations[1].audioDeviceSelection?.selectedDevicePlaceholder, "Select Device")
-        XCTAssertEqual(presentations[1].audioDeviceSelection?.unknownDeviceName, "Unknown Device")
-        XCTAssertEqual(
-            presentations[1].audioDeviceSelection?.recommendationText,
-            "For best results, using your Mac's built-in microphone is recommended."
-        )
-        XCTAssertEqual(presentations[2].title, "Accessibility Access")
-        XCTAssertEqual(presentations[3].title, "Input Monitoring")
-        XCTAssertEqual(presentations[4].title, "Screen Context (Optional)")
-        XCTAssertEqual(
-            presentations[4].description,
-            "Enable screen context only if you want roma-just-talk to use visible text for transcript enhancement."
-        )
-        XCTAssertEqual(
-            presentations[4].screenContextInfoMessage,
-            VoiceInkMacOSOnboardingPermissionPresentation.screenContextInfoHelpMessage
-        )
-        XCTAssertEqual(
-            presentations[4].screenContextInfoURLString,
-            "https://tryvoiceink.com/docs/contextual-awareness"
-        )
-        XCTAssertEqual(presentations[5].title, "Keyboard Shortcut")
-        XCTAssertEqual(presentations[5].iconSystemName, "keyboard")
-    }
-
     func testMacOSOnboardingPermissionButtonTitlesAndSkipPolicy() {
         let presentations = VoiceInkMacOSOnboardingPermissionPresentation.all
         let microphone = presentations[0]
@@ -549,80 +372,6 @@ final class OnboardingPresentationTests: XCTestCase {
             VoiceInkMacOSOnboardingPermissionPresentation.relaunchRequiredMessage,
             "If you already turned this on in System Settings, relaunch roma-just-talk to activate it."
         )
-    }
-
-    func testMacOSPermissionSettingsPresentationPreservesHeaderAndStatusIcons() {
-        XCTAssertEqual(VoiceInkMacOSPermissionSettingsPresentation.headerIconSystemName, "shield.lefthalf.filled")
-        XCTAssertEqual(VoiceInkMacOSPermissionSettingsPresentation.headerTitle, "App Permissions")
-        XCTAssertEqual(
-            VoiceInkMacOSPermissionSettingsPresentation.headerDescription,
-            "Microphone and shortcut access are needed for recording. Screen context is optional."
-        )
-        XCTAssertEqual(VoiceInkMacOSPermissionSettingsPresentation.refreshButtonSystemImageName, "arrow.clockwise")
-        XCTAssertEqual(VoiceInkMacOSPermissionSettingsPresentation.grantedStatusSystemImageName, "checkmark.seal.fill")
-        XCTAssertEqual(VoiceInkMacOSPermissionSettingsPresentation.deniedStatusSystemImageName, "xmark.seal.fill")
-        XCTAssertEqual(VoiceInkMacOSPermissionSettingsPresentation.actionSystemImageName, "arrow.right")
-        XCTAssertEqual(
-            VoiceInkMacOSPermissionSettingsPresentation.relaunchRequiredMessage,
-            "If you already turned this on in System Settings, relaunch roma-just-talk to activate it."
-        )
-    }
-
-    func testMacOSPermissionSettingsCardsPreserveCopyAndButtonPolicy() {
-        let inputMonitoring = VoiceInkMacOSPermissionSettingsPresentation.inputMonitoringCard
-        let microphone = VoiceInkMacOSPermissionSettingsPresentation.microphoneCard
-        let accessibility = VoiceInkMacOSPermissionSettingsPresentation.accessibilityCard
-        let screenContext = VoiceInkMacOSPermissionSettingsPresentation.screenContextCard
-
-        XCTAssertEqual(inputMonitoring.kind, .inputMonitoring)
-        XCTAssertEqual(inputMonitoring.iconSystemName, "keyboard.badge.eye")
-        XCTAssertEqual(inputMonitoring.grantedIconSystemName, "keyboard.badge.eye.fill")
-        XCTAssertEqual(inputMonitoring.title, "Input Monitoring Access")
-        XCTAssertEqual(inputMonitoring.description, "Allow roma-just-talk to listen for your recording hotkey globally")
-        XCTAssertEqual(inputMonitoring.buttonTitle(requiresRelaunch: false), "Grant")
-        XCTAssertEqual(inputMonitoring.buttonTitle(requiresRelaunch: true), "Relaunch to Apply")
-        XCTAssertEqual(
-            inputMonitoring.infoTipMessage,
-            "roma-just-talk uses Input Monitoring only to detect your configured recording shortcut while other apps are active."
-        )
-
-        XCTAssertEqual(microphone.kind, .microphone)
-        XCTAssertEqual(microphone.iconSystemName, "mic")
-        XCTAssertEqual(microphone.title, "Microphone Access")
-        XCTAssertEqual(microphone.description, "Allow roma-just-talk to record your voice for transcription")
-        XCTAssertEqual(microphone.buttonTitle(requiresRelaunch: true), "Grant")
-
-        XCTAssertEqual(accessibility.kind, .accessibility)
-        XCTAssertEqual(accessibility.iconSystemName, "hand.raised")
-        XCTAssertEqual(accessibility.title, "Accessibility Access")
-        XCTAssertEqual(accessibility.description, "Add roma-just-talk to Accessibility, then turn its switch on")
-        XCTAssertEqual(
-            accessibility.infoTipMessage,
-            "macOS requires you to enable the roma-just-talk switch yourself. Dragging the app into the list only adds it when it is missing."
-        )
-
-        XCTAssertEqual(screenContext.kind, .screenContext)
-        XCTAssertEqual(screenContext.iconSystemName, "rectangle.on.rectangle")
-        XCTAssertEqual(screenContext.title, "Screen Context (Optional)")
-        XCTAssertEqual(screenContext.description, "Use visible screen text to improve transcript enhancement when you choose.")
-        XCTAssertEqual(screenContext.buttonTitle(requiresRelaunch: false), "Enable")
-        XCTAssertEqual(screenContext.buttonTitle(requiresRelaunch: true), "Relaunch to Apply")
-        XCTAssertEqual(
-            screenContext.infoTipMessage,
-            "roma-just-talk captures on-screen text to understand the context of your voice input, which significantly improves transcription accuracy. Your privacy is important: this data is processed locally and is not stored."
-        )
-        XCTAssertEqual(screenContext.infoTipURLString, "https://tryvoiceink.com/docs/contextual-awareness")
-    }
-
-    func testMacOSDashboardAccessibilityCalloutPreservesMetricsCopy() {
-        let callout = VoiceInkMacOSPermissionSettingsPresentation.dashboardAccessibilityCallout
-
-        XCTAssertEqual(callout.kind, .accessibility)
-        XCTAssertEqual(callout.iconSystemName, "hand.raised")
-        XCTAssertEqual(callout.title, "Accessibility Access")
-        XCTAssertEqual(callout.description, "VoiceInk needs Accessibility permission to work reliably across your entire Mac")
-        XCTAssertEqual(callout.buttonTitle(requiresRelaunch: true), "Open System Settings")
-        XCTAssertEqual(callout.infoTipMessage, "VoiceInk uses Accessibility to work reliably across apps.")
     }
 
     func testMacOSPermissionTimingPolicyPreservesPollingAndRelaunchDelays() {

@@ -54,10 +54,9 @@ class TranscriptionServiceRegistry {
     /// Creates a streaming or file-based session depending on the model's capabilities.
     func createSession(
         for model: any TranscriptionModel,
-        onPartialTranscript: ((String) -> Void)? = nil,
-        forceStreaming: Bool = false
+        onPartialTranscript: ((String) -> Void)? = nil
     ) -> TranscriptionSession {
-        let routePlan = model.transcriptionSessionRouteFacts.plan(forceStreaming: forceStreaming)
+        let routePlan = model.transcriptionSessionRouteFacts.plan()
 
         return routePlan.executionPlan.applyRuntimeState(
             file: { serviceRoute -> TranscriptionSession in
@@ -68,7 +67,6 @@ class TranscriptionServiceRegistry {
                     modelContext: modelContext,
                     streamingAdapterKind: request.adapterKind,
                     fluidAudioService: request.adapterKind == .localFluidAudio ? fluidAudioTranscriptionService : nil,
-                    fluidAudioStreamingConfig: request.usesRollingPreload ? .rollingPreload : nil,
                     finalCommitTimeoutNanoseconds: request.finalCommitTimeoutNanoseconds,
                     onPartialTranscript: onPartialTranscript
                 )

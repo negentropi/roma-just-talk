@@ -40,21 +40,12 @@ final class WhisperModelWarmupCoordinator: ObservableObject {
     }
 
     private func runWarmup(for model: WhisperModel, whisperModelManager: WhisperModelManager) async throws {
-        guard let sampleURL = warmupSampleURL() else { return }
-        let service = WhisperTranscriptionService(
-            modelsDirectory: whisperModelManager.modelsDirectory,
-            modelProvider: whisperModelManager
-        )
-        _ = try await service.transcribe(audioURL: sampleURL, model: model)
-    }
-
-    private func warmupSampleURL() -> URL? {
-        VoiceInkModelPrewarmSamplePolicy.firstAvailableURL { resource in
-            Bundle.main.url(
-                forResource: resource.name,
-                withExtension: resource.fileExtension,
-                subdirectory: resource.subdirectory
-            )
+        guard let localModel = VoiceInkWhisperModelFiles.downloadedLocalModelFile(
+            forModelName: model.name,
+            in: whisperModelManager.availableModels
+        ) else {
+            throw VoiceInkEngineError.modelLoadFailed
         }
+        try await whisperModelManager.prewarmModel(localModel)
     }
 }

@@ -4,6 +4,9 @@ import VoiceInkCore
 
 /// Protocol for streaming transcription providers.
 protocol StreamingTranscriptionProvider: AnyObject {
+    /// Associates provider-internal diagnostic events with one recording lifecycle.
+    func setLatencyTraceToken(_ token: VoiceInkLatencyTrace.Token?)
+
     /// Connect to the streaming transcription endpoint
     func connect(model: any TranscriptionModel, language: String?) async throws
 
@@ -21,6 +24,8 @@ protocol StreamingTranscriptionProvider: AnyObject {
 }
 
 extension StreamingTranscriptionProvider {
+    func setLatencyTraceToken(_ token: VoiceInkLatencyTrace.Token?) {}
+
     func apiKey(for model: any TranscriptionModel) throws -> String {
         guard let apiKey = VoiceInkProviderCredential.nonBlank(
             APIKeyManager.shared.getAPIKey(forProvider: model.provider.apiKeyProviderName)

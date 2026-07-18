@@ -33,73 +33,8 @@ struct PreRollStreamingEmissionGate {
     }
 }
 
-enum PCM16WAVFileWriter {
-    static func writeMono16k(_ data: Data, to url: URL) throws {
-        if FileManager.default.fileExists(atPath: url.path) {
-            try FileManager.default.removeItem(at: url)
-        }
-
-        var outputFormat = AudioStreamBasicDescription(
-            mSampleRate: VoiceInkPCM16Audio.mono16kSampleRate,
-            mFormatID: kAudioFormatLinearPCM,
-            mFormatFlags: kAudioFormatFlagIsSignedInteger | kAudioFormatFlagIsPacked,
-            mBytesPerPacket: UInt32(VoiceInkPCM16Audio.bytesPerSample),
-            mFramesPerPacket: 1,
-            mBytesPerFrame: UInt32(VoiceInkPCM16Audio.bytesPerSample),
-            mChannelsPerFrame: UInt32(VoiceInkPCM16Audio.monoChannelCount),
-            mBitsPerChannel: UInt32(VoiceInkPCM16Audio.bitsPerSample),
-            mReserved: 0
-        )
-
-        var fileRef: ExtAudioFileRef?
-        var status = ExtAudioFileCreateWithURL(
-            url as CFURL,
-            kAudioFileWAVEType,
-            &outputFormat,
-            nil,
-            AudioFileFlags.eraseFile.rawValue,
-            &fileRef
-        )
-        guard status == noErr, let fileRef else {
-            throw CoreAudioRecorderError.failedToCreateFile(status: status)
-        }
-
-        defer { ExtAudioFileDispose(fileRef) }
-
-        status = ExtAudioFileSetProperty(
-            fileRef,
-            kExtAudioFileProperty_ClientDataFormat,
-            UInt32(MemoryLayout<AudioStreamBasicDescription>.size),
-            &outputFormat
-        )
-        guard status == noErr else {
-            throw CoreAudioRecorderError.failedToSetFileFormat(status: status)
-        }
-
-        guard data.count >= VoiceInkPCM16Audio.bytesPerSample else { return }
-        let frameCount = UInt32(VoiceInkPCM16Audio.sampleCount(inData: data))
-        var mutableData = data
-        let writeStatus: OSStatus = mutableData.withUnsafeMutableBytes { rawBuffer in
-            var outputBufferList = AudioBufferList(
-                mNumberBuffers: 1,
-                mBuffers: AudioBuffer(
-                    mNumberChannels: UInt32(VoiceInkPCM16Audio.monoChannelCount),
-                    mDataByteSize: frameCount * UInt32(VoiceInkPCM16Audio.bytesPerSample),
-                    mData: rawBuffer.baseAddress
-                )
-            )
-            return ExtAudioFileWrite(fileRef, frameCount, &outputBufferList)
-        }
-
-        guard writeStatus == noErr else {
-            throw CoreAudioRecorderError.failedToWriteFile(status: writeStatus)
-        }
-    }
-}
-
 // MARK: - Core Audio Recorder (AUHAL-based, does not change system default device)
 final class CoreAudioRecorder: @unchecked Sendable {
-
     // MARK: - Properties
 
     private let logger = Logger(
@@ -115,10 +50,9 @@ final class CoreAudioRecorder: @unchecked Sendable {
     private var isRecording = false
     private var currentDeviceID: AudioDeviceID = 0
     private var recordingURL: URL?
-    private let preRollSampleRate = VoiceInkPCM16Audio.mono16kSampleRateHz
     private let preRollBuffer = VoiceInkPCM16PreRollBuffer(
         sampleRate: VoiceInkPCM16Audio.mono16kSampleRateHz,
-        durationSeconds: VoiceInkRollingBufferPreloadSettings.defaultBufferDurationSeconds
+        durationSeconds: VoiceInkAudioPreRollPolicy.durationSeconds
     )
     private let preRollStreamingChunkBytes = VoiceInkPCM16Audio.byteCount(forMono16kDuration: 0.1)
     private var preRollStreamingGate = PreRollStreamingEmissionGate()
@@ -155,8 +89,6 @@ final class CoreAudioRecorder: @unchecked Sendable {
 
     /// Called on the audio thread with raw PCM data (16-bit, 16kHz, mono) for streaming.
     var onAudioChunk: ((_ data: Data) -> Void)?
-    /// Called on the audio thread with raw PCM data while the rolling buffer is warm.
-    var onRollingAudioChunk: ((_ data: Data) -> Void)?
 
     // MARK: - Initialization
 
@@ -191,7 +123,6 @@ final class CoreAudioRecorder: @unchecked Sendable {
         }
 
         currentDeviceID = deviceID
-        reloadPreRollBufferSettings()
         preRollBuffer.clear()
 
         logger.notice("🎙️ Starting pre-roll buffering from device \(deviceID, privacy: .public)")
@@ -207,7 +138,11 @@ final class CoreAudioRecorder: @unchecked Sendable {
     }
 
     /// Starts recording from the specified device to the given URL (WAV format)
-    func startRecording(toOutputFile url: URL, deviceID: AudioDeviceID) throws {
+    func startRecording(
+        toOutputFile url: URL,
+        deviceID: AudioDeviceID,
+        latencyTraceToken: VoiceInkLatencyTrace.Token? = nil
+    ) throws {
         if deviceID == 0 {
             logger.error("Cannot start recording - no valid audio device (deviceID is 0)")
             throw CoreAudioRecorderError.failedToSetDevice(status: 0)
@@ -220,21 +155,37 @@ final class CoreAudioRecorder: @unchecked Sendable {
         }
 
         if isRecording {
-            finishRecording()
+            finishRecording(latencyTraceToken: latencyTraceToken)
         }
 
         if !isCapturing || currentDeviceID != deviceID {
             try startPreBuffering(deviceID: deviceID)
-        } else {
-            reloadPreRollBufferSettings()
         }
 
         logger.notice("🎙️ Starting recording from device \(deviceID, privacy: .public)")
 
         recordingURL = url
-        let fileRef = try createOutputFile(at: url)
+        let outputFileSpan = VoiceInkLatencyTrace.shared.begin(
+            "core_audio.output_file.create",
+            token: latencyTraceToken
+        )
+        let fileRef: ExtAudioFileRef
+        do {
+            fileRef = try createOutputFile(at: url)
+            VoiceInkLatencyTrace.shared.end(outputFileSpan, details: "result=success")
+        } catch {
+            VoiceInkLatencyTrace.shared.end(
+                outputFileSpan,
+                details: "result=failure error=\(String(describing: type(of: error)))"
+            )
+            throw error
+        }
 
         var preRollData = Data()
+        let preRollSnapshotSpan = VoiceInkLatencyTrace.shared.begin(
+            "core_audio.pre_roll.snapshot_and_write",
+            token: latencyTraceToken
+        )
         fileAccessLock.lock()
         do {
             audioFile = fileRef
@@ -252,20 +203,43 @@ final class CoreAudioRecorder: @unchecked Sendable {
             preRollStreamingGate.cancel()
             fileAccessLock.unlock()
             ExtAudioFileDispose(fileRef)
+            VoiceInkLatencyTrace.shared.end(
+                preRollSnapshotSpan,
+                details: "result=failure bytes=\(preRollData.count) error=\(String(describing: type(of: error)))"
+            )
             throw error
         }
+        VoiceInkLatencyTrace.shared.end(
+            preRollSnapshotSpan,
+            details: "result=success bytes=\(preRollData.count)"
+        )
 
         if !preRollData.isEmpty {
+            let preRollEmitSpan = VoiceInkLatencyTrace.shared.begin(
+                "core_audio.pre_roll.emit_to_stream",
+                token: latencyTraceToken
+            )
             emitPreRollDataToStreaming(preRollData)
             finishPreRollStreamingEmission()
+            VoiceInkLatencyTrace.shared.end(
+                preRollEmitSpan,
+                details: "bytes=\(preRollData.count)"
+            )
             logger.notice("🎙️ Wrote pre-roll buffer bytes=\(preRollData.count, privacy: .public)")
         }
     }
 
     /// Finishes the WAV file while leaving the AudioUnit open so the next hotkey has pre-roll.
-    func finishRecording(keepCapturing: Bool = true) {
+    func finishRecording(
+        keepCapturing: Bool = true,
+        latencyTraceToken: VoiceInkLatencyTrace.Token? = nil
+    ) {
         guard isRecording || audioFile != nil else { return }
 
+        let latencySpan = VoiceInkLatencyTrace.shared.begin(
+            "core_audio.finish_recording",
+            token: latencyTraceToken
+        )
         let start = Date()
 
         fileAccessLock.lock()
@@ -280,6 +254,10 @@ final class CoreAudioRecorder: @unchecked Sendable {
 
         recordingURL = nil
         preRollBuffer.clear()
+        VoiceInkLatencyTrace.shared.end(
+            latencySpan,
+            details: "keepCapturing=\(keepCapturing)"
+        )
         logger.notice("finishRecording completed keepCapturing=\(keepCapturing, privacy: .public) elapsed=\(Date().timeIntervalSince(start), format: .fixed(precision: 3), privacy: .public)s")
     }
 
@@ -863,7 +841,6 @@ final class CoreAudioRecorder: @unchecked Sendable {
         )
 
         preRollBuffer.append(outputBuffer, sampleCount: Int(outputFrameCount))
-        let rollingAudioChunkHandler = onRollingAudioChunk
         var audioChunkData: Data?
         var audioChunkHandler: ((_ data: Data) -> Void)?
         var queuedForPreRollStreaming = false
@@ -892,17 +869,7 @@ final class CoreAudioRecorder: @unchecked Sendable {
             if !queuedForPreRollStreaming {
                 audioChunkHandler?(audioChunkData)
             }
-            rollingAudioChunkHandler?(audioChunkData)
-        } else if let rollingAudioChunkHandler {
-            let byteCount = Int(outputFrameCount) * VoiceInkPCM16Audio.bytesPerSample
-            let data = Data(bytes: outputBuffer, count: byteCount)
-            rollingAudioChunkHandler(data)
         }
-    }
-
-    func reloadPreRollBufferSettings() {
-        let duration = VoiceInkRollingBufferPreloadSettings.configuration().bufferDurationSeconds
-        preRollBuffer.resize(sampleRate: preRollSampleRate, durationSeconds: duration)
     }
 
     private func writePCMDataToFile(_ data: Data) throws {

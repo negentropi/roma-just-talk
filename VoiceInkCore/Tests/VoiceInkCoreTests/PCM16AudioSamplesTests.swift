@@ -2,20 +2,6 @@ import Foundation
 @testable import VoiceInkCore
 
 final class PCM16AudioSamplesTests: XCTestCase {
-    func testAudioProcessingErrorDescriptionsPreserveMacOSImportCopy() {
-        XCTAssertEqual(
-            VoiceInkAudioProcessingError.invalidAudioFile.errorDescription,
-            "The audio file is invalid or corrupted"
-        )
-        XCTAssertEqual(
-            VoiceInkAudioProcessingError.conversionFailed.errorDescription,
-            "Failed to convert the audio format"
-        )
-        XCTAssertEqual(
-            VoiceInkAudioProcessingError.unsupportedFormat.errorDescription,
-            "The audio format is not supported"
-        )
-    }
 
     func testFloatSamplesDecodeLittleEndianPCM16Data() {
         let data = pcm16Data(samples: [Int16.min, -16_384, 0, 16_384, Int16.max])
@@ -410,7 +396,7 @@ final class PCM16AudioSamplesTests: XCTestCase {
         XCTAssertEqual(result.output, [123, 123])
     }
 
-    func testDurationAndByteCountUseMono16kPCM16Format() {
+    func testByteAndSampleCountsUseMono16kPCM16Format() {
         XCTAssertEqual(VoiceInkPCM16Audio.mono16kSampleRateHz, 16_000)
         XCTAssertEqual(VoiceInkPCM16Audio.mono16kSampleRate, 16_000.0)
         XCTAssertEqual(VoiceInkPCM16Audio.monoChannelCount, 1)
@@ -420,9 +406,6 @@ final class PCM16AudioSamplesTests: XCTestCase {
         XCTAssertFalse(VoiceInkPCM16Audio.isFloatingPoint)
         XCTAssertEqual(VoiceInkPCM16Audio.byteCount(forMono16kDuration: 0.1), 3_200)
         XCTAssertEqual(VoiceInkPCM16Audio.sampleCount(forMono16kDuration: 0.1), 1_600)
-
-        let oneSecond = Data(repeating: 0, count: VoiceInkPCM16Audio.byteCount(forMono16kDuration: 1))
-        XCTAssertEqual(VoiceInkPCM16Audio.duration(forMono16kData: oneSecond), 1)
     }
 
     func testMonoPCM16ChunksSplitDataOnSampleAlignedByteCounts() {

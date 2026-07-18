@@ -1760,14 +1760,6 @@ public struct VoiceInkGeneralSettingsBackupPayload<ShortcutBackup: Codable>: Cod
     private let isExperimentalFeaturesEnabled: Bool?
     private let restoreClipboardAfterPaste: Bool?
     private let clipboardRestoreDelay: Double?
-    private let rollingBufferPreloadModeRawValue: String?
-    private let rollingBufferPreloadAutoDisableCloudModels: Bool?
-    private let rollingBufferPreloadAutoDisableLowBatteryLocalModels: Bool?
-    private let rollingBufferPreloadLowBatteryThresholdPercent: Int?
-    private let rollingBufferDurationSeconds: Double?
-    private let rollingBufferPreloadFinalization: Bool?
-    private let rollingBufferVADModel: String?
-    private let rollingBufferPreloadEnabledByModel: [String: Bool]?
 
     public init(
         shortcutBackupRecords: [VoiceInkShortcutActionIdentifier: ShortcutBackup],
@@ -1807,14 +1799,6 @@ public struct VoiceInkGeneralSettingsBackupPayload<ShortcutBackup: Codable>: Cod
         self.isExperimentalFeaturesEnabled = preferences.recordingFeedback.isExperimentalFeaturesEnabled
         self.restoreClipboardAfterPaste = preferences.paste.shouldRestoreClipboardAfterPaste
         self.clipboardRestoreDelay = preferences.paste.clipboardRestoreDelay
-        self.rollingBufferPreloadModeRawValue = preferences.rollingBuffer.preloadModeRawValue
-        self.rollingBufferPreloadAutoDisableCloudModels = preferences.rollingBuffer.autoDisablesCloudModels
-        self.rollingBufferPreloadAutoDisableLowBatteryLocalModels = preferences.rollingBuffer.autoDisablesLowBatteryLocalModels
-        self.rollingBufferPreloadLowBatteryThresholdPercent = preferences.rollingBuffer.lowBatteryThresholdPercent
-        self.rollingBufferDurationSeconds = preferences.rollingBuffer.bufferDurationSeconds
-        self.rollingBufferPreloadFinalization = preferences.rollingBuffer.preRunFinalization
-        self.rollingBufferVADModel = preferences.rollingBuffer.vadModelRawValue
-        self.rollingBufferPreloadEnabledByModel = preferences.rollingBuffer.perModelPreloadEnabled
     }
 
     public var shortcutBackupRecords: [VoiceInkShortcutActionIdentifier: ShortcutBackup] {
@@ -1839,8 +1823,7 @@ public struct VoiceInkGeneralSettingsBackupPayload<ShortcutBackup: Codable>: Cod
             audioCleanup: audioCleanupBackupPreferences,
             recordingFeedback: recordingFeedbackBackupPreferences,
             transcriptionCleanup: transcriptionCleanupBackupPreferences,
-            paste: pasteBackupPreferences,
-            rollingBuffer: rollingBufferBackupPreferences
+            paste: pasteBackupPreferences
         )
     }
 
@@ -1904,18 +1887,6 @@ public struct VoiceInkGeneralSettingsBackupPayload<ShortcutBackup: Codable>: Cod
         )
     }
 
-    private var rollingBufferBackupPreferences: VoiceInkRollingBufferBackupPreferences {
-        VoiceInkRollingBufferBackupPreferences(
-            preloadModeRawValue: rollingBufferPreloadModeRawValue,
-            autoDisablesCloudModels: rollingBufferPreloadAutoDisableCloudModels,
-            autoDisablesLowBatteryLocalModels: rollingBufferPreloadAutoDisableLowBatteryLocalModels,
-            lowBatteryThresholdPercent: rollingBufferPreloadLowBatteryThresholdPercent,
-            bufferDurationSeconds: rollingBufferDurationSeconds,
-            preRunFinalization: rollingBufferPreloadFinalization,
-            vadModelRawValue: rollingBufferVADModel,
-            perModelPreloadEnabled: rollingBufferPreloadEnabledByModel
-        )
-    }
 }
 
 public struct VoiceInkGeneralSettingsBackupPreferences: Equatable, Sendable {
@@ -1926,7 +1897,6 @@ public struct VoiceInkGeneralSettingsBackupPreferences: Equatable, Sendable {
     public let recordingFeedback: VoiceInkRecordingFeedbackBackupPreferences
     public let transcriptionCleanup: VoiceInkTranscriptionCleanupBackupPreferences
     public let paste: VoiceInkPasteBackupPreferences
-    public let rollingBuffer: VoiceInkRollingBufferBackupPreferences
 
     public init(
         recordingShortcut: VoiceInkRecordingShortcutBackupPreferences,
@@ -1935,8 +1905,7 @@ public struct VoiceInkGeneralSettingsBackupPreferences: Equatable, Sendable {
         audioCleanup: VoiceInkAudioCleanupBackupPreferences,
         recordingFeedback: VoiceInkRecordingFeedbackBackupPreferences,
         transcriptionCleanup: VoiceInkTranscriptionCleanupBackupPreferences,
-        paste: VoiceInkPasteBackupPreferences,
-        rollingBuffer: VoiceInkRollingBufferBackupPreferences
+        paste: VoiceInkPasteBackupPreferences
     ) {
         self.recordingShortcut = recordingShortcut
         self.macOSShell = macOSShell
@@ -1945,7 +1914,6 @@ public struct VoiceInkGeneralSettingsBackupPreferences: Equatable, Sendable {
         self.recordingFeedback = recordingFeedback
         self.transcriptionCleanup = transcriptionCleanup
         self.paste = paste
-        self.rollingBuffer = rollingBuffer
     }
 }
 
@@ -1957,7 +1925,6 @@ public struct VoiceInkGeneralSettingsBackupImportPlans: Equatable, Sendable {
     fileprivate let recordingFeedback: VoiceInkRecordingFeedbackBackupImportPlan
     fileprivate let transcriptionCleanup: VoiceInkTranscriptionCleanupBackupImportPlan
     fileprivate let paste: VoiceInkPasteBackupImportPlan
-    fileprivate let rollingBuffer: VoiceInkRollingBufferBackupImportPlan
 
     public init(
         recordingShortcut: VoiceInkRecordingShortcutBackupImportPlan,
@@ -1966,8 +1933,7 @@ public struct VoiceInkGeneralSettingsBackupImportPlans: Equatable, Sendable {
         audioCleanup: VoiceInkAudioCleanupBackupImportPlan,
         recordingFeedback: VoiceInkRecordingFeedbackBackupImportPlan,
         transcriptionCleanup: VoiceInkTranscriptionCleanupBackupImportPlan,
-        paste: VoiceInkPasteBackupImportPlan,
-        rollingBuffer: VoiceInkRollingBufferBackupImportPlan
+        paste: VoiceInkPasteBackupImportPlan
     ) {
         self.recordingShortcut = recordingShortcut
         self.macOSShell = macOSShell
@@ -1976,40 +1942,24 @@ public struct VoiceInkGeneralSettingsBackupImportPlans: Equatable, Sendable {
         self.recordingFeedback = recordingFeedback
         self.transcriptionCleanup = transcriptionCleanup
         self.paste = paste
-        self.rollingBuffer = rollingBuffer
     }
 
-    @discardableResult
     public func applyRuntimeState(
         to defaults: UserDefaults = .standard,
         applyRecordingShortcutImportPlan: (VoiceInkRecordingShortcutBackupImportPlan) -> Void,
         applyMacOSShellImportPlan: (VoiceInkMacOSShellBackupImportPlan) -> Void,
         applyRecordingFeedbackImportPlan: (VoiceInkRecordingFeedbackBackupImportPlan) -> Void,
-        postCorePreferenceSettingsDidChange: () -> Void,
         reportImportedGeneralSettings: () -> Void
-    ) -> VoiceInkGeneralSettingsCorePreferenceImportResult {
+    ) {
         applyRecordingShortcutImportPlan(recordingShortcut)
         applyMacOSShellImportPlan(macOSShell)
         applyRecordingFeedbackImportPlan(recordingFeedback)
 
-        let result = VoiceInkGeneralSettingsBackupPolicy.applyCorePreferenceImportPlans(
+        VoiceInkGeneralSettingsBackupPolicy.applyCorePreferenceImportPlans(
             self,
             to: defaults
         )
-        if result.didImportRollingBufferSetting {
-            postCorePreferenceSettingsDidChange()
-        }
-
         reportImportedGeneralSettings()
-        return result
-    }
-}
-
-public struct VoiceInkGeneralSettingsCorePreferenceImportResult: Equatable, Sendable {
-    public let didImportRollingBufferSetting: Bool
-
-    public init(didImportRollingBufferSetting: Bool) {
-        self.didImportRollingBufferSetting = didImportRollingBufferSetting
     }
 }
 
@@ -2021,8 +1971,7 @@ public enum VoiceInkGeneralSettingsBackupPolicy {
         audioCleanup: VoiceInkAudioCleanupBackupPreferences,
         recordingFeedback: VoiceInkRecordingFeedbackBackupPreferences,
         transcriptionCleanup: VoiceInkTranscriptionCleanupBackupPreferences,
-        paste: VoiceInkPasteBackupPreferences,
-        rollingBuffer: VoiceInkRollingBufferBackupPreferences
+        paste: VoiceInkPasteBackupPreferences
     ) -> VoiceInkGeneralSettingsBackupPreferences {
         VoiceInkGeneralSettingsBackupPreferences(
             recordingShortcut: recordingShortcut,
@@ -2031,8 +1980,7 @@ public enum VoiceInkGeneralSettingsBackupPolicy {
             audioCleanup: audioCleanup,
             recordingFeedback: recordingFeedback,
             transcriptionCleanup: transcriptionCleanup,
-            paste: paste,
-            rollingBuffer: rollingBuffer
+            paste: paste
         )
     }
 
@@ -2060,35 +2008,19 @@ public enum VoiceInkGeneralSettingsBackupPolicy {
             ),
             paste: VoiceInkPastePreference.backupImportPlan(
                 from: preferences.paste
-            ),
-            rollingBuffer: VoiceInkRollingBufferPreloadSettings.backupImportPlan(
-                from: preferences.rollingBuffer
             )
         )
     }
 
-    @discardableResult
     public static func applyCorePreferenceImportPlans(
         _ importPlans: VoiceInkGeneralSettingsBackupImportPlans,
         to defaults: UserDefaults = .standard
-    ) -> VoiceInkGeneralSettingsCorePreferenceImportResult {
+    ) {
         applyTranscriptionAutoCleanupImportPlan(importPlans.transcriptionAutoCleanup, to: defaults)
         applyAudioCleanupImportPlan(importPlans.audioCleanup, to: defaults)
         applyRecordingFeedbackCorePreferenceImportPlan(importPlans.recordingFeedback, to: defaults)
         applyTranscriptionCleanupImportPlan(importPlans.transcriptionCleanup, to: defaults)
         applyPasteImportPlan(importPlans.paste, to: defaults)
-
-        var didImportRollingBufferSetting = VoiceInkRollingBufferPreloadSettings.saveImportedSettings(
-            from: importPlans.rollingBuffer,
-            to: defaults
-        )
-        if VoiceInkRollingBufferVADSettings.saveImportedModel(from: importPlans.rollingBuffer, to: defaults) {
-            didImportRollingBufferSetting = true
-        }
-
-        return VoiceInkGeneralSettingsCorePreferenceImportResult(
-            didImportRollingBufferSetting: didImportRollingBufferSetting
-        )
     }
 
     private static func applyTranscriptionAutoCleanupImportPlan(
@@ -3038,7 +2970,7 @@ public struct VoiceInkMacOSAdvancedTranscriptionSettingsPresentation: Equatable,
         sectionTitle: "Advanced",
         vad: VoiceInkSettingsTogglePresentation(
             title: "Voice Activity Detection (VAD)",
-            helpText: "Use VAD inside batch/final transcription when supported. Buffer preload has its own VAD model in Rolling Buffer settings."
+            helpText: "Use VAD inside batch/final transcription when supported."
         ),
         modelPrewarm: VoiceInkSettingsTogglePresentation(
             title: "Prewarm model (Experimental)",
@@ -3046,7 +2978,7 @@ public struct VoiceInkMacOSAdvancedTranscriptionSettingsPresentation: Equatable,
         ),
         liveTextPreview: VoiceInkSettingsTogglePresentation(
             title: "Show Transcript Preview",
-            helpText: "Displays in-progress transcript text when a model or buffer preload can provide it."
+            helpText: "Displays in-progress transcript text when the active model provides it."
         )
     )
 }

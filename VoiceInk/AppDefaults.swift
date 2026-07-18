@@ -12,13 +12,6 @@ enum AppDefaults {
             // Onboarding & General
 
             // Recording & Transcription
-            VoiceInkRollingBufferPreloadSettings.modeKey: VoiceInkRollingBufferPreloadSettings.defaultMode.rawValue,
-            VoiceInkRollingBufferPreloadSettings.autoDisableCloudModelsKey: VoiceInkRollingBufferPreloadSettings.defaultAutoDisablesCloudModels,
-            VoiceInkRollingBufferPreloadSettings.autoDisableLowBatteryLocalModelsKey: VoiceInkRollingBufferPreloadSettings.defaultAutoDisablesLowBatteryLocalModels,
-            VoiceInkRollingBufferPreloadSettings.lowBatteryThresholdPercentKey: VoiceInkRollingBufferPreloadSettings.defaultLowBatteryThresholdPercent,
-            VoiceInkRollingBufferPreloadSettings.bufferDurationSecondsKey: VoiceInkRollingBufferPreloadSettings.defaultBufferDurationSeconds,
-            VoiceInkRollingBufferPreloadSettings.preRunFinalizationKey: VoiceInkRollingBufferPreloadSettings.defaultPreRunFinalization,
-            VoiceInkRollingBufferVADSettings.modelKey: VoiceInkRollingBufferVADSettings.sileroModelName,
             VoiceInkRecorderStylePreference.userDefaultsKey: VoiceInkRecorderStylePreference.defaultRawValue,
 
             // UI & Behavior

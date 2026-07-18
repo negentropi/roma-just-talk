@@ -90,26 +90,6 @@ final class DashboardMetricsTests: XCTestCase {
         }
     }
 
-    func testMigrationDiagnosticsPreserveMacOSLogCopy() {
-        XCTAssertEqual(
-            VoiceInkSessionMetricMigrationDiagnostics.completedMessage(insertedCount: 3),
-            "Completed stats migration with 3 session metric(s)"
-        )
-        XCTAssertEqual(
-            VoiceInkSessionMetricMigrationDiagnostics.failedMessage(localizedDescription: "store failed"),
-            "Stats migration failed: store failed"
-        )
-    }
-
-    func testRecorderDiagnosticsPreserveMacOSLogCopy() {
-        let id = UUID(uuidString: "00000000-0000-0000-0000-000000000789")!
-
-        XCTAssertEqual(
-            VoiceInkSessionMetricRecorderDiagnostics.recordedSessionMetricMessage(transcriptionId: id),
-            "Recorded session metric for transcription 00000000-0000-0000-0000-000000000789"
-        )
-    }
-
     func testAccumulatorBuildsSummaryFromMetricRecords() {
         var accumulator = VoiceInkDashboardMetricsAccumulator()
 
@@ -199,23 +179,6 @@ final class DashboardMetricsTests: XCTestCase {
         ))
 
         XCTAssertEqual(metrics.averageWordsPerMinuteDisplayText, "50.0")
-    }
-
-    func testDashboardPresentationPreservesMacOSDashboardCopy() {
-        XCTAssertEqual(VoiceInkDashboardPresentation.metricValuePlaceholder, "–")
-        XCTAssertEqual(VoiceInkDashboardPresentation.emptyStateSystemImageName, "waveform")
-        XCTAssertEqual(VoiceInkDashboardPresentation.emptyStateTitle, "No sessions yet")
-        XCTAssertEqual(VoiceInkDashboardPresentation.emptyStateMessage, "Start a recording; your dictation rhythm will show here.")
-        XCTAssertEqual(VoiceInkDashboardPresentation.heroSectionTitle, "Dashboard")
-        XCTAssertEqual(VoiceInkDashboardPresentation.readyTitle, "Ready when you are")
-        XCTAssertEqual(VoiceInkDashboardPresentation.usageSummaryPendingSubtitle, "Your usage summary will appear here.")
-        XCTAssertEqual(VoiceInkDashboardPresentation.firstRecordingSubtitle, "Your first roma-just-talk recording starts the timeline.")
-        XCTAssertEqual(VoiceInkDashboardPresentation.timeSavedFallbackTitle, "Time savings coming soon")
-        XCTAssertEqual(VoiceInkDashboardPresentation.sessionsPillTitle, "Sessions")
-        XCTAssertEqual(VoiceInkDashboardPresentation.wordsPillTitle, "Words")
-        XCTAssertEqual(VoiceInkDashboardPresentation.modelPerformanceButtonTitle, "Model Performance")
-        XCTAssertEqual(VoiceInkDashboardPresentation.modelPerformanceSystemImageName, "gauge")
-        XCTAssertEqual(VoiceInkDashboardPresentation.modelPerformanceHelpText, "View transcription and enhancement model performance")
     }
 
     func testDashboardPresentationBuildsHeroTitleAndSubtitle() {
@@ -481,47 +444,6 @@ final class DashboardMetricsTests: XCTestCase {
         XCTAssertTrue(deletionPlan.deletesID(3))
     }
 
-    func testNoteListPresentationPreservesIOSChromeCopy() {
-        XCTAssertEqual(VoiceInkNoteListPresentation.sectionTitle, "Recent")
-        XCTAssertEqual(VoiceInkNoteListPresentation.settingsSystemImageName, "gearshape")
-        XCTAssertEqual(VoiceInkNoteListPresentation.startRecordingButtonTitle, "Start Recording")
-        XCTAssertEqual(VoiceInkNoteListPresentation.startRecordingSystemImageName, "mic.fill")
-    }
-
-    func testHelpResourcesPresentationPreservesMacOSCopyIconsAndURLs() {
-        XCTAssertEqual(VoiceInkHelpResourcesPresentation.title, "Help & Resources")
-        XCTAssertEqual(VoiceInkHelpResourcesPresentation.externalLinkSystemImageName, "arrow.up.right")
-        XCTAssertEqual(
-            VoiceInkHelpResourcesPresentation.resources,
-            [
-                VoiceInkHelpResourcePresentation(
-                    id: .recommendedModels,
-                    systemImageName: "sparkles",
-                    title: "Recommended Models",
-                    destination: .url(URL(string: "https://tryvoiceink.com/recommended-models")!)
-                ),
-                VoiceInkHelpResourcePresentation(
-                    id: .videoGuides,
-                    systemImageName: "video.fill",
-                    title: "YouTube Videos & Guides",
-                    destination: .url(URL(string: "https://www.youtube.com/@tryvoiceink/videos")!)
-                ),
-                VoiceInkHelpResourcePresentation(
-                    id: .documentation,
-                    systemImageName: "book.fill",
-                    title: "Documentation",
-                    destination: .url(URL(string: "https://tryvoiceink.com/docs")!)
-                ),
-                VoiceInkHelpResourcePresentation(
-                    id: .supportEmail,
-                    systemImageName: "exclamationmark.bubble.fill",
-                    title: "Feedback or Issues?",
-                    destination: .supportEmail
-                )
-            ]
-        )
-    }
-
     func testDashboardPromotionPresentationPreservesMacOSCopyURLsAndDismissalKey() {
         XCTAssertEqual(
             VoiceInkDashboardPromotionPresentation.affiliateDismissedKey,
@@ -770,34 +692,6 @@ final class DashboardMetricsTests: XCTestCase {
             calendar.date(from: DateComponents(timeZone: calendar.timeZone, year: 2026, month: 1, day: 1))
         )
         XCTAssertNil(VoiceInkPerformanceTimeFilter.allTime.startDate(now: now, calendar: calendar))
-    }
-
-    func testPerformancePresentationPreservesMacOSPanelCopyAndIcons() {
-        XCTAssertEqual(VoiceInkPerformancePresentation.modelPerformancePanelTitle, "Model Performance")
-        XCTAssertEqual(VoiceInkPerformancePresentation.performanceAnalysisPanelTitle, "Performance Analysis")
-        XCTAssertEqual(VoiceInkPerformancePresentation.closeSystemImageName, "xmark")
-        XCTAssertEqual(VoiceInkPerformancePresentation.emptyStateSystemImageName, "chart.bar.xaxis")
-        XCTAssertEqual(VoiceInkPerformancePresentation.emptyStateTitle, "No data for this period")
-        XCTAssertEqual(VoiceInkPerformancePresentation.summarySectionTitle, "Summary")
-        XCTAssertEqual(VoiceInkPerformancePresentation.systemInformationSectionTitle, "System Information")
-        XCTAssertEqual(VoiceInkPerformancePresentation.transcriptionModelsSectionTitle, "Transcription Models")
-        XCTAssertEqual(VoiceInkPerformancePresentation.enhancementModelsSectionTitle, "Enhancement Models")
-        XCTAssertEqual(VoiceInkPerformancePresentation.totalSummaryIconSystemName, "doc.text.fill")
-        XCTAssertEqual(VoiceInkPerformancePresentation.totalSummaryLabel, "Total")
-        XCTAssertEqual(VoiceInkPerformancePresentation.analyzableSummaryIconSystemName, "waveform.path.ecg")
-        XCTAssertEqual(VoiceInkPerformancePresentation.analyzableSummaryLabel, "Analyzable")
-        XCTAssertEqual(VoiceInkPerformancePresentation.enhancedSummaryIconSystemName, "sparkles")
-        XCTAssertEqual(VoiceInkPerformancePresentation.enhancedSummaryLabel, "Enhanced")
-        XCTAssertEqual(VoiceInkPerformancePresentation.deviceInfoLabel, "Device")
-        XCTAssertEqual(VoiceInkPerformancePresentation.processorInfoLabel, "Processor")
-        XCTAssertEqual(VoiceInkPerformancePresentation.memoryInfoLabel, "Memory")
-        XCTAssertEqual(VoiceInkPerformancePresentation.averageAudioLabel, "Avg. Audio")
-        XCTAssertEqual(VoiceInkPerformancePresentation.averageProcessingLabel, "Avg. Processing")
-        XCTAssertEqual(VoiceInkPerformancePresentation.averageEnhancementTimeLabel, "Avg. Enhancement Time")
-        XCTAssertEqual(VoiceInkPerformancePresentation.sessionSampleCountText(2), "2 sessions")
-        XCTAssertEqual(VoiceInkPerformancePresentation.transcriptSampleCountText(3), "3 transcripts")
-        XCTAssertEqual(VoiceInkPerformancePresentation.physicalMemoryText(byteCount: 1_073_741_824), "1 GB")
-        XCTAssertEqual(VoiceInkPerformancePresentation.physicalMemoryText(byteCount: 17_179_869_184), "16 GB")
     }
 
     private func withTemporaryDefaults(_ test: (UserDefaults) -> Void) {

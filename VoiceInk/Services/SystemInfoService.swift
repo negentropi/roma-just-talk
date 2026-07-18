@@ -57,7 +57,6 @@ class SystemInfoService {
             aiEnhancement: VoiceInkAIEnhancementPreference.statusDiagnosticDescription(),
             aiProvider: VoiceInkAIEnhancementProviderPreference.selectedProviderDiagnosticDescription(),
             aiModel: VoiceInkAIEnhancementProviderPreference.selectedModelDiagnosticDescription(),
-            rollingBufferPreload: getRollingBufferPreloadInfo(),
             hideDockIcon: VoiceInkMenuBarPreference.isMenuBarOnly(),
             recorderStyle: VoiceInkRecorderStylePreference.rawValue(),
             soundFeedback: VoiceInkRecordingFeedbackPreference.isSoundFeedbackEnabled(),
@@ -143,27 +142,6 @@ class SystemInfoService {
             return modelName
         }
         return VoiceInkModelManagementPresentation.noModelSelectedText
-    }
-
-    private func getRollingBufferPreloadInfo() -> String {
-        let configuration = VoiceInkRollingBufferPreloadSettings.configuration()
-        let powerState = IOKitRollingBufferPowerStateProvider().currentPowerState()
-        let runtimeClaim = RollingBufferPreloadRuntimeDiagnostics.shared.currentQuickReleaseClaim()
-        let currentModelName = VoiceInkCurrentTranscriptionModelPreference.modelName()
-        let currentModelPreloadEnabled: Bool?
-        if let currentModelName {
-            currentModelPreloadEnabled = VoiceInkRollingBufferPreloadSettings.perModelPreloadEnabled(forModelName: currentModelName)
-        } else {
-            currentModelPreloadEnabled = nil
-        }
-
-        return VoiceInkRollingBufferPreloadDiagnostics.systemInformationText(
-            configuration: configuration,
-            selectedVADModelRawValue: VoiceInkRollingBufferVADSettings.selectedModel(),
-            powerState: powerState,
-            currentModelPreloadEnabled: currentModelPreloadEnabled,
-            quickReleaseClaimExportSummary: runtimeClaim.exportSummary
-        )
     }
 
     private func getAccessibilityStatus() -> String {

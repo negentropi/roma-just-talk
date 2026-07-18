@@ -15,14 +15,12 @@ struct CloudModelCardView: View {
     @State private var isExpanded = false
     @State private var apiKeyFormState = VoiceInkProviderAPIKeyFormState()
     @State private var streamingEnabled: Bool
-    @State private var preloadEnabled: Bool
 
     init(model: CloudModel, isCurrent: Bool, setDefaultAction: @escaping () -> Void) {
         self.model = model
         self.isCurrent = isCurrent
         self.setDefaultAction = setDefaultAction
         _streamingEnabled = State(initialValue: VoiceInkTranscriptionStreamingPreference.isEnabled(forModelName: model.name))
-        _preloadEnabled = State(initialValue: VoiceInkRollingBufferPreloadSettings.perModelPreloadEnabled(forModelName: model.name))
     }
     private let apiKeyVerifier = VoiceInkProviderAPIKeyVerifier()
 
@@ -79,8 +77,7 @@ struct CloudModelCardView: View {
     private var streamingModeBadge: some View {
         let streamingModePresentation = VoiceInkTranscriptionStreamingModePresentation(
             isStreamingEnabled: streamingEnabled,
-            isStreamingOnly: model.streamingPreferenceSnapshot.isStreamingOnly,
-            isPreloadEnabled: preloadEnabled
+            isStreamingOnly: model.streamingPreferenceSnapshot.isStreamingOnly
         )
 
         return HStack(spacing: 8) {
@@ -101,17 +98,6 @@ struct CloudModelCardView: View {
                     }
                 }
                 .help(streamingModePresentation.streamingToggleHelp)
-
-            Toggle(streamingModePresentation.preloadToggleTitle, isOn: $preloadEnabled)
-                .toggleStyle(.switch)
-                .controlSize(.mini)
-                .font(.system(size: 11, weight: .medium))
-                .foregroundColor(Color(.secondaryLabelColor))
-                .onChange(of: preloadEnabled) { _, newValue in
-                    VoiceInkRollingBufferPreloadSettings.savePerModelPreloadEnabled(newValue, forModelName: model.name)
-                    NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
-                }
-                .help(streamingModePresentation.preloadToggleHelp)
         }
     }
 

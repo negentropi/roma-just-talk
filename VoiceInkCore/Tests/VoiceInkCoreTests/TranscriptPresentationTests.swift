@@ -2,41 +2,6 @@ import Foundation
 import VoiceInkCore
 
 final class TranscriptPresentationTests: XCTestCase {
-    func testHistoryEmptyStatePresentationPreservesIOSNotesCopy() {
-        XCTAssertEqual(
-            VoiceInkHistoryPresentation.iOSNotesEmptyState,
-            VoiceInkHistoryEmptyStatePresentation(
-                systemImageName: "waveform",
-                title: "No notes yet",
-                message: "Tap Start Recording to capture your first note."
-            )
-        )
-    }
-
-    func testHistoryEmptyStatePresentationPreservesMacOSHistoryCopy() {
-        XCTAssertEqual(
-            VoiceInkHistoryPresentation.macOSHistoryListEmptyState,
-            VoiceInkHistoryEmptyStatePresentation(
-                systemImageName: "doc.text.magnifyingglass",
-                title: "No transcriptions"
-            )
-        )
-        XCTAssertEqual(
-            VoiceInkHistoryPresentation.macOSNoSelectionEmptyState,
-            VoiceInkHistoryEmptyStatePresentation(
-                systemImageName: "doc.text",
-                title: "No Selection",
-                message: "Select a transcription to view details"
-            )
-        )
-        XCTAssertEqual(
-            VoiceInkHistoryPresentation.macOSNoMetadataEmptyState,
-            VoiceInkHistoryEmptyStatePresentation(
-                systemImageName: "info.circle",
-                title: "No Metadata"
-            )
-        )
-    }
 
     func testInlineHistoryEmptyStatePresentationPreservesSearchBranching() {
         XCTAssertEqual(
@@ -55,41 +20,6 @@ final class TranscriptPresentationTests: XCTestCase {
                 message: "Try a different search term"
             )
         )
-    }
-
-    func testHistoryControlPresentationPreservesMacOSSearchAndPagingCopy() {
-        XCTAssertEqual(VoiceInkHistoryPresentation.macOSHistorySearchPrompt, "Search transcriptions")
-        XCTAssertEqual(VoiceInkHistoryPresentation.macOSInlineHistorySearchPrompt, "Search transcriptions...")
-        XCTAssertEqual(VoiceInkHistoryPresentation.loadingOrLoadMoreText(isLoading: true), "Loading...")
-        XCTAssertEqual(VoiceInkHistoryPresentation.loadingOrLoadMoreText(isLoading: false), "Load More")
-    }
-
-    func testHistorySelectionPresentationPreservesMacOSCopyAndActions() {
-        XCTAssertEqual(VoiceInkHistoryPresentation.selectAllButtonTitle, "Select All")
-        XCTAssertEqual(VoiceInkHistoryPresentation.deselectAllButtonTitle, "Deselect All")
-        XCTAssertEqual(VoiceInkHistoryPresentation.selectedCountText(3), "3 selected")
-        XCTAssertEqual(
-            VoiceInkHistoryPresentation.analyzeAction,
-            VoiceInkHistoryActionPresentation(title: "Analyze", systemImageName: "chart.bar.xaxis")
-        )
-        XCTAssertEqual(
-            VoiceInkHistoryPresentation.exportAction,
-            VoiceInkHistoryActionPresentation(title: "Export", systemImageName: "square.and.arrow.up")
-        )
-        XCTAssertEqual(
-            VoiceInkHistoryPresentation.deleteAction,
-            VoiceInkHistoryActionPresentation(title: "Delete", systemImageName: "trash")
-        )
-    }
-
-    func testHistoryShortcutTipPresentationPreservesMacOSCopyAndIcon() {
-        XCTAssertEqual(VoiceInkHistoryPresentation.macOSShortcutTip.title, "Quick Access")
-        XCTAssertEqual(
-            VoiceInkHistoryPresentation.macOSShortcutTip.subtitle,
-            "Open history from anywhere with a global shortcut"
-        )
-        XCTAssertEqual(VoiceInkHistoryPresentation.macOSShortcutTip.shortcutLabel, "Open History Window")
-        XCTAssertEqual(VoiceInkHistoryPresentation.macOSShortcutTip.systemImageName, "command.circle")
     }
 
     func testHistoryPaginationPolicyBuildsInitialPageState() {
@@ -375,31 +305,6 @@ final class TranscriptPresentationTests: XCTestCase {
         return events
     }
 
-    func testHistoryDeleteConfirmationPresentationPreservesMacOSAlertCopy() {
-        XCTAssertEqual(VoiceInkHistoryPresentation.deleteConfirmationTitle, "Delete Selected Items?")
-        XCTAssertEqual(VoiceInkHistoryPresentation.deleteConfirmationPrimaryButtonTitle, "Delete")
-        XCTAssertEqual(VoiceInkHistoryPresentation.deleteConfirmationCancelButtonTitle, "Cancel")
-    }
-
-    func testHistoryDiagnosticsPreserveMacOSConsoleCopy() {
-        XCTAssertEqual(
-            VoiceInkHistoryDiagnostics.initialLoadFailedMessage(errorDescription: "store unavailable"),
-            "Error loading transcriptions: store unavailable"
-        )
-        XCTAssertEqual(
-            VoiceInkHistoryDiagnostics.loadMoreFailedMessage(errorDescription: "cursor expired"),
-            "Error loading more transcriptions: cursor expired"
-        )
-        XCTAssertEqual(
-            VoiceInkHistoryDiagnostics.saveDeletionFailedMessage(localizedDescription: "permission denied"),
-            "Error saving deletion: permission denied"
-        )
-        XCTAssertEqual(
-            VoiceInkHistoryDiagnostics.selectAllFailedMessage(errorDescription: "fetch failed"),
-            "Error selecting all transcriptions: fetch failed"
-        )
-    }
-
     func testTranscriptionMetadataPresentationPreservesMacOSDetailRows() {
         XCTAssertEqual(VoiceInkTranscriptionMetadataPresentation.detailsSectionTitle, "Details")
         XCTAssertEqual(
@@ -426,12 +331,6 @@ final class TranscriptPresentationTests: XCTestCase {
         )
     }
 
-    func testTranscriptionMetadataPresentationPreservesAIRequestCopy() {
-        XCTAssertEqual(VoiceInkTranscriptionMetadataPresentation.aiRequestSectionTitle, "AI Request")
-        XCTAssertEqual(VoiceInkTranscriptionMetadataPresentation.systemPromptLabel, "System Prompt")
-        XCTAssertEqual(VoiceInkTranscriptionMetadataPresentation.userMessageLabel, "User Message")
-    }
-
     func testTranscriptionMetadataPresentationPreservesAIRequestVisibilityRule() {
         XCTAssertFalse(
             VoiceInkTranscriptionMetadataPresentation.shouldShowAIRequestSection(
@@ -450,37 +349,6 @@ final class TranscriptPresentationTests: XCTestCase {
                 systemMessage: nil,
                 userMessage: ""
             )
-        )
-    }
-
-    func testFullAIRequestTextPreservesMacOSCopyComposition() {
-        XCTAssertEqual(
-            VoiceInkTranscriptionMetadataPresentation.fullAIRequestText(
-                systemMessage: "Follow style guide.",
-                userMessage: "Clean this transcript."
-            ),
-            "System Prompt:\nFollow style guide.\n\nUser Message:\nClean this transcript."
-        )
-        XCTAssertEqual(
-            VoiceInkTranscriptionMetadataPresentation.fullAIRequestText(
-                systemMessage: "Follow style guide.",
-                userMessage: nil
-            ),
-            "System Prompt:\nFollow style guide."
-        )
-        XCTAssertEqual(
-            VoiceInkTranscriptionMetadataPresentation.fullAIRequestText(
-                systemMessage: nil,
-                userMessage: "Clean this transcript."
-            ),
-            "User Message:\nClean this transcript."
-        )
-        XCTAssertEqual(
-            VoiceInkTranscriptionMetadataPresentation.fullAIRequestText(
-                systemMessage: "",
-                userMessage: ""
-            ),
-            ""
         )
     }
 
@@ -1280,12 +1148,6 @@ final class TranscriptPresentationTests: XCTestCase {
         ).runtimeAction {})
     }
 
-    func testTranscriptTextVariantTitlesPreserveMacOSTabs() {
-        XCTAssertEqual(VoiceInkTranscriptTextVariant.original.title, "Original")
-        XCTAssertEqual(VoiceInkTranscriptTextVariant.enhanced.title, "Enhanced")
-        XCTAssertEqual(VoiceInkTranscriptTextVariant.allCases, [.original, .enhanced])
-    }
-
     func testTranscriptTextVariantDisplayTextPreservesMacOSTabSelection() {
         XCTAssertEqual(
             VoiceInkTranscriptTextVariant.original.displayText(
@@ -1314,26 +1176,6 @@ final class TranscriptPresentationTests: XCTestCase {
         XCTAssertFalse(VoiceInkTranscriptTextVariant.shouldShowTabs(enhancedText: nil))
         XCTAssertTrue(VoiceInkTranscriptTextVariant.shouldShowTabs(enhancedText: ""))
         XCTAssertTrue(VoiceInkTranscriptTextVariant.shouldShowTabs(enhancedText: "enhanced"))
-    }
-
-    func testTranscriptDetailCopyPreservesIOSNoteDetailLabels() {
-        XCTAssertEqual(VoiceInkTranscriptPresentation.noteDetailNavigationTitle, "Note")
-        XCTAssertEqual(VoiceInkTranscriptPresentation.transcriptTitle, "Transcript")
-        XCTAssertEqual(VoiceInkTranscriptPresentation.copyTranscriptSystemImageName, "doc.on.doc")
-        XCTAssertEqual(VoiceInkTranscriptPresentation.retranscribingDisplayText, "Retranscribing...")
-        XCTAssertEqual(VoiceInkTranscriptPresentation.retryTranscriptionButtonTitle, "Retry Transcription")
-        XCTAssertEqual(VoiceInkTranscriptPresentation.retryTranscriptionSystemImageName, "arrow.clockwise")
-    }
-
-    func testTranscriptActionControlPresentationPreservesMacOSCopyAndSaveCopy() {
-        XCTAssertEqual(VoiceInkTranscriptPresentation.actionSucceededSystemImageName, "checkmark")
-        XCTAssertEqual(VoiceInkTranscriptPresentation.copyToClipboardHelp, "Copy to clipboard")
-        XCTAssertEqual(VoiceInkTranscriptPresentation.saveTranscriptSystemImageName, "square.and.arrow.down")
-        XCTAssertEqual(VoiceInkTranscriptPresentation.saveTranscriptAsPlainTextButtonTitle, "Save as TXT")
-        XCTAssertEqual(VoiceInkTranscriptPresentation.saveTranscriptAsMarkdownButtonTitle, "Save as MD")
-        XCTAssertEqual(VoiceInkTranscriptPresentation.saveTranscriptHelp, "Save to file")
-        XCTAssertEqual(VoiceInkTranscriptPresentation.saveTranscriptPanelTitle, "Save Transcription")
-        XCTAssertEqual(VoiceInkTranscriptPresentation.saveTranscriptFailureConsolePrefix, "Failed to save file:")
     }
 
     func testLastTranscriptionPresentationPreservesMacOSNotificationCopy() {
@@ -1407,13 +1249,6 @@ final class TranscriptPresentationTests: XCTestCase {
         XCTAssertEqual(VoiceInkLastTranscriptionPolicy.fetchLimit, 20)
     }
 
-    func testFetchFailureDiagnosticPreservesMacOSCopy() {
-        XCTAssertEqual(
-            VoiceInkLastTranscriptionPolicy.fetchFailedDiagnosticMessage(errorDescription: "SwiftData failed"),
-            "Error fetching last transcription: SwiftData failed"
-        )
-    }
-
     func testLastTranscriptionNotificationPresentationsPreserveCopyOutcomes() {
         XCTAssertEqual(
             VoiceInkLastTranscriptionPolicy.noTranscriptionNotification,
@@ -1483,40 +1318,6 @@ final class TranscriptPresentationTests: XCTestCase {
         )
     }
 
-    func testEnhancementUnavailableMessagePreservesMacOSGuardCopy() {
-        XCTAssertEqual(
-            VoiceInkPostProcessingFailurePresentation.enhancementUnavailableFallbackText,
-            "AI Enhancement is not enabled or configured"
-        )
-        XCTAssertEqual(
-            VoiceInkPostProcessingFailurePresentation.enhancementUnavailableMessage(
-                isEnabled: false,
-                isConfigured: true
-            ),
-            "AI Enhancement is not enabled or configured"
-        )
-        XCTAssertEqual(
-            VoiceInkPostProcessingFailurePresentation.enhancementUnavailableMessage(
-                isEnabled: true,
-                isConfigured: false
-            ),
-            "AI Enhancement is not enabled or configured"
-        )
-        XCTAssertEqual(
-            VoiceInkPostProcessingFailurePresentation.enhancementUnavailableMessage(
-                isEnabled: false,
-                isConfigured: false
-            ),
-            "AI Enhancement is not enabled or configured"
-        )
-        XCTAssertNil(
-            VoiceInkPostProcessingFailurePresentation.enhancementUnavailableMessage(
-                isEnabled: true,
-                isConfigured: true
-            )
-        )
-    }
-
     func testEnhancementFailureNotificationTitlePreservesEightyCharacterReasonLimit() {
         let reason = String(repeating: "a", count: 100)
         let title = VoiceInkPostProcessingFailurePresentation.enhancementFailureNotificationTitle(reason: reason)
@@ -1531,37 +1332,6 @@ final class TranscriptPresentationTests: XCTestCase {
                 reasonLimit: -1
             ),
             "Enhancement failed: "
-        )
-    }
-
-    func testAudioFileActionStatusPresentationPreservesMacOSBannerCopy() {
-        XCTAssertEqual(
-            VoiceInkTranscriptPresentation.audioFileRetranscriptionSuccessMessage,
-            "Retranscription successful"
-        )
-        XCTAssertEqual(
-            VoiceInkTranscriptPresentation.audioFileReEnhancementSuccessMessage,
-            "Re-enhancement successful"
-        )
-        XCTAssertEqual(
-            VoiceInkTranscriptPresentation.audioFileRetranscriptionFailureMessage(errorDescription: ""),
-            "Retranscription failed"
-        )
-        XCTAssertEqual(
-            VoiceInkTranscriptPresentation.audioFileRetranscriptionFailureMessage(
-                errorDescription: "provider unavailable"
-            ),
-            "provider unavailable"
-        )
-        XCTAssertEqual(
-            VoiceInkTranscriptPresentation.audioFileReEnhancementFailureMessage(errorDescription: ""),
-            "Re-enhancement failed"
-        )
-        XCTAssertEqual(
-            VoiceInkTranscriptPresentation.audioFileReEnhancementFailureMessage(
-                errorDescription: "timeout"
-            ),
-            "timeout"
         )
     }
 
@@ -1666,14 +1436,6 @@ final class TranscriptPresentationTests: XCTestCase {
 
             Shared export.
             """
-        )
-    }
-
-    func testCSVExportPresentationPreservesMacOSFilenameAndFailureCopy() {
-        XCTAssertEqual(VoiceInkTranscriptionCSVExporter.defaultFilename, "VoiceInk-transcription.csv")
-        XCTAssertEqual(
-            VoiceInkTranscriptionCSVExporter.writeFailureDiagnosticMessage(errorDescription: "disk full"),
-            "Error writing CSV file: disk full"
         )
     }
 

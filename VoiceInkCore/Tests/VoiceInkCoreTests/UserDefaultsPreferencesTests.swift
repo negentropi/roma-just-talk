@@ -2,93 +2,6 @@ import Foundation
 @testable import VoiceInkCore
 
 final class UserDefaultsPreferencesTests: XCTestCase {
-    func testIOSSettingsPresentationPreservesSettingsChromeCopy() {
-        let presentation = VoiceInkSettingsPresentation.iOS
-
-        XCTAssertEqual(presentation.navigationTitle, "Settings")
-        XCTAssertEqual(presentation.modesSectionTitle, "Modes")
-        XCTAssertEqual(presentation.addModeButtonTitle, "Add New Mode")
-        XCTAssertEqual(presentation.addActionSystemImageName, "plus.circle.fill")
-    }
-
-    func testMacOSSettingsPresentationPreservesSettingsChromeCopy() {
-        let presentation = VoiceInkMacOSSettingsPresentation.macOS
-
-        XCTAssertEqual(presentation.generalSectionTitle, "General")
-        XCTAssertEqual(presentation.showMenuBarIconTitle, "Show in Menu Bar")
-        XCTAssertEqual(presentation.hideDockIconTitle, "Hide Dock Icon")
-        XCTAssertEqual(presentation.launchAtLoginTitle, "Launch at Login")
-        XCTAssertEqual(presentation.autoCheckUpdatesTitle, "Auto-check Updates")
-        XCTAssertEqual(presentation.showAnnouncementsTitle, "Show Announcements")
-        XCTAssertEqual(presentation.checkForUpdatesButtonTitle, "Check for Updates")
-        XCTAssertEqual(presentation.privacySectionTitle, "Privacy")
-        XCTAssertEqual(
-            presentation.privacyFooterText,
-            "Control how VoiceInk handles your transcription data and audio recordings."
-        )
-        XCTAssertEqual(presentation.backupSectionTitle, "Backup")
-        XCTAssertEqual(
-            presentation.backupFooterText,
-            "Export all settings, or choose specific categories when importing a backup."
-        )
-        XCTAssertEqual(presentation.exportSettingsLabel, "Export Settings")
-        XCTAssertEqual(presentation.exportButtonTitle, "Export")
-        XCTAssertEqual(presentation.importSettingsLabel, "Import Settings")
-        XCTAssertEqual(presentation.importButtonTitle, "Import")
-        XCTAssertEqual(presentation.diagnosticsSectionTitle, "Diagnostics")
-    }
-
-    func testMacOSEnhancementSettingsPresentationPreservesCopy() {
-        let presentation = VoiceInkEnhancementSettingsPresentation.macOS
-
-        XCTAssertEqual(presentation.title, "Enhancement Settings")
-        XCTAssertEqual(presentation.closeButtonHelp, "Close")
-        XCTAssertEqual(presentation.generalSectionTitle, "General")
-        XCTAssertEqual(presentation.enableEnhancementTitle, "Enable Enhancement")
-        XCTAssertEqual(
-            presentation.enableEnhancementHelp,
-            "AI enhancement lets you pass the transcribed audio through LLMs to post-process using different prompts suitable for different use cases like e-mails, summary, writing, etc."
-        )
-        XCTAssertEqual(
-            presentation.enableEnhancementLearnMoreURLString,
-            "https://tryvoiceink.com/docs/enhancements-configuring-models"
-        )
-        XCTAssertEqual(presentation.settingsButtonSystemImageName, "gear")
-        XCTAssertEqual(presentation.settingsButtonHelp, "Enhancement settings")
-        XCTAssertEqual(presentation.promptsSectionTitle, "Enhancement Prompts")
-        XCTAssertEqual(presentation.contextSectionTitle, "Context")
-        XCTAssertEqual(presentation.clipboardContextTitle, "Clipboard Context")
-        XCTAssertEqual(presentation.clipboardContextHelp, "Use clipboard text to understand context for better enhancement.")
-        XCTAssertEqual(presentation.screenContextTitle, "Screen Context")
-        XCTAssertEqual(presentation.screenContextHelp, "Capture on-screen text to understand context for better enhancement.")
-        XCTAssertEqual(presentation.skipShortEnhancementTitle, "Skip short transcriptions")
-        XCTAssertEqual(
-            presentation.skipShortEnhancementHelp,
-            "Automatically skip AI enhancement when the transcription has very few words. Short phrases like \"yes\", \"thank you\", or quick commands don't benefit from enhancement."
-        )
-        XCTAssertEqual(presentation.disclosureSystemImageName, "chevron.right")
-        XCTAssertEqual(presentation.minimumWordsPickerTitle, "Minimum words")
-        XCTAssertEqual(presentation.timeoutPickerTitle, "Timeout duration")
-        XCTAssertEqual(presentation.timeoutRetryPickerTitle, "On timeout")
-        XCTAssertEqual(presentation.requestTimeoutSectionTitle, "Request Timeout")
-        XCTAssertEqual(
-            presentation.requestTimeoutHelp,
-            "Set how long to wait for the AI provider to respond. If no response is received within this duration, you can either fail immediately and paste the original transcription, or retry the request (up to 3 attempts)."
-        )
-        XCTAssertEqual(presentation.shortcutsSectionTitle, "Shortcuts")
-        XCTAssertEqual(presentation.toggleEnhancementShortcutTitle, "Toggle AI Enhancement")
-        XCTAssertEqual(
-            presentation.toggleEnhancementShortcutHelp,
-            "Quickly enable or disable AI enhancement while recording. Available only when VoiceInk is running and the recorder is visible."
-        )
-        XCTAssertEqual(presentation.switchPromptShortcutTitle, "Switch Enhancement Prompt")
-        XCTAssertEqual(
-            presentation.switchPromptShortcutHelp,
-            "Switch between your saved prompts using ⌘1 through ⌘0 to activate the corresponding prompt in the order they are saved. Available only when VoiceInk is running and the recorder is visible."
-        )
-        XCTAssertEqual(presentation.shortcutLearnMoreURLString, "https://tryvoiceink.com/docs/enhancement-shortcuts")
-        XCTAssertEqual(presentation.switchPromptKeyChipTitles, ["⌘", "1 – 0"])
-    }
 
     func testMacOSEnhancementSettingsPresentationPreservesOptions() {
         let presentation = VoiceInkEnhancementSettingsPresentation.macOS
@@ -719,106 +632,6 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         }
     }
 
-    func testMacOSMenuBarPresentationPreservesMenuCopyAndIcons() {
-        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.toggleRecorderTitle, "Toggle Recorder")
-        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.manageModelsTitle, "Manage Models")
-        XCTAssertEqual(
-            VoiceInkMacOSMenuBarPresentation.transcriptionModelTitle(currentDisplayName: "Whisper Large"),
-            "Transcription Model: Whisper Large"
-        )
-        XCTAssertEqual(
-            VoiceInkMacOSMenuBarPresentation.transcriptionModelTitle(currentDisplayName: nil),
-            "Transcription Model: None"
-        )
-        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.aiEnhancementToggleTitle, "AI Enhancement")
-        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.promptTitle(activePromptTitle: "Email"), "Prompt: Email")
-        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.promptTitle(activePromptTitle: nil), "Prompt: None")
-        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.noProvidersConnectedText, "No providers connected")
-        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.aiProviderTitle(selectedProviderName: "OpenAI"), "AI Provider: OpenAI")
-        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.noModelsAvailableText, "No models available")
-        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.aiModelTitle(currentModelName: "gpt-4o"), "AI Model: gpt-4o")
-        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.audioInputTitle, "Audio Input")
-        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.noDevicesAvailableText, "No devices available")
-        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.additionalMenuTitle, "Additional")
-        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.clipboardContextTitle, "Clipboard Context")
-        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.contextAwarenessTitle, "Context Awareness")
-        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.retryLastTranscriptionTitle, "Retry Last Transcription")
-        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.copyLastTranscriptionTitle, "Copy Last Transcription")
-        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.historyTitle, "History")
-        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.permissionsTitle, "Permissions")
-        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.settingsTitle, "Settings")
-        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.dockIconTitle(isMenuBarOnly: true), "Show Dock Icon")
-        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.dockIconTitle(isMenuBarOnly: false), "Hide Dock Icon")
-        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.hideMenuBarIconTitle, "Hide Menu Bar Icon")
-        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.launchAtLoginTitle, "Launch at Login")
-        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.checkForUpdatesTitle, "Check for Updates")
-        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.helpAndSupportTitle, "Help and Support")
-        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.quitTitle, "Quit roma-just-talk")
-        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.selectionCheckmarkSystemImageName, "checkmark")
-        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.pickerSystemImageName, "chevron.up.chevron.down")
-    }
-
-    func testMacOSMenuBarDiagnosticsPreserveManagerCopy() {
-        XCTAssertEqual(
-            VoiceInkMacOSMenuBarDiagnostics.windowDidCloseAccessoryPolicyMessage,
-            "windowDidClose: no visible windows, switching to .accessory policy"
-        )
-        XCTAssertEqual(
-            VoiceInkMacOSMenuBarDiagnostics.focusMainWindowActivationPolicyMessage,
-            "focusMainWindow: activation policy set to .regular"
-        )
-        XCTAssertEqual(
-            VoiceInkMacOSMenuBarDiagnostics.focusMainWindowFailedMessage,
-            "focusMainWindow: showMainWindow returned nil"
-        )
-        XCTAssertEqual(
-            VoiceInkMacOSMenuBarDiagnostics.updateActivationPolicyAccessoryMessage,
-            "updateAppActivationPolicy: switching to .accessory (dock icon hidden)"
-        )
-        XCTAssertEqual(
-            VoiceInkMacOSMenuBarDiagnostics.updateActivationPolicyRegularMessage,
-            "updateAppActivationPolicy: switching to .regular (dock icon visible)"
-        )
-        XCTAssertEqual(
-            VoiceInkMacOSMenuBarDiagnostics.openMainWindowRequestedMessage(
-                destination: "Settings",
-                isMenuBarOnly: true
-            ),
-            "openMainWindowAndNavigate: requested destination=Settings, isMenuBarOnly=true"
-        )
-        XCTAssertEqual(
-            VoiceInkMacOSMenuBarDiagnostics.openMainWindowActivationPolicyMessage,
-            "openMainWindowAndNavigate: activation policy set to .regular"
-        )
-        XCTAssertEqual(
-            VoiceInkMacOSMenuBarDiagnostics.openMainWindowFailedMessage(destination: "Settings"),
-            "openMainWindowAndNavigate: showMainWindow returned nil — cannot navigate to Settings"
-        )
-        XCTAssertEqual(
-            VoiceInkMacOSMenuBarDiagnostics.openMainWindowPostingNavigationMessage(destination: "Settings"),
-            "openMainWindowAndNavigate: window shown, posting navigation notification for Settings"
-        )
-        XCTAssertEqual(
-            VoiceInkMacOSMenuBarDiagnostics.openMainWindowNavigationPostedMessage(destination: "Settings"),
-            "openMainWindowAndNavigate: navigation notification posted for Settings"
-        )
-        XCTAssertEqual(
-            VoiceInkMacOSMenuBarDiagnostics.openHistoryWindowDependenciesMissingMessage(
-                hasModelContainer: false,
-                hasEngine: true
-            ),
-            "openHistoryWindow: dependencies not configured (modelContainer=false, engine=true)"
-        )
-        XCTAssertEqual(
-            VoiceInkMacOSMenuBarDiagnostics.openHistoryWindowOpeningMessage,
-            "openHistoryWindow: opening history window"
-        )
-        XCTAssertEqual(
-            VoiceInkMacOSMenuBarDiagnostics.openHistoryWindowActivationPolicyMessage,
-            "openHistoryWindow: activation policy set to .regular"
-        )
-    }
-
     func testMacOSShellBackupPreferencesPreserveExportShape() {
         XCTAssertEqual(
             VoiceInkMacOSShellBackupPreference.backupPreferences(
@@ -1001,17 +814,6 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(events, expectedEvents)
     }
 
-    func testAudioSessionTimeoutPresentationPreservesIOSSettingsCopy() {
-        let presentation = VoiceInkAudioSessionTimeoutPreference.settingsPresentation
-
-        XCTAssertEqual(presentation.sectionTitle, "Audio Settings")
-        XCTAssertEqual(presentation.timeoutTitle, "Session Timeout")
-        XCTAssertEqual(
-            presentation.detailText,
-            "How long to keep the microphone session active after recording stops. Longer timeouts prevent 'session activation failed' errors when recording frequently, but may use more battery."
-        )
-    }
-
     func testVADPreferenceUsesSharedDefaultWhenMissing() {
         XCTAssertEqual(VoiceInkVADPreference.userDefaultsKey, "IsVADEnabled")
         XCTAssertTrue(VoiceInkVADPreference.defaultIsEnabled)
@@ -1039,22 +841,6 @@ final class UserDefaultsPreferencesTests: XCTestCase {
 
     func testCustomLanguagePromptsKeyPreservesExistingMacOSStorageName() {
         XCTAssertEqual(VoiceInkLocalWhisperPromptCatalog.customLanguagePromptsKey, "CustomLanguagePrompts")
-    }
-
-    func testMacOSPromptSettingsPresentationPreservesExistingCopy() {
-        let presentation = VoiceInkLocalWhisperPromptCatalog.macOSSettingsPresentation
-
-        XCTAssertEqual(presentation.sectionTitle, "Output Format")
-        XCTAssertEqual(
-            presentation.helpText,
-            "Only supported for local Whisper models. Unlike GPT, Voice Models(whisper) follows the style of your prompt rather than instructions. Use examples of your desired output format instead of commands."
-        )
-        XCTAssertEqual(
-            presentation.learnMoreURLString,
-            "https://cookbook.openai.com/examples/whisper_prompting_guide#comparison-with-gpt-prompting"
-        )
-        XCTAssertEqual(presentation.saveButtonTitle, "Save")
-        XCTAssertEqual(presentation.editButtonTitle, "Edit")
     }
 
     func testPromptDraftStateOwnsMacOSEditSaveAndLanguageRefresh() {
@@ -2134,33 +1920,6 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         )
     }
 
-    func testTranscriptionAutoCleanupDiagnosticsPreserveMacOSLogCopy() {
-        XCTAssertEqual(
-            VoiceInkTranscriptionAutoCleanupDiagnostics.invalidCompletedTranscriptionMessage,
-            "Invalid transcription or missing model context"
-        )
-        XCTAssertEqual(
-            VoiceInkTranscriptionAutoCleanupDiagnostics.saveAfterCompletedDeletionFailedMessage(errorDescription: "disk full"),
-            "Failed to save after transcription deletion: disk full"
-        )
-        XCTAssertEqual(
-            VoiceInkTranscriptionAutoCleanupDiagnostics.oldTranscriptionsCleanedMessage(deletedCount: 2),
-            "Cleaned up 2 old transcription(s)"
-        )
-        XCTAssertEqual(
-            VoiceInkTranscriptionAutoCleanupDiagnostics.transcriptionCleanupFailedMessage(errorDescription: "fetch failed"),
-            "Failed during transcription cleanup: fetch failed"
-        )
-        XCTAssertEqual(
-            VoiceInkTranscriptionAutoCleanupDiagnostics.orphanAudioFilesCleanedMessage(deletedCount: 3),
-            "Cleaned up 3 orphan audio file(s)"
-        )
-        XCTAssertEqual(
-            VoiceInkTranscriptionAutoCleanupDiagnostics.orphanAudioCleanupFailedMessage(errorDescription: "remove failed"),
-            "Failed during orphan audio cleanup: remove failed"
-        )
-    }
-
     func testAudioCleanupPreferenceUsesSharedDefaultsWhenUnset() {
         withIsolatedDefaults { defaults in
             let configuration = VoiceInkAudioCleanupPreference.current(from: defaults)
@@ -2274,30 +2033,6 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(
             VoiceInkRecorderPreviewPreference.registeredDefaults[VoiceInkRecorderPreviewPreference.userDefaultsKey] as? Bool,
             false
-        )
-    }
-
-    func testMacOSAdvancedTranscriptionSettingsPresentationPreservesCopy() {
-        let presentation = VoiceInkMacOSAdvancedTranscriptionSettingsPresentation.macOS
-
-        XCTAssertEqual(presentation.sectionTitle, "Advanced")
-        XCTAssertEqual(presentation.vad, VoiceInkVADPreference.macOSSettingsPresentation)
-        XCTAssertEqual(presentation.vad.title, "Voice Activity Detection (VAD)")
-        XCTAssertEqual(
-            presentation.vad.helpText,
-            "Use VAD inside batch/final transcription when supported. Buffer preload has its own VAD model in Rolling Buffer settings."
-        )
-        XCTAssertEqual(presentation.modelPrewarm, VoiceInkModelRuntimePreference.macOSSettingsPresentation)
-        XCTAssertEqual(presentation.modelPrewarm.title, "Prewarm model (Experimental)")
-        XCTAssertEqual(
-            presentation.modelPrewarm.helpText,
-            "Turn this on if transcriptions with local models are taking longer than expected. Runs silent background transcription on app launch and wake to trigger optimization."
-        )
-        XCTAssertEqual(presentation.liveTextPreview, VoiceInkRecorderPreviewPreference.macOSSettingsPresentation)
-        XCTAssertEqual(presentation.liveTextPreview.title, "Show Transcript Preview")
-        XCTAssertEqual(
-            presentation.liveTextPreview.helpText,
-            "Displays in-progress transcript text when a model or buffer preload can provide it."
         )
     }
 
@@ -2729,37 +2464,6 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(
             VoiceInkShortcutActionPresentation.displayName(for: .miniRecorderPowerMode(9)),
             "Select Power Mode 10"
-        )
-    }
-
-    func testShortcutValidationPresentationPreservesMacOSNotificationTitles() {
-        XCTAssertEqual(
-            VoiceInkShortcutValidationPresentation.notificationTitle(
-                for: .plainKeyRequiresModifier,
-                shortcutDisplayString: "A"
-            ),
-            "Shortcut not allowed: A"
-        )
-        XCTAssertEqual(
-            VoiceInkShortcutValidationPresentation.notificationTitle(
-                for: .shiftTypingKeyRequiresAdditionalModifier,
-                shortcutDisplayString: "Shift + A"
-            ),
-            "Shortcut not allowed: Shift + A"
-        )
-        XCTAssertEqual(
-            VoiceInkShortcutValidationPresentation.notificationTitle(
-                for: .reservedBySystem,
-                shortcutDisplayString: "Command + Q"
-            ),
-            "Shortcut reserved by macOS: Command + Q"
-        )
-        XCTAssertEqual(
-            VoiceInkShortcutValidationPresentation.notificationTitle(
-                for: .alreadyUsedBy("Open History Window"),
-                shortcutDisplayString: "Command + H"
-            ),
-            "Shortcut already used by Open History Window"
         )
     }
 

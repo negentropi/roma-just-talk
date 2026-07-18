@@ -6,6 +6,45 @@ It is intentionally separate from normal CI because it needs a logged-in GUI
 session, Accessibility permission for the terminal, a running Roma build, and a
 real target app such as TextEdit, Notes, Safari, Slack, or Zed.
 
+## Latency Architecture Contract
+
+- Pre-roll retains raw audio only; it must not start speculative transcription before key-down.
+- Key-down starts the ordinary recording and streaming path.
+- Granted microphone permission continues on the current recording task; it must not add a callback-to-MainActor task hop.
+- With zero Power Mode configurations, skip automatic resolution and prepare the ordinary transcription session before awaiting recorder startup. If a configuration could change the model, resolve and activate it before preparing that session.
+- Key-up commits an established stream when ready. If startup is still pending and the model supports recorded-file transcription, cancel that startup and use the recorded-file fallback without waiting.
+- Recorder stop stays serialized on its audio setup queue, but the measured warm stop completes inline instead of adding an async continuation-resume hop.
+- Streaming-only models may wait for their connection because no recorded-file fallback exists.
+- Local model prewarm loads the selected runtime directly; it must not depend on transcribing a bundled UI sound.
+- Whisper prewarm reuses a loaded context only when it belongs to the currently selected model.
+- FluidAudio may reuse a hypothesis only when the ordinary post-key-down session produced it and it covers every captured sample; missing or incomplete hypotheses require final ASR.
+
+Shared-core checks lock the startup-resolution and direct-prewarm policies. This harness is the end-to-end proof that those policies still produce visible text within the latency budget.
+
+## Deep Runtime Trace
+
+Every recording emits a bounded `LatencyTrace` timeline. Events share one trace ID,
+monotonic milliseconds from shortcut key-down, time since the previous event, and
+an ordered sequence number. The trace includes recorder startup/stop, Power Mode
+resolution, streaming connection and backlog drain, final ASR, cleanup, paste
+event posting, clipboard-restore execution, and persistence. Shortcut events also
+report physical-event-to-main-callback and main-callback-to-handler delay, so queued
+key-up work cannot disappear before the first handler timestamp. Trace tokens reject
+late events from older recordings; replacing an unfinished trace emits
+`trace.replaced`. Counts and state only are recorded, never transcript, URL, or
+clipboard contents. FluidAudio traces also distinguish complete-hypothesis reuse
+from final-ASR fallback.
+
+```bash
+log stream --style compact \
+  --predicate 'subsystem == "com.prakashjoshipax.voiceink" && category == "LatencyTrace"'
+```
+
+Use this trace before changing latency behavior. A green build, successful prewarm,
+or fast ASR alone does not prove the key-up-to-visible-text path is fast.
+`paste_event_posted` is only the app-to-macOS handoff. The visible-text harness below
+supplies the terminal timestamp after the focused app actually exposes the new text.
+
 ## Build
 
 ```bash

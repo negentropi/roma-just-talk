@@ -199,14 +199,9 @@ public struct VoiceInkTranscriptionStreamingModePresentation: Equatable, Sendabl
     public let isStreamingToggleForcedOn: Bool
     public let isStreamingToggleDisabled: Bool
     public let streamingToggleHelp: String
-    public let preloadToggleTitle: String
-    public let preloadToggleHelp: String
-
     public init(
         isStreamingEnabled: Bool,
-        isStreamingOnly: Bool,
-        isPreloadEnabled: Bool,
-        preloadHelpContext: VoiceInkTranscriptionStreamingPreloadHelpContext = .cloud
+        isStreamingOnly: Bool
     ) {
         self.streamingToggleTitle = "Streaming"
         self.isStreamingToggleForcedOn = isStreamingOnly
@@ -218,44 +213,12 @@ public struct VoiceInkTranscriptionStreamingModePresentation: Equatable, Sendabl
         } else {
             self.streamingToggleHelp = "Saved-file batch mode; click to stream active-recording audio"
         }
-        self.preloadToggleTitle = "Buffer Preload"
-        self.preloadToggleHelp = Self.preloadToggleHelp(
-            isPreloadEnabled: isPreloadEnabled,
-            context: preloadHelpContext
-        )
     }
-
-    private static func preloadToggleHelp(
-        isPreloadEnabled: Bool,
-        context: VoiceInkTranscriptionStreamingPreloadHelpContext
-    ) -> String {
-        guard isPreloadEnabled else {
-            return "Rolling buffer preload disabled for this model"
-        }
-
-        switch context {
-        case .cloud:
-            return "Rolling buffer can pre-run this model when global policy allows it"
-        case .localFluidAudio:
-            return "Rolling buffer can pre-run this model"
-        }
-    }
-}
-
-public enum VoiceInkTranscriptionStreamingPreloadHelpContext: Equatable, Sendable {
-    case cloud
-    case localFluidAudio
 }
 
 public enum VoiceInkStreamingFinalCommitSource: Equatable, Sendable {
     case cloud
     case localFluidAudio
-}
-
-public struct VoiceInkFluidAudioCachedFinalTextPlan: Equatable, Sendable {
-    public let text: String?
-    public let pendingSamples: Int
-    public let isTooStale: Bool
 }
 
 public struct TimedWord: Equatable, Sendable {
@@ -287,36 +250,29 @@ public struct AgreementConfig: Equatable, Sendable {
     public var minWordsToConfirm: Int
     public var minPassConfidence: Float
     public var minWordConfidence: Float
-    public var cachedFinalizationMaxLagSeconds: Double
-    public var runsImmediatePassOnBufferedAudio: Bool
 
     public init(
         transcribeIntervalSeconds: Double = 1.0,
         tokenConfirmationsNeeded: Int = 3,
         minWordsToConfirm: Int = 5,
         minPassConfidence: Float = 0.15,
-        minWordConfidence: Float = 0.6,
-        cachedFinalizationMaxLagSeconds: Double = 0.35,
-        runsImmediatePassOnBufferedAudio: Bool = false
+        minWordConfidence: Float = 0.6
     ) {
         self.transcribeIntervalSeconds = transcribeIntervalSeconds
         self.tokenConfirmationsNeeded = tokenConfirmationsNeeded
         self.minWordsToConfirm = minWordsToConfirm
         self.minPassConfidence = minPassConfidence
         self.minWordConfidence = minWordConfidence
-        self.cachedFinalizationMaxLagSeconds = cachedFinalizationMaxLagSeconds
-        self.runsImmediatePassOnBufferedAudio = runsImmediatePassOnBufferedAudio
     }
 
-    public static var rollingPreload: AgreementConfig {
+    /// Active-recording policy: starts only after key-down, then immediately consumes pre-roll.
+    public static var resolveHingeStreaming: AgreementConfig {
         AgreementConfig(
             transcribeIntervalSeconds: 0.35,
             tokenConfirmationsNeeded: 3,
             minWordsToConfirm: 5,
             minPassConfidence: 0.15,
-            minWordConfidence: 0.6,
-            cachedFinalizationMaxLagSeconds: 0.25,
-            runsImmediatePassOnBufferedAudio: true
+            minWordConfidence: 0.6
         )
     }
 }
@@ -325,6 +281,15 @@ public struct AgreementResult: Equatable, Sendable {
     public let fullText: String
     public let hypothesisText: String
     public let newlyConfirmedText: String
+}
+
+public struct VoiceInkFluidAudioCompleteHypothesisCommitPlan: Equatable, Sendable {
+    public let reusableText: String?
+    public let pendingSamples: Int
+
+    public var requiresFinalASR: Bool {
+        reusableText == nil
+    }
 }
 
 public final class WordAgreementEngine {
@@ -496,20 +461,6 @@ public enum VoiceInkFluidAudioTranscriptionPolicy {
         return samples + [Float](repeating: 0, count: trailingSilenceSamples)
     }
 
-    public static func shouldScheduleImmediatePass(
-        config: AgreementConfig,
-        hasImmediatePassInFlight: Bool,
-        absoluteSampleCount: Int,
-        lastScheduledSampleCount: Int,
-        minimumAudioSamples: Int,
-        minimumNewSamples: Int
-    ) -> Bool {
-        config.runsImmediatePassOnBufferedAudio &&
-        !hasImmediatePassInFlight &&
-        absoluteSampleCount >= minimumAudioSamples &&
-        absoluteSampleCount - lastScheduledSampleCount >= minimumNewSamples
-    }
-
     public static func shouldRunTranscriptionPass(
         absoluteSampleCount: Int,
         lastTranscribedSampleCount: Int,
@@ -518,6 +469,33 @@ public enum VoiceInkFluidAudioTranscriptionPolicy {
     ) -> Bool {
         absoluteSampleCount - lastTranscribedSampleCount >= minimumNewSamples &&
         absoluteSampleCount >= minimumAudioSamples
+    }
+
+    public static func completeHypothesisCommitPlan(
+        latestHypothesisText: String,
+        latestHypothesisSampleCount: Int,
+        absoluteSampleCount: Int
+    ) -> VoiceInkFluidAudioCompleteHypothesisCommitPlan {
+        let pendingSamples = max(0, absoluteSampleCount - latestHypothesisSampleCount)
+        let text = latestHypothesisText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty else {
+            return VoiceInkFluidAudioCompleteHypothesisCommitPlan(
+                reusableText: nil,
+                pendingSamples: pendingSamples
+            )
+        }
+
+        guard latestHypothesisSampleCount == absoluteSampleCount else {
+            return VoiceInkFluidAudioCompleteHypothesisCommitPlan(
+                reusableText: nil,
+                pendingSamples: pendingSamples
+            )
+        }
+
+        return VoiceInkFluidAudioCompleteHypothesisCommitPlan(
+            reusableText: text,
+            pendingSamples: pendingSamples
+        )
     }
 
     public static func seekSample(
@@ -534,37 +512,6 @@ public enum VoiceInkFluidAudioTranscriptionPolicy {
         trimmedSampleCount: Int
     ) -> Int {
         max(0, seekSample - trimmedSampleCount)
-    }
-
-    public static func cachedFinalTextPlan(
-        latestHypothesisText: String,
-        latestHypothesisSampleCount: Int,
-        absoluteSampleCount: Int,
-        maxCachedFinalizationLagSamples: Int
-    ) -> VoiceInkFluidAudioCachedFinalTextPlan {
-        let cachedText = latestHypothesisText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !cachedText.isEmpty else {
-            return VoiceInkFluidAudioCachedFinalTextPlan(
-                text: nil,
-                pendingSamples: 0,
-                isTooStale: false
-            )
-        }
-
-        let pendingSamples = max(0, absoluteSampleCount - latestHypothesisSampleCount)
-        guard pendingSamples <= maxCachedFinalizationLagSamples else {
-            return VoiceInkFluidAudioCachedFinalTextPlan(
-                text: nil,
-                pendingSamples: pendingSamples,
-                isTooStale: true
-            )
-        }
-
-        return VoiceInkFluidAudioCachedFinalTextPlan(
-            text: cachedText,
-            pendingSamples: pendingSamples,
-            isTooStale: false
-        )
     }
 }
 
@@ -726,7 +673,6 @@ public enum VoiceInkTranscriptionStreamingAdapterKind: Equatable, Sendable {
 public struct VoiceInkTranscriptionStreamingSessionRequest: Equatable, Sendable {
     public let serviceRoute: VoiceInkTranscriptionServiceRoute
     public let adapterKind: VoiceInkTranscriptionStreamingAdapterKind
-    public let usesRollingPreload: Bool
     public let finalCommitTimeoutNanoseconds: UInt64
 }
 
@@ -768,20 +714,16 @@ public struct VoiceInkTranscriptionSessionRouteFacts: Equatable, Sendable {
     }
 
     public func plan(
-        forceStreaming: Bool,
         defaults: UserDefaults = .standard
     ) -> VoiceInkTranscriptionSessionRoutePlan {
-        let usesStreaming = forceStreaming
-            ? streamingSnapshot.supportsStreaming
-            : VoiceInkTranscriptionStreamingPreference.shouldUseStreaming(
-                for: streamingSnapshot,
-                in: defaults
-            )
+        let usesStreaming = VoiceInkTranscriptionStreamingPreference.shouldUseStreaming(
+            for: streamingSnapshot,
+            in: defaults
+        )
 
         return VoiceInkTranscriptionSessionRoutePlan(
             serviceRoute: serviceRoute,
-            usesStreaming: usesStreaming,
-            forceStreaming: forceStreaming
+            usesStreaming: usesStreaming
         )
     }
 }
@@ -790,20 +732,17 @@ public struct VoiceInkTranscriptionSessionRoutePlan: Equatable, Sendable {
     public let serviceRoute: VoiceInkTranscriptionServiceRoute
     public let usesStreaming: Bool
     public let streamingAdapterKind: VoiceInkTranscriptionStreamingAdapterKind?
-    public let usesRollingPreload: Bool
     public let finalCommitSource: VoiceInkStreamingFinalCommitSource?
 
     public init(
         serviceRoute: VoiceInkTranscriptionServiceRoute,
-        usesStreaming: Bool,
-        forceStreaming: Bool
+        usesStreaming: Bool
     ) {
         self.serviceRoute = serviceRoute
         self.usesStreaming = usesStreaming
 
         guard usesStreaming else {
             self.streamingAdapterKind = nil
-            self.usesRollingPreload = false
             self.finalCommitSource = nil
             return
         }
@@ -811,11 +750,9 @@ public struct VoiceInkTranscriptionSessionRoutePlan: Equatable, Sendable {
         switch serviceRoute {
         case .localFluidAudio:
             self.streamingAdapterKind = .localFluidAudio
-            self.usesRollingPreload = forceStreaming
             self.finalCommitSource = .localFluidAudio
         case .cloud, .localWhisper, .nativeApple:
             self.streamingAdapterKind = .cloud
-            self.usesRollingPreload = false
             self.finalCommitSource = .cloud
         }
     }
@@ -841,7 +778,6 @@ public struct VoiceInkTranscriptionSessionRoutePlan: Equatable, Sendable {
                 VoiceInkTranscriptionStreamingSessionRequest(
                     serviceRoute: serviceRoute,
                     adapterKind: streamingAdapterKind,
-                    usesRollingPreload: usesRollingPreload,
                     finalCommitTimeoutNanoseconds: finalCommitTimeoutNanoseconds
                 )
             )

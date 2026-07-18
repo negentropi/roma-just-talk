@@ -177,12 +177,6 @@ class ImportExportService {
         let audioCleanupBackupPreferences = VoiceInkAudioCleanupPreference.backupPreferences(
             from: audioCleanup
         )
-        let rollingBufferConfiguration = VoiceInkRollingBufferPreloadSettings.configuration()
-        let rollingBufferBackupPreferences = VoiceInkRollingBufferPreloadSettings.backupPreferences(
-            from: rollingBufferConfiguration,
-            selectedVADModelRawValue: VoiceInkRollingBufferVADSettings.selectedModel(),
-            perModelPreloadEnabled: VoiceInkRollingBufferPreloadSettings.exportedPerModelPreloadEnabled()
-        )
         let recordingFeedbackBackupPreferences = VoiceInkRecordingFeedbackPreference.backupPreferences(
             isSoundFeedbackEnabled: soundManager.isEnabled,
             isSystemMuteEnabled: mediaController.isSystemMuteEnabled,
@@ -216,8 +210,7 @@ class ImportExportService {
             audioCleanup: audioCleanupBackupPreferences,
             recordingFeedback: recordingFeedbackBackupPreferences,
             transcriptionCleanup: transcriptionCleanupBackupPreferences,
-            paste: pasteBackupPreferences,
-            rollingBuffer: rollingBufferBackupPreferences
+            paste: pasteBackupPreferences
         )
         let shortcutBackupRecords = VoiceInkShortcutBackupPolicy.generalBackupShortcutRecords { actionIdentifier in
             ShortcutStore.shortcut(for: actionIdentifier).map(ShortcutBackup.init)

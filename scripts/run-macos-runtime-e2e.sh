@@ -28,6 +28,7 @@ config_full="$runtime_root/runtime-e2e-full.json"
 scenario_status=1
 current_phase="initialize"
 phase_file="$evidence/macos-runtime-e2e-phase.txt"
+coteditor_pid=""
 
 mkdir -p "$runtime_root" "$audio_root" "$evidence"
 test -d "$voiceink_app"
@@ -167,6 +168,9 @@ cleanup() {
   if [ "$exit_code" -ne 0 ]; then
     scenario_status="$exit_code"
   fi
+  if [ -n "$coteditor_pid" ]; then
+    kill "$coteditor_pid" 2>/dev/null || true
+  fi
   if [ -x "$helper_app/Contents/MacOS/RuntimeE2EHarness" ]; then
     make -C "$repo_root" runtime-e2e-restore \
       RUNTIME_E2E_CONFIG="$config_full" \
@@ -283,7 +287,9 @@ test -x "$lsregister_bin"
   > "$evidence/app-registration.log" 2>&1
 open -b com.apple.TextEdit > "$evidence/textedit-launch.log" 2>&1
 open -b com.apple.Safari > "$evidence/safari-launch.log" 2>&1
-open -b com.coteditor.CotEditor > "$evidence/coteditor-launch.log" 2>&1
+"/Applications/CotEditor.app/Contents/MacOS/CotEditor" \
+  > "$evidence/coteditor-launch.log" 2>&1 &
+coteditor_pid="$!"
 open -b com.apple.ScriptEditor2 > "$evidence/scripteditor-launch.log" 2>&1
 sleep 15
 

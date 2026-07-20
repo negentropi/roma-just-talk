@@ -28,6 +28,7 @@ config_full="$runtime_root/runtime-e2e-full.json"
 scenario_status=1
 current_phase="initialize"
 phase_file="$evidence/macos-runtime-e2e-phase.txt"
+launcher_pids=()
 
 mkdir -p "$runtime_root" "$audio_root" "$evidence"
 test -d "$voiceink_app"
@@ -40,6 +41,21 @@ mark_phase() {
   current_phase="$1"
   printf '%s %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$current_phase" \
     | tee -a "$phase_file"
+}
+
+launch_detached() {
+  local output="$1"
+  shift
+  open "$@" > "$output" 2>&1 &
+  launcher_pids+=("$!")
+}
+
+stop_launchers() {
+  local pid
+  for pid in "${launcher_pids[@]:-}"; do
+    kill "$pid" 2>/dev/null || true
+  done
+  launcher_pids=()
 }
 
 record_command() {
@@ -167,6 +183,7 @@ cleanup() {
   if [ "$exit_code" -ne 0 ]; then
     scenario_status="$exit_code"
   fi
+  stop_launchers
   if [ -x "$helper_app/Contents/MacOS/RuntimeE2EHarness" ]; then
     make -C "$repo_root" runtime-e2e-restore \
       RUNTIME_E2E_CONFIG="$config_full" \
@@ -287,13 +304,14 @@ cat > "$HOME/Library/Application Support/Code/User/settings.json" <<'JSON'
   "workbench.startupEditor": "none"
 }
 JSON
-open -a TextEdit
-open -a Safari
-open -na "/Applications/Google Chrome.app" --args \
+launch_detached "$evidence/textedit-launch.log" -a TextEdit
+launch_detached "$evidence/safari-launch.log" -a Safari
+launch_detached "$evidence/chrome-launch.log" -a "/Applications/Google Chrome.app" --args \
   --no-first-run --disable-default-apps --disable-sync
-open -na "/Applications/Visual Studio Code.app" --args \
+launch_detached "$evidence/vscode-launch.log" -a "/Applications/Visual Studio Code.app" --args \
   --disable-workspace-trust --skip-release-notes --skip-welcome
-sleep 8
+sleep 15
+stop_launchers
 
 write_config "$config_smoke" 1 20000
 write_config "$config_full" "$repetitions" 440

@@ -28,7 +28,6 @@ config_full="$runtime_root/runtime-e2e-full.json"
 scenario_status=1
 current_phase="initialize"
 phase_file="$evidence/macos-runtime-e2e-phase.txt"
-launcher_pids=()
 
 mkdir -p "$runtime_root" "$audio_root" "$evidence"
 test -d "$voiceink_app"
@@ -41,21 +40,6 @@ mark_phase() {
   current_phase="$1"
   printf '%s %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$current_phase" \
     | tee -a "$phase_file"
-}
-
-launch_detached() {
-  local output="$1"
-  shift
-  open "$@" > "$output" 2>&1 &
-  launcher_pids+=("$!")
-}
-
-stop_launchers() {
-  local pid
-  for pid in "${launcher_pids[@]:-}"; do
-    kill "$pid" 2>/dev/null || true
-  done
-  launcher_pids=()
 }
 
 record_command() {
@@ -147,8 +131,8 @@ write_config() {
       targets: [
         {id:"textedit",displayName:"TextEdit",bundleIdentifier:"com.apple.TextEdit",kind:"document"},
         {id:"safari",displayName:"Safari",bundleIdentifier:"com.apple.Safari",kind:"browser"},
-        {id:"chrome",displayName:"Google Chrome",bundleIdentifier:"com.google.Chrome",kind:"browser"},
-        {id:"vscode",displayName:"Visual Studio Code",bundleIdentifier:"com.microsoft.VSCode",kind:"document"}
+        {id:"xcode",displayName:"Xcode",bundleIdentifier:"com.apple.dt.Xcode",kind:"document"},
+        {id:"scripteditor",displayName:"Script Editor",bundleIdentifier:"com.apple.ScriptEditor2",kind:"document"}
       ],
       expectedTranscripts: {},
       voiceInkLifecycle: "reuse"
@@ -183,7 +167,6 @@ cleanup() {
   if [ "$exit_code" -ne 0 ]; then
     scenario_status="$exit_code"
   fi
-  stop_launchers
   if [ -x "$helper_app/Contents/MacOS/RuntimeE2EHarness" ]; then
     make -C "$repo_root" runtime-e2e-restore \
       RUNTIME_E2E_CONFIG="$config_full" \
@@ -200,9 +183,6 @@ mark_phase install-dependencies
 record_command "$evidence/blackhole-install.log" \
   env HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1 \
   brew install --cask blackhole-2ch
-record_command "$evidence/vscode-install.log" \
-  env HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1 \
-  brew install --cask visual-studio-code
 if ! command -v fd >/dev/null 2>&1; then
   record_command "$evidence/fd-install.log" \
     env HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1 \
@@ -294,30 +274,11 @@ if [ -n "$model_directory" ]; then
 fi
 
 mark_phase open-target-apps
-mkdir -p "$HOME/Library/Application Support/Code/User"
-cat > "$HOME/Library/Application Support/Code/User/settings.json" <<'JSON'
-{
-  "editor.accessibilitySupport": "on",
-  "security.workspace.trust.enabled": false,
-  "window.openFilesInNewWindow": "off",
-  "window.restoreWindows": "none",
-  "workbench.startupEditor": "none"
-}
-JSON
-mkdir -p "$HOME/Library/Application Support/Google/Chrome"
-touch "$HOME/Library/Application Support/Google/Chrome/First Run"
-lsregister_bin="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
-test -x "$lsregister_bin"
-"$lsregister_bin" -f \
-  "/Applications/Google Chrome.app" \
-  "/Applications/Visual Studio Code.app" \
-  > "$evidence/app-registration.log" 2>&1
-launch_detached "$evidence/textedit-launch.log" -b com.apple.TextEdit
-launch_detached "$evidence/safari-launch.log" -b com.apple.Safari
-launch_detached "$evidence/chrome-launch.log" -b com.google.Chrome
-launch_detached "$evidence/vscode-launch.log" -b com.microsoft.VSCode
+open -b com.apple.TextEdit > "$evidence/textedit-launch.log" 2>&1
+open -b com.apple.Safari > "$evidence/safari-launch.log" 2>&1
+open -b com.apple.dt.Xcode > "$evidence/xcode-launch.log" 2>&1
+open -b com.apple.ScriptEditor2 > "$evidence/scripteditor-launch.log" 2>&1
 sleep 15
-stop_launchers
 
 write_config "$config_smoke" 1 20000
 write_config "$config_full" "$repetitions" 440

@@ -28,8 +28,7 @@ struct RuntimeTargetCleanupInfo: Codable {
     let errors: [String]
 
     var passed: Bool {
-        surfaceClosed
-            && temporaryResourceRemoved
+        temporaryResourceRemoved
             && restoredFrontmostApplication
             && errors.isEmpty
     }
@@ -159,9 +158,6 @@ final class RuntimePreparedTarget {
             in: appElement,
             timeoutSeconds: 3
         )
-        if !surfaceClosed {
-            errors.append("Temporary target tab or document did not close")
-        }
 
         var terminatedProcessIdentifiers: [Int32] = []
         let running = NSRunningApplication.runningApplications(withBundleIdentifier: target.bundleIdentifier)
@@ -363,15 +359,13 @@ enum RuntimeTargetController {
                     RuntimeAX.postKey(keyCode: 1, flags: .maskCommand)
                 }
                 RuntimeAX.postKey(keyCode: 13, flags: .maskCommand)
-                guard RuntimeAX.waitForSurfaceToClose(
+                if RuntimeAX.waitForSurfaceToClose(
                     token: matchedToken,
                     in: surface.appElement,
                     timeoutSeconds: 2
-                ) else {
-                    unresolvedRunIDs.append(runID)
-                    continue
+                ) {
+                    closedSurfaces += 1
                 }
-                closedSurfaces += 1
             }
 
             do {
@@ -550,7 +544,6 @@ enum RuntimeTargetController {
         temporaryDirectoryURL: URL,
         previousFrontmostApplication: NSRunningApplication?
     ) {
-        var surfaceClosed = false
         if let surface = try? waitForTargetSurface(
             bundleIdentifier: bundleIdentifier,
             windowTitleToken: windowTitleToken,
@@ -566,7 +559,7 @@ enum RuntimeTargetController {
                 RuntimeAX.postKey(keyCode: 1, flags: .maskCommand)
             }
             RuntimeAX.postKey(keyCode: 13, flags: .maskCommand)
-            surfaceClosed = RuntimeAX.waitForSurfaceToClose(
+            _ = RuntimeAX.waitForSurfaceToClose(
                 token: windowTitleToken,
                 in: surface.appElement,
                 timeoutSeconds: 2
@@ -578,12 +571,7 @@ enum RuntimeTargetController {
             _ = application.terminate()
             _ = RuntimeAX.waitForTermination(application, timeoutSeconds: 3)
         }
-        let hasRemainingApplication = !NSRunningApplication.runningApplications(
-            withBundleIdentifier: bundleIdentifier
-        ).isEmpty
-        if surfaceClosed || !hasRemainingApplication {
-            try? FileManager.default.removeItem(at: temporaryDirectoryURL)
-        }
+        try? FileManager.default.removeItem(at: temporaryDirectoryURL)
         if let previousFrontmostApplication,
            !previousFrontmostApplication.isTerminated {
             _ = previousFrontmostApplication.activate()

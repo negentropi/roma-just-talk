@@ -26,6 +26,8 @@ nsc_bin="${NAMESPACE_CLI:-/opt/nsc/bin/nsc}"
 config_smoke="$runtime_root/runtime-e2e-smoke.json"
 config_full="$runtime_root/runtime-e2e-full.json"
 scenario_status=1
+current_phase="initialize"
+phase_file="$evidence/macos-runtime-e2e-phase.txt"
 
 mkdir -p "$runtime_root" "$audio_root" "$evidence"
 test -d "$voiceink_app"
@@ -33,6 +35,12 @@ test -x "$nsc_bin"
 command -v jq >/dev/null
 command -v sqlite3 >/dev/null
 command -v csreq >/dev/null
+
+mark_phase() {
+  current_phase="$1"
+  printf '%s %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$current_phase" \
+    | tee -a "$phase_file"
+}
 
 record_command() {
   local output="$1"
@@ -166,10 +174,12 @@ cleanup() {
   fi
   defaults read "$voiceink_bundle_id" > "$evidence/voiceink-defaults-final.txt" 2>&1
   system_profiler SPAudioDataType > "$evidence/audio-final.txt" 2>&1
+  printf '%s\n' "$current_phase" > "$evidence/macos-runtime-e2e-final-phase.txt"
   printf '%s\n' "$scenario_status" > "$evidence/macos-runtime-e2e-exit-code.txt"
 }
 trap cleanup EXIT
 
+mark_phase install-dependencies
 record_command "$evidence/blackhole-install.log" \
   env HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1 \
   brew install --cask blackhole-2ch
@@ -186,6 +196,7 @@ sleep 4
 system_profiler SPAudioDataType > "$evidence/audio-after-install.txt"
 grep -q "BlackHole 2ch" "$evidence/audio-after-install.txt"
 
+mark_phase stage-audio-fixtures
 "$nsc_bin" artifact download "$audio_artifact" "$runtime_root/audio.zip" \
   > "$evidence/audio-artifact-download.log" 2>&1
 ditto -x -k "$runtime_root/audio.zip" "$audio_root"
@@ -200,6 +211,7 @@ while IFS= read -r fixture; do
 done < <(fd -a -t f -e wav -e wave -e aif -e aiff -e caf -e m4a -e mp3 -e flac . "$audio_directory" | sort) \
   > "$evidence/audio-fixtures.txt"
 
+mark_phase build-helper
 make -C "$repo_root" runtime-e2e-check > "$evidence/harness-check.log" 2>&1
 make -C "$repo_root" runtime-e2e-app > "$evidence/harness-build.log" 2>&1
 codesign -dv --verbose=4 "$helper_app" > "$evidence/helper-codesign.txt" 2>&1
@@ -212,6 +224,7 @@ pkill -9 -x RuntimeE2EHarness 2>/dev/null || true
 killall tccd 2>/dev/null || true
 sudo killall tccd 2>/dev/null || true
 sleep 2
+mark_phase grant-tcc
 capture_tcc before-grant
 voiceink_requirement="$(make_csreq "$voiceink_app" "$runtime_root/voiceink.csreq")"
 helper_requirement="$(make_csreq "$helper_app" "$runtime_root/helper.csreq")"
@@ -237,6 +250,7 @@ defaults write "$voiceink_bundle_id" restoreClipboardAfterPaste -bool false
 defaults write "$voiceink_bundle_id" appendTrailingSpace -bool false
 killall cfprefsd 2>/dev/null || true
 
+mark_phase prewarm-model
 open -na "$voiceink_app"
 model_deadline=$((SECONDS + 1200))
 while (( SECONDS < model_deadline )); do
@@ -250,12 +264,19 @@ while (( SECONDS < model_deadline )); do
   sleep 5
 done
 grep -Fq "Prewarm completed" "$evidence/macos-app.log"
-model_directory="$HOME/Library/Application Support/FluidAudio/mModels/parakeet-tdt-0.6b-v2"
-test -d "$model_directory"
-du -sh "$model_directory" > "$evidence/model-cache-size.txt"
-fd -a -t f . "$model_directory" -x stat -f '%z %N' \
-  | sort > "$evidence/model-cache-files.txt"
+model_root="$HOME/Library/Application Support/FluidAudio"
+fd -a -d 4 . "$model_root" | sort > "$evidence/model-cache-tree.txt" 2>&1 || true
+model_directory="$(fd -a -t d '^parakeet-tdt-0\.6b-v2' "$model_root" | sort | head -n 1 || true)"
+if [ -n "$model_directory" ]; then
+  printf '%s\n' "$model_directory" > "$evidence/model-cache-directory.txt"
+  du -sh "$model_directory" > "$evidence/model-cache-size.txt" 2>&1 || true
+  while IFS= read -r model_file; do
+    stat -f '%z %N' "$model_file"
+  done < <(fd -a -t f . "$model_directory" | sort) \
+    > "$evidence/model-cache-files.txt" 2>&1 || true
+fi
 
+mark_phase open-target-apps
 mkdir -p "$HOME/Library/Application Support/Code/User"
 cat > "$HOME/Library/Application Support/Code/User/settings.json" <<'JSON'
 {
@@ -280,9 +301,13 @@ cp "$config_smoke" "$evidence/runtime-e2e-smoke-config.json"
 cp "$config_full" "$evidence/runtime-e2e-full-config.json"
 
 scenario_status=0
+mark_phase preflight
 run_harness_phase preflight runtime-e2e-preflight "$config_full"
+mark_phase target-probe
 run_harness_phase target-probe runtime-e2e-target-probe "$config_full"
+mark_phase functional-smoke
 run_harness_phase functional-smoke runtime-e2e-run "$config_smoke"
+mark_phase repeated-runtime-matrix
 run_harness_phase runtime-e2e-report runtime-e2e-run "$config_full" || scenario_status=$?
 
 if [ -f "$evidence/runtime-e2e-report.json" ]; then
@@ -301,6 +326,5 @@ fi
 
 capture_tcc final
 defaults read "$voiceink_bundle_id" > "$evidence/voiceink-defaults-before-cleanup.txt" 2>&1
-pgrep -fl 'roma just talk|RuntimeE2EHarness|TextEdit|Safari|Google Chrome|Visual Studio Code' \
-  > "$evidence/process-inventory.txt" 2>&1 || true
+mark_phase complete
 exit "$scenario_status"

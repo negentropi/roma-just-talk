@@ -306,6 +306,12 @@ cat > "$HOME/Library/Application Support/Code/User/settings.json" <<'JSON'
 JSON
 mkdir -p "$HOME/Library/Application Support/Google/Chrome"
 touch "$HOME/Library/Application Support/Google/Chrome/First Run"
+lsregister_bin="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
+test -x "$lsregister_bin"
+"$lsregister_bin" -f \
+  "/Applications/Google Chrome.app" \
+  "/Applications/Visual Studio Code.app" \
+  > "$evidence/app-registration.log" 2>&1
 launch_detached "$evidence/textedit-launch.log" -b com.apple.TextEdit
 launch_detached "$evidence/safari-launch.log" -b com.apple.Safari
 launch_detached "$evidence/chrome-launch.log" -b com.google.Chrome

@@ -304,12 +304,12 @@ cat > "$HOME/Library/Application Support/Code/User/settings.json" <<'JSON'
   "workbench.startupEditor": "none"
 }
 JSON
-launch_detached "$evidence/textedit-launch.log" -a TextEdit
-launch_detached "$evidence/safari-launch.log" -a Safari
-launch_detached "$evidence/chrome-launch.log" -a "/Applications/Google Chrome.app" --args \
-  --no-first-run --disable-default-apps --disable-sync
-launch_detached "$evidence/vscode-launch.log" -a "/Applications/Visual Studio Code.app" --args \
-  --disable-workspace-trust --skip-release-notes --skip-welcome
+mkdir -p "$HOME/Library/Application Support/Google/Chrome"
+touch "$HOME/Library/Application Support/Google/Chrome/First Run"
+launch_detached "$evidence/textedit-launch.log" -b com.apple.TextEdit
+launch_detached "$evidence/safari-launch.log" -b com.apple.Safari
+launch_detached "$evidence/chrome-launch.log" -b com.google.Chrome
+launch_detached "$evidence/vscode-launch.log" -b com.microsoft.VSCode
 sleep 15
 stop_launchers
 

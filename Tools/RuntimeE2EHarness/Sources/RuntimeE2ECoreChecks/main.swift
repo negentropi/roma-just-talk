@@ -116,9 +116,19 @@ do {
 
     let targetTitle = "Roma Runtime E2E fixture-textedit-r1-ABC123"
     try require(
-        RuntimeTargetIsolationPlan.documentFilename(windowTitleToken: targetTitle)
+        RuntimeTargetIsolationPlan.documentFilename(
+            windowTitleToken: targetTitle,
+            bundleIdentifier: "com.apple.TextEdit"
+        )
             == "\(targetTitle).txt",
         "document filename must preserve the window-title token used for scoped cleanup"
+    )
+    try require(
+        RuntimeTargetIsolationPlan.documentFilename(
+            windowTitleToken: targetTitle,
+            bundleIdentifier: "com.apple.ScriptEditor2"
+        ) == "\(targetTitle).applescript",
+        "Script Editor targets must use its editable document type"
     )
     try require(
         RuntimeTargetIsolationPlan.openArguments(

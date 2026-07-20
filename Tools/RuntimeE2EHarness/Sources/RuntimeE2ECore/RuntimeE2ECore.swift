@@ -62,8 +62,14 @@ public struct RuntimeTargetApp: Codable, Equatable, Hashable, Sendable {
 }
 
 public enum RuntimeTargetIsolationPlan {
-    public static func documentFilename(windowTitleToken: String) -> String {
-        "\(windowTitleToken).txt"
+    public static func documentFilename(
+        windowTitleToken: String,
+        bundleIdentifier: String
+    ) -> String {
+        let pathExtension = bundleIdentifier == "com.apple.ScriptEditor2"
+            ? "applescript"
+            : "txt"
+        return "\(windowTitleToken).\(pathExtension)"
     }
 
     public static func openArguments(bundleIdentifier: String, resourcePath: String) -> [String] {

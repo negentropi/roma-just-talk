@@ -428,7 +428,10 @@ enum RuntimeTargetController {
             try Data(html.utf8).write(to: url, options: .atomic)
             return TestResource(url: url, windowTitleToken: title)
         case .document:
-            let filename = RuntimeTargetIsolationPlan.documentFilename(windowTitleToken: title)
+            let filename = RuntimeTargetIsolationPlan.documentFilename(
+                windowTitleToken: title,
+                bundleIdentifier: target.bundleIdentifier
+            )
             let url = directoryURL.appendingPathComponent(filename)
             try Data().write(to: url, options: .atomic)
             return TestResource(url: url, windowTitleToken: title)
@@ -442,13 +445,19 @@ enum RuntimeTargetController {
         resourceURL: URL
     ) throws {
         let process = Process()
-        if bundleIdentifier == "com.microsoft.VSCode" {
-            let launcherURL = appURL.appendingPathComponent("Contents/Resources/app/bin/code")
+        if bundleIdentifier == "com.microsoft.VSCode"
+            || bundleIdentifier == "com.coteditor.CotEditor" {
+            let relativeLauncherPath = bundleIdentifier == "com.microsoft.VSCode"
+                ? "Contents/Resources/app/bin/code"
+                : "Contents/SharedSupport/bin/cot"
+            let launcherURL = appURL.appendingPathComponent(relativeLauncherPath)
             guard FileManager.default.isExecutableFile(atPath: launcherURL.path) else {
                 throw RuntimeTargetControllerError.launcherNotFound(appName, launcherURL.path)
             }
             process.executableURL = launcherURL
-            process.arguments = ["--reuse-window", resourceURL.path]
+            process.arguments = bundleIdentifier == "com.microsoft.VSCode"
+                ? ["--reuse-window", resourceURL.path]
+                : [resourceURL.path]
         } else {
             process.executableURL = URL(fileURLWithPath: "/usr/bin/open")
             process.arguments = RuntimeTargetIsolationPlan.openArguments(

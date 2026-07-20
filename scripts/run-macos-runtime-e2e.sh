@@ -131,7 +131,7 @@ write_config() {
       targets: [
         {id:"textedit",displayName:"TextEdit",bundleIdentifier:"com.apple.TextEdit",kind:"document"},
         {id:"safari",displayName:"Safari",bundleIdentifier:"com.apple.Safari",kind:"browser"},
-        {id:"xcode",displayName:"Xcode",bundleIdentifier:"com.apple.dt.Xcode",kind:"document"},
+        {id:"coteditor",displayName:"CotEditor",bundleIdentifier:"com.coteditor.CotEditor",kind:"document"},
         {id:"scripteditor",displayName:"Script Editor",bundleIdentifier:"com.apple.ScriptEditor2",kind:"document"}
       ],
       expectedTranscripts: {},
@@ -183,6 +183,9 @@ mark_phase install-dependencies
 record_command "$evidence/blackhole-install.log" \
   env HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1 \
   brew install --cask blackhole-2ch
+record_command "$evidence/coteditor-install.log" \
+  env HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1 \
+  brew install --cask coteditor
 if ! command -v fd >/dev/null 2>&1; then
   record_command "$evidence/fd-install.log" \
     env HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1 \
@@ -274,9 +277,13 @@ if [ -n "$model_directory" ]; then
 fi
 
 mark_phase open-target-apps
+lsregister_bin="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
+test -x "$lsregister_bin"
+"$lsregister_bin" -f "/Applications/CotEditor.app" \
+  > "$evidence/app-registration.log" 2>&1
 open -b com.apple.TextEdit > "$evidence/textedit-launch.log" 2>&1
 open -b com.apple.Safari > "$evidence/safari-launch.log" 2>&1
-open -b com.apple.dt.Xcode > "$evidence/xcode-launch.log" 2>&1
+open -b com.coteditor.CotEditor > "$evidence/coteditor-launch.log" 2>&1
 open -b com.apple.ScriptEditor2 > "$evidence/scripteditor-launch.log" 2>&1
 sleep 15
 

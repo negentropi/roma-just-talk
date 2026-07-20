@@ -54,6 +54,7 @@
 - Added a first-run setup skip action for the keyboard-shortcut step so setup can continue without configuring a shortcut immediately.
 - Added a Homebrew cask for installing the fork from the repo tap and aligned CI packaging with the release asset URL.
 - Added an opt-in visible-text latency harness for measuring real hotkey-release-to-target-text timing in everyday macOS apps.
+- Added an autonomous Namespace macOS runtime E2E harness that feeds fixed WAV fixtures through BlackHole, drives the real Special shortcut, verifies Accessibility-visible insertion across four already-running apps, preserves per-phase evidence without guessing failure ownership, and restores audio, app, clipboard-target, and temporary-resource state.
 - Kept the dictated text on the clipboard when the paste command cannot be posted, so failed target-app pastes do not immediately restore over the transcript.
 - Added up to three seconds of audio pre-roll to iOS after capture has warmed, using the shared PCM pre-roll buffer without carrying over speculative transcription preload.
 - Prevented iOS from crashing after onboarding when the active audio route exposes no usable microphone format, returning a recorder-start failure before installing the AVAudioEngine tap.

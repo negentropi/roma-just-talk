@@ -1,0 +1,306 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+voiceink_app="${1:?VoiceInk app path required}"
+audio_artifact="${2:?Namespace audio artifact required}"
+evidence="${3:?evidence directory required}"
+repetitions="${4:-3}"
+
+case "$repetitions" in
+  1|3|5) ;;
+  *)
+    echo "Repetitions must be 1, 3, or 5" >&2
+    exit 2
+    ;;
+esac
+
+repo_root="${GITHUB_WORKSPACE:-$(cd "$(dirname "$0")/.." && pwd)}"
+runtime_root="$(dirname "$evidence")/macos-runtime-e2e"
+audio_root="$runtime_root/audio"
+helper_app="$repo_root/.local-build/Tools/RuntimeE2EHarness.app"
+helper_bundle_id="com.happyf.roma-just-talk.RuntimeE2EHarness"
+voiceink_bundle_id="com.prakashjoshipax.VoiceInk"
+system_tcc_db="/Library/Application Support/com.apple.TCC/TCC.db"
+user_tcc_db="$HOME/Library/Application Support/com.apple.TCC/TCC.db"
+nsc_bin="${NAMESPACE_CLI:-/opt/nsc/bin/nsc}"
+config_smoke="$runtime_root/runtime-e2e-smoke.json"
+config_full="$runtime_root/runtime-e2e-full.json"
+scenario_status=1
+
+mkdir -p "$runtime_root" "$audio_root" "$evidence"
+test -d "$voiceink_app"
+test -x "$nsc_bin"
+command -v jq >/dev/null
+command -v sqlite3 >/dev/null
+command -v csreq >/dev/null
+
+record_command() {
+  local output="$1"
+  shift
+  {
+    printf '$'
+    printf ' %q' "$@"
+    printf '\n'
+    "$@"
+  } > "$output" 2>&1
+}
+
+capture_tcc() {
+  local phase="$1"
+  sudo sqlite3 -header -column "$system_tcc_db" \
+    "select service,client,client_type,auth_value,auth_reason,length(csreq) as csreq_length,last_modified from access where client in ('$voiceink_bundle_id','$helper_bundle_id') order by client,service;" \
+    > "$evidence/tcc-system-$phase.txt"
+  sqlite3 -header -column "$user_tcc_db" \
+    "select service,client,client_type,auth_value,auth_reason,length(csreq) as csreq_length,last_modified from access where client in ('$voiceink_bundle_id','$helper_bundle_id') order by client,service;" \
+    > "$evidence/tcc-user-$phase.txt"
+}
+
+make_csreq() {
+  local app="$1"
+  local output="$2"
+  local requirement
+  requirement="$(codesign -dr - "$app" 2>&1 | sed -n 's/^# designated => //p')"
+  test -n "$requirement"
+  printf '%s\n' "$requirement" | csreq -r- -b "$output"
+  printf '%s\n' "$requirement"
+}
+
+grant_system_tcc() {
+  local service="$1"
+  local client="$2"
+  local csreq_path="$3"
+  sudo sqlite3 "$system_tcc_db" <<SQL
+INSERT OR REPLACE INTO access(
+  service,client,client_type,auth_value,auth_reason,auth_version,csreq,
+  indirect_object_identifier_type,indirect_object_identifier,flags
+) VALUES(
+  '$service','$client',0,2,4,1,readfile('$csreq_path'),0,'UNUSED',0
+);
+SQL
+}
+
+grant_user_tcc() {
+  local service="$1"
+  local client="$2"
+  local csreq_path="$3"
+  sqlite3 "$user_tcc_db" <<SQL
+INSERT OR REPLACE INTO access(
+  service,client,client_type,auth_value,auth_reason,auth_version,csreq,
+  indirect_object_identifier_type,indirect_object_identifier,flags
+) VALUES(
+  '$service','$client',0,2,4,1,readfile('$csreq_path'),0,'UNUSED',0
+);
+SQL
+}
+
+write_config() {
+  local output="$1"
+  local run_repetitions="$2"
+  local latency_threshold="$3"
+  jq -n \
+    --arg audio_directory "$audio_directory" \
+    --arg voiceink_app "$voiceink_app" \
+    --arg voiceink_build_directory "$(dirname "$voiceink_app")" \
+    --argjson repetitions "$run_repetitions" \
+    --argjson latency_threshold "$latency_threshold" \
+    '{
+      audioDirectory: $audio_directory,
+      audioDeviceName: "BlackHole 2ch",
+      voiceInkBundleIdentifier: "com.prakashjoshipax.VoiceInk",
+      voiceInkAppPath: $voiceink_app,
+      voiceInkBuildDirectory: $voiceink_build_directory,
+      audioLeadSeconds: 1.1,
+      releaseTailSeconds: 0.15,
+      explicitHoldSeconds: null,
+      preRollWarmupSeconds: 12,
+      targetSettleSeconds: 1,
+      targetTextTimeoutSeconds: 20,
+      latencyThresholdMilliseconds: $latency_threshold,
+      maximumWordErrorRate: 1,
+      repetitions: $repetitions,
+      targetAvailabilityPolicy: "runningOnly",
+      minimumTargetCount: 4,
+      targets: [
+        {id:"textedit",displayName:"TextEdit",bundleIdentifier:"com.apple.TextEdit",kind:"document"},
+        {id:"safari",displayName:"Safari",bundleIdentifier:"com.apple.Safari",kind:"browser"},
+        {id:"chrome",displayName:"Google Chrome",bundleIdentifier:"com.google.Chrome",kind:"browser"},
+        {id:"vscode",displayName:"Visual Studio Code",bundleIdentifier:"com.microsoft.VSCode",kind:"document"}
+      ],
+      expectedTranscripts: {},
+      voiceInkLifecycle: "reuse"
+    }' > "$output"
+}
+
+run_harness_phase() {
+  local phase="$1"
+  local make_target="$2"
+  local config="$3"
+  local report="$evidence/$phase.json"
+  local stdout="$evidence/$phase.stdout.log"
+  local stderr="$evidence/$phase.stderr.log"
+  local command_log="$evidence/$phase.command.log"
+
+  set +e
+  make -C "$repo_root" "$make_target" \
+    RUNTIME_E2E_CONFIG="$config" \
+    RUNTIME_E2E_REPORT="$report" \
+    RUNTIME_E2E_STDOUT="$stdout" \
+    RUNTIME_E2E_STDERR="$stderr" \
+    > "$command_log" 2>&1
+  local exit_code=$?
+  set -e
+  printf '%s\n' "$exit_code" > "$evidence/$phase.exit-code.txt"
+  return "$exit_code"
+}
+
+cleanup() {
+  local exit_code=$?
+  set +e
+  if [ "$exit_code" -ne 0 ]; then
+    scenario_status="$exit_code"
+  fi
+  if [ -x "$helper_app/Contents/MacOS/RuntimeE2EHarness" ]; then
+    make -C "$repo_root" runtime-e2e-restore \
+      RUNTIME_E2E_CONFIG="$config_full" \
+      > "$evidence/restore.log" 2>&1
+  fi
+  defaults read "$voiceink_bundle_id" > "$evidence/voiceink-defaults-final.txt" 2>&1
+  system_profiler SPAudioDataType > "$evidence/audio-final.txt" 2>&1
+  printf '%s\n' "$scenario_status" > "$evidence/macos-runtime-e2e-exit-code.txt"
+}
+trap cleanup EXIT
+
+record_command "$evidence/blackhole-install.log" \
+  env HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1 \
+  brew install --cask blackhole-2ch
+record_command "$evidence/vscode-install.log" \
+  env HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1 \
+  brew install --cask visual-studio-code
+if ! command -v fd >/dev/null 2>&1; then
+  record_command "$evidence/fd-install.log" \
+    env HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1 \
+    brew install fd
+fi
+sudo killall coreaudiod 2>/dev/null || true
+sleep 4
+system_profiler SPAudioDataType > "$evidence/audio-after-install.txt"
+grep -q "BlackHole 2ch" "$evidence/audio-after-install.txt"
+
+"$nsc_bin" artifact download "$audio_artifact" "$runtime_root/audio.zip" \
+  > "$evidence/audio-artifact-download.log" 2>&1
+ditto -x -k "$runtime_root/audio.zip" "$audio_root"
+first_fixture="$(fd -a -t f -e wav -e wave -e aif -e aiff -e caf -e m4a -e mp3 -e flac . "$audio_root" | sort | head -n 1)"
+test -n "$first_fixture"
+audio_directory="$(dirname "$first_fixture")"
+fixture_count="$(fd -a -t f -e wav -e wave -e aif -e aiff -e caf -e m4a -e mp3 -e flac . "$audio_directory" | wc -l | tr -d ' ')"
+test "$fixture_count" -ge 2
+while IFS= read -r fixture; do
+  shasum -a 256 "$fixture"
+  afinfo "$fixture"
+done < <(fd -a -t f -e wav -e wave -e aif -e aiff -e caf -e m4a -e mp3 -e flac . "$audio_directory" | sort) \
+  > "$evidence/audio-fixtures.txt"
+
+make -C "$repo_root" runtime-e2e-check > "$evidence/harness-check.log" 2>&1
+make -C "$repo_root" runtime-e2e-app > "$evidence/harness-build.log" 2>&1
+codesign -dv --verbose=4 "$helper_app" > "$evidence/helper-codesign.txt" 2>&1
+codesign -dv --verbose=4 "$voiceink_app" > "$evidence/voiceink-codesign.txt" 2>&1
+shasum -a 256 "$helper_app/Contents/MacOS/RuntimeE2EHarness" > "$evidence/helper-sha256.txt"
+shasum -a 256 "$voiceink_app/Contents/MacOS/roma just talk" > "$evidence/voiceink-sha256.txt"
+
+pkill -9 -x "roma just talk" 2>/dev/null || true
+pkill -9 -x RuntimeE2EHarness 2>/dev/null || true
+killall tccd 2>/dev/null || true
+sudo killall tccd 2>/dev/null || true
+sleep 2
+capture_tcc before-grant
+voiceink_requirement="$(make_csreq "$voiceink_app" "$runtime_root/voiceink.csreq")"
+helper_requirement="$(make_csreq "$helper_app" "$runtime_root/helper.csreq")"
+printf '%s\n' "$voiceink_requirement" > "$evidence/voiceink-designated-requirement.txt"
+printf '%s\n' "$helper_requirement" > "$evidence/helper-designated-requirement.txt"
+
+grant_system_tcc kTCCServiceAccessibility "$voiceink_bundle_id" "$runtime_root/voiceink.csreq"
+grant_system_tcc kTCCServiceListenEvent "$voiceink_bundle_id" "$runtime_root/voiceink.csreq"
+grant_system_tcc kTCCServicePostEvent "$voiceink_bundle_id" "$runtime_root/voiceink.csreq"
+grant_user_tcc kTCCServiceMicrophone "$voiceink_bundle_id" "$runtime_root/voiceink.csreq"
+grant_system_tcc kTCCServiceAccessibility "$helper_bundle_id" "$runtime_root/helper.csreq"
+grant_system_tcc kTCCServicePostEvent "$helper_bundle_id" "$runtime_root/helper.csreq"
+capture_tcc after-grant
+
+defaults write "$voiceink_bundle_id" hasCompletedOnboarding -bool true
+defaults delete "$voiceink_bundle_id" macOSOnboardingStage 2>/dev/null || true
+defaults delete "$voiceink_bundle_id" macOSOnboardingPermissionKind 2>/dev/null || true
+defaults write "$voiceink_bundle_id" CurrentTranscriptionModel -string "parakeet-tdt-0.6b-v2"
+defaults write "$voiceink_bundle_id" PrewarmModelOnWake -bool true
+defaults write "$voiceink_bundle_id" isSoundFeedbackEnabled -bool false
+defaults write "$voiceink_bundle_id" enableAnnouncements -bool false
+defaults write "$voiceink_bundle_id" restoreClipboardAfterPaste -bool false
+defaults write "$voiceink_bundle_id" appendTrailingSpace -bool false
+killall cfprefsd 2>/dev/null || true
+
+open -na "$voiceink_app"
+model_deadline=$((SECONDS + 1_200))
+while (( SECONDS < model_deadline )); do
+  if grep -Fq "Prewarm completed" "$evidence/macos-app.log"; then
+    break
+  fi
+  if grep -Fq "Prewarm failed" "$evidence/macos-app.log"; then
+    echo "VoiceInk model prewarm failed" >&2
+    exit 10
+  fi
+  sleep 5
+done
+grep -Fq "Prewarm completed" "$evidence/macos-app.log"
+model_directory="$HOME/Library/Application Support/FluidAudio/mModels/parakeet-tdt-0.6b-v2"
+test -d "$model_directory"
+du -sh "$model_directory" > "$evidence/model-cache-size.txt"
+fd -a -t f . "$model_directory" -x stat -f '%z %N' \
+  | sort > "$evidence/model-cache-files.txt"
+
+mkdir -p "$HOME/Library/Application Support/Code/User"
+cat > "$HOME/Library/Application Support/Code/User/settings.json" <<'JSON'
+{
+  "editor.accessibilitySupport": "on",
+  "security.workspace.trust.enabled": false,
+  "window.openFilesInNewWindow": "off",
+  "window.restoreWindows": "none",
+  "workbench.startupEditor": "none"
+}
+JSON
+open -a TextEdit
+open -a Safari
+open -na "/Applications/Google Chrome.app" --args \
+  --no-first-run --disable-default-apps --disable-sync
+open -na "/Applications/Visual Studio Code.app" --args \
+  --disable-workspace-trust --skip-release-notes --skip-welcome
+sleep 8
+
+write_config "$config_smoke" 1 20_000
+write_config "$config_full" "$repetitions" 440
+cp "$config_smoke" "$evidence/runtime-e2e-smoke-config.json"
+cp "$config_full" "$evidence/runtime-e2e-full-config.json"
+
+scenario_status=0
+run_harness_phase preflight runtime-e2e-preflight "$config_full"
+run_harness_phase target-probe runtime-e2e-target-probe "$config_full"
+run_harness_phase functional-smoke runtime-e2e-run "$config_smoke"
+run_harness_phase runtime-e2e-report runtime-e2e-run "$config_full" || scenario_status=$?
+
+if [ -f "$evidence/runtime-e2e-report.json" ]; then
+  jq '{summary, fatalError, restoredOriginalState}' \
+    "$evidence/runtime-e2e-report.json" > "$evidence/runtime-e2e-summary.json"
+  jq '[.cases[] | select(.assessment.passed | not) | {
+    id,
+    target: .target.id,
+    fixture: (.fixturePath | split("/") | last),
+    status: .assessment.status,
+    failureBoundary,
+    evidence,
+    error
+  }]' "$evidence/runtime-e2e-report.json" > "$evidence/runtime-e2e-failures.json"
+fi
+
+capture_tcc final
+defaults read "$voiceink_bundle_id" > "$evidence/voiceink-defaults-before-cleanup.txt" 2>&1
+pgrep -fl 'roma just talk|RuntimeE2EHarness|TextEdit|Safari|Google Chrome|Visual Studio Code' \
+  > "$evidence/process-inventory.txt" 2>&1 || true
+exit "$scenario_status"

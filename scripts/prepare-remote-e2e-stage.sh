@@ -6,6 +6,9 @@ hold_minutes="${2:?hold minutes required}"
 inputs_root="${3:?inputs root required}"
 stage_root="${4:?stage root required}"
 ios_scenario="${5:-none}"
+macos_scenario="${6:-none}"
+macos_audio_artifact="${7:-}"
+macos_repetitions="${8:-3}"
 
 case "$target" in
   both|macos|ios) ;;
@@ -28,6 +31,32 @@ case "$ios_scenario" in
     ;;
 esac
 
+case "$macos_scenario" in
+  none|runtime-e2e) ;;
+  *)
+    echo "Unsupported macOS scenario: $macos_scenario" >&2
+    exit 2
+    ;;
+esac
+
+if [ "$target" = "ios" ] && [ "$macos_scenario" != "none" ]; then
+  echo "A macOS scenario requires the macos or both target" >&2
+  exit 2
+fi
+
+if [ "$macos_scenario" = "runtime-e2e" ] && [ -z "$macos_audio_artifact" ]; then
+  echo "runtime-e2e requires a private Namespace audio artifact" >&2
+  exit 2
+fi
+
+case "$macos_repetitions" in
+  1|3|5) ;;
+  *)
+    echo "macOS repetitions must be 1, 3, or 5" >&2
+    exit 2
+    ;;
+esac
+
 if [ "$target" = "macos" ] && [ "$ios_scenario" != "none" ]; then
   echo "An iOS scenario requires the ios or both target" >&2
   exit 2
@@ -40,6 +69,8 @@ ready_file="$stage_root/READY"
 simulator_udid=""
 macos_artifact_run_id=""
 ios_artifact_run_id=""
+macos_scenario_status=0
+ios_scenario_status=0
 log_pids=()
 
 mkdir -p "$desktop" "$evidence"
@@ -91,7 +122,9 @@ prepare_macos() {
     > "$evidence/macos-app.log" 2>&1 &
   log_pids+=("$!")
 
-  open -na "$app"
+  if [ "$macos_scenario" = "none" ]; then
+    open -na "$app"
+  fi
   echo "$app" > "$stage_root/macos-app-path.txt"
 }
 
@@ -151,7 +184,12 @@ write_manifest() {
   "schemaVersion": 1,
   "status": "$status",
   "target": "$target",
+  "macOSScenario": "$macos_scenario",
+  "macOSScenarioExitCode": $macos_scenario_status,
+  "macOSAudioArtifact": "$macos_audio_artifact",
+  "macOSRepetitions": $macos_repetitions,
   "iOSScenario": "$ios_scenario",
+  "iOSScenarioExitCode": $ios_scenario_status,
   "githubRunId": "${GITHUB_RUN_ID:-local}",
   "githubSha": "${GITHUB_SHA:-local}",
   "githubRef": "${GITHUB_REF:-local}",
@@ -169,13 +207,29 @@ EOF
 
 write_manifest scenario-running
 
+if [ "$macos_scenario" = "runtime-e2e" ]; then
+  set +e
+  bash "$(dirname "$0")/run-macos-runtime-e2e.sh" \
+    "$HOME/Applications/roma just talk.app" \
+    "$macos_audio_artifact" \
+    "$evidence" \
+    "$macos_repetitions"
+  macos_scenario_status=$?
+  set -e
+fi
+
 if [ "$ios_scenario" = "local-whisper-import" ]; then
+  set +e
   bash "$(dirname "$0")/run-ios-remote-stt-e2e.sh" \
     "$simulator_udid" \
     "$evidence"
+  ios_scenario_status=$?
+  set -e
 fi
 
-if [ "$ios_scenario" = "none" ]; then
+if [ "$macos_scenario_status" -ne 0 ] || [ "$ios_scenario_status" -ne 0 ]; then
+  scenario_summary="A scripted scenario failed. Inspect the uploaded evidence before assigning ownership."
+elif [ "$macos_scenario" = "none" ] && [ "$ios_scenario" = "none" ]; then
   scenario_summary="No scripted scenario ran."
 else
   scenario_summary="The requested scripted scenario completed successfully."
@@ -185,7 +239,8 @@ cat > "$desktop/REMOTE E2E STAGE READY.txt" <<EOF
 roma just talk remote E2E stage
 
 Target: $target
-Scenario: $ios_scenario
+macOS scenario: $macos_scenario
+iOS scenario: $ios_scenario
 GitHub run: ${GITHUB_RUN_ID:-local}
 Stage root: $stage_root
 
@@ -203,7 +258,11 @@ EOF
 chmod +x "$desktop/Finish Remote E2E Stage.command"
 ln -sfn "$stage_root" "$desktop/Remote E2E Stage"
 
-write_manifest ready
+if [ "$macos_scenario_status" -eq 0 ] && [ "$ios_scenario_status" -eq 0 ]; then
+  write_manifest ready
+else
+  write_manifest scenario-failed
+fi
 
 touch "$ready_file"
 capture_desktop ready
@@ -214,6 +273,8 @@ fi
 echo "REMOTE E2E STAGE READY"
 echo "Open Namespace dashboard -> this GitHub job -> Remote Display."
 echo "Target: $target"
+echo "macOS scenario: $macos_scenario (exit $macos_scenario_status)"
+echo "iOS scenario: $ios_scenario (exit $ios_scenario_status)"
 echo "Hold: $hold_minutes minutes"
 echo "Finish early: double-click Finish Remote E2E Stage.command on the remote desktop."
 
@@ -236,4 +297,17 @@ if [ -f "$done_file" ]; then
   echo "Remote E2E stage finished early."
 else
   echo "Remote E2E stage hold expired."
+fi
+
+if [ "$macos_scenario_status" -eq 0 ] && [ "$ios_scenario_status" -eq 0 ]; then
+  write_manifest completed
+else
+  write_manifest scenario-failed
+fi
+
+if [ "$macos_scenario_status" -ne 0 ]; then
+  exit "$macos_scenario_status"
+fi
+if [ "$ios_scenario_status" -ne 0 ]; then
+  exit "$ios_scenario_status"
 fi

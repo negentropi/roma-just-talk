@@ -1,0 +1,581 @@
+import Foundation
+
+public struct RuntimeTimingPlan: Codable, Equatable, Sendable {
+    public let keyDownOffsetSeconds: TimeInterval
+    public let keyUpOffsetSeconds: TimeInterval
+
+    public var holdDurationSeconds: TimeInterval {
+        keyUpOffsetSeconds - keyDownOffsetSeconds
+    }
+
+    public init(
+        audioDurationSeconds: TimeInterval,
+        audioLeadSeconds: TimeInterval,
+        releaseTailSeconds: TimeInterval
+    ) throws {
+        guard audioDurationSeconds > 0,
+              audioLeadSeconds >= 0,
+              releaseTailSeconds >= 0,
+              audioDurationSeconds + releaseTailSeconds > audioLeadSeconds else {
+            throw RuntimeTimingPlanError.invalidTiming
+        }
+
+        keyDownOffsetSeconds = audioLeadSeconds
+        keyUpOffsetSeconds = audioDurationSeconds + releaseTailSeconds
+    }
+}
+
+public enum RuntimeTimingPlanError: Error, Equatable, Sendable {
+    case invalidTiming
+}
+
+public struct RuntimeTargetApp: Codable, Equatable, Hashable, Sendable {
+    public enum Kind: String, Codable, Sendable {
+        case document
+        case browser
+    }
+
+    public let id: String
+    public let displayName: String
+    public let bundleIdentifier: String
+    public let kind: Kind
+
+    public init(
+        id: String,
+        displayName: String,
+        bundleIdentifier: String,
+        kind: Kind
+    ) {
+        self.id = id
+        self.displayName = displayName
+        self.bundleIdentifier = bundleIdentifier
+        self.kind = kind
+    }
+
+    public static let defaultMatrix: [Self] = [
+        Self(id: "textedit", displayName: "TextEdit", bundleIdentifier: "com.apple.TextEdit", kind: .document),
+        Self(id: "safari", displayName: "Safari", bundleIdentifier: "com.apple.Safari", kind: .browser),
+        Self(id: "chrome", displayName: "Google Chrome", bundleIdentifier: "com.google.Chrome", kind: .browser),
+        Self(id: "arc", displayName: "Arc", bundleIdentifier: "company.thebrowser.Browser", kind: .browser),
+        Self(id: "zed", displayName: "Zed", bundleIdentifier: "dev.zed.Zed", kind: .document)
+    ]
+}
+
+public enum RuntimeTargetIsolationPlan {
+    public static func documentFilename(windowTitleToken: String) -> String {
+        "\(windowTitleToken).txt"
+    }
+
+    public static func openArguments(appPath: String, resourcePath: String) -> [String] {
+        ["-a", appPath, resourcePath]
+    }
+
+    public static func browserEditableLabel(windowTitleToken: String) -> String {
+        "Roma Runtime E2E target \(windowTitleToken)"
+    }
+}
+
+public enum RuntimeTargetAvailabilitySelector {
+    public static func select(
+        configuredTargets: [RuntimeTargetApp],
+        runningBundleIdentifiers: Set<String>,
+        policy: RuntimeHarnessConfiguration.TargetAvailabilityPolicy
+    ) -> [RuntimeTargetApp] {
+        switch policy {
+        case .runningOnly:
+            return configuredTargets.filter {
+                runningBundleIdentifiers.contains($0.bundleIdentifier)
+            }
+        case .launchIfNeeded:
+            return configuredTargets
+        }
+    }
+}
+
+public enum RuntimeTargetCatalog {
+    public static func restorationTargets(
+        configuredTargets: [RuntimeTargetApp]
+    ) -> [RuntimeTargetApp] {
+        var seenBundleIdentifiers: Set<String> = []
+        return (configuredTargets + RuntimeTargetApp.defaultMatrix).filter {
+            seenBundleIdentifiers.insert($0.bundleIdentifier).inserted
+        }
+    }
+}
+
+public struct RuntimeRunCase: Codable, Equatable, Sendable {
+    public let fixtureURL: URL
+    public let expectedTranscript: String?
+    public let target: RuntimeTargetApp
+    public let repetition: Int
+
+    public init(
+        fixtureURL: URL,
+        expectedTranscript: String?,
+        target: RuntimeTargetApp,
+        repetition: Int
+    ) {
+        self.fixtureURL = fixtureURL
+        self.expectedTranscript = expectedTranscript
+        self.target = target
+        self.repetition = repetition
+    }
+}
+
+public struct RuntimeRunPlan: Codable, Equatable, Sendable {
+    public let cases: [RuntimeRunCase]
+
+    public init(cases: [RuntimeRunCase]) {
+        self.cases = cases
+    }
+
+    public static func make(
+        fixtureURLs: [URL],
+        expectedTranscripts: [String: String],
+        targets: [RuntimeTargetApp],
+        repetitions: Int
+    ) throws -> Self {
+        guard repetitions > 0, !targets.isEmpty else {
+            throw RuntimeRunPlanError.invalidMatrix
+        }
+
+        let supportedExtensions = Set(["wav", "wave", "aif", "aiff", "caf", "m4a", "mp3", "flac"])
+        let fixtures = fixtureURLs
+            .filter { supportedExtensions.contains($0.pathExtension.lowercased()) }
+            .sorted { $0.lastPathComponent.localizedStandardCompare($1.lastPathComponent) == .orderedAscending }
+        guard !fixtures.isEmpty else {
+            throw RuntimeRunPlanError.noAudioFixtures
+        }
+
+        var cases: [RuntimeRunCase] = []
+        for fixtureURL in fixtures {
+            for target in targets {
+                for repetition in 1...repetitions {
+                    cases.append(
+                        RuntimeRunCase(
+                            fixtureURL: fixtureURL,
+                            expectedTranscript: expectedTranscripts[fixtureURL.lastPathComponent],
+                            target: target,
+                            repetition: repetition
+                        )
+                    )
+                }
+            }
+        }
+        return Self(cases: cases)
+    }
+}
+
+public enum RuntimeRunPlanError: Error, Equatable, Sendable {
+    case invalidMatrix
+    case noAudioFixtures
+}
+
+public struct RuntimeHarnessConfiguration: Codable, Equatable, Sendable {
+    public enum VoiceInkLifecycle: String, Codable, Sendable {
+        case reuse
+        case relaunchPerFixture
+        case relaunchPerCase
+    }
+
+    public enum TargetAvailabilityPolicy: String, Codable, Sendable {
+        case runningOnly
+        case launchIfNeeded
+    }
+
+    public var audioDirectory: String
+    public var audioDeviceName: String
+    public var voiceInkBundleIdentifier: String
+    public var voiceInkAppPath: String?
+    public var voiceInkBuildDirectory: String
+    public var audioLeadSeconds: TimeInterval
+    public var releaseTailSeconds: TimeInterval
+    public var explicitHoldSeconds: TimeInterval?
+    public var preRollWarmupSeconds: TimeInterval
+    public var targetSettleSeconds: TimeInterval
+    public var targetTextTimeoutSeconds: TimeInterval
+    public var latencyThresholdMilliseconds: Double
+    public var maximumWordErrorRate: Double
+    public var repetitions: Int
+    public var targets: [RuntimeTargetApp]
+    public var targetAvailabilityPolicy: TargetAvailabilityPolicy
+    public var minimumTargetCount: Int
+    public var expectedTranscripts: [String: String]
+    public var voiceInkLifecycle: VoiceInkLifecycle
+
+    public init(
+        audioDirectory: String,
+        audioDeviceName: String,
+        voiceInkBundleIdentifier: String,
+        voiceInkAppPath: String?,
+        voiceInkBuildDirectory: String,
+        audioLeadSeconds: TimeInterval,
+        releaseTailSeconds: TimeInterval,
+        explicitHoldSeconds: TimeInterval?,
+        preRollWarmupSeconds: TimeInterval,
+        targetSettleSeconds: TimeInterval,
+        targetTextTimeoutSeconds: TimeInterval,
+        latencyThresholdMilliseconds: Double,
+        maximumWordErrorRate: Double,
+        repetitions: Int,
+        targets: [RuntimeTargetApp],
+        targetAvailabilityPolicy: TargetAvailabilityPolicy,
+        minimumTargetCount: Int,
+        expectedTranscripts: [String: String],
+        voiceInkLifecycle: VoiceInkLifecycle
+    ) {
+        self.audioDirectory = audioDirectory
+        self.audioDeviceName = audioDeviceName
+        self.voiceInkBundleIdentifier = voiceInkBundleIdentifier
+        self.voiceInkAppPath = voiceInkAppPath
+        self.voiceInkBuildDirectory = voiceInkBuildDirectory
+        self.audioLeadSeconds = audioLeadSeconds
+        self.releaseTailSeconds = releaseTailSeconds
+        self.explicitHoldSeconds = explicitHoldSeconds
+        self.preRollWarmupSeconds = preRollWarmupSeconds
+        self.targetSettleSeconds = targetSettleSeconds
+        self.targetTextTimeoutSeconds = targetTextTimeoutSeconds
+        self.latencyThresholdMilliseconds = latencyThresholdMilliseconds
+        self.maximumWordErrorRate = maximumWordErrorRate
+        self.repetitions = repetitions
+        self.targets = targets
+        self.targetAvailabilityPolicy = targetAvailabilityPolicy
+        self.minimumTargetCount = minimumTargetCount
+        self.expectedTranscripts = expectedTranscripts
+        self.voiceInkLifecycle = voiceInkLifecycle
+    }
+
+    public static var `default`: Self {
+        Self(
+            audioDirectory: NSString(string: "~/Downloads/roma jt builds/audio").expandingTildeInPath,
+            audioDeviceName: "BlackHole 2ch",
+            voiceInkBundleIdentifier: "com.prakashjoshipax.VoiceInk",
+            voiceInkAppPath: nil,
+            voiceInkBuildDirectory: NSString(string: "~/Downloads/roma jt builds").expandingTildeInPath,
+            audioLeadSeconds: 1.1,
+            releaseTailSeconds: 0.15,
+            explicitHoldSeconds: nil,
+            preRollWarmupSeconds: 2,
+            targetSettleSeconds: 1,
+            targetTextTimeoutSeconds: 15,
+            latencyThresholdMilliseconds: 440,
+            maximumWordErrorRate: 0.2,
+            repetitions: 3,
+            targets: RuntimeTargetApp.defaultMatrix,
+            targetAvailabilityPolicy: .runningOnly,
+            minimumTargetCount: 4,
+            expectedTranscripts: [:],
+            voiceInkLifecycle: .reuse
+        )
+    }
+}
+
+public struct RuntimeVoiceInkCandidate: Codable, Equatable, Sendable {
+    public let path: String
+    public let modifiedAt: Date
+
+    public init(path: String, modifiedAt: Date) {
+        self.path = path
+        self.modifiedAt = modifiedAt
+    }
+}
+
+public struct RuntimeVoiceInkSelection: Codable, Equatable, Sendable {
+    public enum Source: String, Codable, Sendable {
+        case explicit
+        case runningBuild
+        case buildDirectory
+        case running
+        case workspaceInstalled
+    }
+
+    public let path: String
+    public let source: Source
+
+    public init(path: String, source: Source) {
+        self.path = path
+        self.source = source
+    }
+}
+
+public enum RuntimeVoiceInkCandidateSelector {
+    public static func select(
+        explicitPath: String?,
+        runningPaths: [String],
+        buildDirectoryPath: String,
+        buildCandidates: [RuntimeVoiceInkCandidate],
+        workspaceInstalledPath: String?
+    ) -> RuntimeVoiceInkSelection? {
+        if let explicitPath, !explicitPath.isEmpty {
+            return RuntimeVoiceInkSelection(path: explicitPath, source: .explicit)
+        }
+
+        let buildDirectoryPrefix = URL(fileURLWithPath: buildDirectoryPath, isDirectory: true)
+            .standardizedFileURL.path + "/"
+        if let runningBuild = runningPaths.first(where: {
+            URL(fileURLWithPath: $0).standardizedFileURL.path.hasPrefix(buildDirectoryPrefix)
+        }) {
+            return RuntimeVoiceInkSelection(path: runningBuild, source: .runningBuild)
+        }
+
+        if let newestBuild = buildCandidates.max(by: { $0.modifiedAt < $1.modifiedAt }) {
+            return RuntimeVoiceInkSelection(path: newestBuild.path, source: .buildDirectory)
+        }
+        if let runningPath = runningPaths.first {
+            return RuntimeVoiceInkSelection(path: runningPath, source: .running)
+        }
+        if let workspaceInstalledPath {
+            return RuntimeVoiceInkSelection(path: workspaceInstalledPath, source: .workspaceInstalled)
+        }
+        return nil
+    }
+}
+
+public struct RuntimeCaseObservation: Codable, Equatable, Sendable {
+    public let visibleText: String?
+    public let keyUpToVisibleMilliseconds: Double?
+    public let clipboardChanged: Bool
+    public let triggerObserved: Bool
+
+    public init(
+        visibleText: String?,
+        keyUpToVisibleMilliseconds: Double?,
+        clipboardChanged: Bool,
+        triggerObserved: Bool
+    ) {
+        self.visibleText = visibleText
+        self.keyUpToVisibleMilliseconds = keyUpToVisibleMilliseconds
+        self.clipboardChanged = clipboardChanged
+        self.triggerObserved = triggerObserved
+    }
+}
+
+public struct RuntimeCaseAssessment: Codable, Equatable, Sendable {
+    public enum Status: String, Codable, Sendable {
+        case passed
+        case preflightFailed
+        case targetSetupFailed
+        case audioFailed
+        case shortcutFailed
+        case triggerRejected
+        case traceMissing
+        case noPaste
+        case clipboardOnly
+        case slow
+        case contentMismatch
+        case targetCleanupFailed
+    }
+
+    public let status: Status
+    public let passed: Bool
+    public let wordErrorRate: Double?
+
+    public init(status: Status, passed: Bool, wordErrorRate: Double? = nil) {
+        self.status = status
+        self.passed = passed
+        self.wordErrorRate = wordErrorRate
+    }
+
+    public static func assess(
+        observation: RuntimeCaseObservation,
+        expectedTranscript: String?,
+        latencyThresholdMilliseconds: Double,
+        maximumWordErrorRate: Double = 0.2
+    ) -> Self {
+        guard observation.triggerObserved else {
+            return Self(status: .triggerRejected, passed: false)
+        }
+        guard let visibleText = observation.visibleText,
+              !visibleText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+              let latency = observation.keyUpToVisibleMilliseconds else {
+            return Self(
+                status: observation.clipboardChanged ? .clipboardOnly : .noPaste,
+                passed: false
+            )
+        }
+        guard latency <= latencyThresholdMilliseconds else {
+            return Self(status: .slow, passed: false)
+        }
+
+        if let expectedTranscript,
+           !expectedTranscript.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            let wordErrorRate = RuntimeTranscriptQuality.wordErrorRate(
+                expected: expectedTranscript,
+                actual: visibleText
+            )
+            guard wordErrorRate <= maximumWordErrorRate else {
+                return Self(status: .contentMismatch, passed: false, wordErrorRate: wordErrorRate)
+            }
+            return Self(status: .passed, passed: true, wordErrorRate: wordErrorRate)
+        }
+        return Self(status: .passed, passed: true)
+    }
+}
+
+public enum RuntimeStatistics {
+    public static func percentile(_ percentile: Double, values: [Double]) -> Double? {
+        guard !values.isEmpty else { return nil }
+        let sorted = values.sorted()
+        let index = Int(ceil((percentile / 100) * Double(sorted.count))) - 1
+        return sorted[max(0, min(index, sorted.count - 1))]
+    }
+}
+
+public enum RuntimeTranscriptQuality {
+    public static func normalizedWords(_ text: String) -> [String] {
+        let folded = text.folding(
+            options: [.caseInsensitive, .diacriticInsensitive, .widthInsensitive],
+            locale: Locale(identifier: "en_US_POSIX")
+        )
+        let normalizedScalars = folded.unicodeScalars.map { scalar -> Character in
+            CharacterSet.alphanumerics.contains(scalar) ? Character(String(scalar)) : " "
+        }
+        return String(normalizedScalars)
+            .split(whereSeparator: { $0.isWhitespace })
+            .map(String.init)
+    }
+
+    public static func wordErrorRate(expected: String, actual: String) -> Double {
+        let expectedWords = normalizedWords(expected)
+        let actualWords = normalizedWords(actual)
+        guard !expectedWords.isEmpty else {
+            return actualWords.isEmpty ? 0 : 1
+        }
+
+        var previous = Array(0...actualWords.count)
+        for (expectedIndex, expectedWord) in expectedWords.enumerated() {
+            var current = [expectedIndex + 1] + Array(repeating: 0, count: actualWords.count)
+            for (actualIndex, actualWord) in actualWords.enumerated() {
+                let substitution = previous[actualIndex] + (expectedWord == actualWord ? 0 : 1)
+                let insertion = current[actualIndex] + 1
+                let deletion = previous[actualIndex + 1] + 1
+                current[actualIndex + 1] = min(substitution, insertion, deletion)
+            }
+            previous = current
+        }
+        return Double(previous[actualWords.count]) / Double(expectedWords.count)
+    }
+}
+
+public struct RuntimeLatencyTraceEvent: Codable, Equatable, Sendable {
+    public let traceID: String
+    public let sequence: Int
+    public let totalMilliseconds: Double
+    public let deltaMilliseconds: Double
+    public let name: String
+    public let details: String
+
+    public init(
+        traceID: String,
+        sequence: Int,
+        totalMilliseconds: Double,
+        deltaMilliseconds: Double,
+        name: String,
+        details: String
+    ) {
+        self.traceID = traceID
+        self.sequence = sequence
+        self.totalMilliseconds = totalMilliseconds
+        self.deltaMilliseconds = deltaMilliseconds
+        self.name = name
+        self.details = details
+    }
+}
+
+public struct RuntimeLatencyTrace: Codable, Equatable, Sendable {
+    public let traceID: String
+    public let events: [RuntimeLatencyTraceEvent]
+
+    public var triggerObserved: Bool {
+        events.contains { $0.name.hasPrefix("shortcut.key_down") }
+    }
+
+    public var pasteEventPosted: Bool {
+        events.contains { $0.name == "paste_event_posted" || $0.name == "paste.event_posted" }
+    }
+
+    public var transcriptionCompleted: Bool {
+        events.contains {
+            $0.name == "pipeline.transcribe.end" && $0.details.contains("result=success")
+        }
+    }
+
+    public var clipboardWriteSucceeded: Bool {
+        events.contains {
+            $0.name == "paste_session.write_clipboard.end" && $0.details.contains("result=success")
+        }
+    }
+
+    public var keyUpToPasteEventMilliseconds: Double? {
+        guard let keyUp = events.last(where: { $0.name == "shortcut.key_up_handler" }),
+              let paste = events.first(where: {
+                  $0.name == "paste_event_posted" || $0.name == "paste.event_posted"
+              }),
+              paste.totalMilliseconds >= keyUp.totalMilliseconds else {
+            return nil
+        }
+        return paste.totalMilliseconds - keyUp.totalMilliseconds
+    }
+
+    public init(traceID: String, events: [RuntimeLatencyTraceEvent]) {
+        self.traceID = traceID
+        self.events = events.sorted { $0.sequence < $1.sequence }
+    }
+
+    public static func parse(messages: [String]) -> Self? {
+        parseAll(messages: messages).last
+    }
+
+    public static func parseAll(messages: [String]) -> [Self] {
+        let pattern = #"\[LATENCY\] trace=([^ ]+) seq=([0-9]+) t=([0-9.]+)ms delta=([0-9.]+)ms event=([^ ]+)(?: (.*))?"#
+        guard let expression = try? NSRegularExpression(pattern: pattern) else {
+            return []
+        }
+
+        var grouped: [String: [RuntimeLatencyTraceEvent]] = [:]
+        var traceOrder: [String] = []
+        for message in messages {
+            let range = NSRange(message.startIndex..<message.endIndex, in: message)
+            guard let match = expression.firstMatch(in: message, range: range),
+                  let traceID = capture(1, match: match, source: message),
+                  let sequenceText = capture(2, match: match, source: message),
+                  let totalText = capture(3, match: match, source: message),
+                  let deltaText = capture(4, match: match, source: message),
+                  let name = capture(5, match: match, source: message),
+                  let sequence = Int(sequenceText),
+                  let total = Double(totalText),
+                  let delta = Double(deltaText) else {
+                continue
+            }
+            if grouped[traceID] == nil {
+                traceOrder.append(traceID)
+            }
+            grouped[traceID, default: []].append(
+                RuntimeLatencyTraceEvent(
+                    traceID: traceID,
+                    sequence: sequence,
+                    totalMilliseconds: total,
+                    deltaMilliseconds: delta,
+                    name: name,
+                    details: capture(6, match: match, source: message) ?? ""
+                )
+            )
+        }
+        return traceOrder.compactMap { traceID in
+            grouped[traceID].map { Self(traceID: traceID, events: $0) }
+        }
+    }
+
+    private static func capture(
+        _ index: Int,
+        match: NSTextCheckingResult,
+        source: String
+    ) -> String? {
+        let range = match.range(at: index)
+        guard range.location != NSNotFound,
+              let swiftRange = Range(range, in: source) else {
+            return nil
+        }
+        return String(source[swiftRange])
+    }
+}

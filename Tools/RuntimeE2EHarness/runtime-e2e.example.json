@@ -1,0 +1,52 @@
+{
+  "audioDirectory": "~/Downloads/roma jt builds/audio",
+  "audioDeviceName": "BlackHole 2ch",
+  "voiceInkBundleIdentifier": "com.prakashjoshipax.VoiceInk",
+  "voiceInkAppPath": null,
+  "voiceInkBuildDirectory": "~/Downloads/roma jt builds",
+  "audioLeadSeconds": 1.1,
+  "releaseTailSeconds": 0.15,
+  "explicitHoldSeconds": null,
+  "preRollWarmupSeconds": 2,
+  "targetSettleSeconds": 1,
+  "targetTextTimeoutSeconds": 15,
+  "latencyThresholdMilliseconds": 440,
+  "maximumWordErrorRate": 0.2,
+  "repetitions": 3,
+  "targetAvailabilityPolicy": "runningOnly",
+  "minimumTargetCount": 4,
+  "targets": [
+    {
+      "id": "textedit",
+      "displayName": "TextEdit",
+      "bundleIdentifier": "com.apple.TextEdit",
+      "kind": "document"
+    },
+    {
+      "id": "safari",
+      "displayName": "Safari",
+      "bundleIdentifier": "com.apple.Safari",
+      "kind": "browser"
+    },
+    {
+      "id": "chrome",
+      "displayName": "Google Chrome",
+      "bundleIdentifier": "com.google.Chrome",
+      "kind": "browser"
+    },
+    {
+      "id": "arc",
+      "displayName": "Arc",
+      "bundleIdentifier": "company.thebrowser.Browser",
+      "kind": "browser"
+    },
+    {
+      "id": "zed",
+      "displayName": "Zed",
+      "bundleIdentifier": "dev.zed.Zed",
+      "kind": "document"
+    }
+  ],
+  "expectedTranscripts": {},
+  "voiceInkLifecycle": "reuse"
+}

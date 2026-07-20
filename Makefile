@@ -18,8 +18,21 @@ LATENCY_EXPECTED ?=
 LATENCY_SAMPLES ?= 5
 LATENCY_TRIGGER ?= left-shift
 LATENCY_THRESHOLD_MS ?= 440
+RUNTIME_E2E_PACKAGE := Tools/RuntimeE2EHarness
+RUNTIME_E2E_SCRATCH := $(LOCAL_DERIVED_DATA)/RuntimeE2EHarness
+RUNTIME_E2E_BINARY := $(RUNTIME_E2E_SCRATCH)/release/RuntimeE2EHarness
+RUNTIME_E2E_INFO_PLIST := $(RUNTIME_E2E_PACKAGE)/Info.plist
+RUNTIME_E2E_APP := $(LOCAL_DERIVED_DATA)/Tools/RuntimeE2EHarness.app
+RUNTIME_E2E_APP_EXECUTABLE := $(RUNTIME_E2E_APP)/Contents/MacOS/RuntimeE2EHarness
+RUNTIME_E2E_BUNDLE_ID ?= com.happyf.roma-just-talk.RuntimeE2EHarness
+RUNTIME_E2E_CONFIG ?=
+RUNTIME_E2E_REPORT ?= $(LOCAL_DERIVED_DATA)/Tools/runtime-e2e-report.json
+RUNTIME_E2E_STDOUT ?= $(LOCAL_DERIVED_DATA)/Tools/runtime-e2e.out.log
+RUNTIME_E2E_STDERR ?= $(LOCAL_DERIVED_DATA)/Tools/runtime-e2e.err.log
+RUNTIME_E2E_CONFIG_ABS := $(abspath $(RUNTIME_E2E_CONFIG))
+RUNTIME_E2E_REPORT_ABS := $(abspath $(RUNTIME_E2E_REPORT))
 
-.PHONY: all clean whisper setup build local check healthcheck help dev run latency-harness-build latency-harness-app latency-harness-check latency-harness-run latency-harness-app-run
+.PHONY: all clean whisper setup build local check healthcheck help dev run latency-harness-build latency-harness-app latency-harness-check latency-harness-run latency-harness-app-run runtime-e2e-build runtime-e2e-app runtime-e2e-check runtime-e2e-preflight runtime-e2e-target-probe runtime-e2e-run runtime-e2e-restore
 
 # Default target
 all: check build
@@ -101,6 +114,115 @@ latency-harness-app-run:
 	if [ "$$PASSED" != "true" ]; then \
 		echo "Latency harness failed. Report: $(LATENCY_HARNESS_REPORT)"; \
 		exit 1; \
+	fi
+
+runtime-e2e-build:
+	swift build \
+		-c release \
+		--package-path "$(RUNTIME_E2E_PACKAGE)" \
+		--scratch-path "$(RUNTIME_E2E_SCRATCH)" \
+		--product RuntimeE2EHarness
+
+runtime-e2e-app: runtime-e2e-build
+	@rm -rf "$(RUNTIME_E2E_APP)"
+	@mkdir -p "$(RUNTIME_E2E_APP)/Contents/MacOS"
+	@cp "$(RUNTIME_E2E_BINARY)" "$(RUNTIME_E2E_APP_EXECUTABLE)"
+	@cp "$(RUNTIME_E2E_INFO_PLIST)" "$(RUNTIME_E2E_APP)/Contents/Info.plist"
+	@plutil -replace CFBundleIdentifier -string "$(RUNTIME_E2E_BUNDLE_ID)" "$(RUNTIME_E2E_APP)/Contents/Info.plist"
+	@codesign --force --sign - "$(RUNTIME_E2E_APP)" >/dev/null
+	@echo "Runtime E2E app: $(RUNTIME_E2E_APP)"
+	@codesign -dvvv "$(RUNTIME_E2E_APP)" 2>&1 | sed -n '1,8p'
+
+runtime-e2e-check:
+	swift run \
+		--package-path "$(RUNTIME_E2E_PACKAGE)" \
+		--scratch-path "$(RUNTIME_E2E_SCRATCH)" \
+		RuntimeE2ECoreChecks
+	swift build \
+		--package-path "$(RUNTIME_E2E_PACKAGE)" \
+		--scratch-path "$(RUNTIME_E2E_SCRATCH)" \
+		--product RuntimeE2EHarness
+	bash scripts/check-runtime-e2e-makefile.sh
+	bash -n scripts/run-macos-runtime-e2e.sh
+
+runtime-e2e-preflight:
+	@if [ ! -x "$(RUNTIME_E2E_APP_EXECUTABLE)" ]; then \
+		echo "Build the helper once with: make runtime-e2e-app"; \
+		exit 2; \
+	fi
+	@rm -f "$(RUNTIME_E2E_REPORT_ABS)" "$(RUNTIME_E2E_STDOUT)" "$(RUNTIME_E2E_STDERR)"
+	@if [ -n "$(RUNTIME_E2E_CONFIG)" ]; then \
+		open -W -n -o "$(RUNTIME_E2E_STDOUT)" --stderr "$(RUNTIME_E2E_STDERR)" "$(RUNTIME_E2E_APP)" --args --preflight --config "$(RUNTIME_E2E_CONFIG_ABS)" --json-output "$(RUNTIME_E2E_REPORT_ABS)"; \
+	else \
+		open -W -n -o "$(RUNTIME_E2E_STDOUT)" --stderr "$(RUNTIME_E2E_STDERR)" "$(RUNTIME_E2E_APP)" --args --preflight --json-output "$(RUNTIME_E2E_REPORT_ABS)"; \
+	fi
+	@if [ -s "$(RUNTIME_E2E_STDOUT)" ]; then cat "$(RUNTIME_E2E_STDOUT)"; fi
+	@if [ -s "$(RUNTIME_E2E_STDERR)" ]; then cat "$(RUNTIME_E2E_STDERR)" >&2; fi
+	@if [ ! -f "$(RUNTIME_E2E_REPORT_ABS)" ]; then \
+		echo "No runtime E2E preflight report written. Check $(RUNTIME_E2E_STDOUT) and $(RUNTIME_E2E_STDERR)."; \
+		exit 1; \
+	fi
+	@PASSED=$$(plutil -extract passed raw -o - "$(RUNTIME_E2E_REPORT_ABS)" 2>/dev/null || echo false); \
+	if [ "$$PASSED" != "true" ]; then \
+		echo "Runtime E2E preflight failed. Report: $(RUNTIME_E2E_REPORT_ABS)"; \
+		exit 1; \
+	fi
+
+runtime-e2e-target-probe:
+	@if [ ! -x "$(RUNTIME_E2E_APP_EXECUTABLE)" ]; then \
+		echo "Build the helper once with: make runtime-e2e-app"; \
+		exit 2; \
+	fi
+	@rm -f "$(RUNTIME_E2E_REPORT_ABS)" "$(RUNTIME_E2E_STDOUT)" "$(RUNTIME_E2E_STDERR)"
+	@if [ -n "$(RUNTIME_E2E_CONFIG)" ]; then \
+		open -W -n -o "$(RUNTIME_E2E_STDOUT)" --stderr "$(RUNTIME_E2E_STDERR)" "$(RUNTIME_E2E_APP)" --args --target-probe --config "$(RUNTIME_E2E_CONFIG_ABS)" --json-output "$(RUNTIME_E2E_REPORT_ABS)"; \
+	else \
+		open -W -n -o "$(RUNTIME_E2E_STDOUT)" --stderr "$(RUNTIME_E2E_STDERR)" "$(RUNTIME_E2E_APP)" --args --target-probe --json-output "$(RUNTIME_E2E_REPORT_ABS)"; \
+	fi
+	@if [ -s "$(RUNTIME_E2E_STDOUT)" ]; then cat "$(RUNTIME_E2E_STDOUT)"; fi
+	@if [ -s "$(RUNTIME_E2E_STDERR)" ]; then cat "$(RUNTIME_E2E_STDERR)" >&2; fi
+	@if [ ! -f "$(RUNTIME_E2E_REPORT_ABS)" ]; then \
+		echo "No runtime target-probe report written. Check $(RUNTIME_E2E_STDOUT) and $(RUNTIME_E2E_STDERR)."; \
+		exit 1; \
+	fi
+	@PASSED=$$(plutil -extract passed raw -o - "$(RUNTIME_E2E_REPORT_ABS)" 2>/dev/null || echo false); \
+	if [ "$$PASSED" != "true" ]; then \
+		echo "Runtime target probe failed. Report: $(RUNTIME_E2E_REPORT_ABS)"; \
+		exit 1; \
+	fi
+
+runtime-e2e-run:
+	@if [ ! -x "$(RUNTIME_E2E_APP_EXECUTABLE)" ]; then \
+		echo "Build the helper once with: make runtime-e2e-app"; \
+		exit 2; \
+	fi
+	@rm -f "$(RUNTIME_E2E_REPORT_ABS)" "$(RUNTIME_E2E_STDOUT)" "$(RUNTIME_E2E_STDERR)"
+	@if [ -n "$(RUNTIME_E2E_CONFIG)" ]; then \
+		open -W -n -o "$(RUNTIME_E2E_STDOUT)" --stderr "$(RUNTIME_E2E_STDERR)" "$(RUNTIME_E2E_APP)" --args --config "$(RUNTIME_E2E_CONFIG_ABS)" --json-output "$(RUNTIME_E2E_REPORT_ABS)"; \
+	else \
+		open -W -n -o "$(RUNTIME_E2E_STDOUT)" --stderr "$(RUNTIME_E2E_STDERR)" "$(RUNTIME_E2E_APP)" --args --json-output "$(RUNTIME_E2E_REPORT_ABS)"; \
+	fi
+	@if [ -s "$(RUNTIME_E2E_STDOUT)" ]; then cat "$(RUNTIME_E2E_STDOUT)"; fi
+	@if [ -s "$(RUNTIME_E2E_STDERR)" ]; then cat "$(RUNTIME_E2E_STDERR)" >&2; fi
+	@if [ ! -f "$(RUNTIME_E2E_REPORT_ABS)" ]; then \
+		echo "No runtime E2E report written. Check $(RUNTIME_E2E_STDOUT) and $(RUNTIME_E2E_STDERR)."; \
+		exit 1; \
+	fi
+	@PASSED=$$(plutil -extract summary.passed raw -o - "$(RUNTIME_E2E_REPORT_ABS)" 2>/dev/null || echo false); \
+	if [ "$$PASSED" != "true" ]; then \
+		echo "Runtime E2E failed. Report: $(RUNTIME_E2E_REPORT_ABS)"; \
+		exit 1; \
+	fi
+
+runtime-e2e-restore:
+	@if [ ! -x "$(RUNTIME_E2E_APP_EXECUTABLE)" ]; then \
+		echo "Runtime E2E helper is not built."; \
+		exit 2; \
+	fi
+	@if [ -n "$(RUNTIME_E2E_CONFIG)" ]; then \
+		open -W -n "$(RUNTIME_E2E_APP)" --args --restore --config "$(RUNTIME_E2E_CONFIG_ABS)"; \
+	else \
+		open -W -n "$(RUNTIME_E2E_APP)" --args --restore; \
 	fi
 
 # Build process
@@ -198,5 +320,12 @@ help:
 	@echo "  latency-harness-check  Verify helper-app run target preserves TCC identity"
 	@echo "  latency-harness-run    Run CLI latency samples; set LATENCY_EXPECTED"
 	@echo "  latency-harness-app-run Run helper-app latency samples; set LATENCY_EXPECTED"
+	@echo "  runtime-e2e-build      Compile autonomous runtime E2E harness"
+	@echo "  runtime-e2e-app        Build stable helper app for one-time TCC grants"
+	@echo "  runtime-e2e-check      Run core checks and verify stable helper invocation"
+	@echo "  runtime-e2e-preflight  Check fixtures, BlackHole, exact build, apps, and TCC"
+	@echo "  runtime-e2e-target-probe Validate four already-running app targets without Roma/audio"
+	@echo "  runtime-e2e-run        Run autonomous fixture x app x repetition matrix"
+	@echo "  runtime-e2e-restore    Restore state after an interrupted harness run"
 	@echo "  clean              Remove build artifacts"
 	@echo "  help               Show this help message"

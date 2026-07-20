@@ -36,6 +36,9 @@ jobs:
       - name: Verify latency helper run target
         run: make latency-harness-check
 
+      - name: Compile and verify autonomous runtime E2E harness
+        run: make runtime-e2e-check
+
       - name: Build release app
         run: make local CONFIGURATION=Release
 

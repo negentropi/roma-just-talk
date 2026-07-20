@@ -238,7 +238,7 @@ defaults write "$voiceink_bundle_id" appendTrailingSpace -bool false
 killall cfprefsd 2>/dev/null || true
 
 open -na "$voiceink_app"
-model_deadline=$((SECONDS + 1_200))
+model_deadline=$((SECONDS + 1200))
 while (( SECONDS < model_deadline )); do
   if grep -Fq "Prewarm completed" "$evidence/macos-app.log"; then
     break
@@ -274,7 +274,7 @@ open -na "/Applications/Visual Studio Code.app" --args \
   --disable-workspace-trust --skip-release-notes --skip-welcome
 sleep 8
 
-write_config "$config_smoke" 1 20_000
+write_config "$config_smoke" 1 20000
 write_config "$config_full" "$repetitions" 440
 cp "$config_smoke" "$evidence/runtime-e2e-smoke-config.json"
 cp "$config_full" "$evidence/runtime-e2e-full-config.json"

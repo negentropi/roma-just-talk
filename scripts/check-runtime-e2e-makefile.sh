@@ -48,3 +48,8 @@ if ! grep -Fq -- '--target-probe' <<<"$target_probe_dry_run"; then
   echo "runtime-e2e-target-probe must invoke the isolated target probe mode." >&2
   exit 1
 fi
+
+if grep -Eq '[[:digit:]]_[[:digit:]]' "$repo_root/scripts/run-macos-runtime-e2e.sh"; then
+  echo "Namespace runtime shell arithmetic must remain compatible with macOS Bash 3.2." >&2
+  exit 1
+fi

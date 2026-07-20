@@ -156,7 +156,7 @@ final class RuntimePreparedTarget {
         RuntimeAX.postKey(keyCode: 13, flags: .maskCommand)
         let surfaceClosed = RuntimeAX.waitForSurfaceToClose(
             token: info.windowTitleToken,
-            in: appElement,
+            in: windowElement,
             timeoutSeconds: 3
         )
         if !surfaceClosed {
@@ -253,7 +253,11 @@ enum RuntimeTargetController {
             directoryURL: temporaryDirectoryURL
         )
         do {
-            try launch(appURL: appURL, resourceURL: resource.url)
+            try launch(
+                appName: appURL.lastPathComponent,
+                bundleIdentifier: target.bundleIdentifier,
+                resourceURL: resource.url
+            )
             let surface = try waitForTargetSurface(
                 bundleIdentifier: target.bundleIdentifier,
                 windowTitleToken: resource.windowTitleToken,
@@ -360,7 +364,7 @@ enum RuntimeTargetController {
                 RuntimeAX.postKey(keyCode: 13, flags: .maskCommand)
                 guard RuntimeAX.waitForSurfaceToClose(
                     token: matchedToken,
-                    in: surface.appElement,
+                    in: surface.windowElement,
                     timeoutSeconds: 2
                 ) else {
                     unresolvedRunIDs.append(runID)
@@ -437,19 +441,20 @@ enum RuntimeTargetController {
     }
 
     private static func launch(
-        appURL: URL,
+        appName: String,
+        bundleIdentifier: String,
         resourceURL: URL
     ) throws {
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/usr/bin/open")
         process.arguments = RuntimeTargetIsolationPlan.openArguments(
-            appPath: appURL.path,
+            bundleIdentifier: bundleIdentifier,
             resourcePath: resourceURL.path
         )
         try process.run()
         process.waitUntilExit()
         guard process.terminationStatus == 0 else {
-            throw RuntimeTargetControllerError.launchFailed(appURL.lastPathComponent)
+            throw RuntimeTargetControllerError.launchFailed(appName, process.terminationStatus)
         }
     }
 
@@ -552,7 +557,7 @@ enum RuntimeTargetController {
             RuntimeAX.postKey(keyCode: 13, flags: .maskCommand)
             surfaceClosed = RuntimeAX.waitForSurfaceToClose(
                 token: windowTitleToken,
-                in: surface.appElement,
+                in: surface.windowElement,
                 timeoutSeconds: 2
             )
         }
@@ -742,17 +747,17 @@ enum RuntimeAX {
 
     static func waitForSurfaceToClose(
         token: String,
-        in appElement: AXUIElement,
+        in surfaceElement: AXUIElement,
         timeoutSeconds: TimeInterval
     ) -> Bool {
         let deadline = Date().addingTimeInterval(timeoutSeconds)
         while Date() < deadline {
-            if !surfaceExists(token: token, in: appElement) {
+            if !surfaceExists(token: token, in: surfaceElement) {
                 return true
             }
             RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.05))
         }
-        return !surfaceExists(token: token, in: appElement)
+        return !surfaceExists(token: token, in: surfaceElement)
     }
 
     static func waitForTermination(
@@ -823,10 +828,11 @@ enum RuntimeAX {
         return text(from: element)?.isEmpty == true
     }
 
-    private static func surfaceExists(token: String, in appElement: AXUIElement) -> Bool {
-        window(containing: token, in: appElement) != nil
-            || editableElement(in: appElement, identifying: token) != nil
-            || element(in: appElement, identifying: token) != nil
+    private static func surfaceExists(token: String, in surfaceElement: AXUIElement) -> Bool {
+        stringAttribute(kAXTitleAttribute, from: surfaceElement)?
+            .localizedCaseInsensitiveContains(token) == true
+            || editableElement(in: surfaceElement, identifying: token) != nil
+            || element(in: surfaceElement, identifying: token) != nil
     }
 
     private static func boolAttribute(_ attribute: String, from element: AXUIElement) -> Bool? {
@@ -862,7 +868,7 @@ enum RuntimeTargetControllerError: Error, CustomStringConvertible {
     case accessibilityNotGranted
     case applicationNotFound(String)
     case targetNotRunning(String)
-    case launchFailed(String)
+    case launchFailed(String, Int32)
     case targetSurfaceTimedOut(String)
     case couldNotClearTarget
 
@@ -874,8 +880,8 @@ enum RuntimeTargetControllerError: Error, CustomStringConvertible {
             return "Target app is not installed: \(identifier)"
         case .targetNotRunning(let identifier):
             return "Target app closed after preflight and running-only policy forbids launching it: \(identifier)"
-        case .launchFailed(let name):
-            return "Could not launch target app \(name)"
+        case .launchFailed(let name, let exitCode):
+            return "Could not open the test resource in target app \(name) (open exit \(exitCode))"
         case .targetSurfaceTimedOut(let identifier):
             return "Target app did not expose the uniquely identified test surface: \(identifier)"
         case .couldNotClearTarget:

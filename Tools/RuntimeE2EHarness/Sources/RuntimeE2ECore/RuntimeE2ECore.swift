@@ -66,8 +66,8 @@ public enum RuntimeTargetIsolationPlan {
         "\(windowTitleToken).txt"
     }
 
-    public static func openArguments(appPath: String, resourcePath: String) -> [String] {
-        ["-a", appPath, resourcePath]
+    public static func openArguments(bundleIdentifier: String, resourcePath: String) -> [String] {
+        ["-b", bundleIdentifier, resourcePath]
     }
 
     public static func browserEditableLabel(windowTitleToken: String) -> String {

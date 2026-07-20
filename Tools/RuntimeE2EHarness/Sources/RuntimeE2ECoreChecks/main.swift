@@ -122,10 +122,10 @@ do {
     )
     try require(
         RuntimeTargetIsolationPlan.openArguments(
-            appPath: "/Applications/TextEdit.app",
+            bundleIdentifier: "com.google.Chrome",
             resourcePath: "/tmp/\(targetTitle).txt"
-        ) == ["-a", "/Applications/TextEdit.app", "/tmp/\(targetTitle).txt"],
-        "target launch must reuse the installed app instead of requesting a split instance"
+        ) == ["-b", "com.google.Chrome", "/tmp/\(targetTitle).txt"],
+        "target resource launch must address third-party apps by exact bundle identifier"
     )
     try require(
         RuntimeTargetIsolationPlan.browserEditableLabel(windowTitleToken: targetTitle)

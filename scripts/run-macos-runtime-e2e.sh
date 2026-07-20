@@ -60,7 +60,7 @@ capture_tcc() {
     "select service,client,client_type,auth_value,auth_reason,length(csreq) as csreq_length,last_modified from access where client in ('$voiceink_bundle_id','$helper_bundle_id') order by client,service;" \
     > "$evidence/tcc-system-$phase.txt"
   sqlite3 -header -column "$user_tcc_db" \
-    "select service,client,client_type,auth_value,auth_reason,length(csreq) as csreq_length,last_modified from access where client in ('$voiceink_bundle_id','$helper_bundle_id') order by client,service;" \
+    "select service,client,client_type,auth_value,auth_reason,indirect_object_identifier,length(csreq) as csreq_length,length(indirect_object_code_identity) as indirect_identity_length,last_modified from access where client in ('$voiceink_bundle_id','$helper_bundle_id') order by client,service,indirect_object_identifier;" \
     > "$evidence/tcc-user-$phase.txt"
 }
 
@@ -68,7 +68,9 @@ make_csreq() {
   local app="$1"
   local output="$2"
   local requirement
-  requirement="$(codesign -dr - "$app" 2>&1 | sed -n 's/^# designated => //p')"
+  requirement="$(codesign -dr - "$app" 2>&1 | sed -n \
+    -e 's/^# designated => //p' \
+    -e 's/^designated => //p')"
   test -n "$requirement"
   printf '%s\n' "$requirement" | csreq -r- -b "$output"
   printf '%s\n' "$requirement"
@@ -98,6 +100,23 @@ INSERT OR REPLACE INTO access(
   indirect_object_identifier_type,indirect_object_identifier,flags
 ) VALUES(
   '$service','$client',0,2,4,1,readfile('$csreq_path'),0,'UNUSED',0
+);
+SQL
+}
+
+grant_user_apple_events_tcc() {
+  local client="$1"
+  local csreq_path="$2"
+  local target_bundle_id="$3"
+  local target_csreq_path="$4"
+  sqlite3 "$user_tcc_db" <<SQL
+INSERT OR REPLACE INTO access(
+  service,client,client_type,auth_value,auth_reason,auth_version,csreq,
+  indirect_object_identifier_type,indirect_object_identifier,
+  indirect_object_code_identity,flags
+) VALUES(
+  'kTCCServiceAppleEvents','$client',0,2,4,1,readfile('$csreq_path'),0,
+  '$target_bundle_id',readfile('$target_csreq_path'),0
 );
 SQL
 }
@@ -232,8 +251,10 @@ mark_phase grant-tcc
 capture_tcc before-grant
 voiceink_requirement="$(make_csreq "$voiceink_app" "$runtime_root/voiceink.csreq")"
 helper_requirement="$(make_csreq "$helper_app" "$runtime_root/helper.csreq")"
+coteditor_requirement="$(make_csreq "/Applications/CotEditor.app" "$runtime_root/coteditor.csreq")"
 printf '%s\n' "$voiceink_requirement" > "$evidence/voiceink-designated-requirement.txt"
 printf '%s\n' "$helper_requirement" > "$evidence/helper-designated-requirement.txt"
+printf '%s\n' "$coteditor_requirement" > "$evidence/coteditor-designated-requirement.txt"
 
 grant_system_tcc kTCCServiceAccessibility "$voiceink_bundle_id" "$runtime_root/voiceink.csreq"
 grant_system_tcc kTCCServiceListenEvent "$voiceink_bundle_id" "$runtime_root/voiceink.csreq"
@@ -241,6 +262,11 @@ grant_system_tcc kTCCServicePostEvent "$voiceink_bundle_id" "$runtime_root/voice
 grant_user_tcc kTCCServiceMicrophone "$voiceink_bundle_id" "$runtime_root/voiceink.csreq"
 grant_system_tcc kTCCServiceAccessibility "$helper_bundle_id" "$runtime_root/helper.csreq"
 grant_system_tcc kTCCServicePostEvent "$helper_bundle_id" "$runtime_root/helper.csreq"
+grant_user_apple_events_tcc \
+  "$helper_bundle_id" \
+  "$runtime_root/helper.csreq" \
+  "com.coteditor.CotEditor" \
+  "$runtime_root/coteditor.csreq"
 capture_tcc after-grant
 
 defaults write "$voiceink_bundle_id" hasCompletedOnboarding -bool true

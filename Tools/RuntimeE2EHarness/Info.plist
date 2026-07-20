@@ -22,5 +22,7 @@
 	<string>14.4</string>
 	<key>LSUIElement</key>
 	<true/>
+	<key>NSAppleEventsUsageDescription</key>
+	<string>Open isolated CotEditor documents for runtime paste verification.</string>
 </dict>
 </plist>

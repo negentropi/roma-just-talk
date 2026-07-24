@@ -6,12 +6,18 @@ This helper drives a real Roma build through the complete macOS path:
 WAV fixture -> BlackHole 2ch -> Roma microphone input
 timed left Shift down/up ------> Special shortcut
 Roma paste --------------------> isolated real-app text field
-AX text + LatencyTrace --------> JSON result
+AX text + rendered pixels -----> user-visible timestamp
+LatencyTrace ------------------> app phase timestamps
 ```
 
 It is external to the production app. The helper does not add test hooks to
 VoiceInk or bypass CoreAudio, global shortcuts, transcription, clipboard paste,
-target-app focus, or Accessibility text visibility.
+target-app focus, Accessibility observation, or rendered-screen verification.
+The report keeps Accessibility value arrival separate from first stable screen
+pixels so AX state is never presented as proof that a person could already see
+the text. Pixel sampling starts at key-up, independently of AX arrival, and a
+render is accepted only after two baseline-different frames are also mutually
+stable. AX may arrive later without moving the earlier rendered timestamp.
 
 ## Default Matrix
 
@@ -22,8 +28,8 @@ target-app focus, or Accessibility text visibility.
 - Candidate apps: TextEdit, Safari, Google Chrome, Arc, and Zed
 - Local target policy: `runningOnly`; closed apps are skipped, never launched
 - Coverage gate: at least `4` distinct candidate apps must already be running
-- Visible-text timeout: `15s`
-- Visible-text p95 budget: `440ms`
+- Rendered-text timeout: `20s`
+- Rendered-text p95 budget: `440ms`
 - Transcript answer: optional until supplied in the config
 
 Each selected browser opens an isolated local tab with a uniquely titled and
@@ -52,11 +58,13 @@ Run `Prepare remote E2E stage` with:
 - `macos_repetitions=3`
 - `hold_minutes=0`
 
-The disposable Namespace Mac installs BlackHole and Visual Studio Code, opens
-TextEdit, Safari, Chrome, and VS Code, and keeps the harness policy at
+The disposable Namespace Mac installs BlackHole and CotEditor, opens TextEdit,
+Safari, CotEditor, and Script Editor, and keeps the harness policy at
 `runningOnly`. It grants Accessibility/Input Monitoring/Microphone only inside
-that ephemeral VM, keyed to the exact ad-hoc CDHashes of the downloaded Roma app
-and the one-time-built helper. It never re-signs the production Roma artifact.
+that ephemeral VM. The helper also receives Screen Recording solely for
+pixel-level target observation. Grants remain keyed to the exact ad-hoc CDHashes
+of the downloaded Roma app and the one-time-built helper. It never re-signs the
+production Roma artifact.
 
 Before sampling, the scenario waits for the real Parakeet V2 download and app
 prewarm. It then runs deterministic checks, a four-app target probe, one
@@ -86,7 +94,8 @@ routing without making a paste claim.
 - No new `LatencyTrace` is emitted
 - VoiceInk posts no text into the target
 - Clipboard changes but the target remains empty (`clipboardOnly`)
-- Visible text exceeds the latency budget
+- Accessibility text arrives but stable changed pixels never render
+- Rendered text exceeds the latency budget
 - Expected transcript exceeds the configured word-error-rate limit
 - Target tab/document or temporary resources cannot be restored
 
@@ -96,20 +105,29 @@ no-visible-paste count, p50, p95, and maximum visible-text latency.
 
 Each case also records factual checkpoints: target prepared, audio started,
 shortcut down/up posted, Roma trigger observed, transcription completed,
-clipboard write succeeded, paste event posted, AX-visible text observed, and
-target cleanup passed. `failureBoundary` names the first unproven boundary; it
-does not guess which component owns the failure.
+clipboard write succeeded, paste event posted, AX text observed, stable rendered
+pixels observed, and target cleanup passed. `failureBoundary` names the first
+unproven boundary; it does not guess which component owns the failure.
 
 Latency is split into:
 
 - `voiceInkKeyUpToPasteEventMilliseconds`: Roma trace from shortcut key-up handler
   to paste-event post
-- `pasteEventToVisibleMilliseconds`: remaining time from that post until the
-  target text is visible through Accessibility
+- `visibleText.keyUpToAccessibilityTextMilliseconds`: first non-empty AX value;
+  useful for paste delivery, but not proof of rendered visibility
+- `visibleText.keyUpToVisibleMilliseconds`: first two stable changed pixel frames
+  in the exact editable screen rectangle
+- `pasteEventToVisibleMilliseconds`: remaining time from Roma's post until the
+  rendered-pixel observation
+- `voiceInkKeyUpToPipelineCompleteMilliseconds`: Roma post-processing and save
+  completion
+- `voiceInkKeyUpToInteractionSettledMilliseconds`: final recorder toggle return,
+  matching the longer endpoint a human may perceive
 
-The second span intentionally remains an end-to-end delivery/visibility boundary;
-the harness does not assign it to Roma, the target app, focus, or scheduling
-without further evidence.
+The rendered span intentionally remains an end-to-end delivery/visibility
+boundary. It includes target rendering and any occlusion inside the sampled
+rectangle; the harness does not assign it to Roma, the target app, focus, or
+scheduling without further evidence.
 
 ## Safety and Restoration
 
@@ -149,6 +167,8 @@ Grant `.local-build/Tools/RuntimeE2EHarness.app` in:
 
 `System Settings -> Privacy & Security -> Accessibility`
 
+`System Settings -> Privacy & Security -> Screen Recording`
+
 Do not rebuild or re-sign afterward. `runtime-e2e-run` intentionally has no
 dependency on the build/app targets so the TCC identity remains stable.
 
@@ -158,9 +178,9 @@ Verify readiness:
 make runtime-e2e-preflight
 ```
 
-Preflight reports selected and skipped target IDs and fails unless Accessibility,
-fixtures, BlackHole, the exact Roma build, and the four-running-app gate are all
-ready.
+Preflight reports selected and skipped target IDs and fails unless macOS 15.2+,
+Accessibility, Screen Recording, fixtures, BlackHole, the exact Roma build, and the
+four-running-app gate are all ready.
 
 ## Run
 

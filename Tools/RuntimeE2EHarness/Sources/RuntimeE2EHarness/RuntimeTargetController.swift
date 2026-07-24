@@ -5,7 +5,9 @@ import RuntimeE2ECore
 
 struct RuntimeVisibleTextResult: Codable {
     let text: String?
+    let keyUpToAccessibilityTextMilliseconds: Double?
     let keyUpToVisibleMilliseconds: Double?
+    let renderedText: RuntimeRenderedTextChangeResult?
     let role: String?
     let error: String?
 }
@@ -57,6 +59,7 @@ final class RuntimePreparedTarget {
     private let temporaryDirectoryURL: URL
     private let testResourceURL: URL
     private let previousFrontmostApplication: NSRunningApplication?
+    private let renderedTextObserver: RuntimeRenderedTextObserver
 
     init(
         target: RuntimeTargetApp,
@@ -69,7 +72,8 @@ final class RuntimePreparedTarget {
         matchedBy: String,
         existingProcessIdentifiers: Set<pid_t>,
         temporaryDirectoryURL: URL,
-        previousFrontmostApplication: NSRunningApplication?
+        previousFrontmostApplication: NSRunningApplication?,
+        renderedTextObserver: RuntimeRenderedTextObserver
     ) {
         self.target = target
         self.appElement = appElement
@@ -79,6 +83,7 @@ final class RuntimePreparedTarget {
         self.temporaryDirectoryURL = temporaryDirectoryURL
         self.testResourceURL = testResourceURL
         self.previousFrontmostApplication = previousFrontmostApplication
+        self.renderedTextObserver = renderedTextObserver
         self.info = RuntimeTargetPreparationInfo(
             targetID: target.id,
             bundleIdentifier: target.bundleIdentifier,
@@ -90,43 +95,88 @@ final class RuntimePreparedTarget {
         )
     }
 
+    func refreshRenderedBaseline() -> String? {
+        renderedTextObserver.refreshBaseline()
+    }
+
     func waitForVisibleText(
         keyUpAtSystemUptime: TimeInterval,
         timeoutSeconds: TimeInterval
     ) -> RuntimeVisibleTextResult {
         let deadline = Date().addingTimeInterval(timeoutSeconds)
         var lastError: String?
+        var accessibilityText: String?
+        var accessibilityLatency: Double?
+        var renderedText: RuntimeRenderedTextChangeResult?
+        var renderedError = renderedTextObserver.beginObservation()
+
         while Date() < deadline {
-            if let text = RuntimeAX.text(from: textElement),
-               !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                let latency = max(0, ProcessInfo.processInfo.systemUptime - keyUpAtSystemUptime) * 1_000
-                return RuntimeVisibleTextResult(
-                    text: text,
-                    keyUpToVisibleMilliseconds: latency,
-                    role: RuntimeAX.stringAttribute(kAXRoleAttribute, from: textElement),
-                    error: nil
-                )
+            if renderedText == nil, renderedError == nil {
+                do {
+                    renderedText = try renderedTextObserver.observeRenderedChange(
+                        keyUpAtSystemUptime: keyUpAtSystemUptime
+                    )
+                } catch {
+                    renderedError = String(describing: error)
+                }
             }
 
-            if let refreshedWindow = RuntimeAX.window(containing: info.windowTitleToken, in: appElement) {
-                windowElement = refreshedWindow
+            if accessibilityText == nil {
+                if let text = RuntimeAX.text(from: textElement),
+                   !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    accessibilityText = text
+                    accessibilityLatency = max(
+                        0,
+                        ProcessInfo.processInfo.systemUptime - keyUpAtSystemUptime
+                    ) * 1_000
+                } else {
+                    if let refreshedWindow = RuntimeAX.window(
+                        containing: info.windowTitleToken,
+                        in: appElement
+                    ) {
+                        windowElement = refreshedWindow
+                    }
+                    if let refreshed = RuntimeAX.editableElement(
+                        in: windowElement,
+                        identifying: info.windowTitleToken
+                    ) ?? RuntimeAX.firstEditableElement(in: windowElement) {
+                        textElement = refreshed
+                    } else {
+                        lastError = "Unique target surface no longer exposes an editable AX element"
+                    }
+                }
             }
-            if let refreshed = RuntimeAX.editableElement(
-                in: windowElement,
-                identifying: info.windowTitleToken
-            ) ?? RuntimeAX.firstEditableElement(in: windowElement) {
-                textElement = refreshed
-            } else {
-                lastError = "Unique target surface no longer exposes an editable AX element"
+
+            if accessibilityText != nil,
+               (renderedText?.keyUpToRenderedTextMilliseconds != nil || renderedError != nil) {
+                break
             }
-            RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.005))
+            RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.016))
         }
 
+        if renderedText == nil {
+            renderedText = renderedTextObserver.failureResult(
+                error: renderedError ?? "Stable rendered pixels were not observed before timeout"
+            )
+        }
+        let visibleLatency = RuntimeTextVisibilityAttribution.renderedLatency(
+            accessibilityText: accessibilityText,
+            renderedLatency: renderedText?.keyUpToRenderedTextMilliseconds
+        )
+        var errors: [String] = []
+        if accessibilityText == nil {
+            errors.append(lastError ?? "Target never exposed non-empty inserted text through Accessibility")
+        }
+        if let renderedError = renderedText?.error {
+            errors.append(renderedError)
+        }
         return RuntimeVisibleTextResult(
-            text: RuntimeAX.text(from: textElement),
-            keyUpToVisibleMilliseconds: nil,
+            text: accessibilityText,
+            keyUpToAccessibilityTextMilliseconds: accessibilityLatency,
+            keyUpToVisibleMilliseconds: visibleLatency,
+            renderedText: renderedText,
             role: RuntimeAX.stringAttribute(kAXRoleAttribute, from: textElement),
-            error: lastError ?? "Visible text timeout"
+            error: errors.isEmpty ? nil : errors.joined(separator: "; ")
         )
     }
 
@@ -272,6 +322,17 @@ enum RuntimeTargetController {
             guard RuntimeAX.text(from: surface.textElement)?.isEmpty == true else {
                 throw RuntimeTargetControllerError.couldNotClearTarget
             }
+            guard let editableFrame = RuntimeAX.frame(of: surface.textElement) else {
+                throw RuntimeTargetControllerError.renderObservationUnavailable(
+                    "Editable AX element has no global frame"
+                )
+            }
+            let renderedTextObserver: RuntimeRenderedTextObserver
+            do {
+                renderedTextObserver = try RuntimeRenderedTextObserver(editableFrame: editableFrame)
+            } catch {
+                throw RuntimeTargetControllerError.renderObservationUnavailable(String(describing: error))
+            }
 
             return RuntimePreparedTarget(
                 target: target,
@@ -284,7 +345,8 @@ enum RuntimeTargetController {
                 matchedBy: surface.matchedBy,
                 existingProcessIdentifiers: existingProcessIdentifiers,
                 temporaryDirectoryURL: temporaryDirectoryURL,
-                previousFrontmostApplication: previousFrontmostApplication
+                previousFrontmostApplication: previousFrontmostApplication,
+                renderedTextObserver: renderedTextObserver
             )
         } catch {
             cleanupFailedPreparation(
@@ -677,6 +739,14 @@ enum RuntimeAX {
         return value as? String
     }
 
+    static func frame(of element: AXUIElement) -> CGRect? {
+        guard let position = pointAttribute(kAXPositionAttribute, from: element),
+              let size = sizeAttribute(kAXSizeAttribute, from: element) else {
+            return nil
+        }
+        return CGRect(origin: position, size: size)
+    }
+
     static func window(for element: AXUIElement) -> AXUIElement? {
         if let window = elementAttribute(kAXWindowAttribute, from: element) {
             return window
@@ -854,6 +924,30 @@ enum RuntimeAX {
         return value as? Bool
     }
 
+    private static func pointAttribute(_ attribute: String, from element: AXUIElement) -> CGPoint? {
+        var value: CFTypeRef?
+        guard AXUIElementCopyAttributeValue(element, attribute as CFString, &value) == .success,
+              let value,
+              CFGetTypeID(value) == AXValueGetTypeID() else {
+            return nil
+        }
+        var point = CGPoint.zero
+        guard AXValueGetValue(value as! AXValue, .cgPoint, &point) else { return nil }
+        return point
+    }
+
+    private static func sizeAttribute(_ attribute: String, from element: AXUIElement) -> CGSize? {
+        var value: CFTypeRef?
+        guard AXUIElementCopyAttributeValue(element, attribute as CFString, &value) == .success,
+              let value,
+              CFGetTypeID(value) == AXValueGetTypeID() else {
+            return nil
+        }
+        var size = CGSize.zero
+        guard AXValueGetValue(value as! AXValue, .cgSize, &size) else { return nil }
+        return size
+    }
+
     private static func elementAttribute(_ attribute: String, from element: AXUIElement) -> AXUIElement? {
         var value: CFTypeRef?
         guard AXUIElementCopyAttributeValue(element, attribute as CFString, &value) == .success,
@@ -882,6 +976,7 @@ enum RuntimeTargetControllerError: Error, CustomStringConvertible {
     case launchFailed(String, Int32)
     case targetSurfaceTimedOut(String)
     case couldNotClearTarget
+    case renderObservationUnavailable(String)
 
     var description: String {
         switch self {
@@ -899,6 +994,8 @@ enum RuntimeTargetControllerError: Error, CustomStringConvertible {
             return "Target app did not expose the uniquely identified test surface: \(identifier)"
         case .couldNotClearTarget:
             return "Could not establish an empty target-text baseline"
+        case .renderObservationUnavailable(let message):
+            return "Could not establish rendered-text observation: \(message)"
         }
     }
 }

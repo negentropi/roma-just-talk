@@ -2,6 +2,7 @@ import AppKit
 @preconcurrency import ApplicationServices
 import AVFoundation
 import CoreAudio
+import CoreGraphics
 import Foundation
 import RuntimeE2ECore
 
@@ -39,6 +40,8 @@ struct RuntimeApplicationInfo: Codable {
 struct RuntimePreflightReport: Codable {
     let generatedAt: Date
     let accessibilityGranted: Bool
+    let screenCaptureGranted: Bool
+    let renderedObservationSupported: Bool
     let audioDirectory: String
     let audioFixtures: [RuntimeAudioFixtureInfo]
     let requestedAudioDeviceName: String
@@ -91,10 +94,23 @@ enum RuntimePreflight {
         } else {
             accessibilityGranted = AXIsProcessTrusted()
         }
+        let screenCaptureGranted = CGPreflightScreenCaptureAccess()
+        let renderedObservationSupported: Bool
+        if #available(macOS 15.2, *) {
+            renderedObservationSupported = true
+        } else {
+            renderedObservationSupported = false
+        }
 
         var failures: [String] = []
         if !accessibilityGranted {
             failures.append("Accessibility is not granted to the runtime harness")
+        }
+        if !screenCaptureGranted {
+            failures.append("Screen Recording is not granted to the runtime harness")
+        }
+        if !renderedObservationSupported {
+            failures.append("Rendered-pixel measurement requires macOS 15.2 or newer")
         }
         if fixtures.isEmpty {
             failures.append("No supported audio fixtures found in \(audioDirectory)")
@@ -130,6 +146,8 @@ enum RuntimePreflight {
         return RuntimePreflightReport(
             generatedAt: Date(),
             accessibilityGranted: accessibilityGranted,
+            screenCaptureGranted: screenCaptureGranted,
+            renderedObservationSupported: renderedObservationSupported,
             audioDirectory: audioDirectory,
             audioFixtures: fixtures,
             requestedAudioDeviceName: configuration.audioDeviceName,

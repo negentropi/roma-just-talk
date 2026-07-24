@@ -28,6 +28,7 @@ struct RuntimeCaseEvidence: Codable {
     let voiceInkClipboardWriteSucceeded: Bool
     let voiceInkPasteEventPosted: Bool
     let systemClipboardChangeObserved: Bool
+    let targetAccessibilityTextObserved: Bool
     let targetVisibleTextObserved: Bool
     let targetCleanupPassed: Bool?
 }
@@ -48,6 +49,8 @@ struct RuntimeCaseReport: Codable {
     let actualAudioLeadMilliseconds: Double?
     let actualHoldMilliseconds: Double?
     let voiceInkKeyUpToPasteEventMilliseconds: Double?
+    let voiceInkKeyUpToPipelineCompleteMilliseconds: Double?
+    let voiceInkKeyUpToInteractionSettledMilliseconds: Double?
     let pasteEventToVisibleMilliseconds: Double?
     let visibleText: RuntimeVisibleTextResult?
     let clipboardChanged: Bool
@@ -65,6 +68,8 @@ struct RuntimeAppSummary: Codable {
     let passedCases: Int
     let failedCases: Int
     let noPasteCases: Int
+    let p50AccessibilityTextMilliseconds: Double?
+    let p95AccessibilityTextMilliseconds: Double?
     let p50VisibleMilliseconds: Double?
     let p95VisibleMilliseconds: Double?
     let maxVisibleMilliseconds: Double?
@@ -75,15 +80,21 @@ struct RuntimeRunSummary: Codable {
     let passedCases: Int
     let failedCases: Int
     let noPasteCases: Int
+    let p50AccessibilityTextMilliseconds: Double?
+    let p95AccessibilityTextMilliseconds: Double?
     let p50VisibleMilliseconds: Double?
     let p95VisibleMilliseconds: Double?
     let maxVisibleMilliseconds: Double?
+    let p50PipelineCompleteMilliseconds: Double?
+    let p95PipelineCompleteMilliseconds: Double?
+    let p50InteractionSettledMilliseconds: Double?
+    let p95InteractionSettledMilliseconds: Double?
     let apps: [RuntimeAppSummary]
     let passed: Bool
 }
 
 struct RuntimeHarnessReport: Codable {
-    var schemaVersion = 1
+    var schemaVersion = 2
     let startedAt: Date
     var finishedAt: Date?
     let configuration: RuntimeHarnessConfiguration
@@ -280,6 +291,11 @@ enum RuntimeHarnessRunner {
             waitUntilSystemUptime(audioStartedAt + plan.keyDownOffsetSeconds)
             let down = try RuntimeShortcutInjector.postLeftShiftDown()
             shortcutDown = down
+            let renderedBaselineDelay = min(0.5, plan.holdDurationSeconds / 2)
+            waitUntilSystemUptime(down.postedAtSystemUptime + renderedBaselineDelay)
+            if let baselineError = target.refreshRenderedBaseline() {
+                errorText = baselineError
+            }
             waitUntilSystemUptime(audioStartedAt + plan.keyUpOffsetSeconds)
             let up = try RuntimeShortcutInjector.postLeftShiftUp()
             shortcutUp = up
@@ -292,11 +308,10 @@ enum RuntimeHarnessRunner {
             audioResult = try audio.waitUntilFinished()
             clipboardChanged = NSPasteboard.general.changeCount != clipboardChangeCount
 
-            Thread.sleep(forTimeInterval: 0.35)
-            let logSnapshot = try RuntimeLatencyLogReader.recent()
-            let newTraces = logSnapshot.traces.filter { !seenTraceIDs.contains($0.traceID) }
-            seenTraceIDs.formUnion(logSnapshot.traces.map(\.traceID))
-            latencyTrace = newTraces.last(where: \.triggerObserved)
+            latencyTrace = try waitForCompletedTrace(
+                excluding: &seenTraceIDs,
+                timeoutSeconds: 3
+            )
 
             let observation = RuntimeCaseObservation(
                 visibleText: visibleText?.text,
@@ -313,6 +328,12 @@ enum RuntimeHarnessRunner {
             if latencyTrace == nil,
                visibleText?.text?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false {
                 assessment = RuntimeCaseAssessment(status: .traceMissing, passed: false)
+            }
+            if let visibleError = visibleText?.error {
+                errorText = [errorText, visibleError]
+                    .compactMap { $0 }
+                    .filter { !$0.isEmpty }
+                    .joined(separator: "; ")
             }
         } catch {
             errorText = String(describing: error)
@@ -340,9 +361,10 @@ enum RuntimeHarnessRunner {
             }
         }
 
-        let targetVisibleTextObserved = visibleText?.text?
+        let targetAccessibilityTextObserved = visibleText?.text?
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .isEmpty == false
+        let targetVisibleTextObserved = visibleText?.keyUpToVisibleMilliseconds != nil
         let evidence = RuntimeCaseEvidence(
             targetPrepared: preparedTarget != nil,
             audioPlaybackStarted: audioPlaybackStarted,
@@ -354,6 +376,7 @@ enum RuntimeHarnessRunner {
             voiceInkClipboardWriteSucceeded: latencyTrace?.clipboardWriteSucceeded == true,
             voiceInkPasteEventPosted: latencyTrace?.pasteEventPosted == true,
             systemClipboardChangeObserved: clipboardChanged,
+            targetAccessibilityTextObserved: targetAccessibilityTextObserved,
             targetVisibleTextObserved: targetVisibleTextObserved,
             targetCleanupPassed: targetCleanup?.passed
         )
@@ -363,6 +386,8 @@ enum RuntimeHarnessRunner {
             latencyTrace: latencyTrace
         )
         let voiceInkKeyUpToPasteEventMilliseconds = latencyTrace?.keyUpToPasteEventMilliseconds
+        let voiceInkKeyUpToPipelineCompleteMilliseconds = latencyTrace?.keyUpToPipelineCompleteMilliseconds
+        let voiceInkKeyUpToInteractionSettledMilliseconds = latencyTrace?.keyUpToInteractionSettledMilliseconds
         let pasteEventToVisibleMilliseconds = visibleText?.keyUpToVisibleMilliseconds.flatMap { visible in
             voiceInkKeyUpToPasteEventMilliseconds.map { max(0, visible - $0) }
         }
@@ -386,6 +411,8 @@ enum RuntimeHarnessRunner {
                 shortcutUp.map { ($0.postedAtSystemUptime - down.postedAtSystemUptime) * 1_000 }
             },
             voiceInkKeyUpToPasteEventMilliseconds: voiceInkKeyUpToPasteEventMilliseconds,
+            voiceInkKeyUpToPipelineCompleteMilliseconds: voiceInkKeyUpToPipelineCompleteMilliseconds,
+            voiceInkKeyUpToInteractionSettledMilliseconds: voiceInkKeyUpToInteractionSettledMilliseconds,
             pasteEventToVisibleMilliseconds: pasteEventToVisibleMilliseconds,
             visibleText: visibleText,
             clipboardChanged: clipboardChanged,
@@ -483,11 +510,41 @@ enum RuntimeHarnessRunner {
         }
     }
 
+    private static func waitForCompletedTrace(
+        excluding seenTraceIDs: inout Set<String>,
+        timeoutSeconds: TimeInterval
+    ) throws -> RuntimeLatencyTrace? {
+        let deadline = Date().addingTimeInterval(timeoutSeconds)
+        var candidate: RuntimeLatencyTrace?
+        var observedTraceIDs = seenTraceIDs
+        repeat {
+            let snapshot = try RuntimeLatencyLogReader.recent()
+            observedTraceIDs.formUnion(snapshot.traces.map(\.traceID))
+            let newTraces = snapshot.traces.filter { !seenTraceIDs.contains($0.traceID) }
+            if let triggered = newTraces.last(where: \.triggerObserved) {
+                candidate = triggered
+                if triggered.keyUpToInteractionSettledMilliseconds != nil {
+                    seenTraceIDs = observedTraceIDs
+                    return triggered
+                }
+            }
+            RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.25))
+        } while Date() < deadline
+        seenTraceIDs = observedTraceIDs
+        return candidate
+    }
+
     private static func summarize(cases: [RuntimeCaseReport]) -> RuntimeRunSummary {
         let latencies = cases.compactMap(\.visibleText?.keyUpToVisibleMilliseconds)
+        let accessibilityLatencies = cases.compactMap(\.visibleText?.keyUpToAccessibilityTextMilliseconds)
+        let pipelineCompleteLatencies = cases.compactMap(\.voiceInkKeyUpToPipelineCompleteMilliseconds)
+        let interactionSettledLatencies = cases.compactMap(\.voiceInkKeyUpToInteractionSettledMilliseconds)
         let appSummaries = Dictionary(grouping: cases, by: { $0.target.id })
             .map { targetID, appCases -> RuntimeAppSummary in
                 let appLatencies = appCases.compactMap(\.visibleText?.keyUpToVisibleMilliseconds)
+                let appAccessibilityLatencies = appCases.compactMap(
+                    \.visibleText?.keyUpToAccessibilityTextMilliseconds
+                )
                 let passed = appCases.filter(\.assessment.passed).count
                 return RuntimeAppSummary(
                     targetID: targetID,
@@ -495,6 +552,14 @@ enum RuntimeHarnessRunner {
                     passedCases: passed,
                     failedCases: appCases.count - passed,
                     noPasteCases: appCases.filter { isVisiblePasteFailure($0.assessment.status) }.count,
+                    p50AccessibilityTextMilliseconds: RuntimeStatistics.percentile(
+                        50,
+                        values: appAccessibilityLatencies
+                    ),
+                    p95AccessibilityTextMilliseconds: RuntimeStatistics.percentile(
+                        95,
+                        values: appAccessibilityLatencies
+                    ),
                     p50VisibleMilliseconds: RuntimeStatistics.percentile(50, values: appLatencies),
                     p95VisibleMilliseconds: RuntimeStatistics.percentile(95, values: appLatencies),
                     maxVisibleMilliseconds: appLatencies.max()
@@ -507,16 +572,40 @@ enum RuntimeHarnessRunner {
             passedCases: passed,
             failedCases: cases.count - passed,
             noPasteCases: cases.filter { isVisiblePasteFailure($0.assessment.status) }.count,
+            p50AccessibilityTextMilliseconds: RuntimeStatistics.percentile(
+                50,
+                values: accessibilityLatencies
+            ),
+            p95AccessibilityTextMilliseconds: RuntimeStatistics.percentile(
+                95,
+                values: accessibilityLatencies
+            ),
             p50VisibleMilliseconds: RuntimeStatistics.percentile(50, values: latencies),
             p95VisibleMilliseconds: RuntimeStatistics.percentile(95, values: latencies),
             maxVisibleMilliseconds: latencies.max(),
+            p50PipelineCompleteMilliseconds: RuntimeStatistics.percentile(
+                50,
+                values: pipelineCompleteLatencies
+            ),
+            p95PipelineCompleteMilliseconds: RuntimeStatistics.percentile(
+                95,
+                values: pipelineCompleteLatencies
+            ),
+            p50InteractionSettledMilliseconds: RuntimeStatistics.percentile(
+                50,
+                values: interactionSettledLatencies
+            ),
+            p95InteractionSettledMilliseconds: RuntimeStatistics.percentile(
+                95,
+                values: interactionSettledLatencies
+            ),
             apps: appSummaries,
             passed: !cases.isEmpty && passed == cases.count
         )
     }
 
     private static func isVisiblePasteFailure(_ status: RuntimeCaseAssessment.Status) -> Bool {
-        status == .noPaste || status == .clipboardOnly
+        status == .noPaste || status == .clipboardOnly || status == .renderNotObserved
     }
 
     private static func write(report: RuntimeHarnessReport, to url: URL) throws {
@@ -534,10 +623,13 @@ enum RuntimeHarnessRunner {
         let latency = report.visibleText?.keyUpToVisibleMilliseconds.map {
             String(format: "%.1fms", $0)
         } ?? "n/a"
+        let accessibilityLatency = report.visibleText?.keyUpToAccessibilityTextMilliseconds.map {
+            String(format: "%.1fms", $0)
+        } ?? "n/a"
         print(
             "[\(index)/\(total)] \(report.target.displayName) | "
             + "\(URL(fileURLWithPath: report.fixturePath).lastPathComponent) | "
-            + "\(report.assessment.status.rawValue) | \(latency) | "
+            + "\(report.assessment.status.rawValue) | rendered=\(latency) ax=\(accessibilityLatency) | "
             + "boundary=\(report.failureBoundary.rawValue)"
         )
     }

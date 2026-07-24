@@ -262,6 +262,7 @@ grant_system_tcc kTCCServicePostEvent "$voiceink_bundle_id" "$runtime_root/voice
 grant_user_tcc kTCCServiceMicrophone "$voiceink_bundle_id" "$runtime_root/voiceink.csreq"
 grant_system_tcc kTCCServiceAccessibility "$helper_bundle_id" "$runtime_root/helper.csreq"
 grant_system_tcc kTCCServicePostEvent "$helper_bundle_id" "$runtime_root/helper.csreq"
+grant_user_tcc kTCCServiceScreenCapture "$helper_bundle_id" "$runtime_root/helper.csreq"
 grant_user_apple_events_tcc \
   "$helper_bundle_id" \
   "$runtime_root/helper.csreq" \

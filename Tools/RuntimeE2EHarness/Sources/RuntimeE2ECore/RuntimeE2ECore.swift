@@ -367,6 +367,7 @@ public struct RuntimeCaseAssessment: Codable, Equatable, Sendable {
         case traceMissing
         case noPaste
         case clipboardOnly
+        case renderNotObserved
         case slow
         case contentMismatch
         case targetCleanupFailed
@@ -392,12 +393,14 @@ public struct RuntimeCaseAssessment: Codable, Equatable, Sendable {
             return Self(status: .triggerRejected, passed: false)
         }
         guard let visibleText = observation.visibleText,
-              !visibleText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
-              let latency = observation.keyUpToVisibleMilliseconds else {
+              !visibleText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             return Self(
                 status: observation.clipboardChanged ? .clipboardOnly : .noPaste,
                 passed: false
             )
+        }
+        guard let latency = observation.keyUpToVisibleMilliseconds else {
+            return Self(status: .renderNotObserved, passed: false)
         }
         guard latency <= latencyThresholdMilliseconds else {
             return Self(status: .slow, passed: false)
@@ -424,6 +427,120 @@ public enum RuntimeStatistics {
         let sorted = values.sorted()
         let index = Int(ceil((percentile / 100) * Double(sorted.count))) - 1
         return sorted[max(0, min(index, sorted.count - 1))]
+    }
+}
+
+public struct RuntimeRenderedPixelDifference: Equatable, Sendable {
+    public let changedPixels: Int
+    public let comparedPixels: Int
+    public let requiredChangedPixels: Int
+
+    public var passed: Bool {
+        changedPixels >= requiredChangedPixels
+    }
+}
+
+public enum RuntimeRenderedTextChangePolicy {
+    public static let channelThreshold: UInt8 = 24
+
+    public static func requiredChangedPixels(for pixelCount: Int) -> Int {
+        max(80, pixelCount / 2_000)
+    }
+
+    public static func maximumStableJitterPixels(requiredChangedPixels: Int) -> Int {
+        max(8, requiredChangedPixels / 4)
+    }
+
+    public static func compareRGBA(
+        baseline: [UInt8],
+        current: [UInt8]
+    ) -> RuntimeRenderedPixelDifference? {
+        guard baseline.count == current.count,
+              baseline.count.isMultiple(of: 4) else {
+            return nil
+        }
+
+        var changedPixels = 0
+        for offset in stride(from: 0, to: baseline.count, by: 4) {
+            let red = abs(Int(baseline[offset]) - Int(current[offset]))
+            let green = abs(Int(baseline[offset + 1]) - Int(current[offset + 1]))
+            let blue = abs(Int(baseline[offset + 2]) - Int(current[offset + 2]))
+            if max(red, green, blue) >= Int(channelThreshold) {
+                changedPixels += 1
+            }
+        }
+
+        let pixelCount = baseline.count / 4
+        return RuntimeRenderedPixelDifference(
+            changedPixels: changedPixels,
+            comparedPixels: pixelCount,
+            requiredChangedPixels: requiredChangedPixels(for: pixelCount)
+        )
+    }
+}
+
+public struct RuntimeRenderedTextStabilitySample: Equatable, Sendable {
+    public let baselineDifference: RuntimeRenderedPixelDifference
+    public let interFrameChangedPixels: Int?
+    public let stable: Bool
+}
+
+public struct RuntimeRenderedTextStabilityTracker: Sendable {
+    private let baseline: [UInt8]
+    private var previousPassingFrame: [UInt8]?
+
+    public init(baseline: [UInt8]) {
+        self.baseline = baseline
+    }
+
+    public mutating func observe(
+        current: [UInt8]
+    ) -> RuntimeRenderedTextStabilitySample? {
+        guard let baselineDifference = RuntimeRenderedTextChangePolicy.compareRGBA(
+            baseline: baseline,
+            current: current
+        ) else {
+            return nil
+        }
+        guard baselineDifference.passed else {
+            previousPassingFrame = nil
+            return RuntimeRenderedTextStabilitySample(
+                baselineDifference: baselineDifference,
+                interFrameChangedPixels: nil,
+                stable: false
+            )
+        }
+
+        let interFrameChangedPixels = previousPassingFrame.flatMap {
+            RuntimeRenderedTextChangePolicy.compareRGBA(
+                baseline: $0,
+                current: current
+            )?.changedPixels
+        }
+        previousPassingFrame = current
+        let stable = interFrameChangedPixels.map {
+            $0 <= RuntimeRenderedTextChangePolicy.maximumStableJitterPixels(
+                requiredChangedPixels: baselineDifference.requiredChangedPixels
+            )
+        } ?? false
+        return RuntimeRenderedTextStabilitySample(
+            baselineDifference: baselineDifference,
+            interFrameChangedPixels: interFrameChangedPixels,
+            stable: stable
+        )
+    }
+}
+
+public enum RuntimeTextVisibilityAttribution {
+    public static func renderedLatency(
+        accessibilityText: String?,
+        renderedLatency: Double?
+    ) -> Double? {
+        guard let accessibilityText,
+              !accessibilityText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            return nil
+        }
+        return renderedLatency
     }
 }
 
@@ -513,19 +630,43 @@ public struct RuntimeLatencyTrace: Codable, Equatable, Sendable {
     }
 
     public var keyUpToPasteEventMilliseconds: Double? {
-        guard let keyUp = events.last(where: { $0.name == "shortcut.key_up_handler" }),
-              let paste = events.first(where: {
-                  $0.name == "paste_event_posted" || $0.name == "paste.event_posted"
-              }),
-              paste.totalMilliseconds >= keyUp.totalMilliseconds else {
-            return nil
-        }
-        return paste.totalMilliseconds - keyUp.totalMilliseconds
+        millisecondsAfterKeyUp(toFirstEventMatching: {
+            $0.name == "paste_event_posted" || $0.name == "paste.event_posted"
+        })
+    }
+
+    public var keyUpToPipelineCompleteMilliseconds: Double? {
+        millisecondsAfterKeyUp(toFirstEventMatching: { $0.name == "pipeline.complete" })
+    }
+
+    public var keyUpToInteractionSettledMilliseconds: Double? {
+        millisecondsAfterKeyUp(toLastEventMatching: { $0.name == "ui.engine_toggle.end" })
     }
 
     public init(traceID: String, events: [RuntimeLatencyTraceEvent]) {
         self.traceID = traceID
         self.events = events.sorted { $0.sequence < $1.sequence }
+    }
+
+    private func millisecondsAfterKeyUp(
+        toFirstEventMatching predicate: (RuntimeLatencyTraceEvent) -> Bool
+    ) -> Double? {
+        millisecondsAfterKeyUp(event: events.first(where: predicate))
+    }
+
+    private func millisecondsAfterKeyUp(
+        toLastEventMatching predicate: (RuntimeLatencyTraceEvent) -> Bool
+    ) -> Double? {
+        millisecondsAfterKeyUp(event: events.last(where: predicate))
+    }
+
+    private func millisecondsAfterKeyUp(event: RuntimeLatencyTraceEvent?) -> Double? {
+        guard let keyUp = events.last(where: { $0.name == "shortcut.key_up_handler" }),
+              let event,
+              event.totalMilliseconds >= keyUp.totalMilliseconds else {
+            return nil
+        }
+        return event.totalMilliseconds - keyUp.totalMilliseconds
     }
 
     public static func parse(messages: [String]) -> Self? {

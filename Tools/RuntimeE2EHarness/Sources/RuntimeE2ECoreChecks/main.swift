@@ -72,6 +72,22 @@ do {
     try require(!noPaste.passed, "noPaste must fail the case")
     print("PASS missing target insertion is an explicit noPaste failure")
 
+    let unrenderedPaste = RuntimeCaseAssessment.assess(
+        observation: RuntimeCaseObservation(
+            visibleText: "AX already contains text",
+            keyUpToVisibleMilliseconds: nil,
+            clipboardChanged: true,
+            triggerObserved: true
+        ),
+        expectedTranscript: nil,
+        latencyThresholdMilliseconds: 440
+    )
+    try require(
+        unrenderedPaste.status == .renderNotObserved,
+        "AX text without rendered pixels must remain a distinct failure"
+    )
+    print("PASS AX text cannot masquerade as rendered visibility")
+
     let defaults = RuntimeHarnessConfiguration.default
     try require(defaults.audioDirectory.hasSuffix("/Downloads/roma jt builds/audio"), "default audio directory")
     try require(defaults.audioDeviceName == "BlackHole 2ch", "default loopback device")
@@ -188,18 +204,85 @@ do {
         "[LATENCY] trace=A1B2C3D4 seq=0 t=0.0ms delta=0.0ms event=shortcut.key_down_source keyCode=56",
         "[LATENCY] trace=A1B2C3D4 seq=1 t=1100.0ms delta=1100.0ms event=shortcut.key_up_handler duration=1.1",
         "[LATENCY] trace=A1B2C3D4 seq=2 t=1300.0ms delta=200.0ms event=paste_event_posted chars=18",
-        "[LATENCY] trace=A1B2C3D4 seq=3 t=1310.0ms delta=10.0ms event=trace.finished"
+        "[LATENCY] trace=A1B2C3D4 seq=3 t=1500.0ms delta=200.0ms event=pipeline.complete",
+        "[LATENCY] trace=A1B2C3D4 seq=4 t=1800.0ms delta=300.0ms event=ui.engine_toggle.end"
     ])
     try require(trace?.traceID == "A1B2C3D4", "trace ID should be parsed")
     try require(trace?.triggerObserved == true, "key-down trace event should prove trigger acceptance")
     try require(trace?.pasteEventPosted == true, "paste event should be recognized")
-    try require(trace?.events.map(\.sequence) == [0, 1, 2, 3], "trace events should stay sequence ordered")
+    try require(trace?.events.map(\.sequence) == [0, 1, 2, 3, 4], "trace events should stay sequence ordered")
     try require(
         trace?.keyUpToPasteEventMilliseconds ?? -1,
         equals: 200,
         "trace should separate VoiceInk key-up-to-paste handoff from target visibility"
     )
-    print("PASS latency trace proves trigger acceptance and paste handoff")
+    try require(
+        trace?.keyUpToPipelineCompleteMilliseconds ?? -1,
+        equals: 400,
+        "trace should expose post-paste pipeline completion"
+    )
+    try require(
+        trace?.keyUpToInteractionSettledMilliseconds ?? -1,
+        equals: 700,
+        "trace should expose the final interaction-settled boundary"
+    )
+    print("PASS latency trace separates paste, pipeline completion, and settled interaction")
+
+    let stablePixels = [UInt8](repeating: 128, count: 400 * 4)
+    var caretOnlyPixels = stablePixels
+    for pixel in 0..<40 {
+        caretOnlyPixels[pixel * 4] = 0
+    }
+    let caretOnlyDifference = RuntimeRenderedTextChangePolicy.compareRGBA(
+        baseline: stablePixels,
+        current: caretOnlyPixels
+    )
+    try require(caretOnlyDifference?.passed == false, "caret-sized changes must not count as rendered text")
+
+    var renderedTextPixels = stablePixels
+    for pixel in 0..<120 {
+        renderedTextPixels[pixel * 4] = 0
+    }
+    let renderedTextDifference = RuntimeRenderedTextChangePolicy.compareRGBA(
+        baseline: stablePixels,
+        current: renderedTextPixels
+    )
+    try require(renderedTextDifference?.passed == true, "text-sized pixel changes must count as rendered text")
+
+    var transientTextPixels = renderedTextPixels
+    for pixel in 120..<180 {
+        transientTextPixels[pixel * 4] = 0
+    }
+    var stabilityTracker = RuntimeRenderedTextStabilityTracker(baseline: stablePixels)
+    try require(
+        stabilityTracker.observe(current: renderedTextPixels)?.stable == false,
+        "the first changed frame cannot establish stability"
+    )
+    try require(
+        stabilityTracker.observe(current: transientTextPixels)?.stable == false,
+        "two materially different changed frames must not establish stability"
+    )
+    try require(
+        stabilityTracker.observe(current: transientTextPixels)?.stable == true,
+        "two mutually stable changed frames must establish rendered text"
+    )
+
+    try require(
+        RuntimeTextVisibilityAttribution.renderedLatency(
+            accessibilityText: nil,
+            renderedLatency: 180
+        ) == nil,
+        "pixel changes alone must not be attributed to inserted text"
+    )
+    try require(
+        RuntimeTextVisibilityAttribution.renderedLatency(
+            accessibilityText: "AX arrived later",
+            renderedLatency: 180
+        ) ?? -1,
+        equals: 180,
+        "AX arriving later must preserve the independently sampled render time"
+    )
+    print("PASS rendered-text policy rejects noise, requires stability, and remains AX-independent")
 
     let latencies = [100.0, 200.0, 300.0, 400.0, 500.0]
     try require(RuntimeStatistics.percentile(50, values: latencies) ?? -1, equals: 300, "p50 latency")

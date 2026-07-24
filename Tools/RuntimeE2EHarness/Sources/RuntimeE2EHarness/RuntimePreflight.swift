@@ -59,7 +59,8 @@ struct RuntimePreflightReport: Codable {
 enum RuntimePreflight {
     static func run(
         configuration: RuntimeHarnessConfiguration,
-        promptForAccessibility: Bool = false
+        promptForAccessibility: Bool = false,
+        requestScreenCaptureAccess: Bool = false
     ) -> RuntimePreflightReport {
         let audioDirectory = NSString(string: configuration.audioDirectory).expandingTildeInPath
         let fixtures = fixtureInfo(in: URL(fileURLWithPath: audioDirectory, isDirectory: true))
@@ -94,13 +95,15 @@ enum RuntimePreflight {
         } else {
             accessibilityGranted = AXIsProcessTrusted()
         }
-        let screenCaptureGranted = CGPreflightScreenCaptureAccess()
         let renderedObservationSupported: Bool
         if #available(macOS 15.2, *) {
             renderedObservationSupported = true
         } else {
             renderedObservationSupported = false
         }
+        let screenCaptureGranted = renderedObservationSupported
+            && (CGPreflightScreenCaptureAccess()
+                || (requestScreenCaptureAccess && CGRequestScreenCaptureAccess()))
 
         var failures: [String] = []
         if !accessibilityGranted {

@@ -180,7 +180,8 @@ make runtime-e2e-preflight
 
 Preflight reports selected and skipped target IDs and fails unless macOS 15.2+,
 Accessibility, Screen Recording, fixtures, BlackHole, the exact Roma build, and the
-four-running-app gate are all ready.
+four-running-app gate are all ready. The explicit preflight command requests any
+missing Accessibility or Screen Recording grant; normal run mode never prompts.
 
 ## Run
 

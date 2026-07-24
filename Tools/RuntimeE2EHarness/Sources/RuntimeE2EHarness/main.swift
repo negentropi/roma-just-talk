@@ -100,7 +100,8 @@ do {
     case "preflight":
         let report = RuntimePreflight.run(
             configuration: try loadConfiguration(path: arguments.configurationPath),
-            promptForAccessibility: true
+            promptForAccessibility: true,
+            requestScreenCaptureAccess: true
         )
         try writeJSON(report, path: arguments.jsonOutputPath)
         exit(report.passed ? 0 : 2)

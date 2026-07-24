@@ -197,6 +197,10 @@ cleanup() {
   fi
   defaults read "$voiceink_bundle_id" > "$evidence/voiceink-defaults-final.txt" 2>&1
   system_profiler SPAudioDataType > "$evidence/audio-final.txt" 2>&1
+  capture_tcc cleanup || true
+  /usr/bin/log show --last 15m --style compact \
+    --predicate 'subsystem == "com.apple.TCC" && (eventMessage CONTAINS[c] "RuntimeE2EHarness" || eventMessage CONTAINS[c] "ScreenCapture")' \
+    > "$evidence/tcc-runtime.log" 2>&1 || true
   printf '%s\n' "$current_phase" > "$evidence/macos-runtime-e2e-final-phase.txt"
   printf '%s\n' "$scenario_status" > "$evidence/macos-runtime-e2e-exit-code.txt"
 }
@@ -269,6 +273,9 @@ grant_user_apple_events_tcc \
   "com.coteditor.CotEditor" \
   "$runtime_root/coteditor.csreq"
 capture_tcc after-grant
+killall tccd 2>/dev/null || true
+sudo killall tccd 2>/dev/null || true
+sleep 2
 
 defaults write "$voiceink_bundle_id" hasCompletedOnboarding -bool true
 defaults delete "$voiceink_bundle_id" macOSOnboardingStage 2>/dev/null || true

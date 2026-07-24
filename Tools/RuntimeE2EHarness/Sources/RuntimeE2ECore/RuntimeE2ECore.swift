@@ -443,8 +443,8 @@ public struct RuntimeRenderedPixelDifference: Equatable, Sendable {
 public enum RuntimeRenderedTextChangePolicy {
     public static let channelThreshold: UInt8 = 24
 
-    public static func requiredChangedPixels(for pixelCount: Int) -> Int {
-        max(80, pixelCount / 2_000)
+    public static func requiredChangedPixels(for _: Int) -> Int {
+        80
     }
 
     public static func maximumStableJitterPixels(requiredChangedPixels: Int) -> Int {

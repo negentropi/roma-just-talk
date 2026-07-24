@@ -248,6 +248,10 @@ do {
         current: renderedTextPixels
     )
     try require(renderedTextDifference?.passed == true, "text-sized pixel changes must count as rendered text")
+    try require(
+        RuntimeRenderedTextChangePolicy.requiredChangedPixels(for: 402_560) == 80,
+        "large editable regions must not raise the rendered-text threshold"
+    )
 
     var transientTextPixels = renderedTextPixels
     for pixel in 120..<180 {

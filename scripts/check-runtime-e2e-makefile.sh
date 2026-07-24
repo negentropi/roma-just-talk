@@ -53,3 +53,35 @@ if grep -Eq '[[:digit:]]_[[:digit:]]' "$repo_root/scripts/run-macos-runtime-e2e.
   echo "Namespace runtime shell arithmetic must remain compatible with macOS Bash 3.2." >&2
   exit 1
 fi
+
+source "$repo_root/scripts/runtime-e2e-phase-runner.sh"
+
+phase_calls=""
+phase_failure="functional-smoke"
+scenario_status=0
+mark_phase() {
+  phase_calls="$phase_calls|phase:$1"
+}
+run_harness_phase() {
+  phase_calls="$phase_calls|run:$1:$2:$3"
+  [ "$1" != "$phase_failure" ]
+}
+
+run_runtime_e2e_phases smoke.json full.json
+if [ "$scenario_status" -eq 0 ] \
+  || ! grep -Fq '|run:runtime-e2e-report:runtime-e2e-run:full.json' <<<"$phase_calls"; then
+  echo "A failed functional smoke must remain failed and still run the repeated matrix." >&2
+  exit 1
+fi
+
+phase_calls=""
+phase_failure="preflight"
+scenario_status=0
+if run_runtime_e2e_phases smoke.json full.json; then
+  echo "A failed preflight must stop runtime phase execution." >&2
+  exit 1
+fi
+if grep -Fq '|phase:target-probe' <<<"$phase_calls"; then
+  echo "Target probing must not run after a failed preflight." >&2
+  exit 1
+fi

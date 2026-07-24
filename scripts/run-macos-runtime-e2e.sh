@@ -15,6 +15,7 @@ case "$repetitions" in
 esac
 
 repo_root="${GITHUB_WORKSPACE:-$(cd "$(dirname "$0")/.." && pwd)}"
+source "$repo_root/scripts/runtime-e2e-phase-runner.sh"
 runtime_root="$(dirname "$evidence")/macos-runtime-e2e"
 audio_root="$runtime_root/audio"
 helper_app="$repo_root/.local-build/Tools/RuntimeE2EHarness.app"
@@ -334,14 +335,7 @@ cp "$config_smoke" "$evidence/runtime-e2e-smoke-config.json"
 cp "$config_full" "$evidence/runtime-e2e-full-config.json"
 
 scenario_status=0
-mark_phase preflight
-run_harness_phase preflight runtime-e2e-preflight "$config_full"
-mark_phase target-probe
-run_harness_phase target-probe runtime-e2e-target-probe "$config_full"
-mark_phase functional-smoke
-run_harness_phase functional-smoke runtime-e2e-run "$config_smoke"
-mark_phase repeated-runtime-matrix
-run_harness_phase runtime-e2e-report runtime-e2e-run "$config_full" || scenario_status=$?
+run_runtime_e2e_phases "$config_smoke" "$config_full"
 
 if [ -f "$evidence/runtime-e2e-report.json" ]; then
   jq '{summary, fatalError, restoredOriginalState}' \

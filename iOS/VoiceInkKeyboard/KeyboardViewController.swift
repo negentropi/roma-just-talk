@@ -47,8 +47,10 @@ class KeyboardViewController: KeyboardInputViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        let standardActionHandler = services.actionHandler
         services.actionHandler = VoiceInkKeyboardActionHandler(
-            controller: self,
+            standardHandler: standardActionHandler,
+            keyboardContext: state.keyboardContext,
             shellState: shellState
         )
         setupShellCallbacks()

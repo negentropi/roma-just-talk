@@ -202,23 +202,38 @@ private extension VoiceInkKeyboardClipboardModel {
     }
 }
 
-final class VoiceInkKeyboardActionHandler: KeyboardAction.StandardActionHandler {
+final class VoiceInkKeyboardActionHandler: KeyboardActionHandler {
+    private let standardHandler: KeyboardActionHandler
+    private let keyboardContext: KeyboardContext
     private let shellState: VoiceInkKeyboardShellState
 
     init(
-        controller: KeyboardController,
+        standardHandler: KeyboardActionHandler,
+        keyboardContext: KeyboardContext,
         shellState: VoiceInkKeyboardShellState
     ) {
+        self.standardHandler = standardHandler
+        self.keyboardContext = keyboardContext
         self.shellState = shellState
-        super.init(controller: controller)
     }
 
-    override func handle(
+    func canHandle(
+        _ gesture: Keyboard.Gesture,
+        on action: KeyboardAction
+    ) -> Bool {
+        standardHandler.canHandle(gesture, on: action)
+    }
+
+    func handle(_ action: KeyboardAction) {
+        standardHandler.handle(action)
+    }
+
+    func handle(
         _ gesture: Keyboard.Gesture,
         on action: KeyboardAction
     ) {
         guard shellState.surface == .clipboard else {
-            super.handle(gesture, on: action)
+            standardHandler.handle(gesture, on: action)
             return
         }
 
@@ -246,14 +261,45 @@ final class VoiceInkKeyboardActionHandler: KeyboardAction.StandardActionHandler 
             shellState.onSubmitSearch?()
         case (.press, .keyboardType(.emojis)):
             shellState.showKeyboard()
-            super.handle(gesture, on: action)
+            standardHandler.handle(gesture, on: action)
         case (_, .keyboardType), (_, .shift), (_, .capsLock), (_, .nextKeyboard), (_, .nextLocale), (_, .dismissKeyboard):
-            super.handle(gesture, on: action)
+            standardHandler.handle(gesture, on: action)
         case (.press, .tab):
             triggerFeedback(for: gesture, on: action)
         default:
             break
         }
+    }
+
+    func handle(_ suggestion: Autocomplete.Suggestion) {
+        standardHandler.handle(suggestion)
+    }
+
+    func handleDrag(
+        on action: KeyboardAction,
+        from startLocation: CGPoint,
+        to currentLocation: CGPoint
+    ) {
+        standardHandler.handleDrag(
+            on: action,
+            from: startLocation,
+            to: currentLocation
+        )
+    }
+
+    func triggerFeedback(
+        for gesture: Keyboard.Gesture,
+        on action: KeyboardAction
+    ) {
+        standardHandler.triggerFeedback(for: gesture, on: action)
+    }
+
+    func triggerAudioFeedback(_ feedback: Feedback.Audio) {
+        standardHandler.triggerAudioFeedback(feedback)
+    }
+
+    func triggerHapticFeedback(_ feedback: Feedback.Haptic) {
+        standardHandler.triggerHapticFeedback(feedback)
     }
 }
 

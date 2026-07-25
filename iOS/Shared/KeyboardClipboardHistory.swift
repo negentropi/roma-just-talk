@@ -1,5 +1,6 @@
 import CryptoKit
 import Foundation
+import VoiceInkCore
 
 enum VoiceInkKeyboardClipboardItemKind: String, Codable, CaseIterable, Sendable {
     case text

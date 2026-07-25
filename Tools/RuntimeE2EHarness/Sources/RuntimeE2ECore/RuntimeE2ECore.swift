@@ -588,6 +588,15 @@ public struct RuntimeLatencyTraceEvent: Codable, Equatable, Sendable {
     public let name: String
     public let details: String
 
+    public var executorQueueDelayMilliseconds: Double? {
+        guard name.hasSuffix(".executor_resumed") else { return nil }
+        let prefix = "queueDelayMs="
+        return details
+            .split(separator: " ")
+            .first { $0.hasPrefix(prefix) }
+            .flatMap { Double($0.dropFirst(prefix.count)) }
+    }
+
     public init(
         traceID: String,
         sequence: Int,
@@ -641,6 +650,10 @@ public struct RuntimeLatencyTrace: Codable, Equatable, Sendable {
 
     public var keyUpToInteractionSettledMilliseconds: Double? {
         millisecondsAfterKeyUp(toLastEventMatching: { $0.name == "ui.engine_toggle.end" })
+    }
+
+    public var maximumExecutorQueueDelayMilliseconds: Double? {
+        events.compactMap(\.executorQueueDelayMilliseconds).max()
     }
 
     public init(traceID: String, events: [RuntimeLatencyTraceEvent]) {

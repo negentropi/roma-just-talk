@@ -69,10 +69,16 @@ class CursorPaster {
     @discardableResult
     static func startPasteAtCursor(
         _ text: String,
-        preparedContext: PreparedPasteContext? = nil
+        preparedContext: PreparedPasteContext? = nil,
+        latencyTraceToken: VoiceInkLatencyTrace.Token? = nil
     ) -> Task<PasteResult, Never> {
-        Task { @MainActor in
-            await performPasteSession(text, preparedContext: preparedContext)
+        let traceToken = latencyTraceToken ?? VoiceInkLatencyTrace.shared.currentToken()
+        return Task { @MainActor in
+            await performPasteSession(
+                text,
+                preparedContext: preparedContext,
+                latencyTraceToken: traceToken
+            )
         }
     }
 
@@ -97,10 +103,21 @@ class CursorPaster {
     @MainActor
     private static func performPasteSession(
         _ text: String,
-        preparedContext: PreparedPasteContext? = nil
+        preparedContext: PreparedPasteContext? = nil,
+        latencyTraceToken: VoiceInkLatencyTrace.Token?
     ) async -> PasteResult {
+        let latencyTrace = VoiceInkLatencyTrace.shared
         let pasteboard = NSPasteboard.general
         let shouldRestoreClipboard = VoiceInkPastePreference.shouldRestoreClipboardAfterPaste()
+        latencyTrace.event(
+            "paste_session.enter",
+            details: "chars=\(text.count) restoreClipboard=\(shouldRestoreClipboard) method=\(VoiceInkPasteMethod.current().rawValue)",
+            token: latencyTraceToken
+        )
+        let clipboardSnapshotSpan = latencyTrace.begin(
+            "paste_session.snapshot_clipboard",
+            token: latencyTraceToken
+        )
         let savedContents: ClipboardSnapshot = if shouldRestoreClipboard {
             if let preparedContext,
                preparedContext.changeCount == pasteboard.changeCount {
@@ -111,24 +128,45 @@ class CursorPaster {
         } else {
             []
         }
+        latencyTrace.end(
+            clipboardSnapshotSpan,
+            details: "items=\(savedContents.count)"
+        )
         let sessionID = UUID().uuidString
 
+        let clipboardWriteSpan = latencyTrace.begin(
+            "paste_session.write_clipboard",
+            token: latencyTraceToken
+        )
         guard ClipboardManager.setClipboard(
             text,
             transient: shouldRestoreClipboard,
             sessionID: shouldRestoreClipboard ? sessionID : nil
         ) else {
+            latencyTrace.end(clipboardWriteSpan, details: "result=failure")
             logger.error("\(VoiceInkPasteDiagnostics.failedToPrepareClipboardMessage, privacy: .public)")
             return .commandNotPosted
         }
+        latencyTrace.end(clipboardWriteSpan, details: "result=success")
 
-        let pasteResult = await postPasteCommand()
+        let commandSpan = latencyTrace.begin("paste_session.post_command", token: latencyTraceToken)
+        let pasteResult = await postPasteCommand(latencyTraceToken: latencyTraceToken)
+        latencyTrace.end(
+            commandSpan,
+            details: "result=\(String(describing: pasteResult))"
+        )
         if shouldRestoreClipboard, pasteResult.didPostPasteCommand {
+            latencyTrace.event(
+                "paste_session.restore_scheduled",
+                details: "delayMs=\(String(format: "%.1f", VoiceInkPastePreference.boundedClipboardRestoreDelay() * 1_000))",
+                token: latencyTraceToken
+            )
             scheduleClipboardRestore(
                 savedContents,
                 expectedText: text,
                 sessionID: sessionID,
-                on: pasteboard
+                on: pasteboard,
+                latencyTraceToken: latencyTraceToken
             )
         } else if shouldRestoreClipboard {
             logger.notice("\(VoiceInkPasteDiagnostics.skippedClipboardRestoreCommandNotPostedMessage, privacy: .public)")
@@ -149,15 +187,25 @@ class CursorPaster {
     }
 
     @MainActor
-    private static func postPasteCommand() async -> PasteResult {
+    private static func postPasteCommand(
+        latencyTraceToken: VoiceInkLatencyTrace.Token?
+    ) async -> PasteResult {
         if let pasteCommandPosterForTesting {
             return await pasteCommandPosterForTesting()
         }
 
         if VoiceInkPasteMethod.current() == .appleScript {
-            return pasteUsingAppleScript() ? .commandPosted : .commandNotPosted
+            let didPost = pasteUsingAppleScript()
+            if didPost {
+                VoiceInkLatencyTrace.shared.event(
+                    "paste_event_posted",
+                    details: "method=appleScript",
+                    token: latencyTraceToken
+                )
+            }
+            return didPost ? .commandPosted : .commandNotPosted
         } else {
-            return await pasteFromClipboard()
+            return await pasteFromClipboard(latencyTraceToken: latencyTraceToken)
         }
     }
 
@@ -165,19 +213,30 @@ class CursorPaster {
         _ savedContents: ClipboardSnapshot,
         expectedText: String,
         sessionID: String,
-        on pasteboard: NSPasteboard
+        on pasteboard: NSPasteboard,
+        latencyTraceToken: VoiceInkLatencyTrace.Token?
     ) {
         let delay = VoiceInkPastePreference.boundedClipboardRestoreDelay()
 
         Task { @MainActor in
             await wait(delay)
             guard pasteboardStillOwnedByPasteSession(pasteboard, expectedText: expectedText, sessionID: sessionID) else {
+                VoiceInkLatencyTrace.shared.event(
+                    "paste_session.restore_skipped",
+                    details: "reason=clipboard_changed",
+                    token: latencyTraceToken
+                )
                 return
             }
             pasteboard.clearContents()
             if !savedContents.isEmpty {
                 pasteboard.writeObjects(pasteboardItems(from: savedContents))
             }
+            VoiceInkLatencyTrace.shared.event(
+                "paste_session.restore_executed",
+                details: "items=\(savedContents.count)",
+                token: latencyTraceToken
+            )
         }
     }
 
@@ -243,8 +302,18 @@ class CursorPaster {
 
     // Posts Cmd+V via CGEvent without modifying the active input source.
     @MainActor
-    private static func pasteFromClipboard() async -> PasteResult {
+    private static func pasteFromClipboard(
+        latencyTraceToken: VoiceInkLatencyTrace.Token?
+    ) async -> PasteResult {
+        VoiceInkLatencyTrace.shared.event(
+            "paste_cgevent.enter",
+            token: latencyTraceToken
+        )
         guard AXIsProcessTrusted() else {
+            VoiceInkLatencyTrace.shared.event(
+                "paste_cgevent.accessibility_denied",
+                token: latencyTraceToken
+            )
             logger.error(
                 "\(VoiceInkPasteDiagnostics.accessibilityPermissionRequiredForSimulatedPasteMessage, privacy: .public)"
             )
@@ -269,6 +338,11 @@ class CursorPaster {
         vDown.post(tap: .cghidEventTap)
         vUp.post(tap: .cghidEventTap)
         cmdUp.post(tap: .cghidEventTap)
+        VoiceInkLatencyTrace.shared.event(
+            "paste_event_posted",
+            details: "method=cgEvent",
+            token: latencyTraceToken
+        )
 
         return .commandPosted
     }

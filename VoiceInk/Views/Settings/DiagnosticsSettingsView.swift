@@ -6,15 +6,9 @@ struct DiagnosticsSettingsView: View {
     @State private var exportedLogURL: URL?
     @State private var showLogExportError = false
     @State private var logExportError: String = ""
-    @State private var rollingBufferClaim = RollingBufferPreloadRuntimeDiagnostics.shared.currentQuickReleaseClaim()
 
     var body: some View {
         Group {
-            LabeledContent(VoiceInkDiagnosticsSettingsPresentation.rollingBufferLastClaimLabel) {
-                Text(rollingBufferClaim.displaySummary)
-                    .foregroundStyle(.secondary)
-            }
-
             LabeledContent {
                 HStack(spacing: 8) {
                     if let url = exportedLogURL {
@@ -41,7 +35,6 @@ struct DiagnosticsSettingsView: View {
                 }
             }
         }
-        .onAppear(perform: refreshRollingBufferClaim)
         .alert(VoiceInkDiagnosticsSettingsPresentation.exportFailedAlertTitle, isPresented: $showLogExportError) {
             Button(VoiceInkDiagnosticsSettingsPresentation.alertDismissButtonTitle, role: .cancel) { }
         } message: {
@@ -50,7 +43,6 @@ struct DiagnosticsSettingsView: View {
     }
 
     private func exportDiagnosticLogs() {
-        refreshRollingBufferClaim()
         isExportingLogs = true
         exportedLogURL = nil
 
@@ -69,9 +61,5 @@ struct DiagnosticsSettingsView: View {
                 }
             }
         }
-    }
-
-    private func refreshRollingBufferClaim() {
-        rollingBufferClaim = RollingBufferPreloadRuntimeDiagnostics.shared.currentQuickReleaseClaim()
     }
 }

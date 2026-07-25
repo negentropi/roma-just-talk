@@ -480,6 +480,7 @@ public enum VoiceInkMacOSLogCategory {
     public static let transcriptionAutoCleanupService = "TranscriptionAutoCleanupService"
     public static let sessionMetricMigrationService = "SessionMetricMigrationService"
     public static let modelPrewarm = "ModelPrewarm"
+    public static let latencyTrace = "LatencyTrace"
     public static let cursorPaster = "CursorPaster"
     public static let sessionMetricRecorder = "SessionMetricRecorder"
     public static let soundPlaybackEngine = "SoundPlaybackEngine"
@@ -507,7 +508,6 @@ public struct VoiceInkDiagnosticLogSessionRange: Equatable, Sendable {
 }
 
 public enum VoiceInkDiagnosticsSettingsPresentation {
-    public static let rollingBufferLastClaimLabel = "Rolling Buffer Last Claim"
     public static let showInFinderButtonTitle = "Show in Finder"
     public static let exportButtonTitle = "Export"
     public static let exportLogsLabel = "Export Logs"
@@ -714,7 +714,6 @@ public struct VoiceInkMacOSSystemInformationFacts: Equatable, Sendable {
     public let aiEnhancement: String
     public let aiProvider: String
     public let aiModel: String
-    public let rollingBufferPreload: String
     public let hideDockIcon: Bool
     public let recorderStyle: String
     public let soundFeedback: Bool
@@ -757,7 +756,6 @@ public struct VoiceInkMacOSSystemInformationFacts: Equatable, Sendable {
         aiEnhancement: String,
         aiProvider: String,
         aiModel: String,
-        rollingBufferPreload: String,
         hideDockIcon: Bool,
         recorderStyle: String,
         soundFeedback: Bool,
@@ -799,7 +797,6 @@ public struct VoiceInkMacOSSystemInformationFacts: Equatable, Sendable {
         self.aiEnhancement = aiEnhancement
         self.aiProvider = aiProvider
         self.aiModel = aiModel
-        self.rollingBufferPreload = rollingBufferPreload
         self.hideDockIcon = hideDockIcon
         self.recorderStyle = recorderStyle
         self.soundFeedback = soundFeedback
@@ -877,9 +874,6 @@ public enum VoiceInkSystemInformationReport {
         AI Enhancement: \(facts.aiEnhancement)
         AI Provider: \(facts.aiProvider)
         AI Model: \(facts.aiModel)
-
-        ROLLING BUFFER PRELOAD:
-        \(facts.rollingBufferPreload)
 
         UI SETTINGS:
         Hide Dock Icon: \(facts.hideDockIcon)

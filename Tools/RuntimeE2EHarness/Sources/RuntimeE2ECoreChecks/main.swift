@@ -228,6 +228,22 @@ do {
     )
     print("PASS latency trace separates paste, pipeline completion, and settled interaction")
 
+    let executorTrace = RuntimeLatencyTrace.parse(messages: [
+        "[LATENCY] trace=E1E2E3E4 seq=0 t=100.0ms delta=100.0ms event=streaming_service.drain_continuation.executor_enqueued sentChunks=12",
+        "[LATENCY] trace=E1E2E3E4 seq=1 t=612.4ms delta=512.4ms event=streaming_service.drain_continuation.executor_resumed queueDelayMs=512.4"
+    ])
+    try require(
+        executorTrace?.events.last?.executorQueueDelayMilliseconds ?? -1,
+        equals: 512.4,
+        "executor resume events should expose their queue delay"
+    )
+    try require(
+        executorTrace?.maximumExecutorQueueDelayMilliseconds ?? -1,
+        equals: 512.4,
+        "trace should expose its worst executor queue delay"
+    )
+    print("PASS latency trace preserves executor enqueue-to-resume timing")
+
     let stablePixels = [UInt8](repeating: 128, count: 400 * 4)
     var caretOnlyPixels = stablePixels
     for pixel in 0..<40 {

@@ -10,6 +10,7 @@ final class FluidAudioStreamingProvider {
 
     private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "FluidAudioStreaming")
     private let loadModels: ModelLoader
+    private var latencyTraceToken: VoiceInkLatencyTrace.Token?
     private var eventsContinuation: AsyncStream<VoiceInkStreamingTranscriptionEvent>.Continuation?
 
     private(set) var transcriptionEvents: AsyncStream<VoiceInkStreamingTranscriptionEvent>
@@ -27,23 +28,17 @@ final class FluidAudioStreamingProvider {
     private let config: AgreementConfig
 
     private var transcriptionTask: Task<Void, Never>?
-    private var immediateTranscriptionTask: Task<Void, Never>?
     private var isTranscribing = false
     private var lastTranscribedSampleCount = 0
-    private var lastImmediatePassScheduledSampleCount = 0
     private var latestHypothesisText = ""
     private var latestHypothesisSampleCount = 0
     private let minimumAudioSamples = ASRConstants.minimumRequiredSamples(forSampleRate: ASRConstants.sampleRate)
     private let minNewSamples = ASRConstants.minimumRequiredSamples(forSampleRate: ASRConstants.sampleRate)
-    private let maxCachedFinalizationLagSamples: Int
 
     init(loadModels: @escaping ModelLoader, config: AgreementConfig = AgreementConfig()) {
         self.loadModels = loadModels
         self.config = config
         self.agreementEngine = WordAgreementEngine(config: config)
-        self.maxCachedFinalizationLagSamples = VoiceInkPCM16Audio.sampleCount(
-            forMono16kDuration: config.cachedFinalizationMaxLagSeconds
-        )
 
         var continuation: AsyncStream<VoiceInkStreamingTranscriptionEvent>.Continuation!
         transcriptionEvents = AsyncStream { continuation = $0 }
@@ -68,15 +63,44 @@ final class FluidAudioStreamingProvider {
 
     deinit {
         transcriptionTask?.cancel()
-        immediateTranscriptionTask?.cancel()
         eventsContinuation?.finish()
     }
 
+    func setLatencyTraceToken(_ token: VoiceInkLatencyTrace.Token?) {
+        latencyTraceToken = token
+    }
+
     func connect(modelName: String, language: String?) async throws {
-        let models = try await loadModels(modelName)
+        let latencyTrace = VoiceInkLatencyTrace.shared
+        let traceToken = latencyTraceToken
+        let modelDataSpan = latencyTrace.begin("fluid_streaming.load_model_data", token: traceToken)
+        let models: AsrModels
+        do {
+            models = try await loadModels(modelName)
+            latencyTrace.end(modelDataSpan, details: "result=success")
+        } catch {
+            latencyTrace.end(
+                modelDataSpan,
+                details: "result=failure error=\(String(describing: type(of: error)))"
+            )
+            throw error
+        }
+        try Task.checkCancellation()
 
         let manager = AsrManager(config: .default)
-        try await manager.loadModels(models)
+        let managerLoadSpan = latencyTrace.begin("fluid_streaming.manager_load", token: traceToken)
+        do {
+            try await manager.loadModels(models)
+            latencyTrace.end(managerLoadSpan, details: "result=success")
+            try Task.checkCancellation()
+        } catch {
+            latencyTrace.end(
+                managerLoadSpan,
+                details: "result=failure error=\(String(describing: type(of: error)))"
+            )
+            await manager.cleanup()
+            throw error
+        }
         self.asrManager = manager
         self.decoderLayerCount = await manager.decoderLayerCount
         self.languageHint = FluidAudioModelManager.languageHint(
@@ -88,7 +112,6 @@ final class FluidAudioStreamingProvider {
         audioBuffer = []
         trimmedSampleCount = 0
         lastTranscribedSampleCount = 0
-        lastImmediatePassScheduledSampleCount = 0
         latestHypothesisText = ""
         latestHypothesisSampleCount = 0
 
@@ -100,46 +123,42 @@ final class FluidAudioStreamingProvider {
 
     func sendAudioChunk(_ data: Data) async throws {
         let samples = VoiceInkPCM16Audio.floatSamples(fromLittleEndianData: data)
-        let shouldRunImmediatePass: Bool
         bufferLock.lock()
         audioBuffer.append(contentsOf: samples)
-        let absoluteSampleCount = trimmedSampleCount + audioBuffer.count
-        shouldRunImmediatePass = VoiceInkFluidAudioTranscriptionPolicy.shouldScheduleImmediatePass(
-            config: config,
-            hasImmediatePassInFlight: immediateTranscriptionTask != nil,
-            absoluteSampleCount: absoluteSampleCount,
-            lastScheduledSampleCount: lastImmediatePassScheduledSampleCount,
-            minimumAudioSamples: minimumAudioSamples,
-            minimumNewSamples: minNewSamples
-        )
-        if shouldRunImmediatePass {
-            lastImmediatePassScheduledSampleCount = absoluteSampleCount
-        }
         bufferLock.unlock()
-
-        if shouldRunImmediatePass {
-            immediateTranscriptionTask = Task { [weak self] in
-                await self?.runTranscriptionPass()
-                self?.immediateTranscriptionTask = nil
-            }
-        }
     }
 
     func commit() async throws {
         let commitStartedAt = Date()
+        let latencyTrace = VoiceInkLatencyTrace.shared
+        let traceToken = latencyTraceToken
+        let loopStopSpan = latencyTrace.begin("fluid_streaming.stop_background_loop", token: traceToken)
         transcriptionTask?.cancel()
         await transcriptionTask?.value
         transcriptionTask = nil
-        await immediateTranscriptionTask?.value
-        immediateTranscriptionTask = nil
+        latencyTrace.end(loopStopSpan)
 
-        if let cachedText = cachedFinalTextIfCurrentEnough() {
-            logger.notice("FluidAudio commit used cached hypothesis elapsed=\(Date().timeIntervalSince(commitStartedAt), format: .fixed(precision: 3), privacy: .public)s chars=\(cachedText.count, privacy: .public)")
-            eventsContinuation?.yield(.committed(text: cachedText))
+        let commitPlan = completeHypothesisCommitPlan()
+        if let reusableText = commitPlan.reusableText {
+            latencyTrace.event(
+                "fluid_streaming.commit.reuse_complete_hypothesis",
+                details: "pendingSamples=\(commitPlan.pendingSamples) chars=\(reusableText.count)",
+                token: traceToken
+            )
+            logger.notice("FluidAudio commit reused complete key-down hypothesis elapsed=\(Date().timeIntervalSince(commitStartedAt), format: .fixed(precision: 3), privacy: .public)s chars=\(reusableText.count, privacy: .public)")
+            eventsContinuation?.yield(.committed(text: reusableText))
             return
         }
 
+        latencyTrace.event(
+            "fluid_streaming.commit.final_asr_required",
+            details: "pendingSamples=\(commitPlan.pendingSamples)",
+            token: traceToken
+        )
+
+        let finalASRSpan = latencyTrace.begin("fluid_streaming.final_asr", token: traceToken)
         let remainingText = await transcribeRemainingAudio() ?? ""
+        latencyTrace.end(finalASRSpan, details: "chars=\(remainingText.count)")
         logger.notice("FluidAudio commit ran final ASR elapsed=\(Date().timeIntervalSince(commitStartedAt), format: .fixed(precision: 3), privacy: .public)s chars=\(remainingText.count, privacy: .public)")
         eventsContinuation?.yield(.committed(text: remainingText))
     }
@@ -148,9 +167,6 @@ final class FluidAudioStreamingProvider {
         transcriptionTask?.cancel()
         await transcriptionTask?.value
         transcriptionTask = nil
-        immediateTranscriptionTask?.cancel()
-        await immediateTranscriptionTask?.value
-        immediateTranscriptionTask = nil
 
         await asrManager?.cleanup()
         asrManager = nil
@@ -160,7 +176,6 @@ final class FluidAudioStreamingProvider {
         bufferLock.lock()
         audioBuffer = []
         trimmedSampleCount = 0
-        lastImmediatePassScheduledSampleCount = 0
         latestHypothesisText = ""
         latestHypothesisSampleCount = 0
         bufferLock.unlock()
@@ -306,6 +321,12 @@ final class FluidAudioStreamingProvider {
         var samples = Array(audioBuffer[bufferRelativeSeek...])
         bufferLock.unlock()
 
+        VoiceInkLatencyTrace.shared.event(
+            "fluid_streaming.final_audio",
+            details: "samples=\(samples.count) seek=\(bufferRelativeSeek) trimmed=\(trimmedSampleCount)",
+            token: latencyTraceToken
+        )
+
         guard samples.count >= minimumAudioSamples else { return nil }
 
         samples = VoiceInkFluidAudioTranscriptionPolicy.paddedSamplesForTranscription(samples)
@@ -326,27 +347,18 @@ final class FluidAudioStreamingProvider {
         }
     }
 
-    private func cachedFinalTextIfCurrentEnough() -> String? {
+    private func completeHypothesisCommitPlan() -> VoiceInkFluidAudioCompleteHypothesisCommitPlan {
         bufferLock.lock()
         let absoluteSampleCount = trimmedSampleCount + audioBuffer.count
         bufferLock.unlock()
 
-        let plan = VoiceInkFluidAudioTranscriptionPolicy.cachedFinalTextPlan(
+        return VoiceInkFluidAudioTranscriptionPolicy.completeHypothesisCommitPlan(
             latestHypothesisText: latestHypothesisText,
             latestHypothesisSampleCount: latestHypothesisSampleCount,
-            absoluteSampleCount: absoluteSampleCount,
-            maxCachedFinalizationLagSamples: maxCachedFinalizationLagSamples
+            absoluteSampleCount: absoluteSampleCount
         )
-
-        guard let cachedText = plan.text else {
-            if plan.isTooStale {
-                logger.notice("FluidAudio cached hypothesis too stale pendingSamples=\(plan.pendingSamples, privacy: .public) limit=\(self.maxCachedFinalizationLagSamples, privacy: .public)")
-            }
-            return nil
-        }
-
-        return cachedText
     }
+
 }
 
 #if os(macOS)

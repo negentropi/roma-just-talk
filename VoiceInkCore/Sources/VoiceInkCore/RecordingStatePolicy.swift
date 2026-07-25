@@ -2194,14 +2194,15 @@ public struct VoiceInkMacOSRecordingCancellationPlan: Equatable, Sendable {
         self.shouldFinishRecorderSessionImmediately = shouldFinishRecorderSessionImmediately
     }
 
+    @MainActor
     public func applyRuntimeState(
-        clearDeferredStopRequest: () -> Void,
-        requestRecordingCancellation: () -> Void,
-        finishActiveRecorderCancellation: () async -> Void,
-        clearPartialTranscript: () -> Void,
-        clearCancelFlag: () -> Void,
-        setRecordingState: (VoiceInkRecordingState) -> Void,
-        finishRecorderSessionImmediately: () async -> Void
+        clearDeferredStopRequest: @MainActor () -> Void,
+        requestRecordingCancellation: @MainActor () -> Void,
+        finishActiveRecorderCancellation: @MainActor () async -> Void,
+        clearPartialTranscript: @MainActor () -> Void,
+        clearCancelFlag: @MainActor () -> Void,
+        setRecordingState: @MainActor (VoiceInkRecordingState) -> Void,
+        finishRecorderSessionImmediately: @MainActor () async -> Void
     ) async {
         if shouldClearDeferredStopRequest {
             clearDeferredStopRequest()
@@ -2273,6 +2274,31 @@ public enum VoiceInkMacOSRecordingCancellationPolicy {
     }
 }
 
+public struct VoiceInkMacOSRecordingStartupOrchestrationPlan: Equatable, Sendable {
+    public let shouldResolvePowerMode: Bool
+    public let shouldPrepareTranscriptionSessionBeforeRecorder: Bool
+
+    public init(
+        shouldResolvePowerMode: Bool,
+        shouldPrepareTranscriptionSessionBeforeRecorder: Bool
+    ) {
+        self.shouldResolvePowerMode = shouldResolvePowerMode
+        self.shouldPrepareTranscriptionSessionBeforeRecorder = shouldPrepareTranscriptionSessionBeforeRecorder
+    }
+}
+
+public enum VoiceInkMacOSRecordingStartupOrchestrationPolicy {
+    public static func plan(
+        powerModeConfigurationCount: Int
+    ) -> VoiceInkMacOSRecordingStartupOrchestrationPlan {
+        let shouldResolvePowerMode = powerModeConfigurationCount > 0
+        return VoiceInkMacOSRecordingStartupOrchestrationPlan(
+            shouldResolvePowerMode: shouldResolvePowerMode,
+            shouldPrepareTranscriptionSessionBeforeRecorder: !shouldResolvePowerMode
+        )
+    }
+}
+
 public extension VoiceInkRecordingState {
     var isActivelyRecording: Bool {
         self == .recording
@@ -2280,10 +2306,6 @@ public extension VoiceInkRecordingState {
 
     var isRecorderCaptureInProgress: Bool {
         self == .starting || self == .recording
-    }
-
-    var acceptsRollingBufferPreloadPreview: Bool {
-        self == .idle || self == .recording
     }
 
     var acceptsRecordingShortcutAction: Bool {
@@ -2320,10 +2342,11 @@ public extension VoiceInkRecordingState {
         }
     }
 
+    @MainActor
     func applyRecorderUIToggleRuntimeState(
-        toggleRecord: () async -> Void,
-        cancelRecording: () async -> Void,
-        dismissRecorder: () async -> Void
+        toggleRecord: @MainActor () async -> Void,
+        cancelRecording: @MainActor () async -> Void,
+        dismissRecorder: @MainActor () async -> Void
     ) async {
         switch recorderUIToggleAction {
         case .toggleRecord:

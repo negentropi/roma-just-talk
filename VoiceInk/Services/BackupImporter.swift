@@ -130,9 +130,6 @@ enum BackupImporter {
                     }
                 )
             },
-            postCorePreferenceSettingsDidChange: {
-                NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
-            },
             reportImportedGeneralSettings: {
                 print(VoiceInkSettingsBackupImportDiagnostics.generalSettingsImportedMessage)
             }

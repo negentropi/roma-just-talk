@@ -2189,9 +2189,10 @@ public struct VoiceInkPowerModeRecordingFinishPlan: Equatable, Sendable {
         Self(shouldRestorePowerModeSession: !shouldPersistConfiguredPreferences)
     }
 
+    @MainActor
     public func applyRuntimeState(
-        endSession: () async -> Void,
-        clearActiveConfiguration: () -> Void
+        endSession: @MainActor () async -> Void,
+        clearActiveConfiguration: @MainActor () -> Void
     ) async {
         guard shouldRestorePowerModeSession else { return }
 

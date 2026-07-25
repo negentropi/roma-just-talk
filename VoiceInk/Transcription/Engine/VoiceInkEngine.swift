@@ -6,27 +6,6 @@ import AppKit
 import os
 import VoiceInkCore
 
-struct RollingBufferPreloadClaim {
-    let preloaded: RollingBufferPreloadedSession
-    let modelName: String
-    let language: String?
-
-    func matches(model: any TranscriptionModel, language: String?) -> Bool {
-        modelName == model.name && self.language == language
-    }
-}
-
-private struct PreparedQuickReleaseContext {
-    let powerModeId: UUID?
-    let powerModeTask: Task<PowerModeConfig?, Never>
-    let cursorContextTask: Task<String?, Never>
-    let pasteContextTask: Task<CursorPaster.PreparedPasteContext?, Never>
-
-    func matches(powerModeId: UUID?) -> Bool {
-        self.powerModeId == powerModeId
-    }
-}
-
 @MainActor
 class VoiceInkEngine: NSObject, ObservableObject {
     @Published var recordingState: VoiceInkRecordingState = .idle
@@ -49,10 +28,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
 
     let modelContext: ModelContext
     internal let serviceRegistry: TranscriptionServiceRegistry
-    private let rollingBufferPreloadCoordinator: RollingBufferPreloadCoordinator
     let enhancementService: AIEnhancementService?
     private let pipeline: TranscriptionPipeline
-    private var preparedQuickReleaseContext: PreparedQuickReleaseContext?
 
     let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "VoiceInkEngine")
 
@@ -75,10 +52,6 @@ class VoiceInkEngine: NSObject, ObservableObject {
             modelContext: modelContext
         )
         self.serviceRegistry = serviceRegistry
-        self.rollingBufferPreloadCoordinator = RollingBufferPreloadCoordinator(
-            serviceRegistry: serviceRegistry,
-            transcriptionModelManager: transcriptionModelManager
-        )
         self.pipeline = TranscriptionPipeline(
             modelContext: modelContext,
             serviceRegistry: serviceRegistry,
@@ -92,8 +65,6 @@ class VoiceInkEngine: NSObject, ObservableObject {
         }
 
         setupNotifications()
-        recorder.onRollingAudioChunk = rollingBufferPreloadCoordinator.audioChunkHandler
-        rollingBufferPreloadCoordinator.start()
         createRecordingsDirectoryIfNeeded()
     }
 
@@ -112,17 +83,30 @@ class VoiceInkEngine: NSObject, ObservableObject {
     // MARK: - Toggle Record
 
     func toggleRecord(powerModeId: UUID? = nil) async {
+        let latencyTrace = VoiceInkLatencyTrace.shared
+        let traceToken = latencyTrace.ensureStarted(
+            event: "engine.toggle_requested",
+            details: "source=non_shortcut state=\(String(describing: recordingState))"
+        )
+        latencyTrace.event(
+            "engine.toggle.enter",
+            details: "state=\(String(describing: recordingState))",
+            token: traceToken
+        )
         logger.notice("toggleRecord called – state=\(String(describing: self.recordingState), privacy: .public)")
 
         if recordingState == .starting {
+            latencyTrace.event("engine.stop.deferred_during_start", token: traceToken)
             logger.notice("toggleRecord: deferring stop until in-flight recording start finishes")
             stopRequestedDuringStart = true
             return
         }
 
         if recordingState.isActivelyRecording {
-            await stopRecordingAndRunPipeline()
+            latencyTrace.event("engine.stop_path.enter", token: traceToken)
+            await stopRecordingAndRunPipeline(latencyTraceToken: traceToken)
         } else {
+            latencyTrace.event("engine.start_path.enter", token: traceToken)
             logger.notice("toggleRecord: entering start-recording branch")
             guard transcriptionModelManager.currentTranscriptionModel != nil else {
                 NotificationManager.shared.showNotification(
@@ -130,6 +114,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
                     type: .error
                 )
                 await recorderUIManager?.dismissMiniRecorder()
+                latencyTrace.finish(event: "engine.start.no_model", token: traceToken)
                 return
             }
             activePipelineTranscriptionID = nil
@@ -137,121 +122,163 @@ class VoiceInkEngine: NSObject, ObservableObject {
             stopRequestedDuringStart = false
             partialTranscript = ""
 
-            await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
-                requestRecordPermission { [self] granted in
-                if granted {
-                    Task { @MainActor [self] in
-                        defer { continuation.resume() }
+            let startLifecycleSpan = latencyTrace.begin("engine.start_lifecycle", token: traceToken)
+            latencyTrace.event("engine.permission.request", token: traceToken)
+            let granted = await requestRecordPermission(latencyTraceToken: traceToken)
+            latencyTrace.event(
+                "engine.permission.callback",
+                details: "granted=\(granted)",
+                token: traceToken
+            )
+            if granted {
+                latencyTrace.event("engine.start_authorized.enter", token: traceToken)
+                defer {
+                    latencyTrace.event("engine.start_authorized.complete", token: traceToken)
+                }
 
                         let startID = UUID()
                         self.activeRecordingStartID = startID
+                        var powerModeConfigTask: Task<PowerModeConfig?, Never>?
+                        let startupAudioRelay = RecordingStartupAudioRelay(
+                            latencyTraceToken: traceToken
+                        )
+                        latencyTrace.event("engine.audio_relay.created", token: traceToken)
 
                         do {
                             let permanentURL = VoiceInkStoredAudioFile.recordingFileURL(in: self.recordingsDirectory)
                             self.recordedFile = permanentURL
 
-                            let startupAudioRelay = RecordingStartupAudioRelay()
+                            self.currentSession?.cancel()
+                            self.currentSession = nil
                             self.recorder.onAudioChunk = { data in
                                 startupAudioRelay.handle(data)
                             }
-                            self.rollingBufferPreloadCoordinator.prepareForRecordingStart()
-
                             self.recordingState = .starting
+                            latencyTrace.event("engine.state.starting", token: traceToken)
                             self.logger.notice("toggleRecord: state=starting, starting audio hardware")
-                            let powerModeConfigTask = Task { @MainActor in
-                                await ActiveWindowService.shared.resolveConfiguration(powerModeId: powerModeId)
+
+                            let startupPlan = VoiceInkMacOSRecordingStartupOrchestrationPolicy.plan(
+                                powerModeConfigurationCount: PowerModeManager.shared.configurations.count
+                            )
+                            latencyTrace.event(
+                                "engine.start_orchestration.plan",
+                                details: "resolvePowerMode=\(startupPlan.shouldResolvePowerMode) prepareSessionBeforeRecorder=\(startupPlan.shouldPrepareTranscriptionSessionBeforeRecorder)",
+                                token: traceToken
+                            )
+
+                            if startupPlan.shouldResolvePowerMode {
+                                powerModeConfigTask = Task { @MainActor in
+                                    guard !Task.isCancelled else { return nil }
+                                    let span = latencyTrace.begin("power_mode.resolve", token: traceToken)
+                                    let config = await ActiveWindowService.shared.resolveConfiguration(
+                                        powerModeId: powerModeId,
+                                        latencyTraceToken: traceToken
+                                    )
+                                    latencyTrace.end(span, details: "matched=\(config != nil)")
+                                    guard !Task.isCancelled else {
+                                        latencyTrace.event("power_mode.resolve.discarded", details: "reason=cancelled", token: traceToken)
+                                        return nil
+                                    }
+                                    return config
+                                }
+                            } else {
+                                powerModeConfigTask = nil
+                                latencyTrace.event("power_mode.resolve.skipped", details: "reason=no_configurations", token: traceToken)
                             }
 
-                            try await self.recorder.startRecording(toOutputFile: permanentURL)
+                            if startupPlan.shouldPrepareTranscriptionSessionBeforeRecorder,
+                               let model = self.transcriptionModelManager.currentTranscriptionModel {
+                                try await self.prepareRecordingTranscriptionSession(
+                                    for: model,
+                                    audioRelay: startupAudioRelay,
+                                    latencyTraceToken: traceToken
+                                )
+                            }
+
+                            let recorderStartSpan = latencyTrace.begin("recorder.start", token: traceToken)
+                            do {
+                                try await self.recorder.startRecording(
+                                    toOutputFile: permanentURL,
+                                    latencyTraceToken: traceToken
+                                )
+                                latencyTrace.end(recorderStartSpan, details: "result=success")
+                            } catch {
+                                latencyTrace.end(
+                                    recorderStartSpan,
+                                    details: "result=failure error=\(String(describing: type(of: error)))"
+                                )
+                                throw error
+                            }
 
                             guard self.activeRecordingStartID == startID,
                                   self.recorderUIManager?.isRecorderSessionActive ?? true,
                                   !self.shouldCancelRecording else {
                                 let shouldKeepRecordingFile = self.shouldCancelRecording
+                                powerModeConfigTask?.cancel()
+                                latencyTrace.event("power_mode.resolve.cancelled", details: "reason=start_aborted", token: traceToken)
                                 if self.activeRecordingStartID == startID {
-                                    await self.recorder.stopRecording()
+                                    await self.recorder.stopRecording(latencyTraceToken: traceToken)
+                                    self.currentSession?.cancel()
+                                    self.currentSession = nil
+                                    self.recorder.onAudioChunk = nil
+                                    startupAudioRelay.clear()
                                     if !shouldKeepRecordingFile {
                                         self.recordedFile = nil
                                     }
                                     self.recordingState = .idle
                                     self.activeRecordingStartID = nil
                                     self.stopRequestedDuringStart = false
-                                    self.rollingBufferPreloadCoordinator.recordingSessionDidFinish()
                                 }
+                                latencyTrace.finish(
+                                    event: "engine.start.aborted",
+                                    details: "cancelRequested=\(self.shouldCancelRecording) recorderSessionActive=\(self.recorderUIManager?.isRecorderSessionActive ?? true)",
+                                    token: traceToken
+                                )
                                 return
                             }
 
                             self.recordingState = .recording
+                            latencyTrace.event("engine.state.recording", token: traceToken)
                             self.logger.notice("toggleRecord: recording started successfully, state=recording")
 
-                            let resolvedPowerModeConfig = await powerModeConfigTask.value
-                            await PowerModeManager.shared.activateConfiguration(resolvedPowerModeConfig)
-                            self.logger.notice("toggleRecord: Power Mode config applied before streaming setup")
-
-                            var claimedPreload: RollingBufferPreloadClaim?
-                            if let model = self.transcriptionModelManager.currentTranscriptionModel,
-                               let preloaded = await self.rollingBufferPreloadCoordinator.claimPreloadedSession(for: model) {
-                                claimedPreload = RollingBufferPreloadClaim(
-                                    preloaded: preloaded,
-                                    modelName: model.name,
-                                    language: preloaded.language
-                                )
+                            if let powerModeConfigTask {
+                                let resolvedPowerModeConfig = await powerModeConfigTask.value
+                                let powerModeActivationSpan = latencyTrace.begin("power_mode.activate", token: traceToken)
+                                await PowerModeManager.shared.activateConfiguration(resolvedPowerModeConfig)
+                                latencyTrace.end(powerModeActivationSpan)
+                                self.logger.notice("toggleRecord: Power Mode config applied before streaming setup")
                             }
 
                             if self.recordingState.isActivelyRecording,
                                let model = self.transcriptionModelManager.currentTranscriptionModel {
-                                if let claim = claimedPreload,
-                                   claim.matches(model: model, language: VoiceInkTranscriptionLanguagePreference.storedLanguage()) {
-                                    self.currentSession = claim.preloaded.session
-                                    startupAudioRelay.installSink(claim.preloaded.audioChunkHandler)
-                                    self.recorder.onAudioChunk = claim.preloaded.audioChunkHandler
-                                } else {
-                                    if let claim = claimedPreload {
-                                        claim.preloaded.session.cancel()
-                                        self.currentSession = nil
-                                        self.recorder.onAudioChunk = { data in
-                                            startupAudioRelay.handle(data)
-                                        }
-                                    }
-                                    self.rollingBufferPreloadCoordinator.cancelUnclaimedPreload(reason: "recording-start-fallback")
-                                    if self.stopRequestedDuringStart,
-                                       self.activeRecordingStartID == startID,
-                                       model.supportsRecordedFileTranscription {
-                                        self.stopRequestedDuringStart = false
+                                if self.stopRequestedDuringStart,
+                                   self.activeRecordingStartID == startID,
+                                   model.supportsRecordedFileTranscription {
+                                    self.stopRequestedDuringStart = false
+                                    if self.currentSession == nil {
                                         if let startupStopSession = await self.prepareStartupStopStreamingSession(
                                             for: model,
-                                            audioRelay: startupAudioRelay
+                                            audioRelay: startupAudioRelay,
+                                            latencyTraceToken: traceToken
                                         ) {
                                             self.currentSession = startupStopSession
                                             self.logger.notice("toggleRecord: stopping startup recording with streaming startup session")
                                         } else {
-                                            self.currentSession = nil
                                             self.recorder.onAudioChunk = nil
                                             startupAudioRelay.clear()
                                             self.logger.notice("toggleRecord: stopping startup recording before fallback streaming setup")
                                         }
-                                        await self.stopRecordingAndRunPipeline()
-                                        return
                                     }
+                                    await self.stopRecordingAndRunPipeline(latencyTraceToken: traceToken)
+                                    return
+                                }
 
-                                    let session = self.serviceRegistry.createSession(
+                                if self.currentSession == nil {
+                                    try await self.prepareRecordingTranscriptionSession(
                                         for: model,
-                                        onPartialTranscript: { [weak self] partial in
-                                            Task { @MainActor in
-                                                self?.partialTranscript = partial
-                                            }
-                                        }
+                                        audioRelay: startupAudioRelay,
+                                        latencyTraceToken: traceToken
                                     )
-                                    self.currentSession = session
-                                    let realCallback = try await session.prepare(model: model)
-
-                                    if let realCallback {
-                                        startupAudioRelay.installSink(realCallback)
-                                        self.recorder.onAudioChunk = realCallback
-                                    } else {
-                                        self.recorder.onAudioChunk = nil
-                                        startupAudioRelay.clear()
-                                    }
                                 }
                             }
 
@@ -259,8 +286,9 @@ class VoiceInkEngine: NSObject, ObservableObject {
                                self.activeRecordingStartID == startID,
                                self.recordingState.isActivelyRecording {
                                 self.stopRequestedDuringStart = false
+                                latencyTrace.event("engine.deferred_stop.apply", token: traceToken)
                                 self.logger.notice("toggleRecord: applying deferred stop after recording start")
-                                await self.stopRecordingAndRunPipeline()
+                                await self.stopRecordingAndRunPipeline(latencyTraceToken: traceToken)
                                 return
                             }
 
@@ -297,51 +325,125 @@ class VoiceInkEngine: NSObject, ObservableObject {
                             }
 
                         } catch {
+                            powerModeConfigTask?.cancel()
+                            latencyTrace.event("power_mode.resolve.cancelled", details: "reason=start_failed", token: traceToken)
+                            latencyTrace.event(
+                                "engine.start.failed",
+                                details: "error=\(String(describing: type(of: error)))",
+                                token: traceToken
+                            )
                             self.logger.error("❌ Failed to start recording: \(error.localizedDescription, privacy: .public)")
                             self.recordingState = .idle
                             self.recordedFile = nil
                             self.activeRecordingStartID = nil
                             self.stopRequestedDuringStart = false
-                            self.rollingBufferPreloadCoordinator.recordingSessionDidFinish()
+                            self.currentSession?.cancel()
+                            self.currentSession = nil
+                            self.recorder.onAudioChunk = nil
+                            startupAudioRelay.clear()
                             NotificationManager.shared.showNotification(
                                 title: VoiceInkRecordingNotificationPresentation.failedToStart.title,
                                 type: .error
                             )
                             self.logger.notice("toggleRecord: calling dismissMiniRecorder from error handler")
                             await self.recorderUIManager?.dismissMiniRecorder()
+                            latencyTrace.finish(
+                                event: "engine.start.failure_complete",
+                                details: "error=\(String(describing: type(of: error)))",
+                                token: traceToken
+                            )
                         }
-                    }
-                } else {
-                    logger.error("❌ Recording permission denied.")
-                    let presentation = VoiceInkRecordingNotificationPresentation.microphonePermissionRequired
-                    let openMicrophonePermission: () -> Void = {
-                        Task { @MainActor in
-                            PermissionGrantCoordinator.openPermissionsAndGrantMicrophone()
-                        }
-                    }
-                    NotificationManager.shared.showNotification(
-                        title: presentation.title,
-                        type: .error,
-                        duration: presentation.duration,
-                        onTap: openMicrophonePermission,
-                        actionButton: presentation.actionButtonTitle.map { label in
-                            (label: label, action: openMicrophonePermission)
-                        }
-                    )
-                    Task { @MainActor [self] in
-                        await self.recorderUIManager?.dismissMiniRecorder()
-                        continuation.resume()
+            } else {
+                latencyTrace.event("engine.permission.denied", token: traceToken)
+                logger.error("❌ Recording permission denied.")
+                let presentation = VoiceInkRecordingNotificationPresentation.microphonePermissionRequired
+                let openMicrophonePermission: () -> Void = {
+                    Task { @MainActor in
+                        PermissionGrantCoordinator.openPermissionsAndGrantMicrophone()
                     }
                 }
+                NotificationManager.shared.showNotification(
+                    title: presentation.title,
+                    type: .error,
+                    duration: presentation.duration,
+                    onTap: openMicrophonePermission,
+                    actionButton: presentation.actionButtonTitle.map { label in
+                        (label: label, action: openMicrophonePermission)
+                    }
+                )
+                await self.recorderUIManager?.dismissMiniRecorder()
+                latencyTrace.finish(event: "engine.permission.denied_complete", token: traceToken)
             }
+            latencyTrace.end(startLifecycleSpan)
+        }
+    }
+
+    private func prepareRecordingTranscriptionSession(
+        for model: any TranscriptionModel,
+        audioRelay: RecordingStartupAudioRelay,
+        latencyTraceToken: VoiceInkLatencyTrace.Token?
+    ) async throws {
+        let latencyTrace = VoiceInkLatencyTrace.shared
+        let traceToken = latencyTraceToken
+        let session = serviceRegistry.createSession(
+            for: model,
+            onPartialTranscript: { [weak self] partial in
+                Task { @MainActor in
+                    self?.partialTranscript = partial
+                }
             }
+        )
+        currentSession = session
+        latencyTrace.event(
+            "streaming_session.created",
+            details: "model=\(model.displayName)",
+            token: traceToken
+        )
+
+        let sessionPrepareSpan = latencyTrace.begin("streaming_session.prepare", token: traceToken)
+        let realCallback: ((Data) -> Void)?
+        do {
+            realCallback = try await session.prepare(
+                model: model,
+                latencyTraceToken: traceToken
+            )
+            latencyTrace.end(
+                sessionPrepareSpan,
+                details: "result=success hasAudioSink=\(realCallback != nil)"
+            )
+        } catch {
+            latencyTrace.end(
+                sessionPrepareSpan,
+                details: "result=failure error=\(String(describing: type(of: error)))"
+            )
+            session.cancel()
+            currentSession = nil
+            throw error
+        }
+
+        if let realCallback {
+            let relayInstallSpan = latencyTrace.begin("audio_relay.install_sink", token: traceToken)
+            audioRelay.installSink(realCallback)
+            latencyTrace.end(relayInstallSpan)
+            recorder.onAudioChunk = realCallback
+        } else {
+            recorder.onAudioChunk = nil
+            audioRelay.clear()
         }
     }
 
     private func prepareStartupStopStreamingSession(
         for model: any TranscriptionModel,
-        audioRelay: RecordingStartupAudioRelay
+        audioRelay: RecordingStartupAudioRelay,
+        latencyTraceToken: VoiceInkLatencyTrace.Token?
     ) async -> TranscriptionSession? {
+        let latencyTrace = VoiceInkLatencyTrace.shared
+        let traceToken = latencyTraceToken
+        latencyTrace.event(
+            "startup_stop_session.create",
+            details: "model=\(model.displayName)",
+            token: traceToken
+        )
         let session = serviceRegistry.createSession(
             for: model,
             onPartialTranscript: { [weak self] partial in
@@ -351,351 +453,96 @@ class VoiceInkEngine: NSObject, ObservableObject {
             }
         )
 
+        let prepareSpan = latencyTrace.begin("startup_stop_session.prepare", token: traceToken)
         do {
-            guard let callback = try await session.prepare(model: model) else {
+            guard let callback = try await session.prepare(
+                model: model,
+                latencyTraceToken: traceToken
+            ) else {
+                latencyTrace.end(prepareSpan, details: "result=success hasAudioSink=false")
                 session.cancel()
                 return nil
             }
+            latencyTrace.end(prepareSpan, details: "result=success hasAudioSink=true")
 
+            let relaySpan = latencyTrace.begin("startup_stop_audio_relay.install_sink", token: traceToken)
             audioRelay.installSink(callback)
+            latencyTrace.end(relaySpan)
             recorder.onAudioChunk = callback
             return session
         } catch {
+            latencyTrace.end(
+                prepareSpan,
+                details: "result=failure error=\(String(describing: type(of: error)))"
+            )
+            latencyTrace.event(
+                "startup_stop_session.failed",
+                details: "error=\(String(describing: type(of: error)))",
+                token: traceToken
+            )
             session.cancel()
             logger.error("Startup-stop streaming setup failed, falling back to batch: \(error.localizedDescription, privacy: .public)")
             return nil
         }
     }
 
-    private func stopRecordingAndRunPipeline() async {
+    private func stopRecordingAndRunPipeline(
+        latencyTraceToken: VoiceInkLatencyTrace.Token?
+    ) async {
+        let latencyTrace = VoiceInkLatencyTrace.shared
+        let traceToken = latencyTraceToken
+        latencyTrace.event(
+            "engine.stop_pipeline.enter",
+            details: "hasSession=\(currentSession != nil) hasFile=\(recordedFile != nil)",
+            token: traceToken
+        )
         activeRecordingStartID = nil
         stopRequestedDuringStart = false
         partialTranscript = ""
         recordingState = .transcribing
-        await recorder.stopRecording()
+        latencyTrace.event("engine.state.transcribing", token: traceToken)
+        let recorderStopSpan = latencyTrace.begin("recorder.stop", token: traceToken)
+        await recorder.stopRecording(latencyTraceToken: traceToken)
+        latencyTrace.end(recorderStopSpan)
 
         if let recordedFile {
             if !shouldCancelRecording {
+                let recordCreationSpan = latencyTrace.begin("transcription_record.create", token: traceToken)
                 let transcription = makePendingRecordingTranscription(
                     for: recordedFile,
                     duration: 0
                 )
                 modelContext.insert(transcription)
+                latencyTrace.end(recordCreationSpan)
 
-                await runPipeline(on: transcription, audioURL: recordedFile)
+                latencyTrace.event("pipeline.dispatch", token: traceToken)
+                await runPipeline(
+                    on: transcription,
+                    audioURL: recordedFile,
+                    latencyTraceToken: traceToken
+                )
             } else {
-                await finishActiveRecorderCancellation()
+                latencyTrace.event("engine.stop_pipeline.cancelled", token: traceToken)
+                await finishActiveRecorderCancellation(latencyTraceToken: traceToken)
             }
         } else {
+            latencyTrace.event("engine.stop_pipeline.missing_file", token: traceToken)
             cancelCurrentSession()
             if !shouldCancelRecording {
                 logger.error("❌ No recorded file found after stopping recording")
             }
             recordingState = .idle
             await cleanupResources()
+            latencyTrace.finish(event: "engine.stop_pipeline.missing_file_complete", token: traceToken)
         }
     }
 
-    func commitReadyRollingBufferPreload(powerModeId: UUID? = nil) async -> Bool {
-        let latencyTrace = TranscriptionLatencyTrace(
-            operation: TranscriptionLatencyTrace.rollingPreloadQuickReleaseOperation,
-            startedAt: Date()
-        )
-
-        guard recordingState == .idle else {
-            discardPreparedQuickReleaseContext()
-            RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
-                strategy: .unavailable,
-                reason: "state-\(recordingState)",
-                elapsedSeconds: latencyTrace.elapsed
-            )
-            logger.notice("Latency trace preload commit unavailable operation=\(latencyTrace.operation, privacy: .public) reason=state elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
-            return false
-        }
-
-        guard let model = transcriptionModelManager.currentTranscriptionModel else {
-            discardPreparedQuickReleaseContext()
-            RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
-                strategy: .unavailable,
-                reason: "no-model",
-                elapsedSeconds: latencyTrace.elapsed
-            )
-            logger.notice("Latency trace preload commit unavailable operation=\(latencyTrace.operation, privacy: .public) reason=no-model elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
-            return false
-        }
-
-        if let claimedPreload = await rollingBufferPreloadCoordinator.claimPreloadedSession(for: model) {
-            return await commitClaimedRollingBufferPreload(
-                claimedPreload,
-                model: model,
-                powerModeId: powerModeId,
-                latencyTrace: latencyTrace
-            )
-        }
-
-        guard VoiceInkRollingBufferBufferedSnapshotTranscriptionPolicy.strategy(
-            for: model.rollingBufferPreloadSnapshot
-        ) == .recordedFile else {
-            discardPreparedQuickReleaseContext()
-            RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
-                strategy: .unavailable,
-                reason: "no-claim-nonbatch-model",
-                elapsedSeconds: latencyTrace.elapsed
-            )
-            logger.notice("Latency trace preload commit unavailable operation=\(latencyTrace.operation, privacy: .public) reason=no-claim-nonbatch-model elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
-            return false
-        }
-
-        guard let audioSnapshot = rollingBufferPreloadCoordinator.claimBufferedAudioSnapshot() else {
-            discardPreparedQuickReleaseContext()
-            RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
-                strategy: .unavailable,
-                reason: "no-claim",
-                elapsedSeconds: latencyTrace.elapsed
-            )
-            logger.notice("Latency trace preload commit unavailable operation=\(latencyTrace.operation, privacy: .public) reason=no-claim elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
-            return false
-        }
-
-        return await commitBufferedRollingAudioSnapshot(
-            audioSnapshot,
-            model: model,
-            powerModeId: powerModeId,
-            latencyTrace: latencyTrace
-        )
-    }
-
-    private func commitClaimedRollingBufferPreload(
-        _ claimedPreload: RollingBufferPreloadedSession,
-        model: any TranscriptionModel,
-        powerModeId: UUID?,
-        latencyTrace: TranscriptionLatencyTrace
+    private func requestRecordPermission(
+        latencyTraceToken: VoiceInkLatencyTrace.Token?
     ) async -> Bool {
-        logger.notice("Latency trace preload claimed operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
-
-        let claim = RollingBufferPreloadClaim(
-            preloaded: claimedPreload,
-            modelName: model.name,
-            language: claimedPreload.language
-        )
-        let permanentURL = VoiceInkStoredAudioFile.recordingFileURL(in: recordingsDirectory)
-        let audioData = claimedPreload.audioData
-        let audioFileReadyTask = Task.detached(priority: .utility) {
-            try PCM16WAVFileWriter.writeMono16k(audioData, to: permanentURL)
-        }
-        logger.notice("Latency trace deferred audio write scheduled operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s bytes=\(audioData.count, privacy: .public)")
-
-        let preparedContext = takePreparedQuickReleaseContext(powerModeId: powerModeId)
-        let powerModeApplyTask = startPowerModeConfigurationApply(powerModeId: powerModeId, preparedContext: preparedContext)
-        logger.notice("Latency trace active window apply scheduled operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
-
-        guard let currentModel = transcriptionModelManager.currentTranscriptionModel,
-              claim.matches(model: currentModel, language: VoiceInkTranscriptionLanguagePreference.storedLanguage()) else {
-            claimedPreload.session.cancel()
-            rollingBufferPreloadCoordinator.recordingSessionDidFinish()
-            discardDeferredAudioFile(audioFileReadyTask, at: permanentURL)
-            RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
-                strategy: .invalidated,
-                reason: "model-or-language-changed",
-                audioBytes: claimedPreload.audioData.count,
-                elapsedSeconds: latencyTrace.elapsed
-            )
-            return false
-        }
-
-        do {
-            if let streamingSession = claimedPreload.session as? StreamingTranscriptionSession {
-                streamingSession.setFallbackAudioReadyTask(audioFileReadyTask)
-            } else {
-                try await audioFileReadyTask.value
-            }
-            logger.notice("Latency trace deferred audio write attached operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s bytes=\(audioData.count, privacy: .public)")
-            RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
-                strategy: .readyPreload,
-                audioBytes: audioData.count,
-                elapsedSeconds: latencyTrace.elapsed
-            )
-
-            let transcription = makePendingRecordingTranscription(
-                for: permanentURL,
-                duration: VoiceInkPCM16Audio.duration(forMono16kData: audioData)
-            )
-
-            recordedFile = permanentURL
-            currentSession = claimedPreload.session
-            activeRecordingStartID = nil
-            stopRequestedDuringStart = false
-            shouldCancelRecording = false
-            partialTranscript = ""
-            recordingState = .transcribing
-
-            await runPipeline(
-                on: transcription,
-                audioURL: permanentURL,
-                audioFileReadyTask: audioFileReadyTask,
-                latencyTrace: latencyTrace,
-                deferHistoryInsertUntilSave: true,
-                powerModeApplyTask: powerModeApplyTask,
-                preparedCursorTextContext: preparedContext?.cursorContextTask,
-                preparedPasteContext: preparedContext?.pasteContextTask
-            )
-            return true
-        } catch {
-            claimedPreload.session.cancel()
-            rollingBufferPreloadCoordinator.recordingSessionDidFinish()
-            discardDeferredAudioFile(audioFileReadyTask, at: permanentURL)
-            RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
-                strategy: .failed,
-                reason: "ready-preload-error",
-                audioBytes: claimedPreload.audioData.count,
-                elapsedSeconds: latencyTrace.elapsed
-            )
-            logger.error("commitReadyRollingBufferPreload failed: \(error.localizedDescription, privacy: .public)")
-            return false
-        }
-    }
-
-    private func commitBufferedRollingAudioSnapshot(
-        _ audioSnapshot: RollingBufferAudioSnapshot,
-        model: any TranscriptionModel,
-        powerModeId: UUID?,
-        latencyTrace: TranscriptionLatencyTrace
-    ) async -> Bool {
-        logger.notice("Latency trace buffered audio claimed operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s bytes=\(audioSnapshot.audioData.count, privacy: .public)")
-        let permanentURL = VoiceInkStoredAudioFile.recordingFileURL(in: recordingsDirectory)
-        let audioData = audioSnapshot.audioData
-        let audioFileReadyTask = Task.detached(priority: .utility) {
-            try PCM16WAVFileWriter.writeMono16k(audioData, to: permanentURL)
-        }
-        logger.notice("Latency trace buffered audio file write scheduled operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s bytes=\(audioData.count, privacy: .public)")
-
-        let preparedContext = takePreparedQuickReleaseContext(powerModeId: powerModeId)
-        let powerModeApplyTask = startPowerModeConfigurationApply(powerModeId: powerModeId, preparedContext: preparedContext)
-        logger.notice("Latency trace active window apply scheduled operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
-
-        guard let currentModel = transcriptionModelManager.currentTranscriptionModel,
-              currentModel.name == model.name,
-              audioSnapshot.language == VoiceInkTranscriptionLanguagePreference.storedLanguage() else {
-            rollingBufferPreloadCoordinator.recordingSessionDidFinish()
-            discardDeferredAudioFile(audioFileReadyTask, at: permanentURL)
-            RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
-                strategy: .invalidated,
-                reason: "model-or-language-changed",
-                audioBytes: audioSnapshot.audioData.count,
-                elapsedSeconds: latencyTrace.elapsed
-            )
-            return false
-        }
-
-        do {
-            try await audioFileReadyTask.value
-            logger.notice("Latency trace buffered audio file ready operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s bytes=\(audioData.count, privacy: .public)")
-            RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
-                strategy: .bufferedAudioSnapshot,
-                audioBytes: audioData.count,
-                elapsedSeconds: latencyTrace.elapsed
-            )
-
-            let transcription = makePendingRecordingTranscription(
-                for: permanentURL,
-                duration: VoiceInkPCM16Audio.duration(forMono16kData: audioData)
-            )
-
-            recordedFile = permanentURL
-            currentSession = nil
-            activeRecordingStartID = nil
-            stopRequestedDuringStart = false
-            shouldCancelRecording = false
-            partialTranscript = ""
-            recordingState = .transcribing
-
-            await runPipeline(
-                on: transcription,
-                audioURL: permanentURL,
-                latencyTrace: latencyTrace,
-                deferHistoryInsertUntilSave: true,
-                powerModeApplyTask: powerModeApplyTask,
-                preparedCursorTextContext: preparedContext?.cursorContextTask,
-                preparedPasteContext: preparedContext?.pasteContextTask
-            )
-            return true
-        } catch {
-            rollingBufferPreloadCoordinator.recordingSessionDidFinish()
-            discardDeferredAudioFile(audioFileReadyTask, at: permanentURL)
-            RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseClaim(
-                strategy: .failed,
-                reason: "buffered-audio-error",
-                audioBytes: audioSnapshot.audioData.count,
-                elapsedSeconds: latencyTrace.elapsed
-            )
-            logger.error("commitBufferedRollingAudioSnapshot failed: \(error.localizedDescription, privacy: .public)")
-            return false
-        }
-    }
-
-    private func discardDeferredAudioFile(_ audioFileReadyTask: Task<Void, Error>, at url: URL) {
-        audioFileReadyTask.cancel()
-        Task.detached(priority: .utility) {
-            _ = try? await audioFileReadyTask.value
-            try? VoiceInkStoredAudioFile.deleteExistingFile(for: url.absoluteString)
-        }
-    }
-
-    func prepareQuickReleaseContext(powerModeId: UUID? = nil) {
-        preparedQuickReleaseContext = PreparedQuickReleaseContext(
-            powerModeId: powerModeId,
-            powerModeTask: Task { @MainActor in
-                await ActiveWindowService.shared.resolveConfiguration(
-                    powerModeId: powerModeId,
-                    updateCurrentApplication: false
-                )
-            },
-            cursorContextTask: Task { @MainActor in
-                CursorTextContextReader.textBeforeCursor()
-            },
-            pasteContextTask: Task { @MainActor in
-                CursorPaster.preparePasteContext()
-            }
-        )
-    }
-
-    func discardPreparedQuickReleaseContext() {
-        preparedQuickReleaseContext = nil
-    }
-
-    private func takePreparedQuickReleaseContext(powerModeId: UUID?) -> PreparedQuickReleaseContext? {
-        defer { preparedQuickReleaseContext = nil }
-        guard let preparedQuickReleaseContext,
-              preparedQuickReleaseContext.matches(powerModeId: powerModeId) else {
-            return nil
-        }
-        return preparedQuickReleaseContext
-    }
-
-    private func applyPowerModeConfiguration(
-        powerModeId: UUID?,
-        preparedContext: PreparedQuickReleaseContext?
-    ) async {
-        if let preparedContext {
-            let config = await preparedContext.powerModeTask.value
-            await PowerModeManager.shared.activateConfiguration(config)
-            return
-        }
-
-        let config = await ActiveWindowService.shared.resolveConfiguration(powerModeId: powerModeId)
-        await PowerModeManager.shared.activateConfiguration(config)
-    }
-
-    private func startPowerModeConfigurationApply(
-        powerModeId: UUID?,
-        preparedContext: PreparedQuickReleaseContext?
-    ) -> Task<Void, Never> {
-        Task { @MainActor in
-            await applyPowerModeConfiguration(powerModeId: powerModeId, preparedContext: preparedContext)
-        }
-    }
-
-    private func requestRecordPermission(response: @escaping (Bool) -> Void) {
+        let latencyTrace = VoiceInkLatencyTrace.shared
+        let traceToken = latencyTraceToken
+        let span = latencyTrace.begin("permission.authorization_status", token: traceToken)
         let permissionStatus: VoiceInkRecordingPermissionStatus
         switch AVCaptureDevice.authorizationStatus(for: .audio) {
         case .authorized:
@@ -707,22 +554,23 @@ class VoiceInkEngine: NSObject, ObservableObject {
         @unknown default:
             permissionStatus = .denied
         }
+        latencyTrace.end(
+            span,
+            details: "status=\(String(describing: permissionStatus))"
+        )
 
-        VoiceInkRecordingPermissionPolicy.plan(for: permissionStatus).applyRuntimeState(
-            startRecording: {
-                response(true)
-            },
-            presentPermissionDenied: {
-                response(false)
-            },
-            requestPermission: { completion in
+        switch permissionStatus {
+        case .granted:
+            return true
+        case .denied:
+            return false
+        case .undetermined:
+            return await withCheckedContinuation { continuation in
                 AVCaptureDevice.requestAccess(for: .audio) { granted in
-                    DispatchQueue.main.async {
-                        completion(granted)
-                    }
+                    continuation.resume(returning: granted)
                 }
             }
-        )
+        }
     }
 
     // MARK: - Pipeline Dispatch
@@ -730,20 +578,15 @@ class VoiceInkEngine: NSObject, ObservableObject {
     private func runPipeline(
         on transcription: Transcription,
         audioURL: URL,
-        audioFileReadyTask: Task<Void, Error>? = nil,
-        latencyTrace: TranscriptionLatencyTrace? = nil,
-        deferHistoryInsertUntilSave: Bool = false,
-        powerModeApplyTask: Task<Void, Never>? = nil,
-        preparedCursorTextContext: Task<String?, Never>? = nil,
-        preparedPasteContext: Task<CursorPaster.PreparedPasteContext?, Never>? = nil
+        latencyTraceToken: VoiceInkLatencyTrace.Token?
     ) async {
+        let latencyTrace = VoiceInkLatencyTrace.shared
+        let traceToken = latencyTraceToken
         guard let model = transcriptionModelManager.currentTranscriptionModel else {
-            if deferHistoryInsertUntilSave {
-                modelContext.insert(transcription)
-            }
             transcription.markAsFailedTranscription(reason: VoiceInkModelManagementPresentation.noModelSelectedText)
             try? modelContext.save()
             recordingState = .idle
+            latencyTrace.finish(event: "pipeline.no_model", token: traceToken)
             return
         }
 
@@ -751,11 +594,12 @@ class VoiceInkEngine: NSObject, ObservableObject {
         let transcriptionID = transcription.id
         activePipelineTranscriptionID = transcriptionID
 
-        let deferredPipelineWork = await pipeline.run(
+        await pipeline.run(
             transcription: transcription,
             audioURL: audioURL,
             model: model,
             session: session,
+            latencyTraceToken: traceToken,
             onStateChange: { [weak self] state in
                 guard let self, self.activePipelineTranscriptionID == transcriptionID else { return }
                 self.recordingState = state
@@ -772,32 +616,16 @@ class VoiceInkEngine: NSObject, ObservableObject {
             onDismiss: { [weak self] in
                 guard let self, self.activePipelineTranscriptionID == transcriptionID else { return }
                 await self.recorderUIManager?.dismissMiniRecorder()
-            },
-            audioFileReadyTask: audioFileReadyTask,
-            latencyTrace: latencyTrace,
-            deferHistoryInsertUntilSave: deferHistoryInsertUntilSave,
-            powerModeApplyTask: powerModeApplyTask,
-            preparedCursorTextContext: preparedCursorTextContext,
-            preparedPasteContext: preparedPasteContext
-        )
-        recordRollingPreloadTiming(latencyTrace, stage: .pipelineReturned)
-        if let latencyTrace, latencyTrace.isRollingPreloadQuickRelease {
-            logger.notice("Latency trace pipeline returned operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
-        }
-
-        let didFinishActivePipeline = activePipelineTranscriptionID == transcriptionID
-        let shouldDeferRecorderSessionFinish = latencyTrace?.isRollingPreloadQuickRelease == true
-        if didFinishActivePipeline {
-            if !shouldDeferRecorderSessionFinish {
-                await finishRecorderSession()
             }
-            // Keep successful local STT resources warm for the next recording/preload.
-            // Cancellation, reset, and Power Mode model changes still release them.
+        )
+        let didFinishActivePipeline = activePipelineTranscriptionID == transcriptionID
+        if didFinishActivePipeline {
+            await finishRecorderSession()
+            // Keep successful local STT resources warm for the next recording.
             activePipelineTranscriptionID = nil
             currentSession = nil
             recordedFile = nil
             shouldCancelRecording = false
-            rollingBufferPreloadCoordinator.recordingSessionDidFinish()
         }
         canceledPipelineTranscriptionIDs.remove(transcriptionID)
 
@@ -805,44 +633,18 @@ class VoiceInkEngine: NSObject, ObservableObject {
            recordingState.shouldReturnToIdleWhenActivePipelineFinishes {
             recordingState = .idle
         }
-        if didFinishActivePipeline {
-            recordRollingPreloadTiming(latencyTrace, stage: .idle)
-            if let latencyTrace, latencyTrace.isRollingPreloadQuickRelease {
-                logger.notice("Latency trace engine idle operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
-            }
-        }
-
-        if didFinishActivePipeline, shouldDeferRecorderSessionFinish {
-            Task { @MainActor in
-                await self.finishRecorderSession()
-                self.recordRollingPreloadTiming(latencyTrace, stage: .sessionFinished)
-                if let latencyTrace, latencyTrace.isRollingPreloadQuickRelease {
-                    self.logger.notice("Latency trace recorder session finished operation=\(latencyTrace.operation, privacy: .public) elapsed=\(latencyTrace.elapsed, format: .fixed(precision: 3), privacy: .public)s")
-                }
-            }
-        }
-
-        if let deferredPipelineWork {
-            Task { @MainActor in
-                deferredPipelineWork()
-            }
-        }
-    }
-
-    private func recordRollingPreloadTiming(
-        _ latencyTrace: TranscriptionLatencyTrace?,
-        stage: VoiceInkRollingBufferQuickReleaseTimingStage
-    ) {
-        guard let latencyTrace, latencyTrace.isRollingPreloadQuickRelease else { return }
-        RollingBufferPreloadRuntimeDiagnostics.shared.recordQuickReleaseTiming(
-            stage: stage,
-            elapsedSeconds: latencyTrace.elapsed
-        )
     }
 
     // MARK: - Cancellation
 
     func cancelRecording() async {
+        let latencyTrace = VoiceInkLatencyTrace.shared
+        let traceToken = latencyTrace.currentToken()
+        latencyTrace.event(
+            "engine.cancel_requested",
+            details: "state=\(String(describing: recordingState))",
+            token: traceToken
+        )
         logger.notice("cancelRecording called – state=\(String(describing: self.recordingState), privacy: .public)")
         let cancellationPlan = VoiceInkMacOSRecordingCancellationPolicy.plan(
             recordingState: recordingState
@@ -856,7 +658,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
                 requestRecordingCancellation()
             },
             finishActiveRecorderCancellation: {
-                await finishActiveRecorderCancellation()
+                await finishActiveRecorderCancellation(latencyTraceToken: traceToken)
             },
             clearPartialTranscript: {
                 partialTranscript = ""
@@ -874,6 +676,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
     }
 
     func resetRecordingSession() async {
+        let latencyTrace = VoiceInkLatencyTrace.shared
+        let traceToken = latencyTrace.currentToken()
         cancelCurrentSession()
         activeRecordingStartID = nil
         activePipelineTranscriptionID = nil
@@ -881,12 +685,12 @@ class VoiceInkEngine: NSObject, ObservableObject {
         shouldCancelRecording = false
         stopRequestedDuringStart = false
         partialTranscript = ""
-        await recorder.stopRecording()
+        await recorder.stopRecording(latencyTraceToken: traceToken)
         recordedFile = nil
         recordingState = .idle
-        rollingBufferPreloadCoordinator.recordingSessionDidFinish()
         await cleanupResources()
         await finishRecorderSession()
+        latencyTrace.finish(event: "engine.session_reset_complete", token: traceToken)
     }
 
     private func requestRecordingCancellation() {
@@ -900,27 +704,38 @@ class VoiceInkEngine: NSObject, ObservableObject {
         cancelCurrentSession()
     }
 
-    private func finishActiveRecorderCancellation() async {
+    private func finishActiveRecorderCancellation(
+        latencyTraceToken: VoiceInkLatencyTrace.Token?
+    ) async {
+        let latencyTrace = VoiceInkLatencyTrace.shared
+        let traceToken = latencyTraceToken
         activeRecordingStartID = nil
         stopRequestedDuringStart = false
-        await recorder.stopRecording()
-        await saveCanceledRecording()
+        await recorder.stopRecording(latencyTraceToken: traceToken)
+        await saveCanceledRecording(latencyTraceToken: traceToken)
         recordedFile = nil
         partialTranscript = ""
         recordingState = .idle
-        rollingBufferPreloadCoordinator.recordingSessionDidFinish()
         await cleanupResources()
+        latencyTrace.finish(event: "engine.recording_cancelled", token: traceToken)
     }
 
-    private func saveCanceledRecording() async {
+    private func saveCanceledRecording(
+        latencyTraceToken: VoiceInkLatencyTrace.Token?
+    ) async {
         guard let recordedFile,
               FileManager.default.fileExists(atPath: recordedFile.path)
         else { return }
 
-        let duration = await AudioFileMetadata.duration(for: recordedFile)
+        let durationResult = await AudioFileMetadata.tracedDuration(
+            for: recordedFile,
+            executorName: "engine.cancel_audio_duration",
+            latencyTraceToken: latencyTraceToken
+        )
+        VoiceInkLatencyTrace.shared.executorResumed(durationResult.executorCheckpoint)
         let transcription = makeCanceledRecordingTranscription(
             for: recordedFile,
-            duration: duration
+            duration: durationResult.seconds
         )
 
         modelContext.insert(transcription)
@@ -985,7 +800,6 @@ class VoiceInkEngine: NSObject, ObservableObject {
     private func cancelCurrentSession() {
         currentSession?.cancel()
         currentSession = nil
-        rollingBufferPreloadCoordinator.cancelUnclaimedPreload(reason: "engine-session-cancel")
     }
 
     private func finishRecorderSession() async {
@@ -1024,43 +838,40 @@ class VoiceInkEngine: NSObject, ObservableObject {
             name: .licenseStatusChanged,
             object: nil
         )
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(handleAppSettingsDidChange),
-            name: .AppSettingsDidChange,
-            object: nil
-        )
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(handleRollingBufferPreloadPartialTranscript(_:)),
-            name: .rollingBufferPreloadPartialTranscript,
-            object: nil
-        )
     }
 
     @objc func handleLicenseStatusChanged() {
         pipeline.licenseViewModel = LicenseViewModel()
     }
 
-    @objc func handleAppSettingsDidChange() {
-        rollingBufferPreloadCoordinator.settingsDidChange()
-        Task { [weak self] in
-            await self?.recorder.reloadRollingBufferSettings()
-        }
-    }
-
-    @objc func handleRollingBufferPreloadPartialTranscript(_ notification: Notification) {
-        guard recordingState.acceptsRollingBufferPreloadPreview,
-              let text = VoiceInkRollingBufferPreloadPartialTranscriptRequest.text(from: notification) else { return }
-        partialTranscript = text
-    }
 }
 
 enum AudioFileMetadata {
-    static func duration(for url: URL) async -> TimeInterval {
+    struct DurationResult: Sendable {
+        let seconds: TimeInterval
+        let executorCheckpoint: VoiceInkLatencyTrace.ExecutorCheckpoint?
+    }
+
+    static func tracedDuration(
+        for url: URL,
+        executorName: String,
+        latencyTraceToken: VoiceInkLatencyTrace.Token?
+    ) async -> DurationResult {
         let asset = AVURLAsset(url: url)
-        guard let duration = try? await asset.load(.duration) else { return 0 }
-        let seconds = CMTimeGetSeconds(duration)
-        return seconds.isFinite ? seconds : 0
+        let seconds: TimeInterval
+        if let duration = try? await asset.load(.duration) {
+            let loadedSeconds = CMTimeGetSeconds(duration)
+            seconds = loadedSeconds.isFinite ? loadedSeconds : 0
+        } else {
+            seconds = 0
+        }
+        let checkpoint = VoiceInkLatencyTrace.shared.executorEnqueued(
+            executorName,
+            token: latencyTraceToken
+        )
+        return DurationResult(
+            seconds: seconds,
+            executorCheckpoint: checkpoint
+        )
     }
 }

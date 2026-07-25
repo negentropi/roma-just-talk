@@ -40,6 +40,7 @@
 - Added iOS audio/video file import with multi-file queueing, 16 kHz WAV preparation, mode selection, background-safe transcription, cancel/retry controls, persistent history, detail navigation, external file opening, and transcript sharing.
 - Added tracked iOS post-record transcription tasks with balanced background execution, retryable expiration/relaunch recovery, user cancellation, keyboard result completion, and whisper.cpp abort support for local inference.
 - Added iOS keyboard setup to onboarding and Settings, with installation guidance, a verification field, fresh activation and Full Access status, recovery through system Settings, and a setup-later path.
+- Added an iOS keyboard clipboard-history surface opened by horizontal swipe or its toolbar button, with explicit current-pasteboard capture, local App Group retention, text/link/image previews, typed search, filters, pin/delete/clear actions, plus emoji, Tab, and hide-keyboard controls.
 - Added context-bound iOS keyboard result handoff so completed dictation inserts exactly once after returning to a matching field, with explicit confirmation for ambiguous empty fields.
 - Fixed the iOS keyboard extension crash when a text document identifier is temporarily unavailable during startup.
 - Kept dismiss-only iOS recording alerts actionable instead of rendering a disabled OK button.

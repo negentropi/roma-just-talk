@@ -7,6 +7,7 @@
 
 import UIKit
 import KeyboardKit
+import SwiftUI
 import VoiceInkCore
 
 class KeyboardViewController: KeyboardInputViewController {
@@ -16,7 +17,12 @@ class KeyboardViewController: KeyboardInputViewController {
     )
     
     var recordButton: UIButton!
+    private var hideKeyboardButton: UIButton!
     private let coordinator = AppGroupCoordinator.shared
+    private let shellState = VoiceInkKeyboardShellState()
+    private lazy var clipboardModel = VoiceInkKeyboardClipboardModel(
+        store: VoiceInkKeyboardClipboardStore.appGroupStore()
+    )
     private var recordingStatusTimer: Timer?
 
     private var currentDocumentIdentifier: UUID? {
@@ -41,8 +47,45 @@ class KeyboardViewController: KeyboardInputViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        services.actionHandler = VoiceInkKeyboardActionHandler(
+            controller: self,
+            shellState: shellState
+        )
+        setupShellCallbacks()
         setupRecordButton()
+        setupHideKeyboardButton()
         setupRecordingStatusMonitoring()
+    }
+
+    override func viewWillSetupKeyboardView() {
+        setupKeyboardView { [weak self] controller in
+            let shellState = self?.shellState ?? VoiceInkKeyboardShellState()
+            let clipboardModel = self?.clipboardModel ?? VoiceInkKeyboardClipboardModel(store: nil)
+            return VoiceInkKeyboardShellView(
+                services: controller.services,
+                state: controller.state,
+                shellState: shellState,
+                clipboardModel: clipboardModel,
+                onOpenClipboard: { [weak self] in
+                    guard let self else { return }
+                    self.clipboardModel.captureCurrentPasteboard(
+                        hasFullAccess: self.hasFullAccess
+                    )
+                },
+                onActivateClipboardItem: { [weak self] item in
+                    self?.activateClipboardItem(item)
+                }
+            )
+        }
+    }
+
+    private func setupShellCallbacks() {
+        shellState.onSurfaceChange = { [weak self] surface in
+            self?.updateChromeVisibility(for: surface)
+        }
+        shellState.onSubmitSearch = { [weak self] in
+            self?.activateFirstClipboardSearchResult()
+        }
     }
     
     private func setupRecordButton() {
@@ -50,6 +93,7 @@ class KeyboardViewController: KeyboardInputViewController {
         recordButton = UIButton(type: .system)
         recordButton.translatesAutoresizingMaskIntoConstraints = false
         recordButton.addTarget(self, action: #selector(recordButtonTapped), for: .touchUpInside)
+        recordButton.accessibilityIdentifier = "voiceink.keyboard.record"
         
         // Configure for idle state initially
         configureButton(
@@ -85,6 +129,39 @@ class KeyboardViewController: KeyboardInputViewController {
         // Ensure button stays on top
         view.bringSubviewToFront(recordButton)
     }
+
+    private func setupHideKeyboardButton() {
+        hideKeyboardButton = UIButton(type: .system)
+        hideKeyboardButton.translatesAutoresizingMaskIntoConstraints = false
+        hideKeyboardButton.addTarget(
+            self,
+            action: #selector(hideKeyboardButtonTapped),
+            for: .touchUpInside
+        )
+        hideKeyboardButton.setImage(
+            UIImage(systemName: "keyboard.chevron.compact.down"),
+            for: .normal
+        )
+        hideKeyboardButton.tintColor = .label
+        hideKeyboardButton.backgroundColor = .secondarySystemBackground
+        hideKeyboardButton.layer.cornerRadius = 16
+        hideKeyboardButton.layer.borderWidth = 0.5
+        hideKeyboardButton.layer.borderColor = UIColor.separator.cgColor
+        hideKeyboardButton.accessibilityLabel = "Hide Keyboard"
+        hideKeyboardButton.accessibilityIdentifier = "voiceink.keyboard.hide"
+
+        view.addSubview(hideKeyboardButton)
+        NSLayoutConstraint.activate([
+            hideKeyboardButton.trailingAnchor.constraint(
+                equalTo: recordButton.leadingAnchor,
+                constant: -8
+            ),
+            hideKeyboardButton.centerYAnchor.constraint(equalTo: recordButton.centerYAnchor),
+            hideKeyboardButton.widthAnchor.constraint(equalToConstant: 32),
+            hideKeyboardButton.heightAnchor.constraint(equalToConstant: 32)
+        ])
+        view.bringSubviewToFront(hideKeyboardButton)
+    }
     
     private func configureButton(
         _ presentation: VoiceInkKeyboardRecordingButtonPresentation,
@@ -111,35 +188,66 @@ class KeyboardViewController: KeyboardInputViewController {
         super.viewDidAppear(animated)
         coordinator.reportKeyboardReadiness(hasFullAccess: hasFullAccess)
         updateButtonAppearanceBasedOnState()
-        
-        // Re-add and ensure record button stays on top after KeyboardKit layout
-        if let button = recordButton {
+        restoreChromeButtonsIfNeeded()
+
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.recordButton.layer.cornerRadius = self.recordButton.frame.height / 2
+        }
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        restoreChromeButtonsIfNeeded()
+        recordButton.layer.cornerRadius = recordButton.frame.height / 2
+    }
+
+    private func restoreChromeButtonsIfNeeded() {
+        for button in [hideKeyboardButton, recordButton].compactMap({ $0 }) {
             if button.superview == nil {
                 view.addSubview(button)
             }
             view.bringSubviewToFront(button)
-            
-            // Ensure proper capsule shape after layout
-            DispatchQueue.main.async {
-                button.layer.cornerRadius = button.frame.height / 2
-            }
         }
+        updateChromeVisibility(for: shellState.surface)
     }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        
-        // Re-add button if KeyboardKit removed it
-        if let button = recordButton, button.superview == nil {
-            view.addSubview(button)
+
+    private func updateChromeVisibility(for surface: VoiceInkKeyboardShellState.Surface) {
+        recordButton?.isHidden = surface == .clipboard
+    }
+
+    @objc private func hideKeyboardButtonTapped() {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        dismissKeyboard()
+    }
+
+    private func activateFirstClipboardSearchResult() {
+        guard let item = clipboardModel.filteredItems(
+            matching: shellState.clipboardQuery,
+            filter: shellState.clipboardFilter
+        ).first else {
+            return
         }
-        
-        // Ensure button is still visible after layout
-        if let button = recordButton {
-            view.bringSubviewToFront(button)
-            
-            // Make button fully capsule-shaped based on its actual height
-            button.layer.cornerRadius = button.frame.height / 2
+        activateClipboardItem(item)
+    }
+
+    private func activateClipboardItem(_ item: VoiceInkKeyboardClipboardItem) {
+        switch item.kind {
+        case .text, .link:
+            guard let text = item.text, !text.isEmpty else { return }
+            textDocumentProxy.insertText(text)
+            clipboardModel.markUsed(item)
+            shellState.showKeyboard()
+            UINotificationFeedbackGenerator().notificationOccurred(.success)
+        case .image:
+            guard hasFullAccess,
+                  let image = clipboardModel.image(for: item) else {
+                return
+            }
+            UIPasteboard.general.image = image
+            clipboardModel.markUsed(item)
+            clipboardModel.reportImageCopied()
+            UINotificationFeedbackGenerator().notificationOccurred(.success)
         }
     }
     

@@ -120,6 +120,15 @@ roma-just-talk is built top on: [VoiceInk](https://github.com/Beingpax/VoiceInk)
 - [PermissionFlow](https://github.com/jaywcjlove/PermissionFlow) - make granting permissions intuitive. they were inspired by when codex app shiped legendary `computer-use` tool alongside a never seen before way of permission granting flow.   
 
 
+## Related Projects
+
+Other projects addressing this issue:
+
+- **[AirPods Volume Memory](https://github.com/mo-khan98/Airpods-Volume-Memory)** is a focused native macOS menu-bar app that remembers each AirPods device's volume and restores it when that device becomes the active output. It targets the same macOS behavior that can reset AirPods to 50% volume on reconnect.
+
+Roma Just Talk touches a broader audio-capture and routing path, so the overlap may help lead to a more comprehensive fix. For now, the issue is not fully solved here: a roughly 0.3-second burst at 50% volume can still happen when AirPods connect or switch microphone profiles, or when output moves from BlackHole back to AirPods while audio is already playing.
+
+
 ---
 
 Built from VoiceInk, then pointed at speak-before-hotkey dictation.

@@ -363,8 +363,10 @@ public struct RuntimeCaseAssessment: Codable, Equatable, Sendable {
         case targetSetupFailed
         case audioFailed
         case shortcutFailed
+        case shortcutTimingMismatch
         case triggerRejected
         case traceMissing
+        case transcriptionIncomplete
         case emptyTranscript
         case noPaste
         case clipboardOnly
@@ -388,11 +390,19 @@ public struct RuntimeCaseAssessment: Codable, Equatable, Sendable {
         observation: RuntimeCaseObservation,
         expectedTranscript: String?,
         latencyThresholdMilliseconds: Double,
+        shortcutHoldMatched: Bool? = nil,
+        transcriptionCompleted: Bool? = nil,
         transcribedCharacterCount: Int? = nil,
         maximumWordErrorRate: Double = 0.2
     ) -> Self {
         guard observation.triggerObserved else {
             return Self(status: .triggerRejected, passed: false)
+        }
+        guard shortcutHoldMatched != false else {
+            return Self(status: .shortcutTimingMismatch, passed: false)
+        }
+        guard transcriptionCompleted != false else {
+            return Self(status: .transcriptionIncomplete, passed: false)
         }
         guard transcribedCharacterCount != 0 else {
             return Self(status: .emptyTranscript, passed: false)
@@ -648,6 +658,15 @@ public struct RuntimeLatencyTrace: Codable, Equatable, Sendable {
             .split(separator: " ")
             .first { $0.hasPrefix(prefix) }
             .flatMap { Int($0.dropFirst(prefix.count)) }
+    }
+
+    public var observedShortcutHoldMilliseconds: Double? {
+        guard let keyDown = events.first(where: { $0.name == "shortcut.key_down_physical" }),
+              let keyUp = events.last(where: { $0.name == "shortcut.key_up_handler" }),
+              keyUp.totalMilliseconds >= keyDown.totalMilliseconds else {
+            return nil
+        }
+        return keyUp.totalMilliseconds - keyDown.totalMilliseconds
     }
 
     public var clipboardWriteSucceeded: Bool {

@@ -89,6 +89,41 @@ do {
     )
     print("PASS empty transcription remains distinct from clipboard and target failures")
 
+    let shortcutTimingMismatch = RuntimeCaseAssessment.assess(
+        observation: RuntimeCaseObservation(
+            visibleText: nil,
+            keyUpToVisibleMilliseconds: nil,
+            clipboardChanged: true,
+            triggerObserved: true
+        ),
+        expectedTranscript: nil,
+        latencyThresholdMilliseconds: 440,
+        shortcutHoldMatched: false,
+        transcriptionCompleted: false
+    )
+    try require(
+        shortcutTimingMismatch.status == .shortcutTimingMismatch,
+        "an app-observed hold that disagrees with the posted hold must remain an input-delivery failure"
+    )
+
+    let incompleteTranscription = RuntimeCaseAssessment.assess(
+        observation: RuntimeCaseObservation(
+            visibleText: nil,
+            keyUpToVisibleMilliseconds: nil,
+            clipboardChanged: true,
+            triggerObserved: true
+        ),
+        expectedTranscript: nil,
+        latencyThresholdMilliseconds: 440,
+        shortcutHoldMatched: true,
+        transcriptionCompleted: false
+    )
+    try require(
+        incompleteTranscription.status == .transcriptionIncomplete,
+        "an incomplete VoiceInk trace must not be classified from unrelated clipboard changes"
+    )
+    print("PASS shortcut delivery and incomplete transcription remain distinct from paste failures")
+
     let unrenderedPaste = RuntimeCaseAssessment.assess(
         observation: RuntimeCaseObservation(
             visibleText: "AX already contains text",
@@ -260,6 +295,17 @@ do {
         "trace should expose its worst executor queue delay"
     )
     print("PASS latency trace preserves executor enqueue-to-resume timing")
+
+    let shortcutTimingTrace = RuntimeLatencyTrace.parse(messages: [
+        "[LATENCY] trace=A1A2A3A4 seq=0 t=0.0ms delta=0.0ms event=shortcut.key_down_physical mode=special",
+        "[LATENCY] trace=A1A2A3A4 seq=1 t=166.2ms delta=166.2ms event=shortcut.key_up_handler state=recording"
+    ])
+    try require(
+        shortcutTimingTrace?.observedShortcutHoldMilliseconds ?? -1,
+        equals: 166.2,
+        "trace should expose the shortcut hold VoiceInk actually observed"
+    )
+    print("PASS latency trace exposes the VoiceInk-observed shortcut hold")
 
     let emptyTranscriptTrace = RuntimeLatencyTrace.parse(messages: [
         "[LATENCY] trace=F1F2F3F4 seq=0 t=100.0ms delta=100.0ms event=pipeline.transcribe.end durationMs=52.0 result=success rawChars=0"

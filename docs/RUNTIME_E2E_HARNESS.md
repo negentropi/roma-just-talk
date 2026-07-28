@@ -92,7 +92,9 @@ routing without making a paste claim.
 - Target app missing, not activated, unreadable through AX, or not cleared
 - WAV cannot play into BlackHole
 - Synthetic Special left Shift is not accepted by VoiceInk
+- Posted Shift hold and VoiceInk-observed hold differ by more than `150ms`
 - No new `LatencyTrace` is emitted
+- VoiceInk starts a trace but never completes transcription
 - VoiceInk completes transcription with zero characters (`emptyTranscript`)
 - VoiceInk posts no text into the target
 - Clipboard changes but the target remains empty (`clipboardOnly`)
@@ -110,10 +112,15 @@ subsequently writes or posts whitespace. It is never counted as a clipboard,
 paste-delivery, or target-visibility failure.
 
 Each case also records factual checkpoints: target prepared, audio started,
-shortcut down/up posted, Roma trigger observed, transcription completed,
+shortcut down/up posted, Roma trigger observed, app-observed shortcut hold matched,
+transcription completed,
 clipboard write succeeded, paste event posted, AX text observed, stable rendered
 pixels observed, and target cleanup passed. `failureBoundary` names the first
 unproven boundary; it does not guess which component owns the failure.
+
+`shortcutDelivery` means the helper's posted hold and Roma's trace disagree. It
+does not assume whether the synthetic injector, macOS delivery, competing input,
+or Roma's monitor caused the mismatch.
 
 Latency is split into:
 

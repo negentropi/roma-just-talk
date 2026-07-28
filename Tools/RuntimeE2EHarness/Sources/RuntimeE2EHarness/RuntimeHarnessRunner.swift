@@ -7,6 +7,7 @@ enum RuntimeFailureBoundary: String, Codable {
     case targetPreparation
     case audioInjection
     case shortcutInjection
+    case shortcutDelivery
     case traceCollection
     case voiceInkTrigger
     case voiceInkTranscription
@@ -24,6 +25,7 @@ struct RuntimeCaseEvidence: Codable {
     let shortcutUpPosted: Bool
     let emergencyShortcutReleasePosted: Bool
     let voiceInkTriggerObserved: Bool
+    let voiceInkShortcutHoldMatched: Bool?
     let voiceInkTranscriptionCompleted: Bool
     let voiceInkClipboardWriteSucceeded: Bool
     let voiceInkPasteEventPosted: Bool
@@ -48,6 +50,8 @@ struct RuntimeCaseReport: Codable {
     let shortcutUp: RuntimeShortcutEventResult?
     let actualAudioLeadMilliseconds: Double?
     let actualHoldMilliseconds: Double?
+    let voiceInkObservedHoldMilliseconds: Double?
+    let shortcutHoldDeltaMilliseconds: Double?
     let voiceInkKeyUpToPasteEventMilliseconds: Double?
     let voiceInkKeyUpToPipelineCompleteMilliseconds: Double?
     let voiceInkKeyUpToInteractionSettledMilliseconds: Double?
@@ -94,7 +98,7 @@ struct RuntimeRunSummary: Codable {
 }
 
 struct RuntimeHarnessReport: Codable {
-    var schemaVersion = 3
+    var schemaVersion = 4
     let startedAt: Date
     var finishedAt: Date?
     let configuration: RuntimeHarnessConfiguration
@@ -108,6 +112,8 @@ struct RuntimeHarnessReport: Codable {
 }
 
 enum RuntimeHarnessRunner {
+    private static let shortcutHoldToleranceMilliseconds: Double = 150
+
     static func run(
         configuration: RuntimeHarnessConfiguration,
         reportURL: URL
@@ -256,6 +262,9 @@ enum RuntimeHarnessRunner {
         var clipboardChanged = false
         var audioPlaybackStarted = false
         var emergencyShortcutReleasePosted = false
+        var voiceInkObservedHoldMilliseconds: Double?
+        var shortcutHoldDeltaMilliseconds: Double?
+        var voiceInkShortcutHoldMatched: Bool?
         var assessment = RuntimeCaseAssessment(status: .targetSetupFailed, passed: false)
         var errorText: String?
 
@@ -313,6 +322,29 @@ enum RuntimeHarnessRunner {
                 timeoutSeconds: 3
             )
 
+            let postedHoldMilliseconds = (up.postedAtSystemUptime - down.postedAtSystemUptime) * 1_000
+            voiceInkObservedHoldMilliseconds = latencyTrace?.observedShortcutHoldMilliseconds
+            shortcutHoldDeltaMilliseconds = voiceInkObservedHoldMilliseconds.map {
+                $0 - postedHoldMilliseconds
+            }
+            voiceInkShortcutHoldMatched = shortcutHoldDeltaMilliseconds.map {
+                abs($0) <= shortcutHoldToleranceMilliseconds
+            }
+            if voiceInkShortcutHoldMatched == false,
+               let voiceInkObservedHoldMilliseconds,
+               let shortcutHoldDeltaMilliseconds {
+                let timingError = String(
+                    format: "Posted shortcut hold %.1fms; VoiceInk observed %.1fms (delta %.1fms)",
+                    postedHoldMilliseconds,
+                    voiceInkObservedHoldMilliseconds,
+                    shortcutHoldDeltaMilliseconds
+                )
+                errorText = [errorText, timingError]
+                    .compactMap { $0 }
+                    .filter { !$0.isEmpty }
+                    .joined(separator: "; ")
+            }
+
             let observation = RuntimeCaseObservation(
                 visibleText: visibleText?.text,
                 keyUpToVisibleMilliseconds: visibleText?.keyUpToVisibleMilliseconds,
@@ -323,6 +355,8 @@ enum RuntimeHarnessRunner {
                 observation: observation,
                 expectedTranscript: runCase.expectedTranscript,
                 latencyThresholdMilliseconds: configuration.latencyThresholdMilliseconds,
+                shortcutHoldMatched: voiceInkShortcutHoldMatched,
+                transcriptionCompleted: latencyTrace.map(\.transcriptionCompleted),
                 transcribedCharacterCount: latencyTrace?.transcribedCharacterCount,
                 maximumWordErrorRate: configuration.maximumWordErrorRate
             )
@@ -373,6 +407,7 @@ enum RuntimeHarnessRunner {
             shortcutUpPosted: shortcutUp != nil,
             emergencyShortcutReleasePosted: emergencyShortcutReleasePosted,
             voiceInkTriggerObserved: latencyTrace?.triggerObserved == true,
+            voiceInkShortcutHoldMatched: voiceInkShortcutHoldMatched,
             voiceInkTranscriptionCompleted: latencyTrace?.transcriptionCompleted == true,
             voiceInkClipboardWriteSucceeded: latencyTrace?.clipboardWriteSucceeded == true,
             voiceInkPasteEventPosted: latencyTrace?.pasteEventPosted == true,
@@ -411,6 +446,8 @@ enum RuntimeHarnessRunner {
             actualHoldMilliseconds: shortcutDown.flatMap { down in
                 shortcutUp.map { ($0.postedAtSystemUptime - down.postedAtSystemUptime) * 1_000 }
             },
+            voiceInkObservedHoldMilliseconds: voiceInkObservedHoldMilliseconds,
+            shortcutHoldDeltaMilliseconds: shortcutHoldDeltaMilliseconds,
             voiceInkKeyUpToPasteEventMilliseconds: voiceInkKeyUpToPasteEventMilliseconds,
             voiceInkKeyUpToPipelineCompleteMilliseconds: voiceInkKeyUpToPipelineCompleteMilliseconds,
             voiceInkKeyUpToInteractionSettledMilliseconds: voiceInkKeyUpToInteractionSettledMilliseconds,
@@ -479,6 +516,7 @@ enum RuntimeHarnessRunner {
         guard evidence.shortcutDownPosted, evidence.shortcutUpPosted else { return .shortcutInjection }
         guard latencyTrace != nil else { return .traceCollection }
         guard evidence.voiceInkTriggerObserved else { return .voiceInkTrigger }
+        if evidence.voiceInkShortcutHoldMatched == false { return .shortcutDelivery }
         guard evidence.voiceInkTranscriptionCompleted else { return .voiceInkTranscription }
         if assessment.status == .emptyTranscript { return .voiceInkTranscription }
         guard evidence.voiceInkClipboardWriteSucceeded,

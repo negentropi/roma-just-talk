@@ -94,7 +94,7 @@ struct RuntimeRunSummary: Codable {
 }
 
 struct RuntimeHarnessReport: Codable {
-    var schemaVersion = 2
+    var schemaVersion = 3
     let startedAt: Date
     var finishedAt: Date?
     let configuration: RuntimeHarnessConfiguration
@@ -323,6 +323,7 @@ enum RuntimeHarnessRunner {
                 observation: observation,
                 expectedTranscript: runCase.expectedTranscript,
                 latencyThresholdMilliseconds: configuration.latencyThresholdMilliseconds,
+                transcribedCharacterCount: latencyTrace?.transcribedCharacterCount,
                 maximumWordErrorRate: configuration.maximumWordErrorRate
             )
             if latencyTrace == nil,
@@ -479,6 +480,7 @@ enum RuntimeHarnessRunner {
         guard latencyTrace != nil else { return .traceCollection }
         guard evidence.voiceInkTriggerObserved else { return .voiceInkTrigger }
         guard evidence.voiceInkTranscriptionCompleted else { return .voiceInkTranscription }
+        if assessment.status == .emptyTranscript { return .voiceInkTranscription }
         guard evidence.voiceInkClipboardWriteSucceeded,
               evidence.voiceInkPasteEventPosted else {
             return .voiceInkPasteHandoff

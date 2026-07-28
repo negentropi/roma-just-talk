@@ -72,6 +72,23 @@ do {
     try require(!noPaste.passed, "noPaste must fail the case")
     print("PASS missing target insertion is an explicit noPaste failure")
 
+    let emptyTranscript = RuntimeCaseAssessment.assess(
+        observation: RuntimeCaseObservation(
+            visibleText: nil,
+            keyUpToVisibleMilliseconds: nil,
+            clipboardChanged: true,
+            triggerObserved: true
+        ),
+        expectedTranscript: nil,
+        latencyThresholdMilliseconds: 440,
+        transcribedCharacterCount: 0
+    )
+    try require(
+        emptyTranscript.status == .emptyTranscript,
+        "a successful zero-character transcription must not be blamed on paste delivery"
+    )
+    print("PASS empty transcription remains distinct from clipboard and target failures")
+
     let unrenderedPaste = RuntimeCaseAssessment.assess(
         observation: RuntimeCaseObservation(
             visibleText: "AX already contains text",
@@ -243,6 +260,22 @@ do {
         "trace should expose its worst executor queue delay"
     )
     print("PASS latency trace preserves executor enqueue-to-resume timing")
+
+    let emptyTranscriptTrace = RuntimeLatencyTrace.parse(messages: [
+        "[LATENCY] trace=F1F2F3F4 seq=0 t=100.0ms delta=100.0ms event=pipeline.transcribe.end durationMs=52.0 result=success rawChars=0"
+    ])
+    try require(
+        emptyTranscriptTrace?.transcribedCharacterCount == 0,
+        "trace parsing must preserve a zero-character transcription result"
+    )
+    let failedTranscriptTrace = RuntimeLatencyTrace.parse(messages: [
+        "[LATENCY] trace=F5F6F7F8 seq=0 t=100.0ms delta=100.0ms event=pipeline.transcribe.end durationMs=52.0 result=failure rawChars=0"
+    ])
+    try require(
+        failedTranscriptTrace?.transcribedCharacterCount == nil,
+        "failed transcription attempts must not masquerade as successful empty transcripts"
+    )
+    print("PASS latency trace exposes the transcription character count")
 
     let stablePixels = [UInt8](repeating: 128, count: 400 * 4)
     var caretOnlyPixels = stablePixels

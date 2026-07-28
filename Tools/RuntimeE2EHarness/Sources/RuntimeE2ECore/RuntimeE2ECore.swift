@@ -365,6 +365,7 @@ public struct RuntimeCaseAssessment: Codable, Equatable, Sendable {
         case shortcutFailed
         case triggerRejected
         case traceMissing
+        case emptyTranscript
         case noPaste
         case clipboardOnly
         case renderNotObserved
@@ -387,10 +388,14 @@ public struct RuntimeCaseAssessment: Codable, Equatable, Sendable {
         observation: RuntimeCaseObservation,
         expectedTranscript: String?,
         latencyThresholdMilliseconds: Double,
+        transcribedCharacterCount: Int? = nil,
         maximumWordErrorRate: Double = 0.2
     ) -> Self {
         guard observation.triggerObserved else {
             return Self(status: .triggerRejected, passed: false)
+        }
+        guard transcribedCharacterCount != 0 else {
+            return Self(status: .emptyTranscript, passed: false)
         }
         guard let visibleText = observation.visibleText,
               !visibleText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
@@ -630,6 +635,19 @@ public struct RuntimeLatencyTrace: Codable, Equatable, Sendable {
         events.contains {
             $0.name == "pipeline.transcribe.end" && $0.details.contains("result=success")
         }
+    }
+
+    public var transcribedCharacterCount: Int? {
+        guard let event = events.last(where: {
+            $0.name == "pipeline.transcribe.end" && $0.details.contains("result=success")
+        }) else {
+            return nil
+        }
+        let prefix = "rawChars="
+        return event.details
+            .split(separator: " ")
+            .first { $0.hasPrefix(prefix) }
+            .flatMap { Int($0.dropFirst(prefix.count)) }
     }
 
     public var clipboardWriteSucceeded: Bool {

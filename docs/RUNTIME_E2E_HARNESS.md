@@ -93,6 +93,7 @@ routing without making a paste claim.
 - WAV cannot play into BlackHole
 - Synthetic Special left Shift is not accepted by VoiceInk
 - No new `LatencyTrace` is emitted
+- VoiceInk completes transcription with zero characters (`emptyTranscript`)
 - VoiceInk posts no text into the target
 - Clipboard changes but the target remains empty (`clipboardOnly`)
 - Accessibility text arrives but stable changed pixels never render
@@ -103,6 +104,10 @@ routing without making a paste claim.
 The report preserves each failure instead of dropping it from percentile
 calculations. Per-app and overall summaries include total, passed, failed,
 no-visible-paste count, p50, p95, and maximum visible-text latency.
+
+An empty transcription is attributed to `voiceInkTranscription`, even if VoiceInk
+subsequently writes or posts whitespace. It is never counted as a clipboard,
+paste-delivery, or target-visibility failure.
 
 Each case also records factual checkpoints: target prepared, audio started,
 shortcut down/up posted, Roma trigger observed, transcription completed,

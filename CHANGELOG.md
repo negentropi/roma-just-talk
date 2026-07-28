@@ -62,6 +62,7 @@
 - Added configurable iOS microphone routing with system-managed routing on by default, optional preferred-input selection with system fallback, deferred preference-driven capture restarts during active recording, and the existing custom-device default preserved on macOS.
 - Kept buffered-snapshot quick releases on the recorded-file transcription path instead of starting a fresh streaming session after key-up, removing a measured post-key-up startup wait before text can paste.
 - Let held Special shortcuts promote to active recording after the rolling-buffer window, so holding the hotkey records beyond the default 3 seconds while short clean taps still use quick-release preload.
+- Cached the macOS Launch at Login status for the app lifetime so recording-state view updates no longer block key-up transcription on repeated `SMAppService.status` checks.
 - Boosted quiet macOS and iOS local Whisper recordings before transcription while leaving silence, noise-floor, continuous-noise, and sparse click-like audio unchanged, improving low-volume/privacy dictation without changing saved audio.
 - Reported malformed macOS local Whisper audio as an audio-processing failure instead of silently sending an empty sample buffer to Whisper.
 - Preserved existing shortcut settings when shortcut recording is canceled, rejected, interrupted by another recorder, or dismissed before a replacement is captured.

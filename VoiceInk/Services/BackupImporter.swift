@@ -1,11 +1,10 @@
 import Foundation
-import LaunchAtLogin
 import SwiftData
 import VoiceInkCore
 
 enum BackupImporter {
     @MainActor
-    static func apply(_ backup: VoiceInkSettingsBackupFile<ShortcutBackup>, categories: Set<VoiceInkSettingsBackupCategory>, enhancementService: AIEnhancementService, recordingShortcutManager: RecordingShortcutManager, menuBarManager: MenuBarManager, mediaController: MediaController, playbackController: PlaybackController, soundManager: SoundManager, recorderUIManager: RecorderUIManager, modelContext: ModelContext, transcriptionModelManager: TranscriptionModelManager) throws {
+    static func apply(_ backup: VoiceInkSettingsBackupFile<ShortcutBackup>, categories: Set<VoiceInkSettingsBackupCategory>, enhancementService: AIEnhancementService, recordingShortcutManager: RecordingShortcutManager, menuBarManager: MenuBarManager, launchAtLoginController: LaunchAtLoginController, mediaController: MediaController, playbackController: PlaybackController, soundManager: SoundManager, recorderUIManager: RecorderUIManager, modelContext: ModelContext, transcriptionModelManager: TranscriptionModelManager) throws {
         if categories.contains(.dictionary) {
             try importDictionary(from: backup, modelContext: modelContext)
         }
@@ -15,6 +14,7 @@ enum BackupImporter {
                 backup.generalSettings,
                 recordingShortcutManager: recordingShortcutManager,
                 menuBarManager: menuBarManager,
+                launchAtLoginController: launchAtLoginController,
                 mediaController: mediaController,
                 playbackController: playbackController,
                 soundManager: soundManager,
@@ -83,7 +83,7 @@ enum BackupImporter {
     }
 
     @MainActor
-    private static func importGeneral(_ general: VoiceInkGeneralSettingsBackupPayload<ShortcutBackup>?, recordingShortcutManager: RecordingShortcutManager, menuBarManager: MenuBarManager, mediaController: MediaController, playbackController: PlaybackController, soundManager: SoundManager, recorderUIManager: RecorderUIManager) {
+    private static func importGeneral(_ general: VoiceInkGeneralSettingsBackupPayload<ShortcutBackup>?, recordingShortcutManager: RecordingShortcutManager, menuBarManager: MenuBarManager, launchAtLoginController: LaunchAtLoginController, mediaController: MediaController, playbackController: PlaybackController, soundManager: SoundManager, recorderUIManager: RecorderUIManager) {
         guard let general else {
             print(VoiceInkSettingsBackupImportDiagnostics.noGeneralSettingsMessage)
             return
@@ -114,7 +114,7 @@ enum BackupImporter {
             },
             applyMacOSShellImportPlan: { macOSShellImportPlan in
                 macOSShellImportPlan.applyRuntimeState(
-                    setLaunchAtLoginEnabled: { LaunchAtLogin.isEnabled = $0 },
+                    setLaunchAtLoginEnabled: { launchAtLoginController.isEnabled = $0 },
                     setMenuBarOnly: { menuBarManager.isMenuBarOnly = $0 },
                     setRecorderType: { recorderUIManager.recorderType = $0 }
                 )

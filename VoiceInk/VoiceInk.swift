@@ -21,6 +21,7 @@ struct VoiceInkApp: App {
     @StateObject private var recordingShortcutManager: RecordingShortcutManager
     @StateObject private var updaterViewModel: UpdaterViewModel
     @StateObject private var menuBarManager: MenuBarManager
+    @StateObject private var launchAtLoginController = LaunchAtLoginController()
     @StateObject private var aiService = AIService()
     @StateObject private var enhancementService: AIEnhancementService
     @StateObject private var activeWindowService = ActiveWindowService.shared
@@ -288,6 +289,7 @@ struct VoiceInkApp: App {
                     .environmentObject(recordingShortcutManager)
                     .environmentObject(updaterViewModel)
                     .environmentObject(menuBarManager)
+                    .environmentObject(launchAtLoginController)
                     .environmentObject(aiService)
                     .environmentObject(enhancementService)
                     .modelContainer(container)
@@ -380,6 +382,7 @@ struct VoiceInkApp: App {
                 .environmentObject(recorderUIManager)
                 .environmentObject(recordingShortcutManager)
                 .environmentObject(menuBarManager)
+                .environmentObject(launchAtLoginController)
                 .environmentObject(updaterViewModel)
                 .environmentObject(aiService)
                 .environmentObject(enhancementService)

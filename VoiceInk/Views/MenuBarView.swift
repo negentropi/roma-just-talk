@@ -1,5 +1,4 @@
 import SwiftUI
-import LaunchAtLogin
 import VoiceInkCore
 
 struct MenuBarView: View {
@@ -10,11 +9,11 @@ struct MenuBarView: View {
     @EnvironmentObject var whisperModelManager: WhisperModelManager
     @EnvironmentObject var recordingShortcutManager: RecordingShortcutManager
     @EnvironmentObject var menuBarManager: MenuBarManager
+    @EnvironmentObject var launchAtLoginController: LaunchAtLoginController
     @EnvironmentObject var updaterViewModel: UpdaterViewModel
     @EnvironmentObject var enhancementService: AIEnhancementService
     @EnvironmentObject var aiService: AIService
     @ObservedObject var audioDeviceManager = AudioDeviceManager.shared
-    @State private var launchAtLoginEnabled = LaunchAtLogin.isEnabled
     @State private var menuRefreshTrigger = false
     @State private var isHovered = false
     @AppStorage(VoiceInkMenuBarPreference.showMenuBarIconKey) private var showMenuBarIcon = VoiceInkMenuBarPreference.defaultShowMenuBarIcon
@@ -234,10 +233,10 @@ struct MenuBarView: View {
                 showMenuBarIcon = false
             }
             
-            Toggle(VoiceInkMacOSMenuBarPresentation.launchAtLoginTitle, isOn: $launchAtLoginEnabled)
-                .onChange(of: launchAtLoginEnabled) { oldValue, newValue in
-                    LaunchAtLogin.isEnabled = newValue
-                }
+            Toggle(
+                VoiceInkMacOSMenuBarPresentation.launchAtLoginTitle,
+                isOn: $launchAtLoginController.isEnabled
+            )
             
             Divider()
             

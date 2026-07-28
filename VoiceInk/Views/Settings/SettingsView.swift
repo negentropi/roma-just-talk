@@ -1,7 +1,6 @@
 import SwiftUI
 import Cocoa
 import Carbon.HIToolbox
-import LaunchAtLogin
 import AVFoundation
 import VoiceInkCore
 
@@ -9,6 +8,7 @@ struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
     @EnvironmentObject private var updaterViewModel: UpdaterViewModel
     @EnvironmentObject private var menuBarManager: MenuBarManager
+    @EnvironmentObject private var launchAtLoginController: LaunchAtLoginController
     @EnvironmentObject private var recordingShortcutManager: RecordingShortcutManager
     @EnvironmentObject private var recorderUIManager: RecorderUIManager
     @EnvironmentObject private var transcriptionModelManager: TranscriptionModelManager
@@ -251,7 +251,10 @@ struct SettingsView: View {
 
                 Toggle(Self.settingsPresentation.hideDockIconTitle, isOn: $menuBarManager.isMenuBarOnly)
 
-                LaunchAtLogin.Toggle(Self.settingsPresentation.launchAtLoginTitle)
+                Toggle(
+                    Self.settingsPresentation.launchAtLoginTitle,
+                    isOn: $launchAtLoginController.isEnabled
+                )
 
                 Toggle(Self.settingsPresentation.autoCheckUpdatesTitle, isOn: Binding(
                     get: { updaterViewModel.automaticallyChecksForUpdates },
@@ -311,6 +314,7 @@ struct SettingsView: View {
                             enhancementService: enhancementService,
                             recordingShortcutManager: recordingShortcutManager,
                             menuBarManager: menuBarManager,
+                            launchAtLoginController: launchAtLoginController,
                             mediaController: mediaController,
                             playbackController: playbackController,
                             soundManager: soundManager,

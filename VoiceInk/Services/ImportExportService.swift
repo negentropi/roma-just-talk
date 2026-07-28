@@ -273,7 +273,7 @@ class ImportExportService {
     }
 
     @MainActor
-    func importSettings(enhancementService: AIEnhancementService, recordingShortcutManager: RecordingShortcutManager, menuBarManager: MenuBarManager, mediaController: MediaController, playbackController: PlaybackController, soundManager: SoundManager, recorderUIManager: RecorderUIManager, modelContext: ModelContext, transcriptionModelManager: TranscriptionModelManager) {
+    func importSettings(enhancementService: AIEnhancementService, recordingShortcutManager: RecordingShortcutManager, menuBarManager: MenuBarManager, launchAtLoginController: LaunchAtLoginController, mediaController: MediaController, playbackController: PlaybackController, soundManager: SoundManager, recorderUIManager: RecorderUIManager, modelContext: ModelContext, transcriptionModelManager: TranscriptionModelManager) {
         let openPanel = NSOpenPanel()
         openPanel.allowedContentTypes = [UTType.json]
         openPanel.canChooseFiles = true
@@ -337,6 +337,7 @@ class ImportExportService {
                         enhancementService: enhancementService,
                         recordingShortcutManager: recordingShortcutManager,
                         menuBarManager: menuBarManager,
+                        launchAtLoginController: launchAtLoginController,
                         mediaController: mediaController,
                         playbackController: playbackController,
                         soundManager: soundManager,

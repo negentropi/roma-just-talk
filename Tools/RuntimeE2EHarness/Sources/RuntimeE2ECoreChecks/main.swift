@@ -366,6 +366,29 @@ do {
         "two mutually stable changed frames must establish rendered text"
     )
 
+    var renderedLatencyTracker = RuntimeRenderedTextLatencyTracker(baseline: stablePixels)
+    try require(
+        renderedLatencyTracker.observe(
+            current: renderedTextPixels,
+            atSystemUptime: 1
+        )?.firstPersistentChangeAtSystemUptime == nil,
+        "the first changed frame must remain provisional"
+    )
+    try require(
+        renderedLatencyTracker.observe(
+            current: transientTextPixels,
+            atSystemUptime: 2
+        )?.firstPersistentChangeAtSystemUptime == nil,
+        "a materially different frame must replace the provisional render timestamp"
+    )
+    try require(
+        renderedLatencyTracker.observe(
+            current: transientTextPixels,
+            atSystemUptime: 3
+        )?.firstPersistentChangeAtSystemUptime == 2,
+        "stable render proof must report the first persistent frame, not the verification frame"
+    )
+
     try require(
         RuntimeTextVisibilityAttribution.renderedLatency(
             accessibilityText: nil,

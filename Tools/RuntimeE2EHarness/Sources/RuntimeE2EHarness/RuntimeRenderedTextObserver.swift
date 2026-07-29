@@ -16,7 +16,7 @@ final class RuntimeRenderedTextObserver {
     private let captureRect: CGRect
     private var baseline: RuntimeRGBAFrame?
     private var baselineError: String?
-    private var stabilityTracker: RuntimeRenderedTextStabilityTracker?
+    private var latencyTracker: RuntimeRenderedTextLatencyTracker?
     private var lastSample: RuntimeRenderedTextStabilitySample?
 
     init(editableFrame: CGRect) throws {
@@ -31,20 +31,20 @@ final class RuntimeRenderedTextObserver {
         self.captureRect = captureRect
         let baseline = try Self.captureRGBA(in: captureRect)
         self.baseline = baseline
-        stabilityTracker = RuntimeRenderedTextStabilityTracker(baseline: baseline.bytes)
+        latencyTracker = RuntimeRenderedTextLatencyTracker(baseline: baseline.bytes)
     }
 
     func refreshBaseline() -> String? {
         do {
             baseline = try Self.captureRGBA(in: captureRect)
             baselineError = nil
-            stabilityTracker = baseline.map {
-                RuntimeRenderedTextStabilityTracker(baseline: $0.bytes)
+            latencyTracker = baseline.map {
+                RuntimeRenderedTextLatencyTracker(baseline: $0.bytes)
             }
             lastSample = nil
         } catch {
             baseline = nil
-            stabilityTracker = nil
+            latencyTracker = nil
             lastSample = nil
             baselineError = String(describing: error)
         }
@@ -55,7 +55,7 @@ final class RuntimeRenderedTextObserver {
         guard let baseline else {
             return baselineError ?? "Rendered-text baseline is unavailable"
         }
-        stabilityTracker = RuntimeRenderedTextStabilityTracker(baseline: baseline.bytes)
+        latencyTracker = RuntimeRenderedTextLatencyTracker(baseline: baseline.bytes)
         lastSample = nil
         return nil
     }
@@ -63,23 +63,32 @@ final class RuntimeRenderedTextObserver {
     func observeRenderedChange(
         keyUpAtSystemUptime: TimeInterval
     ) throws -> RuntimeRenderedTextChangeResult? {
-        guard var stabilityTracker else {
+        guard var latencyTracker else {
             throw RuntimeRenderedTextObserverError.baselineUnavailable(
                 baselineError ?? "Rendered-text baseline is unavailable"
             )
         }
         let current = try Self.captureRGBA(in: captureRect)
-        guard let sample = stabilityTracker.observe(current: current.bytes) else {
+        let observedAtSystemUptime = ProcessInfo.processInfo.systemUptime
+        guard let latencySample = latencyTracker.observe(
+            current: current.bytes,
+            atSystemUptime: observedAtSystemUptime
+        ) else {
             throw RuntimeRenderedTextObserverError.incompatibleFrames
         }
-        self.stabilityTracker = stabilityTracker
+        self.latencyTracker = latencyTracker
+        let sample = latencySample.stabilitySample
         lastSample = sample
-        guard sample.stable else { return nil }
+        guard sample.stable,
+              let firstPersistentChangeAtSystemUptime =
+                latencySample.firstPersistentChangeAtSystemUptime else {
+            return nil
+        }
 
         return RuntimeRenderedTextChangeResult(
             keyUpToRenderedTextMilliseconds: max(
                 0,
-                ProcessInfo.processInfo.systemUptime - keyUpAtSystemUptime
+                firstPersistentChangeAtSystemUptime - keyUpAtSystemUptime
             ) * 1_000,
             changedPixels: sample.baselineDifference.changedPixels,
             comparedPixels: sample.baselineDifference.comparedPixels,

@@ -546,6 +546,42 @@ public struct RuntimeRenderedTextStabilityTracker: Sendable {
     }
 }
 
+public struct RuntimeRenderedTextLatencySample: Equatable, Sendable {
+    public let stabilitySample: RuntimeRenderedTextStabilitySample
+    public let firstPersistentChangeAtSystemUptime: TimeInterval?
+}
+
+public struct RuntimeRenderedTextLatencyTracker: Sendable {
+    private var stabilityTracker: RuntimeRenderedTextStabilityTracker
+    private var candidateChangeAtSystemUptime: TimeInterval?
+
+    public init(baseline: [UInt8]) {
+        stabilityTracker = RuntimeRenderedTextStabilityTracker(baseline: baseline)
+    }
+
+    public mutating func observe(
+        current: [UInt8],
+        atSystemUptime observedAtSystemUptime: TimeInterval
+    ) -> RuntimeRenderedTextLatencySample? {
+        guard let sample = stabilityTracker.observe(current: current) else {
+            return nil
+        }
+
+        if !sample.baselineDifference.passed {
+            candidateChangeAtSystemUptime = nil
+        } else if sample.interFrameChangedPixels == nil || !sample.stable {
+            candidateChangeAtSystemUptime = observedAtSystemUptime
+        }
+
+        return RuntimeRenderedTextLatencySample(
+            stabilitySample: sample,
+            firstPersistentChangeAtSystemUptime: sample.stable
+                ? candidateChangeAtSystemUptime ?? observedAtSystemUptime
+                : nil
+        )
+    }
+}
+
 public enum RuntimeTextVisibilityAttribution {
     public static func renderedLatency(
         accessibilityText: String?,

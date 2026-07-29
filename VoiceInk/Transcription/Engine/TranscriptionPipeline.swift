@@ -126,6 +126,19 @@ class TranscriptionPipeline {
             )
             return context
         }
+        let pasteAuthorizationCheckpoint = latencyTrace.executorEnqueued(
+            "pipeline.paste_authorization_preflight",
+            token: traceToken
+        )
+        let pasteAuthorizationPreflight = Task { @MainActor in
+            latencyTrace.executorResumed(pasteAuthorizationCheckpoint)
+            let span = latencyTrace.begin(
+                "pipeline.paste_authorization_preflight",
+                token: traceToken
+            )
+            let isTrusted = CursorPaster.preflightPasteAuthorization()
+            latencyTrace.end(span, details: "trusted=\(isTrusted)")
+        }
 
         do {
             let transcriptionStart = Date()
@@ -322,6 +335,7 @@ class TranscriptionPipeline {
             )
             latencyTrace.end(pastePreparationSpan, details: "chars=\(pastedText.count)")
             let pasteSpan = latencyTrace.begin("pipeline.paste_command", token: traceToken)
+            await pasteAuthorizationPreflight.value
             let pasteResult = await CursorPaster.startPasteAtCursor(
                 pastedText,
                 latencyTraceToken: traceToken

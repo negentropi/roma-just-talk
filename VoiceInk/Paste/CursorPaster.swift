@@ -103,6 +103,11 @@ class CursorPaster {
     }
 
     @MainActor
+    static func preflightPasteAuthorization() -> Bool {
+        AXIsProcessTrusted()
+    }
+
+    @MainActor
     private static func performPasteSession(
         _ text: String,
         preparedContext: PreparedPasteContext? = nil,

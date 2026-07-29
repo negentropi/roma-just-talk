@@ -78,6 +78,43 @@ enum CursorTextContextReader {
         return preparedContext.text
     }
 
+    @MainActor
+    static func insertSelectedText(
+        _ text: String,
+        preparedContext: PreparedContext?
+    ) -> Bool {
+        guard AXIsProcessTrusted(),
+              let focusedElement = focusedElement(from: AXUIElementCreateSystemWide()),
+              let selectedRange = selectedTextRange(from: focusedElement),
+              let role = role(from: focusedElement),
+              VoiceInkCursorTextContextPolicy.isTextInputRole(role) else {
+            return false
+        }
+
+        if let preparedContext {
+            guard CFEqual(focusedElement, preparedContext.focusedElement),
+                  sameRange(selectedRange, preparedContext.selectedRange) else {
+                return false
+            }
+        }
+
+        var isSettable = DarwinBoolean(false)
+        guard AXUIElementIsAttributeSettable(
+            focusedElement,
+            kAXSelectedTextAttribute as CFString,
+            &isSettable
+        ) == .success,
+              isSettable.boolValue else {
+            return false
+        }
+
+        return AXUIElementSetAttributeValue(
+            focusedElement,
+            kAXSelectedTextAttribute as CFString,
+            text as CFString
+        ) == .success
+    }
+
     private static func textBeforeCursor(in focusedElement: AXUIElement, maximumLength: Int) -> String? {
         let elements = contextCandidateElements(startingAt: focusedElement)
 

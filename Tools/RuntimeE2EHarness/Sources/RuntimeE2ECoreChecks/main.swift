@@ -255,14 +255,16 @@ do {
     let trace = RuntimeLatencyTrace.parse(messages: [
         "[LATENCY] trace=A1B2C3D4 seq=0 t=0.0ms delta=0.0ms event=shortcut.key_down_source keyCode=56",
         "[LATENCY] trace=A1B2C3D4 seq=1 t=1100.0ms delta=1100.0ms event=shortcut.key_up_handler duration=1.1",
-        "[LATENCY] trace=A1B2C3D4 seq=2 t=1300.0ms delta=200.0ms event=paste_event_posted chars=18",
-        "[LATENCY] trace=A1B2C3D4 seq=3 t=1500.0ms delta=200.0ms event=pipeline.complete",
-        "[LATENCY] trace=A1B2C3D4 seq=4 t=1800.0ms delta=300.0ms event=ui.engine_toggle.end"
+        "[LATENCY] trace=A1B2C3D4 seq=2 t=1200.0ms delta=100.0ms event=paste_session.write_clipboard.end result=success",
+        "[LATENCY] trace=A1B2C3D4 seq=3 t=1300.0ms delta=100.0ms event=paste_event_posted chars=18",
+        "[LATENCY] trace=A1B2C3D4 seq=4 t=1500.0ms delta=200.0ms event=pipeline.complete",
+        "[LATENCY] trace=A1B2C3D4 seq=5 t=1800.0ms delta=300.0ms event=ui.engine_toggle.end"
     ])
     try require(trace?.traceID == "A1B2C3D4", "trace ID should be parsed")
     try require(trace?.triggerObserved == true, "key-down trace event should prove trigger acceptance")
     try require(trace?.pasteEventPosted == true, "paste event should be recognized")
-    try require(trace?.events.map(\.sequence) == [0, 1, 2, 3, 4], "trace events should stay sequence ordered")
+    try require(trace?.textDeliveryHandoffCompleted == true, "clipboard paste should require write and command proof")
+    try require(trace?.events.map(\.sequence) == [0, 1, 2, 3, 4, 5], "trace events should stay sequence ordered")
     try require(
         trace?.keyUpToPasteEventMilliseconds ?? -1,
         equals: 200,
@@ -272,6 +274,31 @@ do {
         trace?.keyUpToPipelineCompleteMilliseconds ?? -1,
         equals: 400,
         "trace should expose post-paste pipeline completion"
+    )
+    let accessibilityInsertTrace = RuntimeLatencyTrace.parse(messages: [
+        "[LATENCY] trace=E5F6A7B8 seq=0 t=1000.0ms delta=0.0ms event=shortcut.key_up_handler",
+        "[LATENCY] trace=E5F6A7B8 seq=1 t=1080.0ms delta=80.0ms event=paste_text_inserted method=accessibility"
+    ])
+    try require(
+        accessibilityInsertTrace?.pasteEventPosted == true,
+        "direct Accessibility insertion should count as VoiceInk text delivery"
+    )
+    try require(
+        accessibilityInsertTrace?.textDeliveryHandoffCompleted == true,
+        "direct Accessibility insertion should not require a clipboard-write event"
+    )
+    try require(
+        accessibilityInsertTrace?.keyUpToPasteEventMilliseconds ?? -1,
+        equals: 80,
+        "direct Accessibility insertion should expose its key-up-to-delivery latency"
+    )
+    let incompleteClipboardTrace = RuntimeLatencyTrace.parse(messages: [
+        "[LATENCY] trace=C9D0E1F2 seq=0 t=1000.0ms delta=0.0ms event=shortcut.key_up_handler",
+        "[LATENCY] trace=C9D0E1F2 seq=1 t=1080.0ms delta=80.0ms event=paste_event_posted method=cgEvent"
+    ])
+    try require(
+        incompleteClipboardTrace?.textDeliveryHandoffCompleted == false,
+        "clipboard paste must retain separate write and command proof"
     )
     try require(
         trace?.keyUpToInteractionSettledMilliseconds ?? -1,

@@ -54,6 +54,78 @@ struct VoiceInkTests {
         #expect(pasteboard.string(forType: .string) == "dictated text")
     }
 
+    @Test @MainActor func accessibilityInsertDeliversWithoutTouchingClipboard() async throws {
+        let defaults = UserDefaults.standard
+        let restoreValue = defaults.object(forKey: "restoreClipboardAfterPaste")
+        let pasteMethodValue = defaults.object(forKey: VoiceInkPasteMethod.userDefaultsKey)
+        let pasteboard = NSPasteboard.general
+        let originalClipboard = pasteboard.string(forType: .string)
+        defer {
+            CursorPaster.configureAccessibilityTextInserterForTesting()
+            CursorPaster.configurePasteCommandPosterForTesting()
+            restoreDefault(restoreValue, forKey: "restoreClipboardAfterPaste")
+            restoreDefault(pasteMethodValue, forKey: VoiceInkPasteMethod.userDefaultsKey)
+            pasteboard.clearContents()
+            if let originalClipboard {
+                pasteboard.setString(originalClipboard, forType: .string)
+            }
+        }
+
+        defaults.set(true, forKey: "restoreClipboardAfterPaste")
+        defaults.set(VoiceInkPasteMethod.standard.rawValue, forKey: VoiceInkPasteMethod.userDefaultsKey)
+        pasteboard.clearContents()
+        pasteboard.setString("previous clipboard", forType: .string)
+        var postedCommand = false
+        CursorPaster.configureAccessibilityTextInserterForTesting { text, _ in
+            text == "dictated text"
+        }
+        CursorPaster.configurePasteCommandPosterForTesting {
+            postedCommand = true
+            return .commandPosted
+        }
+
+        let result = await CursorPaster.pasteAtCursorAndWaitUntilPosted("dictated text")
+
+        #expect(result == .textInserted)
+        #expect(!postedCommand)
+        #expect(pasteboard.string(forType: .string) == "previous clipboard")
+    }
+
+    @Test @MainActor func unsupportedAccessibilityInsertFallsBackToPasteCommand() async throws {
+        let defaults = UserDefaults.standard
+        let restoreValue = defaults.object(forKey: "restoreClipboardAfterPaste")
+        let pasteMethodValue = defaults.object(forKey: VoiceInkPasteMethod.userDefaultsKey)
+        let pasteboard = NSPasteboard.general
+        let originalClipboard = pasteboard.string(forType: .string)
+        defer {
+            CursorPaster.configureAccessibilityTextInserterForTesting()
+            CursorPaster.configurePasteCommandPosterForTesting()
+            restoreDefault(restoreValue, forKey: "restoreClipboardAfterPaste")
+            restoreDefault(pasteMethodValue, forKey: VoiceInkPasteMethod.userDefaultsKey)
+            pasteboard.clearContents()
+            if let originalClipboard {
+                pasteboard.setString(originalClipboard, forType: .string)
+            }
+        }
+
+        defaults.set(false, forKey: "restoreClipboardAfterPaste")
+        defaults.set(VoiceInkPasteMethod.standard.rawValue, forKey: VoiceInkPasteMethod.userDefaultsKey)
+        pasteboard.clearContents()
+        pasteboard.setString("previous clipboard", forType: .string)
+        var postedCommand = false
+        CursorPaster.configureAccessibilityTextInserterForTesting { _, _ in false }
+        CursorPaster.configurePasteCommandPosterForTesting {
+            postedCommand = true
+            return .commandPosted
+        }
+
+        let result = await CursorPaster.pasteAtCursorAndWaitUntilPosted("dictated text")
+
+        #expect(result == .commandPosted)
+        #expect(postedCommand)
+        #expect(pasteboard.string(forType: .string) == "dictated text")
+    }
+
     @Test @MainActor func sessionMetricRecorderAcceptsSnapshotModelName() throws {
         let container = try makeSessionMetricContainer()
         let context = container.mainContext

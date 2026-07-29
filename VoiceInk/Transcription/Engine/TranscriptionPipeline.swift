@@ -338,11 +338,12 @@ class TranscriptionPipeline {
             await pasteAuthorizationPreflight.value
             let pasteResult = await CursorPaster.startPasteAtCursor(
                 pastedText,
+                preparedCursorTextContext: preparedCursorTextContext,
                 latencyTraceToken: traceToken
             ).value
             latencyTrace.end(
                 pasteSpan,
-                details: "eventPosted=\(pasteResult.didPostPasteCommand)"
+                details: "textDelivered=\(pasteResult.didDeliverText) result=\(String(describing: pasteResult))"
             )
             let autoSendKey = PowerModeManager.shared.activeConfiguration?.autoSendKey
             let stopSoundSpan = latencyTrace.begin("pipeline.stop_sound", token: traceToken)

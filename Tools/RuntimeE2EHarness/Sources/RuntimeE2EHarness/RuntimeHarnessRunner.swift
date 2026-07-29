@@ -29,6 +29,7 @@ struct RuntimeCaseEvidence: Codable {
     let voiceInkTranscriptionCompleted: Bool
     let voiceInkClipboardWriteSucceeded: Bool
     let voiceInkPasteEventPosted: Bool
+    let voiceInkTextDeliveryHandoffSucceeded: Bool
     let systemClipboardChangeObserved: Bool
     let targetAccessibilityTextObserved: Bool
     let targetVisibleTextObserved: Bool
@@ -411,6 +412,7 @@ enum RuntimeHarnessRunner {
             voiceInkTranscriptionCompleted: latencyTrace?.transcriptionCompleted == true,
             voiceInkClipboardWriteSucceeded: latencyTrace?.clipboardWriteSucceeded == true,
             voiceInkPasteEventPosted: latencyTrace?.pasteEventPosted == true,
+            voiceInkTextDeliveryHandoffSucceeded: latencyTrace?.textDeliveryHandoffCompleted == true,
             systemClipboardChangeObserved: clipboardChanged,
             targetAccessibilityTextObserved: targetAccessibilityTextObserved,
             targetVisibleTextObserved: targetVisibleTextObserved,
@@ -519,8 +521,7 @@ enum RuntimeHarnessRunner {
         if evidence.voiceInkShortcutHoldMatched == false { return .shortcutDelivery }
         guard evidence.voiceInkTranscriptionCompleted else { return .voiceInkTranscription }
         if assessment.status == .emptyTranscript { return .voiceInkTranscription }
-        guard evidence.voiceInkClipboardWriteSucceeded,
-              evidence.voiceInkPasteEventPosted else {
+        guard evidence.voiceInkTextDeliveryHandoffSucceeded else {
             return .voiceInkPasteHandoff
         }
         guard evidence.targetVisibleTextObserved else { return .pasteDeliveryOrTargetVisibility }

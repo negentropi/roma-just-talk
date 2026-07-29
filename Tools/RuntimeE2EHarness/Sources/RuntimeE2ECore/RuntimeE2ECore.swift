@@ -674,7 +674,11 @@ public struct RuntimeLatencyTrace: Codable, Equatable, Sendable {
     }
 
     public var pasteEventPosted: Bool {
-        events.contains { $0.name == "paste_event_posted" || $0.name == "paste.event_posted" }
+        events.contains(where: Self.isTextDeliveryEvent)
+    }
+
+    public var textDeliveryHandoffCompleted: Bool {
+        directTextInsertionSucceeded || (clipboardWriteSucceeded && pasteCommandPosted)
     }
 
     public var transcriptionCompleted: Bool {
@@ -712,9 +716,7 @@ public struct RuntimeLatencyTrace: Codable, Equatable, Sendable {
     }
 
     public var keyUpToPasteEventMilliseconds: Double? {
-        millisecondsAfterKeyUp(toFirstEventMatching: {
-            $0.name == "paste_event_posted" || $0.name == "paste.event_posted"
-        })
+        millisecondsAfterKeyUp(toFirstEventMatching: Self.isTextDeliveryEvent)
     }
 
     public var keyUpToPipelineCompleteMilliseconds: Double? {
@@ -732,6 +734,24 @@ public struct RuntimeLatencyTrace: Codable, Equatable, Sendable {
     public init(traceID: String, events: [RuntimeLatencyTraceEvent]) {
         self.traceID = traceID
         self.events = events.sorted { $0.sequence < $1.sequence }
+    }
+
+    // Report fields retain their historical "paste event" names. Direct AX insertion is the
+    // equivalent product handoff boundary and must not be classified as a missing paste.
+    private static func isTextDeliveryEvent(_ event: RuntimeLatencyTraceEvent) -> Bool {
+        isPasteCommandEvent(event) || event.name == "paste_text_inserted"
+    }
+
+    private var directTextInsertionSucceeded: Bool {
+        events.contains { $0.name == "paste_text_inserted" }
+    }
+
+    private var pasteCommandPosted: Bool {
+        events.contains(where: Self.isPasteCommandEvent)
+    }
+
+    private static func isPasteCommandEvent(_ event: RuntimeLatencyTraceEvent) -> Bool {
+        event.name == "paste_event_posted" || event.name == "paste.event_posted"
     }
 
     private func millisecondsAfterKeyUp(

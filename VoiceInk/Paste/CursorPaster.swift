@@ -12,6 +12,8 @@ class CursorPaster {
         category: VoiceInkMacOSLogCategory.cursorPaster
     )
     @MainActor private static var pasteCommandPosterForTesting: (() async -> PasteResult)?
+    @MainActor private static var accessibilityTextInserterForTesting:
+        ((String, CursorTextContextReader.PreparedContext?) -> Bool)?
 
     struct PreparedPasteContext {
         fileprivate let changeCount: Int
@@ -19,11 +21,16 @@ class CursorPaster {
     }
 
     enum PasteResult: Equatable {
+        case textInserted
         case commandPosted
         case commandNotPosted
 
         var didPostPasteCommand: Bool {
             self == .commandPosted
+        }
+
+        var didDeliverText: Bool {
+            self != .commandNotPosted
         }
     }
 
@@ -68,10 +75,18 @@ class CursorPaster {
     }
 
     @MainActor
+    static func configureAccessibilityTextInserterForTesting(
+        _ inserter: ((String, CursorTextContextReader.PreparedContext?) -> Bool)? = nil
+    ) {
+        accessibilityTextInserterForTesting = inserter
+    }
+
+    @MainActor
     @discardableResult
     static func startPasteAtCursor(
         _ text: String,
         preparedContext: PreparedPasteContext? = nil,
+        preparedCursorTextContext: Task<CursorTextContextReader.PreparedContext?, Never>? = nil,
         latencyTraceToken: VoiceInkLatencyTrace.Token? = nil
     ) -> Task<PasteResult, Never> {
         let traceToken = latencyTraceToken ?? VoiceInkLatencyTrace.shared.currentToken()
@@ -79,6 +94,7 @@ class CursorPaster {
             await performPasteSession(
                 text,
                 preparedContext: preparedContext,
+                preparedCursorTextContext: preparedCursorTextContext,
                 latencyTraceToken: traceToken
             )
         }
@@ -111,6 +127,7 @@ class CursorPaster {
     private static func performPasteSession(
         _ text: String,
         preparedContext: PreparedPasteContext? = nil,
+        preparedCursorTextContext: Task<CursorTextContextReader.PreparedContext?, Never>? = nil,
         latencyTraceToken: VoiceInkLatencyTrace.Token?
     ) async -> PasteResult {
         let latencyTrace = VoiceInkLatencyTrace.shared
@@ -121,6 +138,35 @@ class CursorPaster {
             details: "chars=\(text.count) restoreClipboard=\(shouldRestoreClipboard) method=\(VoiceInkPasteMethod.current().rawValue)",
             token: latencyTraceToken
         )
+        if VoiceInkPasteMethod.current() == .standard,
+           accessibilityTextInserterForTesting != nil || pasteCommandPosterForTesting == nil {
+            let insertionSpan = latencyTrace.begin(
+                "paste_session.accessibility_insert",
+                token: latencyTraceToken
+            )
+            let cursorContext = await preparedCursorTextContext?.value
+            let didInsert = if let accessibilityTextInserterForTesting {
+                accessibilityTextInserterForTesting(text, cursorContext)
+            } else {
+                CursorTextContextReader.insertSelectedText(
+                    text,
+                    preparedContext: cursorContext
+                )
+            }
+            latencyTrace.end(
+                insertionSpan,
+                details: "result=\(didInsert ? "success" : "unsupported")"
+            )
+            if didInsert {
+                latencyTrace.event(
+                    "paste_text_inserted",
+                    details: "method=accessibility",
+                    token: latencyTraceToken
+                )
+                return .textInserted
+            }
+        }
+
         let clipboardSnapshotSpan = latencyTrace.begin(
             "paste_session.snapshot_clipboard",
             token: latencyTraceToken

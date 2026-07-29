@@ -93,7 +93,9 @@ struct SpeechFirstStreamingReplayTests {
             blockedChunkIndex: expectedChunks.count,
             committedText: committedText
         )
+        let drainWaitEventPair = AsyncStream.makeStream(of: Void.self)
         defer {
+            drainWaitEventPair.continuation.finish()
             Task {
                 await provider.resumeBlockedSend()
             }
@@ -101,6 +103,9 @@ struct SpeechFirstStreamingReplayTests {
         let streamingService = StreamingTranscriptionService(
             streamingAdapterKind: .cloud,
             finalCommitTimeoutNanoseconds: 1_000_000_000,
+            onDrainWaitStarted: {
+                drainWaitEventPair.continuation.yield(())
+            },
             providerFactory: { _ in provider }
         )
         let session = StreamingTranscriptionSession(
@@ -130,6 +135,11 @@ struct SpeechFirstStreamingReplayTests {
             timeoutNanoseconds: 1_000_000_000
         )
         #expect(blocked)
+        let drainWaitStarted = await receivesSignal(
+            drainWaitEventPair.stream,
+            timeoutNanoseconds: 1_000_000_000
+        )
+        #expect(drainWaitStarted)
         let didCommitBeforeBlockedSendResumed = await provider.didCommit
         await provider.resumeBlockedSend()
 

@@ -90,6 +90,7 @@ class StreamingTranscriptionService {
     private let streamingAdapterKind: VoiceInkTranscriptionStreamingAdapterKind
     private let fluidAudioService: FluidAudioTranscriptionService?
     private let providerFactory: ((any TranscriptionModel) -> StreamingTranscriptionProvider)?
+    private let onDrainWaitStarted: (() -> Void)?
     private let finalCommitTimeoutNanoseconds: UInt64
     private var onPartialTranscript: ((String) -> Void)?
     private let metrics = StreamingMetrics()
@@ -108,6 +109,7 @@ class StreamingTranscriptionService {
         self.streamingAdapterKind = streamingAdapterKind
         self.fluidAudioService = fluidAudioService
         self.providerFactory = nil
+        self.onDrainWaitStarted = nil
         self.finalCommitTimeoutNanoseconds = finalCommitTimeoutNanoseconds
         self.onPartialTranscript = onPartialTranscript
     }
@@ -116,12 +118,14 @@ class StreamingTranscriptionService {
         streamingAdapterKind: VoiceInkTranscriptionStreamingAdapterKind,
         finalCommitTimeoutNanoseconds: UInt64 = VoiceInkStreamingFinalCommitTimeout.cloudNanoseconds,
         onPartialTranscript: ((String) -> Void)? = nil,
+        onDrainWaitStarted: (() -> Void)? = nil,
         providerFactory: @escaping (any TranscriptionModel) -> StreamingTranscriptionProvider
     ) {
         self.modelContext = nil
         self.streamingAdapterKind = streamingAdapterKind
         self.fluidAudioService = nil
         self.providerFactory = providerFactory
+        self.onDrainWaitStarted = onDrainWaitStarted
         self.finalCommitTimeoutNanoseconds = finalCommitTimeoutNanoseconds
         self.onPartialTranscript = onPartialTranscript
     }
@@ -367,6 +371,7 @@ class StreamingTranscriptionService {
         chunkSource.finish()
         let resumeCheckpoint: VoiceInkLatencyTrace.ExecutorCheckpoint?
         if let sendTask {
+            onDrainWaitStarted?()
             resumeCheckpoint = await sendTask.value
         } else {
             resumeCheckpoint = nil

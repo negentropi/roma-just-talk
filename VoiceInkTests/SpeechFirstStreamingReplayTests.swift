@@ -19,10 +19,14 @@ struct SpeechFirstStreamingReplayTests {
             outcome.transcript,
             cleanupConfiguration: VoiceInkTranscriptionCleanupConfiguration()
         )
-        #expect(VoiceInkTranscriptionPasteOutputPolicy.shouldPaste(prepared.cleanedText))
+        let pasteDecision = VoiceInkTranscriptionPasteOutputPolicy.decision(
+            text: prepared.cleanedText,
+            transcriptionCompleted: true
+        )
+        let textToPaste = try #require(pasteDecision.textToPaste)
 
         let cursorPlan = VoiceInkTranscriptionPasteOutputPolicy.cursorPasteTextPlan(
-            prepared.cleanedText,
+            textToPaste,
             shouldLowercase: false
         )
         let pastedText = VoiceInkTranscriptionPasteOutputPolicy.finalPastedText(
@@ -38,10 +42,26 @@ struct SpeechFirstStreamingReplayTests {
         let outcome = try await replay(committedText: " \n\t ")
 
         #expect(outcome.provider.receivedChunks == outcome.expectedChunks)
+        #expect(outcome.provider.completedSendCount == outcome.expectedChunks.count)
         #expect(outcome.provider.didCommit)
         #expect(outcome.transcript.isEmpty)
-        #expect(!VoiceInkTranscriptionPasteOutputPolicy.shouldPaste(outcome.transcript))
-        #expect(!VoiceInkTranscriptionPasteOutputPolicy.shouldPaste(" \n\t "))
+        let pasteDecision = VoiceInkTranscriptionPasteOutputPolicy.decision(
+            text: outcome.transcript,
+            transcriptionCompleted: true
+        )
+        #expect(pasteDecision.textToPaste == nil)
+        #expect(pasteDecision.shouldPlayCompletionSoundWithoutPaste)
+    }
+
+    @Test
+    func incompleteTranscriptionDoesNotPasteOrPlayCompletionSound() {
+        let pasteDecision = VoiceInkTranscriptionPasteOutputPolicy.decision(
+            text: "actual transcript",
+            transcriptionCompleted: false
+        )
+
+        #expect(pasteDecision.textToPaste == nil)
+        #expect(!pasteDecision.shouldPlayCompletionSoundWithoutPaste)
     }
 
     @MainActor
@@ -73,6 +93,11 @@ struct SpeechFirstStreamingReplayTests {
             blockedChunkIndex: expectedChunks.count,
             committedText: committedText
         )
+        defer {
+            Task {
+                await provider.resumeBlockedSend()
+            }
+        }
         let streamingService = StreamingTranscriptionService(
             streamingAdapterKind: .cloud,
             finalCommitTimeoutNanoseconds: 1_000_000_000,
@@ -100,9 +125,10 @@ struct SpeechFirstStreamingReplayTests {
                 audioURL: URL(fileURLWithPath: "/tmp/voiceink-speech-first-replay.wav")
             )
         }
-        let blocked = await eventually {
-            await provider.isBlockedSending
-        }
+        let blocked = await receivesSignal(
+            provider.blockedSendEvents,
+            timeoutNanoseconds: 1_000_000_000
+        )
         #expect(blocked)
         let didCommitBeforeBlockedSendResumed = await provider.didCommit
         await provider.resumeBlockedSend()
@@ -117,14 +143,24 @@ struct SpeechFirstStreamingReplayTests {
         )
     }
 
-    private func eventually(_ predicate: () async -> Bool) async -> Bool {
-        for _ in 0..<10_000 {
-            if await predicate() {
-                return true
+    private func receivesSignal(
+        _ stream: AsyncStream<Void>,
+        timeoutNanoseconds: UInt64
+    ) async -> Bool {
+        await withTaskGroup(of: Bool.self) { group in
+            group.addTask {
+                var iterator = stream.makeAsyncIterator()
+                return await iterator.next() != nil
             }
-            await Task.yield()
+            group.addTask {
+                try? await Task.sleep(nanoseconds: timeoutNanoseconds)
+                return false
+            }
+
+            let received = await group.next() ?? false
+            group.cancelAll()
+            return received
         }
-        return await predicate()
     }
 }
 
@@ -184,8 +220,10 @@ private struct UnexpectedReplayFallbackService: TranscriptionService {
 
 private actor SpeechFirstReplayProvider: StreamingTranscriptionProvider {
     nonisolated let transcriptionEvents: AsyncStream<VoiceInkStreamingTranscriptionEvent>
+    nonisolated let blockedSendEvents: AsyncStream<Void>
 
     private let continuation: AsyncStream<VoiceInkStreamingTranscriptionEvent>.Continuation
+    private let blockedSendEventContinuation: AsyncStream<Void>.Continuation
     private let expectedChunks: [Data]
     private let blockedChunkIndex: Int
     private let committedText: String
@@ -195,14 +233,20 @@ private actor SpeechFirstReplayProvider: StreamingTranscriptionProvider {
     private(set) var isBlockedSending = false
     private(set) var didCommit = false
     private var didDisconnect = false
+    private var completedSendCount = 0
 
     init(expectedChunks: [Data], blockedChunkIndex: Int, committedText: String) {
         self.expectedChunks = expectedChunks
         self.blockedChunkIndex = blockedChunkIndex
         self.committedText = committedText
-        (transcriptionEvents, continuation) = AsyncStream.makeStream(
+        let transcriptionEventPair = AsyncStream.makeStream(
             of: VoiceInkStreamingTranscriptionEvent.self
         )
+        transcriptionEvents = transcriptionEventPair.stream
+        continuation = transcriptionEventPair.continuation
+        let blockedSendEventPair = AsyncStream.makeStream(of: Void.self)
+        blockedSendEvents = blockedSendEventPair.stream
+        blockedSendEventContinuation = blockedSendEventPair.continuation
     }
 
     func connect(model: any TranscriptionModel, language: String?) async throws {
@@ -211,19 +255,26 @@ private actor SpeechFirstReplayProvider: StreamingTranscriptionProvider {
 
     func sendAudioChunk(_ data: Data) async throws {
         receivedChunks.append(data)
-        guard receivedChunks.count == blockedChunkIndex else { return }
+        guard receivedChunks.count == blockedChunkIndex else {
+            completedSendCount += 1
+            return
+        }
 
         isBlockedSending = true
+        blockedSendEventContinuation.yield(())
         if !releaseWasRequested {
             await withCheckedContinuation { continuation in
                 blockedSendContinuation = continuation
             }
         }
         isBlockedSending = false
+        completedSendCount += 1
     }
 
     func commit() async throws {
-        guard receivedChunks == expectedChunks else {
+        guard receivedChunks == expectedChunks,
+              completedSendCount == expectedChunks.count,
+              !isBlockedSending else {
             throw SpeechFirstReplayError.audioDeliveryMismatch
         }
         didCommit = true
@@ -233,6 +284,7 @@ private actor SpeechFirstReplayProvider: StreamingTranscriptionProvider {
     func disconnect() async {
         didDisconnect = true
         continuation.finish()
+        blockedSendEventContinuation.finish()
     }
 
     func resumeBlockedSend() {
@@ -244,6 +296,7 @@ private actor SpeechFirstReplayProvider: StreamingTranscriptionProvider {
     func snapshot() -> SpeechFirstReplayProviderSnapshot {
         SpeechFirstReplayProviderSnapshot(
             receivedChunks: receivedChunks,
+            completedSendCount: completedSendCount,
             didCommit: didCommit,
             didDisconnect: didDisconnect
         )
@@ -260,6 +313,7 @@ private struct SpeechFirstReplayOutcome {
 
 private struct SpeechFirstReplayProviderSnapshot: Sendable {
     let receivedChunks: [Data]
+    let completedSendCount: Int
     let didCommit: Bool
     let didDisconnect: Bool
 }

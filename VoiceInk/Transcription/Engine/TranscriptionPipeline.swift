@@ -276,13 +276,15 @@ class TranscriptionPipeline {
             return
         }
 
+        let pasteDecision = VoiceInkTranscriptionPasteOutputPolicy.decision(
+            text: finalPastedText,
+            transcriptionCompleted: transcription.transcriptionState == .completed
+        )
         if SpecialShortcutEmptyTranscriptionFallback.consumeIfNeeded(for: transcription, modelContext: modelContext) {
             latencyTrace.event("pipeline.empty_transcription_fallback", token: traceToken)
             SoundManager.shared.play(.stop)
             await restorePromptDetectionSettingsAndDismiss()
-        } else if var textToPaste = finalPastedText,
-           VoiceInkTranscriptionPasteOutputPolicy.shouldPaste(textToPaste),
-           transcription.transcriptionState == .completed {
+        } else if var textToPaste = pasteDecision.textToPaste {
             let pastePreparationSpan = latencyTrace.begin("pipeline.paste_prepare", token: traceToken)
             textToPaste = CursorPaster.preparedTextForPaste(textToPaste)
 
@@ -325,12 +327,10 @@ class TranscriptionPipeline {
         } else {
             latencyTrace.event(
                 "pipeline.no_paste",
-                details: "state=\(transcription.transcriptionState) pasteableText=\(finalPastedText.map(VoiceInkTranscriptionPasteOutputPolicy.shouldPaste) ?? false)",
+                details: "state=\(transcription.transcriptionState) pasteableText=\(pasteDecision.textToPaste != nil)",
                 token: traceToken
             )
-            if let finalPastedText,
-               transcription.transcriptionState == .completed,
-               !VoiceInkTranscriptionPasteOutputPolicy.shouldPaste(finalPastedText) {
+            if pasteDecision.shouldPlayCompletionSoundWithoutPaste {
                 SoundManager.shared.play(.stop)
             }
             await restorePromptDetectionSettingsAndDismiss()

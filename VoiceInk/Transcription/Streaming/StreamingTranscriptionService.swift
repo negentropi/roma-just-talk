@@ -82,6 +82,7 @@ class StreamingTranscriptionService {
     private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "StreamingTranscriptionService")
     private var provider: StreamingTranscriptionProvider?
     private var sendTask: Task<VoiceInkLatencyTrace.ExecutorCheckpoint?, Never>?
+    private var drainAndCommitTask: Task<VoiceInkLatencyTrace.ExecutorCheckpoint?, Error>?
     private var eventConsumerTask: Task<Void, Never>?
     private let chunkSource = AudioChunkSource()
     private var state: StreamingState = .idle
@@ -90,7 +91,7 @@ class StreamingTranscriptionService {
     private let streamingAdapterKind: VoiceInkTranscriptionStreamingAdapterKind
     private let fluidAudioService: FluidAudioTranscriptionService?
     private let providerFactory: ((any TranscriptionModel) -> StreamingTranscriptionProvider)?
-    private let onDrainWaitStarted: (() -> Void)?
+    private let onDrainWaitStarted: (@Sendable () -> Void)?
     private let finalCommitTimeoutNanoseconds: UInt64
     private var onPartialTranscript: ((String) -> Void)?
     private let metrics = StreamingMetrics()
@@ -118,7 +119,7 @@ class StreamingTranscriptionService {
         streamingAdapterKind: VoiceInkTranscriptionStreamingAdapterKind,
         finalCommitTimeoutNanoseconds: UInt64 = VoiceInkStreamingFinalCommitTimeout.cloudNanoseconds,
         onPartialTranscript: ((String) -> Void)? = nil,
-        onDrainWaitStarted: (() -> Void)? = nil,
+        onDrainWaitStarted: (@Sendable () -> Void)? = nil,
         providerFactory: @escaping (any TranscriptionModel) -> StreamingTranscriptionProvider
     ) {
         self.modelContext = nil
@@ -133,6 +134,7 @@ class StreamingTranscriptionService {
     deinit {
         onPartialTranscript = nil
         sendTask?.cancel()
+        drainAndCommitTask?.cancel()
         eventConsumerTask?.cancel()
         chunkSource.finish()
         commitSignal?.finish()
@@ -226,33 +228,68 @@ class StreamingTranscriptionService {
         )
         logger.notice("Streaming stop requested receivedChunks=\(beforeDrain.receivedChunks, privacy: .public) sentChunks=\(beforeDrain.sentChunks, privacy: .public) receivedBytes=\(beforeDrain.receivedBytes, privacy: .public) sentBytes=\(beforeDrain.sentBytes, privacy: .public)")
 
-        // Finish the chunk source so the send loop drains remaining chunks and exits naturally.
-        let drainSpan = latencyTrace.begin("streaming_service.drain", token: traceToken)
-        await drainRemainingChunks()
-        let afterDrain = metrics.snapshot()
-        latencyTrace.end(
-            drainSpan,
-            details: "receivedChunks=\(afterDrain.receivedChunks) sentChunks=\(afterDrain.sentChunks) receivedBytes=\(afterDrain.receivedBytes) sentBytes=\(afterDrain.sentBytes)"
-        )
-
         // Set up the commit signal BEFORE sending commit to avoid a race with the response.
         let (signalStream, signalContinuation) = AsyncStream.makeStream(of: Void.self)
         self.commitSignal = signalContinuation
 
-        // Send commit to finalize any remaining audio
-        let commitSpan = latencyTrace.begin("streaming_provider.commit", token: traceToken)
-        do {
-            try await provider.commit()
-            latencyTrace.end(commitSpan, details: "result=success")
-        } catch {
-            latencyTrace.end(
-                commitSpan,
-                details: "result=failure error=\(String(describing: type(of: error)))"
+        // Drain and commit away from MainActor so local final ASR can overlap recorder restoration.
+        let drainSpan = latencyTrace.begin("streaming_service.drain", token: traceToken)
+        let pendingSendTask = sendTask
+        let metrics = metrics
+        let onDrainWaitStarted = onDrainWaitStarted
+        let drainAndCommitTask = Task.detached {
+            onDrainWaitStarted?()
+            let drainCheckpoint = await pendingSendTask?.value
+            try Task.checkCancellation()
+            latencyTrace.executorResumed(
+                drainCheckpoint,
+                details: "executor=commit_worker"
             )
+            let afterDrain = metrics.snapshot()
+            latencyTrace.end(
+                drainSpan,
+                details: "receivedChunks=\(afterDrain.receivedChunks) sentChunks=\(afterDrain.sentChunks) receivedBytes=\(afterDrain.receivedBytes) sentBytes=\(afterDrain.sentBytes)"
+            )
+
+            let commitSpan = latencyTrace.begin("streaming_provider.commit", token: traceToken)
+            do {
+                try await provider.commit()
+                latencyTrace.end(commitSpan, details: "result=success")
+            } catch {
+                latencyTrace.end(
+                    commitSpan,
+                    details: "result=failure error=\(String(describing: type(of: error)))"
+                )
+                throw error
+            }
+
+            return latencyTrace.executorEnqueued(
+                "streaming_service.commit_continuation",
+                token: traceToken
+            )
+        }
+        self.drainAndCommitTask = drainAndCommitTask
+        chunkSource.finish()
+
+        do {
+            let commitCheckpoint = try await drainAndCommitTask.value
+            latencyTrace.executorResumed(
+                commitCheckpoint,
+                details: "executor=main_actor"
+            )
+            self.drainAndCommitTask = nil
+            sendTask = nil
+        } catch {
+            self.drainAndCommitTask = nil
+            sendTask = nil
             commitSignal?.finish()
             commitSignal = nil
-            logger.error("Failed to send commit: \(error.localizedDescription, privacy: .public)")
-            state = .failed
+            if error is CancellationError || state == .cancelled {
+                logger.notice("Streaming commit cancelled")
+            } else {
+                logger.error("Failed to send commit: \(error.localizedDescription, privacy: .public)")
+                state = .failed
+            }
             await cleanupStreaming()
             throw error
         }
@@ -286,6 +323,8 @@ class StreamingTranscriptionService {
         eventConsumerTask = nil
         sendTask?.cancel()
         sendTask = nil
+        drainAndCommitTask?.cancel()
+        drainAndCommitTask = nil
         chunkSource.finish()
 
         // Clean up commit signal if waiting
@@ -363,23 +402,6 @@ class StreamingTranscriptionService {
                 token: latencyTraceToken
             )
         }
-    }
-
-    /// Finishes the chunk source and waits for the send loop to process all remaining buffered chunks.
-    private func drainRemainingChunks() async {
-        let start = Date()
-        chunkSource.finish()
-        let resumeCheckpoint: VoiceInkLatencyTrace.ExecutorCheckpoint?
-        if let sendTask {
-            onDrainWaitStarted?()
-            resumeCheckpoint = await sendTask.value
-        } else {
-            resumeCheckpoint = nil
-        }
-        VoiceInkLatencyTrace.shared.executorResumed(resumeCheckpoint)
-        sendTask = nil
-        let snapshot = metrics.snapshot()
-        logger.notice("Streaming drain finished elapsed=\(Date().timeIntervalSince(start), format: .fixed(precision: 3), privacy: .public)s receivedChunks=\(snapshot.receivedChunks, privacy: .public) sentChunks=\(snapshot.sentChunks, privacy: .public) receivedBytes=\(snapshot.receivedBytes, privacy: .public) sentBytes=\(snapshot.sentBytes, privacy: .public)")
     }
 
     /// Consumes transcription events throughout the session, accumulating committed segments.
@@ -480,6 +502,8 @@ class StreamingTranscriptionService {
         eventConsumerTask = nil
         sendTask?.cancel()
         sendTask = nil
+        drainAndCommitTask?.cancel()
+        drainAndCommitTask = nil
         chunkSource.finish()
         commitSignal?.finish()
         commitSignal = nil

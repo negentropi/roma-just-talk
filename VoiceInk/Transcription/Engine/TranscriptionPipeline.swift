@@ -109,6 +109,24 @@ class TranscriptionPipeline {
             return
         }
 
+        let cursorContextCheckpoint = latencyTrace.executorEnqueued(
+            "pipeline.cursor_context_prefetch",
+            token: traceToken
+        )
+        let preparedCursorTextContext = Task { @MainActor in
+            latencyTrace.executorResumed(cursorContextCheckpoint)
+            let span = latencyTrace.begin(
+                "pipeline.cursor_context_prefetch",
+                token: traceToken
+            )
+            let context = CursorTextContextReader.prepareTextBeforeCursor()
+            latencyTrace.end(
+                span,
+                details: "available=\(context != nil)"
+            )
+            return context
+        }
+
         do {
             let transcriptionStart = Date()
             let rawText: String
@@ -286,7 +304,10 @@ class TranscriptionPipeline {
             await restorePromptDetectionSettingsAndDismiss()
         } else if var textToPaste = pasteDecision.textToPaste {
             let pastePreparationSpan = latencyTrace.begin("pipeline.paste_prepare", token: traceToken)
-            textToPaste = CursorPaster.preparedTextForPaste(textToPaste)
+            textToPaste = await CursorPaster.preparedTextForPaste(
+                textToPaste,
+                preparedCursorTextContext: preparedCursorTextContext
+            )
 
             let isTrialExpired: Bool
             if case .trialExpired = licenseViewModel.licenseState {

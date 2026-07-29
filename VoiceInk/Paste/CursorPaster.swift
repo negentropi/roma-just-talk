@@ -47,13 +47,15 @@ class CursorPaster {
     @MainActor
     static func preparedTextForPaste(
         _ text: String,
-        preparedCursorTextContext: Task<String?, Never>?
+        preparedCursorTextContext: Task<CursorTextContextReader.PreparedContext?, Never>?
     ) async -> String {
         let plan = VoiceInkTranscriptionPasteOutputPolicy.cursorPasteTextPlan(text)
         guard plan.shouldReadCursorContext else { return text }
 
         let beforeCursor = if let preparedCursorTextContext {
-            await preparedCursorTextContext.value
+            CursorTextContextReader.textBeforeCursor(
+                preparedContext: await preparedCursorTextContext.value
+            )
         } else {
             CursorTextContextReader.textBeforeCursor()
         }

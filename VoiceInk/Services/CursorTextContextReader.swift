@@ -4,6 +4,23 @@ import VoiceInkCore
 
 enum CursorTextContextReader {
     @MainActor
+    final class PreparedContext: Sendable {
+        fileprivate let focusedElement: AXUIElement
+        fileprivate let selectedRange: CFRange?
+        fileprivate let text: String?
+
+        fileprivate init(
+            focusedElement: AXUIElement,
+            selectedRange: CFRange?,
+            text: String?
+        ) {
+            self.focusedElement = focusedElement
+            self.selectedRange = selectedRange
+            self.text = text
+        }
+    }
+
+    @MainActor
     static func textBeforeCursor(
         maximumLength: Int = VoiceInkCursorTextContextPolicy.defaultMaximumLength
     ) -> String? {
@@ -19,6 +36,46 @@ enum CursorTextContextReader {
         }
 
         return prefix
+    }
+
+    @MainActor
+    static func prepareTextBeforeCursor(
+        maximumLength: Int = VoiceInkCursorTextContextPolicy.defaultMaximumLength
+    ) -> PreparedContext? {
+        guard VoiceInkCursorTextContextPolicy.shouldAttemptRead(maximumLength: maximumLength),
+              AXIsProcessTrusted() else {
+            return nil
+        }
+
+        let systemWideElement = AXUIElementCreateSystemWide()
+        guard let focusedElement = focusedElement(from: systemWideElement) else {
+            return nil
+        }
+        return PreparedContext(
+            focusedElement: focusedElement,
+            selectedRange: selectedTextRange(from: focusedElement),
+            text: textBeforeCursor(in: focusedElement, maximumLength: maximumLength)
+        )
+    }
+
+    @MainActor
+    static func textBeforeCursor(
+        preparedContext: PreparedContext?,
+        maximumLength: Int = VoiceInkCursorTextContextPolicy.defaultMaximumLength
+    ) -> String? {
+        guard let preparedContext,
+              AXIsProcessTrusted(),
+              let focusedElement = focusedElement(from: AXUIElementCreateSystemWide()),
+              CFEqual(focusedElement, preparedContext.focusedElement),
+              preparedContext.selectedRange != nil,
+              preparedContext.text != nil,
+              sameRange(
+                selectedTextRange(from: focusedElement),
+                preparedContext.selectedRange
+              ) else {
+            return textBeforeCursor(maximumLength: maximumLength)
+        }
+        return preparedContext.text
     }
 
     private static func textBeforeCursor(in focusedElement: AXUIElement, maximumLength: Int) -> String? {
@@ -127,6 +184,17 @@ enum CursorTextContextReader {
         }
 
         return range
+    }
+
+    private static func sameRange(_ lhs: CFRange?, _ rhs: CFRange?) -> Bool {
+        switch (lhs, rhs) {
+        case (.none, .none):
+            true
+        case (.some(let lhs), .some(let rhs)):
+            lhs.location == rhs.location && lhs.length == rhs.length
+        default:
+            false
+        }
     }
 
     private static func stringForRange(_ range: CFRange, in element: AXUIElement) -> String? {

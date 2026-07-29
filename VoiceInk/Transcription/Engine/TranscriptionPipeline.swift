@@ -281,6 +281,7 @@ class TranscriptionPipeline {
             SoundManager.shared.play(.stop)
             await restorePromptDetectionSettingsAndDismiss()
         } else if var textToPaste = finalPastedText,
+           VoiceInkTranscriptionPasteOutputPolicy.shouldPaste(textToPaste),
            transcription.transcriptionState == .completed {
             let pastePreparationSpan = latencyTrace.begin("pipeline.paste_prepare", token: traceToken)
             textToPaste = CursorPaster.preparedTextForPaste(textToPaste)
@@ -324,9 +325,14 @@ class TranscriptionPipeline {
         } else {
             latencyTrace.event(
                 "pipeline.no_paste",
-                details: "state=\(transcription.transcriptionState) hasText=\(finalPastedText != nil)",
+                details: "state=\(transcription.transcriptionState) pasteableText=\(finalPastedText.map(VoiceInkTranscriptionPasteOutputPolicy.shouldPaste) ?? false)",
                 token: traceToken
             )
+            if let finalPastedText,
+               transcription.transcriptionState == .completed,
+               !VoiceInkTranscriptionPasteOutputPolicy.shouldPaste(finalPastedText) {
+                SoundManager.shared.play(.stop)
+            }
             await restorePromptDetectionSettingsAndDismiss()
         }
 

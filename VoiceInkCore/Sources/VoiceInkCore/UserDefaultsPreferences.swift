@@ -1264,6 +1264,10 @@ public enum VoiceInkContextualCapitalizationFormatter {
 public enum VoiceInkTranscriptionPasteOutputPolicy {
     public static let trialExpiredPrefix = "Your trial has expired. Upgrade to VoiceInk Pro at \(VoiceInkLicenseLinks.purchaseDisplayURLString)"
 
+    public static func shouldPaste(_ text: String) -> Bool {
+        !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
     public struct CursorPasteTextPlan: Equatable, Sendable {
         public let text: String
         public let shouldReadCursorContext: Bool

@@ -21,6 +21,31 @@ real target app such as TextEdit, Notes, Safari, Slack, or Zed.
 
 Shared-core checks lock the startup-resolution and direct-prewarm policies. This harness is the end-to-end proof that those policies still produce visible text within the latency budget.
 
+## Deterministic Speech-First Replay
+
+`SpeechFirstStreamingReplayTests` is the fast normal-CI layer derived from
+runtime traces. It uses virtual fixture time instead of sleeping: PCM begins 1.1
+seconds before key-down, the production 3-second pre-roll buffer snapshots it,
+and key-up finalizes the real `StreamingTranscriptionSession` and
+`StreamingTranscriptionService`.
+
+Only the external transcription provider is replaced. The deterministic provider
+requires the exact pre-roll and live PCM chunks, blocks the final send until the
+test releases it, and refuses to commit if bytes are missing or reordered. This
+exercises the production startup task, detached send executor, drain-before-commit
+contract, provider event consumer, transcript accumulator, cleanup pipeline, and
+paste-output decision. A blank committed result is also replayed through the same
+path and must stop before paste.
+
+The PCM values are content-agnostic because this boundary validates session
+delivery, not model accuracy. Provider/model correctness remains covered by
+provider tests and runtime audio fixtures.
+
+The replay deliberately excludes CoreAudio devices, `CGEvent`, TCC,
+Accessibility, clipboard ownership, and cross-app rendering. Those stay in the
+runtime E2E harness so an OS-boundary failure is not mislabeled as a shortcut,
+transcription, executor-drain, or paste-decision regression.
+
 ## Deep Runtime Trace
 
 Every recording emits a bounded `LatencyTrace` timeline. Events share one trace ID,

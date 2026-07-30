@@ -1,5 +1,6 @@
 import AppKit
 import CoreFoundation
+import Darwin
 import Foundation
 import RuntimeE2ECore
 
@@ -214,17 +215,29 @@ final class RuntimeVoiceInkSession {
 
     private static func terminateRunningApplications(bundleIdentifier: String) throws {
         let applications = runningApplications(bundleIdentifier: bundleIdentifier)
+        let processIdentifiers = applications.map(\.processIdentifier)
         for application in applications {
             _ = application.terminate()
         }
         let deadline = Date().addingTimeInterval(10)
         while Date() < deadline {
-            if runningApplications(bundleIdentifier: bundleIdentifier).isEmpty {
+            let capturedProcessesExited = processIdentifiers.allSatisfy {
+                !processExists(processIdentifier: $0)
+            }
+            if capturedProcessesExited,
+               runningApplications(bundleIdentifier: bundleIdentifier).isEmpty {
                 return
             }
             RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.05))
         }
         throw RuntimeVoiceInkSessionError.applicationWouldNotTerminate
+    }
+
+    private static func processExists(processIdentifier: pid_t) -> Bool {
+        if kill(processIdentifier, 0) == 0 {
+            return true
+        }
+        return errno != ESRCH
     }
 
     private static func launchApplication(atPath path: String, bundleIdentifier: String) throws {

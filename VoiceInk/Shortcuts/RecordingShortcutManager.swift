@@ -675,7 +675,7 @@ final class RecordingShortcutModeHandler {
         }
     }
 
-    static func keyEvidenceTraceDetails(_ context: VoiceInkShortcutPressContext) -> String {
+    nonisolated static func keyEvidenceTraceDetails(_ context: VoiceInkShortcutPressContext) -> String {
         "pressedOtherKey=\(context.didPressOtherKeyDuringPress) releasedOtherKey=\(context.didReleaseOtherKeyDuringPress) reliable=\(context.hasReliableKeyEvidence)"
     }
 

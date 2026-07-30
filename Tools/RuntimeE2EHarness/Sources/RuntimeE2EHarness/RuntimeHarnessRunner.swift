@@ -2,40 +2,6 @@ import AppKit
 import Foundation
 import RuntimeE2ECore
 
-enum RuntimeFailureBoundary: String, Codable {
-    case none
-    case targetPreparation
-    case audioInjection
-    case shortcutInjection
-    case shortcutDelivery
-    case traceCollection
-    case voiceInkTrigger
-    case voiceInkTranscription
-    case voiceInkPasteHandoff
-    case pasteDeliveryOrTargetVisibility
-    case latencyBudget
-    case contentQuality
-    case targetCleanup
-}
-
-struct RuntimeCaseEvidence: Codable {
-    let targetPrepared: Bool
-    let audioPlaybackStarted: Bool
-    let shortcutDownPosted: Bool
-    let shortcutUpPosted: Bool
-    let emergencyShortcutReleasePosted: Bool
-    let voiceInkTriggerObserved: Bool
-    let voiceInkShortcutHoldMatched: Bool?
-    let voiceInkTranscriptionCompleted: Bool
-    let voiceInkClipboardWriteSucceeded: Bool
-    let voiceInkPasteEventPosted: Bool
-    let voiceInkTextDeliveryHandoffSucceeded: Bool
-    let systemClipboardChangeObserved: Bool
-    let targetAccessibilityTextObserved: Bool
-    let targetVisibleTextObserved: Bool
-    let targetCleanupPassed: Bool?
-}
-
 struct RuntimeCaseReport: Codable {
     let id: String
     let fixturePath: String
@@ -409,6 +375,7 @@ enum RuntimeHarnessRunner {
             emergencyShortcutReleasePosted: emergencyShortcutReleasePosted,
             voiceInkTriggerObserved: latencyTrace?.triggerObserved == true,
             voiceInkShortcutHoldMatched: voiceInkShortcutHoldMatched,
+            voiceInkShortcutEvidenceRejected: latencyTrace?.shortcutKeyEvidenceRejected == true,
             voiceInkTranscriptionCompleted: latencyTrace?.transcriptionCompleted == true,
             voiceInkClipboardWriteSucceeded: latencyTrace?.clipboardWriteSucceeded == true,
             voiceInkPasteEventPosted: latencyTrace?.pasteEventPosted == true,
@@ -418,10 +385,10 @@ enum RuntimeHarnessRunner {
             targetVisibleTextObserved: targetVisibleTextObserved,
             targetCleanupPassed: targetCleanup?.passed
         )
-        let failureBoundary = failureBoundary(
+        let failureBoundary = RuntimeFailureBoundaryPolicy.classify(
             assessment: assessment,
             evidence: evidence,
-            latencyTrace: latencyTrace
+            hasLatencyTrace: latencyTrace != nil
         )
         let voiceInkKeyUpToPasteEventMilliseconds = latencyTrace?.keyUpToPasteEventMilliseconds
         let voiceInkKeyUpToPipelineCompleteMilliseconds = latencyTrace?.keyUpToPipelineCompleteMilliseconds
@@ -506,29 +473,6 @@ enum RuntimeHarnessRunner {
         case "shortcut": return .shortcutFailed
         default: return .traceMissing
         }
-    }
-
-    private static func failureBoundary(
-        assessment: RuntimeCaseAssessment,
-        evidence: RuntimeCaseEvidence,
-        latencyTrace: RuntimeLatencyTrace?
-    ) -> RuntimeFailureBoundary {
-        guard evidence.targetPrepared else { return .targetPreparation }
-        guard evidence.audioPlaybackStarted else { return .audioInjection }
-        guard evidence.shortcutDownPosted, evidence.shortcutUpPosted else { return .shortcutInjection }
-        guard latencyTrace != nil else { return .traceCollection }
-        guard evidence.voiceInkTriggerObserved else { return .voiceInkTrigger }
-        if evidence.voiceInkShortcutHoldMatched == false { return .shortcutDelivery }
-        guard evidence.voiceInkTranscriptionCompleted else { return .voiceInkTranscription }
-        if assessment.status == .emptyTranscript { return .voiceInkTranscription }
-        guard evidence.voiceInkTextDeliveryHandoffSucceeded else {
-            return .voiceInkPasteHandoff
-        }
-        guard evidence.targetVisibleTextObserved else { return .pasteDeliveryOrTargetVisibility }
-        if assessment.status == .slow { return .latencyBudget }
-        if assessment.status == .contentMismatch { return .contentQuality }
-        if evidence.targetCleanupPassed == false { return .targetCleanup }
-        return .none
     }
 
     private static func makeRunID(_ runCase: RuntimeRunCase) -> String {

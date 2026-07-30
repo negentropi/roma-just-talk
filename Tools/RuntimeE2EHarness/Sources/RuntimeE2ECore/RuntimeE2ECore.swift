@@ -436,6 +436,104 @@ public struct RuntimeCaseAssessment: Codable, Equatable, Sendable {
     }
 }
 
+public enum RuntimeFailureBoundary: String, Codable, Equatable, Sendable {
+    case none
+    case targetPreparation
+    case audioInjection
+    case shortcutInjection
+    case shortcutDelivery
+    case traceCollection
+    case voiceInkTrigger
+    case voiceInkShortcutEvidence
+    case voiceInkTranscription
+    case voiceInkPasteHandoff
+    case pasteDeliveryOrTargetVisibility
+    case latencyBudget
+    case contentQuality
+    case targetCleanup
+}
+
+public struct RuntimeCaseEvidence: Codable, Equatable, Sendable {
+    public let targetPrepared: Bool
+    public let audioPlaybackStarted: Bool
+    public let shortcutDownPosted: Bool
+    public let shortcutUpPosted: Bool
+    public let emergencyShortcutReleasePosted: Bool
+    public let voiceInkTriggerObserved: Bool
+    public let voiceInkShortcutHoldMatched: Bool?
+    public let voiceInkShortcutEvidenceRejected: Bool
+    public let voiceInkTranscriptionCompleted: Bool
+    public let voiceInkClipboardWriteSucceeded: Bool
+    public let voiceInkPasteEventPosted: Bool
+    public let voiceInkTextDeliveryHandoffSucceeded: Bool
+    public let systemClipboardChangeObserved: Bool
+    public let targetAccessibilityTextObserved: Bool
+    public let targetVisibleTextObserved: Bool
+    public let targetCleanupPassed: Bool?
+
+    public init(
+        targetPrepared: Bool,
+        audioPlaybackStarted: Bool,
+        shortcutDownPosted: Bool,
+        shortcutUpPosted: Bool,
+        emergencyShortcutReleasePosted: Bool,
+        voiceInkTriggerObserved: Bool,
+        voiceInkShortcutHoldMatched: Bool?,
+        voiceInkShortcutEvidenceRejected: Bool,
+        voiceInkTranscriptionCompleted: Bool,
+        voiceInkClipboardWriteSucceeded: Bool,
+        voiceInkPasteEventPosted: Bool,
+        voiceInkTextDeliveryHandoffSucceeded: Bool,
+        systemClipboardChangeObserved: Bool,
+        targetAccessibilityTextObserved: Bool,
+        targetVisibleTextObserved: Bool,
+        targetCleanupPassed: Bool?
+    ) {
+        self.targetPrepared = targetPrepared
+        self.audioPlaybackStarted = audioPlaybackStarted
+        self.shortcutDownPosted = shortcutDownPosted
+        self.shortcutUpPosted = shortcutUpPosted
+        self.emergencyShortcutReleasePosted = emergencyShortcutReleasePosted
+        self.voiceInkTriggerObserved = voiceInkTriggerObserved
+        self.voiceInkShortcutHoldMatched = voiceInkShortcutHoldMatched
+        self.voiceInkShortcutEvidenceRejected = voiceInkShortcutEvidenceRejected
+        self.voiceInkTranscriptionCompleted = voiceInkTranscriptionCompleted
+        self.voiceInkClipboardWriteSucceeded = voiceInkClipboardWriteSucceeded
+        self.voiceInkPasteEventPosted = voiceInkPasteEventPosted
+        self.voiceInkTextDeliveryHandoffSucceeded = voiceInkTextDeliveryHandoffSucceeded
+        self.systemClipboardChangeObserved = systemClipboardChangeObserved
+        self.targetAccessibilityTextObserved = targetAccessibilityTextObserved
+        self.targetVisibleTextObserved = targetVisibleTextObserved
+        self.targetCleanupPassed = targetCleanupPassed
+    }
+}
+
+public enum RuntimeFailureBoundaryPolicy {
+    public static func classify(
+        assessment: RuntimeCaseAssessment,
+        evidence: RuntimeCaseEvidence,
+        hasLatencyTrace: Bool
+    ) -> RuntimeFailureBoundary {
+        guard evidence.targetPrepared else { return .targetPreparation }
+        guard evidence.audioPlaybackStarted else { return .audioInjection }
+        guard evidence.shortcutDownPosted, evidence.shortcutUpPosted else { return .shortcutInjection }
+        guard hasLatencyTrace else { return .traceCollection }
+        guard evidence.voiceInkTriggerObserved else { return .voiceInkTrigger }
+        if evidence.voiceInkShortcutEvidenceRejected { return .voiceInkShortcutEvidence }
+        if evidence.voiceInkShortcutHoldMatched == false { return .shortcutDelivery }
+        guard evidence.voiceInkTranscriptionCompleted else { return .voiceInkTranscription }
+        if assessment.status == .emptyTranscript { return .voiceInkTranscription }
+        guard evidence.voiceInkTextDeliveryHandoffSucceeded else {
+            return .voiceInkPasteHandoff
+        }
+        guard evidence.targetVisibleTextObserved else { return .pasteDeliveryOrTargetVisibility }
+        if assessment.status == .slow { return .latencyBudget }
+        if assessment.status == .contentMismatch { return .contentQuality }
+        if evidence.targetCleanupPassed == false { return .targetCleanup }
+        return .none
+    }
+}
+
 public enum RuntimeStatistics {
     public static func percentile(_ percentile: Double, values: [Double]) -> Double? {
         guard !values.isEmpty else { return nil }
@@ -671,6 +769,10 @@ public struct RuntimeLatencyTrace: Codable, Equatable, Sendable {
 
     public var triggerObserved: Bool {
         events.contains { $0.name.hasPrefix("shortcut.key_down") }
+    }
+
+    public var shortcutKeyEvidenceRejected: Bool {
+        events.contains { $0.name == "shortcut.key_evidence_rejected" }
     }
 
     public var pasteEventPosted: Bool {

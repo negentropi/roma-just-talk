@@ -332,6 +332,41 @@ do {
         equals: 166.2,
         "trace should expose the shortcut hold VoiceInk actually observed"
     )
+    let rejectedShortcutTrace = RuntimeLatencyTrace.parse(messages: [
+        "[LATENCY] trace=A5A6A7A8 seq=0 t=0.0ms delta=0.0ms event=shortcut.key_down_physical mode=special",
+        "[LATENCY] trace=A5A6A7A8 seq=1 t=166.2ms delta=166.2ms event=shortcut.key_up_handler pressedOtherKey=true releasedOtherKey=false reliable=true",
+        "[LATENCY] trace=A5A6A7A8 seq=2 t=166.2ms delta=0.0ms event=shortcut.key_evidence_rejected pressedOtherKey=true releasedOtherKey=false reliable=true"
+    ])
+    try require(
+        rejectedShortcutTrace?.shortcutKeyEvidenceRejected == true,
+        "trace should distinguish rejected key evidence from transcription failure"
+    )
+    let rejectedEvidence = RuntimeCaseEvidence(
+        targetPrepared: true,
+        audioPlaybackStarted: true,
+        shortcutDownPosted: true,
+        shortcutUpPosted: true,
+        emergencyShortcutReleasePosted: false,
+        voiceInkTriggerObserved: true,
+        voiceInkShortcutHoldMatched: false,
+        voiceInkShortcutEvidenceRejected: rejectedShortcutTrace?.shortcutKeyEvidenceRejected == true,
+        voiceInkTranscriptionCompleted: false,
+        voiceInkClipboardWriteSucceeded: false,
+        voiceInkPasteEventPosted: false,
+        voiceInkTextDeliveryHandoffSucceeded: false,
+        systemClipboardChangeObserved: false,
+        targetAccessibilityTextObserved: false,
+        targetVisibleTextObserved: false,
+        targetCleanupPassed: true
+    )
+    try require(
+        RuntimeFailureBoundaryPolicy.classify(
+            assessment: RuntimeCaseAssessment(status: .transcriptionIncomplete, passed: false),
+            evidence: rejectedEvidence,
+            hasLatencyTrace: true
+        ) == .voiceInkShortcutEvidence,
+        "explicit key-evidence rejection should outrank inferred hold or transcription failures"
+    )
     print("PASS latency trace exposes the VoiceInk-observed shortcut hold")
 
     let emptyTranscriptTrace = RuntimeLatencyTrace.parse(messages: [

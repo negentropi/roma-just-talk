@@ -689,6 +689,17 @@ struct VoiceInkTests {
         #expect(recordingState == .idle)
         #expect(!sessionActive)
     }
+
+    @Test func shortcutKeyEvidenceTraceDetailsIdentifyEveryCause() {
+        #expect(RecordingShortcutModeHandler.keyEvidenceTraceDetails(
+            VoiceInkShortcutPressContext(
+                didPressOtherKeyDuringPress: true,
+                didReleaseOtherKeyDuringPress: false,
+                hasReliableKeyEvidence: false
+            )
+        ) == "pressedOtherKey=true releasedOtherKey=false reliable=false")
+    }
+
     @Test func inputMonitoringPermissionUsesInjectedSystemClient() async throws {
         var didRequestAccess = false
         let client = InputMonitoringPermission.Client(

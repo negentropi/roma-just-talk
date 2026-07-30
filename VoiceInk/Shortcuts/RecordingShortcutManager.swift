@@ -610,9 +610,10 @@ final class RecordingShortcutModeHandler {
         let callbackTime = callbackReceivedAt ?? eventTime
         let pressDuration = shortcutPressStartTime.map { eventTime - $0 } ?? 0
         let pressDurationMilliseconds = String(format: "%.1f", pressDuration * 1_000)
+        let keyEvidenceDetails = Self.keyEvidenceTraceDetails(context)
         VoiceInkLatencyTrace.shared.event(
             "shortcut.key_up_handler",
-            details: "action=\(action.storageName) mode=\(mode.rawValue) sourceTMs=\(pressDurationMilliseconds) sourceToCallbackMs=\(String(format: "%.1f", max(0, callbackTime - eventTime) * 1_000)) callbackToHandlerMs=\(String(format: "%.1f", max(0, handlerEnteredAt - callbackTime) * 1_000)) state=\(String(describing: recordingState()))",
+            details: "action=\(action.storageName) mode=\(mode.rawValue) sourceTMs=\(pressDurationMilliseconds) sourceToCallbackMs=\(String(format: "%.1f", max(0, callbackTime - eventTime) * 1_000)) callbackToHandlerMs=\(String(format: "%.1f", max(0, handlerEnteredAt - callbackTime) * 1_000)) state=\(String(describing: recordingState())) \(keyEvidenceDetails)",
             token: activeLatencyTraceToken
         )
         isShortcutPressed = false
@@ -623,6 +624,11 @@ final class RecordingShortcutModeHandler {
             let options = activeSpecialOptions
 
             if VoiceInkSpecialShortcutKeyEvidencePolicy.shouldDiscardShortcut(for: context) {
+                VoiceInkLatencyTrace.shared.event(
+                    "shortcut.key_evidence_rejected",
+                    details: keyEvidenceDetails,
+                    token: activeLatencyTraceToken
+                )
                 if isRecorderVisible() {
                     logger.notice("handleShortcutKeyUp: cancelling special recording; unsafe key evidence")
                     await cancelRecording()
@@ -667,6 +673,10 @@ final class RecordingShortcutModeHandler {
         if !isHandsFreeRecording {
             activeLatencyTraceToken = nil
         }
+    }
+
+    static func keyEvidenceTraceDetails(_ context: VoiceInkShortcutPressContext) -> String {
+        "pressedOtherKey=\(context.didPressOtherKeyDuringPress) releasedOtherKey=\(context.didReleaseOtherKeyDuringPress) reliable=\(context.hasReliableKeyEvidence)"
     }
 
     func handleInterruption(action: ShortcutAction) async {

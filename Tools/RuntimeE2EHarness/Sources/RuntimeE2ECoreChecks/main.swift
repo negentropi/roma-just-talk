@@ -124,6 +124,84 @@ do {
     )
     print("PASS shortcut delivery and incomplete transcription remain distinct from paste failures")
 
+    let pendingMicrophoneTrace = RuntimeLatencyTrace.parse(messages: [
+        "[LATENCY] trace=B1B2B3B4 seq=0 t=0.0ms delta=0.0ms event=engine.permission.request",
+        "[LATENCY] trace=B1B2B3B4 seq=1 t=0.9ms delta=0.9ms event=permission.authorization_status.end durationMs=0.1 status=undetermined",
+        "[LATENCY] trace=B1B2B3B4 seq=2 t=3402.8ms delta=3401.9ms event=shortcut.key_up_handler state=idle"
+    ])
+    try require(
+        pendingMicrophoneTrace?.microphonePermissionUnavailable == true,
+        "an unanswered microphone authorization request must remain distinct from transcription"
+    )
+    let deniedMicrophoneTrace = RuntimeLatencyTrace.parse(messages: [
+        "[LATENCY] trace=B5B6B7B8 seq=0 t=0.0ms delta=0.0ms event=engine.permission.denied"
+    ])
+    try require(
+        deniedMicrophoneTrace?.microphonePermissionUnavailable == true,
+        "an explicit microphone denial must remain distinct from transcription"
+    )
+    let rejectedMicrophoneCallbackTrace = RuntimeLatencyTrace.parse(messages: [
+        "[LATENCY] trace=B9B0B1B2 seq=0 t=0.0ms delta=0.0ms event=engine.permission.callback granted=false"
+    ])
+    try require(
+        rejectedMicrophoneCallbackTrace?.microphonePermissionUnavailable == true,
+        "a rejected microphone callback must remain distinct from transcription"
+    )
+    let grantedMicrophoneTrace = RuntimeLatencyTrace.parse(messages: [
+        "[LATENCY] trace=B3B4B5B6 seq=0 t=0.0ms delta=0.0ms event=engine.permission.request",
+        "[LATENCY] trace=B3B4B5B6 seq=1 t=0.9ms delta=0.9ms event=permission.authorization_status.end durationMs=0.1 status=undetermined",
+        "[LATENCY] trace=B3B4B5B6 seq=2 t=140.0ms delta=139.1ms event=engine.permission.callback granted=true"
+    ])
+    try require(
+        grantedMicrophoneTrace?.microphonePermissionUnavailable == false,
+        "a granted microphone callback must not become a permission failure"
+    )
+    let unavailableMicrophoneAssessment = RuntimeCaseAssessment.assess(
+        observation: RuntimeCaseObservation(
+            visibleText: nil,
+            keyUpToVisibleMilliseconds: nil,
+            clipboardChanged: false,
+            triggerObserved: true
+        ),
+        expectedTranscript: nil,
+        latencyThresholdMilliseconds: 250,
+        shortcutHoldMatched: true,
+        microphonePermissionUnavailable: pendingMicrophoneTrace?.microphonePermissionUnavailable,
+        transcriptionCompleted: false
+    )
+    try require(
+        unavailableMicrophoneAssessment.status == .microphonePermissionUnavailable,
+        "pending microphone authorization must not be reported as transcription failure"
+    )
+    let unavailableMicrophoneEvidence = RuntimeCaseEvidence(
+        targetPrepared: true,
+        audioPlaybackStarted: true,
+        shortcutDownPosted: true,
+        shortcutUpPosted: true,
+        emergencyShortcutReleasePosted: false,
+        voiceInkTriggerObserved: true,
+        voiceInkShortcutHoldMatched: true,
+        voiceInkShortcutEvidenceRejected: false,
+        voiceInkTranscriptionCompleted: false,
+        voiceInkClipboardWriteSucceeded: false,
+        voiceInkPasteEventPosted: false,
+        voiceInkTextDeliveryHandoffSucceeded: false,
+        systemClipboardChangeObserved: false,
+        targetAccessibilityTextObserved: false,
+        targetVisibleTextObserved: false,
+        targetCleanupPassed: true,
+        voiceInkMicrophonePermissionUnavailable: true
+    )
+    try require(
+        RuntimeFailureBoundaryPolicy.classify(
+            assessment: unavailableMicrophoneAssessment,
+            evidence: unavailableMicrophoneEvidence,
+            hasLatencyTrace: true
+        ) == .voiceInkMicrophonePermission,
+        "microphone authorization must have its own VoiceInk failure boundary"
+    )
+    print("PASS pending microphone authorization remains distinct from transcription failure")
+
     let unrenderedPaste = RuntimeCaseAssessment.assess(
         observation: RuntimeCaseObservation(
             visibleText: "AX already contains text",

@@ -107,7 +107,9 @@ The report preserves each failure instead of dropping it from percentile
 calculations. Per-app and overall summaries include total, passed, failed,
 no-visible-paste count, p50, p95, and maximum visible-text latency.
 
-An empty transcription is attributed to `voiceInkTranscription`, even if VoiceInk
+An unanswered or denied microphone request is attributed to
+`voiceInkMicrophonePermission`, before transcription classification. An empty
+transcription is attributed to `voiceInkTranscription`, even if VoiceInk
 subsequently writes or posts whitespace. It is never counted as a clipboard,
 paste-delivery, or target-visibility failure.
 

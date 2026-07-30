@@ -366,6 +366,7 @@ public struct RuntimeCaseAssessment: Codable, Equatable, Sendable {
         case shortcutTimingMismatch
         case triggerRejected
         case traceMissing
+        case microphonePermissionUnavailable
         case transcriptionIncomplete
         case emptyTranscript
         case noPaste
@@ -391,6 +392,7 @@ public struct RuntimeCaseAssessment: Codable, Equatable, Sendable {
         expectedTranscript: String?,
         latencyThresholdMilliseconds: Double,
         shortcutHoldMatched: Bool? = nil,
+        microphonePermissionUnavailable: Bool? = nil,
         transcriptionCompleted: Bool? = nil,
         transcribedCharacterCount: Int? = nil,
         maximumWordErrorRate: Double = 0.2
@@ -400,6 +402,9 @@ public struct RuntimeCaseAssessment: Codable, Equatable, Sendable {
         }
         guard shortcutHoldMatched != false else {
             return Self(status: .shortcutTimingMismatch, passed: false)
+        }
+        guard microphonePermissionUnavailable != true else {
+            return Self(status: .microphonePermissionUnavailable, passed: false)
         }
         guard transcriptionCompleted != false else {
             return Self(status: .transcriptionIncomplete, passed: false)
@@ -445,6 +450,7 @@ public enum RuntimeFailureBoundary: String, Codable, Equatable, Sendable {
     case traceCollection
     case voiceInkTrigger
     case voiceInkShortcutEvidence
+    case voiceInkMicrophonePermission
     case voiceInkTranscription
     case voiceInkPasteHandoff
     case pasteDeliveryOrTargetVisibility
@@ -470,6 +476,7 @@ public struct RuntimeCaseEvidence: Codable, Equatable, Sendable {
     public let targetAccessibilityTextObserved: Bool
     public let targetVisibleTextObserved: Bool
     public let targetCleanupPassed: Bool?
+    public let voiceInkMicrophonePermissionUnavailable: Bool?
 
     public init(
         targetPrepared: Bool,
@@ -487,7 +494,8 @@ public struct RuntimeCaseEvidence: Codable, Equatable, Sendable {
         systemClipboardChangeObserved: Bool,
         targetAccessibilityTextObserved: Bool,
         targetVisibleTextObserved: Bool,
-        targetCleanupPassed: Bool?
+        targetCleanupPassed: Bool?,
+        voiceInkMicrophonePermissionUnavailable: Bool? = nil
     ) {
         self.targetPrepared = targetPrepared
         self.audioPlaybackStarted = audioPlaybackStarted
@@ -505,6 +513,7 @@ public struct RuntimeCaseEvidence: Codable, Equatable, Sendable {
         self.targetAccessibilityTextObserved = targetAccessibilityTextObserved
         self.targetVisibleTextObserved = targetVisibleTextObserved
         self.targetCleanupPassed = targetCleanupPassed
+        self.voiceInkMicrophonePermissionUnavailable = voiceInkMicrophonePermissionUnavailable
     }
 }
 
@@ -521,6 +530,9 @@ public enum RuntimeFailureBoundaryPolicy {
         guard evidence.voiceInkTriggerObserved else { return .voiceInkTrigger }
         if evidence.voiceInkShortcutEvidenceRejected { return .voiceInkShortcutEvidence }
         if evidence.voiceInkShortcutHoldMatched == false { return .shortcutDelivery }
+        if evidence.voiceInkMicrophonePermissionUnavailable == true {
+            return .voiceInkMicrophonePermission
+        }
         guard evidence.voiceInkTranscriptionCompleted else { return .voiceInkTranscription }
         if assessment.status == .emptyTranscript { return .voiceInkTranscription }
         guard evidence.voiceInkTextDeliveryHandoffSucceeded else {
@@ -787,6 +799,23 @@ public struct RuntimeLatencyTrace: Codable, Equatable, Sendable {
         events.contains {
             $0.name == "pipeline.transcribe.end" && $0.details.contains("result=success")
         }
+    }
+
+    public var microphonePermissionUnavailable: Bool {
+        if events.contains(where: {
+            $0.name == "engine.permission.denied" ||
+                ($0.name == "engine.permission.callback" && $0.details.contains("granted=false"))
+        }) {
+            return true
+        }
+        guard events.contains(where: { $0.name == "engine.permission.request" }),
+              events.contains(where: {
+                  $0.name == "permission.authorization_status.end" &&
+                      $0.details.contains("status=undetermined")
+              }) else {
+            return false
+        }
+        return !events.contains(where: { $0.name == "engine.permission.callback" })
     }
 
     public var transcribedCharacterCount: Int? {

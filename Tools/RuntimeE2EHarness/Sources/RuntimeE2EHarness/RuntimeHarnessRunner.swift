@@ -65,7 +65,7 @@ struct RuntimeRunSummary: Codable {
 }
 
 struct RuntimeHarnessReport: Codable {
-    var schemaVersion = 4
+    var schemaVersion = 5
     let startedAt: Date
     var finishedAt: Date?
     let configuration: RuntimeHarnessConfiguration
@@ -323,6 +323,7 @@ enum RuntimeHarnessRunner {
                 expectedTranscript: runCase.expectedTranscript,
                 latencyThresholdMilliseconds: configuration.latencyThresholdMilliseconds,
                 shortcutHoldMatched: voiceInkShortcutHoldMatched,
+                microphonePermissionUnavailable: latencyTrace.map(\.microphonePermissionUnavailable),
                 transcriptionCompleted: latencyTrace.map(\.transcriptionCompleted),
                 transcribedCharacterCount: latencyTrace?.transcribedCharacterCount,
                 maximumWordErrorRate: configuration.maximumWordErrorRate
@@ -383,7 +384,8 @@ enum RuntimeHarnessRunner {
             systemClipboardChangeObserved: clipboardChanged,
             targetAccessibilityTextObserved: targetAccessibilityTextObserved,
             targetVisibleTextObserved: targetVisibleTextObserved,
-            targetCleanupPassed: targetCleanup?.passed
+            targetCleanupPassed: targetCleanup?.passed,
+            voiceInkMicrophonePermissionUnavailable: latencyTrace.map(\.microphonePermissionUnavailable)
         )
         let failureBoundary = RuntimeFailureBoundaryPolicy.classify(
             assessment: assessment,

@@ -13,7 +13,7 @@ class CursorPaster {
     )
     @MainActor private static var pasteCommandPosterForTesting: (() async -> PasteResult)?
     @MainActor private static var accessibilityTextInserterForTesting:
-        ((String, CursorTextContextReader.PreparedContext?) -> Bool)?
+        ((String, CursorTextContextReader.PreparedContext?) -> CursorTextContextReader.SelectedTextInsertionResult)?
 
     struct PreparedPasteContext {
         fileprivate let changeCount: Int
@@ -76,7 +76,10 @@ class CursorPaster {
 
     @MainActor
     static func configureAccessibilityTextInserterForTesting(
-        _ inserter: ((String, CursorTextContextReader.PreparedContext?) -> Bool)? = nil
+        _ inserter: (
+            (String, CursorTextContextReader.PreparedContext?)
+                -> CursorTextContextReader.SelectedTextInsertionResult
+        )? = nil
     ) {
         accessibilityTextInserterForTesting = inserter
     }
@@ -145,7 +148,7 @@ class CursorPaster {
                 token: latencyTraceToken
             )
             let cursorContext = await preparedCursorTextContext?.value
-            let didInsert = if let accessibilityTextInserterForTesting {
+            let insertionResult = if let accessibilityTextInserterForTesting {
                 accessibilityTextInserterForTesting(text, cursorContext)
             } else {
                 CursorTextContextReader.insertSelectedText(
@@ -155,9 +158,9 @@ class CursorPaster {
             }
             latencyTrace.end(
                 insertionSpan,
-                details: "result=\(didInsert ? "success" : "unsupported")"
+                details: "result=\(insertionResult.rawValue)"
             )
-            if didInsert {
+            if insertionResult == .inserted {
                 latencyTrace.event(
                     "paste_text_inserted",
                     details: "method=accessibility",

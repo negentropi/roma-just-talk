@@ -77,7 +77,7 @@ struct VoiceInkTests {
         pasteboard.setString("previous clipboard", forType: .string)
         var postedCommand = false
         CursorPaster.configureAccessibilityTextInserterForTesting { text, _ in
-            text == "dictated text"
+            text == "dictated text" ? .inserted : .notApplied
         }
         CursorPaster.configurePasteCommandPosterForTesting {
             postedCommand = true
@@ -91,7 +91,7 @@ struct VoiceInkTests {
         #expect(pasteboard.string(forType: .string) == "previous clipboard")
     }
 
-    @Test @MainActor func unsupportedAccessibilityInsertFallsBackToPasteCommand() async throws {
+    @Test @MainActor func unappliedAccessibilityInsertFallsBackToPasteCommand() async throws {
         let defaults = UserDefaults.standard
         let restoreValue = defaults.object(forKey: "restoreClipboardAfterPaste")
         let pasteMethodValue = defaults.object(forKey: VoiceInkPasteMethod.userDefaultsKey)
@@ -113,7 +113,7 @@ struct VoiceInkTests {
         pasteboard.clearContents()
         pasteboard.setString("previous clipboard", forType: .string)
         var postedCommand = false
-        CursorPaster.configureAccessibilityTextInserterForTesting { _, _ in false }
+        CursorPaster.configureAccessibilityTextInserterForTesting { _, _ in .notApplied }
         CursorPaster.configurePasteCommandPosterForTesting {
             postedCommand = true
             return .commandPosted
@@ -124,6 +124,43 @@ struct VoiceInkTests {
         #expect(result == .commandPosted)
         #expect(postedCommand)
         #expect(pasteboard.string(forType: .string) == "dictated text")
+    }
+
+    @Test func accessibilityInsertionObservationRejectsSilentAXSuccess() {
+        #expect(!CursorTextContextReader.insertionWasObserved(
+            textBeforeInsertion: "",
+            rangeBeforeInsertion: CFRange(location: 0, length: 0),
+            insertedText: "dictated text",
+            textAfterInsertion: "",
+            rangeAfterInsertion: CFRange(location: 0, length: 0)
+        ))
+    }
+
+    @Test func accessibilityInsertionObservationAcceptsTextOrCursorMutation() {
+        #expect(CursorTextContextReader.insertionWasObserved(
+            textBeforeInsertion: "before after",
+            rangeBeforeInsertion: CFRange(location: 7, length: 0),
+            insertedText: "dictated ",
+            textAfterInsertion: "before dictated after",
+            rangeAfterInsertion: CFRange(location: 16, length: 0)
+        ))
+        #expect(CursorTextContextReader.insertionWasObserved(
+            textBeforeInsertion: nil,
+            rangeBeforeInsertion: CFRange(location: 0, length: 0),
+            insertedText: "👋",
+            textAfterInsertion: nil,
+            rangeAfterInsertion: CFRange(location: 2, length: 0)
+        ))
+    }
+
+    @Test func accessibilityInsertionObservationRejectsUnrelatedTextMutation() {
+        #expect(!CursorTextContextReader.insertionWasObserved(
+            textBeforeInsertion: "before after",
+            rangeBeforeInsertion: CFRange(location: 7, length: 0),
+            insertedText: "dictated ",
+            textAfterInsertion: "before unrelated after",
+            rangeAfterInsertion: CFRange(location: 16, length: 0)
+        ))
     }
 
     @Test @MainActor func sessionMetricRecorderAcceptsSnapshotModelName() throws {

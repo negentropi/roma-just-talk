@@ -3,6 +3,12 @@ import Foundation
 import VoiceInkCore
 
 enum CursorTextContextReader {
+    enum SelectedTextInsertionResult: String {
+        case inserted
+        case unsupported
+        case notApplied
+    }
+
     @MainActor
     final class PreparedContext: Sendable {
         fileprivate let focusedElement: AXUIElement
@@ -82,19 +88,20 @@ enum CursorTextContextReader {
     static func insertSelectedText(
         _ text: String,
         preparedContext: PreparedContext?
-    ) -> Bool {
-        guard AXIsProcessTrusted(),
+    ) -> SelectedTextInsertionResult {
+        guard !text.isEmpty,
+              AXIsProcessTrusted(),
               let focusedElement = focusedElement(from: AXUIElementCreateSystemWide()),
               let selectedRange = selectedTextRange(from: focusedElement),
               let role = role(from: focusedElement),
               VoiceInkCursorTextContextPolicy.isTextInputRole(role) else {
-            return false
+            return .unsupported
         }
 
         if let preparedContext {
             guard CFEqual(focusedElement, preparedContext.focusedElement),
                   sameRange(selectedRange, preparedContext.selectedRange) else {
-                return false
+                return .unsupported
             }
         }
 
@@ -105,14 +112,71 @@ enum CursorTextContextReader {
             &isSettable
         ) == .success,
               isSettable.boolValue else {
-            return false
+            return .unsupported
         }
 
-        return AXUIElementSetAttributeValue(
+        let textBeforeInsertion = textValue(from: focusedElement)
+        guard AXUIElementSetAttributeValue(
             focusedElement,
             kAXSelectedTextAttribute as CFString,
             text as CFString
-        ) == .success
+        ) == .success else {
+            return .notApplied
+        }
+
+        if insertionWasObserved(
+            textBeforeInsertion: textBeforeInsertion,
+            rangeBeforeInsertion: selectedRange,
+            insertedText: text,
+            textAfterInsertion: textValue(from: focusedElement),
+            rangeAfterInsertion: selectedTextRange(from: focusedElement)
+        ) {
+            return .inserted
+        }
+
+        RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.005))
+        return insertionWasObserved(
+            textBeforeInsertion: textBeforeInsertion,
+            rangeBeforeInsertion: selectedRange,
+            insertedText: text,
+            textAfterInsertion: textValue(from: focusedElement),
+            rangeAfterInsertion: selectedTextRange(from: focusedElement)
+        ) ? .inserted : .notApplied
+    }
+
+    static func insertionWasObserved(
+        textBeforeInsertion: String?,
+        rangeBeforeInsertion: CFRange,
+        insertedText: String,
+        textAfterInsertion: String?,
+        rangeAfterInsertion: CFRange?
+    ) -> Bool {
+        if let textBeforeInsertion,
+           let textAfterInsertion {
+            let source = textBeforeInsertion as NSString
+            guard rangeBeforeInsertion.location >= 0,
+                  rangeBeforeInsertion.length >= 0,
+                  rangeBeforeInsertion.location <= source.length,
+                  rangeBeforeInsertion.length <= source.length - rangeBeforeInsertion.location else {
+                return false
+            }
+            let expectedText = source.replacingCharacters(
+                in: NSRange(
+                    location: rangeBeforeInsertion.location,
+                    length: rangeBeforeInsertion.length
+                ),
+                with: insertedText
+            )
+            return textAfterInsertion == expectedText
+        }
+
+        guard !insertedText.isEmpty,
+              let rangeAfterInsertion else {
+            return false
+        }
+        return rangeAfterInsertion.location
+                == rangeBeforeInsertion.location + insertedText.utf16.count
+            && rangeAfterInsertion.length == 0
     }
 
     private static func textBeforeCursor(in focusedElement: AXUIElement, maximumLength: Int) -> String? {
@@ -254,13 +318,7 @@ enum CursorTextContextReader {
     }
 
     private static func valuePrefix(_ range: CFRange, in element: AXUIElement) -> String? {
-        var value: CFTypeRef?
-        guard AXUIElementCopyAttributeValue(
-            element,
-            kAXValueAttribute as CFString,
-            &value
-        ) == .success,
-              let text = value as? String,
+        guard let text = textValue(from: element),
               let stringRange = Range(NSRange(location: range.location, length: range.length), in: text) else {
             return nil
         }
@@ -270,10 +328,19 @@ enum CursorTextContextReader {
 
     private static func valueSuffix(in element: AXUIElement, maximumLength: Int) -> String? {
         guard let role = role(from: element),
-              VoiceInkCursorTextContextPolicy.isTextInputRole(role) else {
+              VoiceInkCursorTextContextPolicy.isTextInputRole(role),
+              let text = textValue(from: element) else {
             return nil
         }
 
+        return VoiceInkCursorTextContextPolicy.valueSuffix(
+            from: text,
+            role: role,
+            maximumLength: maximumLength
+        )
+    }
+
+    private static func textValue(from element: AXUIElement) -> String? {
         var value: CFTypeRef?
         guard AXUIElementCopyAttributeValue(
             element,
@@ -283,12 +350,7 @@ enum CursorTextContextReader {
               let text = value as? String else {
             return nil
         }
-
-        return VoiceInkCursorTextContextPolicy.valueSuffix(
-            from: text,
-            role: role,
-            maximumLength: maximumLength
-        )
+        return text
     }
 
     private static func role(from element: AXUIElement) -> String? {

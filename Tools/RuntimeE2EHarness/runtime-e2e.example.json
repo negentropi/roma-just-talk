@@ -10,7 +10,7 @@
   "preRollWarmupSeconds": 2,
   "targetSettleSeconds": 1,
   "targetTextTimeoutSeconds": 15,
-  "latencyThresholdMilliseconds": 440,
+  "latencyThresholdMilliseconds": 250,
   "maximumWordErrorRate": 0.2,
   "repetitions": 3,
   "targetAvailabilityPolicy": "runningOnly",

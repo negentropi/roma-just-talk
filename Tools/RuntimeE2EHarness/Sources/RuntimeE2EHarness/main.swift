@@ -168,7 +168,7 @@ do {
         }
         if FileManager.default.fileExists(atPath: RuntimeSystemOutputSession.journalURL.path) {
             try RuntimeSystemOutputSession.restoreFromJournal()
-            restored.append("system output device")
+            restored.append("system output device and loopback controls")
         }
         let targetCleanup = RuntimeTargetController.restoreAbandonedTargets(
             targets: RuntimeTargetCatalog.restorationTargets(

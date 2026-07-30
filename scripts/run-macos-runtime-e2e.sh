@@ -330,7 +330,7 @@ open -b com.apple.ScriptEditor2 > "$evidence/scripteditor-launch.log" 2>&1
 sleep 15
 
 write_config "$config_smoke" 1 20000
-write_config "$config_full" "$repetitions" 440
+write_config "$config_full" "$repetitions" 250
 cp "$config_smoke" "$evidence/runtime-e2e-smoke-config.json"
 cp "$config_full" "$evidence/runtime-e2e-full-config.json"
 

@@ -26,11 +26,14 @@ struct RuntimeTargetCleanupInfo: Codable {
     let surfaceClosed: Bool
     let temporaryResourceRemoved: Bool
     let terminatedProcessIdentifiers: [Int32]
+    let restoredInitiallyRunningApplication: Bool
     let restoredFrontmostApplication: Bool
     let errors: [String]
 
     var passed: Bool {
-        temporaryResourceRemoved
+        surfaceClosed
+            && temporaryResourceRemoved
+            && restoredInitiallyRunningApplication
             && restoredFrontmostApplication
             && errors.isEmpty
     }
@@ -52,6 +55,7 @@ struct RuntimeAbandonedTargetCleanupInfo: Codable {
 final class RuntimePreparedTarget {
     let info: RuntimeTargetPreparationInfo
     private let target: RuntimeTargetApp
+    private let appURL: URL
     private let appElement: AXUIElement
     private var windowElement: AXUIElement
     private var textElement: AXUIElement
@@ -63,6 +67,7 @@ final class RuntimePreparedTarget {
 
     init(
         target: RuntimeTargetApp,
+        appURL: URL,
         appElement: AXUIElement,
         windowElement: AXUIElement,
         textElement: AXUIElement,
@@ -76,6 +81,7 @@ final class RuntimePreparedTarget {
         renderedTextObserver: RuntimeRenderedTextObserver
     ) {
         self.target = target
+        self.appURL = appURL
         self.appElement = appElement
         self.windowElement = windowElement
         self.textElement = textElement
@@ -219,6 +225,15 @@ final class RuntimePreparedTarget {
                 errors.append("Could not terminate newly launched target process \(application.processIdentifier)")
             }
         }
+        let restoredInitiallyRunningApplication =
+            RuntimeTargetController.restoreInitiallyRunningApplicationIfNeeded(
+                appURL: appURL,
+                bundleIdentifier: target.bundleIdentifier,
+                existingProcessIdentifiers: existingProcessIdentifiers
+            )
+        if !restoredInitiallyRunningApplication {
+            errors.append("Could not restore target app that was running before preparation")
+        }
 
         let temporaryResourceRemoved: Bool
         do {
@@ -243,6 +258,7 @@ final class RuntimePreparedTarget {
             surfaceClosed: surfaceClosed,
             temporaryResourceRemoved: temporaryResourceRemoved,
             terminatedProcessIdentifiers: terminatedProcessIdentifiers,
+            restoredInitiallyRunningApplication: restoredInitiallyRunningApplication,
             restoredFrontmostApplication: restoredFrontmostApplication,
             errors: errors
         )
@@ -305,23 +321,20 @@ enum RuntimeTargetController {
                 bundleIdentifier: target.bundleIdentifier,
                 resourceURL: resource.url
             )
-            let surface = try waitForTargetSurface(
+            var surface = try waitForTargetSurface(
                 bundleIdentifier: target.bundleIdentifier,
                 windowTitleToken: resource.windowTitleToken,
                 timeoutSeconds: 15
             )
-            RuntimeAX.focus(
-                application: surface.application,
-                windowElement: surface.windowElement,
-                textElement: surface.textElement
-            )
-            guard RuntimeAX.clear(textElement: surface.textElement) else {
+            guard let emptySurface = establishEmptyBaseline(
+                surface: surface,
+                bundleIdentifier: target.bundleIdentifier,
+                windowTitleToken: resource.windowTitleToken,
+                settleSeconds: settleSeconds
+            ) else {
                 throw RuntimeTargetControllerError.couldNotClearTarget
             }
-            Thread.sleep(forTimeInterval: settleSeconds)
-            guard RuntimeAX.text(from: surface.textElement)?.isEmpty == true else {
-                throw RuntimeTargetControllerError.couldNotClearTarget
-            }
+            surface = emptySurface
             guard let editableFrame = RuntimeAX.frame(of: surface.textElement) else {
                 throw RuntimeTargetControllerError.renderObservationUnavailable(
                     "Editable AX element has no global frame"
@@ -336,6 +349,7 @@ enum RuntimeTargetController {
 
             return RuntimePreparedTarget(
                 target: target,
+                appURL: appURL,
                 appElement: surface.appElement,
                 windowElement: surface.windowElement,
                 textElement: surface.textElement,
@@ -351,6 +365,7 @@ enum RuntimeTargetController {
         } catch {
             cleanupFailedPreparation(
                 target: target,
+                appURL: appURL,
                 bundleIdentifier: target.bundleIdentifier,
                 windowTitleToken: resource.windowTitleToken,
                 existingProcessIdentifiers: existingProcessIdentifiers,
@@ -594,6 +609,38 @@ enum RuntimeTargetController {
         throw RuntimeTargetControllerError.targetSurfaceTimedOut(bundleIdentifier)
     }
 
+    private static func establishEmptyBaseline(
+        surface: TargetSurface,
+        bundleIdentifier: String,
+        windowTitleToken: String,
+        settleSeconds: TimeInterval
+    ) -> TargetSurface? {
+        var candidate = surface
+        for attempt in 0..<2 {
+            RuntimeAX.focus(
+                application: candidate.application,
+                windowElement: candidate.windowElement,
+                textElement: candidate.textElement
+            )
+            if RuntimeAX.clear(textElement: candidate.textElement) {
+                Thread.sleep(forTimeInterval: settleSeconds)
+                if RuntimeAX.text(from: candidate.textElement)?.isEmpty == true {
+                    return candidate
+                }
+            }
+            guard attempt == 0,
+                  let refreshed = try? waitForTargetSurface(
+                    bundleIdentifier: bundleIdentifier,
+                    windowTitleToken: windowTitleToken,
+                    timeoutSeconds: 2
+                  ) else {
+                continue
+            }
+            candidate = refreshed
+        }
+        return nil
+    }
+
     private static func orderedApplications(bundleIdentifier: String) -> [NSRunningApplication] {
         let applications = NSRunningApplication.runningApplications(withBundleIdentifier: bundleIdentifier)
         guard let frontmost = NSWorkspace.shared.frontmostApplication,
@@ -609,6 +656,7 @@ enum RuntimeTargetController {
 
     private static func cleanupFailedPreparation(
         target: RuntimeTargetApp,
+        appURL: URL,
         bundleIdentifier: String,
         windowTitleToken: String,
         existingProcessIdentifiers: Set<pid_t>,
@@ -642,11 +690,56 @@ enum RuntimeTargetController {
             _ = application.terminate()
             _ = RuntimeAX.waitForTermination(application, timeoutSeconds: 3)
         }
+        _ = restoreInitiallyRunningApplicationIfNeeded(
+            appURL: appURL,
+            bundleIdentifier: bundleIdentifier,
+            existingProcessIdentifiers: existingProcessIdentifiers
+        )
         try? FileManager.default.removeItem(at: temporaryDirectoryURL)
         if let previousFrontmostApplication,
            !previousFrontmostApplication.isTerminated {
             _ = previousFrontmostApplication.activate()
         }
+    }
+
+    fileprivate static func restoreInitiallyRunningApplicationIfNeeded(
+        appURL: URL,
+        bundleIdentifier: String,
+        existingProcessIdentifiers: Set<pid_t>
+    ) -> Bool {
+        let isRunning = !NSRunningApplication.runningApplications(
+            withBundleIdentifier: bundleIdentifier
+        ).isEmpty
+        guard RuntimeTargetLifecyclePlan.shouldRestoreApplication(
+            wasRunningBeforePreparation: !existingProcessIdentifiers.isEmpty,
+            isRunningAfterCleanup: isRunning
+        ) else {
+            return true
+        }
+
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/open")
+        process.arguments = ["-g", "-a", appURL.path]
+        do {
+            try process.run()
+            process.waitUntilExit()
+        } catch {
+            return false
+        }
+        guard process.terminationStatus == 0 else { return false }
+
+        let deadline = Date().addingTimeInterval(5)
+        while Date() < deadline {
+            if !NSRunningApplication.runningApplications(
+                withBundleIdentifier: bundleIdentifier
+            ).isEmpty {
+                return true
+            }
+            RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.05))
+        }
+        return !NSRunningApplication.runningApplications(
+            withBundleIdentifier: bundleIdentifier
+        ).isEmpty
     }
 }
 

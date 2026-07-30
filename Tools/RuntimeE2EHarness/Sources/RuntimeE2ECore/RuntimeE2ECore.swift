@@ -109,6 +109,59 @@ public enum RuntimeTargetCatalog {
     }
 }
 
+public struct RuntimeLoopbackDeviceControlState: Codable, Equatable, Sendable {
+    public let inputMuted: Bool?
+    public let outputMuted: Bool?
+    public let inputVolume: Double?
+    public let outputVolume: Double?
+
+    public init(
+        inputMuted: Bool?,
+        outputMuted: Bool?,
+        inputVolume: Double?,
+        outputVolume: Double?
+    ) {
+        self.inputMuted = inputMuted
+        self.outputMuted = outputMuted
+        self.inputVolume = inputVolume
+        self.outputVolume = outputVolume
+    }
+
+    public var preparedForPlayback: Self {
+        Self(
+            inputMuted: inputMuted.map { _ in false },
+            outputMuted: outputMuted.map { _ in false },
+            inputVolume: inputVolume.map { _ in 1 },
+            outputVolume: outputVolume.map { _ in 1 }
+        )
+    }
+}
+
+public struct RuntimeSystemOutputJournal: Codable, Equatable, Sendable {
+    public let originalDeviceUID: String
+    public let targetDeviceUID: String?
+    public let targetControlState: RuntimeLoopbackDeviceControlState?
+
+    public init(
+        originalDeviceUID: String,
+        targetDeviceUID: String?,
+        targetControlState: RuntimeLoopbackDeviceControlState?
+    ) {
+        self.originalDeviceUID = originalDeviceUID
+        self.targetDeviceUID = targetDeviceUID
+        self.targetControlState = targetControlState
+    }
+}
+
+public enum RuntimeTargetLifecyclePlan {
+    public static func shouldRestoreApplication(
+        wasRunningBeforePreparation: Bool,
+        isRunningAfterCleanup: Bool
+    ) -> Bool {
+        wasRunningBeforePreparation && !isRunningAfterCleanup
+    }
+}
+
 public struct RuntimeRunCase: Codable, Equatable, Sendable {
     public let fixtureURL: URL
     public let expectedTranscript: String?
@@ -264,7 +317,7 @@ public struct RuntimeHarnessConfiguration: Codable, Equatable, Sendable {
             preRollWarmupSeconds: 2,
             targetSettleSeconds: 1,
             targetTextTimeoutSeconds: 15,
-            latencyThresholdMilliseconds: 440,
+            latencyThresholdMilliseconds: 250,
             maximumWordErrorRate: 0.2,
             repetitions: 3,
             targets: RuntimeTargetApp.defaultMatrix,

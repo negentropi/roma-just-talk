@@ -29,13 +29,14 @@ stable. AX may arrive later without moving the earlier rendered timestamp.
 - Local target policy: `runningOnly`; closed apps are skipped, never launched
 - Coverage gate: at least `4` distinct candidate apps must already be running
 - Rendered-text timeout: `20s`
-- Rendered-text p95 budget: `440ms`
+- Rendered-text p95 budget: `250ms`
 - Transcript answer: optional until supplied in the config
 
 Each selected browser opens an isolated local tab with a uniquely titled and
 labelled textarea. Document apps open a uniquely named temporary text file.
 Cleanup saves an empty temporary document before closing its tab/window, removes
-the resource, terminates only a target process started by the harness, and
+the resource, terminates only a target process started by the harness, restores
+an initially running target if closing its last isolated surface exits it, and
 restores the previously frontmost app. Existing documents and pages are not used
 as test targets.
 
@@ -69,7 +70,7 @@ production Roma artifact.
 Before sampling, the scenario waits for the real Parakeet V2 download and app
 prewarm. It then runs deterministic checks, a four-app target probe, one
 functional repetition with a relaxed latency ceiling, and the requested repeated
-matrix with the `440ms` budget. A functional-smoke failure is retained but does
+matrix with the `250ms` budget. A functional-smoke failure is retained but does
 not suppress the repeated matrix. All JSON reports, phase stdout/stderr, TCC rows,
 signatures, hashes, model/audio provenance, app logs, and restoration results are
 uploaded as `remote-e2e-stage-evidence` even when a phase fails.
@@ -84,8 +85,10 @@ make runtime-e2e-target-probe
 
 This proves only test-tab/document discovery, focus, empty AX baseline, scoped
 close, and cleanup. A target-probe failure is not reported as a Roma failure.
-The separate `--audio-probe` mode proves WAV-to-BlackHole-to-Roma microphone
-routing without making a paste claim.
+The separate `--audio-probe` mode validates fixture decoding, transactional
+BlackHole control setup, Roma device selection, and playback-process completion.
+It does not prove that non-silent PCM reached Roma. Only a full case with Roma
+capture/transcription trace evidence and target text proves the complete route.
 
 ## What Fails a Case
 
@@ -151,12 +154,14 @@ Before a run, the helper records:
 - VoiceInk microphone mode and selected-device UID
 - exact running VoiceInk bundle paths
 - system default output-device UID
+- BlackHole input/output mute and volume controls when supported
 
-It then selects BlackHole for both sides and launches the exact selected Roma
-artifact. On completion or handled failure it restores the original preferences,
-output device, and running state. It also scans `/tmp/roma-runtime-e2e-targets`
-for abandoned test tabs/documents before a run. Journals under `/tmp/` allow
-recovery after an interrupted process:
+It then selects BlackHole for both sides, unmutes both scopes, normalizes
+supported volumes for playback, and launches the exact selected Roma artifact.
+On completion or handled failure it restores the original preferences, output
+device, BlackHole controls, and running state. It also scans
+`/tmp/roma-runtime-e2e-targets` for abandoned test tabs/documents before a run.
+Journals under `/tmp/` allow recovery after an interrupted process:
 
 ```bash
 make runtime-e2e-restore

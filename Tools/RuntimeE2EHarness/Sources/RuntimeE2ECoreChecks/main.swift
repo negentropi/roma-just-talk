@@ -224,7 +224,7 @@ do {
     try require(defaults.targets == RuntimeTargetApp.defaultMatrix, "default app matrix")
     try require(defaults.repetitions == 3, "default repetitions")
     try require(defaults.audioLeadSeconds, equals: 1.1, "default audio lead")
-    try require(defaults.latencyThresholdMilliseconds, equals: 440, "default latency budget")
+    try require(defaults.latencyThresholdMilliseconds, equals: 250, "default latency budget")
     try require(
         defaults.targetAvailabilityPolicy == .runningOnly,
         "local default must not launch closed target apps"
@@ -239,6 +239,62 @@ do {
         runningTargets.map(\.id) == ["chrome", "zed"],
         "running-only coverage should preserve configured order and skip closed apps"
     )
+    let originalLoopbackState = RuntimeLoopbackDeviceControlState(
+        inputMuted: true,
+        outputMuted: true,
+        inputVolume: 0.875,
+        outputVolume: 0.875
+    )
+    try require(
+        originalLoopbackState.preparedForPlayback
+            == RuntimeLoopbackDeviceControlState(
+                inputMuted: false,
+                outputMuted: false,
+                inputVolume: 1,
+                outputVolume: 1
+            ),
+        "loopback playback must unmute and normalize every restorable control"
+    )
+    let unsupportedLoopbackControls = RuntimeLoopbackDeviceControlState(
+        inputMuted: nil,
+        outputMuted: false,
+        inputVolume: nil,
+        outputVolume: 0.5
+    )
+    try require(
+        unsupportedLoopbackControls.preparedForPlayback
+            == RuntimeLoopbackDeviceControlState(
+                inputMuted: nil,
+                outputMuted: false,
+                inputVolume: nil,
+                outputVolume: 1
+            ),
+        "missing CoreAudio controls must stay untouched instead of inventing state"
+    )
+    let legacyOutputJournal = try JSONDecoder().decode(
+        RuntimeSystemOutputJournal.self,
+        from: Data(#"{"originalDeviceUID":"legacy-output"}"#.utf8)
+    )
+    try require(
+        legacyOutputJournal.targetDeviceUID == nil
+            && legacyOutputJournal.targetControlState == nil,
+        "output-only crash journals from older helpers must remain recoverable"
+    )
+    try require(
+        RuntimeTargetLifecyclePlan.shouldRestoreApplication(
+            wasRunningBeforePreparation: true,
+            isRunningAfterCleanup: false
+        ),
+        "cleanup must restore an initially running app that its isolated surface closes"
+    )
+    try require(
+        !RuntimeTargetLifecyclePlan.shouldRestoreApplication(
+            wasRunningBeforePreparation: false,
+            isRunningAfterCleanup: false
+        ),
+        "running-only cleanup must not launch an app that was closed before preparation"
+    )
+    print("PASS loopback controls and running-target lifecycle are deterministic and reversible")
     let restorationTargets = RuntimeTargetCatalog.restorationTargets(
         configuredTargets: [
             targets[1],
@@ -329,6 +385,30 @@ do {
     )
     try require(contentMismatch.status == .contentMismatch, "materially wrong transcript should fail content QA")
     print("PASS optional transcript answers enforce normalized word-error quality")
+
+    let latencyBoundaryPass = RuntimeCaseAssessment.assess(
+        observation: RuntimeCaseObservation(
+            visibleText: "visible",
+            keyUpToVisibleMilliseconds: 250,
+            clipboardChanged: true,
+            triggerObserved: true
+        ),
+        expectedTranscript: nil,
+        latencyThresholdMilliseconds: 250
+    )
+    let latencyBoundaryFail = RuntimeCaseAssessment.assess(
+        observation: RuntimeCaseObservation(
+            visibleText: "visible",
+            keyUpToVisibleMilliseconds: 251,
+            clipboardChanged: true,
+            triggerObserved: true
+        ),
+        expectedTranscript: nil,
+        latencyThresholdMilliseconds: 250
+    )
+    try require(latencyBoundaryPass.status == .passed, "250ms must satisfy the local latency contract")
+    try require(latencyBoundaryFail.status == .slow, "251ms must fail the local latency contract")
+    print("PASS local rendered-latency contract is exact at 250ms")
 
     let trace = RuntimeLatencyTrace.parse(messages: [
         "[LATENCY] trace=A1B2C3D4 seq=0 t=0.0ms delta=0.0ms event=shortcut.key_down_source keyCode=56",

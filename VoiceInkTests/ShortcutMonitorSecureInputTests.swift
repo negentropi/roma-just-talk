@@ -44,9 +44,10 @@ extension VoiceInkTests {
             eventTime: 2
         )
 
-        #expect(!(await eventuallySecureInputCheck {
-            keyDownCount > 0 || keyUpCount > 0 || contextChangeCount > 0
-        }))
+        await drainSecureInputMainQueue()
+        #expect(keyDownCount == 0)
+        #expect(keyUpCount == 0)
+        #expect(contextChangeCount == 0)
 
         secureInputEnabled = false
         monitor.handleEventTapFlagsChangedForTesting(
@@ -60,16 +61,16 @@ extension VoiceInkTests {
             eventTime: 4
         )
 
-        #expect(await eventuallySecureInputCheck { keyDownCount == 1 && keyUpCount == 1 })
+        await drainSecureInputMainQueue()
+        #expect(keyDownCount == 1)
+        #expect(keyUpCount == 1)
     }
 
-    private func eventuallySecureInputCheck(_ predicate: () -> Bool) async -> Bool {
-        for _ in 0..<20 {
-            if predicate() {
-                return true
+    private func drainSecureInputMainQueue() async {
+        await withCheckedContinuation { continuation in
+            DispatchQueue.main.async {
+                continuation.resume()
             }
-            try? await Task.sleep(nanoseconds: 5_000_000)
         }
-        return predicate()
     }
 }

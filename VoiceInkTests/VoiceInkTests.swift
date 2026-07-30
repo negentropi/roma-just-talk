@@ -76,17 +76,24 @@ struct VoiceInkTests {
         pasteboard.clearContents()
         pasteboard.setString("previous clipboard", forType: .string)
         var postedCommand = false
+        var insertionResult = CursorTextContextReader.SelectedTextInsertionResult.inserted
         CursorPaster.configureAccessibilityTextInserterForTesting { text, _ in
-            text == "dictated text" ? .inserted : .notApplied
+            text == "dictated text" ? insertionResult : .notApplied
         }
         CursorPaster.configurePasteCommandPosterForTesting {
             postedCommand = true
             return .commandPosted
         }
 
-        let result = await CursorPaster.pasteAtCursorAndWaitUntilPosted("dictated text")
-
-        #expect(result == .textInserted)
+        for result in [
+            CursorTextContextReader.SelectedTextInsertionResult.inserted,
+            .insertedWithoutSelection,
+            .insertedViaValue,
+            .insertedViaValueWithoutSelection
+        ] {
+            insertionResult = result
+            #expect(await CursorPaster.pasteAtCursorAndWaitUntilPosted("dictated text") == .textInserted)
+        }
         #expect(!postedCommand)
         #expect(pasteboard.string(forType: .string) == "previous clipboard")
     }
@@ -160,6 +167,56 @@ struct VoiceInkTests {
             insertedText: "dictated ",
             textAfterInsertion: "before unrelated after",
             rangeAfterInsertion: CFRange(location: 16, length: 0)
+        ))
+        #expect(!CursorTextContextReader.insertionWasObserved(
+            textBeforeInsertion: "before after",
+            rangeBeforeInsertion: CFRange(location: 7, length: 0),
+            insertedText: "dictated ",
+            textAfterInsertion: "before dictated after",
+            rangeAfterInsertion: CFRange(location: 0, length: 0)
+        ))
+        #expect(CursorTextContextReader.replacementTextWasObserved(
+            textBeforeInsertion: "before after",
+            rangeBeforeInsertion: CFRange(location: 7, length: 0),
+            insertedText: "dictated ",
+            textAfterInsertion: "before dictated after"
+        ))
+    }
+
+    @Test func accessibilityValueReplacementUsesUTF16Selection() throws {
+        let replacement = try #require(CursorTextContextReader.valueReplacement(
+            textBeforeInsertion: "before 👋 after",
+            rangeBeforeInsertion: CFRange(location: 7, length: 2),
+            insertedText: "dictated"
+        ))
+
+        #expect(replacement.text == "before dictated after")
+        #expect(replacement.selectedRange.location == 15)
+        #expect(replacement.selectedRange.length == 0)
+    }
+
+    @Test func accessibilityValueReplacementRejectsInvalidRange() {
+        #expect(CursorTextContextReader.valueReplacement(
+            textBeforeInsertion: "text",
+            rangeBeforeInsertion: CFRange(location: 5, length: 0),
+            insertedText: "dictated"
+        ) == nil)
+    }
+
+    @Test func accessibilityValueReplacementRequiresExactRangeRestore() {
+        let expectedRange = CFRange(location: 8, length: 0)
+
+        #expect(CursorTextContextReader.valueReplacementWasObserved(
+            text: "dictated",
+            selectedRange: expectedRange,
+            textAfterInsertion: "dictated",
+            rangeAfterInsertion: expectedRange
+        ))
+        #expect(!CursorTextContextReader.valueReplacementWasObserved(
+            text: "dictated",
+            selectedRange: expectedRange,
+            textAfterInsertion: "dictated",
+            rangeAfterInsertion: CFRange(location: 0, length: 8)
         ))
     }
 

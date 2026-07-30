@@ -160,10 +160,10 @@ class CursorPaster {
                 insertionSpan,
                 details: "result=\(insertionResult.rawValue)"
             )
-            if insertionResult == .inserted {
+            if insertionResult.didInsert {
                 latencyTrace.event(
                     "paste_text_inserted",
-                    details: "method=accessibility",
+                    details: "method=\(insertionResult.method ?? "accessibility")",
                     token: latencyTraceToken
                 )
                 return .textInserted

@@ -5,8 +5,36 @@ import VoiceInkCore
 enum CursorTextContextReader {
     enum SelectedTextInsertionResult: String {
         case inserted
+        case insertedWithoutSelection
+        case insertedViaValue
+        case insertedViaValueWithoutSelection
         case unsupported
         case notApplied
+
+        var didInsert: Bool {
+            switch self {
+            case .inserted, .insertedWithoutSelection, .insertedViaValue,
+                 .insertedViaValueWithoutSelection:
+                true
+            case .unsupported, .notApplied:
+                false
+            }
+        }
+
+        var method: String? {
+            switch self {
+            case .inserted:
+                "accessibilitySelectedText"
+            case .insertedWithoutSelection:
+                "accessibilitySelectedTextSelectionUnverified"
+            case .insertedViaValue:
+                "accessibilityValue"
+            case .insertedViaValueWithoutSelection:
+                "accessibilityValueSelectionUnverified"
+            case .unsupported, .notApplied:
+                nil
+            }
+        }
     }
 
     @MainActor
@@ -105,43 +133,126 @@ enum CursorTextContextReader {
             }
         }
 
-        var isSettable = DarwinBoolean(false)
-        guard AXUIElementIsAttributeSettable(
-            focusedElement,
+        let textBeforeInsertion = textValue(from: focusedElement)
+        let canSetSelectedText = isAttributeSettable(
             kAXSelectedTextAttribute as CFString,
-            &isSettable
-        ) == .success,
-              isSettable.boolValue else {
-            return .unsupported
+            on: focusedElement
+        )
+        if canSetSelectedText,
+           AXUIElementSetAttributeValue(
+               focusedElement,
+               kAXSelectedTextAttribute as CFString,
+               text as CFString
+           ) == .success {
+            if insertionWasObserved(
+                textBeforeInsertion: textBeforeInsertion,
+                rangeBeforeInsertion: selectedRange,
+                insertedText: text,
+                textAfterInsertion: textValue(from: focusedElement),
+                rangeAfterInsertion: selectedTextRange(from: focusedElement)
+            ) {
+                return .inserted
+            }
+            let textWasInsertedImmediately = replacementTextWasObserved(
+                textBeforeInsertion: textBeforeInsertion,
+                rangeBeforeInsertion: selectedRange,
+                insertedText: text,
+                textAfterInsertion: textValue(from: focusedElement)
+            )
+
+            RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.005))
+            if insertionWasObserved(
+                textBeforeInsertion: textBeforeInsertion,
+                rangeBeforeInsertion: selectedRange,
+                insertedText: text,
+                textAfterInsertion: textValue(from: focusedElement),
+                rangeAfterInsertion: selectedTextRange(from: focusedElement)
+            ) {
+                return .inserted
+            }
+            if textWasInsertedImmediately || replacementTextWasObserved(
+                textBeforeInsertion: textBeforeInsertion,
+                rangeBeforeInsertion: selectedRange,
+                insertedText: text,
+                textAfterInsertion: textValue(from: focusedElement)
+            ) {
+                return .insertedWithoutSelection
+            }
         }
 
-        let textBeforeInsertion = textValue(from: focusedElement)
-        guard AXUIElementSetAttributeValue(
-            focusedElement,
-            kAXSelectedTextAttribute as CFString,
-            text as CFString
-        ) == .success else {
+        guard let textBeforeInsertion,
+              textValue(from: focusedElement) == textBeforeInsertion,
+              sameRange(selectedTextRange(from: focusedElement), selectedRange),
+              let replacement = valueReplacement(
+                textBeforeInsertion: textBeforeInsertion,
+                rangeBeforeInsertion: selectedRange,
+                insertedText: text
+              ),
+              isAttributeSettable(kAXValueAttribute as CFString, on: focusedElement),
+              setSelectedTextRange(selectedRange, on: focusedElement),
+              AXUIElementSetAttributeValue(
+                focusedElement,
+                kAXValueAttribute as CFString,
+                replacement.text as CFString
+              ) == .success else {
+            return canSetSelectedText ? .notApplied : .unsupported
+        }
+
+        if textValue(from: focusedElement) != replacement.text {
+            RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.005))
+        }
+        guard textValue(from: focusedElement) == replacement.text else {
             return .notApplied
         }
 
-        if insertionWasObserved(
-            textBeforeInsertion: textBeforeInsertion,
-            rangeBeforeInsertion: selectedRange,
-            insertedText: text,
+        if valueReplacementWasObserved(
+            text: replacement.text,
+            selectedRange: replacement.selectedRange,
             textAfterInsertion: textValue(from: focusedElement),
             rangeAfterInsertion: selectedTextRange(from: focusedElement)
-        ) {
-            return .inserted
+        ) || setSelectedTextRange(replacement.selectedRange, on: focusedElement) {
+            return .insertedViaValue
         }
 
-        RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.005))
-        return insertionWasObserved(
-            textBeforeInsertion: textBeforeInsertion,
-            rangeBeforeInsertion: selectedRange,
-            insertedText: text,
-            textAfterInsertion: textValue(from: focusedElement),
-            rangeAfterInsertion: selectedTextRange(from: focusedElement)
-        ) ? .inserted : .notApplied
+        // Text is already present. Never post a fallback paste that could duplicate it.
+        return .insertedViaValueWithoutSelection
+    }
+
+    static func valueReplacement(
+        textBeforeInsertion: String,
+        rangeBeforeInsertion: CFRange,
+        insertedText: String
+    ) -> (text: String, selectedRange: CFRange)? {
+        let source = textBeforeInsertion as NSString
+        guard rangeBeforeInsertion.location >= 0,
+              rangeBeforeInsertion.length >= 0,
+              rangeBeforeInsertion.location <= source.length,
+              rangeBeforeInsertion.length <= source.length - rangeBeforeInsertion.location else {
+            return nil
+        }
+
+        return (
+            source.replacingCharacters(
+                in: NSRange(
+                    location: rangeBeforeInsertion.location,
+                    length: rangeBeforeInsertion.length
+                ),
+                with: insertedText
+            ),
+            CFRange(
+                location: rangeBeforeInsertion.location + insertedText.utf16.count,
+                length: 0
+            )
+        )
+    }
+
+    static func valueReplacementWasObserved(
+        text: String,
+        selectedRange: CFRange,
+        textAfterInsertion: String?,
+        rangeAfterInsertion: CFRange?
+    ) -> Bool {
+        textAfterInsertion == text && sameRange(rangeAfterInsertion, selectedRange)
     }
 
     static func insertionWasObserved(
@@ -153,21 +264,19 @@ enum CursorTextContextReader {
     ) -> Bool {
         if let textBeforeInsertion,
            let textAfterInsertion {
-            let source = textBeforeInsertion as NSString
-            guard rangeBeforeInsertion.location >= 0,
-                  rangeBeforeInsertion.length >= 0,
-                  rangeBeforeInsertion.location <= source.length,
-                  rangeBeforeInsertion.length <= source.length - rangeBeforeInsertion.location else {
+            guard let replacement = valueReplacement(
+                textBeforeInsertion: textBeforeInsertion,
+                rangeBeforeInsertion: rangeBeforeInsertion,
+                insertedText: insertedText
+            ) else {
                 return false
             }
-            let expectedText = source.replacingCharacters(
-                in: NSRange(
-                    location: rangeBeforeInsertion.location,
-                    length: rangeBeforeInsertion.length
-                ),
-                with: insertedText
+            return valueReplacementWasObserved(
+                text: replacement.text,
+                selectedRange: replacement.selectedRange,
+                textAfterInsertion: textAfterInsertion,
+                rangeAfterInsertion: rangeAfterInsertion
             )
-            return textAfterInsertion == expectedText
         }
 
         guard !insertedText.isEmpty,
@@ -177,6 +286,24 @@ enum CursorTextContextReader {
         return rangeAfterInsertion.location
                 == rangeBeforeInsertion.location + insertedText.utf16.count
             && rangeAfterInsertion.length == 0
+    }
+
+    static func replacementTextWasObserved(
+        textBeforeInsertion: String?,
+        rangeBeforeInsertion: CFRange,
+        insertedText: String,
+        textAfterInsertion: String?
+    ) -> Bool {
+        guard let textBeforeInsertion,
+              let textAfterInsertion,
+              let replacement = valueReplacement(
+                textBeforeInsertion: textBeforeInsertion,
+                rangeBeforeInsertion: rangeBeforeInsertion,
+                insertedText: insertedText
+              ) else {
+            return false
+        }
+        return textAfterInsertion == replacement.text
     }
 
     private static func textBeforeCursor(in focusedElement: AXUIElement, maximumLength: Int) -> String? {
@@ -285,6 +412,36 @@ enum CursorTextContextReader {
         }
 
         return range
+    }
+
+    private static func setSelectedTextRange(_ range: CFRange, on element: AXUIElement) -> Bool {
+        guard isAttributeSettable(kAXSelectedTextRangeAttribute as CFString, on: element) else {
+            return false
+        }
+
+        var range = range
+        guard let value = AXValueCreate(.cfRange, &range) else {
+            return false
+        }
+        guard AXUIElementSetAttributeValue(
+            element,
+            kAXSelectedTextRangeAttribute as CFString,
+            value
+        ) == .success else {
+            return false
+        }
+        if sameRange(selectedTextRange(from: element), range) {
+            return true
+        }
+
+        RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.005))
+        return sameRange(selectedTextRange(from: element), range)
+    }
+
+    private static func isAttributeSettable(_ attribute: CFString, on element: AXUIElement) -> Bool {
+        var isSettable = DarwinBoolean(false)
+        return AXUIElementIsAttributeSettable(element, attribute, &isSettable) == .success
+            && isSettable.boolValue
     }
 
     private static func sameRange(_ lhs: CFRange?, _ rhs: CFRange?) -> Bool {

@@ -15,7 +15,7 @@ enum RuntimeLatencyLogReader {
             "show",
             "--last", last,
             "--style", "compact",
-            "--predicate", "subsystem == \"com.prakashjoshipax.voiceink\" && category == \"LatencyTrace\""
+            "--predicate", "subsystem == \"com.negentropi.RomaJustTalk\" && category == \"LatencyTrace\""
         ]
         process.standardOutput = pipe
         process.standardError = FileHandle.nullDevice

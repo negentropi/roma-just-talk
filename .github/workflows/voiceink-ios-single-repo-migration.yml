@@ -105,11 +105,11 @@ jobs:
           APP_GROUPS="$(
             xcrun simctl get_app_container \
               "$SIMULATOR_UDID" \
-              com.prakashjoshipax.VoiceInk \
+              com.negentropi.RomaJustTalk \
               groups
           )"
           printf '%s\n' "$APP_GROUPS"
-          [[ "$APP_GROUPS" == *"group.com.prakashjoshipax.VoiceInk"* ]]
+          [[ "$APP_GROUPS" == *"group.com.negentropi.RomaJustTalk"* ]]
           xcodebuild test \
             -workspace VoiceInk.xcworkspace \
             -scheme VoiceInk-ios \

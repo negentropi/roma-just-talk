@@ -97,8 +97,8 @@ capture_desktop() {
 prepare_macos() {
   local archive="$inputs_root/macos/roma.just.talk.app.zip"
   local app="$HOME/Applications/roma just talk.app"
-  local preferences="$HOME/Library/Preferences/com.prakashjoshipax.VoiceInk.plist"
-  local preferences_backup="$HOME/Library/Preferences/ccom.prakashjoshipax.VoiceInk.plist"
+  local preferences="$HOME/Library/Preferences/com.negentropi.RomaJustTalk.plist"
+  local preferences_backup="$HOME/Library/Preferences/ccom.negentropi.RomaJustTalk.plist"
 
   test -f "$archive"
   read -r macos_artifact_run_id < "$inputs_root/macos/build-run-id.txt"
@@ -111,9 +111,9 @@ prepare_macos() {
   if [ -f "$preferences" ] && [ ! -f "$preferences_backup" ]; then
     mv "$preferences" "$preferences_backup"
   fi
-  defaults delete com.prakashjoshipax.VoiceInk hasCompletedOnboarding 2>/dev/null || true
-  defaults delete com.prakashjoshipax.VoiceInk macOSOnboardingStage 2>/dev/null || true
-  defaults delete com.prakashjoshipax.VoiceInk macOSOnboardingPermissionKind 2>/dev/null || true
+  defaults delete com.negentropi.RomaJustTalk hasCompletedOnboarding 2>/dev/null || true
+  defaults delete com.negentropi.RomaJustTalk macOSOnboardingStage 2>/dev/null || true
+  defaults delete com.negentropi.RomaJustTalk macOSOnboardingPermissionKind 2>/dev/null || true
   killall cfprefsd 2>/dev/null || true
 
   /usr/bin/log stream \
@@ -152,7 +152,7 @@ prepare_ios() {
   xcrun simctl bootstatus "$simulator_udid" -b
   xcrun simctl install "$simulator_udid" "$app"
   open -a Simulator
-  xcrun simctl launch "$simulator_udid" com.prakashjoshipax.VoiceInk
+  xcrun simctl launch "$simulator_udid" com.negentropi.RomaJustTalk
 
   xcrun simctl spawn "$simulator_udid" log stream \
     --style compact \
@@ -197,8 +197,8 @@ write_manifest() {
   "iOSArtifactRunId": "$ios_artifact_run_id",
   "doneFile": "$done_file",
   "evidenceDirectory": "$evidence",
-  "macOSBundleIdentifier": "com.prakashjoshipax.VoiceInk",
-  "iOSBundleIdentifier": "com.prakashjoshipax.VoiceInk",
+  "macOSBundleIdentifier": "com.negentropi.RomaJustTalk",
+  "iOSBundleIdentifier": "com.negentropi.RomaJustTalk",
   "simulatorUDID": "$simulator_udid"
 }
 EOF

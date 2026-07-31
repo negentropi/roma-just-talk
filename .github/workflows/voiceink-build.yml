@@ -69,6 +69,12 @@ jobs:
             exit 1
           fi
 
+      - name: Verify packaged app identity
+        run: |
+          APP="$HOME/Applications/roma just talk.app"
+          BUNDLE_ID=$(plutil -extract CFBundleIdentifier raw -o - "$APP/Contents/Info.plist")
+          test "$BUNDLE_ID" = "com.negentropi.RomaJustTalk"
+
       - name: Package app
         run: ditto -c -k --keepParent "$HOME/Applications/roma just talk.app" "roma.just.talk.app.zip"
 

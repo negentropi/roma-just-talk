@@ -4,7 +4,7 @@ set -Eeuo pipefail
 simulator_udid="${1:?simulator UDID required}"
 evidence="${2:?evidence directory required}"
 
-bundle_identifier="${VOICEINK_IOS_BUNDLE_IDENTIFIER:-com.prakashjoshipax.VoiceInk}"
+bundle_identifier="${VOICEINK_IOS_BUNDLE_IDENTIFIER:-com.negentropi.RomaJustTalk}"
 expected_phrase="${VOICEINK_IOS_E2E_PHRASE:-The quick brown fox confirms this iPhone speech to text test for Roma just talk.}"
 model_url="${VOICEINK_IOS_E2E_MODEL_URL:-https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.bin}"
 model_sha256="${VOICEINK_IOS_E2E_MODEL_SHA256:-60ed5bc3dd14eea856493d334349b405782ddcaf0028d4b5df4088345fba2efe}"

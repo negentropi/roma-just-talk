@@ -20,7 +20,7 @@ runtime_root="$(dirname "$evidence")/macos-runtime-e2e"
 audio_root="$runtime_root/audio"
 helper_app="$repo_root/.local-build/Tools/RuntimeE2EHarness.app"
 helper_bundle_id="com.happyf.roma-just-talk.RuntimeE2EHarness"
-voiceink_bundle_id="com.prakashjoshipax.VoiceInk"
+voiceink_bundle_id="com.negentropi.RomaJustTalk"
 system_tcc_db="/Library/Application Support/com.apple.TCC/TCC.db"
 user_tcc_db="$HOME/Library/Application Support/com.apple.TCC/TCC.db"
 nsc_bin="${NAMESPACE_CLI:-/opt/nsc/bin/nsc}"
@@ -135,7 +135,7 @@ write_config() {
     '{
       audioDirectory: $audio_directory,
       audioDeviceName: "BlackHole 2ch",
-      voiceInkBundleIdentifier: "com.prakashjoshipax.VoiceInk",
+      voiceInkBundleIdentifier: "com.negentropi.RomaJustTalk",
       voiceInkAppPath: $voiceink_app,
       voiceInkBuildDirectory: $voiceink_build_directory,
       audioLeadSeconds: 1.1,

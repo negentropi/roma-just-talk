@@ -25,7 +25,7 @@
 	<array>
 		<dict>
 			<key>CFBundleURLName</key>
-			<string>com.prakashjoshipax.VoiceInk</string>
+			<string>com.negentropi.RomaJustTalk</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>voiceink</string>

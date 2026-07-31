@@ -4,23 +4,23 @@ import VoiceInkCore
 
 final class AppIdentityTests: XCTestCase {
     func testAppIdentityPreservesSharedVisibleNames() {
-        XCTAssertEqual(VoiceInkAppIdentity.bundleIdentifier, "com.prakashjoshipax.VoiceInk")
-        XCTAssertEqual(VoiceInkAppIdentity.loggingSubsystem, "com.prakashjoshipax.voiceink")
+        XCTAssertEqual(VoiceInkAppIdentity.bundleIdentifier, "com.negentropi.RomaJustTalk")
+        XCTAssertEqual(VoiceInkAppIdentity.loggingSubsystem, "com.negentropi.RomaJustTalk")
         XCTAssertEqual(VoiceInkAppIdentity.displayName, "roma just talk")
         XCTAssertEqual(VoiceInkAppIdentity.compactDisplayName, "roma-just-talk")
         XCTAssertEqual(VoiceInkAppIdentity.sidebarSubtitle, "speak before hotkey")
-        XCTAssertEqual(VoiceInkAppIdentity.iCloudContainerIdentifier, "iCloud.com.prakashjoshipax.VoiceInk")
-        XCTAssertEqual(VoiceInkAppIdentity.iOSAppGroupIdentifier, "group.com.prakashjoshipax.VoiceInk")
+        XCTAssertEqual(VoiceInkAppIdentity.iCloudContainerIdentifier, "iCloud.com.negentropi.RomaJustTalk")
+        XCTAssertEqual(VoiceInkAppIdentity.iOSAppGroupIdentifier, "group.com.negentropi.RomaJustTalk")
         XCTAssertEqual(VoiceInkAppIdentity.iOSRecordDeepLinkScheme, "voiceink")
         XCTAssertEqual(VoiceInkAppIdentity.iOSRecordDeepLinkHost, "record")
         XCTAssertEqual(VoiceInkAppIdentity.iOSRecordDeepLinkURL.absoluteString, "voiceink://record")
         XCTAssertEqual(
             VoiceInkAppIdentity.iOSStopRecordingDarwinNotificationName,
-            "com.prakashjoshipax.VoiceInk.stopRecording"
+            "com.negentropi.RomaJustTalk.stopRecording"
         )
         XCTAssertEqual(
             VoiceInkAppIdentity.iOSRecordingStateChangedDarwinNotificationName,
-            "com.prakashjoshipax.VoiceInk.recordingStateChanged"
+            "com.negentropi.RomaJustTalk.recordingStateChanged"
         )
         XCTAssertEqual(
             VoiceInkAppIdentity.iOSStopRecordingFromKeyboardNotificationName.rawValue,
@@ -320,14 +320,14 @@ final class AppIdentityTests: XCTestCase {
         XCTAssertEqual(
             VoiceInkDiagnosticLogExportPolicy.headerLines(
                 exportDate: date,
-                subsystem: "com.prakashjoshipax.voiceink",
+                subsystem: "com.negentropi.RomaJustTalk",
                 sessionCount: 2,
                 systemInfo: "System info"
             ),
             [
                 "=== VoiceInk Diagnostic Logs ===",
                 "Export Date: \(formattedTimestamp)",
-                "Subsystem: com.prakashjoshipax.voiceink",
+                "Subsystem: com.negentropi.RomaJustTalk",
                 "Total Sessions: 2",
                 "================================",
                 "",
@@ -510,9 +510,9 @@ final class AppIdentityTests: XCTestCase {
     }
 
     func testMacOSWindowIdentityPreservesIdentifiersTitlesAndFrameNames() {
-        XCTAssertEqual(VoiceInkMacOSWindowIdentity.mainIdentifierRawValue, "com.prakashjoshipax.voiceink.mainWindow")
-        XCTAssertEqual(VoiceInkMacOSWindowIdentity.onboardingIdentifierRawValue, "com.prakashjoshipax.voiceink.onboardingWindow")
-        XCTAssertEqual(VoiceInkMacOSWindowIdentity.historyIdentifierRawValue, "com.prakashjoshipax.voiceink.historyWindow")
+        XCTAssertEqual(VoiceInkMacOSWindowIdentity.mainIdentifierRawValue, "com.negentropi.RomaJustTalk.mainWindow")
+        XCTAssertEqual(VoiceInkMacOSWindowIdentity.onboardingIdentifierRawValue, "com.negentropi.RomaJustTalk.onboardingWindow")
+        XCTAssertEqual(VoiceInkMacOSWindowIdentity.historyIdentifierRawValue, "com.negentropi.RomaJustTalk.historyWindow")
         XCTAssertEqual(VoiceInkMacOSWindowIdentity.mainFrameAutosaveName, "VoiceInkMainWindowFrame")
         XCTAssertEqual(VoiceInkMacOSWindowIdentity.historyFrameAutosaveName, "VoiceInkHistoryWindowFrame")
         XCTAssertEqual(VoiceInkMacOSWindowIdentity.mainTitle, "roma-just-talk")
@@ -524,7 +524,7 @@ final class AppIdentityTests: XCTestCase {
                 nil,
                 VoiceInkMacOSWindowIdentity.historyIdentifierRawValue
             ]),
-            "com.prakashjoshipax.voiceink.mainWindow, nil, com.prakashjoshipax.voiceink.historyWindow"
+            "com.negentropi.RomaJustTalk.mainWindow, nil, com.negentropi.RomaJustTalk.historyWindow"
         )
         XCTAssertEqual(VoiceInkMacOSWindowIdentity.identifierListDebugText([]), "")
         XCTAssertEqual(
@@ -644,14 +644,14 @@ final class AppIdentityTests: XCTestCase {
 
         XCTAssertEqual(
             VoiceInkAppIdentity.macOSApplicationSupportDirectory(in: baseDirectory).path,
-            "/tmp/Application Support/com.prakashjoshipax.VoiceInk"
+            "/tmp/Application Support/com.negentropi.RomaJustTalk"
         )
     }
 
     func testBundleScopedErrorDomainUsesBundleIdentifier() {
         XCTAssertEqual(
             VoiceInkAppIdentity.errorDomain(component: "AudioRecorder"),
-            "com.prakashjoshipax.VoiceInk.AudioRecorder"
+            "com.negentropi.RomaJustTalk.AudioRecorder"
         )
     }
 

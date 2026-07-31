@@ -6,7 +6,7 @@ cd "$ROOT"
 
 local_whisper_xcframework_path="${HOME}/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework"
 expected_whisper_project_path='$(HOME)/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework'
-expected_app_group="group.com.prakashjoshipax.VoiceInk"
+expected_app_group="group.com.negentropi.RomaJustTalk"
 
 if [[ $# -gt 0 ]]; then
   echo "usage: $0" >&2

@@ -68,7 +68,7 @@ network, or persistence work.
 
 ```bash
 log stream --style compact \
-  --predicate 'subsystem == "com.prakashjoshipax.voiceink" && category == "LatencyTrace"'
+  --predicate 'subsystem == "com.negentropi.RomaJustTalk" && category == "LatencyTrace"'
 ```
 
 Use this trace before changing latency behavior. A green build, successful prewarm,

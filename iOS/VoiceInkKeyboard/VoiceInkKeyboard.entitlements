@@ -4,7 +4,7 @@
 <dict>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.com.prakashjoshipax.VoiceInk</string>
+		<string>group.com.negentropi.RomaJustTalk</string>
 	</array>
 </dict>
 </plist>

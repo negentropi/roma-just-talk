@@ -308,7 +308,7 @@ public struct RuntimeHarnessConfiguration: Codable, Equatable, Sendable {
         Self(
             audioDirectory: NSString(string: "~/Downloads/roma jt builds/audio").expandingTildeInPath,
             audioDeviceName: "BlackHole 2ch",
-            voiceInkBundleIdentifier: "com.prakashjoshipax.VoiceInk",
+            voiceInkBundleIdentifier: "com.negentropi.RomaJustTalk",
             voiceInkAppPath: nil,
             voiceInkBuildDirectory: NSString(string: "~/Downloads/roma jt builds").expandingTildeInPath,
             audioLeadSeconds: 1.1,

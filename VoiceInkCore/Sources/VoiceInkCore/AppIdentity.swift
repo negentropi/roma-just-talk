@@ -988,7 +988,7 @@ public enum VoiceInkAppIdentity {
     public static let displayName = "roma just talk"
     public static let compactDisplayName = "roma-just-talk"
     public static let sidebarSubtitle = "speak before hotkey"
-    public static let iOSRecordDeepLinkScheme = "voiceink"
+    public static let iOSRecordDeepLinkScheme = "romajusttalk"
     public static let iOSRecordDeepLinkHost = "record"
 
     public static var iCloudContainerIdentifier: String {

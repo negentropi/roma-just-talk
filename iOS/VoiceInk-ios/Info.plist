@@ -28,7 +28,7 @@
 			<string>com.negentropi.RomaJustTalk</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>voiceink</string>
+				<string>romajusttalk</string>
 			</array>
 		</dict>
 	</array>

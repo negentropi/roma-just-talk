@@ -303,10 +303,10 @@ require_plist_value \
   "roma just talk"
 
 require_plist_value \
-  "iOS record deep-link scheme stays voiceink" \
+  "iOS record deep-link scheme stays romajusttalk" \
   iOS/VoiceInk-ios/Info.plist \
   CFBundleURLTypes.0.CFBundleURLSchemes.0 \
-  voiceink
+  romajusttalk
 
 require_plist_value \
   "iOS app keeps audio background mode" \

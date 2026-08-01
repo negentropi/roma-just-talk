@@ -11,9 +11,9 @@ final class AppIdentityTests: XCTestCase {
         XCTAssertEqual(VoiceInkAppIdentity.sidebarSubtitle, "speak before hotkey")
         XCTAssertEqual(VoiceInkAppIdentity.iCloudContainerIdentifier, "iCloud.com.negentropi.RomaJustTalk")
         XCTAssertEqual(VoiceInkAppIdentity.iOSAppGroupIdentifier, "group.com.negentropi.RomaJustTalk")
-        XCTAssertEqual(VoiceInkAppIdentity.iOSRecordDeepLinkScheme, "voiceink")
+        XCTAssertEqual(VoiceInkAppIdentity.iOSRecordDeepLinkScheme, "romajusttalk")
         XCTAssertEqual(VoiceInkAppIdentity.iOSRecordDeepLinkHost, "record")
-        XCTAssertEqual(VoiceInkAppIdentity.iOSRecordDeepLinkURL.absoluteString, "voiceink://record")
+        XCTAssertEqual(VoiceInkAppIdentity.iOSRecordDeepLinkURL.absoluteString, "romajusttalk://record")
         XCTAssertEqual(
             VoiceInkAppIdentity.iOSStopRecordingDarwinNotificationName,
             "com.negentropi.RomaJustTalk.stopRecording"
@@ -662,8 +662,8 @@ final class AppIdentityTests: XCTestCase {
         XCTAssertEqual(url.scheme, VoiceInkAppIdentity.iOSRecordDeepLinkScheme)
         XCTAssertEqual(url.host, VoiceInkAppIdentity.iOSRecordDeepLinkHost)
         XCTAssertEqual(VoiceInkAppDeepLink(url: url), .record)
-        XCTAssertNil(VoiceInkAppDeepLink(url: try XCTUnwrap(URL(string: "voiceink://settings"))))
-        XCTAssertNil(VoiceInkAppDeepLink(url: try XCTUnwrap(URL(string: "roma://record"))))
+        XCTAssertNil(VoiceInkAppDeepLink(url: try XCTUnwrap(URL(string: "romajusttalk://settings"))))
+        XCTAssertNil(VoiceInkAppDeepLink(url: try XCTUnwrap(URL(string: "voiceink://record"))))
     }
 
     func testIOSRecordDeepLinkAppliesRuntimeState() {

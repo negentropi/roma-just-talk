@@ -118,6 +118,12 @@ roma-just-talk is built top on: [VoiceInk](https://github.com/Beingpax/VoiceInk)
 - [Swift Atomics](https://github.com/apple/swift-atomics) - Low-level atomic operations for thread-safe concurrent programming
 - [PermissionFlow](https://github.com/jaywcjlove/PermissionFlow) - make granting permissions intuitive. they were inspired by when codex app shiped legendary `computer-use` tool alongside a never seen before way of permission granting flow.   
 
+### Development transparency
+
+Codex with GPT-5.6 Sol was the primary development agent used throughout Roma Just Talk. It helped inspect and modify the Swift/macOS codebase; implement and debug pre-roll audio and its buffered-to-live streaming handoff; diagnose shortcut, permission, focus, and text-insertion paths; maintain CI and remote end-to-end checks; review and refactor patches; and write documentation and release material.
+
+I remained responsible for the product concept, interaction design, architecture decisions, testing, and deciding which generated changes to accept.
+
 
 ---
 

@@ -21,7 +21,7 @@
   <p>Local & cloud STT solution both available.</p> 
   </div>
 
-This [fork](https://github.com/Beingpax/VoiceInk) explores new idea: keep a short rolling audio buffer, so the app can catch what you already started saying. shift key as single hotkey, much nearer to home row.   
+Most dictation apps make you reach for a hotkey and wait before speaking. Roma Just Talk keeps a short rolling buffer, so you can begin speaking while your hand moves to Shift without losing the start of the thought.
 
 <img src="docs/assets/roma-just-talk-how-to-use.png" alt="roma-just-talk split keyboard logo"/>
 

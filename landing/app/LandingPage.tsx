@@ -10,14 +10,14 @@ import {
   useState,
 } from "react";
 
-const REPO_URL = "https://github.com/negentropi/roma-just-talk";
+const REPO_URL = "https://github.com/happyf-weallareeuropean/roma-just-talk";
 const LATEST_RELEASE_URL = `${REPO_URL}/releases/latest`;
 const LATEST_RELEASE_API =
-  "https://api.github.com/repos/negentropi/roma-just-talk/releases/latest";
+  "https://api.github.com/repos/happyf-weallareeuropean/roma-just-talk/releases/latest";
 const LOGO_URL =
-  "https://raw.githubusercontent.com/negentropi/roma-just-talk/main/docs/assets/roma-just-talk-logo.png";
+  "https://raw.githubusercontent.com/happyf-weallareeuropean/roma-just-talk/main/docs/assets/roma-just-talk-logo.png";
 const HOWTO_IMAGE_URL =
-  "https://raw.githubusercontent.com/negentropi/roma-just-talk/main/docs/assets/roma-just-talk-how-to-use.png";
+  "https://raw.githubusercontent.com/happyf-weallareeuropean/roma-just-talk/main/docs/assets/roma-just-talk-how-to-use.png";
 const X_URL = "https://x.com/Hft_freedom";
 const TELEGRAM_URL = "https://t.me/felixorder";
 const DISCORD_URL = "https://discord.com/channels/@me/";
@@ -65,7 +65,7 @@ function readmeUrl(url: string, mode: "blob" | "raw") {
 
   const cleanUrl = url.replace(/^.\//, "");
   if (mode === "raw") {
-    return `https://raw.githubusercontent.com/negentropi/roma-just-talk/main/${cleanUrl}`;
+    return `https://raw.githubusercontent.com/happyf-weallareeuropean/roma-just-talk/main/${cleanUrl}`;
   }
 
   return `${REPO_URL}/blob/main/${cleanUrl}`;

@@ -6,12 +6,12 @@
 
   [![License](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
   ![Platform](https://img.shields.io/badge/platform-macOS%2014.0%2B-brightgreen)
-  [![GitHub release (latest by date)](https://img.shields.io/github/v/release/negentropi/roma-just-talk)](https://github.com/negentropi/roma-just-talk/releases)
-  ![GitHub all releases](https://img.shields.io/github/downloads/negentropi/roma-just-talk/total)
-  [![GitHub stars](https://img.shields.io/github/stars/negentropi/roma-just-talk?style=for-the-badge&logo=github&logoColor=white&label=Stars&labelColor=000000&color=111111)](https://github.com/negentropi/roma-just-talk)
+  [![GitHub release (latest by date)](https://img.shields.io/github/v/release/happyf-weallareeuropean/roma-just-talk)](https://github.com/happyf-weallareeuropean/roma-just-talk/releases)
+  ![GitHub all releases](https://img.shields.io/github/downloads/happyf-weallareeuropean/roma-just-talk/total)
+  [![GitHub stars](https://img.shields.io/github/stars/happyf-weallareeuropean/roma-just-talk?style=for-the-badge&logo=github&logoColor=white&label=Stars&labelColor=000000&color=111111)](https://github.com/happyf-weallareeuropean/roma-just-talk)
   [![Follow @Hft_freedom on X](https://img.shields.io/badge/Follow-%40Hft__freedom-111111?style=for-the-badge&logo=x&logoColor=white)](https://x.com/Hft_freedom)
  
-  <a href="https://github.com/negentropi/roma-just-talk/releases/latest">
+  <a href="https://github.com/happyf-weallareeuropean/roma-just-talk/releases/latest">
     <img src="https://img.shields.io/badge/Download%20Latest-macOS%20App-blue?style=for-the-badge&logo=apple" alt="Download roma-just-talk" width="250"/>
   </a>
 </div>
@@ -50,7 +50,7 @@ Current status: visible app branding uses roma-just-talk, while many internal la
 ## Get Started
 
 ### Download
-Download the latest fork release from [GitHub Releases](https://github.com/negentropi/roma-just-talk/releases).
+Download the latest fork release from [GitHub Releases](https://github.com/happyf-weallareeuropean/roma-just-talk/releases).
 
 The source app icon now uses the roma-just-talk split-keyboard mark. Published downloads may still show older assets until the next release.
 
@@ -81,7 +81,7 @@ You can build the app yourself by following [BUILDING.md](BUILDING.md).
 This fork is early. Issues, experiments, and focused patches are welcome when they help the pre-roll dictation direction.
 
 Useful contributions right now:
-- Reporting bugs via [issues](https://github.com/negentropi/roma-just-talk/issues)
+- Reporting bugs via [issues](https://github.com/happyf-weallareeuropean/roma-just-talk/issues)
 - Testing pre-roll capture in real macOS writing workflows
 - Improving rough docs left over from the upstream project
 - Proposing focused changes that make speak-before-hotkey dictation faster, calmer, or more reliable

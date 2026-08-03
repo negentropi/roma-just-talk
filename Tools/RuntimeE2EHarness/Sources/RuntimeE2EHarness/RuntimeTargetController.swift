@@ -1088,7 +1088,8 @@ enum RuntimeAX {
     static func focus(
         application: NSRunningApplication,
         windowElement: AXUIElement,
-        textElement: AXUIElement
+        textElement: AXUIElement,
+        requireFrontmostApplication: Bool = true
     ) -> Bool {
         guard !application.isTerminated else { return false }
         _ = application.activate(options: [.activateAllWindows])
@@ -1114,7 +1115,8 @@ enum RuntimeAX {
         while Date() < deadline {
             let focusedWindow = elementAttribute(kAXFocusedWindowAttribute, from: appElement)
             if !application.isTerminated,
-               NSWorkspace.shared.frontmostApplication?.processIdentifier == application.processIdentifier,
+               (!requireFrontmostApplication
+                   || NSWorkspace.shared.frontmostApplication?.processIdentifier == application.processIdentifier),
                let focusedWindow,
                CFEqual(focusedWindow, windowElement) {
                 return true
@@ -1297,7 +1299,8 @@ enum RuntimeAX {
             guard focus(
                 application: application,
                 windowElement: currentWindow,
-                textElement: currentTextElement
+                textElement: currentTextElement,
+                requireFrontmostApplication: false
             ) else {
                 return reportCloseFailure("window focus failed", token: token, in: appElement)
             }
@@ -1333,7 +1336,8 @@ enum RuntimeAX {
         guard focus(
             application: application,
             windowElement: currentWindow,
-            textElement: currentTextElement
+            textElement: currentTextElement,
+            requireFrontmostApplication: false
         ) else {
             return reportCloseFailure("fallback focus failed", token: token, in: appElement)
         }

@@ -393,7 +393,8 @@ class CursorPaster {
 
         await wait(prePasteDelay)
         if let targetProcessIdentifier = await CursorTextContextReader.pressFocusedCommandVMenuItem(
-            retryIfUnavailable: retryCommandVMenuDiscovery
+            retryIfUnavailable: retryCommandVMenuDiscovery,
+            latencyTraceToken: latencyTraceToken
         ) {
             VoiceInkLatencyTrace.shared.event(
                 "paste_event_posted",

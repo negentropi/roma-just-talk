@@ -6,7 +6,7 @@ enum CursorTextContextReader {
     private static let webAreaRole = "AXWebArea"
     // Bound malformed Accessibility parent chains without missing deeply nested web editors.
     private static let insertionAncestorTraversalLimit = 64
-    private static let commandVMenuTraversalLimit = 512
+    private static let commandVMenuTraversalLimit = 2_048
     // Give cold web-editor Accessibility menu discovery one bounded retry.
     private static let commandVMenuTraversalAttempts = 2
     private static let commandVMenuTraversalRetryDelay: TimeInterval = 0.25
@@ -143,7 +143,10 @@ enum CursorTextContextReader {
     }
 
     @MainActor
-    static func pressFocusedCommandVMenuItem(retryIfUnavailable: Bool) async -> pid_t? {
+    static func pressFocusedCommandVMenuItem(
+        retryIfUnavailable: Bool,
+        latencyTraceToken: VoiceInkLatencyTrace.Token?
+    ) async -> pid_t? {
         guard AXIsProcessTrusted(),
               let focusedElement = focusedElement(from: AXUIElementCreateSystemWide()) else {
             return nil
@@ -164,7 +167,28 @@ enum CursorTextContextReader {
             guard let menuBar = elementAttribute(
                 kAXMenuBarAttribute as CFString,
                 from: application
-            ), let menuItem = plainCommandVMenuItem(in: menuBar) else {
+            ) else {
+                VoiceInkLatencyTrace.shared.event(
+                    "paste_command_v_menu_lookup",
+                    details: "attempt=\(attempt + 1) result=noMenuBar",
+                    token: latencyTraceToken
+                )
+                guard attempt < traversalAttempts - 1 else {
+                    return nil
+                }
+                // Let the Accessibility server process cold menu discovery before retrying.
+                try? await Task.sleep(
+                    nanoseconds: UInt64(commandVMenuTraversalRetryDelay * 1_000_000_000)
+                )
+                continue
+            }
+            let searchResult = plainCommandVMenuItem(in: menuBar)
+            VoiceInkLatencyTrace.shared.event(
+                "paste_command_v_menu_lookup",
+                details: "attempt=\(attempt + 1) result=\(searchResult.menuItem == nil ? "missing" : "found") visited=\(searchResult.visitedNodes) enqueued=\(searchResult.enqueuedNodes) limitExhausted=\(searchResult.limitExhausted) timeout=\(searchResult.timedOut)",
+                token: latencyTraceToken
+            )
+            guard let menuItem = searchResult.menuItem else {
                 guard attempt < traversalAttempts - 1 else {
                     return nil
                 }
@@ -186,7 +210,15 @@ enum CursorTextContextReader {
         return nil
     }
 
-    private static func plainCommandVMenuItem(in menuBar: AXUIElement) -> AXUIElement? {
+    private struct CommandVMenuSearchResult {
+        let menuItem: AXUIElement?
+        let visitedNodes: Int
+        let enqueuedNodes: Int
+        let limitExhausted: Bool
+        let timedOut: Bool
+    }
+
+    private static func plainCommandVMenuItem(in menuBar: AXUIElement) -> CommandVMenuSearchResult {
         let deadline = Date().addingTimeInterval(commandVMenuTraversalTimeout)
         var queue = [menuBar]
         var index = 0
@@ -214,15 +246,27 @@ enum CursorTextContextReader {
                        from: element
                    )?.boolValue == true
                ) {
-                guard Date() < deadline else { return nil }
-                return element
+                return CommandVMenuSearchResult(
+                    menuItem: element,
+                    visitedNodes: index,
+                    enqueuedNodes: queue.count,
+                    limitExhausted: false,
+                    timedOut: false
+                )
             }
 
             let remainingCapacity = commandVMenuTraversalLimit - queue.count
             guard remainingCapacity > 0 else { continue }
             queue.append(contentsOf: childElements(from: element).prefix(remainingCapacity))
         }
-        return nil
+        let hasUnvisitedNodes = index < queue.count
+        return CommandVMenuSearchResult(
+            menuItem: nil,
+            visitedNodes: index,
+            enqueuedNodes: queue.count,
+            limitExhausted: hasUnvisitedNodes && index >= commandVMenuTraversalLimit,
+            timedOut: hasUnvisitedNodes && Date() >= deadline
+        )
     }
 
     static func isPlainCommandVMenuItem(

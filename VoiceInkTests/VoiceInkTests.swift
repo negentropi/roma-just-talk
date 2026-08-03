@@ -193,6 +193,16 @@ struct VoiceInkTests {
             modifiers: 0,
             enabled: true
         ))
+        #expect(CursorTextContextReader.isPlainCommandVShortcut(
+            commandCharacter: "v",
+            virtualKey: 0x09,
+            modifiers: 0
+        ))
+        #expect(!CursorTextContextReader.isPlainCommandVShortcut(
+            commandCharacter: "v",
+            virtualKey: 0x09,
+            modifiers: 1
+        ))
     }
 
     @Test func accessibilityInsertionObservationAcceptsTextOrCursorMutation() {

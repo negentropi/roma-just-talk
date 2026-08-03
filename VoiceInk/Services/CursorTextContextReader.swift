@@ -7,9 +7,10 @@ enum CursorTextContextReader {
     // Bound malformed Accessibility parent chains without missing deeply nested web editors.
     private static let insertionAncestorTraversalLimit = 64
     private static let commandVMenuTraversalLimit = 2_048
-    // Give cold web-editor Accessibility menu discovery one bounded retry.
-    private static let commandVMenuTraversalAttempts = 2
+    // Cold web editors may expose their menu before validating Paste.
+    private static let commandVMenuTraversalAttempts = 4
     private static let commandVMenuTraversalRetryDelay: TimeInterval = 0.25
+    private static let commandVMenuRefreshSettleDelay: TimeInterval = 0.05
     private static let commandVMenuTraversalTimeout: TimeInterval = 0.25
 
     enum SelectedTextInsertionResult: String {
@@ -160,6 +161,7 @@ enum CursorTextContextReader {
         let application = AXUIElementCreateApplication(processIdentifier)
 
         let traversalAttempts = retryIfUnavailable ? commandVMenuTraversalAttempts : 1
+        var openedMenuBarItem: AXUIElement?
         for attempt in 0..<traversalAttempts {
             guard focusedProcessIdentifierForPaste() == processIdentifier else {
                 return nil
@@ -174,6 +176,11 @@ enum CursorTextContextReader {
                     token: latencyTraceToken
                 )
                 guard attempt < traversalAttempts - 1 else {
+                    closeRefreshedMenu(
+                        openedMenuBarItem,
+                        processIdentifier: processIdentifier,
+                        latencyTraceToken: latencyTraceToken
+                    )
                     return nil
                 }
                 // Let the Accessibility server process cold menu discovery before retrying.
@@ -185,12 +192,37 @@ enum CursorTextContextReader {
             let searchResult = plainCommandVMenuItem(in: menuBar)
             VoiceInkLatencyTrace.shared.event(
                 "paste_command_v_menu_lookup",
-                details: "attempt=\(attempt + 1) result=\(searchResult.menuItem == nil ? "missing" : "found") visited=\(searchResult.visitedNodes) enqueued=\(searchResult.enqueuedNodes) limitExhausted=\(searchResult.limitExhausted) timeout=\(searchResult.timedOut)",
+                details: "attempt=\(attempt + 1) result=\(searchResult.menuItem == nil ? "missing" : "found") visited=\(searchResult.visitedNodes) enqueued=\(searchResult.enqueuedNodes) candidates=\(searchResult.shortcutCandidates) disabled=\(searchResult.disabledShortcutCandidates) limitExhausted=\(searchResult.limitExhausted) timeout=\(searchResult.timedOut)",
                 token: latencyTraceToken
             )
             guard let menuItem = searchResult.menuItem else {
                 guard attempt < traversalAttempts - 1 else {
+                    closeRefreshedMenu(
+                        openedMenuBarItem,
+                        processIdentifier: processIdentifier,
+                        latencyTraceToken: latencyTraceToken
+                    )
                     return nil
+                }
+                if openedMenuBarItem == nil,
+                   let refreshMenuBarItem = searchResult.refreshMenuBarItem,
+                   focusedProcessIdentifierForPaste() == processIdentifier {
+                    let refreshResult = AXUIElementPerformAction(
+                        refreshMenuBarItem,
+                        kAXPressAction as CFString
+                    )
+                    VoiceInkLatencyTrace.shared.event(
+                        "paste_command_v_menu_refresh",
+                        details: "attempt=\(attempt + 1) result=\(refreshResult == .success ? "opened" : "failed") error=\(refreshResult.rawValue)",
+                        token: latencyTraceToken
+                    )
+                    if refreshResult == .success {
+                        openedMenuBarItem = refreshMenuBarItem
+                        try? await Task.sleep(
+                            nanoseconds: UInt64(commandVMenuRefreshSettleDelay * 1_000_000_000)
+                        )
+                        continue
+                    }
                 }
                 // Let the Accessibility server process cold menu discovery before retrying.
                 try? await Task.sleep(
@@ -203,6 +235,11 @@ enum CursorTextContextReader {
                 return nil
             }
             guard AXUIElementPerformAction(menuItem, kAXPressAction as CFString) == .success else {
+                closeRefreshedMenu(
+                    openedMenuBarItem,
+                    processIdentifier: processIdentifier,
+                    latencyTraceToken: latencyTraceToken
+                )
                 return nil
             }
             return processIdentifier
@@ -214,56 +251,88 @@ enum CursorTextContextReader {
         let menuItem: AXUIElement?
         let visitedNodes: Int
         let enqueuedNodes: Int
+        let shortcutCandidates: Int
+        let disabledShortcutCandidates: Int
+        let refreshMenuBarItem: AXUIElement?
         let limitExhausted: Bool
         let timedOut: Bool
     }
 
+    private struct CommandVMenuTraversalNode {
+        let element: AXUIElement
+        let menuBarItem: AXUIElement?
+    }
+
     private static func plainCommandVMenuItem(in menuBar: AXUIElement) -> CommandVMenuSearchResult {
         let deadline = Date().addingTimeInterval(commandVMenuTraversalTimeout)
-        var queue = [menuBar]
+        var queue = [CommandVMenuTraversalNode(element: menuBar, menuBarItem: nil)]
         var index = 0
+        var shortcutCandidates = 0
+        var disabledShortcutCandidates = 0
+        var refreshMenuBarItem: AXUIElement?
         while index < queue.count,
               index < commandVMenuTraversalLimit,
               Date() < deadline {
-            let element = queue[index]
+            let node = queue[index]
             index += 1
-            if role(from: element) == kAXMenuItemRole as String,
-               isPlainCommandVMenuItem(
-                   commandCharacter: stringAttribute(
-                       kAXMenuItemCmdCharAttribute as CFString,
-                       from: element
-                   ),
-                   virtualKey: numberAttribute(
-                       kAXMenuItemCmdVirtualKeyAttribute as CFString,
-                       from: element
-                   )?.intValue,
-                   modifiers: numberAttribute(
-                       kAXMenuItemCmdModifiersAttribute as CFString,
-                       from: element
-                   )?.uint32Value,
-                   enabled: numberAttribute(
-                       kAXEnabledAttribute as CFString,
-                       from: element
-                   )?.boolValue == true
-               ) {
-                return CommandVMenuSearchResult(
-                    menuItem: element,
-                    visitedNodes: index,
-                    enqueuedNodes: queue.count,
-                    limitExhausted: false,
-                    timedOut: false
+            let element = node.element
+            let elementRole = role(from: element)
+            let menuBarItem = node.menuBarItem
+                ?? (elementRole == kAXMenuBarItemRole as String ? element : nil)
+            if elementRole == kAXMenuItemRole as String {
+                let commandCharacter = stringAttribute(
+                    kAXMenuItemCmdCharAttribute as CFString,
+                    from: element
                 )
+                let virtualKey = numberAttribute(
+                    kAXMenuItemCmdVirtualKeyAttribute as CFString,
+                    from: element
+                )?.intValue
+                let modifiers = numberAttribute(
+                    kAXMenuItemCmdModifiersAttribute as CFString,
+                    from: element
+                )?.uint32Value
+                let enabled = numberAttribute(
+                    kAXEnabledAttribute as CFString,
+                    from: element
+                )?.boolValue == true
+                if isPlainCommandVShortcut(
+                    commandCharacter: commandCharacter,
+                    virtualKey: virtualKey,
+                    modifiers: modifiers
+                ) {
+                    shortcutCandidates += 1
+                    if enabled {
+                        return CommandVMenuSearchResult(
+                            menuItem: element,
+                            visitedNodes: index,
+                            enqueuedNodes: queue.count,
+                            shortcutCandidates: shortcutCandidates,
+                            disabledShortcutCandidates: disabledShortcutCandidates,
+                            refreshMenuBarItem: nil,
+                            limitExhausted: false,
+                            timedOut: false
+                        )
+                    }
+                    disabledShortcutCandidates += 1
+                    refreshMenuBarItem = refreshMenuBarItem ?? menuBarItem
+                }
             }
 
             let remainingCapacity = commandVMenuTraversalLimit - queue.count
             guard remainingCapacity > 0 else { continue }
-            queue.append(contentsOf: childElements(from: element).prefix(remainingCapacity))
+            queue.append(contentsOf: childElements(from: element).prefix(remainingCapacity).map {
+                CommandVMenuTraversalNode(element: $0, menuBarItem: menuBarItem)
+            })
         }
         let hasUnvisitedNodes = index < queue.count
         return CommandVMenuSearchResult(
             menuItem: nil,
             visitedNodes: index,
             enqueuedNodes: queue.count,
+            shortcutCandidates: shortcutCandidates,
+            disabledShortcutCandidates: disabledShortcutCandidates,
+            refreshMenuBarItem: refreshMenuBarItem,
             limitExhausted: hasUnvisitedNodes && index >= commandVMenuTraversalLimit,
             timedOut: hasUnvisitedNodes && Date() >= deadline
         )
@@ -275,9 +344,39 @@ enum CursorTextContextReader {
         modifiers: UInt32?,
         enabled: Bool
     ) -> Bool {
-        guard enabled, modifiers == 0 else { return false }
+        enabled && isPlainCommandVShortcut(
+            commandCharacter: commandCharacter,
+            virtualKey: virtualKey,
+            modifiers: modifiers
+        )
+    }
+
+    static func isPlainCommandVShortcut(
+        commandCharacter: String?,
+        virtualKey: Int?,
+        modifiers: UInt32?
+    ) -> Bool {
+        guard modifiers == 0 else { return false }
         return commandCharacter?.caseInsensitiveCompare("v") == .orderedSame
             || virtualKey == 0x09
+    }
+
+    @MainActor
+    private static func closeRefreshedMenu(
+        _ menuBarItem: AXUIElement?,
+        processIdentifier: pid_t,
+        latencyTraceToken: VoiceInkLatencyTrace.Token?
+    ) {
+        guard let menuBarItem,
+              focusedProcessIdentifierForPaste() == processIdentifier else {
+            return
+        }
+        let result = AXUIElementPerformAction(menuBarItem, kAXPressAction as CFString)
+        VoiceInkLatencyTrace.shared.event(
+            "paste_command_v_menu_refresh",
+            details: "result=close error=\(result.rawValue)",
+            token: latencyTraceToken
+        )
     }
 
     @MainActor

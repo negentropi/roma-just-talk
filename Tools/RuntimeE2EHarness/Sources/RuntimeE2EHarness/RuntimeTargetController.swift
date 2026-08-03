@@ -239,8 +239,8 @@ final class RuntimePreparedTarget {
             }
         }
 
-        RuntimeAX.postKey(keyCode: 13, flags: .maskCommand)
-        let surfaceClosed = RuntimeAX.waitForSurfaceToClose(
+        let surfaceClosed = RuntimeAX.closeSurface(
+            application: application,
             token: info.windowTitleToken,
             in: appElement,
             timeoutSeconds: 3
@@ -476,8 +476,8 @@ enum RuntimeTargetController {
                     _ = RuntimeAX.clear(textElement: surface.textElement, targetKind: target.kind)
                     RuntimeAX.postKey(keyCode: 1, flags: .maskCommand)
                 }
-                RuntimeAX.postKey(keyCode: 13, flags: .maskCommand)
-                if RuntimeAX.waitForSurfaceToClose(
+                if RuntimeAX.closeSurface(
+                    application: surface.application,
                     token: matchedToken,
                     in: surface.appElement,
                     timeoutSeconds: 2
@@ -774,8 +774,8 @@ enum RuntimeTargetController {
                 _ = RuntimeAX.clear(textElement: surface.textElement, targetKind: target.kind)
                 RuntimeAX.postKey(keyCode: 1, flags: .maskCommand)
             }
-            RuntimeAX.postKey(keyCode: 13, flags: .maskCommand)
-            _ = RuntimeAX.waitForSurfaceToClose(
+            _ = RuntimeAX.closeSurface(
+                application: surface.application,
                 token: windowTitleToken,
                 in: surface.appElement,
                 timeoutSeconds: 2
@@ -981,11 +981,13 @@ enum RuntimeAX {
         }
     }
 
+    @discardableResult
     static func focus(
         application: NSRunningApplication,
         windowElement: AXUIElement,
         textElement: AXUIElement
-    ) {
+    ) -> Bool {
+        guard !application.isTerminated else { return false }
         _ = application.activate(options: [.activateAllWindows])
         AXUIElementPerformAction(windowElement, kAXRaiseAction as CFString)
         _ = AXUIElementSetAttributeValue(
@@ -1004,6 +1006,17 @@ enum RuntimeAX {
             kCFBooleanTrue
         )
         RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.05))
+        let appElement = AXUIElementCreateApplication(application.processIdentifier)
+        let deadline = Date().addingTimeInterval(0.5)
+        while Date() < deadline {
+            if !application.isTerminated,
+               NSWorkspace.shared.frontmostApplication?.processIdentifier == application.processIdentifier,
+               focusedEditableElement(in: appElement, matchingWindow: windowElement) != nil {
+                return true
+            }
+            RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.02))
+        }
+        return false
     }
 
     static func clear(
@@ -1108,6 +1121,37 @@ enum RuntimeAX {
             RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.05))
         }
         return !surfaceExistsInWindows(token: token, in: appElement)
+    }
+
+    static func closeSurface(
+        application: NSRunningApplication?,
+        token: String,
+        in appElement: AXUIElement,
+        timeoutSeconds: TimeInterval
+    ) -> Bool {
+        guard let application else { return false }
+        // A scoped surface may outlive one close attempt; retry only while its unique token exists.
+        for _ in 0..<2 {
+            guard let currentWindow = surfaceWindow(token: token, in: appElement) else {
+                return true
+            }
+            guard let currentTextElement = editableElement(in: currentWindow, identifying: token)
+                ?? firstEditableElement(in: currentWindow) else { return false }
+            guard focus(
+                application: application,
+                windowElement: currentWindow,
+                textElement: currentTextElement
+            ) else { return false }
+            postKey(keyCode: 13, flags: .maskCommand)
+            if waitForSurfaceToClose(
+                token: token,
+                in: appElement,
+                timeoutSeconds: timeoutSeconds
+            ) {
+                return true
+            }
+        }
+        return false
     }
 
     static func waitForTermination(
@@ -1256,7 +1300,11 @@ enum RuntimeAX {
     }
 
     private static func surfaceExistsInWindows(token: String, in appElement: AXUIElement) -> Bool {
-        elementArrayAttribute(kAXWindowsAttribute, from: appElement).contains { windowElement in
+        surfaceWindow(token: token, in: appElement) != nil
+    }
+
+    private static func surfaceWindow(token: String, in appElement: AXUIElement) -> AXUIElement? {
+        elementArrayAttribute(kAXWindowsAttribute, from: appElement).first { windowElement in
             stringAttribute(kAXTitleAttribute, from: windowElement)?
                 .localizedCaseInsensitiveContains(token) == true
                 || editableElement(in: windowElement, identifying: token) != nil

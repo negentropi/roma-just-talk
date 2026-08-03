@@ -7,7 +7,8 @@ enum CursorTextContextReader {
     // Bound malformed Accessibility parent chains without missing deeply nested web editors.
     private static let insertionAncestorTraversalLimit = 64
     private static let commandVMenuTraversalLimit = 512
-    private static let commandVMenuTraversalTimeout: TimeInterval = 0.1
+    // Cold Chromium menu hierarchies exceed 100 ms before their Accessibility cache is warm.
+    private static let commandVMenuTraversalTimeout: TimeInterval = 0.25
 
     enum SelectedTextInsertionResult: String {
         case inserted

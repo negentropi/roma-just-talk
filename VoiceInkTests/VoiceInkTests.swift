@@ -43,7 +43,7 @@ struct VoiceInkTests {
         defaults.set(0.01, forKey: "clipboardRestoreDelay")
         pasteboard.clearContents()
         pasteboard.setString("previous clipboard", forType: .string)
-        CursorPaster.configurePasteCommandPosterForTesting {
+        CursorPaster.configurePasteCommandPosterForTesting { _ in
             .commandNotPosted
         }
 
@@ -80,7 +80,7 @@ struct VoiceInkTests {
         CursorPaster.configureAccessibilityTextInserterForTesting { text, _ in
             text == "dictated text" ? insertionResult : .notApplied
         }
-        CursorPaster.configurePasteCommandPosterForTesting {
+        CursorPaster.configurePasteCommandPosterForTesting { _ in
             postedCommand = true
             return .commandPosted
         }
@@ -119,9 +119,11 @@ struct VoiceInkTests {
         defaults.set(VoiceInkPasteMethod.standard.rawValue, forKey: VoiceInkPasteMethod.userDefaultsKey)
         var insertionResult = CursorTextContextReader.SelectedTextInsertionResult.notApplied
         var postedCommandCount = 0
+        var retryCommandVMenuDiscoveryValues: [Bool] = []
         CursorPaster.configureAccessibilityTextInserterForTesting { _, _ in insertionResult }
-        CursorPaster.configurePasteCommandPosterForTesting {
+        CursorPaster.configurePasteCommandPosterForTesting { retryCommandVMenuDiscovery in
             postedCommandCount += 1
+            retryCommandVMenuDiscoveryValues.append(retryCommandVMenuDiscovery)
             return .commandPosted
         }
 
@@ -138,6 +140,7 @@ struct VoiceInkTests {
         }
 
         #expect(postedCommandCount == 2)
+        #expect(retryCommandVMenuDiscoveryValues == [false, true])
     }
 
     @Test func accessibilityInsertionObservationRejectsSilentAXSuccess() {

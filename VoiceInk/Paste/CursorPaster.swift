@@ -14,7 +14,7 @@ class CursorPaster {
     // Let target apps observe modifier release before the synthesized Cmd-V chord.
     private static let prePasteDelay: TimeInterval = 0.1
     private static let pasteShortcutEventDelay: TimeInterval = 0.01
-    @MainActor private static var pasteCommandPosterForTesting: (() async -> PasteResult)?
+    @MainActor private static var pasteCommandPosterForTesting: ((Bool) async -> PasteResult)?
     @MainActor private static var accessibilityTextInserterForTesting:
         ((String, CursorTextContextReader.PreparedContext?) -> CursorTextContextReader.SelectedTextInsertionResult)?
 
@@ -73,7 +73,9 @@ class CursorPaster {
     }
 
     @MainActor
-    static func configurePasteCommandPosterForTesting(_ poster: (() async -> PasteResult)? = nil) {
+    static func configurePasteCommandPosterForTesting(
+        _ poster: ((Bool) async -> PasteResult)? = nil
+    ) {
         pasteCommandPosterForTesting = poster
     }
 
@@ -139,6 +141,7 @@ class CursorPaster {
         let latencyTrace = VoiceInkLatencyTrace.shared
         let pasteboard = NSPasteboard.general
         let shouldRestoreClipboard = VoiceInkPastePreference.shouldRestoreClipboardAfterPaste()
+        var shouldRetryCommandVMenuDiscovery = false
         latencyTrace.event(
             "paste_session.enter",
             details: "chars=\(text.count) restoreClipboard=\(shouldRestoreClipboard) method=\(VoiceInkPasteMethod.current().rawValue)",
@@ -163,6 +166,7 @@ class CursorPaster {
                 insertionSpan,
                 details: "result=\(insertionResult.rawValue)"
             )
+            shouldRetryCommandVMenuDiscovery = insertionResult.shouldRetryCommandVMenuDiscovery
             if insertionResult.didInsert {
                 latencyTrace.event(
                     "paste_text_inserted",
@@ -209,7 +213,10 @@ class CursorPaster {
         latencyTrace.end(clipboardWriteSpan, details: "result=success")
 
         let commandSpan = latencyTrace.begin("paste_session.post_command", token: latencyTraceToken)
-        let pasteResult = await postPasteCommand(latencyTraceToken: latencyTraceToken)
+        let pasteResult = await postPasteCommand(
+            retryCommandVMenuDiscovery: shouldRetryCommandVMenuDiscovery,
+            latencyTraceToken: latencyTraceToken
+        )
         latencyTrace.end(
             commandSpan,
             details: "result=\(String(describing: pasteResult))"
@@ -247,10 +254,11 @@ class CursorPaster {
 
     @MainActor
     private static func postPasteCommand(
+        retryCommandVMenuDiscovery: Bool,
         latencyTraceToken: VoiceInkLatencyTrace.Token?
     ) async -> PasteResult {
         if let pasteCommandPosterForTesting {
-            return await pasteCommandPosterForTesting()
+            return await pasteCommandPosterForTesting(retryCommandVMenuDiscovery)
         }
 
         if VoiceInkPasteMethod.current() == .appleScript {
@@ -264,7 +272,10 @@ class CursorPaster {
             }
             return didPost ? .commandPosted : .commandNotPosted
         } else {
-            return await pasteFromClipboard(latencyTraceToken: latencyTraceToken)
+            return await pasteFromClipboard(
+                retryCommandVMenuDiscovery: retryCommandVMenuDiscovery,
+                latencyTraceToken: latencyTraceToken
+            )
         }
     }
 
@@ -362,6 +373,7 @@ class CursorPaster {
     // Posts Cmd+V via CGEvent without modifying the active input source.
     @MainActor
     private static func pasteFromClipboard(
+        retryCommandVMenuDiscovery: Bool,
         latencyTraceToken: VoiceInkLatencyTrace.Token?
     ) async -> PasteResult {
         VoiceInkLatencyTrace.shared.event(
@@ -380,7 +392,9 @@ class CursorPaster {
         }
 
         await wait(prePasteDelay)
-        if let targetProcessIdentifier = await CursorTextContextReader.pressFocusedCommandVMenuItem() {
+        if let targetProcessIdentifier = await CursorTextContextReader.pressFocusedCommandVMenuItem(
+            retryIfUnavailable: retryCommandVMenuDiscovery
+        ) {
             VoiceInkLatencyTrace.shared.event(
                 "paste_event_posted",
                 details: "method=accessibilityMenuCommandV targetPid=\(targetProcessIdentifier)",

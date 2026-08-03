@@ -44,6 +44,10 @@ enum CursorTextContextReader {
                 nil
             }
         }
+
+        var shouldRetryCommandVMenuDiscovery: Bool {
+            self == .unsupported
+        }
     }
 
     @MainActor
@@ -139,7 +143,7 @@ enum CursorTextContextReader {
     }
 
     @MainActor
-    static func pressFocusedCommandVMenuItem() async -> pid_t? {
+    static func pressFocusedCommandVMenuItem(retryIfUnavailable: Bool) async -> pid_t? {
         guard AXIsProcessTrusted(),
               let focusedElement = focusedElement(from: AXUIElementCreateSystemWide()) else {
             return nil
@@ -152,7 +156,8 @@ enum CursorTextContextReader {
         }
         let application = AXUIElementCreateApplication(processIdentifier)
 
-        for attempt in 0..<commandVMenuTraversalAttempts {
+        let traversalAttempts = retryIfUnavailable ? commandVMenuTraversalAttempts : 1
+        for attempt in 0..<traversalAttempts {
             guard focusedProcessIdentifierForPaste() == processIdentifier else {
                 return nil
             }
@@ -160,10 +165,7 @@ enum CursorTextContextReader {
                 kAXMenuBarAttribute as CFString,
                 from: application
             ), let menuItem = plainCommandVMenuItem(in: menuBar) else {
-                guard attempt < commandVMenuTraversalAttempts - 1,
-                      !shouldUseDirectAccessibilityInsertion(
-                          ancestorRoles: insertionAncestorRoles(startingAt: focusedElement)
-                      ) else {
+                guard attempt < traversalAttempts - 1 else {
                     return nil
                 }
                 // Let the Accessibility server process cold menu discovery before retrying.

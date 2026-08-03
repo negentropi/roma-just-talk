@@ -228,7 +228,7 @@ final class RuntimePreparedTarget {
             )
         }
 
-        if target.kind == .document {
+        if target.kind.usesDocumentResource {
             if !RuntimeAX.clear(textElement: textElement) {
                 errors.append("Could not clear the temporary document before closing it")
             } else {
@@ -468,7 +468,7 @@ enum RuntimeTargetController {
                     windowElement: surface.windowElement,
                     textElement: surface.textElement
                 )
-                if target.kind == .document {
+                if target.kind.usesDocumentResource {
                     _ = RuntimeAX.clear(textElement: surface.textElement)
                     RuntimeAX.postKey(keyCode: 1, flags: .maskCommand)
                 }
@@ -574,7 +574,7 @@ enum RuntimeTargetController {
             """
             try Data(html.utf8).write(to: url, options: .atomic)
             return TestResource(url: url, windowTitleToken: title)
-        case .document:
+        case .document, .electron:
             let filename = RuntimeTargetIsolationPlan.documentFilename(
                 windowTitleToken: title,
                 bundleIdentifier: target.bundleIdentifier
@@ -750,7 +750,7 @@ enum RuntimeTargetController {
                 windowElement: surface.windowElement,
                 textElement: surface.textElement
             )
-            if target.kind == .document {
+            if target.kind.usesDocumentResource {
                 _ = RuntimeAX.clear(textElement: surface.textElement)
                 RuntimeAX.postKey(keyCode: 1, flags: .maskCommand)
             }

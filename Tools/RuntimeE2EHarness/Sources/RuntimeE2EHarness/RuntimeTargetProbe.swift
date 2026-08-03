@@ -61,35 +61,38 @@ enum RuntimeTargetProbe {
         var cases: [RuntimeTargetProbeCaseReport] = []
         if failures.isEmpty {
             for target in selectedTargets {
-                var preparedTarget: RuntimePreparedTarget?
-                do {
-                    let prepared = try RuntimeTargetController.prepare(
-                        target: target,
-                        runID: "target-probe-\(target.id)-r1-\(UUID().uuidString.prefix(6))",
-                        settleSeconds: configuration.targetSettleSeconds,
-                        availabilityPolicy: configuration.targetAvailabilityPolicy
-                    )
-                    preparedTarget = prepared
-                    let cleanup = prepared.cleanup()
-                    cases.append(
-                        RuntimeTargetProbeCaseReport(
+                for textScenario in RuntimeTextScenario.allCases {
+                    var preparedTarget: RuntimePreparedTarget?
+                    do {
+                        let prepared = try RuntimeTargetController.prepare(
                             target: target,
-                            preparation: prepared.info,
-                            cleanup: cleanup,
-                            passed: cleanup.passed,
-                            error: cleanup.passed ? nil : cleanup.errors.joined(separator: "; ")
+                            textScenario: textScenario,
+                            runID: "target-probe-\(target.id)-\(textScenario.rawValue)-r1-\(UUID().uuidString.prefix(6))",
+                            settleSeconds: configuration.targetSettleSeconds,
+                            availabilityPolicy: configuration.targetAvailabilityPolicy
                         )
-                    )
-                } catch {
-                    cases.append(
-                        RuntimeTargetProbeCaseReport(
-                            target: target,
-                            preparation: preparedTarget?.info,
-                            cleanup: nil,
-                            passed: false,
-                            error: String(describing: error)
+                        preparedTarget = prepared
+                        let cleanup = prepared.cleanup()
+                        cases.append(
+                            RuntimeTargetProbeCaseReport(
+                                target: target,
+                                preparation: prepared.info,
+                                cleanup: cleanup,
+                                passed: cleanup.passed,
+                                error: cleanup.passed ? nil : cleanup.errors.joined(separator: "; ")
+                            )
                         )
-                    )
+                    } catch {
+                        cases.append(
+                            RuntimeTargetProbeCaseReport(
+                                target: target,
+                                preparation: preparedTarget?.info,
+                                cleanup: nil,
+                                passed: false,
+                                error: String(describing: error)
+                            )
+                        )
+                    }
                 }
             }
         }

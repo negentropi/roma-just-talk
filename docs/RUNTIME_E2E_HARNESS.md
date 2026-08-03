@@ -26,7 +26,7 @@ stable. AX may arrive later without moving the earlier rendered timestamp.
 - Release: `150ms` after the fixture ends
 - Repetitions: `3`
 - Text baselines: empty, plus `[existing before]{cursor}[existing after]`
-- Candidate apps: TextEdit, Safari, Google Chrome, Arc, and Zed
+- Candidate apps: TextEdit, Safari, Google Chrome, Arc, Zed, and Visual Studio Code
 - Local target policy: `runningOnly`; closed apps are skipped, never launched
 - Coverage gate: at least `4` distinct candidate apps must already be running
 - Rendered-text timeout: `20s`
@@ -34,10 +34,10 @@ stable. AX may arrive later without moving the earlier rendered timestamp.
 - Transcript answer: optional until supplied in the config
 
 Each selected browser opens an isolated local tab with a uniquely titled,
-controlled contenteditable. It accepts only DOM `input` events, matching web
-apps that reject Accessibility-only value mutation. Document apps open a
-uniquely named temporary text file. Every target runs once empty and once with
-text on both sides of the insertion cursor.
+controlled contenteditable. It accepts only paste-backed DOM `input` events,
+matching web apps that reject Accessibility-only value mutation. Document and
+Electron editor apps open a uniquely named temporary text file. Every target
+runs once empty and once with text on both sides of the insertion cursor.
 Cleanup saves an empty temporary document before closing its tab/window, removes
 the resource, terminates only a target process started by the harness, restores
 an initially running target if closing its last isolated surface exits it, and
@@ -63,8 +63,8 @@ Run `Prepare remote E2E stage` with:
 - `macos_repetitions=3`
 - `hold_minutes=0`
 
-The disposable Namespace Mac installs BlackHole and CotEditor, opens TextEdit,
-Safari, CotEditor, and Script Editor, and keeps the harness policy at
+The disposable Namespace Mac installs BlackHole, Chrome, and Visual Studio Code;
+opens TextEdit, Safari, Chrome, and VS Code; and keeps the harness policy at
 `runningOnly`. It grants Accessibility/Input Monitoring/Microphone only inside
 that ephemeral VM. The helper also receives Screen Recording solely for
 pixel-level target observation. Grants remain keyed to the exact ad-hoc CDHashes
@@ -72,7 +72,7 @@ of the downloaded Roma app and the one-time-built helper. It never re-signs the
 production Roma artifact.
 
 Before sampling, the scenario waits for the real Parakeet V2 download and app
-prewarm. It then runs deterministic checks, a four-app target probe, one
+prewarm. It then runs deterministic checks, a four-app, two-baseline target probe, one
 functional repetition with a relaxed latency ceiling, and the requested repeated
 matrix with the `250ms` budget. A functional-smoke failure is retained but does
 not suppress the repeated matrix. All JSON reports, phase stdout/stderr, TCC rows,
@@ -87,8 +87,8 @@ Run target automation without Roma, audio, or shortcut input first:
 make runtime-e2e-target-probe
 ```
 
-This proves only test-tab/document discovery, focus, empty AX baseline, scoped
-close, and cleanup. A target-probe failure is not reported as a Roma failure.
+This proves only test-tab/document discovery, focus, empty and middle-cursor AX
+baselines, scoped close, and cleanup. A target-probe failure is not reported as a Roma failure.
 The separate `--audio-probe` mode validates fixture decoding, transactional
 BlackHole control setup, Roma device selection, and playback-process completion.
 It does not prove that non-silent PCM reached Roma. Only a full case with Roma

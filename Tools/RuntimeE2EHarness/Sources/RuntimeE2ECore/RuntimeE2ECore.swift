@@ -33,6 +33,23 @@ public struct RuntimeTargetApp: Codable, Equatable, Hashable, Sendable {
     public enum Kind: String, Codable, Sendable {
         case document
         case browser
+        case electron
+
+        public var usesDocumentResource: Bool {
+            self != .browser
+        }
+
+        public var requiresPasteSemantics: Bool {
+            self != .document
+        }
+
+        public func satisfiesPasteSemantics(
+            directAccessibilityInsertionSucceeded: Bool,
+            clipboardPasteHandoffCompleted: Bool
+        ) -> Bool {
+            !requiresPasteSemantics
+                || (!directAccessibilityInsertionSucceeded && clipboardPasteHandoffCompleted)
+        }
     }
 
     public let id: String
@@ -57,7 +74,13 @@ public struct RuntimeTargetApp: Codable, Equatable, Hashable, Sendable {
         Self(id: "safari", displayName: "Safari", bundleIdentifier: "com.apple.Safari", kind: .browser),
         Self(id: "chrome", displayName: "Google Chrome", bundleIdentifier: "com.google.Chrome", kind: .browser),
         Self(id: "arc", displayName: "Arc", bundleIdentifier: "company.thebrowser.Browser", kind: .browser),
-        Self(id: "zed", displayName: "Zed", bundleIdentifier: "dev.zed.Zed", kind: .document)
+        Self(id: "zed", displayName: "Zed", bundleIdentifier: "dev.zed.Zed", kind: .document),
+        Self(
+            id: "vscode",
+            displayName: "Visual Studio Code",
+            bundleIdentifier: "com.microsoft.VSCode",
+            kind: .electron
+        )
     ]
 }
 
@@ -465,7 +488,7 @@ public struct RuntimeCaseAssessment: Codable, Equatable, Sendable {
         case microphonePermissionUnavailable
         case transcriptionIncomplete
         case emptyTranscript
-        case webInputSemanticsBypassed
+        case pasteSemanticsNotProven
         case noPaste
         case clipboardOnly
         case renderNotObserved
@@ -492,6 +515,7 @@ public struct RuntimeCaseAssessment: Codable, Equatable, Sendable {
         microphonePermissionUnavailable: Bool? = nil,
         transcriptionCompleted: Bool? = nil,
         transcribedCharacterCount: Int? = nil,
+        pasteSemanticsSatisfied: Bool? = nil,
         maximumWordErrorRate: Double = 0.2
     ) -> Self {
         guard observation.triggerObserved else {
@@ -508,6 +532,9 @@ public struct RuntimeCaseAssessment: Codable, Equatable, Sendable {
         }
         guard transcribedCharacterCount != 0 else {
             return Self(status: .emptyTranscript, passed: false)
+        }
+        guard pasteSemanticsSatisfied != false else {
+            return Self(status: .pasteSemanticsNotProven, passed: false)
         }
         guard let visibleText = observation.visibleText,
               !visibleText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
@@ -632,7 +659,7 @@ public enum RuntimeFailureBoundaryPolicy {
         }
         guard evidence.voiceInkTranscriptionCompleted else { return .voiceInkTranscription }
         if assessment.status == .emptyTranscript { return .voiceInkTranscription }
-        if assessment.status == .webInputSemanticsBypassed { return .voiceInkPasteHandoff }
+        if assessment.status == .pasteSemanticsNotProven { return .voiceInkPasteHandoff }
         guard evidence.voiceInkTextDeliveryHandoffSucceeded else {
             return .voiceInkPasteHandoff
         }

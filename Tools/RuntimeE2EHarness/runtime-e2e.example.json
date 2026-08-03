@@ -45,6 +45,12 @@
       "displayName": "Zed",
       "bundleIdentifier": "dev.zed.Zed",
       "kind": "document"
+    },
+    {
+      "id": "vscode",
+      "displayName": "Visual Studio Code",
+      "bundleIdentifier": "com.microsoft.VSCode",
+      "kind": "electron"
     }
   ],
   "expectedTranscripts": {},

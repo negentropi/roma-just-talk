@@ -46,10 +46,10 @@ do {
         repetitions: 2
     )
 
-    try require(targets.count == 5, "default target matrix should contain five apps")
+    try require(targets.count == 6, "default target matrix should contain six apps")
     try require(
-        runPlan.cases.count == 40,
-        "two fixtures x five apps x two text scenarios x two repetitions should create forty cases"
+        runPlan.cases.count == 48,
+        "two fixtures x six apps x two text scenarios x two repetitions should create forty-eight cases"
     )
     try require(
         runPlan.cases.first?.expectedTranscript == "expected noisy speech",
@@ -86,6 +86,32 @@ do {
         "abandoned-target cleanup must retain legacy run-ID support"
     )
     print("PASS fixture/app/text-scenario/repetition matrix carries optional transcript answers")
+
+    try require(targets.contains { $0.kind == .electron }, "default matrix should cover an Electron editor")
+    try require(RuntimeTargetApp.Kind.electron.usesDocumentResource, "Electron editors should open isolated files")
+    try require(RuntimeTargetApp.Kind.electron.requiresPasteSemantics, "Electron editors must exercise native paste events")
+    try require(!RuntimeTargetApp.Kind.document.requiresPasteSemantics, "native documents may retain direct AX insertion")
+    try require(
+        !RuntimeTargetApp.Kind.electron.satisfiesPasteSemantics(
+            directAccessibilityInsertionSucceeded: true,
+            clipboardPasteHandoffCompleted: false
+        ),
+        "Electron direct AX insertion must fail paste-semantics validation"
+    )
+    try require(
+        RuntimeTargetApp.Kind.electron.satisfiesPasteSemantics(
+            directAccessibilityInsertionSucceeded: false,
+            clipboardPasteHandoffCompleted: true
+        ),
+        "Electron clipboard insertion must satisfy paste-semantics validation"
+    )
+    try require(
+        RuntimeTargetApp.Kind.document.satisfiesPasteSemantics(
+            directAccessibilityInsertionSucceeded: true,
+            clipboardPasteHandoffCompleted: false
+        ),
+        "native document AX insertion must remain allowed"
+    )
 
     let noPaste = RuntimeCaseAssessment.assess(
         observation: RuntimeCaseObservation(
@@ -497,6 +523,30 @@ do {
         incompleteClipboardTrace?.textDeliveryHandoffCompleted == false,
         "clipboard paste must retain separate write and command proof"
     )
+    for kind in [RuntimeTargetApp.Kind.browser, .electron] {
+        let incompleteWebPaste = RuntimeCaseAssessment.assess(
+            observation: RuntimeCaseObservation(
+                visibleText: "visible text from an unproven source",
+                keyUpToVisibleMilliseconds: 100,
+                clipboardChanged: true,
+                triggerObserved: true
+            ),
+            expectedTranscript: nil,
+            latencyThresholdMilliseconds: 250,
+            transcriptionCompleted: true,
+            transcribedCharacterCount: 36,
+            pasteSemanticsSatisfied: incompleteClipboardTrace.map {
+                kind.satisfiesPasteSemantics(
+                    directAccessibilityInsertionSucceeded: $0.directTextInsertionSucceeded,
+                    clipboardPasteHandoffCompleted: $0.clipboardPasteHandoffCompleted
+                )
+            }
+        )
+        try require(
+            incompleteWebPaste.status == .pasteSemanticsNotProven && !incompleteWebPaste.passed,
+            "\(kind.rawValue) visible text must fail when its parsed trace lacks clipboard-write proof"
+        )
+    }
     try require(
         trace?.keyUpToInteractionSettledMilliseconds ?? -1,
         equals: 700,

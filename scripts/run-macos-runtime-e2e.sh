@@ -29,7 +29,7 @@ config_full="$runtime_root/runtime-e2e-full.json"
 scenario_status=1
 current_phase="initialize"
 phase_file="$evidence/macos-runtime-e2e-phase.txt"
-coteditor_pid=""
+launcher_pids=()
 
 mkdir -p "$runtime_root" "$audio_root" "$evidence"
 test -d "$voiceink_app"
@@ -42,6 +42,21 @@ mark_phase() {
   current_phase="$1"
   printf '%s %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$current_phase" \
     | tee -a "$phase_file"
+}
+
+launch_detached() {
+  local output="$1"
+  shift
+  open "$@" > "$output" 2>&1 &
+  launcher_pids+=("$!")
+}
+
+stop_launchers() {
+  local pid
+  for pid in "${launcher_pids[@]:-}"; do
+    kill "$pid" 2>/dev/null || true
+  done
+  launcher_pids=()
 }
 
 record_command() {
@@ -105,23 +120,6 @@ INSERT OR REPLACE INTO access(
 SQL
 }
 
-grant_user_apple_events_tcc() {
-  local client="$1"
-  local csreq_path="$2"
-  local target_bundle_id="$3"
-  local target_csreq_path="$4"
-  sqlite3 "$user_tcc_db" <<SQL
-INSERT OR REPLACE INTO access(
-  service,client,client_type,auth_value,auth_reason,auth_version,csreq,
-  indirect_object_identifier_type,indirect_object_identifier,
-  indirect_object_code_identity,flags
-) VALUES(
-  'kTCCServiceAppleEvents','$client',0,2,4,1,readfile('$csreq_path'),0,
-  '$target_bundle_id',readfile('$target_csreq_path'),0
-);
-SQL
-}
-
 write_config() {
   local output="$1"
   local run_repetitions="$2"
@@ -152,8 +150,8 @@ write_config() {
       targets: [
         {id:"textedit",displayName:"TextEdit",bundleIdentifier:"com.apple.TextEdit",kind:"document"},
         {id:"safari",displayName:"Safari",bundleIdentifier:"com.apple.Safari",kind:"browser"},
-        {id:"coteditor",displayName:"CotEditor",bundleIdentifier:"com.coteditor.CotEditor",kind:"document"},
-        {id:"scripteditor",displayName:"Script Editor",bundleIdentifier:"com.apple.ScriptEditor2",kind:"document"}
+        {id:"chrome",displayName:"Google Chrome",bundleIdentifier:"com.google.Chrome",kind:"browser"},
+        {id:"vscode",displayName:"Visual Studio Code",bundleIdentifier:"com.microsoft.VSCode",kind:"electron"}
       ],
       expectedTranscripts: {},
       voiceInkLifecycle: "reuse"
@@ -188,9 +186,7 @@ cleanup() {
   if [ "$exit_code" -ne 0 ]; then
     scenario_status="$exit_code"
   fi
-  if [ -n "$coteditor_pid" ]; then
-    kill "$coteditor_pid" 2>/dev/null || true
-  fi
+  stop_launchers
   if [ -x "$helper_app/Contents/MacOS/RuntimeE2EHarness" ]; then
     make -C "$repo_root" runtime-e2e-restore \
       RUNTIME_E2E_CONFIG="$config_full" \
@@ -211,9 +207,16 @@ mark_phase install-dependencies
 record_command "$evidence/blackhole-install.log" \
   env HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1 \
   brew install --cask blackhole-2ch
-record_command "$evidence/coteditor-install.log" \
-  env HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1 \
-  brew install --cask coteditor
+if [ ! -d "/Applications/Google Chrome.app" ]; then
+  record_command "$evidence/chrome-install.log" \
+    env HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1 \
+    brew install --cask google-chrome
+fi
+if [ ! -d "/Applications/Visual Studio Code.app" ]; then
+  record_command "$evidence/vscode-install.log" \
+    env HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1 \
+    brew install --cask visual-studio-code
+fi
 if ! command -v fd >/dev/null 2>&1; then
   record_command "$evidence/fd-install.log" \
     env HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1 \
@@ -256,10 +259,8 @@ mark_phase grant-tcc
 capture_tcc before-grant
 voiceink_requirement="$(make_csreq "$voiceink_app" "$runtime_root/voiceink.csreq")"
 helper_requirement="$(make_csreq "$helper_app" "$runtime_root/helper.csreq")"
-coteditor_requirement="$(make_csreq "/Applications/CotEditor.app" "$runtime_root/coteditor.csreq")"
 printf '%s\n' "$voiceink_requirement" > "$evidence/voiceink-designated-requirement.txt"
 printf '%s\n' "$helper_requirement" > "$evidence/helper-designated-requirement.txt"
-printf '%s\n' "$coteditor_requirement" > "$evidence/coteditor-designated-requirement.txt"
 
 grant_system_tcc kTCCServiceAccessibility "$voiceink_bundle_id" "$runtime_root/voiceink.csreq"
 grant_system_tcc kTCCServiceListenEvent "$voiceink_bundle_id" "$runtime_root/voiceink.csreq"
@@ -269,11 +270,6 @@ grant_system_tcc kTCCServiceAccessibility "$helper_bundle_id" "$runtime_root/hel
 grant_system_tcc kTCCServicePostEvent "$helper_bundle_id" "$runtime_root/helper.csreq"
 grant_system_tcc kTCCServiceScreenCapture "$helper_bundle_id" "$runtime_root/helper.csreq"
 grant_user_tcc kTCCServiceScreenCapture "$helper_bundle_id" "$runtime_root/helper.csreq"
-grant_user_apple_events_tcc \
-  "$helper_bundle_id" \
-  "$runtime_root/helper.csreq" \
-  "com.coteditor.CotEditor" \
-  "$runtime_root/coteditor.csreq"
 capture_tcc after-grant
 killall tccd 2>/dev/null || true
 sudo killall tccd 2>/dev/null || true
@@ -317,17 +313,29 @@ if [ -n "$model_directory" ]; then
 fi
 
 mark_phase open-target-apps
+mkdir -p "$HOME/Library/Application Support/Google/Chrome"
+touch "$HOME/Library/Application Support/Google/Chrome/First Run"
+mkdir -p "$HOME/Library/Application Support/Code/User"
+printf '%s\n' \
+  '{' \
+  '  "editor.accessibilitySupport": "on",' \
+  '  "security.workspace.trust.enabled": false,' \
+  '  "window.openFilesInNewWindow": "off",' \
+  '  "window.restoreWindows": "none",' \
+  '  "workbench.startupEditor": "none"' \
+  '}' > "$HOME/Library/Application Support/Code/User/settings.json"
 lsregister_bin="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
 test -x "$lsregister_bin"
-"$lsregister_bin" -f "/Applications/CotEditor.app" \
+"$lsregister_bin" -f \
+  "/Applications/Google Chrome.app" \
+  "/Applications/Visual Studio Code.app" \
   > "$evidence/app-registration.log" 2>&1
-open -b com.apple.TextEdit > "$evidence/textedit-launch.log" 2>&1
-open -b com.apple.Safari > "$evidence/safari-launch.log" 2>&1
-"/Applications/CotEditor.app/Contents/MacOS/CotEditor" \
-  > "$evidence/coteditor-launch.log" 2>&1 &
-coteditor_pid="$!"
-open -b com.apple.ScriptEditor2 > "$evidence/scripteditor-launch.log" 2>&1
+launch_detached "$evidence/textedit-launch.log" -b com.apple.TextEdit
+launch_detached "$evidence/safari-launch.log" -b com.apple.Safari
+launch_detached "$evidence/chrome-launch.log" -b com.google.Chrome
+launch_detached "$evidence/vscode-launch.log" -b com.microsoft.VSCode
 sleep 15
+stop_launchers
 
 write_config "$config_smoke" 1 20000
 write_config "$config_full" "$repetitions" 250

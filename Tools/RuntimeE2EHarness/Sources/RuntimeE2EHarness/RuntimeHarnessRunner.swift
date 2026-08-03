@@ -66,7 +66,7 @@ struct RuntimeRunSummary: Codable {
 }
 
 struct RuntimeHarnessReport: Codable {
-    var schemaVersion = 6
+    var schemaVersion = 7
     let startedAt: Date
     var finishedAt: Date?
     let configuration: RuntimeHarnessConfiguration
@@ -328,15 +328,20 @@ enum RuntimeHarnessRunner {
                 microphonePermissionUnavailable: latencyTrace.map(\.microphonePermissionUnavailable),
                 transcriptionCompleted: latencyTrace.map(\.transcriptionCompleted),
                 transcribedCharacterCount: latencyTrace?.transcribedCharacterCount,
+                pasteSemanticsSatisfied: latencyTrace.map {
+                    runCase.target.kind.satisfiesPasteSemantics(
+                        directAccessibilityInsertionSucceeded: $0.directTextInsertionSucceeded,
+                        clipboardPasteHandoffCompleted: $0.clipboardPasteHandoffCompleted
+                    )
+                },
                 maximumWordErrorRate: configuration.maximumWordErrorRate
             )
-            if runCase.target.kind == .browser,
-               latencyTrace?.directTextInsertionSucceeded == true {
-                assessment = RuntimeCaseAssessment(
-                    status: .webInputSemanticsBypassed,
-                    passed: false
-                )
-                let semanticsError = "Web target received direct Accessibility insertion instead of paste semantics"
+            if assessment.status == .pasteSemanticsNotProven {
+                let semanticsError = if latencyTrace?.directTextInsertionSucceeded == true {
+                    "Web-backed target received direct Accessibility insertion instead of paste semantics"
+                } else {
+                    "Web-backed target did not prove clipboard write plus paste command"
+                }
                 errorText = [errorText, semanticsError]
                     .compactMap { $0 }
                     .filter { !$0.isEmpty }

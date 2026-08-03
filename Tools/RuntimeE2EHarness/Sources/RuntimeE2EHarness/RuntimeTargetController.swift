@@ -219,23 +219,37 @@ final class RuntimePreparedTarget {
 
     func cleanup() -> RuntimeTargetCleanupInfo {
         var errors: [String] = []
-        let application = NSRunningApplication(processIdentifier: info.processIdentifier)
-        if let application {
-            RuntimeAX.focus(
-                application: application,
-                windowElement: windowElement,
-                textElement: textElement
-            )
+        let runningApplication = NSRunningApplication(processIdentifier: info.processIdentifier)
+        let application = runningApplication.flatMap {
+            !$0.isTerminated && $0.bundleIdentifier == target.bundleIdentifier ? $0 : nil
         }
 
         if target.kind.usesDocumentResource {
-            if !RuntimeAX.clear(textElement: textElement, targetKind: target.kind) {
-                errors.append("Could not clear the temporary document before closing it")
-            } else {
-                RuntimeAX.postKey(keyCode: 1, flags: .maskCommand)
-                if !RuntimeAX.waitForFileToBecomeEmpty(testResourceURL, timeoutSeconds: 2) {
-                    errors.append("Temporary document did not save an empty value before cleanup")
+            if let application,
+               RuntimeAX.clear(
+                textElement: textElement,
+                targetKind: target.kind,
+                application: application,
+                windowElement: windowElement
+            ) {
+                if RuntimeAX.focus(
+                    application: application,
+                    windowElement: windowElement,
+                    textElement: textElement
+                ) {
+                    RuntimeAX.postKey(
+                        keyCode: 1,
+                        flags: .maskCommand,
+                        processIdentifier: application.processIdentifier
+                    )
+                    if !RuntimeAX.waitForFileToBecomeEmpty(testResourceURL, timeoutSeconds: 2) {
+                        errors.append("Temporary document did not save an empty value before cleanup")
+                    }
+                } else {
+                    errors.append("Could not focus the temporary document before saving it")
                 }
+            } else {
+                errors.append("Could not clear the temporary document before closing it")
             }
         }
 
@@ -487,14 +501,23 @@ enum RuntimeTargetController {
             }
 
             if let surface = matchedSurface, let matchedToken {
-                RuntimeAX.focus(
-                    application: surface.application,
-                    windowElement: surface.windowElement,
-                    textElement: surface.textElement
-                )
                 if target.kind.usesDocumentResource {
-                    _ = RuntimeAX.clear(textElement: surface.textElement, targetKind: target.kind)
-                    RuntimeAX.postKey(keyCode: 1, flags: .maskCommand)
+                    if RuntimeAX.clear(
+                        textElement: surface.textElement,
+                        targetKind: target.kind,
+                        application: surface.application,
+                        windowElement: surface.windowElement
+                    ), RuntimeAX.focus(
+                        application: surface.application,
+                        windowElement: surface.windowElement,
+                        textElement: surface.textElement
+                    ) {
+                        RuntimeAX.postKey(
+                            keyCode: 1,
+                            flags: .maskCommand,
+                            processIdentifier: surface.application.processIdentifier
+                        )
+                    }
                 }
                 if RuntimeAX.closeSurface(
                     application: surface.application,
@@ -786,14 +809,23 @@ enum RuntimeTargetController {
             windowTitleToken: windowTitleToken,
             timeoutSeconds: 1
         ) {
-            RuntimeAX.focus(
-                application: surface.application,
-                windowElement: surface.windowElement,
-                textElement: surface.textElement
-            )
             if target.kind.usesDocumentResource {
-                _ = RuntimeAX.clear(textElement: surface.textElement, targetKind: target.kind)
-                RuntimeAX.postKey(keyCode: 1, flags: .maskCommand)
+                if RuntimeAX.clear(
+                    textElement: surface.textElement,
+                    targetKind: target.kind,
+                    application: surface.application,
+                    windowElement: surface.windowElement
+                ), RuntimeAX.focus(
+                    application: surface.application,
+                    windowElement: surface.windowElement,
+                    textElement: surface.textElement
+                ) {
+                    RuntimeAX.postKey(
+                        keyCode: 1,
+                        flags: .maskCommand,
+                        processIdentifier: surface.application.processIdentifier
+                    )
+                }
             }
             _ = RuntimeAX.closeSurface(
                 application: surface.application,
@@ -1045,7 +1077,9 @@ enum RuntimeAX {
 
     static func clear(
         textElement: AXUIElement,
-        targetKind: RuntimeTargetApp.Kind
+        targetKind: RuntimeTargetApp.Kind,
+        application: NSRunningApplication,
+        windowElement: AXUIElement
     ) -> Bool {
         if AXUIElementSetAttributeValue(
             textElement,
@@ -1056,8 +1090,13 @@ enum RuntimeAX {
             return true
         }
 
-        postKey(keyCode: 0, flags: .maskCommand)
-        postKey(keyCode: 51, flags: [])
+        guard focus(
+            application: application,
+            windowElement: windowElement,
+            textElement: textElement
+        ) else { return false }
+        postKey(keyCode: 0, flags: .maskCommand, processIdentifier: application.processIdentifier)
+        postKey(keyCode: 51, flags: [], processIdentifier: application.processIdentifier)
         return waitForBaselineText(.empty, targetKind: targetKind, in: textElement, timeoutSeconds: 2)
     }
 
@@ -1167,7 +1206,11 @@ enum RuntimeAX {
                 windowElement: currentWindow,
                 textElement: currentTextElement
             ) else { return false }
-            postKey(keyCode: 13, flags: .maskCommand)
+            postKey(
+                keyCode: 13,
+                flags: .maskCommand,
+                processIdentifier: application.processIdentifier
+            )
             if waitForSurfaceToClose(
                 token: token,
                 in: appElement,
@@ -1210,7 +1253,11 @@ enum RuntimeAX {
         return application.isTerminated
     }
 
-    static func postKey(keyCode: UInt16, flags: CGEventFlags) {
+    static func postKey(
+        keyCode: UInt16,
+        flags: CGEventFlags,
+        processIdentifier: pid_t? = nil
+    ) {
         guard let source = CGEventSource(stateID: .hidSystemState),
               let down = CGEvent(keyboardEventSource: source, virtualKey: CGKeyCode(keyCode), keyDown: true),
               let up = CGEvent(keyboardEventSource: source, virtualKey: CGKeyCode(keyCode), keyDown: false) else {
@@ -1218,8 +1265,13 @@ enum RuntimeAX {
         }
         down.flags = flags
         up.flags = flags
-        down.post(tap: .cghidEventTap)
-        up.post(tap: .cghidEventTap)
+        if let processIdentifier {
+            down.postToPid(processIdentifier)
+            up.postToPid(processIdentifier)
+        } else {
+            down.post(tap: .cghidEventTap)
+            up.post(tap: .cghidEventTap)
+        }
     }
 
     private static func isEditable(_ element: AXUIElement) -> Bool {

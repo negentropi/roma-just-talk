@@ -1299,6 +1299,13 @@ enum RuntimeAX {
                 flags: .maskCommand,
                 processIdentifier: application.processIdentifier
             )
+            if useCloseButtonFallback {
+                _ = discardChangesSheetIfPresent(
+                    in: currentWindow,
+                    processIdentifier: application.processIdentifier,
+                    timeoutSeconds: 0.5
+                )
+            }
             if waitForSurfaceToClose(
                 token: token,
                 in: appElement,
@@ -1320,6 +1327,11 @@ enum RuntimeAX {
               AXUIElementPerformAction(closeButton, kAXPressAction as CFString) == .success else {
             return false
         }
+        _ = discardChangesSheetIfPresent(
+            in: currentWindow,
+            processIdentifier: application.processIdentifier,
+            timeoutSeconds: 0.5
+        )
         return waitForSurfaceToClose(
             token: token,
             in: appElement,
@@ -1339,6 +1351,31 @@ enum RuntimeAX {
             RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.05))
         }
         return application.isTerminated
+    }
+
+    private static func discardChangesSheetIfPresent(
+        in windowElement: AXUIElement,
+        processIdentifier: pid_t,
+        timeoutSeconds: TimeInterval
+    ) -> Bool {
+        let deadline = Date().addingTimeInterval(timeoutSeconds)
+        repeat {
+            let hasSheet = elementArrayAttribute(kAXChildrenAttribute, from: windowElement)
+                .contains {
+                    stringAttribute(kAXRoleAttribute, from: $0) == kAXSheetRole as String
+                }
+            if hasSheet {
+                // Standard macOS document sheets map Command-D to the non-saving close action.
+                postKey(
+                    keyCode: 2,
+                    flags: .maskCommand,
+                    processIdentifier: processIdentifier
+                )
+                return true
+            }
+            RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.02))
+        } while Date() < deadline
+        return false
     }
 
     static func postKey(

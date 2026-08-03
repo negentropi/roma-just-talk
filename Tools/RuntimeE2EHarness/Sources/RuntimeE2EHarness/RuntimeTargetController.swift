@@ -224,6 +224,7 @@ final class RuntimePreparedTarget {
             !$0.isTerminated && $0.bundleIdentifier == target.bundleIdentifier ? $0 : nil
         }
 
+        var documentReadyToClose = true
         if target.kind.usesDocumentResource {
             if let application,
                RuntimeAX.clear(
@@ -232,28 +233,22 @@ final class RuntimePreparedTarget {
                 application: application,
                 windowElement: windowElement
             ) {
-                if RuntimeAX.focus(
+                if !RuntimeAX.saveClearedDocumentIfNeeded(
+                    fileURL: testResourceURL,
                     application: application,
                     windowElement: windowElement,
                     textElement: textElement
                 ) {
-                    RuntimeAX.postKey(
-                        keyCode: 1,
-                        flags: .maskCommand,
-                        processIdentifier: application.processIdentifier
-                    )
-                    if !RuntimeAX.waitForFileToBecomeEmpty(testResourceURL, timeoutSeconds: 2) {
-                        errors.append("Temporary document did not save an empty value before cleanup")
-                    }
-                } else {
-                    errors.append("Could not focus the temporary document before saving it")
+                    errors.append("Could not save the cleared temporary document before closing it")
+                    documentReadyToClose = false
                 }
             } else {
                 errors.append("Could not clear the temporary document before closing it")
+                documentReadyToClose = false
             }
         }
 
-        var surfaceClosed = RuntimeAX.closeSurface(
+        var surfaceClosed = documentReadyToClose && RuntimeAX.closeSurface(
             application: application,
             token: info.windowTitleToken,
             in: appElement,
@@ -262,23 +257,25 @@ final class RuntimePreparedTarget {
         )
 
         var terminatedProcessIdentifiers: [Int32] = []
-        let running = NSRunningApplication.runningApplications(withBundleIdentifier: target.bundleIdentifier)
-        for application in running where !existingProcessIdentifiers.contains(application.processIdentifier) {
-            if application.terminate(),
-               RuntimeAX.waitForTermination(application, timeoutSeconds: 3) {
-                terminatedProcessIdentifiers.append(application.processIdentifier)
-            } else {
-                errors.append("Could not terminate newly launched target process \(application.processIdentifier)")
+        if documentReadyToClose {
+            let running = NSRunningApplication.runningApplications(withBundleIdentifier: target.bundleIdentifier)
+            for application in running where !existingProcessIdentifiers.contains(application.processIdentifier) {
+                if application.terminate(),
+                   RuntimeAX.waitForTermination(application, timeoutSeconds: 3) {
+                    terminatedProcessIdentifiers.append(application.processIdentifier)
+                } else {
+                    errors.append("Could not terminate newly launched target process \(application.processIdentifier)")
+                }
             }
         }
-        if !surfaceClosed, terminatedProcessIdentifiers.contains(info.processIdentifier) {
+        if !surfaceClosed {
             surfaceClosed = RuntimeAX.waitForSurfaceToClose(
                 token: info.windowTitleToken,
                 in: appElement,
                 timeoutSeconds: 1
             )
         }
-        if !surfaceClosed {
+        if !surfaceClosed, documentReadyToClose {
             errors.append("Could not close the uniquely tokened target surface")
         }
         let restoredInitiallyRunningApplication =
@@ -292,14 +289,23 @@ final class RuntimePreparedTarget {
         }
 
         let temporaryResourceRemoved: Bool
-        do {
-            try FileManager.default.removeItem(at: temporaryDirectoryURL)
-            temporaryResourceRemoved = true
-        } catch {
-            temporaryResourceRemoved = !FileManager.default.fileExists(atPath: temporaryDirectoryURL.path)
-            if !temporaryResourceRemoved {
-                errors.append("Could not remove temporary target resource: \(error)")
+        if documentReadyToClose, surfaceClosed {
+            do {
+                try FileManager.default.removeItem(at: temporaryDirectoryURL)
+                temporaryResourceRemoved = true
+            } catch {
+                temporaryResourceRemoved = !FileManager.default.fileExists(atPath: temporaryDirectoryURL.path)
+                if !temporaryResourceRemoved {
+                    errors.append("Could not remove temporary target resource: \(error)")
+                }
             }
+        } else {
+            temporaryResourceRemoved = false
+            errors.append(
+                documentReadyToClose
+                    ? "Preserved temporary target resource because its surface remains open"
+                    : "Preserved temporary target resource because its cleared content was not saved"
+            )
         }
 
         let restoredFrontmostApplication: Bool
@@ -443,7 +449,8 @@ enum RuntimeTargetController {
                 windowTitleToken: resource.windowTitleToken,
                 existingProcessIdentifiers: existingProcessIdentifiers,
                 temporaryDirectoryURL: temporaryDirectoryURL,
-                previousFrontmostApplication: previousFrontmostApplication
+                previousFrontmostApplication: previousFrontmostApplication,
+                testResourceURL: resource.url
             )
             throw error
         }
@@ -501,33 +508,53 @@ enum RuntimeTargetController {
             }
 
             if let surface = matchedSurface, let matchedToken {
+                var documentReadyToClose = true
                 if target.kind.usesDocumentResource {
-                    if RuntimeAX.clear(
+                    let resourceTokens = [matchedToken] + tokens.filter { $0 != matchedToken }
+                    let testResourceURL = resourceTokens
+                        .map {
+                            resourceURL.appendingPathComponent(
+                                RuntimeTargetIsolationPlan.documentFilename(
+                                    windowTitleToken: $0,
+                                    bundleIdentifier: target.bundleIdentifier
+                                )
+                            )
+                        }
+                        .first { FileManager.default.fileExists(atPath: $0.path) }
+                    if let testResourceURL,
+                       RuntimeAX.clear(
                         textElement: surface.textElement,
                         targetKind: target.kind,
                         application: surface.application,
                         windowElement: surface.windowElement
-                    ), RuntimeAX.focus(
-                        application: surface.application,
-                        windowElement: surface.windowElement,
-                        textElement: surface.textElement
                     ) {
-                        RuntimeAX.postKey(
-                            keyCode: 1,
-                            flags: .maskCommand,
-                            processIdentifier: surface.application.processIdentifier
+                        documentReadyToClose = RuntimeAX.saveClearedDocumentIfNeeded(
+                            fileURL: testResourceURL,
+                            application: surface.application,
+                            windowElement: surface.windowElement,
+                            textElement: surface.textElement
                         )
+                    } else {
+                        documentReadyToClose = false
                     }
                 }
-                if RuntimeAX.closeSurface(
+                guard documentReadyToClose else {
+                    unresolvedRunIDs.append(runID)
+                    errors.append("Could not save abandoned target \(runID); preserved its surface and resource")
+                    continue
+                }
+                guard RuntimeAX.closeSurface(
                     application: surface.application,
                     token: matchedToken,
                     in: surface.appElement,
                     timeoutSeconds: 2,
                     useCloseButtonFallback: target.bundleIdentifier == "com.apple.TextEdit"
-                ) {
-                    closedSurfaces += 1
+                ) else {
+                    unresolvedRunIDs.append(runID)
+                    errors.append("Could not close abandoned target \(runID); preserved its resource")
+                    continue
                 }
+                closedSurfaces += 1
             }
 
             do {
@@ -802,51 +829,73 @@ enum RuntimeTargetController {
         windowTitleToken: String,
         existingProcessIdentifiers: Set<pid_t>,
         temporaryDirectoryURL: URL,
-        previousFrontmostApplication: NSRunningApplication?
+        previousFrontmostApplication: NSRunningApplication?,
+        testResourceURL: URL
     ) {
+        var preparedSurface: TargetSurface?
+        var surfaceClosed = false
+        var safeToTerminate = false
         if let surface = try? waitForTargetSurface(
             bundleIdentifier: bundleIdentifier,
             windowTitleToken: windowTitleToken,
             timeoutSeconds: 1
         ) {
+            preparedSurface = surface
+            var documentReadyToClose = true
             if target.kind.usesDocumentResource {
                 if RuntimeAX.clear(
                     textElement: surface.textElement,
                     targetKind: target.kind,
                     application: surface.application,
                     windowElement: surface.windowElement
-                ), RuntimeAX.focus(
-                    application: surface.application,
-                    windowElement: surface.windowElement,
-                    textElement: surface.textElement
                 ) {
-                    RuntimeAX.postKey(
-                        keyCode: 1,
-                        flags: .maskCommand,
-                        processIdentifier: surface.application.processIdentifier
+                    documentReadyToClose = RuntimeAX.saveClearedDocumentIfNeeded(
+                        fileURL: testResourceURL,
+                        application: surface.application,
+                        windowElement: surface.windowElement,
+                        textElement: surface.textElement
                     )
+                } else {
+                    documentReadyToClose = false
                 }
             }
-            _ = RuntimeAX.closeSurface(
-                application: surface.application,
-                token: windowTitleToken,
-                in: surface.appElement,
-                timeoutSeconds: 2,
-                useCloseButtonFallback: target.bundleIdentifier == "com.apple.TextEdit"
-            )
+            safeToTerminate = documentReadyToClose
+            if documentReadyToClose {
+                surfaceClosed = RuntimeAX.closeSurface(
+                    application: surface.application,
+                    token: windowTitleToken,
+                    in: surface.appElement,
+                    timeoutSeconds: 2,
+                    useCloseButtonFallback: target.bundleIdentifier == "com.apple.TextEdit"
+                )
+            } else {
+                surfaceClosed = false
+            }
         }
 
-        for application in NSRunningApplication.runningApplications(withBundleIdentifier: bundleIdentifier)
-        where !existingProcessIdentifiers.contains(application.processIdentifier) {
-            _ = application.terminate()
-            _ = RuntimeAX.waitForTermination(application, timeoutSeconds: 3)
+        if safeToTerminate {
+            for application in NSRunningApplication.runningApplications(withBundleIdentifier: bundleIdentifier)
+            where !existingProcessIdentifiers.contains(application.processIdentifier) {
+                if application.terminate() {
+                    _ = RuntimeAX.waitForTermination(application, timeoutSeconds: 3)
+                }
+            }
+        }
+        if !surfaceClosed, let preparedSurface {
+            surfaceClosed = RuntimeAX.waitForSurfaceToClose(
+                token: windowTitleToken,
+                in: preparedSurface.appElement,
+                timeoutSeconds: 1
+            )
         }
         _ = restoreInitiallyRunningApplicationIfNeeded(
             appURL: appURL,
             bundleIdentifier: bundleIdentifier,
             existingProcessIdentifiers: existingProcessIdentifiers
         )
-        try? FileManager.default.removeItem(at: temporaryDirectoryURL)
+        if safeToTerminate, surfaceClosed {
+            try? FileManager.default.removeItem(at: temporaryDirectoryURL)
+        }
         if let previousFrontmostApplication,
            !previousFrontmostApplication.isTerminated {
             _ = previousFrontmostApplication.activate()
@@ -1160,15 +1209,54 @@ enum RuntimeAX {
         )
     }
 
-    static func waitForFileToBecomeEmpty(_ url: URL, timeoutSeconds: TimeInterval) -> Bool {
-        let deadline = Date().addingTimeInterval(timeoutSeconds)
-        while Date() < deadline {
-            if let data = try? Data(contentsOf: url), data.isEmpty {
+    static func saveClearedDocumentIfNeeded(
+        fileURL: URL,
+        application: NSRunningApplication,
+        windowElement: AXUIElement,
+        textElement: AXUIElement
+    ) -> Bool {
+        let editedBeforeSave = boolAttribute(kAXEditedAttribute, from: windowElement)
+        let fileWasEmpty = fileIsEmpty(fileURL)
+        if editedBeforeSave == false,
+           fileWasEmpty == true {
+            return true
+        }
+        let modificationDateBeforeSave = fileModificationDate(fileURL)
+        guard focus(
+            application: application,
+            windowElement: windowElement,
+            textElement: textElement
+        ) else { return false }
+        postKey(
+            keyCode: 1,
+            flags: .maskCommand,
+            processIdentifier: application.processIdentifier
+        )
+        let requiresEditedAcknowledgement = editedBeforeSave == true
+        let requiresFileAcknowledgement = fileWasEmpty != true
+        let requiresModificationAcknowledgement = editedBeforeSave == nil && fileWasEmpty != false
+        let deadline = Date().addingTimeInterval(2)
+        repeat {
+            let editAcknowledged = !requiresEditedAcknowledgement
+                || boolAttribute(kAXEditedAttribute, from: windowElement) == false
+            let fileAcknowledged = !requiresFileAcknowledgement
+                || fileIsEmpty(fileURL) == true
+            let modificationAcknowledged = !requiresModificationAcknowledgement
+                || modificationDateBeforeSave != fileModificationDate(fileURL)
+            if editAcknowledged && fileAcknowledged && modificationAcknowledged {
                 return true
             }
             RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.02))
-        }
+        } while Date() < deadline
         return false
+    }
+
+    private static func fileIsEmpty(_ url: URL) -> Bool? {
+        try? Data(contentsOf: url).isEmpty
+    }
+
+    private static func fileModificationDate(_ url: URL) -> Date? {
+        try? url.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate
     }
 
     static func waitForSurfaceToClose(

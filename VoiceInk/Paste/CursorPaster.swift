@@ -13,6 +13,7 @@ class CursorPaster {
     )
     // Let target apps observe modifier release before the synthesized Cmd-V chord.
     private static let prePasteDelay: TimeInterval = 0.1
+    private static let pasteShortcutEventDelay: TimeInterval = 0.01
     @MainActor private static var pasteCommandPosterForTesting: (() async -> PasteResult)?
     @MainActor private static var accessibilityTextInserterForTesting:
         ((String, CursorTextContextReader.PreparedContext?) -> CursorTextContextReader.SelectedTextInsertionResult)?
@@ -394,11 +395,15 @@ class CursorPaster {
         vDown.flags   = .maskCommand
         vUp.flags     = .maskCommand
 
-        for event in [cmdDown, vDown, vUp, cmdUp] {
+        let events = [cmdDown, vDown, vUp, cmdUp]
+        for (index, event) in events.enumerated() {
             if let targetProcessIdentifier {
                 event.postToPid(targetProcessIdentifier)
             } else {
                 event.post(tap: .cghidEventTap)
+            }
+            if index < events.count - 1 {
+                await wait(pasteShortcutEventDelay)
             }
         }
         VoiceInkLatencyTrace.shared.event(

@@ -5,6 +5,7 @@ import RuntimeE2ECore
 
 struct RuntimeVisibleTextResult: Codable {
     let text: String?
+    let fullText: String?
     let keyUpToAccessibilityTextMilliseconds: Double?
     let keyUpToVisibleMilliseconds: Double?
     let renderedText: RuntimeRenderedTextChangeResult?
@@ -18,6 +19,7 @@ struct RuntimeTargetPreparationInfo: Codable {
     let processIdentifier: Int32
     let testResourcePath: String
     let windowTitleToken: String
+    let textScenario: RuntimeTextScenario
     let editableRole: String
     let matchedBy: String
 }
@@ -64,6 +66,7 @@ final class RuntimePreparedTarget {
     private let testResourceURL: URL
     private let previousFrontmostApplication: NSRunningApplication?
     private let renderedTextObserver: RuntimeRenderedTextObserver
+    private let textScenario: RuntimeTextScenario
 
     init(
         target: RuntimeTargetApp,
@@ -74,6 +77,7 @@ final class RuntimePreparedTarget {
         processIdentifier: pid_t,
         testResourceURL: URL,
         windowTitleToken: String,
+        textScenario: RuntimeTextScenario,
         matchedBy: String,
         existingProcessIdentifiers: Set<pid_t>,
         temporaryDirectoryURL: URL,
@@ -90,12 +94,14 @@ final class RuntimePreparedTarget {
         self.testResourceURL = testResourceURL
         self.previousFrontmostApplication = previousFrontmostApplication
         self.renderedTextObserver = renderedTextObserver
+        self.textScenario = textScenario
         self.info = RuntimeTargetPreparationInfo(
             targetID: target.id,
             bundleIdentifier: target.bundleIdentifier,
             processIdentifier: processIdentifier,
             testResourcePath: testResourceURL.path,
             windowTitleToken: windowTitleToken,
+            textScenario: textScenario,
             editableRole: RuntimeAX.stringAttribute(kAXRoleAttribute, from: textElement) ?? "unknown",
             matchedBy: matchedBy
         )
@@ -109,10 +115,14 @@ final class RuntimePreparedTarget {
         keyUpAtSystemUptime: TimeInterval,
         timeoutSeconds: TimeInterval
     ) -> RuntimeVisibleTextResult {
+        let finalTextSettleSeconds: TimeInterval = 0.25
         let deadline = Date().addingTimeInterval(timeoutSeconds)
         var lastError: String?
         var accessibilityText: String?
+        var fullText: String?
         var accessibilityLatency: Double?
+        var stableFullText: String?
+        var stableSinceSystemUptime: TimeInterval?
         var renderedText: RuntimeRenderedTextChangeResult?
         var renderedError = renderedTextObserver.beginObservation()
 
@@ -127,33 +137,53 @@ final class RuntimePreparedTarget {
                 }
             }
 
-            if accessibilityText == nil {
-                if let text = RuntimeAX.text(from: textElement),
-                   !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                    accessibilityText = text
-                    accessibilityLatency = max(
-                        0,
-                        ProcessInfo.processInfo.systemUptime - keyUpAtSystemUptime
-                    ) * 1_000
-                } else {
-                    if let refreshedWindow = RuntimeAX.window(
-                        containing: info.windowTitleToken,
-                        in: appElement
-                    ) {
-                        windowElement = refreshedWindow
+            let now = ProcessInfo.processInfo.systemUptime
+            if let currentText = RuntimeAX.text(from: textElement) {
+                fullText = currentText
+                if let insertedText = textScenario.insertedText(from: currentText),
+                   !insertedText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    if stableFullText != currentText {
+                        let replacedCandidate = stableFullText != nil
+                        stableFullText = currentText
+                        stableSinceSystemUptime = now
+                        accessibilityText = insertedText
+                        accessibilityLatency = max(0, now - keyUpAtSystemUptime) * 1_000
+                        if replacedCandidate {
+                            renderedText = nil
+                            renderedError = renderedTextObserver.beginObservation()
+                        }
                     }
-                    if let refreshed = RuntimeAX.editableElement(
-                        in: windowElement,
-                        identifying: info.windowTitleToken
-                    ) ?? RuntimeAX.firstEditableElement(in: windowElement) {
-                        textElement = refreshed
-                    } else {
-                        lastError = "Unique target surface no longer exposes an editable AX element"
-                    }
+                } else if stableFullText != nil {
+                    stableFullText = nil
+                    stableSinceSystemUptime = nil
+                    accessibilityText = nil
+                    accessibilityLatency = nil
+                    renderedText = nil
+                    renderedError = renderedTextObserver.beginObservation()
                 }
             }
 
-            if accessibilityText != nil,
+            if accessibilityText == nil {
+                if let refreshedWindow = RuntimeAX.window(
+                    containing: info.windowTitleToken,
+                    in: appElement
+                ) {
+                    windowElement = refreshedWindow
+                }
+                if let refreshed = RuntimeAX.editableElement(
+                    in: windowElement,
+                    identifying: info.windowTitleToken
+                ) ?? RuntimeAX.firstEditableElement(in: windowElement) {
+                    textElement = refreshed
+                } else {
+                    lastError = "Unique target surface no longer exposes an editable AX element"
+                }
+            }
+
+            let finalTextIsStable = stableSinceSystemUptime.map {
+                now - $0 >= finalTextSettleSeconds
+            } ?? false
+            if finalTextIsStable,
                (renderedText?.keyUpToRenderedTextMilliseconds != nil || renderedError != nil) {
                 break
             }
@@ -178,6 +208,7 @@ final class RuntimePreparedTarget {
         }
         return RuntimeVisibleTextResult(
             text: accessibilityText,
+            fullText: fullText,
             keyUpToAccessibilityTextMilliseconds: accessibilityLatency,
             keyUpToVisibleMilliseconds: visibleLatency,
             renderedText: renderedText,
@@ -286,6 +317,7 @@ enum RuntimeTargetController {
 
     static func prepare(
         target: RuntimeTargetApp,
+        textScenario: RuntimeTextScenario = .empty,
         runID: String,
         settleSeconds: TimeInterval,
         availabilityPolicy: RuntimeHarnessConfiguration.TargetAvailabilityPolicy
@@ -311,6 +343,7 @@ enum RuntimeTargetController {
         )
         let resource = try createTestResource(
             target: target,
+            textScenario: textScenario,
             title: "Roma Runtime E2E \(runID)",
             directoryURL: temporaryDirectoryURL
         )
@@ -326,15 +359,16 @@ enum RuntimeTargetController {
                 windowTitleToken: resource.windowTitleToken,
                 timeoutSeconds: 15
             )
-            guard let emptySurface = establishEmptyBaseline(
+            guard let preparedSurface = establishBaseline(
                 surface: surface,
                 bundleIdentifier: target.bundleIdentifier,
                 windowTitleToken: resource.windowTitleToken,
+                textScenario: textScenario,
                 settleSeconds: settleSeconds
             ) else {
-                throw RuntimeTargetControllerError.couldNotClearTarget
+                throw RuntimeTargetControllerError.couldNotPrepareTarget
             }
-            surface = emptySurface
+            surface = preparedSurface
             guard let editableFrame = RuntimeAX.frame(of: surface.textElement) else {
                 throw RuntimeTargetControllerError.renderObservationUnavailable(
                     "Editable AX element has no global frame"
@@ -356,6 +390,7 @@ enum RuntimeTargetController {
                 processIdentifier: surface.application.processIdentifier,
                 testResourceURL: resource.url,
                 windowTitleToken: resource.windowTitleToken,
+                textScenario: textScenario,
                 matchedBy: surface.matchedBy,
                 existingProcessIdentifiers: existingProcessIdentifiers,
                 temporaryDirectoryURL: temporaryDirectoryURL,
@@ -403,7 +438,9 @@ enum RuntimeTargetController {
 
         for resourceURL in resourceURLs {
             let runID = resourceURL.lastPathComponent
-            guard let target = targets.first(where: { runID.contains("-\($0.id)-r") }) else {
+            guard let target = targets.first(where: {
+                RuntimeTargetIsolationPlan.runID(runID, belongsToTargetID: $0.id)
+            }) else {
                 unresolvedRunIDs.append(runID)
                 continue
             }
@@ -474,6 +511,7 @@ enum RuntimeTargetController {
 
     private static func createTestResource(
         target: RuntimeTargetApp,
+        textScenario: RuntimeTextScenario,
         title: String,
         directoryURL: URL
     ) throws -> TestResource {
@@ -487,19 +525,51 @@ enum RuntimeTargetController {
             let editableLabel = RuntimeTargetIsolationPlan.browserEditableLabel(
                 windowTitleToken: title
             )
+            let escapedInitialText = textScenario.initialText
+                .replacingOccurrences(of: "&", with: "&amp;")
+                .replacingOccurrences(of: "<", with: "&lt;")
+                .replacingOccurrences(of: ">", with: "&gt;")
             let html = """
             <!doctype html>
             <meta charset="utf-8">
             <title>\(escapedTitle)</title>
             <style>
               body { margin: 40px; font: 18px -apple-system, sans-serif; }
-              textarea { width: 900px; height: 420px; font: 20px -apple-system, sans-serif; }
+              #target { width: 900px; height: 420px; padding: 8px; border: 1px solid; font: 20px -apple-system, sans-serif; white-space: pre-wrap; }
             </style>
-            <label for="target">\(editableLabel)</label>
-            <textarea id="target" aria-label="\(editableLabel)" autofocus spellcheck="false"></textarea>
+            <div>\(editableLabel)</div>
+            <div id="target" role="textbox" aria-label="\(editableLabel)" aria-multiline="true" contenteditable="true" spellcheck="false">\(escapedInitialText)</div>
             <script>
               const target = document.getElementById('target');
-              addEventListener('load', () => { target.value = ''; target.focus(); });
+              const cursorOffset = \(textScenario.cursorUTF16Offset);
+              let acceptedText = target.textContent;
+              const placeCursor = () => {
+                const node = target.firstChild || target.appendChild(document.createTextNode(''));
+                const range = document.createRange();
+                range.setStart(node, Math.min(cursorOffset, node.length));
+                range.collapse(true);
+                const selection = getSelection();
+                selection.removeAllRanges();
+                selection.addRange(range);
+              };
+              let pasteObserved = false;
+              target.addEventListener('paste', () => { pasteObserved = true; });
+              target.addEventListener('input', event => {
+                if (pasteObserved || event.inputType === 'insertFromPaste') {
+                  acceptedText = target.textContent;
+                }
+                pasteObserved = false;
+              });
+              const observer = new MutationObserver(() => {
+                if (target.textContent === acceptedText) return;
+                target.textContent = acceptedText;
+                placeCursor();
+              });
+              addEventListener('load', () => {
+                target.focus();
+                placeCursor();
+                observer.observe(target, { childList: true, characterData: true, subtree: true });
+              });
             </script>
             """
             try Data(html.utf8).write(to: url, options: .atomic)
@@ -510,7 +580,7 @@ enum RuntimeTargetController {
                 bundleIdentifier: target.bundleIdentifier
             )
             let url = directoryURL.appendingPathComponent(filename)
-            try Data().write(to: url, options: .atomic)
+            try Data(textScenario.initialText.utf8).write(to: url, options: .atomic)
             return TestResource(url: url, windowTitleToken: title)
         }
     }
@@ -609,10 +679,11 @@ enum RuntimeTargetController {
         throw RuntimeTargetControllerError.targetSurfaceTimedOut(bundleIdentifier)
     }
 
-    private static func establishEmptyBaseline(
+    private static func establishBaseline(
         surface: TargetSurface,
         bundleIdentifier: String,
         windowTitleToken: String,
+        textScenario: RuntimeTextScenario,
         settleSeconds: TimeInterval
     ) -> TargetSurface? {
         var candidate = surface
@@ -622,9 +693,15 @@ enum RuntimeTargetController {
                 windowElement: candidate.windowElement,
                 textElement: candidate.textElement
             )
-            if RuntimeAX.clear(textElement: candidate.textElement) {
+            if RuntimeAX.prepareBaseline(
+                textScenario,
+                textElement: candidate.textElement
+            ) {
                 Thread.sleep(forTimeInterval: settleSeconds)
-                if RuntimeAX.text(from: candidate.textElement)?.isEmpty == true {
+                if RuntimeAX.matchesBaseline(
+                    textScenario,
+                    textElement: candidate.textElement
+                ) {
                     return candidate
                 }
             }
@@ -905,6 +982,45 @@ enum RuntimeAX {
         return waitForEmptyText(textElement, timeoutSeconds: 2)
     }
 
+    static func prepareBaseline(
+        _ scenario: RuntimeTextScenario,
+        textElement: AXUIElement
+    ) -> Bool {
+        if text(from: textElement) != scenario.initialText {
+            _ = AXUIElementSetAttributeValue(
+                textElement,
+                kAXValueAttribute as CFString,
+                scenario.initialText as CFString
+            )
+        }
+        guard waitForText(scenario.initialText, in: textElement, timeoutSeconds: 1) else {
+            return false
+        }
+        guard scenario != .empty else {
+            return true
+        }
+        return setSelectedTextRange(
+            CFRange(location: scenario.cursorUTF16Offset, length: 0),
+            on: textElement
+        )
+    }
+
+    static func matchesBaseline(
+        _ scenario: RuntimeTextScenario,
+        textElement: AXUIElement
+    ) -> Bool {
+        guard text(from: textElement) == scenario.initialText else {
+            return false
+        }
+        guard scenario != .empty else {
+            return true
+        }
+        return sameRange(
+            selectedTextRange(from: textElement),
+            CFRange(location: scenario.cursorUTF16Offset, length: 0)
+        )
+    }
+
     static func waitForFileToBecomeEmpty(_ url: URL, timeoutSeconds: TimeInterval) -> Bool {
         let deadline = Date().addingTimeInterval(timeoutSeconds)
         while Date() < deadline {
@@ -999,6 +1115,64 @@ enum RuntimeAX {
         return text(from: element)?.isEmpty == true
     }
 
+    private static func waitForText(
+        _ expected: String,
+        in element: AXUIElement,
+        timeoutSeconds: TimeInterval
+    ) -> Bool {
+        let deadline = Date().addingTimeInterval(timeoutSeconds)
+        while Date() < deadline {
+            if text(from: element) == expected {
+                return true
+            }
+            RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.02))
+        }
+        return text(from: element) == expected
+    }
+
+    private static func selectedTextRange(from element: AXUIElement) -> CFRange? {
+        var value: CFTypeRef?
+        guard AXUIElementCopyAttributeValue(
+            element,
+            kAXSelectedTextRangeAttribute as CFString,
+            &value
+        ) == .success,
+              let value,
+              CFGetTypeID(value) == AXValueGetTypeID() else {
+            return nil
+        }
+        var range = CFRange()
+        guard AXValueGetValue(value as! AXValue, .cfRange, &range) else {
+            return nil
+        }
+        return range
+    }
+
+    private static func setSelectedTextRange(_ range: CFRange, on element: AXUIElement) -> Bool {
+        var range = range
+        guard let value = AXValueCreate(.cfRange, &range),
+              AXUIElementSetAttributeValue(
+                  element,
+                  kAXSelectedTextRangeAttribute as CFString,
+                  value
+              ) == .success else {
+            return false
+        }
+        let deadline = Date().addingTimeInterval(1)
+        while Date() < deadline {
+            if sameRange(selectedTextRange(from: element), range) {
+                return true
+            }
+            RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.02))
+        }
+        return sameRange(selectedTextRange(from: element), range)
+    }
+
+    private static func sameRange(_ lhs: CFRange?, _ rhs: CFRange?) -> Bool {
+        guard let lhs, let rhs else { return lhs == nil && rhs == nil }
+        return lhs.location == rhs.location && lhs.length == rhs.length
+    }
+
     private static func surfaceExistsInWindows(token: String, in appElement: AXUIElement) -> Bool {
         elementArrayAttribute(kAXWindowsAttribute, from: appElement).contains { windowElement in
             stringAttribute(kAXTitleAttribute, from: windowElement)?
@@ -1068,7 +1242,7 @@ enum RuntimeTargetControllerError: Error, CustomStringConvertible {
     case launcherNotFound(String, String)
     case launchFailed(String, Int32)
     case targetSurfaceTimedOut(String)
-    case couldNotClearTarget
+    case couldNotPrepareTarget
     case renderObservationUnavailable(String)
 
     var description: String {
@@ -1085,8 +1259,8 @@ enum RuntimeTargetControllerError: Error, CustomStringConvertible {
             return "Could not open the test resource in target app \(name) (open exit \(exitCode))"
         case .targetSurfaceTimedOut(let identifier):
             return "Target app did not expose the uniquely identified test surface: \(identifier)"
-        case .couldNotClearTarget:
-            return "Could not establish an empty target-text baseline"
+        case .couldNotPrepareTarget:
+            return "Could not establish the requested target-text baseline and cursor"
         case .renderObservationUnavailable(let message):
             return "Could not establish rendered-text observation: \(message)"
         }

@@ -7,6 +7,7 @@ struct RuntimeCaseReport: Codable {
     let fixturePath: String
     let expectedTranscript: String?
     let target: RuntimeTargetApp
+    let textScenario: RuntimeTextScenario
     let repetition: Int
     let startedAt: Date
     let finishedAt: Date
@@ -65,7 +66,7 @@ struct RuntimeRunSummary: Codable {
 }
 
 struct RuntimeHarnessReport: Codable {
-    var schemaVersion = 5
+    var schemaVersion = 6
     let startedAt: Date
     var finishedAt: Date?
     let configuration: RuntimeHarnessConfiguration
@@ -246,6 +247,7 @@ enum RuntimeHarnessRunner {
             timingPlan = plan
             let target = try RuntimeTargetController.prepare(
                 target: runCase.target,
+                textScenario: runCase.textScenario,
                 runID: runID,
                 settleSeconds: configuration.targetSettleSeconds,
                 availabilityPolicy: configuration.targetAvailabilityPolicy
@@ -328,6 +330,18 @@ enum RuntimeHarnessRunner {
                 transcribedCharacterCount: latencyTrace?.transcribedCharacterCount,
                 maximumWordErrorRate: configuration.maximumWordErrorRate
             )
+            if runCase.target.kind == .browser,
+               latencyTrace?.directTextInsertionSucceeded == true {
+                assessment = RuntimeCaseAssessment(
+                    status: .webInputSemanticsBypassed,
+                    passed: false
+                )
+                let semanticsError = "Web target received direct Accessibility insertion instead of paste semantics"
+                errorText = [errorText, semanticsError]
+                    .compactMap { $0 }
+                    .filter { !$0.isEmpty }
+                    .joined(separator: "; ")
+            }
             if latencyTrace == nil,
                visibleText?.text?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false {
                 assessment = RuntimeCaseAssessment(status: .traceMissing, passed: false)
@@ -403,6 +417,7 @@ enum RuntimeHarnessRunner {
             fixturePath: runCase.fixtureURL.path,
             expectedTranscript: runCase.expectedTranscript,
             target: runCase.target,
+            textScenario: runCase.textScenario,
             repetition: runCase.repetition,
             startedAt: startedAt,
             finishedAt: Date(),
@@ -486,7 +501,7 @@ enum RuntimeHarnessRunner {
             with: "-",
             options: .regularExpression
         )
-        return "\(collapsed)-\(runCase.target.id)-r\(runCase.repetition)-\(UUID().uuidString.prefix(6))"
+        return "\(collapsed)-\(runCase.target.id)-\(runCase.textScenario.rawValue)-r\(runCase.repetition)-\(UUID().uuidString.prefix(6))"
     }
 
     private static func waitUntilSystemUptime(_ target: TimeInterval) {
@@ -615,7 +630,7 @@ enum RuntimeHarnessRunner {
         } ?? "n/a"
         print(
             "[\(index)/\(total)] \(report.target.displayName) | "
-            + "\(URL(fileURLWithPath: report.fixturePath).lastPathComponent) | "
+            + "\(URL(fileURLWithPath: report.fixturePath).lastPathComponent) | \(report.textScenario.rawValue) | "
             + "\(report.assessment.status.rawValue) | rendered=\(latency) ax=\(accessibilityLatency) | "
             + "boundary=\(report.failureBoundary.rawValue)"
         )

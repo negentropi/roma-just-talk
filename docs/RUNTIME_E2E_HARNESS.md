@@ -25,6 +25,7 @@ stable. AX may arrive later without moving the earlier rendered timestamp.
 - Audio lead: `1.1s` before left-Shift key-down
 - Release: `150ms` after the fixture ends
 - Repetitions: `3`
+- Text baselines: empty, plus `[existing before]{cursor}[existing after]`
 - Candidate apps: TextEdit, Safari, Google Chrome, Arc, and Zed
 - Local target policy: `runningOnly`; closed apps are skipped, never launched
 - Coverage gate: at least `4` distinct candidate apps must already be running
@@ -32,8 +33,11 @@ stable. AX may arrive later without moving the earlier rendered timestamp.
 - Rendered-text p95 budget: `250ms`
 - Transcript answer: optional until supplied in the config
 
-Each selected browser opens an isolated local tab with a uniquely titled and
-labelled textarea. Document apps open a uniquely named temporary text file.
+Each selected browser opens an isolated local tab with a uniquely titled,
+controlled contenteditable. It accepts only DOM `input` events, matching web
+apps that reject Accessibility-only value mutation. Document apps open a
+uniquely named temporary text file. Every target runs once empty and once with
+text on both sides of the insertion cursor.
 Cleanup saves an empty temporary document before closing its tab/window, removes
 the resource, terminates only a target process started by the harness, restores
 an initially running target if closing its last isolated surface exits it, and
@@ -93,6 +97,7 @@ capture/transcription trace evidence and target text proves the complete route.
 ## What Fails a Case
 
 - Target app missing, not activated, unreadable through AX, or not cleared
+- Existing text on either side of the insertion cursor is changed or lost
 - WAV cannot play into BlackHole
 - Synthetic Special left Shift is not accepted by VoiceInk
 - Posted Shift hold and VoiceInk-observed hold differ by more than `150ms`
@@ -211,7 +216,7 @@ Default full matrix:
 make runtime-e2e-run
 ```
 
-The default case count is `fixtures x currently-running selected apps x 3`; the
+The default case count is `fixtures x currently-running selected apps x 2 text baselines x 3`; the
 four-app minimum is enforced before Roma or audio state changes.
 
 Custom manifest:

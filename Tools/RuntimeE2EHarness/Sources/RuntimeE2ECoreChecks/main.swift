@@ -47,7 +47,10 @@ do {
     )
 
     try require(targets.count == 5, "default target matrix should contain five apps")
-    try require(runPlan.cases.count == 20, "two fixtures x five apps x two repetitions should create twenty cases")
+    try require(
+        runPlan.cases.count == 40,
+        "two fixtures x five apps x two text scenarios x two repetitions should create forty cases"
+    )
     try require(
         runPlan.cases.first?.expectedTranscript == "expected noisy speech",
         "fixture answer should flow into each case when supplied"
@@ -56,7 +59,33 @@ do {
         runPlan.cases.contains { $0.fixtureURL.lastPathComponent == "normal wispering.wav" && $0.expectedTranscript == nil },
         "fixtures without answers should remain runnable without content assertions"
     )
-    print("PASS fixture/app/repetition matrix carries optional transcript answers")
+    try require(
+        Set(runPlan.cases.map(\.textScenario)) == Set(RuntimeTextScenario.allCases),
+        "every runtime matrix must cover empty and existing-text cursor baselines"
+    )
+    let existingTextScenario = RuntimeTextScenario.existingText
+    try require(
+        existingTextScenario.insertedText(
+            from: existingTextScenario.prefix + "dictated text" + existingTextScenario.suffix
+        ) == "dictated text",
+        "existing-text cases must preserve both sides and isolate inserted text"
+    )
+    try require(
+        existingTextScenario.insertedText(from: "dictated text") == nil,
+        "existing-text cases must fail if either side is lost"
+    )
+    try require(
+        RuntimeTargetIsolationPlan.runID(
+            "fixture-chrome-existingText-r1-ABC123",
+            belongsToTargetID: "chrome"
+        ),
+        "abandoned-target cleanup must recognize text-scenario run IDs"
+    )
+    try require(
+        RuntimeTargetIsolationPlan.runID("fixture-chrome-r1-ABC123", belongsToTargetID: "chrome"),
+        "abandoned-target cleanup must retain legacy run-ID support"
+    )
+    print("PASS fixture/app/text-scenario/repetition matrix carries optional transcript answers")
 
     let noPaste = RuntimeCaseAssessment.assess(
         observation: RuntimeCaseObservation(
@@ -422,6 +451,8 @@ do {
     try require(trace?.triggerObserved == true, "key-down trace event should prove trigger acceptance")
     try require(trace?.pasteEventPosted == true, "paste event should be recognized")
     try require(trace?.textDeliveryHandoffCompleted == true, "clipboard paste should require write and command proof")
+    try require(trace?.clipboardPasteHandoffCompleted == true, "clipboard trace should prove paste semantics")
+    try require(trace?.directTextInsertionSucceeded == false, "clipboard trace must not report direct AX insertion")
     try require(trace?.events.map(\.sequence) == [0, 1, 2, 3, 4, 5], "trace events should stay sequence ordered")
     try require(
         trace?.keyUpToPasteEventMilliseconds ?? -1,
@@ -444,6 +475,14 @@ do {
     try require(
         accessibilityInsertTrace?.textDeliveryHandoffCompleted == true,
         "direct Accessibility insertion should not require a clipboard-write event"
+    )
+    try require(
+        accessibilityInsertTrace?.directTextInsertionSucceeded == true,
+        "direct Accessibility insertion must remain distinguishable from paste semantics"
+    )
+    try require(
+        accessibilityInsertTrace?.clipboardPasteHandoffCompleted == false,
+        "direct Accessibility insertion must not masquerade as clipboard paste"
     )
     try require(
         accessibilityInsertTrace?.keyUpToPasteEventMilliseconds ?? -1,

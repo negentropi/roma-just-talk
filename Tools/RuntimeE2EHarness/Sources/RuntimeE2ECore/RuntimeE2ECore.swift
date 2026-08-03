@@ -61,7 +61,44 @@ public struct RuntimeTargetApp: Codable, Equatable, Hashable, Sendable {
     ]
 }
 
+public enum RuntimeTextScenario: String, Codable, CaseIterable, Sendable {
+    case empty
+    case existingText
+
+    public var prefix: String {
+        self == .existingText ? "[existing before]" : ""
+    }
+
+    public var suffix: String {
+        self == .existingText ? "[existing after]" : ""
+    }
+
+    public var initialText: String {
+        prefix + suffix
+    }
+
+    public var cursorUTF16Offset: Int {
+        prefix.utf16.count
+    }
+
+    public func insertedText(from finalText: String) -> String? {
+        guard finalText.hasPrefix(prefix), finalText.hasSuffix(suffix) else {
+            return nil
+        }
+        return String(finalText.dropFirst(prefix.count).dropLast(suffix.count))
+    }
+}
+
 public enum RuntimeTargetIsolationPlan {
+    public static func runID(_ runID: String, belongsToTargetID targetID: String) -> Bool {
+        if runID.contains("-\(targetID)-r") {
+            return true
+        }
+        return RuntimeTextScenario.allCases.contains {
+            runID.contains("-\(targetID)-\($0.rawValue)-r")
+        }
+    }
+
     public static func documentFilename(
         windowTitleToken: String,
         bundleIdentifier: String
@@ -166,17 +203,20 @@ public struct RuntimeRunCase: Codable, Equatable, Sendable {
     public let fixtureURL: URL
     public let expectedTranscript: String?
     public let target: RuntimeTargetApp
+    public let textScenario: RuntimeTextScenario
     public let repetition: Int
 
     public init(
         fixtureURL: URL,
         expectedTranscript: String?,
         target: RuntimeTargetApp,
+        textScenario: RuntimeTextScenario,
         repetition: Int
     ) {
         self.fixtureURL = fixtureURL
         self.expectedTranscript = expectedTranscript
         self.target = target
+        self.textScenario = textScenario
         self.repetition = repetition
     }
 }
@@ -209,15 +249,18 @@ public struct RuntimeRunPlan: Codable, Equatable, Sendable {
         var cases: [RuntimeRunCase] = []
         for fixtureURL in fixtures {
             for target in targets {
-                for repetition in 1...repetitions {
-                    cases.append(
-                        RuntimeRunCase(
-                            fixtureURL: fixtureURL,
-                            expectedTranscript: expectedTranscripts[fixtureURL.lastPathComponent],
-                            target: target,
-                            repetition: repetition
+                for textScenario in RuntimeTextScenario.allCases {
+                    for repetition in 1...repetitions {
+                        cases.append(
+                            RuntimeRunCase(
+                                fixtureURL: fixtureURL,
+                                expectedTranscript: expectedTranscripts[fixtureURL.lastPathComponent],
+                                target: target,
+                                textScenario: textScenario,
+                                repetition: repetition
+                            )
                         )
-                    )
+                    }
                 }
             }
         }
@@ -422,6 +465,7 @@ public struct RuntimeCaseAssessment: Codable, Equatable, Sendable {
         case microphonePermissionUnavailable
         case transcriptionIncomplete
         case emptyTranscript
+        case webInputSemanticsBypassed
         case noPaste
         case clipboardOnly
         case renderNotObserved
@@ -588,6 +632,7 @@ public enum RuntimeFailureBoundaryPolicy {
         }
         guard evidence.voiceInkTranscriptionCompleted else { return .voiceInkTranscription }
         if assessment.status == .emptyTranscript { return .voiceInkTranscription }
+        if assessment.status == .webInputSemanticsBypassed { return .voiceInkPasteHandoff }
         guard evidence.voiceInkTextDeliveryHandoffSucceeded else {
             return .voiceInkPasteHandoff
         }
@@ -845,7 +890,15 @@ public struct RuntimeLatencyTrace: Codable, Equatable, Sendable {
     }
 
     public var textDeliveryHandoffCompleted: Bool {
-        directTextInsertionSucceeded || (clipboardWriteSucceeded && pasteCommandPosted)
+        directTextInsertionSucceeded || clipboardPasteHandoffCompleted
+    }
+
+    public var directTextInsertionSucceeded: Bool {
+        events.contains { $0.name == "paste_text_inserted" }
+    }
+
+    public var clipboardPasteHandoffCompleted: Bool {
+        clipboardWriteSucceeded && pasteCommandPosted
     }
 
     public var transcriptionCompleted: Bool {
@@ -924,10 +977,6 @@ public struct RuntimeLatencyTrace: Codable, Equatable, Sendable {
     // equivalent product handoff boundary and must not be classified as a missing paste.
     private static func isTextDeliveryEvent(_ event: RuntimeLatencyTraceEvent) -> Bool {
         isPasteCommandEvent(event) || event.name == "paste_text_inserted"
-    }
-
-    private var directTextInsertionSucceeded: Bool {
-        events.contains { $0.name == "paste_text_inserted" }
     }
 
     private var pasteCommandPosted: Bool {

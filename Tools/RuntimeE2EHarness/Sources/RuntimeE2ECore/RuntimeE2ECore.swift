@@ -132,11 +132,8 @@ public enum RuntimeTargetIsolationPlan {
         return "\(windowTitleToken).\(pathExtension)"
     }
 
-    public static func chromeOpenArguments(applicationPath: String, resourceURL: URL) -> [String] {
+    public static func chromeArguments(resourceURL: URL) -> [String] {
         [
-            "-na",
-            applicationPath,
-            "--args",
             "--force-renderer-accessibility",
             "--new-window",
             resourceURL.absoluteString

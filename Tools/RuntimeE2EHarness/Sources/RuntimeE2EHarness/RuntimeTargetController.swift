@@ -593,11 +593,12 @@ enum RuntimeTargetController {
     ) throws {
         let process = Process()
         if bundleIdentifier == "com.google.Chrome" {
-            process.executableURL = URL(fileURLWithPath: "/usr/bin/open")
-            process.arguments = RuntimeTargetIsolationPlan.chromeOpenArguments(
-                applicationPath: appURL.path,
-                resourceURL: resourceURL
-            )
+            guard let launcherURL = Bundle(url: appURL)?.executableURL,
+                  FileManager.default.isExecutableFile(atPath: launcherURL.path) else {
+                throw RuntimeTargetControllerError.launcherNotFound(appName, appURL.path)
+            }
+            process.executableURL = launcherURL
+            process.arguments = RuntimeTargetIsolationPlan.chromeArguments(resourceURL: resourceURL)
         } else if bundleIdentifier == "com.microsoft.VSCode"
             || bundleIdentifier == "com.coteditor.CotEditor" {
             let relativeLauncherPath = bundleIdentifier == "com.microsoft.VSCode"
@@ -616,6 +617,10 @@ enum RuntimeTargetController {
             process.arguments = ["-b", bundleIdentifier, resourceURL.path]
         }
         try process.run()
+        if bundleIdentifier == "com.google.Chrome" {
+            // Chrome may remain attached as the app process; surface discovery is the launch result.
+            return
+        }
         process.waitUntilExit()
         guard process.terminationStatus == 0 else {
             throw RuntimeTargetControllerError.launchFailed(appName, process.terminationStatus)

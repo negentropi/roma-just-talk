@@ -388,25 +388,21 @@ do {
         "Script Editor targets must use its editable document type"
     )
     try require(
-        RuntimeTargetIsolationPlan.chromeOpenArguments(
-            applicationPath: "/Applications/Google Chrome.app",
+        RuntimeTargetIsolationPlan.chromeArguments(
             resourceURL: URL(fileURLWithPath: "/tmp/\(targetTitle).html")
         ) == [
-            "-na",
-            "/Applications/Google Chrome.app",
-            "--args",
             "--force-renderer-accessibility",
             "--new-window",
             "file:///tmp/\(targetTitle.replacingOccurrences(of: " ", with: "%20")).html"
         ],
-        "Chrome fixtures must bypass LaunchServices file delivery"
+        "Chrome fixtures must carry renderer accessibility and an explicit file URL"
     )
     try require(
         RuntimeTargetIsolationPlan.browserEditableLabel(windowTitleToken: targetTitle)
             .contains(targetTitle),
         "browser textarea label must carry the unique target token"
     )
-    print("PASS target resources preserve unique tab/window identity and use explicit Chrome URL launch")
+    print("PASS target resources preserve unique identity and use explicit Chrome URL arguments")
 
     let selectedVoiceInk = RuntimeVoiceInkCandidateSelector.select(
         explicitPath: nil,

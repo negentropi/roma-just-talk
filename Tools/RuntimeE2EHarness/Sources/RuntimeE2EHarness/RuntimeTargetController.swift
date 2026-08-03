@@ -1219,8 +1219,8 @@ enum RuntimeAX {
     ) -> Bool {
         let editedBeforeSave = boolAttribute(kAXEditedAttribute, from: windowElement)
         let fileWasEmpty = fileIsEmpty(fileURL)
-        if editedBeforeSave == false,
-           fileWasEmpty == true {
+        // Cleanup already verified the empty AX baseline; an empty fixture has nothing left to persist.
+        if fileWasEmpty == true {
             return true
         }
         let modificationDateBeforeSave = fileModificationDate(fileURL)

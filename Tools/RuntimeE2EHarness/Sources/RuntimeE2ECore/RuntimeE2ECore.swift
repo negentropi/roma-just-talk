@@ -140,6 +140,28 @@ public enum RuntimeTargetIsolationPlan {
         ]
     }
 
+    public static func vscodeArguments(resourcePath: String) -> [String] {
+        [
+            "--force-renderer-accessibility",
+            "--disable-extensions",
+            "--skip-welcome",
+            "--new-window",
+            resourcePath
+        ]
+    }
+
+    public static func matchesAccessibilityBaseline(
+        _ observedText: String?,
+        scenario: RuntimeTextScenario,
+        targetKind: RuntimeTargetApp.Kind
+    ) -> Bool {
+        guard let observedText else { return false }
+        if targetKind == .electron, scenario == .empty, observedText == "\n" {
+            return true
+        }
+        return observedText == scenario.initialText
+    }
+
     public static func browserEditableLabel(windowTitleToken: String) -> String {
         "Roma Runtime E2E target \(windowTitleToken)"
     }

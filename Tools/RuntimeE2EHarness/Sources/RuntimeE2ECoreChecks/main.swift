@@ -398,11 +398,45 @@ do {
         "Chrome fixtures must carry renderer accessibility and an explicit file URL"
     )
     try require(
+        RuntimeTargetIsolationPlan.vscodeArguments(resourcePath: "/tmp/\(targetTitle).txt") == [
+            "--force-renderer-accessibility",
+            "--disable-extensions",
+            "--skip-welcome",
+            "--new-window",
+            "/tmp/\(targetTitle).txt"
+        ],
+        "VS Code fixtures must launch an isolated accessible editor instance"
+    )
+    try require(
+        RuntimeTargetIsolationPlan.matchesAccessibilityBaseline(
+            "\n",
+            scenario: .empty,
+            targetKind: .electron
+        ),
+        "Electron's accessible empty-line sentinel must count as an empty baseline"
+    )
+    try require(
+        !RuntimeTargetIsolationPlan.matchesAccessibilityBaseline(
+            "\n",
+            scenario: .empty,
+            targetKind: .document
+        ),
+        "native document targets must retain exact empty-text matching"
+    )
+    try require(
+        RuntimeTargetIsolationPlan.matchesAccessibilityBaseline(
+            RuntimeTextScenario.existingText.initialText,
+            scenario: .existingText,
+            targetKind: .electron
+        ),
+        "Electron's prefilled baseline must retain exact surrounding text"
+    )
+    try require(
         RuntimeTargetIsolationPlan.browserEditableLabel(windowTitleToken: targetTitle)
             .contains(targetTitle),
         "browser textarea label must carry the unique target token"
     )
-    print("PASS target resources preserve unique identity and use explicit Chrome URL arguments")
+    print("PASS target resources preserve identity, launch arguments, and editor baselines")
 
     let selectedVoiceInk = RuntimeVoiceInkCandidateSelector.select(
         explicitPath: nil,

@@ -229,7 +229,7 @@ final class RuntimePreparedTarget {
         }
 
         if target.kind.usesDocumentResource {
-            if !RuntimeAX.clear(textElement: textElement) {
+            if !RuntimeAX.clear(textElement: textElement, targetKind: target.kind) {
                 errors.append("Could not clear the temporary document before closing it")
             } else {
                 RuntimeAX.postKey(keyCode: 1, flags: .maskCommand)
@@ -364,14 +364,18 @@ enum RuntimeTargetController {
                 bundleIdentifier: target.bundleIdentifier,
                 windowTitleToken: resource.windowTitleToken,
                 textScenario: textScenario,
+                targetKind: target.kind,
                 settleSeconds: settleSeconds
             ) else {
                 throw RuntimeTargetControllerError.couldNotPrepareTarget
             }
             surface = preparedSurface
-            guard let editableFrame = RuntimeAX.frame(of: surface.textElement) else {
+            guard let editableFrame = RuntimeAX.observationFrame(
+                for: surface.textElement,
+                fallbackWindow: surface.windowElement
+            ) else {
                 throw RuntimeTargetControllerError.renderObservationUnavailable(
-                    "Editable AX element has no global frame"
+                    "Target editor has no usable screen rectangle"
                 )
             }
             let renderedTextObserver: RuntimeRenderedTextObserver
@@ -469,7 +473,7 @@ enum RuntimeTargetController {
                     textElement: surface.textElement
                 )
                 if target.kind.usesDocumentResource {
-                    _ = RuntimeAX.clear(textElement: surface.textElement)
+                    _ = RuntimeAX.clear(textElement: surface.textElement, targetKind: target.kind)
                     RuntimeAX.postKey(keyCode: 1, flags: .maskCommand)
                 }
                 RuntimeAX.postKey(keyCode: 13, flags: .maskCommand)
@@ -592,33 +596,38 @@ enum RuntimeTargetController {
         resourceURL: URL
     ) throws {
         let process = Process()
-        if bundleIdentifier == "com.google.Chrome" {
+        let launchesAsynchronously: Bool
+        if bundleIdentifier == "com.google.Chrome"
+            || bundleIdentifier == "com.microsoft.VSCode" {
             guard let launcherURL = Bundle(url: appURL)?.executableURL,
                   FileManager.default.isExecutableFile(atPath: launcherURL.path) else {
                 throw RuntimeTargetControllerError.launcherNotFound(appName, appURL.path)
             }
             process.executableURL = launcherURL
-            process.arguments = RuntimeTargetIsolationPlan.chromeArguments(resourceURL: resourceURL)
-        } else if bundleIdentifier == "com.microsoft.VSCode"
-            || bundleIdentifier == "com.coteditor.CotEditor" {
-            let relativeLauncherPath = bundleIdentifier == "com.microsoft.VSCode"
-                ? "Contents/Resources/app/bin/code"
-                : "Contents/SharedSupport/bin/cot"
+            process.arguments = bundleIdentifier == "com.google.Chrome"
+                ? RuntimeTargetIsolationPlan.chromeArguments(resourceURL: resourceURL)
+                : RuntimeTargetIsolationPlan.vscodeArguments(resourcePath: resourceURL.path)
+            process.standardInput = FileHandle.nullDevice
+            process.standardOutput = FileHandle.nullDevice
+            process.standardError = FileHandle.nullDevice
+            launchesAsynchronously = true
+        } else if bundleIdentifier == "com.coteditor.CotEditor" {
+            let relativeLauncherPath = "Contents/SharedSupport/bin/cot"
             let launcherURL = appURL.appendingPathComponent(relativeLauncherPath)
             guard FileManager.default.isExecutableFile(atPath: launcherURL.path) else {
                 throw RuntimeTargetControllerError.launcherNotFound(appName, launcherURL.path)
             }
             process.executableURL = launcherURL
-            process.arguments = bundleIdentifier == "com.microsoft.VSCode"
-                ? ["--force-renderer-accessibility", "--reuse-window", resourceURL.path]
-                : [resourceURL.path]
+            process.arguments = [resourceURL.path]
+            launchesAsynchronously = false
         } else {
             process.executableURL = URL(fileURLWithPath: "/usr/bin/open")
             process.arguments = ["-b", bundleIdentifier, resourceURL.path]
+            launchesAsynchronously = false
         }
         try process.run()
-        if bundleIdentifier == "com.google.Chrome" {
-            // Chrome may remain attached as the app process; surface discovery is the launch result.
+        if launchesAsynchronously {
+            // GUI processes may remain attached; bounded surface discovery is the launch result.
             return
         }
         process.waitUntilExit()
@@ -692,6 +701,7 @@ enum RuntimeTargetController {
         bundleIdentifier: String,
         windowTitleToken: String,
         textScenario: RuntimeTextScenario,
+        targetKind: RuntimeTargetApp.Kind,
         settleSeconds: TimeInterval
     ) -> TargetSurface? {
         var candidate = surface
@@ -703,12 +713,14 @@ enum RuntimeTargetController {
             )
             if RuntimeAX.prepareBaseline(
                 textScenario,
-                textElement: candidate.textElement
+                textElement: candidate.textElement,
+                targetKind: targetKind
             ) {
                 Thread.sleep(forTimeInterval: settleSeconds)
                 if RuntimeAX.matchesBaseline(
                     textScenario,
-                    textElement: candidate.textElement
+                    textElement: candidate.textElement,
+                    targetKind: targetKind
                 ) {
                     return candidate
                 }
@@ -759,7 +771,7 @@ enum RuntimeTargetController {
                 textElement: surface.textElement
             )
             if target.kind.usesDocumentResource {
-                _ = RuntimeAX.clear(textElement: surface.textElement)
+                _ = RuntimeAX.clear(textElement: surface.textElement, targetKind: target.kind)
                 RuntimeAX.postKey(keyCode: 1, flags: .maskCommand)
             }
             RuntimeAX.postKey(keyCode: 13, flags: .maskCommand)
@@ -925,6 +937,25 @@ enum RuntimeAX {
         return CGRect(origin: position, size: size)
     }
 
+    static func observationFrame(
+        for textElement: AXUIElement,
+        fallbackWindow: AXUIElement
+    ) -> CGRect? {
+        // Empty Electron text areas can be zero-sized; use the nearest visible editor container.
+        var currentElement: AXUIElement? = textElement
+        for _ in 0..<24 {
+            guard let element = currentElement else { break }
+            if let candidate = frame(of: element), isUsableObservationFrame(candidate) {
+                return candidate
+            }
+            currentElement = elementAttribute(kAXParentAttribute, from: element)
+        }
+        guard let fallback = frame(of: fallbackWindow), isUsableObservationFrame(fallback) else {
+            return nil
+        }
+        return fallback
+    }
+
     static func window(for element: AXUIElement) -> AXUIElement? {
         if let window = elementAttribute(kAXWindowAttribute, from: element) {
             return window
@@ -975,49 +1006,73 @@ enum RuntimeAX {
         RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.05))
     }
 
-    static func clear(textElement: AXUIElement) -> Bool {
+    static func clear(
+        textElement: AXUIElement,
+        targetKind: RuntimeTargetApp.Kind
+    ) -> Bool {
         if AXUIElementSetAttributeValue(
             textElement,
             kAXValueAttribute as CFString,
             "" as CFString
         ) == .success,
-        waitForEmptyText(textElement, timeoutSeconds: 1) {
+        waitForBaselineText(.empty, targetKind: targetKind, in: textElement, timeoutSeconds: 1) {
             return true
         }
 
         postKey(keyCode: 0, flags: .maskCommand)
         postKey(keyCode: 51, flags: [])
-        return waitForEmptyText(textElement, timeoutSeconds: 2)
+        return waitForBaselineText(.empty, targetKind: targetKind, in: textElement, timeoutSeconds: 2)
     }
 
     static func prepareBaseline(
         _ scenario: RuntimeTextScenario,
-        textElement: AXUIElement
+        textElement: AXUIElement,
+        targetKind: RuntimeTargetApp.Kind
     ) -> Bool {
-        if text(from: textElement) != scenario.initialText {
+        if !RuntimeTargetIsolationPlan.matchesAccessibilityBaseline(
+            text(from: textElement),
+            scenario: scenario,
+            targetKind: targetKind
+        ) {
             _ = AXUIElementSetAttributeValue(
                 textElement,
                 kAXValueAttribute as CFString,
                 scenario.initialText as CFString
             )
         }
-        guard waitForText(scenario.initialText, in: textElement, timeoutSeconds: 1) else {
+        guard waitForBaselineText(
+            scenario,
+            targetKind: targetKind,
+            in: textElement,
+            timeoutSeconds: 1
+        ) else {
             return false
         }
         guard scenario != .empty else {
             return true
         }
-        return setSelectedTextRange(
-            CFRange(location: scenario.cursorUTF16Offset, length: 0),
-            on: textElement
-        )
+        let expectedRange = CFRange(location: scenario.cursorUTF16Offset, length: 0)
+        if setSelectedTextRange(expectedRange, on: textElement) {
+            return true
+        }
+        guard targetKind == .electron else { return false }
+        postKey(keyCode: 123, flags: .maskCommand)
+        for _ in 0..<scenario.cursorUTF16Offset {
+            postKey(keyCode: 124, flags: [])
+        }
+        return waitForSelectedTextRange(expectedRange, on: textElement, timeoutSeconds: 1)
     }
 
     static func matchesBaseline(
         _ scenario: RuntimeTextScenario,
-        textElement: AXUIElement
+        textElement: AXUIElement,
+        targetKind: RuntimeTargetApp.Kind
     ) -> Bool {
-        guard text(from: textElement) == scenario.initialText else {
+        guard RuntimeTargetIsolationPlan.matchesAccessibilityBaseline(
+            text(from: textElement),
+            scenario: scenario,
+            targetKind: targetKind
+        ) else {
             return false
         }
         guard scenario != .empty else {
@@ -1089,6 +1144,15 @@ enum RuntimeAX {
         return boolAttribute(kAXEnabledAttribute, from: element) != false
     }
 
+    private static func isUsableObservationFrame(_ frame: CGRect) -> Bool {
+        frame.minX.isFinite
+            && frame.minY.isFinite
+            && frame.width.isFinite
+            && frame.height.isFinite
+            && frame.width >= 16
+            && frame.height >= 16
+    }
+
     private static func editableScore(_ element: AXUIElement) -> Int {
         let role = stringAttribute(kAXRoleAttribute, from: element)
         var score = role == kAXTextAreaRole as String ? 20 : 10
@@ -1109,33 +1173,28 @@ enum RuntimeAX {
         .joined(separator: " ")
     }
 
-    private static func waitForEmptyText(
-        _ element: AXUIElement,
-        timeoutSeconds: TimeInterval
-    ) -> Bool {
-        let deadline = Date().addingTimeInterval(timeoutSeconds)
-        while Date() < deadline {
-            if text(from: element)?.isEmpty == true {
-                return true
-            }
-            RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.02))
-        }
-        return text(from: element)?.isEmpty == true
-    }
-
-    private static func waitForText(
-        _ expected: String,
+    private static func waitForBaselineText(
+        _ scenario: RuntimeTextScenario,
+        targetKind: RuntimeTargetApp.Kind,
         in element: AXUIElement,
         timeoutSeconds: TimeInterval
     ) -> Bool {
         let deadline = Date().addingTimeInterval(timeoutSeconds)
         while Date() < deadline {
-            if text(from: element) == expected {
+            if RuntimeTargetIsolationPlan.matchesAccessibilityBaseline(
+                text(from: element),
+                scenario: scenario,
+                targetKind: targetKind
+            ) {
                 return true
             }
             RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.02))
         }
-        return text(from: element) == expected
+        return RuntimeTargetIsolationPlan.matchesAccessibilityBaseline(
+            text(from: element),
+            scenario: scenario,
+            targetKind: targetKind
+        )
     }
 
     private static func selectedTextRange(from element: AXUIElement) -> CFRange? {
@@ -1167,6 +1226,21 @@ enum RuntimeAX {
             return false
         }
         let deadline = Date().addingTimeInterval(1)
+        while Date() < deadline {
+            if sameRange(selectedTextRange(from: element), range) {
+                return true
+            }
+            RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.02))
+        }
+        return sameRange(selectedTextRange(from: element), range)
+    }
+
+    private static func waitForSelectedTextRange(
+        _ range: CFRange,
+        on element: AXUIElement,
+        timeoutSeconds: TimeInterval
+    ) -> Bool {
+        let deadline = Date().addingTimeInterval(timeoutSeconds)
         while Date() < deadline {
             if sameRange(selectedTextRange(from: element), range) {
                 return true

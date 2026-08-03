@@ -11,6 +11,7 @@ enum CursorTextContextReader {
     private static let commandVMenuTraversalAttempts = 2
     private static let commandVMenuTraversalRetryDelay: TimeInterval = 0.25
     private static let commandVMenuTraversalTimeout: TimeInterval = 0.25
+    private static let targetKeyboardEventDelay: TimeInterval = 0.01
 
     enum SelectedTextInsertionResult: String {
         case inserted
@@ -48,6 +49,51 @@ enum CursorTextContextReader {
         var shouldRetryCommandVMenuDiscovery: Bool {
             self == .unsupported
         }
+    }
+
+    enum CommandVKeyEventPostDisposition: String, Equatable {
+        case commandPosted
+        case deliveryUncertain
+    }
+
+    enum CommandVKeyEvent: String, Hashable {
+        case commandDown = "cmdDown"
+        case vDown
+        case vUp
+        case commandUp = "cmdUp"
+
+        var virtualKey: CGKeyCode {
+            switch self {
+            case .commandDown, .commandUp: 0x37
+            case .vDown, .vUp: 0x09
+            }
+        }
+
+        var keyDown: Bool {
+            self == .commandDown || self == .vDown
+        }
+
+        var isRelease: Bool {
+            !keyDown
+        }
+    }
+
+    struct CommandVKeyEventAttempt {
+        let event: CommandVKeyEvent
+        let result: AXError
+    }
+
+    struct CommandVReleaseFallback {
+        let event: CommandVKeyEvent
+        let posted: Bool
+    }
+
+    struct CommandVKeyEventPostResult {
+        let processIdentifier: pid_t
+        let disposition: CommandVKeyEventPostDisposition
+        let initialAttempts: [CommandVKeyEventAttempt]
+        let cleanupAttempts: [CommandVKeyEventAttempt]
+        let releaseFallbacks: [CommandVReleaseFallback]
     }
 
     @MainActor
@@ -198,23 +244,6 @@ enum CursorTextContextReader {
                 }
                 return processIdentifier
             }
-            if let disabledMenuItem = searchResult.disabledMenuItem {
-                guard focusedProcessIdentifierForPaste() == processIdentifier else {
-                    return nil
-                }
-                let pressResult = AXUIElementPerformAction(
-                    disabledMenuItem,
-                    kAXPressAction as CFString
-                )
-                VoiceInkLatencyTrace.shared.event(
-                    "paste_command_v_menu_press",
-                    details: "attempt=\(attempt + 1) enabled=false result=\(pressResult == .success ? "pressed" : "failed") error=\(pressResult.rawValue)",
-                    token: latencyTraceToken
-                )
-                if pressResult == .success {
-                    return processIdentifier
-                }
-            }
             guard attempt < traversalAttempts - 1 else {
                 return nil
             }
@@ -226,13 +255,136 @@ enum CursorTextContextReader {
         return nil
     }
 
+    @MainActor
+    static func postFocusedCommandVKeyEvents(
+        latencyTraceToken: VoiceInkLatencyTrace.Token?
+    ) async -> CommandVKeyEventPostResult? {
+        guard AXIsProcessTrusted(),
+              let processIdentifier = focusedProcessIdentifierForPaste() else {
+            return nil
+        }
+        let application = AXUIElementCreateApplication(processIdentifier)
+        let postResult = await postCommandVKeyEvents(
+            processIdentifier: processIdentifier,
+            eventDelay: targetKeyboardEventDelay,
+            postTargetEvent: { event in
+                VoiceInkPostTargetVirtualKey(
+                    application,
+                    event.virtualKey,
+                    event.keyDown
+                )
+            },
+            postReleaseFallback: { event in
+                postTargetReleaseEvent(event, to: processIdentifier)
+            }
+        )
+        let initialDetails = postResult.initialAttempts
+            .map { "initial.\($0.event.rawValue)=\($0.result.rawValue)" }
+            .joined(separator: " ")
+        let cleanupDetails = postResult.cleanupAttempts
+            .map { "cleanup.\($0.event.rawValue)=\($0.result.rawValue)" }
+            .joined(separator: " ")
+        let fallbackDetails = postResult.releaseFallbacks
+            .map { "fallback.\($0.event.rawValue)=\($0.posted ? "posted" : "failed")" }
+            .joined(separator: " ")
+        VoiceInkLatencyTrace.shared.event(
+            "paste_target_keyboard_events",
+            details: "targetPid=\(processIdentifier) \(initialDetails) cleanup=\(cleanupDetails.isEmpty ? "none" : cleanupDetails) fallback=\(fallbackDetails.isEmpty ? "none" : fallbackDetails)",
+            token: latencyTraceToken
+        )
+        return postResult
+    }
+
+    @MainActor
+    static func postCommandVKeyEvents(
+        processIdentifier: pid_t,
+        eventDelay: TimeInterval,
+        postTargetEvent: (CommandVKeyEvent) -> AXError,
+        postReleaseFallback: (CommandVKeyEvent) -> Bool
+    ) async -> CommandVKeyEventPostResult {
+        var initialAttempts: [CommandVKeyEventAttempt] = []
+        let commandDownResult = postTargetEvent(.commandDown)
+        initialAttempts.append(CommandVKeyEventAttempt(
+            event: .commandDown,
+            result: commandDownResult
+        ))
+
+        let remainingEvents: [CommandVKeyEvent] = commandDownResult == .success
+            ? [.vDown, .vUp, .commandUp]
+            : [.vUp, .commandUp]
+        for event in remainingEvents {
+            await waitForTargetKeyboardEventDelay(eventDelay)
+            initialAttempts.append(CommandVKeyEventAttempt(
+                event: event,
+                result: postTargetEvent(event)
+            ))
+        }
+
+        let failedReleases = initialAttempts.filter {
+            $0.event.isRelease && $0.result != .success
+        }
+        var cleanupAttempts: [CommandVKeyEventAttempt] = []
+        for failedRelease in failedReleases {
+            await waitForTargetKeyboardEventDelay(eventDelay)
+            cleanupAttempts.append(CommandVKeyEventAttempt(
+                event: failedRelease.event,
+                result: postTargetEvent(failedRelease.event)
+            ))
+        }
+
+        let hasUnresolvedRelease = cleanupAttempts.contains { $0.result != .success }
+        let releaseFallbacks: [CommandVReleaseFallback] = hasUnresolvedRelease
+            ? [CommandVKeyEvent.vUp, .commandUp].map { event in
+                CommandVReleaseFallback(
+                    event: event,
+                    posted: postReleaseFallback(event)
+                )
+            }
+            : []
+        let completeEventSequence: [CommandVKeyEvent] = [
+            .commandDown, .vDown, .vUp, .commandUp
+        ]
+        let commandPosted = initialAttempts.map(\.event) == completeEventSequence
+            && initialAttempts.allSatisfy { $0.result == .success }
+        return CommandVKeyEventPostResult(
+            processIdentifier: processIdentifier,
+            disposition: commandPosted ? .commandPosted : .deliveryUncertain,
+            initialAttempts: initialAttempts,
+            cleanupAttempts: cleanupAttempts,
+            releaseFallbacks: releaseFallbacks
+        )
+    }
+
+    private static func waitForTargetKeyboardEventDelay(_ delay: TimeInterval) async {
+        guard delay > 0 else { return }
+        try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+    }
+
+    private static func postTargetReleaseEvent(
+        _ event: CommandVKeyEvent,
+        to processIdentifier: pid_t
+    ) -> Bool {
+        guard event.isRelease,
+              let keyboardEvent = CGEvent(
+                  keyboardEventSource: CGEventSource(stateID: .combinedSessionState),
+                  virtualKey: event.virtualKey,
+                  keyDown: false
+              ) else {
+            return false
+        }
+        if event == .vUp {
+            keyboardEvent.flags = .maskCommand
+        }
+        keyboardEvent.postToPid(processIdentifier)
+        return true
+    }
+
     private struct CommandVMenuSearchResult {
         let menuItem: AXUIElement?
         let visitedNodes: Int
         let enqueuedNodes: Int
         let shortcutCandidates: Int
         let disabledShortcutCandidates: Int
-        let disabledMenuItem: AXUIElement?
         let limitExhausted: Bool
         let timedOut: Bool
     }
@@ -243,7 +395,6 @@ enum CursorTextContextReader {
         var index = 0
         var shortcutCandidates = 0
         var disabledShortcutCandidates = 0
-        var disabledMenuItem: AXUIElement?
         while index < queue.count,
               index < commandVMenuTraversalLimit,
               Date() < deadline {
@@ -280,13 +431,11 @@ enum CursorTextContextReader {
                             enqueuedNodes: queue.count,
                             shortcutCandidates: shortcutCandidates,
                             disabledShortcutCandidates: disabledShortcutCandidates,
-                            disabledMenuItem: nil,
                             limitExhausted: false,
                             timedOut: false
                         )
                     }
                     disabledShortcutCandidates += 1
-                    disabledMenuItem = disabledMenuItem ?? element
                 }
             }
 
@@ -301,7 +450,6 @@ enum CursorTextContextReader {
             enqueuedNodes: queue.count,
             shortcutCandidates: shortcutCandidates,
             disabledShortcutCandidates: disabledShortcutCandidates,
-            disabledMenuItem: disabledMenuItem,
             limitExhausted: hasUnvisitedNodes && index >= commandVMenuTraversalLimit,
             timedOut: hasUnvisitedNodes && Date() >= deadline
         )

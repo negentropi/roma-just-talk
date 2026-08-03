@@ -26,6 +26,7 @@ class CursorPaster {
     enum PasteResult: Equatable {
         case textInserted
         case commandPosted
+        case commandDeliveryUncertain
         case commandNotPosted
 
         var didPostPasteCommand: Bool {
@@ -33,7 +34,7 @@ class CursorPaster {
         }
 
         var didDeliverText: Bool {
-            self != .commandNotPosted
+            self == .textInserted || self == .commandPosted
         }
     }
 
@@ -235,7 +236,14 @@ class CursorPaster {
                 latencyTraceToken: latencyTraceToken
             )
         } else if shouldRestoreClipboard {
-            logger.notice("\(VoiceInkPasteDiagnostics.skippedClipboardRestoreCommandNotPostedMessage, privacy: .public)")
+            latencyTrace.event(
+                "paste_session.restore_skipped",
+                details: "reason=\(String(describing: pasteResult))",
+                token: latencyTraceToken
+            )
+            if pasteResult == .commandNotPosted {
+                logger.notice("\(VoiceInkPasteDiagnostics.skippedClipboardRestoreCommandNotPostedMessage, privacy: .public)")
+            }
         }
 
         return pasteResult
@@ -402,6 +410,27 @@ class CursorPaster {
                 token: latencyTraceToken
             )
             return .commandPosted
+        }
+        if retryCommandVMenuDiscovery,
+           let targetKeyboardPost = await CursorTextContextReader.postFocusedCommandVKeyEvents(
+               latencyTraceToken: latencyTraceToken
+           ) {
+            switch targetKeyboardPost.disposition {
+            case .commandPosted:
+                VoiceInkLatencyTrace.shared.event(
+                    "paste_event_posted",
+                    details: "method=accessibilityKeyboardEvent targetPid=\(targetKeyboardPost.processIdentifier) disposition=\(targetKeyboardPost.disposition.rawValue)",
+                    token: latencyTraceToken
+                )
+                return .commandPosted
+            case .deliveryUncertain:
+                VoiceInkLatencyTrace.shared.event(
+                    "paste_event_delivery_uncertain",
+                    details: "method=accessibilityKeyboardEvent targetPid=\(targetKeyboardPost.processIdentifier)",
+                    token: latencyTraceToken
+                )
+                return .commandDeliveryUncertain
+            }
         }
 
         let targetProcessIdentifier = CursorTextContextReader.focusedProcessIdentifierForPaste()

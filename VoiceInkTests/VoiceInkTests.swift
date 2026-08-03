@@ -23,7 +23,7 @@ struct VoiceInkTests {
         #expect(AppDefaults.registeredDefaults[VoiceInkUserDefaultsKey.specialShortcutPasteLastTranscriptOnEmptyTap] as? Bool == true)
     }
 
-    @Test @MainActor func failedPasteCommandDoesNotRestoreOverTranscriptClipboard() async throws {
+    @Test @MainActor func unconfirmedPasteCommandDoesNotRestoreOverTranscriptClipboard() async throws {
         let defaults = UserDefaults.standard
         let restoreValue = defaults.object(forKey: "restoreClipboardAfterPaste")
         let restoreDelayValue = defaults.object(forKey: "clipboardRestoreDelay")
@@ -41,17 +41,21 @@ struct VoiceInkTests {
 
         defaults.set(true, forKey: "restoreClipboardAfterPaste")
         defaults.set(0.01, forKey: "clipboardRestoreDelay")
-        pasteboard.clearContents()
-        pasteboard.setString("previous clipboard", forType: .string)
-        CursorPaster.configurePasteCommandPosterForTesting { _ in
-            .commandNotPosted
+        for expectedResult in [
+            CursorPaster.PasteResult.commandNotPosted,
+            .commandDeliveryUncertain
+        ] {
+            pasteboard.clearContents()
+            pasteboard.setString("previous clipboard", forType: .string)
+            CursorPaster.configurePasteCommandPosterForTesting { _ in expectedResult }
+
+            let result = await CursorPaster.pasteAtCursorAndWaitUntilPosted("dictated text")
+            try await Task.sleep(nanoseconds: 350_000_000)
+
+            #expect(result == expectedResult)
+            #expect(!result.didDeliverText)
+            #expect(pasteboard.string(forType: .string) == "dictated text")
         }
-
-        let result = await CursorPaster.pasteAtCursorAndWaitUntilPosted("dictated text")
-        try await Task.sleep(nanoseconds: 350_000_000)
-
-        #expect(result == .commandNotPosted)
-        #expect(pasteboard.string(forType: .string) == "dictated text")
     }
 
     @Test @MainActor func accessibilityInsertDeliversWithoutTouchingClipboard() async throws {
@@ -203,6 +207,79 @@ struct VoiceInkTests {
             virtualKey: 0x09,
             modifiers: 1
         ))
+    }
+
+    @Test @MainActor func targetCommandVKeyEventFailuresDoNotRiskDuplicatePaste() async {
+        let failed = AXError.cannotComplete
+        var failedCommandDownEvents: [CursorTextContextReader.CommandVKeyEvent] = []
+        let failedCommandDown = await CursorTextContextReader.postCommandVKeyEvents(
+            processIdentifier: 42,
+            eventDelay: 0,
+            postTargetEvent: { event in
+                failedCommandDownEvents.append(event)
+                return event == .commandDown ? failed : .success
+            },
+            postReleaseFallback: { _ in true }
+        )
+        #expect(failedCommandDownEvents == [.commandDown, .vUp, .commandUp])
+        #expect(failedCommandDown.disposition == .deliveryUncertain)
+        #expect(failedCommandDown.releaseFallbacks.isEmpty)
+
+        var failedReleaseEvents: [CursorTextContextReader.CommandVKeyEvent] = []
+        var releaseFallbackEvents: [CursorTextContextReader.CommandVKeyEvent] = []
+        let failedReleases = await CursorTextContextReader.postCommandVKeyEvents(
+            processIdentifier: 42,
+            eventDelay: 0,
+            postTargetEvent: { event in
+                failedReleaseEvents.append(event)
+                return event.isRelease ? failed : .success
+            },
+            postReleaseFallback: { event in
+                releaseFallbackEvents.append(event)
+                return true
+            }
+        )
+        #expect(failedReleaseEvents == [
+            .commandDown, .vDown, .vUp, .commandUp, .vUp, .commandUp
+        ])
+        #expect(releaseFallbackEvents == [.vUp, .commandUp])
+        #expect(failedReleases.disposition == .deliveryUncertain)
+
+        var vUpAttemptCount = 0
+        var singleReleaseFallbackEvents: [CursorTextContextReader.CommandVKeyEvent] = []
+        let failedVUp = await CursorTextContextReader.postCommandVKeyEvents(
+            processIdentifier: 42,
+            eventDelay: 0,
+            postTargetEvent: { event in
+                if event == .vUp {
+                    vUpAttemptCount += 1
+                    return failed
+                }
+                return .success
+            },
+            postReleaseFallback: { event in
+                singleReleaseFallbackEvents.append(event)
+                return true
+            }
+        )
+        #expect(vUpAttemptCount == 2)
+        #expect(singleReleaseFallbackEvents == [.vUp, .commandUp])
+        #expect(failedVUp.disposition == .deliveryUncertain)
+
+        var successfulEvents: [CursorTextContextReader.CommandVKeyEvent] = []
+        let successfulPost = await CursorTextContextReader.postCommandVKeyEvents(
+            processIdentifier: 42,
+            eventDelay: 0,
+            postTargetEvent: { event in
+                successfulEvents.append(event)
+                return .success
+            },
+            postReleaseFallback: { _ in false }
+        )
+        #expect(successfulEvents == [.commandDown, .vDown, .vUp, .commandUp])
+        #expect(successfulPost.disposition == .commandPosted)
+        #expect(successfulPost.cleanupAttempts.isEmpty)
+        #expect(successfulPost.releaseFallbacks.isEmpty)
     }
 
     @Test func accessibilityInsertionObservationAcceptsTextOrCursorMutation() {

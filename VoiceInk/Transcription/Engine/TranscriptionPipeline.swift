@@ -351,7 +351,8 @@ class TranscriptionPipeline {
             latencyTrace.end(stopSoundSpan)
             let dismissSpan = latencyTrace.begin("pipeline.dismiss_recorder", token: traceToken)
             await restorePromptDetectionSettingsAndDismiss {
-                if let autoSendKey,
+                if pasteResult.didDeliverText,
+                   let autoSendKey,
                    let delayAfterPaste = VoiceInkAutoSendPolicy.delayAfterPasteNanoseconds(for: autoSendKey) {
                     Task { @MainActor in
                         try? await Task.sleep(nanoseconds: delayAfterPaste)

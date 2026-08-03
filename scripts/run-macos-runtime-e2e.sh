@@ -332,8 +332,12 @@ test -x "$lsregister_bin"
   > "$evidence/app-registration.log" 2>&1
 launch_detached "$evidence/textedit-launch.log" -b com.apple.TextEdit
 launch_detached "$evidence/safari-launch.log" -b com.apple.Safari
-launch_detached "$evidence/chrome-launch.log" -b com.google.Chrome
-launch_detached "$evidence/vscode-launch.log" -b com.microsoft.VSCode
+launch_detached "$evidence/chrome-launch.log" \
+  -na "/Applications/Google Chrome.app" --args \
+  --force-renderer-accessibility --no-first-run --no-default-browser-check about:blank
+launch_detached "$evidence/vscode-launch.log" \
+  -na "/Applications/Visual Studio Code.app" --args \
+  --force-renderer-accessibility --disable-extensions --skip-welcome
 sleep 15
 stop_launchers
 

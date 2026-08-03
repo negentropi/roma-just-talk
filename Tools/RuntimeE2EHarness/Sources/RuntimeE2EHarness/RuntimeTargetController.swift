@@ -592,7 +592,13 @@ enum RuntimeTargetController {
         resourceURL: URL
     ) throws {
         let process = Process()
-        if bundleIdentifier == "com.microsoft.VSCode"
+        if bundleIdentifier == "com.google.Chrome" {
+            process.executableURL = URL(fileURLWithPath: "/usr/bin/open")
+            process.arguments = RuntimeTargetIsolationPlan.chromeOpenArguments(
+                applicationPath: appURL.path,
+                resourceURL: resourceURL
+            )
+        } else if bundleIdentifier == "com.microsoft.VSCode"
             || bundleIdentifier == "com.coteditor.CotEditor" {
             let relativeLauncherPath = bundleIdentifier == "com.microsoft.VSCode"
                 ? "Contents/Resources/app/bin/code"
@@ -603,14 +609,11 @@ enum RuntimeTargetController {
             }
             process.executableURL = launcherURL
             process.arguments = bundleIdentifier == "com.microsoft.VSCode"
-                ? ["--reuse-window", resourceURL.path]
+                ? ["--force-renderer-accessibility", "--reuse-window", resourceURL.path]
                 : [resourceURL.path]
         } else {
             process.executableURL = URL(fileURLWithPath: "/usr/bin/open")
-            process.arguments = RuntimeTargetIsolationPlan.openArguments(
-                bundleIdentifier: bundleIdentifier,
-                resourcePath: resourceURL.path
-            )
+            process.arguments = ["-b", bundleIdentifier, resourceURL.path]
         }
         try process.run()
         process.waitUntilExit()

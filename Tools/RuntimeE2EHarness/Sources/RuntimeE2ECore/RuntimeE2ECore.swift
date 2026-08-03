@@ -132,8 +132,15 @@ public enum RuntimeTargetIsolationPlan {
         return "\(windowTitleToken).\(pathExtension)"
     }
 
-    public static func openArguments(bundleIdentifier: String, resourcePath: String) -> [String] {
-        ["-b", bundleIdentifier, resourcePath]
+    public static func chromeOpenArguments(applicationPath: String, resourceURL: URL) -> [String] {
+        [
+            "-na",
+            applicationPath,
+            "--args",
+            "--force-renderer-accessibility",
+            "--new-window",
+            resourceURL.absoluteString
+        ]
     }
 
     public static func browserEditableLabel(windowTitleToken: String) -> String {

@@ -1281,30 +1281,38 @@ enum RuntimeAX {
         timeoutSeconds: TimeInterval,
         useCloseButtonFallback: Bool
     ) -> Bool {
-        guard let application else { return false }
+        guard let application else {
+            return reportCloseFailure("application unavailable", token: token, in: appElement)
+        }
+        var discardedSheetCount = 0
         // A scoped surface may outlive one close attempt; retry only while its unique token exists.
         for _ in 0..<2 {
             guard let currentWindow = surfaceWindow(token: token, in: appElement) else {
                 return true
             }
             guard let currentTextElement = editableElement(in: currentWindow, identifying: token)
-                ?? firstEditableElement(in: currentWindow) else { return false }
+                ?? firstEditableElement(in: currentWindow) else {
+                return reportCloseFailure("editable element unavailable", token: token, in: appElement)
+            }
             guard focus(
                 application: application,
                 windowElement: currentWindow,
                 textElement: currentTextElement
-            ) else { return false }
+            ) else {
+                return reportCloseFailure("window focus failed", token: token, in: appElement)
+            }
             postKey(
                 keyCode: 13,
                 flags: .maskCommand,
                 processIdentifier: application.processIdentifier
             )
-            if useCloseButtonFallback {
-                _ = discardChangesSheetIfPresent(
+            if useCloseButtonFallback,
+               discardChangesSheetIfPresent(
                     in: currentWindow,
                     processIdentifier: application.processIdentifier,
                     timeoutSeconds: 0.5
-                )
+               ) {
+                discardedSheetCount += 1
             }
             if waitForSurfaceToClose(
                 token: token,
@@ -1314,28 +1322,50 @@ enum RuntimeAX {
                 return true
             }
         }
-        guard useCloseButtonFallback,
-              let currentWindow = surfaceWindow(token: token, in: appElement),
-              let currentTextElement = editableElement(in: currentWindow, identifying: token)
-                ?? firstEditableElement(in: currentWindow),
-              focus(
-                  application: application,
-                  windowElement: currentWindow,
-                  textElement: currentTextElement
-              ),
-              let closeButton = elementAttribute(kAXCloseButtonAttribute, from: currentWindow),
-              AXUIElementPerformAction(closeButton, kAXPressAction as CFString) == .success else {
-            return false
+        guard useCloseButtonFallback else {
+            return reportCloseFailure("keyboard close attempts exhausted", token: token, in: appElement)
         }
-        _ = discardChangesSheetIfPresent(
+        guard let currentWindow = surfaceWindow(token: token, in: appElement),
+              let currentTextElement = editableElement(in: currentWindow, identifying: token)
+                ?? firstEditableElement(in: currentWindow) else {
+            return reportCloseFailure("fallback surface unavailable", token: token, in: appElement)
+        }
+        guard focus(
+            application: application,
+            windowElement: currentWindow,
+            textElement: currentTextElement
+        ) else {
+            return reportCloseFailure("fallback focus failed", token: token, in: appElement)
+        }
+        guard let closeButton = elementAttribute(kAXCloseButtonAttribute, from: currentWindow) else {
+            return reportCloseFailure("close button unavailable", token: token, in: appElement)
+        }
+        let closeAction = AXUIElementPerformAction(closeButton, kAXPressAction as CFString)
+        guard closeAction == .success else {
+            return reportCloseFailure(
+                "close button action failed: \(closeAction.rawValue)",
+                token: token,
+                in: appElement
+            )
+        }
+        if discardChangesSheetIfPresent(
             in: currentWindow,
             processIdentifier: application.processIdentifier,
             timeoutSeconds: 0.5
-        )
-        return waitForSurfaceToClose(
+        ) {
+            discardedSheetCount += 1
+        }
+        if waitForSurfaceToClose(
             token: token,
             in: appElement,
             timeoutSeconds: timeoutSeconds
+        ) {
+            return true
+        }
+        return reportCloseFailure(
+            "close button left surface open; discardedSheets=\(discardedSheetCount)",
+            token: token,
+            in: appElement
         )
     }
 
@@ -1375,6 +1405,68 @@ enum RuntimeAX {
             }
             RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.02))
         } while Date() < deadline
+        return false
+    }
+
+    private static func reportCloseFailure(
+        _ reason: String,
+        token: String,
+        in appElement: AXUIElement
+    ) -> Bool {
+        let details: String
+        if let windowElement = surfaceWindow(token: token, in: appElement) {
+            let titleMatchesToken = stringAttribute(kAXTitleAttribute, from: windowElement)?
+                .localizedCaseInsensitiveContains(token) == true
+            let documentMatchesToken = stringAttribute(kAXDocumentAttribute, from: windowElement)?
+                .localizedCaseInsensitiveContains(token) == true
+            let edited = boolAttribute(kAXEditedAttribute, from: windowElement)
+                .map(String.init(describing:)) ?? "<nil>"
+            let focusedWindow = elementAttribute(kAXFocusedWindowAttribute, from: appElement)
+            let isFocused = focusedWindow.map { CFEqual($0, windowElement) } ?? false
+            var queue: [(AXUIElement, Int)] = [(windowElement, 0)]
+            var index = 0
+            var roleCounts: [String: Int] = [:]
+            var buttonCount = 0
+            var discardButtonCount = 0
+            var traversalTruncated = false
+            var depthLimitReached = false
+            let traversalDeadline = Date().addingTimeInterval(0.25)
+            while index < queue.count, index < 200, Date() < traversalDeadline {
+                let (element, depth) = queue[index]
+                index += 1
+                let role = stringAttribute(kAXRoleAttribute, from: element) ?? "<nil>"
+                roleCounts[role, default: 0] += 1
+                if role == kAXButtonRole as String {
+                    buttonCount += 1
+                    let title = stringAttribute(kAXTitleAttribute, from: element) ?? ""
+                    if ["don't save", "delete", "revert changes"].contains(title.lowercased()) {
+                        discardButtonCount += 1
+                    }
+                }
+                if depth < 6 {
+                    let children = elementArrayAttribute(kAXChildrenAttribute, from: element)
+                    let remainingCapacity = max(0, 200 - queue.count)
+                    traversalTruncated = traversalTruncated || children.count > remainingCapacity
+                    queue.append(contentsOf: children.prefix(remainingCapacity).map { ($0, depth + 1) })
+                } else {
+                    depthLimitReached = true
+                }
+            }
+            let timeLimitReached = index < queue.count
+            let roleSummary = roleCounts
+                .sorted { $0.key < $1.key }
+                .map { "\($0.key):\($0.value)" }
+                .joined(separator: ",")
+            details = "titleMatchesToken=\(titleMatchesToken) documentMatchesToken=\(documentMatchesToken) "
+                + "edited=\(edited) focused=\(isFocused) roles=\(roleSummary) "
+                + "buttons=\(buttonCount) discardButtons=\(discardButtonCount) "
+                + "queueTruncated=\(traversalTruncated) depthLimitReached=\(depthLimitReached) "
+                + "timeLimitReached=\(timeLimitReached)"
+        } else {
+            details = "surface=<absent>"
+        }
+        let message = "Runtime E2E close attempt failed: \(reason); token=\(token); \(details)\n"
+        FileHandle.standardError.write(Data(message.utf8))
         return false
     }
 

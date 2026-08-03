@@ -239,7 +239,7 @@ final class RuntimePreparedTarget {
             }
         }
 
-        let surfaceClosed = RuntimeAX.closeSurface(
+        var surfaceClosed = RuntimeAX.closeSurface(
             application: application,
             token: info.windowTitleToken,
             in: appElement,
@@ -255,6 +255,16 @@ final class RuntimePreparedTarget {
             } else {
                 errors.append("Could not terminate newly launched target process \(application.processIdentifier)")
             }
+        }
+        if !surfaceClosed, terminatedProcessIdentifiers.contains(info.processIdentifier) {
+            surfaceClosed = RuntimeAX.waitForSurfaceToClose(
+                token: info.windowTitleToken,
+                in: appElement,
+                timeoutSeconds: 1
+            )
+        }
+        if !surfaceClosed {
+            errors.append("Could not close the uniquely tokened target surface")
         }
         let restoredInitiallyRunningApplication =
             RuntimeTargetController.restoreInitiallyRunningApplicationIfNeeded(
@@ -330,7 +340,16 @@ enum RuntimeTargetController {
         }
 
         let previousFrontmostApplication = NSWorkspace.shared.frontmostApplication
-        let existingApplications = NSRunningApplication.runningApplications(withBundleIdentifier: target.bundleIdentifier)
+        var existingApplications = NSRunningApplication.runningApplications(withBundleIdentifier: target.bundleIdentifier)
+        if availabilityPolicy == .runningOnly, existingApplications.isEmpty {
+            let deadline = Date().addingTimeInterval(2)
+            while existingApplications.isEmpty, Date() < deadline {
+                RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.05))
+                existingApplications = NSRunningApplication.runningApplications(
+                    withBundleIdentifier: target.bundleIdentifier
+                )
+            }
+        }
         if availabilityPolicy == .runningOnly, existingApplications.isEmpty {
             throw RuntimeTargetControllerError.targetNotRunning(target.bundleIdentifier)
         }
@@ -1009,9 +1028,11 @@ enum RuntimeAX {
         let appElement = AXUIElementCreateApplication(application.processIdentifier)
         let deadline = Date().addingTimeInterval(0.5)
         while Date() < deadline {
+            let focusedWindow = elementAttribute(kAXFocusedWindowAttribute, from: appElement)
             if !application.isTerminated,
                NSWorkspace.shared.frontmostApplication?.processIdentifier == application.processIdentifier,
-               focusedEditableElement(in: appElement, matchingWindow: windowElement) != nil {
+               let focusedWindow,
+               CFEqual(focusedWindow, windowElement) {
                 return true
             }
             RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.02))

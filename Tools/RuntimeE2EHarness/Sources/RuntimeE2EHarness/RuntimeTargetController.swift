@@ -243,7 +243,8 @@ final class RuntimePreparedTarget {
             application: application,
             token: info.windowTitleToken,
             in: appElement,
-            timeoutSeconds: 3
+            timeoutSeconds: 3,
+            useCloseButtonFallback: target.bundleIdentifier == "com.apple.TextEdit"
         )
 
         var terminatedProcessIdentifiers: [Int32] = []
@@ -499,7 +500,8 @@ enum RuntimeTargetController {
                     application: surface.application,
                     token: matchedToken,
                     in: surface.appElement,
-                    timeoutSeconds: 2
+                    timeoutSeconds: 2,
+                    useCloseButtonFallback: target.bundleIdentifier == "com.apple.TextEdit"
                 ) {
                     closedSurfaces += 1
                 }
@@ -797,7 +799,8 @@ enum RuntimeTargetController {
                 application: surface.application,
                 token: windowTitleToken,
                 in: surface.appElement,
-                timeoutSeconds: 2
+                timeoutSeconds: 2,
+                useCloseButtonFallback: target.bundleIdentifier == "com.apple.TextEdit"
             )
         }
 
@@ -1148,7 +1151,8 @@ enum RuntimeAX {
         application: NSRunningApplication?,
         token: String,
         in appElement: AXUIElement,
-        timeoutSeconds: TimeInterval
+        timeoutSeconds: TimeInterval,
+        useCloseButtonFallback: Bool
     ) -> Bool {
         guard let application else { return false }
         // A scoped surface may outlive one close attempt; retry only while its unique token exists.
@@ -1172,7 +1176,24 @@ enum RuntimeAX {
                 return true
             }
         }
-        return false
+        guard useCloseButtonFallback,
+              let currentWindow = surfaceWindow(token: token, in: appElement),
+              let currentTextElement = editableElement(in: currentWindow, identifying: token)
+                ?? firstEditableElement(in: currentWindow),
+              focus(
+                  application: application,
+                  windowElement: currentWindow,
+                  textElement: currentTextElement
+              ),
+              let closeButton = elementAttribute(kAXCloseButtonAttribute, from: currentWindow),
+              AXUIElementPerformAction(closeButton, kAXPressAction as CFString) == .success else {
+            return false
+        }
+        return waitForSurfaceToClose(
+            token: token,
+            in: appElement,
+            timeoutSeconds: timeoutSeconds
+        )
     }
 
     static func waitForTermination(

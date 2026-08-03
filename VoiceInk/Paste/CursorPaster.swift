@@ -380,7 +380,7 @@ class CursorPaster {
         }
 
         await wait(prePasteDelay)
-        if let targetProcessIdentifier = CursorTextContextReader.pressFocusedCommandVMenuItem() {
+        if let targetProcessIdentifier = await CursorTextContextReader.pressFocusedCommandVMenuItem() {
             VoiceInkLatencyTrace.shared.event(
                 "paste_event_posted",
                 details: "method=accessibilityMenuCommandV targetPid=\(targetProcessIdentifier)",

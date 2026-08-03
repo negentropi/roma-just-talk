@@ -7,8 +7,9 @@ enum CursorTextContextReader {
     // Bound malformed Accessibility parent chains without missing deeply nested web editors.
     private static let insertionAncestorTraversalLimit = 64
     private static let commandVMenuTraversalLimit = 512
-    // The first cold Chromium traversal populates its Accessibility menu cache.
+    // Give cold web-editor Accessibility menu discovery one bounded retry.
     private static let commandVMenuTraversalAttempts = 2
+    private static let commandVMenuTraversalRetryDelay: TimeInterval = 0.25
     private static let commandVMenuTraversalTimeout: TimeInterval = 0.25
 
     enum SelectedTextInsertionResult: String {
@@ -138,7 +139,7 @@ enum CursorTextContextReader {
     }
 
     @MainActor
-    static func pressFocusedCommandVMenuItem() -> pid_t? {
+    static func pressFocusedCommandVMenuItem() async -> pid_t? {
         guard AXIsProcessTrusted(),
               let focusedElement = focusedElement(from: AXUIElementCreateSystemWide()) else {
             return nil
@@ -151,7 +152,7 @@ enum CursorTextContextReader {
         }
         let application = AXUIElementCreateApplication(processIdentifier)
 
-        for _ in 0..<commandVMenuTraversalAttempts {
+        for attempt in 0..<commandVMenuTraversalAttempts {
             guard focusedProcessIdentifierForPaste() == processIdentifier else {
                 return nil
             }
@@ -159,6 +160,16 @@ enum CursorTextContextReader {
                 kAXMenuBarAttribute as CFString,
                 from: application
             ), let menuItem = plainCommandVMenuItem(in: menuBar) else {
+                guard attempt < commandVMenuTraversalAttempts - 1,
+                      !shouldUseDirectAccessibilityInsertion(
+                          ancestorRoles: insertionAncestorRoles(startingAt: focusedElement)
+                      ) else {
+                    return nil
+                }
+                // Let the Accessibility server process cold menu discovery before retrying.
+                try? await Task.sleep(
+                    nanoseconds: UInt64(commandVMenuTraversalRetryDelay * 1_000_000_000)
+                )
                 continue
             }
             // The app's plain Cmd-V command is target-affine, unlike a global key event.

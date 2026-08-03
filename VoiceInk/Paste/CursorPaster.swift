@@ -419,11 +419,9 @@ class CursorPaster {
         }
         VoiceInkLatencyTrace.shared.event(
             "paste_event_posted",
-            details: if let targetProcessIdentifier {
-                "method=cgEvent source=combinedSession targetPid=\(targetProcessIdentifier)"
-            } else {
-                "method=cgEvent source=combinedSession target=global"
-            },
+            details: targetProcessIdentifier.map {
+                "method=cgEvent source=combinedSession targetPid=\($0)"
+            } ?? "method=cgEvent source=combinedSession target=global",
             token: latencyTraceToken
         )
 

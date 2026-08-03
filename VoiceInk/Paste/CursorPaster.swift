@@ -380,6 +380,15 @@ class CursorPaster {
         }
 
         await wait(prePasteDelay)
+        if let targetProcessIdentifier = CursorTextContextReader.pressFocusedCommandVMenuItem() {
+            VoiceInkLatencyTrace.shared.event(
+                "paste_event_posted",
+                details: "method=accessibilityMenuCommandV targetPid=\(targetProcessIdentifier)",
+                token: latencyTraceToken
+            )
+            return .commandPosted
+        }
+
         let targetProcessIdentifier = CursorTextContextReader.focusedProcessIdentifierForPaste()
         // VoiceInk posts from the active login session, so share that session's
         // accumulated keyboard state instead of creating an isolated private state.
@@ -410,9 +419,11 @@ class CursorPaster {
         }
         VoiceInkLatencyTrace.shared.event(
             "paste_event_posted",
-            details: targetProcessIdentifier.map {
-                "method=cgEvent source=combinedSession targetPid=\($0)"
-            } ?? "method=cgEvent source=combinedSession target=global",
+            details: if let targetProcessIdentifier {
+                "method=cgEvent source=combinedSession targetPid=\(targetProcessIdentifier)"
+            } else {
+                "method=cgEvent source=combinedSession target=global"
+            },
             token: latencyTraceToken
         )
 

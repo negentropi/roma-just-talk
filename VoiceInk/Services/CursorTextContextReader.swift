@@ -6,6 +6,8 @@ enum CursorTextContextReader {
     private static let webAreaRole = "AXWebArea"
     // Bound malformed Accessibility parent chains without missing deeply nested web editors.
     private static let insertionAncestorTraversalLimit = 64
+    private static let commandVMenuTraversalLimit = 512
+    private static let commandVMenuTraversalTimeout: TimeInterval = 0.1
 
     enum SelectedTextInsertionResult: String {
         case inserted
@@ -131,6 +133,78 @@ enum CursorTextContextReader {
             return nil
         }
         return processIdentifier
+    }
+
+    @MainActor
+    static func pressFocusedCommandVMenuItem() -> pid_t? {
+        guard AXIsProcessTrusted(),
+              let focusedElement = focusedElement(from: AXUIElementCreateSystemWide()) else {
+            return nil
+        }
+        var processIdentifier = pid_t()
+        guard AXUIElementGetPid(focusedElement, &processIdentifier) == .success,
+              processIdentifier > 0,
+              processIdentifier != ProcessInfo.processInfo.processIdentifier,
+              let menuBar = elementAttribute(
+                  kAXMenuBarAttribute as CFString,
+                  from: AXUIElementCreateApplication(processIdentifier)
+              ) else {
+            return nil
+        }
+
+        let deadline = Date().addingTimeInterval(commandVMenuTraversalTimeout)
+        var queue = [menuBar]
+        var index = 0
+        while index < queue.count,
+              index < commandVMenuTraversalLimit,
+              Date() < deadline {
+            let element = queue[index]
+            index += 1
+            if role(from: element) == kAXMenuItemRole as String,
+               isPlainCommandVMenuItem(
+                   commandCharacter: stringAttribute(
+                       kAXMenuItemCmdCharAttribute as CFString,
+                       from: element
+                   ),
+                   virtualKey: numberAttribute(
+                       kAXMenuItemCmdVirtualKeyAttribute as CFString,
+                       from: element
+                   )?.intValue,
+                   modifiers: numberAttribute(
+                       kAXMenuItemCmdModifiersAttribute as CFString,
+                       from: element
+                   )?.uint32Value,
+                   enabled: numberAttribute(
+                       kAXEnabledAttribute as CFString,
+                       from: element
+                   )?.boolValue == true
+               ) {
+                // The app's plain Cmd-V command is target-affine, unlike a global key event.
+                guard Date() < deadline,
+                      focusedProcessIdentifierForPaste() == processIdentifier else {
+                    return nil
+                }
+                if AXUIElementPerformAction(element, kAXPressAction as CFString) == .success {
+                    return processIdentifier
+                }
+            }
+
+            let remainingCapacity = commandVMenuTraversalLimit - queue.count
+            guard remainingCapacity > 0 else { continue }
+            queue.append(contentsOf: childElements(from: element).prefix(remainingCapacity))
+        }
+        return nil
+    }
+
+    static func isPlainCommandVMenuItem(
+        commandCharacter: String?,
+        virtualKey: Int?,
+        modifiers: UInt32?,
+        enabled: Bool
+    ) -> Bool {
+        guard enabled, modifiers == 0 else { return false }
+        return commandCharacter?.caseInsensitiveCompare("v") == .orderedSame
+            || virtualKey == 0x09
     }
 
     @MainActor
@@ -413,6 +487,54 @@ enum CursorTextContextReader {
         }
 
         return (value as! AXUIElement)
+    }
+
+    private static func elementAttribute(
+        _ attribute: CFString,
+        from element: AXUIElement
+    ) -> AXUIElement? {
+        var value: CFTypeRef?
+        guard AXUIElementCopyAttributeValue(element, attribute, &value) == .success,
+              let value,
+              CFGetTypeID(value) == AXUIElementGetTypeID() else {
+            return nil
+        }
+        return (value as! AXUIElement)
+    }
+
+    private static func childElements(from element: AXUIElement) -> [AXUIElement] {
+        var value: CFTypeRef?
+        guard AXUIElementCopyAttributeValue(
+            element,
+            kAXChildrenAttribute as CFString,
+            &value
+        ) == .success,
+              let values = value as? [AXUIElement] else {
+            return []
+        }
+        return values
+    }
+
+    private static func stringAttribute(
+        _ attribute: CFString,
+        from element: AXUIElement
+    ) -> String? {
+        var value: CFTypeRef?
+        guard AXUIElementCopyAttributeValue(element, attribute, &value) == .success else {
+            return nil
+        }
+        return value as? String
+    }
+
+    private static func numberAttribute(
+        _ attribute: CFString,
+        from element: AXUIElement
+    ) -> NSNumber? {
+        var value: CFTypeRef?
+        guard AXUIElementCopyAttributeValue(element, attribute, &value) == .success else {
+            return nil
+        }
+        return value as? NSNumber
     }
 
     private static func focusedElement(from systemWideElement: AXUIElement) -> AXUIElement? {

@@ -159,6 +159,39 @@ struct VoiceInkTests {
         ))
     }
 
+    @Test func accessibilityCommandVMenuMatchRequiresEnabledPlainShortcut() {
+        #expect(CursorTextContextReader.isPlainCommandVMenuItem(
+            commandCharacter: "V",
+            virtualKey: nil,
+            modifiers: 0,
+            enabled: true
+        ))
+        #expect(CursorTextContextReader.isPlainCommandVMenuItem(
+            commandCharacter: nil,
+            virtualKey: 0x09,
+            modifiers: 0,
+            enabled: true
+        ))
+        #expect(!CursorTextContextReader.isPlainCommandVMenuItem(
+            commandCharacter: "v",
+            virtualKey: 0x09,
+            modifiers: 1,
+            enabled: true
+        ))
+        #expect(!CursorTextContextReader.isPlainCommandVMenuItem(
+            commandCharacter: "v",
+            virtualKey: 0x09,
+            modifiers: 0,
+            enabled: false
+        ))
+        #expect(!CursorTextContextReader.isPlainCommandVMenuItem(
+            commandCharacter: "c",
+            virtualKey: 0x08,
+            modifiers: 0,
+            enabled: true
+        ))
+    }
+
     @Test func accessibilityInsertionObservationAcceptsTextOrCursorMutation() {
         #expect(CursorTextContextReader.insertionWasObserved(
             textBeforeInsertion: "before after",

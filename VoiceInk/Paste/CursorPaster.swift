@@ -379,6 +379,7 @@ class CursorPaster {
         }
 
         await wait(prePasteDelay)
+        let targetProcessIdentifier = CursorTextContextReader.focusedProcessIdentifierForPaste()
         let source = CGEventSource(stateID: .privateState)
 
         guard let cmdDown = CGEvent(keyboardEventSource: source, virtualKey: 0x37, keyDown: true),
@@ -393,13 +394,18 @@ class CursorPaster {
         vDown.flags   = .maskCommand
         vUp.flags     = .maskCommand
 
-        cmdDown.post(tap: .cghidEventTap)
-        vDown.post(tap: .cghidEventTap)
-        vUp.post(tap: .cghidEventTap)
-        cmdUp.post(tap: .cghidEventTap)
+        for event in [cmdDown, vDown, vUp, cmdUp] {
+            if let targetProcessIdentifier {
+                event.postToPid(targetProcessIdentifier)
+            } else {
+                event.post(tap: .cghidEventTap)
+            }
+        }
         VoiceInkLatencyTrace.shared.event(
             "paste_event_posted",
-            details: "method=cgEvent",
+            details: targetProcessIdentifier.map {
+                "method=cgEvent targetPid=\($0)"
+            } ?? "method=cgEvent target=global",
             token: latencyTraceToken
         )
 

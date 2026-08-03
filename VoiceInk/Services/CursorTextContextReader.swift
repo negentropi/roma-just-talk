@@ -117,6 +117,23 @@ enum CursorTextContextReader {
     }
 
     @MainActor
+    static func focusedProcessIdentifierForPaste() -> pid_t? {
+        guard AXIsProcessTrusted(),
+              let focusedElement = focusedElement(from: AXUIElementCreateSystemWide()) else {
+            return nil
+        }
+        var processIdentifier = pid_t()
+        guard AXUIElementGetPid(focusedElement, &processIdentifier) == .success else {
+            return nil
+        }
+        guard processIdentifier > 0,
+              processIdentifier != ProcessInfo.processInfo.processIdentifier else {
+            return nil
+        }
+        return processIdentifier
+    }
+
+    @MainActor
     static func insertSelectedText(
         _ text: String,
         preparedContext: PreparedContext?

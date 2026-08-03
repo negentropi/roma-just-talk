@@ -381,7 +381,9 @@ class CursorPaster {
 
         await wait(prePasteDelay)
         let targetProcessIdentifier = CursorTextContextReader.focusedProcessIdentifierForPaste()
-        let source = CGEventSource(stateID: .privateState)
+        // VoiceInk posts from the active login session, so share that session's
+        // accumulated keyboard state instead of creating an isolated private state.
+        let source = CGEventSource(stateID: .combinedSessionState)
 
         guard let cmdDown = CGEvent(keyboardEventSource: source, virtualKey: 0x37, keyDown: true),
               let vDown = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: true),
@@ -409,8 +411,8 @@ class CursorPaster {
         VoiceInkLatencyTrace.shared.event(
             "paste_event_posted",
             details: targetProcessIdentifier.map {
-                "method=cgEvent targetPid=\($0)"
-            } ?? "method=cgEvent target=global",
+                "method=cgEvent source=combinedSession targetPid=\($0)"
+            } ?? "method=cgEvent source=combinedSession target=global",
             token: latencyTraceToken
         )
 

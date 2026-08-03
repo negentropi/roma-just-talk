@@ -7,10 +7,9 @@ enum CursorTextContextReader {
     // Bound malformed Accessibility parent chains without missing deeply nested web editors.
     private static let insertionAncestorTraversalLimit = 64
     private static let commandVMenuTraversalLimit = 2_048
-    // Cold web editors may expose their menu before validating Paste.
-    private static let commandVMenuTraversalAttempts = 4
+    // Give cold web-editor Accessibility menu discovery one bounded retry.
+    private static let commandVMenuTraversalAttempts = 2
     private static let commandVMenuTraversalRetryDelay: TimeInterval = 0.25
-    private static let commandVMenuRefreshSettleDelay: TimeInterval = 0.05
     private static let commandVMenuTraversalTimeout: TimeInterval = 0.25
 
     enum SelectedTextInsertionResult: String {
@@ -161,7 +160,6 @@ enum CursorTextContextReader {
         let application = AXUIElementCreateApplication(processIdentifier)
 
         let traversalAttempts = retryIfUnavailable ? commandVMenuTraversalAttempts : 1
-        var openedMenuBarItem: AXUIElement?
         for attempt in 0..<traversalAttempts {
             guard focusedProcessIdentifierForPaste() == processIdentifier else {
                 return nil
@@ -176,11 +174,6 @@ enum CursorTextContextReader {
                     token: latencyTraceToken
                 )
                 guard attempt < traversalAttempts - 1 else {
-                    closeRefreshedMenu(
-                        openedMenuBarItem,
-                        processIdentifier: processIdentifier,
-                        latencyTraceToken: latencyTraceToken
-                    )
                     return nil
                 }
                 // Let the Accessibility server process cold menu discovery before retrying.
@@ -195,54 +188,40 @@ enum CursorTextContextReader {
                 details: "attempt=\(attempt + 1) result=\(searchResult.menuItem == nil ? "missing" : "found") visited=\(searchResult.visitedNodes) enqueued=\(searchResult.enqueuedNodes) candidates=\(searchResult.shortcutCandidates) disabled=\(searchResult.disabledShortcutCandidates) limitExhausted=\(searchResult.limitExhausted) timeout=\(searchResult.timedOut)",
                 token: latencyTraceToken
             )
-            guard let menuItem = searchResult.menuItem else {
-                guard attempt < traversalAttempts - 1 else {
-                    closeRefreshedMenu(
-                        openedMenuBarItem,
-                        processIdentifier: processIdentifier,
-                        latencyTraceToken: latencyTraceToken
-                    )
+            if let menuItem = searchResult.menuItem {
+                // The app's plain Cmd-V command is target-affine, unlike a global key event.
+                guard focusedProcessIdentifierForPaste() == processIdentifier else {
                     return nil
                 }
-                if openedMenuBarItem == nil,
-                   let refreshMenuBarItem = searchResult.refreshMenuBarItem,
-                   focusedProcessIdentifierForPaste() == processIdentifier {
-                    let refreshResult = AXUIElementPerformAction(
-                        refreshMenuBarItem,
-                        kAXPressAction as CFString
-                    )
-                    VoiceInkLatencyTrace.shared.event(
-                        "paste_command_v_menu_refresh",
-                        details: "attempt=\(attempt + 1) result=\(refreshResult == .success ? "opened" : "failed") error=\(refreshResult.rawValue)",
-                        token: latencyTraceToken
-                    )
-                    if refreshResult == .success {
-                        openedMenuBarItem = refreshMenuBarItem
-                        try? await Task.sleep(
-                            nanoseconds: UInt64(commandVMenuRefreshSettleDelay * 1_000_000_000)
-                        )
-                        continue
-                    }
+                guard AXUIElementPerformAction(menuItem, kAXPressAction as CFString) == .success else {
+                    return nil
                 }
-                // Let the Accessibility server process cold menu discovery before retrying.
-                try? await Task.sleep(
-                    nanoseconds: UInt64(commandVMenuTraversalRetryDelay * 1_000_000_000)
-                )
-                continue
+                return processIdentifier
             }
-            // The app's plain Cmd-V command is target-affine, unlike a global key event.
-            guard focusedProcessIdentifierForPaste() == processIdentifier else {
+            if let disabledMenuItem = searchResult.disabledMenuItem {
+                guard focusedProcessIdentifierForPaste() == processIdentifier else {
+                    return nil
+                }
+                let pressResult = AXUIElementPerformAction(
+                    disabledMenuItem,
+                    kAXPressAction as CFString
+                )
+                VoiceInkLatencyTrace.shared.event(
+                    "paste_command_v_menu_press",
+                    details: "attempt=\(attempt + 1) enabled=false result=\(pressResult == .success ? "pressed" : "failed") error=\(pressResult.rawValue)",
+                    token: latencyTraceToken
+                )
+                if pressResult == .success {
+                    return processIdentifier
+                }
+            }
+            guard attempt < traversalAttempts - 1 else {
                 return nil
             }
-            guard AXUIElementPerformAction(menuItem, kAXPressAction as CFString) == .success else {
-                closeRefreshedMenu(
-                    openedMenuBarItem,
-                    processIdentifier: processIdentifier,
-                    latencyTraceToken: latencyTraceToken
-                )
-                return nil
-            }
-            return processIdentifier
+            // Let the Accessibility server process cold menu discovery before retrying.
+            try? await Task.sleep(
+                nanoseconds: UInt64(commandVMenuTraversalRetryDelay * 1_000_000_000)
+            )
         }
         return nil
     }
@@ -253,32 +232,24 @@ enum CursorTextContextReader {
         let enqueuedNodes: Int
         let shortcutCandidates: Int
         let disabledShortcutCandidates: Int
-        let refreshMenuBarItem: AXUIElement?
+        let disabledMenuItem: AXUIElement?
         let limitExhausted: Bool
         let timedOut: Bool
     }
 
-    private struct CommandVMenuTraversalNode {
-        let element: AXUIElement
-        let menuBarItem: AXUIElement?
-    }
-
     private static func plainCommandVMenuItem(in menuBar: AXUIElement) -> CommandVMenuSearchResult {
         let deadline = Date().addingTimeInterval(commandVMenuTraversalTimeout)
-        var queue = [CommandVMenuTraversalNode(element: menuBar, menuBarItem: nil)]
+        var queue = [menuBar]
         var index = 0
         var shortcutCandidates = 0
         var disabledShortcutCandidates = 0
-        var refreshMenuBarItem: AXUIElement?
+        var disabledMenuItem: AXUIElement?
         while index < queue.count,
               index < commandVMenuTraversalLimit,
               Date() < deadline {
-            let node = queue[index]
+            let element = queue[index]
             index += 1
-            let element = node.element
             let elementRole = role(from: element)
-            let menuBarItem = node.menuBarItem
-                ?? (elementRole == kAXMenuBarItemRole as String ? element : nil)
             if elementRole == kAXMenuItemRole as String {
                 let commandCharacter = stringAttribute(
                     kAXMenuItemCmdCharAttribute as CFString,
@@ -309,21 +280,19 @@ enum CursorTextContextReader {
                             enqueuedNodes: queue.count,
                             shortcutCandidates: shortcutCandidates,
                             disabledShortcutCandidates: disabledShortcutCandidates,
-                            refreshMenuBarItem: nil,
+                            disabledMenuItem: nil,
                             limitExhausted: false,
                             timedOut: false
                         )
                     }
                     disabledShortcutCandidates += 1
-                    refreshMenuBarItem = refreshMenuBarItem ?? menuBarItem
+                    disabledMenuItem = disabledMenuItem ?? element
                 }
             }
 
             let remainingCapacity = commandVMenuTraversalLimit - queue.count
             guard remainingCapacity > 0 else { continue }
-            queue.append(contentsOf: childElements(from: element).prefix(remainingCapacity).map {
-                CommandVMenuTraversalNode(element: $0, menuBarItem: menuBarItem)
-            })
+            queue.append(contentsOf: childElements(from: element).prefix(remainingCapacity))
         }
         let hasUnvisitedNodes = index < queue.count
         return CommandVMenuSearchResult(
@@ -332,7 +301,7 @@ enum CursorTextContextReader {
             enqueuedNodes: queue.count,
             shortcutCandidates: shortcutCandidates,
             disabledShortcutCandidates: disabledShortcutCandidates,
-            refreshMenuBarItem: refreshMenuBarItem,
+            disabledMenuItem: disabledMenuItem,
             limitExhausted: hasUnvisitedNodes && index >= commandVMenuTraversalLimit,
             timedOut: hasUnvisitedNodes && Date() >= deadline
         )
@@ -359,24 +328,6 @@ enum CursorTextContextReader {
         guard modifiers == 0 else { return false }
         return commandCharacter?.caseInsensitiveCompare("v") == .orderedSame
             || virtualKey == 0x09
-    }
-
-    @MainActor
-    private static func closeRefreshedMenu(
-        _ menuBarItem: AXUIElement?,
-        processIdentifier: pid_t,
-        latencyTraceToken: VoiceInkLatencyTrace.Token?
-    ) {
-        guard let menuBarItem,
-              focusedProcessIdentifierForPaste() == processIdentifier else {
-            return
-        }
-        let result = AXUIElementPerformAction(menuBarItem, kAXPressAction as CFString)
-        VoiceInkLatencyTrace.shared.event(
-            "paste_command_v_menu_refresh",
-            details: "result=close error=\(result.rawValue)",
-            token: latencyTraceToken
-        )
     }
 
     @MainActor

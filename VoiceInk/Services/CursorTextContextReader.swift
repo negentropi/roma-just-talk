@@ -7,7 +7,8 @@ enum CursorTextContextReader {
     // Bound malformed Accessibility parent chains without missing deeply nested web editors.
     private static let insertionAncestorTraversalLimit = 64
     private static let commandVMenuTraversalLimit = 512
-    // Cold Chromium menu hierarchies exceed 100 ms before their Accessibility cache is warm.
+    // The first cold Chromium traversal populates its Accessibility menu cache.
+    private static let commandVMenuTraversalAttempts = 2
     private static let commandVMenuTraversalTimeout: TimeInterval = 0.25
 
     enum SelectedTextInsertionResult: String {
@@ -145,14 +146,34 @@ enum CursorTextContextReader {
         var processIdentifier = pid_t()
         guard AXUIElementGetPid(focusedElement, &processIdentifier) == .success,
               processIdentifier > 0,
-              processIdentifier != ProcessInfo.processInfo.processIdentifier,
-              let menuBar = elementAttribute(
-                  kAXMenuBarAttribute as CFString,
-                  from: AXUIElementCreateApplication(processIdentifier)
-              ) else {
+              processIdentifier != ProcessInfo.processInfo.processIdentifier else {
             return nil
         }
+        let application = AXUIElementCreateApplication(processIdentifier)
 
+        for _ in 0..<commandVMenuTraversalAttempts {
+            guard focusedProcessIdentifierForPaste() == processIdentifier else {
+                return nil
+            }
+            guard let menuBar = elementAttribute(
+                kAXMenuBarAttribute as CFString,
+                from: application
+            ), let menuItem = plainCommandVMenuItem(in: menuBar) else {
+                continue
+            }
+            // The app's plain Cmd-V command is target-affine, unlike a global key event.
+            guard focusedProcessIdentifierForPaste() == processIdentifier else {
+                return nil
+            }
+            guard AXUIElementPerformAction(menuItem, kAXPressAction as CFString) == .success else {
+                return nil
+            }
+            return processIdentifier
+        }
+        return nil
+    }
+
+    private static func plainCommandVMenuItem(in menuBar: AXUIElement) -> AXUIElement? {
         let deadline = Date().addingTimeInterval(commandVMenuTraversalTimeout)
         var queue = [menuBar]
         var index = 0
@@ -180,14 +201,8 @@ enum CursorTextContextReader {
                        from: element
                    )?.boolValue == true
                ) {
-                // The app's plain Cmd-V command is target-affine, unlike a global key event.
-                guard Date() < deadline,
-                      focusedProcessIdentifierForPaste() == processIdentifier else {
-                    return nil
-                }
-                if AXUIElementPerformAction(element, kAXPressAction as CFString) == .success {
-                    return processIdentifier
-                }
+                guard Date() < deadline else { return nil }
+                return element
             }
 
             let remainingCapacity = commandVMenuTraversalLimit - queue.count

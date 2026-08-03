@@ -11,6 +11,8 @@ class CursorPaster {
         subsystem: VoiceInkAppIdentity.loggingSubsystem,
         category: VoiceInkMacOSLogCategory.cursorPaster
     )
+    // Let target apps observe modifier release before the synthesized Cmd-V chord.
+    private static let prePasteDelay: TimeInterval = 0.1
     @MainActor private static var pasteCommandPosterForTesting: (() async -> PasteResult)?
     @MainActor private static var accessibilityTextInserterForTesting:
         ((String, CursorTextContextReader.PreparedContext?) -> CursorTextContextReader.SelectedTextInsertionResult)?
@@ -376,6 +378,7 @@ class CursorPaster {
             return .commandNotPosted
         }
 
+        await wait(prePasteDelay)
         let source = CGEventSource(stateID: .privateState)
 
         guard let cmdDown = CGEvent(keyboardEventSource: source, virtualKey: 0x37, keyDown: true),

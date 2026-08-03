@@ -98,7 +98,7 @@ struct VoiceInkTests {
         #expect(pasteboard.string(forType: .string) == "previous clipboard")
     }
 
-    @Test @MainActor func unappliedAccessibilityInsertFallsBackToPasteCommand() async throws {
+    @Test @MainActor func nonInsertedAccessibilityResultsFallBackToPasteCommand() async throws {
         let defaults = UserDefaults.standard
         let restoreValue = defaults.object(forKey: "restoreClipboardAfterPaste")
         let pasteMethodValue = defaults.object(forKey: VoiceInkPasteMethod.userDefaultsKey)
@@ -117,20 +117,27 @@ struct VoiceInkTests {
 
         defaults.set(false, forKey: "restoreClipboardAfterPaste")
         defaults.set(VoiceInkPasteMethod.standard.rawValue, forKey: VoiceInkPasteMethod.userDefaultsKey)
-        pasteboard.clearContents()
-        pasteboard.setString("previous clipboard", forType: .string)
-        var postedCommand = false
-        CursorPaster.configureAccessibilityTextInserterForTesting { _, _ in .notApplied }
+        var insertionResult = CursorTextContextReader.SelectedTextInsertionResult.notApplied
+        var postedCommandCount = 0
+        CursorPaster.configureAccessibilityTextInserterForTesting { _, _ in insertionResult }
         CursorPaster.configurePasteCommandPosterForTesting {
-            postedCommand = true
+            postedCommandCount += 1
             return .commandPosted
         }
 
-        let result = await CursorPaster.pasteAtCursorAndWaitUntilPosted("dictated text")
+        for result in [
+            CursorTextContextReader.SelectedTextInsertionResult.notApplied,
+            .unsupported
+        ] {
+            insertionResult = result
+            pasteboard.clearContents()
+            pasteboard.setString("previous clipboard", forType: .string)
 
-        #expect(result == .commandPosted)
-        #expect(postedCommand)
-        #expect(pasteboard.string(forType: .string) == "dictated text")
+            #expect(await CursorPaster.pasteAtCursorAndWaitUntilPosted("dictated text") == .commandPosted)
+            #expect(pasteboard.string(forType: .string) == "dictated text")
+        }
+
+        #expect(postedCommandCount == 2)
     }
 
     @Test func accessibilityInsertionObservationRejectsSilentAXSuccess() {
@@ -140,6 +147,15 @@ struct VoiceInkTests {
             insertedText: "dictated text",
             textAfterInsertion: "",
             rangeAfterInsertion: CFRange(location: 0, length: 0)
+        ))
+    }
+
+    @Test func directAccessibilityInsertionSkipsWebBackedEditors() {
+        #expect(CursorTextContextReader.shouldUseDirectAccessibilityInsertion(
+            ancestorRoles: ["AXTextArea", "AXGroup", "AXWindow"]
+        ))
+        #expect(!CursorTextContextReader.shouldUseDirectAccessibilityInsertion(
+            ancestorRoles: ["AXTextArea", "AXGroup", "AXWebArea", "AXWindow"]
         ))
     }
 

@@ -60,6 +60,7 @@
 - Added an autonomous Namespace macOS runtime E2E harness that feeds fixed WAV fixtures through BlackHole, drives the real Special shortcut, verifies Accessibility-visible insertion across four already-running apps, preserves per-phase evidence without guessing failure ownership, and restores audio, app, clipboard-target, and temporary-resource state.
 - Kept macOS recording, cancellation, streaming fallback, and Power Mode runtime closures on the MainActor, with executor enqueue-to-resume queue-delay events in the latency trace for separating scheduler stalls from app work.
 - Kept the dictated text on the clipboard when the paste command cannot be posted, so failed target-app pastes do not immediately restore over the transcript.
+- Fixed dictation in browser and Electron editors so delivery uses a real paste command instead of Accessibility-only mutation, preserving application state and existing text around the cursor.
 - Added up to three seconds of audio pre-roll to iOS after capture has warmed, using the shared PCM pre-roll buffer without carrying over speculative transcription preload.
 - Prevented iOS from crashing after onboarding when the active audio route exposes no usable microphone format, returning a recorder-start failure before installing the AVAudioEngine tap.
 - Added configurable iOS microphone routing with system-managed routing on by default, optional preferred-input selection with system fallback, deferred preference-driven capture restarts during active recording, and the existing custom-device default preserved on macOS.

@@ -3,6 +3,10 @@ import Foundation
 import VoiceInkCore
 
 enum CursorTextContextReader {
+    private static let webAreaRole = "AXWebArea"
+    // Bound malformed Accessibility parent chains without missing deeply nested web editors.
+    private static let insertionAncestorTraversalLimit = 64
+
     enum SelectedTextInsertionResult: String {
         case inserted
         case insertedWithoutSelection
@@ -122,7 +126,10 @@ enum CursorTextContextReader {
               let focusedElement = focusedElement(from: AXUIElementCreateSystemWide()),
               let selectedRange = selectedTextRange(from: focusedElement),
               let role = role(from: focusedElement),
-              VoiceInkCursorTextContextPolicy.isTextInputRole(role) else {
+              VoiceInkCursorTextContextPolicy.isTextInputRole(role),
+              shouldUseDirectAccessibilityInsertion(
+                  ancestorRoles: insertionAncestorRoles(startingAt: focusedElement)
+              ) else {
             return .unsupported
         }
 
@@ -306,6 +313,11 @@ enum CursorTextContextReader {
         return textAfterInsertion == replacement.text
     }
 
+    static func shouldUseDirectAccessibilityInsertion(ancestorRoles: [String]) -> Bool {
+        // Web editors need Cmd-V so their DOM paste/input handlers update application state.
+        !ancestorRoles.contains(webAreaRole)
+    }
+
     private static func textBeforeCursor(in focusedElement: AXUIElement, maximumLength: Int) -> String? {
         let elements = contextCandidateElements(startingAt: focusedElement)
 
@@ -354,6 +366,21 @@ enum CursorTextContextReader {
         }
 
         return elements
+    }
+
+    private static func insertionAncestorRoles(startingAt element: AXUIElement) -> [String] {
+        var roles: [String] = []
+        var currentElement: AXUIElement? = element
+
+        for _ in 0..<insertionAncestorTraversalLimit {
+            guard let element = currentElement else { break }
+            if let role = role(from: element) {
+                roles.append(role)
+            }
+            currentElement = parentElement(from: element)
+        }
+
+        return roles
     }
 
     private static func parentElement(from element: AXUIElement) -> AXUIElement? {

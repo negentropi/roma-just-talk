@@ -12,6 +12,7 @@ import SwiftData
 import AppKit
 import Carbon.HIToolbox
 import os
+import SwiftUI
 @testable import VoiceInk
 
 @Suite(.serialized)
@@ -21,6 +22,46 @@ struct VoiceInkTests {
         #expect(AppDefaults.registeredDefaults[VoiceInkMenuBarPreference.showMenuBarIconKey] as? Bool == false)
         #expect(AppDefaults.registeredDefaults[VoiceInkMenuBarPreference.legacyIsMenuBarOnlyKey] as? Bool == true)
         #expect(AppDefaults.registeredDefaults[VoiceInkUserDefaultsKey.specialShortcutPasteLastTranscriptOnEmptyTap] as? Bool == true)
+    }
+
+    @Test @MainActor func iconVisibilityControlsExposeAndToggleShowHideValues() async throws {
+        let state = IconVisibilityToggleTestState()
+        let hostingView = NSHostingView(rootView: IconVisibilityToggleTestView(state: state))
+        hostingView.frame = NSRect(x: 0, y: 0, width: 320, height: 80)
+
+        let window = NSWindow(
+            contentRect: hostingView.frame,
+            styleMask: .borderless,
+            backing: .buffered,
+            defer: false
+        )
+        window.contentView = hostingView
+        defer { window.contentView = nil }
+
+        hostingView.layoutSubtreeIfNeeded()
+        await drainMainQueue()
+
+        var elements = accessibilityElements(from: hostingView)
+        let menuBar = try #require(elements.first { $0.accessibilityLabel() == "Menu Bar" })
+        let dockIcon = try #require(elements.first { $0.accessibilityLabel() == "Dock Icon" })
+
+        #expect(menuBar.accessibilityValue() as? String == "Hide")
+        #expect(dockIcon.accessibilityValue() as? String == "Show")
+        #expect(menuBar.accessibilityPerformPress())
+        #expect(dockIcon.accessibilityPerformPress())
+
+        await drainMainQueue()
+        hostingView.layoutSubtreeIfNeeded()
+        elements = accessibilityElements(from: hostingView)
+
+        #expect(state.showMenuBarIcon)
+        #expect(!state.showDockIcon)
+        #expect(
+            elements.first { $0.accessibilityLabel() == "Menu Bar" }?.accessibilityValue() as? String == "Show"
+        )
+        #expect(
+            elements.first { $0.accessibilityLabel() == "Dock Icon" }?.accessibilityValue() as? String == "Hide"
+        )
     }
 
     @Test @MainActor func unconfirmedPasteCommandDoesNotRestoreOverTranscriptClipboard() async throws {
@@ -1461,6 +1502,36 @@ struct VoiceInkTests {
             DispatchQueue.main.async {
                 continuation.resume()
             }
+        }
+    }
+
+    private func accessibilityElements(from value: Any) -> [NSAccessibilityElement] {
+        if let view = value as? NSView {
+            return (view.accessibilityChildren() ?? []).flatMap {
+                accessibilityElements(from: $0)
+            }
+        }
+
+        guard let element = value as? NSAccessibilityElement else { return [] }
+        return [element] + (element.accessibilityChildren() ?? []).flatMap {
+            accessibilityElements(from: $0)
+        }
+    }
+}
+
+@MainActor
+private final class IconVisibilityToggleTestState: ObservableObject {
+    @Published var showMenuBarIcon = false
+    @Published var showDockIcon = true
+}
+
+private struct IconVisibilityToggleTestView: View {
+    @ObservedObject var state: IconVisibilityToggleTestState
+
+    var body: some View {
+        VStack {
+            IconVisibilityToggle(title: "Menu Bar", isVisible: $state.showMenuBarIcon)
+            IconVisibilityToggle(title: "Dock Icon", isVisible: $state.showDockIcon)
         }
     }
 }

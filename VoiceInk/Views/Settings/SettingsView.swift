@@ -247,9 +247,15 @@ struct SettingsView: View {
 
             // MARK: - General
             Section(Self.settingsPresentation.generalSectionTitle) {
-                Toggle(Self.settingsPresentation.menuBarTitle, isOn: $showMenuBarIcon)
+                IconVisibilityToggle(
+                    title: Self.settingsPresentation.menuBarTitle,
+                    isVisible: $showMenuBarIcon
+                )
 
-                Toggle(Self.settingsPresentation.dockIconTitle, isOn: $menuBarManager.showDockIcon)
+                IconVisibilityToggle(
+                    title: Self.settingsPresentation.dockIconTitle,
+                    isVisible: $menuBarManager.showDockIcon
+                )
 
                 Toggle(
                     Self.settingsPresentation.launchAtLoginTitle,
@@ -373,6 +379,84 @@ struct SettingsView: View {
         }
         .labelsHidden()
         .fixedSize()
+    }
+}
+
+struct IconVisibilityToggle: View {
+    let title: String
+    @Binding var isVisible: Bool
+
+    var body: some View {
+        Toggle(title, isOn: $isVisible)
+            .toggleStyle(
+                VisibilityToggleStyle(presentation: VoiceInkMacOSSettingsPresentation.macOS)
+            )
+    }
+}
+
+private struct VisibilityToggleStyle: ToggleStyle {
+    let presentation: VoiceInkMacOSSettingsPresentation
+    @Environment(\.colorSchemeContrast) private var colorSchemeContrast
+
+    func makeBody(configuration: Configuration) -> some View {
+        Button {
+            configuration.isOn.toggle()
+        } label: {
+            HStack {
+                configuration.label
+                Spacer()
+
+                ZStack(alignment: configuration.isOn ? .trailing : .leading) {
+                    Capsule()
+                        .fill(configuration.isOn ? Color.accentColor : hiddenTrackColor)
+
+                    Text(presentation.visibilityValueTitle(isVisible: configuration.isOn))
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundStyle(Color.primary)
+                        .lineLimit(1)
+                        .frame(width: 48, height: 22)
+                        .background {
+                            Capsule()
+                                .fill(Color(nsColor: .controlBackgroundColor))
+                                .overlay {
+                                    Capsule()
+                                        .stroke(thumbBorderColor, lineWidth: thumbBorderWidth)
+                                }
+                                .shadow(color: .black.opacity(0.14), radius: 1, y: 1)
+                        }
+                        .padding(2)
+                }
+                .frame(width: 78, height: 26)
+                .animation(.easeInOut(duration: 0.16), value: configuration.isOn)
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityRepresentation {
+            Toggle(
+                isOn: Binding(
+                    get: { configuration.isOn },
+                    set: { configuration.isOn = $0 }
+                )
+            ) {
+                configuration.label
+            }
+            .accessibilityValue(
+                Text(presentation.visibilityValueTitle(isVisible: configuration.isOn))
+            )
+        }
+    }
+
+    private var hiddenTrackColor: Color {
+        Color.secondary.opacity(colorSchemeContrast == .increased ? 0.55 : 0.3)
+    }
+
+    private var thumbBorderColor: Color {
+        Color.primary.opacity(colorSchemeContrast == .increased ? 0.4 : 0.08)
+    }
+
+    private var thumbBorderWidth: CGFloat {
+        colorSchemeContrast == .increased ? 1 : 0.5
     }
 }
 

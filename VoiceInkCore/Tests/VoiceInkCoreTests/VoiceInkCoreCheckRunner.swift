@@ -13,6 +13,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "SubscriptionPlanPolicyTests.testCatalogPreservesFreemiumItalyAndRomaOffer", run: { SubscriptionPlanPolicyTests().testCatalogPreservesFreemiumItalyAndRomaOffer() }),
             VoiceInkCoreCheck(name: "SubscriptionPlanPolicyTests.testWeeklyAllowanceClampsUsageAndBlocksOnlyAtFreemiumLimit", run: { SubscriptionPlanPolicyTests().testWeeklyAllowanceClampsUsageAndBlocksOnlyAtFreemiumLimit() }),
             VoiceInkCoreCheck(name: "SubscriptionPlanPolicyTests.testFreemiumLearnMoreExplains476Reference", run: { SubscriptionPlanPolicyTests().testFreemiumLearnMoreExplains476Reference() }),
+            VoiceInkCoreCheck(name: "MacOSSettingsPresentationTests.testIconVisibilityThumbLabelsMatchVisibleState", run: { MacOSSettingsPresentationTests().testIconVisibilityThumbLabelsMatchVisibleState() }),
             VoiceInkCoreCheck(name: "AudioRoutingPolicyTests.testPlatformDefaultsKeepPhoneSystemManagedAndMacCustom", run: { AudioRoutingPolicyTests().testPlatformDefaultsKeepPhoneSystemManagedAndMacCustom() }),
             VoiceInkCoreCheck(name: "AudioRoutingPolicyTests.testIOSNormalizesUnsupportedPrioritizedModeToSystemManaged", run: { AudioRoutingPolicyTests().testIOSNormalizesUnsupportedPrioritizedModeToSystemManaged() }),
             VoiceInkCoreCheck(name: "AudioRoutingPolicyTests.testIOSCustomRouteUsesAvailableSelectionAndFallsBackWhenUnavailable", run: { AudioRoutingPolicyTests().testIOSCustomRouteUsesAvailableSelectionAndFallsBackWhenUnavailable() }),

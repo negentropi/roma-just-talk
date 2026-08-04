@@ -5,7 +5,7 @@
 - Renamed the inherited iOS record deep-link scheme from `voiceink://record` to `romajusttalk://record` so external launch identity matches Roma Just Talk.
 - Replaced the inherited VoiceInk bundle, logging, iCloud, App Group, keychain, test, and extension identifiers with `com.negentropi.RomaJustTalk`.
 - Routed macOS update checks away from the upstream VoiceInk feed to an informational appcast attached to each Roma Just Talk GitHub release.
-- Simplified the macOS icon settings to positive Menu Bar and Dock Icon switches, with ON consistently meaning visible while preserving existing choices and backup compatibility.
+- Simplified the macOS icon settings to positive Menu Bar and Dock Icon switches whose moving thumb reads Show or Hide, with ON consistently meaning visible while preserving existing choices and backup compatibility.
 - Added a landing-site pricing preview for the planned Freemium, Italy, and Roma monthly tiers, clearly marking billing, usage tracking, and entitlement enforcement as not yet live.
 - Prevented Special modifier-only shortcuts from arming while macOS Secure Input is already active.
 - Added iOS microphone permission setup during onboarding plus a refreshable Settings recovery screen that reuses the recording permission path.

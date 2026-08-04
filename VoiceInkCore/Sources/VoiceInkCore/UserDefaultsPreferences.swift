@@ -1445,6 +1445,8 @@ public struct VoiceInkMacOSSettingsPresentation: Equatable, Sendable {
     public let generalSectionTitle: String
     public let menuBarTitle: String
     public let dockIconTitle: String
+    public let showVisibilityValueTitle: String
+    public let hideVisibilityValueTitle: String
     public let launchAtLoginTitle: String
     public let autoCheckUpdatesTitle: String
     public let showAnnouncementsTitle: String
@@ -1463,6 +1465,8 @@ public struct VoiceInkMacOSSettingsPresentation: Equatable, Sendable {
         generalSectionTitle: "General",
         menuBarTitle: "Menu Bar",
         dockIconTitle: "Dock Icon",
+        showVisibilityValueTitle: "Show",
+        hideVisibilityValueTitle: "Hide",
         launchAtLoginTitle: "Launch at Login",
         autoCheckUpdatesTitle: "Auto-check Updates",
         showAnnouncementsTitle: "Show Announcements",
@@ -1477,6 +1481,10 @@ public struct VoiceInkMacOSSettingsPresentation: Equatable, Sendable {
         importButtonTitle: "Import",
         diagnosticsSectionTitle: "Diagnostics"
     )
+
+    public func visibilityValueTitle(isVisible: Bool) -> String {
+        isVisible ? showVisibilityValueTitle : hideVisibilityValueTitle
+    }
 }
 
 public enum VoiceInkSettingsBackupCategory: String, CaseIterable, Hashable, Sendable {

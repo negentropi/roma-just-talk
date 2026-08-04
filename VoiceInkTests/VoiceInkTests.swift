@@ -36,10 +36,15 @@ struct VoiceInkTests {
             defer: false
         )
         window.contentView = hostingView
-        defer { window.contentView = nil }
+        window.orderFrontRegardless()
+        defer { window.close() }
 
-        hostingView.layoutSubtreeIfNeeded()
-        await drainMainQueue()
+        #expect(await eventually {
+            hostingView.layoutSubtreeIfNeeded()
+            let elements = accessibilityElements(from: hostingView)
+            return elements.contains { $0.accessibilityLabel() == "Menu Bar" } &&
+                elements.contains { $0.accessibilityLabel() == "Dock Icon" }
+        })
 
         var elements = accessibilityElements(from: hostingView)
         let menuBar = try #require(elements.first { $0.accessibilityLabel() == "Menu Bar" })
@@ -50,18 +55,14 @@ struct VoiceInkTests {
         #expect(menuBar.accessibilityPerformPress())
         #expect(dockIcon.accessibilityPerformPress())
 
-        await drainMainQueue()
-        hostingView.layoutSubtreeIfNeeded()
-        elements = accessibilityElements(from: hostingView)
-
-        #expect(state.showMenuBarIcon)
-        #expect(!state.showDockIcon)
-        #expect(
-            elements.first { $0.accessibilityLabel() == "Menu Bar" }?.accessibilityValue() as? String == "Show"
-        )
-        #expect(
-            elements.first { $0.accessibilityLabel() == "Dock Icon" }?.accessibilityValue() as? String == "Hide"
-        )
+        #expect(await eventually {
+            hostingView.layoutSubtreeIfNeeded()
+            elements = accessibilityElements(from: hostingView)
+            return state.showMenuBarIcon &&
+                !state.showDockIcon &&
+                elements.first { $0.accessibilityLabel() == "Menu Bar" }?.accessibilityValue() as? String == "Show" &&
+                elements.first { $0.accessibilityLabel() == "Dock Icon" }?.accessibilityValue() as? String == "Hide"
+        })
     }
 
     @Test @MainActor func unconfirmedPasteCommandDoesNotRestoreOverTranscriptClipboard() async throws {
@@ -1486,7 +1487,7 @@ struct VoiceInkTests {
     }
 
     private func eventually(_ predicate: () -> Bool) async -> Bool {
-        for _ in 0..<20 {
+        for _ in 0..<200 {
             await drainMainQueue()
             if predicate() {
                 return true

@@ -250,44 +250,97 @@ enum CursorTextContextReader {
                 }
                 continue
             }
-            let searchResult = plainCommandVMenuItem(in: menuBar)
+            var searchResult = plainCommandVMenuItem(in: menuBar)
             VoiceInkLatencyTrace.shared.event(
                 "paste_command_v_menu_lookup",
                 details: "attempt=\(attempt + 1) result=\(searchResult.menuItem == nil ? "missing" : "found") visited=\(searchResult.visitedNodes) enqueued=\(searchResult.enqueuedNodes) candidates=\(searchResult.shortcutCandidates) disabled=\(searchResult.disabledShortcutCandidates) limitExhausted=\(searchResult.limitExhausted) timeout=\(searchResult.timedOut)",
                 token: latencyTraceToken
             )
+            var openedMenu: AXUIElement?
+            let cancelOpenedMenu: (AXUIElement?) -> Bool = { menu in
+                guard let menu else { return true }
+                let cancelled = cancelMenu(menu)
+                VoiceInkLatencyTrace.shared.event(
+                    "paste_command_v_menu_refresh",
+                    details: "attempt=\(attempt + 1) phase=cancel targetPid=\(processIdentifier) result=\(cancelled ? "success" : "failed")",
+                    token: latencyTraceToken
+                )
+                return cancelled
+            }
+            if searchResult.menuItem == nil,
+               attempt < traversalAttempts - 1,
+               pasteTargetIsCurrent(target),
+               let openResult = searchResult.disabledMenuItem.flatMap({
+                   openContainingMenu(of: $0)
+               }) {
+                VoiceInkLatencyTrace.shared.event(
+                    "paste_command_v_menu_refresh",
+                    details: "attempt=\(attempt + 1) phase=open targetPid=\(processIdentifier) result=\(openResult.result.rawValue)",
+                    token: latencyTraceToken
+                )
+                // AX failure is not transactional: the menu may already be tracking.
+                // Treat every attempted open as a cleanup obligation.
+                openedMenu = openResult.menu
+                if openResult.result == .success {
+                    // Opening starts AppKit's validation pass. Keep the menu open until
+                    // Chrome has updated its cold, clipboard-dependent Paste command.
+                    do {
+                        try await Task.sleep(
+                            nanoseconds: UInt64(commandVMenuTraversalRetryDelay * 1_000_000_000)
+                        )
+                    } catch {
+                        return cancelOpenedMenu(openResult.menu)
+                            ? .targetChanged(processIdentifier)
+                            : .unavailable(nil)
+                    }
+                    guard pasteTargetIsCurrent(target) else {
+                        return cancelOpenedMenu(openResult.menu)
+                            ? .targetChanged(processIdentifier)
+                            : .unavailable(nil)
+                    }
+                    searchResult = plainCommandVMenuItem(in: menuBar)
+                    VoiceInkLatencyTrace.shared.event(
+                        "paste_command_v_menu_lookup",
+                        details: "attempt=\(attempt + 1) phase=open result=\(searchResult.menuItem == nil ? "missing" : "found") visited=\(searchResult.visitedNodes) enqueued=\(searchResult.enqueuedNodes) candidates=\(searchResult.shortcutCandidates) disabled=\(searchResult.disabledShortcutCandidates) limitExhausted=\(searchResult.limitExhausted) timeout=\(searchResult.timedOut)",
+                        token: latencyTraceToken
+                    )
+                }
+            }
             if let menuItem = searchResult.menuItem {
                 // The app's plain Cmd-V command is target-affine, unlike a global key event.
                 guard !Task.isCancelled,
                       pasteTargetIsCurrent(target) else {
-                    return .targetChanged(processIdentifier)
+                    return cancelOpenedMenu(openedMenu)
+                        ? .targetChanged(processIdentifier)
+                        : .unavailable(nil)
                 }
                 guard AXUIElementPerformAction(menuItem, kAXPressAction as CFString) == .success else {
+                    if !cancelOpenedMenu(openedMenu) {
+                        // Never stack a context-menu fallback over an app menu that
+                        // may still be tracking.
+                        return .unavailable(nil)
+                    }
                     return .unavailable(target)
                 }
                 return .pressed(processIdentifier)
             }
+            guard cancelOpenedMenu(openedMenu) else { return .unavailable(nil) }
             guard attempt < traversalAttempts - 1 else {
                 return .unavailable(target)
             }
             guard pasteTargetIsCurrent(target) else {
                 return .targetChanged(processIdentifier)
             }
-            let refreshResult = searchResult.disabledMenuItem.flatMap {
-                refreshContainingMenu(of: $0)
-            }
-            VoiceInkLatencyTrace.shared.event(
-                "paste_command_v_menu_refresh",
-                details: "attempt=\(attempt + 1) targetPid=\(processIdentifier) result=\(refreshResult.map { String($0.rawValue) } ?? "unavailable")",
-                token: latencyTraceToken
-            )
-            // Let the Accessibility server process cold menu discovery before retrying.
-            do {
-                try await Task.sleep(
-                    nanoseconds: UInt64(commandVMenuTraversalRetryDelay * 1_000_000_000)
-                )
-            } catch {
-                return .targetChanged(processIdentifier)
+            if openedMenu == nil {
+                // No disabled command was available to validate; give cold AX discovery
+                // one bounded delay before the final lookup.
+                do {
+                    try await Task.sleep(
+                        nanoseconds: UInt64(commandVMenuTraversalRetryDelay * 1_000_000_000)
+                    )
+                } catch {
+                    return .targetChanged(processIdentifier)
+                }
             }
         }
         return .unavailable(target)
@@ -606,7 +659,14 @@ enum CursorTextContextReader {
         return updatedTitles
     }
 
-    private static func refreshContainingMenu(of menuItem: AXUIElement) -> AXError? {
+    private struct ContainingMenuOpenResult {
+        let menu: AXUIElement
+        let result: AXError
+    }
+
+    private static func openContainingMenu(
+        of menuItem: AXUIElement
+    ) -> ContainingMenuOpenResult? {
         guard let menu = firstAncestor(
             startingAt: menuItem,
             matchingRole: kAXMenuRole as String
@@ -626,9 +686,10 @@ enum CursorTextContextReader {
         } else {
             return nil
         }
-        let result = AXUIElementPerformAction(menuBarItem, action)
-        guard result == .success else { return result }
-        return cancelMenu(menu) ? result : .cannotComplete
+        return ContainingMenuOpenResult(
+            menu: menu,
+            result: AXUIElementPerformAction(menuBarItem, action)
+        )
     }
 
     private static func firstAncestor(

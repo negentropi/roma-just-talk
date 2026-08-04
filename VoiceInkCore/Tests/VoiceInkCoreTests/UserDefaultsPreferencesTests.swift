@@ -15,8 +15,8 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         let presentation = VoiceInkMacOSSettingsPresentation.macOS
 
         XCTAssertEqual(presentation.generalSectionTitle, "General")
-        XCTAssertEqual(presentation.showMenuBarIconTitle, "Show in Menu Bar")
-        XCTAssertEqual(presentation.hideDockIconTitle, "Hide Dock Icon")
+        XCTAssertEqual(presentation.menuBarTitle, "Menu Bar")
+        XCTAssertEqual(presentation.dockIconTitle, "Dock Icon")
         XCTAssertEqual(presentation.launchAtLoginTitle, "Launch at Login")
         XCTAssertEqual(presentation.autoCheckUpdatesTitle, "Auto-check Updates")
         XCTAssertEqual(presentation.showAnnouncementsTitle, "Show Announcements")
@@ -758,8 +758,8 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.historyTitle, "History")
         XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.permissionsTitle, "Permissions")
         XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.settingsTitle, "Settings")
-        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.dockIconTitle(isMenuBarOnly: true), "Show Dock Icon")
-        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.dockIconTitle(isMenuBarOnly: false), "Hide Dock Icon")
+        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.dockIconTitle(showDockIcon: false), "Show Dock Icon")
+        XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.dockIconTitle(showDockIcon: true), "Hide Dock Icon")
         XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.hideMenuBarIconTitle, "Hide Menu Bar Icon")
         XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.launchAtLoginTitle, "Launch at Login")
         XCTAssertEqual(VoiceInkMacOSMenuBarPresentation.checkForUpdatesTitle, "Check for Updates")
@@ -793,9 +793,9 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(
             VoiceInkMacOSMenuBarDiagnostics.openMainWindowRequestedMessage(
                 destination: "Settings",
-                isMenuBarOnly: true
+                showDockIcon: true
             ),
-            "openMainWindowAndNavigate: requested destination=Settings, isMenuBarOnly=true"
+            "openMainWindowAndNavigate: requested destination=Settings, showDockIcon=true"
         )
         XCTAssertEqual(
             VoiceInkMacOSMenuBarDiagnostics.openMainWindowActivationPolicyMessage,

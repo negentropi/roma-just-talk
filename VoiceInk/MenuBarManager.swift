@@ -6,9 +6,9 @@ import VoiceInkCore
 
 class MenuBarManager: ObservableObject {
     private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: VoiceInkMacOSLogCategory.menuBarManager)
-    @Published var isMenuBarOnly: Bool {
+    @Published var showDockIcon: Bool {
         didSet {
-            VoiceInkMenuBarPreference.saveIsMenuBarOnly(isMenuBarOnly)
+            VoiceInkMenuBarPreference.saveShowDockIcon(showDockIcon)
             updateAppActivationPolicy()
         }
     }
@@ -17,7 +17,7 @@ class MenuBarManager: ObservableObject {
     private var engine: VoiceInkEngine?
 
     init() {
-        self.isMenuBarOnly = VoiceInkMenuBarPreference.isMenuBarOnly()
+        self.showDockIcon = VoiceInkMenuBarPreference.shouldShowDockIcon()
         updateAppActivationPolicy()
 
         NotificationCenter.default.addObserver(
@@ -33,7 +33,7 @@ class MenuBarManager: ObservableObject {
     }
 
     @objc private func windowDidClose(_ notification: Notification) {
-        guard isMenuBarOnly else { return }
+        guard !showDockIcon else { return }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
             let hasVisibleWindows = NSApplication.shared.windows.contains {
@@ -51,8 +51,8 @@ class MenuBarManager: ObservableObject {
         self.engine = engine
     }
     
-    func toggleMenuBarOnly() {
-        isMenuBarOnly.toggle()
+    func toggleDockIcon() {
+        showDockIcon.toggle()
     }
     
     func applyActivationPolicy() {
@@ -71,14 +71,14 @@ class MenuBarManager: ObservableObject {
         let applyPolicy = { [weak self] in
             guard let self else { return }
             let application = NSApplication.shared
-            if self.isMenuBarOnly {
-                self.logger.notice("\(VoiceInkMacOSMenuBarDiagnostics.updateActivationPolicyAccessoryMessage, privacy: .public)")
-                application.setActivationPolicy(.accessory)
-                WindowManager.shared.hideMainWindow()
-            } else {
+            if self.showDockIcon {
                 self.logger.notice("\(VoiceInkMacOSMenuBarDiagnostics.updateActivationPolicyRegularMessage, privacy: .public)")
                 application.setActivationPolicy(.regular)
                 WindowManager.shared.showMainWindow()
+            } else {
+                self.logger.notice("\(VoiceInkMacOSMenuBarDiagnostics.updateActivationPolicyAccessoryMessage, privacy: .public)")
+                application.setActivationPolicy(.accessory)
+                WindowManager.shared.hideMainWindow()
             }
         }
 
@@ -92,7 +92,7 @@ class MenuBarManager: ObservableObject {
     func openMainWindowAndNavigate(to destination: String) {
         let requestedMessage = VoiceInkMacOSMenuBarDiagnostics.openMainWindowRequestedMessage(
             destination: destination,
-            isMenuBarOnly: isMenuBarOnly
+            showDockIcon: showDockIcon
         )
         logger.notice("\(requestedMessage, privacy: .public)")
 

@@ -200,7 +200,7 @@ class ImportExportService {
         )
         let macOSShellBackupPreferences = VoiceInkMacOSShellBackupPreference.backupPreferences(
             launchAtLoginEnabled: LaunchAtLogin.isEnabled,
-            isMenuBarOnly: menuBarManager.isMenuBarOnly,
+            showDockIcon: menuBarManager.showDockIcon,
             recorderType: recorderUIManager.recorderType
         )
         let generalSettingsBackupPreferences = VoiceInkGeneralSettingsBackupPolicy.backupPreferences(

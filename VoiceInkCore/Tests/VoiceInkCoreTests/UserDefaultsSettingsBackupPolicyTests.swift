@@ -407,6 +407,48 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
         XCTAssertEqual(decoded.generalSettingsBackupPreferences, preferences)
     }
 
+    func testGeneralSettingsBackupPayloadPreservesLegacyDockIconWireSemantics() throws {
+        for isMenuBarOnly in [false, true] {
+            let legacyData = try JSONSerialization.data(withJSONObject: [
+                "isMenuBarOnly": isMenuBarOnly
+            ])
+            let decoded = try JSONDecoder().decode(
+                VoiceInkGeneralSettingsBackupPayload<String>.self,
+                from: legacyData
+            )
+
+            XCTAssertEqual(
+                decoded.generalSettingsBackupPreferences.macOSShell.showDockIcon,
+                !isMenuBarOnly
+            )
+
+            let importPlan = VoiceInkMacOSShellBackupPreference.backupImportPlan(
+                from: decoded.generalSettingsBackupPreferences.macOSShell
+            )
+            var appliedShowDockIcon: Bool?
+            importPlan.applyRuntimeState(
+                setLaunchAtLoginEnabled: { _ in },
+                setShowDockIcon: { appliedShowDockIcon = $0 },
+                setRecorderType: { _ in }
+            )
+            XCTAssertEqual(appliedShowDockIcon, !isMenuBarOnly)
+        }
+
+        for showDockIcon in [false, true] {
+            let payload = VoiceInkGeneralSettingsBackupPayload<String>(
+                shortcutBackupRecords: [:],
+                preferences: generalSettingsBackupPreferencesFixture(showDockIcon: showDockIcon)
+            )
+            let encodedData = try JSONEncoder().encode(payload)
+            let encodedObject = try XCTUnwrap(
+                JSONSerialization.jsonObject(with: encodedData) as? [String: Any]
+            )
+
+            XCTAssertEqual(encodedObject["isMenuBarOnly"] as? Bool, !showDockIcon)
+            XCTAssertNil(encodedObject["showDockIcon"])
+        }
+    }
+
     func testBackupPreferencesPreserveGroupedExportShape() {
         let recordingShortcut = VoiceInkRecordingShortcutBackupPreferences(
             primaryRecordingShortcutRawValue: VoiceInkRecordingShortcutSelection.custom.rawValue,
@@ -419,7 +461,7 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
         )
         let macOSShell = VoiceInkMacOSShellBackupPreferences(
             launchAtLoginEnabled: true,
-            isMenuBarOnly: false,
+            showDockIcon: true,
             recorderType: "mini"
         )
         let transcriptionAutoCleanup = VoiceInkTranscriptionAutoCleanupBackupPreferences(
@@ -482,7 +524,7 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
             ),
             macOSShell: VoiceInkMacOSShellBackupPreferences(
                 launchAtLoginEnabled: true,
-                isMenuBarOnly: nil,
+                showDockIcon: nil,
                 recorderType: "mini"
             ),
             transcriptionAutoCleanup: VoiceInkTranscriptionAutoCleanupBackupPreferences(
@@ -572,7 +614,7 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
                     ),
                     macOSShell: VoiceInkMacOSShellBackupImportPlan(
                         launchAtLoginEnabled: true,
-                        isMenuBarOnly: false,
+                        showDockIcon: true,
                         recorderType: "mini"
                     ),
                     transcriptionAutoCleanup: VoiceInkTranscriptionAutoCleanupBackupImportPlan(
@@ -638,7 +680,7 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
                     ),
                     macOSShell: VoiceInkMacOSShellBackupImportPlan(
                         launchAtLoginEnabled: nil,
-                        isMenuBarOnly: nil,
+                        showDockIcon: nil,
                         recorderType: nil
                     ),
                     transcriptionAutoCleanup: VoiceInkTranscriptionAutoCleanupBackupImportPlan(
@@ -686,7 +728,9 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
         defaults.removePersistentDomain(forName: suiteName)
     }
 
-    private func generalSettingsBackupPreferencesFixture() -> VoiceInkGeneralSettingsBackupPreferences {
+    private func generalSettingsBackupPreferencesFixture(
+        showDockIcon: Bool = true
+    ) -> VoiceInkGeneralSettingsBackupPreferences {
         VoiceInkGeneralSettingsBackupPreferences(
             recordingShortcut: VoiceInkRecordingShortcutBackupPreferences(
                 primaryRecordingShortcutRawValue: VoiceInkRecordingShortcutSelection.custom.rawValue,
@@ -699,7 +743,7 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
             ),
             macOSShell: VoiceInkMacOSShellBackupPreferences(
                 launchAtLoginEnabled: true,
-                isMenuBarOnly: false,
+                showDockIcon: showDockIcon,
                 recorderType: "mini"
             ),
             transcriptionAutoCleanup: VoiceInkTranscriptionAutoCleanupBackupPreferences(
@@ -743,7 +787,7 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
             ),
             macOSShell: VoiceInkMacOSShellBackupPreferences(
                 launchAtLoginEnabled: true,
-                isMenuBarOnly: false,
+                showDockIcon: true,
                 recorderType: "mini"
             ),
             transcriptionAutoCleanup: VoiceInkTranscriptionAutoCleanupBackupPreferences(
@@ -804,14 +848,14 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
         }
         let appendMacOSShell: (VoiceInkMacOSShellBackupImportPlan) -> Void = { plan in
             var launchAtLogin = "nil"
-            var menuOnly = "nil"
+            var dockIcon = "nil"
             var recorderType = "nil"
             plan.applyRuntimeState(
                 setLaunchAtLoginEnabled: { launchAtLogin = String($0) },
-                setMenuBarOnly: { menuOnly = String($0) },
+                setShowDockIcon: { dockIcon = String($0) },
                 setRecorderType: { recorderType = $0 }
             )
-            events.append("macOSShell:\(launchAtLogin):\(menuOnly):\(recorderType)")
+            events.append("macOSShell:\(launchAtLogin):\(dockIcon):\(recorderType)")
         }
         let appendRecordingFeedback: (VoiceInkRecordingFeedbackBackupImportPlan) -> Void = { plan in
             var soundFeedback = "nil"

@@ -401,8 +401,8 @@ struct VoiceInkApp: App {
 
         #if DEBUG
         WindowGroup("Debug") {
-            Button("Toggle Menu Bar Only") {
-                menuBarManager.isMenuBarOnly.toggle()
+            Button("Toggle Dock Icon") {
+                menuBarManager.showDockIcon.toggle()
             }
         }
         #endif

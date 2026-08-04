@@ -163,7 +163,7 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(VoiceInkUserDefaultsKey.customProviderBaseURL, "customProviderBaseURL")
         XCTAssertEqual(VoiceInkUserDefaultsKey.customProviderModel, "customProviderModel")
         XCTAssertEqual(VoiceInkUserDefaultsKey.showMenuBarIcon, "ShowMenuBarIcon")
-        XCTAssertEqual(VoiceInkUserDefaultsKey.isMenuBarOnly, "IsMenuBarOnly")
+        XCTAssertEqual(VoiceInkUserDefaultsKey.legacyIsMenuBarOnly, "IsMenuBarOnly")
         XCTAssertEqual(VoiceInkUserDefaultsKey.didApplyLaunchAtLoginDefault, "DidApplyLaunchAtLoginDefault")
     }
 
@@ -234,7 +234,7 @@ final class UserDefaultsPreferencesTests: XCTestCase {
 
     func testSharedPreferenceDefaultsPreserveExistingMacOSMenuBarPolicy() {
         XCTAssertFalse(VoiceInkPreferenceDefault.showMenuBarIcon)
-        XCTAssertTrue(VoiceInkPreferenceDefault.isMenuBarOnly)
+        XCTAssertFalse(VoiceInkPreferenceDefault.showDockIcon)
         XCTAssertFalse(VoiceInkPreferenceDefault.didApplyLaunchAtLoginDefault)
     }
 
@@ -648,36 +648,47 @@ final class UserDefaultsPreferencesTests: XCTestCase {
 
     func testMenuBarPreferencePreservesRegisteredDefaultsAndStorage() {
         withIsolatedDefaults { defaults in
+            XCTAssertEqual(VoiceInkMacOSSettingsPresentation.macOS.menuBarTitle, "Menu Bar")
+            XCTAssertEqual(VoiceInkMacOSSettingsPresentation.macOS.dockIconTitle, "Dock Icon")
             XCTAssertEqual(
                 VoiceInkMenuBarPreference.showMenuBarIconKey,
                 VoiceInkUserDefaultsKey.showMenuBarIcon
             )
             XCTAssertEqual(
-                VoiceInkMenuBarPreference.isMenuBarOnlyKey,
-                VoiceInkUserDefaultsKey.isMenuBarOnly
+                VoiceInkMenuBarPreference.legacyIsMenuBarOnlyKey,
+                VoiceInkUserDefaultsKey.legacyIsMenuBarOnly
             )
             XCTAssertEqual(
                 VoiceInkMenuBarPreference.registeredDefaults[VoiceInkUserDefaultsKey.showMenuBarIcon] as? Bool,
                 VoiceInkPreferenceDefault.showMenuBarIcon
             )
             XCTAssertEqual(
-                VoiceInkMenuBarPreference.registeredDefaults[VoiceInkUserDefaultsKey.isMenuBarOnly] as? Bool,
-                VoiceInkPreferenceDefault.isMenuBarOnly
+                VoiceInkMenuBarPreference.registeredDefaults[VoiceInkUserDefaultsKey.legacyIsMenuBarOnly] as? Bool,
+                !VoiceInkPreferenceDefault.showDockIcon
             )
 
             XCTAssertFalse(VoiceInkMenuBarPreference.shouldShowMenuBarIcon(from: defaults))
-            XCTAssertFalse(VoiceInkMenuBarPreference.isMenuBarOnly(from: defaults))
+            XCTAssertFalse(VoiceInkMenuBarPreference.shouldShowDockIcon(from: defaults))
 
             defaults.register(defaults: VoiceInkMenuBarPreference.registeredDefaults)
 
             XCTAssertFalse(VoiceInkMenuBarPreference.shouldShowMenuBarIcon(from: defaults))
-            XCTAssertTrue(VoiceInkMenuBarPreference.isMenuBarOnly(from: defaults))
+            XCTAssertFalse(VoiceInkMenuBarPreference.shouldShowDockIcon(from: defaults))
 
             VoiceInkMenuBarPreference.saveShowMenuBarIcon(true, to: defaults)
-            VoiceInkMenuBarPreference.saveIsMenuBarOnly(false, to: defaults)
+            VoiceInkMenuBarPreference.saveShowDockIcon(true, to: defaults)
 
             XCTAssertTrue(VoiceInkMenuBarPreference.shouldShowMenuBarIcon(from: defaults))
-            XCTAssertFalse(VoiceInkMenuBarPreference.isMenuBarOnly(from: defaults))
+            XCTAssertTrue(VoiceInkMenuBarPreference.shouldShowDockIcon(from: defaults))
+            XCTAssertFalse(defaults.bool(forKey: VoiceInkMenuBarPreference.legacyIsMenuBarOnlyKey))
+            XCTAssertEqual(
+                VoiceInkMacOSMenuBarPresentation.dockIconTitle(showDockIcon: true),
+                "Hide Dock Icon"
+            )
+            XCTAssertEqual(
+                VoiceInkMacOSMenuBarPresentation.dockIconTitle(showDockIcon: false),
+                "Show Dock Icon"
+            )
         }
     }
 
@@ -823,12 +834,12 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(
             VoiceInkMacOSShellBackupPreference.backupPreferences(
                 launchAtLoginEnabled: true,
-                isMenuBarOnly: false,
+                showDockIcon: true,
                 recorderType: "mini"
             ),
             VoiceInkMacOSShellBackupPreferences(
                 launchAtLoginEnabled: true,
-                isMenuBarOnly: false,
+                showDockIcon: true,
                 recorderType: "mini"
             )
         )
@@ -839,13 +850,13 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             VoiceInkMacOSShellBackupPreference.backupImportPlan(
                 from: VoiceInkMacOSShellBackupPreferences(
                     launchAtLoginEnabled: nil,
-                    isMenuBarOnly: true,
+                    showDockIcon: false,
                     recorderType: nil
                 )
             ),
             VoiceInkMacOSShellBackupImportPlan(
                 launchAtLoginEnabled: nil,
-                isMenuBarOnly: true,
+                showDockIcon: false,
                 recorderType: nil
             )
         )

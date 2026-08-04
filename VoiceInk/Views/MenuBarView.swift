@@ -224,8 +224,8 @@ struct MenuBarView: View {
             }
             .keyboardShortcut(",", modifiers: .command)
             
-            Button(VoiceInkMacOSMenuBarPresentation.dockIconTitle(isMenuBarOnly: menuBarManager.isMenuBarOnly)) {
-                menuBarManager.toggleMenuBarOnly()
+            Button(VoiceInkMacOSMenuBarPresentation.dockIconTitle(showDockIcon: menuBarManager.showDockIcon)) {
+                menuBarManager.toggleDockIcon()
             }
             .keyboardShortcut("d", modifiers: [.command, .shift])
 

@@ -247,9 +247,9 @@ struct SettingsView: View {
 
             // MARK: - General
             Section(Self.settingsPresentation.generalSectionTitle) {
-                Toggle(Self.settingsPresentation.showMenuBarIconTitle, isOn: $showMenuBarIcon)
+                Toggle(Self.settingsPresentation.menuBarTitle, isOn: $showMenuBarIcon)
 
-                Toggle(Self.settingsPresentation.hideDockIconTitle, isOn: $menuBarManager.isMenuBarOnly)
+                Toggle(Self.settingsPresentation.dockIconTitle, isOn: $menuBarManager.showDockIcon)
 
                 Toggle(
                     Self.settingsPresentation.launchAtLoginTitle,

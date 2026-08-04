@@ -57,7 +57,7 @@ class SystemInfoService {
             aiEnhancement: VoiceInkAIEnhancementPreference.statusDiagnosticDescription(),
             aiProvider: VoiceInkAIEnhancementProviderPreference.selectedProviderDiagnosticDescription(),
             aiModel: VoiceInkAIEnhancementProviderPreference.selectedModelDiagnosticDescription(),
-            hideDockIcon: VoiceInkMenuBarPreference.isMenuBarOnly(),
+            hideDockIcon: !VoiceInkMenuBarPreference.shouldShowDockIcon(),
             recorderStyle: VoiceInkRecorderStylePreference.rawValue(),
             soundFeedback: VoiceInkRecordingFeedbackPreference.isSoundFeedbackEnabled(),
             pauseMediaWhileRecording: VoiceInkRecordingFeedbackPreference.isPauseMediaEnabled(),

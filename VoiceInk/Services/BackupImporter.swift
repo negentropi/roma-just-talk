@@ -115,7 +115,7 @@ enum BackupImporter {
             applyMacOSShellImportPlan: { macOSShellImportPlan in
                 macOSShellImportPlan.applyRuntimeState(
                     setLaunchAtLoginEnabled: { launchAtLoginController.isEnabled = $0 },
-                    setMenuBarOnly: { menuBarManager.isMenuBarOnly = $0 },
+                    setShowDockIcon: { menuBarManager.showDockIcon = $0 },
                     setRecorderType: { recorderUIManager.recorderType = $0 }
                 )
             },

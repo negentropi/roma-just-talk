@@ -17,9 +17,9 @@ import os
 @Suite(.serialized)
 struct VoiceInkTests {
 
-    @Test func freshDefaultsHideMenuBarIcon() async throws {
+    @Test func freshDefaultsHideMenuBarAndDockIcons() async throws {
         #expect(AppDefaults.registeredDefaults[VoiceInkMenuBarPreference.showMenuBarIconKey] as? Bool == false)
-        #expect(AppDefaults.registeredDefaults["IsMenuBarOnly"] as? Bool == true)
+        #expect(AppDefaults.registeredDefaults[VoiceInkMenuBarPreference.legacyIsMenuBarOnlyKey] as? Bool == true)
         #expect(AppDefaults.registeredDefaults[VoiceInkUserDefaultsKey.specialShortcutPasteLastTranscriptOnEmptyTap] as? Bool == true)
     }
 

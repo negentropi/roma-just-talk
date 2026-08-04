@@ -51,7 +51,7 @@ public enum VoiceInkUserDefaultsKey {
     public static let customProviderBaseURL = "customProviderBaseURL"
     public static let customProviderModel = "customProviderModel"
     public static let showMenuBarIcon = "ShowMenuBarIcon"
-    public static let isMenuBarOnly = "IsMenuBarOnly"
+    public static let legacyIsMenuBarOnly = "IsMenuBarOnly"
     public static let enableAnnouncements = "enableAnnouncements"
     public static let didApplyLaunchAtLoginDefault = "DidApplyLaunchAtLoginDefault"
 
@@ -83,7 +83,7 @@ public enum VoiceInkPreferenceDefault {
     public static let ollamaBaseURL = "http://localhost:11434"
     public static let macOSSelectedTranscriptionLanguage = "en"
     public static let showMenuBarIcon = false
-    public static let isMenuBarOnly = true
+    public static let showDockIcon = false
     public static let enableAnnouncements = true
     public static let didApplyLaunchAtLoginDefault = false
 }
@@ -1443,8 +1443,8 @@ public struct VoiceInkSettingsPresentation: Equatable, Sendable {
 
 public struct VoiceInkMacOSSettingsPresentation: Equatable, Sendable {
     public let generalSectionTitle: String
-    public let showMenuBarIconTitle: String
-    public let hideDockIconTitle: String
+    public let menuBarTitle: String
+    public let dockIconTitle: String
     public let launchAtLoginTitle: String
     public let autoCheckUpdatesTitle: String
     public let showAnnouncementsTitle: String
@@ -1461,8 +1461,8 @@ public struct VoiceInkMacOSSettingsPresentation: Equatable, Sendable {
 
     public static let macOS = VoiceInkMacOSSettingsPresentation(
         generalSectionTitle: "General",
-        showMenuBarIconTitle: "Show in Menu Bar",
-        hideDockIconTitle: "Hide Dock Icon",
+        menuBarTitle: "Menu Bar",
+        dockIconTitle: "Dock Icon",
         launchAtLoginTitle: "Launch at Login",
         autoCheckUpdatesTitle: "Auto-check Updates",
         showAnnouncementsTitle: "Show Announcements",
@@ -1774,6 +1774,7 @@ public struct VoiceInkGeneralSettingsBackupPayload<ShortcutBackup: Codable>: Cod
     private let isMiddleClickToggleEnabled: Bool?
     private let middleClickActivationDelay: Int?
     private let launchAtLoginEnabled: Bool?
+    // Legacy backup wire field. Keep its inverted meaning so existing backup files round-trip.
     private let isMenuBarOnly: Bool?
     private let recorderType: String?
     private let isTranscriptionCleanupEnabled: Bool?
@@ -1883,7 +1884,7 @@ public struct VoiceInkGeneralSettingsBackupPayload<ShortcutBackup: Codable>: Cod
     private var macOSShellBackupPreferences: VoiceInkMacOSShellBackupPreferences {
         VoiceInkMacOSShellBackupPreferences(
             launchAtLoginEnabled: launchAtLoginEnabled,
-            isMenuBarOnly: isMenuBarOnly,
+            showDockIcon: isMenuBarOnly.map { !$0 },
             recorderType: recorderType
         )
     }
@@ -2767,14 +2768,14 @@ public struct VoiceInkAudioSessionDeactivationExecutionPlan: Equatable, Sendable
 
 public enum VoiceInkMenuBarPreference {
     public static let showMenuBarIconKey = VoiceInkUserDefaultsKey.showMenuBarIcon
-    public static let isMenuBarOnlyKey = VoiceInkUserDefaultsKey.isMenuBarOnly
+    public static let legacyIsMenuBarOnlyKey = VoiceInkUserDefaultsKey.legacyIsMenuBarOnly
     public static let defaultShowMenuBarIcon = VoiceInkPreferenceDefault.showMenuBarIcon
-    public static let defaultIsMenuBarOnly = VoiceInkPreferenceDefault.isMenuBarOnly
+    public static let defaultShowDockIcon = VoiceInkPreferenceDefault.showDockIcon
 
     public static var registeredDefaults: [String: Any] {
         [
             showMenuBarIconKey: defaultShowMenuBarIcon,
-            isMenuBarOnlyKey: defaultIsMenuBarOnly
+            legacyIsMenuBarOnlyKey: !defaultShowDockIcon
         ]
     }
 
@@ -2786,12 +2787,15 @@ public enum VoiceInkMenuBarPreference {
         defaults.set(shouldShow, forKey: showMenuBarIconKey)
     }
 
-    public static func isMenuBarOnly(from defaults: UserDefaults = .standard) -> Bool {
-        defaults.bool(forKey: isMenuBarOnlyKey)
+    public static func shouldShowDockIcon(from defaults: UserDefaults = .standard) -> Bool {
+        guard let isMenuBarOnly = defaults.object(forKey: legacyIsMenuBarOnlyKey) as? Bool else {
+            return defaultShowDockIcon
+        }
+        return !isMenuBarOnly
     }
 
-    public static func saveIsMenuBarOnly(_ isMenuBarOnly: Bool, to defaults: UserDefaults = .standard) {
-        defaults.set(isMenuBarOnly, forKey: isMenuBarOnlyKey)
+    public static func saveShowDockIcon(_ shouldShow: Bool, to defaults: UserDefaults = .standard) {
+        defaults.set(!shouldShow, forKey: legacyIsMenuBarOnlyKey)
     }
 }
 
@@ -2840,8 +2844,8 @@ public enum VoiceInkMacOSMenuBarPresentation {
         "AI Model: \(currentModelName)"
     }
 
-    public static func dockIconTitle(isMenuBarOnly: Bool) -> String {
-        isMenuBarOnly ? showDockIconTitle : hideDockIconTitle
+    public static func dockIconTitle(showDockIcon: Bool) -> String {
+        showDockIcon ? hideDockIconTitle : showDockIconTitle
     }
 
     private static let noneDisplayText = "None"
@@ -2857,8 +2861,8 @@ public enum VoiceInkMacOSMenuBarDiagnostics {
     public static let openHistoryWindowOpeningMessage = "openHistoryWindow: opening history window"
     public static let openHistoryWindowActivationPolicyMessage = "openHistoryWindow: activation policy set to .regular"
 
-    public static func openMainWindowRequestedMessage(destination: String, isMenuBarOnly: Bool) -> String {
-        "openMainWindowAndNavigate: requested destination=\(destination), isMenuBarOnly=\(isMenuBarOnly)"
+    public static func openMainWindowRequestedMessage(destination: String, showDockIcon: Bool) -> String {
+        "openMainWindowAndNavigate: requested destination=\(destination), showDockIcon=\(showDockIcon)"
     }
 
     public static func openMainWindowFailedMessage(destination: String) -> String {
@@ -2883,45 +2887,50 @@ public enum VoiceInkMacOSMenuBarDiagnostics {
 
 public struct VoiceInkMacOSShellBackupPreferences: Codable, Equatable, Sendable {
     public let launchAtLoginEnabled: Bool?
+    // Legacy backup wire field. Runtime callers use the positive showDockIcon view.
     public let isMenuBarOnly: Bool?
     public let recorderType: String?
 
+    public var showDockIcon: Bool? {
+        isMenuBarOnly.map { !$0 }
+    }
+
     public init(
         launchAtLoginEnabled: Bool?,
-        isMenuBarOnly: Bool?,
+        showDockIcon: Bool?,
         recorderType: String?
     ) {
         self.launchAtLoginEnabled = launchAtLoginEnabled
-        self.isMenuBarOnly = isMenuBarOnly
+        self.isMenuBarOnly = showDockIcon.map { !$0 }
         self.recorderType = recorderType
     }
 }
 
 public struct VoiceInkMacOSShellBackupImportPlan: Equatable, Sendable {
     private let launchAtLoginEnabled: Bool?
-    private let isMenuBarOnly: Bool?
+    private let showDockIcon: Bool?
     private let recorderType: String?
 
     public init(
         launchAtLoginEnabled: Bool?,
-        isMenuBarOnly: Bool?,
+        showDockIcon: Bool?,
         recorderType: String?
     ) {
         self.launchAtLoginEnabled = launchAtLoginEnabled
-        self.isMenuBarOnly = isMenuBarOnly
+        self.showDockIcon = showDockIcon
         self.recorderType = recorderType
     }
 
     public func applyRuntimeState(
         setLaunchAtLoginEnabled: (Bool) -> Void,
-        setMenuBarOnly: (Bool) -> Void,
+        setShowDockIcon: (Bool) -> Void,
         setRecorderType: (String) -> Void
     ) {
         if let launchAtLoginEnabled {
             setLaunchAtLoginEnabled(launchAtLoginEnabled)
         }
-        if let isMenuBarOnly {
-            setMenuBarOnly(isMenuBarOnly)
+        if let showDockIcon {
+            setShowDockIcon(showDockIcon)
         }
         if let recorderType {
             setRecorderType(recorderType)
@@ -2932,12 +2941,12 @@ public struct VoiceInkMacOSShellBackupImportPlan: Equatable, Sendable {
 public enum VoiceInkMacOSShellBackupPreference {
     public static func backupPreferences(
         launchAtLoginEnabled: Bool,
-        isMenuBarOnly: Bool,
+        showDockIcon: Bool,
         recorderType: String
     ) -> VoiceInkMacOSShellBackupPreferences {
         VoiceInkMacOSShellBackupPreferences(
             launchAtLoginEnabled: launchAtLoginEnabled,
-            isMenuBarOnly: isMenuBarOnly,
+            showDockIcon: showDockIcon,
             recorderType: recorderType
         )
     }
@@ -2947,7 +2956,7 @@ public enum VoiceInkMacOSShellBackupPreference {
     ) -> VoiceInkMacOSShellBackupImportPlan {
         VoiceInkMacOSShellBackupImportPlan(
             launchAtLoginEnabled: preferences.launchAtLoginEnabled,
-            isMenuBarOnly: preferences.isMenuBarOnly,
+            showDockIcon: preferences.showDockIcon,
             recorderType: preferences.recorderType
         )
     }

@@ -637,6 +637,27 @@ enum CursorTextContextReader {
         return nil
     }
 
+    static func firstUsableTextMarkerBounds<Element, Marker>(
+        startingAt element: Element,
+        traversalLimit: Int,
+        markerRange: (Element, Int) -> Marker?,
+        bounds: (Element, Marker, Int) -> CGRect?,
+        parent: (Element) -> Element?
+    ) -> (bounds: CGRect, depth: Int)? {
+        guard traversalLimit > 0 else { return nil }
+        var currentElement: Element? = element
+        for depth in 0..<traversalLimit {
+            guard let element = currentElement else { return nil }
+            if let markerRange = markerRange(element, depth),
+               let bounds = bounds(element, markerRange, depth),
+               contextMenuBoundsAreUsable(bounds) {
+                return (bounds, depth)
+            }
+            currentElement = parent(element)
+        }
+        return nil
+    }
+
     @MainActor
     private static func performShowMenuAction(
         startingAt capturedElement: AXUIElement,
@@ -764,12 +785,7 @@ enum CursorTextContextReader {
         displayBounds: [CGRect],
         hitTestMatchesEditor: (CGPoint) -> Bool
     ) -> CGPoint? {
-        guard bounds.width >= 0,
-              bounds.height > 0,
-              bounds.origin.x.isFinite,
-              bounds.origin.y.isFinite,
-              bounds.width.isFinite,
-              bounds.height.isFinite else {
+        guard contextMenuBoundsAreUsable(bounds) else {
             return nil
         }
         let points = [
@@ -790,6 +806,15 @@ enum CursorTextContextReader {
             displayBounds.contains(where: { $0.contains(point) })
                 && hitTestMatchesEditor(point)
         }
+    }
+
+    private static func contextMenuBoundsAreUsable(_ bounds: CGRect) -> Bool {
+        bounds.width >= 0
+            && bounds.height > 0
+            && bounds.origin.x.isFinite
+            && bounds.origin.y.isFinite
+            && bounds.width.isFinite
+            && bounds.height.isFinite
     }
 
     private static func activeDisplayBounds() -> [CGRect] {
@@ -1457,43 +1482,56 @@ enum CursorTextContextReader {
     private static func boundsForSelectedTextMarkerRange(
         in element: AXUIElement
     ) -> ContextMenuBoundsProbe {
-        var markerRange: CFTypeRef?
-        let markerResult = AXUIElementCopyAttributeValue(
-            element,
-            kAXSelectedTextMarkerRangeAttribute as CFString,
-            &markerRange
+        var visitedAncestorCount = 0
+        var lastDetails = "marker=none"
+        let match = firstUsableTextMarkerBounds(
+            startingAt: element,
+            traversalLimit: insertionAncestorTraversalLimit,
+            markerRange: { candidate, depth in
+                visitedAncestorCount = depth + 1
+                var markerRange: CFTypeRef?
+                let markerResult = AXUIElementCopyAttributeValue(
+                    candidate,
+                    kAXSelectedTextMarkerRangeAttribute as CFString,
+                    &markerRange
+                )
+                guard markerResult == .success,
+                      let markerRange else {
+                    lastDetails = "markerDepth=\(depth) markerQuery=\(markerResult.rawValue) marker=none"
+                    return nil
+                }
+                guard CFGetTypeID(markerRange) == AXTextMarkerRangeGetTypeID() else {
+                    lastDetails = "markerDepth=\(depth) markerQuery=\(markerResult.rawValue) marker=cf:\(CFGetTypeID(markerRange))"
+                    return nil
+                }
+                lastDetails = "markerDepth=\(depth) markerQuery=\(markerResult.rawValue)"
+                return markerRange
+            },
+            bounds: { candidate, markerRange, depth in
+                var value: CFTypeRef?
+                let queryResult = AXUIElementCopyParameterizedAttributeValue(
+                    candidate,
+                    kAXBoundsForTextMarkerRangeParameterizedAttribute as CFString,
+                    markerRange,
+                    &value
+                )
+                guard queryResult == .success,
+                      let value else {
+                    lastDetails = "\(lastDetails) query=\(queryResult.rawValue) value=none"
+                    return nil
+                }
+                let probe = contextMenuBoundsProbe(queryResult: queryResult, value: value)
+                lastDetails = "\(lastDetails) \(probe.details)"
+                return probe.bounds
+            },
+            parent: parentElement
         )
-        guard markerResult == .success,
-              let markerRange else {
-            return ContextMenuBoundsProbe(
-                bounds: nil,
-                details: "markerQuery=\(markerResult.rawValue) marker=none"
-            )
+        if let match {
+            return ContextMenuBoundsProbe(bounds: match.bounds, details: lastDetails)
         }
-        guard CFGetTypeID(markerRange) == AXTextMarkerRangeGetTypeID() else {
-            return ContextMenuBoundsProbe(
-                bounds: nil,
-                details: "markerQuery=\(markerResult.rawValue) marker=cf:\(CFGetTypeID(markerRange))"
-            )
-        }
-        var value: CFTypeRef?
-        let queryResult = AXUIElementCopyParameterizedAttributeValue(
-            element,
-            kAXBoundsForTextMarkerRangeParameterizedAttribute as CFString,
-            markerRange,
-            &value
-        )
-        guard queryResult == .success,
-              let value else {
-            return ContextMenuBoundsProbe(
-                bounds: nil,
-                details: "markerQuery=\(markerResult.rawValue) query=\(queryResult.rawValue) value=none"
-            )
-        }
-        let probe = contextMenuBoundsProbe(queryResult: queryResult, value: value)
         return ContextMenuBoundsProbe(
-            bounds: probe.bounds,
-            details: "markerQuery=\(markerResult.rawValue) \(probe.details)"
+            bounds: nil,
+            details: "markerAncestors=\(visitedAncestorCount) \(lastDetails)"
         )
     }
 

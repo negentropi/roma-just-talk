@@ -337,6 +337,42 @@ struct VoiceInkTests {
         ) == CGRect(x: -40, y: 220, width: 30, height: 40))
     }
 
+    @Test func browserTextMarkerBoundsSearchesAncestorsWithinLimit() throws {
+        let parents = ["editor": "group", "group": "webArea"]
+        var markerQueries: [String] = []
+        var boundsQueries: [String] = []
+        let match = try #require(CursorTextContextReader.firstUsableTextMarkerBounds(
+            startingAt: "editor",
+            traversalLimit: 3,
+            markerRange: { element, _ in
+                markerQueries.append(element)
+                return element == "editor" ? nil : "marker-from-\(element)"
+            },
+            bounds: { element, marker, _ in
+                boundsQueries.append("\(element):\(marker)")
+                return element == "webArea"
+                    ? CGRect(x: 1, y: 2, width: 0, height: 16)
+                    : .zero
+            },
+            parent: { parents[$0] }
+        ))
+
+        #expect(match.depth == 2)
+        #expect(match.bounds == CGRect(x: 1, y: 2, width: 0, height: 16))
+        #expect(markerQueries == ["editor", "group", "webArea"])
+        #expect(boundsQueries == [
+            "group:marker-from-group",
+            "webArea:marker-from-webArea"
+        ])
+        #expect(CursorTextContextReader.firstUsableTextMarkerBounds(
+            startingAt: "editor",
+            traversalLimit: 2,
+            markerRange: { element, _ in element == "editor" ? nil : element },
+            bounds: { _, _, _ in .zero },
+            parent: { parents[$0] }
+        ) == nil)
+    }
+
     @Test func browserContextMenuCandidateRequiresTriggerPointProvenance() {
         let point = CGPoint(x: 100, y: 200)
         #expect(CursorTextContextReader.attributableContextMenuCandidates(

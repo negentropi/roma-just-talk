@@ -274,8 +274,12 @@ struct VoiceInkTests {
 
     @Test func browserContextMenuPointRequiresUsableBoundsAndEditorHit() {
         let bounds = CGRect(x: -10, y: 20, width: 0, height: 16)
+        let displayBounds = [CGRect(x: -100, y: 0, width: 200, height: 1_000)]
         var inspectedPoints: [CGPoint] = []
-        let point = CursorTextContextReader.verifiedContextMenuPoint(in: bounds) {
+        let point = CursorTextContextReader.verifiedContextMenuPoint(
+            in: bounds,
+            displayBounds: displayBounds
+        ) {
             inspectedPoints.append($0)
             return inspectedPoints.count == 2
         }
@@ -284,14 +288,22 @@ struct VoiceInkTests {
 
         #expect(CursorTextContextReader.verifiedContextMenuPoint(
             in: bounds,
+            displayBounds: displayBounds,
             hitTestMatchesEditor: { _ in false }
         ) == nil)
         #expect(CursorTextContextReader.verifiedContextMenuPoint(
             in: CGRect(x: 0, y: 0, width: 1, height: 0),
+            displayBounds: displayBounds,
             hitTestMatchesEditor: { _ in true }
         ) == nil)
         #expect(CursorTextContextReader.verifiedContextMenuPoint(
             in: CGRect(x: CGFloat.greatestFiniteMagnitude, y: 0, width: 1, height: 1),
+            displayBounds: displayBounds,
+            hitTestMatchesEditor: { _ in true }
+        ) == nil)
+        #expect(CursorTextContextReader.verifiedContextMenuPoint(
+            in: CGRect(x: 1_000, y: 1_000, width: 1, height: 16),
+            displayBounds: displayBounds,
             hitTestMatchesEditor: { _ in true }
         ) == nil)
     }

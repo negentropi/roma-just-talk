@@ -64,6 +64,11 @@ enum CursorTextContextReader {
         let disposition: ContextMenuPasteDisposition
     }
 
+    private struct ContextMenuAnchor {
+        let point: CGPoint
+        let boundsMethod: String
+    }
+
     @MainActor
     final class FocusedPasteTarget: Sendable {
         fileprivate let focusedElement: AXUIElement
@@ -333,14 +338,14 @@ enum CursorTextContextReader {
         )
         let contextMenuPoint: CGPoint?
         if showResult != .success {
-            let clickedPoint = postCaretContextMenuClick(to: target)
+            let anchor = postCaretContextMenuClick(to: target)
             VoiceInkLatencyTrace.shared.event(
                 "paste_context_menu_show",
-                details: "method=caretRightClick targetPid=\(processIdentifier) result=\(clickedPoint == nil ? "unavailable" : "posted")",
+                details: "method=caretRightClick targetPid=\(processIdentifier) bounds=\(anchor?.boundsMethod ?? "unavailable") result=\(anchor == nil ? "unavailable" : "posted")",
                 token: latencyTraceToken
             )
-            guard let clickedPoint else { return nil }
-            contextMenuPoint = clickedPoint
+            guard let anchor else { return nil }
+            contextMenuPoint = anchor.point
         } else {
             contextMenuPoint = nil
         }
@@ -673,16 +678,16 @@ enum CursorTextContextReader {
     }
 
     @MainActor
-    private static func postCaretContextMenuClick(to target: FocusedPasteTarget) -> CGPoint? {
+    private static func postCaretContextMenuClick(to target: FocusedPasteTarget) -> ContextMenuAnchor? {
         guard pasteTargetIsCurrent(target),
               let selectedRange = target.selectedRange,
-              let point = verifiedPointForContextMenu(
+              let anchor = verifiedContextMenuAnchor(
                 range: selectedRange,
                 in: target.focusedElement
               ),
               pasteTargetIsCurrent(target),
               let events = rightClickContextMenuEvents(
-                at: point,
+                at: anchor.point,
                 source: CGEventSource(stateID: .combinedSessionState)
               ) else {
             return nil
@@ -690,15 +695,32 @@ enum CursorTextContextReader {
         for event in events {
             event.postToPid(target.processIdentifier)
         }
-        return point
+        return anchor
     }
 
-    private static func verifiedPointForContextMenu(
+    private static func verifiedContextMenuAnchor(
         range: CFRange,
         in editor: AXUIElement
+    ) -> ContextMenuAnchor? {
+        if let bounds = boundsForRange(range, in: editor),
+           let point = verifiedContextMenuPoint(in: bounds, matching: editor) {
+            return ContextMenuAnchor(point: point, boundsMethod: "range")
+        }
+        if let bounds = boundsForSelectedTextMarkerRange(in: editor),
+           let point = verifiedContextMenuPoint(in: bounds, matching: editor) {
+            return ContextMenuAnchor(point: point, boundsMethod: "textMarkerRange")
+        }
+        return nil
+    }
+
+    private static func verifiedContextMenuPoint(
+        in bounds: CGRect,
+        matching editor: AXUIElement
     ) -> CGPoint? {
-        guard let bounds = boundsForRange(range, in: editor) else { return nil }
-        return verifiedContextMenuPoint(in: bounds) { point in
+        verifiedContextMenuPoint(
+            in: bounds,
+            displayBounds: activeDisplayBounds()
+        ) { point in
             guard let hitElement = elementAtPosition(point) else { return false }
             return element(hitElement, belongsTo: editor)
         }
@@ -706,6 +728,7 @@ enum CursorTextContextReader {
 
     static func verifiedContextMenuPoint(
         in bounds: CGRect,
+        displayBounds: [CGRect],
         hitTestMatchesEditor: (CGPoint) -> Bool
     ) -> CGPoint? {
         guard bounds.width >= 0,
@@ -730,7 +753,25 @@ enum CursorTextContextReader {
         }) else {
             return nil
         }
-        return points.first(where: hitTestMatchesEditor)
+        return points.first { point in
+            displayBounds.contains(where: { $0.contains(point) })
+                && hitTestMatchesEditor(point)
+        }
+    }
+
+    private static func activeDisplayBounds() -> [CGRect] {
+        var displayCount: UInt32 = 0
+        guard CGGetActiveDisplayList(0, nil, &displayCount) == .success,
+              displayCount > 0 else {
+            return []
+        }
+        let capacity = displayCount
+        var displays = [CGDirectDisplayID](repeating: 0, count: Int(capacity))
+        let result = displays.withUnsafeMutableBufferPointer { buffer in
+            CGGetActiveDisplayList(capacity, buffer.baseAddress, &displayCount)
+        }
+        guard result == .success else { return [] }
+        return displays.prefix(Int(displayCount)).map(CGDisplayBounds)
     }
 
     private static func element(_ candidate: AXUIElement, belongsTo ancestor: AXUIElement) -> Bool {
@@ -1360,10 +1401,38 @@ enum CursorTextContextReader {
             rangeValue,
             &value
         ) == .success,
-              let value,
-              CFGetTypeID(value) == AXValueGetTypeID() else {
+              let value else {
             return nil
         }
+        return rect(from: value)
+    }
+
+    private static func boundsForSelectedTextMarkerRange(in element: AXUIElement) -> CGRect? {
+        var markerRange: CFTypeRef?
+        guard AXUIElementCopyAttributeValue(
+            element,
+            kAXSelectedTextMarkerRangeAttribute as CFString,
+            &markerRange
+        ) == .success,
+              let markerRange,
+              CFGetTypeID(markerRange) == AXTextMarkerRangeGetTypeID() else {
+            return nil
+        }
+        var value: CFTypeRef?
+        guard AXUIElementCopyParameterizedAttributeValue(
+            element,
+            kAXBoundsForTextMarkerRangeParameterizedAttribute as CFString,
+            markerRange,
+            &value
+        ) == .success,
+              let value else {
+            return nil
+        }
+        return rect(from: value)
+    }
+
+    private static func rect(from value: CFTypeRef) -> CGRect? {
+        guard CFGetTypeID(value) == AXValueGetTypeID() else { return nil }
         let axValue = value as! AXValue
         guard AXValueGetType(axValue) == .cgRect else { return nil }
         var bounds = CGRect.zero

@@ -243,6 +243,78 @@ struct VoiceInkTests {
             capturedRange: capturedRange,
             currentRange: CFRange(location: 8, length: 0)
         ))
+        #expect(!CursorTextContextReader.pasteTargetSnapshotMatches(
+            capturedEditorFocused: true,
+            capturedText: nil,
+            currentText: nil,
+            capturedRange: capturedRange,
+            currentRange: capturedRange
+        ))
+        #expect(!CursorTextContextReader.pasteTargetSnapshotMatches(
+            capturedEditorFocused: true,
+            capturedText: "before after",
+            currentText: "before after",
+            capturedRange: nil,
+            currentRange: nil
+        ))
+    }
+
+    @Test func browserContextMenuRightClickIsBalancedAndPositionBound() throws {
+        let point = CGPoint(x: 123, y: 456)
+        let events = try #require(CursorTextContextReader.rightClickContextMenuEvents(
+            at: point,
+            source: CGEventSource(stateID: .combinedSessionState)
+        ))
+        #expect(events.map(\.type) == [.rightMouseDown, .rightMouseUp])
+        #expect(events.allSatisfy { $0.location == point })
+        #expect(events.allSatisfy {
+            $0.getIntegerValueField(.mouseEventClickState) == 1
+        })
+    }
+
+    @Test func browserContextMenuPointRequiresUsableBoundsAndEditorHit() {
+        let bounds = CGRect(x: -10, y: 20, width: 0, height: 16)
+        var inspectedPoints: [CGPoint] = []
+        let point = CursorTextContextReader.verifiedContextMenuPoint(in: bounds) {
+            inspectedPoints.append($0)
+            return inspectedPoints.count == 2
+        }
+        #expect(point == CGPoint(x: -9, y: 28))
+        #expect(inspectedPoints == [CGPoint(x: -10, y: 28), CGPoint(x: -9, y: 28)])
+
+        #expect(CursorTextContextReader.verifiedContextMenuPoint(
+            in: bounds,
+            hitTestMatchesEditor: { _ in false }
+        ) == nil)
+        #expect(CursorTextContextReader.verifiedContextMenuPoint(
+            in: CGRect(x: 0, y: 0, width: 1, height: 0),
+            hitTestMatchesEditor: { _ in true }
+        ) == nil)
+        #expect(CursorTextContextReader.verifiedContextMenuPoint(
+            in: CGRect(x: CGFloat.greatestFiniteMagnitude, y: 0, width: 1, height: 1),
+            hitTestMatchesEditor: { _ in true }
+        ) == nil)
+    }
+
+    @Test func browserContextMenuCandidateRequiresTriggerPointProvenance() {
+        let point = CGPoint(x: 100, y: 200)
+        #expect(CursorTextContextReader.attributableContextMenuCandidates(
+            ["competing", "captured"],
+            triggerPoint: point,
+            ownsTriggerPoint: { candidate, receivedPoint in
+                candidate == "captured" && receivedPoint == point
+            }
+        ) == ["captured"])
+        #expect(CursorTextContextReader.attributableContextMenuCandidates(
+            ["competing"],
+            triggerPoint: point,
+            ownsTriggerPoint: { _, _ in false }
+        ).isEmpty)
+        #expect(CursorTextContextReader.attributableContextMenuCandidates(
+            ["accessibility-action"],
+            triggerPoint: nil,
+            ownsTriggerPoint: { _, _ in false }
+        ) == ["accessibility-action"])
     }
 
     @Test func accessibilityInsertionObservationAcceptsTextOrCursorMutation() {

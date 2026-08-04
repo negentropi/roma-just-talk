@@ -40,11 +40,14 @@ when exactly one of each occurred. This matches web apps that reject
 Accessibility-only value mutation. When a cold browser keeps its app-menu Paste
 command disabled, Roma refreshes that command by opening and closing its
 containing app menu. If Paste remains unavailable, Roma asks the captured editor
-(or one of its ancestors) to show its context menu through Accessibility,
-presses enabled Paste from the newly visible menu, and confirms the exact
+(or one of its ancestors) to show its context menu through Accessibility. When
+Chromium does not advertise that action, Roma right-clicks the AX-reported caret
+only after a system hit-test resolves back to the captured editor. It accepts
+only an activated menu that owns that same screen point, then presses enabled
+Paste and confirms the exact
 replacement before reporting delivery. Browser fallbacks stay bound to that
-editor's unchanged text and selection; drift aborts without a recaptured or
-CGEvent paste.
+editor's unchanged text and selection; drift aborts without a recaptured,
+keyboard-triggered, or Cmd-V CGEvent paste.
 Document and
 Electron editor apps open a uniquely named temporary text file. Every target
 runs once empty and once with text on both sides of the insertion cursor.

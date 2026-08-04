@@ -300,8 +300,10 @@ enum CursorTextContextReader {
             )
         }
 
-        let textBeforePaste = target.text
-        let selectedRangeBeforePaste = target.selectedRange
+        guard let textBeforePaste = target.text,
+              let selectedRangeBeforePaste = target.selectedRange else {
+            return nil
+        }
         let application = AXUIElementCreateApplication(processIdentifier)
         let menusBeforeShow = menuSnapshots(in: application)
         let applicationSearch = plainCommandVMenuItem(in: application)
@@ -329,7 +331,19 @@ enum CursorTextContextReader {
             details: "method=elementAccessibility targetPid=\(processIdentifier) result=\(showResult.rawValue)",
             token: latencyTraceToken
         )
-        guard showResult == .success else { return nil }
+        let contextMenuPoint: CGPoint?
+        if showResult != .success {
+            let clickedPoint = postCaretContextMenuClick(to: target)
+            VoiceInkLatencyTrace.shared.event(
+                "paste_context_menu_show",
+                details: "method=caretRightClick targetPid=\(processIdentifier) result=\(clickedPoint == nil ? "unavailable" : "posted")",
+                token: latencyTraceToken
+            )
+            guard let clickedPoint else { return nil }
+            contextMenuPoint = clickedPoint
+        } else {
+            contextMenuPoint = nil
+        }
 
         for attempt in 0..<contextMenuTraversalAttempts {
             do {
@@ -337,18 +351,20 @@ enum CursorTextContextReader {
                     nanoseconds: UInt64(contextMenuTraversalRetryDelay * 1_000_000_000)
                 )
             } catch {
-                cancelMenus(activatedMenuElements(
+                cancelMenus(contextMenuElements(
                     in: application,
-                    since: menusBeforeShow
+                    since: menusBeforeShow,
+                    triggerPoint: contextMenuPoint
                 ))
                 return ContextMenuPasteResult(
                     processIdentifier: processIdentifier,
                     disposition: .deliveryUncertain
                 )
             }
-            let contextMenus = activatedMenuElements(
+            let contextMenus = contextMenuElements(
                 in: application,
-                since: menusBeforeShow
+                since: menusBeforeShow,
+                triggerPoint: contextMenuPoint
             )
             guard !Task.isCancelled,
                   capturedEditorIsFocused(
@@ -424,9 +440,10 @@ enum CursorTextContextReader {
             }
         }
 
-        cancelMenus(activatedMenuElements(
+        cancelMenus(contextMenuElements(
             in: application,
-            since: menusBeforeShow
+            since: menusBeforeShow,
+            triggerPoint: contextMenuPoint
         ))
         return ContextMenuPasteResult(
             processIdentifier: processIdentifier,
@@ -632,6 +649,100 @@ enum CursorTextContextReader {
         return .actionUnsupported
     }
 
+    static func rightClickContextMenuEvents(
+        at point: CGPoint,
+        source: CGEventSource?
+    ) -> [CGEvent]? {
+        guard let mouseDown = CGEvent(
+            mouseEventSource: source,
+            mouseType: .rightMouseDown,
+            mouseCursorPosition: point,
+            mouseButton: .right
+        ),
+        let mouseUp = CGEvent(
+            mouseEventSource: source,
+            mouseType: .rightMouseUp,
+            mouseCursorPosition: point,
+            mouseButton: .right
+        ) else {
+            return nil
+        }
+        mouseDown.setIntegerValueField(.mouseEventClickState, value: 1)
+        mouseUp.setIntegerValueField(.mouseEventClickState, value: 1)
+        return [mouseDown, mouseUp]
+    }
+
+    @MainActor
+    private static func postCaretContextMenuClick(to target: FocusedPasteTarget) -> CGPoint? {
+        guard pasteTargetIsCurrent(target),
+              let selectedRange = target.selectedRange,
+              let point = verifiedPointForContextMenu(
+                range: selectedRange,
+                in: target.focusedElement
+              ),
+              pasteTargetIsCurrent(target),
+              let events = rightClickContextMenuEvents(
+                at: point,
+                source: CGEventSource(stateID: .combinedSessionState)
+              ) else {
+            return nil
+        }
+        for event in events {
+            event.postToPid(target.processIdentifier)
+        }
+        return point
+    }
+
+    private static func verifiedPointForContextMenu(
+        range: CFRange,
+        in editor: AXUIElement
+    ) -> CGPoint? {
+        guard let bounds = boundsForRange(range, in: editor) else { return nil }
+        return verifiedContextMenuPoint(in: bounds) { point in
+            guard let hitElement = elementAtPosition(point) else { return false }
+            return element(hitElement, belongsTo: editor)
+        }
+    }
+
+    static func verifiedContextMenuPoint(
+        in bounds: CGRect,
+        hitTestMatchesEditor: (CGPoint) -> Bool
+    ) -> CGPoint? {
+        guard bounds.width >= 0,
+              bounds.height > 0,
+              bounds.origin.x.isFinite,
+              bounds.origin.y.isFinite,
+              bounds.width.isFinite,
+              bounds.height.isFinite else {
+            return nil
+        }
+        let points = [
+            CGPoint(x: bounds.midX, y: bounds.midY),
+            CGPoint(x: bounds.midX + 1, y: bounds.midY),
+            CGPoint(x: bounds.midX - 1, y: bounds.midY)
+        ]
+        let maximumCoordinate = CGFloat(Float.greatestFiniteMagnitude)
+        guard points.allSatisfy({ point in
+            point.x.isFinite
+                && point.y.isFinite
+                && abs(point.x) <= maximumCoordinate
+                && abs(point.y) <= maximumCoordinate
+        }) else {
+            return nil
+        }
+        return points.first(where: hitTestMatchesEditor)
+    }
+
+    private static func element(_ candidate: AXUIElement, belongsTo ancestor: AXUIElement) -> Bool {
+        var currentElement: AXUIElement? = candidate
+        for _ in 0..<insertionAncestorTraversalLimit {
+            guard let element = currentElement else { return false }
+            if CFEqual(element, ancestor) { return true }
+            currentElement = parentElement(from: element)
+        }
+        return false
+    }
+
     @MainActor
     private static func pasteTargetIsCurrent(_ target: FocusedPasteTarget) -> Bool {
         pasteTargetSnapshotMatches(
@@ -653,8 +764,14 @@ enum CursorTextContextReader {
         capturedRange: CFRange?,
         currentRange: CFRange?
     ) -> Bool {
-        capturedEditorFocused
-            && capturedText == currentText
+        guard capturedEditorFocused,
+              let capturedText,
+              let currentText,
+              let capturedRange,
+              let currentRange else {
+            return false
+        }
+        return capturedText == currentText
             && sameRange(capturedRange, currentRange)
     }
 
@@ -732,6 +849,29 @@ enum CursorTextContextReader {
             }
             return current.element
         }
+    }
+
+    private static func contextMenuElements(
+        in application: AXUIElement,
+        since previousMenus: [MenuSnapshot],
+        triggerPoint: CGPoint?
+    ) -> [AXUIElement] {
+        attributableContextMenuCandidates(
+            activatedMenuElements(in: application, since: previousMenus),
+            triggerPoint: triggerPoint
+        ) { menu, point in
+            guard let hitElement = elementAtPosition(point) else { return false }
+            return element(hitElement, belongsTo: menu)
+        }
+    }
+
+    static func attributableContextMenuCandidates<Menu>(
+        _ candidates: [Menu],
+        triggerPoint: CGPoint?,
+        ownsTriggerPoint: (Menu, CGPoint) -> Bool
+    ) -> [Menu] {
+        guard let triggerPoint else { return candidates }
+        return candidates.filter { ownsTriggerPoint($0, triggerPoint) }
     }
 
     private static func cancelMenus(_ menus: [AXUIElement]) {
@@ -1106,6 +1246,19 @@ enum CursorTextContextReader {
         return (value as! AXUIElement)
     }
 
+    private static func elementAtPosition(_ point: CGPoint) -> AXUIElement? {
+        var element: AXUIElement?
+        guard AXUIElementCopyElementAtPosition(
+            AXUIElementCreateSystemWide(),
+            Float(point.x),
+            Float(point.y),
+            &element
+        ) == .success else {
+            return nil
+        }
+        return element
+    }
+
     private static func childElements(from element: AXUIElement) -> [AXUIElement] {
         var value: CFTypeRef?
         guard AXUIElementCopyAttributeValue(
@@ -1195,6 +1348,27 @@ enum CursorTextContextReader {
         }
 
         return range
+    }
+
+    private static func boundsForRange(_ range: CFRange, in element: AXUIElement) -> CGRect? {
+        var range = range
+        guard let rangeValue = AXValueCreate(.cfRange, &range) else { return nil }
+        var value: CFTypeRef?
+        guard AXUIElementCopyParameterizedAttributeValue(
+            element,
+            kAXBoundsForRangeParameterizedAttribute as CFString,
+            rangeValue,
+            &value
+        ) == .success,
+              let value,
+              CFGetTypeID(value) == AXValueGetTypeID() else {
+            return nil
+        }
+        let axValue = value as! AXValue
+        guard AXValueGetType(axValue) == .cgRect else { return nil }
+        var bounds = CGRect.zero
+        guard AXValueGetValue(axValue, .cgRect, &bounds) else { return nil }
+        return bounds
     }
 
     private static func setSelectedTextRange(_ range: CFRange, on element: AXUIElement) -> Bool {

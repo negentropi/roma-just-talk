@@ -35,7 +35,9 @@ stable. AX may arrive later without moving the earlier rendered timestamp.
 
 Each selected browser opens an isolated local tab with a uniquely titled,
 controlled contenteditable. It accepts only paste-backed DOM `input` events,
-matching web apps that reject Accessibility-only value mutation. Document and
+records DOM `paste` and accepted-input counts in the report, and passes only
+when exactly one of each occurred. This matches web apps that reject
+Accessibility-only value mutation. Document and
 Electron editor apps open a uniquely named temporary text file. Every target
 runs once empty and once with text on both sides of the insertion cursor.
 Cleanup saves an empty temporary document before closing its tab/window, removes

@@ -74,6 +74,18 @@ do {
         existingTextScenario.insertedText(from: "dictated text") == nil,
         "existing-text cases must fail if either side is lost"
     )
+    let singlePasteProof = RuntimeDOMPasteProof.parse(
+        from: "Roma Runtime E2E Paste Proof pasteEvents=1 pasteInputs=1"
+    )
+    try require(
+        singlePasteProof?.provesExactlyOnePaste == true,
+        "browser proof must accept exactly one paste event and one paste-backed input"
+    )
+    try require(
+        !RuntimeDOMPasteProof(pasteEventCount: 2, pasteInputCount: 2)
+            .provesExactlyOnePaste,
+        "browser proof must reject duplicate paste operations"
+    )
     try require(
         RuntimeTargetIsolationPlan.runID(
             "fixture-chrome-existingText-r1-ABC123",
@@ -126,6 +138,24 @@ do {
     try require(noPaste.status == .noPaste, "missing target text should be classified as noPaste")
     try require(!noPaste.passed, "noPaste must fail the case")
     print("PASS missing target insertion is an explicit noPaste failure")
+
+    let duplicateBrowserPaste = RuntimeCaseAssessment.assess(
+        observation: RuntimeCaseObservation(
+            visibleText: "dictated textdictated text",
+            keyUpToVisibleMilliseconds: 100,
+            clipboardChanged: true,
+            triggerObserved: true
+        ),
+        expectedTranscript: nil,
+        latencyThresholdMilliseconds: 250,
+        pasteOperationCountSatisfied: false
+    )
+    try require(
+        duplicateBrowserPaste.status == .pasteOperationCountMismatch
+            && !duplicateBrowserPaste.passed,
+        "visible browser text must fail when DOM reports duplicate paste operations"
+    )
+    print("PASS browser target requires exactly one paste-backed DOM input")
 
     let emptyTranscript = RuntimeCaseAssessment.assess(
         observation: RuntimeCaseObservation(

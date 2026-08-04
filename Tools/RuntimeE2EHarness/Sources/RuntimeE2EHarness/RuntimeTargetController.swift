@@ -6,6 +6,7 @@ import RuntimeE2ECore
 struct RuntimeVisibleTextResult: Codable {
     let text: String?
     let fullText: String?
+    let domPasteProof: RuntimeDOMPasteProof?
     let keyUpToAccessibilityTextMilliseconds: Double?
     let keyUpToVisibleMilliseconds: Double?
     let renderedText: RuntimeRenderedTextChangeResult?
@@ -67,6 +68,7 @@ final class RuntimePreparedTarget {
     private let previousFrontmostApplication: NSRunningApplication?
     private let renderedTextObserver: RuntimeRenderedTextObserver
     private let textScenario: RuntimeTextScenario
+    private let pasteProofToken: String?
 
     init(
         target: RuntimeTargetApp,
@@ -78,6 +80,7 @@ final class RuntimePreparedTarget {
         testResourceURL: URL,
         windowTitleToken: String,
         textScenario: RuntimeTextScenario,
+        pasteProofToken: String?,
         matchedBy: String,
         existingProcessIdentifiers: Set<pid_t>,
         temporaryDirectoryURL: URL,
@@ -95,6 +98,7 @@ final class RuntimePreparedTarget {
         self.previousFrontmostApplication = previousFrontmostApplication
         self.renderedTextObserver = renderedTextObserver
         self.textScenario = textScenario
+        self.pasteProofToken = pasteProofToken
         self.info = RuntimeTargetPreparationInfo(
             targetID: target.id,
             bundleIdentifier: target.bundleIdentifier,
@@ -120,6 +124,7 @@ final class RuntimePreparedTarget {
         var lastError: String?
         var accessibilityText: String?
         var fullText: String?
+        var domPasteProof: RuntimeDOMPasteProof?
         var accessibilityLatency: Double?
         var stableFullText: String?
         var stableSinceSystemUptime: TimeInterval?
@@ -161,6 +166,12 @@ final class RuntimePreparedTarget {
                     renderedText = nil
                     renderedError = renderedTextObserver.beginObservation()
                 }
+            }
+            if let pasteProofToken {
+                domPasteProof = RuntimeAX.domPasteProof(
+                    in: windowElement,
+                    identifying: pasteProofToken
+                )
             }
 
             if accessibilityText == nil {
@@ -209,6 +220,7 @@ final class RuntimePreparedTarget {
         return RuntimeVisibleTextResult(
             text: accessibilityText,
             fullText: fullText,
+            domPasteProof: domPasteProof,
             keyUpToAccessibilityTextMilliseconds: accessibilityLatency,
             keyUpToVisibleMilliseconds: visibleLatency,
             renderedText: renderedText,
@@ -336,6 +348,7 @@ enum RuntimeTargetController {
     private struct TestResource {
         let url: URL
         let windowTitleToken: String
+        let pasteProofToken: String?
     }
 
     private struct TargetSurface {
@@ -435,6 +448,7 @@ enum RuntimeTargetController {
                 testResourceURL: resource.url,
                 windowTitleToken: resource.windowTitleToken,
                 textScenario: textScenario,
+                pasteProofToken: resource.pasteProofToken,
                 matchedBy: surface.matchedBy,
                 existingProcessIdentifiers: existingProcessIdentifiers,
                 temporaryDirectoryURL: temporaryDirectoryURL,
@@ -604,6 +618,11 @@ enum RuntimeTargetController {
                 .replacingOccurrences(of: "&", with: "&amp;")
                 .replacingOccurrences(of: "<", with: "&lt;")
                 .replacingOccurrences(of: ">", with: "&gt;")
+            let pasteProofToken = "Roma Runtime E2E Paste Proof \(title)"
+            let escapedPasteProofToken = pasteProofToken
+                .replacingOccurrences(of: "&", with: "&amp;")
+                .replacingOccurrences(of: "<", with: "&lt;")
+                .replacingOccurrences(of: ">", with: "&gt;")
             let html = """
             <!doctype html>
             <meta charset="utf-8">
@@ -611,13 +630,24 @@ enum RuntimeTargetController {
             <style>
               body { margin: 40px; font: 18px -apple-system, sans-serif; }
               #target { width: 900px; height: 420px; padding: 8px; border: 1px solid; font: 20px -apple-system, sans-serif; white-space: pre-wrap; }
+              #paste-proof { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
             </style>
             <div>\(editableLabel)</div>
             <div id="target" role="textbox" aria-label="\(editableLabel)" aria-multiline="true" contenteditable="true" spellcheck="false">\(escapedInitialText)</div>
+            <div id="paste-proof" role="status" aria-label="\(escapedPasteProofToken) pasteEvents=0 pasteInputs=0">\(escapedPasteProofToken) pasteEvents=0 pasteInputs=0</div>
             <script>
               const target = document.getElementById('target');
+              const pasteProof = document.getElementById('paste-proof');
+              const pasteProofToken = '\(escapedPasteProofToken)';
               const cursorOffset = \(textScenario.cursorUTF16Offset);
               let acceptedText = target.textContent;
+              let pasteEventCount = 0;
+              let pasteInputCount = 0;
+              const updatePasteProof = () => {
+                const proof = `${pasteProofToken} pasteEvents=${pasteEventCount} pasteInputs=${pasteInputCount}`;
+                pasteProof.textContent = proof;
+                pasteProof.setAttribute('aria-label', proof);
+              };
               const placeCursor = () => {
                 const node = target.firstChild || target.appendChild(document.createTextNode(''));
                 const range = document.createRange();
@@ -628,10 +658,16 @@ enum RuntimeTargetController {
                 selection.addRange(range);
               };
               let pasteObserved = false;
-              target.addEventListener('paste', () => { pasteObserved = true; });
+              target.addEventListener('paste', () => {
+                pasteObserved = true;
+                pasteEventCount += 1;
+                updatePasteProof();
+              });
               target.addEventListener('input', event => {
                 if (pasteObserved || event.inputType === 'insertFromPaste') {
                   acceptedText = target.textContent;
+                  pasteInputCount += 1;
+                  updatePasteProof();
                 }
                 pasteObserved = false;
               });
@@ -648,7 +684,11 @@ enum RuntimeTargetController {
             </script>
             """
             try Data(html.utf8).write(to: url, options: .atomic)
-            return TestResource(url: url, windowTitleToken: title)
+            return TestResource(
+                url: url,
+                windowTitleToken: title,
+                pasteProofToken: pasteProofToken
+            )
         case .document, .electron:
             let filename = RuntimeTargetIsolationPlan.documentFilename(
                 windowTitleToken: title,
@@ -656,7 +696,7 @@ enum RuntimeTargetController {
             )
             let url = directoryURL.appendingPathComponent(filename)
             try Data(textScenario.initialText.utf8).write(to: url, options: .atomic)
-            return TestResource(url: url, windowTitleToken: title)
+            return TestResource(url: url, windowTitleToken: title, pasteProofToken: nil)
         }
     }
 
@@ -993,6 +1033,17 @@ enum RuntimeAX {
             queue.append(contentsOf: elementArrayAttribute(kAXChildrenAttribute, from: element).map { ($0, depth + 1) })
         }
         return nil
+    }
+
+    static func domPasteProof(
+        in root: AXUIElement,
+        identifying token: String
+    ) -> RuntimeDOMPasteProof? {
+        guard let proofElement = element(in: root, identifying: token) else { return nil }
+        let proofText = [identifyingText(from: proofElement), text(from: proofElement)]
+            .compactMap { $0 }
+            .joined(separator: " ")
+        return RuntimeDOMPasteProof.parse(from: proofText)
     }
 
     static func focusedEditableElement(

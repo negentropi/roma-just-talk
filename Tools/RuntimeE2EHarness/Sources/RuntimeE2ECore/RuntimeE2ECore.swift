@@ -112,6 +112,37 @@ public enum RuntimeTextScenario: String, Codable, CaseIterable, Sendable {
     }
 }
 
+public struct RuntimeDOMPasteProof: Codable, Equatable, Sendable {
+    public let pasteEventCount: Int
+    public let pasteInputCount: Int
+
+    public init(pasteEventCount: Int, pasteInputCount: Int) {
+        self.pasteEventCount = pasteEventCount
+        self.pasteInputCount = pasteInputCount
+    }
+
+    public var provesExactlyOnePaste: Bool {
+        pasteEventCount == 1 && pasteInputCount == 1
+    }
+
+    public static func parse(from text: String) -> Self? {
+        var fields: [String: Int] = [:]
+        for component in text.split(whereSeparator: \.isWhitespace) {
+            let parts = component.split(separator: "=", maxSplits: 1)
+            guard parts.count == 2, let value = Int(parts[1]) else { continue }
+            fields[String(parts[0])] = value
+        }
+        guard let pasteEventCount = fields["pasteEvents"],
+              let pasteInputCount = fields["pasteInputs"] else {
+            return nil
+        }
+        return Self(
+            pasteEventCount: pasteEventCount,
+            pasteInputCount: pasteInputCount
+        )
+    }
+}
+
 public enum RuntimeTargetIsolationPlan {
     public static func runID(_ runID: String, belongsToTargetID targetID: String) -> Bool {
         if runID.contains("-\(targetID)-r") {
@@ -515,6 +546,7 @@ public struct RuntimeCaseAssessment: Codable, Equatable, Sendable {
         case transcriptionIncomplete
         case emptyTranscript
         case pasteSemanticsNotProven
+        case pasteOperationCountMismatch
         case noPaste
         case clipboardOnly
         case renderNotObserved
@@ -542,6 +574,7 @@ public struct RuntimeCaseAssessment: Codable, Equatable, Sendable {
         transcriptionCompleted: Bool? = nil,
         transcribedCharacterCount: Int? = nil,
         pasteSemanticsSatisfied: Bool? = nil,
+        pasteOperationCountSatisfied: Bool? = nil,
         maximumWordErrorRate: Double = 0.2
     ) -> Self {
         guard observation.triggerObserved else {
@@ -568,6 +601,9 @@ public struct RuntimeCaseAssessment: Codable, Equatable, Sendable {
                 status: observation.clipboardChanged ? .clipboardOnly : .noPaste,
                 passed: false
             )
+        }
+        guard pasteOperationCountSatisfied != false else {
+            return Self(status: .pasteOperationCountMismatch, passed: false)
         }
         guard let latency = observation.keyUpToVisibleMilliseconds else {
             return Self(status: .renderNotObserved, passed: false)
@@ -690,6 +726,9 @@ public enum RuntimeFailureBoundaryPolicy {
             return .voiceInkPasteHandoff
         }
         guard evidence.targetVisibleTextObserved else { return .pasteDeliveryOrTargetVisibility }
+        if assessment.status == .pasteOperationCountMismatch {
+            return .pasteDeliveryOrTargetVisibility
+        }
         if assessment.status == .slow { return .latencyBudget }
         if assessment.status == .contentMismatch { return .contentQuality }
         if evidence.targetCleanupPassed == false { return .targetCleanup }

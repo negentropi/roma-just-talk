@@ -66,7 +66,7 @@ struct RuntimeRunSummary: Codable {
 }
 
 struct RuntimeHarnessReport: Codable {
-    var schemaVersion = 7
+    var schemaVersion = 8
     let startedAt: Date
     var finishedAt: Date?
     let configuration: RuntimeHarnessConfiguration
@@ -334,6 +334,9 @@ enum RuntimeHarnessRunner {
                         clipboardPasteHandoffCompleted: $0.clipboardPasteHandoffCompleted
                     )
                 },
+                pasteOperationCountSatisfied: runCase.target.kind == .browser
+                    ? visibleText?.domPasteProof?.provesExactlyOnePaste == true
+                    : nil,
                 maximumWordErrorRate: configuration.maximumWordErrorRate
             )
             if assessment.status == .pasteSemanticsNotProven {
@@ -343,6 +346,14 @@ enum RuntimeHarnessRunner {
                     "Web-backed target did not prove clipboard write plus paste command"
                 }
                 errorText = [errorText, semanticsError]
+                    .compactMap { $0 }
+                    .filter { !$0.isEmpty }
+                    .joined(separator: "; ")
+            }
+            if assessment.status == .pasteOperationCountMismatch {
+                let proof = visibleText?.domPasteProof
+                let proofError = "Browser DOM observed pasteEvents=\(proof?.pasteEventCount ?? -1) pasteInputs=\(proof?.pasteInputCount ?? -1); expected exactly one of each"
+                errorText = [errorText, proofError]
                     .compactMap { $0 }
                     .filter { !$0.isEmpty }
                     .joined(separator: "; ")

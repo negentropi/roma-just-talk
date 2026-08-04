@@ -215,6 +215,7 @@ class CursorPaster {
 
         let commandSpan = latencyTrace.begin("paste_session.post_command", token: latencyTraceToken)
         let pasteResult = await postPasteCommand(
+            expectedText: text,
             retryCommandVMenuDiscovery: shouldRetryCommandVMenuDiscovery,
             latencyTraceToken: latencyTraceToken
         )
@@ -262,6 +263,7 @@ class CursorPaster {
 
     @MainActor
     private static func postPasteCommand(
+        expectedText: String,
         retryCommandVMenuDiscovery: Bool,
         latencyTraceToken: VoiceInkLatencyTrace.Token?
     ) async -> PasteResult {
@@ -281,6 +283,7 @@ class CursorPaster {
             return didPost ? .commandPosted : .commandNotPosted
         } else {
             return await pasteFromClipboard(
+                expectedText: expectedText,
                 retryCommandVMenuDiscovery: retryCommandVMenuDiscovery,
                 latencyTraceToken: latencyTraceToken
             )
@@ -381,6 +384,7 @@ class CursorPaster {
     // Posts Cmd+V via CGEvent without modifying the active input source.
     @MainActor
     private static func pasteFromClipboard(
+        expectedText: String,
         retryCommandVMenuDiscovery: Bool,
         latencyTraceToken: VoiceInkLatencyTrace.Token?
     ) async -> PasteResult {
@@ -400,6 +404,7 @@ class CursorPaster {
         }
 
         await wait(prePasteDelay)
+        guard !Task.isCancelled else { return .commandNotPosted }
         if let targetProcessIdentifier = await CursorTextContextReader.pressFocusedCommandVMenuItem(
             retryIfUnavailable: retryCommandVMenuDiscovery,
             latencyTraceToken: latencyTraceToken
@@ -411,27 +416,33 @@ class CursorPaster {
             )
             return .commandPosted
         }
+        guard !Task.isCancelled else { return .commandNotPosted }
         if retryCommandVMenuDiscovery,
-           let targetKeyboardPost = await CursorTextContextReader.postFocusedCommandVKeyEvents(
+           let contextMenuPaste = await CursorTextContextReader.pressFocusedContextMenuPasteItem(
+               expectedText: expectedText,
                latencyTraceToken: latencyTraceToken
            ) {
-            switch targetKeyboardPost.disposition {
-            case .commandPosted:
+            if Task.isCancelled {
+                return .commandDeliveryUncertain
+            }
+            switch contextMenuPaste.disposition {
+            case .delivered:
                 VoiceInkLatencyTrace.shared.event(
                     "paste_event_posted",
-                    details: "method=accessibilityKeyboardEvent targetPid=\(targetKeyboardPost.processIdentifier) disposition=\(targetKeyboardPost.disposition.rawValue)",
+                    details: "method=accessibilityContextMenu targetPid=\(contextMenuPaste.processIdentifier) disposition=\(contextMenuPaste.disposition.rawValue)",
                     token: latencyTraceToken
                 )
                 return .commandPosted
             case .deliveryUncertain:
                 VoiceInkLatencyTrace.shared.event(
                     "paste_event_delivery_uncertain",
-                    details: "method=accessibilityKeyboardEvent targetPid=\(targetKeyboardPost.processIdentifier)",
+                    details: "method=accessibilityContextMenu targetPid=\(contextMenuPaste.processIdentifier)",
                     token: latencyTraceToken
                 )
                 return .commandDeliveryUncertain
             }
         }
+        guard !Task.isCancelled else { return .commandNotPosted }
 
         let targetProcessIdentifier = CursorTextContextReader.focusedProcessIdentifierForPaste()
         // VoiceInk posts from the active login session, so share that session's

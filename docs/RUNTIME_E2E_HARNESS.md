@@ -39,7 +39,8 @@ records DOM `paste` and accepted-input counts in the report, and passes only
 when exactly one of each occurred. This matches web apps that reject
 Accessibility-only value mutation. When a cold browser keeps its app-menu Paste
 command disabled, Roma refreshes that command by opening and closing its
-containing app menu. If Paste remains unavailable, Roma asks the captured editor
+containing app menu, with at most two bounded refreshes. If Paste remains
+unavailable, Roma asks the captured editor
 (or one of its ancestors) to show its context menu through Accessibility. When
 Chromium does not advertise that action, Roma right-clicks the AX-reported caret
 using Chromium's selected text-marker bounds when ordinary range bounds cannot

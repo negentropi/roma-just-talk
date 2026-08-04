@@ -7,8 +7,8 @@ enum CursorTextContextReader {
     // Bound malformed Accessibility parent chains without missing deeply nested web editors.
     private static let insertionAncestorTraversalLimit = 64
     private static let commandVMenuTraversalLimit = 2_048
-    // Give cold web-editor Accessibility menu discovery one bounded retry.
-    private static let commandVMenuTraversalAttempts = 2
+    // Give cold web-editor Accessibility menu discovery two bounded retries.
+    private static let commandVMenuTraversalAttempts = 3
     private static let commandVMenuTraversalRetryDelay: TimeInterval = 0.25
     private static let commandVMenuTraversalTimeout: TimeInterval = 0.25
     private static let contextMenuTraversalAttempts = 4

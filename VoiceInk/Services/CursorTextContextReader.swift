@@ -1404,7 +1404,7 @@ enum CursorTextContextReader {
               let value else {
             return nil
         }
-        return rect(from: value)
+        return contextMenuRect(from: value)
     }
 
     private static func boundsForSelectedTextMarkerRange(in element: AXUIElement) -> CGRect? {
@@ -1428,16 +1428,21 @@ enum CursorTextContextReader {
               let value else {
             return nil
         }
-        return rect(from: value)
+        return contextMenuRect(from: value)
     }
 
-    private static func rect(from value: CFTypeRef) -> CGRect? {
-        guard CFGetTypeID(value) == AXValueGetTypeID() else { return nil }
-        let axValue = value as! AXValue
-        guard AXValueGetType(axValue) == .cgRect else { return nil }
-        var bounds = CGRect.zero
-        guard AXValueGetValue(axValue, .cgRect, &bounds) else { return nil }
-        return bounds
+    static func contextMenuRect(from value: CFTypeRef) -> CGRect? {
+        if CFGetTypeID(value) == AXValueGetTypeID() {
+            let axValue = value as! AXValue
+            guard AXValueGetType(axValue) == .cgRect else { return nil }
+            var bounds = CGRect.zero
+            return AXValueGetValue(axValue, .cgRect, &bounds) ? bounds : nil
+        }
+        guard let nsValue = value as? NSValue,
+              strcmp(nsValue.objCType, NSValue(rect: .zero).objCType) == 0 else {
+            return nil
+        }
+        return nsValue.rectValue
     }
 
     private static func setSelectedTextRange(_ range: CFRange, on element: AXUIElement) -> Bool {

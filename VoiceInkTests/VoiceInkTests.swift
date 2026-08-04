@@ -308,6 +308,24 @@ struct VoiceInkTests {
         ) == nil)
     }
 
+    @Test func browserContextMenuRectAcceptsAccessibilityAndChromiumValues() throws {
+        let expected = CGRect(x: 12, y: 34, width: 0, height: 18)
+        var axRect = expected
+        let axValue = try #require(AXValueCreate(.cgRect, &axRect))
+        #expect(CursorTextContextReader.contextMenuRect(from: axValue) == expected)
+
+        let nsValue = NSValue(rect: expected)
+        #expect(CursorTextContextReader.contextMenuRect(
+            from: nsValue as CFTypeRef
+        ) == expected)
+        #expect(CursorTextContextReader.contextMenuRect(
+            from: NSValue(point: expected.origin) as CFTypeRef
+        ) == nil)
+        #expect(CursorTextContextReader.contextMenuRect(
+            from: "not a rectangle" as CFString
+        ) == nil)
+    }
+
     @Test func browserContextMenuCandidateRequiresTriggerPointProvenance() {
         let point = CGPoint(x: 100, y: 200)
         #expect(CursorTextContextReader.attributableContextMenuCandidates(

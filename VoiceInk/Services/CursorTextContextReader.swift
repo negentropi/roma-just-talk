@@ -707,15 +707,26 @@ enum CursorTextContextReader {
                 latencyTraceToken: latencyTraceToken
               ),
               pasteTargetIsCurrent(target),
+              NSWorkspace.shared.frontmostApplication?.processIdentifier
+                == target.processIdentifier,
+              let hitElement = elementAtPosition(anchor.point),
+              element(hitElement, belongsTo: target.focusedElement),
               let events = rightClickContextMenuEvents(
                 at: anchor.point,
                 source: CGEventSource(stateID: .combinedSessionState)
               ) else {
             return nil
         }
+        // PID-directed mouse events never reached cold Chromium's hit-testing.
+        // Global HID delivery is safe here because focus, PID, and hit target were revalidated.
         for event in events {
-            event.postToPid(target.processIdentifier)
+            event.post(tap: .cghidEventTap)
         }
+        VoiceInkLatencyTrace.shared.event(
+            "paste_context_menu_click_delivery",
+            details: "method=globalHID targetPid=\(target.processIdentifier) eventCount=\(events.count)",
+            token: latencyTraceToken
+        )
         return anchor
     }
 

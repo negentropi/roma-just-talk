@@ -1487,7 +1487,7 @@ enum CursorTextContextReader {
         let match = firstUsableTextMarkerBounds(
             startingAt: element,
             traversalLimit: insertionAncestorTraversalLimit,
-            markerRange: { candidate, depth in
+            markerRange: { (candidate: AXUIElement, depth: Int) -> CFTypeRef? in
                 visitedAncestorCount = depth + 1
                 var markerRange: CFTypeRef?
                 let markerResult = AXUIElementCopyAttributeValue(
@@ -1507,7 +1507,7 @@ enum CursorTextContextReader {
                 lastDetails = "markerDepth=\(depth) markerQuery=\(markerResult.rawValue)"
                 return markerRange
             },
-            bounds: { candidate, markerRange, depth in
+            bounds: { (candidate: AXUIElement, markerRange: CFTypeRef, _: Int) -> CGRect? in
                 var value: CFTypeRef?
                 let queryResult = AXUIElementCopyParameterizedAttributeValue(
                     candidate,

@@ -431,6 +431,29 @@ class CursorPaster {
         guard !Task.isCancelled else { return .commandNotPosted }
         if retryCommandVMenuDiscovery {
             guard let stableTarget else { return .commandNotPosted }
+            if let keyboardPaste = await CursorTextContextReader.postFocusedCommandVShortcut(
+                target: stableTarget,
+                expectedText: expectedText,
+                latencyTraceToken: latencyTraceToken
+            ) {
+                switch keyboardPaste.disposition {
+                case .delivered:
+                    VoiceInkLatencyTrace.shared.event(
+                        "paste_event_posted",
+                        details: "method=globalHIDCommandV targetPid=\(keyboardPaste.processIdentifier) disposition=\(keyboardPaste.disposition.rawValue)",
+                        token: latencyTraceToken
+                    )
+                    return .commandPosted
+                case .deliveryUncertain:
+                    VoiceInkLatencyTrace.shared.event(
+                        "paste_event_delivery_uncertain",
+                        details: "method=globalHIDCommandV targetPid=\(keyboardPaste.processIdentifier)",
+                        token: latencyTraceToken
+                    )
+                    return .commandDeliveryUncertain
+                }
+            }
+            guard !Task.isCancelled else { return .commandNotPosted }
             if let contextMenuPaste = await CursorTextContextReader.pressFocusedContextMenuPasteItem(
                 target: stableTarget,
                 expectedText: expectedText,

@@ -41,18 +41,24 @@ struct VoiceInkTests {
 
         defaults.set(true, forKey: "restoreClipboardAfterPaste")
         defaults.set(0.01, forKey: "clipboardRestoreDelay")
+        var postCount = 0
         for expectedResult in [
             CursorPaster.PasteResult.commandNotPosted,
             .commandDeliveryUncertain
         ] {
             pasteboard.clearContents()
             pasteboard.setString("previous clipboard", forType: .string)
-            CursorPaster.configurePasteCommandPosterForTesting { _ in expectedResult }
+            postCount = 0
+            CursorPaster.configurePasteCommandPosterForTesting { _ in
+                postCount += 1
+                return expectedResult
+            }
 
             let result = await CursorPaster.pasteAtCursorAndWaitUntilPosted("dictated text")
             try await Task.sleep(nanoseconds: 350_000_000)
 
             #expect(result == expectedResult)
+            #expect(postCount == 1)
             #expect(!result.didDeliverText)
             #expect(pasteboard.string(forType: .string) == "dictated text")
         }
@@ -270,6 +276,51 @@ struct VoiceInkTests {
         #expect(events.allSatisfy {
             $0.getIntegerValueField(.mouseEventClickState) == 1
         })
+    }
+
+    @Test func browserCommandVShortcutPostsOneBalancedChord() throws {
+        let events = try #require(CursorTextContextReader.commandVShortcutEvents(
+            source: CGEventSource(stateID: .combinedSessionState)
+        ))
+        var postedEvents: [CGEvent] = []
+        let postedPaste = CursorTextContextReader.postCommandVShortcutEvents(
+            events,
+            targetIsCurrent: { true },
+            post: { postedEvents.append($0) }
+        )
+
+        #expect(postedPaste)
+        #expect(postedEvents.map(\.type) == [.keyDown, .keyDown, .keyUp, .keyUp])
+        #expect(postedEvents.map {
+            $0.getIntegerValueField(.keyboardEventKeycode)
+        } == [0x37, 0x09, 0x09, 0x37])
+        #expect(postedEvents.dropLast().allSatisfy { $0.flags == .maskCommand })
+        #expect(postedEvents.last?.flags == [])
+    }
+
+    @Test func browserCommandVShortcutAbortsBeforeVAndReleasesCommandOnDrift() throws {
+        let events = try #require(CursorTextContextReader.commandVShortcutEvents(
+            source: CGEventSource(stateID: .combinedSessionState)
+        ))
+        var continuationChecks = 0
+        var postedEvents: [CGEvent] = []
+        let postedPaste = CursorTextContextReader.postCommandVShortcutEvents(
+            events,
+            targetIsCurrent: {
+                continuationChecks += 1
+                return continuationChecks == 1
+            },
+            post: { postedEvents.append($0) }
+        )
+
+        #expect(!postedPaste)
+        #expect(continuationChecks == 2)
+        #expect(postedEvents.map {
+            $0.getIntegerValueField(.keyboardEventKeycode)
+        } == [0x37, 0x37])
+        #expect(postedEvents.map(\.type) == [.keyDown, .keyUp])
+        #expect(postedEvents.first?.flags == .maskCommand)
+        #expect(postedEvents.last?.flags == [])
     }
 
     @Test func browserContextMenuPointRequiresUsableBoundsAndEditorHit() {

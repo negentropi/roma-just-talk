@@ -13,8 +13,8 @@ enum CursorTextContextReader {
     private static let commandVMenuTraversalTimeout: TimeInterval = 0.25
     private static let contextMenuTraversalAttempts = 4
     private static let contextMenuTraversalRetryDelay: TimeInterval = 0.05
-    private static let contextMenuDeliveryObservationAttempts = 6
-    private static let contextMenuDeliveryObservationDelay: TimeInterval = 0.05
+    private static let pasteDeliveryObservationAttempts = 6
+    private static let pasteDeliveryObservationDelay: TimeInterval = 0.05
 
     enum SelectedTextInsertionResult: String {
         case inserted
@@ -54,14 +54,19 @@ enum CursorTextContextReader {
         }
     }
 
-    enum ContextMenuPasteDisposition: String, Equatable {
+    enum PasteDeliveryDisposition: String, Equatable {
         case delivered
         case deliveryUncertain
     }
 
     struct ContextMenuPasteResult {
         let processIdentifier: pid_t
-        let disposition: ContextMenuPasteDisposition
+        let disposition: PasteDeliveryDisposition
+    }
+
+    struct CommandVShortcutPasteResult {
+        let processIdentifier: pid_t
+        let disposition: PasteDeliveryDisposition
     }
 
     private struct ContextMenuAnchor {
@@ -250,100 +255,158 @@ enum CursorTextContextReader {
                 }
                 continue
             }
-            var searchResult = plainCommandVMenuItem(in: menuBar)
+            let searchResult = plainCommandVMenuItem(in: menuBar)
             VoiceInkLatencyTrace.shared.event(
                 "paste_command_v_menu_lookup",
                 details: "attempt=\(attempt + 1) result=\(searchResult.menuItem == nil ? "missing" : "found") visited=\(searchResult.visitedNodes) enqueued=\(searchResult.enqueuedNodes) candidates=\(searchResult.shortcutCandidates) disabled=\(searchResult.disabledShortcutCandidates) limitExhausted=\(searchResult.limitExhausted) timeout=\(searchResult.timedOut)",
                 token: latencyTraceToken
             )
-            var openedMenu: AXUIElement?
-            let cancelOpenedMenu: (AXUIElement?) -> Bool = { menu in
-                guard let menu else { return true }
-                let cancelled = cancelMenu(menu)
-                VoiceInkLatencyTrace.shared.event(
-                    "paste_command_v_menu_refresh",
-                    details: "attempt=\(attempt + 1) phase=cancel targetPid=\(processIdentifier) result=\(cancelled ? "success" : "failed")",
-                    token: latencyTraceToken
-                )
-                return cancelled
-            }
-            if searchResult.menuItem == nil,
-               attempt < traversalAttempts - 1,
-               pasteTargetIsCurrent(target),
-               let openResult = searchResult.disabledMenuItem.flatMap({
-                   openContainingMenu(of: $0)
-               }) {
-                VoiceInkLatencyTrace.shared.event(
-                    "paste_command_v_menu_refresh",
-                    details: "attempt=\(attempt + 1) phase=open targetPid=\(processIdentifier) result=\(openResult.result.rawValue)",
-                    token: latencyTraceToken
-                )
-                // AX failure is not transactional: the menu may already be tracking.
-                // Treat every attempted open as a cleanup obligation.
-                openedMenu = openResult.menu
-                if openResult.result == .success {
-                    // Opening starts AppKit's validation pass. Keep the menu open until
-                    // Chrome has updated its cold, clipboard-dependent Paste command.
-                    do {
-                        try await Task.sleep(
-                            nanoseconds: UInt64(commandVMenuTraversalRetryDelay * 1_000_000_000)
-                        )
-                    } catch {
-                        return cancelOpenedMenu(openResult.menu)
-                            ? .targetChanged(processIdentifier)
-                            : .unavailable(nil)
-                    }
-                    guard pasteTargetIsCurrent(target) else {
-                        return cancelOpenedMenu(openResult.menu)
-                            ? .targetChanged(processIdentifier)
-                            : .unavailable(nil)
-                    }
-                    searchResult = plainCommandVMenuItem(in: menuBar)
-                    VoiceInkLatencyTrace.shared.event(
-                        "paste_command_v_menu_lookup",
-                        details: "attempt=\(attempt + 1) phase=open result=\(searchResult.menuItem == nil ? "missing" : "found") visited=\(searchResult.visitedNodes) enqueued=\(searchResult.enqueuedNodes) candidates=\(searchResult.shortcutCandidates) disabled=\(searchResult.disabledShortcutCandidates) limitExhausted=\(searchResult.limitExhausted) timeout=\(searchResult.timedOut)",
-                        token: latencyTraceToken
-                    )
-                }
-            }
             if let menuItem = searchResult.menuItem {
                 // The app's plain Cmd-V command is target-affine, unlike a global key event.
                 guard !Task.isCancelled,
                       pasteTargetIsCurrent(target) else {
-                    return cancelOpenedMenu(openedMenu)
-                        ? .targetChanged(processIdentifier)
-                        : .unavailable(nil)
+                    return .targetChanged(processIdentifier)
                 }
                 guard AXUIElementPerformAction(menuItem, kAXPressAction as CFString) == .success else {
-                    if !cancelOpenedMenu(openedMenu) {
-                        // Never stack a context-menu fallback over an app menu that
-                        // may still be tracking.
-                        return .unavailable(nil)
-                    }
                     return .unavailable(target)
                 }
                 return .pressed(processIdentifier)
             }
-            guard cancelOpenedMenu(openedMenu) else { return .unavailable(nil) }
             guard attempt < traversalAttempts - 1 else {
                 return .unavailable(target)
             }
             guard pasteTargetIsCurrent(target) else {
                 return .targetChanged(processIdentifier)
             }
-            if openedMenu == nil {
-                // No disabled command was available to validate; give cold AX discovery
-                // one bounded delay before the final lookup.
-                do {
-                    try await Task.sleep(
-                        nanoseconds: UInt64(commandVMenuTraversalRetryDelay * 1_000_000_000)
-                    )
-                } catch {
-                    return .targetChanged(processIdentifier)
-                }
+            // Let the Accessibility server process cold menu discovery before retrying.
+            do {
+                try await Task.sleep(
+                    nanoseconds: UInt64(commandVMenuTraversalRetryDelay * 1_000_000_000)
+                )
+            } catch {
+                return .targetChanged(processIdentifier)
             }
         }
         return .unavailable(target)
+    }
+
+    static func commandVShortcutEvents(source: CGEventSource?) -> [CGEvent]? {
+        guard let commandDown = CGEvent(
+            keyboardEventSource: source,
+            virtualKey: 0x37,
+            keyDown: true
+        ), let vDown = CGEvent(
+            keyboardEventSource: source,
+            virtualKey: 0x09,
+            keyDown: true
+        ), let vUp = CGEvent(
+            keyboardEventSource: source,
+            virtualKey: 0x09,
+            keyDown: false
+        ), let commandUp = CGEvent(
+            keyboardEventSource: source,
+            virtualKey: 0x37,
+            keyDown: false
+        ) else {
+            return nil
+        }
+        commandDown.flags = .maskCommand
+        vDown.flags = .maskCommand
+        vUp.flags = .maskCommand
+        commandUp.flags = []
+        return [commandDown, vDown, vUp, commandUp]
+    }
+
+    static func postCommandVShortcutEvents(
+        _ events: [CGEvent],
+        targetIsCurrent: () -> Bool,
+        post: (CGEvent) -> Void
+    ) -> Bool {
+        guard events.count == 4, targetIsCurrent() else { return false }
+        post(events[0])
+        guard targetIsCurrent() else {
+            post(events[3])
+            return false
+        }
+        for event in events.dropFirst() {
+            post(event)
+        }
+        return true
+    }
+
+    @MainActor
+    static func postFocusedCommandVShortcut(
+        target: FocusedPasteTarget,
+        expectedText: String,
+        latencyTraceToken: VoiceInkLatencyTrace.Token?
+    ) async -> CommandVShortcutPasteResult? {
+        guard !Task.isCancelled,
+              !expectedText.isEmpty,
+              AXIsProcessTrusted() else {
+            return nil
+        }
+        let processIdentifier = target.processIdentifier
+        guard pasteTargetIsCurrent(target),
+              NSWorkspace.shared.frontmostApplication?.processIdentifier
+                == processIdentifier else {
+            return CommandVShortcutPasteResult(
+                processIdentifier: processIdentifier,
+                disposition: .deliveryUncertain
+            )
+        }
+        guard let events = commandVShortcutEvents(
+            source: CGEventSource(stateID: .combinedSessionState)
+        ) else {
+            return nil
+        }
+
+        // Chromium needs the normal window-server route. Recheck after Command-down,
+        // then post V and both releases without an actor suspension between events.
+        let postedPaste = postCommandVShortcutEvents(
+            events,
+            targetIsCurrent: {
+                !Task.isCancelled
+                    && pasteTargetIsCurrent(target)
+                    && NSWorkspace.shared.frontmostApplication?.processIdentifier
+                        == processIdentifier
+            },
+            post: { $0.post(tap: .cghidEventTap) }
+        )
+        guard postedPaste else {
+            VoiceInkLatencyTrace.shared.event(
+                "paste_command_v_keyboard_aborted",
+                details: "reason=targetChangedOrCancelled targetPid=\(processIdentifier)",
+                token: latencyTraceToken
+            )
+            return CommandVShortcutPasteResult(
+                processIdentifier: processIdentifier,
+                disposition: .deliveryUncertain
+            )
+        }
+        VoiceInkLatencyTrace.shared.event(
+            "paste_command_v_keyboard_delivery",
+            details: "method=globalHID source=combinedSession targetPid=\(processIdentifier) eventCount=\(events.count)",
+            token: latencyTraceToken
+        )
+        let delivered = await pasteWasObserved(
+            focusedElement: target.focusedElement,
+            processIdentifier: processIdentifier,
+            textBeforePaste: target.text,
+            selectedRangeBeforePaste: target.selectedRange,
+            expectedText: expectedText
+        )
+        let disposition: PasteDeliveryDisposition = delivered
+            ? .delivered
+            : .deliveryUncertain
+        VoiceInkLatencyTrace.shared.event(
+            "paste_command_v_keyboard_observation",
+            details: "targetPid=\(processIdentifier) disposition=\(disposition.rawValue)",
+            token: latencyTraceToken
+        )
+        return CommandVShortcutPasteResult(
+            processIdentifier: processIdentifier,
+            disposition: disposition
+        )
     }
 
     @MainActor
@@ -496,7 +559,7 @@ enum CursorTextContextReader {
                         disposition: .deliveryUncertain
                     )
                 }
-                let delivered = await contextMenuPasteWasObserved(
+                let delivered = await pasteWasObserved(
                     focusedElement: focusedElement,
                     processIdentifier: processIdentifier,
                     textBeforePaste: textBeforePaste,
@@ -526,7 +589,6 @@ enum CursorTextContextReader {
 
     private struct CommandVMenuSearchResult {
         let menuItem: AXUIElement?
-        let disabledMenuItem: AXUIElement?
         let visitedNodes: Int
         let enqueuedNodes: Int
         let shortcutCandidates: Int
@@ -546,7 +608,6 @@ enum CursorTextContextReader {
         var index = 0
         var shortcutCandidates = 0
         var disabledShortcutCandidates = 0
-        var disabledMenuItem: AXUIElement?
         var shortcutTitles = matchingTitles
         var enabledTitledMenuItems: [(element: AXUIElement, title: String)] = []
         while index < queue.count,
@@ -586,7 +647,6 @@ enum CursorTextContextReader {
                     if enabled {
                         return CommandVMenuSearchResult(
                             menuItem: element,
-                            disabledMenuItem: disabledMenuItem,
                             visitedNodes: index,
                             enqueuedNodes: queue.count,
                             shortcutCandidates: shortcutCandidates,
@@ -598,9 +658,6 @@ enum CursorTextContextReader {
                         )
                     }
                     disabledShortcutCandidates += 1
-                    if disabledMenuItem == nil {
-                        disabledMenuItem = element
-                    }
                 } else if enabled,
                           let normalizedTitle = normalizedMenuTitle(title) {
                     enabledTitledMenuItems.append((element, normalizedTitle))
@@ -617,7 +674,6 @@ enum CursorTextContextReader {
         if let titleFallbackItem = titleFallbackItems.first {
             return CommandVMenuSearchResult(
                 menuItem: titleFallbackItem.element,
-                disabledMenuItem: disabledMenuItem,
                 visitedNodes: index,
                 enqueuedNodes: queue.count,
                 shortcutCandidates: shortcutCandidates,
@@ -631,7 +687,6 @@ enum CursorTextContextReader {
         let hasUnvisitedNodes = index < queue.count
         return CommandVMenuSearchResult(
             menuItem: nil,
-            disabledMenuItem: disabledMenuItem,
             visitedNodes: index,
             enqueuedNodes: queue.count,
             shortcutCandidates: shortcutCandidates,
@@ -657,52 +712,6 @@ enum CursorTextContextReader {
         var updatedTitles = titles
         updatedTitles.insert(normalizedTitle)
         return updatedTitles
-    }
-
-    private struct ContainingMenuOpenResult {
-        let menu: AXUIElement
-        let result: AXError
-    }
-
-    private static func openContainingMenu(
-        of menuItem: AXUIElement
-    ) -> ContainingMenuOpenResult? {
-        guard let menu = firstAncestor(
-            startingAt: menuItem,
-            matchingRole: kAXMenuRole as String
-        ),
-        let menuBarItem = firstAncestor(
-            startingAt: menuItem,
-            matchingRole: kAXMenuBarItemRole as String
-        ) else {
-            return nil
-        }
-        let supportedActions = actionNames(from: menuBarItem)
-        let action: CFString
-        if supportedActions.contains(kAXPressAction as String) {
-            action = kAXPressAction as CFString
-        } else if supportedActions.contains(kAXShowMenuAction as String) {
-            action = kAXShowMenuAction as CFString
-        } else {
-            return nil
-        }
-        return ContainingMenuOpenResult(
-            menu: menu,
-            result: AXUIElementPerformAction(menuBarItem, action)
-        )
-    }
-
-    private static func firstAncestor(
-        startingAt element: AXUIElement,
-        matchingRole expectedRole: String
-    ) -> AXUIElement? {
-        var currentElement: AXUIElement? = element
-        for _ in 0..<insertionAncestorTraversalLimit {
-            guard let element = currentElement else { return nil }
-            if role(from: element) == expectedRole { return element }
-            currentElement = parentElement(from: element)
-        }
-        return nil
     }
 
     @MainActor
@@ -1223,7 +1232,7 @@ enum CursorTextContextReader {
     }
 
     @MainActor
-    private static func contextMenuPasteWasObserved(
+    private static func pasteWasObserved(
         focusedElement: AXUIElement,
         processIdentifier: pid_t,
         textBeforePaste: String?,
@@ -1234,7 +1243,7 @@ enum CursorTextContextReader {
               let selectedRangeBeforePaste else {
             return false
         }
-        for attempt in 0..<contextMenuDeliveryObservationAttempts {
+        for attempt in 0..<pasteDeliveryObservationAttempts {
             guard !Task.isCancelled,
                   capturedEditorIsFocused(
                     focusedElement,
@@ -1253,10 +1262,10 @@ enum CursorTextContextReader {
                     processIdentifier: processIdentifier
                 )
             }
-            guard attempt < contextMenuDeliveryObservationAttempts - 1 else { break }
+            guard attempt < pasteDeliveryObservationAttempts - 1 else { break }
             do {
                 try await Task.sleep(
-                    nanoseconds: UInt64(contextMenuDeliveryObservationDelay * 1_000_000_000)
+                    nanoseconds: UInt64(pasteDeliveryObservationDelay * 1_000_000_000)
                 )
             } catch {
                 return false

@@ -609,15 +609,15 @@ enum CursorTextContextReader {
 
     @MainActor
     private static func performShowMenuAction(
-        startingAt element: AXUIElement,
+        startingAt capturedElement: AXUIElement,
         processIdentifier: pid_t
     ) -> AXError {
-        var currentElement: AXUIElement? = element
+        var currentElement: AXUIElement? = capturedElement
         for _ in 0..<insertionAncestorTraversalLimit {
             guard let element = currentElement else { break }
             if actionNames(from: element).contains(kAXShowMenuAction as String) {
                 guard capturedEditorIsFocused(
-                    startingAt,
+                    capturedElement,
                     processIdentifier: processIdentifier
                 ) else {
                     return .cannotComplete

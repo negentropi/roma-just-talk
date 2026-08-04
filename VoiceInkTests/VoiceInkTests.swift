@@ -290,7 +290,7 @@ struct VoiceInkTests {
         )
 
         #expect(postedPaste)
-        #expect(postedEvents.map(\.type) == [.keyDown, .keyDown, .keyUp, .keyUp])
+        #expect(postedEvents.map(\.type) == [.flagsChanged, .keyDown, .keyUp, .flagsChanged])
         #expect(postedEvents.map {
             $0.getIntegerValueField(.keyboardEventKeycode)
         } == [0x37, 0x09, 0x09, 0x37])
@@ -318,7 +318,7 @@ struct VoiceInkTests {
         #expect(postedEvents.map {
             $0.getIntegerValueField(.keyboardEventKeycode)
         } == [0x37, 0x37])
-        #expect(postedEvents.map(\.type) == [.keyDown, .keyUp])
+        #expect(postedEvents.map(\.type) == [.flagsChanged, .flagsChanged])
         #expect(postedEvents.first?.flags == .maskCommand)
         #expect(postedEvents.last?.flags == [])
     }

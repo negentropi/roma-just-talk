@@ -37,7 +37,15 @@ Each selected browser opens an isolated local tab with a uniquely titled,
 controlled contenteditable. It accepts only paste-backed DOM `input` events,
 records DOM `paste` and accepted-input counts in the report, and passes only
 when exactly one of each occurred. This matches web apps that reject
-Accessibility-only value mutation. Document and
+Accessibility-only value mutation. When a cold browser keeps its app-menu Paste
+command disabled, Roma refreshes that command by opening and closing its
+containing app menu. If Paste remains unavailable, Roma asks the captured editor
+(or one of its ancestors) to show its context menu through Accessibility,
+presses enabled Paste from the newly visible menu, and confirms the exact
+replacement before reporting delivery. Browser fallbacks stay bound to that
+editor's unchanged text and selection; drift aborts without a recaptured or
+CGEvent paste.
+Document and
 Electron editor apps open a uniquely named temporary text file. Every target
 runs once empty and once with text on both sides of the insertion cursor.
 Cleanup saves an empty temporary document before closing its tab/window, removes

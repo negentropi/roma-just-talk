@@ -405,42 +405,63 @@ class CursorPaster {
 
         await wait(prePasteDelay)
         guard !Task.isCancelled else { return .commandNotPosted }
-        if let targetProcessIdentifier = await CursorTextContextReader.pressFocusedCommandVMenuItem(
+        let menuAttempt = await CursorTextContextReader.pressFocusedCommandVMenuItem(
             retryIfUnavailable: retryCommandVMenuDiscovery,
             latencyTraceToken: latencyTraceToken
-        ) {
+        )
+        let stableTarget: CursorTextContextReader.FocusedPasteTarget?
+        switch menuAttempt {
+        case .pressed(let targetProcessIdentifier):
             VoiceInkLatencyTrace.shared.event(
                 "paste_event_posted",
                 details: "method=accessibilityMenuCommandV targetPid=\(targetProcessIdentifier)",
                 token: latencyTraceToken
             )
             return .commandPosted
+        case .targetChanged(let targetProcessIdentifier):
+            VoiceInkLatencyTrace.shared.event(
+                "paste_event_delivery_uncertain",
+                details: "method=accessibilityMenuCommandV reason=targetChanged targetPid=\(targetProcessIdentifier.map { String($0) } ?? "unknown")",
+                token: latencyTraceToken
+            )
+            return .commandDeliveryUncertain
+        case .unavailable(let target):
+            stableTarget = target
         }
         guard !Task.isCancelled else { return .commandNotPosted }
-        if retryCommandVMenuDiscovery,
-           let contextMenuPaste = await CursorTextContextReader.pressFocusedContextMenuPasteItem(
-               expectedText: expectedText,
+        if retryCommandVMenuDiscovery {
+            guard let stableTarget else { return .commandNotPosted }
+            if let contextMenuPaste = await CursorTextContextReader.pressFocusedContextMenuPasteItem(
+                target: stableTarget,
+                expectedText: expectedText,
                latencyTraceToken: latencyTraceToken
-           ) {
-            if Task.isCancelled {
-                return .commandDeliveryUncertain
+            ) {
+                if Task.isCancelled {
+                    return .commandDeliveryUncertain
+                }
+                switch contextMenuPaste.disposition {
+                case .delivered:
+                    VoiceInkLatencyTrace.shared.event(
+                        "paste_event_posted",
+                        details: "method=accessibilityContextMenu targetPid=\(contextMenuPaste.processIdentifier) disposition=\(contextMenuPaste.disposition.rawValue)",
+                        token: latencyTraceToken
+                    )
+                    return .commandPosted
+                case .deliveryUncertain:
+                    VoiceInkLatencyTrace.shared.event(
+                        "paste_event_delivery_uncertain",
+                        details: "method=accessibilityContextMenu targetPid=\(contextMenuPaste.processIdentifier)",
+                        token: latencyTraceToken
+                    )
+                    return .commandDeliveryUncertain
+                }
             }
-            switch contextMenuPaste.disposition {
-            case .delivered:
-                VoiceInkLatencyTrace.shared.event(
-                    "paste_event_posted",
-                    details: "method=accessibilityContextMenu targetPid=\(contextMenuPaste.processIdentifier) disposition=\(contextMenuPaste.disposition.rawValue)",
-                    token: latencyTraceToken
-                )
-                return .commandPosted
-            case .deliveryUncertain:
-                VoiceInkLatencyTrace.shared.event(
-                    "paste_event_delivery_uncertain",
-                    details: "method=accessibilityContextMenu targetPid=\(contextMenuPaste.processIdentifier)",
-                    token: latencyTraceToken
-                )
-                return .commandDeliveryUncertain
-            }
+            VoiceInkLatencyTrace.shared.event(
+                "paste_event_not_posted",
+                details: "reason=safeBrowserMethodUnavailable targetPid=\(stableTarget.processIdentifier)",
+                token: latencyTraceToken
+            )
+            return .commandNotPosted
         }
         guard !Task.isCancelled else { return .commandNotPosted }
 

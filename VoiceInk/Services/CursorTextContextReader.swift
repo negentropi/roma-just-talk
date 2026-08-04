@@ -65,6 +65,32 @@ enum CursorTextContextReader {
     }
 
     @MainActor
+    final class FocusedPasteTarget: Sendable {
+        fileprivate let focusedElement: AXUIElement
+        let processIdentifier: pid_t
+        fileprivate let text: String?
+        fileprivate let selectedRange: CFRange?
+
+        fileprivate init(
+            focusedElement: AXUIElement,
+            processIdentifier: pid_t,
+            text: String?,
+            selectedRange: CFRange?
+        ) {
+            self.focusedElement = focusedElement
+            self.processIdentifier = processIdentifier
+            self.text = text
+            self.selectedRange = selectedRange
+        }
+    }
+
+    enum CommandVMenuAttempt {
+        case pressed(pid_t)
+        case unavailable(FocusedPasteTarget?)
+        case targetChanged(pid_t?)
+    }
+
+    @MainActor
     final class PreparedContext: Sendable {
         fileprivate let focusedElement: AXUIElement
         fileprivate let selectedRange: CFRange?
@@ -160,24 +186,30 @@ enum CursorTextContextReader {
     static func pressFocusedCommandVMenuItem(
         retryIfUnavailable: Bool,
         latencyTraceToken: VoiceInkLatencyTrace.Token?
-    ) async -> pid_t? {
+    ) async -> CommandVMenuAttempt {
         guard AXIsProcessTrusted(),
               let focusedElement = focusedElement(from: AXUIElementCreateSystemWide()) else {
-            return nil
+            return .unavailable(nil)
         }
         var processIdentifier = pid_t()
         guard AXUIElementGetPid(focusedElement, &processIdentifier) == .success,
               processIdentifier > 0,
               processIdentifier != ProcessInfo.processInfo.processIdentifier else {
-            return nil
+            return .unavailable(nil)
         }
+        let target = FocusedPasteTarget(
+            focusedElement: focusedElement,
+            processIdentifier: processIdentifier,
+            text: textValue(from: focusedElement),
+            selectedRange: selectedTextRange(from: focusedElement)
+        )
         let application = AXUIElementCreateApplication(processIdentifier)
 
         let traversalAttempts = retryIfUnavailable ? commandVMenuTraversalAttempts : 1
         for attempt in 0..<traversalAttempts {
             guard !Task.isCancelled,
-                  focusedProcessIdentifierForPaste() == processIdentifier else {
-                return nil
+                  pasteTargetIsCurrent(target) else {
+                return .targetChanged(processIdentifier)
             }
             guard let menuBar = elementAttribute(
                 kAXMenuBarAttribute as CFString,
@@ -189,7 +221,7 @@ enum CursorTextContextReader {
                     token: latencyTraceToken
                 )
                 guard attempt < traversalAttempts - 1 else {
-                    return nil
+                    return .unavailable(target)
                 }
                 // Let the Accessibility server process cold menu discovery before retrying.
                 do {
@@ -197,7 +229,7 @@ enum CursorTextContextReader {
                         nanoseconds: UInt64(commandVMenuTraversalRetryDelay * 1_000_000_000)
                     )
                 } catch {
-                    return nil
+                    return .targetChanged(processIdentifier)
                 }
                 continue
             }
@@ -210,65 +242,91 @@ enum CursorTextContextReader {
             if let menuItem = searchResult.menuItem {
                 // The app's plain Cmd-V command is target-affine, unlike a global key event.
                 guard !Task.isCancelled,
-                      focusedProcessIdentifierForPaste() == processIdentifier else {
-                    return nil
+                      pasteTargetIsCurrent(target) else {
+                    return .targetChanged(processIdentifier)
                 }
                 guard AXUIElementPerformAction(menuItem, kAXPressAction as CFString) == .success else {
-                    return nil
+                    return .unavailable(target)
                 }
-                return processIdentifier
+                return .pressed(processIdentifier)
             }
             guard attempt < traversalAttempts - 1 else {
-                return nil
+                return .unavailable(target)
             }
+            guard pasteTargetIsCurrent(target) else {
+                return .targetChanged(processIdentifier)
+            }
+            let refreshResult = searchResult.disabledMenuItem.flatMap {
+                refreshContainingMenu(of: $0)
+            }
+            VoiceInkLatencyTrace.shared.event(
+                "paste_command_v_menu_refresh",
+                details: "attempt=\(attempt + 1) targetPid=\(processIdentifier) result=\(refreshResult.map { String($0.rawValue) } ?? "unavailable")",
+                token: latencyTraceToken
+            )
             // Let the Accessibility server process cold menu discovery before retrying.
             do {
                 try await Task.sleep(
                     nanoseconds: UInt64(commandVMenuTraversalRetryDelay * 1_000_000_000)
                 )
             } catch {
-                return nil
+                return .targetChanged(processIdentifier)
             }
         }
-        return nil
+        return .unavailable(target)
     }
 
     @MainActor
     static func pressFocusedContextMenuPasteItem(
+        target: FocusedPasteTarget,
         expectedText: String,
         latencyTraceToken: VoiceInkLatencyTrace.Token?
     ) async -> ContextMenuPasteResult? {
         guard !Task.isCancelled,
               !expectedText.isEmpty,
-              AXIsProcessTrusted(),
-              let focusedElement = focusedElement(from: AXUIElementCreateSystemWide()) else {
+              AXIsProcessTrusted() else {
             return nil
         }
-        var processIdentifier = pid_t()
-        guard AXUIElementGetPid(focusedElement, &processIdentifier) == .success,
-              processIdentifier > 0,
-              processIdentifier != ProcessInfo.processInfo.processIdentifier,
-              let actionElement = firstAncestor(
-                  startingAt: focusedElement,
-                  supporting: kAXShowMenuAction as CFString
-              ),
-              focusedProcessIdentifierForPaste() == processIdentifier else {
+        let focusedElement = target.focusedElement
+        let processIdentifier = target.processIdentifier
+        guard processIdentifier > 0,
+              processIdentifier != ProcessInfo.processInfo.processIdentifier else {
             return nil
+        }
+        guard pasteTargetIsCurrent(target) else {
+            return ContextMenuPasteResult(
+                processIdentifier: processIdentifier,
+                disposition: .deliveryUncertain
+            )
         }
 
-        let textBeforePaste = textValue(from: focusedElement)
-        let selectedRangeBeforePaste = selectedTextRange(from: focusedElement)
+        let textBeforePaste = target.text
+        let selectedRangeBeforePaste = target.selectedRange
         let application = AXUIElementCreateApplication(processIdentifier)
-        let menusBeforeShow = menuElements(in: application)
+        let menusBeforeShow = menuSnapshots(in: application)
         let applicationSearch = plainCommandVMenuItem(in: application)
+        guard capturedEditorIsFocused(
+            focusedElement,
+            processIdentifier: processIdentifier
+        ) else {
+            VoiceInkLatencyTrace.shared.event(
+                "paste_context_menu_aborted",
+                details: "reason=focusChangedBeforeTrigger targetPid=\(processIdentifier)",
+                token: latencyTraceToken
+            )
+            return ContextMenuPasteResult(
+                processIdentifier: processIdentifier,
+                disposition: .deliveryUncertain
+            )
+        }
 
-        let showResult = AXUIElementPerformAction(
-            actionElement,
-            kAXShowMenuAction as CFString
+        let showResult = performShowMenuAction(
+            startingAt: focusedElement,
+            processIdentifier: processIdentifier
         )
         VoiceInkLatencyTrace.shared.event(
             "paste_context_menu_show",
-            details: "targetPid=\(processIdentifier) result=\(showResult.rawValue)",
+            details: "method=elementAccessibility targetPid=\(processIdentifier) result=\(showResult.rawValue)",
             token: latencyTraceToken
         )
         guard showResult == .success else { return nil }
@@ -279,15 +337,24 @@ enum CursorTextContextReader {
                     nanoseconds: UInt64(contextMenuTraversalRetryDelay * 1_000_000_000)
                 )
             } catch {
-                cancelMenus(newMenuElements(in: application, excluding: menusBeforeShow))
+                cancelMenus(activatedMenuElements(
+                    in: application,
+                    since: menusBeforeShow
+                ))
                 return ContextMenuPasteResult(
                     processIdentifier: processIdentifier,
                     disposition: .deliveryUncertain
                 )
             }
-            let contextMenus = newMenuElements(in: application, excluding: menusBeforeShow)
+            let contextMenus = activatedMenuElements(
+                in: application,
+                since: menusBeforeShow
+            )
             guard !Task.isCancelled,
-                  focusedProcessIdentifierForPaste() == processIdentifier else {
+                  capturedEditorIsFocused(
+                    focusedElement,
+                    processIdentifier: processIdentifier
+                  ) else {
                 cancelMenus(contextMenus)
                 return ContextMenuPasteResult(
                     processIdentifier: processIdentifier,
@@ -304,12 +371,20 @@ enum CursorTextContextReader {
                 ?? searchResults.max { $0.visitedNodes < $1.visitedNodes }
             VoiceInkLatencyTrace.shared.event(
                 "paste_context_menu_lookup",
-                details: "attempt=\(attempt + 1) result=\(searchResult?.menuItem == nil ? "missing" : "found") newMenus=\(contextMenus.count) visited=\(searchResult?.visitedNodes ?? 0) enqueued=\(searchResult?.enqueuedNodes ?? 0) candidates=\(searchResult?.shortcutCandidates ?? 0) disabled=\(searchResult?.disabledShortcutCandidates ?? 0) titleFallbacks=\(searchResult?.titleFallbackCandidates ?? 0) limitExhausted=\(searchResult?.limitExhausted ?? false) timeout=\(searchResult?.timedOut ?? false)",
+                details: "attempt=\(attempt + 1) result=\(searchResult?.menuItem == nil ? "missing" : "found") activatedMenus=\(contextMenus.count) visited=\(searchResult?.visitedNodes ?? 0) enqueued=\(searchResult?.enqueuedNodes ?? 0) candidates=\(searchResult?.shortcutCandidates ?? 0) disabled=\(searchResult?.disabledShortcutCandidates ?? 0) titleFallbacks=\(searchResult?.titleFallbackCandidates ?? 0) limitExhausted=\(searchResult?.limitExhausted ?? false) timeout=\(searchResult?.timedOut ?? false)",
                 token: latencyTraceToken
             )
             if let menuItem = searchResult?.menuItem {
-                guard focusedProcessIdentifierForPaste() == processIdentifier,
-                      !Task.isCancelled else {
+                guard !Task.isCancelled,
+                      capturedEditorIsFocused(
+                        focusedElement,
+                        processIdentifier: processIdentifier
+                      ),
+                      textValue(from: focusedElement) == textBeforePaste,
+                      sameRange(
+                        selectedTextRange(from: focusedElement),
+                        selectedRangeBeforePaste
+                      ) else {
                     cancelMenus(contextMenus)
                     return ContextMenuPasteResult(
                         processIdentifier: processIdentifier,
@@ -334,6 +409,7 @@ enum CursorTextContextReader {
                 }
                 let delivered = await contextMenuPasteWasObserved(
                     focusedElement: focusedElement,
+                    processIdentifier: processIdentifier,
                     textBeforePaste: textBeforePaste,
                     selectedRangeBeforePaste: selectedRangeBeforePaste,
                     expectedText: expectedText
@@ -348,7 +424,10 @@ enum CursorTextContextReader {
             }
         }
 
-        cancelMenus(newMenuElements(in: application, excluding: menusBeforeShow))
+        cancelMenus(activatedMenuElements(
+            in: application,
+            since: menusBeforeShow
+        ))
         return ContextMenuPasteResult(
             processIdentifier: processIdentifier,
             disposition: .deliveryUncertain
@@ -357,6 +436,7 @@ enum CursorTextContextReader {
 
     private struct CommandVMenuSearchResult {
         let menuItem: AXUIElement?
+        let disabledMenuItem: AXUIElement?
         let visitedNodes: Int
         let enqueuedNodes: Int
         let shortcutCandidates: Int
@@ -376,6 +456,7 @@ enum CursorTextContextReader {
         var index = 0
         var shortcutCandidates = 0
         var disabledShortcutCandidates = 0
+        var disabledMenuItem: AXUIElement?
         var shortcutTitles = matchingTitles
         var enabledTitledMenuItems: [(element: AXUIElement, title: String)] = []
         while index < queue.count,
@@ -415,6 +496,7 @@ enum CursorTextContextReader {
                     if enabled {
                         return CommandVMenuSearchResult(
                             menuItem: element,
+                            disabledMenuItem: disabledMenuItem,
                             visitedNodes: index,
                             enqueuedNodes: queue.count,
                             shortcutCandidates: shortcutCandidates,
@@ -426,6 +508,9 @@ enum CursorTextContextReader {
                         )
                     }
                     disabledShortcutCandidates += 1
+                    if disabledMenuItem == nil {
+                        disabledMenuItem = element
+                    }
                 } else if enabled,
                           let normalizedTitle = normalizedMenuTitle(title) {
                     enabledTitledMenuItems.append((element, normalizedTitle))
@@ -442,6 +527,7 @@ enum CursorTextContextReader {
         if let titleFallbackItem = titleFallbackItems.first {
             return CommandVMenuSearchResult(
                 menuItem: titleFallbackItem.element,
+                disabledMenuItem: disabledMenuItem,
                 visitedNodes: index,
                 enqueuedNodes: queue.count,
                 shortcutCandidates: shortcutCandidates,
@@ -455,6 +541,7 @@ enum CursorTextContextReader {
         let hasUnvisitedNodes = index < queue.count
         return CommandVMenuSearchResult(
             menuItem: nil,
+            disabledMenuItem: disabledMenuItem,
             visitedNodes: index,
             enqueuedNodes: queue.count,
             shortcutCandidates: shortcutCandidates,
@@ -482,19 +569,107 @@ enum CursorTextContextReader {
         return updatedTitles
     }
 
+    private static func refreshContainingMenu(of menuItem: AXUIElement) -> AXError? {
+        guard let menu = firstAncestor(
+            startingAt: menuItem,
+            matchingRole: kAXMenuRole as String
+        ),
+        let menuBarItem = firstAncestor(
+            startingAt: menuItem,
+            matchingRole: kAXMenuBarItemRole as String
+        ) else {
+            return nil
+        }
+        let supportedActions = actionNames(from: menuBarItem)
+        let action: CFString
+        if supportedActions.contains(kAXPressAction as String) {
+            action = kAXPressAction as CFString
+        } else if supportedActions.contains(kAXShowMenuAction as String) {
+            action = kAXShowMenuAction as CFString
+        } else {
+            return nil
+        }
+        let result = AXUIElementPerformAction(menuBarItem, action)
+        guard result == .success else { return result }
+        return cancelMenu(menu) ? result : .cannotComplete
+    }
+
     private static func firstAncestor(
         startingAt element: AXUIElement,
-        supporting action: CFString
+        matchingRole expectedRole: String
     ) -> AXUIElement? {
         var currentElement: AXUIElement? = element
         for _ in 0..<insertionAncestorTraversalLimit {
             guard let element = currentElement else { return nil }
-            if actionNames(from: element).contains(action as String) {
-                return element
-            }
+            if role(from: element) == expectedRole { return element }
             currentElement = parentElement(from: element)
         }
         return nil
+    }
+
+    @MainActor
+    private static func performShowMenuAction(
+        startingAt element: AXUIElement,
+        processIdentifier: pid_t
+    ) -> AXError {
+        var currentElement: AXUIElement? = element
+        for _ in 0..<insertionAncestorTraversalLimit {
+            guard let element = currentElement else { break }
+            if actionNames(from: element).contains(kAXShowMenuAction as String) {
+                guard capturedEditorIsFocused(
+                    startingAt,
+                    processIdentifier: processIdentifier
+                ) else {
+                    return .cannotComplete
+                }
+                return AXUIElementPerformAction(
+                    element,
+                    kAXShowMenuAction as CFString
+                )
+            }
+            currentElement = parentElement(from: element)
+        }
+        return .actionUnsupported
+    }
+
+    @MainActor
+    private static func pasteTargetIsCurrent(_ target: FocusedPasteTarget) -> Bool {
+        pasteTargetSnapshotMatches(
+            capturedEditorFocused: capturedEditorIsFocused(
+                target.focusedElement,
+                processIdentifier: target.processIdentifier
+            ),
+            capturedText: target.text,
+            currentText: textValue(from: target.focusedElement),
+            capturedRange: target.selectedRange,
+            currentRange: selectedTextRange(from: target.focusedElement)
+        )
+    }
+
+    static func pasteTargetSnapshotMatches(
+        capturedEditorFocused: Bool,
+        capturedText: String?,
+        currentText: String?,
+        capturedRange: CFRange?,
+        currentRange: CFRange?
+    ) -> Bool {
+        capturedEditorFocused
+            && capturedText == currentText
+            && sameRange(capturedRange, currentRange)
+    }
+
+    @MainActor
+    private static func capturedEditorIsFocused(
+        _ capturedElement: AXUIElement,
+        processIdentifier: pid_t
+    ) -> Bool {
+        guard let currentElement = focusedElement(from: AXUIElementCreateSystemWide()),
+              CFEqual(currentElement, capturedElement) else {
+            return false
+        }
+        var currentProcessIdentifier = pid_t()
+        return AXUIElementGetPid(currentElement, &currentProcessIdentifier) == .success
+            && currentProcessIdentifier == processIdentifier
     }
 
     private static func actionNames(from element: AXUIElement) -> [String] {
@@ -526,24 +701,54 @@ enum CursorTextContextReader {
         return menus
     }
 
-    private static func newMenuElements(
+    private struct MenuSnapshot {
+        let element: AXUIElement
+        let visibleChildCount: Int?
+    }
+
+    private static func menuSnapshots(in application: AXUIElement) -> [MenuSnapshot] {
+        menuElements(in: application).map {
+            MenuSnapshot(
+                element: $0,
+                visibleChildCount: visibleChildElements(from: $0)?.count
+            )
+        }
+    }
+
+    private static func activatedMenuElements(
         in application: AXUIElement,
-        excluding previousMenus: [AXUIElement]
+        since previousMenus: [MenuSnapshot]
     ) -> [AXUIElement] {
-        menuElements(in: application).filter { candidate in
-            !previousMenus.contains { CFEqual(candidate, $0) }
+        menuSnapshots(in: application).compactMap { current in
+            guard let previous = previousMenus.first(where: {
+                CFEqual(current.element, $0.element)
+            }) else {
+                return current.element
+            }
+            guard previous.visibleChildCount == 0,
+                  let currentVisibleChildCount = current.visibleChildCount,
+                  currentVisibleChildCount > 0 else {
+                return nil
+            }
+            return current.element
         }
     }
 
     private static func cancelMenus(_ menus: [AXUIElement]) {
-        for menu in menus where actionNames(from: menu).contains(kAXCancelAction as String) {
-            _ = AXUIElementPerformAction(menu, kAXCancelAction as CFString)
+        for menu in menus {
+            _ = cancelMenu(menu)
         }
+    }
+
+    private static func cancelMenu(_ menu: AXUIElement) -> Bool {
+        actionNames(from: menu).contains(kAXCancelAction as String)
+            && AXUIElementPerformAction(menu, kAXCancelAction as CFString) == .success
     }
 
     @MainActor
     private static func contextMenuPasteWasObserved(
         focusedElement: AXUIElement,
+        processIdentifier: pid_t,
         textBeforePaste: String?,
         selectedRangeBeforePaste: CFRange?,
         expectedText: String
@@ -553,14 +758,23 @@ enum CursorTextContextReader {
             return false
         }
         for attempt in 0..<contextMenuDeliveryObservationAttempts {
-            guard !Task.isCancelled else { return false }
+            guard !Task.isCancelled,
+                  capturedEditorIsFocused(
+                    focusedElement,
+                    processIdentifier: processIdentifier
+                  ) else {
+                return false
+            }
             if replacementTextWasObserved(
                 textBeforeInsertion: textBeforePaste,
                 rangeBeforeInsertion: selectedRangeBeforePaste,
                 insertedText: expectedText,
                 textAfterInsertion: textValue(from: focusedElement)
             ) {
-                return !Task.isCancelled
+                return !Task.isCancelled && capturedEditorIsFocused(
+                    focusedElement,
+                    processIdentifier: processIdentifier
+                )
             }
             guard attempt < contextMenuDeliveryObservationAttempts - 1 else { break }
             do {
@@ -901,6 +1115,19 @@ enum CursorTextContextReader {
         ) == .success,
               let values = value as? [AXUIElement] else {
             return []
+        }
+        return values
+    }
+
+    private static func visibleChildElements(from element: AXUIElement) -> [AXUIElement]? {
+        var value: CFTypeRef?
+        guard AXUIElementCopyAttributeValue(
+            element,
+            kAXVisibleChildrenAttribute as CFString,
+            &value
+        ) == .success,
+              let values = value as? [AXUIElement] else {
+            return nil
         }
         return values
     }

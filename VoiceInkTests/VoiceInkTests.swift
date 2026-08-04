@@ -213,6 +213,38 @@ struct VoiceInkTests {
         ) == ["einfügen"])
     }
 
+    @Test func browserPasteTargetRejectsFocusTextAndSelectionDrift() {
+        let capturedRange = CFRange(location: 7, length: 0)
+        #expect(CursorTextContextReader.pasteTargetSnapshotMatches(
+            capturedEditorFocused: true,
+            capturedText: "before after",
+            currentText: "before after",
+            capturedRange: capturedRange,
+            currentRange: capturedRange
+        ))
+        #expect(!CursorTextContextReader.pasteTargetSnapshotMatches(
+            capturedEditorFocused: false,
+            capturedText: "before after",
+            currentText: "before after",
+            capturedRange: capturedRange,
+            currentRange: capturedRange
+        ))
+        #expect(!CursorTextContextReader.pasteTargetSnapshotMatches(
+            capturedEditorFocused: true,
+            capturedText: "before after",
+            currentText: "before typed after",
+            capturedRange: capturedRange,
+            currentRange: capturedRange
+        ))
+        #expect(!CursorTextContextReader.pasteTargetSnapshotMatches(
+            capturedEditorFocused: true,
+            capturedText: "before after",
+            currentText: "before after",
+            capturedRange: capturedRange,
+            currentRange: CFRange(location: 8, length: 0)
+        ))
+    }
+
     @Test func accessibilityInsertionObservationAcceptsTextOrCursorMutation() {
         #expect(CursorTextContextReader.insertionWasObserved(
             textBeforeInsertion: "before after",

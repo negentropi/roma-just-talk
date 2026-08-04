@@ -69,6 +69,11 @@ enum CursorTextContextReader {
         let boundsMethod: String
     }
 
+    private struct ContextMenuBoundsProbe {
+        let bounds: CGRect?
+        let details: String
+    }
+
     @MainActor
     final class FocusedPasteTarget: Sendable {
         fileprivate let focusedElement: AXUIElement
@@ -338,7 +343,10 @@ enum CursorTextContextReader {
         )
         let contextMenuPoint: CGPoint?
         if showResult != .success {
-            let anchor = postCaretContextMenuClick(to: target)
+            let anchor = postCaretContextMenuClick(
+                to: target,
+                latencyTraceToken: latencyTraceToken
+            )
             VoiceInkLatencyTrace.shared.event(
                 "paste_context_menu_show",
                 details: "method=caretRightClick targetPid=\(processIdentifier) bounds=\(anchor?.boundsMethod ?? "unavailable") result=\(anchor == nil ? "unavailable" : "posted")",
@@ -678,12 +686,16 @@ enum CursorTextContextReader {
     }
 
     @MainActor
-    private static func postCaretContextMenuClick(to target: FocusedPasteTarget) -> ContextMenuAnchor? {
+    private static func postCaretContextMenuClick(
+        to target: FocusedPasteTarget,
+        latencyTraceToken: VoiceInkLatencyTrace.Token?
+    ) -> ContextMenuAnchor? {
         guard pasteTargetIsCurrent(target),
               let selectedRange = target.selectedRange,
               let anchor = verifiedContextMenuAnchor(
                 range: selectedRange,
-                in: target.focusedElement
+                in: target.focusedElement,
+                latencyTraceToken: latencyTraceToken
               ),
               pasteTargetIsCurrent(target),
               let events = rightClickContextMenuEvents(
@@ -701,14 +713,34 @@ enum CursorTextContextReader {
     @MainActor
     private static func verifiedContextMenuAnchor(
         range: CFRange,
-        in editor: AXUIElement
+        in editor: AXUIElement,
+        latencyTraceToken: VoiceInkLatencyTrace.Token?
     ) -> ContextMenuAnchor? {
-        if let bounds = boundsForRange(range, in: editor),
-           let point = verifiedContextMenuPoint(in: bounds, matching: editor) {
+        let rangeProbe = boundsForRange(range, in: editor)
+        let rangePoint = rangeProbe.bounds.flatMap {
+            verifiedContextMenuPoint(in: $0, matching: editor)
+        }
+        traceContextMenuBoundsProbe(
+            rangeProbe,
+            method: "range",
+            matchedPoint: rangePoint,
+            latencyTraceToken: latencyTraceToken
+        )
+        if let point = rangePoint {
             return ContextMenuAnchor(point: point, boundsMethod: "range")
         }
-        if let bounds = boundsForSelectedTextMarkerRange(in: editor),
-           let point = verifiedContextMenuPoint(in: bounds, matching: editor) {
+
+        let markerProbe = boundsForSelectedTextMarkerRange(in: editor)
+        let markerPoint = markerProbe.bounds.flatMap {
+            verifiedContextMenuPoint(in: $0, matching: editor)
+        }
+        traceContextMenuBoundsProbe(
+            markerProbe,
+            method: "textMarkerRange",
+            matchedPoint: markerPoint,
+            latencyTraceToken: latencyTraceToken
+        )
+        if let point = markerPoint {
             return ContextMenuAnchor(point: point, boundsMethod: "textMarkerRange")
         }
         return nil
@@ -1393,45 +1425,122 @@ enum CursorTextContextReader {
     }
 
     @MainActor
-    private static func boundsForRange(_ range: CFRange, in element: AXUIElement) -> CGRect? {
+    private static func boundsForRange(
+        _ range: CFRange,
+        in element: AXUIElement
+    ) -> ContextMenuBoundsProbe {
         var range = range
-        guard let rangeValue = AXValueCreate(.cfRange, &range) else { return nil }
+        guard let rangeValue = AXValueCreate(.cfRange, &range) else {
+            return ContextMenuBoundsProbe(
+                bounds: nil,
+                details: "query=parameterUnavailable"
+            )
+        }
         var value: CFTypeRef?
-        guard AXUIElementCopyParameterizedAttributeValue(
+        let queryResult = AXUIElementCopyParameterizedAttributeValue(
             element,
             kAXBoundsForRangeParameterizedAttribute as CFString,
             rangeValue,
             &value
-        ) == .success,
+        )
+        guard queryResult == .success,
               let value else {
-            return nil
+            return ContextMenuBoundsProbe(
+                bounds: nil,
+                details: "query=\(queryResult.rawValue) value=none"
+            )
         }
-        return contextMenuScreenRect(from: value)
+        return contextMenuBoundsProbe(queryResult: queryResult, value: value)
     }
 
     @MainActor
-    private static func boundsForSelectedTextMarkerRange(in element: AXUIElement) -> CGRect? {
+    private static func boundsForSelectedTextMarkerRange(
+        in element: AXUIElement
+    ) -> ContextMenuBoundsProbe {
         var markerRange: CFTypeRef?
-        guard AXUIElementCopyAttributeValue(
+        let markerResult = AXUIElementCopyAttributeValue(
             element,
             kAXSelectedTextMarkerRangeAttribute as CFString,
             &markerRange
-        ) == .success,
-              let markerRange,
-              CFGetTypeID(markerRange) == AXTextMarkerRangeGetTypeID() else {
-            return nil
+        )
+        guard markerResult == .success,
+              let markerRange else {
+            return ContextMenuBoundsProbe(
+                bounds: nil,
+                details: "markerQuery=\(markerResult.rawValue) marker=none"
+            )
+        }
+        guard CFGetTypeID(markerRange) == AXTextMarkerRangeGetTypeID() else {
+            return ContextMenuBoundsProbe(
+                bounds: nil,
+                details: "markerQuery=\(markerResult.rawValue) marker=cf:\(CFGetTypeID(markerRange))"
+            )
         }
         var value: CFTypeRef?
-        guard AXUIElementCopyParameterizedAttributeValue(
+        let queryResult = AXUIElementCopyParameterizedAttributeValue(
             element,
             kAXBoundsForTextMarkerRangeParameterizedAttribute as CFString,
             markerRange,
             &value
-        ) == .success,
+        )
+        guard queryResult == .success,
               let value else {
-            return nil
+            return ContextMenuBoundsProbe(
+                bounds: nil,
+                details: "markerQuery=\(markerResult.rawValue) query=\(queryResult.rawValue) value=none"
+            )
         }
-        return contextMenuScreenRect(from: value)
+        let probe = contextMenuBoundsProbe(queryResult: queryResult, value: value)
+        return ContextMenuBoundsProbe(
+            bounds: probe.bounds,
+            details: "markerQuery=\(markerResult.rawValue) \(probe.details)"
+        )
+    }
+
+    @MainActor
+    private static func contextMenuBoundsProbe(
+        queryResult: AXError,
+        value: CFTypeRef
+    ) -> ContextMenuBoundsProbe {
+        let rawBounds = contextMenuRect(from: value)
+        let screenBounds = contextMenuScreenRect(from: value)
+        return ContextMenuBoundsProbe(
+            bounds: screenBounds,
+            details: "query=\(queryResult.rawValue) value=\(contextMenuValueKind(value)) raw=\(contextMenuRectDescription(rawBounds)) screen=\(contextMenuRectDescription(screenBounds))"
+        )
+    }
+
+    @MainActor
+    private static func traceContextMenuBoundsProbe(
+        _ probe: ContextMenuBoundsProbe,
+        method: String,
+        matchedPoint: CGPoint?,
+        latencyTraceToken: VoiceInkLatencyTrace.Token?
+    ) {
+        let onDisplay = probe.bounds.map { bounds in
+            let point = CGPoint(x: bounds.midX, y: bounds.midY)
+            return activeDisplayBounds().contains(where: { $0.contains(point) })
+        }
+        VoiceInkLatencyTrace.shared.event(
+            "paste_context_menu_bounds",
+            details: "method=\(method) \(probe.details) onDisplay=\(onDisplay.map { String($0) } ?? "unknown") editorMatch=\(matchedPoint != nil)",
+            token: latencyTraceToken
+        )
+    }
+
+    private static func contextMenuValueKind(_ value: CFTypeRef) -> String {
+        if CFGetTypeID(value) == AXValueGetTypeID() {
+            return "ax:\(String(describing: AXValueGetType(value as! AXValue)))"
+        }
+        if let nsValue = value as? NSValue {
+            return "ns:\(String(cString: nsValue.objCType))"
+        }
+        return "cf:\(CFGetTypeID(value))"
+    }
+
+    private static func contextMenuRectDescription(_ bounds: CGRect?) -> String {
+        guard let bounds else { return "none" }
+        return "\(bounds.origin.x),\(bounds.origin.y),\(bounds.width),\(bounds.height)"
     }
 
     @MainActor

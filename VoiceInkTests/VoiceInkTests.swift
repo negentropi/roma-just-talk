@@ -326,6 +326,17 @@ struct VoiceInkTests {
         ) == nil)
     }
 
+    @Test func browserContextMenuRectConvertsChromiumScreenCoordinates() {
+        #expect(CursorTextContextReader.accessibilityScreenRect(
+            fromAppKitScreenRect: CGRect(x: 10, y: 140, width: 0, height: 40),
+            primaryScreenMaxY: 200
+        ) == CGRect(x: 10, y: 20, width: 0, height: 40))
+        #expect(CursorTextContextReader.accessibilityScreenRect(
+            fromAppKitScreenRect: CGRect(x: -40, y: -60, width: 30, height: 40),
+            primaryScreenMaxY: 200
+        ) == CGRect(x: -40, y: 220, width: 30, height: 40))
+    }
+
     @Test func browserContextMenuCandidateRequiresTriggerPointProvenance() {
         let point = CGPoint(x: 100, y: 200)
         #expect(CursorTextContextReader.attributableContextMenuCandidates(

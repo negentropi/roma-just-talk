@@ -7,8 +7,8 @@ enum CursorTextContextReader {
     // Bound malformed Accessibility parent chains without missing deeply nested web editors.
     private static let insertionAncestorTraversalLimit = 64
     private static let commandVMenuTraversalLimit = 2_048
-    // Give cold web-editor Accessibility menu discovery two bounded retries.
-    private static let commandVMenuTraversalAttempts = 3
+    // Give cold web-editor Accessibility menu discovery one bounded retry.
+    private static let commandVMenuTraversalAttempts = 2
     private static let commandVMenuTraversalRetryDelay: TimeInterval = 0.25
     private static let commandVMenuTraversalTimeout: TimeInterval = 0.25
     private static let contextMenuTraversalAttempts = 4
@@ -698,6 +698,7 @@ enum CursorTextContextReader {
         return anchor
     }
 
+    @MainActor
     private static func verifiedContextMenuAnchor(
         range: CFRange,
         in editor: AXUIElement
@@ -1391,6 +1392,7 @@ enum CursorTextContextReader {
         return range
     }
 
+    @MainActor
     private static func boundsForRange(_ range: CFRange, in element: AXUIElement) -> CGRect? {
         var range = range
         guard let rangeValue = AXValueCreate(.cfRange, &range) else { return nil }
@@ -1404,9 +1406,10 @@ enum CursorTextContextReader {
               let value else {
             return nil
         }
-        return contextMenuRect(from: value)
+        return contextMenuScreenRect(from: value)
     }
 
+    @MainActor
     private static func boundsForSelectedTextMarkerRange(in element: AXUIElement) -> CGRect? {
         var markerRange: CFTypeRef?
         guard AXUIElementCopyAttributeValue(
@@ -1428,7 +1431,32 @@ enum CursorTextContextReader {
               let value else {
             return nil
         }
-        return contextMenuRect(from: value)
+        return contextMenuScreenRect(from: value)
+    }
+
+    @MainActor
+    private static func contextMenuScreenRect(from value: CFTypeRef) -> CGRect? {
+        guard let bounds = contextMenuRect(from: value) else { return nil }
+        guard CFGetTypeID(value) != AXValueGetTypeID() else { return bounds }
+        guard let primaryScreenMaxY = NSScreen.screens.first?.frame.maxY else {
+            return nil
+        }
+        return accessibilityScreenRect(
+            fromAppKitScreenRect: bounds,
+            primaryScreenMaxY: primaryScreenMaxY
+        )
+    }
+
+    static func accessibilityScreenRect(
+        fromAppKitScreenRect bounds: CGRect,
+        primaryScreenMaxY: CGFloat
+    ) -> CGRect {
+        CGRect(
+            x: bounds.origin.x,
+            y: primaryScreenMaxY - bounds.maxY,
+            width: bounds.width,
+            height: bounds.height
+        )
     }
 
     static func contextMenuRect(from value: CFTypeRef) -> CGRect? {

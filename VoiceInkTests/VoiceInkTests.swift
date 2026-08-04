@@ -337,40 +337,155 @@ struct VoiceInkTests {
         ) == CGRect(x: -40, y: 220, width: 30, height: 40))
     }
 
-    @Test func browserTextMarkerBoundsSearchesAncestorsWithinLimit() throws {
-        let parents = ["editor": "group", "group": "webArea"]
-        var markerQueries: [String] = []
-        var boundsQueries: [String] = []
-        let match = try #require(CursorTextContextReader.firstUsableTextMarkerBounds(
-            startingAt: "editor",
-            traversalLimit: 3,
-            markerRange: { element, _ in
-                markerQueries.append(element)
-                return element == "editor" ? nil : "marker-from-\(element)"
-            },
-            bounds: { element, marker, _ in
-                boundsQueries.append("\(element):\(marker)")
-                return element == "webArea"
-                    ? CGRect(x: 1, y: 2, width: 0, height: 16)
-                    : .zero
-            },
-            parent: { parents[$0] }
-        ))
+    @Test func browserCaretFallbackUsesAdjacentComposedCharacters() throws {
+        let existingText = "[existing before][existing after]"
+        let middle = CursorTextContextReader.contextMenuNeighborRanges(
+            around: CFRange(location: 17, length: 0),
+            in: existingText
+        )
+        let previous = try #require(middle.previous)
+        let next = try #require(middle.next)
+        #expect(middle.previousOuter?.location == 15)
+        #expect(previous.location == 16)
+        #expect(previous.length == 1)
+        #expect(next.location == 17)
+        #expect(next.length == 1)
+        #expect(middle.nextOuter?.location == 18)
 
-        #expect(match.depth == 2)
-        #expect(match.bounds == CGRect(x: 1, y: 2, width: 0, height: 16))
-        #expect(markerQueries == ["editor", "group", "webArea"])
-        #expect(boundsQueries == [
-            "group:marker-from-group",
-            "webArea:marker-from-webArea"
-        ])
-        #expect(CursorTextContextReader.firstUsableTextMarkerBounds(
-            startingAt: "editor",
-            traversalLimit: 2,
-            markerRange: { element, _ in element == "editor" ? nil : element },
-            bounds: { _, _, _ in .zero },
-            parent: { parents[$0] }
-        ) == nil)
+        let emoji = "👨‍👩‍👧‍👦"
+        let emojiLength = (emoji as NSString).length
+        let afterEmoji = CursorTextContextReader.contextMenuNeighborRanges(
+            around: CFRange(location: 1 + emojiLength, length: 0),
+            in: "a\(emoji)b"
+        )
+        let previousEmoji = try #require(afterEmoji.previous)
+        #expect(afterEmoji.previousOuter?.location == 0)
+        #expect(previousEmoji.location == 1)
+        #expect(previousEmoji.length == emojiLength)
+        #expect(afterEmoji.next?.location == 1 + emojiLength)
+        #expect(afterEmoji.nextOuter == nil)
+        let insideEmoji = CursorTextContextReader.contextMenuNeighborRanges(
+            around: CFRange(location: 2, length: 0),
+            in: "a\(emoji)b"
+        )
+        #expect(insideEmoji.previous == nil)
+        #expect(insideEmoji.next == nil)
+
+        let empty = CursorTextContextReader.contextMenuNeighborRanges(
+            around: CFRange(location: 0, length: 0),
+            in: ""
+        )
+        #expect(empty.previous == nil)
+        #expect(empty.next == nil)
+        #expect(empty.previousOuter == nil)
+        #expect(empty.nextOuter == nil)
+        let selection = CursorTextContextReader.contextMenuNeighborRanges(
+            around: CFRange(location: 1, length: 1),
+            in: "ab"
+        )
+        #expect(selection.previous == nil)
+        #expect(selection.next == nil)
+        #expect(selection.previousOuter == nil)
+        #expect(selection.nextOuter == nil)
+    }
+
+    @Test func browserCaretFallbackFindsSharedLTRAndRTLBoundary() throws {
+        let ltr = try #require(CursorTextContextReader.contextMenuCaretBoundaryBounds(
+            previousOuter: nil,
+            previous: CGRect(x: 10, y: 20, width: 5, height: 16),
+            next: CGRect(x: 15, y: 22, width: 5, height: 16),
+            nextOuter: nil,
+            isAtStart: false,
+            isAtEnd: false
+        ).first)
+        #expect(ltr == CGRect(x: 15, y: 22, width: 0, height: 14))
+
+        let rtl = try #require(CursorTextContextReader.contextMenuCaretBoundaryBounds(
+            previousOuter: nil,
+            previous: CGRect(x: 20, y: 20, width: 5, height: 16),
+            next: CGRect(x: 15, y: 20, width: 5, height: 16),
+            nextOuter: nil,
+            isAtStart: false,
+            isAtEnd: false
+        ).first)
+        #expect(rtl == CGRect(x: 20, y: 20, width: 0, height: 16))
+    }
+
+    @Test func browserCaretFallbackFindsLTRAndRTLEdges() throws {
+        let ltrEnd = try #require(CursorTextContextReader.contextMenuCaretBoundaryBounds(
+            previousOuter: CGRect(x: 10, y: 20, width: 5, height: 16),
+            previous: CGRect(x: 15, y: 20, width: 5, height: 16),
+            next: nil,
+            nextOuter: nil,
+            isAtStart: false,
+            isAtEnd: true
+        ).first)
+        #expect(ltrEnd == CGRect(x: 20, y: 20, width: 0, height: 16))
+
+        let rtlEnd = try #require(CursorTextContextReader.contextMenuCaretBoundaryBounds(
+            previousOuter: CGRect(x: 20, y: 20, width: 5, height: 16),
+            previous: CGRect(x: 15, y: 20, width: 5, height: 16),
+            next: nil,
+            nextOuter: nil,
+            isAtStart: false,
+            isAtEnd: true
+        ).first)
+        #expect(rtlEnd == CGRect(x: 15, y: 20, width: 0, height: 16))
+
+        let ltrStart = try #require(CursorTextContextReader.contextMenuCaretBoundaryBounds(
+            previousOuter: nil,
+            previous: nil,
+            next: CGRect(x: 10, y: 20, width: 5, height: 16),
+            nextOuter: CGRect(x: 15, y: 20, width: 5, height: 16),
+            isAtStart: true,
+            isAtEnd: false
+        ).first)
+        #expect(ltrStart == CGRect(x: 10, y: 20, width: 0, height: 16))
+
+        let rtlStart = try #require(CursorTextContextReader.contextMenuCaretBoundaryBounds(
+            previousOuter: nil,
+            previous: nil,
+            next: CGRect(x: 20, y: 20, width: 5, height: 16),
+            nextOuter: CGRect(x: 15, y: 20, width: 5, height: 16),
+            isAtStart: true,
+            isAtEnd: false
+        ).first)
+        #expect(rtlStart == CGRect(x: 25, y: 20, width: 0, height: 16))
+    }
+
+    @Test func browserCaretFallbackRejectsAmbiguousEdges() {
+        #expect(CursorTextContextReader.contextMenuCaretBoundaryBounds(
+            previousOuter: nil,
+            previous: CGRect(x: 10, y: 20, width: 5, height: 16),
+            next: nil,
+            nextOuter: nil,
+            isAtStart: false,
+            isAtEnd: true
+        ).isEmpty)
+        #expect(CursorTextContextReader.contextMenuCaretBoundaryBounds(
+            previousOuter: nil,
+            previous: nil,
+            next: nil,
+            nextOuter: nil,
+            isAtStart: true,
+            isAtEnd: true
+        ).isEmpty)
+        #expect(CursorTextContextReader.contextMenuCaretBoundaryBounds(
+            previousOuter: nil,
+            previous: CGRect(x: 10, y: 20, width: 5, height: 16),
+            next: CGRect(x: 10, y: 50, width: 5, height: 16),
+            nextOuter: nil,
+            isAtStart: false,
+            isAtEnd: false
+        ).isEmpty)
+        #expect(CursorTextContextReader.contextMenuCaretBoundaryBounds(
+            previousOuter: nil,
+            previous: CGRect(x: 10, y: 20, width: 5, height: 16),
+            next: CGRect(x: 10, y: 20, width: 5, height: 16),
+            nextOuter: nil,
+            isAtStart: false,
+            isAtEnd: false
+        ).isEmpty)
     }
 
     @Test func browserContextMenuCandidateRequiresTriggerPointProvenance() {

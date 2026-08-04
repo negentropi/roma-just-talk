@@ -74,6 +74,13 @@ enum CursorTextContextReader {
         let details: String
     }
 
+    struct ContextMenuNeighborRanges {
+        let previousOuter: CFRange?
+        let previous: CFRange?
+        let next: CFRange?
+        let nextOuter: CFRange?
+    }
+
     @MainActor
     final class FocusedPasteTarget: Sendable {
         fileprivate let focusedElement: AXUIElement
@@ -637,27 +644,6 @@ enum CursorTextContextReader {
         return nil
     }
 
-    static func firstUsableTextMarkerBounds<Element, Marker>(
-        startingAt element: Element,
-        traversalLimit: Int,
-        markerRange: (Element, Int) -> Marker?,
-        bounds: (Element, Marker, Int) -> CGRect?,
-        parent: (Element) -> Element?
-    ) -> (bounds: CGRect, depth: Int)? {
-        guard traversalLimit > 0 else { return nil }
-        var currentElement: Element? = element
-        for depth in 0..<traversalLimit {
-            guard let element = currentElement else { return nil }
-            if let markerRange = markerRange(element, depth),
-               let bounds = bounds(element, markerRange, depth),
-               contextMenuBoundsAreUsable(bounds) {
-                return (bounds, depth)
-            }
-            currentElement = parent(element)
-        }
-        return nil
-    }
-
     @MainActor
     private static func performShowMenuAction(
         startingAt capturedElement: AXUIElement,
@@ -713,8 +699,10 @@ enum CursorTextContextReader {
     ) -> ContextMenuAnchor? {
         guard pasteTargetIsCurrent(target),
               let selectedRange = target.selectedRange,
+              let text = target.text,
               let anchor = verifiedContextMenuAnchor(
                 range: selectedRange,
+                text: text,
                 in: target.focusedElement,
                 latencyTraceToken: latencyTraceToken
               ),
@@ -734,6 +722,7 @@ enum CursorTextContextReader {
     @MainActor
     private static func verifiedContextMenuAnchor(
         range: CFRange,
+        text: String,
         in editor: AXUIElement,
         latencyTraceToken: VoiceInkLatencyTrace.Token?
     ) -> ContextMenuAnchor? {
@@ -751,20 +740,197 @@ enum CursorTextContextReader {
             return ContextMenuAnchor(point: point, boundsMethod: "range")
         }
 
-        let markerProbe = boundsForSelectedTextMarkerRange(in: editor)
-        let markerPoint = markerProbe.bounds.flatMap {
-            verifiedContextMenuPoint(in: $0, matching: editor)
+        // Chromium reports a zero rectangle for collapsed contenteditable ranges.
+        // Adjacent glyph bounds locate the same caret without changing selection.
+        let neighborRanges = contextMenuNeighborRanges(around: range, in: text)
+        let previousProbe = neighborRanges.previous.map { boundsForRange($0, in: editor) }
+        let nextProbe = neighborRanges.next.map { boundsForRange($0, in: editor) }
+        let previousOuterProbe = neighborRanges.next == nil
+            ? neighborRanges.previousOuter.map { boundsForRange($0, in: editor) }
+            : nil
+        let nextOuterProbe = neighborRanges.previous == nil
+            ? neighborRanges.nextOuter.map { boundsForRange($0, in: editor) }
+            : nil
+        var neighborDetails = [
+            contextMenuRangeProbeDescription(
+                neighborRanges.previous,
+                probe: previousProbe,
+                label: "previous"
+            ),
+            contextMenuRangeProbeDescription(
+                neighborRanges.next,
+                probe: nextProbe,
+                label: "next"
+            )
+        ]
+        if neighborRanges.next == nil {
+            neighborDetails.append(contextMenuRangeProbeDescription(
+                neighborRanges.previousOuter,
+                probe: previousOuterProbe,
+                label: "previousOuter"
+            ))
         }
-        traceContextMenuBoundsProbe(
-            markerProbe,
-            method: "textMarkerRange",
-            matchedPoint: markerPoint,
-            latencyTraceToken: latencyTraceToken
-        )
-        if let point = markerPoint {
-            return ContextMenuAnchor(point: point, boundsMethod: "textMarkerRange")
+        if neighborRanges.previous == nil {
+            neighborDetails.append(contextMenuRangeProbeDescription(
+                neighborRanges.nextOuter,
+                probe: nextOuterProbe,
+                label: "nextOuter"
+            ))
+        }
+        for (index, bounds) in contextMenuCaretBoundaryBounds(
+            previousOuter: previousOuterProbe?.bounds,
+            previous: previousProbe?.bounds,
+            next: nextProbe?.bounds,
+            nextOuter: nextOuterProbe?.bounds,
+            isAtStart: neighborRanges.previous == nil,
+            isAtEnd: neighborRanges.next == nil
+        ).enumerated() {
+            let neighborProbe = ContextMenuBoundsProbe(
+                bounds: bounds,
+                details: "candidate=\(index + 1) \(neighborDetails.joined(separator: " "))"
+            )
+            let neighborPoint = verifiedContextMenuPoint(in: bounds, matching: editor)
+            traceContextMenuBoundsProbe(
+                neighborProbe,
+                method: "adjacentCharacter",
+                matchedPoint: neighborPoint,
+                latencyTraceToken: latencyTraceToken
+            )
+            if let point = neighborPoint {
+                return ContextMenuAnchor(point: point, boundsMethod: "adjacentCharacter")
+            }
+        }
+
+        // An empty editor has only one possible caret position.
+        if text.isEmpty {
+            let editorProbe = boundsForEditor(editor)
+            let editorPoint = editorProbe.bounds.flatMap {
+                verifiedContextMenuPoint(in: $0, matching: editor)
+            }
+            traceContextMenuBoundsProbe(
+                editorProbe,
+                method: "emptyEditorFrame",
+                matchedPoint: editorPoint,
+                latencyTraceToken: latencyTraceToken
+            )
+            if let point = editorPoint {
+                return ContextMenuAnchor(point: point, boundsMethod: "emptyEditorFrame")
+            }
         }
         return nil
+    }
+
+    static func contextMenuNeighborRanges(
+        around selectedRange: CFRange,
+        in text: String
+    ) -> ContextMenuNeighborRanges {
+        let text = text as NSString
+        let location = selectedRange.location
+        guard selectedRange.length == 0,
+              location >= 0,
+              location <= text.length,
+              location == text.length
+                || text.rangeOfComposedCharacterSequence(at: location).location == location else {
+            return ContextMenuNeighborRanges(
+                previousOuter: nil,
+                previous: nil,
+                next: nil,
+                nextOuter: nil
+            )
+        }
+        let previous = location > 0
+            ? contextMenuCFRange(text.rangeOfComposedCharacterSequence(at: location - 1))
+            : nil
+        let next = location < text.length
+            ? contextMenuCFRange(text.rangeOfComposedCharacterSequence(at: location))
+            : nil
+        let previousOuter = previous.flatMap { range in
+            range.location > 0
+                ? contextMenuCFRange(text.rangeOfComposedCharacterSequence(at: range.location - 1))
+                : nil
+        }
+        let nextOuter = next.flatMap { range in
+            let location = range.location + range.length
+            return location < text.length
+                ? contextMenuCFRange(text.rangeOfComposedCharacterSequence(at: location))
+                : nil
+        }
+        return ContextMenuNeighborRanges(
+            previousOuter: previousOuter,
+            previous: previous,
+            next: next,
+            nextOuter: nextOuter
+        )
+    }
+
+    private static func contextMenuCFRange(_ range: NSRange) -> CFRange {
+        CFRange(location: range.location, length: range.length)
+    }
+
+    static func contextMenuCaretBoundaryBounds(
+        previousOuter: CGRect?,
+        previous: CGRect?,
+        next: CGRect?,
+        nextOuter: CGRect?,
+        isAtStart: Bool,
+        isAtEnd: Bool
+    ) -> [CGRect] {
+        if let previous,
+           let next {
+            let minimumY = max(previous.minY, next.minY)
+            let maximumY = min(previous.maxY, next.maxY)
+            if maximumY > minimumY {
+                let edgePairs = [
+                    (previous.maxX, next.minX),
+                    (previous.minX, next.maxX)
+                ]
+                let distances = edgePairs.map { abs($0.0 - $0.1) }
+                guard distances[0] != distances[1] else { return [] }
+                let closestPair = distances[0] < distances[1] ? edgePairs[0] : edgePairs[1]
+                return [CGRect(
+                    x: (closestPair.0 + closestPair.1) / 2,
+                    y: minimumY,
+                    width: 0,
+                    height: maximumY - minimumY
+                )]
+            }
+            return []
+        }
+
+        if isAtEnd,
+           let previousOuter,
+           let previous,
+           contextMenuBoundsShareLine(previousOuter, previous),
+           previousOuter.midX != previous.midX {
+            let x = previous.midX > previousOuter.midX ? previous.maxX : previous.minX
+            return [contextMenuCaretBounds(atX: x, matching: previous)]
+        }
+        if isAtStart,
+           let next,
+           let nextOuter,
+           contextMenuBoundsShareLine(next, nextOuter),
+           next.midX != nextOuter.midX {
+            let x = next.midX < nextOuter.midX ? next.minX : next.maxX
+            return [contextMenuCaretBounds(atX: x, matching: next)]
+        }
+        return []
+    }
+
+    private static func contextMenuBoundsShareLine(_ lhs: CGRect, _ rhs: CGRect) -> Bool {
+        max(lhs.minY, rhs.minY) < min(lhs.maxY, rhs.maxY)
+    }
+
+    private static func contextMenuCaretBounds(atX x: CGFloat, matching bounds: CGRect) -> CGRect {
+        CGRect(x: x, y: bounds.minY, width: 0, height: bounds.height)
+    }
+
+    private static func contextMenuRangeProbeDescription(
+        _ range: CFRange?,
+        probe: ContextMenuBoundsProbe?,
+        label: String
+    ) -> String {
+        guard let range else { return "\(label)=none" }
+        return "\(label)=\(range.location):\(range.length) \(probe?.details ?? "bounds=none")"
     }
 
     private static func verifiedContextMenuPoint(
@@ -1479,59 +1645,52 @@ enum CursorTextContextReader {
     }
 
     @MainActor
-    private static func boundsForSelectedTextMarkerRange(
-        in element: AXUIElement
-    ) -> ContextMenuBoundsProbe {
-        var visitedAncestorCount = 0
-        var lastDetails = "marker=none"
-        let match = firstUsableTextMarkerBounds(
-            startingAt: element,
-            traversalLimit: insertionAncestorTraversalLimit,
-            markerRange: { (candidate: AXUIElement, depth: Int) -> CFTypeRef? in
-                visitedAncestorCount = depth + 1
-                var markerRange: CFTypeRef?
-                let markerResult = AXUIElementCopyAttributeValue(
-                    candidate,
-                    kAXSelectedTextMarkerRangeAttribute as CFString,
-                    &markerRange
-                )
-                guard markerResult == .success,
-                      let markerRange else {
-                    lastDetails = "markerDepth=\(depth) markerQuery=\(markerResult.rawValue) marker=none"
-                    return nil
-                }
-                guard CFGetTypeID(markerRange) == AXTextMarkerRangeGetTypeID() else {
-                    lastDetails = "markerDepth=\(depth) markerQuery=\(markerResult.rawValue) marker=cf:\(CFGetTypeID(markerRange))"
-                    return nil
-                }
-                lastDetails = "markerDepth=\(depth) markerQuery=\(markerResult.rawValue)"
-                return markerRange
-            },
-            bounds: { (candidate: AXUIElement, markerRange: CFTypeRef, _: Int) -> CGRect? in
-                var value: CFTypeRef?
-                let queryResult = AXUIElementCopyParameterizedAttributeValue(
-                    candidate,
-                    kAXBoundsForTextMarkerRangeParameterizedAttribute as CFString,
-                    markerRange,
-                    &value
-                )
-                guard queryResult == .success,
-                      let value else {
-                    lastDetails = "\(lastDetails) query=\(queryResult.rawValue) value=none"
-                    return nil
-                }
-                let probe = contextMenuBoundsProbe(queryResult: queryResult, value: value)
-                lastDetails = "\(lastDetails) \(probe.details)"
-                return probe.bounds
-            },
-            parent: parentElement
+    private static func boundsForEditor(_ element: AXUIElement) -> ContextMenuBoundsProbe {
+        var positionValue: CFTypeRef?
+        let positionResult = AXUIElementCopyAttributeValue(
+            element,
+            kAXPositionAttribute as CFString,
+            &positionValue
         )
-        if let match {
-            return ContextMenuBoundsProbe(bounds: match.bounds, details: lastDetails)
+        var sizeValue: CFTypeRef?
+        let sizeResult = AXUIElementCopyAttributeValue(
+            element,
+            kAXSizeAttribute as CFString,
+            &sizeValue
+        )
+        guard positionResult == .success,
+              sizeResult == .success,
+              let positionValue,
+              let sizeValue,
+              CFGetTypeID(positionValue) == AXValueGetTypeID(),
+              CFGetTypeID(sizeValue) == AXValueGetTypeID() else {
+            return ContextMenuBoundsProbe(
+                bounds: nil,
+                details: "positionQuery=\(positionResult.rawValue) sizeQuery=\(sizeResult.rawValue) value=unavailable"
+            )
         }
+        let positionAXValue = positionValue as! AXValue
+        let sizeAXValue = sizeValue as! AXValue
+        guard AXValueGetType(positionAXValue) == .cgPoint,
+              AXValueGetType(sizeAXValue) == .cgSize else {
+            return ContextMenuBoundsProbe(
+                bounds: nil,
+                details: "positionQuery=\(positionResult.rawValue) sizeQuery=\(sizeResult.rawValue) value=unexpected"
+            )
+        }
+        var position = CGPoint.zero
+        var size = CGSize.zero
+        guard AXValueGetValue(positionAXValue, .cgPoint, &position),
+              AXValueGetValue(sizeAXValue, .cgSize, &size) else {
+            return ContextMenuBoundsProbe(
+                bounds: nil,
+                details: "positionQuery=\(positionResult.rawValue) sizeQuery=\(sizeResult.rawValue) value=decodeFailed"
+            )
+        }
+        let bounds = CGRect(origin: position, size: size)
         return ContextMenuBoundsProbe(
-            bounds: nil,
-            details: "markerAncestors=\(visitedAncestorCount) \(lastDetails)"
+            bounds: bounds,
+            details: "positionQuery=\(positionResult.rawValue) sizeQuery=\(sizeResult.rawValue) screen=\(contextMenuRectDescription(bounds))"
         )
     }
 

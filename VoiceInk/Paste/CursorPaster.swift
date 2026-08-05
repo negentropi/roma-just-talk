@@ -148,6 +148,16 @@ class CursorPaster {
             details: "chars=\(text.count) restoreClipboard=\(shouldRestoreClipboard) method=\(VoiceInkPasteMethod.current().rawValue)",
             token: latencyTraceToken
         )
+        let initialFocusedTarget = if VoiceInkPasteMethod.current() == .standard,
+                                      accessibilityTextInserterForTesting == nil,
+                                      pasteCommandPosterForTesting == nil {
+            CursorTextContextReader.focusedPasteTargetForCurrentFocus(
+                latencyTraceToken: latencyTraceToken,
+                captureStage: "preInsertion"
+            )
+        } else {
+            nil
+        }
         if VoiceInkPasteMethod.current() == .standard,
            accessibilityTextInserterForTesting != nil || pasteCommandPosterForTesting == nil {
             let insertionSpan = latencyTrace.begin(
@@ -155,7 +165,9 @@ class CursorPaster {
                 token: latencyTraceToken
             )
             let cursorContext = await preparedCursorTextContext?.value
-            let insertionResult = if let accessibilityTextInserterForTesting {
+            let insertionResult = if initialFocusedTarget?.usesWebPasteSemantics == true {
+                CursorTextContextReader.SelectedTextInsertionResult.unsupported
+            } else if let accessibilityTextInserterForTesting {
                 accessibilityTextInserterForTesting(text, cursorContext)
             } else {
                 CursorTextContextReader.insertSelectedText(
@@ -217,6 +229,7 @@ class CursorPaster {
         let pasteResult = await postPasteCommand(
             expectedText: text,
             retryCommandVMenuDiscovery: shouldRetryCommandVMenuDiscovery,
+            initialFocusedTarget: initialFocusedTarget,
             latencyTraceToken: latencyTraceToken
         )
         latencyTrace.end(
@@ -265,6 +278,7 @@ class CursorPaster {
     private static func postPasteCommand(
         expectedText: String,
         retryCommandVMenuDiscovery: Bool,
+        initialFocusedTarget: CursorTextContextReader.FocusedPasteTarget?,
         latencyTraceToken: VoiceInkLatencyTrace.Token?
     ) async -> PasteResult {
         if let pasteCommandPosterForTesting {
@@ -285,6 +299,7 @@ class CursorPaster {
             return await pasteFromClipboard(
                 expectedText: expectedText,
                 retryCommandVMenuDiscovery: retryCommandVMenuDiscovery,
+                initialFocusedTarget: initialFocusedTarget,
                 latencyTraceToken: latencyTraceToken
             )
         }
@@ -386,6 +401,7 @@ class CursorPaster {
     private static func pasteFromClipboard(
         expectedText: String,
         retryCommandVMenuDiscovery: Bool,
+        initialFocusedTarget: CursorTextContextReader.FocusedPasteTarget?,
         latencyTraceToken: VoiceInkLatencyTrace.Token?
     ) async -> PasteResult {
         VoiceInkLatencyTrace.shared.event(
@@ -404,9 +420,23 @@ class CursorPaster {
         }
 
         guard !Task.isCancelled else { return .commandNotPosted }
-        let focusedTarget = retryCommandVMenuDiscovery
-            ? CursorTextContextReader.focusedPasteTargetForCurrentFocus()
-            : nil
+        let focusedTarget = if retryCommandVMenuDiscovery {
+            if initialFocusedTarget?.usesWebPasteSemantics == true {
+                VoiceInkLatencyTrace.shared.event(
+                    "paste_target_reused",
+                    details: "stage=postClipboard targetPid=\(initialFocusedTarget?.processIdentifier ?? 0) web=true",
+                    token: latencyTraceToken
+                )
+                initialFocusedTarget
+            } else {
+                CursorTextContextReader.focusedPasteTargetForCurrentFocus(
+                    latencyTraceToken: latencyTraceToken,
+                    captureStage: "postClipboard"
+                )
+            }
+        } else {
+            nil
+        }
         let deliveryPlan = CursorTextContextReader.pasteCommandDeliveryPlan(
             retryCommandVMenuDiscovery: retryCommandVMenuDiscovery,
             targetUsesWebPasteSemantics: focusedTarget?.usesWebPasteSemantics == true

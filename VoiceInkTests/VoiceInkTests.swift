@@ -210,6 +210,27 @@ struct VoiceInkTests {
         ))
     }
 
+    @Test func focusedCommandVFastPathIsScopedToWebPasteTargets() {
+        #expect(CursorTextContextReader.usesWebPasteSemantics(
+            ancestorRoles: ["AXTextArea", "AXWebArea", "AXWindow"]
+        ))
+        #expect(!CursorTextContextReader.usesWebPasteSemantics(
+            ancestorRoles: ["AXTextArea", "AXGroup", "AXWindow"]
+        ))
+        #expect(CursorTextContextReader.pasteCommandDeliveryPlan(
+            retryCommandVMenuDiscovery: true,
+            targetUsesWebPasteSemantics: true
+        ) == .focusedCommandVFirst)
+        #expect(CursorTextContextReader.pasteCommandDeliveryPlan(
+            retryCommandVMenuDiscovery: true,
+            targetUsesWebPasteSemantics: false
+        ) == .accessibilityMenuFirst)
+        #expect(CursorTextContextReader.pasteCommandDeliveryPlan(
+            retryCommandVMenuDiscovery: false,
+            targetUsesWebPasteSemantics: true
+        ) == .legacyCommandV)
+    }
+
     @Test func accessibilityCommandVMenuMatchRequiresEnabledPlainShortcut() {
         #expect(CursorTextContextReader.isPlainCommandVMenuItem(
             commandCharacter: "V",

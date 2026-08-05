@@ -403,8 +403,38 @@ class CursorPaster {
             return .commandNotPosted
         }
 
-        await wait(prePasteDelay)
         guard !Task.isCancelled else { return .commandNotPosted }
+        let focusedTarget = retryCommandVMenuDiscovery
+            ? CursorTextContextReader.focusedPasteTargetForCurrentFocus()
+            : nil
+        let deliveryPlan = CursorTextContextReader.pasteCommandDeliveryPlan(
+            retryCommandVMenuDiscovery: retryCommandVMenuDiscovery,
+            targetUsesWebPasteSemantics: focusedTarget?.usesWebPasteSemantics == true
+        )
+        let useFocusedCommandVFastPath = deliveryPlan == .focusedCommandVFirst
+        if useFocusedCommandVFastPath,
+           let stableTarget = focusedTarget,
+           let keyboardPaste = await CursorTextContextReader.postFocusedCommandVShortcut(
+               target: stableTarget,
+               expectedText: expectedText,
+               latencyTraceToken: latencyTraceToken
+           ) {
+            switch keyboardPaste.disposition {
+            case .delivered:
+                return .commandPosted
+            case .deliveryUncertain:
+                VoiceInkLatencyTrace.shared.event(
+                    "paste_event_delivery_uncertain",
+                    details: "method=globalHIDCommandV targetPid=\(keyboardPaste.processIdentifier)",
+                    token: latencyTraceToken
+                )
+                return .commandDeliveryUncertain
+            }
+        }
+        guard !Task.isCancelled else { return .commandNotPosted }
+        if !useFocusedCommandVFastPath {
+            await wait(prePasteDelay)
+        }
         let menuAttempt = await CursorTextContextReader.pressFocusedCommandVMenuItem(
             retryIfUnavailable: retryCommandVMenuDiscovery,
             latencyTraceToken: latencyTraceToken
@@ -432,17 +462,12 @@ class CursorPaster {
         if retryCommandVMenuDiscovery {
             guard let stableTarget else { return .commandNotPosted }
             if let keyboardPaste = await CursorTextContextReader.postFocusedCommandVShortcut(
-                target: stableTarget,
-                expectedText: expectedText,
-                latencyTraceToken: latencyTraceToken
-            ) {
+                   target: stableTarget,
+                   expectedText: expectedText,
+                   latencyTraceToken: latencyTraceToken
+               ) {
                 switch keyboardPaste.disposition {
                 case .delivered:
-                    VoiceInkLatencyTrace.shared.event(
-                        "paste_event_posted",
-                        details: "method=globalHIDCommandV targetPid=\(keyboardPaste.processIdentifier) disposition=\(keyboardPaste.disposition.rawValue)",
-                        token: latencyTraceToken
-                    )
                     return .commandPosted
                 case .deliveryUncertain:
                     VoiceInkLatencyTrace.shared.event(

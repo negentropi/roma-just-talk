@@ -46,9 +46,15 @@ using Chromium's selected text-marker bounds when ordinary range bounds cannot
 resolve back to the captured editor, converting Chromium's AppKit screen
 coordinates before AX hit-testing. It accepts only an activated menu that owns
 that same system-hit-tested screen point, then presses enabled Paste and confirms
-the exact replacement before reporting delivery. Browser fallbacks stay bound to that
-editor's unchanged text and selection; drift aborts without a recaptured,
-keyboard-triggered, or Cmd-V CGEvent paste.
+the exact replacement before reporting delivery. For a captured browser or
+Electron editor whose AX ancestor chain contains `AXWebArea`, Roma first tries
+a focus- and frontmost-validated combined-session Cmd-V and observes the exact replacement;
+this removes the cold web-menu delay while retaining the same drift guard. If
+that fast path cannot deliver, the menu and context-menu fallbacks remain bound
+to the captured editor's unchanged text and selection. A target without
+`AXWebArea` keeps the legacy delay and menu-first ordering even when AX insertion
+is unsupported. Browser/Electron target drift or uncertain delivery aborts
+without recapturing focus or sending another keyboard paste.
 Document and
 Electron editor apps open a uniquely named temporary text file. Every target
 runs once empty and once with text on both sides of the insertion cursor.

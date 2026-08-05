@@ -206,7 +206,8 @@ struct VoiceInkTests {
             ancestorRoles: ["AXTextArea", "AXGroup", "AXWindow"]
         ))
         #expect(!CursorTextContextReader.shouldUseDirectAccessibilityInsertion(
-            ancestorRoles: ["AXTextArea", "AXGroup", "AXWebArea", "AXWindow"]
+            ancestorRoles: ["AXTextArea", "AXGroup", "AXWebArea", "AXWindow"],
+            focusedRole: "AXTextArea"
         ))
         #expect(!CursorTextContextReader.shouldUseDirectAccessibilityInsertion(
             ancestorRoles: ["AXTextArea", "AXGroup", "AXWindow"],
@@ -222,7 +223,8 @@ struct VoiceInkTests {
 
     @Test func focusedCommandVFastPathIsScopedToWebPasteTargets() {
         #expect(CursorTextContextReader.usesWebPasteSemantics(
-            ancestorRoles: ["AXTextArea", "AXWebArea", "AXWindow"]
+            ancestorRoles: ["AXTextArea", "AXWebArea", "AXWindow"],
+            focusedRole: "AXTextArea"
         ))
         #expect(!CursorTextContextReader.usesWebPasteSemantics(
             ancestorRoles: ["AXTextArea", "AXGroup", "AXWindow"]
@@ -243,6 +245,13 @@ struct VoiceInkTests {
             ancestorRoles: ["AXTextField", "AXGroup", "AXWindow"],
             bundleIdentifier: "com.google.Chrome",
             focusedRole: "AXTextField"
+        ))
+        #expect(!CursorTextContextReader.usesWebPasteSemantics(
+            ancestorRoles: ["AXWebArea", "AXGroup", "AXWindow"],
+            focusedRole: "AXButton"
+        ))
+        #expect(!CursorTextContextReader.usesWebPasteSemantics(
+            ancestorRoles: ["AXWebArea", "AXGroup", "AXWindow"]
         ))
         #expect(!CursorTextContextReader.usesWebPasteSemantics(
             ancestorRoles: ["AXTextArea", "AXGroup", "AXWindow"],

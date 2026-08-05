@@ -50,10 +50,13 @@ the exact replacement before reporting delivery. For a captured browser or
 Electron editor whose AX ancestor chain contains `AXWebArea` (or whose bundle
 identifier is one of the runtime matrix's verified browser/Electron targets and
 the focused role is the target editor's `AXTextArea`), Roma first tries a focus-
-and frontmost-validated combined-session Cmd-V and observes the exact
-replacement. This removes the cold web-menu delay while retaining the same
-drift guard. Native browser controls such as the URL bar remain on the legacy
-path. If that fast path cannot deliver, the menu and context-menu fallbacks
+and frontmost-validated combined-session Cmd-V. Once that validated chord is
+posted, Roma acknowledges the web delivery without waiting for a delayed AX
+text snapshot; the harness proves the
+exact DOM `paste`/`input` replacement and rendered result. This removes the cold
+web-menu delay and the AX-observation tail while retaining the same drift guard.
+Native browser controls such as the URL bar remain on the legacy path. If the
+fast path cannot post a complete chord, the menu and context-menu fallbacks
 remain bound to the captured editor's unchanged text and selection. A target
 without `AXWebArea` and outside the verified editor-role/bundle list keeps the
 legacy delay and menu-first ordering even when AX insertion is unsupported.

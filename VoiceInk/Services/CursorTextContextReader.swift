@@ -150,10 +150,6 @@ enum CursorTextContextReader {
               let focusedElement = focusedElement(from: AXUIElementCreateSystemWide()) else {
             return nil
         }
-        guard let focusedRole = role(from: focusedElement),
-              VoiceInkCursorTextContextPolicy.isTextInputRole(focusedRole) else {
-            return nil
-        }
         var processIdentifier = pid_t()
         guard AXUIElementGetPid(focusedElement, &processIdentifier) == .success,
               processIdentifier > 0,
@@ -161,6 +157,7 @@ enum CursorTextContextReader {
             return nil
         }
         let ancestorRoles = insertionAncestorRoles(startingAt: focusedElement)
+        let focusedRole = role(from: focusedElement)
         let bundleIdentifier = NSRunningApplication(
             processIdentifier: processIdentifier
         )?.bundleIdentifier
@@ -184,6 +181,10 @@ enum CursorTextContextReader {
         bundleIdentifier: String? = nil,
         focusedRole: String? = nil
     ) -> Bool {
+        guard let focusedRole,
+              VoiceInkCursorTextContextPolicy.isTextInputRole(focusedRole) else {
+            return false
+        }
         if ancestorRoles.contains(webAreaRole) {
             return true
         }
@@ -451,6 +452,17 @@ enum CursorTextContextReader {
             details: "method=globalHIDCommandV targetPid=\(processIdentifier)",
             token: latencyTraceToken
         )
+        if target.usesWebPasteSemantics {
+            VoiceInkLatencyTrace.shared.event(
+                "paste_command_v_keyboard_observation",
+                details: "targetPid=\(processIdentifier) disposition=delivered mode=eventPosted",
+                token: latencyTraceToken
+            )
+            return CommandVShortcutPasteResult(
+                processIdentifier: processIdentifier,
+                disposition: .delivered
+            )
+        }
         let delivered = await pasteWasObserved(
             focusedElement: target.focusedElement,
             processIdentifier: processIdentifier,

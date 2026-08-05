@@ -1163,18 +1163,67 @@ enum RuntimeAX {
         RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.05))
         let appElement = AXUIElementCreateApplication(application.processIdentifier)
         let deadline = Date().addingTimeInterval(0.5)
+        var didClickEditor = false
         while Date() < deadline {
             let focusedWindow = elementAttribute(kAXFocusedWindowAttribute, from: appElement)
-            if !application.isTerminated,
-               (!requireFrontmostApplication
-                   || NSWorkspace.shared.frontmostApplication?.processIdentifier == application.processIdentifier),
-               let focusedWindow,
-               CFEqual(focusedWindow, windowElement) {
-                return true
+            let isFrontmost = !requireFrontmostApplication
+                || NSWorkspace.shared.frontmostApplication?.processIdentifier == application.processIdentifier
+            if !application.isTerminated, isFrontmost,
+               let focusedWindow, CFEqual(focusedWindow, windowElement) {
+                if let focusedElement = elementAttribute(
+                    kAXFocusedUIElementAttribute,
+                    from: appElement
+                ), CFEqual(focusedElement, textElement) {
+                    return true
+                }
+                // Chromium/Electron may accept AXFocused without moving the real caret.
+                // A bounded click makes the test target the editor the paste path will see.
+                if !didClickEditor,
+                   clickEditor(textElement) {
+                    didClickEditor = true
+                }
             }
             RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.02))
         }
-        return false
+        guard !application.isTerminated,
+              (!requireFrontmostApplication
+                  || NSWorkspace.shared.frontmostApplication?.processIdentifier == application.processIdentifier),
+              let focusedWindow = elementAttribute(kAXFocusedWindowAttribute, from: appElement),
+              CFEqual(focusedWindow, windowElement) else {
+            return false
+        }
+        return elementAttribute(kAXFocusedUIElementAttribute, from: appElement)
+            .map { CFEqual($0, textElement) } == true
+    }
+
+    private static func clickEditor(_ textElement: AXUIElement) -> Bool {
+        guard let editorFrame = observationFrame(
+            for: textElement,
+            fallbackWindow: textElement
+        ), editorFrame.width >= 4, editorFrame.height >= 4 else {
+            return false
+        }
+        let point = CGPoint(x: editorFrame.midX, y: editorFrame.midY)
+        guard let source = CGEventSource(stateID: .combinedSessionState),
+              let mouseDown = CGEvent(
+                  mouseEventSource: source,
+                  mouseType: .leftMouseDown,
+                  mouseCursorPosition: point,
+                  mouseButton: .left
+              ),
+              let mouseUp = CGEvent(
+                  mouseEventSource: source,
+                  mouseType: .leftMouseUp,
+                  mouseCursorPosition: point,
+                  mouseButton: .left
+              ) else {
+            return false
+        }
+        mouseDown.setIntegerValueField(.mouseEventClickState, value: 1)
+        mouseUp.setIntegerValueField(.mouseEventClickState, value: 1)
+        mouseDown.post(tap: .cghidEventTap)
+        mouseUp.post(tap: .cghidEventTap)
+        return true
     }
 
     static func clear(

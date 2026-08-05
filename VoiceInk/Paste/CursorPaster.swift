@@ -420,22 +420,21 @@ class CursorPaster {
         }
 
         guard !Task.isCancelled else { return .commandNotPosted }
-        let focusedTarget: CursorTextContextReader.FocusedPasteTarget? = if retryCommandVMenuDiscovery {
+        var focusedTarget: CursorTextContextReader.FocusedPasteTarget?
+        if retryCommandVMenuDiscovery {
             if initialFocusedTarget?.usesWebPasteSemantics == true {
                 VoiceInkLatencyTrace.shared.event(
                     "paste_target_reused",
                     details: "stage=postClipboard targetPid=\(initialFocusedTarget?.processIdentifier ?? 0) web=true",
                     token: latencyTraceToken
                 )
-                initialFocusedTarget
+                focusedTarget = initialFocusedTarget
             } else {
-                CursorTextContextReader.focusedPasteTargetForCurrentFocus(
+                focusedTarget = CursorTextContextReader.focusedPasteTargetForCurrentFocus(
                     latencyTraceToken: latencyTraceToken,
                     captureStage: "postClipboard"
                 )
             }
-        } else {
-            nil
         }
         let deliveryPlan = CursorTextContextReader.pasteCommandDeliveryPlan(
             retryCommandVMenuDiscovery: retryCommandVMenuDiscovery,

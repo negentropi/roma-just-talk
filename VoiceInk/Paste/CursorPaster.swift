@@ -148,9 +148,9 @@ class CursorPaster {
             details: "chars=\(text.count) restoreClipboard=\(shouldRestoreClipboard) method=\(VoiceInkPasteMethod.current().rawValue)",
             token: latencyTraceToken
         )
-        let initialFocusedTarget = if VoiceInkPasteMethod.current() == .standard,
-                                      accessibilityTextInserterForTesting == nil,
-                                      pasteCommandPosterForTesting == nil {
+        let initialFocusedTarget: CursorTextContextReader.FocusedPasteTarget? = if VoiceInkPasteMethod.current() == .standard,
+                                                                                  accessibilityTextInserterForTesting == nil,
+                                                                                  pasteCommandPosterForTesting == nil {
             CursorTextContextReader.focusedPasteTargetForCurrentFocus(
                 latencyTraceToken: latencyTraceToken,
                 captureStage: "preInsertion"
@@ -420,7 +420,7 @@ class CursorPaster {
         }
 
         guard !Task.isCancelled else { return .commandNotPosted }
-        let focusedTarget = if retryCommandVMenuDiscovery {
+        let focusedTarget: CursorTextContextReader.FocusedPasteTarget? = if retryCommandVMenuDiscovery {
             if initialFocusedTarget?.usesWebPasteSemantics == true {
                 VoiceInkLatencyTrace.shared.event(
                     "paste_target_reused",

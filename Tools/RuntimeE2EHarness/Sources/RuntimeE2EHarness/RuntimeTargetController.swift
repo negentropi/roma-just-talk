@@ -817,11 +817,22 @@ enum RuntimeTargetController {
     ) -> TargetSurface? {
         var candidate = surface
         for attempt in 0..<2 {
-            RuntimeAX.focus(
+            guard RuntimeAX.focus(
                 application: candidate.application,
                 windowElement: candidate.windowElement,
                 textElement: candidate.textElement
-            )
+            ) else {
+                guard attempt == 0,
+                      let refreshed = try? waitForTargetSurface(
+                        bundleIdentifier: bundleIdentifier,
+                        windowTitleToken: windowTitleToken,
+                        timeoutSeconds: 2
+                      ) else {
+                    continue
+                }
+                candidate = refreshed
+                continue
+            }
             if RuntimeAX.prepareBaseline(
                 textScenario,
                 textElement: candidate.textElement,
@@ -985,6 +996,14 @@ enum RuntimeTargetController {
 
 enum RuntimeAX {
     private static let editableRoles = Set([kAXTextAreaRole as String, kAXTextFieldRole as String])
+    private static let editorClickRejectedRoles = Set([
+        "AXButton",
+        "AXCheckBox",
+        "AXComboBox",
+        "AXLink",
+        "AXMenuItem",
+        "AXRadioButton"
+    ])
 
     static func firstEditableElement(in root: AXUIElement) -> AXUIElement? {
         editableElement(in: root, identifying: nil)
@@ -1204,6 +1223,21 @@ enum RuntimeAX {
             return false
         }
         let point = CGPoint(x: editorFrame.midX, y: editorFrame.midY)
+        var hitElement: AXUIElement?
+        guard AXUIElementCopyElementAtPosition(
+            AXUIElementCreateSystemWide(),
+            Float(point.x),
+            Float(point.y),
+            &hitElement
+        ) == .success,
+              let hitElement,
+              elementsShareProcess(hitElement, textElement),
+              let hitWindow = window(for: hitElement),
+              let editorWindow = window(for: textElement),
+              CFEqual(hitWindow, editorWindow),
+              editorHitIsSafe(hitElement, for: textElement) else {
+            return false
+        }
         guard let source = CGEventSource(stateID: .combinedSessionState),
               let mouseDown = CGEvent(
                   mouseEventSource: source,
@@ -1224,6 +1258,68 @@ enum RuntimeAX {
         mouseDown.post(tap: .cghidEventTap)
         mouseUp.post(tap: .cghidEventTap)
         return true
+    }
+
+    private static func editorHitIsSafe(
+        _ hitElement: AXUIElement,
+        for textElement: AXUIElement
+    ) -> Bool {
+        if elementBelongsTo(hitElement, textElement) {
+            return !pathContainsRejectedRole(
+                from: hitElement,
+                through: textElement
+            )
+        }
+        if elementBelongsTo(textElement, hitElement) {
+            return !pathContainsRejectedRole(
+                from: textElement,
+                through: hitElement
+            )
+        }
+        return false
+    }
+
+    private static func pathContainsRejectedRole(
+        from element: AXUIElement,
+        through ancestor: AXUIElement
+    ) -> Bool {
+        var current: AXUIElement? = element
+        for _ in 0..<24 {
+            guard let currentElement = current else { return true }
+            if editorClickRejectedRoles.contains(
+                stringAttribute(kAXRoleAttribute, from: currentElement) ?? ""
+            ) {
+                return true
+            }
+            if CFEqual(currentElement, ancestor) { return false }
+            current = elementAttribute(kAXParentAttribute, from: currentElement)
+        }
+        return true
+    }
+
+    private static func elementsShareProcess(
+        _ lhs: AXUIElement,
+        _ rhs: AXUIElement
+    ) -> Bool {
+        var lhsProcess = pid_t()
+        var rhsProcess = pid_t()
+        return AXUIElementGetPid(lhs, &lhsProcess) == .success
+            && AXUIElementGetPid(rhs, &rhsProcess) == .success
+            && lhsProcess > 0
+            && lhsProcess == rhsProcess
+    }
+
+    private static func elementBelongsTo(
+        _ element: AXUIElement,
+        _ ancestor: AXUIElement
+    ) -> Bool {
+        var current: AXUIElement? = element
+        for _ in 0..<24 {
+            guard let currentElement = current else { return false }
+            if CFEqual(currentElement, ancestor) { return true }
+            current = elementAttribute(kAXParentAttribute, from: currentElement)
+        }
+        return false
     }
 
     static func clear(

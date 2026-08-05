@@ -4,6 +4,12 @@ import VoiceInkCore
 
 enum CursorTextContextReader {
     private static let webAreaRole = "AXWebArea"
+    private static let webPasteBundleIdentifiers: Set<String> = [
+        "com.apple.Safari",
+        "com.google.Chrome",
+        "company.thebrowser.Browser",
+        "com.microsoft.VSCode"
+    ]
     // Bound malformed Accessibility parent chains without missing deeply nested web editors.
     private static let insertionAncestorTraversalLimit = 64
     private static let commandVMenuTraversalLimit = 2_048
@@ -144,6 +150,10 @@ enum CursorTextContextReader {
               let focusedElement = focusedElement(from: AXUIElementCreateSystemWide()) else {
             return nil
         }
+        guard let focusedRole = role(from: focusedElement),
+              VoiceInkCursorTextContextPolicy.isTextInputRole(focusedRole) else {
+            return nil
+        }
         var processIdentifier = pid_t()
         guard AXUIElementGetPid(focusedElement, &processIdentifier) == .success,
               processIdentifier > 0,
@@ -151,19 +161,34 @@ enum CursorTextContextReader {
             return nil
         }
         let ancestorRoles = insertionAncestorRoles(startingAt: focusedElement)
+        let bundleIdentifier = NSRunningApplication(
+            processIdentifier: processIdentifier
+        )?.bundleIdentifier
+        let text = textValue(from: focusedElement)
+        let selectedRange = selectedTextRange(from: focusedElement)
         return FocusedPasteTarget(
             focusedElement: focusedElement,
             processIdentifier: processIdentifier,
-            text: textValue(from: focusedElement),
-            selectedRange: selectedTextRange(from: focusedElement),
+            text: text,
+            selectedRange: selectedRange,
             usesWebPasteSemantics: CursorTextContextReader.usesWebPasteSemantics(
-                ancestorRoles: ancestorRoles
-            )
+                ancestorRoles: ancestorRoles,
+                bundleIdentifier: bundleIdentifier,
+                focusedRole: focusedRole
+            ) && text != nil && selectedRange != nil
         )
     }
 
-    static func usesWebPasteSemantics(ancestorRoles: [String]) -> Bool {
-        ancestorRoles.contains(webAreaRole)
+    static func usesWebPasteSemantics(
+        ancestorRoles: [String],
+        bundleIdentifier: String? = nil,
+        focusedRole: String? = nil
+    ) -> Bool {
+        if ancestorRoles.contains(webAreaRole) {
+            return true
+        }
+        return bundleIdentifier.map(webPasteBundleIdentifiers.contains) == true
+            && focusedRole == "AXTextArea"
     }
 
     static func pasteCommandDeliveryPlan(
@@ -1345,10 +1370,22 @@ enum CursorTextContextReader {
               let focusedElement = focusedElement(from: AXUIElementCreateSystemWide()),
               let selectedRange = selectedTextRange(from: focusedElement),
               let role = role(from: focusedElement),
-              VoiceInkCursorTextContextPolicy.isTextInputRole(role),
-              shouldUseDirectAccessibilityInsertion(
-                  ancestorRoles: insertionAncestorRoles(startingAt: focusedElement)
-              ) else {
+              VoiceInkCursorTextContextPolicy.isTextInputRole(role) else {
+            return .unsupported
+        }
+        let ancestorRoles = insertionAncestorRoles(startingAt: focusedElement)
+        var processIdentifier = pid_t()
+        let bundleIdentifier = AXUIElementGetPid(
+            focusedElement,
+            &processIdentifier
+        ) == .success
+            ? NSRunningApplication(processIdentifier: processIdentifier)?.bundleIdentifier
+            : nil
+        guard shouldUseDirectAccessibilityInsertion(
+            ancestorRoles: ancestorRoles,
+            bundleIdentifier: bundleIdentifier,
+            focusedRole: role
+        ) else {
             return .unsupported
         }
 
@@ -1532,9 +1569,17 @@ enum CursorTextContextReader {
         return textAfterInsertion == replacement.text
     }
 
-    static func shouldUseDirectAccessibilityInsertion(ancestorRoles: [String]) -> Bool {
+    static func shouldUseDirectAccessibilityInsertion(
+        ancestorRoles: [String],
+        bundleIdentifier: String? = nil,
+        focusedRole: String? = nil
+    ) -> Bool {
         // Web editors need Cmd-V so their DOM paste/input handlers update application state.
-        !usesWebPasteSemantics(ancestorRoles: ancestorRoles)
+        !usesWebPasteSemantics(
+            ancestorRoles: ancestorRoles,
+            bundleIdentifier: bundleIdentifier,
+            focusedRole: focusedRole
+        )
     }
 
     private static func textBeforeCursor(in focusedElement: AXUIElement, maximumLength: Int) -> String? {

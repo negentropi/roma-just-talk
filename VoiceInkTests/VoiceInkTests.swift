@@ -208,6 +208,16 @@ struct VoiceInkTests {
         #expect(!CursorTextContextReader.shouldUseDirectAccessibilityInsertion(
             ancestorRoles: ["AXTextArea", "AXGroup", "AXWebArea", "AXWindow"]
         ))
+        #expect(!CursorTextContextReader.shouldUseDirectAccessibilityInsertion(
+            ancestorRoles: ["AXTextArea", "AXGroup", "AXWindow"],
+            bundleIdentifier: "com.google.Chrome",
+            focusedRole: "AXTextArea"
+        ))
+        #expect(CursorTextContextReader.shouldUseDirectAccessibilityInsertion(
+            ancestorRoles: ["AXTextField", "AXGroup", "AXWindow"],
+            bundleIdentifier: "com.google.Chrome",
+            focusedRole: "AXTextField"
+        ))
     }
 
     @Test func focusedCommandVFastPathIsScopedToWebPasteTargets() {
@@ -216,6 +226,32 @@ struct VoiceInkTests {
         ))
         #expect(!CursorTextContextReader.usesWebPasteSemantics(
             ancestorRoles: ["AXTextArea", "AXGroup", "AXWindow"]
+        ))
+        for bundleIdentifier in [
+            "com.apple.Safari",
+            "com.google.Chrome",
+            "company.thebrowser.Browser",
+            "com.microsoft.VSCode"
+        ] {
+            #expect(CursorTextContextReader.usesWebPasteSemantics(
+                ancestorRoles: ["AXTextArea", "AXGroup", "AXWindow"],
+                bundleIdentifier: bundleIdentifier,
+                focusedRole: "AXTextArea"
+            ))
+        }
+        #expect(!CursorTextContextReader.usesWebPasteSemantics(
+            ancestorRoles: ["AXTextField", "AXGroup", "AXWindow"],
+            bundleIdentifier: "com.google.Chrome",
+            focusedRole: "AXTextField"
+        ))
+        #expect(!CursorTextContextReader.usesWebPasteSemantics(
+            ancestorRoles: ["AXTextArea", "AXGroup", "AXWindow"],
+            bundleIdentifier: "com.example.UnknownEditor",
+            focusedRole: "AXTextArea"
+        ))
+        #expect(!CursorTextContextReader.usesWebPasteSemantics(
+            ancestorRoles: ["AXTextArea", "AXGroup", "AXWindow"],
+            bundleIdentifier: "com.google.Chrome"
         ))
         #expect(CursorTextContextReader.pasteCommandDeliveryPlan(
             retryCommandVMenuDiscovery: true,

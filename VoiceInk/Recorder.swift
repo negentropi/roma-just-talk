@@ -116,14 +116,14 @@ class Recorder: NSObject, ObservableObject {
     }
 
     func scheduleSystemMute(
-        forInputDevice deviceID: AudioDeviceID,
         afterDelayNanoseconds delay: UInt64 = VoiceInkRecordingFeedbackPreference.defaultSystemMuteScheduleDelayNanoseconds
     ) {
+        // ponytail: Evaluate once per recording; observe route changes only if mid-recording switching matters.
         audioMuteTask?.cancel()
         audioMuteTask = Task { [weak self] in
             try? await Task.sleep(nanoseconds: delay)
             guard !Task.isCancelled, let self else { return }
-            _ = await self.mediaController.muteSystemAudio(forInputDevice: deviceID)
+            _ = await self.mediaController.muteSystemAudio()
         }
     }
 
@@ -189,7 +189,7 @@ class Recorder: NSObject, ObservableObject {
         audioRestorationTask?.cancel()
         audioRestorationTask = nil
         audioMeterUpdateTimer?.cancel()
-        scheduleSystemMute(forInputDevice: deviceID)
+        scheduleSystemMute()
 
         let coreAudioRecorder = recorder ?? CoreAudioRecorder()
         coreAudioRecorder.onAudioChunk = onAudioChunk

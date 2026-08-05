@@ -6,8 +6,7 @@ final class MediaController: ObservableObject {
 
     static let shared = MediaController()
 
-    private var didMuteAudio = false
-    private var wasAudioMutedBeforeRecording = false
+    private var mutedOutputDeviceID: AudioDeviceID?
     private var unmuteTask: Task<Void, Never>?
     private var muteGeneration: Int = 0
 
@@ -30,38 +29,35 @@ final class MediaController: ObservableObject {
 
     private init() {}
 
-    func muteSystemAudio(forInputDevice deviceID: AudioDeviceID) async -> Bool {
-        guard shouldMuteAudio(forInputDevice: deviceID) else { return false }
+    func muteSystemAudio() async -> Bool {
+        guard let outputDeviceID = getDefaultOutputDevice(),
+              shouldMuteAudio(forOutputDevice: outputDeviceID) else {
+            return false
+        }
 
         unmuteTask?.cancel()
         unmuteTask = nil
         muteGeneration += 1
 
-        let currentlyMuted = isSystemAudioMuted()
+        if let previousDeviceID = mutedOutputDeviceID,
+           previousDeviceID != outputDeviceID {
+            _ = setSystemMuted(false, on: previousDeviceID)
+            mutedOutputDeviceID = nil
+        }
 
-        if currentlyMuted {
-            if didMuteAudio {
-                // We muted it previously, stay responsible for unmuting
-                wasAudioMutedBeforeRecording = false
-            } else {
-                // User muted it, don't unmute when done
-                wasAudioMutedBeforeRecording = true
-                didMuteAudio = false
-            }
+        if isSystemAudioMuted(on: outputDeviceID) {
             return true
         }
 
-        wasAudioMutedBeforeRecording = false
-        let success = setSystemMuted(true)
-        didMuteAudio = success
+        let success = setSystemMuted(true, on: outputDeviceID)
+        mutedOutputDeviceID = success ? outputDeviceID : nil
         return success
     }
 
     func unmuteSystemAudio() async {
-        guard isSystemMuteEnabled else { return }
+        guard let outputDeviceID = mutedOutputDeviceID else { return }
 
         let delay = audioResumptionDelay
-        let shouldUnmute = didMuteAudio && !wasAudioMutedBeforeRecording
         let myGeneration = muteGeneration
 
         let task = Task { [weak self] in
@@ -73,11 +69,8 @@ final class MediaController: ObservableObject {
             guard !Task.isCancelled else { return }
             guard self.muteGeneration == myGeneration else { return }
 
-            if shouldUnmute {
-                _ = self.setSystemMuted(false)
-            }
-
-            self.didMuteAudio = false
+            _ = self.setSystemMuted(false, on: outputDeviceID)
+            self.mutedOutputDeviceID = nil
         }
 
         unmuteTask = task
@@ -106,9 +99,7 @@ final class MediaController: ObservableObject {
         return status == noErr ? deviceID : nil
     }
 
-    private func isSystemAudioMuted() -> Bool {
-        guard let deviceID = getDefaultOutputDevice() else { return false }
-
+    private func isSystemAudioMuted(on deviceID: AudioDeviceID) -> Bool {
         var muted: UInt32 = 0
         var propertySize = UInt32(MemoryLayout<UInt32>.size)
 
@@ -127,9 +118,7 @@ final class MediaController: ObservableObject {
         return status == noErr && muted != 0
     }
 
-    private func setSystemMuted(_ muted: Bool) -> Bool {
-        guard let deviceID = getDefaultOutputDevice() else { return false }
-
+    private func setSystemMuted(_ muted: Bool, on deviceID: AudioDeviceID) -> Bool {
         var muteValue: UInt32 = muted ? 1 : 0
         let propertySize = UInt32(MemoryLayout<UInt32>.size)
 
@@ -152,16 +141,28 @@ final class MediaController: ObservableObject {
         return status == noErr
     }
 
-    private func shouldMuteAudio(forInputDevice deviceID: AudioDeviceID) -> Bool {
-        switch systemMuteMode {
+    private func shouldMuteAudio(forOutputDevice deviceID: AudioDeviceID) -> Bool {
+        Self.shouldMuteAudio(
+            mode: systemMuteMode,
+            outputDeviceModelName: AudioDeviceManager.shared.getDeviceModelName(deviceID: deviceID),
+            outputDeviceName: AudioDeviceManager.shared.getDeviceName(deviceID: deviceID)
+        )
+    }
+
+    static func shouldMuteAudio(
+        mode: VoiceInkSystemMuteMode,
+        outputDeviceModelName: String?,
+        outputDeviceName: String?
+    ) -> Bool {
+        switch mode {
         case .always:
             return true
         case .never:
             return false
         case .automatic:
-            // Simplified fast-dev policy: built-in mic gets output mute, external mics do not.
-            // Future expansion can add explicit external-mic noise/isolation rules here.
-            return AudioDeviceManager.shared.isBuiltInDevice(deviceID)
+            // ponytail: CoreAudio has no public AirPods type; add a product-ID catalog only if renamed devices become a real case.
+            let outputIdentity = outputDeviceModelName ?? outputDeviceName
+            return outputIdentity?.localizedCaseInsensitiveContains("airpods") != true
         }
     }
 }

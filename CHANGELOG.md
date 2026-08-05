@@ -2,6 +2,7 @@
 
 ## v1.96 - Unreleased
 
+- Changed automatic macOS recording mute to keep AirPods output audible while muting other outputs; explicit On and Off modes remain overrides.
 - Renamed the inherited iOS record deep-link scheme from `voiceink://record` to `romajusttalk://record` so external launch identity matches Roma Just Talk.
 - Replaced the inherited VoiceInk bundle, logging, iCloud, App Group, keychain, test, and extension identifiers with `com.negentropi.RomaJustTalk`.
 - Routed macOS update checks away from the upstream VoiceInk feed to an informational appcast attached to each Roma Just Talk GitHub release.

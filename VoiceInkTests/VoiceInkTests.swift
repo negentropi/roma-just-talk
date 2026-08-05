@@ -23,6 +23,44 @@ struct VoiceInkTests {
         #expect(AppDefaults.registeredDefaults[VoiceInkUserDefaultsKey.specialShortcutPasteLastTranscriptOnEmptyTap] as? Bool == true)
     }
 
+    @Test func automaticSystemMuteFollowsAirPodsOutput() {
+        #expect(!MediaController.shouldMuteAudio(
+            mode: .automatic,
+            outputDeviceModelName: "AirPods Pro",
+            outputDeviceName: "Felix Buds"
+        ))
+        #expect(!MediaController.shouldMuteAudio(
+            mode: .automatic,
+            outputDeviceModelName: nil,
+            outputDeviceName: "AIRPODS MAX"
+        ))
+        #expect(MediaController.shouldMuteAudio(
+            mode: .automatic,
+            outputDeviceModelName: "WH-1000XM5",
+            outputDeviceName: "AirPods"
+        ))
+        #expect(MediaController.shouldMuteAudio(
+            mode: .automatic,
+            outputDeviceModelName: nil,
+            outputDeviceName: "MacBook Pro Speakers"
+        ))
+        #expect(MediaController.shouldMuteAudio(
+            mode: .automatic,
+            outputDeviceModelName: nil,
+            outputDeviceName: nil
+        ))
+        #expect(MediaController.shouldMuteAudio(
+            mode: .always,
+            outputDeviceModelName: "AirPods Max",
+            outputDeviceName: "Felix Headphones"
+        ))
+        #expect(!MediaController.shouldMuteAudio(
+            mode: .never,
+            outputDeviceModelName: "MacBook Pro Speakers",
+            outputDeviceName: "MacBook Pro Speakers"
+        ))
+    }
+
     @Test @MainActor func unconfirmedPasteCommandDoesNotRestoreOverTranscriptClipboard() async throws {
         let defaults = UserDefaults.standard
         let restoreValue = defaults.object(forKey: "restoreClipboardAfterPaste")

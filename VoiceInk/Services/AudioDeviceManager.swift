@@ -176,6 +176,14 @@ class AudioDeviceManager: ObservableObject {
                                               selector: kAudioDevicePropertyDeviceNameCFString)
         return name as String?
     }
+
+    func getDeviceModelName(deviceID: AudioDeviceID) -> String? {
+        let name: CFString? = getDeviceProperty(
+            deviceID: deviceID,
+            selector: kAudioObjectPropertyModelName
+        )
+        return name as String?
+    }
     
     private func isValidInputDevice(deviceID: AudioDeviceID) -> Bool {
         var address = AudioObjectPropertyAddress(

@@ -1077,9 +1077,11 @@ struct VoiceInkTests {
         let discardedID = UUID()
         let nextID = UUID()
 
-        #expect(lifecycle.begin(discardedID))
+        let beganDiscardedStart = lifecycle.begin(discardedID)
+        #expect(beganDiscardedStart)
         #expect(lifecycle.hasInFlightStart)
-        #expect(!lifecycle.begin(nextID))
+        let beganOverlappingStart = lifecycle.begin(nextID)
+        #expect(!beganOverlappingStart)
         #expect(lifecycle.canContinue(
             discardedID,
             activeID: discardedID,
@@ -1096,12 +1098,14 @@ struct VoiceInkTests {
             cancellationRequested: false
         ))
         #expect(lifecycle.shouldDeleteOutput(for: discardedID))
-        #expect(!lifecycle.begin(nextID))
+        let beganWhileDiscardPending = lifecycle.begin(nextID)
+        #expect(!beganWhileDiscardPending)
 
         lifecycle.finish(discardedID)
 
         #expect(!lifecycle.hasInFlightStart)
-        #expect(lifecycle.begin(nextID))
+        let beganNextStart = lifecycle.begin(nextID)
+        #expect(beganNextStart)
         #expect(!lifecycle.shouldDeleteOutput(for: nextID))
     }
 

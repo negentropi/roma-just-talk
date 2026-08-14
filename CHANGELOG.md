@@ -9,6 +9,7 @@
 - Simplified the macOS icon settings to positive Menu Bar and Dock Icon switches whose moving thumb reads Show or Hide, with ON consistently meaning visible while preserving existing choices and backup compatibility.
 - Added a landing-site pricing preview for the planned Freemium, Italy, and Roma monthly tiers, clearly marking billing, usage tracking, and entitlement enforcement as not yet live.
 - Prevented Special modifier-only shortcuts from arming while macOS Secure Input is already active.
+- Prevented Special modifier-only shortcuts from triggering on normal shifted typing, shortcut chords, or pointer gestures, discarding their owned capture without leaving a recording or history row while valid Special holds still capture immediately.
 - Added iOS microphone permission setup during onboarding plus a refreshable Settings recovery screen that reuses the recording permission path.
 - Resumed incomplete iOS onboarding at its last saved setup step after relaunch, clearing the saved step on completion or app-data reset.
 - Exposed iOS app-data reset in shipping Settings with destructive confirmation before deleting recordings, models, preferences, and credentials.

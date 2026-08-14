@@ -1072,6 +1072,54 @@ struct VoiceInkTests {
         #expect(sessionActive)
     }
 
+    @Test func discardedDelayedRecordingStartCannotResumeOrOverlapNextStart() {
+        var lifecycle = VoiceInkRecordingStartLifecycle()
+        let discardedID = UUID()
+        let nextID = UUID()
+
+        #expect(lifecycle.begin(discardedID))
+        #expect(lifecycle.hasInFlightStart)
+        #expect(!lifecycle.begin(nextID))
+        #expect(lifecycle.canContinue(
+            discardedID,
+            activeID: discardedID,
+            recorderSessionActive: true,
+            cancellationRequested: false
+        ))
+
+        lifecycle.markDiscard(discardedID)
+
+        #expect(!lifecycle.canContinue(
+            discardedID,
+            activeID: nil,
+            recorderSessionActive: true,
+            cancellationRequested: false
+        ))
+        #expect(lifecycle.shouldDeleteOutput(for: discardedID))
+        #expect(!lifecycle.begin(nextID))
+
+        lifecycle.finish(discardedID)
+
+        #expect(!lifecycle.hasInFlightStart)
+        #expect(lifecycle.begin(nextID))
+        #expect(!lifecycle.shouldDeleteOutput(for: nextID))
+    }
+
+    @Test func runtimeHarnessModifierPayloadMatchesShortcutStorageSchema() throws {
+        let data = try JSONSerialization.data(withJSONObject: [
+            "kind": "modifierOnly",
+            "keyCode": UInt16(kVK_Shift),
+            "modifierFlagsRawValue": NSEvent.ModifierFlags.shift.rawValue
+        ])
+
+        let shortcut = try JSONDecoder().decode(Shortcut.self, from: data)
+
+        #expect(shortcut == .modifierOnly(
+            keyCode: UInt16(kVK_Shift),
+            modifierFlags: [.shift]
+        ))
+    }
+
     @Test @MainActor func specialModeCleanReleaseStopsRecording() async throws {
         var recordingState = VoiceInkRecordingState.idle
         var sessionActive = false
@@ -1107,10 +1155,11 @@ struct VoiceInkTests {
         #expect(!sessionActive)
     }
 
-    @Test @MainActor func specialModeUnsafeKeyEvidenceCancelsStartedRecording() async throws {
+    @Test @MainActor func specialModeUnsafeKeyEvidenceDiscardsOwnedRecording() async throws {
         var recordingState = VoiceInkRecordingState.idle
         var sessionActive = false
         var cancelCount = 0
+        var discardCount = 0
 
         let handler = RecordingShortcutModeHandler(
             logger: Logger(subsystem: "VoiceInkTests", category: "RecordingShortcutModeHandler"),
@@ -1123,6 +1172,11 @@ struct VoiceInkTests {
             },
             cancelRecording: {
                 cancelCount += 1
+                recordingState = .idle
+                sessionActive = false
+            },
+            discardRecording: {
+                discardCount += 1
                 recordingState = .idle
                 sessionActive = false
             }
@@ -1140,7 +1194,81 @@ struct VoiceInkTests {
             context: VoiceInkShortcutPressContext(didPressOtherKeyDuringPress: true)
         )
 
-        #expect(cancelCount == 1)
+        #expect(cancelCount == 0)
+        #expect(discardCount == 1)
+        #expect(recordingState == .idle)
+        #expect(!sessionActive)
+    }
+
+    @Test @MainActor func specialModeUnsafeEvidenceDoesNotDiscardPreexistingRecording() async throws {
+        var discardCount = 0
+        let handler = RecordingShortcutModeHandler(
+            logger: Logger(subsystem: "VoiceInkTests", category: "RecordingShortcutModeHandler"),
+            canHandleShortcutAction: { true },
+            isRecorderVisible: { true },
+            recordingState: { .recording },
+            toggleMiniRecorder: { _ in },
+            cancelRecording: {},
+            discardRecording: { discardCount += 1 }
+        )
+
+        await handler.handleKeyDown(
+            action: .primaryRecording,
+            eventTime: 1,
+            mode: .special
+        )
+        await handler.handleKeyUp(
+            action: .primaryRecording,
+            eventTime: 1.2,
+            mode: .special,
+            context: VoiceInkShortcutPressContext(didPressOtherKeyDuringPress: true)
+        )
+
+        #expect(discardCount == 0)
+    }
+
+    @Test @MainActor func specialModeDiscardsAsSoonAsEvidenceBecomesUnsafe() async throws {
+        var recordingState = VoiceInkRecordingState.idle
+        var sessionActive = false
+        var discardCount = 0
+        let handler = RecordingShortcutModeHandler(
+            logger: Logger(subsystem: "VoiceInkTests", category: "RecordingShortcutModeHandler"),
+            canHandleShortcutAction: { true },
+            isRecorderVisible: { sessionActive },
+            recordingState: { recordingState },
+            toggleMiniRecorder: { _ in
+                recordingState = .recording
+                sessionActive = true
+            },
+            cancelRecording: {},
+            discardRecording: {
+                discardCount += 1
+                recordingState = .idle
+                sessionActive = false
+            }
+        )
+
+        await handler.handleKeyDown(
+            action: .primaryRecording,
+            eventTime: 1,
+            mode: .special
+        )
+        await handler.handlePressContextChanged(
+            action: .primaryRecording,
+            context: VoiceInkShortcutPressContext(didUsePointerDuringPress: true)
+        )
+        await handler.handlePressContextChanged(
+            action: .primaryRecording,
+            context: VoiceInkShortcutPressContext(didUsePointerDuringPress: true)
+        )
+        await handler.handleKeyUp(
+            action: .primaryRecording,
+            eventTime: 5.5,
+            mode: .special,
+            context: VoiceInkShortcutPressContext(didUsePointerDuringPress: true)
+        )
+
+        #expect(discardCount == 1)
         #expect(recordingState == .idle)
         #expect(!sessionActive)
     }
@@ -1152,7 +1280,7 @@ struct VoiceInkTests {
                 didReleaseOtherKeyDuringPress: false,
                 hasReliableKeyEvidence: false
             )
-        ) == "pressedOtherKey=true releasedOtherKey=false reliable=false")
+        ) == "pressedOtherKey=true releasedOtherKey=false usedPointer=false reliable=false")
     }
 
     @Test func inputMonitoringPermissionUsesInjectedSystemClient() async throws {
@@ -1598,6 +1726,41 @@ struct VoiceInkTests {
 
         #expect(await eventually { contexts.count == 1 })
         #expect(contexts == [VoiceInkShortcutPressContext(didPressOtherKeyDuringPress: true, didReleaseOtherKeyDuringPress: true)])
+    }
+
+    @Test func modifierOnlyShortcutTracksPointerActivity() async throws {
+        let monitor = ShortcutMonitor()
+        var contexts: [VoiceInkShortcutPressContext] = []
+        var contextChanges: [VoiceInkShortcutPressContext] = []
+
+        monitor.configureForTesting(
+            shortcuts: [
+                .primaryRecording: .modifierOnly(
+                    keyCode: UInt16(kVK_Shift),
+                    modifierFlags: [.shift]
+                )
+            ],
+            onKeyDown: { _, _ in },
+            onKeyUp: { _, _, context in contexts.append(context) },
+            onPressContextChanged: { _, context in contextChanges.append(context) }
+        )
+
+        monitor.handleModifierOnlyFlagsChangedForTesting(
+            keyCode: UInt16(kVK_Shift),
+            modifierFlags: [.shift],
+            eventTime: 1
+        )
+        monitor.handlePointerActivityForTesting()
+        monitor.handlePointerActivityForTesting()
+        monitor.handleModifierOnlyFlagsChangedForTesting(
+            keyCode: UInt16(kVK_Shift),
+            modifierFlags: [],
+            eventTime: 2
+        )
+
+        #expect(await eventually { contexts.count == 1 })
+        #expect(contextChanges == [VoiceInkShortcutPressContext(didUsePointerDuringPress: true)])
+        #expect(contexts == [VoiceInkShortcutPressContext(didUsePointerDuringPress: true)])
     }
 
     @Test @MainActor func shortcutRecorderCancelRestoresStoredShortcut() throws {

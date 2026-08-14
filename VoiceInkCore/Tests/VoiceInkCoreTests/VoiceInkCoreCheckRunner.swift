@@ -716,6 +716,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "UserDefaultsPreferencesTests.testReliablePressContextAllowsSpecialShortcutCommit", run: { UserDefaultsPreferencesTests().testReliablePressContextAllowsSpecialShortcutCommit() }),
             VoiceInkCoreCheck(name: "UserDefaultsPreferencesTests.testTypingEvidenceDiscardsSpecialShortcut", run: { UserDefaultsPreferencesTests().testTypingEvidenceDiscardsSpecialShortcut() }),
             VoiceInkCoreCheck(name: "UserDefaultsPreferencesTests.testUnreliableKeyEvidenceFailsClosed", run: { UserDefaultsPreferencesTests().testUnreliableKeyEvidenceFailsClosed() }),
+            VoiceInkCoreCheck(name: "SpecialShortcutEvidenceTests.testPointerActivityDiscardsSpecialShortcut", run: { SpecialShortcutEvidenceTests().testPointerActivityDiscardsSpecialShortcut() }),
             VoiceInkCoreCheck(name: "UserDefaultsPreferencesTests.testShortcutInterruptionPolicyPreservesMacOSWindow", run: { UserDefaultsPreferencesTests().testShortcutInterruptionPolicyPreservesMacOSWindow() }),
             VoiceInkCoreCheck(name: "UserDefaultsPreferencesTests.testRecordingShortcutTimingPolicyPreservesMacOSThresholds", run: { UserDefaultsPreferencesTests().testRecordingShortcutTimingPolicyPreservesMacOSThresholds() }),
             VoiceInkCoreCheck(name: "UserDefaultsPreferencesTests.testRecordingShortcutTimingPolicyDetectsPressCooldown", run: { UserDefaultsPreferencesTests().testRecordingShortcutTimingPolicyDetectsPressCooldown() }),

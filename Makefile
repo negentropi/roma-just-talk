@@ -142,6 +142,11 @@ runtime-e2e-check:
 		--package-path "$(RUNTIME_E2E_PACKAGE)" \
 		--scratch-path "$(RUNTIME_E2E_SCRATCH)" \
 		--product RuntimeE2EHarness
+	swift run \
+		--package-path "$(RUNTIME_E2E_PACKAGE)" \
+		--scratch-path "$(RUNTIME_E2E_SCRATCH)" \
+		--skip-build \
+		RuntimeE2EHarness --side-effect-restore-check
 	bash scripts/check-runtime-e2e-makefile.sh
 	bash -n scripts/runtime-e2e-phase-runner.sh
 	bash -n scripts/run-macos-runtime-e2e.sh

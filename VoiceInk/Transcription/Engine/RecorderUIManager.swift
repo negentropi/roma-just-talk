@@ -197,6 +197,13 @@ class RecorderUIManager: ObservableObject {
         await dismissMiniRecorder()
     }
 
+    func discardRecording() async {
+        guard let engine = engine else { return }
+        logger.notice("discardRecording called")
+        await engine.discardRecording()
+        await dismissMiniRecorder()
+    }
+
     // MARK: - Notification Handling
 
     private func setupNotifications() {

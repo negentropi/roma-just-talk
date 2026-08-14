@@ -154,7 +154,20 @@ write_config() {
         {id:"vscode",displayName:"Visual Studio Code",bundleIdentifier:"com.microsoft.VSCode",kind:"electron"}
       ],
       expectedTranscripts: {},
-      voiceInkLifecycle: "reuse"
+      voiceInkLifecycle: "reuse",
+      specialShortcut: {keyCode:56,modifierFlag:"shift"},
+      falseTriggerScenarios: [
+        {id:"capital-random-letter",kind:"capitalLetter",holdSeconds:0.35,interactionStartSeconds:0.08,interactionDurationSeconds:0.05,targetIDs:["textedit"]},
+        {id:"shifted-dollar",kind:"shiftedSymbol",holdSeconds:0.35,interactionStartSeconds:0.08,interactionDurationSeconds:0.05,targetIDs:["textedit"]},
+        {id:"shift-tab",kind:"shiftTab",holdSeconds:0.35,interactionStartSeconds:0.08,interactionDurationSeconds:0.05,targetIDs:["textedit"]},
+        {id:"shift-a-hotkey",kind:"shiftAHotkey",holdSeconds:0.35,interactionStartSeconds:0.08,interactionDurationSeconds:0.05,targetIDs:["textedit"]},
+        {id:"pointer-move-short",kind:"pointerMove",holdSeconds:0.35,interactionStartSeconds:0.08,interactionDurationSeconds:0.05,targetIDs:["textedit"]},
+        {id:"pointer-click-short",kind:"pointerClick",holdSeconds:0.35,interactionStartSeconds:0.08,interactionDurationSeconds:0.05,targetIDs:["textedit"]},
+        {id:"pointer-drag-short",kind:"pointerDrag",holdSeconds:0.5,interactionStartSeconds:0.08,interactionDurationSeconds:0.2,targetIDs:["textedit"]},
+        {id:"pointer-click-starts-after-four-seconds",kind:"pointerClick",holdSeconds:4.5,interactionStartSeconds:4.1,interactionDurationSeconds:0.05,targetIDs:["textedit"]},
+        {id:"pointer-click-ends-after-four-seconds",kind:"pointerClick",holdSeconds:4.5,interactionStartSeconds:0.2,interactionDurationSeconds:4,targetIDs:["textedit"]},
+        {id:"pointer-click-ends-before-four-second-release",kind:"pointerClick",holdSeconds:4.5,interactionStartSeconds:0.2,interactionDurationSeconds:0.05,targetIDs:["textedit"]}
+      ]
     }' > "$output"
 }
 
@@ -361,6 +374,14 @@ if [ -f "$evidence/runtime-e2e-report.json" ]; then
     evidence,
     error
   }]' "$evidence/runtime-e2e-report.json" > "$evidence/runtime-e2e-failures.json"
+  jq '[.falseTriggerCases[] | select(.assessment.passed | not) | {
+    id,
+    target: .target.id,
+    scenario: .scenario.id,
+    status: .assessment.status,
+    nativeBehaviorSatisfied,
+    error
+  }]' "$evidence/runtime-e2e-report.json" > "$evidence/runtime-e2e-false-trigger-failures.json"
 fi
 
 capture_tcc final

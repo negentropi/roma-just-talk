@@ -63,6 +63,188 @@ do {
         Set(runPlan.cases.map(\.textScenario)) == Set(RuntimeTextScenario.allCases),
         "every runtime matrix must cover empty and existing-text cursor baselines"
     )
+    let falseTriggerPlan = try RuntimeFalseTriggerPlan.make(
+        scenarios: RuntimeFalseTriggerScenario.defaultMatrix,
+        targets: targets,
+        repetitions: 2
+    )
+    try require(
+        Set(falseTriggerPlan.cases.map(\.scenario.kind)) == Set(RuntimeFalseTriggerKind.allCases),
+        "false-trigger cases must cover typing, shortcut chords, and pointer interactions"
+    )
+    try require(
+        falseTriggerPlan.cases.contains {
+            $0.scenario.kind == .pointerClick && $0.scenario.holdSeconds > 4
+        },
+        "pointer coverage must include a hold longer than four seconds"
+    )
+    let falseScenarios = Dictionary(
+        uniqueKeysWithValues: RuntimeFalseTriggerScenario.defaultMatrix.map { ($0.id, $0) }
+    )
+    try require(falseScenarios.count == 10, "the default false-trigger matrix should contain ten cases")
+    let startsAfterFour = falseScenarios["pointer-click-starts-after-four-seconds"]
+    try require(
+        startsAfterFour?.interactionStartSeconds ?? 0 > 4,
+        "one click must start after four seconds"
+    )
+    let spansFour = falseScenarios["pointer-click-ends-after-four-seconds"]
+    try require(
+        (spansFour?.interactionStartSeconds ?? 5) < 4
+            && (spansFour.map { $0.interactionStartSeconds + $0.interactionDurationSeconds } ?? 0) > 4,
+        "one click must start before and end after four seconds"
+    )
+    let endsBeforeLongRelease = falseScenarios["pointer-click-ends-before-four-second-release"]
+    try require(
+        (endsBeforeLongRelease.map { $0.interactionStartSeconds + $0.interactionDurationSeconds } ?? 5) < 4
+            && (endsBeforeLongRelease?.holdSeconds ?? 0) > 4,
+        "one click must end before four seconds while modifier release stays after four seconds"
+    )
+
+    let nativeBaseline = RuntimeFalseTriggerNativeSnapshot(
+        text: "",
+        selectionLocation: 0,
+        selectionLength: 0,
+        textElementFocused: true,
+        focusedRole: "AXTextArea",
+        focusedTitle: nil,
+        pointerX: 10,
+        pointerY: 10
+    )
+    try require(
+        RuntimeFalseTriggerNativeBehaviorPolicy.isSatisfied(
+            kind: .capitalLetter,
+            expectedInsertedText: "Q",
+            before: nativeBaseline,
+            after: RuntimeFalseTriggerNativeSnapshot(
+                text: "Q",
+                selectionLocation: 1,
+                selectionLength: 0,
+                textElementFocused: true,
+                focusedRole: "AXTextArea",
+                focusedTitle: nil,
+                pointerX: 10,
+                pointerY: 10
+            )
+        ),
+        "capital-letter proof must observe the exact native character"
+    )
+    try require(
+        !RuntimeFalseTriggerNativeBehaviorPolicy.isSatisfied(
+            kind: .shiftAHotkey,
+            expectedInsertedText: "A",
+            before: nativeBaseline,
+            after: nativeBaseline
+        ),
+        "Shift-A cannot pass without an observable native result"
+    )
+    try require(
+        !RuntimeFalseTriggerNativeBehaviorPolicy.isSatisfied(
+            kind: .shiftTab,
+            expectedInsertedText: nil,
+            before: nativeBaseline,
+            after: nativeBaseline
+        ),
+        "Shift-Tab cannot pass on unchanged focus, selection, and text"
+    )
+    let shiftTabFocusResult = RuntimeFalseTriggerNativeSnapshot(
+        text: "",
+        selectionLocation: 0,
+        selectionLength: 0,
+        textElementFocused: false,
+        focusedRole: "AXButton",
+        focusedTitle: "Previous",
+        pointerX: 10,
+        pointerY: 10
+    )
+    try require(
+        RuntimeFalseTriggerNativeBehaviorPolicy.isSatisfied(
+            kind: .shiftTab,
+            expectedInsertedText: nil,
+            before: nativeBaseline,
+            after: shiftTabFocusResult
+        ),
+        "Shift-Tab must prove an unchanged editor plus a focus or selection transition"
+    )
+    try require(
+        !RuntimeFalseTriggerNativeBehaviorPolicy.isSatisfied(
+            kind: .shiftTab,
+            expectedInsertedText: nil,
+            before: nativeBaseline,
+            after: RuntimeFalseTriggerNativeSnapshot(
+                text: "unexpected transcript",
+                selectionLocation: 0,
+                selectionLength: 0,
+                textElementFocused: false,
+                focusedRole: "AXButton",
+                focusedTitle: "Previous",
+                pointerX: 10,
+                pointerY: 10
+            )
+        ),
+        "Shift-Tab must reject text mutation even when focus changed"
+    )
+    try require(
+        RuntimeFalseTriggerNativeBehaviorPolicy.isSatisfied(
+            kind: .pointerMove,
+            expectedInsertedText: nil,
+            before: nativeBaseline,
+            after: RuntimeFalseTriggerNativeSnapshot(
+                text: "",
+                selectionLocation: 0,
+                selectionLength: 0,
+                textElementFocused: true,
+                focusedRole: "AXTextArea",
+                focusedTitle: nil,
+                pointerX: 20,
+                pointerY: 10
+            )
+        ),
+        "pointer-move proof must observe cursor displacement"
+    )
+
+    let encodedDefaultConfiguration = try JSONEncoder().encode(RuntimeHarnessConfiguration.default)
+    guard var legacyConfigurationObject = try JSONSerialization.jsonObject(
+        with: encodedDefaultConfiguration
+    ) as? [String: Any] else {
+        throw CheckFailure(description: "default runtime configuration must encode as an object")
+    }
+    legacyConfigurationObject.removeValue(forKey: "specialShortcut")
+    legacyConfigurationObject.removeValue(forKey: "falseTriggerScenarios")
+    let legacyConfigurationData = try JSONSerialization.data(withJSONObject: legacyConfigurationObject)
+    let decodedLegacyConfiguration = try JSONDecoder().decode(
+        RuntimeHarnessConfiguration.self,
+        from: legacyConfigurationData
+    )
+    try require(
+        decodedLegacyConfiguration.resolvedSpecialShortcut == .leftShift
+            && decodedLegacyConfiguration.resolvedFalseTriggerScenarios == RuntimeFalseTriggerScenario.defaultMatrix,
+        "schema-8 manifests must inherit the left-Shift false-trigger defaults"
+    )
+    let rejectedAssessment = RuntimeFalseTriggerAssessment.assess(
+        nativeBehaviorSatisfied: true,
+        shortcutEvidenceRejected: true,
+        recordingDiscarded: true,
+        transcriptionStarted: false,
+        textDeliveryAttempted: false,
+        clipboardChanged: false,
+        recordingsChanged: false,
+        transcriptionCountChanged: false
+    )
+    try require(rejectedAssessment.passed, "a clean rejected shortcut with no side effects must pass")
+    try require(
+        RuntimeFalseTriggerAssessment.assess(
+            nativeBehaviorSatisfied: true,
+            shortcutEvidenceRejected: true,
+            recordingDiscarded: true,
+            transcriptionStarted: false,
+            textDeliveryAttempted: false,
+            clipboardChanged: false,
+            recordingsChanged: true,
+            transcriptionCountChanged: false
+        ).status == .recordingArtifactCreated,
+        "a false trigger that leaves a recording file must fail explicitly"
+    )
+    print("PASS false-trigger matrix covers native input and rejects persistent side effects")
     let existingTextScenario = RuntimeTextScenario.existingText
     try require(
         existingTextScenario.insertedText(
@@ -647,13 +829,31 @@ do {
         "trace should expose the shortcut hold VoiceInk actually observed"
     )
     let rejectedShortcutTrace = RuntimeLatencyTrace.parse(messages: [
-        "[LATENCY] trace=A5A6A7A8 seq=0 t=0.0ms delta=0.0ms event=shortcut.key_down_physical mode=special",
+        "[LATENCY] trace=A5A6A7A8 seq=0 t=0.0ms delta=0.0ms event=shortcut.key_down_physical mode=special sourceUptime=4812.125000",
         "[LATENCY] trace=A5A6A7A8 seq=1 t=166.2ms delta=166.2ms event=shortcut.key_up_handler pressedOtherKey=true releasedOtherKey=false reliable=true",
-        "[LATENCY] trace=A5A6A7A8 seq=2 t=166.2ms delta=0.0ms event=shortcut.key_evidence_rejected pressedOtherKey=true releasedOtherKey=false reliable=true"
+        "[LATENCY] trace=A5A6A7A8 seq=2 t=166.2ms delta=0.0ms event=shortcut.key_evidence_rejected pressedOtherKey=true releasedOtherKey=false reliable=true",
+        "[LATENCY] trace=A5A6A7A8 seq=3 t=170.0ms delta=3.8ms event=engine.recording_discarded"
     ])
     try require(
         rejectedShortcutTrace?.shortcutKeyEvidenceRejected == true,
         "trace should distinguish rejected key evidence from transcription failure"
+    )
+    try require(
+        rejectedShortcutTrace?.recordingDiscarded == true,
+        "trace should prove that a rejected Special recording was discarded"
+    )
+    try require(
+        rejectedShortcutTrace?.shortcutKeyDownSystemUptime ?? -1,
+        equals: 4812.125,
+        "trace should preserve the physical shortcut timestamp for E2E attribution"
+    )
+    let prematurelyStartedPipelineTrace = RuntimeLatencyTrace.parse(messages: [
+        "[LATENCY] trace=A9A0A1A2 seq=0 t=0.0ms delta=0.0ms event=shortcut.key_down_physical mode=special sourceUptime=4813.000000",
+        "[LATENCY] trace=A9A0A1A2 seq=1 t=50.0ms delta=50.0ms event=pipeline.enter"
+    ])
+    try require(
+        prematurelyStartedPipelineTrace?.transcriptionStarted == true,
+        "false-trigger evidence must detect pipeline entry before completion"
     )
     let rejectedEvidence = RuntimeCaseEvidence(
         targetPrepared: true,

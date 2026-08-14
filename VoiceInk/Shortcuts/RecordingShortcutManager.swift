@@ -134,6 +134,9 @@ class RecordingShortcutManager: ObservableObject {
             },
             cancelRecording: {
                 await recorderUIManager.cancelRecording()
+            },
+            discardRecording: {
+                await recorderUIManager.discardRecording()
             }
         )
 
@@ -305,6 +308,15 @@ class RecordingShortcutManager: ObservableObject {
                     } else {
                         await self.handleGlobalShortcut(action)
                     }
+                }
+            },
+            onPressContextChanged: { [weak self] action, context in
+                Task { @MainActor in
+                    guard let self, self.recordingMode(for: action) == .special else { return }
+                    await self.shortcutModeHandler.handlePressContextChanged(
+                        action: action,
+                        context: context
+                    )
                 }
             },
             onShortcutInterrupted: { [weak self] action, _ in
@@ -482,6 +494,7 @@ final class RecordingShortcutModeHandler {
     private let recordingState: @MainActor () -> VoiceInkRecordingState
     private let toggleMiniRecorder: @MainActor (UUID?) async -> Void
     private let cancelRecording: @MainActor () async -> Void
+    private let discardRecording: @MainActor () async -> Void
 
     private var shortcutPressStartTime: TimeInterval?
     private var isHandsFreeRecording = false
@@ -489,6 +502,7 @@ final class RecordingShortcutModeHandler {
     private var activeRecordingShortcutAction: ShortcutAction?
     private var interruptedRecordingActions = Set<ShortcutAction>()
     private var activeShortcutCanCancelAccidentalStart = false
+    private var activeSpecialRecordingDiscarded = false
     private var activeSpecialOptions = SpecialShortcutOptions()
     private var lastShortcutPressTime: Date?
     private var activeLatencyTraceToken: VoiceInkLatencyTrace.Token?
@@ -499,7 +513,8 @@ final class RecordingShortcutModeHandler {
         isRecorderVisible: @escaping @MainActor () -> Bool,
         recordingState: @escaping @MainActor () -> VoiceInkRecordingState,
         toggleMiniRecorder: @escaping @MainActor (UUID?) async -> Void,
-        cancelRecording: @escaping @MainActor () async -> Void
+        cancelRecording: @escaping @MainActor () async -> Void,
+        discardRecording: @escaping @MainActor () async -> Void = {}
     ) {
         self.logger = logger
         self.canHandleShortcutAction = canHandleShortcutAction
@@ -507,6 +522,7 @@ final class RecordingShortcutModeHandler {
         self.recordingState = recordingState
         self.toggleMiniRecorder = toggleMiniRecorder
         self.cancelRecording = cancelRecording
+        self.discardRecording = discardRecording
     }
 
     func reset() {
@@ -516,6 +532,7 @@ final class RecordingShortcutModeHandler {
         activeRecordingShortcutAction = nil
         interruptedRecordingActions.removeAll()
         activeShortcutCanCancelAccidentalStart = false
+        activeSpecialRecordingDiscarded = false
         activeSpecialOptions = SpecialShortcutOptions()
         activeLatencyTraceToken = nil
     }
@@ -544,6 +561,7 @@ final class RecordingShortcutModeHandler {
         isShortcutPressed = true
         activeRecordingShortcutAction = action
         activeShortcutCanCancelAccidentalStart = canCurrentShortcutPressCancelAccidentalStart
+        activeSpecialRecordingDiscarded = false
         activeSpecialOptions = specialOptions
         lastShortcutPressTime = now
         shortcutPressStartTime = eventTime
@@ -611,6 +629,8 @@ final class RecordingShortcutModeHandler {
         let pressDuration = shortcutPressStartTime.map { eventTime - $0 } ?? 0
         let pressDurationMilliseconds = String(format: "%.1f", pressDuration * 1_000)
         let keyEvidenceDetails = Self.keyEvidenceTraceDetails(context)
+        let ownsAccidentalStart = activeShortcutCanCancelAccidentalStart
+        let alreadyDiscardedSpecialRecording = activeSpecialRecordingDiscarded
         VoiceInkLatencyTrace.shared.event(
             "shortcut.key_up_handler",
             details: "action=\(action.storageName) mode=\(mode.rawValue) sourceTMs=\(pressDurationMilliseconds) sourceToCallbackMs=\(String(format: "%.1f", max(0, callbackTime - eventTime) * 1_000)) callbackToHandlerMs=\(String(format: "%.1f", max(0, handlerEnteredAt - callbackTime) * 1_000)) state=\(String(describing: recordingState())) \(keyEvidenceDetails)",
@@ -619,19 +639,22 @@ final class RecordingShortcutModeHandler {
         isShortcutPressed = false
         activeRecordingShortcutAction = nil
         activeShortcutCanCancelAccidentalStart = false
+        activeSpecialRecordingDiscarded = false
         switch mode {
         case .special:
             let options = activeSpecialOptions
 
             if VoiceInkSpecialShortcutKeyEvidencePolicy.shouldDiscardShortcut(for: context) {
-                VoiceInkLatencyTrace.shared.event(
-                    "shortcut.key_evidence_rejected",
-                    details: keyEvidenceDetails,
-                    token: activeLatencyTraceToken
-                )
-                if isRecorderVisible() {
-                    logger.notice("handleShortcutKeyUp: cancelling special recording; unsafe key evidence")
-                    await cancelRecording()
+                if !alreadyDiscardedSpecialRecording {
+                    VoiceInkLatencyTrace.shared.event(
+                        "shortcut.key_evidence_rejected",
+                        details: keyEvidenceDetails,
+                        token: activeLatencyTraceToken
+                    )
+                }
+                if ownsAccidentalStart, !alreadyDiscardedSpecialRecording {
+                    logger.notice("handleShortcutKeyUp: discarding owned special recording; unsafe input evidence")
+                    await discardRecording()
                 }
                 logger.notice("handleShortcutKeyUp: discarding special shortcut; unsafe key evidence")
             } else if isRecorderVisible() {
@@ -676,7 +699,29 @@ final class RecordingShortcutModeHandler {
     }
 
     nonisolated static func keyEvidenceTraceDetails(_ context: VoiceInkShortcutPressContext) -> String {
-        "pressedOtherKey=\(context.didPressOtherKeyDuringPress) releasedOtherKey=\(context.didReleaseOtherKeyDuringPress) reliable=\(context.hasReliableKeyEvidence)"
+        "pressedOtherKey=\(context.didPressOtherKeyDuringPress) releasedOtherKey=\(context.didReleaseOtherKeyDuringPress) usedPointer=\(context.didUsePointerDuringPress) reliable=\(context.hasReliableKeyEvidence)"
+    }
+
+    func handlePressContextChanged(
+        action: ShortcutAction,
+        context: VoiceInkShortcutPressContext
+    ) async {
+        guard isShortcutPressed,
+              activeRecordingShortcutAction == action,
+              activeShortcutCanCancelAccidentalStart,
+              !activeSpecialRecordingDiscarded,
+              VoiceInkSpecialShortcutKeyEvidencePolicy.shouldDiscardShortcut(for: context) else {
+            return
+        }
+
+        activeSpecialRecordingDiscarded = true
+        VoiceInkLatencyTrace.shared.event(
+            "shortcut.key_evidence_rejected",
+            details: Self.keyEvidenceTraceDetails(context),
+            token: activeLatencyTraceToken
+        )
+        logger.notice("handlePressContextChanged: discarding owned special recording; unsafe input evidence")
+        await discardRecording()
     }
 
     func handleInterruption(action: ShortcutAction) async {
@@ -709,7 +754,7 @@ final class RecordingShortcutModeHandler {
             let handlerEnteredAt = ProcessInfo.processInfo.systemUptime
             let traceToken = VoiceInkLatencyTrace.shared.start(
                 event: "shortcut.key_down_physical",
-                details: "mode=\(mode.rawValue) state=\(String(describing: recordingState()))",
+                details: "mode=\(mode.rawValue) state=\(String(describing: recordingState())) sourceUptime=\(String(format: "%.6f", eventTime))",
                 originTimestamp: eventTime
             )
             activeLatencyTraceToken = traceToken

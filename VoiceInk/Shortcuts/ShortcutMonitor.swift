@@ -359,6 +359,11 @@ final class ShortcutMonitor {
     }
 
     private func handleCGEvent(type: CGEventType, event: CGEvent) -> Bool {
+        if Self.isPointerActivity(type) {
+            recordPointerEvidenceDuringActiveShortcuts()
+            return false
+        }
+
         guard let eventKind = EventKind(type) else {
             return false
         }
@@ -526,6 +531,21 @@ final class ShortcutMonitor {
             }
 
             state.pressContext.hasReliableKeyEvidence = false
+            shortcuts[action] = state
+            dispatchPressContextChanged(for: action, context: state.pressContext)
+        }
+    }
+
+    private func recordPointerEvidenceDuringActiveShortcuts() {
+        for action in Array(shortcuts.keys) {
+            guard var state = shortcuts[action],
+                  state.isDown,
+                  !state.isBlockedBySecureInput,
+                  !state.pressContext.didUsePointerDuringPress else {
+                continue
+            }
+
+            state.pressContext.didUsePointerDuringPress = true
             shortcuts[action] = state
             dispatchPressContextChanged(for: action, context: state.pressContext)
         }
@@ -759,9 +779,34 @@ final class ShortcutMonitor {
         CGEventType.keyDown.rawValue,
         CGEventType.keyUp.rawValue,
         CGEventType.flagsChanged.rawValue,
-        systemDefinedCGEventTypeRawValue
+        systemDefinedCGEventTypeRawValue,
+        CGEventType.mouseMoved.rawValue,
+        CGEventType.leftMouseDown.rawValue,
+        CGEventType.leftMouseUp.rawValue,
+        CGEventType.rightMouseDown.rawValue,
+        CGEventType.rightMouseUp.rawValue,
+        CGEventType.otherMouseDown.rawValue,
+        CGEventType.otherMouseUp.rawValue,
+        CGEventType.leftMouseDragged.rawValue,
+        CGEventType.rightMouseDragged.rawValue,
+        CGEventType.otherMouseDragged.rawValue,
+        CGEventType.scrollWheel.rawValue
     ].reduce(CGEventMask(0)) { mask, rawValue in
         mask | (CGEventMask(1) << Int(rawValue))
+    }
+
+    private static func isPointerActivity(_ type: CGEventType) -> Bool {
+        switch type {
+        case .mouseMoved,
+             .leftMouseDown, .leftMouseUp,
+             .rightMouseDown, .rightMouseUp,
+             .otherMouseDown, .otherMouseUp,
+             .leftMouseDragged, .rightMouseDragged, .otherMouseDragged,
+             .scrollWheel:
+            return true
+        default:
+            return false
+        }
     }
 }
 
@@ -927,6 +972,10 @@ extension ShortcutMonitor {
             modifierFlags: [],
             eventTime: eventTime
         )
+    }
+
+    func handlePointerActivityForTesting() {
+        recordPointerEvidenceDuringActiveShortcuts()
     }
 }
 #endif

@@ -51,6 +51,9 @@ struct RuntimeRunSummary: Codable {
     let totalCases: Int
     let passedCases: Int
     let failedCases: Int
+    let falseTriggerTotalCases: Int
+    let falseTriggerPassedCases: Int
+    let falseTriggerFailedCases: Int
     let noPasteCases: Int
     let p50AccessibilityTextMilliseconds: Double?
     let p95AccessibilityTextMilliseconds: Double?
@@ -66,13 +69,14 @@ struct RuntimeRunSummary: Codable {
 }
 
 struct RuntimeHarnessReport: Codable {
-    var schemaVersion = 8
+    var schemaVersion = 9
     let startedAt: Date
     var finishedAt: Date?
     let configuration: RuntimeHarnessConfiguration
     let preflight: RuntimePreflightReport
     var abandonedTargetCleanup: RuntimeAbandonedTargetCleanupInfo?
     var voiceInkSession: RuntimeVoiceInkSessionInfo?
+    var falseTriggerCases: [RuntimeFalseTriggerCaseReport]
     var cases: [RuntimeCaseReport]
     var summary: RuntimeRunSummary
     var restoredOriginalState: Bool
@@ -86,6 +90,10 @@ enum RuntimeHarnessRunner {
         configuration: RuntimeHarnessConfiguration,
         reportURL: URL
     ) throws -> RuntimeHarnessReport {
+        let mutationLock = try RuntimeHarnessMutationLock.acquire()
+        defer { mutationLock.release() }
+        _ = try RuntimeRestorationCoordinator.restorePendingRun()
+
         let preflight = RuntimePreflight.run(configuration: configuration)
         guard preflight.passed else {
             var report = RuntimeHarnessReport(
@@ -95,13 +103,17 @@ enum RuntimeHarnessRunner {
                 preflight: preflight,
                 abandonedTargetCleanup: nil,
                 voiceInkSession: nil,
+                falseTriggerCases: [],
                 cases: [],
-                summary: summarize(cases: []),
+                summary: summarize(cases: [], falseTriggerCases: []),
                 restoredOriginalState: true,
                 fatalError: preflight.failures.joined(separator: "; ")
             )
             try write(report: report, to: reportURL)
-            report.summary = summarize(cases: report.cases)
+            report.summary = summarize(
+                cases: report.cases,
+                falseTriggerCases: report.falseTriggerCases
+            )
             return report
         }
 
@@ -114,6 +126,11 @@ enum RuntimeHarnessRunner {
         let runPlan = try RuntimeRunPlan.make(
             fixtureURLs: fixtureURLs,
             expectedTranscripts: configuration.expectedTranscripts,
+            targets: selectedTargets,
+            repetitions: configuration.repetitions
+        )
+        let falseTriggerPlan = try RuntimeFalseTriggerPlan.make(
+            scenarios: configuration.resolvedFalseTriggerScenarios,
             targets: selectedTargets,
             repetitions: configuration.repetitions
         )
@@ -130,8 +147,9 @@ enum RuntimeHarnessRunner {
             preflight: preflight,
             abandonedTargetCleanup: nil,
             voiceInkSession: nil,
+            falseTriggerCases: [],
             cases: [],
-            summary: summarize(cases: []),
+            summary: summarize(cases: [], falseTriggerCases: []),
             restoredOriginalState: false,
             fatalError: nil
         )
@@ -152,18 +170,51 @@ enum RuntimeHarnessRunner {
         }
         try write(report: report, to: reportURL)
 
-        let outputSession = try RuntimeSystemOutputSession.start(targetDevice: audioDevice)
+        let restorationScope = try RuntimeRestorationScope.create()
+        defer { try? restorationScope.finish() }
+        let outputSession = try RuntimeSystemOutputSession.start(
+            targetDevice: audioDevice,
+            restorationScope: restorationScope
+        )
         var voiceInkSession: RuntimeVoiceInkSession?
         do {
             let session = try RuntimeVoiceInkSession.start(
                 configuration: configuration,
-                audioDeviceUID: audioDevice.uid
+                audioDeviceUID: audioDevice.uid,
+                restorationScope: restorationScope
             )
             voiceInkSession = session
             report.voiceInkSession = session.info
             Thread.sleep(forTimeInterval: configuration.preRollWarmupSeconds)
 
             var seenTraceIDs = Set((try? RuntimeLatencyLogReader.recent().traces.map(\.traceID)) ?? [])
+            for (caseIndex, falseTriggerCase) in falseTriggerPlan.cases.enumerated() {
+                let caseReport = RuntimeFalseTriggerRunner.execute(
+                    falseTriggerCase,
+                    configuration: configuration,
+                    seenTraceIDs: &seenTraceIDs,
+                    restorationJournalURL: restorationScope.falseTriggerSideEffectJournalURL,
+                    prepareForSideEffectRestoration: {
+                        try session.terminateForSideEffectRestoration()
+                    }
+                )
+                report.falseTriggerCases.append(caseReport)
+                report.summary = summarize(
+                    cases: report.cases,
+                    falseTriggerCases: report.falseTriggerCases
+                )
+                try write(report: report, to: reportURL)
+                printFalseTriggerProgress(
+                    caseReport,
+                    index: caseIndex + 1,
+                    total: falseTriggerPlan.cases.count
+                )
+                guard caseReport.assessment.passed,
+                      caseReport.sideEffectRestoration.passed else {
+                    throw RuntimeHarnessRunError.falseTriggerCaseFailed(caseReport.id)
+                }
+            }
+
             var previousFixturePath: String?
             for (caseIndex, runCase) in runPlan.cases.enumerated() {
                 if shouldRelaunchVoiceInk(
@@ -185,25 +236,68 @@ enum RuntimeHarnessRunner {
                     seenTraceIDs: &seenTraceIDs
                 )
                 report.cases.append(caseReport)
-                report.summary = summarize(cases: report.cases)
+                report.summary = summarize(
+                    cases: report.cases,
+                    falseTriggerCases: report.falseTriggerCases
+                )
                 try write(report: report, to: reportURL)
                 printCaseProgress(caseReport, index: caseIndex + 1, total: runPlan.cases.count)
             }
 
             try session.restore()
             try outputSession.restore()
-            report.restoredOriginalState = true
+            try restorationScope.finish()
+            report.restoredOriginalState = falseTriggerStateWasRestored(
+                in: restorationScope
+            )
             report.finishedAt = Date()
-            report.summary = summarize(cases: report.cases)
+            report.summary = summarize(
+                cases: report.cases,
+                falseTriggerCases: report.falseTriggerCases
+            )
             try write(report: report, to: reportURL)
             return report
         } catch {
-            try? voiceInkSession?.restore()
-            try? outputSession.restore()
-            report.restoredOriginalState = true
+            let originalError = String(describing: error)
+            var restorationErrors: [String] = []
+            do {
+                if let voiceInkSession {
+                    try voiceInkSession.restore()
+                } else if FileManager.default.fileExists(
+                    atPath: restorationScope.voiceInkJournalURL.path
+                ) {
+                    try RuntimeVoiceInkSession.restoreFromJournal(in: restorationScope)
+                } else if FileManager.default.fileExists(
+                    atPath: restorationScope.falseTriggerSideEffectJournalURL.path
+                ) {
+                    try RuntimeVoiceInkSession.restoreOrphanedFalseTriggerArtifacts(
+                        in: restorationScope
+                    )
+                }
+            } catch {
+                restorationErrors.append("VoiceInk preferences/running state: \(error)")
+            }
+            do {
+                try outputSession.restore()
+            } catch {
+                restorationErrors.append("system output/loopback state: \(error)")
+            }
+            if !falseTriggerStateWasRestored(in: restorationScope) {
+                restorationErrors.append("false-trigger recording/history artifacts")
+            }
+            do {
+                try restorationScope.finish()
+            } catch {
+                restorationErrors.append("recovery namespace: \(error)")
+            }
+            report.restoredOriginalState = restorationErrors.isEmpty
             report.finishedAt = Date()
-            report.fatalError = String(describing: error)
-            report.summary = summarize(cases: report.cases)
+            report.fatalError = ([originalError] + restorationErrors.map { "Restoration failed: \($0)" })
+                .joined(separator: "; ")
+            report.summary = summarize(
+                cases: report.cases,
+                falseTriggerCases: report.falseTriggerCases
+            )
             try? write(report: report, to: reportURL)
             throw error
         }
@@ -267,7 +361,9 @@ enum RuntimeHarnessRunner {
 
             phase = "shortcut"
             waitUntilSystemUptime(audioStartedAt + plan.keyDownOffsetSeconds)
-            let down = try RuntimeShortcutInjector.postLeftShiftDown()
+            let down = try RuntimeShortcutInjector.postModifierDown(
+                configuration.resolvedSpecialShortcut
+            )
             shortcutDown = down
             let renderedBaselineDelay = min(0.5, plan.holdDurationSeconds / 2)
             waitUntilSystemUptime(down.postedAtSystemUptime + renderedBaselineDelay)
@@ -275,7 +371,9 @@ enum RuntimeHarnessRunner {
                 errorText = baselineError
             }
             waitUntilSystemUptime(audioStartedAt + plan.keyUpOffsetSeconds)
-            let up = try RuntimeShortcutInjector.postLeftShiftUp()
+            let up = try RuntimeShortcutInjector.postModifierUp(
+                configuration.resolvedSpecialShortcut
+            )
             shortcutUp = up
 
             phase = "observation"
@@ -377,7 +475,9 @@ enum RuntimeHarnessRunner {
         }
 
         if shortcutDown != nil, shortcutUp == nil,
-           let emergencyUp = try? RuntimeShortcutInjector.postLeftShiftUp() {
+           let emergencyUp = try? RuntimeShortcutInjector.postModifierUp(
+               configuration.resolvedSpecialShortcut
+           ) {
             shortcutUp = emergencyUp
             emergencyShortcutReleasePosted = true
         }
@@ -552,7 +652,10 @@ enum RuntimeHarnessRunner {
         return candidate
     }
 
-    private static func summarize(cases: [RuntimeCaseReport]) -> RuntimeRunSummary {
+    private static func summarize(
+        cases: [RuntimeCaseReport],
+        falseTriggerCases: [RuntimeFalseTriggerCaseReport]
+    ) -> RuntimeRunSummary {
         let latencies = cases.compactMap(\.visibleText?.keyUpToVisibleMilliseconds)
         let accessibilityLatencies = cases.compactMap(\.visibleText?.keyUpToAccessibilityTextMilliseconds)
         let pipelineCompleteLatencies = cases.compactMap(\.voiceInkKeyUpToPipelineCompleteMilliseconds)
@@ -585,10 +688,16 @@ enum RuntimeHarnessRunner {
             }
             .sorted { $0.targetID < $1.targetID }
         let passed = cases.filter(\.assessment.passed).count
+        let falseTriggerPassed = falseTriggerCases.filter(\.assessment.passed).count
+        let totalCases = cases.count + falseTriggerCases.count
+        let passedCases = passed + falseTriggerPassed
         return RuntimeRunSummary(
-            totalCases: cases.count,
-            passedCases: passed,
-            failedCases: cases.count - passed,
+            totalCases: totalCases,
+            passedCases: passedCases,
+            failedCases: totalCases - passedCases,
+            falseTriggerTotalCases: falseTriggerCases.count,
+            falseTriggerPassedCases: falseTriggerPassed,
+            falseTriggerFailedCases: falseTriggerCases.count - falseTriggerPassed,
             noPasteCases: cases.filter { isVisiblePasteFailure($0.assessment.status) }.count,
             p50AccessibilityTextMilliseconds: RuntimeStatistics.percentile(
                 50,
@@ -618,7 +727,9 @@ enum RuntimeHarnessRunner {
                 values: interactionSettledLatencies
             ),
             apps: appSummaries,
-            passed: !cases.isEmpty && passed == cases.count
+            passed: !cases.isEmpty
+                && passed == cases.count
+                && falseTriggerPassed == falseTriggerCases.count
         )
     }
 
@@ -631,6 +742,14 @@ enum RuntimeHarnessRunner {
         encoder.dateEncodingStrategy = .iso8601
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         try encoder.encode(report).write(to: url, options: .atomic)
+    }
+
+    private static func falseTriggerStateWasRestored(
+        in restorationScope: RuntimeRestorationScope
+    ) -> Bool {
+        !FileManager.default.fileExists(
+            atPath: restorationScope.falseTriggerSideEffectJournalURL.path
+        )
     }
 
     private static func printCaseProgress(
@@ -651,15 +770,29 @@ enum RuntimeHarnessRunner {
             + "boundary=\(report.failureBoundary.rawValue)"
         )
     }
+
+    private static func printFalseTriggerProgress(
+        _ report: RuntimeFalseTriggerCaseReport,
+        index: Int,
+        total: Int
+    ) {
+        print(
+            "[false \(index)/\(total)] \(report.scenario.id) | \(report.target.displayName) | "
+            + "\(report.assessment.status.rawValue) | native=\(report.nativeBehaviorSatisfied)"
+        )
+    }
 }
 
 enum RuntimeHarnessRunError: Error, CustomStringConvertible {
     case fixtureDurationMissing(String)
+    case falseTriggerCaseFailed(String)
 
     var description: String {
         switch self {
         case .fixtureDurationMissing(let path):
             return "Fixture duration is unavailable: \(path)"
+        case .falseTriggerCaseFailed(let id):
+            return "False-trigger case failed; remaining cases were not run: \(id)"
         }
     }
 }

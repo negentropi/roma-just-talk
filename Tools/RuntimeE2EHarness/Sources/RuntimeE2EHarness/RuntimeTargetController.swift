@@ -25,6 +25,13 @@ struct RuntimeTargetPreparationInfo: Codable {
     let matchedBy: String
 }
 
+typealias RuntimeTargetInteractionSnapshot = RuntimeFalseTriggerNativeSnapshot
+
+struct RuntimeTargetInteractionPoints {
+    let start: CGPoint
+    let end: CGPoint
+}
+
 struct RuntimeTargetCleanupInfo: Codable {
     let surfaceClosed: Bool
     let temporaryResourceRemoved: Bool
@@ -113,6 +120,52 @@ final class RuntimePreparedTarget {
 
     func refreshRenderedBaseline() -> String? {
         renderedTextObserver.refreshBaseline()
+    }
+
+    func focusForInteraction() -> Bool {
+        guard let application = NSRunningApplication(processIdentifier: info.processIdentifier),
+              !application.isTerminated else {
+            return false
+        }
+        return RuntimeAX.focus(
+            application: application,
+            windowElement: windowElement,
+            textElement: textElement
+        )
+    }
+
+    func interactionSnapshot() -> RuntimeTargetInteractionSnapshot {
+        let selection = RuntimeAX.selectedTextRange(from: textElement)
+        let focusedElement = RuntimeAX.focusedElement(in: appElement)
+        let pointer = NSEvent.mouseLocation
+        return RuntimeTargetInteractionSnapshot(
+            text: RuntimeAX.text(from: textElement),
+            selectionLocation: selection.map(\.location),
+            selectionLength: selection.map(\.length),
+            textElementFocused: RuntimeAX.boolAttribute(kAXFocusedAttribute, from: textElement),
+            focusedRole: focusedElement.flatMap {
+                RuntimeAX.stringAttribute(kAXRoleAttribute, from: $0)
+            },
+            focusedTitle: focusedElement.flatMap {
+                RuntimeAX.stringAttribute(kAXTitleAttribute, from: $0)
+            },
+            pointerX: pointer.x,
+            pointerY: pointer.y
+        )
+    }
+
+    func interactionPoints() -> RuntimeTargetInteractionPoints? {
+        guard let frame = RuntimeAX.observationFrame(
+            for: textElement,
+            fallbackWindow: windowElement
+        ), frame.width >= 80, frame.height >= 30 else {
+            return nil
+        }
+        let y = frame.minY + min(28, frame.height / 2)
+        return RuntimeTargetInteractionPoints(
+            start: CGPoint(x: frame.minX + max(20, frame.width * 0.2), y: y),
+            end: CGPoint(x: frame.minX + min(frame.width - 20, frame.width * 0.8), y: y)
+        )
     }
 
     func waitForVisibleText(
@@ -1059,6 +1112,10 @@ enum RuntimeAX {
         return focusedElement
     }
 
+    static func focusedElement(in appElement: AXUIElement) -> AXUIElement? {
+        elementAttribute(kAXFocusedUIElementAttribute, from: appElement)
+    }
+
     static func text(from element: AXUIElement) -> String? {
         var value: CFTypeRef?
         guard AXUIElementCopyAttributeValue(
@@ -1607,7 +1664,7 @@ enum RuntimeAX {
         )
     }
 
-    private static func selectedTextRange(from element: AXUIElement) -> CFRange? {
+    static func selectedTextRange(from element: AXUIElement) -> CFRange? {
         var value: CFTypeRef?
         guard AXUIElementCopyAttributeValue(
             element,
@@ -1678,7 +1735,7 @@ enum RuntimeAX {
         }
     }
 
-    private static func boolAttribute(_ attribute: String, from element: AXUIElement) -> Bool? {
+    static func boolAttribute(_ attribute: String, from element: AXUIElement) -> Bool? {
         var value: CFTypeRef?
         guard AXUIElementCopyAttributeValue(element, attribute as CFString, &value) == .success,
               let value else {

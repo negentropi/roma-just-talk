@@ -4,10 +4,11 @@ This helper drives a real Roma build through the complete macOS path:
 
 ```text
 WAV fixture -> BlackHole 2ch -> Roma microphone input
-timed left Shift down/up ------> Special shortcut
+timed configured modifier -----> Special shortcut
 Roma paste --------------------> isolated real-app text field
 AX text + rendered pixels -----> user-visible timestamp
 LatencyTrace ------------------> app phase timestamps
+typing/pointer gestures -------> false-trigger rejection proof
 ```
 
 It is external to the production app. The helper does not add test hooks to
@@ -32,6 +33,9 @@ stable. AX may arrive later without moving the earlier rendered timestamp.
 - Rendered-text timeout: `20s`
 - Rendered-text p95 budget: `250ms`
 - Transcript answer: optional until supplied in the config
+- Special shortcut: left Shift (`keyCode=56`) unless explicitly configured otherwise
+- False-trigger matrix: capital letter, `$`, Shift-Tab, Shift-A, pointer move,
+  click, drag-select, and click timing before/across/after a four-second hold
 
 Each selected browser opens an isolated local tab with a uniquely titled,
 controlled contenteditable. It accepts only paste-backed DOM `input` events,
@@ -57,6 +61,21 @@ the resource, terminates only a target process started by the harness, restores
 an initially running target if closing its last isolated surface exits it, and
 restores the previously frontmost app. Existing documents and pages are not used
 as test targets.
+
+Before the speech matrix, the helper runs the false-trigger matrix in an isolated
+TextEdit document. Each case must preserve the native typing, focus, click, or
+selection result while Roma emits `shortcut.key_evidence_rejected` and proves the
+owned recording was discarded. The helper snapshots the exact bundle's
+`Recordings/` files, `ZTRANSCRIPTION` row IDs, and transcription primary-key
+watermark before and after every case; any leaked WAV, history mutation,
+transcription, paste, or clipboard mutation fails it. On a leak it stops Roma,
+removes only case-created files and rows, verifies the original snapshot, and
+aborts before another baseline is sampled.
+Shift-Tab specifically requires unchanged editor text plus an observed focus or
+selection transition; arbitrary inserted text cannot satisfy native behavior.
+The three long-click cases distinguish an interaction that starts after four
+seconds, spans four seconds, and ends early while the modifier remains held past
+four seconds.
 
 Set `targetAvailabilityPolicy` to `launchIfNeeded` only on a dedicated test Mac.
 The local default remains `runningOnly` to avoid memory pressure and surprise app
@@ -113,8 +132,8 @@ capture/transcription trace evidence and target text proves the complete route.
 - Target app missing, not activated, unreadable through AX, or not cleared
 - Existing text on either side of the insertion cursor is changed or lost
 - WAV cannot play into BlackHole
-- Synthetic Special left Shift is not accepted by VoiceInk
-- Posted Shift hold and VoiceInk-observed hold differ by more than `150ms`
+- Synthetic configured Special modifier is not accepted by VoiceInk
+- Posted modifier hold and VoiceInk-observed hold differ by more than `150ms`
 - No new `LatencyTrace` is emitted
 - VoiceInk starts a trace but never completes transcription
 - VoiceInk completes transcription with zero characters (`emptyTranscript`)
@@ -125,9 +144,16 @@ capture/transcription trace evidence and target text proves the complete route.
 - Expected transcript exceeds the configured word-error-rate limit
 - Target tab/document or temporary resources cannot be restored
 
-The report preserves each failure instead of dropping it from percentile
-calculations. Per-app and overall summaries include total, passed, failed,
-no-visible-paste count, p50, p95, and maximum visible-text latency.
+A false-trigger case also fails when native input is missing, key evidence is not
+rejected, its recording is not explicitly discarded, transcription or delivery
+starts, the clipboard changes, a recording artifact remains, the history count
+changes, or those side-effect surfaces cannot be inspected.
+
+The schema-9 report preserves each failure instead of dropping it from percentile
+calculations. `falseTriggerCases` contains native-input, trace, recording-directory,
+history, targeted rollback, and cleanup evidence. Per-app and overall summaries
+include total, passed, failed, false-trigger totals, no-visible-paste count, p50,
+p95, and maximum visible-text latency.
 
 An unanswered or denied microphone request is attributed to
 `voiceInkMicrophonePermission`, before transcription classification. An empty
@@ -171,16 +197,29 @@ scheduling without further evidence.
 Before a run, the helper records:
 
 - VoiceInk microphone mode and selected-device UID
+- primary shortcut selection, mode, stored modifier, and cleared state
 - exact running VoiceInk bundle paths
 - system default output-device UID
 - BlackHole input/output mute and volume controls when supported
 
-It then selects BlackHole for both sides, unmutes both scopes, normalizes
-supported volumes for playback, and launches the exact selected Roma artifact.
+It then selects BlackHole for both sides, configures the manifest's modifier as
+the primary Special shortcut, unmutes both scopes, normalizes supported volumes
+for playback, and launches the exact selected Roma artifact.
+The run stops before changing preferences if Roma has not already completed both
+legacy shortcut migrations; this prevents a harness launch from deleting legacy
+shortcut state that was outside the restoration journal.
 On completion or handled failure it restores the original preferences, output
-device, BlackHole controls, and running state. It also scans
+device, BlackHole controls, running state, and any case-created false-trigger
+WAV/history data. The report sets `restoredOriginalState` only after every
+required restoration succeeds. It also scans
 `/tmp/roma-runtime-e2e-targets` for abandoned test tabs/documents before a run.
-Journals under `/tmp/` allow recovery after an interrupted process:
+Each run owns a UUID-namespaced recovery directory under the user's temporary
+directory. A process lock serializes all state-mutating harness modes because
+VoiceInk preferences, app
+processes, target surfaces, and system audio are machine-global. Preference,
+output, and per-case side-effect journals allow recovery after an interrupted
+process; a new run restores exactly one prior namespace and refuses ambiguous
+multiple recoveries:
 
 ```bash
 make runtime-e2e-restore
@@ -230,8 +269,9 @@ Default full matrix:
 make runtime-e2e-run
 ```
 
-The default case count is `fixtures x currently-running selected apps x 2 text baselines x 3`; the
-four-app minimum is enforced before Roma or audio state changes.
+The default case count is `(fixtures x currently-running selected apps x 2 text
+baselines x 3) + (10 false-trigger scenarios x 3)`; the four-app minimum is
+enforced before Roma or audio state changes.
 
 Custom manifest:
 
@@ -261,7 +301,7 @@ The default report is written to:
 ## CI Boundary
 
 `make runtime-e2e-check` runs deterministic public-interface checks, compiles the
-helper, and verifies that preflight, target-probe, and run targets cannot rebuild,
-delete, or re-sign the TCC app. Real GUI/audio sampling runs only in the logged-in
-Namespace macOS scenario unless a person explicitly opts into a dedicated local
-test Mac.
+helper, exercises targeted WAV/history rollback in a disposable store, and
+verifies that preflight, target-probe, and run targets cannot rebuild, delete, or
+re-sign the TCC app. Real GUI/audio sampling runs only in the logged-in Namespace
+macOS scenario unless a person explicitly opts into a dedicated local test Mac.

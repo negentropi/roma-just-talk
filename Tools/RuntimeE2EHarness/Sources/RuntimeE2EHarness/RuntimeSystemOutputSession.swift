@@ -3,19 +3,23 @@ import Foundation
 import RuntimeE2ECore
 
 final class RuntimeSystemOutputSession {
-    static let journalURL = URL(fileURLWithPath: "/tmp/roma-runtime-e2e-output-restoration.json")
-
     private let journal: RuntimeSystemOutputJournal
+    private let restorationScope: RuntimeRestorationScope
     private var restored = false
 
-    private init(journal: RuntimeSystemOutputJournal) {
+    private init(
+        journal: RuntimeSystemOutputJournal,
+        restorationScope: RuntimeRestorationScope
+    ) {
         self.journal = journal
+        self.restorationScope = restorationScope
     }
 
-    static func start(targetDevice: RuntimeAudioDevice) throws -> RuntimeSystemOutputSession {
-        if FileManager.default.fileExists(atPath: journalURL.path) {
-            try restoreFromJournal()
-        }
+    static func start(
+        targetDevice: RuntimeAudioDevice,
+        restorationScope: RuntimeRestorationScope
+    ) throws -> RuntimeSystemOutputSession {
+        let journalURL = restorationScope.systemOutputJournalURL
         let devices = try RuntimeAudioDeviceCatalog.devices()
         let currentID = try defaultOutputDeviceID()
         guard let current = devices.first(where: { $0.id == currentID }) else {
@@ -48,17 +52,23 @@ final class RuntimeSystemOutputSession {
             }
             throw error
         }
-        return RuntimeSystemOutputSession(journal: journal)
+        return RuntimeSystemOutputSession(
+            journal: journal,
+            restorationScope: restorationScope
+        )
     }
 
     func restore() throws {
         guard !restored else { return }
         try Self.restore(journal: journal)
+        if FileManager.default.fileExists(atPath: restorationScope.systemOutputJournalURL.path) {
+            try FileManager.default.removeItem(at: restorationScope.systemOutputJournalURL)
+        }
         restored = true
-        try? FileManager.default.removeItem(at: Self.journalURL)
     }
 
-    static func restoreFromJournal() throws {
+    static func restoreFromJournal(in restorationScope: RuntimeRestorationScope) throws {
+        let journalURL = restorationScope.systemOutputJournalURL
         let data = try Data(contentsOf: journalURL)
         let journal = try JSONDecoder().decode(RuntimeSystemOutputJournal.self, from: data)
         try restore(journal: journal)

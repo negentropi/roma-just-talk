@@ -384,6 +384,8 @@ public struct RuntimeHarnessConfiguration: Codable, Equatable, Sendable {
     public var minimumTargetCount: Int
     public var expectedTranscripts: [String: String]
     public var voiceInkLifecycle: VoiceInkLifecycle
+    public var specialShortcut: RuntimeModifierShortcut?
+    public var falseTriggerScenarios: [RuntimeFalseTriggerScenario]?
 
     public init(
         audioDirectory: String,
@@ -404,7 +406,9 @@ public struct RuntimeHarnessConfiguration: Codable, Equatable, Sendable {
         targetAvailabilityPolicy: TargetAvailabilityPolicy,
         minimumTargetCount: Int,
         expectedTranscripts: [String: String],
-        voiceInkLifecycle: VoiceInkLifecycle
+        voiceInkLifecycle: VoiceInkLifecycle,
+        specialShortcut: RuntimeModifierShortcut? = nil,
+        falseTriggerScenarios: [RuntimeFalseTriggerScenario]? = nil
     ) {
         self.audioDirectory = audioDirectory
         self.audioDeviceName = audioDeviceName
@@ -425,6 +429,8 @@ public struct RuntimeHarnessConfiguration: Codable, Equatable, Sendable {
         self.minimumTargetCount = minimumTargetCount
         self.expectedTranscripts = expectedTranscripts
         self.voiceInkLifecycle = voiceInkLifecycle
+        self.specialShortcut = specialShortcut
+        self.falseTriggerScenarios = falseTriggerScenarios
     }
 
     public static var `default`: Self {
@@ -447,8 +453,18 @@ public struct RuntimeHarnessConfiguration: Codable, Equatable, Sendable {
             targetAvailabilityPolicy: .runningOnly,
             minimumTargetCount: 4,
             expectedTranscripts: [:],
-            voiceInkLifecycle: .reuse
+            voiceInkLifecycle: .reuse,
+            specialShortcut: .leftShift,
+            falseTriggerScenarios: RuntimeFalseTriggerScenario.defaultMatrix
         )
+    }
+
+    public var resolvedSpecialShortcut: RuntimeModifierShortcut {
+        specialShortcut ?? .leftShift
+    }
+
+    public var resolvedFalseTriggerScenarios: [RuntimeFalseTriggerScenario] {
+        falseTriggerScenarios ?? RuntimeFalseTriggerScenario.defaultMatrix
     }
 }
 
@@ -975,6 +991,33 @@ public struct RuntimeLatencyTrace: Codable, Equatable, Sendable {
 
     public var shortcutKeyEvidenceRejected: Bool {
         events.contains { $0.name == "shortcut.key_evidence_rejected" }
+    }
+
+    public var shortcutKeyDownSystemUptime: TimeInterval? {
+        guard let event = events.first(where: { $0.name == "shortcut.key_down_physical" }) else {
+            return nil
+        }
+        let prefix = "sourceUptime="
+        return event.details
+            .split(separator: " ")
+            .first { $0.hasPrefix(prefix) }
+            .flatMap { Double($0.dropFirst(prefix.count)) }
+    }
+
+    public var recordingDiscarded: Bool {
+        events.contains {
+            $0.name == "engine.recording_discarded" ||
+                $0.name == "engine.start.discarded" ||
+                $0.name == "engine.start.discarded_before_authorization"
+        }
+    }
+
+    public var transcriptionStarted: Bool {
+        events.contains {
+            $0.name == "pipeline.dispatch" ||
+                $0.name == "pipeline.enter" ||
+                $0.name == "pipeline.transcribe.begin"
+        }
     }
 
     public var pasteEventPosted: Bool {

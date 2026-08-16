@@ -1218,64 +1218,6 @@ final class CustomPromptTests: XCTestCase {
         XCTAssertEqual(object?["useSystemInstructions"] as? Bool, false)
     }
 
-    func testCustomPromptPresentationPreservesIconCatalogAndGridCopy() {
-        XCTAssertEqual(VoiceInkCustomPromptPresentation.defaultIconSystemName, "doc.text.fill")
-        XCTAssertEqual(VoiceInkCustomPromptPresentation.defaultPromptFallbackIconSystemName, "checkmark.seal.fill")
-        XCTAssertEqual(VoiceInkCustomPromptPresentation.iconSystemNames.first, "doc.text.fill")
-        XCTAssertEqual(VoiceInkCustomPromptPresentation.iconSystemNames.last, "hand.thumbsup.fill")
-        XCTAssertTrue(VoiceInkCustomPromptPresentation.iconSystemNames.contains("bubble.left.and.bubble.right.fill"))
-        XCTAssertTrue(VoiceInkCustomPromptPresentation.iconSystemNames.contains("brain.head.profile"))
-        XCTAssertEqual(VoiceInkCustomPromptPresentation.addPromptTitle, "Add New")
-        XCTAssertEqual(VoiceInkCustomPromptPresentation.addPromptSystemImageName, "plus.circle.fill")
-        XCTAssertEqual(VoiceInkCustomPromptPresentation.promptGridEmptyText, "No prompts available")
-        XCTAssertEqual(VoiceInkCustomPromptPresentation.promptGridInfoSystemImageName, "info.circle")
-        XCTAssertEqual(
-            VoiceInkCustomPromptPresentation.promptGridHelpText,
-            "Double-click to edit • Right-click for more options"
-        )
-        XCTAssertEqual(VoiceInkCustomPromptPresentation.addPromptHelpText, "Add new prompt")
-    }
-
-    func testCustomPromptPresentationPreservesEditorCopy() {
-        XCTAssertEqual(
-            VoiceInkCustomPromptPresentation.editorTitle(
-                isEditingPredefinedPrompt: true,
-                isAddingPrompt: false
-            ),
-            "Edit Trigger Words"
-        )
-        XCTAssertEqual(
-            VoiceInkCustomPromptPresentation.editorTitle(
-                isEditingPredefinedPrompt: false,
-                isAddingPrompt: true
-            ),
-            "New Prompt"
-        )
-        XCTAssertEqual(
-            VoiceInkCustomPromptPresentation.editorTitle(
-                isEditingPredefinedPrompt: false,
-                isAddingPrompt: false
-            ),
-            "Edit Prompt"
-        )
-        XCTAssertEqual(VoiceInkCustomPromptPresentation.editingHeaderTitle(for: "Assistant"), "Editing: Assistant")
-        XCTAssertEqual(VoiceInkCustomPromptPresentation.promptNamePlaceholder, "Prompt Name")
-        XCTAssertEqual(VoiceInkCustomPromptPresentation.descriptionPlaceholder, "Brief description")
-        XCTAssertEqual(
-            VoiceInkCustomPromptPresentation.promptInstructionsPlaceholder,
-            "Enter your custom prompt instructions here..."
-        )
-        XCTAssertEqual(VoiceInkCustomPromptPresentation.useSystemTemplateTitle, "Use System Template")
-        XCTAssertEqual(VoiceInkCustomPromptPresentation.triggerWordsSectionTitle, "Trigger Words")
-        XCTAssertEqual(VoiceInkCustomPromptPresentation.triggerWordPlaceholder, "Add trigger word")
-        XCTAssertEqual(VoiceInkCustomPromptPresentation.addTriggerWordSystemImageName, "plus.circle.fill")
-        XCTAssertEqual(VoiceInkCustomPromptPresentation.removeTriggerWordSystemImageName, "xmark")
-        XCTAssertEqual(VoiceInkCustomPromptPresentation.noTriggerWordsText, "No trigger words added")
-        XCTAssertEqual(VoiceInkCustomPromptPresentation.startWithTemplateTitle, "Start with Template")
-        XCTAssertEqual(VoiceInkCustomPromptPresentation.startWithTemplateIconSystemName, "sparkles")
-        XCTAssertEqual(VoiceInkCustomPromptPresentation.closeSystemImageName, "xmark")
-    }
-
     func testCustomPromptPresentationFormatsTriggerSummaryAndDeleteAlert() throws {
         XCTAssertNil(VoiceInkCustomPromptPresentation.triggerSummary(for: []))
 

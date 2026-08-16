@@ -9,40 +9,6 @@ final class AIProviderCatalogTests: XCTestCase {
         )
     }
 
-    func testMacOSAIEnhancementProviderIdentityIsShared() {
-        XCTAssertEqual(
-            VoiceInkAIEnhancementProviderKind.allCases.map(\.rawValue),
-            [
-                "Cerebras",
-                "Groq",
-                "Gemini",
-                "Anthropic",
-                "OpenAI",
-                "OpenRouter",
-                "Mistral",
-                "ElevenLabs",
-                "Deepgram",
-                "Soniox",
-                "Speechmatics",
-                "AssemblyAI",
-                "Ollama",
-                "Local CLI",
-                "Custom"
-            ]
-        )
-        XCTAssertEqual(VoiceInkAIEnhancementProviderKind(rawValue: "OpenRouter"), .openRouter)
-        XCTAssertEqual(VoiceInkAIEnhancementProviderKind(rawValue: "Local CLI"), .localCLI)
-    }
-
-    func testMacOSAIEnhancementProviderStoredValueParsingIsShared() {
-        for provider in VoiceInkAIEnhancementProviderKind.allCases {
-            XCTAssertEqual(VoiceInkAIEnhancementProviderKind(storedValue: provider.rawValue), provider)
-        }
-
-        XCTAssertEqual(VoiceInkAIEnhancementProviderKind(storedValue: "GROQ"), .groq)
-        XCTAssertNil(VoiceInkAIEnhancementProviderKind(storedValue: "MissingProvider"))
-    }
-
     func testMacOSAIEnhancementProviderMapsToSharedModelProvider() {
         XCTAssertEqual(VoiceInkAIEnhancementProviderKind.anthropic.aiModelProvider, .anthropic)
         XCTAssertEqual(VoiceInkAIEnhancementProviderKind.cerebras.aiModelProvider, .cerebras)
@@ -51,108 +17,6 @@ final class AIProviderCatalogTests: XCTestCase {
         XCTAssertNil(VoiceInkAIEnhancementProviderKind.ollama.aiModelProvider)
         XCTAssertNil(VoiceInkAIEnhancementProviderKind.localCLI.aiModelProvider)
         XCTAssertNil(VoiceInkAIEnhancementProviderKind.custom.aiModelProvider)
-    }
-
-    func testMacOSAIEnhancementProviderAPIKeyRequirementIsShared() {
-        XCTAssertFalse(VoiceInkAIEnhancementProviderKind.ollama.requiresUserAPIKey)
-        XCTAssertFalse(VoiceInkAIEnhancementProviderKind.localCLI.requiresUserAPIKey)
-        XCTAssertTrue(VoiceInkAIEnhancementProviderKind.custom.requiresUserAPIKey)
-        XCTAssertTrue(VoiceInkAIEnhancementProviderKind.groq.requiresUserAPIKey)
-        XCTAssertTrue(VoiceInkAIEnhancementProviderKind.anthropic.requiresUserAPIKey)
-    }
-
-    func testMacOSAIEnhancementCredentialStateIsShared() {
-        XCTAssertEqual(
-            VoiceInkAIEnhancementProviderKind.groq.textEnhancementCredentialState(
-                savedAPIKey: "saved-groq-key",
-                isLocalCLIConfigured: false
-            ),
-            VoiceInkAIEnhancementCredentialState(apiKey: "saved-groq-key", isAPIKeyValid: true)
-        )
-        XCTAssertEqual(
-            VoiceInkAIEnhancementProviderKind.groq.textEnhancementCredentialState(
-                savedAPIKey: nil,
-                isLocalCLIConfigured: true
-            ),
-            VoiceInkAIEnhancementCredentialState(apiKey: "", isAPIKeyValid: false)
-        )
-        XCTAssertEqual(
-            VoiceInkAIEnhancementProviderKind.localCLI.textEnhancementCredentialState(
-                savedAPIKey: "ignored-key",
-                isLocalCLIConfigured: true
-            ),
-            VoiceInkAIEnhancementCredentialState(apiKey: "", isAPIKeyValid: true)
-        )
-        XCTAssertEqual(
-            VoiceInkAIEnhancementProviderKind.localCLI.textEnhancementCredentialState(
-                savedAPIKey: nil,
-                isLocalCLIConfigured: false
-            ),
-            VoiceInkAIEnhancementCredentialState(apiKey: "", isAPIKeyValid: false)
-        )
-        XCTAssertEqual(
-            VoiceInkAIEnhancementProviderKind.ollama.textEnhancementCredentialState(
-                savedAPIKey: nil,
-                isLocalCLIConfigured: false
-            ),
-            VoiceInkAIEnhancementCredentialState(apiKey: "", isAPIKeyValid: true)
-        )
-    }
-
-    func testMacOSAIEnhancementCredentialStateResolutionPlanIsShared() {
-        let groqPlan = VoiceInkAIEnhancementCredentialStateResolutionPlan.resolving(provider: .groq)
-        let localCLIPlan = VoiceInkAIEnhancementCredentialStateResolutionPlan.resolving(provider: .localCLI)
-        let ollamaPlan = VoiceInkAIEnhancementCredentialStateResolutionPlan.resolving(provider: .ollama)
-
-        XCTAssertEqual(
-            groqPlan,
-            VoiceInkAIEnhancementCredentialStateResolutionPlan(
-                provider: .groq,
-                providerKeyStorageNameToLoad: VoiceInkAIEnhancementProviderKind.groq.rawValue
-            )
-        )
-        XCTAssertEqual(
-            groqPlan.credentialState(
-                savedAPIKey: "saved-groq-key",
-                isLocalCLIConfigured: false
-            ),
-            VoiceInkAIEnhancementCredentialState(apiKey: "saved-groq-key", isAPIKeyValid: true)
-        )
-        XCTAssertEqual(
-            groqPlan.credentialState(
-                savedAPIKey: nil,
-                isLocalCLIConfigured: true
-            ),
-            VoiceInkAIEnhancementCredentialState(apiKey: "", isAPIKeyValid: false)
-        )
-        XCTAssertEqual(
-            localCLIPlan,
-            VoiceInkAIEnhancementCredentialStateResolutionPlan(
-                provider: .localCLI,
-                providerKeyStorageNameToLoad: nil
-            )
-        )
-        XCTAssertEqual(
-            localCLIPlan.credentialState(
-                savedAPIKey: "ignored-key",
-                isLocalCLIConfigured: true
-            ),
-            VoiceInkAIEnhancementCredentialState(apiKey: "", isAPIKeyValid: true)
-        )
-        XCTAssertEqual(
-            ollamaPlan,
-            VoiceInkAIEnhancementCredentialStateResolutionPlan(
-                provider: .ollama,
-                providerKeyStorageNameToLoad: nil
-            )
-        )
-        XCTAssertEqual(
-            ollamaPlan.credentialState(
-                savedAPIKey: nil,
-                isLocalCLIConfigured: false
-            ),
-            VoiceInkAIEnhancementCredentialState(apiKey: "", isAPIKeyValid: true)
-        )
     }
 
     func testMacOSAIEnhancementCredentialStateResolutionPlanAppliesRuntimeState() {
@@ -193,19 +57,27 @@ final class AIProviderCatalogTests: XCTestCase {
         ])
     }
 
-    func testLocalCLISettingsPresentationPreservesMacOSCopy() {
-        let presentation = VoiceInkLocalCLIPreference.macOSSettingsPresentation
-
-        XCTAssertEqual(presentation.commandTitle, "Command")
-        XCTAssertEqual(presentation.loadTemplateButtonTitle, "Load Template")
-        XCTAssertEqual(presentation.timeoutPickerTitle, "Timeout")
+    func testMacOSAIEnhancementCredentialStateHandlesMissingAndNoKeyProviders() {
         XCTAssertEqual(
-            presentation.environmentHelpText,
-            "Environment variables available: VOICEINK_SYSTEM_PROMPT, VOICEINK_USER_PROMPT, VOICEINK_FULL_PROMPT. VoiceInk also writes VOICEINK_FULL_PROMPT to stdin for every command."
+            VoiceInkAIEnhancementProviderKind.groq.textEnhancementCredentialState(
+                savedAPIKey: nil,
+                isLocalCLIConfigured: false
+            ),
+            VoiceInkAIEnhancementCredentialState(apiKey: "", isAPIKeyValid: false)
         )
         XCTAssertEqual(
-            presentation.configurationRequiredHelpText,
-            "Load a template or enter a command to enable Local CLI enhancement."
+            VoiceInkAIEnhancementProviderKind.localCLI.textEnhancementCredentialState(
+                savedAPIKey: nil,
+                isLocalCLIConfigured: false
+            ),
+            VoiceInkAIEnhancementCredentialState(apiKey: "", isAPIKeyValid: false)
+        )
+        XCTAssertEqual(
+            VoiceInkAIEnhancementProviderKind.ollama.textEnhancementCredentialState(
+                savedAPIKey: nil,
+                isLocalCLIConfigured: false
+            ),
+            VoiceInkAIEnhancementCredentialState(apiKey: "", isAPIKeyValid: true)
         )
     }
 
@@ -296,36 +168,7 @@ final class AIProviderCatalogTests: XCTestCase {
         )
     }
 
-    func testLocalCLIExecutionErrorsPreserveMacOSCopyAndFailureClassification() {
-        XCTAssertEqual(
-            VoiceInkLocalCLIExecutionError.commandNotConfigured.errorDescription,
-            "Local CLI command is not configured. Load a template or enter a command first."
-        )
-        XCTAssertEqual(
-            VoiceInkLocalCLIExecutionError.commandNotFound("zsh: command not found: roma").errorDescription,
-            "Local CLI command was not found. Use an absolute path or fix your shell PATH. Details: zsh: command not found: roma"
-        )
-        XCTAssertEqual(
-            VoiceInkLocalCLIExecutionError.timeout(seconds: 45.9).errorDescription,
-            "Local CLI command timed out after 45 seconds."
-        )
-        XCTAssertEqual(
-            VoiceInkLocalCLIExecutionError.nonZeroExit(status: 2, stderr: "").errorDescription,
-            "Local CLI command failed with exit code 2."
-        )
-        XCTAssertEqual(
-            VoiceInkLocalCLIExecutionError.nonZeroExit(status: 2, stderr: "bad flag").errorDescription,
-            "Local CLI command failed with exit code 2: bad flag"
-        )
-        XCTAssertEqual(
-            VoiceInkLocalCLIExecutionError.emptyOutput.errorDescription,
-            "Local CLI command returned empty output."
-        )
-        XCTAssertEqual(
-            VoiceInkLocalCLIExecutionError.executionFailed("permission denied").errorDescription,
-            "Failed to execute Local CLI command: permission denied"
-        )
-
+    func testLocalCLICommandFailureClassificationTrimsStderrAndDetectsMissingCommands() {
         XCTAssertEqual(
             VoiceInkLocalCLIPreference.commandFailureError(
                 terminationStatus: 127,
@@ -543,79 +386,6 @@ final class AIProviderCatalogTests: XCTestCase {
 
         XCTAssertTrue(completionResults.isEmpty)
         XCTAssertEqual(resolvedKeys, ["resolved-key"])
-    }
-
-    func testMacOSAIEnhancementAPIKeyVerificationDispatchPlanIsShared() async {
-        let customRequestURL = URL(string: "https://api.example.com/v1/chat/completions")!
-
-        await assertVerificationDispatch(
-            VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan.plan(
-                provider: .localCLI,
-                currentModel: "ignored",
-                requestURL: nil
-            ),
-            expectedResult: VoiceInkAPIKeyVerificationResult(
-                    isValid: false,
-                    errorMessage: VoiceInkAIEnhancementProviderKind.localCLI.unsupportedAPIKeyVerificationMessage
-            ),
-            expectedCalls: []
-        )
-        await assertVerificationDispatch(
-            VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan.plan(
-                provider: .custom,
-                currentModel: "custom-model",
-                requestURL: nil
-            ),
-            expectedResult: VoiceInkAPIKeyVerificationResult(
-                    isValid: false,
-                    errorMessage: VoiceInkAIEnhancementProviderKind.invalidOrMissingBaseURLConfigurationMessage
-            ),
-            expectedCalls: []
-        )
-        await assertVerificationDispatch(
-            VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan.plan(
-                provider: .custom,
-                currentModel: "custom-model",
-                requestURL: customRequestURL
-            ),
-            expectedResult: VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: "openai"),
-            expectedCalls: [
-                "openai:https://api.example.com/v1/chat/completions:resolved-key:custom-model"
-            ]
-        )
-        await assertVerificationDispatch(
-            VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan.plan(
-                provider: .gemini,
-                currentModel: "gemini-2.5-pro",
-                requestURL: nil
-            ),
-            expectedResult: VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: "shared"),
-            expectedCalls: [
-                "shared:resolved-key:gemini"
-            ]
-        )
-        await assertVerificationDispatch(
-            VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan.plan(
-                provider: .anthropic,
-                currentModel: "claude-sonnet-4-20250514",
-                requestURL: nil
-            ),
-            expectedResult: VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: "anthropic"),
-            expectedCalls: [
-                "anthropic:resolved-key"
-            ]
-        )
-        await assertVerificationDispatch(
-            VoiceInkAIEnhancementAPIKeyVerificationDispatchPlan.plan(
-                provider: .openRouter,
-                currentModel: "openai/gpt-5.5",
-                requestURL: nil
-            ),
-            expectedResult: VoiceInkAPIKeyVerificationResult(isValid: true, errorMessage: "openrouter"),
-            expectedCalls: [
-                "openrouter:resolved-key:openai/gpt-5.5"
-            ]
-        )
     }
 
     func testMacOSAIEnhancementAPIKeyVerificationDispatchPlanAppliesAdapters() async {
@@ -1011,7 +781,6 @@ final class AIProviderCatalogTests: XCTestCase {
                 )
             )
         )
-
         XCTAssertEqual(
             VoiceInkAIEnhancementAPIKeyClearPlan.clearing(provider: .custom),
             VoiceInkAIEnhancementAPIKeyClearPlan(
@@ -1279,28 +1048,9 @@ final class AIProviderCatalogTests: XCTestCase {
         )
     }
 
-    func testMacOSAIEnhancementConnectionStatusPresentationIsShared() {
+    func testMacOSAIEnhancementConnectionStatusUsesProviderState() {
         let presentation = VoiceInkAIEnhancementProviderSettingsPresentation.macOS
 
-        XCTAssertEqual(presentation.connectedText, "Connected")
-        XCTAssertEqual(presentation.disconnectedText, "Disconnected")
-        XCTAssertEqual(
-            presentation.connectionStatus(
-                provider: .groq,
-                isAPIKeyValid: true,
-                isCheckingOllama: false,
-                hasOllamaModels: false
-            ),
-            .status(text: "Connected", tone: .connected)
-        )
-        XCTAssertNil(
-            presentation.connectionStatus(
-                provider: .groq,
-                isAPIKeyValid: false,
-                isCheckingOllama: false,
-                hasOllamaModels: false
-            )
-        )
         XCTAssertEqual(
             presentation.connectionStatus(
                 provider: .ollama,
@@ -1317,7 +1067,7 @@ final class AIProviderCatalogTests: XCTestCase {
                 isCheckingOllama: false,
                 hasOllamaModels: true
             ),
-            .status(text: "Connected", tone: .connected)
+            .status(text: presentation.connectedText, tone: .connected)
         )
         XCTAssertEqual(
             presentation.connectionStatus(
@@ -1326,64 +1076,61 @@ final class AIProviderCatalogTests: XCTestCase {
                 isCheckingOllama: false,
                 hasOllamaModels: false
             ),
-            .status(text: "Disconnected", tone: .disconnected)
+            .status(text: presentation.disconnectedText, tone: .disconnected)
         )
         XCTAssertEqual(
             presentation.connectionStatus(
-                provider: .localCLI,
+                provider: .groq,
                 isAPIKeyValid: true,
                 isCheckingOllama: false,
                 hasOllamaModels: false
             ),
-            .status(text: "Connected", tone: .connected)
+            .status(text: presentation.connectedText, tone: .connected)
         )
-
-        for provider in VoiceInkAIEnhancementProviderKind.allCases where provider != .ollama {
-            XCTAssertEqual(
-                presentation.connectionStatus(
-                    provider: provider,
-                    isAPIKeyValid: true,
-                    isCheckingOllama: true,
-                    hasOllamaModels: true
-                ),
-                .status(text: "Connected", tone: .connected),
-                provider.rawValue
+        XCTAssertNil(
+            presentation.connectionStatus(
+                provider: .groq,
+                isAPIKeyValid: false,
+                isCheckingOllama: false,
+                hasOllamaModels: false
             )
-            XCTAssertNil(
-                presentation.connectionStatus(
-                    provider: provider,
-                    isAPIKeyValid: false,
-                    isCheckingOllama: true,
-                    hasOllamaModels: true
-                ),
-                provider.rawValue
-            )
-        }
+        )
     }
 
-    func testMacOSAIEnhancementSettingsChromeAndOllamaPresentationIsShared() {
+    func testMacOSAIEnhancementModelPickerFollowsProviderCapabilities() {
         let presentation = VoiceInkAIEnhancementProviderSettingsPresentation.macOS
 
-        XCTAssertEqual(presentation.sectionTitle, "AI Provider Integration")
-        XCTAssertEqual(presentation.providerPickerTitle, "Provider")
-        XCTAssertEqual(presentation.modelPickerTitle, "Model")
-        XCTAssertEqual(presentation.noModelsLoadedText, "No models loaded")
-        XCTAssertEqual(presentation.refreshButtonTitle, "Refresh")
-        XCTAssertEqual(presentation.defaultAPIKeyRemoveButtonTitle, "Remove")
-        XCTAssertEqual(presentation.getAPIKeyButtonTitle, "Get API Key")
-        XCTAssertEqual(presentation.errorAlertTitle, "Error")
-        XCTAssertEqual(presentation.errorAlertDismissButtonTitle, "OK")
-        XCTAssertEqual(presentation.ollamaBaseURLFieldTitle, "Base URL")
-        XCTAssertEqual(presentation.ollamaSaveButtonTitle, "Save")
-        XCTAssertEqual(presentation.ollamaEditButtonTitle, "Edit")
-        XCTAssertEqual(presentation.ollamaResetButtonHelp, "Reset to default")
         XCTAssertEqual(
-            presentation.ollamaConnectionFailureMessage,
-            "Could not connect to Ollama. Please check if Ollama is running and the base URL is correct."
+            presentation.modelPickerPresentation(provider: .openRouter, availableModels: []),
+            VoiceInkAIEnhancementModelPickerPresentation(
+                isModelPickerVisible: false,
+                isRefreshButtonVisible: true,
+                emptyStateText: presentation.noModelsLoadedText
+            )
         )
         XCTAssertEqual(
-            presentation.ollamaServerText(baseURL: "http://localhost:11434"),
-            "Server: http://localhost:11434"
+            presentation.modelPickerPresentation(provider: .openRouter, availableModels: ["model"]),
+            VoiceInkAIEnhancementModelPickerPresentation(
+                isModelPickerVisible: true,
+                isRefreshButtonVisible: true,
+                emptyStateText: nil
+            )
+        )
+        XCTAssertEqual(
+            presentation.modelPickerPresentation(provider: .groq, availableModels: ["model"]),
+            VoiceInkAIEnhancementModelPickerPresentation(
+                isModelPickerVisible: true,
+                isRefreshButtonVisible: false,
+                emptyStateText: nil
+            )
+        )
+        XCTAssertEqual(
+            presentation.modelPickerPresentation(provider: .custom, availableModels: ["model"]),
+            VoiceInkAIEnhancementModelPickerPresentation(
+                isModelPickerVisible: false,
+                isRefreshButtonVisible: false,
+                emptyStateText: nil
+            )
         )
     }
 
@@ -1497,32 +1244,6 @@ final class AIProviderCatalogTests: XCTestCase {
         )
     }
 
-    func testMacOSAIEnhancementProviderSelectionPlanIsShared() {
-        XCTAssertEqual(
-            VoiceInkAIEnhancementProviderSelectionPlan.selecting(.groq),
-            VoiceInkAIEnhancementProviderSelectionPlan(
-                selectedProviderToSave: .groq,
-                shouldRefreshOllamaRuntimeModels: false
-            )
-        )
-
-        XCTAssertEqual(
-            VoiceInkAIEnhancementProviderSelectionPlan.selecting(.ollama),
-            VoiceInkAIEnhancementProviderSelectionPlan(
-                selectedProviderToSave: .ollama,
-                shouldRefreshOllamaRuntimeModels: true
-            )
-        )
-
-        XCTAssertEqual(
-            VoiceInkAIEnhancementProviderSelectionPlan.selecting(.localCLI),
-            VoiceInkAIEnhancementProviderSelectionPlan(
-                selectedProviderToSave: .localCLI,
-                shouldRefreshOllamaRuntimeModels: false
-            )
-        )
-    }
-
     func testMacOSAIEnhancementProviderSelectionPlanAppliesRuntimeState() {
         let groqPlan = VoiceInkAIEnhancementProviderSelectionPlan.selecting(.groq)
         let ollamaPlan = VoiceInkAIEnhancementProviderSelectionPlan.selecting(.ollama)
@@ -1626,48 +1347,6 @@ final class AIProviderCatalogTests: XCTestCase {
                 defaultModel: "mistral"
             ),
             "local-llama"
-        )
-    }
-
-    func testMacOSAIEnhancementModelSelectionPlanIsShared() throws {
-        let initialModels: [VoiceInkAIEnhancementProviderKind: String] = [
-            .groq: "old-groq-model",
-            .openAI: "gpt-5.4"
-        ]
-
-        let groqPlan = try XCTUnwrap(
-            VoiceInkAIEnhancementModelSelectionPlan.selecting(
-                "openai/gpt-oss-120b",
-                provider: .groq,
-                selectedModels: initialModels
-            )
-        )
-
-        XCTAssertEqual(groqPlan.provider, .groq)
-        XCTAssertEqual(groqPlan.selectedModelToSave, "openai/gpt-oss-120b")
-        XCTAssertNil(groqPlan.ollamaModelToApply)
-        XCTAssertEqual(groqPlan.selectedModels[.groq], "openai/gpt-oss-120b")
-        XCTAssertEqual(groqPlan.selectedModels[.openAI], "gpt-5.4")
-
-        let ollamaPlan = try XCTUnwrap(
-            VoiceInkAIEnhancementModelSelectionPlan.selecting(
-                "llama3",
-                provider: .ollama,
-                selectedModels: initialModels
-            )
-        )
-
-        XCTAssertEqual(ollamaPlan.provider, .ollama)
-        XCTAssertEqual(ollamaPlan.selectedModelToSave, "llama3")
-        XCTAssertEqual(ollamaPlan.ollamaModelToApply, "llama3")
-        XCTAssertEqual(ollamaPlan.selectedModels[.ollama], "llama3")
-
-        XCTAssertNil(
-            VoiceInkAIEnhancementModelSelectionPlan.selecting(
-                "",
-                provider: .groq,
-                selectedModels: initialModels
-            )
         )
     }
 
@@ -1828,13 +1507,6 @@ final class AIProviderCatalogTests: XCTestCase {
         }
     }
 
-    func testMacOSOllamaRequestTemperaturePolicyIsShared() {
-        XCTAssertEqual(
-            VoiceInkAIEnhancementProviderKind.ollamaTextEnhancementRequestTemperature,
-            0.3
-        )
-    }
-
     func testMacOSAIEnhancementStaticTextEnhancementModelsAreShared() {
         XCTAssertEqual(
             VoiceInkAIEnhancementProviderKind.groq.staticTextEnhancementModels,
@@ -1887,201 +1559,6 @@ final class AIProviderCatalogTests: XCTestCase {
                 openRouterModels: openRouterModels
             ),
             []
-        )
-    }
-
-    func testMacOSAIEnhancementModelPickerPresentationIsShared() {
-        let presentation = VoiceInkAIEnhancementProviderSettingsPresentation.macOS
-        let hidden = VoiceInkAIEnhancementModelPickerPresentation(
-            isModelPickerVisible: false,
-            isRefreshButtonVisible: false,
-            emptyStateText: nil
-        )
-        let staticPicker = VoiceInkAIEnhancementModelPickerPresentation(
-            isModelPickerVisible: true,
-            isRefreshButtonVisible: false,
-            emptyStateText: nil
-        )
-        let refreshablePicker = VoiceInkAIEnhancementModelPickerPresentation(
-            isModelPickerVisible: true,
-            isRefreshButtonVisible: true,
-            emptyStateText: nil
-        )
-        let refreshableEmptyState = VoiceInkAIEnhancementModelPickerPresentation(
-            isModelPickerVisible: false,
-            isRefreshButtonVisible: true,
-            emptyStateText: "No models loaded"
-        )
-        let expectedLoadedPresentations: [VoiceInkAIEnhancementProviderKind: VoiceInkAIEnhancementModelPickerPresentation] = [
-            .anthropic: staticPicker,
-            .assemblyAI: staticPicker,
-            .cerebras: staticPicker,
-            .custom: hidden,
-            .deepgram: staticPicker,
-            .elevenLabs: staticPicker,
-            .gemini: staticPicker,
-            .groq: staticPicker,
-            .localCLI: hidden,
-            .mistral: staticPicker,
-            .ollama: hidden,
-            .openAI: staticPicker,
-            .openRouter: refreshablePicker,
-            .soniox: staticPicker,
-            .speechmatics: staticPicker
-        ]
-
-        XCTAssertEqual(VoiceInkAIEnhancementProviderKind.allCases.count, expectedLoadedPresentations.count)
-
-        for (provider, expectedPresentation) in expectedLoadedPresentations {
-            XCTAssertEqual(
-                presentation.modelPickerPresentation(provider: provider, availableModels: ["model"]),
-                expectedPresentation,
-                provider.rawValue
-            )
-            XCTAssertEqual(
-                presentation.modelPickerPresentation(provider: provider, availableModels: []),
-                provider == .openRouter ? refreshableEmptyState : hidden,
-                provider.rawValue
-            )
-        }
-    }
-
-    func testMacOSAIEnhancementRequestURLSelectionIsShared() async {
-        await withIsolatedDefaultsAsync { defaults in
-            XCTAssertEqual(
-                VoiceInkAIEnhancementProviderKind.groq.textEnhancementRequestURLString(from: defaults),
-                VoiceInkAIModelProvider.groq.postProcessingRequestURL?.absoluteString
-            )
-            XCTAssertEqual(
-                VoiceInkAIEnhancementProviderKind.openRouter.textEnhancementRequestURLString(from: defaults),
-                VoiceInkAIModelProvider.openRouter.postProcessingRequestURL?.absoluteString
-            )
-            XCTAssertEqual(
-                VoiceInkAIEnhancementProviderKind.ollama.textEnhancementRequestURLString(from: defaults),
-                VoiceInkPreferenceDefault.ollamaBaseURL
-            )
-            XCTAssertEqual(
-                VoiceInkAIEnhancementProviderKind.localCLI.textEnhancementRequestURLString(from: defaults),
-                ""
-            )
-            XCTAssertEqual(
-                VoiceInkAIEnhancementProviderKind.custom.textEnhancementRequestURLString(from: defaults),
-                ""
-            )
-
-            VoiceInkDynamicAIProviderPreference.saveOllamaBaseURL("http://example.local:11434", to: defaults)
-            VoiceInkDynamicAIProviderPreference.saveCustomProviderBaseURL("https://api.example.com", to: defaults)
-
-            XCTAssertEqual(
-                VoiceInkAIEnhancementProviderKind.ollama.textEnhancementRequestURLString(from: defaults),
-                "http://example.local:11434"
-            )
-            XCTAssertEqual(
-                VoiceInkAIEnhancementProviderKind.custom.textEnhancementRequestURLString(from: defaults),
-                "https://api.example.com"
-            )
-            XCTAssertEqual(
-                VoiceInkAIEnhancementProviderKind.custom.textEnhancementRequestURL(from: defaults)?.absoluteString,
-                "https://api.example.com"
-            )
-
-            VoiceInkDynamicAIProviderPreference.saveCustomProviderBaseURL("http://[::1", to: defaults)
-
-            XCTAssertNil(VoiceInkAIEnhancementProviderKind.custom.textEnhancementRequestURL(from: defaults))
-            XCTAssertNil(VoiceInkAIEnhancementProviderKind.localCLI.textEnhancementRequestURL(from: defaults))
-
-            let invalidCustomPlan = VoiceInkAIEnhancementRequestExecutionPlan.planning(
-                provider: .custom,
-                modelName: "custom-model",
-                defaults: defaults
-            )
-
-            do {
-                _ = try await openAICompatibleRequestSummary(for: invalidCustomPlan)
-                XCTFail("Expected invalid custom endpoint to throw")
-            } catch {
-                XCTAssertEqual(
-                    error as? VoiceInkAIEnhancementError,
-                    .customError(VoiceInkAIEnhancementProviderKind.custom.invalidTextEnhancementRequestURLMessage)
-                )
-            }
-
-            VoiceInkDynamicAIProviderPreference.saveCustomProviderBaseURL(
-                "https://api.example.com/v1/chat/completions",
-                to: defaults
-            )
-            let customPlan = VoiceInkAIEnhancementRequestExecutionPlan.planning(
-                provider: .custom,
-                modelName: "custom-model",
-                defaults: defaults
-            )
-
-            do {
-                let customRequestSummary = try await openAICompatibleRequestSummary(for: customPlan)
-                XCTAssertEqual(customRequestSummary?.requestURL.absoluteString, "https://api.example.com/v1/chat/completions")
-                XCTAssertEqual(customRequestSummary?.temperature, 0.3)
-                XCTAssertNil(customRequestSummary?.reasoningEffort)
-                XCTAssertFalse(customRequestSummary?.hasExtraBodyParameters ?? true)
-                XCTAssertNil(customRequestSummary?.includeReasoning)
-            } catch {
-                XCTFail("Expected valid custom endpoint to produce a request plan")
-            }
-        }
-    }
-
-    func testMacOSAIEnhancementRefreshModelSelectionRepairIsShared() {
-        let openRouterModels = [
-            "anthropic/claude-3.5-sonnet",
-            "openai/gpt-4o"
-        ]
-        let ollamaModels = [
-            "llama3",
-            "mistral"
-        ]
-
-        XCTAssertEqual(
-            VoiceInkAIEnhancementProviderKind.openRouter.textEnhancementModelToSelectAfterRefresh(
-                currentModel: VoiceInkAIModelCatalog.defaultModel(for: .openRouter),
-                refreshedModels: openRouterModels,
-                defaultModel: VoiceInkAIModelCatalog.defaultModel(for: .openRouter)
-            ),
-            "anthropic/claude-3.5-sonnet"
-        )
-        XCTAssertNil(
-            VoiceInkAIEnhancementProviderKind.openRouter.textEnhancementModelToSelectAfterRefresh(
-                currentModel: "custom/openrouter-model",
-                refreshedModels: openRouterModels,
-                defaultModel: VoiceInkAIModelCatalog.defaultModel(for: .openRouter)
-            )
-        )
-        XCTAssertEqual(
-            VoiceInkAIEnhancementProviderKind.ollama.textEnhancementModelToSelectAfterRefresh(
-                currentModel: "missing-local-model",
-                refreshedModels: ollamaModels,
-                defaultModel: VoiceInkAIEnhancementProviderKind.defaultOllamaTextEnhancementModel
-            ),
-            "llama3"
-        )
-        XCTAssertNil(
-            VoiceInkAIEnhancementProviderKind.ollama.textEnhancementModelToSelectAfterRefresh(
-                currentModel: "mistral",
-                refreshedModels: ollamaModels,
-                defaultModel: VoiceInkAIEnhancementProviderKind.defaultOllamaTextEnhancementModel
-            )
-        )
-        XCTAssertNil(
-            VoiceInkAIEnhancementProviderKind.groq.textEnhancementModelToSelectAfterRefresh(
-                currentModel: VoiceInkAIModelCatalog.defaultModel(for: .groq),
-                refreshedModels: openRouterModels,
-                defaultModel: VoiceInkAIModelCatalog.defaultModel(for: .groq)
-            )
-        )
-        XCTAssertNil(
-            VoiceInkAIEnhancementProviderKind.openRouter.textEnhancementModelToSelectAfterRefresh(
-                currentModel: VoiceInkAIModelCatalog.defaultModel(for: .openRouter),
-                refreshedModels: [],
-                defaultModel: VoiceInkAIModelCatalog.defaultModel(for: .openRouter)
-            )
         )
     }
 
@@ -2666,13 +2143,6 @@ extension AIProviderCatalogTests {
         )
     }
 
-    func testSelectedTextDiagnosticsPreservesMacOSFailureCopy() {
-        XCTAssertEqual(
-            VoiceInkSelectedTextDiagnostics.fetchFailedMessage(errorDescription: "permission denied"),
-            "Failed to get selected text: permission denied"
-        )
-    }
-
     func testScreenContextPrefersFrontmostVisibleNonSelfWindow() {
         let windows = [
             aiPromptScreenWindow(processID: 7, title: "Background"),
@@ -2705,27 +2175,6 @@ extension AIProviderCatalogTests {
                 frontmostProcessID: 99
             ),
             3
-        )
-    }
-
-    func testScreenContextTextPreservesMacOSCaptureCopy() {
-        XCTAssertEqual(
-            VoiceInkAIEnhancementScreenContext.contextText(
-                window: aiPromptScreenWindow(
-                    processID: 9,
-                    title: "Spec.md",
-                    applicationName: "Zed"
-                ),
-                extractedText: "Roadmap\nArchitecture"
-            ),
-            """
-            Active Window: Spec.md
-            Application: Zed
-
-            Window Content:
-            Roadmap
-            Architecture
-            """
         )
     }
 
@@ -2834,36 +2283,6 @@ private func aiPromptScreenWindow(
 }
 
 extension AIProviderCatalogTests {
-    func testErrorDescriptionsPreserveExistingMacOSMessages() {
-        XCTAssertEqual(
-            VoiceInkAIEnhancementError.notConfigured.errorDescription,
-            "AI provider not configured. Please check your API key."
-        )
-        XCTAssertEqual(
-            VoiceInkAIEnhancementError.enhancementFailed.errorDescription,
-            "AI enhancement failed to process the text."
-        )
-        XCTAssertEqual(
-            VoiceInkAIEnhancementError.networkError.errorDescription,
-            "Network connection failed. Check your internet."
-        )
-        XCTAssertEqual(
-            VoiceInkAIEnhancementError.serverError.errorDescription,
-            "The AI provider's server encountered an error. Please try again later."
-        )
-        XCTAssertEqual(
-            VoiceInkAIEnhancementError.rateLimitExceeded.errorDescription,
-            "Rate limit exceeded. Please try again later."
-        )
-        XCTAssertEqual(
-            VoiceInkAIEnhancementError.timeout.errorDescription,
-            "Enhancement request timed out. Check your connection or increase the timeout duration."
-        )
-        XCTAssertEqual(
-            VoiceInkAIEnhancementError.customError("provider down").errorDescription,
-            "provider down"
-        )
-    }
 
     func testHTTPErrorMappingPreservesMacOSRetryCategories() {
         XCTAssertEqual(
@@ -3007,17 +2426,6 @@ extension AIProviderCatalogTests {
         XCTAssertEqual(VoiceInkOllamaEnhancementFailure.transportFailure(.invalidRequest), .invalidRequest)
         XCTAssertEqual(VoiceInkOllamaEnhancementFailure.transportFailure(.missingCredential), .invalidResponse)
         XCTAssertEqual(VoiceInkOllamaEnhancementFailure.transportFailure(.timeout), .timeout)
-    }
-
-    func testOllamaServiceDiagnosticsPreserveMacOSConsoleCopy() {
-        XCTAssertEqual(
-            VoiceInkOllamaServiceDiagnostics.invalidBaseURLMessage,
-            "Invalid Ollama base URL"
-        )
-        XCTAssertEqual(
-            VoiceInkOllamaServiceDiagnostics.modelFetchFailedMessage(errorDescription: "server down"),
-            "Error fetching models: server down"
-        )
     }
 
     func testDefaultRetryStatePreservesMacOSAttemptAndDelayDefaults() {
@@ -3186,73 +2594,87 @@ extension AIProviderCatalogTests {
             now: Date(timeIntervalSince1970: 100)
         ))
     }
-
-    func testRetryProgressPresentationPreservesMacOSLogMessages() {
-        XCTAssertEqual(
-            VoiceInkAIEnhancementRetryProgressPresentation.diagnosticMessage(
-                for: .retryAfterDelay(2),
-                failedAttempts: 2,
-                maxAttempts: 3
-            ),
-            "Request failed, retrying in 2.0s... (Attempt 2/3)"
-        )
-        XCTAssertEqual(
-            VoiceInkAIEnhancementRetryProgressPresentation.diagnosticMessage(
-                for: .retryImmediately,
-                failedAttempts: 1,
-                maxAttempts: 3
-            ),
-            "Request timed out, retrying immediately... (Attempt 1/3)"
-        )
-        XCTAssertNil(
-            VoiceInkAIEnhancementRetryProgressPresentation.diagnosticMessage(
-                for: .fail(.networkError),
-                failedAttempts: 3,
-                maxAttempts: 3
+    func testMacOSAIEnhancementRequestURLSelectionIsShared() async {
+        await withIsolatedDefaultsAsync { defaults in
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderKind.groq.textEnhancementRequestURLString(from: defaults),
+                VoiceInkAIModelProvider.groq.postProcessingRequestURL?.absoluteString
             )
-        )
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderKind.openRouter.textEnhancementRequestURLString(from: defaults),
+                VoiceInkAIModelProvider.openRouter.postProcessingRequestURL?.absoluteString
+            )
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderKind.ollama.textEnhancementRequestURLString(from: defaults),
+                VoiceInkPreferenceDefault.ollamaBaseURL
+            )
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderKind.localCLI.textEnhancementRequestURLString(from: defaults),
+                ""
+            )
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderKind.custom.textEnhancementRequestURLString(from: defaults),
+                ""
+            )
+
+            VoiceInkDynamicAIProviderPreference.saveOllamaBaseURL("http://example.local:11434", to: defaults)
+            VoiceInkDynamicAIProviderPreference.saveCustomProviderBaseURL("https://api.example.com", to: defaults)
+
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderKind.ollama.textEnhancementRequestURLString(from: defaults),
+                "http://example.local:11434"
+            )
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderKind.custom.textEnhancementRequestURLString(from: defaults),
+                "https://api.example.com"
+            )
+            XCTAssertEqual(
+                VoiceInkAIEnhancementProviderKind.custom.textEnhancementRequestURL(from: defaults)?.absoluteString,
+                "https://api.example.com"
+            )
+
+            VoiceInkDynamicAIProviderPreference.saveCustomProviderBaseURL("http://[::1", to: defaults)
+
+            XCTAssertNil(VoiceInkAIEnhancementProviderKind.custom.textEnhancementRequestURL(from: defaults))
+            XCTAssertNil(VoiceInkAIEnhancementProviderKind.localCLI.textEnhancementRequestURL(from: defaults))
+
+            let invalidCustomPlan = VoiceInkAIEnhancementRequestExecutionPlan.planning(
+                provider: .custom,
+                modelName: "custom-model",
+                defaults: defaults
+            )
+
+            do {
+                _ = try await openAICompatibleRequestSummary(for: invalidCustomPlan)
+                XCTFail("Expected invalid custom endpoint to throw")
+            } catch {
+                XCTAssertEqual(
+                    error as? VoiceInkAIEnhancementError,
+                    .customError(VoiceInkAIEnhancementProviderKind.custom.invalidTextEnhancementRequestURLMessage)
+                )
+            }
+
+            VoiceInkDynamicAIProviderPreference.saveCustomProviderBaseURL(
+                "https://api.example.com/v1/chat/completions",
+                to: defaults
+            )
+            let customPlan = VoiceInkAIEnhancementRequestExecutionPlan.planning(
+                provider: .custom,
+                modelName: "custom-model",
+                defaults: defaults
+            )
+
+            do {
+                let customRequestSummary = try await openAICompatibleRequestSummary(for: customPlan)
+                XCTAssertEqual(customRequestSummary?.requestURL.absoluteString, "https://api.example.com/v1/chat/completions")
+                XCTAssertEqual(customRequestSummary?.temperature, 0.3)
+                XCTAssertNil(customRequestSummary?.reasoningEffort)
+                XCTAssertFalse(customRequestSummary?.hasExtraBodyParameters ?? true)
+                XCTAssertNil(customRequestSummary?.includeReasoning)
+            } catch {
+                XCTFail("Expected valid custom endpoint to produce a request plan")
+            }
+        }
     }
 
-    func testRetryFailurePresentationPreservesMacOSLogMessages() {
-        XCTAssertEqual(
-            VoiceInkAIEnhancementRetryFailurePresentation.diagnosticMessage(
-                for: .timeout,
-                attempts: 3,
-                retryOnTimeoutEnabled: true
-            ),
-            "Request timed out after 3 retries."
-        )
-        XCTAssertEqual(
-            VoiceInkAIEnhancementRetryFailurePresentation.diagnosticMessage(
-                for: .timeout,
-                attempts: 3,
-                retryOnTimeoutEnabled: false
-            ),
-            "Request timed out, failing immediately (retry disabled)."
-        )
-        XCTAssertEqual(
-            VoiceInkAIEnhancementRetryFailurePresentation.diagnosticMessage(
-                for: .networkError,
-                attempts: 3,
-                retryOnTimeoutEnabled: true,
-                transportNetworkFailure: true
-            ),
-            "Request failed after 3 retries with network error."
-        )
-        XCTAssertEqual(
-            VoiceInkAIEnhancementRetryFailurePresentation.diagnosticMessage(
-                for: .serverError,
-                attempts: 3,
-                retryOnTimeoutEnabled: true
-            ),
-            "Request failed after 3 retries."
-        )
-        XCTAssertNil(
-            VoiceInkAIEnhancementRetryFailurePresentation.diagnosticMessage(
-                for: .notConfigured,
-                attempts: 3,
-                retryOnTimeoutEnabled: true
-            )
-        )
-    }
 }

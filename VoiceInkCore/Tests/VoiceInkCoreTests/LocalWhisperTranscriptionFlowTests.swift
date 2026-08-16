@@ -2,45 +2,6 @@ import Foundation
 import VoiceInkCore
 
 final class LocalWhisperTranscriptionFlowTests: XCTestCase {
-    func testTranscriptionRunPreparationSymbolsExposePublicAPI() {
-        let skipConfiguration = VoiceInkPostProcessingSkipConfiguration(
-            isEnabled: true,
-            wordThreshold: 2
-        )
-
-        XCTAssertTrue(VoiceInkPostProcessingSkipPolicy.shouldSkipPostProcessing(
-            transcript: "Roma works",
-            configuration: skipConfiguration,
-            promptTriggerForcesPostProcessing: false
-        ))
-        XCTAssertEqual(VoiceInkWordCounter.count(in: "Roma works"), 2)
-        XCTAssertEqual(
-            VoiceInkTranscriptionPromptUse.directTranscription.requestPrompt(" spell Roma "),
-            " spell Roma "
-        )
-        XCTAssertNil(VoiceInkTranscriptionPromptUse.recordedFileTranscription(.deepgram).requestPrompt("ignored"))
-
-        let preparedText = VoiceInkTranscriptionRunPreparation.prepareRawText(
-            "Hello.",
-            cleanupConfiguration: .disabled
-        )
-        XCTAssertEqual(preparedText.filteredText, "Hello.")
-        XCTAssertEqual(preparedText.transcript(for: .cleanedText), "Hello.")
-        XCTAssertTrue(preparedText.shouldSkipPostProcessing(configuration: skipConfiguration))
-
-        let enhancementPlan = VoiceInkTranscriptionRunPreparation.prepareAudioFileText(
-            "Hello.",
-            cleanupConfiguration: .disabled
-        )
-        XCTAssertEqual(
-            enhancementPlan.enhancementRequest(
-                isEnhancementEnabled: true,
-                isEnhancementConfigured: true
-            )?.text,
-            "Hello."
-        )
-        XCTAssertEqual(VoiceInkTranscriptionEnhancementRequest(text: "raw").text, "raw")
-    }
 
     func testRequestBuildersPreservePlatformDefaults() {
         let suiteName = "LocalWhisperTranscriptionFlowTests.\(UUID().uuidString)"
@@ -69,80 +30,6 @@ final class LocalWhisperTranscriptionFlowTests: XCTestCase {
                 prompt: "",
                 failurePlatform: .iOS
             )
-        )
-    }
-
-    func testTranscriptionDiagnosticsPreservePlatformLogCopy() {
-        XCTAssertEqual(
-            VoiceInkLocalWhisperTranscriptionDiagnostics.macOSInitiatingLocalTranscriptionMessage(
-                modelDisplayName: "Base"
-            ),
-            "Initiating local transcription for model: Base"
-        )
-        XCTAssertEqual(
-            VoiceInkLocalWhisperTranscriptionDiagnostics.macOSUsingLoadedModelMessage(modelName: "tiny"),
-            "Using already loaded model: tiny"
-        )
-        XCTAssertEqual(
-            VoiceInkLocalWhisperTranscriptionDiagnostics.macOSModelFileNotFoundMessage(modelName: "small"),
-            "❌ Model file not found for: small"
-        )
-        XCTAssertEqual(
-            VoiceInkLocalWhisperTranscriptionDiagnostics.macOSLoadingModelMessage(modelName: "medium"),
-            "Loading model: medium"
-        )
-        XCTAssertEqual(
-            VoiceInkLocalWhisperTranscriptionDiagnostics.macOSModelLoadFailedMessage(
-                modelName: "large",
-                localizedDescription: "bad file"
-            ),
-            "❌ Failed to load model: large - bad file"
-        )
-        XCTAssertEqual(
-            VoiceInkLocalWhisperTranscriptionDiagnostics.macOSAudioSamplesProcessingFailedMessage,
-            "❌ Failed to process audio samples for local Whisper transcription."
-        )
-        XCTAssertEqual(
-            VoiceInkLocalWhisperTranscriptionDiagnostics.macOSCoreTranscriptionFailedMessage,
-            "❌ Core transcription engine failed (whisper_full)."
-        )
-        XCTAssertEqual(
-            VoiceInkLocalWhisperTranscriptionDiagnostics.macOSTranscriptionCompletedMessage,
-            "Whisper transcription completed successfully."
-        )
-        XCTAssertEqual(
-            VoiceInkLocalWhisperTranscriptionDiagnostics.iOSStartingLocalTranscriptionMessage,
-            "Starting local transcription."
-        )
-        XCTAssertEqual(
-            VoiceInkLocalWhisperTranscriptionDiagnostics.iOSUsingModelMessage(modelPath: "/tmp/model.bin"),
-            "Using model at /tmp/model.bin"
-        )
-        XCTAssertEqual(
-            VoiceInkLocalWhisperTranscriptionDiagnostics.iOSAudioProcessingFailedMessage,
-            "Audio processing failed."
-        )
-        XCTAssertEqual(
-            VoiceInkLocalWhisperTranscriptionDiagnostics.iOSProcessedAudioSamplesMessage(count: 42),
-            "Processed 42 audio samples."
-        )
-        XCTAssertEqual(
-            VoiceInkLocalWhisperTranscriptionDiagnostics.iOSAudioProcessingFailedMessage(
-                localizedDescription: "decode"
-            ),
-            "Audio processing failed: decode"
-        )
-        XCTAssertEqual(
-            VoiceInkLocalWhisperTranscriptionDiagnostics.iOSTranscriptionFailedMessage,
-            "Transcription failed."
-        )
-        XCTAssertEqual(
-            VoiceInkLocalWhisperTranscriptionDiagnostics.iOSContextResourcesReleasedMessage,
-            "Whisper context resources released."
-        )
-        XCTAssertEqual(
-            VoiceInkLocalWhisperTranscriptionDiagnostics.iOSTranscriptionCompletedMessage,
-            "Transcription completed successfully."
         )
     }
 

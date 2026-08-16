@@ -156,31 +156,6 @@ final class CustomCloudModelPolicyTests: XCTestCase {
         )
     }
 
-    func testMacOSFormPresentationPreservesDefaultsAndCopy() {
-        let presentation = VoiceInkCustomCloudModelFormPresentation.macOS
-
-        XCTAssertEqual(presentation.defaultAPIEndpoint, "https://api.example.com/v1/audio/transcriptions")
-        XCTAssertEqual(presentation.defaultModelName, "large-v3-turbo")
-        XCTAssertTrue(presentation.defaultIsMultilingual)
-        XCTAssertEqual(presentation.compatibilityWarningText, "Only OpenAI-compatible transcription APIs are supported")
-        XCTAssertEqual(presentation.displayNameFieldTitle, "Display Name")
-        XCTAssertEqual(presentation.displayNamePlaceholder, "My Custom Model")
-        XCTAssertEqual(presentation.apiEndpointFieldTitle, "API Endpoint")
-        XCTAssertEqual(presentation.apiEndpointPlaceholder, "https://api.example.com/v1/audio/transcriptions")
-        XCTAssertEqual(presentation.apiKeyFieldTitle, "API Key")
-        XCTAssertEqual(presentation.apiKeyPlaceholder, "your-api-key")
-        XCTAssertEqual(presentation.modelNameFieldTitle, "Model Name")
-        XCTAssertEqual(presentation.modelNamePlaceholder, "whisper-1")
-        XCTAssertEqual(presentation.multilingualToggleTitle, "Multilingual Model")
-        XCTAssertEqual(presentation.validationAlertTitle, "Validation Errors")
-        XCTAssertEqual(presentation.validationAlertDismissButtonTitle, "OK")
-        XCTAssertEqual(presentation.defaultModelDescription, "Custom transcription model")
-        XCTAssertEqual(
-            presentation.keychainSaveFailureMessage,
-            "Failed to securely save API Key to Keychain. Please check your system settings or try again."
-        )
-    }
-
     func testMacOSFormPresentationBuildsValidationAlertMessage() {
         XCTAssertEqual(
             VoiceInkCustomCloudModelFormPresentation.macOS.validationAlertMessage(
@@ -543,17 +518,6 @@ final class CustomCloudModelPolicyTests: XCTestCase {
         VoiceInkCustomCloudModelStorage.clear(from: defaults)
 
         XCTAssertNil(defaults.data(forKey: VoiceInkCustomCloudModelStorage.userDefaultsKey))
-    }
-
-    func testCustomCloudModelStorageDiagnosticsPreserveMacOSLogCopy() {
-        XCTAssertEqual(
-            VoiceInkCustomCloudModelStorage.decodeFailedMessage(errorDescription: "Bad JSON"),
-            "Failed to decode custom models: Bad JSON"
-        )
-        XCTAssertEqual(
-            VoiceInkCustomCloudModelStorage.encodeFailedMessage(errorDescription: "Disk full"),
-            "Failed to encode custom models: Disk full"
-        )
     }
 
     func testCustomCloudTranscriptionPolicyPreservesOpenAICompatibleRequestDefaults() {

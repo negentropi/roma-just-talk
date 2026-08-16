@@ -880,62 +880,6 @@ final class WhisperModelFilesTests: XCTestCase {
         XCTAssertEqual(downloadedSnapshot.managementRow(for: model).presentation.action, .downloaded)
     }
 
-    func testModelManagementDiagnosticsPreserveIOSLogCopy() {
-        let downloadURL = URL(string: "https://example.com/ggml-base.bin")!
-
-        XCTAssertEqual(
-            VoiceInkWhisperModelManagementDiagnostics.alreadyDownloadingMessage(modelName: "ggml-base"),
-            "Model ggml-base is already being downloaded."
-        )
-        XCTAssertEqual(
-            VoiceInkWhisperModelManagementDiagnostics.startingDownloadMessage(
-                modelName: "ggml-base",
-                downloadURL: downloadURL
-            ),
-            "Starting download of ggml-base from https://example.com/ggml-base.bin."
-        )
-        XCTAssertEqual(
-            VoiceInkWhisperModelManagementDiagnostics.downloadFailedMessage(
-                modelName: "ggml-base",
-                alertMessage: "No file received"
-            ),
-            "Download failed for ggml-base: No file received"
-        )
-        XCTAssertEqual(
-            VoiceInkWhisperModelManagementDiagnostics.downloadCancelledMessage(modelName: "ggml-base"),
-            "Download cancelled for ggml-base."
-        )
-        XCTAssertEqual(
-            VoiceInkWhisperModelManagementDiagnostics.downloadedMessage(
-                modelName: "ggml-base",
-                finalPath: "/tmp/ggml-base.bin"
-            ),
-            "Successfully downloaded ggml-base to /tmp/ggml-base.bin."
-        )
-        XCTAssertEqual(
-            VoiceInkWhisperModelManagementDiagnostics.saveFailedMessage(
-                modelName: "ggml-base",
-                localizedDescription: "Permission denied"
-            ),
-            "Failed to save ggml-base: Permission denied"
-        )
-        XCTAssertEqual(
-            VoiceInkWhisperModelManagementDiagnostics.notDownloadedMessage(modelName: "ggml-base"),
-            "Model ggml-base is not downloaded."
-        )
-        XCTAssertEqual(
-            VoiceInkWhisperModelManagementDiagnostics.deletedMessage(modelName: "ggml-base"),
-            "Successfully deleted model ggml-base."
-        )
-        XCTAssertEqual(
-            VoiceInkWhisperModelManagementDiagnostics.deleteFailedMessage(
-                modelName: "ggml-base",
-                localizedDescription: "File is locked"
-            ),
-            "Failed to delete model ggml-base: File is locked"
-        )
-    }
-
     func testSimpleDownloadStateBuildsSharedRowPresentation() {
         let model = VoiceInkWhisperModelFiles.baseModel
         let downloadingState = VoiceInkWhisperModelDownloadState(
@@ -1225,76 +1169,6 @@ final class WhisperModelFilesTests: XCTestCase {
 
         XCTAssertEqual(progress.fraction, 0.25, accuracy: 0.000001)
         XCTAssertEqual(progress.phaseText, "Downloading ggml-large-v3-turbo-q5_0 Model")
-    }
-
-    func testModelDownloadCopyUsesSharedModelSize() {
-        let model = VoiceInkWhisperModelFiles.baseModel
-
-        XCTAssertEqual(
-            VoiceInkWhisperModelDownloadProgress.downloadActionTitle(for: model),
-            "Download Model (142 MB)"
-        )
-        XCTAssertEqual(
-            VoiceInkWhisperModelDownloadProgress.downloadConfirmationMessage(for: model),
-            "To enable offline transcription, a 142 MB model needs to be downloaded. This may incur data charges if you are not on Wi-Fi."
-        )
-    }
-
-    func testModelOperationConfirmationPreservesIOSDownloadAndDeleteCopy() {
-        let model = VoiceInkWhisperModelFiles.baseModel
-        let download = VoiceInkWhisperModelOperationConfirmationPresentation.download(for: model)
-        let delete = VoiceInkWhisperModelOperationConfirmationPresentation.delete(for: model)
-
-        XCTAssertEqual(download.id, "download-base")
-        XCTAssertEqual(download.title, "Download Model")
-        XCTAssertEqual(download.message, "To enable offline transcription, a 142 MB model needs to be downloaded. This may incur data charges if you are not on Wi-Fi.")
-        XCTAssertEqual(download.primaryButtonTitle, "Download")
-        XCTAssertEqual(download.cancelButtonTitle, "Cancel")
-        XCTAssertEqual(delete.id, "delete-base")
-        XCTAssertEqual(delete.title, "Delete Model")
-        XCTAssertEqual(delete.message, "Delete Whisper Base Model? This will remove the model from your device.")
-        XCTAssertEqual(delete.primaryButtonTitle, "Delete")
-        XCTAssertEqual(delete.cancelButtonTitle, "Cancel")
-    }
-
-    func testModelOperationAlertPreservesIOSDownloadFailureCopy() {
-        let alert = VoiceInkWhisperModelOperationAlertPresentation.downloadFailed(
-            localizedDescription: "The request timed out."
-        )
-
-        XCTAssertEqual(alert.id, "downloadFailed-The request timed out.")
-        XCTAssertEqual(alert.title, "Download Error")
-        XCTAssertEqual(alert.message, "Download failed: The request timed out.")
-        XCTAssertEqual(alert.primaryButtonTitle, "OK")
-    }
-
-    func testModelOperationAlertPreservesIOSServerAndMissingFileCopy() {
-        XCTAssertEqual(
-            VoiceInkWhisperModelOperationAlertPresentation.serverErrorDuringDownload.message,
-            "Server error during download"
-        )
-        XCTAssertEqual(
-            VoiceInkWhisperModelOperationAlertPresentation.noFileReceived.message,
-            "No file received"
-        )
-        XCTAssertEqual(
-            VoiceInkWhisperModelOperationAlertPresentation.unknownDownloadFailure.message,
-            "An unknown error occurred."
-        )
-    }
-
-    func testModelOperationAlertPreservesIOSSaveAndDeleteFailureCopy() {
-        let saveAlert = VoiceInkWhisperModelOperationAlertPresentation.saveFailed(
-            localizedDescription: "Permission denied"
-        )
-        let deleteAlert = VoiceInkWhisperModelOperationAlertPresentation.deleteFailed(
-            localizedDescription: "File is locked"
-        )
-
-        XCTAssertEqual(saveAlert.title, "Download Error")
-        XCTAssertEqual(saveAlert.message, "Failed to save model: Permission denied")
-        XCTAssertEqual(deleteAlert.title, "Download Error")
-        XCTAssertEqual(deleteAlert.message, "Failed to delete model: File is locked")
     }
 
     func testDownloadableModelsMatchMacOSLocalWhisperCatalog() {

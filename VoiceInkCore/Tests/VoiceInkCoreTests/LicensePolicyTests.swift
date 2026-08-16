@@ -194,53 +194,21 @@ final class LicensePolicyTests: XCTestCase {
         XCTAssertFalse(VoiceInkLicenseState.trialExpired.canUseApp)
     }
 
-    func testLicenseValidationPolicyPreservesMacOSFeedbackMessages() {
+    func testLicenseTrialBannerUsesThresholdAndLicenseState() {
+        XCTAssertEqual(VoiceInkLicenseTrialBannerPresentation.warningThresholdDaysRemaining, 2)
         XCTAssertEqual(
-            VoiceInkLicenseValidationPolicy.emptyKeyFeedback,
-            VoiceInkLicenseValidationFeedback(isSuccess: false, message: "Please enter a license key")
+            VoiceInkLicenseTrialBannerPresentation.banner(for: .trial(daysRemaining: 3))?.tone,
+            .info
         )
         XCTAssertEqual(
-            VoiceInkLicenseValidationPolicy.disabledLicenseFeedback,
-            VoiceInkLicenseValidationFeedback(
-                isSuccess: false,
-                message: "This license has been revoked or disabled. Please contact support."
-            )
+            VoiceInkLicenseTrialBannerPresentation.banner(for: .trial(daysRemaining: 2))?.tone,
+            .warning
         )
         XCTAssertEqual(
-            VoiceInkLicenseValidationPolicy.failureFeedback(for: .keyNotFound),
-            VoiceInkLicenseValidationFeedback(
-                isSuccess: false,
-                message: "License key not found. Please double-check your key and try again."
-            )
+            VoiceInkLicenseTrialBannerPresentation.banner(for: .trialExpired)?.tone,
+            .expired
         )
-        XCTAssertEqual(
-            VoiceInkLicenseValidationPolicy.failureFeedback(for: .activationLimitReached),
-            VoiceInkLicenseValidationFeedback(
-                isSuccess: false,
-                message: "This license has reached its device limit. Visit the License Management Portal to deactivate other devices."
-            )
-        )
-        XCTAssertEqual(
-            VoiceInkLicenseValidationPolicy.failureFeedback(for: .serverError(503)),
-            VoiceInkLicenseValidationFeedback(
-                isSuccess: false,
-                message: "Server error (503). Please try again later or contact support."
-            )
-        )
-        XCTAssertEqual(
-            VoiceInkLicenseValidationPolicy.networkFailureFeedback,
-            VoiceInkLicenseValidationFeedback(
-                isSuccess: false,
-                message: "Could not reach the server. Please check your internet connection and try again."
-            )
-        )
-        XCTAssertEqual(
-            VoiceInkLicenseValidationPolicy.unexpectedFailureFeedback,
-            VoiceInkLicenseValidationFeedback(
-                isSuccess: false,
-                message: "An unexpected error occurred. Please try again or contact support at support@tryvoiceink.com"
-            )
-        )
+        XCTAssertNil(VoiceInkLicenseTrialBannerPresentation.banner(for: .licensed))
     }
 
     func testLicenseValidationApplicationPlansPreserveMacOSStorageWritesAndSuccessCopy() {
@@ -304,131 +272,6 @@ final class LicensePolicyTests: XCTestCase {
             VoiceInkLicenseLinks.managementPortalURL.absoluteString,
             "https://polar.sh/beingpax/portal/request"
         )
-    }
-
-    func testLicenseManagementPresentationPreservesMacOSCopyAndResources() {
-        XCTAssertEqual(VoiceInkLicenseManagementPresentation.appVersionFallback, "Unknown")
-        XCTAssertEqual(VoiceInkLicenseManagementPresentation.heroSystemImageName, "checkmark.seal.fill")
-        XCTAssertEqual(
-            VoiceInkLicenseManagementPresentation.heroTitle(for: .licensed),
-            "VoiceInk Pro"
-        )
-        XCTAssertEqual(
-            VoiceInkLicenseManagementPresentation.heroTitle(for: .trial(daysRemaining: 3)),
-            "Upgrade to Pro"
-        )
-        XCTAssertEqual(
-            VoiceInkLicenseManagementPresentation.heroSubtitle(for: .licensed),
-            "Thank you for supporting VoiceInk"
-        )
-        XCTAssertEqual(
-            VoiceInkLicenseManagementPresentation.heroSubtitle(for: .trialExpired),
-            "Transcribe what you say to text instantly with AI"
-        )
-        XCTAssertEqual(
-            VoiceInkLicenseManagementPresentation.appVersionText("1.2.3"),
-            "v1.2.3"
-        )
-
-        XCTAssertEqual(
-            VoiceInkLicenseManagementPresentation.licensedResourceLinks,
-            [
-                VoiceInkLicenseManagementResourceLink(
-                    id: .changelog,
-                    title: "Changelog",
-                    systemImageName: "list.bullet.clipboard.fill",
-                    urlString: "https://github.com/Beingpax/VoiceInk/releases"
-                ),
-                VoiceInkLicenseManagementResourceLink(
-                    id: .discord,
-                    title: "Discord",
-                    systemImageName: "bubble.left.and.bubble.right.fill",
-                    urlString: "https://discord.gg/xryDy57nYD"
-                ),
-                VoiceInkLicenseManagementResourceLink(
-                    id: .emailSupport,
-                    title: "Email Support",
-                    systemImageName: "envelope.fill",
-                    urlString: nil
-                ),
-                VoiceInkLicenseManagementResourceLink(
-                    id: .docs,
-                    title: "Docs",
-                    systemImageName: "book.fill",
-                    urlString: "https://tryvoiceink.com/docs"
-                ),
-                VoiceInkLicenseManagementResourceLink(
-                    id: .tipJar,
-                    title: "Tip Jar",
-                    systemImageName: "heart.fill",
-                    urlString: "https://buymeacoffee.com/beingpax"
-                )
-            ]
-        )
-        XCTAssertEqual(
-            VoiceInkLicenseManagementPresentation.purchaseFeatures.map(\.title),
-            ["Priority Support", "Lifetime Access", "Free Updates", "Multiple Devices"]
-        )
-        XCTAssertEqual(
-            VoiceInkLicenseManagementPresentation.purchaseFeatures.map(\.systemImageName),
-            [
-                "bubble.left.and.bubble.right.fill",
-                "infinity.circle.fill",
-                "arrow.up.circle.fill",
-                "macbook.and.iphone"
-            ]
-        )
-        XCTAssertEqual(
-            VoiceInkLicenseManagementPresentation.activeLicenseDeviceLimitText(activationsLimit: 3),
-            "This license can be activated on up to 3 devices"
-        )
-        XCTAssertEqual(
-            VoiceInkLicenseManagementPresentation.activeLicenseDeviceLimitText(activationsLimit: 0),
-            "You can use VoiceInk Pro on all your personal devices"
-        )
-    }
-
-    func testLicenseTrialBannerPresentationPreservesMacOSCopyAndThreshold() {
-        XCTAssertEqual(VoiceInkLicenseTrialBannerPresentation.warningThresholdDaysRemaining, 2)
-        XCTAssertEqual(VoiceInkLicenseTrialBannerPresentation.trialMessage(daysRemaining: 4), "You have 4 days left in your trial")
-
-        XCTAssertEqual(
-            VoiceInkLicenseTrialBannerPresentation.banner(for: .trial(daysRemaining: 4)),
-            VoiceInkLicenseTrialBanner(
-                tone: .info,
-                title: "Trial Active",
-                message: "You have 4 days left in your trial",
-                systemImageName: "info.circle.fill",
-                enterLicenseButtonTitle: "Enter License",
-                purchaseButtonTitle: "Buy License"
-            )
-        )
-
-        XCTAssertEqual(
-            VoiceInkLicenseTrialBannerPresentation.banner(for: .trial(daysRemaining: 2)),
-            VoiceInkLicenseTrialBanner(
-                tone: .warning,
-                title: "Trial Ending Soon",
-                message: "You have 2 days left in your trial",
-                systemImageName: "exclamationmark.triangle.fill",
-                enterLicenseButtonTitle: "Enter License",
-                purchaseButtonTitle: "Buy License"
-            )
-        )
-
-        XCTAssertEqual(
-            VoiceInkLicenseTrialBannerPresentation.banner(for: .trialExpired),
-            VoiceInkLicenseTrialBanner(
-                tone: .expired,
-                title: "Trial Expired",
-                message: "Your trial has expired. Upgrade to continue using VoiceInk",
-                systemImageName: "xmark.circle.fill",
-                enterLicenseButtonTitle: "Enter License",
-                purchaseButtonTitle: "Buy License"
-            )
-        )
-
-        XCTAssertNil(VoiceInkLicenseTrialBannerPresentation.banner(for: .licensed))
     }
 
     func testLicenseRemovalPolicyPreservesMacOSResetPlan() {

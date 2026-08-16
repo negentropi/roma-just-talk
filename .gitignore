@@ -34,6 +34,8 @@ build/
 .local-build/
 .vercel/
 /landing-vercel/alts/*
+/.omo/evidence/
+.playwright-cli/
 
 # CocoaPods
 #

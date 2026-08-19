@@ -83,6 +83,7 @@ final class RuntimeVoiceInkSession {
         let resolution = try resolveApplication(configuration: configuration)
         let runningPaths = runningApplications(bundleIdentifier: configuration.voiceInkBundleIdentifier)
             .compactMap { $0.bundleURL?.path }
+            .map { restorableApplicationPath($0, configuration: configuration) }
             .sorted()
         let snapshot = preferenceSnapshot(bundleIdentifier: configuration.voiceInkBundleIdentifier)
         guard snapshot.legacyKeyboardMigrationComplete,
@@ -302,6 +303,22 @@ final class RuntimeVoiceInkSession {
             throw RuntimeVoiceInkSessionError.applicationNotFound(bundleIdentifier)
         }
         return selection
+    }
+
+    private static func restorableApplicationPath(
+        _ runningPath: String,
+        configuration: RuntimeHarnessConfiguration
+    ) -> String {
+        guard runningPath.contains("/AppTranslocation/") else { return runningPath }
+        let buildDirectoryPath = NSString(
+            string: configuration.voiceInkBuildDirectory
+        ).expandingTildeInPath
+        let candidate = URL(fileURLWithPath: buildDirectoryPath, isDirectory: true)
+            .appendingPathComponent(URL(fileURLWithPath: runningPath).lastPathComponent)
+        guard Bundle(url: candidate)?.bundleIdentifier == configuration.voiceInkBundleIdentifier else {
+            return runningPath
+        }
+        return candidate.path
     }
 
     private static func preferenceSnapshot(

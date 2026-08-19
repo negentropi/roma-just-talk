@@ -135,6 +135,7 @@ final class RuntimePreparedTarget {
     }
 
     func interactionSnapshot() -> RuntimeTargetInteractionSnapshot {
+        refreshInteractionElements()
         let selection = RuntimeAX.selectedTextRange(from: textElement)
         let focusedElement = RuntimeAX.focusedElement(in: appElement)
         let pointer = NSEvent.mouseLocation
@@ -283,6 +284,7 @@ final class RuntimePreparedTarget {
     }
 
     func cleanup() -> RuntimeTargetCleanupInfo {
+        refreshInteractionElements()
         var errors: [String] = []
         let runningApplication = NSRunningApplication(processIdentifier: info.processIdentifier)
         let application = runningApplication.flatMap {
@@ -389,6 +391,21 @@ final class RuntimePreparedTarget {
             restoredFrontmostApplication: restoredFrontmostApplication,
             errors: errors
         )
+    }
+
+    private func refreshInteractionElements() {
+        if let refreshedWindow = RuntimeAX.window(
+            containing: info.windowTitleToken,
+            in: appElement
+        ) {
+            windowElement = refreshedWindow
+        }
+        if let refreshedTextElement = RuntimeAX.editableElement(
+            in: windowElement,
+            identifying: info.windowTitleToken
+        ) ?? RuntimeAX.firstEditableElement(in: windowElement) {
+            textElement = refreshedTextElement
+        }
     }
 }
 

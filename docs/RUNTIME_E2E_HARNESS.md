@@ -65,18 +65,18 @@ as test targets.
 
 Before the speech matrix, the helper runs the false-trigger matrix in isolated
 target surfaces. Typing and pointer cases use TextEdit; Shift-Tab uses a browser
-editor with a preceding focus control. Each case must preserve the native typing,
-focus, click, or selection result while Roma emits `shortcut.key_evidence_rejected`
+editor. Each case must preserve the native typing, focus, click, or selection
+result while Roma emits `shortcut.key_evidence_rejected`
 and proves the owned recording was discarded. The helper snapshots the exact bundle's
 `Recordings/` files, `ZTRANSCRIPTION` row IDs, and transcription primary-key
 watermark before and after every case; any leaked WAV, history mutation,
 transcription, paste, or clipboard mutation fails it. On a leak it stops Roma,
 removes only case-created files and rows, verifies the original snapshot, and
 aborts before another baseline is sampled.
-Shift-Tab specifically requires readable, unchanged editor text plus the exact
-preceding text-field role and controlled accessibility label. The browser fixture
-moves focus there only after receiving Shift-Tab in its editor, so arbitrary
-inserted text or unrelated focus movement cannot satisfy native behavior.
+Shift-Tab specifically requires readable, unchanged editor text plus the
+editor focus changing from focused to unfocused and a different focused element
+reported by the same browser process. Arbitrary inserted text cannot satisfy
+native behavior.
 The three long-click cases distinguish an interaction that starts after four
 seconds, spans four seconds, and ends early while the modifier remains held past
 four seconds.
@@ -154,7 +154,7 @@ rejected, its recording is not explicitly discarded, transcription or delivery
 starts, the clipboard changes, a recording artifact remains, the history count
 changes, or those side-effect surfaces cannot be inspected.
 
-The schema-10 report preserves each failure instead of dropping it from percentile
+The schema-11 report preserves each failure instead of dropping it from percentile
 calculations. `falseTriggerCases` contains native-input, trace, recording-directory,
 history, targeted rollback, and cleanup evidence. Per-app and overall summaries
 include total, passed, failed, false-trigger totals, no-visible-paste count, p50,

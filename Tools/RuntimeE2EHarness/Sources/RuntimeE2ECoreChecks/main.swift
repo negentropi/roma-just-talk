@@ -84,7 +84,7 @@ do {
     try require(falseScenarios.count == 10, "the default false-trigger matrix should contain ten cases")
     try require(
         falseScenarios["shift-tab"]?.targetIDs == ["chrome"],
-        "Shift-Tab must use the browser fixture with a deterministic previous focus target"
+        "Shift-Tab must use the browser fixture with observable focus evidence"
     )
     try require(
         RuntimeFalseTriggerPlan.missingTargetScenarioIDs(
@@ -155,6 +155,34 @@ do {
         ),
         "Shift-A cannot pass without an observable native result"
     )
+    let shiftTabFocusResult = RuntimeFalseTriggerNativeSnapshot(
+        text: "",
+        selectionLocation: 0,
+        selectionLength: 0,
+        textElementFocused: false,
+        focusedRole: "AXButton",
+        focusedTitle: nil,
+        pointerX: 10,
+        pointerY: 10
+    )
+    try require(
+        !RuntimeFalseTriggerNativeBehaviorPolicy.isSatisfied(
+            kind: .shiftTab,
+            expectedInsertedText: nil,
+            before: RuntimeFalseTriggerNativeSnapshot(
+                text: "",
+                selectionLocation: 0,
+                selectionLength: 0,
+                textElementFocused: true,
+                focusedRole: nil,
+                focusedTitle: nil,
+                pointerX: 10,
+                pointerY: 10
+            ),
+            after: shiftTabFocusResult
+        ),
+        "Shift-Tab must reject missing pre-interaction browser focus evidence"
+    )
     try require(
         !RuntimeFalseTriggerNativeBehaviorPolicy.isSatisfied(
             kind: .shiftTab,
@@ -165,25 +193,14 @@ do {
                 selectionLocation: 0,
                 selectionLength: 0,
                 textElementFocused: true,
-                focusedRole: "AXTextField",
+                focusedRole: "AXButton",
                 focusedTitle: "",
-                focusedDescription: RuntimeFalseTriggerNativeBehaviorPolicy.shiftTabFocusTargetAccessibilityLabel,
+                focusedDescription: "Browser control",
                 pointerX: 10,
                 pointerY: 10
             )
         ),
         "Shift-Tab must prove that focus left the editor"
-    )
-    let shiftTabFocusResult = RuntimeFalseTriggerNativeSnapshot(
-        text: "",
-        selectionLocation: 0,
-        selectionLength: 0,
-        textElementFocused: false,
-        focusedRole: "AXTextField",
-        focusedTitle: "",
-        focusedDescription: RuntimeFalseTriggerNativeBehaviorPolicy.shiftTabFocusTargetAccessibilityLabel,
-        pointerX: 10,
-        pointerY: 10
     )
     try require(
         RuntimeFalseTriggerNativeBehaviorPolicy.isSatisfied(
@@ -192,7 +209,44 @@ do {
             before: nativeBaseline,
             after: shiftTabFocusResult
         ),
-        "Shift-Tab must prove unchanged editor text plus focus on the fixture text field"
+        "Shift-Tab must prove unchanged editor text plus a different browser focus target"
+    )
+    try require(
+        RuntimeFalseTriggerNativeBehaviorPolicy.isSatisfied(
+            kind: .shiftTab,
+            expectedInsertedText: nil,
+            before: nativeBaseline,
+            after: RuntimeFalseTriggerNativeSnapshot(
+                text: "",
+                selectionLocation: 0,
+                selectionLength: 0,
+                textElementFocused: false,
+                focusedRole: "AXTextArea",
+                focusedTitle: "Browser control",
+                pointerX: 10,
+                pointerY: 10
+            )
+        ),
+        "Shift-Tab may prove a different same-role browser target by title"
+    )
+    try require(
+        RuntimeFalseTriggerNativeBehaviorPolicy.isSatisfied(
+            kind: .shiftTab,
+            expectedInsertedText: nil,
+            before: nativeBaseline,
+            after: RuntimeFalseTriggerNativeSnapshot(
+                text: "",
+                selectionLocation: 0,
+                selectionLength: 0,
+                textElementFocused: false,
+                focusedRole: "AXTextArea",
+                focusedTitle: nil,
+                focusedDescription: "Browser control",
+                pointerX: 10,
+                pointerY: 10
+            )
+        ),
+        "Shift-Tab may prove a different same-role browser target by description"
     )
     try require(
         !RuntimeFalseTriggerNativeBehaviorPolicy.isSatisfied(
@@ -240,9 +294,9 @@ do {
                 selectionLocation: 0,
                 selectionLength: 0,
                 textElementFocused: nil,
-                focusedRole: "AXTextField",
+                focusedRole: "AXButton",
                 focusedTitle: "",
-                focusedDescription: RuntimeFalseTriggerNativeBehaviorPolicy.shiftTabFocusTargetAccessibilityLabel,
+                focusedDescription: "Browser control",
                 pointerX: 10,
                 pointerY: 10
             )
@@ -268,9 +322,9 @@ do {
                 selectionLocation: 0,
                 selectionLength: 0,
                 textElementFocused: false,
-                focusedRole: "AXTextField",
+                focusedRole: "AXButton",
                 focusedTitle: "",
-                focusedDescription: RuntimeFalseTriggerNativeBehaviorPolicy.shiftTabFocusTargetAccessibilityLabel,
+                focusedDescription: "Browser control",
                 pointerX: 10,
                 pointerY: 10
             )
@@ -287,14 +341,13 @@ do {
                 selectionLocation: 0,
                 selectionLength: 0,
                 textElementFocused: false,
-                focusedRole: "AXTextField",
-                focusedTitle: "",
-                focusedDescription: "Unrelated control",
+                focusedRole: "AXTextArea",
+                focusedTitle: nil,
                 pointerX: 10,
                 pointerY: 10
             )
         ),
-        "Shift-Tab must focus the fixture's exact previous control"
+        "Shift-Tab must reject unchanged browser focus identity"
     )
     try require(
         !RuntimeFalseTriggerNativeBehaviorPolicy.isSatisfied(
@@ -306,14 +359,14 @@ do {
                 selectionLocation: 0,
                 selectionLength: 0,
                 textElementFocused: false,
-                focusedRole: "AXButton",
+                focusedRole: nil,
                 focusedTitle: "",
-                focusedDescription: RuntimeFalseTriggerNativeBehaviorPolicy.shiftTabFocusTargetAccessibilityLabel,
+                focusedDescription: "Browser control",
                 pointerX: 10,
                 pointerY: 10
             )
         ),
-        "Shift-Tab must reject the controlled label on the wrong role"
+        "Shift-Tab must reject missing browser focus evidence"
     )
     try require(
         !RuntimeFalseTriggerNativeBehaviorPolicy.isSatisfied(
@@ -325,9 +378,9 @@ do {
                 selectionLocation: 0,
                 selectionLength: 0,
                 textElementFocused: false,
-                focusedRole: "AXTextField",
+                focusedRole: "AXButton",
                 focusedTitle: "",
-                focusedDescription: RuntimeFalseTriggerNativeBehaviorPolicy.shiftTabFocusTargetAccessibilityLabel,
+                focusedDescription: "Browser control",
                 pointerX: 10,
                 pointerY: 10
             )

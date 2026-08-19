@@ -702,12 +702,10 @@ enum RuntimeTargetController {
             <title>\(escapedTitle)</title>
             <style>
               body { margin: 40px; font: 18px -apple-system, sans-serif; }
-              #previous-focus { display: block; margin-bottom: 12px; }
               #target { width: 900px; height: 420px; padding: 8px; border: 1px solid; font: 20px -apple-system, sans-serif; white-space: pre-wrap; }
               #paste-proof { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
             </style>
             <div>\(editableLabel)</div>
-            <input id="previous-focus" type="text" aria-label="\(RuntimeFalseTriggerNativeBehaviorPolicy.shiftTabFocusTargetAccessibilityLabel)" value="\(RuntimeFalseTriggerNativeBehaviorPolicy.shiftTabFocusTargetValue)">
             <div id="target" role="textbox" aria-label="\(editableLabel)" aria-multiline="true" contenteditable="true" spellcheck="false">\(escapedInitialText)</div>
             <div id="paste-proof" role="status" aria-label="\(escapedPasteProofToken) pasteEvents=0 pasteInputs=0">\(escapedPasteProofToken) pasteEvents=0 pasteInputs=0</div>
             <script>
@@ -745,11 +743,6 @@ enum RuntimeTargetController {
                   updatePasteProof();
                 }
                 pasteObserved = false;
-              });
-              target.addEventListener('keydown', event => {
-                if (event.key !== 'Tab' || !event.shiftKey) return;
-                event.preventDefault();
-                document.getElementById('previous-focus').focus();
               });
               const observer = new MutationObserver(() => {
                 if (target.textContent === acceptedText) return;

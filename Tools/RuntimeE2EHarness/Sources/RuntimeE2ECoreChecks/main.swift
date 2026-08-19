@@ -160,9 +160,19 @@ do {
             kind: .shiftTab,
             expectedInsertedText: nil,
             before: nativeBaseline,
-            after: nativeBaseline
+            after: RuntimeFalseTriggerNativeSnapshot(
+                text: "",
+                selectionLocation: 0,
+                selectionLength: 0,
+                textElementFocused: true,
+                focusedRole: "AXButton",
+                focusedTitle: "",
+                focusedDescription: RuntimeFalseTriggerNativeBehaviorPolicy.shiftTabFocusTargetAccessibilityLabel,
+                pointerX: 10,
+                pointerY: 10
+            )
         ),
-        "Shift-Tab cannot pass on unchanged focus, selection, and text"
+        "Shift-Tab must prove that focus left the editor"
     )
     let shiftTabFocusResult = RuntimeFalseTriggerNativeSnapshot(
         text: "",
@@ -183,6 +193,24 @@ do {
             after: shiftTabFocusResult
         ),
         "Shift-Tab must prove unchanged editor text plus focus on the fixture button"
+    )
+    try require(
+        !RuntimeFalseTriggerNativeBehaviorPolicy.isSatisfied(
+            kind: .shiftTab,
+            expectedInsertedText: nil,
+            before: RuntimeFalseTriggerNativeSnapshot(
+                text: "",
+                selectionLocation: 0,
+                selectionLength: 0,
+                textElementFocused: false,
+                focusedRole: "AXTextArea",
+                focusedTitle: nil,
+                pointerX: 10,
+                pointerY: 10
+            ),
+            after: shiftTabFocusResult
+        ),
+        "Shift-Tab must prove that the editor was focused before interaction"
     )
     try require(
         !RuntimeFalseTriggerNativeBehaviorPolicy.isSatisfied(

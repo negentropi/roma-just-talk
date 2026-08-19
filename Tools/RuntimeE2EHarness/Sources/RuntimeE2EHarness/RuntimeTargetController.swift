@@ -707,7 +707,7 @@ enum RuntimeTargetController {
               #paste-proof { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
             </style>
             <div>\(editableLabel)</div>
-            <button id="previous-focus" type="button" aria-label="\(RuntimeFalseTriggerNativeBehaviorPolicy.shiftTabFocusTargetAccessibilityLabel)">\(RuntimeFalseTriggerNativeBehaviorPolicy.shiftTabFocusTargetTitle)</button>
+            <input id="previous-focus" type="text" aria-label="\(RuntimeFalseTriggerNativeBehaviorPolicy.shiftTabFocusTargetAccessibilityLabel)" value="\(RuntimeFalseTriggerNativeBehaviorPolicy.shiftTabFocusTargetValue)">
             <div id="target" role="textbox" aria-label="\(editableLabel)" aria-multiline="true" contenteditable="true" spellcheck="false">\(escapedInitialText)</div>
             <div id="paste-proof" role="status" aria-label="\(escapedPasteProofToken) pasteEvents=0 pasteInputs=0">\(escapedPasteProofToken) pasteEvents=0 pasteInputs=0</div>
             <script>
@@ -833,7 +833,10 @@ enum RuntimeTargetController {
             for application in applications {
                 let appElement = AXUIElementCreateApplication(application.processIdentifier)
                 if let windowElement = RuntimeAX.window(containing: windowTitleToken, in: appElement),
-                   let textElement = RuntimeAX.firstEditableElement(in: windowElement) {
+                   let textElement = RuntimeAX.editableElement(
+                       in: windowElement,
+                       identifying: windowTitleToken
+                   ) ?? RuntimeAX.firstEditableElement(in: windowElement) {
                     return TargetSurface(
                         application: application,
                         appElement: appElement,

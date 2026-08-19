@@ -65,7 +65,7 @@ public struct RuntimeFalseTriggerNativeSnapshot: Codable, Equatable, Sendable {
 }
 
 public enum RuntimeFalseTriggerNativeBehaviorPolicy {
-    public static let shiftTabFocusTargetTitle = "Previous focus target"
+    public static let shiftTabFocusTargetValue = "Previous focus target"
     public static let shiftTabFocusTargetAccessibilityLabel = "Roma Runtime E2E previous focus target"
 
     public static func isSatisfied(
@@ -90,7 +90,7 @@ public enum RuntimeFalseTriggerNativeBehaviorPolicy {
             }
             return before.textElementFocused == true
                 && after.textElementFocused == false
-                && after.focusedRole == "AXButton"
+                && after.focusedRole == "AXTextField"
                 && after.focusedDescription == shiftTabFocusTargetAccessibilityLabel
         case .pointerMove:
             return before.text == after.text

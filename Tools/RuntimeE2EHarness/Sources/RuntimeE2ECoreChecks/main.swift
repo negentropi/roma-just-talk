@@ -165,7 +165,7 @@ do {
                 selectionLocation: 0,
                 selectionLength: 0,
                 textElementFocused: true,
-                focusedRole: "AXButton",
+                focusedRole: "AXTextField",
                 focusedTitle: "",
                 focusedDescription: RuntimeFalseTriggerNativeBehaviorPolicy.shiftTabFocusTargetAccessibilityLabel,
                 pointerX: 10,
@@ -179,7 +179,7 @@ do {
         selectionLocation: 0,
         selectionLength: 0,
         textElementFocused: false,
-        focusedRole: "AXButton",
+        focusedRole: "AXTextField",
         focusedTitle: "",
         focusedDescription: RuntimeFalseTriggerNativeBehaviorPolicy.shiftTabFocusTargetAccessibilityLabel,
         pointerX: 10,
@@ -192,7 +192,7 @@ do {
             before: nativeBaseline,
             after: shiftTabFocusResult
         ),
-        "Shift-Tab must prove unchanged editor text plus focus on the fixture button"
+        "Shift-Tab must prove unchanged editor text plus focus on the fixture text field"
     )
     try require(
         !RuntimeFalseTriggerNativeBehaviorPolicy.isSatisfied(
@@ -240,7 +240,7 @@ do {
                 selectionLocation: 0,
                 selectionLength: 0,
                 textElementFocused: nil,
-                focusedRole: "AXButton",
+                focusedRole: "AXTextField",
                 focusedTitle: "",
                 focusedDescription: RuntimeFalseTriggerNativeBehaviorPolicy.shiftTabFocusTargetAccessibilityLabel,
                 pointerX: 10,
@@ -268,7 +268,7 @@ do {
                 selectionLocation: 0,
                 selectionLength: 0,
                 textElementFocused: false,
-                focusedRole: "AXButton",
+                focusedRole: "AXTextField",
                 focusedTitle: "",
                 focusedDescription: RuntimeFalseTriggerNativeBehaviorPolicy.shiftTabFocusTargetAccessibilityLabel,
                 pointerX: 10,
@@ -287,7 +287,7 @@ do {
                 selectionLocation: 0,
                 selectionLength: 0,
                 textElementFocused: false,
-                focusedRole: "AXButton",
+                focusedRole: "AXTextField",
                 focusedTitle: "",
                 focusedDescription: "Unrelated control",
                 pointerX: 10,
@@ -306,7 +306,7 @@ do {
                 selectionLocation: 0,
                 selectionLength: 0,
                 textElementFocused: false,
-                focusedRole: "AXCheckBox",
+                focusedRole: "AXButton",
                 focusedTitle: "",
                 focusedDescription: RuntimeFalseTriggerNativeBehaviorPolicy.shiftTabFocusTargetAccessibilityLabel,
                 pointerX: 10,
@@ -325,7 +325,7 @@ do {
                 selectionLocation: 0,
                 selectionLength: 0,
                 textElementFocused: false,
-                focusedRole: "AXButton",
+                focusedRole: "AXTextField",
                 focusedTitle: "",
                 focusedDescription: RuntimeFalseTriggerNativeBehaviorPolicy.shiftTabFocusTargetAccessibilityLabel,
                 pointerX: 10,

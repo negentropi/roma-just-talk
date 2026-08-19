@@ -74,8 +74,9 @@ transcription, paste, or clipboard mutation fails it. On a leak it stops Roma,
 removes only case-created files and rows, verifies the original snapshot, and
 aborts before another baseline is sampled.
 Shift-Tab specifically requires readable, unchanged editor text plus the exact
-preceding button role and controlled accessibility label; arbitrary inserted text
-or unrelated focus movement cannot satisfy native behavior.
+preceding text-field role and controlled accessibility label. Text fields remain
+in the default macOS Tab loop when buttons do not; arbitrary inserted text or
+unrelated focus movement cannot satisfy native behavior.
 The three long-click cases distinguish an interaction that starts after four
 seconds, spans four seconds, and ends early while the modifier remains held past
 four seconds.

@@ -150,6 +150,9 @@ final class RuntimePreparedTarget {
             focusedTitle: focusedElement.flatMap {
                 RuntimeAX.stringAttribute(kAXTitleAttribute, from: $0)
             },
+            focusedDescription: focusedElement.flatMap {
+                RuntimeAX.stringAttribute(kAXDescriptionAttribute, from: $0)
+            },
             pointerX: pointer.x,
             pointerY: pointer.y
         )
@@ -704,7 +707,7 @@ enum RuntimeTargetController {
               #paste-proof { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
             </style>
             <div>\(editableLabel)</div>
-            <button id="previous-focus" type="button">\(RuntimeFalseTriggerNativeBehaviorPolicy.shiftTabFocusTargetTitle)</button>
+            <button id="previous-focus" type="button" aria-label="\(RuntimeFalseTriggerNativeBehaviorPolicy.shiftTabFocusTargetAccessibilityLabel)">\(RuntimeFalseTriggerNativeBehaviorPolicy.shiftTabFocusTargetTitle)</button>
             <div id="target" role="textbox" aria-label="\(editableLabel)" aria-multiline="true" contenteditable="true" spellcheck="false">\(escapedInitialText)</div>
             <div id="paste-proof" role="status" aria-label="\(escapedPasteProofToken) pasteEvents=0 pasteInputs=0">\(escapedPasteProofToken) pasteEvents=0 pasteInputs=0</div>
             <script>

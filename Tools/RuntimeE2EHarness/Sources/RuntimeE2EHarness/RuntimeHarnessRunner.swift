@@ -69,7 +69,7 @@ struct RuntimeRunSummary: Codable {
 }
 
 struct RuntimeHarnessReport: Codable {
-    var schemaVersion = 9
+    var schemaVersion = 10
     let startedAt: Date
     var finishedAt: Date?
     let configuration: RuntimeHarnessConfiguration

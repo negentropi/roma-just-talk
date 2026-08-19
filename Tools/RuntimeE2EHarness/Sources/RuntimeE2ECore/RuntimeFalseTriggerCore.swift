@@ -37,6 +37,7 @@ public struct RuntimeFalseTriggerNativeSnapshot: Codable, Equatable, Sendable {
     public let textElementFocused: Bool?
     public let focusedRole: String?
     public let focusedTitle: String?
+    public let focusedDescription: String?
     public let pointerX: Double
     public let pointerY: Double
 
@@ -47,6 +48,7 @@ public struct RuntimeFalseTriggerNativeSnapshot: Codable, Equatable, Sendable {
         textElementFocused: Bool?,
         focusedRole: String?,
         focusedTitle: String?,
+        focusedDescription: String? = nil,
         pointerX: Double,
         pointerY: Double
     ) {
@@ -56,6 +58,7 @@ public struct RuntimeFalseTriggerNativeSnapshot: Codable, Equatable, Sendable {
         self.textElementFocused = textElementFocused
         self.focusedRole = focusedRole
         self.focusedTitle = focusedTitle
+        self.focusedDescription = focusedDescription
         self.pointerX = pointerX
         self.pointerY = pointerY
     }
@@ -63,6 +66,7 @@ public struct RuntimeFalseTriggerNativeSnapshot: Codable, Equatable, Sendable {
 
 public enum RuntimeFalseTriggerNativeBehaviorPolicy {
     public static let shiftTabFocusTargetTitle = "Previous focus target"
+    public static let shiftTabFocusTargetAccessibilityLabel = "Roma Runtime E2E previous focus target"
 
     public static func isSatisfied(
         kind: RuntimeFalseTriggerKind,
@@ -87,7 +91,7 @@ public enum RuntimeFalseTriggerNativeBehaviorPolicy {
             return before.textElementFocused == true
                 && after.textElementFocused == false
                 && after.focusedRole == "AXButton"
-                && after.focusedTitle == shiftTabFocusTargetTitle
+                && after.focusedDescription == shiftTabFocusTargetAccessibilityLabel
         case .pointerMove:
             return before.text == after.text
                 && hypot(after.pointerX - before.pointerX, after.pointerY - before.pointerY) >= 5

@@ -73,9 +73,9 @@ watermark before and after every case; any leaked WAV, history mutation,
 transcription, paste, or clipboard mutation fails it. On a leak it stops Roma,
 removes only case-created files and rows, verifies the original snapshot, and
 aborts before another baseline is sampled.
-Shift-Tab specifically requires readable, unchanged editor text plus focus on the
-fixture's exact preceding button; arbitrary inserted text or unrelated focus
-movement cannot satisfy native behavior.
+Shift-Tab specifically requires readable, unchanged editor text plus the exact
+preceding button role and controlled accessibility label; arbitrary inserted text
+or unrelated focus movement cannot satisfy native behavior.
 The three long-click cases distinguish an interaction that starts after four
 seconds, spans four seconds, and ends early while the modifier remains held past
 four seconds.
@@ -153,7 +153,7 @@ rejected, its recording is not explicitly discarded, transcription or delivery
 starts, the clipboard changes, a recording artifact remains, the history count
 changes, or those side-effect surfaces cannot be inspected.
 
-The schema-9 report preserves each failure instead of dropping it from percentile
+The schema-10 report preserves each failure instead of dropping it from percentile
 calculations. `falseTriggerCases` contains native-input, trace, recording-directory,
 history, targeted rollback, and cleanup evidence. Per-app and overall summaries
 include total, passed, failed, false-trigger totals, no-visible-paste count, p50,

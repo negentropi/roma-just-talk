@@ -170,7 +170,8 @@ do {
         selectionLength: 0,
         textElementFocused: false,
         focusedRole: "AXButton",
-        focusedTitle: RuntimeFalseTriggerNativeBehaviorPolicy.shiftTabFocusTargetTitle,
+        focusedTitle: "",
+        focusedDescription: RuntimeFalseTriggerNativeBehaviorPolicy.shiftTabFocusTargetAccessibilityLabel,
         pointerX: 10,
         pointerY: 10
     )
@@ -203,7 +204,8 @@ do {
                 selectionLength: 0,
                 textElementFocused: false,
                 focusedRole: "AXButton",
-                focusedTitle: RuntimeFalseTriggerNativeBehaviorPolicy.shiftTabFocusTargetTitle,
+                focusedTitle: "",
+                focusedDescription: RuntimeFalseTriggerNativeBehaviorPolicy.shiftTabFocusTargetAccessibilityLabel,
                 pointerX: 10,
                 pointerY: 10
             )
@@ -221,7 +223,8 @@ do {
                 selectionLength: 0,
                 textElementFocused: false,
                 focusedRole: "AXButton",
-                focusedTitle: "Unrelated control",
+                focusedTitle: "",
+                focusedDescription: "Unrelated control",
                 pointerX: 10,
                 pointerY: 10
             )
@@ -234,12 +237,32 @@ do {
             expectedInsertedText: nil,
             before: nativeBaseline,
             after: RuntimeFalseTriggerNativeSnapshot(
+                text: "",
+                selectionLocation: 0,
+                selectionLength: 0,
+                textElementFocused: false,
+                focusedRole: "AXCheckBox",
+                focusedTitle: "",
+                focusedDescription: RuntimeFalseTriggerNativeBehaviorPolicy.shiftTabFocusTargetAccessibilityLabel,
+                pointerX: 10,
+                pointerY: 10
+            )
+        ),
+        "Shift-Tab must reject the controlled label on the wrong role"
+    )
+    try require(
+        !RuntimeFalseTriggerNativeBehaviorPolicy.isSatisfied(
+            kind: .shiftTab,
+            expectedInsertedText: nil,
+            before: nativeBaseline,
+            after: RuntimeFalseTriggerNativeSnapshot(
                 text: "unexpected transcript",
                 selectionLocation: 0,
                 selectionLength: 0,
                 textElementFocused: false,
                 focusedRole: "AXButton",
-                focusedTitle: RuntimeFalseTriggerNativeBehaviorPolicy.shiftTabFocusTargetTitle,
+                focusedTitle: "",
+                focusedDescription: RuntimeFalseTriggerNativeBehaviorPolicy.shiftTabFocusTargetAccessibilityLabel,
                 pointerX: 10,
                 pointerY: 10
             )

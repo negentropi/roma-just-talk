@@ -217,6 +217,43 @@ do {
             kind: .shiftTab,
             expectedInsertedText: nil,
             before: RuntimeFalseTriggerNativeSnapshot(
+                text: "",
+                selectionLocation: 0,
+                selectionLength: 0,
+                textElementFocused: nil,
+                focusedRole: "AXTextArea",
+                focusedTitle: nil,
+                pointerX: 10,
+                pointerY: 10
+            ),
+            after: shiftTabFocusResult
+        ),
+        "Shift-Tab must reject unreadable pre-interaction focus evidence"
+    )
+    try require(
+        !RuntimeFalseTriggerNativeBehaviorPolicy.isSatisfied(
+            kind: .shiftTab,
+            expectedInsertedText: nil,
+            before: nativeBaseline,
+            after: RuntimeFalseTriggerNativeSnapshot(
+                text: "",
+                selectionLocation: 0,
+                selectionLength: 0,
+                textElementFocused: nil,
+                focusedRole: "AXButton",
+                focusedTitle: "",
+                focusedDescription: RuntimeFalseTriggerNativeBehaviorPolicy.shiftTabFocusTargetAccessibilityLabel,
+                pointerX: 10,
+                pointerY: 10
+            )
+        ),
+        "Shift-Tab must reject unreadable post-interaction focus evidence"
+    )
+    try require(
+        !RuntimeFalseTriggerNativeBehaviorPolicy.isSatisfied(
+            kind: .shiftTab,
+            expectedInsertedText: nil,
+            before: RuntimeFalseTriggerNativeSnapshot(
                 text: nil,
                 selectionLocation: 0,
                 selectionLength: 0,

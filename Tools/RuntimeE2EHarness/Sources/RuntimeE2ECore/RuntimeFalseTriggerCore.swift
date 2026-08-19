@@ -62,6 +62,8 @@ public struct RuntimeFalseTriggerNativeSnapshot: Codable, Equatable, Sendable {
 }
 
 public enum RuntimeFalseTriggerNativeBehaviorPolicy {
+    public static let shiftTabFocusTargetTitle = "Previous focus target"
+
     public static func isSatisfied(
         kind: RuntimeFalseTriggerKind,
         expectedInsertedText: String?,
@@ -77,9 +79,15 @@ public enum RuntimeFalseTriggerNativeBehaviorPolicy {
             }
             return afterText == beforeText + expectedInsertedText
         case .shiftTab:
-            return before.text == after.text
-                && (selectionChanged(before: before, after: after)
-                    || focusChanged(before: before, after: after))
+            guard let beforeText = before.text,
+                  let afterText = after.text,
+                  beforeText == afterText else {
+                return false
+            }
+            return before.textElementFocused == true
+                && after.textElementFocused == false
+                && after.focusedRole == "AXButton"
+                && after.focusedTitle == shiftTabFocusTargetTitle
         case .pointerMove:
             return before.text == after.text
                 && hypot(after.pointerX - before.pointerX, after.pointerY - before.pointerY) >= 5
@@ -166,7 +174,7 @@ public struct RuntimeFalseTriggerScenario: Codable, Equatable, Sendable {
             holdSeconds: 0.35,
             interactionStartSeconds: 0.08,
             interactionDurationSeconds: 0.05,
-            targetIDs: ["textedit"]
+            targetIDs: ["chrome"]
         ),
         Self(
             id: "shift-a-hotkey",

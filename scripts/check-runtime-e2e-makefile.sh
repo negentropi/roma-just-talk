@@ -54,6 +54,15 @@ if grep -Eq '[[:digit:]]_[[:digit:]]' "$repo_root/scripts/run-macos-runtime-e2e.
   exit 1
 fi
 
+example_shift_tab_targets="$(
+  jq -c '[.falseTriggerScenarios[] | select(.id == "shift-tab") | .targetIDs]' \
+    "$repo_root/Tools/RuntimeE2EHarness/runtime-e2e.example.json"
+)"
+if [ "$example_shift_tab_targets" != '[["chrome"]]' ]; then
+  echo "The example Shift-Tab scenario must use the deterministic Chrome focus fixture." >&2
+  exit 1
+fi
+
 source "$repo_root/scripts/runtime-e2e-phase-runner.sh"
 
 phase_calls=""

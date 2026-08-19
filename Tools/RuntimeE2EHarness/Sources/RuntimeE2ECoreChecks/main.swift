@@ -82,6 +82,10 @@ do {
         uniqueKeysWithValues: RuntimeFalseTriggerScenario.defaultMatrix.map { ($0.id, $0) }
     )
     try require(falseScenarios.count == 10, "the default false-trigger matrix should contain ten cases")
+    try require(
+        falseScenarios["shift-tab"]?.targetIDs == ["chrome"],
+        "Shift-Tab must use the browser fixture with a deterministic previous focus target"
+    )
     let startsAfterFour = falseScenarios["pointer-click-starts-after-four-seconds"]
     try require(
         startsAfterFour?.interactionStartSeconds ?? 0 > 4,
@@ -152,7 +156,7 @@ do {
         selectionLength: 0,
         textElementFocused: false,
         focusedRole: "AXButton",
-        focusedTitle: "Previous",
+        focusedTitle: RuntimeFalseTriggerNativeBehaviorPolicy.shiftTabFocusTargetTitle,
         pointerX: 10,
         pointerY: 10
     )
@@ -163,7 +167,52 @@ do {
             before: nativeBaseline,
             after: shiftTabFocusResult
         ),
-        "Shift-Tab must prove an unchanged editor plus a focus or selection transition"
+        "Shift-Tab must prove unchanged editor text plus focus on the fixture button"
+    )
+    try require(
+        !RuntimeFalseTriggerNativeBehaviorPolicy.isSatisfied(
+            kind: .shiftTab,
+            expectedInsertedText: nil,
+            before: RuntimeFalseTriggerNativeSnapshot(
+                text: nil,
+                selectionLocation: 0,
+                selectionLength: 0,
+                textElementFocused: true,
+                focusedRole: "AXTextArea",
+                focusedTitle: nil,
+                pointerX: 10,
+                pointerY: 10
+            ),
+            after: RuntimeFalseTriggerNativeSnapshot(
+                text: nil,
+                selectionLocation: 0,
+                selectionLength: 0,
+                textElementFocused: false,
+                focusedRole: "AXButton",
+                focusedTitle: RuntimeFalseTriggerNativeBehaviorPolicy.shiftTabFocusTargetTitle,
+                pointerX: 10,
+                pointerY: 10
+            )
+        ),
+        "Shift-Tab must not pass when Accessibility cannot read editor text"
+    )
+    try require(
+        !RuntimeFalseTriggerNativeBehaviorPolicy.isSatisfied(
+            kind: .shiftTab,
+            expectedInsertedText: nil,
+            before: nativeBaseline,
+            after: RuntimeFalseTriggerNativeSnapshot(
+                text: "",
+                selectionLocation: 0,
+                selectionLength: 0,
+                textElementFocused: false,
+                focusedRole: "AXButton",
+                focusedTitle: "Unrelated control",
+                pointerX: 10,
+                pointerY: 10
+            )
+        ),
+        "Shift-Tab must focus the fixture's exact previous control"
     )
     try require(
         !RuntimeFalseTriggerNativeBehaviorPolicy.isSatisfied(
@@ -176,7 +225,7 @@ do {
                 selectionLength: 0,
                 textElementFocused: false,
                 focusedRole: "AXButton",
-                focusedTitle: "Previous",
+                focusedTitle: RuntimeFalseTriggerNativeBehaviorPolicy.shiftTabFocusTargetTitle,
                 pointerX: 10,
                 pointerY: 10
             )

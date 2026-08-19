@@ -62,17 +62,19 @@ an initially running target if closing its last isolated surface exits it, and
 restores the previously frontmost app. Existing documents and pages are not used
 as test targets.
 
-Before the speech matrix, the helper runs the false-trigger matrix in an isolated
-TextEdit document. Each case must preserve the native typing, focus, click, or
-selection result while Roma emits `shortcut.key_evidence_rejected` and proves the
-owned recording was discarded. The helper snapshots the exact bundle's
+Before the speech matrix, the helper runs the false-trigger matrix in isolated
+target surfaces. Typing and pointer cases use TextEdit; Shift-Tab uses a browser
+editor with a preceding focus control. Each case must preserve the native typing,
+focus, click, or selection result while Roma emits `shortcut.key_evidence_rejected`
+and proves the owned recording was discarded. The helper snapshots the exact bundle's
 `Recordings/` files, `ZTRANSCRIPTION` row IDs, and transcription primary-key
 watermark before and after every case; any leaked WAV, history mutation,
 transcription, paste, or clipboard mutation fails it. On a leak it stops Roma,
 removes only case-created files and rows, verifies the original snapshot, and
 aborts before another baseline is sampled.
-Shift-Tab specifically requires unchanged editor text plus an observed focus or
-selection transition; arbitrary inserted text cannot satisfy native behavior.
+Shift-Tab specifically requires readable, unchanged editor text plus focus on the
+fixture's exact preceding button; arbitrary inserted text or unrelated focus
+movement cannot satisfy native behavior.
 The three long-click cases distinguish an interaction that starts after four
 seconds, spans four seconds, and ends early while the modifier remains held past
 four seconds.

@@ -699,10 +699,12 @@ enum RuntimeTargetController {
             <title>\(escapedTitle)</title>
             <style>
               body { margin: 40px; font: 18px -apple-system, sans-serif; }
+              #previous-focus { display: block; margin-bottom: 12px; }
               #target { width: 900px; height: 420px; padding: 8px; border: 1px solid; font: 20px -apple-system, sans-serif; white-space: pre-wrap; }
               #paste-proof { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
             </style>
             <div>\(editableLabel)</div>
+            <button id="previous-focus" type="button">\(RuntimeFalseTriggerNativeBehaviorPolicy.shiftTabFocusTargetTitle)</button>
             <div id="target" role="textbox" aria-label="\(editableLabel)" aria-multiline="true" contenteditable="true" spellcheck="false">\(escapedInitialText)</div>
             <div id="paste-proof" role="status" aria-label="\(escapedPasteProofToken) pasteEvents=0 pasteInputs=0">\(escapedPasteProofToken) pasteEvents=0 pasteInputs=0</div>
             <script>

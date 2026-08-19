@@ -62,7 +62,7 @@
   "falseTriggerScenarios": [
     {"id":"capital-random-letter","kind":"capitalLetter","holdSeconds":0.35,"interactionStartSeconds":0.08,"interactionDurationSeconds":0.05,"targetIDs":["textedit"]},
     {"id":"shifted-dollar","kind":"shiftedSymbol","holdSeconds":0.35,"interactionStartSeconds":0.08,"interactionDurationSeconds":0.05,"targetIDs":["textedit"]},
-    {"id":"shift-tab","kind":"shiftTab","holdSeconds":0.35,"interactionStartSeconds":0.08,"interactionDurationSeconds":0.05,"targetIDs":["textedit"]},
+    {"id":"shift-tab","kind":"shiftTab","holdSeconds":0.35,"interactionStartSeconds":0.08,"interactionDurationSeconds":0.05,"targetIDs":["chrome"]},
     {"id":"shift-a-hotkey","kind":"shiftAHotkey","holdSeconds":0.35,"interactionStartSeconds":0.08,"interactionDurationSeconds":0.05,"targetIDs":["textedit"]},
     {"id":"pointer-move-short","kind":"pointerMove","holdSeconds":0.35,"interactionStartSeconds":0.08,"interactionDurationSeconds":0.05,"targetIDs":["textedit"]},
     {"id":"pointer-click-short","kind":"pointerClick","holdSeconds":0.35,"interactionStartSeconds":0.08,"interactionDurationSeconds":0.05,"targetIDs":["textedit"]},

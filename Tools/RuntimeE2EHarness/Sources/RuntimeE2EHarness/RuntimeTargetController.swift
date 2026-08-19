@@ -746,6 +746,11 @@ enum RuntimeTargetController {
                 }
                 pasteObserved = false;
               });
+              target.addEventListener('keydown', event => {
+                if (event.key !== 'Tab' || !event.shiftKey) return;
+                event.preventDefault();
+                document.getElementById('previous-focus').focus();
+              });
               const observer = new MutationObserver(() => {
                 if (target.textContent === acceptedText) return;
                 target.textContent = acceptedText;

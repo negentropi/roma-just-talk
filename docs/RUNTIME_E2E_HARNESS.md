@@ -29,7 +29,8 @@ stable. AX may arrive later without moving the earlier rendered timestamp.
 - Text baselines: empty, plus `[existing before]{cursor}[existing after]`
 - Candidate apps: TextEdit, Safari, Google Chrome, Arc, Zed, and Visual Studio Code
 - Local target policy: `runningOnly`; closed apps are skipped, never launched
-- Coverage gate: at least `4` distinct candidate apps must already be running
+- Coverage gate: TextEdit, Google Chrome, and at least `2` other candidate apps
+  must already be running
 - Rendered-text timeout: `20s`
 - Rendered-text p95 budget: `250ms`
 - Transcript answer: optional until supplied in the config
@@ -81,7 +82,8 @@ four seconds.
 
 Set `targetAvailabilityPolicy` to `launchIfNeeded` only on a dedicated test Mac.
 The local default remains `runningOnly` to avoid memory pressure and surprise app
-launches. `minimumTargetCount` controls the distinct-app coverage gate.
+launches. `minimumTargetCount` controls the distinct-app coverage gate; preflight
+also requires at least one selected target for every false-trigger scenario.
 
 Runtime execution for this project is Namespace-first. Local commands below are
 opt-in tools for a dedicated test Mac; CI/static checks never launch Roma or

@@ -254,6 +254,19 @@ public struct RuntimeFalseTriggerPlan: Codable, Equatable, Sendable {
         self.cases = cases
     }
 
+    public static func missingTargetScenarioIDs(
+        scenarios: [RuntimeFalseTriggerScenario],
+        targets: [RuntimeTargetApp]
+    ) -> [String] {
+        let availableTargetIDs = Set(targets.map(\.id))
+        return scenarios.filter {
+            !$0.targetIDs.isEmpty
+                && $0.targetIDs.allSatisfy { !availableTargetIDs.contains($0) }
+        }
+        .map(\.id)
+        .sorted()
+    }
+
     public static func make(
         scenarios: [RuntimeFalseTriggerScenario],
         targets: [RuntimeTargetApp],

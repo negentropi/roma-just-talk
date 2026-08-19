@@ -86,6 +86,20 @@ do {
         falseScenarios["shift-tab"]?.targetIDs == ["chrome"],
         "Shift-Tab must use the browser fixture with a deterministic previous focus target"
     )
+    try require(
+        RuntimeFalseTriggerPlan.missingTargetScenarioIDs(
+            scenarios: RuntimeFalseTriggerScenario.defaultMatrix,
+            targets: targets.filter { $0.id != "chrome" }
+        ) == ["shift-tab"],
+        "false-trigger plans must expose a missing required Shift-Tab target before execution"
+    )
+    try require(
+        RuntimeFalseTriggerPlan.missingTargetScenarioIDs(
+            scenarios: RuntimeFalseTriggerScenario.defaultMatrix,
+            targets: targets.filter { $0.id == "textedit" || $0.id == "chrome" }
+        ).isEmpty,
+        "TextEdit and Chrome must satisfy every default false-trigger target requirement"
+    )
     let startsAfterFour = falseScenarios["pointer-click-starts-after-four-seconds"]
     try require(
         startsAfterFour?.interactionStartSeconds ?? 0 > 4,

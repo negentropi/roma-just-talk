@@ -145,6 +145,16 @@ enum RuntimePreflight {
                 + "at least \(configuration.minimumTargetCount) are required"
             )
         }
+        let missingFalseTriggerScenarioIDs = RuntimeFalseTriggerPlan.missingTargetScenarioIDs(
+            scenarios: configuration.resolvedFalseTriggerScenarios,
+            targets: selectedTargets
+        )
+        if !missingFalseTriggerScenarioIDs.isEmpty {
+            failures.append(
+                "False-trigger scenarios have no available target: "
+                + missingFalseTriggerScenarioIDs.joined(separator: ", ")
+            )
+        }
 
         return RuntimePreflightReport(
             generatedAt: Date(),

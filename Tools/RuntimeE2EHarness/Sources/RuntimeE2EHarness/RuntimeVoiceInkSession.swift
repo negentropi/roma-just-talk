@@ -18,6 +18,8 @@ private struct RuntimeVoiceInkRestorationJournal: Codable {
     let originalAudioInputModeExisted: Bool
     let originalSelectedDeviceUID: String?
     let originalSelectedDeviceUIDExisted: Bool
+    let originalPauseMediaEnabled: Bool?
+    let originalPauseMediaEnabledExisted: Bool?
     let originalPrimaryShortcutSelection: String?
     let originalPrimaryShortcutSelectionExisted: Bool?
     let originalPrimaryShortcutMode: String?
@@ -34,6 +36,8 @@ private struct RuntimeVoiceInkPreferenceSnapshot {
     let audioInputModeExisted: Bool
     let selectedDeviceUID: String?
     let selectedDeviceUIDExisted: Bool
+    let pauseMediaEnabled: Bool?
+    let pauseMediaEnabledExisted: Bool
     let primaryShortcutSelection: String?
     let primaryShortcutSelectionExisted: Bool
     let primaryShortcutMode: String?
@@ -54,6 +58,7 @@ private struct RuntimeStoredModifierShortcut: Encodable {
 
 final class RuntimeVoiceInkSession {
     private static let primaryShortcutSelectionKey = "primaryRecordingShortcut"
+    private static let pauseMediaEnabledKey = "isPauseMediaEnabled"
     private static let primaryShortcutModeKey = "primaryRecordingShortcutMode"
     private static let primaryShortcutDataKey = "Shortcut_primaryRecording"
     private static let primaryShortcutClearedKey = "Shortcut_primaryRecording_cleared"
@@ -97,6 +102,8 @@ final class RuntimeVoiceInkSession {
             originalAudioInputModeExisted: snapshot.audioInputModeExisted,
             originalSelectedDeviceUID: snapshot.selectedDeviceUID,
             originalSelectedDeviceUIDExisted: snapshot.selectedDeviceUIDExisted,
+            originalPauseMediaEnabled: snapshot.pauseMediaEnabled,
+            originalPauseMediaEnabledExisted: snapshot.pauseMediaEnabledExisted,
             originalPrimaryShortcutSelection: snapshot.primaryShortcutSelection,
             originalPrimaryShortcutSelectionExisted: snapshot.primaryShortcutSelectionExisted,
             originalPrimaryShortcutMode: snapshot.primaryShortcutMode,
@@ -113,6 +120,11 @@ final class RuntimeVoiceInkSession {
             try terminateRunningApplications(bundleIdentifier: configuration.voiceInkBundleIdentifier)
             setPreference("Custom Device", key: "audioInputMode", bundleIdentifier: configuration.voiceInkBundleIdentifier)
             setPreference(audioDeviceUID, key: "selectedAudioDeviceUID", bundleIdentifier: configuration.voiceInkBundleIdentifier)
+            setBoolPreference(
+                false,
+                key: pauseMediaEnabledKey,
+                bundleIdentifier: configuration.voiceInkBundleIdentifier
+            )
             setPreference(
                 "custom",
                 key: primaryShortcutSelectionKey,
@@ -227,6 +239,14 @@ final class RuntimeVoiceInkSession {
             key: "selectedAudioDeviceUID",
             bundleIdentifier: journal.bundleIdentifier
         )
+        if let existed = journal.originalPauseMediaEnabledExisted {
+            restoreBoolPreference(
+                journal.originalPauseMediaEnabled,
+                existed: existed,
+                key: pauseMediaEnabledKey,
+                bundleIdentifier: journal.bundleIdentifier
+            )
+        }
         if let existed = journal.originalPrimaryShortcutSelectionExisted {
             restorePreference(
                 journal.originalPrimaryShortcutSelection,
@@ -327,6 +347,7 @@ final class RuntimeVoiceInkSession {
         let appID = bundleIdentifier as CFString
         let audioMode = CFPreferencesCopyAppValue("audioInputMode" as CFString, appID)
         let deviceUID = CFPreferencesCopyAppValue("selectedAudioDeviceUID" as CFString, appID)
+        let pauseMediaEnabled = CFPreferencesCopyAppValue(pauseMediaEnabledKey as CFString, appID)
         let primarySelection = CFPreferencesCopyAppValue(primaryShortcutSelectionKey as CFString, appID)
         let primaryMode = CFPreferencesCopyAppValue(primaryShortcutModeKey as CFString, appID)
         let primaryData = CFPreferencesCopyAppValue(primaryShortcutDataKey as CFString, appID)
@@ -338,6 +359,8 @@ final class RuntimeVoiceInkSession {
             audioInputModeExisted: audioMode != nil,
             selectedDeviceUID: deviceUID as? String,
             selectedDeviceUIDExisted: deviceUID != nil,
+            pauseMediaEnabled: pauseMediaEnabled as? Bool,
+            pauseMediaEnabledExisted: pauseMediaEnabled != nil,
             primaryShortcutSelection: primarySelection as? String,
             primaryShortcutSelectionExisted: primarySelection != nil,
             primaryShortcutMode: primaryMode as? String,
@@ -384,6 +407,18 @@ final class RuntimeVoiceInkSession {
         CFPreferencesSetAppValue(
             key as CFString,
             value as CFData,
+            bundleIdentifier as CFString
+        )
+    }
+
+    private static func setBoolPreference(
+        _ value: Bool,
+        key: String,
+        bundleIdentifier: String
+    ) {
+        CFPreferencesSetAppValue(
+            key as CFString,
+            value as CFBoolean,
             bundleIdentifier as CFString
         )
     }

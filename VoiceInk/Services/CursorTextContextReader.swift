@@ -4,6 +4,12 @@ import VoiceInkCore
 
 enum CursorTextContextReader {
     private static let webAreaRole = "AXWebArea"
+    private static let webPasteBundleIdentifiers: Set<String> = [
+        "com.apple.Safari",
+        "com.google.Chrome",
+        "company.thebrowser.Browser",
+        "com.microsoft.VSCode"
+    ]
     // Bound malformed Accessibility parent chains without missing deeply nested web editors.
     private static let insertionAncestorTraversalLimit = 64
     private static let commandVMenuTraversalLimit = 2_048
@@ -59,6 +65,12 @@ enum CursorTextContextReader {
         case deliveryUncertain
     }
 
+    enum PasteCommandDeliveryPlan: Equatable {
+        case focusedCommandVFirst
+        case accessibilityMenuFirst
+        case legacyCommandV
+    }
+
     struct ContextMenuPasteResult {
         let processIdentifier: pid_t
         let disposition: PasteDeliveryDisposition
@@ -92,17 +104,27 @@ enum CursorTextContextReader {
         let processIdentifier: pid_t
         fileprivate let text: String?
         fileprivate let selectedRange: CFRange?
+        let usesWebPasteSemantics: Bool
+
+        var supportsFocusedCommandVFastPath: Bool {
+            CursorTextContextReader.supportsFocusedCommandVFastPath(
+                usesWebPasteSemantics: usesWebPasteSemantics,
+                hasSelectionSnapshot: selectedRange != nil
+            )
+        }
 
         fileprivate init(
             focusedElement: AXUIElement,
             processIdentifier: pid_t,
             text: String?,
-            selectedRange: CFRange?
+            selectedRange: CFRange?,
+            usesWebPasteSemantics: Bool
         ) {
             self.focusedElement = focusedElement
             self.processIdentifier = processIdentifier
             self.text = text
             self.selectedRange = selectedRange
+            self.usesWebPasteSemantics = usesWebPasteSemantics
         }
     }
 
@@ -127,6 +149,89 @@ enum CursorTextContextReader {
             self.selectedRange = selectedRange
             self.text = text
         }
+    }
+
+    @MainActor
+    static func focusedPasteTargetForCurrentFocus(
+        latencyTraceToken: VoiceInkLatencyTrace.Token? = nil,
+        captureStage: String = "unspecified"
+    ) -> FocusedPasteTarget? {
+        guard AXIsProcessTrusted(),
+              let focusedElement = focusedElement(from: AXUIElementCreateSystemWide()) else {
+            return nil
+        }
+        var processIdentifier = pid_t()
+        guard AXUIElementGetPid(focusedElement, &processIdentifier) == .success,
+              processIdentifier > 0,
+              processIdentifier != ProcessInfo.processInfo.processIdentifier else {
+            return nil
+        }
+        let ancestorRoles = insertionAncestorRoles(startingAt: focusedElement)
+        let focusedRole = role(from: focusedElement)
+        let bundleIdentifier = NSRunningApplication(
+            processIdentifier: processIdentifier
+        )?.bundleIdentifier
+        let text = textValue(from: focusedElement)
+        let selectedRange = selectedTextRange(from: focusedElement)
+        let usesWebPasteSemantics = CursorTextContextReader.usesWebPasteSemantics(
+            ancestorRoles: ancestorRoles,
+            bundleIdentifier: bundleIdentifier,
+            focusedRole: focusedRole
+        )
+        VoiceInkLatencyTrace.shared.event(
+            "paste_target_classification",
+            details: "stage=\(captureStage) targetPid=\(processIdentifier) role=\(focusedRole ?? "nil") bundle=\(bundleIdentifier ?? "nil") ancestors=\(ancestorRoles.joined(separator: ",")) text=\(text != nil) range=\(selectedRange != nil) web=\(usesWebPasteSemantics)",
+            token: latencyTraceToken
+        )
+        return FocusedPasteTarget(
+            focusedElement: focusedElement,
+            processIdentifier: processIdentifier,
+            text: text,
+            selectedRange: selectedRange,
+            usesWebPasteSemantics: usesWebPasteSemantics
+        )
+    }
+
+    static func usesWebPasteSemantics(
+        ancestorRoles: [String],
+        bundleIdentifier: String? = nil,
+        focusedRole: String? = nil
+    ) -> Bool {
+        let hasTextInputRole = VoiceInkCursorTextContextPolicy.isTextInputRole(focusedRole)
+            || ancestorRoles.contains {
+                VoiceInkCursorTextContextPolicy.isTextInputRole($0)
+            }
+        let focusedRoleIsTransientContainer = focusedRole == nil || focusedRole == "AXGroup"
+        guard hasTextInputRole,
+              VoiceInkCursorTextContextPolicy.isTextInputRole(focusedRole)
+                  || focusedRoleIsTransientContainer else {
+            return false
+        }
+        if ancestorRoles.contains(webAreaRole) {
+            return true
+        }
+        let focusedRoleIsNativeControl = focusedRole == "AXTextField"
+            || focusedRole == "AXComboBox"
+        return bundleIdentifier.map(webPasteBundleIdentifiers.contains) == true
+            && !focusedRoleIsNativeControl
+            && (focusedRole == "AXTextArea" || ancestorRoles.contains("AXTextArea"))
+    }
+
+    static func pasteCommandDeliveryPlan(
+        retryCommandVMenuDiscovery: Bool,
+        targetSupportsFocusedCommandVFastPath: Bool
+    ) -> PasteCommandDeliveryPlan {
+        guard retryCommandVMenuDiscovery else { return .legacyCommandV }
+        return targetSupportsFocusedCommandVFastPath
+            ? .focusedCommandVFirst
+            : .accessibilityMenuFirst
+    }
+
+    static func supportsFocusedCommandVFastPath(
+        usesWebPasteSemantics: Bool,
+        hasSelectionSnapshot: Bool
+    ) -> Bool {
+        usesWebPasteSemantics && hasSelectionSnapshot
     }
 
     @MainActor
@@ -209,22 +314,13 @@ enum CursorTextContextReader {
         retryIfUnavailable: Bool,
         latencyTraceToken: VoiceInkLatencyTrace.Token?
     ) async -> CommandVMenuAttempt {
-        guard AXIsProcessTrusted(),
-              let focusedElement = focusedElement(from: AXUIElementCreateSystemWide()) else {
+        guard let target = focusedPasteTargetForCurrentFocus(
+            latencyTraceToken: latencyTraceToken,
+            captureStage: "menu"
+        ) else {
             return .unavailable(nil)
         }
-        var processIdentifier = pid_t()
-        guard AXUIElementGetPid(focusedElement, &processIdentifier) == .success,
-              processIdentifier > 0,
-              processIdentifier != ProcessInfo.processInfo.processIdentifier else {
-            return .unavailable(nil)
-        }
-        let target = FocusedPasteTarget(
-            focusedElement: focusedElement,
-            processIdentifier: processIdentifier,
-            text: textValue(from: focusedElement),
-            selectedRange: selectedTextRange(from: focusedElement)
-        )
+        let processIdentifier = target.processIdentifier
         let application = AXUIElementCreateApplication(processIdentifier)
 
         let traversalAttempts = retryIfUnavailable ? commandVMenuTraversalAttempts : 1
@@ -346,7 +442,7 @@ enum CursorTextContextReader {
             return nil
         }
         let processIdentifier = target.processIdentifier
-        guard pasteTargetIsCurrent(target),
+        guard commandVTargetIsCurrent(target),
               NSWorkspace.shared.frontmostApplication?.processIdentifier
                 == processIdentifier else {
             return CommandVShortcutPasteResult(
@@ -366,7 +462,7 @@ enum CursorTextContextReader {
             events,
             targetIsCurrent: {
                 !Task.isCancelled
-                    && pasteTargetIsCurrent(target)
+                    && commandVTargetIsCurrent(target)
                     && NSWorkspace.shared.frontmostApplication?.processIdentifier
                         == processIdentifier
             },
@@ -388,6 +484,32 @@ enum CursorTextContextReader {
             details: "method=globalHID source=combinedSession targetPid=\(processIdentifier) eventCount=\(events.count)",
             token: latencyTraceToken
         )
+        VoiceInkLatencyTrace.shared.event(
+            "paste_event_posted",
+            details: "method=globalHIDCommandV targetPid=\(processIdentifier)",
+            token: latencyTraceToken
+        )
+        if target.usesWebPasteSemantics {
+            let remainsCurrentAfterChord = !Task.isCancelled
+                && capturedEditorIsFocused(
+                    target.focusedElement,
+                    processIdentifier: processIdentifier
+                )
+                && NSWorkspace.shared.frontmostApplication?.processIdentifier
+                    == processIdentifier
+            let disposition: PasteDeliveryDisposition = remainsCurrentAfterChord
+                ? .delivered
+                : .deliveryUncertain
+            VoiceInkLatencyTrace.shared.event(
+                "paste_command_v_keyboard_observation",
+                details: "targetPid=\(processIdentifier) disposition=\(disposition.rawValue) mode=eventPosted",
+                token: latencyTraceToken
+            )
+            return CommandVShortcutPasteResult(
+                processIdentifier: processIdentifier,
+                disposition: disposition
+            )
+        }
         let delivered = await pasteWasObserved(
             focusedElement: target.focusedElement,
             processIdentifier: processIdentifier,
@@ -1121,6 +1243,51 @@ enum CursorTextContextReader {
             && sameRange(capturedRange, currentRange)
     }
 
+    // Some browser AX trees omit the value while still exposing a stable selection.
+    // The fast path keeps the selection plus role/bundle and focus/PID bounds.
+    static func webPasteTargetValidationMatches(
+        capturedEditorFocused: Bool,
+        capturedText: String?,
+        currentText: String?,
+        capturedRange: CFRange?,
+        currentRange: CFRange?
+    ) -> Bool {
+        guard capturedEditorFocused,
+              let capturedRange,
+              let currentRange,
+              sameRange(capturedRange, currentRange) else {
+            return false
+        }
+        if let capturedText {
+            return currentText == capturedText
+        }
+        return true
+    }
+
+    @MainActor
+    private static func commandVTargetIsCurrent(_ target: FocusedPasteTarget) -> Bool {
+        let capturedEditorFocused = capturedEditorIsFocused(
+            target.focusedElement,
+            processIdentifier: target.processIdentifier
+        )
+        if target.usesWebPasteSemantics {
+            return webPasteTargetValidationMatches(
+                capturedEditorFocused: capturedEditorFocused,
+                capturedText: target.text,
+                currentText: textValue(from: target.focusedElement),
+                capturedRange: target.selectedRange,
+                currentRange: selectedTextRange(from: target.focusedElement)
+            )
+        }
+        return pasteTargetSnapshotMatches(
+            capturedEditorFocused: capturedEditorFocused,
+            capturedText: target.text,
+            currentText: textValue(from: target.focusedElement),
+            capturedRange: target.selectedRange,
+            currentRange: selectedTextRange(from: target.focusedElement)
+        )
+    }
+
     @MainActor
     private static func capturedEditorIsFocused(
         _ capturedElement: AXUIElement,
@@ -1307,10 +1474,22 @@ enum CursorTextContextReader {
               let focusedElement = focusedElement(from: AXUIElementCreateSystemWide()),
               let selectedRange = selectedTextRange(from: focusedElement),
               let role = role(from: focusedElement),
-              VoiceInkCursorTextContextPolicy.isTextInputRole(role),
-              shouldUseDirectAccessibilityInsertion(
-                  ancestorRoles: insertionAncestorRoles(startingAt: focusedElement)
-              ) else {
+              VoiceInkCursorTextContextPolicy.isTextInputRole(role) else {
+            return .unsupported
+        }
+        let ancestorRoles = insertionAncestorRoles(startingAt: focusedElement)
+        var processIdentifier = pid_t()
+        let bundleIdentifier = AXUIElementGetPid(
+            focusedElement,
+            &processIdentifier
+        ) == .success
+            ? NSRunningApplication(processIdentifier: processIdentifier)?.bundleIdentifier
+            : nil
+        guard shouldUseDirectAccessibilityInsertion(
+            ancestorRoles: ancestorRoles,
+            bundleIdentifier: bundleIdentifier,
+            focusedRole: role
+        ) else {
             return .unsupported
         }
 
@@ -1494,9 +1673,17 @@ enum CursorTextContextReader {
         return textAfterInsertion == replacement.text
     }
 
-    static func shouldUseDirectAccessibilityInsertion(ancestorRoles: [String]) -> Bool {
+    static func shouldUseDirectAccessibilityInsertion(
+        ancestorRoles: [String],
+        bundleIdentifier: String? = nil,
+        focusedRole: String? = nil
+    ) -> Bool {
         // Web editors need Cmd-V so their DOM paste/input handlers update application state.
-        !ancestorRoles.contains(webAreaRole)
+        !usesWebPasteSemantics(
+            ancestorRoles: ancestorRoles,
+            bundleIdentifier: bundleIdentifier,
+            focusedRole: focusedRole
+        )
     }
 
     private static func textBeforeCursor(in focusedElement: AXUIElement, maximumLength: Int) -> String? {

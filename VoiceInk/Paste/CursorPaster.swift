@@ -148,6 +148,16 @@ class CursorPaster {
             details: "chars=\(text.count) restoreClipboard=\(shouldRestoreClipboard) method=\(VoiceInkPasteMethod.current().rawValue)",
             token: latencyTraceToken
         )
+        let initialFocusedTarget: CursorTextContextReader.FocusedPasteTarget? = if VoiceInkPasteMethod.current() == .standard,
+                                                                                  accessibilityTextInserterForTesting == nil,
+                                                                                  pasteCommandPosterForTesting == nil {
+            CursorTextContextReader.focusedPasteTargetForCurrentFocus(
+                latencyTraceToken: latencyTraceToken,
+                captureStage: "preInsertion"
+            )
+        } else {
+            nil
+        }
         if VoiceInkPasteMethod.current() == .standard,
            accessibilityTextInserterForTesting != nil || pasteCommandPosterForTesting == nil {
             let insertionSpan = latencyTrace.begin(
@@ -155,7 +165,9 @@ class CursorPaster {
                 token: latencyTraceToken
             )
             let cursorContext = await preparedCursorTextContext?.value
-            let insertionResult = if let accessibilityTextInserterForTesting {
+            let insertionResult = if initialFocusedTarget?.usesWebPasteSemantics == true {
+                CursorTextContextReader.SelectedTextInsertionResult.unsupported
+            } else if let accessibilityTextInserterForTesting {
                 accessibilityTextInserterForTesting(text, cursorContext)
             } else {
                 CursorTextContextReader.insertSelectedText(
@@ -217,6 +229,7 @@ class CursorPaster {
         let pasteResult = await postPasteCommand(
             expectedText: text,
             retryCommandVMenuDiscovery: shouldRetryCommandVMenuDiscovery,
+            initialFocusedTarget: initialFocusedTarget,
             latencyTraceToken: latencyTraceToken
         )
         latencyTrace.end(
@@ -265,6 +278,7 @@ class CursorPaster {
     private static func postPasteCommand(
         expectedText: String,
         retryCommandVMenuDiscovery: Bool,
+        initialFocusedTarget: CursorTextContextReader.FocusedPasteTarget?,
         latencyTraceToken: VoiceInkLatencyTrace.Token?
     ) async -> PasteResult {
         if let pasteCommandPosterForTesting {
@@ -285,6 +299,7 @@ class CursorPaster {
             return await pasteFromClipboard(
                 expectedText: expectedText,
                 retryCommandVMenuDiscovery: retryCommandVMenuDiscovery,
+                initialFocusedTarget: initialFocusedTarget,
                 latencyTraceToken: latencyTraceToken
             )
         }
@@ -386,6 +401,7 @@ class CursorPaster {
     private static func pasteFromClipboard(
         expectedText: String,
         retryCommandVMenuDiscovery: Bool,
+        initialFocusedTarget: CursorTextContextReader.FocusedPasteTarget?,
         latencyTraceToken: VoiceInkLatencyTrace.Token?
     ) async -> PasteResult {
         VoiceInkLatencyTrace.shared.event(
@@ -403,8 +419,52 @@ class CursorPaster {
             return .commandNotPosted
         }
 
-        await wait(prePasteDelay)
         guard !Task.isCancelled else { return .commandNotPosted }
+        var focusedTarget: CursorTextContextReader.FocusedPasteTarget?
+        if retryCommandVMenuDiscovery {
+            if initialFocusedTarget?.supportsFocusedCommandVFastPath == true {
+                VoiceInkLatencyTrace.shared.event(
+                    "paste_target_reused",
+                    details: "stage=postClipboard targetPid=\(initialFocusedTarget?.processIdentifier ?? 0) web=true",
+                    token: latencyTraceToken
+                )
+                focusedTarget = initialFocusedTarget
+            } else {
+                focusedTarget = CursorTextContextReader.focusedPasteTargetForCurrentFocus(
+                    latencyTraceToken: latencyTraceToken,
+                    captureStage: "postClipboard"
+                )
+            }
+        }
+        let deliveryPlan = CursorTextContextReader.pasteCommandDeliveryPlan(
+            retryCommandVMenuDiscovery: retryCommandVMenuDiscovery,
+            targetSupportsFocusedCommandVFastPath:
+                focusedTarget?.supportsFocusedCommandVFastPath == true
+        )
+        let useFocusedCommandVFastPath = deliveryPlan == .focusedCommandVFirst
+        if useFocusedCommandVFastPath,
+           let stableTarget = focusedTarget,
+           let keyboardPaste = await CursorTextContextReader.postFocusedCommandVShortcut(
+               target: stableTarget,
+               expectedText: expectedText,
+               latencyTraceToken: latencyTraceToken
+           ) {
+            switch keyboardPaste.disposition {
+            case .delivered:
+                return .commandPosted
+            case .deliveryUncertain:
+                VoiceInkLatencyTrace.shared.event(
+                    "paste_event_delivery_uncertain",
+                    details: "method=globalHIDCommandV targetPid=\(keyboardPaste.processIdentifier)",
+                    token: latencyTraceToken
+                )
+                return .commandDeliveryUncertain
+            }
+        }
+        guard !Task.isCancelled else { return .commandNotPosted }
+        if !useFocusedCommandVFastPath {
+            await wait(prePasteDelay)
+        }
         let menuAttempt = await CursorTextContextReader.pressFocusedCommandVMenuItem(
             retryIfUnavailable: retryCommandVMenuDiscovery,
             latencyTraceToken: latencyTraceToken
@@ -432,17 +492,12 @@ class CursorPaster {
         if retryCommandVMenuDiscovery {
             guard let stableTarget else { return .commandNotPosted }
             if let keyboardPaste = await CursorTextContextReader.postFocusedCommandVShortcut(
-                target: stableTarget,
-                expectedText: expectedText,
-                latencyTraceToken: latencyTraceToken
-            ) {
+                   target: stableTarget,
+                   expectedText: expectedText,
+                   latencyTraceToken: latencyTraceToken
+               ) {
                 switch keyboardPaste.disposition {
                 case .delivered:
-                    VoiceInkLatencyTrace.shared.event(
-                        "paste_event_posted",
-                        details: "method=globalHIDCommandV targetPid=\(keyboardPaste.processIdentifier) disposition=\(keyboardPaste.disposition.rawValue)",
-                        token: latencyTraceToken
-                    )
                     return .commandPosted
                 case .deliveryUncertain:
                     VoiceInkLatencyTrace.shared.event(

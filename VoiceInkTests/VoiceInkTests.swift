@@ -206,7 +206,108 @@ struct VoiceInkTests {
             ancestorRoles: ["AXTextArea", "AXGroup", "AXWindow"]
         ))
         #expect(!CursorTextContextReader.shouldUseDirectAccessibilityInsertion(
-            ancestorRoles: ["AXTextArea", "AXGroup", "AXWebArea", "AXWindow"]
+            ancestorRoles: ["AXTextArea", "AXGroup", "AXWebArea", "AXWindow"],
+            focusedRole: "AXTextArea"
+        ))
+        #expect(!CursorTextContextReader.shouldUseDirectAccessibilityInsertion(
+            ancestorRoles: ["AXTextArea", "AXGroup", "AXWindow"],
+            bundleIdentifier: "com.google.Chrome",
+            focusedRole: "AXTextArea"
+        ))
+        #expect(CursorTextContextReader.shouldUseDirectAccessibilityInsertion(
+            ancestorRoles: ["AXTextField", "AXGroup", "AXWindow"],
+            bundleIdentifier: "com.google.Chrome",
+            focusedRole: "AXTextField"
+        ))
+    }
+
+    @Test func focusedCommandVFastPathIsScopedToWebPasteTargets() {
+        #expect(CursorTextContextReader.usesWebPasteSemantics(
+            ancestorRoles: ["AXTextArea", "AXWebArea", "AXWindow"],
+            focusedRole: "AXTextArea"
+        ))
+        #expect(!CursorTextContextReader.usesWebPasteSemantics(
+            ancestorRoles: ["AXTextArea", "AXGroup", "AXWindow"]
+        ))
+        for bundleIdentifier in [
+            "com.apple.Safari",
+            "com.google.Chrome",
+            "company.thebrowser.Browser",
+            "com.microsoft.VSCode"
+        ] {
+            #expect(CursorTextContextReader.usesWebPasteSemantics(
+                ancestorRoles: ["AXTextArea", "AXGroup", "AXWindow"],
+                bundleIdentifier: bundleIdentifier,
+                focusedRole: "AXTextArea"
+            ))
+        }
+        #expect(CursorTextContextReader.usesWebPasteSemantics(
+            ancestorRoles: ["AXGroup", "AXTextArea", "AXWindow"],
+            bundleIdentifier: "com.google.Chrome",
+            focusedRole: "AXGroup"
+        ))
+        #expect(CursorTextContextReader.usesWebPasteSemantics(
+            ancestorRoles: ["AXGroup", "AXTextArea", "AXWindow"],
+            bundleIdentifier: "com.google.Chrome"
+        ))
+        #expect(CursorTextContextReader.usesWebPasteSemantics(
+            ancestorRoles: ["AXGroup", "AXTextArea", "AXWebArea", "AXWindow"],
+            focusedRole: "AXGroup"
+        ))
+        #expect(!CursorTextContextReader.usesWebPasteSemantics(
+            ancestorRoles: ["AXTextField", "AXGroup", "AXWindow"],
+            bundleIdentifier: "com.google.Chrome",
+            focusedRole: "AXTextField"
+        ))
+        #expect(!CursorTextContextReader.usesWebPasteSemantics(
+            ancestorRoles: ["AXTextField", "AXTextArea", "AXGroup", "AXWindow"],
+            bundleIdentifier: "com.google.Chrome",
+            focusedRole: "AXTextField"
+        ))
+        #expect(!CursorTextContextReader.usesWebPasteSemantics(
+            ancestorRoles: ["AXButton", "AXTextArea", "AXGroup", "AXWindow"],
+            bundleIdentifier: "com.google.Chrome",
+            focusedRole: "AXButton"
+        ))
+        #expect(!CursorTextContextReader.usesWebPasteSemantics(
+            ancestorRoles: ["AXLink", "AXTextArea", "AXWebArea", "AXWindow"],
+            focusedRole: "AXLink"
+        ))
+        #expect(!CursorTextContextReader.usesWebPasteSemantics(
+            ancestorRoles: ["AXWebArea", "AXGroup", "AXWindow"],
+            focusedRole: "AXButton"
+        ))
+        #expect(!CursorTextContextReader.usesWebPasteSemantics(
+            ancestorRoles: ["AXWebArea", "AXGroup", "AXWindow"]
+        ))
+        #expect(!CursorTextContextReader.usesWebPasteSemantics(
+            ancestorRoles: ["AXTextArea", "AXGroup", "AXWindow"],
+            bundleIdentifier: "com.example.UnknownEditor",
+            focusedRole: "AXTextArea"
+        ))
+        #expect(!CursorTextContextReader.usesWebPasteSemantics(
+            ancestorRoles: ["AXGroup", "AXWindow"],
+            bundleIdentifier: "com.google.Chrome"
+        ))
+        #expect(CursorTextContextReader.pasteCommandDeliveryPlan(
+            retryCommandVMenuDiscovery: true,
+            targetSupportsFocusedCommandVFastPath: true
+        ) == .focusedCommandVFirst)
+        #expect(CursorTextContextReader.pasteCommandDeliveryPlan(
+            retryCommandVMenuDiscovery: true,
+            targetSupportsFocusedCommandVFastPath: false
+        ) == .accessibilityMenuFirst)
+        #expect(CursorTextContextReader.pasteCommandDeliveryPlan(
+            retryCommandVMenuDiscovery: false,
+            targetSupportsFocusedCommandVFastPath: true
+        ) == .legacyCommandV)
+        #expect(CursorTextContextReader.supportsFocusedCommandVFastPath(
+            usesWebPasteSemantics: true,
+            hasSelectionSnapshot: true
+        ))
+        #expect(!CursorTextContextReader.supportsFocusedCommandVFastPath(
+            usesWebPasteSemantics: true,
+            hasSelectionSnapshot: false
         ))
     }
 
@@ -300,6 +401,72 @@ struct VoiceInkTests {
             currentText: "before after",
             capturedRange: nil,
             currentRange: nil
+        ))
+    }
+
+    @Test func browserPasteTargetRequiresSelectionWhenAXValueIsMissing() {
+        #expect(CursorTextContextReader.webPasteTargetValidationMatches(
+            capturedEditorFocused: true,
+            capturedText: nil,
+            currentText: nil,
+            capturedRange: CFRange(location: 7, length: 0),
+            currentRange: CFRange(location: 7, length: 0)
+        ))
+        #expect(!CursorTextContextReader.webPasteTargetValidationMatches(
+            capturedEditorFocused: true,
+            capturedText: "before after",
+            currentText: nil,
+            capturedRange: CFRange(location: 7, length: 0),
+            currentRange: CFRange(location: 7, length: 0)
+        ))
+        #expect(CursorTextContextReader.webPasteTargetValidationMatches(
+            capturedEditorFocused: true,
+            capturedText: nil,
+            currentText: "before after",
+            capturedRange: CFRange(location: 7, length: 0),
+            currentRange: CFRange(location: 7, length: 0)
+        ))
+        #expect(!CursorTextContextReader.webPasteTargetValidationMatches(
+            capturedEditorFocused: true,
+            capturedText: nil,
+            currentText: nil,
+            capturedRange: nil,
+            currentRange: CFRange(location: 7, length: 0)
+        ))
+        #expect(!CursorTextContextReader.webPasteTargetValidationMatches(
+            capturedEditorFocused: true,
+            capturedText: nil,
+            currentText: nil,
+            capturedRange: CFRange(location: 7, length: 0),
+            currentRange: nil
+        ))
+        #expect(!CursorTextContextReader.webPasteTargetValidationMatches(
+            capturedEditorFocused: true,
+            capturedText: "before after",
+            currentText: "before typed after",
+            capturedRange: nil,
+            currentRange: nil
+        ))
+        #expect(!CursorTextContextReader.webPasteTargetValidationMatches(
+            capturedEditorFocused: true,
+            capturedText: nil,
+            currentText: nil,
+            capturedRange: CFRange(location: 7, length: 0),
+            currentRange: CFRange(location: 8, length: 0)
+        ))
+        #expect(!CursorTextContextReader.webPasteTargetValidationMatches(
+            capturedEditorFocused: false,
+            capturedText: nil,
+            currentText: nil,
+            capturedRange: nil,
+            currentRange: nil
+        ))
+        #expect(!CursorTextContextReader.webPasteTargetValidationMatches(
+            capturedEditorFocused: true,
+            capturedText: "before after",
+            currentText: "before typed after",
+            capturedRange: CFRange(location: 7, length: 0),
+            currentRange: CFRange(location: 7, length: 0)
         ))
     }
 

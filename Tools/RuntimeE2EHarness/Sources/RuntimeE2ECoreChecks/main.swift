@@ -943,6 +943,22 @@ do {
         equals: 400,
         "trace should expose post-paste pipeline completion"
     )
+    let focusedShortcutTrace = RuntimeLatencyTrace.parse(messages: [
+        "[LATENCY] trace=F1E2D3C4 seq=0 t=1000.0ms delta=0.0ms event=shortcut.key_up_handler",
+        "[LATENCY] trace=F1E2D3C4 seq=1 t=1190.0ms delta=190.0ms event=paste_command_v_keyboard_delivery method=globalHID",
+        "[LATENCY] trace=F1E2D3C4 seq=2 t=1190.0ms delta=0.0ms event=paste_event_posted method=globalHIDCommandV",
+        "[LATENCY] trace=F1E2D3C4 seq=3 t=1440.0ms delta=250.0ms event=paste_command_v_keyboard_observation disposition=delivered"
+    ])
+    try require(
+        focusedShortcutTrace?.keyUpToPasteEventMilliseconds ?? -1,
+        equals: 190,
+        "global Cmd-V latency must stop at event posting, not AX delivery observation"
+    )
+    try require(
+        focusedShortcutTrace?.events.first(where: { $0.name == "paste_event_posted" })?.sequence
+            == 2,
+        "global Cmd-V should emit paste proof before asynchronous delivery observation"
+    )
     let accessibilityInsertTrace = RuntimeLatencyTrace.parse(messages: [
         "[LATENCY] trace=E5F6A7B8 seq=0 t=1000.0ms delta=0.0ms event=shortcut.key_up_handler",
         "[LATENCY] trace=E5F6A7B8 seq=1 t=1080.0ms delta=80.0ms event=paste_text_inserted method=accessibility"

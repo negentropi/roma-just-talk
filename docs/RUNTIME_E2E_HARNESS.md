@@ -51,9 +51,27 @@ using Chromium's selected text-marker bounds when ordinary range bounds cannot
 resolve back to the captured editor, converting Chromium's AppKit screen
 coordinates before AX hit-testing. It accepts only an activated menu that owns
 that same system-hit-tested screen point, then presses enabled Paste and confirms
-the exact replacement before reporting delivery. Browser fallbacks stay bound to that
-editor's unchanged text and selection; drift aborts without a recaptured,
-keyboard-triggered, or Cmd-V CGEvent paste.
+the exact replacement before reporting delivery. For a captured browser or
+Electron editor whose AX ancestor chain contains `AXWebArea` plus a text-input
+role (with only an editor or transient `AXGroup` focused role), or whose
+verified browser/Electron bundle has an `AXTextArea` in the captured ancestor
+chain with that same focused-role policy, Roma first tries a focus- and
+frontmost-validated combined-session Cmd-V. The qualified target is captured before direct
+Accessibility insertion and carried through clipboard preparation, so a
+transient later AX-role change cannot downgrade it to the cold menu path. Once
+that validated chord is posted, Roma acknowledges the web delivery without
+waiting for a delayed AX text snapshot; the harness proves the exact DOM
+`paste`/`input` replacement and rendered result. This removes the cold web-menu
+delay and the AX-observation tail while retaining the captured target's text,
+selection, focus, and frontmost/PID drift checks immediately before posting;
+when a browser omits only its optional AX value snapshot, the required matching
+selection snapshot plus strict role/bundle and focus/PID checks remain the
+bounded validation.
+Native browser controls such as the URL bar remain on the legacy path. A target
+without the verified editor evidence keeps the legacy delay and menu-first
+ordering even when AX insertion is unsupported. Browser/Electron target drift
+or uncertain delivery aborts without recapturing focus or sending another
+keyboard paste.
 Document and
 Electron editor apps open a uniquely named temporary text file. Every target
 runs once empty and once with text on both sides of the insertion cursor.

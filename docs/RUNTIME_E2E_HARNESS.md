@@ -202,6 +202,7 @@ scheduling without further evidence.
 Before a run, the helper records:
 
 - VoiceInk microphone mode and selected-device UID
+- Mute Audio While Recording mode
 - Pause Media While Recording state
 - primary shortcut selection, mode, stored modifier, and cleared state
 - exact running VoiceInk bundle paths
@@ -209,9 +210,9 @@ Before a run, the helper records:
 - BlackHole input/output mute and volume controls when supported
 
 It then selects BlackHole for both sides, configures the manifest's modifier as
-the primary Special shortcut, temporarily disables Pause Media While Recording,
-unmutes both scopes, normalizes supported volumes for playback, and launches the
-exact selected Roma artifact.
+the primary Special shortcut, temporarily disables Mute Audio While Recording
+and Pause Media While Recording, unmutes both scopes, normalizes supported
+volumes for playback, and launches the exact selected Roma artifact.
 The run stops before changing preferences if Roma has not already completed both
 legacy shortcut migrations; this prevents a harness launch from deleting legacy
 shortcut state that was outside the restoration journal.

@@ -18,6 +18,8 @@ private struct RuntimeVoiceInkRestorationJournal: Codable {
     let originalAudioInputModeExisted: Bool
     let originalSelectedDeviceUID: String?
     let originalSelectedDeviceUIDExisted: Bool
+    let originalSystemMuteMode: String?
+    let originalSystemMuteModeExisted: Bool?
     let originalPauseMediaEnabled: Bool?
     let originalPauseMediaEnabledExisted: Bool?
     let originalPrimaryShortcutSelection: String?
@@ -36,6 +38,8 @@ private struct RuntimeVoiceInkPreferenceSnapshot {
     let audioInputModeExisted: Bool
     let selectedDeviceUID: String?
     let selectedDeviceUIDExisted: Bool
+    let systemMuteMode: String?
+    let systemMuteModeExisted: Bool
     let pauseMediaEnabled: Bool?
     let pauseMediaEnabledExisted: Bool
     let primaryShortcutSelection: String?
@@ -58,6 +62,7 @@ private struct RuntimeStoredModifierShortcut: Encodable {
 
 final class RuntimeVoiceInkSession {
     private static let primaryShortcutSelectionKey = "primaryRecordingShortcut"
+    private static let systemMuteModeKey = "systemMuteMode"
     private static let pauseMediaEnabledKey = "isPauseMediaEnabled"
     private static let primaryShortcutModeKey = "primaryRecordingShortcutMode"
     private static let primaryShortcutDataKey = "Shortcut_primaryRecording"
@@ -102,6 +107,8 @@ final class RuntimeVoiceInkSession {
             originalAudioInputModeExisted: snapshot.audioInputModeExisted,
             originalSelectedDeviceUID: snapshot.selectedDeviceUID,
             originalSelectedDeviceUIDExisted: snapshot.selectedDeviceUIDExisted,
+            originalSystemMuteMode: snapshot.systemMuteMode,
+            originalSystemMuteModeExisted: snapshot.systemMuteModeExisted,
             originalPauseMediaEnabled: snapshot.pauseMediaEnabled,
             originalPauseMediaEnabledExisted: snapshot.pauseMediaEnabledExisted,
             originalPrimaryShortcutSelection: snapshot.primaryShortcutSelection,
@@ -120,6 +127,7 @@ final class RuntimeVoiceInkSession {
             try terminateRunningApplications(bundleIdentifier: configuration.voiceInkBundleIdentifier)
             setPreference("Custom Device", key: "audioInputMode", bundleIdentifier: configuration.voiceInkBundleIdentifier)
             setPreference(audioDeviceUID, key: "selectedAudioDeviceUID", bundleIdentifier: configuration.voiceInkBundleIdentifier)
+            setPreference("never", key: systemMuteModeKey, bundleIdentifier: configuration.voiceInkBundleIdentifier)
             setBoolPreference(
                 false,
                 key: pauseMediaEnabledKey,
@@ -239,6 +247,14 @@ final class RuntimeVoiceInkSession {
             key: "selectedAudioDeviceUID",
             bundleIdentifier: journal.bundleIdentifier
         )
+        if let existed = journal.originalSystemMuteModeExisted {
+            restorePreference(
+                journal.originalSystemMuteMode,
+                existed: existed,
+                key: systemMuteModeKey,
+                bundleIdentifier: journal.bundleIdentifier
+            )
+        }
         if let existed = journal.originalPauseMediaEnabledExisted {
             restoreBoolPreference(
                 journal.originalPauseMediaEnabled,
@@ -347,6 +363,7 @@ final class RuntimeVoiceInkSession {
         let appID = bundleIdentifier as CFString
         let audioMode = CFPreferencesCopyAppValue("audioInputMode" as CFString, appID)
         let deviceUID = CFPreferencesCopyAppValue("selectedAudioDeviceUID" as CFString, appID)
+        let systemMuteMode = CFPreferencesCopyAppValue(systemMuteModeKey as CFString, appID)
         let pauseMediaEnabled = CFPreferencesCopyAppValue(pauseMediaEnabledKey as CFString, appID)
         let primarySelection = CFPreferencesCopyAppValue(primaryShortcutSelectionKey as CFString, appID)
         let primaryMode = CFPreferencesCopyAppValue(primaryShortcutModeKey as CFString, appID)
@@ -359,6 +376,8 @@ final class RuntimeVoiceInkSession {
             audioInputModeExisted: audioMode != nil,
             selectedDeviceUID: deviceUID as? String,
             selectedDeviceUIDExisted: deviceUID != nil,
+            systemMuteMode: systemMuteMode as? String,
+            systemMuteModeExisted: systemMuteMode != nil,
             pauseMediaEnabled: pauseMediaEnabled as? Bool,
             pauseMediaEnabledExisted: pauseMediaEnabled != nil,
             primaryShortcutSelection: primarySelection as? String,

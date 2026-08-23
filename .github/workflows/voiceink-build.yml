@@ -100,7 +100,7 @@ jobs:
   build:
     name: Build release macOS app
     needs: reuse
-    if: always() && needs.reuse.outputs.hit != 'true'
+    if: ${{ !cancelled() && needs.reuse.outputs.hit != 'true' }}
     runs-on: namespace-profile-roma-jt
     timeout-minutes: 60
 

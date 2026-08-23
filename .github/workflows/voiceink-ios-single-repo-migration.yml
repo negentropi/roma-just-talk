@@ -147,7 +147,7 @@ jobs:
   verify:
     name: Verify single-repo migration
     needs: reuse
-    if: always() && needs.reuse.outputs.hit != 'true'
+    if: ${{ !cancelled() && needs.reuse.outputs.hit != 'true' }}
     runs-on: namespace-profile-roma-jt
     timeout-minutes: 90
     env:

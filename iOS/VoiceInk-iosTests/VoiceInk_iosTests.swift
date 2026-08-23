@@ -42,32 +42,24 @@ final class VoiceInkIOSTests: XCTestCase {
         XCTAssertEqual(analysis.totalWithTranscriptionData, 1)
         XCTAssertEqual(analysis.totalAudioDuration, 12)
         XCTAssertEqual(analysis.totalEnhancedFiles, 1)
-        XCTAssertEqual(
-            analysis.transcriptionModels,
-            [
-                VoiceInkPerformanceModelStat(
-                    name: "fast-local",
-                    sampleCount: 1,
-                    totalProcessingTime: 3,
-                    avgProcessingTime: 3,
-                    avgAudioDuration: 12,
-                    speedFactor: 4
-                )
-            ]
-        )
-        XCTAssertEqual(
-            analysis.enhancementModels,
-            [
-                VoiceInkPerformanceModelStat(
-                    name: "cleaner",
-                    sampleCount: 1,
-                    totalProcessingTime: 2,
-                    avgProcessingTime: 2,
-                    avgAudioDuration: 12,
-                    speedFactor: 6
-                )
-            ]
-        )
+
+        XCTAssertEqual(analysis.transcriptionModels.count, 1)
+        let transcriptionModel = try XCTUnwrap(analysis.transcriptionModels.first)
+        XCTAssertEqual(transcriptionModel.name, "fast-local")
+        XCTAssertEqual(transcriptionModel.sampleCount, 1)
+        XCTAssertEqual(transcriptionModel.totalProcessingTime, 3)
+        XCTAssertEqual(transcriptionModel.avgProcessingTime, 3)
+        XCTAssertEqual(transcriptionModel.avgAudioDuration, 12)
+        XCTAssertEqual(transcriptionModel.speedFactor, 4)
+
+        XCTAssertEqual(analysis.enhancementModels.count, 1)
+        let enhancementModel = try XCTUnwrap(analysis.enhancementModels.first)
+        XCTAssertEqual(enhancementModel.name, "cleaner")
+        XCTAssertEqual(enhancementModel.sampleCount, 1)
+        XCTAssertEqual(enhancementModel.totalProcessingTime, 2)
+        XCTAssertEqual(enhancementModel.avgProcessingTime, 2)
+        XCTAssertEqual(enhancementModel.avgAudioDuration, 12)
+        XCTAssertEqual(enhancementModel.speedFactor, 6)
     }
 
     func testAppGroupRecordingBridgeKeepsFreshRecordingState() throws {

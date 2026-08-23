@@ -2,7 +2,7 @@
 
 ## v1.96 - Unreleased
 
-- Restyled the landing-page download action with a transparent face and the headline's idea color, and changed the contact action frame from blue to dark gray.
+- Restyled the landing-page action frames in white, light gray, and dark gray while keeping their current faces and interactions.
 - Changed automatic macOS recording mute to keep AirPods output audible while muting other outputs; explicit On and Off modes remain overrides.
 - Renamed the inherited iOS record deep-link scheme from `voiceink://record` to `romajusttalk://record` so external launch identity matches Roma Just Talk.
 - Replaced the inherited VoiceInk bundle, logging, iCloud, App Group, keychain, test, and extension identifiers with `com.negentropi.RomaJustTalk`.

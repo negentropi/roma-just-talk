@@ -9,8 +9,9 @@
   --coral: #ff6b4a;
   --cyan: #46d9ff;
   --cream: #fff8e7;
-  --download-accent: var(--idea);
-  --github-accent: var(--cream);
+  --download-accent: #fff;
+  --download-edge: color-mix(in srgb, var(--ink) 52%, transparent);
+  --github-accent: #b8b8b8;
   --talk-ink: #171412;
   --talk-accent: #2f2f2f;
   --talk-inner: color-mix(in srgb, var(--talk-accent) 20%, transparent);
@@ -48,6 +49,7 @@
     --coral: #ff785e;
     --cyan: #42d9ff;
     --cream: #fff8e7;
+    --download-edge: transparent;
     --talk-ink: #fff8e7;
     --talk-accent: #606060;
     --talk-inner: color-mix(in srgb, var(--talk-accent) 22%, transparent);
@@ -333,6 +335,8 @@ h1 .before-word {
   color: var(--ink);
   box-shadow:
     4px 4px 0 var(--button-accent),
+    5px 5px 0 var(--download-edge),
+    0 0 0 1px var(--download-edge),
     inset 0 0 0 1px color-mix(in srgb, var(--button-accent) 20%, transparent),
     0 18px 42px color-mix(in srgb, var(--button-accent) 10%, transparent);
 }
@@ -340,6 +344,8 @@ h1 .before-word {
 #download-button:hover {
   box-shadow:
     4px 4px 0 var(--button-accent),
+    5px 5px 0 var(--download-edge),
+    0 0 0 1px var(--download-edge),
     inset 0 0 0 1px color-mix(in srgb, var(--button-accent) 20%, transparent),
     0 22px 52px color-mix(in srgb, var(--button-accent) 12%, transparent);
 }

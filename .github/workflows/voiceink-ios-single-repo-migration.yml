@@ -86,7 +86,7 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-      - name: Run focused iOS parity tests
+      - name: Run iOS test bundles
         id: ios_tests
         continue-on-error: true
         run: |
@@ -120,36 +120,8 @@ jobs:
             CODE_SIGNING_ALLOWED=YES \
             CODE_SIGN_IDENTITY=- \
             ENTITLEMENTS_ALLOWED=YES \
-            EXCLUDED_SOURCE_FILE_NAMES=VoiceInk_iosTests.swift \
-            -only-testing:VoiceInk-iosTests/KeyboardDictationExchangeTests \
-            -only-testing:VoiceInk-iosTests/KeyboardReadinessTests \
-            -only-testing:VoiceInk-iosTests/KeyboardClipboardHistoryTests \
-            -only-testing:VoiceInk-iosTests/IOSTranscriptionTaskCoordinatorTests \
-            -only-testing:VoiceInk-iosTests/IOSStreamingTranscriptionTests \
-            -only-testing:VoiceInk-iosTests/IOSLocalWhisperSettingsTests \
-            -only-testing:VoiceInk-iosTests/IOSLocalWhisperModelImporterTests \
-            -only-testing:VoiceInk-iosTests/IOSMicrophonePermissionTests \
-            -only-testing:VoiceInk-iosTests/IOSNativeAppleTranscriptionTests \
-            -only-testing:VoiceInk-iosTests/IOSRecordingAppIntentTests \
-            -only-testing:VoiceInk-iosTests/IOSAnnouncementsStoreTests \
-            -only-testing:VoiceInk-iosTests/IOSFluidAudioTests \
-            -only-testing:VoiceInk-iosTests/IOSCustomCloudModelTests \
-            -only-testing:VoiceInk-iosTests/IOSDictionarySettingsTests \
-            -only-testing:VoiceInk-iosTests/IOSPostProcessingProviderTests \
-            -only-testing:VoiceInk-iosTests/IOSAnthropicPostProcessingTests \
-            -only-testing:VoiceInk-iosTests/IOSOpenRouterPostProcessingTests \
-            -only-testing:VoiceInk-iosTests/IOSCustomEnhancementProviderTests \
-            -only-testing:VoiceInk-iosTests/IOSOllamaPostProcessingTests \
-            -only-testing:VoiceInk-iosTests/IOSPromptLibraryTests \
-            -only-testing:VoiceInk-iosTests/IOSHistoryReprocessingTests \
-            -only-testing:VoiceInk-iosTests/IOSHistoryBulkActionsTests \
-            -only-testing:VoiceInk-iosTests/IOSMetricsTests \
-            -only-testing:VoiceInk-iosTests/IOSHistoryCleanupTests \
-            -only-testing:VoiceInk-iosTests/IOSSettingsBackupTests \
-            -only-testing:VoiceInk-iosTests/IOSDiagnosticsTests \
-            -only-testing:VoiceInk-iosTests/IOSEnhancementBehaviorTests \
-            -only-testing:VoiceInk-iosTests/IOSRecordingFeedbackTests \
-            -only-testing:VoiceInk-iosUITests/VoiceInkIOSUITests
+            -only-testing:VoiceInk-iosTests \
+            -only-testing:VoiceInk-iosUITests
 
       - name: Upload iOS runtime proof
         if: always()

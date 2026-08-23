@@ -60,6 +60,29 @@ require_file_string_count() {
   fi
 }
 
+require_file_line_count() {
+  local description="$1"
+  local file="$2"
+  local expected_line="$3"
+  local expected="$4"
+
+  section "$description"
+  local actual
+  if ! actual="$(
+    ruby -e '
+      path, expected_line = ARGV
+      print File.readlines(path, chomp: true).count { |line| line.strip == expected_line }
+    ' "$file" "$expected_line"
+  )"; then
+    fail "$description"
+    return
+  fi
+
+  if [[ "$actual" != "$expected" ]]; then
+    fail "$description: expected $expected line(s), got $actual"
+  fi
+}
+
 require_dir() {
   if [[ ! -d "$1" ]]; then
     fail "missing directory: $1"
@@ -285,10 +308,22 @@ require_xml_xpath_value \
   "VoiceInk-iosTests"
 
 require_xml_xpath_value \
+  "iOS workspace scheme enables unit-test bundle" \
+  VoiceInk.xcworkspace/xcshareddata/xcschemes/VoiceInk-ios.xcscheme \
+  "//TestableReference[BuildableReference[@BlueprintName='VoiceInk-iosTests']]/@skipped" \
+  "NO"
+
+require_xml_xpath_value \
   "iOS workspace scheme includes UI-test bundle" \
   VoiceInk.xcworkspace/xcshareddata/xcschemes/VoiceInk-ios.xcscheme \
   "//BuildableReference[@BlueprintName='VoiceInk-iosUITests']/@BlueprintName" \
   "VoiceInk-iosUITests"
+
+require_xml_xpath_value \
+  "iOS workspace scheme enables UI-test bundle" \
+  VoiceInk.xcworkspace/xcshareddata/xcschemes/VoiceInk-ios.xcscheme \
+  "//TestableReference[BuildableReference[@BlueprintName='VoiceInk-iosUITests']]/@skipped" \
+  "NO"
 
 require_plist_value \
   "iOS app display name stays roma just talk" \
@@ -362,6 +397,48 @@ require_file_string_count \
   "iOS CI does not disable signing for Simulator artifacts" \
   .github/workflows/voiceink-ios-single-repo-migration.yml \
   "CODE_SIGNING_ALLOWED=NO" \
+  0
+
+require_file_string_count \
+  "iOS CI does not exclude test source files" \
+  .github/workflows/voiceink-ios-single-repo-migration.yml \
+  "EXCLUDED_SOURCE_FILE_NAMES" \
+  0
+
+require_file_line_count \
+  "iOS CI runs the complete unit-test bundle" \
+  .github/workflows/voiceink-ios-single-repo-migration.yml \
+  "-only-testing:VoiceInk-iosTests \\" \
+  1
+
+require_file_string_count \
+  "iOS CI avoids class-level unit-test allowlists" \
+  .github/workflows/voiceink-ios-single-repo-migration.yml \
+  "-only-testing:VoiceInk-iosTests/" \
+  0
+
+require_file_line_count \
+  "iOS CI runs the complete UI-test bundle" \
+  .github/workflows/voiceink-ios-single-repo-migration.yml \
+  "-only-testing:VoiceInk-iosUITests" \
+  1
+
+require_file_string_count \
+  "iOS CI avoids class-level UI-test allowlists" \
+  .github/workflows/voiceink-ios-single-repo-migration.yml \
+  "-only-testing:VoiceInk-iosUITests/" \
+  0
+
+require_file_string_count \
+  "iOS CI has only the two complete-bundle selectors" \
+  .github/workflows/voiceink-ios-single-repo-migration.yml \
+  "-only-testing:" \
+  2
+
+require_file_string_count \
+  "iOS CI does not skip tests inside either bundle" \
+  .github/workflows/voiceink-ios-single-repo-migration.yml \
+  "-skip-testing:" \
   0
 
 require_project_string \

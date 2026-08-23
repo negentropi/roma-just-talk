@@ -382,7 +382,7 @@ The remaining Swift files present in `../VoiceInk-iOS/VoiceInk-ios` but not in `
 - `Item.swift`: unused SwiftData template sample.
 - `VoiceInk-ios/Transcription.swift`: obsolete nested clone-side model copy; current in-repo iOS model is `iOS/VoiceInk-ios/Transcription.swift`.
 - In-repo-only iOS app Swift files are limited to `ProviderAPIKeyTone+iOS.swift`, `TranscriptStatusTone+iOS.swift`, `Transcription.swift`, and `WhisperModelDownloadTint+iOS.swift`; these are the intentional iOS shell adapters/model files after the single-repo import, not sibling clone drift.
-- `VoiceInk_iosTests.swift` and `VoiceInk_iosUITests.swift`: kept in the in-repo iOS target as real migration/runtime smoke coverage; pure `VoiceInkCore` contract assertions stay in `VoiceInkCoreTests`, and the old stock-template assertions from the sibling clone should not be copied back.
+- `VoiceInk_iosTests.swift` and `VoiceInk_iosUITests.swift`: kept in the in-repo iOS target as real migration/runtime smoke coverage; pure `VoiceInkCore` contract assertions stay in `VoiceInkCoreTests`, and the old stock-template assertions from the sibling clone should not be copied back. CI runs both complete test bundles, and the migration gate rejects disabled bundles, source exclusions, skip selectors, or class-level allowlists that could silently omit tests.
 - `VoiceInk_iosUITestsLaunchTests.swift`: obsolete stock launch-screenshot template; the real launch smoke assertion lives in `VoiceInk_iosUITests.swift`, so this file stays absent from the in-repo iOS UI-test target.
 
 Do not copy these files back into `VoiceInk/iOS`. If behavior from one appears missing, port it into `VoiceInkCore` or the appropriate platform shell with a focused test.

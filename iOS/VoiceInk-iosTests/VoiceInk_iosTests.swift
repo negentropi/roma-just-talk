@@ -1,6 +1,6 @@
 import XCTest
 import VoiceInkCore
-@testable import VoiceInk_ios
+@testable import roma_just_talk
 
 final class VoiceInkIOSTests: XCTestCase {
     func testTranscriptionFeedsSharedDashboardMetrics() throws {

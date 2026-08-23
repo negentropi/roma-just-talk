@@ -2,6 +2,12 @@ name: Build roma just talk
 
 on:
   workflow_dispatch:
+    inputs:
+      force:
+        description: Ignore an existing green exact-SHA build
+        required: true
+        default: false
+        type: boolean
   push:
     branches:
       - main
@@ -10,13 +16,91 @@ on:
       - "LocalBuild.xcconfig"
       - "Makefile"
       - "Tools/**"
+      - "scripts/check-find-reusable-ci-run.sh"
+      - "scripts/find-reusable-ci-run.sh"
       - "VoiceInk/**"
       - "VoiceInkTests/**"
       - "VoiceInk.xcodeproj/**"
 
+permissions:
+  contents: read
+
+concurrency:
+  group: namespace-profile-roma-jt
+  cancel-in-progress: false
+  queue: max
+
 jobs:
+  reuse:
+    name: Find reusable exact-SHA build
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    outputs:
+      hit: ${{ steps.result.outputs.hit }}
+      run_id: ${{ steps.lookup.outputs.run_id }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check exact-SHA reuse behavior
+        run: bash scripts/check-find-reusable-ci-run.sh
+
+      - name: Find green build with a live app artifact
+        id: lookup
+        if: inputs.force != true
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/find-reusable-ci-run.sh voiceink-build.yml "$GITHUB_SHA" roma.just.talk.app
+
+      - name: Report reused build
+        if: steps.lookup.outputs.hit == 'true'
+        run: echo "Reusing build run ${{ steps.lookup.outputs.run_id }} for $GITHUB_SHA"
+
+      - name: Download reused app artifact
+        if: steps.lookup.outputs.hit == 'true'
+        id: download
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: roma.just.talk.app
+          path: reused-artifact
+          repository: ${{ github.repository }}
+          run-id: ${{ steps.lookup.outputs.run_id }}
+          github-token: ${{ github.token }}
+
+      - name: Republish reused app artifact
+        if: steps.download.outcome == 'success'
+        id: upload
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.just.talk.app
+          path: reused-artifact/roma.just.talk.app.zip
+          if-no-files-found: error
+          overwrite: true
+
+      - name: Resolve reusable build
+        id: result
+        if: always()
+        env:
+          CACHE_HIT: ${{ steps.lookup.outputs.hit }}
+          DOWNLOAD_OUTCOME: ${{ steps.download.outcome }}
+          UPLOAD_OUTCOME: ${{ steps.upload.outcome }}
+        run: |
+          if [[ "$CACHE_HIT" == true && "$DOWNLOAD_OUTCOME" == success && "$UPLOAD_OUTCOME" == success ]]; then
+            echo "hit=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "hit=false" >> "$GITHUB_OUTPUT"
+          fi
+
   build:
     name: Build release macOS app
+    needs: reuse
+    if: always() && needs.reuse.outputs.hit != 'true'
     runs-on: namespace-profile-roma-jt
     timeout-minutes: 60
 
@@ -84,3 +168,4 @@ jobs:
           name: roma.just.talk.app
           path: roma.just.talk.app.zip
           if-no-files-found: error
+          overwrite: true

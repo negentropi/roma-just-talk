@@ -2,6 +2,12 @@ name: VoiceInk iOS single-repo migration
 
 on:
   workflow_dispatch:
+    inputs:
+      force:
+        description: Ignore an existing green exact-SHA verification
+        required: true
+        default: false
+        type: boolean
   pull_request:
     paths:
       - ".github/workflows/voiceink-ios-single-repo-migration.yml"
@@ -29,9 +35,119 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: namespace-profile-roma-jt
+  cancel-in-progress: false
+  queue: max
+
 jobs:
+  reuse:
+    name: Find reusable exact-SHA verification
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    outputs:
+      hit: ${{ steps.result.outputs.hit }}
+      run_id: ${{ steps.lookup.outputs.run_id }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check exact-SHA reuse behavior
+        run: bash scripts/check-find-reusable-ci-run.sh
+
+      - name: Find green verification with live proof artifacts
+        id: lookup
+        if: inputs.force != true
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          bash scripts/find-reusable-ci-run.sh \
+            voiceink-ios-single-repo-migration.yml \
+            "$GITHUB_SHA" \
+            roma.just.talk.ios-simulator.app \
+            ios-runtime-proof
+
+      - name: Report reused verification
+        if: steps.lookup.outputs.hit == 'true'
+        run: echo "Reusing verification run ${{ steps.lookup.outputs.run_id }} for $GITHUB_SHA"
+
+      - name: Download reused Simulator app
+        if: steps.lookup.outputs.hit == 'true'
+        id: download_app
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: roma.just.talk.ios-simulator.app
+          path: reused-artifacts/ios-app
+          repository: ${{ github.repository }}
+          run-id: ${{ steps.lookup.outputs.run_id }}
+          github-token: ${{ github.token }}
+
+      - name: Download reused runtime proof
+        if: steps.download_app.outcome == 'success'
+        id: download_proof
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: ios-runtime-proof
+          path: reused-artifacts/runtime-proof
+          repository: ${{ github.repository }}
+          run-id: ${{ steps.lookup.outputs.run_id }}
+          github-token: ${{ github.token }}
+
+      - name: Republish reused Simulator app
+        if: steps.download_proof.outcome == 'success'
+        id: upload_app
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.just.talk.ios-simulator.app
+          path: reused-artifacts/ios-app/roma.just.talk.ios-simulator.app.zip
+          if-no-files-found: error
+          retention-days: 7
+          overwrite: true
+
+      - name: Republish reused runtime proof
+        if: steps.upload_app.outcome == 'success'
+        id: upload_proof
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-runtime-proof
+          path: reused-artifacts/runtime-proof
+          if-no-files-found: error
+          retention-days: 7
+          overwrite: true
+
+      - name: Resolve reusable verification
+        id: result
+        if: always()
+        env:
+          CACHE_HIT: ${{ steps.lookup.outputs.hit }}
+          DOWNLOAD_APP_OUTCOME: ${{ steps.download_app.outcome }}
+          DOWNLOAD_PROOF_OUTCOME: ${{ steps.download_proof.outcome }}
+          UPLOAD_APP_OUTCOME: ${{ steps.upload_app.outcome }}
+          UPLOAD_PROOF_OUTCOME: ${{ steps.upload_proof.outcome }}
+        run: |
+          if [[ "$CACHE_HIT" == true \
+            && "$DOWNLOAD_APP_OUTCOME" == success \
+            && "$DOWNLOAD_PROOF_OUTCOME" == success \
+            && "$UPLOAD_APP_OUTCOME" == success \
+            && "$UPLOAD_PROOF_OUTCOME" == success ]]; then
+            echo "hit=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "hit=false" >> "$GITHUB_OUTPUT"
+          fi
+
   verify:
     name: Verify single-repo migration
+    needs: reuse
+    if: always() && needs.reuse.outputs.hit != 'true'
     runs-on: namespace-profile-roma-jt
     timeout-minutes: 90
     env:
@@ -85,6 +201,7 @@ jobs:
           path: roma.just.talk.ios-simulator.app.zip
           if-no-files-found: error
           retention-days: 7
+          overwrite: true
 
       - name: Run iOS test bundles
         id: ios_tests
@@ -131,6 +248,7 @@ jobs:
           path: .local-build-ios/Logs/Test/*.xcresult
           if-no-files-found: warn
           retention-days: 7
+          overwrite: true
 
       - name: Upload iOS test diagnostics
         if: steps.ios_tests.outcome == 'failure'

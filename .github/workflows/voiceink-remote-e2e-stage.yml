@@ -88,6 +88,11 @@ env:
   STAGE_MACOS_REPETITIONS: ${{ inputs.macos_repetitions || '3' }}
   STAGE_IOS_SCENARIO: ${{ inputs.ios_scenario || 'none' }}
 
+concurrency:
+  group: namespace-profile-roma-jt
+  cancel-in-progress: false
+  queue: max
+
 jobs:
   stage:
     name: Remote desktop ready

@@ -282,6 +282,8 @@ defaults write "$voiceink_bundle_id" appendTrailingSpace -bool false
 killall cfprefsd 2>/dev/null || true
 
 mark_phase prewarm-model
+printf '%s\n' "${RUNTIME_MODEL_CACHE_HIT:-false}" > "$evidence/model-cache-hit.txt"
+printf '%s\n' false > "$evidence/model-prewarm-completed.txt"
 open -na "$voiceink_app"
 model_deadline=$((SECONDS + 1200))
 while (( SECONDS < model_deadline )); do
@@ -295,6 +297,7 @@ while (( SECONDS < model_deadline )); do
   sleep 5
 done
 grep -Fq "Prewarm completed" "$evidence/macos-app.log"
+printf '%s\n' true > "$evidence/model-prewarm-completed.txt"
 model_root="$HOME/Library/Application Support/FluidAudio"
 fd -a -d 4 . "$model_root" | sort > "$evidence/model-cache-tree.txt" 2>&1 || true
 model_directory="$(fd -a -t d '^parakeet-tdt-0\.6b-v2' "$model_root" | sort | head -n 1 || true)"

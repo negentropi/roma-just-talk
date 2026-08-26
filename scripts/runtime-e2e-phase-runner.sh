@@ -56,7 +56,8 @@ runtime_e2e_config_json() {
       explicitHoldSeconds: null,
       preRollWarmupSeconds: 12,
       targetSettleSeconds: 1,
-      targetTextTimeoutSeconds: 20,
+      # Prior green Namespace evidence peaked at 174ms; smoke keeps over 17x headroom.
+      targetTextTimeoutSeconds: (if $config_mode == "smoke" then 3 else 20 end),
       latencyThresholdMilliseconds: $latency_threshold,
       maximumWordErrorRate: 1,
       repetitions: $repetitions,

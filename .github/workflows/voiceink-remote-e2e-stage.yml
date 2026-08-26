@@ -167,7 +167,16 @@ jobs:
           echo "$RUN_ID" > "$RUNNER_TEMP/remote-e2e-inputs/ios/build-run-id.txt"
           echo "Using iOS artifact from run $RUN_ID"
 
+      - name: Mount runtime E2E model cache
+        id: runtime-model-cache
+        if: env.STAGE_TARGET != 'ios' && env.STAGE_MACOS_SCENARIO != 'none'
+        uses: namespacelabs/nscloud-cache-action@c5f8dab7560444c4bf8dbc64f1b203431873c547 # v1.6.1
+        with:
+          path: ~/Library/Application Support/FluidAudio/Models/parakeet-tdt-0.6b-v2
+
       - name: Prepare desktop and hold for Remote Display
+        env:
+          RUNTIME_MODEL_CACHE_HIT: ${{ steps.runtime-model-cache.outputs.cache-hit }}
         run: |
           bash scripts/prepare-remote-e2e-stage.sh \
             "$STAGE_TARGET" \

@@ -83,12 +83,29 @@ smoke_config_json="$(
     20000 \
     smoke
 )"
+full_config_json="$(
+  runtime_e2e_config_json \
+    /fixtures \
+    '/Applications/roma just talk.app' \
+    3 \
+    250 \
+    full
+)"
 if ! jq -e '
   .preRollWarmupSeconds == 12
+  and .targetTextTimeoutSeconds == 3
   and .minimumTargetCount == 2
   and ([.targets[].id] == ["textedit", "chrome"])
 ' <<<"$smoke_config_json" >/dev/null; then
   echo "Runtime smoke must emit the proven warmup and reduced target set." >&2
+  exit 1
+fi
+if ! jq -e '
+  .targetTextTimeoutSeconds == 20
+  and .minimumTargetCount == 4
+  and .repetitions == 3
+' <<<"$full_config_json" >/dev/null; then
+  echo "Full runtime proof must preserve its observation and repetition budget." >&2
   exit 1
 fi
 
@@ -146,6 +163,26 @@ if ! grep -Fq -- '- "scripts/runtime-e2e-phase-runner.sh"' \
   echo "Remote E2E must run when its phase router changes." >&2
   exit 1
 fi
+
+workflow="$repo_root/.github/workflows/voiceink-remote-e2e-stage.yml"
+ruby - "$workflow" <<'RUBY'
+require "yaml"
+
+steps = YAML.load_file(ARGV.fetch(0)).fetch("jobs").fetch("stage").fetch("steps")
+cache = steps.find { |step| step["id"] == "runtime-model-cache" }
+prepare = steps.find { |step| step["name"] == "Prepare desktop and hold for Remote Display" }
+
+abort "Remote E2E must mount the pinned persistent Parakeet model cache." unless
+  cache&.fetch("uses", nil) ==
+    "namespacelabs/nscloud-cache-action@c5f8dab7560444c4bf8dbc64f1b203431873c547" &&
+  cache.dig("with", "path") ==
+    "~/Library/Application Support/FluidAudio/Models/parakeet-tdt-0.6b-v2" &&
+  !cache.key?("continue-on-error")
+
+abort "Remote E2E must record the cache action's authoritative hit output." unless
+  prepare&.dig("env", "RUNTIME_MODEL_CACHE_HIT") ==
+    "${{ steps.runtime-model-cache.outputs.cache-hit }}"
+RUBY
 
 fd() {
   printf '%s\n' \

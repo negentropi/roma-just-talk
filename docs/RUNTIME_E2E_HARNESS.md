@@ -68,6 +68,12 @@ change the frontmost application.
 
 ## Autonomous Namespace Run
 
+For a fast hypothesis check, use the same inputs below with
+`macos_scenario=runtime-smoke`. It requires a named quick-release fixture no
+longer than eight seconds, then uses TextEdit, Chrome, and one repetition. It
+skips VS Code installation and the repeated matrix. This is an early rejection
+lane, not final runtime proof.
+
 Run `Prepare remote E2E stage` with:
 
 - `target=macos`
@@ -86,10 +92,10 @@ of the downloaded Roma app and the one-time-built helper. It never re-signs the
 production Roma artifact.
 
 Before sampling, the scenario waits for the real Parakeet V2 download and app
-prewarm. It then runs deterministic checks, a four-app, two-baseline target probe, one
-functional repetition with a relaxed latency ceiling, and the requested repeated
-matrix with the `250ms` budget. A functional-smoke failure is retained but does
-not suppress the repeated matrix. All JSON reports, phase stdout/stderr, TCC rows,
+prewarm. It then runs deterministic checks, a two-app target probe and four-case
+smoke using one short fixture, and the requested repeated four-app matrix with the
+`250ms` budget. A smoke failure is retained but does not suppress the repeated
+matrix in `runtime-e2e`. All JSON reports, phase stdout/stderr, TCC rows,
 signatures, hashes, model/audio provenance, app logs, and restoration results are
 uploaded as `remote-e2e-stage-evidence` even when a phase fails.
 

@@ -32,7 +32,7 @@ case "$ios_scenario" in
 esac
 
 case "$macos_scenario" in
-  none|runtime-e2e) ;;
+  none|runtime-smoke|runtime-e2e) ;;
   *)
     echo "Unsupported macOS scenario: $macos_scenario" >&2
     exit 2
@@ -44,8 +44,8 @@ if [ "$target" = "ios" ] && [ "$macos_scenario" != "none" ]; then
   exit 2
 fi
 
-if [ "$macos_scenario" = "runtime-e2e" ] && [ -z "$macos_audio_artifact" ]; then
-  echo "runtime-e2e requires a private Namespace audio artifact" >&2
+if [ "$macos_scenario" != "none" ] && [ -z "$macos_audio_artifact" ]; then
+  echo "$macos_scenario requires a private Namespace audio artifact" >&2
   exit 2
 fi
 
@@ -207,13 +207,18 @@ EOF
 
 write_manifest scenario-running
 
-if [ "$macos_scenario" = "runtime-e2e" ]; then
+if [ "$macos_scenario" != "none" ]; then
+  macos_runtime_mode="full"
+  if [ "$macos_scenario" = "runtime-smoke" ]; then
+    macos_runtime_mode="smoke"
+  fi
   set +e
   bash "$(dirname "$0")/run-macos-runtime-e2e.sh" \
     "$HOME/Applications/roma just talk.app" \
     "$macos_audio_artifact" \
     "$evidence" \
-    "$macos_repetitions"
+    "$macos_repetitions" \
+    "$macos_runtime_mode"
   macos_scenario_status=$?
   set -e
 fi

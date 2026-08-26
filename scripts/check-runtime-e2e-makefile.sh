@@ -85,3 +85,55 @@ if grep -Fq '|phase:target-probe' <<<"$phase_calls"; then
   echo "Target probing must not run after a failed preflight." >&2
   exit 1
 fi
+
+phase_calls=""
+phase_failure="none"
+scenario_status=0
+run_runtime_e2e_phases smoke.json full.json smoke
+if ! grep -Fq '|run:preflight:runtime-e2e-preflight:smoke.json' <<<"$phase_calls" \
+  || ! grep -Fq '|run:functional-smoke:runtime-e2e-run:smoke.json' <<<"$phase_calls"; then
+  echo "Runtime smoke must use the reduced config from preflight through execution." >&2
+  exit 1
+fi
+if grep -Fq '|phase:repeated-runtime-matrix' <<<"$phase_calls"; then
+  echo "Runtime smoke must not run the repeated matrix." >&2
+  exit 1
+fi
+
+if run_runtime_e2e_phases smoke.json full.json unsupported >/dev/null 2>&1; then
+  echo "Unsupported runtime modes must fail closed." >&2
+  exit 1
+fi
+
+if ! grep -Fq -- '- "scripts/runtime-e2e-phase-runner.sh"' \
+  "$repo_root/.github/workflows/voiceink-remote-e2e-stage.yml"; then
+  echo "Remote E2E must run when its phase router changes." >&2
+  exit 1
+fi
+
+fd() {
+  printf '%s\n' \
+    '/fixtures/quick-release-a-slow.wav' \
+    '/fixtures/quick-release-b-short.wav'
+}
+afinfo() {
+  case "$2" in
+    *-a-slow.wav) printf '%s\n' 'estimated duration: 12.000 sec' ;;
+    *-b-short.wav) printf '%s\n' 'estimated duration: 3.250 sec' ;;
+    *) return 1 ;;
+  esac
+}
+
+selected_fixture="$(select_runtime_smoke_fixture /fixtures 8)"
+if [ "$selected_fixture" != '/fixtures/quick-release-b-short.wav' ]; then
+  echo "Runtime smoke must select a measured fixture within its duration bound." >&2
+  exit 1
+fi
+
+fd() {
+  printf '%s\n' '/fixtures/quick-release-a-slow.wav'
+}
+if select_runtime_smoke_fixture /fixtures 8 >/dev/null 2>&1; then
+  echo "Runtime smoke must fail closed without a bounded quick-release fixture." >&2
+  exit 1
+fi

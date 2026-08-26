@@ -17,15 +17,16 @@ on:
         required: false
         type: string
       macos_scenario:
-        description: Optional deterministic macOS runtime scenario
+        description: Optional deterministic macOS runtime scenario; smoke is hypothesis evidence
         required: true
         default: none
         type: choice
         options:
           - none
+          - runtime-smoke
           - runtime-e2e
       macos_audio_artifact:
-        description: Private Namespace artifact containing WAV fixtures for runtime-e2e
+        description: Private Namespace artifact containing WAV fixtures for macOS runtime scenarios
         required: false
         type: string
       macos_repetitions:
@@ -68,6 +69,7 @@ on:
       - "scripts/open-remote-e2e-stage.sh"
       - "scripts/prepare-remote-e2e-stage.sh"
       - "scripts/run-macos-runtime-e2e.sh"
+      - "scripts/runtime-e2e-phase-runner.sh"
       - "scripts/run-ios-remote-stt-e2e.sh"
       - "Tools/RuntimeE2EHarness/**"
       - "Makefile"

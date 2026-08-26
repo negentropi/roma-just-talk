@@ -1,8 +1,8 @@
 # Remote E2E Stage
 
 This workflow prepares the remote computer. Manual interaction remains the
-default. Deterministic macOS runtime and iOS local-Whisper scenarios can run
-before the optional hold.
+default. Deterministic macOS smoke, full runtime, and iOS local-Whisper scenarios
+can run before the optional hold.
 
 The intended split:
 
@@ -19,8 +19,8 @@ Inputs:
 
 - `target`: `macos`, `ios`, or `both`.
 - `macos_artifact_run_id`: successful `Build roma just talk` workflow run containing the exact macOS artifact to exercise. Blank selects the latest green build.
-- `macos_scenario`: `none` or `runtime-e2e`.
-- `macos_audio_artifact`: private Namespace artifact containing the WAV fixtures; required by `runtime-e2e`.
+- `macos_scenario`: `none`, `runtime-smoke`, or `runtime-e2e`.
+- `macos_audio_artifact`: private Namespace artifact containing the WAV fixtures; required by both macOS runtime scenarios.
 - `macos_repetitions`: `1`, `3`, or `5` repetitions per fixture/app after the smoke run.
 - `ios_artifact_run_id`: successful `VoiceInk iOS single-repo migration` workflow run containing the exact Simulator artifact. Blank selects the latest green run.
 - `ios_scenario`: `none` or `local-whisper-import`.
@@ -72,6 +72,25 @@ The stable future-agent contract is:
 Provisioning remains owned by this workflow. Manual interaction prompts and judgment
 remain owned by Computer Use; the optional local-STT path is owned by the deterministic script.
 
+## Fast macOS hypothesis check
+
+Choose `target=macos`, set `macos_artifact_run_id` to an exact green build,
+choose `macos_scenario=runtime-smoke`, provide the private Namespace WAV
+artifact, and use `hold_minutes=0`.
+
+This lane answers whether a runtime idea survives one named quick-release fixture
+of at most eight seconds in TextEdit and Chrome, with both empty and existing-text
+insertion. It runs the same
+preflight, isolated target probe, real app, BlackHole route, Special shortcut,
+trace, rendered-text, cleanup, and restoration checks as the full scenario. It
+does not provide repeated latency or four-app coverage. Treat it as hypothesis
+evidence, then run `runtime-e2e` on the final candidate.
+
+When only `Tools/RuntimeE2EHarness`, its runtime scripts, or these docs changed,
+reuse the last exact app build. Do not rebuild macOS or run iOS verification for
+an unchanged app. Any app, shared-core, project, entitlement, build-setting, or
+dependency change needs a new exact app artifact first.
+
 ## Deterministic macOS runtime E2E scenario
 
 Choose `target=macos`, set `macos_artifact_run_id` to the exact green build,
@@ -80,14 +99,14 @@ and use `hold_minutes=0` for a fully scripted run.
 
 The scenario:
 
-1. installs BlackHole 2ch and Visual Studio Code on the disposable VM;
+1. installs BlackHole 2ch, Chrome, and Visual Studio Code on the disposable VM;
 2. preserves the downloaded Roma app signature and builds the external harness once;
 3. grants exact-CDHash TCC rows only on that ephemeral Mac;
 4. waits for Roma's real Parakeet V2 model download and prewarm;
 5. opens TextEdit, Safari, Chrome, and VS Code before the `runningOnly` harness starts;
 6. proves isolated target setup/cleanup before involving Roma, audio, or Shift;
 7. feeds each WAV into BlackHole, beginning audio `1.1s` before synthetic left-Shift down;
-8. runs an eight-case functional smoke, then the requested repeated four-app matrix; and
+8. runs a four-case TextEdit/Chrome smoke using one short fixture, then the requested repeated four-app matrix; and
 9. uploads factual phase checkpoints and the first unproven boundary without assigning blame to Roma or the harness.
 
 The TCC database writes are intentionally remote-only. They are not a local setup
@@ -129,5 +148,5 @@ Namespace VNC can be active while `screencapture` remains unable to see that dis
 - iOS means iOS Simulator on the remote Mac, not a physical iPhone.
 - Microphone availability is not assumed; the deterministic STT scenario uses a generated audio file.
 - Manual stages do not pre-grant Accessibility, Input Monitoring, Screen Recording, or other TCC permissions.
-- The `runtime-e2e` scenario grants only the exact helper/Roma permissions needed on its disposable VM and verifies the real global-shortcut/audio-input path.
+- Both macOS runtime scenarios grant only the exact helper/Roma permissions needed on their disposable VM and verify the real global-shortcut/audio-input path.
 - The optional local-STT scenario performs narrow AXe UI assertions; XCUITest remains a separate fast gate.

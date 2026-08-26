@@ -11,11 +11,20 @@ on:
   pull_request:
     paths:
       - ".github/workflows/voiceink-ios-single-repo-migration.yml"
-      - "scripts/**"
-      - "docs/**"
+      - "LocalBuild.xcconfig"
+      - "Makefile"
+      - "scripts/check-find-reusable-ci-run.sh"
+      - "scripts/find-reusable-ci-run.sh"
+      - "scripts/verify-ios-single-repo-migration.sh"
       - "VoiceInkCore/**"
       - "iOS/**"
-      - "VoiceInk/**"
+      - "VoiceInk/Info.plist"
+      - "VoiceInk/Resources/Sounds/**"
+      - "VoiceInk/Transcription/FluidAudio/FluidAudioModelManager.swift"
+      - "VoiceInk/Transcription/Streaming/FluidAudioStreamingProvider.swift"
+      - "VoiceInk/Transcription/Streaming/FluidAudioWordTimingAdapter.swift"
+      - "VoiceInk/VoiceInk.entitlements"
+      - "VoiceInk/VoiceInk.local.entitlements"
       - "VoiceInk.xcodeproj/**"
       - "VoiceInk.xcworkspace/**"
   push:
@@ -24,11 +33,20 @@ on:
       - "ci/**" # Temporary CI transport branches during the migration.
     paths:
       - ".github/workflows/voiceink-ios-single-repo-migration.yml"
-      - "scripts/**"
-      - "docs/**"
+      - "LocalBuild.xcconfig"
+      - "Makefile"
+      - "scripts/check-find-reusable-ci-run.sh"
+      - "scripts/find-reusable-ci-run.sh"
+      - "scripts/verify-ios-single-repo-migration.sh"
       - "VoiceInkCore/**"
       - "iOS/**"
-      - "VoiceInk/**"
+      - "VoiceInk/Info.plist"
+      - "VoiceInk/Resources/Sounds/**"
+      - "VoiceInk/Transcription/FluidAudio/FluidAudioModelManager.swift"
+      - "VoiceInk/Transcription/Streaming/FluidAudioStreamingProvider.swift"
+      - "VoiceInk/Transcription/Streaming/FluidAudioWordTimingAdapter.swift"
+      - "VoiceInk/VoiceInk.entitlements"
+      - "VoiceInk/VoiceInk.local.entitlements"
       - "VoiceInk.xcodeproj/**"
       - "VoiceInk.xcworkspace/**"
 
@@ -172,9 +190,6 @@ jobs:
 
       - name: Prepare local Whisper framework
         run: make setup
-
-      - name: Build macOS app
-        run: make local CONFIGURATION=Release
 
       - name: Build iOS app
         run: |

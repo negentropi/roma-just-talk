@@ -8,6 +8,18 @@ on:
         required: true
         default: false
         type: boolean
+  pull_request:
+    paths:
+      - ".github/workflows/voiceink-build.yml"
+      - "LocalBuild.xcconfig"
+      - "Makefile"
+      - "Tools/**"
+      - "scripts/check-find-reusable-ci-run.sh"
+      - "scripts/find-reusable-ci-run.sh"
+      - "VoiceInk/**"
+      - "VoiceInkCore/**"
+      - "VoiceInkTests/**"
+      - "VoiceInk.xcodeproj/**"
   push:
     branches:
       - main
@@ -19,6 +31,7 @@ on:
       - "scripts/check-find-reusable-ci-run.sh"
       - "scripts/find-reusable-ci-run.sh"
       - "VoiceInk/**"
+      - "VoiceInkCore/**"
       - "VoiceInkTests/**"
       - "VoiceInk.xcodeproj/**"
 
@@ -50,7 +63,7 @@ jobs:
 
       - name: Find green build with a live app artifact
         id: lookup
-        if: inputs.force != true
+        if: github.event_name != 'pull_request' && inputs.force != true
         continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}

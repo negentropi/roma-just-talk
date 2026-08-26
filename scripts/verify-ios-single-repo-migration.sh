@@ -441,6 +441,63 @@ require_file_string_count \
   "-skip-testing:" \
   0
 
+for broad_path in 'docs/**' 'scripts/**' 'VoiceInk/**'; do
+  require_file_line_count \
+    "iOS CI avoids broad unrelated trigger $broad_path" \
+    .github/workflows/voiceink-ios-single-repo-migration.yml \
+    "- \"$broad_path\"" \
+    0
+done
+
+for shared_ios_input in \
+  LocalBuild.xcconfig \
+  Makefile \
+  scripts/check-find-reusable-ci-run.sh \
+  scripts/find-reusable-ci-run.sh \
+  scripts/verify-ios-single-repo-migration.sh \
+  'VoiceInkCore/**' \
+  'iOS/**' \
+  VoiceInk/Info.plist \
+  'VoiceInk/Resources/Sounds/**' \
+  VoiceInk/Transcription/FluidAudio/FluidAudioModelManager.swift \
+  VoiceInk/Transcription/Streaming/FluidAudioStreamingProvider.swift \
+  VoiceInk/Transcription/Streaming/FluidAudioWordTimingAdapter.swift \
+  VoiceInk/VoiceInk.entitlements \
+  VoiceInk/VoiceInk.local.entitlements \
+  'VoiceInk.xcodeproj/**' \
+  'VoiceInk.xcworkspace/**'
+do
+  require_file_line_count \
+    "iOS CI watches shared input $shared_ios_input" \
+    .github/workflows/voiceink-ios-single-repo-migration.yml \
+    "- \"$shared_ios_input\"" \
+    2
+done
+
+require_file_line_count \
+  "macOS build watches shared core" \
+  .github/workflows/voiceink-build.yml \
+  '- "VoiceInkCore/**"' \
+  2
+
+require_file_string_count \
+  "iOS CI does not duplicate the macOS build" \
+  .github/workflows/voiceink-ios-single-repo-migration.yml \
+  "make local CONFIGURATION=Release" \
+  0
+
+require_file_line_count \
+  "macOS build checks pull requests" \
+  .github/workflows/voiceink-build.yml \
+  "pull_request:" \
+  1
+
+require_file_line_count \
+  "macOS pull requests never reuse prior proof" \
+  .github/workflows/voiceink-build.yml \
+  "if: github.event_name != 'pull_request' && inputs.force != true" \
+  1
+
 require_project_string \
   "macOS project references VoiceInkCore" \
   VoiceInk.xcodeproj/project.pbxproj \

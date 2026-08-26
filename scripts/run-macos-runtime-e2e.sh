@@ -5,6 +5,7 @@ voiceink_app="${1:?VoiceInk app path required}"
 audio_artifact="${2:?Namespace audio artifact required}"
 evidence="${3:?evidence directory required}"
 repetitions="${4:-3}"
+mode="${5:-full}"
 
 case "$repetitions" in
   1|3|5) ;;
@@ -14,10 +15,19 @@ case "$repetitions" in
     ;;
 esac
 
+case "$mode" in
+  smoke|full) ;;
+  *)
+    echo "Mode must be smoke or full" >&2
+    exit 2
+    ;;
+esac
+
 repo_root="${GITHUB_WORKSPACE:-$(cd "$(dirname "$0")/.." && pwd)}"
 source "$repo_root/scripts/runtime-e2e-phase-runner.sh"
 runtime_root="$(dirname "$evidence")/macos-runtime-e2e"
 audio_root="$runtime_root/audio"
+smoke_audio_root=""
 helper_app="$repo_root/.local-build/Tools/RuntimeE2EHarness.app"
 helper_bundle_id="com.happyf.roma-just-talk.RuntimeE2EHarness"
 voiceink_bundle_id="com.negentropi.RomaJustTalk"
@@ -26,6 +36,7 @@ user_tcc_db="$HOME/Library/Application Support/com.apple.TCC/TCC.db"
 nsc_bin="${NAMESPACE_CLI:-/opt/nsc/bin/nsc}"
 config_smoke="$runtime_root/runtime-e2e-smoke.json"
 config_full="$runtime_root/runtime-e2e-full.json"
+restore_config="$config_full"
 scenario_status=1
 current_phase="initialize"
 phase_file="$evidence/macos-runtime-e2e-phase.txt"
@@ -122,12 +133,15 @@ SQL
 
 write_config() {
   local output="$1"
-  local run_repetitions="$2"
-  local latency_threshold="$3"
+  local config_audio_directory="$2"
+  local run_repetitions="$3"
+  local latency_threshold="$4"
+  local config_mode="$5"
   jq -n \
-    --arg audio_directory "$audio_directory" \
+    --arg audio_directory "$config_audio_directory" \
     --arg voiceink_app "$voiceink_app" \
     --arg voiceink_build_directory "$(dirname "$voiceink_app")" \
+    --arg config_mode "$config_mode" \
     --argjson repetitions "$run_repetitions" \
     --argjson latency_threshold "$latency_threshold" \
     '{
@@ -139,20 +153,23 @@ write_config() {
       audioLeadSeconds: 1.1,
       releaseTailSeconds: 0.15,
       explicitHoldSeconds: null,
-      preRollWarmupSeconds: 12,
+      preRollWarmupSeconds: (if $config_mode == "smoke" then 2 else 12 end),
       targetSettleSeconds: 1,
       targetTextTimeoutSeconds: 20,
       latencyThresholdMilliseconds: $latency_threshold,
       maximumWordErrorRate: 1,
       repetitions: $repetitions,
       targetAvailabilityPolicy: "runningOnly",
-      minimumTargetCount: 4,
-      targets: [
-        {id:"textedit",displayName:"TextEdit",bundleIdentifier:"com.apple.TextEdit",kind:"document"},
-        {id:"safari",displayName:"Safari",bundleIdentifier:"com.apple.Safari",kind:"browser"},
-        {id:"chrome",displayName:"Google Chrome",bundleIdentifier:"com.google.Chrome",kind:"browser"},
-        {id:"vscode",displayName:"Visual Studio Code",bundleIdentifier:"com.microsoft.VSCode",kind:"electron"}
-      ],
+      minimumTargetCount: (if $config_mode == "smoke" then 2 else 4 end),
+      targets: (if $config_mode == "smoke" then [
+          {id:"textedit",displayName:"TextEdit",bundleIdentifier:"com.apple.TextEdit",kind:"document"},
+          {id:"chrome",displayName:"Google Chrome",bundleIdentifier:"com.google.Chrome",kind:"browser"}
+        ] else [
+          {id:"textedit",displayName:"TextEdit",bundleIdentifier:"com.apple.TextEdit",kind:"document"},
+          {id:"safari",displayName:"Safari",bundleIdentifier:"com.apple.Safari",kind:"browser"},
+          {id:"chrome",displayName:"Google Chrome",bundleIdentifier:"com.google.Chrome",kind:"browser"},
+          {id:"vscode",displayName:"Visual Studio Code",bundleIdentifier:"com.microsoft.VSCode",kind:"electron"}
+        ] end),
       expectedTranscripts: {},
       voiceInkLifecycle: "reuse"
     }' > "$output"
@@ -189,7 +206,7 @@ cleanup() {
   stop_launchers
   if [ -x "$helper_app/Contents/MacOS/RuntimeE2EHarness" ]; then
     make -C "$repo_root" runtime-e2e-restore \
-      RUNTIME_E2E_CONFIG="$config_full" \
+      RUNTIME_E2E_CONFIG="$restore_config" \
       > "$evidence/restore.log" 2>&1
   fi
   defaults read "$voiceink_bundle_id" > "$evidence/voiceink-defaults-final.txt" 2>&1
@@ -212,7 +229,7 @@ if [ ! -d "/Applications/Google Chrome.app" ]; then
     env HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1 \
     brew install --cask google-chrome
 fi
-if [ ! -d "/Applications/Visual Studio Code.app" ]; then
+if [ "$mode" = "full" ] && [ ! -d "/Applications/Visual Studio Code.app" ]; then
   record_command "$evidence/vscode-install.log" \
     env HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1 \
     brew install --cask visual-studio-code
@@ -241,6 +258,13 @@ while IFS= read -r fixture; do
   afinfo "$fixture"
 done < <(fd -a -t f -e wav -e wave -e aif -e aiff -e caf -e m4a -e mp3 -e flac . "$audio_directory" | sort) \
   > "$evidence/audio-fixtures.txt"
+
+smoke_audio_root="$(mktemp -d "$runtime_root/audio-smoke.XXXXXX")"
+smoke_fixture="$(select_runtime_smoke_fixture "$audio_directory" 8)"
+smoke_fixture_duration="$(runtime_audio_duration_seconds "$smoke_fixture")"
+ln -sfn "$smoke_fixture" "$smoke_audio_root/$(basename "$smoke_fixture")"
+printf '%s\n' "$smoke_fixture" > "$evidence/smoke-audio-fixture.txt"
+printf '%s\n' "$smoke_fixture_duration" > "$evidence/smoke-audio-duration-seconds.txt"
 
 mark_phase build-helper
 make -C "$repo_root" runtime-e2e-check > "$evidence/harness-check.log" 2>&1
@@ -315,43 +339,61 @@ fi
 mark_phase open-target-apps
 mkdir -p "$HOME/Library/Application Support/Google/Chrome"
 touch "$HOME/Library/Application Support/Google/Chrome/First Run"
-mkdir -p "$HOME/Library/Application Support/Code/User"
-printf '%s\n' \
-  '{' \
-  '  "editor.accessibilitySupport": "on",' \
-  '  "security.workspace.trust.enabled": false,' \
-  '  "window.openFilesInNewWindow": "off",' \
-  '  "window.restoreWindows": "none",' \
-  '  "workbench.startupEditor": "none"' \
-  '}' > "$HOME/Library/Application Support/Code/User/settings.json"
+if [ "$mode" = "full" ]; then
+  mkdir -p "$HOME/Library/Application Support/Code/User"
+  printf '%s\n' \
+    '{' \
+    '  "editor.accessibilitySupport": "on",' \
+    '  "security.workspace.trust.enabled": false,' \
+    '  "window.openFilesInNewWindow": "off",' \
+    '  "window.restoreWindows": "none",' \
+    '  "workbench.startupEditor": "none"' \
+    '}' > "$HOME/Library/Application Support/Code/User/settings.json"
+fi
 lsregister_bin="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
 test -x "$lsregister_bin"
-"$lsregister_bin" -f \
-  "/Applications/Google Chrome.app" \
-  "/Applications/Visual Studio Code.app" \
-  > "$evidence/app-registration.log" 2>&1
+if [ "$mode" = "full" ]; then
+  "$lsregister_bin" -f \
+    "/Applications/Google Chrome.app" \
+    "/Applications/Visual Studio Code.app" \
+    > "$evidence/app-registration.log" 2>&1
+else
+  "$lsregister_bin" -f "/Applications/Google Chrome.app" \
+    > "$evidence/app-registration.log" 2>&1
+fi
 launch_detached "$evidence/textedit-launch.log" -b com.apple.TextEdit
-launch_detached "$evidence/safari-launch.log" -b com.apple.Safari
 launch_detached "$evidence/chrome-launch.log" \
   -na "/Applications/Google Chrome.app" --args \
   --force-renderer-accessibility --no-first-run --no-default-browser-check about:blank
-launch_detached "$evidence/vscode-launch.log" \
-  -na "/Applications/Visual Studio Code.app" --args \
-  --force-renderer-accessibility --disable-extensions --skip-welcome
+if [ "$mode" = "full" ]; then
+  launch_detached "$evidence/safari-launch.log" -b com.apple.Safari
+  launch_detached "$evidence/vscode-launch.log" \
+    -na "/Applications/Visual Studio Code.app" --args \
+    --force-renderer-accessibility --disable-extensions --skip-welcome
+fi
 sleep 15
 stop_launchers
 
-write_config "$config_smoke" 1 20000
-write_config "$config_full" "$repetitions" 250
+write_config "$config_smoke" "$smoke_audio_root" 1 20000 smoke
+write_config "$config_full" "$audio_directory" "$repetitions" 250 full
+if [ "$mode" = "smoke" ]; then
+  restore_config="$config_smoke"
+fi
 cp "$config_smoke" "$evidence/runtime-e2e-smoke-config.json"
-cp "$config_full" "$evidence/runtime-e2e-full-config.json"
+if [ "$mode" = "full" ]; then
+  cp "$config_full" "$evidence/runtime-e2e-full-config.json"
+fi
 
 scenario_status=0
-run_runtime_e2e_phases "$config_smoke" "$config_full"
+run_runtime_e2e_phases "$config_smoke" "$config_full" "$mode"
 
-if [ -f "$evidence/runtime-e2e-report.json" ]; then
+summary_report="$evidence/runtime-e2e-report.json"
+if [ "$mode" = "smoke" ]; then
+  summary_report="$evidence/functional-smoke.json"
+fi
+if [ -f "$summary_report" ]; then
   jq '{summary, fatalError, restoredOriginalState}' \
-    "$evidence/runtime-e2e-report.json" > "$evidence/runtime-e2e-summary.json"
+    "$summary_report" > "$evidence/runtime-e2e-summary.json"
   jq '[.cases[] | select(.assessment.passed | not) | {
     id,
     target: .target.id,
@@ -360,7 +402,7 @@ if [ -f "$evidence/runtime-e2e-report.json" ]; then
     failureBoundary,
     evidence,
     error
-  }]' "$evidence/runtime-e2e-report.json" > "$evidence/runtime-e2e-failures.json"
+  }]' "$summary_report" > "$evidence/runtime-e2e-failures.json"
 fi
 
 capture_tcc final

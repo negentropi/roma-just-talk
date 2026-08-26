@@ -21,6 +21,7 @@ LATENCY_THRESHOLD_MS ?= 440
 RUNTIME_E2E_PACKAGE := Tools/RuntimeE2EHarness
 RUNTIME_E2E_SCRATCH := $(LOCAL_DERIVED_DATA)/RuntimeE2EHarness
 RUNTIME_E2E_BINARY := $(RUNTIME_E2E_SCRATCH)/release/RuntimeE2EHarness
+RUNTIME_E2E_DEBUG_BINARY := $(RUNTIME_E2E_SCRATCH)/debug/RuntimeE2EHarness
 RUNTIME_E2E_INFO_PLIST := $(RUNTIME_E2E_PACKAGE)/Info.plist
 RUNTIME_E2E_APP := $(LOCAL_DERIVED_DATA)/Tools/RuntimeE2EHarness.app
 RUNTIME_E2E_APP_EXECUTABLE := $(RUNTIME_E2E_APP)/Contents/MacOS/RuntimeE2EHarness
@@ -142,7 +143,7 @@ runtime-e2e-check:
 		--package-path "$(RUNTIME_E2E_PACKAGE)" \
 		--scratch-path "$(RUNTIME_E2E_SCRATCH)" \
 		--product RuntimeE2EHarness
-	bash scripts/check-runtime-e2e-makefile.sh
+	bash scripts/check-runtime-e2e-makefile.sh "$(RUNTIME_E2E_DEBUG_BINARY)"
 	bash -n scripts/runtime-e2e-phase-runner.sh
 	bash -n scripts/run-macos-runtime-e2e.sh
 

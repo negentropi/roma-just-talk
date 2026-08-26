@@ -24,6 +24,8 @@ private struct RuntimeHarnessArguments {
                 result.audioProbePath = arguments[index]
             case "--restore":
                 result.mode = "restore"
+            case "--playback-check":
+                result.mode = "playback-check"
             case "--config":
                 index += 1
                 guard index < arguments.count else { throw RuntimeHarnessArgumentError.missingValue(argument) }
@@ -84,6 +86,7 @@ private func printUsage() {
       RuntimeE2EHarness --target-probe [--config PATH] [--json-output PATH]
       RuntimeE2EHarness --audio-probe WAV [--config PATH] [--json-output PATH]
       RuntimeE2EHarness --restore [--config PATH]
+      RuntimeE2EHarness --playback-check
       RuntimeE2EHarness --config PATH --json-output PATH
 
     A run without --config uses ~/Downloads/roma jt builds/audio, BlackHole 2ch,
@@ -188,6 +191,10 @@ do {
             exit(2)
         }
         print(restored.isEmpty ? "No pending runtime-harness restoration" : "Restored " + restored.joined(separator: " and "))
+        exit(0)
+    case "playback-check":
+        try RuntimeAudioPlayback.verifyLifecycle()
+        print("PASS playback completes naturally and stalled children are killed")
         exit(0)
     default:
         let configuration = try loadConfiguration(path: arguments.configurationPath)

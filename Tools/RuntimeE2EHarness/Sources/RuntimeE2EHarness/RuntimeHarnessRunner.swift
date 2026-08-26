@@ -177,7 +177,7 @@ enum RuntimeHarnessRunner {
                 }
                 previousFixturePath = runCase.fixtureURL.path
 
-                let caseReport = executeCase(
+                let caseReport = try executeCase(
                     runCase,
                     configuration: configuration,
                     audioDevice: audioDevice,
@@ -215,7 +215,7 @@ enum RuntimeHarnessRunner {
         audioDevice: RuntimeAudioDevice,
         fixtureDurationSeconds: TimeInterval?,
         seenTraceIDs: inout Set<String>
-    ) -> RuntimeCaseReport {
+    ) throws -> RuntimeCaseReport {
         let startedAt = Date()
         let runID = makeRunID(runCase)
         var phase = "target"
@@ -274,7 +274,22 @@ enum RuntimeHarnessRunner {
             if let baselineError = target.refreshRenderedBaseline() {
                 errorText = baselineError
             }
-            waitUntilSystemUptime(audioStartedAt + plan.keyUpOffsetSeconds)
+            if RuntimePlaybackReleasePolicy.waitsForPlaybackCompletion(
+                explicitHoldSeconds: configuration.explicitHoldSeconds
+            ) {
+                phase = "audio"
+                let completedPlayback = try audio.waitUntilFinished()
+                audioResult = completedPlayback
+                waitUntilSystemUptime(
+                    plan.keyUpSystemUptime(
+                        audioStartedAtSystemUptime: audioStartedAt,
+                        audioFinishedAtSystemUptime: completedPlayback.finishedAtSystemUptime
+                    )
+                )
+            } else {
+                waitUntilSystemUptime(audioStartedAt + plan.keyUpOffsetSeconds)
+            }
+            phase = "shortcut"
             let up = try RuntimeShortcutInjector.postLeftShiftUp()
             shortcutUp = up
 
@@ -283,7 +298,9 @@ enum RuntimeHarnessRunner {
                 keyUpAtSystemUptime: up.postedAtSystemUptime,
                 timeoutSeconds: configuration.targetTextTimeoutSeconds
             )
-            audioResult = try audio.waitUntilFinished()
+            if audioResult == nil {
+                audioResult = try audio.waitUntilFinished()
+            }
             clipboardChanged = NSPasteboard.general.changeCount != clipboardChangeCount
 
             latencyTrace = try waitForCompletedTrace(
@@ -381,7 +398,12 @@ enum RuntimeHarnessRunner {
             shortcutUp = emergencyUp
             emergencyShortcutReleasePosted = true
         }
-        playback?.stop()
+        var playbackCleanupError: Error?
+        do {
+            try playback?.stop()
+        } catch {
+            playbackCleanupError = error
+        }
         let targetCleanup = preparedTarget?.cleanup()
         if let targetCleanup, !targetCleanup.passed {
             let cleanupError = targetCleanup.errors.joined(separator: "; ")
@@ -392,6 +414,9 @@ enum RuntimeHarnessRunner {
             if assessment.passed {
                 assessment = RuntimeCaseAssessment(status: .targetCleanupFailed, passed: false)
             }
+        }
+        if let playbackCleanupError {
+            throw playbackCleanupError
         }
 
         let targetAccessibilityTextObserved = visibleText?.text?

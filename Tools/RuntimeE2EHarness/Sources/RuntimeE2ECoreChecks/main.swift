@@ -32,6 +32,22 @@ do {
     try require(plan.keyDownOffsetSeconds, equals: 1.1, "key-down offset")
     try require(plan.keyUpOffsetSeconds, equals: 12.18125, "key-up offset")
     try require(plan.holdDurationSeconds, equals: 11.08125, "hold duration")
+    try require(
+        plan.keyUpSystemUptime(
+            audioStartedAtSystemUptime: 100,
+            audioFinishedAtSystemUptime: 112.8
+        ),
+        equals: 112.95,
+        "key-up must follow real playback completion and the release tail"
+    )
+    try require(
+        RuntimePlaybackReleasePolicy.waitsForPlaybackCompletion(explicitHoldSeconds: nil),
+        "fixture-timed runs must wait for real playback completion"
+    )
+    try require(
+        !RuntimePlaybackReleasePolicy.waitsForPlaybackCompletion(explicitHoldSeconds: 2),
+        "explicit-hold probes must keep their requested schedule"
+    )
     print("PASS speech starts 1.1 seconds before key-down and release follows fixture")
 
     let fixtures = [

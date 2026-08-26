@@ -3,6 +3,7 @@ import Foundation
 public struct RuntimeTimingPlan: Codable, Equatable, Sendable {
     public let keyDownOffsetSeconds: TimeInterval
     public let keyUpOffsetSeconds: TimeInterval
+    public let releaseTailSeconds: TimeInterval
 
     public var holdDurationSeconds: TimeInterval {
         keyUpOffsetSeconds - keyDownOffsetSeconds
@@ -22,11 +23,32 @@ public struct RuntimeTimingPlan: Codable, Equatable, Sendable {
 
         keyDownOffsetSeconds = audioLeadSeconds
         keyUpOffsetSeconds = audioDurationSeconds + releaseTailSeconds
+        self.releaseTailSeconds = releaseTailSeconds
+    }
+
+    public func keyUpSystemUptime(
+        audioStartedAtSystemUptime: TimeInterval,
+        audioFinishedAtSystemUptime: TimeInterval
+    ) -> TimeInterval {
+        max(
+            audioStartedAtSystemUptime + keyUpOffsetSeconds,
+            audioFinishedAtSystemUptime + releaseTailSeconds
+        )
     }
 }
 
 public enum RuntimeTimingPlanError: Error, Equatable, Sendable {
     case invalidTiming
+}
+
+public enum RuntimePlaybackReleasePolicy {
+    public static let completionGraceSeconds: TimeInterval = 5
+
+    public static func waitsForPlaybackCompletion(
+        explicitHoldSeconds: TimeInterval?
+    ) -> Bool {
+        explicitHoldSeconds == nil
+    }
 }
 
 public struct RuntimeTargetApp: Codable, Equatable, Hashable, Sendable {

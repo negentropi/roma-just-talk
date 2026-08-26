@@ -56,6 +56,25 @@ fi
 
 source "$repo_root/scripts/runtime-e2e-phase-runner.sh"
 
+runtime_debug_binary="$repo_root/.local-build/RuntimeE2EHarness/debug/RuntimeE2EHarness"
+runtime_debug_binary="${1:-$runtime_debug_binary}"
+if [ ! -x "$runtime_debug_binary" ]; then
+  echo "runtime-e2e-check must build the playback lifecycle probe before running this check." >&2
+  exit 1
+fi
+"$runtime_debug_binary" --playback-check
+
+custom_scratch=/tmp/roma-runtime-e2e-custom-scratch
+custom_check_dry_run="$(
+  cd "$repo_root"
+  make --dry-run runtime-e2e-check RUNTIME_E2E_SCRATCH="$custom_scratch"
+)"
+if ! grep -Fq -- "bash scripts/check-runtime-e2e-makefile.sh \"$custom_scratch/debug/RuntimeE2EHarness\"" \
+  <<<"$custom_check_dry_run"; then
+  echo "runtime-e2e-check must validate the helper built in its configured scratch path." >&2
+  exit 1
+fi
+
 smoke_config_json="$(
   runtime_e2e_config_json \
     /fixtures \

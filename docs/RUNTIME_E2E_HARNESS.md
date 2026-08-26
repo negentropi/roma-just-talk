@@ -113,6 +113,10 @@ smoke failure is retained but does not suppress the repeated matrix in
 `runtime-e2e`. All JSON reports, phase stdout/stderr, TCC rows, signatures,
 hashes, model/audio provenance, app logs, and restoration results are uploaded
 as `remote-e2e-stage-evidence` even when a phase fails.
+The cache-owning stage treats the scenario command as a recorded outcome so the
+Namespace cache post-save still runs after a rejected hypothesis. A dependent
+verdict job converts that recorded outcome back into the workflow's final
+red/green result.
 
 ## Isolation Gates
 

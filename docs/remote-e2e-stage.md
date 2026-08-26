@@ -96,6 +96,11 @@ reuse the last exact app build. Do not rebuild macOS or run iOS verification for
 an unchanged app. Any app, shared-core, project, entitlement, build-setting, or
 dependency change needs a new exact app artifact first.
 
+The remote stage records a failed scenario without ending its cache-owning job,
+uploads the evidence, and lets Namespace save the model cache. A separate
+verdict job then fails the workflow. Red hypotheses therefore keep the same
+failure signal while still warming the next run.
+
 ## Deterministic macOS runtime E2E scenario
 
 Choose `target=macos`, set `macos_artifact_run_id` to the exact green build,

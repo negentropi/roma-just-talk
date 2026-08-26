@@ -100,6 +100,8 @@ jobs:
     name: Remote desktop ready
     runs-on: namespace-profile-roma-jt
     timeout-minutes: 75
+    outputs:
+      scenario-outcome: ${{ steps.prepare-stage.outcome }}
 
     steps:
       - name: Checkout stage tooling
@@ -175,6 +177,8 @@ jobs:
           path: ~/Library/Application Support/FluidAudio/Models
 
       - name: Prepare desktop and hold for Remote Display
+        id: prepare-stage
+        continue-on-error: true
         env:
           RUNTIME_MODEL_CACHE_HIT: ${{ steps.runtime-model-cache.outputs.cache-hit }}
         run: |
@@ -196,3 +200,17 @@ jobs:
           path: ${{ runner.temp }}/voiceink-remote-e2e-stage/evidence
           if-no-files-found: warn
           retention-days: 7
+
+  verdict:
+    name: Require scenario success
+    if: always()
+    needs: stage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check remote stage result
+        env:
+          STAGE_RESULT: ${{ needs.stage.result }}
+          SCENARIO_OUTCOME: ${{ needs.stage.outputs.scenario-outcome }}
+        run: |
+          test "$STAGE_RESULT" = success
+          test "$SCENARIO_OUTCOME" = success

@@ -176,9 +176,13 @@ workflow="$repo_root/.github/workflows/voiceink-remote-e2e-stage.yml"
 ruby - "$workflow" <<'RUBY'
 require "yaml"
 
-steps = YAML.load_file(ARGV.fetch(0)).fetch("jobs").fetch("stage").fetch("steps")
+jobs = YAML.load_file(ARGV.fetch(0)).fetch("jobs")
+stage = jobs.fetch("stage")
+steps = stage.fetch("steps")
 cache = steps.find { |step| step["id"] == "runtime-model-cache" }
 prepare = steps.find { |step| step["name"] == "Prepare desktop and hold for Remote Display" }
+verdict = jobs.fetch("verdict")
+verdict_step = verdict.fetch("steps").find { |step| step["name"] == "Check remote stage result" }
 
 abort "Remote E2E must mount the pinned persistent Parakeet model cache." unless
   cache&.fetch("uses", nil) ==
@@ -190,6 +194,21 @@ abort "Remote E2E must mount the pinned persistent Parakeet model cache." unless
 abort "Remote E2E must record the cache action's authoritative hit output." unless
   prepare&.dig("env", "RUNTIME_MODEL_CACHE_HIT") ==
     "${{ steps.runtime-model-cache.outputs.cache-hit }}"
+
+abort "Scenario failures must not suppress the cache action's post-save." unless
+  prepare["id"] == "prepare-stage" &&
+  prepare["continue-on-error"] == true &&
+  stage.dig("outputs", "scenario-outcome") ==
+    "${{ steps.prepare-stage.outcome }}"
+
+abort "Remote E2E must preserve a truthful workflow verdict after cache save." unless
+  verdict["if"] == "always()" &&
+  verdict["needs"] == "stage" &&
+  verdict_step&.dig("env", "STAGE_RESULT") == "${{ needs.stage.result }}" &&
+  verdict_step&.dig("env", "SCENARIO_OUTCOME") ==
+    "${{ needs.stage.outputs.scenario-outcome }}" &&
+  verdict_step.fetch("run").include?('test "$STAGE_RESULT" = success') &&
+  verdict_step.fetch("run").include?('test "$SCENARIO_OUTCOME" = success')
 RUBY
 
 fd() {

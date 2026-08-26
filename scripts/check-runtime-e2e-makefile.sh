@@ -56,6 +56,23 @@ fi
 
 source "$repo_root/scripts/runtime-e2e-phase-runner.sh"
 
+smoke_config_json="$(
+  runtime_e2e_config_json \
+    /fixtures \
+    '/Applications/roma just talk.app' \
+    1 \
+    20000 \
+    smoke
+)"
+if ! jq -e '
+  .preRollWarmupSeconds == 12
+  and .minimumTargetCount == 2
+  and ([.targets[].id] == ["textedit", "chrome"])
+' <<<"$smoke_config_json" >/dev/null; then
+  echo "Runtime smoke must emit the proven warmup and reduced target set." >&2
+  exit 1
+fi
+
 phase_calls=""
 phase_failure="functional-smoke"
 scenario_status=0

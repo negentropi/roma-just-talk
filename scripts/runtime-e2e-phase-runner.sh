@@ -30,6 +30,52 @@ select_runtime_smoke_fixture() {
   return 1
 }
 
+runtime_e2e_config_json() {
+  local audio_directory="$1"
+  local voiceink_app="$2"
+  local repetitions="$3"
+  local latency_threshold="$4"
+  local mode="$5"
+
+  # The quick-release speech lands in pre-roll; two seconds produced empty remote transcripts.
+  jq -n \
+    --arg audio_directory "$audio_directory" \
+    --arg voiceink_app "$voiceink_app" \
+    --arg voiceink_build_directory "$(dirname "$voiceink_app")" \
+    --arg config_mode "$mode" \
+    --argjson repetitions "$repetitions" \
+    --argjson latency_threshold "$latency_threshold" \
+    '{
+      audioDirectory: $audio_directory,
+      audioDeviceName: "BlackHole 2ch",
+      voiceInkBundleIdentifier: "com.negentropi.RomaJustTalk",
+      voiceInkAppPath: $voiceink_app,
+      voiceInkBuildDirectory: $voiceink_build_directory,
+      audioLeadSeconds: 1.1,
+      releaseTailSeconds: 0.15,
+      explicitHoldSeconds: null,
+      preRollWarmupSeconds: 12,
+      targetSettleSeconds: 1,
+      targetTextTimeoutSeconds: 20,
+      latencyThresholdMilliseconds: $latency_threshold,
+      maximumWordErrorRate: 1,
+      repetitions: $repetitions,
+      targetAvailabilityPolicy: "runningOnly",
+      minimumTargetCount: (if $config_mode == "smoke" then 2 else 4 end),
+      targets: (if $config_mode == "smoke" then [
+          {id:"textedit",displayName:"TextEdit",bundleIdentifier:"com.apple.TextEdit",kind:"document"},
+          {id:"chrome",displayName:"Google Chrome",bundleIdentifier:"com.google.Chrome",kind:"browser"}
+        ] else [
+          {id:"textedit",displayName:"TextEdit",bundleIdentifier:"com.apple.TextEdit",kind:"document"},
+          {id:"safari",displayName:"Safari",bundleIdentifier:"com.apple.Safari",kind:"browser"},
+          {id:"chrome",displayName:"Google Chrome",bundleIdentifier:"com.google.Chrome",kind:"browser"},
+          {id:"vscode",displayName:"Visual Studio Code",bundleIdentifier:"com.microsoft.VSCode",kind:"electron"}
+        ] end),
+      expectedTranscripts: {},
+      voiceInkLifecycle: "reuse"
+    }'
+}
+
 run_runtime_e2e_phases() {
   local smoke_config="$1"
   local full_config="$2"

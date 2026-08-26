@@ -137,42 +137,13 @@ write_config() {
   local run_repetitions="$3"
   local latency_threshold="$4"
   local config_mode="$5"
-  jq -n \
-    --arg audio_directory "$config_audio_directory" \
-    --arg voiceink_app "$voiceink_app" \
-    --arg voiceink_build_directory "$(dirname "$voiceink_app")" \
-    --arg config_mode "$config_mode" \
-    --argjson repetitions "$run_repetitions" \
-    --argjson latency_threshold "$latency_threshold" \
-    '{
-      audioDirectory: $audio_directory,
-      audioDeviceName: "BlackHole 2ch",
-      voiceInkBundleIdentifier: "com.negentropi.RomaJustTalk",
-      voiceInkAppPath: $voiceink_app,
-      voiceInkBuildDirectory: $voiceink_build_directory,
-      audioLeadSeconds: 1.1,
-      releaseTailSeconds: 0.15,
-      explicitHoldSeconds: null,
-      preRollWarmupSeconds: (if $config_mode == "smoke" then 2 else 12 end),
-      targetSettleSeconds: 1,
-      targetTextTimeoutSeconds: 20,
-      latencyThresholdMilliseconds: $latency_threshold,
-      maximumWordErrorRate: 1,
-      repetitions: $repetitions,
-      targetAvailabilityPolicy: "runningOnly",
-      minimumTargetCount: (if $config_mode == "smoke" then 2 else 4 end),
-      targets: (if $config_mode == "smoke" then [
-          {id:"textedit",displayName:"TextEdit",bundleIdentifier:"com.apple.TextEdit",kind:"document"},
-          {id:"chrome",displayName:"Google Chrome",bundleIdentifier:"com.google.Chrome",kind:"browser"}
-        ] else [
-          {id:"textedit",displayName:"TextEdit",bundleIdentifier:"com.apple.TextEdit",kind:"document"},
-          {id:"safari",displayName:"Safari",bundleIdentifier:"com.apple.Safari",kind:"browser"},
-          {id:"chrome",displayName:"Google Chrome",bundleIdentifier:"com.google.Chrome",kind:"browser"},
-          {id:"vscode",displayName:"Visual Studio Code",bundleIdentifier:"com.microsoft.VSCode",kind:"electron"}
-        ] end),
-      expectedTranscripts: {},
-      voiceInkLifecycle: "reuse"
-    }' > "$output"
+  runtime_e2e_config_json \
+    "$config_audio_directory" \
+    "$voiceink_app" \
+    "$run_repetitions" \
+    "$latency_threshold" \
+    "$config_mode" \
+    > "$output"
 }
 
 run_harness_phase() {

@@ -103,7 +103,7 @@ if ! jq -e '
   .preRollWarmupSeconds == 12
   and .targetTextTimeoutSeconds == 3
   and .minimumTargetCount == 2
-  and ([.targets[].id] == ["textedit", "chrome"])
+  and ([.targets[].id] == ["textedit", "safari"])
 ' <<<"$smoke_config_json" >/dev/null; then
   echo "Runtime smoke must emit the proven warmup and reduced target set." >&2
   exit 1

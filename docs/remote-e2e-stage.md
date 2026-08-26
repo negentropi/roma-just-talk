@@ -84,7 +84,7 @@ Namespace's immutable-URL cache and verifies its SHA-256 before playback. Pass a
 private Namespace WAV artifact only when a hypothesis needs that exact audio.
 
 This lane answers whether a runtime idea survives one named quick-release fixture
-of at most eight seconds in TextEdit and Chrome, with both empty and existing-text
+of at most eight seconds in TextEdit and Safari, with both empty and existing-text
 insertion. It runs the same
 preflight, isolated target probe, real app, BlackHole route, Special shortcut,
 trace, rendered-text, cleanup, and restoration checks as the full scenario. It
@@ -116,7 +116,7 @@ The scenario:
 5. opens TextEdit, Safari, Chrome, and VS Code before the `runningOnly` harness starts;
 6. proves isolated target setup/cleanup before involving Roma, audio, or Shift;
 7. feeds each WAV into BlackHole, beginning audio `1.1s` before synthetic left-Shift down;
-8. runs a four-case TextEdit/Chrome smoke using one short fixture, then the requested repeated four-app matrix; and
+8. runs a four-case TextEdit/Safari smoke using one short fixture, then the requested repeated four-app matrix; and
 9. uploads factual phase checkpoints and the first unproven boundary without assigning blame to Roma or the harness.
 
 The TCC database writes are intentionally remote-only. They are not a local setup

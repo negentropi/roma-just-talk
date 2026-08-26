@@ -198,7 +198,7 @@ mark_phase install-dependencies
 record_command "$evidence/blackhole-install.log" \
   env HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1 \
   brew install --cask blackhole-2ch
-if [ ! -d "/Applications/Google Chrome.app" ]; then
+if [ "$mode" = "full" ] && [ ! -d "/Applications/Google Chrome.app" ]; then
   record_command "$evidence/chrome-install.log" \
     env HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1 \
     brew install --cask google-chrome
@@ -337,9 +337,9 @@ if [ -d "$model_directory" ]; then
 fi
 
 mark_phase open-target-apps
-mkdir -p "$HOME/Library/Application Support/Google/Chrome"
-touch "$HOME/Library/Application Support/Google/Chrome/First Run"
 if [ "$mode" = "full" ]; then
+  mkdir -p "$HOME/Library/Application Support/Google/Chrome"
+  touch "$HOME/Library/Application Support/Google/Chrome/First Run"
   mkdir -p "$HOME/Library/Application Support/Code/User"
   printf '%s\n' \
     '{' \
@@ -351,22 +351,19 @@ if [ "$mode" = "full" ]; then
     '}' > "$HOME/Library/Application Support/Code/User/settings.json"
 fi
 lsregister_bin="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
-test -x "$lsregister_bin"
 if [ "$mode" = "full" ]; then
+  test -x "$lsregister_bin"
   "$lsregister_bin" -f \
     "/Applications/Google Chrome.app" \
     "/Applications/Visual Studio Code.app" \
     > "$evidence/app-registration.log" 2>&1
-else
-  "$lsregister_bin" -f "/Applications/Google Chrome.app" \
-    > "$evidence/app-registration.log" 2>&1
 fi
 launch_detached "$evidence/textedit-launch.log" -b com.apple.TextEdit
-launch_detached "$evidence/chrome-launch.log" \
-  -na "/Applications/Google Chrome.app" --args \
-  --force-renderer-accessibility --no-first-run --no-default-browser-check about:blank
+launch_detached "$evidence/safari-launch.log" -b com.apple.Safari
 if [ "$mode" = "full" ]; then
-  launch_detached "$evidence/safari-launch.log" -b com.apple.Safari
+  launch_detached "$evidence/chrome-launch.log" \
+    -na "/Applications/Google Chrome.app" --args \
+    --force-renderer-accessibility --no-first-run --no-default-browser-check about:blank
   launch_detached "$evidence/vscode-launch.log" \
     -na "/Applications/Visual Studio Code.app" --args \
     --force-renderer-accessibility --disable-extensions --skip-welcome

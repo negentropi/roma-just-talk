@@ -74,9 +74,9 @@ pinned 5.64-second English FLEURS fixture through Namespace's URL cache and
 verifies its SHA-256. The fixture comes from the CC-BY-4.0
 [`podscripter-project/test-fixtures`](https://huggingface.co/datasets/podscripter-project/test-fixtures)
 dataset and was sourced there from the English FLEURS test set. Smoke then uses
-TextEdit, Chrome, one repetition, and a three-second target-text timeout. It
-skips VS Code installation and the repeated matrix. This is an early rejection
-lane, not final runtime proof.
+TextEdit, Safari, one repetition, and a three-second target-text timeout. It
+skips Chrome and VS Code installation and the repeated matrix. This is an early
+rejection lane, not final runtime proof.
 
 Fixture attribution: `fleurs_en_test_3529855487992513201.wav` comes from
 FLEURS by Conneau et al. ([paper](https://arxiv.org/abs/2205.12446)) and is

@@ -91,7 +91,7 @@ runtime_e2e_config_json() {
       minimumTargetCount: (if $config_mode == "smoke" then 2 else 4 end),
       targets: (if $config_mode == "smoke" then [
           {id:"textedit",displayName:"TextEdit",bundleIdentifier:"com.apple.TextEdit",kind:"document"},
-          {id:"chrome",displayName:"Google Chrome",bundleIdentifier:"com.google.Chrome",kind:"browser"}
+          {id:"safari",displayName:"Safari",bundleIdentifier:"com.apple.Safari",kind:"browser"}
         ] else [
           {id:"textedit",displayName:"TextEdit",bundleIdentifier:"com.apple.TextEdit",kind:"document"},
           {id:"safari",displayName:"Safari",bundleIdentifier:"com.apple.Safari",kind:"browser"},

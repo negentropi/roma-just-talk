@@ -69,10 +69,21 @@ change the frontmost application.
 ## Autonomous Namespace Run
 
 For a fast hypothesis check, use the same inputs below with
-`macos_scenario=runtime-smoke`. It requires a named quick-release fixture no
-longer than eight seconds, then uses TextEdit, Chrome, and one repetition. It
-uses a three-second target-text timeout, skips VS Code installation and the
-repeated matrix. This is an early rejection lane, not final runtime proof.
+`macos_scenario=runtime-smoke`. When `macos_audio_artifact` is blank, it pulls a
+pinned 5.64-second English FLEURS fixture through Namespace's URL cache and
+verifies its SHA-256. The fixture comes from the CC-BY-4.0
+[`podscripter-project/test-fixtures`](https://huggingface.co/datasets/podscripter-project/test-fixtures)
+dataset and was sourced there from the English FLEURS test set. Smoke then uses
+TextEdit, Chrome, one repetition, and a three-second target-text timeout. It
+skips VS Code installation and the repeated matrix. This is an early rejection
+lane, not final runtime proof.
+
+Fixture attribution: `fleurs_en_test_3529855487992513201.wav` comes from
+FLEURS by Conneau et al. ([paper](https://arxiv.org/abs/2205.12446)) and is
+licensed [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/). The
+podscripter fixture project extracted it from the English test archive and
+re-encoded it as 16 kHz mono signed-16-bit WAV without trimming. This workflow
+downloads that pinned file unchanged.
 
 Run `Prepare remote E2E stage` with:
 
@@ -91,9 +102,11 @@ pixel-level target observation. Grants remain keyed to the exact ad-hoc CDHashes
 of the downloaded Roma app and the one-time-built helper. It never re-signs the
 production Roma artifact.
 
-Before sampling, the scenario mounts the Parakeet V2 directory from the
-Namespace runner profile's persistent cache volume. A cache miss downloads the
-real model directly into that volume before app prewarm. It then runs
+Before sampling, the scenario mounts FluidAudio's `Models` parent directory from
+the Namespace runner profile's persistent cache volume. Mounting the parent is
+intentional because FluidAudio replaces the model's child directory after a
+download. A cache miss downloads the real model directly into the mounted parent
+before app prewarm. It then runs
 deterministic checks, a two-app target probe and four-case smoke using one short
 fixture, and the requested repeated four-app matrix with the `250ms` budget. A
 smoke failure is retained but does not suppress the repeated matrix in

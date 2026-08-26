@@ -5,6 +5,32 @@ runtime_audio_duration_seconds() {
     | awk '/estimated duration:/ { print $3; exit }'
 }
 
+runtime_audio_source_kind() {
+  local mode="$1"
+  local audio_artifact="${2:-}"
+
+  case "$mode" in
+    smoke)
+      if [ -n "$audio_artifact" ]; then
+        printf '%s\n' namespace
+      else
+        printf '%s\n' public
+      fi
+      ;;
+    full)
+      if [ -z "$audio_artifact" ]; then
+        echo "Full runtime E2E requires a private Namespace audio artifact" >&2
+        return 1
+      fi
+      printf '%s\n' namespace
+      ;;
+    *)
+      echo "Unsupported runtime E2E mode: $mode" >&2
+      return 2
+      ;;
+  esac
+}
+
 select_runtime_smoke_fixture() {
   local audio_directory="$1"
   local maximum_duration_seconds="${2:-8}"

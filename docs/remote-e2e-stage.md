@@ -20,7 +20,7 @@ Inputs:
 - `target`: `macos`, `ios`, or `both`.
 - `macos_artifact_run_id`: successful `Build roma just talk` workflow run containing the exact macOS artifact to exercise. Blank selects the latest green build.
 - `macos_scenario`: `none`, `runtime-smoke`, or `runtime-e2e`.
-- `macos_audio_artifact`: private Namespace artifact containing the WAV fixtures; required by both macOS runtime scenarios.
+- `macos_audio_artifact`: private Namespace artifact containing WAV fixtures. Full runtime requires it. Smoke uses a pinned public CC-BY-4.0 [podscripter FLEURS fixture](https://huggingface.co/datasets/podscripter-project/test-fixtures) when blank.
 - `macos_repetitions`: `1`, `3`, or `5` repetitions per fixture/app after the smoke run.
 - `ios_artifact_run_id`: successful `VoiceInk iOS single-repo migration` workflow run containing the exact Simulator artifact. Blank selects the latest green run.
 - `ios_scenario`: `none` or `local-whisper-import`.
@@ -31,6 +31,9 @@ macOS runtime scenario builds and ad-hoc signs only its external helper. The
 existing iOS migration workflow packages its Xcode-signed Simulator application
 as `roma.just.talk.ios-simulator.app`, preserving App Group exchange between the
 app and keyboard extension.
+
+The public smoke fixture's source, license, and re-encoding notice are recorded
+in [the runtime harness guide](RUNTIME_E2E_HARNESS.md#autonomous-namespace-run).
 
 Wait for the `Remote desktop ready` job to print `REMOTE E2E STAGE READY`. In Namespace, open that GitHub job and select **Remote Display**.
 
@@ -75,8 +78,10 @@ remain owned by Computer Use; the optional local-STT path is owned by the determ
 ## Fast macOS hypothesis check
 
 Choose `target=macos`, set `macos_artifact_run_id` to an exact green build,
-choose `macos_scenario=runtime-smoke`, provide the private Namespace WAV
-artifact, and use `hold_minutes=0`.
+choose `macos_scenario=runtime-smoke`, leave `macos_audio_artifact` blank, and
+use `hold_minutes=0`. The runner fetches the pinned public fixture through
+Namespace's immutable-URL cache and verifies its SHA-256 before playback. Pass a
+private Namespace WAV artifact only when a hypothesis needs that exact audio.
 
 This lane answers whether a runtime idea survives one named quick-release fixture
 of at most eight seconds in TextEdit and Chrome, with both empty and existing-text

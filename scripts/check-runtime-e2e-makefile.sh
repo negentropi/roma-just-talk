@@ -56,6 +56,14 @@ fi
 
 source "$repo_root/scripts/runtime-e2e-phase-runner.sh"
 
+if [ "$(runtime_audio_source_kind smoke '')" != public ] \
+  || [ "$(runtime_audio_source_kind smoke runtime-audio.zip)" != namespace ] \
+  || [ "$(runtime_audio_source_kind full runtime-audio.zip)" != namespace ] \
+  || runtime_audio_source_kind full '' >/dev/null 2>&1; then
+  echo "Runtime smoke must use public fallback audio without weakening full input requirements." >&2
+  exit 1
+fi
+
 runtime_debug_binary="$repo_root/.local-build/RuntimeE2EHarness/debug/RuntimeE2EHarness"
 runtime_debug_binary="${1:-$runtime_debug_binary}"
 if [ ! -x "$runtime_debug_binary" ]; then
@@ -176,7 +184,7 @@ abort "Remote E2E must mount the pinned persistent Parakeet model cache." unless
   cache&.fetch("uses", nil) ==
     "namespacelabs/nscloud-cache-action@c5f8dab7560444c4bf8dbc64f1b203431873c547" &&
   cache.dig("with", "path") ==
-    "~/Library/Application Support/FluidAudio/Models/parakeet-tdt-0.6b-v2" &&
+    "~/Library/Application Support/FluidAudio/Models" &&
   !cache.key?("continue-on-error")
 
 abort "Remote E2E must record the cache action's authoritative hit output." unless

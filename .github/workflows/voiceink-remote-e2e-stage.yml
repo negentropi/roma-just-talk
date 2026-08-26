@@ -26,7 +26,7 @@ on:
           - runtime-smoke
           - runtime-e2e
       macos_audio_artifact:
-        description: Private Namespace artifact containing WAV fixtures for macOS runtime scenarios
+        description: Private Namespace WAV artifact; required for full runtime, optional for smoke
         required: false
         type: string
       macos_repetitions:
@@ -172,7 +172,7 @@ jobs:
         if: env.STAGE_TARGET != 'ios' && env.STAGE_MACOS_SCENARIO != 'none'
         uses: namespacelabs/nscloud-cache-action@c5f8dab7560444c4bf8dbc64f1b203431873c547 # v1.6.1
         with:
-          path: ~/Library/Application Support/FluidAudio/Models/parakeet-tdt-0.6b-v2
+          path: ~/Library/Application Support/FluidAudio/Models
 
       - name: Prepare desktop and hold for Remote Display
         env:

@@ -44,8 +44,8 @@ if [ "$target" = "ios" ] && [ "$macos_scenario" != "none" ]; then
   exit 2
 fi
 
-if [ "$macos_scenario" != "none" ] && [ -z "$macos_audio_artifact" ]; then
-  echo "$macos_scenario requires a private Namespace audio artifact" >&2
+if [ "$macos_scenario" = "runtime-e2e" ] && [ -z "$macos_audio_artifact" ]; then
+  echo "runtime-e2e requires a private Namespace audio artifact" >&2
   exit 2
 fi
 

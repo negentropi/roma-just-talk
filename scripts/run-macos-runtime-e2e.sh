@@ -2,7 +2,7 @@
 set -euo pipefail
 
 voiceink_app="${1:?VoiceInk app path required}"
-audio_artifact="${2:?Namespace audio artifact required}"
+audio_artifact="${2:-}"
 evidence="${3:?evidence directory required}"
 repetitions="${4:-3}"
 mode="${5:-full}"
@@ -25,6 +25,7 @@ esac
 
 repo_root="${GITHUB_WORKSPACE:-$(cd "$(dirname "$0")/.." && pwd)}"
 source "$repo_root/scripts/runtime-e2e-phase-runner.sh"
+audio_source_kind="$(runtime_audio_source_kind "$mode" "$audio_artifact")"
 runtime_root="$(dirname "$evidence")/macos-runtime-e2e"
 audio_root="$runtime_root/audio"
 smoke_audio_root=""
@@ -37,6 +38,8 @@ nsc_bin="${NAMESPACE_CLI:-/opt/nsc/bin/nsc}"
 config_smoke="$runtime_root/runtime-e2e-smoke.json"
 config_full="$runtime_root/runtime-e2e-full.json"
 restore_config="$config_full"
+public_smoke_fixture_url="https://huggingface.co/datasets/podscripter-project/test-fixtures/resolve/6e1c1eced6e68bb35b1f1d89c56478229201a2f7/en/fleurs_en_test_3529855487992513201.wav"
+public_smoke_fixture_sha256="b15246f0a22a7de701f6a6abd331edc7817ddd8795f3911af5e1c1d51cc77784"
 scenario_status=1
 current_phase="initialize"
 phase_file="$evidence/macos-runtime-e2e-phase.txt"
@@ -216,14 +219,31 @@ system_profiler SPAudioDataType > "$evidence/audio-after-install.txt"
 grep -q "BlackHole 2ch" "$evidence/audio-after-install.txt"
 
 mark_phase stage-audio-fixtures
-"$nsc_bin" artifact download "$audio_artifact" "$runtime_root/audio.zip" \
-  > "$evidence/audio-artifact-download.log" 2>&1
-ditto -x -k "$runtime_root/audio.zip" "$audio_root"
+if [ "$audio_source_kind" = public ]; then
+  audio_directory="$audio_root/public"
+  public_fixture="$audio_directory/public quick release.wav"
+  mkdir -p "$audio_directory"
+  "$nsc_bin" artifact cache-url "$public_smoke_fixture_url" \
+    --out="$public_fixture" \
+    > "$evidence/audio-artifact-download.log" 2>&1
+  actual_public_fixture_sha256="$(shasum -a 256 "$public_fixture" | awk '{print $1}')"
+  test "$actual_public_fixture_sha256" = "$public_smoke_fixture_sha256"
+  printf '%s\n' "$public_smoke_fixture_url" > "$evidence/audio-source-url.txt"
+  printf '%s\n' "$actual_public_fixture_sha256" > "$evidence/audio-source-sha256.txt"
+else
+  "$nsc_bin" artifact download "$audio_artifact" "$runtime_root/audio.zip" \
+    > "$evidence/audio-artifact-download.log" 2>&1
+  ditto -x -k "$runtime_root/audio.zip" "$audio_root"
+fi
 first_fixture="$(fd -a -t f -e wav -e wave -e aif -e aiff -e caf -e m4a -e mp3 -e flac . "$audio_root" | sort | head -n 1)"
 test -n "$first_fixture"
 audio_directory="$(dirname "$first_fixture")"
 fixture_count="$(fd -a -t f -e wav -e wave -e aif -e aiff -e caf -e m4a -e mp3 -e flac . "$audio_directory" | wc -l | tr -d ' ')"
-test "$fixture_count" -ge 2
+minimum_fixture_count=1
+if [ "$mode" = full ]; then
+  minimum_fixture_count=2
+fi
+test "$fixture_count" -ge "$minimum_fixture_count"
 while IFS= read -r fixture; do
   shasum -a 256 "$fixture"
   afinfo "$fixture"
@@ -299,10 +319,16 @@ done
 grep -Fq "Prewarm completed" "$evidence/macos-app.log"
 printf '%s\n' true > "$evidence/model-prewarm-completed.txt"
 model_root="$HOME/Library/Application Support/FluidAudio"
-fd -a -d 4 . "$model_root" | sort > "$evidence/model-cache-tree.txt" 2>&1 || true
-model_directory="$(fd -a -t d '^parakeet-tdt-0\.6b-v2' "$model_root" | sort | head -n 1 || true)"
-if [ -n "$model_directory" ]; then
+model_directory="$model_root/Models/parakeet-tdt-0.6b-v2"
+fd -L -a -d 4 . "$model_root" | sort > "$evidence/model-cache-tree.txt" 2>&1 || true
+if [ -d "$model_directory" ]; then
   printf '%s\n' "$model_directory" > "$evidence/model-cache-directory.txt"
+  {
+    ls -ld "$model_root/Models" "$model_directory"
+    readlink "$model_root/Models" || true
+    df -h "$model_root/Models"
+    mount | grep -F '/Volumes/cache' || true
+  } > "$evidence/model-cache-mount.txt" 2>&1
   du -sh "$model_directory" > "$evidence/model-cache-size.txt" 2>&1 || true
   while IFS= read -r model_file; do
     stat -f '%z %N' "$model_file"

@@ -105,13 +105,18 @@ production Roma artifact.
 Before sampling, the scenario mounts FluidAudio's `Models` parent directory from
 the Namespace runner profile's persistent cache volume. Mounting the parent is
 intentional because FluidAudio replaces the model's child directory after a
-download. A cache miss downloads the real model directly into the mounted parent
-before app prewarm. It then runs
+download. The volume is an opportunistic fast path. The runner validates all 22
+Parakeet V2 files against a size and SHA-256 manifest pinned to one public model
+revision. It fetches missing or corrupt files through Namespace's immutable-URL
+artifact cache with four workers, largest files first, while dependency
+installation and helper compilation run. App
+prewarm then proves FluidAudio can load those exact files. It then runs
 deterministic checks, a two-app target probe and four-case smoke using one short
 fixture, and the requested repeated four-app matrix with the `250ms` budget. A
 smoke failure is retained but does not suppress the repeated matrix in
 `runtime-e2e`. All JSON reports, phase stdout/stderr, TCC rows, signatures,
-hashes, model/audio provenance, app logs, and restoration results are uploaded
+hashes, model/audio provenance, model source and preparation timing, the actual
+post-prewarm 22-file hash receipt, app logs, and restoration results are uploaded
 as `remote-e2e-stage-evidence` even when a phase fails.
 The cache-owning stage treats the scenario command as a recorded outcome so the
 Namespace cache post-save still runs after a rejected hypothesis. A dependent

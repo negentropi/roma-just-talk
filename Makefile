@@ -144,6 +144,7 @@ runtime-e2e-check:
 		--scratch-path "$(RUNTIME_E2E_SCRATCH)" \
 		--product RuntimeE2EHarness
 	bash scripts/check-runtime-e2e-makefile.sh "$(RUNTIME_E2E_DEBUG_BINARY)"
+	bash -n scripts/runtime-e2e-model-bootstrap.sh
 	bash -n scripts/runtime-e2e-phase-runner.sh
 	bash -n scripts/run-macos-runtime-e2e.sh
 

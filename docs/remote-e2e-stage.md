@@ -99,7 +99,10 @@ dependency change needs a new exact app artifact first.
 The remote stage records a failed scenario without ending its cache-owning job,
 uploads the evidence, and lets Namespace save the model cache. A separate
 verdict job then fails the workflow. Red hypotheses therefore keep the same
-failure signal while still warming the next run.
+failure signal while still warming the next run. Empty cache-volume forks do not
+block on FluidAudio's model download. The runner verifies a pinned 22-file model
+manifest and fetches only missing files through Namespace's immutable-URL cache
+across four workers in parallel with machine setup.
 
 ## Deterministic macOS runtime E2E scenario
 
@@ -112,7 +115,7 @@ The scenario:
 1. installs BlackHole 2ch, Chrome, and Visual Studio Code on the disposable VM;
 2. preserves the downloaded Roma app signature and builds the external harness once;
 3. grants exact-CDHash TCC rows only on that ephemeral Mac;
-4. waits for Roma's real Parakeet V2 model download and prewarm;
+4. verifies the pinned public Parakeet V2 files and waits for Roma's real prewarm;
 5. opens TextEdit, Safari, Chrome, and VS Code before the `runningOnly` harness starts;
 6. proves isolated target setup/cleanup before involving Roma, audio, or Shift;
 7. feeds each WAV into BlackHole, beginning audio `1.1s` before synthetic left-Shift down;

@@ -25,6 +25,7 @@ esac
 
 repo_root="${GITHUB_WORKSPACE:-$(cd "$(dirname "$0")/.." && pwd)}"
 source "$repo_root/scripts/runtime-e2e-phase-runner.sh"
+source "$repo_root/scripts/runtime-e2e-model-bootstrap.sh"
 audio_source_kind="$(runtime_audio_source_kind "$mode" "$audio_artifact")"
 runtime_root="$(dirname "$evidence")/macos-runtime-e2e"
 audio_root="$runtime_root/audio"
@@ -35,6 +36,11 @@ voiceink_bundle_id="com.negentropi.RomaJustTalk"
 system_tcc_db="/Library/Application Support/com.apple.TCC/TCC.db"
 user_tcc_db="$HOME/Library/Application Support/com.apple.TCC/TCC.db"
 nsc_bin="${NAMESPACE_CLI:-/opt/nsc/bin/nsc}"
+model_manifest="$repo_root/scripts/runtime-e2e-parakeet-v2.manifest"
+model_revision="ee09c569f73759e6d44c9bd16766f477b2b36d39"
+model_source_base_url="https://huggingface.co/FluidInference/parakeet-tdt-0.6b-v2-coreml/resolve/$model_revision"
+model_root="$HOME/Library/Application Support/FluidAudio"
+model_directory="$model_root/Models/parakeet-tdt-0.6b-v2"
 config_smoke="$runtime_root/runtime-e2e-smoke.json"
 config_full="$runtime_root/runtime-e2e-full.json"
 restore_config="$config_full"
@@ -44,6 +50,8 @@ scenario_status=1
 current_phase="initialize"
 phase_file="$evidence/macos-runtime-e2e-phase.txt"
 launcher_pids=()
+model_prepare_pid=""
+model_prepare_started_seconds=0
 
 mkdir -p "$runtime_root" "$audio_root" "$evidence"
 test -d "$voiceink_app"
@@ -51,6 +59,7 @@ test -x "$nsc_bin"
 command -v jq >/dev/null
 command -v sqlite3 >/dev/null
 command -v csreq >/dev/null
+test -f "$model_manifest"
 
 mark_phase() {
   current_phase="$1"
@@ -71,6 +80,11 @@ stop_launchers() {
     kill "$pid" 2>/dev/null || true
   done
   launcher_pids=()
+}
+
+finish_model_prepare() {
+  runtime_wait_background_job "$model_prepare_pid"
+  model_prepare_pid=""
 }
 
 record_command() {
@@ -177,6 +191,7 @@ cleanup() {
   if [ "$exit_code" -ne 0 ]; then
     scenario_status="$exit_code"
   fi
+  finish_model_prepare
   stop_launchers
   if [ -x "$helper_app/Contents/MacOS/RuntimeE2EHarness" ]; then
     make -C "$repo_root" runtime-e2e-restore \
@@ -193,6 +208,21 @@ cleanup() {
   printf '%s\n' "$scenario_status" > "$evidence/macos-runtime-e2e-exit-code.txt"
 }
 trap cleanup EXIT
+
+printf '%s\n' "${RUNTIME_MODEL_CACHE_HIT:-false}" > "$evidence/model-cache-hit.txt"
+printf '%s\n' "$model_revision" > "$evidence/model-source-revision.txt"
+printf '%s\n' "$model_source_base_url" > "$evidence/model-source-url.txt"
+cp "$model_manifest" "$evidence/model-source-manifest.txt"
+date -u +%Y-%m-%dT%H:%M:%SZ > "$evidence/model-prepare-started-at.txt"
+model_prepare_started_seconds=$SECONDS
+runtime_prepare_pinned_model \
+  "$model_manifest" \
+  "$model_directory" \
+  "$model_source_base_url" \
+  "$nsc_bin" \
+  "$evidence/model-source-kind.txt" \
+  > "$evidence/model-prepare.log" 2>&1 &
+model_prepare_pid=$!
 
 mark_phase install-dependencies
 record_command "$evidence/blackhole-install.log" \
@@ -302,7 +332,11 @@ defaults write "$voiceink_bundle_id" appendTrailingSpace -bool false
 killall cfprefsd 2>/dev/null || true
 
 mark_phase prewarm-model
-printf '%s\n' "${RUNTIME_MODEL_CACHE_HIT:-false}" > "$evidence/model-cache-hit.txt"
+wait "$model_prepare_pid"
+model_prepare_pid=""
+printf '%s\n' "$((SECONDS - model_prepare_started_seconds))" \
+  > "$evidence/model-prepare-wall-seconds.txt"
+date -u +%Y-%m-%dT%H:%M:%SZ > "$evidence/model-prepare-completed-at.txt"
 printf '%s\n' false > "$evidence/model-prewarm-completed.txt"
 open -na "$voiceink_app"
 model_deadline=$((SECONDS + 1200))
@@ -318,8 +352,11 @@ while (( SECONDS < model_deadline )); do
 done
 grep -Fq "Prewarm completed" "$evidence/macos-app.log"
 printf '%s\n' true > "$evidence/model-prewarm-completed.txt"
-model_root="$HOME/Library/Application Support/FluidAudio"
-model_directory="$model_root/Models/parakeet-tdt-0.6b-v2"
+runtime_write_model_receipt \
+  "$model_manifest" \
+  "$model_directory" \
+  "$evidence/model-runtime-receipt.txt"
+printf '%s\n' verified > "$evidence/model-runtime-manifest-verification.txt"
 fd -L -a -d 4 . "$model_root" | sort > "$evidence/model-cache-tree.txt" 2>&1 || true
 if [ -d "$model_directory" ]; then
   printf '%s\n' "$model_directory" > "$evidence/model-cache-directory.txt"

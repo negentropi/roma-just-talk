@@ -2,6 +2,7 @@
 
 ## v1.96 - Unreleased
 
+- Added a live `/demo` landing route with page-scoped Left Shift and touch controls, browser-managed speech recognition, shuffled writing contexts, explicit privacy and browser-parity notes, and no Roma transcription backend or API key.
 - Restyled the landing-page action frames in white, light gray, and dark gray while keeping their current faces and interactions.
 - Changed automatic macOS recording mute to keep AirPods output audible while muting other outputs; explicit On and Off modes remain overrides.
 - Renamed the inherited iOS record deep-link scheme from `voiceink://record` to `romajusttalk://record` so external launch identity matches Roma Just Talk.

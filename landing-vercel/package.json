@@ -1,5 +1,8 @@
 {
   "name": "roma-just-talk",
   "version": "0.1.0",
-  "private": true
+  "private": true,
+  "scripts": {
+    "test": "node --test demo/*.test.mjs"
+  }
 }

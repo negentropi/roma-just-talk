@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Try Roma Just Talk's speak-first dictation interaction directly in your browser."
+    />
+    <meta name="darkreader-lock" />
+    <title>Try Roma Just Talk in your browser</title>
+    <link
+      rel="icon"
+      href="https://raw.githubusercontent.com/happyf-weallareeuropean/roma-just-talk/without/no-adhoc-macos-tcc/docs/assets/roma-just-talk-logo.png"
+      type="image/png"
+    />
+    <link rel="stylesheet" href="../styles.css?v=20260829-browser-demo" />
+    <link rel="stylesheet" href="/demo/demo.css?v=20260829-browser-demo-2" />
+    <script>
+      window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
+    <script defer src="/_vercel/insights/script.js"></script>
+  </head>
+  <body class="demo-page">
+    <header class="demo-header">
+      <nav class="topline" aria-label="Primary">
+        <a class="brand-lockup" href="/">
+          <img
+            src="https://raw.githubusercontent.com/happyf-weallareeuropean/roma-just-talk/without/no-adhoc-macos-tcc/docs/assets/roma-just-talk-logo.png"
+            alt=""
+            width="42"
+            height="42"
+          />
+          <span>roma just talk</span>
+        </a>
+        <div class="top-actions">
+          <a href="/">home</a>
+          <a aria-current="page" href="/demo">demo</a>
+          <a href="/pricing">pricing</a>
+          <a href="/readme">readme</a>
+          <a href="/changelogs">changelog</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="demo-intro" aria-labelledby="demo-heading">
+        <div>
+          <p class="kicker">live browser demo</p>
+          <h1 id="demo-heading">Speak first. <span>Hold Shift later.</span></h1>
+        </div>
+        <p class="body-copy">Enable the mic, start talking, then hold Left Shift to catch the thought and what follows.</p>
+      </section>
+
+      <section class="demo-workbench" data-demo-root data-context="messages" data-phase="idle" aria-label="Interactive dictation demo">
+        <aside class="demo-controls">
+          <div class="status-line" role="status" aria-live="polite">
+            <span class="status-dot" data-status-dot data-state="idle" aria-hidden="true"></span>
+            <span data-status-text>Enable the microphone to begin.</span>
+          </div>
+
+          <div class="control-copy">
+            <p class="control-label">browser speech mode</p>
+            <strong data-capability>not armed</strong>
+          </div>
+
+          <label class="language-field">
+            <span>speech language</span>
+            <select data-language>
+              <option value="en-US">English, United States</option>
+              <option value="en-GB">English, United Kingdom</option>
+              <option value="zh-TW">Mandarin, Taiwan</option>
+              <option value="it-IT">Italian</option>
+              <option value="fr-FR">French</option>
+              <option value="de-DE">German</option>
+              <option value="es-ES">Spanish</option>
+              <option value="ja-JP">Japanese</option>
+              <option value="ko-KR">Korean</option>
+            </select>
+          </label>
+
+          <button class="demo-button mic-button" type="button" data-mic-button>enable microphone</button>
+
+          <ol class="demo-steps">
+            <li><span>1</span>start talking</li>
+            <li><span>2</span>hold Left Shift</li>
+            <li><span>3</span>release to add text</li>
+          </ol>
+
+          <p class="privacy-note">
+            While enabled, browser speech listens continuously for the rolling preview. If on-device speech is unavailable, your browser can transmit microphone audio to its speech provider. This site does not receive or store that audio. Hiding this tab turns the mic off.
+          </p>
+          <p class="unsupported-note" data-browser-difference hidden>
+            Try current Chrome or Edge, or <a href="https://github.com/happyf-weallareeuropean/roma-just-talk/releases/latest">download the Mac app</a>.
+          </p>
+        </aside>
+
+        <div class="context-stage">
+          <div class="context-ambient" aria-hidden="true">
+            <i></i><i></i><i></i><i></i><i></i>
+          </div>
+
+          <div class="context-switcher">
+            <div class="context-current">
+              <span class="context-glyph" data-context-glyph>@</span>
+              <div>
+                <small>writing in</small>
+                <strong data-context-name>messages</strong>
+              </div>
+            </div>
+            <button type="button" class="shuffle-button" data-shuffle>shuffle context</button>
+          </div>
+
+          <div class="context-rail" data-context-rail aria-label="Writing context"></div>
+
+          <article class="editor-window">
+            <header>
+              <div>
+                <h2 data-context-title>New message</h2>
+                <p data-context-meta>to: Mia</p>
+              </div>
+              <span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+            </header>
+            <textarea data-demo-editor rows="8" spellcheck="true" placeholder="Tell Mia what changed..."></textarea>
+            <div class="interim-strip" aria-live="polite">
+              <span>hearing</span>
+              <p data-interim>Your live speech preview appears here.</p>
+            </div>
+            <footer>
+              <p data-context-action-state>Nothing leaves this preview.</p>
+              <button type="button" data-context-action>send</button>
+            </footer>
+          </article>
+
+          <div class="trigger-dock">
+            <div class="shift-instruction">
+              <span class="physical-key" data-shift-key aria-hidden="true">left shift</span>
+              <p>Physical key works while this page has focus.</p>
+            </div>
+            <button class="hold-button" type="button" data-hold-button disabled aria-pressed="false">
+              <span>enable mic first</span>
+              <small>hold</small>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="demo-truth" aria-labelledby="difference-heading">
+        <p class="section-label">what this proves</p>
+        <div>
+          <h2 id="difference-heading">The interaction is real. The engine is your browser.</h2>
+          <p>This demo approximates the three-second lead-in with rolling browser speech. The Mac app buffers exact raw audio and runs Roma's full transcription pipeline.</p>
+        </div>
+        <a href="https://github.com/happyf-weallareeuropean/roma-just-talk/releases/latest">get the native app</a>
+      </section>
+    </main>
+
+    <noscript>This demo needs JavaScript for live microphone capture.</noscript>
+    <script type="module" src="/demo/demo.mjs?v=20260829-browser-demo-2"></script>
+  </body>
+</html>

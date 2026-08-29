@@ -1,0 +1,117 @@
+.demo-page {
+  --demo-dark: var(--button-ink);
+  --demo-light: var(--cream);
+  --demo-stage: color-mix(in srgb, var(--paper) 84%, var(--ink));
+  --context-coding: var(--github-accent);
+  --context-social: #ff9f77;
+  --context-notes: #ffd652;
+  --context-email: #82e196;
+  --context-office: #a88cff;
+  --context-forms: #74b6ff;
+  --demo-control-surface: color-mix(in srgb, var(--demo-dark) 86%, white);
+  --demo-control-shadow: color-mix(in srgb, var(--demo-light) 45%, transparent);
+  min-height: 100svh;
+}
+
+.demo-page button,
+.demo-page select,
+.demo-page textarea {
+  font: inherit;
+}
+
+.demo-header,
+.demo-intro,
+.demo-workbench,
+.demo-truth {
+  width: min(1180px, calc(100% - 40px));
+  margin-inline: auto;
+}
+
+.demo-header {
+  padding: 12px 0;
+}
+
+.top-actions a[aria-current="page"] {
+  text-decoration-color: var(--coral);
+  text-decoration-thickness: 4px;
+}
+
+.demo-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.48fr);
+  align-items: end;
+  gap: clamp(28px, 7vw, 100px);
+  padding: clamp(60px, 10vw, 120px) 0 clamp(34px, 6vw, 70px);
+}
+
+.demo-intro .kicker {
+  margin-bottom: 22px;
+}
+
+.demo-intro h1 {
+  max-width: 10ch;
+  font-size: clamp(3.4rem, 9vw, 7.8rem);
+  letter-spacing: -0.055em;
+  line-height: 0.82;
+}
+
+.demo-intro h1 span {
+  display: block;
+  margin-top: 0.12em;
+  color: var(--idea);
+  font-family: "Instrument Serif", Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+}
+
+.demo-intro .body-copy {
+  max-width: 390px;
+  margin: 0 0 4px;
+  font-size: clamp(1.05rem, 2vw, 1.32rem);
+}
+
+.demo-workbench {
+  --context-accent: var(--coral);
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  min-height: 720px;
+  overflow: hidden;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  background: var(--demo-stage);
+  box-shadow: 9px 9px 0 var(--ink);
+}
+
+.demo-workbench[data-context="ai"] {
+  --context-accent: var(--acid);
+}
+
+.demo-workbench[data-context="search"] {
+  --context-accent: var(--cyan);
+}
+
+.demo-workbench[data-context="coding"] {
+  --context-accent: var(--context-coding);
+}
+
+.demo-workbench[data-context="social"] {
+  --context-accent: var(--context-social);
+}
+
+.demo-workbench[data-context="notes"] {
+  --context-accent: var(--context-notes);
+}
+
+.demo-workbench[data-context="email"] {
+  --context-accent: var(--context-email);
+}
+
+.demo-workbench[data-context="office"] {
+  --context-accent: var(--context-office);
+}
+
+.demo-workbench[data-context="forms"] {
+  --context-accent: var(--context-forms);
+}
+

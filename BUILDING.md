@@ -12,7 +12,7 @@ Before you begin, ensure you have:
 
 ## Quick Start with Makefile (Recommended)
 
-The easiest way to build VoiceInk is using the included Makefile, which automates the entire build process including building and linking the whisper framework.
+The easiest way to build VoiceInk is using the included Makefile, which automates the entire build process including building and statically linking Whisper.
 
 ### Simple Build Commands
 
@@ -31,7 +31,7 @@ make dev
 ### Available Makefile Commands
 
 - `make check` or `make healthcheck` - Verify all required tools are installed
-- `make whisper` - Clone and build whisper.cpp XCFramework automatically
+- `make whisper` - Clone and build the static whisper.cpp XCFramework automatically
 - `make setup` - Prepare the whisper framework for linking
 - `make build` - Build the VoiceInk Xcode project
 - `make local` - Build for local use (no Apple Developer certificate needed)
@@ -45,8 +45,8 @@ make dev
 
 The Makefile automatically:
 1. **Manages Dependencies**: Creates a dedicated `~/VoiceInk-Dependencies` directory for all external frameworks
-2. **Builds Whisper Framework**: Clones whisper.cpp and builds the XCFramework with the correct configuration
-3. **Handles Framework Linking**: Sets up the whisper.xcframework in the proper location for Xcode to find
+2. **Builds Whisper Framework**: Clones whisper.cpp and builds every XCFramework slice as a static archive
+3. **Handles Framework Linking**: Links Whisper into each app executable instead of embedding `whisper.framework`
 4. **Verifies Prerequisites**: Checks that git, xcodebuild, and swift are installed before building
 5. **Streamlines Development**: Provides convenient shortcuts for common development tasks
 
@@ -66,6 +66,7 @@ open ~/Downloads/VoiceInk.app
 ```
 
 This builds VoiceInk with ad-hoc signing using a separate build configuration (`LocalBuild.xcconfig`) that requires no Apple Developer account.
+Whisper is part of the app executable, so the local build does not need a separately signed Whisper dynamic framework at launch.
 
 ### How It Works
 
@@ -88,7 +89,7 @@ If you prefer to build manually or need more control over the build process, fol
 ```bash
 git clone https://github.com/ggerganov/whisper.cpp.git
 cd whisper.cpp
-./build-xcframework.sh
+BUILD_STATIC_XCFRAMEWORK=ON ./build-xcframework.sh
 ```
 This will create the XCFramework at `build-apple/whisper.xcframework`.
 
@@ -100,9 +101,10 @@ git clone https://github.com/Beingpax/VoiceInk.git
 cd VoiceInk
 ```
 
-2. Add the whisper.xcframework to your project:
+2. Add the whisper.xcframework to your project for linking without embedding it:
    - Drag and drop `../whisper.cpp/build-apple/whisper.xcframework` into the project navigator, or
-   - Add it manually in the "Frameworks, Libraries, and Embedded Content" section of project settings
+   - Add it manually in the "Frameworks, Libraries, and Embedded Content" section with "Do Not Embed"
+   - Keep `CoreML.framework` linked because the static Whisper archive includes its CoreML implementation
 
 3. Build and Run
    - Build the project using Cmd+B or Product > Build
@@ -116,7 +118,7 @@ cd VoiceInk
 
 2. **Dependencies**
    - The project uses [whisper.cpp](https://github.com/ggerganov/whisper.cpp) for transcription
-   - Ensure the whisper.xcframework is properly linked in your Xcode project
+   - Ensure the static whisper.xcframework is linked but not embedded in your Xcode project
    - Test the whisper.cpp installation independently before proceeding
 
 3. **Building for Development**
@@ -135,5 +137,7 @@ If you encounter any build issues:
 3. Check Xcode and macOS versions
 4. Verify all dependencies are properly installed
 5. Make sure whisper.xcframework is properly built and linked
+6. Run `bash scripts/verify-static-whisper-xcframework.sh ~/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework`
+7. After building, run `make static-whisper-app-check`
 
-For more help, please check the [issues](https://github.com/Beingpax/VoiceInk/issues) section or create a new issue. 
+For more help, please check the [issues](https://github.com/Beingpax/VoiceInk/issues) section or create a new issue.

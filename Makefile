@@ -2,6 +2,8 @@
 DEPS_DIR := $(HOME)/VoiceInk-Dependencies
 WHISPER_CPP_DIR := $(DEPS_DIR)/whisper.cpp
 FRAMEWORK_PATH := $(WHISPER_CPP_DIR)/build-apple/whisper.xcframework
+STATIC_WHISPER_XCFRAMEWORK_CHECK := scripts/verify-static-whisper-xcframework.sh
+STATIC_WHISPER_APP_CHECK := scripts/verify-static-whisper-app.sh
 LOCAL_DERIVED_DATA := $(CURDIR)/.local-build
 LOCAL_APP_DEST := $(HOME)/Applications/roma just talk.app
 LATENCY_HARNESS := $(LOCAL_DERIVED_DATA)/Tools/VisibleTextLatencyHarness
@@ -33,7 +35,7 @@ RUNTIME_E2E_STDERR ?= $(LOCAL_DERIVED_DATA)/Tools/runtime-e2e.err.log
 RUNTIME_E2E_CONFIG_ABS := $(abspath $(RUNTIME_E2E_CONFIG))
 RUNTIME_E2E_REPORT_ABS := $(abspath $(RUNTIME_E2E_REPORT))
 
-.PHONY: all clean whisper setup build local check healthcheck help dev run latency-harness-build latency-harness-app latency-harness-check latency-harness-run latency-harness-app-run runtime-e2e-build runtime-e2e-app runtime-e2e-check runtime-e2e-preflight runtime-e2e-target-probe runtime-e2e-run runtime-e2e-restore
+.PHONY: all clean whisper setup build local static-whisper-app-check check healthcheck help dev run latency-harness-build latency-harness-app latency-harness-check latency-harness-run latency-harness-app-run runtime-e2e-build runtime-e2e-app runtime-e2e-check runtime-e2e-preflight runtime-e2e-target-probe runtime-e2e-run runtime-e2e-restore
 
 # Default target
 all: check build
@@ -231,17 +233,18 @@ runtime-e2e-restore:
 # Build process
 whisper:
 	@mkdir -p $(DEPS_DIR)
-	@if [ ! -d "$(FRAMEWORK_PATH)" ]; then \
-		echo "Building whisper.xcframework in $(DEPS_DIR)..."; \
+	@if ! bash "$(STATIC_WHISPER_XCFRAMEWORK_CHECK)" "$(FRAMEWORK_PATH)" >/dev/null 2>&1; then \
+		echo "Building static whisper.xcframework in $(DEPS_DIR)..."; \
 		if [ ! -d "$(WHISPER_CPP_DIR)" ]; then \
 			git clone https://github.com/ggerganov/whisper.cpp.git $(WHISPER_CPP_DIR); \
 		else \
-			(cd $(WHISPER_CPP_DIR) && git pull); \
+			(cd $(WHISPER_CPP_DIR) && git pull --ff-only); \
 		fi; \
-		cd $(WHISPER_CPP_DIR) && ./build-xcframework.sh; \
+		cd $(WHISPER_CPP_DIR) && BUILD_STATIC_XCFRAMEWORK=ON ./build-xcframework.sh; \
 	else \
-		echo "whisper.xcframework already built in $(DEPS_DIR), skipping build"; \
+		echo "Static whisper.xcframework already built in $(DEPS_DIR), skipping build"; \
 	fi
+	@bash "$(STATIC_WHISPER_XCFRAMEWORK_CHECK)" "$(FRAMEWORK_PATH)"
 
 setup: whisper
 	@echo "Whisper framework is ready at $(FRAMEWORK_PATH)"
@@ -283,6 +286,10 @@ local: check setup
 		echo "Error: Could not find built roma just talk.app at $$APP_PATH"; \
 		exit 1; \
 	fi
+	@bash "$(STATIC_WHISPER_APP_CHECK)" "$(LOCAL_APP_DEST)"
+
+static-whisper-app-check:
+	bash "$(STATIC_WHISPER_APP_CHECK)" "$(LOCAL_APP_DEST)"
 
 # Run application
 run:
@@ -315,6 +322,7 @@ help:
 	@echo "  setup              Copy whisper XCFramework to VoiceInk project"
 	@echo "  build              Build the VoiceInk Xcode project"
 	@echo "  local              Build for local use (Debug default; use CONFIGURATION=Release for packaging)"
+	@echo "  static-whisper-app-check Verify the built app does not embed or load Whisper dynamically"
 	@echo "  run                Launch the built VoiceInk app"
 	@echo "  dev                Build and run the app (for development)"
 	@echo "  all                Run full build process (default)"

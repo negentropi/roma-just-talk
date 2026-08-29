@@ -16,6 +16,8 @@ on:
       - "scripts/check-find-reusable-ci-run.sh"
       - "scripts/find-reusable-ci-run.sh"
       - "scripts/verify-ios-single-repo-migration.sh"
+      - "scripts/verify-static-whisper-app.sh"
+      - "scripts/verify-static-whisper-xcframework.sh"
       - "VoiceInkCore/**"
       - "iOS/**"
       - "VoiceInk/Info.plist"
@@ -38,6 +40,8 @@ on:
       - "scripts/check-find-reusable-ci-run.sh"
       - "scripts/find-reusable-ci-run.sh"
       - "scripts/verify-ios-single-repo-migration.sh"
+      - "scripts/verify-static-whisper-app.sh"
+      - "scripts/verify-static-whisper-xcframework.sh"
       - "VoiceInkCore/**"
       - "iOS/**"
       - "VoiceInk/Info.plist"
@@ -202,6 +206,9 @@ jobs:
             CODE_SIGNING_ALLOWED=YES \
             CODE_SIGN_IDENTITY=- \
             ENTITLEMENTS_ALLOWED=YES
+
+      - name: Verify Whisper is statically linked
+        run: bash scripts/verify-static-whisper-app.sh "$PWD/.local-build-ios/Build/Products/Debug-iphonesimulator/roma just talk.app"
 
       - name: Package iOS Simulator app
         run: |

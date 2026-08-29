@@ -213,6 +213,39 @@ reject_project_string() {
   fi
 }
 
+require_target_framework() {
+  local description="$1"
+  local project_file="$2"
+  local target_name="$3"
+  local framework_path="$4"
+
+  section "$description"
+  if ! plutil -convert json -o - "$project_file" | ruby -rjson -e '
+    objects = JSON.parse(STDIN.read).fetch("objects")
+    target_name, framework_path = ARGV
+    target = objects.values.find do |object|
+      object["isa"] == "PBXNativeTarget" && object["name"] == target_name
+    end
+    exit 1 unless target
+
+    linked = Array(target["buildPhases"]).any? do |phase_id|
+      phase = objects[phase_id]
+      next false unless phase && phase["isa"] == "PBXFrameworksBuildPhase"
+
+      Array(phase["files"]).any? do |build_file_id|
+        build_file = objects[build_file_id]
+        file = build_file && objects[build_file["fileRef"]]
+        file && file["sourceTree"] == "SDKROOT" && file["path"] == framework_path
+      end
+    end
+
+    exit(linked ? 0 : 1)
+  ' "$target_name" "$framework_path"
+  then
+    fail "$description: '$framework_path' is not in target '$target_name' Frameworks phase"
+  fi
+}
+
 section "tool availability"
 require_command git
 require_command plutil
@@ -246,6 +279,8 @@ require_file VoiceInkCore/Package.swift
 require_file Makefile
 require_file LocalBuild.xcconfig
 require_file .github/workflows/voiceink-ios-single-repo-migration.yml
+require_file scripts/verify-static-whisper-app.sh
+require_file scripts/verify-static-whisper-xcframework.sh
 
 section "required app configuration files"
 require_file VoiceInk/Info.plist
@@ -455,6 +490,8 @@ for shared_ios_input in \
   scripts/check-find-reusable-ci-run.sh \
   scripts/find-reusable-ci-run.sh \
   scripts/verify-ios-single-repo-migration.sh \
+  scripts/verify-static-whisper-app.sh \
+  scripts/verify-static-whisper-xcframework.sh \
   'VoiceInkCore/**' \
   'iOS/**' \
   VoiceInk/Info.plist \
@@ -479,6 +516,17 @@ require_file_line_count \
   .github/workflows/voiceink-build.yml \
   '- "VoiceInkCore/**"' \
   2
+
+for static_whisper_input in \
+  scripts/verify-static-whisper-app.sh \
+  scripts/verify-static-whisper-xcframework.sh
+do
+  require_file_line_count \
+    "macOS build watches $static_whisper_input" \
+    .github/workflows/voiceink-build.yml \
+    "- \"$static_whisper_input\"" \
+    2
+done
 
 require_file_string_count \
   "iOS CI does not duplicate the macOS build" \
@@ -542,6 +590,34 @@ require_project_string \
   "iOS project uses canonical local Whisper framework path" \
   iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
   "$expected_whisper_project_path"
+
+reject_project_string \
+  "macOS project does not embed static Whisper" \
+  VoiceInk.xcodeproj/project.pbxproj \
+  "whisper.xcframework in Embed Frameworks"
+
+reject_project_string \
+  "iOS project does not embed static Whisper" \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
+  "whisper.xcframework in Embed Frameworks"
+
+require_file_string_count \
+  "Makefile requests upstream static Whisper packaging" \
+  Makefile \
+  "BUILD_STATIC_XCFRAMEWORK=ON" \
+  1
+
+require_target_framework \
+  "macOS app explicitly links CoreML required by static Whisper" \
+  VoiceInk.xcodeproj/project.pbxproj \
+  VoiceInk \
+  System/Library/Frameworks/CoreML.framework
+
+require_target_framework \
+  "iOS app explicitly links CoreML required by static Whisper" \
+  iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
+  VoiceInk-ios \
+  System/Library/Frameworks/CoreML.framework
 
 for obsolete_framework_path in \
   "../Downloads/build-apple/whisper.xcframework" \

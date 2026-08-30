@@ -78,6 +78,25 @@ Your normal `make all` / `make build` commands are completely unaffected.
 
 ---
 
+## Building a Release
+
+Public releases are **not** built with `make local`. They go through the
+Developer ID signing, notarization and artifact-validation pipeline in
+[`docs/macos-release-pipeline.md`](docs/macos-release-pipeline.md):
+
+```bash
+make release-credentials   # what signing/notarization secrets are configured
+make release               # signed + notarized + validated public artifact
+make release-dev           # ad-hoc development build of the same pipeline
+make release-test          # regression tests for the pipeline (no Xcode needed)
+```
+
+Ad-hoc signed builds (`make local`, `make release-dev`) are for development
+only. They carry no Team ID, so they are exempted from Library Validation
+through `VoiceInk/VoiceInk.local.entitlements` and must never be published.
+
+---
+
 ## Manual Build Process (Alternative)
 
 If you prefer to build manually or need more control over the build process, follow these steps:

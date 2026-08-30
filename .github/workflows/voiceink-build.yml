@@ -8,6 +8,8 @@ on:
     paths:
       - ".github/workflows/voiceink-build.yml"
       - "LocalBuild.xcconfig"
+      - "scripts/release/**"
+      - "scripts/tests/**"
       - "Makefile"
       - "Tools/**"
       - "VoiceInk/**"
@@ -29,6 +31,9 @@ jobs:
           xcode-select -p
           xcodebuild -version
           swift --version
+
+      - name: Run release pipeline regression tests
+        run: bash scripts/tests/release-pipeline.test.sh
 
       - name: Compile visible text latency harness helper
         run: make latency-harness-app
@@ -77,6 +82,16 @@ jobs:
 
       - name: Package app
         run: ditto -c -k --keepParent "$HOME/Applications/roma just talk.app" "roma.just.talk.app.zip"
+
+      # Structural and signature validation of the exact ZIP produced above.
+      # This is a development (ad-hoc) build, so Developer ID, notarization and
+      # the launch check are only enforced by .github/workflows/macos-release.yml.
+      - name: Validate the packaged development artifact
+        run: |
+          bash scripts/release/validate-macos-artifact.sh \
+            --artifact "roma.just.talk.app.zip" \
+            --allow-adhoc \
+            --skip-launch
 
       - name: Upload app artifact
         uses: actions/upload-artifact@v4

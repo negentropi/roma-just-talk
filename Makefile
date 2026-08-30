@@ -31,8 +31,14 @@ RUNTIME_E2E_STDOUT ?= $(LOCAL_DERIVED_DATA)/Tools/runtime-e2e.out.log
 RUNTIME_E2E_STDERR ?= $(LOCAL_DERIVED_DATA)/Tools/runtime-e2e.err.log
 RUNTIME_E2E_CONFIG_ABS := $(abspath $(RUNTIME_E2E_CONFIG))
 RUNTIME_E2E_REPORT_ABS := $(abspath $(RUNTIME_E2E_REPORT))
+RELEASE_OUT_DIR ?= $(CURDIR)/build/release
+RELEASE_MODE ?= auto
+RELEASE_ZIP ?= $(RELEASE_OUT_DIR)/roma.just.talk.app.zip
+RELEASE_ARTIFACT ?= $(RELEASE_ZIP)
+RELEASE_VALIDATE_ARGS ?=
+RELEASE_ARGS ?=
 
-.PHONY: all clean whisper setup build local check healthcheck help dev run latency-harness-build latency-harness-app latency-harness-check latency-harness-run latency-harness-app-run runtime-e2e-build runtime-e2e-app runtime-e2e-check runtime-e2e-preflight runtime-e2e-target-probe runtime-e2e-run runtime-e2e-restore
+.PHONY: all clean whisper setup build local check healthcheck help dev run latency-harness-build latency-harness-app latency-harness-check latency-harness-run latency-harness-app-run runtime-e2e-build runtime-e2e-app runtime-e2e-check runtime-e2e-preflight runtime-e2e-target-probe runtime-e2e-run runtime-e2e-restore release release-dev release-credentials release-validate release-test
 
 # Default target
 all: check build
@@ -226,6 +232,33 @@ runtime-e2e-restore:
 		open -W -n "$(RUNTIME_E2E_APP)" --args --restore; \
 	fi
 
+# ---------------------------------------------------------------------------
+# Release pipeline (see docs/macos-release-pipeline.md)
+# ---------------------------------------------------------------------------
+
+# Report which signing/notarization credentials are configured.
+release-credentials:
+	bash scripts/release/check-signing-credentials.sh
+
+# Full public release: Developer ID signing, notarization, stapling, packaging
+# and validation of the exact artifact that gets uploaded. Fails without
+# credentials rather than silently producing an unpublishable build.
+release:
+	bash scripts/release/release-macos.sh --mode developer-id --require-signing \
+		--out-dir "$(RELEASE_OUT_DIR)" $(RELEASE_ARGS)
+
+# Ad-hoc development build of the same pipeline. Never publish the result.
+release-dev:
+	bash scripts/release/release-macos.sh --mode adhoc --out-dir "$(RELEASE_OUT_DIR)" $(RELEASE_ARGS)
+
+# Re-run validation against an already built artifact (ZIP, DMG or .app).
+release-validate:
+	bash scripts/release/validate-macos-artifact.sh --artifact "$(RELEASE_ARTIFACT)" $(RELEASE_VALIDATE_ARGS)
+
+# Regression tests for the release scripts themselves (no Xcode required).
+release-test:
+	bash scripts/tests/release-pipeline.test.sh
+
 # Build process
 whisper:
 	@mkdir -p $(DEPS_DIR)
@@ -268,7 +301,7 @@ local: check setup
 		mkdir -p "$$(dirname "$(LOCAL_APP_DEST)")"; \
 		rm -rf "$(LOCAL_APP_DEST)"; \
 		ditto "$$APP_PATH" "$(LOCAL_APP_DEST)"; \
-		xattr -cr "$(LOCAL_APP_DEST)"; \
+		/usr/bin/xattr -cr "$(LOCAL_APP_DEST)"; \
 		/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -lint -v -R -f "$(LOCAL_APP_DEST)"; \
 		echo ""; \
 		echo "Build complete! App saved to: $(LOCAL_APP_DEST)"; \
@@ -328,5 +361,10 @@ help:
 	@echo "  runtime-e2e-target-probe Validate four already-running app targets without Roma/audio"
 	@echo "  runtime-e2e-run        Run autonomous fixture x app x repetition matrix"
 	@echo "  runtime-e2e-restore    Restore state after an interrupted harness run"
+	@echo "  release            Signed + notarized public release, validated end to end"
+	@echo "  release-dev        Ad-hoc development release build (never publish it)"
+	@echo "  release-credentials Report which signing/notarization secrets are configured"
+	@echo "  release-validate   Validate an existing artifact (RELEASE_ARTIFACT=...)"
+	@echo "  release-test       Run the release pipeline regression tests"
 	@echo "  clean              Remove build artifacts"
 	@echo "  help               Show this help message"

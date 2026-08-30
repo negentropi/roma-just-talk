@@ -1,0 +1,183 @@
+name: Release roma just talk (macOS)
+
+# Produces the signed, notarized, stapled artifact that is published to GitHub
+# Releases. Every stage is fatal: a signing, nested-framework, notarization,
+# validation or launch failure stops the release instead of shipping an app
+# that macOS refuses to load.
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Upload the validated artifact to the GitHub release for `tag`
+        required: false
+        default: false
+        type: boolean
+      tag:
+        description: Release tag to upload to (required when publish is true)
+        required: false
+        type: string
+      build_dmg:
+        description: Also build and validate a DMG
+        required: false
+        default: false
+        type: boolean
+      allow_unsigned_dev_build:
+        description: Continue with an ad-hoc development build when no signing secrets exist
+        required: false
+        default: false
+        type: boolean
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: macos-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Build, sign, notarize and validate
+    runs-on: namespace-profile-roma-jt
+    timeout-minutes: 120
+
+    env:
+      # Code signing. Never hard-code any of these - they are repository or
+      # environment secrets.
+      MACOS_CERTIFICATE_P12_BASE64: ${{ secrets.MACOS_CERTIFICATE_P12_BASE64 }}
+      MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+      MACOS_KEYCHAIN_PASSWORD: ${{ secrets.MACOS_KEYCHAIN_PASSWORD }}
+      MACOS_SIGNING_IDENTITY: ${{ secrets.MACOS_SIGNING_IDENTITY }}
+      MACOS_TEAM_ID: ${{ secrets.MACOS_TEAM_ID }}
+      # Notarization (App Store Connect API key preferred).
+      AC_API_KEY_ID: ${{ secrets.AC_API_KEY_ID }}
+      AC_API_ISSUER_ID: ${{ secrets.AC_API_ISSUER_ID }}
+      AC_API_KEY_BASE64: ${{ secrets.AC_API_KEY_BASE64 }}
+      AC_APPLE_ID: ${{ secrets.AC_APPLE_ID }}
+      AC_APP_PASSWORD: ${{ secrets.AC_APP_PASSWORD }}
+      AC_TEAM_ID: ${{ secrets.AC_TEAM_ID }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Decide release kind
+        id: kind
+        run: |
+          production=false
+          tag=""
+          case "${{ github.ref }}" in
+            refs/tags/v*) production=true; tag="${GITHUB_REF#refs/tags/}" ;;
+          esac
+          if [ "${{ inputs.publish }}" = "true" ]; then
+            production=true
+            tag="${{ inputs.tag }}"
+            if [ -z "$tag" ]; then
+              echo "::error::publish requires a tag input"
+              exit 1
+            fi
+          fi
+          echo "production=$production" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "Production release: $production (tag: ${tag:-none})"
+
+      - name: Show toolchain
+        run: |
+          xcode-select -p
+          xcodebuild -version
+          swift --version
+
+      - name: Verify release script tests
+        run: bash scripts/tests/release-pipeline.test.sh
+
+      - name: Check signing and notarization credentials
+        id: credentials
+        run: |
+          if [ "${{ steps.kind.outputs.production }}" = "true" ]; then
+            bash scripts/release/check-signing-credentials.sh --require
+          else
+            bash scripts/release/check-signing-credentials.sh
+          fi
+
+      - name: Fail unsigned non-production build unless explicitly allowed
+        if: steps.credentials.outputs.signing_available != 'true' && inputs.allow_unsigned_dev_build != true
+        run: |
+          echo "::error::No Developer ID signing credentials are configured."
+          echo "::error::Configure the secrets listed in docs/macos-release-pipeline.md,"
+          echo "::error::or re-run with allow_unsigned_dev_build to produce a development build."
+          exit 1
+
+      - name: Import Developer ID certificate
+        id: signing
+        if: steps.credentials.outputs.signing_available == 'true' && env.MACOS_CERTIFICATE_P12_BASE64 != ''
+        run: bash scripts/release/import-signing-certificate.sh
+
+      - name: Build, sign, notarize, package and validate
+        env:
+          MACOS_KEYCHAIN_PATH: ${{ steps.signing.outputs.keychain_path }}
+        run: |
+          args="--out-dir $PWD/build/release"
+          if [ "${{ inputs.build_dmg }}" = "true" ]; then
+            args="$args --dmg"
+          fi
+          if [ "${{ steps.credentials.outputs.signing_available }}" = "true" ]; then
+            args="$args --mode developer-id --require-signing"
+          else
+            args="$args --mode adhoc"
+          fi
+          bash scripts/release/release-macos.sh $args
+
+      - name: Summarise the artifact
+        if: always()
+        run: |
+          {
+            echo "### macOS release artifact"
+            echo
+            if [ -f build/release/checksums.txt ]; then
+              echo '```'
+              cat build/release/checksums.txt
+              echo '```'
+            fi
+            if [ "${{ steps.credentials.outputs.signing_available }}" != "true" ]; then
+              echo
+              echo "> **Development build.** Ad-hoc signed and not notarized - do not publish it."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload the validated artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.just.talk.release
+          path: |
+            build/release/roma.just.talk.app.zip
+            build/release/roma.just.talk.dmg
+            build/release/checksums.txt
+          if-no-files-found: error
+
+      - name: Publish to the GitHub release
+        if: steps.kind.outputs.production == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.kind.outputs.tag }}
+        run: |
+          if [ "${{ steps.credentials.outputs.signing_available }}" != "true" ] || \
+             [ "${{ steps.credentials.outputs.notarization_available }}" != "true" ]; then
+            echo "::error::refusing to publish an artifact that is not signed and notarized"
+            exit 1
+          fi
+          assets="build/release/roma.just.talk.app.zip"
+          if [ -f build/release/roma.just.talk.dmg ]; then
+            assets="$assets build/release/roma.just.talk.dmg"
+          fi
+          gh release upload "$TAG" $assets --repo "$GITHUB_REPOSITORY" --clobber
+
+      - name: Remove the temporary signing keychain
+        if: always()
+        run: |
+          keychain="${{ steps.signing.outputs.keychain_path }}"
+          if [ -n "$keychain" ]; then
+            security delete-keychain "$keychain" || true
+          fi

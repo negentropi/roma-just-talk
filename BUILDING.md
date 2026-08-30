@@ -67,12 +67,14 @@ open ~/Downloads/VoiceInk.app
 
 This builds VoiceInk with ad-hoc signing using a separate build configuration (`LocalBuild.xcconfig`) that requires no Apple Developer account.
 Whisper is part of the app executable, so the local build does not need a separately signed Whisper dynamic framework at launch.
+The local entitlement set disables Hardened Runtime Library Validation because the app still loads the bundled MediaRemoteAdapter and Sparkle frameworks. Without a Developer ID Team ID, macOS 26.4.1 can reject those separately signed objects when Gatekeeper runs the app through App Translocation. Normal certificate-signed builds keep Library Validation enabled.
 
 ### How It Works
 
 The `make local` command uses:
 - `LocalBuild.xcconfig` to override signing and entitlements settings
 - `VoiceInk.local.entitlements` (stripped-down, no CloudKit/keychain groups)
+- `scripts/verify-adhoc-library-validation.sh` to reject an ad-hoc app that loads bundled code without the required local entitlement
 - `LOCAL_BUILD` Swift compilation flag for conditional code paths
 
 Your normal `make all` / `make build` commands are completely unaffected.
@@ -139,5 +141,6 @@ If you encounter any build issues:
 5. Make sure whisper.xcframework is properly built and linked
 6. Run `bash scripts/verify-static-whisper-xcframework.sh ~/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework`
 7. After building, run `make static-whisper-app-check`
+8. Run `make adhoc-library-validation-check` to verify the local app's signature and bundled-code contract
 
 For more help, please check the [issues](https://github.com/Beingpax/VoiceInk/issues) section or create a new issue.

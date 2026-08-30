@@ -10,6 +10,7 @@ on:
         type: boolean
   pull_request:
     paths:
+      - ".github/workflows/voiceink-build.yml"
       - ".github/workflows/voiceink-ios-single-repo-migration.yml"
       - "LocalBuild.xcconfig"
       - "Makefile"
@@ -34,6 +35,7 @@ on:
       - main
       - "ci/**" # Temporary CI transport branches during the migration.
     paths:
+      - ".github/workflows/voiceink-build.yml"
       - ".github/workflows/voiceink-ios-single-repo-migration.yml"
       - "LocalBuild.xcconfig"
       - "Makefile"

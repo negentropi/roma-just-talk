@@ -16,6 +16,8 @@ on:
       - "Tools/**"
       - "scripts/check-find-reusable-ci-run.sh"
       - "scripts/find-reusable-ci-run.sh"
+      - "scripts/tests/verify-adhoc-library-validation.test.sh"
+      - "scripts/verify-adhoc-library-validation.sh"
       - "scripts/verify-static-whisper-app.sh"
       - "scripts/verify-static-whisper-xcframework.sh"
       - "VoiceInk/**"
@@ -32,6 +34,8 @@ on:
       - "Tools/**"
       - "scripts/check-find-reusable-ci-run.sh"
       - "scripts/find-reusable-ci-run.sh"
+      - "scripts/tests/verify-adhoc-library-validation.test.sh"
+      - "scripts/verify-adhoc-library-validation.sh"
       - "scripts/verify-static-whisper-app.sh"
       - "scripts/verify-static-whisper-xcframework.sh"
       - "VoiceInk/**"
@@ -139,6 +143,9 @@ jobs:
 
       - name: Compile and verify autonomous runtime E2E harness
         run: make runtime-e2e-check
+
+      - name: Verify ad-hoc Library Validation packaging contract
+        run: bash scripts/tests/verify-adhoc-library-validation.test.sh
 
       - name: Build release app
         run: make local CONFIGURATION=Release

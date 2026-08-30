@@ -123,6 +123,37 @@ require_plist_value() {
   fi
 }
 
+require_plist_boolean() {
+  local description="$1"
+  local file="$2"
+  local key="$3"
+  local expected="$4"
+
+  section "$description"
+  if ! plutil -convert json -o - "$file" 2>/dev/null \
+    | ruby -rjson -e '
+        key, expected = ARGV
+        value = JSON.parse(STDIN.read).fetch(key)
+        exit(value.equal?(expected == "true") ? 0 : 1)
+      ' "$key" "$expected"
+  then
+    fail "$description: expected Boolean $expected"
+  fi
+}
+
+reject_plist_key() {
+  local description="$1"
+  local file="$2"
+  local key="$3"
+
+  section "$description"
+  if ! plutil -convert json -o - "$file" 2>/dev/null \
+    | ruby -rjson -e 'exit(JSON.parse(STDIN.read).key?(ARGV.fetch(0)) ? 1 : 0)' "$key"
+  then
+    fail "$description: unexpected key '$key'"
+  fi
+}
+
 require_json_array_value() {
   local description="$1"
   local file="$2"
@@ -279,6 +310,8 @@ require_file VoiceInkCore/Package.swift
 require_file Makefile
 require_file LocalBuild.xcconfig
 require_file .github/workflows/voiceink-ios-single-repo-migration.yml
+require_file scripts/tests/verify-adhoc-library-validation.test.sh
+require_file scripts/verify-adhoc-library-validation.sh
 require_file scripts/verify-static-whisper-app.sh
 require_file scripts/verify-static-whisper-xcframework.sh
 
@@ -485,6 +518,7 @@ for broad_path in 'docs/**' 'scripts/**' 'VoiceInk/**'; do
 done
 
 for shared_ios_input in \
+  .github/workflows/voiceink-build.yml \
   LocalBuild.xcconfig \
   Makefile \
   scripts/check-find-reusable-ci-run.sh \
@@ -527,6 +561,65 @@ do
     "- \"$static_whisper_input\"" \
     2
 done
+
+require_file_line_count \
+  "macOS build watches the ad-hoc Library Validation check" \
+  .github/workflows/voiceink-build.yml \
+  '- "scripts/verify-adhoc-library-validation.sh"' \
+  2
+
+require_file_line_count \
+  "macOS build watches the ad-hoc Library Validation regression test" \
+  .github/workflows/voiceink-build.yml \
+  '- "scripts/tests/verify-adhoc-library-validation.test.sh"' \
+  2
+
+require_file_string_count \
+  "macOS build runs the ad-hoc Library Validation regression test" \
+  .github/workflows/voiceink-build.yml \
+  'bash scripts/tests/verify-adhoc-library-validation.test.sh' \
+  1
+
+require_file_string_count \
+  "local build verifies its DerivedData app before installation" \
+  Makefile \
+  'if ! bash "$(ADHOC_LIBRARY_VALIDATION_CHECK)" "$$APP_PATH"; then exit 1; fi' \
+  1
+
+require_file_string_count \
+  "local build fails before installation when static Whisper verification fails" \
+  Makefile \
+  'if ! bash "$(STATIC_WHISPER_APP_CHECK)" "$$APP_PATH"; then exit 1; fi' \
+  1
+
+require_file_string_count \
+  "local build verifies the staged install before replacing the current app" \
+  Makefile \
+  'if ! bash "$(ADHOC_LIBRARY_VALIDATION_CHECK)" "$$STAGED_APP"; then exit 1; fi' \
+  1
+
+require_file_string_count \
+  "local build fails when staging the verified app fails" \
+  Makefile \
+  'if ! ditto "$$APP_PATH" "$$STAGED_APP"; then exit 1; fi' \
+  1
+
+require_file_string_count \
+  "standalone ad-hoc Library Validation check targets the installed app" \
+  Makefile \
+  'bash "$(ADHOC_LIBRARY_VALIDATION_CHECK)" "$(LOCAL_APP_DEST)"' \
+  1
+
+require_plist_boolean \
+  "local entitlements disable Library Validation for ad-hoc dynamic frameworks" \
+  VoiceInk/VoiceInk.local.entitlements \
+  com.apple.security.cs.disable-library-validation \
+  true
+
+reject_plist_key \
+  "certificate-signed release entitlements keep Library Validation enabled" \
+  VoiceInk/VoiceInk.entitlements \
+  com.apple.security.cs.disable-library-validation
 
 require_file_string_count \
   "iOS CI does not duplicate the macOS build" \

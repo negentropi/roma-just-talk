@@ -4,6 +4,7 @@ WHISPER_CPP_DIR := $(DEPS_DIR)/whisper.cpp
 FRAMEWORK_PATH := $(WHISPER_CPP_DIR)/build-apple/whisper.xcframework
 STATIC_WHISPER_XCFRAMEWORK_CHECK := scripts/verify-static-whisper-xcframework.sh
 STATIC_WHISPER_APP_CHECK := scripts/verify-static-whisper-app.sh
+ADHOC_LIBRARY_VALIDATION_CHECK := scripts/verify-adhoc-library-validation.sh
 LOCAL_DERIVED_DATA := $(CURDIR)/.local-build
 LOCAL_APP_DEST := $(HOME)/Applications/roma just talk.app
 LATENCY_HARNESS := $(LOCAL_DERIVED_DATA)/Tools/VisibleTextLatencyHarness
@@ -35,7 +36,7 @@ RUNTIME_E2E_STDERR ?= $(LOCAL_DERIVED_DATA)/Tools/runtime-e2e.err.log
 RUNTIME_E2E_CONFIG_ABS := $(abspath $(RUNTIME_E2E_CONFIG))
 RUNTIME_E2E_REPORT_ABS := $(abspath $(RUNTIME_E2E_REPORT))
 
-.PHONY: all clean whisper setup build local static-whisper-app-check check healthcheck help dev run latency-harness-build latency-harness-app latency-harness-check latency-harness-run latency-harness-app-run runtime-e2e-build runtime-e2e-app runtime-e2e-check runtime-e2e-preflight runtime-e2e-target-probe runtime-e2e-run runtime-e2e-restore
+.PHONY: all clean whisper setup build local static-whisper-app-check adhoc-library-validation-check check healthcheck help dev run latency-harness-build latency-harness-app latency-harness-check latency-harness-run latency-harness-app-run runtime-e2e-build runtime-e2e-app runtime-e2e-check runtime-e2e-preflight runtime-e2e-target-probe runtime-e2e-run runtime-e2e-restore
 
 # Default target
 all: check build
@@ -268,13 +269,34 @@ local: check setup
 		SWIFT_ACTIVE_COMPILATION_CONDITIONS='$$(inherited) LOCAL_BUILD' \
 		build
 	@APP_PATH="$(LOCAL_DERIVED_DATA)/Build/Products/$(CONFIGURATION)/roma just talk.app" && \
+	STAGED_APP="$(LOCAL_DERIVED_DATA)/Install/roma just talk.app" && \
+	PREVIOUS_APP="$(LOCAL_DERIVED_DATA)/Install/previous-roma-just-talk.app" && \
 	if [ -d "$$APP_PATH" ]; then \
+		echo "Verifying the built app before installation..."; \
+		if ! bash "$(STATIC_WHISPER_APP_CHECK)" "$$APP_PATH"; then exit 1; fi; \
+		if ! bash "$(ADHOC_LIBRARY_VALIDATION_CHECK)" "$$APP_PATH"; then exit 1; fi; \
+		if ! mkdir -p "$$(dirname "$$STAGED_APP")"; then exit 1; fi; \
+		if ! ditto "$$APP_PATH" "$$STAGED_APP"; then exit 1; fi; \
+		if ! xattr -cr "$$STAGED_APP"; then exit 1; fi; \
+		if ! bash "$(STATIC_WHISPER_APP_CHECK)" "$$STAGED_APP"; then exit 1; fi; \
+		if ! bash "$(ADHOC_LIBRARY_VALIDATION_CHECK)" "$$STAGED_APP"; then exit 1; fi; \
 		echo "Copying roma just talk.app to $(LOCAL_APP_DEST)..."; \
-		mkdir -p "$$(dirname "$(LOCAL_APP_DEST)")"; \
-		rm -rf "$(LOCAL_APP_DEST)"; \
-		ditto "$$APP_PATH" "$(LOCAL_APP_DEST)"; \
-		xattr -cr "$(LOCAL_APP_DEST)"; \
-		/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -lint -v -R -f "$(LOCAL_APP_DEST)"; \
+		if ! mkdir -p "$$(dirname "$(LOCAL_APP_DEST)")"; then exit 1; fi; \
+		if [ -e "$(LOCAL_APP_DEST)" ]; then \
+			if ! mv "$(LOCAL_APP_DEST)" "$$PREVIOUS_APP"; then exit 1; fi; \
+		fi; \
+		if ! mv "$$STAGED_APP" "$(LOCAL_APP_DEST)"; then \
+			if [ -e "$$PREVIOUS_APP" ]; then mv "$$PREVIOUS_APP" "$(LOCAL_APP_DEST)" || true; fi; \
+			exit 1; \
+		fi; \
+		if ! /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -lint -v -R -f "$(LOCAL_APP_DEST)"; then \
+			if [ -e "$$PREVIOUS_APP" ]; then \
+				rm -rf "$(LOCAL_APP_DEST)"; \
+				mv "$$PREVIOUS_APP" "$(LOCAL_APP_DEST)" || true; \
+			fi; \
+			exit 1; \
+		fi; \
+		if ! rm -rf "$$PREVIOUS_APP"; then exit 1; fi; \
 		echo ""; \
 		echo "Build complete! App saved to: $(LOCAL_APP_DEST)"; \
 		echo "Run with: open $(LOCAL_APP_DEST)"; \
@@ -286,10 +308,12 @@ local: check setup
 		echo "Error: Could not find built roma just talk.app at $$APP_PATH"; \
 		exit 1; \
 	fi
-	@bash "$(STATIC_WHISPER_APP_CHECK)" "$(LOCAL_APP_DEST)"
 
 static-whisper-app-check:
 	bash "$(STATIC_WHISPER_APP_CHECK)" "$(LOCAL_APP_DEST)"
+
+adhoc-library-validation-check:
+	bash "$(ADHOC_LIBRARY_VALIDATION_CHECK)" "$(LOCAL_APP_DEST)"
 
 # Run application
 run:
@@ -323,6 +347,7 @@ help:
 	@echo "  build              Build the VoiceInk Xcode project"
 	@echo "  local              Build for local use (Debug default; use CONFIGURATION=Release for packaging)"
 	@echo "  static-whisper-app-check Verify the built app does not embed or load Whisper dynamically"
+	@echo "  adhoc-library-validation-check Verify the local app can load its bundled frameworks"
 	@echo "  run                Launch the built VoiceInk app"
 	@echo "  dev                Build and run the app (for development)"
 	@echo "  all                Run full build process (default)"

@@ -128,6 +128,7 @@ require_text "$RUNNER" 'macos-bundle-manifest.sh'
 require_text "$RUNNER" 'GATEKEEPER ACTION REQUIRED'
 require_text "$RUNNER" 'Confirm Finder Extraction Complete.command'
 require_text "$RUNNER" 'Confirm Finder Follow-up Extraction.command'
+require_text "$RUNNER" '/bin/date -u +%Y-%m-%dT%H:%M:%SZ > "$confirmation_path"'
 require_text "$RUNNER" 'archive-utility-recursive'
 require_text "$RUNNER" 'finder-extraction-mode.txt'
 require_text "$RUNNER" 'expected-inner-app-files.sha256'
@@ -163,6 +164,7 @@ reject_text "$RUNNER" 'http://127\.0\.0\.1'
 reject_text "$RUNNER" 'python3[[:space:]]+-m[[:space:]]+http\.server'
 reject_text "$RUNNER" 'browser-download-url\.txt'
 reject_text "$RUNNER" 'Confirm (First|Second) Finder Extraction\.command'
+reject_text "$RUNNER" '/usr/bin/date'
 
 ditto_extraction_count="$(grep -Ec 'ditto[[:space:]].*-x' "$RUNNER")"
 if [[ "$ditto_extraction_count" -ne 1 ]]; then

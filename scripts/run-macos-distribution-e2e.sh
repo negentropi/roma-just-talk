@@ -119,7 +119,7 @@ write_confirmation_command() {
   local confirmation_path="$2"
   cat > "$command_path" <<EOF
 #!/usr/bin/env bash
-/usr/bin/date -u +%Y-%m-%dT%H:%M:%SZ > "$confirmation_path"
+/bin/date -u +%Y-%m-%dT%H:%M:%SZ > "$confirmation_path"
 EOF
   chmod +x "$command_path"
 }

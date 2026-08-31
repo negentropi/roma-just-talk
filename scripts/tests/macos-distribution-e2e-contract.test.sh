@@ -64,6 +64,12 @@ require_text "$WORKFLOW" "sed -E 's/^\\{ sec = ([0-9]+),.*/\\1/'"
 require_text "$WORKFLOW" "startsWith(inputs.macos_runner, 'namespace-profile-')"
 require_text "$WORKFLOW" "startsWith(inputs.macos_runner, 'nscloud-macos-')"
 require_text "$WORKFLOW" 'provisioning-context.txt'
+require_text "$WORKFLOW" '$RUNNER_TEMP/roma-runtime-e2e-cold-model-cache'
+require_text "$WORKFLOW" 'test ! -e "$COLD_CACHE"'
+require_text "$WORKFLOW" 'test ! -L "$COLD_CACHE"'
+require_text "$WORKFLOW" 'cold_model_cache_preexisting=true'
+require_text "$WORKFLOW" 'cold_model_cache_preexisting=false'
+require_text "$WORKFLOW" 'RUNTIME_E2E_MODEL_CACHE_PATH=$COLD_CACHE'
 require_text "$BUILD_WORKFLOW" 'roma.runtime-e2e-harness.macos'
 
 require_text "$PREPARER" 'none|runtime-smoke|runtime-e2e|distribution-e2e'

@@ -492,7 +492,25 @@ jobs:
           env.STAGE_TARGET != 'ios' &&
           env.STAGE_MACOS_SCENARIO != 'none' &&
           startsWith(inputs.macos_runner, 'nscloud-macos-')
-        run: mkdir -p "$HOME/Library/Caches/roma-runtime-e2e-models"
+        run: |
+          COLD_CACHE="$RUNNER_TEMP/roma-runtime-e2e-cold-model-cache"
+          if [ -e "$COLD_CACHE" ] || [ -L "$COLD_CACHE" ]; then
+            {
+              printf 'cold_model_cache_preexisting=true\n'
+              printf 'cold_model_cache_path=%s\n' "$COLD_CACHE"
+            } >> "$RUNNER_TEMP/voiceink-remote-e2e-stage/evidence/provisioning-context.txt"
+            ls -ldeO@ "$COLD_CACHE" \
+              > "$RUNNER_TEMP/voiceink-remote-e2e-stage/evidence/cold-model-cache-preexisting.txt"
+            exit 2
+          fi
+          test ! -e "$COLD_CACHE"
+          test ! -L "$COLD_CACHE"
+          mkdir -p "$COLD_CACHE"
+          {
+            printf 'cold_model_cache_preexisting=false\n'
+            printf 'cold_model_cache_path=%s\n' "$COLD_CACHE"
+          } >> "$RUNNER_TEMP/voiceink-remote-e2e-stage/evidence/provisioning-context.txt"
+          echo "RUNTIME_E2E_MODEL_CACHE_PATH=$COLD_CACHE" >> "$GITHUB_ENV"
 
       - name: Prepare desktop and hold for Remote Display
         id: prepare-stage

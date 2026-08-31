@@ -48,10 +48,11 @@ as `roma.just.talk.ios-simulator.app`, preserving App Group exchange between the
 app and keyboard extension.
 
 Runner profiles may attach the persistent runtime-model cache. Direct
-`nscloud-macos-*` image labels use a cold cache on that disposable Mac, so an
-exact image lane never depends on a cache-volume label. Both keep model files
-outside FluidAudio's live model directory until the first distribution launch
-has passed.
+`nscloud-macos-*` image labels require a previously absent cache path under that
+job's runner-temporary directory and record the pre-state before creating it, so
+an exact image lane never depends on a cache-volume label or preloaded model.
+Both keep model files outside FluidAudio's live model directory until the first
+distribution launch has passed.
 
 The public smoke fixture's source, license, and re-encoding notice are recorded
 in [the runtime harness guide](RUNTIME_E2E_HARNESS.md#autonomous-namespace-run).

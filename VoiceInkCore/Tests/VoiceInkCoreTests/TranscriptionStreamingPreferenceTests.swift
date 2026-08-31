@@ -396,6 +396,30 @@ final class TranscriptionStreamingPreferenceTests: XCTestCase {
         XCTAssertTrue(blank.requiresFinalASR)
     }
 
+    func testResolveHingeCommitKeepsLiveHypothesisWhenFinalASRIsEmpty() {
+        XCTAssertEqual(
+            VoiceInkFluidAudioTranscriptionPolicy.resolvedCommitText(
+                finalASRText: " final transcript ",
+                latestHypothesisText: "live hypothesis"
+            ),
+            "final transcript"
+        )
+        XCTAssertEqual(
+            VoiceInkFluidAudioTranscriptionPolicy.resolvedCommitText(
+                finalASRText: " ",
+                latestHypothesisText: " live hypothesis "
+            ),
+            "live hypothesis"
+        )
+        XCTAssertEqual(
+            VoiceInkFluidAudioTranscriptionPolicy.resolvedCommitText(
+                finalASRText: nil,
+                latestHypothesisText: " "
+            ),
+            ""
+        )
+    }
+
     func testTranscriptionPassSchedulingRequiresMinimumTotalAndNewAudio() {
         XCTAssertFalse(VoiceInkFluidAudioTranscriptionPolicy.shouldRunTranscriptionPass(
             absoluteSampleCount: 15_999,

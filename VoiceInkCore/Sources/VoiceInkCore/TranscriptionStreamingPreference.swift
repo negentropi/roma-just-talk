@@ -499,6 +499,17 @@ public enum VoiceInkFluidAudioTranscriptionPolicy {
         )
     }
 
+    public static func resolvedCommitText(
+        finalASRText: String?,
+        latestHypothesisText: String
+    ) -> String {
+        let finalText = finalASRText?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        if !finalText.isEmpty {
+            return finalText
+        }
+        return latestHypothesisText.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
     public static func seekSample(
         hypothesisStartTime: Double,
         confirmedEndTime: Double,

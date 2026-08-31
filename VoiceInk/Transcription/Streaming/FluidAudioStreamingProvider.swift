@@ -157,10 +157,23 @@ final class FluidAudioStreamingProvider {
         )
 
         let finalASRSpan = latencyTrace.begin("fluid_streaming.final_asr", token: traceToken)
-        let remainingText = await transcribeRemainingAudio() ?? ""
-        latencyTrace.end(finalASRSpan, details: "chars=\(remainingText.count)")
-        logger.notice("FluidAudio commit ran final ASR elapsed=\(Date().timeIntervalSince(commitStartedAt), format: .fixed(precision: 3), privacy: .public)s chars=\(remainingText.count, privacy: .public)")
-        eventsContinuation?.yield(.committed(text: remainingText))
+        let finalASRText = await transcribeRemainingAudio() ?? ""
+        latencyTrace.end(finalASRSpan, details: "chars=\(finalASRText.count)")
+        // A cold final pass can be empty after live ASR already recognized the remaining speech.
+        let committedText = VoiceInkFluidAudioTranscriptionPolicy.resolvedCommitText(
+            finalASRText: finalASRText,
+            latestHypothesisText: latestHypothesisText
+        )
+        if finalASRText.isEmpty && !committedText.isEmpty {
+            latencyTrace.event(
+                "fluid_streaming.commit.fallback_to_hypothesis",
+                details: "pendingSamples=\(commitPlan.pendingSamples) chars=\(committedText.count)",
+                token: traceToken
+            )
+            logger.notice("FluidAudio final ASR was empty; committed the latest live hypothesis chars=\(committedText.count, privacy: .public)")
+        }
+        logger.notice("FluidAudio commit ran final ASR elapsed=\(Date().timeIntervalSince(commitStartedAt), format: .fixed(precision: 3), privacy: .public)s chars=\(finalASRText.count, privacy: .public)")
+        eventsContinuation?.yield(.committed(text: committedText))
     }
 
     func disconnect() async {

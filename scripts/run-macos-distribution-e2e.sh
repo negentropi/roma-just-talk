@@ -23,6 +23,7 @@ fi
 
 repo_root="${GITHUB_WORKSPACE:-$(cd "$(dirname "$0")/.." && pwd)}"
 verifier="$repo_root/scripts/verify-macos-distribution-launch.sh"
+finder_extraction_classifier="$repo_root/scripts/macos-finder-extraction-state.sh"
 source "$repo_root/scripts/macos-bundle-manifest.sh"
 distribution_root="$stage_root/macos-distribution-e2e"
 distribution_evidence="$evidence/macos-distribution-e2e"
@@ -30,15 +31,16 @@ desktop="$HOME/Desktop"
 instructions="$desktop/GATEKEEPER ACTION REQUIRED.txt"
 phase_file="$distribution_evidence/distribution-phase.txt"
 verdict_file="$distribution_evidence/distribution-verdict.txt"
-first_extraction_confirmation="$distribution_root/first-finder-extraction-confirmed.txt"
-second_extraction_confirmation="$distribution_root/second-finder-extraction-confirmed.txt"
+finder_extraction_confirmation="$distribution_root/finder-extraction-confirmed.txt"
+finder_followup_confirmation="$distribution_root/finder-followup-extraction-confirmed.txt"
 gatekeeper_confirmation="$distribution_root/gatekeeper-not-opened-confirmed.txt"
 readiness_confirmation="$distribution_root/first-launch-ui-confirmed.txt"
-first_extraction_confirmation_command="$desktop/Confirm First Finder Extraction.command"
-second_extraction_confirmation_command="$desktop/Confirm Second Finder Extraction.command"
+finder_extraction_confirmation_command="$desktop/Confirm Finder Extraction Complete.command"
+finder_followup_confirmation_command="$desktop/Confirm Finder Follow-up Extraction.command"
 gatekeeper_confirmation_command="$desktop/Confirm Gatekeeper Not Opened.command"
 readiness_confirmation_command="$desktop/Confirm Roma First Launch Ready.command"
 disk_image="$distribution_root/roma-distribution-e2e.dmg"
+reference_root="$distribution_root/expected-inner-reference"
 volume_name="Roma Distribution E2E"
 download_name="$(basename "$archive")"
 app_name="roma just talk.app"
@@ -133,6 +135,13 @@ wait_for_path() {
     sleep 2
   done
   fail "timed out waiting for $description: $path"
+}
+
+state_value() {
+  local state_file="$1"
+  local key="$2"
+  awk -F '\t' -v key="$key" '$1 == key { sub(/^[^\t]*\t/, ""); print; exit }' \
+    "$state_file"
 }
 
 resolve_github_artifact_download_url() {
@@ -356,6 +365,8 @@ test -f "$archive" || fail "GitHub Actions archive is missing: $archive"
 test -f "$expected_inner_archive" \
   || fail "unwrapped app archive is missing: $expected_inner_archive"
 test -x "$verifier" || fail "distribution launch verifier is missing: $verifier"
+test -x "$finder_extraction_classifier" \
+  || fail "Finder extraction classifier is missing: $finder_extraction_classifier"
 [[ "$(uname -s)" == "Darwin" ]] || fail "distribution E2E requires macOS"
 [[ "$(uname -m)" == "arm64" ]] || fail "distribution E2E requires Apple Silicon"
 [[ -n "$expected_macos_version" && -n "$expected_macos_build" ]] \
@@ -431,6 +442,23 @@ artifact_digest="${MACOS_ARTIFACT_DIGEST:-}"
   printf 'github_artifact_id=%s\n' "${MACOS_ARTIFACT_ID:-unknown}"
   printf 'github_artifact_digest=%s\n' "$artifact_digest"
 } > "$distribution_evidence/source-artifact.txt"
+
+mark_phase prepare-expected-inner-reference
+[[ ! -e "$reference_root" ]] \
+  || fail "expected inner reference already exists: $reference_root"
+mkdir -p "$reference_root"
+if ! ditto -x -k "$expected_inner_archive" "$reference_root"; then
+  fail "could not extract the hash-verified inner ZIP for reference"
+fi
+reference_app="$reference_root/$app_name"
+[[ -f "$reference_app/Contents/Info.plist" ]] \
+  || fail "hash-verified inner ZIP does not contain the expected app"
+codesign --verify --deep --strict --verbose=4 "$reference_app" \
+  > "$distribution_evidence/expected-inner-app-codesign.txt" 2>&1 \
+  || fail "app inside the hash-verified inner ZIP fails strict deep signature verification"
+write_macos_bundle_manifest \
+  "$reference_app" \
+  "$distribution_evidence/expected-inner-app-files.sha256"
 
 mark_phase create-external-volume
 [[ ! -e "$disk_image" ]] || fail "distribution disk image already exists: $disk_image"
@@ -515,94 +543,224 @@ mdls \
   > "$distribution_evidence/browser-downloaded-metadata.txt" 2>&1 || true
 
 mark_phase finder-actions-artifact-extraction
-[[ ! -e "$first_extraction_confirmation" ]] \
-  || fail "first Finder extraction confirmation already exists"
+[[ ! -e "$finder_extraction_confirmation" ]] \
+  || fail "Finder extraction confirmation already exists"
 write_confirmation_command \
-  "$first_extraction_confirmation_command" \
-  "$first_extraction_confirmation"
+  "$finder_extraction_confirmation_command" \
+  "$finder_extraction_confirmation"
+defaults read com.apple.archiveutility \
+  > "$distribution_evidence/archive-utility-defaults-before.txt" 2>&1 \
+  || true
+if find "$volume" -type d -name "$app_name" -prune -print -quit 2>/dev/null \
+  | grep -q .; then
+  fail "fresh distribution volume already contains Roma before Finder extraction"
+fi
 cat > "$instructions" <<EOF
 roma just talk distribution E2E
 
-Current step: first Finder extraction
+Current step: Finder and Archive Utility extraction
 
 In the open Finder window, double-click:
 $download_name
 
-This is the outer ZIP supplied by GitHub Actions. Wait for its folder and the
-inner app ZIP to appear. Then double-click on the Desktop:
+This is the outer ZIP supplied by GitHub Actions. Wait until Archive Utility
+finishes and either "$app_name" or another app ZIP appears. Some macOS versions
+recursively extract the nested ZIP in this one action. Then double-click:
 
-Confirm First Finder Extraction.command
+Confirm Finder Extraction Complete.command
 
-Run that confirmation only if you used Finder and Archive Utility for this step.
-Do not use Terminal, move the app, clear quarantine, or re-sign it.
+Run that confirmation only after Archive Utility finishes. Do not open a nested
+ZIP yet. Do not use Terminal, move the app, clear quarantine, or re-sign it.
 EOF
 echo "DISTRIBUTION E2E FINDER ACTION REQUIRED"
 echo "In Finder, double-click the outer GitHub Actions ZIP: $download_name."
 open -a Finder "$volume"
-
-inner_archive=""
-while (( SECONDS < deadline )); do
-  while IFS= read -r candidate; do
-    [[ "$candidate" != "$downloaded_archive" ]] || continue
-    candidate_sha256="$(shasum -a 256 "$candidate" | awk '{print $1}')"
-    if [[ "$candidate_sha256" == "$expected_inner_sha256" ]]; then
-      inner_archive="$candidate"
-      break 2
-    fi
-  done < <(find "$volume" -type f -name '*.zip' -print 2>/dev/null)
-  sleep 2
-done
-[[ -n "$inner_archive" ]] \
-  || fail "timed out waiting for Finder to extract the exact inner app ZIP"
-
-if ! inner_quarantine="$(xattr -p com.apple.quarantine "$inner_archive" 2>/dev/null)"; then
-  fail "Finder-extracted inner app ZIP did not inherit download quarantine"
-fi
-printf '%s\n' "$inner_quarantine" > "$distribution_evidence/inner-archive-quarantine.txt"
-IFS=';' read -r _ _ inner_quarantine_agent _ <<< "$inner_quarantine"
-[[ "$inner_quarantine_agent" == "Safari" ]] \
-  || fail "inner app ZIP did not preserve Safari quarantine"
-{
-  printf 'inner_archive=%s\n' "$inner_archive"
-  printf 'inner_archive_sha256=%s\n' "$expected_inner_sha256"
-} > "$distribution_evidence/inner-artifact.txt"
 wait_for_path \
-  "$first_extraction_confirmation" \
-  "operator confirmation of the first Finder and Archive Utility extraction" \
+  "$finder_extraction_confirmation" \
+  "operator confirmation that Finder and Archive Utility finished" \
   "$deadline"
-cp "$first_extraction_confirmation" \
-  "$distribution_evidence/first-finder-extraction-human-confirmation.txt"
+cp "$finder_extraction_confirmation" \
+  "$distribution_evidence/finder-extraction-human-confirmation.txt"
 ps -axo pid,ppid,state,lstart,command \
-  > "$distribution_evidence/processes-after-first-finder-extraction.txt" 2>&1 \
+  > "$distribution_evidence/processes-after-finder-extraction.txt" 2>&1 \
   || true
 
-mark_phase finder-app-extraction
-[[ ! -e "$second_extraction_confirmation" ]] \
-  || fail "second Finder extraction confirmation already exists"
-write_confirmation_command \
-  "$second_extraction_confirmation_command" \
-  "$second_extraction_confirmation"
-cat > "$instructions" <<EOF
+finder_state_file="$distribution_root/finder-extraction-state.tsv"
+finder_state_deadline=$((SECONDS + 60))
+if (( finder_state_deadline > deadline )); then
+  finder_state_deadline="$deadline"
+fi
+separate_state_first_seen=-1
+recursive_state_first_seen=-1
+while true; do
+  "$finder_extraction_classifier" \
+    "$volume" \
+    "$downloaded_archive" \
+    "$expected_inner_sha256" \
+    "$app_name" \
+    > "$finder_state_file" \
+    || fail "could not classify Finder extraction output"
+  finder_state="$(state_value "$finder_state_file" state)"
+  case "$finder_state" in
+    recursive)
+      if (( recursive_state_first_seen < 0 )); then
+        recursive_state_first_seen="$SECONDS"
+      fi
+      if (( SECONDS - recursive_state_first_seen >= 4 )) \
+        && ! pgrep -x "Archive Utility" >/dev/null 2>&1; then
+        break
+      fi
+      if (( SECONDS >= finder_state_deadline )); then
+        fail "Archive Utility did not stabilize the recursively extracted app"
+      fi
+      sleep 2
+      ;;
+    separate)
+      recursive_state_first_seen=-1
+      if (( separate_state_first_seen < 0 )); then
+        separate_state_first_seen="$SECONDS"
+      fi
+      if (( SECONDS - separate_state_first_seen >= 4 )) \
+        && ! pgrep -x "Archive Utility" >/dev/null 2>&1; then
+        break
+      fi
+      if (( SECONDS >= finder_state_deadline )); then
+        fail "Archive Utility did not finish after exposing the exact inner ZIP"
+      fi
+      sleep 2
+      ;;
+    invalid)
+      recursive_state_first_seen=-1
+      separate_state_first_seen=-1
+      cp "$finder_state_file" \
+        "$distribution_evidence/finder-extraction-invalid-state.tsv"
+      if (( SECONDS >= finder_state_deadline )); then
+        fail "Finder extraction produced duplicate or unexpected output"
+      fi
+      sleep 2
+      ;;
+    pending)
+      recursive_state_first_seen=-1
+      separate_state_first_seen=-1
+      if (( SECONDS >= finder_state_deadline )); then
+        fail "Finder extraction produced neither the app nor the exact inner ZIP"
+      fi
+      sleep 2
+      ;;
+    *) fail "Finder extraction classifier returned unknown state: $finder_state" ;;
+  esac
+done
+cp "$finder_state_file" \
+  "$distribution_evidence/finder-extraction-first-action-state.tsv"
+
+if [[ "$finder_state" == "recursive" ]]; then
+  extraction_mode="archive-utility-recursive"
+  extracted_app="$(state_value "$finder_state_file" app_path)"
+else
+  extraction_mode="finder-separate-inner-zip"
+  inner_archive="$(state_value "$finder_state_file" inner_path)"
+  if ! inner_quarantine="$(xattr -p com.apple.quarantine "$inner_archive" 2>/dev/null)"; then
+    fail "Finder-extracted inner app ZIP did not inherit download quarantine"
+  fi
+  printf '%s\n' "$inner_quarantine" \
+    > "$distribution_evidence/inner-archive-quarantine.txt"
+  IFS=';' read -r _ _ inner_quarantine_agent _ <<< "$inner_quarantine"
+  [[ "$inner_quarantine_agent" == "Safari" ]] \
+    || fail "inner app ZIP did not preserve Safari quarantine"
+  {
+    printf 'inner_archive=%s\n' "$inner_archive"
+    printf 'inner_archive_sha256=%s\n' "$expected_inner_sha256"
+  } > "$distribution_evidence/inner-artifact.txt"
+
+  mark_phase finder-inner-app-extraction
+  [[ ! -e "$finder_followup_confirmation" ]] \
+    || fail "Finder follow-up confirmation already exists"
+  write_confirmation_command \
+    "$finder_followup_confirmation_command" \
+    "$finder_followup_confirmation"
+  cat > "$instructions" <<EOF
 roma just talk distribution E2E
 
-Current step: second Finder extraction
+Current step: Finder follow-up extraction
 
-In Finder, double-click the inner app ZIP:
+This Mac kept the nested app ZIP instead of recursively extracting it. In
+Finder, double-click:
 $inner_archive
 
-Wait for "$app_name" to appear beside it. Then double-click on the Desktop:
+Wait for "$app_name" to appear. Then double-click on the Desktop:
 
-Confirm Second Finder Extraction.command
+Confirm Finder Follow-up Extraction.command
 
-Run that confirmation only if you used Finder and Archive Utility for this step.
 Do not use Terminal, move the app, clear quarantine, or re-sign it.
 EOF
-echo "DISTRIBUTION E2E SECOND FINDER ACTION REQUIRED"
-echo "In Finder, double-click the inner app ZIP: $inner_archive"
-open -R "$inner_archive"
-extracted_app="$(dirname "$inner_archive")/$app_name"
+  echo "DISTRIBUTION E2E FINDER FOLLOW-UP ACTION REQUIRED"
+  echo "In Finder, double-click the inner app ZIP: $inner_archive"
+  open -R "$inner_archive"
+  wait_for_path \
+    "$finder_followup_confirmation" \
+    "operator confirmation of the Finder follow-up extraction" \
+    "$deadline"
+  cp "$finder_followup_confirmation" \
+    "$distribution_evidence/finder-followup-human-confirmation.txt"
+  finder_followup_deadline=$((SECONDS + 60))
+  if (( finder_followup_deadline > deadline )); then
+    finder_followup_deadline="$deadline"
+  fi
+  followup_recursive_first_seen=-1
+  while true; do
+    "$finder_extraction_classifier" \
+      "$volume" \
+      "$downloaded_archive" \
+      "$expected_inner_sha256" \
+      "$app_name" \
+      > "$finder_state_file" \
+      || fail "could not classify Finder follow-up extraction output"
+    finder_state="$(state_value "$finder_state_file" state)"
+    if [[ "$finder_state" == "recursive" ]]; then
+      if (( followup_recursive_first_seen < 0 )); then
+        followup_recursive_first_seen="$SECONDS"
+      fi
+      if (( SECONDS - followup_recursive_first_seen >= 4 )) \
+        && ! pgrep -x "Archive Utility" >/dev/null 2>&1; then
+        break
+      fi
+    else
+      followup_recursive_first_seen=-1
+    fi
+    if [[ "$finder_state" == "invalid" ]]; then
+      cp "$finder_state_file" \
+        "$distribution_evidence/finder-followup-invalid-state.tsv"
+      if (( SECONDS >= finder_followup_deadline )); then
+        fail "Finder follow-up extraction produced duplicate or unexpected output"
+      fi
+    fi
+    if (( SECONDS >= finder_followup_deadline )); then
+      fail "Finder follow-up extraction did not produce one Roma app"
+    fi
+    sleep 2
+  done
+  cp "$finder_state_file" \
+    "$distribution_evidence/finder-extraction-followup-state.tsv"
+  extracted_app="$(state_value "$finder_state_file" app_path)"
+fi
+
 wait_for_path "$extracted_app/Contents/Info.plist" \
   "Finder and Archive Utility app extraction" "$deadline"
+case "$extracted_app" in
+  "$volume"/*) ;;
+  *) fail "Finder-extracted app escaped the distribution volume: $extracted_app" ;;
+esac
+{
+  printf 'mode=%s\n' "$extraction_mode"
+  printf 'app=%s\n' "$extracted_app"
+  printf 'downloaded_outer_sha256=%s\n' "$downloaded_sha256"
+  printf 'expected_inner_sha256=%s\n' "$expected_inner_sha256"
+  printf 'inner_zip_present_after_first_action=%s\n' \
+    "$([[ "$(state_value "$distribution_evidence/finder-extraction-first-action-state.tsv" inner_count)" -gt 0 ]] && echo true || echo false)"
+} > "$distribution_evidence/finder-extraction-mode.txt"
+defaults read com.apple.archiveutility \
+  > "$distribution_evidence/archive-utility-defaults-after.txt" 2>&1 \
+  || true
 
 codesign_deadline=$((SECONDS + 60))
 while ! codesign --verify --deep --strict --verbose=4 "$extracted_app" \
@@ -612,22 +770,28 @@ while ! codesign --verify --deep --strict --verbose=4 "$extracted_app" \
   fi
   sleep 2
 done
+"$finder_extraction_classifier" \
+  "$volume" \
+  "$downloaded_archive" \
+  "$expected_inner_sha256" \
+  "$app_name" \
+  > "$distribution_evidence/finder-extraction-final-state.tsv" \
+  || fail "could not classify the final Finder extraction output"
+final_finder_state="$(
+  state_value "$distribution_evidence/finder-extraction-final-state.tsv" state
+)"
+final_extracted_app="$(
+  state_value "$distribution_evidence/finder-extraction-final-state.tsv" app_path
+)"
+[[ "$final_finder_state" == "recursive" && "$final_extracted_app" == "$extracted_app" ]] \
+  || fail "Finder extraction output changed before signature verification finished"
 if ! app_quarantine="$(xattr -p com.apple.quarantine "$extracted_app" 2>/dev/null)"; then
-  fail "second Finder extraction did not preserve app quarantine"
+  fail "Finder extraction did not preserve app quarantine"
 fi
 printf '%s\n' "$app_quarantine" > "$distribution_evidence/extracted-app-quarantine.txt"
 IFS=';' read -r _ _ app_quarantine_agent _ <<< "$app_quarantine"
 [[ "$app_quarantine_agent" == "Safari" ]] \
-  || fail "second Finder extraction did not preserve Safari quarantine"
-wait_for_path \
-  "$second_extraction_confirmation" \
-  "operator confirmation of the second Finder and Archive Utility extraction" \
-  "$deadline"
-cp "$second_extraction_confirmation" \
-  "$distribution_evidence/second-finder-extraction-human-confirmation.txt"
-ps -axo pid,ppid,state,lstart,command \
-  > "$distribution_evidence/processes-after-second-finder-extraction.txt" 2>&1 \
-  || true
+  || fail "Finder extraction did not preserve Safari quarantine"
 /usr/bin/log show --last "${interaction_minutes}m" --style compact \
   --predicate 'process == "Archive Utility" OR process == "Finder"' \
   > "$distribution_evidence/finder-archive-utility-unified-log.txt" 2>&1 \
@@ -658,9 +822,13 @@ fi
   printf 'executable=%s\n' "$extracted_executable"
   printf 'executable_sha256=%s\n' "$extracted_executable_sha256"
 } > "$distribution_evidence/extracted-app-identity.txt"
-write_macos_bundle_manifest \
+if ! compare_macos_bundle_to_manifest \
   "$extracted_app" \
-  "$distribution_evidence/extracted-app-files-before-gatekeeper.sha256"
+  "$distribution_evidence/expected-inner-app-files.sha256" \
+  "$distribution_evidence/extracted-app-files-before-gatekeeper.sha256" \
+  "$distribution_evidence/extracted-app-source-mismatch.diff"; then
+  fail "Finder-extracted app does not match the hash-verified inner ZIP"
+fi
 printf '%s\n' "$extracted_app" > "$stage_root/macos-app-path.txt"
 
 mark_phase gatekeeper-first-block

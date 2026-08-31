@@ -125,11 +125,11 @@ before the user path starts. The scenario then:
 
 1. asks GitHub's authenticated artifact endpoint for a short-lived download redirect for that exact artifact ID, opens the redirect in Safari, and downloads it to a newly mounted APFS volume. The redirect itself is never saved in evidence. APFS preserves the framework symlinks in the signed app bundle;
 2. requires Safari quarantine and byte equality with the untouched outer ZIP already fetched from the selected Actions run;
-3. asks the operator to double-click the outer ZIP in Finder, requires human confirmation that Finder and Archive Utility performed the extraction, and proves the exact inner ZIP inherited Safari quarantine;
-4. asks the operator to double-click the inner ZIP, requires the same human confirmation for that separate extraction, proves the app inherited quarantine and still passes strict deep signature verification, and compares its minimum macOS version with the exact runner version;
-5. hashes every regular file and symlink in the extracted app, performs the first launch while Gatekeeper still rejects it, and requires the operator to confirm the visible "Not Opened" dialog before using Privacy & Security, Open Anyway;
+3. asks the operator to double-click the outer ZIP in Finder and waits for Archive Utility to finish. Stock Archive Utility may recursively expand the nested app ZIP and remove that intermediate file. The lane records whether this one-action path produced the app. If the Mac keeps the exact inner ZIP instead, the lane verifies its hash and Safari quarantine before requesting one follow-up Finder extraction;
+4. requires human confirmation after each Finder action actually needed, proves the final app inherited Safari quarantine, checks its strict deep signature, and compares every directory mode, every regular file's contents and mode, and every symlink target with an independent reference extracted from the hash-verified inner ZIP. That reference never becomes the launched app. The lane also compares the app's minimum macOS version with the exact runner version;
+5. records the complete file, directory, and symlink manifest for the extracted app, performs the first launch while Gatekeeper still rejects it, and requires the operator to confirm the visible "Not Opened" dialog before using Privacy & Security, Open Anyway;
 6. starts an approval-window process and log monitor before Open Anyway, requires the operator to confirm that the approved first-launch UI is visible and responsive, then requires the first observed PID to report finished AppKit launch, run through App Translocation as native ARM64, remain runnable without `SIGCONT`, map every bundle-relative Mach-O dependency discovered recursively from the active ARM64 executable graph, survive a stability interval without dyld or signature errors, and leave the full app bundle byte-identical to its pre-launch manifest. A second Roma PID, new Roma crash report, or approval-window dyld error invalidates the run; and
-7. records that first-process verdict, then deliberately starts separate prewarm and transcription relaunches of the same extracted artifact. Every observed Roma PID must be recorded by the helper, run through App Translocation with the same executable hash, pass the same recursive signature and mapped-code checks through process exit, and have an explicit test-requested termination. A new crash report or unaccounted process invalidates the run. The lane also compares the complete file-and-symlink bundle manifest before and after runtime and writes a separate transcription verdict.
+7. records that first-process verdict, then deliberately starts separate prewarm and transcription relaunches of the same extracted artifact. Every observed Roma PID must be recorded by the helper, run through App Translocation with the same executable hash, pass the same recursive signature and mapped-code checks through process exit, and have an explicit test-requested termination. A new crash report or unaccounted process invalidates the run. The lane also compares the complete file, directory, and symlink bundle manifest before and after runtime and writes a separate transcription verdict.
 
 CI builds the runtime helper with a macOS 14.0 deployment target. Before changing
 TCC or starting Roma runtime work, the target Mac runs that exact packaged helper
@@ -146,12 +146,15 @@ Open the running Namespace job's Remote Display as soon as the log prints
 boundary. No script clicks Open Anyway, clears quarantine, modifies SIP, or
 re-signs the app.
 
-The four Desktop confirmation commands are human evidence. Run the two Finder
-commands only after using Finder and Archive Utility for their named extraction.
-Run the Gatekeeper command only after seeing and dismissing the actual "Not
-Opened" dialog. Run the final command only after the approved Roma process shows
-responsive first-launch UI. The verifier still checks the same PID and fails if
-it stopped, died, did not finish AppKit launch, or did not run through App
+Three Desktop confirmation commands are mandatory human evidence: Finder
+extraction complete, Gatekeeper Not Opened, and Roma first-launch ready. A fourth
+Finder follow-up command appears only when Archive Utility leaves the nested app
+ZIP for a separate double-click. Run each Finder command only after Archive
+Utility finishes that action. Run the Gatekeeper command only after seeing and
+dismissing the actual "Not Opened" dialog. Run the final command only after the
+approved Roma process shows responsive first-launch UI. The verifier still checks
+the same PID and fails if it stopped, died, did not finish AppKit launch, or did
+not run through App
 Translocation.
 
 Run Sonoma and Tahoe as separate jobs. A moving selector such as `14.x` or
@@ -251,6 +254,6 @@ Namespace VNC can be active while `screencapture` remains unable to see that dis
 - iOS means iOS Simulator on the remote Mac, not a physical iPhone.
 - Microphone availability is not assumed; the deterministic STT scenario uses a generated audio file.
 - Manual stages do not pre-grant Accessibility, Input Monitoring, Screen Recording, or other TCC permissions.
-- `distribution-e2e` requires a person or authorized Computer Use session for Safari's site-download prompt, both Finder extractions, and Gatekeeper Open Anyway. Missing interaction times out and fails.
+- `distribution-e2e` requires a person or authorized Computer Use session for Safari's site-download prompt, Finder extraction, and Gatekeeper Open Anyway. A Mac that does not recursively expand the nested ZIP requires one extra Finder action. Missing interaction times out and fails.
 - Both macOS runtime scenarios grant only the exact helper/Roma permissions needed on their disposable VM and verify the real global-shortcut/audio-input path.
 - The optional local-STT scenario performs narrow AXe UI assertions; XCUITest remains a separate fast gate.

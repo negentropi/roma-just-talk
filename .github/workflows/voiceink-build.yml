@@ -19,7 +19,9 @@ on:
       - "scripts/tests/verify-adhoc-library-validation.test.sh"
       - "scripts/tests/verify-macos-distribution-launch.test.sh"
       - "scripts/tests/macos-distribution-e2e-contract.test.sh"
+      - "scripts/tests/macos-finder-extraction-state.test.sh"
       - "scripts/run-macos-distribution-e2e.sh"
+      - "scripts/macos-finder-extraction-state.sh"
       - "scripts/macos-bundle-manifest.sh"
       - "scripts/prepare-remote-e2e-stage.sh"
       - ".github/workflows/voiceink-remote-e2e-stage.yml"
@@ -44,7 +46,9 @@ on:
       - "scripts/tests/verify-adhoc-library-validation.test.sh"
       - "scripts/tests/verify-macos-distribution-launch.test.sh"
       - "scripts/tests/macos-distribution-e2e-contract.test.sh"
+      - "scripts/tests/macos-finder-extraction-state.test.sh"
       - "scripts/run-macos-distribution-e2e.sh"
+      - "scripts/macos-finder-extraction-state.sh"
       - "scripts/macos-bundle-manifest.sh"
       - "scripts/prepare-remote-e2e-stage.sh"
       - ".github/workflows/voiceink-remote-e2e-stage.yml"
@@ -201,6 +205,7 @@ jobs:
 
       - name: Verify distribution launch evidence contract
         run: |
+          bash scripts/tests/macos-finder-extraction-state.test.sh
           bash scripts/tests/macos-distribution-e2e-contract.test.sh
           bash scripts/tests/verify-macos-distribution-launch.test.sh
 

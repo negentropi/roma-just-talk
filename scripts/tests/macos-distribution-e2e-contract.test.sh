@@ -3,6 +3,8 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 RUNNER="$ROOT/scripts/run-macos-distribution-e2e.sh"
+FINDER_STATE="$ROOT/scripts/macos-finder-extraction-state.sh"
+FINDER_STATE_TEST="$ROOT/scripts/tests/macos-finder-extraction-state.test.sh"
 PREPARER="$ROOT/scripts/prepare-remote-e2e-stage.sh"
 WORKFLOW="$ROOT/.github/workflows/voiceink-remote-e2e-stage.yml"
 BUILD_WORKFLOW="$ROOT/.github/workflows/voiceink-build.yml"
@@ -30,6 +32,8 @@ reject_text() {
 }
 
 test -x "$RUNNER"
+test -x "$FINDER_STATE"
+test -x "$FINDER_STATE_TEST"
 test -x "$ROOT/scripts/verify-macos-distribution-launch.sh"
 
 require_text "$WORKFLOW" 'distribution-e2e'
@@ -37,9 +41,12 @@ require_text "$WORKFLOW" 'macos_expected_version'
 require_text "$WORKFLOW" 'macos_expected_build'
 require_text "$WORKFLOW" 'developer_dir'
 require_text "$WORKFLOW" '- "scripts/run-macos-distribution-e2e.sh"'
+require_text "$WORKFLOW" '- "scripts/macos-finder-extraction-state.sh"'
 require_text "$WORKFLOW" '- "scripts/macos-bundle-manifest.sh"'
 require_text "$WORKFLOW" '- "scripts/verify-macos-distribution-launch.sh"'
 require_text "$WORKFLOW" '- "scripts/tests/macos-distribution-e2e-contract.test.sh"'
+require_text "$WORKFLOW" '- "scripts/tests/macos-finder-extraction-state.test.sh"'
+require_text "$WORKFLOW" 'bash scripts/tests/macos-finder-extraction-state.test.sh'
 require_text "$WORKFLOW" '- "scripts/tests/verify-macos-distribution-launch.test.sh"'
 require_text "$WORKFLOW" 'roma.runtime-e2e-harness.macos'
 require_text "$WORKFLOW" 'runtime_helper_run_id'
@@ -71,6 +78,7 @@ require_text "$WORKFLOW" 'cold_model_cache_preexisting=true'
 require_text "$WORKFLOW" 'cold_model_cache_preexisting=false'
 require_text "$WORKFLOW" 'RUNTIME_E2E_MODEL_CACHE_PATH=$COLD_CACHE'
 require_text "$BUILD_WORKFLOW" 'roma.runtime-e2e-harness.macos'
+require_text "$BUILD_WORKFLOW" 'bash scripts/tests/macos-finder-extraction-state.test.sh'
 
 require_text "$PREPARER" 'none|runtime-smoke|runtime-e2e|distribution-e2e'
 require_text "$PREPARER" 'run-macos-distribution-e2e.sh'
@@ -118,8 +126,15 @@ require_text "$RUNNER" 'DISTRIBUTION_E2E_REQUIRE_APPKIT_FINISHED=true'
 require_text "$RUNNER" 'verify-macos-distribution-launch.sh'
 require_text "$RUNNER" 'macos-bundle-manifest.sh'
 require_text "$RUNNER" 'GATEKEEPER ACTION REQUIRED'
-require_text "$RUNNER" 'Confirm First Finder Extraction.command'
-require_text "$RUNNER" 'Confirm Second Finder Extraction.command'
+require_text "$RUNNER" 'Confirm Finder Extraction Complete.command'
+require_text "$RUNNER" 'Confirm Finder Follow-up Extraction.command'
+require_text "$RUNNER" 'archive-utility-recursive'
+require_text "$RUNNER" 'finder-extraction-mode.txt'
+require_text "$RUNNER" 'expected-inner-app-files.sha256'
+require_text "$RUNNER" 'compare_macos_bundle_to_manifest'
+require_text "$RUNNER" 'Finder-extracted app does not match the hash-verified inner ZIP'
+require_text "$RUNNER" 'macos-finder-extraction-state.sh'
+require_text "$RUNNER" 'ditto -x -k "$expected_inner_archive" "$reference_root"'
 require_text "$RUNNER" 'Confirm Gatekeeper Not Opened.command'
 require_text "$RUNNER" 'Confirm Roma First Launch Ready.command'
 require_text "$RUNNER" 'finder-archive-utility-unified-log.txt'
@@ -140,12 +155,19 @@ require_text "$RUNNER" 'unset GH_TOKEN'
 
 reject_text "$RUNNER" 'xattr[[:space:]]+-(c|d|cr|dr)'
 reject_text "$RUNNER" 'codesign[[:space:]].*--(force|sign)'
-reject_text "$RUNNER" '(ditto[[:space:]].*-x|unzip[[:space:]])'
+reject_text "$RUNNER" 'unzip[[:space:]]'
 reject_text "$RUNNER" 'kill[[:space:]]+-CONT'
 reject_text "$RUNNER" '(whisper|Sparkle|MediaRemoteAdapter)'
 reject_text "$RUNNER" 'ExFAT'
 reject_text "$RUNNER" 'http://127\.0\.0\.1'
 reject_text "$RUNNER" 'python3[[:space:]]+-m[[:space:]]+http\.server'
 reject_text "$RUNNER" 'browser-download-url\.txt'
+reject_text "$RUNNER" 'Confirm (First|Second) Finder Extraction\.command'
+
+ditto_extraction_count="$(grep -Ec 'ditto[[:space:]].*-x' "$RUNNER")"
+if [[ "$ditto_extraction_count" -ne 1 ]]; then
+  echo "distribution E2E must use one CLI extraction, only for the expected reference bundle" >&2
+  exit 1
+fi
 
 echo "macOS distribution E2E contract checks passed"

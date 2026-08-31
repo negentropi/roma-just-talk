@@ -2,6 +2,7 @@
 
 ## v1.96 - Unreleased
 
+- Added a landing-page Trust section that explains local and cloud data flow, macOS permissions, the current non-notarized download boundary, public project evidence, website analytics, and Felix's promise to investigate and publish fixes.
 - Added a local-only Hardened Runtime exception for ad-hoc macOS builds that load bundled MediaRemoteAdapter and Sparkle frameworks, while keeping Library Validation enabled for certificate-signed releases.
 - Added a fresh-Mac distribution E2E that follows the exact GitHub Actions outer ZIP through Safari quarantine, Archive Utility's real recursive or separate Finder extraction path, Gatekeeper Open Anyway, App Translocation, generic mapped-code verification, and a real transcription smoke.
 - Linked whisper.cpp statically into the macOS and iOS apps so ad-hoc builds no longer depend on a separately signed `whisper.framework` at launch.

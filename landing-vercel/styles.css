@@ -912,6 +912,147 @@ h1 .before-word {
   --panel-accent: var(--acid);
 }
 
+.trust-section {
+  border-top: 1px solid var(--line);
+  padding: clamp(70px, 10vw, 128px) 0 clamp(76px, 11vw, 140px);
+}
+
+.trust-shell {
+  width: min(1040px, calc(100% - 40px));
+  margin: 0 auto;
+}
+
+.trust-intro {
+  max-width: 800px;
+}
+
+.trust-intro h2 {
+  max-width: 9ch;
+  margin: 0;
+  font-size: clamp(3.4rem, 9vw, 7rem);
+  letter-spacing: -0.055em;
+  line-height: 0.88;
+}
+
+.trust-intro > p {
+  max-width: 700px;
+  margin: 24px 0 0;
+  color: var(--muted);
+  font-size: clamp(1.16rem, 2.4vw, 1.5rem);
+  line-height: 1.5;
+}
+
+.trust-disclosures {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  margin-top: clamp(48px, 7vw, 76px);
+  border-top: 2px solid var(--ink);
+  border-bottom: 2px solid var(--ink);
+}
+
+.trust-disclosure {
+  min-width: 0;
+  padding: clamp(26px, 4vw, 42px);
+}
+
+.trust-disclosure h3,
+.trust-promise h3 {
+  margin: 0;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.trust-disclosure p {
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-size: 1.08rem;
+  line-height: 1.58;
+}
+
+.trust-disclosure .trust-warning {
+  border-left: 4px solid var(--coral);
+  background: var(--surface);
+  color: var(--ink);
+  padding: 12px 14px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.trust-data {
+  grid-row: span 2;
+  border-right: 1px solid var(--line);
+  background: color-mix(in srgb, var(--cyan) 7%, transparent);
+}
+
+.trust-permissions {
+  border-bottom: 1px solid var(--line);
+}
+
+.trust-public {
+  background: color-mix(in srgb, var(--coral) 6%, transparent);
+}
+
+.trust-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  margin-top: 24px;
+}
+
+.trust-links a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+.trust-promise {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: clamp(28px, 6vw, 76px);
+  margin-top: clamp(48px, 8vw, 88px);
+  border-left: 8px solid var(--coral);
+  background: var(--surface-strong);
+  padding: clamp(28px, 5vw, 52px);
+  box-shadow: 8px 8px 0 var(--ink);
+}
+
+.trust-promise-title {
+  max-width: 13ch;
+  margin: 18px 0 0;
+  font-size: clamp(2rem, 5vw, 4rem);
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 0.98;
+}
+
+.trust-promise-body > p:first-child {
+  max-width: 580px;
+  margin: 0;
+  color: var(--muted);
+  font-size: clamp(1.08rem, 2.2vw, 1.34rem);
+  line-height: 1.56;
+}
+
+.trust-signoff {
+  margin: 24px 0 0;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.trust-section a:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 4px;
+}
+
 /* tuck 2px up so the first card's top border coincides with the bar's frame-top */
 .feature-panel:first-child {
   margin-top: -2px;
@@ -1485,8 +1626,32 @@ h1 .before-word {
 
   .pricing-hero-layout,
   .pricing-layout,
-  .pricing-access {
+  .pricing-access,
+  .trust-disclosures,
+  .trust-promise {
     grid-template-columns: 1fr;
+  }
+
+  .trust-shell {
+    width: min(100% - 28px, 1040px);
+  }
+
+  .trust-intro h2 {
+    font-size: clamp(3rem, 18vw, 5rem);
+  }
+
+  .trust-data {
+    grid-row: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .trust-promise {
+    border-left-width: 6px;
+  }
+
+  .trust-promise-title {
+    max-width: 16ch;
   }
 
   .pricing-hero-logo {

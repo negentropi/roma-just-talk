@@ -14,7 +14,7 @@
       href="https://raw.githubusercontent.com/happyf-weallareeuropean/roma-just-talk/without/no-adhoc-macos-tcc/docs/assets/roma-just-talk-logo.png"
       type="image/png"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260824-neutral-hero-buttons" />
+    <link rel="stylesheet" href="./styles.css?v=20260831-trust-links" />
     <script>
       window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
     </script>
@@ -44,6 +44,7 @@
             <div class="top-actions">
               <a href="/demo">demo</a>
               <a href="/pricing">pricing</a>
+              <a href="#trust">trust</a>
               <a href="/readme">readme</a>
               <a href="/changelogs">changelog</a>
             </div>
@@ -217,6 +218,82 @@
                 <p>Raw speech can become usable text without breaking the flow of speaking.</p>
               </div>
             </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="trust-section" id="trust" aria-labelledby="trust-title">
+        <div class="trust-shell">
+          <header class="trust-intro">
+            <h2 id="trust-title">Trust needs proof.</h2>
+            <p>
+              Roma is early. I'm Felix. I'm 20, and this app asks for powerful macOS permissions.
+              Your hesitation is reasonable. Here is the exact deal.
+            </p>
+          </header>
+
+          <div class="trust-disclosures">
+            <article class="trust-disclosure trust-data">
+              <h3>What leaves your Mac</h3>
+              <p>
+                Local transcription keeps audio on your Mac. Choose a cloud model and Roma sends
+                audio to that provider using the credentials you configure.
+              </p>
+              <p>
+                Cloud polishing can send the transcript, selected text, and any clipboard or screen
+                context you turn on. Recordings stay in local history until you delete them or
+                enable automatic cleanup.
+              </p>
+            </article>
+
+            <article class="trust-disclosure trust-permissions">
+              <h3>Why Roma asks</h3>
+              <p>
+                Microphone records speech. Input Monitoring detects your chosen shortcut.
+                Accessibility inserts text, reads nearby cursor text for capitalization, and can
+                read selected text for enhancement. Screen Context is optional and reads visible
+                text only when you turn it on.
+              </p>
+            </article>
+
+            <article class="trust-disclosure trust-public">
+              <h3>What is public</h3>
+              <p>
+                The source, releases, and changes are public. The browser demo lets you try the
+                interaction before installing, but it does not test the Mac app. This website loads
+                Vercel Web Analytics. The Mac app has no product-analytics or crash-reporting SDK.
+              </p>
+              <p class="trust-warning">
+                Current Mac downloads are not Apple-notarized. Gatekeeper can block the first
+                launch until you choose Open Anyway. If that is too much trust for your main Mac,
+                use the browser demo or wait.
+              </p>
+              <nav class="trust-links" aria-label="Project evidence">
+                <a href="https://github.com/happyf-weallareeuropean/roma-just-talk">source</a>
+                <a href="/changelogs">changelog</a>
+                <a href="/demo">browser demo</a>
+              </nav>
+            </article>
+          </div>
+
+          <div class="trust-promise">
+            <div>
+              <h3>My promise</h3>
+              <p class="trust-promise-title">
+                I cannot promise zero bugs. I can promise to own the bugs I ship.
+              </p>
+            </div>
+            <div class="trust-promise-body">
+              <p>
+                If Roma misbehaves, report it publicly or privately. I will investigate, explain
+                what happened, fix the problem in Roma, and publish the change.
+              </p>
+              <p class="trust-signoff">Felix C. Order, builder of Roma Just Talk</p>
+              <nav class="trust-links" aria-label="Report a problem">
+                <a href="https://github.com/happyf-weallareeuropean/roma-just-talk/issues/new">report publicly</a>
+                <a href="mailto:happyfumd@icloud.com?subject=Roma%20Just%20Talk%20support">email me privately</a>
+              </nav>
+            </div>
           </div>
         </div>
       </section>

@@ -31,6 +31,19 @@ reject_text() {
   fi
 }
 
+eval "$(sed -n '/^version_is_at_least()/,/^}/p' "$RUNNER")"
+version_is_at_least 26.3.1 14.4
+version_is_at_least 14.4 14.4
+version_is_at_least 14.4.1 14.4
+if version_is_at_least 14.2.1 14.4; then
+  echo "macOS 14.2.1 must not satisfy a 14.4 minimum" >&2
+  exit 1
+fi
+if version_is_at_least 14.4 14.4.1; then
+  echo "macOS 14.4 must not satisfy a 14.4.1 minimum" >&2
+  exit 1
+fi
+
 test -x "$RUNNER"
 test -x "$FINDER_STATE"
 test -x "$FINDER_STATE_TEST"

@@ -315,9 +315,9 @@ version_is_at_least() {
       actual_count = split(actual, actual_parts, ".")
       minimum_count = split(minimum, minimum_parts, ".")
       count = actual_count > minimum_count ? actual_count : minimum_count
-      for (index = 1; index <= count; index++) {
-        actual_part = actual_parts[index] + 0
-        minimum_part = minimum_parts[index] + 0
+      for (part_index = 1; part_index <= count; part_index++) {
+        actual_part = actual_parts[part_index] + 0
+        minimum_part = minimum_parts[part_index] + 0
         if (actual_part > minimum_part) exit 0
         if (actual_part < minimum_part) exit 1
       }

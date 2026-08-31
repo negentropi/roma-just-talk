@@ -1,0 +1,7 @@
+e2e/
+node_modules/
+playwright-report/
+scripts/demo-server.mjs
+test-results/
+demo/*.test.mjs
+playwright.config.mjs

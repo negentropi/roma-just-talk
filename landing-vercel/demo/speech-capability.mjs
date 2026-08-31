@@ -1,5 +1,3 @@
-import { waitForOperation } from "./pending-operation.mjs";
-
 export function speechError(errorLike) {
   const code = errorLike?.error || errorLike?.name || "speech-error";
   const messages = {
@@ -9,26 +7,14 @@ export function speechError(errorLike) {
     "language-not-supported": "The selected language is not available in this browser.",
     network: "The browser speech service could not connect. Try again.",
   };
+  if (errorLike instanceof Error && !messages[code]) {
+    const preserved = new Error(errorLike.message || "Browser speech recognition stopped. Try again.");
+    preserved.name = errorLike.name;
+    preserved.code = code;
+    return preserved;
+  }
   const error = new Error(messages[code] || "Browser speech recognition stopped. Try again.");
   error.code = code;
+  if (["not-allowed", "service-not-allowed"].includes(code)) error.name = "NotAllowedError";
   return error;
-}
-
-export async function canUseInstalledLocalPack(Recognition, language, { browser, signal }) {
-  if (typeof Recognition.available !== "function") return false;
-  try {
-    const status = await waitForOperation(
-      Recognition.available({ langs: [language], processLocally: true }),
-      {
-        browser,
-        signal,
-        timeoutMs: 1_500,
-        timeoutMessage: "Browser speech capability check timed out.",
-      },
-    );
-    return ["available", "ready", "readily"].includes(String(status).toLowerCase());
-  } catch (error) {
-    if (error?.name === "AbortError") throw error;
-    return false;
-  }
 }

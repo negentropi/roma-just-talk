@@ -8,26 +8,11 @@ test("browser adapter carries recent rolling speech into a clean claim", async (
   let now = 0;
   const instances = [];
   class FakeRecognition {
-    static async available() {
-      return "unavailable";
-    }
-
-    constructor() {
-      instances.push(this);
-    }
-
-    start() {
-      queueMicrotask(() => this.onstart?.());
-    }
-
-    stop() {
-      queueMicrotask(() => this.onend?.());
-    }
-
-    abort() {
-      queueMicrotask(() => this.onend?.());
-    }
-
+    static async available() { return "unavailable"; }
+    constructor() { instances.push(this); }
+    start() { queueMicrotask(() => this.onstart?.()); }
+    stop() { queueMicrotask(() => this.onend?.()); }
+    abort() { queueMicrotask(() => this.onend?.()); }
     result(values) {
       const results = values.map(({ text, final }) => {
         const result = [{ transcript: text }];
@@ -68,26 +53,44 @@ test("browser adapter carries recent rolling speech into a clean claim", async (
   await prepared.dispose();
 });
 
+test("release drains the final speech result before committing", async () => {
+  const instances = [];
+  class DrainingRecognition {
+    constructor() { instances.push(this); }
+    start() { queueMicrotask(() => this.onstart?.()); }
+    stop() {
+      queueMicrotask(() => {
+        const result = [{ transcript: "including the last word" }];
+        result.isFinal = true;
+        this.onresult?.({ results: [result] });
+        this.onend?.();
+      });
+    }
+    abort() { queueMicrotask(() => this.onend?.()); }
+  }
+  const prepared = await createBrowserSpeechAdapter({
+    SpeechRecognition: DrainingRecognition,
+    isSecureContext: true,
+    setTimeout,
+    clearTimeout,
+  }).arm({ language: "en-US", lookbackMs: 3_000 });
+  const claim = prepared.begin();
+
+  const finished = claim.finish();
+
+  assert.deepEqual(await finished, { text: "including the last word" });
+  assert.equal(instances.length, 1);
+  await prepared.dispose();
+});
+
 test("browser adapter drops stale unfinished speech from the rolling preview", async () => {
   let now = 0;
   const instances = [];
   class FakeRecognition {
-    constructor() {
-      instances.push(this);
-    }
-
-    start() {
-      queueMicrotask(() => this.onstart?.());
-    }
-
-    stop() {
-      queueMicrotask(() => this.onend?.());
-    }
-
-    abort() {
-      queueMicrotask(() => this.onend?.());
-    }
-
+    constructor() { instances.push(this); }
+    start() { queueMicrotask(() => this.onstart?.()); }
+    stop() { queueMicrotask(() => this.onend?.()); }
+    abort() { queueMicrotask(() => this.onend?.()); }
     result(text) {
       const result = [{ transcript: text }];
       result.isFinal = false;
@@ -112,18 +115,9 @@ test("browser adapter drops stale unfinished speech from the rolling preview", a
 test("discard fences late results from the aborted recognizer", async () => {
   const instances = [];
   class LateAbortRecognition {
-    constructor() {
-      instances.push(this);
-    }
-
-    start() {
-      queueMicrotask(() => this.onstart?.());
-    }
-
-    abort() {
-      this.finishAbort = () => queueMicrotask(() => this.onend?.());
-    }
-
+    constructor() { instances.push(this); }
+    start() { queueMicrotask(() => this.onstart?.()); }
+    abort() { this.finishAbort = () => queueMicrotask(() => this.onend?.()); }
     result(text) {
       const result = [{ transcript: text }];
       result.isFinal = true;
@@ -155,21 +149,10 @@ test("discard stays non-ready until the aborted recognizer restarts", async () =
   const instances = [];
   let now = 10_000;
   class DelayedAbortRecognition {
-    constructor() {
-      instances.push(this);
-    }
-
-    start() {
-      queueMicrotask(() => this.onstart?.());
-    }
-
-    stop() {
-      queueMicrotask(() => this.onend?.());
-    }
-
-    abort() {
-      this.finishAbort = () => queueMicrotask(() => this.onend?.());
-    }
+    constructor() { instances.push(this); }
+    start() { queueMicrotask(() => this.onstart?.()); }
+    stop() { queueMicrotask(() => this.onend?.()); }
+    abort() { this.finishAbort = () => queueMicrotask(() => this.onend?.()); }
   }
   const browser = {
     SpeechRecognition: DelayedAbortRecognition,
@@ -177,8 +160,10 @@ test("discard stays non-ready until the aborted recognizer restarts", async () =
     setTimeout,
     clearTimeout,
   };
-  const adapter = createBrowserSpeechAdapter(browser);
-  const session = createDemoSession({ dictation: adapter, clock: () => now });
+  const session = createDemoSession({
+    dictation: createBrowserSpeechAdapter(browser),
+    clock: () => now,
+  });
 
   await session.enable();
   assert.equal(session.press(), true);
@@ -202,16 +187,9 @@ test("discard stays non-ready until the aborted recognizer restarts", async () =
 test("disabling during browser speech startup aborts the unowned recognizer", async () => {
   const instances = [];
   class PendingRecognition {
-    constructor() {
-      instances.push(this);
-      this.aborts = 0;
-    }
-
+    constructor() { instances.push(this); this.aborts = 0; }
     start() {}
-
-    abort() {
-      this.aborts += 1;
-    }
+    abort() { this.aborts += 1; }
   }
   const adapter = createBrowserSpeechAdapter({
     SpeechRecognition: PendingRecognition,
@@ -229,6 +207,36 @@ test("disabling during browser speech startup aborts the unowned recognizer", as
   assert.equal(await enabling, false);
   assert.equal(instances[0].aborts, 1);
   assert.equal(session.getSnapshot().phase, "idle");
+});
+
+test("finishing resolves even when the replacement recognizer never starts", async () => {
+  const instances = [];
+  class RestartStallsRecognition {
+    constructor() { instances.push(this); }
+    start() {
+      if (instances.length === 1) queueMicrotask(() => this.onstart?.());
+    }
+    stop() { queueMicrotask(() => this.onend?.()); }
+    abort() { queueMicrotask(() => this.onend?.()); }
+    result(text) {
+      const result = [{ transcript: text }];
+      result.isFinal = true;
+      this.onresult?.({ results: [result] });
+    }
+  }
+  const prepared = await createBrowserSpeechAdapter({
+    SpeechRecognition: RestartStallsRecognition,
+    isSecureContext: true,
+    setTimeout,
+    clearTimeout,
+  }, { startTimeoutMs: 20 }).arm({ language: "en-US", lookbackMs: 3_000 });
+  instances[0].result("finished thought");
+  const claim = prepared.begin();
+
+  assert.deepEqual(await claim.finish(), { text: "finished thought" });
+  await new Promise((resolve) => setTimeout(resolve, 90));
+  assert.equal(instances.length, 2);
+  await prepared.dispose();
 });
 
 test("browser speech startup has a deadline", async () => {
@@ -249,4 +257,102 @@ test("browser speech startup has a deadline", async () => {
     /did not start/,
   );
   assert.equal(aborts, 1);
+});
+
+test("first-start permission denial maps to the recoverable permission state", async () => {
+  class DeniedRecognition {
+    start() { queueMicrotask(() => this.onerror?.({ error: "not-allowed" })); }
+    abort() {}
+  }
+  const session = createDemoSession({
+    dictation: createBrowserSpeechAdapter({
+      SpeechRecognition: DeniedRecognition,
+      isSecureContext: true,
+      setTimeout,
+      clearTimeout,
+    }),
+  });
+
+  assert.equal(await session.enable(), false);
+  assert.equal(session.getSnapshot().phase, "permission-denied");
+});
+
+test("fatal re-arm waits for Chrome's asynchronous speech teardown", async () => {
+  const instances = [];
+  let serviceActive = false;
+  class FatalRecognition {
+    constructor() { this.aborts = 0; instances.push(this); }
+    start() {
+      if (serviceActive) throw new DOMException("Speech recognition already started", "InvalidStateError");
+      serviceActive = true;
+      queueMicrotask(() => this.onstart?.());
+    }
+    abort() {
+      this.aborts += 1;
+      this.finishAbort = () => {
+        serviceActive = false;
+        queueMicrotask(() => this.onend?.());
+      };
+    }
+    fail() { this.onerror?.({ error: "network" }); }
+  }
+  const browser = {
+    SpeechRecognition: FatalRecognition,
+    isSecureContext: true,
+    setTimeout,
+    clearTimeout,
+  };
+  const adapter = createBrowserSpeechAdapter(browser);
+  let rearmed;
+  const first = await adapter.arm({
+    language: "en-US",
+    lookbackMs: 3_000,
+    onFatal: () => {
+      assert.equal(instances[0].aborts, 1);
+      rearmed = adapter.arm({ language: "en-US", lookbackMs: 3_000 });
+    },
+  });
+
+  instances[0].fail();
+  await Promise.resolve();
+  assert.equal(instances.length, 1);
+  instances[0].finishAbort();
+  const second = await rearmed;
+  assert.equal(instances.length, 2);
+  await first.dispose();
+  const disposing = second.dispose();
+  instances[1].finishAbort();
+  await disposing;
+});
+
+test("fatal re-arm has a bounded fallback when Chrome omits end", async () => {
+  const instances = [];
+  class MissingEndRecognition {
+    constructor() { instances.push(this); }
+    start() { queueMicrotask(() => this.onstart?.()); }
+    abort() {}
+    fail() { this.onerror?.({ error: "network" }); }
+  }
+  const adapter = createBrowserSpeechAdapter({
+    SpeechRecognition: MissingEndRecognition,
+    isSecureContext: true,
+    setTimeout,
+    clearTimeout,
+  }, { startTimeoutMs: 100, teardownTimeoutMs: 5 });
+  let rearmed;
+  const first = await adapter.arm({
+    language: "en-US",
+    lookbackMs: 3_000,
+    onFatal: () => {
+      rearmed = adapter.arm({ language: "en-US", lookbackMs: 3_000 });
+    },
+  });
+
+  instances[0].fail();
+  await Promise.resolve();
+  assert.equal(instances.length, 1);
+  const second = await rearmed;
+  assert.equal(instances.length, 2);
+  await first.dispose();
+  await second.dispose();
 });

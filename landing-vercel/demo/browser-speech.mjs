@@ -1,14 +1,75 @@
 import { createRestartGate } from "./restart-gate.mjs";
 import { createRollingTranscript } from "./rolling-transcript.mjs";
-import { waitForOperation } from "./pending-operation.mjs";
-import { canUseInstalledLocalPack, speechError } from "./speech-capability.mjs";
+import { operationAbortError, waitForOperation } from "./pending-operation.mjs";
+import { speechError } from "./speech-capability.mjs";
+
+function createRecognitionSlot(browser, teardownTimeoutMs) {
+  let owner = null;
+
+  const release = (token) => {
+    if (owner !== token) return;
+    browser.clearTimeout(token.fallbackTimer);
+    owner = null;
+    token.resolve();
+  };
+
+  return {
+    async acquire({ signal, timeoutMs }) {
+      while (owner) {
+        const previous = owner;
+        await waitForOperation(previous.released, {
+          browser,
+          signal,
+          timeoutMs,
+          timeoutMessage: "Browser speech is still stopping. Try enabling the microphone again.",
+        });
+      }
+      if (signal?.aborted) throw operationAbortError();
+
+      let resolve;
+      const token = {
+        fallbackTimer: 0,
+        recognition: null,
+        released: new Promise((done) => { resolve = done; }),
+        resolve,
+      };
+      owner = token;
+      return token;
+    },
+
+    bind(token, recognition) {
+      token.recognition = recognition;
+    },
+
+    ended(token) {
+      release(token);
+    },
+
+    abort(token) {
+      if (!token) return;
+      try {
+        token.recognition?.abort();
+      } catch (_error) {
+        release(token);
+        return;
+      }
+      if (owner !== token || token.fallbackTimer) return;
+      token.fallbackTimer = browser.setTimeout(() => release(token), teardownTimeoutMs);
+      token.fallbackTimer?.unref?.();
+    },
+
+    release,
+  };
+}
 
 export function createBrowserSpeechAdapter(browser = globalThis, {
   clock = () => Date.now(),
   startTimeoutMs = 8_000,
+  teardownTimeoutMs = 1_000,
 } = {}) {
   const Recognition = browser.SpeechRecognition || browser.webkitSpeechRecognition;
   const secureEnough = browser.isSecureContext !== false;
+  const recognitionSlot = createRecognitionSlot(browser, teardownTimeoutMs);
 
   return {
     isSupported: () => Boolean(Recognition && secureEnough),
@@ -17,21 +78,22 @@ export function createBrowserSpeechAdapter(browser = globalThis, {
       if (!Recognition) throw new Error("This browser does not expose live speech recognition.");
       if (!secureEnough) throw new Error("Live speech needs a secure HTTPS page.");
 
-      const useLocalPack = await canUseInstalledLocalPack(Recognition, language, { browser, signal });
-      const capabilityLabel = useLocalPack
-        ? "on-device browser speech"
-        : "browser-managed speech";
+      const capabilityLabel = "browser-managed speech";
       let active = true;
       let recognition = null;
+      let recognitionToken = null;
       let recognitionStarted = false;
       let recognitionAcceptingResults = false;
       let recognitionCycle = 0;
+      let cycleStarting = false;
       let restartTimer = 0;
+      let cycleStartTimer = 0;
       let currentClaim = null;
       let finishTimer = 0;
       let firstStartResolve;
       let firstStartReject;
       let firstStartPending = true;
+      const lifecycleController = new AbortController();
       const restartGate = createRestartGate(browser);
       const transcript = createRollingTranscript({ clock, lookbackMs });
 
@@ -49,7 +111,7 @@ export function createBrowserSpeechAdapter(browser = globalThis, {
         if (!active || restartTimer) return;
         restartTimer = browser.setTimeout(() => {
           restartTimer = 0;
-          if (active) startCycle();
+          if (active) void startCycle();
         }, 80);
       };
 
@@ -59,31 +121,35 @@ export function createBrowserSpeechAdapter(browser = globalThis, {
         browser.clearTimeout(finishTimer);
         finishTimer = 0;
         currentClaim = null;
+        recognitionAcceptingResults = false;
+        const finishedRecognition = recognition;
+        const finishedToken = recognitionToken;
+        recognition = null;
+        recognitionToken = null;
+        recognitionStarted = false;
         const text = transcript.textFor(claim.transcriptClaim);
         transcript.clear();
-        claim.state = "restarting";
-        const restarted = restartGate.waitForStart(recognitionCycle + 1);
-        recognitionAcceptingResults = false;
-        if (recognition && recognitionStarted) {
+        if (finishedToken) recognitionSlot.abort(finishedToken);
+        else {
           try {
-            recognition.abort();
+            finishedRecognition?.abort();
           } catch (_error) {
             // The recognizer already ended.
           }
         }
+        claim.state = "finished";
+        claim.resolve({ text });
         scheduleRestart();
-        restarted.then(() => {
-          claim.state = "finished";
-          claim.resolve({ text });
-        }, claim.reject);
       };
 
       const reportFatal = (errorLike) => {
         if (!active) return;
         const error = speechError(errorLike);
         active = false;
+        lifecycleController.abort();
         recognitionAcceptingResults = false;
         browser.clearTimeout(restartTimer);
+        browser.clearTimeout(cycleStartTimer);
         browser.clearTimeout(finishTimer);
         restartGate.rejectAll(error);
         if (currentClaim?.state === "finishing") {
@@ -91,51 +157,92 @@ export function createBrowserSpeechAdapter(browser = globalThis, {
           currentClaim.reject(error);
           currentClaim = null;
         }
+        const failedRecognition = recognition;
+        const failedToken = recognitionToken;
+        recognition = null;
+        recognitionToken = null;
+        recognitionStarted = false;
+        if (failedToken) recognitionSlot.abort(failedToken);
+        else {
+          try {
+            failedRecognition?.abort();
+          } catch (_error) {
+            // The recognizer already ended.
+          }
+        }
         if (firstStartPending) {
           firstStartPending = false;
           firstStartReject(error);
         } else {
           onFatal?.(error);
         }
-        try {
-          recognition?.abort();
-        } catch (_error) {
-          // The recognizer already ended.
-        }
       };
 
-      const startCycle = () => {
-        if (!active || recognition) return;
+      const startCycle = async () => {
+        if (!active || recognition || cycleStarting) return;
+        cycleStarting = true;
+        let token;
+        try {
+          token = await recognitionSlot.acquire({
+            signal: lifecycleController.signal,
+            timeoutMs: startTimeoutMs,
+          });
+        } catch (error) {
+          cycleStarting = false;
+          if (active) reportFatal(error);
+          return;
+        }
+        if (!active || recognition) {
+          cycleStarting = false;
+          recognitionSlot.release(token);
+          return;
+        }
         const cycle = recognitionCycle + 1;
         recognitionCycle = cycle;
         let nextRecognition;
         try {
           nextRecognition = new Recognition();
         } catch (error) {
+          cycleStarting = false;
+          recognitionSlot.release(token);
           reportFatal(error);
           return;
         }
         recognition = nextRecognition;
+        recognitionToken = token;
+        recognitionSlot.bind(token, nextRecognition);
         recognitionStarted = false;
         recognitionAcceptingResults = true;
-        let finalResultIndexes = new Set();
+        const finalResultIndexes = new Set();
+        cycleStartTimer = browser.setTimeout(() => {
+          if (recognition === nextRecognition && !recognitionStarted) {
+            reportFatal(new Error(firstStartPending
+              ? "Browser speech did not start."
+              : "Browser speech did not restart."));
+          }
+        }, startTimeoutMs);
 
         nextRecognition.lang = language;
         nextRecognition.continuous = true;
         nextRecognition.interimResults = true;
         nextRecognition.maxAlternatives = 1;
-        if (useLocalPack && "processLocally" in nextRecognition) {
-          nextRecognition.processLocally = true;
-        }
-
         nextRecognition.onstart = () => {
           if (recognition !== nextRecognition) return;
+          browser.clearTimeout(cycleStartTimer);
+          cycleStartTimer = 0;
           recognitionStarted = true;
           if (firstStartPending) {
             firstStartPending = false;
             firstStartResolve();
           }
           restartGate.resolveCycle(cycle);
+          if (currentClaim?.state === "finishing") {
+            try {
+              nextRecognition.stop();
+            } catch (_error) {
+              browser.setTimeout(settleFinish, 0);
+            }
+          }
         };
 
         nextRecognition.onresult = (event) => {
@@ -151,8 +258,12 @@ export function createBrowserSpeechAdapter(browser = globalThis, {
         };
 
         nextRecognition.onend = () => {
+          recognitionSlot.ended(token);
           if (recognition !== nextRecognition) return;
+          browser.clearTimeout(cycleStartTimer);
+          cycleStartTimer = 0;
           recognition = null;
+          recognitionToken = null;
           recognitionStarted = false;
           recognitionAcceptingResults = false;
           if (!active) return;
@@ -162,14 +273,20 @@ export function createBrowserSpeechAdapter(browser = globalThis, {
 
         try {
           nextRecognition.start();
+          cycleStarting = false;
         } catch (error) {
           recognition = null;
+          recognitionToken = null;
+          cycleStarting = false;
+          recognitionSlot.release(token);
+          browser.clearTimeout(cycleStartTimer);
+          cycleStartTimer = 0;
           reportFatal(error);
         }
       };
 
       try {
-        startCycle();
+        void startCycle();
         await waitForOperation(firstStart, {
           browser,
           signal,
@@ -178,16 +295,24 @@ export function createBrowserSpeechAdapter(browser = globalThis, {
         });
       } catch (error) {
         active = false;
+        lifecycleController.abort();
         firstStartPending = false;
         recognitionAcceptingResults = false;
         browser.clearTimeout(restartTimer);
+        browser.clearTimeout(cycleStartTimer);
         restartGate.rejectAll(error);
-        try {
-          recognition?.abort();
-        } catch (_abortError) {
-          // The recognizer never started.
-        }
+        const failedRecognition = recognition;
+        const failedToken = recognitionToken;
         recognition = null;
+        recognitionToken = null;
+        if (failedToken) recognitionSlot.abort(failedToken);
+        else {
+          try {
+            failedRecognition?.abort();
+          } catch (_abortError) {
+            // The recognizer never started.
+          }
+        }
         throw error;
       }
 
@@ -209,7 +334,7 @@ export function createBrowserSpeechAdapter(browser = globalThis, {
 
           return {
             finish() {
-              if (["finished", "restarting"].includes(claim.state)) return claim.promise;
+              if (claim.state === "finished") return claim.promise;
               if (claim.state !== "capturing") return Promise.resolve({ text: "" });
               claim.state = "finishing";
               claim.promise = new Promise((resolve, reject) => {
@@ -239,10 +364,18 @@ export function createBrowserSpeechAdapter(browser = globalThis, {
               const restarted = shouldRestart
                 ? restartGate.waitForStart(recognitionCycle + 1)
                 : null;
-              try {
-                recognition?.abort();
-              } catch (_error) {
-                // The recognizer already ended.
+              const discardedRecognition = recognition;
+              const discardedToken = recognitionToken;
+              recognition = null;
+              recognitionToken = null;
+              recognitionStarted = false;
+              if (discardedToken) recognitionSlot.abort(discardedToken);
+              else {
+                try {
+                  discardedRecognition?.abort();
+                } catch (_error) {
+                  // The recognizer already ended.
+                }
               }
               if (shouldRestart) {
                 scheduleRestart();
@@ -254,19 +387,27 @@ export function createBrowserSpeechAdapter(browser = globalThis, {
 
         async dispose() {
           active = false;
+          lifecycleController.abort();
           recognitionAcceptingResults = false;
           browser.clearTimeout(restartTimer);
+          browser.clearTimeout(cycleStartTimer);
           browser.clearTimeout(finishTimer);
           restartGate.rejectAll(new Error("Browser speech was disabled."));
           currentClaim?.resolve?.({ text: "" });
           currentClaim = null;
           transcript.clear();
-          try {
-            recognition?.abort();
-          } catch (_error) {
-            // The recognizer already ended.
-          }
+          const disposedRecognition = recognition;
+          const disposedToken = recognitionToken;
           recognition = null;
+          recognitionToken = null;
+          if (disposedToken) recognitionSlot.abort(disposedToken);
+          else {
+            try {
+              disposedRecognition?.abort();
+            } catch (_error) {
+              // The recognizer already ended.
+            }
+          }
         },
       };
     },

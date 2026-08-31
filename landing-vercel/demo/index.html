@@ -5,157 +5,168 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="Try Roma Just Talk's speak-first dictation interaction directly in your browser."
+      content="Speak before the shortcut. Try Roma Just Talk's rolling speech pre-roll directly in your browser."
     />
+    <meta name="theme-color" content="#111210" />
     <meta name="darkreader-lock" />
-    <title>Try Roma Just Talk in your browser</title>
-    <link
-      rel="icon"
-      href="https://raw.githubusercontent.com/happyf-weallareeuropean/roma-just-talk/without/no-adhoc-macos-tcc/docs/assets/roma-just-talk-logo.png"
-      type="image/png"
-    />
-    <link rel="stylesheet" href="../styles.css?v=20260829-browser-demo" />
-    <link rel="stylesheet" href="/demo/demo.css?v=20260829-browser-demo-2" />
-    <script>
-      window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
-    </script>
-    <script defer src="/_vercel/insights/script.js"></script>
+    <title>Try Roma Just Talk</title>
+    <link rel="stylesheet" href="/demo/demo.css?v=20260831-browser-speech" />
   </head>
-  <body class="demo-page">
-    <header class="demo-header">
-      <nav class="topline" aria-label="Primary">
-        <a class="brand-lockup" href="/">
-          <img
-            src="https://raw.githubusercontent.com/happyf-weallareeuropean/roma-just-talk/without/no-adhoc-macos-tcc/docs/assets/roma-just-talk-logo.png"
-            alt=""
-            width="42"
-            height="42"
-          />
-          <span>roma just talk</span>
-        </a>
-        <div class="top-actions">
-          <a href="/">home</a>
-          <a aria-current="page" href="/demo">demo</a>
-          <a href="/pricing">pricing</a>
-          <a href="/readme">readme</a>
-          <a href="/changelogs">changelog</a>
-        </div>
-      </nav>
-    </header>
+  <body>
+    <main class="demo" data-demo-root data-phase="preparing" data-mode="microphone">
+      <div class="environment-stack" aria-hidden="true" inert>
+        <section class="environment environment-messages is-active" data-environment="messages">
+          <div class="app-window messages-window">
+            <div class="messages-rail">
+              <span class="rail-mark">r</span>
+              <i></i><i></i><i></i><i></i>
+            </div>
+            <div class="messages-list">
+              <strong>Messages</strong>
+              <div class="search-stub">Search</div>
+              <article class="person active"><b>ML</b><span><strong>Mila</strong><small>Voice note ready</small></span></article>
+              <article class="person"><b>EO</b><span><strong>Ellis</strong><small>See you Thursday</small></span></article>
+              <article class="person"><b>NK</b><span><strong>Niko</strong><small>Sent a photo</small></span></article>
+              <article class="person"><b>AR</b><span><strong>Ari</strong><small>Draft shared</small></span></article>
+            </div>
+            <div class="conversation">
+              <header><b>ML</b><span><strong>Mila</strong><small>online</small></span></header>
+              <div class="bubble received">Did the review move?</div>
+              <div class="bubble sent">I am checking the latest build now.</div>
+              <div class="bubble received">Send me the plan when you know.</div>
+            </div>
+          </div>
+        </section>
 
-    <main>
-      <section class="demo-intro" aria-labelledby="demo-heading">
-        <div>
-          <p class="kicker">live browser demo</p>
-          <h1 id="demo-heading">Speak first. <span>Hold Shift later.</span></h1>
+        <section class="environment environment-ai" data-environment="ai-chat">
+          <div class="app-window ai-window">
+            <aside>
+              <span class="ai-mark">o</span>
+              <button>New chat</button>
+              <small>Today</small>
+              <p>Release plan</p>
+              <p>Explain the shortcut</p>
+              <p>Rewrite draft</p>
+            </aside>
+            <div class="ai-thread">
+              <header><span>Assistant</span><i></i></header>
+              <div class="ai-heading">What are we working on?</div>
+              <div class="ai-answer"><i></i><i></i><i></i></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="environment environment-search" data-environment="search">
+          <div class="browser-window">
+            <div class="browser-tabs"><i></i><span>Search</span><b>+</b></div>
+            <div class="address-bar"><span>‹</span><span>›</span><div>search.example</div><b>⋯</b></div>
+            <div class="search-page">
+              <strong class="search-wordmark">find</strong>
+              <div class="search-field">release review Thursday</div>
+              <nav><b>All</b><span>News</span><span>Images</span><span>Videos</span></nav>
+              <article><small>docs.example / planning</small><strong>Planning a focused release review</strong><p>Keep the review close to the build that it verifies.</p></article>
+              <article><small>calendar.example / teams</small><strong>Move a team review without losing context</strong><p>A short update is enough when the reason is clear.</p></article>
+            </div>
+          </div>
+        </section>
+
+        <section class="environment environment-code" data-environment="agentic-coding">
+          <div class="app-window code-window">
+            <div class="code-activity"><b>◇</b><span>⌕</span><span>⑂</span><span>▱</span></div>
+            <aside><strong>EXPLORER</strong><p>roma-just-talk</p><small>› demo</small><small>› docs</small><small>› src</small><small>  README.md</small></aside>
+            <div class="code-editor">
+              <header><span>demo-session.mjs</span><i></i></header>
+              <pre><em>31</em> const preRoll = speech.last(3_000)
+<em>32</em>
+<em>33</em> function beginClaim() {
+<em>34</em>   return [...preRoll, ...liveWords]
+<em>35</em> }
+<em>36</em>
+<em>37</em> // text arrives after release</pre>
+              <div class="terminal"><strong>TERMINAL</strong><p>$ npm test</p><p class="passed">18 tests passed</p></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="environment environment-social" data-environment="social-post">
+          <div class="social-shell">
+            <aside class="social-nav"><b>p</b><span>Home</span><span>Explore</span><span>Messages</span><span>Bookmarks</span><span>Profile</span></aside>
+            <div class="social-feed">
+              <header>Home</header>
+              <article class="post"><b>ST</b><div><strong>Sora Tan</strong><small>@soratan</small><p>The useful part of a demo is the moment the product changes your behavior.</p><footer>♡ 42　◯ 8　↗</footer></div></article>
+              <article class="post"><b>AM</b><div><strong>Amir M.</strong><small>@amirbuilds</small><p>Shipping the smaller interface today.</p><footer>♡ 19　◯ 4　↗</footer></div></article>
+            </div>
+            <aside class="trends"><strong>Happening now</strong><div>Design tools<small>1,204 posts</small></div><div>Voice interfaces<small>842 posts</small></div><div>Local software<small>518 posts</small></div></aside>
+          </div>
+        </section>
+
+        <section class="environment environment-notes" data-environment="notes">
+          <div class="app-window notes-window">
+            <aside><header><b>Notes</b><span>＋</span></header><div class="note active"><strong>Release review</strong><p>The latest build should be...</p><small>11:42</small></div><div class="note"><strong>Demo ideas</strong><p>Keep the text still...</p><small>Yesterday</small></div><div class="note"><strong>Thursday</strong><p>Call with Mila...</p><small>Monday</small></div></aside>
+            <article class="note-page"><small>31 August 2026 at 11:42</small><h2>Release review</h2><p>The latest build should be ready before the review.</p><p>Move the meeting only after the final test finishes.</p></article>
+          </div>
+        </section>
+
+        <section class="environment environment-email" data-environment="email">
+          <div class="app-window mail-window">
+            <aside><button>＋ Compose</button><span>Inbox <b>12</b></span><span>Starred</span><span>Sent</span><span>Drafts <b>3</b></span></aside>
+            <div class="inbox"><header><strong>Inbox</strong><span>⌕　?</span></header><article class="mail active"><b>MC</b><span><strong>Mila Chen</strong><small>Review timing</small><p>Does Thursday still work?</p></span><time>11:36</time></article><article class="mail"><b>JB</b><span><strong>Jon Bell</strong><small>Build notes</small><p>The latest checks are green.</p></span><time>10:20</time></article><article class="mail"><b>AP</b><span><strong>Alex P.</strong><small>Design handoff</small><p>New screenshots attached.</p></span><time>09:48</time></article></div>
+            <div class="compose"><header><strong>New message</strong><span>_　×</span></header><p>To　Mila Chen</p><p>Subject　Review timing</p><div class="compose-body"></div><footer><button>Send</button><span>⌘ ↵</span></footer></div>
+          </div>
+        </section>
+
+        <section class="environment environment-office" data-environment="documents">
+          <div class="office-window">
+            <header><b>Project brief</b><span>File　Edit　View　Insert　Format</span><button>Share</button></header>
+            <div class="office-toolbar"><span>↶</span><span>↷</span><select aria-label="Style"><option>Normal text</option></select><span>B</span><i>I</i><span>U</span><span>☰</span></div>
+            <aside><strong>Outline</strong><p>Project brief</p><small>Context</small><small>Decision</small><small>Next review</small></aside>
+            <article class="document-page"><h2>Project brief</h2><p class="lead">A short plan for the next release.</p><h3>Context</h3><p>The browser demo should show the same timing as the native app.</p><h3>Decision</h3><p>Keep the writing still while the working environment changes.</p></article>
+          </div>
+        </section>
+
+        <section class="environment environment-form" data-environment="form">
+          <div class="form-page">
+            <header><span class="form-mark">f</span><div><b>Project request</b><small>Saved automatically</small></div></header>
+            <div class="form-progress"><i></i><i></i><i></i><i></i></div>
+            <article><small>QUESTION 3 OF 4</small><h2>What should change?</h2><p>Describe the result in your own words.</p><label>Request<textarea disabled>Make the browser demo feel like using Roma directly.</textarea></label><footer><button>Back</button><button>Continue</button></footer></article>
+          </div>
+        </section>
+      </div>
+
+      <section class="dictation-subject" aria-label="Roma Just Talk browser demo">
+        <div class="writing-field" data-writing-field>
+          <textarea
+            data-dictation-input
+            rows="3"
+            spellcheck="false"
+            aria-label="Dictation text"
+            aria-describedby="audio-disclosure"
+            placeholder="Speak first. Hold Left Shift when the thought is ready."
+          ></textarea>
+          <span class="voice-caret" data-voice-caret aria-hidden="true">
+            <i></i><i></i><i></i>
+          </span>
         </div>
-        <p class="body-copy">Enable the mic, start talking, then hold Left Shift to catch the thought and what follows.</p>
+        <p class="demo-status" data-status role="status" aria-live="polite">Waiting for microphone access.</p>
+        <p class="audio-disclosure" id="audio-disclosure" data-audio-disclosure>
+          Your browser's speech provider may receive audio. Roma servers receive or store no audio or text. Closing this tab clears text. Shift claims 3 seconds back.
+        </p>
       </section>
 
-      <section class="demo-workbench" data-demo-root data-context="messages" data-phase="idle" aria-label="Interactive dictation demo">
-        <aside class="demo-controls">
-          <div class="status-line" role="status" aria-live="polite">
-            <span class="status-dot" data-status-dot data-state="idle" aria-hidden="true"></span>
-            <span data-status-text>Enable the microphone to begin.</span>
-          </div>
-
-          <div class="control-copy">
-            <p class="control-label">browser speech mode</p>
-            <strong data-capability>not armed</strong>
-          </div>
-
-          <label class="language-field">
-            <span>speech language</span>
-            <select data-language>
-              <option value="en-US">English, United States</option>
-              <option value="en-GB">English, United Kingdom</option>
-              <option value="zh-TW">Mandarin, Taiwan</option>
-              <option value="it-IT">Italian</option>
-              <option value="fr-FR">French</option>
-              <option value="de-DE">German</option>
-              <option value="es-ES">Spanish</option>
-              <option value="ja-JP">Japanese</option>
-              <option value="ko-KR">Korean</option>
-            </select>
-          </label>
-
-          <button class="demo-button mic-button" type="button" data-mic-button>enable microphone</button>
-
-          <ol class="demo-steps">
-            <li><span>1</span>start talking</li>
-            <li><span>2</span>hold Left Shift</li>
-            <li><span>3</span>release to add text</li>
-          </ol>
-
-          <p class="privacy-note">
-            While enabled, browser speech listens continuously for the rolling preview. If on-device speech is unavailable, your browser can transmit microphone audio to its speech provider. This site does not receive or store that audio. Hiding this tab turns the mic off.
-          </p>
-          <p class="unsupported-note" data-browser-difference hidden>
-            Try current Chrome or Edge, or <a href="https://github.com/happyf-weallareeuropean/roma-just-talk/releases/latest">download the Mac app</a>.
-          </p>
-        </aside>
-
-        <div class="context-stage">
-          <div class="context-ambient" aria-hidden="true">
-            <i></i><i></i><i></i><i></i><i></i>
-          </div>
-
-          <div class="context-switcher">
-            <div class="context-current">
-              <span class="context-glyph" data-context-glyph>@</span>
-              <div>
-                <small>writing in</small>
-                <strong data-context-name>messages</strong>
-              </div>
-            </div>
-            <button type="button" class="shuffle-button" data-shuffle>shuffle context</button>
-          </div>
-
-          <div class="context-rail" data-context-rail aria-label="Writing context"></div>
-
-          <article class="editor-window">
-            <header>
-              <div>
-                <h2 data-context-title>New message</h2>
-                <p data-context-meta>to: Mia</p>
-              </div>
-              <span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-            </header>
-            <textarea data-demo-editor rows="8" spellcheck="true" placeholder="Tell Mia what changed..."></textarea>
-            <div class="interim-strip" aria-live="polite">
-              <span>hearing</span>
-              <p data-interim>Your live speech preview appears here.</p>
-            </div>
-            <footer>
-              <p data-context-action-state>Nothing leaves this preview.</p>
-              <button type="button" data-context-action>send</button>
-            </footer>
-          </article>
-
-          <div class="trigger-dock">
-            <div class="shift-instruction">
-              <span class="physical-key" data-shift-key aria-hidden="true">left shift</span>
-              <p>Physical key works while this page has focus.</p>
-            </div>
-            <button class="hold-button" type="button" data-hold-button disabled aria-pressed="false">
-              <span>enable mic first</span>
-              <small>hold</small>
-            </button>
-          </div>
-        </div>
+      <section class="permission-recovery" data-permission-recovery hidden aria-label="Microphone access">
+        <p data-recovery-copy>Allow microphone for the hands-on demo. Chrome's recovery control covers both permissions, but this demo requests audio only.</p>
+        <usermedia data-usermedia>
+          <button type="button" data-enable-microphone>enable microphone</button>
+        </usermedia>
+        <button type="button" class="secondary" data-preview-mode hidden>preview without microphone</button>
       </section>
 
-      <section class="demo-truth" aria-labelledby="difference-heading">
-        <p class="section-label">what this proves</p>
-        <div>
-          <h2 id="difference-heading">The interaction is real. The engine is your browser.</h2>
-          <p>This demo approximates the three-second lead-in with rolling browser speech. The Mac app buffers exact raw audio and runs Roma's full transcription pipeline.</p>
-        </div>
-        <a href="https://github.com/happyf-weallareeuropean/roma-just-talk/releases/latest">get the native app</a>
-      </section>
+      <button class="touch-trigger" type="button" data-touch-trigger disabled aria-pressed="false">
+        hold to catch this
+      </button>
     </main>
 
-    <noscript>This demo needs JavaScript for live microphone capture.</noscript>
-    <script type="module" src="/demo/demo.mjs?v=20260829-browser-demo-2"></script>
+    <noscript>This demo needs JavaScript and microphone access.</noscript>
+    <script type="module" src="/demo/demo.mjs?v=20260831-browser-speech"></script>
   </body>
 </html>

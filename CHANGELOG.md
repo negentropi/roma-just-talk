@@ -7,7 +7,7 @@
 - Added a fresh-Mac distribution E2E that follows the exact GitHub Actions outer ZIP through Safari quarantine, Archive Utility's real recursive or separate Finder extraction path, Gatekeeper Open Anyway, App Translocation, generic mapped-code verification, and a real transcription smoke.
 - Fixed the first cold FluidAudio streaming dictation sometimes pasting nothing when live recognition had text but final ASR returned empty.
 - Linked whisper.cpp statically into the macOS and iOS apps so ad-hoc builds no longer depend on a separately signed `whisper.framework` at launch.
-- Added a live `/demo` landing route with page-scoped Left Shift and touch controls, browser-managed speech recognition, shuffled writing contexts, explicit privacy and browser-parity notes, and no Roma transcription backend or API key.
+- Rebuilt `/demo` as a full-screen, zero-download browser dictation experience with a three-second rolling speech pre-roll, Left Shift release insertion, automatic writing-environment changes, microphone recovery, and a narrated no-mic preview.
 - Restyled the landing-page action frames in white, light gray, and dark gray while keeping their current faces and interactions.
 - Changed automatic macOS recording mute to keep AirPods output audible while muting other outputs; explicit On and Off modes remain overrides.
 - Renamed the inherited iOS record deep-link scheme from `voiceink://record` to `romajusttalk://record` so external launch identity matches Roma Just Talk.

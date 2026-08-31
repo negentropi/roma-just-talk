@@ -113,6 +113,42 @@ test("unsupported browsers never pretend the demo is live", async () => {
   assert.equal(state.arms, 0);
 });
 
+test("microphone denial becomes a recoverable permission state", async () => {
+  const error = new DOMException("Permission denied", "NotAllowedError");
+  const adapter = {
+    isSupported: () => true,
+    async arm() { throw error; },
+  };
+  const session = createDemoSession({ dictation: adapter });
+
+  assert.equal(await session.enable({ mode: "microphone" }), false);
+  assert.equal(session.getSnapshot().phase, "permission-denied");
+  assert.equal(session.getSnapshot().canPress, false);
+});
+
+test("an unsupported primary adapter exposes the see-only recovery path", async () => {
+  const adapter = {
+    isSupported: () => true,
+    async arm() { throw new DOMException("Unsupported", "NotSupportedError"); },
+  };
+  const session = createDemoSession({ dictation: adapter });
+
+  assert.equal(await session.enable({ mode: "microphone" }), false);
+  assert.equal(session.getSnapshot().phase, "unsupported");
+});
+
+test("arming forwards the selected mode and browser-owned stream", async () => {
+  const { adapter, state } = fakeDictation();
+  const stream = { id: "browser-owned-stream" };
+  const session = createDemoSession({ dictation: adapter });
+
+  await session.enable({ language: "fr-FR", mode: "microphone", stream });
+
+  assert.equal(state.armOptions.language, "fr-FR");
+  assert.equal(state.armOptions.mode, "microphone");
+  assert.equal(state.armOptions.stream, stream);
+});
+
 test("a fatal recognizer error discards the owned attempt", async () => {
   const { adapter, state } = fakeDictation();
   const session = createDemoSession({ dictation: adapter, clock: () => 8_000 });
@@ -156,6 +192,36 @@ test("a final result cannot commit after the session is disabled", async () => {
 
   assert.deepEqual(commits, []);
   assert.equal(session.getSnapshot().phase, "idle");
+});
+
+test("a transient transcription failure keeps the warmed microphone ready", async () => {
+  let begins = 0;
+  const adapter = {
+    isSupported: () => true,
+    async arm() {
+      return {
+        begin() {
+          begins += 1;
+          return {
+            async finish() { throw new Error("Demo transcription is busy. Try once more."); },
+            async discard() {},
+          };
+        },
+        async dispose() {},
+      };
+    },
+  };
+  let now = 1_000;
+  const session = createDemoSession({ dictation: adapter, clock: () => now });
+
+  await session.enable();
+  session.press();
+  await session.release();
+  assert.equal(session.getSnapshot().phase, "ready");
+  assert.equal(session.getSnapshot().message, "Demo transcription is busy. Try once more.");
+  now += 80;
+  assert.equal(session.press(), true);
+  assert.equal(begins, 2);
 });
 
 test("disabling an active session discards its claim and browser speech", async () => {

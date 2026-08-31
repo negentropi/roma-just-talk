@@ -35,4 +35,3 @@ export function joinTranscriptParts(parts) {
   }
   return joined.join(" ").trim();
 }
-

@@ -71,7 +71,7 @@ export function createDemoSession({
     });
   };
 
-  const enable = async ({ language = "en-US" } = {}) => {
+  const enable = async (options = {}) => {
     if (disposed || prepared || snapshot.phase === "preparing") return false;
     if (!dictation.isSupported()) {
       publish({ phase: "unsupported", message: COPY.unsupported });
@@ -93,7 +93,8 @@ export function createDemoSession({
 
     try {
       const nextPrepared = await dictation.arm({
-        language,
+        ...options,
+        language: options.language || "en-US",
         lookbackMs: contract.preRollMs,
         onFatal: (error) => void fail(error, enableGeneration),
         signal: armController.signal,
@@ -108,9 +109,15 @@ export function createDemoSession({
       return true;
     } catch (error) {
       if (enableGeneration !== generation || disposed) return false;
+      const permissionDenied = ["NotAllowedError", "PermissionDeniedError"].includes(error?.name);
+      const unsupported = error?.name === "NotSupportedError";
       publish({
-        phase: "error",
-        message: error?.message || "The browser could not start speech recognition.",
+        phase: permissionDenied ? "permission-denied" : unsupported ? "unsupported" : "error",
+        message: permissionDenied
+          ? COPY.permissionDenied
+          : unsupported
+            ? COPY.unsupported
+            : error?.message || "The microphone could not start.",
         capability: "not armed",
         isArmed: false,
         canPress: false,
@@ -204,7 +211,11 @@ export function createDemoSession({
       if (text) onCommit({ text, contextId: attempt.contextId });
       resetReady(text ? COPY.ready : COPY.empty);
     } catch (error) {
-      await fail(error, attempt.generation);
+      if (!disposed && attempt.generation === generation && prepared) {
+        resetReady(error?.message || "This attempt could not finish. Try once more.");
+      } else {
+        await fail(error, attempt.generation);
+      }
     }
     return true;
   };

@@ -47,12 +47,12 @@ existing iOS migration workflow packages its Xcode-signed Simulator application
 as `roma.just.talk.ios-simulator.app`, preserving App Group exchange between the
 app and keyboard extension.
 
-Runner profiles may attach the persistent runtime-model cache. Direct
-`nscloud-macos-*` image labels require a previously absent cache path under that
-job's runner-temporary directory and record the pre-state before creating it, so
-an exact image lane never depends on a cache-volume label or preloaded model.
-Both keep model files outside FluidAudio's live model directory until the first
-distribution launch has passed.
+Runtime-only runner profiles may attach the persistent model cache. Runtime-only
+`nscloud-macos-*` image lanes require a previously absent cache path under that
+job's runner-temporary directory and record the pre-state before creating it.
+The distribution lane exposes neither cache. The downloaded app is the first
+process allowed to create FluidAudio's live model directory, and the lane fails
+unless that verified first-launch process creates it.
 
 The public smoke fixture's source, license, and re-encoding notice are recorded
 in [the runtime harness guide](RUNTIME_E2E_HARNESS.md#autonomous-namespace-run).
@@ -110,9 +110,9 @@ This is not the installed-app runtime test with quarantine added afterward. It
 starts on a fresh Apple Silicon runner and fails if Roma preferences, Roma TCC
 rows, FluidAudio model state, an installed copy, a running process, disabled
 Gatekeeper assessments, the wrong architecture, or the wrong exact macOS
-product or build version already exist. The persistent model cache stays outside
-FluidAudio's live directory until the downloaded app passes its initial
-Gatekeeper and App Translocation launch.
+product or build version already exist. No model cache is mounted or created for
+this lane. The downloaded app must create the initial FluidAudio model state
+during its verified Gatekeeper and App Translocation launch.
 
 The workflow downloads both forms of the selected Actions artifact:
 
@@ -129,7 +129,7 @@ before the user path starts. The scenario then:
 4. requires human confirmation after each Finder action actually needed, proves the final app inherited Safari quarantine, checks its strict deep signature, and compares every directory mode, every regular file's contents and mode, and every symlink target with an independent reference extracted from the hash-verified inner ZIP. That reference never becomes the launched app. The lane also compares the app's minimum macOS version with the exact runner version;
 5. records the complete file, directory, and symlink manifest for the extracted app, performs the first launch while Gatekeeper still rejects it, and requires the operator to confirm the visible "Not Opened" dialog before using Privacy & Security, Open Anyway;
 6. starts an approval-window process and log monitor before Open Anyway, requires the operator to confirm that the approved first-launch UI is visible and responsive, then requires the first observed PID to report finished AppKit launch, run through App Translocation as native ARM64, remain runnable without `SIGCONT`, map every bundle-relative Mach-O dependency discovered recursively from the active ARM64 executable graph, survive a stability interval without dyld or signature errors, and leave the full app bundle byte-identical to its pre-launch manifest. A second Roma PID, new Roma crash report, or approval-window dyld error invalidates the run; and
-7. records that first-process verdict, then deliberately starts separate prewarm and transcription relaunches of the same extracted artifact. Every observed Roma PID must be recorded by the helper, run through App Translocation with the same executable hash, pass the same recursive signature and mapped-code checks through process exit, and have an explicit test-requested termination. A new crash report or unaccounted process invalidates the run. The lane also compares the complete file, directory, and symlink bundle manifest before and after runtime and writes a separate transcription verdict.
+7. records that first-process verdict, requires that exact Roma process to remain the only running Roma instance, records its normal termination, and validates or completes its live model directory against the pinned manifest before deliberately starting separate prewarm and transcription relaunches of the same extracted artifact. Every observed Roma PID must be recorded by the helper, run through App Translocation with the same executable hash, pass the same recursive signature and mapped-code checks through process exit, and have an explicit test-requested termination. A new crash report or unaccounted process invalidates the run. The lane also compares the complete file, directory, and symlink bundle manifest before and after runtime and writes a separate transcription verdict.
 
 CI builds the runtime helper with a macOS 14.0 deployment target. Before changing
 TCC or starting Roma runtime work, the target Mac runs that exact packaged helper

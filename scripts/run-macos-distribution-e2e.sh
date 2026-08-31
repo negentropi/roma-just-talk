@@ -46,6 +46,7 @@ download_name="$(basename "$archive")"
 app_name="roma just talk.app"
 process_name="roma just talk"
 bundle_identifier="com.negentropi.RomaJustTalk"
+live_model_directory="$HOME/Library/Application Support/FluidAudio/Models/parakeet-tdt-0.6b-v2"
 approval_process_monitor_pid=""
 approval_log_pid=""
 approval_stop_file="$distribution_root/approval-window-stop"
@@ -402,7 +403,8 @@ fi
 if [[ -e "$HOME/Applications/$app_name" || -e "/Applications/$app_name" ]]; then
   fail "fresh-Mac precondition failed: Roma is already installed"
 fi
-if [[ -e "$HOME/Library/Application Support/FluidAudio/Models" ]]; then
+if [[ -e "$HOME/Library/Application Support/FluidAudio/Models" \
+  || -L "$HOME/Library/Application Support/FluidAudio/Models" ]]; then
   fail "fresh-Mac precondition failed: Roma model state already exists"
 fi
 printf 'fluid_audio_models=absent\n' \
@@ -976,6 +978,19 @@ if grep -Eiq \
   "$approval_log"; then
   fail "dyld or code-signature failure appeared during the approval window"
 fi
+if [[ ! -d "$live_model_directory" \
+  || -L "$(dirname "$live_model_directory")" \
+  || -L "$live_model_directory" ]]; then
+  fail "approved first launch did not create the live FluidAudio model directory"
+fi
+{
+  printf 'live_model_state=created_by_verified_first_launch\n'
+  printf 'first_launch_pid=%s\n' "$launched_pid"
+  printf 'live_model_directory=%s\n' "$live_model_directory"
+  find "$live_model_directory" -type f -print 2>/dev/null \
+    | LC_ALL=C sort \
+    || true
+} > "$distribution_evidence/first-launch-live-model-state.txt"
 
 write_macos_bundle_manifest \
   "$extracted_app" \
@@ -1019,6 +1034,8 @@ mark_phase complete
   printf 'external_volume=%s\n' "$volume"
   printf 'source_app=%s\n' "$extracted_app"
   printf 'launched_pid=%s\n' "$launched_pid"
+  printf 'live_model_directory=%s\n' "$live_model_directory"
+  printf 'live_model_state=created_by_verified_first_launch\n'
   printf 'launch_verification=passed\n'
 } > "$verdict_file"
 

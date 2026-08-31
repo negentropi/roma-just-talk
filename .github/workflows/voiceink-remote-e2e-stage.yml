@@ -92,10 +92,12 @@ on:
       - "scripts/prepare-remote-e2e-stage.sh"
       - "scripts/run-macos-runtime-e2e.sh"
       - "scripts/run-macos-distribution-e2e.sh"
+      - "scripts/macos-distribution-runtime-handoff.sh"
       - "scripts/macos-finder-extraction-state.sh"
       - "scripts/macos-bundle-manifest.sh"
       - "scripts/verify-macos-distribution-launch.sh"
       - "scripts/tests/macos-distribution-e2e-contract.test.sh"
+      - "scripts/tests/macos-distribution-runtime-handoff.test.sh"
       - "scripts/tests/macos-finder-extraction-state.test.sh"
       - "scripts/tests/verify-macos-distribution-launch.test.sh"
       - "scripts/runtime-e2e-model-bootstrap.sh"
@@ -210,6 +212,7 @@ jobs:
         run: |
           bash scripts/tests/macos-finder-extraction-state.test.sh
           bash scripts/tests/macos-distribution-e2e-contract.test.sh
+          bash scripts/tests/macos-distribution-runtime-handoff.test.sh
           bash scripts/tests/verify-macos-distribution-launch.test.sh
 
       - name: Download macOS app artifact
@@ -485,6 +488,7 @@ jobs:
         if: >-
           env.STAGE_TARGET != 'ios' &&
           env.STAGE_MACOS_SCENARIO != 'none' &&
+          env.STAGE_MACOS_SCENARIO != 'distribution-e2e' &&
           startsWith(inputs.macos_runner, 'namespace-profile-')
         uses: namespacelabs/nscloud-cache-action@c5f8dab7560444c4bf8dbc64f1b203431873c547 # v1.6.1
         with:
@@ -494,6 +498,7 @@ jobs:
         if: >-
           env.STAGE_TARGET != 'ios' &&
           env.STAGE_MACOS_SCENARIO != 'none' &&
+          env.STAGE_MACOS_SCENARIO != 'distribution-e2e' &&
           startsWith(inputs.macos_runner, 'nscloud-macos-')
         run: |
           COLD_CACHE="$RUNNER_TEMP/roma-runtime-e2e-cold-model-cache"

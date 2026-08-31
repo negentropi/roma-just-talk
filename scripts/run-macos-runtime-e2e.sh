@@ -35,6 +35,7 @@ esac
 repo_root="${GITHUB_WORKSPACE:-$(cd "$(dirname "$0")/.." && pwd)}"
 source "$repo_root/scripts/runtime-e2e-phase-runner.sh"
 source "$repo_root/scripts/runtime-e2e-model-bootstrap.sh"
+source "$repo_root/scripts/macos-distribution-runtime-handoff.sh"
 audio_source_kind="$(runtime_audio_source_kind "$mode" "$audio_artifact")"
 runtime_root="$(dirname "$evidence")/macos-runtime-e2e"
 audio_root="$runtime_root/audio"
@@ -51,6 +52,7 @@ model_source_base_url="https://huggingface.co/FluidInference/parakeet-tdt-0.6b-v
 model_root="$HOME/Library/Application Support/FluidAudio"
 model_directory="$model_root/Models/parakeet-tdt-0.6b-v2"
 external_model_cache="${RUNTIME_E2E_MODEL_CACHE_PATH:-}"
+expected_first_launch_pid="${RUNTIME_E2E_EXPECTED_FIRST_LAUNCH_PID:-}"
 external_model_directory=""
 config_smoke="$runtime_root/runtime-e2e-smoke.json"
 config_full="$runtime_root/runtime-e2e-full.json"
@@ -83,6 +85,10 @@ command -v jq >/dev/null
 command -v sqlite3 >/dev/null
 command -v csreq >/dev/null
 test -f "$model_manifest"
+if [ "$require_app_translocation" = true ] && [ -n "$external_model_cache" ]; then
+  echo "Distribution runtime handoff must not use an external model cache" >&2
+  exit 2
+fi
 if [ -n "$external_model_cache" ]; then
   external_model_directory="$external_model_cache/$(basename "$model_directory")"
   mkdir -p "$external_model_directory" "$model_root/Models"
@@ -521,6 +527,36 @@ cleanup() {
 }
 trap cleanup EXIT
 
+if [ "$require_app_translocation" = true ]; then
+  observed_voiceink_pids="$(pgrep -x "roma just talk" 2>/dev/null || true)"
+  distribution_runtime_validate_handoff \
+    "$expected_first_launch_pid" \
+    "$observed_voiceink_pids" \
+    "$model_directory" \
+    "$external_model_cache"
+  terminate_runtime_voiceink_pid "$expected_first_launch_pid"
+  {
+    printf 'distribution_runtime_handoff=passed\n'
+    printf 'first_launch_pid=%s\n' "$expected_first_launch_pid"
+    printf 'first_launch_termination=normal\n'
+    printf 'runtime_model_directory=%s\n' "$model_directory"
+    printf 'external_model_cache=%s\n' "${external_model_cache:-absent}"
+  } > "$evidence/distribution-runtime-handoff.txt"
+  while IFS= read -r first_launch_model_file; do
+    first_launch_relative_path="${first_launch_model_file#"$model_directory"/}"
+    first_launch_size="$(stat -f '%z' "$first_launch_model_file")"
+    first_launch_sha256="$(shasum -a 256 "$first_launch_model_file" | awk '{print $1}')"
+    printf '%s %s %s\n' \
+      "$first_launch_sha256" \
+      "$first_launch_size" \
+      "$first_launch_relative_path"
+  done < <(find "$model_directory" -type f -print | LC_ALL=C sort) \
+    > "$evidence/first-launch-live-model-files-after-termination.sha256"
+  : > "$runtime_termination_events"
+else
+  pkill -9 -x "roma just talk" 2>/dev/null || true
+fi
+
 printf '%s\n' "${RUNTIME_MODEL_CACHE_HIT:-false}" > "$evidence/model-cache-hit.txt"
 printf '%s\n' "$model_revision" > "$evidence/model-source-revision.txt"
 printf '%s\n' "$model_source_base_url" > "$evidence/model-source-url.txt"
@@ -687,15 +723,6 @@ fi
   printf 'helper_executable_sha256=%s\n' "$(awk 'NR == 1 { print $1 }' "$evidence/helper-sha256.txt")"
 } > "$evidence/helper-host-loadability.txt"
 
-if [ "$require_app_translocation" = true ]; then
-  while IFS= read -r existing_voiceink_pid; do
-    [[ "$existing_voiceink_pid" =~ ^[0-9]+$ ]] || continue
-    terminate_runtime_voiceink_pid "$existing_voiceink_pid"
-  done < <(pgrep -x "roma just talk" 2>/dev/null || true)
-  : > "$runtime_termination_events"
-else
-  pkill -9 -x "roma just talk" 2>/dev/null || true
-fi
 killall tccd 2>/dev/null || true
 sudo killall tccd 2>/dev/null || true
 sleep 2

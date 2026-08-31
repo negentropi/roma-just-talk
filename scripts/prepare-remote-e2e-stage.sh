@@ -46,6 +46,10 @@ case "$macos_scenario" in
     ;;
 esac
 
+if [ "$macos_scenario" = "distribution-e2e" ]; then
+  runtime_model_cache_path=""
+fi
+
 if [ "$macos_scenario" = "distribution-e2e" ] && [ "$hold_minutes" -eq 0 ]; then
   echo "distribution-e2e requires time for Safari, Finder, and Gatekeeper interaction" >&2
   exit 2
@@ -451,6 +455,10 @@ if [ "$macos_scenario" = "distribution-e2e" ]; then
     runtime_bundle_before="$evidence/macos-distribution-e2e/runtime-bundle-before.sha256"
     runtime_bundle_after="$evidence/macos-distribution-e2e/runtime-bundle-after.sha256"
     runtime_chain_verdict="$evidence/macos-distribution-e2e/runtime-chain-verdict.txt"
+    distribution_launched_pid="$(
+      sed -n 's/^launched_pid=//p' \
+        "$evidence/macos-distribution-e2e/distribution-verdict.txt"
+    )"
     write_macos_bundle_manifest "$distribution_app" "$runtime_bundle_before"
     runtime_status=0
     if ! cmp -s "$distribution_bundle_manifest" "$runtime_bundle_before"; then
@@ -463,6 +471,7 @@ if [ "$macos_scenario" = "distribution-e2e" ]; then
       RUNTIME_E2E_REQUIRE_APP_TRANSLOCATION=true \
       RUNTIME_E2E_EXPECTED_MACOS_VERSION="$macos_expected_version" \
       RUNTIME_E2E_EXPECTED_MACOS_BUILD="$macos_expected_build" \
+      RUNTIME_E2E_EXPECTED_FIRST_LAUNCH_PID="$distribution_launched_pid" \
       RUNTIME_E2E_MODEL_CACHE_PATH="$runtime_model_cache_path" \
         bash "$(dirname "$0")/run-macos-runtime-e2e.sh" \
         "$distribution_app" \
@@ -507,6 +516,8 @@ if [ "$macos_scenario" = "distribution-e2e" ]; then
       {
         printf 'runtime_transcription_verdict=passed\n'
         printf 'runtime_process=separate_relaunch_of_same_artifact\n'
+        printf 'runtime_model_source=first_launch_live_directory\n'
+        printf 'runtime_first_launch_pid=%s\n' "$distribution_launched_pid"
         printf 'distribution_executable_sha256=%s\n' "$distribution_executable_sha256"
         printf 'runtime_executable_sha256=%s\n' "$runtime_executable_sha256"
         printf 'distribution_bundle_manifest_sha256=%s\n' "$distribution_bundle_manifest_sha256"
@@ -517,6 +528,8 @@ if [ "$macos_scenario" = "distribution-e2e" ]; then
       {
         printf 'runtime_transcription_verdict=failed\n'
         printf 'runtime_process=separate_relaunch_of_same_artifact\n'
+        printf 'runtime_model_source=first_launch_live_directory\n'
+        printf 'runtime_first_launch_pid=%s\n' "$distribution_launched_pid"
         printf 'runtime_exit_code=%s\n' "$macos_scenario_status"
         printf 'distribution_executable_sha256=%s\n' "$distribution_executable_sha256"
         printf 'runtime_executable_sha256=%s\n' "$runtime_executable_sha256"

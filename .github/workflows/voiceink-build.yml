@@ -19,8 +19,10 @@ on:
       - "scripts/tests/verify-adhoc-library-validation.test.sh"
       - "scripts/tests/verify-macos-distribution-launch.test.sh"
       - "scripts/tests/macos-distribution-e2e-contract.test.sh"
+      - "scripts/tests/macos-distribution-runtime-handoff.test.sh"
       - "scripts/tests/macos-finder-extraction-state.test.sh"
       - "scripts/run-macos-distribution-e2e.sh"
+      - "scripts/macos-distribution-runtime-handoff.sh"
       - "scripts/macos-finder-extraction-state.sh"
       - "scripts/macos-bundle-manifest.sh"
       - "scripts/prepare-remote-e2e-stage.sh"
@@ -46,8 +48,10 @@ on:
       - "scripts/tests/verify-adhoc-library-validation.test.sh"
       - "scripts/tests/verify-macos-distribution-launch.test.sh"
       - "scripts/tests/macos-distribution-e2e-contract.test.sh"
+      - "scripts/tests/macos-distribution-runtime-handoff.test.sh"
       - "scripts/tests/macos-finder-extraction-state.test.sh"
       - "scripts/run-macos-distribution-e2e.sh"
+      - "scripts/macos-distribution-runtime-handoff.sh"
       - "scripts/macos-finder-extraction-state.sh"
       - "scripts/macos-bundle-manifest.sh"
       - "scripts/prepare-remote-e2e-stage.sh"
@@ -207,6 +211,7 @@ jobs:
         run: |
           bash scripts/tests/macos-finder-extraction-state.test.sh
           bash scripts/tests/macos-distribution-e2e-contract.test.sh
+          bash scripts/tests/macos-distribution-runtime-handoff.test.sh
           bash scripts/tests/verify-macos-distribution-launch.test.sh
 
       - name: Build release app

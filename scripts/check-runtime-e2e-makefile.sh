@@ -391,6 +391,9 @@ jobs = YAML.load_file(ARGV.fetch(0)).fetch("jobs")
 stage = jobs.fetch("stage")
 steps = stage.fetch("steps")
 cache = steps.find { |step| step["id"] == "runtime-model-cache" }
+cold_cache = steps.find do |step|
+  step["name"] == "Initialize cold runtime E2E model cache"
+end
 prepare = steps.find { |step| step["name"] == "Prepare desktop and hold for Remote Display" }
 verdict = jobs.fetch("verdict")
 verdict_step = verdict.fetch("steps").find { |step| step["name"] == "Check remote stage result" }
@@ -405,6 +408,12 @@ abort "Remote E2E must mount the pinned persistent Parakeet model cache." unless
 abort "Remote E2E must record the cache action's authoritative hit output." unless
   prepare&.dig("env", "RUNTIME_MODEL_CACHE_HIT") ==
     "${{ steps.runtime-model-cache.outputs.cache-hit }}"
+
+abort "Distribution E2E must not expose a persistent or cold model cache." unless
+  cache.fetch("if").include?("env.STAGE_MACOS_SCENARIO != 'distribution-e2e'") &&
+  cold_cache&.fetch("if")&.include?(
+    "env.STAGE_MACOS_SCENARIO != 'distribution-e2e'"
+  )
 
 abort "Scenario failures must not suppress the cache action's post-save." unless
   prepare["id"] == "prepare-stage" &&
@@ -426,9 +435,46 @@ if ! grep -Fq \
   'runtime_model_cache_path="${RUNTIME_E2E_MODEL_CACHE_PATH:-$HOME/Library/Caches/roma-runtime-e2e-models}"' \
   "$repo_root/scripts/prepare-remote-e2e-stage.sh" \
   || ! grep -Fq \
+    'if [ "$macos_scenario" = "distribution-e2e" ]; then' \
+    "$repo_root/scripts/prepare-remote-e2e-stage.sh" \
+  || ! grep -Fq \
+    'runtime_model_cache_path=""' \
+    "$repo_root/scripts/prepare-remote-e2e-stage.sh" \
+  || ! grep -Fq \
     'RUNTIME_E2E_MODEL_CACHE_PATH="$runtime_model_cache_path"' \
     "$repo_root/scripts/prepare-remote-e2e-stage.sh"; then
-  echo "Remote E2E must expose the isolated model cache only after distribution launch proof." >&2
+  echo "Remote E2E must keep distribution first launch on FluidAudio's live model directory." >&2
+  exit 1
+fi
+
+distribution_termination_line="$(
+  grep -n '^  terminate_runtime_voiceink_pid "$expected_first_launch_pid"' \
+    "$repo_root/scripts/run-macos-runtime-e2e.sh" \
+    | head -n 1 \
+    | cut -d: -f1
+)"
+model_prepare_line="$(
+  grep -n '^runtime_prepare_pinned_model \\' \
+    "$repo_root/scripts/run-macos-runtime-e2e.sh" \
+    | head -n 1 \
+    | cut -d: -f1
+)"
+if [ -z "$distribution_termination_line" ] \
+  || [ -z "$model_prepare_line" ] \
+  || [ "$distribution_termination_line" -ge "$model_prepare_line" ]; then
+  echo "Distribution E2E must stop the first-launch app before hydrating its live model directory." >&2
+  exit 1
+fi
+if ! grep -Fq \
+  'RUNTIME_E2E_EXPECTED_FIRST_LAUNCH_PID="$distribution_launched_pid"' \
+  "$repo_root/scripts/prepare-remote-e2e-stage.sh" \
+  || ! grep -Fq \
+    'distribution_runtime_validate_handoff' \
+  "$repo_root/scripts/run-macos-runtime-e2e.sh" \
+  || ! grep -Fq \
+    'distribution-runtime-handoff.txt' \
+    "$repo_root/scripts/run-macos-runtime-e2e.sh"; then
+  echo "Distribution E2E must prove the first-launch process handoff." >&2
   exit 1
 fi
 

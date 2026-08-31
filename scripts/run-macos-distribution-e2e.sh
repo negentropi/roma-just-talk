@@ -842,8 +842,8 @@ roma just talk distribution E2E
 
 Current step: prove the first Gatekeeper block
 
-Finder will open "$app_name" while Gatekeeper still rejects it.
-When the real "Not Opened" dialog appears:
+Finder will reveal "$app_name" while Gatekeeper still rejects it.
+Double-click the app in Finder. When the real "Not Opened" dialog appears:
 
 1. Click Done.
 2. In Finder, double-click "Confirm Gatekeeper Not Opened.command" on the Desktop.
@@ -865,33 +865,28 @@ if ! grep -Eiq 'rejected|not accepted|denied' \
 fi
 
 set +e
-DISTRIBUTION_E2E_APP_PATH="$extracted_app" osascript <<'APPLESCRIPT' \
-  > "$distribution_evidence/gatekeeper-first-open.stdout.txt" \
-  2> "$distribution_evidence/gatekeeper-first-open.stderr.txt"
-set appPath to system attribute "DISTRIBUTION_E2E_APP_PATH"
-tell application "Finder"
-  activate
-  open (POSIX file appPath as alias)
-end tell
-APPLESCRIPT
-first_open_status=$?
+open -R "$extracted_app" \
+  > "$distribution_evidence/gatekeeper-finder-reveal.stdout.txt" \
+  2> "$distribution_evidence/gatekeeper-finder-reveal.stderr.txt"
+finder_reveal_status=$?
 set -e
-printf '%s\n' "$first_open_status" > "$distribution_evidence/gatekeeper-first-open-exit-code.txt"
-if [[ "$first_open_status" -ne 0 ]]; then
-  fail "Finder could not request the first Gatekeeper-protected launch"
+printf '%s\n' "$finder_reveal_status" \
+  > "$distribution_evidence/gatekeeper-finder-reveal-exit-code.txt"
+if [[ "$finder_reveal_status" -ne 0 ]]; then
+  fail "Finder could not reveal the app for the first Gatekeeper-protected launch"
 fi
-sleep 5
-if pgrep -x "$process_name" >/dev/null 2>&1; then
-  fail "first launch bypassed the expected fresh-Mac Gatekeeper block"
-fi
-ps -axo pid,ppid,state,etime,command \
-  > "$distribution_evidence/processes-after-first-block.txt" 2>&1 || true
 wait_for_path \
   "$gatekeeper_confirmation" \
   "operator confirmation of the visible Gatekeeper Not Opened dialog" \
   "$deadline"
 cp "$gatekeeper_confirmation" \
   "$distribution_evidence/gatekeeper-not-opened-human-confirmation.txt"
+sleep 1
+if pgrep -x "$process_name" >/dev/null 2>&1; then
+  fail "first launch bypassed the expected fresh-Mac Gatekeeper block"
+fi
+ps -axo pid,ppid,state,etime,command \
+  > "$distribution_evidence/processes-after-first-block.txt" 2>&1 || true
 
 start_approval_monitors
 cat > "$instructions" <<EOF

@@ -131,7 +131,9 @@ require_text "$VOICEINK_SESSION" 'RUNTIME_E2E_VOICEINK_TERMINATION_EVENTS'
 require_text "$RUNNER" 'com.apple.quarantine'
 require_text "$RUNNER" 'Safari'
 require_text "$RUNNER" 'Finder'
-require_text "$RUNNER" 'tell application "Finder"'
+require_text "$RUNNER" 'Double-click the app in Finder.'
+require_text "$RUNNER" 'open -R "$extracted_app"'
+require_text "$RUNNER" 'gatekeeper-finder-reveal-exit-code.txt'
 require_text "$RUNNER" 'APFS'
 require_text "$RUNNER" 'AppTranslocation'
 require_text "$RUNNER" 'DISTRIBUTION_E2E_REQUIRE_TRANSLOCATION=true'
@@ -178,6 +180,7 @@ reject_text "$RUNNER" 'python3[[:space:]]+-m[[:space:]]+http\.server'
 reject_text "$RUNNER" 'browser-download-url\.txt'
 reject_text "$RUNNER" 'Confirm (First|Second) Finder Extraction\.command'
 reject_text "$RUNNER" '/usr/bin/date'
+reject_text "$RUNNER" 'tell application "Finder"'
 
 ditto_extraction_count="$(grep -Ec 'ditto[[:space:]].*-x' "$RUNNER")"
 if [[ "$ditto_extraction_count" -ne 1 ]]; then

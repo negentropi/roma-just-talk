@@ -13,7 +13,7 @@ struct RuntimeRenderedTextChangeResult: Codable {
 }
 
 final class RuntimeRenderedTextObserver {
-    private let captureRect: CGRect
+    private let captureSession: RuntimeScreenshotCaptureSession
     private var baseline: RuntimeRGBAFrame?
     private var baselineError: String?
     private var latencyTracker: RuntimeRenderedTextLatencyTracker?
@@ -28,15 +28,16 @@ final class RuntimeRenderedTextObserver {
         guard captureRect.width >= 8, captureRect.height >= 8 else {
             throw RuntimeRenderedTextObserverError.invalidCaptureRect
         }
-        self.captureRect = captureRect
-        let baseline = try Self.captureRGBA(in: captureRect)
+        let captureSession = try RuntimeScreenshotCaptureSession(captureRect: captureRect)
+        self.captureSession = captureSession
+        let baseline = try captureSession.captureRGBA()
         self.baseline = baseline
         latencyTracker = RuntimeRenderedTextLatencyTracker(baseline: baseline.bytes)
     }
 
     func refreshBaseline() -> String? {
         do {
-            baseline = try Self.captureRGBA(in: captureRect)
+            baseline = try captureSession.captureRGBA()
             baselineError = nil
             latencyTracker = baseline.map {
                 RuntimeRenderedTextLatencyTracker(baseline: $0.bytes)
@@ -68,7 +69,7 @@ final class RuntimeRenderedTextObserver {
                 baselineError ?? "Rendered-text baseline is unavailable"
             )
         }
-        let current = try Self.captureRGBA(in: captureRect)
+        let current = try captureSession.captureRGBA()
         let observedAtSystemUptime = ProcessInfo.processInfo.systemUptime
         guard let latencySample = latencyTracker.observe(
             current: current.bytes,
@@ -109,11 +110,46 @@ final class RuntimeRenderedTextObserver {
         )
     }
 
-    private static func captureRGBA(in rect: CGRect) throws -> RuntimeRGBAFrame {
-        guard #available(macOS 15.2, *) else {
-            throw RuntimeRenderedTextObserverError.unsupportedOS
+}
+
+private final class RuntimeScreenshotCaptureSession {
+    private let filter: SCContentFilter
+    private let configuration: SCStreamConfiguration
+
+    init(captureRect: CGRect) throws {
+        let contentState = RuntimeShareableContentState()
+        Task {
+            do {
+                let content = try await SCShareableContent.excludingDesktopWindows(
+                    false,
+                    onScreenWindowsOnly: true
+                )
+                contentState.complete(content: content, error: nil)
+            } catch {
+                contentState.complete(content: nil, error: error)
+            }
         }
-        let image = try captureImage(in: rect)
+        let content = try contentState.wait(timeoutSeconds: 3)
+        guard let display = content.displays.max(by: {
+            Self.intersectionArea($0.frame, captureRect)
+                < Self.intersectionArea($1.frame, captureRect)
+        }), Self.intersectionArea(display.frame, captureRect) > 0 else {
+            throw RuntimeRenderedTextObserverError.captureDisplayNotFound
+        }
+
+        filter = SCContentFilter(display: display, excludingWindows: [])
+        configuration = SCStreamConfiguration()
+        configuration.sourceRect = captureRect.offsetBy(
+            dx: -display.frame.minX,
+            dy: -display.frame.minY
+        )
+        configuration.width = max(1, Int(captureRect.width.rounded(.up)))
+        configuration.height = max(1, Int(captureRect.height.rounded(.up)))
+        configuration.showsCursor = false
+    }
+
+    func captureRGBA() throws -> RuntimeRGBAFrame {
+        let image = try captureImage()
         let longestSide = max(image.width, image.height)
         let scale = min(1, 640 / Double(longestSide))
         let width = max(1, Int((Double(image.width) * scale).rounded()))
@@ -142,10 +178,12 @@ final class RuntimeRenderedTextObserver {
         return RuntimeRGBAFrame(bytes: bytes)
     }
 
-    @available(macOS 15.2, *)
-    private static func captureImage(in rect: CGRect) throws -> CGImage {
+    private func captureImage() throws -> CGImage {
         let state = RuntimeScreenshotCaptureState()
-        SCScreenshotManager.captureImage(in: rect) { image, error in
+        SCScreenshotManager.captureImage(
+            contentFilter: filter,
+            configuration: configuration
+        ) { image, error in
             state.complete(image: image, error: error)
         }
 
@@ -163,13 +201,18 @@ final class RuntimeRenderedTextObserver {
         }
         throw RuntimeRenderedTextObserverError.captureTimedOut
     }
+
+    private static func intersectionArea(_ lhs: CGRect, _ rhs: CGRect) -> CGFloat {
+        let intersection = lhs.intersection(rhs)
+        guard !intersection.isNull else { return 0 }
+        return intersection.width * intersection.height
+    }
 }
 
 private struct RuntimeRGBAFrame {
     let bytes: [UInt8]
 }
 
-@available(macOS 15.2, *)
 private final class RuntimeScreenshotCaptureState: @unchecked Sendable {
     private let lock = NSLock()
     private var value: Result<CGImage, Error>?
@@ -191,10 +234,41 @@ private final class RuntimeScreenshotCaptureState: @unchecked Sendable {
     }
 }
 
+private final class RuntimeShareableContentState: @unchecked Sendable {
+    private let lock = NSLock()
+    private var value: Result<SCShareableContent, Error>?
+
+    func complete(content: SCShareableContent?, error: Error?) {
+        lock.lock()
+        defer { lock.unlock() }
+        if let content {
+            value = .success(content)
+        } else {
+            value = .failure(error ?? RuntimeRenderedTextObserverError.missingShareableContent)
+        }
+    }
+
+    func wait(timeoutSeconds: TimeInterval) throws -> SCShareableContent {
+        let deadline = Date().addingTimeInterval(timeoutSeconds)
+        while Date() < deadline {
+            lock.lock()
+            let result = value
+            lock.unlock()
+            if let result {
+                return try result.get()
+            }
+            RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.005))
+        }
+        throw RuntimeRenderedTextObserverError.shareableContentTimedOut
+    }
+}
+
 private enum RuntimeRenderedTextObserverError: Error, CustomStringConvertible {
     case invalidCaptureRect
     case baselineUnavailable(String)
-    case unsupportedOS
+    case captureDisplayNotFound
+    case shareableContentTimedOut
+    case missingShareableContent
     case captureTimedOut
     case captureFailed(String)
     case missingImage
@@ -207,8 +281,12 @@ private enum RuntimeRenderedTextObserverError: Error, CustomStringConvertible {
             return "Editable AX element has no usable screen rectangle"
         case .baselineUnavailable(let message):
             return message
-        case .unsupportedOS:
-            return "Rendered-pixel measurement requires macOS 15.2 or newer"
+        case .captureDisplayNotFound:
+            return "No ScreenCaptureKit display contains the target editor"
+        case .shareableContentTimedOut:
+            return "ScreenCaptureKit shareable-content discovery timed out"
+        case .missingShareableContent:
+            return "ScreenCaptureKit returned no shareable content"
         case .captureTimedOut:
             return "ScreenCaptureKit screenshot timed out"
         case .captureFailed(let message):

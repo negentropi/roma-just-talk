@@ -1,8 +1,9 @@
 # Remote E2E Stage
 
 This workflow prepares the remote computer. Manual interaction remains the
-default. Deterministic macOS smoke, full runtime, and iOS local-Whisper scenarios
-can run before the optional hold.
+default. The macOS distribution scenario preserves the downloaded artifact's
+security state. Deterministic macOS smoke, full runtime, and iOS local-Whisper
+scenarios can run before the optional hold.
 
 The intended split:
 
@@ -18,16 +19,30 @@ Run the `Prepare remote E2E stage` workflow manually.
 Inputs:
 
 - `target`: `macos`, `ios`, or `both`.
-- `macos_artifact_run_id`: successful `Build roma just talk` workflow run containing the exact macOS artifact to exercise. Blank selects the latest green build.
-- `macos_scenario`: `none`, `runtime-smoke`, or `runtime-e2e`.
+- `macos_artifact_run_id`: successful `Build roma just talk` workflow run containing the exact macOS artifact to exercise. Blank requires a green build from the stage tooling's exact source SHA.
+- `runtime_helper_run_id`: optional build run containing the current Sonoma-compatible runtime helper. Whether selected or discovered, the helper must come from the stage tooling's exact source SHA, so a historical app artifact can use the current trusted test oracle.
+- `macos_runner`: GitHub runner label backed by the requested macOS image. Use a separate pinned label for each OS lane.
+- `macos_expected_version`: exact `sw_vers -productVersion` required by the test. Blank records but does not enforce the version.
+- `macos_expected_build`: exact `sw_vers -buildVersion` required by `distribution-e2e`.
+- `developer_dir`: optional Xcode app developer directory for that runner. Blank uses the runner's selected compatible Xcode.
+- `macos_scenario`: `none`, `runtime-smoke`, `runtime-e2e`, or `distribution-e2e`.
 - `macos_audio_artifact`: private Namespace artifact containing WAV fixtures. Full runtime requires it. Smoke uses a pinned public CC-BY-4.0 [podscripter FLEURS fixture](https://huggingface.co/datasets/podscripter-project/test-fixtures) when blank.
 - `macos_repetitions`: `1`, `3`, or `5` repetitions per fixture/app after the smoke run.
 - `ios_artifact_run_id`: successful `VoiceInk iOS single-repo migration` workflow run containing the exact Simulator artifact. Blank selects the latest green run.
 - `ios_scenario`: `none` or `local-whisper-import`.
-- `hold_minutes`: 0 to 60 minutes after setup/scenario. Use `0` to upload evidence immediately.
+- `hold_minutes`: 0 to 60 minutes after setup/scenario. `distribution-e2e` consumes this window while waiting for Safari, Finder, and Gatekeeper interaction and therefore rejects `0`.
 
-The stage downloads the macOS artifact unchanged and does not re-sign it. The
-macOS runtime scenario builds and ad-hoc signs only its external helper. The
+The stage downloads the macOS artifact unchanged and does not re-sign it. CI
+builds and ad-hoc signs the external runtime helper once, then the selected Mac
+runs that prebuilt helper without compiling it. The stage rejects app and helper
+run IDs unless they are completed, successful, non-PR runs of
+`voiceink-build.yml` from this repository. The helper must match the checked-out
+stage tooling SHA. The app build, helper build, and distribution stage must also
+report distinct Namespace runner instance names. The stage records its boot
+session, then the distribution script independently requires absent Roma
+preferences, TCC rows, installed copies, running processes, and model state.
+Its evidence ties both
+artifacts to their workflow run and source SHA. The
 existing iOS migration workflow packages its Xcode-signed Simulator application
 as `roma.just.talk.ios-simulator.app`, preserving App Group exchange between the
 app and keyboard extension.
@@ -55,9 +70,10 @@ Omit the run ID only when one remote E2E stage is running. The helper then selec
 
 ## Prepared desktop
 
-Depending on `target`, the remote Mac contains:
+Depending on `target` and scenario, the remote Mac contains:
 
-- macOS: `~/Applications/roma just talk.app`, launched with onboarding state reset.
+- ordinary macOS stage: `~/Applications/roma just talk.app`, launched with onboarding state reset;
+- macOS distribution E2E: the untouched app below a newly mounted APFS volume under `/Volumes`, where Finder extracted it;
 - iOS: a booted iPhone Simulator with `roma just talk` installed and launched.
 - `~/Desktop/REMOTE E2E STAGE READY.txt`: human-readable handoff.
 - `~/Desktop/Remote E2E Stage`: link to the machine-readable stage directory.
@@ -74,6 +90,70 @@ The stable future-agent contract is:
 
 Provisioning remains owned by this workflow. Manual interaction prompts and judgment
 remain owned by Computer Use; the optional local-STT path is owned by the deterministic script.
+
+## Download-to-launch distribution E2E
+
+Choose `target=macos`, select `macos_scenario=distribution-e2e`, provide the
+exact successful build run, set the runner label for the intended OS lane, set
+`macos_expected_version` and `macos_expected_build` to the affected release,
+and allow 30 to 60 minutes of interaction time. The distribution lane refuses
+to start without both exact values.
+
+This is not the installed-app runtime test with quarantine added afterward. It
+starts on a fresh Apple Silicon runner and fails if Roma preferences, Roma TCC
+rows, FluidAudio model state, an installed copy, a running process, disabled
+Gatekeeper assessments, the wrong architecture, or the wrong exact macOS
+product or build version already exist. The persistent model cache stays outside
+FluidAudio's live directory until the downloaded app passes its initial
+Gatekeeper and App Translocation launch.
+
+The workflow downloads both forms of the selected Actions artifact:
+
+1. the outer ZIP a person receives from the GitHub Actions web download; and
+2. the inner `roma.just.talk.app.zip` after GitHub's artifact wrapper is removed.
+
+It requires the outer ZIP hash to match GitHub's recorded artifact digest and
+proves that the inner ZIP in the distributed wrapper matches the CLI download
+before the user path starts. The scenario then:
+
+1. asks GitHub's authenticated artifact endpoint for a short-lived download redirect for that exact artifact ID, opens the redirect in Safari, and downloads it to a newly mounted APFS volume. The redirect itself is never saved in evidence. APFS preserves the framework symlinks in the signed app bundle;
+2. requires Safari quarantine and byte equality with the untouched outer ZIP already fetched from the selected Actions run;
+3. asks the operator to double-click the outer ZIP in Finder, requires human confirmation that Finder and Archive Utility performed the extraction, and proves the exact inner ZIP inherited Safari quarantine;
+4. asks the operator to double-click the inner ZIP, requires the same human confirmation for that separate extraction, proves the app inherited quarantine and still passes strict deep signature verification, and compares its minimum macOS version with the exact runner version;
+5. hashes every regular file and symlink in the extracted app, performs the first launch while Gatekeeper still rejects it, and requires the operator to confirm the visible "Not Opened" dialog before using Privacy & Security, Open Anyway;
+6. starts an approval-window process and log monitor before Open Anyway, requires the operator to confirm that the approved first-launch UI is visible and responsive, then requires the first observed PID to report finished AppKit launch, run through App Translocation as native ARM64, remain runnable without `SIGCONT`, map every bundle-relative Mach-O dependency discovered recursively from the active ARM64 executable graph, survive a stability interval without dyld or signature errors, and leave the full app bundle byte-identical to its pre-launch manifest. A second Roma PID, new Roma crash report, or approval-window dyld error invalidates the run; and
+7. records that first-process verdict, then deliberately starts separate prewarm and transcription relaunches of the same extracted artifact. Every observed Roma PID must be recorded by the helper, run through App Translocation with the same executable hash, pass the same recursive signature and mapped-code checks through process exit, and have an explicit test-requested termination. A new crash report or unaccounted process invalidates the run. The lane also compares the complete file-and-symlink bundle manifest before and after runtime and writes a separate transcription verdict.
+
+CI builds the runtime helper with a macOS 14.0 deployment target. Before changing
+TCC or starting Roma runtime work, the target Mac runs that exact packaged helper
+executable with `--help`, requires its own clean exit and expected output,
+and records the host product version, build, architecture, helper hash, and
+minimum OS. The helper uses the ScreenCaptureKit content-filter screenshot API
+available on Sonoma, so the functional smoke keeps its rendered-pixel proof on
+macOS 14 instead of falling back to Accessibility text alone. The selected Mac
+never compiles this Swift 6.2 helper.
+
+Open the running Namespace job's Remote Display as soon as the log prints
+`DISTRIBUTION E2E BROWSER ACTION REQUIRED`. Follow
+`~/Desktop/GATEKEEPER ACTION REQUIRED.txt`; the file updates at each manual
+boundary. No script clicks Open Anyway, clears quarantine, modifies SIP, or
+re-signs the app.
+
+The four Desktop confirmation commands are human evidence. Run the two Finder
+commands only after using Finder and Archive Utility for their named extraction.
+Run the Gatekeeper command only after seeing and dismissing the actual "Not
+Opened" dialog. Run the final command only after the approved Roma process shows
+responsive first-launch UI. The verifier still checks the same PID and fails if
+it stopped, died, did not finish AppKit launch, or did not run through App
+Translocation.
+
+Run Sonoma and Tahoe as separate jobs. A moving selector such as `14.x` or
+`26.x` is useful for coverage but is not proof for 14.2.1 or 26.4.1 unless the
+recorded product and build versions equal the requested release. The exact
+identity check fails before Safari launches when the runner image is wrong. The
+current app target is macOS 14.4, so an exact 14.2.1 lane will stop at the app
+compatibility checkpoint until the separate Sonoma deployment work lands. That
+failure must not be reported as a signing result.
 
 ## Fast macOS hypothesis check
 
@@ -152,6 +232,9 @@ The workflow uploads `remote-e2e-stage-evidence` containing:
 - Simulator screenshots when iOS is selected;
 - macOS and iOS application logs;
 - macOS runtime preflight, target-probe, smoke, full report, failure-boundary summary, TCC rows, exact signatures/hashes, audio/model provenance, and restoration logs;
+- distribution source and browser hashes, GitHub's artifact digest, exact artifact ID and sanitized redirect host, outer and inner quarantine records, APFS volume inventory, per-extraction human confirmations, Finder and Archive Utility process/log evidence, Gatekeeper assessments, approval-window PID events and crash-report baseline, source and translocated executable identity, native ARM64 process identity, recursively discovered active-slice code, observed mapped bundle code, signatures, process states, and unified logs;
+- every runtime Roma PID, its translocated launch identity, lifetime mapped-code evidence, explicit termination intent, and pre/post crash-report inventories;
+- app and runtime-helper workflow run IDs, source SHAs, workflow identity, archive and executable hashes, plus the helper's target-host loadability result;
 - macOS, Xcode, and Simulator inventory.
 
 Namespace VNC can be active while `screencapture` remains unable to see that display from the runner shell. The workflow records this condition instead of silently claiming a desktop screenshot. The VNC controller or future Computer Use skill owns macOS desktop screenshots.
@@ -161,5 +244,6 @@ Namespace VNC can be active while `screencapture` remains unable to see that dis
 - iOS means iOS Simulator on the remote Mac, not a physical iPhone.
 - Microphone availability is not assumed; the deterministic STT scenario uses a generated audio file.
 - Manual stages do not pre-grant Accessibility, Input Monitoring, Screen Recording, or other TCC permissions.
+- `distribution-e2e` requires a person or authorized Computer Use session for Safari's site-download prompt, both Finder extractions, and Gatekeeper Open Anyway. Missing interaction times out and fails.
 - Both macOS runtime scenarios grant only the exact helper/Roma permissions needed on their disposable VM and verify the real global-shortcut/audio-input path.
 - The optional local-STT scenario performs narrow AXe UI assertions; XCUITest remains a separate fast gate.

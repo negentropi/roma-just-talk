@@ -3,6 +3,7 @@
 ## v1.96 - Unreleased
 
 - Added a local-only Hardened Runtime exception for ad-hoc macOS builds that load bundled MediaRemoteAdapter and Sparkle frameworks, while keeping Library Validation enabled for certificate-signed releases.
+- Added a fresh-Mac distribution E2E that follows the exact GitHub Actions outer ZIP through Safari quarantine, both Finder extractions, Gatekeeper Open Anyway, App Translocation, generic mapped-code verification, and a real transcription smoke.
 - Linked whisper.cpp statically into the macOS and iOS apps so ad-hoc builds no longer depend on a separately signed `whisper.framework` at launch.
 - Added a live `/demo` landing route with page-scoped Left Shift and touch controls, browser-managed speech recognition, shuffled writing contexts, explicit privacy and browser-parity notes, and no Roma transcription backend or API key.
 - Restyled the landing-page action frames in white, light gray, and dark gray while keeping their current faces and interactions.

@@ -13,11 +13,32 @@ on:
           - macos
           - ios
       macos_artifact_run_id:
-        description: Build run ID containing the macOS app; blank uses latest green build
+        description: Build run ID containing the app; blank finds a green build for this tooling SHA
+        required: false
+        type: string
+      runtime_helper_run_id:
+        description: Build run ID containing helper from this tooling SHA; blank finds its green build
+        required: false
+        type: string
+      macos_runner:
+        description: Runner label for the requested macOS image
+        required: true
+        default: namespace-profile-roma-jt
+        type: string
+      macos_expected_version:
+        description: Exact macOS version; required for distribution, optional otherwise
+        required: false
+        type: string
+      macos_expected_build:
+        description: Exact macOS build; required for distribution, optional otherwise
+        required: false
+        type: string
+      developer_dir:
+        description: Optional Xcode developer directory for the selected runner
         required: false
         type: string
       macos_scenario:
-        description: Optional deterministic macOS runtime scenario; smoke is hypothesis evidence
+        description: macOS scenario; distribution follows browser, Finder, Gatekeeper, and runtime smoke
         required: true
         default: none
         type: choice
@@ -25,6 +46,7 @@ on:
           - none
           - runtime-smoke
           - runtime-e2e
+          - distribution-e2e
       macos_audio_artifact:
         description: Private Namespace WAV artifact; required for full runtime, optional for smoke
         required: false
@@ -69,6 +91,11 @@ on:
       - "scripts/open-remote-e2e-stage.sh"
       - "scripts/prepare-remote-e2e-stage.sh"
       - "scripts/run-macos-runtime-e2e.sh"
+      - "scripts/run-macos-distribution-e2e.sh"
+      - "scripts/macos-bundle-manifest.sh"
+      - "scripts/verify-macos-distribution-launch.sh"
+      - "scripts/tests/macos-distribution-e2e-contract.test.sh"
+      - "scripts/tests/verify-macos-distribution-launch.test.sh"
       - "scripts/runtime-e2e-model-bootstrap.sh"
       - "scripts/runtime-e2e-phase-runner.sh"
       - "scripts/runtime-e2e-parakeet-v2.manifest"
@@ -84,12 +111,14 @@ permissions:
   contents: read
 
 env:
-  DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
   STAGE_TARGET: ${{ inputs.target || 'ios' }}
   STAGE_HOLD_MINUTES: ${{ inputs.hold_minutes || '10' }}
   STAGE_MACOS_SCENARIO: ${{ inputs.macos_scenario || 'none' }}
   STAGE_MACOS_AUDIO_ARTIFACT: ${{ inputs.macos_audio_artifact || '' }}
   STAGE_MACOS_REPETITIONS: ${{ inputs.macos_repetitions || '3' }}
+  STAGE_MACOS_EXPECTED_VERSION: ${{ inputs.macos_expected_version || '' }}
+  STAGE_MACOS_EXPECTED_BUILD: ${{ inputs.macos_expected_build || '' }}
+  STAGE_DEVELOPER_DIR: ${{ inputs.developer_dir || '' }}
   STAGE_IOS_SCENARIO: ${{ inputs.ios_scenario || 'none' }}
 
 concurrency:
@@ -100,8 +129,8 @@ concurrency:
 jobs:
   stage:
     name: Remote desktop ready
-    runs-on: namespace-profile-roma-jt
-    timeout-minutes: 75
+    runs-on: ${{ inputs.macos_runner || 'namespace-profile-roma-jt' }}
+    timeout-minutes: 105
     outputs:
       scenario-outcome: ${{ steps.prepare-stage.outcome }}
 
@@ -109,39 +138,300 @@ jobs:
       - name: Checkout stage tooling
         uses: actions/checkout@v4
 
+      - name: Require a fresh Namespace macOS runner instance
+        env:
+          REQUESTED_RUNNER: ${{ inputs.macos_runner || 'namespace-profile-roma-jt' }}
+        run: |
+          case "$REQUESTED_RUNNER" in
+            namespace-profile-*|nscloud-macos-*) ;;
+            *)
+              echo "macos_runner must select a Namespace macOS runner" >&2
+              exit 2
+              ;;
+          esac
+          case "$RUNNER_NAME" in
+            nsc-runner-*) ;;
+            *)
+              echo "Namespace runner name must expose its instance ID" >&2
+              exit 2
+              ;;
+          esac
+          BOOT_EPOCH="$(
+            sysctl -n kern.boottime \
+              | sed -E 's/.*sec = ([0-9]+).*/\1/'
+          )"
+          BOOT_SESSION_UUID="$(sysctl -n kern.bootsessionuuid)"
+          [[ "$BOOT_EPOCH" =~ ^[0-9]+$ ]]
+          [[ "$BOOT_SESSION_UUID" =~ ^[0-9A-Fa-f-]{36}$ ]]
+          BOOT_AGE_SECONDS="$(( $(date +%s) - BOOT_EPOCH ))"
+          [ "$BOOT_AGE_SECONDS" -ge 0 ]
+          echo "STAGE_RUNNER_LABEL=$REQUESTED_RUNNER" >> "$GITHUB_ENV"
+          echo "STAGE_RUNNER_NAME=$RUNNER_NAME" >> "$GITHUB_ENV"
+          echo "STAGE_RUNNER_INSTANCE_ID=${RUNNER_NAME#nsc-runner-}" >> "$GITHUB_ENV"
+          echo "STAGE_RUNNER_BOOT_EPOCH=$BOOT_EPOCH" >> "$GITHUB_ENV"
+          echo "STAGE_RUNNER_BOOT_SESSION_UUID=$BOOT_SESSION_UUID" >> "$GITHUB_ENV"
+          echo "STAGE_RUNNER_BOOT_AGE_SECONDS=$BOOT_AGE_SECONDS" >> "$GITHUB_ENV"
+
+      - name: Select requested Xcode
+        if: env.STAGE_DEVELOPER_DIR != ''
+        run: |
+          if [[ ! "$STAGE_DEVELOPER_DIR" =~ ^/Applications/Xcode[^/]*\.app/Contents/Developer$ ]]; then
+            echo "developer_dir must name an Xcode app under /Applications" >&2
+            exit 2
+          fi
+          test -d "$STAGE_DEVELOPER_DIR"
+          echo "DEVELOPER_DIR=$STAGE_DEVELOPER_DIR" >> "$GITHUB_ENV"
+
       - name: Show toolchain
         run: |
           xcode-select -p
           xcodebuild -version
           swift --version
 
+      - name: Verify distribution E2E tooling
+        run: |
+          bash scripts/tests/macos-distribution-e2e-contract.test.sh
+          bash scripts/tests/verify-macos-distribution-launch.test.sh
+
       - name: Download macOS app artifact
         if: env.STAGE_TARGET != 'ios'
         env:
           GH_TOKEN: ${{ github.token }}
           REQUESTED_RUN_ID: ${{ inputs.macos_artifact_run_id }}
+          REQUESTED_HELPER_RUN_ID: ${{ inputs.runtime_helper_run_id }}
         run: |
+          mkdir -p \
+            "$RUNNER_TEMP/remote-e2e-inputs/macos/distributed" \
+            "$RUNNER_TEMP/remote-e2e-inputs/macos/unwrapped" \
+            "$RUNNER_TEMP/remote-e2e-inputs/macos/runtime-helper"
+
+          validate_build_run() {
+            local run_id="$1"
+            local output="$2"
+            local required_head_sha="${3:-}"
+            gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run_id" \
+              | jq -e \
+                --arg repository "$GITHUB_REPOSITORY" \
+                --arg required_head_sha "$required_head_sha" '
+                  select(
+                    .repository.full_name == $repository
+                    and .head_repository.full_name == $repository
+                    and .status == "completed"
+                    and .conclusion == "success"
+                    and (.event == "push" or .event == "workflow_dispatch")
+                    and ((.path | split("@")[0]) == ".github/workflows/voiceink-build.yml")
+                    and ($required_head_sha == "" or .head_sha == $required_head_sha)
+                  )
+                  | {
+                      runId: .id,
+                      headSha: .head_sha,
+                      workflowId: .workflow_id,
+                      workflowName: .name,
+                      workflowPath: (.path | split("@")[0]),
+                      headBranch: .head_branch,
+                      headRepository: .head_repository.full_name,
+                      event: .event,
+                      status: .status,
+                      conclusion: .conclusion,
+                      htmlUrl: .html_url,
+                      repository: .repository.full_name
+                    }
+                ' > "$output"
+            test -s "$output"
+          }
+
+          record_required_namespace_job() {
+            local run_id="$1"
+            local job_name="$2"
+            local output="$3"
+            gh api \
+              "repos/$GITHUB_REPOSITORY/actions/runs/$run_id/jobs?per_page=100" \
+              | jq -e \
+                --argjson run_id "$run_id" \
+                --arg job_name "$job_name" '
+                  [
+                    .jobs[]
+                    | select(
+                        .name == $job_name
+                        and .status == "completed"
+                        and .conclusion == "success"
+                        and (.runner_name | startswith("nsc-runner-"))
+                      )
+                    | {
+                        jobId: .id,
+                        name: .name,
+                        runnerName: .runner_name,
+                        status: .status,
+                        conclusion: .conclusion,
+                        startedAt: .started_at,
+                        completedAt: .completed_at
+                      }
+                  ]
+                  | select(length == 1)
+                  | {runId: $run_id, job: .[0]}
+                ' > "$output"
+            test -s "$output"
+          }
+
           RUN_ID="$REQUESTED_RUN_ID"
+          APP_REQUIRED_HEAD_SHA=""
           if [ -z "$RUN_ID" ]; then
-            RUN_ID="$(
-              gh run list \
-                --repo "$GITHUB_REPOSITORY" \
-                --workflow voiceink-build.yml \
-                --status success \
-                --limit 1 \
-                --json databaseId \
-                --jq '.[0].databaseId'
-            )"
+            if [ "$STAGE_MACOS_SCENARIO" = distribution-e2e ]; then
+              while IFS= read -r CANDIDATE_RUN_ID; do
+                CANDIDATE_ARTIFACT_ID="$(
+                  gh api \
+                    "repos/$GITHUB_REPOSITORY/actions/runs/$CANDIDATE_RUN_ID/artifacts?per_page=100" \
+                    --jq '[.artifacts[] | select(.name == "roma.just.talk.app" and .expired == false)][0].id // empty'
+                )"
+                if [ -z "$CANDIDATE_ARTIFACT_ID" ]; then
+                  continue
+                fi
+                if record_required_namespace_job \
+                  "$CANDIDATE_RUN_ID" \
+                  "Build release macOS app" \
+                  "$RUNNER_TEMP/remote-e2e-inputs/macos/macos-app-run-jobs.json"; then
+                  RUN_ID="$CANDIDATE_RUN_ID"
+                  break
+                fi
+              done < <(
+                gh run list \
+                  --repo "$GITHUB_REPOSITORY" \
+                  --workflow voiceink-build.yml \
+                  --status success \
+                  --commit "$GITHUB_SHA" \
+                  --limit 20 \
+                  --json databaseId,event \
+                  --jq '.[] | select(.event == "push" or .event == "workflow_dispatch") | .databaseId'
+              )
+            else
+              RUN_ID="$(
+                gh run list \
+                  --repo "$GITHUB_REPOSITORY" \
+                  --workflow voiceink-build.yml \
+                  --status success \
+                  --commit "$GITHUB_SHA" \
+                  --limit 20 \
+                  --json databaseId,event \
+                  --jq '[.[] | select(.event == "push" or .event == "workflow_dispatch")] | first | .databaseId // empty'
+              )"
+            fi
+            APP_REQUIRED_HEAD_SHA="$GITHUB_SHA"
           fi
           test -n "$RUN_ID"
-          mkdir -p "$RUNNER_TEMP/remote-e2e-inputs/macos"
+          validate_build_run \
+            "$RUN_ID" \
+            "$RUNNER_TEMP/remote-e2e-inputs/macos/macos-app-run-metadata.json" \
+            "$APP_REQUIRED_HEAD_SHA"
+          if [ "$STAGE_MACOS_SCENARIO" = distribution-e2e ]; then
+            record_required_namespace_job \
+              "$RUN_ID" \
+              "Build release macOS app" \
+              "$RUNNER_TEMP/remote-e2e-inputs/macos/macos-app-run-jobs.json"
+          fi
           gh run download "$RUN_ID" \
             --repo "$GITHUB_REPOSITORY" \
             --name roma.just.talk.app \
-            --dir "$RUNNER_TEMP/remote-e2e-inputs/macos"
-          test -f "$RUNNER_TEMP/remote-e2e-inputs/macos/roma.just.talk.app.zip"
+            --dir "$RUNNER_TEMP/remote-e2e-inputs/macos/unwrapped"
+          test -f "$RUNNER_TEMP/remote-e2e-inputs/macos/unwrapped/roma.just.talk.app.zip"
+          if [ "$STAGE_MACOS_SCENARIO" != none ]; then
+            HELPER_RUN_ID="$REQUESTED_HELPER_RUN_ID"
+            if [ -z "$HELPER_RUN_ID" ]; then
+              while IFS= read -r CANDIDATE_RUN_ID; do
+                HELPER_ARTIFACT_ID="$(
+                  gh api \
+                    "repos/$GITHUB_REPOSITORY/actions/runs/$CANDIDATE_RUN_ID/artifacts?per_page=100" \
+                    --jq '[.artifacts[] | select(.name == "roma.runtime-e2e-harness.macos" and .expired == false)][0].id // empty'
+                )"
+                if [ -n "$HELPER_ARTIFACT_ID" ]; then
+                  HELPER_RUN_ID="$CANDIDATE_RUN_ID"
+                  break
+                fi
+              done < <(
+                gh run list \
+                  --repo "$GITHUB_REPOSITORY" \
+                  --workflow voiceink-build.yml \
+                  --status success \
+                  --commit "$GITHUB_SHA" \
+                  --limit 20 \
+                  --json databaseId,event \
+                  --jq '.[] | select(.event == "push" or .event == "workflow_dispatch") | .databaseId'
+              )
+            fi
+            test -n "$HELPER_RUN_ID"
+            validate_build_run \
+              "$HELPER_RUN_ID" \
+              "$RUNNER_TEMP/remote-e2e-inputs/macos/runtime-helper-run-metadata.json" \
+              "$GITHUB_SHA"
+            if [ "$STAGE_MACOS_SCENARIO" = distribution-e2e ]; then
+              record_required_namespace_job \
+                "$HELPER_RUN_ID" \
+                "Build reusable runtime E2E helper" \
+                "$RUNNER_TEMP/remote-e2e-inputs/macos/runtime-helper-run-jobs.json"
+            fi
+            gh run download "$HELPER_RUN_ID" \
+              --repo "$GITHUB_REPOSITORY" \
+              --name roma.runtime-e2e-harness.macos \
+              --dir "$RUNNER_TEMP/remote-e2e-inputs/macos/runtime-helper"
+            test -f "$RUNNER_TEMP/remote-e2e-inputs/macos/runtime-helper/roma.runtime-e2e-harness.macos.zip"
+            echo "$HELPER_RUN_ID" \
+              > "$RUNNER_TEMP/remote-e2e-inputs/macos/runtime-helper-run-id.txt"
+            echo "Using runtime helper from run $HELPER_RUN_ID at $(jq -r .headSha "$RUNNER_TEMP/remote-e2e-inputs/macos/runtime-helper-run-metadata.json")"
+          fi
+
+          gh api \
+            "repos/$GITHUB_REPOSITORY/actions/runs/$RUN_ID/artifacts?per_page=100" \
+            | jq -e \
+              --argjson run_id "$RUN_ID" '
+                [.artifacts[] | select(.name == "roma.just.talk.app" and .expired == false)]
+                | select(length == 1)
+                | .[0]
+                | {
+                    id,
+                    runId: $run_id,
+                    name,
+                    sizeInBytes: .size_in_bytes,
+                    digest,
+                    createdAt: .created_at,
+                    expiresAt: .expires_at,
+                    expired
+                  }
+                | select(.digest | test("^sha256:[0-9a-f]{64}$"))
+              ' \
+              > "$RUNNER_TEMP/remote-e2e-inputs/macos/macos-artifact-metadata.json"
+          ARTIFACT_ID="$(
+            jq -r .id "$RUNNER_TEMP/remote-e2e-inputs/macos/macos-artifact-metadata.json"
+          )"
+          test -n "$ARTIFACT_ID"
+          gh api \
+            "repos/$GITHUB_REPOSITORY/actions/artifacts/$ARTIFACT_ID/zip" \
+            > "$RUNNER_TEMP/remote-e2e-inputs/macos/distributed/roma.just.talk.app.zip"
+          test -s "$RUNNER_TEMP/remote-e2e-inputs/macos/distributed/roma.just.talk.app.zip"
+          DISTRIBUTED_ARCHIVE_SHA="$(
+            shasum -a 256 \
+              "$RUNNER_TEMP/remote-e2e-inputs/macos/distributed/roma.just.talk.app.zip" \
+              | awk '{print $1}'
+          )"
+          test "sha256:$DISTRIBUTED_ARCHIVE_SHA" = "$(
+            jq -r .digest "$RUNNER_TEMP/remote-e2e-inputs/macos/macos-artifact-metadata.json"
+          )"
+
+          EXPECTED_INNER_SHA="$(
+            shasum -a 256 "$RUNNER_TEMP/remote-e2e-inputs/macos/unwrapped/roma.just.talk.app.zip" \
+              | awk '{print $1}'
+          )"
+          DISTRIBUTED_INNER_SHA="$(
+            unzip -p \
+              "$RUNNER_TEMP/remote-e2e-inputs/macos/distributed/roma.just.talk.app.zip" \
+              roma.just.talk.app.zip \
+              | shasum -a 256 \
+              | awk '{print $1}'
+          )"
+          test "$DISTRIBUTED_INNER_SHA" = "$EXPECTED_INNER_SHA"
           echo "$RUN_ID" > "$RUNNER_TEMP/remote-e2e-inputs/macos/build-run-id.txt"
-          echo "Using macOS artifact from run $RUN_ID"
+          echo "$ARTIFACT_ID" > "$RUNNER_TEMP/remote-e2e-inputs/macos/macos-artifact-id.txt"
+          echo "$GITHUB_REPOSITORY" \
+            > "$RUNNER_TEMP/remote-e2e-inputs/macos/macos-artifact-repository.txt"
+          echo "Using macOS artifact from run $RUN_ID at $(jq -r .headSha "$RUNNER_TEMP/remote-e2e-inputs/macos/macos-app-run-metadata.json")"
 
       - name: Download iOS Simulator app artifact
         if: env.STAGE_TARGET != 'macos'
@@ -176,12 +466,13 @@ jobs:
         if: env.STAGE_TARGET != 'ios' && env.STAGE_MACOS_SCENARIO != 'none'
         uses: namespacelabs/nscloud-cache-action@c5f8dab7560444c4bf8dbc64f1b203431873c547 # v1.6.1
         with:
-          path: ~/Library/Application Support/FluidAudio/Models
+          path: ~/Library/Caches/roma-runtime-e2e-models
 
       - name: Prepare desktop and hold for Remote Display
         id: prepare-stage
         continue-on-error: true
         env:
+          GH_TOKEN: ${{ github.token }}
           RUNTIME_MODEL_CACHE_HIT: ${{ steps.runtime-model-cache.outputs.cache-hit }}
         run: |
           bash scripts/prepare-remote-e2e-stage.sh \
@@ -192,7 +483,10 @@ jobs:
             "$STAGE_IOS_SCENARIO" \
             "$STAGE_MACOS_SCENARIO" \
             "$STAGE_MACOS_AUDIO_ARTIFACT" \
-            "$STAGE_MACOS_REPETITIONS"
+            "$STAGE_MACOS_REPETITIONS" \
+            "$STAGE_MACOS_EXPECTED_VERSION" \
+            "$STAGE_MACOS_EXPECTED_BUILD" \
+            "$RUNNER_TEMP/remote-e2e-inputs/macos/runtime-helper/roma.runtime-e2e-harness.macos.zip"
 
       - name: Upload stage evidence
         if: always()
@@ -200,7 +494,7 @@ jobs:
         with:
           name: remote-e2e-stage-evidence
           path: ${{ runner.temp }}/voiceink-remote-e2e-stage/evidence
-          if-no-files-found: warn
+          if-no-files-found: error
           retention-days: 7
 
   verdict:

@@ -1,5 +1,6 @@
 import AppKit
 import CoreFoundation
+import CryptoKit
 import Darwin
 import Foundation
 import RuntimeE2ECore
@@ -216,9 +217,14 @@ final class RuntimeVoiceInkSession {
     private static func terminateRunningApplications(bundleIdentifier: String) throws {
         let applications = runningApplications(bundleIdentifier: bundleIdentifier)
         let processIdentifiers = applications.map(\.processIdentifier)
+        var acceptedProcessIdentifiers: [pid_t] = []
         for application in applications {
-            _ = application.terminate()
+            guard application.terminate() else {
+                throw RuntimeVoiceInkSessionError.applicationWouldNotTerminate
+            }
+            acceptedProcessIdentifiers.append(application.processIdentifier)
         }
+        try appendTerminationEvidence(processIdentifiers: acceptedProcessIdentifiers)
         let deadline = Date().addingTimeInterval(10)
         while Date() < deadline {
             let capturedProcessesExited = processIdentifiers.allSatisfy {
@@ -231,6 +237,24 @@ final class RuntimeVoiceInkSession {
             RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.05))
         }
         throw RuntimeVoiceInkSessionError.applicationWouldNotTerminate
+    }
+
+    private static func appendTerminationEvidence(processIdentifiers: [pid_t]) throws {
+        guard let evidencePath = ProcessInfo.processInfo.environment[
+            "RUNTIME_E2E_VOICEINK_TERMINATION_EVENTS"
+        ], !evidencePath.isEmpty, !processIdentifiers.isEmpty else {
+            return
+        }
+        let timestamp = ISO8601DateFormatter().string(from: Date())
+        let lines = processIdentifiers.map { "\(timestamp)\t\($0)\n" }.joined()
+        let evidenceURL = URL(fileURLWithPath: evidencePath)
+        if !FileManager.default.fileExists(atPath: evidencePath) {
+            try Data().write(to: evidenceURL, options: .atomic)
+        }
+        let handle = try FileHandle(forWritingTo: evidenceURL)
+        defer { try? handle.close() }
+        try handle.seekToEnd()
+        try handle.write(contentsOf: Data(lines.utf8))
     }
 
     private static func processExists(processIdentifier: pid_t) -> Bool {
@@ -250,17 +274,89 @@ final class RuntimeVoiceInkSession {
             throw RuntimeVoiceInkSessionError.launchFailed(path)
         }
 
-        let standardizedPath = URL(fileURLWithPath: path).standardizedFileURL.path
+        let sourceBundleURL = URL(fileURLWithPath: path).standardizedFileURL
+        guard let sourceExecutableURL = Bundle(url: sourceBundleURL)?.executableURL else {
+            throw RuntimeVoiceInkSessionError.launchIdentityUnavailable(path)
+        }
+        let sourceExecutableSHA256 = try sha256(path: sourceExecutableURL.path)
+        let requireAppTranslocation = ProcessInfo.processInfo.environment[
+            "RUNTIME_E2E_REQUIRE_APP_TRANSLOCATION"
+        ] == "true"
         let deadline = Date().addingTimeInterval(15)
         while Date() < deadline {
-            if runningApplications(bundleIdentifier: bundleIdentifier).contains(where: {
-                $0.bundleURL?.standardizedFileURL.path == standardizedPath
-            }) {
+            if let launch = try runningApplications(bundleIdentifier: bundleIdentifier).compactMap({ application -> (
+                application: NSRunningApplication,
+                bundlePath: String,
+                executableSHA256: String
+            )? in
+                guard let runningBundleURL = application.bundleURL?.standardizedFileURL,
+                      Bundle(url: runningBundleURL)?.bundleIdentifier == bundleIdentifier,
+                      let runningExecutableURL = Bundle(url: runningBundleURL)?.executableURL else {
+                    return nil
+                }
+                let runningExecutableSHA256 = try sha256(path: runningExecutableURL.path)
+                guard RuntimeVoiceInkLaunchIdentityPolicy.accepts(
+                    sourceBundlePath: sourceBundleURL.path,
+                    runningBundlePath: runningBundleURL.path,
+                    sourceExecutableSHA256: sourceExecutableSHA256,
+                    runningExecutableSHA256: runningExecutableSHA256,
+                    requireAppTranslocation: requireAppTranslocation
+                ) else {
+                    return nil
+                }
+                return (application, runningBundleURL.path, runningExecutableSHA256)
+            }).first {
+                try appendLaunchEvidence(
+                    processIdentifier: launch.application.processIdentifier,
+                    sourceBundlePath: sourceBundleURL.path,
+                    runningBundlePath: launch.bundlePath,
+                    sourceExecutableSHA256: sourceExecutableSHA256,
+                    runningExecutableSHA256: launch.executableSHA256
+                )
                 return
             }
             RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.05))
         }
         throw RuntimeVoiceInkSessionError.launchTimedOut(path)
+    }
+
+    private static func sha256(path: String) throws -> String {
+        let digest = SHA256.hash(data: try Data(contentsOf: URL(fileURLWithPath: path)))
+        return digest.map { String(format: "%02x", $0) }.joined()
+    }
+
+    private static func appendLaunchEvidence(
+        processIdentifier: pid_t,
+        sourceBundlePath: String,
+        runningBundlePath: String,
+        sourceExecutableSHA256: String,
+        runningExecutableSHA256: String
+    ) throws {
+        guard let evidencePath = ProcessInfo.processInfo.environment[
+            "RUNTIME_E2E_VOICEINK_LAUNCH_EVENTS"
+        ], !evidencePath.isEmpty else {
+            return
+        }
+        let fields = [
+            ISO8601DateFormatter().string(from: Date()),
+            String(processIdentifier),
+            sourceExecutableSHA256,
+            runningExecutableSHA256,
+            sourceBundlePath,
+            runningBundlePath
+        ]
+        guard fields.allSatisfy({ !$0.contains("\t") && !$0.contains("\n") }) else {
+            throw RuntimeVoiceInkSessionError.launchEvidenceInvalid
+        }
+        let line = Data((fields.joined(separator: "\t") + "\n").utf8)
+        let evidenceURL = URL(fileURLWithPath: evidencePath)
+        if !FileManager.default.fileExists(atPath: evidencePath) {
+            try Data().write(to: evidenceURL, options: .atomic)
+        }
+        let handle = try FileHandle(forWritingTo: evidenceURL)
+        defer { try? handle.close() }
+        try handle.seekToEnd()
+        try handle.write(contentsOf: line)
     }
 
     private static func writeJournal(_ journal: RuntimeVoiceInkRestorationJournal) throws {
@@ -275,6 +371,8 @@ enum RuntimeVoiceInkSessionError: Error, CustomStringConvertible {
     case applicationWouldNotTerminate
     case preferenceSynchronizationFailed
     case launchFailed(String)
+    case launchIdentityUnavailable(String)
+    case launchEvidenceInvalid
     case launchTimedOut(String)
 
     var description: String {
@@ -287,6 +385,10 @@ enum RuntimeVoiceInkSessionError: Error, CustomStringConvertible {
             return "Could not synchronize VoiceInk audio preferences"
         case .launchFailed(let path):
             return "Could not launch VoiceInk at \(path)"
+        case .launchIdentityUnavailable(let path):
+            return "Could not inspect the launched VoiceInk identity at \(path)"
+        case .launchEvidenceInvalid:
+            return "VoiceInk launch evidence contains an unsupported tab or newline"
         case .launchTimedOut(let path):
             return "VoiceInk launch timed out at \(path)"
         }

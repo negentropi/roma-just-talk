@@ -399,7 +399,7 @@ abort "Remote E2E must mount the pinned persistent Parakeet model cache." unless
   cache&.fetch("uses", nil) ==
     "namespacelabs/nscloud-cache-action@c5f8dab7560444c4bf8dbc64f1b203431873c547" &&
   cache.dig("with", "path") ==
-    "~/Library/Application Support/FluidAudio/Models" &&
+    "~/Library/Caches/roma-runtime-e2e-models" &&
   !cache.key?("continue-on-error")
 
 abort "Remote E2E must record the cache action's authoritative hit output." unless
@@ -421,6 +421,16 @@ abort "Remote E2E must preserve a truthful workflow verdict after cache save." u
   verdict_step.fetch("run").include?('test "$STAGE_RESULT" = success') &&
   verdict_step.fetch("run").include?('test "$SCENARIO_OUTCOME" = success')
 RUBY
+
+if ! grep -Fq \
+  'runtime_model_cache_path="${RUNTIME_E2E_MODEL_CACHE_PATH:-$HOME/Library/Caches/roma-runtime-e2e-models}"' \
+  "$repo_root/scripts/prepare-remote-e2e-stage.sh" \
+  || ! grep -Fq \
+    'RUNTIME_E2E_MODEL_CACHE_PATH="$runtime_model_cache_path"' \
+    "$repo_root/scripts/prepare-remote-e2e-stage.sh"; then
+  echo "Remote E2E must expose the isolated model cache only after distribution launch proof." >&2
+  exit 1
+fi
 
 fd() {
   printf '%s\n' \

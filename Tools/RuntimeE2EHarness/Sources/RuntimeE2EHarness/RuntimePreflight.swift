@@ -95,12 +95,7 @@ enum RuntimePreflight {
         } else {
             accessibilityGranted = AXIsProcessTrusted()
         }
-        let renderedObservationSupported: Bool
-        if #available(macOS 15.2, *) {
-            renderedObservationSupported = true
-        } else {
-            renderedObservationSupported = false
-        }
+        let renderedObservationSupported = true
         let screenCaptureGranted = renderedObservationSupported
             && (CGPreflightScreenCaptureAccess()
                 || (requestScreenCaptureAccess && CGRequestScreenCaptureAccess()))
@@ -111,9 +106,6 @@ enum RuntimePreflight {
         }
         if !screenCaptureGranted {
             failures.append("Screen Recording is not granted to the runtime harness")
-        }
-        if !renderedObservationSupported {
-            failures.append("Rendered-pixel measurement requires macOS 15.2 or newer")
         }
         if fixtures.isEmpty {
             failures.append("No supported audio fixtures found in \(audioDirectory)")

@@ -17,6 +17,13 @@ on:
       - "scripts/check-find-reusable-ci-run.sh"
       - "scripts/find-reusable-ci-run.sh"
       - "scripts/tests/verify-adhoc-library-validation.test.sh"
+      - "scripts/tests/verify-macos-distribution-launch.test.sh"
+      - "scripts/tests/macos-distribution-e2e-contract.test.sh"
+      - "scripts/run-macos-distribution-e2e.sh"
+      - "scripts/macos-bundle-manifest.sh"
+      - "scripts/prepare-remote-e2e-stage.sh"
+      - ".github/workflows/voiceink-remote-e2e-stage.yml"
+      - "scripts/verify-macos-distribution-launch.sh"
       - "scripts/verify-adhoc-library-validation.sh"
       - "scripts/verify-static-whisper-app.sh"
       - "scripts/verify-static-whisper-xcframework.sh"
@@ -35,6 +42,13 @@ on:
       - "scripts/check-find-reusable-ci-run.sh"
       - "scripts/find-reusable-ci-run.sh"
       - "scripts/tests/verify-adhoc-library-validation.test.sh"
+      - "scripts/tests/verify-macos-distribution-launch.test.sh"
+      - "scripts/tests/macos-distribution-e2e-contract.test.sh"
+      - "scripts/run-macos-distribution-e2e.sh"
+      - "scripts/macos-bundle-manifest.sh"
+      - "scripts/prepare-remote-e2e-stage.sh"
+      - ".github/workflows/voiceink-remote-e2e-stage.yml"
+      - "scripts/verify-macos-distribution-launch.sh"
       - "scripts/verify-adhoc-library-validation.sh"
       - "scripts/verify-static-whisper-app.sh"
       - "scripts/verify-static-whisper-xcframework.sh"
@@ -118,6 +132,47 @@ jobs:
             echo "hit=false" >> "$GITHUB_OUTPUT"
           fi
 
+  runtime-helper:
+    name: Build reusable runtime E2E helper
+    runs-on: namespace-profile-roma-jt
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Compile and verify autonomous runtime E2E harness
+        run: |
+          make runtime-e2e-check
+          make runtime-e2e-app
+
+      - name: Verify Sonoma-compatible helper
+        run: |
+          HELPER=".local-build/Tools/RuntimeE2EHarness.app"
+          test "$(plutil -extract LSMinimumSystemVersion raw -o - "$HELPER/Contents/Info.plist")" = "14.0"
+          codesign --verify --deep --strict --verbose=4 "$HELPER"
+          file "$HELPER/Contents/MacOS/RuntimeE2EHarness" | grep -Fq arm64
+          otool -l "$HELPER/Contents/MacOS/RuntimeE2EHarness" > helper-load-commands.txt
+          awk '
+            $1 == "cmd" && $2 == "LC_BUILD_VERSION" { in_build = 1; next }
+            in_build && $1 == "minos" && $2 == "14.0" { found = 1; in_build = 0 }
+            END { exit(found ? 0 : 1) }
+          ' helper-load-commands.txt
+
+      - name: Package runtime E2E helper
+        run: |
+          ditto -c -k --keepParent \
+            ".local-build/Tools/RuntimeE2EHarness.app" \
+            "roma.runtime-e2e-harness.macos.zip"
+
+      - name: Upload runtime E2E helper
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.runtime-e2e-harness.macos
+          path: roma.runtime-e2e-harness.macos.zip
+          if-no-files-found: error
+          overwrite: true
+
   build:
     name: Build release macOS app
     needs: reuse
@@ -141,11 +196,13 @@ jobs:
       - name: Verify latency helper run target
         run: make latency-harness-check
 
-      - name: Compile and verify autonomous runtime E2E harness
-        run: make runtime-e2e-check
-
       - name: Verify ad-hoc Library Validation packaging contract
         run: bash scripts/tests/verify-adhoc-library-validation.test.sh
+
+      - name: Verify distribution launch evidence contract
+        run: |
+          bash scripts/tests/macos-distribution-e2e-contract.test.sh
+          bash scripts/tests/verify-macos-distribution-launch.test.sh
 
       - name: Build release app
         run: make local CONFIGURATION=Release

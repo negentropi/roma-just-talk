@@ -102,10 +102,12 @@ pixel-level target observation. Grants remain keyed to the exact ad-hoc CDHashes
 of the downloaded Roma app and the one-time-built helper. It never re-signs the
 production Roma artifact.
 
-Before sampling, the scenario mounts FluidAudio's `Models` parent directory from
-the Namespace runner profile's persistent cache volume. Mounting the parent is
-intentional because FluidAudio replaces the model's child directory after a
-download. The volume is an opportunistic fast path. The runner validates all 22
+Before sampling, the scenario mounts a persistent cache at
+`~/Library/Caches/roma-runtime-e2e-models`. It exposes only the pinned model's
+child directory to FluidAudio through a symlink when runtime preparation starts.
+The distribution lane therefore keeps `~/Library/Application Support/FluidAudio/Models`
+absent through the fresh download, Finder, Gatekeeper, and initial App
+Translocation launch. The cache is an opportunistic fast path. The runner validates all 22
 Parakeet V2 files against a size and SHA-256 manifest pinned to one public model
 revision. It fetches missing or corrupt files through Namespace's immutable-URL
 artifact cache with four workers, largest files first, while dependency
@@ -247,10 +249,16 @@ Verify readiness:
 make runtime-e2e-preflight
 ```
 
-Preflight reports selected and skipped target IDs and fails unless macOS 15.2+,
+Preflight reports selected and skipped target IDs and fails unless macOS 14+,
 Accessibility, Screen Recording, fixtures, BlackHole, the exact Roma build, and the
-four-running-app gate are all ready. The explicit preflight command requests any
+four-running-app gate are all ready. On Sonoma it uses ScreenCaptureKit's macOS 14
+content-filter screenshot API for the same rendered-pixel check. The explicit preflight command requests any
 missing Accessibility or Screen Recording grant; normal run mode never prompts.
+
+Remote stages use the helper artifact produced by `voiceink-build.yml`. The
+target Mac first runs the packaged helper executable with `--help` and records
+its process exit. A 14.0 plist value or Mach-O minimum alone does
+not count as Sonoma compatibility proof.
 
 ## Run
 

@@ -535,6 +535,36 @@ public enum RuntimeVoiceInkCandidateSelector {
     }
 }
 
+public enum RuntimeVoiceInkLaunchIdentityPolicy {
+    public static func accepts(
+        sourceBundlePath: String,
+        runningBundlePath: String,
+        sourceExecutableSHA256: String,
+        runningExecutableSHA256: String,
+        requireAppTranslocation: Bool
+    ) -> Bool {
+        guard !sourceExecutableSHA256.isEmpty,
+              sourceExecutableSHA256 == runningExecutableSHA256 else {
+            return false
+        }
+
+        let sourcePath = URL(fileURLWithPath: sourceBundlePath).standardizedFileURL.path
+        let runningPath = URL(fileURLWithPath: runningBundlePath).standardizedFileURL.path
+        if !requireAppTranslocation {
+            return sourcePath == runningPath
+        }
+
+        let components = runningPath.split(separator: "/").map(String.init)
+        guard let translocationIndex = components.firstIndex(of: "AppTranslocation"),
+              translocationIndex + 3 == components.count - 1,
+              components[translocationIndex + 2] == "d",
+              components.last?.hasSuffix(".app") == true else {
+            return false
+        }
+        return sourcePath != runningPath
+    }
+}
+
 public struct RuntimeCaseObservation: Codable, Equatable, Sendable {
     public let visibleText: String?
     public let keyUpToVisibleMilliseconds: Double?

@@ -498,6 +498,40 @@ do {
     try require(selectedVoiceInk?.source == .buildDirectory, "selection source should identify the build directory")
     print("PASS exact newest build artifact is selected instead of unrelated installed VoiceInk")
 
+    let sourceRoma = "/Volumes/Roma Distribution E2E/roma just talk.app"
+    let translocatedRoma = "/private/var/folders/aa/bb/T/AppTranslocation/UUID/d/roma just talk.app"
+    try require(
+        RuntimeVoiceInkLaunchIdentityPolicy.accepts(
+            sourceBundlePath: sourceRoma,
+            runningBundlePath: translocatedRoma,
+            sourceExecutableSHA256: "same-sha",
+            runningExecutableSHA256: "same-sha",
+            requireAppTranslocation: true
+        ),
+        "distribution runtime must accept the same executable through App Translocation"
+    )
+    try require(
+        !RuntimeVoiceInkLaunchIdentityPolicy.accepts(
+            sourceBundlePath: sourceRoma,
+            runningBundlePath: sourceRoma,
+            sourceExecutableSHA256: "same-sha",
+            runningExecutableSHA256: "same-sha",
+            requireAppTranslocation: true
+        ),
+        "distribution runtime must reject an untranslocated relaunch"
+    )
+    try require(
+        !RuntimeVoiceInkLaunchIdentityPolicy.accepts(
+            sourceBundlePath: sourceRoma,
+            runningBundlePath: translocatedRoma,
+            sourceExecutableSHA256: "source-sha",
+            runningExecutableSHA256: "other-sha",
+            requireAppTranslocation: true
+        ),
+        "distribution runtime must reject a translocated app with different bytes"
+    )
+    print("PASS distribution runtime launch identity requires translocation and matching bytes")
+
     let contentPass = RuntimeCaseAssessment.assess(
         observation: RuntimeCaseObservation(
             visibleText: "Hello, ROMA runtime!",

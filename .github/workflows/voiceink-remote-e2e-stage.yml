@@ -158,7 +158,7 @@ jobs:
           esac
           BOOT_EPOCH="$(
             sysctl -n kern.boottime \
-              | sed -E 's/.*sec = ([0-9]+).*/\1/'
+              | sed -E 's/^\{ sec = ([0-9]+),.*/\1/'
           )"
           BOOT_SESSION_UUID="$(sysctl -n kern.bootsessionuuid)"
           [[ "$BOOT_EPOCH" =~ ^[0-9]+$ ]]
@@ -187,6 +187,22 @@ jobs:
           xcode-select -p
           xcodebuild -version
           swift --version
+
+      - name: Initialize stage evidence
+        if: always()
+        run: |
+          EVIDENCE="$RUNNER_TEMP/voiceink-remote-e2e-stage/evidence"
+          mkdir -p "$EVIDENCE"
+          {
+            printf 'stage_runner_label=%s\n' "$STAGE_RUNNER_LABEL"
+            printf 'stage_runner_name=%s\n' "$STAGE_RUNNER_NAME"
+            printf 'stage_runner_instance_id=%s\n' "$STAGE_RUNNER_INSTANCE_ID"
+            printf 'stage_runner_boot_epoch=%s\n' "$STAGE_RUNNER_BOOT_EPOCH"
+            printf 'stage_runner_boot_session_uuid=%s\n' "$STAGE_RUNNER_BOOT_SESSION_UUID"
+            printf 'stage_runner_boot_age_seconds_at_job_start=%s\n' "$STAGE_RUNNER_BOOT_AGE_SECONDS"
+            printf 'expected_macos_version=%s\n' "$STAGE_MACOS_EXPECTED_VERSION"
+            printf 'expected_macos_build=%s\n' "$STAGE_MACOS_EXPECTED_BUILD"
+          } > "$EVIDENCE/provisioning-context.txt"
 
       - name: Verify distribution E2E tooling
         run: |
@@ -463,10 +479,20 @@ jobs:
 
       - name: Mount runtime E2E model cache
         id: runtime-model-cache
-        if: env.STAGE_TARGET != 'ios' && env.STAGE_MACOS_SCENARIO != 'none'
+        if: >-
+          env.STAGE_TARGET != 'ios' &&
+          env.STAGE_MACOS_SCENARIO != 'none' &&
+          startsWith(inputs.macos_runner, 'namespace-profile-')
         uses: namespacelabs/nscloud-cache-action@c5f8dab7560444c4bf8dbc64f1b203431873c547 # v1.6.1
         with:
           path: ~/Library/Caches/roma-runtime-e2e-models
+
+      - name: Initialize cold runtime E2E model cache
+        if: >-
+          env.STAGE_TARGET != 'ios' &&
+          env.STAGE_MACOS_SCENARIO != 'none' &&
+          startsWith(inputs.macos_runner, 'nscloud-macos-')
+        run: mkdir -p "$HOME/Library/Caches/roma-runtime-e2e-models"
 
       - name: Prepare desktop and hold for Remote Display
         id: prepare-stage

@@ -60,6 +60,10 @@ require_text "$WORKFLOW" 'nsc-runner-'
 require_text "$WORKFLOW" 'namespace-profile-*|nscloud-macos-*'
 require_text "$WORKFLOW" 'sysctl -n kern.boottime'
 require_text "$WORKFLOW" 'sysctl -n kern.bootsessionuuid'
+require_text "$WORKFLOW" "sed -E 's/^\\{ sec = ([0-9]+),.*/\\1/'"
+require_text "$WORKFLOW" "startsWith(inputs.macos_runner, 'namespace-profile-')"
+require_text "$WORKFLOW" "startsWith(inputs.macos_runner, 'nscloud-macos-')"
+require_text "$WORKFLOW" 'provisioning-context.txt'
 require_text "$BUILD_WORKFLOW" 'roma.runtime-e2e-harness.macos'
 
 require_text "$PREPARER" 'none|runtime-smoke|runtime-e2e|distribution-e2e'

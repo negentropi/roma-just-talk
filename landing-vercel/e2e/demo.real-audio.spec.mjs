@@ -1,9 +1,9 @@
 import { expect, test } from "@playwright/test";
-import { spawn } from "node:child_process";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { performance } from "node:perf_hooks";
 import { maximizeLoopbackOutput, measureLoopback } from "./real-audio-loopback.mjs";
+import { playWave, stopWave } from "./real-audio-playback.mjs";
 import { pcm16WaveRmsDecibelsFullScale } from "./wave-audio.mjs";
 
 const AUDIO_LEAD_MS = 1_100;
@@ -49,36 +49,10 @@ function wordErrorRate(expectedWords, actualWords) {
   return row.at(-1) / Math.max(1, expectedWords.length);
 }
 
-function waitForPlayback(playback) {
-  return new Promise((resolvePlayback, rejectPlayback) => {
-    let stderr = "";
-    playback.stderr.setEncoding("utf8");
-    playback.stderr.on("data", (chunk) => { stderr += chunk; });
-    playback.once("error", rejectPlayback);
-    playback.once("close", (exitCode, signal) => {
-      if (exitCode === 0) resolvePlayback();
-      else rejectPlayback(new Error(`afplay failed with exit ${exitCode}, signal ${signal || "none"}: ${stderr.trim()}`));
-    });
-  });
-}
-
-async function stopPlayback(playback) {
-  if (!playback || playback.exitCode !== null || playback.signalCode !== null) return;
-
-  const closed = new Promise((resolveClose) => playback.once("close", resolveClose));
-  playback.kill("SIGTERM");
-  const stopped = await Promise.race([
-    closed.then(() => true),
-    new Promise((resolveTimeout) => setTimeout(resolveTimeout, 1_000, false)),
-  ]);
-  if (!stopped) {
-    playback.kill("SIGKILL");
-    await closed;
-  }
-}
-
-test("afplay starts 1.1 seconds before Left Shift and finishes as timely text", async ({ page, baseURL }, testInfo) => {
+test("WAV starts 1.1 seconds before Left Shift and finishes as timely text", async ({ page, baseURL }, testInfo) => {
   const fixture = requiredEnvironment("ROMA_DEMO_AUDIO_FIXTURE");
+  const audioPlayer = requiredEnvironment("ROMA_DEMO_AUDIO_PLAYER");
+  const audioDeviceUID = requiredEnvironment("ROMA_DEMO_AUDIO_DEVICE_UID");
   const expectedTranscript = requiredEnvironment("ROMA_DEMO_EXPECTED_TRANSCRIPT");
   const audioDevice = process.env.ROMA_DEMO_AUDIO_DEVICE || "BlackHole 2ch";
   const completionBudgetMs = Number(process.env.ROMA_DEMO_COMPLETION_BUDGET_MS || DEFAULT_COMPLETION_BUDGET_MS);
@@ -90,7 +64,8 @@ test("afplay starts 1.1 seconds before Left Shift and finishes as timely text", 
     fixture,
     expectedTranscript,
     audioDevice,
-    playbackProcessLeadTargetMilliseconds: AUDIO_LEAD_MS,
+    audioDeviceUID,
+    playbackLeadTargetMilliseconds: AUDIO_LEAD_MS,
     completionBudgetMilliseconds: completionBudgetMs,
     maximumWordErrorRate,
     startedAt: new Date().toISOString(),
@@ -149,7 +124,11 @@ test("afplay starts 1.1 seconds before Left Shift and finishes as timely text", 
     expect(fixtureRmsDecibelsFullScale).toBeGreaterThanOrEqual(MINIMUM_FIXTURE_RMS_DBFS);
 
     const probePage = await page.context().newPage();
-    const loopback = await measureLoopback(probePage, baseURL, fixture)
+    const loopback = await measureLoopback(probePage, baseURL, {
+      audioPlayer,
+      deviceUID: audioDeviceUID,
+      fixture,
+    })
       .finally(() => probePage.close());
     report.loopback = loopback;
     expect(loopback.inputLabel).toContain(audioDevice);
@@ -172,22 +151,23 @@ test("afplay starts 1.1 seconds before Left Shift and finishes as timely text", 
     const defaultInput = audioInputs.find((device) => device.deviceId === "default") || audioInputs[0];
     expect(defaultInput?.label || "").toContain(audioDevice);
 
-    playback = spawn("/usr/bin/afplay", [fixture], { stdio: ["ignore", "ignore", "pipe"] });
-    await new Promise((resolveSpawn, rejectSpawn) => {
-      playback.once("spawn", resolveSpawn);
-      playback.once("error", rejectSpawn);
+    playback = playWave({
+      executable: audioPlayer,
+      deviceUID: audioDeviceUID,
+      fixture,
     });
+    playbackFinished = playback.finished;
+    playbackFinished.catch(() => {});
+    report.audioPlaybackStarted = await playback.started;
     const audioStartedAt = performance.now();
     const audioStartedEpochMs = Date.now();
-    playbackFinished = waitForPlayback(playback);
-    playbackFinished.catch(() => {});
     const waitBeforeShift = Math.max(0, AUDIO_LEAD_MS - (performance.now() - audioStartedAt));
     await new Promise((resolveDelay) => setTimeout(resolveDelay, waitBeforeShift));
 
     await page.keyboard.down("Shift");
     shiftHeld = true;
     await expect(root).toHaveAttribute("data-phase", "capturing");
-    await playbackFinished;
+    report.audioPlayback = await playbackFinished;
     const audioFinishedEpochMs = Date.now();
     await page.keyboard.up("Shift");
     shiftHeld = false;
@@ -214,8 +194,8 @@ test("afplay starts 1.1 seconds before Left Shift and finishes as timely text", 
       normalizedExpected: expectedWords.join(" "),
       normalizedTranscript: transcriptWords.join(" "),
       wordErrorRate: transcriptWordErrorRate,
-      playbackProcessStartToShiftDownMilliseconds: audioStartToShiftDownMs,
-      playbackProcessExitToShiftUpMilliseconds: playbackExitToShiftUpMs,
+      playbackStartToShiftDownMilliseconds: audioStartToShiftDownMs,
+      playbackCompletionToShiftUpMilliseconds: playbackExitToShiftUpMs,
       browserShiftHoldMilliseconds: timing.shiftUpAt - timing.shiftDownAt,
       keyUpToVisibleTextMilliseconds: keyUpToTextMs,
     });
@@ -237,7 +217,7 @@ test("afplay starts 1.1 seconds before Left Shift and finishes as timely text", 
     throw error;
   } finally {
     if (shiftHeld) await page.keyboard.up("Shift").catch(() => {});
-    await stopPlayback(playback);
+    await stopWave(playback);
     await playbackFinished?.catch(() => {});
     report.finalBrowserState = await page.evaluate(() => ({
       inputValue: document.querySelector("[data-dictation-input]")?.value || "",

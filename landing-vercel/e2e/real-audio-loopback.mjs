@@ -1,6 +1,7 @@
-import { execFile, spawn } from "node:child_process";
+import { execFile } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import { promisify } from "node:util";
+import { playWave, stopWave } from "./real-audio-playback.mjs";
 import { maximumEnvelopeCorrelation, pcm16WaveEnvelope } from "./wave-audio.mjs";
 
 const PROBE_SECONDS = 2;
@@ -22,20 +23,7 @@ export async function maximizeLoopbackOutput() {
   return { before, after: await volumeSettings() };
 }
 
-function waitForPlayback(playback) {
-  return new Promise((resolve, reject) => {
-    let stderr = "";
-    playback.stderr.setEncoding("utf8");
-    playback.stderr.on("data", (chunk) => { stderr += chunk; });
-    playback.once("error", reject);
-    playback.once("close", (exitCode, signal) => {
-      if (exitCode === 0) resolve();
-      else reject(new Error(`afplay probe failed with exit ${exitCode}, signal ${signal || "none"}: ${stderr.trim()}`));
-    });
-  });
-}
-
-export async function measureLoopback(page, origin, fixture) {
+export async function measureLoopback(page, origin, { audioPlayer, deviceUID, fixture }) {
   const expectedEnvelope = pcm16WaveEnvelope(await readFile(fixture), {
     seconds: PROBE_SECONDS,
     windowMilliseconds: ENVELOPE_WINDOW_MILLISECONDS,
@@ -73,13 +61,18 @@ export async function measureLoopback(page, origin, fixture) {
   });
   const outputLevel = await maximizeLoopbackOutput();
 
-  const playback = spawn("/usr/bin/afplay", ["-t", String(PROBE_SECONDS), fixture], {
-    stdio: ["ignore", "ignore", "pipe"],
+  const playback = playWave({
+    executable: audioPlayer,
+    deviceUID,
+    fixture,
+    seconds: PROBE_SECONDS,
   });
-  const playbackFinished = waitForPlayback(playback);
+  const playbackFinished = playback.finished;
+  playbackFinished.catch(() => {});
   let operationError;
   try {
-    await playbackFinished;
+    const playbackStarted = await playback.started;
+    const playbackReceipt = await playbackFinished;
     const measurement = await page.evaluate(async ({ envelopeWindowMilliseconds, outputLevel, probeSeconds, probeStarted }) => {
       const probe = window.__romaLoopbackProbe;
       if (!probe) throw new Error("The BlackHole probe was lost before completion.");
@@ -147,6 +140,7 @@ export async function measureLoopback(page, origin, fixture) {
     const { envelope, ...receipt } = measurement;
     return {
       ...receipt,
+      playback: { started: playbackStarted, ...playbackReceipt },
       envelopeWindowMilliseconds: ENVELOPE_WINDOW_MILLISECONDS,
       envelopeWindows: envelope.length,
       fixtureEnvelopeCorrelation,
@@ -156,7 +150,7 @@ export async function measureLoopback(page, origin, fixture) {
     throw error;
   } finally {
     const cleanupErrors = [];
-    if (playback.exitCode === null && playback.signalCode === null) playback.kill("SIGTERM");
+    await stopWave(playback);
     await playbackFinished.catch((error) => {
       if (error !== operationError) cleanupErrors.push(error);
     });

@@ -9,6 +9,8 @@ on:
       - ".github/workflows/browser-demo-real-audio-e2e.yml"
       - "landing-vercel/demo/**"
       - "landing-vercel/e2e/demo.real-audio.spec.mjs"
+      - "landing-vercel/e2e/play-wav.swift"
+      - "landing-vercel/e2e/real-audio-playback.mjs"
       - "landing-vercel/e2e/real-audio-loopback.mjs"
       - "landing-vercel/e2e/wave-audio.mjs"
       - "landing-vercel/package-lock.json"
@@ -17,6 +19,7 @@ on:
       - "landing-vercel/playwright.real-audio.config.mjs"
       - "landing-vercel/scripts/demo-server.mjs"
       - "landing-vercel/scripts/run-real-audio-e2e.sh"
+      - "landing-vercel/test/**"
 
 permissions:
   contents: read
@@ -137,11 +140,20 @@ jobs:
             "MACOSX_DEPLOYMENT_TARGET=$(sw_vers -productVersion | cut -d. -f1,2)" \
             > "$evidence/switchaudio-build.log"
           install -m 0755 "$tools/switchaudio-build/Release/SwitchAudioSource" "$switch_bin"
+          xcrun swiftc -O \
+            -module-cache-path "$tools/swift-module-cache" \
+            -framework AVFAudio \
+            -framework AudioToolbox \
+            -framework CoreAudio \
+            "$GITHUB_WORKSPACE/landing-vercel/e2e/play-wav.swift" \
+            -o "$tools/bin/roma-play-wav"
+          file "$tools/bin/roma-play-wav" | grep -F "arm64"
           export PATH="$tools/bin:$PATH"
           echo "$tools/bin" >> "$GITHUB_PATH"
           echo "ROMA_DEMO_CHROME_APP=$chrome_app" >> "$GITHUB_ENV"
           echo "ROMA_DEMO_CHROME_BUNDLE_ID=$chrome_bundle_id" >> "$GITHUB_ENV"
           echo "ROMA_DEMO_CHROME_EXECUTABLE=$chrome_app/Contents/MacOS/Google Chrome" >> "$GITHUB_ENV"
+          echo "ROMA_DEMO_AUDIO_PLAYER=$tools/bin/roma-play-wav" >> "$GITHUB_ENV"
 
           sudo killall coreaudiod 2>/dev/null || true
           sleep 4
@@ -156,6 +168,7 @@ jobs:
             printf 'blackhole_version=0.7.1\n'
             printf 'switchaudio_version=1.2.2\n'
             shasum -a 256 "$switch_bin"
+            shasum -a 256 "$tools/bin/roma-play-wav"
             pkgutil --pkg-info audio.existential.BlackHole2ch
           } > "$RUNNER_TEMP/browser-demo-tool-versions.txt"
           {
@@ -163,8 +176,6 @@ jobs:
             SwitchAudioSource -c -f json -t input
             printf 'output='
             SwitchAudioSource -c -f json -t output
-            printf 'system='
-            SwitchAudioSource -c -f json -t system
           } > "$evidence/audio-before-test.txt"
           touch "$RUNNER_TEMP/browser-demo-audio-baseline-created"
 
@@ -262,8 +273,6 @@ jobs:
               SwitchAudioSource -c -f json -t input
               printf 'output='
               SwitchAudioSource -c -f json -t output
-              printf 'system='
-              SwitchAudioSource -c -f json -t system
             } > "$evidence/audio-after-test.txt"
             cmp "$evidence/audio-before-test.txt" "$evidence/audio-after-test.txt"
             if [ -f "$evidence/audio-level-before-test.txt" ]; then

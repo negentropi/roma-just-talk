@@ -23,18 +23,21 @@ implementation so it can prove the whole interaction without a network speech
 service.
 
 The separate macOS hardware lane proves the part that suite cannot: it starts a
-real WAV player 1.1 seconds before Left Shift, routes the WAV through BlackHole
-into Chrome, waits for playback to finish, and then releases Shift. The expected
+CoreAudio WAV player 1.1 seconds before Left Shift, binds the player directly to
+BlackHole's device UID, starts the timing clock when the first frame has played
+through that device, waits for the final frame, and then releases Shift.
+The expected
 opening word proves pre-trigger audio reached Chrome. The lane rejects fixtures
 below -30 dBFS RMS and records a short, isolated BlackHole loopback before it
 starts speech recognition. It then records accuracy and key-up latency from
 Chrome's real speech service, restores, and verifies the original input and
-ordinary and system outputs. The lane resets BlackHole's output gain after each
+output. The lane resets BlackHole's output gain after each
 Chrome microphone open because the driver shares that gain with its input. CI
 uses the public `samples/jfk.wav` fixture pinned to a whisper.cpp commit and
 SHA-256, then restores and verifies BlackHole's prior gain and mute state.
 
 ```sh
+ROMA_DEMO_AUDIO_PLAYER=/absolute/path/to/compiled/roma-play-wav \
 ROMA_DEMO_AUDIO_FIXTURE=/absolute/path/to/fixture.wav \
 ROMA_DEMO_EXPECTED_TRANSCRIPT="expected fixture words" \
 bash scripts/run-real-audio-e2e.sh

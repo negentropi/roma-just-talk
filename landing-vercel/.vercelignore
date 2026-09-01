@@ -1,4 +1,5 @@
 e2e/
+test/
 node_modules/
 playwright-report/
 playwright-report-real-audio/

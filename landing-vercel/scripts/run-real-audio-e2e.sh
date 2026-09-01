@@ -9,7 +9,7 @@ if [ "$(uname -s)" != "Darwin" ]; then
   exit 2
 fi
 
-for command_name in SwitchAudioSource afplay node; do
+for command_name in SwitchAudioSource node; do
   if ! command -v "$command_name" >/dev/null; then
     echo "Missing required command: $command_name" >&2
     exit 2
@@ -23,6 +23,7 @@ fi
 fixture="${ROMA_DEMO_AUDIO_FIXTURE:-}"
 expected="${ROMA_DEMO_EXPECTED_TRANSCRIPT:-}"
 audio_device="${ROMA_DEMO_AUDIO_DEVICE:-BlackHole 2ch}"
+audio_player="${ROMA_DEMO_AUDIO_PLAYER:-}"
 
 if [ -z "$fixture" ] || [ ! -f "$fixture" ]; then
   echo "ROMA_DEMO_AUDIO_FIXTURE must name an existing WAV file." >&2
@@ -36,6 +37,10 @@ if [ -z "$expected" ]; then
   echo "ROMA_DEMO_EXPECTED_TRANSCRIPT is required." >&2
   exit 2
 fi
+if [ -z "$audio_player" ] || [ ! -x "$audio_player" ]; then
+  echo "ROMA_DEMO_AUDIO_PLAYER must name the compiled CoreAudio WAV player." >&2
+  exit 2
+fi
 
 current_uid() {
   SwitchAudioSource -c -f json -t "$1" \
@@ -44,10 +49,8 @@ current_uid() {
 
 original_input_uid="$(current_uid input)"
 original_output_uid="$(current_uid output)"
-original_system_output_uid="$(current_uid system)"
 [ -n "$original_input_uid" ]
 [ -n "$original_output_uid" ]
-[ -n "$original_system_output_uid" ]
 audio_changed=false
 loopback_level_captured=false
 original_loopback_output_volume=""
@@ -104,18 +107,14 @@ restore_audio() {
   local restore_exit=0
   local restored_input_uid=""
   local restored_output_uid=""
-  local restored_system_output_uid=""
   if [ "$audio_changed" = true ]; then
     restore_loopback_level || restore_exit=1
     SwitchAudioSource -u "$original_input_uid" -t input >/dev/null 2>&1 || restore_exit=1
     SwitchAudioSource -u "$original_output_uid" -t output >/dev/null 2>&1 || restore_exit=1
-    SwitchAudioSource -u "$original_system_output_uid" -t system >/dev/null 2>&1 || restore_exit=1
     restored_input_uid="$(current_uid input 2>/dev/null || true)"
     restored_output_uid="$(current_uid output 2>/dev/null || true)"
-    restored_system_output_uid="$(current_uid system 2>/dev/null || true)"
     if [ "$restored_input_uid" != "$original_input_uid" ] \
-      || [ "$restored_output_uid" != "$original_output_uid" ] \
-      || [ "$restored_system_output_uid" != "$original_system_output_uid" ]; then
+      || [ "$restored_output_uid" != "$original_output_uid" ]; then
       restore_exit=1
     fi
   fi
@@ -140,15 +139,12 @@ trap 'exit 143' TERM
 audio_changed=true
 SwitchAudioSource -s "$audio_device" -t input >/dev/null
 SwitchAudioSource -s "$audio_device" -t output >/dev/null
-SwitchAudioSource -s "$audio_device" -t system >/dev/null
 
 actual_input="$(SwitchAudioSource -c -t input)"
 actual_output="$(SwitchAudioSource -c -t output)"
-actual_system_output="$(SwitchAudioSource -c -t system)"
 if [ "$actual_input" != "$audio_device" ] \
-  || [ "$actual_output" != "$audio_device" ] \
-  || [ "$actual_system_output" != "$audio_device" ]; then
-  echo "BlackHole did not become the default input, output, and system output." >&2
+  || [ "$actual_output" != "$audio_device" ]; then
+  echo "BlackHole did not become both the default input and output." >&2
   exit 3
 fi
 
@@ -168,5 +164,6 @@ loopback_level_captured=true
 export ROMA_DEMO_AUDIO_FIXTURE="$fixture"
 export ROMA_DEMO_EXPECTED_TRANSCRIPT="$expected"
 export ROMA_DEMO_AUDIO_DEVICE="$audio_device"
+export ROMA_DEMO_AUDIO_DEVICE_UID="$(current_uid output)"
 
 node_modules/.bin/playwright test --config playwright.real-audio.config.mjs

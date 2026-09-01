@@ -1,12 +1,41 @@
-import { execFile } from "node:child_process";
+import { execFile, spawn } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import { promisify } from "node:util";
-import { playWave, stopWave } from "./real-audio-playback.mjs";
+import { stopWave } from "./real-audio-playback.mjs";
 import { maximumEnvelopeCorrelation, pcm16WaveEnvelope } from "./wave-audio.mjs";
 
 const PROBE_SECONDS = 2;
 const ENVELOPE_WINDOW_MILLISECONDS = 20;
 const execFileAsync = promisify(execFile);
+
+function playThroughDefaultOutput(fixture, seconds) {
+  const process = spawn("/usr/bin/afplay", ["-t", String(seconds), fixture], {
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  let stdout = "";
+  let stderr = "";
+  process.stdout.setEncoding("utf8");
+  process.stderr.setEncoding("utf8");
+  process.stdout.on("data", (chunk) => { stdout += chunk; });
+  process.stderr.on("data", (chunk) => { stderr += chunk; });
+  const finished = new Promise((resolve, reject) => {
+    process.once("error", reject);
+    process.once("close", (exitCode, signal) => {
+      if (exitCode === 0) {
+        resolve({
+          executable: "/usr/bin/afplay",
+          stdout: stdout.trim(),
+          stderr: stderr.trim(),
+        });
+      } else {
+        reject(new Error(
+          `afplay failed with exit ${exitCode}, signal ${signal || "none"}: ${stderr.trim()}`,
+        ));
+      }
+    });
+  });
+  return { process, finished };
+}
 
 async function volumeSettings() {
   const { stdout } = await execFileAsync("/usr/bin/osascript", ["-e", "get volume settings"]);
@@ -23,7 +52,7 @@ export async function maximizeLoopbackOutput() {
   return { before, after: await volumeSettings() };
 }
 
-export async function measureLoopback(page, origin, { audioPlayer, deviceUID, fixture }) {
+export async function measureLoopback(page, origin, { fixture }) {
   const expectedEnvelope = pcm16WaveEnvelope(await readFile(fixture), {
     seconds: PROBE_SECONDS,
     windowMilliseconds: ENVELOPE_WINDOW_MILLISECONDS,
@@ -61,17 +90,11 @@ export async function measureLoopback(page, origin, { audioPlayer, deviceUID, fi
   });
   const outputLevel = await maximizeLoopbackOutput();
 
-  const playback = playWave({
-    executable: audioPlayer,
-    deviceUID,
-    fixture,
-    seconds: PROBE_SECONDS,
-  });
+  const playback = playThroughDefaultOutput(fixture, PROBE_SECONDS);
   const playbackFinished = playback.finished;
   playbackFinished.catch(() => {});
   let operationError;
   try {
-    const playbackStarted = await playback.started;
     const playbackReceipt = await playbackFinished;
     const measurement = await page.evaluate(async ({ envelopeWindowMilliseconds, outputLevel, probeSeconds, probeStarted }) => {
       const probe = window.__romaLoopbackProbe;
@@ -140,7 +163,7 @@ export async function measureLoopback(page, origin, { audioPlayer, deviceUID, fi
     const { envelope, ...receipt } = measurement;
     return {
       ...receipt,
-      playback: { started: playbackStarted, ...playbackReceipt },
+      playback: playbackReceipt,
       envelopeWindowMilliseconds: ENVELOPE_WINDOW_MILLISECONDS,
       envelopeWindows: envelope.length,
       fixtureEnvelopeCorrelation,

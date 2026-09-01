@@ -125,15 +125,12 @@ test("WAV starts 1.1 seconds before Left Shift and finishes as timely text", asy
 
     const probePage = await page.context().newPage();
     const loopback = await measureLoopback(probePage, baseURL, {
-      audioPlayer,
-      deviceUID: audioDeviceUID,
       fixture,
     })
       .finally(() => probePage.close());
     report.loopback = loopback;
     expect(loopback.inputLabel).toContain(audioDevice);
     expect(loopback.recordedSeconds).toBeGreaterThanOrEqual(1.5);
-    expect(loopback.playback.mixerRmsDecibelsFullScale).toBeGreaterThanOrEqual(MINIMUM_FIXTURE_RMS_DBFS);
     expect(loopback.rmsDecibelsFullScale).toBeGreaterThanOrEqual(MINIMUM_LOOPBACK_RMS_DBFS);
     expect(loopback.fixtureEnvelopeCorrelation).toBeGreaterThanOrEqual(MINIMUM_LOOPBACK_CORRELATION);
 

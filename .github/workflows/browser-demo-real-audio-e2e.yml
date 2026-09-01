@@ -189,7 +189,9 @@ jobs:
 
       - name: Install browser test dependencies
         working-directory: landing-vercel
-        run: npm ci
+        run: |
+          npm ci
+          ./node_modules/.bin/playwright install ffmpeg
 
       - name: Download pinned public WAV fixture
         run: |

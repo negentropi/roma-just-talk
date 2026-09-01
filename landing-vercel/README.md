@@ -29,10 +29,10 @@ opening word proves pre-trigger audio reached Chrome. The lane rejects fixtures
 below -30 dBFS RMS and records a short, isolated BlackHole loopback before it
 starts speech recognition. It then records accuracy and key-up latency from
 Chrome's real speech service, restores, and verifies the original input and
-output. The lane resets BlackHole's output gain after each Chrome microphone
-open because the driver shares that gain with its input. CI uses the public
-`samples/jfk.wav` fixture pinned to a whisper.cpp commit and SHA-256, then
-restores and verifies BlackHole's prior gain and mute state.
+ordinary and system outputs. The lane resets BlackHole's output gain after each
+Chrome microphone open because the driver shares that gain with its input. CI
+uses the public `samples/jfk.wav` fixture pinned to a whisper.cpp commit and
+SHA-256, then restores and verifies BlackHole's prior gain and mute state.
 
 ```sh
 ROMA_DEMO_AUDIO_FIXTURE=/absolute/path/to/fixture.wav \

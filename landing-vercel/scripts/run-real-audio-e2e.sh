@@ -44,8 +44,10 @@ current_uid() {
 
 original_input_uid="$(current_uid input)"
 original_output_uid="$(current_uid output)"
+original_system_output_uid="$(current_uid system)"
 [ -n "$original_input_uid" ]
 [ -n "$original_output_uid" ]
+[ -n "$original_system_output_uid" ]
 audio_changed=false
 loopback_level_captured=false
 original_loopback_output_volume=""
@@ -102,13 +104,18 @@ restore_audio() {
   local restore_exit=0
   local restored_input_uid=""
   local restored_output_uid=""
+  local restored_system_output_uid=""
   if [ "$audio_changed" = true ]; then
     restore_loopback_level || restore_exit=1
     SwitchAudioSource -u "$original_input_uid" -t input >/dev/null 2>&1 || restore_exit=1
     SwitchAudioSource -u "$original_output_uid" -t output >/dev/null 2>&1 || restore_exit=1
+    SwitchAudioSource -u "$original_system_output_uid" -t system >/dev/null 2>&1 || restore_exit=1
     restored_input_uid="$(current_uid input 2>/dev/null || true)"
     restored_output_uid="$(current_uid output 2>/dev/null || true)"
-    if [ "$restored_input_uid" != "$original_input_uid" ] || [ "$restored_output_uid" != "$original_output_uid" ]; then
+    restored_system_output_uid="$(current_uid system 2>/dev/null || true)"
+    if [ "$restored_input_uid" != "$original_input_uid" ] \
+      || [ "$restored_output_uid" != "$original_output_uid" ] \
+      || [ "$restored_system_output_uid" != "$original_system_output_uid" ]; then
       restore_exit=1
     fi
   fi
@@ -133,11 +140,15 @@ trap 'exit 143' TERM
 audio_changed=true
 SwitchAudioSource -s "$audio_device" -t input >/dev/null
 SwitchAudioSource -s "$audio_device" -t output >/dev/null
+SwitchAudioSource -s "$audio_device" -t system >/dev/null
 
 actual_input="$(SwitchAudioSource -c -t input)"
 actual_output="$(SwitchAudioSource -c -t output)"
-if [ "$actual_input" != "$audio_device" ] || [ "$actual_output" != "$audio_device" ]; then
-  echo "BlackHole did not become both the default input and output." >&2
+actual_system_output="$(SwitchAudioSource -c -t system)"
+if [ "$actual_input" != "$audio_device" ] \
+  || [ "$actual_output" != "$audio_device" ] \
+  || [ "$actual_system_output" != "$audio_device" ]; then
+  echo "BlackHole did not become the default input, output, and system output." >&2
   exit 3
 fi
 

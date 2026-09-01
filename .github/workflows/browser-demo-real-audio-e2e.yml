@@ -163,6 +163,8 @@ jobs:
             SwitchAudioSource -c -f json -t input
             printf 'output='
             SwitchAudioSource -c -f json -t output
+            printf 'system='
+            SwitchAudioSource -c -f json -t system
           } > "$evidence/audio-before-test.txt"
           touch "$RUNNER_TEMP/browser-demo-audio-baseline-created"
 
@@ -260,6 +262,8 @@ jobs:
               SwitchAudioSource -c -f json -t input
               printf 'output='
               SwitchAudioSource -c -f json -t output
+              printf 'system='
+              SwitchAudioSource -c -f json -t system
             } > "$evidence/audio-after-test.txt"
             cmp "$evidence/audio-before-test.txt" "$evidence/audio-after-test.txt"
             if [ -f "$evidence/audio-level-before-test.txt" ]; then

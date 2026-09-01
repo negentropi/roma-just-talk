@@ -133,6 +133,7 @@ test("WAV starts 1.1 seconds before Left Shift and finishes as timely text", asy
     report.loopback = loopback;
     expect(loopback.inputLabel).toContain(audioDevice);
     expect(loopback.recordedSeconds).toBeGreaterThanOrEqual(1.5);
+    expect(loopback.playback.mixerRmsDecibelsFullScale).toBeGreaterThanOrEqual(MINIMUM_FIXTURE_RMS_DBFS);
     expect(loopback.rmsDecibelsFullScale).toBeGreaterThanOrEqual(MINIMUM_LOOPBACK_RMS_DBFS);
     expect(loopback.fixtureEnvelopeCorrelation).toBeGreaterThanOrEqual(MINIMUM_LOOPBACK_CORRELATION);
 
@@ -168,6 +169,7 @@ test("WAV starts 1.1 seconds before Left Shift and finishes as timely text", asy
     shiftHeld = true;
     await expect(root).toHaveAttribute("data-phase", "capturing");
     report.audioPlayback = await playbackFinished;
+    expect(report.audioPlayback.mixerRmsDecibelsFullScale).toBeGreaterThanOrEqual(MINIMUM_FIXTURE_RMS_DBFS);
     const audioFinishedEpochMs = Date.now();
     await page.keyboard.up("Shift");
     shiftHeld = false;

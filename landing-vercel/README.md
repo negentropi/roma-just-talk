@@ -26,12 +26,12 @@ The separate macOS hardware lane proves the part that suite cannot: it starts a
 CoreAudio WAV player 1.1 seconds before Left Shift, binds the player directly to
 BlackHole's device UID, starts the timing clock when the first frame has played
 through that device, waits for the final frame, and then releases Shift.
-The expected
-opening word proves pre-trigger audio reached Chrome. The lane rejects fixtures
-below -30 dBFS RMS and records a short, isolated BlackHole loopback before it
-starts speech recognition. It then records accuracy and key-up latency from
-Chrome's real speech service, restores, and verifies the original input and
-output. The lane resets BlackHole's output gain after each
+The player records the rendered mixer level, and the expected opening word proves
+pre-trigger audio reached Chrome. The lane rejects fixtures below -30 dBFS RMS
+and records a short, isolated BlackHole loopback before it starts speech
+recognition. It then records accuracy and key-up latency from Chrome's real
+speech service, restores, and verifies the original input and output. The lane
+resets BlackHole's output gain after each
 Chrome microphone open because the driver shares that gain with its input. CI
 uses the public `samples/jfk.wav` fixture pinned to a whisper.cpp commit and
 SHA-256, then restores and verifies BlackHole's prior gain and mute state.

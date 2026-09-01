@@ -9,6 +9,7 @@ enum PlaybackError: Error, CustomStringConvertible {
     case deviceNotFound(String)
     case missingOutputUnit
     case invalidDuration(String)
+    case mixerProducedNoSamples
     case playbackDidNotStart
     case playbackTimedOut
 
@@ -24,11 +25,47 @@ enum PlaybackError: Error, CustomStringConvertible {
             return "AVAudioEngine did not expose an output AudioUnit"
         case let .invalidDuration(value):
             return "invalid playback duration: \(value)"
+        case .mixerProducedNoSamples:
+            return "AVAudioEngine rendered no mixer samples"
         case .playbackDidNotStart:
             return "CoreAudio did not play the first WAV frame before its deadline"
         case .playbackTimedOut:
             return "CoreAudio playback did not finish before its deadline"
         }
+    }
+}
+
+final class AudioMeter: @unchecked Sendable {
+    private let lock = NSLock()
+    private var peak: Double = 0
+    private var sampleCount = 0
+    private var squaredTotal: Double = 0
+
+    func consume(_ buffer: AVAudioPCMBuffer) {
+        guard let channels = buffer.floatChannelData else { return }
+        lock.lock()
+        defer { lock.unlock() }
+        for channelIndex in 0 ..< Int(buffer.format.channelCount) {
+            let samples = channels[channelIndex]
+            for frameIndex in 0 ..< Int(buffer.frameLength) {
+                let sample = Double(samples[frameIndex])
+                squaredTotal += sample * sample
+                peak = max(peak, abs(sample))
+                sampleCount += 1
+            }
+        }
+    }
+
+    func decibelsFullScale() throws -> (rms: Double, peak: Double, sampleCount: Int) {
+        lock.lock()
+        defer { lock.unlock() }
+        guard sampleCount > 0 else { throw PlaybackError.mixerProducedNoSamples }
+        let rms = sqrt(squaredTotal / Double(sampleCount))
+        return (
+            rms > 0 ? 20 * log10(rms) : -.infinity,
+            peak > 0 ? 20 * log10(peak) : -.infinity,
+            sampleCount
+        )
     }
 }
 
@@ -85,24 +122,32 @@ func play(deviceUID: String, wavPath: String, maximumSeconds: Double?) throws {
         ),
         "select output device"
     )
-    var boundDevice = AudioDeviceID(kAudioObjectUnknown)
-    var boundDeviceSize = UInt32(MemoryLayout<AudioDeviceID>.size)
-    try requireNoError(
-        AudioUnitGetProperty(
-            outputUnit,
-            kAudioOutputUnitProperty_CurrentDevice,
-            kAudioUnitScope_Global,
-            0,
-            &boundDevice,
-            &boundDeviceSize
-        ),
-        "verify output device"
-    )
-    if boundDevice != deviceID {
-        throw PlaybackError.deviceNotFound("\(deviceUID) resolved to \(deviceID), bound \(boundDevice)")
+    func verifyBoundDevice(_ operation: String) throws {
+        var boundDevice = AudioDeviceID(kAudioObjectUnknown)
+        var boundDeviceSize = UInt32(MemoryLayout<AudioDeviceID>.size)
+        try requireNoError(
+            AudioUnitGetProperty(
+                outputUnit,
+                kAudioOutputUnitProperty_CurrentDevice,
+                kAudioUnitScope_Global,
+                0,
+                &boundDevice,
+                &boundDeviceSize
+            ),
+            operation
+        )
+        if boundDevice != deviceID {
+            throw PlaybackError.deviceNotFound("\(deviceUID) resolved to \(deviceID), bound \(boundDevice)")
+        }
     }
+    try verifyBoundDevice("verify selected output device")
     engine.attach(player)
     engine.connect(player, to: engine.mainMixerNode, format: file.processingFormat)
+
+    let meter = AudioMeter()
+    engine.mainMixerNode.installTap(onBus: 0, bufferSize: 1_024, format: nil) { buffer, _ in
+        meter.consume(buffer)
+    }
 
     let framesToPlay: AVAudioFramePosition
     if let maximumSeconds {
@@ -142,8 +187,10 @@ func play(deviceUID: String, wavPath: String, maximumSeconds: Double?) throws {
     try engine.start()
     defer {
         player.stop()
+        engine.mainMixerNode.removeTap(onBus: 0)
         engine.stop()
     }
+    try verifyBoundDevice("verify running output device")
     let playbackSeconds = Double(framesToPlay) / file.fileFormat.sampleRate
     player.play()
     guard started.wait(timeout: .now() + 5) == .success else {
@@ -155,7 +202,11 @@ func play(deviceUID: String, wavPath: String, maximumSeconds: Double?) throws {
     guard finished.wait(timeout: .now() + playbackSeconds + 5) == .success else {
         throw PlaybackError.playbackTimedOut
     }
-    print("completed device_uid=\(deviceUID) frames=\(framesToPlay) seconds=\(playbackSeconds)")
+    let mixerLevel = try meter.decibelsFullScale()
+    print(
+        "completed device_uid=\(deviceUID) frames=\(framesToPlay) seconds=\(playbackSeconds) "
+            + "mixer_rms_dbfs=\(mixerLevel.rms) mixer_peak_dbfs=\(mixerLevel.peak) mixer_samples=\(mixerLevel.sampleCount)"
+    )
 }
 
 do {

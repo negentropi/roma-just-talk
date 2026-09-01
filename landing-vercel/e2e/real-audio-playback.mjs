@@ -1,5 +1,11 @@
 import { spawn } from "node:child_process";
 
+function numericMarkerField(line, name) {
+  const value = Number(line.match(new RegExp(`(?:^| )${name}=([^ ]+)`))?.[1]);
+  if (!Number.isFinite(value)) throw new Error(`CoreAudio WAV player emitted an invalid ${name} marker: ${line}`);
+  return value;
+}
+
 export function playWave({ executable, deviceUID, fixture, seconds }) {
   const args = [deviceUID, fixture];
   if (seconds !== undefined) args.push(String(seconds));
@@ -52,7 +58,18 @@ export function playWave({ executable, deviceUID, fixture, seconds }) {
       } else if (!stdout.split("\n").some((line) => line.startsWith("completed device_uid="))) {
         rejectFinished(new Error(`CoreAudio WAV player exited without a completion marker: ${detail}`));
       } else {
-        resolveFinished({ stdout: stdout.trim(), stderr: stderr.trim() });
+        const completionLine = stdout.split("\n").find((line) => line.startsWith("completed device_uid="));
+        try {
+          resolveFinished({
+            stdout: stdout.trim(),
+            stderr: stderr.trim(),
+            mixerRmsDecibelsFullScale: numericMarkerField(completionLine, "mixer_rms_dbfs"),
+            mixerPeakDecibelsFullScale: numericMarkerField(completionLine, "mixer_peak_dbfs"),
+            mixerSampleCount: numericMarkerField(completionLine, "mixer_samples"),
+          });
+        } catch (error) {
+          rejectFinished(error);
+        }
       }
     } else {
       const error = new Error(`CoreAudio WAV player failed with ${detail}`);

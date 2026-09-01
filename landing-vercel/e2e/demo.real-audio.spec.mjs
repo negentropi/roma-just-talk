@@ -220,6 +220,12 @@ test("afplay starts 1.1 seconds before Left Shift and finishes as timely text", 
     if (shiftHeld) await page.keyboard.up("Shift").catch(() => {});
     await stopPlayback(playback);
     await playbackFinished?.catch(() => {});
+    report.finalBrowserState = await page.evaluate(() => ({
+      inputValue: document.querySelector("[data-dictation-input]")?.value || "",
+      phase: document.querySelector("[data-demo-root]")?.dataset.phase || "missing",
+      status: document.querySelector("[data-status]")?.textContent || "",
+      timing: window.__romaRealAudioTiming || null,
+    })).catch(() => null);
     report.finishedAt = new Date().toISOString();
     report.browserMessages = browserMessages;
     await mkdir(dirname(reportPath), { recursive: true });

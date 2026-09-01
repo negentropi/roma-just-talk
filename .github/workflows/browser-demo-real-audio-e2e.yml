@@ -69,17 +69,18 @@ jobs:
           set -u
           tools="$RUNNER_TEMP/browser-demo-tools"
           evidence="$RUNNER_TEMP/browser-demo-real-audio"
-          chrome_archive="$tools/chrome-for-testing-152.0.7977.64.zip"
-          chrome_app="$tools/chrome-mac-arm64/Google Chrome for Testing.app"
+          chrome_archive="$tools/googlechrome-152.0.7977.65.dmg"
+          chrome_volume="$tools/google-chrome-volume"
+          chrome_app="$tools/Google Chrome.app"
           blackhole_pkg="$tools/BlackHole2ch-0.7.1.pkg"
           switch_archive="$tools/switchaudio-osx-1.2.2.tar.gz"
           switch_source="$tools/switchaudio-osx-1.2.2"
           switch_bin="$tools/bin/SwitchAudioSource"
           [ "$(uname -m)" = "arm64" ]
-          mkdir -p "$tools/bin" "$switch_source" "$evidence"
+          mkdir -p "$tools/bin" "$switch_source" "$evidence" "$chrome_volume"
 
           curl --fail --location --retry 3 \
-            "https://storage.googleapis.com/chrome-for-testing-public/152.0.7977.64/mac-arm64/chrome-mac-arm64.zip" \
+            "https://dl.google.com/release2/chrome/hojsgpdatugdlbpbk6whstg6m4_152.0.7977.65/GoogleChrome-152.0.7977.65.dmg" \
             --output "$chrome_archive"
           curl --fail --location --retry 3 \
             "https://existential.audio/downloads/BlackHole2ch-0.7.1.pkg" \
@@ -89,7 +90,7 @@ jobs:
             --output "$switch_archive"
           {
             printf '%s  %s\n' \
-              "10033804338bd0a5aa098149a8dd64f3f2e0e8b201bf3d400d7c17d067ff696f" \
+              "6b7affec349755f40928dba3176c6ee4a3d32e3264dc92c4fa816b03092d3c07" \
               "$chrome_archive"
             printf '%s  %s\n' \
               "57b540f27a3e29c37e310e01bee0fdfab76733087e47f997ef9dccf851400dcf" \
@@ -99,17 +100,30 @@ jobs:
               "$switch_archive"
           } | tee "$evidence/tool-source-sha256.txt" | shasum -a 256 --check
 
-          unzip -q "$chrome_archive" -d "$tools"
+          chrome_mounted=false
+          detach_chrome_volume() {
+            if [ "$chrome_mounted" = true ]; then
+              hdiutil detach "$chrome_volume" >/dev/null
+            fi
+          }
+          trap detach_chrome_volume EXIT
+          hdiutil attach -nobrowse -readonly -mountpoint "$chrome_volume" "$chrome_archive" \
+            > "$evidence/chrome-dmg-attach.log"
+          chrome_mounted=true
+          ditto "$chrome_volume/Google Chrome.app" "$chrome_app"
+          hdiutil detach "$chrome_volume" >/dev/null
+          chrome_mounted=false
+          trap - EXIT
 
           chrome_version="$(plutil -extract CFBundleShortVersionString raw "$chrome_app/Contents/Info.plist")"
           chrome_bundle_id="$(plutil -extract CFBundleIdentifier raw "$chrome_app/Contents/Info.plist")"
-          chrome_signature="$(codesign -dv --verbose=4 "$chrome_app" 2>&1 | sed -n 's/^Signature=//p')"
+          chrome_codesign_id="$(codesign -dv --verbose=4 "$chrome_app" 2>&1 | sed -n 's/^Identifier=//p')"
           chrome_team_id="$(codesign -dv --verbose=4 "$chrome_app" 2>&1 | sed -n 's/^TeamIdentifier=//p')"
-          [ "$chrome_version" = "152.0.7977.64" ]
-          [ "$chrome_bundle_id" = "com.google.chrome.for.testing" ]
-          [ "$chrome_signature" = "adhoc" ]
-          [ "$chrome_team_id" = "not set" ]
-          file "$chrome_app/Contents/MacOS/Google Chrome for Testing" | grep -F "arm64"
+          [ "$chrome_version" = "152.0.7977.65" ]
+          [ "$chrome_bundle_id" = "com.google.Chrome" ]
+          [ "$chrome_codesign_id" = "com.google.Chrome" ]
+          [ "$chrome_team_id" = "EQHXZ8M8AV" ]
+          file "$chrome_app/Contents/MacOS/Google Chrome" | grep -F "arm64"
 
           sudo installer -pkg "$blackhole_pkg" -target / > "$evidence/blackhole-install.log"
           tar -xzf "$switch_archive" --strip-components=1 -C "$switch_source"
@@ -125,7 +139,7 @@ jobs:
           echo "$tools/bin" >> "$GITHUB_PATH"
           echo "ROMA_DEMO_CHROME_APP=$chrome_app" >> "$GITHUB_ENV"
           echo "ROMA_DEMO_CHROME_BUNDLE_ID=$chrome_bundle_id" >> "$GITHUB_ENV"
-          echo "ROMA_DEMO_CHROME_EXECUTABLE=$chrome_app/Contents/MacOS/Google Chrome for Testing" >> "$GITHUB_ENV"
+          echo "ROMA_DEMO_CHROME_EXECUTABLE=$chrome_app/Contents/MacOS/Google Chrome" >> "$GITHUB_ENV"
 
           sudo killall coreaudiod 2>/dev/null || true
           sleep 4
@@ -135,7 +149,7 @@ jobs:
           {
             printf 'chrome_version=%s\n' "$chrome_version"
             printf 'chrome_bundle_id=%s\n' "$chrome_bundle_id"
-            printf 'chrome_signature=%s\n' "$chrome_signature"
+            printf 'chrome_codesign_id=%s\n' "$chrome_codesign_id"
             printf 'chrome_team_id=%s\n' "$chrome_team_id"
             printf 'blackhole_version=0.7.1\n'
             printf 'switchaudio_version=1.2.2\n'

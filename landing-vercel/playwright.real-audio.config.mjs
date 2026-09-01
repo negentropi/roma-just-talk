@@ -20,7 +20,6 @@ export default defineConfig(baseConfig, {
     launchOptions: {
       ...(chromeExecutable ? { executablePath: chromeExecutable } : {}),
       args: [
-        "--use-fake-ui-for-media-stream",
         "--no-first-run",
         "--no-default-browser-check",
       ],

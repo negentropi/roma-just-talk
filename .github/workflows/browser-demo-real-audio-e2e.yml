@@ -117,7 +117,10 @@ jobs:
           hdiutil attach -nobrowse -readonly -mountpoint "$chrome_volume" "$chrome_archive" \
             > "$evidence/chrome-dmg-attach.log"
           chrome_mounted=true
-          ditto "$chrome_volume/Google Chrome.app" "$chrome_app"
+          # The signed DMG can carry Finder/resource-fork metadata that strict
+          # code-signature verification rejects after a filesystem copy.
+          ditto --norsrc --noextattr --noqtn --noacl \
+            "$chrome_volume/Google Chrome.app" "$chrome_app"
           hdiutil detach "$chrome_volume" >/dev/null
           chrome_mounted=false
           trap - EXIT

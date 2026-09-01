@@ -3,7 +3,7 @@ import { spawn } from "node:child_process";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { performance } from "node:perf_hooks";
-import { measureLoopback } from "./real-audio-loopback.mjs";
+import { maximizeLoopbackOutput, measureLoopback } from "./real-audio-loopback.mjs";
 import { pcm16WaveRmsDecibelsFullScale } from "./wave-audio.mjs";
 
 const AUDIO_LEAD_MS = 1_100;
@@ -163,6 +163,7 @@ test("afplay starts 1.1 seconds before Left Shift and finishes as timely text", 
     const input = page.locator("[data-dictation-input]");
     await expect(root).toHaveAttribute("data-phase", "ready", { timeout: 15_000 });
     await expect(input).toBeFocused();
+    report.outputLevelBeforePlayback = await maximizeLoopbackOutput();
 
     const audioInputs = await page.evaluate(async () => (await navigator.mediaDevices.enumerateDevices())
       .filter((device) => device.kind === "audioinput")

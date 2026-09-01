@@ -231,6 +231,8 @@ jobs:
           shasum -a 256 "$fixture" > "$evidence/fixture-sha256.txt"
           echo "ROMA_DEMO_AUDIO_FIXTURE=$fixture" >> "$GITHUB_ENV"
           echo "ROMA_DEMO_AUDIO_REPORT=$evidence/receipt.json" >> "$GITHUB_ENV"
+          echo "ROMA_DEMO_AUDIO_LEVEL_BEFORE=$evidence/audio-level-before-test.txt" >> "$GITHUB_ENV"
+          echo "ROMA_DEMO_AUDIO_LEVEL_AFTER=$evidence/audio-level-after-test.txt" >> "$GITHUB_ENV"
           echo "ROMA_DEMO_COMPLETION_BUDGET_MS=1500" >> "$GITHUB_ENV"
           echo "ROMA_DEMO_MAXIMUM_WER=0.15" >> "$GITHUB_ENV"
           {
@@ -260,6 +262,12 @@ jobs:
               SwitchAudioSource -c -f json -t output
             } > "$evidence/audio-after-test.txt"
             cmp "$evidence/audio-before-test.txt" "$evidence/audio-after-test.txt"
+            if [ -f "$evidence/audio-level-before-test.txt" ]; then
+              test -f "$evidence/audio-level-after-test.txt"
+              cmp "$evidence/audio-level-before-test.txt" "$evidence/audio-level-after-test.txt"
+            else
+              test ! -f "$evidence/audio-level-after-test.txt"
+            fi
           else
             echo "Audio route was never changed; no restoration check needed."
           fi

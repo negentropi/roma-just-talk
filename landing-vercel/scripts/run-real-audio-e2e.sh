@@ -47,12 +47,63 @@ original_output_uid="$(current_uid output)"
 [ -n "$original_input_uid" ]
 [ -n "$original_output_uid" ]
 audio_changed=false
+loopback_level_captured=false
+original_loopback_output_volume=""
+original_loopback_output_muted=""
+
+output_volume() {
+  /usr/bin/osascript -e 'output volume of (get volume settings)'
+}
+
+output_muted() {
+  /usr/bin/osascript -e 'output muted of (get volume settings)'
+}
+
+write_output_level() {
+  local destination="$1"
+  local volume="$2"
+  local muted="$3"
+  if [ -n "$destination" ]; then
+    printf 'output_volume=%s\noutput_muted=%s\n' "$volume" "$muted" > "$destination"
+  fi
+}
+
+restore_loopback_level() {
+  local restore_exit=0
+  local restored_volume=""
+  local restored_muted=""
+  local mute_clause="without output muted"
+  if [ "$loopback_level_captured" != true ]; then
+    return 0
+  fi
+  if [ "$original_loopback_output_muted" = true ]; then
+    mute_clause="with output muted"
+  fi
+  /usr/bin/osascript -e \
+    "set volume output volume $original_loopback_output_volume $mute_clause" \
+    >/dev/null 2>&1 || restore_exit=1
+  restored_volume="$(output_volume 2>/dev/null || true)"
+  restored_muted="$(output_muted 2>/dev/null || true)"
+  write_output_level \
+    "${ROMA_DEMO_AUDIO_LEVEL_AFTER:-}" \
+    "$restored_volume" \
+    "$restored_muted" || restore_exit=1
+  if [ "$restored_volume" != "$original_loopback_output_volume" ] \
+    || [ "$restored_muted" != "$original_loopback_output_muted" ]; then
+    restore_exit=1
+  fi
+  if [ "$restore_exit" -ne 0 ]; then
+    echo "Could not verify the original BlackHole output level was restored." >&2
+  fi
+  return "$restore_exit"
+}
 
 restore_audio() {
   local restore_exit=0
   local restored_input_uid=""
   local restored_output_uid=""
   if [ "$audio_changed" = true ]; then
+    restore_loopback_level || restore_exit=1
     SwitchAudioSource -u "$original_input_uid" -t input >/dev/null 2>&1 || restore_exit=1
     SwitchAudioSource -u "$original_output_uid" -t output >/dev/null 2>&1 || restore_exit=1
     restored_input_uid="$(current_uid input 2>/dev/null || true)"
@@ -89,6 +140,19 @@ if [ "$actual_input" != "$audio_device" ] || [ "$actual_output" != "$audio_devic
   echo "BlackHole did not become both the default input and output." >&2
   exit 3
 fi
+
+original_loopback_output_volume="$(output_volume)"
+original_loopback_output_muted="$(output_muted)"
+if [[ ! "$original_loopback_output_volume" =~ ^[0-9]+$ ]] \
+  || { [ "$original_loopback_output_muted" != true ] && [ "$original_loopback_output_muted" != false ]; }; then
+  echo "BlackHole did not expose restorable output volume and mute controls." >&2
+  exit 3
+fi
+write_output_level \
+  "${ROMA_DEMO_AUDIO_LEVEL_BEFORE:-}" \
+  "$original_loopback_output_volume" \
+  "$original_loopback_output_muted"
+loopback_level_captured=true
 
 export ROMA_DEMO_AUDIO_FIXTURE="$fixture"
 export ROMA_DEMO_EXPECTED_TRANSCRIPT="$expected"

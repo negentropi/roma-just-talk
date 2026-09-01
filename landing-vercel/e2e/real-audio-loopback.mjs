@@ -1,9 +1,26 @@
-import { spawn } from "node:child_process";
+import { execFile, spawn } from "node:child_process";
 import { readFile } from "node:fs/promises";
+import { promisify } from "node:util";
 import { maximumEnvelopeCorrelation, pcm16WaveEnvelope } from "./wave-audio.mjs";
 
 const PROBE_SECONDS = 2;
 const ENVELOPE_WINDOW_MILLISECONDS = 20;
+const execFileAsync = promisify(execFile);
+
+async function volumeSettings() {
+  const { stdout } = await execFileAsync("/usr/bin/osascript", ["-e", "get volume settings"]);
+  return stdout.trim();
+}
+
+export async function maximizeLoopbackOutput() {
+  const before = await volumeSettings();
+  await execFileAsync("SwitchAudioSource", ["-m", "unmute", "-t", "output"]);
+  await execFileAsync("/usr/bin/osascript", [
+    "-e",
+    "set volume output volume 100 without output muted",
+  ]);
+  return { before, after: await volumeSettings() };
+}
 
 function waitForPlayback(playback) {
   return new Promise((resolve, reject) => {
@@ -54,6 +71,7 @@ export async function measureLoopback(page, origin, fixture) {
       trackSettings: stream.getAudioTracks()[0]?.getSettings?.() || {},
     };
   });
+  const outputLevel = await maximizeLoopbackOutput();
 
   const playback = spawn("/usr/bin/afplay", ["-t", String(PROBE_SECONDS), fixture], {
     stdio: ["ignore", "ignore", "pipe"],
@@ -62,7 +80,7 @@ export async function measureLoopback(page, origin, fixture) {
   let operationError;
   try {
     await playbackFinished;
-    const measurement = await page.evaluate(async ({ envelopeWindowMilliseconds, probeSeconds, probeStarted }) => {
+    const measurement = await page.evaluate(async ({ envelopeWindowMilliseconds, outputLevel, probeSeconds, probeStarted }) => {
       const probe = window.__romaLoopbackProbe;
       if (!probe) throw new Error("The BlackHole probe was lost before completion.");
       const stopped = new Promise((resolve, reject) => {
@@ -107,6 +125,7 @@ export async function measureLoopback(page, origin, fixture) {
         const rms = Math.sqrt(squaredTotal / sampleCount);
         return {
           ...probeStarted,
+          outputLevel,
           requestedPlaybackSeconds: probeSeconds,
           recordedSeconds: decoded.duration,
           encodedBytes: recording.size,
@@ -122,6 +141,7 @@ export async function measureLoopback(page, origin, fixture) {
       envelopeWindowMilliseconds: ENVELOPE_WINDOW_MILLISECONDS,
       probeSeconds: PROBE_SECONDS,
       probeStarted,
+      outputLevel,
     });
     const fixtureEnvelopeCorrelation = maximumEnvelopeCorrelation(expectedEnvelope, measurement.envelope);
     const { envelope, ...receipt } = measurement;

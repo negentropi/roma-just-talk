@@ -45,5 +45,6 @@ bash scripts/run-real-audio-e2e.sh
 
 This lane needs macOS, Google Chrome, BlackHole 2ch, `SwitchAudioSource`, Chrome
 microphone permission, and network access to Chrome's speech provider. CI runs it
-on a fresh Namespace Mac and uploads the JSON timing receipt, screenshot, trace,
+on a fresh Namespace Mac. It launches the signed Chrome app through macOS before
+Playwright connects, then uploads the JSON timing receipt, screenshot, trace,
 video, and browser logs.

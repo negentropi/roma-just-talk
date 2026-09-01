@@ -12,6 +12,7 @@ on:
       - "landing-vercel/e2e/play-wav.swift"
       - "landing-vercel/e2e/real-audio-playback.mjs"
       - "landing-vercel/e2e/real-audio-loopback.mjs"
+      - "landing-vercel/e2e/real-audio-test.mjs"
       - "landing-vercel/e2e/wave-audio.mjs"
       - "landing-vercel/package-lock.json"
       - "landing-vercel/package.json"
@@ -129,6 +130,7 @@ jobs:
           [ "$chrome_bundle_id" = "com.google.Chrome" ]
           [ "$chrome_codesign_id" = "com.google.Chrome" ]
           [ "$chrome_team_id" = "EQHXZ8M8AV" ]
+          codesign --verify --deep --strict "$chrome_app"
           file "$chrome_app/Contents/MacOS/Google Chrome" | grep -F "arm64"
 
           sudo installer -pkg "$blackhole_pkg" -target / > "$evidence/blackhole-install.log"
@@ -153,7 +155,6 @@ jobs:
           echo "$tools/bin" >> "$GITHUB_PATH"
           echo "ROMA_DEMO_CHROME_APP=$chrome_app" >> "$GITHUB_ENV"
           echo "ROMA_DEMO_CHROME_BUNDLE_ID=$chrome_bundle_id" >> "$GITHUB_ENV"
-          echo "ROMA_DEMO_CHROME_EXECUTABLE=$chrome_app/Contents/MacOS/Google Chrome" >> "$GITHUB_ENV"
           echo "ROMA_DEMO_AUDIO_PLAYER=$tools/bin/roma-play-wav" >> "$GITHUB_ENV"
 
           sudo killall coreaudiod 2>/dev/null || true
@@ -186,6 +187,15 @@ jobs:
           chrome_bundle_id="$ROMA_DEMO_CHROME_BUNDLE_ID"
           tcc_db="$HOME/Library/Application Support/com.apple.TCC/TCC.db"
           csreq_file="$RUNNER_TEMP/google-chrome.csreq"
+          existing_chrome_processes="$(
+            ps -ww -axo pid=,command= \
+              | awk 'index($0, "/Google " "Chrome.app/Contents/") { print }'
+          )"
+          if [ -n "$existing_chrome_processes" ]; then
+            echo "Namespace Mac already has a running Chrome instance." >&2
+            printf '%s\n' "$existing_chrome_processes" >&2
+            exit 3
+          fi
           requirement="$(
             codesign -dr - "$chrome_app" 2>&1 \
               | sed -n -e 's/^# designated => //p' -e 's/^designated => //p'
@@ -211,6 +221,20 @@ jobs:
               readfile('$csreq_file'),0,'UNUSED',0
             );
           "
+          granted_count="$(sqlite3 "$tcc_db" "
+            SELECT count(*) FROM access
+            WHERE service='kTCCServiceMicrophone'
+              AND client='$chrome_bundle_id'
+              AND client_type=0
+              AND auth_value=2
+              AND auth_reason=4
+              AND auth_version=1
+              AND hex(csreq)=hex(readfile('$csreq_file'))
+              AND indirect_object_identifier_type=0
+              AND indirect_object_identifier='UNUSED'
+              AND flags=0;
+          ")"
+          [ "$granted_count" = 1 ]
           sqlite3 -json "$tcc_db" \
             "SELECT service,client,auth_value,auth_reason,length(csreq) AS csreq_length FROM access WHERE service='kTCCServiceMicrophone' AND client='$chrome_bundle_id';" \
             > "$RUNNER_TEMP/browser-demo-chrome-tcc.json"
@@ -246,6 +270,7 @@ jobs:
           echo "ROMA_DEMO_AUDIO_FIXTURE=$fixture" >> "$GITHUB_ENV"
           echo "ROMA_DEMO_AUDIO_REPORT=$evidence/receipt.json" >> "$GITHUB_ENV"
           echo "ROMA_DEMO_CHROME_LOG=$evidence/chrome-debug.log" >> "$GITHUB_ENV"
+          echo "ROMA_DEMO_BROWSER_LAUNCH_REPORT=$evidence/browser-launch.json" >> "$GITHUB_ENV"
           echo "ROMA_DEMO_AUDIO_LEVEL_BEFORE=$evidence/audio-level-before-test.txt" >> "$GITHUB_ENV"
           echo "ROMA_DEMO_AUDIO_LEVEL_AFTER=$evidence/audio-level-after-test.txt" >> "$GITHUB_ENV"
           echo "ROMA_DEMO_COMPLETION_BUDGET_MS=1500" >> "$GITHUB_ENV"
@@ -309,9 +334,33 @@ jobs:
           marker="$RUNNER_TEMP/browser-demo-chrome-tcc-created"
           tcc_db="$HOME/Library/Application Support/com.apple.TCC/TCC.db"
           chrome_bundle_id="$ROMA_DEMO_CHROME_BUNDLE_ID"
+          csreq_file="$RUNNER_TEMP/google-chrome.csreq"
           if [ -f "$marker" ]; then
-            sqlite3 "$tcc_db" \
-              "DELETE FROM access WHERE service='kTCCServiceMicrophone' AND client='$chrome_bundle_id' AND client_type=0 AND auth_reason=4;"
+            remaining_chrome_processes="$(
+              ps -ww -axo pid=,command= \
+                | awk 'index($0, "/Google " "Chrome.app/Contents/") { print }'
+            )"
+            if [ -n "$remaining_chrome_processes" ]; then
+              sqlite3 -json "$tcc_db" \
+                "SELECT service,client,auth_value,auth_reason FROM access WHERE service='kTCCServiceMicrophone' AND client='$chrome_bundle_id';" \
+                > "$RUNNER_TEMP/browser-demo-chrome-tcc-after-cleanup.json"
+              echo "Refusing to remove Chrome microphone access while Chrome is running." >&2
+              printf '%s\n' "$remaining_chrome_processes" >&2
+              exit 4
+            fi
+            sqlite3 "$tcc_db" "
+              DELETE FROM access
+              WHERE service='kTCCServiceMicrophone'
+                AND client='$chrome_bundle_id'
+                AND client_type=0
+                AND auth_value=2
+                AND auth_reason=4
+                AND auth_version=1
+                AND hex(csreq)=hex(readfile('$csreq_file'))
+                AND indirect_object_identifier_type=0
+                AND indirect_object_identifier='UNUSED'
+                AND flags=0;
+            "
             remaining_count="$(sqlite3 "$tcc_db" \
               "SELECT count(*) FROM access WHERE service='kTCCServiceMicrophone' AND client='$chrome_bundle_id';")"
             [ "$remaining_count" = 0 ]

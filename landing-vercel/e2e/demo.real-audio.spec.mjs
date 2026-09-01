@@ -1,9 +1,9 @@
-import { expect, test } from "@playwright/test";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { performance } from "node:perf_hooks";
 import { maximizeLoopbackOutput, measureLoopback } from "./real-audio-loopback.mjs";
 import { playWave, stopWave } from "./real-audio-playback.mjs";
+import { expect, test } from "./real-audio-test.mjs";
 import { pcm16WaveRmsDecibelsFullScale } from "./wave-audio.mjs";
 
 const AUDIO_LEAD_MS = 1_100;

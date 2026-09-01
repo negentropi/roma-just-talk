@@ -9,7 +9,7 @@ if [ "$(uname -s)" != "Darwin" ]; then
   exit 2
 fi
 
-for command_name in SwitchAudioSource node; do
+for command_name in SwitchAudioSource curl lsof node; do
   if ! command -v "$command_name" >/dev/null; then
     echo "Missing required command: $command_name" >&2
     exit 2
@@ -24,6 +24,10 @@ fixture="${ROMA_DEMO_AUDIO_FIXTURE:-}"
 expected="${ROMA_DEMO_EXPECTED_TRANSCRIPT:-}"
 audio_device="${ROMA_DEMO_AUDIO_DEVICE:-BlackHole 2ch}"
 audio_player="${ROMA_DEMO_AUDIO_PLAYER:-}"
+chrome_app="${ROMA_DEMO_CHROME_APP:-/Applications/Google Chrome.app}"
+chrome_log="${ROMA_DEMO_CHROME_LOG:-}"
+cdp_port="${ROMA_DEMO_CDP_PORT:-9222}"
+browser_launch_report="${ROMA_DEMO_BROWSER_LAUNCH_REPORT:-}"
 
 if [ -z "$fixture" ] || [ ! -f "$fixture" ]; then
   echo "ROMA_DEMO_AUDIO_FIXTURE must name an existing WAV file." >&2
@@ -41,6 +45,26 @@ if [ -z "$audio_player" ] || [ ! -x "$audio_player" ]; then
   echo "ROMA_DEMO_AUDIO_PLAYER must name the compiled CoreAudio WAV player." >&2
   exit 2
 fi
+chrome_executable="$chrome_app/Contents/MacOS/Google Chrome"
+chrome_info_plist="$chrome_app/Contents/Info.plist"
+if [ ! -x "$chrome_executable" ] || [ ! -f "$chrome_info_plist" ]; then
+  echo "ROMA_DEMO_CHROME_APP must name an installed Google Chrome app." >&2
+  exit 2
+fi
+chrome_bundle_id="$(/usr/bin/plutil -extract CFBundleIdentifier raw "$chrome_info_plist")"
+chrome_codesign_id="$(/usr/bin/codesign -dv --verbose=4 "$chrome_app" 2>&1 | sed -n 's/^Identifier=//p')"
+chrome_team_id="$(/usr/bin/codesign -dv --verbose=4 "$chrome_app" 2>&1 | sed -n 's/^TeamIdentifier=//p')"
+/usr/bin/codesign --verify --deep --strict "$chrome_app"
+if [ "$chrome_bundle_id" != "com.google.Chrome" ] \
+  || [ "$chrome_codesign_id" != "com.google.Chrome" ] \
+  || [ "$chrome_team_id" != "EQHXZ8M8AV" ]; then
+  echo "ROMA_DEMO_CHROME_APP must be Google's signed Chrome app." >&2
+  exit 2
+fi
+if [[ ! "$cdp_port" =~ ^[0-9]+$ ]] || [ "$cdp_port" -lt 1024 ] || [ "$cdp_port" -gt 65535 ]; then
+  echo "ROMA_DEMO_CDP_PORT must be an unused port between 1024 and 65535." >&2
+  exit 2
+fi
 
 current_uid() {
   SwitchAudioSource -c -f json -t "$1" \
@@ -55,6 +79,8 @@ audio_changed=false
 loopback_level_captured=false
 original_loopback_output_volume=""
 original_loopback_output_muted=""
+chrome_pid=""
+chrome_profile=""
 
 output_volume() {
   /usr/bin/osascript -e 'output volume of (get volume settings)'
@@ -124,11 +150,139 @@ restore_audio() {
   return "$restore_exit"
 }
 
+chrome_process_pids() {
+  ps -ww -axo pid=,command= \
+    | node -e '
+      let rows = "";
+      process.stdin.on("data", (chunk) => { rows += chunk; });
+      process.stdin.on("end", () => {
+        const executable = `${process.argv[1]}/Contents/MacOS/Google Chrome`;
+        const profile = `--user-data-dir=${process.argv[2]}`;
+        const matches = rows.split("\n").map((row) => row.trim()).filter((row) => {
+          const separator = row.indexOf(" ");
+          const command = separator === -1 ? "" : row.slice(separator + 1).trim();
+          const executableMatches = command === executable || command.startsWith(`${executable} `);
+          const profileMatches = command.endsWith(` ${profile}`) || command.includes(` ${profile} `);
+          return executableMatches && profileMatches;
+        });
+        process.stdout.write(matches.map((row) => row.slice(0, row.indexOf(" "))).join("\n"));
+      });
+    ' "$chrome_app" "$chrome_profile"
+}
+
+chrome_profile_process_pids() {
+  ps -ww -axo pid=,command= \
+    | node -e '
+      let rows = "";
+      process.stdin.on("data", (chunk) => { rows += chunk; });
+      process.stdin.on("end", () => {
+        const profile = `--user-data-dir=${process.argv[1]}`;
+        const matches = rows.split("\n").map((row) => row.trim()).filter((row) => {
+          const separator = row.indexOf(" ");
+          const command = separator === -1 ? "" : row.slice(separator + 1).trim();
+          return command.endsWith(` ${profile}`) || command.includes(` ${profile} `);
+        });
+        process.stdout.write(matches.map((row) => row.slice(0, row.indexOf(" "))).join("\n"));
+      });
+    ' "$chrome_profile"
+}
+
+chrome_profile_clear() {
+  local lsof_exit=0
+  local lsof_output=""
+  local profile_pids=""
+  if ! profile_pids="$(chrome_profile_process_pids)"; then
+    echo "Could not inspect processes using the real-audio test profile." >&2
+    return 2
+  fi
+  if [ -n "$profile_pids" ]; then
+    return 1
+  fi
+  if lsof_output="$(lsof +D "$chrome_profile" 2>&1)"; then
+    if [ -n "$lsof_output" ]; then
+      return 1
+    fi
+    echo "lsof reported success without a profile-use result." >&2
+    return 2
+  else
+    lsof_exit=$?
+  fi
+  if [ "$lsof_exit" -eq 1 ] && [ -z "$lsof_output" ]; then
+    return 0
+  fi
+  echo "Could not verify that Chrome released the real-audio test profile: $lsof_output" >&2
+  return 2
+}
+
+find_chrome_pid() {
+  chrome_process_pids | sed -n '1p'
+}
+
+stop_browser() {
+  local matching_pids=""
+  local profile_check=0
+  local profile_clear=false
+  if [ -z "$chrome_profile" ]; then
+    return 0
+  fi
+  if [ -z "$chrome_pid" ]; then
+    chrome_pid="$(find_chrome_pid)"
+  fi
+  if [ -n "$chrome_pid" ] && kill -0 "$chrome_pid" 2>/dev/null; then
+    matching_pids="$(chrome_process_pids)"
+    if ! printf '%s\n' "$matching_pids" | grep -Fx "$chrome_pid" >/dev/null; then
+      echo "Refusing to stop a process that is not this test's Chrome instance." >&2
+      return 1
+    fi
+    kill "$chrome_pid"
+    for _ in {1..50}; do
+      if ! kill -0 "$chrome_pid" 2>/dev/null; then
+        break
+      fi
+      sleep 0.1
+    done
+    if kill -0 "$chrome_pid" 2>/dev/null; then
+      echo "Chrome did not stop after the real-audio E2E." >&2
+      return 1
+    fi
+  fi
+  for _ in {1..50}; do
+    if chrome_profile_clear; then
+      profile_clear=true
+      break
+    else
+      profile_check=$?
+    fi
+    if [ "$profile_check" -eq 2 ]; then
+      return 1
+    fi
+    sleep 0.1
+  done
+  if [ "$profile_clear" != true ]; then
+    echo "Chrome processes still reference the real-audio test profile." >&2
+    return 1
+  fi
+  case "$chrome_profile" in
+    "${TMPDIR:-/tmp}"/roma-demo-chrome.*) rm -r "$chrome_profile" ;;
+    *)
+      echo "Refusing to delete an unexpected Chrome profile path." >&2
+      return 1
+      ;;
+  esac
+}
+
 finish() {
   local test_exit=$?
+  local cleanup_exit=0
   trap - EXIT
+  if ! stop_browser; then
+    cleanup_exit=4
+  fi
   if ! restore_audio; then
-    test_exit=4
+    cleanup_exit=4
+  fi
+  if [ "$test_exit" -eq 0 ]; then
+    test_exit="$cleanup_exit"
   fi
   exit "$test_exit"
 }
@@ -165,5 +319,68 @@ export ROMA_DEMO_AUDIO_FIXTURE="$fixture"
 export ROMA_DEMO_EXPECTED_TRANSCRIPT="$expected"
 export ROMA_DEMO_AUDIO_DEVICE="$audio_device"
 export ROMA_DEMO_AUDIO_DEVICE_UID="$(current_uid output)"
+
+chrome_profile="$(mktemp -d "${TMPDIR:-/tmp}/roma-demo-chrome.XXXXXX")"
+if lsof -nP -iTCP:"$cdp_port" -sTCP:LISTEN >/dev/null 2>&1; then
+  echo "ROMA_DEMO_CDP_PORT is already in use: $cdp_port" >&2
+  exit 2
+fi
+chrome_args=(
+  "--remote-debugging-address=127.0.0.1"
+  "--remote-debugging-port=$cdp_port"
+  "--user-data-dir=$chrome_profile"
+  "--use-fake-ui-for-media-stream"
+  "--no-first-run"
+  "--no-default-browser-check"
+)
+if [ -n "$chrome_log" ]; then
+  chrome_args+=(
+    "--enable-logging"
+    "--log-file=$chrome_log"
+    "--vmodule=audio*=2,media*=2"
+  )
+fi
+
+# LaunchServices makes the signed browser, rather than this shell's host, the
+# responsible macOS process for microphone permission checks.
+/usr/bin/open -n -g "$chrome_app" --args "${chrome_args[@]}"
+for _ in {1..50}; do
+  chrome_pid="$(find_chrome_pid)"
+  if [ -n "$chrome_pid" ]; then
+    break
+  fi
+  sleep 0.1
+done
+if [ -z "$chrome_pid" ]; then
+  echo "Could not identify the LaunchServices Chrome process." >&2
+  exit 3
+fi
+cdp_version_url="http://127.0.0.1:$cdp_port/json/version"
+cdp_version_file="$chrome_profile/cdp-version.json"
+cdp_deadline_seconds="$((SECONDS + 10))"
+while [ "$SECONDS" -lt "$cdp_deadline_seconds" ]; do
+  if curl --silent --fail --connect-timeout 0.2 --max-time 0.2 \
+      "$cdp_version_url" --output "$cdp_version_file"; then
+    break
+  fi
+  sleep 0.2
+done
+if [ ! -s "$cdp_version_file" ]; then
+  echo "Chrome did not expose its DevTools endpoint at $cdp_version_url." >&2
+  exit 3
+fi
+listener_pid="$(lsof -nP -iTCP:"$cdp_port" -sTCP:LISTEN -t | sed -n '1p')"
+if [ "$listener_pid" != "$chrome_pid" ]; then
+  echo "The DevTools listener does not belong to this test's Chrome process." >&2
+  exit 3
+fi
+node -e '
+  const version = JSON.parse(require("node:fs").readFileSync(process.argv[1], "utf8"));
+  if (!String(version.Browser).startsWith("Chrome/") || !version.webSocketDebuggerUrl) process.exit(1);
+' "$cdp_version_file"
+if [ -n "$browser_launch_report" ]; then
+  cp "$cdp_version_file" "$browser_launch_report"
+fi
+export ROMA_DEMO_CDP_ENDPOINT="http://127.0.0.1:$cdp_port"
 
 node_modules/.bin/playwright test --config playwright.real-audio.config.mjs

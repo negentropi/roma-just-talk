@@ -76,13 +76,14 @@ jobs:
           evidence="$RUNNER_TEMP/browser-demo-real-audio"
           chrome_archive="$tools/googlechrome-152.0.7977.65.dmg"
           chrome_volume="$tools/google-chrome-volume"
-          chrome_app="$tools/Google Chrome.app"
+          chrome_app="$HOME/Applications/Google Chrome.app"
           blackhole_pkg="$tools/BlackHole2ch-0.6.1.pkg"
           switch_archive="$tools/switchaudio-osx-1.2.2.tar.gz"
           switch_source="$tools/switchaudio-osx-1.2.2"
           switch_bin="$tools/bin/SwitchAudioSource"
           [ "$(uname -m)" = "arm64" ]
-          mkdir -p "$tools/bin" "$switch_source" "$evidence" "$chrome_volume"
+          mkdir -p "$tools/bin" "$switch_source" "$evidence" "$chrome_volume" "$HOME/Applications"
+          [ ! -e "$chrome_app" ]
 
           curl --fail --location --retry 3 \
             "https://dl.google.com/release2/chrome/hojsgpdatugdlbpbk6whstg6m4_152.0.7977.65/GoogleChrome-152.0.7977.65.dmg" \

@@ -99,7 +99,7 @@ jobs:
               "$switch_archive"
           } | tee "$evidence/tool-source-sha256.txt" | shasum -a 256 --check
 
-          ditto -x -k "$chrome_archive" "$tools"
+          unzip -q "$chrome_archive" -d "$tools"
 
           codesign --verify --deep --strict --verbose=2 "$chrome_app"
           chrome_version="$(defaults read "$chrome_app/Contents/Info" CFBundleShortVersionString)"
@@ -145,6 +145,7 @@ jobs:
             printf 'output='
             SwitchAudioSource -c -f json -t output
           } > "$evidence/audio-before-test.txt"
+          touch "$RUNNER_TEMP/browser-demo-audio-baseline-created"
 
       - name: Grant Chrome microphone access on the disposable Mac
         run: |
@@ -221,14 +222,19 @@ jobs:
         if: always()
         run: |
           evidence="$RUNNER_TEMP/browser-demo-real-audio"
+          marker="$RUNNER_TEMP/browser-demo-audio-baseline-created"
           mkdir -p "$evidence"
-          {
-            printf 'input='
-            SwitchAudioSource -c -f json -t input
-            printf 'output='
-            SwitchAudioSource -c -f json -t output
-          } > "$evidence/audio-after-test.txt"
-          cmp "$evidence/audio-before-test.txt" "$evidence/audio-after-test.txt"
+          if [ -f "$marker" ]; then
+            {
+              printf 'input='
+              SwitchAudioSource -c -f json -t input
+              printf 'output='
+              SwitchAudioSource -c -f json -t output
+            } > "$evidence/audio-after-test.txt"
+            cmp "$evidence/audio-before-test.txt" "$evidence/audio-after-test.txt"
+          else
+            echo "Audio route was never changed; no restoration check needed."
+          fi
 
       - name: Remove temporary Chrome microphone grant
         if: always()

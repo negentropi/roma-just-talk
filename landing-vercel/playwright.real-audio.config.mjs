@@ -2,6 +2,7 @@ import { defineConfig } from "@playwright/test";
 import baseConfig from "./playwright.config.mjs";
 
 const chromeExecutable = process.env.ROMA_DEMO_CHROME_EXECUTABLE?.trim();
+const chromeLogFile = process.env.ROMA_DEMO_CHROME_LOG?.trim();
 
 export default defineConfig(baseConfig, {
   testMatch: "**/*.real-audio.spec.mjs",
@@ -23,6 +24,11 @@ export default defineConfig(baseConfig, {
         "--use-fake-ui-for-media-stream",
         "--no-first-run",
         "--no-default-browser-check",
+        ...(chromeLogFile ? [
+          "--enable-logging",
+          `--log-file=${chromeLogFile}`,
+          "--vmodule=audio*=2,media*=2",
+        ] : []),
       ],
     },
   },

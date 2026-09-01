@@ -245,6 +245,7 @@ jobs:
           shasum -a 256 "$fixture" > "$evidence/fixture-sha256.txt"
           echo "ROMA_DEMO_AUDIO_FIXTURE=$fixture" >> "$GITHUB_ENV"
           echo "ROMA_DEMO_AUDIO_REPORT=$evidence/receipt.json" >> "$GITHUB_ENV"
+          echo "ROMA_DEMO_CHROME_LOG=$evidence/chrome-debug.log" >> "$GITHUB_ENV"
           echo "ROMA_DEMO_AUDIO_LEVEL_BEFORE=$evidence/audio-level-before-test.txt" >> "$GITHUB_ENV"
           echo "ROMA_DEMO_AUDIO_LEVEL_AFTER=$evidence/audio-level-after-test.txt" >> "$GITHUB_ENV"
           echo "ROMA_DEMO_COMPLETION_BUDGET_MS=1500" >> "$GITHUB_ENV"
@@ -261,6 +262,22 @@ jobs:
           set -o pipefail
           bash scripts/run-real-audio-e2e.sh 2>&1 \
             | tee "$RUNNER_TEMP/browser-demo-real-audio/run.log"
+
+      - name: Capture browser audio diagnostics
+        if: always()
+        run: |
+          evidence="$RUNNER_TEMP/browser-demo-real-audio"
+          mkdir -p "$evidence"
+          if ! /usr/bin/log show \
+              --last 5m \
+              --style compact \
+              --info \
+              --debug \
+              --predicate 'process == "tccd" OR process == "coreaudiod" OR process CONTAINS "Google Chrome"' \
+              > "$evidence/macos-audio.log" \
+              2> "$evidence/macos-audio.stderr.log"; then
+            echo "macOS unified-log collection failed." >> "$evidence/macos-audio.stderr.log"
+          fi
 
       - name: Record restored audio route
         if: always()

@@ -217,13 +217,13 @@ jobs:
       - name: Download pinned public WAV fixture
         run: |
           evidence="$RUNNER_TEMP/browser-demo-real-audio"
-          fixture="$evidence/fleurs_en_test_3529855487992513201.wav"
+          fixture="$evidence/jfk-eacbd823.wav"
           mkdir -p "$evidence"
           curl --fail --location --retry 3 \
-            "https://huggingface.co/datasets/podscripter-project/test-fixtures/resolve/6e1c1eced6e68bb35b1f1d89c56478229201a2f7/en/fleurs_en_test_3529855487992513201.wav" \
+            "https://raw.githubusercontent.com/ggerganov/whisper.cpp/eacbd8234c6654cdbf2c377f72b2106875479bdc/samples/jfk.wav" \
             --output "$fixture"
           printf '%s  %s\n' \
-            "b15246f0a22a7de701f6a6abd331edc7817ddd8795f3911af5e1c1d51cc77784" \
+            "59dfb9a4acb36fe2a2affc14bacbee2920ff435cb13cc314a08c13f66ba7860e" \
             "$fixture" \
             | shasum -a 256 --check
           shasum -a 256 "$fixture" > "$evidence/fixture-sha256.txt"
@@ -233,7 +233,7 @@ jobs:
           echo "ROMA_DEMO_MAXIMUM_WER=0.15" >> "$GITHUB_ENV"
           {
             echo 'ROMA_DEMO_EXPECTED_TRANSCRIPT<<ROMA_TRANSCRIPT'
-            echo "This seems sensible, because the Earth doesn't feel as if it's moving, does it?"
+            echo "And so, my fellow Americans, ask not what your country can do for you, ask what you can do for your country."
             echo 'ROMA_TRANSCRIPT'
           } >> "$GITHUB_ENV"
 

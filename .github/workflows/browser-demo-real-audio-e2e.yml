@@ -1,0 +1,268 @@
+name: Browser demo real-audio E2E
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "ci/browser-demo-real-audio-*"
+    paths:
+      - ".github/workflows/browser-demo-real-audio-e2e.yml"
+      - "landing-vercel/demo/**"
+      - "landing-vercel/e2e/demo.real-audio.spec.mjs"
+      - "landing-vercel/package-lock.json"
+      - "landing-vercel/package.json"
+      - "landing-vercel/playwright.config.mjs"
+      - "landing-vercel/playwright.real-audio.config.mjs"
+      - "landing-vercel/scripts/demo-server.mjs"
+      - "landing-vercel/scripts/run-real-audio-e2e.sh"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: browser-demo-real-audio
+  cancel-in-progress: false
+  queue: max
+
+jobs:
+  chrome-blackhole:
+    name: Chrome, BlackHole, WAV, Left Shift
+    runs-on: namespace-profile-roma-jt
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Require a fresh Namespace Mac
+        run: |
+          case "$RUNNER_NAME" in
+            nsc-runner-*) ;;
+            *)
+              echo "Real-audio E2E requires a Namespace macOS runner." >&2
+              exit 2
+              ;;
+          esac
+          runner_instance_id="${RUNNER_NAME#nsc-runner-}"
+          test -n "$runner_instance_id"
+          boot_epoch="$(
+            sysctl -n kern.boottime \
+              | sed -E 's/^\{ sec = ([0-9]+),.*/\1/'
+          )"
+          boot_session_uuid="$(sysctl -n kern.bootsessionuuid)"
+          [[ "$boot_epoch" =~ ^[0-9]+$ ]]
+          [[ "$boot_session_uuid" =~ ^[0-9A-Fa-f-]{36}$ ]]
+          boot_age_seconds="$(( $(date +%s) - boot_epoch ))"
+          [ "$boot_age_seconds" -ge 0 ]
+          [ "$boot_age_seconds" -le 900 ]
+          {
+            printf 'runner_name=%s\n' "$RUNNER_NAME"
+            printf 'runner_instance_id=%s\n' "$runner_instance_id"
+            printf 'boot_session_uuid=%s\n' "$boot_session_uuid"
+            printf 'boot_age_seconds_at_job_start=%s\n' "$boot_age_seconds"
+            printf 'macos_version=%s\n' "$(sw_vers -productVersion)"
+            printf 'macos_build=%s\n' "$(sw_vers -buildVersion)"
+          } > "$RUNNER_TEMP/browser-demo-runner.txt"
+
+      - name: Install pinned Chrome and loopback audio tools
+        run: |
+          set -u
+          tools="$RUNNER_TEMP/browser-demo-tools"
+          evidence="$RUNNER_TEMP/browser-demo-real-audio"
+          chrome_archive="$tools/chrome-for-testing-152.0.7977.64.zip"
+          chrome_app="$tools/chrome-mac-arm64/Google Chrome for Testing.app"
+          blackhole_pkg="$tools/BlackHole2ch-0.7.1.pkg"
+          switch_archive="$tools/switchaudio-osx-1.2.2.tar.gz"
+          switch_source="$tools/switchaudio-osx-1.2.2"
+          switch_bin="$tools/bin/SwitchAudioSource"
+          [ "$(uname -m)" = "arm64" ]
+          mkdir -p "$tools/bin" "$switch_source" "$evidence"
+
+          curl --fail --location --retry 3 \
+            "https://storage.googleapis.com/chrome-for-testing-public/152.0.7977.64/mac-arm64/chrome-mac-arm64.zip" \
+            --output "$chrome_archive"
+          curl --fail --location --retry 3 \
+            "https://existential.audio/downloads/BlackHole2ch-0.7.1.pkg" \
+            --output "$blackhole_pkg"
+          curl --fail --location --retry 3 \
+            "https://github.com/deweller/switchaudio-osx/archive/refs/tags/1.2.2.tar.gz" \
+            --output "$switch_archive"
+          {
+            printf '%s  %s\n' \
+              "10033804338bd0a5aa098149a8dd64f3f2e0e8b201bf3d400d7c17d067ff696f" \
+              "$chrome_archive"
+            printf '%s  %s\n' \
+              "57b540f27a3e29c37e310e01bee0fdfab76733087e47f997ef9dccf851400dcf" \
+              "$blackhole_pkg"
+            printf '%s  %s\n' \
+              "3d12b57cbd6063a643a12f12287af99c87894c33449c6bcac0a71fd15776b3ed" \
+              "$switch_archive"
+          } | tee "$evidence/tool-source-sha256.txt" | shasum -a 256 --check
+
+          ditto -x -k "$chrome_archive" "$tools"
+
+          codesign --verify --deep --strict --verbose=2 "$chrome_app"
+          chrome_version="$(defaults read "$chrome_app/Contents/Info" CFBundleShortVersionString)"
+          chrome_bundle_id="$(defaults read "$chrome_app/Contents/Info" CFBundleIdentifier)"
+          chrome_team_id="$(codesign -dv --verbose=4 "$chrome_app" 2>&1 | sed -n 's/^TeamIdentifier=//p')"
+          [ "$chrome_version" = "152.0.7977.64" ]
+          [ "$chrome_bundle_id" = "com.google.chrome.for.testing" ]
+          [ "$chrome_team_id" = "EQHXZ8M8AV" ]
+
+          sudo installer -pkg "$blackhole_pkg" -target / > "$evidence/blackhole-install.log"
+          tar -xzf "$switch_archive" --strip-components=1 -C "$switch_source"
+          xcodebuild \
+            -project "$switch_source/AudioSwitcher.xcodeproj" \
+            -target SwitchAudioSource \
+            "SYMROOT=$tools/switchaudio-build" \
+            -arch "$(uname -m)" \
+            "MACOSX_DEPLOYMENT_TARGET=$(sw_vers -productVersion | cut -d. -f1,2)" \
+            > "$evidence/switchaudio-build.log"
+          install -m 0755 "$tools/switchaudio-build/Release/SwitchAudioSource" "$switch_bin"
+          export PATH="$tools/bin:$PATH"
+          echo "$tools/bin" >> "$GITHUB_PATH"
+          echo "ROMA_DEMO_CHROME_APP=$chrome_app" >> "$GITHUB_ENV"
+          echo "ROMA_DEMO_CHROME_BUNDLE_ID=$chrome_bundle_id" >> "$GITHUB_ENV"
+          echo "ROMA_DEMO_CHROME_EXECUTABLE=$chrome_app/Contents/MacOS/Google Chrome for Testing" >> "$GITHUB_ENV"
+
+          sudo killall coreaudiod 2>/dev/null || true
+          sleep 4
+          SwitchAudioSource -a -f json > "$RUNNER_TEMP/browser-demo-audio-devices.json"
+          SwitchAudioSource -a -t input | grep -Fx "BlackHole 2ch"
+          SwitchAudioSource -a -t output | grep -Fx "BlackHole 2ch"
+          {
+            printf 'chrome_version=%s\n' "$chrome_version"
+            printf 'chrome_bundle_id=%s\n' "$chrome_bundle_id"
+            printf 'chrome_team_id=%s\n' "$chrome_team_id"
+            printf 'blackhole_version=0.7.1\n'
+            printf 'switchaudio_version=1.2.2\n'
+            shasum -a 256 "$switch_bin"
+            pkgutil --pkg-info audio.existential.BlackHole2ch
+          } > "$RUNNER_TEMP/browser-demo-tool-versions.txt"
+          {
+            printf 'input='
+            SwitchAudioSource -c -f json -t input
+            printf 'output='
+            SwitchAudioSource -c -f json -t output
+          } > "$evidence/audio-before-test.txt"
+
+      - name: Grant Chrome microphone access on the disposable Mac
+        run: |
+          chrome_app="$ROMA_DEMO_CHROME_APP"
+          chrome_bundle_id="$ROMA_DEMO_CHROME_BUNDLE_ID"
+          tcc_db="$HOME/Library/Application Support/com.apple.TCC/TCC.db"
+          csreq_file="$RUNNER_TEMP/google-chrome.csreq"
+          requirement="$(
+            codesign -dr - "$chrome_app" 2>&1 \
+              | sed -n -e 's/^# designated => //p' -e 's/^designated => //p'
+          )"
+          test -n "$requirement"
+          printf '%s\n' "$requirement" | csreq -r- -b "$csreq_file"
+          test -s "$csreq_file"
+          existing_count="$(sqlite3 "$tcc_db" \
+            "SELECT count(*) FROM access WHERE service='kTCCServiceMicrophone' AND client='$chrome_bundle_id';")"
+          if [ "$existing_count" != 0 ]; then
+            echo "Namespace Mac already has a Chrome microphone TCC row." >&2
+            exit 3
+          fi
+          touch "$RUNNER_TEMP/browser-demo-chrome-tcc-created"
+          killall tccd 2>/dev/null || true
+          sudo killall tccd 2>/dev/null || true
+          sqlite3 "$tcc_db" "
+            INSERT INTO access (
+              service,client,client_type,auth_value,auth_reason,auth_version,csreq,
+              indirect_object_identifier_type,indirect_object_identifier,flags
+            ) VALUES (
+              'kTCCServiceMicrophone','$chrome_bundle_id',0,2,4,1,
+              readfile('$csreq_file'),0,'UNUSED',0
+            );
+          "
+          sqlite3 -json "$tcc_db" \
+            "SELECT service,client,auth_value,auth_reason,length(csreq) AS csreq_length FROM access WHERE service='kTCCServiceMicrophone' AND client='$chrome_bundle_id';" \
+            > "$RUNNER_TEMP/browser-demo-chrome-tcc.json"
+          killall tccd 2>/dev/null || true
+          sudo killall tccd 2>/dev/null || true
+
+      - name: Install browser test dependencies
+        working-directory: landing-vercel
+        run: npm ci
+
+      - name: Download pinned public WAV fixture
+        run: |
+          evidence="$RUNNER_TEMP/browser-demo-real-audio"
+          fixture="$evidence/fleurs_en_test_3529855487992513201.wav"
+          mkdir -p "$evidence"
+          curl --fail --location --retry 3 \
+            "https://huggingface.co/datasets/podscripter-project/test-fixtures/resolve/6e1c1eced6e68bb35b1f1d89c56478229201a2f7/en/fleurs_en_test_3529855487992513201.wav" \
+            --output "$fixture"
+          printf '%s  %s\n' \
+            "b15246f0a22a7de701f6a6abd331edc7817ddd8795f3911af5e1c1d51cc77784" \
+            "$fixture" \
+            | shasum -a 256 --check
+          shasum -a 256 "$fixture" > "$evidence/fixture-sha256.txt"
+          echo "ROMA_DEMO_AUDIO_FIXTURE=$fixture" >> "$GITHUB_ENV"
+          echo "ROMA_DEMO_AUDIO_REPORT=$evidence/receipt.json" >> "$GITHUB_ENV"
+          echo "ROMA_DEMO_COMPLETION_BUDGET_MS=1500" >> "$GITHUB_ENV"
+          echo "ROMA_DEMO_MAXIMUM_WER=0.15" >> "$GITHUB_ENV"
+          {
+            echo 'ROMA_DEMO_EXPECTED_TRANSCRIPT<<ROMA_TRANSCRIPT'
+            echo "This seems sensible, because the Earth doesn't feel as if it's moving, does it?"
+            echo 'ROMA_TRANSCRIPT'
+          } >> "$GITHUB_ENV"
+
+      - name: Run real browser speech E2E
+        working-directory: landing-vercel
+        run: |
+          set -o pipefail
+          bash scripts/run-real-audio-e2e.sh 2>&1 \
+            | tee "$RUNNER_TEMP/browser-demo-real-audio/run.log"
+
+      - name: Record restored audio route
+        if: always()
+        run: |
+          evidence="$RUNNER_TEMP/browser-demo-real-audio"
+          mkdir -p "$evidence"
+          {
+            printf 'input='
+            SwitchAudioSource -c -f json -t input
+            printf 'output='
+            SwitchAudioSource -c -f json -t output
+          } > "$evidence/audio-after-test.txt"
+          cmp "$evidence/audio-before-test.txt" "$evidence/audio-after-test.txt"
+
+      - name: Remove temporary Chrome microphone grant
+        if: always()
+        run: |
+          marker="$RUNNER_TEMP/browser-demo-chrome-tcc-created"
+          tcc_db="$HOME/Library/Application Support/com.apple.TCC/TCC.db"
+          chrome_bundle_id="$ROMA_DEMO_CHROME_BUNDLE_ID"
+          if [ -f "$marker" ]; then
+            sqlite3 "$tcc_db" \
+              "DELETE FROM access WHERE service='kTCCServiceMicrophone' AND client='$chrome_bundle_id' AND client_type=0 AND auth_reason=4;"
+            remaining_count="$(sqlite3 "$tcc_db" \
+              "SELECT count(*) FROM access WHERE service='kTCCServiceMicrophone' AND client='$chrome_bundle_id';")"
+            [ "$remaining_count" = 0 ]
+            rm "$marker"
+            killall tccd 2>/dev/null || true
+            sudo killall tccd 2>/dev/null || true
+          fi
+          sqlite3 -json "$tcc_db" \
+            "SELECT service,client,auth_value,auth_reason FROM access WHERE service='kTCCServiceMicrophone' AND client='$chrome_bundle_id';" \
+            > "$RUNNER_TEMP/browser-demo-chrome-tcc-after-cleanup.json"
+
+      - name: Upload real-audio evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: browser-demo-real-audio-evidence
+          path: |
+            ${{ runner.temp }}/browser-demo-runner.txt
+            ${{ runner.temp }}/browser-demo-audio-devices.json
+            ${{ runner.temp }}/browser-demo-tool-versions.txt
+            ${{ runner.temp }}/browser-demo-chrome-tcc.json
+            ${{ runner.temp }}/browser-demo-chrome-tcc-after-cleanup.json
+            ${{ runner.temp }}/browser-demo-real-audio
+            landing-vercel/playwright-report-real-audio
+            landing-vercel/test-results
+          if-no-files-found: error
+          retention-days: 7

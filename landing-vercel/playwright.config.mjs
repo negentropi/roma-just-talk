@@ -18,6 +18,7 @@ const baseURL = `http://127.0.0.1:${port}`;
 
 export default defineConfig({
   testDir: "./e2e",
+  testIgnore: "**/*.real-audio.spec.mjs",
   timeout: 20_000,
   expect: { timeout: 5_000 },
   fullyParallel: false,

@@ -1,7 +1,10 @@
 e2e/
 node_modules/
 playwright-report/
+playwright-report-real-audio/
 scripts/demo-server.mjs
+scripts/run-real-audio-e2e.sh
 test-results/
 demo/*.test.mjs
 playwright.config.mjs
+playwright.real-audio.config.mjs

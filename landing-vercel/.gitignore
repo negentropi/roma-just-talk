@@ -1,3 +1,4 @@
 node_modules/
 playwright-report/
+playwright-report-real-audio/
 test-results/

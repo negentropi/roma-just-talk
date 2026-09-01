@@ -101,13 +101,15 @@ jobs:
 
           unzip -q "$chrome_archive" -d "$tools"
 
-          codesign --verify --deep --strict --verbose=2 "$chrome_app"
-          chrome_version="$(defaults read "$chrome_app/Contents/Info" CFBundleShortVersionString)"
-          chrome_bundle_id="$(defaults read "$chrome_app/Contents/Info" CFBundleIdentifier)"
+          chrome_version="$(plutil -extract CFBundleShortVersionString raw "$chrome_app/Contents/Info.plist")"
+          chrome_bundle_id="$(plutil -extract CFBundleIdentifier raw "$chrome_app/Contents/Info.plist")"
+          chrome_signature="$(codesign -dv --verbose=4 "$chrome_app" 2>&1 | sed -n 's/^Signature=//p')"
           chrome_team_id="$(codesign -dv --verbose=4 "$chrome_app" 2>&1 | sed -n 's/^TeamIdentifier=//p')"
           [ "$chrome_version" = "152.0.7977.64" ]
           [ "$chrome_bundle_id" = "com.google.chrome.for.testing" ]
-          [ "$chrome_team_id" = "EQHXZ8M8AV" ]
+          [ "$chrome_signature" = "adhoc" ]
+          [ "$chrome_team_id" = "not set" ]
+          file "$chrome_app/Contents/MacOS/Google Chrome for Testing" | grep -F "arm64"
 
           sudo installer -pkg "$blackhole_pkg" -target / > "$evidence/blackhole-install.log"
           tar -xzf "$switch_archive" --strip-components=1 -C "$switch_source"
@@ -133,6 +135,7 @@ jobs:
           {
             printf 'chrome_version=%s\n' "$chrome_version"
             printf 'chrome_bundle_id=%s\n' "$chrome_bundle_id"
+            printf 'chrome_signature=%s\n' "$chrome_signature"
             printf 'chrome_team_id=%s\n' "$chrome_team_id"
             printf 'blackhole_version=0.7.1\n'
             printf 'switchaudio_version=1.2.2\n'

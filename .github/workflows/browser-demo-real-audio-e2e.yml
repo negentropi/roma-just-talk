@@ -9,6 +9,8 @@ on:
       - ".github/workflows/browser-demo-real-audio-e2e.yml"
       - "landing-vercel/demo/**"
       - "landing-vercel/e2e/demo.real-audio.spec.mjs"
+      - "landing-vercel/e2e/real-audio-loopback.mjs"
+      - "landing-vercel/e2e/wave-audio.mjs"
       - "landing-vercel/package-lock.json"
       - "landing-vercel/package.json"
       - "landing-vercel/playwright.config.mjs"

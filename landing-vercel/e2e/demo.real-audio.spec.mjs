@@ -3,11 +3,15 @@ import { spawn } from "node:child_process";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { performance } from "node:perf_hooks";
+import { measureLoopback } from "./real-audio-loopback.mjs";
+import { pcm16WaveRmsDecibelsFullScale } from "./wave-audio.mjs";
 
 const AUDIO_LEAD_MS = 1_100;
 const DEFAULT_COMPLETION_BUDGET_MS = 1_500;
 const DEFAULT_MAXIMUM_WORD_ERROR_RATE = 0.15;
 const MINIMUM_FIXTURE_RMS_DBFS = -30;
+const MINIMUM_LOOPBACK_RMS_DBFS = -35;
+const MINIMUM_LOOPBACK_CORRELATION = 0.65;
 
 function requiredEnvironment(name) {
   const value = process.env[name]?.trim();
@@ -43,46 +47,6 @@ function wordErrorRate(expectedWords, actualWords) {
     }
   }
   return row.at(-1) / Math.max(1, expectedWords.length);
-}
-
-function pcm16WaveRmsDecibelsFullScale(buffer) {
-  if (buffer.toString("ascii", 0, 4) !== "RIFF" || buffer.toString("ascii", 8, 12) !== "WAVE") {
-    throw new Error("The real-audio fixture must be a RIFF/WAVE file.");
-  }
-
-  let format;
-  let dataStart;
-  let dataSize;
-  for (let offset = 12; offset + 8 <= buffer.length;) {
-    const chunkId = buffer.toString("ascii", offset, offset + 4);
-    const chunkSize = buffer.readUInt32LE(offset + 4);
-    const chunkStart = offset + 8;
-    const chunkEnd = chunkStart + chunkSize;
-    if (chunkEnd > buffer.length) throw new Error(`Invalid ${chunkId} chunk in the WAV fixture.`);
-    if (chunkId === "fmt ") {
-      format = {
-        audioFormat: buffer.readUInt16LE(chunkStart),
-        bitsPerSample: buffer.readUInt16LE(chunkStart + 14),
-      };
-    } else if (chunkId === "data") {
-      dataStart = chunkStart;
-      dataSize = chunkSize;
-    }
-    offset = chunkEnd + (chunkSize % 2);
-  }
-
-  if (format?.audioFormat !== 1 || format.bitsPerSample !== 16 || dataStart === undefined || !dataSize) {
-    throw new Error("The real-audio fixture must contain 16-bit PCM samples.");
-  }
-
-  const sampleCount = Math.floor(dataSize / 2);
-  let squaredTotal = 0;
-  for (let offset = dataStart; offset < dataStart + sampleCount * 2; offset += 2) {
-    const sample = buffer.readInt16LE(offset) / 32_768;
-    squaredTotal += sample * sample;
-  }
-  const rms = Math.sqrt(squaredTotal / sampleCount);
-  return rms > 0 ? 20 * Math.log10(rms) : Number.NEGATIVE_INFINITY;
 }
 
 function waitForPlayback(playback) {
@@ -183,6 +147,15 @@ test("afplay starts 1.1 seconds before Left Shift and finishes as timely text", 
     const fixtureRmsDecibelsFullScale = pcm16WaveRmsDecibelsFullScale(await readFile(fixture));
     report.fixtureRmsDecibelsFullScale = fixtureRmsDecibelsFullScale;
     expect(fixtureRmsDecibelsFullScale).toBeGreaterThanOrEqual(MINIMUM_FIXTURE_RMS_DBFS);
+
+    const probePage = await page.context().newPage();
+    const loopback = await measureLoopback(probePage, baseURL, fixture)
+      .finally(() => probePage.close());
+    report.loopback = loopback;
+    expect(loopback.inputLabel).toContain(audioDevice);
+    expect(loopback.recordedSeconds).toBeGreaterThanOrEqual(1.5);
+    expect(loopback.rmsDecibelsFullScale).toBeGreaterThanOrEqual(MINIMUM_LOOPBACK_RMS_DBFS);
+    expect(loopback.fixtureEnvelopeCorrelation).toBeGreaterThanOrEqual(MINIMUM_LOOPBACK_CORRELATION);
 
     const response = await page.goto(`${baseURL}/demo`);
     expect(response?.status()).toBe(200);

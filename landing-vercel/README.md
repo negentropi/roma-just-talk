@@ -26,9 +26,11 @@ The separate macOS hardware lane proves the part that suite cannot: it starts a
 real WAV player 1.1 seconds before Left Shift, routes the WAV through BlackHole
 into Chrome, waits for playback to finish, and then releases Shift. The expected
 opening word proves pre-trigger audio reached Chrome. The lane rejects fixtures
-below -30 dBFS RMS, records accuracy and key-up latency from Chrome's real speech
-service, then restores and verifies the original input and output. CI uses the
-public `samples/jfk.wav` fixture pinned to a whisper.cpp commit and SHA-256.
+below -30 dBFS RMS and records a short, isolated BlackHole loopback before it
+starts speech recognition. It then records accuracy and key-up latency from
+Chrome's real speech service, restores, and verifies the original input and
+output. CI uses the public `samples/jfk.wav` fixture pinned to a whisper.cpp
+commit and SHA-256.
 
 ```sh
 ROMA_DEMO_AUDIO_FIXTURE=/absolute/path/to/fixture.wav \

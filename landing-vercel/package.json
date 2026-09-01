@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "node scripts/demo-server.mjs",
-    "test": "node --test demo/*.test.mjs",
+    "test": "node --test demo/*.test.mjs test/*.test.mjs",
     "test:e2e": "playwright test",
     "test:e2e:audio": "bash scripts/run-real-audio-e2e.sh"
   },

@@ -192,6 +192,13 @@ jobs:
         run: |
           npm ci
           ./node_modules/.bin/playwright install ffmpeg
+          ffmpeg_bin="$HOME/Library/Caches/ms-playwright/ffmpeg-1011/ffmpeg-mac"
+          printf '%s  %s\n' \
+            "662398c99429f5493ff0ff40cdcd97ea25132addcbdedafd0741389964147825" \
+            "$ffmpeg_bin" \
+            | shasum -a 256 --check
+          file "$ffmpeg_bin" | grep -F "arm64"
+          shasum -a 256 "$ffmpeg_bin" >> "$RUNNER_TEMP/browser-demo-tool-versions.txt"
 
       - name: Download pinned public WAV fixture
         run: |

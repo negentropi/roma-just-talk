@@ -28,6 +28,7 @@ chrome_app="${ROMA_DEMO_CHROME_APP:-/Applications/Google Chrome.app}"
 chrome_log="${ROMA_DEMO_CHROME_LOG:-}"
 cdp_port="${ROMA_DEMO_CDP_PORT:-9222}"
 browser_launch_report="${ROMA_DEMO_BROWSER_LAUNCH_REPORT:-}"
+browser_state_file="${ROMA_DEMO_BROWSER_STATE_FILE:-}"
 
 if [ -z "$fixture" ] || [ ! -f "$fixture" ]; then
   echo "ROMA_DEMO_AUDIO_FIXTURE must name an existing WAV file." >&2
@@ -176,15 +177,38 @@ chrome_profile_process_pids() {
       let rows = "";
       process.stdin.on("data", (chunk) => { rows += chunk; });
       process.stdin.on("end", () => {
-        const profile = `--user-data-dir=${process.argv[1]}`;
+        const appPrefix = `${process.argv[1]}/Contents/`;
+        const profile = `--user-data-dir=${process.argv[2]}`;
         const matches = rows.split("\n").map((row) => row.trim()).filter((row) => {
           const separator = row.indexOf(" ");
           const command = separator === -1 ? "" : row.slice(separator + 1).trim();
-          return command.endsWith(` ${profile}`) || command.includes(` ${profile} `);
+          const profileMatches = command.endsWith(` ${profile}`) || command.includes(` ${profile} `);
+          return command.startsWith(appPrefix) && profileMatches;
         });
         process.stdout.write(matches.map((row) => row.slice(0, row.indexOf(" "))).join("\n"));
       });
-    ' "$chrome_profile"
+    ' "$chrome_app" "$chrome_profile"
+}
+
+chrome_microphone_process_pids() {
+  ps -ww -axo pid=,command= \
+    | node -e '
+      let rows = "";
+      process.stdin.on("data", (chunk) => { rows += chunk; });
+      process.stdin.on("end", () => {
+        const app = process.argv[1];
+        const main = `${app}/Contents/MacOS/Google Chrome`;
+        const helperPrefix = `${app}/Contents/Frameworks/Google Chrome Framework.framework/Versions/`;
+        const matches = rows.split("\n").map((row) => row.trim()).filter((row) => {
+          const separator = row.indexOf(" ");
+          const command = separator === -1 ? "" : row.slice(separator + 1).trim();
+          const isMain = command === main || command.startsWith(`${main} `);
+          const isHelper = command.startsWith(helperPrefix) && command.includes("/Helpers/Google Chrome Helper");
+          return isMain || isHelper;
+        });
+        process.stdout.write(matches.map((row) => row.slice(0, row.indexOf(" "))).join("\n"));
+      });
+    ' "$chrome_app"
 }
 
 chrome_profile_clear() {
@@ -220,31 +244,53 @@ find_chrome_pid() {
 
 stop_browser() {
   local matching_pids=""
+  local microphone_pids=""
   local profile_check=0
   local profile_clear=false
   if [ -z "$chrome_profile" ]; then
     return 0
   fi
-  if [ -z "$chrome_pid" ]; then
-    chrome_pid="$(find_chrome_pid)"
+  if ! matching_pids="$(chrome_profile_process_pids)"; then
+    echo "Could not inspect the real-audio test's Chrome processes." >&2
+    return 1
   fi
-  if [ -n "$chrome_pid" ] && kill -0 "$chrome_pid" 2>/dev/null; then
-    matching_pids="$(chrome_process_pids)"
-    if ! printf '%s\n' "$matching_pids" | grep -Fx "$chrome_pid" >/dev/null; then
-      echo "Refusing to stop a process that is not this test's Chrome instance." >&2
+  while IFS= read -r matching_pid; do
+    if [ -n "$matching_pid" ] && ! kill "$matching_pid" 2>/dev/null \
+      && kill -0 "$matching_pid" 2>/dev/null; then
+      echo "Could not stop real-audio Chrome process $matching_pid." >&2
       return 1
     fi
-    kill "$chrome_pid"
-    for _ in {1..50}; do
-      if ! kill -0 "$chrome_pid" 2>/dev/null; then
+  done <<< "$matching_pids"
+  for _ in {1..50}; do
+    if ! matching_pids="$(chrome_profile_process_pids)"; then
+      echo "Could not inspect the real-audio test's Chrome processes." >&2
+      return 1
+    fi
+    if [ -z "$matching_pids" ]; then
+      break
+    fi
+    sleep 0.1
+  done
+  if [ -n "$matching_pids" ]; then
+    while IFS= read -r matching_pid; do
+      if [ -n "$matching_pid" ]; then
+        kill -KILL "$matching_pid" 2>/dev/null || true
+      fi
+    done <<< "$matching_pids"
+    for _ in {1..20}; do
+      if ! matching_pids="$(chrome_profile_process_pids)"; then
+        echo "Could not inspect the real-audio test's Chrome processes." >&2
+        return 1
+      fi
+      if [ -z "$matching_pids" ]; then
         break
       fi
       sleep 0.1
     done
-    if kill -0 "$chrome_pid" 2>/dev/null; then
-      echo "Chrome did not stop after the real-audio E2E." >&2
-      return 1
-    fi
+  fi
+  if [ -n "$matching_pids" ]; then
+    echo "Chrome did not stop after the real-audio E2E: $matching_pids" >&2
+    return 1
   fi
   for _ in {1..50}; do
     if chrome_profile_clear; then
@@ -262,6 +308,20 @@ stop_browser() {
     echo "Chrome processes still reference the real-audio test profile." >&2
     return 1
   fi
+  for _ in {1..50}; do
+    if ! microphone_pids="$(chrome_microphone_process_pids)"; then
+      echo "Could not inspect Chrome microphone-client processes." >&2
+      return 1
+    fi
+    if [ -z "$microphone_pids" ]; then
+      break
+    fi
+    sleep 0.1
+  done
+  if [ -n "$microphone_pids" ]; then
+    echo "Chrome microphone-client processes are still running: $microphone_pids" >&2
+    return 1
+  fi
   case "$chrome_profile" in
     "${TMPDIR:-/tmp}"/roma-demo-chrome.*) rm -r "$chrome_profile" ;;
     *)
@@ -275,7 +335,12 @@ finish() {
   local test_exit=$?
   local cleanup_exit=0
   trap - EXIT
-  if ! stop_browser; then
+  if stop_browser; then
+    if [ -n "$browser_state_file" ] && ! printf 'stopped\n' > "$browser_state_file"; then
+      echo "Could not record that the browser stopped." >&2
+      cleanup_exit=4
+    fi
+  else
     cleanup_exit=4
   fi
   if ! restore_audio; then
@@ -343,6 +408,9 @@ fi
 
 # LaunchServices makes the signed browser, rather than this shell's host, the
 # responsible macOS process for microphone permission checks.
+if [ -n "$browser_state_file" ]; then
+  printf 'running\n' > "$browser_state_file"
+fi
 /usr/bin/open -n -g "$chrome_app" --args "${chrome_args[@]}"
 for _ in {1..50}; do
   chrome_pid="$(find_chrome_pid)"

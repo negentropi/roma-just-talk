@@ -1,10 +1,9 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
-import { performance } from "node:perf_hooks";
 import { maximizeLoopbackOutput, measureLoopback } from "./real-audio-loopback.mjs";
 import { playWave, stopWave } from "./real-audio-playback.mjs";
 import { expect, test } from "./real-audio-test.mjs";
-import { pcm16WaveRmsDecibelsFullScale } from "./wave-audio.mjs";
+import { pcm16WaveDurationSeconds, pcm16WaveRmsDecibelsFullScale } from "./wave-audio.mjs";
 
 const AUDIO_LEAD_MS = 1_100;
 const DEFAULT_COMPLETION_BUDGET_MS = 1_500;
@@ -12,11 +11,35 @@ const DEFAULT_MAXIMUM_WORD_ERROR_RATE = 0.15;
 const MINIMUM_FIXTURE_RMS_DBFS = -30;
 const MINIMUM_LOOPBACK_RMS_DBFS = -35;
 const MINIMUM_LOOPBACK_CORRELATION = 0.65;
+const MAXIMUM_CALLBACK_DURATION_ERROR_MS = 250;
+const MAXIMUM_CLOCK_ALIGNMENT_ERROR_MS = 25;
 
 function requiredEnvironment(name) {
   const value = process.env[name]?.trim();
   if (!value) throw new Error(`${name} is required for the real-audio E2E.`);
   return value;
+}
+
+function elapsedMilliseconds(laterNanoseconds, earlierNanoseconds) {
+  return Number(laterNanoseconds - earlierNanoseconds) / 1_000_000;
+}
+
+function receiveCallbackTimestamp(callbackContinuousNanoseconds, callbackEpochNanoseconds) {
+  const receivedEpochNanoseconds = BigInt(Date.now()) * 1_000_000n;
+  const receivedContinuousNanoseconds = process.hrtime.bigint();
+  const continuousDeliveryMilliseconds = elapsedMilliseconds(
+    receivedContinuousNanoseconds,
+    callbackContinuousNanoseconds,
+  );
+  const epochDeliveryMilliseconds = elapsedMilliseconds(
+    receivedEpochNanoseconds,
+    callbackEpochNanoseconds,
+  );
+  return {
+    alignmentErrorMilliseconds: Math.abs(continuousDeliveryMilliseconds - epochDeliveryMilliseconds),
+    continuousDeliveryMilliseconds,
+    epochDeliveryMilliseconds,
+  };
 }
 
 function normalizedWords(text) {
@@ -119,8 +142,11 @@ test("WAV starts 1.1 seconds before Left Shift and finishes as timely text", asy
   });
 
   try {
-    const fixtureRmsDecibelsFullScale = pcm16WaveRmsDecibelsFullScale(await readFile(fixture));
+    const fixtureBuffer = await readFile(fixture);
+    const fixtureRmsDecibelsFullScale = pcm16WaveRmsDecibelsFullScale(fixtureBuffer);
+    const fixtureDurationMilliseconds = pcm16WaveDurationSeconds(fixtureBuffer) * 1_000;
     report.fixtureRmsDecibelsFullScale = fixtureRmsDecibelsFullScale;
+    report.fixtureDurationMilliseconds = fixtureDurationMilliseconds;
     expect(fixtureRmsDecibelsFullScale).toBeGreaterThanOrEqual(MINIMUM_FIXTURE_RMS_DBFS);
 
     const probePage = await page.context().newPage();
@@ -156,19 +182,55 @@ test("WAV starts 1.1 seconds before Left Shift and finishes as timely text", asy
     });
     playbackFinished = playback.finished;
     playbackFinished.catch(() => {});
-    report.audioPlaybackStarted = await playback.started;
-    const audioStartedAt = performance.now();
-    const audioStartedEpochMs = Date.now();
-    const waitBeforeShift = Math.max(0, AUDIO_LEAD_MS - (performance.now() - audioStartedAt));
+    const playbackStart = await playback.started;
+    const startClockAlignment = receiveCallbackTimestamp(
+      playbackStart.callbackContinuousNanoseconds,
+      playbackStart.callbackEpochNanoseconds,
+    );
+    report.audioPlaybackStarted = playbackStart.marker;
+    report.audioPlaybackStartContinuousNanoseconds = playbackStart.callbackContinuousNanoseconds.toString();
+    report.audioPlaybackStartEpochNanoseconds = playbackStart.callbackEpochNanoseconds.toString();
+    report.audioPlaybackStartClockAlignment = startClockAlignment;
+    expect(startClockAlignment.continuousDeliveryMilliseconds).toBeGreaterThanOrEqual(0);
+    expect(startClockAlignment.continuousDeliveryMilliseconds).toBeLessThanOrEqual(500);
+    expect(startClockAlignment.epochDeliveryMilliseconds).toBeGreaterThanOrEqual(-2);
+    expect(startClockAlignment.epochDeliveryMilliseconds).toBeLessThanOrEqual(500);
+    expect(startClockAlignment.alignmentErrorMilliseconds).toBeLessThanOrEqual(MAXIMUM_CLOCK_ALIGNMENT_ERROR_MS);
+    const waitBeforeShift = Math.max(0, AUDIO_LEAD_MS - elapsedMilliseconds(
+      process.hrtime.bigint(),
+      playbackStart.callbackContinuousNanoseconds,
+    ));
     await new Promise((resolveDelay) => setTimeout(resolveDelay, waitBeforeShift));
 
+    const shiftDownSendStartedEpochNanoseconds = BigInt(Date.now()) * 1_000_000n;
+    const shiftDownSendStartedNanoseconds = process.hrtime.bigint();
     await page.keyboard.down("Shift");
+    const shiftDownSendFinishedNanoseconds = process.hrtime.bigint();
+    const shiftDownSendFinishedEpochNanoseconds = BigInt(Date.now()) * 1_000_000n;
     shiftHeld = true;
     await expect(root).toHaveAttribute("data-phase", "capturing");
-    report.audioPlayback = await playbackFinished;
-    expect(report.audioPlayback.mixerRmsDecibelsFullScale).toBeGreaterThanOrEqual(MINIMUM_FIXTURE_RMS_DBFS);
-    const audioFinishedEpochMs = Date.now();
+    const audioPlayback = await playbackFinished;
+    const completionClockAlignment = receiveCallbackTimestamp(
+      audioPlayback.callbackContinuousNanoseconds,
+      audioPlayback.callbackEpochNanoseconds,
+    );
+    report.audioPlayback = {
+      ...audioPlayback,
+      callbackContinuousNanoseconds: audioPlayback.callbackContinuousNanoseconds.toString(),
+      callbackEpochNanoseconds: audioPlayback.callbackEpochNanoseconds.toString(),
+    };
+    report.audioPlaybackCompletionClockAlignment = completionClockAlignment;
+    expect(audioPlayback.mixerRmsDecibelsFullScale).toBeGreaterThanOrEqual(MINIMUM_FIXTURE_RMS_DBFS);
+    expect(completionClockAlignment.continuousDeliveryMilliseconds).toBeGreaterThanOrEqual(0);
+    expect(completionClockAlignment.continuousDeliveryMilliseconds).toBeLessThanOrEqual(500);
+    expect(completionClockAlignment.epochDeliveryMilliseconds).toBeGreaterThanOrEqual(-2);
+    expect(completionClockAlignment.epochDeliveryMilliseconds).toBeLessThanOrEqual(500);
+    expect(completionClockAlignment.alignmentErrorMilliseconds).toBeLessThanOrEqual(MAXIMUM_CLOCK_ALIGNMENT_ERROR_MS);
+    const shiftUpSendStartedEpochNanoseconds = BigInt(Date.now()) * 1_000_000n;
+    const shiftUpSendStartedNanoseconds = process.hrtime.bigint();
     await page.keyboard.up("Shift");
+    const shiftUpSendFinishedNanoseconds = process.hrtime.bigint();
+    const shiftUpSendFinishedEpochNanoseconds = BigInt(Date.now()) * 1_000_000n;
     shiftHeld = false;
 
     await expect(input).not.toHaveValue("", { timeout: completionBudgetMs + 1_000 });
@@ -184,8 +246,58 @@ test("WAV starts 1.1 seconds before Left Shift and finishes as timely text", asy
     const expectedWords = normalizedWords(expectedTranscript);
     const transcriptWords = normalizedWords(transcript);
     const transcriptWordErrorRate = wordErrorRate(expectedWords, transcriptWords);
-    const audioStartToShiftDownMs = timing.shiftDownEpochMs - audioStartedEpochMs;
-    const playbackExitToShiftUpMs = timing.shiftUpEpochMs - audioFinishedEpochMs;
+    const audioStartToShiftDownMinimumMs = elapsedMilliseconds(
+      shiftDownSendStartedNanoseconds,
+      playbackStart.callbackContinuousNanoseconds,
+    );
+    const audioStartToShiftDownMaximumMs = elapsedMilliseconds(
+      shiftDownSendFinishedNanoseconds,
+      playbackStart.callbackContinuousNanoseconds,
+    );
+    const audioStartToShiftDownMs = (audioStartToShiftDownMinimumMs + audioStartToShiftDownMaximumMs) / 2;
+    const audioStartToShiftDownEpochMinimumMs = elapsedMilliseconds(
+      shiftDownSendStartedEpochNanoseconds,
+      playbackStart.callbackEpochNanoseconds,
+    );
+    const audioStartToShiftDownEpochMaximumMs = elapsedMilliseconds(
+      shiftDownSendFinishedEpochNanoseconds,
+      playbackStart.callbackEpochNanoseconds,
+    );
+    const audioStartToShiftDownClockAlignmentErrorMs = Math.max(
+      Math.abs(audioStartToShiftDownMinimumMs - audioStartToShiftDownEpochMinimumMs),
+      Math.abs(audioStartToShiftDownMaximumMs - audioStartToShiftDownEpochMaximumMs),
+    );
+    const playbackCompletionToShiftUpMinimumMs = elapsedMilliseconds(
+      shiftUpSendStartedNanoseconds,
+      audioPlayback.callbackContinuousNanoseconds,
+    );
+    const playbackCompletionToShiftUpMaximumMs = elapsedMilliseconds(
+      shiftUpSendFinishedNanoseconds,
+      audioPlayback.callbackContinuousNanoseconds,
+    );
+    const playbackCompletionToShiftUpMs = (
+      playbackCompletionToShiftUpMinimumMs + playbackCompletionToShiftUpMaximumMs
+    ) / 2;
+    const playbackCompletionToShiftUpEpochMinimumMs = elapsedMilliseconds(
+      shiftUpSendStartedEpochNanoseconds,
+      audioPlayback.callbackEpochNanoseconds,
+    );
+    const playbackCompletionToShiftUpEpochMaximumMs = elapsedMilliseconds(
+      shiftUpSendFinishedEpochNanoseconds,
+      audioPlayback.callbackEpochNanoseconds,
+    );
+    const playbackCompletionToShiftUpClockAlignmentErrorMs = Math.max(
+      Math.abs(playbackCompletionToShiftUpMinimumMs - playbackCompletionToShiftUpEpochMinimumMs),
+      Math.abs(playbackCompletionToShiftUpMaximumMs - playbackCompletionToShiftUpEpochMaximumMs),
+    );
+    const callbackPlaybackDurationMs = elapsedMilliseconds(
+      audioPlayback.callbackContinuousNanoseconds,
+      playbackStart.callbackContinuousNanoseconds,
+    );
+    const callbackPlaybackEpochDurationMs = elapsedMilliseconds(
+      audioPlayback.callbackEpochNanoseconds,
+      playbackStart.callbackEpochNanoseconds,
+    );
     const keyUpToTextMs = timing.textVisibleAt - timing.shiftUpAt;
 
     Object.assign(report, {
@@ -194,15 +306,50 @@ test("WAV starts 1.1 seconds before Left Shift and finishes as timely text", asy
       normalizedTranscript: transcriptWords.join(" "),
       wordErrorRate: transcriptWordErrorRate,
       playbackStartToShiftDownMilliseconds: audioStartToShiftDownMs,
-      playbackCompletionToShiftUpMilliseconds: playbackExitToShiftUpMs,
+      playbackStartToShiftDownMinimumMilliseconds: audioStartToShiftDownMinimumMs,
+      playbackStartToShiftDownMaximumMilliseconds: audioStartToShiftDownMaximumMs,
+      playbackStartToShiftDownEpochMinimumMilliseconds: audioStartToShiftDownEpochMinimumMs,
+      playbackStartToShiftDownEpochMaximumMilliseconds: audioStartToShiftDownEpochMaximumMs,
+      playbackStartToShiftDownClockAlignmentErrorMilliseconds: audioStartToShiftDownClockAlignmentErrorMs,
+      playbackCompletionToShiftUpMilliseconds: playbackCompletionToShiftUpMs,
+      playbackCompletionToShiftUpMinimumMilliseconds: playbackCompletionToShiftUpMinimumMs,
+      playbackCompletionToShiftUpMaximumMilliseconds: playbackCompletionToShiftUpMaximumMs,
+      playbackCompletionToShiftUpEpochMinimumMilliseconds: playbackCompletionToShiftUpEpochMinimumMs,
+      playbackCompletionToShiftUpEpochMaximumMilliseconds: playbackCompletionToShiftUpEpochMaximumMs,
+      playbackCompletionToShiftUpClockAlignmentErrorMilliseconds: playbackCompletionToShiftUpClockAlignmentErrorMs,
+      callbackPlaybackDurationMilliseconds: callbackPlaybackDurationMs,
+      callbackPlaybackEpochDurationMilliseconds: callbackPlaybackEpochDurationMs,
       browserShiftHoldMilliseconds: timing.shiftUpAt - timing.shiftDownAt,
       keyUpToVisibleTextMilliseconds: keyUpToTextMs,
     });
 
-    expect(audioStartToShiftDownMs).toBeGreaterThanOrEqual(1_000);
-    expect(audioStartToShiftDownMs).toBeLessThanOrEqual(1_400);
-    expect(playbackExitToShiftUpMs).toBeGreaterThanOrEqual(0);
-    expect(playbackExitToShiftUpMs).toBeLessThanOrEqual(500);
+    expect(audioStartToShiftDownMinimumMs).toBeGreaterThanOrEqual(1_000);
+    expect(audioStartToShiftDownMaximumMs).toBeLessThanOrEqual(1_400);
+    expect(audioStartToShiftDownEpochMinimumMs).toBeGreaterThanOrEqual(1_000);
+    expect(audioStartToShiftDownEpochMaximumMs).toBeLessThanOrEqual(1_400);
+    expect(audioStartToShiftDownClockAlignmentErrorMs).toBeLessThanOrEqual(MAXIMUM_CLOCK_ALIGNMENT_ERROR_MS);
+    expect(playbackCompletionToShiftUpMinimumMs).toBeGreaterThanOrEqual(0);
+    expect(playbackCompletionToShiftUpMaximumMs).toBeLessThanOrEqual(500);
+    expect(playbackCompletionToShiftUpEpochMinimumMs).toBeGreaterThanOrEqual(-2);
+    expect(playbackCompletionToShiftUpEpochMaximumMs).toBeLessThanOrEqual(500);
+    expect(playbackCompletionToShiftUpClockAlignmentErrorMs).toBeLessThanOrEqual(
+      MAXIMUM_CLOCK_ALIGNMENT_ERROR_MS,
+    );
+    expect(callbackPlaybackDurationMs).toBeGreaterThanOrEqual(
+      fixtureDurationMilliseconds - MAXIMUM_CALLBACK_DURATION_ERROR_MS,
+    );
+    expect(callbackPlaybackDurationMs).toBeLessThanOrEqual(
+      fixtureDurationMilliseconds + MAXIMUM_CALLBACK_DURATION_ERROR_MS,
+    );
+    expect(callbackPlaybackEpochDurationMs).toBeGreaterThanOrEqual(
+      fixtureDurationMilliseconds - MAXIMUM_CALLBACK_DURATION_ERROR_MS,
+    );
+    expect(callbackPlaybackEpochDurationMs).toBeLessThanOrEqual(
+      fixtureDurationMilliseconds + MAXIMUM_CALLBACK_DURATION_ERROR_MS,
+    );
+    expect(Math.abs(callbackPlaybackDurationMs - callbackPlaybackEpochDurationMs)).toBeLessThanOrEqual(
+      MAXIMUM_CLOCK_ALIGNMENT_ERROR_MS,
+    );
     expect(timing.shiftDownAt).not.toBeNull();
     expect(timing.shiftUpAt).toBeGreaterThan(timing.shiftDownAt);
     expect(timing.textVisibleAt).toBeGreaterThanOrEqual(timing.shiftUpAt);

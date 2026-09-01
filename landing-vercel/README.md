@@ -47,4 +47,6 @@ This lane needs macOS, Google Chrome, BlackHole 2ch, `SwitchAudioSource`, Chrome
 microphone permission, and network access to Chrome's speech provider. CI runs it
 on a fresh Namespace Mac. It launches the signed Chrome app through macOS before
 Playwright connects, then uploads the JSON timing receipt, screenshot, trace,
-video, and browser logs.
+video, and browser logs. The 1.1-second lead is measured from the macOS timestamp
+captured inside CoreAudio's played-back callback, then cross-checked against the
+system realtime clock. It does not start when Node receives the player's output.

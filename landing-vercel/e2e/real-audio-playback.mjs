@@ -6,12 +6,25 @@ function numericMarkerField(line, name) {
   return value;
 }
 
+function bigIntMarkerField(line, name) {
+  const value = line.match(new RegExp(`(?:^| )${name}=([^ ]+)`))?.[1];
+  try {
+    if (!value || !/^\d+$/.test(value)) throw new Error();
+    const parsed = BigInt(value);
+    if (parsed <= 0n) throw new Error();
+    return parsed;
+  } catch {
+    throw new Error(`CoreAudio WAV player emitted an invalid ${name} marker: ${line}`);
+  }
+}
+
 export function playWave({ executable, deviceUID, fixture, seconds }) {
   const args = [deviceUID, fixture];
   if (seconds !== undefined) args.push(String(seconds));
   const process = spawn(executable, args, { stdio: ["ignore", "pipe", "pipe"] });
   let stdout = "";
   let stderr = "";
+  let startError;
   let startedSettled = false;
   let resolveStarted;
   let rejectStarted;
@@ -39,8 +52,15 @@ export function playWave({ executable, deviceUID, fixture, seconds }) {
     const startLine = stdout.split("\n")
       .find((line) => line.startsWith("started marker=first-frame-played-back "));
     if (startLine && !startedSettled) {
-      startedSettled = true;
-      resolveStarted(startLine);
+      try {
+        const callbackContinuousNanoseconds = bigIntMarkerField(startLine, "callback_continuous_ns");
+        const callbackEpochNanoseconds = bigIntMarkerField(startLine, "callback_epoch_ns");
+        startedSettled = true;
+        resolveStarted({ callbackContinuousNanoseconds, callbackEpochNanoseconds, marker: startLine });
+      } catch (error) {
+        startError = error;
+        failStarted(error);
+      }
     }
   });
   process.stderr.on("data", (chunk) => { stderr += chunk; });
@@ -51,16 +71,21 @@ export function playWave({ executable, deviceUID, fixture, seconds }) {
   process.once("close", (exitCode, signal) => {
     const detail = `exit ${exitCode}, signal ${signal || "none"}: ${stderr.trim()}`;
     if (exitCode === 0) {
-      if (!startedSettled) {
+      if (startError) {
+        rejectFinished(startError);
+      } else if (!startedSettled) {
         const error = new Error(`CoreAudio WAV player exited before playback started: ${detail}`);
         failStarted(error);
         rejectFinished(error);
-      } else if (!stdout.split("\n").some((line) => line.startsWith("completed device_uid="))) {
+      } else if (!stdout.split("\n").some((line) => line.startsWith("completed callback_continuous_ns="))) {
         rejectFinished(new Error(`CoreAudio WAV player exited without a completion marker: ${detail}`));
       } else {
-        const completionLine = stdout.split("\n").find((line) => line.startsWith("completed device_uid="));
+        const completionLine = stdout.split("\n")
+          .find((line) => line.startsWith("completed callback_continuous_ns="));
         try {
           resolveFinished({
+            callbackContinuousNanoseconds: bigIntMarkerField(completionLine, "callback_continuous_ns"),
+            callbackEpochNanoseconds: bigIntMarkerField(completionLine, "callback_epoch_ns"),
             stdout: stdout.trim(),
             stderr: stderr.trim(),
             mixerRmsDecibelsFullScale: numericMarkerField(completionLine, "mixer_rms_dbfs"),

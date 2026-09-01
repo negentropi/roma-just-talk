@@ -55,6 +55,11 @@ export function pcm16WaveRmsDecibelsFullScale(buffer) {
   return rms > 0 ? 20 * Math.log10(rms) : Number.NEGATIVE_INFINITY;
 }
 
+export function pcm16WaveDurationSeconds(buffer) {
+  const wave = pcm16Wave(buffer);
+  return wave.dataSize / wave.blockAlign / wave.sampleRate;
+}
+
 export function pcm16WaveEnvelope(buffer, { seconds, windowMilliseconds }) {
   const wave = pcm16Wave(buffer);
   const totalFrames = Math.min(

@@ -19,6 +19,7 @@ on:
       - "landing-vercel/playwright.config.mjs"
       - "landing-vercel/playwright.real-audio.config.mjs"
       - "landing-vercel/scripts/demo-server.mjs"
+      - "landing-vercel/scripts/invalidate-tccd-cache.sh"
       - "landing-vercel/scripts/run-real-audio-e2e.sh"
       - "landing-vercel/test/**"
 
@@ -159,6 +160,7 @@ jobs:
           echo "ROMA_DEMO_CHROME_APP=$chrome_app" >> "$GITHUB_ENV"
           echo "ROMA_DEMO_CHROME_BUNDLE_ID=$chrome_bundle_id" >> "$GITHUB_ENV"
           echo "ROMA_DEMO_AUDIO_PLAYER=$tools/bin/roma-play-wav" >> "$GITHUB_ENV"
+          echo "ROMA_DEMO_BROWSER_STATE_FILE=$RUNNER_TEMP/browser-demo-chrome-state" >> "$GITHUB_ENV"
 
           sudo killall coreaudiod 2>/dev/null || true
           sleep 4
@@ -212,9 +214,8 @@ jobs:
             echo "Namespace Mac already has a Chrome microphone TCC row." >&2
             exit 3
           fi
+          printf 'stopped\n' > "$ROMA_DEMO_BROWSER_STATE_FILE"
           touch "$RUNNER_TEMP/browser-demo-chrome-tcc-created"
-          killall tccd 2>/dev/null || true
-          sudo killall tccd 2>/dev/null || true
           sqlite3 "$tcc_db" "
             INSERT INTO access (
               service,client,client_type,auth_value,auth_reason,auth_version,csreq,
@@ -241,8 +242,8 @@ jobs:
           sqlite3 -json "$tcc_db" \
             "SELECT service,client,auth_value,auth_reason,length(csreq) AS csreq_length FROM access WHERE service='kTCCServiceMicrophone' AND client='$chrome_bundle_id';" \
             > "$RUNNER_TEMP/browser-demo-chrome-tcc.json"
-          killall tccd 2>/dev/null || true
-          sudo killall tccd 2>/dev/null || true
+          bash landing-vercel/scripts/invalidate-tccd-cache.sh \
+            "$RUNNER_TEMP/browser-demo-tccd-grant-invalidation.txt"
 
       - name: Install browser test dependencies
         working-directory: landing-vercel
@@ -339,16 +340,11 @@ jobs:
           chrome_bundle_id="$ROMA_DEMO_CHROME_BUNDLE_ID"
           csreq_file="$RUNNER_TEMP/google-chrome.csreq"
           if [ -f "$marker" ]; then
-            remaining_chrome_processes="$(
-              ps -ww -axo pid=,command= \
-                | awk 'index($0, "/Google " "Chrome.app/Contents/") { print }'
-            )"
-            if [ -n "$remaining_chrome_processes" ]; then
+            if ! grep -Fx "stopped" "$ROMA_DEMO_BROWSER_STATE_FILE" >/dev/null; then
               sqlite3 -json "$tcc_db" \
                 "SELECT service,client,auth_value,auth_reason FROM access WHERE service='kTCCServiceMicrophone' AND client='$chrome_bundle_id';" \
                 > "$RUNNER_TEMP/browser-demo-chrome-tcc-after-cleanup.json"
-              echo "Refusing to remove Chrome microphone access while Chrome is running." >&2
-              printf '%s\n' "$remaining_chrome_processes" >&2
+              echo "Refusing to remove Chrome microphone access before the test browser stops." >&2
               exit 4
             fi
             sqlite3 "$tcc_db" "
@@ -367,9 +363,9 @@ jobs:
             remaining_count="$(sqlite3 "$tcc_db" \
               "SELECT count(*) FROM access WHERE service='kTCCServiceMicrophone' AND client='$chrome_bundle_id';")"
             [ "$remaining_count" = 0 ]
+            bash landing-vercel/scripts/invalidate-tccd-cache.sh \
+              "$RUNNER_TEMP/browser-demo-tccd-cleanup-invalidation.txt"
             rm "$marker"
-            killall tccd 2>/dev/null || true
-            sudo killall tccd 2>/dev/null || true
           fi
           sqlite3 -json "$tcc_db" \
             "SELECT service,client,auth_value,auth_reason FROM access WHERE service='kTCCServiceMicrophone' AND client='$chrome_bundle_id';" \
@@ -386,6 +382,8 @@ jobs:
             ${{ runner.temp }}/browser-demo-tool-versions.txt
             ${{ runner.temp }}/browser-demo-chrome-tcc.json
             ${{ runner.temp }}/browser-demo-chrome-tcc-after-cleanup.json
+            ${{ runner.temp }}/browser-demo-tccd-grant-invalidation.txt
+            ${{ runner.temp }}/browser-demo-tccd-cleanup-invalidation.txt
             ${{ runner.temp }}/browser-demo-real-audio
             landing-vercel/playwright-report-real-audio
             landing-vercel/test-results

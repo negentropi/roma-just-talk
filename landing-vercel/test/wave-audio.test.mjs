@@ -3,6 +3,7 @@ import test from "node:test";
 
 import {
   maximumEnvelopeCorrelation,
+  pcm16WaveDurationSeconds,
   pcm16WaveEnvelope,
   pcm16WaveRmsDecibelsFullScale,
 } from "../e2e/wave-audio.mjs";
@@ -31,6 +32,7 @@ test("PCM16 WAV measurements use complete frames and deterministic windows", () 
   const fixture = pcm16Wave([1_000, -1_000, 2_000, -2_000]);
 
   assert.ok(Math.abs(pcm16WaveRmsDecibelsFullScale(fixture) - (-26.32959861247398)) < 1e-12);
+  assert.equal(pcm16WaveDurationSeconds(fixture), 0.004);
   assert.deepEqual(
     pcm16WaveEnvelope(fixture, { seconds: 0.004, windowMilliseconds: 2 }),
     [1_000 / 32_768, 2_000 / 32_768],

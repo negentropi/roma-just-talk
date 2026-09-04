@@ -9,6 +9,10 @@ mode="${5:-full}"
 prebuilt_helper_archive="${6:-}"
 require_app_translocation="${RUNTIME_E2E_REQUIRE_APP_TRANSLOCATION:-false}"
 empty_final_expectation="${RUNTIME_E2E_EMPTY_FINAL_EXPECTATION:-none}"
+external_model_cache="${RUNTIME_E2E_MODEL_CACHE_PATH:-}"
+empty_final_baseline_evidence="${RUNTIME_E2E_EMPTY_FINAL_BASELINE_EVIDENCE:-}"
+model_root="$HOME/Library/Application Support/FluidAudio"
+model_directory="$model_root/Models/parakeet-tdt-0.6b-v2"
 
 case "$repetitions" in
   1|3|5) ;;
@@ -43,6 +47,40 @@ if [ "$empty_final_expectation" != "none" ] && [ "$mode" != "smoke" ]; then
   echo "An empty-final expectation requires smoke mode" >&2
   exit 2
 fi
+if [ "$empty_final_expectation" != "none" ] && [ "$repetitions" != "5" ]; then
+  echo "An empty-final expectation requires five repetitions" >&2
+  exit 2
+fi
+if [ "$empty_final_expectation" != "none" ] \
+  && [ -n "$external_model_cache" ]; then
+  echo "Empty-final regression proof must use the normal FluidAudio model directory" >&2
+  exit 2
+fi
+if [ "$empty_final_expectation" != "none" ]; then
+  for model_storage_path in \
+    "$model_root" \
+    "$model_root/Models" \
+    "$model_directory"; do
+    if [ -L "$model_storage_path" ]; then
+      echo "Empty-final regression proof requires non-symlinked FluidAudio model storage" >&2
+      exit 2
+    fi
+  done
+fi
+if [ "$empty_final_expectation" = "fixed" ]; then
+  if [ -z "$empty_final_baseline_evidence" ] \
+    || [ ! -f "$empty_final_baseline_evidence/functional-smoke.json" ] \
+    || [ ! -f "$empty_final_baseline_evidence/empty-final-e2e-contract.json" ] \
+    || [ ! -f "$empty_final_baseline_evidence/empty-final-launch-events.tsv" ] \
+    || [ ! -f "$empty_final_baseline_evidence/empty-final-termination-events.tsv" ] \
+    || [ ! -f "$empty_final_baseline_evidence/voiceink-sha256.txt" ]; then
+    echo "Fixed empty-final proof requires known-bad baseline evidence" >&2
+    exit 2
+  fi
+elif [ -n "$empty_final_baseline_evidence" ]; then
+  echo "Known-bad baseline evidence is only valid for a fixed empty-final proof" >&2
+  exit 2
+fi
 
 repo_root="${GITHUB_WORKSPACE:-$(cd "$(dirname "$0")/.." && pwd)}"
 source "$repo_root/scripts/runtime-e2e-phase-runner.sh"
@@ -61,9 +99,6 @@ nsc_bin="${NAMESPACE_CLI:-/opt/nsc/bin/nsc}"
 model_manifest="$repo_root/scripts/runtime-e2e-parakeet-v2.manifest"
 model_revision="ee09c569f73759e6d44c9bd16766f477b2b36d39"
 model_source_base_url="https://huggingface.co/FluidInference/parakeet-tdt-0.6b-v2-coreml/resolve/$model_revision"
-model_root="$HOME/Library/Application Support/FluidAudio"
-model_directory="$model_root/Models/parakeet-tdt-0.6b-v2"
-external_model_cache="${RUNTIME_E2E_MODEL_CACHE_PATH:-}"
 expected_first_launch_pid="${RUNTIME_E2E_EXPECTED_FIRST_LAUNCH_PID:-}"
 external_model_directory=""
 config_smoke="$runtime_root/runtime-e2e-smoke.json"
@@ -78,6 +113,8 @@ distribution_verifier="$repo_root/scripts/verify-macos-distribution-launch.sh"
 empty_final_verifier="$repo_root/scripts/verify-runtime-empty-final-regression.sh"
 runtime_launch_events="$evidence/runtime-translocation-launch-events.tsv"
 runtime_termination_events="$evidence/runtime-translocation-termination-events.tsv"
+empty_final_launch_events="$evidence/empty-final-launch-events.tsv"
+empty_final_termination_events="$evidence/empty-final-termination-events.tsv"
 runtime_verified_launches="$evidence/runtime-translocation-verified-launches.tsv"
 runtime_observed_pids="$evidence/runtime-translocation-observed-pids.tsv"
 runtime_monitor_stop="$runtime_root/runtime-translocation-monitor-stop"
@@ -90,6 +127,7 @@ recorded_voiceink_pid=""
 launcher_pids=()
 model_prepare_pid=""
 model_prepare_started_seconds=0
+prewarm_pid=""
 
 mkdir -p "$runtime_root" "$audio_root" "$evidence"
 test -d "$voiceink_app"
@@ -480,13 +518,99 @@ write_config() {
   local run_repetitions="$3"
   local latency_threshold="$4"
   local config_mode="$5"
+  local voiceink_lifecycle="${6:-reuse}"
   runtime_e2e_config_json \
     "$config_audio_directory" \
     "$voiceink_app" \
     "$run_repetitions" \
     "$latency_threshold" \
     "$config_mode" \
+    "$voiceink_lifecycle" \
     > "$output"
+}
+
+verify_empty_final_model_storage() {
+  if [ "$empty_final_expectation" = "none" ]; then
+    return 0
+  fi
+
+  local model_storage_path=""
+  for model_storage_path in \
+    "$model_root" \
+    "$model_root/Models" \
+    "$model_directory"; do
+    if [ -L "$model_storage_path" ]; then
+      echo "Empty-final regression proof requires non-symlinked FluidAudio model storage" >&2
+      return 1
+    fi
+  done
+
+  local physical_home=""
+  local physical_model_directory=""
+  local expected_physical_model_directory=""
+  physical_home="$(cd "$HOME" && pwd -P)"
+  physical_model_directory="$(cd "$model_directory" && pwd -P)"
+  expected_physical_model_directory="$physical_home/Library/Application Support/FluidAudio/Models/parakeet-tdt-0.6b-v2"
+  if [ "$physical_model_directory" != "$expected_physical_model_directory" ]; then
+    echo "Empty-final regression proof model storage resolved outside Application Support" >&2
+    return 1
+  fi
+
+  {
+    printf 'storage=normal-application-support\n'
+    printf 'configured_directory=%s\n' "$model_directory"
+    printf 'physical_directory=%s\n' "$physical_model_directory"
+    printf 'symlinked=false\n'
+  } > "$evidence/empty-final-model-storage.txt"
+}
+
+write_empty_final_evidence_contract() {
+  local config="$1"
+  local output="$2"
+  local audio_sha256=""
+  local contract_sha256=""
+  local helper_sha256=""
+  local model_manifest_sha256=""
+  audio_sha256="$(shasum -a 256 "$smoke_fixture" | awk '{print $1}')"
+  helper_sha256="$(awk 'NR == 1 { print $1 }' "$evidence/helper-sha256.txt")"
+  model_manifest_sha256="$(shasum -a 256 "$model_manifest" | awk '{print $1}')"
+
+  runtime_e2e_evidence_contract_json \
+    "$(< "$config")" \
+    "${GITHUB_SHA:-local}" \
+    "$require_app_translocation" \
+    "$(sw_vers -productVersion)" \
+    "$(sw_vers -buildVersion)" \
+    "$(uname -m)" \
+    "$audio_source_kind" \
+    "$(basename "$smoke_fixture")" \
+    "$audio_sha256" \
+    "$smoke_fixture_duration" \
+    "$model_revision" \
+    "$model_manifest_sha256" \
+    "$helper_sha256" \
+    > "$output"
+
+  contract_sha256="$(shasum -a 256 "$output" | awk '{print $1}')"
+  printf '%s  %s\n' "$contract_sha256" "$(basename "$output")" \
+    > "$evidence/empty-final-e2e-contract.sha256"
+}
+
+write_empty_final_process_events() {
+  if [ "$empty_final_expectation" = "none" ]; then
+    return 0
+  fi
+  [[ "$prewarm_pid" =~ ^[0-9]+$ ]]
+  test -f "$runtime_launch_events"
+  test -f "$runtime_termination_events"
+  awk -F '\t' -v prewarm_pid="$prewarm_pid" \
+    '$2 != prewarm_pid' \
+    "$runtime_launch_events" \
+    > "$empty_final_launch_events"
+  awk -F '\t' -v prewarm_pid="$prewarm_pid" \
+    '$2 != prewarm_pid' \
+    "$runtime_termination_events" \
+    > "$empty_final_termination_events"
 }
 
 run_harness_phase() {
@@ -774,6 +898,7 @@ killall cfprefsd 2>/dev/null || true
 mark_phase prewarm-model
 wait "$model_prepare_pid"
 model_prepare_pid=""
+verify_empty_final_model_storage
 printf '%s\n' "$((SECONDS - model_prepare_started_seconds))" \
   > "$evidence/model-prepare-wall-seconds.txt"
 date -u +%Y-%m-%dT%H:%M:%SZ > "$evidence/model-prepare-completed-at.txt"
@@ -852,6 +977,21 @@ fi
 if [ "$require_app_translocation" = true ]; then
   [[ "$prewarm_pid" =~ ^[0-9]+$ ]]
   terminate_runtime_voiceink_pid "$prewarm_pid"
+elif [ "$empty_final_expectation" != "none" ]; then
+  prewarm_pid="$(pgrep -x "roma just talk" 2>/dev/null || true)"
+  if ! [[ "$prewarm_pid" =~ ^[0-9]+$ ]]; then
+    echo "Expected exactly one Roma prewarm process before the fresh-process regression run" >&2
+    exit 10
+  fi
+  terminate_runtime_voiceink_pid "$prewarm_pid"
+  {
+    printf 'prewarm_pid=%s\n' "$prewarm_pid"
+    printf 'preflight_app_state=stopped\n'
+  } > "$evidence/empty-final-fresh-process-start.txt"
+  : > "$runtime_launch_events"
+  : > "$runtime_termination_events"
+  export RUNTIME_E2E_VOICEINK_LAUNCH_EVENTS="$runtime_launch_events"
+  export RUNTIME_E2E_VOICEINK_TERMINATION_EVENTS="$runtime_termination_events"
 fi
 
 mark_phase open-target-apps
@@ -890,10 +1030,18 @@ sleep 15
 stop_launchers
 
 smoke_repetitions=1
+smoke_voiceink_lifecycle=reuse
 if [ "$empty_final_expectation" != "none" ]; then
   smoke_repetitions="$repetitions"
+  smoke_voiceink_lifecycle=relaunchPerCase
 fi
-write_config "$config_smoke" "$smoke_audio_root" "$smoke_repetitions" 20000 smoke
+write_config \
+  "$config_smoke" \
+  "$smoke_audio_root" \
+  "$smoke_repetitions" \
+  20000 \
+  smoke \
+  "$smoke_voiceink_lifecycle"
 write_config "$config_full" "$audio_directory" "$repetitions" 250 full
 if [ "$mode" = "smoke" ]; then
   restore_config="$config_smoke"
@@ -901,6 +1049,73 @@ fi
 cp "$config_smoke" "$evidence/runtime-e2e-smoke-config.json"
 if [ "$mode" = "full" ]; then
   cp "$config_full" "$evidence/runtime-e2e-full-config.json"
+fi
+if [ "$empty_final_expectation" != "none" ]; then
+  empty_final_contract="$evidence/empty-final-e2e-contract.json"
+  write_empty_final_evidence_contract "$config_smoke" "$empty_final_contract"
+fi
+if [ "$empty_final_expectation" = "fixed" ]; then
+  baseline_report="$empty_final_baseline_evidence/functional-smoke.json"
+  baseline_contract="$empty_final_baseline_evidence/empty-final-e2e-contract.json"
+  baseline_launch_events="$empty_final_baseline_evidence/empty-final-launch-events.tsv"
+  baseline_termination_events="$empty_final_baseline_evidence/empty-final-termination-events.tsv"
+  baseline_voiceink_sha256="$(
+    awk 'NR == 1 { print $1 }' "$empty_final_baseline_evidence/voiceink-sha256.txt"
+  )"
+  current_voiceink_sha256="$(awk 'NR == 1 { print $1 }' "$evidence/voiceink-sha256.txt")"
+  if ! [[ "$baseline_voiceink_sha256" =~ ^[0-9a-f]{64}$ ]] \
+    || ! [[ "$current_voiceink_sha256" =~ ^[0-9a-f]{64}$ ]] \
+    || [ "$baseline_voiceink_sha256" = "$current_voiceink_sha256" ]; then
+    echo "Paired empty-final proof requires different baseline and candidate app executables" >&2
+    exit 14
+  fi
+  cp "$baseline_report" "$evidence/paired-known-bad-functional-smoke.json"
+  cp "$baseline_contract" "$evidence/paired-known-bad-evidence-contract.json"
+  cp "$baseline_launch_events" "$evidence/paired-known-bad-launch-events.tsv"
+  cp "$baseline_termination_events" "$evidence/paired-known-bad-termination-events.tsv"
+  cp \
+    "$empty_final_baseline_evidence/voiceink-sha256.txt" \
+    "$evidence/paired-known-bad-voiceink-sha256.txt"
+  if [ -f "$empty_final_baseline_evidence/stage-manifest.json" ]; then
+    cp \
+      "$empty_final_baseline_evidence/stage-manifest.json" \
+      "$evidence/paired-known-bad-stage-manifest.json"
+  fi
+  if [ -f "$empty_final_baseline_evidence/baseline-run-metadata.json" ]; then
+    cp \
+      "$empty_final_baseline_evidence/baseline-run-metadata.json" \
+      "$evidence/paired-known-bad-run-metadata.json"
+  fi
+  if [ -f "$empty_final_baseline_evidence/baseline-artifact-metadata.json" ]; then
+    cp \
+      "$empty_final_baseline_evidence/baseline-artifact-metadata.json" \
+      "$evidence/paired-known-bad-artifact-metadata.json"
+  fi
+  if ! bash "$empty_final_verifier" \
+    known-bad \
+    "$baseline_report" \
+    "$baseline_contract" \
+    "$baseline_launch_events" \
+    "$baseline_termination_events" \
+    > "$evidence/paired-known-bad-reverification.txt" 2>&1; then
+    cat "$evidence/paired-known-bad-reverification.txt" >&2
+    echo "Fixed empty-final proof baseline did not reverify" >&2
+    exit 14
+  fi
+  if ! cmp -s "$empty_final_contract" "$baseline_contract"; then
+    diff -u "$baseline_contract" "$empty_final_contract" \
+      > "$evidence/paired-empty-final-contract.diff" \
+      || true
+    echo "Fixed and known-bad E2E conditions differ" >&2
+    exit 14
+  fi
+  {
+    printf 'paired_contract=matched\n'
+    printf 'known_bad_contract_sha256=%s\n' \
+      "$(shasum -a 256 "$baseline_contract" | awk '{print $1}')"
+    printf 'fixed_contract_sha256=%s\n' \
+      "$(shasum -a 256 "$empty_final_contract" | awk '{print $1}')"
+  } > "$evidence/paired-empty-final-contract-verdict.txt"
 fi
 
 scenario_status=0
@@ -915,6 +1130,9 @@ if [ "$require_app_translocation" = true ]; then
     runtime_integrity_status=12
     scenario_status=12
   fi
+fi
+if [ "$empty_final_expectation" != "none" ]; then
+  write_empty_final_process_events
 fi
 
 summary_report="$evidence/runtime-e2e-report.json"
@@ -938,9 +1156,18 @@ fi
 if [ "$empty_final_expectation" != "none" ]; then
   empty_final_verdict="$evidence/runtime-empty-final-regression-verdict.txt"
   empty_final_verifier_status=0
+  empty_final_verifier_arguments=(
+    "$empty_final_expectation"
+    "$evidence/functional-smoke.json"
+    "$empty_final_contract"
+    "$empty_final_launch_events"
+    "$empty_final_termination_events"
+  )
+  if [ "$empty_final_expectation" = "fixed" ]; then
+    empty_final_verifier_arguments+=("$baseline_contract")
+  fi
   bash "$empty_final_verifier" \
-    "$empty_final_expectation" \
-    "$evidence/functional-smoke.json" \
+    "${empty_final_verifier_arguments[@]}" \
     > "$empty_final_verdict" 2>&1 \
     || empty_final_verifier_status=$?
   cat "$empty_final_verdict"

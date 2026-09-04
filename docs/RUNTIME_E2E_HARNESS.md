@@ -126,17 +126,37 @@ Namespace cache post-save still runs after a rejected hypothesis. A dependent
 verdict job converts that recorded outcome back into the workflow's final
 red/green result.
 
-For a matched cold empty-final regression, run the historical affected artifact
+For a matched fresh-process empty-final regression, run the historical affected artifact
 with `macos_scenario=distribution-e2e`,
 `macos_empty_final_expectation=known-bad`, and `macos_repetitions=5`. Repeat the
-same path with the candidate artifact and `macos_empty_final_expectation=fixed`.
+same path with the candidate artifact, `macos_empty_final_expectation=fixed`,
+and `macos_empty_final_baseline_run_id` set to the successful known-bad stage
+run. The fixed lane downloads that immutable evidence artifact, reverifies its
+GitHub digest and known-bad report, and requires the two generated evidence
+contracts to match. The stage also requires the same runner profile. It rejects
+a baseline whose app run, artifact ID, digest, source SHA, or executable hash
+matches the candidate. The contract binds the tooling
+SHA, macOS version/build/architecture, helper hash, selected audio hash and
+duration, model revision/manifest, translocation mode, targets, timing,
+lifecycle, and repetitions. It excludes volatile app, build, and audio
+directory paths. The audio bytes remain bound by hash; only the app artifact is
+intended to differ.
 The first run accepts only the exact live-partial, zero-character final ASR, and
 empty-commit failure. The second accepts only an all-green report with at least
 one case where that same zero-character final ASR emitted
 `fluid_streaming.commit.fallback_to_hypothesis`, committed non-empty text, and
 rendered it in the target. A normal non-empty final ASR is intentionally
 allowed in other passing cases. A run with no fallback case is rejected as
-unproven.
+unproven. These expectation modes reject external or symlinked model storage. They
+hydrate the normal FluidAudio Application Support directory, stop the prewarm
+process before preflight, require the report to begin with no Roma process, and
+relaunch Roma before every case. The verifier consumes the launch and normal
+termination event files. It requires 20 unique launch PIDs, one for every smoke
+case, and the same 20 PIDs in the termination file. Five of those processes run
+the TextEdit empty-document case. Each gets a fresh streaming provider and
+`AsrManager` after the normal app-level model prewarm. This is not an uncached
+model-load claim. The matched inputs are recorded in
+`empty-final-e2e-contract.json`.
 
 ## Isolation Gates
 

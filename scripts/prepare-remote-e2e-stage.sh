@@ -14,6 +14,8 @@ macos_expected_build="${10:-}"
 runtime_helper_archive="${11:-$inputs_root/macos/runtime-helper/roma.runtime-e2e-harness.macos.zip}"
 runtime_model_cache_path="${RUNTIME_E2E_MODEL_CACHE_PATH:-$HOME/Library/Caches/roma-runtime-e2e-models}"
 runtime_empty_final_expectation="${RUNTIME_E2E_EMPTY_FINAL_EXPECTATION:-none}"
+runtime_empty_final_baseline_evidence="${RUNTIME_E2E_EMPTY_FINAL_BASELINE_EVIDENCE:-}"
+runtime_empty_final_baseline_run_id="${RUNTIME_E2E_EMPTY_FINAL_BASELINE_RUN_ID:-}"
 github_download_token="${GH_TOKEN:-}"
 unset GH_TOKEN
 source "$(cd "$(dirname "$0")" && pwd)/macos-bundle-manifest.sh"
@@ -61,7 +63,8 @@ if [ "$runtime_empty_final_expectation" != "none" ] \
   exit 2
 fi
 
-if [ "$macos_scenario" = "distribution-e2e" ]; then
+if [ "$macos_scenario" = "distribution-e2e" ] \
+  || [ "$runtime_empty_final_expectation" != "none" ]; then
   runtime_model_cache_path=""
 fi
 
@@ -106,6 +109,29 @@ case "$macos_repetitions" in
     exit 2
     ;;
 esac
+if [ "$runtime_empty_final_expectation" != "none" ] \
+  && [ "$macos_repetitions" != "5" ]; then
+  echo "An empty-final expectation requires five repetitions" >&2
+  exit 2
+fi
+if [ "$runtime_empty_final_expectation" = "fixed" ]; then
+  if ! [[ "$runtime_empty_final_baseline_run_id" =~ ^[0-9]+$ ]] \
+    || [ ! -f "$runtime_empty_final_baseline_evidence/functional-smoke.json" ] \
+    || [ ! -f "$runtime_empty_final_baseline_evidence/empty-final-e2e-contract.json" ] \
+    || [ ! -f "$runtime_empty_final_baseline_evidence/empty-final-launch-events.tsv" ] \
+    || [ ! -f "$runtime_empty_final_baseline_evidence/empty-final-termination-events.tsv" ] \
+    || [ ! -f "$runtime_empty_final_baseline_evidence/voiceink-sha256.txt" ] \
+    || [ ! -f "$runtime_empty_final_baseline_evidence/macos-artifact-metadata.json" ] \
+    || [ ! -f "$runtime_empty_final_baseline_evidence/macos-app-run-metadata.json" ] \
+    || [ ! -f "$runtime_empty_final_baseline_evidence/stage-manifest.json" ]; then
+    echo "Fixed empty-final proof requires downloaded known-bad baseline evidence" >&2
+    exit 2
+  fi
+elif [ -n "$runtime_empty_final_baseline_evidence" ] \
+  || [ -n "$runtime_empty_final_baseline_run_id" ]; then
+  echo "Known-bad baseline evidence is only valid for a fixed empty-final proof" >&2
+  exit 2
+fi
 
 if [ "$target" = "macos" ] && [ "$ios_scenario" != "none" ]; then
   echo "An iOS scenario requires the ios or both target" >&2
@@ -126,9 +152,12 @@ macos_artifact_workflow_path=""
 runtime_helper_run_id=""
 runtime_helper_head_sha=""
 runtime_helper_workflow_path=""
+runtime_helper_artifact_id=""
+runtime_helper_artifact_digest=""
 runtime_helper_archive_sha256=""
 macos_artifact_runner_name=""
 runtime_helper_runner_name=""
+runtime_empty_final_baseline_contract_sha256=""
 stage_runner_label="${STAGE_RUNNER_LABEL:-}"
 stage_runner_name="${STAGE_RUNNER_NAME:-}"
 stage_runner_instance_id="${STAGE_RUNNER_INSTANCE_ID:-}"
@@ -142,6 +171,13 @@ log_pids=()
 
 mkdir -p "$desktop" "$evidence"
 rm -f "$done_file"
+if [ "$runtime_empty_final_expectation" = "fixed" ]; then
+  runtime_empty_final_baseline_contract_sha256="$(
+    shasum -a 256 \
+      "$runtime_empty_final_baseline_evidence/empty-final-e2e-contract.json" \
+      | awk '{print $1}'
+  )"
+fi
 
 stop_logs() {
   for pid in "${log_pids[@]:-}"; do
@@ -187,6 +223,27 @@ prepare_macos() {
   macos_artifact_workflow_path="$(jq -r .workflowPath "$macos_run_metadata")"
   cp "$macos_run_metadata" "$evidence/macos-app-run-metadata.json"
 
+  test -f "$actions_archive"
+  read -r macos_artifact_id \
+    < "$inputs_root/macos/macos-artifact-id.txt"
+  read -r macos_artifact_repository \
+    < "$inputs_root/macos/macos-artifact-repository.txt"
+  macos_artifact_metadata="$inputs_root/macos/macos-artifact-metadata.json"
+  test -f "$macos_artifact_metadata"
+  [[ "$macos_artifact_id" =~ ^[0-9]+$ ]]
+  [ "$macos_artifact_repository" = "${GITHUB_REPOSITORY:-}" ]
+  jq -e \
+    --argjson artifact_id "$macos_artifact_id" \
+    --arg run_id "$macos_artifact_run_id" '
+      .id == $artifact_id
+      and (.runId | tostring) == $run_id
+      and .name == "roma.just.talk.app"
+      and .expired == false
+      and (.digest | test("^sha256:[0-9a-f]{64}$"))
+    ' "$macos_artifact_metadata" >/dev/null
+  macos_artifact_digest="$(jq -r .digest "$macos_artifact_metadata")"
+  cp "$macos_artifact_metadata" "$evidence/macos-artifact-metadata.json"
+
   if [ "$macos_scenario" = "distribution-e2e" ]; then
     macos_run_jobs="$inputs_root/macos/macos-app-run-jobs.json"
     test -f "$macos_run_jobs"
@@ -222,10 +279,40 @@ prepare_macos() {
       "$helper_run_metadata" >/dev/null
     runtime_helper_head_sha="$(jq -r .headSha "$helper_run_metadata")"
     runtime_helper_workflow_path="$(jq -r .workflowPath "$helper_run_metadata")"
+    helper_artifact_metadata="$inputs_root/macos/runtime-helper-artifact-metadata.json"
+    test -f "$helper_artifact_metadata"
+    jq -e \
+      --arg run_id "$runtime_helper_run_id" '
+        (.runId | tostring) == $run_id
+        and .name == "roma.runtime-e2e-harness.macos"
+        and .expired == false
+        and (.id | tostring | test("^[0-9]+$"))
+        and (.digest | test("^sha256:[0-9a-f]{64}$"))
+      ' "$helper_artifact_metadata" >/dev/null
+    runtime_helper_artifact_id="$(jq -r .id "$helper_artifact_metadata")"
+    runtime_helper_artifact_digest="$(jq -r .digest "$helper_artifact_metadata")"
+    helper_artifact_archive_sha256="$inputs_root/macos/runtime-helper-artifact-archive.sha256"
+    helper_artifact_archive="$inputs_root/macos/runtime-helper-artifact-archive.zip"
+    test -f "$helper_artifact_archive_sha256"
+    test -f "$helper_artifact_archive"
+    grep -Eq \
+      "^[0-9a-f]{64}  .+runtime-helper-artifact-archive\\.zip$" \
+      "$helper_artifact_archive_sha256"
+    helper_outer_archive_sha256="$(
+      shasum -a 256 "$helper_artifact_archive" | awk '{print $1}'
+    )"
+    test "sha256:$helper_outer_archive_sha256" = "$runtime_helper_artifact_digest"
+    test "$helper_outer_archive_sha256" = "$(
+      awk 'NR == 1 { print $1 }' "$helper_artifact_archive_sha256"
+    )"
     runtime_helper_archive_sha256="$(
       shasum -a 256 "$runtime_helper_archive" | awk '{print $1}'
     )"
     cp "$helper_run_metadata" "$evidence/runtime-helper-run-metadata.json"
+    cp "$helper_artifact_metadata" "$evidence/runtime-helper-artifact-metadata.json"
+    cp \
+      "$helper_artifact_archive_sha256" \
+      "$evidence/runtime-helper-artifact-archive.sha256"
     printf '%s  %s\n' \
       "$runtime_helper_archive_sha256" \
       "$runtime_helper_archive" \
@@ -246,6 +333,106 @@ prepare_macos() {
       cp "$helper_run_jobs" "$evidence/runtime-helper-run-jobs.json"
     fi
   fi
+
+  if [ "$runtime_empty_final_expectation" = "fixed" ]; then
+    baseline_stage_manifest="$runtime_empty_final_baseline_evidence/stage-manifest.json"
+    jq -e \
+      --arg repository "${GITHUB_REPOSITORY:-}" '
+        (.macOSArtifactRunId | tostring | test("^[0-9]+$"))
+        and (.macOSArtifactId | tostring | test("^[0-9]+$"))
+        and ($repository == "" or .macOSArtifactRepository == $repository)
+        and (.macOSArtifactDigest | test("^sha256:[0-9a-f]{64}$"))
+        and (.macOSArtifactHeadSha | test("^[0-9a-f]{40}$"))
+        and .macOSArtifactWorkflowPath == ".github/workflows/voiceink-build.yml"
+      ' "$baseline_stage_manifest" >/dev/null
+    baseline_app_run_id="$(jq -r .macOSArtifactRunId "$baseline_stage_manifest")"
+    baseline_app_artifact_id="$(jq -r .macOSArtifactId "$baseline_stage_manifest")"
+    baseline_app_digest="$(jq -r .macOSArtifactDigest "$baseline_stage_manifest")"
+    baseline_app_head_sha="$(jq -r .macOSArtifactHeadSha "$baseline_stage_manifest")"
+    baseline_app_repository="$(jq -r .macOSArtifactRepository "$baseline_stage_manifest")"
+    baseline_app_workflow_path="$(jq -r .macOSArtifactWorkflowPath "$baseline_stage_manifest")"
+    baseline_app_artifact_metadata="$runtime_empty_final_baseline_evidence/macos-artifact-metadata.json"
+    jq -e \
+      --arg run_id "$baseline_app_run_id" \
+      --arg artifact_id "$baseline_app_artifact_id" \
+      --arg digest "$baseline_app_digest" '
+        (.runId | tostring) == $run_id
+        and (.id | tostring) == $artifact_id
+        and .name == "roma.just.talk.app"
+        and .digest == $digest
+        and .expired == false
+      ' "$baseline_app_artifact_metadata" >/dev/null
+    baseline_app_run_metadata="$runtime_empty_final_baseline_evidence/macos-app-run-metadata.json"
+    jq -e \
+      --arg run_id "$baseline_app_run_id" \
+      --arg repository "$baseline_app_repository" \
+      --arg head_sha "$baseline_app_head_sha" \
+      --arg workflow_path "$baseline_app_workflow_path" '
+        (.runId | tostring) == $run_id
+        and .headRepository == $repository
+        and .headSha == $head_sha
+        and .workflowPath == $workflow_path
+        and .status == "completed"
+        and .conclusion == "success"
+      ' "$baseline_app_run_metadata" >/dev/null
+    baseline_artifact_metadata="$runtime_empty_final_baseline_evidence/baseline-artifact-metadata.json"
+    baseline_artifact_archive="$runtime_empty_final_baseline_evidence/baseline-artifact-archive.zip"
+    baseline_artifact_archive_sha256="$runtime_empty_final_baseline_evidence/baseline-artifact-archive.sha256"
+    test -f "$baseline_artifact_metadata"
+    test -f "$baseline_artifact_archive"
+    test -f "$baseline_artifact_archive_sha256"
+    baseline_outer_archive_sha256="$(
+      shasum -a 256 "$baseline_artifact_archive" | awk '{print $1}'
+    )"
+    test "sha256:$baseline_outer_archive_sha256" = "$(
+      jq -r .digest "$baseline_artifact_metadata"
+    )"
+    test "$baseline_outer_archive_sha256" = "$(
+      awk 'NR == 1 { print $1 }' "$baseline_artifact_archive_sha256"
+    )"
+    if [ "$baseline_app_run_id" = "$macos_artifact_run_id" ] \
+      || [ "$baseline_app_artifact_id" = "$macos_artifact_id" ] \
+      || [ "$baseline_app_digest" = "$macos_artifact_digest" ] \
+      || [ "$baseline_app_head_sha" = "$macos_artifact_head_sha" ]; then
+      echo "Paired empty-final proof requires distinct baseline and candidate app artifacts" >&2
+      exit 2
+    fi
+    jq -n \
+      --arg baseline_run_id "$baseline_app_run_id" \
+      --arg baseline_artifact_id "$baseline_app_artifact_id" \
+      --arg baseline_repository "$baseline_app_repository" \
+      --arg baseline_digest "$baseline_app_digest" \
+      --arg baseline_head_sha "$baseline_app_head_sha" \
+      --arg baseline_workflow_path "$baseline_app_workflow_path" \
+      --arg candidate_run_id "$macos_artifact_run_id" \
+      --arg candidate_artifact_id "$macos_artifact_id" \
+      --arg candidate_repository "$macos_artifact_repository" \
+      --arg candidate_digest "$macos_artifact_digest" \
+      --arg candidate_head_sha "$macos_artifact_head_sha" \
+      --arg candidate_workflow_path "$macos_artifact_workflow_path" '
+        {
+          baseline: {
+            runId: $baseline_run_id,
+            artifactId: $baseline_artifact_id,
+            repository: $baseline_repository,
+            digest: $baseline_digest,
+            headSha: $baseline_head_sha,
+            workflowPath: $baseline_workflow_path
+          },
+          candidate: {
+            runId: $candidate_run_id,
+            artifactId: $candidate_artifact_id,
+            repository: $candidate_repository,
+            digest: $candidate_digest,
+            headSha: $candidate_head_sha,
+            workflowPath: $candidate_workflow_path
+          }
+        }
+      ' > "$evidence/paired-app-identity.json"
+    cp \
+      "$baseline_artifact_archive_sha256" \
+      "$evidence/paired-known-bad-artifact-archive.sha256"
+  fi
   mkdir -p "$HOME/Applications" "$stage_root/macos"
 
   /usr/bin/log stream \
@@ -255,26 +442,6 @@ prepare_macos() {
   log_pids+=("$!")
 
   if [ "$macos_scenario" = "distribution-e2e" ]; then
-    test -f "$actions_archive"
-    read -r macos_artifact_id \
-      < "$inputs_root/macos/macos-artifact-id.txt"
-    read -r macos_artifact_repository \
-      < "$inputs_root/macos/macos-artifact-repository.txt"
-    macos_artifact_metadata="$inputs_root/macos/macos-artifact-metadata.json"
-    test -f "$macos_artifact_metadata"
-    [[ "$macos_artifact_id" =~ ^[0-9]+$ ]]
-    [ "$macos_artifact_repository" = "${GITHUB_REPOSITORY:-}" ]
-    jq -e \
-      --argjson artifact_id "$macos_artifact_id" \
-      --arg run_id "$macos_artifact_run_id" '
-        .id == $artifact_id
-        and (.runId | tostring) == $run_id
-        and .name == "roma.just.talk.app"
-        and .expired == false
-        and (.digest | test("^sha256:[0-9a-f]{64}$"))
-      ' "$macos_artifact_metadata" >/dev/null
-    macos_artifact_digest="$(jq -r .digest "$macos_artifact_metadata")"
-    cp "$macos_artifact_metadata" "$evidence/macos-artifact-metadata.json"
     [ -n "$github_download_token" ]
     case "$stage_runner_label" in
       namespace-profile-*|nscloud-macos-*) ;;
@@ -409,6 +576,8 @@ write_manifest() {
   "macOSAudioArtifact": "$macos_audio_artifact",
   "macOSRepetitions": $macos_repetitions,
   "macOSEmptyFinalExpectation": "$runtime_empty_final_expectation",
+  "macOSEmptyFinalBaselineRunId": "$runtime_empty_final_baseline_run_id",
+  "macOSEmptyFinalBaselineContractSha256": "$runtime_empty_final_baseline_contract_sha256",
   "iOSScenario": "$ios_scenario",
   "iOSScenarioExitCode": $ios_scenario_status,
   "githubRunId": "${GITHUB_RUN_ID:-local}",
@@ -430,6 +599,8 @@ write_manifest() {
   "runtimeHelperRunId": "$runtime_helper_run_id",
   "runtimeHelperHeadSha": "$runtime_helper_head_sha",
   "runtimeHelperWorkflowPath": "$runtime_helper_workflow_path",
+  "runtimeHelperArtifactId": "$runtime_helper_artifact_id",
+  "runtimeHelperArtifactDigest": "$runtime_helper_artifact_digest",
   "runtimeHelperRunnerName": "$runtime_helper_runner_name",
   "runtimeHelperArchiveSha256": "$runtime_helper_archive_sha256",
   "runtimeHelperExecutableSha256": "$runtime_helper_executable_sha256",
@@ -494,6 +665,7 @@ if [ "$macos_scenario" = "distribution-e2e" ]; then
       RUNTIME_E2E_EXPECTED_FIRST_LAUNCH_PID="$distribution_launched_pid" \
       RUNTIME_E2E_MODEL_CACHE_PATH="$runtime_model_cache_path" \
       RUNTIME_E2E_EMPTY_FINAL_EXPECTATION="$runtime_empty_final_expectation" \
+      RUNTIME_E2E_EMPTY_FINAL_BASELINE_EVIDENCE="$runtime_empty_final_baseline_evidence" \
         bash "$(dirname "$0")/run-macos-runtime-e2e.sh" \
         "$distribution_app" \
         "$macos_audio_artifact" \
@@ -580,6 +752,7 @@ elif [ "$macos_scenario" != "none" ]; then
   set +e
   RUNTIME_E2E_MODEL_CACHE_PATH="$runtime_model_cache_path" \
   RUNTIME_E2E_EMPTY_FINAL_EXPECTATION="$runtime_empty_final_expectation" \
+  RUNTIME_E2E_EMPTY_FINAL_BASELINE_EVIDENCE="$runtime_empty_final_baseline_evidence" \
     bash "$(dirname "$0")/run-macos-runtime-e2e.sh" \
     "$HOME/Applications/roma just talk.app" \
     "$macos_audio_artifact" \

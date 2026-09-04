@@ -56,12 +56,114 @@ test -x "$HANDOFF_TEST"
 test -x "$EMPTY_FINAL_VERIFIER"
 test -x "$EMPTY_FINAL_VERIFIER_TEST"
 
+EMPTY_FINAL_POLICY_ROOT="$(
+  mktemp -d "${TMPDIR:-/tmp}/roma-empty-final-policy.XXXXXX"
+)"
+EMPTY_FINAL_POLICY_OUTPUT="$EMPTY_FINAL_POLICY_ROOT/output.txt"
+trap 'rm -rf "$EMPTY_FINAL_POLICY_ROOT"' EXIT
+if RUNTIME_E2E_EMPTY_FINAL_EXPECTATION=known-bad \
+  RUNTIME_E2E_MODEL_CACHE_PATH=/tmp/forbidden-roma-model-cache \
+  bash "$RUNTIME_RUNNER" \
+    /nonexistent/roma.app \
+    "" \
+    /nonexistent/evidence \
+    5 \
+    smoke \
+    >"$EMPTY_FINAL_POLICY_OUTPUT" 2>&1; then
+  echo "Empty-final proof accepted an external model cache" >&2
+  exit 1
+fi
+if ! grep -Fq \
+  "Empty-final regression proof must use the normal FluidAudio model directory" \
+  "$EMPTY_FINAL_POLICY_OUTPUT"; then
+  echo "Empty-final model-cache rejection happened after an unrelated preflight failure" >&2
+  cat "$EMPTY_FINAL_POLICY_OUTPUT" >&2
+  exit 1
+fi
+
+EMPTY_FINAL_FAKE_HOME="$EMPTY_FINAL_POLICY_ROOT/home"
+EMPTY_FINAL_FAKE_CACHE="$EMPTY_FINAL_POLICY_ROOT/cache/parakeet-tdt-0.6b-v2"
+mkdir -p \
+  "$EMPTY_FINAL_FAKE_HOME/Library/Application Support/FluidAudio/Models" \
+  "$EMPTY_FINAL_FAKE_CACHE"
+ln -s \
+  "$EMPTY_FINAL_FAKE_CACHE" \
+  "$EMPTY_FINAL_FAKE_HOME/Library/Application Support/FluidAudio/Models/parakeet-tdt-0.6b-v2"
+if HOME="$EMPTY_FINAL_FAKE_HOME" \
+  RUNTIME_E2E_EMPTY_FINAL_EXPECTATION=known-bad \
+  RUNTIME_E2E_MODEL_CACHE_PATH= \
+  bash "$RUNTIME_RUNNER" \
+    /nonexistent/roma.app \
+    "" \
+    /nonexistent/evidence \
+    5 \
+    smoke \
+    >"$EMPTY_FINAL_POLICY_OUTPUT" 2>&1; then
+  echo "Empty-final proof accepted a symlinked model directory" >&2
+  exit 1
+fi
+if ! grep -Fq \
+  "Empty-final regression proof requires non-symlinked FluidAudio model storage" \
+  "$EMPTY_FINAL_POLICY_OUTPUT"; then
+  echo "Empty-final model symlink rejection happened after an unrelated preflight failure" >&2
+  cat "$EMPTY_FINAL_POLICY_OUTPUT" >&2
+  exit 1
+fi
+
+if HOME="$EMPTY_FINAL_POLICY_ROOT/clean-home" \
+  RUNTIME_E2E_EMPTY_FINAL_EXPECTATION=fixed \
+  RUNTIME_E2E_MODEL_CACHE_PATH= \
+  bash "$RUNTIME_RUNNER" \
+    /nonexistent/roma.app \
+    "" \
+    /nonexistent/evidence \
+    5 \
+    smoke \
+    >"$EMPTY_FINAL_POLICY_OUTPUT" 2>&1; then
+  echo "Fixed proof accepted a missing known-bad baseline" >&2
+  exit 1
+fi
+if ! grep -Fq \
+  "Fixed empty-final proof requires known-bad baseline evidence" \
+  "$EMPTY_FINAL_POLICY_OUTPUT"; then
+  echo "Fixed baseline rejection happened after an unrelated preflight failure" >&2
+  cat "$EMPTY_FINAL_POLICY_OUTPUT" >&2
+  exit 1
+fi
+
+eval "$(sed -n '/^write_empty_final_process_events()/,/^}/p' "$RUNTIME_RUNNER")"
+runtime_launch_events="$EMPTY_FINAL_POLICY_ROOT/raw-launches.tsv"
+runtime_termination_events="$EMPTY_FINAL_POLICY_ROOT/raw-terminations.tsv"
+empty_final_launch_events="$EMPTY_FINAL_POLICY_ROOT/filtered-launches.tsv"
+empty_final_termination_events="$EMPTY_FINAL_POLICY_ROOT/filtered-terminations.tsv"
+empty_final_expectation=known-bad
+prewarm_pid=900
+printf '%s\n' \
+  $'2026-09-04T10:00:00Z\t900\ta\ta\t/source\t/running' \
+  $'2026-09-04T10:01:00Z\t901\tb\tb\t/source\t/running' \
+  > "$runtime_launch_events"
+printf '%s\n' \
+  $'2026-09-04T10:00:30Z\t900' \
+  $'2026-09-04T10:01:30Z\t901' \
+  > "$runtime_termination_events"
+write_empty_final_process_events
+if [ "$(awk -F '\t' '{ print $2 }' "$empty_final_launch_events")" != 901 ] \
+  || [ "$(awk -F '\t' '{ print $2 }' "$empty_final_termination_events")" != 901 ]; then
+  echo "Empty-final lifecycle evidence did not exclude the model-prewarm process" >&2
+  exit 1
+fi
+
 require_text "$WORKFLOW" 'distribution-e2e'
 require_text "$WORKFLOW" 'macos_expected_version'
 require_text "$WORKFLOW" 'macos_expected_build'
 require_text "$WORKFLOW" 'developer_dir'
 require_text "$WORKFLOW" 'macos_empty_final_expectation:'
+require_text "$WORKFLOW" 'macos_empty_final_baseline_run_id:'
 require_text "$WORKFLOW" 'STAGE_MACOS_EMPTY_FINAL_EXPECTATION: ${{ inputs.macos_empty_final_expectation || '\''none'\'' }}'
+require_text "$WORKFLOW" 'Download matched known-bad empty-final evidence'
+require_text "$WORKFLOW" 'baseline-reverification.txt'
+require_text "$WORKFLOW" 'empty-final-launch-events.tsv'
+require_text "$WORKFLOW" 'empty-final-termination-events.tsv'
 require_text "$WORKFLOW" '- "scripts/run-macos-distribution-e2e.sh"'
 require_text "$WORKFLOW" '- "scripts/verify-runtime-empty-final-regression.sh"'
 require_text "$WORKFLOW" '- "scripts/tests/verify-runtime-empty-final-regression.test.sh"'
@@ -79,6 +181,13 @@ require_text "$WORKFLOW" 'bash scripts/tests/verify-runtime-empty-final-regressi
 require_text "$WORKFLOW" 'roma.runtime-e2e-harness.macos'
 require_text "$WORKFLOW" 'runtime_helper_run_id'
 require_text "$WORKFLOW" 'runtime-helper-run-metadata.json'
+require_text "$WORKFLOW" 'runtime-helper-artifact-metadata.json'
+require_text "$WORKFLOW" 'runtime-helper-artifact-archive.zip'
+require_text "$WORKFLOW" 'runtime-helper-artifact-archive.sha256'
+require_text "$WORKFLOW" 'Runtime helper artifact must be checksum-verified'
+require_text "$WORKFLOW" 'baseline-artifact-archive.zip'
+require_text "$WORKFLOW" 'baseline-artifact-archive.sha256'
+require_text "$WORKFLOW" 'Baseline evidence archive does not match its artifact digest'
 require_text "$WORKFLOW" 'macos-app-run-metadata.json'
 require_text "$WORKFLOW" 'macos-app-run-jobs.json'
 require_text "$WORKFLOW" 'runtime-helper-run-jobs.json'
@@ -112,6 +221,13 @@ if [ "$cache_exclusion_count" -ne 2 ]; then
   echo "distribution E2E must skip both persistent and cold runtime model caches" >&2
   exit 1
 fi
+empty_final_cache_exclusion_count="$(
+  grep -Fc "env.STAGE_MACOS_EMPTY_FINAL_EXPECTATION == 'none'" "$WORKFLOW"
+)"
+if [ "$empty_final_cache_exclusion_count" -ne 2 ]; then
+  echo "Empty-final proof must skip both runtime model caches" >&2
+  exit 1
+fi
 require_text "$BUILD_WORKFLOW" 'roma.runtime-e2e-harness.macos'
 require_text "$BUILD_WORKFLOW" 'bash scripts/tests/macos-distribution-runtime-handoff.test.sh'
 require_text "$BUILD_WORKFLOW" 'bash scripts/tests/macos-finder-extraction-state.test.sh'
@@ -126,6 +242,14 @@ require_text "$PREPARER" 'run-macos-runtime-e2e.sh'
 require_text "$PREPARER" 'macos_expected_version'
 require_text "$PREPARER" 'runtime-helper/roma.runtime-e2e-harness.macos.zip'
 require_text "$PREPARER" 'runtime-helper-run-metadata.json'
+require_text "$PREPARER" 'runtime-helper-artifact-metadata.json'
+require_text "$PREPARER" 'runtimeHelperArtifactId'
+require_text "$PREPARER" 'runtimeHelperArtifactDigest'
+require_text "$PREPARER" 'paired-app-identity.json'
+require_text "$PREPARER" 'Paired empty-final proof requires distinct baseline and candidate app artifacts'
+require_text "$PREPARER" 'baseline_app_artifact_metadata'
+require_text "$PREPARER" 'baseline_app_run_metadata'
+require_text "$PREPARER" 'macOSArtifactDigest'
 require_text "$PREPARER" 'macos-app-run-jobs.json'
 require_text "$PREPARER" 'runtime-helper-run-jobs.json'
 require_text "$PREPARER" 'runtime-helper-archive-sha256.txt'
@@ -140,13 +264,17 @@ require_text "$PREPARER" 'MACOS_ARTIFACT_REPOSITORY="$macos_artifact_repository"
 require_text "$PREPARER" 'MACOS_ARTIFACT_DIGEST="$macos_artifact_digest"'
 require_text "$PREPARER" 'github_download_token="${GH_TOKEN:-}"'
 require_text "$PREPARER" 'unset GH_TOKEN'
-require_text "$PREPARER" 'if [ "$macos_scenario" = "distribution-e2e" ]; then'
+require_text "$PREPARER" '|| [ "$runtime_empty_final_expectation" != "none" ]; then'
 require_text "$PREPARER" 'runtime_model_cache_path=""'
 require_text "$PREPARER" 'runtime_model_source=first_launch_live_directory'
 require_text "$PREPARER" 'RUNTIME_E2E_EXPECTED_FIRST_LAUNCH_PID="$distribution_launched_pid"'
 require_text "$PREPARER" 'runtime_empty_final_expectation="${RUNTIME_E2E_EMPTY_FINAL_EXPECTATION:-none}"'
 require_text "$PREPARER" 'RUNTIME_E2E_EMPTY_FINAL_EXPECTATION="$runtime_empty_final_expectation"'
+require_text "$PREPARER" 'RUNTIME_E2E_EMPTY_FINAL_BASELINE_EVIDENCE="$runtime_empty_final_baseline_evidence"'
 require_text "$PREPARER" '"macOSEmptyFinalExpectation": "$runtime_empty_final_expectation"'
+require_text "$PREPARER" '"macOSEmptyFinalBaselineRunId": "$runtime_empty_final_baseline_run_id"'
+require_text "$PREPARER" 'empty-final-launch-events.tsv'
+require_text "$PREPARER" 'empty-final-termination-events.tsv'
 
 require_text "$RUNTIME_RUNNER" 'prebuilt_helper_archive'
 require_text "$RUNTIME_RUNNER" 'RUNTIME_E2E_APP="$helper_app"'
@@ -168,6 +296,12 @@ require_text "$RUNTIME_RUNNER" 'first_launch_termination=normal'
 require_text "$RUNTIME_RUNNER" 'empty_final_expectation="${RUNTIME_E2E_EMPTY_FINAL_EXPECTATION:-none}"'
 require_text "$RUNTIME_RUNNER" 'runtime-empty-final-regression-verdict.txt'
 require_text "$RUNTIME_RUNNER" 'verify-runtime-empty-final-regression.sh'
+require_text "$RUNTIME_RUNNER" 'empty-final-e2e-contract.json'
+require_text "$RUNTIME_RUNNER" 'paired-known-bad-reverification.txt'
+require_text "$RUNTIME_RUNNER" 'write_empty_final_process_events'
+require_text "$RUNTIME_RUNNER" 'empty-final-launch-events.tsv'
+require_text "$RUNTIME_RUNNER" 'empty-final-termination-events.tsv'
+require_text "$RUNTIME_RUNNER" 'Paired empty-final proof requires different baseline and candidate app executables'
 require_text "$HANDOFF_HELPER" 'requires only the verified first-launch PID'
 require_text "$HANDOFF_HELPER" 'must not use an external model cache'
 require_text "$HANDOFF_HELPER" 'did not create the live model directory'

@@ -300,11 +300,34 @@ full_config_json="$(
     250 \
     full
 )"
+cold_regression_config_json="$(
+  runtime_e2e_config_json \
+    /fixtures \
+    '/Applications/roma just talk.app' \
+    5 \
+    20000 \
+    smoke \
+    relaunchPerCase
+)"
 if ! jq -e '
   .preRollWarmupSeconds == 12
   and .targetTextTimeoutSeconds == 3
   and .minimumTargetCount == 2
-  and ([.targets[].id] == ["textedit", "safari"])
+  and .voiceInkBundleIdentifier == "com.negentropi.RomaJustTalk"
+  and .targets == [
+    {
+      id: "textedit",
+      displayName: "TextEdit",
+      bundleIdentifier: "com.apple.TextEdit",
+      kind: "document"
+    },
+    {
+      id: "safari",
+      displayName: "Safari",
+      bundleIdentifier: "com.apple.Safari",
+      kind: "browser"
+    }
+  ]
 ' <<<"$smoke_config_json" >/dev/null; then
   echo "Runtime smoke must emit the proven warmup and reduced target set." >&2
   exit 1
@@ -315,6 +338,50 @@ if ! jq -e '
   and .repetitions == 3
 ' <<<"$full_config_json" >/dev/null; then
   echo "Full runtime proof must preserve its observation and repetition budget." >&2
+  exit 1
+fi
+if ! jq -e '
+  .repetitions == 5
+  and .voiceInkLifecycle == "relaunchPerCase"
+' <<<"$cold_regression_config_json" >/dev/null; then
+  echo "Empty-final regression proof must relaunch Roma for every fresh-process case." >&2
+  exit 1
+fi
+evidence_contract_json="$(
+  runtime_e2e_evidence_contract_json \
+    "$cold_regression_config_json" \
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa \
+    false \
+    26.3.1 \
+    25D2128 \
+    arm64 \
+    public \
+    'public quick release.wav' \
+    bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb \
+    5.64 \
+    cccccccccccccccccccccccccccccccccccccccc \
+    dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd \
+    eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+)"
+if ! jq -e '
+  .schemaVersion == 1
+  and .platform == {
+    productVersion: "26.3.1",
+    buildVersion: "25D2128",
+    architecture: "arm64"
+  }
+  and .audio.sha256 == "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  and .audio.durationSeconds == 5.64
+  and .model.storage == "normal-application-support"
+  and .helperExecutableSha256 == "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+  and .configuration.repetitions == 5
+  and .configuration.voiceInkLifecycle == "relaunchPerCase"
+  and (.configuration | has("audioDirectory") | not)
+  and (.configuration | has("voiceInkAppPath") | not)
+  and (.configuration | has("voiceInkBuildDirectory") | not)
+  and (.configuration | has("explicitHoldSeconds") | not)
+' <<<"$evidence_contract_json" >/dev/null; then
+  echo "Empty-final evidence contract must bind normalized runtime inputs." >&2
   exit 1
 fi
 

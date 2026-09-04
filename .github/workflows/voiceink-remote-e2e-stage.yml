@@ -61,7 +61,7 @@ on:
           - "3"
           - "5"
       macos_empty_final_expectation:
-        description: Require exact cold empty-final regression evidence from the functional smoke
+        description: Require exact fresh-process empty-final evidence from the functional smoke
         required: true
         default: none
         type: choice
@@ -69,6 +69,10 @@ on:
           - none
           - known-bad
           - fixed
+      macos_empty_final_baseline_run_id:
+        description: Successful known-bad stage run required by fixed empty-final proof
+        required: false
+        type: string
       ios_artifact_run_id:
         description: Migration run ID containing the iOS Simulator app; blank uses latest green run
         required: false
@@ -132,6 +136,7 @@ env:
   STAGE_MACOS_AUDIO_ARTIFACT: ${{ inputs.macos_audio_artifact || '' }}
   STAGE_MACOS_REPETITIONS: ${{ inputs.macos_repetitions || '3' }}
   STAGE_MACOS_EMPTY_FINAL_EXPECTATION: ${{ inputs.macos_empty_final_expectation || 'none' }}
+  STAGE_MACOS_EMPTY_FINAL_BASELINE_RUN_ID: ${{ inputs.macos_empty_final_baseline_run_id || '' }}
   STAGE_MACOS_EXPECTED_VERSION: ${{ inputs.macos_expected_version || '' }}
   STAGE_MACOS_EXPECTED_BUILD: ${{ inputs.macos_expected_build || '' }}
   STAGE_DEVELOPER_DIR: ${{ inputs.developer_dir || '' }}
@@ -219,6 +224,7 @@ jobs:
             printf 'expected_macos_version=%s\n' "$STAGE_MACOS_EXPECTED_VERSION"
             printf 'expected_macos_build=%s\n' "$STAGE_MACOS_EXPECTED_BUILD"
             printf 'empty_final_expectation=%s\n' "$STAGE_MACOS_EMPTY_FINAL_EXPECTATION"
+            printf 'empty_final_baseline_run_id=%s\n' "$STAGE_MACOS_EMPTY_FINAL_BASELINE_RUN_ID"
           } > "$EVIDENCE/provisioning-context.txt"
 
       - name: Verify distribution E2E tooling
@@ -404,10 +410,57 @@ jobs:
                 "Build reusable runtime E2E helper" \
                 "$RUNNER_TEMP/remote-e2e-inputs/macos/runtime-helper-run-jobs.json"
             fi
-            gh run download "$HELPER_RUN_ID" \
-              --repo "$GITHUB_REPOSITORY" \
-              --name roma.runtime-e2e-harness.macos \
-              --dir "$RUNNER_TEMP/remote-e2e-inputs/macos/runtime-helper"
+            gh api \
+              "repos/$GITHUB_REPOSITORY/actions/runs/$HELPER_RUN_ID/artifacts?per_page=100" \
+              | jq -e \
+                --argjson run_id "$HELPER_RUN_ID" '
+                  [
+                    .artifacts[]
+                    | select(.name == "roma.runtime-e2e-harness.macos" and .expired == false)
+                  ]
+                  | select(length == 1)
+                  | .[0]
+                  | {
+                      id,
+                      runId: $run_id,
+                      name,
+                      sizeInBytes: .size_in_bytes,
+                      digest,
+                      createdAt: .created_at,
+                      expiresAt: .expires_at,
+                      expired
+                    }
+                  | select(.digest | test("^sha256:[0-9a-f]{64}$"))
+                ' \
+              > "$RUNNER_TEMP/remote-e2e-inputs/macos/runtime-helper-artifact-metadata.json"
+            test -s "$RUNNER_TEMP/remote-e2e-inputs/macos/runtime-helper-artifact-metadata.json"
+            HELPER_ARTIFACT_ID="$(
+              jq -r .id \
+                "$RUNNER_TEMP/remote-e2e-inputs/macos/runtime-helper-artifact-metadata.json"
+            )"
+            [[ "$HELPER_ARTIFACT_ID" =~ ^[0-9]+$ ]]
+            HELPER_OUTER_ARCHIVE="$RUNNER_TEMP/remote-e2e-inputs/macos/runtime-helper-artifact-archive.zip"
+            gh api \
+              "repos/$GITHUB_REPOSITORY/actions/artifacts/$HELPER_ARTIFACT_ID/zip" \
+              > "$HELPER_OUTER_ARCHIVE"
+            test -s "$HELPER_OUTER_ARCHIVE"
+            HELPER_OUTER_ARCHIVE_SHA="$(
+              shasum -a 256 "$HELPER_OUTER_ARCHIVE" | awk '{print $1}'
+            )"
+            if [ "sha256:$HELPER_OUTER_ARCHIVE_SHA" != "$(
+              jq -r .digest \
+                "$RUNNER_TEMP/remote-e2e-inputs/macos/runtime-helper-artifact-metadata.json"
+            )" ]; then
+              echo "Runtime helper artifact must be checksum-verified" >&2
+              exit 2
+            fi
+            printf '%s  %s\n' \
+              "$HELPER_OUTER_ARCHIVE_SHA" \
+              "$HELPER_OUTER_ARCHIVE" \
+              > "$RUNNER_TEMP/remote-e2e-inputs/macos/runtime-helper-artifact-archive.sha256"
+            ditto -x -k \
+              "$HELPER_OUTER_ARCHIVE" \
+              "$RUNNER_TEMP/remote-e2e-inputs/macos/runtime-helper"
             test -f "$RUNNER_TEMP/remote-e2e-inputs/macos/runtime-helper/roma.runtime-e2e-harness.macos.zip"
             echo "$HELPER_RUN_ID" \
               > "$RUNNER_TEMP/remote-e2e-inputs/macos/runtime-helper-run-id.txt"
@@ -469,6 +522,118 @@ jobs:
             > "$RUNNER_TEMP/remote-e2e-inputs/macos/macos-artifact-repository.txt"
           echo "Using macOS artifact from run $RUN_ID at $(jq -r .headSha "$RUNNER_TEMP/remote-e2e-inputs/macos/macos-app-run-metadata.json")"
 
+      - name: Download matched known-bad empty-final evidence
+        if: env.STAGE_MACOS_EMPTY_FINAL_EXPECTATION == 'fixed'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BASELINE_RUN_ID="$STAGE_MACOS_EMPTY_FINAL_BASELINE_RUN_ID"
+          if [[ ! "$BASELINE_RUN_ID" =~ ^[0-9]+$ ]]; then
+            echo "fixed empty-final proof requires macos_empty_final_baseline_run_id" >&2
+            exit 2
+          fi
+
+          BASELINE_ROOT="$RUNNER_TEMP/remote-e2e-inputs/macos/empty-final-baseline"
+          mkdir -p "$BASELINE_ROOT"
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$BASELINE_RUN_ID" \
+            | jq -e \
+              --arg repository "$GITHUB_REPOSITORY" \
+              --arg head_sha "$GITHUB_SHA" '
+                select(
+                  .repository.full_name == $repository
+                  and .head_repository.full_name == $repository
+                  and .status == "completed"
+                  and .conclusion == "success"
+                  and .head_sha == $head_sha
+                  and ((.path | split("@")[0]) == ".github/workflows/voiceink-remote-e2e-stage.yml")
+                )
+                | {
+                    runId: .id,
+                    headSha: .head_sha,
+                    workflowPath: (.path | split("@")[0]),
+                    conclusion: .conclusion,
+                    htmlUrl: .html_url,
+                    repository: .repository.full_name
+                  }
+              ' > "$BASELINE_ROOT/baseline-run-metadata.json"
+          test -s "$BASELINE_ROOT/baseline-run-metadata.json"
+
+          gh api \
+            "repos/$GITHUB_REPOSITORY/actions/runs/$BASELINE_RUN_ID/artifacts?per_page=100" \
+            | jq -e \
+              --argjson run_id "$BASELINE_RUN_ID" '
+                [
+                  .artifacts[]
+                  | select(.name == "remote-e2e-stage-evidence" and .expired == false)
+                ]
+                | select(length == 1)
+                | .[0]
+                | {
+                    id,
+                    runId: $run_id,
+                    name,
+                    sizeInBytes: .size_in_bytes,
+                    digest,
+                    createdAt: .created_at,
+                    expiresAt: .expires_at,
+                    expired
+                  }
+                | select(.digest | test("^sha256:[0-9a-f]{64}$"))
+              ' > "$BASELINE_ROOT/baseline-artifact-metadata.json"
+          test -s "$BASELINE_ROOT/baseline-artifact-metadata.json"
+
+          BASELINE_ARTIFACT_ID="$(jq -r .id "$BASELINE_ROOT/baseline-artifact-metadata.json")"
+          [[ "$BASELINE_ARTIFACT_ID" =~ ^[0-9]+$ ]]
+          BASELINE_ARCHIVE="$BASELINE_ROOT/baseline-artifact-archive.zip"
+          gh api \
+            "repos/$GITHUB_REPOSITORY/actions/artifacts/$BASELINE_ARTIFACT_ID/zip" \
+            > "$BASELINE_ARCHIVE"
+          test -s "$BASELINE_ARCHIVE"
+          BASELINE_ARCHIVE_SHA="$(
+            shasum -a 256 "$BASELINE_ARCHIVE" | awk '{print $1}'
+          )"
+          if [ "sha256:$BASELINE_ARCHIVE_SHA" != "$(
+            jq -r .digest "$BASELINE_ROOT/baseline-artifact-metadata.json"
+          )" ]; then
+            echo "Baseline evidence archive does not match its artifact digest" >&2
+            exit 2
+          fi
+          printf '%s  %s\n' \
+            "$BASELINE_ARCHIVE_SHA" \
+            "$BASELINE_ARCHIVE" \
+            > "$BASELINE_ROOT/baseline-artifact-archive.sha256"
+          ditto -x -k "$BASELINE_ARCHIVE" "$BASELINE_ROOT"
+          test -f "$BASELINE_ROOT/functional-smoke.json"
+          test -f "$BASELINE_ROOT/empty-final-e2e-contract.json"
+          test -f "$BASELINE_ROOT/empty-final-launch-events.tsv"
+          test -f "$BASELINE_ROOT/empty-final-termination-events.tsv"
+          test -f "$BASELINE_ROOT/voiceink-sha256.txt"
+          test -f "$BASELINE_ROOT/macos-artifact-metadata.json"
+          test -f "$BASELINE_ROOT/macos-app-run-metadata.json"
+          test -f "$BASELINE_ROOT/stage-manifest.json"
+          jq -e \
+            --arg run_id "$BASELINE_RUN_ID" \
+            --arg head_sha "$GITHUB_SHA" \
+            --arg scenario "$STAGE_MACOS_SCENARIO" \
+            --arg runner_label "$STAGE_RUNNER_LABEL" '
+              .status == "completed"
+                and .macOSEmptyFinalExpectation == "known-bad"
+                and .macOSRepetitions == 5
+                and .macOSScenario == $scenario
+                and .stageRunnerLabel == $runner_label
+                and .githubRunId == $run_id
+                and .githubSha == $head_sha
+            ' "$BASELINE_ROOT/stage-manifest.json" >/dev/null
+          bash scripts/verify-runtime-empty-final-regression.sh \
+            known-bad \
+            "$BASELINE_ROOT/functional-smoke.json" \
+            "$BASELINE_ROOT/empty-final-e2e-contract.json" \
+            "$BASELINE_ROOT/empty-final-launch-events.tsv" \
+            "$BASELINE_ROOT/empty-final-termination-events.tsv" \
+            > "$BASELINE_ROOT/baseline-reverification.txt"
+          echo "RUNTIME_E2E_EMPTY_FINAL_BASELINE_EVIDENCE=$BASELINE_ROOT" >> "$GITHUB_ENV"
+          echo "RUNTIME_E2E_EMPTY_FINAL_BASELINE_RUN_ID=$BASELINE_RUN_ID" >> "$GITHUB_ENV"
+
       - name: Download iOS Simulator app artifact
         if: env.STAGE_TARGET != 'macos'
         env:
@@ -503,6 +668,7 @@ jobs:
           env.STAGE_TARGET != 'ios' &&
           env.STAGE_MACOS_SCENARIO != 'none' &&
           env.STAGE_MACOS_SCENARIO != 'distribution-e2e' &&
+          env.STAGE_MACOS_EMPTY_FINAL_EXPECTATION == 'none' &&
           startsWith(inputs.macos_runner, 'namespace-profile-')
         uses: namespacelabs/nscloud-cache-action@c5f8dab7560444c4bf8dbc64f1b203431873c547 # v1.6.1
         with:
@@ -513,6 +679,7 @@ jobs:
           env.STAGE_TARGET != 'ios' &&
           env.STAGE_MACOS_SCENARIO != 'none' &&
           env.STAGE_MACOS_SCENARIO != 'distribution-e2e' &&
+          env.STAGE_MACOS_EMPTY_FINAL_EXPECTATION == 'none' &&
           startsWith(inputs.macos_runner, 'nscloud-macos-')
         run: |
           COLD_CACHE="$RUNNER_TEMP/roma-runtime-e2e-cold-model-cache"
@@ -541,6 +708,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           RUNTIME_MODEL_CACHE_HIT: ${{ steps.runtime-model-cache.outputs.cache-hit }}
           RUNTIME_E2E_EMPTY_FINAL_EXPECTATION: ${{ env.STAGE_MACOS_EMPTY_FINAL_EXPECTATION }}
+          RUNTIME_E2E_EMPTY_FINAL_BASELINE_RUN_ID: ${{ env.STAGE_MACOS_EMPTY_FINAL_BASELINE_RUN_ID }}
         run: |
           bash scripts/prepare-remote-e2e-stage.sh \
             "$STAGE_TARGET" \

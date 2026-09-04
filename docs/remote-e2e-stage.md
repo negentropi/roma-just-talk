@@ -29,6 +29,7 @@ Inputs:
 - `macos_audio_artifact`: private Namespace artifact containing WAV fixtures. Full runtime requires it. Smoke uses a pinned public CC-BY-4.0 [podscripter FLEURS fixture](https://huggingface.co/datasets/podscripter-project/test-fixtures) when blank.
 - `macos_repetitions`: `1`, `3`, or `5` repetitions per fixture/app after the smoke run.
 - `macos_empty_final_expectation`: `none`, `known-bad`, or `fixed`. The latter two require `runtime-smoke` or `distribution-e2e` and make the selected repetition count apply to the smoke cases.
+- `macos_empty_final_baseline_run_id`: successful `known-bad` stage run. Required only for a `fixed` empty-final proof. It must use the same stage tooling SHA and scenario.
 - `ios_artifact_run_id`: successful `VoiceInk iOS single-repo migration` workflow run containing the exact Simulator artifact. Blank selects the latest green run.
 - `ios_scenario`: `none` or `local-whisper-import`.
 - `hold_minutes`: 0 to 60 minutes after setup/scenario. `distribution-e2e` consumes this window while waiting for Safari, Finder, and Gatekeeper interaction and therefore rejects `0`.
@@ -203,17 +204,41 @@ partial, final ASR returns zero characters, the first commit is empty, and every
 failed smoke case has that same `emptyTranscript` boundary. A generic launch,
 target, permission, or audio failure does not count as reproduction.
 
-Then run the same scenario, fixture, and repetition count with the fixed app and
-`macos_empty_final_expectation=fixed`. That lane requires every smoke case to
-pass. At least one case must also have non-empty visible text, zero-character
-final ASR, the explicit `fluid_streaming.commit.fallback_to_hypothesis` event,
-and a non-empty first commit. Other passing repetitions may receive a normal
-non-empty final ASR. A green run with no fallback case does not prove this fix.
-Use `macos_repetitions=5` for both runs. For the release claim, use
+Then run the fixed app with `macos_empty_final_expectation=fixed` and set
+`macos_empty_final_baseline_run_id` to that successful known-bad stage run. The
+stage requires the same runner profile, downloads the immutable evidence
+artifact by ID, verifies its GitHub SHA-256 digest, reverifies the known-bad
+report, and compares
+`empty-final-e2e-contract.json` byte-for-byte before the fixed trial. The
+contract binds the tooling SHA, host OS/build/architecture, helper hash, audio
+hash and duration, model revision/manifest, translocation mode, targets, timing,
+lifecycle, and repetitions. It omits volatile app, build, and audio directory
+paths. The audio bytes remain bound by hash; only the affected and candidate app
+artifacts may differ.
+
+The app artifact is the experiment's changed input. The fixed stage requires
+the affected and candidate app run IDs, artifact IDs, artifact digests, source
+SHAs, and executable hashes to differ. The runtime helper and baseline evidence
+archives are also downloaded by artifact ID and checked against GitHub's
+recorded digest before extraction.
+
+The fixed lane requires every smoke case to pass. At least one case must also
+have non-empty visible text, zero-character final ASR, the explicit
+`fluid_streaming.commit.fallback_to_hypothesis` event, and a non-empty first
+commit. Other passing repetitions may receive a normal non-empty final ASR. A
+green run with no fallback case does not prove this fix. Use
+`macos_repetitions=5` for both runs. For the release claim, use
 `distribution-e2e`; `runtime-smoke` is only a faster diagnostic run.
 
 Both expectations reject a harness fatal error or failed restoration, even when
-one case otherwise matches the requested evidence.
+one case otherwise matches the requested evidence. They also require Roma to be
+stopped at preflight, reject external or symlinked model storage, and use the
+normal local FluidAudio model directory. Roma relaunches before every smoke case. Each
+case gets a fresh Roma process and fresh streaming provider/`AsrManager` after
+the normal app-level model prewarm. The verifier requires one unique launch PID
+per all 20 smoke cases and the same 20 PIDs in the normal-termination evidence.
+Five of those cases are the TextEdit empty-document repetitions. Ordinary
+runtime lanes keep the existing reused-process behavior.
 
 The exact result is stored in
 `runtime-empty-final-regression-verdict.txt`. The distribution chain also records

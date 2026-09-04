@@ -200,8 +200,12 @@ across four workers in parallel with machine setup.
 
 Use `macos_empty_final_expectation=known-bad` with the historical affected app
 artifact first. The lane succeeds only when a case receives a non-empty live
-partial, final ASR returns zero characters, the first commit is empty, and every
-failed smoke case has that same `emptyTranscript` boundary. A generic launch,
+partial, final ASR returns zero characters, and an empty first commit follows
+that final result in the same trace. The partial observer is asynchronous, so
+its log entry need not precede final ASR. Every failed smoke case must have that
+same `emptyTranscript` boundary on one exact configured target. The verifier
+derives that affected target and its affected text scenarios from the evidence.
+A generic launch,
 target, permission, or audio failure does not count as reproduction.
 
 Then run the fixed app with `macos_empty_final_expectation=fixed` and set
@@ -222,11 +226,13 @@ SHAs, and executable hashes to differ. The runtime helper and baseline evidence
 archives are also downloaded by artifact ID and checked against GitHub's
 recorded digest before extraction.
 
-The fixed lane requires every smoke case to pass. At least one case must also
-have non-empty visible text, zero-character final ASR, the explicit
+The fixed lane requires every smoke case to pass. It re-derives the baseline
+profile from the downloaded report. For every affected baseline text scenario,
+at least one case on the same exact target must have non-empty visible text,
+zero-character final ASR, the explicit
 `fluid_streaming.commit.fallback_to_hypothesis` event, and a non-empty first
-commit. Other passing repetitions may receive a normal non-empty final ASR. A
-green run with no fallback case does not prove this fix. Use
+commit in order. Other passing repetitions may receive a normal non-empty final
+ASR. A green run missing any matched fallback case does not prove this fix. Use
 `macos_repetitions=5` for both runs. For the release claim, use
 `distribution-e2e`; `runtime-smoke` is only a faster diagnostic run.
 
@@ -237,7 +243,8 @@ normal local FluidAudio model directory. Roma relaunches before every smoke case
 case gets a fresh Roma process and fresh streaming provider/`AsrManager` after
 the normal app-level model prewarm. The verifier requires one unique launch PID
 per all 20 smoke cases and the same 20 PIDs in the normal-termination evidence.
-Five of those cases are the TextEdit empty-document repetitions. Ordinary
+Those cases are the five repetitions of each TextEdit/Safari
+empty/existing-text condition. Ordinary
 runtime lanes keep the existing reused-process behavior.
 
 The exact result is stored in

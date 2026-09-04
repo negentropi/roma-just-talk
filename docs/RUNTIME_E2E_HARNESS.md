@@ -141,20 +141,27 @@ duration, model revision/manifest, translocation mode, targets, timing,
 lifecycle, and repetitions. It excludes volatile app, build, and audio
 directory paths. The audio bytes remain bound by hash; only the app artifact is
 intended to differ.
-The first run accepts only the exact live-partial, zero-character final ASR, and
-empty-commit failure. The second accepts only an all-green report with at least
-one case where that same zero-character final ASR emitted
-`fluid_streaming.commit.fallback_to_hypothesis`, committed non-empty text, and
-rendered it in the target. A normal non-empty final ASR is intentionally
-allowed in other passing cases. A run with no fallback case is rejected as
+The first run accepts only a non-empty live partial plus a zero-character final
+ASR followed by an empty commit in the same trace. The partial event may be
+logged later because its observer crosses an actor boundary. All failed cases
+must have that exact symptom on one configured target. The verifier derives the
+affected target and text scenarios
+from this report instead of assuming which target will expose the intermittent
+ASR result. The second run reverifies that baseline report and accepts only an
+all-green report. For every affected baseline scenario on the same target, at
+least one case must reach zero-character final ASR, emit
+`fluid_streaming.commit.fallback_to_hypothesis`, commit non-empty text, and
+render it in the target. A normal non-empty final ASR is intentionally allowed
+in other passing cases. A run missing any matched fallback case is rejected as
 unproven. These expectation modes reject external or symlinked model storage. They
 hydrate the normal FluidAudio Application Support directory, stop the prewarm
 process before preflight, require the report to begin with no Roma process, and
 relaunch Roma before every case. The verifier consumes the launch and normal
 termination event files. It requires 20 unique launch PIDs, one for every smoke
-case, and the same 20 PIDs in the termination file. Five of those processes run
-the TextEdit empty-document case. Each gets a fresh streaming provider and
-`AsrManager` after the normal app-level model prewarm. This is not an uncached
+case, and the same 20 PIDs in the termination file. The matrix contains five
+repetitions of each TextEdit/Safari empty/existing-text condition. Each gets a
+fresh streaming provider and `AsrManager` after the normal app-level model
+prewarm. This is not an uncached
 model-load claim. The matched inputs are recorded in
 `empty-final-e2e-contract.json`.
 

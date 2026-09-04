@@ -1164,7 +1164,7 @@ if [ "$empty_final_expectation" != "none" ]; then
     "$empty_final_termination_events"
   )
   if [ "$empty_final_expectation" = "fixed" ]; then
-    empty_final_verifier_arguments+=("$baseline_contract")
+    empty_final_verifier_arguments+=("$baseline_report" "$baseline_contract")
   fi
   bash "$empty_final_verifier" \
     "${empty_final_verifier_arguments[@]}" \

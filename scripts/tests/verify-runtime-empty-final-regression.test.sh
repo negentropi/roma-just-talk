@@ -41,7 +41,13 @@ cat > "$TEMP_ROOT/known-bad.json" <<'JSON'
   "summary": {"passed": false},
   "fatalError": null,
   "restoredOriginalState": true,
-  "preflight": {"voiceInk": {"runningPaths": []}},
+  "preflight": {
+    "voiceInk": {"runningPaths": []},
+    "targets": [
+      {"id":"textedit","displayName":"TextEdit","bundleIdentifier":"com.apple.TextEdit","bundlePath":"/System/Applications/TextEdit.app","installed":true,"runningPaths":[],"version":"1"},
+      {"id":"safari","displayName":"Safari","bundleIdentifier":"com.apple.Safari","bundlePath":"/System/Applications/Safari.app","installed":true,"runningPaths":[],"version":"1"}
+    ]
+  },
   "voiceInkSession": {"originallyRunningPaths": []},
   "cases": [
     {
@@ -109,7 +115,13 @@ cat > "$TEMP_ROOT/fixed-fallback.json" <<'JSON'
   "summary": {"passed": true},
   "fatalError": null,
   "restoredOriginalState": true,
-  "preflight": {"voiceInk": {"runningPaths": []}},
+  "preflight": {
+    "voiceInk": {"runningPaths": []},
+    "targets": [
+      {"id":"textedit","displayName":"TextEdit","bundleIdentifier":"com.apple.TextEdit","bundlePath":"/System/Applications/TextEdit.app","installed":true,"runningPaths":[],"version":"1"},
+      {"id":"safari","displayName":"Safari","bundleIdentifier":"com.apple.Safari","bundlePath":"/System/Applications/Safari.app","installed":true,"runningPaths":[],"version":"1"}
+    ]
+  },
   "voiceInkSession": {"originallyRunningPaths": []},
   "cases": [
     {
@@ -252,23 +264,6 @@ jq '
 ' "$TEMP_ROOT/known-bad.json" > "$TEMP_ROOT/mixed-failure.json"
 
 jq '
-  .cases[0].id = "ordinary-textedit-pass"
-  | .cases[0].assessment = {"status": "passed", "passed": true}
-  | .cases[0].latencyTrace.events = [
-      {"name": "streaming_event.first_partial", "details": "chars=18"},
-      {"name": "fluid_streaming.final_asr.end", "details": "chars=18"},
-      {"name": "streaming_event.first_commit", "details": "chars=18"}
-    ]
-  | .cases[10].id = "wrong-target-empty-final"
-  | .cases[10].assessment = {"status": "emptyTranscript", "passed": false}
-  | .cases[10].latencyTrace.events = [
-      {"name": "streaming_event.first_partial", "details": "chars=18"},
-      {"name": "fluid_streaming.final_asr.end", "details": "chars=0"},
-      {"name": "streaming_event.first_commit", "details": "chars=0"}
-    ]
-' "$TEMP_ROOT/known-bad.json" > "$TEMP_ROOT/wrong-target.json"
-
-jq '
   .cases[0].assessment = {"status": "passed", "passed": true}
   | .cases[5].id = "wrong-textedit-bundle-empty-final"
   | .cases[5].textScenario = "empty"
@@ -350,6 +345,12 @@ JSON
 jq '.audio.sha256 = "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"' \
   "$TEMP_ROOT/evidence-contract.json" \
   > "$TEMP_ROOT/different-evidence-contract.json"
+jq '.configuration.voiceInkLifecycle = "reuse"' \
+  "$TEMP_ROOT/evidence-contract.json" \
+  > "$TEMP_ROOT/baseline-reused-process-contract.json"
+jq '.configuration.repetitions = 3' \
+  "$TEMP_ROOT/evidence-contract.json" \
+  > "$TEMP_ROOT/baseline-three-repetitions-contract.json"
 
 verify_known_bad() {
   bash "$VERIFIER" \
@@ -367,30 +368,163 @@ verify_fixed() {
     "$TEMP_ROOT/evidence-contract.json" \
     "${2:-$LAUNCH_EVENTS}" \
     "${3:-$TERMINATION_EVENTS}" \
+    "${4:-$TEMP_ROOT/known-bad.json}" \
     "$TEMP_ROOT/evidence-contract.json"
 }
 
+verify_fixed_with_baseline_contract() {
+  bash "$VERIFIER" \
+    fixed \
+    "$1" \
+    "$TEMP_ROOT/evidence-contract.json" \
+    "${2:-$LAUNCH_EVENTS}" \
+    "${3:-$TERMINATION_EVENTS}" \
+    "$4" \
+    "$5"
+}
+
+# A second, live-shape baseline proves that the verifier derives the affected
+# target/scenario profile from the known-bad report instead of hard-coding
+# TextEdit empty. Safari fails in both supported text scenarios here.
+jq '
+  .cases[0].assessment = {status: "passed", passed: true}
+  | .cases[0].latencyTrace.events = []
+  | .cases[10].assessment = {status: "emptyTranscript", passed: false}
+  | .cases[10].latencyTrace.events = [
+      {name: "streaming_event.first_partial", details: "chars=18"},
+      {name: "fluid_streaming.final_asr.end", details: "chars=0"},
+      {name: "streaming_event.first_commit", details: "chars=0"}
+    ]
+  | .cases[15].assessment = {status: "emptyTranscript", passed: false}
+  | .cases[15].latencyTrace.events = [
+      {name: "streaming_event.first_partial", details: "chars=18"},
+      {name: "fluid_streaming.final_asr.end", details: "chars=0"},
+      {name: "streaming_event.first_commit", details: "chars=0"}
+    ]
+' "$TEMP_ROOT/known-bad.json" > "$TEMP_ROOT/known-bad-safari.json"
+
+jq '
+  .cases[0].latencyTrace.events = []
+  | .cases[0].visibleText = null
+  | .cases[10].visibleText = {text: "safari empty fallback"}
+  | .cases[10].latencyTrace.events = [
+      {name: "streaming_event.first_partial", details: "chars=18"},
+      {name: "fluid_streaming.final_asr.end", details: "chars=0"},
+      {name: "fluid_streaming.commit.fallback_to_hypothesis", details: "chars=18"},
+      {name: "streaming_event.first_commit", details: "chars=18"}
+    ]
+  | .cases[15].visibleText = {text: "safari existing fallback"}
+  | .cases[15].latencyTrace.events = [
+      {name: "streaming_event.first_partial", details: "chars=18"},
+      {name: "fluid_streaming.final_asr.end", details: "chars=0"},
+      {name: "fluid_streaming.commit.fallback_to_hypothesis", details: "chars=18"},
+      {name: "streaming_event.first_commit", details: "chars=18"}
+    ]
+' "$TEMP_ROOT/fixed-fallback.json" > "$TEMP_ROOT/fixed-safari-fallback.json"
+
+jq '.preflight.targets |= map(select(.id != "safari"))' \
+  "$TEMP_ROOT/known-bad-safari.json" > "$TEMP_ROOT/safari-absent-preflight.json"
+jq '(.preflight.targets[] | select(.id == "safari")).displayName = "Wrong Safari"' \
+  "$TEMP_ROOT/known-bad-safari.json" > "$TEMP_ROOT/safari-target-tuple-mismatch.json"
+jq '.configuration.targets[1] = {id:"notes",displayName:"Notes",bundleIdentifier:"com.apple.Notes",kind:"document"}' \
+  "$TEMP_ROOT/known-bad-safari.json" > "$TEMP_ROOT/safari-absent-config.json"
+jq '.configuration.targets[1] = {id:"notes",displayName:"Notes",bundleIdentifier:"com.apple.Notes",kind:"document"}' \
+  "$TEMP_ROOT/evidence-contract.json" > "$TEMP_ROOT/safari-absent-config-contract.json"
+jq '.cases[10].assessment = {status: "emptyTranscript", passed: false}
+    | .cases[10].latencyTrace.events = .cases[0].latencyTrace.events' \
+  "$TEMP_ROOT/known-bad.json" > "$TEMP_ROOT/failures-split-targets.json"
+jq '.cases[15].visibleText = null | .cases[15].latencyTrace.events = []' \
+  "$TEMP_ROOT/fixed-safari-fallback.json" > "$TEMP_ROOT/missing-safari-existing-fallback.json"
+jq '.cases[10].latencyTrace.events = [
+      {name: "streaming_event.first_partial", details: "chars=18"},
+      {name: "fluid_streaming.final_asr.end", details: "chars=0"},
+      {name: "streaming_event.first_commit", details: "chars=18"},
+      {name: "fluid_streaming.commit.fallback_to_hypothesis", details: "chars=18"}
+    ]' "$TEMP_ROOT/fixed-safari-fallback.json" > "$TEMP_ROOT/out-of-order-safari-fallback.json"
+jq '.cases[0].latencyTrace.events = [
+      {name: "streaming_event.first_commit", details: "chars=18"},
+      {name: "streaming_event.first_partial", details: "chars=18"},
+      {name: "fluid_streaming.final_asr.end", details: "chars=0"},
+      {name: "streaming_event.first_commit", details: "chars=0"}
+    ]' "$TEMP_ROOT/known-bad.json" > "$TEMP_ROOT/duplicate-known-bad-first-commit.json"
+jq '.cases[0].latencyTrace.events += [
+      {name: "streaming_event.first_commit", details: "chars=18"}
+    ]' "$TEMP_ROOT/fixed-fallback.json" > "$TEMP_ROOT/duplicate-fixed-first-commit.json"
+jq '.cases[0].latencyTrace.events += [
+      {name: "fluid_streaming.final_asr.end", details: "chars=0"}
+    ]' "$TEMP_ROOT/fixed-fallback.json" > "$TEMP_ROOT/duplicate-fixed-final.json"
+jq '.cases[0].latencyTrace.events += [
+      {name: "fluid_streaming.commit.fallback_to_hypothesis", details: "chars=18"}
+    ]' "$TEMP_ROOT/fixed-fallback.json" > "$TEMP_ROOT/duplicate-fixed-fallback.json"
+
 verify_known_bad "$TEMP_ROOT/known-bad.json"
 verify_fixed "$TEMP_ROOT/fixed-fallback.json"
+verify_known_bad "$TEMP_ROOT/known-bad-safari.json"
+verify_fixed "$TEMP_ROOT/fixed-safari-fallback.json" "$LAUNCH_EVENTS" "$TERMINATION_EVENTS" "$TEMP_ROOT/known-bad-safari.json"
 
 expect_failure \
-  "no case proved the fixed empty-final fallback" \
+  "fixed report did not prove ordered fallback delivery for every affected baseline scenario" \
   verify_fixed "$TEMP_ROOT/ordinary-pass.json"
 expect_failure \
   "no case reproduced the live-partial to empty-final bug" \
   verify_known_bad "$TEMP_ROOT/generic-empty.json"
 expect_failure \
   "no case reproduced the live-partial to empty-final bug" \
-  verify_known_bad "$TEMP_ROOT/wrong-target.json"
+  verify_known_bad "$TEMP_ROOT/duplicate-known-bad-first-commit.json"
 expect_failure \
-  "no case reproduced the live-partial to empty-final bug" \
+  "runtime E2E report did not contain the complete 20-case smoke matrix" \
   verify_known_bad "$TEMP_ROOT/wrong-textedit-bundle.json"
 expect_failure \
-  "no case reproduced the live-partial to empty-final bug" \
+  "runtime E2E report did not contain the complete 20-case smoke matrix" \
   verify_known_bad "$TEMP_ROOT/wrong-textedit-kind.json"
 expect_failure \
-  "known-bad report contains a different failed case" \
+  "no case reproduced the live-partial to empty-final bug" \
   verify_known_bad "$TEMP_ROOT/mixed-failure.json"
+expect_failure \
+  "no case reproduced the live-partial to empty-final bug" \
+  verify_known_bad "$TEMP_ROOT/safari-absent-preflight.json"
+expect_failure \
+  "no case reproduced the live-partial to empty-final bug" \
+  verify_known_bad "$TEMP_ROOT/safari-target-tuple-mismatch.json"
+expect_failure \
+  "runtime E2E evidence contract is invalid" \
+  bash "$VERIFIER" known-bad "$TEMP_ROOT/safari-absent-config.json" "$TEMP_ROOT/safari-absent-config-contract.json" "$LAUNCH_EVENTS" "$TERMINATION_EVENTS"
+expect_failure \
+  "no case reproduced the live-partial to empty-final bug" \
+  verify_known_bad "$TEMP_ROOT/failures-split-targets.json"
+expect_failure \
+  "fixed report did not prove ordered fallback delivery for every affected baseline scenario" \
+  verify_fixed "$TEMP_ROOT/fixed-fallback.json" "$LAUNCH_EVENTS" "$TERMINATION_EVENTS" "$TEMP_ROOT/known-bad-safari.json"
+expect_failure \
+  "fixed report did not prove ordered fallback delivery for every affected baseline scenario" \
+  verify_fixed "$TEMP_ROOT/missing-safari-existing-fallback.json" "$LAUNCH_EVENTS" "$TERMINATION_EVENTS" "$TEMP_ROOT/known-bad-safari.json"
+expect_failure \
+  "fixed report did not prove ordered fallback delivery for every affected baseline scenario" \
+  verify_fixed "$TEMP_ROOT/out-of-order-safari-fallback.json" "$LAUNCH_EVENTS" "$TERMINATION_EVENTS" "$TEMP_ROOT/known-bad-safari.json"
+expect_failure \
+  "fixed report did not prove ordered fallback delivery for every affected baseline scenario" \
+  verify_fixed "$TEMP_ROOT/duplicate-fixed-first-commit.json"
+expect_failure \
+  "fixed report did not prove ordered fallback delivery for every affected baseline scenario" \
+  verify_fixed "$TEMP_ROOT/duplicate-fixed-final.json"
+expect_failure \
+  "fixed report did not prove ordered fallback delivery for every affected baseline scenario" \
+  verify_fixed "$TEMP_ROOT/duplicate-fixed-fallback.json"
+expect_failure \
+  "verified known-bad report contains a fatal error" \
+  verify_fixed "$TEMP_ROOT/fixed-fallback.json" "$LAUNCH_EVENTS" "$TERMINATION_EVENTS" "$TEMP_ROOT/known-bad-fatal.json"
+expect_failure \
+  "verified known-bad report did not restore original state" \
+  verify_fixed "$TEMP_ROOT/fixed-fallback.json" "$LAUNCH_EVENTS" "$TERMINATION_EVENTS" "$TEMP_ROOT/known-bad-unrestored.json"
+expect_failure \
+  "verified known-bad report did not begin from a stopped app" \
+  verify_fixed "$TEMP_ROOT/fixed-fallback.json" "$LAUNCH_EVENTS" "$TERMINATION_EVENTS" "$TEMP_ROOT/known-bad-warm-start.json"
+expect_failure \
+  "verified known-bad report did not use five relaunch-per-case trials" \
+  verify_fixed_with_baseline_contract "$TEMP_ROOT/fixed-fallback.json" "$LAUNCH_EVENTS" "$TERMINATION_EVENTS" "$TEMP_ROOT/known-bad-reused-process.json" "$TEMP_ROOT/baseline-reused-process-contract.json"
+expect_failure \
+  "verified known-bad report did not use five relaunch-per-case trials" \
+  verify_fixed_with_baseline_contract "$TEMP_ROOT/fixed-fallback.json" "$LAUNCH_EVENTS" "$TERMINATION_EVENTS" "$TEMP_ROOT/known-bad-three-repetitions.json" "$TEMP_ROOT/baseline-three-repetitions-contract.json"
 expect_failure \
   "runtime E2E report contains a fatal error" \
   verify_known_bad "$TEMP_ROOT/known-bad-fatal.json"
@@ -401,13 +535,13 @@ expect_failure \
   "runtime E2E report did not begin from a stopped app" \
   verify_known_bad "$TEMP_ROOT/known-bad-warm-start.json"
 expect_failure \
-  "runtime E2E report did not use five relaunch-per-case trials" \
+  "runtime E2E report does not match its evidence contract" \
   verify_known_bad "$TEMP_ROOT/known-bad-reused-process.json"
 expect_failure \
-  "runtime E2E report did not use five relaunch-per-case trials" \
+  "runtime E2E report does not match its evidence contract" \
   verify_known_bad "$TEMP_ROOT/known-bad-three-repetitions.json"
 expect_failure \
-  "runtime E2E report did not contain five TextEdit empty-document repetitions" \
+  "runtime E2E report did not contain the complete 20-case smoke matrix" \
   verify_known_bad "$TEMP_ROOT/known-bad-missing-trial.json"
 expect_failure \
   "runtime E2E report does not match its evidence contract" \
@@ -437,7 +571,7 @@ expect_failure \
     "$LAUNCH_EVENTS" \
     "$TEMP_ROOT/mismatched-termination.tsv"
 expect_failure \
-  "fixed proof requires a verified known-bad evidence contract" \
+  "fixed proof requires a verified known-bad report and evidence contract" \
   bash "$VERIFIER" \
     fixed \
     "$TEMP_ROOT/fixed-fallback.json" \
@@ -452,6 +586,7 @@ expect_failure \
     "$TEMP_ROOT/evidence-contract.json" \
     "$LAUNCH_EVENTS" \
     "$TERMINATION_EVENTS" \
+    "$TEMP_ROOT/known-bad.json" \
     "$TEMP_ROOT/different-evidence-contract.json"
 expect_failure \
   "usage:" \

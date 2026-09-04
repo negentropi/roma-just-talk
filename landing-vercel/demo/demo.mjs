@@ -5,6 +5,7 @@ import { createPreviewDictationAdapter } from "./preview-dictation.mjs";
 import { createSpecialHold } from "./special-hold.mjs";
 
 const root = document.querySelector("[data-demo-root]");
+const siteBarTemplate = document.querySelector("[data-site-bar-template]");
 const editor = document.querySelector("[data-dictation-input]");
 const writingField = document.querySelector("[data-writing-field]");
 const caret = document.querySelector("[data-voice-caret]");
@@ -29,7 +30,58 @@ let shouldResumePreview = false;
 let userMediaOwnsPermission = false;
 let firstAttemptStarted = false;
 let armGeneration = 0;
+let siteBar = null;
+let siteBarToggle = null;
 const heldChordKeys = new Set();
+
+function setSiteBarOpen(open) {
+  if (!siteBar || !siteBarToggle) return;
+  siteBar.dataset.open = String(open);
+  siteBarToggle.setAttribute("aria-expanded", String(open));
+}
+
+function closeSiteBarOutside(event) {
+  if (siteBar?.dataset.open === "true" && !siteBar.contains(event.target)) {
+    setSiteBarOpen(false);
+  }
+}
+
+function mountSiteBar() {
+  if (!siteBar) {
+    siteBar = siteBarTemplate.content.firstElementChild.cloneNode(true);
+    siteBarToggle = siteBar.querySelector("[data-site-bar-toggle]");
+
+    siteBarToggle.addEventListener("click", () => setSiteBarOpen(true));
+
+    siteBar.addEventListener("focusin", () => setSiteBarOpen(true));
+
+    siteBar.addEventListener("focusout", (event) => {
+      if (!siteBar.contains(event.relatedTarget)) setSiteBarOpen(false);
+    });
+
+    siteBar.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape") return;
+      setSiteBarOpen(false);
+      editor.focus({ preventScroll: true });
+    });
+  }
+
+  if (!siteBar.isConnected) {
+    root.append(siteBar);
+    document.addEventListener("pointerdown", closeSiteBarOutside);
+  }
+}
+
+function setSiteBarAvailable(available) {
+  if (available) {
+    mountSiteBar();
+    return;
+  }
+  if (!siteBar) return;
+  setSiteBarOpen(false);
+  document.removeEventListener("pointerdown", closeSiteBarOutside);
+  siteBar.remove();
+}
 
 function insertionFor(value, start, end, text) {
   const before = value.slice(0, start);
@@ -104,6 +156,8 @@ function render(snapshot) {
   currentSnapshot = snapshot;
   root.dataset.phase = snapshot.phase;
   root.dataset.mode = currentMode;
+  const siteBarAvailable = ["ready", "capturing", "finalizing"].includes(snapshot.phase);
+  setSiteBarAvailable(siteBarAvailable);
   statusText.textContent = snapshot.message;
   audioDisclosure.textContent = currentMode === "preview"
     ? "See-only preview. No microphone audio is captured or sent."

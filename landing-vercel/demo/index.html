@@ -10,7 +10,7 @@
     <meta name="theme-color" content="#111210" />
     <meta name="darkreader-lock" />
     <title>Try Roma Just Talk</title>
-    <link rel="stylesheet" href="/demo/demo.css?v=20260831-browser-speech" />
+    <link rel="stylesheet" href="/demo/demo.css?v=20260904-top-bar" />
   </head>
   <body>
     <main class="demo" data-demo-root data-phase="preparing" data-mode="microphone">
@@ -164,9 +164,38 @@
       <button class="touch-trigger" type="button" data-touch-trigger disabled aria-pressed="false">
         hold to catch this
       </button>
+
+      <template data-site-bar-template>
+        <header class="site-bar-reveal" data-site-bar data-open="false">
+          <span class="site-bar-hotspot" aria-hidden="true"></span>
+          <button
+            class="site-bar-toggle"
+            type="button"
+            data-site-bar-toggle
+            aria-label="Show site navigation"
+            aria-controls="site-navigation"
+            aria-expanded="false"
+          >
+            <span aria-hidden="true"></span>
+          </button>
+          <nav class="site-bar" id="site-navigation" data-site-bar-panel aria-label="Site">
+            <a class="site-brand" href="/">
+              <span class="site-mark" aria-hidden="true">r</span>
+              <span>roma just talk</span>
+            </a>
+            <div class="site-links">
+              <a href="/">home</a>
+              <a href="/demo" aria-current="page">demo</a>
+              <a href="/pricing">pricing</a>
+              <a href="/readme">readme</a>
+              <a href="/changelogs">changelog</a>
+            </div>
+          </nav>
+        </header>
+      </template>
     </main>
 
     <noscript>This demo needs JavaScript and microphone access.</noscript>
-    <script type="module" src="/demo/demo.mjs?v=20260831-browser-speech"></script>
+    <script type="module" src="/demo/demo.mjs?v=20260904-top-bar"></script>
   </body>
 </html>

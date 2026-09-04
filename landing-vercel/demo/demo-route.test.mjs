@@ -35,6 +35,9 @@ test("the exact public /demo rewrite resolves runnable local assets", async () =
   assert.match(page.body, /class="environment-stack"[^>]+inert/);
   assert.match(page.body, /Roma servers receive or store no audio or text/);
   assert.equal((page.body.match(/data-environment=/g) || []).length, 9);
+  assert.match(page.body, /<template data-site-bar-template>/);
+  assert.match(page.body, /data-site-bar-toggle/);
+  assert.match(page.body, /<nav class="site-bar"[^>]+aria-label="Site"/);
   assert.doesNotMatch(page.body, /<nav class="topline"|demo-intro|demo-controls|context-rail|shuffle context/i);
   assert.doesNotMatch(page.body, /<script(?![^>]+src=)[^>]*>\s*\S/i);
   assert.doesNotMatch(page.body, /<script[^>]+src="https:/i);

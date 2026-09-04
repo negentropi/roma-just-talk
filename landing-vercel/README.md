@@ -12,6 +12,8 @@ the previous three seconds of recognized words in the tab, adds speech heard
 while Left Shift is held, and inserts the claimed words on release. There is no
 model download, site transcription API, or Roma microphone-audio upload. The
 browser may process audio on the device or send it to its own speech provider.
+Moving the pointer to the top edge, or tapping its slim touch handle, reveals
+site navigation without framing the demo as a regular landing page.
 
 ```sh
 npm test

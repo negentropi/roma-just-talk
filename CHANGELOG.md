@@ -7,7 +7,7 @@
 - Added a fresh-Mac distribution E2E that follows the exact GitHub Actions outer ZIP through Safari quarantine, Archive Utility's real recursive or separate Finder extraction path, Gatekeeper Open Anyway, App Translocation, generic mapped-code verification, and a real transcription smoke.
 - Fixed the first cold FluidAudio streaming dictation sometimes pasting nothing when live recognition had text but final ASR returned empty.
 - Linked whisper.cpp statically into the macOS and iOS apps so ad-hoc builds no longer depend on a separately signed `whisper.framework` at launch.
-- Rebuilt `/demo` as a full-screen, zero-download browser dictation experience with a three-second rolling speech pre-roll, Left Shift release insertion, automatic writing-environment changes, microphone recovery, and a narrated no-mic preview.
+- Rebuilt `/demo` as a full-screen, zero-download browser dictation experience with a three-second rolling speech pre-roll, Left Shift release insertion, automatic writing-environment changes, microphone recovery, a narrated no-mic preview, and site navigation revealed only at the top edge.
 - Added a real-audio `/demo` E2E lane that routes a fixed WAV through BlackHole, starts the player 1.1 seconds before Left Shift, releases after playback, and gates the pre-trigger opening word, transcript accuracy, and key-up completion latency in Chrome's real speech service.
 - Restyled the landing-page action frames in white, light gray, and dark gray while keeping their current faces and interactions.
 - Changed automatic macOS recording mute to keep AirPods output audible while muting other outputs; explicit On and Off modes remain overrides.

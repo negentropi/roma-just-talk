@@ -103,7 +103,8 @@ test("hands-on demo claims speech from before and during Left Shift", async ({ p
   await expect(input).toBeFocused();
   await expect(page.locator("[data-permission-recovery]")).toBeHidden();
   await expect(page.locator("[data-audio-disclosure]")).toContainText("Roma servers receive or store no audio or text");
-  await expect(page.locator("header nav, .demo-intro, .demo-controls")).toHaveCount(0);
+  await expect(page.locator("[data-site-bar]")).toHaveCount(1);
+  await expect(page.locator(".demo-intro, .demo-controls")).toHaveCount(0);
   for (let step = 0; step < 8; step += 1) {
     await page.keyboard.press("Tab");
     expect(await page.evaluate(() => Boolean(document.activeElement?.closest(".environment-stack")))).toBe(false);
@@ -126,6 +127,72 @@ test("hands-on demo claims speech from before and during Left Shift", async ({ p
     timeout: 8_000,
   }).not.toBe("messages");
   expect(await input.boundingBox()).toEqual(startingBox);
+});
+
+test("top-edge hover reveals site navigation without disturbing dictation", async ({ page }) => {
+  await installSpeech(page);
+  await page.goto("/demo");
+
+  const input = page.locator("[data-dictation-input]");
+  const siteBar = page.locator("[data-site-bar-panel]");
+  const startingBox = await input.boundingBox();
+
+  await expect(siteBar).toHaveCSS("opacity", "0");
+  await page.mouse.move(200, 1);
+  await expect(siteBar).toHaveCSS("opacity", "1");
+  await expect(page.getByRole("navigation", { name: "Site" })).toContainText("roma just talk");
+  await expect(page.getByRole("link", { name: "demo", exact: true })).toHaveAttribute("aria-current", "page");
+  await expect(input).toBeFocused();
+  expect(await input.boundingBox()).toEqual(startingBox);
+
+  await page.mouse.move(200, 140);
+  await expect(siteBar).toHaveCSS("opacity", "0");
+
+  await input.focus();
+  await page.keyboard.press("Tab");
+  const toggle = page.locator("[data-site-bar-toggle]");
+  await expect(toggle).toBeFocused();
+  await expect(toggle).toHaveAttribute("aria-expanded", "true");
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("link", { name: "roma just talk" })).toBeFocused();
+  await expect(siteBar).toHaveCSS("opacity", "1");
+  await page.keyboard.press("Escape");
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await expect(input).toBeFocused();
+  await expect(siteBar).toHaveCSS("opacity", "0");
+});
+
+test("touch handle opens the site navigation and outside tap closes it", async ({ browser, baseURL }) => {
+  const context = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    hasTouch: true,
+    isMobile: true,
+  });
+  await context.addInitScript(installFakeSpeech);
+  const page = await context.newPage();
+  await page.goto(`${baseURL}/demo`);
+
+  const input = page.locator("[data-dictation-input]");
+  const siteBar = page.locator("[data-site-bar-panel]");
+  const toggle = page.locator("[data-site-bar-toggle]");
+  const startingBox = await input.boundingBox();
+
+  await expect(siteBar).toHaveCSS("opacity", "0");
+  await expect(toggle).toBeVisible();
+  expect(Math.round((await toggle.boundingBox()).height)).toBeGreaterThanOrEqual(44);
+  await toggle.tap();
+  await expect(toggle).toHaveAttribute("aria-expanded", "true");
+  await expect(siteBar).toHaveCSS("opacity", "1");
+  for (const link of await page.getByRole("navigation", { name: "Site" }).getByRole("link").all()) {
+    expect(Math.round((await link.boundingBox()).height)).toBeGreaterThanOrEqual(44);
+  }
+  expect(await input.boundingBox()).toEqual(startingBox);
+
+  await page.touchscreen.tap(195, 300);
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await expect(siteBar).toHaveCSS("opacity", "0");
+  expect(await input.boundingBox()).toEqual(startingBox);
+  await context.close();
 });
 
 test("unsupported speech exposes the secondary preview without page chrome", async ({ browser, baseURL }) => {
@@ -159,7 +226,8 @@ test("unsupported speech exposes the secondary preview without page chrome", asy
   await expect(page.locator("[data-demo-root]")).toHaveAttribute("data-phase", "unsupported");
   await expect(page.locator("[data-permission-recovery]")).toBeVisible();
   await expect(page.locator("[data-preview-mode]")).toBeVisible();
-  await expect(page.locator("header nav, .demo-intro, .demo-controls")).toHaveCount(0);
+  await expect(page.locator("[data-site-bar]")).toHaveCount(0);
+  await expect(page.locator(".demo-intro, .demo-controls")).toHaveCount(0);
   await expect(page.locator("[data-dictation-input]")).toBeFocused();
   await page.locator("[data-preview-mode]").click();
   await expect(page.locator("[data-demo-root]")).toHaveAttribute("data-mode", "preview");
@@ -180,12 +248,14 @@ test("a denied microphone recovers through Chrome's trusted control", async ({ b
 
   const root = page.locator("[data-demo-root]");
   await expect(root).toHaveAttribute("data-phase", "permission-denied");
+  await expect(page.locator("[data-site-bar]")).toHaveCount(0);
   await expect(page.locator("[data-permission-recovery]")).toBeVisible();
   await expect(page.locator("[data-recovery-copy]")).toContainText("requests audio only");
   await expect(page.locator("[data-preview-mode]")).toBeHidden();
   await page.waitForTimeout(1_500);
   await page.locator("usermedia").click();
   await expect(root).toHaveAttribute("data-phase", "ready");
+  await expect(page.locator("[data-site-bar]")).toHaveCount(1);
   await expect(page.locator("[data-dictation-input]")).toBeFocused();
   await expect.poll(() => page.evaluate(() => window.__speech.starts)).toBe(2);
   await context.close();

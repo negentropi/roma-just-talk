@@ -2,7 +2,7 @@
 
 ## v1.96 - Unreleased
 
-- Added a landing-page Trust section that explains local and cloud data flow, macOS permissions, the current non-notarized download boundary, public project evidence, website analytics, and Felix's promise to investigate and publish fixes.
+- Reworked the landing Trust section to disclose the exact downloadable build, pre-trigger microphone behavior, cloud and context data paths, local history and credential storage, broad permission scope, non-notarized distribution, and Felix's support process, with every direct app-download link pinned to the reviewed v1.95 artifact.
 - Added a local-only Hardened Runtime exception for ad-hoc macOS builds that load bundled MediaRemoteAdapter and Sparkle frameworks, while keeping Library Validation enabled for certificate-signed releases.
 - Added a fresh-Mac distribution E2E that follows the exact GitHub Actions outer ZIP through Safari quarantine, Archive Utility's real recursive or separate Finder extraction path, Gatekeeper Open Anyway, App Translocation, generic mapped-code verification, and a real transcription smoke.
 - Fixed the first cold FluidAudio streaming dictation sometimes pasting nothing when live recognition had text but final ASR returned empty.

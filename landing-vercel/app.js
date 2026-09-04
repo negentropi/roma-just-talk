@@ -1,8 +1,8 @@
 const repoUrl = "https://github.com/happyf-weallareeuropean/roma-just-talk";
 const repoBranch = "without/no-adhoc-macos-tcc";
-const latestReleaseUrl = `${repoUrl}/releases/latest`;
+const pinnedMacReleaseTag = "v1.95";
+const pinnedMacDownloadUrl = `https://github.com/negentropi/roma-just-talk/releases/download/${pinnedMacReleaseTag}/roma.just.talk.app.zip`;
 const releasesApi = "https://api.github.com/repos/happyf-weallareeuropean/roma-just-talk/releases";
-const latestReleaseApi = `${releasesApi}/latest`;
 const releasesPageUrl = `${repoUrl}/releases`;
 const rawBase = `https://raw.githubusercontent.com/happyf-weallareeuropean/roma-just-talk/${repoBranch}/`;
 const readmeMarkdownUrl = `${rawBase}README.md`;
@@ -42,25 +42,9 @@ async function fetchWithTimeout(url, options = {}) {
   }
 }
 
-async function resolveMacDownloadUrl() {
-  try {
-    const response = await fetchWithTimeout(latestReleaseApi, {
-      headers: { Accept: "application/vnd.github+json" },
-    });
-    if (!response.ok) throw new Error(`release fetch failed: ${response.status}`);
-    const release = await response.json();
-    const appAsset = release.assets?.find((asset) => {
-      return asset.name?.endsWith(".app.zip") && asset.browser_download_url;
-    });
-    return appAsset?.browser_download_url || latestReleaseUrl;
-  } catch (_error) {
-    return latestReleaseUrl;
-  }
-}
-
-async function downloadMac(event) {
+function downloadMac(event) {
   event?.preventDefault();
-  window.location.href = await resolveMacDownloadUrl();
+  window.location.href = pinnedMacDownloadUrl;
 }
 
 function inlineMarkdown(value) {
@@ -226,15 +210,10 @@ function releaseNotesToHtml(release) {
 }
 
 function releaseAssetLinks(release) {
-  const links = (release.assets || [])
-    .filter((asset) => asset.browser_download_url)
-    .slice(0, 3)
-    .map((asset) => {
-      const isAppZip = asset.name?.endsWith(".app.zip");
-      const label = isAppZip ? "download app" : `download ${asset.name || "asset"}`;
-      return `<a class="release-link release-download" href="${escapeHtml(asset.browser_download_url)}">${escapeHtml(label)}</a>`;
-    });
-
+  const links = [];
+  if (release.tag_name === pinnedMacReleaseTag) {
+    links.unshift(`<a class="release-link release-download" href="${pinnedMacDownloadUrl}">download reviewed app</a>`);
+  }
   links.unshift(`<a class="release-link" href="${escapeHtml(release.html_url || releasesPageUrl)}">view release</a>`);
   return `<div class="release-actions">${links.join("")}</div>`;
 }

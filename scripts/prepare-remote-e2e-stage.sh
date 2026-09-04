@@ -13,6 +13,7 @@ macos_expected_version="${9:-}"
 macos_expected_build="${10:-}"
 runtime_helper_archive="${11:-$inputs_root/macos/runtime-helper/roma.runtime-e2e-harness.macos.zip}"
 runtime_model_cache_path="${RUNTIME_E2E_MODEL_CACHE_PATH:-$HOME/Library/Caches/roma-runtime-e2e-models}"
+runtime_empty_final_expectation="${RUNTIME_E2E_EMPTY_FINAL_EXPECTATION:-none}"
 github_download_token="${GH_TOKEN:-}"
 unset GH_TOKEN
 source "$(cd "$(dirname "$0")" && pwd)/macos-bundle-manifest.sh"
@@ -45,6 +46,20 @@ case "$macos_scenario" in
     exit 2
     ;;
 esac
+
+case "$runtime_empty_final_expectation" in
+  none|known-bad|fixed) ;;
+  *)
+    echo "Unsupported empty-final expectation: $runtime_empty_final_expectation" >&2
+    exit 2
+    ;;
+esac
+if [ "$runtime_empty_final_expectation" != "none" ] \
+  && [ "$macos_scenario" != "runtime-smoke" ] \
+  && [ "$macos_scenario" != "distribution-e2e" ]; then
+  echo "An empty-final expectation requires runtime-smoke or distribution-e2e" >&2
+  exit 2
+fi
 
 if [ "$macos_scenario" = "distribution-e2e" ]; then
   runtime_model_cache_path=""
@@ -393,6 +408,7 @@ write_manifest() {
   "macOSExpectedBuild": "$macos_expected_build",
   "macOSAudioArtifact": "$macos_audio_artifact",
   "macOSRepetitions": $macos_repetitions,
+  "macOSEmptyFinalExpectation": "$runtime_empty_final_expectation",
   "iOSScenario": "$ios_scenario",
   "iOSScenarioExitCode": $ios_scenario_status,
   "githubRunId": "${GITHUB_RUN_ID:-local}",
@@ -455,6 +471,10 @@ if [ "$macos_scenario" = "distribution-e2e" ]; then
     runtime_bundle_before="$evidence/macos-distribution-e2e/runtime-bundle-before.sha256"
     runtime_bundle_after="$evidence/macos-distribution-e2e/runtime-bundle-after.sha256"
     runtime_chain_verdict="$evidence/macos-distribution-e2e/runtime-chain-verdict.txt"
+    runtime_repetitions=1
+    if [ "$runtime_empty_final_expectation" != "none" ]; then
+      runtime_repetitions="$macos_repetitions"
+    fi
     distribution_launched_pid="$(
       sed -n 's/^launched_pid=//p' \
         "$evidence/macos-distribution-e2e/distribution-verdict.txt"
@@ -473,11 +493,12 @@ if [ "$macos_scenario" = "distribution-e2e" ]; then
       RUNTIME_E2E_EXPECTED_MACOS_BUILD="$macos_expected_build" \
       RUNTIME_E2E_EXPECTED_FIRST_LAUNCH_PID="$distribution_launched_pid" \
       RUNTIME_E2E_MODEL_CACHE_PATH="$runtime_model_cache_path" \
+      RUNTIME_E2E_EMPTY_FINAL_EXPECTATION="$runtime_empty_final_expectation" \
         bash "$(dirname "$0")/run-macos-runtime-e2e.sh" \
         "$distribution_app" \
         "$macos_audio_artifact" \
         "$evidence" \
-        "1" \
+        "$runtime_repetitions" \
         "smoke" \
         "$runtime_helper_archive"
       runtime_status=$?
@@ -513,8 +534,13 @@ if [ "$macos_scenario" = "distribution-e2e" ]; then
       && [ "$distribution_executable_sha256" = "$runtime_executable_sha256" ] \
       && [ "$distribution_bundle_manifest_sha256" = "$runtime_bundle_before_sha256" ] \
       && [ "$runtime_bundle_before_sha256" = "$runtime_bundle_after_sha256" ]; then
+      runtime_transcription_verdict=passed
+      if [ "$runtime_empty_final_expectation" = "known-bad" ]; then
+        runtime_transcription_verdict=expected_failure_reproduced
+      fi
       {
-        printf 'runtime_transcription_verdict=passed\n'
+        printf 'runtime_transcription_verdict=%s\n' "$runtime_transcription_verdict"
+        printf 'runtime_empty_final_expectation=%s\n' "$runtime_empty_final_expectation"
         printf 'runtime_process=separate_relaunch_of_same_artifact\n'
         printf 'runtime_model_source=first_launch_live_directory\n'
         printf 'runtime_first_launch_pid=%s\n' "$distribution_launched_pid"
@@ -527,6 +553,7 @@ if [ "$macos_scenario" = "distribution-e2e" ]; then
     else
       {
         printf 'runtime_transcription_verdict=failed\n'
+        printf 'runtime_empty_final_expectation=%s\n' "$runtime_empty_final_expectation"
         printf 'runtime_process=separate_relaunch_of_same_artifact\n'
         printf 'runtime_model_source=first_launch_live_directory\n'
         printf 'runtime_first_launch_pid=%s\n' "$distribution_launched_pid"
@@ -552,6 +579,7 @@ elif [ "$macos_scenario" != "none" ]; then
   fi
   set +e
   RUNTIME_E2E_MODEL_CACHE_PATH="$runtime_model_cache_path" \
+  RUNTIME_E2E_EMPTY_FINAL_EXPECTATION="$runtime_empty_final_expectation" \
     bash "$(dirname "$0")/run-macos-runtime-e2e.sh" \
     "$HOME/Applications/roma just talk.app" \
     "$macos_audio_artifact" \

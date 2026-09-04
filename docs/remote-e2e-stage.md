@@ -28,6 +28,7 @@ Inputs:
 - `macos_scenario`: `none`, `runtime-smoke`, `runtime-e2e`, or `distribution-e2e`.
 - `macos_audio_artifact`: private Namespace artifact containing WAV fixtures. Full runtime requires it. Smoke uses a pinned public CC-BY-4.0 [podscripter FLEURS fixture](https://huggingface.co/datasets/podscripter-project/test-fixtures) when blank.
 - `macos_repetitions`: `1`, `3`, or `5` repetitions per fixture/app after the smoke run.
+- `macos_empty_final_expectation`: `none`, `known-bad`, or `fixed`. The latter two require `runtime-smoke` or `distribution-e2e` and make the selected repetition count apply to the smoke cases.
 - `ios_artifact_run_id`: successful `VoiceInk iOS single-repo migration` workflow run containing the exact Simulator artifact. Blank selects the latest green run.
 - `ios_scenario`: `none` or `local-whisper-import`.
 - `hold_minutes`: 0 to 60 minutes after setup/scenario. `distribution-e2e` consumes this window while waiting for Safari, Finder, and Gatekeeper interaction and therefore rejects `0`.
@@ -193,6 +194,32 @@ failure signal while still warming the next run. Empty cache-volume forks do not
 block on FluidAudio's model download. The runner verifies a pinned 22-file model
 manifest and fetches only missing files through Namespace's immutable-URL cache
 across four workers in parallel with machine setup.
+
+## Matched empty-final regression proof
+
+Use `macos_empty_final_expectation=known-bad` with the historical affected app
+artifact first. The lane succeeds only when a case receives a non-empty live
+partial, final ASR returns zero characters, the first commit is empty, and every
+failed smoke case has that same `emptyTranscript` boundary. A generic launch,
+target, permission, or audio failure does not count as reproduction.
+
+Then run the same scenario, fixture, and repetition count with the fixed app and
+`macos_empty_final_expectation=fixed`. That lane requires every smoke case to
+pass. At least one case must also have non-empty visible text, zero-character
+final ASR, the explicit `fluid_streaming.commit.fallback_to_hypothesis` event,
+and a non-empty first commit. Other passing repetitions may receive a normal
+non-empty final ASR. A green run with no fallback case does not prove this fix.
+Use `macos_repetitions=5` for both runs. For the release claim, use
+`distribution-e2e`; `runtime-smoke` is only a faster diagnostic run.
+
+Both expectations reject a harness fatal error or failed restoration, even when
+one case otherwise matches the requested evidence.
+
+The exact result is stored in
+`runtime-empty-final-regression-verdict.txt`. The distribution chain also records
+the requested expectation. A matched `known-bad` run reports
+`runtime_transcription_verdict=expected_failure_reproduced`, not a successful
+transcription.
 
 ## Deterministic macOS runtime E2E scenario
 

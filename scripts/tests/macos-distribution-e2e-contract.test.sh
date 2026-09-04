@@ -14,6 +14,8 @@ RENDERED_OBSERVER="$ROOT/Tools/RuntimeE2EHarness/Sources/RuntimeE2EHarness/Runti
 VOICEINK_SESSION="$ROOT/Tools/RuntimeE2EHarness/Sources/RuntimeE2EHarness/RuntimeVoiceInkSession.swift"
 HANDOFF_HELPER="$ROOT/scripts/macos-distribution-runtime-handoff.sh"
 HANDOFF_TEST="$ROOT/scripts/tests/macos-distribution-runtime-handoff.test.sh"
+EMPTY_FINAL_VERIFIER="$ROOT/scripts/verify-runtime-empty-final-regression.sh"
+EMPTY_FINAL_VERIFIER_TEST="$ROOT/scripts/tests/verify-runtime-empty-final-regression.test.sh"
 
 require_text() {
   local file="$1"
@@ -51,12 +53,18 @@ test -x "$FINDER_STATE"
 test -x "$FINDER_STATE_TEST"
 test -x "$ROOT/scripts/verify-macos-distribution-launch.sh"
 test -x "$HANDOFF_TEST"
+test -x "$EMPTY_FINAL_VERIFIER"
+test -x "$EMPTY_FINAL_VERIFIER_TEST"
 
 require_text "$WORKFLOW" 'distribution-e2e'
 require_text "$WORKFLOW" 'macos_expected_version'
 require_text "$WORKFLOW" 'macos_expected_build'
 require_text "$WORKFLOW" 'developer_dir'
+require_text "$WORKFLOW" 'macos_empty_final_expectation:'
+require_text "$WORKFLOW" 'STAGE_MACOS_EMPTY_FINAL_EXPECTATION: ${{ inputs.macos_empty_final_expectation || '\''none'\'' }}'
 require_text "$WORKFLOW" '- "scripts/run-macos-distribution-e2e.sh"'
+require_text "$WORKFLOW" '- "scripts/verify-runtime-empty-final-regression.sh"'
+require_text "$WORKFLOW" '- "scripts/tests/verify-runtime-empty-final-regression.test.sh"'
 require_text "$WORKFLOW" '- "scripts/macos-finder-extraction-state.sh"'
 require_text "$WORKFLOW" '- "scripts/macos-bundle-manifest.sh"'
 require_text "$WORKFLOW" '- "scripts/verify-macos-distribution-launch.sh"'
@@ -67,6 +75,7 @@ require_text "$WORKFLOW" 'bash scripts/tests/macos-distribution-runtime-handoff.
 require_text "$WORKFLOW" '- "scripts/tests/macos-finder-extraction-state.test.sh"'
 require_text "$WORKFLOW" 'bash scripts/tests/macos-finder-extraction-state.test.sh'
 require_text "$WORKFLOW" '- "scripts/tests/verify-macos-distribution-launch.test.sh"'
+require_text "$WORKFLOW" 'bash scripts/tests/verify-runtime-empty-final-regression.test.sh'
 require_text "$WORKFLOW" 'roma.runtime-e2e-harness.macos'
 require_text "$WORKFLOW" 'runtime_helper_run_id'
 require_text "$WORKFLOW" 'runtime-helper-run-metadata.json'
@@ -106,6 +115,10 @@ fi
 require_text "$BUILD_WORKFLOW" 'roma.runtime-e2e-harness.macos'
 require_text "$BUILD_WORKFLOW" 'bash scripts/tests/macos-distribution-runtime-handoff.test.sh'
 require_text "$BUILD_WORKFLOW" 'bash scripts/tests/macos-finder-extraction-state.test.sh'
+require_text "$BUILD_WORKFLOW" '- "scripts/verify-runtime-empty-final-regression.sh"'
+require_text "$BUILD_WORKFLOW" '- "scripts/tests/verify-runtime-empty-final-regression.test.sh"'
+require_text "$BUILD_WORKFLOW" 'bash scripts/tests/verify-runtime-empty-final-regression.test.sh'
+require_text "$ROOT/Makefile" 'bash scripts/tests/verify-runtime-empty-final-regression.test.sh'
 
 require_text "$PREPARER" 'none|runtime-smoke|runtime-e2e|distribution-e2e'
 require_text "$PREPARER" 'run-macos-distribution-e2e.sh'
@@ -131,6 +144,9 @@ require_text "$PREPARER" 'if [ "$macos_scenario" = "distribution-e2e" ]; then'
 require_text "$PREPARER" 'runtime_model_cache_path=""'
 require_text "$PREPARER" 'runtime_model_source=first_launch_live_directory'
 require_text "$PREPARER" 'RUNTIME_E2E_EXPECTED_FIRST_LAUNCH_PID="$distribution_launched_pid"'
+require_text "$PREPARER" 'runtime_empty_final_expectation="${RUNTIME_E2E_EMPTY_FINAL_EXPECTATION:-none}"'
+require_text "$PREPARER" 'RUNTIME_E2E_EMPTY_FINAL_EXPECTATION="$runtime_empty_final_expectation"'
+require_text "$PREPARER" '"macOSEmptyFinalExpectation": "$runtime_empty_final_expectation"'
 
 require_text "$RUNTIME_RUNNER" 'prebuilt_helper_archive'
 require_text "$RUNTIME_RUNNER" 'RUNTIME_E2E_APP="$helper_app"'
@@ -149,6 +165,9 @@ require_text "$RUNTIME_RUNNER" 'source "$repo_root/scripts/macos-distribution-ru
 require_text "$RUNTIME_RUNNER" 'distribution_runtime_validate_handoff'
 require_text "$RUNTIME_RUNNER" 'distribution-runtime-handoff.txt'
 require_text "$RUNTIME_RUNNER" 'first_launch_termination=normal'
+require_text "$RUNTIME_RUNNER" 'empty_final_expectation="${RUNTIME_E2E_EMPTY_FINAL_EXPECTATION:-none}"'
+require_text "$RUNTIME_RUNNER" 'runtime-empty-final-regression-verdict.txt'
+require_text "$RUNTIME_RUNNER" 'verify-runtime-empty-final-regression.sh'
 require_text "$HANDOFF_HELPER" 'requires only the verified first-launch PID'
 require_text "$HANDOFF_HELPER" 'must not use an external model cache'
 require_text "$HANDOFF_HELPER" 'did not create the live model directory'

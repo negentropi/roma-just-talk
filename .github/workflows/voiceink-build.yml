@@ -21,6 +21,7 @@ on:
       - "scripts/tests/macos-distribution-e2e-contract.test.sh"
       - "scripts/tests/macos-distribution-runtime-handoff.test.sh"
       - "scripts/tests/macos-finder-extraction-state.test.sh"
+      - "scripts/tests/verify-runtime-empty-final-regression.test.sh"
       - "scripts/run-macos-distribution-e2e.sh"
       - "scripts/macos-distribution-runtime-handoff.sh"
       - "scripts/macos-finder-extraction-state.sh"
@@ -28,6 +29,7 @@ on:
       - "scripts/prepare-remote-e2e-stage.sh"
       - ".github/workflows/voiceink-remote-e2e-stage.yml"
       - "scripts/verify-macos-distribution-launch.sh"
+      - "scripts/verify-runtime-empty-final-regression.sh"
       - "scripts/verify-adhoc-library-validation.sh"
       - "scripts/verify-static-whisper-app.sh"
       - "scripts/verify-static-whisper-xcframework.sh"
@@ -50,6 +52,7 @@ on:
       - "scripts/tests/macos-distribution-e2e-contract.test.sh"
       - "scripts/tests/macos-distribution-runtime-handoff.test.sh"
       - "scripts/tests/macos-finder-extraction-state.test.sh"
+      - "scripts/tests/verify-runtime-empty-final-regression.test.sh"
       - "scripts/run-macos-distribution-e2e.sh"
       - "scripts/macos-distribution-runtime-handoff.sh"
       - "scripts/macos-finder-extraction-state.sh"
@@ -57,6 +60,7 @@ on:
       - "scripts/prepare-remote-e2e-stage.sh"
       - ".github/workflows/voiceink-remote-e2e-stage.yml"
       - "scripts/verify-macos-distribution-launch.sh"
+      - "scripts/verify-runtime-empty-final-regression.sh"
       - "scripts/verify-adhoc-library-validation.sh"
       - "scripts/verify-static-whisper-app.sh"
       - "scripts/verify-static-whisper-xcframework.sh"
@@ -213,6 +217,7 @@ jobs:
           bash scripts/tests/macos-distribution-e2e-contract.test.sh
           bash scripts/tests/macos-distribution-runtime-handoff.test.sh
           bash scripts/tests/verify-macos-distribution-launch.test.sh
+          bash scripts/tests/verify-runtime-empty-final-regression.test.sh
 
       - name: Build release app
         run: make local CONFIGURATION=Release

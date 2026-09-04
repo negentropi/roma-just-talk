@@ -74,7 +74,8 @@ pinned 5.64-second English FLEURS fixture through Namespace's URL cache and
 verifies its SHA-256. The fixture comes from the CC-BY-4.0
 [`podscripter-project/test-fixtures`](https://huggingface.co/datasets/podscripter-project/test-fixtures)
 dataset and was sourced there from the English FLEURS test set. Smoke then uses
-TextEdit, Safari, one repetition, and a three-second target-text timeout. It
+TextEdit, Safari, normally one repetition, and a three-second target-text timeout. An
+empty-final regression run instead uses the selected `macos_repetitions`. It
 skips Chrome and VS Code installation and the repeated matrix. This is an early
 rejection lane, not final runtime proof.
 
@@ -124,6 +125,18 @@ The cache-owning stage treats the scenario command as a recorded outcome so the
 Namespace cache post-save still runs after a rejected hypothesis. A dependent
 verdict job converts that recorded outcome back into the workflow's final
 red/green result.
+
+For a matched cold empty-final regression, run the historical affected artifact
+with `macos_scenario=distribution-e2e`,
+`macos_empty_final_expectation=known-bad`, and `macos_repetitions=5`. Repeat the
+same path with the candidate artifact and `macos_empty_final_expectation=fixed`.
+The first run accepts only the exact live-partial, zero-character final ASR, and
+empty-commit failure. The second accepts only an all-green report with at least
+one case where that same zero-character final ASR emitted
+`fluid_streaming.commit.fallback_to_hypothesis`, committed non-empty text, and
+rendered it in the target. A normal non-empty final ASR is intentionally
+allowed in other passing cases. A run with no fallback case is rejected as
+unproven.
 
 ## Isolation Gates
 

@@ -8,6 +8,7 @@ repetitions="${4:-3}"
 mode="${5:-full}"
 prebuilt_helper_archive="${6:-}"
 require_app_translocation="${RUNTIME_E2E_REQUIRE_APP_TRANSLOCATION:-false}"
+empty_final_expectation="${RUNTIME_E2E_EMPTY_FINAL_EXPECTATION:-none}"
 
 case "$repetitions" in
   1|3|5) ;;
@@ -31,6 +32,17 @@ case "$require_app_translocation" in
     exit 2
     ;;
 esac
+case "$empty_final_expectation" in
+  none|known-bad|fixed) ;;
+  *)
+    echo "RUNTIME_E2E_EMPTY_FINAL_EXPECTATION must be none, known-bad, or fixed" >&2
+    exit 2
+    ;;
+esac
+if [ "$empty_final_expectation" != "none" ] && [ "$mode" != "smoke" ]; then
+  echo "An empty-final expectation requires smoke mode" >&2
+  exit 2
+fi
 
 repo_root="${GITHUB_WORKSPACE:-$(cd "$(dirname "$0")/.." && pwd)}"
 source "$repo_root/scripts/runtime-e2e-phase-runner.sh"
@@ -63,6 +75,7 @@ scenario_status=1
 current_phase="initialize"
 phase_file="$evidence/macos-runtime-e2e-phase.txt"
 distribution_verifier="$repo_root/scripts/verify-macos-distribution-launch.sh"
+empty_final_verifier="$repo_root/scripts/verify-runtime-empty-final-regression.sh"
 runtime_launch_events="$evidence/runtime-translocation-launch-events.tsv"
 runtime_termination_events="$evidence/runtime-translocation-termination-events.tsv"
 runtime_verified_launches="$evidence/runtime-translocation-verified-launches.tsv"
@@ -85,6 +98,7 @@ command -v jq >/dev/null
 command -v sqlite3 >/dev/null
 command -v csreq >/dev/null
 test -f "$model_manifest"
+test -x "$empty_final_verifier"
 if [ "$require_app_translocation" = true ] && [ -n "$external_model_cache" ]; then
   echo "Distribution runtime handoff must not use an external model cache" >&2
   exit 2
@@ -875,7 +889,11 @@ fi
 sleep 15
 stop_launchers
 
-write_config "$config_smoke" "$smoke_audio_root" 1 20000 smoke
+smoke_repetitions=1
+if [ "$empty_final_expectation" != "none" ]; then
+  smoke_repetitions="$repetitions"
+fi
+write_config "$config_smoke" "$smoke_audio_root" "$smoke_repetitions" 20000 smoke
 write_config "$config_full" "$audio_directory" "$repetitions" 250 full
 if [ "$mode" = "smoke" ]; then
   restore_config="$config_smoke"
@@ -887,11 +905,14 @@ fi
 
 scenario_status=0
 run_runtime_e2e_phases "$config_smoke" "$config_full" "$mode"
+harness_status="$scenario_status"
+runtime_integrity_status=0
 if [ "$require_app_translocation" = true ]; then
   if ! stop_runtime_translocation_monitors \
     || ! require_verified_runtime_processes; then
     printf 'runtime_translocation_verdict=failed\n' \
       > "$evidence/runtime-translocation-verdict.txt"
+    runtime_integrity_status=12
     scenario_status=12
   fi
 fi
@@ -912,6 +933,27 @@ if [ -f "$summary_report" ]; then
     evidence,
     error
   }]' "$summary_report" > "$evidence/runtime-e2e-failures.json"
+fi
+
+if [ "$empty_final_expectation" != "none" ]; then
+  empty_final_verdict="$evidence/runtime-empty-final-regression-verdict.txt"
+  empty_final_verifier_status=0
+  bash "$empty_final_verifier" \
+    "$empty_final_expectation" \
+    "$evidence/functional-smoke.json" \
+    > "$empty_final_verdict" 2>&1 \
+    || empty_final_verifier_status=$?
+  cat "$empty_final_verdict"
+
+  if [ "$empty_final_verifier_status" -ne 0 ]; then
+    scenario_status=13
+  elif [ "$runtime_integrity_status" -ne 0 ]; then
+    scenario_status="$runtime_integrity_status"
+  elif [ "$empty_final_expectation" = "known-bad" ]; then
+    scenario_status=0
+  else
+    scenario_status="$harness_status"
+  fi
 fi
 
 capture_tcc final

@@ -60,6 +60,15 @@ on:
           - "1"
           - "3"
           - "5"
+      macos_empty_final_expectation:
+        description: Require exact cold empty-final regression evidence from the functional smoke
+        required: true
+        default: none
+        type: choice
+        options:
+          - none
+          - known-bad
+          - fixed
       ios_artifact_run_id:
         description: Migration run ID containing the iOS Simulator app; blank uses latest green run
         required: false
@@ -91,6 +100,7 @@ on:
       - "scripts/open-remote-e2e-stage.sh"
       - "scripts/prepare-remote-e2e-stage.sh"
       - "scripts/run-macos-runtime-e2e.sh"
+      - "scripts/verify-runtime-empty-final-regression.sh"
       - "scripts/run-macos-distribution-e2e.sh"
       - "scripts/macos-distribution-runtime-handoff.sh"
       - "scripts/macos-finder-extraction-state.sh"
@@ -100,6 +110,7 @@ on:
       - "scripts/tests/macos-distribution-runtime-handoff.test.sh"
       - "scripts/tests/macos-finder-extraction-state.test.sh"
       - "scripts/tests/verify-macos-distribution-launch.test.sh"
+      - "scripts/tests/verify-runtime-empty-final-regression.test.sh"
       - "scripts/runtime-e2e-model-bootstrap.sh"
       - "scripts/runtime-e2e-phase-runner.sh"
       - "scripts/runtime-e2e-parakeet-v2.manifest"
@@ -120,6 +131,7 @@ env:
   STAGE_MACOS_SCENARIO: ${{ inputs.macos_scenario || 'none' }}
   STAGE_MACOS_AUDIO_ARTIFACT: ${{ inputs.macos_audio_artifact || '' }}
   STAGE_MACOS_REPETITIONS: ${{ inputs.macos_repetitions || '3' }}
+  STAGE_MACOS_EMPTY_FINAL_EXPECTATION: ${{ inputs.macos_empty_final_expectation || 'none' }}
   STAGE_MACOS_EXPECTED_VERSION: ${{ inputs.macos_expected_version || '' }}
   STAGE_MACOS_EXPECTED_BUILD: ${{ inputs.macos_expected_build || '' }}
   STAGE_DEVELOPER_DIR: ${{ inputs.developer_dir || '' }}
@@ -206,6 +218,7 @@ jobs:
             printf 'stage_runner_boot_age_seconds_at_job_start=%s\n' "$STAGE_RUNNER_BOOT_AGE_SECONDS"
             printf 'expected_macos_version=%s\n' "$STAGE_MACOS_EXPECTED_VERSION"
             printf 'expected_macos_build=%s\n' "$STAGE_MACOS_EXPECTED_BUILD"
+            printf 'empty_final_expectation=%s\n' "$STAGE_MACOS_EMPTY_FINAL_EXPECTATION"
           } > "$EVIDENCE/provisioning-context.txt"
 
       - name: Verify distribution E2E tooling
@@ -214,6 +227,7 @@ jobs:
           bash scripts/tests/macos-distribution-e2e-contract.test.sh
           bash scripts/tests/macos-distribution-runtime-handoff.test.sh
           bash scripts/tests/verify-macos-distribution-launch.test.sh
+          bash scripts/tests/verify-runtime-empty-final-regression.test.sh
 
       - name: Download macOS app artifact
         if: env.STAGE_TARGET != 'ios'
@@ -526,6 +540,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           RUNTIME_MODEL_CACHE_HIT: ${{ steps.runtime-model-cache.outputs.cache-hit }}
+          RUNTIME_E2E_EMPTY_FINAL_EXPECTATION: ${{ env.STAGE_MACOS_EMPTY_FINAL_EXPECTATION }}
         run: |
           bash scripts/prepare-remote-e2e-stage.sh \
             "$STAGE_TARGET" \

@@ -105,10 +105,11 @@ derive_known_bad_profile() {
   jq -ce '
     def ordered_empty_final:
       [ .latencyTrace.events[]? | { name, details: (.details // "") } ] as $events
-      | ([ $events[] | select(.name == "streaming_event.first_partial" and (.details | test("(^|[[:space:]])chars=[1-9][0-9]*($|[[:space:]])"))) ] | length > 0)
-      and [range(0; $events | length) | select($events[.].name == "fluid_streaming.final_asr.end")] as $finals
+      | [ $events[] | select(.name == "streaming_event.first_partial" and (.details | test("(^|[[:space:]])chars=[1-9][0-9]*($|[[:space:]])"))) ] as $positive_partials
+      | [range(0; $events | length) | select($events[.].name == "fluid_streaming.final_asr.end")] as $finals
       | [range(0; $events | length) | select($events[.].name == "streaming_event.first_commit")] as $commits
-      | ($finals | length) == 1
+      | ($positive_partials | length) > 0
+      and ($finals | length) == 1
       and ($commits | length) == 1
       and ($events[$finals[0]].details | test("(^|[[:space:]])chars=0($|[[:space:]])"))
       and ($events[$commits[0]].details | test("(^|[[:space:]])chars=0($|[[:space:]])"))
@@ -220,11 +221,12 @@ if [[ "$expectation" == "fixed" ]]; then
   fixed_analysis="$(jq -ce --argjson profile "$profile" '
     def ordered_fallback:
       [ .latencyTrace.events[]? | { name, details: (.details // "") } ] as $events
-      | ([ $events[] | select(.name == "streaming_event.first_partial" and (.details | test("(^|[[:space:]])chars=[1-9][0-9]*($|[[:space:]])"))) ] | length > 0)
-      and [range(0; $events | length) | select($events[.].name == "fluid_streaming.final_asr.end")] as $finals
+      | [ $events[] | select(.name == "streaming_event.first_partial" and (.details | test("(^|[[:space:]])chars=[1-9][0-9]*($|[[:space:]])"))) ] as $positive_partials
+      | [range(0; $events | length) | select($events[.].name == "fluid_streaming.final_asr.end")] as $finals
       | [range(0; $events | length) | select($events[.].name == "fluid_streaming.commit.fallback_to_hypothesis")] as $fallbacks
       | [range(0; $events | length) | select($events[.].name == "streaming_event.first_commit")] as $commits
-      | ($finals | length) == 1
+      | ($positive_partials | length) > 0
+      and ($finals | length) == 1
       and ($fallbacks | length) == 1
       and ($commits | length) == 1
       and ($events[$finals[0]].details | test("(^|[[:space:]])chars=0($|[[:space:]])"))

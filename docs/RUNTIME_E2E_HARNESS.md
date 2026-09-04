@@ -143,15 +143,15 @@ directory paths. The audio bytes remain bound by hash; only the app artifact is
 intended to differ.
 The first run accepts only a non-empty live partial plus a zero-character final
 ASR followed by an empty commit in the same trace. The partial event may be
-logged later because its observer crosses an actor boundary. All failed cases
-must have that exact symptom on one configured target. The verifier derives the
-affected target and text scenarios
-from this report instead of assuming which target will expose the intermittent
+logged later because its observer crosses an actor boundary. Every red failure
+must have that exact symptom on a configured target listed by preflight. The
+verifier derives every exact affected `target` + `textScenario` pair from this
+report instead of assuming which target or scenario will expose the intermittent
 ASR result. The second run reverifies that baseline report and accepts only an
-all-green report. For every affected baseline scenario on the same target, at
-least one case must reach zero-character final ASR, emit
-`fluid_streaming.commit.fallback_to_hypothesis`, commit non-empty text, and
-render it in the target. A normal non-empty final ASR is intentionally allowed
+all-green report. For every affected baseline pair, at least one case on that
+exact target and text scenario must show zero-character final ASR followed by
+`fluid_streaming.commit.fallback_to_hypothesis`, a non-empty first commit, and
+non-empty visible text, in that order. A normal non-empty final ASR is allowed
 in other passing cases. A run missing any matched fallback case is rejected as
 unproven. These expectation modes reject external or symlinked model storage. They
 hydrate the normal FluidAudio Application Support directory, stop the prewarm

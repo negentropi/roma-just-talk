@@ -98,9 +98,9 @@ ensure_report_matches_contract() {
 validate_contract "$contract" || { echo "runtime E2E evidence contract is invalid" >&2; exit 2; }
 ensure_report_matches_contract "$report" "$contract" || exit 1
 
-# Known-bad failures define the only profile the fixed proof may cure. A report
-# with another failure, a different target tuple, or out-of-order symptoms is
-# not evidence for this bug.
+# Known-bad failures define every exact target/scenario pair the fixed proof
+# must cure. A report with another failure or out-of-order symptoms is not
+# evidence for this bug.
 derive_known_bad_profile() {
   jq -ce '
     def ordered_empty_final:
@@ -127,12 +127,17 @@ derive_known_bad_profile() {
           and .assessment.status == "emptyTranscript"
           and ordered_empty_final
       )) then . else error("different failed case") end
-    | ($failed | map(.target | tojson) | unique) as $target_keys
-    | if ($target_keys | length) == 1 then . else error("split targets") end
     | {
-        target: $failed[0].target,
-        scenarios: ($failed | map(.textScenario) | unique | sort),
-        failedCaseIDs: ($failed | map(.id // "<missing-case-id>"))
+        affectedPairs: (
+          $failed
+          | group_by([(.target | tojson), .textScenario])
+          | map({
+              target: .[0].target,
+              textScenario: .[0].textScenario,
+              failedCaseIDs: map(.id // "<missing-case-id>")
+            })
+          | sort_by([.target.id, .target.bundleIdentifier, .textScenario])
+        )
       }
   ' "$1"
 }
@@ -236,15 +241,17 @@ if [[ "$expectation" == "fixed" ]]; then
       and $fallbacks[0] < $commits[0];
     . as $report
     | {
-        scenarioMatches: [
-          $profile.scenarios[] as $scenario
+        pairMatches: [
+          $profile.affectedPairs[] as $pair
           | {
-              scenario: $scenario,
+              target: $pair.target,
+              textScenario: $pair.textScenario,
+              baselineCaseIDs: $pair.failedCaseIDs,
               caseIDs: [
                 $report.cases[]
                 | select(
-                    .target == $profile.target
-                      and .textScenario == $scenario
+                    .target == $pair.target
+                      and .textScenario == $pair.textScenario
                       and .assessment.passed == true
                       and ((.visibleText.text // "") | test("[^[:space:]]"))
                       and ordered_fallback
@@ -258,9 +265,9 @@ if [[ "$expectation" == "fixed" ]]; then
     echo "could not analyze fixed empty-final report" >&2
     exit 1
   }
-  if ! jq -e '.scenarioMatches | length > 0 and all(.[]; (.caseIDs | length) > 0)' \
+  if ! jq -e '.pairMatches | length > 0 and all(.[]; (.caseIDs | length) > 0)' \
     <<< "$fixed_analysis" >/dev/null; then
-    echo "fixed report did not prove ordered fallback delivery for every affected baseline scenario" >&2
+    echo "fixed report did not prove ordered fallback delivery for every affected baseline target/scenario pair" >&2
     exit 1
   fi
 fi
@@ -268,13 +275,16 @@ fi
 printf 'runtime_empty_final_expectation=%s\n' "$expectation"
 printf 'evidence_contract_sha256=%s\n' "$contract_sha256"
 printf 'fresh_process_count=%s\n' "$launch_count"
-printf 'affected_target=%s\n' "$(jq -c '.target' <<< "$profile")"
-while IFS= read -r scenario; do printf 'affected_text_scenario=%s\n' "$scenario"; done < <(jq -r '.scenarios[]' <<< "$profile")
+while IFS= read -r pair; do
+  printf 'affected_target_text_scenario=%s\n' "$pair"
+done < <(jq -c '.affectedPairs[]' <<< "$profile")
 if [[ "$expectation" == "known-bad" ]]; then
-  while IFS= read -r case_id; do printf 'matching_case_id=%s\n' "$case_id"; done < <(jq -r '.failedCaseIDs[]' <<< "$profile")
+  while IFS= read -r case_id; do printf 'matching_case_id=%s\n' "$case_id"; done < <(jq -r '.affectedPairs[].failedCaseIDs[]' <<< "$profile")
 else
-  while IFS= read -r case_id; do printf 'baseline_matching_case_id=%s\n' "$case_id"; done < <(jq -r '.failedCaseIDs[]' <<< "$profile")
-  while IFS=$'\t' read -r scenario case_id; do
-    printf 'fixed_matching_case=%s\t%s\n' "$scenario" "$case_id"
-  done < <(jq -r '.scenarioMatches[] | .scenario as $scenario | .caseIDs[] | [$scenario, .] | @tsv' <<< "$fixed_analysis")
+  while IFS= read -r pair; do
+    printf 'baseline_affected_target_text_scenario=%s\n' "$pair"
+  done < <(jq -c '.affectedPairs[]' <<< "$profile")
+  while IFS=$'\t' read -r pair case_id; do
+    printf 'fixed_matching_case=%s\t%s\n' "$pair" "$case_id"
+  done < <(jq -r '.pairMatches[] | {target, textScenario} as $pair | .caseIDs[] | [($pair | tojson), .] | @tsv' <<< "$fixed_analysis")
 fi

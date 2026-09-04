@@ -202,10 +202,10 @@ Use `macos_empty_final_expectation=known-bad` with the historical affected app
 artifact first. The lane succeeds only when a case receives a non-empty live
 partial, final ASR returns zero characters, and an empty first commit follows
 that final result in the same trace. The partial observer is asynchronous, so
-its log entry need not precede final ASR. Every failed smoke case must have that
-same `emptyTranscript` boundary on one exact configured target. The verifier
-derives that affected target and its affected text scenarios from the evidence.
-A generic launch,
+its log entry need not precede final ASR. Every red failure must have that same
+`emptyTranscript` boundary on a configured target listed by preflight. The
+verifier derives every exact affected `target` + `textScenario` pair from the
+evidence. A generic launch,
 target, permission, or audio failure does not count as reproduction.
 
 Then run the fixed app with `macos_empty_final_expectation=fixed` and set
@@ -227,12 +227,13 @@ archives are also downloaded by artifact ID and checked against GitHub's
 recorded digest before extraction.
 
 The fixed lane requires every smoke case to pass. It re-derives the baseline
-profile from the downloaded report. For every affected baseline text scenario,
-at least one case on the same exact target must have non-empty visible text,
-zero-character final ASR, the explicit
-`fluid_streaming.commit.fallback_to_hypothesis` event, and a non-empty first
-commit in order. Other passing repetitions may receive a normal non-empty final
-ASR. A green run missing any matched fallback case does not prove this fix. Use
+profile from the downloaded report. For every affected baseline `target` +
+`textScenario` pair, at least one case on that exact target and text scenario
+must show zero-character final ASR followed by the explicit
+`fluid_streaming.commit.fallback_to_hypothesis` event, a non-empty first
+commit, and non-empty visible text, in that order. Other passing repetitions
+may receive a normal non-empty final ASR. A green run missing any matched
+fallback case does not prove this fix. Use
 `macos_repetitions=5` for both runs. For the release claim, use
 `distribution-e2e`; `runtime-smoke` is only a faster diagnostic run.
 

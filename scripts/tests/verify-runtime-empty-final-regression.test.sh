@@ -433,6 +433,25 @@ jq '.configuration.targets[1] = {id:"notes",displayName:"Notes",bundleIdentifier
 jq '.cases[10].assessment = {status: "emptyTranscript", passed: false}
     | .cases[10].latencyTrace.events = .cases[0].latencyTrace.events' \
   "$TEMP_ROOT/known-bad.json" > "$TEMP_ROOT/failures-split-targets.json"
+jq '.cases[10].visibleText = {text: "safari empty fallback"}
+    | .cases[10].latencyTrace.events = [
+        {name: "streaming_event.first_partial", details: "chars=18"},
+        {name: "fluid_streaming.final_asr.end", details: "chars=0"},
+        {name: "fluid_streaming.commit.fallback_to_hypothesis", details: "chars=18"},
+        {name: "streaming_event.first_commit", details: "chars=18"}
+      ]' "$TEMP_ROOT/fixed-fallback.json" > "$TEMP_ROOT/fixed-multi-target-fallback.json"
+jq '.cases[0].visibleText = null | .cases[0].latencyTrace.events = []' \
+  "$TEMP_ROOT/fixed-multi-target-fallback.json" > "$TEMP_ROOT/missing-textedit-affected-pair.json"
+jq '.cases[10].visibleText = null | .cases[10].latencyTrace.events = []' \
+  "$TEMP_ROOT/fixed-multi-target-fallback.json" > "$TEMP_ROOT/missing-safari-affected-pair.json"
+jq '.cases[10].visibleText = null | .cases[10].latencyTrace.events = []
+    | .cases[15].visibleText = {text: "wrong safari scenario fallback"}
+    | .cases[15].latencyTrace.events = [
+        {name: "streaming_event.first_partial", details: "chars=18"},
+        {name: "fluid_streaming.final_asr.end", details: "chars=0"},
+        {name: "fluid_streaming.commit.fallback_to_hypothesis", details: "chars=18"},
+        {name: "streaming_event.first_commit", details: "chars=18"}
+      ]' "$TEMP_ROOT/fixed-multi-target-fallback.json" > "$TEMP_ROOT/mismatched-target-scenario-fallback.json"
 jq '.cases[15].visibleText = null | .cases[15].latencyTrace.events = []' \
   "$TEMP_ROOT/fixed-safari-fallback.json" > "$TEMP_ROOT/missing-safari-existing-fallback.json"
 jq '.cases[10].latencyTrace.events = [
@@ -463,7 +482,7 @@ verify_known_bad "$TEMP_ROOT/known-bad-safari.json"
 verify_fixed "$TEMP_ROOT/fixed-safari-fallback.json" "$LAUNCH_EVENTS" "$TERMINATION_EVENTS" "$TEMP_ROOT/known-bad-safari.json"
 
 expect_failure \
-  "fixed report did not prove ordered fallback delivery for every affected baseline scenario" \
+  "fixed report did not prove ordered fallback delivery for every affected baseline target/scenario pair" \
   verify_fixed "$TEMP_ROOT/ordinary-pass.json"
 expect_failure \
   "no case reproduced the live-partial to empty-final bug" \
@@ -489,26 +508,34 @@ expect_failure \
 expect_failure \
   "runtime E2E evidence contract is invalid" \
   bash "$VERIFIER" known-bad "$TEMP_ROOT/safari-absent-config.json" "$TEMP_ROOT/safari-absent-config-contract.json" "$LAUNCH_EVENTS" "$TERMINATION_EVENTS"
+verify_known_bad "$TEMP_ROOT/failures-split-targets.json"
+verify_fixed "$TEMP_ROOT/fixed-multi-target-fallback.json" "$LAUNCH_EVENTS" "$TERMINATION_EVENTS" "$TEMP_ROOT/failures-split-targets.json"
 expect_failure \
-  "no case reproduced the live-partial to empty-final bug" \
-  verify_known_bad "$TEMP_ROOT/failures-split-targets.json"
+  "fixed report did not prove ordered fallback delivery for every affected baseline target/scenario pair" \
+  verify_fixed "$TEMP_ROOT/missing-textedit-affected-pair.json" "$LAUNCH_EVENTS" "$TERMINATION_EVENTS" "$TEMP_ROOT/failures-split-targets.json"
 expect_failure \
-  "fixed report did not prove ordered fallback delivery for every affected baseline scenario" \
+  "fixed report did not prove ordered fallback delivery for every affected baseline target/scenario pair" \
+  verify_fixed "$TEMP_ROOT/missing-safari-affected-pair.json" "$LAUNCH_EVENTS" "$TERMINATION_EVENTS" "$TEMP_ROOT/failures-split-targets.json"
+expect_failure \
+  "fixed report did not prove ordered fallback delivery for every affected baseline target/scenario pair" \
+  verify_fixed "$TEMP_ROOT/mismatched-target-scenario-fallback.json" "$LAUNCH_EVENTS" "$TERMINATION_EVENTS" "$TEMP_ROOT/failures-split-targets.json"
+expect_failure \
+  "fixed report did not prove ordered fallback delivery for every affected baseline target/scenario pair" \
   verify_fixed "$TEMP_ROOT/fixed-fallback.json" "$LAUNCH_EVENTS" "$TERMINATION_EVENTS" "$TEMP_ROOT/known-bad-safari.json"
 expect_failure \
-  "fixed report did not prove ordered fallback delivery for every affected baseline scenario" \
+  "fixed report did not prove ordered fallback delivery for every affected baseline target/scenario pair" \
   verify_fixed "$TEMP_ROOT/missing-safari-existing-fallback.json" "$LAUNCH_EVENTS" "$TERMINATION_EVENTS" "$TEMP_ROOT/known-bad-safari.json"
 expect_failure \
-  "fixed report did not prove ordered fallback delivery for every affected baseline scenario" \
+  "fixed report did not prove ordered fallback delivery for every affected baseline target/scenario pair" \
   verify_fixed "$TEMP_ROOT/out-of-order-safari-fallback.json" "$LAUNCH_EVENTS" "$TERMINATION_EVENTS" "$TEMP_ROOT/known-bad-safari.json"
 expect_failure \
-  "fixed report did not prove ordered fallback delivery for every affected baseline scenario" \
+  "fixed report did not prove ordered fallback delivery for every affected baseline target/scenario pair" \
   verify_fixed "$TEMP_ROOT/duplicate-fixed-first-commit.json"
 expect_failure \
-  "fixed report did not prove ordered fallback delivery for every affected baseline scenario" \
+  "fixed report did not prove ordered fallback delivery for every affected baseline target/scenario pair" \
   verify_fixed "$TEMP_ROOT/duplicate-fixed-final.json"
 expect_failure \
-  "fixed report did not prove ordered fallback delivery for every affected baseline scenario" \
+  "fixed report did not prove ordered fallback delivery for every affected baseline target/scenario pair" \
   verify_fixed "$TEMP_ROOT/duplicate-fixed-fallback.json"
 expect_failure \
   "verified known-bad report contains a fatal error" \

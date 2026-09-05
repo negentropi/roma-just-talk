@@ -16,6 +16,12 @@ runtime_model_cache_path="${RUNTIME_E2E_MODEL_CACHE_PATH:-$HOME/Library/Caches/r
 runtime_empty_final_expectation="${RUNTIME_E2E_EMPTY_FINAL_EXPECTATION:-none}"
 runtime_empty_final_baseline_evidence="${RUNTIME_E2E_EMPTY_FINAL_BASELINE_EVIDENCE:-}"
 runtime_empty_final_baseline_run_id="${RUNTIME_E2E_EMPTY_FINAL_BASELINE_RUN_ID:-}"
+distribution_expectation="${DISTRIBUTION_E2E_EXPECTATION:-fixed}"
+expected_rejected_framework="${DISTRIBUTION_E2E_EXPECTED_REJECTED_FRAMEWORK:-}"
+expected_main_uuid="${DISTRIBUTION_E2E_EXPECTED_MAIN_UUID:-}"
+expected_rejected_framework_uuid="${DISTRIBUTION_E2E_EXPECTED_REJECTED_FRAMEWORK_UUID:-}"
+framework_signature_baseline_evidence="${DISTRIBUTION_E2E_FRAMEWORK_SIGNATURE_BASELINE_EVIDENCE:-}"
+framework_signature_baseline_run_id="${DISTRIBUTION_E2E_FRAMEWORK_SIGNATURE_BASELINE_RUN_ID:-}"
 github_download_token="${GH_TOKEN:-}"
 unset GH_TOKEN
 source "$(cd "$(dirname "$0")" && pwd)/macos-bundle-manifest.sh"
@@ -56,6 +62,51 @@ case "$runtime_empty_final_expectation" in
     exit 2
     ;;
 esac
+
+case "$distribution_expectation" in
+  fixed|fixed-after-framework-signature|known-bad-framework-signature) ;;
+  *)
+    echo "Unsupported distribution E2E expectation: $distribution_expectation" >&2
+    exit 2
+    ;;
+esac
+if { [ "$distribution_expectation" = "known-bad-framework-signature" ] \
+  || [ "$distribution_expectation" = "fixed-after-framework-signature" ]; } \
+  && [ "$macos_scenario" != "distribution-e2e" ]; then
+  echo "$distribution_expectation requires distribution-e2e" >&2
+  exit 2
+fi
+if [ "$distribution_expectation" = "known-bad-framework-signature" ] \
+  || [ "$distribution_expectation" = "fixed-after-framework-signature" ]; then
+  case "$expected_rejected_framework" in
+    whisper|MediaRemoteAdapter) ;;
+    *)
+      echo "known-bad framework signature requires whisper or MediaRemoteAdapter" >&2
+      exit 2
+      ;;
+  esac
+  for expected_uuid in "$expected_main_uuid" "$expected_rejected_framework_uuid"; do
+    if ! [[ "$expected_uuid" =~ ^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$ ]]; then
+      echo "Known-bad framework signature proof requires source UUID inputs" >&2
+      exit 2
+    fi
+  done
+fi
+if [ "$distribution_expectation" = "fixed-after-framework-signature" ]; then
+  if [ "$runtime_empty_final_expectation" != "none" ]; then
+    echo "Paired framework-signature proof requires normal passing runtime smoke" >&2
+    exit 2
+  fi
+  if ! [[ "$framework_signature_baseline_run_id" =~ ^[0-9]+$ ]] \
+    || [ ! -d "$framework_signature_baseline_evidence" ]; then
+    echo "Paired framework-signature proof requires downloaded known-bad baseline evidence" >&2
+    exit 2
+  fi
+elif [ -n "$framework_signature_baseline_evidence" ] \
+  || [ -n "$framework_signature_baseline_run_id" ]; then
+  echo "Framework-signature baseline evidence is only valid for paired fixed proof" >&2
+  exit 2
+fi
 if [ "$runtime_empty_final_expectation" != "none" ] \
   && [ "$macos_scenario" != "runtime-smoke" ] \
   && [ "$macos_scenario" != "distribution-e2e" ]; then
@@ -166,6 +217,8 @@ stage_runner_boot_session_uuid="${STAGE_RUNNER_BOOT_SESSION_UUID:-}"
 stage_runner_boot_age_seconds="${STAGE_RUNNER_BOOT_AGE_SECONDS:-}"
 ios_artifact_run_id=""
 macos_scenario_status=0
+distribution_verdict="not-run"
+framework_signature_pair_verdict="not-run"
 ios_scenario_status=0
 log_pids=()
 
@@ -332,6 +385,234 @@ prepare_macos() {
       runtime_helper_runner_name="$(jq -r .job.runnerName "$helper_run_jobs")"
       cp "$helper_run_jobs" "$evidence/runtime-helper-run-jobs.json"
     fi
+  fi
+
+  if [ "$distribution_expectation" = "fixed-after-framework-signature" ]; then
+    baseline_root="$framework_signature_baseline_evidence"
+    baseline_evidence="$baseline_root/evidence"
+    baseline_stage_manifest="$baseline_evidence/stage-manifest.json"
+    required_baseline_evidence=(
+      "$baseline_stage_manifest"
+      "$baseline_root/baseline-run-metadata.json"
+      "$baseline_root/baseline-artifact-metadata.json"
+      "$baseline_root/baseline-artifact-archive.zip"
+      "$baseline_root/baseline-artifact-archive.sha256"
+      "$baseline_evidence/macos-artifact-metadata.json"
+      "$baseline_evidence/macos-app-run-metadata.json"
+      "$baseline_evidence/macos-distribution-e2e/distribution-verdict.txt"
+      "$baseline_evidence/macos-distribution-e2e/approval-window-dyld-report.ips"
+      "$baseline_evidence/macos-distribution-e2e/approval-window-dyld-match.txt"
+      "$baseline_evidence/macos-distribution-e2e/approval-window-started-at.txt"
+      "$baseline_evidence/macos-distribution-e2e/approval-window-dyld-pid-correlation.txt"
+      "$baseline_evidence/macos-distribution-e2e/expected-negative-control-identities.txt"
+      "$baseline_evidence/macos-distribution-e2e/extracted-app-identity.txt"
+      "$baseline_evidence/macos-distribution-e2e/source-artifact.txt"
+      "$baseline_evidence/fresh-namespace-runner.txt"
+    )
+    for required_evidence in "${required_baseline_evidence[@]}"; do
+      test -s "$required_evidence"
+    done
+
+    jq -e \
+      --arg run_id "$framework_signature_baseline_run_id" \
+      --arg head_sha "${GITHUB_SHA:-}" \
+      --arg repository "${GITHUB_REPOSITORY:-}" \
+      --arg workflow_path ".github/workflows/voiceink-remote-e2e-stage.yml" \
+      --arg version "$macos_expected_version" \
+      --arg build "$macos_expected_build" \
+      --arg runner "$stage_runner_label" \
+      --arg framework "$expected_rejected_framework" \
+      --arg main_uuid "$expected_main_uuid" \
+      --arg framework_uuid "$expected_rejected_framework_uuid" '
+        .status == "completed"
+          and .macOSScenario == "distribution-e2e"
+          and .macOSScenarioExitCode == 0
+          and .macOSDistributionExpectation == "known-bad-framework-signature"
+          and .macOSDistributionVerdict == "expected_framework_signature_failure_reproduced"
+          and .macOSExpectedVersion == $version
+          and .macOSExpectedBuild == $build
+          and .stageRunnerLabel == $runner
+          and .macOSExpectedRejectedFramework == $framework
+          and ((.macOSExpectedMainUUID | ascii_upcase) == ($main_uuid | ascii_upcase))
+          and ((.macOSExpectedRejectedFrameworkUUID | ascii_upcase) == ($framework_uuid | ascii_upcase))
+          and .githubRunId == $run_id
+          and ($head_sha == "" or .githubSha == $head_sha)
+          and ($repository == "" or .githubRepository == $repository)
+          and .githubWorkflowPath == $workflow_path
+          and (.macOSArtifactRunId | tostring | test("^[0-9]+$"))
+          and (.macOSArtifactId | tostring | test("^[0-9]+$"))
+          and (.macOSArtifactDigest | test("^sha256:[0-9a-f]{64}$"))
+          and (.macOSArtifactHeadSha | test("^[0-9a-f]{40}$"))
+          and .macOSArtifactWorkflowPath == ".github/workflows/voiceink-build.yml"
+      ' "$baseline_stage_manifest" >/dev/null
+
+    jq -e \
+      --arg run_id "$framework_signature_baseline_run_id" \
+      --arg head_sha "${GITHUB_SHA:-}" \
+      --arg repository "${GITHUB_REPOSITORY:-}" '
+        (.runId | tostring) == $run_id
+          and .status == "completed"
+          and .conclusion == "success"
+          and ($head_sha == "" or .headSha == $head_sha)
+          and ($repository == "" or .repository == $repository)
+          and .workflowPath == ".github/workflows/voiceink-remote-e2e-stage.yml"
+      ' "$baseline_root/baseline-run-metadata.json" >/dev/null
+    jq -e \
+      --arg run_id "$framework_signature_baseline_run_id" '
+        (.runId | tostring) == $run_id
+          and .name == "remote-e2e-stage-evidence"
+          and .expired == false
+          and (.id | tostring | test("^[0-9]+$"))
+          and (.digest | test("^sha256:[0-9a-f]{64}$"))
+      ' "$baseline_root/baseline-artifact-metadata.json" >/dev/null
+    baseline_outer_sha="$(
+      shasum -a 256 "$baseline_root/baseline-artifact-archive.zip" | awk '{print $1}'
+    )"
+    test "sha256:$baseline_outer_sha" = "$(
+      jq -r .digest "$baseline_root/baseline-artifact-metadata.json"
+    )"
+    test "$baseline_outer_sha" = "$(
+      awk 'NR == 1 { print $1 }' "$baseline_root/baseline-artifact-archive.sha256"
+    )"
+
+    baseline_app_run_id="$(jq -r .macOSArtifactRunId "$baseline_stage_manifest")"
+    baseline_app_artifact_id="$(jq -r .macOSArtifactId "$baseline_stage_manifest")"
+    baseline_app_digest="$(jq -r .macOSArtifactDigest "$baseline_stage_manifest")"
+    baseline_app_head_sha="$(jq -r .macOSArtifactHeadSha "$baseline_stage_manifest")"
+    baseline_app_repository="$(jq -r .macOSArtifactRepository "$baseline_stage_manifest")"
+    baseline_app_workflow_path="$(jq -r .macOSArtifactWorkflowPath "$baseline_stage_manifest")"
+    jq -e \
+      --arg run_id "$baseline_app_run_id" \
+      --arg artifact_id "$baseline_app_artifact_id" \
+      --arg digest "$baseline_app_digest" '
+        (.runId | tostring) == $run_id
+          and (.id | tostring) == $artifact_id
+          and .name == "roma.just.talk.app"
+          and .digest == $digest
+          and .expired == false
+      ' "$baseline_evidence/macos-artifact-metadata.json" >/dev/null
+    jq -e \
+      --arg run_id "$baseline_app_run_id" \
+      --arg repository "$baseline_app_repository" \
+      --arg head_sha "$baseline_app_head_sha" \
+      --arg workflow_path "$baseline_app_workflow_path" '
+        (.runId | tostring) == $run_id
+          and .headRepository == $repository
+          and .headSha == $head_sha
+          and .workflowPath == $workflow_path
+          and .status == "completed"
+          and .conclusion == "success"
+      ' "$baseline_evidence/macos-app-run-metadata.json" >/dev/null
+
+    baseline_identities="$baseline_evidence/macos-distribution-e2e/expected-negative-control-identities.txt"
+    baseline_extracted_identity="$baseline_evidence/macos-distribution-e2e/extracted-app-identity.txt"
+    baseline_distribution_verdict="$baseline_evidence/macos-distribution-e2e/distribution-verdict.txt"
+    baseline_source_artifact="$baseline_evidence/macos-distribution-e2e/source-artifact.txt"
+    grep -Fx "expected_rejected_framework=$expected_rejected_framework" \
+      "$baseline_distribution_verdict"
+    grep -Fxi "main_arm64_uuid=$expected_main_uuid" "$baseline_identities"
+    grep -Fxi "framework_arm64_uuid=$expected_rejected_framework_uuid" "$baseline_identities"
+    grep -Fxi "source_main_uuid=$expected_main_uuid" "$baseline_distribution_verdict"
+    grep -Fxi "source_rejected_framework_uuid=$expected_rejected_framework_uuid" \
+      "$baseline_distribution_verdict"
+    grep -Eq '^app_short_version=[0-9A-Za-z][0-9A-Za-z._-]*$' "$baseline_identities"
+    grep -Eq '^app_bundle_version=[0-9A-Za-z][0-9A-Za-z._-]*$' "$baseline_identities"
+    baseline_short_version="$(sed -n 's/^app_short_version=//p' "$baseline_identities")"
+    baseline_bundle_version="$(sed -n 's/^app_bundle_version=//p' "$baseline_identities")"
+    test "$(grep -c '^app_short_version=' "$baseline_identities")" -eq 1
+    test "$(grep -c '^app_bundle_version=' "$baseline_identities")" -eq 1
+    grep -Fx "app_short_version=$baseline_short_version" "$baseline_extracted_identity"
+    grep -Fx "app_bundle_version=$baseline_bundle_version" "$baseline_extracted_identity"
+    grep -Fx "app_short_version=$baseline_short_version" "$baseline_distribution_verdict"
+    grep -Fx "app_bundle_version=$baseline_bundle_version" "$baseline_distribution_verdict"
+    baseline_crash_sha="$(
+      shasum -a 256 \
+        "$baseline_evidence/macos-distribution-e2e/approval-window-dyld-report.ips" \
+        | awk '{print $1}'
+    )"
+    bash "$(dirname "$0")/verify-macos-framework-signature-crash.sh" \
+      "$baseline_evidence/macos-distribution-e2e/approval-window-dyld-report.ips" \
+      com.negentropi.RomaJustTalk "$macos_expected_version" "$macos_expected_build" \
+      "$expected_main_uuid" "$expected_rejected_framework" "$expected_rejected_framework_uuid" \
+      "$(cat "$baseline_evidence/macos-distribution-e2e/approval-window-started-at.txt")" \
+      "$baseline_short_version" "$baseline_bundle_version" \
+      > "$evidence/framework-signature-baseline-reverification.txt"
+    grep -Eq '^verdict=matched pid=[1-9][0-9]* ' \
+      "$baseline_evidence/macos-distribution-e2e/approval-window-dyld-match.txt"
+    grep -Fq "crash_report_sha256=$baseline_crash_sha" \
+      "$baseline_evidence/macos-distribution-e2e/approval-window-dyld-match.txt"
+    grep -Eq '^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$' \
+      "$baseline_evidence/macos-distribution-e2e/approval-window-started-at.txt"
+    grep -Fx 'report_pid_dead=true' \
+      "$baseline_evidence/macos-distribution-e2e/approval-window-dyld-pid-correlation.txt"
+    grep -Fx 'running_roma_processes=0' \
+      "$baseline_evidence/macos-distribution-e2e/approval-window-dyld-pid-correlation.txt"
+    grep -Fx 'distribution_verdict=expected_framework_signature_failure_reproduced' \
+      "$baseline_evidence/macos-distribution-e2e/distribution-verdict.txt"
+    grep -Fx "github_artifact_run_id=$baseline_app_run_id" "$baseline_source_artifact"
+    grep -Fx "github_artifact_id=$baseline_app_artifact_id" \
+      "$baseline_source_artifact"
+    grep -Fx "github_artifact_digest=$baseline_app_digest" \
+      "$baseline_source_artifact"
+    grep -Fx "github_actions_archive_sha256=${baseline_app_digest#sha256:}" \
+      "$baseline_source_artifact"
+    grep -Fx 'fresh_machine_provenance=passed' "$baseline_evidence/fresh-namespace-runner.txt"
+
+    if [ "$baseline_app_run_id" = "$macos_artifact_run_id" ] \
+      || [ "$baseline_app_artifact_id" = "$macos_artifact_id" ] \
+      || [ "$baseline_app_digest" = "$macos_artifact_digest" ] \
+      || [ "$baseline_app_head_sha" = "$macos_artifact_head_sha" ]; then
+      echo "Paired framework-signature proof requires distinct baseline and candidate app artifacts" >&2
+      exit 2
+    fi
+    jq -n \
+      --arg baseline_stage_run_id "$framework_signature_baseline_run_id" \
+      --arg baseline_app_run_id "$baseline_app_run_id" \
+      --arg baseline_artifact_id "$baseline_app_artifact_id" \
+      --arg baseline_digest "$baseline_app_digest" \
+      --arg baseline_head_sha "$baseline_app_head_sha" \
+      --arg candidate_run_id "$macos_artifact_run_id" \
+      --arg candidate_artifact_id "$macos_artifact_id" \
+      --arg candidate_digest "$macos_artifact_digest" \
+      --arg candidate_head_sha "$macos_artifact_head_sha" \
+      --arg tooling_sha "${GITHUB_SHA:-local}" \
+      --arg macos_version "$macos_expected_version" \
+      --arg macos_build "$macos_expected_build" \
+      --arg runner_label "$stage_runner_label" \
+      --arg framework "$expected_rejected_framework" \
+      --arg main_uuid "$expected_main_uuid" \
+      --arg framework_uuid "$expected_rejected_framework_uuid" \
+      --arg baseline_short_version "$baseline_short_version" \
+      --arg baseline_bundle_version "$baseline_bundle_version" '
+        {
+          pairingValidation: "passed",
+          toolingSha: $tooling_sha,
+          macOSVersion: $macos_version,
+          macOSBuild: $macos_build,
+          runnerLabel: $runner_label,
+          rejectedFramework: $framework,
+          reportedMainUUID: $main_uuid,
+          reportedFrameworkUUID: $framework_uuid,
+          baselineAppShortVersion: $baseline_short_version,
+          baselineAppBundleVersion: $baseline_bundle_version,
+          baseline: {
+            stageRunId: $baseline_stage_run_id,
+            appRunId: $baseline_app_run_id,
+            artifactId: $baseline_artifact_id,
+            digest: $baseline_digest,
+            headSha: $baseline_head_sha,
+            verdict: "expected_framework_signature_failure_reproduced"
+          },
+          candidate: {
+            appRunId: $candidate_run_id,
+            artifactId: $candidate_artifact_id,
+            digest: $candidate_digest,
+            headSha: $candidate_head_sha
+          }
+        }
+      ' > "$evidence/paired-framework-signature-proof.json"
+    cp "$baseline_root/baseline-artifact-archive.sha256" \
+      "$evidence/paired-framework-signature-baseline-artifact-archive.sha256"
   fi
 
   if [ "$runtime_empty_final_expectation" = "fixed" ]; then
@@ -573,6 +854,13 @@ write_manifest() {
   "macOSScenarioExitCode": $macos_scenario_status,
   "macOSExpectedVersion": "$macos_expected_version",
   "macOSExpectedBuild": "$macos_expected_build",
+  "macOSDistributionExpectation": "$distribution_expectation",
+  "macOSExpectedRejectedFramework": "$expected_rejected_framework",
+  "macOSExpectedMainUUID": "$expected_main_uuid",
+  "macOSExpectedRejectedFrameworkUUID": "$expected_rejected_framework_uuid",
+  "macOSDistributionVerdict": "$distribution_verdict",
+  "macOSFrameworkSignatureBaselineRunId": "$framework_signature_baseline_run_id",
+  "macOSFrameworkSignaturePairVerdict": "$framework_signature_pair_verdict",
   "macOSAudioArtifact": "$macos_audio_artifact",
   "macOSRepetitions": $macos_repetitions,
   "macOSEmptyFinalExpectation": "$runtime_empty_final_expectation",
@@ -583,6 +871,8 @@ write_manifest() {
   "githubRunId": "${GITHUB_RUN_ID:-local}",
   "githubSha": "${GITHUB_SHA:-local}",
   "githubRef": "${GITHUB_REF:-local}",
+  "githubRepository": "${GITHUB_REPOSITORY:-local}",
+  "githubWorkflowPath": ".github/workflows/voiceink-remote-e2e-stage.yml",
   "stageRunnerLabel": "$stage_runner_label",
   "stageRunnerName": "$stage_runner_name",
   "stageRunnerInstanceId": "$stage_runner_instance_id",
@@ -618,8 +908,13 @@ EOF
 write_manifest scenario-running
 
 if [ "$macos_scenario" = "distribution-e2e" ]; then
+  low_level_distribution_expectation="$distribution_expectation"
+  if [ "$distribution_expectation" = "fixed-after-framework-signature" ]; then
+    low_level_distribution_expectation="fixed"
+  fi
   set +e
   GH_TOKEN="$github_download_token" \
+  DISTRIBUTION_E2E_EXPECTATION="$low_level_distribution_expectation" \
   MACOS_ARTIFACT_RUN_ID="$macos_artifact_run_id" \
   MACOS_ARTIFACT_ID="$macos_artifact_id" \
   MACOS_ARTIFACT_REPOSITORY="$macos_artifact_repository" \
@@ -637,6 +932,25 @@ if [ "$macos_scenario" = "distribution-e2e" ]; then
   set -e
 
   if [ "$macos_scenario_status" -eq 0 ]; then
+    distribution_verdict="$(
+      sed -n 's/^distribution_verdict=//p' \
+        "$evidence/macos-distribution-e2e/distribution-verdict.txt"
+    )"
+  fi
+
+  if [ "$macos_scenario_status" -eq 0 ] \
+    && [ "$distribution_expectation" = "known-bad-framework-signature" ]; then
+    observed_rejected_framework="$(
+      sed -n 's/^expected_rejected_framework=//p' \
+        "$evidence/macos-distribution-e2e/distribution-verdict.txt"
+    )"
+    if [ "$distribution_verdict" != "expected_framework_signature_failure_reproduced" ] \
+      || [ "$observed_rejected_framework" != "$expected_rejected_framework" ] \
+      || [ ! -f "$stage_root/distribution-expected-terminal-failure.txt" ]; then
+      echo "known-bad distribution E2E did not record the expected framework signature failure" >&2
+      macos_scenario_status=1
+    fi
+  elif [ "$macos_scenario_status" -eq 0 ]; then
     read -r distribution_app < "$stage_root/macos-app-path.txt"
     distribution_bundle_manifest="$evidence/macos-distribution-e2e/extracted-app-files-after-gatekeeper.sha256"
     runtime_bundle_before="$evidence/macos-distribution-e2e/runtime-bundle-before.sha256"
@@ -739,6 +1053,23 @@ if [ "$macos_scenario" = "distribution-e2e" ]; then
       if [ "$macos_scenario_status" -eq 0 ]; then
         macos_scenario_status=1
       fi
+    fi
+
+    if [ "$macos_scenario_status" -eq 0 ] \
+      && [ "$distribution_expectation" = "fixed-after-framework-signature" ]; then
+      distribution_verdict="passed_after_framework_signature_baseline"
+      framework_signature_pair_verdict="passed"
+      {
+        printf 'pair_verdict=passed\n'
+        printf 'distribution_verdict=%s\n' "$distribution_verdict"
+        printf 'baseline_stage_run_id=%s\n' "$framework_signature_baseline_run_id"
+        printf 'baseline_verdict=expected_framework_signature_failure_reproduced\n'
+        printf 'candidate_app_run_id=%s\n' "$macos_artifact_run_id"
+        printf 'candidate_artifact_id=%s\n' "$macos_artifact_id"
+        printf 'candidate_artifact_digest=%s\n' "$macos_artifact_digest"
+        printf 'candidate_head_sha=%s\n' "$macos_artifact_head_sha"
+        printf 'candidate_launch_and_runtime_smoke=passed\n'
+      } > "$evidence/framework-signature-pair-verdict.txt"
     fi
   fi
 

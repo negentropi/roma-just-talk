@@ -14,11 +14,45 @@ expected_macos_version="${5:-}"
 expected_macos_build="${6:-}"
 interaction_minutes="${7:-30}"
 github_download_token="${GH_TOKEN:-}"
+distribution_expectation="${DISTRIBUTION_E2E_EXPECTATION:-fixed}"
+expected_rejected_framework="${DISTRIBUTION_E2E_EXPECTED_REJECTED_FRAMEWORK:-}"
+expected_main_uuid="${DISTRIBUTION_E2E_EXPECTED_MAIN_UUID:-}"
+expected_rejected_framework_uuid="${DISTRIBUTION_E2E_EXPECTED_REJECTED_FRAMEWORK_UUID:-}"
+source_main_uuid=""
+source_rejected_framework_uuid=""
+reported_crash_pid=""
+operator_credential_file="${DISTRIBUTION_E2E_OPERATOR_CREDENTIAL_FILE:-}"
 unset GH_TOKEN
 
 if [[ ! "$interaction_minutes" =~ ^[0-9]+$ ]] || (( interaction_minutes < 1 || interaction_minutes > 60 )); then
   echo "Distribution E2E interaction minutes must be between 1 and 60" >&2
   exit 2
+fi
+case "$distribution_expectation" in
+  fixed|known-bad-framework-signature) ;;
+  *)
+    echo "Unsupported distribution E2E expectation: $distribution_expectation" >&2
+    exit 2
+    ;;
+esac
+if [[ "$distribution_expectation" == known-bad-framework-signature ]]; then
+  case "$expected_rejected_framework" in
+    whisper|MediaRemoteAdapter) ;;
+    *)
+      echo "Known-bad framework signature proof requires whisper or MediaRemoteAdapter" >&2
+      exit 2
+      ;;
+  esac
+  for expected_uuid in "$expected_main_uuid" "$expected_rejected_framework_uuid"; do
+    [[ "$expected_uuid" =~ ^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$ ]] \
+      || { echo "Known-bad framework signature proof requires source UUID inputs" >&2; exit 2; }
+  done
+fi
+if [[ -n "$operator_credential_file" ]]; then
+  [[ -f "$operator_credential_file" ]] \
+    || { echo "Distribution E2E operator credential file is missing" >&2; exit 2; }
+  [[ "$(stat -f '%Lp' "$operator_credential_file")" == 600 ]] \
+    || { echo "Distribution E2E operator credential file must be mode 600" >&2; exit 2; }
 fi
 
 repo_root="${GITHUB_WORKSPACE:-$(cd "$(dirname "$0")/.." && pwd)}"
@@ -306,6 +340,157 @@ wait_for_first_approval_pid() {
     sleep 0.1
   done
   return 1
+}
+
+wait_for_pid_exit() {
+  local pid="$1"
+  local deadline="$2"
+  while (( SECONDS < deadline )); do
+    if ! kill -0 "$pid" 2>/dev/null; then
+      return 0
+    fi
+    sleep 0.1
+  done
+  return 1
+}
+
+write_approval_window_crash_report_details() {
+  local report=""
+  while IFS= read -r report; do
+    [[ -n "$report" && -f "$report" ]] || continue
+    cp "$report" "$distribution_evidence/approval-window-dyld-report.ips"
+    return 0
+  done < "$distribution_evidence/approval-window-new-crash-reports.txt"
+  return 1
+}
+
+wait_for_new_approval_window_crash_report() {
+  local deadline="$1"
+  local report_count=""
+  local report_grace_deadline=0
+  local report_path=""
+  local report_sha_before=""
+  local report_sha_after=""
+  while (( SECONDS < deadline )); do
+    write_roma_crash_report_inventory \
+      "$distribution_evidence/approval-window-crash-reports-after.txt"
+    comm -13 \
+      "$distribution_evidence/approval-window-crash-reports-before.txt" \
+      "$distribution_evidence/approval-window-crash-reports-after.txt" \
+      > "$distribution_evidence/approval-window-new-crash-reports.txt"
+    report_count="$(awk 'NF { count++ } END { print count + 0 }' \
+      "$distribution_evidence/approval-window-new-crash-reports.txt")"
+    if (( report_grace_deadline == 0 )) && [[ -s "$approval_first_pid_file" ]]; then
+      report_grace_deadline=$((SECONDS + 30))
+    fi
+    if [[ "$report_count" -eq 1 ]]; then
+      if (( report_grace_deadline == 0 )); then
+        report_grace_deadline=$((SECONDS + 30))
+      fi
+      report_path="$(sed -n '1p' "$distribution_evidence/approval-window-new-crash-reports.txt")"
+      if [[ -f "$report_path" ]]; then
+        report_sha_before="$(shasum -a 256 "$report_path" | awk '{ print $1 }')"
+        sleep 1
+        report_sha_after="$(shasum -a 256 "$report_path" | awk '{ print $1 }')"
+        if [[ "$report_sha_before" == "$report_sha_after" ]]; then
+          cp "$report_path" "$distribution_evidence/approval-window-dyld-report.ips"
+          if report_matches_expected_framework_signature_failure; then
+            return 0
+          fi
+        fi
+      fi
+    fi
+    if [[ "$report_count" -gt 1 ]]; then
+      return 1
+    fi
+    if [[ -s "$distribution_evidence/approval-window-new-crash-reports.txt" ]]; then
+      write_approval_window_crash_report_details
+    fi
+    if (( report_grace_deadline > 0 && SECONDS >= report_grace_deadline )); then
+      return 1
+    fi
+    sleep 0.2
+  done
+  return 1
+}
+
+report_matches_expected_framework_signature_failure() {
+  local report="$distribution_evidence/approval-window-dyld-report.ips"
+  local approval_window_start_utc="$(cat "$distribution_evidence/approval-window-started-at.txt")"
+  "$repo_root/scripts/verify-macos-framework-signature-crash.sh" \
+    "$report" \
+    "$bundle_identifier" \
+    "$actual_macos_version" \
+    "$actual_macos_build" \
+    "$source_main_uuid" \
+    "$expected_rejected_framework" \
+    "$source_rejected_framework_uuid" \
+    "$approval_window_start_utc" \
+    "$extracted_app_short_version" \
+    "$extracted_app_bundle_version" \
+    > "$distribution_evidence/approval-window-dyld-match.txt"
+}
+
+validate_known_bad_approval_pid() {
+  local sampled_pid=""
+  local sampled_count=0
+  reported_crash_pid="$(
+    sed -n 's/^verdict=matched pid=\([1-9][0-9]*\) .*/\1/p' \
+      "$distribution_evidence/approval-window-dyld-match.txt"
+  )"
+  [[ "$reported_crash_pid" =~ ^[1-9][0-9]*$ ]] \
+    || fail "framework signature crash verifier did not report a launch PID"
+
+  while IFS= read -r sampled_pid; do
+    [[ -n "$sampled_pid" ]] || continue
+    sampled_count=$((sampled_count + 1))
+    [[ "$sampled_pid" == "$reported_crash_pid" ]] \
+      || fail "approval monitor observed Roma PID $sampled_pid, not crash-report PID $reported_crash_pid"
+  done < <(awk -F '\t' 'NF >= 2 && $2 ~ /^[1-9][0-9]*$/ { print $2 }' \
+    "$approval_process_events" | LC_ALL=C sort -u)
+
+  if ! wait_for_pid_exit "$reported_crash_pid" "$((SECONDS + 2))"; then
+    fail "known-bad crash-report PID is still alive after its dyld abort"
+  fi
+  if pgrep -x "$process_name" >/dev/null 2>&1; then
+    fail "Roma process remains after the expected framework-signature dyld abort"
+  fi
+  {
+    printf 'report_pid=%s\n' "$reported_crash_pid"
+    printf 'sampled_approval_pid_count=%s\n' "$sampled_count"
+    printf 'report_pid_dead=true\n'
+    printf 'running_roma_processes=0\n'
+  } > "$distribution_evidence/approval-window-dyld-pid-correlation.txt"
+}
+
+read_arm64_uuid() {
+  local binary="$1"
+  xcrun dwarfdump --uuid "$binary" \
+    | awk '/\(arm64\)/ { print toupper($2); exit }'
+}
+
+require_expected_framework_signature_failure() {
+  local report_count=""
+  wait_for_new_approval_window_crash_report "$deadline" \
+    || fail "expected approved dyld abort did not create one complete Roma crash report"
+  sleep 2
+  write_roma_crash_report_inventory \
+    "$distribution_evidence/approval-window-crash-reports-after.txt"
+  comm -13 \
+    "$distribution_evidence/approval-window-crash-reports-before.txt" \
+    "$distribution_evidence/approval-window-crash-reports-after.txt" \
+    > "$distribution_evidence/approval-window-new-crash-reports.txt"
+  stop_approval_monitors
+  report_count="$(awk 'NF { count++ } END { print count + 0 }' \
+    "$distribution_evidence/approval-window-new-crash-reports.txt")"
+  if [[ "$report_count" -ne 1 ]]; then
+    fail "known-bad approval must create exactly one Roma dyld crash report"
+  fi
+  write_approval_window_crash_report_details
+  if ! report_matches_expected_framework_signature_failure; then
+    fail "approved launch did not reproduce the expected framework signature dyld failure"
+  fi
+  validate_known_bad_approval_pid
 }
 
 version_is_at_least() {
@@ -806,6 +991,18 @@ extracted_executable_name="$(
 )"
 extracted_executable="$extracted_app/Contents/MacOS/$extracted_executable_name"
 extracted_executable_sha256="$(shasum -a 256 "$extracted_executable" | awk '{print $1}')"
+extracted_app_short_version="$(
+  /usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' \
+    "$extracted_app/Contents/Info.plist"
+)"
+extracted_app_bundle_version="$(
+  /usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' \
+    "$extracted_app/Contents/Info.plist"
+)"
+[[ "$extracted_app_short_version" =~ ^[0-9A-Za-z][0-9A-Za-z._-]*$ ]] \
+  || fail "extracted app has no valid short version"
+[[ "$extracted_app_bundle_version" =~ ^[0-9A-Za-z][0-9A-Za-z._-]*$ ]] \
+  || fail "extracted app has no valid bundle version"
 app_minimum_system_version="$(
   /usr/libexec/PlistBuddy -c 'Print :LSMinimumSystemVersion' \
     "$extracted_app/Contents/Info.plist" 2>/dev/null || true
@@ -823,7 +1020,39 @@ fi
   printf 'app=%s\n' "$extracted_app"
   printf 'executable=%s\n' "$extracted_executable"
   printf 'executable_sha256=%s\n' "$extracted_executable_sha256"
+  printf 'app_short_version=%s\n' "$extracted_app_short_version"
+  printf 'app_bundle_version=%s\n' "$extracted_app_bundle_version"
 } > "$distribution_evidence/extracted-app-identity.txt"
+if [[ "$distribution_expectation" == known-bad-framework-signature ]]; then
+  extracted_framework_binary="$extracted_app/Contents/Frameworks/${expected_rejected_framework}.framework/Versions/Current/${expected_rejected_framework}"
+  [[ -f "$extracted_framework_binary" ]] \
+    || fail "expected rejected framework binary is absent from the distributed app"
+  source_main_uuid="$(read_arm64_uuid "$extracted_executable")"
+  source_rejected_framework_uuid="$(read_arm64_uuid "$extracted_framework_binary")"
+  [[ "$source_main_uuid" =~ ^[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}$ ]] \
+    || fail "could not read the distributed app arm64 UUID"
+  [[ "$source_rejected_framework_uuid" =~ ^[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}$ ]] \
+    || fail "could not read the distributed framework arm64 UUID"
+  normalized_expected_main_uuid="$(printf '%s' "$expected_main_uuid" | tr '[:lower:]' '[:upper:]')"
+  normalized_expected_framework_uuid="$(printf '%s' "$expected_rejected_framework_uuid" | tr '[:lower:]' '[:upper:]')"
+  if [[ -n "$expected_main_uuid" && "$normalized_expected_main_uuid" != "$source_main_uuid" ]]; then
+    fail "requested main UUID does not match the distributed app"
+  fi
+  if [[ -n "$expected_rejected_framework_uuid" \
+    && "$normalized_expected_framework_uuid" != "$source_rejected_framework_uuid" ]]; then
+    fail "requested framework UUID does not match the distributed app"
+  fi
+  expected_main_uuid="$source_main_uuid"
+  expected_rejected_framework_uuid="$source_rejected_framework_uuid"
+  {
+    printf 'main_executable=%s\n' "$extracted_executable"
+    printf 'main_arm64_uuid=%s\n' "$source_main_uuid"
+    printf 'framework_binary=%s\n' "$extracted_framework_binary"
+    printf 'framework_arm64_uuid=%s\n' "$source_rejected_framework_uuid"
+    printf 'app_short_version=%s\n' "$extracted_app_short_version"
+    printf 'app_bundle_version=%s\n' "$extracted_app_bundle_version"
+  } > "$distribution_evidence/expected-negative-control-identities.txt"
+fi
 if ! compare_macos_bundle_to_manifest \
   "$extracted_app" \
   "$distribution_evidence/expected-inner-app-files.sha256" \
@@ -900,6 +1129,13 @@ Current step: GATEKEEPER ACTION REQUIRED
 2. Find the blocked "$process_name" launch and click Open Anyway.
 3. Confirm Open. Authenticate if macOS asks.
 
+$(if [[ -n "$operator_credential_file" ]]; then
+  printf 'Open the Desktop credential file "%s" and use those disposable administrator credentials only if macOS asks.\n' \
+    "$(basename "$operator_credential_file")"
+else
+  printf 'Use the authorized administrator credentials if macOS asks.\n'
+fi)
+
 Keep the app on $volume. Do not clear quarantine or re-sign it.
 The test is waiting for the first approved AppTranslocation process.
 EOF
@@ -907,6 +1143,63 @@ echo "DISTRIBUTION E2E GATEKEEPER ACTION REQUIRED"
 echo "In Remote Display: dismiss Not Opened, then Privacy & Security -> Open Anyway -> Open."
 open "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension" \
   > "$distribution_evidence/privacy-settings-open.txt" 2>&1 || true
+
+if [[ "$distribution_expectation" == known-bad-framework-signature ]]; then
+  mark_phase verify-known-bad-framework-signature-dyld-failure
+  require_expected_framework_signature_failure
+  write_macos_bundle_manifest \
+    "$extracted_app" \
+    "$distribution_evidence/extracted-app-files-after-known-bad-dyld.sha256"
+  if ! cmp -s \
+    "$distribution_evidence/extracted-app-files-before-gatekeeper.sha256" \
+    "$distribution_evidence/extracted-app-files-after-known-bad-dyld.sha256"; then
+    diff -u \
+      "$distribution_evidence/extracted-app-files-before-gatekeeper.sha256" \
+      "$distribution_evidence/extracted-app-files-after-known-bad-dyld.sha256" \
+      > "$distribution_evidence/extracted-app-known-bad-dyld-mutation.diff" || true
+    fail "approved known-bad launch changed the distributed app bundle"
+  fi
+  if ! app_quarantine_after_dyld="$(xattr -p com.apple.quarantine "$extracted_app" 2>/dev/null)"; then
+    fail "approved known-bad launch removed app quarantine"
+  fi
+  printf '%s\n' "$app_quarantine_after_dyld" \
+    > "$distribution_evidence/extracted-app-quarantine-after-known-bad-dyld.txt"
+  IFS=';' read -r _ _ app_quarantine_after_dyld_agent _ <<< "$app_quarantine_after_dyld"
+  [[ "$app_quarantine_after_dyld_agent" == "Safari" ]] \
+    || fail "approved known-bad launch did not preserve Safari quarantine"
+  cat > "$instructions" <<EOF
+roma just talk distribution E2E
+
+Expected known-bad framework signature failure reproduced.
+
+After the user-approved Gatekeeper launch, the one AppTranslocated Roma process
+aborted with the requested framework code-signature dyld report. Do not retry
+the app or change its quarantine, signature, or system security settings.
+EOF
+  mark_phase complete
+  {
+    printf 'distribution_verdict=expected_framework_signature_failure_reproduced\n'
+    printf 'distribution_expectation=%s\n' "$distribution_expectation"
+    printf 'expected_rejected_framework=%s\n' "$expected_rejected_framework"
+    printf 'source_main_uuid=%s\n' "$source_main_uuid"
+    printf 'source_rejected_framework_uuid=%s\n' "$source_rejected_framework_uuid"
+    printf 'app_short_version=%s\n' "$extracted_app_short_version"
+    printf 'app_bundle_version=%s\n' "$extracted_app_bundle_version"
+    printf 'github_actions_archive_sha256=%s\n' "$source_sha256"
+    printf 'browser_downloaded_archive_sha256=%s\n' "$downloaded_sha256"
+    printf 'inner_app_archive_sha256=%s\n' "$expected_inner_sha256"
+    printf 'macos_version=%s\n' "$actual_macos_version"
+    printf 'macos_build=%s\n' "$actual_macos_build"
+    printf 'external_volume=%s\n' "$volume"
+    printf 'source_app=%s\n' "$extracted_app"
+    printf 'launched_pid=%s\n' "$reported_crash_pid"
+    printf 'launch_verification=expected_dyld_abort\n'
+  } > "$verdict_file"
+  printf '%s\n' "$distribution_expectation" \
+    > "$stage_root/distribution-expected-terminal-failure.txt"
+  echo "macOS distribution E2E reproduced the expected $expected_rejected_framework signature failure: $extracted_app"
+  exit 0
+fi
 
 if ! launched_pid="$(wait_for_first_approval_pid "$deadline")"; then
   fail "timed out waiting for the first user-approved Gatekeeper launch"
@@ -1026,6 +1319,7 @@ EOF
 mark_phase complete
 {
   printf 'distribution_verdict=passed\n'
+  printf 'distribution_expectation=%s\n' "$distribution_expectation"
   printf 'github_actions_archive_sha256=%s\n' "$source_sha256"
   printf 'browser_downloaded_archive_sha256=%s\n' "$downloaded_sha256"
   printf 'inner_app_archive_sha256=%s\n' "$expected_inner_sha256"

@@ -151,6 +151,7 @@ runtime-e2e-check:
 	bash -n scripts/runtime-e2e-phase-runner.sh
 	bash -n scripts/run-macos-runtime-e2e.sh
 	bash scripts/tests/verify-runtime-empty-final-regression.test.sh
+	bash scripts/tests/verify-macos-framework-signature-crash.test.sh
 
 runtime-e2e-preflight:
 	@if [ ! -x "$(RUNTIME_E2E_APP_EXECUTABLE)" ]; then \

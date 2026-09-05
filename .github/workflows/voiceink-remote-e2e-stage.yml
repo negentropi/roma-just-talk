@@ -33,6 +33,35 @@ on:
         description: Exact macOS build; required for distribution, optional otherwise
         required: false
         type: string
+      macos_distribution_expectation:
+        description: Distribution result expected after manual Gatekeeper approval
+        required: true
+        default: fixed
+        type: choice
+        options:
+          - fixed
+          - fixed-after-framework-signature
+          - known-bad-framework-signature
+      macos_expected_rejected_framework:
+        description: Framework expected to be rejected in known-bad-framework-signature mode
+        required: false
+        default: whisper
+        type: choice
+        options:
+          - whisper
+          - MediaRemoteAdapter
+      macos_expected_main_uuid:
+        description: Required app main-executable UUID in known-bad framework mode
+        required: false
+        type: string
+      macos_expected_rejected_framework_uuid:
+        description: Required rejected-framework UUID in known-bad framework mode
+        required: false
+        type: string
+      macos_framework_signature_baseline_run_id:
+        description: Successful known-bad stage run required by paired framework-signature fixed proof
+        required: false
+        type: string
       developer_dir:
         description: Optional Xcode developer directory for the selected runner
         required: false
@@ -110,10 +139,13 @@ on:
       - "scripts/macos-finder-extraction-state.sh"
       - "scripts/macos-bundle-manifest.sh"
       - "scripts/verify-macos-distribution-launch.sh"
+      - "scripts/verify-macos-framework-signature-crash.sh"
       - "scripts/tests/macos-distribution-e2e-contract.test.sh"
       - "scripts/tests/macos-distribution-runtime-handoff.test.sh"
       - "scripts/tests/macos-finder-extraction-state.test.sh"
       - "scripts/tests/verify-macos-distribution-launch.test.sh"
+      - "scripts/tests/verify-macos-framework-signature-crash.test.sh"
+      - "scripts/tests/fixtures/macos-framework-signature-crash/**"
       - "scripts/tests/verify-runtime-empty-final-regression.test.sh"
       - "scripts/runtime-e2e-model-bootstrap.sh"
       - "scripts/runtime-e2e-phase-runner.sh"
@@ -139,6 +171,11 @@ env:
   STAGE_MACOS_EMPTY_FINAL_BASELINE_RUN_ID: ${{ inputs.macos_empty_final_baseline_run_id || '' }}
   STAGE_MACOS_EXPECTED_VERSION: ${{ inputs.macos_expected_version || '' }}
   STAGE_MACOS_EXPECTED_BUILD: ${{ inputs.macos_expected_build || '' }}
+  STAGE_MACOS_DISTRIBUTION_EXPECTATION: ${{ inputs.macos_distribution_expectation || 'fixed' }}
+  STAGE_MACOS_EXPECTED_REJECTED_FRAMEWORK: ${{ inputs.macos_expected_rejected_framework || 'whisper' }}
+  STAGE_MACOS_EXPECTED_MAIN_UUID: ${{ inputs.macos_expected_main_uuid || '' }}
+  STAGE_MACOS_EXPECTED_REJECTED_FRAMEWORK_UUID: ${{ inputs.macos_expected_rejected_framework_uuid || '' }}
+  STAGE_MACOS_FRAMEWORK_SIGNATURE_BASELINE_RUN_ID: ${{ inputs.macos_framework_signature_baseline_run_id || '' }}
   STAGE_DEVELOPER_DIR: ${{ inputs.developer_dir || '' }}
   STAGE_IOS_SCENARIO: ${{ inputs.ios_scenario || 'none' }}
 
@@ -186,12 +223,22 @@ jobs:
           [[ "$BOOT_SESSION_UUID" =~ ^[0-9A-Fa-f-]{36}$ ]]
           BOOT_AGE_SECONDS="$(( $(date +%s) - BOOT_EPOCH ))"
           [ "$BOOT_AGE_SECONDS" -ge 0 ]
+          if [ "$STAGE_MACOS_SCENARIO" = distribution-e2e ] \
+            && [ "$BOOT_AGE_SECONDS" -gt 900 ]; then
+            echo "distribution-e2e requires a Namespace macOS instance booted within 15 minutes" >&2
+            exit 2
+          fi
           echo "STAGE_RUNNER_LABEL=$REQUESTED_RUNNER" >> "$GITHUB_ENV"
           echo "STAGE_RUNNER_NAME=$RUNNER_NAME" >> "$GITHUB_ENV"
           echo "STAGE_RUNNER_INSTANCE_ID=${RUNNER_NAME#nsc-runner-}" >> "$GITHUB_ENV"
           echo "STAGE_RUNNER_BOOT_EPOCH=$BOOT_EPOCH" >> "$GITHUB_ENV"
           echo "STAGE_RUNNER_BOOT_SESSION_UUID=$BOOT_SESSION_UUID" >> "$GITHUB_ENV"
           echo "STAGE_RUNNER_BOOT_AGE_SECONDS=$BOOT_AGE_SECONDS" >> "$GITHUB_ENV"
+          if [ "$STAGE_MACOS_SCENARIO" = distribution-e2e ]; then
+            echo "STAGE_RUNNER_VERIFIED_FRESH=true" >> "$GITHUB_ENV"
+          else
+            echo "STAGE_RUNNER_VERIFIED_FRESH=false" >> "$GITHUB_ENV"
+          fi
 
       - name: Select requested Xcode
         if: env.STAGE_DEVELOPER_DIR != ''
@@ -225,7 +272,118 @@ jobs:
             printf 'expected_macos_build=%s\n' "$STAGE_MACOS_EXPECTED_BUILD"
             printf 'empty_final_expectation=%s\n' "$STAGE_MACOS_EMPTY_FINAL_EXPECTATION"
             printf 'empty_final_baseline_run_id=%s\n' "$STAGE_MACOS_EMPTY_FINAL_BASELINE_RUN_ID"
+            printf 'distribution_expectation=%s\n' "$STAGE_MACOS_DISTRIBUTION_EXPECTATION"
+            printf 'expected_rejected_framework=%s\n' "$STAGE_MACOS_EXPECTED_REJECTED_FRAMEWORK"
+            printf 'expected_main_uuid=%s\n' "$STAGE_MACOS_EXPECTED_MAIN_UUID"
+            printf 'expected_rejected_framework_uuid=%s\n' "$STAGE_MACOS_EXPECTED_REJECTED_FRAMEWORK_UUID"
+            printf 'framework_signature_baseline_run_id=%s\n' "$STAGE_MACOS_FRAMEWORK_SIGNATURE_BASELINE_RUN_ID"
           } > "$EVIDENCE/provisioning-context.txt"
+
+      - name: Provision disposable distribution E2E administrator
+        if: env.STAGE_MACOS_SCENARIO == 'distribution-e2e'
+        run: |
+          test "$STAGE_RUNNER_VERIFIED_FRESH" = true
+          case "$STAGE_RUNNER_LABEL" in
+            namespace-profile-*|nscloud-macos-*) ;;
+            *)
+              echo "distribution-e2e requires a Namespace macOS runner" >&2
+              exit 2
+              ;;
+          esac
+          case "$STAGE_RUNNER_NAME" in
+            nsc-runner-*) ;;
+            *)
+              echo "distribution-e2e requires a Namespace instance runner" >&2
+              exit 2
+              ;;
+          esac
+          sudo -n -v
+
+          OPERATOR_USERNAME="roma-e2e-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          OPERATOR_PASSWORD="Rjt!$(/usr/bin/openssl rand -hex 24)"
+          OPERATOR_PASSWORD_FILE="$RUNNER_TEMP/voiceink-remote-e2e-stage/operator-password"
+          OPERATOR_CREDENTIAL_FILE="$HOME/Desktop/Roma Distribution E2E Operator Credentials.txt"
+          SETUP_FACTS="$RUNNER_TEMP/voiceink-remote-e2e-stage/evidence/distribution-operator-setup.txt"
+          printf 'account_short_name=%s\n' "$OPERATOR_USERNAME" > "$SETUP_FACTS"
+          cleanup_operator_password_file() {
+            /bin/rm -f "$OPERATOR_PASSWORD_FILE"
+          }
+          trap cleanup_operator_password_file EXIT
+
+          if /usr/bin/id "$OPERATOR_USERNAME" >/dev/null 2>&1; then
+            echo "refusing to reuse a distribution E2E operator account" >&2
+            exit 2
+          fi
+          umask 077
+          printf '%s' "$OPERATOR_PASSWORD" > "$OPERATOR_PASSWORD_FILE"
+          chmod 600 "$OPERATOR_PASSWORD_FILE"
+          ROMA_OPERATOR_USERNAME="$OPERATOR_USERNAME" ROMA_OPERATOR_PASSWORD_FILE="$OPERATOR_PASSWORD_FILE" /usr/bin/expect -c '
+            log_user 0
+            set timeout 30
+            set username $env(ROMA_OPERATOR_USERNAME)
+            set password_file $env(ROMA_OPERATOR_PASSWORD_FILE)
+            set password_channel [open $password_file r]
+            set password [read $password_channel]
+            close $password_channel
+            file delete -force -- $password_file
+
+            set create_prompt_count 0
+            spawn sudo -n /usr/sbin/sysadminctl -addUser $username -fullName {Roma distribution E2E operator} -password - -admin
+            expect {
+              -re {User password:} {
+                incr create_prompt_count
+                if {$create_prompt_count != 1} { exit 2 }
+                send -- "$password\r"
+                exp_continue
+              }
+              timeout { exit 124 }
+              eof {}
+            }
+            set create_status [lindex [wait] 3]
+            if {$create_prompt_count != 1 || $create_status != 0} { exit 2 }
+
+            set auth_prompt_count 0
+            spawn /usr/bin/dscl . -authonly $username
+            expect {
+              -re {Password:} {
+                incr auth_prompt_count
+                if {$auth_prompt_count != 1} { exit 2 }
+                send -- "$password\r"
+                exp_continue
+              }
+              timeout { exit 124 }
+              eof {}
+            }
+            set auth_status [lindex [wait] 3]
+            set password ""
+            if {$auth_prompt_count != 1 || $auth_status != 0} { exit 2 }
+          '
+          cleanup_operator_password_file
+          trap - EXIT
+          if ! sudo -n /usr/sbin/dseditgroup -o checkmember \
+            -m "$OPERATOR_USERNAME" admin | grep -Fq 'yes'; then
+            echo "distribution E2E operator account is not an administrator" >&2
+            exit 2
+          fi
+          {
+            printf 'Roma distribution E2E operator credentials\n'
+            printf 'Username: %s\n' "$OPERATOR_USERNAME"
+            printf 'Password: %s\n' "$OPERATOR_PASSWORD"
+            printf '\nUse only if macOS requests administrator authentication after Open Anyway.\n'
+            printf 'Do not upload, copy into evidence, or share this file.\n'
+          } > "$OPERATOR_CREDENTIAL_FILE"
+          chmod 600 "$OPERATOR_CREDENTIAL_FILE"
+          test "$(stat -f '%Lp' "$OPERATOR_CREDENTIAL_FILE")" = 600
+          {
+            printf 'created=true\n'
+            printf 'account_admin=true\n'
+            printf 'credential_authentication=passed\n'
+            printf 'credential_file=~/Desktop/Roma Distribution E2E Operator Credentials.txt\n'
+            printf 'credential_file_mode=600\n'
+            printf 'runner_verified_fresh=%s\n' "$STAGE_RUNNER_VERIFIED_FRESH"
+          } >> "$SETUP_FACTS"
+          unset OPERATOR_PASSWORD
+          echo "DISTRIBUTION_E2E_OPERATOR_CREDENTIAL_FILE=$OPERATOR_CREDENTIAL_FILE" >> "$GITHUB_ENV"
 
       - name: Verify distribution E2E tooling
         run: |
@@ -233,6 +391,7 @@ jobs:
           bash scripts/tests/macos-distribution-e2e-contract.test.sh
           bash scripts/tests/macos-distribution-runtime-handoff.test.sh
           bash scripts/tests/verify-macos-distribution-launch.test.sh
+          bash scripts/tests/verify-macos-framework-signature-crash.test.sh
           bash scripts/tests/verify-runtime-empty-final-regression.test.sh
 
       - name: Download macOS app artifact
@@ -634,6 +793,138 @@ jobs:
           echo "RUNTIME_E2E_EMPTY_FINAL_BASELINE_EVIDENCE=$BASELINE_ROOT" >> "$GITHUB_ENV"
           echo "RUNTIME_E2E_EMPTY_FINAL_BASELINE_RUN_ID=$BASELINE_RUN_ID" >> "$GITHUB_ENV"
 
+      - name: Download matched known-bad framework-signature evidence
+        if: env.STAGE_MACOS_DISTRIBUTION_EXPECTATION == 'fixed-after-framework-signature'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BASELINE_RUN_ID="$STAGE_MACOS_FRAMEWORK_SIGNATURE_BASELINE_RUN_ID"
+          if [[ ! "$BASELINE_RUN_ID" =~ ^[0-9]+$ ]]; then
+            echo "paired framework-signature proof requires macos_framework_signature_baseline_run_id" >&2
+            exit 2
+          fi
+
+          BASELINE_ROOT="$RUNNER_TEMP/remote-e2e-inputs/macos/framework-signature-baseline"
+          mkdir -p "$BASELINE_ROOT"
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$BASELINE_RUN_ID" \
+            | jq -e \
+              --arg repository "$GITHUB_REPOSITORY" \
+              --arg head_sha "$GITHUB_SHA" '
+                select(
+                  .repository.full_name == $repository
+                  and .head_repository.full_name == $repository
+                  and .status == "completed"
+                  and .conclusion == "success"
+                  and .head_sha == $head_sha
+                  and ((.path | split("@")[0]) == ".github/workflows/voiceink-remote-e2e-stage.yml")
+                )
+                | {
+                    runId: .id,
+                    headSha: .head_sha,
+                    workflowPath: (.path | split("@")[0]),
+                    status: .status,
+                    conclusion: .conclusion,
+                    htmlUrl: .html_url,
+                    repository: .repository.full_name
+                  }
+              ' > "$BASELINE_ROOT/baseline-run-metadata.json"
+          test -s "$BASELINE_ROOT/baseline-run-metadata.json"
+
+          gh api \
+            "repos/$GITHUB_REPOSITORY/actions/runs/$BASELINE_RUN_ID/artifacts?per_page=100" \
+            | jq -e \
+              --argjson run_id "$BASELINE_RUN_ID" '
+                [
+                  .artifacts[]
+                  | select(.name == "remote-e2e-stage-evidence" and .expired == false)
+                ]
+                | select(length == 1)
+                | .[0]
+                | {
+                    id,
+                    runId: $run_id,
+                    name,
+                    sizeInBytes: .size_in_bytes,
+                    digest,
+                    createdAt: .created_at,
+                    expiresAt: .expires_at,
+                    expired
+                  }
+                | select(.digest | test("^sha256:[0-9a-f]{64}$"))
+              ' > "$BASELINE_ROOT/baseline-artifact-metadata.json"
+          test -s "$BASELINE_ROOT/baseline-artifact-metadata.json"
+
+          BASELINE_ARTIFACT_ID="$(jq -r .id "$BASELINE_ROOT/baseline-artifact-metadata.json")"
+          [[ "$BASELINE_ARTIFACT_ID" =~ ^[0-9]+$ ]]
+          BASELINE_ARCHIVE="$BASELINE_ROOT/baseline-artifact-archive.zip"
+          gh api \
+            "repos/$GITHUB_REPOSITORY/actions/artifacts/$BASELINE_ARTIFACT_ID/zip" \
+            > "$BASELINE_ARCHIVE"
+          test -s "$BASELINE_ARCHIVE"
+          BASELINE_ARCHIVE_SHA="$(shasum -a 256 "$BASELINE_ARCHIVE" | awk '{print $1}')"
+          if [ "sha256:$BASELINE_ARCHIVE_SHA" != "$(
+            jq -r .digest "$BASELINE_ROOT/baseline-artifact-metadata.json"
+          )" ]; then
+            echo "Framework-signature baseline archive does not match its artifact digest" >&2
+            exit 2
+          fi
+          printf '%s  %s\n' \
+            "$BASELINE_ARCHIVE_SHA" \
+            "$BASELINE_ARCHIVE" \
+            > "$BASELINE_ROOT/baseline-artifact-archive.sha256"
+          BASELINE_EVIDENCE="$BASELINE_ROOT/evidence"
+          mkdir -p "$BASELINE_EVIDENCE"
+          ditto -x -k "$BASELINE_ARCHIVE" "$BASELINE_EVIDENCE"
+
+          REQUIRED_DISTRIBUTION_EVIDENCE=(
+            stage-manifest.json
+            macos-artifact-metadata.json
+            macos-app-run-metadata.json
+            macos-distribution-e2e/distribution-verdict.txt
+            macos-distribution-e2e/approval-window-dyld-report.ips
+            macos-distribution-e2e/approval-window-dyld-match.txt
+            macos-distribution-e2e/approval-window-started-at.txt
+            macos-distribution-e2e/approval-window-dyld-pid-correlation.txt
+            macos-distribution-e2e/expected-negative-control-identities.txt
+            macos-distribution-e2e/extracted-app-identity.txt
+            macos-distribution-e2e/source-artifact.txt
+            fresh-namespace-runner.txt
+          )
+          for required_evidence in "${REQUIRED_DISTRIBUTION_EVIDENCE[@]}"; do
+            test -s "$BASELINE_EVIDENCE/$required_evidence"
+          done
+
+          jq -e \
+            --arg run_id "$BASELINE_RUN_ID" \
+            --arg head_sha "$GITHUB_SHA" \
+            --arg repository "$GITHUB_REPOSITORY" \
+            --arg workflow_path ".github/workflows/voiceink-remote-e2e-stage.yml" \
+            --arg version "$STAGE_MACOS_EXPECTED_VERSION" \
+            --arg build "$STAGE_MACOS_EXPECTED_BUILD" \
+            --arg runner "$STAGE_RUNNER_LABEL" \
+            --arg framework "$STAGE_MACOS_EXPECTED_REJECTED_FRAMEWORK" \
+            --arg main_uuid "$STAGE_MACOS_EXPECTED_MAIN_UUID" \
+            --arg framework_uuid "$STAGE_MACOS_EXPECTED_REJECTED_FRAMEWORK_UUID" '
+              .status == "completed"
+                and .macOSScenario == "distribution-e2e"
+                and .macOSScenarioExitCode == 0
+                and .macOSDistributionExpectation == "known-bad-framework-signature"
+                and .macOSDistributionVerdict == "expected_framework_signature_failure_reproduced"
+                and .macOSExpectedVersion == $version
+                and .macOSExpectedBuild == $build
+                and .stageRunnerLabel == $runner
+                and .macOSExpectedRejectedFramework == $framework
+                and ((.macOSExpectedMainUUID | ascii_upcase) == ($main_uuid | ascii_upcase))
+                and ((.macOSExpectedRejectedFrameworkUUID | ascii_upcase) == ($framework_uuid | ascii_upcase))
+                and .githubRunId == $run_id
+                and .githubSha == $head_sha
+                and .githubRepository == $repository
+                and .githubWorkflowPath == $workflow_path
+            ' "$BASELINE_EVIDENCE/stage-manifest.json" >/dev/null
+          grep -Fx 'distribution_verdict=expected_framework_signature_failure_reproduced' \
+            "$BASELINE_EVIDENCE/macos-distribution-e2e/distribution-verdict.txt"
+          echo "DISTRIBUTION_E2E_FRAMEWORK_SIGNATURE_BASELINE_EVIDENCE=$BASELINE_ROOT" >> "$GITHUB_ENV"
+
       - name: Download iOS Simulator app artifact
         if: env.STAGE_TARGET != 'macos'
         env:
@@ -709,6 +1000,12 @@ jobs:
           RUNTIME_MODEL_CACHE_HIT: ${{ steps.runtime-model-cache.outputs.cache-hit }}
           RUNTIME_E2E_EMPTY_FINAL_EXPECTATION: ${{ env.STAGE_MACOS_EMPTY_FINAL_EXPECTATION }}
           RUNTIME_E2E_EMPTY_FINAL_BASELINE_RUN_ID: ${{ env.STAGE_MACOS_EMPTY_FINAL_BASELINE_RUN_ID }}
+          DISTRIBUTION_E2E_EXPECTATION: ${{ env.STAGE_MACOS_DISTRIBUTION_EXPECTATION }}
+          DISTRIBUTION_E2E_EXPECTED_REJECTED_FRAMEWORK: ${{ env.STAGE_MACOS_EXPECTED_REJECTED_FRAMEWORK }}
+          DISTRIBUTION_E2E_EXPECTED_MAIN_UUID: ${{ env.STAGE_MACOS_EXPECTED_MAIN_UUID }}
+          DISTRIBUTION_E2E_EXPECTED_REJECTED_FRAMEWORK_UUID: ${{ env.STAGE_MACOS_EXPECTED_REJECTED_FRAMEWORK_UUID }}
+          DISTRIBUTION_E2E_FRAMEWORK_SIGNATURE_BASELINE_EVIDENCE: ${{ env.DISTRIBUTION_E2E_FRAMEWORK_SIGNATURE_BASELINE_EVIDENCE }}
+          DISTRIBUTION_E2E_FRAMEWORK_SIGNATURE_BASELINE_RUN_ID: ${{ env.STAGE_MACOS_FRAMEWORK_SIGNATURE_BASELINE_RUN_ID }}
         run: |
           bash scripts/prepare-remote-e2e-stage.sh \
             "$STAGE_TARGET" \
@@ -722,6 +1019,48 @@ jobs:
             "$STAGE_MACOS_EXPECTED_VERSION" \
             "$STAGE_MACOS_EXPECTED_BUILD" \
             "$RUNNER_TEMP/remote-e2e-inputs/macos/runtime-helper/roma.runtime-e2e-harness.macos.zip"
+
+      - name: Remove disposable distribution E2E administrator
+        if: always() && env.STAGE_MACOS_SCENARIO == 'distribution-e2e'
+        run: |
+          EVIDENCE="$RUNNER_TEMP/voiceink-remote-e2e-stage/evidence"
+          SETUP_FACTS="$EVIDENCE/distribution-operator-setup.txt"
+          CLEANUP_LOG="$EVIDENCE/distribution-operator-cleanup-command.txt"
+          CLEANUP_FACTS="$EVIDENCE/distribution-operator-cleanup.txt"
+          CREDENTIAL_FILE="$HOME/Desktop/Roma Distribution E2E Operator Credentials.txt"
+          test -s "$SETUP_FACTS"
+          OPERATOR_USERNAME="$(sed -n 's/^account_short_name=//p' "$SETUP_FACTS")"
+          if [[ ! "$OPERATOR_USERNAME" =~ ^roma-e2e-[0-9]+-[0-9]+$ ]]; then
+            echo "refusing to clean up an unexpected account name" >&2
+            exit 2
+          fi
+          test "$(grep -c '^account_short_name=' "$SETUP_FACTS")" -eq 1
+          /bin/rm -f "$CREDENTIAL_FILE"
+          test ! -e "$CREDENTIAL_FILE"
+          if ! /usr/bin/id "$OPERATOR_USERNAME" >/dev/null 2>&1; then
+            echo "disposable distribution E2E operator account was not present for cleanup" >&2
+            exit 2
+          fi
+          if ! sudo -n /usr/sbin/sysadminctl \
+            -deleteUser "$OPERATOR_USERNAME" \
+            -secure \
+            > "$CLEANUP_LOG" 2>&1; then
+            echo "could not delete the disposable distribution E2E operator account" >&2
+            exit 2
+          fi
+          if /usr/bin/id "$OPERATOR_USERNAME" >/dev/null 2>&1 \
+            || /usr/bin/dscl . -read "/Users/$OPERATOR_USERNAME" >/dev/null 2>&1 \
+            || [ -e "/Users/$OPERATOR_USERNAME" ]; then
+            echo "disposable distribution E2E operator account cleanup was incomplete" >&2
+            exit 2
+          fi
+          {
+            printf 'account_short_name=%s\n' "$OPERATOR_USERNAME"
+            printf 'credential_file_removed=true\n'
+            printf 'directory_service_record_removed=true\n'
+            printf 'home_directory_removed=true\n'
+            printf 'cleanup=passed\n'
+          } > "$CLEANUP_FACTS"
 
       - name: Upload stage evidence
         if: always()

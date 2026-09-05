@@ -24,6 +24,10 @@ Inputs:
 - `macos_runner`: GitHub runner label backed by the requested macOS image. Use a separate pinned label for each OS lane.
 - `macos_expected_version`: exact `sw_vers -productVersion` required by the test. Blank records but does not enforce the version.
 - `macos_expected_build`: exact `sw_vers -buildVersion` required by `distribution-e2e`.
+- `macos_distribution_expectation`: `fixed` for a general responsive-first-launch proof, `known-bad-framework-signature` to reproduce a historical framework-signature failure, or `fixed-after-framework-signature` to require a matched historical reproduction before testing the candidate.
+- `macos_expected_rejected_framework`: `whisper` or `MediaRemoteAdapter`, required by the known-bad framework-signature mode and ignored by the fixed mode.
+- `macos_expected_main_uuid` and `macos_expected_rejected_framework_uuid`: required canonical UUIDs from the historical crash in known-bad framework-signature mode. The runner independently reads the matching arm64 UUIDs from the downloaded app and framework before launch.
+- `macos_framework_signature_baseline_run_id`: required by `fixed-after-framework-signature`. It names a successful known-bad remote-stage run produced from the same tooling SHA.
 - `developer_dir`: optional Xcode app developer directory for that runner. Blank uses the runner's selected compatible Xcode.
 - `macos_scenario`: `none`, `runtime-smoke`, `runtime-e2e`, or `distribution-e2e`.
 - `macos_audio_artifact`: private Namespace artifact containing WAV fixtures. Full runtime requires it. Smoke uses a pinned public CC-BY-4.0 [podscripter FLEURS fixture](https://huggingface.co/datasets/podscripter-project/test-fixtures) when blank.
@@ -48,6 +52,19 @@ artifacts to their workflow run and source SHA. The
 existing iOS migration workflow packages its Xcode-signed Simulator application
 as `roma.just.talk.ios-simulator.app`, preserving App Group exchange between the
 app and keyboard extension.
+
+For `distribution-e2e`, the workflow also requires the Namespace instance to
+have booted within 15 minutes. It uses passwordless runner sudo to create one
+new per-run disposable administrator account. Its generated credentials are
+written only to `~/Desktop/Roma Distribution E2E Operator Credentials.txt` with
+mode `0600`. The workflow proves that account is an administrator and that its
+credentials authenticate before the desktop handoff. It supplies the generated
+password to `sysadminctl` and `dscl` only through their interactive PTY prompts,
+never through a process argument or environment variable. Evidence records those
+checks but never the password or credential file. Do not upload, copy, or share
+that Desktop file. After the scenario and hold finish, an always-running cleanup
+step removes the credential file and securely deletes the disposable account and
+home directory. The uploaded evidence records those deletion checks.
 
 Runtime-only runner profiles may attach the persistent model cache. Runtime-only
 `nscloud-macos-*` image lanes require a previously absent cache path under that
@@ -85,6 +102,7 @@ Depending on `target` and scenario, the remote Mac contains:
 - macOS distribution E2E: the untouched app below a newly mounted APFS volume under `/Volumes`, where Finder extracted it;
 - iOS: a booted iPhone Simulator with `roma just talk` installed and launched.
 - `~/Desktop/REMOTE E2E STAGE READY.txt`: human-readable handoff.
+- `~/Desktop/Roma Distribution E2E Operator Credentials.txt`: present only for a distribution E2E. Use it only if macOS asks for administrator authentication after **Open Anyway**.
 - `~/Desktop/Remote E2E Stage`: link to the machine-readable stage directory.
 - `~/Desktop/Finish Remote E2E Stage.command`: ends the hold window early.
 
@@ -108,13 +126,43 @@ exact successful build run, set the runner label for the intended OS lane, set
 and allow 30 to 60 minutes of interaction time. The distribution lane refuses
 to start without both exact values.
 
+Use `macos_distribution_expectation=fixed` for a general candidate launch check.
+That mode alone does not close a reported framework-signature bug. Use
+`fixed-after-framework-signature` for closure. It downloads exactly one
+nonexpired `remote-e2e-stage-evidence` artifact from the named successful
+baseline run, checks the GitHub artifact digest, then requires the baseline to
+prove the same tooling SHA, workflow, repository, exact OS version and build,
+runner lane, rejected framework, and reported executable UUIDs. It also requires
+the raw crash report, matcher, timing, PID, identity, source-artifact, and fresh
+runner evidence. The crash report must also match the short version and bundle
+version read from the downloaded app's `Info.plist`. The baseline app run,
+artifact ID, digest, and head SHA must all
+differ from the candidate. Only a candidate that then completes the normal
+Gatekeeper launch and deterministic runtime smoke records
+`passed_after_framework_signature_baseline`.
+
+Use
+`known-bad-framework-signature` only for a historical failing artifact, with
+`macos_expected_rejected_framework=whisper` or
+`macos_expected_rejected_framework=MediaRemoteAdapter`. That
+mode ends immediately after it proves a parsed AppTranslocated Roma crash-report PID aborted with
+all of: `fatalDyldError=1`, `EXC_CRASH`/`SIGABRT`, `Namespace DYLD, Code 1`,
+`Library missing`, the selected `@rpath/<framework>.framework`, an actual
+framework path, `AppTranslocation`, and `code signature in ... not valid for
+use in process` in one new Roma crash report. macOS can truncate the final
+MediaRemoteAdapter reason after its exact framework path; the verifier accepts
+only that documented truncation shape, not a generic AMFI warning. It rejects
+evidence naming the other permitted framework. A UI timeout, authentication
+failure, another crash, a second Roma PID, or a wrong OS is a failed test, not
+a reproduction.
+
 This is not the installed-app runtime test with quarantine added afterward. It
 starts on a fresh Apple Silicon runner and fails if Roma preferences, Roma TCC
 rows, FluidAudio model state, an installed copy, a running process, disabled
 Gatekeeper assessments, the wrong architecture, or the wrong exact macOS
 product or build version already exist. No model cache is mounted or created for
-this lane. The downloaded app must create the initial FluidAudio model state
-during its verified Gatekeeper and App Translocation launch.
+this lane. In fixed mode, the downloaded app must create the initial FluidAudio
+model state during its verified Gatekeeper and App Translocation launch.
 
 The workflow downloads both forms of the selected Actions artifact:
 
@@ -130,8 +178,8 @@ before the user path starts. The scenario then:
 3. asks the operator to double-click the outer ZIP in Finder and waits for Archive Utility to finish. Stock Archive Utility may recursively expand the nested app ZIP and remove that intermediate file. The lane records whether this one-action path produced the app. If the Mac keeps the exact inner ZIP instead, the lane verifies its hash and Safari quarantine before requesting one follow-up Finder extraction;
 4. requires human confirmation after each Finder action actually needed, proves the final app inherited Safari quarantine, checks its strict deep signature, and compares every directory mode, every regular file's contents and mode, and every symlink target with an independent reference extracted from the hash-verified inner ZIP. That reference never becomes the launched app. The lane also compares the app's minimum macOS version with the exact runner version;
 5. records the complete file, directory, and symlink manifest for the extracted app, performs the first launch while Gatekeeper still rejects it, and requires the operator to confirm the visible "Not Opened" dialog before using Privacy & Security, Open Anyway;
-6. starts an approval-window process and log monitor before Open Anyway, requires the operator to confirm that the approved first-launch UI is visible and responsive, then requires the first observed PID to report finished AppKit launch, run through App Translocation as native ARM64, remain runnable without `SIGCONT`, map every bundle-relative Mach-O dependency discovered recursively from the active ARM64 executable graph, survive a stability interval without dyld or signature errors, and leave the full app bundle byte-identical to its pre-launch manifest. A second Roma PID, new Roma crash report, or approval-window dyld error invalidates the run; and
-7. records that first-process verdict, requires that exact Roma process to remain the only running Roma instance, records its normal termination, and validates or completes its live model directory against the pinned manifest before deliberately starting separate prewarm and transcription relaunches of the same extracted artifact. Every observed Roma PID must be recorded by the helper, run through App Translocation with the same executable hash, pass the same recursive signature and mapped-code checks through process exit, and have an explicit test-requested termination. A new crash report or unaccounted process invalidates the run. The lane also compares the complete file, directory, and symlink bundle manifest before and after runtime and writes a separate transcription verdict.
+6. starts an approval-window process and log monitor before Open Anyway. In `fixed` mode, it requires the operator to confirm that the approved first-launch UI is visible and responsive, then requires the first observed PID to report finished AppKit launch, run through App Translocation as native ARM64, remain runnable without `SIGCONT`, map every bundle-relative Mach-O dependency discovered recursively from the active ARM64 executable graph, survive a stability interval without dyld or signature errors, and leave the full app bundle byte-identical to its pre-launch manifest. In `known-bad-framework-signature` mode, it instead requires the matching crash-report PID to be dead, any sampled approval PID to equal it, no Roma process to remain, the exact selected-framework three-part dyld signature report, Safari quarantine, and an unchanged bundle. A second Roma PID, wrong crash report, or approval-window dyld error invalidates either mode; and
+7. only in fixed mode, records that first-process verdict, requires that exact Roma process to remain the only running Roma instance, records its normal termination, and validates or completes its live model directory against the pinned manifest before deliberately starting separate prewarm and transcription relaunches of the same extracted artifact. Every observed Roma PID must be recorded by the helper, run through App Translocation with the same executable hash, pass the same recursive signature and mapped-code checks through process exit, and have an explicit test-requested termination. A new crash report or unaccounted process invalidates the run. The lane also compares the complete file, directory, and symlink bundle manifest before and after runtime and writes a separate transcription verdict.
 
 CI builds the runtime helper with a macOS 14.0 deployment target. Before changing
 TCC or starting Roma runtime work, the target Mac runs that exact packaged helper
@@ -148,16 +196,22 @@ Open the running Namespace job's Remote Display as soon as the log prints
 boundary. No script clicks Open Anyway, clears quarantine, modifies SIP, or
 re-signs the app.
 
-Three Desktop confirmation commands are mandatory human evidence: Finder
-extraction complete, Gatekeeper Not Opened, and Roma first-launch ready. A fourth
-Finder follow-up command appears only when Archive Utility leaves the nested app
-ZIP for a separate double-click. Run each Finder command only after Archive
-Utility finishes that action. Run the Gatekeeper command only after seeing and
-dismissing the actual "Not Opened" dialog. Run the final command only after the
-approved Roma process shows responsive first-launch UI. The verifier still checks
-the same PID and fails if it stopped, died, did not finish AppKit launch, or did
-not run through App
-Translocation.
+If the **Open Anyway** confirmation asks for administrator authentication, open
+`~/Desktop/Roma Distribution E2E Operator Credentials.txt` in Remote Display
+and enter its generated credentials. This is the single authorized use of that
+file. Never put its contents into GitHub logs, the evidence directory, chat, or
+an artifact.
+
+Fixed mode has three Desktop confirmation commands: Finder extraction complete,
+Gatekeeper Not Opened, and Roma first-launch ready. Known-bad framework-signature
+mode has only the first two, because the app must abort before it can show UI. A
+fourth Finder follow-up command appears only when Archive Utility leaves the
+nested app ZIP for a separate double-click. Run each Finder command only after
+Archive Utility finishes that action. Run the Gatekeeper command only after
+seeing and dismissing the actual "Not Opened" dialog. In fixed mode, run the
+final command only after the approved Roma process shows responsive first-launch
+UI. The fixed verifier still checks the same PID and fails if it stopped, died,
+did not finish AppKit launch, or did not run through AppTranslocation.
 
 Run Sonoma and Tahoe as separate jobs. A moving selector such as `14.x` or
 `26.x` is useful for coverage but is not proof for 14.2.1 or 26.4.1 unless the

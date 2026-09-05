@@ -18,6 +18,8 @@ on:
       - "scripts/find-reusable-ci-run.sh"
       - "scripts/tests/verify-adhoc-library-validation.test.sh"
       - "scripts/tests/verify-macos-distribution-launch.test.sh"
+      - "scripts/tests/verify-macos-framework-signature-crash.test.sh"
+      - "scripts/tests/fixtures/macos-framework-signature-crash/**"
       - "scripts/tests/macos-distribution-e2e-contract.test.sh"
       - "scripts/tests/macos-distribution-runtime-handoff.test.sh"
       - "scripts/tests/macos-finder-extraction-state.test.sh"
@@ -29,6 +31,7 @@ on:
       - "scripts/prepare-remote-e2e-stage.sh"
       - ".github/workflows/voiceink-remote-e2e-stage.yml"
       - "scripts/verify-macos-distribution-launch.sh"
+      - "scripts/verify-macos-framework-signature-crash.sh"
       - "scripts/verify-runtime-empty-final-regression.sh"
       - "scripts/verify-adhoc-library-validation.sh"
       - "scripts/verify-static-whisper-app.sh"
@@ -49,6 +52,8 @@ on:
       - "scripts/find-reusable-ci-run.sh"
       - "scripts/tests/verify-adhoc-library-validation.test.sh"
       - "scripts/tests/verify-macos-distribution-launch.test.sh"
+      - "scripts/tests/verify-macos-framework-signature-crash.test.sh"
+      - "scripts/tests/fixtures/macos-framework-signature-crash/**"
       - "scripts/tests/macos-distribution-e2e-contract.test.sh"
       - "scripts/tests/macos-distribution-runtime-handoff.test.sh"
       - "scripts/tests/macos-finder-extraction-state.test.sh"
@@ -60,6 +65,7 @@ on:
       - "scripts/prepare-remote-e2e-stage.sh"
       - ".github/workflows/voiceink-remote-e2e-stage.yml"
       - "scripts/verify-macos-distribution-launch.sh"
+      - "scripts/verify-macos-framework-signature-crash.sh"
       - "scripts/verify-runtime-empty-final-regression.sh"
       - "scripts/verify-adhoc-library-validation.sh"
       - "scripts/verify-static-whisper-app.sh"
@@ -217,6 +223,7 @@ jobs:
           bash scripts/tests/macos-distribution-e2e-contract.test.sh
           bash scripts/tests/macos-distribution-runtime-handoff.test.sh
           bash scripts/tests/verify-macos-distribution-launch.test.sh
+          bash scripts/tests/verify-macos-framework-signature-crash.test.sh
           bash scripts/tests/verify-runtime-empty-final-regression.test.sh
 
       - name: Build release app

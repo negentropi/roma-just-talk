@@ -380,9 +380,8 @@ wait_for_new_approval_window_crash_report() {
       > "$distribution_evidence/approval-window-new-crash-reports.txt"
     report_count="$(awk 'NF { count++ } END { print count + 0 }' \
       "$distribution_evidence/approval-window-new-crash-reports.txt")"
-    if (( report_grace_deadline == 0 )) && [[ -s "$approval_first_pid_file" ]]; then
-      report_grace_deadline=$((SECONDS + 30))
-    fi
+    # Gatekeeper creates a suspended PID before administrator authentication.
+    # Only a report starts the completion grace period; approval uses the full deadline.
     if [[ "$report_count" -eq 1 ]]; then
       if (( report_grace_deadline == 0 )); then
         report_grace_deadline=$((SECONDS + 30))

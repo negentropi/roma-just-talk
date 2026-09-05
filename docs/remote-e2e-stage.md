@@ -156,6 +156,15 @@ evidence naming the other permitted framework. A UI timeout, authentication
 failure, another crash, a second Roma PID, or a wrong OS is a failed test, not
 a reproduction.
 
+Gatekeeper can create a suspended Roma process before administrator authentication
+finishes. A PID alone does not start the 30-second crash-report completion timer.
+That timer starts only when a new report appears; authentication and launch remain
+bounded by the configured interaction window. Run
+[33936115642](https://github.com/negentropi/roma-just-talk/actions/runs/33936115642)
+exposed the old premature timeout: PID 27074 appeared in state `T` at 01:44:35 UTC,
+and the test failed at 01:45:06 while the administrator dialog was still open.
+This is a test-timing regression, not reproduction of the framework crash.
+
 This is not the installed-app runtime test with quarantine added afterward. It
 starts on a fresh Apple Silicon runner and fails if Roma preferences, Roma TCC
 rows, FluidAudio model state, an installed copy, a running process, disabled

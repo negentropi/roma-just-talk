@@ -1,0 +1,45 @@
+workflows:
+  macos-release:
+    name: Roma macOS build
+    instance_type: mac_mini_m2
+    max_build_duration: 90
+    environment:
+      xcode: "26.3"
+    cache:
+      cache_paths:
+        - $HOME/VoiceInk-Dependencies
+    scripts:
+      - name: Check build environment
+        script: |
+          set -euo pipefail
+          mkdir -p artifacts
+          {
+            git rev-parse HEAD
+            sw_vers
+            uname -m
+            xcodebuild -version
+            swift --version
+          } | tee artifacts/environment.txt
+          command -v cmake >/dev/null || brew install cmake
+          make check
+      - name: Run shared core checks
+        script: |
+          set -euo pipefail
+          swift run --package-path VoiceInkCore VoiceInkCoreChecks 2>&1 | tee artifacts/core-checks.log
+      - name: Build the macOS app
+        script: |
+          set -euo pipefail
+          make local CONFIGURATION=Release 2>&1 | tee artifacts/build.log
+      - name: Verify and package the app
+        script: |
+          set -euo pipefail
+          app="$HOME/Applications/roma just talk.app"
+          test "$(plutil -extract CFBundleIdentifier raw -o - "$app/Contents/Info.plist")" = com.negentropi.RomaJustTalk
+          codesign --verify --deep --strict "$app"
+          bash scripts/verify-static-whisper-app.sh "$app"
+          bash scripts/verify-adhoc-library-validation.sh "$app"
+          bash scripts/verify-macos-release-instrumentation.sh "$app"
+          ditto -c -k --keepParent "$app" artifacts/roma.just.talk.app.zip
+          shasum -a 256 artifacts/roma.just.talk.app.zip | tee artifacts/sha256.txt
+    artifacts:
+      - artifacts/**

@@ -81,6 +81,29 @@ Your normal `make all` / `make build` commands are completely unaffected.
 
 ---
 
+## Codemagic macOS build
+
+The root `codemagic.yaml` provides the manually triggered **Roma macOS build**
+workflow. It uses a Mac mini M2 with Xcode 26.3, runs the shared core checks, then
+builds and verifies the app using the existing `make local CONFIGURATION=Release`
+path. No Apple signing credentials are needed; this produces the same ad-hoc
+local-use app described above, not a notarized release.
+
+In Codemagic, open `roma-just-talk`, select a branch containing `codemagic.yaml`,
+click **Check for configuration files**, then start **Roma macOS build**. Download
+`roma.just.talk.app.zip` from the completed build's artifacts. Environment details,
+check/build logs, and the ZIP's SHA-256 accompany the app.
+
+The workflow uses the individual plan's free Mac M2 allowance and stops after
+90 minutes. It has no automatic push, pull-request, or scheduled triggers. Check
+the account's remaining free minutes before starting another build.
+
+For an interactive session, enable SSH/VNC access when starting the build in
+Codemagic, then use the connection details on that build's page. The machine is
+temporary; follow [Codemagic's remote access guide](https://docs.codemagic.io/troubleshooting/accessing-builder-machine-via-ssh/)
+for session limits. GUI, microphone, and Accessibility permissions must be verified
+on that remote machine before claiming runtime or dictation test coverage.
+
 ## Manual Build Process (Alternative)
 
 If you prefer to build manually or need more control over the build process, follow these steps:

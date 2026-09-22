@@ -2,6 +2,8 @@
 
 ## v1.95.2 - Unreleased
 
+- Add a manually triggered Codemagic Mac M2 workflow for shared core checks and downloadable macOS app builds.
+
 ## v1.95.1 - 2026-09-11
 
 - Explain rejected NVIDIA API keys, missing access, and connection failures instead of showing an internal gRPC error.

@@ -84,7 +84,7 @@ Your normal `make all` / `make build` commands are completely unaffected.
 ## Codemagic macOS build
 
 The root `codemagic.yaml` provides the manually triggered **Roma macOS build**
-workflow. It uses a Mac mini M2 with Xcode 26.3, installs Apple's Metal toolchain
+workflow. It uses a Mac mini M2 with Xcode 26.4.1, installs Apple's Metal toolchain
 if the image does not include it, runs the shared core checks, then
 builds and verifies the app using the existing `make local CONFIGURATION=Release`
 path. No Apple signing credentials are needed; this produces the same ad-hoc

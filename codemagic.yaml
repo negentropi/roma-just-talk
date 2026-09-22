@@ -21,9 +21,15 @@ workflows:
             swift --version
           } | tee artifacts/environment.txt
           command -v cmake >/dev/null || brew install cmake
-          # Xcode images can omit the separately downloaded MLX Metal compiler.
+          # Headless Codemagic images download Metal without mounting its asset.
           if ! xcrun metal --version >/dev/null 2>&1; then
-            xcodebuild -downloadComponent MetalToolchain
+            metal_log=$(mktemp)
+            xcodebuild -downloadComponent MetalToolchain 2>&1 | tee "$metal_log"
+            if ! xcrun metal --version >/dev/null 2>&1; then
+              metal_dmg=$(sed -n 's/^Downloaded asset to: //p' "$metal_log" | tail -n 1)
+              test -f "$metal_dmg"
+              hdiutil attach -readonly -nobrowse "$metal_dmg"
+            fi
           fi
           xcrun metal --version
           make check

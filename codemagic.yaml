@@ -21,6 +21,11 @@ workflows:
             swift --version
           } | tee artifacts/environment.txt
           command -v cmake >/dev/null || brew install cmake
+          # Xcode images can omit the separately downloaded MLX Metal compiler.
+          if ! xcrun metal --version >/dev/null 2>&1; then
+            xcodebuild -downloadComponent MetalToolchain
+          fi
+          xcrun metal --version
           make check
       - name: Run shared core checks
         script: |

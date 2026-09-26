@@ -81,7 +81,14 @@ for phase in known-bad candidate; do
     echo "$phase minimum OS changed: $actual_minimum" >&2
     exit 1
   }
-  codesign --verify --deep --strict --verbose=4 "$app" > "$evidence/$phase-codesign.txt" 2>&1
+  if codesign --verify --deep --strict --verbose=4 "$app" > "$evidence/$phase-codesign.txt" 2>&1; then
+    printf 'codesign_verdict=valid\n' >> "$evidence/$phase-codesign.txt"
+  elif [[ "$phase" == candidate ]]; then
+    echo "The candidate app fails strict signature verification" >&2
+    exit 1
+  else
+    printf 'codesign_verdict=invalid_before_launch\n' >> "$evidence/$phase-codesign.txt"
+  fi
   shasum -a 256 "$phase_dir/wrapper/roma.just.talk.app.zip" > "$evidence/$phase-inner-sha256.txt"
   dwarfdump --uuid "$app/Contents/MacOS/roma just talk" > "$evidence/$phase-main-uuid.txt"
 
@@ -149,6 +156,7 @@ for phase in known-bad candidate; do
   ps -p "$candidate_pid" -o pid,etime,state,command > "$evidence/$1-candidate-process.txt"
   DISTRIBUTION_E2E_EXPECTED_MACOS_VERSION="$expected_version" \
   DISTRIBUTION_E2E_EXPECTED_MACOS_BUILD="$expected_build" \
+  DISTRIBUTION_E2E_REQUIRE_APPKIT_FINISHED=true \
   DISTRIBUTION_E2E_REQUIRE_TRANSLOCATION=true \
     "$script_root/verify-macos-distribution-launch.sh" "$app" "$candidate_pid" "$evidence/$1-candidate-launch" \
       > "$evidence/$1-candidate-verifier.txt" 2>&1

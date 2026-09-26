@@ -1,0 +1,41 @@
+workflows:
+  tahoe-launch-pair:
+    name: Roma launch pair on macOS 26.4.1
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    environment:
+      xcode: "26.4"
+    scripts:
+      - name: Hold the exact Mac for launch capture
+        script: |
+          #!/usr/bin/env bash
+          set -euo pipefail
+          evidence="$CM_BUILD_DIR/codemagic-launch-proof"
+          mkdir -p "$evidence"
+          sw_vers > "$evidence/host-preflight.txt"
+          uname -a >> "$evidence/host-preflight.txt"
+          if [[ "$(sw_vers -productVersion)" != 26.4.1 || "$(sw_vers -buildVersion)" != 25E253 || "$(uname -m)" != arm64 ]]; then
+            printf 'host_verdict=wrong_image\n' > "$evidence/host-verdict.txt"
+            exit 1
+          fi
+          printf 'host_verdict=exact_image\n' > "$evidence/host-verdict.txt"
+          printf 'Ready for SSH/VNC capture at %s\n' "$evidence"
+          deadline=$((SECONDS + 3000))
+          while (( SECONDS < deadline )); do
+            if [[ -f "$evidence/verdict.txt" ]] && grep -Fxq 'runtime_verdict=failed' "$evidence/verdict.txt"; then
+              exit 1
+            fi
+            if [[ -f "$evidence/review-status.txt" ]]; then
+              grep -Fxq 'runtime_verdict=matched_host_pair_complete' "$evidence/verdict.txt"
+              grep -Fxq 'visual_review=accepted' "$evidence/review-status.txt"
+              test -s "$evidence/tahoe-known-bad.ips"
+              test -s "$evidence/tahoe-known-bad-after-launch.png"
+              test -s "$evidence/tahoe-candidate-running.png"
+              exit 0
+            fi
+            sleep 5
+          done
+          printf 'host_verdict=timed_out_waiting_for_capture\n' > "$evidence/host-verdict.txt"
+          exit 1
+    artifacts:
+      - codemagic-launch-proof/**

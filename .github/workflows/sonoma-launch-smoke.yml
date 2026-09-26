@@ -1,0 +1,55 @@
+name: Sonoma launch smoke
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/sonoma-launch-smoke.yml"
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  launch:
+    runs-on: macos-14
+    timeout-minutes: 30
+    steps:
+      - name: Check Sonoma runner
+        run: |
+          sw_vers
+          uname -m
+          test "$(uname -m)" = arm64
+          case "$(sw_vers -productVersion)" in
+            14.*) ;;
+            *) exit 1 ;;
+          esac
+
+      - name: Download current Sonoma candidate
+        uses: actions/download-artifact@v4
+        with:
+          name: roma.just.talk.app
+          repository: ${{ github.repository }}
+          run-id: 36238526273
+          github-token: ${{ github.token }}
+
+      - name: Launch candidate on Sonoma
+        run: |
+          ditto -x -k roma.just.talk.app.zip .
+          app="$PWD/roma just talk.app"
+          test "$(plutil -extract CFBundleIdentifier raw -o - "$app/Contents/Info.plist")" = com.negentropi.RomaJustTalk
+          test "$(plutil -extract CFBundleShortVersionString raw -o - "$app/Contents/Info.plist")" = 1.95.1
+          test "$(plutil -extract LSMinimumSystemVersion raw -o - "$app/Contents/Info.plist")" = 14.0
+          codesign --verify --deep --strict "$app"
+          if pgrep -x 'roma just talk' >/dev/null; then
+            echo 'Unexpected preexisting app process.' >&2
+            exit 1
+          fi
+          open -n "$app"
+          for attempt in {1..20}; do
+            if pgrep -x 'roma just talk' >/dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          sleep 10
+          pgrep -xl 'roma just talk'

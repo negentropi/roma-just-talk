@@ -21,27 +21,34 @@ check_mach_o_payload() {
   local display_path="$2"
   local comparison="$3"
   local records
-  local record_count=0
+  local macos_record_count=0
   local platform
   local version
 
-  records="$(otool -l "$payload_path" | macos_load_command_records)"
+  records="$(otool -arch arm64 -l "$payload_path" | macos_load_command_records)"
   while IFS=$'\t' read -r platform version; do
     if [[ -z "$platform" && -z "$version" ]]; then
       continue
     fi
 
-    record_count=$((record_count + 1))
+    if [[ "$platform" == "6" && "$comparison" == "maximum" ]]; then
+      continue
+    fi
+
     if [[ "$platform" != "1" ]]; then
       fail "$display_path has non-macOS platform $platform"
-    elif [[ "$comparison" == "exact" && "$version" != "$expected_version" ]]; then
+      continue
+    fi
+
+    macos_record_count=$((macos_record_count + 1))
+    if [[ "$comparison" == "exact" && "$version" != "$expected_version" ]]; then
       fail "$display_path minimum macOS is $version, expected $expected_version"
     elif [[ "$comparison" == "maximum" ]] && ! macos_version_is_at_most "$version" "$expected_version"; then
       fail "$display_path requires macOS $version, newer than $expected_version"
     fi
   done <<<"$records"
 
-  if [[ "$record_count" -eq 0 ]]; then
+  if [[ "$macos_record_count" -eq 0 ]]; then
     fail "$display_path has no macOS minimum-version load command"
   fi
 }

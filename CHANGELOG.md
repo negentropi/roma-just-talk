@@ -2,6 +2,8 @@
 
 ## v1.95.2 - Unreleased
 
+- Lowered the macOS minimum from 14.4 to 14.0 so Sonoma 14.0 to 14.3 can pass the app's version check at launch.
+
 ## v1.95.1 - 2026-09-11
 
 - Explain rejected NVIDIA API keys, missing access, and connection failures instead of showing an internal gRPC error.

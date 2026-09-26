@@ -253,9 +253,9 @@ Run Sonoma and Tahoe as separate jobs. A moving selector such as `14.x` or
 `26.x` is useful for coverage but is not proof for 14.2.1 or 26.4.1 unless the
 recorded product and build versions equal the requested release. The exact
 identity check fails before Safari launches when the runner image is wrong. The
-current app target is macOS 14.4, so an exact 14.2.1 lane will stop at the app
-compatibility checkpoint until the separate Sonoma deployment work lands. That
-failure must not be reported as a signing result.
+app target is macOS 14.0, so an exact 14.2.1 lane can reach the browser download
+and launch checks. The app and every packaged Mach-O must still pass the build's
+minimum-version check before that lane counts as a Sonoma result.
 
 ## Fast macOS hypothesis check
 

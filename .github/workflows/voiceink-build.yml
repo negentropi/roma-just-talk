@@ -11,10 +11,18 @@ on:
   pull_request:
     paths:
       - ".github/workflows/voiceink-build.yml"
+      - "BUILDING.md"
+      - "CONTRIBUTING.md"
       - "LocalBuild.xcconfig"
       - "Makefile"
+      - "README.md"
       - "Tools/**"
       - "scripts/check-find-reusable-ci-run.sh"
+      - "scripts/check-macos-deployment-target.sh"
+      - "scripts/generate-github-release-appcast.js"
+      - "scripts/macos-deployment-target-lib.sh"
+      - "scripts/tests/github-release-appcast.test.js"
+      - "scripts/tests/macos-deployment-target.test.sh"
       - "scripts/find-reusable-ci-run.sh"
       - "scripts/run-macos-ci-unit-tests.sh"
       - "scripts/verify-macos-release-instrumentation.sh"
@@ -57,10 +65,18 @@ on:
       - main
     paths:
       - ".github/workflows/voiceink-build.yml"
+      - "BUILDING.md"
+      - "CONTRIBUTING.md"
       - "LocalBuild.xcconfig"
       - "Makefile"
+      - "README.md"
       - "Tools/**"
       - "scripts/check-find-reusable-ci-run.sh"
+      - "scripts/check-macos-deployment-target.sh"
+      - "scripts/generate-github-release-appcast.js"
+      - "scripts/macos-deployment-target-lib.sh"
+      - "scripts/tests/github-release-appcast.test.js"
+      - "scripts/tests/macos-deployment-target.test.sh"
       - "scripts/find-reusable-ci-run.sh"
       - "scripts/run-macos-ci-unit-tests.sh"
       - "scripts/verify-macos-release-instrumentation.sh"
@@ -103,7 +119,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: namespace-profile-roma-jt
+  group: macos-arm64-build
   cancel-in-progress: false
   queue: max
 
@@ -176,7 +192,7 @@ jobs:
 
   runtime-helper:
     name: Build reusable runtime E2E helper
-    runs-on: namespace-profile-roma-jt
+    runs-on: macos-26
     timeout-minutes: 20
 
     steps:
@@ -219,7 +235,7 @@ jobs:
     name: Build release macOS app
     needs: reuse
     if: ${{ !cancelled() && needs.reuse.outputs.hit != 'true' }}
-    runs-on: namespace-profile-roma-jt
+    runs-on: macos-26
     timeout-minutes: 60
 
     steps:
@@ -237,11 +253,8 @@ jobs:
           xcodebuild -version
           swift --version
 
-      - name: Compile visible text latency harness helper
-        run: make latency-harness-app
-
-      - name: Verify latency helper run target
-        run: make latency-harness-check
+      - name: Verify macOS deployment sources
+        run: bash scripts/check-macos-deployment-target.sh
 
       - name: Verify ad-hoc Library Validation packaging contract
         run: bash scripts/tests/verify-adhoc-library-validation.test.sh
@@ -258,6 +271,15 @@ jobs:
       - name: Build release app
         id: release_app
         run: make local CONFIGURATION=Release
+
+      - name: Compile visible text latency harness helper
+        run: make latency-harness-app
+
+      - name: Verify latency helper run target
+        run: make latency-harness-check
+
+      - name: Verify built app and latency helper minimum macOS 14.0
+        run: bash scripts/check-macos-deployment-target.sh "$HOME/Applications/roma just talk.app" ".local-build/Tools/VisibleTextLatencyHarness.app"
 
       - name: Verify FluidAudio array reset semantics
         id: fluidaudio_test

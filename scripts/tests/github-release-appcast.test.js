@@ -41,6 +41,7 @@ test("builds a GitHub-backed informational Sparkle appcast", () => {
 
   assert.match(appcast, /<sparkle:version>196<\/sparkle:version>/);
   assert.match(appcast, /<sparkle:shortVersionString>1\.96<\/sparkle:shortVersionString>/);
+  assert.match(appcast, /<sparkle:minimumSystemVersion>14\.0<\/sparkle:minimumSystemVersion>/);
   assert.match(appcast, /negentropi\/roma-just-talk\/releases\/tag\/v1\.96/);
   assert.match(appcast, /<description sparkle:format="markdown">/);
   assert.match(appcast, /Fixes &lt;upstream&gt; routing &amp; keeps notes\./);

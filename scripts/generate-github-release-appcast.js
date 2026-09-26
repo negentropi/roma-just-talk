@@ -6,7 +6,7 @@ const repository = "negentropi/roma-just-talk";
 const releasesPage = `https://github.com/${repository}/releases`;
 const releaseURLPrefix = `${releasesPage}/tag/`;
 const archiveName = "roma.just.talk.app.zip";
-const minimumSystemVersion = "14.4";
+const minimumSystemVersion = "14.0";
 
 function escapeXML(value) {
   return String(value).replace(/[&<>"']/g, (character) => ({

@@ -57,6 +57,7 @@ healthcheck: check
 latency-harness-build:
 	@mkdir -p "$(dir $(LATENCY_HARNESS))"
 	swiftc "$(LATENCY_HARNESS_SOURCE)" \
+		-target "$$(uname -m)-apple-macosx14.0" \
 		-framework AppKit \
 		-framework ApplicationServices \
 		-o "$(LATENCY_HARNESS)"

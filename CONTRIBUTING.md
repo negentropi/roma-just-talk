@@ -37,7 +37,7 @@ By participating in this project, you agree to abide by our [Code of Conduct](CO
 ### Development Process
 
 1. Ensure you have all the requirements installed:
-   - macOS 14.4 or later
+   - macOS 14.0 or later
    - Latest version of Xcode
    - Latest version of Swift
    - whisper.cpp properly set up
@@ -75,4 +75,4 @@ If you have any questions or need clarification, feel free to:
 2. Start a discussion
 3. Reach out to the maintainers
 
-Thank you for contributing to VoiceInk! 🎉 
+Thank you for contributing to VoiceInk! 🎉

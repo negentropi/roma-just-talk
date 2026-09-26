@@ -68,7 +68,7 @@ You can build the app yourself by following [BUILDING.md](BUILDING.md).
 
 ## Requirements
 
-- macOS 14.4 or later
+- macOS 14.0 or later
 
 ## Documentation
 

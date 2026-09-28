@@ -1,6 +1,6 @@
 # Roma Just Talk — 2026 YZU Startup Challenge
 
-Working submission package, prepared 2026-09-27. **Not submitted.** The competition is a semester-long startup contest, not a weekend hackathon. The likely track is **Practical / 實戰組** because Roma has a macOS prototype and public release. The team must confirm eligibility and the organizer must clarify how the originality declaration applies to a disclosed VoiceInk GPL fork before the captain signs it.
+Working submission package, updated 2026-09-28. **Not submitted.** The competition is a semester-long startup contest, not a weekend hackathon. The likely track is **Practical / 實戰組** because Roma has a macOS prototype and public release. The team must confirm eligibility and resolve how the originality declaration applies to a disclosed VoiceInk GPL fork before the captain signs it.
 
 ## Source of truth
 
@@ -12,7 +12,7 @@ Working submission package, prepared 2026-09-27. **Not submitted.** The competit
 ## Hard gates
 
 1. Team: 3–6 students; YZU student captain; at least half the team enrolled at YZU as of **2026-10-16**. Cross-school members need enrollment proof. Under-18 members need guardian consent. Each person should join one team only.
-2. Third-party rights: disclose that Roma is derived from [VoiceInk](https://github.com/Beingpax/VoiceInk), released under GPLv3, with additional open-source dependencies. State clearly what the entrant team actually created. The form asks the captain to attest that the work is original and non-infringing. Obtain written clarification from `yzuiic@saturn.yzu.edu.tw` before making that attestation; do not suggest the whole codebase was made by this team.
+2. Third-party rights: the rules allow existing third-party technology when ownership and licensing are disclosed. State that Roma is derived from [VoiceInk](https://github.com/Beingpax/VoiceInk), released under GPLv3, and identify the entrant team's actual contributions. The form asks the captain to attest that the work is original and non-infringing. Because this project predates a prospective student team, request written clarification from `yzuiic@saturn.yzu.edu.tw` about the fork and the existing founder's role before making that attestation.
 3. Practical-track files: selectable-text A4 PDF proposal, **at most 8 body pages** (cover and up to 5 cited appendix pages excluded), **under 10 MB**; separate single PDF of prototype evidence, **under 100 MB** (20 MB recommended). English or Chinese accepted. Use exact file names `元創盃_B_<team>_提案書.pdf` and `元創盃_B_<team>_成果佐證.pdf`.
 4. Submission closes **2026-10-16 17:00 Taiwan time**. Fix missing documents by **2026-10-23 17:00** if the center requests them. Initial review is 10/26–10/30, shortlist 11/3, mandatory clinic 11/11, final 16:9 slide PDF due **12/7 17:00**, final 5-minute pitch and 3-minute Q&A on **12/11**.
 
@@ -21,6 +21,9 @@ Working submission package, prepared 2026-09-27. **Not submitted.** The competit
 - [proposal.md](proposal.md): English draft following every practical-track section. Bracketed items need team facts or evidence; remove brackets before export.
 - [evidence.md](evidence.md): separate prototype-evidence PDF plan, with links and verification checklist.
 - [application.md](application.md): form preparation, work plan, and organizer email draft.
+- [mother-brief.md](mother-brief.md): Traditional Chinese note and student invitation text for family sharing.
+- [evidence-preview.md](evidence-preview.md): separate evidence-file draft showing verified facts and missing exhibits.
+- [Family packet PDF](previews/Roma_YZU_family_packet_preview.pdf): the invitation note, proposal, and evidence preview in one file. The [invitation](previews/Roma_YZU_student_invitation_preview.pdf), [proposal](previews/Roma_YZU_proposal_preview.pdf), and [evidence](previews/Roma_YZU_evidence_preview.pdf) are also separate PDFs. These are previews, not files ready to upload.
 
 ## Evidence boundary
 

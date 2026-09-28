@@ -1,13 +1,13 @@
 # YZU Startup Challenge 2026 — practical-track proposal draft
 
-**Team name:** [20 characters maximum; choose with team]
-**Proposal name:** Roma Just Talk
-**One sentence:** Speak before Shift.
-**Sector:** AI and ICT
-**Captain:** [YZU student, department/year]
-**Members and roles:** [3–6 total; use names and department/year only in proposal]
-**Advisor:** [optional]
-**Language:** English
+- **Team name:** [20 characters maximum; choose with team]
+- **Proposal name:** Roma Just Talk
+- **One sentence:** Speak before Shift.
+- **Sector:** AI and ICT
+- **Captain:** [YZU student, department/year]
+- **Members and roles:** [3–6 total; use names and department/year only in proposal]
+- **Advisor:** [optional]
+- **Language:** English
 
 > Export to selectable-text A4 PDF using the organizer's format: 12 pt Arial or Times New Roman, 1.5 spacing, numbered pages. Maximum eight body pages, separate cover; cite any appendix. Do not include IDs, phone numbers, or addresses. The name and one-liner must match the form exactly.
 

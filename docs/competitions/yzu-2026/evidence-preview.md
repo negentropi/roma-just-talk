@@ -1,33 +1,27 @@
-# Roma Just Talk existing results
+# Roma Just Talk evidence preview
 
-**YZU Startup Challenge 2026 practical track evidence preview**
+**For the 2026 YZU Startup Challenge practical group. Draft for discussion, not for upload.** The team name and Mac test results are still missing. The final evidence PDF will be separate from the proposal.
 
-**Draft for family and prospective teammates. Not yet a submission.** Team name, verified Mac capture, and participant results remain open. Export separately from the proposal as `元創盃_B_<team>_成果佐證.pdf` after these are filled.
+## Public app
 
-## 1. Public prototype
+Roma's [source code](https://github.com/negentropi/roma-just-talk) and [v1.95.1 Mac beta](https://github.com/negentropi/roma-just-talk/releases/tag/v1.95.1) are public. The beta was released on 11 September 2026. This establishes that there is an app to inspect and download. It does not, by itself, show the judge what happens when someone speaks before pressing Shift.
 
-The [Roma Just Talk source](https://github.com/negentropi/roma-just-talk) and [v1.95.1 release](https://github.com/negentropi/roma-just-talk/releases/tag/v1.95.1) are public. The release page published a Mac app archive on 2026-09-11. This shows that the project has progressed beyond an idea, but an archive is not proof of the exact live interaction under contest conditions.
+**Still needed:** Two dated screenshots from a run of the published app. Show the recording state and the text inserted into another Mac app. Beside them, give the exact spoken phrase and output, app version, Mac model, macOS version, microphone, and recognition model. If we use a newer development build, label it with its own version and commit rather than calling it the published beta.
 
-**Exhibit A to add:** Two dated screenshots from the *published* Mac app: (1) shortcut/recording state, (2) text inserted into a real target app. Include the spoken phrase, exact output, macOS version, Mac model, microphone, speech model, and archive SHA/checksum. If a development candidate is used instead, identify it separately and do not label it the public release.
+## Working demonstration
 
-## 2. Demonstration
+The [browser demo code](https://github.com/negentropi/roma-just-talk/tree/without/no-adhoc-macos-tcc/landing-vercel/demo) shows the interaction, but it uses browser speech recognition. It cannot prove the Mac app's recording and text-insertion path.
 
-The [browser demo source](https://github.com/negentropi/roma-just-talk/tree/without/no-adhoc-macos-tcc/landing-vercel/demo) illustrates the speech-first interaction. It uses browser speech recognition and is distinct from the Mac app. A public URL should only be listed after opening it signed out, granting microphone access, and checking the interaction. Keep that URL reachable through at least 2026-12-11.
+**Still needed:** A short recording of the Mac app capturing words said before the shortcut and inserting the full result. Check the exact public link without a login, and keep it available through the final on 11 December. Bring a local copy to the pitch in case the network fails.
 
-**Exhibit B to add:** A short recording of an actual Mac run with a visible pre-trigger phrase and final inserted text. Test the exact file or URL judges will receive. Keep a local playback copy for the December pitch.
+## Who made what
 
-## 3. Contribution and rights record
+Roma builds on [VoiceInk](https://github.com/Beingpax/VoiceInk), which is licensed under GPLv3. The evidence file should credit that work. It should also show which changes Felix made before this competition and which changes the students make after joining.
 
-Roma is based on [VoiceInk](https://github.com/Beingpax/VoiceInk), which is GPLv3 licensed. Its inherited Mac base and dependencies must be credited. The entrant team should list its own pre-roll interaction, implementation, testing, design, and market-validation contributions with commit links and dates. It must not represent upstream code or pre-existing founder work as newly created by recruited students.
+**Still needed:** A short table with three to five relevant commits or design records, their dates, authors, and what changed. Ask the organiser how to present the existing fork and founder work under the captain's originality declaration. Do not attribute earlier work to new entrants.
 
-**Exhibit C to add:** 3–5 commit or design links and a table with author, date, contribution, and whether the author is on the eligible student team. Obtain the organizer's guidance on how to declare the fork and pre-existing work before the captain signs the originality statement.
+## What users say and do
 
-## 4. External validation
+We have no verified active-user count, sales figure, retention rate, or measured speed advantage to put in this file. If the team runs tests before submission, it will report the dates, number of people, exact task, results, and failures. Interviews can explain why someone would try Roma; they are not usage statistics.
 
-No active-user count, paid-customer count, retention rate, or measured speed advantage is established in this preview. If pilot results arrive before submission, add the exact date range, sample, task protocol, raw counts, and anonymized findings. If there are no results, say so and present a concrete pilot plan rather than invented traction.
-
-**Exhibit D to add, if available:** A compact task table showing first-word capture and correction time compared with the participant's current method. Link to a consented, anonymized result record.
-
-## Submission check
-
-Single selectable-text PDF; all links accessible without login; screenshots legible; no private student data; under 100 MB (20 MB recommended). Confirm the team and rights statements match the proposal and form.
+The final PDF should contain only results we can trace to a test or public artifact. Check every link without signing in, keep student details private, make the text selectable, and stay below the 100 MB upload limit. The organiser recommends 20 MB or less.

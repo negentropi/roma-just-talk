@@ -1,80 +1,86 @@
-# YZU Startup Challenge 2026 — practical-track proposal draft
+# Roma Just Talk proposal for YZU Startup Challenge 2026
 
-- **Team name:** [20 characters maximum; choose with team]
-- **Proposal name:** Roma Just Talk
-- **One sentence:** Speak before Shift.
-- **Sector:** AI and ICT
-- **Captain:** [YZU student, department/year]
-- **Members and roles:** [3–6 total; use names and department/year only in proposal]
-- **Advisor:** [optional]
-- **Language:** English
+- **Team name:** [Choose with the student team; 20-character limit]
+- **Project name:** Roma Just Talk
+- **One-line description:** Speak before Shift.
+- **Track:** Practical group
+- **Field:** AI and information technology
+- **Captain:** [YZU student, department and year]
+- **Members:** [Names, departments, years, and actual roles]
+- **Advisor:** [Optional]
 
-> Export to selectable-text A4 PDF using the organizer's format: 12 pt Arial or Times New Roman, 1.5 spacing, numbered pages. Maximum eight body pages, separate cover; cite any appendix. Do not include IDs, phone numbers, or addresses. The name and one-liner must match the form exactly.
+**Draft for discussion, not for upload.** The final proposal must use the organiser's A4 PDF format. The team name, members, rights statement, and evidence are still open.
 
 ## 1. Summary
 
-Roma Just Talk is a macOS dictation prototype for people who think of a sentence before they can reach a keyboard shortcut. Conventional push-to-talk starts recording after activation; a first word can be lost or the speaker has to pause. Roma keeps a short rolling microphone buffer on the Mac and joins it to audio captured after the shortcut. The intended interaction is to speak naturally, press Left Shift, then release to insert text into the active app. Users can choose local or configured cloud speech recognition. A public beta and source repository exist; the team has not yet established a verified customer count or repeat-use metric. Our next step is to test whether this interaction reduces lost opening words and interruption in real writing tasks, then learn whether users will adopt or pay for it. We seek users for a controlled pilot and advice on distribution, accessibility, privacy, and commercialization. The current app is derived from GPLv3 VoiceInk; our proposal concerns the differentiated interaction and continuing development, with third-party rights disclosed below.
+Roma Just Talk is a Mac dictation app for people who start speaking before they press a shortcut. With ordinary push-to-talk recording, the first words can be lost; the speaker then pauses, repeats them, or repairs the text. Roma keeps a short microphone buffer on the Mac. When the user presses Left Shift, the app can include those earlier seconds with the rest of the recording and insert the transcript into the active app. Users may choose local recognition or configure a cloud provider.
+
+A beta Mac app and its source are public. What we cannot yet show is how often this problem occurs for other people, whether Roma solves it reliably in their daily work, or whether they would pay for it. The proposed student team would test those questions with Mac users who already dictate, improve the weakest parts of the setup and recording flow, and bring a measured demo to the final. We want introductions to potential testers and advice on Mac app distribution. Roma builds on the GPLv3 VoiceInk project; the proposal will identify VoiceInk's work, Felix's work before this competition, and what the student team adds.
 
 ## 2. Problem and market
 
-**Concrete moment.** A student, writer, or knowledge worker is composing in a Mac app. They start speaking as an idea arrives but the dictation shortcut has not yet been pressed. Standard recording misses the beginning, so they repeat themselves, edit the first phrase, or stop to prepare the input tool. This friction is small per episode but interrupts a frequent workflow. Roma targets people who write across many desktop apps, especially those who already try voice input and are dissatisfied with activation delay.
+Imagine someone drafting a message on a Mac. They start the sentence out loud, then reach for the dictation key. Recording that begins only after the key press misses the opening words. The person has to repeat them or edit the result. Roma addresses that moment.
 
-**First reachable segment.** Begin with 10–20 Mac users who dictate multiple times a day, recruited through the existing public project and YZU/community channels. Run short task observations and a two-week opt-in pilot. Measure first-word capture, time to usable text, correction burden, and retention. This is a testable beachhead, **not** a claim about market size. Estimate TAM/SAM/SOM only after obtaining sourced platform and willingness-to-pay data; do not insert an invented revenue figure.
+We have not measured how often it happens. Our first research group would be 10 to 20 Mac users who already dictate several times a day. We would recruit through the public project and local student networks, watch them complete their usual writing tasks, and ask what they use now. We would record missed opening words, corrections, and whether they choose to use Roma again after two weeks. These observations would tell us whether the problem is worth solving before we estimate a larger market.
 
-**Current alternatives.** Keyboard typing, built-in macOS dictation, and third-party dictation apps. Users may already be satisfied with these alternatives; the study must identify when Roma is meaningfully better and when it is not.
+Typing, built-in Mac dictation, and established dictation apps are all credible alternatives. The question is whether keeping words spoken before the shortcut matters enough for people to change their routine.
 
 ## 3. Solution and technology
 
-The user speaks, presses Left Shift, continues speaking, and releases to insert text. Roma maintains a short pre-roll buffer so the opening phrase can enter the transcription pipeline. The app integrates with the macOS text-insertion flow and offers local model options or user-configured cloud providers. The distinctive product hypothesis is the **speak-before-hotkey** interaction, not a proprietary speech model.
+The user speaks, presses Left Shift, continues, then releases it to insert text. Roma's short rolling buffer lets the transcription path receive audio from before the key press. The app also has local speech-recognition choices and options for user-configured cloud providers. The product idea is the timing of the interaction. Roma does not claim to have invented a speech model.
 
-The published codebase is a fork of [VoiceInk](https://github.com/Beingpax/VoiceInk). VoiceInk's macOS base and open-source speech libraries remain credited. Roma's team should itemize its own design and implementation contributions, especially pre-roll capture and the buffered-to-live handoff, using a commit-backed appendix. Distribution and reuse must respect GPLv3 and each dependency's license. **Organizer clarification on the declaration of originality remains pending.**
+Roma is a fork of [VoiceInk](https://github.com/Beingpax/VoiceInk). VoiceInk supplies much of the existing Mac app, and other open-source libraries support speech recognition and shortcuts. Roma's pre-roll interaction and its handoff from buffered to live audio are work done on the fork. Before submission, the team will attach commit links that separate upstream code, Felix's earlier changes, and new student work. The app remains subject to GPLv3 and the licences of its other dependencies. We will ask the organiser how to describe that history under the form's originality statement.
 
-**Privacy and reliability.** Local transcription is an option. Cloud transcription sends data to the configured provider; it must be described accurately. The current public beta's signing, notarization, and data-handling limitations should be shown in the [Trust disclosure](https://github.com/negentropi/roma-just-talk/blob/without/no-adhoc-macos-tcc/landing-vercel/index.html), then checked against the release artifact before a public pitch. Do not imply a production-ready safety guarantee.
+Local recognition can keep transcription on the Mac after any required model download. Cloud recognition sends audio to the chosen provider. The public beta also has release and privacy limitations, which we will state alongside the demo rather than ask judges to infer them from the source code.
 
-**AI use disclosure.** Speech recognition powers the product. Generative AI tools have also helped build and document the code, under human product and acceptance decisions. State the specific tools and scope used by the actual entrant team before submission. The contest permits AI tools and asks for truthful disclosure.
+Speech recognition is the AI function in the product. Felix has used generative AI tools while developing and documenting Roma and has made the product and acceptance decisions. The student team will record its own use of those tools for the final AI disclosure.
 
 ## 4. Existing work and validation
 
-**Built:** a public [source repository](https://github.com/negentropi/roma-just-talk), [v1.95.1 beta release](https://github.com/negentropi/roma-just-talk/releases/tag/v1.95.1), and a [browser interaction demo](https://github.com/negentropi/roma-just-talk/tree/without/no-adhoc-macos-tcc/landing-vercel/demo). The browser demo illustrates the shortcut flow; it is not itself proof that the Mac app works end to end. Include dated screenshots of a verified app run and a working public demo link in the separate evidence PDF once checked.
+The [source repository](https://github.com/negentropi/roma-just-talk) and [v1.95.1 Mac beta](https://github.com/negentropi/roma-just-talk/releases/tag/v1.95.1) are public. There is also a [browser demo](https://github.com/negentropi/roma-just-talk/tree/without/no-adhoc-macos-tcc/landing-vercel/demo) that explains the interaction. It uses the browser's speech recognition, so it cannot stand in for a test of the Mac app.
 
-**Not yet validated for this submission:** active users, retention, paid demand, first-word recovery rate in a user study, and measured advantage over alternatives. A downloaded release and automated build do not prove these outcomes. The pilot will use a fixed sentence/task set and record version, macOS version, hardware, microphone, model, exact spoken text, trigger timing, output, corrections, and consent. This makes the product claim falsifiable.
+For this application, we still need a dated recording of the published Mac app capturing words spoken before the shortcut and inserting the result into another app. The separate evidence PDF will state the exact app version, Mac, macOS version, microphone, model, spoken phrase, and inserted text. We have no verified user count, retention result, sales figure, or measured advantage over another app to report here.
+
+The student team will run the same short writing tasks with participants' current method and Roma. It will record the opening words captured, corrections, time to usable text, and failures. A judge should be able to see both successes and limits in those results.
 
 ## 5. Business model
 
-**Hypothesis:** a free evaluation path could lead to paid convenience or support for heavy users, or an organization could sponsor deployment. No price or plan is committed here. First interview target users about existing spend and test a concrete offer against alternatives. Because the application code is GPLv3, any paid model must respect the right to source and redistribute under that license. Do not claim exclusive ownership of the inherited code or promise a proprietary code license. Costs to estimate include model hosting when cloud options are used, release signing, support, and acquisition. The first distribution path is the public release and a clear onboarding page; effectiveness remains unmeasured.
+Pricing is undecided. The beta is publicly downloadable, but that does not show demand for a paid product. We will ask frequent dictation users what they pay for now, where those tools fall short, and what they would pay for a reliable fix. We can then test one clear offer with interested users.
+
+Any paid offer must respect GPLv3. The inherited code cannot be treated as exclusive property. Costs we need to measure include release signing, support, and any hosting used for cloud features. The public release is our starting distribution channel; we have not measured how many people it brings in or keeps.
 
 ## 6. Competition
 
-| Option | Useful strength | Question Roma must answer |
+| Current option | Why people use it | What Roma needs to prove |
 | --- | --- | --- |
-| Typing and editing | Familiar, precise, no mic setup | Is voice input faster for the target task? |
-| Built-in macOS dictation | Present on the Mac, low acquisition friction | Is first-word recovery important enough to switch? |
-| Established dictation apps | Mature recognition and workflows | Can Roma's interaction and control justify setup and trust costs? |
+| Typing and editing | Familiar and precise; no microphone setup | Voice is useful for the tasks we target |
+| Built-in Mac dictation | Already available on the computer | Lost opening words are common enough to justify switching |
+| Established dictation apps | Mature recognition and workflows | Roma's timing benefit outweighs setup and trust costs |
 
-The comparison should be tested on real tasks; no unsupported accuracy, RAM, price, or speed ranking is proposed. The differentiated shortcut can be copied, so durable value would need to come from execution quality, reliability, user trust, and workflow learning.
+A shortcut can be copied. If Roma earns a place in someone's routine, it will be because the whole recording and insertion flow works reliably and the app is clear about permissions and data handling. We need to test that claim with users.
 
 ## 7. Team
 
-| Member | YZU or other school, department/year | Owned work | Evidence of ability |
+| Member | School and department | Work in this project | Relevant experience |
 | --- | --- | --- | --- |
-| [Captain] | [YZU] | Product direction, submission, user research | [Specific work] |
-| [Member 2] | [School] | macOS engineering and demo reliability | [Specific work] |
-| [Member 3] | [School] | Market research, pilot recruitment, business model | [Specific work] |
+| [YZU student captain] | [Department and year] | Submission, interviews, team coordination | [Fill from actual work] |
+| [Student 2] | [School, department, year] | Mac testing and demo | [Fill from actual work] |
+| [Student 3] | [School, department, year] | Market research and pitch | [Fill from actual work] |
 
-Assign actual work and confirm each person's consent. An advisor is optional. If a role is unfilled, name the gap rather than listing a nominal teammate. The product predates this competition; distinguish founder work and new teammate contributions honestly.
+[Fill this section after the students agree to join. Name any missing role. Keep Felix's work before the team formed separate from work done by entrants.]
 
-## 8. Next six months and resources
+## 8. Resources and next steps
 
-| By | Deliverable | Completion test |
+| Date | Work | Evidence that it is done |
 | --- | --- | --- |
-| 2026-10-16 | Eligible team and application | Center confirms received and then accepted; both PDFs conform |
-| 2026-11 | First-word pilot | 10+ consented Mac users; versioned task records and correction results |
-| 2026-12 | Final pitch and live demo | Rehearsed 5-minute talk; 3-minute Q&A; offline video backup |
-| 2027-01 | Onboarding and release quality | Tested published download on target macOS versions, documented blockers |
-| 2027-03 | Demand decision | Repeat-use and willingness-to-pay evidence; explicit continue/pivot choice |
+| October 2026 | Form the eligible team and submit | The centre sends its registration-success email |
+| November 2026 | Test first-word capture with Mac users | Consented task records, including failures and corrections |
+| December 2026 | Present the product | Five-minute pitch, three-minute Q&A, tested live demo and video backup |
+| January 2027 | Improve installation and first use | Published download tested on named Mac and macOS versions |
+| March 2027 | Decide what to offer users | Repeat-use results and responses to a specific price or offer |
 
-**Requested support:** introductions to target users and a mentor for Mac software distribution or open-source commercialization. Budget to be filled only after team agrees on line items and quotes: participant incentives, test hardware/access, Developer ID/notarization, and hosting if needed. Consider FITI/U-start with center guidance after eligibility and IP questions are resolved.
+We would use the centre's help to meet prospective testers and speak with a mentor who knows Mac software distribution and open-source business models. The team will add a costed budget after it checks actual prices. We can consider FITI or U-start with the centre once the team and rights questions are settled.
 
-## Source and rights note for appendix
+## Source and rights note
 
-VoiceInk: original upstream macOS application, GPLv3. Roma Just Talk: a public fork that retains VoiceInk credits and adds a speech-first pre-roll direction. Third-party libraries and model licenses should be listed from the release's dependency manifest. The team's own contribution list must be verified against Git history before the captain attests to originality. The organizer's rules say third-party technology and licenses must be stated; the captain should seek a written ruling on this fork before submission.
+VoiceInk is the original GPLv3 Mac app. Roma is a public fork. The final proposal will cite upstream code and dependencies, Felix's existing commits, and each entrant's new work. The organiser's rules require disclosure of third-party technology and its licence. We will seek written guidance on how the existing fork fits the captain's originality declaration before signing it.

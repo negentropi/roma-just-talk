@@ -1,11 +1,11 @@
-# Separate practical-track evidence PDF draft
+# Evidence to collect for the practical-track PDF
 
-Name on export: `元創盃_B_<team>_成果佐證.pdf`. Single PDF, under 100 MB (20 MB recommended). Use dated, legible captures; a prototype image or accessible demo is mandatory. Replace all bracketed fields before export.
+Export one PDF named `元創盃_B_<team>_成果佐證.pdf`. The limit is 100 MB; the organiser recommends 20 MB or less. Include a dated, legible image of the prototype or a public demo link. Fill any missing fields before export.
 
-1. **What works, on what artifact.** App name, exact release tag/SHA, macOS version, hardware, mic, model, date. Two screenshots: recording/shortcut state and inserted text in a target app. Provide the exact spoken phrase and output. State whether each capture is from the published beta or a development candidate. Do not substitute the browser demo for Mac runtime proof.
-2. **Public links.** [Source](https://github.com/negentropi/roma-just-talk), [v1.95.1 release](https://github.com/negentropi/roma-just-talk/releases/tag/v1.95.1), [landing/demo source](https://github.com/negentropi/roma-just-talk/tree/without/no-adhoc-macos-tcc/landing-vercel/demo). Add the live demo URL only after testing it in a signed-out browser. The organizer requires a public link that remains available through 2026-12-11.
-3. **What Roma added.** A small table of 3–5 Roma-specific commits/files, with one sentence per change and dates. Link to commits. Credit VoiceInk's inherited application and other dependencies.
-4. **External validation.** [Pilot or interview results only after collected.] For every figure include sample size, period, protocol, and artifact. No testimonials without consent; no personally identifying data in the PDF.
-5. **Limits.** State any setup friction, unsigned/notarization status, unsupported macOS/model combinations, and unverified behavior relevant to a judge trying the app. Include a short, pre-recorded demonstration backup if permitted, but keep the PDF itself self-contained.
+1. Record the app version and commit, Mac model, macOS version, microphone, recognition model, and date. Capture the recording state and inserted text in another app. Give the exact spoken phrase and result. Mark whether the test used the published beta or a development build.
+2. Link the [source](https://github.com/negentropi/roma-just-talk), [v1.95.1 release](https://github.com/negentropi/roma-just-talk/releases/tag/v1.95.1), and [browser demo code](https://github.com/negentropi/roma-just-talk/tree/without/no-adhoc-macos-tcc/landing-vercel/demo). Add a live demo URL after testing it while signed out. The public link must remain available through 2026-12-11. The browser demo does not prove the Mac app works.
+3. Link three to five commits that show what Roma added, with dates and authors. Credit work inherited from VoiceInk and other dependencies.
+4. Add pilot or interview results only after collecting them. For each figure, show the dates, number of people, task, and underlying record. Get consent for testimonials and remove identifying details.
+5. Tell judges about setup problems, signing and notarization status, unsupported Mac or model combinations, and behavior the team has not verified. Bring a short video backup if the rules allow it.
 
-Before export: open all links in a signed-out browser; test the precise download; record page count, selectable text, size, and PDF opening. Check screenshots at 100% zoom.
+Before export, open every link while signed out, test the exact download, and check the PDF's page count, text selection, file size, and screenshots at 100% zoom.

@@ -21,7 +21,7 @@ Drafts updated 2026-09-28. **Nothing has been submitted.** This is a startup com
 - [proposal.md](proposal.md) follows the practical-track sections. Fill the team and evidence gaps before export.
 - [evidence.md](evidence.md) lists the proof to collect for the separate evidence PDF.
 - [application.md](application.md) has the form checklist and an email draft for the organiser.
-- [mother-brief.md](mother-brief.md) contains the note for Felix's mother and a student invitation she can forward.
+- [mother-brief.md](mother-brief.md) gives Felix's mother a short connection request and students an invitation in Traditional Chinese and English.
 - [evidence-preview.md](evidence-preview.md) shows what can be said now and what proof is missing.
 - [Family packet PDF](previews/Roma_YZU_family_packet_preview.pdf) combines the note, proposal, and evidence preview. The [invitation](previews/Roma_YZU_student_invitation_preview.pdf), [proposal](previews/Roma_YZU_proposal_preview.pdf), and [evidence](previews/Roma_YZU_evidence_preview.pdf) are also available separately. These are discussion drafts, not upload files.
 

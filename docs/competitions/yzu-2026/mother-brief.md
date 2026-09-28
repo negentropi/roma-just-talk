@@ -1,29 +1,43 @@
-# Roma Just Talk 元創盃組隊說明
+# Roma Just Talk student invitation
 
-**給媽媽看｜2026 年 9 月 28 日｜尚未報名**
+**Draft · 28 September 2026 · Team not formed yet**
 
-媽，我想帶 Roma Just Talk 參加元智大學的「元創盃」。這是我正在做的 Mac 語音輸入軟體，已有公開測試版。比賽需要學生組隊，我想請妳介紹有興趣的元智學生給我。我會自己跟他們談要做什麼、能投入多少時間，再決定要不要一起報名。
+## Mom, could you make the introductions?
 
-## Roma 做什麼
+Could you introduce me to Yuan Ze students who enjoy building things? You do not need to explain Roma or persuade them. Please send either invitation below, then connect me directly with anyone interested. I will show them the app and talk through the work, team rules, and what they want to contribute.
 
-一般語音輸入要先按鍵再開口。用 Roma，可以先開始說，按下快捷鍵時，前面幾秒的聲音還在，不必為了漏掉句首重講。這是產品想解決的問題；我們還需要用實際測試證明它能穩定做到。
+Students interested in software, design, user research, or starting a product could all help. Someone willing to coordinate the Yuan Ze competition team would be especially valuable. A few thoughtful introductions are enough to start.
 
-Roma 建立在開源專案 VoiceInk 上。我會在提案裡寫清楚原專案做了什麼、我已做了什麼，以及新隊友後來做了什麼。
+## Roma in one picture
 
-## 比賽怎麼組隊
+Imagine saying **“Please send the slides”** and pressing the dictation key only after **“Please.”**
 
-- 一隊要有 **3 至 6 位在學學生**，其中至少一半是元智學生，隊長也必須是元智學生。其他學校的學生可以加入，但要交在學證明。
-- 我的學生身分還要確認。如果我不是在學學生，就不能算進參賽隊員人數；我會向主辦單位問清楚，能否以原專案負責人的身分協助學生隊伍。
-- 指導老師可有可無。隊員必須知道自己要負責什麼，並親自同意參賽。專案權利和獎金分配要在組隊時談清楚。
+| What you said | If recording starts at the key press | What Roma aims to capture |
+| --- | --- | --- |
+| **Please** send the slides | send the slides | **Please** send the slides |
 
-Roma 已有產品雛型，適合報「實戰組」。初審有 20% 看已完成的成果。找來的同學可以做使用者訪談、測試 Mac 程式、整理提案，或準備決賽簡報。每個人都應有能拿出來的工作成果。
+Roma keeps a few seconds of recent microphone audio so the beginning of the sentence can be included. The goal is simple: speak naturally without having to restart because you pressed the key late. We have a public Mac beta; we still need to test how well this works for other people.
 
-**時間：** 10 月 16 日 17:00 前交報名表及兩份 PDF。若晉級，11 月 11 日要參加提案診所，12 月 7 日 17:00 前交簡報，12 月 11 日到場簡報五分鐘、回答問題三分鐘。10 月 7 日有自由參加的工作坊，但公告與報名頁寫的時間不同，去之前要向主辦單位確認。
+## 給學生轉傳｜繁體中文
 
-## 可以轉給學生的訊息
+### 一起把語音輸入做得更順
 
-> 你好，Felix 想帶 Roma Just Talk 參加今年元智的「元創盃」，正在找願意一起做事的學生。Roma 是已有公開測試版的 Mac 語音輸入軟體，讓使用者先說話，再按快捷鍵保留句首。隊友可以協助訪談、測試、提案或簡報，不必每個人都會寫程式。比賽需要 3 至 6 位在學學生，元智學生至少占一半，並由元智學生擔任隊長。10 月 16 日 17:00 截止。Roma 建立在開源專案 VoiceInk 上，我們會如實交代來源和各人的工作。如果你有興趣，請寄信給 Felix，聊聊你想負責什麼、能投入多少時間：happyfumd@icloud.com。活動頁：https://johnnyweb-art.github.io/yzu-startup-challenge/
+你已經開口說「幫我寄這封信」，才想起要按語音輸入鍵；錄下來卻只剩「寄這封信」。Roma Just Talk 想保住句首，讓人不用為了配合快捷鍵重講一次。產品已有[公開的 Mac 測試版](https://github.com/negentropi/roma-just-talk/releases/tag/v1.95.1)和[原始碼](https://github.com/negentropi/roma-just-talk)。
 
-媽，請先幫我介紹至少三位有興趣的元智學生，不用替任何人答應參賽。我會處理接下來的資格確認和文件。
+我們正在找願意一起做產品的學生。你可以選一塊自己想負責的事：改進 Mac 程式或語音流程、設計好用的操作、找人實測，或把使用者發現整理成產品方向和簡報。歡迎質疑現在的做法；我們會用測試結果決定下一步。不必每個人都會寫程式。
 
-資料來源：[活動頁](https://johnnyweb-art.github.io/yzu-startup-challenge/)、[正式簡章](https://drive.google.com/file/d/13YDhuFKO_87lKiC0y145As92wKw_bdG7/view)、[提案格式](https://drive.google.com/file/d/16JGdLvj1So-UXsJgINpX902JngVbCf2C/view)。
+第一站是元智大學[元創盃](https://johnnyweb-art.github.io/yzu-startup-challenge/)，**2026 年 10 月 16 日 17:00** 報名截止。比賽需要 **3 至 6 位在學學生**，由元智學生任隊長，且至少一半隊員是元智學生。如果合作愉快，我們也可以在比賽後繼續做。Roma 是基於 GPLv3 開源專案 VoiceInk 開發；加入前會談清楚各人的工作、署名、獎金分配和專案權利。
+
+有興趣的話，寫信給 Felix：[happyfumd@icloud.com](mailto:happyfumd@icloud.com)。告訴我你的學校、最想做哪一部分，以及接下來兩週大概有多少時間。我們先聊 20 分鐘、看看產品，沒有加入壓力。
+
+## For students to forward｜English
+
+### Help make voice input easier to use
+
+You say “Please send the slides,” then press the dictation key after “Please.” An ordinary recording misses the first word. Roma Just Talk is a Mac voice-input app that keeps a few seconds of audio so it can include the start of the sentence. There is already a [public beta](https://github.com/negentropi/roma-just-talk/releases/tag/v1.95.1) and [source code](https://github.com/negentropi/roma-just-talk).
+
+We are looking for students who want to build the next version together. Pick a part you care about: the Mac app or speech flow, the way people use it, testing with users, or turning what we learn into a product plan and pitch. Question the current approach. We will use real tests to decide what to improve. Not every role requires coding.
+
+The [YZU Startup Challenge](https://johnnyweb-art.github.io/yzu-startup-challenge/) is our first milestone. Registration closes **16 October 2026 at 17:00 Taiwan time**. The team needs **3–6 enrolled students**, a YZU student captain, and at least half its members from YZU. If we work well together, we can keep building after the competition. Roma builds on the GPLv3 VoiceInk project; we will agree on work, credit, prize sharing, and project rights before anyone joins.
+
+Interested? Email Felix at [happyfumd@icloud.com](mailto:happyfumd@icloud.com) with your school, the part you would like to work on, and your rough availability over the next two weeks. We can start with a 20-minute conversation and a look at the beta, with no obligation to join.

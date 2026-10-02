@@ -81,4 +81,13 @@ final class UpdateExperienceTests: XCTestCase {
         XCTAssertFalse(failed.canCancel)
         XCTAssertFalse(failed.canRelaunch)
     }
+
+    private func withTemporaryDefaults(_ test: (UserDefaults) -> Void) {
+        let suiteName = "VoiceInkCore.UpdateExperienceTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer {
+            defaults.removePersistentDomain(forName: suiteName)
+        }
+        test(defaults)
+    }
 }

@@ -4,6 +4,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 VERIFIER="$ROOT/scripts/verify-macos-distribution-launch.sh"
 TEMP_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/roma-distribution-launch.XXXXXX")"
+TEMP_ROOT="$(cd "$TEMP_ROOT" && pwd -P)"
 APP="$TEMP_ROOT/Fixture.app"
 LEAF_FRAMEWORK="$APP/Contents/Frameworks/RomaDistributionFixtureLeaf.framework"
 MIDDLE_FRAMEWORKS="$APP/Contents/Frameworks/My Frameworks"

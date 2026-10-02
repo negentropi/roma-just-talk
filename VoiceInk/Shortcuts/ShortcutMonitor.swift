@@ -77,6 +77,14 @@ enum KeyboardState {
     }
 }
 
+struct ShiftShortcutEvent {
+    enum Edge { case down, up, invalidated }
+    let edge: Edge
+    let keyCode: UInt16
+    let time: TimeInterval
+    var context = VoiceInkShortcutPressContext()
+}
+
 final class ShortcutMonitor {
     enum EventKind {
         case keyDown
@@ -118,6 +126,11 @@ final class ShortcutMonitor {
     private var onKeyUp: ((ShortcutAction, TimeInterval, VoiceInkShortcutPressContext) -> Void)?
     private var onPressContextChanged: ((ShortcutAction, VoiceInkShortcutPressContext) -> Void)?
     private var onShortcutInterrupted: ((ShortcutAction, TimeInterval) -> Void)?
+    private var onShiftEvent: ((ShiftShortcutEvent) -> Void)?
+    private var shiftObservedAction: ShortcutAction?
+    private var heldShiftKeys = Set<UInt16>()
+    private var shiftPressContext = VoiceInkShortcutPressContext()
+    private var monitoringGeneration: UInt64 = 0
     private var eventTap: CFMachPort?
     private var eventTapRunLoopSource: CFRunLoopSource?
     private var modifierOnlyGlobalMonitor: Any?
@@ -148,7 +161,9 @@ final class ShortcutMonitor {
         onKeyDown: @escaping (ShortcutAction, TimeInterval) -> Void,
         onKeyUp: @escaping (ShortcutAction, TimeInterval, VoiceInkShortcutPressContext) -> Void,
         onPressContextChanged: ((ShortcutAction, VoiceInkShortcutPressContext) -> Void)? = nil,
-        onShortcutInterrupted: ((ShortcutAction, TimeInterval) -> Void)? = nil
+        onShortcutInterrupted: ((ShortcutAction, TimeInterval) -> Void)? = nil,
+        shiftObservedAction: ShortcutAction? = nil,
+        onShiftEvent: ((ShiftShortcutEvent) -> Void)? = nil
     ) -> Bool {
         stop()
 
@@ -156,7 +171,7 @@ final class ShortcutMonitor {
             self.shortcuts[action] = ShortcutState(shortcut: shortcut)
         }
 
-        guard !self.shortcuts.isEmpty else {
+        guard !self.shortcuts.isEmpty || onShiftEvent != nil else {
             logger.notice("start: no shortcuts configured")
             return true
         }
@@ -167,12 +182,15 @@ final class ShortcutMonitor {
         self.onKeyUp = onKeyUp
         self.onPressContextChanged = onPressContextChanged
         self.onShortcutInterrupted = onShortcutInterrupted
+        self.shiftObservedAction = shiftObservedAction
+        self.onShiftEvent = onShiftEvent
         logger.notice("start: installing event tap for \(self.shortcuts.count, privacy: .public) shortcut(s)")
 
-        return installEventTap(tracksKeyUpEvidence: tracksKeyUpEvidence)
+        return installEventTap(tracksKeyUpEvidence: tracksKeyUpEvidence || onShiftEvent != nil)
     }
 
     func stop() {
+        monitoringGeneration &+= 1
         if let modifierOnlyGlobalMonitor {
             NSEvent.removeMonitor(modifierOnlyGlobalMonitor)
             self.modifierOnlyGlobalMonitor = nil
@@ -200,6 +218,10 @@ final class ShortcutMonitor {
         onKeyUp = nil
         onPressContextChanged = nil
         onShortcutInterrupted = nil
+        onShiftEvent = nil
+        shiftObservedAction = nil
+        heldShiftKeys.removeAll()
+        shiftPressContext = VoiceInkShortcutPressContext()
         handlesModifierOnlyShortcutsInEventTap = false
     }
 
@@ -369,7 +391,7 @@ final class ShortcutMonitor {
             kind: eventKind,
             keyCode: keyCode,
             modifierFlags: modifierFlags,
-            eventTime: ProcessInfo.processInfo.systemUptime,
+            eventTime: TimeInterval(event.timestamp) / 1_000_000_000,
             scope: handlesModifierOnlyShortcutsInEventTap ? .all : .nonModifierOnly
         )
     }
@@ -390,6 +412,10 @@ final class ShortcutMonitor {
 
     private func resetPressedShortcutsAfterTapInterruption() {
         let eventTime = ProcessInfo.processInfo.systemUptime
+        heldShiftKeys.removeAll()
+        shiftPressContext = VoiceInkShortcutPressContext()
+        dispatchShiftEvent(ShiftShortcutEvent(edge: .invalidated, keyCode: 0, time: eventTime,
+                                             context: VoiceInkShortcutPressContext(hasReliableKeyEvidence: false)))
         let pressedActions = shortcuts.compactMap { action, state in
             state.isDown ? action : nil
         }
@@ -427,6 +453,10 @@ final class ShortcutMonitor {
     ) -> Bool {
         var shouldSuppress = false
         let isSecureInputEnabled = Self.isSecureEventInputEnabled()
+        if scope != .modifierOnly || handlesModifierOnlyShortcutsInEventTap {
+            observeShiftEvent(kind: kind, keyCode: keyCode, modifierFlags: modifierFlags,
+                              eventTime: eventTime, isSecureInputEnabled: isSecureInputEnabled)
+        }
 
         if isSecureInputEnabled {
             recordUnreliableKeyEvidenceDuringActiveShortcuts()
@@ -498,18 +528,21 @@ final class ShortcutMonitor {
                 state.pressedAt = eventTime
                 state.isInterrupted = false
                 state.pressContext = VoiceInkShortcutPressContext()
+                state.isBlockedBySecureInput = secureInputBlockedActions.contains(action) && isSecureInputEnabled
                 shortcuts[action] = state
                 shouldSuppress = true
-                dispatchKeyDown(for: action, eventTime: eventTime)
+                if !state.isBlockedBySecureInput { dispatchKeyDown(for: action, eventTime: eventTime) }
             case .keyUp:
                 let context = state.pressContext
+                let shouldDispatchKeyUp = !state.isBlockedBySecureInput
                 state.isDown = false
+                state.isBlockedBySecureInput = false
                 state.pressedAt = nil
                 state.isInterrupted = false
                 state.pressContext = VoiceInkShortcutPressContext()
                 shortcuts[action] = state
                 shouldSuppress = true
-                dispatchKeyUp(for: action, eventTime: eventTime, context: context)
+                if shouldDispatchKeyUp { dispatchKeyUp(for: action, eventTime: eventTime, context: context) }
             }
         }
 
@@ -728,30 +761,98 @@ final class ShortcutMonitor {
         }
     }
 
+    private func observesAssignedShift(for action: ShortcutAction) -> Bool {
+        guard action == shiftObservedAction, let shortcut = shortcuts[action]?.shortcut else { return false }
+        return shortcut.isModifierOnly && shortcut.modifierFlags == [.shift]
+    }
+
+    private func observeShiftEvent(
+        kind: EventKind,
+        keyCode: UInt16,
+        modifierFlags: NSEvent.ModifierFlags,
+        eventTime: TimeInterval,
+        isSecureInputEnabled: Bool
+    ) {
+        guard onShiftEvent != nil else { return }
+        let isShift = keyCode == UInt16(kVK_Shift) || keyCode == UInt16(kVK_RightShift)
+        guard kind == .flagsChanged, isShift else {
+            if isSecureInputEnabled || kind == .keyDown || kind == .keyUp || kind == .systemDefined || kind == .flagsChanged {
+                shiftPressContext.didPressOtherKeyDuringPress = true
+                if isSecureInputEnabled { shiftPressContext.hasReliableKeyEvidence = false }
+                dispatchShiftEvent(ShiftShortcutEvent(edge: .invalidated, keyCode: keyCode, time: eventTime,
+                                                     context: shiftPressContext))
+            }
+            return
+        }
+
+        // Device flags distinguish a Shift release while the other Shift remains held.
+        let deviceShiftFlags = modifierFlags.rawValue & 0x6
+        let sideFlag: UInt = keyCode == UInt16(kVK_Shift) ? 0x2 : 0x4
+        let isDown = deviceShiftFlags != 0 ? deviceShiftFlags & sideFlag != 0 : modifierFlags.contains(.shift)
+        if isDown {
+            guard heldShiftKeys.insert(keyCode).inserted else { return }
+            if heldShiftKeys.count == 1 { shiftPressContext = VoiceInkShortcutPressContext() }
+            shiftPressContext.didPressOtherKeyDuringPress = heldShiftKeys.count > 1 ||
+                Self.hasPressedNonModifierKey() || Shortcut.normalizedModifierFlags(modifierFlags, forKeyCode: keyCode) != [.shift]
+            shiftPressContext.hasReliableKeyEvidence = !isSecureInputEnabled
+            if VoiceInkSpecialShortcutKeyEvidencePolicy.shouldDiscardShortcut(for: shiftPressContext) {
+                dispatchShiftEvent(ShiftShortcutEvent(edge: .invalidated, keyCode: keyCode, time: eventTime,
+                                                     context: shiftPressContext))
+            }
+            dispatchShiftEvent(ShiftShortcutEvent(edge: .down, keyCode: keyCode, time: eventTime,
+                                                 context: shiftPressContext))
+        } else {
+            guard heldShiftKeys.remove(keyCode) != nil else { return }
+            if !modifierFlags.contains(.shift) { heldShiftKeys.removeAll() }
+            if Self.hasPressedNonModifierKey() { shiftPressContext.didPressOtherKeyDuringPress = true }
+            if isSecureInputEnabled { shiftPressContext.hasReliableKeyEvidence = false }
+            dispatchShiftEvent(ShiftShortcutEvent(edge: .up, keyCode: keyCode, time: eventTime,
+                                                 context: shiftPressContext))
+        }
+    }
+
+    private func dispatchShiftEvent(_ event: ShiftShortcutEvent) {
+        let generation = monitoringGeneration
+        DispatchQueue.main.async { [weak self] in
+            guard let self, self.monitoringGeneration == generation else { return }
+            self.onShiftEvent?(event)
+        }
+    }
+
     private func dispatchKeyDown(for action: ShortcutAction, eventTime: TimeInterval) {
+        guard !observesAssignedShift(for: action) else { return }
         logger.notice("dispatchKeyDown: action=\(action.storageName, privacy: .public)")
-        DispatchQueue.main.async { [onKeyDown] in
-            onKeyDown?(action, eventTime)
+        let generation = monitoringGeneration
+        DispatchQueue.main.async { [weak self] in
+            guard let self, self.monitoringGeneration == generation else { return }
+            self.onKeyDown?(action, eventTime)
         }
     }
 
     private func dispatchKeyUp(for action: ShortcutAction, eventTime: TimeInterval, context: VoiceInkShortcutPressContext) {
+        guard !observesAssignedShift(for: action) else { return }
         logger.notice("dispatchKeyUp: action=\(action.storageName, privacy: .public)")
-        DispatchQueue.main.async { [onKeyUp] in
-            onKeyUp?(action, eventTime, context)
+        let generation = monitoringGeneration
+        DispatchQueue.main.async { [weak self] in
+            guard let self, self.monitoringGeneration == generation else { return }
+            self.onKeyUp?(action, eventTime, context)
         }
     }
 
     private func dispatchPressContextChanged(for action: ShortcutAction, context: VoiceInkShortcutPressContext) {
-        DispatchQueue.main.async { [onPressContextChanged] in
-            onPressContextChanged?(action, context)
+        let generation = monitoringGeneration
+        DispatchQueue.main.async { [weak self] in
+            guard let self, self.monitoringGeneration == generation else { return }
+            self.onPressContextChanged?(action, context)
         }
     }
 
     private func dispatchShortcutInterrupted(for action: ShortcutAction, eventTime: TimeInterval) {
         logger.notice("dispatchShortcutInterrupted: action=\(action.storageName, privacy: .public)")
-        DispatchQueue.main.async { [onShortcutInterrupted] in
-            onShortcutInterrupted?(action, eventTime)
+        let generation = monitoringGeneration
+        DispatchQueue.main.async { [weak self] in
+            guard let self, self.monitoringGeneration == generation else { return }
+            self.onShortcutInterrupted?(action, eventTime)
         }
     }
 
@@ -844,7 +945,9 @@ extension ShortcutMonitor {
         onKeyDown: @escaping (ShortcutAction, TimeInterval) -> Void,
         onKeyUp: @escaping (ShortcutAction, TimeInterval, VoiceInkShortcutPressContext) -> Void,
         onPressContextChanged: ((ShortcutAction, VoiceInkShortcutPressContext) -> Void)? = nil,
-        onShortcutInterrupted: ((ShortcutAction, TimeInterval) -> Void)? = nil
+        onShortcutInterrupted: ((ShortcutAction, TimeInterval) -> Void)? = nil,
+        shiftObservedAction: ShortcutAction? = nil,
+        onShiftEvent: ((ShiftShortcutEvent) -> Void)? = nil
     ) {
         stop()
 
@@ -859,6 +962,8 @@ extension ShortcutMonitor {
         self.onKeyUp = onKeyUp
         self.onPressContextChanged = onPressContextChanged
         self.onShortcutInterrupted = onShortcutInterrupted
+        self.shiftObservedAction = shiftObservedAction
+        self.onShiftEvent = onShiftEvent
     }
 
     @discardableResult

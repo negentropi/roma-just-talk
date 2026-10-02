@@ -390,6 +390,7 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
         XCTAssertEqual(json["toggleEnhancementShortcut"] as? String, "toggle-shortcut")
         XCTAssertEqual(json["primaryRecordingShortcutRawValue"] as? String, "custom")
         XCTAssertEqual(json["secondaryRecordingShortcutModeRawValue"] as? String, "hybrid")
+        XCTAssertEqual(json["specialShortcutDoubleShiftTapInterval"] as? Int, 450)
         XCTAssertEqual(json["launchAtLoginEnabled"] as? Bool, true)
         XCTAssertEqual(json["isSoundFeedbackEnabled"] as? Bool, true)
         let decoded = try JSONDecoder().decode(
@@ -457,7 +458,8 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
             secondaryRecordingShortcutModeRawValue: VoiceInkRecordingShortcutMode.hybrid.rawValue,
             specialShortcutPasteLastTranscriptOnEmptyTap: true,
             isMiddleClickToggleEnabled: false,
-            middleClickActivationDelay: 220
+            middleClickActivationDelay: 220,
+            specialShortcutDoubleShiftTapInterval: nil
         )
         let macOSShell = VoiceInkMacOSShellBackupPreferences(
             launchAtLoginEnabled: true,
@@ -520,7 +522,8 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
                 secondaryRecordingShortcutModeRawValue: "invalid",
                 specialShortcutPasteLastTranscriptOnEmptyTap: true,
                 isMiddleClickToggleEnabled: true,
-                middleClickActivationDelay: 180
+                middleClickActivationDelay: 180,
+                specialShortcutDoubleShiftTapInterval: nil
             ),
             macOSShell: VoiceInkMacOSShellBackupPreferences(
                 launchAtLoginEnabled: true,
@@ -610,7 +613,8 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
                         secondaryRecordingShortcutMode: .hybrid,
                         specialShortcutPasteLastTranscriptOnEmptyTap: false,
                         isMiddleClickToggleEnabled: true,
-                        middleClickActivationDelay: 250
+                        middleClickActivationDelay: 250,
+                        specialShortcutDoubleShiftTapInterval: nil
                     ),
                     macOSShell: VoiceInkMacOSShellBackupImportPlan(
                         launchAtLoginEnabled: true,
@@ -676,7 +680,8 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
                         secondaryRecordingShortcutMode: nil,
                         specialShortcutPasteLastTranscriptOnEmptyTap: nil,
                         isMiddleClickToggleEnabled: nil,
-                        middleClickActivationDelay: nil
+                        middleClickActivationDelay: nil,
+                        specialShortcutDoubleShiftTapInterval: nil
                     ),
                     macOSShell: VoiceInkMacOSShellBackupImportPlan(
                         launchAtLoginEnabled: nil,
@@ -739,7 +744,8 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
                 secondaryRecordingShortcutModeRawValue: VoiceInkRecordingShortcutMode.hybrid.rawValue,
                 specialShortcutPasteLastTranscriptOnEmptyTap: true,
                 isMiddleClickToggleEnabled: false,
-                middleClickActivationDelay: 220
+                middleClickActivationDelay: 220,
+                specialShortcutDoubleShiftTapInterval: 450
             ),
             macOSShell: VoiceInkMacOSShellBackupPreferences(
                 launchAtLoginEnabled: true,
@@ -783,7 +789,8 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
                 secondaryRecordingShortcutModeRawValue: VoiceInkRecordingShortcutMode.hybrid.rawValue,
                 specialShortcutPasteLastTranscriptOnEmptyTap: true,
                 isMiddleClickToggleEnabled: false,
-                middleClickActivationDelay: 220
+                middleClickActivationDelay: 220,
+                specialShortcutDoubleShiftTapInterval: nil
             ),
             macOSShell: VoiceInkMacOSShellBackupPreferences(
                 launchAtLoginEnabled: true,
@@ -840,7 +847,8 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
                     pasteLastTranscriptOnEmptyTap = String($0)
                 },
                 setMiddleClickToggleEnabled: { middleClickEnabled = String($0) },
-                setMiddleClickActivationDelay: { middleClickDelay = String($0) }
+                setMiddleClickActivationDelay: { middleClickDelay = String($0) },
+                setSpecialShortcutDoubleShiftTapInterval: { _ in }
             )
             events.append(
                 "recordingShortcut:\(primaryShortcut):\(secondaryShortcut):\(primaryMode):\(secondaryMode):\(pasteLastTranscriptOnEmptyTap):\(middleClickEnabled):\(middleClickDelay)"

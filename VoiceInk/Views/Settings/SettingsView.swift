@@ -94,6 +94,20 @@ struct SettingsView: View {
                 }
 
                 if usesSpecialShortcutMode {
+                    LabeledContent("Double-Shift tap interval") {
+                        HStack {
+                            TextField("", value: $recordingShortcutManager.specialShortcutDoubleShiftTapInterval,
+                                      formatter: VoiceInkRecordingShortcutPreference.doubleShiftTapIntervalFormatter())
+                                .textFieldStyle(.roundedBorder)
+                                .frame(width: 60)
+                                .accessibilityLabel("Double-Shift tap interval in milliseconds")
+                            Text(recordingShortcutManager.specialShortcutDoubleShiftTapInterval == 0 ? "Off" : "ms")
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    Text("Tap the same Shift twice to dictate hands-free. Press and release the assigned Special shortcut to finish. Each tap can last at most this interval. The gap must be shorter. Use 100 to 1000 ms, or 0 for Off. A short assigned-Shift release waits this long for a second tap.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                     Toggle(
                         Self.recordingShortcutPresentation.emptyTapPasteLastTranscriptLabel,
                         isOn: $recordingShortcutManager.specialShortcutPasteLastTranscriptOnEmptyTap

@@ -109,7 +109,8 @@ enum BackupImporter {
                         recordingShortcutManager.specialShortcutPasteLastTranscriptOnEmptyTap = $0
                     },
                     setMiddleClickToggleEnabled: { recordingShortcutManager.isMiddleClickToggleEnabled = $0 },
-                    setMiddleClickActivationDelay: { recordingShortcutManager.middleClickActivationDelay = $0 }
+                    setMiddleClickActivationDelay: { recordingShortcutManager.middleClickActivationDelay = $0 },
+                    setSpecialShortcutDoubleShiftTapInterval: { recordingShortcutManager.specialShortcutDoubleShiftTapInterval = $0 }
                 )
             },
             applyMacOSShellImportPlan: { macOSShellImportPlan in

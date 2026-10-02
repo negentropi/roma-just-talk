@@ -44,6 +44,7 @@ public enum VoiceInkUserDefaultsKey {
     public static let isMiddleClickToggleEnabled = "isMiddleClickToggleEnabled"
     public static let middleClickActivationDelay = "middleClickActivationDelay"
     public static let specialShortcutPasteLastTranscriptOnEmptyTap = "specialShortcutPasteLastTranscriptOnEmptyTap"
+    public static let specialShortcutDoubleShiftTapInterval = "specialShortcutDoubleShiftTapInterval"
     public static let selectedAIProvider = "selectedAIProvider"
     public static let openRouterModels = "openRouterModels"
     public static let ollamaBaseURL = "ollamaBaseURL"
@@ -80,6 +81,7 @@ public enum VoiceInkPreferenceDefault {
     public static let isMiddleClickToggleEnabled = false
     public static let middleClickActivationDelay = 200
     public static let specialShortcutPasteLastTranscriptOnEmptyTap = true
+    public static let specialShortcutDoubleShiftTapInterval = 300
     public static let ollamaBaseURL = "http://localhost:11434"
     public static let macOSSelectedTranscriptionLanguage = "en"
     public static let showMenuBarIcon = false
@@ -1779,6 +1781,7 @@ public struct VoiceInkGeneralSettingsBackupPayload<ShortcutBackup: Codable>: Cod
     private let primaryRecordingShortcutModeRawValue: String?
     private let secondaryRecordingShortcutModeRawValue: String?
     private let specialShortcutPasteLastTranscriptOnEmptyTap: Bool?
+    private let specialShortcutDoubleShiftTapInterval: Int?
     private let isMiddleClickToggleEnabled: Bool?
     private let middleClickActivationDelay: Int?
     private let launchAtLoginEnabled: Bool?
@@ -1819,6 +1822,7 @@ public struct VoiceInkGeneralSettingsBackupPayload<ShortcutBackup: Codable>: Cod
         self.primaryRecordingShortcutModeRawValue = preferences.recordingShortcut.primaryRecordingShortcutModeRawValue
         self.secondaryRecordingShortcutModeRawValue = preferences.recordingShortcut.secondaryRecordingShortcutModeRawValue
         self.specialShortcutPasteLastTranscriptOnEmptyTap = preferences.recordingShortcut.specialShortcutPasteLastTranscriptOnEmptyTap
+        self.specialShortcutDoubleShiftTapInterval = preferences.recordingShortcut.specialShortcutDoubleShiftTapInterval
         self.isMiddleClickToggleEnabled = preferences.recordingShortcut.isMiddleClickToggleEnabled
         self.middleClickActivationDelay = preferences.recordingShortcut.middleClickActivationDelay
         self.launchAtLoginEnabled = preferences.macOSShell.launchAtLoginEnabled
@@ -1875,7 +1879,8 @@ public struct VoiceInkGeneralSettingsBackupPayload<ShortcutBackup: Codable>: Cod
             secondaryRecordingShortcutModeRawValue: secondaryRecordingShortcutModeRawValue,
             specialShortcutPasteLastTranscriptOnEmptyTap: specialShortcutPasteLastTranscriptOnEmptyTap,
             isMiddleClickToggleEnabled: isMiddleClickToggleEnabled,
-            middleClickActivationDelay: middleClickActivationDelay
+            middleClickActivationDelay: middleClickActivationDelay,
+            specialShortcutDoubleShiftTapInterval: specialShortcutDoubleShiftTapInterval
         )
     }
 
@@ -4501,6 +4506,7 @@ public struct VoiceInkRecordingShortcutBackupPreferences: Codable, Equatable, Se
     public let primaryRecordingShortcutModeRawValue: String?
     public let secondaryRecordingShortcutModeRawValue: String?
     public let specialShortcutPasteLastTranscriptOnEmptyTap: Bool?
+    public let specialShortcutDoubleShiftTapInterval: Int?
     public let isMiddleClickToggleEnabled: Bool?
     public let middleClickActivationDelay: Int?
 
@@ -4511,7 +4517,8 @@ public struct VoiceInkRecordingShortcutBackupPreferences: Codable, Equatable, Se
         secondaryRecordingShortcutModeRawValue: String?,
         specialShortcutPasteLastTranscriptOnEmptyTap: Bool?,
         isMiddleClickToggleEnabled: Bool?,
-        middleClickActivationDelay: Int?
+        middleClickActivationDelay: Int?,
+        specialShortcutDoubleShiftTapInterval: Int?
     ) {
         self.primaryRecordingShortcutRawValue = primaryRecordingShortcutRawValue
         self.secondaryRecordingShortcutRawValue = secondaryRecordingShortcutRawValue
@@ -4520,6 +4527,7 @@ public struct VoiceInkRecordingShortcutBackupPreferences: Codable, Equatable, Se
         self.specialShortcutPasteLastTranscriptOnEmptyTap = specialShortcutPasteLastTranscriptOnEmptyTap
         self.isMiddleClickToggleEnabled = isMiddleClickToggleEnabled
         self.middleClickActivationDelay = middleClickActivationDelay
+        self.specialShortcutDoubleShiftTapInterval = specialShortcutDoubleShiftTapInterval
     }
 }
 
@@ -4529,6 +4537,7 @@ public struct VoiceInkRecordingShortcutBackupImportPlan: Equatable, Sendable {
     private let primaryRecordingShortcutMode: VoiceInkRecordingShortcutMode?
     private let secondaryRecordingShortcutMode: VoiceInkRecordingShortcutMode?
     private let specialShortcutPasteLastTranscriptOnEmptyTap: Bool?
+    private let specialShortcutDoubleShiftTapInterval: Int?
     private let isMiddleClickToggleEnabled: Bool?
     private let middleClickActivationDelay: Int?
 
@@ -4539,7 +4548,8 @@ public struct VoiceInkRecordingShortcutBackupImportPlan: Equatable, Sendable {
         secondaryRecordingShortcutMode: VoiceInkRecordingShortcutMode?,
         specialShortcutPasteLastTranscriptOnEmptyTap: Bool?,
         isMiddleClickToggleEnabled: Bool?,
-        middleClickActivationDelay: Int?
+        middleClickActivationDelay: Int?,
+        specialShortcutDoubleShiftTapInterval: Int?
     ) {
         self.primaryRecordingShortcut = primaryRecordingShortcut
         self.secondaryRecordingShortcut = secondaryRecordingShortcut
@@ -4548,6 +4558,7 @@ public struct VoiceInkRecordingShortcutBackupImportPlan: Equatable, Sendable {
         self.specialShortcutPasteLastTranscriptOnEmptyTap = specialShortcutPasteLastTranscriptOnEmptyTap
         self.isMiddleClickToggleEnabled = isMiddleClickToggleEnabled
         self.middleClickActivationDelay = middleClickActivationDelay
+        self.specialShortcutDoubleShiftTapInterval = specialShortcutDoubleShiftTapInterval
     }
 
     public func applyRuntimeState(
@@ -4557,7 +4568,8 @@ public struct VoiceInkRecordingShortcutBackupImportPlan: Equatable, Sendable {
         setSecondaryRecordingShortcutMode: (VoiceInkRecordingShortcutMode) -> Void,
         setSpecialShortcutPasteLastTranscriptOnEmptyTap: (Bool) -> Void,
         setMiddleClickToggleEnabled: (Bool) -> Void,
-        setMiddleClickActivationDelay: (Int) -> Void
+        setMiddleClickActivationDelay: (Int) -> Void,
+        setSpecialShortcutDoubleShiftTapInterval: (Int) -> Void
     ) {
         if let primaryRecordingShortcut {
             setPrimaryRecordingShortcut(primaryRecordingShortcut)
@@ -4579,6 +4591,9 @@ public struct VoiceInkRecordingShortcutBackupImportPlan: Equatable, Sendable {
         }
         if let middleClickActivationDelay {
             setMiddleClickActivationDelay(middleClickActivationDelay)
+        }
+        if let specialShortcutDoubleShiftTapInterval {
+            setSpecialShortcutDoubleShiftTapInterval(specialShortcutDoubleShiftTapInterval)
         }
     }
 }
@@ -4775,7 +4790,8 @@ public enum VoiceInkRecordingShortcutPreference {
         [
             VoiceInkUserDefaultsKey.isMiddleClickToggleEnabled: VoiceInkPreferenceDefault.isMiddleClickToggleEnabled,
             VoiceInkUserDefaultsKey.middleClickActivationDelay: VoiceInkPreferenceDefault.middleClickActivationDelay,
-            VoiceInkUserDefaultsKey.specialShortcutPasteLastTranscriptOnEmptyTap: VoiceInkPreferenceDefault.specialShortcutPasteLastTranscriptOnEmptyTap
+            VoiceInkUserDefaultsKey.specialShortcutPasteLastTranscriptOnEmptyTap: VoiceInkPreferenceDefault.specialShortcutPasteLastTranscriptOnEmptyTap,
+            VoiceInkUserDefaultsKey.specialShortcutDoubleShiftTapInterval: VoiceInkPreferenceDefault.specialShortcutDoubleShiftTapInterval
         ]
     }
 
@@ -4953,7 +4969,8 @@ public enum VoiceInkRecordingShortcutPreference {
         secondaryRecordingShortcutMode: VoiceInkRecordingShortcutMode,
         specialShortcutPasteLastTranscriptOnEmptyTap: Bool,
         isMiddleClickToggleEnabled: Bool,
-        middleClickActivationDelay: Int
+        middleClickActivationDelay: Int,
+        specialShortcutDoubleShiftTapInterval: Int
     ) -> VoiceInkRecordingShortcutBackupPreferences {
         VoiceInkRecordingShortcutBackupPreferences(
             primaryRecordingShortcutRawValue: primaryRecordingShortcut.rawValue,
@@ -4962,7 +4979,8 @@ public enum VoiceInkRecordingShortcutPreference {
             secondaryRecordingShortcutModeRawValue: secondaryRecordingShortcutMode.rawValue,
             specialShortcutPasteLastTranscriptOnEmptyTap: specialShortcutPasteLastTranscriptOnEmptyTap,
             isMiddleClickToggleEnabled: isMiddleClickToggleEnabled,
-            middleClickActivationDelay: middleClickActivationDelay
+            middleClickActivationDelay: middleClickActivationDelay,
+            specialShortcutDoubleShiftTapInterval: normalizedDoubleShiftTapInterval(specialShortcutDoubleShiftTapInterval)
         )
     }
 
@@ -4976,7 +4994,8 @@ public enum VoiceInkRecordingShortcutPreference {
             secondaryRecordingShortcutMode: backup.secondaryRecordingShortcutModeRawValue.flatMap(VoiceInkRecordingShortcutMode.init(rawValue:)),
             specialShortcutPasteLastTranscriptOnEmptyTap: backup.specialShortcutPasteLastTranscriptOnEmptyTap,
             isMiddleClickToggleEnabled: backup.isMiddleClickToggleEnabled,
-            middleClickActivationDelay: backup.middleClickActivationDelay.map(Self.normalizedMiddleClickActivationDelay)
+            middleClickActivationDelay: backup.middleClickActivationDelay.map(Self.normalizedMiddleClickActivationDelay),
+            specialShortcutDoubleShiftTapInterval: backup.specialShortcutDoubleShiftTapInterval.map(Self.normalizedDoubleShiftTapInterval)
         )
     }
 
@@ -5050,6 +5069,29 @@ public enum VoiceInkRecordingShortcutPreference {
         return formatter
     }
 
+    public static func doubleShiftTapInterval(from defaults: UserDefaults = .standard) -> Int {
+        normalizedDoubleShiftTapInterval(
+            defaults.object(forKey: VoiceInkUserDefaultsKey.specialShortcutDoubleShiftTapInterval) as? Int
+                ?? VoiceInkPreferenceDefault.specialShortcutDoubleShiftTapInterval
+        )
+    }
+
+    public static func saveDoubleShiftTapInterval(_ interval: Int, to defaults: UserDefaults = .standard) {
+        defaults.set(normalizedDoubleShiftTapInterval(interval), forKey: VoiceInkUserDefaultsKey.specialShortcutDoubleShiftTapInterval)
+    }
+
+    public static func normalizedDoubleShiftTapInterval(_ interval: Int) -> Int {
+        interval <= 0 ? 0 : min(max(interval, 100), 1_000)
+    }
+
+    public static func doubleShiftTapIntervalFormatter() -> NumberFormatter {
+        let formatter = NumberFormatter()
+        formatter.minimum = 0
+        formatter.maximum = 1_000
+        formatter.maximumFractionDigits = 0
+        return formatter
+    }
+
     public static func shouldPasteLastTranscriptOnEmptyTap(from defaults: UserDefaults = .standard) -> Bool {
         defaults.object(forKey: VoiceInkUserDefaultsKey.specialShortcutPasteLastTranscriptOnEmptyTap) as? Bool
             ?? VoiceInkPreferenceDefault.specialShortcutPasteLastTranscriptOnEmptyTap
@@ -5070,6 +5112,7 @@ public enum VoiceInkRecordingShortcutPreference {
         defaults.removeObject(forKey: VoiceInkUserDefaultsKey.isMiddleClickToggleEnabled)
         defaults.removeObject(forKey: VoiceInkUserDefaultsKey.middleClickActivationDelay)
         defaults.removeObject(forKey: VoiceInkUserDefaultsKey.specialShortcutPasteLastTranscriptOnEmptyTap)
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.specialShortcutDoubleShiftTapInterval)
     }
 
     private static func shortcutSelectionMigrationPlan(

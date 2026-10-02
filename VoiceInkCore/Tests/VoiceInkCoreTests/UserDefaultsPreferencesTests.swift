@@ -2701,6 +2701,48 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         }
     }
 
+    func testDoubleShiftPreferenceAndBackupRoundTrip() throws {
+        withIsolatedDefaults { defaults in
+            XCTAssertEqual(VoiceInkRecordingShortcutPreference.doubleShiftTapInterval(from: defaults), 300)
+            for (input, expected) in [(-10, 0), (0, 0), (1, 100), (99, 100), (100, 100), (500, 500), (1_000, 1_000), (2_000, 1_000)] {
+                VoiceInkRecordingShortcutPreference.saveDoubleShiftTapInterval(input, to: defaults)
+                XCTAssertEqual(VoiceInkRecordingShortcutPreference.doubleShiftTapInterval(from: defaults), expected)
+            }
+            defaults.set(12, forKey: VoiceInkUserDefaultsKey.specialShortcutDoubleShiftTapInterval)
+            XCTAssertEqual(VoiceInkRecordingShortcutPreference.doubleShiftTapInterval(from: defaults), 100)
+            VoiceInkRecordingShortcutPreference.clear(from: defaults)
+            XCTAssertEqual(VoiceInkRecordingShortcutPreference.doubleShiftTapInterval(from: defaults), 300)
+        }
+        let backup = VoiceInkRecordingShortcutPreference.backupPreferences(
+            primaryRecordingShortcut: .custom, secondaryRecordingShortcut: .none,
+            primaryRecordingShortcutMode: .special, secondaryRecordingShortcutMode: .hybrid,
+            specialShortcutPasteLastTranscriptOnEmptyTap: true, isMiddleClickToggleEnabled: false,
+            middleClickActivationDelay: 200, specialShortcutDoubleShiftTapInterval: 450
+        )
+        let decoded = try JSONDecoder().decode(VoiceInkRecordingShortcutBackupPreferences.self,
+                                               from: JSONEncoder().encode(backup))
+        var currentInterval = 600
+        func importInterval(_ backup: VoiceInkRecordingShortcutBackupPreferences) {
+            VoiceInkRecordingShortcutPreference.backupImportPlan(from: backup).applyRuntimeState(
+                setPrimaryRecordingShortcut: { _ in }, setSecondaryRecordingShortcut: { _ in },
+                setPrimaryRecordingShortcutMode: { _ in }, setSecondaryRecordingShortcutMode: { _ in },
+                setSpecialShortcutPasteLastTranscriptOnEmptyTap: { _ in }, setMiddleClickToggleEnabled: { _ in },
+                setMiddleClickActivationDelay: { _ in }, setSpecialShortcutDoubleShiftTapInterval: { currentInterval = $0 }
+            )
+        }
+        importInterval(try JSONDecoder().decode(VoiceInkRecordingShortcutBackupPreferences.self, from: Data("{}".utf8)))
+        XCTAssertEqual(currentInterval, 600)
+        importInterval(decoded)
+        XCTAssertEqual(currentInterval, 450)
+        importInterval(VoiceInkRecordingShortcutBackupPreferences(
+            primaryRecordingShortcutRawValue: nil, secondaryRecordingShortcutRawValue: nil,
+            primaryRecordingShortcutModeRawValue: nil, secondaryRecordingShortcutModeRawValue: nil,
+            specialShortcutPasteLastTranscriptOnEmptyTap: nil, isMiddleClickToggleEnabled: nil,
+            middleClickActivationDelay: nil, specialShortcutDoubleShiftTapInterval: 2_000
+        ))
+        XCTAssertEqual(currentInterval, 1_000)
+    }
+
     func testShortcutStoragePreferenceStoresDataAndClearedState() {
         withIsolatedDefaults { defaults in
             let shortcutKey = "Shortcut_primaryRecording"
@@ -2765,7 +2807,8 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             secondaryRecordingShortcutMode: .pushToTalk,
             specialShortcutPasteLastTranscriptOnEmptyTap: false,
             isMiddleClickToggleEnabled: true,
-            middleClickActivationDelay: 350
+            middleClickActivationDelay: 350,
+            specialShortcutDoubleShiftTapInterval: 300
         )
 
         XCTAssertEqual(backup.primaryRecordingShortcutRawValue, "custom")
@@ -2792,7 +2835,8 @@ final class UserDefaultsPreferencesTests: XCTestCase {
                 secondaryRecordingShortcutModeRawValue: "invalid-mode",
                 specialShortcutPasteLastTranscriptOnEmptyTap: false,
                 isMiddleClickToggleEnabled: true,
-                middleClickActivationDelay: 350
+                middleClickActivationDelay: 350,
+                specialShortcutDoubleShiftTapInterval: nil
             )
         )
 
@@ -2804,7 +2848,8 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             setSecondaryRecordingShortcutMode: { appliedEvents.append("secondaryMode:\($0.rawValue)") },
             setSpecialShortcutPasteLastTranscriptOnEmptyTap: { appliedEvents.append("paste:\($0)") },
             setMiddleClickToggleEnabled: { appliedEvents.append("middleClick:\($0)") },
-            setMiddleClickActivationDelay: { appliedEvents.append("middleClickDelay:\($0)") }
+            setMiddleClickActivationDelay: { appliedEvents.append("middleClickDelay:\($0)") },
+            setSpecialShortcutDoubleShiftTapInterval: { _ in }
         )
 
         XCTAssertEqual(
@@ -2826,7 +2871,8 @@ final class UserDefaultsPreferencesTests: XCTestCase {
                 secondaryRecordingShortcutModeRawValue: nil,
                 specialShortcutPasteLastTranscriptOnEmptyTap: nil,
                 isMiddleClickToggleEnabled: nil,
-                middleClickActivationDelay: -1
+                middleClickActivationDelay: -1,
+                specialShortcutDoubleShiftTapInterval: nil
             )
         )
 
@@ -2838,7 +2884,8 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             setSecondaryRecordingShortcutMode: { negativeDelayEvents.append("secondaryMode:\($0.rawValue)") },
             setSpecialShortcutPasteLastTranscriptOnEmptyTap: { negativeDelayEvents.append("paste:\($0)") },
             setMiddleClickToggleEnabled: { negativeDelayEvents.append("middleClick:\($0)") },
-            setMiddleClickActivationDelay: { negativeDelayEvents.append("middleClickDelay:\($0)") }
+            setMiddleClickActivationDelay: { negativeDelayEvents.append("middleClickDelay:\($0)") },
+            setSpecialShortcutDoubleShiftTapInterval: { _ in }
         )
 
         XCTAssertEqual(negativeDelayEvents, ["middleClickDelay:0"])

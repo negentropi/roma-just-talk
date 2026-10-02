@@ -2,6 +2,8 @@
 
 ## v1.95.2 - Unreleased
 
+- Double-tap Shift in Special mode to dictate hands-free, then press the assigned shortcut to finish. Set the tap interval in milliseconds or turn the gesture off.
+
 ## v1.95.1 - 2026-09-11
 
 - Explain rejected NVIDIA API keys, missing access, and connection failures instead of showing an internal gRPC error.

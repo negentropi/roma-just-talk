@@ -47,6 +47,14 @@ Current status: visible app branding uses roma-just-talk, while many internal la
 - 🔄 **Smart Modes**: Instantly switch between AI-powered modes optimized for different writing styles and contexts
 - 🤖 **AI Assistant**: Built-in voice assistant mode for a quick chatGPT like conversational assistant
 
+### Dictate hands-free with Special mode
+
+Set a recording shortcut to **Special**. Tap the same Shift key twice, then release it and dictate hands-free. Press and release the assigned Special shortcut to finish. Shift remains the activator even when that shortcut uses another key. When both recording shortcuts use Special, double Shift uses the primary shortcut. Otherwise it uses the secondary Special shortcut.
+
+Set **Double-Shift tap interval** in Settings. The default is **300 ms**. Use **100 to 1000 ms**, or **0** for Off. Each tap can last at most this interval. The gap from the first release to the second press must be shorter than the interval. A press exactly at the deadline starts a new tap sequence.
+
+An assigned Shift shortcut still starts recording immediately on press. A short release waits one interval for the second tap before finishing. A longer hold finishes on release immediately. Shift typing, overlapping Shift keys, and Secure Input do not start hands-free dictation. Shift assigned to another recording shortcut keeps its assigned behavior.
+
 ## Get Started
 
 ### Download

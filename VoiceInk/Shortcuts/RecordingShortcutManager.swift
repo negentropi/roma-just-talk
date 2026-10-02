@@ -1,10 +1,24 @@
 import Foundation
 import AppKit
+import Carbon.HIToolbox
 import os
 import VoiceInkCore
 
 struct SpecialShortcutOptions: Equatable {
     var pasteLastTranscriptOnEmptyTap = VoiceInkPreferenceDefault.specialShortcutPasteLastTranscriptOnEmptyTap
+    var doubleShiftTapIntervalMilliseconds = VoiceInkPreferenceDefault.specialShortcutDoubleShiftTapInterval
+
+    var doubleShiftTapInterval: TimeInterval { Double(doubleShiftTapIntervalMilliseconds) / 1_000 }
+}
+
+struct SpecialShortcutOwner {
+    let action: ShortcutAction
+    let shortcut: Shortcut
+
+    func matchesBareShift(_ keyCode: UInt16) -> Bool {
+        shortcut.isModifierOnly && shortcut.modifierFlags == [.shift] &&
+            (shortcut.keyCode == keyCode || shortcut.keyCode == UInt16.max)
+    }
 }
 
 @MainActor
@@ -62,6 +76,17 @@ class RecordingShortcutManager: ObservableObject {
         }
     }
     
+    @Published var specialShortcutDoubleShiftTapInterval: Int {
+        didSet {
+            let interval = VoiceInkRecordingShortcutPreference.normalizedDoubleShiftTapInterval(specialShortcutDoubleShiftTapInterval)
+            if interval != specialShortcutDoubleShiftTapInterval { specialShortcutDoubleShiftTapInterval = interval }
+            VoiceInkRecordingShortcutPreference.saveDoubleShiftTapInterval(interval)
+            specialOptionsSource.options = specialOptions
+            refreshShortcutMonitoring()
+        }
+    }
+    private var shortcutMonitoringGeneration: UInt64 = 0
+
     private var engine: VoiceInkEngine
     private var recorderUIManager: RecorderUIManager
     private var miniRecorderShortcutManager: MiniRecorderShortcutManager
@@ -116,6 +141,8 @@ class RecordingShortcutManager: ObservableObject {
         self.middleClickActivationDelay = VoiceInkRecordingShortcutPreference.middleClickActivationDelay()
         let specialPasteLastTranscriptOnEmptyTap = VoiceInkRecordingShortcutPreference.shouldPasteLastTranscriptOnEmptyTap()
         self.specialShortcutPasteLastTranscriptOnEmptyTap = specialPasteLastTranscriptOnEmptyTap
+        let doubleShiftTapInterval = VoiceInkRecordingShortcutPreference.doubleShiftTapInterval()
+        self.specialShortcutDoubleShiftTapInterval = doubleShiftTapInterval
 
         let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "RecordingShortcutManager")
         let shortcutModeHandler = RecordingShortcutModeHandler(
@@ -142,7 +169,8 @@ class RecordingShortcutManager: ObservableObject {
         )
         let specialOptionsSource = RecordingShortcutSpecialOptionsSource(
             options: SpecialShortcutOptions(
-                pasteLastTranscriptOnEmptyTap: specialPasteLastTranscriptOnEmptyTap
+                pasteLastTranscriptOnEmptyTap: specialPasteLastTranscriptOnEmptyTap,
+                doubleShiftTapIntervalMilliseconds: doubleShiftTapInterval
             )
         )
 
@@ -270,15 +298,25 @@ class RecordingShortcutManager: ObservableObject {
             recordingMode(for: $0)?.tracksKeyUpEvidence == true
         })
 
+        let specialOwner: SpecialShortcutOwner?
+        if specialShortcutDoubleShiftTapInterval > 0, primaryRecordingShortcutMode == .special, let primaryShortcut {
+            specialOwner = SpecialShortcutOwner(action: .primaryRecording, shortcut: primaryShortcut)
+        } else if specialShortcutDoubleShiftTapInterval > 0, secondaryRecordingShortcutMode == .special, let secondaryShortcut {
+            specialOwner = SpecialShortcutOwner(action: .secondaryRecording, shortcut: secondaryShortcut)
+        } else {
+            specialOwner = nil
+        }
+        let generation = shortcutMonitoringGeneration
+
         let isMonitoring = shortcutMonitor.start(
             shortcuts: shortcuts,
             interruptibleActions: interruptibleRecordingActions,
             secureInputBlockedActions: evidenceTrackedActions,
-            tracksKeyUpEvidence: !evidenceTrackedActions.isEmpty,
+            tracksKeyUpEvidence: !evidenceTrackedActions.isEmpty || specialOwner != nil,
             onKeyDown: { [weak self] action, eventTime in
                 let callbackReceivedAt = ProcessInfo.processInfo.systemUptime
                 Task { @MainActor in
-                    guard let self else { return }
+                    guard let self, self.shortcutMonitoringGeneration == generation else { return }
                     guard let mode = self.recordingMode(for: action) else { return }
                     await self.shortcutModeHandler.handleKeyDown(
                         action: action,
@@ -292,7 +330,7 @@ class RecordingShortcutManager: ObservableObject {
             onKeyUp: { [weak self] action, eventTime, context in
                 let callbackReceivedAt = ProcessInfo.processInfo.systemUptime
                 Task { @MainActor in
-                    guard let self else { return }
+                    guard let self, self.shortcutMonitoringGeneration == generation else { return }
                     if let mode = self.recordingMode(for: action) {
                         await self.shortcutModeHandler.handleKeyUp(
                             action: action,
@@ -309,8 +347,19 @@ class RecordingShortcutManager: ObservableObject {
             },
             onShortcutInterrupted: { [weak self] action, _ in
                 Task { @MainActor in
-                    guard let self, self.recordingMode(for: action) != nil else { return }
+                    guard let self, self.shortcutMonitoringGeneration == generation, self.recordingMode(for: action) != nil else { return }
                     await self.shortcutModeHandler.handleInterruption(action: action)
+                }
+            },
+            shiftObservedAction: specialOwner?.action,
+            onShiftEvent: specialOwner.map { owner in
+                { [weak self] event in
+                    let callbackReceivedAt = ProcessInfo.processInfo.systemUptime
+                    Task { @MainActor in
+                        guard let self, self.shortcutMonitoringGeneration == generation else { return }
+                        await self.shortcutModeHandler.handleShiftEvent(event, owner: owner, options: self.specialOptions,
+                                                                       callbackReceivedAt: callbackReceivedAt)
+                    }
                 }
             }
         )
@@ -387,7 +436,8 @@ class RecordingShortcutManager: ObservableObject {
 
     private var specialOptions: SpecialShortcutOptions {
         SpecialShortcutOptions(
-            pasteLastTranscriptOnEmptyTap: specialShortcutPasteLastTranscriptOnEmptyTap
+            pasteLastTranscriptOnEmptyTap: specialShortcutPasteLastTranscriptOnEmptyTap,
+            doubleShiftTapIntervalMilliseconds: specialShortcutDoubleShiftTapInterval
         )
     }
 
@@ -417,6 +467,7 @@ class RecordingShortcutManager: ObservableObject {
     }
 
     private func removeAllMonitoring() {
+        shortcutMonitoringGeneration &+= 1
         shortcutMonitor.stop()
         
         for monitor in middleClickMonitors {
@@ -427,7 +478,19 @@ class RecordingShortcutManager: ObservableObject {
         middleClickMonitors = []
         middleClickTask?.cancel()
         
-        shortcutModeHandler.reset()
+        var availableRecordingActions: [ShortcutAction] = []
+        if primaryRecordingShortcut == .custom, ShortcutStore.shortcut(for: .primaryRecording) != nil {
+            availableRecordingActions.append(.primaryRecording)
+        }
+        if secondaryRecordingShortcut == .custom, ShortcutStore.shortcut(for: .secondaryRecording) != nil {
+            availableRecordingActions.append(.secondaryRecording)
+        }
+        if VoiceInkPowerModePreference.isUIEnabled() {
+            availableRecordingActions += PowerModeManager.shared.configurations.powerModeShortcutEntries { id in
+                ShortcutStore.shortcut(for: .powerMode(id))
+            }.map { .powerMode($0.configuration.id) }
+        }
+        shortcutModeHandler.resetForMonitorRefresh(availableRecordingActions: availableRecordingActions)
     }
     
     var isShortcutConfigured: Bool {
@@ -489,9 +552,59 @@ final class RecordingShortcutModeHandler {
     private var activeRecordingShortcutAction: ShortcutAction?
     private var interruptedRecordingActions = Set<ShortcutAction>()
     private var activeShortcutCanCancelAccidentalStart = false
-    private var activeSpecialOptions = SpecialShortcutOptions()
     private var lastShortcutPressTime: Date?
     private var activeLatencyTraceToken: VoiceInkLatencyTrace.Token?
+
+    private final class SpecialSession {
+        enum Origin { case started, existing }
+        enum Startup { case pending, complete }
+        var action: ShortcutAction
+        let options: SpecialShortcutOptions
+        let powerModeId: UUID?
+        let origin: Origin
+        var startup: Startup
+
+        init(action: ShortcutAction, options: SpecialShortcutOptions,
+             powerModeId: UUID?, origin: Origin) {
+            self.action = action
+            self.options = options
+            self.powerModeId = powerModeId
+            self.origin = origin
+            self.startup = origin == .started ? .pending : .complete
+        }
+    }
+
+    private struct ShiftPress {
+        let keyCode: UInt16
+        let downAt: TimeInterval
+    }
+
+    private enum SpecialInteraction {
+        case idle
+        case firstShiftHeld(ShiftPress, SpecialSession?)
+        case awaitingSecondShift(ShiftPress, SpecialSession?, releasedAt: TimeInterval, ticket: UInt64)
+        case secondShiftHeld(ShiftPress, SpecialSession?)
+        case held(SpecialSession, downAt: TimeInterval)
+        case latched(SpecialSession)
+        case finishHeld(SpecialSession, downAt: TimeInterval)
+        case stopping(SpecialSession)
+
+        var session: SpecialSession? {
+            switch self {
+            case .idle: return nil
+            case .firstShiftHeld(_, let session), .awaitingSecondShift(_, let session, _, _),
+                 .secondShiftHeld(_, let session): return session
+            case .held(let session, _), .latched(let session), .finishHeld(let session, _),
+                 .stopping(let session): return session
+            }
+        }
+    }
+
+    private var specialInteraction = SpecialInteraction.idle
+    private var specialReleaseTask: Task<Void, Never>?
+    private var specialGeneration: UInt64 = 0
+    private let sleepForSpecialRelease: @MainActor (TimeInterval) async throws -> Void
+    private let scheduleEmptyFallback: @MainActor () -> Void
 
     init(
         logger: Logger,
@@ -499,7 +612,11 @@ final class RecordingShortcutModeHandler {
         isRecorderVisible: @escaping @MainActor () -> Bool,
         recordingState: @escaping @MainActor () -> VoiceInkRecordingState,
         toggleMiniRecorder: @escaping @MainActor (UUID?) async -> Void,
-        cancelRecording: @escaping @MainActor () async -> Void
+        cancelRecording: @escaping @MainActor () async -> Void,
+        sleepForSpecialRelease: @escaping @MainActor (TimeInterval) async throws -> Void = { interval in
+            try await Task.sleep(nanoseconds: UInt64(interval * 1_000_000_000))
+        },
+        scheduleEmptyFallback: @escaping @MainActor () -> Void = { SpecialShortcutEmptyTranscriptionFallback.scheduleFallback() }
     ) {
         self.logger = logger
         self.canHandleShortcutAction = canHandleShortcutAction
@@ -507,16 +624,21 @@ final class RecordingShortcutModeHandler {
         self.recordingState = recordingState
         self.toggleMiniRecorder = toggleMiniRecorder
         self.cancelRecording = cancelRecording
+        self.sleepForSpecialRelease = sleepForSpecialRelease
+        self.scheduleEmptyFallback = scheduleEmptyFallback
     }
 
     func reset() {
+        specialGeneration &+= 1
+        specialReleaseTask?.cancel()
+        specialReleaseTask = nil
+        specialInteraction = .idle
         isShortcutPressed = false
         shortcutPressStartTime = nil
         isHandsFreeRecording = false
         activeRecordingShortcutAction = nil
         interruptedRecordingActions.removeAll()
         activeShortcutCanCancelAccidentalStart = false
-        activeSpecialOptions = SpecialShortcutOptions()
         activeLatencyTraceToken = nil
     }
 
@@ -528,6 +650,28 @@ final class RecordingShortcutModeHandler {
         specialOptions: SpecialShortcutOptions = SpecialShortcutOptions(),
         powerModeId: UUID? = nil
     ) async {
+        specialGeneration &+= 1
+        reconcileSpecialRecording()
+        switch specialInteraction {
+        case .firstShiftHeld(_, nil), .awaitingSecondShift(_, nil, _, _), .secondShiftHeld(_, nil):
+            specialReleaseTask?.cancel()
+            specialReleaseTask = nil
+            specialInteraction = .idle
+        default:
+            break
+        }
+        if case .latched(let session) = specialInteraction, session.action == action {
+            specialInteraction = .finishHeld(session, downAt: eventTime)
+            return
+        }
+        if mode == .special {
+            await handleSpecialKeyDown(action: action, eventTime: eventTime,
+                                       callbackReceivedAt: callbackReceivedAt ?? eventTime,
+                                       options: specialOptions, powerModeId: powerModeId)
+            return
+        }
+        guard specialInteraction.session == nil else { return }
+
         if interruptedRecordingActions.remove(action) != nil {
             return
         }
@@ -544,18 +688,12 @@ final class RecordingShortcutModeHandler {
         isShortcutPressed = true
         activeRecordingShortcutAction = action
         activeShortcutCanCancelAccidentalStart = canCurrentShortcutPressCancelAccidentalStart
-        activeSpecialOptions = specialOptions
         lastShortcutPressTime = now
         shortcutPressStartTime = eventTime
 
         switch mode {
         case .special:
-            await startRecordingIfNeeded(
-                mode: mode,
-                eventTime: eventTime,
-                callbackReceivedAt: callbackReceivedAt ?? eventTime,
-                powerModeId: powerModeId
-            )
+            break
 
         case .pushToTalk:
             await startRecordingIfNeeded(
@@ -605,44 +743,29 @@ final class RecordingShortcutModeHandler {
         specialOptions: SpecialShortcutOptions = SpecialShortcutOptions(),
         powerModeId: UUID? = nil
     ) async {
+        specialGeneration &+= 1
+        reconcileSpecialRecording()
+        if case .finishHeld(let session, _) = specialInteraction, session.action == action {
+            await handleSpecialKeyUp(action: action, eventTime: eventTime, context: context,
+                                     callbackReceivedAt: callbackReceivedAt ?? eventTime)
+            return
+        }
+        if mode == .special {
+            await handleSpecialKeyUp(action: action, eventTime: eventTime, context: context,
+                                     callbackReceivedAt: callbackReceivedAt ?? eventTime)
+            return
+        }
+
         guard isShortcutPressed, activeRecordingShortcutAction == action else { return }
-        let handlerEnteredAt = ProcessInfo.processInfo.systemUptime
-        let callbackTime = callbackReceivedAt ?? eventTime
         let pressDuration = shortcutPressStartTime.map { eventTime - $0 } ?? 0
-        let pressDurationMilliseconds = String(format: "%.1f", pressDuration * 1_000)
-        let keyEvidenceDetails = Self.keyEvidenceTraceDetails(context)
-        VoiceInkLatencyTrace.shared.event(
-            "shortcut.key_up_handler",
-            details: "action=\(action.storageName) mode=\(mode.rawValue) sourceTMs=\(pressDurationMilliseconds) sourceToCallbackMs=\(String(format: "%.1f", max(0, callbackTime - eventTime) * 1_000)) callbackToHandlerMs=\(String(format: "%.1f", max(0, handlerEnteredAt - callbackTime) * 1_000)) state=\(String(describing: recordingState())) \(keyEvidenceDetails)",
-            token: activeLatencyTraceToken
-        )
+        traceKeyUp(action: action, eventTime: eventTime, callbackReceivedAt: callbackReceivedAt ?? eventTime,
+                   mode: mode, pressDuration: pressDuration, context: context)
         isShortcutPressed = false
         activeRecordingShortcutAction = nil
         activeShortcutCanCancelAccidentalStart = false
         switch mode {
         case .special:
-            let options = activeSpecialOptions
-
-            if VoiceInkSpecialShortcutKeyEvidencePolicy.shouldDiscardShortcut(for: context) {
-                VoiceInkLatencyTrace.shared.event(
-                    "shortcut.key_evidence_rejected",
-                    details: keyEvidenceDetails,
-                    token: activeLatencyTraceToken
-                )
-                if isRecorderVisible() {
-                    logger.notice("handleShortcutKeyUp: cancelling special recording; unsafe key evidence")
-                    await cancelRecording()
-                }
-                logger.notice("handleShortcutKeyUp: discarding special shortcut; unsafe key evidence")
-            } else if isRecorderVisible() {
-                guard canHandleShortcutAction() else { return }
-                if options.pasteLastTranscriptOnEmptyTap,
-                   VoiceInkSpecialShortcutEmptyFallbackPolicy.shouldScheduleFallback(pressDuration: pressDuration) {
-                    SpecialShortcutEmptyTranscriptionFallback.scheduleFallback()
-                }
-                logger.notice("handleShortcutKeyUp: stopping recording (special shortcut, duration=\(pressDuration, privacy: .public)s)")
-                await toggleMiniRecorder(powerModeId)
-            }
+            break
 
         case .toggle:
             isHandsFreeRecording = true
@@ -669,10 +792,296 @@ final class RecordingShortcutModeHandler {
         }
 
         shortcutPressStartTime = nil
-        activeSpecialOptions = SpecialShortcutOptions()
         if !isHandsFreeRecording {
             activeLatencyTraceToken = nil
         }
+    }
+
+    func resetForMonitorRefresh(availableRecordingActions: [ShortcutAction]) {
+        reconcileSpecialRecording()
+        let interaction = specialInteraction
+        reset()
+        if case .stopping = interaction {
+            specialInteraction = interaction
+        } else if let session = interaction.session, session.startup == .pending || isRecorderVisible() {
+            if !availableRecordingActions.contains(session.action), let fallback = availableRecordingActions.first {
+                session.action = fallback
+            }
+            specialInteraction = .latched(session)
+        }
+    }
+
+    private func reconcileSpecialRecording() {
+        if case .stopping = specialInteraction { return }
+        guard let session = specialInteraction.session,
+              session.startup == .complete,
+              !isRecorderVisible(), recordingState() == .idle else { return }
+        specialGeneration &+= 1
+        specialReleaseTask?.cancel()
+        specialReleaseTask = nil
+        specialInteraction = .idle
+    }
+
+    private func makeSpecialSession(action: ShortcutAction, options: SpecialShortcutOptions,
+                                    powerModeId: UUID? = nil) -> SpecialSession {
+        return SpecialSession(action: action, options: options,
+                              powerModeId: powerModeId, origin: isRecorderVisible() ? .existing : .started)
+    }
+
+    private func handleSpecialKeyDown(action: ShortcutAction, eventTime: TimeInterval,
+                                      callbackReceivedAt: TimeInterval, options: SpecialShortcutOptions,
+                                      powerModeId: UUID?) async {
+        switch specialInteraction {
+        case .latched(let session) where session.action == action:
+            specialInteraction = .finishHeld(session, downAt: eventTime)
+        case .idle:
+            guard !isShortcutPressed, canHandleShortcutAction() else { return }
+            let session = makeSpecialSession(action: action, options: options, powerModeId: powerModeId)
+            specialInteraction = .held(session, downAt: eventTime)
+            await startSpecialRecording(session, eventTime: eventTime, callbackReceivedAt: callbackReceivedAt)
+        default:
+            break
+        }
+    }
+
+    private func handleSpecialKeyUp(action: ShortcutAction, eventTime: TimeInterval,
+                                    context: VoiceInkShortcutPressContext, callbackReceivedAt: TimeInterval) async {
+        traceSpecialKeyUp(action: action, eventTime: eventTime, callbackReceivedAt: callbackReceivedAt, context: context)
+        switch specialInteraction {
+        case .held(let session, let downAt) where session.action == action:
+            if VoiceInkSpecialShortcutKeyEvidencePolicy.shouldDiscardShortcut(for: context) {
+                await rejectSpecialInteraction(context: context)
+            } else {
+                await finishSpecialRecording(session, emptyTapDuration: eventTime - downAt)
+            }
+        case .finishHeld(let session, _) where session.action == action:
+            if VoiceInkSpecialShortcutKeyEvidencePolicy.shouldDiscardShortcut(for: context) {
+                traceRejectedSpecialEvidence(context)
+                specialInteraction = .latched(session)
+            } else {
+                await finishSpecialRecording(session)
+            }
+        default:
+            break
+        }
+    }
+
+    func handleShiftEvent(_ event: ShiftShortcutEvent, owner: SpecialShortcutOwner,
+                          options: SpecialShortcutOptions, callbackReceivedAt: TimeInterval? = nil) async {
+        reconcileSpecialRecording()
+        specialGeneration &+= 1
+        let eventTicket = specialGeneration
+        let callbackTime = callbackReceivedAt ?? event.time
+        if event.edge == .up, owner.matchesBareShift(event.keyCode) {
+            traceSpecialKeyUp(action: owner.action, eventTime: event.time, callbackReceivedAt: callbackTime,
+                              context: event.context)
+        }
+        guard options.doubleShiftTapInterval > 0 else { return }
+        if event.edge == .invalidated {
+            switch specialInteraction {
+            case .held:
+                return
+            case .finishHeld where !(owner.shortcut.isModifierOnly && owner.shortcut.modifierFlags == [.shift]):
+                return
+            default:
+                break
+            }
+            await rejectSpecialInteraction(context: event.context)
+            return
+        }
+        if VoiceInkSpecialShortcutKeyEvidencePolicy.shouldDiscardShortcut(for: event.context) {
+            await rejectSpecialInteraction(context: event.context)
+            return
+        }
+
+        switch (specialInteraction, event.edge) {
+        case (.held(let session, let downAt), .up):
+            if session.action == owner.action, owner.matchesBareShift(event.keyCode) {
+                await finishSpecialRecording(session, emptyTapDuration: event.time - downAt)
+            }
+        case (.latched(let session), .down):
+            if session.action == owner.action, owner.matchesBareShift(event.keyCode) {
+                specialInteraction = .finishHeld(session, downAt: event.time)
+            }
+        case (.finishHeld(let session, _), .up):
+            if owner.matchesBareShift(event.keyCode) {
+                await finishSpecialRecording(session)
+            }
+        case (.idle, .down):
+            guard !isShortcutPressed, canHandleShortcutAction() else { return }
+            if isRecorderVisible(), owner.matchesBareShift(event.keyCode) {
+                specialInteraction = .held(makeSpecialSession(action: owner.action, options: options), downAt: event.time)
+                return
+            }
+            guard !isRecorderVisible(), recordingState() == .idle else { return }
+            let session = owner.matchesBareShift(event.keyCode)
+                ? makeSpecialSession(action: owner.action, options: options) : nil
+            specialInteraction = .firstShiftHeld(ShiftPress(keyCode: event.keyCode, downAt: event.time), session)
+            if let session {
+                await startSpecialRecording(session, eventTime: event.time, callbackReceivedAt: callbackTime)
+            }
+        case (.firstShiftHeld(let press, let session), .up) where press.keyCode == event.keyCode:
+            let interval = session?.options.doubleShiftTapInterval ?? options.doubleShiftTapInterval
+            if event.time - press.downAt <= interval {
+                specialGeneration &+= 1
+                let ticket = specialGeneration
+                specialInteraction = .awaitingSecondShift(press, session, releasedAt: event.time, ticket: ticket)
+                specialReleaseTask = Task { [weak self, sleepForSpecialRelease] in
+                    do {
+                        try await sleepForSpecialRelease(interval)
+                        guard !Task.isCancelled else { return }
+                        await self?.expireSpecialShiftRelease(ticket: ticket)
+                    } catch {}
+                }
+            } else if let session {
+                await finishSpecialRecording(session, emptyTapDuration: event.time - press.downAt)
+            } else {
+                specialInteraction = .idle
+            }
+        case (.awaitingSecondShift(let first, let session, let releasedAt, let ticket), .down):
+            let interval = session?.options.doubleShiftTapInterval ?? options.doubleShiftTapInterval
+            if first.keyCode == event.keyCode, event.time >= releasedAt, event.time - releasedAt < interval {
+                specialReleaseTask?.cancel()
+                specialReleaseTask = nil
+                specialInteraction = .secondShiftHeld(ShiftPress(keyCode: event.keyCode, downAt: event.time), session)
+            } else {
+                await expireSpecialShiftRelease(ticket: ticket)
+                guard specialGeneration == eventTicket else { return }
+                await handleShiftEvent(event, owner: owner, options: options, callbackReceivedAt: callbackTime)
+            }
+        case (.secondShiftHeld(let press, let session), .up) where press.keyCode == event.keyCode:
+            let interval = session?.options.doubleShiftTapInterval ?? options.doubleShiftTapInterval
+            if event.time - press.downAt <= interval {
+                if let session {
+                    specialInteraction = .latched(session)
+                } else {
+                    guard !isRecorderVisible(), recordingState() == .idle, canHandleShortcutAction() else {
+                        specialInteraction = .idle
+                        return
+                    }
+                    let session = makeSpecialSession(action: owner.action, options: options)
+                    specialInteraction = .latched(session)
+                    await startSpecialRecording(session, eventTime: event.time, callbackReceivedAt: callbackTime)
+                }
+            } else if let session {
+                await finishSpecialRecording(session)
+            } else {
+                specialInteraction = .idle
+            }
+        default:
+            break
+        }
+    }
+
+    private func expireSpecialShiftRelease(ticket: UInt64) async {
+        guard case .awaitingSecondShift(let press, let session, let releasedAt, let currentTicket) = specialInteraction,
+              ticket == currentTicket else { return }
+        specialReleaseTask?.cancel()
+        specialReleaseTask = nil
+        if let session {
+            await finishSpecialRecording(session, emptyTapDuration: releasedAt - press.downAt)
+        } else {
+            specialInteraction = .idle
+        }
+    }
+
+    private func rejectSpecialInteraction(context: VoiceInkShortcutPressContext) async {
+        switch specialInteraction {
+        case .idle, .latched, .stopping:
+            break
+        default:
+            traceRejectedSpecialEvidence(context)
+        }
+        switch specialInteraction {
+        case .finishHeld(let session, _):
+            specialInteraction = .latched(session)
+        case .firstShiftHeld(_, let session), .awaitingSecondShift(_, let session, _, _),
+             .secondShiftHeld(_, let session):
+            await discardSpecialSession(session)
+        case .held(let session, _):
+            await discardSpecialSession(session)
+        case .idle, .latched, .stopping:
+            break
+        }
+    }
+
+    private func discardSpecialSession(_ session: SpecialSession?) async {
+        specialReleaseTask?.cancel()
+        specialReleaseTask = nil
+        guard let session, session.origin == .started else {
+            specialInteraction = .idle
+            return
+        }
+        specialInteraction = .stopping(session)
+        await cancelRecording()
+        if specialInteraction.session === session {
+            specialInteraction = .idle
+            activeLatencyTraceToken = nil
+        }
+    }
+
+    private func startSpecialRecording(_ session: SpecialSession, eventTime: TimeInterval,
+                                       callbackReceivedAt: TimeInterval) async {
+        guard session.origin == .started else { return }
+        await startRecordingIfNeeded(mode: .special, eventTime: eventTime,
+                                     callbackReceivedAt: callbackReceivedAt, powerModeId: session.powerModeId)
+        session.startup = .complete
+        if specialInteraction.session === session { reconcileSpecialRecording() }
+    }
+
+    private func finishSpecialRecording(_ session: SpecialSession, emptyTapDuration: TimeInterval? = nil) async {
+        guard specialInteraction.session === session, canHandleShortcutAction(),
+              isRecorderVisible() || session.startup == .pending else { return }
+        specialReleaseTask?.cancel()
+        specialReleaseTask = nil
+        specialInteraction = .stopping(session)
+        isHandsFreeRecording = false
+        if session.options.pasteLastTranscriptOnEmptyTap, let emptyTapDuration,
+           VoiceInkSpecialShortcutEmptyFallbackPolicy.shouldScheduleFallback(pressDuration: emptyTapDuration) {
+            scheduleEmptyFallback()
+        }
+        await toggleMiniRecorder(session.powerModeId)
+        if specialInteraction.session === session {
+            specialInteraction = .idle
+            activeLatencyTraceToken = nil
+        }
+    }
+
+    private func traceSpecialKeyUp(action: ShortcutAction, eventTime: TimeInterval,
+                                   callbackReceivedAt: TimeInterval, context: VoiceInkShortcutPressContext) {
+        let session: SpecialSession
+        let downAt: TimeInterval
+        switch specialInteraction {
+        case .firstShiftHeld(let press, .some(let current)), .secondShiftHeld(let press, .some(let current)):
+            session = current
+            downAt = press.downAt
+        case .held(let current, let pressedAt), .finishHeld(let current, let pressedAt):
+            session = current
+            downAt = pressedAt
+        default:
+            return
+        }
+        guard session.action == action else { return }
+        traceKeyUp(action: action, eventTime: eventTime, callbackReceivedAt: callbackReceivedAt,
+                   mode: .special, pressDuration: eventTime - downAt, context: context)
+    }
+
+    private func traceKeyUp(action: ShortcutAction, eventTime: TimeInterval, callbackReceivedAt: TimeInterval,
+                            mode: RecordingShortcutManager.Mode, pressDuration: TimeInterval,
+                            context: VoiceInkShortcutPressContext) {
+        let handlerEnteredAt = ProcessInfo.processInfo.systemUptime
+        let pressDurationMilliseconds = String(format: "%.1f", pressDuration * 1_000)
+        let keyEvidenceDetails = Self.keyEvidenceTraceDetails(context)
+        VoiceInkLatencyTrace.shared.event(
+            "shortcut.key_up_handler",
+            details: "action=\(action.storageName) mode=\(mode.rawValue) sourceTMs=\(pressDurationMilliseconds) sourceToCallbackMs=\(String(format: "%.1f", max(0, callbackReceivedAt - eventTime) * 1_000)) callbackToHandlerMs=\(String(format: "%.1f", max(0, handlerEnteredAt - callbackReceivedAt) * 1_000)) state=\(String(describing: recordingState())) \(keyEvidenceDetails)",
+            token: activeLatencyTraceToken
+        )
+    }
+
+    private func traceRejectedSpecialEvidence(_ context: VoiceInkShortcutPressContext) {
+        VoiceInkLatencyTrace.shared.event("shortcut.key_evidence_rejected",
+                                         details: Self.keyEvidenceTraceDetails(context), token: activeLatencyTraceToken)
     }
 
     nonisolated static func keyEvidenceTraceDetails(_ context: VoiceInkShortcutPressContext) -> String {
@@ -680,6 +1089,10 @@ final class RecordingShortcutModeHandler {
     }
 
     func handleInterruption(action: ShortcutAction) async {
+        if specialInteraction.session?.action == action {
+            await rejectSpecialInteraction(context: VoiceInkShortcutPressContext(didPressOtherKeyDuringPress: true))
+            return
+        }
         guard isShortcutPressed, activeRecordingShortcutAction == action else {
             if canCurrentShortcutPressCancelAccidentalStart {
                 interruptedRecordingActions.insert(action)

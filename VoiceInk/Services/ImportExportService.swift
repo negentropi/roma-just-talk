@@ -196,7 +196,8 @@ class ImportExportService {
             secondaryRecordingShortcutMode: recordingShortcutManager.secondaryRecordingShortcutMode,
             specialShortcutPasteLastTranscriptOnEmptyTap: recordingShortcutManager.specialShortcutPasteLastTranscriptOnEmptyTap,
             isMiddleClickToggleEnabled: recordingShortcutManager.isMiddleClickToggleEnabled,
-            middleClickActivationDelay: recordingShortcutManager.middleClickActivationDelay
+            middleClickActivationDelay: recordingShortcutManager.middleClickActivationDelay,
+            specialShortcutDoubleShiftTapInterval: recordingShortcutManager.specialShortcutDoubleShiftTapInterval
         )
         let macOSShellBackupPreferences = VoiceInkMacOSShellBackupPreference.backupPreferences(
             launchAtLoginEnabled: LaunchAtLogin.isEnabled,

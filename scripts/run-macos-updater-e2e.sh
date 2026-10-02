@@ -180,6 +180,8 @@ cp "$xctestrun_file" "$work_dir/UpdaterE2E.xctestrun"
 
 defaults delete com.negentropi.RomaJustTalk 2>/dev/null || true
 defaults write com.negentropi.RomaJustTalk hasCompletedOnboarding -bool true
+# The updater UI test requires a foreground app with its main window visible.
+defaults write com.negentropi.RomaJustTalk IsMenuBarOnly -bool false
 defaults write com.negentropi.RomaJustTalk CurrentTranscriptionModel -string roma-updater-e2e-no-model
 defaults write com.negentropi.RomaJustTalk automaticUpdatesEnabled -bool true
 

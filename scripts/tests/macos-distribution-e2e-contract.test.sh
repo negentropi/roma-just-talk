@@ -404,7 +404,7 @@ require_text "$RUNTIME_RUNNER" 'empty_final_verifier_arguments+=("$baseline_repo
 require_text "$RUNTIME_RUNNER" 'Paired empty-final proof requires different baseline and candidate app executables'
 require_text "$HANDOFF_HELPER" 'requires only the verified first-launch PID'
 require_text "$HANDOFF_HELPER" 'must not use an external model cache'
-require_text "$HANDOFF_HELPER" 'did not create the live model directory'
+require_text "$HANDOFF_HELPER" 'must contain only real directories'
 
 distribution_termination_line="$(
   grep -n '^  terminate_runtime_voiceink_pid "$expected_first_launch_pid"' \
@@ -464,9 +464,9 @@ require_text "$RUNNER" 'open location artifactURL'
 require_text "$RUNNER" 'wait_for_matching_browser_download'
 require_text "$RUNNER" 'downloaded GitHub Actions archive does not match its artifact digest'
 require_text "$RUNNER" 'unset GH_TOKEN'
-require_text "$RUNNER" 'approved first launch did not create the live FluidAudio model directory'
+require_text "$RUNNER" 'first launch left invalid FluidAudio model storage'
 require_text "$RUNNER" 'first-launch-live-model-state.txt'
-require_text "$RUNNER" 'live_model_state=created_by_verified_first_launch'
+require_text "$RUNNER" 'distribution_live_model_state "$live_model_directory"'
 require_text "$RUNNER" 'DISTRIBUTION_E2E_EXPECTATION'
 require_text "$RUNNER" 'DISTRIBUTION_E2E_EXPECTED_REJECTED_FRAMEWORK'
 require_text "$RUNNER" 'known-bad-framework-signature'

@@ -30,6 +30,7 @@ distribution_runtime_validate_handoff \
   4812 \
   "$MODEL_DIRECTORY" \
   ""
+test "$(distribution_live_model_state "$MODEL_DIRECTORY")" = present
 
 expect_failure \
   "missing the verified first-launch PID" \
@@ -49,15 +50,20 @@ expect_failure \
   4812 4812 "$MODEL_DIRECTORY" "$TEMP_ROOT/cache"
 
 rmdir "$MODEL_DIRECTORY"
+distribution_runtime_validate_handoff 4812 4812 "$MODEL_DIRECTORY" ""
+test "$(distribution_live_model_state "$MODEL_DIRECTORY")" = absent
+
+touch "$MODEL_DIRECTORY"
 expect_failure \
-  "did not create the live model directory" \
+  "must contain only real directories" \
   distribution_runtime_validate_handoff \
   4812 4812 "$MODEL_DIRECTORY" ""
+rm "$MODEL_DIRECTORY"
 
 ln -s "$TEMP_ROOT/cache" "$MODEL_DIRECTORY"
 mkdir -p "$TEMP_ROOT/cache"
 expect_failure \
-  "did not create the live model directory" \
+  "must contain only real directories" \
   distribution_runtime_validate_handoff \
   4812 4812 "$MODEL_DIRECTORY" ""
 
@@ -66,7 +72,15 @@ rmdir "$TEMP_ROOT/cache" "$TEMP_ROOT/Models"
 mkdir -p "$TEMP_ROOT/cache/parakeet-tdt-0.6b-v2"
 ln -s "$TEMP_ROOT/cache" "$TEMP_ROOT/Models"
 expect_failure \
-  "did not create the live model directory" \
+  "must contain only real directories" \
+  distribution_runtime_validate_handoff \
+  4812 4812 "$MODEL_DIRECTORY" ""
+
+rm "$TEMP_ROOT/Models"
+rmdir "$TEMP_ROOT/cache/parakeet-tdt-0.6b-v2" "$TEMP_ROOT/cache"
+ln -s "$TEMP_ROOT/other-cache" "$TEMP_ROOT/Models"
+expect_failure \
+  "must contain only real directories" \
   distribution_runtime_validate_handoff \
   4812 4812 "$MODEL_DIRECTORY" ""
 

@@ -344,6 +344,12 @@ Those cases are the five repetitions of each TextEdit/Safari
 empty/existing-text condition. Ordinary
 runtime lanes keep the existing reused-process behavior.
 
+Onboarding can skip model download. The first launch therefore records model
+storage as `absent` or `present`; both are valid. Symlinks and non-directory
+storage paths remain rejected. The later runtime smoke prepares and verifies its
+pinned model in the normal local directory after the first process terminates.
+It does not attribute those downloaded files to the first launch.
+
 The exact result is stored in
 `runtime-empty-final-regression-verdict.txt`. The distribution chain also records
 the requested expectation. A matched `known-bad` run reports

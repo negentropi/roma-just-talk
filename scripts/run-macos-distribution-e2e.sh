@@ -60,6 +60,7 @@ verifier="$repo_root/scripts/verify-macos-distribution-launch.sh"
 finder_extraction_classifier="$repo_root/scripts/macos-finder-extraction-state.sh"
 source "$repo_root/scripts/macos-bundle-manifest.sh"
 source "$repo_root/scripts/macos-distribution-contract.sh"
+source "$repo_root/scripts/macos-distribution-runtime-handoff.sh"
 distribution_root="$stage_root/macos-distribution-e2e"
 distribution_evidence="$evidence/macos-distribution-e2e"
 desktop="$HOME/Desktop"
@@ -1340,18 +1341,15 @@ if grep -Eiq \
   "$approval_log"; then
   fail "dyld or code-signature failure appeared during the approval window"
 fi
-if [[ ! -d "$live_model_directory" \
-  || -L "$(dirname "$live_model_directory")" \
-  || -L "$live_model_directory" ]]; then
-  fail "approved first launch did not create the live FluidAudio model directory"
-fi
+live_model_state="$(distribution_live_model_state "$live_model_directory")" \
+  || fail "first launch left invalid FluidAudio model storage"
 {
-  printf 'live_model_state=created_by_verified_first_launch\n'
+  printf 'live_model_state=%s\n' "$live_model_state"
   printf 'first_launch_pid=%s\n' "$launched_pid"
   printf 'live_model_directory=%s\n' "$live_model_directory"
-  find "$live_model_directory" -type f -print 2>/dev/null \
-    | LC_ALL=C sort \
-    || true
+  if [[ "$live_model_state" == present ]]; then
+    find "$live_model_directory" -type f -print | LC_ALL=C sort
+  fi
 } > "$distribution_evidence/first-launch-live-model-state.txt"
 
 write_macos_bundle_manifest \
@@ -1407,7 +1405,7 @@ mark_phase complete
   printf 'source_app=%s\n' "$extracted_app"
   printf 'launched_pid=%s\n' "$launched_pid"
   printf 'live_model_directory=%s\n' "$live_model_directory"
-  printf 'live_model_state=created_by_verified_first_launch\n'
+  printf 'live_model_state=%s\n' "$live_model_state"
   printf 'launch_verification=passed\n'
 } > "$verdict_file"
 

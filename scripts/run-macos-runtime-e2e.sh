@@ -672,12 +672,14 @@ if [ "$require_app_translocation" = true ]; then
     "$observed_voiceink_pids" \
     "$model_directory" \
     "$external_model_cache"
+  first_launch_model_state="$(distribution_live_model_state "$model_directory")"
   terminate_runtime_voiceink_pid "$expected_first_launch_pid"
   {
     printf 'distribution_runtime_handoff=passed\n'
     printf 'first_launch_pid=%s\n' "$expected_first_launch_pid"
     printf 'first_launch_termination=normal\n'
     printf 'runtime_model_directory=%s\n' "$model_directory"
+    printf 'first_launch_model_state=%s\n' "$first_launch_model_state"
     printf 'external_model_cache=%s\n' "${external_model_cache:-absent}"
   } > "$evidence/distribution-runtime-handoff.txt"
   while IFS= read -r first_launch_model_file; do
@@ -688,7 +690,11 @@ if [ "$require_app_translocation" = true ]; then
       "$first_launch_sha256" \
       "$first_launch_size" \
       "$first_launch_relative_path"
-  done < <(find "$model_directory" -type f -print | LC_ALL=C sort) \
+  done < <(
+    if [ "$first_launch_model_state" = present ]; then
+      find "$model_directory" -type f -print | LC_ALL=C sort
+    fi
+  ) \
     > "$evidence/first-launch-live-model-files-after-termination.sha256"
   : > "$runtime_termination_events"
 else

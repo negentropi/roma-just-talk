@@ -11,8 +11,14 @@ EVIDENCE="$TEMP_ROOT/evidence"
 OUTPUT="$TEMP_ROOT/verifier-output.txt"
 fixture_pid=""
 unrelated_pid=""
+capture_verifier_pid=""
 
 cleanup() {
+  local test_exit_code=$?
+  if [[ -n "$capture_verifier_pid" ]]; then
+    kill -KILL "$capture_verifier_pid" 2>/dev/null || true
+    wait "$capture_verifier_pid" 2>/dev/null || true
+  fi
   if [[ -n "$fixture_pid" ]]; then
     kill -KILL "$fixture_pid" 2>/dev/null || true
     wait "$fixture_pid" 2>/dev/null || true
@@ -21,7 +27,7 @@ cleanup() {
     kill -KILL "$unrelated_pid" 2>/dev/null || true
     wait "$unrelated_pid" 2>/dev/null || true
   fi
-  if [[ "${KEEP_DISTRIBUTION_FIXTURE:-false}" == "true" ]]; then
+  if [[ "${KEEP_DISTRIBUTION_FIXTURE:-false}" == "true" || "$test_exit_code" -ne 0 ]]; then
     echo "preserved distribution fixture: $TEMP_ROOT" >&2
   else
     rm -rf "$TEMP_ROOT"
@@ -257,17 +263,44 @@ expect_failure \
 stop_fixture
 
 start_fixture
+capture_evidence="$TEMP_ROOT/capture-evidence"
+capture_app="$(cd "$APP" && pwd -P)"
+mkdir -p "$capture_evidence" "$TEMP_ROOT/slow-inspection-tools"
+cat > "$TEMP_ROOT/slow-inspection-tools/lsof" <<'SCRIPT'
+#!/bin/bash
+marker="$(dirname "$0")/delay-applied"
+if [[ ! -e "$marker" ]]; then
+  : > "$marker"
+  sleep 3
+fi
+exec /usr/sbin/lsof "$@"
+SCRIPT
+chmod +x "$TEMP_ROOT/slow-inspection-tools/lsof"
+PATH="$TEMP_ROOT/slow-inspection-tools:$PATH" \
 DISTRIBUTION_E2E_REQUIRE_TRANSLOCATION=false \
 DISTRIBUTION_E2E_CAPTURE_MAPPED_CODE_UNTIL_EXIT=true \
 DISTRIBUTION_E2E_CAPTURE_TIMEOUT_SECONDS=30 \
 DISTRIBUTION_E2E_STABILITY_SECONDS=0 \
-  bash "$VERIFIER" "$APP" "$fixture_pid" "$EVIDENCE" &
+  bash "$VERIFIER" "$APP" "$fixture_pid" "$capture_evidence" &
 capture_verifier_pid=$!
-sleep 2
+capture_ready_deadline=$((SECONDS + 30))
+until grep -Fxq "pid=$fixture_pid" "$capture_evidence/launch-identity.txt" 2>/dev/null \
+  && grep -Fxq "$capture_app/Contents/MacOS/Fixture" "$capture_evidence/process-mapped-paths-through-runtime.txt" 2>/dev/null \
+  && grep -Fxq "$capture_app/Contents/Frameworks/RomaDistributionFixtureLeaf.framework/Versions/A/RomaDistributionFixtureLeaf" "$capture_evidence/process-mapped-paths-through-runtime.txt" 2>/dev/null \
+  && [[ -s "$capture_evidence/process-open-files-runtime-sample.txt" ]]; do
+  if (( SECONDS >= capture_ready_deadline )) \
+    || ! kill -0 "$fixture_pid" 2>/dev/null \
+    || ! kill -0 "$capture_verifier_pid" 2>/dev/null; then
+    echo 'Capture verifier did not observe the live fixture before termination' >&2
+    exit 1
+  fi
+  sleep 0.1
+done
 stop_fixture
 wait "$capture_verifier_pid"
+capture_verifier_pid=""
 grep -Fq 'capture_mapped_code_until_exit=true' \
-  "$EVIDENCE/distribution-launch-verdict.txt"
+  "$capture_evidence/distribution-launch-verdict.txt"
 
 start_fixture
 expect_failure \

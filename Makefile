@@ -5,6 +5,7 @@ FRAMEWORK_PATH := $(WHISPER_CPP_DIR)/build-apple/whisper.xcframework
 STATIC_WHISPER_XCFRAMEWORK_CHECK := scripts/verify-static-whisper-xcframework.sh
 STATIC_WHISPER_APP_CHECK := scripts/verify-static-whisper-app.sh
 ADHOC_LIBRARY_VALIDATION_CHECK := scripts/verify-adhoc-library-validation.sh
+MACOS_DEPLOYMENT_CHECK := scripts/check-macos-deployment-target.py
 LOCAL_DERIVED_DATA := $(CURDIR)/.local-build
 LOCAL_APP_DEST := $(HOME)/Applications/roma just talk.app
 LATENCY_HARNESS := $(LOCAL_DERIVED_DATA)/Tools/VisibleTextLatencyHarness
@@ -57,6 +58,7 @@ healthcheck: check
 latency-harness-build:
 	@mkdir -p "$(dir $(LATENCY_HARNESS))"
 	swiftc "$(LATENCY_HARNESS_SOURCE)" \
+		-target "$$(uname -m)-apple-macosx14.2.1" \
 		-framework AppKit \
 		-framework ApplicationServices \
 		-o "$(LATENCY_HARNESS)"
@@ -278,11 +280,13 @@ local: check setup
 		echo "Verifying the built app before installation..."; \
 		if ! bash "$(STATIC_WHISPER_APP_CHECK)" "$$APP_PATH"; then exit 1; fi; \
 		if ! bash "$(ADHOC_LIBRARY_VALIDATION_CHECK)" "$$APP_PATH"; then exit 1; fi; \
+		if ! python3 "$(MACOS_DEPLOYMENT_CHECK)" "$$APP_PATH"; then exit 1; fi; \
 		if ! mkdir -p "$$(dirname "$$STAGED_APP")"; then exit 1; fi; \
 		if ! ditto "$$APP_PATH" "$$STAGED_APP"; then exit 1; fi; \
 		if ! xattr -cr "$$STAGED_APP"; then exit 1; fi; \
 		if ! bash "$(STATIC_WHISPER_APP_CHECK)" "$$STAGED_APP"; then exit 1; fi; \
 		if ! bash "$(ADHOC_LIBRARY_VALIDATION_CHECK)" "$$STAGED_APP"; then exit 1; fi; \
+		if ! python3 "$(MACOS_DEPLOYMENT_CHECK)" "$$STAGED_APP"; then exit 1; fi; \
 		echo "Copying roma just talk.app to $(LOCAL_APP_DEST)..."; \
 		if ! mkdir -p "$$(dirname "$(LOCAL_APP_DEST)")"; then exit 1; fi; \
 		if [ -e "$(LOCAL_APP_DEST)" ]; then \

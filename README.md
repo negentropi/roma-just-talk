@@ -5,7 +5,7 @@
   
 
   [![License](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-  ![Platform](https://img.shields.io/badge/platform-macOS%2014.0%2B-brightgreen)
+  ![Platform](https://img.shields.io/badge/platform-macOS%2014.2.1%2B-brightgreen)
   [![GitHub release (latest by date)](https://img.shields.io/github/v/release/happyf-weallareeuropean/roma-just-talk)](https://github.com/happyf-weallareeuropean/roma-just-talk/releases)
   ![GitHub all releases](https://img.shields.io/github/downloads/happyf-weallareeuropean/roma-just-talk/total)
   [![GitHub stars](https://img.shields.io/github/stars/happyf-weallareeuropean/roma-just-talk?style=for-the-badge&logo=github&logoColor=white&label=Stars&labelColor=000000&color=111111)](https://github.com/happyf-weallareeuropean/roma-just-talk)
@@ -68,7 +68,7 @@ You can build the app yourself by following [BUILDING.md](BUILDING.md).
 
 ## Requirements
 
-- macOS 14.4 or later
+- macOS 14.2.1 or later
 
 ## Documentation
 

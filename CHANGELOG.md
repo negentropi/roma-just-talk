@@ -2,6 +2,8 @@
 
 ## v1.95.2 - Unreleased
 
+- Lower the Mac app and helper minimum to Sonoma 14.2.1, and reject build payloads that require a newer Mac version before installation.
+
 - Add a manually triggered Codemagic Mac M2 workflow for shared core checks and downloadable macOS app builds.
 
 ## v1.95.1 - 2026-09-11

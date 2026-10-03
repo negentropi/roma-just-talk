@@ -5,7 +5,7 @@ This guide provides detailed instructions for building VoiceInk from source.
 ## Prerequisites
 
 Before you begin, ensure you have:
-- macOS 14.4 or later
+- macOS 14.2.1 or later for the app; Xcode requires its own supported host version
 - Xcode (latest version recommended)
 - Swift (latest version recommended)
 - Git (for cloning repositories)
@@ -66,6 +66,10 @@ open ~/Downloads/VoiceInk.app
 ```
 
 This builds VoiceInk with ad-hoc signing using a separate build configuration (`LocalBuild.xcconfig`) that requires no Apple Developer account.
+Before installation, the deployment gate checks each bundled Mac executable and
+helper against the 14.2.1 floor. This structural check cannot prove first launch.
+Browser-downloaded ad-hoc builds still require macOS per-app approval. Ordinary
+first Open without that exception requires a Developer ID signed, notarized build.
 Whisper is part of the app executable, so the local build does not need a separately signed Whisper dynamic framework at launch.
 The local entitlement set disables Hardened Runtime Library Validation because the app still loads the bundled MediaRemoteAdapter and Sparkle frameworks. Without a Developer ID Team ID, macOS 26.4.1 can reject those separately signed objects when Gatekeeper runs the app through App Translocation. Normal certificate-signed builds keep Library Validation enabled.
 

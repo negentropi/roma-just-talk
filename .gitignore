@@ -80,6 +80,7 @@ iOSInjectionProject/
 
 # macOS
 .DS_Store
+__pycache__/
 .AppleDouble
 .LSOverride
 

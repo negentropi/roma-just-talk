@@ -15,6 +15,8 @@ on:
       - "Makefile"
       - "Tools/**"
       - "scripts/check-find-reusable-ci-run.sh"
+      - "scripts/check-macos-deployment-target.py"
+      - "scripts/tests/macos-deployment-target.test.py"
       - "scripts/find-reusable-ci-run.sh"
       - "scripts/run-macos-ci-unit-tests.sh"
       - "scripts/verify-macos-release-instrumentation.sh"
@@ -56,6 +58,8 @@ on:
       - "Makefile"
       - "Tools/**"
       - "scripts/check-find-reusable-ci-run.sh"
+      - "scripts/check-macos-deployment-target.py"
+      - "scripts/tests/macos-deployment-target.test.py"
       - "scripts/find-reusable-ci-run.sh"
       - "scripts/run-macos-ci-unit-tests.sh"
       - "scripts/verify-macos-release-instrumentation.sh"
@@ -235,6 +239,9 @@ jobs:
 
       - name: Verify ad-hoc Library Validation packaging contract
         run: bash scripts/tests/verify-adhoc-library-validation.test.sh
+
+      - name: Verify macOS deployment command parsing
+        run: python3 scripts/tests/macos-deployment-target.test.py
 
       - name: Verify distribution launch evidence contract
         run: |

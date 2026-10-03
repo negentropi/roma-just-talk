@@ -10,6 +10,14 @@ Before you begin, ensure you have:
 - Swift (latest version recommended)
 - Git (for cloning repositories)
 
+## GitHub Actions build
+
+The Actions build supports the Namespace Mac profile and the hosted Apple Silicon
+`macos-26` runner. Select the provider in **Run workflow** when one cannot acquire
+a runner. Both execute the same build and checks. The build host version does
+not prove first launch on a target macOS release; downloaded artifacts require
+the separate distribution launch test on that exact OS.
+
 ## Quick Start with Makefile (Recommended)
 
 The easiest way to build VoiceInk is using the included Makefile, which automates the entire build process including building and statically linking Whisper.

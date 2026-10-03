@@ -8,6 +8,14 @@ on:
         required: true
         default: false
         type: boolean
+      runner:
+        description: Mac build provider (launch proof runs separately on the exact target OS)
+        required: true
+        default: namespace-profile-roma-jt
+        type: choice
+        options:
+          - namespace-profile-roma-jt
+          - macos-26
   pull_request:
     paths:
       - ".github/workflows/voiceink-build.yml"
@@ -97,7 +105,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: namespace-profile-roma-jt
+  group: ${{ inputs.runner == 'macos-26' && format('hosted-macos-build-{0}', github.ref) || 'namespace-profile-roma-jt' }}
   cancel-in-progress: false
   queue: max
 
@@ -170,7 +178,7 @@ jobs:
 
   runtime-helper:
     name: Build reusable runtime E2E helper
-    runs-on: namespace-profile-roma-jt
+    runs-on: ${{ inputs.runner == 'macos-26' && 'macos-26' || 'namespace-profile-roma-jt' }}
     timeout-minutes: 20
 
     steps:
@@ -213,7 +221,7 @@ jobs:
     name: Build release macOS app
     needs: reuse
     if: ${{ !cancelled() && needs.reuse.outputs.hit != 'true' }}
-    runs-on: namespace-profile-roma-jt
+    runs-on: ${{ inputs.runner == 'macos-26' && 'macos-26' || 'namespace-profile-roma-jt' }}
     timeout-minutes: 60
 
     steps:

@@ -1,0 +1,81 @@
+name: Check production macOS compilation
+
+on:
+  push:
+    branches:
+      - "ci/roma-production-compile-*"
+
+permissions:
+  contents: read
+
+jobs:
+  compile:
+    name: Compile Release without local behavior
+    runs-on: macos-26
+    timeout-minutes: 45
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Record exact toolchain
+        run: |
+          mkdir -p "$RUNNER_TEMP/roma-production-compile"
+          git rev-parse HEAD > "$RUNNER_TEMP/roma-production-compile/source-sha.txt"
+          xcodebuild -version > "$RUNNER_TEMP/roma-production-compile/xcode.txt"
+          swift --version > "$RUNNER_TEMP/roma-production-compile/swift.txt"
+          test "$(xcodebuild -version | sed -n '1p')" = 'Xcode 26.6'
+          test "$(xcodebuild -version | sed -n '2p')" = 'Build version 17F113'
+      - name: Build the observed Whisper revision
+        run: |
+          mkdir -p "$HOME/VoiceInk-Dependencies"
+          git clone --no-checkout https://github.com/ggml-org/whisper.cpp.git "$HOME/VoiceInk-Dependencies/whisper.cpp"
+          git -C "$HOME/VoiceInk-Dependencies/whisper.cpp" checkout --detach 60c0be6ac8fa71b1a2ae2dd938a31a34a508e774
+          test "$(git -C "$HOME/VoiceInk-Dependencies/whisper.cpp" rev-parse HEAD)" = 60c0be6ac8fa71b1a2ae2dd938a31a34a508e774
+          cd "$HOME/VoiceInk-Dependencies/whisper.cpp"
+          BUILD_STATIC_XCFRAMEWORK=ON ./build-xcframework.sh
+      - name: Archive unsigned production Release
+        run: |
+          set -o pipefail
+          xcodebuild -project VoiceInk.xcodeproj -scheme VoiceInk -configuration Release \
+            -derivedDataPath "$RUNNER_TEMP/roma-production-derived" \
+            -archivePath "$RUNNER_TEMP/roma-production.xcarchive" \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY='' \
+            ENABLE_CODE_COVERAGE=NO ARCHS=arm64 ONLY_ACTIVE_ARCH=YES \
+            archive 2>&1 | tee "$RUNNER_TEMP/roma-production-compile/archive.log"
+      - name: Verify actual production compilation boundary
+        run: |
+          xcodebuild -project VoiceInk.xcodeproj -scheme VoiceInk -configuration Release \
+            -derivedDataPath "$RUNNER_TEMP/roma-production-derived" \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY='' \
+            ENABLE_CODE_COVERAGE=NO ARCHS=arm64 ONLY_ACTIVE_ARCH=YES \
+            -showBuildSettings -json > "$RUNNER_TEMP/roma-production-compile/build-settings.json"
+          python3 - "$RUNNER_TEMP/roma-production-compile/build-settings.json" <<'PY'
+          import json, sys
+          rows=[r for r in json.load(open(sys.argv[1])) if r.get('target')=='VoiceInk']
+          assert len(rows)==1
+          settings=rows[0]['buildSettings']
+          assert settings['CONFIGURATION']=='Release'
+          assert 'LOCAL_BUILD' not in settings.get('SWIFT_ACTIVE_COMPILATION_CONDITIONS','').split()
+          assert 'ENABLE_NATIVE_SPEECH_ANALYZER' in settings.get('SWIFT_ACTIVE_COMPILATION_CONDITIONS','').split()
+          assert settings['CODE_SIGN_ENTITLEMENTS']=='VoiceInk/VoiceInk.entitlements'
+          assert settings['CODE_SIGNING_ALLOWED']=='NO'
+          assert settings['ARCHS']=='arm64'
+          assert settings['PRODUCT_BUNDLE_IDENTIFIER']=='com.negentropi.RomaJustTalk'
+          assert settings['MACOSX_DEPLOYMENT_TARGET']=='14.2.1'
+          PY
+          APP="$RUNNER_TEMP/roma-production.xcarchive/Products/Applications/roma just talk.app"
+          test -d "$APP"
+          cp "$APP/Contents/Info.plist" "$RUNNER_TEMP/roma-production-compile/app-info.plist"
+          bash scripts/verify-macos-release-instrumentation.sh "$APP"
+          python3 scripts/check-macos-deployment-target.py "$APP"
+          printf '%s\n' 'Production compile only; unsigned archive is not a qualified distribution.' \
+            > "$RUNNER_TEMP/roma-production-compile/BOUNDARY.txt"
+      - name: Retain compilation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.macos.production-compile-evidence
+          path: ${{ runner.temp }}/roma-production-compile/
+          if-no-files-found: error

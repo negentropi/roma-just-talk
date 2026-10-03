@@ -68,7 +68,7 @@ def check_app(app):
         with path.open("rb") as stream:
             if stream.read(4) not in MACHO_MAGIC:
                 continue
-        result = subprocess.run(["otool", "-l", str(path)], check=True,
+        result = subprocess.run(["otool", "-arch", "all", "-l", str(path)], check=True,
                                 capture_output=True, text=True)
         for minimum in macos_minimums(result.stdout):
             if minimum > floor:

@@ -59,7 +59,7 @@ source "$repo_root/scripts/runtime-e2e-model-bootstrap.sh"
 
 model_manifest="$repo_root/scripts/runtime-e2e-parakeet-v2.manifest"
 model_file_count="$(awk '!/^#/ && NF { count += 1 } END { print count + 0 }' "$model_manifest")"
-model_path_digest="$(awk '!/^#/ && NF { print $3 }' "$model_manifest" | sort | shasum -a 256 | awk '{print $1}')"
+model_path_digest="$(awk '!/^#/ && NF { print $3 }' "$model_manifest" | LC_ALL=C sort | shasum -a 256 | awk '{print $1}')"
 model_first_entry="$(awk '!/^#/ && NF { print; exit }' "$model_manifest")"
 if [ "$model_file_count" -ne 22 ] \
   || [ "$model_path_digest" != 0b563ca5e98413afbd98a0e68c4bafa5d3f72f08458b78786f5369a3319a90e7 ] \

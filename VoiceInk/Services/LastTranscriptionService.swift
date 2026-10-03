@@ -85,7 +85,7 @@ class LastTranscriptionService: ObservableObject {
         }
     }
     
-    static func retryLastTranscription(from modelContext: ModelContext, transcriptionModelManager: TranscriptionModelManager, serviceRegistry: TranscriptionServiceRegistry, enhancementService: AIEnhancementService?) {
+    static func retryLastTranscription(from modelContext: ModelContext, dictionaryContext: ModelContext, transcriptionModelManager: TranscriptionModelManager, serviceRegistry: TranscriptionServiceRegistry, enhancementService: AIEnhancementService?) {
         Task { @MainActor in
             guard let lastTranscription = getLastTranscription(from: modelContext),
                   let audioURL = lastTranscription.existingAudioFileURL() else {
@@ -104,6 +104,7 @@ class LastTranscriptionService: ObservableObject {
 
             let transcriptionService = AudioTranscriptionService(
                 modelContext: modelContext,
+                dictionaryContext: dictionaryContext,
                 serviceRegistry: serviceRegistry,
                 enhancementService: enhancementService
             )

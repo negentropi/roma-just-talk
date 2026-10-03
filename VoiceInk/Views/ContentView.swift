@@ -22,6 +22,8 @@ struct VisualEffectView: NSViewRepresentable {
 }
 
 struct ContentView: View {
+    let dictionaryContainer: ModelContainer
+    let metricsContainer: ModelContainer
     private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "ContentView")
     @Environment(\.modelContext) private var modelContext
     @Environment(\.colorScheme) private var colorScheme
@@ -118,6 +120,7 @@ struct ContentView: View {
         switch viewType {
         case .metrics:
             MetricsView()
+                .modelContainer(metricsContainer)
         case .models:
             ModelManagementView()
         case .enhancement:
@@ -130,6 +133,7 @@ struct ContentView: View {
             AudioInputSettingsView()
         case .dictionary:
             DictionarySettingsView()
+                .modelContainer(dictionaryContainer)
         case .powerMode:
             PowerModeView()
         case .settings:

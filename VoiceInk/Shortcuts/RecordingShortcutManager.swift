@@ -400,6 +400,7 @@ class RecordingShortcutManager: ObservableObject {
         case .retryLastTranscription:
             LastTranscriptionService.retryLastTranscription(
                 from: engine.modelContext,
+                dictionaryContext: engine.dictionaryContext,
                 transcriptionModelManager: engine.transcriptionModelManager,
                 serviceRegistry: engine.serviceRegistry,
                 enhancementService: engine.enhancementService
@@ -410,7 +411,7 @@ class RecordingShortcutManager: ObservableObject {
                 engine: engine
             )
         case .quickAddToDictionary:
-            DictionaryQuickAddManager.shared.toggle(modelContainer: engine.modelContext.container)
+            DictionaryQuickAddManager.shared.toggle(modelContainer: engine.dictionaryContext.container)
         default:
             break
         }

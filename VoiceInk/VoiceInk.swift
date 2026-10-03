@@ -10,7 +10,8 @@ import VoiceInkCore
 @main
 struct VoiceInkApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    let container: ModelContainer
+    let modelStores: VoiceInkModelStores
+    var container: ModelContainer { modelStores.transcription }
     let containerInitializationFailed: Bool
 
     @StateObject private var engine: VoiceInkEngine
@@ -50,50 +51,49 @@ struct VoiceInkApp: App {
         )
 
         let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "Initialization")
-        // Keep existing model order stable; append new models after synced entities.
-        let schema = Schema([
-            Transcription.self,
-            VocabularyWord.self,
-            WordReplacement.self,
-            SessionMetric.self
-        ])
         var initializationFailed = false
-        let resolvedContainer: ModelContainer
-
-        // Attempt 1: Try persistent storage
-        if let persistentContainer = Self.createPersistentContainer(schema: schema, logger: logger) {
-            resolvedContainer = persistentContainer
-        }
-        // Attempt 2: Try in-memory storage
-        else if let memoryContainer = Self.createInMemoryContainer(schema: schema, logger: logger) {
-            resolvedContainer = memoryContainer
-
-            logger.warning("Using in-memory storage as fallback. Data will not persist between sessions.")
-
-            // Show alert to user about storage issue
-            DispatchQueue.main.async {
-                let presentation = VoiceInkAppIdentity.storageFallbackWarningPresentation
-                let alert = NSAlert()
-                alert.messageText = presentation.title
-                alert.informativeText = presentation.message
-                alert.alertStyle = .warning
-                alert.addButton(withTitle: presentation.buttonTitle)
-                alert.runModal()
+        let resolvedStores: VoiceInkModelStores
+        #if LOCAL_BUILD
+        let dictionaryCloudKit: ModelConfiguration.CloudKitDatabase = .none
+        #else
+        let dictionaryCloudKit: ModelConfiguration.CloudKitDatabase = .private(VoiceInkAppIdentity.iCloudContainerIdentifier)
+        #endif
+        do {
+            resolvedStores = try VoiceInkModelStores.persistent(
+                at: VoiceInkMacOSStorageDirectories.appSupportDirectory,
+                dictionaryCloudKit: dictionaryCloudKit
+            )
+        } catch {
+            logger.error("Failed to create persistent model stores: \(error.localizedDescription, privacy: .public)")
+            do {
+                resolvedStores = try VoiceInkModelStores.inMemory()
+                logger.warning("Using in-memory storage as fallback. Data will not persist between sessions.")
+                DispatchQueue.main.async {
+                    let presentation = VoiceInkAppIdentity.storageFallbackWarningPresentation
+                    let alert = NSAlert()
+                    alert.messageText = presentation.title
+                    alert.informativeText = presentation.message
+                    alert.alertStyle = .warning
+                    alert.addButton(withTitle: presentation.buttonTitle)
+                    alert.runModal()
+                }
+            } catch {
+                logger.critical("\(VoiceInkStorageStartupDiagnostics.modelContainerInitializationFailedMessage, privacy: .public)")
+                initializationFailed = true
+                let schema = Schema([Transcription.self, VocabularyWord.self, WordReplacement.self, SessionMetric.self])
+                let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
+                let emergencyContainer = (try? ModelContainer(for: schema, configurations: [config])) ?? {
+                    preconditionFailure(VoiceInkStorageStartupDiagnostics.modelContainerUnavailablePreconditionMessage)
+                }()
+                resolvedStores = VoiceInkModelStores(
+                    transcription: emergencyContainer,
+                    dictionary: emergencyContainer,
+                    metrics: emergencyContainer
+                )
             }
         }
-        // All attempts failed
-        else {
-            logger.critical("\(VoiceInkStorageStartupDiagnostics.modelContainerInitializationFailedMessage, privacy: .public)")
-            initializationFailed = true
-
-            // Create minimal in-memory container to satisfy initialization
-            let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
-            resolvedContainer = (try? ModelContainer(for: schema, configurations: [config])) ?? {
-                preconditionFailure(VoiceInkStorageStartupDiagnostics.modelContainerUnavailablePreconditionMessage)
-            }()
-        }
-
-        container = resolvedContainer
+        modelStores = resolvedStores
+        let resolvedContainer = resolvedStores.transcription
         containerInitializationFailed = initializationFailed
 
         // Initialize services with proper sharing of instances
@@ -103,7 +103,7 @@ struct VoiceInkApp: App {
         let updaterViewModel = UpdaterViewModel()
         _updaterViewModel = StateObject(wrappedValue: updaterViewModel)
 
-        let enhancementService = AIEnhancementService(aiService: aiService, modelContext: resolvedContainer.mainContext)
+        let enhancementService = AIEnhancementService(aiService: aiService, modelContext: resolvedStores.dictionary.mainContext)
         _enhancementService = StateObject(wrappedValue: enhancementService)
 
         // 1. Create modelsDirectory URL
@@ -125,6 +125,8 @@ struct VoiceInkApp: App {
         // 4. Create engine
         let engine = VoiceInkEngine(
             modelContext: resolvedContainer.mainContext,
+            dictionaryContext: resolvedStores.dictionary.mainContext,
+            metricWriter: resolvedStores.metricWriter,
             whisperModelManager: whisperModelManager,
             transcriptionModelManager: transcriptionModelManager,
             qwenRuntimeResult: qwenModelManager.runtimeResult,
@@ -173,7 +175,7 @@ struct VoiceInkApp: App {
         let prewarmService = ModelPrewarmService(
             transcriptionModelManager: transcriptionModelManager,
             whisperModelManager: whisperModelManager,
-            modelContext: resolvedContainer.mainContext,
+            modelContext: resolvedStores.dictionary.mainContext,
             qwenRuntimeResult: qwenModelManager.runtimeResult,
             serviceRegistry: engine.serviceRegistry
         )
@@ -185,12 +187,15 @@ struct VoiceInkApp: App {
         Task {
             await recorderUIManager.resetOnLaunch()
             await engine.recorder.startPreRollBuffering()
-            DictionaryService.warmWordReplacementCache(using: resolvedContainer.mainContext)
+            DictionaryService.warmWordReplacementCache(using: resolvedStores.dictionary.mainContext)
         }
 
         AppShortcuts.updateAppShortcutParameters()
 
-        let migrationTask = SessionMetricMigrationService.shared.runIfNeeded(modelContainer: resolvedContainer)
+        let migrationTask = SessionMetricMigrationService.shared.runIfNeeded(
+            transcriptionContainer: resolvedContainer,
+            metricWriter: resolvedStores.metricWriter
+        )
         let mainContext = resolvedContainer.mainContext
         Task {
             await migrationTask?.value
@@ -198,100 +203,10 @@ struct VoiceInkApp: App {
         }
     }
 
-    // MARK: - Container Creation Helpers
-
-    private static func createPersistentContainer(schema: Schema, logger: Logger) -> ModelContainer? {
-        do {
-            // Create app-specific Application Support directory URL
-            let appSupportURL = VoiceInkMacOSStorageDirectories.appSupportDirectory
-
-            // Create the directory if it doesn't exist
-            try? FileManager.default.createDirectory(at: appSupportURL, withIntermediateDirectories: true)
-
-            // Define storage locations
-            let defaultStoreURL = appSupportURL.appendingPathComponent("default.store")
-            let dictionaryStoreURL = appSupportURL.appendingPathComponent("dictionary.store")
-            let statsStoreURL = appSupportURL.appendingPathComponent("stats.store")
-
-            // Transcript configuration
-            let transcriptSchema = Schema([Transcription.self])
-            let transcriptConfig = ModelConfiguration(
-                "default",
-                schema: transcriptSchema,
-                url: defaultStoreURL,
-                cloudKitDatabase: .none
-            )
-
-            // Dictionary configuration
-            let dictionarySchema = Schema([VocabularyWord.self, WordReplacement.self])
-            #if LOCAL_BUILD
-            let dictionaryCloudKit: ModelConfiguration.CloudKitDatabase = .none
-            #else
-            let dictionaryCloudKit: ModelConfiguration.CloudKitDatabase = .private(VoiceInkAppIdentity.iCloudContainerIdentifier)
-            #endif
-            let dictionaryConfig = ModelConfiguration(
-                "dictionary",
-                schema: dictionarySchema,
-                url: dictionaryStoreURL,
-                cloudKitDatabase: dictionaryCloudKit
-            )
-
-            // Recorder session metrics configuration
-            let statsSchema = Schema([SessionMetric.self])
-            let statsConfig = ModelConfiguration(
-                "stats",
-                schema: statsSchema,
-                url: statsStoreURL,
-                cloudKitDatabase: .none
-            )
-
-            // Initialize container
-            return try ModelContainer(
-                for: schema,
-                configurations: transcriptConfig, dictionaryConfig, statsConfig
-            )
-        } catch {
-            logger.error("❌ Failed to create persistent ModelContainer: \(error.localizedDescription, privacy: .public)")
-            return nil
-        }
-    }
-
-    private static func createInMemoryContainer(schema: Schema, logger: Logger) -> ModelContainer? {
-        do {
-            // Transcript configuration
-            let transcriptSchema = Schema([Transcription.self])
-            let transcriptConfig = ModelConfiguration(
-                "default",
-                schema: transcriptSchema,
-                isStoredInMemoryOnly: true
-            )
-
-            // Dictionary configuration
-            let dictionarySchema = Schema([VocabularyWord.self, WordReplacement.self])
-            let dictionaryConfig = ModelConfiguration(
-                "dictionary",
-                schema: dictionarySchema,
-                isStoredInMemoryOnly: true
-            )
-
-            let statsSchema = Schema([SessionMetric.self])
-            let statsConfig = ModelConfiguration(
-                "stats",
-                schema: statsSchema,
-                isStoredInMemoryOnly: true
-            )
-
-            return try ModelContainer(for: schema, configurations: transcriptConfig, dictionaryConfig, statsConfig)
-        } catch {
-            logger.error("❌ Failed to create in-memory ModelContainer: \(error.localizedDescription, privacy: .public)")
-            return nil
-        }
-    }
-
     var body: some Scene {
         WindowGroup(VoiceInkAppIdentity.compactDisplayName, id: "main") {
             if hasCompletedOnboarding {
-                ContentView()
+                ContentView(dictionaryContainer: modelStores.dictionary, metricsContainer: modelStores.metrics)
                     .environmentObject(engine)
                     .environmentObject(whisperModelManager)
                     .environmentObject(fluidAudioModelManager)

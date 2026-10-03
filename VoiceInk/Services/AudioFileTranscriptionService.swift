@@ -7,6 +7,7 @@ import VoiceInkCore
 @MainActor
 class AudioTranscriptionService {
     private let modelContext: ModelContext
+    private let dictionaryContext: ModelContext
     private let enhancementService: AIEnhancementService?
     private let logger = Logger(
         subsystem: VoiceInkAppIdentity.loggingSubsystem,
@@ -16,17 +17,19 @@ class AudioTranscriptionService {
 
     init(modelContext: ModelContext, engine: VoiceInkEngine) {
         self.modelContext = modelContext
+        self.dictionaryContext = engine.dictionaryContext
         self.enhancementService = engine.enhancementService
         self.serviceRegistry = TranscriptionServiceRegistry(
             modelProvider: engine.whisperModelManager,
             modelsDirectory: engine.whisperModelManager.modelsDirectory,
-            modelContext: modelContext,
+            modelContext: engine.dictionaryContext,
             qwenRuntimeResult: engine.serviceRegistry.qwenRuntimeResult
         )
     }
 
-    init(modelContext: ModelContext, serviceRegistry: TranscriptionServiceRegistry, enhancementService: AIEnhancementService?) {
+    init(modelContext: ModelContext, dictionaryContext: ModelContext, serviceRegistry: TranscriptionServiceRegistry, enhancementService: AIEnhancementService?) {
         self.modelContext = modelContext
+        self.dictionaryContext = dictionaryContext
         self.enhancementService = enhancementService
         self.serviceRegistry = serviceRegistry
     }
@@ -50,7 +53,7 @@ class AudioTranscriptionService {
                 rawText,
                 cleanupConfiguration: cleanupConfiguration
             ) { text in
-                DictionaryService.applyWordReplacements(to: text, using: modelContext)
+                DictionaryService.applyWordReplacements(to: text, using: dictionaryContext)
             }
             let text = textPlan.textForEnhancement
             logger.notice("\(VoiceInkAudioFileTranscriptionDiagnostics.wordReplacementsAppliedMessage, privacy: .public)")

@@ -16,34 +16,27 @@ final class SessionMetricMigrationService {
     private init() {}
 
     @discardableResult
-    func runIfNeeded(modelContainer: ModelContainer) -> Task<Void, Never>? {
+    func runIfNeeded(
+        transcriptionContainer: ModelContainer,
+        metricWriter: Task<SessionMetricRecorder, Never>
+    ) -> Task<Void, Never>? {
         guard !VoiceInkSessionMetricMigrationPreference.isCompleted(), !isRunning else { return nil }
         isRunning = true
 
         let logger = self.logger
 
         return Task.detached(priority: .utility) {
-            let backgroundContext = ModelContext(modelContainer)
+            let backgroundContext = ModelContext(transcriptionContainer)
             var insertedCount = 0
 
             do {
-                // Build a Set of already-migrated IDs in one query instead of
-                // checking per-record — turns N queries into 1.
-                let existingIds = Set(
-                    try backgroundContext.fetch(FetchDescriptor<SessionMetric>())
-                        .map { $0.transcriptionId }
-                )
-
+                try Task.checkCancellation()
                 let completedStatus = VoiceInkSessionMetricPolicy.completedTranscriptionStatusRawValue
                 let descriptor = FetchDescriptor<Transcription>(
                     predicate: #Predicate<Transcription> { $0.transcriptionStatus == completedStatus }
                 )
-                let transcriptions = try backgroundContext.fetch(descriptor)
-
-                for transcription in transcriptions {
-                    guard !existingIds.contains(transcription.id) else { continue }
-
-                    let draft = VoiceInkSessionMetricPolicy.recorderDraft(
+                let drafts = try backgroundContext.fetch(descriptor).map { transcription in
+                    VoiceInkSessionMetricPolicy.recorderDraft(
                         transcriptionId: transcription.id,
                         timestamp: transcription.timestamp,
                         source: transcription,
@@ -51,14 +44,15 @@ final class SessionMetricMigrationService {
                         powerModeName: transcription.powerModeName,
                         aiEnhancementModelName: transcription.aiEnhancementModelName
                     )
-                    backgroundContext.insert(SessionMetric(draft: draft))
-                    insertedCount += 1
                 }
-
-                if insertedCount > 0 {
-                    try backgroundContext.save()
+                let writer = await metricWriter.value
+                let batchSize = 100
+                for start in stride(from: 0, to: drafts.count, by: batchSize) {
+                    try Task.checkCancellation()
+                    let end = min(start + batchSize, drafts.count)
+                    insertedCount += try await writer.record(Array(drafts[start..<end]))
                 }
-
+                try Task.checkCancellation()
                 VoiceInkSessionMetricMigrationPreference.markCompleted()
                 let message = VoiceInkSessionMetricMigrationDiagnostics.completedMessage(insertedCount: insertedCount)
                 logger.notice("\(message, privacy: .public)")

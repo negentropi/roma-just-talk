@@ -828,9 +828,9 @@ struct VoiceInkTests {
         ))
     }
 
-    @Test @MainActor func sessionMetricRecorderAcceptsSnapshotModelName() throws {
-        let container = try makeSessionMetricContainer()
-        let context = container.mainContext
+    @Test @MainActor func sessionMetricRecorderAcceptsSnapshotModelName() async throws {
+        let stores = try VoiceInkModelStores.inMemory()
+        let context = stores.transcription.mainContext
         let transcription = Transcription(
             text: "quick release wins",
             duration: 2,
@@ -840,16 +840,19 @@ struct VoiceInkTests {
         context.insert(transcription)
         try context.save()
 
-        let didInsertMetric = try SessionMetricRecorder.recordRecorderSession(
-            transcription: transcription,
-            modelDisplayName: "Snapshot Model",
-            in: context,
-            timestamp: Date(timeIntervalSince1970: 0)
+        let draft = VoiceInkSessionMetricPolicy.recorderDraft(
+            transcriptionId: transcription.id,
+            timestamp: Date(timeIntervalSince1970: 0),
+            source: transcription,
+            transcriptionModelName: "Snapshot Model",
+            powerModeName: nil,
+            aiEnhancementModelName: nil
         )
-        try context.save()
+        let writer = await stores.metricWriter.value
+        let insertedCount = try await writer.record([draft])
 
-        let metrics = try context.fetch(FetchDescriptor<SessionMetric>())
-        #expect(didInsertMetric)
+        let metrics = try ModelContext(stores.metrics).fetch(FetchDescriptor<SessionMetric>())
+        #expect(insertedCount == 1)
         #expect(metrics.count == 1)
         #expect(metrics.first?.transcriptionModelName == "Snapshot Model")
         #expect(metrics.first?.wordCount == 3)
@@ -1813,12 +1816,6 @@ struct VoiceInkTests {
 
     private func makeVocabularyContainer() throws -> ModelContainer {
         let schema = Schema([VocabularyWord.self])
-        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
-        return try ModelContainer(for: schema, configurations: [configuration])
-    }
-
-    private func makeSessionMetricContainer() throws -> ModelContainer {
-        let schema = Schema([Transcription.self, SessionMetric.self])
         let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
         return try ModelContainer(for: schema, configurations: [configuration])
     }

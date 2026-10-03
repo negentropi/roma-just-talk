@@ -1,66 +1,31 @@
 import Foundation
 import SwiftData
-import OSLog
 import VoiceInkCore
 
-enum SessionMetricRecorder {
-    private static let logger = Logger(
-        subsystem: VoiceInkAppIdentity.loggingSubsystem,
-        category: VoiceInkMacOSLogCategory.sessionMetricRecorder
-    )
-
+@ModelActor
+actor SessionMetricRecorder {
     @discardableResult
-    static func recordRecorderSession(
-        transcription: Transcription,
-        model: (any TranscriptionModel)?,
-        in modelContext: ModelContext,
-        timestamp: Date = Date()
-    ) throws -> Bool {
-        try recordRecorderSession(
-            transcription: transcription,
-            modelDisplayName: model?.displayName,
-            in: modelContext,
-            timestamp: timestamp
-        )
-    }
-
-    @discardableResult
-    static func recordRecorderSession(
-        transcription: Transcription,
-        modelDisplayName: String?,
-        in modelContext: ModelContext,
-        timestamp: Date = Date()
-    ) throws -> Bool {
-        guard transcription.transcriptionState == .completed else {
-            return false
-        }
-
-        let transcriptionId = transcription.id
-        let descriptor = FetchDescriptor<SessionMetric>(
-            predicate: #Predicate<SessionMetric> { metric in
-                metric.transcriptionId == transcriptionId
+    func record(_ drafts: [VoiceInkSessionMetricDraft]) throws -> Int {
+        modelContext.autosaveEnabled = false
+        var insertedIDs = Set<UUID>()
+        do {
+            for draft in drafts {
+                guard !insertedIDs.contains(draft.transcriptionId) else { continue }
+                let transcriptionID = draft.transcriptionId
+                let descriptor = FetchDescriptor<SessionMetric>(
+                    predicate: #Predicate<SessionMetric> { $0.transcriptionId == transcriptionID }
+                )
+                guard try modelContext.fetchCount(descriptor) == 0 else { continue }
+                modelContext.insert(SessionMetric(draft: draft))
+                insertedIDs.insert(transcriptionID)
             }
-        )
-
-        if try modelContext.fetchCount(descriptor) > 0 {
-            return false
+            if !insertedIDs.isEmpty {
+                try modelContext.save()
+            }
+            return insertedIDs.count
+        } catch {
+            modelContext.rollback()
+            throw error
         }
-
-        let draft = VoiceInkSessionMetricPolicy.recorderDraft(
-            transcriptionId: transcription.id,
-            timestamp: timestamp,
-            source: transcription,
-            transcriptionModelName: transcription.transcriptionModelName ?? modelDisplayName,
-            powerModeName: transcription.powerModeName,
-            aiEnhancementModelName: transcription.aiEnhancementModelName
-        )
-
-        modelContext.insert(SessionMetric(draft: draft))
-        let message = VoiceInkSessionMetricRecorderDiagnostics.recordedSessionMetricMessage(
-            transcriptionId: transcriptionId
-        )
-        logger.notice("\(message, privacy: .public)")
-        return true
     }
-
 }

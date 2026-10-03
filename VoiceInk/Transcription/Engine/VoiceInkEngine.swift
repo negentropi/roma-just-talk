@@ -31,6 +31,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
     weak var recorderUIManager: RecorderUIManager?
 
     let modelContext: ModelContext
+    let dictionaryContext: ModelContext
     internal let serviceRegistry: TranscriptionServiceRegistry
     let enhancementService: AIEnhancementService?
     private let pipeline: TranscriptionPipeline
@@ -39,12 +40,15 @@ class VoiceInkEngine: NSObject, ObservableObject {
 
     init(
         modelContext: ModelContext,
+        dictionaryContext: ModelContext,
+        metricWriter: Task<SessionMetricRecorder, Never>,
         whisperModelManager: WhisperModelManager,
         transcriptionModelManager: TranscriptionModelManager,
         qwenRuntimeResult: Result<QwenRuntime, Error>,
         enhancementService: AIEnhancementService? = nil
     ) {
         self.modelContext = modelContext
+        self.dictionaryContext = dictionaryContext
         self.whisperModelManager = whisperModelManager
         self.transcriptionModelManager = transcriptionModelManager
         self.enhancementService = enhancementService
@@ -54,13 +58,15 @@ class VoiceInkEngine: NSObject, ObservableObject {
         let serviceRegistry = TranscriptionServiceRegistry(
             modelProvider: whisperModelManager,
             modelsDirectory: whisperModelManager.modelsDirectory,
-            modelContext: modelContext,
+            modelContext: dictionaryContext,
             qwenRuntimeResult: qwenRuntimeResult,
             ownsQwenRuntime: true
         )
         self.serviceRegistry = serviceRegistry
         self.pipeline = TranscriptionPipeline(
             modelContext: modelContext,
+            dictionaryContext: dictionaryContext,
+            metricWriter: metricWriter,
             serviceRegistry: serviceRegistry,
             enhancementService: enhancementService
         )

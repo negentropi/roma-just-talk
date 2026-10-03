@@ -199,6 +199,7 @@ struct MenuBarView: View {
             Button(VoiceInkMacOSMenuBarPresentation.retryLastTranscriptionTitle) {
                 LastTranscriptionService.retryLastTranscription(
                     from: engine.modelContext,
+                    dictionaryContext: engine.dictionaryContext,
                     transcriptionModelManager: transcriptionModelManager,
                     serviceRegistry: engine.serviceRegistry,
                     enhancementService: enhancementService

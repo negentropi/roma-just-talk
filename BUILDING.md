@@ -23,6 +23,20 @@ diagnostic launch tests can use those exact bytes while CI continues. An
 available artifact is an unqualified candidate. Build reuse and distribution
 qualification require the complete source build run to succeed.
 
+### Storage startup checks
+
+History, dictionary, and session metrics each use a dedicated SwiftData container.
+Their existing `default.store`, `dictionary.store`, and `stats.store` files retain
+the same model schemas. Only dictionary storage uses CloudKit in certificate
+builds. Local builds keep all three stores local.
+
+The macOS unit gate checks persistence, reopening, metrics deduplication, and save
+failure recovery. `Tools/SwiftDataExactModelProbe` isolates the production models
+and store configurations on the target OS. A green hosted test is insufficient
+for a supported older OS; retain the known-bad and candidate runtime results
+under the same OS and store conditions, followed by the actual downloaded app's
+first-Open test.
+
 ## Quick Start with Makefile (Recommended)
 
 The easiest way to build VoiceInk is using the included Makefile, which automates the entire build process including building and statically linking Whisper.

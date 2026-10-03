@@ -41,12 +41,12 @@ struct QwenRecordingSelectionTests {
     }
 
     @Test @MainActor func selectionCancelsDeferredConnectBeforeRuntimeReservation() async throws {
-        let schema = Schema([Transcription.self, VocabularyWord.self, WordReplacement.self, SessionMetric.self])
-        let container = try ModelContainer(for: schema, configurations: [ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)])
+        let stores = try VoiceInkModelStores.inMemory()
         let whisper = WhisperModelManager(modelsDirectory: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString))
         let models = TranscriptionModelManager(whisperModelManager: whisper, fluidAudioModelManager: FluidAudioModelManager())
         models.currentTranscriptionModel = QwenModel()
-        let engine = VoiceInkEngine(modelContext: ModelContext(container), whisperModelManager: whisper,
+        let engine = VoiceInkEngine(modelContext: stores.transcription.mainContext,
+            dictionaryContext: stores.dictionary.mainContext, metricWriter: stores.metricWriter, whisperModelManager: whisper,
             transcriptionModelManager: models, qwenRuntimeResult: .failure(SelectionFixtureError.unusedRuntime))
         let session = DeferredConnectSession()
         engine.trackQwenRecordingSession(session, model: QwenModel())

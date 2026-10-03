@@ -124,7 +124,7 @@ class AudioTranscriptionManager: ObservableObject {
         let serviceRegistry = TranscriptionServiceRegistry(
             modelProvider: engine.whisperModelManager,
             modelsDirectory: engine.whisperModelManager.modelsDirectory,
-            modelContext: modelContext,
+            modelContext: engine.dictionaryContext,
             qwenRuntimeResult: engine.serviceRegistry.qwenRuntimeResult
         )
 
@@ -172,7 +172,7 @@ class AudioTranscriptionManager: ObservableObject {
                 rawText,
                 cleanupConfiguration: cleanupConfiguration
             ) { text in
-                DictionaryService.applyWordReplacements(to: text, using: modelContext)
+                DictionaryService.applyWordReplacements(to: text, using: engine.dictionaryContext)
             }
             let cleanedText = textPlan.cleanedText
             try Task.checkCancellation()

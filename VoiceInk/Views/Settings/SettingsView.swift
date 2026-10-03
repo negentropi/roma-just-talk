@@ -5,7 +5,7 @@ import AVFoundation
 import VoiceInkCore
 
 struct SettingsView: View {
-    @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject private var engine: VoiceInkEngine
     @EnvironmentObject private var updaterViewModel: UpdaterViewModel
     @EnvironmentObject private var menuBarManager: MenuBarManager
     @EnvironmentObject private var launchAtLoginController: LaunchAtLoginController
@@ -309,7 +309,7 @@ struct SettingsView: View {
                             playbackController: playbackController,
                             soundManager: soundManager,
                             recorderUIManager: recorderUIManager,
-                            modelContext: modelContext
+                            modelContext: engine.dictionaryContext
                         )
                     }
                 }
@@ -325,7 +325,7 @@ struct SettingsView: View {
                             playbackController: playbackController,
                             soundManager: soundManager,
                             recorderUIManager: recorderUIManager,
-                            modelContext: modelContext,
+                            modelContext: engine.dictionaryContext,
                             transcriptionModelManager: transcriptionModelManager
                         )
                     }

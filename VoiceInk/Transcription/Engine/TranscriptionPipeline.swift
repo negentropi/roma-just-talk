@@ -8,6 +8,8 @@ import VoiceInkCore
 @MainActor
 class TranscriptionPipeline {
     private let modelContext: ModelContext
+    private let dictionaryContext: ModelContext
+    private let metricWriter: Task<SessionMetricRecorder, Never>
     private let serviceRegistry: TranscriptionServiceRegistry
     private let enhancementService: AIEnhancementService?
     private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "TranscriptionPipeline")
@@ -16,10 +18,14 @@ class TranscriptionPipeline {
 
     init(
         modelContext: ModelContext,
+        dictionaryContext: ModelContext,
+        metricWriter: Task<SessionMetricRecorder, Never>,
         serviceRegistry: TranscriptionServiceRegistry,
         enhancementService: AIEnhancementService?
     ) {
         self.modelContext = modelContext
+        self.dictionaryContext = dictionaryContext
+        self.metricWriter = metricWriter
         self.serviceRegistry = serviceRegistry
         self.enhancementService = enhancementService
         self.licenseViewModel = LicenseViewModel()
@@ -175,7 +181,7 @@ class TranscriptionPipeline {
                 rawText,
                 cleanupConfiguration: cleanupConfiguration
             ) { text in
-                DictionaryService.applyWordReplacements(to: text, using: modelContext)
+                DictionaryService.applyWordReplacements(to: text, using: dictionaryContext)
             }
             let text = textPlan.textForEnhancement
             let cleanedText = textPlan.cleanedText
@@ -276,37 +282,34 @@ class TranscriptionPipeline {
             transcription.markAsFailedTranscription(reason: errorDescription)
         }
 
-        func saveTranscriptionAndPostCompletion() {
-            let shouldRecordSessionMetric = transcription.transcriptionState == .completed
-            let didInsertSessionMetric: Bool
-            if shouldRecordSessionMetric {
-                do {
-                    didInsertSessionMetric = try SessionMetricRecorder.recordRecorderSession(
-                        transcription: transcription,
-                        model: model,
-                        in: modelContext
-                    )
-                } catch {
-                    logger.error("Failed to record session metric: \(error.localizedDescription, privacy: .public)")
-                    didInsertSessionMetric = false
-                }
-            } else {
-                didInsertSessionMetric = false
-            }
-
-            var didSaveTranscription = false
+        func saveTranscriptionAndPostCompletion() async {
+            // Completion observers can delete history immediately under zero retention.
+            let metricDraft = transcription.transcriptionState == .completed ? VoiceInkSessionMetricPolicy.recorderDraft(
+                transcriptionId: transcription.id,
+                timestamp: Date(),
+                source: transcription,
+                transcriptionModelName: model.displayName,
+                powerModeName: transcription.powerModeName,
+                aiEnhancementModelName: transcription.aiEnhancementModelName
+            ) : nil
             do {
                 try modelContext.save()
-                didSaveTranscription = true
-                if didInsertSessionMetric {
-                    NotificationCenter.default.post(name: .sessionMetricsDidChange, object: nil)
-                }
                 NotificationCenter.default.post(name: .transcriptionCreated, object: transcription)
                 NotificationCenter.default.post(name: .transcriptionCompleted, object: transcription)
             } catch {
                 logger.error("Failed to save transcription: \(error.localizedDescription, privacy: .public)")
+                return
             }
-
+            if let metricDraft {
+                do {
+                    let writer = await metricWriter.value
+                    if try await writer.record([metricDraft]) > 0 {
+                        NotificationCenter.default.post(name: .sessionMetricsDidChange, object: nil)
+                    }
+                } catch {
+                    logger.error("Failed to record session metric: \(error.localizedDescription, privacy: .public)")
+                }
+            }
         }
 
         if shouldCancel() {
@@ -394,11 +397,12 @@ class TranscriptionPipeline {
         }
 
         let saveSpan = latencyTrace.begin("pipeline.save", token: traceToken)
-        saveTranscriptionAndPostCompletion()
+        let completedState = transcription.transcriptionState
+        await saveTranscriptionAndPostCompletion()
         latencyTrace.end(saveSpan)
         latencyTrace.finish(
             event: "pipeline.complete",
-            details: "state=\(transcription.transcriptionState) finalChars=\(finalPastedText?.count ?? 0)",
+            details: "state=\(completedState) finalChars=\(finalPastedText?.count ?? 0)",
             token: traceToken
         )
     }

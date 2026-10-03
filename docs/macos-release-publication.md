@@ -54,6 +54,8 @@ node --test scripts/tests/github-release-appcast.test.js
 
 The publication tests execute the old workflow's actual upload block through a controlled `gh` subprocess transport. The old route uploads an informational feed for an unqualified archive. The new consumer runs the actual qualification CLI on recorded ad-hoc failure fields and performs zero writes. Other tests exercise asset download bytes, replacement between checks, tag peeling, metadata drift, immutable appcast retries, actual plist version checks, and the default-branch dispatch guard.
 
+The read-only `macos-release-policy-checks.yml` workflow runs these suites for relevant pull requests and disposable `ci/roma-release-policy-*` verification branches. It cannot publish releases.
+
 Transport fixtures and version-only ZIPs establish consumer behavior. They do not establish authenticated GitHub execution, signed first Open, or successful publication. There is no signed or controller-positive fixture. No test writes to real GitHub.
 
 Direct administrator publication, other external publishers, and writers who can replace trusted workflow code remain outside this boundary. Concurrent external draft edits can race the final API operation. Repository permissions and immutable releases require separate verified controls. This workflow protects its supported publication route; it does not claim to prevent every administrator bypass.

@@ -1,0 +1,36 @@
+name: Check macOS release qualification policy
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/macos-release-policy-checks.yml"
+      - ".github/workflows/publish-update-feed.yml"
+      - "scripts/verify-macos-release-qualification.py"
+      - "scripts/publish-qualified-macos-release.py"
+      - "scripts/generate-github-release-appcast.js"
+      - "scripts/tests/macos-release-qualification.test.py"
+      - "scripts/tests/macos-release-publication.test.py"
+      - "scripts/tests/github-release-appcast.test.js"
+      - "scripts/tests/fixtures/publish-update-feed-before-qualification.yml"
+      - "scripts/macos-build-job.jq"
+  push:
+    branches:
+      - "ci/roma-release-policy-*"
+
+permissions:
+  contents: read
+
+jobs:
+  policy:
+    name: Reject unqualified macOS publication
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Check actual verifier and publication consumer
+        run: |
+          python3 scripts/tests/macos-release-qualification.test.py
+          python3 scripts/tests/macos-release-publication.test.py
+          node --test scripts/tests/github-release-appcast.test.js

@@ -403,6 +403,7 @@ prepare_macos() {
       "$baseline_evidence/macos-distribution-e2e/approval-window-dyld-report.ips"
       "$baseline_evidence/macos-distribution-e2e/approval-window-dyld-match.txt"
       "$baseline_evidence/macos-distribution-e2e/approval-window-started-at.txt"
+      "$baseline_evidence/macos-distribution-e2e/approval-window-ended-at.txt"
       "$baseline_evidence/macos-distribution-e2e/approval-window-dyld-pid-correlation.txt"
       "$baseline_evidence/macos-distribution-e2e/expected-negative-control-identities.txt"
       "$baseline_evidence/macos-distribution-e2e/extracted-app-identity.txt"
@@ -535,6 +536,7 @@ prepare_macos() {
       com.negentropi.RomaJustTalk "$macos_expected_version" "$macos_expected_build" \
       "$expected_main_uuid" "$expected_rejected_framework" "$expected_rejected_framework_uuid" \
       "$(cat "$baseline_evidence/macos-distribution-e2e/approval-window-started-at.txt")" \
+      "$(cat "$baseline_evidence/macos-distribution-e2e/approval-window-ended-at.txt")" \
       "$baseline_short_version" "$baseline_bundle_version" \
       > "$evidence/framework-signature-baseline-reverification.txt"
     grep -Eq '^verdict=matched pid=[1-9][0-9]* ' \

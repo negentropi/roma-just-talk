@@ -13,6 +13,7 @@ expect_match() {
   "$VERIFIER" "$fixture" com.negentropi.RomaJustTalk 26.4.1 25E253 \
     "$main_uuid" "$framework" "$framework_uuid" \
     "$(approval_start_for_framework "$framework")" \
+    "$(window_end_for_framework "$framework")" \
     1.95 195 >"$OUTPUT"
   grep -Eq '^verdict=matched pid=[1-9][0-9]* crash_report_sha256=[0-9a-f]{64} framework=' "$OUTPUT"
 }
@@ -25,11 +26,19 @@ approval_start_for_framework() {
   esac
 }
 
+window_end_for_framework() {
+  case "$1" in
+    whisper) printf '%s\n' '2026-08-28T13:10:00Z' ;;
+    MediaRemoteAdapter) printf '%s\n' '2026-08-30T04:40:00Z' ;;
+    *) return 1 ;;
+  esac
+}
+
 expect_failure() {
   local expected_message="$1"
   shift
   local framework="${7:-}"
-  if "$@" "$(approval_start_for_framework "$framework")" \
+  if "$@" "$(approval_start_for_framework "$framework")" "$(window_end_for_framework "$framework")" \
     1.95 195 >"$OUTPUT" 2>&1; then
     echo "expected command to fail: $*" >&2
     exit 1
@@ -44,7 +53,7 @@ expect_failure() {
 expect_failure_with_approval() {
   local expected_message="$1" approval_start="$2"
   shift 2
-  if "$@" "$approval_start" 1.95 195 >"$OUTPUT" 2>&1; then
+  if "$@" "$approval_start" "$(window_end_for_framework "${7:-}")" 1.95 195 >"$OUTPUT" 2>&1; then
     echo "expected command to fail: $*" >&2
     exit 1
   fi
@@ -72,6 +81,26 @@ as_multiline_ips "$FIXTURES/mediaremote-adapter.ips" "$mediaremote"
 expect_match "$whisper" whisper DD61BD03-E85F-3824-9A93-5386BCE534B2 73A2EE0D-7421-3340-95D9-48D385E4747B
 expect_match "$mediaremote" MediaRemoteAdapter A51BCF76-FDCD-3355-9DBB-D23F2BC65726 D9A3CAFD-7DA9-3BC2-A771-16A3AE5B8C18
 
+verify_sonoma() {
+  "$VERIFIER" "$1" com.negentropi.RomaJustTalk 14.2.1 23C71 \
+    6C77B089-A141-33AC-9F2E-A950F6F15386 whisper \
+    73A2EE0D-7421-3340-95D9-48D385E4747B \
+    "${2:-2026-10-03T05:50:22Z}" "${3:-2026-10-03T05:52:19Z}" 1.95 195
+}
+
+verify_sonoma "$FIXTURES/sonoma-prior-minimum.ips" > "$OUTPUT"
+grep -Fq 'crash_report_sha256=b382d4f5f359a7b667ad8e2475cfa71d26c052cac7ce9f02097d3693e60f8852' "$OUTPUT"
+if verify_sonoma "$FIXTURES/sonoma-prior-minimum.ips" \
+  2026-10-03T05:51:05Z > "$OUTPUT" 2>&1; then
+  echo 'launch before the guest start marker accepted' >&2
+  exit 1
+fi
+if verify_sonoma "$FIXTURES/sonoma-prior-minimum.ips" \
+  2026-10-03T05:50:22Z 2026-10-03T05:51:22Z > "$OUTPUT" 2>&1; then
+  echo 'capture after the guest end marker accepted' >&2
+  exit 1
+fi
+
 mutate_body() {
   local source="$1" destination="$2" filter="$3"
   jq -s ".[1] |= ($filter) | .[]" "$source" > "$destination"
@@ -86,6 +115,22 @@ mutate_report() {
   local source="$1" destination="$2" filter="$3"
   jq -s "$filter | .[]" "$source" > "$destination"
 }
+
+for mutation in \
+  '.fatalDyldError = 0' \
+  '.termination.namespace = "CODESIGNING"' \
+  '.termination.reasons[2] |= gsub("code signature in"; "unrelated signature")' \
+  '.incident = "unrelated incident"' \
+  '.procLaunch = "2026-10-02 22:49:00.0000 -0700"' \
+  '.captureTime = "2026-10-02 22:50:00.0000 -0700"' \
+  '.captureTime = "2026-10-02 22:53:00.0000 -0700"'; do
+  mutated_sonoma="$TEMP_ROOT/sonoma-mutated.ips"
+  mutate_body "$FIXTURES/sonoma-prior-minimum.ips" "$mutated_sonoma" "$mutation"
+  if verify_sonoma "$mutated_sonoma" > "$OUTPUT" 2>&1; then
+    echo "invalid Sonoma report accepted: $mutation" >&2
+    exit 1
+  fi
+done
 
 wrong_framework="$TEMP_ROOT/wrong-framework.ips"
 mutate_body "$whisper" "$wrong_framework" '.termination.reasons[0] = "Library not loaded: @rpath/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter"'

@@ -416,6 +416,7 @@ wait_for_new_approval_window_crash_report() {
 report_matches_expected_framework_signature_failure() {
   local report="$distribution_evidence/approval-window-dyld-report.ips"
   local approval_window_start_utc="$(cat "$distribution_evidence/approval-window-started-at.txt")"
+  date -u +%Y-%m-%dT%H:%M:%SZ > "$distribution_evidence/approval-window-ended-at.txt"
   "$repo_root/scripts/verify-macos-framework-signature-crash.sh" \
     "$report" \
     "$bundle_identifier" \
@@ -425,6 +426,7 @@ report_matches_expected_framework_signature_failure() {
     "$expected_rejected_framework" \
     "$source_rejected_framework_uuid" \
     "$approval_window_start_utc" \
+    "$(cat "$distribution_evidence/approval-window-ended-at.txt")" \
     "$extracted_app_short_version" \
     "$extracted_app_bundle_version" \
     > "$distribution_evidence/approval-window-dyld-match.txt"

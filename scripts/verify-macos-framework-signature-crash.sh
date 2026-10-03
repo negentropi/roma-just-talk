@@ -2,10 +2,10 @@
 set -euo pipefail
 
 usage() {
-  echo "usage: $0 <crash-report.ips> <bundle-id> <macos-version> <macos-build> <main-uuid> <whisper|MediaRemoteAdapter> <framework-uuid> <approval-window-start-utc> <app-short-version> <app-bundle-version>" >&2
+  echo "usage: $0 <crash-report.ips> <bundle-id> <macos-version> <macos-build> <main-uuid> <whisper|MediaRemoteAdapter> <framework-uuid> <launch-window-start-utc> <launch-window-end-utc> <app-short-version> <app-bundle-version>" >&2
 }
 
-if [[ $# -ne 10 ]]; then
+if [[ $# -ne 11 ]]; then
   usage
   exit 2
 fi
@@ -17,9 +17,10 @@ macos_build="$4"
 main_uuid="$5"
 framework="$6"
 framework_uuid="$7"
-approval_window_start_utc="$8"
-app_short_version="$9"
-app_bundle_version="${10}"
+launch_window_start_utc="$8"
+launch_window_end_utc="$9"
+app_short_version="${10}"
+app_bundle_version="${11}"
 
 [[ -f "$report" ]] || { echo "crash report does not exist: $report" >&2; exit 2; }
 command -v jq >/dev/null 2>&1 || { echo "jq is required to verify a macOS crash report" >&2; exit 2; }
@@ -39,10 +40,12 @@ uuid_pattern='^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A
   echo "expected macOS build must be alphanumeric" >&2
   exit 2
 }
-[[ "$approval_window_start_utc" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$ ]] || {
-  echo "approval-window start must be an ISO-8601 UTC timestamp" >&2
-  exit 2
-}
+for window_timestamp in "$launch_window_start_utc" "$launch_window_end_utc"; do
+  [[ "$window_timestamp" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$ ]] || {
+    echo "launch-window boundaries must be ISO-8601 UTC timestamps from the guest" >&2
+    exit 2
+  }
+done
 for app_version_value in "$app_short_version" "$app_bundle_version"; do
   [[ "$app_version_value" =~ ^[0-9A-Za-z][0-9A-Za-z._-]*$ ]] || {
     echo "expected app versions must be nonempty plist-safe version strings" >&2
@@ -130,7 +133,7 @@ if ! jq -e -s \
       and (($body.bundleInfo.CFBundleVersion | tostring) == ($metadata.build_version | tostring))
       and ($body.codeSigningID == $bundle_id)
       and ($body.coalitionName == $bundle_id)
-      and ($body.fatalDyldError == 1)
+      and (($body | has("fatalDyldError") | not) or $body.fatalDyldError == 1)
       and ($body.exception.type == "EXC_CRASH" and $body.exception.signal == "SIGABRT")
       and ($body.termination.namespace == "DYLD")
       and ($body.termination.code == 1)
@@ -188,26 +191,28 @@ proc_launch_timestamp="$(printf '%s\n' "$timestamp_fields" | sed -n '2p')"
 capture_timestamp="$(printf '%s\n' "$timestamp_fields" | sed -n '3p')"
 
 if ! ruby -r time -e '
-  metadata, proc_launch, capture, approval = ARGV
+  metadata, proc_launch, capture, window_start, window_end = ARGV
   begin
     metadata_time = Time.parse(metadata)
     proc_launch_time = Time.parse(proc_launch)
     capture_time = Time.parse(capture)
-    approval_time = Time.iso8601(approval)
+    start_time = Time.iso8601(window_start)
+    end_time = Time.iso8601(window_end)
   rescue ArgumentError
     exit 1
   end
-  now = Time.now.utc
-  exit 1 if (metadata_time - proc_launch_time).abs > 2
-  exit 1 if proc_launch_time < approval_time - 2
+  # Report-tracking time is independent of process creation and crash capture.
+  exit 1 if end_time < start_time
+  exit 1 if proc_launch_time < start_time
   exit 1 if capture_time < proc_launch_time
-  exit 1 if capture_time > now + 120
-' "$metadata_timestamp" "$proc_launch_timestamp" "$capture_timestamp" "$approval_window_start_utc"; then
+  exit 1 if capture_time >= end_time + 1
+  exit 1 if metadata_time < start_time || metadata_time >= end_time + 1
+' "$metadata_timestamp" "$proc_launch_timestamp" "$capture_timestamp" "$launch_window_start_utc" "$launch_window_end_utc"; then
   echo "crash report timestamps do not prove this approval-window launch" >&2
   exit 1
 fi
 
 report_sha256="$(shasum -a 256 "$report" | awk '{print $1}')"
 pid="$(jq -r -s '.[1].pid' "$report")"
-printf 'verdict=matched pid=%s crash_report_sha256=%s framework=%s main_uuid=%s framework_uuid=%s approval_window_start_utc=%s\n' \
-  "$pid" "$report_sha256" "$framework" "$main_uuid" "$framework_uuid" "$approval_window_start_utc"
+printf 'verdict=matched pid=%s crash_report_sha256=%s framework=%s main_uuid=%s framework_uuid=%s launch_window_start_utc=%s launch_window_end_utc=%s\n' \
+  "$pid" "$report_sha256" "$framework" "$main_uuid" "$framework_uuid" "$launch_window_start_utc" "$launch_window_end_utc"

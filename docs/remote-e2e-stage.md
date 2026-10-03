@@ -242,6 +242,14 @@ final command only after the approved Roma process shows responsive first-launch
 UI. The fixed verifier still checks the same PID and fails if it stopped, died,
 did not finish AppKit launch, or did not run through AppTranslocation.
 
+Framework crash matching uses start and end markers recorded inside the guest.
+It requires process creation and crash capture within that launch window, plus
+a new report absent from the before inventory. Report-tracking time is not
+process creation time. Sonoma reports may omit `fatalDyldError`; an explicit
+contradictory value still fails. Exact artifact, OS, UUID, DYLD and signature
+checks remain required. Saved baseline verification uses its original guest
+window, not the verifier host's current clock.
+
 Run Sonoma and Tahoe as separate jobs. A moving selector such as `14.x` or
 `26.x` is useful for coverage but is not proof for 14.2.1 or 26.4.1 unless the
 recorded product and build versions equal the requested release. The exact

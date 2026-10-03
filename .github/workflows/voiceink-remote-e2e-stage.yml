@@ -883,7 +883,8 @@ jobs:
             macos-distribution-e2e/distribution-verdict.txt
             macos-distribution-e2e/approval-window-dyld-report.ips
             macos-distribution-e2e/approval-window-dyld-match.txt
-            macos-distribution-e2e/approval-window-started-at.txt
+              macos-distribution-e2e/approval-window-started-at.txt
+              macos-distribution-e2e/approval-window-ended-at.txt
             macos-distribution-e2e/approval-window-dyld-pid-correlation.txt
             macos-distribution-e2e/expected-negative-control-identities.txt
             macos-distribution-e2e/extracted-app-identity.txt

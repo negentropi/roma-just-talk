@@ -58,4 +58,5 @@ jobs:
         with:
           name: roma.swiftdata-store-probe
           path: .swiftdata-probe/
+          include-hidden-files: true
           if-no-files-found: error

@@ -1,0 +1,42 @@
+name: Diagnostic ordinary upstream dynamic Whisper
+run-name: Diagnostic D; exact-OS downloaded-app runtime proof runs separately
+
+on:
+  push:
+    branches:
+      - 'ci/roma-whisper-upstream-dynamic-*'
+    paths:
+      - '.github/workflows/roma-whisper-upstream-dynamic.yml'
+      - 'scripts/build-whisper-upstream-dynamic-experiment.sh'
+      - 'scripts/tests/whisper-upstream-dynamic-experiment.test.sh'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: whisper-upstream-dynamic-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  diagnostic-build:
+    if: ${{ github.repository == 'negentropi/roma-just-talk' && (github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/heads/ci/roma-whisper-upstream-dynamic-')) }}
+    runs-on: macos-26
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify diagnostic project and input boundaries
+        run: bash scripts/tests/whisper-upstream-dynamic-experiment.test.sh
+      - name: Build ordinary upstream dynamic D
+        run: bash scripts/build-whisper-upstream-dynamic-experiment.sh
+      - name: Retain D app ZIP and build receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.whisper-upstream-dynamic-D
+          path: .whisper-upstream-dynamic/output/
+          include-hidden-files: true
+          if-no-files-found: error

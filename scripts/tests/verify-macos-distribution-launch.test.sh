@@ -141,13 +141,42 @@ cat >"$TEMP_ROOT/opened-only.c" <<'C'
 int roma_distribution_opened_only_value(void) { return 7; }
 C
 
+cat >"$TEMP_ROOT/optional-child.c" <<'C'
+int roma_distribution_optional_child_value(void) { return 42; }
+C
+
+cat >"$TEMP_ROOT/optional-mapped.c" <<'C'
+extern int roma_distribution_optional_child_value(void);
+int roma_distribution_optional_mapped_value(void) {
+  return roma_distribution_optional_child_value();
+}
+C
+
+cat >"$TEMP_ROOT/optional-unmapped.c" <<'C'
+extern int roma_distribution_optional_child_value(void);
+int roma_distribution_optional_unmapped_value(void) {
+  return roma_distribution_optional_child_value();
+}
+C
+
+cat >"$TEMP_ROOT/optional-missing.c" <<'C'
+int roma_distribution_optional_missing_value(void) { return 42; }
+C
+
 cat >"$TEMP_ROOT/main.m" <<'OBJC'
 #import <AppKit/AppKit.h>
 #include <fcntl.h>
 extern int roma_distribution_fixture_value(void);
+extern int roma_distribution_optional_mapped_value(void) __attribute__((weak_import));
+extern int roma_distribution_optional_unmapped_value(void) __attribute__((weak_import));
+extern int roma_distribution_optional_missing_value(void) __attribute__((weak_import));
 
 int main(void) {
   if (roma_distribution_fixture_value() != 42) return 1;
+  if (!roma_distribution_optional_mapped_value
+      || roma_distribution_optional_mapped_value() != 42) return 3;
+  if (roma_distribution_optional_unmapped_value
+      || roma_distribution_optional_missing_value) return 4;
   NSString *openedOnlyPath = [
     [[NSBundle mainBundle] bundlePath]
     stringByAppendingPathComponent:
@@ -167,6 +196,33 @@ xcrun clang \
   -dynamiclib "$TEMP_ROOT/opened-only.c" \
   -Wl,-install_name,@rpath/libRomaDistributionOpenedOnly.dylib \
   -o "$APP/Contents/Frameworks/libRomaDistributionOpenedOnly.dylib"
+xcrun clang \
+  -arch arm64 \
+  -dynamiclib "$TEMP_ROOT/optional-child.c" \
+  -Wl,-install_name,@loader_path/libRomaDistributionOptionalChild.dylib \
+  -o "$APP/Contents/Frameworks/libRomaDistributionOptionalChild.dylib"
+xcrun clang \
+  -arch arm64 \
+  -dynamiclib "$TEMP_ROOT/optional-mapped.c" \
+  "$APP/Contents/Frameworks/libRomaDistributionOptionalChild.dylib" \
+  -Wl,-install_name,@rpath/libRomaDistributionOptionalMapped.dylib \
+  -o "$APP/Contents/Frameworks/libRomaDistributionOptionalMapped.dylib"
+xcrun clang \
+  -arch arm64 \
+  -dynamiclib "$TEMP_ROOT/optional-child.c" \
+  -Wl,-install_name,@loader_path/libRomaDistributionAbsentOptionalChild.dylib \
+  -o "$TEMP_ROOT/libRomaDistributionAbsentOptionalChild.dylib"
+xcrun clang \
+  -arch arm64 \
+  -dynamiclib "$TEMP_ROOT/optional-unmapped.c" \
+  "$TEMP_ROOT/libRomaDistributionAbsentOptionalChild.dylib" \
+  -Wl,-install_name,@rpath/libSystem.B.dylib \
+  -o "$APP/Contents/Frameworks/libSystem.B.dylib"
+xcrun clang \
+  -arch arm64 \
+  -dynamiclib "$TEMP_ROOT/optional-missing.c" \
+  -Wl,-install_name,@executable_path/../Frameworks/libRomaDistributionMissingWeak.dylib \
+  -o "$TEMP_ROOT/libRomaDistributionMissingWeak.dylib"
 xcrun clang \
   -arch arm64 \
   -dynamiclib "$TEMP_ROOT/leaf.c" \
@@ -202,13 +258,23 @@ xcrun clang \
   -arch arm64 \
   "$TEMP_ROOT/main.m" \
   "$MIDDLE_FRAMEWORKS/libRoma Distribution Fixture.dylib" \
+  -Wl,-weak_library,"$APP/Contents/Frameworks/libSystem.B.dylib" \
+  -Wl,-weak_library,"$TEMP_ROOT/libRomaDistributionMissingWeak.dylib" \
+  -Wl,-weak_library,"$APP/Contents/Frameworks/libRomaDistributionOptionalMapped.dylib" \
   -framework AppKit \
+  -Wl,-rpath,/usr/lib \
   '-Wl,-rpath,@executable_path/../Frameworks/My Frameworks' \
   -Wl,-rpath,@executable_path/../Frameworks \
   -o "$APP/Contents/MacOS/Fixture"
 
 codesign --force --sign - --options runtime \
   "$APP/Contents/Frameworks/libRomaDistributionOpenedOnly.dylib" >/dev/null
+codesign --force --sign - --options runtime \
+  "$APP/Contents/Frameworks/libRomaDistributionOptionalChild.dylib" >/dev/null
+codesign --force --sign - --options runtime \
+  "$APP/Contents/Frameworks/libRomaDistributionOptionalMapped.dylib" >/dev/null
+codesign --force --sign - --options runtime \
+  "$APP/Contents/Frameworks/libSystem.B.dylib" >/dev/null
 codesign --force --sign - --options runtime "$LEAF_FRAMEWORK" >/dev/null
 codesign --force --sign - --options runtime \
   "$APP/Contents/Frameworks/x86-only/RomaDistributionWrongSliceOnly.dylib" >/dev/null
@@ -246,6 +312,62 @@ if grep -Fq 'libRomaDistributionOpenedOnly.dylib' \
   exit 1
 fi
 grep -Fq 'launch_verdict=passed' "$EVIDENCE/distribution-launch-verdict.txt"
+grep -Fxq 'Contents/Frameworks/libRomaDistributionOptionalMapped.dylib' \
+  "$EVIDENCE/observed-mapped-bundle-code.txt"
+grep -Fxq 'Contents/Frameworks/libRomaDistributionOptionalChild.dylib' \
+  "$EVIDENCE/expected-mapped-bundle-code.txt"
+for optional_unmapped in libSystem.B.dylib libRomaDistributionMissingWeak.dylib \
+  libRomaDistributionAbsentOptionalChild.dylib; do
+  if grep -Fq "$optional_unmapped" "$EVIDENCE/expected-mapped-bundle-code.txt"; then
+    echo "unmapped optional branch must not require bundled code: $optional_unmapped" >&2
+    exit 1
+  fi
+done
+grep -Fq $'LC_LOAD_WEAK_DYLIB\t@rpath/libSystem.B.dylib\tContents/Frameworks/libSystem.B.dylib\tunmapped' \
+  "$EVIDENCE/optional-weak-dependencies.txt"
+grep -Fq $'LC_LOAD_WEAK_DYLIB\t@executable_path/../Frameworks/libRomaDistributionMissingWeak.dylib\t\tunresolved' \
+  "$EVIDENCE/optional-weak-dependencies.txt"
+
+mkdir -p "$TEMP_ROOT/filtered-mapping-tools"
+cat > "$TEMP_ROOT/filtered-mapping-tools/lsof" <<'SCRIPT'
+#!/usr/bin/env bash
+set -euo pipefail
+/usr/sbin/lsof "$@" | awk '$0 != "n" ENVIRON["HIDE_MAPPED_CODE_PATH"]'
+SCRIPT
+chmod +x "$TEMP_ROOT/filtered-mapping-tools/lsof"
+for required_relative in \
+  'Contents/Frameworks/My Frameworks/libRoma Distribution Fixture.dylib' \
+  'Contents/Frameworks/RomaDistributionFixtureLeaf.framework/Versions/A/RomaDistributionFixtureLeaf' \
+  'Contents/Frameworks/libRomaDistributionOptionalChild.dylib'; do
+  expect_failure \
+    "launched process did not map bundled dependency: $required_relative" \
+    env PATH="$TEMP_ROOT/filtered-mapping-tools:$PATH" \
+      HIDE_MAPPED_CODE_PATH="$(cd "$APP" && pwd -P)/$required_relative" \
+      DISTRIBUTION_E2E_REQUIRE_TRANSLOCATION=false \
+      DISTRIBUTION_E2E_STABILITY_SECONDS=0 \
+      bash "$VERIFIER" "$APP" "$fixture_pid" "$EVIDENCE"
+done
+
+mutated_app="$TEMP_ROOT/Mutated.app"
+ditto "$APP" "$mutated_app"
+printf 'changed\n' > "$mutated_app/Contents/PkgInfo"
+codesign --force --sign - --options runtime \
+  --entitlements "$TEMP_ROOT/fixture.entitlements" \
+  "$mutated_app" >/dev/null
+expect_failure \
+  'running process bundle does not match the downloaded app bundle' \
+  env DISTRIBUTION_E2E_REQUIRE_TRANSLOCATION=false \
+    DISTRIBUTION_E2E_STABILITY_SECONDS=0 \
+    bash "$VERIFIER" "$mutated_app" "$fixture_pid" "$EVIDENCE"
+
+tampered_app="$TEMP_ROOT/TamperedOptional.app"
+ditto "$APP" "$tampered_app"
+printf 'changed\n' >> "$tampered_app/Contents/Frameworks/libSystem.B.dylib"
+expect_failure \
+  'source app fails strict deep signature verification' \
+  env DISTRIBUTION_E2E_REQUIRE_TRANSLOCATION=false \
+    DISTRIBUTION_E2E_STABILITY_SECONDS=0 \
+    bash "$VERIFIER" "$tampered_app" "$fixture_pid" "$EVIDENCE"
 
 mkdir -p "$TEMP_ROOT/fake-tools"
 cat > "$TEMP_ROOT/fake-tools/vmmap" <<'SCRIPT'

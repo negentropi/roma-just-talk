@@ -69,13 +69,18 @@ macho_runpaths() {
 }
 
 macho_dependencies() {
-  otool -arch "$active_architecture" -L "$1" 2>/dev/null | awk '
-    NR == 1 { next }
-    {
+  otool -arch "$active_architecture" -l "$1" 2>/dev/null | awk '
+    $1 == "cmd" {
+      kind = $2
+      linked = kind ~ /^LC_(LOAD_DYLIB|LOAD_WEAK_DYLIB|REEXPORT_DYLIB|LOAD_UPWARD_DYLIB|LAZY_LOAD_DYLIB)$/
+      next
+    }
+    linked && $1 == "name" {
       dependency = $0
-      sub(/^[[:space:]]+/, "", dependency)
-      sub(/[[:space:]]+\(compatibility version.*$/, "", dependency)
-      if (dependency != "") print dependency
+      sub(/^[[:space:]]*name[[:space:]]+/, "", dependency)
+      sub(/[[:space:]]+\(offset[[:space:]]+[0-9]+\)[[:space:]]*$/, "", dependency)
+      if (dependency != "") printf "%s\t%s\n", kind, dependency
+      linked = 0
     }
   '
 }
@@ -382,6 +387,34 @@ mapped_paths="$evidence/process-mapped-paths-through-runtime.txt"
 : > "$evidence/mapped-code-signatures.txt"
 : > "$evidence/bundle-dependency-resolution.txt"
 : > "$evidence/unresolved-external-or-cache-dependencies.txt"
+: > "$evidence/optional-weak-dependencies.txt"
+
+record_unique_mapped_paths "$evidence/process-open-files.txt" "$mapped_paths"
+if [[ "$capture_until_exit" == "true" ]]; then
+  capture_lsof="$evidence/process-open-files-runtime-sample.txt"
+  capture_deadline=$((SECONDS + capture_timeout_seconds))
+  while kill -0 "$pid" 2>/dev/null; do
+    if (( SECONDS >= capture_deadline )); then
+      fail "timed out waiting for the runtime process to finish: $pid"
+    fi
+    if lsof -p "$pid" -Ffn > "$capture_lsof" 2>/dev/null; then
+      record_unique_mapped_paths "$capture_lsof" "$mapped_paths"
+    fi
+    sleep 1
+  done
+fi
+
+while IFS= read -r mapped_path; do
+  case "$mapped_path" in
+    "$process_app"/Contents/*)
+      relative_mapped_path="${mapped_path#"$process_app"/}"
+      if is_macho "$app/$relative_mapped_path"; then
+        printf '%s\n' "$relative_mapped_path" >> "$observed_code"
+      fi
+      ;;
+  esac
+done < "$mapped_paths"
+LC_ALL=C sort -u -o "$observed_code" "$observed_code"
 
 queue=("$source_executable")
 queue_runpaths=("")
@@ -395,7 +428,7 @@ while (( queue_index < ${#queue[@]} )); do
     continue
   fi
   require_active_architecture "$candidate"
-  if ! otool -arch "$active_architecture" -L "$candidate" >/dev/null 2>&1; then
+  if ! otool -arch "$active_architecture" -l "$candidate" >/dev/null 2>&1; then
     fail "could not inspect bundled Mach-O dependencies: $candidate"
   fi
 
@@ -412,7 +445,7 @@ while (( queue_index < ${#queue[@]} )); do
     fi
   done < <(macho_runpaths "$candidate")
 
-  while IFS= read -r reference; do
+  while IFS=$'\t' read -r dependency_kind reference; do
     [[ -n "$reference" ]] || continue
     resolved=""
     bundle_required="false"
@@ -461,6 +494,12 @@ while (( queue_index < ${#queue[@]} )); do
     fi
 
     if [[ -z "$resolved" || ! -f "$resolved" ]]; then
+      if [[ "$dependency_kind" == "LC_LOAD_WEAK_DYLIB" ]]; then
+        printf '%s\t%s\t%s\t\tunresolved\n' \
+          "${candidate#"$app"/}" "$dependency_kind" "$reference" \
+          >> "$evidence/optional-weak-dependencies.txt"
+        continue
+      fi
       if [[ "$bundle_required" == "true" ]]; then
         fail "could not resolve bundled dependency: $reference from ${candidate#"$app"/}"
       fi
@@ -488,6 +527,18 @@ while (( queue_index < ${#queue[@]} )); do
       "$reference" \
       "$relative" \
       >> "$evidence/bundle-dependency-resolution.txt"
+    if [[ "$dependency_kind" == "LC_LOAD_WEAK_DYLIB" ]]; then
+      weak_mapping="mapped"
+      if ! grep -Fxq "$relative" "$observed_code"; then
+        weak_mapping="unmapped"
+      fi
+      printf '%s\t%s\t%s\t%s\t%s\n' \
+        "${candidate#"$app"/}" "$dependency_kind" "$reference" \
+        "$relative" "$weak_mapping" \
+        >> "$evidence/optional-weak-dependencies.txt"
+      # dyld permits absent weak images and only loads children of images it maps.
+      [[ "$weak_mapping" == "mapped" ]] || continue
+    fi
     if ! grep -Fxq "$relative" "$expected_code"; then
       printf '%s\n' "$relative" >> "$expected_code"
       queue+=("$resolved")
@@ -495,33 +546,6 @@ while (( queue_index < ${#queue[@]} )); do
     fi
   done < <(macho_dependencies "$candidate")
 done
-
-record_unique_mapped_paths "$evidence/process-open-files.txt" "$mapped_paths"
-if [[ "$capture_until_exit" == "true" ]]; then
-  capture_lsof="$evidence/process-open-files-runtime-sample.txt"
-  capture_deadline=$((SECONDS + capture_timeout_seconds))
-  while kill -0 "$pid" 2>/dev/null; do
-    if (( SECONDS >= capture_deadline )); then
-      fail "timed out waiting for the runtime process to finish: $pid"
-    fi
-    if lsof -p "$pid" -Ffn > "$capture_lsof" 2>/dev/null; then
-      record_unique_mapped_paths "$capture_lsof" "$mapped_paths"
-    fi
-    sleep 1
-  done
-fi
-
-while IFS= read -r mapped_path; do
-  case "$mapped_path" in
-    "$process_app"/Contents/*)
-      relative_mapped_path="${mapped_path#"$process_app"/}"
-      if is_macho "$app/$relative_mapped_path"; then
-        printf '%s\n' "$relative_mapped_path" >> "$observed_code"
-      fi
-      ;;
-  esac
-done < "$mapped_paths"
-LC_ALL=C sort -u -o "$observed_code" "$observed_code"
 
 while IFS= read -r expected_relative; do
   [[ -n "$expected_relative" ]] || continue

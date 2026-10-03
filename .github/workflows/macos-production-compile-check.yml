@@ -27,6 +27,11 @@ jobs:
           swift --version > "$RUNNER_TEMP/roma-production-compile/swift.txt"
           test "$(xcodebuild -version | sed -n '1p')" = 'Xcode 26.6'
           test "$(xcodebuild -version | sed -n '2p')" = 'Build version 17F113'
+          test "$(xcrun --sdk macosx --show-sdk-version)" = '26.5'
+          python3 - "$RUNNER_TEMP/roma-production-compile/swift.txt" <<'PY'
+          import pathlib, re, sys
+          assert re.search(r'\bApple Swift version 6\.3\.3\b', pathlib.Path(sys.argv[1]).read_text())
+          PY
       - name: Build the observed Whisper revision
         run: |
           mkdir -p "$HOME/VoiceInk-Dependencies"
@@ -41,6 +46,7 @@ jobs:
           xcodebuild -project VoiceInk.xcodeproj -scheme VoiceInk -configuration Release \
             -derivedDataPath "$RUNNER_TEMP/roma-production-derived" \
             -archivePath "$RUNNER_TEMP/roma-production.xcarchive" \
+            -disableAutomaticPackageResolution -onlyUsePackageVersionsFromResolvedFile \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY='' \
             ENABLE_CODE_COVERAGE=NO ARCHS=arm64 ONLY_ACTIVE_ARCH=YES \
             archive 2>&1 | tee "$RUNNER_TEMP/roma-production-compile/archive.log"
@@ -48,6 +54,7 @@ jobs:
         run: |
           xcodebuild -project VoiceInk.xcodeproj -scheme VoiceInk -configuration Release \
             -derivedDataPath "$RUNNER_TEMP/roma-production-derived" \
+            -disableAutomaticPackageResolution -onlyUsePackageVersionsFromResolvedFile \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY='' \
             ENABLE_CODE_COVERAGE=NO ARCHS=arm64 ONLY_ACTIVE_ARCH=YES \
             -showBuildSettings -json > "$RUNNER_TEMP/roma-production-compile/build-settings.json"
@@ -72,6 +79,20 @@ jobs:
           python3 scripts/check-macos-deployment-target.py "$APP"
           printf '%s\n' 'Production compile only; unsigned archive is not a qualified distribution.' \
             > "$RUNNER_TEMP/roma-production-compile/BOUNDARY.txt"
+      - name: Package unsigned production archive
+        run: |
+          bash scripts/package-macos-production-archive.sh \
+            --archive "$RUNNER_TEMP/roma-production.xcarchive" \
+            --evidence-directory "$RUNNER_TEMP/roma-production-compile" \
+            --whisper-source "$HOME/VoiceInk-Dependencies/whisper.cpp" \
+            --expected-source-sha "$GITHUB_SHA" \
+            --output-directory "$RUNNER_TEMP/roma-unsigned-production-archive"
+      - name: Retain unsigned production archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.macos.unsigned-production-archive
+          path: ${{ runner.temp }}/roma-unsigned-production-archive/
+          if-no-files-found: error
       - name: Retain compilation evidence
         if: always()
         uses: actions/upload-artifact@v4

@@ -1,6 +1,8 @@
 import CoreData
+import Darwin
 import Foundation
 import SwiftData
+import VoiceInkCore
 
 private enum Layout: Equatable {
     case combined, separateStats, separateDomains, fullSchemaControl
@@ -38,6 +40,16 @@ private enum Mode: String, CaseIterable {
         case .combinedModelActor: .modelActor
         }
     }
+}
+
+private enum ProductionMode: String, CaseIterable {
+    case persistentReopen = "production-persistent-reopen"
+    case memory = "production-memory"
+    case writer = "production-writer"
+    case upgrade = "production-upgrade"
+    case legacySeedHosted = "legacy-seed-hosted"
+
+    static var automaticCases: [ProductionMode] { [.persistentReopen, .memory, .writer] }
 }
 
 private struct Containers {
@@ -146,7 +158,201 @@ private actor FetchWorker {
 }
 
 private enum ProbeError: Error {
-    case usage, nonemptyDirectory, nonemptyFreshStore
+    case usage, nonemptyDirectory, nonemptyFreshStore, unexpectedValues, readOnlySaveAccepted, storeIdentityChanged, nonAPFSDirectory
+}
+
+private func requireAPFS(_ directory: URL) throws {
+    var filesystem = statfs()
+    guard directory.path.withCString({ statfs($0, &filesystem) }) == 0 else { throw ProbeError.nonAPFSDirectory }
+    let capacity = MemoryLayout.size(ofValue: filesystem.f_fstypename)
+    let name = withUnsafePointer(to: &filesystem.f_fstypename) {
+        $0.withMemoryRebound(to: CChar.self, capacity: capacity) { String(cString: $0) }
+    }
+    guard name == "apfs" else { throw ProbeError.nonAPFSDirectory }
+    try emit(["event": "store-filesystem", "type": name, "path": directory.path])
+}
+
+private struct StoreIdentity: Equatable {
+    let uuid: String
+    let versionHashes: [String: Data]
+}
+
+private func storeIdentities(directory: URL) throws -> [String: StoreIdentity] {
+    var identities: [String: StoreIdentity] = [:]
+    for name in ["default", "dictionary", "stats"] {
+        let metadata = try NSPersistentStoreCoordinator.metadataForPersistentStore(
+            ofType: NSSQLiteStoreType, at: directory.appendingPathComponent(name + ".store"),
+            options: [NSReadOnlyPersistentStoreOption: true]
+        )
+        guard let uuid = metadata[NSStoreUUIDKey] as? String,
+              let hashes = metadata[NSStoreModelVersionHashesKey] as? [String: Data] else {
+            throw ProbeError.storeIdentityChanged
+        }
+        identities[name] = StoreIdentity(uuid: uuid, versionHashes: hashes)
+    }
+    return identities
+}
+
+private let fixtureID = UUID(uuidString: "E74051A6-A777-45B1-8574-8B1C9A719740")!
+
+private func fixtureTranscript() -> Transcription {
+    let transcript = Transcription(
+        text: "legacy three words", duration: 6, transcriptionModelName: "fixture model",
+        transcriptionDuration: 2, transcriptionStatus: .completed
+    )
+    transcript.id = fixtureID
+    transcript.timestamp = Date(timeIntervalSince1970: 1_700_000_000)
+    return transcript
+}
+
+private func fixtureDraft(id: UUID = fixtureID) -> VoiceInkSessionMetricDraft {
+    let transcript = fixtureTranscript()
+    return VoiceInkSessionMetricPolicy.recorderDraft(
+        transcriptionId: id, timestamp: transcript.timestamp, source: transcript,
+        transcriptionModelName: transcript.transcriptionModelName,
+        powerModeName: nil, aiEnhancementModelName: nil
+    )
+}
+
+@MainActor
+private func verifyValues(_ containers: Containers) throws {
+    let transcriptions = try ModelContext(containers.transcript).fetch(FetchDescriptor<Transcription>())
+    let vocabulary = try ModelContext(containers.dictionary).fetch(FetchDescriptor<VocabularyWord>())
+    let replacements = try ModelContext(containers.dictionary).fetch(FetchDescriptor<WordReplacement>())
+    let metrics = try ModelContext(containers.stats).fetch(FetchDescriptor<SessionMetric>())
+    try emit([
+        "event": "stored-values", "transcripts": transcriptions.map { ["id": $0.id.uuidString, "text": $0.text] },
+        "vocabulary": vocabulary.map(\.word),
+        "replacements": replacements.map { ["original": $0.originalText, "replacement": $0.replacementText] },
+        "metrics": metrics.map { ["id": $0.transcriptionId.uuidString, "words": $0.wordCount, "duration": $0.audioDuration] as [String: Any] }
+    ])
+    guard transcriptions.count == 1, vocabulary.count == 1, replacements.count == 1, metrics.count == 1,
+          transcriptions[0].id == fixtureID, transcriptions[0].text == "legacy three words",
+          transcriptions[0].duration == 6, transcriptions[0].transcriptionState == .completed,
+          vocabulary[0].word == "RJT Sonoma", replacements[0].originalText == "r j t",
+          replacements[0].replacementText == "Roma Just Talk", metrics[0].transcriptionId == fixtureID,
+          metrics[0].wordCount == 3, metrics[0].audioDuration == 6, metrics[0].speedFactor == 3,
+          metrics[0].transcriptionModelName == "fixture model" else {
+        throw ProbeError.unexpectedValues
+    }
+}
+
+@MainActor
+private func observeProductionStores(_ stores: VoiceInkModelStores) throws {
+    for container in [stores.transcription, stores.dictionary, stores.metrics] {
+        for configuration in container.configurations { try observeStore(configuration) }
+    }
+}
+
+@MainActor
+private func productionContainers(_ stores: VoiceInkModelStores) -> Containers {
+    Containers(transcript: stores.transcription, dictionary: stores.dictionary, stats: stores.metrics)
+}
+
+@MainActor
+private func seedProductionStores(_ stores: VoiceInkModelStores) async throws {
+    stores.transcription.mainContext.insert(fixtureTranscript())
+    try stores.transcription.mainContext.save()
+    stores.dictionary.mainContext.insert(VocabularyWord(word: "RJT Sonoma"))
+    stores.dictionary.mainContext.insert(WordReplacement(originalText: "r j t", replacementText: "Roma Just Talk"))
+    try stores.dictionary.mainContext.save()
+    guard try await stores.metricWriter.value.record([fixtureDraft()]) == 1 else { throw ProbeError.unexpectedValues }
+}
+
+@MainActor
+private func verifyProductionWriter(directory: URL) async throws {
+    let stores = try VoiceInkModelStores.persistent(at: directory, dictionaryCloudKit: .none)
+    let draft = fixtureDraft()
+    let writerTask = stores.metricWriter
+    let inserted = try await withThrowingTaskGroup(of: Int.self) { group in
+        for _ in 0..<20 {
+            group.addTask { try await writerTask.value.record([draft, draft]) }
+        }
+        var total = 0
+        for try await count in group { total += count }
+        return total
+    }
+    guard inserted == 1 else { throw ProbeError.unexpectedValues }
+    let pending = fixtureDraft(id: UUID(uuidString: "2B182BD0-4F19-4C68-9996-C8467055F8B2")!)
+    let schema = Schema([SessionMetric.self])
+    let readOnly = try ModelContainer(for: schema, configurations: ModelConfiguration(
+        "stats", schema: schema, url: directory.appendingPathComponent("stats.store"),
+        allowsSave: false, cloudKitDatabase: .none
+    ))
+    let context = ModelContext(readOnly)
+    context.autosaveEnabled = false
+    context.insert(SessionMetric(draft: pending))
+    var rejected = false
+    do { try context.save() } catch {
+        rejected = true
+        try emit(["event": "read-only-save-rejected", "error": String(describing: error)])
+    }
+    guard rejected else { throw ProbeError.readOnlySaveAccepted }
+    context.rollback()
+    let failingWriter = await Task.detached { SessionMetricRecorder(modelContainer: readOnly) }.value
+    for attempt in 1...2 {
+        var writerRejected = false
+        do { _ = try await failingWriter.record([draft, pending]) } catch {
+            writerRejected = true
+            try emit(["event": "writer-save-rejected", "attempt": attempt, "error": String(describing: error)])
+        }
+        guard writerRejected else { throw ProbeError.readOnlySaveAccepted }
+    }
+    let reopened = try VoiceInkModelStores.persistent(at: directory, dictionaryCloudKit: .none)
+    guard try await reopened.metricWriter.value.record([draft, pending]) == 1,
+          try await reopened.metricWriter.value.record([draft, pending]) == 0 else {
+        throw ProbeError.unexpectedValues
+    }
+    let final = try VoiceInkModelStores.persistent(at: directory, dictionaryCloudKit: .none)
+    let rows = try final.metrics.mainContext.fetch(FetchDescriptor<SessionMetric>())
+    guard rows.count == 2, Set(rows.map(\.transcriptionId)) == [draft.transcriptionId, pending.transcriptionId],
+          rows.reduce(0, { $0 + $1.wordCount }) == 6 else { throw ProbeError.unexpectedValues }
+    try observeProductionStores(final)
+    try emit(["event": "writer-verified", "concurrentInsertCount": inserted, "persistedMetricCount": rows.count, "totalWords": 6])
+}
+
+@MainActor
+private func runProduction(_ mode: ProductionMode, directory: URL) async throws {
+    switch mode {
+    case .legacySeedHosted:
+        guard ProcessInfo.processInfo.operatingSystemVersion.majorVersion == 26 else { throw ProbeError.usage }
+        let containers = try makeContainers(layout: .combined, directory: directory)
+        let context = containers.transcript.mainContext
+        context.insert(fixtureTranscript())
+        context.insert(VocabularyWord(word: "RJT Sonoma"))
+        context.insert(WordReplacement(originalText: "r j t", replacementText: "Roma Just Talk"))
+        context.insert(SessionMetric(draft: fixtureDraft()))
+        try context.save()
+        try verifyValues(containers)
+        for configuration in containers.transcript.configurations { try observeStore(configuration) }
+        try emit(["event": "legacy-fixture-seeded", "layout": "original-three-subset-configurations"])
+    case .persistentReopen:
+        let stores = try VoiceInkModelStores.persistent(at: directory, dictionaryCloudKit: .none)
+        try await seedProductionStores(stores)
+        let reopened = try VoiceInkModelStores.persistent(at: directory, dictionaryCloudKit: .none)
+        try verifyValues(productionContainers(reopened))
+        try observeProductionStores(reopened)
+    case .memory:
+        let stores = try VoiceInkModelStores.inMemory()
+        try await seedProductionStores(stores)
+        try verifyValues(productionContainers(stores))
+        let independent = try VoiceInkModelStores.inMemory()
+        try fetchAll(statsContext: independent.metrics.mainContext, containers: productionContainers(independent))
+    case .writer:
+        try await verifyProductionWriter(directory: directory)
+    case .upgrade:
+        let before = try storeIdentities(directory: directory)
+        for name in ["default", "dictionary", "stats"] {
+            let configuration = ModelConfiguration(name, url: directory.appendingPathComponent(name + ".store"), cloudKitDatabase: .none)
+            try observeStore(configuration)
+        }
+        let stores = try VoiceInkModelStores.persistent(at: directory, dictionaryCloudKit: .none)
+        try verifyValues(productionContainers(stores))
+        guard try await stores.metricWriter.value.record([fixtureDraft()]) == 0 else { throw ProbeError.unexpectedValues }
+        try observeProductionStores(stores)
+        guard try storeIdentities(directory: directory) == before else { throw ProbeError.storeIdentityChanged }
+        try emit(["event": "legacy-store-identities-preserved", "stores": before.keys.sorted()])
+    }
 }
 
 @main
@@ -154,39 +360,49 @@ private struct Probe {
     @MainActor
     static func main() async throws {
         if CommandLine.arguments == [CommandLine.arguments[0], "--list-modes"] {
-            let data = try JSONEncoder().encode(Mode.allCases.map(\.rawValue))
+            let data = try JSONEncoder().encode(Mode.allCases.map(\.rawValue) + ProductionMode.automaticCases.map(\.rawValue))
             FileHandle.standardOutput.write(data + Data([10]))
             return
         }
-        guard CommandLine.arguments.count == 3, let mode = Mode(rawValue: CommandLine.arguments[1]) else {
+        guard CommandLine.arguments.count == 3 else {
             throw ProbeError.usage
         }
+        let modeName = CommandLine.arguments[1]
+        let mode = Mode(rawValue: modeName)
+        let productionMode = ProductionMode(rawValue: modeName)
+        guard mode != nil || productionMode != nil else { throw ProbeError.usage }
         let directory = URL(fileURLWithPath: CommandLine.arguments[2], isDirectory: true)
-        guard FileManager.default.fileExists(atPath: directory.path),
-              try FileManager.default.contentsOfDirectory(atPath: directory.path).isEmpty else {
+        guard FileManager.default.fileExists(atPath: directory.path) else { throw ProbeError.nonemptyDirectory }
+        let contents = try FileManager.default.contentsOfDirectory(atPath: directory.path)
+        guard productionMode == .upgrade || contents.isEmpty else {
             throw ProbeError.nonemptyDirectory
         }
+        try requireAPFS(directory)
         try emit([
-            "event": "start", "mode": mode.rawValue, "diagnosticOnly": true, "directory": directory.path,
+            "event": "start", "mode": modeName, "diagnosticOnly": true, "directory": directory.path,
             "bundleIdentifier": Bundle.main.bundleIdentifier ?? "absent",
             "bundleName": Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String ?? "absent"
         ])
-        let containers = try makeContainers(layout: mode.layout, directory: directory)
-        switch mode.execution {
-        case .main:
-            try fetchAll(statsContext: ModelContext(containers.stats), containers: containers)
-        case .mainContext:
-            try fetchAll(statsContext: containers.stats.mainContext, containers: containers)
-        case .detached:
-            try await Task.detached {
+        if let productionMode {
+            try await runProduction(productionMode, directory: directory)
+        } else if let mode {
+            let containers = try makeContainers(layout: mode.layout, directory: directory)
+            switch mode.execution {
+            case .main:
                 try fetchAll(statsContext: ModelContext(containers.stats), containers: containers)
-            }.value
-        case .modelActor:
-            try await Task.detached {
-                let worker = FetchWorker(modelContainer: containers.stats)
-                try await worker.fetch(containers: containers)
-            }.value
+            case .mainContext:
+                try fetchAll(statsContext: containers.stats.mainContext, containers: containers)
+            case .detached:
+                try await Task.detached {
+                    try fetchAll(statsContext: ModelContext(containers.stats), containers: containers)
+                }.value
+            case .modelActor:
+                try await Task.detached {
+                    let worker = FetchWorker(modelContainer: containers.stats)
+                    try await worker.fetch(containers: containers)
+                }.value
+            }
         }
-        try emit(["event": "completed", "mode": mode.rawValue])
+        try emit(["event": "completed", "mode": modeName])
     }
 }

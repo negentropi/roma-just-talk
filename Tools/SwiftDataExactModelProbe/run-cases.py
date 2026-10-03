@@ -16,11 +16,65 @@ def now():
     return datetime.now(timezone.utc).isoformat()
 
 
+def fixture_inventory(directory):
+    allowed = {name + suffix for name in ("default", "dictionary", "stats")
+               for suffix in (".store", ".store-wal", ".store-shm")}
+    observed = {}
+    for path in directory.iterdir():
+        if path.name not in allowed or not path.is_file() or path.is_symlink():
+            raise ValueError("Legacy fixture contains an unexpected path")
+        observed[path.name] = hashlib.sha256(path.read_bytes()).hexdigest()
+    if not {"default.store", "dictionary.store", "stats.store"} <= observed.keys():
+        raise ValueError("Legacy fixture is missing an original store")
+    return observed
+
+
+def observe_case(binary, output, mode, legacy_fixture=None):
+    stores = Path(tempfile.mkdtemp(prefix="roma-swiftdata-exact-" + mode + "-")).resolve()
+    fixture_binding = None
+    if legacy_fixture is not None:
+        before = fixture_inventory(legacy_fixture)
+        shutil.copytree(legacy_fixture, stores, dirs_exist_ok=True)
+        if fixture_inventory(stores) != before or fixture_inventory(legacy_fixture) != before:
+            raise ValueError("Legacy fixture copy changed bytes")
+        fixture_binding = {"sourceDirectory": str(legacy_fixture), "sha256": before}
+    file_system = subprocess.check_output(["df", "-P", str(stores)], text=True, timeout=10)
+    started = now()
+    begin = time.monotonic()
+    timed_out = False
+    command = [str(binary), mode, str(stores)]
+    with (output / (mode + ".log")).open("wb") as log:
+        process = subprocess.Popen(command, stdout=log, stderr=subprocess.STDOUT)
+        try:
+            exit_code = process.wait(timeout=60)
+        except subprocess.TimeoutExpired:
+            timed_out = True
+            process.kill()
+            exit_code = process.wait(timeout=5)
+    if fixture_binding is not None and fixture_inventory(legacy_fixture) != fixture_binding["sha256"]:
+        raise ValueError("Original legacy fixture changed during upgrade")
+    result = {"mode": mode, "pid": process.pid, "command": command, "startedUTC": started,
+              "finishedUTC": now(), "seconds": round(time.monotonic() - begin, 3),
+              "exitCode": exit_code, "timedOut": timed_out,
+              "storeDirectory": str(stores), "storeFileSystem": file_system,
+              "storeDevice": stores.stat().st_dev, "outputDevice": output.stat().st_dev,
+              "legacyFixture": fixture_binding}
+    (output / (mode + ".result.json")).write_text(json.dumps(result, sort_keys=True, indent=2) + "\n")
+    shutil.copytree(stores, output / (mode + ".stores"))
+    print(json.dumps(result, sort_keys=True), flush=True)
+    return result
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("binary", type=Path)
     parser.add_argument("fresh_output", type=Path)
+    parser.add_argument("--prepare-legacy-fixture", action="store_true")
+    parser.add_argument("--legacy-fixture", type=Path)
+    parser.add_argument("--require-production-success", action="store_true")
     args = parser.parse_args()
+    if args.prepare_legacy_fixture and args.legacy_fixture is not None:
+        parser.error("Choose hosted legacy preparation or an existing legacy fixture")
     binary = args.binary.resolve(strict=True)
     app = binary.parent.parent.parent
     info = app / "Contents" / "Info.plist"
@@ -68,29 +122,33 @@ def main():
             raise ValueError("Invalid probe mode")
     identity["modes"] = modes
     (output / "runtime-identity.json").write_text(json.dumps(identity, sort_keys=True, indent=2) + "\n")
+    production_modes = {"production-persistent-reopen", "production-memory", "production-writer"}
+    if not production_modes <= set(modes):
+        raise ValueError("Probe does not contain the required production-owner cases")
+    legacy_fixture = args.legacy_fixture.resolve(strict=True) if args.legacy_fixture is not None else None
+    failures = []
+    if args.prepare_legacy_fixture:
+        seeded = observe_case(binary, output, "legacy-seed-hosted")
+        if seeded["exitCode"] == 0 and not seeded["timedOut"]:
+            legacy_fixture = output / "legacy-seed-hosted.stores"
+        else:
+            failures.append("legacy-seed-hosted")
     for mode in modes:
-        stores = Path(tempfile.mkdtemp(prefix="roma-swiftdata-exact-" + mode + "-")).resolve()
-        file_system = subprocess.check_output(["df", "-P", str(stores)], text=True, timeout=10)
-        started = now()
-        begin = time.monotonic()
-        timed_out = False
-        command = [str(binary), mode, str(stores)]
-        with (output / (mode + ".log")).open("wb") as log:
-            process = subprocess.Popen(command, stdout=log, stderr=subprocess.STDOUT)
-            try:
-                exit_code = process.wait(timeout=60)
-            except subprocess.TimeoutExpired:
-                timed_out = True
-                process.kill()
-                exit_code = process.wait(timeout=5)
-        result = {"mode": mode, "pid": process.pid, "command": command, "startedUTC": started,
-                  "finishedUTC": now(), "seconds": round(time.monotonic() - begin, 3),
-                  "exitCode": exit_code, "timedOut": timed_out,
-                  "storeDirectory": str(stores), "storeFileSystem": file_system,
-                  "storeDevice": stores.stat().st_dev, "outputDevice": output.stat().st_dev}
-        (output / (mode + ".result.json")).write_text(json.dumps(result, sort_keys=True, indent=2) + "\n")
-        shutil.copytree(stores, output / (mode + ".stores"))
-        print(json.dumps(result, sort_keys=True), flush=True)
+        result = observe_case(binary, output, mode)
+        if mode in production_modes and (result["exitCode"] != 0 or result["timedOut"]):
+            failures.append(mode)
+    if legacy_fixture is not None:
+        result = observe_case(binary, output, "production-upgrade", legacy_fixture)
+        if result["exitCode"] != 0 or result["timedOut"]:
+            failures.append("production-upgrade")
+    else:
+        (output / "production-upgrade.blocked.json").write_text(json.dumps({
+            "mode": "production-upgrade", "executed": False,
+            "reason": "A successful hosted old-layout fixture is required"
+        }, sort_keys=True, indent=2) + "\n")
+        failures.append("production-upgrade")
+    if args.require_production_success and failures:
+        raise SystemExit("Production-owner cases failed or were not executed: " + ", ".join(failures))
 
 
 if __name__ == "__main__":

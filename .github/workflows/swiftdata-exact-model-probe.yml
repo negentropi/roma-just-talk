@@ -23,7 +23,7 @@ jobs:
           persist-credentials: false
       - name: Verify exact probe input guards
         run: python3 Tools/SwiftDataExactModelProbe/verify-inputs.py --self-test
-      - name: Build unchanged production model probe
+      - name: Build unchanged production models and storage owners
         run: |
           bash Tools/SwiftDataExactModelProbe/build.sh \
             .swiftdata-exact-probe "$RUNNER_TEMP/swiftdata-exact-build-$GITHUB_RUN_ATTEMPT"
@@ -31,7 +31,8 @@ jobs:
         run: |
           python3 Tools/SwiftDataExactModelProbe/run-cases.py \
             .swiftdata-exact-probe/VoiceInkSwiftDataExactProbe.app/Contents/MacOS/voiceink-swiftdata-probe \
-            .swiftdata-exact-probe/hosted-observations
+            .swiftdata-exact-probe/hosted-observations \
+            --prepare-legacy-fixture --require-production-success
       - name: Retain exact diagnostic bytes and raw observations
         if: always()
         uses: actions/upload-artifact@v4

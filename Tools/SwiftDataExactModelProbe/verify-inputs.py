@@ -7,6 +7,7 @@ import subprocess
 import tempfile
 
 MODELS = ("Transcription.swift", "VocabularyWord.swift", "WordReplacement.swift", "SessionMetric.swift")
+SERVICES = ("VoiceInkModelStores.swift", "SessionMetricRecorder.swift")
 INPUT_LOCKS = {
     "VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved": "2cdda5176a184329f2ca828316bfdefd9578d94bfed96a2b48b34b42b851e84c",
     "VoiceInkCore/Package.resolved": "146873579ca308c62a7a0bc5b8d4743d1bc2d8be0fab818e0bb032126b26ffa2",
@@ -139,11 +140,11 @@ def verify_checkouts(lock, scratch):
 
 def verify_models(repo, probe):
     result = {}
-    for name in MODELS:
-        source = repo / "VoiceInk" / "Models" / name
+    for name in (*MODELS, *SERVICES):
+        source = repo / "VoiceInk" / ("Models" if name in MODELS else "Services") / name
         copied = probe / "Sources" / "VoiceInk" / name
         if source.read_bytes() != copied.read_bytes():
-            raise ValueError(f"Production model copy differs: {name}")
+            raise ValueError(f"Production source copy differs: {name}")
         result[name] = sha(source)
     return result
 
@@ -243,17 +244,21 @@ def self_test():
             raise AssertionError("Duplicate checkout accepted")
         repo, probe = root / "repo", root / "probe"
         (repo / "VoiceInk" / "Models").mkdir(parents=True)
+        (repo / "VoiceInk" / "Services").mkdir(parents=True)
         (probe / "Sources" / "VoiceInk").mkdir(parents=True)
-        for name in MODELS:
-            (repo / "VoiceInk" / "Models" / name).write_text(name)
+        for name in (*MODELS, *SERVICES):
+            (repo / "VoiceInk" / ("Models" if name in MODELS else "Services") / name).write_text(name)
             (probe / "Sources" / "VoiceInk" / name).write_text(name)
         verify_models(repo, probe)
-        (probe / "Sources" / "VoiceInk" / "SessionMetric.swift").write_text("altered")
-        try:
-            verify_models(repo, probe)
-        except ValueError:
-            return
-        raise AssertionError("Modified model was accepted")
+        for name in ("SessionMetric.swift", *SERVICES):
+            copied = probe / "Sources" / "VoiceInk" / name
+            copied.write_text("altered")
+            try:
+                verify_models(repo, probe)
+            except ValueError:
+                copied.write_text(name)
+            else:
+                raise AssertionError("Modified production source was accepted")
 
 
 def main():
@@ -268,7 +273,7 @@ def main():
         parser.error("Choose one input verification operation")
     if args.self_test:
         self_test()
-        print("Exact model and dependency input rejection tests passed")
+        print("Exact production model, factory, writer and dependency input rejection tests passed")
     elif args.models:
         print(json.dumps(verify_models(*args.models), sort_keys=True, indent=2))
     elif args.locks:

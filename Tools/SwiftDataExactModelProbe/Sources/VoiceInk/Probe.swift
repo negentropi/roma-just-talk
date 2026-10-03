@@ -177,6 +177,69 @@ private struct StoreIdentity: Equatable {
     let versionHashes: [String: Data]
 }
 
+private let ownedEntitiesByStore: [String: Set<String>] = [
+    "default": ["Transcription"],
+    "dictionary": ["VocabularyWord", "WordReplacement"],
+    "stats": ["SessionMetric"]
+]
+
+private func verifyUpgradeIdentities(before: [String: StoreIdentity], after: [String: StoreIdentity]) throws {
+    let names = Set(ownedEntitiesByStore.keys)
+    guard Set(before.keys) == names, Set(after.keys) == names else { throw ProbeError.storeIdentityChanged }
+    for (name, entities) in ownedEntitiesByStore {
+        guard let original = before[name], let current = after[name], original.uuid == current.uuid,
+              Set(current.versionHashes.keys) == entities else { throw ProbeError.storeIdentityChanged }
+        for entity in entities {
+            guard let originalHash = original.versionHashes[entity],
+                  current.versionHashes[entity] == originalHash else { throw ProbeError.storeIdentityChanged }
+        }
+    }
+}
+
+private func verifyUpgradeIdentityRejections(before: [String: StoreIdentity], after: [String: StoreIdentity]) throws {
+    var rejected: [String] = []
+    func requireRejection(_ name: String, original: [String: StoreIdentity], current: [String: StoreIdentity]) throws {
+        do { try verifyUpgradeIdentities(before: original, after: current) }
+        catch ProbeError.storeIdentityChanged {
+            rejected.append(name)
+            return
+        }
+        throw ProbeError.unexpectedValues
+    }
+    for name in ownedEntitiesByStore.keys.sorted() {
+        let original = before[name]!
+        let current = after[name]!
+        var changed = after
+        changed[name] = StoreIdentity(uuid: "changed-" + current.uuid, versionHashes: current.versionHashes)
+        try requireRejection(name + "-changed-uuid", original: before, current: changed)
+        var hashes = current.versionHashes
+        hashes["UnexpectedEntity"] = Data([1])
+        changed[name] = StoreIdentity(uuid: current.uuid, versionHashes: hashes)
+        try requireRejection(name + "-extra-entity", original: before, current: changed)
+        for entity in ownedEntitiesByStore[name]!.sorted() {
+            hashes = current.versionHashes
+            hashes[entity] = current.versionHashes[entity]! + Data([0])
+            changed[name] = StoreIdentity(uuid: current.uuid, versionHashes: hashes)
+            try requireRejection(name + "-" + entity + "-changed-hash", original: before, current: changed)
+            hashes.removeValue(forKey: entity)
+            changed[name] = StoreIdentity(uuid: current.uuid, versionHashes: hashes)
+            try requireRejection(name + "-" + entity + "-missing-entity", original: before, current: changed)
+            var missingOriginal = before
+            hashes = original.versionHashes
+            hashes.removeValue(forKey: entity)
+            missingOriginal[name] = StoreIdentity(uuid: original.uuid, versionHashes: hashes)
+            try requireRejection(name + "-" + entity + "-missing-original-hash", original: missingOriginal, current: after)
+        }
+    }
+    var missing = after
+    missing.removeValue(forKey: "stats")
+    try requireRejection("missing-store", original: before, current: missing)
+    var extra = after
+    extra["unexpected"] = after["stats"]!
+    try requireRejection("extra-store", original: before, current: extra)
+    try emit(["event": "upgrade-identity-rejections-verified", "cases": rejected])
+}
+
 private func storeIdentities(directory: URL) throws -> [String: StoreIdentity] {
     var identities: [String: StoreIdentity] = [:]
     for name in ["default", "dictionary", "stats"] {
@@ -350,8 +413,11 @@ private func runProduction(_ mode: ProductionMode, directory: URL) async throws 
         try verifyValues(productionContainers(stores))
         guard try await stores.metricWriter.value.record([fixtureDraft()]) == 0 else { throw ProbeError.unexpectedValues }
         try observeProductionStores(stores)
-        guard try storeIdentities(directory: directory) == before else { throw ProbeError.storeIdentityChanged }
-        try emit(["event": "legacy-store-identities-preserved", "stores": before.keys.sorted()])
+        let after = try storeIdentities(directory: directory)
+        try verifyUpgradeIdentities(before: before, after: after)
+        try verifyUpgradeIdentityRejections(before: before, after: after)
+        try emit(["event": "legacy-store-identities-preserved", "stores": before.keys.sorted(),
+                  "ownedEntities": ownedEntitiesByStore.mapValues { $0.sorted() }])
     }
 }
 

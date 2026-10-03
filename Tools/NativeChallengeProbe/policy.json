@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "threadId": "01a0de81-d14c-7670-b36d-7b045ff3c6d0",
+  "codes": {
+    "before": "await currentVm.getAXStateAndScreenshot();",
+    "action": "await currentVm.click([280,358]); await currentVm.getAXStateAndScreenshot();",
+    "after": "await currentVm.getAXStateAndScreenshot();"
+  },
+  "browser": {
+    "backend": "iab",
+    "browserId": "4",
+    "url": "http://127.0.0.1:6080/vnc.html"
+  },
+  "target": {
+    "productVersion": "26.4.1",
+    "buildVersion": "25E253",
+    "architecture": "arm64",
+    "bootUuid": "393C9C89-55DA-41C7-BE80-59B000E7BE43",
+    "firstPid": 20029,
+    "executableSha256": "103c7b38c26cfea5683aaa184048f601dbf5a137809819fe0832e2116a34bc87",
+    "finalZipSha256": "c0fcbbec22cc5ea0bffb26962045873673725ea5384ba63164be9d2aa645dbdb"
+  }
+}

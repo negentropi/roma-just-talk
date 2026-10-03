@@ -1,0 +1,88 @@
+name: Diagnose original native CUA collection
+
+on:
+  push:
+    branches:
+      - 'ci/roma-native-challenge-*'
+    paths:
+      - '.github/workflows/roma-native-challenge-probe.yml'
+      - 'Tools/NativeChallengeProbe/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  collect:
+    name: Collect original native calls
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Bind reviewed job and create fresh challenge
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          test "$GITHUB_REPOSITORY" = negentropi/roma-just-talk
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          python3 -m pip install --disable-pip-version-check Pillow==12.1.1
+          mkdir "$RUNNER_TEMP/native-probe"
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" > "$RUNNER_TEMP/native-probe/run.json"
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/attempts/$GITHUB_RUN_ATTEMPT/jobs?per_page=100" > "$RUNNER_TEMP/native-probe/jobs.json"
+          python3 Tools/NativeChallengeProbe/native_challenge.py make \
+            --policy Tools/NativeChallengeProbe/policy.json --sha "$GITHUB_SHA" \
+            --run-id "$GITHUB_RUN_ID" --attempt "$GITHUB_RUN_ATTEMPT" \
+            --run "$RUNNER_TEMP/native-probe/run.json" --jobs "$RUNNER_TEMP/native-probe/jobs.json" \
+            --exporter-sha 69f7afdc99ff35b19440b1ade5cc8bc84101bfe0dd2dbec2c83fb425d7292d2e \
+            --output "$RUNNER_TEMP/native-probe/challenge.json"
+      - name: Publish diagnostic challenge
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.native.challenge.${{ github.run_id }}.${{ github.run_attempt }}
+          path: ${{ runner.temp }}/native-probe/challenge.json
+          if-no-files-found: error
+          retention-days: 7
+      - name: Wait for exact challenge response and validate original payload
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          response_ref=$(python3 -c 'import json,os; print(json.load(open(os.environ["RUNNER_TEMP"]+"/native-probe/challenge.json"))["responseRef"])')
+          response_commit=''
+          for attempt in $(seq 1 90); do
+            if response_commit=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/$response_ref" --jq '.object.sha' 2>/dev/null); then break; fi
+            sleep 10
+          done
+          test -n "$response_commit"
+          [[ "$response_commit" =~ ^[0-9a-f]{40}$ ]]
+          python3 Tools/NativeChallengeProbe/read_response.py \
+            "$response_commit" "$GITHUB_SHA" "$RUNNER_TEMP/native-probe/response" \
+            "$RUNNER_TEMP/native-probe/response-commit.json"
+          python3 Tools/NativeChallengeProbe/native_challenge.py verify \
+            --policy Tools/NativeChallengeProbe/policy.json --sha "$GITHUB_SHA" \
+            --run-id "$GITHUB_RUN_ID" --attempt "$GITHUB_RUN_ATTEMPT" \
+            --challenge "$RUNNER_TEMP/native-probe/challenge.json" \
+            --export "$RUNNER_TEMP/native-probe/response" \
+            --exporter-sha 69f7afdc99ff35b19440b1ade5cc8bc84101bfe0dd2dbec2c83fb425d7292d2e \
+            --output "$RUNNER_TEMP/native-probe/diagnostic-result.json"
+      - name: Retain validated diagnostic payload
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.native.validated-payload.${{ github.run_id }}.${{ github.run_attempt }}
+          path: ${{ runner.temp }}/native-probe/response/**
+          if-no-files-found: error
+          retention-days: 7
+      - name: Retain diagnostic result only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.native.challenge-result.${{ github.run_id }}.${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/native-probe/challenge.json
+            ${{ runner.temp }}/native-probe/diagnostic-result.json
+            ${{ runner.temp }}/native-probe/response-commit.json
+          if-no-files-found: warn
+          retention-days: 7

@@ -1305,6 +1305,7 @@ cp "$readiness_confirmation" \
 mark_phase verify-apptranslocation-and-bundled-code
 DISTRIBUTION_E2E_REQUIRE_TRANSLOCATION="$distribution_require_translocation" \
 DISTRIBUTION_E2E_REQUIRE_APPKIT_FINISHED=true \
+DISTRIBUTION_E2E_STABILITY_SECONDS=60 \
 DISTRIBUTION_E2E_EXPECTED_MACOS_VERSION="$expected_macos_version" \
 DISTRIBUTION_E2E_EXPECTED_MACOS_BUILD="$expected_macos_build" \
 DISTRIBUTION_E2E_EXPECTED_QUARANTINE_AGENT=Safari \
@@ -1315,6 +1316,7 @@ DISTRIBUTION_E2E_EXPECTED_QUARANTINE_AGENT=Safari \
 
 sleep 2
 stop_approval_monitors
+date -u +%Y-%m-%dT%H:%M:%SZ > "$distribution_evidence/approval-window-ended-at.txt"
 awk -F '\t' 'NF >= 2 { print $2 }' "$approval_process_events" \
   | LC_ALL=C sort -nu \
   > "$distribution_evidence/approval-window-distinct-pids.txt"

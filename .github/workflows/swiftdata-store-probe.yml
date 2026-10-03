@@ -1,0 +1,61 @@
+name: Diagnose SwiftData store configuration
+
+on:
+  push:
+    branches:
+      - 'ci/roma-swiftdata-probe-*'
+    paths:
+      - '.github/workflows/swiftdata-store-probe.yml'
+      - 'Tools/SwiftDataStoreProbe/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-probe:
+    runs-on: macos-26
+    timeout-minutes: 10
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Compile isolated store probe
+        run: |
+          mkdir -p .swiftdata-probe
+          {
+            git rev-parse HEAD
+            xcodebuild -version
+            xcrun swiftc --version
+            xcrun --sdk macosx --show-sdk-version
+            sw_vers
+          } > .swiftdata-probe/build-identity.txt
+          test "$(xcodebuild -version | head -n 1)" = 'Xcode 26.6'
+          test "$(xcodebuild -version | tail -n 1)" = 'Build version 17F113'
+          xcrun swiftc -parse-as-library -target arm64-apple-macosx14.2.1 \
+            -o .swiftdata-probe/schema-probe Tools/SwiftDataStoreProbe/SchemaProbe.swift \
+            > .swiftdata-probe/compile.log 2>&1
+          codesign --verify --strict .swiftdata-probe/schema-probe
+          shasum -a 256 Tools/SwiftDataStoreProbe/SchemaProbe.swift .swiftdata-probe/schema-probe \
+            > .swiftdata-probe/source-and-binary.sha256
+          otool -l .swiftdata-probe/schema-probe > .swiftdata-probe/load-commands.txt
+          otool -L .swiftdata-probe/schema-probe > .swiftdata-probe/linked-libraries.txt
+      - name: Observe hosted store configurations
+        run: |
+          for mode in combined-main combined-background separate-main separate-background full-background; do
+            data=$(mktemp -d "$RUNNER_TEMP/schema-$mode.XXXXXX")
+            set +e
+            .swiftdata-probe/schema-probe "$mode" "$data" > ".swiftdata-probe/$mode.log" 2>&1
+            result=$?
+            set -e
+            printf '%s\n' "$result" > ".swiftdata-probe/$mode.exit"
+          done
+      - name: Retain diagnostic binary and observations
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.swiftdata-store-probe
+          path: .swiftdata-probe/
+          if-no-files-found: error

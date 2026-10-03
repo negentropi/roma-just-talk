@@ -481,6 +481,17 @@ verify_fixed "$TEMP_ROOT/fixed-fallback.json"
 verify_known_bad "$TEMP_ROOT/known-bad-safari.json"
 verify_fixed "$TEMP_ROOT/fixed-safari-fallback.json" "$LAUNCH_EVENTS" "$TERMINATION_EVENTS" "$TEMP_ROOT/known-bad-safari.json"
 
+jq '.cases[10].id = "case\\id\tline\nnext"' "$TEMP_ROOT/fixed-safari-fallback.json" > "$TEMP_ROOT/escaped-case-id.json"
+verify_fixed "$TEMP_ROOT/escaped-case-id.json" "$LAUNCH_EVENTS" "$TERMINATION_EVENTS" "$TEMP_ROOT/known-bad-safari.json" > "$OUTPUT"
+python3 - "$OUTPUT" <<'PY'
+from pathlib import Path
+import sys
+lines = Path(sys.argv[1]).read_text().splitlines()
+matching = [line for line in lines if line.startswith('fixed_matching_case=')]
+assert len(matching) == 2
+assert matching[0].endswith('\tcase\\\\id\\tline\\nnext'), matching[0]
+PY
+
 python3 - "$VERIFIER" "$TEMP_ROOT" <<'PY'
 import os
 from pathlib import Path

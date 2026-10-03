@@ -285,6 +285,6 @@ jq -nr --arg expectation "$expectation" --arg contract "$contract_sha256" \
   else
     ($profile.affectedPairs[] | "baseline_affected_target_text_scenario=" + tojson),
     ($fixed.pairMatches[] | {target, textScenario} as $pair | .caseIDs[] |
-      "fixed_matching_case=" + ($pair | tojson) + "\t" + .)
+      "fixed_matching_case=" + ([($pair | tojson), .] | @tsv))
   end)
 '

@@ -65,7 +65,38 @@ function normalizedRelease(release) {
 }
 
 function buildAppcast(release) {
-  const item = normalizedRelease(release);
+  return renderAppcast(normalizedRelease(release), minimumSystemVersion);
+}
+
+function buildDraftAppcast(release, intent) {
+  if (!release || release.draft !== true || release.prerelease !== false || release.published_at != null) {
+    throw new Error("Release must be an unpublished stable draft");
+  }
+  const version = releaseVersion(release.tag_name);
+  if (!version || intent.appVersion !== version.short || intent.appBuild !== version.build) {
+    throw new Error("Draft tag and verified app versions differ");
+  }
+  if (!/^\d+\.\d+(?:\.\d+)?$/.test(intent.minimumSystemVersion || "")) {
+    throw new Error("Verified minimum system version is invalid");
+  }
+  if (typeof intent.publicationTime !== "string" || !/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ$/.test(intent.publicationTime)) {
+    throw new Error("Draft publication time is invalid");
+  }
+  const publicationTime = new Date(intent.publicationTime);
+  if (Number.isNaN(publicationTime.getTime()) || publicationTime.toISOString() !== intent.publicationTime.replace("Z", ".000Z")) {
+    throw new Error("Draft publication time is invalid");
+  }
+  const archives = release.assets?.filter(asset => asset.name === archiveName && asset.state === "uploaded") || [];
+  if (archives.length !== 1) throw new Error(`Draft must contain one uploaded ${archiveName}`);
+  return renderAppcast({
+    ...version,
+    releaseURL: `${releaseURLPrefix}${release.tag_name}`,
+    publishedAt: publicationTime.toUTCString(),
+    notes: release.body?.trim() || "See the GitHub release page for details.",
+  }, intent.minimumSystemVersion);
+}
+
+function renderAppcast(item, minimum) {
 
   return `<?xml version="1.0" encoding="utf-8"?>
 <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
@@ -80,7 +111,7 @@ function buildAppcast(release) {
       <pubDate>${escapeXML(item.publishedAt)}</pubDate>
       <sparkle:version>${escapeXML(item.build)}</sparkle:version>
       <sparkle:shortVersionString>${escapeXML(item.short)}</sparkle:shortVersionString>
-      <sparkle:minimumSystemVersion>${minimumSystemVersion}</sparkle:minimumSystemVersion>
+      <sparkle:minimumSystemVersion>${escapeXML(minimum)}</sparkle:minimumSystemVersion>
       <description sparkle:format="markdown">${escapeXML(item.notes)}</description>
     </item>
   </channel>
@@ -97,7 +128,13 @@ if (require.main === module) {
   try {
     const eventPath = process.argv[2] || process.env.GITHUB_EVENT_PATH;
     if (!eventPath) throw new Error("Pass a GitHub release event JSON file");
-    process.stdout.write(buildAppcast(releaseFromEventFile(eventPath)));
+    const release = releaseFromEventFile(eventPath);
+    if (process.argv[3] === "--draft-intent" && process.argv.length === 5) {
+      process.stdout.write(buildDraftAppcast(release, JSON.parse(fs.readFileSync(process.argv[4], "utf8"))));
+    } else {
+      if (process.argv.length > 3) throw new Error("Unsupported appcast arguments");
+      process.stdout.write(buildAppcast(release));
+    }
   } catch (error) {
     console.error(error.message);
     process.exitCode = 1;
@@ -106,6 +143,7 @@ if (require.main === module) {
 
 module.exports = {
   buildAppcast,
+  buildDraftAppcast,
   normalizedRelease,
   releaseFromEventFile,
   releaseVersion,

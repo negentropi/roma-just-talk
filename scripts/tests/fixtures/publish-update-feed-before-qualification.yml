@@ -1,0 +1,46 @@
+name: Publish roma just talk update feed
+
+on:
+  release:
+    types:
+      - published
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    name: Attach Sparkle appcast to release
+    if: ${{ !github.event.release.draft && !github.event.release.prerelease }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout release source
+        uses: actions/checkout@v4
+
+      - name: Test appcast generator
+        run: node --test scripts/tests/github-release-appcast.test.js
+
+      - name: Read release after app archive upload
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          for attempt in {1..30}; do
+            gh api "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" > "$RUNNER_TEMP/release.json"
+            if node -e 'const release = require(process.argv[1]); process.exit(release.assets?.some((asset) => asset.name === "roma.just.talk.app.zip" && asset.state === "uploaded") ? 0 : 1)' "$RUNNER_TEMP/release.json"; then
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "Timed out waiting for roma.just.talk.app.zip"
+          exit 1
+
+      - name: Generate informational appcast
+        run: node scripts/generate-github-release-appcast.js "$RUNNER_TEMP/release.json" > "$RUNNER_TEMP/appcast.xml"
+
+      - name: Attach appcast to GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: gh release upload "$RELEASE_TAG" "$RUNNER_TEMP/appcast.xml" --repo "$GITHUB_REPOSITORY" --clobber

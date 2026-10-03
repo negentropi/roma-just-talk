@@ -3,6 +3,7 @@ const test = require("node:test");
 
 const {
   buildAppcast,
+  buildDraftAppcast,
   normalizedRelease,
   releaseVersion,
 } = require("../generate-github-release-appcast");
@@ -62,4 +63,25 @@ test("rejects releases that cannot safely become the stable feed", () => {
     })),
     /must belong to negentropi\/roma-just-talk/
   );
+});
+
+test("creates the same informational feed from an explicit draft intent", () => {
+  const intent = { publicationTime: "2026-07-31T12:34:56Z", minimumSystemVersion: "14.4", appVersion: "1.96", appBuild: "196" };
+  assert.equal(buildDraftAppcast(release({ draft: true, published_at: null }), intent), buildAppcast(release()));
+  const appcast = buildDraftAppcast(release({ draft: true, published_at: null }), { ...intent, minimumSystemVersion: "14.2.1" });
+  assert.match(appcast, /<sparkle:minimumSystemVersion>14\.2\.1<\/sparkle:minimumSystemVersion>/);
+  assert.doesNotMatch(appcast, /<enclosure\b/);
+  assert.match(appcast, /Fixes &lt;upstream&gt; routing &amp; keeps notes\./);
+});
+
+test("rejects invalid or mismatched draft intent without changing published metadata", () => {
+  const draft = release({ draft: true, published_at: null });
+  const intent = { publicationTime: "2026-07-31T12:34:56Z", minimumSystemVersion: "14.2.1", appVersion: "1.96", appBuild: "196" };
+  for (const changes of [{ appBuild: "195" }, { appVersion: "1.95" }, { minimumSystemVersion: "14.2.1<bad>" }, { publicationTime: "2026-02-30T00:00:00Z" }]) {
+    assert.throws(() => buildDraftAppcast(draft, { ...intent, ...changes }));
+  }
+  assert.throws(() => buildDraftAppcast(release(), intent), /unpublished stable draft/);
+  assert.throws(() => buildDraftAppcast({ ...draft, assets: [...draft.assets, ...draft.assets] }, intent), /one uploaded/);
+  assert.equal(draft.draft, true);
+  assert.equal(draft.published_at, null);
 });

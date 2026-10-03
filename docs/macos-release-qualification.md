@@ -1,6 +1,6 @@
 # macOS release qualification input contract
 
-`scripts/verify-macos-release-qualification.py` previews the evidence required before a macOS ZIP becomes public. The current verifier always returns `publicationEligible=false` and exits with status 1. Authenticated controller origin is not established. There is no signed positive fixture or publication wiring.
+`scripts/verify-macos-release-qualification.py` previews the evidence required before a macOS ZIP becomes public. The current verifier always returns `publicationEligible=false` and exits with status 1. Authenticated controller origin is not established. There is no signed positive fixture. The [draft-release consumer](macos-release-publication.md) invokes this verifier before any publication write and therefore rejects current evidence.
 
 A completed source build and a successful per-app approval launch do not satisfy ordinary notarized first Open. The recorded `d504e90e` Sonoma app launches after explicit approval, but normal Open remains blocked by Gatekeeper. That artifact stays unqualified.
 
@@ -104,9 +104,9 @@ A trusted runner must obtain valid automatic screenshots from the same exact bro
 
 The producer must also preserve fresh app-state checks, actual trust-command exit results, ordinary Archive Utility extraction, Finder first Open, and visible startup through that controller. Existing raw process proof continues alongside GUI proof. Build success or a rewritten evidence file cannot establish normal launch.
 
-The publisher still needs a draft release asset binding. It must download that asset by ID and recheck the qualified ZIP digest before publication. The feed and final app asset must consume the same result. The existing `release.published` feed workflow runs after public exposure and does not provide this boundary. Manual administrator publication remains a separate bypass unless repository controls prevent it.
+The draft-release consumer downloads the app asset by ID and rechecks the qualified ZIP digest before publication. The feed and final app asset consume the same verification result. `publish-update-feed.yml` now requires an explicit default-branch dispatch. It no longer runs after `release.published`. Manual administrator publication remains a separate bypass unless repository controls prevent it.
 
-Signing credentials, Developer Program membership, both exact normal notarized runtime rows, the authenticated controller bridge, and publisher wiring remain prerequisites. The verifier makes those gaps visible without accepting current ad-hoc evidence as a signed positive.
+Signing credentials, Developer Program membership, the qualification producer, both exact normal notarized runtime rows, and the authenticated controller bridge remain prerequisites. The verifier makes those gaps visible without accepting current ad-hoc evidence as a signed positive.
 
 ## Verification
 

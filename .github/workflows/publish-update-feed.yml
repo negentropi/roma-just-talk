@@ -1,46 +1,90 @@
-name: Publish roma just talk update feed
+name: Publish qualified Roma macOS release
 
 on:
-  release:
-    types:
-      - published
+  workflow_dispatch:
+    inputs:
+      release_id:
+        description: Existing unpublished stable draft release ID
+        required: true
+        type: string
+      application_sha:
+        description: Exact application commit already identified by the release tag
+        required: true
+        type: string
+      qualification_run_id:
+        description: Completed successful trusted distribution qualification run
+        required: true
+        type: string
+      qualification_run_attempt:
+        description: Exact successful qualification run attempt
+        required: true
+        type: string
 
 permissions:
-  contents: write
+  contents: read
+  actions: read
+
+concurrency:
+  group: qualified-release-${{ github.repository }}-${{ inputs.release_id }}
+  cancel-in-progress: false
 
 jobs:
   publish:
-    name: Attach Sparkle appcast to release
-    if: ${{ !github.event.release.draft && !github.event.release.prerelease }}
+    name: Verify draft bytes and publish
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      actions: read
 
     steps:
-      - name: Checkout release source
-        uses: actions/checkout@v4
-
-      - name: Test appcast generator
-        run: node --test scripts/tests/github-release-appcast.test.js
-
-      - name: Read release after app archive upload
+      - name: Require trusted default-branch dispatch
         env:
-          GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          EXPECTED_REF: refs/heads/${{ github.event.repository.default_branch }}
         run: |
-          for attempt in {1..30}; do
-            gh api "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" > "$RUNNER_TEMP/release.json"
-            if node -e 'const release = require(process.argv[1]); process.exit(release.assets?.some((asset) => asset.name === "roma.just.talk.app.zip" && asset.state === "uploaded") ? 0 : 1)' "$RUNNER_TEMP/release.json"; then
-              exit 0
-            fi
-            sleep 10
-          done
-          echo "Timed out waiting for roma.just.talk.app.zip"
-          exit 1
+          test "$GITHUB_REPOSITORY" = negentropi/roma-just-talk
+          test "$GITHUB_EVENT_NAME" = workflow_dispatch
+          test "$GITHUB_REF" = "$EXPECTED_REF"
 
-      - name: Generate informational appcast
-        run: node scripts/generate-github-release-appcast.js "$RUNNER_TEMP/release.json" > "$RUNNER_TEMP/appcast.xml"
+      - name: Checkout trusted publication tooling
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
 
-      - name: Attach appcast to GitHub release
+      - name: Verify tooling identity
+        run: test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+
+      - name: Verify publication contracts
+        run: |
+          node --test scripts/tests/github-release-appcast.test.js
+          python3 scripts/tests/macos-release-qualification.test.py
+          python3 scripts/tests/macos-release-publication.test.py
+
+      - name: Verify qualification and publish the existing draft
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
-        run: gh release upload "$RELEASE_TAG" "$RUNNER_TEMP/appcast.xml" --repo "$GITHUB_REPOSITORY" --clobber
+          RELEASE_ID: ${{ inputs.release_id }}
+          APPLICATION_SHA: ${{ inputs.application_sha }}
+          QUALIFICATION_RUN_ID: ${{ inputs.qualification_run_id }}
+          QUALIFICATION_RUN_ATTEMPT: ${{ inputs.qualification_run_attempt }}
+          DEVELOPER_ID_TEAM: ${{ vars.MACOS_DEVELOPER_ID_TEAM }}
+        run: |
+          python3 scripts/publish-qualified-macos-release.py "$RELEASE_ID" \
+            --qualification-run-id "$QUALIFICATION_RUN_ID" \
+            --qualification-run-attempt "$QUALIFICATION_RUN_ATTEMPT" \
+            --expected-source-sha "$APPLICATION_SHA" \
+            --expected-tooling-sha "$GITHUB_SHA" \
+            --developer-id-team "$DEVELOPER_ID_TEAM" \
+            --output-dir "$RUNNER_TEMP/roma-publication" \
+            --publish
+
+      - name: Retain publication rejection or verification results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.macos.publication-result
+          path: |
+            ${{ runner.temp }}/roma-publication/publication-result.json
+            ${{ runner.temp }}/roma-publication/qualification-result.json
+          if-no-files-found: warn

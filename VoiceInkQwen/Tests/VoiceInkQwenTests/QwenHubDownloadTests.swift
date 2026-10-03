@@ -79,11 +79,16 @@ import Testing
         await store.cancelAndDrain()
         let result = await install.result
         if case .success = result { Issue.record("Cancelled HTTP transfer published an install") }
-        #expect(HubFixture.routes.stoppedCount == HubFixture.routes.heldCount)
-        #expect(await store.isInstalled() == false)
-        #expect(!HubFixture.routes.phases.contains(.ready))
-        #expect(try FileManager.default.contentsOfDirectory(atPath: fixture.root.path).isEmpty)
         let phases = HubFixture.routes.phases
+        #expect(await store.isInstalled() == false)
+        #expect(!phases.contains(.ready))
+        #expect(try FileManager.default.contentsOfDirectory(atPath: fixture.root.path).isEmpty)
+        // URLSession completion can precede URLProtocol's stopLoading acknowledgement.
+        for _ in 0..<200 {
+            if HubFixture.routes.stoppedCount == HubFixture.routes.heldCount { break }
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        #expect(HubFixture.routes.stoppedCount == HubFixture.routes.heldCount)
         // Cross the sampler interval after drain to catch a late progress callback.
         try await Task.sleep(for: .milliseconds(150))
         #expect(HubFixture.routes.phases == phases)
@@ -190,8 +195,13 @@ private final class HubFixtureProtocol: URLProtocol {
         }
     }
     override func stopLoading() {
-        stateLock.withLock {
-            if held { HubFixture.routes.stoppedTransfer(); held = false }
+        let stoppedHeldTransfer = stateLock.withLock {
+            guard held else { return false }
+            held = false
+            return true
         }
+        guard stoppedHeldTransfer else { return }
+        Thread.sleep(forTimeInterval: 0.1)
+        HubFixture.routes.stoppedTransfer()
     }
 }

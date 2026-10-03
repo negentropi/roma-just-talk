@@ -98,9 +98,11 @@ Trust text and verdict files remain command output. Their authenticated producti
 
 ## Remaining producer and publication prerequisites
 
-The consumer has no positive controller adapter. Marker files, uploaded `passed=true`, user-selected controller labels, and successful job status cannot replace one. An actual Cua Driver `browser_click` round trip exported action and before-and-after image files. Those exported images were black desktop pixels, while the separate browser snapshot showed the correct guest. A `captured` status did not establish valid GUI evidence.
+The consumer has no authenticated positive controller adapter. Marker files, uploaded `passed=true`, user-selected controller labels, and successful job status cannot replace one. The earlier Cua Driver `browser_click` export contained black desktop images. Its `captured` status did not establish valid guest evidence.
 
-A trusted runner must obtain valid automatic screenshots from the same exact browser transport and bind those daemon-generated files to the final digest, guest, actions, and job. The observed browser action export does not fill that capture gap.
+A later native CuaRepl roundtrip retained the running Tahoe setup guest before and after a real click. The supported local app-server history API returned the completed original tool entries and JPEG bytes. The exporter preserved those bytes, and the parent checked the exported guest images. This establishes native capture mechanics and the observed setup transition. It does not establish app launch or independent producer origin.
+
+The reviewed producer must obtain the original native calls itself and bind them to its job, guest boot, final ZIP, and first process. A local export uploaded afterward cannot establish that origin. Full history pages can contain private calls or signed URLs. Those pages remain private. A public evidence artifact can contain only the automatically selected complete proof entries and their unchanged images, after checking the outbound content.
 
 The producer must also preserve fresh app-state checks, actual trust-command exit results, ordinary Archive Utility extraction, Finder first Open, and visible startup through that controller. Existing raw process proof continues alongside GUI proof. Build success or a rewritten evidence file cannot establish normal launch.
 

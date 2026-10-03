@@ -25,6 +25,8 @@ jobs:
       - name: Compile isolated store probe
         run: |
           mkdir -p .swiftdata-probe
+          app='.swiftdata-probe/SwiftDataSchemaProbe.app'
+          mkdir -p "$app/Contents/MacOS"
           {
             git rev-parse HEAD
             xcodebuild -version
@@ -35,19 +37,27 @@ jobs:
           test "$(xcodebuild -version | head -n 1)" = 'Xcode 26.6'
           test "$(xcodebuild -version | tail -n 1)" = 'Build version 17F113'
           xcrun swiftc -parse-as-library -target arm64-apple-macosx14.2.1 \
-            -o .swiftdata-probe/schema-probe Tools/SwiftDataStoreProbe/SchemaProbe.swift \
+            -o "$app/Contents/MacOS/schema-probe" Tools/SwiftDataStoreProbe/SchemaProbe.swift \
             > .swiftdata-probe/compile.log 2>&1
-          codesign --verify --strict .swiftdata-probe/schema-probe
-          shasum -a 256 Tools/SwiftDataStoreProbe/SchemaProbe.swift .swiftdata-probe/schema-probe \
+          python3 - "$app/Contents/Info.plist" <<'PY'
+          import plistlib, sys
+          plistlib.dump({"CFBundleIdentifier": "com.negentropi.RomaJustTalk.SwiftDataSchemaProbe",
+                        "CFBundleName": "SwiftDataSchemaProbe", "CFBundleExecutable": "schema-probe",
+                        "CFBundlePackageType": "APPL", "CFBundleVersion": "1",
+                        "LSMinimumSystemVersion": "14.2.1"}, open(sys.argv[1], "wb"))
+          PY
+          codesign --force --sign - --timestamp=none "$app"
+          codesign --verify --deep --strict "$app"
+          shasum -a 256 Tools/SwiftDataStoreProbe/SchemaProbe.swift "$app/Contents/MacOS/schema-probe" "$app/Contents/Info.plist" \
             > .swiftdata-probe/source-and-binary.sha256
-          otool -l .swiftdata-probe/schema-probe > .swiftdata-probe/load-commands.txt
-          otool -L .swiftdata-probe/schema-probe > .swiftdata-probe/linked-libraries.txt
+          otool -l "$app/Contents/MacOS/schema-probe" > .swiftdata-probe/load-commands.txt
+          otool -L "$app/Contents/MacOS/schema-probe" > .swiftdata-probe/linked-libraries.txt
       - name: Observe hosted store configurations
         run: |
           for mode in combined-main combined-background separate-main separate-background full-background; do
             data=$(mktemp -d "$RUNNER_TEMP/schema-$mode.XXXXXX")
             set +e
-            .swiftdata-probe/schema-probe "$mode" "$data" > ".swiftdata-probe/$mode.log" 2>&1
+            .swiftdata-probe/SwiftDataSchemaProbe.app/Contents/MacOS/schema-probe "$mode" "$data" > ".swiftdata-probe/$mode.log" 2>&1
             result=$?
             set -e
             printf '%s\n' "$result" > ".swiftdata-probe/$mode.exit"

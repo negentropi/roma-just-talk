@@ -24,7 +24,8 @@ framework_signature_baseline_evidence="${DISTRIBUTION_E2E_FRAMEWORK_SIGNATURE_BA
 framework_signature_baseline_run_id="${DISTRIBUTION_E2E_FRAMEWORK_SIGNATURE_BASELINE_RUN_ID:-}"
 github_download_token="${GH_TOKEN:-}"
 unset GH_TOKEN
-source "$(cd "$(dirname "$0")" && pwd)/macos-bundle-manifest.sh"
+script_dir="$(cd "$(dirname "$0")" && pwd)"
+source "$script_dir/macos-bundle-manifest.sh"
 
 case "$target" in
   both|macos|ios) ;;
@@ -300,13 +301,10 @@ prepare_macos() {
   if [ "$macos_scenario" = "distribution-e2e" ]; then
     macos_run_jobs="$inputs_root/macos/macos-app-run-jobs.json"
     test -f "$macos_run_jobs"
-    jq -e \
+    jq -e -L "$script_dir" \
       --arg run_id "$macos_artifact_run_id" \
-      '(.runId | tostring) == $run_id
-        and .job.name == "Build release macOS app"
-        and .job.status == "completed"
-        and .job.conclusion == "success"
-        and (.job.runnerName | startswith("nsc-runner-"))' \
+      --arg job_name "Build release macOS app" \
+      'include "macos-build-job"; valid_macos_build_job_record($run_id; $job_name)' \
       "$macos_run_jobs" >/dev/null
     macos_artifact_runner_name="$(jq -r .job.runnerName "$macos_run_jobs")"
     cp "$macos_run_jobs" "$evidence/macos-app-run-jobs.json"
@@ -374,13 +372,10 @@ prepare_macos() {
     if [ "$macos_scenario" = "distribution-e2e" ]; then
       helper_run_jobs="$inputs_root/macos/runtime-helper-run-jobs.json"
       test -f "$helper_run_jobs"
-      jq -e \
+      jq -e -L "$script_dir" \
         --arg run_id "$runtime_helper_run_id" \
-        '(.runId | tostring) == $run_id
-          and .job.name == "Build reusable runtime E2E helper"
-          and .job.status == "completed"
-          and .job.conclusion == "success"
-          and (.job.runnerName | startswith("nsc-runner-"))' \
+        --arg job_name "Build reusable runtime E2E helper" \
+        'include "macos-build-job"; valid_macos_build_job_record($run_id; $job_name)' \
         "$helper_run_jobs" >/dev/null
       runtime_helper_runner_name="$(jq -r .job.runnerName "$helper_run_jobs")"
       cp "$helper_run_jobs" "$evidence/runtime-helper-run-jobs.json"

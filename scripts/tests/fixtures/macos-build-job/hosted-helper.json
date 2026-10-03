@@ -1,0 +1,19 @@
+{
+  "jobs": [
+    {
+      "completed_at": "2026-10-03T06:41:27Z",
+      "conclusion": "success",
+      "id": 111148337744,
+      "labels": [
+        "macos-26"
+      ],
+      "name": "Build reusable runtime E2E helper",
+      "run_id": 37103649405,
+      "runner_group_name": "GitHub Actions",
+      "runner_id": 1000000706,
+      "runner_name": "GitHub Actions 1000000706",
+      "started_at": "2026-10-03T06:40:10Z",
+      "status": "completed"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "jobs": [
+    {
+      "completed_at": "2026-09-12T06:08:39Z",
+      "conclusion": "success",
+      "id": 103509393482,
+      "labels": [
+        "namespace-profile-roma-jt"
+      ],
+      "name": "Build reusable runtime E2E helper",
+      "run_id": 34677323344,
+      "runner_group_name": "Default",
+      "runner_id": 978,
+      "runner_name": "nsc-runner-ij4vmi1tadsrg",
+      "started_at": "2026-09-12T06:08:02Z",
+      "status": "completed"
+    }
+  ]
+}

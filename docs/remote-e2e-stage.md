@@ -43,8 +43,11 @@ builds and ad-hoc signs the external runtime helper once, then the selected Mac
 runs that prebuilt helper without compiling it. The stage rejects app and helper
 run IDs unless they are completed, successful, non-PR runs of
 `voiceink-build.yml` from this repository. The helper must match the checked-out
-stage tooling SHA. The app build, helper build, and distribution stage must also
-report distinct Namespace runner instance names. The stage records its boot
+stage tooling SHA. Source app and helper builds may use Namespace or the hosted
+`macos-26` provider. Their job receipts retain runner IDs, names, groups, labels
+and provider. The app build, helper build, and Namespace distribution stage must
+report distinct runner names. Source build providers do not establish the test
+OS. The stage independently checks the requested OS/build and records its boot
 session, then the distribution script independently requires absent Roma
 preferences, TCC rows, installed copies, running processes, and model state.
 Its evidence ties both

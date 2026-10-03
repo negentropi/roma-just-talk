@@ -132,6 +132,9 @@ on:
       - ".github/workflows/voiceink-remote-e2e-stage.yml"
       - "scripts/open-remote-e2e-stage.sh"
       - "scripts/prepare-remote-e2e-stage.sh"
+      - "scripts/macos-build-job.jq"
+      - "scripts/tests/macos-build-job.test.sh"
+      - "scripts/tests/fixtures/macos-build-job/**"
       - "scripts/run-macos-runtime-e2e.sh"
       - "scripts/verify-runtime-empty-final-regression.sh"
       - "scripts/run-macos-distribution-e2e.sh"
@@ -387,6 +390,7 @@ jobs:
 
       - name: Verify distribution E2E tooling
         run: |
+          bash scripts/tests/macos-build-job.test.sh
           bash scripts/tests/macos-finder-extraction-state.test.sh
           bash scripts/tests/macos-distribution-e2e-contract.test.sh
           bash scripts/tests/macos-distribution-runtime-handoff.test.sh
@@ -441,35 +445,17 @@ jobs:
             test -s "$output"
           }
 
-          record_required_namespace_job() {
+          record_required_macos_build_job() {
             local run_id="$1"
             local job_name="$2"
             local output="$3"
             gh api \
               "repos/$GITHUB_REPOSITORY/actions/runs/$run_id/jobs?per_page=100" \
-              | jq -e \
+              | jq -e -L scripts \
                 --argjson run_id "$run_id" \
                 --arg job_name "$job_name" '
-                  [
-                    .jobs[]
-                    | select(
-                        .name == $job_name
-                        and .status == "completed"
-                        and .conclusion == "success"
-                        and (.runner_name | startswith("nsc-runner-"))
-                      )
-                    | {
-                        jobId: .id,
-                        name: .name,
-                        runnerName: .runner_name,
-                        status: .status,
-                        conclusion: .conclusion,
-                        startedAt: .started_at,
-                        completedAt: .completed_at
-                      }
-                  ]
-                  | select(length == 1)
-                  | {runId: $run_id, job: .[0]}
+                  include "macos-build-job";
+                  select_macos_build_job($run_id; $job_name)
                 ' > "$output"
             test -s "$output"
           }
@@ -487,7 +473,7 @@ jobs:
                 if [ -z "$CANDIDATE_ARTIFACT_ID" ]; then
                   continue
                 fi
-                if record_required_namespace_job \
+                if record_required_macos_build_job \
                   "$CANDIDATE_RUN_ID" \
                   "Build release macOS app" \
                   "$RUNNER_TEMP/remote-e2e-inputs/macos/macos-app-run-jobs.json"; then
@@ -524,7 +510,7 @@ jobs:
             "$RUNNER_TEMP/remote-e2e-inputs/macos/macos-app-run-metadata.json" \
             "$APP_REQUIRED_HEAD_SHA"
           if [ "$STAGE_MACOS_SCENARIO" = distribution-e2e ]; then
-            record_required_namespace_job \
+            record_required_macos_build_job \
               "$RUN_ID" \
               "Build release macOS app" \
               "$RUNNER_TEMP/remote-e2e-inputs/macos/macos-app-run-jobs.json"
@@ -564,7 +550,7 @@ jobs:
               "$RUNNER_TEMP/remote-e2e-inputs/macos/runtime-helper-run-metadata.json" \
               "$GITHUB_SHA"
             if [ "$STAGE_MACOS_SCENARIO" = distribution-e2e ]; then
-              record_required_namespace_job \
+              record_required_macos_build_job \
                 "$HELPER_RUN_ID" \
                 "Build reusable runtime E2E helper" \
                 "$RUNNER_TEMP/remote-e2e-inputs/macos/runtime-helper-run-jobs.json"

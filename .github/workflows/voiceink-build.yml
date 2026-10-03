@@ -34,6 +34,9 @@ on:
       - "scripts/tests/verify-macos-distribution-launch.test.sh"
       - "scripts/tests/verify-macos-framework-signature-crash.test.sh"
       - "scripts/tests/fixtures/macos-framework-signature-crash/**"
+      - "scripts/macos-build-job.jq"
+      - "scripts/tests/macos-build-job.test.sh"
+      - "scripts/tests/fixtures/macos-build-job/**"
       - "scripts/tests/macos-distribution-e2e-contract.test.sh"
       - "scripts/tests/macos-distribution-runtime-handoff.test.sh"
       - "scripts/tests/macos-finder-extraction-state.test.sh"
@@ -77,6 +80,9 @@ on:
       - "scripts/tests/verify-macos-distribution-launch.test.sh"
       - "scripts/tests/verify-macos-framework-signature-crash.test.sh"
       - "scripts/tests/fixtures/macos-framework-signature-crash/**"
+      - "scripts/macos-build-job.jq"
+      - "scripts/tests/macos-build-job.test.sh"
+      - "scripts/tests/fixtures/macos-build-job/**"
       - "scripts/tests/macos-distribution-e2e-contract.test.sh"
       - "scripts/tests/macos-distribution-runtime-handoff.test.sh"
       - "scripts/tests/macos-finder-extraction-state.test.sh"
@@ -254,6 +260,7 @@ jobs:
       - name: Verify distribution launch evidence contract
         run: |
           bash scripts/tests/macos-finder-extraction-state.test.sh
+          bash scripts/tests/macos-build-job.test.sh
           bash scripts/tests/macos-distribution-e2e-contract.test.sh
           bash scripts/tests/macos-distribution-runtime-handoff.test.sh
           bash scripts/tests/verify-macos-distribution-launch.test.sh

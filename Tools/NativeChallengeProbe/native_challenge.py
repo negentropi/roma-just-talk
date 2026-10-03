@@ -9,7 +9,10 @@ import os
 from pathlib import Path, PurePosixPath
 import re
 import secrets
+import stat
+import subprocess
 import sys
+import tempfile
 import warnings
 
 from PIL import Image, ImageStat
@@ -21,6 +24,9 @@ JOB = "Collect original native calls"
 THREAD = "01a0de81-d14c-7670-b36d-7b045ff3c6d0"
 PHASES = ("before", "action", "after")
 MAX_FILE = 32 * 1024 * 1024
+BROKER_IDENTITY = "roma-native-origin-task-broker"
+BROKER_NAMESPACE = "roma-native-origin@roma-just-talk"
+ORIGIN_FILES = {"broker-origin.json", "broker-origin.json.sig"}
 
 
 class Rejected(Exception):
@@ -53,6 +59,10 @@ def write(path, data):
 
 def encoded(value):
     return (json.dumps(value, ensure_ascii=False, indent=2) + "\n").encode()
+
+
+def canonical(value):
+    return (json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n").encode()
 
 
 def now_ms():
@@ -95,6 +105,11 @@ def policy_check(policy):
             and re.fullmatch(r"[0-9A-Fa-f]{8}(-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12}", target.get("bootUuid", "")), "policy-guest")
     for key in ("executableSha256", "finalZipSha256"):
         require(re.fullmatch(r"[0-9a-f]{64}", target.get(key, "")), "policy-byte-identity")
+    broker = policy.get("broker", {})
+    require(broker.get("identity") == BROKER_IDENTITY and broker.get("namespace") == BROKER_NAMESPACE
+            and re.fullmatch(r"ssh-ed25519 [A-Za-z0-9+/]+={0,2}", broker.get("publicKey", "")), "policy-broker-key")
+    key = base64.b64decode(broker["publicKey"].split()[1], validate=True)
+    require(key[:19] == b"\x00\x00\x00\x0bssh-ed25519\x00\x00\x00\x20" and len(key) == 51, "policy-broker-key")
 
 
 def active_job(run, jobs, expected_sha, run_id, attempt):
@@ -130,7 +145,7 @@ def make_challenge(policy, policy_bytes, run, jobs, sha, run_id, attempt):
             "responseRef": f"ci/roma-native-response-{run_id}-{attempt}-{nonce}"}
 
 
-def challenge_check(challenge, policy, policy_bytes, sha, run_id, attempt, clock=None):
+def challenge_check(challenge, policy, policy_bytes, sha, run_id, attempt, clock=None, completed_collection=False):
     policy_check(policy)
     require(challenge.get("schemaVersion") == 1 and challenge.get("repository") == REPOSITORY
             and challenge.get("workflow") == WORKFLOW and challenge.get("jobName") == JOB
@@ -144,7 +159,7 @@ def challenge_check(challenge, policy, policy_bytes, sha, run_id, attempt, clock
     created, expires = challenge.get("createdAtMs"), challenge.get("expiresAtMs")
     require(type(created) is int and type(expires) is int and expires - created == 900_000, "challenge-lifetime")
     current = now_ms() if clock is None else clock
-    require(created <= current < expires, "challenge-expired-or-future")
+    require(created <= current and (completed_collection or current < expires), "challenge-expired-or-future")
 
 
 def guest_check(root, challenge, policy, calls):
@@ -250,7 +265,7 @@ def calls_check(root, challenge, policy):
     return selected
 
 
-def prepare_response(export, guest, output, challenge, challenge_bytes, policy, policy_bytes, exporter_sha):
+def prepare_response(export, guest, output, challenge, challenge_bytes, policy, policy_bytes, exporter_sha, private_key):
     receipt = load(export / "receipt.json")
     require(receipt.get("threadId") == THREAD and receipt.get("titlePrefix") == challenge["titlePrefix"]
             and receipt.get("sinceMs") == challenge["createdAtMs"] and receipt.get("exporterSha256") == exporter_sha,
@@ -287,7 +302,80 @@ def prepare_response(export, guest, output, challenge, challenge_bytes, policy, 
           "publicationEligible": False, "threadId": THREAD, "policySha256": digest(policy_bytes),
           "exporterSha256": exporter_sha, "privateReceiptSha256": digest(read(export / "receipt.json")),
           "calls": calls, "createdAtMs": now_ms(), "trustLimit": "Mac broker and guest-command origin are not independently attested"}))
+    sign_origin(output, challenge, policy, policy_bytes, exporter_sha, receipt, private_key)
     verify_response(output, challenge_bytes, challenge, policy, policy_bytes, exporter_sha)
+
+
+def payload_files(root, calls):
+    expected = {"challenge.json", "broker-execution.json"}
+    for phase in ("before", "after"):
+        expected.update(f"guest-{phase}{suffix}" for suffix in (".json", "-mapped-paths.txt", "-process.txt"))
+    for call in calls:
+        expected.add(f"{call['phase']}/original-entry.json")
+        entry = load(root / call['phase'] / "original-entry.json")
+        for index, block in enumerate(entry["item"]["result"]["content"]):
+            if block.get("type") == "image":
+                suffix = {"image/png": "png", "image/jpeg": "jpg"}[block["mimeType"]]
+                expected.add(f"{call['phase']}/image-{index:03d}.{suffix}")
+    return expected
+
+
+def origin_inventory(root, challenge, policy, policy_bytes, exporter_sha, calls, started, ended, signed):
+    return {"schemaVersion": 1, "brokerIdentity": BROKER_IDENTITY, "namespace": BROKER_NAMESPACE,
+            "repository": REPOSITORY, "workflow": WORKFLOW, "jobName": JOB,
+            "runId": challenge["runId"], "runAttempt": challenge["runAttempt"], "jobId": challenge["jobId"],
+            "toolingSha": challenge["toolingSha"], "exporterSha256": exporter_sha,
+            "policySha256": digest(policy_bytes), "nonce": challenge["nonce"], "target": policy["target"],
+            "collectionStartedAtMs": started, "collectionEndedAtMs": ended, "signedAtMs": signed,
+            "calls": calls, "files": [{"path": name, "sha256": digest(read(member(root, name))),
+                                       "size": (root / name).stat().st_size}
+                                      for name in sorted(payload_files(root, calls))], "publicationEligible": False}
+
+
+def sign_origin(root, challenge, policy, policy_bytes, exporter_sha, receipt, private_key):
+    require(private_key.is_file() and not private_key.is_symlink()
+            and stat.S_IMODE(private_key.stat().st_mode) == 0o600, "broker-private-key-mode")
+    public = subprocess.run(["ssh-keygen", "-y", "-f", str(private_key)], capture_output=True, timeout=10)
+    require(public.returncode == 0 and public.stdout.decode().strip().split()[:2] == policy['broker']['publicKey'].split(), "broker-private-key-mismatch")
+    calls = calls_check(root, challenge, policy)
+    started = timestamp(load(root / 'guest-before.json')['startedAt'])
+    ended = timestamp(receipt['completedAt'])
+    signed = now_ms()
+    require(challenge['createdAtMs'] <= started <= timestamp(receipt['startedAt']) <= ended <= signed < challenge['expiresAtMs'], "broker-collection-window")
+    write(root / "broker-origin.json", canonical(origin_inventory(root, challenge, policy, policy_bytes, exporter_sha, calls, started, ended, signed)))
+    result = subprocess.run(["ssh-keygen", "-Y", "sign", "-f", str(private_key), "-n", BROKER_NAMESPACE, "-"],
+                            input=read(root / "broker-origin.json"), capture_output=True, timeout=10)
+    require(result.returncode == 0 and result.stdout, "broker-sign-failed")
+    completed = now_ms()
+    if completed >= challenge['expiresAtMs']:
+        write(root / "broker-sign-failure.json", encoded({'reason': 'broker-collection-window',
+              'exitCode': result.returncode, 'completedAtMs': completed, 'signatureSha256': digest(result.stdout)}))
+        raise Rejected("broker-collection-window")
+    write(root / "broker-origin.json.sig", result.stdout)
+
+
+def verify_origin(root, challenge, policy, policy_bytes, exporter_sha, calls):
+    raw = read(root / "broker-origin.json")
+    origin = json.loads(raw)
+    require(raw == canonical(origin), "broker-inventory-not-canonical")
+    signature = read(root / "broker-origin.json.sig")
+    require(0 < len(signature) <= 16384, "broker-signature-size")
+    with tempfile.TemporaryDirectory(prefix="roma-native-origin-") as directory:
+        allowed = Path(directory) / "allowed_signers"
+        allowed.write_text(f'{BROKER_IDENTITY} namespaces="{BROKER_NAMESPACE}" {policy["broker"]["publicKey"]}\n')
+        result = subprocess.run(["ssh-keygen", "-Y", "verify", "-f", str(allowed), "-I", BROKER_IDENTITY,
+                                 "-n", BROKER_NAMESPACE, "-s", str(root / "broker-origin.json.sig")],
+                                input=raw, capture_output=True, timeout=10)
+    require(result.returncode == 0, "broker-signature-invalid")
+    started, ended, signed = (origin.get(key) for key in ('collectionStartedAtMs', 'collectionEndedAtMs', 'signedAtMs'))
+    require(all(type(value) is int for value in (started, ended, signed))
+            and challenge['createdAtMs'] <= started <= ended <= signed < challenge['expiresAtMs']
+            and signed <= now_ms(), "broker-collection-window")
+    require(started == timestamp(load(root / 'guest-before.json')['startedAt'])
+            and ended >= timestamp(load(root / 'guest-after.json')['completedAt'])
+            and ended <= load(root / 'broker-execution.json')['createdAtMs'] <= signed, "broker-collection-window")
+    require(origin == origin_inventory(root, challenge, policy, policy_bytes, exporter_sha, calls, started, ended, signed), "broker-inventory-mismatch")
+    return {"identity": BROKER_IDENTITY, "namespace": BROKER_NAMESPACE, "inventorySha256": digest(raw)}
 
 
 def verify_response(root, challenge_bytes, challenge, policy, policy_bytes, exporter_sha):
@@ -301,26 +389,19 @@ def verify_response(root, challenge_bytes, challenge, policy, policy_bytes, expo
     paths = list(root.rglob("*"))
     require(not root.is_symlink() and not any(path.is_symlink() for path in paths), "symlink-evidence")
     files = {str(path.relative_to(root)) for path in paths if path.is_file()}
-    expected = {"challenge.json", "broker-execution.json"}
-    for phase in ("before", "after"):
-        expected.update(f"guest-{phase}{suffix}" for suffix in (".json", "-mapped-paths.txt", "-process.txt"))
-    for phase in PHASES:
-        expected.add(f"{phase}/original-entry.json")
-        entry = load(root / phase / "original-entry.json")
-        for index, block in enumerate(entry["item"]["result"]["content"]):
-            if block.get("type") == "image":
-                suffix = {"image/png": "png", "image/jpeg": "jpg"}[block["mimeType"]]
-                expected.add(f"{phase}/image-{index:03d}.{suffix}")
+    require(ORIGIN_FILES <= files, "broker-origin-missing")
+    expected = payload_files(root, calls) | ORIGIN_FILES
     require(files == expected, "unapproved-response-file")
     require(all((root / name).stat().st_size <= 4 * 1024 * 1024 for name in files)
             and sum((root / name).stat().st_size for name in files) <= 12 * 1024 * 1024, "response-size-bound")
-    return {"state": "diagnostic-payload-bound", "publicationEligible": False,
+    origin = verify_origin(root, challenge, policy, policy_bytes, exporter_sha, calls)
+    return {"state": "diagnostic-payload-bound", "publicationEligible": False, "brokerOrigin": origin,
             "runId": challenge["runId"], "jobId": challenge["jobId"], "target": policy["target"], "calls": calls}
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("mode", choices=("make", "prepare", "verify"))
+    parser.add_argument("mode", choices=("make", "verify"))
     parser.add_argument("--policy", type=Path, required=True)
     parser.add_argument("--sha", required=True)
     parser.add_argument("--run-id", type=int, required=True)
@@ -329,7 +410,6 @@ def main():
     parser.add_argument("--jobs", type=Path)
     parser.add_argument("--challenge", type=Path)
     parser.add_argument("--export", type=Path)
-    parser.add_argument("--guest", type=Path)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--exporter-sha", required=True)
     args = parser.parse_args()
@@ -345,16 +425,13 @@ def main():
         else:
             challenge_bytes = read(args.challenge)
             challenge = json.loads(challenge_bytes)
-            challenge_check(challenge, policy, policy_bytes, args.sha, args.run_id, args.attempt)
-            if args.mode == "prepare":
-                prepare_response(args.export, args.guest, args.output, challenge, challenge_bytes, policy, policy_bytes, args.exporter_sha)
-                result = {"state": "diagnostic-payload-bound", "publicationEligible": False, "responseRef": challenge["responseRef"]}
-            else:
-                result = verify_response(args.export, challenge_bytes, challenge, policy, policy_bytes, args.exporter_sha)
-                write(args.output, encoded(result))
+            challenge_check(challenge, policy, policy_bytes, args.sha, args.run_id, args.attempt,
+                            completed_collection=args.mode == 'verify')
+            result = verify_response(args.export, challenge_bytes, challenge, policy, policy_bytes, args.exporter_sha)
+            write(args.output, encoded(result))
         print(json.dumps({"state": result.get("state", "challenge-created"), "publicationEligible": False}))
         return 0
-    except (Rejected, OSError, ValueError, TypeError, KeyError) as error:
+    except (Rejected, OSError, ValueError, TypeError, KeyError, subprocess.SubprocessError) as error:
         print(json.dumps({"state": "rejected", "reason": str(error) if isinstance(error, Rejected) else type(error).__name__, "publicationEligible": False}))
         return 1
 

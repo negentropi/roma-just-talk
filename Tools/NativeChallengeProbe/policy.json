@@ -16,8 +16,13 @@
     "buildVersion": "25E253",
     "architecture": "arm64",
     "bootUuid": "393C9C89-55DA-41C7-BE80-59B000E7BE43",
-    "firstPid": 20029,
-    "executableSha256": "103c7b38c26cfea5683aaa184048f601dbf5a137809819fe0832e2116a34bc87",
-    "finalZipSha256": "c0fcbbec22cc5ea0bffb26962045873673725ea5384ba63164be9d2aa645dbdb"
+    "firstPid": 34447,
+    "executableSha256": "ac6e6f2d1d7a441fdefb37cdb939605a0b875c7dd6cfcd48047cb77da06c9931",
+    "finalZipSha256": "429f6caccb6ccbfd4698b74df929b6eb0a80c935252ec0515217a33825fda0ab"
+  },
+  "broker": {
+    "identity": "roma-native-origin-task-broker",
+    "namespace": "roma-native-origin@roma-just-talk",
+    "publicKey": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILLBuxFnSrPf/eMBPetFNJUekA4djhX0V1rMl28604ax"
   }
 }

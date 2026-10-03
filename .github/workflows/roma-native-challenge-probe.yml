@@ -29,6 +29,7 @@ jobs:
         run: |
           test "$GITHUB_REPOSITORY" = negentropi/roma-just-talk
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          command -v ssh-keygen >/dev/null
           python3 -m pip install --disable-pip-version-check Pillow==12.1.1
           mkdir "$RUNNER_TEMP/native-probe"
           gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" > "$RUNNER_TEMP/native-probe/run.json"
@@ -46,7 +47,7 @@ jobs:
           path: ${{ runner.temp }}/native-probe/challenge.json
           if-no-files-found: error
           retention-days: 7
-      - name: Wait for exact challenge response and validate original payload
+      - name: Wait for exact challenge response and verify broker-signed payload
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

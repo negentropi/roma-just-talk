@@ -18,6 +18,16 @@ EXPORTER = Path('/Users/atalphalnmomhappyhouse/.codex/task-artifacts/roma-macos-
 EXPORTER_SHA = '69f7afdc99ff35b19440b1ade5cc8bc84101bfe0dd2dbec2c83fb425d7292d2e'
 PYTHON = '/Users/atalphalnmomhappyhouse/.pyenv/versions/3.11.9/bin/python3'
 SOURCE_PREFIX = 'Tools/NativeChallengeProbe/'
+PRIVATE_KEY = Path('/Users/atalphalnmomhappyhouse/.codex/task-artifacts/roma-macos-proof/release-qualification/native-origin-proof/broker-ed25519')
+GUEST_ROOT = Path('/Users/atalphalnmomhappyhouse/.codex/task-artifacts/roma-macos-proof/guest-share/proof/native-challenge')
+
+
+def guest_directory(path, nonce):
+    expected = GUEST_ROOT / nonce
+    protocol.require(path == expected, 'broker-guest-scope')
+    protocol.require(not any(parent.is_symlink() for parent in (path, *path.parents)), 'broker-guest-symlink')
+    protocol.require(path.is_dir(), 'broker-guest-input')
+    return path
 
 
 class GitHub:
@@ -115,7 +125,7 @@ def main():
             print(json.dumps({'state': 'armed', 'publicationEligible': False, 'titlePrefix': challenge['titlePrefix'],
                               'expiresAtMs': challenge['expiresAtMs'], 'codes': policy['codes'], 'target': policy['target']}))
         else:
-            protocol.require(args.guest is not None and args.guest.is_dir() and not args.guest.is_symlink(), 'broker-guest-input')
+            protocol.require(args.guest is not None, 'broker-guest-input')
             arm = protocol.load(case / 'arm.json')
             protocol.require(arm.get('localSourceSha256') == {name: protocol.digest(protocol.read(ROOT / name))
                              for name in ('native_challenge.py', 'broker.py')}, 'broker-source-changed-after-arm')
@@ -124,6 +134,7 @@ def main():
             challenge_bytes = protocol.read(case / 'challenge.json')
             challenge = json.loads(challenge_bytes)
             protocol.challenge_check(challenge, policy, policy_bytes, arm['sha'], arm['runId'], arm['attempt'])
+            guest = guest_directory(args.guest, challenge['nonce'])
             api_dir = case / 'export-api'
             api_dir.mkdir(mode=0o700)
             api = GitHub(api_dir)
@@ -151,7 +162,8 @@ def main():
             protocol.write(case / 'export-execution.json', protocol.encoded({'argv': command, 'exitCode': result, 'privateExport': str(export)}))
             protocol.require(result == 0, 'exporter-exit-nonzero')
             protocol.challenge_check(challenge, policy, policy_bytes, arm['sha'], arm['runId'], arm['attempt'])
-            protocol.prepare_response(export, args.guest, case / 'response', challenge, challenge_bytes, policy, policy_bytes, EXPORTER_SHA)
+            guest = guest_directory(args.guest, challenge['nonce'])
+            protocol.prepare_response(export, guest, case / 'response', challenge, challenge_bytes, policy, policy_bytes, EXPORTER_SHA, PRIVATE_KEY)
             print(json.dumps({'state': 'diagnostic-response-staged', 'publicationEligible': False,
                               'responseRef': challenge['responseRef'], 'responseDirectory': str(case / 'response')}))
         return 0

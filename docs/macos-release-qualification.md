@@ -86,7 +86,7 @@ Each `evidenceDirectory` contains the existing `macos-distribution-e2e` director
 | `runner-identity.txt`, `gatekeeper-status.txt`, `sip-status.txt` | Exact OS, build, and architecture; enabled protections |
 | `source-artifact.txt`, `browser-downloaded-artifact.txt` | Normal contract; exact finalizer artifact; browser download equals the direct final ZIP digest and size |
 | `downloaded-archive-quarantine.txt`, `launch-verification/source-app-quarantine.txt` | Safari quarantine on ZIP and app |
-| `reference-trust`, `extracted-trust-before`, `extracted-trust-after` | Expected team, identifier, Hardened Runtime, stapler success text, notarized assessment, and no policy override |
+| `reference-trust`, `extracted-trust-before`, `extracted-trust-after` | Exact trust command receipts; expected team, identifier, Hardened Runtime, stapler success text, notarized assessment, and no policy override |
 | Expected, extracted, source, and process `*-files.sha256` | Full manifests equal the manifest derived from the final ZIP |
 | `launch-verification/launch-identity.txt`, `launched-pid.txt` | One first PID; final executable hash and bundle identifier |
 | `distribution-launch-verdict.txt`, `appkit-running-application.txt` | First process finishes AppKit launch and remains stable for at least 60 seconds |
@@ -94,7 +94,32 @@ Each `evidenceDirectory` contains the existing `macos-distribution-e2e` director
 | Mapped code inventories and both `process-open-files` samples | Required bundled code and executable mapping |
 | `runtime-chain-verdict.txt` | Same first PID, executable, and full bundle through the separate runtime smoke |
 
-Trust text and verdict files remain command output. Their authenticated production and command exit status still require the reviewed producer and controller adapter. Hashes establish byte equality after origin is known. Hashes alone cannot authenticate a command or screenshot.
+### Trust command receipts
+
+`scripts/verify-macos-notarized-app.sh` records each subprocess in `trust-command-receipts.json`. The receipt contains integer `schemaVersion=1`, the absolute `app` path, `developerIdTeam`, `signingIdentifier`, and an ordered `commands` array.
+
+The four commands run in this order.
+
+| Command name | Actual argv | Output basename |
+| --- | --- | --- |
+| `codesign-verify` | `codesign --verify --deep --strict --test-requirement=<requirement> <app>` | `developer-id-verification` |
+| `codesign-display` | `codesign --display --verbose=4 <app>` | `signature` |
+| `stapler-validate` | `xcrun stapler validate <app>` | `stapled-ticket` |
+| `gatekeeper-assess` | `spctl --assess --type execute --verbose=4 <app>` | `gatekeeper-assessment` |
+
+The requirement checks the Apple Developer ID certificate chain, the expected team, and the application identifier. The consumer compares the complete requirement argument. The receipt's `argv` is a JSON string array, preserving argument boundaries.
+
+Each command records `name`, `argv`, integer `exitStatus`, UTC `startedAt` and `endedAt`, boolean `timedOut`, `stdout`, and `stderr`. Each stream record contains its fixed relative `path`, byte `size`, and lowercase SHA-256 `sha256`. The exact bytes remain in `<basename>.stdout` and `<basename>.stderr`. Existing `<basename>.txt` files contain stdout followed by stderr. They do not preserve interleaving between the streams.
+
+Each subprocess has a 120-second timeout. A timeout kills its process group. A missing executable records a null exit status and an error name. Failed command receipts and raw output remain available, but no passed trust verdict is written. A subsequent invocation cannot overwrite existing command evidence.
+
+The consumer requires exactly the four ordered records. Every exit status must be integer zero, and every `timedOut` value must be false. Each stream's size and hash must match its preserved bytes. Those bytes, the JSON receipt, and the existing text files must also match the API-bound qualification archive. Success text cannot replace a zero exit status.
+
+Command times must be ordered and fall inside the authenticated OS job window. Reference and extracted-before commands end before the launch observation starts. Extracted-after commands start after that observation ends. Reference commands target the `macos-distribution-e2e/expected-inner-reference/roma just talk.app` path. Extracted commands target the app recorded by both `extracted-app-identity.txt` and `launch-verification/launch-identity.txt`. Signature display must contain exactly one `Executable=` line that names an executable inside that app. Repeated `Authority=` lines represent the certificate chain and are allowed.
+
+The receipts establish command outcomes and byte relationships. The reviewed producer and controller adapter must still establish their origin, including the native executable environment. Hashes alone cannot authenticate a command or screenshot. Publication eligibility remains false.
+
+The contract tests run controlled subprocesses with known output and exit statuses. They reject missing receipts, success text paired with a nonzero exit, altered arguments, repeated commands, changed output, and invalid time windows. These tests establish receipt handling, not notarization or normal first Open.
 
 ## Remaining producer and publication prerequisites
 

@@ -158,8 +158,11 @@ class Qualification:
             self.require(decode_json(archive.read(manifest)) == expected,
                          "QUALIFICATION_INPUTS_UNBOUND", "qualification", "requested inputs differ from authenticated producer inputs")
 
-    def evidence_text(self, reference):
-        text = self.text(reference)
+    def evidence_bytes(self, reference):
+        path = self.path(reference)
+        if path.stat().st_size > MAX_RECEIPT:
+            raise InvalidEvidence("raw receipt exceeds size limit")
+        raw = path.read_bytes()
         member = self.evidence_members.get(reference)
         if self.evidence_archive is None or member is None:
             self.reject("RAW_RECEIPT_UNBOUND", reference, "raw receipt is absent from qualification artifact")
@@ -168,9 +171,12 @@ class Qualification:
                 if archive.getinfo(member).file_size > MAX_RECEIPT:
                     raise InvalidEvidence("raw receipt exceeds size limit")
                 with archive.open(member) as stream:
-                    self.require(digest(stream) == self.file_digest(reference),
+                    self.require(digest(stream) == hashlib.sha256(raw).hexdigest(),
                                  "RAW_RECEIPT_UNBOUND", reference, "local raw receipt differs from qualification artifact")
-        return text
+        return raw
+
+    def evidence_text(self, reference):
+        return self.evidence_bytes(reference).decode("utf-8")
 
     def unit(self, scope, operation):
         try:
@@ -322,11 +328,81 @@ class Qualification:
         self.observed["finalArchive"] = {"sha256": expected, "size": path.stat().st_size, "minimumSystemVersion": info.get("LSMinimumSystemVersion")}
         return manifest, files[executable][0]
 
+    def trust_commands(self, prefix, trust, scope, job):
+        directory = prefix + trust + "/"
+        receipt = decode_json(self.evidence_text(directory + "trust-command-receipts.json"))
+        if set(receipt) != {"schemaVersion", "app", "developerIdTeam", "signingIdentifier", "commands"}:
+            raise InvalidEvidence("unexpected trust command receipt fields")
+        app = receipt["app"]
+        executables = [line.partition("=")[2] for line in self.evidence_text(directory + "signature.txt").splitlines() if line.startswith("Executable=")]
+        if len(executables) != 1:
+            raise InvalidEvidence("expected exactly one signature Executable line")
+        if not isinstance(app, str) or not app.startswith("/") or posixpath.normpath(app) != app or not app.endswith("/" + APP_NAME):
+            raise InvalidEvidence("expected canonical absolute trust app path")
+        if trust == "reference-trust":
+            self.require(app.endswith("/macos-distribution-e2e/expected-inner-reference/" + APP_NAME),
+                         "TRUST_APP_MISMATCH", scope, "reference commands must target the extracted final ZIP reference")
+        else:
+            extracted = key_values(self.evidence_text(prefix + "extracted-app-identity.txt"))
+            launch = key_values(self.evidence_text(prefix + "launch-verification/launch-identity.txt"))
+            self.require(app == extracted.get("app") == launch.get("source_app"),
+                         "TRUST_APP_MISMATCH", scope, "trust commands must target the same Finder-extracted source app")
+        self.require(executables[0].startswith(app + "/Contents/MacOS/"),
+                     "TRUST_APP_MISMATCH", scope, "signature display must identify the command's app executable")
+        self.require(type(receipt["schemaVersion"]) is int and receipt["schemaVersion"] == 1
+                     and receipt["developerIdTeam"] == self.team and receipt["signingIdentifier"] == BUNDLE_ID,
+                     "TRUST_POLICY_MISMATCH", scope, "trust receipts must use the expected team and identifier")
+        requirement = ('=anchor apple generic and certificate leaf[field.1.2.840.113635.100.6.1.13] exists '
+                       'and certificate 1[field.1.2.840.113635.100.6.2.6] exists '
+                       f'and certificate leaf[subject.OU] = "{self.team}" and identifier "{BUNDLE_ID}"')
+        expected = [
+            ("codesign-verify", "developer-id-verification", ["codesign", "--verify", "--deep", "--strict", "--test-requirement=" + requirement, app]),
+            ("codesign-display", "signature", ["codesign", "--display", "--verbose=4", app]),
+            ("stapler-validate", "stapled-ticket", ["xcrun", "stapler", "validate", app]),
+            ("gatekeeper-assess", "gatekeeper-assessment", ["spctl", "--assess", "--type", "execute", "--verbose=4", app]),
+        ]
+        commands = receipt["commands"]
+        if not isinstance(commands, list) or len(commands) != len(expected):
+            raise InvalidEvidence("expected exactly four trust command receipts")
+        if job is None:
+            raise InvalidEvidence("trust commands lack authenticated OS job window")
+        job_start, job_end = utc_time(job["started_at"]), utc_time(job["completed_at"])
+        launch_start = utc_time(self.evidence_text(prefix + "approval-window-started-at.txt").strip())
+        launch_end = utc_time(self.evidence_text(prefix + "approval-window-ended-at.txt").strip())
+        previous_end = job_start
+        for command, (name, output_name, argv) in zip(commands, expected):
+            if not isinstance(command, dict) or set(command) != {"name", "argv", "exitStatus", "startedAt", "endedAt", "timedOut", "stdout", "stderr"}:
+                raise InvalidEvidence("unexpected trust command fields")
+            self.require(command["name"] == name and command["argv"] == argv,
+                         "TRUST_COMMAND_MISMATCH", scope, "exact ordered trust commands, flags, and app required")
+            self.require(type(command["exitStatus"]) is int and command["exitStatus"] == 0 and command["timedOut"] is False,
+                         "TRUST_COMMAND_FAILED", scope, "each actual trust command must exit zero without timeout")
+            start, end = utc_time(command["startedAt"]), utc_time(command["endedAt"])
+            self.require(previous_end <= start <= end <= job_end and (end - start).total_seconds() <= 120
+                         and (start >= launch_end if trust == "extracted-trust-after" else end <= launch_start),
+                         "TRUST_COMMAND_WINDOW_INVALID", scope, "ordered bounded trust commands must fall inside the OS job and their launch phase")
+            previous_end = end
+            raw = []
+            for channel in ("stdout", "stderr"):
+                record = command[channel]
+                if not isinstance(record, dict) or set(record) != {"path", "sha256", "size"}:
+                    raise InvalidEvidence("unexpected trust command output fields")
+                expected_path = output_name + "." + channel
+                self.require(record["path"] == expected_path, "TRUST_OUTPUT_PATH_MISMATCH", scope, "fixed raw command output path required")
+                data = self.evidence_bytes(directory + expected_path)
+                self.require(type(record["size"]) is int and record["size"] == len(data)
+                             and isinstance(record["sha256"], str) and SHA256.fullmatch(record["sha256"]) is not None
+                             and record["sha256"] == hashlib.sha256(data).hexdigest(),
+                             "TRUST_OUTPUT_MISMATCH", scope, "raw output bytes must match the command receipt's size and hash")
+                raw.append(data)
+            self.require(b"".join(raw) == self.evidence_bytes(directory + output_name + ".txt"),
+                         "TRUST_OUTPUT_MISMATCH", scope, "legacy text must contain the recorded stdout followed by stderr")
+
     def row(self, row, jobs, run_id, attempt, final_record, manifest, executable_sha):
         name = row["name"]
         version, build, job_name = ROWS[name]
         scope = f"rows.{name}"
-        self.job(jobs, run_id, attempt, job_name, scope, row["jobId"])
+        job = self.job(jobs, run_id, attempt, job_name, scope, row["jobId"])
         prefix = row["evidenceDirectory"].rstrip("/") + "/macos-distribution-e2e/"
         read = lambda relative: self.evidence_text(prefix + relative)
         values = lambda relative: key_values(read(relative))
@@ -366,6 +442,7 @@ class Qualification:
             assessment = read(f"{trust}/gatekeeper-assessment.txt")
             self.require("source=Notarized Developer ID" in assessment.splitlines() and re.search(r"^override=", assessment, re.M) is None,
                          "TRUST_ASSESSMENT_REJECTED", scope, "notarized assessment without override required")
+            self.unit(scope + "." + trust, lambda trust=trust: self.trust_commands(prefix, trust, scope + "." + trust, job))
         for relative in ("expected-inner-app-files.sha256", "extracted-app-files-before-gatekeeper.sha256", "extracted-app-files-after-gatekeeper.sha256",
                          "launch-verification/source-bundle-files.sha256", "launch-verification/process-bundle-files.sha256"):
             self.require(read(relative) == manifest, "BUNDLE_MANIFEST_MISMATCH", scope, "recorded full bundle differs from final ZIP")

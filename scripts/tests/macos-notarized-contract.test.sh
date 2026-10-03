@@ -95,6 +95,7 @@ case "$1" in
     [[ "$*" == *'certificate leaf[subject.OU] = "ABCDE12345"'* ]] || exit 1
     [[ "$*" == *'and identifier "com.example.Roma"'* ]] || exit 1
     [[ "${TRUST_FAILURE:-}" != identity ]] || exit 1
+    if [[ "${TRUST_FAILURE:-}" == verify-exit ]]; then echo 'verification successful'; exit 17; fi
     ;;
   --display)
     if [[ "${TRUST_FAILURE:-}" == runtime ]]; then
@@ -102,6 +103,7 @@ case "$1" in
     else
       echo 'CodeDirectory v=20500 flags=0x10000(runtime)'
     fi
+    if [[ "${TRUST_FAILURE:-}" == display-exit ]]; then exit 18; fi
     ;;
   *) exit 1 ;;
 esac
@@ -109,6 +111,10 @@ SH
 cat > "$scratch/bin/xcrun" <<'SH'
 #!/bin/bash
 [[ "$1 $2" == 'stapler validate' && "${TRUST_FAILURE:-}" != ticket ]]
+command_status=$?
+echo 'The validate action worked!'
+if [[ "${TRUST_FAILURE:-}" == ticket-exit ]]; then exit 19; fi
+exit "$command_status"
 SH
 cat > "$scratch/bin/spctl" <<'SH'
 #!/bin/bash
@@ -122,18 +128,61 @@ else
   echo 'source=Notarized Developer ID'
 fi
 if [[ "${TRUST_FAILURE:-}" == override ]]; then echo 'override=security disabled'; fi
+if [[ "${TRUST_FAILURE:-}" == assessment-exit ]]; then exit 20; fi
 exit 0
 SH
 chmod +x "$scratch/bin/"*
 PATH="$scratch/bin:$PATH" bash "$root/scripts/verify-macos-notarized-app.sh" fixture.app ABCDE12345 com.example.Roma "$scratch/trusted"
 grep -Fxq 'trust_verdict=passed' "$scratch/trusted/trust-verdict.txt"
-for failure in identity runtime ticket assessment source override; do
+python3 - "$scratch/trusted" <<'PY'
+import hashlib, json, sys
+from datetime import datetime
+from pathlib import Path
+root = Path(sys.argv[1])
+receipt = json.loads((root / 'trust-command-receipts.json').read_text())
+assert receipt['schemaVersion'] == 1
+assert receipt['developerIdTeam'] == 'ABCDE12345'
+assert receipt['signingIdentifier'] == 'com.example.Roma'
+assert [command['name'] for command in receipt['commands']] == [
+    'codesign-verify', 'codesign-display', 'stapler-validate', 'gatekeeper-assess']
+for command in receipt['commands']:
+    assert command['argv'][-1] == receipt['app']
+    assert command['exitStatus'] == 0
+    assert command['timedOut'] is False
+    assert datetime.fromisoformat(command['startedAt'].replace('Z', '+00:00')) <= datetime.fromisoformat(command['endedAt'].replace('Z', '+00:00'))
+    for stream in ('stdout', 'stderr'):
+        record = command[stream]
+        raw = (root / record['path']).read_bytes()
+        assert len(raw) == record['size']
+        assert hashlib.sha256(raw).hexdigest() == record['sha256']
+PY
+for failure in identity runtime ticket assessment source override verify-exit display-exit ticket-exit assessment-exit; do
   if PATH="$scratch/bin:$PATH" TRUST_FAILURE="$failure" \
     bash "$root/scripts/verify-macos-notarized-app.sh" fixture.app ABCDE12345 com.example.Roma "$scratch/$failure" > "$scratch/out" 2>&1; then
     echo "Trust gate accepted $failure failure" >&2; exit 1
   fi
   [[ ! -e "$scratch/$failure/trust-verdict.txt" ]]
 done
+failed_receipt_sha="$(shasum -a 256 "$scratch/verify-exit/trust-command-receipts.json" | awk '{print $1}')"
+if PATH="$scratch/bin:$PATH" bash "$root/scripts/verify-macos-notarized-app.sh" fixture.app ABCDE12345 com.example.Roma "$scratch/verify-exit" > "$scratch/out" 2>&1; then
+  echo 'Trust gate reused an existing failed receipt' >&2; exit 1
+fi
+[[ "$(shasum -a 256 "$scratch/verify-exit/trust-command-receipts.json" | awk '{print $1}')" == "$failed_receipt_sha" ]]
+python3 - "$scratch" <<'PY'
+import hashlib, json, sys
+from pathlib import Path
+root = Path(sys.argv[1])
+for name, status in [('verify-exit', 17), ('display-exit', 18), ('ticket-exit', 19), ('assessment-exit', 20)]:
+    directory = root / name
+    receipt = json.loads((directory / 'trust-command-receipts.json').read_text())
+    assert receipt['commands'][-1]['exitStatus'] == status
+    assert not (directory / 'trust-verdict.txt').exists()
+    for command in receipt['commands']:
+        for channel in ('stdout', 'stderr'):
+            output = command[channel]
+            assert hashlib.sha256((directory / output['path']).read_bytes()).hexdigest() == output['sha256']
+    assert (directory / receipt['commands'][-1]['stdout']['path']).stat().st_size > 0
+PY
 if PATH="$scratch/bin:$PATH" bash "$root/scripts/verify-macos-notarized-app.sh" fixture.app ABCDE12345 com.example.Roma "$scratch/trusted" > "$scratch/out" 2>&1; then
   echo 'Trust gate reused an existing verdict' >&2; exit 1
 fi

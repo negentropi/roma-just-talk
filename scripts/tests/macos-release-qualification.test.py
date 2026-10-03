@@ -2,6 +2,7 @@
 
 import copy
 import hashlib
+import importlib.util
 import json
 import os
 import plistlib
@@ -12,9 +13,12 @@ import sys
 import tempfile
 import unittest
 import zipfile
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from unittest.mock import patch
 
 SCRIPT = Path(__file__).resolve().parents[1] / "verify-macos-release-qualification.py"
+TRUST_SCRIPT = SCRIPT.parent / "verify-macos-notarized-app.sh"
 SOURCE = "d504e90e63035c4cb8e9597cbef9894253fdaf01"
 RUN = {
     "id": 37140159415, "run_attempt": 1, "head_sha": SOURCE,
@@ -201,6 +205,214 @@ class QualificationTests(unittest.TestCase):
         output = self.invoke()
         self.assertTrue(any(item["code"] == "RAW_RECEIPT_UNBOUND" and item["scope"] == receipt for item in output["rejections"]))
         self.assertIn("CONTROLLER_ORIGIN_UNVERIFIED", {item["code"] for item in output["rejections"]})
+
+    def write_actual_stub_trust_row(self):
+        self.bind_failed_qualification_archive()
+        prefix = "row/macos-distribution-e2e/"
+        binary = self.root / "trust-bin"
+        binary.mkdir()
+        command = '''#!/usr/bin/env python3
+import os, sys
+name, app = os.path.basename(sys.argv[0]), sys.argv[-1]
+if name == 'codesign' and sys.argv[1] == '--display':
+    print('Executable=' + app + '/Contents/MacOS/roma just talk', file=sys.stderr)
+    print('Identifier=com.negentropi.RomaJustTalk', file=sys.stderr)
+    print('CodeDirectory v=20500 flags=0x10000(runtime)', file=sys.stderr)
+    print('TeamIdentifier=ABCDE12345', file=sys.stderr)
+elif name == 'codesign':
+    print('fixture verification stdout')
+    print('fixture verification stderr', file=sys.stderr)
+elif name == 'xcrun':
+    print('The validate action worked!')
+elif name == 'spctl':
+    print(app + ': accepted', file=sys.stderr)
+    print('source=Notarized Developer ID', file=sys.stderr)
+else:
+    sys.exit(3)
+'''
+        for name in ("codesign", "xcrun", "spctl"):
+            path = binary / name
+            path.write_text(command)
+            path.chmod(0o755)
+        environment = dict(os.environ, PATH=str(binary) + os.pathsep + os.environ.get("PATH", ""))
+        extracted = "/Volumes/Roma Distribution E2E/roma just talk.app"
+        reference = "/fixture/macos-distribution-e2e/expected-inner-reference/roma just talk.app"
+        self.write(prefix + "extracted-app-identity.txt", "app=" + extracted + "\n")
+        self.write(prefix + "launch-verification/launch-identity.txt", "source_app=" + extracted + "\n")
+        for trust, app in [("reference-trust", reference), ("extracted-trust-before", extracted), ("extracted-trust-after", extracted)]:
+            if trust == "extracted-trust-after":
+                instant = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+                self.write(prefix + "approval-window-started-at.txt", instant + "\n")
+                self.write(prefix + "approval-window-ended-at.txt", instant + "\n")
+            directory = self.root / prefix / trust
+            if directory.exists():
+                shutil.rmtree(directory)
+            result = subprocess.run(["bash", str(TRUST_SCRIPT), app, "ABCDE12345", "com.negentropi.RomaJustTalk", str(directory)],
+                                    env=environment, capture_output=True, text=True, timeout=10)
+            self.assertEqual(result.returncode, 0, result.stderr)
+        now = datetime.now(timezone.utc)
+        jobs = json.loads((self.root / "producer-jobs.json").read_text())
+        for job in jobs["jobs"]:
+            job.update(started_at=(now - timedelta(minutes=5)).isoformat().replace("+00:00", "Z"),
+                       completed_at=(now + timedelta(minutes=5)).isoformat().replace("+00:00", "Z"))
+        self.write("producer-jobs.json", jobs)
+        for metadata in ("qualification-artifact.json", "final-artifact.json"):
+            value = json.loads((self.root / metadata).read_text())
+            value["created_at"] = now.isoformat().replace("+00:00", "Z")
+            self.write(metadata, value)
+        self.rebind_trust_archive()
+
+    def rebind_trust_archive(self):
+        path = self.root / "qualification.zip"
+        with zipfile.ZipFile(path) as archive:
+            inputs = archive.read("qualification-inputs.json")
+        with zipfile.ZipFile(path, "w") as archive:
+            archive.writestr("qualification-inputs.json", inputs)
+            for member in sorted((self.root / "row").rglob("*")):
+                if member.is_file():
+                    archive.write(member, member.relative_to(self.root).as_posix())
+        metadata = json.loads((self.root / "qualification-artifact.json").read_text())
+        metadata.update(size_in_bytes=path.stat().st_size, digest="sha256:" + hashlib.sha256(path.read_bytes()).hexdigest())
+        self.write("qualification-artifact.json", metadata)
+
+    def trust_rejections(self):
+        return [item for item in self.invoke()["rejections"] if item["scope"].startswith("rows.sonoma.")]
+
+    def test_actual_stub_command_receipts_pass_only_trust_checks(self):
+        self.write_actual_stub_trust_row()
+        self.assertEqual(self.trust_rejections(), [])
+        self.assertIn("CONTROLLER_ORIGIN_UNVERIFIED", self.codes())
+
+    def test_parsed_raw_snapshot_must_match_bound_archive(self):
+        self.bind_failed_qualification_archive()
+        reference = "row/macos-distribution-e2e/runner-identity.txt"
+        path = self.root / reference
+        bound = path.read_bytes()
+        changed = bound.replace(b"14.2.1", b"14.4.1")
+        self.assertNotEqual(bound, changed)
+        path.write_bytes(changed)
+        spec = importlib.util.spec_from_file_location("qualification_under_test", SCRIPT)
+        verifier = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(verifier)
+        checker = verifier.Qualification(self.root, SOURCE, SOURCE, "ABCDE12345", offline=True)
+        checker.bind_evidence(self.root / "qualification.zip", self.inputs)
+        read_bytes = Path.read_bytes
+
+        def read_then_restore(target):
+            raw = read_bytes(target)
+            if target.resolve() == path.resolve():
+                path.write_bytes(bound)
+            return raw
+
+        with patch.object(Path, "read_bytes", read_then_restore):
+            parsed = checker.evidence_text(reference)
+        self.assertEqual(parsed, changed.decode("utf-8"))
+        self.assertEqual(path.read_bytes(), bound)
+        self.assertTrue(any(item["code"] == "RAW_RECEIPT_UNBOUND" and item["scope"] == reference for item in checker.problems))
+
+    def test_signature_authority_chain_allows_repeated_authority(self):
+        self.write_actual_stub_trust_row()
+        directory = self.root / "row/macos-distribution-e2e/reference-trust"
+        signature = (directory / "signature.stderr").read_bytes() + (
+            b"Authority=macOS Software Signing\n"
+            b"Authority=Apple Code Signing Certification Authority\n"
+            b"Authority=Apple Root CA\n")
+        self.replace_signature_output(directory, signature)
+        self.assertEqual(self.trust_rejections(), [])
+
+    def test_signature_duplicate_executable_rejects(self):
+        self.write_actual_stub_trust_row()
+        directory = self.root / "row/macos-distribution-e2e/reference-trust"
+        signature = (directory / "signature.stderr").read_bytes()
+        executable = next(line for line in signature.splitlines(keepends=True) if line.startswith(b"Executable="))
+        self.replace_signature_output(directory, signature + executable)
+        self.assertTrue(any(item["code"] == "EVIDENCE_INVALID" and item["detail"] == "expected exactly one signature Executable line" for item in self.trust_rejections()))
+
+    def replace_signature_output(self, directory, signature):
+        (directory / "signature.stderr").write_bytes(signature)
+        (directory / "signature.txt").write_bytes((directory / "signature.stdout").read_bytes() + signature)
+        receipt = json.loads((directory / "trust-command-receipts.json").read_text())
+        receipt["commands"][1]["stderr"].update(size=len(signature), sha256=hashlib.sha256(signature).hexdigest())
+        (directory / "trust-command-receipts.json").write_text(json.dumps(receipt))
+        self.rebind_trust_archive()
+
+    def test_success_text_without_receipts_rejects(self):
+        self.write_actual_stub_trust_row()
+        receipt = self.root / "row/macos-distribution-e2e/reference-trust/trust-command-receipts.json"
+        receipt.unlink()
+        self.rebind_trust_archive()
+        rejected = self.trust_rejections()
+        self.assertTrue(any(item["scope"] == "rows.sonoma.reference-trust" and item["code"] == "EVIDENCE_INVALID" for item in rejected))
+
+    def test_duplicate_json_receipt_key_rejects(self):
+        self.write_actual_stub_trust_row()
+        path = "row/macos-distribution-e2e/reference-trust/trust-command-receipts.json"
+        raw = (self.root / path).read_text().replace('"exitStatus": 0,', '"exitStatus": 7, "exitStatus": 0,', 1)
+        self.write(path, raw)
+        self.rebind_trust_archive()
+        self.assertTrue(any(item["code"] == "EVIDENCE_INVALID" and item["detail"] == "duplicate JSON key" for item in self.trust_rejections()))
+
+    def test_success_text_with_failed_command_rejects(self):
+        self.write_actual_stub_trust_row()
+        path = "row/macos-distribution-e2e/reference-trust/trust-command-receipts.json"
+        receipt = json.loads((self.root / path).read_text())
+        for index in range(4):
+            with self.subTest(command=index):
+                changed = copy.deepcopy(receipt)
+                changed["commands"][index]["exitStatus"] = 9
+                self.write(path, changed)
+                self.rebind_trust_archive()
+                self.assertIn("TRUST_COMMAND_FAILED", {item["code"] for item in self.trust_rejections()})
+
+    def test_replaced_duplicate_or_missing_command_rejects(self):
+        self.write_actual_stub_trust_row()
+        path = "row/macos-distribution-e2e/reference-trust/trust-command-receipts.json"
+        original = json.loads((self.root / path).read_text())
+        for change in ("argv", "duplicate", "missing", "extra", "team", "identifier", "app", "timeout"):
+            with self.subTest(change=change):
+                receipt = copy.deepcopy(original)
+                if change == "argv":
+                    receipt["commands"][0]["argv"][2] = "--ignore-resources"
+                elif change == "duplicate":
+                    receipt["commands"][1] = copy.deepcopy(receipt["commands"][0])
+                elif change == "missing":
+                    receipt["commands"].pop()
+                elif change == "extra":
+                    receipt["commands"].append(copy.deepcopy(receipt["commands"][0]))
+                elif change == "team":
+                    receipt["developerIdTeam"] = "OTHER12345"
+                elif change == "identifier":
+                    receipt["signingIdentifier"] = "com.example.Other"
+                elif change == "app":
+                    receipt["app"] = "/different/roma just talk.app"
+                elif change == "timeout":
+                    receipt["commands"][0]["timedOut"] = True
+                self.write(path, receipt)
+                self.rebind_trust_archive()
+                self.assertTrue(self.trust_rejections())
+
+    def test_actual_output_tamper_rejects_hash_and_archive_binding(self):
+        self.write_actual_stub_trust_row()
+        path = "row/macos-distribution-e2e/reference-trust/developer-id-verification.stderr"
+        self.write(path, "changed stdout-looking verification evidence\n")
+        rejected = self.trust_rejections()
+        self.assertIn("TRUST_OUTPUT_MISMATCH", {item["code"] for item in rejected})
+        output = self.invoke()
+        self.assertTrue(any(item["code"] == "RAW_RECEIPT_UNBOUND" and item["scope"] == path for item in output["rejections"]))
+        self.rebind_trust_archive()
+        self.assertIn("TRUST_OUTPUT_MISMATCH", {item["code"] for item in self.trust_rejections()})
+
+    def test_command_outside_job_or_launch_phase_rejects(self):
+        self.write_actual_stub_trust_row()
+        path = "row/macos-distribution-e2e/reference-trust/trust-command-receipts.json"
+        receipt = json.loads((self.root / path).read_text())
+        receipt["commands"][0]["startedAt"] = "2000-01-01T00:00:00Z"
+        self.write(path, receipt)
+        self.rebind_trust_archive()
+        self.assertIn("TRUST_COMMAND_WINDOW_INVALID", {item["code"] for item in self.trust_rejections()})
+        self.write("row/macos-distribution-e2e/approval-window-started-at.txt", "2000-01-01T00:00:00Z\n")
+        self.rebind_trust_archive()
+        self.assertIn("TRUST_COMMAND_WINDOW_INVALID", {item["code"] for item in self.trust_rejections()})
 
     def test_producer_inputs_and_final_attempt_cannot_be_replaced(self):
         self.bind_failed_qualification_archive()

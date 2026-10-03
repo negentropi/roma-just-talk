@@ -481,6 +481,62 @@ verify_fixed "$TEMP_ROOT/fixed-fallback.json"
 verify_known_bad "$TEMP_ROOT/known-bad-safari.json"
 verify_fixed "$TEMP_ROOT/fixed-safari-fallback.json" "$LAUNCH_EVENTS" "$TERMINATION_EVENTS" "$TEMP_ROOT/known-bad-safari.json"
 
+python3 - "$VERIFIER" "$TEMP_ROOT" <<'PY'
+import os
+from pathlib import Path
+import selectors
+import signal
+import subprocess
+import sys
+import time
+
+verifier, directory = sys.argv[1], Path(sys.argv[2])
+command = ["/bin/bash", verifier, "fixed", str(directory / "fixed-safari-fallback.json"),
+    str(directory / "evidence-contract.json"), str(directory / "empty-final-launch-events.tsv"),
+    str(directory / "empty-final-termination-events.tsv"), str(directory / "known-bad-safari.json"),
+    str(directory / "evidence-contract.json")]
+expected = subprocess.check_output(command)
+read_fd, write_fd = os.pipe()
+os.set_blocking(write_fd, False)
+prefix = b""
+try:
+    while True:
+        count = os.write(write_fd, b"x" * 8192)
+        prefix += b"x" * count
+except BlockingIOError:
+    pass
+os.set_blocking(write_fd, True)
+process = subprocess.Popen(command, stdout=write_fd, stderr=subprocess.PIPE, start_new_session=True)
+os.close(write_fd)
+output = bytearray()
+selector = selectors.DefaultSelector()
+selector.register(read_fd, selectors.EVENT_READ)
+try:
+    time.sleep(2)
+    for _ in range(3):
+        os.kill(process.pid, signal.SIGCHLD)
+        time.sleep(0.01)
+    deadline = time.monotonic() + 10
+    while True:
+        assert time.monotonic() < deadline, "Verifier output did not drain"
+        if not selector.select(0.1):
+            continue
+        data = os.read(read_fd, 65536)
+        if not data:
+            break
+        output.extend(data)
+    _, errors = process.communicate(timeout=5)
+    assert process.returncode == 0, errors.decode()
+    assert bytes(output) == prefix + expected, "Blocked output lost verifier evidence"
+    assert not errors, errors.decode()
+finally:
+    selector.close()
+    os.close(read_fd)
+    if process.poll() is None:
+        os.killpg(process.pid, signal.SIGKILL)
+        process.wait()
+PY
+
 expect_failure \
   "fixed report did not prove ordered fallback delivery for every affected baseline target/scenario pair" \
   verify_fixed "$TEMP_ROOT/ordinary-pass.json"

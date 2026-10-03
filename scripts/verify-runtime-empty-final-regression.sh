@@ -272,19 +272,19 @@ if [[ "$expectation" == "fixed" ]]; then
   fi
 fi
 
-printf 'runtime_empty_final_expectation=%s\n' "$expectation"
-printf 'evidence_contract_sha256=%s\n' "$contract_sha256"
-printf 'fresh_process_count=%s\n' "$launch_count"
-while IFS= read -r pair; do
-  printf 'affected_target_text_scenario=%s\n' "$pair"
-done < <(jq -c '.affectedPairs[]' <<< "$profile")
-if [[ "$expectation" == "known-bad" ]]; then
-  while IFS= read -r case_id; do printf 'matching_case_id=%s\n' "$case_id"; done < <(jq -r '.affectedPairs[].failedCaseIDs[]' <<< "$profile")
-else
-  while IFS= read -r pair; do
-    printf 'baseline_affected_target_text_scenario=%s\n' "$pair"
-  done < <(jq -c '.affectedPairs[]' <<< "$profile")
-  while IFS=$'\t' read -r pair case_id; do
-    printf 'fixed_matching_case=%s\t%s\n' "$pair" "$case_id"
-  done < <(jq -r '.pairMatches[] | {target, textScenario} as $pair | .caseIDs[] | [($pair | tojson), .] | @tsv' <<< "$fixed_analysis")
-fi
+# macOS Bash 3.2 can lose a blocked printf when a child-exit signal interrupts it.
+jq -nr --arg expectation "$expectation" --arg contract "$contract_sha256" \
+  --arg count "$launch_count" --argjson profile "$profile" \
+  --argjson fixed "${fixed_analysis:-null}" '
+  "runtime_empty_final_expectation=" + $expectation,
+  "evidence_contract_sha256=" + $contract,
+  "fresh_process_count=" + $count,
+  ($profile.affectedPairs[] | "affected_target_text_scenario=" + tojson),
+  (if $expectation == "known-bad" then
+    $profile.affectedPairs[].failedCaseIDs[] | "matching_case_id=" + .
+  else
+    ($profile.affectedPairs[] | "baseline_affected_target_text_scenario=" + tojson),
+    ($fixed.pairMatches[] | {target, textScenario} as $pair | .caseIDs[] |
+      "fixed_matching_case=" + ($pair | tojson) + "\t" + .)
+  end)
+'

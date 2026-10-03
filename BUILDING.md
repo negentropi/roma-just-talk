@@ -18,6 +18,11 @@ a runner. Both execute the same build and checks. The build host version does
 not prove first launch on a target macOS release; downloaded artifacts require
 the separate distribution launch test on that exact OS.
 
+The checked Release ZIP is uploaded before the longer test gates finish, so
+diagnostic launch tests can use those exact bytes while CI continues. An
+available artifact is an unqualified candidate. Build reuse and distribution
+qualification require the complete source build run to succeed.
+
 ## Quick Start with Makefile (Recommended)
 
 The easiest way to build VoiceInk is using the included Makefile, which automates the entire build process including building and statically linking Whisper.

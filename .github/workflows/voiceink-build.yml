@@ -282,6 +282,35 @@ jobs:
         id: release_app
         run: make local CONFIGURATION=Release
 
+      - name: Reject debug-only release payload
+        run: |
+          APP="$HOME/Applications/roma just talk.app"
+          if [ -e "$APP/Contents/MacOS/roma just talk.debug.dylib" ] || [ -e "$APP/Contents/MacOS/__preview.dylib" ]; then
+            echo "Release artifact contains debug-only binaries:"
+            ls -la "$APP/Contents/MacOS"
+            exit 1
+          fi
+
+      - name: Verify packaged app identity
+        run: |
+          APP="$HOME/Applications/roma just talk.app"
+          BUNDLE_ID=$(plutil -extract CFBundleIdentifier raw -o - "$APP/Contents/Info.plist")
+          test "$BUNDLE_ID" = "com.negentropi.RomaJustTalk"
+
+      - name: Reject test-coverage instrumentation in release app
+        run: bash scripts/verify-macos-release-instrumentation.sh "$HOME/Applications/roma just talk.app"
+
+      - name: Package app
+        run: ditto -c -k --keepParent "$HOME/Applications/roma just talk.app" "roma.just.talk.app.zip"
+
+      - name: Upload app artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.just.talk.app
+          path: roma.just.talk.app.zip
+          if-no-files-found: error
+          overwrite: true
+
       - name: Verify FluidAudio array reset semantics
         id: fluidaudio_test
         timeout-minutes: 15
@@ -330,32 +359,3 @@ jobs:
           name: roma.debug-test-evidence
           path: .local-build/onboarding-test-evidence
           if-no-files-found: error
-
-      - name: Reject debug-only release payload
-        run: |
-          APP="$HOME/Applications/roma just talk.app"
-          if [ -e "$APP/Contents/MacOS/roma just talk.debug.dylib" ] || [ -e "$APP/Contents/MacOS/__preview.dylib" ]; then
-            echo "Release artifact contains debug-only binaries:"
-            ls -la "$APP/Contents/MacOS"
-            exit 1
-          fi
-
-      - name: Verify packaged app identity
-        run: |
-          APP="$HOME/Applications/roma just talk.app"
-          BUNDLE_ID=$(plutil -extract CFBundleIdentifier raw -o - "$APP/Contents/Info.plist")
-          test "$BUNDLE_ID" = "com.negentropi.RomaJustTalk"
-
-      - name: Reject test-coverage instrumentation in release app
-        run: bash scripts/verify-macos-release-instrumentation.sh "$HOME/Applications/roma just talk.app"
-
-      - name: Package app
-        run: ditto -c -k --keepParent "$HOME/Applications/roma just talk.app" "roma.just.talk.app.zip"
-
-      - name: Upload app artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: roma.just.talk.app
-          path: roma.just.talk.app.zip
-          if-no-files-found: error
-          overwrite: true

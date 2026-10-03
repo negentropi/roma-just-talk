@@ -22,9 +22,15 @@ SCRATCH=$(cd "$SCRATCH" && pwd -P)
 APP="$OUTPUT/VoiceInkSwiftDataExactProbe.app"
 EXECUTABLE="$APP/Contents/MacOS/voiceink-swiftdata-probe"
 APP_LOCK="$ROOT/VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+CORE_LOCK="$ROOT/VoiceInkCore/Package.resolved"
+NVIDIA_LOCK="$ROOT/VoiceInkNVIDIA/Package.resolved"
+UNION_LOCK="$OUTPUT/production-union-Package.resolved"
 python3 "$PROBE/verify-inputs.py" --models "$ROOT" "$PROBE" > "$OUTPUT/production-model-hashes.json"
 cp "$APP_LOCK" "$OUTPUT/app-Package.resolved"
-cp "$APP_LOCK" "$PROBE/Package.resolved"
+cp "$CORE_LOCK" "$OUTPUT/core-Package.resolved"
+cp "$NVIDIA_LOCK" "$OUTPUT/nvidia-Package.resolved"
+python3 "$PROBE/verify-inputs.py" --union "$ROOT" "$UNION_LOCK" > "$OUTPUT/production-lock-union.json"
+cp "$UNION_LOCK" "$PROBE/Package.resolved"
 {
   git -C "$ROOT" rev-parse HEAD
   xcodebuild -version
@@ -36,7 +42,7 @@ cp "$APP_LOCK" "$PROBE/Package.resolved"
   printf 'product_module=VoiceInk\nprobe_swift_language=5\nfloor=14.2.1\ncloudkit=none\ndistribution_qualification=false\n'
 } > "$OUTPUT/build-identity.txt"
 shasum -a 256 "$(xcrun --find swiftc)" "$(xcrun --find clang)" "$(xcrun --find ld)" \
-  "$PROBE/Package.swift" "$PROBE/Sources/VoiceInk/Probe.swift" "$APP_LOCK" > "$OUTPUT/toolchain-and-input.sha256"
+  "$PROBE/Package.swift" "$PROBE/Sources/VoiceInk/Probe.swift" "$APP_LOCK" "$CORE_LOCK" "$NVIDIA_LOCK" > "$OUTPUT/toolchain-and-input.sha256"
 python3 - "$ROOT" "$OUTPUT/core-source-hashes.json" <<'PY'
 import hashlib, json, pathlib, subprocess, sys
 root, output = pathlib.Path(sys.argv[1]), pathlib.Path(sys.argv[2])
@@ -44,12 +50,15 @@ paths = subprocess.check_output(["git", "-C", str(root), "ls-files", "-z", "Voic
 result = {path.decode(): hashlib.sha256((root / path.decode()).read_bytes()).hexdigest() for path in paths if path}
 output.write_text(json.dumps(result, sort_keys=True, indent=2) + "\n")
 PY
-swift package --package-path "$PROBE" --scratch-path "$SCRATCH" resolve > "$OUTPUT/resolve.log" 2>&1
-python3 "$PROBE/verify-inputs.py" --locks "$APP_LOCK" "$PROBE/Package.resolved" > "$OUTPUT/resolved-pins.json"
+swift package --package-path "$PROBE" --scratch-path "$SCRATCH" --force-resolved-versions resolve > "$OUTPUT/resolve.log" 2>&1
+python3 "$PROBE/verify-inputs.py" --locks "$UNION_LOCK" "$PROBE/Package.resolved" > "$OUTPUT/resolved-pins.json"
+python3 "$PROBE/verify-inputs.py" --checkouts "$PROBE/Package.resolved" "$SCRATCH" > "$OUTPUT/actual-checkouts.json"
 cp "$PROBE/Package.resolved" "$OUTPUT/probe-Package.resolved"
 ARGS=(--package-path "$PROBE" --scratch-path "$SCRATCH" -c release --force-resolved-versions --triple arm64-apple-macosx14.2.1 -Xlinker -rpath -Xlinker @executable_path/../Frameworks)
 swift build "${ARGS[@]}" --product voiceink-swiftdata-probe > "$OUTPUT/build.log" 2>&1
-python3 "$PROBE/verify-inputs.py" --locks "$APP_LOCK" "$PROBE/Package.resolved" > "$OUTPUT/resolved-pins-after-build.json"
+python3 "$PROBE/verify-inputs.py" --locks "$UNION_LOCK" "$PROBE/Package.resolved" > "$OUTPUT/resolved-pins-after-build.json"
+python3 "$PROBE/verify-inputs.py" --checkouts "$PROBE/Package.resolved" "$SCRATCH" > "$OUTPUT/actual-checkouts-after-build.json"
+cmp "$OUTPUT/actual-checkouts.json" "$OUTPUT/actual-checkouts-after-build.json"
 python3 "$PROBE/verify-inputs.py" --models "$ROOT" "$PROBE" > "$OUTPUT/production-model-hashes-after-build.json"
 cmp "$OUTPUT/production-model-hashes.json" "$OUTPUT/production-model-hashes-after-build.json"
 BIN_PATH=$(swift build "${ARGS[@]}" --show-bin-path)

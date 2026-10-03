@@ -213,6 +213,29 @@ before the user path starts. The scenario then:
 6. starts an approval-window process and log monitor before Open Anyway. In `fixed` mode, it requires the operator to confirm that the approved first-launch UI is visible and responsive, then requires the first observed PID to report finished AppKit launch, run through App Translocation as native ARM64, remain runnable without `SIGCONT`, map the required bundled dependencies discovered recursively from the active ARM64 executable graph, survive a stability interval without dyld or signature errors, and leave the full app bundle byte-identical to its pre-launch manifest. Weak load commands may remain unresolved or unmapped and are recorded separately. A mapped weak library still requires its strong children. Strict signature and full bundle checks include unmapped optional code. In `known-bad-framework-signature` mode, it instead requires the matching crash-report PID to be dead, any sampled approval PID to equal it, no Roma process to remain, the exact selected-framework three-part dyld signature report, Safari quarantine, and an unchanged bundle. A second Roma PID, wrong crash report, or approval-window dyld error invalidates either mode; and
 7. only in fixed mode, records that first-process verdict, requires that exact Roma process to remain the only running Roma instance, records its normal termination, and validates or completes its live model directory against the pinned manifest before deliberately starting separate prewarm and transcription relaunches of the same extracted artifact. Every observed Roma PID must be recorded by the helper, run through App Translocation with the same executable hash, pass the same recursive signature and mapped-code checks through process exit, and have an explicit test-requested termination. A new crash report or unaccounted process invalidates the run. The lane also compares the complete file, directory, and symlink bundle manifest before and after runtime and writes a separate transcription verdict.
 
+The launch verifier resolves each dependency in dyld's runpath stack order,
+including the active system cache before a later bundled copy. A cached path
+can name a different canonical image; filesystem existence alone cannot decide
+that resolution. A small external C observer, built with the target's Command
+Line Tools, records active-cache membership, canonical path, image UUID, and the
+observer's cache UUID. A bounded `sample` capture must name the original PID and
+process start time. Every required cached dependency must match its exact
+canonical path and image UUID in that process's Binary Images. The observer's
+cache UUID is recorded; the verifier does not claim it read the target's full
+cache UUID. A dependency that resolves to the bundle still requires its exact
+bundled mapping, active architecture, and signature. This observer does not load
+dependencies, modify the app, or change TCC.
+
+Apple documents [cache membership](https://github.com/apple-oss-distributions/dyld/blob/fd8d0c4d52320ebf64db34f3cb280310d905c5ae/include/mach-o/dyld.h#L117-L122),
+[canonical cache paths](https://github.com/apple-oss-distributions/dyld/blob/fd8d0c4d52320ebf64db34f3cb280310d905c5ae/include/mach-o/dyld_priv.h#L596-L602),
+[cache image UUID enumeration](https://github.com/apple-oss-distributions/dyld/blob/fd8d0c4d52320ebf64db34f3cb280310d905c5ae/include/mach-o/dyld_priv.h#L454-L484),
+and [runpath stack order](https://github.com/apple-oss-distributions/dyld/blob/fd8d0c4d52320ebf64db34f3cb280310d905c5ae/dyld/Loader.cpp#L1409-L1465).
+For standalone investigation, run
+`scripts/verify-macos-distribution-launch.sh --capture-dyld-cache <pid> <new-evidence-directory> <absolute-dependency-path> ...`.
+The diagnostic requires a new absolute evidence directory, a live numeric PID,
+and absolute dependency paths. Its sample subprocess has a 15-second deadline;
+cleanup terminates only that observer subprocess, preserving the target app.
+
 CI builds the runtime helper with a macOS 14.0 deployment target. Before changing
 TCC or starting Roma runtime work, the target Mac runs that exact packaged helper
 executable with `--help`, requires its own clean exit and expected output,

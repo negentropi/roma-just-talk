@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-VERIFIER="$ROOT/scripts/verify-macos-distribution-launch.sh"
+VERIFIER="${1:-$ROOT/scripts/verify-macos-distribution-launch.sh}"
 TEMP_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/roma-distribution-launch.XXXXXX")"
 APP="$TEMP_ROOT/Fixture.app"
 LEAF_FRAMEWORK="$APP/Contents/Frameworks/RomaDistributionFixtureLeaf.framework"
@@ -163,6 +163,13 @@ cat >"$TEMP_ROOT/optional-missing.c" <<'C'
 int roma_distribution_optional_missing_value(void) { return 42; }
 C
 
+cat >"$TEMP_ROOT/cache-shadow.c" <<'C'
+extern int roma_distribution_optional_child_value(void);
+int roma_distribution_cache_shadow_value(void) {
+  return roma_distribution_optional_child_value();
+}
+C
+
 cat >"$TEMP_ROOT/main.m" <<'OBJC'
 #import <AppKit/AppKit.h>
 #include <fcntl.h>
@@ -220,6 +227,12 @@ xcrun clang \
   -o "$APP/Contents/Frameworks/libSystem.B.dylib"
 xcrun clang \
   -arch arm64 \
+  -dynamiclib "$TEMP_ROOT/cache-shadow.c" \
+  "$TEMP_ROOT/libRomaDistributionAbsentOptionalChild.dylib" \
+  -Wl,-install_name,@rpath/libc.dylib \
+  -o "$APP/Contents/Frameworks/libc.dylib"
+xcrun clang \
+  -arch arm64 \
   -dynamiclib "$TEMP_ROOT/optional-missing.c" \
   -Wl,-install_name,@executable_path/../Frameworks/libRomaDistributionMissingWeak.dylib \
   -o "$TEMP_ROOT/libRomaDistributionMissingWeak.dylib"
@@ -258,6 +271,7 @@ xcrun clang \
   -arch arm64 \
   "$TEMP_ROOT/main.m" \
   "$MIDDLE_FRAMEWORKS/libRoma Distribution Fixture.dylib" \
+  -Wl,-needed_library,"$APP/Contents/Frameworks/libc.dylib" \
   -Wl,-weak_library,"$APP/Contents/Frameworks/libSystem.B.dylib" \
   -Wl,-weak_library,"$TEMP_ROOT/libRomaDistributionMissingWeak.dylib" \
   -Wl,-weak_library,"$APP/Contents/Frameworks/libRomaDistributionOptionalMapped.dylib" \
@@ -275,6 +289,8 @@ codesign --force --sign - --options runtime \
   "$APP/Contents/Frameworks/libRomaDistributionOptionalMapped.dylib" >/dev/null
 codesign --force --sign - --options runtime \
   "$APP/Contents/Frameworks/libSystem.B.dylib" >/dev/null
+codesign --force --sign - --options runtime \
+  "$APP/Contents/Frameworks/libc.dylib" >/dev/null
 codesign --force --sign - --options runtime "$LEAF_FRAMEWORK" >/dev/null
 codesign --force --sign - --options runtime \
   "$APP/Contents/Frameworks/x86-only/RomaDistributionWrongSliceOnly.dylib" >/dev/null
@@ -316,17 +332,116 @@ grep -Fxq 'Contents/Frameworks/libRomaDistributionOptionalMapped.dylib' \
   "$EVIDENCE/observed-mapped-bundle-code.txt"
 grep -Fxq 'Contents/Frameworks/libRomaDistributionOptionalChild.dylib' \
   "$EVIDENCE/expected-mapped-bundle-code.txt"
-for optional_unmapped in libSystem.B.dylib libRomaDistributionMissingWeak.dylib \
+for optional_unmapped in libSystem.B.dylib libc.dylib libRomaDistributionMissingWeak.dylib \
   libRomaDistributionAbsentOptionalChild.dylib; do
   if grep -Fq "$optional_unmapped" "$EVIDENCE/expected-mapped-bundle-code.txt"; then
     echo "unmapped optional branch must not require bundled code: $optional_unmapped" >&2
     exit 1
   fi
 done
-grep -Fq $'LC_LOAD_WEAK_DYLIB\t@rpath/libSystem.B.dylib\tContents/Frameworks/libSystem.B.dylib\tunmapped' \
-  "$EVIDENCE/optional-weak-dependencies.txt"
+grep -Fq $'LC_LOAD_DYLIB\t@rpath/libc.dylib\t/usr/lib/libSystem.B.dylib\t' \
+  "$EVIDENCE/cache-dependency-resolution.tsv"
+grep -Fq $'LC_LOAD_WEAK_DYLIB\t@rpath/libSystem.B.dylib\t/usr/lib/libSystem.B.dylib\t' \
+  "$EVIDENCE/cache-dependency-resolution.tsv"
 grep -Fq $'LC_LOAD_WEAK_DYLIB\t@executable_path/../Frameworks/libRomaDistributionMissingWeak.dylib\t\tunresolved' \
   "$EVIDENCE/optional-weak-dependencies.txt"
+
+mkdir -p "$TEMP_ROOT/filtered-cache-tools"
+cat > "$TEMP_ROOT/filtered-cache-tools/sample" <<'SCRIPT'
+#!/usr/bin/env bash
+set -euo pipefail
+if [[ "${CACHE_SAMPLE_MUTATION:-}" == "stall" ]]; then
+  printf '%s\n' "$$" > "$SAMPLE_CAPTURE_PID_FILE"
+  exec /bin/sleep 60
+fi
+/usr/bin/sample "$@"
+sample_file="${@: -1}"
+awk '
+  /<[0-9A-Fa-f-]+> \/usr\/lib\/libSystem.B.dylib$/ {
+    if (ENVIRON["CACHE_SAMPLE_MUTATION"] == "missing-path") next
+    if (ENVIRON["CACHE_SAMPLE_MUTATION"] == "wrong-uuid")
+      sub(/<[0-9A-Fa-f-]+>/, "<00000000-0000-0000-0000-000000000000>")
+  }
+  /^Process:/ && ENVIRON["CACHE_SAMPLE_MUTATION"] == "wrong-pid" {
+    sub(/\[[0-9]+\]$/, "[1]")
+  }
+  /^Launch Time:/ && ENVIRON["CACHE_SAMPLE_MUTATION"] == "wrong-start" {
+    sub(/[0-9]{4}-[0-9]{2}-[0-9]{2}/, "2000-01-01")
+  }
+  { print }
+' "$sample_file" > "$sample_file.filtered"
+mv "$sample_file.filtered" "$sample_file"
+SCRIPT
+chmod +x "$TEMP_ROOT/filtered-cache-tools/sample"
+for mutation in missing-path wrong-uuid; do
+  expect_failure 'launched process did not map active cache dependency: /usr/lib/libSystem.B.dylib' \
+    env PATH="$TEMP_ROOT/filtered-cache-tools:$PATH" \
+      CACHE_SAMPLE_MUTATION="$mutation" \
+      DISTRIBUTION_E2E_REQUIRE_TRANSLOCATION=false \
+      DISTRIBUTION_E2E_STABILITY_SECONDS=0 \
+      bash "$VERIFIER" "$APP" "$fixture_pid" "$EVIDENCE"
+done
+expect_failure 'dyld image sample does not match launched process PID' \
+  env PATH="$TEMP_ROOT/filtered-cache-tools:$PATH" \
+    CACHE_SAMPLE_MUTATION=wrong-pid \
+    DISTRIBUTION_E2E_REQUIRE_TRANSLOCATION=false \
+    DISTRIBUTION_E2E_STABILITY_SECONDS=0 \
+    bash "$VERIFIER" "$APP" "$fixture_pid" "$EVIDENCE"
+expect_failure 'dyld image sample does not match launched process start time' \
+  env PATH="$TEMP_ROOT/filtered-cache-tools:$PATH" \
+    CACHE_SAMPLE_MUTATION=wrong-start \
+    DISTRIBUTION_E2E_REQUIRE_TRANSLOCATION=false \
+    DISTRIBUTION_E2E_STABILITY_SECONDS=0 \
+    bash "$VERIFIER" "$APP" "$fixture_pid" "$EVIDENCE"
+sample_timeout_start=$SECONDS
+expect_failure 'could not capture launched process dyld images' \
+  env PATH="$TEMP_ROOT/filtered-cache-tools:$PATH" \
+    CACHE_SAMPLE_MUTATION=stall \
+    SAMPLE_CAPTURE_PID_FILE="$TEMP_ROOT/stalled-sample.pid" \
+    DISTRIBUTION_E2E_REQUIRE_TRANSLOCATION=false \
+    DISTRIBUTION_E2E_STABILITY_SECONDS=0 \
+    bash "$VERIFIER" "$APP" "$fixture_pid" "$EVIDENCE"
+if (( SECONDS - sample_timeout_start > 25 )) \
+  || kill -0 "$(cat "$TEMP_ROOT/stalled-sample.pid")" 2>/dev/null \
+  || ! kill -0 "$fixture_pid" 2>/dev/null; then
+  echo 'sample timeout must be bounded, clean its observer, and preserve the app' >&2
+  exit 1
+fi
+
+cat > "$TEMP_ROOT/filtered-cache-tools/xcrun" <<'SCRIPT'
+#!/usr/bin/env bash
+set -euo pipefail
+/usr/bin/xcrun "$@"
+output="${@: -1}"
+if [[ "$output" == */dyld-cache-probe ]]; then
+  mv "$output" "$output.native"
+  cat > "$output" <<'PROBE'
+#!/usr/bin/env bash
+set -euo pipefail
+"$0.native" "$@" | awk -F '\t' 'BEGIN { OFS = "\t" }
+  NF == 5 && ENVIRON["CACHE_PROBE_MUTATION"] == "wrong-cache" {
+    $1 = "00000000-0000-0000-0000-000000000000"
+  }
+  NF == 5 && ENVIRON["CACHE_PROBE_MUTATION"] == "invalid-membership" { $2 = 2 }
+  { print }
+'
+PROBE
+  chmod +x "$output"
+fi
+SCRIPT
+chmod +x "$TEMP_ROOT/filtered-cache-tools/xcrun"
+expect_failure 'active dyld cache identity changed during dependency resolution' \
+  env PATH="$TEMP_ROOT/filtered-cache-tools:$PATH" \
+    CACHE_PROBE_MUTATION=wrong-cache \
+    DISTRIBUTION_E2E_REQUIRE_TRANSLOCATION=false \
+    DISTRIBUTION_E2E_STABILITY_SECONDS=0 \
+    bash "$VERIFIER" "$APP" "$fixture_pid" "$EVIDENCE"
+expect_failure 'active dyld cache returned invalid membership' \
+  env PATH="$TEMP_ROOT/filtered-cache-tools:$PATH" \
+    CACHE_PROBE_MUTATION=invalid-membership \
+    DISTRIBUTION_E2E_REQUIRE_TRANSLOCATION=false \
+    DISTRIBUTION_E2E_STABILITY_SECONDS=0 \
+    bash "$VERIFIER" "$APP" "$fixture_pid" "$EVIDENCE"
 
 mkdir -p "$TEMP_ROOT/filtered-mapping-tools"
 cat > "$TEMP_ROOT/filtered-mapping-tools/lsof" <<'SCRIPT'
@@ -493,5 +608,51 @@ expect_failure \
   env DISTRIBUTION_E2E_REQUIRE_TRANSLOCATION=false \
     DISTRIBUTION_E2E_STABILITY_SECONDS=0 \
     bash "$VERIFIER" "$x86_app" 999999 "$EVIDENCE"
+
+original_app="$APP"
+APP="$TEMP_ROOT/BundleFirst.app"
+ditto "$original_app" "$APP"
+cat > "$TEMP_ROOT/bundle-first-main.m" <<'OBJC'
+#import <AppKit/AppKit.h>
+extern int roma_distribution_fixture_value(void);
+int main(void) {
+  if (roma_distribution_fixture_value() != 42) return 1;
+  [NSApplication sharedApplication];
+  [NSApp run];
+  return 0;
+}
+OBJC
+xcrun clang -arch arm64 -dynamiclib "$TEMP_ROOT/leaf.c" \
+  -Wl,-install_name,@rpath/libc.dylib \
+  -o "$APP/Contents/Frameworks/libc.dylib"
+xcrun clang -arch arm64 "$TEMP_ROOT/bundle-first-main.m" \
+  "$APP/Contents/Frameworks/My Frameworks/libRoma Distribution Fixture.dylib" \
+  -Wl,-needed_library,"$APP/Contents/Frameworks/libc.dylib" \
+  -framework AppKit \
+  -Wl,-rpath,@executable_path/../Frameworks \
+  -Wl,-rpath,/usr/lib \
+  '-Wl,-rpath,@executable_path/../Frameworks/My Frameworks' \
+  -o "$APP/Contents/MacOS/Fixture"
+codesign --force --sign - --options runtime \
+  "$APP/Contents/Frameworks/libc.dylib" >/dev/null
+codesign --force --sign - --options runtime \
+  --entitlements "$TEMP_ROOT/fixture.entitlements" "$APP" >/dev/null
+start_fixture
+bundle_first_evidence="$TEMP_ROOT/bundle-first-evidence"
+DISTRIBUTION_E2E_REQUIRE_TRANSLOCATION=false \
+DISTRIBUTION_E2E_STABILITY_SECONDS=0 \
+  bash "$VERIFIER" "$APP" "$fixture_pid" "$bundle_first_evidence"
+grep -Fxq 'Contents/Frameworks/libc.dylib' \
+  "$bundle_first_evidence/expected-mapped-bundle-code.txt"
+grep -Fxq 'Contents/Frameworks/libc.dylib' \
+  "$bundle_first_evidence/observed-mapped-bundle-code.txt"
+expect_failure 'launched process did not map bundled dependency: Contents/Frameworks/libc.dylib' \
+  env PATH="$TEMP_ROOT/filtered-mapping-tools:$PATH" \
+    HIDE_MAPPED_CODE_PATH="$(cd "$APP" && pwd -P)/Contents/Frameworks/libc.dylib" \
+    DISTRIBUTION_E2E_REQUIRE_TRANSLOCATION=false \
+    DISTRIBUTION_E2E_STABILITY_SECONDS=0 \
+    bash "$VERIFIER" "$APP" "$fixture_pid" "$bundle_first_evidence"
+stop_fixture
+APP="$original_app"
 
 echo "macOS distribution launch verifier regression checks passed"

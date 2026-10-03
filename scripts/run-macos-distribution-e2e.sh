@@ -59,6 +59,7 @@ repo_root="${GITHUB_WORKSPACE:-$(cd "$(dirname "$0")/.." && pwd)}"
 verifier="$repo_root/scripts/verify-macos-distribution-launch.sh"
 finder_extraction_classifier="$repo_root/scripts/macos-finder-extraction-state.sh"
 source "$repo_root/scripts/macos-bundle-manifest.sh"
+source "$repo_root/scripts/macos-distribution-contract.sh"
 distribution_root="$stage_root/macos-distribution-e2e"
 distribution_evidence="$evidence/macos-distribution-e2e"
 desktop="$HOME/Desktop"
@@ -255,10 +256,10 @@ wait_for_matching_browser_download() {
   while (( SECONDS < wait_deadline )); do
     while IFS= read -r candidate; do
       [[ -f "$candidate" ]] || continue
-      [[ "$(stat -f '%z' "$candidate" 2>/dev/null || true)" == "$source_size" ]] \
+      [[ "$(stat -f '%z' "$candidate" 2>/dev/null || true)" == "$download_expected_size" ]] \
         || continue
       candidate_sha="$(shasum -a 256 "$candidate" 2>/dev/null | awk '{print $1}')"
-      if [[ "$candidate_sha" == "$source_sha256" ]]; then
+      if [[ "$candidate_sha" == "$download_expected_sha256" ]]; then
         printf '%s\n' "$candidate"
         return 0
       fi
@@ -611,6 +612,10 @@ fi
 if ! grep -Fq 'assessments enabled' "$distribution_evidence/gatekeeper-status.txt"; then
   fail "Gatekeeper assessments are not enabled"
 fi
+csrutil status > "$distribution_evidence/sip-status.txt" 2>&1 \
+  || fail "could not inspect System Integrity Protection"
+grep -Fxq 'System Integrity Protection status: enabled.' "$distribution_evidence/sip-status.txt" \
+  || fail "System Integrity Protection is not enabled"
 
 source_sha256="$(shasum -a 256 "$archive" | awk '{print $1}')"
 source_size="$(stat -f '%z' "$archive")"
@@ -620,7 +625,16 @@ artifact_digest="${MACOS_ARTIFACT_DIGEST:-}"
   || fail "distribution E2E requires the GitHub artifact digest"
 [[ "sha256:$source_sha256" == "$artifact_digest" ]] \
   || fail "downloaded GitHub Actions archive does not match its artifact digest"
+download_expected_sha256="$source_sha256"
+download_expected_size="$source_size"
+if [[ "$distribution_launch_contract" == notarized-first-open ]]; then
+  download_expected_sha256="$expected_inner_sha256"
+  download_expected_size="$(stat -f '%z' "$expected_inner_archive")"
+  download_name="$(basename "$expected_inner_archive")"
+fi
 {
+  printf 'launch_contract=%s\n' "$distribution_launch_contract"
+  printf 'browser_expected_sha256=%s\n' "$download_expected_sha256"
   printf 'github_actions_archive=%s\n' "$archive"
   printf 'github_actions_archive_sha256=%s\n' "$source_sha256"
   printf 'github_actions_archive_size=%s\n' "$source_size"
@@ -647,6 +661,14 @@ codesign --verify --deep --strict --verbose=4 "$reference_app" \
 write_macos_bundle_manifest \
   "$reference_app" \
   "$distribution_evidence/expected-inner-app-files.sha256"
+if [[ "$distribution_launch_contract" == notarized-first-open ]]; then
+  [[ "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$reference_app/Contents/Info.plist")" == "$bundle_identifier" ]] \
+    || fail "final app ZIP has the wrong bundle identifier"
+  bash "$repo_root/scripts/verify-macos-notarized-app.sh" \
+    "$reference_app" "$distribution_developer_id_team" "$bundle_identifier" \
+    "$distribution_evidence/reference-trust" \
+    || fail "final app ZIP does not contain a trusted notarized Developer ID app"
+fi
 
 mark_phase create-external-volume
 [[ ! -e "$disk_image" ]] || fail "distribution disk image already exists: $disk_image"
@@ -674,7 +696,15 @@ deadline=$((SECONDS + interaction_minutes * 60))
 mark_phase browser-download
 defaults write com.apple.Safari DownloadsPath -string "$volume"
 defaults write com.apple.Safari AutoOpenSafeDownloads -bool false
-download_url="$(resolve_github_artifact_download_url)"
+if [[ "$distribution_launch_contract" == notarized-first-open ]]; then
+  download_url="$distribution_final_archive_url"
+  distribution_final_archive_url=""
+  unset DISTRIBUTION_E2E_FINAL_ARCHIVE_URL
+  printf 'launch_contract=%s\nredirect_url_recorded=false\n' "$distribution_launch_contract" \
+    > "$distribution_evidence/browser-download-origin.txt"
+else
+  download_url="$(resolve_github_artifact_download_url)"
+fi
 github_download_token=""
 
 cat > "$instructions" <<EOF
@@ -682,8 +712,8 @@ roma just talk distribution E2E
 
 Current step: browser download
 
-Safari is downloading the selected artifact from GitHub Actions to an APFS volume.
-If Safari asks whether GitHub's download host may download files, click Allow.
+Safari is downloading the selected $distribution_launch_contract archive to an APFS volume.
+If Safari asks whether the download host may download files, click Allow.
 
 Do not copy the ZIP, clear quarantine, re-sign anything, or move the app.
 This window will update for the Finder and Gatekeeper steps.
@@ -709,8 +739,8 @@ fi
 download_name="$(basename "$downloaded_archive")"
 
 downloaded_sha256="$(shasum -a 256 "$downloaded_archive" | awk '{print $1}')"
-[[ "$downloaded_sha256" == "$source_sha256" ]] \
-  || fail "Safari download does not match the GitHub Actions archive"
+[[ "$downloaded_sha256" == "$download_expected_sha256" ]] \
+  || fail "Safari download does not match the selected archive"
 if ! archive_quarantine="$(xattr -p com.apple.quarantine "$downloaded_archive" 2>/dev/null)"; then
   fail "Safari download is missing quarantine"
 fi
@@ -731,6 +761,11 @@ mdls \
   > "$distribution_evidence/browser-downloaded-metadata.txt" 2>&1 || true
 
 mark_phase finder-actions-artifact-extraction
+if [[ "$distribution_launch_contract" == notarized-first-open ]]; then
+  extraction_description="This is the final app ZIP. Wait until Archive Utility finishes and $app_name appears."
+else
+  extraction_description="This is the outer Actions ZIP. Archive Utility may expose another app ZIP or recursively extract the app."
+fi
 [[ ! -e "$finder_extraction_confirmation" ]] \
   || fail "Finder extraction confirmation already exists"
 write_confirmation_command \
@@ -751,9 +786,8 @@ Current step: Finder and Archive Utility extraction
 In the open Finder window, double-click:
 $download_name
 
-This is the outer ZIP supplied by GitHub Actions. Wait until Archive Utility
-finishes and either "$app_name" or another app ZIP appears. Some macOS versions
-recursively extract the nested ZIP in this one action. Then double-click:
+$extraction_description
+Then double-click:
 
 Confirm Finder Extraction Complete.command
 
@@ -840,6 +874,10 @@ while true; do
 done
 cp "$finder_state_file" \
   "$distribution_evidence/finder-extraction-first-action-state.tsv"
+if [[ "$distribution_launch_contract" == notarized-first-open ]]; then
+  [[ "$finder_state" == recursive && "$(state_value "$finder_state_file" inner_count)" == 0 ]] \
+    || fail "final app ZIP must directly extract one app without a nested archive"
+fi
 
 if [[ "$finder_state" == "recursive" ]]; then
   extraction_mode="archive-utility-recursive"
@@ -971,6 +1009,12 @@ final_finder_state="$(
 final_extracted_app="$(
   state_value "$distribution_evidence/finder-extraction-final-state.tsv" app_path
 )"
+if [[ "$distribution_launch_contract" == notarized-first-open ]]; then
+  [[ "$finder_state" == recursive \
+    && "$(state_value "$distribution_evidence/finder-extraction-first-action-state.tsv" inner_count)" == 0 \
+    && "$(state_value "$distribution_evidence/finder-extraction-final-state.tsv" inner_count)" == 0 ]] \
+    || fail "final app ZIP produced a nested archive instead of one directly extracted app"
+fi
 [[ "$final_finder_state" == "recursive" && "$final_extracted_app" == "$extracted_app" ]] \
   || fail "Finder extraction output changed before signature verification finished"
 if ! app_quarantine="$(xattr -p com.apple.quarantine "$extracted_app" 2>/dev/null)"; then
@@ -1063,6 +1107,7 @@ if ! compare_macos_bundle_to_manifest \
 fi
 printf '%s\n' "$extracted_app" > "$stage_root/macos-app-path.txt"
 
+if [[ "$distribution_launch_contract" == adhoc-approval ]]; then
 mark_phase gatekeeper-first-block
 [[ ! -e "$gatekeeper_confirmation" ]] \
   || fail "Gatekeeper confirmation already exists on a supposedly fresh stage"
@@ -1144,6 +1189,29 @@ echo "DISTRIBUTION E2E GATEKEEPER ACTION REQUIRED"
 echo "In Remote Display: dismiss Not Opened, then Privacy & Security -> Open Anyway -> Open."
 open "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension" \
   > "$distribution_evidence/privacy-settings-open.txt" 2>&1 || true
+else
+  mark_phase notarized-first-open
+  bash "$repo_root/scripts/verify-macos-notarized-app.sh" \
+    "$extracted_app" "$distribution_developer_id_team" "$bundle_identifier" \
+    "$distribution_evidence/extracted-trust-before" \
+    || fail "Finder-extracted app is not trusted with the expected Developer ID"
+  start_approval_monitors
+  cat > "$instructions" <<EOF
+roma just talk distribution E2E
+
+Current step: normal first Open of the final notarized download
+
+Double-click "$app_name" in Finder. Confirm the ordinary downloaded-app Open
+prompt if it appears. Do not use Open Anyway, a context-menu override, or change
+security settings. If macOS blocks the app, leave that dialog visible and stop.
+
+The test waits for this first process and responsive onboarding UI.
+EOF
+  open -R "$extracted_app" \
+    > "$distribution_evidence/normal-first-open-finder-reveal.txt" 2>&1 \
+    || fail "Finder could not reveal the notarized app"
+  echo "DISTRIBUTION E2E NORMAL FIRST OPEN REQUIRED"
+fi
 
 if [[ "$distribution_expectation" == known-bad-framework-signature ]]; then
   mark_phase verify-known-bad-framework-signature-dyld-failure
@@ -1215,17 +1283,17 @@ write_confirmation_command \
 cat > "$instructions" <<EOF
 roma just talk distribution E2E
 
-Current step: prove the approved first process reached usable UI
+Current step: prove the first process reached usable UI
 
 Confirm that Roma's first-launch or onboarding UI is visible and responds to
 normal clicks. Then, without quitting or moving Roma, double-click:
 
 Confirm Roma First Launch Ready.command
 
-The test will verify this same PID through AppTranslocation after confirmation.
+The test will verify this same PID, bundle bytes, signatures, and mapped code.
 EOF
 echo "DISTRIBUTION E2E FIRST-LAUNCH UI CONFIRMATION REQUIRED"
-echo "Confirm the approved Roma UI responds, then run the Desktop confirmation command."
+echo "Confirm the first Roma UI responds, then run the Desktop confirmation command."
 wait_for_path \
   "$readiness_confirmation" \
   "operator confirmation of responsive Roma first-launch UI" \
@@ -1234,7 +1302,7 @@ cp "$readiness_confirmation" \
   "$distribution_evidence/first-launch-ui-human-confirmation.txt"
 
 mark_phase verify-apptranslocation-and-bundled-code
-DISTRIBUTION_E2E_REQUIRE_TRANSLOCATION=true \
+DISTRIBUTION_E2E_REQUIRE_TRANSLOCATION="$distribution_require_translocation" \
 DISTRIBUTION_E2E_REQUIRE_APPKIT_FINISHED=true \
 DISTRIBUTION_E2E_EXPECTED_MACOS_VERSION="$expected_macos_version" \
 DISTRIBUTION_E2E_EXPECTED_MACOS_BUILD="$expected_macos_build" \
@@ -1306,20 +1374,29 @@ assessment_after_status=$?
 set -e
 printf '%s\n' "$assessment_after_status" \
   > "$distribution_evidence/gatekeeper-assessment-after-exit-code.txt"
+if [[ "$distribution_launch_contract" == notarized-first-open ]]; then
+  bash "$repo_root/scripts/verify-macos-notarized-app.sh" \
+    "$extracted_app" "$distribution_developer_id_team" "$bundle_identifier" \
+    "$distribution_evidence/extracted-trust-after" \
+    || fail "normal first Open changed the notarized trust result"
+fi
 
 cat > "$instructions" <<EOF
 roma just talk distribution E2E
 
 Distribution launch passed.
 
-The exact Safari-downloaded ZIP survived Finder extraction, Gatekeeper approval,
-AppTranslocation, signature checks, and generic bundled-code mapping checks.
+The exact Safari-downloaded ZIP passed Finder extraction, $distribution_launch_contract,
+signature checks, and generic bundled-code mapping checks.
 The stage will now run the deterministic transcription smoke against this same app.
 EOF
 
 mark_phase complete
 {
   printf 'distribution_verdict=passed\n'
+  printf 'launch_contract=%s\n' "$distribution_launch_contract"
+  printf 'require_translocation=%s\n' "$distribution_require_translocation"
+  printf 'developer_id_team=%s\n' "$distribution_developer_id_team"
   printf 'distribution_expectation=%s\n' "$distribution_expectation"
   printf 'github_actions_archive_sha256=%s\n' "$source_sha256"
   printf 'browser_downloaded_archive_sha256=%s\n' "$downloaded_sha256"

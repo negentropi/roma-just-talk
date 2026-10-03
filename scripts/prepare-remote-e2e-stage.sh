@@ -26,6 +26,12 @@ github_download_token="${GH_TOKEN:-}"
 unset GH_TOKEN
 script_dir="$(cd "$(dirname "$0")" && pwd)"
 source "$script_dir/macos-bundle-manifest.sh"
+source "$script_dir/macos-distribution-contract.sh"
+if [[ "$distribution_launch_contract" == notarized-first-open \
+  && "$macos_scenario" != distribution-e2e ]]; then
+  echo 'Notarized first Open requires the distribution-e2e scenario' >&2
+  exit 2
+fi
 
 case "$target" in
   both|macos|ios) ;;
@@ -938,6 +944,8 @@ write_manifest() {
   "macOSExpectedVersion": "$macos_expected_version",
   "macOSExpectedBuild": "$macos_expected_build",
   "macOSDistributionExpectation": "$distribution_expectation",
+  "macOSDistributionLaunchContract": "$distribution_launch_contract",
+  "macOSDistributionDeveloperIDTeam": "$distribution_developer_id_team",
   "macOSExpectedRejectedFramework": "$expected_rejected_framework",
   "macOSExpectedMainUUID": "$expected_main_uuid",
   "macOSExpectedRejectedFrameworkUUID": "$expected_rejected_framework_uuid",
@@ -998,6 +1006,9 @@ if [ "$macos_scenario" = "distribution-e2e" ]; then
   set +e
   GH_TOKEN="$github_download_token" \
   DISTRIBUTION_E2E_EXPECTATION="$low_level_distribution_expectation" \
+  DISTRIBUTION_E2E_LAUNCH_CONTRACT="$distribution_launch_contract" \
+  DISTRIBUTION_E2E_DEVELOPER_ID_TEAM="$distribution_developer_id_team" \
+  DISTRIBUTION_E2E_FINAL_ARCHIVE_URL="$distribution_final_archive_url" \
   MACOS_ARTIFACT_RUN_ID="$macos_artifact_run_id" \
   MACOS_ARTIFACT_ID="$macos_artifact_id" \
   MACOS_ARTIFACT_REPOSITORY="$macos_artifact_repository" \
@@ -1056,7 +1067,7 @@ if [ "$macos_scenario" = "distribution-e2e" ]; then
       runtime_status=1
     else
       set +e
-      RUNTIME_E2E_REQUIRE_APP_TRANSLOCATION=true \
+      RUNTIME_E2E_REQUIRE_APP_TRANSLOCATION="$distribution_require_translocation" \
       RUNTIME_E2E_EXPECTED_MACOS_VERSION="$macos_expected_version" \
       RUNTIME_E2E_EXPECTED_MACOS_BUILD="$macos_expected_build" \
       RUNTIME_E2E_EXPECTED_FIRST_LAUNCH_PID="$distribution_launched_pid" \

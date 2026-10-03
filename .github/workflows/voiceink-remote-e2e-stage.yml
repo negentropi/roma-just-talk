@@ -42,6 +42,22 @@ on:
           - fixed
           - fixed-after-framework-signature
           - known-bad-framework-signature
+      macos_distribution_launch_contract:
+        description: Ad-hoc approval control or normal first Open of the finalized notarized ZIP
+        required: true
+        default: adhoc-approval
+        type: choice
+        options:
+          - adhoc-approval
+          - notarized-first-open
+      macos_developer_id_team:
+        description: Expected signing team; required for notarized-first-open
+        required: false
+        type: string
+      macos_final_archive_url:
+        description: HTTPS URL serving the exact finalized inner app ZIP; required for notarized-first-open
+        required: false
+        type: string
       macos_expected_rejected_framework:
         description: Framework expected to be rejected in known-bad-framework-signature mode
         required: false
@@ -138,6 +154,9 @@ on:
       - "scripts/run-macos-runtime-e2e.sh"
       - "scripts/verify-runtime-empty-final-regression.sh"
       - "scripts/run-macos-distribution-e2e.sh"
+      - "scripts/macos-distribution-contract.sh"
+      - "scripts/verify-macos-notarized-app.sh"
+      - "scripts/tests/macos-notarized-contract.test.sh"
       - "scripts/macos-distribution-runtime-handoff.sh"
       - "scripts/macos-finder-extraction-state.sh"
       - "scripts/macos-bundle-manifest.sh"
@@ -175,6 +194,8 @@ env:
   STAGE_MACOS_EXPECTED_VERSION: ${{ inputs.macos_expected_version || '' }}
   STAGE_MACOS_EXPECTED_BUILD: ${{ inputs.macos_expected_build || '' }}
   STAGE_MACOS_DISTRIBUTION_EXPECTATION: ${{ inputs.macos_distribution_expectation || 'fixed' }}
+  STAGE_MACOS_DISTRIBUTION_LAUNCH_CONTRACT: ${{ inputs.macos_distribution_launch_contract || 'adhoc-approval' }}
+  STAGE_MACOS_DEVELOPER_ID_TEAM: ${{ inputs.macos_developer_id_team || '' }}
   STAGE_MACOS_EXPECTED_REJECTED_FRAMEWORK: ${{ inputs.macos_expected_rejected_framework || 'whisper' }}
   STAGE_MACOS_EXPECTED_MAIN_UUID: ${{ inputs.macos_expected_main_uuid || '' }}
   STAGE_MACOS_EXPECTED_REJECTED_FRAMEWORK_UUID: ${{ inputs.macos_expected_rejected_framework_uuid || '' }}
@@ -393,6 +414,7 @@ jobs:
           bash scripts/tests/macos-build-job.test.sh
           bash scripts/tests/macos-finder-extraction-state.test.sh
           bash scripts/tests/macos-distribution-e2e-contract.test.sh
+          bash scripts/tests/macos-notarized-contract.test.sh
           bash scripts/tests/macos-distribution-runtime-handoff.test.sh
           bash scripts/tests/verify-macos-distribution-launch.test.sh
           bash scripts/tests/verify-macos-framework-signature-crash.test.sh
@@ -988,12 +1010,33 @@ jobs:
           RUNTIME_E2E_EMPTY_FINAL_EXPECTATION: ${{ env.STAGE_MACOS_EMPTY_FINAL_EXPECTATION }}
           RUNTIME_E2E_EMPTY_FINAL_BASELINE_RUN_ID: ${{ env.STAGE_MACOS_EMPTY_FINAL_BASELINE_RUN_ID }}
           DISTRIBUTION_E2E_EXPECTATION: ${{ env.STAGE_MACOS_DISTRIBUTION_EXPECTATION }}
+          DISTRIBUTION_E2E_LAUNCH_CONTRACT: ${{ env.STAGE_MACOS_DISTRIBUTION_LAUNCH_CONTRACT }}
+          DISTRIBUTION_E2E_DEVELOPER_ID_TEAM: ${{ env.STAGE_MACOS_DEVELOPER_ID_TEAM }}
           DISTRIBUTION_E2E_EXPECTED_REJECTED_FRAMEWORK: ${{ env.STAGE_MACOS_EXPECTED_REJECTED_FRAMEWORK }}
           DISTRIBUTION_E2E_EXPECTED_MAIN_UUID: ${{ env.STAGE_MACOS_EXPECTED_MAIN_UUID }}
           DISTRIBUTION_E2E_EXPECTED_REJECTED_FRAMEWORK_UUID: ${{ env.STAGE_MACOS_EXPECTED_REJECTED_FRAMEWORK_UUID }}
           DISTRIBUTION_E2E_FRAMEWORK_SIGNATURE_BASELINE_EVIDENCE: ${{ env.DISTRIBUTION_E2E_FRAMEWORK_SIGNATURE_BASELINE_EVIDENCE }}
           DISTRIBUTION_E2E_FRAMEWORK_SIGNATURE_BASELINE_RUN_ID: ${{ env.STAGE_MACOS_FRAMEWORK_SIGNATURE_BASELINE_RUN_ID }}
         run: |
+          FINAL_URL_FILE="$(mktemp "$RUNNER_TEMP/roma-final-archive-url.XXXXXX")"
+          export FINAL_URL_FILE
+          trap 'rm -f "$FINAL_URL_FILE"' EXIT
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          event = json.loads(Path(os.environ['GITHUB_EVENT_PATH']).read_text())
+          value = event.get('inputs', {}).get('macos_final_archive_url', '')
+          if not isinstance(value, str) or any(c.isspace() or ord(c) < 32 or ord(c) == 127 for c in value):
+              raise SystemExit('Invalid final archive URL input')
+          if value:
+              masked = value.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+              print('::add-mask::' + masked, flush=True)
+          path = Path(os.environ['FINAL_URL_FILE'])
+          fd = os.open(path, os.O_WRONLY | os.O_TRUNC)
+          with os.fdopen(fd, 'w') as stream:
+              stream.write(value)
+          PY
+          export DISTRIBUTION_E2E_FINAL_ARCHIVE_URL="$(cat "$FINAL_URL_FILE")"
           bash scripts/prepare-remote-e2e-stage.sh \
             "$STAGE_TARGET" \
             "$STAGE_HOLD_MINUTES" \

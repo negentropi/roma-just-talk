@@ -414,6 +414,41 @@ not prove live microphone capture, recorder pre-roll, keyboard handoff, or physi
 
 ## Evidence
 
+### Normal first Open of a notarized download
+
+Set `macos_distribution_launch_contract=notarized-first-open`,
+`macos_distribution_expectation=fixed`, the expected `macos_developer_id_team`,
+and `macos_final_archive_url`. The HTTPS endpoint must serve the finalized app
+ZIP already contained in the selected build artifact. The stage retains the
+Actions wrapper digest for provenance, but Safari must download the inner ZIP's
+exact bytes directly. A wrapper, nested ZIP, changed package, or mismatched signer
+fails. Finish signing and stapling before producing that immutable ZIP.
+The workflow validates and masks a signed URL before exporting it to the
+collector. It keeps the temporary URL file private and removes its own file.
+
+This contract requires Developer ID Application signing for the expected team,
+Hardened Runtime, a valid stapled notarization ticket, and an accepted
+`Notarized Developer ID` assessment without a policy override. Stapling is this
+project's package requirement. These checks do not themselves prove launch.
+The guest must have Gatekeeper and System Integrity Protection enabled.
+
+Use ordinary Finder Open and observe the first responsive onboarding UI. Do not
+use Open Anyway or a context-menu override. Monitors start before that Open and
+bind the first native PID to the unchanged executable, whole bundle, mapped
+code, AppKit readiness, stable lifetime, and crash window. The evidence records
+whether macOS actually translocated the process; translocation is mandatory only
+for the historical `adhoc-approval` contract. The subsequent transcription smoke
+remains a separate required stage result.
+
+The existing build lanes produce ad-hoc candidates. Selecting the new contract
+does not sign or notarize them and must reject them. Real normal-first-Open proof
+still requires a finalized signed artifact, an HTTPS endpoint, and actual GUI
+observations on each required exact OS row. Do not infer qualification from the
+contract tests or a passing build.
+Publication qualification must retain the trusted controller trace and
+screenshots showing ordinary Finder Open and responsive UI. The readiness
+confirmation alone establishes neither the launch action nor absence of an override.
+
 The workflow uploads `remote-e2e-stage-evidence` containing:
 
 - Simulator screenshots when iOS is selected;
@@ -431,6 +466,6 @@ Namespace VNC can be active while `screencapture` remains unable to see that dis
 - iOS means iOS Simulator on the remote Mac, not a physical iPhone.
 - Microphone availability is not assumed; the deterministic STT scenario uses a generated audio file.
 - Manual stages do not pre-grant Accessibility, Input Monitoring, Screen Recording, or other TCC permissions.
-- `distribution-e2e` requires a person or authorized Computer Use session for Safari's site-download prompt, Finder extraction, and Gatekeeper Open Anyway. A Mac that does not recursively expand the nested ZIP requires one extra Finder action. Missing interaction times out and fails.
+- `distribution-e2e` requires a person or authorized Computer Use session for Safari's site-download prompt, Finder extraction, and first Open. The historical `adhoc-approval` contract also requires Gatekeeper Open Anyway. A Mac that does not recursively expand its Actions wrapper requires one extra Finder action. Missing interaction times out and fails.
 - Both macOS runtime scenarios grant only the exact helper/Roma permissions needed on their disposable VM and verify the real global-shortcut/audio-input path.
 - The optional local-STT scenario performs narrow AXe UI assertions; XCUITest remains a separate fast gate.

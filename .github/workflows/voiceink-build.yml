@@ -42,6 +42,9 @@ on:
       - "scripts/tests/macos-finder-extraction-state.test.sh"
       - "scripts/tests/verify-runtime-empty-final-regression.test.sh"
       - "scripts/run-macos-distribution-e2e.sh"
+      - "scripts/macos-distribution-contract.sh"
+      - "scripts/verify-macos-notarized-app.sh"
+      - "scripts/tests/macos-notarized-contract.test.sh"
       - "scripts/macos-distribution-runtime-handoff.sh"
       - "scripts/macos-finder-extraction-state.sh"
       - "scripts/macos-bundle-manifest.sh"
@@ -88,6 +91,9 @@ on:
       - "scripts/tests/macos-finder-extraction-state.test.sh"
       - "scripts/tests/verify-runtime-empty-final-regression.test.sh"
       - "scripts/run-macos-distribution-e2e.sh"
+      - "scripts/macos-distribution-contract.sh"
+      - "scripts/verify-macos-notarized-app.sh"
+      - "scripts/tests/macos-notarized-contract.test.sh"
       - "scripts/macos-distribution-runtime-handoff.sh"
       - "scripts/macos-finder-extraction-state.sh"
       - "scripts/macos-bundle-manifest.sh"
@@ -262,6 +268,7 @@ jobs:
           bash scripts/tests/macos-finder-extraction-state.test.sh
           bash scripts/tests/macos-build-job.test.sh
           bash scripts/tests/macos-distribution-e2e-contract.test.sh
+          bash scripts/tests/macos-notarized-contract.test.sh
           bash scripts/tests/macos-distribution-runtime-handoff.test.sh
           bash scripts/tests/verify-macos-distribution-launch.test.sh
           bash scripts/tests/verify-macos-framework-signature-crash.test.sh

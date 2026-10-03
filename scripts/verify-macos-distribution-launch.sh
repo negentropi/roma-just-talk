@@ -336,6 +336,10 @@ fi
 
 source_executable_sha="$(shasum -a 256 "$source_executable" | awk '{print $1}')"
 process_executable_sha="$(shasum -a 256 "$process_executable" | awk '{print $1}')"
+observed_translocation=false
+case "$process_app" in
+  */AppTranslocation/*/d/*.app) observed_translocation=true ;;
+esac
 {
   printf 'pid=%s\n' "$pid"
   printf 'bundle_identifier=%s\n' "$bundle_identifier"
@@ -346,6 +350,7 @@ process_executable_sha="$(shasum -a 256 "$process_executable" | awk '{print $1}'
   printf 'process_executable_sha256=%s\n' "$process_executable_sha"
   printf 'process_code_type=%s\n' "$process_code_type"
   printf 'initial_state=%s\n' "$initial_state"
+  printf 'observed_translocation=%s\n' "$observed_translocation"
 } > "$evidence/launch-identity.txt"
 
 if [[ "$source_executable_sha" != "$process_executable_sha" ]]; then

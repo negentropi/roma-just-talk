@@ -15,11 +15,18 @@ Whisper builds from `60c0be6ac8fa71b1a2ae2dd938a31a34a508e774`.
 
 Package resolution uses the checked-in project `Package.resolved`.
 Packaging compares its bytes with the Git blob at the expected source SHA and rejects tracked source mutations.
-The current lock has 24 pins. Regenerate the count with this command.
+The current lock has 41 pins. Regenerate the count with this command.
 
 ```sh
 python3 -c 'import json; print(len(json.load(open("VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"))["pins"]))'
 ```
+
+Run [37160793135](https://github.com/negentropi/roma-just-talk/actions/runs/37160793135) proved the former 24-pin lock was incomplete.
+Xcode refused the missing `grpc-swift-nio-transport` dependency with automatic resolution disabled.
+The complete lock preserves those 24 pins and adds 17 entries from the existing Core and NVIDIA source locks.
+The exact union was compiled in [diagnostic run 37158798723](https://github.com/negentropi/roma-just-talk/actions/runs/37158798723) with the same pinned toolchain.
+That diagnostic app remains separate from the production archive and runtime qualification.
+The production workflow still rejects resolution changes and requires a fresh successful build at the updated source SHA.
 
 The build uses Release, arm64, the macOS 14.2.1 floor, `VoiceInk/VoiceInk.entitlements`,
 disabled signing, and disabled coverage instrumentation.
@@ -61,7 +68,8 @@ It extracts its ZIP into a disposable directory and compares the full archive in
 The comparison preserves original content, file modes, directory modes, and symlink targets.
 The output directory cannot already exist or overlap the inputs.
 
-`roma.macos.production-compile-evidence` retains the original seven diagnostic receipts with `if: always()`.
+`roma.macos.production-compile-evidence` uploads the available diagnostic receipts with `if: always()`.
+Successful producer checks create all seven receipts. Earlier failures retain only the receipts already produced.
 The archive artifact is uploaded only after all producer checks succeed.
 Consumers require the complete source workflow to finish successfully and bind the artifact to its live run, attempt, source SHA, and API digest.
 The [macOS finalizer](macos-finalizer.md) owns that authenticated consumption and the credentialed export.

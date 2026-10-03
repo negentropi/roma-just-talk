@@ -1,0 +1,42 @@
+name: Diagnose exact SwiftData model stores
+
+on:
+  push:
+    branches:
+      - 'ci/roma-swiftdata-exact-probe-*'
+    paths:
+      - '.github/workflows/swiftdata-exact-model-probe.yml'
+      - 'Tools/SwiftDataExactModelProbe/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-observe:
+    if: github.repository == 'negentropi/roma-just-talk'
+    runs-on: macos-26
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify exact probe input guards
+        run: python3 Tools/SwiftDataExactModelProbe/verify-inputs.py --self-test
+      - name: Build unchanged production model probe
+        run: |
+          bash Tools/SwiftDataExactModelProbe/build.sh \
+            .swiftdata-exact-probe "$RUNNER_TEMP/swiftdata-exact-build-$GITHUB_RUN_ATTEMPT"
+      - name: Observe hosted store and context cases
+        run: |
+          python3 Tools/SwiftDataExactModelProbe/run-cases.py \
+            .swiftdata-exact-probe/VoiceInkSwiftDataExactProbe.app/Contents/MacOS/voiceink-swiftdata-probe \
+            .swiftdata-exact-probe/hosted-observations
+      - name: Retain exact diagnostic bytes and raw observations
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.swiftdata-exact-model-probe
+          path: .swiftdata-exact-probe/
+          include-hidden-files: true
+          if-no-files-found: error

@@ -1,0 +1,42 @@
+name: Diagnostic Whisper linkage and Library Validation experiment
+run-name: Diagnostic only; dispatch requires the candidate's observed passing first Open
+
+on:
+  push:
+    branches:
+      - 'ci/roma-whisper-experiment-*'
+    paths:
+      - '.github/workflows/whisper-launch-experiment.yml'
+      - 'scripts/build-whisper-experiment.sh'
+      - 'scripts/tests/whisper-launch-experiment.test.sh'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: whisper-launch-experiment-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  diagnostic-build:
+    if: ${{ github.repository == 'negentropi/roma-just-talk' && (github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/heads/ci/roma-whisper-experiment-')) }}
+    runs-on: macos-26
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify experiment boundaries
+        run: bash scripts/tests/whisper-launch-experiment.test.sh
+      - name: Build matched diagnostic artifacts
+        run: bash scripts/build-whisper-experiment.sh
+      - name: Retain diagnostic inputs and artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.whisper-abc-experiment
+          path: .whisper-experiment/output/
+          include-hidden-files: true
+          if-no-files-found: error

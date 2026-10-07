@@ -22,6 +22,23 @@ final class CoreAudioRecorder: @unchecked Sendable {
     private let preRollBuffer = PCMPreRollBuffer(sampleRate: 16_000, seconds: 3)
     private let preRollStreamingChunkBytes = 3_200
 
+    private let captureHealthLock = NSLock()
+    private var liveWriteTime: TimeInterval?
+    private var liveBufferTime: TimeInterval?
+    private var captureFailure: String?
+
+    var captureHealth: CaptureHealth {
+        captureHealthLock.lock()
+        defer { captureHealthLock.unlock() }
+        return CaptureHealth(lastWrite: liveWriteTime, failure: captureFailure)
+    }
+
+    var preRollHealth: CaptureHealth {
+        captureHealthLock.lock()
+        defer { captureHealthLock.unlock() }
+        return CaptureHealth(lastWrite: liveBufferTime)
+    }
+
     // Device format (what the hardware provides)
     private var deviceFormat = AudioStreamBasicDescription()
     // Output format (16kHz mono PCM Int16 for transcription)
@@ -88,6 +105,9 @@ final class CoreAudioRecorder: @unchecked Sendable {
         }
 
         currentDeviceID = deviceID
+        captureHealthLock.lock()
+        liveBufferTime = nil
+        captureHealthLock.unlock()
         preRollBuffer.clear()
 
         logger.notice("🎙️ Starting pre-roll buffering from device \(deviceID, privacy: .public)")
@@ -125,6 +145,10 @@ final class CoreAudioRecorder: @unchecked Sendable {
 
         logger.notice("🎙️ Starting recording from device \(deviceID, privacy: .public)")
 
+        captureHealthLock.lock()
+        liveWriteTime = nil
+        captureFailure = nil
+        captureHealthLock.unlock()
         recordingURL = url
         try createOutputFile(at: url)
 
@@ -766,12 +790,21 @@ final class CoreAudioRecorder: @unchecked Sendable {
         )
 
         preRollBuffer.append(outputBuffer, sampleCount: Int(outputFrameCount))
+        captureHealthLock.lock()
+        liveBufferTime = ProcessInfo.processInfo.systemUptime
+        captureHealthLock.unlock()
 
         if isRecording, let file = audioFile {
             let writeStatus = ExtAudioFileWrite(file, outputFrameCount, &outputBufferList)
             if writeStatus != noErr {
-                logger.error("🎙️ ExtAudioFileWrite failed with status: \(writeStatus, privacy: .public)")
+                captureHealthLock.lock()
+                if captureFailure == nil { captureFailure = "Audio could not be saved. Stop and try again." }
+                captureHealthLock.unlock()
+                return
             }
+            captureHealthLock.lock()
+            liveWriteTime = ProcessInfo.processInfo.systemUptime
+            captureHealthLock.unlock()
         }
 
         // Send the same PCM data to the streaming callback if set

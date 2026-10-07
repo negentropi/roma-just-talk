@@ -5,6 +5,7 @@ struct OnboardingView: View {
     @State private var textOpacity: CGFloat = 0
     @State private var showSecondaryElements = false
     @State private var showPermissions = false
+    @State private var showAvatarChoice = false
     
     // Animation timing
     private let animationDelay = 0.2
@@ -58,7 +59,7 @@ struct OnboardingView: View {
                                 VStack(spacing: 20) {
                                     Button(action: {
                                         withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
-                                            showPermissions = true
+                                            showAvatarChoice = true
                                         }
                                     }) {
                                         Text("Get Started")
@@ -82,6 +83,14 @@ struct OnboardingView: View {
                 }
             }
             
+            if showAvatarChoice {
+                OnboardingAvatarView {
+                    showPermissions = true
+                    showAvatarChoice = false
+                }
+                .transition(.move(edge: .trailing).combined(with: .opacity))
+            }
+
             if showPermissions {
                 OnboardingPermissionsView(hasCompletedOnboarding: $hasCompletedOnboarding)
                     .transition(.move(edge: .trailing).combined(with: .opacity))

@@ -18,6 +18,7 @@ struct SettingsView: View {
     @ObservedObject private var mediaController = MediaController.shared
     @ObservedObject private var playbackController = PlaybackController.shared
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = true
+    @AppStorage(CursorAvatarStyle.defaultsKey) private var cursorAvatarStyle = CursorAvatarStyle.cartoon.rawValue
     @AppStorage("enableAnnouncements") private var enableAnnouncements = true
     @AppStorage("restoreClipboardAfterPaste") private var restoreClipboardAfterPaste =
         ClipboardRestoreConfiguration.defaultRestoreClipboard
@@ -153,6 +154,13 @@ struct SettingsView: View {
 
             // MARK: - Recording Feedback
             Section("Recording Feedback") {
+                Picker("Cursor Companion", selection: $cursorAvatarStyle) {
+                    ForEach(CursorAvatarStyle.allCases) { style in
+                        Text(style.title).tag(style.rawValue)
+                    }
+                }
+                Text("Your companion appears beside the text cursor, or mouse pointer when the app cannot share its text cursor. None keeps a compact status cue.")
+                    .settingsDescription()
                 // Sound Feedback
                 ExpandableSettingsRow(
                     isExpanded: $isSoundFeedbackExpanded,

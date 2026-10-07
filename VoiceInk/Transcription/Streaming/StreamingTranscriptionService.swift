@@ -88,6 +88,7 @@ class StreamingTranscriptionService {
     private let modelContext: ModelContext
     private let fluidAudioService: FluidAudioTranscriptionService?
     private var onPartialTranscript: ((String) -> Void)?
+    var onFailure: ((Error) -> Void)?
     private let metrics = StreamingMetrics()
     private var stopStartedAt: Date?
     private var firstPartialLogged = false
@@ -134,7 +135,7 @@ class StreamingTranscriptionService {
         if state == .cancelled {
             await provider.disconnect()
             self.provider = nil
-            return
+            throw CancellationError()
         }
 
         state = .streaming
@@ -248,6 +249,7 @@ class StreamingTranscriptionService {
                     let desc = error.localizedDescription
                     await MainActor.run {
                         self?.logger.error("Failed to send audio chunk: \(desc, privacy: .public)")
+                        self?.reportFailure(error)
                     }
                 }
             }
@@ -318,10 +320,17 @@ class StreamingTranscriptionService {
                 case .error(let error):
                     await MainActor.run {
                         self.logger.error("Streaming event error: \(error.localizedDescription, privacy: .public)")
+                        self.reportFailure(error)
                     }
                 }
             }  
         }
+    }
+
+    private func reportFailure(_ error: Error) {
+        guard state == .streaming || state == .connecting else { return }
+        state = .failed
+        onFailure?(error)
     }
 
     /// Waits for the server to acknowledge our explicit commit, with a 10-second timeout.

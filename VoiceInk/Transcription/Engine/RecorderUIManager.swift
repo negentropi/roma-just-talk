@@ -1,10 +1,18 @@
 import Foundation
 import SwiftUI
 import os
+import Combine
 
 @MainActor
 class RecorderUIManager: ObservableObject {
     @Published var miniRecorderError: String?
+    private let cursorAvatar = CursorAvatarController()
+    private var avatarMeterSubscription: AnyCancellable?
+
+    func showCaptureFeedback(_ feedback: CaptureFeedback) {
+        cursorAvatar.update(feedback, level: recorder?.audioMeter.averagePower ?? 0)
+    }
+
 
     @Published var recorderType: String = UserDefaults.standard.string(forKey: "RecorderType") ?? "none" {
         didSet {
@@ -45,6 +53,16 @@ class RecorderUIManager: ObservableObject {
     func configure(engine: VoiceInkEngine, recorder: Recorder) {
         self.engine = engine
         self.recorder = recorder
+        recorder.onPreRollReady = { [weak engine] in
+            Task { @MainActor in await engine?.confirmPreRollReadiness() }
+        }
+        recorder.onPreRollFailure = { [weak engine, weak self] message in
+            guard engine?.recordingState == .idle else { return }
+            self?.showCaptureFeedback(.failed(message))
+        }
+        avatarMeterSubscription = recorder.$audioMeter
+            .throttle(for: .milliseconds(100), scheduler: RunLoop.main, latest: true)
+            .sink { [weak self] meter in self?.cursorAvatar.updateLevel(meter.averagePower) }
         setupNotifications()
     }
 
@@ -148,6 +166,7 @@ class RecorderUIManager: ObservableObject {
         hideRecorderPanel()
         isMiniRecorderVisible = false
         isRecorderSessionActive = false
+        cursorAvatar.update(.hidden)
 
         logger.notice("dismissMiniRecorder completed")
     }
@@ -160,6 +179,7 @@ class RecorderUIManager: ObservableObject {
         isMiniRecorderVisible = false
         isRecorderSessionActive = false
         miniRecorderError = nil
+        cursorAvatar.hide()
     }
 
     func cancelRecording() async {

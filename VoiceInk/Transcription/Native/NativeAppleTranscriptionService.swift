@@ -43,33 +43,19 @@ class NativeAppleTranscriptionService: TranscriptionService {
             ?? localeIdentifier
     }
 
-    func transcribe(audioURL: URL, model: any TranscriptionModel) async throws -> String {
-        guard model is NativeAppleModel else {
-            throw ServiceError.invalidModel
-        }
-        
-        guard #available(macOS 26, *) else {
-            logger.error("SpeechAnalyzer is not available on this macOS version")
-            throw ServiceError.unsupportedOS
-        }
-        
-        // Feature gated: SpeechAnalyzer/SpeechTranscriber are future APIs.
-        // Enable by defining ENABLE_NATIVE_SPEECH_ANALYZER in build settings once building against macOS 26+ SDKs.
+    func prepare(model: any TranscriptionModel) async throws {
+        guard model is NativeAppleModel else { throw ServiceError.invalidModel }
+        guard #available(macOS 26, *) else { throw ServiceError.unsupportedOS }
         #if canImport(Speech) && ENABLE_NATIVE_SPEECH_ANALYZER
-        let audioFile = try AVAudioFile(forReading: audioURL)
-        let audioDuration = Double(audioFile.length) / audioFile.processingFormat.sampleRate
-        
-        // Apple Speech stores and consumes actual BCP-47 locale identifiers directly.
         let selectedLanguage = UserDefaults.standard.string(forKey: "SelectedLanguage") ?? "en-US"
         let locale = Locale(identifier: selectedLanguage)
-
         let supportedLocales = await SpeechTranscriber.supportedLocales
         let installedLocales = await SpeechTranscriber.installedLocales
         let supportedIdentifiers = Set(supportedLocales.map { $0.identifier(.bcp47) })
         let installedIdentifiers = Set(installedLocales.map { $0.identifier(.bcp47) })
         let isLocaleSupported = supportedIdentifiers.contains(locale.identifier(.bcp47))
         let isLocaleInstalled = installedIdentifiers.contains(locale.identifier(.bcp47))
-        
+
         let selectedLocaleIdentifier = locale.identifier(.bcp47)
         let displayName = languageDisplayName(for: selectedLocaleIdentifier)
 
@@ -82,7 +68,28 @@ class NativeAppleTranscriptionService: TranscriptionService {
             logger.error("Transcription failed: Assets for '\(selectedLocaleIdentifier, privacy: .public)' are not downloaded.")
             throw ServiceError.assetDownloadRequired(displayName)
         }
-        
+
+        #else
+        throw ServiceError.unsupportedOS
+        #endif
+    }
+
+    func transcribe(audioURL: URL, model: any TranscriptionModel) async throws -> String {
+        try await prepare(model: model)
+        guard #available(macOS 26, *) else { throw ServiceError.unsupportedOS }
+
+        // Feature gated: SpeechAnalyzer/SpeechTranscriber are future APIs.
+        // Enable by defining ENABLE_NATIVE_SPEECH_ANALYZER in build settings once building against macOS 26+ SDKs.
+        #if canImport(Speech) && ENABLE_NATIVE_SPEECH_ANALYZER
+        let audioFile = try AVAudioFile(forReading: audioURL)
+        let audioDuration = Double(audioFile.length) / audioFile.processingFormat.sampleRate
+
+        // Apple Speech stores and consumes actual BCP-47 locale identifiers directly.
+        let selectedLanguage = UserDefaults.standard.string(forKey: "SelectedLanguage") ?? "en-US"
+        let locale = Locale(identifier: selectedLanguage)
+
+        let selectedLocaleIdentifier = locale.identifier(.bcp47)
+
         let transcriber = SpeechTranscriber(
             locale: locale,
             transcriptionOptions: [],

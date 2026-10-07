@@ -49,6 +49,12 @@ Current status: app bundle name and many internal labels still come from VoiceIn
 - 🔄 **Smart Modes**: Instantly switch between AI-powered modes optimized for different writing styles and contexts
 - 🤖 **AI Assistant**: Built-in voice assistant mode for a quick chatGPT like conversational assistant
 
+## Cursor Companion
+
+Choose Cartoon, Disney, Anime, or None during onboarding or in Settings → Recording Feedback. Your companion perches beside the blinking text cursor when the focused app exposes its location. Otherwise it follows the mouse pointer. It never captures clicks or keyboard focus.
+
+“Getting ready…” means setup is still underway. “Listening” appears only after live microphone audio has been saved and the transcription session is prepared. Local models must load first, and known missing cloud API keys or invalid custom endpoints prevent activation. Silence is valid audio. “Working…” means transcription is underway. An orange warning means RJT cannot continue and tells you what to check. None removes the character and keeps the status cue. Reduce Motion keeps the illustration still. No recurring sound is added.
+
 ## Get Started
 
 ### Download

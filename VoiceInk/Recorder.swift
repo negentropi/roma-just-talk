@@ -15,6 +15,15 @@ class Recorder: NSObject, ObservableObject {
     private let playbackController = PlaybackController.shared
     @Published var audioMeter = AudioMeter(averagePower: 0, peakPower: 0)
     private var audioMeterUpdateTimer: DispatchSourceTimer?
+    private var captureHealthMonitor: CaptureHealthMonitor?
+    private var preRollHealthMonitor: CaptureHealthMonitor?
+    private(set) var preRollIsHealthy = false
+    var onPreRollReady: (() -> Void)?
+    var onPreRollFailure: ((String) -> Void)?
+    private var recordingOperationID = UUID()
+    var onCaptureReady: (() -> Void)?
+    var onRecordingFailure: ((String) -> Void)?
+
     private let audioMeterQueue = DispatchQueue(label: "com.prakashjoshipax.voiceink.audiometer", qos: .userInteractive)
     /// Dedicated serial queue for hardware setup.
     private let audioSetupQueue = DispatchQueue(label: "com.prakashjoshipax.voiceink.audioSetup", qos: .userInitiated)
@@ -71,6 +80,7 @@ class Recorder: NSObject, ObservableObject {
             return
         }
 
+        let operationID = recordingOperationID
         // Prevent concurrent device switches and handleDeviceChange() interference
         isReconfiguring = true
         defer { isReconfiguring = false }
@@ -104,6 +114,7 @@ class Recorder: NSObject, ObservableObject {
             logger.error("❌ Failed to switch device: \(error.localizedDescription, privacy: .public)")
 
             // If switch fails, stop recording and notify user
+            guard recordingOperationID == operationID else { return }
             await handleRecordingError(error)
         }
     }
@@ -123,6 +134,8 @@ class Recorder: NSObject, ObservableObject {
         let deviceID = deviceManager.getCurrentDevice()
         guard deviceID != 0 else {
             logger.error("startPreRollBuffering: no available input device")
+            preRollIsHealthy = false
+            onPreRollFailure?("Pre-roll unavailable. Connect a microphone and check Settings.")
             return
         }
 
@@ -141,14 +154,22 @@ class Recorder: NSObject, ObservableObject {
                     }
                 }
             }
+            startPreRollHealthMonitor(coreAudioRecorder)
             logger.notice("startPreRollBuffering: active on deviceID=\(deviceID, privacy: .public)")
         } catch {
+            preRollIsHealthy = false
+            onPreRollFailure?("Pre-roll unavailable. Check microphone access and your audio input.")
             logger.error("startPreRollBuffering failed: \(error.localizedDescription, privacy: .public)")
         }
     }
 
     func startRecording(toOutputFile url: URL) async throws {
         logger.notice("startRecording called – deviceID=\(self.deviceManager.getCurrentDevice(), privacy: .public), file=\(url.lastPathComponent, privacy: .public)")
+        preRollHealthMonitor?.stop()
+        preRollHealthMonitor = nil
+        preRollIsHealthy = false
+        let operationID = UUID()
+        recordingOperationID = operationID
         deviceManager.isRecordingActive = true
 
         let currentDeviceID = deviceManager.getCurrentDevice()
@@ -183,26 +204,33 @@ class Recorder: NSObject, ObservableObject {
                     }
                 }
             }
+            guard recordingOperationID == operationID else { return }
             logger.notice("startRecording: CoreAudioRecorder started successfully")
 
             startAudioMeterTimer()
+            startCaptureHealthTimer(coreAudioRecorder)
+
             Task { [weak self] in
                 guard let self else { return }
                 await self.playbackController.pauseMedia()
             }
         } catch {
             logger.error("Failed to start recording: \(error.localizedDescription, privacy: .public)")
-            await stopRecording()
+            if recordingOperationID == operationID { await stopRecording() }
             throw RecorderError.couldNotStartRecording
         }
     }
 
     func stopRecording() async {
         logger.notice("stopRecording called")
+        let operationID = UUID()
+        recordingOperationID = operationID
         audioMuteTask?.cancel()
         audioMuteTask = nil
         audioMeterUpdateTimer?.cancel()
         audioMeterUpdateTimer = nil
+        captureHealthMonitor?.stop()
+        captureHealthMonitor = nil
 
         let currentRecorder = self.recorder
 
@@ -213,6 +241,7 @@ class Recorder: NSObject, ObservableObject {
                 continuation.resume()
             }
         }
+        guard recordingOperationID == operationID else { return }
         onAudioChunk = nil
 
         smoothedValuesLock.lock()
@@ -227,13 +256,19 @@ class Recorder: NSObject, ObservableObject {
             await playbackController.resumeMedia()
         }
         deviceManager.isRecordingActive = false
+        if let currentRecorder, currentRecorder.isPreBuffering {
+            startPreRollHealthMonitor(currentRecorder)
+        }
     }
 
     private func handleRecordingError(_ error: Error) async {
         logger.error("❌ Recording error occurred: \(error.localizedDescription, privacy: .public)")
 
-        // Stop the recording
-        await stopRecording()
+        if let callback = onRecordingFailure {
+            callback("Microphone stopped. Check your audio input and try again.")
+        } else {
+            await stopRecording()
+        }
 
         // Notify the user about the recording failure
         await MainActor.run {
@@ -242,6 +277,29 @@ class Recorder: NSObject, ObservableObject {
                 type: .error
             )
         }
+    }
+
+    private func startPreRollHealthMonitor(_ core: CoreAudioRecorder) {
+        preRollHealthMonitor?.stop()
+        preRollIsHealthy = false
+        preRollHealthMonitor = CaptureHealthMonitor(snapshot: { core.preRollHealth }, onReady: { [weak self] in
+            guard let self else { return }
+            self.preRollIsHealthy = true
+            self.onPreRollReady?()
+        }, onFailure: { [weak self] _ in
+            guard let self else { return }
+            self.preRollIsHealthy = false
+            self.onPreRollFailure?("Pre-roll stopped. Check your microphone before speaking.")
+        })
+    }
+
+    private func startCaptureHealthTimer(_ core: CoreAudioRecorder) {
+        captureHealthMonitor?.stop()
+        let readyCallback = onCaptureReady
+        let failureCallback = onRecordingFailure
+        captureHealthMonitor = CaptureHealthMonitor(snapshot: { core.captureHealth },
+                                                     onReady: { readyCallback?() },
+                                                     onFailure: { failureCallback?($0) })
     }
 
     private func startAudioMeterTimer() {

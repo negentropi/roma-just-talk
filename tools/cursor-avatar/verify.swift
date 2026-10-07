@@ -44,6 +44,27 @@ struct Verify {
         stopped.stop()
         try? await Task.sleep(for: .milliseconds(350))
         assert(staleReady == 0, "stopped monitor cannot deliver a stale activation receipt")
+        let application = NSApplication.shared
+        application.setActivationPolicy(.accessory)
+        let controller = CursorAvatarController()
+        controller.update(.starting)
+        guard let panel = application.windows.compactMap({ $0 as? NSPanel }).first(where: { $0.isVisible }) else {
+            fatalError("production cursor panel did not appear")
+        }
+        assert(panel.ignoresMouseEvents, "companion cannot intercept the user's clicks")
+        assert(panel.styleMask.contains(.nonactivatingPanel), "companion cannot steal keyboard focus")
+        assert(!panel.isOpaque && panel.backgroundColor == .clear, "companion has a transparent background")
+        assert(NSScreen.screens.contains { $0.visibleFrame.contains(panel.frame) }, "live panel stays within a usable screen")
+        controller.update(.failed("Disk full"))
+        controller.update(.hidden)
+        assert(panel.isVisible, "ordinary dismissal cannot hide a capture failure")
+        controller.update(.starting)
+        controller.update(.hidden)
+        assert(!panel.isVisible, "explicit new activation clears the previous failure")
+        controller.update(.ready)
+        try? await Task.sleep(for: .milliseconds(2300))
+        assert(!application.windows.contains { $0 is NSPanel && $0.isVisible }, "idle readiness becomes quiet after its greeting")
         print("PASS readiness ordering, successful-write heartbeat policy, stalled heartbeat policy, write failure policy, primary and secondary display geometry, real monitor callback ordering and stop lifecycle")
+        print("PASS native panel visibility, click-through, nonactivation, transparency, screen bounds, failure retention and idle dismissal")
     }
 }

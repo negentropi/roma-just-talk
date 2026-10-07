@@ -9,3 +9,8 @@ swiftc "$root/VoiceInk/Views/Recorder/CursorAvatarView.swift" "$root/VoiceInk/Vi
 if [[ -d "$root/VoiceInk/Assets.xcassets/CursorAvatar-cartoon-greeting.imageset" ]]; then
     "$output/render" "$root/VoiceInk/Assets.xcassets" "$output"
 fi
+known_bad=38ab4b39be05cce5cdd19e8595c44c41d252d7e2
+if ! git -C "$root" cat-file -e "$known_bad^{commit}" 2>/dev/null; then
+    git -C "$root" fetch --no-tags --depth=1 origin "$known_bad"
+fi
+bash "$root/tools/cursor-avatar/verify-streaming.sh" "$output/streaming" "$known_bad"

@@ -228,7 +228,19 @@ class VoiceInkEngine: NSObject, ObservableObject {
                                     }
                                 )
                                 self.currentSession = session
-                                let realCallback = try await session.prepare(model: model)
+                                if let callback = session.audioChunkCallback {
+                                    self.recorder.onAudioChunk = callback
+                                    let buffered = pendingChunks.withLock { chunks -> [Data] in
+                                        let result = chunks
+                                        chunks.removeAll()
+                                        return result
+                                    }
+                                    for chunk in buffered { callback(chunk) }
+                                } else {
+                                    self.recorder.onAudioChunk = nil
+                                    pendingChunks.withLock { $0.removeAll() }
+                                }
+                                try await session.prepare(model: model)
                                 guard self.activeRecordingStartID == startID, !self.shouldCancelRecording else {
                                     session.cancel()
                                     return
@@ -238,19 +250,6 @@ class VoiceInkEngine: NSObject, ObservableObject {
                                 self.preparationDeadline = nil
                                 self.recordingState = .recording
                                 self.confirmListening(startID)
-
-                                if let realCallback {
-                                    self.recorder.onAudioChunk = realCallback
-                                    let buffered = pendingChunks.withLock { chunks -> [Data] in
-                                        let result = chunks
-                                        chunks.removeAll()
-                                        return result
-                                    }
-                                    for chunk in buffered { realCallback(chunk) }
-                                } else {
-                                    self.recorder.onAudioChunk = nil
-                                    pendingChunks.withLock { $0.removeAll() }
-                                }
                             }
 
                             Task { @MainActor [weak self] in
@@ -343,7 +342,11 @@ class VoiceInkEngine: NSObject, ObservableObject {
                   !custom.modelName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
                 throw VoiceInkEngineError.transcriptionFailed
             }
-        case .nativeApple, .fluidAudio:
+        case .fluidAudio:
+            guard transcriptionModelManager.usableModels.contains(where: { $0.provider == .fluidAudio && $0.name == model.name }) else {
+                throw VoiceInkEngineError.modelLoadFailed
+            }
+        case .nativeApple:
             break
         default:
             guard let provider = CloudProviderRegistry.provider(for: model.provider),

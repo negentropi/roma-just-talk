@@ -56,7 +56,21 @@ struct Render {
         guard let animationImage = animationRenderer.cgImage else { fatalError("animation render failed") }
         try NSBitmapImageRep(cgImage: animationImage).representation(using: .png, properties: [:])!
             .write(to: output.appendingPathComponent("listening-animation.png"))
+        let application = NSApplication.shared
+        application.setActivationPolicy(.accessory)
+        let onboarding = NSHostingView(rootView: OnboardingAvatarView(continueAction: {}))
+        let window = NSWindow(contentRect: CGRect(x: 0, y: 0, width: 620, height: 730), styleMask: [.borderless], backing: .buffered, defer: false)
+        window.contentView = onboarding
+        onboarding.layoutSubtreeIfNeeded()
+        try awaitOnboardingFrame(onboarding, output: output)
         withExtendedLifetime(loadedImages) {}
         print("Rendered production avatar views for all styles, states, and Reduced Motion")
+    }
+
+    @MainActor private static func awaitOnboardingFrame(_ view: NSView, output: URL) throws {
+        RunLoop.main.run(until: Date().addingTimeInterval(0.3))
+        guard let bitmap = view.bitmapImageRepForCachingDisplay(in: view.bounds) else { fatalError("onboarding capture failed") }
+        view.cacheDisplay(in: view.bounds, to: bitmap)
+        try bitmap.representation(using: .png, properties: [:])!.write(to: output.appendingPathComponent("onboarding.png"))
     }
 }

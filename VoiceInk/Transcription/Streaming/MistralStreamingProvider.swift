@@ -80,6 +80,7 @@ final class MistralStreamingProvider: StreamingTranscriptionProvider {
                     self.eventsContinuation?.yield(.error(StreamingTranscriptionError.serverError(message)))
                 }
             }
+            self.eventsContinuation?.finish()
         }
     }
 

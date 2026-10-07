@@ -22,6 +22,10 @@ jobs:
       - uses: actions/checkout@v4
       - name: Verify production feedback and render native views
         run: bash tools/cursor-avatar/verify.sh "$RUNNER_TEMP/cursor-avatar-proof"
+      - name: Verify streaming readiness against the known-bad service
+        run: |
+          git fetch --no-tags --depth=1 origin 38ab4b39be05cce5cdd19e8595c44c41d252d7e2
+          bash tools/cursor-avatar/verify-streaming.sh "$RUNNER_TEMP/cursor-avatar-proof/streaming" 38ab4b39be05cce5cdd19e8595c44c41d252d7e2
       - uses: actions/upload-artifact@v4
         if: always()
         with:

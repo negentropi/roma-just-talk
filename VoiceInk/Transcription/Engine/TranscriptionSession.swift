@@ -4,8 +4,8 @@ import os
 /// Encapsulates a single recording-to-transcription lifecycle (streaming or file-based).
 @MainActor
 protocol TranscriptionSession: AnyObject {
-    /// Prepares the session. Returns an audio chunk callback for streaming, or nil for file-based.
-    func prepare(model: any TranscriptionModel) async throws -> ((Data) -> Void)?
+    var audioChunkCallback: ((Data) -> Void)? { get }
+    func prepare(model: any TranscriptionModel) async throws
 
     /// Called after recording stops. Returns the final transcribed text.
     func transcribe(audioURL: URL) async throws -> String
@@ -26,9 +26,10 @@ final class FileTranscriptionSession: TranscriptionSession {
         self.service = service
     }
 
-    func prepare(model: any TranscriptionModel) async throws -> ((Data) -> Void)? {
+    var audioChunkCallback: ((Data) -> Void)? { nil }
+
+    func prepare(model: any TranscriptionModel) async throws {
         self.model = model
-        return nil
     }
 
     func transcribe(audioURL: URL) async throws -> String {
@@ -51,7 +52,6 @@ final class StreamingTranscriptionSession: TranscriptionSession {
     private let streamingService: StreamingTranscriptionService
     private let fallbackService: TranscriptionService
     private var model: (any TranscriptionModel)?
-    private var streamingFailed = false
     private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "StreamingTranscriptionSession")
 
     init(streamingService: StreamingTranscriptionService, fallbackService: TranscriptionService) {
@@ -59,17 +59,16 @@ final class StreamingTranscriptionSession: TranscriptionSession {
         self.fallbackService = fallbackService
     }
 
-    func prepare(model: any TranscriptionModel) async throws -> ((Data) -> Void)? {
+    var audioChunkCallback: ((Data) -> Void)? {
+        let service = streamingService
+        return { [weak service] data in service?.sendAudioChunk(data) }
+    }
+
+    func prepare(model: any TranscriptionModel) async throws {
         self.model = model
         logger.notice("Streaming session prepare model=\(model.displayName, privacy: .public)")
-
         try await streamingService.startStreaming(model: model)
         try Task.checkCancellation()
-        let service = streamingService
-        let callback: (Data) -> Void = { [weak service] data in
-            service?.sendAudioChunk(data)
-        }
-        return callback
     }
 
     func transcribe(audioURL: URL) async throws -> String {
@@ -77,18 +76,14 @@ final class StreamingTranscriptionSession: TranscriptionSession {
             throw VoiceInkEngineError.transcriptionFailed
         }
 
-        if !streamingFailed {
-            do {
-                let start = Date()
-                logger.notice("Streaming stop/transcribe started model=\(model.displayName, privacy: .public)")
-                let text = try await streamingService.stopAndGetFinalText()
-                logger.notice("Streaming transcript received elapsed=\(Date().timeIntervalSince(start), format: .fixed(precision: 3), privacy: .public)s chars=\(text.count, privacy: .public)")
-                return text
-            } catch {
-                logger.error("❌ Streaming failed, falling back to batch: \(error.localizedDescription, privacy: .public)")
-                streamingService.cancel()
-            }
-        } else {
+        do {
+            let start = Date()
+            logger.notice("Streaming stop/transcribe started model=\(model.displayName, privacy: .public)")
+            let text = try await streamingService.stopAndGetFinalText()
+            logger.notice("Streaming transcript received elapsed=\(Date().timeIntervalSince(start), format: .fixed(precision: 3), privacy: .public)s chars=\(text.count, privacy: .public)")
+            return text
+        } catch {
+            logger.error("❌ Streaming failed, falling back to batch: \(error.localizedDescription, privacy: .public)")
             streamingService.cancel()
         }
 

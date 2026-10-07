@@ -93,6 +93,7 @@ class StreamingTranscriptionService {
     private var stopStartedAt: Date?
     private var firstPartialLogged = false
     private var firstCommitLogged = false
+    private var firstAudioSend: CheckedContinuation<Void, Error>?
 
     init(modelContext: ModelContext, fluidAudioService: FluidAudioTranscriptionService? = nil, onPartialTranscript: ((String) -> Void)? = nil) {
         self.modelContext = modelContext
@@ -138,9 +139,13 @@ class StreamingTranscriptionService {
             throw CancellationError()
         }
 
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            firstAudioSend = continuation
+            startSendLoop()
+            startEventConsumer()
+        }
+        guard state == .connecting else { throw StreamingTranscriptionError.notConnected }
         state = .streaming
-        startSendLoop()
-        startEventConsumer()
 
         logger.notice("Streaming connected model=\(model.displayName, privacy: .public) elapsed=\(Date().timeIntervalSince(start), format: .fixed(precision: 3), privacy: .public)s")
     }
@@ -196,6 +201,8 @@ class StreamingTranscriptionService {
     /// Cancels the streaming session without waiting for results.
     func cancel() {
         state = .cancelled
+        firstAudioSend?.resume(throwing: CancellationError())
+        firstAudioSend = nil
         onPartialTranscript = nil
         eventConsumerTask?.cancel()
         eventConsumerTask = nil
@@ -242,14 +249,20 @@ class StreamingTranscriptionService {
 
         sendTask = Task.detached { [weak self] in
             for await chunk in source.stream {
+                guard let self else { return }
                 do {
-                    try await provider?.sendAudioChunk(chunk)
+                    guard let provider else { throw StreamingTranscriptionError.notConnected }
+                    try await provider.sendAudioChunk(chunk)
                     metrics.recordSent(chunk.count)
+                    await MainActor.run {
+                        self.firstAudioSend?.resume()
+                        self.firstAudioSend = nil
+                    }
                 } catch {
                     let desc = error.localizedDescription
                     await MainActor.run {
-                        self?.logger.error("Failed to send audio chunk: \(desc, privacy: .public)")
-                        self?.reportFailure(error)
+                        self.logger.error("Failed to send audio chunk: \(desc, privacy: .public)")
+                        self.reportFailure(error)
                     }
                 }
             }
@@ -323,13 +336,19 @@ class StreamingTranscriptionService {
                         self.reportFailure(error)
                     }
                 }
-            }  
+            }
+            guard let self else { return }
+            await MainActor.run {
+                self.reportFailure(StreamingTranscriptionError.connectionFailed("Streaming connection closed."))
+            }
         }
     }
 
     private func reportFailure(_ error: Error) {
         guard state == .streaming || state == .connecting else { return }
         state = .failed
+        firstAudioSend?.resume(throwing: error)
+        firstAudioSend = nil
         onFailure?(error)
     }
 

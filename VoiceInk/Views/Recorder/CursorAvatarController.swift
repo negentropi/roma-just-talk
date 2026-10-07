@@ -26,16 +26,16 @@ final class CursorAvatarController {
     private var preferences: AnyCancellable?
     private var feedback: CaptureFeedback = .hidden
     private let presentation = CursorAvatarPresentation()
-    private var failureDismissal: Task<Void, Never>?
+    private var readyDismissal: Task<Void, Never>?
 
     func update(_ feedback: CaptureFeedback, level: Double = 0) {
         presentation.level = level
-        if feedback == .hidden, self.feedback.isFailure { return }
+        if self.feedback.isFailure, feedback == .hidden || feedback == .ready { return }
         if feedback != self.feedback {
-            failureDismissal?.cancel()
+            readyDismissal?.cancel()
             self.feedback = feedback
             if feedback == .ready {
-                failureDismissal = Task { [weak self] in
+                readyDismissal = Task { [weak self] in
                     try? await Task.sleep(for: .seconds(2))
                     guard !Task.isCancelled else { return }
                     self?.hide()
@@ -74,8 +74,8 @@ final class CursorAvatarController {
 
     func hide() {
         feedback = .hidden
-        failureDismissal?.cancel()
-        failureDismissal = nil
+        readyDismissal?.cancel()
+        readyDismissal = nil
         timer?.invalidate()
         timer = nil
         preferences = nil

@@ -1,0 +1,51 @@
+name: Verify cursor companion
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["ci/neg-27-avatar-*"]
+  pull_request:
+    paths:
+      - "VoiceInk/**"
+      - "VoiceInk.xcodeproj/**"
+      - "tools/cursor-avatar/**"
+      - ".github/workflows/cursor-avatar.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  native-feedback:
+    runs-on: macos-26
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify production feedback and render native views
+        run: bash tools/cursor-avatar/verify.sh "$RUNNER_TEMP/cursor-avatar-proof"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cursor-avatar-native-proof
+          path: ${{ runner.temp }}/cursor-avatar-proof
+          if-no-files-found: error
+  app-build:
+    runs-on: macos-26
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare existing Whisper dependency
+        run: make setup
+      - name: Compile complete macOS app without signing
+        run: |
+          xcodebuild -project VoiceInk.xcodeproj -scheme VoiceInk -configuration Debug \
+            -derivedDataPath "$RUNNER_TEMP/cursor-avatar-build" \
+            -xcconfig LocalBuild.xcconfig \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO DEVELOPMENT_TEAM="" \
+            SWIFT_ACTIVE_COMPILATION_CONDITIONS='$(inherited) LOCAL_BUILD' \
+            build > "$RUNNER_TEMP/cursor-avatar-build.log" 2>&1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cursor-avatar-build-log
+          path: ${{ runner.temp }}/cursor-avatar-build.log
+          if-no-files-found: warn

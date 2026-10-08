@@ -37,6 +37,10 @@ workflows:
         script: |
           set -euo pipefail
           swift run --package-path VoiceInkCore VoiceInkCoreChecks 2>&1 | tee artifacts/core-checks.log
+      - name: Render cursor companion frames
+        script: |
+          set -euo pipefail
+          bash Tools/CursorCompanionArt/render-frames.sh artifacts/cursor-companion
       - name: Build the macOS app
         script: |
           set -euo pipefail

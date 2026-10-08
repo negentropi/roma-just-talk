@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "companion-cartoon-oops.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

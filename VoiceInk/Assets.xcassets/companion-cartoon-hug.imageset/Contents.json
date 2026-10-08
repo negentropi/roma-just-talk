@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "companion-cartoon-hug.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

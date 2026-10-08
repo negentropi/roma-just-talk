@@ -216,6 +216,28 @@ public struct VoiceInkMacOSOnboardingModelDownloadPresentation: Equatable, Senda
     }
 }
 
+public struct VoiceInkMacOSOnboardingCompanionPresentation: Equatable, Sendable {
+    public let title: String
+    public let subtitle: String
+    public let continueButtonTitle: String
+    public let skipButtonTitle: String
+    public let noneCaption: String
+
+    public init(
+        title: String,
+        subtitle: String,
+        continueButtonTitle: String,
+        skipButtonTitle: String,
+        noneCaption: String
+    ) {
+        self.title = title
+        self.subtitle = subtitle
+        self.continueButtonTitle = continueButtonTitle
+        self.skipButtonTitle = skipButtonTitle
+        self.noneCaption = noneCaption
+    }
+}
+
 public struct VoiceInkMacOSOnboardingTutorialPresentation: Equatable, Sendable {
     public let title: String
     public let subtitle: String
@@ -450,6 +472,14 @@ public enum VoiceInkMacOSOnboardingPresentation {
         subtitle: "Choose a local model and download it for offline dictation, or select another option. You can also skip setup for now.",
         nextButtonTitle: "Next",
         skipButtonTitle: "Skip for now"
+    )
+
+    public static let companion = VoiceInkMacOSOnboardingCompanionPresentation(
+        title: "Pick a listening buddy",
+        subtitle: "The moment roma starts listening, your buddy hops onto your cursor. No buddy means roma didn't start.",
+        continueButtonTitle: "Continue",
+        skipButtonTitle: "Skip for now",
+        noneCaption: "No companion. You'll rely on the start sound."
     )
 
     public static let tutorial = VoiceInkMacOSOnboardingTutorialPresentation(
@@ -750,6 +780,7 @@ public enum VoiceInkMacOSOnboardingStage: String, Equatable, Sendable {
     case welcome
     case permissions
     case modelDownload
+    case companion
     case tutorial
 
     public var resumesPermissionsView: Bool {
@@ -757,7 +788,11 @@ public enum VoiceInkMacOSOnboardingStage: String, Equatable, Sendable {
     }
 
     public var resumesModelDownload: Bool {
-        self == .modelDownload || self == .tutorial
+        self == .modelDownload || resumesCompanion
+    }
+
+    public var resumesCompanion: Bool {
+        self == .companion || self == .tutorial
     }
 
     public var resumesTutorial: Bool {

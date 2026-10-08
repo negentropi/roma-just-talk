@@ -409,18 +409,27 @@ final class OnboardingPresentationTests: XCTestCase {
     func testMacOSOnboardingStageResumeFlagsPreserveExistingFlow() {
         XCTAssertFalse(VoiceInkMacOSOnboardingStage.welcome.resumesPermissionsView)
         XCTAssertFalse(VoiceInkMacOSOnboardingStage.welcome.resumesModelDownload)
+        XCTAssertFalse(VoiceInkMacOSOnboardingStage.welcome.resumesCompanion)
         XCTAssertFalse(VoiceInkMacOSOnboardingStage.welcome.resumesTutorial)
 
         XCTAssertTrue(VoiceInkMacOSOnboardingStage.permissions.resumesPermissionsView)
         XCTAssertFalse(VoiceInkMacOSOnboardingStage.permissions.resumesModelDownload)
+        XCTAssertFalse(VoiceInkMacOSOnboardingStage.permissions.resumesCompanion)
         XCTAssertFalse(VoiceInkMacOSOnboardingStage.permissions.resumesTutorial)
 
         XCTAssertTrue(VoiceInkMacOSOnboardingStage.modelDownload.resumesPermissionsView)
         XCTAssertTrue(VoiceInkMacOSOnboardingStage.modelDownload.resumesModelDownload)
+        XCTAssertFalse(VoiceInkMacOSOnboardingStage.modelDownload.resumesCompanion)
         XCTAssertFalse(VoiceInkMacOSOnboardingStage.modelDownload.resumesTutorial)
+
+        XCTAssertTrue(VoiceInkMacOSOnboardingStage.companion.resumesPermissionsView)
+        XCTAssertTrue(VoiceInkMacOSOnboardingStage.companion.resumesModelDownload)
+        XCTAssertTrue(VoiceInkMacOSOnboardingStage.companion.resumesCompanion)
+        XCTAssertFalse(VoiceInkMacOSOnboardingStage.companion.resumesTutorial)
 
         XCTAssertTrue(VoiceInkMacOSOnboardingStage.tutorial.resumesPermissionsView)
         XCTAssertTrue(VoiceInkMacOSOnboardingStage.tutorial.resumesModelDownload)
+        XCTAssertTrue(VoiceInkMacOSOnboardingStage.tutorial.resumesCompanion)
         XCTAssertTrue(VoiceInkMacOSOnboardingStage.tutorial.resumesTutorial)
     }
 
@@ -428,6 +437,7 @@ final class OnboardingPresentationTests: XCTestCase {
         XCTAssertEqual(VoiceInkMacOSOnboardingStage.welcome.rawValue, "welcome")
         XCTAssertEqual(VoiceInkMacOSOnboardingStage.permissions.rawValue, "permissions")
         XCTAssertEqual(VoiceInkMacOSOnboardingStage.modelDownload.rawValue, "modelDownload")
+        XCTAssertEqual(VoiceInkMacOSOnboardingStage.companion.rawValue, "companion")
         XCTAssertEqual(VoiceInkMacOSOnboardingStage.tutorial.rawValue, "tutorial")
 
         XCTAssertEqual(VoiceInkMacOSOnboardingPermissionKind.microphone.rawValue, "microphone")

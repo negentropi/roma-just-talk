@@ -1664,6 +1664,17 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "TranscriptionStreamingPreferenceTests.testResetClearsAgreementState", run: { TranscriptionStreamingPreferenceTests().testResetClearsAgreementState() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testMacOSAIEnhancementRequestURLSelectionIsShared", run: { await AIProviderCatalogTests().testMacOSAIEnhancementRequestURLSelectionIsShared() }),
             VoiceInkCoreCheck(name: "TranscriptionModelCatalogTests.testFluidAudioModelMetadataIsShared", run: { TranscriptionModelCatalogTests().testFluidAudioModelMetadataIsShared() }),
+            VoiceInkCoreCheck(name: "CursorCompanionPolicyTests.testCompanionAppearsOnlyAfterMicrophoneAudioArrives", run: { CursorCompanionPolicyTests().testCompanionAppearsOnlyAfterMicrophoneAudioArrives() }),
+            VoiceInkCoreCheck(name: "CursorCompanionPolicyTests.testSilentMicrophoneShowsStalledUntilAudioRecoversOrRecordingEnds", run: { CursorCompanionPolicyTests().testSilentMicrophoneShowsStalledUntilAudioRecoversOrRecordingEnds() }),
+            VoiceInkCoreCheck(name: "CursorCompanionPolicyTests.testRecordingThatEndsBeforeAudioArrivesShowsNothing", run: { CursorCompanionPolicyTests().testRecordingThatEndsBeforeAudioArrivesShowsNothing() }),
+            VoiceInkCoreCheck(name: "CursorCompanionPolicyTests.testStartFailureWinsFromEveryPhaseAndClearsAfterItsAnimation", run: { CursorCompanionPolicyTests().testStartFailureWinsFromEveryPhaseAndClearsAfterItsAnimation() }),
+            VoiceInkCoreCheck(name: "CursorCompanionPolicyTests.testIrrelevantEventsKeepPhase", run: { CursorCompanionPolicyTests().testIrrelevantEventsKeepPhase() }),
+            VoiceInkCoreCheck(name: "CursorCompanionPolicyTests.testCaptureFlowMonitorReportsFirstAudioStallAndRecovery", run: { CursorCompanionPolicyTests().testCaptureFlowMonitorReportsFirstAudioStallAndRecovery() }),
+            VoiceInkCoreCheck(name: "CursorCompanionPolicyTests.testCaptureFlowMonitorReportsMicrophoneThatNeverDelivers", run: { CursorCompanionPolicyTests().testCaptureFlowMonitorReportsMicrophoneThatNeverDelivers() }),
+            VoiceInkCoreCheck(name: "CursorCompanionPolicyTests.testRecordingStateTransitionsMapToCompanionEvents", run: { CursorCompanionPolicyTests().testRecordingStateTransitionsMapToCompanionEvents() }),
+            VoiceInkCoreCheck(name: "CursorCompanionPolicyTests.testOnlyAnimatedPhasesHaveDurations", run: { CursorCompanionPolicyTests().testOnlyAnimatedPhasesHaveDurations() }),
+            VoiceInkCoreCheck(name: "CursorCompanionPolicyTests.testPreferenceDefaultsToCartoonRoundTripsAndIgnoresUnknownValues", run: { CursorCompanionPolicyTests().testPreferenceDefaultsToCartoonRoundTripsAndIgnoresUnknownValues() }),
+            VoiceInkCoreCheck(name: "CursorCompanionPolicyTests.testStylesPresentInPickerOrderWithNames", run: { CursorCompanionPolicyTests().testStylesPresentInPickerOrderWithNames() }),
         ]
 
         for check in checks {

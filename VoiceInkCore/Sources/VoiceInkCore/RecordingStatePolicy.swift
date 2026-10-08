@@ -2005,6 +2005,11 @@ public struct VoiceInkRecordingNotificationPresentation: Equatable, Sendable {
         title: "Recording failed to start"
     )
 
+    public static let microphoneStoppedSendingAudio = VoiceInkRecordingNotificationPresentation(
+        title: "Microphone isn't sending audio",
+        duration: 8.0
+    )
+
     public static let microphonePermissionRequired = VoiceInkRecordingNotificationPresentation(
         title: "Microphone permission required",
         duration: 8.0,

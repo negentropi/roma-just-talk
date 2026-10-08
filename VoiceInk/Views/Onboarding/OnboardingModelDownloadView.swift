@@ -10,7 +10,7 @@ struct OnboardingModelDownloadView: View {
     @State private var displayedLocalModelName: String
     @State private var scale: CGFloat = 0.8
     @State private var opacity: CGFloat = 0
-    @State private var showTutorial: Bool
+    @State private var showCompanion: Bool
 
     private let lookupCountry: @Sendable () async -> String?
     private let onRegionLookupFinished: (() -> Void)?
@@ -32,8 +32,8 @@ struct OnboardingModelDownloadView: View {
         _showAdvancedModels = State(initialValue: existing != nil
             && existing != QwenModel().name
             && existing != TranscriptionModelRegistry.defaultMacOSFluidAudioModel.name)
-        self._showTutorial = State(
-            initialValue: VoiceInkMacOSOnboardingProgressStore.stage().resumesTutorial
+        self._showCompanion = State(
+            initialValue: VoiceInkMacOSOnboardingProgressStore.stage().resumesCompanion
         )
     }
 
@@ -48,8 +48,8 @@ struct OnboardingModelDownloadView: View {
 
     var body: some View {
         ZStack {
-            if showTutorial {
-                OnboardingTutorialView(hasCompletedOnboarding: $hasCompletedOnboarding)
+            if showCompanion {
+                OnboardingCompanionView(hasCompletedOnboarding: $hasCompletedOnboarding)
                     .transition(.move(edge: .trailing).combined(with: .opacity))
             } else {
                 GeometryReader { geometry in
@@ -178,9 +178,9 @@ struct OnboardingModelDownloadView: View {
     }
 
     private func advance() {
-        VoiceInkMacOSOnboardingProgressStore.saveStage(.tutorial)
+        VoiceInkMacOSOnboardingProgressStore.saveStage(.companion)
         if let onAdvance { onAdvance() }
-        else { withAnimation { showTutorial = true } }
+        else { withAnimation { showCompanion = true } }
     }
 
     private func animateIn() {

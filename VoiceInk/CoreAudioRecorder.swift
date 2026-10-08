@@ -109,6 +109,14 @@ final class CoreAudioRecorder: @unchecked Sendable {
     private let meterLock = NSLock()
     private var _averagePower: Float = -160.0
     private var _peakPower: Float = -160.0
+    private var _meteredBufferCount: UInt64 = 0
+
+    /// Monotonic count of input buffers delivered by the device; stops advancing when the microphone goes silent at the driver level.
+    var meteredBufferCount: UInt64 {
+        meterLock.lock()
+        defer { meterLock.unlock() }
+        return _meteredBufferCount
+    }
 
     var averagePower: Float {
         meterLock.lock()
@@ -913,6 +921,7 @@ final class CoreAudioRecorder: @unchecked Sendable {
         meterLock.lock()
         _averagePower = avgDb
         _peakPower = peakDb
+        _meteredBufferCount &+= 1
         meterLock.unlock()
     }
 

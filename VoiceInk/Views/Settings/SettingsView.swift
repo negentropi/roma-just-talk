@@ -11,6 +11,7 @@ struct SettingsView: View {
     @EnvironmentObject private var launchAtLoginController: LaunchAtLoginController
     @EnvironmentObject private var recordingShortcutManager: RecordingShortcutManager
     @EnvironmentObject private var recorderUIManager: RecorderUIManager
+    @EnvironmentObject private var cursorCompanionController: CursorCompanionController
     @EnvironmentObject private var transcriptionModelManager: TranscriptionModelManager
     @EnvironmentObject private var enhancementService: AIEnhancementService
     @StateObject private var deviceManager = AudioDeviceManager.shared
@@ -33,6 +34,7 @@ struct SettingsView: View {
     @State private var isRestoreClipboardExpanded = false
     private static let recordingShortcutPresentation = VoiceInkRecordingShortcutPreference.macOSSettingsPresentation
     private static let recorderStylePresentation = VoiceInkRecorderStylePreference.macOSSettingsPresentation
+    private static let cursorCompanionPresentation = VoiceInkCursorCompanionPreference.macOSSettingsPresentation
     private static let recordingFeedbackPresentation = VoiceInkRecordingFeedbackPreference.macOSSettingsPresentation
     private static let pasteSettingsPresentation = VoiceInkPastePreference.macOSSettingsPresentation
     private static let resetOnboardingPresentation = VoiceInkMacOSOnboardingPresentation.resetSettingsAlert
@@ -240,6 +242,18 @@ struct SettingsView: View {
                 }
                 .pickerStyle(.segmented)
 
+                VStack(alignment: .leading, spacing: 4) {
+                    Picker(Self.cursorCompanionPresentation.pickerTitle, selection: $cursorCompanionController.style) {
+                        ForEach(VoiceInkCursorCompanionStyle.allCases) { style in
+                            Text(style.displayName).tag(style)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+
+                    Text(Self.cursorCompanionPresentation.caption)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
 
             // MARK: - Experimental

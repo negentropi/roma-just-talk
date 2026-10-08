@@ -236,6 +236,26 @@ enum CursorTextContextReader {
         return processIdentifier
     }
 
+    /// Caret rect of the focused text element in Accessibility (top-left origin) global coordinates.
+    @MainActor
+    static func focusedCaretAccessibilityBounds() -> CGRect? {
+        guard AXIsProcessTrusted(),
+              let focusedElement = focusedElement(from: AXUIElementCreateSystemWide()),
+              let range = selectedTextRange(from: focusedElement) else {
+            return nil
+        }
+        // Polled from the main thread while recording, so a hung target app must not stall the UI.
+        AXUIElementSetMessagingTimeout(focusedElement, 0.1)
+        if let bounds = boundsForRange(range, in: focusedElement).bounds, bounds.height > 0 {
+            return bounds
+        }
+        guard range.location > 0,
+              let previous = boundsForRange(CFRange(location: range.location - 1, length: 1), in: focusedElement).bounds else {
+            return nil
+        }
+        return CGRect(x: previous.maxX, y: previous.minY, width: 0, height: previous.height)
+    }
+
     @MainActor
     static func pressFocusedCommandVMenuItem(
         retryIfUnavailable: Bool,

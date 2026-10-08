@@ -19,6 +19,7 @@ struct VoiceInkApp: App {
     @StateObject private var qwenModelManager: QwenModelManager
     @StateObject private var transcriptionModelManager: TranscriptionModelManager
     @StateObject private var recorderUIManager: RecorderUIManager
+    @StateObject private var cursorCompanionController: CursorCompanionController
     @StateObject private var recordingShortcutManager: RecordingShortcutManager
     @StateObject private var updaterViewModel: UpdaterViewModel
     @StateObject private var menuBarManager: MenuBarManager
@@ -134,6 +135,8 @@ struct VoiceInkApp: App {
         // 5. Configure circular deps
         recorderUIManager.configure(engine: engine, recorder: engine.recorder)
         engine.recorderUIManager = recorderUIManager
+        let cursorCompanionController = CursorCompanionController()
+        cursorCompanionController.configure(engine: engine)
 
         // 6. Initialize model state
         // Migration and refreshAllAvailableModels must run before loadCurrentTranscriptionModel so renamed keys are remapped and imported models are present when restoring the saved selection.
@@ -158,6 +161,7 @@ struct VoiceInkApp: App {
         Task { await qwenModelManager.refresh() }
         _transcriptionModelManager = StateObject(wrappedValue: transcriptionModelManager)
         _recorderUIManager = StateObject(wrappedValue: recorderUIManager)
+        _cursorCompanionController = StateObject(wrappedValue: cursorCompanionController)
         _engine = StateObject(wrappedValue: engine)
 
         // 7. Create other services that depend on engine
@@ -298,6 +302,7 @@ struct VoiceInkApp: App {
                     .environmentObject(qwenModelManager)
                     .environmentObject(transcriptionModelManager)
                     .environmentObject(recorderUIManager)
+                    .environmentObject(cursorCompanionController)
                     .environmentObject(recordingShortcutManager)
                     .environmentObject(updaterViewModel)
                     .environmentObject(menuBarManager)
@@ -365,6 +370,7 @@ struct VoiceInkApp: App {
                     .environmentObject(qwenModelManager)
                     .environmentObject(transcriptionModelManager)
                     .environmentObject(recorderUIManager)
+                    .environmentObject(cursorCompanionController)
                     .environmentObject(aiService)
                     .environmentObject(enhancementService)
                     .background(WindowAccessor(configurationID: VoiceInkMacOSWindowIdentity.onboardingIdentifierRawValue) { window in

@@ -28,6 +28,10 @@ class Recorder: NSObject, ObservableObject {
 
     /// Audio chunk callback for streaming. Can be updated while recording;
     /// changes are forwarded to the live CoreAudioRecorder.
+    var capturedBufferCount: UInt64 {
+        recorder?.meteredBufferCount ?? 0
+    }
+
     var onAudioChunk: ((_ data: Data) -> Void)? {
         didSet { recorder?.onAudioChunk = onAudioChunk }
     }

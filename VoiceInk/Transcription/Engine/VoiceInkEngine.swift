@@ -1,3 +1,4 @@
+import Combine
 import Foundation
 import SwiftUI
 import AVFoundation
@@ -11,6 +12,7 @@ import VoiceInkQwen
 class VoiceInkEngine: NSObject, ObservableObject {
     @Published var recordingState: VoiceInkRecordingState = .idle
     @Published var shouldCancelRecording = false
+    let recordingStartFailures = PassthroughSubject<Void, Never>()
     var partialTranscript: String = ""
     var currentSession: TranscriptionSession?
     private var activeRecordingStartID: UUID?
@@ -120,6 +122,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
                     title: VoiceInkRecordingNotificationPresentation.noTranscriptionModelSelected.title,
                     type: .error
                 )
+                recordingStartFailures.send()
                 await recorderUIManager?.dismissMiniRecorder()
                 latencyTrace.finish(event: "engine.start.no_model", token: traceToken)
                 return
@@ -358,6 +361,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
                                 title: VoiceInkRecordingNotificationPresentation.failedToStart.title,
                                 type: .error
                             )
+                            self.recordingStartFailures.send()
                             self.logger.notice("toggleRecord: calling dismissMiniRecorder from error handler")
                             await self.recorderUIManager?.dismissMiniRecorder()
                             latencyTrace.finish(
@@ -384,6 +388,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
                         (label: label, action: openMicrophonePermission)
                     }
                 )
+                recordingStartFailures.send()
                 await self.recorderUIManager?.dismissMiniRecorder()
                 latencyTrace.finish(event: "engine.permission.denied_complete", token: traceToken)
             }

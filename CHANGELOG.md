@@ -2,6 +2,7 @@
 
 ## v1.95.2 - Unreleased
 
+- Add a cursor companion that hops onto your text caret or mouse pointer as soon as your microphone audio is actually arriving, so you know roma is listening before you talk. If recording can't start, or the microphone stops sending audio, an unmistakable red "oops" pose appears instead. Choose Cartoon, Storybook, Anime, or None during onboarding or in Settings.
 - Add a manually triggered Codemagic Mac M2 workflow for shared core checks and downloadable macOS app builds.
 
 ## v1.95.1 - 2026-09-11

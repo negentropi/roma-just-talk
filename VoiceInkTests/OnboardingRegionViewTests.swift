@@ -121,7 +121,7 @@ final class OnboardingRegionViewTests: XCTestCase {
         try await fixture.waitForLookup()
         try await fixture.press(identifier: "onboarding-model-skip")
         try await fixture.waitUntil { fixture.didAdvance }
-        XCTAssertEqual(VoiceInkMacOSOnboardingProgressStore.stage(), .tutorial)
+        XCTAssertEqual(VoiceInkMacOSOnboardingProgressStore.stage(), .companion)
         fixture.close(resumePendingLookup: false)
         await fixture.region.respond("TW")
         try await fixture.waitUntil { fixture.regionLookupFinished }

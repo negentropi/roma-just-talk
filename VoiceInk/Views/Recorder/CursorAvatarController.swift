@@ -17,6 +17,25 @@ struct CursorAvatarPlacement {
     static func caretToAppKit(_ rect: CGRect, primaryTop: CGFloat) -> CGRect {
         CGRect(x: rect.minX, y: primaryTop - rect.maxY, width: rect.width, height: rect.height)
     }
+
+    static func caretBounds(at location: Int, read: (CFRange) -> CGRect?,
+                            emptyElementTop: () -> CGFloat? = { nil }) -> CGRect? {
+        guard location >= 0, var caret = read(CFRange(location: location, length: 0)) else { return nil }
+        // AppKit can report an empty range one line above the drawn insertion point.
+        // Character bounds provide the actual line without shifting correct browser carets.
+        if let next = read(CFRange(location: location, length: 1)), next.height > 0,
+           abs(next.minX - caret.minX) <= 1 || abs(next.maxX - caret.minX) <= 1 ||
+            (next.height > caret.height + 1 && caret.minX >= next.minX && caret.minX <= next.maxX) {
+            caret.origin.y = next.minY
+        } else if location > 0, let previous = read(CFRange(location: location - 1, length: 1)), previous.height > 0,
+                  abs(previous.maxX - caret.minX) <= 1 || abs(previous.minX - caret.minX) <= 1 ||
+                    (previous.height > caret.height + 1 && caret.minX >= previous.minX && caret.minX <= previous.maxX) {
+            caret.origin.y = previous.maxY - caret.height
+        } else if location == 0, let top = emptyElementTop() {
+            caret.origin.y = max(caret.minY, top)
+        }
+        return caret
+    }
 }
 
 @MainActor
@@ -125,20 +144,34 @@ final class CursorAvatarController {
         guard AXUIElementCopyAttributeValue(system, kAXFocusedUIElementAttribute as CFString, &focused) == .success,
               let focused, CFGetTypeID(focused) == AXUIElementGetTypeID() else { return nil }
         let element = unsafeBitCast(focused, to: AXUIElement.self)
-        AXUIElementSetMessagingTimeout(element, 0.05)
+        AXUIElementSetMessagingTimeout(element, 0.01)
         var range: CFTypeRef?
         guard AXUIElementCopyAttributeValue(element, kAXSelectedTextRangeAttribute as CFString, &range) == .success, let range else { return nil }
         var selection = CFRange()
         guard CFGetTypeID(range) == AXValueGetTypeID(),
               AXValueGetValue(unsafeBitCast(range, to: AXValue.self), .cfRange, &selection),
               selection.length == 0 else { return nil }
-        var bounds: CFTypeRef?
-        guard AXUIElementCopyParameterizedAttributeValue(element, kAXBoundsForRangeParameterizedAttribute as CFString, range, &bounds) == .success,
-              let bounds, CFGetTypeID(bounds) == AXValueGetTypeID() else { return nil }
-        var rect = CGRect.zero
-        guard AXValueGetValue(unsafeBitCast(bounds, to: AXValue.self), .cgRect, &rect),
-              rect.minX.isFinite, rect.minY.isFinite, rect.width.isFinite, rect.height.isFinite,
-              rect.height > 0, rect.width >= 0, rect.width < 200 else { return nil }
+        let rect = CursorAvatarPlacement.caretBounds(at: selection.location, read: { requestedRange in
+            var requestedRange = requestedRange
+            guard let value = AXValueCreate(.cfRange, &requestedRange) else { return nil }
+            var bounds: CFTypeRef?
+            guard AXUIElementCopyParameterizedAttributeValue(element, kAXBoundsForRangeParameterizedAttribute as CFString, value, &bounds) == .success,
+                  let bounds, CFGetTypeID(bounds) == AXValueGetTypeID() else { return nil }
+            var rect = CGRect.zero
+            guard AXValueGetValue(unsafeBitCast(bounds, to: AXValue.self), .cgRect, &rect),
+                  rect.minX.isFinite, rect.minY.isFinite, rect.width.isFinite, rect.height.isFinite,
+                  rect.height > 0, rect.width >= 0,
+                  requestedRange.length > 0 || rect.width < 200 else { return nil }
+            return rect
+        }, emptyElementTop: {
+            var value: CFTypeRef?
+            guard AXUIElementCopyAttributeValue(element, kAXPositionAttribute as CFString, &value) == .success,
+                  let value, CFGetTypeID(value) == AXValueGetTypeID() else { return nil }
+            var point = CGPoint.zero
+            guard AXValueGetValue(unsafeBitCast(value, to: AXValue.self), .cgPoint, &point), point.y.isFinite else { return nil }
+            return point.y
+        })
+        guard let rect else { return nil }
         let converted = CursorAvatarPlacement.caretToAppKit(rect, primaryTop: primary.frame.maxY)
         guard NSScreen.screens.contains(where: { $0.frame.contains(CGPoint(x: converted.midX, y: converted.midY)) }) else { return nil }
         return converted

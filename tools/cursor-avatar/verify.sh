@@ -21,6 +21,23 @@ if ! /usr/bin/grep -q 'character feet touch the pointer hotspot without a gap' "
     exit 1
 fi
 "$output/verify"
+swiftc "$root/VoiceInk/Views/Recorder/CursorAvatarView.swift" "$root/VoiceInk/Views/Recorder/CursorAvatarController.swift" "$root/tools/cursor-avatar/verify-caret.swift" -o "$output/verify-caret"
+known_bad_caret=a1fc169df63e14fb8a4eabbf7b0b6ec42b8ad967
+if ! git -C "$root" cat-file -e "$known_bad_caret^{commit}" 2>/dev/null; then
+    git -C "$root" fetch --no-tags --depth=1 origin "$known_bad_caret"
+fi
+git -C "$root" show "$known_bad_caret:VoiceInk/Views/Recorder/CursorAvatarController.swift" > "$output/old-caret-controller.swift"
+swiftc -D RAW_CARET_BASELINE "$root/VoiceInk/Views/Recorder/CursorAvatarView.swift" "$output/old-caret-controller.swift" "$root/tools/cursor-avatar/verify-caret.swift" -o "$output/old-verify-caret"
+if "$output/old-verify-caret" > "$output/old-native-caret.log" 2>&1; then
+    echo "FAIL: raw empty-range bounds passed the drawn-caret regression; environment does not reproduce the bug"
+    exit 1
+fi
+if ! /usr/bin/grep -q 'native character feet must touch the drawn insertion caret' "$output/old-native-caret.log"; then
+    echo "FAIL: baseline did not fail at the native drawn-caret boundary"
+    cat "$output/old-native-caret.log"
+    exit 1
+fi
+"$output/verify-caret"
 swiftc "$root/VoiceInk/Views/Recorder/CursorAvatarView.swift" "$root/VoiceInk/Views/Onboarding/OnboardingAvatarView.swift" "$root/tools/cursor-avatar/render.swift" -o "$output/render"
 if [[ -d "$root/VoiceInk/Assets.xcassets/CursorAvatar-cartoon-greeting.imageset" ]]; then
     "$output/render" "$root/VoiceInk/Assets.xcassets" "$output"

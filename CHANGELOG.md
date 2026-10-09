@@ -3,6 +3,7 @@
 ## v1.81 - Unreleased
 
 - Added tiny animated Cartoon, Disney, and Anime characters perched directly on the pointer or blinking text caret, an onboarding choice, and clear ready, working, and failure cues. None keeps a compact status cue.
+- Kept the cursor character attached to native text fields, including empty fields and trailing new lines.
 
 - Trimmed repeated correction markers after repeated cursor context.
 - Trimmed "I was trying to say is" correction lead-ins after repeated cursor context.

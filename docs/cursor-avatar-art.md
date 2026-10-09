@@ -6,6 +6,8 @@ Assets live in `VoiceInk/Assets.xcassets/CursorAvatar-{style}-{pose}.imageset`. 
 
 Runtime artwork is 32 points square. Its bottom center touches the pointer hotspot or the top of the insertion caret, with no detached panel gap. Normal feedback uses a 12-point badge rather than a caption. Failures keep a readable instruction beside the attachment and flip left near the display's right edge. Mouse tracking runs at 30 Hz; accessibility caret queries stay at 10 Hz. Nonempty text selections use the pointer instead of treating the selection rectangle as a caret.
 
+Empty AppKit text ranges can sit one line above the drawn insertion point. The accessibility adapter compares empty and character bounds on the same text element before correcting that offset. Editors whose bounds already align keep their original caret position.
+
 The built-in image generation tool produced one transparent 2 by 2 sprite sheet per style. Equal-cell extraction and downsampling preserve transparency. No existing film or anime character is depicted.
 
 The generation prompts used these character descriptions.

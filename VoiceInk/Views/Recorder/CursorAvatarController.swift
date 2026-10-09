@@ -29,6 +29,8 @@ final class CursorAvatarController {
     private var readyDismissal: Task<Void, Never>?
     private var lastCaretCheck = Date.distantPast
     private var cachedCaret: CGRect?
+    private var lastMouse = CGPoint.zero
+    private var lastMouseMovement = Date.distantPast
 
     func update(_ feedback: CaptureFeedback, level: Double = 0) {
         presentation.level = level
@@ -98,14 +100,21 @@ final class CursorAvatarController {
     private func position() {
         guard let panel else { return }
         let mouse = NSEvent.mouseLocation
+        if mouse != lastMouse {
+            lastMouse = mouse
+            lastMouseMovement = Date()
+        }
         if Date().timeIntervalSince(lastCaretCheck) >= 0.1 {
             cachedCaret = caretAnchor()
             lastCaretCheck = Date()
         }
-        let anchor = cachedCaret ?? CGRect(origin: mouse, size: .zero)
+        let anchor = Date().timeIntervalSince(lastMouseMovement) >= 0.8 ? (cachedCaret ?? CGRect(origin: mouse, size: .zero)) : CGRect(origin: mouse, size: .zero)
         guard let screen = NSScreen.screens.first(where: { $0.frame.contains(CGPoint(x: anchor.midX, y: anchor.midY)) }) ?? NSScreen.main else { return }
         presentation.trailingAttachment = feedback.isFailure && anchor.minX - 16 + panel.frame.width > screen.visibleFrame.maxX
-        panel.setFrame(CursorAvatarPlacement.frame(anchor: anchor, size: panel.frame.size, screen: screen.visibleFrame), display: true)
+        let frame = CursorAvatarPlacement.frame(anchor: anchor, size: panel.frame.size, screen: screen.visibleFrame)
+        presentation.attachmentOffset = CGSize(width: anchor.minX - frame.minX - (presentation.trailingAttachment ? 204 : 16),
+                                             height: frame.maxY - anchor.maxY - 32)
+        panel.setFrame(frame, display: true)
     }
 
     private func caretAnchor() -> CGRect? {

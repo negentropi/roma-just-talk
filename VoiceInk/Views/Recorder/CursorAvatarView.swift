@@ -39,6 +39,7 @@ struct CursorAvatarView: View {
     var animationDateOverride: Date? = nil
     var listeningElapsedOverride: TimeInterval? = nil
     var trailingAttachment = false
+    var attachmentOffset: CGSize = .zero
     @State private var listeningBegan = Date.distantPast
     private var reduceMotion: Bool { reducedMotionOverride ?? systemReduceMotion }
 
@@ -54,7 +55,7 @@ struct CursorAvatarView: View {
                         }
                     }
                 }
-                .offset(x: trailingAttachment ? 188 : 0)
+                .offset(x: (trailingAttachment ? 188 : 0) + attachmentOffset.width, y: attachmentOffset.height)
                 .accessibilityHidden(true)
             }
             Image(systemName: statusSymbol)
@@ -62,7 +63,7 @@ struct CursorAvatarView: View {
                 .foregroundStyle(.white)
                 .frame(width: 12, height: 12)
                 .background(statusColor, in: Circle())
-                .offset(x: trailingAttachment ? 211 : 23, y: 20)
+                .offset(x: (trailingAttachment ? 211 : 23) + attachmentOffset.width, y: 20 + attachmentOffset.height)
             if feedback.isFailure {
                 Text(feedback.label)
                     .font(.system(size: 11, weight: .semibold))
@@ -164,12 +165,13 @@ final class CursorAvatarPresentation: ObservableObject {
     @Published var feedback: CaptureFeedback = .hidden
     @Published var level: Double = 0
     @Published var trailingAttachment = false
+    @Published var attachmentOffset: CGSize = .zero
 }
 
 struct CursorAvatarLiveView: View {
     @ObservedObject var presentation: CursorAvatarPresentation
     var body: some View {
         CursorAvatarView(style: presentation.style, feedback: presentation.feedback, level: presentation.level,
-                         trailingAttachment: presentation.trailingAttachment)
+                         trailingAttachment: presentation.trailingAttachment, attachmentOffset: presentation.attachmentOffset)
     }
 }

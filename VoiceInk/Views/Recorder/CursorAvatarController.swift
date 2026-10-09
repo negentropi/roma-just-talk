@@ -18,12 +18,13 @@ struct CursorAvatarPlacement {
         CGRect(x: rect.minX, y: primaryTop - rect.maxY, width: rect.width, height: rect.height)
     }
 
-    static func caretBounds(at location: Int, read: (CFRange) -> CGRect?,
+    static func caretBounds(at location: Int, characterCount: Int?, read: (CFRange) -> CGRect?,
                             emptyElementTop: () -> CGFloat? = { nil }) -> CGRect? {
         guard location >= 0, var caret = read(CFRange(location: location, length: 0)) else { return nil }
         // AppKit can report an empty range one line above the drawn insertion point.
         // Character bounds provide the actual line without shifting correct browser carets.
-        if let next = read(CFRange(location: location, length: 1)), next.height > 0,
+        if characterCount.map({ location < $0 }) ?? true,
+           let next = read(CFRange(location: location, length: 1)), next.height > 0,
            abs(next.minX - caret.minX) <= 1 || abs(next.maxX - caret.minX) <= 1 ||
             (next.height > caret.height + 1 && caret.minX >= next.minX && caret.minX <= next.maxX) {
             caret.origin.y = next.minY
@@ -151,7 +152,10 @@ final class CursorAvatarController {
         guard CFGetTypeID(range) == AXValueGetTypeID(),
               AXValueGetValue(unsafeBitCast(range, to: AXValue.self), .cfRange, &selection),
               selection.length == 0 else { return nil }
-        let rect = CursorAvatarPlacement.caretBounds(at: selection.location, read: { requestedRange in
+        var countValue: CFTypeRef?
+        let countResult = AXUIElementCopyAttributeValue(element, kAXNumberOfCharactersAttribute as CFString, &countValue)
+        let characterCount = countResult == .success ? (countValue as? NSNumber)?.intValue : nil
+        let rect = CursorAvatarPlacement.caretBounds(at: selection.location, characterCount: characterCount, read: { requestedRange in
             var requestedRange = requestedRange
             guard let value = AXValueCreate(.cfRange, &requestedRange) else { return nil }
             var bounds: CFTypeRef?

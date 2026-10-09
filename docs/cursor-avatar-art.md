@@ -8,6 +8,8 @@ Runtime artwork is 32 points square. Its bottom center touches the pointer hotsp
 
 Empty AppKit text ranges can sit one line above the drawn insertion point. The accessibility adapter compares empty and character bounds on the same text element before correcting that offset. Editors whose bounds already align keep their original caret position.
 
+At document end, the adapter uses the element's character count to avoid an out-of-range character query. TextEdit can accept that query and return empty-range geometry instead of rejecting it.
+
 The built-in image generation tool produced one transparent 2 by 2 sprite sheet per style. Equal-cell extraction and downsampling preserve transparency. No existing film or anime character is depicted.
 
 The generation prompts used these character descriptions.

@@ -38,6 +38,21 @@ if ! /usr/bin/grep -q 'native character feet must touch the drawn insertion care
     exit 1
 fi
 "$output/verify-caret"
+known_bad_character_bounds=a34ae42cd3671de28ec8e80ea0fea63ccaa9de6c
+if ! git -C "$root" cat-file -e "$known_bad_character_bounds^{commit}" 2>/dev/null; then
+    git -C "$root" fetch --no-tags --depth=1 origin "$known_bad_character_bounds"
+fi
+git -C "$root" show "$known_bad_character_bounds:VoiceInk/Views/Recorder/CursorAvatarController.swift" > "$output/old-character-controller.swift"
+swiftc -D UNBOUNDED_CHARACTER_BASELINE "$root/VoiceInk/Views/Recorder/CursorAvatarView.swift" "$output/old-character-controller.swift" "$root/tools/cursor-avatar/verify-caret.swift" -o "$output/old-verify-character"
+if "$output/old-verify-character" > "$output/old-character-bounds.log" 2>&1; then
+    echo "FAIL: out-of-range character query passed the document-end regression"
+    exit 1
+fi
+if ! /usr/bin/grep -q 'native character feet must touch the drawn insertion caret' "$output/old-character-bounds.log"; then
+    echo "FAIL: character-range baseline did not fail at the caret boundary"
+    cat "$output/old-character-bounds.log"
+    exit 1
+fi
 swiftc "$root/VoiceInk/Views/Recorder/CursorAvatarView.swift" "$root/VoiceInk/Views/Onboarding/OnboardingAvatarView.swift" "$root/tools/cursor-avatar/render.swift" -o "$output/render"
 if [[ -d "$root/VoiceInk/Assets.xcassets/CursorAvatar-cartoon-greeting.imageset" ]]; then
     "$output/render" "$root/VoiceInk/Assets.xcassets" "$output"

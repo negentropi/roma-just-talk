@@ -5,10 +5,10 @@ import Combine
 
 struct CursorAvatarPlacement {
     static func frame(anchor: CGRect, size: CGSize, screen: CGRect) -> CGRect {
-        let right = anchor.maxX + 12
-        let left = anchor.minX - size.width - 12
-        let x = right + size.width <= screen.maxX ? right : left
-        let y = anchor.maxY - 14
+        // The artwork's feet are 16 points across and 32 points below the panel top.
+        let attachmentX: CGFloat = anchor.minX - 16 + size.width > screen.maxX ? size.width - 20 : 16
+        let x = anchor.minX - attachmentX
+        let y = anchor.maxY - (size.height - 32)
         return CGRect(x: min(max(x, screen.minX), screen.maxX - size.width),
                       y: min(max(y, screen.minY), screen.maxY - size.height),
                       width: size.width, height: size.height)
@@ -27,6 +27,8 @@ final class CursorAvatarController {
     private var feedback: CaptureFeedback = .hidden
     private let presentation = CursorAvatarPresentation()
     private var readyDismissal: Task<Void, Never>?
+    private var lastCaretCheck = Date.distantPast
+    private var cachedCaret: CGRect?
 
     func update(_ feedback: CaptureFeedback, level: Double = 0) {
         presentation.level = level
@@ -59,7 +61,7 @@ final class CursorAvatarController {
             }
         }
         if timer == nil {
-            timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
+            timer = Timer.scheduledTimer(withTimeInterval: 1 / 30, repeats: true) { [weak self] _ in
                 Task { @MainActor in self?.position() }
             }
         }
@@ -78,6 +80,8 @@ final class CursorAvatarController {
         readyDismissal = nil
         timer?.invalidate()
         timer = nil
+        cachedCaret = nil
+        lastCaretCheck = .distantPast
         preferences = nil
         panel?.orderOut(nil)
         panel = nil
@@ -88,14 +92,19 @@ final class CursorAvatarController {
         let style = CursorAvatarStyle(rawValue: UserDefaults.standard.string(forKey: CursorAvatarStyle.defaultsKey) ?? "") ?? .cartoon
         presentation.style = style
         presentation.feedback = feedback
-        panel?.setContentSize(CGSize(width: 180, height: style == .none ? 76 : 180))
+        panel?.setContentSize(CGSize(width: feedback.isFailure ? 224 : 40, height: feedback.isFailure ? 90 : 36))
     }
 
     private func position() {
         guard let panel else { return }
         let mouse = NSEvent.mouseLocation
-        let anchor = caretAnchor() ?? CGRect(origin: mouse, size: CGSize(width: 1, height: 1))
+        if Date().timeIntervalSince(lastCaretCheck) >= 0.1 {
+            cachedCaret = caretAnchor()
+            lastCaretCheck = Date()
+        }
+        let anchor = cachedCaret ?? CGRect(origin: mouse, size: .zero)
         guard let screen = NSScreen.screens.first(where: { $0.frame.contains(CGPoint(x: anchor.midX, y: anchor.midY)) }) ?? NSScreen.main else { return }
+        presentation.trailingAttachment = feedback.isFailure && anchor.minX - 16 + panel.frame.width > screen.visibleFrame.maxX
         panel.setFrame(CursorAvatarPlacement.frame(anchor: anchor, size: panel.frame.size, screen: screen.visibleFrame), display: true)
     }
 
@@ -110,6 +119,10 @@ final class CursorAvatarController {
         AXUIElementSetMessagingTimeout(element, 0.05)
         var range: CFTypeRef?
         guard AXUIElementCopyAttributeValue(element, kAXSelectedTextRangeAttribute as CFString, &range) == .success, let range else { return nil }
+        var selection = CFRange()
+        guard CFGetTypeID(range) == AXValueGetTypeID(),
+              AXValueGetValue(unsafeBitCast(range, to: AXValue.self), .cfRange, &selection),
+              selection.length == 0 else { return nil }
         var bounds: CFTypeRef?
         guard AXUIElementCopyParameterizedAttributeValue(element, kAXBoundsForRangeParameterizedAttribute as CFString, range, &bounds) == .success,
               let bounds, CFGetTypeID(bounds) == AXValueGetTypeID() else { return nil }

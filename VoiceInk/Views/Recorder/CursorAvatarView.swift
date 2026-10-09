@@ -38,11 +38,12 @@ struct CursorAvatarView: View {
     var reducedMotionOverride: Bool? = nil
     var animationDateOverride: Date? = nil
     var listeningElapsedOverride: TimeInterval? = nil
+    var trailingAttachment = false
     @State private var listeningBegan = Date.distantPast
     private var reduceMotion: Bool { reducedMotionOverride ?? systemReduceMotion }
 
     var body: some View {
-        VStack(spacing: 0) {
+        ZStack(alignment: .topLeading) {
             if style != .none {
                 Group {
                     if let date = animationDateOverride {
@@ -53,19 +54,27 @@ struct CursorAvatarView: View {
                         }
                     }
                 }
+                .offset(x: trailingAttachment ? 188 : 0)
                 .accessibilityHidden(true)
             }
-            HStack(spacing: 6) {
-                Image(systemName: feedback.isFailure ? "exclamationmark.triangle.fill" : (feedback == .listening ? "mic.fill" : "ellipsis"))
-                Text(feedback.label).lineLimit(3).fixedSize(horizontal: false, vertical: true)
+            Image(systemName: statusSymbol)
+                .font(.system(size: 7, weight: .bold))
+                .foregroundStyle(.white)
+                .frame(width: 12, height: 12)
+                .background(statusColor, in: Circle())
+                .offset(x: trailingAttachment ? 211 : 23, y: 20)
+            if feedback.isFailure {
+                Text(feedback.label)
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(8)
+                    .frame(width: 180, alignment: .leading)
+                    .background(.black.opacity(0.9), in: RoundedRectangle(cornerRadius: 8))
+                    .offset(x: trailingAttachment ? 0 : 38)
             }
-            .font(.system(size: 11, weight: .semibold))
-            .foregroundStyle(feedback.isFailure ? Color.orange : Color.white)
-            .padding(.horizontal, 10).padding(.vertical, 7)
-            .background(.black.opacity(0.86), in: Capsule())
-            .overlay(Capsule().stroke(feedback.isFailure ? Color.orange : Color.white.opacity(0.2), lineWidth: 1))
         }
-        .frame(width: 180, height: style == .none ? 76 : 180, alignment: .bottom)
+        .frame(width: feedback.isFailure ? 224 : 40, height: feedback.isFailure ? 90 : 36, alignment: .topLeading)
         .accessibilityElement(children: .combine)
         .accessibilityLabel("RJT \(feedback.label)")
         .onAppear { if feedback == .listening { listeningBegan = Date() } }
@@ -84,10 +93,28 @@ struct CursorAvatarView: View {
             artworkImage(blink ? "listening-blink" : feedback.pose).opacity(1 - greeting)
             if greeting > 0 { artworkImage("greeting").opacity(greeting) }
         }
-        .frame(width: 104, height: 104)
+        .frame(width: 32, height: 32)
         .scaleEffect(reduceMotion ? 1 : 1 + wave * 0.012 + (feedback == .listening ? min(level, 1) * 0.035 : 0), anchor: .bottom)
         .rotationEffect(.degrees(greeting > 0 ? sin(elapsed * 12) * greeting * 6 : (feedback == .working ? wave * 3 : 0)), anchor: .bottom)
-        .offset(y: wave * 1.5)
+        .offset(y: wave * 0.4)
+    }
+
+    private var statusSymbol: String {
+        switch feedback {
+        case .hidden, .starting: return "ellipsis"
+        case .ready: return "checkmark"
+        case .listening: return "mic.fill"
+        case .working: return "hourglass"
+        case .failed: return "exclamationmark"
+        }
+    }
+
+    private var statusColor: Color {
+        switch feedback {
+        case .failed: return .orange
+        case .ready, .listening: return .green
+        default: return .blue
+        }
     }
 
     private func artworkImage(_ pose: String) -> some View {
@@ -107,8 +134,15 @@ struct CursorAvatarPicker: View {
                     selection = style.rawValue
                 } label: {
                     VStack(spacing: 8) {
-                        CursorAvatarView(style: style, feedback: .listening)
-                            .frame(maxWidth: .infinity).frame(height: 180)
+                        ZStack(alignment: .topLeading) {
+                            CursorAvatarView(style: style, feedback: .listening)
+                            Image(systemName: "cursorarrow")
+                                .font(.system(size: 24))
+                                .offset(x: 16, y: 32)
+                        }
+                        .frame(width: 60, height: 64, alignment: .topLeading)
+                        .clipped()
+                        .frame(maxWidth: .infinity)
                         Text(style.title).font(.headline)
                         Image(systemName: selection == style.rawValue ? "checkmark.circle.fill" : "circle")
                     }
@@ -129,11 +163,13 @@ final class CursorAvatarPresentation: ObservableObject {
     @Published var style: CursorAvatarStyle = .cartoon
     @Published var feedback: CaptureFeedback = .hidden
     @Published var level: Double = 0
+    @Published var trailingAttachment = false
 }
 
 struct CursorAvatarLiveView: View {
     @ObservedObject var presentation: CursorAvatarPresentation
     var body: some View {
-        CursorAvatarView(style: presentation.style, feedback: presentation.feedback, level: presentation.level)
+        CursorAvatarView(style: presentation.style, feedback: presentation.feedback, level: presentation.level,
+                         trailingAttachment: presentation.trailingAttachment)
     }
 }

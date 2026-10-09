@@ -9,7 +9,7 @@ struct OnboardingAvatarView: View {
                 VStack(spacing: 24) {
                     Text("Meet your cursor companion")
                         .font(.system(size: 32, weight: .bold, design: .rounded))
-                    Text("A quiet companion beside your cursor.\nSee when RJT is listening, working, or needs your help.")
+                Text("A tiny companion perched on your pointer or text caret.\nSee when RJT is listening, working, or needs your help.")
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
                     CursorAvatarPicker()

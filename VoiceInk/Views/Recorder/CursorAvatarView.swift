@@ -137,9 +137,14 @@ struct CursorAvatarPicker: View {
                     VStack(spacing: 8) {
                         ZStack(alignment: .topLeading) {
                             CursorAvatarView(style: style, feedback: .listening)
-                            Image(systemName: "cursorarrow")
-                                .font(.system(size: 24))
-                                .offset(x: 16, y: 32)
+                            Path { path in
+                                path.move(to: CGPoint(x: 16, y: 32))
+                                path.addLines([CGPoint(x: 16, y: 54), CGPoint(x: 22, y: 49),
+                                               CGPoint(x: 27, y: 60), CGPoint(x: 31, y: 58),
+                                               CGPoint(x: 26, y: 47), CGPoint(x: 34, y: 47)])
+                                path.closeSubpath()
+                            }
+                            .fill(.white)
                         }
                         .frame(width: 60, height: 64, alignment: .topLeading)
                         .clipped()

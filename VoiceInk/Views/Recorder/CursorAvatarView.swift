@@ -145,6 +145,7 @@ struct CursorAvatarPicker: View {
                                 path.closeSubpath()
                             }
                             .fill(.white)
+                            .frame(width: 60, height: 64)
                         }
                         .frame(width: 60, height: 64, alignment: .topLeading)
                         .clipped()

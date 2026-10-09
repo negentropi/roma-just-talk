@@ -6,7 +6,7 @@ import Combine
 struct CursorAvatarPlacement {
     static func frame(anchor: CGRect, size: CGSize, screen: CGRect) -> CGRect {
         // The artwork's feet are 16 points across and 32 points below the panel top.
-        let attachmentX: CGFloat = anchor.minX - 16 + size.width > screen.maxX ? size.width - 20 : 16
+        let attachmentX: CGFloat = size.width > 40 && anchor.minX - 16 + size.width > screen.maxX ? size.width - 20 : 16
         let x = anchor.minX - attachmentX
         let y = anchor.maxY - (size.height - 32)
         return CGRect(x: min(max(x, screen.minX), screen.maxX - size.width),

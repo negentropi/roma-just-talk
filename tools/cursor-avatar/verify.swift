@@ -24,7 +24,7 @@ struct Verify {
         let caret = CursorAvatarPlacement.frame(anchor: CGRect(x: 400, y: 300, width: 0, height: 16), size: CGSize(width: 40, height: 36), screen: desktop)
         assert(caret.minX + 16 == 400 && caret.maxY - 32 == 316, "character perches on the blinking caret")
         let frame = CursorAvatarPlacement.frame(anchor: CGRect(x: 990, y: 5, width: 1, height: 16), size: CGSize(width: 224, height: 90), screen: desktop)
-        assert(frame == CGRect(x: 786, y: 0, width: 224, height: 90))
+        assert(frame == CGRect(x: 776, y: 0, width: 224, height: 90), "warning remains readable at the display corner")
         let rightEdge = CursorAvatarPlacement.frame(anchor: CGRect(x: 970, y: 300, width: 0, height: 16), size: CGSize(width: 224, height: 90), screen: desktop)
         assert(rightEdge.minX + 204 == 970 && rightEdge.maxY - 32 == 316, "warning flips left without detaching the character")
         let above = CursorAvatarPlacement.caretToAppKit(CGRect(x: -1200, y: -600, width: 1, height: 20), primaryTop: 900)

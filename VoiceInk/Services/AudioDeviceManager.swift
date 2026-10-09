@@ -479,7 +479,8 @@ class AudioDeviceManager: ObservableObject {
                         )
                     } else {
                         self.logger.error("No audio input devices available!")
-                        NotificationCenter.default.post(name: .toggleMiniRecorder, object: nil)
+                        // Losing every input is a failure, not a user-requested stop.
+                        NotificationCenter.default.post(name: .audioInputUnavailable, object: nil)
                     }
                 }
                 return

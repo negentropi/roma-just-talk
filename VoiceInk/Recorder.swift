@@ -9,6 +9,7 @@ class Recorder: NSObject, ObservableObject {
     private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "Recorder")
     private let deviceManager = AudioDeviceManager.shared
     private var deviceSwitchObserver: NSObjectProtocol?
+    private var inputUnavailableObserver: NSObjectProtocol?
     private var audioDeviceChangeObserver: NSObjectProtocol?
     private var isReconfiguring = false
     private let mediaController = MediaController.shared
@@ -49,6 +50,14 @@ class Recorder: NSObject, ObservableObject {
     }
 
     private func setupDeviceSwitchObserver() {
+        inputUnavailableObserver = NotificationCenter.default.addObserver(
+            forName: .audioInputUnavailable, object: nil, queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                guard let self, self.deviceManager.isRecordingActive else { return }
+                await self.handleRecordingError(CoreAudioRecorderError.deviceNotAvailable)
+            }
+        }
         deviceSwitchObserver = NotificationCenter.default.addObserver(
             forName: .audioDeviceSwitchRequired,
             object: nil,
@@ -361,6 +370,9 @@ class Recorder: NSObject, ObservableObject {
         audioMeterUpdateTimer?.cancel()
         audioRestorationTask?.cancel()
         if let observer = deviceSwitchObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
+        if let observer = inputUnavailableObserver {
             NotificationCenter.default.removeObserver(observer)
         }
         if let observer = audioDeviceChangeObserver {

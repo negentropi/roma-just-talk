@@ -71,9 +71,12 @@ final class CursorAvatarController {
             }
         }
         if timer == nil {
-            timer = Timer.scheduledTimer(withTimeInterval: 1 / 30, repeats: true) { [weak self] _ in
+            let timer = Timer(timeInterval: 1 / 30, repeats: true) { [weak self] _ in
                 Task { @MainActor in self?.position() }
             }
+            // Menu tracking must not freeze the cursor attachment.
+            RunLoop.main.add(timer, forMode: .common)
+            self.timer = timer
         }
         render()
         position()

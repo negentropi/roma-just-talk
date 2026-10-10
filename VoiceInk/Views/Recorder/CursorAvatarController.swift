@@ -19,8 +19,44 @@ struct CursorAvatarPlacement {
     }
 
     static func caretBounds(at location: Int, characterCount: Int?, read: (CFRange) -> CGRect?,
-                            emptyElementTop: () -> CGFloat? = { nil }) -> CGRect? {
-        guard location >= 0, var caret = read(CFRange(location: location, length: 0)) else { return nil }
+                            emptyElementTop: () -> CGFloat? = { nil },
+                            precedingLineBreak: () -> Bool = { false },
+                            previousLineStart: () -> CGRect? = { nil }) -> CGRect? {
+        guard location >= 0 else { return nil }
+        let reported = read(CFRange(location: location, length: 0))
+        // Sonoma TextEdit returns success with a zero-height insertion rectangle.
+        // Read actual glyph geometry rather than moving the companion to the mouse.
+        guard var caret = reported, caret.height > 0 else {
+            if characterCount.map({ location < $0 }) ?? true,
+               let next = read(CFRange(location: location, length: 1)), next.height > 0 {
+                let previous = location > 0 ? read(CFRange(location: location - 1, length: 1)) : nil
+                let following = characterCount.map({ location + 1 < $0 }) ?? true
+                    ? read(CFRange(location: location + 1, length: 1)) : nil
+                let x: CGFloat?
+                if let previous, let edge = sharedCharacterEdge(previous, next) {
+                    x = edge
+                } else if let previous, previous.height > 0, abs(previous.minY - next.minY) <= 1 {
+                    x = nil
+                } else if let following, let edge = sharedCharacterEdge(next, following) {
+                    x = abs(edge - next.minX) <= 1 ? next.maxX : next.minX
+                } else if let start = previousLineStart(), abs(start.minX - next.minX) <= 1 || abs(start.minX - next.maxX) <= 1 {
+                    x = start.minX
+                } else {
+                    x = nil
+                }
+                guard let x else { return nil }
+                return CGRect(x: x, y: next.minY, width: 0, height: next.height)
+            }
+            guard location > 0, let previous = read(CFRange(location: location - 1, length: 1)), previous.height > 0 else { return nil }
+            if precedingLineBreak() {
+                guard let start = previousLineStart() else { return nil }
+                return CGRect(x: start.minX, y: previous.maxY, width: 0, height: previous.height)
+            }
+            guard location > 1, let before = read(CFRange(location: location - 2, length: 1)),
+                  let edge = sharedCharacterEdge(before, previous) else { return nil }
+            let x = abs(edge - previous.minX) <= 1 ? previous.maxX : previous.minX
+            return CGRect(x: x, y: previous.minY, width: 0, height: previous.height)
+        }
         // AppKit can report an empty range one line above the drawn insertion point.
         // Character bounds provide the actual line without shifting correct browser carets.
         if characterCount.map({ location < $0 }) ?? true,
@@ -36,6 +72,13 @@ struct CursorAvatarPlacement {
             caret.origin.y = max(caret.minY, top)
         }
         return caret
+    }
+
+    private static func sharedCharacterEdge(_ first: CGRect, _ second: CGRect) -> CGFloat? {
+        guard first.height > 0, second.height > 0, abs(first.minY - second.minY) <= 1 else { return nil }
+        if abs(first.maxX - second.minX) <= 1 { return second.minX }
+        if abs(first.minX - second.maxX) <= 1 { return second.maxX }
+        return nil
     }
 }
 
@@ -140,7 +183,7 @@ final class CursorAvatarController {
         var countValue: CFTypeRef?
         let countResult = AXUIElementCopyAttributeValue(element, kAXNumberOfCharactersAttribute as CFString, &countValue)
         let characterCount = countResult == .success ? (countValue as? NSNumber)?.intValue : nil
-        let rect = CursorAvatarPlacement.caretBounds(at: selection.location, characterCount: characterCount, read: { requestedRange in
+        let readBounds: (CFRange) -> CGRect? = { requestedRange in
             var requestedRange = requestedRange
             guard let value = AXValueCreate(.cfRange, &requestedRange) else { return nil }
             var bounds: CFTypeRef?
@@ -149,16 +192,46 @@ final class CursorAvatarController {
             var rect = CGRect.zero
             guard AXValueGetValue(unsafeBitCast(bounds, to: AXValue.self), .cgRect, &rect),
                   rect.minX.isFinite, rect.minY.isFinite, rect.width.isFinite, rect.height.isFinite,
-                  rect.height > 0, rect.width >= 0,
+                  rect.height >= 0, rect.width >= 0,
                   requestedRange.length > 0 || rect.width < 200 else { return nil }
             return rect
-        }, emptyElementTop: {
+        }
+        let rect = CursorAvatarPlacement.caretBounds(at: selection.location, characterCount: characterCount, read: readBounds, emptyElementTop: {
             var value: CFTypeRef?
             guard AXUIElementCopyAttributeValue(element, kAXPositionAttribute as CFString, &value) == .success,
                   let value, CFGetTypeID(value) == AXValueGetTypeID() else { return nil }
             var point = CGPoint.zero
             guard AXValueGetValue(unsafeBitCast(value, to: AXValue.self), .cgPoint, &point), point.y.isFinite else { return nil }
             return point.y
+        }, precedingLineBreak: {
+            var previous = CFRange(location: selection.location - 1, length: 1)
+            guard let value = AXValueCreate(.cfRange, &previous) else { return false }
+            var text: CFTypeRef?
+            guard AXUIElementCopyParameterizedAttributeValue(element, kAXStringForRangeParameterizedAttribute as CFString, value, &text) == .success,
+                  let text = text as? String else { return false }
+            return text == "\n" || text == "\r" || text == "\u{2028}" || text == "\u{2029}"
+        }, previousLineStart: {
+            guard selection.location > 0 else { return nil }
+            var line: CFTypeRef?
+            guard AXUIElementCopyParameterizedAttributeValue(element, kAXLineForIndexParameterizedAttribute as CFString,
+                                                             NSNumber(value: selection.location - 1), &line) == .success,
+                  let line else { return nil }
+            guard let lineNumber = line as? NSNumber else { return nil }
+            // Empty lines have no directional glyph pair. Look through nearby lines
+            // without guessing that every writing system starts at the left edge.
+            for number in stride(from: lineNumber.intValue, through: max(0, lineNumber.intValue - 8), by: -1) {
+                var range: CFTypeRef?
+                guard AXUIElementCopyParameterizedAttributeValue(element, kAXRangeForLineParameterizedAttribute as CFString,
+                                                                 NSNumber(value: number), &range) == .success,
+                      let range, CFGetTypeID(range) == AXValueGetTypeID() else { return nil }
+                var previousLine = CFRange()
+                guard AXValueGetValue(unsafeBitCast(range, to: AXValue.self), .cfRange, &previousLine) else { return nil }
+                if previousLine.length > 1,
+                   let start = CursorAvatarPlacement.caretBounds(at: previousLine.location, characterCount: characterCount, read: readBounds) {
+                    return start
+                }
+            }
+            return nil
         })
         guard let rect else { return nil }
         let converted = CursorAvatarPlacement.caretToAppKit(rect, primaryTop: primary.frame.maxY)

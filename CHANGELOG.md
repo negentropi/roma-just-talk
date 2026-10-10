@@ -5,6 +5,7 @@
 - Added tiny animated Cartoon, Disney, and Anime characters perched directly on the pointer or blinking text caret, an onboarding choice, and clear ready, working, and failure cues. None keeps a compact status cue.
 - Kept one cursor character visible while idle, attached to the caret throughout editing or the pointer otherwise, without a timed handoff.
 - Kept the cursor character attached to native text fields, including empty fields and trailing new lines.
+- Kept the character at TextEdit's caret on Sonoma when the editor reports zero-height insertion bounds.
 - Kept a visible microphone failure warning when all audio inputs disconnect during recording.
 
 - Trimmed repeated correction markers after repeated cursor context.

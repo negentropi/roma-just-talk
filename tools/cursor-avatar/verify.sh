@@ -54,6 +54,23 @@ if ! /usr/bin/grep -q 'native character feet must touch the drawn insertion care
     exit 1
 fi
 "$output/verify-caret"
+known_bad_zero_caret=616b0ec4fcb69ba6e4fc28540e0ec2a519abc62b
+if ! git -C "$root" cat-file -e "$known_bad_zero_caret^{commit}" 2>/dev/null; then
+    git -C "$root" fetch --no-tags --depth=1 origin "$known_bad_zero_caret"
+fi
+git -C "$root" show "$known_bad_zero_caret:VoiceInk/Views/Recorder/CursorAvatarController.swift" > "$output/old-zero-caret-controller.swift"
+swiftc -D ZERO_CARET_BASELINE "$root/VoiceInk/Views/Recorder/CursorAvatarView.swift" "$output/old-zero-caret-controller.swift" "$root/tools/cursor-avatar/verify-sonoma-caret.swift" -o "$output/old-verify-zero-caret"
+if "$output/old-verify-zero-caret" > "$output/old-zero-caret.log" 2>&1; then
+    echo "FAIL: zero-height TextEdit caret passed the drawn-caret regression"
+    exit 1
+fi
+if ! /usr/bin/grep -q 'Sonoma zero-height caret must stay at the drawn insertion point' "$output/old-zero-caret.log"; then
+    echo "FAIL: baseline did not fail at the zero-height caret boundary"
+    cat "$output/old-zero-caret.log"
+    exit 1
+fi
+swiftc "$root/VoiceInk/Views/Recorder/CursorAvatarView.swift" "$root/VoiceInk/Views/Recorder/CursorAvatarController.swift" "$root/tools/cursor-avatar/verify-sonoma-caret.swift" -o "$output/verify-zero-caret"
+"$output/verify-zero-caret"
 known_bad_character_bounds=a34ae42cd3671de28ec8e80ea0fea63ccaa9de6c
 if ! git -C "$root" cat-file -e "$known_bad_character_bounds^{commit}" 2>/dev/null; then
     git -C "$root" fetch --no-tags --depth=1 origin "$known_bad_character_bounds"

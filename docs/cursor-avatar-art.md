@@ -10,6 +10,8 @@ Empty AppKit text ranges can sit one line above the drawn insertion point. The a
 
 At document end, the adapter uses the element's character count to avoid an out-of-range character query. TextEdit can accept that query and return empty-range geometry instead of rejecting it.
 
+Sonoma TextEdit can instead return a successful zero-height insertion rectangle. The adapter uses adjoining character edges to recover left-to-right and right-to-left insertion positions. Uniform paragraphs use a preceding line's insertion start for a trailing newline. A completely empty editor, an ambiguous bidirectional boundary, or an isolated glyph that exposes neither caret geometry nor insertion direction still has no reliable insertion position; the companion follows the pointer until the editor exposes usable geometry. Paragraph formatting changes are not qualified by the neighboring-line fallback.
+
 The built-in image generation tool produced one transparent 2 by 2 sprite sheet per style. Equal-cell extraction and downsampling preserve transparency. No existing film or anime character is depicted.
 
 The generation prompts used these character descriptions.

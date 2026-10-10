@@ -491,7 +491,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
             if transcription.transcriptionStatus == TranscriptionStatus.failed.rawValue {
                 recorderUIManager?.showCaptureFeedback(.failed("Transcription failed. Retry from History."))
             } else {
-                recorderUIManager?.showCaptureFeedback(.hidden)
+                recorderUIManager?.showCaptureFeedback(.idle)
             }
         }
         if didFinishActivePipeline {
@@ -518,7 +518,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
         isStoppingCapture = true
         defer { isStoppingCapture = false }
         clearCaptureCallbacks()
-        recorderUIManager?.showCaptureFeedback(.hidden)
+        recorderUIManager?.showCaptureFeedback(.idle)
 
         let shouldFinishSessionImmediately: Bool
         switch recordingState {
@@ -549,7 +549,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
         defer { isStoppingCapture = false }
         cancelCurrentSession()
         clearCaptureCallbacks()
-        recorderUIManager?.showCaptureFeedback(.hidden)
+        recorderUIManager?.showCaptureFeedback(.idle)
         activeRecordingStartID = nil
         activePipelineTranscriptionID = nil
         canceledPipelineTranscriptionIDs.removeAll()

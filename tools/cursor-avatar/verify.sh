@@ -4,12 +4,13 @@ root="$(cd "$(dirname "$0")/../.." && pwd)"
 output="${1:-/tmp/rjt-cursor-avatar-proof}"
 mkdir -p "$output"
 swiftc "$root/VoiceInk/Transcription/Engine/CaptureReadiness.swift" "$root/VoiceInk/Views/Recorder/CursorAvatarView.swift" "$root/VoiceInk/Views/Recorder/CursorAvatarController.swift" "$root/tools/cursor-avatar/verify.swift" -o "$output/verify"
+# Normalize the internal feedback rename only; retain known-bad behavior.
 known_bad_attachment=4fe24ff70a04b132064c3142f00dea53eaf48bae
 if ! git -C "$root" cat-file -e "$known_bad_attachment^{commit}" 2>/dev/null; then
     git -C "$root" fetch --no-tags --depth=1 origin "$known_bad_attachment"
 fi
-git -C "$root" show "$known_bad_attachment:VoiceInk/Views/Recorder/CursorAvatarView.swift" > "$output/old-view.swift"
-git -C "$root" show "$known_bad_attachment:VoiceInk/Views/Recorder/CursorAvatarController.swift" > "$output/old-controller.swift"
+git -C "$root" show "$known_bad_attachment:VoiceInk/Views/Recorder/CursorAvatarView.swift" | sed -e 's/\.hidden/\.idle/g' -e 's/case hidden,/case idle,/' > "$output/old-view.swift"
+git -C "$root" show "$known_bad_attachment:VoiceInk/Views/Recorder/CursorAvatarController.swift" | sed -e 's/\.hidden/\.idle/g' -e 's/case hidden,/case idle,/' > "$output/old-controller.swift"
 swiftc "$root/VoiceInk/Transcription/Engine/CaptureReadiness.swift" "$output/old-view.swift" "$output/old-controller.swift" "$root/tools/cursor-avatar/verify.swift" -o "$output/old-verify"
 if "$output/old-verify" > "$output/old-attachment.log" 2>&1; then
     echo "FAIL: detached avatar passed the attachment regression"
@@ -21,12 +22,27 @@ if ! /usr/bin/grep -q 'character feet touch the pointer hotspot without a gap' "
     exit 1
 fi
 "$output/verify"
+known_bad_timing=ea5ad76f181a959ade7ec37ee8f3fd7ff3909b03
+if ! git -C "$root" cat-file -e "$known_bad_timing^{commit}" 2>/dev/null; then
+    git -C "$root" fetch --no-tags --depth=1 origin "$known_bad_timing"
+fi
+git -C "$root" show "$known_bad_timing:VoiceInk/Views/Recorder/CursorAvatarController.swift" | sed 's/\.hidden/\.idle/g' > "$output/old-timing-controller.swift"
+swiftc "$root/VoiceInk/Transcription/Engine/CaptureReadiness.swift" "$root/VoiceInk/Views/Recorder/CursorAvatarView.swift" "$output/old-timing-controller.swift" "$root/tools/cursor-avatar/verify.swift" -o "$output/old-verify-timing"
+if "$output/old-verify-timing" > "$output/old-timing.log" 2>&1; then
+    echo "FAIL: disappearing idle companion passed the persistent companion regression"
+    exit 1
+fi
+if ! /usr/bin/grep -q 'new activation clears the warning while keeping the idle companion attached' "$output/old-timing.log"; then
+    echo "FAIL: timing baseline did not fail at the idle visibility boundary"
+    cat "$output/old-timing.log"
+    exit 1
+fi
 swiftc "$root/VoiceInk/Views/Recorder/CursorAvatarView.swift" "$root/VoiceInk/Views/Recorder/CursorAvatarController.swift" "$root/tools/cursor-avatar/verify-caret.swift" -o "$output/verify-caret"
 known_bad_caret=a1fc169df63e14fb8a4eabbf7b0b6ec42b8ad967
 if ! git -C "$root" cat-file -e "$known_bad_caret^{commit}" 2>/dev/null; then
     git -C "$root" fetch --no-tags --depth=1 origin "$known_bad_caret"
 fi
-git -C "$root" show "$known_bad_caret:VoiceInk/Views/Recorder/CursorAvatarController.swift" > "$output/old-caret-controller.swift"
+git -C "$root" show "$known_bad_caret:VoiceInk/Views/Recorder/CursorAvatarController.swift" | sed -e 's/\.hidden/\.idle/g' -e 's/case hidden,/case idle,/' > "$output/old-caret-controller.swift"
 swiftc -D RAW_CARET_BASELINE "$root/VoiceInk/Views/Recorder/CursorAvatarView.swift" "$output/old-caret-controller.swift" "$root/tools/cursor-avatar/verify-caret.swift" -o "$output/old-verify-caret"
 if "$output/old-verify-caret" > "$output/old-native-caret.log" 2>&1; then
     echo "FAIL: raw empty-range bounds passed the drawn-caret regression; environment does not reproduce the bug"
@@ -42,7 +58,7 @@ known_bad_character_bounds=a34ae42cd3671de28ec8e80ea0fea63ccaa9de6c
 if ! git -C "$root" cat-file -e "$known_bad_character_bounds^{commit}" 2>/dev/null; then
     git -C "$root" fetch --no-tags --depth=1 origin "$known_bad_character_bounds"
 fi
-git -C "$root" show "$known_bad_character_bounds:VoiceInk/Views/Recorder/CursorAvatarController.swift" > "$output/old-character-controller.swift"
+git -C "$root" show "$known_bad_character_bounds:VoiceInk/Views/Recorder/CursorAvatarController.swift" | sed -e 's/\.hidden/\.idle/g' -e 's/case hidden,/case idle,/' > "$output/old-character-controller.swift"
 swiftc -D UNBOUNDED_CHARACTER_BASELINE "$root/VoiceInk/Views/Recorder/CursorAvatarView.swift" "$output/old-character-controller.swift" "$root/tools/cursor-avatar/verify-caret.swift" -o "$output/old-verify-character"
 if "$output/old-verify-character" > "$output/old-character-bounds.log" 2>&1; then
     echo "FAIL: out-of-range character query passed the document-end regression"

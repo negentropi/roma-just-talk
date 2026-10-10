@@ -64,6 +64,7 @@ class RecorderUIManager: ObservableObject {
             .throttle(for: .milliseconds(100), scheduler: RunLoop.main, latest: true)
             .sink { [weak self] meter in self?.cursorAvatar.updateLevel(meter.averagePower) }
         setupNotifications()
+        cursorAvatar.update(.idle)
     }
 
     // MARK: - Recorder Panel Management
@@ -166,7 +167,7 @@ class RecorderUIManager: ObservableObject {
         hideRecorderPanel()
         isMiniRecorderVisible = false
         isRecorderSessionActive = false
-        cursorAvatar.update(.hidden)
+        cursorAvatar.update(.idle)
 
         logger.notice("dismissMiniRecorder completed")
     }
@@ -179,7 +180,7 @@ class RecorderUIManager: ObservableObject {
         isMiniRecorderVisible = false
         isRecorderSessionActive = false
         miniRecorderError = nil
-        cursorAvatar.hide()
+        cursorAvatar.update(.idle)
     }
 
     func cancelRecording() async {

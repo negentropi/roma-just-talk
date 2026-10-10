@@ -44,29 +44,17 @@ final class CursorAvatarController {
     private var panel: NSPanel?
     private var timer: Timer?
     private var preferences: AnyCancellable?
-    private var feedback: CaptureFeedback = .hidden
+    private var feedback: CaptureFeedback = .idle
     private let presentation = CursorAvatarPresentation()
-    private var readyDismissal: Task<Void, Never>?
     private var lastCaretCheck = Date.distantPast
     private var cachedCaret: CGRect?
-    private var lastMouse = CGPoint.zero
-    private var lastMouseMovement = Date.distantPast
 
     func update(_ feedback: CaptureFeedback, level: Double = 0) {
         presentation.level = level
-        if self.feedback.isFailure, feedback == .hidden || feedback == .ready { return }
+        if self.feedback.isFailure, feedback == .idle || feedback == .ready { return }
         if feedback != self.feedback {
-            readyDismissal?.cancel()
             self.feedback = feedback
-            if feedback == .ready {
-                readyDismissal = Task { [weak self] in
-                    try? await Task.sleep(for: .seconds(2))
-                    guard !Task.isCancelled else { return }
-                    self?.hide()
-                }
-            }
         }
-        guard feedback != .hidden else { hide(); return }
         if panel == nil {
             let panel = NSPanel(contentRect: .zero, styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false)
             panel.isOpaque = false
@@ -97,9 +85,7 @@ final class CursorAvatarController {
     }
 
     func hide() {
-        feedback = .hidden
-        readyDismissal?.cancel()
-        readyDismissal = nil
+        feedback = .idle
         timer?.invalidate()
         timer = nil
         cachedCaret = nil
@@ -110,7 +96,6 @@ final class CursorAvatarController {
     }
 
     private func render() {
-        guard feedback != .hidden else { return }
         let style = CursorAvatarStyle(rawValue: UserDefaults.standard.string(forKey: CursorAvatarStyle.defaultsKey) ?? "") ?? .cartoon
         presentation.style = style
         presentation.feedback = feedback
@@ -120,15 +105,12 @@ final class CursorAvatarController {
     private func position() {
         guard let panel else { return }
         let mouse = NSEvent.mouseLocation
-        if mouse != lastMouse {
-            lastMouse = mouse
-            lastMouseMovement = Date()
-        }
         if Date().timeIntervalSince(lastCaretCheck) >= 0.1 {
             cachedCaret = caretAnchor()
             lastCaretCheck = Date()
         }
-        let anchor = Date().timeIntervalSince(lastMouseMovement) >= 0.8 ? (cachedCaret ?? CGRect(origin: mouse, size: .zero)) : CGRect(origin: mouse, size: .zero)
+        // Focused insertion geometry owns the companion throughout editing.
+        let anchor = cachedCaret ?? CGRect(origin: mouse, size: .zero)
         guard let screen = NSScreen.screens.first(where: { $0.frame.contains(CGPoint(x: anchor.midX, y: anchor.midY)) }) ?? NSScreen.main else { return }
         presentation.trailingAttachment = feedback.isFailure && anchor.minX - 16 + panel.frame.width > screen.visibleFrame.maxX
         let frame = CursorAvatarPlacement.frame(anchor: anchor, size: panel.frame.size, screen: screen.visibleFrame)

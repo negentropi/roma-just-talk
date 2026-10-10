@@ -4,7 +4,7 @@ The cursor companion uses original generated character art. Each style has five 
 
 Assets live in `VoiceInk/Assets.xcassets/CursorAvatar-{style}-{pose}.imageset`. Each image is at most 384 pixels wide or tall. The renderer supplies motion and status labels.
 
-Runtime artwork is 32 points square. Its bottom center touches the pointer hotspot or the top of the insertion caret, with no detached panel gap. Normal feedback uses a 12-point badge rather than a caption. Failures keep a readable instruction beside the attachment and flip left near the display's right edge. Mouse tracking runs at 30 Hz; accessibility caret queries stay at 10 Hz. Nonempty text selections use the pointer instead of treating the selection rectangle as a caret.
+One companion remains visible while RJT runs, including idle and ready states. A focused insertion caret owns its position throughout editing; there is no timed handoff from the mouse. Otherwise it follows the pointer. Runtime artwork is 32 points square. Its bottom center touches the pointer hotspot or the top of the insertion caret, with no detached panel gap. Normal feedback uses a 12-point badge rather than a caption. Failures keep a readable instruction beside the attachment and flip left near the display's right edge. Mouse tracking runs at 30 Hz; accessibility caret queries stay at 10 Hz. Nonempty text selections use the pointer instead of treating the selection rectangle as a caret.
 
 Empty AppKit text ranges can sit one line above the drawn insertion point. The accessibility adapter compares empty and character bounds on the same text element before correcting that offset. Editors whose bounds already align keep their original caret position.
 
@@ -20,4 +20,4 @@ The generation prompts used these character descriptions.
 
 All prompts requested the same character and scale across four full-body perched poses. The greeting waves, the listening pose holds a hand to an ear, the working pose thinks beside a sparkle, and the worried pose has an orange exclamation mark. The background is transparent. No cursor, logo, or lettering is drawn into the art.
 
-A follow-up image edit closed the listening character's eyes while preserving its pose, clothing, scale, and transparent background. The renderer crossfades the greeting for 900 milliseconds, blinks every 4.3 seconds, and adds subtle breathing, audio response, and working motion. Reduced Motion keeps the character still.
+A follow-up image edit closed the listening character's eyes while preserving its pose, clothing, scale, and transparent background. The renderer crossfades the greeting for 900 milliseconds, blinks every 4.3 seconds, and adds subtle breathing, audio response, and working motion around a fixed foot attachment. The character does not bob away from the cursor. Reduced Motion keeps the character still.

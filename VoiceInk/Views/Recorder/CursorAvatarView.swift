@@ -8,10 +8,10 @@ enum CursorAvatarStyle: String, CaseIterable, Identifiable {
 }
 
 enum CaptureFeedback: Equatable {
-    case hidden, starting, ready, listening, working, failed(String)
+    case idle, starting, ready, listening, working, failed(String)
     var label: String {
         switch self {
-        case .hidden: return ""
+        case .idle: return "Idle"
         case .starting: return "Getting ready…"
         case .ready: return "Ready to capture"
         case .listening: return "Listening"
@@ -21,7 +21,8 @@ enum CaptureFeedback: Equatable {
     }
     var pose: String {
         switch self {
-        case .hidden, .starting: return "greeting"
+        case .idle: return "listening"
+        case .starting: return "greeting"
         case .ready, .listening: return "listening"
         case .working: return "working"
         case .failed: return "worried"
@@ -40,7 +41,7 @@ struct CursorAvatarView: View {
     var listeningElapsedOverride: TimeInterval? = nil
     var trailingAttachment = false
     var attachmentOffset: CGSize = .zero
-    @State private var listeningBegan = Date.distantPast
+    @State private var poseBegan = Date()
     private var reduceMotion: Bool { reducedMotionOverride ?? systemReduceMotion }
 
     var body: some View {
@@ -78,18 +79,15 @@ struct CursorAvatarView: View {
         .frame(width: feedback.isFailure ? 224 : 40, height: feedback.isFailure ? 90 : 36, alignment: .topLeading)
         .accessibilityElement(children: .combine)
         .accessibilityLabel("RJT \(feedback.label)")
-        .onAppear { if feedback == .listening { listeningBegan = Date() } }
-        .onChange(of: feedback) { _, next in
-            if next == .listening { listeningBegan = Date() }
-        }
+        .onChange(of: feedback) { _, _ in poseBegan = Date() }
     }
 
     private func artwork(at date: Date) -> some View {
         let time = date.timeIntervalSinceReferenceDate
         let wave = reduceMotion ? 0 : sin(time * (feedback == .working ? 4 : 2))
-        let elapsed = listeningElapsedOverride ?? max(0, date.timeIntervalSince(listeningBegan))
+        let elapsed = listeningElapsedOverride ?? max(0, date.timeIntervalSince(poseBegan))
         let greeting = feedback == .listening && !reduceMotion ? max(0, 1 - elapsed / 0.9) : 0
-        let blink = feedback == .listening && !reduceMotion && elapsed > 1 && elapsed.truncatingRemainder(dividingBy: 4.3) < 0.16
+        let blink = (feedback == .idle || feedback == .ready || feedback == .listening) && !reduceMotion && elapsed > 1 && elapsed.truncatingRemainder(dividingBy: 4.3) < 0.16
         return ZStack {
             artworkImage(blink ? "listening-blink" : feedback.pose).opacity(1 - greeting)
             if greeting > 0 { artworkImage("greeting").opacity(greeting) }
@@ -97,12 +95,12 @@ struct CursorAvatarView: View {
         .frame(width: 32, height: 32)
         .scaleEffect(reduceMotion ? 1 : 1 + wave * 0.012 + (feedback == .listening ? min(level, 1) * 0.035 : 0), anchor: .bottom)
         .rotationEffect(.degrees(greeting > 0 ? sin(elapsed * 12) * greeting * 6 : (feedback == .working ? wave * 3 : 0)), anchor: .bottom)
-        .offset(y: wave * 0.4)
     }
 
     private var statusSymbol: String {
         switch feedback {
-        case .hidden, .starting: return "ellipsis"
+        case .idle: return "moon.fill"
+        case .starting: return "ellipsis"
         case .ready: return "checkmark"
         case .listening: return "mic.fill"
         case .working: return "hourglass"
@@ -112,6 +110,7 @@ struct CursorAvatarView: View {
 
     private var statusColor: Color {
         switch feedback {
+        case .idle: return .gray
         case .failed: return .orange
         case .ready, .listening: return .green
         default: return .blue
@@ -161,7 +160,7 @@ struct CursorAvatarPicker: View {
 @MainActor
 final class CursorAvatarPresentation: ObservableObject {
     @Published var style: CursorAvatarStyle = .cartoon
-    @Published var feedback: CaptureFeedback = .hidden
+    @Published var feedback: CaptureFeedback = .idle
     @Published var level: Double = 0
     @Published var trailingAttachment = false
     @Published var attachmentOffset: CGSize = .zero

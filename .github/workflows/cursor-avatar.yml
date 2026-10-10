@@ -43,10 +43,12 @@ jobs:
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO DEVELOPMENT_TEAM="" \
             SWIFT_ACTIVE_COMPILATION_CONDITIONS='$(inherited) LOCAL_BUILD' \
             build > "$RUNNER_TEMP/cursor-avatar-build.log" 2>&1
+      - name: Archive app with executable permissions and framework links
+        run: ditto -c -k --keepParent "$RUNNER_TEMP/cursor-avatar-build/Build/Products/Debug/VoiceInk.app" "$RUNNER_TEMP/cursor-avatar-app.zip"
       - uses: actions/upload-artifact@v4
         with:
           name: cursor-avatar-app
-          path: ${{ runner.temp }}/cursor-avatar-build/Build/Products/Debug/VoiceInk.app
+          path: ${{ runner.temp }}/cursor-avatar-app.zip
           if-no-files-found: error
       - uses: actions/upload-artifact@v4
         if: always()

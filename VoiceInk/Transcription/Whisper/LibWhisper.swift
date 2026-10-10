@@ -1,4 +1,5 @@
 import Foundation
+import Metal
 #if canImport(whisper)
 import whisper
 #else
@@ -127,8 +128,10 @@ actor WhisperContext {
         params.use_gpu = false
         logger.info("Running on the simulator, using CPU")
         #else
-        params.flash_attn = true // Enable flash attention for Metal
-        logger.info("Flash attention enabled for Metal")
+        // Intel VMs can expose a Metal backend without an allocatable GPU device.
+        params.use_gpu = MTLCreateSystemDefaultDevice() != nil
+        params.flash_attn = params.use_gpu
+        logger.info("Whisper GPU acceleration: \(params.use_gpu, privacy: .public)")
         #endif
         
         let context = whisper_init_from_file_with_params(path, params)

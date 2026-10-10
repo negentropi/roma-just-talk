@@ -52,6 +52,8 @@ The Makefile automatically:
 
 This approach ensures consistent builds across different machines and eliminates manual framework setup errors.
 
+Whisper uses Metal when macOS exposes a GPU device. Macs and virtual machines without a Metal device use the CPU for model loading and transcription.
+
 ---
 
 ## Building for Local Use (No Apple Developer Certificate)
@@ -136,4 +138,4 @@ If you encounter any build issues:
 4. Verify all dependencies are properly installed
 5. Make sure whisper.xcframework is properly built and linked
 
-For more help, please check the [issues](https://github.com/Beingpax/VoiceInk/issues) section or create a new issue. 
+For more help, please check the [issues](https://github.com/Beingpax/VoiceInk/issues) section or create a new issue.

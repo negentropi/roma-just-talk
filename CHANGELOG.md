@@ -7,6 +7,7 @@
 - Kept the cursor character attached to native text fields, including empty fields and trailing new lines.
 - Kept the character at TextEdit's caret on Sonoma when the editor reports zero-height insertion bounds.
 - Kept a visible microphone failure warning when all audio inputs disconnect during recording.
+- Used CPU transcription on Macs without a Metal device, avoiding a crash during model loading.
 
 - Trimmed repeated correction markers after repeated cursor context.
 - Trimmed "I was trying to say is" correction lead-ins after repeated cursor context.

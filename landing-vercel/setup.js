@@ -2,7 +2,7 @@
   const command = '/usr/bin/xattr -dr com.apple.quarantine "/Applications/roma just talk.app" && /usr/bin/open "/Applications/roma just talk.app"';
   const prompt = `Help me set up the early beta of Roma Just Talk on my Mac. I downloaded it from https://github.com/negentropi/roma-just-talk/releases. It has no Apple Developer ID signature and is not notarized.
 
-Find the downloaded app and verify its version and archive checksum against the release notes. Verify its bundle ID against that release's source: v1.95 uses com.prakashjoshipax.VoiceInk; v1.95.1 uses com.negentropi.RomaJustTalk. Move that exact app to Applications without overwriting an existing installation or deleting my data. If there are multiple builds, help me choose the intended one.
+Find the downloaded app and verify its version and archive checksum against the release notes. Verify its bundle ID against that release's source: v1.95 uses the inherited com.prakashjoshipax.VoiceInk; v1.95.1 and later use com.negentropi.RomaJustTalk. Move that exact app to Applications without overwriting an existing installation or deleting my data. If there are multiple builds, help me choose the intended one.
 
 Explain that removing com.apple.quarantine skips the downloaded-app Gatekeeper check for this app; it does not make it Apple-approved. After I choose to trust this download, remove only that attribute recursively from the exact app bundle, then open it. Do not disable Gatekeeper globally, re-sign the app, change its bundle ID, reset TCC, or ask for my password.
 

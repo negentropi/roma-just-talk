@@ -708,8 +708,6 @@ public enum VoiceInkHelpResourceKind: String, Equatable, Hashable, Sendable {
     case changelog
     case website
     case commonIssues
-    case recommendedModels
-    case videoGuides
     case documentation
     case supportEmail
 }
@@ -741,52 +739,9 @@ public struct VoiceInkHelpResourcePresentation: Equatable, Sendable, Identifiabl
 public enum VoiceInkHelpResourcesPresentation {
     public static let title = "Help & Resources"
     public static let externalLinkSystemImageName = "arrow.up.right"
-    public static let recommendedModelsURLString = "https://tryvoiceink.com/recommended-models"
-    public static let videoGuidesURLString = "https://www.youtube.com/@tryvoiceink/videos"
-    public static let documentationURLString = "https://tryvoiceink.com/docs"
-
-    public static var resources: [VoiceInkHelpResourcePresentation] {
-        [
-            VoiceInkHelpResourcePresentation(
-                id: .recommendedModels,
-                systemImageName: "sparkles",
-                title: "Recommended Models",
-                destination: .url(URL(string: recommendedModelsURLString)!)
-            ),
-            VoiceInkHelpResourcePresentation(
-                id: .videoGuides,
-                systemImageName: "video.fill",
-                title: "YouTube Videos & Guides",
-                destination: .url(URL(string: videoGuidesURLString)!)
-            ),
-            VoiceInkHelpResourcePresentation(
-                id: .documentation,
-                systemImageName: "book.fill",
-                title: "Documentation",
-                destination: .url(URL(string: documentationURLString)!)
-            ),
-            VoiceInkHelpResourcePresentation(
-                id: .supportEmail,
-                systemImageName: "exclamationmark.bubble.fill",
-                title: "Feedback or Issues?",
-                destination: .supportEmail
-            )
-        ]
-    }
-}
-
-public enum VoiceInkAboutSupportPresentation {
-    public static let title = "About & Support"
-    public static let productName = "Roma Just Talk"
-    public static let subtitle = "Release notes, documentation, and support for Roma Just Talk."
-    public static let resourcesTitle = "Resources"
     public static let changelogURLString = "https://github.com/negentropi/roma-just-talk/releases"
     public static let websiteURLString = "https://roma-just-talk.com"
     public static let documentationURLString = "https://roma-just-talk.com/readme"
-
-    public static func versionText(_ version: String) -> String {
-        "Version \(version)"
-    }
 
     public static var resources: [VoiceInkHelpResourcePresentation] {
         [
@@ -810,10 +765,20 @@ public enum VoiceInkAboutSupportPresentation {
             ),
             VoiceInkHelpResourcePresentation(
                 id: .supportEmail,
-                systemImageName: "envelope.fill",
-                title: "Email Support",
+                systemImageName: "exclamationmark.bubble.fill",
+                title: "Feedback or Issues?",
                 destination: .supportEmail
             )
         ]
+    }
+}
+
+public enum VoiceInkAboutSupportPresentation {
+    public static let productName = "Roma Just Talk"
+    public static let subtitle = "Release notes, documentation, and support for Roma Just Talk."
+    public static let resourcesTitle = "Resources"
+
+    public static func versionText(_ version: String) -> String {
+        "Version \(version)"
     }
 }

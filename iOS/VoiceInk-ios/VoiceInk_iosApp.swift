@@ -17,16 +17,12 @@ struct VoiceInk_iosApp: App {
     @State private var launchRecordingRequestState = VoiceInkLaunchRecordingRequestState()
     @StateObject private var recordingManager = RecordingManager()
     @StateObject private var modelPrewarmService = IOSModelPrewarmService.shared
-    @StateObject private var announcementsStore = IOSAnnouncementsStore.shared
-    @AppStorage(VoiceInkAnnouncementPreference.isEnabledKey)
-    private var announcementsEnabled = VoiceInkAnnouncementPreference.defaultIsEnabled
     
     init() {
         VoiceInkDefaultSettings.iOS.registerUserDefaults()
         UserDefaults.standard.register(
             defaults: VoiceInkPlatformAudioInputPolicy.registeredDefaults(for: .iOS)
         )
-        UserDefaults.standard.register(defaults: VoiceInkAnnouncementPreference.registeredDefaults)
         VoiceInkStartupPreferenceMigration.migrateLegacyPreferences(for: .iOS)
 
         // Clear any stale recording state on app launch
@@ -82,25 +78,6 @@ struct VoiceInk_iosApp: App {
                         }
                     }
                 }
-            }
-            .overlay(alignment: .top) {
-                if hasCompletedOnboarding,
-                   let announcement = announcementsStore.currentAnnouncement {
-                    IOSAnnouncementBannerView(
-                        presentation: announcement,
-                        onDismiss: announcementsStore.dismissCurrentAnnouncement
-                    )
-                    .transition(.move(edge: .top).combined(with: .opacity))
-                    .zIndex(1)
-                }
-            }
-            .task {
-                if announcementsEnabled {
-                    announcementsStore.start()
-                }
-            }
-            .onChange(of: announcementsEnabled) { _, enabled in
-                announcementsStore.setEnabled(enabled)
             }
             .onChange(of: scenePhase) { _, phase in
                 switch phase {

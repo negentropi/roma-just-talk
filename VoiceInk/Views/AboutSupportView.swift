@@ -29,7 +29,7 @@ struct AboutSupportView: View {
                     Text(VoiceInkAboutSupportPresentation.resourcesTitle)
                         .font(.headline)
 
-                    ForEach(VoiceInkAboutSupportPresentation.resources) { resource in
+                    ForEach(VoiceInkHelpResourcesPresentation.resources) { resource in
                         Button {
                             open(resource.destination)
                         } label: {

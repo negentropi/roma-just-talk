@@ -27,7 +27,6 @@ struct VoiceInkApp: App {
     @StateObject private var enhancementService: AIEnhancementService
     @StateObject private var activeWindowService = ActiveWindowService.shared
     @AppStorage(VoiceInkUserDefaultsKey.hasCompletedOnboarding) private var hasCompletedOnboarding = false
-    @AppStorage(VoiceInkAnnouncementPreference.isEnabledKey) private var enableAnnouncements = VoiceInkAnnouncementPreference.defaultIsEnabled
     @AppStorage(VoiceInkMenuBarPreference.showMenuBarIconKey) private var showMenuBarIcon = VoiceInkMenuBarPreference.defaultShowMenuBarIcon
 
     // Audio cleanup manager for automatic deletion of old audio files
@@ -320,10 +319,6 @@ struct VoiceInkApp: App {
                             return
                         }
 
-                        if enableAnnouncements {
-                            AnnouncementsService.shared.start()
-                        }
-
                         // Start the automatic audio cleanup process only if transcript cleanup is not enabled
                         if !VoiceInkTranscriptionAutoCleanupPreference.isEnabled() {
                             audioCleanupManager.startAutomaticCleanup(modelContext: container.mainContext)
@@ -350,7 +345,6 @@ struct VoiceInkApp: App {
                         WindowManager.shared.configureWindow(window)
                     })
                     .onDisappear {
-                        AnnouncementsService.shared.stop()
                         whisperModelManager.unloadModel()
 
                         // Stop the automatic audio cleanup process

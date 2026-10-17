@@ -52,7 +52,6 @@ public enum VoiceInkUserDefaultsKey {
     public static let customProviderModel = "customProviderModel"
     public static let showMenuBarIcon = "ShowMenuBarIcon"
     public static let legacyIsMenuBarOnly = "IsMenuBarOnly"
-    public static let enableAnnouncements = "enableAnnouncements"
     public static let didApplyLaunchAtLoginDefault = "DidApplyLaunchAtLoginDefault"
 
     public static func selectedAIProviderModel(_ providerRawValue: String) -> String {
@@ -84,7 +83,6 @@ public enum VoiceInkPreferenceDefault {
     public static let macOSSelectedTranscriptionLanguage = "en"
     public static let showMenuBarIcon = false
     public static let showDockIcon = false
-    public static let enableAnnouncements = true
     public static let didApplyLaunchAtLoginDefault = false
 }
 
@@ -1442,7 +1440,6 @@ public struct VoiceInkMacOSSettingsPresentation: Equatable, Sendable {
     public let hideVisibilityValueTitle: String
     public let launchAtLoginTitle: String
     public let autoCheckUpdatesTitle: String
-    public let showAnnouncementsTitle: String
     public let checkForUpdatesButtonTitle: String
     public let privacySectionTitle: String
     public let privacyFooterText: String
@@ -1462,7 +1459,6 @@ public struct VoiceInkMacOSSettingsPresentation: Equatable, Sendable {
         hideVisibilityValueTitle: "Hide",
         launchAtLoginTitle: "Launch at Login",
         autoCheckUpdatesTitle: "Auto-check Updates",
-        showAnnouncementsTitle: "Show Announcements",
         checkForUpdatesButtonTitle: "Check for Updates",
         privacySectionTitle: "Privacy",
         privacyFooterText: "Control how VoiceInk handles your transcription data and audio recordings.",

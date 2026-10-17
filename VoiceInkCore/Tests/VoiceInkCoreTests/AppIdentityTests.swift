@@ -428,7 +428,6 @@ final class AppIdentityTests: XCTestCase {
             generated: "June 24, 2026 at 3:42:11 PM",
             appVersion: "1.2.3",
             buildVersion: "456",
-            licenseStatus: "Licensed (Pro)",
             operatingSystemVersion: "Version 26.0",
             deviceModel: "Mac16,1",
             cpu: "Apple M4 Pro",
@@ -487,8 +486,6 @@ final class AppIdentityTests: XCTestCase {
         XCTAssertEqual(VoiceInkMacOSLogCategory.menuBarManager, "MenuBarManager")
         XCTAssertEqual(VoiceInkMacOSLogCategory.apiKeyManager, "APIKeyManager")
         XCTAssertEqual(VoiceInkMacOSLogCategory.keychainService, "KeychainService")
-        XCTAssertEqual(VoiceInkMacOSLogCategory.polarService, "PolarService")
-        XCTAssertEqual(VoiceInkMacOSLogCategory.licenseViewModel, "LicenseViewModel")
         XCTAssertEqual(VoiceInkMacOSLogCategory.aiEnhancementService, "AIEnhancementService")
         XCTAssertEqual(VoiceInkMacOSLogCategory.customCloudModelManager, "CustomCloudModelManager")
         XCTAssertEqual(VoiceInkMacOSLogCategory.transcriptionAutoCleanupService, "TranscriptionAutoCleanupService")
@@ -565,7 +562,6 @@ final class AppIdentityTests: XCTestCase {
             [
                 "Settings",
                 "AI Models",
-                "VoiceInk Pro",
                 "History",
                 "Permissions",
                 "Enhancement",
@@ -598,10 +594,6 @@ final class AppIdentityTests: XCTestCase {
         XCTAssertEqual(VoiceInkMacOSMainViewItem.item(forNavigationDestination: "past"), .history)
         XCTAssertEqual(VoiceInkMacOSMainViewItem.item(forNavigationDestination: "style"), .enhancement)
         XCTAssertEqual(VoiceInkMacOSMainViewItem.item(forNavigationDestination: "manual stt"), .transcribeAudio)
-        XCTAssertEqual(
-            VoiceInkMacOSMainViewItem.item(forNavigationDestination: VoiceInkMacOSNavigationDestination.license.rawValue),
-            .license
-        )
         XCTAssertEqual(
             VoiceInkMacOSMainViewItem.item(forNavigationDestination: VoiceInkMacOSNavigationDestination.powerMode.rawValue),
             .powerMode

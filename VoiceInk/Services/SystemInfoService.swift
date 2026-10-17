@@ -39,7 +39,6 @@ class SystemInfoService {
             generated: VoiceInkSystemInformationReport.generatedDateText(Date()),
             appVersion: getAppVersion(),
             buildVersion: getBuildVersion(),
-            licenseStatus: getLicenseStatus(),
             operatingSystemVersion: ProcessInfo.processInfo.operatingSystemVersionString,
             deviceModel: getMacModel(),
             cpu: getCPUInfo(),
@@ -178,17 +177,6 @@ class SystemInfoService {
         }
 
         return status.displayText
-    }
-
-    private func getLicenseStatus() -> String {
-        let licenseManager = LicenseManager.shared
-
-        return VoiceInkSystemInformationLicenseStatus.status(
-            hasUsableStoredLicense: VoiceInkLicensePreference.hasUsableStoredLicense(
-                licenseKey: licenseManager.licenseKey,
-                activationId: licenseManager.activationId
-            )
-        ).displayText
     }
 
 }

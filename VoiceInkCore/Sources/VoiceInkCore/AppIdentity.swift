@@ -263,7 +263,6 @@ public struct VoiceInkMacOSStorageAlertPresentation: Equatable, Sendable {
 public enum VoiceInkMacOSNavigationDestination: String, CaseIterable, Sendable {
     case settings = "Settings"
     case aiModels = "AI Models"
-    case license = "VoiceInk Pro"
     case history = "History"
     case permissions = "Permissions"
     case enhancement = "Enhancement"
@@ -282,7 +281,7 @@ public enum VoiceInkMacOSMainViewItem: String, CaseIterable, Identifiable, Senda
     case audioInput
     case dictionary
     case settings
-    case license
+    case about
 
     public var id: String { rawValue }
 
@@ -308,8 +307,8 @@ public enum VoiceInkMacOSMainViewItem: String, CaseIterable, Identifiable, Senda
             return "Dictionary"
         case .settings:
             return "Settings"
-        case .license:
-            return "VoiceInk Pro"
+        case .about:
+            return "About & Support"
         }
     }
 
@@ -335,8 +334,8 @@ public enum VoiceInkMacOSMainViewItem: String, CaseIterable, Identifiable, Senda
             return "character.book.closed.fill"
         case .settings:
             return "gearshape.fill"
-        case .license:
-            return "checkmark.seal.fill"
+        case .about:
+            return "info.circle.fill"
         }
     }
 
@@ -355,8 +354,6 @@ public enum VoiceInkMacOSMainViewItem: String, CaseIterable, Identifiable, Senda
             return .settings
         case VoiceInkMacOSNavigationDestination.aiModels.rawValue, VoiceInkMacOSMainViewItem.models.title:
             return .models
-        case VoiceInkMacOSNavigationDestination.license.rawValue:
-            return .license
         case VoiceInkMacOSNavigationDestination.history.rawValue, VoiceInkMacOSMainViewItem.history.title:
             return .history
         case VoiceInkMacOSNavigationDestination.permissions.rawValue:
@@ -473,8 +470,6 @@ public enum VoiceInkMacOSLogCategory {
     public static let menuBarManager = "MenuBarManager"
     public static let apiKeyManager = "APIKeyManager"
     public static let keychainService = "KeychainService"
-    public static let polarService = "PolarService"
-    public static let licenseViewModel = "LicenseViewModel"
     public static let aiEnhancementService = "AIEnhancementService"
     public static let customCloudModelManager = "CustomCloudModelManager"
     public static let transcriptionAutoCleanupService = "TranscriptionAutoCleanupService"
@@ -696,7 +691,6 @@ public struct VoiceInkMacOSSystemInformationFacts: Equatable, Sendable {
     public let generated: String
     public let appVersion: String
     public let buildVersion: String
-    public let licenseStatus: String
     public let operatingSystemVersion: String
     public let deviceModel: String
     public let cpu: String
@@ -738,7 +732,6 @@ public struct VoiceInkMacOSSystemInformationFacts: Equatable, Sendable {
         generated: String,
         appVersion: String,
         buildVersion: String,
-        licenseStatus: String,
         operatingSystemVersion: String,
         deviceModel: String,
         cpu: String,
@@ -779,7 +772,6 @@ public struct VoiceInkMacOSSystemInformationFacts: Equatable, Sendable {
         self.generated = generated
         self.appVersion = appVersion
         self.buildVersion = buildVersion
-        self.licenseStatus = licenseStatus
         self.operatingSystemVersion = operatingSystemVersion
         self.deviceModel = deviceModel
         self.cpu = cpu
@@ -846,7 +838,6 @@ public enum VoiceInkSystemInformationReport {
         APP INFORMATION:
         App Version: \(facts.appVersion)
         Build Version: \(facts.buildVersion)
-        License Status: \(facts.licenseStatus)
 
         OPERATING SYSTEM:
         macOS Version: \(facts.operatingSystemVersion)
@@ -936,24 +927,6 @@ public enum VoiceInkSystemInformationPermissionStatus: Equatable, Sendable {
 
     public static func grantStatus(isGranted: Bool) -> Self {
         isGranted ? .granted : .notGranted
-    }
-}
-
-public enum VoiceInkSystemInformationLicenseStatus: Equatable, Sendable {
-    case licensedPro
-    case notLicensed
-
-    public var displayText: String {
-        switch self {
-        case .licensedPro:
-            return "Licensed (Pro)"
-        case .notLicensed:
-            return "Not Licensed"
-        }
-    }
-
-    public static func status(hasUsableStoredLicense: Bool) -> Self {
-        hasUsableStoredLicense ? .licensedPro : .notLicensed
     }
 }
 

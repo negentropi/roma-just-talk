@@ -1262,8 +1262,6 @@ public enum VoiceInkContextualCapitalizationFormatter {
 }
 
 public enum VoiceInkTranscriptionPasteOutputPolicy {
-    public static let trialExpiredPrefix = "Your trial has expired. Upgrade to VoiceInk Pro at \(VoiceInkLicenseLinks.purchaseDisplayURLString)"
-
     public struct PasteDecision: Equatable, Sendable {
         public let textToPaste: String?
         public let shouldPlayCompletionSoundWithoutPaste: Bool
@@ -1336,14 +1334,9 @@ public enum VoiceInkTranscriptionPasteOutputPolicy {
 
     public static func finalPastedText(
         _ text: String,
-        appendTrailingSpace: Bool,
-        isTrialExpired: Bool
+        appendTrailingSpace: Bool
     ) -> String {
-        let textWithLicensePrefix = isTrialExpired
-            ? "\(trialExpiredPrefix)\n\n\(text)"
-            : text
-
-        return textWithLicensePrefix + (appendTrailingSpace ? " " : "")
+        text + (appendTrailingSpace ? " " : "")
     }
 }
 

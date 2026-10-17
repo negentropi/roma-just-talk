@@ -58,16 +58,16 @@ select_runtime_smoke_fixture() {
 
 runtime_e2e_config_json() {
   local audio_directory="$1"
-  local voiceink_app="$2"
+  local roma_app="$2"
   local repetitions="$3"
   local latency_threshold="$4"
   local mode="$5"
-  local voiceink_lifecycle="${6:-reuse}"
+  local roma_lifecycle="${6:-reuse}"
 
-  case "$voiceink_lifecycle" in
+  case "$roma_lifecycle" in
     reuse|relaunchPerFixture|relaunchPerCase) ;;
     *)
-      echo "Unsupported Roma lifecycle: $voiceink_lifecycle" >&2
+      echo "Unsupported Roma lifecycle: $roma_lifecycle" >&2
       return 2
       ;;
   esac
@@ -75,18 +75,18 @@ runtime_e2e_config_json() {
   # The quick-release speech lands in pre-roll; two seconds produced empty remote transcripts.
   jq -n \
     --arg audio_directory "$audio_directory" \
-    --arg voiceink_app "$voiceink_app" \
-    --arg voiceink_build_directory "$(dirname "$voiceink_app")" \
+    --arg roma_app "$roma_app" \
+    --arg roma_build_directory "$(dirname "$roma_app")" \
     --arg config_mode "$mode" \
-    --arg voiceink_lifecycle "$voiceink_lifecycle" \
+    --arg roma_lifecycle "$roma_lifecycle" \
     --argjson repetitions "$repetitions" \
     --argjson latency_threshold "$latency_threshold" \
     '{
       audioDirectory: $audio_directory,
       audioDeviceName: "BlackHole 2ch",
-      voiceInkBundleIdentifier: "com.negentropi.RomaJustTalk",
-      voiceInkAppPath: $voiceink_app,
-      voiceInkBuildDirectory: $voiceink_build_directory,
+      romaBundleIdentifier: "com.negentropi.RomaJustTalk",
+      romaAppPath: $roma_app,
+      romaBuildDirectory: $roma_build_directory,
       audioLeadSeconds: 1.1,
       releaseTailSeconds: 0.15,
       explicitHoldSeconds: null,
@@ -109,7 +109,7 @@ runtime_e2e_config_json() {
           {id:"vscode",displayName:"Visual Studio Code",bundleIdentifier:"com.microsoft.VSCode",kind:"electron"}
         ] end),
       expectedTranscripts: {},
-      voiceInkLifecycle: $voiceink_lifecycle
+      romaLifecycle: $roma_lifecycle
     }'
 }
 
@@ -168,7 +168,7 @@ runtime_e2e_evidence_contract_json() {
         configuration: (
           $configuration
           | with_entries(select(.value != null))
-          | del(.audioDirectory, .voiceInkAppPath, .voiceInkBuildDirectory)
+          | del(.audioDirectory, .romaAppPath, .romaBuildDirectory)
         )
       }
     '

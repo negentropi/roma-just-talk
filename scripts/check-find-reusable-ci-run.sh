@@ -2,7 +2,7 @@
 set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-fixture_root="$(mktemp -d "${TMPDIR:-/tmp}/voiceink-ci-reuse.XXXXXX")"
+fixture_root="$(mktemp -d "${TMPDIR:-/tmp}/roma-ci-reuse.XXXXXX")"
 trap 'rm -rf "$fixture_root"' EXIT
 
 mkdir -p "$fixture_root/bin"
@@ -74,7 +74,7 @@ export GITHUB_REPOSITORY="owner/repository"
 export GITHUB_OUTPUT="$fixture_root/output"
 
 bash "$repo_root/scripts/find-reusable-ci-run.sh" \
-  voiceink-build.yml \
+  roma-build.yml \
   0123456789abcdef0123456789abcdef01234567 \
   app \
   proof
@@ -84,7 +84,7 @@ grep -Fxq 'run_id=202' "$GITHUB_OUTPUT"
 
 : >"$GITHUB_OUTPUT"
 bash "$repo_root/scripts/find-reusable-ci-run.sh" \
-  voiceink-build.yml \
+  roma-build.yml \
   0123456789abcdef0123456789abcdef01234567 \
   missing
 
@@ -99,7 +99,7 @@ if bash "$repo_root/scripts/find-reusable-ci-run.sh" \
 fi
 
 if bash "$repo_root/scripts/find-reusable-ci-run.sh" \
-  voiceink-build.yml \
+  roma-build.yml \
   not-a-sha >/dev/null 2>&1; then
   echo "invalid commit SHA should fail" >&2
   exit 1

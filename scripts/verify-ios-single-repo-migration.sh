@@ -4,8 +4,8 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-local_whisper_xcframework_path="${HOME}/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework"
-expected_whisper_project_path='$(HOME)/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework'
+local_whisper_xcframework_path="${HOME}/RomaJustTalk-Dependencies/whisper.cpp/build-apple/whisper.xcframework"
+expected_whisper_project_path='$(HOME)/RomaJustTalk-Dependencies/whisper.cpp/build-apple/whisper.xcframework'
 expected_app_group="group.com.negentropi.RomaJustTalk"
 
 if [[ $# -gt 0 ]]; then
@@ -204,7 +204,7 @@ project_string_count() {
   local project_file="$1"
   local needle="$2"
   local tmp
-  tmp="$(mktemp "${TMPDIR:-/tmp}/voiceink-project.XXXXXX.xml")"
+  tmp="$(mktemp "${TMPDIR:-/tmp}/roma-project.XXXXXX.xml")"
   plutil -convert xml1 -o "$tmp" "$project_file"
   xmllint --xpath "count(//string[contains(., '$needle')])" "$tmp"
   rm -f "$tmp"
@@ -290,235 +290,235 @@ if [[ "$actual_root" != "$ROOT" ]]; then
 fi
 
 section "required project directories"
-require_dir VoiceInk.xcodeproj
-require_dir VoiceInk.xcworkspace
-require_dir VoiceInkCore
-require_dir iOS/VoiceInk-ios.xcodeproj
-require_dir iOS/VoiceInk-ios
-require_dir iOS/VoiceInkKeyboard
+require_dir RomaJustTalk.xcodeproj
+require_dir RomaJustTalk.xcworkspace
+require_dir RomaCore
+require_dir iOS/RomaJustTalk-ios.xcodeproj
+require_dir iOS/RomaJustTalk-ios
+require_dir iOS/RomaKeyboard
 require_dir iOS/Shared
 
 section "required project files"
-require_file VoiceInk.xcworkspace/contents.xcworkspacedata
-require_file VoiceInk.xcworkspace/xcshareddata/xcschemes/VoiceInk-ios.xcscheme
-require_file VoiceInk.xcodeproj/project.pbxproj
-require_file VoiceInk.xcodeproj/project.xcworkspace/contents.xcworkspacedata
-require_file VoiceInk.xcodeproj/xcshareddata/xcschemes/VoiceInk.xcscheme
-require_file iOS/VoiceInk-ios.xcodeproj/project.pbxproj
-require_file iOS/VoiceInk-ios.xcodeproj/project.xcworkspace/contents.xcworkspacedata
-require_file VoiceInkCore/Package.swift
+require_file RomaJustTalk.xcworkspace/contents.xcworkspacedata
+require_file RomaJustTalk.xcworkspace/xcshareddata/xcschemes/RomaJustTalk-ios.xcscheme
+require_file RomaJustTalk.xcodeproj/project.pbxproj
+require_file RomaJustTalk.xcodeproj/project.xcworkspace/contents.xcworkspacedata
+require_file RomaJustTalk.xcodeproj/xcshareddata/xcschemes/RomaJustTalk.xcscheme
+require_file iOS/RomaJustTalk-ios.xcodeproj/project.pbxproj
+require_file iOS/RomaJustTalk-ios.xcodeproj/project.xcworkspace/contents.xcworkspacedata
+require_file RomaCore/Package.swift
 require_file Makefile
 require_file LocalBuild.xcconfig
-require_file .github/workflows/voiceink-ios-single-repo-migration.yml
+require_file .github/workflows/roma-ios-single-repo-migration.yml
 require_file scripts/tests/verify-adhoc-library-validation.test.sh
 require_file scripts/verify-adhoc-library-validation.sh
 require_file scripts/verify-static-whisper-app.sh
 require_file scripts/verify-static-whisper-xcframework.sh
 
 section "required app configuration files"
-require_file VoiceInk/Info.plist
-require_file VoiceInk/VoiceInk.entitlements
-require_file VoiceInk/VoiceInk.local.entitlements
-require_file iOS/VoiceInk-ios/Info.plist
-require_file iOS/VoiceInk-ios/PrivacyInfo.xcprivacy
-require_file iOS/VoiceInk-ios/VoiceInk_ios.entitlements
-require_file iOS/VoiceInkKeyboard/Info.plist
-require_file iOS/VoiceInkKeyboard/VoiceInkKeyboard.entitlements
+require_file RomaJustTalk/Info.plist
+require_file RomaJustTalk/RomaJustTalk.entitlements
+require_file RomaJustTalk/RomaJustTalk.local.entitlements
+require_file iOS/RomaJustTalk-ios/Info.plist
+require_file iOS/RomaJustTalk-ios/PrivacyInfo.xcprivacy
+require_file iOS/RomaJustTalk-ios/RomaJustTalk_ios.entitlements
+require_file iOS/RomaKeyboard/Info.plist
+require_file iOS/RomaKeyboard/RomaKeyboard.entitlements
 
 section "required iOS shared shell files"
 require_file iOS/Shared/AppGroupCoordinator.swift
-require_file iOS/Shared/VoiceInkIOSLogger.swift
-require_file iOS/Shared/VoiceInkKeyboardURLOpener.swift
+require_file iOS/Shared/RomaIOSLogger.swift
+require_file iOS/Shared/RomaKeyboardURLOpener.swift
 
 section "required iOS resources"
-require_file iOS/VoiceInk-ios/Assets.xcassets/AppIcon.appiconset/Contents.json
-require_file iOS/VoiceInk-ios/Resources/ggml-silero-v5.1.2.bin
+require_file iOS/RomaJustTalk-ios/Assets.xcassets/AppIcon.appiconset/Contents.json
+require_file iOS/RomaJustTalk-ios/Resources/ggml-silero-v5.1.2.bin
 
 section "abandoned root-level shared-core shape stays absent"
-reject_path ../VoiceInkCore
+reject_path ../RomaCore
 reject_path ../Package.swift
-reject_path ../Sources/VoiceInkCore
-reject_path ../Tests/VoiceInkCoreTests
+reject_path ../Sources/RomaCore
+reject_path ../Tests/RomaCoreTests
 
 run_required "project/plist/entitlements lint" plutil -lint \
-  VoiceInk.xcodeproj/project.pbxproj \
-  iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
-  VoiceInk/Info.plist \
-  VoiceInk/VoiceInk.entitlements \
-  VoiceInk/VoiceInk.local.entitlements \
-  iOS/VoiceInk-ios/Info.plist \
-  iOS/VoiceInk-ios/PrivacyInfo.xcprivacy \
-  iOS/VoiceInk-ios/VoiceInk_ios.entitlements \
-  iOS/VoiceInkKeyboard/Info.plist \
-  iOS/VoiceInkKeyboard/VoiceInkKeyboard.entitlements
+  RomaJustTalk.xcodeproj/project.pbxproj \
+  iOS/RomaJustTalk-ios.xcodeproj/project.pbxproj \
+  RomaJustTalk/Info.plist \
+  RomaJustTalk/RomaJustTalk.entitlements \
+  RomaJustTalk/RomaJustTalk.local.entitlements \
+  iOS/RomaJustTalk-ios/Info.plist \
+  iOS/RomaJustTalk-ios/PrivacyInfo.xcprivacy \
+  iOS/RomaJustTalk-ios/RomaJustTalk_ios.entitlements \
+  iOS/RomaKeyboard/Info.plist \
+  iOS/RomaKeyboard/RomaKeyboard.entitlements
 
 run_required "iOS app icon JSON lint" plutil -convert xml1 \
-  -o /tmp/VoiceInkAppIconContents.plist \
-  iOS/VoiceInk-ios/Assets.xcassets/AppIcon.appiconset/Contents.json
+  -o /tmp/RomaAppIconContents.plist \
+  iOS/RomaJustTalk-ios/Assets.xcassets/AppIcon.appiconset/Contents.json
 
 run_required "workspace and scheme XML lint" xmllint --noout \
-  VoiceInk.xcworkspace/contents.xcworkspacedata \
-  VoiceInk.xcworkspace/xcshareddata/xcschemes/VoiceInk-ios.xcscheme \
-  VoiceInk.xcodeproj/xcshareddata/xcschemes/VoiceInk.xcscheme \
-  VoiceInk.xcodeproj/project.xcworkspace/contents.xcworkspacedata \
-  iOS/VoiceInk-ios.xcodeproj/project.xcworkspace/contents.xcworkspacedata
+  RomaJustTalk.xcworkspace/contents.xcworkspacedata \
+  RomaJustTalk.xcworkspace/xcshareddata/xcschemes/RomaJustTalk-ios.xcscheme \
+  RomaJustTalk.xcodeproj/xcshareddata/xcschemes/RomaJustTalk.xcscheme \
+  RomaJustTalk.xcodeproj/project.xcworkspace/contents.xcworkspacedata \
+  iOS/RomaJustTalk-ios.xcodeproj/project.xcworkspace/contents.xcworkspacedata
 
 require_xml_xpath_value \
   "workspace includes in-repo iOS project" \
-  VoiceInk.xcworkspace/contents.xcworkspacedata \
-  "/Workspace/FileRef[contains(@location, 'iOS/VoiceInk-ios.xcodeproj')]/@location" \
-  "group:iOS/VoiceInk-ios.xcodeproj"
+  RomaJustTalk.xcworkspace/contents.xcworkspacedata \
+  "/Workspace/FileRef[contains(@location, 'iOS/RomaJustTalk-ios.xcodeproj')]/@location" \
+  "group:iOS/RomaJustTalk-ios.xcodeproj"
 
 require_xml_xpath_value \
   "iOS workspace scheme includes unit-test bundle" \
-  VoiceInk.xcworkspace/xcshareddata/xcschemes/VoiceInk-ios.xcscheme \
-  "//BuildableReference[@BlueprintName='VoiceInk-iosTests']/@BlueprintName" \
-  "VoiceInk-iosTests"
+  RomaJustTalk.xcworkspace/xcshareddata/xcschemes/RomaJustTalk-ios.xcscheme \
+  "//BuildableReference[@BlueprintName='RomaJustTalk-iosTests']/@BlueprintName" \
+  "RomaJustTalk-iosTests"
 
 require_xml_xpath_value \
   "iOS workspace scheme enables unit-test bundle" \
-  VoiceInk.xcworkspace/xcshareddata/xcschemes/VoiceInk-ios.xcscheme \
-  "//TestableReference[BuildableReference[@BlueprintName='VoiceInk-iosTests']]/@skipped" \
+  RomaJustTalk.xcworkspace/xcshareddata/xcschemes/RomaJustTalk-ios.xcscheme \
+  "//TestableReference[BuildableReference[@BlueprintName='RomaJustTalk-iosTests']]/@skipped" \
   "NO"
 
 require_xml_xpath_value \
   "iOS workspace scheme includes UI-test bundle" \
-  VoiceInk.xcworkspace/xcshareddata/xcschemes/VoiceInk-ios.xcscheme \
-  "//BuildableReference[@BlueprintName='VoiceInk-iosUITests']/@BlueprintName" \
-  "VoiceInk-iosUITests"
+  RomaJustTalk.xcworkspace/xcshareddata/xcschemes/RomaJustTalk-ios.xcscheme \
+  "//BuildableReference[@BlueprintName='RomaJustTalk-iosUITests']/@BlueprintName" \
+  "RomaJustTalk-iosUITests"
 
 require_xml_xpath_value \
   "iOS workspace scheme enables UI-test bundle" \
-  VoiceInk.xcworkspace/xcshareddata/xcschemes/VoiceInk-ios.xcscheme \
-  "//TestableReference[BuildableReference[@BlueprintName='VoiceInk-iosUITests']]/@skipped" \
+  RomaJustTalk.xcworkspace/xcshareddata/xcschemes/RomaJustTalk-ios.xcscheme \
+  "//TestableReference[BuildableReference[@BlueprintName='RomaJustTalk-iosUITests']]/@skipped" \
   "NO"
 
 require_plist_value \
   "iOS app display name stays roma just talk" \
-  iOS/VoiceInk-ios/Info.plist \
+  iOS/RomaJustTalk-ios/Info.plist \
   CFBundleDisplayName \
   "roma just talk"
 
 require_plist_value \
   "iOS app bundle name stays roma just talk" \
-  iOS/VoiceInk-ios/Info.plist \
+  iOS/RomaJustTalk-ios/Info.plist \
   CFBundleName \
   "roma just talk"
 
 require_plist_value \
   "iOS record deep-link scheme stays romajusttalk" \
-  iOS/VoiceInk-ios/Info.plist \
+  iOS/RomaJustTalk-ios/Info.plist \
   CFBundleURLTypes.0.CFBundleURLSchemes.0 \
   romajusttalk
 
 require_plist_value \
   "iOS app keeps audio background mode" \
-  iOS/VoiceInk-ios/Info.plist \
+  iOS/RomaJustTalk-ios/Info.plist \
   UIBackgroundModes.0 \
   audio
 
 require_plist_value \
   "keyboard extension point stays keyboard service" \
-  iOS/VoiceInkKeyboard/Info.plist \
+  iOS/RomaKeyboard/Info.plist \
   NSExtension.NSExtensionPointIdentifier \
   com.apple.keyboard-service
 
 require_plist_value \
   "keyboard open access stays enabled" \
-  iOS/VoiceInkKeyboard/Info.plist \
+  iOS/RomaKeyboard/Info.plist \
   NSExtension.NSExtensionAttributes.RequestsOpenAccess \
   true
 
 require_json_array_value \
   "iOS app entitlement uses shared App Group" \
-  iOS/VoiceInk-ios/VoiceInk_ios.entitlements \
+  iOS/RomaJustTalk-ios/RomaJustTalk_ios.entitlements \
   "com.apple.security.application-groups" \
   0 \
   "$expected_app_group"
 
 require_json_array_value \
   "keyboard entitlement uses shared App Group" \
-  iOS/VoiceInkKeyboard/VoiceInkKeyboard.entitlements \
+  iOS/RomaKeyboard/RomaKeyboard.entitlements \
   "com.apple.security.application-groups" \
   0 \
   "$expected_app_group"
 
 require_file_string_count \
   "iOS CI allows Simulator signing for builds and tests" \
-  .github/workflows/voiceink-ios-single-repo-migration.yml \
+  .github/workflows/roma-ios-single-repo-migration.yml \
   "CODE_SIGNING_ALLOWED=YES" \
   2
 
 require_file_string_count \
   "iOS CI uses the ad-hoc Simulator signing identity" \
-  .github/workflows/voiceink-ios-single-repo-migration.yml \
+  .github/workflows/roma-ios-single-repo-migration.yml \
   "CODE_SIGN_IDENTITY=-" \
   2
 
 require_file_string_count \
   "iOS CI keeps Simulator entitlements in builds and tests" \
-  .github/workflows/voiceink-ios-single-repo-migration.yml \
+  .github/workflows/roma-ios-single-repo-migration.yml \
   "ENTITLEMENTS_ALLOWED=YES" \
   2
 
 require_file_string_count \
   "iOS CI does not disable signing for Simulator artifacts" \
-  .github/workflows/voiceink-ios-single-repo-migration.yml \
+  .github/workflows/roma-ios-single-repo-migration.yml \
   "CODE_SIGNING_ALLOWED=NO" \
   0
 
 require_file_string_count \
   "iOS CI does not exclude test source files" \
-  .github/workflows/voiceink-ios-single-repo-migration.yml \
+  .github/workflows/roma-ios-single-repo-migration.yml \
   "EXCLUDED_SOURCE_FILE_NAMES" \
   0
 
 require_file_line_count \
   "iOS CI runs the complete unit-test bundle" \
-  .github/workflows/voiceink-ios-single-repo-migration.yml \
-  "-only-testing:VoiceInk-iosTests \\" \
+  .github/workflows/roma-ios-single-repo-migration.yml \
+  "-only-testing:RomaJustTalk-iosTests \\" \
   1
 
 require_file_string_count \
   "iOS CI avoids class-level unit-test allowlists" \
-  .github/workflows/voiceink-ios-single-repo-migration.yml \
-  "-only-testing:VoiceInk-iosTests/" \
+  .github/workflows/roma-ios-single-repo-migration.yml \
+  "-only-testing:RomaJustTalk-iosTests/" \
   0
 
 require_file_line_count \
   "iOS CI runs the complete UI-test bundle" \
-  .github/workflows/voiceink-ios-single-repo-migration.yml \
-  "-only-testing:VoiceInk-iosUITests" \
+  .github/workflows/roma-ios-single-repo-migration.yml \
+  "-only-testing:RomaJustTalk-iosUITests" \
   1
 
 require_file_string_count \
   "iOS CI avoids class-level UI-test allowlists" \
-  .github/workflows/voiceink-ios-single-repo-migration.yml \
-  "-only-testing:VoiceInk-iosUITests/" \
+  .github/workflows/roma-ios-single-repo-migration.yml \
+  "-only-testing:RomaJustTalk-iosUITests/" \
   0
 
 require_file_string_count \
   "iOS CI has only the two complete-bundle selectors" \
-  .github/workflows/voiceink-ios-single-repo-migration.yml \
+  .github/workflows/roma-ios-single-repo-migration.yml \
   "-only-testing:" \
   2
 
 require_file_string_count \
   "iOS CI does not skip tests inside either bundle" \
-  .github/workflows/voiceink-ios-single-repo-migration.yml \
+  .github/workflows/roma-ios-single-repo-migration.yml \
   "-skip-testing:" \
   0
 
-for broad_path in 'docs/**' 'scripts/**' 'VoiceInk/**'; do
+for broad_path in 'docs/**' 'scripts/**' 'RomaJustTalk/**'; do
   require_file_line_count \
     "iOS CI avoids broad unrelated trigger $broad_path" \
-    .github/workflows/voiceink-ios-single-repo-migration.yml \
+    .github/workflows/roma-ios-single-repo-migration.yml \
     "- \"$broad_path\"" \
     0
 done
 
 for shared_ios_input in \
-  .github/workflows/voiceink-build.yml \
+  .github/workflows/roma-build.yml \
   LocalBuild.xcconfig \
   Makefile \
   scripts/check-find-reusable-ci-run.sh \
@@ -526,29 +526,29 @@ for shared_ios_input in \
   scripts/verify-ios-single-repo-migration.sh \
   scripts/verify-static-whisper-app.sh \
   scripts/verify-static-whisper-xcframework.sh \
-  'VoiceInkCore/**' \
+  'RomaCore/**' \
   'iOS/**' \
-  VoiceInk/Info.plist \
-  'VoiceInk/Resources/Sounds/**' \
-  VoiceInk/Transcription/FluidAudio/FluidAudioModelManager.swift \
-  VoiceInk/Transcription/Streaming/FluidAudioStreamingProvider.swift \
-  VoiceInk/Transcription/Streaming/FluidAudioWordTimingAdapter.swift \
-  VoiceInk/VoiceInk.entitlements \
-  VoiceInk/VoiceInk.local.entitlements \
-  'VoiceInk.xcodeproj/**' \
-  'VoiceInk.xcworkspace/**'
+  RomaJustTalk/Info.plist \
+  'RomaJustTalk/Resources/Sounds/**' \
+  RomaJustTalk/Transcription/FluidAudio/FluidAudioModelManager.swift \
+  RomaJustTalk/Transcription/Streaming/FluidAudioStreamingProvider.swift \
+  RomaJustTalk/Transcription/Streaming/FluidAudioWordTimingAdapter.swift \
+  RomaJustTalk/RomaJustTalk.entitlements \
+  RomaJustTalk/RomaJustTalk.local.entitlements \
+  'RomaJustTalk.xcodeproj/**' \
+  'RomaJustTalk.xcworkspace/**'
 do
   require_file_line_count \
     "iOS CI watches shared input $shared_ios_input" \
-    .github/workflows/voiceink-ios-single-repo-migration.yml \
+    .github/workflows/roma-ios-single-repo-migration.yml \
     "- \"$shared_ios_input\"" \
     2
 done
 
 require_file_line_count \
   "macOS build watches shared core" \
-  .github/workflows/voiceink-build.yml \
-  '- "VoiceInkCore/**"' \
+  .github/workflows/roma-build.yml \
+  '- "RomaCore/**"' \
   2
 
 for static_whisper_input in \
@@ -557,26 +557,26 @@ for static_whisper_input in \
 do
   require_file_line_count \
     "macOS build watches $static_whisper_input" \
-    .github/workflows/voiceink-build.yml \
+    .github/workflows/roma-build.yml \
     "- \"$static_whisper_input\"" \
     2
 done
 
 require_file_line_count \
   "macOS build watches the ad-hoc Library Validation check" \
-  .github/workflows/voiceink-build.yml \
+  .github/workflows/roma-build.yml \
   '- "scripts/verify-adhoc-library-validation.sh"' \
   2
 
 require_file_line_count \
   "macOS build watches the ad-hoc Library Validation regression test" \
-  .github/workflows/voiceink-build.yml \
+  .github/workflows/roma-build.yml \
   '- "scripts/tests/verify-adhoc-library-validation.test.sh"' \
   2
 
 require_file_string_count \
   "macOS build runs the ad-hoc Library Validation regression test" \
-  .github/workflows/voiceink-build.yml \
+  .github/workflows/roma-build.yml \
   'bash scripts/tests/verify-adhoc-library-validation.test.sh' \
   1
 
@@ -612,86 +612,86 @@ require_file_string_count \
 
 require_plist_boolean \
   "local entitlements disable Library Validation for ad-hoc dynamic frameworks" \
-  VoiceInk/VoiceInk.local.entitlements \
+  RomaJustTalk/RomaJustTalk.local.entitlements \
   com.apple.security.cs.disable-library-validation \
   true
 
 reject_plist_key \
   "certificate-signed release entitlements keep Library Validation enabled" \
-  VoiceInk/VoiceInk.entitlements \
+  RomaJustTalk/RomaJustTalk.entitlements \
   com.apple.security.cs.disable-library-validation
 
 require_file_string_count \
   "iOS CI does not duplicate the macOS build" \
-  .github/workflows/voiceink-ios-single-repo-migration.yml \
+  .github/workflows/roma-ios-single-repo-migration.yml \
   "make local CONFIGURATION=Release" \
   0
 
 require_file_line_count \
   "macOS build checks pull requests" \
-  .github/workflows/voiceink-build.yml \
+  .github/workflows/roma-build.yml \
   "pull_request:" \
   1
 
 require_file_line_count \
   "macOS pull requests never reuse prior proof" \
-  .github/workflows/voiceink-build.yml \
+  .github/workflows/roma-build.yml \
   "if: github.event_name != 'pull_request' && inputs.force != true" \
   1
 
 require_project_string \
-  "macOS project references VoiceInkCore" \
-  VoiceInk.xcodeproj/project.pbxproj \
-  VoiceInkCore
+  "macOS project references RomaCore" \
+  RomaJustTalk.xcodeproj/project.pbxproj \
+  RomaCore
 
 require_project_string \
-  "iOS project references VoiceInkCore" \
-  iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
-  VoiceInkCore
+  "iOS project references RomaCore" \
+  iOS/RomaJustTalk-ios.xcodeproj/project.pbxproj \
+  RomaCore
 
 require_project_string \
   "iOS project references shared shell group" \
-  iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
+  iOS/RomaJustTalk-ios.xcodeproj/project.pbxproj \
   Shared
 
 require_project_string \
   "macOS project product name stays roma just talk" \
-  VoiceInk.xcodeproj/project.pbxproj \
+  RomaJustTalk.xcodeproj/project.pbxproj \
   "roma just talk"
 
 require_project_string \
   "iOS project product name stays roma just talk" \
-  iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
+  iOS/RomaJustTalk-ios.xcodeproj/project.pbxproj \
   "roma just talk"
 
 reject_project_string \
-  "macOS project avoids sibling VoiceInk-iOS references" \
-  VoiceInk.xcodeproj/project.pbxproj \
-  VoiceInk-iOS
+  "macOS project avoids sibling RomaJustTalk-iOS references" \
+  RomaJustTalk.xcodeproj/project.pbxproj \
+  RomaJustTalk-iOS
 
 reject_project_string \
-  "iOS project avoids sibling VoiceInk-iOS references" \
-  iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
-  VoiceInk-iOS
+  "iOS project avoids sibling RomaJustTalk-iOS references" \
+  iOS/RomaJustTalk-ios.xcodeproj/project.pbxproj \
+  RomaJustTalk-iOS
 
 require_project_string \
   "macOS project uses canonical local Whisper framework path" \
-  VoiceInk.xcodeproj/project.pbxproj \
+  RomaJustTalk.xcodeproj/project.pbxproj \
   "$expected_whisper_project_path"
 
 require_project_string \
   "iOS project uses canonical local Whisper framework path" \
-  iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
+  iOS/RomaJustTalk-ios.xcodeproj/project.pbxproj \
   "$expected_whisper_project_path"
 
 reject_project_string \
   "macOS project does not embed static Whisper" \
-  VoiceInk.xcodeproj/project.pbxproj \
+  RomaJustTalk.xcodeproj/project.pbxproj \
   "whisper.xcframework in Embed Frameworks"
 
 reject_project_string \
   "iOS project does not embed static Whisper" \
-  iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
+  iOS/RomaJustTalk-ios.xcodeproj/project.pbxproj \
   "whisper.xcframework in Embed Frameworks"
 
 require_file_string_count \
@@ -702,14 +702,14 @@ require_file_string_count \
 
 require_target_framework \
   "macOS app explicitly links CoreML required by static Whisper" \
-  VoiceInk.xcodeproj/project.pbxproj \
-  VoiceInk \
+  RomaJustTalk.xcodeproj/project.pbxproj \
+  RomaJustTalk \
   System/Library/Frameworks/CoreML.framework
 
 require_target_framework \
   "iOS app explicitly links CoreML required by static Whisper" \
-  iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
-  VoiceInk-ios \
+  iOS/RomaJustTalk-ios.xcodeproj/project.pbxproj \
+  RomaJustTalk-ios \
   System/Library/Frameworks/CoreML.framework
 
 for obsolete_framework_path in \
@@ -719,11 +719,11 @@ for obsolete_framework_path in \
 do
   reject_project_string \
     "macOS project avoids obsolete framework path $obsolete_framework_path" \
-    VoiceInk.xcodeproj/project.pbxproj \
+    RomaJustTalk.xcodeproj/project.pbxproj \
     "$obsolete_framework_path"
   reject_project_string \
     "iOS project avoids obsolete framework path $obsolete_framework_path" \
-    iOS/VoiceInk-ios.xcodeproj/project.pbxproj \
+    iOS/RomaJustTalk-ios.xcodeproj/project.pbxproj \
     "$obsolete_framework_path"
 done
 

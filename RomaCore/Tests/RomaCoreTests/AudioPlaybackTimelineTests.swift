@@ -1,0 +1,510 @@
+import Foundation
+import RomaCore
+
+final class AudioPlaybackTimelineTests: XCTestCase {
+    func testIOSAudioPlaybackSessionConfigurationPreservesPlaybackPolicy() {
+        XCTAssertEqual(
+            RomaIOSAudioPlaybackSessionConfiguration.notePlayback,
+            RomaIOSAudioPlaybackSessionConfiguration(
+                category: .playback,
+                mode: .spokenAudio
+            )
+        )
+    }
+
+    func testIOSAudioSessionRecordingConfigurationPreservesRecordingPolicy() {
+        XCTAssertEqual(
+            RomaIOSAudioSessionRecordingConfiguration.voiceRecording,
+            RomaIOSAudioSessionRecordingConfiguration(
+                category: .playAndRecord,
+                mode: .spokenAudio,
+                options: [.defaultToSpeaker, .allowBluetooth, .allowBluetoothA2DP, .mixWithOthers]
+            )
+        )
+    }
+
+    func testIOSAudioRecorderConfigurationUsesMono16kPCM16Policy() {
+        XCTAssertEqual(
+            RomaIOSAudioRecorderConfiguration.voiceRecording,
+            RomaIOSAudioRecorderConfiguration(
+                format: .linearPCM,
+                sampleRate: RomaPCM16Audio.mono16kSampleRate,
+                channelCount: RomaPCM16Audio.monoChannelCount,
+                bitDepth: RomaPCM16Audio.bitsPerSample,
+                isBigEndian: RomaPCM16Audio.isBigEndian,
+                isFloatingPoint: RomaPCM16Audio.isFloatingPoint,
+                quality: .high,
+                isMeteringEnabled: true
+            )
+        )
+    }
+
+    func testAudioSessionLifecycleStatePreservesIOSActivationAndTimeoutFlow() {
+        var state = RomaAudioSessionLifecycleState()
+
+        XCTAssertFalse(state.isSessionActive)
+        XCTAssertEqual(state.timeoutRemaining, 0)
+
+        state.markActivatedForRecording()
+        XCTAssertTrue(state.isSessionActive)
+        XCTAssertEqual(state.timeoutRemaining, 0)
+
+        XCTAssertEqual(state.scheduleDeactivation(timeoutSeconds: 90), .delayed(90))
+        XCTAssertTrue(state.isSessionActive)
+        XCTAssertEqual(state.timeoutRemaining, 90)
+
+        XCTAssertEqual(state.advanceCountdown(), .delayed(89))
+        XCTAssertEqual(state.timeoutRemaining, 89)
+
+        state.cancelScheduledDeactivation()
+        XCTAssertTrue(state.isSessionActive)
+        XCTAssertEqual(state.timeoutRemaining, 0)
+
+        XCTAssertEqual(state.scheduleDeactivation(timeoutSeconds: 0), .immediate)
+        XCTAssertEqual(state.timeoutRemaining, 0)
+
+        state.markDeactivated()
+        XCTAssertFalse(state.isSessionActive)
+        XCTAssertEqual(state.timeoutRemaining, 0)
+    }
+
+    func testAudioSessionLifecycleStateCancelsPendingDeactivationForPlayback() {
+        var state = RomaAudioSessionLifecycleState(isSessionActive: true)
+
+        XCTAssertEqual(state.scheduleDeactivation(timeoutSeconds: 90), .delayed(90))
+        XCTAssertEqual(state.timeoutRemaining, 90)
+
+        state.markActivatedForPlayback()
+
+        XCTAssertTrue(state.isSessionActive)
+        XCTAssertEqual(state.timeoutRemaining, 0)
+    }
+
+    func testAudioSessionLifecycleStatePlansPlaybackActivationSideEffects() {
+        var activeState = RomaAudioSessionLifecycleState(isSessionActive: true)
+        XCTAssertEqual(activeState.scheduleDeactivation(timeoutSeconds: 90), .delayed(90))
+
+        XCTAssertEqual(playbackActivationEvents(from: &activeState), ["cancel", "deactivate", "mark"])
+        XCTAssertEqual(activeState.timeoutRemaining, 0)
+        XCTAssertTrue(activeState.isSessionActive)
+
+        var inactiveState = RomaAudioSessionLifecycleState()
+        XCTAssertEqual(playbackActivationEvents(from: &inactiveState), ["cancel"])
+        XCTAssertFalse(inactiveState.isSessionActive)
+    }
+
+    func testAudioSessionPlaybackActivationPlanAppliesRuntimeStateInOrder() {
+        var activeState = RomaAudioSessionLifecycleState(isSessionActive: true)
+        XCTAssertEqual(playbackActivationEvents(from: &activeState), ["cancel", "deactivate", "mark"])
+
+        var inactiveState = RomaAudioSessionLifecycleState(isSessionActive: false)
+        XCTAssertEqual(playbackActivationEvents(from: &inactiveState), ["cancel"])
+    }
+
+    private func playbackActivationEvents(from state: inout RomaAudioSessionLifecycleState) -> [String] {
+        let plan = state.beginPlaybackActivation()
+        var events: [String] = []
+
+        do {
+            try plan.applyRuntimeState(
+                cancelScheduledDeactivation: { events.append("cancel") },
+                deactivateCurrentSession: { events.append("deactivate") },
+                markDeactivated: { events.append("mark") }
+            )
+        } catch {
+            XCTFail("Unexpected playback activation error: \(error)")
+        }
+
+        return events
+    }
+
+    func testAudioSessionLifecycleStatePlansImmediateDeactivationSideEffects() {
+        var activeState = RomaAudioSessionLifecycleState(isSessionActive: true, timeoutRemaining: 12)
+
+        XCTAssertEqual(immediateDeactivationApplication(from: &activeState).events, ["cancel", "deactivate", "mark"])
+        XCTAssertEqual(activeState.timeoutRemaining, 0)
+        XCTAssertTrue(activeState.isSessionActive)
+
+        var inactiveState = RomaAudioSessionLifecycleState(isSessionActive: false, timeoutRemaining: 12)
+        XCTAssertEqual(immediateDeactivationApplication(from: &inactiveState).events, ["cancel"])
+        XCTAssertEqual(inactiveState.timeoutRemaining, 0)
+        XCTAssertFalse(inactiveState.isSessionActive)
+    }
+
+    func testAudioSessionImmediateDeactivationPlanAppliesRuntimeStateInOrder() {
+        var activeState = RomaAudioSessionLifecycleState(isSessionActive: true)
+        let activeApplication = immediateDeactivationApplication(from: &activeState)
+        XCTAssertTrue(activeApplication.didDeactivate)
+        XCTAssertEqual(activeApplication.events, ["cancel", "deactivate", "mark"])
+
+        var inactiveState = RomaAudioSessionLifecycleState(isSessionActive: false)
+        let inactiveApplication = immediateDeactivationApplication(from: &inactiveState)
+        XCTAssertFalse(inactiveApplication.didDeactivate)
+        XCTAssertEqual(inactiveApplication.events, ["cancel"])
+    }
+
+    private func immediateDeactivationApplication(
+        from state: inout RomaAudioSessionLifecycleState
+    ) -> (didDeactivate: Bool, events: [String]) {
+        let plan = state.beginImmediateDeactivation()
+        var events: [String] = []
+        var didDeactivate = false
+
+        do {
+            didDeactivate = try plan.applyRuntimeState(
+                cancelScheduledDeactivation: { events.append("cancel") },
+                deactivateSession: { events.append("deactivate") },
+                markDeactivated: { events.append("mark") }
+            )
+        } catch {
+            XCTFail("Unexpected immediate deactivation error: \(error)")
+        }
+
+        return (didDeactivate, events)
+    }
+
+    func testAudioSessionLifecycleStateRequestsDeactivationWhenCountdownExpires() {
+        var state = RomaAudioSessionLifecycleState(isSessionActive: true, timeoutRemaining: 1)
+
+        XCTAssertEqual(state.advanceCountdown(), .immediate)
+        XCTAssertEqual(state.timeoutRemaining, 0)
+        XCTAssertTrue(state.isSessionActive)
+    }
+
+    func testAudioSessionLifecycleStateReturnsShellExecutionPlans() {
+        var state = RomaAudioSessionLifecycleState(isSessionActive: true)
+
+        assertDeactivationExecution(
+            state.scheduleDeactivationExecution(timeoutSeconds: 90),
+            expectedEvents: ["timer", "scheduled"]
+        )
+        XCTAssertEqual(state.timeoutRemaining, 90)
+
+        state = RomaAudioSessionLifecycleState(isSessionActive: true)
+        assertDeactivationExecution(
+            state.scheduleDeactivationExecution(timeoutSeconds: 0),
+            expectedEvents: ["deactivate"]
+        )
+        XCTAssertEqual(state.timeoutRemaining, 0)
+
+        state = RomaAudioSessionLifecycleState(isSessionActive: true, timeoutRemaining: 1)
+        assertDeactivationExecution(
+            state.advanceCountdownExecution(),
+            expectedEvents: ["deactivate"]
+        )
+        XCTAssertEqual(state.timeoutRemaining, 0)
+    }
+
+    private func assertDeactivationExecution(
+        _ plan: RomaAudioSessionDeactivationExecutionPlan,
+        expectedEvents: [String]
+    ) {
+        var events: [String] = []
+
+        plan.applyRuntimeState(
+            deactivateSession: { events.append("deactivate") },
+            runCountdownTimer: { events.append("timer") },
+            countdownTimerDidStart: { events.append("scheduled") }
+        )
+
+        XCTAssertEqual(events, expectedEvents)
+    }
+
+    func testProgressClampsCurrentTimeAgainstDuration() {
+        XCTAssertEqual(RomaAudioPlaybackTimeline.progress(currentTime: -1, duration: 10), 0)
+        XCTAssertEqual(RomaAudioPlaybackTimeline.progress(currentTime: 5, duration: 10), 0.5)
+        XCTAssertEqual(RomaAudioPlaybackTimeline.progress(currentTime: 12, duration: 10), 1)
+    }
+
+    func testProgressReturnsZeroForInvalidDuration() {
+        XCTAssertEqual(RomaAudioPlaybackTimeline.progress(currentTime: 5, duration: 0), 0)
+        XCTAssertEqual(RomaAudioPlaybackTimeline.progress(currentTime: 5, duration: -1), 0)
+        XCTAssertEqual(RomaAudioPlaybackTimeline.progress(currentTime: .infinity, duration: 10), 0)
+    }
+
+    func testLocationProgressClampsAgainstWidth() {
+        XCTAssertEqual(RomaAudioPlaybackTimeline.progress(locationX: -10, width: 100), 0)
+        XCTAssertEqual(RomaAudioPlaybackTimeline.progress(locationX: 25, width: 100), 0.25)
+        XCTAssertEqual(RomaAudioPlaybackTimeline.progress(locationX: 125, width: 100), 1)
+    }
+
+    func testLocationProgressReturnsZeroForInvalidWidth() {
+        XCTAssertEqual(RomaAudioPlaybackTimeline.progress(locationX: 10, width: 0), 0)
+        XCTAssertEqual(RomaAudioPlaybackTimeline.progress(locationX: 10, width: -5), 0)
+        XCTAssertEqual(RomaAudioPlaybackTimeline.progress(locationX: .infinity, width: 100), 0)
+    }
+
+    func testTimeAtLocationUsesClampedLocationProgress() {
+        XCTAssertEqual(RomaAudioPlaybackTimeline.time(atLocationX: 25, width: 100, duration: 40), 10)
+        XCTAssertEqual(RomaAudioPlaybackTimeline.time(atLocationX: -25, width: 100, duration: 40), 0)
+        XCTAssertEqual(RomaAudioPlaybackTimeline.time(atLocationX: 125, width: 100, duration: 40), 40)
+        XCTAssertEqual(RomaAudioPlaybackTimeline.time(atLocationX: 25, width: 100, duration: 0), 0)
+    }
+
+    func testClampedTimeBoundsDirectSeekRequests() {
+        XCTAssertEqual(RomaAudioPlaybackTimeline.clampedTime(-3, duration: 10), 0)
+        XCTAssertEqual(RomaAudioPlaybackTimeline.clampedTime(4, duration: 10), 4)
+        XCTAssertEqual(RomaAudioPlaybackTimeline.clampedTime(14, duration: 10), 10)
+        XCTAssertEqual(RomaAudioPlaybackTimeline.clampedTime(4, duration: 0), 0)
+        XCTAssertEqual(RomaAudioPlaybackTimeline.clampedTime(.infinity, duration: 10), 0)
+    }
+
+    func testSampleProgressUsesStableWaveformPosition() {
+        XCTAssertEqual(RomaAudioPlaybackTimeline.sampleProgress(index: 0, sampleCount: 200), 0)
+        XCTAssertEqual(RomaAudioPlaybackTimeline.sampleProgress(index: 100, sampleCount: 200), 0.5)
+        XCTAssertEqual(RomaAudioPlaybackTimeline.sampleProgress(index: 250, sampleCount: 200), 1)
+        XCTAssertEqual(RomaAudioPlaybackTimeline.sampleProgress(index: 1, sampleCount: 0), 0)
+    }
+
+    func testTimelineUpdateIntervalPreservesPlatformAudioPlayerCadence() {
+        XCTAssertEqual(RomaAudioPlaybackTimeline.updateInterval, 0.1)
+    }
+
+    func testTimerTickPlanPreservesPlatformCompletionBehavior() {
+        let playingState = RomaAudioPlaybackState(
+            isPlaying: true,
+            currentTime: 4,
+            duration: 10,
+            playbackRate: 1
+        )
+
+        XCTAssertEqual(
+            playingState.applyingTimerTickPlan(
+                RomaAudioPlaybackTimerTickPlan.macOS(currentTime: 4, duration: 10)
+            ),
+            RomaAudioPlaybackState(isPlaying: true, currentTime: 4, duration: 10, playbackRate: 1)
+        )
+        XCTAssertEqual(
+            playingState.applyingTimerTickPlan(
+                RomaAudioPlaybackTimerTickPlan.macOS(currentTime: 10, duration: 10)
+            ),
+            RomaAudioPlaybackState(isPlaying: false, currentTime: 0, duration: 10, playbackRate: 1)
+        )
+        XCTAssertEqual(
+            playingState.applyingTimerTickPlan(
+                RomaAudioPlaybackTimerTickPlan.iOS(
+                    currentTime: 9.5,
+                    playerIsPlaying: false,
+                    shellIsPlaying: true
+                )
+            ),
+            RomaAudioPlaybackState(isPlaying: false, currentTime: 9.5, duration: 10, playbackRate: 1)
+        )
+        XCTAssertEqual(
+            playingState.applyingTimerTickPlan(
+                RomaAudioPlaybackTimerTickPlan.iOS(
+                    currentTime: 9.5,
+                    playerIsPlaying: false,
+                    shellIsPlaying: false
+                )
+            ),
+            RomaAudioPlaybackState(isPlaying: true, currentTime: 9.5, duration: 10, playbackRate: 1)
+        )
+    }
+
+    func testTimerTickPlanAppliesRuntimeStateInOrder() {
+        var events: [String] = []
+
+        RomaAudioPlaybackTimerTickPlan.iOS(
+            currentTime: 4,
+            playerIsPlaying: true,
+            shellIsPlaying: true
+        ).applyRuntimeState(
+            seekPlayer: { events.append("seek:\($0)") },
+            stopTimer: { events.append("stop") }
+        )
+
+        RomaAudioPlaybackTimerTickPlan.iOS(
+            currentTime: 9.5,
+            playerIsPlaying: false,
+            shellIsPlaying: true
+        ).applyRuntimeState(
+            seekPlayer: { events.append("seek:\($0)") },
+            stopTimer: { events.append("stop") }
+        )
+
+        RomaAudioPlaybackTimerTickPlan.macOS(currentTime: 10, duration: 10).applyRuntimeState(
+            seekPlayer: { events.append("seek:\($0)") },
+            stopTimer: { events.append("stop") }
+        )
+
+        XCTAssertEqual(events, ["stop", "seek:0.0", "stop"])
+    }
+
+    func testPlaybackStateLoadPreservesPlatformResetBehavior() {
+        let state = RomaAudioPlaybackState(
+            isPlaying: true,
+            currentTime: 4,
+            duration: 10,
+            playbackRate: 1.5
+        )
+
+        XCTAssertEqual(
+            state.loaded(duration: 12, resetCurrentTime: true),
+            RomaAudioPlaybackState(isPlaying: true, currentTime: 0, duration: 12, playbackRate: 1.5)
+        )
+        XCTAssertEqual(
+            state.loaded(duration: 12, resetCurrentTime: false),
+            RomaAudioPlaybackState(isPlaying: true, currentTime: 4, duration: 12, playbackRate: 1.5)
+        )
+    }
+
+    func testPlaybackStatePlansPlayPauseStopAndTickUpdates() {
+        let state = RomaAudioPlaybackState(
+            isPlaying: false,
+            currentTime: 3,
+            duration: 10,
+            playbackRate: 1
+        )
+
+        XCTAssertEqual(state.playing().isPlaying, true)
+        XCTAssertEqual(state.playing().paused().isPlaying, false)
+        XCTAssertEqual(
+            state.playing().stopped(),
+            RomaAudioPlaybackState(isPlaying: false, currentTime: 0, duration: 10, playbackRate: 1)
+        )
+        XCTAssertEqual(
+            state.updatingCurrentTime(6),
+            RomaAudioPlaybackState(isPlaying: false, currentTime: 6, duration: 10, playbackRate: 1)
+        )
+    }
+
+    func testPlaybackStateBuildsPlayPauseRuntimePlan() {
+        var events: [String] = []
+        let stopped = RomaAudioPlaybackState(
+            isPlaying: false,
+            currentTime: 0,
+            duration: 10,
+            playbackRate: 1
+        )
+        let playing = RomaAudioPlaybackState(
+            isPlaying: true,
+            currentTime: 1,
+            duration: 10,
+            playbackRate: 1
+        )
+
+        stopped.playPausePlan.applyRuntimeState(
+            play: { events.append("play") },
+            pause: { events.append("pause") }
+        )
+        playing.playPausePlan.applyRuntimeState(
+            play: { events.append("play") },
+            pause: { events.append("pause") }
+        )
+
+        XCTAssertEqual(events, ["play", "pause"])
+    }
+
+    func testPlaybackStateAppliesTimerTickPlanActions() {
+        let state = RomaAudioPlaybackState(
+            isPlaying: true,
+            currentTime: 3,
+            duration: 10,
+            playbackRate: 1
+        )
+
+        XCTAssertEqual(
+            state.applyingTimerTickPlan(
+                RomaAudioPlaybackTimerTickPlan.iOS(
+                    currentTime: 6,
+                    playerIsPlaying: true,
+                    shellIsPlaying: true
+                )
+            ),
+            RomaAudioPlaybackState(isPlaying: true, currentTime: 6, duration: 10, playbackRate: 1)
+        )
+        XCTAssertEqual(
+            state.applyingTimerTickPlan(
+                RomaAudioPlaybackTimerTickPlan.iOS(
+                    currentTime: 9.5,
+                    playerIsPlaying: false,
+                    shellIsPlaying: true
+                )
+            ),
+            RomaAudioPlaybackState(isPlaying: false, currentTime: 9.5, duration: 10, playbackRate: 1)
+        )
+        XCTAssertEqual(
+            state.applyingTimerTickPlan(
+                RomaAudioPlaybackTimerTickPlan.macOS(currentTime: 10, duration: 10)
+            ),
+            RomaAudioPlaybackState(isPlaying: false, currentTime: 0, duration: 10, playbackRate: 1)
+        )
+    }
+
+    func testPlaybackStateSeekAndRateCycleUseSharedPolicies() {
+        let state = RomaAudioPlaybackState(
+            isPlaying: false,
+            currentTime: 3,
+            duration: 10,
+            playbackRate: 1
+        )
+
+        XCTAssertEqual(state.seeking(to: -2).currentTime, 0)
+        XCTAssertEqual(state.seeking(to: 14).currentTime, 10)
+        XCTAssertEqual(state.cyclingPlaybackRate().playbackRate, 1.5)
+    }
+
+    func testPlaybackRateRestoresExistingPositiveMacOSValues() {
+        XCTAssertEqual(RomaAudioPlaybackRate.restoredRate(0), 1.0)
+        XCTAssertEqual(RomaAudioPlaybackRate.restoredRate(-1), 1.0)
+        XCTAssertEqual(RomaAudioPlaybackRate.restoredRate(1.25), 1.25)
+    }
+
+    func testPlaybackRateCyclesThroughExistingMacOSOrder() {
+        XCTAssertEqual(RomaAudioPlaybackRate.next(after: 1.0), 1.5)
+        XCTAssertEqual(RomaAudioPlaybackRate.next(after: 1.5), 2.0)
+        XCTAssertEqual(RomaAudioPlaybackRate.next(after: 2.0), 1.0)
+        XCTAssertEqual(RomaAudioPlaybackRate.next(after: 1.25), 1.0)
+    }
+
+    func testPlaybackRatePreferenceUsesSharedStorageKey() {
+        let suiteName = "RomaAudioPlaybackRateTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        XCTAssertEqual(RomaAudioPlaybackRate.current(from: defaults), 1.0)
+
+        RomaAudioPlaybackRate.save(1.5, to: defaults)
+        XCTAssertEqual(defaults.float(forKey: RomaUserDefaultsKey.audioPlaybackRate), 1.5)
+        XCTAssertEqual(RomaAudioPlaybackRate.current(from: defaults), 1.5)
+
+        RomaAudioPlaybackRate.clear(from: defaults)
+        XCTAssertEqual(RomaAudioPlaybackRate.current(from: defaults), 1.0)
+    }
+
+    func testPlaybackReEnhancementControlPresentationOwnsAvailabilityAndOpacity() {
+        let available = RomaAudioPlaybackReEnhancementControlPresentation(
+            isOperationInProgress: false,
+            isEnhancementEnabled: true,
+            isEnhancementConfigured: true
+        )
+        XCTAssertFalse(available.isActionDisabled)
+        XCTAssertEqual(available.opacity, 1.0)
+        XCTAssertNil(available.unavailableBannerPresentation)
+
+        let unavailable = RomaAudioPlaybackReEnhancementControlPresentation(
+            isOperationInProgress: false,
+            isEnhancementEnabled: false,
+            isEnhancementConfigured: false
+        )
+        XCTAssertTrue(unavailable.isActionDisabled)
+        XCTAssertEqual(unavailable.opacity, 0.4)
+        XCTAssertEqual(
+            unavailable.unavailableBannerPresentation,
+            RomaAudioPlaybackActionBannerPresentation(
+                message: "AI Enhancement is not enabled or configured",
+                isError: true
+            )
+        )
+
+        let busy = RomaAudioPlaybackReEnhancementControlPresentation(
+            isOperationInProgress: true,
+            isEnhancementEnabled: true,
+            isEnhancementConfigured: true
+        )
+        XCTAssertTrue(busy.isActionDisabled)
+        XCTAssertEqual(busy.opacity, 1.0)
+        XCTAssertNil(busy.unavailableBannerPresentation)
+    }
+}

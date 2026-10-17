@@ -313,7 +313,7 @@ if ! jq -e '
   .preRollWarmupSeconds == 12
   and .targetTextTimeoutSeconds == 3
   and .minimumTargetCount == 2
-  and .voiceInkBundleIdentifier == "com.negentropi.RomaJustTalk"
+  and .romaBundleIdentifier == "com.negentropi.RomaJustTalk"
   and .targets == [
     {
       id: "textedit",
@@ -342,7 +342,7 @@ if ! jq -e '
 fi
 if ! jq -e '
   .repetitions == 5
-  and .voiceInkLifecycle == "relaunchPerCase"
+  and .romaLifecycle == "relaunchPerCase"
 ' <<<"$cold_regression_config_json" >/dev/null; then
   echo "Empty-final regression proof must relaunch Roma for every fresh-process case." >&2
   exit 1
@@ -375,10 +375,10 @@ if ! jq -e '
   and .model.storage == "normal-application-support"
   and .helperExecutableSha256 == "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
   and .configuration.repetitions == 5
-  and .configuration.voiceInkLifecycle == "relaunchPerCase"
+  and .configuration.romaLifecycle == "relaunchPerCase"
   and (.configuration | has("audioDirectory") | not)
-  and (.configuration | has("voiceInkAppPath") | not)
-  and (.configuration | has("voiceInkBuildDirectory") | not)
+  and (.configuration | has("romaAppPath") | not)
+  and (.configuration | has("romaBuildDirectory") | not)
   and (.configuration | has("explicitHoldSeconds") | not)
 ' <<<"$evidence_contract_json" >/dev/null; then
   echo "Empty-final evidence contract must bind normalized runtime inputs." >&2
@@ -435,22 +435,22 @@ if run_runtime_e2e_phases smoke.json full.json unsupported >/dev/null 2>&1; then
 fi
 
 if ! grep -Fq -- '- "scripts/runtime-e2e-phase-runner.sh"' \
-  "$repo_root/.github/workflows/voiceink-remote-e2e-stage.yml"; then
+  "$repo_root/.github/workflows/roma-remote-e2e-stage.yml"; then
   echo "Remote E2E must run when its phase router changes." >&2
   exit 1
 fi
 if ! grep -Fq -- '- "scripts/runtime-e2e-model-bootstrap.sh"' \
-  "$repo_root/.github/workflows/voiceink-remote-e2e-stage.yml"; then
+  "$repo_root/.github/workflows/roma-remote-e2e-stage.yml"; then
   echo "Remote E2E must run when its model bootstrap changes." >&2
   exit 1
 fi
 if ! grep -Fq -- '- "scripts/runtime-e2e-parakeet-v2.manifest"' \
-  "$repo_root/.github/workflows/voiceink-remote-e2e-stage.yml"; then
+  "$repo_root/.github/workflows/roma-remote-e2e-stage.yml"; then
   echo "Remote E2E must run when its pinned model manifest changes." >&2
   exit 1
 fi
 
-workflow="$repo_root/.github/workflows/voiceink-remote-e2e-stage.yml"
+workflow="$repo_root/.github/workflows/roma-remote-e2e-stage.yml"
 ruby - "$workflow" <<'RUBY'
 require "yaml"
 
@@ -515,7 +515,7 @@ if ! grep -Fq \
 fi
 
 distribution_termination_line="$(
-  grep -n '^  terminate_runtime_voiceink_pid "$expected_first_launch_pid"' \
+  grep -n '^  terminate_runtime_roma_pid "$expected_first_launch_pid"' \
     "$repo_root/scripts/run-macos-runtime-e2e.sh" \
     | head -n 1 \
     | cut -d: -f1

@@ -1,0 +1,520 @@
+import SwiftUI
+import SwiftData
+import OSLog
+import RomaCore
+
+struct SettingsView: View {
+    @StateObject private var settings = AppSettings.shared
+    @AppStorage(RomaVADPreference.userDefaultsKey)
+    private var isVADEnabled = RomaVADPreference.defaultIsEnabled
+    @AppStorage(RomaModelRuntimePreference.userDefaultsKey)
+    private var shouldPrewarmModel = RomaModelRuntimePreference.defaultShouldPrewarmModelOnWake
+    @AppStorage(RomaAppendTrailingSpacePreference.userDefaultsKey)
+    private var appendTrailingSpace = RomaAppendTrailingSpacePreference.defaultIsEnabled
+    @AppStorage(RomaIOSKeyboardAutoSendPreference.userDefaultsKey)
+    private var keyboardAutoSendReturn = RomaIOSKeyboardAutoSendPreference.defaultIsEnabled
+    @State private var promptDraftState = RomaLocalWhisperPromptDraftState()
+    @State private var fillerWordDraftState = RomaFillerWordDraftState()
+    @State private var customVocabularyDraftState = RomaVocabularyDraftState()
+    @State private var wordReplacementDraftState = RomaWordReplacementDraftState()
+    @State private var editingWordReplacement: IOSWordReplacementEditSelection?
+    @State private var dictionaryAlert: RomaDictionaryAlertPresentation?
+    @State private var isResetConfirmationPresented = false
+    private let cleanupPresentation = RomaTranscriptionCleanupPresentation.iOS
+    private let dictionaryPresentation = RomaDictionarySettingsPresentation.iOS
+    private let wordReplacementListPresentation = RomaWordReplacementListPresentation.iOS
+    private let audioTimeoutPresentation = RomaAudioSessionTimeoutPreference.settingsPresentation
+    private let settingsPresentation = RomaSettingsPresentation.iOS
+    private let vadPresentation = RomaVADPreference.settingsPresentation
+    private let prewarmPresentation = RomaModelRuntimePreference.settingsPresentation
+    private let promptPresentation = RomaLocalWhisperPromptCatalog.settingsPresentation
+    private let trailingSpacePresentation = RomaAppendTrailingSpacePreference.settingsPresentation
+    
+    var body: some View {
+        let dictionarySnapshot = self.dictionarySnapshot
+        let fillerWordEditorPresentation = RomaFillerWords.editorPresentation(
+            isEnabled: settings.transcriptionCleanupSettings.removeFillerWords,
+            words: settings.fillerWords
+        )
+
+        List {
+            Section {
+                NavigationLink(destination: IOSMicrophonePermissionView()) {
+                    Label(
+                        RomaIOSMicrophonePermissionPresentation.settingsRowTitle,
+                        systemImage: RomaIOSMicrophonePermissionPresentation.settingsRowSystemImageName
+                    )
+                }
+
+                NavigationLink(destination: IOSAudioInputSettingsView()) {
+                    Label("Audio Routing", systemImage: "waveform.badge.mic")
+                }
+
+                NavigationLink(destination: KeyboardSetupView()) {
+                    Label(
+                        RomaIOSKeyboardSetupPresentation.settingsRowTitle,
+                        systemImage: RomaIOSKeyboardSetupPresentation.settingsRowSystemImageName
+                    )
+                }
+
+                NavigationLink(destination: IOSEnhancementBehaviorView()) {
+                    Label("AI Enhancement", systemImage: "wand.and.stars")
+                }
+
+                NavigationLink(destination: IOSRecordingFeedbackView()) {
+                    Label("Recording Feedback", systemImage: "speaker.wave.2")
+                }
+
+                NavigationLink(destination: IOSHelpSupportView()) {
+                    Label(
+                        RomaIOSHelpSupportPresentation.settingsRowTitle,
+                        systemImage: RomaIOSHelpSupportPresentation.settingsRowSystemImageName
+                    )
+                }
+
+                NavigationLink(destination: IOSHistoryCleanupView()) {
+                    Label("History Retention", systemImage: "clock.arrow.circlepath")
+                }
+
+                NavigationLink(destination: IOSSettingsBackupView()) {
+                    Label("Settings Backup", systemImage: "externaldrive")
+                }
+
+                NavigationLink(destination: IOSDiagnosticsView()) {
+                    Label("Diagnostics", systemImage: "stethoscope")
+                }
+            }
+
+            Section(header: Text(settingsPresentation.modesSectionTitle)) {
+                NavigationLink(destination: IOSPromptLibraryView(settings: settings)) {
+                    Label("Prompt Library", systemImage: "text.badge.plus")
+                }
+
+                ForEach(settings.modes) { mode in
+                    NavigationLink(destination: ModeConfigurationView(
+                        mode: mode,
+                        settings: settings
+                    ) { updatedMode in
+                        settings.updateMode(updatedMode, replacing: mode.id)
+                    }) {
+                        ModeRowView(mode: mode)
+                    }
+                }
+                .onDelete(perform: settings.removeModes)
+                
+                NavigationLink(destination: ModeConfigurationView(
+                    settings: settings
+                ) { newMode in
+                    settings.addMode(newMode)
+                }) {
+                    HStack {
+                        Image(systemName: settingsPresentation.addActionSystemImageName)
+                            .foregroundStyle(.blue)
+                        Text(settingsPresentation.addModeButtonTitle)
+                            .foregroundStyle(.blue)
+                    }
+                }
+            }
+            
+            Section(header: Text(RomaModelManagementFilter.local.settingsSectionTitle)) {
+                NavigationLink(destination: LocalModelManagementView()) {
+                    Text(RomaModelManagementFilter.local.manageSettingsTitle)
+                }
+
+                Toggle(vadPresentation.title, isOn: $isVADEnabled)
+
+                Text(vadPresentation.helpText)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                Toggle(prewarmPresentation.title, isOn: $shouldPrewarmModel)
+
+                Text(prewarmPresentation.helpText)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            
+            Section(header: Text(RomaModelManagementFilter.cloud.settingsSectionTitle)) {
+                NavigationLink(destination: APIKeysView()) {
+                    Text(RomaModelManagementFilter.cloud.manageSettingsTitle)
+                }
+
+                NavigationLink(destination: IOSCustomCloudModelsView()) {
+                    Text(RomaModelManagementFilter.custom.manageSettingsTitle)
+                }
+
+                NavigationLink(destination: IOSOllamaSettingsView(settings: settings)) {
+                    Text("Ollama")
+                }
+            }
+
+            Section(header: Text(RomaTranscriptionLanguagePresentation.sectionTitle)) {
+                Picker(
+                    RomaTranscriptionLanguagePresentation.pickerTitle,
+                    selection: Binding(
+                        get: { settings.selectedTranscriptionLanguage },
+                        set: { settings.setSelectedTranscriptionLanguage($0) }
+                    )
+                ) {
+                    ForEach(RomaLanguageCatalog.sortedOptions(settings.transcriptionLanguages)) { language in
+                        Text(language.name).tag(language.code)
+                    }
+                }
+
+                if selectedTranscriptionProvider == .nativeApple {
+                    IOSNativeAppleLanguageAssetView(
+                        localeIdentifier: settings.selectedTranscriptionLanguage
+                    )
+                }
+            }
+
+            Section(header: Text(promptPresentation.sectionTitle)) {
+                if promptDraftState.isEditing {
+                    TextEditor(text: $promptDraftState.text)
+                        .frame(minHeight: 88)
+
+                    Button {
+                        saveLanguagePrompt()
+                    } label: {
+                        Label(promptPresentation.saveButtonTitle, systemImage: "checkmark")
+                    }
+                } else {
+                    Text(languagePrompt)
+                        .foregroundStyle(.secondary)
+
+                    Button {
+                        promptDraftState = promptDraftState.editing(prompt: languagePrompt)
+                    } label: {
+                        Label(promptPresentation.editButtonTitle, systemImage: "pencil")
+                    }
+                }
+
+                Toggle(trailingSpacePresentation.toggleTitle, isOn: $appendTrailingSpace)
+
+                Text(trailingSpacePresentation.helpText)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                Toggle("Press Return After Dictation", isOn: $keyboardAutoSendReturn)
+
+                Text("After the keyboard inserts a completed dictation, send one Return key to submit compatible text fields.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Section(header: Text(cleanupPresentation.sectionTitle)) {
+                Picker(cleanupPresentation.punctuationPickerTitle, selection: cleanupBinding(\.punctuationMode)) {
+                    ForEach(PunctuationCleanupMode.allCases) { mode in
+                        Text(mode.displayName).tag(mode)
+                    }
+                }
+
+                Toggle(cleanupPresentation.paragraphBreaksToggleTitle, isOn: cleanupBinding(\.isTextFormattingEnabled))
+
+                Toggle(cleanupPresentation.lowercaseToggleTitle, isOn: cleanupBinding(\.lowercaseTranscription))
+
+                Toggle(cleanupPresentation.removeFillerWordsToggleTitle, isOn: cleanupBinding(\.removeFillerWords))
+
+                if fillerWordEditorPresentation.shouldShowEditor {
+                    HStack {
+                        TextField(cleanupPresentation.addFillerWordPlaceholder, text: $fillerWordDraftState.draft)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                            .onSubmit(addFillerWord)
+
+                        Button(action: addFillerWord) {
+                            Image(systemName: settingsPresentation.addActionSystemImageName)
+                        }
+                        .disabled(!fillerWordDraftState.canSubmit)
+                    }
+
+                    if fillerWordEditorPresentation.shouldShowWordList {
+                        ForEach(settings.fillerWords, id: \.self) { word in
+                            Text(word)
+                        }
+                        .onDelete { offsets in
+                            settings.fillerWords = dictionarySnapshot.removingFillerWords(at: offsets)
+                        }
+                    }
+                }
+            }
+
+            Section(header: Text(dictionaryPresentation.sectionTitle)) {
+                HStack {
+                    TextField(dictionaryPresentation.vocabularyPlaceholder, text: $customVocabularyDraftState.draft)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                        .onSubmit(addCustomVocabularyTerm)
+
+                    Button(action: addCustomVocabularyTerm) {
+                        Image(systemName: settingsPresentation.addActionSystemImageName)
+                    }
+                    .disabled(!customVocabularyDraftState.canSubmit)
+                }
+
+                ForEach(dictionarySnapshot.sortedCustomVocabularyTerms, id: \.self) { term in
+                    Text(term)
+                }
+                .onDelete { offsets in
+                    settings.customVocabularyTerms = dictionarySnapshot.removingCustomVocabularyTerms(
+                        atSortedOffsets: offsets
+                    )
+                }
+
+                TextField(dictionaryPresentation.originalTextPlaceholder, text: $wordReplacementDraftState.original)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .onSubmit(submitWordReplacement)
+
+                TextField(dictionaryPresentation.replacementTextPlaceholder, text: $wordReplacementDraftState.replacement)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .onSubmit(submitWordReplacement)
+
+                Button(action: submitWordReplacement) {
+                    Label(
+                        dictionaryPresentation.addReplacementButtonTitle,
+                        systemImage: settingsPresentation.addActionSystemImageName
+                    )
+                }
+                .disabled(!wordReplacementDraftState.canSubmit)
+
+                ForEach(Array(dictionarySnapshot.sortedWordReplacements.enumerated()), id: \.offset) { _, rule in
+                    Button {
+                        editingWordReplacement = IOSWordReplacementEditSelection(rule: rule)
+                    } label: {
+                        HStack(spacing: 8) {
+                            Text(rule.originalText)
+                            Image(systemName: dictionaryPresentation.wordReplacementArrowSystemImageName)
+                                .foregroundStyle(.secondary)
+                            Text(rule.replacementText)
+                                .foregroundStyle(.secondary)
+                            Spacer()
+                            Image(systemName: "pencil")
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(wordReplacementListPresentation.editButtonHelp)
+                }
+                .onDelete { offsets in
+                    settings.wordReplacements = dictionarySnapshot.removingWordReplacements(
+                        atSortedOffsets: offsets
+                    )
+                }
+            }
+            
+            Section(header: Text(audioTimeoutPresentation.sectionTitle)) {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text(audioTimeoutPresentation.timeoutTitle)
+                        Spacer()
+                        Text(RomaAudioSessionTimeoutPreference.displayText(
+                            for: settings.audioSessionTimeoutSeconds
+                        ))
+                            .foregroundStyle(.secondary)
+                    }
+                    
+                    Slider(
+                        value: Binding(
+                            get: { Double(settings.audioSessionTimeoutSeconds) },
+                            set: { settings.audioSessionTimeoutSeconds = Int($0) }
+                        ),
+                        in: Double(RomaAudioSessionTimeoutPreference.minimumSeconds)...Double(
+                            RomaAudioSessionTimeoutPreference.maximumSeconds
+                        ),
+                        step: Double(RomaAudioSessionTimeoutPreference.stepSeconds)
+                    )
+                    
+                    Text(audioTimeoutPresentation.detailText)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(.vertical, 4)
+            }
+
+            Section(header: Text(RomaIOSAppDataResetPresentation.sectionTitle)) {
+                Button(role: .destructive) {
+                    isResetConfirmationPresented = true
+                } label: {
+                    Label(
+                        RomaIOSAppDataResetPresentation.buttonTitle,
+                        systemImage: RomaIOSAppDataResetPresentation.buttonSystemImageName
+                    )
+                }
+            }
+        }
+        .navigationTitle(settingsPresentation.navigationTitle)
+        .sheet(item: $editingWordReplacement) { selection in
+            IOSWordReplacementEditView(
+                selection: selection,
+                snapshot: dictionarySnapshot,
+                setRules: { settings.wordReplacements = $0 }
+            )
+        }
+        .onAppear {
+            settings.repairSelectedTranscriptionLanguage()
+        }
+        .onChange(of: settings.selectedTranscriptionLanguage) { _, _ in
+            promptDraftState = promptDraftState.refreshingForSelectedLanguage(
+                prompt: languagePrompt
+            )
+        }
+        .alert(item: $dictionaryAlert) { alert in
+            Alert(
+                title: Text(alert.title),
+                message: Text(alert.message),
+                dismissButton: .cancel(Text(alert.primaryButtonTitle))
+            )
+        }
+        .confirmationDialog(
+            RomaIOSAppDataResetPresentation.confirmationTitle,
+            isPresented: $isResetConfirmationPresented,
+            titleVisibility: .visible
+        ) {
+            Button(RomaIOSAppDataResetPresentation.confirmButtonTitle, role: .destructive) {
+                resetAppData()
+            }
+            Button(RomaIOSAppDataResetPresentation.cancelButtonTitle, role: .cancel) { }
+        } message: {
+            Text(RomaIOSAppDataResetPresentation.confirmationMessage)
+        }
+    }
+
+    private func cleanupBinding<Value>(
+        _ keyPath: WritableKeyPath<RomaTranscriptionCleanupSettings, Value>
+    ) -> Binding<Value> {
+        Binding(
+            get: { settings.transcriptionCleanupSettings[keyPath: keyPath] },
+            set: { settings.transcriptionCleanupSettings[keyPath: keyPath] = $0 }
+        )
+    }
+
+    private var dictionarySnapshot: RomaDictionarySettingsSnapshot {
+        RomaDictionarySettingsSnapshot(
+            fillerWords: settings.fillerWords,
+            customVocabularyTerms: settings.customVocabularyTerms,
+            wordReplacements: settings.wordReplacements
+        )
+    }
+
+    private var selectedTranscriptionProvider: RomaProviderKind? {
+        settings.modes.activeMode(selectedModeId: settings.selectedModeId)?.transcriptionProvider
+    }
+
+    private var languagePrompt: String {
+        RomaLocalWhisperPromptCatalog.prompt(
+            for: settings.selectedTranscriptionLanguage,
+            customPrompts: RomaLocalWhisperPromptCatalog.storedCustomPrompts()
+        )
+    }
+
+    private func saveLanguagePrompt() {
+        RomaLocalWhisperPromptCatalog.saveCustomPrompt(
+            promptDraftState.text,
+            for: settings.selectedTranscriptionLanguage
+        )
+        promptDraftState = promptDraftState.saved()
+    }
+
+    private func addFillerWord() {
+        let snapshot = dictionarySnapshot
+        snapshot
+            .fillerWordSubmission(fillerWordDraftState)
+            .applyRuntimeState(
+                applyPlan: {
+                    snapshot.applyFillerWordSubmission($0) { settings.fillerWords = $0 }
+                },
+                setDraftState: { fillerWordDraftState = $0 },
+                setAlertPresentation: { dictionaryAlert = $0 }
+            )
+    }
+
+    private func addCustomVocabularyTerm() {
+        let snapshot = dictionarySnapshot
+        snapshot
+            .customVocabularySubmission(customVocabularyDraftState)
+            .applyRuntimeState(
+                applyPlan: {
+                    snapshot.applyCustomVocabularySubmission($0) { settings.customVocabularyTerms = $0 }
+                },
+                setDraftState: { customVocabularyDraftState = $0 },
+                setAlertPresentation: { dictionaryAlert = $0 }
+            )
+    }
+
+    private func submitWordReplacement() {
+        let snapshot = dictionarySnapshot
+        snapshot
+            .wordReplacementSubmission(wordReplacementDraftState)
+            .applyRuntimeState(
+                applyPlan: {
+                    snapshot.applyWordReplacementSubmission($0) { settings.wordReplacements = $0 }
+                },
+                setDraftState: { wordReplacementDraftState = $0 },
+                setAlertPresentation: { dictionaryAlert = $0 }
+            )
+    }
+
+    private func resetAppData() {
+        let resetPlan = RomaAppDataResetPlan.iOS()
+
+        resetPlan.applyRuntimeState(
+            deleteTranscriptionRecords: deleteTranscriptionRecords,
+            resetAppSettings: { settings.resetAll() }
+        )
+    }
+
+    private func deleteTranscriptionRecords() {
+        do {
+            let descriptor = FetchDescriptor<Transcription>()
+            let modelContainer = try ModelContainer(for: Transcription.self)
+            let context = ModelContext(modelContainer)
+            let notes = try context.fetch(descriptor)
+            for note in notes {
+                context.delete(note)
+            }
+            try? context.save()
+        } catch {
+            RomaIOSLogger.settings.error("\(RomaAppDataResetDiagnostics.swiftDataResetFailedMessage(errorDescription: String(describing: error)), privacy: .public)")
+        }
+    }
+}
+
+
+
+#Preview {
+    NavigationStack { SettingsView() }
+}
+
+private struct ModeRowView: View {
+    let mode: Mode
+
+    var body: some View {
+        let presentation = mode.summaryPresentation
+
+        HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 6) {
+                Text(presentation.title)
+                    .font(.headline)
+                    .foregroundStyle(.primary)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(presentation.transcriptionText)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+
+                    if let postProcessingText = presentation.postProcessingText {
+                        Text(postProcessingText)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+
+            Spacer()
+        }
+        .padding(.vertical, 4)
+    }
+}

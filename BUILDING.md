@@ -33,7 +33,7 @@ make dev
 - `make check` or `make healthcheck` - Verify all required tools are installed
 - `make whisper` - Clone and build the static whisper.cpp XCFramework automatically
 - `make setup` - Prepare the whisper framework for linking
-- `make build` - Build the macOS app from `VoiceInk.xcodeproj`
+- `make build` - Build the macOS app from `RomaJustTalk.xcodeproj`
 - `make local` - Build for local use (no Apple Developer certificate needed)
 - `make run` - Launch the built `roma just talk.app`
 - `make dev` - Build and run (ideal for development workflow)
@@ -44,7 +44,7 @@ make dev
 ### How the Makefile Helps
 
 The Makefile automatically:
-1. **Manages Dependencies**: Creates a dedicated `~/VoiceInk-Dependencies` directory for all external frameworks
+1. **Manages Dependencies**: Creates a dedicated `~/RomaJustTalk-Dependencies` directory for all external frameworks
 2. **Builds Whisper Framework**: Clones whisper.cpp and builds every XCFramework slice as a static archive
 3. **Handles Framework Linking**: Links Whisper into each app executable instead of embedding `whisper.framework`
 4. **Verifies Prerequisites**: Checks that git, xcodebuild, and swift are installed before building
@@ -73,7 +73,7 @@ The local entitlement set disables Hardened Runtime Library Validation because t
 
 The `make local` command uses:
 - `LocalBuild.xcconfig` to override signing and entitlements settings
-- `VoiceInk.local.entitlements` (stripped-down, no CloudKit/keychain groups)
+- `RomaJustTalk.local.entitlements` (stripped-down, no CloudKit/keychain groups)
 - `scripts/verify-adhoc-library-validation.sh` to reject an ad-hoc app that loads bundled code without the required local entitlement
 - `LOCAL_BUILD` Swift compilation flag for conditional code paths
 
@@ -163,7 +163,7 @@ If you encounter any build issues:
 3. Check Xcode and macOS versions
 4. Verify all dependencies are properly installed
 5. Make sure whisper.xcframework is properly built and linked
-6. Run `bash scripts/verify-static-whisper-xcframework.sh ~/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework`
+6. Run `bash scripts/verify-static-whisper-xcframework.sh ~/RomaJustTalk-Dependencies/whisper.cpp/build-apple/whisper.xcframework`
 7. After building, run `make static-whisper-app-check`
 8. Run `make adhoc-library-validation-check` to verify the local app's signature and bundled-code contract
 

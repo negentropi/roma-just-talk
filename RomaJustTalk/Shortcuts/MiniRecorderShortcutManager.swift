@@ -1,0 +1,200 @@
+import Foundation
+import AppKit
+import Carbon.HIToolbox
+import RomaCore
+
+@MainActor
+class MiniRecorderShortcutManager: ObservableObject {
+    private var engine: RomaEngine
+    private var recorderUIManager: RecorderUIManager
+    private var visibilityTask: Task<Void, Never>?
+    private var shortcutChangeObserver: NSObjectProtocol?
+    private let visibleRecorderMonitor = ShortcutMonitor()
+    
+    // Double-tap Escape handling
+    private var firstEscapePressTime: Date? = nil
+    private var escapeTimeoutTask: Task<Void, Never>?
+    
+    init(engine: RomaEngine, recorderUIManager: RecorderUIManager) {
+        self.engine = engine
+        self.recorderUIManager = recorderUIManager
+        setupShortcutChangeObserver()
+        setupVisibilityObserver()
+    }
+
+    private func setupShortcutChangeObserver() {
+        shortcutChangeObserver = NotificationCenter.default.addObserver(
+            forName: ShortcutStore.shortcutDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard
+                let action = notification.object as? ShortcutAction,
+                action == .cancelRecorder || action == .toggleEnhancement
+            else {
+                return
+            }
+
+            Task { @MainActor in
+                self?.refreshVisibleShortcuts()
+            }
+        }
+    }
+
+    private func setupVisibilityObserver() {
+        visibilityTask = Task { @MainActor in
+            for await isVisible in recorderUIManager.$isMiniRecorderVisible.values {
+                if isVisible {
+                    refreshVisibleShortcuts()
+                } else {
+                    visibleRecorderMonitor.stop()
+                    resetEscapeState()
+                }
+            }
+        }
+    }
+
+    private var canUsePowerModeShortcuts: Bool {
+        RomaPowerModePreference.canUseShortcuts(
+            hasEnabledConfigurations: PowerModeManager.shared.configurations.hasEnabledPowerModeConfigurations
+        )
+    }
+
+    private func resetEscapeState() {
+        firstEscapePressTime = nil
+        escapeTimeoutTask?.cancel()
+        escapeTimeoutTask = nil
+    }
+    
+    private func refreshVisibleShortcuts() {
+        guard recorderUIManager.isMiniRecorderVisible else {
+            visibleRecorderMonitor.stop()
+            resetEscapeState()
+            return
+        }
+
+        var shortcuts = ShortcutStore.shortcuts(for: ShortcutAction.miniRecorderStoredActions)
+
+        if ShortcutStore.shortcut(for: .cancelRecorder) == nil {
+            shortcuts[.miniRecorderEscape] = .key(keyCode: UInt16(kVK_Escape), modifierFlags: [])
+        }
+
+        for (index, keyCode) in Self.digitKeyCodes.enumerated() {
+            shortcuts[.miniRecorderPrompt(index)] = .key(
+                keyCode: keyCode,
+                modifierFlags: [.command]
+            )
+        }
+
+        if canUsePowerModeShortcuts {
+            for (index, keyCode) in Self.digitKeyCodes.enumerated() {
+                shortcuts[.miniRecorderPowerMode(index)] = .key(
+                    keyCode: keyCode,
+                    modifierFlags: [.option]
+                )
+            }
+        }
+
+        visibleRecorderMonitor.start(
+            shortcuts: shortcuts,
+            onKeyDown: { [weak self] action, _ in
+                Task { @MainActor in
+                    await self?.handleMiniRecorderShortcut(action)
+                }
+            },
+            onKeyUp: { _, _, _ in }
+        )
+    }
+
+    private func handleMiniRecorderShortcut(_ action: ShortcutAction) async {
+        guard recorderUIManager.isMiniRecorderVisible else { return }
+
+        switch action {
+        case .cancelRecorder:
+            guard ShortcutStore.shortcut(for: .cancelRecorder) != nil else { return }
+            await recorderUIManager.cancelRecording()
+        case .toggleEnhancement:
+            guard let enhancementService = engine.getEnhancementService() else { return }
+            enhancementService.isEnhancementEnabled.toggle()
+        case .miniRecorderEscape:
+            await handleEscapeShortcut()
+        case .miniRecorderPrompt(let index):
+            handlePromptShortcut(index: index)
+        case .miniRecorderPowerMode(let index):
+            await handlePowerModeSelectionShortcut(index: index)
+        default:
+            break
+        }
+    }
+
+    private func handleEscapeShortcut() async {
+        guard ShortcutStore.shortcut(for: .cancelRecorder) == nil else { return }
+
+        let now = Date()
+        if RomaMiniRecorderEscapeShortcutPolicy.isSecondPress(
+            firstPressTime: firstEscapePressTime,
+            now: now
+        ) {
+            resetEscapeState()
+            await recorderUIManager.cancelRecording()
+            return
+        }
+
+        firstEscapePressTime = now
+        let presentation = RomaMiniRecorderEscapeShortcutPolicy.confirmationPresentation
+        NotificationManager.shared.showNotification(
+            title: presentation.title,
+            type: .info,
+            duration: presentation.duration
+        )
+        let timeoutNanoseconds = RomaMiniRecorderEscapeShortcutPolicy.timeoutNanoseconds()
+        escapeTimeoutTask = Task { [weak self] in
+            try? await Task.sleep(nanoseconds: timeoutNanoseconds)
+            await MainActor.run {
+                self?.firstEscapePressTime = nil
+            }
+        }
+    }
+
+    private func handlePromptShortcut(index: Int) {
+        engine.getEnhancementService()?.selectPromptFromShortcut(index: index)
+    }
+
+    private func handlePowerModeSelectionShortcut(index: Int) async {
+        let powerModeManager = PowerModeManager.shared
+        guard
+            canUsePowerModeShortcuts,
+            let selectedConfig = powerModeManager.configurations
+                .powerModeConfigurationForMiniRecorderShortcut(index: index)
+        else {
+            return
+        }
+
+        await powerModeManager.activateConfiguration(selectedConfig)
+    }
+
+    deinit {
+        if let shortcutChangeObserver {
+            NotificationCenter.default.removeObserver(shortcutChangeObserver)
+        }
+
+        visibilityTask?.cancel()
+        MainActor.assumeIsolated {
+            visibleRecorderMonitor.stop()
+            resetEscapeState()
+        }
+    }
+
+    private static let digitKeyCodes: [UInt16] = [
+        UInt16(kVK_ANSI_1),
+        UInt16(kVK_ANSI_2),
+        UInt16(kVK_ANSI_3),
+        UInt16(kVK_ANSI_4),
+        UInt16(kVK_ANSI_5),
+        UInt16(kVK_ANSI_6),
+        UInt16(kVK_ANSI_7),
+        UInt16(kVK_ANSI_8),
+        UInt16(kVK_ANSI_9),
+        UInt16(kVK_ANSI_0)
+    ]
+}

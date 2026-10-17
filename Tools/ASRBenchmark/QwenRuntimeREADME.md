@@ -2,14 +2,14 @@
 
 This probe calls `QwenRuntime` directly: snapshot verification/load, streaming session, every audio append, display events, real finish, and unload. It does not invoke or reproduce the decoder. Native build and model replay are pending; previous research-loop timings do not establish this runtime's latency.
 
-Stage `QwenRuntimePackage.swift` as `Package.swift`, `QwenRuntimeProbe.swift` as `Sources/Probe.swift`, and the complete `VoiceInkQwen`, `VoiceInkCore`, `VoiceInkNVIDIA` packages as sibling directories in that package root. Build with Swift 6.2.1 or newer and the repository's pinned dependencies. Save the executable, the built MLX `mlx.metallib` beside it, all generated SwiftPM resource bundles (including `VoiceInkQwen_VoiceInkQwen.bundle`), package lockfile, source hashes, full build log, and compiler version. Preserve the bundles beside the relocated executable; `QwenRuntime.init` reads its snapshot through `Bundle.module` even when model files are cached. Verify the relocated checkpoint with its original build directory unavailable before calling it portable. Run actual `VoiceInkQwen` tests separately; compiling this executable is not a package-test result. Follow the Metal artifact build recipe in `QwenNativeREADME.md`.
+Stage `QwenRuntimePackage.swift` as `Package.swift`, `QwenRuntimeProbe.swift` as `Sources/Probe.swift`, and the complete `RomaQwen`, `RomaCore`, `RomaNVIDIA` packages as sibling directories in that package root. Build with Swift 6.2.1 or newer and the repository's pinned dependencies. Save the executable, the built MLX `mlx.metallib` beside it, all generated SwiftPM resource bundles (including `RomaQwen_RomaQwen.bundle`), package lockfile, source hashes, full build log, and compiler version. Preserve the bundles beside the relocated executable; `QwenRuntime.init` reads its snapshot through `Bundle.module` even when model files are cached. Verify the relocated checkpoint with its original build directory unavailable before calling it portable. Run actual `RomaQwen` tests separately; compiling this executable is not a package-test result. Follow the Metal artifact build recipe in `QwenNativeREADME.md`.
 
 Prepare fixtures/cache without downloads (destination must not exist; hard links require the same filesystem):
 
 ```sh
 python3 Tools/ASRBenchmark/QwenRuntimeFixtures.py \
   .local-build/asr-research/app-fixtures /tmp/roma-qwen-models/8bit \
-  VoiceInkQwen/Sources/VoiceInkQwen/Resources /tmp/roma-qwen-runtime-case-run
+  RomaQwen/Sources/RomaQwen/Resources /tmp/roma-qwen-runtime-case-run
 /path/to/QwenRuntimeProbe /tmp/roma-qwen-runtime-case-run/cache \
   /tmp/roma-qwen-runtime-case-run/cases.json /tmp/roma-qwen-runtime-case-run/results.jsonl
 ```

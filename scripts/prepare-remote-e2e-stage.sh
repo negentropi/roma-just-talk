@@ -171,7 +171,7 @@ if [ "$runtime_empty_final_expectation" = "fixed" ]; then
     || [ ! -f "$runtime_empty_final_baseline_evidence/empty-final-e2e-contract.json" ] \
     || [ ! -f "$runtime_empty_final_baseline_evidence/empty-final-launch-events.tsv" ] \
     || [ ! -f "$runtime_empty_final_baseline_evidence/empty-final-termination-events.tsv" ] \
-    || [ ! -f "$runtime_empty_final_baseline_evidence/voiceink-sha256.txt" ] \
+    || [ ! -f "$runtime_empty_final_baseline_evidence/roma-sha256.txt" ] \
     || [ ! -f "$runtime_empty_final_baseline_evidence/macos-artifact-metadata.json" ] \
     || [ ! -f "$runtime_empty_final_baseline_evidence/macos-app-run-metadata.json" ] \
     || [ ! -f "$runtime_empty_final_baseline_evidence/stage-manifest.json" ]; then
@@ -191,7 +191,7 @@ fi
 
 desktop="$HOME/Desktop"
 evidence="$stage_root/evidence"
-done_file="/tmp/voiceink-remote-e2e-stage-done"
+done_file="/tmp/roma-remote-e2e-stage-done"
 ready_file="$stage_root/READY"
 simulator_udid=""
 macos_artifact_run_id=""
@@ -269,7 +269,7 @@ prepare_macos() {
       and .conclusion == "success"
       and (.event == "push" or .event == "workflow_dispatch")
       and ($repository == "" or .headRepository == $repository)
-      and .workflowPath == ".github/workflows/voiceink-build.yml"
+      and .workflowPath == ".github/workflows/roma-build.yml"
       and (.headSha | test("^[0-9a-f]{40}$"))' \
     "$macos_run_metadata" >/dev/null
   macos_artifact_head_sha="$(jq -r .headSha "$macos_run_metadata")"
@@ -327,7 +327,7 @@ prepare_macos() {
         and (.event == "push" or .event == "workflow_dispatch")
         and ($repository == "" or .headRepository == $repository)
         and ($expected_head_sha == "" or .headSha == $expected_head_sha)
-        and .workflowPath == ".github/workflows/voiceink-build.yml"
+        and .workflowPath == ".github/workflows/roma-build.yml"
         and (.headSha | test("^[0-9a-f]{40}$"))' \
       "$helper_run_metadata" >/dev/null
     runtime_helper_head_sha="$(jq -r .headSha "$helper_run_metadata")"
@@ -417,7 +417,7 @@ prepare_macos() {
       --arg run_id "$framework_signature_baseline_run_id" \
       --arg head_sha "${GITHUB_SHA:-}" \
       --arg repository "${GITHUB_REPOSITORY:-}" \
-      --arg workflow_path ".github/workflows/voiceink-remote-e2e-stage.yml" \
+      --arg workflow_path ".github/workflows/roma-remote-e2e-stage.yml" \
       --arg version "$macos_expected_version" \
       --arg build "$macos_expected_build" \
       --arg runner "$stage_runner_label" \
@@ -443,7 +443,7 @@ prepare_macos() {
           and (.macOSArtifactId | tostring | test("^[0-9]+$"))
           and (.macOSArtifactDigest | test("^sha256:[0-9a-f]{64}$"))
           and (.macOSArtifactHeadSha | test("^[0-9a-f]{40}$"))
-          and .macOSArtifactWorkflowPath == ".github/workflows/voiceink-build.yml"
+          and .macOSArtifactWorkflowPath == ".github/workflows/roma-build.yml"
       ' "$baseline_stage_manifest" >/dev/null
 
     jq -e \
@@ -455,7 +455,7 @@ prepare_macos() {
           and .conclusion == "success"
           and ($head_sha == "" or .headSha == $head_sha)
           and ($repository == "" or .repository == $repository)
-          and .workflowPath == ".github/workflows/voiceink-remote-e2e-stage.yml"
+          and .workflowPath == ".github/workflows/roma-remote-e2e-stage.yml"
       ' "$baseline_root/baseline-run-metadata.json" >/dev/null
     jq -e \
       --arg run_id "$framework_signature_baseline_run_id" '
@@ -624,7 +624,7 @@ prepare_macos() {
         and ($repository == "" or .macOSArtifactRepository == $repository)
         and (.macOSArtifactDigest | test("^sha256:[0-9a-f]{64}$"))
         and (.macOSArtifactHeadSha | test("^[0-9a-f]{40}$"))
-        and .macOSArtifactWorkflowPath == ".github/workflows/voiceink-build.yml"
+        and .macOSArtifactWorkflowPath == ".github/workflows/roma-build.yml"
       ' "$baseline_stage_manifest" >/dev/null
     baseline_app_run_id="$(jq -r .macOSArtifactRunId "$baseline_stage_manifest")"
     baseline_app_artifact_id="$(jq -r .macOSArtifactId "$baseline_stage_manifest")"
@@ -958,7 +958,7 @@ write_manifest() {
   "githubSha": "${GITHUB_SHA:-local}",
   "githubRef": "${GITHUB_REF:-local}",
   "githubRepository": "${GITHUB_REPOSITORY:-local}",
-  "githubWorkflowPath": ".github/workflows/voiceink-remote-e2e-stage.yml",
+  "githubWorkflowPath": ".github/workflows/roma-remote-e2e-stage.yml",
   "stageRunnerLabel": "$stage_runner_label",
   "stageRunnerName": "$stage_runner_name",
   "stageRunnerInstanceId": "$stage_runner_instance_id",
@@ -1090,7 +1090,7 @@ if [ "$macos_scenario" = "distribution-e2e" ]; then
         "$evidence/macos-distribution-e2e/extracted-app-identity.txt"
     )"
     runtime_executable_sha256="$(
-      awk 'NR == 1 { print $1 }' "$evidence/voiceink-sha256.txt" 2>/dev/null || true
+      awk 'NR == 1 { print $1 }' "$evidence/roma-sha256.txt" 2>/dev/null || true
     )"
     distribution_bundle_manifest_sha256="$(
       shasum -a 256 "$distribution_bundle_manifest" | awk '{print $1}'

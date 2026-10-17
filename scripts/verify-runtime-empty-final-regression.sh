@@ -59,9 +59,9 @@ validate_contract() {
       and .model.storage == "normal-application-support"
       and .model.prewarmOnWake == true
       and (.helperExecutableSha256 | test("^[0-9a-f]{64}$"))
-      and .configuration.voiceInkBundleIdentifier == "com.negentropi.RomaJustTalk"
+      and .configuration.romaBundleIdentifier == "com.negentropi.RomaJustTalk"
       and .configuration.repetitions == 5
-      and .configuration.voiceInkLifecycle == "relaunchPerCase"
+      and .configuration.romaLifecycle == "relaunchPerCase"
       and .configuration.targets == [
         {
           id: "textedit",
@@ -80,7 +80,7 @@ validate_contract() {
 }
 
 report_configuration() {
-  jq -cS '.configuration | with_entries(select(.value != null)) | del(.audioDirectory, .voiceInkAppPath, .voiceInkBuildDirectory)' "$1"
+  jq -cS '.configuration | with_entries(select(.value != null)) | del(.audioDirectory, .romaAppPath, .romaBuildDirectory)' "$1"
 }
 
 ensure_report_matches_contract() {
@@ -164,8 +164,8 @@ validate_report_state() {
   local candidate_report="$1" label="$2"
   jq -e '.fatalError == null' "$candidate_report" >/dev/null || { echo "$label contains a fatal error" >&2; return 1; }
   jq -e '.restoredOriginalState == true' "$candidate_report" >/dev/null || { echo "$label did not restore original state" >&2; return 1; }
-  jq -e '(.preflight.voiceInk.runningPaths | type == "array" and length == 0) and (.voiceInkSession.originallyRunningPaths | type == "array" and length == 0)' "$candidate_report" >/dev/null || { echo "$label did not begin from a stopped app" >&2; return 1; }
-  jq -e '.configuration.repetitions == 5 and .configuration.voiceInkLifecycle == "relaunchPerCase"' "$candidate_report" >/dev/null || { echo "$label did not use five relaunch-per-case trials" >&2; return 1; }
+  jq -e '(.preflight.romaJustTalk.runningPaths | type == "array" and length == 0) and (.romaSession.originallyRunningPaths | type == "array" and length == 0)' "$candidate_report" >/dev/null || { echo "$label did not begin from a stopped app" >&2; return 1; }
+  jq -e '.configuration.repetitions == 5 and .configuration.romaLifecycle == "relaunchPerCase"' "$candidate_report" >/dev/null || { echo "$label did not use five relaunch-per-case trials" >&2; return 1; }
 }
 
 validate_report_state "$report" "runtime E2E report" || exit 1
@@ -199,12 +199,12 @@ else
     exit 1
   }
 fi
-voiceink_app_path="$(jq -r '.configuration.voiceInkAppPath // empty' "$report")"
-[[ -n "$voiceink_app_path" ]] || { echo "runtime E2E report has no VoiceInk app path" >&2; exit 1; }
+roma_app_path="$(jq -r '.configuration.romaAppPath // empty' "$report")"
+[[ -n "$roma_app_path" ]] || { echo "runtime E2E report has no RomaJustTalk app path" >&2; exit 1; }
 case_count="$(jq -r '.cases | length' "$report")"
 launch_count="$(awk 'length($0) > 0 { count++ } END { print count + 0 }' "$launch_events")"
 [[ "$launch_count" -eq "$case_count" ]] || { echo "fresh-process lifecycle did not record one launch per runtime case" >&2; exit 1; }
-if ! awk -F '\t' -v expected_path="$voiceink_app_path" 'NF != 6 || $2 !~ /^[0-9]+$/ || length($3) != 64 || $3 !~ /^[0-9a-f]+$/ || $3 != $4 || $5 != expected_path { exit 1 }' "$launch_events"; then echo "fresh-process launch evidence is invalid" >&2; exit 1; fi
+if ! awk -F '\t' -v expected_path="$roma_app_path" 'NF != 6 || $2 !~ /^[0-9]+$/ || length($3) != 64 || $3 !~ /^[0-9a-f]+$/ || $3 != $4 || $5 != expected_path { exit 1 }' "$launch_events"; then echo "fresh-process launch evidence is invalid" >&2; exit 1; fi
 launch_unique_count="$({ awk -F '\t' '{ print $2 }' "$launch_events" | LC_ALL=C sort -nu; } | awk 'END { print NR + 0 }')"
 [[ "$launch_unique_count" -eq "$launch_count" ]] || { echo "fresh-process lifecycle reused a Roma process" >&2; exit 1; }
 termination_count="$(awk 'length($0) > 0 { count++ } END { print count + 0 }' "$termination_events")"

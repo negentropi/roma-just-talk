@@ -383,7 +383,7 @@ public enum RuntimeRunPlanError: Error, Equatable, Sendable {
 }
 
 public struct RuntimeHarnessConfiguration: Codable, Equatable, Sendable {
-    public enum VoiceInkLifecycle: String, Codable, Sendable {
+    public enum RomaLifecycle: String, Codable, Sendable {
         case reuse
         case relaunchPerFixture
         case relaunchPerCase
@@ -396,9 +396,9 @@ public struct RuntimeHarnessConfiguration: Codable, Equatable, Sendable {
 
     public var audioDirectory: String
     public var audioDeviceName: String
-    public var voiceInkBundleIdentifier: String
-    public var voiceInkAppPath: String?
-    public var voiceInkBuildDirectory: String
+    public var romaBundleIdentifier: String
+    public var romaAppPath: String?
+    public var romaBuildDirectory: String
     public var audioLeadSeconds: TimeInterval
     public var releaseTailSeconds: TimeInterval
     public var explicitHoldSeconds: TimeInterval?
@@ -412,14 +412,14 @@ public struct RuntimeHarnessConfiguration: Codable, Equatable, Sendable {
     public var targetAvailabilityPolicy: TargetAvailabilityPolicy
     public var minimumTargetCount: Int
     public var expectedTranscripts: [String: String]
-    public var voiceInkLifecycle: VoiceInkLifecycle
+    public var romaLifecycle: RomaLifecycle
 
     public init(
         audioDirectory: String,
         audioDeviceName: String,
-        voiceInkBundleIdentifier: String,
-        voiceInkAppPath: String?,
-        voiceInkBuildDirectory: String,
+        romaBundleIdentifier: String,
+        romaAppPath: String?,
+        romaBuildDirectory: String,
         audioLeadSeconds: TimeInterval,
         releaseTailSeconds: TimeInterval,
         explicitHoldSeconds: TimeInterval?,
@@ -433,13 +433,13 @@ public struct RuntimeHarnessConfiguration: Codable, Equatable, Sendable {
         targetAvailabilityPolicy: TargetAvailabilityPolicy,
         minimumTargetCount: Int,
         expectedTranscripts: [String: String],
-        voiceInkLifecycle: VoiceInkLifecycle
+        romaLifecycle: RomaLifecycle
     ) {
         self.audioDirectory = audioDirectory
         self.audioDeviceName = audioDeviceName
-        self.voiceInkBundleIdentifier = voiceInkBundleIdentifier
-        self.voiceInkAppPath = voiceInkAppPath
-        self.voiceInkBuildDirectory = voiceInkBuildDirectory
+        self.romaBundleIdentifier = romaBundleIdentifier
+        self.romaAppPath = romaAppPath
+        self.romaBuildDirectory = romaBuildDirectory
         self.audioLeadSeconds = audioLeadSeconds
         self.releaseTailSeconds = releaseTailSeconds
         self.explicitHoldSeconds = explicitHoldSeconds
@@ -453,16 +453,16 @@ public struct RuntimeHarnessConfiguration: Codable, Equatable, Sendable {
         self.targetAvailabilityPolicy = targetAvailabilityPolicy
         self.minimumTargetCount = minimumTargetCount
         self.expectedTranscripts = expectedTranscripts
-        self.voiceInkLifecycle = voiceInkLifecycle
+        self.romaLifecycle = romaLifecycle
     }
 
     public static var `default`: Self {
         Self(
             audioDirectory: NSString(string: "~/Downloads/roma jt builds/audio").expandingTildeInPath,
             audioDeviceName: "BlackHole 2ch",
-            voiceInkBundleIdentifier: "com.negentropi.RomaJustTalk",
-            voiceInkAppPath: nil,
-            voiceInkBuildDirectory: NSString(string: "~/Downloads/roma jt builds").expandingTildeInPath,
+            romaBundleIdentifier: "com.negentropi.RomaJustTalk",
+            romaAppPath: nil,
+            romaBuildDirectory: NSString(string: "~/Downloads/roma jt builds").expandingTildeInPath,
             audioLeadSeconds: 1.1,
             releaseTailSeconds: 0.15,
             explicitHoldSeconds: nil,
@@ -476,12 +476,12 @@ public struct RuntimeHarnessConfiguration: Codable, Equatable, Sendable {
             targetAvailabilityPolicy: .runningOnly,
             minimumTargetCount: 4,
             expectedTranscripts: [:],
-            voiceInkLifecycle: .reuse
+            romaLifecycle: .reuse
         )
     }
 }
 
-public struct RuntimeVoiceInkCandidate: Codable, Equatable, Sendable {
+public struct RuntimeRomaCandidate: Codable, Equatable, Sendable {
     public let path: String
     public let modifiedAt: Date
 
@@ -491,7 +491,7 @@ public struct RuntimeVoiceInkCandidate: Codable, Equatable, Sendable {
     }
 }
 
-public struct RuntimeVoiceInkSelection: Codable, Equatable, Sendable {
+public struct RuntimeRomaSelection: Codable, Equatable, Sendable {
     public enum Source: String, Codable, Sendable {
         case explicit
         case runningBuild
@@ -509,16 +509,16 @@ public struct RuntimeVoiceInkSelection: Codable, Equatable, Sendable {
     }
 }
 
-public enum RuntimeVoiceInkCandidateSelector {
+public enum RuntimeRomaCandidateSelector {
     public static func select(
         explicitPath: String?,
         runningPaths: [String],
         buildDirectoryPath: String,
-        buildCandidates: [RuntimeVoiceInkCandidate],
+        buildCandidates: [RuntimeRomaCandidate],
         workspaceInstalledPath: String?
-    ) -> RuntimeVoiceInkSelection? {
+    ) -> RuntimeRomaSelection? {
         if let explicitPath, !explicitPath.isEmpty {
-            return RuntimeVoiceInkSelection(path: explicitPath, source: .explicit)
+            return RuntimeRomaSelection(path: explicitPath, source: .explicit)
         }
 
         let buildDirectoryPrefix = URL(fileURLWithPath: buildDirectoryPath, isDirectory: true)
@@ -526,23 +526,23 @@ public enum RuntimeVoiceInkCandidateSelector {
         if let runningBuild = runningPaths.first(where: {
             URL(fileURLWithPath: $0).standardizedFileURL.path.hasPrefix(buildDirectoryPrefix)
         }) {
-            return RuntimeVoiceInkSelection(path: runningBuild, source: .runningBuild)
+            return RuntimeRomaSelection(path: runningBuild, source: .runningBuild)
         }
 
         if let newestBuild = buildCandidates.max(by: { $0.modifiedAt < $1.modifiedAt }) {
-            return RuntimeVoiceInkSelection(path: newestBuild.path, source: .buildDirectory)
+            return RuntimeRomaSelection(path: newestBuild.path, source: .buildDirectory)
         }
         if let runningPath = runningPaths.first {
-            return RuntimeVoiceInkSelection(path: runningPath, source: .running)
+            return RuntimeRomaSelection(path: runningPath, source: .running)
         }
         if let workspaceInstalledPath {
-            return RuntimeVoiceInkSelection(path: workspaceInstalledPath, source: .workspaceInstalled)
+            return RuntimeRomaSelection(path: workspaceInstalledPath, source: .workspaceInstalled)
         }
         return nil
     }
 }
 
-public enum RuntimeVoiceInkLaunchIdentityPolicy {
+public enum RuntimeRomaLaunchIdentityPolicy {
     public static func accepts(
         sourceBundlePath: String,
         runningBundlePath: String,
@@ -693,11 +693,11 @@ public enum RuntimeFailureBoundary: String, Codable, Equatable, Sendable {
     case shortcutInjection
     case shortcutDelivery
     case traceCollection
-    case voiceInkTrigger
-    case voiceInkShortcutEvidence
-    case voiceInkMicrophonePermission
-    case voiceInkTranscription
-    case voiceInkPasteHandoff
+    case romaTrigger
+    case romaShortcutEvidence
+    case romaMicrophonePermission
+    case romaTranscription
+    case romaPasteHandoff
     case pasteDeliveryOrTargetVisibility
     case latencyBudget
     case contentQuality
@@ -710,18 +710,18 @@ public struct RuntimeCaseEvidence: Codable, Equatable, Sendable {
     public let shortcutDownPosted: Bool
     public let shortcutUpPosted: Bool
     public let emergencyShortcutReleasePosted: Bool
-    public let voiceInkTriggerObserved: Bool
-    public let voiceInkShortcutHoldMatched: Bool?
-    public let voiceInkShortcutEvidenceRejected: Bool
-    public let voiceInkTranscriptionCompleted: Bool
-    public let voiceInkClipboardWriteSucceeded: Bool
-    public let voiceInkPasteEventPosted: Bool
-    public let voiceInkTextDeliveryHandoffSucceeded: Bool
+    public let romaTriggerObserved: Bool
+    public let romaShortcutHoldMatched: Bool?
+    public let romaShortcutEvidenceRejected: Bool
+    public let romaTranscriptionCompleted: Bool
+    public let romaClipboardWriteSucceeded: Bool
+    public let romaPasteEventPosted: Bool
+    public let romaTextDeliveryHandoffSucceeded: Bool
     public let systemClipboardChangeObserved: Bool
     public let targetAccessibilityTextObserved: Bool
     public let targetVisibleTextObserved: Bool
     public let targetCleanupPassed: Bool?
-    public let voiceInkMicrophonePermissionUnavailable: Bool?
+    public let romaMicrophonePermissionUnavailable: Bool?
 
     public init(
         targetPrepared: Bool,
@@ -729,36 +729,36 @@ public struct RuntimeCaseEvidence: Codable, Equatable, Sendable {
         shortcutDownPosted: Bool,
         shortcutUpPosted: Bool,
         emergencyShortcutReleasePosted: Bool,
-        voiceInkTriggerObserved: Bool,
-        voiceInkShortcutHoldMatched: Bool?,
-        voiceInkShortcutEvidenceRejected: Bool,
-        voiceInkTranscriptionCompleted: Bool,
-        voiceInkClipboardWriteSucceeded: Bool,
-        voiceInkPasteEventPosted: Bool,
-        voiceInkTextDeliveryHandoffSucceeded: Bool,
+        romaTriggerObserved: Bool,
+        romaShortcutHoldMatched: Bool?,
+        romaShortcutEvidenceRejected: Bool,
+        romaTranscriptionCompleted: Bool,
+        romaClipboardWriteSucceeded: Bool,
+        romaPasteEventPosted: Bool,
+        romaTextDeliveryHandoffSucceeded: Bool,
         systemClipboardChangeObserved: Bool,
         targetAccessibilityTextObserved: Bool,
         targetVisibleTextObserved: Bool,
         targetCleanupPassed: Bool?,
-        voiceInkMicrophonePermissionUnavailable: Bool? = nil
+        romaMicrophonePermissionUnavailable: Bool? = nil
     ) {
         self.targetPrepared = targetPrepared
         self.audioPlaybackStarted = audioPlaybackStarted
         self.shortcutDownPosted = shortcutDownPosted
         self.shortcutUpPosted = shortcutUpPosted
         self.emergencyShortcutReleasePosted = emergencyShortcutReleasePosted
-        self.voiceInkTriggerObserved = voiceInkTriggerObserved
-        self.voiceInkShortcutHoldMatched = voiceInkShortcutHoldMatched
-        self.voiceInkShortcutEvidenceRejected = voiceInkShortcutEvidenceRejected
-        self.voiceInkTranscriptionCompleted = voiceInkTranscriptionCompleted
-        self.voiceInkClipboardWriteSucceeded = voiceInkClipboardWriteSucceeded
-        self.voiceInkPasteEventPosted = voiceInkPasteEventPosted
-        self.voiceInkTextDeliveryHandoffSucceeded = voiceInkTextDeliveryHandoffSucceeded
+        self.romaTriggerObserved = romaTriggerObserved
+        self.romaShortcutHoldMatched = romaShortcutHoldMatched
+        self.romaShortcutEvidenceRejected = romaShortcutEvidenceRejected
+        self.romaTranscriptionCompleted = romaTranscriptionCompleted
+        self.romaClipboardWriteSucceeded = romaClipboardWriteSucceeded
+        self.romaPasteEventPosted = romaPasteEventPosted
+        self.romaTextDeliveryHandoffSucceeded = romaTextDeliveryHandoffSucceeded
         self.systemClipboardChangeObserved = systemClipboardChangeObserved
         self.targetAccessibilityTextObserved = targetAccessibilityTextObserved
         self.targetVisibleTextObserved = targetVisibleTextObserved
         self.targetCleanupPassed = targetCleanupPassed
-        self.voiceInkMicrophonePermissionUnavailable = voiceInkMicrophonePermissionUnavailable
+        self.romaMicrophonePermissionUnavailable = romaMicrophonePermissionUnavailable
     }
 }
 
@@ -772,17 +772,17 @@ public enum RuntimeFailureBoundaryPolicy {
         guard evidence.audioPlaybackStarted else { return .audioInjection }
         guard evidence.shortcutDownPosted, evidence.shortcutUpPosted else { return .shortcutInjection }
         guard hasLatencyTrace else { return .traceCollection }
-        guard evidence.voiceInkTriggerObserved else { return .voiceInkTrigger }
-        if evidence.voiceInkShortcutEvidenceRejected { return .voiceInkShortcutEvidence }
-        if evidence.voiceInkShortcutHoldMatched == false { return .shortcutDelivery }
-        if evidence.voiceInkMicrophonePermissionUnavailable == true {
-            return .voiceInkMicrophonePermission
+        guard evidence.romaTriggerObserved else { return .romaTrigger }
+        if evidence.romaShortcutEvidenceRejected { return .romaShortcutEvidence }
+        if evidence.romaShortcutHoldMatched == false { return .shortcutDelivery }
+        if evidence.romaMicrophonePermissionUnavailable == true {
+            return .romaMicrophonePermission
         }
-        guard evidence.voiceInkTranscriptionCompleted else { return .voiceInkTranscription }
-        if assessment.status == .emptyTranscript { return .voiceInkTranscription }
-        if assessment.status == .pasteSemanticsNotProven { return .voiceInkPasteHandoff }
-        guard evidence.voiceInkTextDeliveryHandoffSucceeded else {
-            return .voiceInkPasteHandoff
+        guard evidence.romaTranscriptionCompleted else { return .romaTranscription }
+        if assessment.status == .emptyTranscript { return .romaTranscription }
+        if assessment.status == .pasteSemanticsNotProven { return .romaPasteHandoff }
+        guard evidence.romaTextDeliveryHandoffSucceeded else {
+            return .romaPasteHandoff
         }
         guard evidence.targetVisibleTextObserved else { return .pasteDeliveryOrTargetVisibility }
         if assessment.status == .pasteOperationCountMismatch {

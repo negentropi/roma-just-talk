@@ -22,7 +22,7 @@ Usage:
   swift scripts/probes/event-layer-compare-probe.swift [--secure] [--log PATH] [--no-mouse] [--no-nsevent-global] [--no-iohid-manager] [--no-iohid-device]
 
 Compares input visibility across:
-  - VI-CGSession: current VoiceInk-level cgSessionEventTap decoding
+  - VI-CGSession: current RomaJustTalk-level cgSessionEventTap decoding
   - CGHID: lower cghidEventTap decoding
   - NSEventFromSessionCG / NSEventFromHIDCG: NSEvent conversion from each CG layer
   - NSEventGlobal: high-level global NSEvent monitor

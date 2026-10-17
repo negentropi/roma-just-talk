@@ -30,7 +30,7 @@ The ordering matters:
 2. Build the Debug test app with `xcodebuild build-for-testing`.
 3. Derive the **current** Debug app's designated requirement and record the app/probe hashes.
 4. Grant that exact Debug host Accessibility and microphone access in the disposable runner; restart TCC to load the scoped grants.
-5. Run all `VoiceInkTests` using `test-without-building`, then verify unchanged hashes and requirement.
+5. Run all `RomaTests` using `test-without-building`, then verify unchanged hashes and requirement.
 
 The app is `com.negentropi.RomaJustTalk`, at `.local-build/Build/Products/Debug/roma just talk.app`. TCC audit evidence attributed the child probe's access to this host. Granting the standalone helper instead is insufficient. XCTest embeds its bundle in the app; changing test sources can change the host signature, so grants must follow the final build.
 

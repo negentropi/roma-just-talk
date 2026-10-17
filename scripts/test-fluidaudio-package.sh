@@ -7,7 +7,7 @@ if [[ $# -ne 0 ]]; then
 fi
 
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
-APP_LOCK="$ROOT/VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+APP_LOCK="$ROOT/RomaJustTalk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
 CHECKOUT="$ROOT/.local-build/SourcePackages/checkouts/FluidAudio"
 EVIDENCE="$ROOT/.local-build/fluidaudio-test-evidence"
 mkdir -p "$EVIDENCE"

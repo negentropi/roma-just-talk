@@ -1,0 +1,920 @@
+import Foundation
+import OSLog
+
+public enum RomaAppNotificationKind: String, CaseIterable, Sendable {
+    case error
+    case warning
+    case info
+    case success
+
+    public static let defaultDisplayDuration: TimeInterval = 3.0
+
+    public var systemImageName: String {
+        switch self {
+        case .error:
+            return "xmark.octagon.fill"
+        case .warning:
+            return "exclamationmark.triangle.fill"
+        case .info:
+            return "info.circle.fill"
+        case .success:
+            return "checkmark.circle.fill"
+        }
+    }
+
+    public var playsFailureSound: Bool {
+        self == .error
+    }
+}
+
+public enum RomaSupportContactPolicy {
+    public static let emailAddress = "happyfumd@icloud.com"
+    public static let emailSubject = "Roma Just Talk Support Request"
+    public static let commonIssuesURLString = "https://roma-just-talk.com/readme"
+
+    public static func emailBody(systemInformation: String) -> String {
+        """
+
+        ------------------------
+        ✨ **SCREEN RECORDING HIGHLY RECOMMENDED** ✨
+        ▶️ Create a quick screen recording showing the issue!
+        ▶️ It makes the problem much faster to understand and fix.
+
+        📝 ISSUE DETAILS:
+        - What steps did you take before the issue occurred?
+        - What did you expect to happen?
+        - What actually happened instead?
+
+
+        ## 📋 COMMON ISSUES:
+        Check the documentation before sending an email: \(commonIssuesURLString)
+        ------------------------
+
+        System Information:
+        \(systemInformation)
+
+
+        """
+    }
+
+    public static func mailtoURL(subject: String = emailSubject) -> URL? {
+        var components = URLComponents()
+        components.scheme = "mailto"
+        components.path = emailAddress
+        components.queryItems = [
+            URLQueryItem(name: "subject", value: subject)
+        ]
+        return components.url
+    }
+}
+
+public enum RomaMiniRecorderAppIntentPresentation {
+    public static let toggleSuccessDialog = "Roma Just Talk recorder toggled"
+    public static let dismissSuccessDialog = "Roma Just Talk recorder dismissed"
+}
+
+public enum RomaMiniRecorderRequest {
+    public static let toggleNotificationName = Notification.Name("toggleMiniRecorder")
+    public static let dismissNotificationName = Notification.Name("dismissMiniRecorder")
+}
+
+public struct RomaMacOSStorageAlertPresentation: Equatable, Sendable {
+    public let title: String
+    public let message: String
+    public let buttonTitle: String
+
+    public init(title: String, message: String, buttonTitle: String) {
+        self.title = title
+        self.message = message
+        self.buttonTitle = buttonTitle
+    }
+}
+
+public enum RomaMacOSNavigationDestination: String, CaseIterable, Sendable {
+    case settings = "Settings"
+    case aiModels = "AI Models"
+    case history = "History"
+    case permissions = "Permissions"
+    case enhancement = "Enhancement"
+    case transcribeAudio = "Transcribe Audio"
+    case powerMode = "Power Mode"
+}
+
+public enum RomaMacOSMainViewItem: String, CaseIterable, Identifiable, Sendable {
+    case metrics
+    case transcribeAudio
+    case history
+    case models
+    case enhancement
+    case powerMode
+    case permissions
+    case audioInput
+    case dictionary
+    case settings
+    case about
+
+    public var id: String { rawValue }
+
+    public var title: String {
+        switch self {
+        case .metrics:
+            return "home"
+        case .transcribeAudio:
+            return "manual stt"
+        case .history:
+            return "past"
+        case .models:
+            return "models"
+        case .enhancement:
+            return "style"
+        case .powerMode:
+            return "Power Mode"
+        case .permissions:
+            return "Permissions"
+        case .audioInput:
+            return "Audio Input"
+        case .dictionary:
+            return "Dictionary"
+        case .settings:
+            return "Settings"
+        case .about:
+            return "About & Support"
+        }
+    }
+
+    public var systemImageName: String {
+        switch self {
+        case .metrics:
+            return "gauge.medium"
+        case .transcribeAudio:
+            return "waveform.circle.fill"
+        case .history:
+            return "doc.text.fill"
+        case .models:
+            return "brain.head.profile"
+        case .enhancement:
+            return "wand.and.stars"
+        case .powerMode:
+            return "sparkles.square.fill.on.square"
+        case .permissions:
+            return "shield.fill"
+        case .audioInput:
+            return "mic.fill"
+        case .dictionary:
+            return "character.book.closed.fill"
+        case .settings:
+            return "gearshape.fill"
+        case .about:
+            return "info.circle.fill"
+        }
+    }
+
+    public static let defaultSelection = RomaMacOSMainViewItem.metrics
+    public static let emptySelectionTitle = "Select a view"
+
+    public static func visibleItems(powerModeEnabled: Bool) -> [RomaMacOSMainViewItem] {
+        allCases.filter { item in
+            item != .powerMode || powerModeEnabled
+        }
+    }
+
+    public static func item(forNavigationDestination destination: String) -> RomaMacOSMainViewItem? {
+        switch destination {
+        case RomaMacOSNavigationDestination.settings.rawValue:
+            return .settings
+        case RomaMacOSNavigationDestination.aiModels.rawValue, RomaMacOSMainViewItem.models.title:
+            return .models
+        case RomaMacOSNavigationDestination.history.rawValue, RomaMacOSMainViewItem.history.title:
+            return .history
+        case RomaMacOSNavigationDestination.permissions.rawValue:
+            return .permissions
+        case RomaMacOSNavigationDestination.enhancement.rawValue, RomaMacOSMainViewItem.enhancement.title:
+            return .enhancement
+        case RomaMacOSNavigationDestination.transcribeAudio.rawValue, RomaMacOSMainViewItem.transcribeAudio.title:
+            return .transcribeAudio
+        case RomaMacOSNavigationDestination.powerMode.rawValue:
+            return .powerMode
+        default:
+            return nil
+        }
+    }
+}
+
+public enum RomaMacOSNavigationRequest {
+    public static let notificationName = Notification.Name("navigateToDestination")
+    public static let destinationUserInfoKey = "destination"
+    public static let defaultDestination = RomaMacOSNavigationDestination.settings
+
+    public static func userInfo(destination: RomaMacOSNavigationDestination) -> [AnyHashable: Any] {
+        userInfo(destination: destination.rawValue)
+    }
+
+    public static func userInfo(destination: String) -> [AnyHashable: Any] {
+        [destinationUserInfoKey: destination]
+    }
+
+    public static func destination(from notification: Notification) -> String? {
+        notification.userInfo?[destinationUserInfoKey] as? String
+    }
+}
+
+public enum RomaMacOSFileTranscriptionRequest {
+    public static let notificationName = Notification.Name("openFileForTranscription")
+    public static let urlUserInfoKey = "url"
+
+    public static func userInfo(url: URL) -> [AnyHashable: Any] {
+        [urlUserInfoKey: url]
+    }
+
+    public static func url(from notification: Notification) -> URL? {
+        notification.userInfo?[urlUserInfoKey] as? URL
+    }
+}
+
+public enum RomaMacOSAppEventRequest {
+    public static let appSettingsDidChangeNotificationName = Notification.Name("appSettingsDidChange")
+    public static let languageDidChangeNotificationName = Notification.Name("languageDidChange")
+    public static let didChangeModelNotificationName = Notification.Name("didChangeModel")
+    public static let openMainWindowRequestedNotificationName = Notification.Name("openMainWindowRequested")
+    public static let appPermissionsDidChangeNotificationName = Notification.Name("appPermissionsDidChange")
+    public static let promptSelectionChangedNotificationName = Notification.Name("promptSelectionChanged")
+    public static let powerModeConfigurationAppliedNotificationName = Notification.Name("powerModeConfigurationApplied")
+    public static let powerModeConfigurationsDidChangeNotificationName = Notification.Name("PowerModeConfigurationsDidChange")
+    public static let powerModeShortcutAvailabilityDidChangeNotificationName = Notification.Name("powerModeShortcutAvailabilityDidChange")
+    public static let transcriptionCreatedNotificationName = Notification.Name("transcriptionCreated")
+    public static let transcriptionCompletedNotificationName = Notification.Name("transcriptionCompleted")
+    public static let transcriptionDeletedNotificationName = Notification.Name("transcriptionDeleted")
+    public static let sessionMetricsDidChangeNotificationName = Notification.Name("sessionMetricsDidChange")
+    public static let enhancementToggleChangedNotificationName = Notification.Name("enhancementToggleChanged")
+}
+
+public enum RomaMacOSWindowIdentity {
+    public static var mainIdentifierRawValue: String {
+        "\(RomaAppIdentity.loggingSubsystem).mainWindow"
+    }
+
+    public static var onboardingIdentifierRawValue: String {
+        "\(RomaAppIdentity.loggingSubsystem).onboardingWindow"
+    }
+
+    public static var historyIdentifierRawValue: String {
+        "\(RomaAppIdentity.loggingSubsystem).historyWindow"
+    }
+
+    public static let mainFrameAutosaveName = "RomaMainWindowFrame"
+    public static let historyFrameAutosaveName = "RomaHistoryWindowFrame"
+
+    public static var mainTitle: String {
+        RomaAppIdentity.compactDisplayName
+    }
+
+    public static var onboardingTitle: String {
+        RomaAppIdentity.onboardingWindowTitle
+    }
+
+    public static var historyTitle: String {
+        "\(RomaAppIdentity.compactDisplayName) - Transcription History"
+    }
+
+    public static func identifierListDebugText(_ rawValues: [String?]) -> String {
+        rawValues.map { $0 ?? "nil" }.joined(separator: ", ")
+    }
+
+    public static let configureWindowDuplicateDetectedMessage = "configureWindow: duplicate detected, reusing existing window"
+    public static let configureWindowRegisteringMainMessage = "configureWindow: registering main window"
+    public static let resolveMainWindowRecoveredMessage = "resolveMainWindow: recovered window via identifier fallback"
+    public static let windowWillCloseMainMessage = "windowWillClose: main window closing, clearing weak reference"
+
+    public static func resolveMainWindowSearchingMessage(windowCount: Int) -> String {
+        "resolveMainWindow: weak ref is nil, searching \(windowCount) windows by identifier"
+    }
+
+    public static func resolveMainWindowFailedMessage(windowCount: Int, identifiers: String) -> String {
+        "resolveMainWindow: FAILED — no window found with main identifier. Total windows: \(windowCount), identifiers: \(identifiers)"
+    }
+}
+
+public enum RomaMacOSLogCategory {
+    public static let logExporter = "LogExporter"
+    public static let windowManager = "WindowManager"
+    public static let menuBarManager = "MenuBarManager"
+    public static let apiKeyManager = "APIKeyManager"
+    public static let keychainService = "KeychainService"
+    public static let aiEnhancementService = "AIEnhancementService"
+    public static let customCloudModelManager = "CustomCloudModelManager"
+    public static let transcriptionAutoCleanupService = "TranscriptionAutoCleanupService"
+    public static let sessionMetricMigrationService = "SessionMetricMigrationService"
+    public static let modelPrewarm = "ModelPrewarm"
+    public static let latencyTrace = "LatencyTrace"
+    public static let cursorPaster = "CursorPaster"
+    public static let sessionMetricRecorder = "SessionMetricRecorder"
+    public static let soundPlaybackEngine = "SoundPlaybackEngine"
+    public static let audioTranscriptionManager = "AudioTranscriptionManager"
+    public static let audioTranscriptionService = "AudioTranscriptionService"
+    public static let coreAudioRecorder = "CoreAudioRecorder"
+    public static let transcriptionServiceRegistry = "TranscriptionServiceRegistry"
+    public static let nativeAppleTranscriptionService = "NativeAppleTranscriptionService"
+    public static let nativeAppleLanguageAssetControl = "NativeAppleLanguageAssetControl"
+    public static let whisperTranscriptionService = "WhisperTranscriptionService"
+    public static let whisperModelManager = "WhisperModelManager"
+    public static let audioDeviceManager = "AudioDeviceManager"
+}
+
+public struct RomaDiagnosticLogSessionRange: Equatable, Sendable {
+    public let label: String
+    public let start: Date
+    public let end: Date?
+
+    public init(label: String, start: Date, end: Date?) {
+        self.label = label
+        self.start = start
+        self.end = end
+    }
+}
+
+public enum RomaDiagnosticsSettingsPresentation {
+    public static let showInFinderButtonTitle = "Show in Finder"
+    public static let exportButtonTitle = "Export"
+    public static let exportLogsLabel = "Export Logs"
+    public static let exportFailedAlertTitle = "Export Failed"
+    public static let alertDismissButtonTitle = "OK"
+    public static let exportedLogSuccessSystemImageName = "checkmark.circle.fill"
+}
+
+public enum RomaDiagnosticLogExportPolicy {
+    public static let sessionStartDatesKey = "logExporter.sessionStartDates.v1"
+    public static let maxSessionStartDatesToKeep = 3
+    public static let timestampDateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
+    public static let fileNameDateFormat = "yyyy-MM-dd_HH-mm-ss"
+    public static let fileNamePrefix = "Roma_Just_Talk_Logs_"
+    public static let fileNameExtension = "log"
+    public static let headerTitle = "=== Roma Just Talk Diagnostic Logs ==="
+    public static let headerDivider = "================================"
+    public static let noLogsFoundMessage = "No logs found for this session."
+    public static let exporterErrorDomain = "LogExporter"
+    public static let downloadsDirectoryUnavailableErrorCode = 1
+    public static let downloadsDirectoryUnavailableDescription = "Downloads directory unavailable"
+
+    public static func storedSessionStartDates(from defaults: UserDefaults = .standard) -> [Date] {
+        guard let data = defaults.data(forKey: sessionStartDatesKey),
+              let dates = try? JSONDecoder().decode([Date].self, from: data) else {
+            return []
+        }
+
+        return dates
+    }
+
+    public static func saveSessionStartDates(
+        _ dates: [Date],
+        to defaults: UserDefaults = .standard
+    ) {
+        guard let data = try? JSONEncoder().encode(dates) else {
+            return
+        }
+
+        defaults.set(data, forKey: sessionStartDatesKey)
+    }
+
+    public static func sessionStartDates(
+        starting currentDate: Date,
+        storedDates: [Date]
+    ) -> [Date] {
+        Array(([currentDate] + storedDates).prefix(maxSessionStartDatesToKeep))
+    }
+
+    public static func sessionRanges(
+        from sessionStartDates: [Date]
+    ) -> [RomaDiagnosticLogSessionRange] {
+        let totalSessions = sessionStartDates.count
+        return sessionStartDates.enumerated().map { index, start in
+            let end: Date? = (index == 0) ? nil : sessionStartDates[index - 1]
+            let sessionNumber = totalSessions - index
+            return RomaDiagnosticLogSessionRange(
+                label: sessionLabel(
+                    index: index,
+                    totalSessions: totalSessions,
+                    sessionNumber: sessionNumber
+                ),
+                start: start,
+                end: end
+            )
+        }
+    }
+
+    public static func headerLines(
+        exportDate: Date,
+        subsystem: String,
+        sessionCount: Int,
+        systemInfo: String
+    ) -> [String] {
+        [
+            headerTitle,
+            "Export Date: \(formattedTimestamp(exportDate))",
+            "Subsystem: \(subsystem)",
+            "Total Sessions: \(sessionCount)",
+            headerDivider,
+            "",
+            systemInfo,
+            ""
+        ]
+    }
+
+    public static func sessionHeaderLines(label: String) -> [String] {
+        [
+            "--- \(label) ---",
+            ""
+        ]
+    }
+
+    public static func logEntryLine(
+        date: Date,
+        level: String,
+        category: String,
+        message: String
+    ) -> String {
+        "[\(formattedTimestamp(date))] [\(level)] [\(category)] \(message)"
+    }
+
+    public static func exportContent(from lines: [String]) -> String {
+        lines.joined(separator: "\n")
+    }
+
+    public static func logLevelLabel(for level: OSLogEntryLog.Level) -> String {
+        switch level {
+        case .undefined:
+            return "UNDEFINED"
+        case .debug:
+            return "DEBUG"
+        case .info:
+            return "INFO"
+        case .notice:
+            return "NOTICE"
+        case .error:
+            return "ERROR"
+        case .fault:
+            return "FAULT"
+        @unknown default:
+            return "UNKNOWN"
+        }
+    }
+
+    public static func fileName(for date: Date) -> String {
+        "\(fileNamePrefix)\(formattedDate(date, format: fileNameDateFormat)).\(fileNameExtension)"
+    }
+
+    public static func downloadsDirectoryUnavailableError() -> NSError {
+        NSError(
+            domain: exporterErrorDomain,
+            code: downloadsDirectoryUnavailableErrorCode,
+            userInfo: [NSLocalizedDescriptionKey: downloadsDirectoryUnavailableDescription]
+        )
+    }
+
+    public static func formattedTimestamp(_ date: Date) -> String {
+        formattedDate(date, format: timestampDateFormat)
+    }
+
+    private static func sessionLabel(
+        index: Int,
+        totalSessions: Int,
+        sessionNumber: Int
+    ) -> String {
+        if totalSessions == 1 {
+            return "Session 1 (Current)"
+        } else if index == 0 {
+            return "Session \(sessionNumber) (Current)"
+        } else if index == totalSessions - 1 {
+            return "Session 1 (Oldest)"
+        } else {
+            return "Session \(sessionNumber)"
+        }
+    }
+
+    private static func formattedDate(_ date: Date, format: String) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = format
+        return formatter.string(from: date)
+    }
+}
+
+public enum RomaSystemArchitecture {
+    public static var isIntelMac: Bool {
+        #if os(macOS) && arch(x86_64)
+        return true
+        #else
+        return false
+        #endif
+    }
+
+    public static var macOSDisplayName: String {
+        #if arch(arm64)
+        return "Apple Silicon (ARM64)"
+        #elseif arch(x86_64)
+        return "Intel (x86_64)"
+        #else
+        return "Unknown"
+        #endif
+    }
+}
+
+public struct RomaMacOSSystemInformationFacts: Equatable, Sendable {
+    public let generated: String
+    public let appVersion: String
+    public let buildVersion: String
+    public let operatingSystemVersion: String
+    public let deviceModel: String
+    public let cpu: String
+    public let memory: String
+    public let architecture: String
+    public let audioInputMode: String
+    public let currentAudioDevice: String
+    public let availableAudioDevices: String
+    public let primaryShortcut: String
+    public let secondaryShortcut: String
+    public let middleClickRecording: Bool
+    public let middleClickActivationDelayMilliseconds: Int
+    public let selectedModel: String
+    public let selectedLanguage: String
+    public let aiEnhancement: String
+    public let aiProvider: String
+    public let aiModel: String
+    public let hideDockIcon: Bool
+    public let recorderStyle: String
+    public let soundFeedback: Bool
+    public let pauseMediaWhileRecording: Bool
+    public let muteAudioWhileRecording: String
+    public let audioResumptionDelaySeconds: Double
+    public let restoreClipboardAfterPaste: Bool
+    public let clipboardRestoreDelaySeconds: Double
+    public let pasteMethod: String
+    public let powerModeEnabled: Bool
+    public let persistConfiguredPreferences: Bool
+    public let autoDeleteTranscriptions: Bool
+    public let transcriptionRetentionMinutes: Int
+    public let autoDeleteAudioFiles: Bool
+    public let audioRetentionPeriodDays: Int
+    public let accessibilityPermission: String
+    public let inputMonitoringPermission: String
+    public let screenRecordingPermission: String
+    public let microphonePermission: String
+
+    public init(
+        generated: String,
+        appVersion: String,
+        buildVersion: String,
+        operatingSystemVersion: String,
+        deviceModel: String,
+        cpu: String,
+        memory: String,
+        architecture: String,
+        audioInputMode: String,
+        currentAudioDevice: String,
+        availableAudioDevices: String,
+        primaryShortcut: String,
+        secondaryShortcut: String,
+        middleClickRecording: Bool,
+        middleClickActivationDelayMilliseconds: Int,
+        selectedModel: String,
+        selectedLanguage: String,
+        aiEnhancement: String,
+        aiProvider: String,
+        aiModel: String,
+        hideDockIcon: Bool,
+        recorderStyle: String,
+        soundFeedback: Bool,
+        pauseMediaWhileRecording: Bool,
+        muteAudioWhileRecording: String,
+        audioResumptionDelaySeconds: Double,
+        restoreClipboardAfterPaste: Bool,
+        clipboardRestoreDelaySeconds: Double,
+        pasteMethod: String,
+        powerModeEnabled: Bool,
+        persistConfiguredPreferences: Bool,
+        autoDeleteTranscriptions: Bool,
+        transcriptionRetentionMinutes: Int,
+        autoDeleteAudioFiles: Bool,
+        audioRetentionPeriodDays: Int,
+        accessibilityPermission: String,
+        inputMonitoringPermission: String,
+        screenRecordingPermission: String,
+        microphonePermission: String
+    ) {
+        self.generated = generated
+        self.appVersion = appVersion
+        self.buildVersion = buildVersion
+        self.operatingSystemVersion = operatingSystemVersion
+        self.deviceModel = deviceModel
+        self.cpu = cpu
+        self.memory = memory
+        self.architecture = architecture
+        self.audioInputMode = audioInputMode
+        self.currentAudioDevice = currentAudioDevice
+        self.availableAudioDevices = availableAudioDevices
+        self.primaryShortcut = primaryShortcut
+        self.secondaryShortcut = secondaryShortcut
+        self.middleClickRecording = middleClickRecording
+        self.middleClickActivationDelayMilliseconds = middleClickActivationDelayMilliseconds
+        self.selectedModel = selectedModel
+        self.selectedLanguage = selectedLanguage
+        self.aiEnhancement = aiEnhancement
+        self.aiProvider = aiProvider
+        self.aiModel = aiModel
+        self.hideDockIcon = hideDockIcon
+        self.recorderStyle = recorderStyle
+        self.soundFeedback = soundFeedback
+        self.pauseMediaWhileRecording = pauseMediaWhileRecording
+        self.muteAudioWhileRecording = muteAudioWhileRecording
+        self.audioResumptionDelaySeconds = audioResumptionDelaySeconds
+        self.restoreClipboardAfterPaste = restoreClipboardAfterPaste
+        self.clipboardRestoreDelaySeconds = clipboardRestoreDelaySeconds
+        self.pasteMethod = pasteMethod
+        self.powerModeEnabled = powerModeEnabled
+        self.persistConfiguredPreferences = persistConfiguredPreferences
+        self.autoDeleteTranscriptions = autoDeleteTranscriptions
+        self.transcriptionRetentionMinutes = transcriptionRetentionMinutes
+        self.autoDeleteAudioFiles = autoDeleteAudioFiles
+        self.audioRetentionPeriodDays = audioRetentionPeriodDays
+        self.accessibilityPermission = accessibilityPermission
+        self.inputMonitoringPermission = inputMonitoringPermission
+        self.screenRecordingPermission = screenRecordingPermission
+        self.microphonePermission = microphonePermission
+    }
+}
+
+public enum RomaSystemInformationReport {
+    public static let noAudioDevicesDetectedText = "None detected"
+    public static let unknownValueText = "Unknown"
+
+    public static func generatedDateText(_ date: Date) -> String {
+        date.formatted(date: .long, time: .standard)
+    }
+
+    public static func knownText(_ text: String?) -> String {
+        text ?? unknownValueText
+    }
+
+    public static func availableAudioDevicesText(_ deviceNames: [String]) -> String {
+        guard !deviceNames.isEmpty else {
+            return noAudioDevicesDetectedText
+        }
+        return deviceNames.joined(separator: ", ")
+    }
+
+    public static func macOS(_ facts: RomaMacOSSystemInformationFacts) -> String {
+        """
+        === ROMA JUST TALK SYSTEM INFORMATION ===
+        Generated: \(facts.generated)
+
+        APP INFORMATION:
+        App Version: \(facts.appVersion)
+        Build Version: \(facts.buildVersion)
+
+        OPERATING SYSTEM:
+        macOS Version: \(facts.operatingSystemVersion)
+
+        HARDWARE INFORMATION:
+        Device Model: \(facts.deviceModel)
+        CPU: \(facts.cpu)
+        Memory: \(facts.memory)
+        Architecture: \(facts.architecture)
+
+        AUDIO SETTINGS:
+        Input Mode: \(facts.audioInputMode)
+        Current Audio Device: \(facts.currentAudioDevice)
+        Available Audio Devices: \(facts.availableAudioDevices)
+
+        HOTKEY SETTINGS:
+        Primary Shortcut: \(facts.primaryShortcut)
+        Secondary Shortcut: \(facts.secondaryShortcut)
+        Middle-Click Recording: \(facts.middleClickRecording)
+        Middle-Click Activation Delay: \(facts.middleClickActivationDelayMilliseconds) ms
+
+        TRANSCRIPTION SETTINGS:
+        Selected Model: \(facts.selectedModel)
+        Selected Language: \(facts.selectedLanguage)
+        AI Enhancement: \(facts.aiEnhancement)
+        AI Provider: \(facts.aiProvider)
+        AI Model: \(facts.aiModel)
+
+        UI SETTINGS:
+        Hide Dock Icon: \(facts.hideDockIcon)
+        Recorder Style: \(facts.recorderStyle)
+
+        RECORDING FEEDBACK:
+        Sound Feedback: \(facts.soundFeedback)
+        Pause Media While Recording: \(facts.pauseMediaWhileRecording)
+        Mute Audio While Recording: \(facts.muteAudioWhileRecording)
+        Audio Resumption Delay: \(facts.audioResumptionDelaySeconds)s
+
+        CLIPBOARD & PASTE SETTINGS:
+        Restore Clipboard After Paste: \(facts.restoreClipboardAfterPaste)
+        Clipboard Restore Delay: \(facts.clipboardRestoreDelaySeconds)s
+        Paste Method: \(facts.pasteMethod)
+
+        POWER MODE:
+        Power Mode Enabled: \(facts.powerModeEnabled)
+        Persist Configured Preferences: \(facts.persistConfiguredPreferences)
+
+        DATA CLEANUP SETTINGS:
+        Auto-Delete Transcriptions: \(facts.autoDeleteTranscriptions)
+        Transcription Retention: \(facts.transcriptionRetentionMinutes) minutes
+        Auto-Delete Audio Files: \(facts.autoDeleteAudioFiles)
+        Audio Retention Period: \(facts.audioRetentionPeriodDays) days
+
+        PERMISSIONS:
+        Accessibility: \(facts.accessibilityPermission)
+        Input Monitoring: \(facts.inputMonitoringPermission)
+        Screen Recording: \(facts.screenRecordingPermission)
+        Microphone: \(facts.microphonePermission)
+        """
+    }
+}
+
+public enum RomaSystemInformationPermissionStatus: Equatable, Sendable {
+    case granted
+    case notGranted
+    case denied
+    case restricted
+    case notDetermined
+    case unknown
+
+    public var displayText: String {
+        switch self {
+        case .granted:
+            return "Granted"
+        case .notGranted:
+            return "Not Granted"
+        case .denied:
+            return "Denied"
+        case .restricted:
+            return "Restricted"
+        case .notDetermined:
+            return "Not Determined"
+        case .unknown:
+            return "Unknown"
+        }
+    }
+
+    public static func grantStatus(isGranted: Bool) -> Self {
+        isGranted ? .granted : .notGranted
+    }
+}
+
+public struct RomaSystemInformationCopyButtonPresentation: Equatable, Sendable {
+    public let systemImageName: String
+    public let title: String
+
+    public init(systemImageName: String, title: String) {
+        self.systemImageName = systemImageName
+        self.title = title
+    }
+}
+
+public enum RomaSystemInformationCopyPresentation {
+    public static let idleSystemImageName = "doc.on.doc"
+    public static let copiedSystemImageName = "checkmark"
+    public static let idleTitle = "Copy System Info"
+    public static let copiedTitle = "Copied!"
+    public static let copiedResetDelay: TimeInterval = 1.5
+
+    public static func button(isCopied: Bool) -> RomaSystemInformationCopyButtonPresentation {
+        RomaSystemInformationCopyButtonPresentation(
+            systemImageName: isCopied ? copiedSystemImageName : idleSystemImageName,
+            title: isCopied ? copiedTitle : idleTitle
+        )
+    }
+}
+
+public enum RomaAppIdentity {
+    public static let bundleIdentifier = "com.negentropi.RomaJustTalk"
+    public static let loggingSubsystem = bundleIdentifier
+    public static let displayName = "roma just talk"
+    public static let compactDisplayName = "roma-just-talk"
+    public static let sidebarSubtitle = "speak before hotkey"
+    public static let iOSRecordDeepLinkScheme = "romajusttalk"
+    public static let iOSRecordDeepLinkHost = "record"
+
+    public static var iCloudContainerIdentifier: String {
+        "iCloud.\(bundleIdentifier)"
+    }
+
+    public static var iOSAppGroupIdentifier: String {
+        "group.\(bundleIdentifier)"
+    }
+
+    public static var iOSRecordDeepLinkURL: URL {
+        URL(string: "\(iOSRecordDeepLinkScheme)://\(iOSRecordDeepLinkHost)")!
+    }
+
+    public static var iOSStopRecordingDarwinNotificationName: String {
+        "\(bundleIdentifier).stopRecording"
+    }
+
+    public static var iOSRecordingStateChangedDarwinNotificationName: String {
+        "\(bundleIdentifier).recordingStateChanged"
+    }
+
+    public static var iOSKeyboardActivatedDarwinNotificationName: String {
+        "\(bundleIdentifier).keyboardActivated"
+    }
+
+    public static var iOSKeyboardActivatedWithFullAccessDarwinNotificationName: String {
+        "\(bundleIdentifier).keyboardActivatedWithFullAccess"
+    }
+
+    public static let iOSStopRecordingFromKeyboardNotificationName = Notification.Name("stopRecordingFromKeyboard")
+
+    public static var welcomeTitle: String {
+        "Welcome to \(displayName)"
+    }
+
+    public static var startUsingTitle: String {
+        "Start Using \(displayName)"
+    }
+
+    public static var onboardingWindowTitle: String {
+        "\(compactDisplayName) Onboarding"
+    }
+
+    public static var storageFailureMessage: String {
+        "\(compactDisplayName) cannot initialize its storage system. The app cannot continue.\n\nPlease try reinstalling the app or contact support if the issue persists."
+    }
+
+    public static let storageFallbackWarningPresentation = RomaMacOSStorageAlertPresentation(
+        title: "Storage Warning",
+        message: "Roma Just Talk couldn't access its storage location. Your transcriptions will not be saved between sessions.",
+        buttonTitle: "OK"
+    )
+
+    public static var storageFailurePresentation: RomaMacOSStorageAlertPresentation {
+        RomaMacOSStorageAlertPresentation(
+            title: "Critical Storage Error",
+            message: storageFailureMessage,
+            buttonTitle: "Quit"
+        )
+    }
+
+    public static func macOSApplicationSupportDirectory(in applicationSupportDirectory: URL) -> URL {
+        applicationSupportDirectory.appendingPathComponent(bundleIdentifier, isDirectory: true)
+    }
+
+    public static func errorDomain(component: String) -> String {
+        "\(bundleIdentifier).\(component)"
+    }
+}
+
+public enum RomaStorageStartupDiagnostics {
+    public static let modelContainerInitializationFailedMessage = "ModelContainer initialization failed"
+    public static let modelContainerUnavailablePreconditionMessage = "Unable to create ModelContainer. SwiftData is unavailable."
+
+    public static func iOSModelContainerCreationFailedMessage(errorDescription: String) -> String {
+        "Could not create ModelContainer: \(errorDescription)"
+    }
+}
+
+public enum RomaIOSLogCategory {
+    public static let app = "iOSApp"
+    public static let appGroup = "iOSAppGroup"
+    public static let audioPlayback = "iOSAudioPlayback"
+    public static let audioSession = "iOSAudioSession"
+    public static let keyboard = "iOSKeyboard"
+    public static let localWhisper = "iOSLocalWhisper"
+    public static let nativeAppleTranscription = "iOSNativeAppleTranscription"
+    public static let nativeAppleLanguageAssets = "iOSNativeAppleLanguageAssets"
+    public static let localModelManagement = "iOSLocalModelManagement"
+    public static let notes = "iOSNotes"
+    public static let recording = "iOSRecording"
+    public static let settings = "iOSSettings"
+}
+
+public enum RomaAppDeepLink: Equatable, Sendable {
+    case record
+
+    public var url: URL {
+        switch self {
+        case .record:
+            return RomaAppIdentity.iOSRecordDeepLinkURL
+        }
+    }
+
+    public init?(url: URL) {
+        guard url.scheme == RomaAppIdentity.iOSRecordDeepLinkScheme else {
+            return nil
+        }
+
+        guard url.host == RomaAppIdentity.iOSRecordDeepLinkHost else {
+            return nil
+        }
+
+        self = .record
+    }
+
+    public func applyRuntimeState(
+        handleRecord: () -> Void
+    ) {
+        switch self {
+        case .record:
+            handleRecord()
+        }
+    }
+}

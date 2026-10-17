@@ -1,0 +1,201 @@
+import SwiftUI
+import RomaCore
+
+struct EmojiPickerView: View {
+    @StateObject private var emojiManager = EmojiManager.shared
+    @Binding var selectedEmoji: String
+    @Binding var isPresented: Bool
+    @State private var newEmojiText: String = ""
+    @State private var isAddingCustomEmoji: Bool = false
+    @FocusState private var isEmojiTextFieldFocused: Bool
+    @State private var inputFeedbackMessage: String = ""
+    @State private var showingEmojiInUseAlert = false
+    @State private var emojiForAlert: String? = nil
+    private let columns: [GridItem] = [GridItem(.adaptive(minimum: 44), spacing: 10)]
+
+    var body: some View {
+        VStack(spacing: 12) {
+            ScrollView {
+                LazyVGrid(columns: columns, spacing: 10) {
+                    ForEach(emojiManager.allEmojis, id: \.self) { emoji in
+                        EmojiButton(
+                            emoji: emoji,
+                            isSelected: selectedEmoji == emoji,
+                            isCustom: emojiManager.isCustomEmoji(emoji),
+                            removeAction: {
+                                attemptToRemoveCustomEmoji(emoji)
+                            }
+                        ) {
+                            selectedEmoji = emoji
+                            inputFeedbackMessage = ""
+                            isPresented = false
+                        }
+                    }
+
+                    AddEmojiButton {
+                        isAddingCustomEmoji.toggle()
+                        newEmojiText = ""
+                        inputFeedbackMessage = ""
+                        if isAddingCustomEmoji {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                isEmojiTextFieldFocused = true
+                            }
+                        }
+                    }
+                }
+            }
+            .frame(maxHeight: 200)
+
+            if isAddingCustomEmoji {
+                VStack(spacing: 8) {
+                    HStack(spacing: 8) {
+                        TextField(RomaPowerModeEmojiInputPresentation.customEmojiFieldPlaceholder, text: $newEmojiText)
+                            .textFieldStyle(.roundedBorder)
+                            .font(.title2)
+                            .multilineTextAlignment(.center)
+                            .frame(maxWidth: 70)
+                            .focused($isEmojiTextFieldFocused)
+                            .onChange(of: newEmojiText) { _, newValue in
+                                let draft = emojiManager.inputDraft(for: newValue)
+                                inputFeedbackMessage = draft.feedbackMessage
+                                if newEmojiText != draft.text {
+                                    newEmojiText = draft.text
+                                }
+                            }
+                            .onSubmit(attemptAddCustomEmoji)
+
+                        Button(RomaPowerModeEmojiInputPresentation.addButtonTitle) {
+                            attemptAddCustomEmoji()
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .disabled(!emojiManager.inputDraft(for: newEmojiText).canSubmit)
+
+                        Button(RomaPowerModeEmojiInputPresentation.cancelButtonTitle) {
+                            isAddingCustomEmoji = false
+                            newEmojiText = ""
+                            inputFeedbackMessage = ""
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                    if !inputFeedbackMessage.isEmpty {
+                        Text(inputFeedbackMessage)
+                            .font(.caption)
+                            .foregroundColor(RomaPowerModeEmojiInputPresentation.isErrorMessage(inputFeedbackMessage) ? .red : .secondary)
+                            .transition(.opacity)
+                    }
+                    Text(RomaPowerModeEmojiInputPresentation.tipText)
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                        .padding(.top, 2)
+                }
+                .padding(.horizontal)
+                .padding(.bottom, 5)
+            }
+        }
+        .padding()
+        .frame(minWidth: 260, idealWidth: 300, maxWidth: 320, minHeight: 150, idealHeight: 280, maxHeight: 350)
+        .alert(
+            RomaPowerModeEmojiInputPresentation.inUseAlertTitle,
+            isPresented: $showingEmojiInUseAlert,
+            presenting: emojiForAlert
+        ) { emojiStr in
+            let presentation = RomaPowerModeEmojiInputPresentation.inUseAlert(emoji: emojiStr)
+            Button(presentation.buttonTitle, role: .cancel) { }
+        } message: { emojiStr in
+            Text(RomaPowerModeEmojiInputPresentation.inUseAlert(emoji: emojiStr).message)
+        }
+    }
+
+    private func attemptAddCustomEmoji() {
+        let result = emojiManager.addCustomEmoji(newEmojiText)
+        if let emoji = result.addedEmoji {
+            selectedEmoji = emoji
+            inputFeedbackMessage = ""
+            isAddingCustomEmoji = false
+            newEmojiText = ""
+        } else {
+            inputFeedbackMessage = RomaPowerModeEmojiInputPresentation.submitFeedbackMessage(for: result)
+        }
+    }
+
+    private func attemptToRemoveCustomEmoji(_ emojiToRemove: String) {
+        guard emojiManager.isCustomEmoji(emojiToRemove) else { return }
+
+        if PowerModeManager.shared.configurations.containsPowerModeEmoji(emojiToRemove) {
+            emojiForAlert = emojiToRemove
+            showingEmojiInUseAlert = true
+        } else {
+            _ = emojiManager.removeCustomEmoji(emojiToRemove)
+        }
+    }
+}
+
+private struct EmojiButton: View {
+    let emoji: String
+    let isSelected: Bool
+    let isCustom: Bool
+    let removeAction: () -> Void
+    let selectAction: () -> Void
+
+    var body: some View {
+        ZStack(alignment: .topTrailing) {
+            Button(action: selectAction) {
+                Text(emoji)
+                    .font(.largeTitle)
+                    .frame(width: 44, height: 44)
+                    .overlay(
+                        Circle()
+                            .strokeBorder(isSelected ? Color.accentColor : Color.gray.opacity(0.3), lineWidth: isSelected ? 2 : 1)
+                    )
+            }
+            .buttonStyle(.plain)
+
+            if isCustom {
+                Button(action: removeAction) {
+                    Image(systemName: RomaPowerModeEmojiInputPresentation.removeCustomEmojiSystemImageName)
+                        .symbolRenderingMode(.palette)
+                        .foregroundStyle(Color.white, Color.red)
+                        .font(.caption2)
+                        .background(Circle().fill(Color.white.opacity(0.8)))
+                }
+                .buttonStyle(.borderless)
+                .offset(x: 6, y: -6)
+            }
+        }
+    }
+}
+
+private struct AddEmojiButton: View {
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Label(
+                RomaPowerModeEmojiInputPresentation.addEmojiAccessibilityLabel,
+                systemImage: RomaPowerModeEmojiInputPresentation.addEmojiSystemImageName
+            )
+                .font(.title2)
+                .labelStyle(.iconOnly)
+                .foregroundColor(.accentColor)
+                .frame(width: 44, height: 44)
+                .overlay(
+                    Circle()
+                        .strokeBorder(Color.gray.opacity(0.3), lineWidth: 1)
+                )
+        }
+        .buttonStyle(.plain)
+        .help(RomaPowerModeEmojiInputPresentation.addCustomEmojiHelpText)
+    }
+}
+
+#if DEBUG
+struct EmojiPickerView_Previews: PreviewProvider {
+    static var previews: some View {
+        EmojiPickerView(
+            selectedEmoji: .constant("😀"),
+            isPresented: .constant(true)
+        )
+        .environmentObject(EmojiManager.shared)
+    }
+}
+#endif

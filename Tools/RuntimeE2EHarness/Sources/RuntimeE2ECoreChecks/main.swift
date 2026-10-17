@@ -239,7 +239,7 @@ do {
     )
     try require(
         incompleteTranscription.status == .transcriptionIncomplete,
-        "an incomplete VoiceInk trace must not be classified from unrelated clipboard changes"
+        "an incomplete RomaJustTalk trace must not be classified from unrelated clipboard changes"
     )
     print("PASS shortcut delivery and incomplete transcription remain distinct from paste failures")
 
@@ -298,26 +298,26 @@ do {
         shortcutDownPosted: true,
         shortcutUpPosted: true,
         emergencyShortcutReleasePosted: false,
-        voiceInkTriggerObserved: true,
-        voiceInkShortcutHoldMatched: true,
-        voiceInkShortcutEvidenceRejected: false,
-        voiceInkTranscriptionCompleted: false,
-        voiceInkClipboardWriteSucceeded: false,
-        voiceInkPasteEventPosted: false,
-        voiceInkTextDeliveryHandoffSucceeded: false,
+        romaTriggerObserved: true,
+        romaShortcutHoldMatched: true,
+        romaShortcutEvidenceRejected: false,
+        romaTranscriptionCompleted: false,
+        romaClipboardWriteSucceeded: false,
+        romaPasteEventPosted: false,
+        romaTextDeliveryHandoffSucceeded: false,
         systemClipboardChangeObserved: false,
         targetAccessibilityTextObserved: false,
         targetVisibleTextObserved: false,
         targetCleanupPassed: true,
-        voiceInkMicrophonePermissionUnavailable: true
+        romaMicrophonePermissionUnavailable: true
     )
     try require(
         RuntimeFailureBoundaryPolicy.classify(
             assessment: unavailableMicrophoneAssessment,
             evidence: unavailableMicrophoneEvidence,
             hasLatencyTrace: true
-        ) == .voiceInkMicrophonePermission,
-        "microphone authorization must have its own VoiceInk failure boundary"
+        ) == .romaMicrophonePermission,
+        "microphone authorization must have its own RomaJustTalk failure boundary"
     )
     print("PASS pending microphone authorization remains distinct from transcription failure")
 
@@ -502,24 +502,24 @@ do {
     )
     print("PASS target resources preserve identity, launch arguments, and editor baselines")
 
-    let selectedVoiceInk = RuntimeVoiceInkCandidateSelector.select(
+    let selectedRomaJustTalk = RuntimeRomaCandidateSelector.select(
         explicitPath: nil,
-        runningPaths: ["/Applications/VoiceInk.app"],
+        runningPaths: ["/Applications/RomaJustTalk.app"],
         buildDirectoryPath: "/Users/felix/Downloads/roma jt builds",
         buildCandidates: [
-            RuntimeVoiceInkCandidate(path: "/Users/felix/Downloads/roma jt builds/older.app", modifiedAt: Date(timeIntervalSince1970: 1)),
-            RuntimeVoiceInkCandidate(path: "/Users/felix/Downloads/roma jt builds/current.app", modifiedAt: Date(timeIntervalSince1970: 2))
+            RuntimeRomaCandidate(path: "/Users/felix/Downloads/roma jt builds/older.app", modifiedAt: Date(timeIntervalSince1970: 1)),
+            RuntimeRomaCandidate(path: "/Users/felix/Downloads/roma jt builds/current.app", modifiedAt: Date(timeIntervalSince1970: 2))
         ],
-        workspaceInstalledPath: "/Applications/VoiceInk.app"
+        workspaceInstalledPath: "/Applications/RomaJustTalk.app"
     )
-    try require(selectedVoiceInk?.path.hasSuffix("/current.app") == true, "newest build artifact should beat unrelated installed app")
-    try require(selectedVoiceInk?.source == .buildDirectory, "selection source should identify the build directory")
-    print("PASS exact newest build artifact is selected instead of unrelated installed VoiceInk")
+    try require(selectedRomaJustTalk?.path.hasSuffix("/current.app") == true, "newest build artifact should beat unrelated installed app")
+    try require(selectedRomaJustTalk?.source == .buildDirectory, "selection source should identify the build directory")
+    print("PASS exact newest build artifact is selected instead of unrelated installed RomaJustTalk")
 
     let sourceRoma = "/Volumes/Roma Distribution E2E/roma just talk.app"
     let translocatedRoma = "/private/var/folders/aa/bb/T/AppTranslocation/UUID/d/roma just talk.app"
     try require(
-        RuntimeVoiceInkLaunchIdentityPolicy.accepts(
+        RuntimeRomaLaunchIdentityPolicy.accepts(
             sourceBundlePath: sourceRoma,
             runningBundlePath: translocatedRoma,
             sourceExecutableSHA256: "same-sha",
@@ -529,7 +529,7 @@ do {
         "distribution runtime must accept the same executable through App Translocation"
     )
     try require(
-        !RuntimeVoiceInkLaunchIdentityPolicy.accepts(
+        !RuntimeRomaLaunchIdentityPolicy.accepts(
             sourceBundlePath: sourceRoma,
             runningBundlePath: sourceRoma,
             sourceExecutableSHA256: "same-sha",
@@ -539,7 +539,7 @@ do {
         "distribution runtime must reject an untranslocated relaunch"
     )
     try require(
-        !RuntimeVoiceInkLaunchIdentityPolicy.accepts(
+        !RuntimeRomaLaunchIdentityPolicy.accepts(
             sourceBundlePath: sourceRoma,
             runningBundlePath: translocatedRoma,
             sourceExecutableSHA256: "source-sha",
@@ -618,7 +618,7 @@ do {
     try require(
         trace?.keyUpToPasteEventMilliseconds ?? -1,
         equals: 200,
-        "trace should separate VoiceInk key-up-to-paste handoff from target visibility"
+        "trace should separate RomaJustTalk key-up-to-paste handoff from target visibility"
     )
     try require(
         trace?.keyUpToPipelineCompleteMilliseconds ?? -1,
@@ -631,7 +631,7 @@ do {
     ])
     try require(
         accessibilityInsertTrace?.pasteEventPosted == true,
-        "direct Accessibility insertion should count as VoiceInk text delivery"
+        "direct Accessibility insertion should count as RomaJustTalk text delivery"
     )
     try require(
         accessibilityInsertTrace?.textDeliveryHandoffCompleted == true,
@@ -712,7 +712,7 @@ do {
     try require(
         shortcutTimingTrace?.observedShortcutHoldMilliseconds ?? -1,
         equals: 166.2,
-        "trace should expose the shortcut hold VoiceInk actually observed"
+        "trace should expose the shortcut hold RomaJustTalk actually observed"
     )
     let rejectedShortcutTrace = RuntimeLatencyTrace.parse(messages: [
         "[LATENCY] trace=A5A6A7A8 seq=0 t=0.0ms delta=0.0ms event=shortcut.key_down_physical mode=special",
@@ -729,13 +729,13 @@ do {
         shortcutDownPosted: true,
         shortcutUpPosted: true,
         emergencyShortcutReleasePosted: false,
-        voiceInkTriggerObserved: true,
-        voiceInkShortcutHoldMatched: false,
-        voiceInkShortcutEvidenceRejected: rejectedShortcutTrace?.shortcutKeyEvidenceRejected == true,
-        voiceInkTranscriptionCompleted: false,
-        voiceInkClipboardWriteSucceeded: false,
-        voiceInkPasteEventPosted: false,
-        voiceInkTextDeliveryHandoffSucceeded: false,
+        romaTriggerObserved: true,
+        romaShortcutHoldMatched: false,
+        romaShortcutEvidenceRejected: rejectedShortcutTrace?.shortcutKeyEvidenceRejected == true,
+        romaTranscriptionCompleted: false,
+        romaClipboardWriteSucceeded: false,
+        romaPasteEventPosted: false,
+        romaTextDeliveryHandoffSucceeded: false,
         systemClipboardChangeObserved: false,
         targetAccessibilityTextObserved: false,
         targetVisibleTextObserved: false,
@@ -746,10 +746,10 @@ do {
             assessment: RuntimeCaseAssessment(status: .transcriptionIncomplete, passed: false),
             evidence: rejectedEvidence,
             hasLatencyTrace: true
-        ) == .voiceInkShortcutEvidence,
+        ) == .romaShortcutEvidence,
         "explicit key-evidence rejection should outrank inferred hold or transcription failures"
     )
-    print("PASS latency trace exposes the VoiceInk-observed shortcut hold")
+    print("PASS latency trace exposes the RomaJustTalk-observed shortcut hold")
 
     let emptyTranscriptTrace = RuntimeLatencyTrace.parse(messages: [
         "[LATENCY] trace=F1F2F3F4 seq=0 t=100.0ms delta=100.0ms event=pipeline.transcribe.end durationMs=52.0 result=success rawChars=0"

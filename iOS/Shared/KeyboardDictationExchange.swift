@@ -1,26 +1,26 @@
 import CryptoKit
 import Foundation
-import VoiceInkCore
+import RomaCore
 
-enum VoiceInkKeyboardDocumentIdentifierPolicy {
+enum RomaKeyboardDocumentIdentifierPolicy {
     static func resolve(_ rawValue: Any?) -> UUID? {
         rawValue as? UUID
     }
 }
 
-struct VoiceInkKeyboardDictationDelivery: Equatable, Sendable {
+struct RomaKeyboardDictationDelivery: Equatable, Sendable {
     let requestID: UUID
     let text: String
     let shouldLowercase: Bool
     let shouldInsertReturn: Bool
 }
 
-struct VoiceInkKeyboardDictationRequest: Equatable, Sendable {
+struct RomaKeyboardDictationRequest: Equatable, Sendable {
     let requestID: UUID
     let surroundingTextBeforeCursor: String?
 }
 
-enum VoiceInkKeyboardDictationExchangeStatus: Equatable, Sendable {
+enum RomaKeyboardDictationExchangeStatus: Equatable, Sendable {
     case none
     case requested(requestID: UUID)
     case ready(requestID: UUID)
@@ -29,7 +29,7 @@ enum VoiceInkKeyboardDictationExchangeStatus: Equatable, Sendable {
     case waitingForOriginalDocument(requestID: UUID)
 }
 
-struct VoiceInkKeyboardDictationExchangeStore {
+struct RomaKeyboardDictationExchangeStore {
     static let expirationInterval: TimeInterval = 15 * 60
 
     private enum State: String, Codable {
@@ -67,7 +67,7 @@ struct VoiceInkKeyboardDictationExchangeStore {
         requestID: UUID = UUID(),
         now: Date = Date()
     ) -> UUID? {
-        let boundedContextBeforeCursor = VoiceInkCursorTextContextPolicy.boundedSuffix(
+        let boundedContextBeforeCursor = RomaCursorTextContextPolicy.boundedSuffix(
             surroundingTextBeforeCursor
         )
         let exchange = Exchange(
@@ -91,12 +91,12 @@ struct VoiceInkKeyboardDictationExchangeStore {
         return write(exchange) ? requestID : nil
     }
 
-    func takePendingRequest(now: Date = Date()) -> VoiceInkKeyboardDictationRequest? {
+    func takePendingRequest(now: Date = Date()) -> RomaKeyboardDictationRequest? {
         guard var exchange = read(now: now), exchange.state == .requested else {
             return nil
         }
 
-        let request = VoiceInkKeyboardDictationRequest(
+        let request = RomaKeyboardDictationRequest(
             requestID: exchange.requestID,
             surroundingTextBeforeCursor: exchange.surroundingTextBeforeCursor
         )
@@ -165,7 +165,7 @@ struct VoiceInkKeyboardDictationExchangeStore {
         surroundingTextBeforeCursor: String? = nil,
         surroundingTextAfterCursor: String? = nil,
         now: Date = Date()
-    ) -> VoiceInkKeyboardDictationExchangeStatus {
+    ) -> RomaKeyboardDictationExchangeStatus {
         guard let exchange = read(now: now) else {
             return .none
         }
@@ -202,7 +202,7 @@ struct VoiceInkKeyboardDictationExchangeStore {
         surroundingTextAfterCursor: String? = nil,
         confirmDocumentChange: Bool = false,
         now: Date = Date()
-    ) -> VoiceInkKeyboardDictationDelivery? {
+    ) -> RomaKeyboardDictationDelivery? {
         guard let exchange = read(now: now),
               exchange.state == .succeeded,
               let text = exchange.text else {
@@ -224,7 +224,7 @@ struct VoiceInkKeyboardDictationExchangeStore {
         }
 
         defaults?.removeObject(forKey: Self.storageKey)
-        return VoiceInkKeyboardDictationDelivery(
+        return RomaKeyboardDictationDelivery(
             requestID: exchange.requestID,
             text: text,
             shouldLowercase: exchange.shouldLowercase ?? false,
@@ -266,7 +266,7 @@ struct VoiceInkKeyboardDictationExchangeStore {
             )
         let currentFingerprint = Self.documentContextFingerprint(
             requestID: exchange.requestID,
-            beforeCursor: VoiceInkCursorTextContextPolicy.boundedSuffix(
+            beforeCursor: RomaCursorTextContextPolicy.boundedSuffix(
                 surroundingTextBeforeCursor
             ),
             afterCursor: Self.boundedPrefix(surroundingTextAfterCursor)
@@ -312,7 +312,7 @@ struct VoiceInkKeyboardDictationExchangeStore {
             return nil
         }
 
-        return String(value.prefix(VoiceInkCursorTextContextPolicy.defaultMaximumLength))
+        return String(value.prefix(RomaCursorTextContextPolicy.defaultMaximumLength))
     }
 
     private func read(now: Date) -> Exchange? {

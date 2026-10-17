@@ -18,11 +18,11 @@ struct RuntimeCaseReport: Codable {
     let shortcutUp: RuntimeShortcutEventResult?
     let actualAudioLeadMilliseconds: Double?
     let actualHoldMilliseconds: Double?
-    let voiceInkObservedHoldMilliseconds: Double?
+    let romaObservedHoldMilliseconds: Double?
     let shortcutHoldDeltaMilliseconds: Double?
-    let voiceInkKeyUpToPasteEventMilliseconds: Double?
-    let voiceInkKeyUpToPipelineCompleteMilliseconds: Double?
-    let voiceInkKeyUpToInteractionSettledMilliseconds: Double?
+    let romaKeyUpToPasteEventMilliseconds: Double?
+    let romaKeyUpToPipelineCompleteMilliseconds: Double?
+    let romaKeyUpToInteractionSettledMilliseconds: Double?
     let pasteEventToVisibleMilliseconds: Double?
     let visibleText: RuntimeVisibleTextResult?
     let clipboardChanged: Bool
@@ -72,7 +72,7 @@ struct RuntimeHarnessReport: Codable {
     let configuration: RuntimeHarnessConfiguration
     let preflight: RuntimePreflightReport
     var abandonedTargetCleanup: RuntimeAbandonedTargetCleanupInfo?
-    var voiceInkSession: RuntimeVoiceInkSessionInfo?
+    var romaSession: RuntimeRomaSessionInfo?
     var cases: [RuntimeCaseReport]
     var summary: RuntimeRunSummary
     var restoredOriginalState: Bool
@@ -94,7 +94,7 @@ enum RuntimeHarnessRunner {
                 configuration: configuration,
                 preflight: preflight,
                 abandonedTargetCleanup: nil,
-                voiceInkSession: nil,
+                romaSession: nil,
                 cases: [],
                 summary: summarize(cases: []),
                 restoredOriginalState: true,
@@ -129,7 +129,7 @@ enum RuntimeHarnessRunner {
             configuration: configuration,
             preflight: preflight,
             abandonedTargetCleanup: nil,
-            voiceInkSession: nil,
+            romaSession: nil,
             cases: [],
             summary: summarize(cases: []),
             restoredOriginalState: false,
@@ -153,26 +153,26 @@ enum RuntimeHarnessRunner {
         try write(report: report, to: reportURL)
 
         let outputSession = try RuntimeSystemOutputSession.start(targetDevice: audioDevice)
-        var voiceInkSession: RuntimeVoiceInkSession?
+        var romaSession: RuntimeRomaSession?
         do {
-            let session = try RuntimeVoiceInkSession.start(
+            let session = try RuntimeRomaSession.start(
                 configuration: configuration,
                 audioDeviceUID: audioDevice.uid
             )
-            voiceInkSession = session
-            report.voiceInkSession = session.info
+            romaSession = session
+            report.romaSession = session.info
             Thread.sleep(forTimeInterval: configuration.preRollWarmupSeconds)
 
             var seenTraceIDs = Set((try? RuntimeLatencyLogReader.recent().traces.map(\.traceID)) ?? [])
             var previousFixturePath: String?
             for (caseIndex, runCase) in runPlan.cases.enumerated() {
-                if shouldRelaunchVoiceInk(
-                    lifecycle: configuration.voiceInkLifecycle,
+                if shouldRelaunchRomaJustTalk(
+                    lifecycle: configuration.romaLifecycle,
                     previousFixturePath: previousFixturePath,
                     currentFixturePath: runCase.fixtureURL.path,
                     caseIndex: caseIndex
                 ) {
-                    try session.relaunchForRun(bundleIdentifier: configuration.voiceInkBundleIdentifier)
+                    try session.relaunchForRun(bundleIdentifier: configuration.romaBundleIdentifier)
                     Thread.sleep(forTimeInterval: configuration.preRollWarmupSeconds)
                 }
                 previousFixturePath = runCase.fixtureURL.path
@@ -198,7 +198,7 @@ enum RuntimeHarnessRunner {
             try write(report: report, to: reportURL)
             return report
         } catch {
-            try? voiceInkSession?.restore()
+            try? romaSession?.restore()
             try? outputSession.restore()
             report.restoredOriginalState = true
             report.finishedAt = Date()
@@ -230,9 +230,9 @@ enum RuntimeHarnessRunner {
         var clipboardChanged = false
         var audioPlaybackStarted = false
         var emergencyShortcutReleasePosted = false
-        var voiceInkObservedHoldMilliseconds: Double?
+        var romaObservedHoldMilliseconds: Double?
         var shortcutHoldDeltaMilliseconds: Double?
-        var voiceInkShortcutHoldMatched: Bool?
+        var romaShortcutHoldMatched: Bool?
         var assessment = RuntimeCaseAssessment(status: .targetSetupFailed, passed: false)
         var errorText: String?
 
@@ -309,20 +309,20 @@ enum RuntimeHarnessRunner {
             )
 
             let postedHoldMilliseconds = (up.postedAtSystemUptime - down.postedAtSystemUptime) * 1_000
-            voiceInkObservedHoldMilliseconds = latencyTrace?.observedShortcutHoldMilliseconds
-            shortcutHoldDeltaMilliseconds = voiceInkObservedHoldMilliseconds.map {
+            romaObservedHoldMilliseconds = latencyTrace?.observedShortcutHoldMilliseconds
+            shortcutHoldDeltaMilliseconds = romaObservedHoldMilliseconds.map {
                 $0 - postedHoldMilliseconds
             }
-            voiceInkShortcutHoldMatched = shortcutHoldDeltaMilliseconds.map {
+            romaShortcutHoldMatched = shortcutHoldDeltaMilliseconds.map {
                 abs($0) <= shortcutHoldToleranceMilliseconds
             }
-            if voiceInkShortcutHoldMatched == false,
-               let voiceInkObservedHoldMilliseconds,
+            if romaShortcutHoldMatched == false,
+               let romaObservedHoldMilliseconds,
                let shortcutHoldDeltaMilliseconds {
                 let timingError = String(
-                    format: "Posted shortcut hold %.1fms; VoiceInk observed %.1fms (delta %.1fms)",
+                    format: "Posted shortcut hold %.1fms; RomaJustTalk observed %.1fms (delta %.1fms)",
                     postedHoldMilliseconds,
-                    voiceInkObservedHoldMilliseconds,
+                    romaObservedHoldMilliseconds,
                     shortcutHoldDeltaMilliseconds
                 )
                 errorText = [errorText, timingError]
@@ -341,7 +341,7 @@ enum RuntimeHarnessRunner {
                 observation: observation,
                 expectedTranscript: runCase.expectedTranscript,
                 latencyThresholdMilliseconds: configuration.latencyThresholdMilliseconds,
-                shortcutHoldMatched: voiceInkShortcutHoldMatched,
+                shortcutHoldMatched: romaShortcutHoldMatched,
                 microphonePermissionUnavailable: latencyTrace.map(\.microphonePermissionUnavailable),
                 transcriptionCompleted: latencyTrace.map(\.transcriptionCompleted),
                 transcribedCharacterCount: latencyTrace?.transcribedCharacterCount,
@@ -429,31 +429,31 @@ enum RuntimeHarnessRunner {
             shortcutDownPosted: shortcutDown != nil,
             shortcutUpPosted: shortcutUp != nil,
             emergencyShortcutReleasePosted: emergencyShortcutReleasePosted,
-            voiceInkTriggerObserved: latencyTrace?.triggerObserved == true,
-            voiceInkShortcutHoldMatched: voiceInkShortcutHoldMatched,
-            voiceInkShortcutEvidenceRejected: latencyTrace?.shortcutKeyEvidenceRejected == true,
-            voiceInkTranscriptionCompleted: latencyTrace?.transcriptionCompleted == true,
-            voiceInkClipboardWriteSucceeded: latencyTrace?.clipboardWriteSucceeded == true,
-            voiceInkPasteEventPosted: latencyTrace?.pasteEventPosted == true,
-            voiceInkTextDeliveryHandoffSucceeded: latencyTrace?.textDeliveryHandoffCompleted == true,
+            romaTriggerObserved: latencyTrace?.triggerObserved == true,
+            romaShortcutHoldMatched: romaShortcutHoldMatched,
+            romaShortcutEvidenceRejected: latencyTrace?.shortcutKeyEvidenceRejected == true,
+            romaTranscriptionCompleted: latencyTrace?.transcriptionCompleted == true,
+            romaClipboardWriteSucceeded: latencyTrace?.clipboardWriteSucceeded == true,
+            romaPasteEventPosted: latencyTrace?.pasteEventPosted == true,
+            romaTextDeliveryHandoffSucceeded: latencyTrace?.textDeliveryHandoffCompleted == true,
             systemClipboardChangeObserved: clipboardChanged,
             targetAccessibilityTextObserved: targetAccessibilityTextObserved,
             targetVisibleTextObserved: targetVisibleTextObserved,
             targetCleanupPassed: targetCleanup?.passed,
-            voiceInkMicrophonePermissionUnavailable: latencyTrace.map(\.microphonePermissionUnavailable)
+            romaMicrophonePermissionUnavailable: latencyTrace.map(\.microphonePermissionUnavailable)
         )
         let failureBoundary = RuntimeFailureBoundaryPolicy.classify(
             assessment: assessment,
             evidence: evidence,
             hasLatencyTrace: latencyTrace != nil
         )
-        let voiceInkKeyUpToPasteEventMilliseconds = latencyTrace?.keyUpToPasteEventMilliseconds
-        let voiceInkKeyUpToPipelineCompleteMilliseconds = latencyTrace?.keyUpToPipelineCompleteMilliseconds
-        let voiceInkKeyUpToInteractionSettledMilliseconds = latencyTrace?.keyUpToInteractionSettledMilliseconds
+        let romaKeyUpToPasteEventMilliseconds = latencyTrace?.keyUpToPasteEventMilliseconds
+        let romaKeyUpToPipelineCompleteMilliseconds = latencyTrace?.keyUpToPipelineCompleteMilliseconds
+        let romaKeyUpToInteractionSettledMilliseconds = latencyTrace?.keyUpToInteractionSettledMilliseconds
         let pasteEventToVisibleMilliseconds = visibleText?.keyUpToVisibleMilliseconds.flatMap { visible in
             // Keep signed evidence: direct AX can precede completion, and an early pixel
             // false positive must not masquerade as an instantaneous paste.
-            voiceInkKeyUpToPasteEventMilliseconds.map { visible - $0 }
+            romaKeyUpToPasteEventMilliseconds.map { visible - $0 }
         }
         return RuntimeCaseReport(
             id: runID,
@@ -475,11 +475,11 @@ enum RuntimeHarnessRunner {
             actualHoldMilliseconds: shortcutDown.flatMap { down in
                 shortcutUp.map { ($0.postedAtSystemUptime - down.postedAtSystemUptime) * 1_000 }
             },
-            voiceInkObservedHoldMilliseconds: voiceInkObservedHoldMilliseconds,
+            romaObservedHoldMilliseconds: romaObservedHoldMilliseconds,
             shortcutHoldDeltaMilliseconds: shortcutHoldDeltaMilliseconds,
-            voiceInkKeyUpToPasteEventMilliseconds: voiceInkKeyUpToPasteEventMilliseconds,
-            voiceInkKeyUpToPipelineCompleteMilliseconds: voiceInkKeyUpToPipelineCompleteMilliseconds,
-            voiceInkKeyUpToInteractionSettledMilliseconds: voiceInkKeyUpToInteractionSettledMilliseconds,
+            romaKeyUpToPasteEventMilliseconds: romaKeyUpToPasteEventMilliseconds,
+            romaKeyUpToPipelineCompleteMilliseconds: romaKeyUpToPipelineCompleteMilliseconds,
+            romaKeyUpToInteractionSettledMilliseconds: romaKeyUpToInteractionSettledMilliseconds,
             pasteEventToVisibleMilliseconds: pasteEventToVisibleMilliseconds,
             visibleText: visibleText,
             clipboardChanged: clipboardChanged,
@@ -510,8 +510,8 @@ enum RuntimeHarnessRunner {
         )
     }
 
-    private static func shouldRelaunchVoiceInk(
-        lifecycle: RuntimeHarnessConfiguration.VoiceInkLifecycle,
+    private static func shouldRelaunchRomaJustTalk(
+        lifecycle: RuntimeHarnessConfiguration.RomaLifecycle,
         previousFixturePath: String?,
         currentFixturePath: String,
         caseIndex: Int
@@ -582,8 +582,8 @@ enum RuntimeHarnessRunner {
     private static func summarize(cases: [RuntimeCaseReport]) -> RuntimeRunSummary {
         let latencies = cases.compactMap(\.visibleText?.keyUpToVisibleMilliseconds)
         let accessibilityLatencies = cases.compactMap(\.visibleText?.keyUpToAccessibilityTextMilliseconds)
-        let pipelineCompleteLatencies = cases.compactMap(\.voiceInkKeyUpToPipelineCompleteMilliseconds)
-        let interactionSettledLatencies = cases.compactMap(\.voiceInkKeyUpToInteractionSettledMilliseconds)
+        let pipelineCompleteLatencies = cases.compactMap(\.romaKeyUpToPipelineCompleteMilliseconds)
+        let interactionSettledLatencies = cases.compactMap(\.romaKeyUpToInteractionSettledMilliseconds)
         let appSummaries = Dictionary(grouping: cases, by: { $0.target.id })
             .map { targetID, appCases -> RuntimeAppSummary in
                 let appLatencies = appCases.compactMap(\.visibleText?.keyUpToVisibleMilliseconds)

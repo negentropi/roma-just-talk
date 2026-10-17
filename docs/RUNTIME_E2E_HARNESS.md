@@ -11,7 +11,7 @@ LatencyTrace ------------------> app phase timestamps
 ```
 
 It is external to the production app. The helper does not add test hooks to
-VoiceInk or bypass CoreAudio, global shortcuts, transcription, clipboard paste,
+RomaJustTalk or bypass CoreAudio, global shortcuts, transcription, clipboard paste,
 target-app focus, Accessibility observation, or rendered-screen verification.
 The report keeps Accessibility value arrival separate from first stable screen
 pixels so AX state is never presented as proof that a person could already see
@@ -313,12 +313,12 @@ capture/transcription trace evidence and target text proves the complete route.
 - Target app missing, not activated, unreadable through AX, or not cleared
 - Existing text on either side of the insertion cursor is changed or lost
 - WAV cannot play into BlackHole
-- Synthetic Special left Shift is not accepted by VoiceInk
-- Posted Shift hold and VoiceInk-observed hold differ by more than `150ms`
+- Synthetic Special left Shift is not accepted by RomaJustTalk
+- Posted Shift hold and RomaJustTalk-observed hold differ by more than `150ms`
 - No new `LatencyTrace` is emitted
-- VoiceInk starts a trace but never completes transcription
-- VoiceInk completes transcription with zero characters (`emptyTranscript`)
-- VoiceInk posts no text into the target
+- RomaJustTalk starts a trace but never completes transcription
+- RomaJustTalk completes transcription with zero characters (`emptyTranscript`)
+- RomaJustTalk posts no text into the target
 - Clipboard changes but the target remains empty (`clipboardOnly`)
 - Accessibility text arrives but stable changed pixels never render
 - Rendered text exceeds the latency budget
@@ -330,8 +330,8 @@ calculations. Per-app and overall summaries include total, passed, failed,
 no-visible-paste count, p50, p95, and maximum visible-text latency.
 
 An unanswered or denied microphone request is attributed to
-`voiceInkMicrophonePermission`, before transcription classification. An empty
-transcription is attributed to `voiceInkTranscription`, even if VoiceInk
+`romaMicrophonePermission`, before transcription classification. An empty
+transcription is attributed to `romaTranscription`, even if RomaJustTalk
 subsequently writes or posts whitespace. It is never counted as a clipboard,
 paste-delivery, or target-visibility failure.
 
@@ -348,7 +348,7 @@ or Roma's monitor caused the mismatch.
 
 Latency is split into:
 
-- `voiceInkKeyUpToPasteEventMilliseconds`: Roma trace from shortcut key-up handler
+- `romaKeyUpToPasteEventMilliseconds`: Roma trace from shortcut key-up handler
   to paste-event post
 - `visibleText.keyUpToAccessibilityTextMilliseconds`: first non-empty AX value;
   useful for paste delivery, but not proof of rendered visibility
@@ -356,9 +356,9 @@ Latency is split into:
   in the exact editable screen rectangle
 - `pasteEventToVisibleMilliseconds`: remaining time from Roma's post until the
   rendered-pixel observation
-- `voiceInkKeyUpToPipelineCompleteMilliseconds`: Roma post-processing and save
+- `romaKeyUpToPipelineCompleteMilliseconds`: Roma post-processing and save
   completion
-- `voiceInkKeyUpToInteractionSettledMilliseconds`: final recorder toggle return,
+- `romaKeyUpToInteractionSettledMilliseconds`: final recorder toggle return,
   matching the longer endpoint a human may perceive
 
 The rendered span intentionally remains an end-to-end delivery/visibility
@@ -380,8 +380,8 @@ not establish Core ML, CPU, GPU, or Neural Engine occupancy.
 
 Before a run, the helper records:
 
-- VoiceInk microphone mode and selected-device UID
-- exact running VoiceInk bundle paths
+- RomaJustTalk microphone mode and selected-device UID
+- exact running RomaJustTalk bundle paths
 - system default output-device UID
 - BlackHole input/output mute and volume controls when supported
 
@@ -425,7 +425,7 @@ do not establish this regression; retain the original helpers and captures.
 
 The exact Roma app is selected in this order:
 
-1. `voiceInkAppPath` from config
+1. `romaAppPath` from config
 2. a running app inside the configured build directory
 3. the newest matching `.app` directly under `~/Downloads/roma jt builds/`
 4. another running matching app
@@ -460,7 +460,7 @@ four-running-app gate are all ready. On Sonoma it uses ScreenCaptureKit's macOS 
 content-filter screenshot API for the same rendered-pixel check. The explicit preflight command requests any
 missing Accessibility or Screen Recording grant; normal run mode never prompts.
 
-Remote stages use the helper artifact produced by `voiceink-build.yml`. The
+Remote stages use the helper artifact produced by `roma-build.yml`. The
 target Mac first runs the packaged helper executable with `--help` and records
 its process exit. A 14.0 plist value or Mach-O minimum alone does
 not count as Sonoma compatibility proof.

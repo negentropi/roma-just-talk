@@ -1,5 +1,5 @@
 # Define a directory for dependencies in the user's home folder
-DEPS_DIR := $(HOME)/VoiceInk-Dependencies
+DEPS_DIR := $(HOME)/RomaJustTalk-Dependencies
 WHISPER_CPP_DIR := $(DEPS_DIR)/whisper.cpp
 FRAMEWORK_PATH := $(WHISPER_CPP_DIR)/build-apple/whisper.xcframework
 STATIC_WHISPER_XCFRAMEWORK_CHECK := scripts/verify-static-whisper-xcframework.sh
@@ -254,13 +254,13 @@ setup: whisper
 	@echo "Please ensure your Xcode project references the framework from this new location."
 
 build: setup
-	xcodebuild -project VoiceInk.xcodeproj -scheme VoiceInk -configuration Debug CODE_SIGN_IDENTITY="" build
+	xcodebuild -project RomaJustTalk.xcodeproj -scheme RomaJustTalk -configuration Debug CODE_SIGN_IDENTITY="" build
 
 # Build for local use without Apple Developer certificate
 local: check setup
 	@echo "Building roma just talk ($(CONFIGURATION)) for local use (no Apple Developer certificate required)..."
 	@rm -rf "$(LOCAL_DERIVED_DATA)"
-	xcodebuild -project VoiceInk.xcodeproj -scheme VoiceInk -configuration "$(CONFIGURATION)" \
+	xcodebuild -project RomaJustTalk.xcodeproj -scheme RomaJustTalk -configuration "$(CONFIGURATION)" \
 		-derivedDataPath "$(LOCAL_DERIVED_DATA)" \
 		-xcconfig LocalBuild.xcconfig \
 		ENABLE_CODE_COVERAGE=NO \
@@ -268,7 +268,7 @@ local: check setup
 		CODE_SIGNING_REQUIRED=NO \
 		CODE_SIGNING_ALLOWED=YES \
 		DEVELOPMENT_TEAM="" \
-		CODE_SIGN_ENTITLEMENTS="$(CURDIR)/VoiceInk/VoiceInk.local.entitlements" \
+		CODE_SIGN_ENTITLEMENTS="$(CURDIR)/RomaJustTalk/RomaJustTalk.local.entitlements" \
 		SWIFT_ACTIVE_COMPILATION_CONDITIONS='$$(inherited) LOCAL_BUILD' \
 		build
 	@APP_PATH="$(LOCAL_DERIVED_DATA)/Build/Products/$(CONFIGURATION)/roma just talk.app" && \
@@ -346,12 +346,12 @@ help:
 	@echo "Available targets:"
 	@echo "  check/healthcheck  Check if required CLI tools are installed"
 	@echo "  whisper            Clone and build whisper.cpp XCFramework"
-	@echo "  setup              Copy whisper XCFramework to VoiceInk project"
-	@echo "  build              Build the VoiceInk Xcode project"
+	@echo "  setup              Copy whisper XCFramework to RomaJustTalk project"
+	@echo "  build              Build the RomaJustTalk Xcode project"
 	@echo "  local              Build for local use (Debug default; use CONFIGURATION=Release for packaging)"
 	@echo "  static-whisper-app-check Verify the built app does not embed or load Whisper dynamically"
 	@echo "  adhoc-library-validation-check Verify the local app can load its bundled frameworks"
-	@echo "  run                Launch the built VoiceInk app"
+	@echo "  run                Launch the built RomaJustTalk app"
 	@echo "  dev                Build and run the app (for development)"
 	@echo "  all                Run full build process (default)"
 	@echo "  latency-harness-build  Compile real visible-text latency harness"

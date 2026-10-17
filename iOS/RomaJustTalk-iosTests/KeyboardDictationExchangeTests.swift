@@ -1,0 +1,389 @@
+import Foundation
+import RomaCore
+import XCTest
+@testable import roma_just_talk
+
+final class KeyboardDictationExchangeTests: XCTestCase {
+    private var suiteName: String!
+    private var defaults: UserDefaults!
+
+    override func setUpWithError() throws {
+        suiteName = "KeyboardDictationExchangeTests.\(UUID().uuidString)"
+        defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+    }
+
+    override func tearDownWithError() throws {
+        defaults.removePersistentDomain(forName: suiteName)
+        defaults = nil
+        suiteName = nil
+    }
+
+    func testDocumentIdentifierPolicyHandlesUnavailableProxyValue() {
+        XCTAssertNil(RomaKeyboardDocumentIdentifierPolicy.resolve(nil))
+
+        let documentID = UUID()
+        XCTAssertEqual(
+            RomaKeyboardDocumentIdentifierPolicy.resolve(
+                NSUUID(uuidString: documentID.uuidString)
+            ),
+            documentID
+        )
+    }
+
+    func testDismissOnlyRecordingAlertStillProvidesEnabledIOSAction() {
+        var openedSettings = false
+
+        RomaRecordingAlertPresentation.noModesAvailable.iOSPrimaryButtonAction {
+            openedSettings = true
+        }()
+        XCTAssertFalse(openedSettings)
+
+        RomaRecordingAlertPresentation.microphonePermissionDenied.iOSPrimaryButtonAction {
+            openedSettings = true
+        }()
+        XCTAssertTrue(openedSettings)
+    }
+
+    func testMatchingDocumentTakesCompletedTextExactlyOnce() throws {
+        let store = RomaKeyboardDictationExchangeStore(defaults: defaults)
+        let requestID = UUID()
+        let documentID = UUID()
+        let requestedAt = Date(timeIntervalSince1970: 100)
+
+        XCTAssertEqual(
+            store.begin(
+                documentIdentifier: documentID,
+                requestID: requestID,
+                now: requestedAt
+            ),
+            requestID
+        )
+        XCTAssertTrue(store.complete(
+            requestID: requestID,
+            text: "Delivered transcript",
+            now: requestedAt.addingTimeInterval(1)
+        ))
+
+        XCTAssertEqual(
+            store.takeCompletedResult(
+                for: documentID,
+                now: requestedAt.addingTimeInterval(2)
+            ),
+            RomaKeyboardDictationDelivery(
+                requestID: requestID,
+                text: "Delivered transcript",
+                shouldLowercase: false,
+                shouldInsertReturn: false
+            )
+        )
+        XCTAssertNil(store.takeCompletedResult(
+            for: documentID,
+            now: requestedAt.addingTimeInterval(2)
+        ))
+    }
+
+    func testDifferentDocumentWithDifferentContextCannotTakeCompletedText() throws {
+        let store = RomaKeyboardDictationExchangeStore(defaults: defaults)
+        let requestID = UUID()
+        let originalDocumentID = UUID()
+        let requestedAt = Date(timeIntervalSince1970: 100)
+
+        store.begin(
+            documentIdentifier: originalDocumentID,
+            surroundingTextBeforeCursor: "Original field",
+            requestID: requestID,
+            now: requestedAt
+        )
+        XCTAssertTrue(store.complete(
+            requestID: requestID,
+            text: "Private transcript",
+            now: requestedAt.addingTimeInterval(1)
+        ))
+
+        let otherDocumentID = UUID()
+        XCTAssertEqual(
+            store.status(
+                for: otherDocumentID,
+                surroundingTextBeforeCursor: "Other field",
+                now: requestedAt.addingTimeInterval(2)
+            ),
+            .waitingForOriginalDocument(requestID: requestID)
+        )
+        XCTAssertNil(store.takeCompletedResult(
+            for: otherDocumentID,
+            surroundingTextBeforeCursor: "Other field",
+            now: requestedAt.addingTimeInterval(2)
+        ))
+        XCTAssertNotNil(store.takeCompletedResult(
+            for: originalDocumentID,
+            now: requestedAt.addingTimeInterval(2)
+        ))
+    }
+
+    func testChangedDocumentWithMatchingCursorContextTakesCompletedText() throws {
+        let store = RomaKeyboardDictationExchangeStore(defaults: defaults)
+        let requestID = UUID()
+        let originalDocumentID = UUID()
+        let returnedDocumentID = UUID()
+        let requestedAt = Date(timeIntervalSince1970: 100)
+
+        store.begin(
+            documentIdentifier: originalDocumentID,
+            surroundingTextBeforeCursor: "Draft prefix ",
+            surroundingTextAfterCursor: "draft suffix",
+            requestID: requestID,
+            now: requestedAt
+        )
+        _ = store.takePendingRequest(now: requestedAt.addingTimeInterval(1))
+        XCTAssertTrue(store.complete(
+            requestID: requestID,
+            text: "returned transcript",
+            now: requestedAt.addingTimeInterval(2)
+        ))
+
+        XCTAssertEqual(
+            store.status(
+                for: returnedDocumentID,
+                surroundingTextBeforeCursor: "Draft prefix ",
+                surroundingTextAfterCursor: "draft suffix",
+                now: requestedAt.addingTimeInterval(3)
+            ),
+            .ready(requestID: requestID)
+        )
+        XCTAssertEqual(
+            store.takeCompletedResult(
+                for: returnedDocumentID,
+                surroundingTextBeforeCursor: "Draft prefix ",
+                surroundingTextAfterCursor: "draft suffix",
+                now: requestedAt.addingTimeInterval(3)
+            )?.text,
+            "returned transcript"
+        )
+    }
+
+    func testChangedDocumentWithDifferentCursorSuffixCannotTakeCompletedText() throws {
+        let store = RomaKeyboardDictationExchangeStore(defaults: defaults)
+        let requestID = UUID()
+        let originalDocumentID = UUID()
+        let returnedDocumentID = UUID()
+        let requestedAt = Date(timeIntervalSince1970: 100)
+
+        store.begin(
+            documentIdentifier: originalDocumentID,
+            surroundingTextBeforeCursor: "Same prefix",
+            surroundingTextAfterCursor: "original suffix",
+            requestID: requestID,
+            now: requestedAt
+        )
+        XCTAssertTrue(store.complete(
+            requestID: requestID,
+            text: "Private transcript",
+            now: requestedAt.addingTimeInterval(1)
+        ))
+
+        XCTAssertEqual(
+            store.status(
+                for: returnedDocumentID,
+                surroundingTextBeforeCursor: "Same prefix",
+                surroundingTextAfterCursor: "different suffix",
+                now: requestedAt.addingTimeInterval(2)
+            ),
+            .waitingForOriginalDocument(requestID: requestID)
+        )
+        XCTAssertNil(store.takeCompletedResult(
+            for: returnedDocumentID,
+            surroundingTextBeforeCursor: "Same prefix",
+            surroundingTextAfterCursor: "different suffix",
+            now: requestedAt.addingTimeInterval(2)
+        ))
+    }
+
+    func testChangedEmptyDocumentRequiresExplicitInsertion() throws {
+        let store = RomaKeyboardDictationExchangeStore(defaults: defaults)
+        let requestID = UUID()
+        let originalDocumentID = UUID()
+        let returnedDocumentID = UUID()
+        let requestedAt = Date(timeIntervalSince1970: 100)
+
+        store.begin(
+            documentIdentifier: originalDocumentID,
+            requestID: requestID,
+            now: requestedAt
+        )
+        XCTAssertTrue(store.complete(
+            requestID: requestID,
+            text: "Explicit transcript",
+            now: requestedAt.addingTimeInterval(1)
+        ))
+
+        XCTAssertEqual(
+            store.status(
+                for: returnedDocumentID,
+                now: requestedAt.addingTimeInterval(2)
+            ),
+            .readyForManualInsertion(requestID: requestID)
+        )
+        XCTAssertNil(store.takeCompletedResult(
+            for: returnedDocumentID,
+            now: requestedAt.addingTimeInterval(2)
+        ))
+        XCTAssertEqual(
+            store.takeCompletedResult(
+                for: returnedDocumentID,
+                confirmDocumentChange: true,
+                now: requestedAt.addingTimeInterval(2)
+            )?.text,
+            "Explicit transcript"
+        )
+    }
+
+    func testNewRequestSupersedesOldCompletion() throws {
+        let store = RomaKeyboardDictationExchangeStore(defaults: defaults)
+        let oldRequestID = UUID()
+        let newRequestID = UUID()
+        let documentID = UUID()
+        let requestedAt = Date(timeIntervalSince1970: 100)
+
+        store.begin(
+            documentIdentifier: documentID,
+            requestID: oldRequestID,
+            now: requestedAt
+        )
+        store.begin(
+            documentIdentifier: documentID,
+            requestID: newRequestID,
+            now: requestedAt.addingTimeInterval(1)
+        )
+
+        XCTAssertFalse(store.complete(
+            requestID: oldRequestID,
+            text: "Stale transcript",
+            now: requestedAt.addingTimeInterval(2)
+        ))
+        XCTAssertEqual(
+            store.takePendingRequest(now: requestedAt.addingTimeInterval(2))?.requestID,
+            newRequestID
+        )
+    }
+
+    func testPendingRequestBoundsAndConsumesSurroundingContext() throws {
+        let store = RomaKeyboardDictationExchangeStore(defaults: defaults)
+        let requestID = UUID()
+        let documentID = UUID()
+        let requestedAt = Date(timeIntervalSince1970: 100)
+        let context = String(repeating: "a", count: 260)
+
+        store.begin(
+            documentIdentifier: documentID,
+            surroundingTextBeforeCursor: context,
+            requestID: requestID,
+            now: requestedAt
+        )
+
+        XCTAssertEqual(
+            store.takePendingRequest(now: requestedAt.addingTimeInterval(1)),
+            RomaKeyboardDictationRequest(
+                requestID: requestID,
+                surroundingTextBeforeCursor: String(repeating: "a", count: 240)
+            )
+        )
+        XCTAssertEqual(
+            store.takePendingRequest(now: requestedAt.addingTimeInterval(2)),
+            RomaKeyboardDictationRequest(
+                requestID: requestID,
+                surroundingTextBeforeCursor: nil
+            )
+        )
+    }
+
+    func testCompletedDeliveryPreservesLowercaseIntent() throws {
+        let store = RomaKeyboardDictationExchangeStore(defaults: defaults)
+        let requestID = UUID()
+        let documentID = UUID()
+        let requestedAt = Date(timeIntervalSince1970: 100)
+
+        store.begin(
+            documentIdentifier: documentID,
+            requestID: requestID,
+            now: requestedAt
+        )
+        XCTAssertTrue(store.complete(
+            requestID: requestID,
+            text: "lowercase transcript",
+            shouldLowercase: true,
+            shouldInsertReturn: true,
+            now: requestedAt.addingTimeInterval(1)
+        ))
+
+        let delivery = store.takeCompletedResult(
+            for: documentID,
+            now: requestedAt.addingTimeInterval(2)
+        )
+        XCTAssertTrue(delivery?.shouldLowercase == true)
+        XCTAssertTrue(delivery?.shouldInsertReturn == true)
+    }
+
+    func testFailureRemainsVisibleUntilClearedForRetry() throws {
+        let store = RomaKeyboardDictationExchangeStore(defaults: defaults)
+        let requestID = UUID()
+        let documentID = UUID()
+        let requestedAt = Date(timeIntervalSince1970: 100)
+
+        store.begin(
+            documentIdentifier: documentID,
+            requestID: requestID,
+            now: requestedAt
+        )
+        XCTAssertTrue(store.fail(
+            requestID: requestID,
+            message: "Microphone permission denied.",
+            now: requestedAt.addingTimeInterval(1)
+        ))
+
+        XCTAssertEqual(
+            store.status(
+                for: documentID,
+                now: requestedAt.addingTimeInterval(2)
+            ),
+            .failed(
+                requestID: requestID,
+                message: "Microphone permission denied."
+            )
+        )
+        XCTAssertTrue(store.clear(
+            requestID: requestID,
+            now: requestedAt.addingTimeInterval(2)
+        ))
+        XCTAssertEqual(
+            store.status(
+                for: documentID,
+                now: requestedAt.addingTimeInterval(2)
+            ),
+            .none
+        )
+    }
+
+    func testExpiredExchangeCannotInsertStaleText() throws {
+        let store = RomaKeyboardDictationExchangeStore(defaults: defaults)
+        let requestID = UUID()
+        let documentID = UUID()
+        let requestedAt = Date(timeIntervalSince1970: 100)
+
+        store.begin(
+            documentIdentifier: documentID,
+            requestID: requestID,
+            now: requestedAt
+        )
+        XCTAssertTrue(store.complete(
+            requestID: requestID,
+            text: "Expired transcript",
+            now: requestedAt.addingTimeInterval(1)
+        ))
+
+        let expiredAt = requestedAt.addingTimeInterval(
+            RomaKeyboardDictationExchangeStore.expirationInterval + 2
+        )
+        XCTAssertNil(store.takeCompletedResult(for: documentID, now: expiredAt))
+        XCTAssertEqual(store.status(for: documentID, now: expiredAt), .none)
+    }
+}

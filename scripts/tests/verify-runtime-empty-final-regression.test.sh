@@ -29,10 +29,10 @@ expect_failure() {
 cat > "$TEMP_ROOT/known-bad.json" <<'JSON'
 {
   "configuration": {
-    "voiceInkAppPath": "/Applications/roma just talk.app",
-    "voiceInkBundleIdentifier": "com.negentropi.RomaJustTalk",
+    "romaAppPath": "/Applications/roma just talk.app",
+    "romaBundleIdentifier": "com.negentropi.RomaJustTalk",
     "repetitions": 5,
-    "voiceInkLifecycle": "relaunchPerCase",
+    "romaLifecycle": "relaunchPerCase",
     "targets": [
       {"id":"textedit","displayName":"TextEdit","bundleIdentifier":"com.apple.TextEdit","kind":"document"},
       {"id":"safari","displayName":"Safari","bundleIdentifier":"com.apple.Safari","kind":"browser"}
@@ -42,13 +42,13 @@ cat > "$TEMP_ROOT/known-bad.json" <<'JSON'
   "fatalError": null,
   "restoredOriginalState": true,
   "preflight": {
-    "voiceInk": {"runningPaths": []},
+    "romaJustTalk": {"runningPaths": []},
     "targets": [
       {"id":"textedit","displayName":"TextEdit","bundleIdentifier":"com.apple.TextEdit","bundlePath":"/System/Applications/TextEdit.app","installed":true,"runningPaths":[],"version":"1"},
       {"id":"safari","displayName":"Safari","bundleIdentifier":"com.apple.Safari","bundlePath":"/System/Applications/Safari.app","installed":true,"runningPaths":[],"version":"1"}
     ]
   },
-  "voiceInkSession": {"originallyRunningPaths": []},
+  "romaSession": {"originallyRunningPaths": []},
   "cases": [
     {
       "id": "known-bad-empty-final",
@@ -103,10 +103,10 @@ JSON
 cat > "$TEMP_ROOT/fixed-fallback.json" <<'JSON'
 {
   "configuration": {
-    "voiceInkAppPath": "/Applications/roma just talk.app",
-    "voiceInkBundleIdentifier": "com.negentropi.RomaJustTalk",
+    "romaAppPath": "/Applications/roma just talk.app",
+    "romaBundleIdentifier": "com.negentropi.RomaJustTalk",
     "repetitions": 5,
-    "voiceInkLifecycle": "relaunchPerCase",
+    "romaLifecycle": "relaunchPerCase",
     "targets": [
       {"id":"textedit","displayName":"TextEdit","bundleIdentifier":"com.apple.TextEdit","kind":"document"},
       {"id":"safari","displayName":"Safari","bundleIdentifier":"com.apple.Safari","kind":"browser"}
@@ -116,13 +116,13 @@ cat > "$TEMP_ROOT/fixed-fallback.json" <<'JSON'
   "fatalError": null,
   "restoredOriginalState": true,
   "preflight": {
-    "voiceInk": {"runningPaths": []},
+    "romaJustTalk": {"runningPaths": []},
     "targets": [
       {"id":"textedit","displayName":"TextEdit","bundleIdentifier":"com.apple.TextEdit","bundlePath":"/System/Applications/TextEdit.app","installed":true,"runningPaths":[],"version":"1"},
       {"id":"safari","displayName":"Safari","bundleIdentifier":"com.apple.Safari","bundlePath":"/System/Applications/Safari.app","installed":true,"runningPaths":[],"version":"1"}
     ]
   },
-  "voiceInkSession": {"originallyRunningPaths": []},
+  "romaSession": {"originallyRunningPaths": []},
   "cases": [
     {
       "id": "fixed-live-hypothesis-fallback",
@@ -290,11 +290,11 @@ jq '.fatalError = "cleanup crashed"' \
 jq '.restoredOriginalState = false' \
   "$TEMP_ROOT/known-bad.json" \
   > "$TEMP_ROOT/known-bad-unrestored.json"
-jq '.preflight.voiceInk.runningPaths = ["/Applications/roma just talk.app"]
-    | .voiceInkSession.originallyRunningPaths = ["/Applications/roma just talk.app"]' \
+jq '.preflight.romaJustTalk.runningPaths = ["/Applications/roma just talk.app"]
+    | .romaSession.originallyRunningPaths = ["/Applications/roma just talk.app"]' \
   "$TEMP_ROOT/known-bad.json" \
   > "$TEMP_ROOT/known-bad-warm-start.json"
-jq '.configuration.voiceInkLifecycle = "reuse"' \
+jq '.configuration.romaLifecycle = "reuse"' \
   "$TEMP_ROOT/known-bad.json" \
   > "$TEMP_ROOT/known-bad-reused-process.json"
 jq '.configuration.repetitions = 3' \
@@ -332,9 +332,9 @@ cat > "$TEMP_ROOT/evidence-contract.json" <<'JSON'
   },
   "helperExecutableSha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
   "configuration": {
-    "voiceInkBundleIdentifier": "com.negentropi.RomaJustTalk",
+    "romaBundleIdentifier": "com.negentropi.RomaJustTalk",
     "repetitions": 5,
-    "voiceInkLifecycle": "relaunchPerCase",
+    "romaLifecycle": "relaunchPerCase",
     "targets": [
       {"id":"textedit","displayName":"TextEdit","bundleIdentifier":"com.apple.TextEdit","kind":"document"},
       {"id":"safari","displayName":"Safari","bundleIdentifier":"com.apple.Safari","kind":"browser"}
@@ -345,7 +345,7 @@ JSON
 jq '.audio.sha256 = "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"' \
   "$TEMP_ROOT/evidence-contract.json" \
   > "$TEMP_ROOT/different-evidence-contract.json"
-jq '.configuration.voiceInkLifecycle = "reuse"' \
+jq '.configuration.romaLifecycle = "reuse"' \
   "$TEMP_ROOT/evidence-contract.json" \
   > "$TEMP_ROOT/baseline-reused-process-contract.json"
 jq '.configuration.repetitions = 3' \

@@ -1,0 +1,823 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A10000012FA0000000000001 /* RomaCore in Frameworks */ = {isa = PBXBuildFile; productRef = A10000032FA0000000000001 /* RomaCore */; };
+		A20000012FA0000000000001 /* RomaQwen in Frameworks */ = {isa = PBXBuildFile; productRef = A20000032FA0000000000001 /* RomaQwen */; };
+		E1342C1F2EB4844800CED8A2 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = E1342C1E2EB4844800CED8A2 /* Atomics */; };
+		DB672CD88F0C8CA5F6DA24AC /* PermissionFlow in Frameworks */ = {isa = PBXBuildFile; productRef = 59D57CC06F203BC2048581CA /* PermissionFlow */; };
+		E161D4A12F41ECB90086F83D /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E161D4A02F41ECB90086F83D /* CloudKit.framework */; };
+		E161D4A32F41ECB90086F83D /* CoreML.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E161D4A22F41ECB90086F83D /* CoreML.framework */; };
+		E1ADD45A2CC5352A00303ECB /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = E1ADD4592CC5352A00303ECB /* LaunchAtLogin */; };
+		E1ADD45F2CC544F100303ECB /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = E1ADD45E2CC544F100303ECB /* Sparkle */; };
+		E1D7EF992E35E16C00640029 /* MediaRemoteAdapter in Frameworks */ = {isa = PBXBuildFile; productRef = E1D7EF982E35E16C00640029 /* MediaRemoteAdapter */; };
+		E1D7EF9A2E35E19B00640029 /* MediaRemoteAdapter in Embed Frameworks */ = {isa = PBXBuildFile; productRef = E1D7EF982E35E16C00640029 /* MediaRemoteAdapter */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		E1DD1EE12FA1D7D30020AF3B /* Zip in Frameworks */ = {isa = PBXBuildFile; productRef = E1DD1EE02FA1D7D30020AF3B /* Zip */; };
+		E1DD20DE2FA20AD90020AF3B /* FluidAudio in Frameworks */ = {isa = PBXBuildFile; productRef = E1DD20DD2FA20AD90020AF3B /* FluidAudio */; };
+		E1DD20E12FA20AEE0020AF3B /* LLMkit in Frameworks */ = {isa = PBXBuildFile; productRef = E1DD20E02FA20AEE0020AF3B /* LLMkit */; };
+		E1F1037B2EF85FC700A4FF94 /* SelectedTextKit in Frameworks */ = {isa = PBXBuildFile; productRef = E1F1037A2EF85FC700A4FF94 /* SelectedTextKit */; };
+		E1F350112F1D10D600790A2C /* whisper.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = E1A0BD052EB1E7B800266859 /* whisper.xcframework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		E11473C42CBE0F0B00318EE4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E11473A82CBE0F0A00318EE4 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E11473AF2CBE0F0A00318EE4;
+			remoteInfo = RomaJustTalk;
+		};
+		E11473CE2CBE0F0B00318EE4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E11473A82CBE0F0A00318EE4 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E11473AF2CBE0F0A00318EE4;
+			remoteInfo = RomaJustTalk;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		E1A8C8CD2E1257B7003E58EC /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				E1D7EF9A2E35E19B00640029 /* MediaRemoteAdapter in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		E11473B02CBE0F0A00318EE4 /* roma just talk.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "roma just talk.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E11473C32CBE0F0B00318EE4 /* RomaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RomaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E11473CD2CBE0F0B00318EE4 /* RomaUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RomaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E161D4A02F41ECB90086F83D /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
+		E161D4A22F41ECB90086F83D /* CoreML.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreML.framework; path = System/Library/Frameworks/CoreML.framework; sourceTree = SDKROOT; };
+		E1A0BD052EB1E7B800266859 /* whisper.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = whisper.xcframework; path = "$(HOME)/RomaJustTalk-Dependencies/whisper.cpp/build-apple/whisper.xcframework"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		E11473B22CBE0F0A00318EE4 /* RomaJustTalk */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = RomaJustTalk;
+			sourceTree = "<group>";
+		};
+		E11473C62CBE0F0B00318EE4 /* RomaTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = RomaTests;
+			sourceTree = "<group>";
+		};
+		E11473D02CBE0F0B00318EE4 /* RomaUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = RomaUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		E11473AD2CBE0F0A00318EE4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E1342C1F2EB4844800CED8A2 /* Atomics in Frameworks */,
+				E1F350112F1D10D600790A2C /* whisper.xcframework in Frameworks */,
+				E161D4A32F41ECB90086F83D /* CoreML.framework in Frameworks */,
+				E1ADD45A2CC5352A00303ECB /* LaunchAtLogin in Frameworks */,
+				E1D7EF992E35E16C00640029 /* MediaRemoteAdapter in Frameworks */,
+				E161D4A12F41ECB90086F83D /* CloudKit.framework in Frameworks */,
+				E1ADD45F2CC544F100303ECB /* Sparkle in Frameworks */,
+				E1DD20DE2FA20AD90020AF3B /* FluidAudio in Frameworks */,
+				E1DD1EE12FA1D7D30020AF3B /* Zip in Frameworks */,
+				E1DD20E12FA20AEE0020AF3B /* LLMkit in Frameworks */,
+				E1F1037B2EF85FC700A4FF94 /* SelectedTextKit in Frameworks */,
+				DB672CD88F0C8CA5F6DA24AC /* PermissionFlow in Frameworks */,
+				A10000012FA0000000000001 /* RomaCore in Frameworks */,
+				A20000012FA0000000000001 /* RomaQwen in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E11473C02CBE0F0B00318EE4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E11473CA2CBE0F0B00318EE4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		E11473A72CBE0F0A00318EE4 = {
+			isa = PBXGroup;
+			children = (
+				E11473B22CBE0F0A00318EE4 /* RomaJustTalk */,
+				E11473C62CBE0F0B00318EE4 /* RomaTests */,
+				E11473D02CBE0F0B00318EE4 /* RomaUITests */,
+				E114741C2CBE1DE200318EE4 /* Frameworks */,
+				E11473B12CBE0F0A00318EE4 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		E11473B12CBE0F0A00318EE4 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E11473B02CBE0F0A00318EE4 /* roma just talk.app */,
+				E11473C32CBE0F0B00318EE4 /* RomaTests.xctest */,
+				E11473CD2CBE0F0B00318EE4 /* RomaUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E114741C2CBE1DE200318EE4 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				E161D4A02F41ECB90086F83D /* CloudKit.framework */,
+				E161D4A22F41ECB90086F83D /* CoreML.framework */,
+				E1A0BD052EB1E7B800266859 /* whisper.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		E11473AF2CBE0F0A00318EE4 /* RomaJustTalk */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E11473D72CBE0F0B00318EE4 /* Build configuration list for PBXNativeTarget "RomaJustTalk" */;
+			buildPhases = (
+				E11473AC2CBE0F0A00318EE4 /* Sources */,
+				E11473AD2CBE0F0A00318EE4 /* Frameworks */,
+				E11473AE2CBE0F0A00318EE4 /* Resources */,
+				E1A8C8CD2E1257B7003E58EC /* Embed Frameworks */,
+				A20000042FA0000000000001 /* Verify MLX Metal Resource */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				E11473B22CBE0F0A00318EE4 /* RomaJustTalk */,
+			);
+			name = RomaJustTalk;
+			packageProductDependencies = (
+				E1ADD4592CC5352A00303ECB /* LaunchAtLogin */,
+				E1ADD45E2CC544F100303ECB /* Sparkle */,
+				E1D7EF982E35E16C00640029 /* MediaRemoteAdapter */,
+				E1342C1E2EB4844800CED8A2 /* Atomics */,
+				E1F1037A2EF85FC700A4FF94 /* SelectedTextKit */,
+				E1DD1EE02FA1D7D30020AF3B /* Zip */,
+				E1DD20DD2FA20AD90020AF3B /* FluidAudio */,
+				E1DD20E02FA20AEE0020AF3B /* LLMkit */,
+				59D57CC06F203BC2048581CA /* PermissionFlow */,
+				A10000032FA0000000000001 /* RomaCore */,
+				A20000032FA0000000000001 /* RomaQwen */,
+			);
+			productName = "roma just talk";
+			productReference = E11473B02CBE0F0A00318EE4 /* roma just talk.app */;
+			productType = "com.apple.product-type.application";
+		};
+		E11473C22CBE0F0B00318EE4 /* RomaTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E11473DA2CBE0F0B00318EE4 /* Build configuration list for PBXNativeTarget "RomaTests" */;
+			buildPhases = (
+				E11473BF2CBE0F0B00318EE4 /* Sources */,
+				E11473C02CBE0F0B00318EE4 /* Frameworks */,
+				E11473C12CBE0F0B00318EE4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E11473C52CBE0F0B00318EE4 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				E11473C62CBE0F0B00318EE4 /* RomaTests */,
+			);
+			name = RomaTests;
+			packageProductDependencies = (
+			);
+			productName = RomaTests;
+			productReference = E11473C32CBE0F0B00318EE4 /* RomaTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		E11473CC2CBE0F0B00318EE4 /* RomaUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E11473DD2CBE0F0B00318EE4 /* Build configuration list for PBXNativeTarget "RomaUITests" */;
+			buildPhases = (
+				E11473C92CBE0F0B00318EE4 /* Sources */,
+				E11473CA2CBE0F0B00318EE4 /* Frameworks */,
+				E11473CB2CBE0F0B00318EE4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E11473CF2CBE0F0B00318EE4 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				E11473D02CBE0F0B00318EE4 /* RomaUITests */,
+			);
+			name = RomaUITests;
+			packageProductDependencies = (
+			);
+			productName = RomaUITests;
+			productReference = E11473CD2CBE0F0B00318EE4 /* RomaUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E11473A82CBE0F0A00318EE4 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					E11473AF2CBE0F0A00318EE4 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+					E11473C22CBE0F0B00318EE4 = {
+						CreatedOnToolsVersion = 16.0;
+						TestTargetID = E11473AF2CBE0F0A00318EE4;
+					};
+					E11473CC2CBE0F0B00318EE4 = {
+						CreatedOnToolsVersion = 16.0;
+						TestTargetID = E11473AF2CBE0F0A00318EE4;
+					};
+				};
+			};
+			buildConfigurationList = E11473AB2CBE0F0A00318EE4 /* Build configuration list for PBXProject "RomaJustTalk" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = E11473A72CBE0F0A00318EE4;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				E1ADD4582CC5352A00303ECB /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */,
+				E1ADD45D2CC544F100303ECB /* XCRemoteSwiftPackageReference "Sparkle" */,
+				E1D7EF972E35E16C00640029 /* XCRemoteSwiftPackageReference "mediaremote-adapter" */,
+				E1ECEC142E44590200DFFBA8 /* XCRemoteSwiftPackageReference "Zip" */,
+				E1342C1D2EB4844800CED8A2 /* XCRemoteSwiftPackageReference "swift-atomics" */,
+				E1F103792EF85FC700A4FF94 /* XCRemoteSwiftPackageReference "SelectedTextKit" */,
+				E1DD20DC2FA20AD90020AF3B /* XCRemoteSwiftPackageReference "FluidAudio" */,
+				E1DD20DF2FA20AEE0020AF3B /* XCRemoteSwiftPackageReference "LLMkit" */,
+				4045DE7D23A97F889C27B330 /* XCRemoteSwiftPackageReference "PermissionFlow" */,
+				A10000022FA0000000000001 /* XCLocalSwiftPackageReference "RomaCore" */,
+				A20000022FA0000000000001 /* XCLocalSwiftPackageReference "RomaQwen" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = E11473B12CBE0F0A00318EE4 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E11473AF2CBE0F0A00318EE4 /* RomaJustTalk */,
+				E11473C22CBE0F0B00318EE4 /* RomaTests */,
+				E11473CC2CBE0F0B00318EE4 /* RomaUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E11473AE2CBE0F0A00318EE4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E11473C12CBE0F0B00318EE4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E11473CB2CBE0F0B00318EE4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		A20000042FA0000000000001 /* Verify MLX Metal Resource */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/mlx-swift_Cmlx.bundle",
+			);
+			name = "Verify MLX Metal Resource";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -eu\n# MLX 0.31.4 searches mlx-swift_Cmlx.bundle via the app resource URL.\nmlx_bundle=\"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/mlx-swift_Cmlx.bundle\"\nif [ ! -s \"$mlx_bundle/Contents/Resources/default.metallib\" ] && [ ! -s \"$mlx_bundle/default.metallib\" ]; then\n    echo \"error: MLX default.metallib is missing from the app resource bundle. Build with Xcode so Cmlx Metal sources are compiled and embedded.\" >&2\n    exit 1\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		E11473AC2CBE0F0A00318EE4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E11473BF2CBE0F0B00318EE4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E11473C92CBE0F0B00318EE4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		E11473C52CBE0F0B00318EE4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E11473AF2CBE0F0A00318EE4 /* RomaJustTalk */;
+			targetProxy = E11473C42CBE0F0B00318EE4 /* PBXContainerItemProxy */;
+		};
+		E11473CF2CBE0F0B00318EE4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E11473AF2CBE0F0A00318EE4 /* RomaJustTalk */;
+			targetProxy = E11473CE2CBE0F0B00318EE4 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		E11473D52CBE0F0B00318EE4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG ENABLE_NATIVE_SPEECH_ANALYZER $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		E11473D62CBE0F0B00318EE4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "ENABLE_NATIVE_SPEECH_ANALYZER $(inherited)";
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		E11473D82CBE0F0B00318EE4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = RomaJustTalk/RomaJustTalk.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 195.1;
+				DEVELOPMENT_ASSET_PATHS = "\"RomaJustTalk/Preview Content\"";
+				DEVELOPMENT_TEAM = V6J6A3VWY2;
+				ENABLE_DEBUG_DYLIB = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = RomaJustTalk/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "roma just talk";
+				INFOPLIST_KEY_CFBundleName = "roma just talk";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.4;
+				MARKETING_VERSION = 1.95.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.negentropi.RomaJustTalk;
+				PRODUCT_MODULE_NAME = RomaJustTalk;
+				PRODUCT_NAME = "roma just talk";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG ENABLE_NATIVE_SPEECH_ANALYZER $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		E11473D92CBE0F0B00318EE4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = RomaJustTalk/RomaJustTalk.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 195.1;
+				DEVELOPMENT_ASSET_PATHS = "\"RomaJustTalk/Preview Content\"";
+				DEVELOPMENT_TEAM = V6J6A3VWY2;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = RomaJustTalk/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "roma just talk";
+				INFOPLIST_KEY_CFBundleName = "roma just talk";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.4;
+				MARKETING_VERSION = 1.95.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.negentropi.RomaJustTalk;
+				PRODUCT_MODULE_NAME = RomaJustTalk;
+				PRODUCT_NAME = "roma just talk";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "ENABLE_NATIVE_SPEECH_ANALYZER $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		E11473DB2CBE0F0B00318EE4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = V6J6A3VWY2;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.negentropi.RomaJustTalkTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/roma just talk.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/roma just talk";
+			};
+			name = Debug;
+		};
+		E11473DC2CBE0F0B00318EE4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = V6J6A3VWY2;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.negentropi.RomaJustTalkTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/roma just talk.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/roma just talk";
+			};
+			name = Release;
+		};
+		E11473DE2CBE0F0B00318EE4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = V6J6A3VWY2;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.negentropi.RomaJustTalkUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = RomaJustTalk;
+			};
+			name = Debug;
+		};
+		E11473DF2CBE0F0B00318EE4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = V6J6A3VWY2;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.negentropi.RomaJustTalkUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = RomaJustTalk;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		E11473AB2CBE0F0A00318EE4 /* Build configuration list for PBXProject "RomaJustTalk" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E11473D52CBE0F0B00318EE4 /* Debug */,
+				E11473D62CBE0F0B00318EE4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E11473D72CBE0F0B00318EE4 /* Build configuration list for PBXNativeTarget "RomaJustTalk" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E11473D82CBE0F0B00318EE4 /* Debug */,
+				E11473D92CBE0F0B00318EE4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E11473DA2CBE0F0B00318EE4 /* Build configuration list for PBXNativeTarget "RomaTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E11473DB2CBE0F0B00318EE4 /* Debug */,
+				E11473DC2CBE0F0B00318EE4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E11473DD2CBE0F0B00318EE4 /* Build configuration list for PBXNativeTarget "RomaUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E11473DE2CBE0F0B00318EE4 /* Debug */,
+				E11473DF2CBE0F0B00318EE4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		E1342C1D2EB4844800CED8A2 /* XCRemoteSwiftPackageReference "swift-atomics" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-atomics.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.3.0;
+			};
+		};
+		4045DE7D23A97F889C27B330 /* XCRemoteSwiftPackageReference "PermissionFlow" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/jaywcjlove/PermissionFlow";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.4.0;
+			};
+		};
+		E1ADD4582CC5352A00303ECB /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/LaunchAtLogin-Modern";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+		E1ADD45D2CC544F100303ECB /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.6.4;
+			};
+		};
+		E1D7EF972E35E16C00640029 /* XCRemoteSwiftPackageReference "mediaremote-adapter" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Beingpax/mediaremote-adapter";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+		E1DD20DC2FA20AD90020AF3B /* XCRemoteSwiftPackageReference "FluidAudio" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/negentropi/FluidAudio.git";
+			requirement = {
+				kind = revision;
+				revision = 56c9c2167efa4363690243709dda4a84f29e5f49;
+			};
+		};
+		E1DD20DF2FA20AEE0020AF3B /* XCRemoteSwiftPackageReference "LLMkit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Beingpax/LLMkit.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+		E1ECEC142E44590200DFFBA8 /* XCRemoteSwiftPackageReference "Zip" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/marmelroy/Zip";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.1.2;
+			};
+		};
+		E1F103792EF85FC700A4FF94 /* XCRemoteSwiftPackageReference "SelectedTextKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/tisfeng/SelectedTextKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.6.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		A10000022FA0000000000001 /* XCLocalSwiftPackageReference "RomaCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = RomaCore;
+		};
+		A20000022FA0000000000001 /* XCLocalSwiftPackageReference "RomaQwen" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = RomaQwen;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A20000032FA0000000000001 /* RomaQwen */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A20000022FA0000000000001 /* XCLocalSwiftPackageReference "RomaQwen" */;
+			productName = RomaQwen;
+		};
+		A10000032FA0000000000001 /* RomaCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A10000022FA0000000000001 /* XCLocalSwiftPackageReference "RomaCore" */;
+			productName = RomaCore;
+		};
+		E1342C1E2EB4844800CED8A2 /* Atomics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E1342C1D2EB4844800CED8A2 /* XCRemoteSwiftPackageReference "swift-atomics" */;
+			productName = Atomics;
+		};
+		E1ADD4592CC5352A00303ECB /* LaunchAtLogin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E1ADD4582CC5352A00303ECB /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */;
+			productName = LaunchAtLogin;
+		};
+		E1ADD45E2CC544F100303ECB /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E1ADD45D2CC544F100303ECB /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+		E1D7EF982E35E16C00640029 /* MediaRemoteAdapter */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E1D7EF972E35E16C00640029 /* XCRemoteSwiftPackageReference "mediaremote-adapter" */;
+			productName = MediaRemoteAdapter;
+		};
+		E1DD1EE02FA1D7D30020AF3B /* Zip */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E1ECEC142E44590200DFFBA8 /* XCRemoteSwiftPackageReference "Zip" */;
+			productName = Zip;
+		};
+		E1DD20DD2FA20AD90020AF3B /* FluidAudio */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E1DD20DC2FA20AD90020AF3B /* XCRemoteSwiftPackageReference "FluidAudio" */;
+			productName = FluidAudio;
+		};
+		E1DD20E02FA20AEE0020AF3B /* LLMkit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E1DD20DF2FA20AEE0020AF3B /* XCRemoteSwiftPackageReference "LLMkit" */;
+			productName = LLMkit;
+		};
+		E1F1037A2EF85FC700A4FF94 /* SelectedTextKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E1F103792EF85FC700A4FF94 /* XCRemoteSwiftPackageReference "SelectedTextKit" */;
+			productName = SelectedTextKit;
+		};
+		59D57CC06F203BC2048581CA /* PermissionFlow */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4045DE7D23A97F889C27B330 /* XCRemoteSwiftPackageReference "PermissionFlow" */;
+			productName = PermissionFlow;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = E11473A82CBE0F0A00318EE4 /* Project object */;
+}

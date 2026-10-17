@@ -1,14 +1,14 @@
 import CryptoKit
 import Foundation
-import VoiceInkCore
+import RomaCore
 
-enum VoiceInkKeyboardClipboardItemKind: String, Codable, CaseIterable, Sendable {
+enum RomaKeyboardClipboardItemKind: String, Codable, CaseIterable, Sendable {
     case text
     case link
     case image
 }
 
-enum VoiceInkKeyboardClipboardFilter: String, CaseIterable, Sendable {
+enum RomaKeyboardClipboardFilter: String, CaseIterable, Sendable {
     case all
     case text
     case links
@@ -26,12 +26,12 @@ enum VoiceInkKeyboardClipboardFilter: String, CaseIterable, Sendable {
     }
 }
 
-struct VoiceInkKeyboardClipboardPayload: Equatable, Sendable {
-    let kind: VoiceInkKeyboardClipboardItemKind
+struct RomaKeyboardClipboardPayload: Equatable, Sendable {
+    let kind: RomaKeyboardClipboardItemKind
     let text: String?
     let imageData: Data?
 
-    init?(text: String, kind: VoiceInkKeyboardClipboardItemKind = .text) {
+    init?(text: String, kind: RomaKeyboardClipboardItemKind = .text) {
         guard kind != .image,
               !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             return nil
@@ -50,9 +50,9 @@ struct VoiceInkKeyboardClipboardPayload: Equatable, Sendable {
     }
 }
 
-struct VoiceInkKeyboardClipboardItem: Codable, Equatable, Identifiable, Sendable {
+struct RomaKeyboardClipboardItem: Codable, Equatable, Identifiable, Sendable {
     let id: UUID
-    let kind: VoiceInkKeyboardClipboardItemKind
+    let kind: RomaKeyboardClipboardItemKind
     let fingerprint: String
     let createdAt: Date
     var lastUsedAt: Date
@@ -71,7 +71,7 @@ struct VoiceInkKeyboardClipboardItem: Codable, Equatable, Identifiable, Sendable
     }
 }
 
-enum VoiceInkKeyboardClipboardStoreError: LocalizedError, Equatable {
+enum RomaKeyboardClipboardStoreError: LocalizedError, Equatable {
     case imageTooLarge
     case invalidPayload
     case unavailableSharedContainer
@@ -88,12 +88,12 @@ enum VoiceInkKeyboardClipboardStoreError: LocalizedError, Equatable {
     }
 }
 
-struct VoiceInkKeyboardClipboardSearch {
+struct RomaKeyboardClipboardSearch {
     static func items(
-        _ items: [VoiceInkKeyboardClipboardItem],
+        _ items: [RomaKeyboardClipboardItem],
         matching query: String,
-        filter: VoiceInkKeyboardClipboardFilter
-    ) -> [VoiceInkKeyboardClipboardItem] {
+        filter: RomaKeyboardClipboardFilter
+    ) -> [RomaKeyboardClipboardItem] {
         let kindFiltered = items.filter { item in
             switch filter {
             case .all: true
@@ -112,7 +112,7 @@ struct VoiceInkKeyboardClipboardSearch {
     }
 }
 
-struct VoiceInkKeyboardClipboardStore {
+struct RomaKeyboardClipboardStore {
     static let appGroupDirectoryName = "KeyboardClipboardHistory"
     static let retentionInterval: TimeInterval = 30 * 24 * 60 * 60
     static let maximumUnpinnedItemCount = 100
@@ -128,7 +128,7 @@ struct VoiceInkKeyboardClipboardStore {
 
     static func appGroupStore(fileManager: FileManager = .default) -> Self? {
         guard let containerURL = fileManager.containerURL(
-            forSecurityApplicationGroupIdentifier: VoiceInkAppIdentity.iOSAppGroupIdentifier
+            forSecurityApplicationGroupIdentifier: RomaAppIdentity.iOSAppGroupIdentifier
         ) else {
             return nil
         }
@@ -142,7 +142,7 @@ struct VoiceInkKeyboardClipboardStore {
         )
     }
 
-    func items(now: Date = Date()) throws -> [VoiceInkKeyboardClipboardItem] {
+    func items(now: Date = Date()) throws -> [RomaKeyboardClipboardItem] {
         let existing = try readItems()
         let normalized = normalizedItems(existing, now: now)
         if normalized != existing {
@@ -153,22 +153,22 @@ struct VoiceInkKeyboardClipboardStore {
 
     @discardableResult
     func record(
-        _ payload: VoiceInkKeyboardClipboardPayload,
+        _ payload: RomaKeyboardClipboardPayload,
         now: Date = Date()
-    ) throws -> VoiceInkKeyboardClipboardItem {
+    ) throws -> RomaKeyboardClipboardItem {
         guard payload.kind == .image ? payload.imageData != nil : payload.text != nil else {
-            throw VoiceInkKeyboardClipboardStoreError.invalidPayload
+            throw RomaKeyboardClipboardStoreError.invalidPayload
         }
         if let imageData = payload.imageData,
            imageData.count > Self.maximumImageByteCount {
-            throw VoiceInkKeyboardClipboardStoreError.imageTooLarge
+            throw RomaKeyboardClipboardStoreError.imageTooLarge
         }
 
         let previousItems = try readItems()
         var updatedItems = previousItems
         let fingerprint = Self.fingerprint(for: payload)
 
-        let item: VoiceInkKeyboardClipboardItem
+        let item: RomaKeyboardClipboardItem
         if let existingIndex = updatedItems.firstIndex(where: { $0.fingerprint == fingerprint }) {
             var existing = updatedItems.remove(at: existingIndex)
             existing.lastUsedAt = now
@@ -177,7 +177,7 @@ struct VoiceInkKeyboardClipboardStore {
         } else {
             let id = UUID()
             let imageFileName = payload.imageData == nil ? nil : "\(id.uuidString).png"
-            item = VoiceInkKeyboardClipboardItem(
+            item = RomaKeyboardClipboardItem(
                 id: id,
                 kind: payload.kind,
                 fingerprint: fingerprint,
@@ -234,18 +234,18 @@ struct VoiceInkKeyboardClipboardStore {
         try save(updatedItems, replacing: previousItems)
     }
 
-    func imageData(for item: VoiceInkKeyboardClipboardItem) throws -> Data? {
+    func imageData(for item: RomaKeyboardClipboardItem) throws -> Data? {
         guard let imageFileName = item.imageFileName else { return nil }
         return try Data(contentsOf: directoryURL.appendingPathComponent(imageFileName))
     }
 }
 
-private extension VoiceInkKeyboardClipboardStore {
+private extension RomaKeyboardClipboardStore {
     var indexURL: URL {
         directoryURL.appendingPathComponent("index.json")
     }
 
-    static func fingerprint(for payload: VoiceInkKeyboardClipboardPayload) -> String {
+    static func fingerprint(for payload: RomaKeyboardClipboardPayload) -> String {
         var data = Data(payload.kind.rawValue.utf8)
         data.append(0)
         if let imageData = payload.imageData {
@@ -259,18 +259,18 @@ private extension VoiceInkKeyboardClipboardStore {
             .joined()
     }
 
-    func readItems() throws -> [VoiceInkKeyboardClipboardItem] {
+    func readItems() throws -> [RomaKeyboardClipboardItem] {
         guard fileManager.fileExists(atPath: indexURL.path) else { return [] }
         let data = try Data(contentsOf: indexURL)
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .millisecondsSince1970
-        return try decoder.decode([VoiceInkKeyboardClipboardItem].self, from: data)
+        return try decoder.decode([RomaKeyboardClipboardItem].self, from: data)
     }
 
     func normalizedItems(
-        _ items: [VoiceInkKeyboardClipboardItem],
+        _ items: [RomaKeyboardClipboardItem],
         now: Date
-    ) -> [VoiceInkKeyboardClipboardItem] {
+    ) -> [RomaKeyboardClipboardItem] {
         let retentionCutoff = now.addingTimeInterval(-Self.retentionInterval)
         let retained = items.filter { $0.isPinned || $0.lastUsedAt >= retentionCutoff }
         let sorted = retained.sorted { lhs, rhs in
@@ -287,8 +287,8 @@ private extension VoiceInkKeyboardClipboardStore {
     }
 
     func save(
-        _ items: [VoiceInkKeyboardClipboardItem],
-        replacing previousItems: [VoiceInkKeyboardClipboardItem]
+        _ items: [RomaKeyboardClipboardItem],
+        replacing previousItems: [RomaKeyboardClipboardItem]
     ) throws {
         try ensureDirectoryExists()
 

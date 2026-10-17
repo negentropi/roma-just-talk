@@ -6,12 +6,12 @@ RUNNER="$ROOT/scripts/run-macos-distribution-e2e.sh"
 FINDER_STATE="$ROOT/scripts/macos-finder-extraction-state.sh"
 FINDER_STATE_TEST="$ROOT/scripts/tests/macos-finder-extraction-state.test.sh"
 PREPARER="$ROOT/scripts/prepare-remote-e2e-stage.sh"
-WORKFLOW="$ROOT/.github/workflows/voiceink-remote-e2e-stage.yml"
-BUILD_WORKFLOW="$ROOT/.github/workflows/voiceink-build.yml"
+WORKFLOW="$ROOT/.github/workflows/roma-remote-e2e-stage.yml"
+BUILD_WORKFLOW="$ROOT/.github/workflows/roma-build.yml"
 RUNTIME_RUNNER="$ROOT/scripts/run-macos-runtime-e2e.sh"
 RUNTIME_PREFLIGHT="$ROOT/Tools/RuntimeE2EHarness/Sources/RuntimeE2EHarness/RuntimePreflight.swift"
 RENDERED_OBSERVER="$ROOT/Tools/RuntimeE2EHarness/Sources/RuntimeE2EHarness/RuntimeRenderedTextObserver.swift"
-VOICEINK_SESSION="$ROOT/Tools/RuntimeE2EHarness/Sources/RuntimeE2EHarness/RuntimeVoiceInkSession.swift"
+ROMA_SESSION="$ROOT/Tools/RuntimeE2EHarness/Sources/RuntimeE2EHarness/RuntimeRomaSession.swift"
 HANDOFF_HELPER="$ROOT/scripts/macos-distribution-runtime-handoff.sh"
 HANDOFF_TEST="$ROOT/scripts/tests/macos-distribution-runtime-handoff.test.sh"
 EMPTY_FINAL_VERIFIER="$ROOT/scripts/verify-runtime-empty-final-regression.sh"
@@ -383,7 +383,7 @@ reject_text "$RUNTIME_PREFLIGHT" 'macOS 15\.2 or newer'
 require_text "$RUNTIME_RUNNER" 'runtime-translocation-new-crash-reports.txt'
 require_text "$RUNTIME_RUNNER" 'runtime-translocation-termination-events.tsv'
 require_text "$RUNTIME_RUNNER" 'DISTRIBUTION_E2E_CAPTURE_MAPPED_CODE_UNTIL_EXIT=true'
-require_text "$VOICEINK_SESSION" 'RUNTIME_E2E_VOICEINK_TERMINATION_EVENTS'
+require_text "$ROMA_SESSION" 'RUNTIME_E2E_ROMA_TERMINATION_EVENTS'
 require_text "$RUNTIME_RUNNER" 'source "$repo_root/scripts/macos-distribution-runtime-handoff.sh"'
 require_text "$RUNTIME_RUNNER" 'distribution_runtime_validate_handoff'
 require_text "$RUNTIME_RUNNER" 'distribution-runtime-handoff.txt'
@@ -403,7 +403,7 @@ require_text "$HANDOFF_HELPER" 'must not use an external model cache'
 require_text "$HANDOFF_HELPER" 'did not create the live model directory'
 
 distribution_termination_line="$(
-  grep -n '^  terminate_runtime_voiceink_pid "$expected_first_launch_pid"' \
+  grep -n '^  terminate_runtime_roma_pid "$expected_first_launch_pid"' \
     "$RUNTIME_RUNNER" \
     | head -n 1 \
     | cut -d: -f1

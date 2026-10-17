@@ -81,7 +81,7 @@ final class StoredAudioFileTests: XCTestCase {
         )
         XCTAssertEqual(
             RomaMacOSStorageDirectories.customSoundsDirectory(in: applicationSupportBaseDirectory).path,
-            "/tmp/Application Support/RomaJustTalk/CustomSounds"
+            "/tmp/Application Support/VoiceInk/CustomSounds"
         )
     }
 

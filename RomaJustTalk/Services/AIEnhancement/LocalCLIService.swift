@@ -76,6 +76,10 @@ final class LocalCLIService {
                 environment["ROMA_SYSTEM_PROMPT"] = systemPrompt
                 environment["ROMA_USER_PROMPT"] = userPrompt
                 environment["ROMA_FULL_PROMPT"] = fullPrompt
+                // Saved command templates from earlier releases still read the inherited names.
+                environment["VOICEINK_SYSTEM_PROMPT"] = systemPrompt
+                environment["VOICEINK_USER_PROMPT"] = userPrompt
+                environment["VOICEINK_FULL_PROMPT"] = fullPrompt
                 process.environment = environment
 
                 let inputPipe = Pipe()

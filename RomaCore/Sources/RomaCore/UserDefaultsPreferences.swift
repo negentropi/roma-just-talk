@@ -5,8 +5,8 @@ public enum RomaUserDefaultsKey {
     public static let lowercaseTranscription = "LowercaseTranscription"
     public static let removeFillerWords = "RemoveFillerWords"
     public static let fillerWords = "FillerWords"
-    public static let wordReplacements = "romaIOSWordReplacements"
-    public static let customVocabularyTerms = "romaIOSCustomVocabularyTerms"
+    public static let wordReplacements = "voiceInkIOSWordReplacements"
+    public static let customVocabularyTerms = "voiceInkIOSCustomVocabularyTerms"
     public static let modes = "modes"
     public static let selectedModeId = "selectedModeId"
     public static let selectedTranscriptionLanguage = "SelectedLanguage"
@@ -552,7 +552,7 @@ public struct RomaCustomSoundCopyPlan: Equatable, Sendable {
 }
 
 public enum RomaCustomSoundPreference {
-    public static let customSoundsRelativeDirectory = "RomaJustTalk/CustomSounds"
+    public static let customSoundsRelativeDirectory = "VoiceInk/CustomSounds"
     public static let changedNotificationName = "CustomSoundsChanged"
     public static let maxDuration: TimeInterval = 3.0
 

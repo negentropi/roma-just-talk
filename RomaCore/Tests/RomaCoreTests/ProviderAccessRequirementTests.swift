@@ -463,8 +463,8 @@ final class ProviderAccessRequirementTests: XCTestCase {
     func testLegacyVoiceInkProviderValuesNoLongerDecodeAsProviderKind() {
         let decoder = JSONDecoder()
 
-        XCTAssertNil(try? decoder.decode(RomaProviderKind.self, from: Data(#""RomaJustTalk""#.utf8)))
-        XCTAssertNil(try? decoder.decode(RomaProviderKind.self, from: Data(#""romaJustTalk""#.utf8)))
+        XCTAssertNil(try? decoder.decode(RomaProviderKind.self, from: Data(#""VoiceInk""#.utf8)))
+        XCTAssertNil(try? decoder.decode(RomaProviderKind.self, from: Data(#""voiceInk""#.utf8)))
     }
 
     func testProviderCredentialRejectsBlankKeysWithoutNormalizingUsableKeys() {

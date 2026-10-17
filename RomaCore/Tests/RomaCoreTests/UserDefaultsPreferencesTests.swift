@@ -32,8 +32,8 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         XCTAssertEqual(RomaUserDefaultsKey.lowercaseTranscription, "LowercaseTranscription")
         XCTAssertEqual(RomaUserDefaultsKey.removeFillerWords, "RemoveFillerWords")
         XCTAssertEqual(RomaUserDefaultsKey.fillerWords, "FillerWords")
-        XCTAssertEqual(RomaUserDefaultsKey.wordReplacements, "romaIOSWordReplacements")
-        XCTAssertEqual(RomaUserDefaultsKey.customVocabularyTerms, "romaIOSCustomVocabularyTerms")
+        XCTAssertEqual(RomaUserDefaultsKey.wordReplacements, "voiceInkIOSWordReplacements")
+        XCTAssertEqual(RomaUserDefaultsKey.customVocabularyTerms, "voiceInkIOSCustomVocabularyTerms")
         XCTAssertEqual(RomaUserDefaultsKey.modes, "modes")
         XCTAssertEqual(RomaUserDefaultsKey.selectedModeId, "selectedModeId")
         XCTAssertEqual(RomaUserDefaultsKey.selectedTranscriptionLanguage, "SelectedLanguage")
@@ -3147,11 +3147,11 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             [
               {
                 "id": "\(legacyModeId.uuidString)",
-                "name": "Legacy RomaJustTalk",
-                "transcriptionProvider": "RomaJustTalk",
+                "name": "Legacy VoiceInk",
+                "transcriptionProvider": "VoiceInk",
                 "transcriptionModel": "whisper-large-v3",
                 "isPostProcessingEnabled": true,
-                "postProcessingProvider": "romaJustTalk",
+                "postProcessingProvider": "voiceInk",
                 "postProcessingModel": "llama-3.1-8b-instant",
                 "promptTemplate": {
                   "type": "Summary",
@@ -3179,7 +3179,7 @@ final class UserDefaultsPreferencesTests: XCTestCase {
             let modes = RomaModeStorage.loadModes(from: defaults)
 
             XCTAssertEqual(modes.map(\.id), [legacyModeId, cloudModeId])
-            XCTAssertEqual(modes.first?.name, "Legacy RomaJustTalk")
+            XCTAssertEqual(modes.first?.name, "Legacy VoiceInk")
             XCTAssertEqual(modes.first?.transcriptionProvider, .localWhisper)
             XCTAssertEqual(modes.first?.transcriptionModel, RomaTranscriptionModelCatalog.localBaseModel)
             XCTAssertEqual(modes.first?.isPostProcessingEnabled, false)

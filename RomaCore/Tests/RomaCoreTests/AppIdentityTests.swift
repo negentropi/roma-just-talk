@@ -556,7 +556,7 @@ final class AppIdentityTests: XCTestCase {
         XCTAssertEqual(url.host, RomaAppIdentity.iOSRecordDeepLinkHost)
         XCTAssertEqual(RomaAppDeepLink(url: url), .record)
         XCTAssertNil(RomaAppDeepLink(url: try XCTUnwrap(URL(string: "romajusttalk://settings"))))
-        XCTAssertNil(RomaAppDeepLink(url: try XCTUnwrap(URL(string: "roma://record"))))
+        XCTAssertNil(RomaAppDeepLink(url: try XCTUnwrap(URL(string: "voiceink://record"))))
     }
 
     func testIOSRecordDeepLinkAppliesRuntimeState() {

@@ -61,7 +61,7 @@ final class RecordingFeedbackPreferenceTests: XCTestCase {
     }
 
     func testCustomSoundPreferencePreservesDefaultsAndNotificationName() {
-        XCTAssertEqual(RomaCustomSoundPreference.customSoundsRelativeDirectory, "RomaJustTalk/CustomSounds")
+        XCTAssertEqual(RomaCustomSoundPreference.customSoundsRelativeDirectory, "VoiceInk/CustomSounds")
         XCTAssertEqual(RomaCustomSoundPreference.changedNotificationName, "CustomSoundsChanged")
         XCTAssertEqual(RomaCustomSoundPreference.maxDuration, 3.0)
         XCTAssertEqual(
@@ -107,7 +107,7 @@ final class RecordingFeedbackPreferenceTests: XCTestCase {
     }
 
     func testCustomSoundSelectionStateOwnsMenuAndTransitionPolicy() {
-        let directory = URL(fileURLWithPath: "/tmp/RomaJustTalk/CustomSounds", isDirectory: true)
+        let directory = URL(fileURLWithPath: "/tmp/VoiceInk/CustomSounds", isDirectory: true)
         let state = RomaCustomSoundSelectionState(
             type: .start,
             isUsingCustomSound: false,
@@ -120,7 +120,7 @@ final class RecordingFeedbackPreferenceTests: XCTestCase {
         XCTAssertNil(state.customSoundURL(in: directory))
         XCTAssertEqual(
             state.storedCustomSoundURL(in: directory)?.path,
-            "/tmp/RomaJustTalk/CustomSounds/CustomStartSound.wav"
+            "/tmp/VoiceInk/CustomSounds/CustomStartSound.wav"
         )
 
         XCTAssertEqual(
@@ -201,7 +201,7 @@ final class RecordingFeedbackPreferenceTests: XCTestCase {
     }
 
     func testCustomSoundPreferenceBuildsCustomSoundURLs() {
-        let directory = URL(fileURLWithPath: "/tmp/RomaJustTalk/CustomSounds", isDirectory: true)
+        let directory = URL(fileURLWithPath: "/tmp/VoiceInk/CustomSounds", isDirectory: true)
 
         XCTAssertEqual(
             RomaCustomSoundPreference.customSoundURL(
@@ -209,7 +209,7 @@ final class RecordingFeedbackPreferenceTests: XCTestCase {
                 filename: "CustomStartSound.wav",
                 in: directory
             )?.path,
-            "/tmp/RomaJustTalk/CustomSounds/CustomStartSound.wav"
+            "/tmp/VoiceInk/CustomSounds/CustomStartSound.wav"
         )
         XCTAssertNil(RomaCustomSoundPreference.customSoundURL(
             isUsingCustomSound: false,

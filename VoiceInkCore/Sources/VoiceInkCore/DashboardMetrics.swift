@@ -707,7 +707,6 @@ public enum VoiceInkNoteListPresentation {
 public enum VoiceInkHelpResourceKind: String, Equatable, Hashable, Sendable {
     case changelog
     case website
-    case commonIssues
     case documentation
     case supportEmail
 }

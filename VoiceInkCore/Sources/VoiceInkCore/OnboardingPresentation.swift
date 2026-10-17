@@ -862,7 +862,7 @@ public struct VoiceInkMacOSOnboardingPermissionPresentation: Identifiable, Equat
     public static let screenContextInfoHelpMessage =
         "roma-just-talk captures on-screen text to understand the context of your voice input, which significantly improves transcription accuracy. Your privacy is important: this data is processed locally and is not stored."
 
-    public static let screenContextInfoLearnMoreURLString = "https://tryvoiceink.com/docs/contextual-awareness"
+    public static let screenContextInfoLearnMoreURLString = "https://roma-just-talk.com/readme"
 
     public static let all = [
         VoiceInkMacOSOnboardingPermissionPresentation(
@@ -1041,7 +1041,7 @@ public enum VoiceInkMacOSPermissionSettingsPresentation {
         grantButtonTitle: "Enable",
         relaunchButtonTitle: "Relaunch to Apply",
         infoTipMessage: "roma-just-talk captures on-screen text to understand the context of your voice input, which significantly improves transcription accuracy. Your privacy is important: this data is processed locally and is not stored.",
-        infoTipURLString: "https://tryvoiceink.com/docs/contextual-awareness"
+        infoTipURLString: "https://roma-just-talk.com/readme"
     )
 }
 

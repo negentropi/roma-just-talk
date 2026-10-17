@@ -51,9 +51,9 @@ final class AppIdentityTests: XCTestCase {
     }
 
     func testSupportContactPolicyPreservesEmailIdentityAndSubject() {
-        XCTAssertEqual(VoiceInkSupportContactPolicy.emailAddress, "support@tryvoiceink.com")
-        XCTAssertEqual(VoiceInkSupportContactPolicy.emailSubject, "VoiceInk Support Request")
-        XCTAssertEqual(VoiceInkSupportContactPolicy.commonIssuesURLString, "https://tryvoiceink.com/common-issues")
+        XCTAssertEqual(VoiceInkSupportContactPolicy.emailAddress, "happyfumd@icloud.com")
+        XCTAssertEqual(VoiceInkSupportContactPolicy.emailSubject, "Roma Just Talk Support Request")
+        XCTAssertEqual(VoiceInkSupportContactPolicy.commonIssuesURLString, "https://roma-just-talk.com/readme")
     }
 
     func testSupportMailtoURLPreservesRecipientAndEncodesSubject() throws {
@@ -65,7 +65,7 @@ final class AppIdentityTests: XCTestCase {
         XCTAssertEqual(components.queryItems, [
             URLQueryItem(name: "subject", value: VoiceInkSupportContactPolicy.emailSubject)
         ])
-        XCTAssertEqual(url.absoluteString, "mailto:support@tryvoiceink.com?subject=VoiceInk%20Support%20Request")
+        XCTAssertEqual(url.absoluteString, "mailto:happyfumd@icloud.com?subject=Roma%20Just%20Talk%20Support%20Request")
     }
 
     func testSystemArchitecturePreservesMacOSDisplayNameForCompileTarget() {

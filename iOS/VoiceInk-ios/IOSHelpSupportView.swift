@@ -8,7 +8,7 @@ struct IOSHelpSupportView: View {
     var body: some View {
         List {
             Section(VoiceInkIOSHelpSupportPresentation.resourcesSectionTitle) {
-                ForEach(VoiceInkIOSHelpSupportPresentation.resources) { resource in
+                ForEach(VoiceInkHelpResourcesPresentation.resources) { resource in
                     Button {
                         open(resource.destination)
                     } label: {
@@ -25,10 +25,10 @@ struct IOSHelpSupportView: View {
 
                 ShareLink(
                     item: VoiceInkSupportContactPolicy.commonIssuesURL,
-                    subject: Text(VoiceInkIOSHelpSupportPresentation.commonIssuesResource.title)
+                    subject: Text(VoiceInkIOSHelpSupportPresentation.shareDocumentationSubject)
                 ) {
                     Label(
-                        VoiceInkIOSHelpSupportPresentation.shareCommonIssuesTitle,
+                        VoiceInkIOSHelpSupportPresentation.shareDocumentationTitle,
                         systemImage: "square.and.arrow.up"
                     )
                 }

@@ -28,9 +28,9 @@ public enum VoiceInkAppNotificationKind: String, CaseIterable, Sendable {
 }
 
 public enum VoiceInkSupportContactPolicy {
-    public static let emailAddress = "support@tryvoiceink.com"
-    public static let emailSubject = "VoiceInk Support Request"
-    public static let commonIssuesURLString = "https://tryvoiceink.com/common-issues"
+    public static let emailAddress = "happyfumd@icloud.com"
+    public static let emailSubject = "Roma Just Talk Support Request"
+    public static let commonIssuesURLString = "https://roma-just-talk.com/readme"
 
     public static func emailBody(systemInformation: String) -> String {
         """
@@ -38,7 +38,7 @@ public enum VoiceInkSupportContactPolicy {
         ------------------------
         ✨ **SCREEN RECORDING HIGHLY RECOMMENDED** ✨
         ▶️ Create a quick screen recording showing the issue!
-        ▶️ It helps me understand and fix the problem much faster.
+        ▶️ It makes the problem much faster to understand and fix.
 
         📝 ISSUE DETAILS:
         - What steps did you take before the issue occurred?
@@ -47,7 +47,7 @@ public enum VoiceInkSupportContactPolicy {
 
 
         ## 📋 COMMON ISSUES:
-        Check out our Common Issues page before sending an email: \(commonIssuesURLString)
+        Check the documentation before sending an email: \(commonIssuesURLString)
         ------------------------
 
         System Information:

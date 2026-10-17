@@ -2278,7 +2278,7 @@ public struct VoiceInkEnhancementSettingsPresentation: Equatable, Sendable {
         generalSectionTitle: "General",
         enableEnhancementTitle: "Enable Enhancement",
         enableEnhancementHelp: "AI enhancement lets you pass the transcribed audio through LLMs to post-process using different prompts suitable for different use cases like e-mails, summary, writing, etc.",
-        enableEnhancementLearnMoreURLString: "https://tryvoiceink.com/docs/enhancements-configuring-models",
+        enableEnhancementLearnMoreURLString: "https://roma-just-talk.com/readme",
         settingsButtonSystemImageName: "gear",
         settingsButtonHelp: "Enhancement settings",
         promptsSectionTitle: "Enhancement Prompts",
@@ -2310,7 +2310,7 @@ public struct VoiceInkEnhancementSettingsPresentation: Equatable, Sendable {
         toggleEnhancementShortcutHelp: "Quickly enable or disable AI enhancement while recording. Available only when VoiceInk is running and the recorder is visible.",
         switchPromptShortcutTitle: "Switch Enhancement Prompt",
         switchPromptShortcutHelp: "Switch between your saved prompts using ⌘1 through ⌘0 to activate the corresponding prompt in the order they are saved. Available only when VoiceInk is running and the recorder is visible.",
-        shortcutLearnMoreURLString: "https://tryvoiceink.com/docs/enhancement-shortcuts",
+        shortcutLearnMoreURLString: "https://roma-just-talk.com/readme",
         switchPromptKeyChipTitles: ["⌘", "1 – 0"]
     )
 }

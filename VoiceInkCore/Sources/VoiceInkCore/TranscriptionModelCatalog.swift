@@ -675,7 +675,7 @@ public enum VoiceInkModelManagementPresentation {
     public static let noModelSelectedText = "No model selected"
     public static let importLocalModelTitle = "Import Local Model…"
     public static let importLocalModelHelpText = "Add a custom fine-tuned whisper model to use with VoiceInk. Select the downloaded .bin file."
-    public static let importLocalModelLearnMoreURLString = "https://tryvoiceink.com/docs/custom-local-whisper-models"
+    public static let importLocalModelLearnMoreURLString = "https://roma-just-talk.com/readme"
     public static let importLocalModelLearnMoreHelpText = "Read more about custom local models"
     public static let importLocalModelPanelTitle = "Select a Whisper ggml .bin model"
     public static let customModelsLimitationText = "Only OpenAI-compatible transcription APIs are supported."

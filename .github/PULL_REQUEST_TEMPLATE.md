@@ -1,6 +1,6 @@
 # ⚠️ This Project Does Not Accept Pull Requests
 
-Thank you for your interest in contributing to VoiceInk!
+Thank you for your interest in contributing to Roma Just Talk!
 
 However, **this project is not currently accepting pull requests.**
 
@@ -13,7 +13,7 @@ However, **this project is not currently accepting pull requests.**
 - 🍴 **Fork the project**: You're welcome to create and maintain your own fork
 - 📖 **Improve documentation**: Suggest corrections or clarifications via issues
 
-Thank you for understanding, and I appreciate your interest in VoiceInk!
+Thank you for understanding, and I appreciate your interest in Roma Just Talk!
 
 ---
 

@@ -123,9 +123,9 @@ final class AppIdentityTests: XCTestCase {
         XCTAssertEqual(VoiceInkDiagnosticLogExportPolicy.maxSessionStartDatesToKeep, 3)
         XCTAssertEqual(VoiceInkDiagnosticLogExportPolicy.timestampDateFormat, "yyyy-MM-dd HH:mm:ss.SSS")
         XCTAssertEqual(VoiceInkDiagnosticLogExportPolicy.fileNameDateFormat, "yyyy-MM-dd_HH-mm-ss")
-        XCTAssertEqual(VoiceInkDiagnosticLogExportPolicy.fileNamePrefix, "VoiceInk_Logs_")
+        XCTAssertEqual(VoiceInkDiagnosticLogExportPolicy.fileNamePrefix, "Roma_Just_Talk_Logs_")
         XCTAssertEqual(VoiceInkDiagnosticLogExportPolicy.fileNameExtension, "log")
-        XCTAssertEqual(VoiceInkDiagnosticLogExportPolicy.headerTitle, "=== VoiceInk Diagnostic Logs ===")
+        XCTAssertEqual(VoiceInkDiagnosticLogExportPolicy.headerTitle, "=== Roma Just Talk Diagnostic Logs ===")
         XCTAssertEqual(VoiceInkDiagnosticLogExportPolicy.headerDivider, "================================")
         XCTAssertEqual(VoiceInkDiagnosticLogExportPolicy.noLogsFoundMessage, "No logs found for this session.")
         XCTAssertEqual(VoiceInkDiagnosticLogExportPolicy.exporterErrorDomain, "LogExporter")
@@ -226,7 +226,7 @@ final class AppIdentityTests: XCTestCase {
                 systemInfo: "System info"
             ),
             [
-                "=== VoiceInk Diagnostic Logs ===",
+                "=== Roma Just Talk Diagnostic Logs ===",
                 "Export Date: \(formattedTimestamp)",
                 "Subsystem: com.negentropi.RomaJustTalk",
                 "Total Sessions: 2",
@@ -255,12 +255,12 @@ final class AppIdentityTests: XCTestCase {
         XCTAssertEqual(
             VoiceInkDiagnosticLogExportPolicy.exportContent(
                 from: [
-                    "=== VoiceInk Diagnostic Logs ===",
+                    "=== Roma Just Talk Diagnostic Logs ===",
                     "",
                     "No logs found for this session."
                 ]
             ),
-            "=== VoiceInk Diagnostic Logs ===\n\nNo logs found for this session."
+            "=== Roma Just Talk Diagnostic Logs ===\n\nNo logs found for this session."
         )
     }
 
@@ -282,7 +282,7 @@ final class AppIdentityTests: XCTestCase {
 
         XCTAssertEqual(
             VoiceInkDiagnosticLogExportPolicy.fileName(for: date),
-            "VoiceInk_Logs_\(timestamp).log"
+            "Roma_Just_Talk_Logs_\(timestamp).log"
         )
     }
 

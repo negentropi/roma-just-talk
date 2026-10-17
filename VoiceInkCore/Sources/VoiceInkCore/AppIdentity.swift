@@ -69,8 +69,8 @@ public enum VoiceInkSupportContactPolicy {
 }
 
 public enum VoiceInkMiniRecorderAppIntentPresentation {
-    public static let toggleSuccessDialog = "VoiceInk recorder toggled"
-    public static let dismissSuccessDialog = "VoiceInk recorder dismissed"
+    public static let toggleSuccessDialog = "Roma Just Talk recorder toggled"
+    public static let dismissSuccessDialog = "Roma Just Talk recorder dismissed"
 }
 
 public enum VoiceInkMiniRecorderRequest {
@@ -346,9 +346,9 @@ public enum VoiceInkDiagnosticLogExportPolicy {
     public static let maxSessionStartDatesToKeep = 3
     public static let timestampDateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
     public static let fileNameDateFormat = "yyyy-MM-dd_HH-mm-ss"
-    public static let fileNamePrefix = "VoiceInk_Logs_"
+    public static let fileNamePrefix = "Roma_Just_Talk_Logs_"
     public static let fileNameExtension = "log"
-    public static let headerTitle = "=== VoiceInk Diagnostic Logs ==="
+    public static let headerTitle = "=== Roma Just Talk Diagnostic Logs ==="
     public static let headerDivider = "================================"
     public static let noLogsFoundMessage = "No logs found for this session."
     public static let exporterErrorDomain = "LogExporter"
@@ -662,7 +662,7 @@ public enum VoiceInkSystemInformationReport {
 
     public static func macOS(_ facts: VoiceInkMacOSSystemInformationFacts) -> String {
         """
-        === VOICEINK SYSTEM INFORMATION ===
+        === ROMA JUST TALK SYSTEM INFORMATION ===
         Generated: \(facts.generated)
 
         APP INFORMATION:
@@ -842,7 +842,7 @@ public enum VoiceInkAppIdentity {
 
     public static let storageFallbackWarningPresentation = VoiceInkMacOSStorageAlertPresentation(
         title: "Storage Warning",
-        message: "VoiceInk couldn't access its storage location. Your transcriptions will not be saved between sessions.",
+        message: "Roma Just Talk couldn't access its storage location. Your transcriptions will not be saved between sessions.",
         buttonTitle: "OK"
     )
 

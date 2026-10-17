@@ -995,7 +995,7 @@ public enum VoiceInkPastePreference {
 
     public static let macOSSettingsPresentation = VoiceInkMacOSPasteSettingsPresentation(
         keepClipboardContentLabel: "Keep Clipboard Content",
-        keepClipboardContentInfoMessage: "VoiceInk temporarily uses the clipboard to paste transcription. When enabled, it restores your previous clipboard content after the selected delay. When disabled, the pasted transcription stays on your clipboard.",
+        keepClipboardContentInfoMessage: "Roma Just Talk temporarily uses the clipboard to paste transcription. When enabled, it restores your previous clipboard content after the selected delay. When disabled, the pasted transcription stays on your clipboard.",
         restoreDelayLabel: "Restore Delay",
         restoreDelayOptions: [
             VoiceInkPasteDelayOption(label: "250ms", value: 0.25),
@@ -1461,7 +1461,7 @@ public struct VoiceInkMacOSSettingsPresentation: Equatable, Sendable {
         autoCheckUpdatesTitle: "Auto-check Updates",
         checkForUpdatesButtonTitle: "Check for Updates",
         privacySectionTitle: "Privacy",
-        privacyFooterText: "Control how VoiceInk handles your transcription data and audio recordings.",
+        privacyFooterText: "Control how Roma Just Talk handles your transcription data and audio recordings.",
         backupSectionTitle: "Backup",
         backupFooterText: "Export all settings, or choose specific categories when importing a backup.",
         exportSettingsLabel: "Export Settings",
@@ -2155,10 +2155,10 @@ public struct VoiceInkSettingsBackupPresentation: Equatable, Sendable {
     public let restartRecommendationText: String
 
     public static let macOS = VoiceInkSettingsBackupPresentation(
-        defaultFileName: "VoiceInk_Settings_Backup.json",
-        exportPanelTitle: "Export VoiceInk Settings",
+        defaultFileName: "Roma_Just_Talk_Settings_Backup.json",
+        exportPanelTitle: "Export Roma Just Talk Settings",
         exportPanelMessage: "Choose a location to save your settings.",
-        importPanelTitle: "Import VoiceInk Settings",
+        importPanelTitle: "Import Roma Just Talk Settings",
         importPanelMessage: "Choose a settings backup, then select what you want to import.",
         importSelectionTitle: "Import Settings",
         importSelectionMessage: "Choose what to import from this backup.",
@@ -2181,7 +2181,7 @@ public struct VoiceInkSettingsBackupPresentation: Equatable, Sendable {
         missingFileURLMessage: "Could not get the file URL from the open panel.",
         emptyCategorySelectionMessage: "Select at least one category to import.",
         apiKeyReminderText: "IMPORTANT: If you were using AI enhancement features, please make sure to reconfigure your API keys in the Enhancement section.",
-        restartRecommendationText: "It is recommended to restart VoiceInk for all changes to take full effect."
+        restartRecommendationText: "It is recommended to restart Roma Just Talk for all changes to take full effect."
     )
 
     public func exportSuccessMessage(fileName: String) -> String {
@@ -2307,9 +2307,9 @@ public struct VoiceInkEnhancementSettingsPresentation: Equatable, Sendable {
         requestTimeoutHelp: "Set how long to wait for the AI provider to respond. If no response is received within this duration, you can either fail immediately and paste the original transcription, or retry the request (up to 3 attempts).",
         shortcutsSectionTitle: "Shortcuts",
         toggleEnhancementShortcutTitle: "Toggle AI Enhancement",
-        toggleEnhancementShortcutHelp: "Quickly enable or disable AI enhancement while recording. Available only when VoiceInk is running and the recorder is visible.",
+        toggleEnhancementShortcutHelp: "Quickly enable or disable AI enhancement while recording. Available only when Roma Just Talk is running and the recorder is visible.",
         switchPromptShortcutTitle: "Switch Enhancement Prompt",
-        switchPromptShortcutHelp: "Switch between your saved prompts using ⌘1 through ⌘0 to activate the corresponding prompt in the order they are saved. Available only when VoiceInk is running and the recorder is visible.",
+        switchPromptShortcutHelp: "Switch between your saved prompts using ⌘1 through ⌘0 to activate the corresponding prompt in the order they are saved. Available only when Roma Just Talk is running and the recorder is visible.",
         shortcutLearnMoreURLString: "https://roma-just-talk.com/readme",
         switchPromptKeyChipTitles: ["⌘", "1 – 0"]
     )

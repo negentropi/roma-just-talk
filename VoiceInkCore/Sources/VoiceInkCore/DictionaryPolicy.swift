@@ -897,7 +897,7 @@ public struct VoiceInkDictionarySettingsPresentation: Equatable, Sendable {
 
     public static let macOS = VoiceInkDictionarySettingsPresentation(
         sectionTitle: "Dictionary Settings",
-        heroDescription: "Enhance VoiceInk's transcription accuracy by teaching it your vocabulary",
+        heroDescription: "Enhance Roma Just Talk's transcription accuracy by teaching it your vocabulary",
         sectionSelectorTitle: "Select Section",
         settingsButtonHelp: "Dictionary settings",
         wordReplacementsSection: VoiceInkDictionarySettingsSectionPresentation(
@@ -907,10 +907,10 @@ public struct VoiceInkDictionarySettingsPresentation: Equatable, Sendable {
         ),
         vocabularySection: VoiceInkDictionarySettingsSectionPresentation(
             title: "Vocabulary",
-            description: "Add words to help VoiceInk recognize them properly",
+            description: "Add words to help Roma Just Talk recognize them properly",
             systemImageName: "character.book.closed.fill"
         ),
-        vocabularyHelpText: "Add words to help VoiceInk recognize them properly. (Requires AI enhancement)",
+        vocabularyHelpText: "Add words to help Roma Just Talk recognize them properly. (Requires AI enhancement)",
         vocabularyPlaceholder: "Add word to vocabulary",
         addVocabularyButtonHelp: "Add word",
         wordReplacementHelpText: "Define word replacements to automatically replace specific words or phrases",
@@ -979,11 +979,11 @@ public struct VoiceInkDictionaryQuickAddPresentation: Equatable, Sendable {
             title: "Word Replacement",
             systemImageName: "arrow.2.squarepath"
         ),
-        vocabularyPlaceholder: "e.g. Prakash, VoiceInk",
+        vocabularyPlaceholder: "e.g. Roma Just Talk, Kubernetes",
         originalLabel: "Replace",
         originalPlaceholder: "e.g. my email, my mail",
         replacementLabel: "With",
-        replacementPlaceholder: "e.g. support@tryvoiceink.com",
+        replacementPlaceholder: "e.g. name@example.com",
         submitHintTitle: "Add",
         dismissHintTitle: "Dismiss"
     )
@@ -1011,18 +1011,18 @@ public struct VoiceInkWordReplacementInfoPresentation: Equatable, Sendable {
     public static let macOS = VoiceInkWordReplacementInfoPresentation(
         title: "How to use Word Replacements",
         multipleOriginalsHelpText: "Separate multiple originals with commas:",
-        multipleOriginalsExampleText: "Voicing, Voice ink, Voiceing",
+        multipleOriginalsExampleText: "Roma jus talk, Rome a just talk, Roma just taught",
         examplesTitle: "Examples",
         originalLabel: "Original:",
         replacementLabel: "Replacement:",
         examples: [
             VoiceInkWordReplacementExamplePresentation(
                 originalText: "my website link",
-                replacementText: "https://tryvoiceink.com"
+                replacementText: "https://roma-just-talk.com"
             ),
             VoiceInkWordReplacementExamplePresentation(
-                originalText: "Voicing, Voice ink",
-                replacementText: "VoiceInk"
+                originalText: "Roma jus talk, Rome a just talk",
+                replacementText: "Roma Just Talk"
             )
         ]
     )

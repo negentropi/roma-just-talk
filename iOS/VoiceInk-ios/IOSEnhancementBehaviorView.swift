@@ -54,7 +54,7 @@ struct IOSEnhancementBehaviorView: View {
             } header: {
                 Text(presentation.requestTimeoutSectionTitle)
             } footer: {
-                Text("If enhancement still fails, VoiceInk keeps the original transcription.")
+                Text("If enhancement still fails, Roma Just Talk keeps the original transcription.")
             }
         }
         .navigationTitle("AI Enhancement")

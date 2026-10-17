@@ -478,7 +478,7 @@ public enum VoiceInkMacOSOnboardingPresentation {
 }
 
 public enum VoiceInkMacOSSetupPresentation {
-    public static let title = "Welcome to VoiceInk"
+    public static let title = "Welcome to Roma Just Talk"
     public static let subtitle = "Complete the setup to get started"
     public static let helpText = "Need help? Check the Help menu for support options"
     public static let actionSystemImageName = "arrow.right"
@@ -492,7 +492,7 @@ public enum VoiceInkMacOSSetupPresentation {
             isOptional: false,
             iconSystemName: "command",
             title: "Set Keyboard Shortcut",
-            description: "Use VoiceInk anywhere with a shortcut."
+            description: "Use Roma Just Talk anywhere with a shortcut."
         ),
         VoiceInkMacOSSetupStepPresentation(
             kind: .accessibility,
@@ -1028,9 +1028,9 @@ public enum VoiceInkMacOSPermissionSettingsPresentation {
         kind: .accessibility,
         iconSystemName: "hand.raised",
         title: "Accessibility Access",
-        description: "VoiceInk needs Accessibility permission to work reliably across your entire Mac",
+        description: "Roma Just Talk needs Accessibility permission to work reliably across your entire Mac",
         grantButtonTitle: "Open System Settings",
-        infoTipMessage: "VoiceInk uses Accessibility to work reliably across apps."
+        infoTipMessage: "Roma Just Talk uses Accessibility to work reliably across apps."
     )
 
     public static let screenContextCard = VoiceInkMacOSPermissionSettingsCardPresentation(

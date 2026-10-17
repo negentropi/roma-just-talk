@@ -215,7 +215,7 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
 
             Imported: General Settings.
 
-            It is recommended to restart VoiceInk for all changes to take full effect.
+            It is recommended to restart Roma Just Talk for all changes to take full effect.
             """
         )
         XCTAssertEqual(
@@ -227,7 +227,7 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
 
             IMPORTANT: If you were using AI enhancement features, please make sure to reconfigure your API keys in the Enhancement section.
 
-            It is recommended to restart VoiceInk for all changes to take full effect.
+            It is recommended to restart Roma Just Talk for all changes to take full effect.
             """
         )
     }

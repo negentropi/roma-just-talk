@@ -96,7 +96,7 @@ public enum VoiceInkPowerModePresentation {
     public static let defaultBadgeTitle = defaultOverrideDisplayText
     public static let disabledBadgeTitle = "Disabled"
     public static let emptyPanelTitle = "No Power Modes Yet"
-    public static let emptyPanelMessage = "Create first power mode to automate your VoiceInk workflow based on apps/website you are using"
+    public static let emptyPanelMessage = "Create first power mode to automate your Roma Just Talk workflow based on apps/website you are using"
     public static let emptyPanelSystemImageName = "square.grid.2x2.fill"
     public static let sidebarEmptyTitle = "No Power Modes"
     public static let sidebarEmptyMessage = "Add customized power modes for different contexts"

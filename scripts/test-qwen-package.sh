@@ -7,10 +7,10 @@ if [[ $# -ne 1 ]]; then
 fi
 
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
-PACKAGE="$ROOT/VoiceInkQwen"
+PACKAGE="$ROOT/RomaQwen"
 APP=$1
 SHADER="$APP/Contents/Resources/mlx-swift_Cmlx.bundle/Contents/Resources/default.metallib"
-APP_LOCK="$ROOT/VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+APP_LOCK="$ROOT/RomaJustTalk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
 test -s "$SHADER"
 
 # The preceding Release build supplies the shader; reject a different dependency graph.
@@ -33,7 +33,7 @@ PY
 BUILD_ARGS=(--package-path "$PACKAGE" -c release --force-resolved-versions -Xswiftc -enable-testing)
 swift build "${BUILD_ARGS[@]}" --build-tests
 BIN_PATH=$(swift build "${BUILD_ARGS[@]}" --show-bin-path)
-TEST_EXECUTABLE="$BIN_PATH/VoiceInkQwenPackageTests.xctest/Contents/MacOS/VoiceInkQwenPackageTests"
+TEST_EXECUTABLE="$BIN_PATH/RomaQwenPackageTests.xctest/Contents/MacOS/RomaQwenPackageTests"
 test -x "$TEST_EXECUTABLE"
 
 # Pinned MLX resolves mlx.metallib beside the current executable before bundle lookup.

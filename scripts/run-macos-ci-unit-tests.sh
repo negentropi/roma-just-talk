@@ -19,13 +19,13 @@ mkdir -p "$evidence" "$(dirname "$probe")"
 xcrun swiftc Tools/OnboardingAccessibilityProbe.swift -o "$probe"
 
 build_arguments=(
-  -project VoiceInk.xcodeproj -scheme VoiceInk -configuration Debug
+  -project RomaJustTalk.xcodeproj -scheme RomaJustTalk -configuration Debug
   -destination 'platform=macOS' -parallel-testing-enabled NO
   -derivedDataPath "$PWD/.local-build" -xcconfig LocalBuild.xcconfig
   CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=YES
-  DEVELOPMENT_TEAM= CODE_SIGN_ENTITLEMENTS="$PWD/VoiceInk/VoiceInk.local.entitlements"
+  DEVELOPMENT_TEAM= CODE_SIGN_ENTITLEMENTS="$PWD/RomaJustTalk/RomaJustTalk.local.entitlements"
   'SWIFT_ACTIVE_COMPILATION_CONDITIONS=$(inherited) LOCAL_BUILD'
-  -only-testing:VoiceInkTests
+  -only-testing:RomaTests
 )
 xcodebuild build-for-testing "${build_arguments[@]}"
 

@@ -1,7 +1,7 @@
 import CryptoKit
 import Foundation
-import VoiceInkCore
-import VoiceInkQwen
+import RomaCore
+import RomaQwen
 
 /// Exercises production queueing, presentation, event delivery and finish; never calls the decoder directly.
 @main
@@ -69,13 +69,13 @@ struct QwenRuntimeProbe {
             let data = try Data(contentsOf: directory.appendingPathComponent(input.file))
             let hash = SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
             guard hash == input.sha256 else { throw ProbeError.badChecksum(input.file) }
-            guard let decoded = VoiceInkPCM16Audio.floatSamples(fromWAVData: data), !decoded.isEmpty else {
+            guard let decoded = RomaPCM16Audio.floatSamples(fromWAVData: data), !decoded.isEmpty else {
                 throw ProbeError.badAudio(input.file)
             }
             if index > 0 { referenceAudio += [Float](repeating: 0, count: samples(milliseconds: specification.gapMilliseconds)) }
             referenceAudio += decoded
         }
-        let preRollCapacity = VoiceInkPCM16Audio.sampleCount(forMono16kDuration: VoiceInkAudioPreRollPolicy.durationSeconds)
+        let preRollCapacity = RomaPCM16Audio.sampleCount(forMono16kDuration: RomaAudioPreRollPolicy.durationSeconds)
         let preRoll: [Float]
         var live: [Float]
         switch specification.preRoll {
@@ -111,7 +111,7 @@ struct QwenRuntimeProbe {
         do {
             // Pre-roll was already captured before key-down. Startup delay can also queue live packets.
             try await wait(until: begin + Double(specification.deliveryHoldMilliseconds) / 1000)
-            let preRollPacket = VoiceInkPCM16Audio.sampleCount(forMono16kDuration: VoiceInkAudioPreRollPolicy.streamingChunkDurationSeconds)
+            let preRollPacket = RomaPCM16Audio.sampleCount(forMono16kDuration: RomaAudioPreRollPolicy.streamingChunkDurationSeconds)
             for offset in stride(from: 0, to: preRoll.count, by: preRollPacket) {
                 let end = min(offset + preRollPacket, preRoll.count)
                 let started = now() - begin

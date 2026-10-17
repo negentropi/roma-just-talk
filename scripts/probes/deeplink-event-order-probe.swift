@@ -7,7 +7,7 @@ import CoreGraphics
 import Foundation
 
 private struct Options {
-    var logPath = "/tmp/voiceink-deeplink-order.log"
+    var logPath = "/tmp/roma-deeplink-order.log"
 }
 
 private var options = Options()
@@ -32,7 +32,7 @@ while !args.isEmpty {
 }
 
 private var logHandle: FileHandle?
-private let logQueue = DispatchQueue(label: "voiceink.deeplink-order-probe.log")
+private let logQueue = DispatchQueue(label: "roma.deeplink-order-probe.log")
 
 private func wallTime() -> String {
     let formatter = DateFormatter()
@@ -142,7 +142,7 @@ NSApplication.shared.setActivationPolicy(.accessory)
 let tap = installCGTap()
 log([
     "event=ready",
-    "scheme=voiceink-event-order-probe",
+    "scheme=roma-event-order-probe",
     "log=\(options.logPath)",
     "listen=\(CGPreflightListenEventAccess())"
 ])

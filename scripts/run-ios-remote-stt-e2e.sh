@@ -4,14 +4,14 @@ set -Eeuo pipefail
 simulator_udid="${1:?simulator UDID required}"
 evidence="${2:?evidence directory required}"
 
-bundle_identifier="${VOICEINK_IOS_BUNDLE_IDENTIFIER:-com.negentropi.RomaJustTalk}"
-expected_phrase="${VOICEINK_IOS_E2E_PHRASE:-The quick brown fox confirms this iPhone speech to text test for Roma just talk.}"
-model_url="${VOICEINK_IOS_E2E_MODEL_URL:-https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.bin}"
-model_sha256="${VOICEINK_IOS_E2E_MODEL_SHA256:-60ed5bc3dd14eea856493d334349b405782ddcaf0028d4b5df4088345fba2efe}"
-timeout_seconds="${VOICEINK_IOS_E2E_TIMEOUT_SECONDS:-120}"
-interaction_settle_seconds="${VOICEINK_IOS_E2E_INTERACTION_SETTLE_SECONDS:-8}"
-temporary_root="${RUNNER_TEMP:-/tmp}/voiceink-ios-stt-e2e"
-model_cache="${VOICEINK_IOS_E2E_MODEL_PATH:-$temporary_root/ggml-base.bin}"
+bundle_identifier="${ROMA_IOS_BUNDLE_IDENTIFIER:-com.negentropi.RomaJustTalk}"
+expected_phrase="${ROMA_IOS_E2E_PHRASE:-The quick brown fox confirms this iPhone speech to text test for Roma just talk.}"
+model_url="${ROMA_IOS_E2E_MODEL_URL:-https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.bin}"
+model_sha256="${ROMA_IOS_E2E_MODEL_SHA256:-60ed5bc3dd14eea856493d334349b405782ddcaf0028d4b5df4088345fba2efe}"
+timeout_seconds="${ROMA_IOS_E2E_TIMEOUT_SECONDS:-120}"
+interaction_settle_seconds="${ROMA_IOS_E2E_INTERACTION_SETTLE_SECONDS:-8}"
+temporary_root="${RUNNER_TEMP:-/tmp}/roma-ios-stt-e2e"
+model_cache="${ROMA_IOS_E2E_MODEL_PATH:-$temporary_root/ggml-base.bin}"
 model_download="$model_cache.download.$$"
 fixture_aiff="$temporary_root/roma-stt.aiff"
 fixture_wav="$temporary_root/roma-stt.wav"
@@ -65,12 +65,12 @@ trap 'remember_failure_line "$LINENO"' ERR
 trap 'capture_failure_evidence "$?"' EXIT
 
 if ! [[ "$timeout_seconds" =~ ^[0-9]+$ ]] || (( timeout_seconds < 1 )); then
-  echo "VOICEINK_IOS_E2E_TIMEOUT_SECONDS must be a positive integer" >&2
+  echo "ROMA_IOS_E2E_TIMEOUT_SECONDS must be a positive integer" >&2
   exit 2
 fi
 if ! [[ "$interaction_settle_seconds" =~ ^[0-9]+$ ]] \
   || (( interaction_settle_seconds > 30 )); then
-  echo "VOICEINK_IOS_E2E_INTERACTION_SETTLE_SECONDS must be between 0 and 30" >&2
+  echo "ROMA_IOS_E2E_INTERACTION_SETTLE_SECONDS must be between 0 and 30" >&2
   exit 2
 fi
 

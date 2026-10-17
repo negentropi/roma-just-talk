@@ -157,8 +157,8 @@ engine control, not an exact current-app runtime baseline. A later headless
 Parakeet command control uses the exact shipping SDK and all matching model/audio
 hashes; its 19/30 errors and 16 empty outputs are recorded in the public report.
 It still does not prove the live app's recording/insertion behavior. Source:
-[Roma provider](../../VoiceInk/Transcription/Streaming/FluidAudioStreamingProvider.swift),
-[existing dependency pin](../../VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved),
+[Roma provider](../../RomaJustTalk/Transcription/Streaming/FluidAudioStreamingProvider.swift),
+[existing dependency pin](../../RomaJustTalk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved),
 [research SDK](https://github.com/FluidInference/FluidAudio/tree/5c19d5e12320e22bbfb7a1877b089d2665a69add).
 
 Current FluidAudio separates batch/sliding-window models from actual streaming

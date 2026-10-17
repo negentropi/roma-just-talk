@@ -34,7 +34,7 @@ Inputs:
 - `macos_repetitions`: `1`, `3`, or `5` repetitions per fixture/app after the smoke run.
 - `macos_empty_final_expectation`: `none`, `known-bad`, or `fixed`. The latter two require `runtime-smoke` or `distribution-e2e` and make the selected repetition count apply to the smoke cases.
 - `macos_empty_final_baseline_run_id`: successful `known-bad` stage run. Required only for a `fixed` empty-final proof. It must use the same stage tooling SHA and scenario.
-- `ios_artifact_run_id`: successful `VoiceInk iOS single-repo migration` workflow run containing the exact Simulator artifact. Blank selects the latest green run.
+- `ios_artifact_run_id`: successful `RomaJustTalk iOS single-repo migration` workflow run containing the exact Simulator artifact. Blank selects the latest green run.
 - `ios_scenario`: `none` or `local-whisper-import`.
 - `hold_minutes`: 0 to 60 minutes after setup/scenario. `distribution-e2e` consumes this window while waiting for Safari, Finder, and Gatekeeper interaction and therefore rejects `0`.
 
@@ -42,7 +42,7 @@ The stage downloads the macOS artifact unchanged and does not re-sign it. CI
 builds and ad-hoc signs the external runtime helper once, then the selected Mac
 runs that prebuilt helper without compiling it. The stage rejects app and helper
 run IDs unless they are completed, successful, non-PR runs of
-`voiceink-build.yml` from this repository. The helper must match the checked-out
+`roma-build.yml` from this repository. The helper must match the checked-out
 stage tooling SHA. The app build, helper build, and distribution stage must also
 report distinct Namespace runner instance names. The stage records its boot
 session, then the distribution script independently requires absent Roma

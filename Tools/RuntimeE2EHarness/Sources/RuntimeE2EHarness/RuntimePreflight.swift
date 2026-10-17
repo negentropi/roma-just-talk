@@ -46,7 +46,7 @@ struct RuntimePreflightReport: Codable {
     let audioFixtures: [RuntimeAudioFixtureInfo]
     let requestedAudioDeviceName: String
     let requestedAudioDevice: RuntimeAudioDevice?
-    let voiceInk: RuntimeApplicationInfo
+    let romaJustTalk: RuntimeApplicationInfo
     let targets: [RuntimeApplicationInfo]
     let selectedTargetIDs: [String]
     let skippedTargetIDs: [String]
@@ -68,7 +68,7 @@ enum RuntimePreflight {
         let requestedDevice = devices.first {
             $0.name.localizedCaseInsensitiveCompare(configuration.audioDeviceName) == .orderedSame
         }
-        let voiceInk = voiceInkApplicationInfo(configuration: configuration)
+        let romaJustTalk = romaApplicationInfo(configuration: configuration)
         let targets = configuration.targets.map {
             applicationInfo(id: $0.id, displayName: $0.displayName, bundleIdentifier: $0.bundleIdentifier)
         }
@@ -118,8 +118,8 @@ enum RuntimePreflight {
         } else if requestedDevice?.isFullDuplex != true {
             failures.append("Audio device \(configuration.audioDeviceName) is not full duplex")
         }
-        if !voiceInk.installed {
-            failures.append("VoiceInk bundle \(configuration.voiceInkBundleIdentifier) is not installed")
+        if !romaJustTalk.installed {
+            failures.append("RomaJustTalk bundle \(configuration.romaBundleIdentifier) is not installed")
         }
         switch configuration.targetAvailabilityPolicy {
         case .runningOnly:
@@ -147,7 +147,7 @@ enum RuntimePreflight {
             audioFixtures: fixtures,
             requestedAudioDeviceName: configuration.audioDeviceName,
             requestedAudioDevice: requestedDevice,
-            voiceInk: voiceInk,
+            romaJustTalk: romaJustTalk,
             targets: targets,
             selectedTargetIDs: selectedTargetIDs,
             skippedTargetIDs: skippedTargetIDs,
@@ -217,14 +217,14 @@ enum RuntimePreflight {
         )
     }
 
-    private static func voiceInkApplicationInfo(
+    private static func romaApplicationInfo(
         configuration: RuntimeHarnessConfiguration
     ) -> RuntimeApplicationInfo {
-        let bundleIdentifier = configuration.voiceInkBundleIdentifier
+        let bundleIdentifier = configuration.romaBundleIdentifier
         let runningPaths = NSRunningApplication.runningApplications(withBundleIdentifier: bundleIdentifier)
             .compactMap { $0.bundleURL?.path }
         let buildDirectoryURL = URL(
-            fileURLWithPath: NSString(string: configuration.voiceInkBuildDirectory).expandingTildeInPath,
+            fileURLWithPath: NSString(string: configuration.romaBuildDirectory).expandingTildeInPath,
             isDirectory: true
         )
         let resourceKeys: Set<URLResourceKey> = [.contentModificationDateKey, .isDirectoryKey]
@@ -232,21 +232,21 @@ enum RuntimePreflight {
             at: buildDirectoryURL,
             includingPropertiesForKeys: Array(resourceKeys),
             options: [.skipsHiddenFiles]
-        )) ?? []).compactMap { url -> RuntimeVoiceInkCandidate? in
+        )) ?? []).compactMap { url -> RuntimeRomaCandidate? in
             guard url.pathExtension.lowercased() == "app",
                   Bundle(url: url)?.bundleIdentifier == bundleIdentifier,
                   let values = try? url.resourceValues(forKeys: resourceKeys),
                   values.isDirectory == true else {
                 return nil
             }
-            return RuntimeVoiceInkCandidate(
+            return RuntimeRomaCandidate(
                 path: url.path,
                 modifiedAt: values.contentModificationDate ?? .distantPast
             )
         }
         let workspacePath = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleIdentifier)?.path
-        let selection = RuntimeVoiceInkCandidateSelector.select(
-            explicitPath: configuration.voiceInkAppPath.map {
+        let selection = RuntimeRomaCandidateSelector.select(
+            explicitPath: configuration.romaAppPath.map {
                 NSString(string: $0).expandingTildeInPath
             },
             runningPaths: runningPaths,
@@ -256,7 +256,7 @@ enum RuntimePreflight {
         )
 
         return applicationInfo(
-            id: "voiceink",
+            id: "roma",
             displayName: "roma just talk",
             bundleIdentifier: bundleIdentifier,
             selectedBundleURL: selection.map { URL(fileURLWithPath: $0.path) },

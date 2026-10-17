@@ -141,14 +141,14 @@ do {
             throw RuntimeAudioPlaybackError.notStarted
         }
         let outputSession = try RuntimeSystemOutputSession.start(targetDevice: device)
-        var voiceInkSession: RuntimeVoiceInkSession?
-        let report: RuntimeAudioThroughVoiceInkProbeReport
+        var romaSession: RuntimeRomaSession?
+        let report: RuntimeAudioThroughRomaProbeReport
         do {
-            let session = try RuntimeVoiceInkSession.start(
+            let session = try RuntimeRomaSession.start(
                 configuration: configuration,
                 audioDeviceUID: device.uid
             )
-            voiceInkSession = session
+            romaSession = session
             Thread.sleep(forTimeInterval: configuration.preRollWarmupSeconds)
             let playback = RuntimeAudioPlayback(
                 fixtureURL: fixtureURL,
@@ -159,13 +159,13 @@ do {
             let result = try playback.waitUntilFinished()
             try session.restore()
             try outputSession.restore()
-            report = RuntimeAudioThroughVoiceInkProbeReport(
-                voiceInkSession: session.info,
+            report = RuntimeAudioThroughRomaProbeReport(
+                romaSession: session.info,
                 playback: result,
                 restoredOriginalState: true
             )
         } catch {
-            try? voiceInkSession?.restore()
+            try? romaSession?.restore()
             try? outputSession.restore()
             throw error
         }
@@ -174,9 +174,9 @@ do {
     case "restore":
         let configuration = try loadConfiguration(path: arguments.configurationPath)
         var restored: [String] = []
-        if FileManager.default.fileExists(atPath: RuntimeVoiceInkSession.journalURL.path) {
-            try RuntimeVoiceInkSession.restoreFromJournal()
-            restored.append("VoiceInk audio preferences and running state")
+        if FileManager.default.fileExists(atPath: RuntimeRomaSession.journalURL.path) {
+            try RuntimeRomaSession.restoreFromJournal()
+            restored.append("RomaJustTalk audio preferences and running state")
         }
         if FileManager.default.fileExists(atPath: RuntimeSystemOutputSession.journalURL.path) {
             try RuntimeSystemOutputSession.restoreFromJournal()

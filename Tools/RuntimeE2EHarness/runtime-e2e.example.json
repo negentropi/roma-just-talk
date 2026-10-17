@@ -1,9 +1,9 @@
 {
   "audioDirectory": "~/Downloads/roma jt builds/audio",
   "audioDeviceName": "BlackHole 2ch",
-  "voiceInkBundleIdentifier": "com.negentropi.RomaJustTalk",
-  "voiceInkAppPath": null,
-  "voiceInkBuildDirectory": "~/Downloads/roma jt builds",
+  "romaBundleIdentifier": "com.negentropi.RomaJustTalk",
+  "romaAppPath": null,
+  "romaBuildDirectory": "~/Downloads/roma jt builds",
   "audioLeadSeconds": 1.1,
   "releaseTailSeconds": 0.15,
   "explicitHoldSeconds": null,
@@ -54,5 +54,5 @@
     }
   ],
   "expectedTranscripts": {},
-  "voiceInkLifecycle": "reuse"
+  "romaLifecycle": "reuse"
 }

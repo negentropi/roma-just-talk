@@ -1,9 +1,9 @@
 import Foundation
 import OSLog
-import VoiceInkCore
+import RomaCore
 
-enum VoiceInkAppGroupRecordingBridge {
-    static let appGroupIdentifier = VoiceInkAppIdentity.iOSAppGroupIdentifier
+enum RomaAppGroupRecordingBridge {
+    static let appGroupIdentifier = RomaAppIdentity.iOSAppGroupIdentifier
 
     static func sharedDefaults() -> UserDefaults? {
         UserDefaults(suiteName: appGroupIdentifier)
@@ -12,57 +12,57 @@ enum VoiceInkAppGroupRecordingBridge {
     static func recordingStateReadPlan(
         in defaults: UserDefaults?,
         now: Date = Date()
-    ) -> VoiceInkAppGroupRecordingStateReadPlan {
-        VoiceInkAppGroupRecordingStatePolicy.readPlan(
+    ) -> RomaAppGroupRecordingStateReadPlan {
+        RomaAppGroupRecordingStatePolicy.readPlan(
             storedIsRecording: defaults?.bool(
-                forKey: VoiceInkAppGroupRecordingStatePolicy.UserDefaultsKey.isRecording
+                forKey: RomaAppGroupRecordingStatePolicy.UserDefaultsKey.isRecording
             ) ?? false,
             lastRecordingTimestamp: defaults?.double(
-                forKey: VoiceInkAppGroupRecordingStatePolicy.UserDefaultsKey.lastRecordingTimestamp
+                forKey: RomaAppGroupRecordingStatePolicy.UserDefaultsKey.lastRecordingTimestamp
             ) ?? 0,
             now: now
         )
     }
 
     static func apply(
-        _ plan: VoiceInkAppGroupRecordingStateWritePlan,
+        _ plan: RomaAppGroupRecordingStateWritePlan,
         to defaults: UserDefaults?
     ) {
         plan.applyRuntimeState(
             setIsRecording: {
                 defaults?.set(
                     $0,
-                    forKey: VoiceInkAppGroupRecordingStatePolicy.UserDefaultsKey.isRecording
+                    forKey: RomaAppGroupRecordingStatePolicy.UserDefaultsKey.isRecording
                 )
             },
             setLastRecordingTimestamp: {
                 defaults?.set(
                     $0,
-                    forKey: VoiceInkAppGroupRecordingStatePolicy.UserDefaultsKey.lastRecordingTimestamp
+                    forKey: RomaAppGroupRecordingStatePolicy.UserDefaultsKey.lastRecordingTimestamp
                 )
             }
         )
     }
 }
 
-/// Handles communication between the main VoiceInk app and the keyboard extension
+/// Handles communication between the main RomaJustTalk app and the keyboard extension
 /// Uses App Groups + Darwin Notifications for reliable iOS-native communication
 final class AppGroupCoordinator {
     static let shared = AppGroupCoordinator()
     
     // MARK: - Properties
     private let sharedDefaults: UserDefaults?
-    private let keyboardDictationStore: VoiceInkKeyboardDictationExchangeStore
+    private let keyboardDictationStore: RomaKeyboardDictationExchangeStore
     private let notificationCenter = CFNotificationCenterGetDarwinNotifyCenter()
     
     var onStopRecordingRequested: (() -> Void)?
-    var onKeyboardReadinessReported: ((VoiceInkIOSKeyboardReadinessObservation) -> Void)?
+    var onKeyboardReadinessReported: ((RomaIOSKeyboardReadinessObservation) -> Void)?
     
     // MARK: - Initialization
     private init() {
-        let sharedDefaults = VoiceInkAppGroupRecordingBridge.sharedDefaults()
+        let sharedDefaults = RomaAppGroupRecordingBridge.sharedDefaults()
         self.sharedDefaults = sharedDefaults
-        self.keyboardDictationStore = VoiceInkKeyboardDictationExchangeStore(defaults: sharedDefaults)
+        self.keyboardDictationStore = RomaKeyboardDictationExchangeStore(defaults: sharedDefaults)
         setupNotificationObservers()
     }
     
@@ -74,7 +74,7 @@ final class AppGroupCoordinator {
     
     /// Call this from the keyboard extension to request recording stop
     func requestStopRecording() {
-        let mutationPlan = VoiceInkAppGroupRecordingStatePolicy.stopRequestedMutationPlan()
+        let mutationPlan = RomaAppGroupRecordingStatePolicy.stopRequestedMutationPlan()
         
         // Send immediate notification
         apply(mutationPlan)
@@ -82,9 +82,9 @@ final class AppGroupCoordinator {
     
     /// Get current recording state (for keyboard UI updates)
     var isRecording: Bool {
-        let readPlan = VoiceInkAppGroupRecordingBridge.recordingStateReadPlan(in: sharedDefaults)
+        let readPlan = RomaAppGroupRecordingBridge.recordingStateReadPlan(in: sharedDefaults)
         let state = readPlan.applyRuntimeState { mutationPlan in
-            VoiceInkIOSLogger.appGroup.warning("\(VoiceInkAppGroupRecordingDiagnostics.staleRecordingStateClearedMessage, privacy: .public)")
+            RomaIOSLogger.appGroup.warning("\(RomaAppGroupRecordingDiagnostics.staleRecordingStateClearedMessage, privacy: .public)")
             apply(mutationPlan)
         }
 
@@ -106,12 +106,12 @@ final class AppGroupCoordinator {
     func reportKeyboardReadiness(hasFullAccess: Bool) {
         postDarwinNotification(
             hasFullAccess
-                ? VoiceInkAppIdentity.iOSKeyboardActivatedWithFullAccessDarwinNotificationName
-                : VoiceInkAppIdentity.iOSKeyboardActivatedDarwinNotificationName
+                ? RomaAppIdentity.iOSKeyboardActivatedWithFullAccessDarwinNotificationName
+                : RomaAppIdentity.iOSKeyboardActivatedDarwinNotificationName
         )
     }
 
-    func takePendingKeyboardDictationRequest() -> VoiceInkKeyboardDictationRequest? {
+    func takePendingKeyboardDictationRequest() -> RomaKeyboardDictationRequest? {
         keyboardDictationStore.takePendingRequest()
     }
 
@@ -119,7 +119,7 @@ final class AppGroupCoordinator {
         documentIdentifier: UUID,
         surroundingTextBeforeCursor: String?,
         surroundingTextAfterCursor: String?
-    ) -> VoiceInkKeyboardDictationExchangeStatus {
+    ) -> RomaKeyboardDictationExchangeStatus {
         keyboardDictationStore.status(
             for: documentIdentifier,
             surroundingTextBeforeCursor: surroundingTextBeforeCursor,
@@ -132,7 +132,7 @@ final class AppGroupCoordinator {
         surroundingTextBeforeCursor: String?,
         surroundingTextAfterCursor: String?,
         confirmDocumentChange: Bool = false
-    ) -> VoiceInkKeyboardDictationDelivery? {
+    ) -> RomaKeyboardDictationDelivery? {
         keyboardDictationStore.takeCompletedResult(
             for: documentIdentifier,
             surroundingTextBeforeCursor: surroundingTextBeforeCursor,
@@ -170,20 +170,20 @@ final class AppGroupCoordinator {
     
     /// Call this from the main app to update recording state
     func updateRecordingState(_ isRecording: Bool) {
-        let mutationPlan = VoiceInkAppGroupRecordingStatePolicy.recordingStateMutationPlan(
+        let mutationPlan = RomaAppGroupRecordingStatePolicy.recordingStateMutationPlan(
             isRecording: isRecording
         )
         
         // Notify keyboard of state change
         apply(mutationPlan)
         
-        VoiceInkIOSLogger.appGroup.notice("\(VoiceInkAppGroupRecordingDiagnostics.updatedRecordingStateMessage(isRecording: isRecording), privacy: .public)")
+        RomaIOSLogger.appGroup.notice("\(RomaAppGroupRecordingDiagnostics.updatedRecordingStateMessage(isRecording: isRecording), privacy: .public)")
     }
 
-    private func apply(_ mutationPlan: VoiceInkAppGroupRecordingStateMutationPlan) {
+    private func apply(_ mutationPlan: RomaAppGroupRecordingStateMutationPlan) {
         mutationPlan.applyRuntimeState(
             applyWritePlan: {
-                VoiceInkAppGroupRecordingBridge.apply($0, to: sharedDefaults)
+                RomaAppGroupRecordingBridge.apply($0, to: sharedDefaults)
             },
             postDarwinNotification: postDarwinNotification
         )
@@ -203,7 +203,7 @@ final class AppGroupCoordinator {
                 let coordinator = Unmanaged<AppGroupCoordinator>.fromOpaque(observer).takeUnretainedValue()
                 coordinator.handleStopRecordingNotification()
             },
-            VoiceInkAppIdentity.iOSStopRecordingDarwinNotificationName as CFString,
+            RomaAppIdentity.iOSStopRecordingDarwinNotificationName as CFString,
             nil,
             .deliverImmediately
         )
@@ -216,7 +216,7 @@ final class AppGroupCoordinator {
                 let coordinator = Unmanaged<AppGroupCoordinator>.fromOpaque(observer).takeUnretainedValue()
                 coordinator.handleKeyboardReadinessNotification(hasFullAccess: false)
             },
-            VoiceInkAppIdentity.iOSKeyboardActivatedDarwinNotificationName as CFString,
+            RomaAppIdentity.iOSKeyboardActivatedDarwinNotificationName as CFString,
             nil,
             .deliverImmediately
         )
@@ -229,7 +229,7 @@ final class AppGroupCoordinator {
                 let coordinator = Unmanaged<AppGroupCoordinator>.fromOpaque(observer).takeUnretainedValue()
                 coordinator.handleKeyboardReadinessNotification(hasFullAccess: true)
             },
-            VoiceInkAppIdentity.iOSKeyboardActivatedWithFullAccessDarwinNotificationName as CFString,
+            RomaAppIdentity.iOSKeyboardActivatedWithFullAccessDarwinNotificationName as CFString,
             nil,
             .deliverImmediately
         )
@@ -262,7 +262,7 @@ final class AppGroupCoordinator {
     private func handleKeyboardReadinessNotification(hasFullAccess: Bool) {
         DispatchQueue.main.async { [weak self] in
             self?.onKeyboardReadinessReported?(
-                VoiceInkIOSKeyboardReadinessObservation(
+                RomaIOSKeyboardReadinessObservation(
                     hasFullAccess: hasFullAccess,
                     observedAt: Date()
                 )

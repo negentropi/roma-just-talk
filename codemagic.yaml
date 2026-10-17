@@ -7,7 +7,7 @@ workflows:
       xcode: "26.4.1"
     cache:
       cache_paths:
-        - $HOME/VoiceInk-Dependencies
+        - $HOME/RomaJustTalk-Dependencies
     scripts:
       - name: Check build environment
         script: |
@@ -36,7 +36,7 @@ workflows:
       - name: Run shared core checks
         script: |
           set -euo pipefail
-          swift run --package-path VoiceInkCore VoiceInkCoreChecks 2>&1 | tee artifacts/core-checks.log
+          swift run --package-path RomaCore RomaCoreChecks 2>&1 | tee artifacts/core-checks.log
       - name: Build the macOS app
         script: |
           set -euo pipefail

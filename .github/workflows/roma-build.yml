@@ -1,0 +1,344 @@
+name: Build roma just talk
+
+on:
+  workflow_dispatch:
+    inputs:
+      force:
+        description: Ignore an existing green exact-SHA build
+        required: true
+        default: false
+        type: boolean
+  pull_request:
+    paths:
+      - ".github/workflows/roma-build.yml"
+      - "LocalBuild.xcconfig"
+      - "Makefile"
+      - "Tools/**"
+      - "scripts/check-find-reusable-ci-run.sh"
+      - "scripts/find-reusable-ci-run.sh"
+      - "scripts/run-macos-ci-unit-tests.sh"
+      - "scripts/verify-macos-release-instrumentation.sh"
+      - "scripts/test-qwen-package.sh"
+      - "scripts/test-fluidaudio-package.sh"
+      - "scripts/tests/verify-adhoc-library-validation.test.sh"
+      - "scripts/tests/verify-macos-distribution-launch.test.sh"
+      - "scripts/tests/verify-macos-framework-signature-crash.test.sh"
+      - "scripts/tests/fixtures/macos-framework-signature-crash/**"
+      - "scripts/tests/macos-distribution-e2e-contract.test.sh"
+      - "scripts/tests/macos-distribution-runtime-handoff.test.sh"
+      - "scripts/tests/macos-finder-extraction-state.test.sh"
+      - "scripts/tests/verify-runtime-empty-final-regression.test.sh"
+      - "scripts/run-macos-distribution-e2e.sh"
+      - "scripts/macos-distribution-runtime-handoff.sh"
+      - "scripts/macos-finder-extraction-state.sh"
+      - "scripts/macos-bundle-manifest.sh"
+      - "scripts/prepare-remote-e2e-stage.sh"
+      - ".github/workflows/roma-remote-e2e-stage.yml"
+      - "scripts/verify-macos-distribution-launch.sh"
+      - "scripts/verify-macos-framework-signature-crash.sh"
+      - "scripts/verify-runtime-empty-final-regression.sh"
+      - "scripts/verify-adhoc-library-validation.sh"
+      - "scripts/verify-static-whisper-app.sh"
+      - "scripts/verify-static-whisper-xcframework.sh"
+      - "RomaJustTalk/**"
+      - "RomaCore/**"
+      - "RomaNVIDIA/**"
+      - "RomaQwen/**"
+      - "RomaTests/**"
+      - "RomaJustTalk.xcodeproj/**"
+      - "RomaJustTalk.xcworkspace/**"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/roma-build.yml"
+      - "LocalBuild.xcconfig"
+      - "Makefile"
+      - "Tools/**"
+      - "scripts/check-find-reusable-ci-run.sh"
+      - "scripts/find-reusable-ci-run.sh"
+      - "scripts/run-macos-ci-unit-tests.sh"
+      - "scripts/verify-macos-release-instrumentation.sh"
+      - "scripts/test-qwen-package.sh"
+      - "scripts/test-fluidaudio-package.sh"
+      - "scripts/tests/verify-adhoc-library-validation.test.sh"
+      - "scripts/tests/verify-macos-distribution-launch.test.sh"
+      - "scripts/tests/verify-macos-framework-signature-crash.test.sh"
+      - "scripts/tests/fixtures/macos-framework-signature-crash/**"
+      - "scripts/tests/macos-distribution-e2e-contract.test.sh"
+      - "scripts/tests/macos-distribution-runtime-handoff.test.sh"
+      - "scripts/tests/macos-finder-extraction-state.test.sh"
+      - "scripts/tests/verify-runtime-empty-final-regression.test.sh"
+      - "scripts/run-macos-distribution-e2e.sh"
+      - "scripts/macos-distribution-runtime-handoff.sh"
+      - "scripts/macos-finder-extraction-state.sh"
+      - "scripts/macos-bundle-manifest.sh"
+      - "scripts/prepare-remote-e2e-stage.sh"
+      - ".github/workflows/roma-remote-e2e-stage.yml"
+      - "scripts/verify-macos-distribution-launch.sh"
+      - "scripts/verify-macos-framework-signature-crash.sh"
+      - "scripts/verify-runtime-empty-final-regression.sh"
+      - "scripts/verify-adhoc-library-validation.sh"
+      - "scripts/verify-static-whisper-app.sh"
+      - "scripts/verify-static-whisper-xcframework.sh"
+      - "RomaJustTalk/**"
+      - "RomaCore/**"
+      - "RomaNVIDIA/**"
+      - "RomaQwen/**"
+      - "RomaTests/**"
+      - "RomaJustTalk.xcodeproj/**"
+      - "RomaJustTalk.xcworkspace/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: namespace-profile-roma-jt
+  cancel-in-progress: false
+  queue: max
+
+jobs:
+  reuse:
+    name: Find reusable exact-SHA build
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    outputs:
+      hit: ${{ steps.result.outputs.hit }}
+      run_id: ${{ steps.lookup.outputs.run_id }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check exact-SHA reuse behavior
+        run: bash scripts/check-find-reusable-ci-run.sh
+
+      - name: Find green build with a live app artifact
+        id: lookup
+        if: github.event_name != 'pull_request' && inputs.force != true
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/find-reusable-ci-run.sh roma-build.yml "$GITHUB_SHA" roma.just.talk.app
+
+      - name: Report reused build
+        if: steps.lookup.outputs.hit == 'true'
+        run: echo "Reusing build run ${{ steps.lookup.outputs.run_id }} for $GITHUB_SHA"
+
+      - name: Download reused app artifact
+        if: steps.lookup.outputs.hit == 'true'
+        id: download
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: roma.just.talk.app
+          path: reused-artifact
+          repository: ${{ github.repository }}
+          run-id: ${{ steps.lookup.outputs.run_id }}
+          github-token: ${{ github.token }}
+
+      - name: Republish reused app artifact
+        if: steps.download.outcome == 'success'
+        id: upload
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.just.talk.app
+          path: reused-artifact/roma.just.talk.app.zip
+          if-no-files-found: error
+          overwrite: true
+
+      - name: Resolve reusable build
+        id: result
+        if: always()
+        env:
+          CACHE_HIT: ${{ steps.lookup.outputs.hit }}
+          DOWNLOAD_OUTCOME: ${{ steps.download.outcome }}
+          UPLOAD_OUTCOME: ${{ steps.upload.outcome }}
+        run: |
+          if [[ "$CACHE_HIT" == true && "$DOWNLOAD_OUTCOME" == success && "$UPLOAD_OUTCOME" == success ]]; then
+            echo "hit=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "hit=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  runtime-helper:
+    name: Build reusable runtime E2E helper
+    runs-on: namespace-profile-roma-jt
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Compile and verify autonomous runtime E2E harness
+        run: |
+          make runtime-e2e-check
+          make runtime-e2e-app
+
+      - name: Verify Sonoma-compatible helper
+        run: |
+          HELPER=".local-build/Tools/RuntimeE2EHarness.app"
+          test "$(plutil -extract LSMinimumSystemVersion raw -o - "$HELPER/Contents/Info.plist")" = "14.0"
+          codesign --verify --deep --strict --verbose=4 "$HELPER"
+          file "$HELPER/Contents/MacOS/RuntimeE2EHarness" | grep -Fq arm64
+          otool -l "$HELPER/Contents/MacOS/RuntimeE2EHarness" > helper-load-commands.txt
+          awk '
+            $1 == "cmd" && $2 == "LC_BUILD_VERSION" { in_build = 1; next }
+            in_build && $1 == "minos" && $2 == "14.0" { found = 1; in_build = 0 }
+            END { exit(found ? 0 : 1) }
+          ' helper-load-commands.txt
+
+      - name: Package runtime E2E helper
+        run: |
+          ditto -c -k --keepParent \
+            ".local-build/Tools/RuntimeE2EHarness.app" \
+            "roma.runtime-e2e-harness.macos.zip"
+
+      - name: Upload runtime E2E helper
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.runtime-e2e-harness.macos
+          path: roma.runtime-e2e-harness.macos.zip
+          if-no-files-found: error
+          overwrite: true
+
+  build:
+    name: Build release macOS app
+    needs: reuse
+    if: ${{ !cancelled() && needs.reuse.outputs.hit != 'true' }}
+    runs-on: namespace-profile-roma-jt
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Keep disposable test desktop awake
+        run: |
+          /usr/bin/caffeinate -d -i -u -t 3600 </dev/null >/dev/null 2>&1 &
+          echo "Temporary desktop assertion PID: $!"
+
+      - name: Show Xcode version
+        run: |
+          xcode-select -p
+          xcodebuild -version
+          swift --version
+
+      - name: Compile visible text latency harness helper
+        run: make latency-harness-app
+
+      - name: Verify latency helper run target
+        run: make latency-harness-check
+
+      - name: Verify ad-hoc Library Validation packaging contract
+        run: bash scripts/tests/verify-adhoc-library-validation.test.sh
+
+      - name: Verify distribution launch evidence contract
+        run: |
+          bash scripts/tests/macos-finder-extraction-state.test.sh
+          bash scripts/tests/macos-distribution-e2e-contract.test.sh
+          bash scripts/tests/macos-distribution-runtime-handoff.test.sh
+          bash scripts/tests/verify-macos-distribution-launch.test.sh
+          bash scripts/tests/verify-macos-framework-signature-crash.test.sh
+          bash scripts/tests/verify-runtime-empty-final-regression.test.sh
+
+      - name: Build release app
+        id: release_app
+        run: make local CONFIGURATION=Release
+
+      - name: Verify FluidAudio array reset semantics
+        id: fluidaudio_test
+        timeout-minutes: 15
+        run: bash scripts/test-fluidaudio-package.sh
+
+      - name: Upload FluidAudio test evidence
+        if: ${{ !cancelled() && (steps.fluidaudio_test.outcome == 'success' || steps.fluidaudio_test.outcome == 'failure') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.fluidaudio-test-evidence
+          path: |
+            .local-build/fluidaudio-test-evidence/**/gate.log
+            .local-build/fluidaudio-test-evidence/**/provenance.txt
+            .local-build/fluidaudio-test-evidence/**/swift-test.log
+            .local-build/fluidaudio-test-evidence/**/result.txt
+          if-no-files-found: error
+
+      - name: Verify local bilingual model package
+        timeout-minutes: 15
+        run: bash scripts/test-qwen-package.sh "$HOME/Applications/roma just talk.app"
+
+      - name: Prove recording cache cleanup regression red and green
+        timeout-minutes: 6
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import subprocess,hashlib,json
+          root=Path.cwd();source=root/'RomaQwen/Sources/RomaQwen/QwenRuntime.swift';candidate=source.read_bytes();digest=hashlib.sha256(candidate).hexdigest();out=root/'.local-build/recording-cache-regression';out.mkdir()
+          base='238516c5cd6022eed161aead00db6fa588e778e1'
+          subprocess.run(['git','fetch','--no-tags','--depth=1','origin',base],check=True)
+          bad=subprocess.check_output(['git','show',base+':RomaQwen/Sources/RomaQwen/QwenRuntime.swift'])
+          cmd=['swift','test','--package-path','RomaQwen','-c','release','--force-resolved-versions','-Xswiftc','-enable-testing','--filter','acceptedLivePassesRetainBuffersUntilFinishOrIdleCancellation']
+          try:
+           source.write_bytes(bad)
+           r=subprocess.run(cmd,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=150);(out/'known-bad.log').write_text(r.stdout)
+           print(r.stdout)
+           assert r.returncode!=0 and 'A continuing live pass must retain its reusable buffers' in r.stdout and 'Build complete!' in r.stdout,'Known bad must fail the behavioral assertion after a successful build'
+          finally:
+           source.write_bytes(candidate)
+           assert hashlib.sha256(source.read_bytes()).hexdigest()==digest
+          r=subprocess.run(cmd,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=150);(out/'candidate.log').write_text(r.stdout);print(r.stdout);assert r.returncode==0
+          (out/'receipt.json').write_text(json.dumps({'knownBad':base,'candidateSourceSHA256':digest,'behavioralRed':True,'candidateGreen':True},indent=2))
+          PY
+
+      - name: Upload recording cache regression evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.recording-cache-regression
+          path: .local-build/recording-cache-regression
+          if-no-files-found: error
+
+      - name: Run Debug unit tests
+        if: ${{ !cancelled() && steps.release_app.outcome == 'success' }}
+        timeout-minutes: 15
+        run: bash scripts/run-macos-ci-unit-tests.sh
+
+      - name: Upload Debug test evidence
+        if: ${{ !cancelled() && steps.release_app.outcome == 'success' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.debug-test-evidence
+          path: .local-build/onboarding-test-evidence
+          if-no-files-found: error
+
+      - name: Reject debug-only release payload
+        run: |
+          APP="$HOME/Applications/roma just talk.app"
+          if [ -e "$APP/Contents/MacOS/roma just talk.debug.dylib" ] || [ -e "$APP/Contents/MacOS/__preview.dylib" ]; then
+            echo "Release artifact contains debug-only binaries:"
+            ls -la "$APP/Contents/MacOS"
+            exit 1
+          fi
+
+      - name: Verify packaged app identity
+        run: |
+          APP="$HOME/Applications/roma just talk.app"
+          BUNDLE_ID=$(plutil -extract CFBundleIdentifier raw -o - "$APP/Contents/Info.plist")
+          test "$BUNDLE_ID" = "com.negentropi.RomaJustTalk"
+
+      - name: Reject test-coverage instrumentation in release app
+        run: bash scripts/verify-macos-release-instrumentation.sh "$HOME/Applications/roma just talk.app"
+
+      - name: Package app
+        run: ditto -c -k --keepParent "$HOME/Applications/roma just talk.app" "roma.just.talk.app.zip"
+
+      - name: Upload app artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.just.talk.app
+          path: roma.just.talk.app.zip
+          if-no-files-found: error
+          overwrite: true

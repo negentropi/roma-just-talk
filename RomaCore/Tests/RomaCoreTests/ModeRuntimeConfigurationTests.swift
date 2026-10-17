@@ -1,0 +1,817 @@
+import Foundation
+@testable import RomaCore
+
+final class ModeRuntimeConfigurationTests: XCTestCase {
+    func testEmptyModeCollectionUsesDefaultLocalWhisperFallbackConfiguration() {
+        let configuration = [Mode]().runtimeConfiguration(selectedModeId: nil)
+
+        XCTAssertEqual(configuration, .fallback)
+        XCTAssertEqual(configuration.transcriptionProvider, .localWhisper)
+        XCTAssertEqual(configuration.transcriptionModel, RomaTranscriptionModelCatalog.localBaseModel)
+        XCTAssertEqual(configuration.postProcessingProvider, .groq)
+        XCTAssertEqual(configuration.postProcessingModel, RomaAIModelCatalog.defaultModel(for: .groq))
+        XCTAssertEqual(configuration.prompt, Mode.defaultLocalWhisper().effectivePrompt)
+        XCTAssertFalse(configuration.isPostProcessingEnabled)
+    }
+
+    func testFallbackConfigurationMatchesDefaultLocalWhisperMode() {
+        XCTAssertEqual(RomaModeRuntimeConfiguration.fallback, Mode.defaultLocalWhisper().runtimeConfiguration)
+    }
+
+    func testDefaultModeUsesSharedPostProcessingDefaultPolicy() {
+        let mode = Mode(name: "Default")
+
+        XCTAssertEqual(mode.postProcessingProvider, .groq)
+        XCTAssertEqual(mode.postProcessingModel, RomaAIModelCatalog.defaultModel(for: .groq))
+    }
+
+    func testDefaultLocalWhisperUsesSharedPostProcessingDefaultPolicy() {
+        let mode = Mode.defaultLocalWhisper()
+
+        XCTAssertEqual(mode.transcriptionProvider, .localWhisper)
+        XCTAssertEqual(mode.transcriptionModel, RomaTranscriptionModelCatalog.localBaseModel)
+        XCTAssertEqual(mode.postProcessingProvider, .groq)
+        XCTAssertEqual(mode.postProcessingModel, RomaAIModelCatalog.defaultModel(for: .groq))
+        XCTAssertFalse(mode.isPostProcessingEnabled)
+    }
+
+    func testDefaultModesAndSelectionSelectsSeededLocalMode() {
+        let defaultSelection = Mode.defaultModesAndSelection()
+
+        XCTAssertEqual(defaultSelection.modes.count, 1)
+        XCTAssertEqual(defaultSelection.modes.first?.id, defaultSelection.selectedModeId)
+        XCTAssertEqual(defaultSelection.modes.first?.transcriptionProvider, .localWhisper)
+        XCTAssertEqual(defaultSelection.modes.first?.transcriptionModel, RomaTranscriptionModelCatalog.localBaseModel)
+    }
+
+    func testModeListPolicyAppendsModeWithoutReorderingExistingModes() {
+        let localMode = Mode.defaultLocalWhisper(name: "Local")
+        let cloudMode = Mode(name: "Cloud")
+
+        let updatedModes = RomaModeListPolicy.appending(cloudMode, to: [localMode])
+
+        XCTAssertEqual(updatedModes.map(\.id), [localMode.id, cloudMode.id])
+    }
+
+    func testModeListPolicyReplacesExistingModeById() throws {
+        let localMode = Mode.defaultLocalWhisper(name: "Local")
+        let cloudMode = Mode(name: "Cloud")
+        let updatedMode = Mode(name: "Updated")
+
+        let updatedModes = try XCTUnwrap(RomaModeListPolicy.replacing(
+            modeId: cloudMode.id,
+            with: updatedMode,
+            in: [localMode, cloudMode]
+        ))
+
+        XCTAssertEqual(updatedModes.map(\.id), [localMode.id, updatedMode.id])
+        XCTAssertEqual(updatedModes.map(\.name), ["Local", "Updated"])
+    }
+
+    func testModeListPolicyLeavesMissingReplacementAsNoOp() {
+        let localMode = Mode.defaultLocalWhisper(name: "Local")
+        let updatedMode = Mode(name: "Updated")
+
+        XCTAssertNil(RomaModeListPolicy.replacing(
+            modeId: UUID(),
+            with: updatedMode,
+            in: [localMode]
+        ))
+    }
+
+    func testModeListPolicyRemovesModesByOffsets() {
+        let localMode = Mode.defaultLocalWhisper(name: "Local")
+        let cloudMode = Mode(name: "Cloud")
+        let backupMode = Mode(name: "Backup")
+
+        let updatedModes = RomaModeListPolicy.removing(
+            at: IndexSet(integer: 1),
+            from: [localMode, cloudMode, backupMode]
+        )
+
+        XCTAssertEqual(updatedModes.map(\.id), [localMode.id, backupMode.id])
+    }
+
+    func testModeListPolicySeedsDefaultModeWhenListIsEmpty() {
+        let plan = RomaModeListPolicy.defaultModeRepairPlan(modes: [], selectedModeId: nil)
+
+        XCTAssertTrue(plan.shouldReplaceModes)
+        XCTAssertEqual(plan.modes.count, 1)
+        XCTAssertEqual(plan.modes.first?.id, plan.selectedModeId)
+        XCTAssertEqual(plan.modes.first?.transcriptionProvider, .localWhisper)
+    }
+
+    func testModeListPolicyRepairsSelectionWithoutReplacingExistingModes() {
+        let localMode = Mode.defaultLocalWhisper(name: "Local")
+        let cloudMode = Mode(name: "Cloud")
+
+        let plan = RomaModeListPolicy.defaultModeRepairPlan(
+            modes: [localMode, cloudMode],
+            selectedModeId: UUID()
+        )
+
+        XCTAssertFalse(plan.shouldReplaceModes)
+        XCTAssertEqual(plan.modes.map(\.id), [localMode.id, cloudMode.id])
+        XCTAssertEqual(plan.selectedModeId, localMode.id)
+    }
+
+    func testModeSettingsPolicyRepairsSelectionBeforeLanguageCompatibility() {
+        let localMode = Mode.defaultLocalWhisper(name: "Local")
+        let cloudMode = Mode(name: "xAI", transcriptionProvider: .xai)
+        let staleModeId = UUID()
+
+        let plan = RomaModeSettingsPolicy.repairPlan(
+            modes: [localMode, cloudMode],
+            selectedModeId: staleModeId,
+            selectedTranscriptionLanguage: "zh"
+        )
+
+        XCTAssertFalse(plan.shouldReplaceModes)
+        XCTAssertEqual(plan.modes.map(\.id), [localMode.id, cloudMode.id])
+        XCTAssertEqual(plan.selectedModeId, localMode.id)
+        XCTAssertEqual(plan.selectedTranscriptionLanguage, "zh")
+        XCTAssertTrue(plan.shouldApplySelectedModeId(from: staleModeId))
+        XCTAssertFalse(plan.shouldApplySelectedTranscriptionLanguage(from: "zh"))
+    }
+
+    func testModeSettingsPolicyRepairsLanguageForActiveMode() {
+        let localMode = Mode.defaultLocalWhisper(name: "Local")
+        let cloudMode = Mode(name: "xAI", transcriptionProvider: .xai)
+
+        let plan = RomaModeSettingsPolicy.repairPlan(
+            modes: [localMode, cloudMode],
+            selectedModeId: cloudMode.id,
+            selectedTranscriptionLanguage: "zh"
+        )
+
+        XCTAssertFalse(plan.shouldReplaceModes)
+        XCTAssertEqual(plan.selectedModeId, cloudMode.id)
+        XCTAssertEqual(plan.selectedTranscriptionLanguage, RomaLanguageCatalog.autoDetectCode)
+        XCTAssertFalse(plan.shouldApplySelectedModeId(from: cloudMode.id))
+        XCTAssertTrue(plan.shouldApplySelectedTranscriptionLanguage(from: "zh"))
+    }
+
+    func testModeSettingsPolicySeedsDefaultModeAndRepairsLanguage() {
+        let plan = RomaModeSettingsPolicy.defaultModeRepairPlan(
+            modes: [],
+            selectedModeId: nil,
+            selectedTranscriptionLanguage: "not-a-language"
+        )
+
+        XCTAssertTrue(plan.shouldReplaceModes)
+        XCTAssertEqual(plan.modes.count, 1)
+        XCTAssertEqual(plan.modes.first?.id, plan.selectedModeId)
+        XCTAssertEqual(plan.modes.first?.transcriptionProvider, .localWhisper)
+        XCTAssertEqual(plan.selectedTranscriptionLanguage, RomaLanguageCatalog.autoDetectCode)
+        XCTAssertTrue(plan.shouldApplySelectedModeId(from: nil))
+        XCTAssertTrue(plan.shouldApplySelectedTranscriptionLanguage(from: "not-a-language"))
+    }
+
+    func testModeSettingsRepairPlanBuildsNoActionsWhenCurrentStateMatches() {
+        let localMode = Mode.defaultLocalWhisper(name: "Local")
+        let plan = RomaModeSettingsPolicy.repairPlan(
+            modes: [localMode],
+            selectedModeId: localMode.id,
+            selectedTranscriptionLanguage: RomaLanguageCatalog.autoDetectCode
+        )
+
+        XCTAssertTrue(plan.applicationActions(
+            currentSelectedModeId: localMode.id,
+            currentSelectedTranscriptionLanguage: RomaLanguageCatalog.autoDetectCode
+        ).isEmpty)
+    }
+
+    func testModeSettingsRepairPlanBuildsSelectionAndLanguageActions() {
+        let localMode = Mode.defaultLocalWhisper(name: "Local")
+        let cloudMode = Mode(name: "xAI", transcriptionProvider: .xai)
+        let staleModeId = UUID()
+        let plan = RomaModeSettingsPolicy.repairPlan(
+            modes: [localMode, cloudMode],
+            selectedModeId: staleModeId,
+            selectedTranscriptionLanguage: "zh"
+        )
+
+        let actions = plan.applicationActions(
+            currentSelectedModeId: staleModeId,
+            currentSelectedTranscriptionLanguage: "not-a-language"
+        )
+
+        XCTAssertEqual(actions.count, 2)
+        guard case .selectMode(let selectedModeId) = actions[0] else {
+            return XCTFail("Expected selected-mode repair action")
+        }
+        XCTAssertEqual(selectedModeId, localMode.id)
+        guard case .selectTranscriptionLanguage(let selectedLanguage) = actions[1] else {
+            return XCTFail("Expected selected-language repair action")
+        }
+        XCTAssertEqual(selectedLanguage, "zh")
+    }
+
+    func testModeSettingsRepairPlanBuildsDefaultModeSeedActionsInOrder() {
+        let plan = RomaModeSettingsPolicy.defaultModeRepairPlan(
+            modes: [],
+            selectedModeId: nil,
+            selectedTranscriptionLanguage: "not-a-language"
+        )
+
+        let actions = plan.applicationActions(
+            currentSelectedModeId: nil,
+            currentSelectedTranscriptionLanguage: "not-a-language"
+        )
+
+        XCTAssertEqual(actions.count, 3)
+        guard case .replaceModes(let repairedModes) = actions[0] else {
+            return XCTFail("Expected repaired mode-list action")
+        }
+        XCTAssertEqual(repairedModes.map(\.id), plan.modes.map(\.id))
+        guard case .selectMode(let selectedModeId) = actions[1] else {
+            return XCTFail("Expected selected-mode repair action")
+        }
+        XCTAssertEqual(selectedModeId, plan.selectedModeId)
+        guard case .selectTranscriptionLanguage(let selectedLanguage) = actions[2] else {
+            return XCTFail("Expected selected-language repair action")
+        }
+        XCTAssertEqual(selectedLanguage, RomaLanguageCatalog.autoDetectCode)
+    }
+
+    func testModeSettingsRepairPlanAppliesRuntimeStateInOrder() {
+        let plan = RomaModeSettingsPolicy.defaultModeRepairPlan(
+            modes: [],
+            selectedModeId: nil,
+            selectedTranscriptionLanguage: "not-a-language"
+        )
+        var runtimeModes: [Mode] = []
+        var runtimeSelectedModeId: UUID?
+        var runtimeLanguage = "not-a-language"
+        var events: [String] = []
+
+        plan.applyRuntimeState(
+            currentSelectedModeId: runtimeSelectedModeId,
+            currentSelectedTranscriptionLanguage: runtimeLanguage,
+            replaceModes: { modes in
+                runtimeModes = modes
+                events.append("modes:\(modes.count)")
+            },
+            selectMode: { selectedModeId in
+                runtimeSelectedModeId = selectedModeId
+                events.append("selectedMode:\(selectedModeId == plan.selectedModeId)")
+            },
+            selectTranscriptionLanguage: { language in
+                runtimeLanguage = language
+                events.append("language:\(language)")
+            }
+        )
+
+        XCTAssertEqual(events, [
+            "modes:1",
+            "selectedMode:true",
+            "language:\(RomaLanguageCatalog.autoDetectCode)"
+        ])
+        XCTAssertEqual(runtimeModes.map(\.id), plan.modes.map(\.id))
+        XCTAssertEqual(runtimeSelectedModeId, plan.selectedModeId)
+        XCTAssertEqual(runtimeLanguage, RomaLanguageCatalog.autoDetectCode)
+    }
+
+    func testUnsupportedTranscriptionProviderDoesNotReceiveFakeFallbackModel() {
+        let mode = Mode(name: "Unsupported", transcriptionProvider: .cerebras)
+
+        XCTAssertEqual(mode.transcriptionProvider, .cerebras)
+        XCTAssertEqual(mode.transcriptionModel, "")
+    }
+
+    func testSelectingTranscriptionProviderRepairsModelThroughSharedPolicy() {
+        var mode = Mode(
+            name: "Draft",
+            transcriptionProvider: .groq,
+            transcriptionModel: "whisper-large-v3"
+        )
+
+        mode.selectTranscriptionProvider(.localWhisper)
+
+        XCTAssertEqual(mode.transcriptionProvider, .localWhisper)
+        XCTAssertEqual(mode.transcriptionModel, RomaTranscriptionModelCatalog.localBaseModel)
+    }
+
+    func testSelectingPostProcessingProviderRepairsModelThroughSharedPolicy() {
+        var mode = Mode(
+            name: "Draft",
+            isPostProcessingEnabled: true,
+            postProcessingProvider: .gemini,
+            postProcessingModel: "old-gemini-model"
+        )
+
+        mode.selectPostProcessingProvider(.groq)
+
+        XCTAssertEqual(mode.postProcessingProvider, .groq)
+        XCTAssertEqual(mode.postProcessingModel, RomaAIModelCatalog.defaultModel(for: .groq))
+    }
+
+    func testModeRepairReplacesUnavailableProvidersWithFirstAvailableProvider() {
+        var mode = Mode(
+            name: "Legacy",
+            transcriptionProvider: .cerebras,
+            transcriptionModel: "whisper-large-v3",
+            isPostProcessingEnabled: true,
+            postProcessingProvider: .deepgram,
+            postProcessingModel: "openai/gpt-oss-120b"
+        )
+
+        mode.repairProviderSelection(
+            availableTranscriptionProviders: [.localWhisper],
+            availablePostProcessingProviders: [.groq]
+        )
+
+        XCTAssertEqual(mode.transcriptionProvider, .localWhisper)
+        XCTAssertEqual(mode.transcriptionModel, RomaTranscriptionModelCatalog.localBaseModel)
+        XCTAssertEqual(mode.postProcessingProvider, .groq)
+        XCTAssertEqual(mode.postProcessingModel, RomaAIModelCatalog.defaultModel(for: .groq))
+    }
+
+    func testModeRepairLeavesUnavailablePostProcessingProviderWhenDisabled() {
+        var mode = Mode(
+            name: "Legacy",
+            transcriptionProvider: .groq,
+            transcriptionModel: RomaProviderKind.groq.defaultModel(for: .transcription),
+            isPostProcessingEnabled: false,
+            postProcessingProvider: .deepgram,
+            postProcessingModel: ""
+        )
+
+        mode.repairProviderSelection(
+            availableTranscriptionProviders: [.groq],
+            availablePostProcessingProviders: [.gemini]
+        )
+
+        XCTAssertEqual(mode.postProcessingProvider, .deepgram)
+    }
+
+    func testRuntimeConfigurationUsesSelectedModeWhenAvailable() {
+        let firstMode = Mode.defaultLocalWhisper(name: "Local")
+        let selectedMode = Mode(
+            name: "Cloud",
+            transcriptionProvider: .deepgram,
+            transcriptionModel: "nova-3-medical",
+            isPostProcessingEnabled: true,
+            postProcessingProvider: .gemini,
+            postProcessingModel: "gemini-2.5-flash",
+            promptTemplate: RomaPostProcessingPromptTemplate(
+                type: .custom,
+                customPrompt: "Clean this transcript."
+            )
+        )
+
+        let configuration = [firstMode, selectedMode].runtimeConfiguration(selectedModeId: selectedMode.id)
+
+        XCTAssertEqual(configuration.transcriptionProvider, .deepgram)
+        XCTAssertEqual(configuration.transcriptionModel, "nova-3-medical")
+        XCTAssertEqual(configuration.postProcessingProvider, .gemini)
+        XCTAssertEqual(configuration.postProcessingModel, "gemini-2.5-flash")
+        XCTAssertEqual(configuration.prompt, "Clean this transcript.")
+        XCTAssertTrue(configuration.isPostProcessingEnabled)
+    }
+
+    func testRuntimeConfigurationRepairsStaleModelSelections() {
+        let mode = Mode(
+            name: "Cloud",
+            transcriptionProvider: .deepgram,
+            transcriptionModel: "stale-transcription-model",
+            isPostProcessingEnabled: true,
+            postProcessingProvider: .gemini,
+            postProcessingModel: "stale-post-processing-model"
+        )
+
+        let configuration = mode.runtimeConfiguration
+
+        XCTAssertEqual(configuration.transcriptionModel, RomaProviderKind.deepgram.defaultModel(for: .transcription))
+        XCTAssertEqual(configuration.postProcessingModel, RomaProviderKind.gemini.defaultModel(for: .postProcessing))
+    }
+
+    func testModeRepairUpdatesStaleModelSelections() {
+        var mode = Mode(
+            name: "Cloud",
+            transcriptionProvider: .deepgram,
+            transcriptionModel: "stale-transcription-model",
+            isPostProcessingEnabled: true,
+            postProcessingProvider: .gemini,
+            postProcessingModel: "stale-post-processing-model"
+        )
+
+        mode.repairModelSelection()
+
+        XCTAssertEqual(mode.transcriptionModel, RomaProviderKind.deepgram.defaultModel(for: .transcription))
+        XCTAssertEqual(mode.postProcessingModel, RomaProviderKind.gemini.defaultModel(for: .postProcessing))
+    }
+
+    func testRuntimeConfigurationFallsBackToFirstModeWhenSelectionIsMissing() {
+        let firstMode = Mode.defaultLocalWhisper(name: "Local")
+        let secondMode = Mode(name: "Cloud")
+
+        let configuration = [firstMode, secondMode].runtimeConfiguration(selectedModeId: UUID())
+
+        XCTAssertEqual(configuration, firstMode.runtimeConfiguration)
+    }
+
+    func testTranscriptionLanguagesUseWhisperFallbackWhenNoModeExists() {
+        XCTAssertEqual(
+            [Mode]().transcriptionLanguages(selectedModeId: nil),
+            RomaLanguageCatalog.whisperLanguages()
+        )
+    }
+
+    func testTranscriptionLanguagesUseActiveModeProvider() {
+        let localMode = Mode.defaultLocalWhisper(name: "Local")
+        let cloudMode = Mode(name: "Speechmatics", transcriptionProvider: .speechmatics)
+
+        XCTAssertEqual(
+            [localMode, cloudMode].transcriptionLanguages(selectedModeId: cloudMode.id),
+            RomaLanguageCatalog.languages(for: RomaProviderKind.speechmatics)
+        )
+    }
+
+    func testSelectedTranscriptionLanguageRepairUsesActiveModeLanguages() {
+        let localMode = Mode.defaultLocalWhisper(name: "Local")
+        let cloudMode = Mode(name: "xAI", transcriptionProvider: .xai)
+
+        XCTAssertEqual(
+            [localMode, cloudMode].repairedSelectedTranscriptionLanguage(
+                "zh",
+                selectedModeId: cloudMode.id
+            ),
+            RomaLanguageCatalog.autoDetectCode
+        )
+    }
+
+    func testRepairedSelectedModeIdPreservesExistingSelection() {
+        let firstMode = Mode.defaultLocalWhisper(name: "Local")
+        let secondMode = Mode(name: "Cloud")
+
+        XCTAssertEqual(
+            [firstMode, secondMode].repairedSelectedModeId(secondMode.id),
+            secondMode.id
+        )
+    }
+
+    func testRepairedSelectedModeIdFallsBackToFirstModeForMissingSelection() {
+        let firstMode = Mode.defaultLocalWhisper(name: "Local")
+        let secondMode = Mode(name: "Cloud")
+
+        XCTAssertEqual(
+            [firstMode, secondMode].repairedSelectedModeId(UUID()),
+            firstMode.id
+        )
+        XCTAssertEqual(
+            [firstMode, secondMode].repairedSelectedModeId(nil),
+            firstMode.id
+        )
+    }
+
+    func testRepairedSelectedModeIdReturnsNilForEmptyModes() {
+        XCTAssertNil([Mode]().repairedSelectedModeId(UUID()))
+        XCTAssertNil([Mode]().repairedSelectedModeId(nil))
+    }
+
+    func testModeSelectionPresentationHidesEmptyModeLists() {
+        let presentation = [Mode]().modeSelectionPresentation
+
+        XCTAssertFalse(presentation.shouldShowControl)
+        XCTAssertFalse(presentation.shouldShowPicker)
+        XCTAssertNil(presentation.singleModeName)
+    }
+
+    func testModeSelectionPresentationShowsSingleModeName() {
+        let mode = Mode.defaultLocalWhisper(name: "Local")
+        let presentation = [mode].modeSelectionPresentation
+
+        XCTAssertTrue(presentation.shouldShowControl)
+        XCTAssertFalse(presentation.shouldShowPicker)
+        XCTAssertEqual(presentation.singleModeName, "Local")
+    }
+
+    func testModeSelectionPresentationUsesPickerForMultipleModes() {
+        let local = Mode.defaultLocalWhisper(name: "Local")
+        let cloud = Mode(name: "Cloud")
+        let presentation = [local, cloud].modeSelectionPresentation
+
+        XCTAssertTrue(presentation.shouldShowControl)
+        XCTAssertTrue(presentation.shouldShowPicker)
+        XCTAssertNil(presentation.singleModeName)
+    }
+
+    func testModeSummaryPresentationUsesEffectiveModelNames() {
+        let mode = Mode(
+            name: "Cloud",
+            transcriptionProvider: .deepgram,
+            transcriptionModel: "stale-transcription-model",
+            isPostProcessingEnabled: true,
+            postProcessingProvider: .gemini,
+            postProcessingModel: "stale-post-processing-model"
+        )
+
+        XCTAssertEqual(mode.summaryPresentation.title, "Cloud")
+        XCTAssertEqual(
+            mode.summaryPresentation.transcriptionText,
+            "Transcription: \(RomaProviderKind.deepgram.defaultModel(for: .transcription) ?? "")"
+        )
+        XCTAssertEqual(
+            mode.summaryPresentation.postProcessingText,
+            "Post-processing: \(RomaProviderKind.gemini.defaultModel(for: .postProcessing) ?? "")"
+        )
+    }
+
+    func testModeSummaryPresentationHidesDisabledPostProcessing() {
+        let mode = Mode.defaultLocalWhisper(name: "Local")
+
+        XCTAssertEqual(mode.summaryPresentation.title, "Local")
+        XCTAssertEqual(
+            mode.summaryPresentation.transcriptionText,
+            "Transcription: \(RomaTranscriptionModelCatalog.localBaseModel)"
+        )
+        XCTAssertNil(mode.summaryPresentation.postProcessingText)
+    }
+
+    func testModeFormPresentationBuildsNewModeCopy() {
+        let mode = Mode.defaultLocalWhisper(name: "Local")
+        let presentation = mode.formPresentation(isEditing: false)
+
+        XCTAssertEqual(presentation.navigationTitle, "New Mode")
+        XCTAssertEqual(presentation.modeDetailsSectionTitle, "Mode Details")
+        XCTAssertEqual(presentation.modeNamePlaceholder, "Mode Name")
+        XCTAssertEqual(presentation.transcriptionSectionTitle, "Transcription")
+        XCTAssertEqual(presentation.postProcessingSectionTitle, "Post-processing")
+        XCTAssertNil(presentation.postProcessingFooterText)
+        XCTAssertEqual(presentation.enablePostProcessingTitle, "Enable Post-processing")
+        XCTAssertEqual(presentation.providerPickerTitle, "Provider")
+        XCTAssertEqual(presentation.promptTemplatePickerTitle, "Prompt Template")
+        XCTAssertEqual(presentation.customPromptPlaceholder, "Custom Prompt")
+        XCTAssertEqual(presentation.modelFieldTitle, "Model")
+        XCTAssertEqual(presentation.saveButtonTitle, "Save")
+    }
+
+    func testModeFormPresentationBuildsEditPostProcessingCopy() {
+        let mode = Mode(name: "Clean", isPostProcessingEnabled: true)
+        let presentation = mode.formPresentation(isEditing: true)
+
+        XCTAssertEqual(presentation.navigationTitle, "Edit Mode")
+        XCTAssertEqual(
+            presentation.postProcessingFooterText,
+            "Configure how the raw transcription should be processed and refined."
+        )
+    }
+
+    func testModeDraftValidationRequiresName() {
+        XCTAssertFalse(Mode(name: "").isSaveableDraft(
+            availableTranscriptionProviders: [.groq],
+            availablePostProcessingProviders: [.groq]
+        ))
+        XCTAssertFalse(Mode(name: "   \n").isSaveableDraft(
+            availableTranscriptionProviders: [.groq],
+            availablePostProcessingProviders: [.groq]
+        ))
+    }
+
+    func testModeDraftValidationRequiresCustomPromptOnlyForCustomTemplates() {
+        var mode = Mode(name: "Custom")
+        mode.promptTemplate.type = .custom
+        mode.promptTemplate.customPrompt = "   "
+
+        XCTAssertFalse(mode.isSaveableDraft(
+            availableTranscriptionProviders: [.groq],
+            availablePostProcessingProviders: [.groq]
+        ))
+
+        mode.promptTemplate.customPrompt = "Clean this transcript."
+
+        XCTAssertTrue(mode.isSaveableDraft(
+            availableTranscriptionProviders: [.groq],
+            availablePostProcessingProviders: [.groq]
+        ))
+    }
+
+    func testModeDraftValidationAllowsPredefinedTemplatesWithoutCustomPrompt() {
+        XCTAssertTrue(Mode(name: "Summary").isSaveableDraft(
+            availableTranscriptionProviders: [.groq],
+            availablePostProcessingProviders: [.groq]
+        ))
+    }
+
+    func testModeDraftValidationRequiresAvailableProviderSelection() {
+        XCTAssertFalse(Mode(name: "Unavailable").isSaveableDraft(
+            availableTranscriptionProviders: [.localWhisper],
+            availablePostProcessingProviders: [.groq]
+        ))
+        XCTAssertFalse(Mode(name: "Unavailable post-processing", isPostProcessingEnabled: true).isSaveableDraft(
+            availableTranscriptionProviders: [.groq],
+            availablePostProcessingProviders: [.gemini]
+        ))
+        XCTAssertTrue(Mode(name: "Disabled post-processing", isPostProcessingEnabled: false).isSaveableDraft(
+            availableTranscriptionProviders: [.groq],
+            availablePostProcessingProviders: [.gemini]
+        ))
+    }
+
+    func testModeDraftValidationUsesModeProviderSelections() {
+        let mode = Mode(
+            name: "Cloud",
+            transcriptionProvider: .deepgram,
+            isPostProcessingEnabled: true,
+            postProcessingProvider: .gemini
+        )
+
+        XCTAssertTrue(mode.isSaveableDraft(
+            availableTranscriptionProviders: [.deepgram],
+            availablePostProcessingProviders: [.gemini]
+        ))
+        XCTAssertFalse(mode.isSaveableDraft(
+            availableTranscriptionProviders: [.groq],
+            availablePostProcessingProviders: [.gemini]
+        ))
+        XCTAssertFalse(mode.isSaveableDraft(
+            availableTranscriptionProviders: [.deepgram],
+            availablePostProcessingProviders: [.groq]
+        ))
+    }
+
+    func testModeFormProviderAvailabilityOwnsDraftSaveabilityAndRepair() {
+        let availability = RomaModeFormProviderAvailability(
+            transcriptionProviders: [.localWhisper],
+            postProcessingProviders: [.gemini]
+        )
+        var mode = Mode(
+            name: "Legacy",
+            transcriptionProvider: .cerebras,
+            transcriptionModel: "stale-transcription-model",
+            isPostProcessingEnabled: true,
+            postProcessingProvider: .deepgram,
+            postProcessingModel: "stale-post-processing-model"
+        )
+
+        XCTAssertFalse(availability.canSave(mode))
+
+        mode.repairProviderSelection(providerAvailability: availability)
+
+        XCTAssertEqual(mode.transcriptionProvider, .localWhisper)
+        XCTAssertEqual(mode.transcriptionModel, RomaTranscriptionModelCatalog.localBaseModel)
+        XCTAssertEqual(mode.postProcessingProvider, .gemini)
+        XCTAssertEqual(mode.postProcessingModel, RomaAIModelCatalog.defaultModel(for: .gemini))
+        XCTAssertTrue(availability.canSave(mode))
+    }
+
+    func testModeFormProviderAvailabilityOwnsFormStatePresentation() {
+        let availability = RomaModeFormProviderAvailability(
+            transcriptionProviders: [.localWhisper],
+            postProcessingProviders: [.groq]
+        )
+        let rawMode = Mode(
+            name: "Raw",
+            transcriptionProvider: .localWhisper,
+            isPostProcessingEnabled: false
+        )
+        var customMode = Mode(
+            name: "Custom",
+            transcriptionProvider: .localWhisper,
+            isPostProcessingEnabled: true,
+            postProcessingProvider: .groq
+        )
+        customMode.promptTemplate.type = .custom
+        customMode.promptTemplate.customPrompt = "Clean this transcript."
+
+        var blankCustomMode = customMode
+        blankCustomMode.promptTemplate.customPrompt = "   "
+
+        XCTAssertEqual(
+            availability.formStatePresentation(for: rawMode),
+            RomaModeFormStatePresentation(
+                shouldShowPostProcessingControls: false,
+                shouldShowCustomPromptField: false,
+                isSaveButtonDisabled: false
+            )
+        )
+        XCTAssertEqual(
+            availability.formStatePresentation(for: customMode),
+            RomaModeFormStatePresentation(
+                shouldShowPostProcessingControls: true,
+                shouldShowCustomPromptField: true,
+                isSaveButtonDisabled: false
+            )
+        )
+        XCTAssertEqual(
+            availability.formStatePresentation(for: blankCustomMode),
+            RomaModeFormStatePresentation(
+                shouldShowPostProcessingControls: true,
+                shouldShowCustomPromptField: true,
+                isSaveButtonDisabled: true
+            )
+        )
+    }
+
+    func testModeFormProviderAvailabilityCanReturnRepairedModeWithoutMutatingOriginal() {
+        let availability = RomaModeFormProviderAvailability(
+            transcriptionProviders: [.deepgram],
+            postProcessingProviders: [.groq]
+        )
+        let originalMode = Mode(
+            name: "Legacy",
+            transcriptionProvider: .localWhisper,
+            isPostProcessingEnabled: false
+        )
+
+        let repairedMode = availability.repairedMode(originalMode)
+
+        XCTAssertEqual(originalMode.transcriptionProvider, .localWhisper)
+        XCTAssertEqual(repairedMode.transcriptionProvider, .deepgram)
+    }
+
+    func testModeFormDraftStateCreatesNewDraftThroughProviderAvailability() {
+        let availability = RomaModeFormProviderAvailability(
+            transcriptionProviders: [.localWhisper],
+            postProcessingProviders: [.gemini]
+        )
+
+        let draftState = RomaModeFormDraftState(
+            existingMode: nil,
+            providerAvailability: availability
+        )
+
+        XCTAssertEqual(draftState.mode.name, "")
+        XCTAssertEqual(draftState.mode.transcriptionProvider, .localWhisper)
+        XCTAssertEqual(draftState.mode.transcriptionModel, RomaTranscriptionModelCatalog.localBaseModel)
+        XCTAssertEqual(draftState.mode.postProcessingProvider, .groq)
+        XCTAssertEqual(draftState.mode.postProcessingModel, RomaAIModelCatalog.defaultModel(for: .groq))
+        XCTAssertEqual(draftState.mode.promptTemplate.type, .summary)
+        XCTAssertFalse(draftState.mode.isPostProcessingEnabled)
+        XCTAssertFalse(availability.canSave(draftState.mode))
+    }
+
+    func testModeFormDraftStatePreservesExistingDraftUntilRepair() {
+        let availability = RomaModeFormProviderAvailability(
+            transcriptionProviders: [.localWhisper],
+            postProcessingProviders: [.gemini]
+        )
+        let existingMode = Mode(
+            name: "Legacy",
+            transcriptionProvider: .cerebras,
+            transcriptionModel: "stale-transcription-model",
+            isPostProcessingEnabled: true,
+            postProcessingProvider: .deepgram,
+            postProcessingModel: "stale-post-processing-model"
+        )
+
+        let draftState = RomaModeFormDraftState(
+            existingMode: existingMode,
+            providerAvailability: availability
+        )
+
+        XCTAssertEqual(draftState.mode.transcriptionProvider, .cerebras)
+        XCTAssertEqual(draftState.mode.transcriptionModel, "stale-transcription-model")
+        XCTAssertEqual(draftState.mode.postProcessingProvider, .deepgram)
+        XCTAssertEqual(draftState.mode.postProcessingModel, "stale-post-processing-model")
+    }
+
+    func testModeFormDraftStateRepairsProvidersOnAvailabilityRepair() {
+        let availability = RomaModeFormProviderAvailability(
+            transcriptionProviders: [.localWhisper],
+            postProcessingProviders: [.gemini]
+        )
+        let existingMode = Mode(
+            name: "Legacy",
+            transcriptionProvider: .cerebras,
+            transcriptionModel: "stale-transcription-model",
+            isPostProcessingEnabled: true,
+            postProcessingProvider: .deepgram,
+            postProcessingModel: "stale-post-processing-model"
+        )
+        var draftState = RomaModeFormDraftState(
+            existingMode: existingMode,
+            providerAvailability: availability
+        )
+
+        draftState.repairProviderAvailability(availability)
+
+        XCTAssertEqual(draftState.mode.transcriptionProvider, .localWhisper)
+        XCTAssertEqual(draftState.mode.transcriptionModel, RomaTranscriptionModelCatalog.localBaseModel)
+        XCTAssertEqual(draftState.mode.postProcessingProvider, .gemini)
+        XCTAssertEqual(draftState.mode.postProcessingModel, RomaAIModelCatalog.defaultModel(for: .gemini))
+        XCTAssertTrue(availability.canSave(draftState.mode))
+    }
+
+    func testModePostProcessingToggleRepairsUnavailableProviderSelection() {
+        let availability = RomaModeFormProviderAvailability(
+            transcriptionProviders: [.localWhisper],
+            postProcessingProviders: [.gemini]
+        )
+        var mode = Mode(
+            name: "Clean",
+            transcriptionProvider: .localWhisper,
+            isPostProcessingEnabled: false,
+            postProcessingProvider: .deepgram,
+            postProcessingModel: "stale-post-processing-model"
+        )
+
+        mode.setPostProcessingEnabled(true, providerAvailability: availability)
+
+        XCTAssertTrue(mode.isPostProcessingEnabled)
+        XCTAssertEqual(mode.postProcessingProvider, .gemini)
+        XCTAssertEqual(mode.postProcessingModel, RomaAIModelCatalog.defaultModel(for: .gemini))
+        XCTAssertTrue(availability.canSave(mode))
+    }
+}

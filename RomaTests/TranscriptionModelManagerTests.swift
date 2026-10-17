@@ -1,0 +1,196 @@
+import Foundation
+import Testing
+import RomaCore
+@testable import RomaJustTalk
+
+private final class ModelChangeNotificationRecorder: NSObject {
+    private(set) var modelChangeCount = 0
+    private(set) var modelChangeUserInfos: [[AnyHashable: Any]?] = []
+    private(set) var settingsChangeCount = 0
+
+    @objc func modelDidChange(_ notification: Notification) {
+        modelChangeCount += 1
+        modelChangeUserInfos.append(notification.userInfo)
+    }
+
+    @objc func settingsDidChange(_ notification: Notification) {
+        settingsChangeCount += 1
+    }
+}
+
+@Suite(.serialized)
+struct TranscriptionModelManagerTests {
+    @Test @MainActor func modelSwitchesPreserveLanguageIntentAcrossReloadAndRefresh() {
+        assertLanguageIntentSurvivesModelSwitches(bilingualModelName: "ggml-tiny")
+    }
+
+    @Test(.enabled(if: !RomaSystemArchitecture.isIntelMac && ProcessInfo.processInfo.isOperatingSystemAtLeast(
+        OperatingSystemVersion(majorVersion: 15, minorVersion: 0, patchVersion: 0)
+    )))
+    @MainActor func qwenModelSwitchesPreserveLanguageIntentAcrossReloadAndRefresh() {
+        assertLanguageIntentSurvivesModelSwitches(bilingualModelName: RomaTranscriptionModelCatalog.localQwenModelName)
+    }
+
+    @MainActor private func assertLanguageIntentSurvivesModelSwitches(bilingualModelName: String) {
+        withFreshModelDefaults {
+            let whisper = makeWhisperManager()
+            let fluid = FluidAudioModelManager()
+            let manager = TranscriptionModelManager(whisperModelManager: whisper, fluidAudioModelManager: fluid)
+            let english = TranscriptionModelRegistry.defaultMacOSFluidAudioModel
+            guard let bilingual = manager.allAvailableModels.first(where: { $0.name == bilingualModelName }) else {
+                Issue.record("Missing bilingual model")
+                return
+            }
+            for preference in ["auto", "en", "zh"] {
+                RomaTranscriptionLanguagePreference.saveSelectedLanguage(preference)
+                manager.setDefaultTranscriptionModel(english)
+                #expect(manager.currentTranscriptionModel?.name == english.name)
+                manager.refreshAllAvailableModels()
+                manager.loadCurrentTranscriptionModel()
+                #expect(english.transcriptionLanguageSelectionFacts.compatibleLanguage(RomaTranscriptionLanguagePreference.storedLanguage()) == "en")
+                #expect(persistedPreference(RomaUserDefaultsKey.selectedTranscriptionLanguage) == preference)
+                manager.setDefaultTranscriptionModel(bilingual)
+                #expect(manager.currentTranscriptionModel?.name == bilingual.name)
+                manager.refreshAllAvailableModels()
+                manager.loadCurrentTranscriptionModel()
+                #expect(bilingual.transcriptionLanguageSelectionFacts.compatibleLanguage(RomaTranscriptionLanguagePreference.storedLanguage()) == preference)
+                #expect(persistedPreference(RomaUserDefaultsKey.selectedTranscriptionLanguage) == preference)
+            }
+        }
+    }
+
+    @Test @MainActor func refreshingRegisteredFallbackDoesNotPersistIt() {
+        withFreshModelDefaults {
+            let whisper = makeWhisperManager()
+            let fluid = FluidAudioModelManager()
+            let manager = TranscriptionModelManager(whisperModelManager: whisper, fluidAudioModelManager: fluid)
+            manager.refreshAllAvailableModels()
+            manager.loadCurrentTranscriptionModel()
+            manager.refreshAllAvailableModels()
+            manager.refreshAllAvailableModels()
+
+            #expect(manager.currentTranscriptionModel?.name == RomaTranscriptionModelCatalog.defaultMacOSFluidAudioModelName)
+            #expect(persistedPreference(RomaUserDefaultsKey.currentTranscriptionModel) == nil)
+            #expect(persistedPreference(RomaUserDefaultsKey.selectedTranscriptionLanguage) == nil)
+        }
+    }
+
+    @Test @MainActor func metadataRefreshUpdatesDescriptorAndPreservesExplicitPreferences() {
+        let restore = prepareFreshModelDefaults()
+        defer { restore() }
+        let whisper = makeWhisperManager()
+        let fluid = FluidAudioModelManager()
+        let manager = TranscriptionModelManager(whisperModelManager: whisper, fluidAudioModelManager: fluid)
+        let selectedModel = TranscriptionModelRegistry.defaultMacOSFluidAudioModel
+        manager.setDefaultTranscriptionModel(selectedModel)
+        RomaTranscriptionLanguagePreference.saveSelectedLanguage("en")
+
+        let recorder = ModelChangeNotificationRecorder()
+        NotificationCenter.default.addObserver(
+            recorder,
+            selector: #selector(ModelChangeNotificationRecorder.modelDidChange(_:)),
+            name: .didChangeModel,
+            object: nil
+        )
+        defer { NotificationCenter.default.removeObserver(recorder) }
+
+        manager.refreshAllAvailableModels()
+        #expect(manager.currentTranscriptionModel?.id == manager.allAvailableModels.first(where: { $0.name == selectedModel.name })?.id)
+        #expect(manager.currentTranscriptionModel?.id != selectedModel.id)
+        #expect(persistedPreference(RomaUserDefaultsKey.currentTranscriptionModel) == selectedModel.name)
+        #expect(persistedPreference(RomaUserDefaultsKey.selectedTranscriptionLanguage) == "en")
+        #expect(recorder.modelChangeCount == 1)
+
+        let returning = TranscriptionModelManager(whisperModelManager: whisper, fluidAudioModelManager: fluid)
+        returning.loadCurrentTranscriptionModel()
+        #expect(returning.currentTranscriptionModel?.name == selectedModel.name)
+    }
+
+    @Test @MainActor func loadingSavedCurrentModelBroadcastsModelAndSettingsChange() {
+        let oldModelName = UserDefaults.standard.string(forKey: "CurrentTranscriptionModel")
+        let oldLanguage = UserDefaults.standard.string(forKey: "SelectedLanguage")
+        defer {
+            restoreDefault(oldModelName, forKey: "CurrentTranscriptionModel")
+            restoreDefault(oldLanguage, forKey: "SelectedLanguage")
+        }
+
+        let recorder = ModelChangeNotificationRecorder()
+        NotificationCenter.default.addObserver(
+            recorder,
+            selector: #selector(ModelChangeNotificationRecorder.modelDidChange(_:)),
+            name: .didChangeModel,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            recorder,
+            selector: #selector(ModelChangeNotificationRecorder.settingsDidChange(_:)),
+            name: .AppSettingsDidChange,
+            object: nil
+        )
+        defer { NotificationCenter.default.removeObserver(recorder) }
+
+        UserDefaults.standard.set("ggml-tiny", forKey: "CurrentTranscriptionModel")
+        UserDefaults.standard.set("auto", forKey: "SelectedLanguage")
+
+        let whisperModelManager = WhisperModelManager(
+            modelsDirectory: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        )
+        let modelManager = TranscriptionModelManager(
+            whisperModelManager: whisperModelManager,
+            fluidAudioModelManager: FluidAudioModelManager()
+        )
+
+        modelManager.loadCurrentTranscriptionModel()
+
+        #expect(modelManager.currentTranscriptionModel?.name == "ggml-tiny")
+        #expect(recorder.modelChangeCount >= 1)
+        #expect(recorder.modelChangeUserInfos.allSatisfy { $0?.isEmpty ?? true })
+        #expect(recorder.settingsChangeCount >= 1)
+    }
+
+    private func restoreDefault(_ value: String?, forKey key: String) {
+        if let value {
+            UserDefaults.standard.set(value, forKey: key)
+        } else {
+            UserDefaults.standard.removeObject(forKey: key)
+        }
+    }
+
+    @MainActor private func makeWhisperManager() -> WhisperModelManager {
+        WhisperModelManager(modelsDirectory: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString))
+    }
+
+    @MainActor private func withFreshModelDefaults(_ body: () -> Void) {
+        let restore = prepareFreshModelDefaults()
+        defer { restore() }
+        body()
+    }
+
+    @MainActor private func prepareFreshModelDefaults() -> () -> Void {
+        let defaults = UserDefaults.standard
+        let domain = defaultsDomainName
+        let previousDomain = defaults.persistentDomain(forName: domain) ?? [:]
+        let previousRegistration = defaults.volatileDomain(forName: UserDefaults.registrationDomain)
+        let keys = [RomaUserDefaultsKey.currentTranscriptionModel, RomaUserDefaultsKey.selectedTranscriptionLanguage, RomaUserDefaultsKey.transcriptionPrompt]
+        for key in keys { defaults.removeObject(forKey: key) }
+        defaults.register(defaults: [
+            RomaUserDefaultsKey.currentTranscriptionModel: RomaTranscriptionModelCatalog.defaultMacOSFluidAudioModelName,
+            RomaUserDefaultsKey.selectedTranscriptionLanguage: "en"
+        ])
+        return {
+            for key in keys {
+                if let previous = previousDomain[key] { defaults.set(previous, forKey: key) }
+                else { defaults.removeObject(forKey: key) }
+            }
+            defaults.setVolatileDomain(previousRegistration, forName: UserDefaults.registrationDomain)
+        }
+    }
+
+    private var defaultsDomainName: String {
+        Bundle.main.bundleIdentifier ?? ProcessInfo.processInfo.processName
+    }
+
+    private func persistedPreference(_ key: String) -> String? {
+        UserDefaults.standard.persistentDomain(forName: defaultsDomainName)?[key] as? String
+    }
+}

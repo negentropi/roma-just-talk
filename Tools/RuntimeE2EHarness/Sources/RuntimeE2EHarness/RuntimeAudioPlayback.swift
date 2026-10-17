@@ -12,8 +12,8 @@ struct RuntimeAudioPlaybackResult: Codable {
     let forcedStopAtExpectedEnd: Bool
 }
 
-struct RuntimeAudioThroughVoiceInkProbeReport: Codable {
-    let voiceInkSession: RuntimeVoiceInkSessionInfo
+struct RuntimeAudioThroughRomaProbeReport: Codable {
+    let romaSession: RuntimeRomaSessionInfo
     let playback: RuntimeAudioPlaybackResult
     let restoredOriginalState: Bool
 }

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-voiceink_app="${1:?VoiceInk app path required}"
+roma_app="${1:?RomaJustTalk app path required}"
 audio_artifact="${2:-}"
 evidence="${3:?evidence directory required}"
 repetitions="${4:-3}"
@@ -73,7 +73,7 @@ if [ "$empty_final_expectation" = "fixed" ]; then
     || [ ! -f "$empty_final_baseline_evidence/empty-final-e2e-contract.json" ] \
     || [ ! -f "$empty_final_baseline_evidence/empty-final-launch-events.tsv" ] \
     || [ ! -f "$empty_final_baseline_evidence/empty-final-termination-events.tsv" ] \
-    || [ ! -f "$empty_final_baseline_evidence/voiceink-sha256.txt" ]; then
+    || [ ! -f "$empty_final_baseline_evidence/roma-sha256.txt" ]; then
     echo "Fixed empty-final proof requires known-bad baseline evidence" >&2
     exit 2
   fi
@@ -92,7 +92,7 @@ audio_root="$runtime_root/audio"
 smoke_audio_root=""
 helper_app="$repo_root/.local-build/Tools/RuntimeE2EHarness.app"
 helper_bundle_id="com.happyf.roma-just-talk.RuntimeE2EHarness"
-voiceink_bundle_id="com.negentropi.RomaJustTalk"
+roma_bundle_id="com.negentropi.RomaJustTalk"
 system_tcc_db="/Library/Application Support/com.apple.TCC/TCC.db"
 user_tcc_db="$HOME/Library/Application Support/com.apple.TCC/TCC.db"
 nsc_bin="${NAMESPACE_CLI:-/opt/nsc/bin/nsc}"
@@ -123,14 +123,14 @@ runtime_crashes_after="$evidence/runtime-translocation-crash-reports-after.txt"
 runtime_new_crashes="$evidence/runtime-translocation-new-crash-reports.txt"
 runtime_verifier_monitor_pid=""
 runtime_process_monitor_pid=""
-recorded_voiceink_pid=""
+recorded_roma_pid=""
 launcher_pids=()
 model_prepare_pid=""
 model_prepare_started_seconds=0
 prewarm_pid=""
 
 mkdir -p "$runtime_root" "$audio_root" "$evidence"
-test -d "$voiceink_app"
+test -d "$roma_app"
 test -x "$nsc_bin"
 command -v jq >/dev/null
 command -v sqlite3 >/dev/null
@@ -216,7 +216,7 @@ verify_runtime_launch_events() {
         <<< "$event"
       [[ "$launched_pid" =~ ^[0-9]+$ ]] || return 1
       [[ -n "$source_sha" && "$source_sha" = "$running_sha" ]] || return 1
-      [[ "$source_path" = "$voiceink_app" ]] || return 1
+      [[ "$source_path" = "$roma_app" ]] || return 1
       case "$running_path" in
         */AppTranslocation/*/d/*.app) ;;
         *) return 1 ;;
@@ -231,7 +231,7 @@ verify_runtime_launch_events() {
         DISTRIBUTION_E2E_CAPTURE_TIMEOUT_SECONDS=1500 \
         DISTRIBUTION_E2E_STABILITY_SECONDS=0 \
         bash "$distribution_verifier" \
-          "$voiceink_app" \
+          "$roma_app" \
           "$launched_pid" \
           "$launch_evidence"; then
         return 1
@@ -257,15 +257,15 @@ start_runtime_translocation_monitors() {
   : > "$runtime_verified_launches"
   : > "$runtime_observed_pids"
   write_roma_crash_report_inventory "$runtime_crashes_before"
-  export RUNTIME_E2E_VOICEINK_LAUNCH_EVENTS="$runtime_launch_events"
-  export RUNTIME_E2E_VOICEINK_TERMINATION_EVENTS="$runtime_termination_events"
+  export RUNTIME_E2E_ROMA_LAUNCH_EVENTS="$runtime_launch_events"
+  export RUNTIME_E2E_ROMA_TERMINATION_EVENTS="$runtime_termination_events"
   monitor_runtime_processes &
   runtime_process_monitor_pid=$!
   verify_runtime_launch_events &
   runtime_verifier_monitor_pid=$!
 }
 
-record_running_voiceink_launch() {
+record_running_roma_launch() {
   local launched_pid=""
   local process_files="$runtime_root/prewarm-process-open-files.txt"
   local executable_name=""
@@ -290,9 +290,9 @@ record_running_voiceink_launch() {
   [[ "$launched_pid" =~ ^[0-9]+$ ]] || return 1
   executable_name="$(
     /usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' \
-      "$voiceink_app/Contents/Info.plist"
+      "$roma_app/Contents/Info.plist"
   )"
-  source_executable="$voiceink_app/Contents/MacOS/$executable_name"
+  source_executable="$roma_app/Contents/MacOS/$executable_name"
   while (( SECONDS < launch_deadline )); do
     lsof -p "$launched_pid" -Ffn > "$process_files" 2>/dev/null || true
     running_executable="$(
@@ -320,10 +320,10 @@ record_running_voiceink_launch() {
     "$launched_pid" \
     "$source_sha" \
     "$running_sha" \
-    "$voiceink_app" \
+    "$roma_app" \
     "$running_bundle" \
     >> "$runtime_launch_events"
-  recorded_voiceink_pid="$launched_pid"
+  recorded_roma_pid="$launched_pid"
 }
 
 log_contains_since() {
@@ -347,7 +347,7 @@ refresh_process_log_since() {
     > "$output" 2>&1 || true
 }
 
-terminate_runtime_voiceink_pid() {
+terminate_runtime_roma_pid() {
   local process_pid="$1"
   local termination_result=""
   printf '%s\t%s\n' \
@@ -426,7 +426,7 @@ require_verified_runtime_processes() {
   {
     printf 'runtime_translocation_verdict=passed\n'
     printf 'observed_pid_count=%s\n' "$(awk 'NF { count++ } END { print count + 0 }' "$observed")"
-    printf 'source_app=%s\n' "$voiceink_app"
+    printf 'source_app=%s\n' "$roma_app"
     printf 'new_crash_report_count=0\n'
   } > "$evidence/runtime-translocation-verdict.txt"
 }
@@ -465,10 +465,10 @@ record_command() {
 capture_tcc() {
   local phase="$1"
   sudo sqlite3 -header -column "$system_tcc_db" \
-    "select service,client,client_type,auth_value,auth_reason,length(csreq) as csreq_length,last_modified from access where client in ('$voiceink_bundle_id','$helper_bundle_id') order by client,service;" \
+    "select service,client,client_type,auth_value,auth_reason,length(csreq) as csreq_length,last_modified from access where client in ('$roma_bundle_id','$helper_bundle_id') order by client,service;" \
     > "$evidence/tcc-system-$phase.txt"
   sqlite3 -header -column "$user_tcc_db" \
-    "select service,client,client_type,auth_value,auth_reason,indirect_object_identifier,length(csreq) as csreq_length,length(indirect_object_code_identity) as indirect_identity_length,last_modified from access where client in ('$voiceink_bundle_id','$helper_bundle_id') order by client,service,indirect_object_identifier;" \
+    "select service,client,client_type,auth_value,auth_reason,indirect_object_identifier,length(csreq) as csreq_length,length(indirect_object_code_identity) as indirect_identity_length,last_modified from access where client in ('$roma_bundle_id','$helper_bundle_id') order by client,service,indirect_object_identifier;" \
     > "$evidence/tcc-user-$phase.txt"
 }
 
@@ -518,14 +518,14 @@ write_config() {
   local run_repetitions="$3"
   local latency_threshold="$4"
   local config_mode="$5"
-  local voiceink_lifecycle="${6:-reuse}"
+  local roma_lifecycle="${6:-reuse}"
   runtime_e2e_config_json \
     "$config_audio_directory" \
-    "$voiceink_app" \
+    "$roma_app" \
     "$run_repetitions" \
     "$latency_threshold" \
     "$config_mode" \
-    "$voiceink_lifecycle" \
+    "$roma_lifecycle" \
     > "$output"
 }
 
@@ -654,7 +654,7 @@ cleanup() {
     pkill -9 -x "roma just talk" 2>/dev/null || true
   fi
   stop_runtime_translocation_monitors || true
-  defaults read "$voiceink_bundle_id" > "$evidence/voiceink-defaults-final.txt" 2>&1
+  defaults read "$roma_bundle_id" > "$evidence/roma-defaults-final.txt" 2>&1
   system_profiler SPAudioDataType > "$evidence/audio-final.txt" 2>&1
   capture_tcc cleanup || true
   /usr/bin/log show --last 15m --style compact \
@@ -666,13 +666,13 @@ cleanup() {
 trap cleanup EXIT
 
 if [ "$require_app_translocation" = true ]; then
-  observed_voiceink_pids="$(pgrep -x "roma just talk" 2>/dev/null || true)"
+  observed_roma_pids="$(pgrep -x "roma just talk" 2>/dev/null || true)"
   distribution_runtime_validate_handoff \
     "$expected_first_launch_pid" \
-    "$observed_voiceink_pids" \
+    "$observed_roma_pids" \
     "$model_directory" \
     "$external_model_cache"
-  terminate_runtime_voiceink_pid "$expected_first_launch_pid"
+  terminate_runtime_roma_pid "$expected_first_launch_pid"
   {
     printf 'distribution_runtime_handoff=passed\n'
     printf 'first_launch_pid=%s\n' "$expected_first_launch_pid"
@@ -826,9 +826,9 @@ awk '
   in_build && $1 == "minos" && $2 == "14.0" { found = 1; in_build = 0 }
   END { exit(found ? 0 : 1) }
 ' "$evidence/helper-load-commands.txt"
-codesign -dv --verbose=4 "$voiceink_app" > "$evidence/voiceink-codesign.txt" 2>&1
+codesign -dv --verbose=4 "$roma_app" > "$evidence/roma-codesign.txt" 2>&1
 shasum -a 256 "$helper_app/Contents/MacOS/RuntimeE2EHarness" > "$evidence/helper-sha256.txt"
-shasum -a 256 "$voiceink_app/Contents/MacOS/roma just talk" > "$evidence/voiceink-sha256.txt"
+shasum -a 256 "$roma_app/Contents/MacOS/roma just talk" > "$evidence/roma-sha256.txt"
 
 mark_phase verify-helper-host-loadability
 pkill -9 -x RuntimeE2EHarness 2>/dev/null || true
@@ -866,15 +866,15 @@ sudo killall tccd 2>/dev/null || true
 sleep 2
 mark_phase grant-tcc
 capture_tcc before-grant
-voiceink_requirement="$(make_csreq "$voiceink_app" "$runtime_root/voiceink.csreq")"
+roma_requirement="$(make_csreq "$roma_app" "$runtime_root/roma.csreq")"
 helper_requirement="$(make_csreq "$helper_app" "$runtime_root/helper.csreq")"
-printf '%s\n' "$voiceink_requirement" > "$evidence/voiceink-designated-requirement.txt"
+printf '%s\n' "$roma_requirement" > "$evidence/roma-designated-requirement.txt"
 printf '%s\n' "$helper_requirement" > "$evidence/helper-designated-requirement.txt"
 
-grant_system_tcc kTCCServiceAccessibility "$voiceink_bundle_id" "$runtime_root/voiceink.csreq"
-grant_system_tcc kTCCServiceListenEvent "$voiceink_bundle_id" "$runtime_root/voiceink.csreq"
-grant_system_tcc kTCCServicePostEvent "$voiceink_bundle_id" "$runtime_root/voiceink.csreq"
-grant_user_tcc kTCCServiceMicrophone "$voiceink_bundle_id" "$runtime_root/voiceink.csreq"
+grant_system_tcc kTCCServiceAccessibility "$roma_bundle_id" "$runtime_root/roma.csreq"
+grant_system_tcc kTCCServiceListenEvent "$roma_bundle_id" "$runtime_root/roma.csreq"
+grant_system_tcc kTCCServicePostEvent "$roma_bundle_id" "$runtime_root/roma.csreq"
+grant_user_tcc kTCCServiceMicrophone "$roma_bundle_id" "$runtime_root/roma.csreq"
 grant_system_tcc kTCCServiceAccessibility "$helper_bundle_id" "$runtime_root/helper.csreq"
 grant_system_tcc kTCCServicePostEvent "$helper_bundle_id" "$runtime_root/helper.csreq"
 grant_system_tcc kTCCServiceScreenCapture "$helper_bundle_id" "$runtime_root/helper.csreq"
@@ -884,14 +884,14 @@ killall tccd 2>/dev/null || true
 sudo killall tccd 2>/dev/null || true
 sleep 2
 
-defaults write "$voiceink_bundle_id" hasCompletedOnboarding -bool true
-defaults delete "$voiceink_bundle_id" macOSOnboardingStage 2>/dev/null || true
-defaults delete "$voiceink_bundle_id" macOSOnboardingPermissionKind 2>/dev/null || true
-defaults write "$voiceink_bundle_id" CurrentTranscriptionModel -string "parakeet-tdt-0.6b-v2"
-defaults write "$voiceink_bundle_id" PrewarmModelOnWake -bool true
-defaults write "$voiceink_bundle_id" isSoundFeedbackEnabled -bool false
-defaults write "$voiceink_bundle_id" restoreClipboardAfterPaste -bool false
-defaults write "$voiceink_bundle_id" appendTrailingSpace -bool false
+defaults write "$roma_bundle_id" hasCompletedOnboarding -bool true
+defaults delete "$roma_bundle_id" macOSOnboardingStage 2>/dev/null || true
+defaults delete "$roma_bundle_id" macOSOnboardingPermissionKind 2>/dev/null || true
+defaults write "$roma_bundle_id" CurrentTranscriptionModel -string "parakeet-tdt-0.6b-v2"
+defaults write "$roma_bundle_id" PrewarmModelOnWake -bool true
+defaults write "$roma_bundle_id" isSoundFeedbackEnabled -bool false
+defaults write "$roma_bundle_id" restoreClipboardAfterPaste -bool false
+defaults write "$roma_bundle_id" appendTrailingSpace -bool false
 killall cfprefsd 2>/dev/null || true
 
 mark_phase prewarm-model
@@ -907,10 +907,10 @@ if [ "$require_app_translocation" = true ]; then
 fi
 prewarm_log_start="$(awk 'END { print NR + 1 }' "$evidence/macos-app.log")"
 prewarm_started_at="$(date '+%Y-%m-%d %H:%M:%S')"
-open -na "$voiceink_app"
+open -na "$roma_app"
 if [ "$require_app_translocation" = true ]; then
-  record_running_voiceink_launch
-  prewarm_pid="$recorded_voiceink_pid"
+  record_running_roma_launch
+  prewarm_pid="$recorded_roma_pid"
 fi
 model_deadline=$((SECONDS + 1200))
 while (( SECONDS < model_deadline )); do
@@ -922,11 +922,11 @@ while (( SECONDS < model_deadline )); do
       break
     fi
     if grep -Fq "Prewarm failed" "$evidence/model-prewarm-process.log"; then
-      echo "VoiceInk model prewarm failed" >&2
+      echo "RomaJustTalk model prewarm failed" >&2
       exit 10
     fi
     if ! kill -0 "$prewarm_pid" 2>/dev/null; then
-      echo "VoiceInk exited before model prewarm completed" >&2
+      echo "RomaJustTalk exited before model prewarm completed" >&2
       exit 10
     fi
   else
@@ -936,7 +936,7 @@ while (( SECONDS < model_deadline )); do
     fi
     if log_contains_since \
       "$prewarm_log_start" "Prewarm failed" "$evidence/macos-app.log"; then
-      echo "VoiceInk model prewarm failed" >&2
+      echo "RomaJustTalk model prewarm failed" >&2
       exit 10
     fi
   fi
@@ -975,22 +975,22 @@ fi
 
 if [ "$require_app_translocation" = true ]; then
   [[ "$prewarm_pid" =~ ^[0-9]+$ ]]
-  terminate_runtime_voiceink_pid "$prewarm_pid"
+  terminate_runtime_roma_pid "$prewarm_pid"
 elif [ "$empty_final_expectation" != "none" ]; then
   prewarm_pid="$(pgrep -x "roma just talk" 2>/dev/null || true)"
   if ! [[ "$prewarm_pid" =~ ^[0-9]+$ ]]; then
     echo "Expected exactly one Roma prewarm process before the fresh-process regression run" >&2
     exit 10
   fi
-  terminate_runtime_voiceink_pid "$prewarm_pid"
+  terminate_runtime_roma_pid "$prewarm_pid"
   {
     printf 'prewarm_pid=%s\n' "$prewarm_pid"
     printf 'preflight_app_state=stopped\n'
   } > "$evidence/empty-final-fresh-process-start.txt"
   : > "$runtime_launch_events"
   : > "$runtime_termination_events"
-  export RUNTIME_E2E_VOICEINK_LAUNCH_EVENTS="$runtime_launch_events"
-  export RUNTIME_E2E_VOICEINK_TERMINATION_EVENTS="$runtime_termination_events"
+  export RUNTIME_E2E_ROMA_LAUNCH_EVENTS="$runtime_launch_events"
+  export RUNTIME_E2E_ROMA_TERMINATION_EVENTS="$runtime_termination_events"
 fi
 
 mark_phase open-target-apps
@@ -1029,10 +1029,10 @@ sleep 15
 stop_launchers
 
 smoke_repetitions=1
-smoke_voiceink_lifecycle=reuse
+smoke_roma_lifecycle=reuse
 if [ "$empty_final_expectation" != "none" ]; then
   smoke_repetitions="$repetitions"
-  smoke_voiceink_lifecycle=relaunchPerCase
+  smoke_roma_lifecycle=relaunchPerCase
 fi
 write_config \
   "$config_smoke" \
@@ -1040,7 +1040,7 @@ write_config \
   "$smoke_repetitions" \
   20000 \
   smoke \
-  "$smoke_voiceink_lifecycle"
+  "$smoke_roma_lifecycle"
 write_config "$config_full" "$audio_directory" "$repetitions" 250 full
 if [ "$mode" = "smoke" ]; then
   restore_config="$config_smoke"
@@ -1058,13 +1058,13 @@ if [ "$empty_final_expectation" = "fixed" ]; then
   baseline_contract="$empty_final_baseline_evidence/empty-final-e2e-contract.json"
   baseline_launch_events="$empty_final_baseline_evidence/empty-final-launch-events.tsv"
   baseline_termination_events="$empty_final_baseline_evidence/empty-final-termination-events.tsv"
-  baseline_voiceink_sha256="$(
-    awk 'NR == 1 { print $1 }' "$empty_final_baseline_evidence/voiceink-sha256.txt"
+  baseline_roma_sha256="$(
+    awk 'NR == 1 { print $1 }' "$empty_final_baseline_evidence/roma-sha256.txt"
   )"
-  current_voiceink_sha256="$(awk 'NR == 1 { print $1 }' "$evidence/voiceink-sha256.txt")"
-  if ! [[ "$baseline_voiceink_sha256" =~ ^[0-9a-f]{64}$ ]] \
-    || ! [[ "$current_voiceink_sha256" =~ ^[0-9a-f]{64}$ ]] \
-    || [ "$baseline_voiceink_sha256" = "$current_voiceink_sha256" ]; then
+  current_roma_sha256="$(awk 'NR == 1 { print $1 }' "$evidence/roma-sha256.txt")"
+  if ! [[ "$baseline_roma_sha256" =~ ^[0-9a-f]{64}$ ]] \
+    || ! [[ "$current_roma_sha256" =~ ^[0-9a-f]{64}$ ]] \
+    || [ "$baseline_roma_sha256" = "$current_roma_sha256" ]; then
     echo "Paired empty-final proof requires different baseline and candidate app executables" >&2
     exit 14
   fi
@@ -1073,8 +1073,8 @@ if [ "$empty_final_expectation" = "fixed" ]; then
   cp "$baseline_launch_events" "$evidence/paired-known-bad-launch-events.tsv"
   cp "$baseline_termination_events" "$evidence/paired-known-bad-termination-events.tsv"
   cp \
-    "$empty_final_baseline_evidence/voiceink-sha256.txt" \
-    "$evidence/paired-known-bad-voiceink-sha256.txt"
+    "$empty_final_baseline_evidence/roma-sha256.txt" \
+    "$evidence/paired-known-bad-roma-sha256.txt"
   if [ -f "$empty_final_baseline_evidence/stage-manifest.json" ]; then
     cp \
       "$empty_final_baseline_evidence/stage-manifest.json" \
@@ -1183,6 +1183,6 @@ if [ "$empty_final_expectation" != "none" ]; then
 fi
 
 capture_tcc final
-defaults read "$voiceink_bundle_id" > "$evidence/voiceink-defaults-before-cleanup.txt" 2>&1
+defaults read "$roma_bundle_id" > "$evidence/roma-defaults-before-cleanup.txt" 2>&1
 mark_phase complete
 exit "$scenario_status"

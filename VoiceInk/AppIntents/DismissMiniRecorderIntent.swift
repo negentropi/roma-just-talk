@@ -3,8 +3,8 @@ import Foundation
 import VoiceInkCore
 
 struct DismissMiniRecorderIntent: AppIntent {
-    static var title: LocalizedStringResource = "Dismiss VoiceInk Recorder"
-    static var description = IntentDescription("Dismiss the VoiceInk mini recorder and cancel any active recording.")
+    static var title: LocalizedStringResource = "Dismiss Roma Just Talk Recorder"
+    static var description = IntentDescription("Dismiss the Roma Just Talk mini recorder and cancel any active recording.")
     
     static var openAppWhenRun: Bool = false
     

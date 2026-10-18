@@ -51,9 +51,9 @@ final class AppIdentityTests: XCTestCase {
     }
 
     func testSupportContactPolicyPreservesEmailIdentityAndSubject() {
-        XCTAssertEqual(VoiceInkSupportContactPolicy.emailAddress, "support@tryvoiceink.com")
-        XCTAssertEqual(VoiceInkSupportContactPolicy.emailSubject, "VoiceInk Support Request")
-        XCTAssertEqual(VoiceInkSupportContactPolicy.commonIssuesURLString, "https://tryvoiceink.com/common-issues")
+        XCTAssertEqual(VoiceInkSupportContactPolicy.emailAddress, "happyfumd@icloud.com")
+        XCTAssertEqual(VoiceInkSupportContactPolicy.emailSubject, "Roma Just Talk Support Request")
+        XCTAssertEqual(VoiceInkSupportContactPolicy.commonIssuesURLString, "https://roma-just-talk.com/readme")
     }
 
     func testSupportMailtoURLPreservesRecipientAndEncodesSubject() throws {
@@ -65,106 +65,7 @@ final class AppIdentityTests: XCTestCase {
         XCTAssertEqual(components.queryItems, [
             URLQueryItem(name: "subject", value: VoiceInkSupportContactPolicy.emailSubject)
         ])
-        XCTAssertEqual(url.absoluteString, "mailto:support@tryvoiceink.com?subject=VoiceInk%20Support%20Request")
-    }
-
-    func testAnnouncementPreferencePreservesMacOSStorageAndFetchDefaults() {
-        XCTAssertEqual(VoiceInkAnnouncementPreference.isEnabledKey, "enableAnnouncements")
-        XCTAssertEqual(VoiceInkAnnouncementPreference.dismissedIdsKey, "dismissedAnnouncementIds")
-        XCTAssertEqual(VoiceInkAnnouncementPreference.defaultIsEnabled, true)
-        XCTAssertEqual(VoiceInkAnnouncementPreference.maxDismissedIdsToKeep, 2)
-        XCTAssertEqual(
-            VoiceInkAnnouncementPreference.announcementsURLString,
-            "https://beingpax.github.io/VoiceInk/announcements.json"
-        )
-        XCTAssertEqual(
-            VoiceInkAnnouncementPreference.announcementsURL.absoluteString,
-            "https://beingpax.github.io/VoiceInk/announcements.json"
-        )
-        XCTAssertEqual(VoiceInkAnnouncementPreference.refreshInterval, 4 * 60 * 60)
-        XCTAssertEqual(VoiceInkAnnouncementPreference.initialFetchDelay, 5)
-        XCTAssertEqual(VoiceInkAnnouncementPreference.requestTimeout, 10)
-        XCTAssertEqual(
-            VoiceInkAnnouncementPreference.registeredDefaults[VoiceInkAnnouncementPreference.isEnabledKey] as? Bool,
-            Optional(true)
-        )
-    }
-
-    func testAnnouncementPreferenceReadsAndSavesEnabledFlagAndDismissedIds() {
-        withTemporaryDefaults { defaults in
-            XCTAssertTrue(VoiceInkAnnouncementPreference.isEnabled(from: defaults))
-            XCTAssertEqual(VoiceInkAnnouncementPreference.dismissedIds(from: defaults), [])
-
-            VoiceInkAnnouncementPreference.saveIsEnabled(false, to: defaults)
-            VoiceInkAnnouncementPreference.saveDismissedIds(["one", "two"], to: defaults)
-
-            XCTAssertFalse(VoiceInkAnnouncementPreference.isEnabled(from: defaults))
-            XCTAssertEqual(VoiceInkAnnouncementPreference.dismissedIds(from: defaults), ["one", "two"])
-        }
-    }
-
-    func testDismissedIdsPlanAvoidsDuplicatesAndKeepsMostRecentTwo() {
-        XCTAssertEqual(
-            VoiceInkAnnouncementPreference.dismissedIds(afterDismissing: "one", currentIds: ["one"]),
-            ["one"]
-        )
-        XCTAssertEqual(
-            VoiceInkAnnouncementPreference.dismissedIds(afterDismissing: "three", currentIds: ["one", "two"]),
-            ["two", "three"]
-        )
-        XCTAssertTrue(VoiceInkAnnouncementPreference.isDismissed("two", dismissedIds: ["one", "two"]))
-        XCTAssertFalse(VoiceInkAnnouncementPreference.isDismissed("three", dismissedIds: ["one", "two"]))
-    }
-
-    func testAnnouncementActiveWindowPreservesOpenEndedAndInvalidDateBehavior() throws {
-        let now = try date("2026-06-21T12:00:00Z")
-
-        XCTAssertTrue(VoiceInkAnnouncementPolicy.isActive(
-            announcement(id: "current", startAt: "2026-06-21T11:00:00Z", endAt: "2026-06-21T13:00:00Z"),
-            at: now
-        ))
-        XCTAssertFalse(VoiceInkAnnouncementPolicy.isActive(
-            announcement(id: "future", startAt: "2026-06-21T13:00:00Z", endAt: nil),
-            at: now
-        ))
-        XCTAssertFalse(VoiceInkAnnouncementPolicy.isActive(
-            announcement(id: "expired", startAt: nil, endAt: "2026-06-21T11:00:00Z"),
-            at: now
-        ))
-        XCTAssertTrue(VoiceInkAnnouncementPolicy.isActive(
-            announcement(id: "invalid", startAt: "bad", endAt: "also-bad"),
-            at: now
-        ))
-    }
-
-    func testNextAnnouncementSkipsDismissedAndInactiveThenReturnsFirstValidPresentation() throws {
-        let now = try date("2026-06-21T12:00:00Z")
-        let next = VoiceInkAnnouncementPolicy.nextAnnouncement(
-            from: [
-                announcement(id: "dismissed"),
-                announcement(id: "future", startAt: "2026-06-21T13:00:00Z", endAt: nil),
-                announcement(id: "valid", description: "Body", url: "https://tryvoiceink.com/docs")
-            ],
-            dismissedIds: ["dismissed"],
-            now: now
-        )
-
-        XCTAssertEqual(next?.id, Optional("valid"))
-        XCTAssertEqual(next?.title, Optional("Title valid"))
-        XCTAssertEqual(next?.description, Optional("Body"))
-        XCTAssertEqual(next?.learnMoreURL, URL(string: "https://tryvoiceink.com/docs"))
-    }
-
-    func testNextAnnouncementReturnsNilWhenNothingIsEligible() throws {
-        let now = try date("2026-06-21T12:00:00Z")
-        XCTAssertNil(VoiceInkAnnouncementPolicy.nextAnnouncement(
-            from: [
-                announcement(id: "dismissed"),
-                announcement(id: "future", startAt: "2026-06-21T13:00:00Z", endAt: nil)
-            ],
-            dismissedIds: ["dismissed"],
-            now: now
-        ))
+        XCTAssertEqual(url.absoluteString, "mailto:happyfumd@icloud.com?subject=Roma%20Just%20Talk%20Support%20Request")
     }
 
     func testSystemArchitecturePreservesMacOSDisplayNameForCompileTarget() {
@@ -222,9 +123,9 @@ final class AppIdentityTests: XCTestCase {
         XCTAssertEqual(VoiceInkDiagnosticLogExportPolicy.maxSessionStartDatesToKeep, 3)
         XCTAssertEqual(VoiceInkDiagnosticLogExportPolicy.timestampDateFormat, "yyyy-MM-dd HH:mm:ss.SSS")
         XCTAssertEqual(VoiceInkDiagnosticLogExportPolicy.fileNameDateFormat, "yyyy-MM-dd_HH-mm-ss")
-        XCTAssertEqual(VoiceInkDiagnosticLogExportPolicy.fileNamePrefix, "VoiceInk_Logs_")
+        XCTAssertEqual(VoiceInkDiagnosticLogExportPolicy.fileNamePrefix, "Roma_Just_Talk_Logs_")
         XCTAssertEqual(VoiceInkDiagnosticLogExportPolicy.fileNameExtension, "log")
-        XCTAssertEqual(VoiceInkDiagnosticLogExportPolicy.headerTitle, "=== VoiceInk Diagnostic Logs ===")
+        XCTAssertEqual(VoiceInkDiagnosticLogExportPolicy.headerTitle, "=== Roma Just Talk Diagnostic Logs ===")
         XCTAssertEqual(VoiceInkDiagnosticLogExportPolicy.headerDivider, "================================")
         XCTAssertEqual(VoiceInkDiagnosticLogExportPolicy.noLogsFoundMessage, "No logs found for this session.")
         XCTAssertEqual(VoiceInkDiagnosticLogExportPolicy.exporterErrorDomain, "LogExporter")
@@ -325,7 +226,7 @@ final class AppIdentityTests: XCTestCase {
                 systemInfo: "System info"
             ),
             [
-                "=== VoiceInk Diagnostic Logs ===",
+                "=== Roma Just Talk Diagnostic Logs ===",
                 "Export Date: \(formattedTimestamp)",
                 "Subsystem: com.negentropi.RomaJustTalk",
                 "Total Sessions: 2",
@@ -354,12 +255,12 @@ final class AppIdentityTests: XCTestCase {
         XCTAssertEqual(
             VoiceInkDiagnosticLogExportPolicy.exportContent(
                 from: [
-                    "=== VoiceInk Diagnostic Logs ===",
+                    "=== Roma Just Talk Diagnostic Logs ===",
                     "",
                     "No logs found for this session."
                 ]
             ),
-            "=== VoiceInk Diagnostic Logs ===\n\nNo logs found for this session."
+            "=== Roma Just Talk Diagnostic Logs ===\n\nNo logs found for this session."
         )
     }
 
@@ -381,7 +282,7 @@ final class AppIdentityTests: XCTestCase {
 
         XCTAssertEqual(
             VoiceInkDiagnosticLogExportPolicy.fileName(for: date),
-            "VoiceInk_Logs_\(timestamp).log"
+            "Roma_Just_Talk_Logs_\(timestamp).log"
         )
     }
 
@@ -428,7 +329,6 @@ final class AppIdentityTests: XCTestCase {
             generated: "June 24, 2026 at 3:42:11 PM",
             appVersion: "1.2.3",
             buildVersion: "456",
-            licenseStatus: "Licensed (Pro)",
             operatingSystemVersion: "Version 26.0",
             deviceModel: "Mac16,1",
             cpu: "Apple M4 Pro",
@@ -487,8 +387,6 @@ final class AppIdentityTests: XCTestCase {
         XCTAssertEqual(VoiceInkMacOSLogCategory.menuBarManager, "MenuBarManager")
         XCTAssertEqual(VoiceInkMacOSLogCategory.apiKeyManager, "APIKeyManager")
         XCTAssertEqual(VoiceInkMacOSLogCategory.keychainService, "KeychainService")
-        XCTAssertEqual(VoiceInkMacOSLogCategory.polarService, "PolarService")
-        XCTAssertEqual(VoiceInkMacOSLogCategory.licenseViewModel, "LicenseViewModel")
         XCTAssertEqual(VoiceInkMacOSLogCategory.aiEnhancementService, "AIEnhancementService")
         XCTAssertEqual(VoiceInkMacOSLogCategory.customCloudModelManager, "CustomCloudModelManager")
         XCTAssertEqual(VoiceInkMacOSLogCategory.transcriptionAutoCleanupService, "TranscriptionAutoCleanupService")
@@ -565,7 +463,6 @@ final class AppIdentityTests: XCTestCase {
             [
                 "Settings",
                 "AI Models",
-                "VoiceInk Pro",
                 "History",
                 "Permissions",
                 "Enhancement",
@@ -598,10 +495,6 @@ final class AppIdentityTests: XCTestCase {
         XCTAssertEqual(VoiceInkMacOSMainViewItem.item(forNavigationDestination: "past"), .history)
         XCTAssertEqual(VoiceInkMacOSMainViewItem.item(forNavigationDestination: "style"), .enhancement)
         XCTAssertEqual(VoiceInkMacOSMainViewItem.item(forNavigationDestination: "manual stt"), .transcribeAudio)
-        XCTAssertEqual(
-            VoiceInkMacOSMainViewItem.item(forNavigationDestination: VoiceInkMacOSNavigationDestination.license.rawValue),
-            .license
-        )
         XCTAssertEqual(
             VoiceInkMacOSMainViewItem.item(forNavigationDestination: VoiceInkMacOSNavigationDestination.powerMode.rawValue),
             .powerMode
@@ -679,23 +572,6 @@ final class AppIdentityTests: XCTestCase {
     func testMiniRecorderRequestPreservesMacOSNotificationNames() {
         XCTAssertEqual(VoiceInkMiniRecorderRequest.toggleNotificationName.rawValue, "toggleMiniRecorder")
         XCTAssertEqual(VoiceInkMiniRecorderRequest.dismissNotificationName.rawValue, "dismissMiniRecorder")
-    }
-
-    private func announcement(
-        id: String,
-        description: String? = nil,
-        url: String? = nil,
-        startAt: String? = nil,
-        endAt: String? = nil
-    ) -> VoiceInkRemoteAnnouncement {
-        VoiceInkRemoteAnnouncement(
-            id: id,
-            title: "Title \(id)",
-            description: description,
-            url: url,
-            startAt: startAt,
-            endAt: endAt
-        )
     }
 
     private func date(_ string: String) throws -> Date {

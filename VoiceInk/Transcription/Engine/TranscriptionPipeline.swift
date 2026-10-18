@@ -12,8 +12,6 @@ class TranscriptionPipeline {
     private let enhancementService: AIEnhancementService?
     private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "TranscriptionPipeline")
 
-    var licenseViewModel: LicenseViewModel
-
     init(
         modelContext: ModelContext,
         serviceRegistry: TranscriptionServiceRegistry,
@@ -22,7 +20,6 @@ class TranscriptionPipeline {
         self.modelContext = modelContext
         self.serviceRegistry = serviceRegistry
         self.enhancementService = enhancementService
-        self.licenseViewModel = LicenseViewModel()
     }
 
     /// Run the full pipeline for a given transcription record.
@@ -329,16 +326,9 @@ class TranscriptionPipeline {
                 preparedCursorTextContext: preparedCursorTextContext
             )
 
-            let isTrialExpired: Bool
-            if case .trialExpired = licenseViewModel.licenseState {
-                isTrialExpired = true
-            } else {
-                isTrialExpired = false
-            }
             let pastedText = VoiceInkTranscriptionPasteOutputPolicy.finalPastedText(
                 textToPaste,
-                appendTrailingSpace: VoiceInkAppendTrailingSpacePreference.isEnabled(),
-                isTrialExpired: isTrialExpired
+                appendTrailingSpace: VoiceInkAppendTrailingSpacePreference.isEnabled()
             )
             latencyTrace.end(pastePreparationSpan, details: "chars=\(pastedText.count)")
             let pasteSpan = latencyTrace.begin("pipeline.paste_command", token: traceToken)

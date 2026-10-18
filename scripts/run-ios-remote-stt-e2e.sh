@@ -204,7 +204,6 @@ xcrun simctl launch \
   "$simulator_udid" \
   "$bundle_identifier" \
   -hasCompletedOnboarding YES \
-  -enableAnnouncements NO \
   > "$evidence/stt-app-launch.txt"
 
 xcrun simctl openurl "$simulator_udid" "file://$fixture_in_container"

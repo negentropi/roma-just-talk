@@ -32,7 +32,6 @@ struct ContentView: View {
     @AppStorage(VoiceInkUserDefaultsKey.powerModeUIFlag) private var powerModeUIFlag = VoiceInkPreferenceDefault.powerModeUIEnabled
     @State private var selectedView: VoiceInkMacOSMainViewItem? = VoiceInkMacOSMainViewItem.defaultSelection
     let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0"
-    @StateObject private var licenseViewModel = LicenseViewModel()
 
     private var visibleViewTypes: [VoiceInkMacOSMainViewItem] {
         VoiceInkMacOSMainViewItem.visibleItems(powerModeEnabled: powerModeUIFlag)
@@ -58,10 +57,6 @@ struct ContentView: View {
                             Text(VoiceInkAppIdentity.sidebarSubtitle)
                                 .font(.system(size: 11, weight: .medium))
                                 .foregroundStyle(.secondary)
-                        }
-
-                        if case .licensed = licenseViewModel.licenseState {
-                            ProBadge()
                         }
 
                         Spacer()
@@ -134,8 +129,8 @@ struct ContentView: View {
             PowerModeView()
         case .settings:
             SettingsView()
-        case .license:
-            LicenseManagementView()
+        case .about:
+            AboutSupportView()
         case .permissions:
             PermissionsView()
         }

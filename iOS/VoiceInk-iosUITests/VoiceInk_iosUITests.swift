@@ -105,9 +105,7 @@ final class VoiceInkIOSUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments = [
             "-iOSOnboardingStep",
-            VoiceInkIOSOnboardingStep.ready.rawValue,
-            "-\(VoiceInkAnnouncementPreference.isEnabledKey)",
-            "NO"
+            VoiceInkIOSOnboardingStep.ready.rawValue
         ]
         app.launch()
 
@@ -171,10 +169,7 @@ final class VoiceInkIOSUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts[defaultTimeoutText].waitForExistence(timeout: 5))
 
         app.terminate()
-        app.launchArguments = [
-            "-\(VoiceInkAnnouncementPreference.isEnabledKey)",
-            "NO"
-        ]
+        app.launchArguments = []
         app.launch()
 
         XCTAssertTrue(
@@ -188,9 +183,7 @@ final class VoiceInkIOSUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments += [
             "-\(VoiceInkUserDefaultsKey.hasCompletedOnboarding)",
-            hasCompletedOnboarding ? "YES" : "NO",
-            "-\(VoiceInkAnnouncementPreference.isEnabledKey)",
-            "NO"
+            hasCompletedOnboarding ? "YES" : "NO"
         ]
         return app
     }

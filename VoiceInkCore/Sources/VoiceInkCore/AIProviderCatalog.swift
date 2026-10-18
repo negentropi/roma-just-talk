@@ -1109,7 +1109,7 @@ public struct VoiceInkMacOSLocalCLISettingsPresentation: Equatable, Sendable {
         commandTitle: "Command",
         loadTemplateButtonTitle: "Load Template",
         timeoutPickerTitle: "Timeout",
-        environmentHelpText: "Environment variables available: VOICEINK_SYSTEM_PROMPT, VOICEINK_USER_PROMPT, VOICEINK_FULL_PROMPT. VoiceInk also writes VOICEINK_FULL_PROMPT to stdin for every command.",
+        environmentHelpText: "Environment variables available: VOICEINK_SYSTEM_PROMPT, VOICEINK_USER_PROMPT, VOICEINK_FULL_PROMPT. Roma Just Talk also writes VOICEINK_FULL_PROMPT to stdin for every command.",
         configurationRequiredHelpText: "Load a template or enter a command to enable Local CLI enhancement."
     )
 }

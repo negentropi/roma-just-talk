@@ -26,7 +26,7 @@ const instrumentSerif = Instrument_Serif({
 });
 
 const logoUrl =
-  "https://raw.githubusercontent.com/happyf-weallareeuropean/roma-just-talk/main/docs/assets/roma-just-talk-logo.png";
+  "https://raw.githubusercontent.com/negentropi/roma-just-talk/main/docs/assets/roma-just-talk-logo.png";
 
 export const metadata: Metadata = {
   title: "roma-just-talk",

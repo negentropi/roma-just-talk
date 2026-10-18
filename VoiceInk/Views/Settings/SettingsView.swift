@@ -18,7 +18,6 @@ struct SettingsView: View {
     @ObservedObject private var mediaController = MediaController.shared
     @ObservedObject private var playbackController = PlaybackController.shared
     @AppStorage(VoiceInkUserDefaultsKey.hasCompletedOnboarding) private var hasCompletedOnboarding = true
-    @AppStorage(VoiceInkAnnouncementPreference.isEnabledKey) private var enableAnnouncements = VoiceInkAnnouncementPreference.defaultIsEnabled
     @AppStorage(VoiceInkPastePreference.restoreClipboardAfterPasteKey) private var restoreClipboardAfterPaste = VoiceInkPastePreference.defaultRestoreClipboardAfterPaste
     @AppStorage(VoiceInkPastePreference.clipboardRestoreDelayKey) private var clipboardRestoreDelay = VoiceInkPastePreference.defaultClipboardRestoreDelay
     @AppStorage(VoiceInkPasteMethod.userDefaultsKey) private var pasteMethodRawValue = VoiceInkPasteMethod.current().rawValue
@@ -266,15 +265,6 @@ struct SettingsView: View {
                     get: { updaterViewModel.automaticallyChecksForUpdates },
                     set: { updaterViewModel.setAutomaticallyChecksForUpdates($0) }
                 ))
-
-                Toggle(Self.settingsPresentation.showAnnouncementsTitle, isOn: $enableAnnouncements)
-                    .onChange(of: enableAnnouncements) { _, newValue in
-                        if newValue {
-                            AnnouncementsService.shared.start()
-                        } else {
-                            AnnouncementsService.shared.stop()
-                        }
-                    }
 
                 HStack {
                     Button(Self.settingsPresentation.checkForUpdatesButtonTitle) {

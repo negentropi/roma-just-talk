@@ -66,6 +66,12 @@ brew install --cask voiceink
 ### Build from Source
 You can build the app yourself by following [BUILDING.md](BUILDING.md).
 
+### ElevenLabs setup
+
+In Models → Cloud, configure a Scribe model with the secret API key shown when you create or rotate a key in [ElevenLabs API keys](https://elevenlabs.io/app/settings/api-keys). The secret starts with `sk_`. The key ID listed on that page cannot authenticate. Enable Speech to Text access for transcription. Verification also uses ElevenLabs' user endpoint, which requires User Read access for restricted keys.
+
+Paste the secret into the secure field and click Verify. Successfully verified keys are saved in macOS Keychain. If ElevenLabs reports that a key ID was supplied, create or rotate a key and copy the secret shown at that time.
+
 ## Requirements
 
 - macOS 14.4 or later

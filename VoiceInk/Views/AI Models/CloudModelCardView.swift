@@ -250,6 +250,14 @@ struct CloudModelCardView: View {
                 .buttonStyle(.plain)
                 .disabled(apiKey.isEmpty || isVerifying)
             }
+
+            if model.provider == .elevenLabs {
+                Text("Use the secret API key starting with sk_, shown when you create or rotate a key. A key ID cannot authenticate.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                Link("Open ElevenLabs API keys", destination: URL(string: "https://elevenlabs.io/app/settings/api-keys")!)
+                    .font(.caption)
+            }
             
             if verificationStatus == .failure {
                 if let error = verificationError {

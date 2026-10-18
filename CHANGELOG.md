@@ -2,6 +2,7 @@
 
 ## v1.81 - Unreleased
 
+- Explained ElevenLabs key ID rejection with secret-key setup instructions instead of raw JSON.
 - Trimmed repeated correction markers after repeated cursor context.
 - Trimmed "I was trying to say is" correction lead-ins after repeated cursor context.
 - Trimmed rephrase and rather correction lead-ins after repeated cursor context.

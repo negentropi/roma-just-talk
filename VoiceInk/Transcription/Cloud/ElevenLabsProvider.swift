@@ -57,6 +57,7 @@ struct ElevenLabsProvider: CloudProvider {
     }
 
     func verifyAPIKey(_ key: String) async -> (isValid: Bool, errorMessage: String?) {
-        return await ElevenLabsClient.verifyAPIKey(key)
+        let result = await ElevenLabsClient.verifyAPIKey(key)
+        return (result.isValid, result.isValid ? nil : ElevenLabsAPIKeyError.message(from: result.errorMessage))
     }
 }

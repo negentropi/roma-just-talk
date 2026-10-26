@@ -72,8 +72,10 @@ enum KeyboardState {
         var isKeyPressed: (UInt16) -> Bool
     }
 
+    // Hardware state only: a synthetic key-down whose key-up was lost (seen with a
+    // stuck `A`) stays "pressed" in combinedSessionState and blocked every Special press.
     static let systemClient = Client { keyCode in
-        CGEventSource.keyState(.combinedSessionState, key: CGKeyCode(keyCode))
+        CGEventSource.keyState(.hidSystemState, key: CGKeyCode(keyCode))
     }
 }
 

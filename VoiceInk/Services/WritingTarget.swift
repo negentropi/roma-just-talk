@@ -42,17 +42,25 @@ final class WritingTarget {
         let selectedText: String
 
         init?(value: String, range: NSRange) {
-            let count = value.utf16.count
+            let source = value as NSString
+            let count = source.length
             guard range.location >= 0,
                   range.length >= 0,
                   range.location <= count,
                   range.length <= count - range.location,
-                  let stringRange = Range(range, in: value) else {
+                  Self.isScalarBoundary(range.location, in: source),
+                  Self.isScalarBoundary(range.location + range.length, in: source) else {
                 return nil
             }
             self.value = value
             self.range = range
-            selectedText = String(value[stringRange])
+            selectedText = source.substring(with: range)
+        }
+
+        private static func isScalarBoundary(_ offset: Int, in source: NSString) -> Bool {
+            guard offset > 0, offset < source.length else { return true }
+            return !(0xD800...0xDBFF).contains(source.character(at: offset - 1))
+                || !(0xDC00...0xDFFF).contains(source.character(at: offset))
         }
 
         func replacement(_ text: String) -> String {

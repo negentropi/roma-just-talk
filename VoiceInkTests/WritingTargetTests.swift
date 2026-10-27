@@ -66,9 +66,30 @@ struct WritingTargetTests {
     }
 
     @Test func selectionCannotSplitAnEmojiSurrogatePair() {
-        for range in [NSRange(location: 1, length: 1), NSRange(location: 2, length: 0)] {
+        for range in [
+            NSRange(location: 1, length: 1),
+            NSRange(location: 2, length: 0),
+            NSRange(location: 2, length: 1),
+            NSRange(location: 0, length: 2),
+        ] {
             #expect(WritingTarget.TextSnapshot(value: "A😀B", range: range)?.value == nil)
         }
+    }
+
+    @Test func scalarBoundariesWithinADecomposedCharacterRemainValid() throws {
+        let accent = try #require(WritingTarget.TextSnapshot(
+            value: "e\u{301} tail",
+            range: NSRange(location: 1, length: 1)
+        ))
+        let between = try #require(WritingTarget.TextSnapshot(
+            value: "e\u{301} tail",
+            range: NSRange(location: 1, length: 0)
+        ))
+
+        #expect(accent.selectedText.utf16.elementsEqual("\u{301}".utf16))
+        #expect(accent.replacement("") == "e tail")
+        #expect(between.selectedText.isEmpty)
+        #expect(between.replacement("x").utf16.elementsEqual("ex\u{301} tail".utf16))
     }
 
     @Test func matchingAllowsUnavailableSelectedTextOnlyWhenValueAndRangeStillMatch() throws {

@@ -1692,6 +1692,7 @@ public struct VoiceInkSettingsBackupFile<ShortcutBackup: Codable>: Codable {
     public let powerModeShortcuts: [String: ShortcutBackup]?
     public let vocabularyWords: [VoiceInkVocabularyWordBackup]?
     public let wordReplacements: [String: String]?
+    public let wordReplacementLibrary: VoiceInkWordReplacementLibrary?
     public let spokenSnippets: [VoiceInkSpokenSnippet]?
     public let generalSettings: VoiceInkGeneralSettingsBackupPayload<ShortcutBackup>?
     public let customEmojis: [String]?
@@ -1704,6 +1705,7 @@ public struct VoiceInkSettingsBackupFile<ShortcutBackup: Codable>: Codable {
         case powerModeShortcuts
         case vocabularyWords
         case wordReplacements
+        case wordReplacementLibrary
         case spokenSnippets
         case generalSettings
         case customEmojis
@@ -1720,7 +1722,8 @@ public struct VoiceInkSettingsBackupFile<ShortcutBackup: Codable>: Codable {
         generalSettings: VoiceInkGeneralSettingsBackupPayload<ShortcutBackup>?,
         customEmojis: [String]?,
         customCloudModels: [VoiceInkCustomCloudModelBackup]?,
-        spokenSnippets: [VoiceInkSpokenSnippet]? = nil
+        spokenSnippets: [VoiceInkSpokenSnippet]? = nil,
+        wordReplacementLibrary: VoiceInkWordReplacementLibrary? = nil
     ) {
         self.version = version
         self.customPrompts = customPrompts
@@ -1728,6 +1731,7 @@ public struct VoiceInkSettingsBackupFile<ShortcutBackup: Codable>: Codable {
         self.powerModeShortcuts = powerModeShortcuts
         self.vocabularyWords = vocabularyWords
         self.wordReplacements = wordReplacements
+        self.wordReplacementLibrary = wordReplacementLibrary
         self.spokenSnippets = spokenSnippets
         self.generalSettings = generalSettings
         self.customEmojis = customEmojis
@@ -1742,6 +1746,8 @@ public struct VoiceInkSettingsBackupFile<ShortcutBackup: Codable>: Codable {
         powerModeShortcuts = try container.decodeIfPresent([String: ShortcutBackup].self, forKey: .powerModeShortcuts)
         vocabularyWords = try container.decodeIfPresent([VoiceInkVocabularyWordBackup].self, forKey: .vocabularyWords)
         wordReplacements = try container.decodeIfPresent([String: String].self, forKey: .wordReplacements)
+        wordReplacementLibrary = container.contains(.wordReplacementLibrary)
+            ? try container.decode(VoiceInkWordReplacementLibrary.self, forKey: .wordReplacementLibrary) : nil
         spokenSnippets = try container.decodeIfPresent([VoiceInkSpokenSnippet].self, forKey: .spokenSnippets)
         generalSettings = try container.decodeIfPresent(VoiceInkGeneralSettingsBackupPayload<ShortcutBackup>.self, forKey: .generalSettings)
         customEmojis = try container.decodeIfPresent([String].self, forKey: .customEmojis)

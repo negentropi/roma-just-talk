@@ -1,0 +1,3133 @@
+{
+  "run_id": 40581988482,
+  "head_sha": "3ada8372711c0d9a484087ea3e3300e4fac0afba",
+  "model_boundaries": [
+    {
+      "identifier": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+      "payload_sha256": "2fd48f8adae614f1f06b6d870a0875f019c6ce1e6a0be772823567a03684e79c",
+      "content": {
+        "actors": {
+          "application": {
+            "enabled": false,
+            "exists": true,
+            "hittable": false
+          },
+          "background-filter": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          },
+          "custom": {
+            "enabled": null,
+            "exists": false,
+            "hittable": null
+          },
+          "form": {
+            "enabled": null,
+            "exists": false,
+            "hittable": null
+          },
+          "main-window": {
+            "enabled": false,
+            "exists": true,
+            "hittable": true
+          },
+          "none": {
+            "enabled": null,
+            "exists": false,
+            "hittable": null
+          },
+          "settings-close": {
+            "enabled": null,
+            "exists": false,
+            "hittable": null
+          },
+          "settings-open": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          }
+        },
+        "boundaryFailures": [],
+        "mainWindowCount": 1,
+        "nativeSheetCount": 0,
+        "opening": 1,
+        "phase": "before-opening",
+        "version": 1
+      }
+    },
+    {
+      "identifier": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+      "payload_sha256": "2e7e6187b943ab3a6285ae050a4cb2c414db147e61617f414218ae903e5099fa",
+      "content": {
+        "actors": {
+          "application": {
+            "enabled": false,
+            "exists": true,
+            "hittable": false
+          },
+          "background-filter": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          },
+          "custom": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          },
+          "form": {
+            "enabled": false,
+            "exists": true,
+            "hittable": true
+          },
+          "main-window": {
+            "enabled": false,
+            "exists": true,
+            "hittable": true
+          },
+          "none": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          },
+          "settings-close": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          },
+          "settings-open": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          }
+        },
+        "boundaryFailures": [],
+        "mainWindowCount": 1,
+        "nativeSheetCount": 1,
+        "opening": 1,
+        "phase": "after-opening",
+        "version": 1
+      }
+    },
+    {
+      "identifier": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+      "payload_sha256": "026c913fdd2a80daf9108f370aa7e3fd09cadf4bf28dd9fa7030ee1ca17cacbd",
+      "content": {
+        "actors": {
+          "application": {
+            "enabled": false,
+            "exists": true,
+            "hittable": false
+          },
+          "background-filter": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          },
+          "custom": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          },
+          "form": {
+            "enabled": false,
+            "exists": true,
+            "hittable": true
+          },
+          "main-window": {
+            "enabled": false,
+            "exists": true,
+            "hittable": true
+          },
+          "none": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          },
+          "settings-close": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          },
+          "settings-open": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          }
+        },
+        "backgroundPointerAttempted": true,
+        "boundaryFailures": [],
+        "mainWindowCount": 1,
+        "nativeSheetCount": 1,
+        "opening": 1,
+        "phase": "after-background-pointer",
+        "version": 1
+      }
+    },
+    {
+      "identifier": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+      "payload_sha256": "6a4ccb9814f061e8d2ebb8ad82c5fbc6a71d8493b22f32160a356f12664b912d",
+      "content": {
+        "actors": {
+          "application": {
+            "enabled": false,
+            "exists": true,
+            "hittable": false
+          },
+          "background-filter": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          },
+          "custom": {
+            "enabled": null,
+            "exists": false,
+            "hittable": null
+          },
+          "form": {
+            "enabled": null,
+            "exists": false,
+            "hittable": null
+          },
+          "main-window": {
+            "enabled": false,
+            "exists": true,
+            "hittable": true
+          },
+          "none": {
+            "enabled": null,
+            "exists": false,
+            "hittable": null
+          },
+          "settings-close": {
+            "enabled": null,
+            "exists": false,
+            "hittable": null
+          },
+          "settings-open": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          }
+        },
+        "boundaryFailures": [],
+        "mainWindowCount": 1,
+        "nativeSheetCount": 0,
+        "opening": 1,
+        "phase": "after-closing",
+        "version": 1
+      }
+    },
+    {
+      "identifier": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+      "payload_sha256": "22ef8334529fa3fd25ed37d8df63ab91f7036d4eb26a0347b408d3bdfedad095",
+      "content": {
+        "actors": {
+          "application": {
+            "enabled": false,
+            "exists": true,
+            "hittable": false
+          },
+          "background-filter": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          },
+          "custom": {
+            "enabled": null,
+            "exists": false,
+            "hittable": null
+          },
+          "form": {
+            "enabled": null,
+            "exists": false,
+            "hittable": null
+          },
+          "main-window": {
+            "enabled": false,
+            "exists": true,
+            "hittable": true
+          },
+          "none": {
+            "enabled": null,
+            "exists": false,
+            "hittable": null
+          },
+          "settings-close": {
+            "enabled": null,
+            "exists": false,
+            "hittable": null
+          },
+          "settings-open": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          }
+        },
+        "boundaryFailures": [],
+        "mainWindowCount": 1,
+        "nativeSheetCount": 0,
+        "opening": 2,
+        "phase": "before-opening",
+        "version": 1
+      }
+    },
+    {
+      "identifier": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+      "payload_sha256": "132b764fa5ffe8ec0e401059d2f6ccf96b447ac60ac127895611dc355cfc7a68",
+      "content": {
+        "actors": {
+          "application": {
+            "enabled": false,
+            "exists": true,
+            "hittable": false
+          },
+          "background-filter": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          },
+          "custom": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          },
+          "form": {
+            "enabled": false,
+            "exists": true,
+            "hittable": true
+          },
+          "main-window": {
+            "enabled": false,
+            "exists": true,
+            "hittable": true
+          },
+          "none": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          },
+          "settings-close": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          },
+          "settings-open": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          }
+        },
+        "boundaryFailures": [],
+        "mainWindowCount": 1,
+        "nativeSheetCount": 1,
+        "opening": 2,
+        "phase": "after-opening",
+        "version": 1
+      }
+    },
+    {
+      "identifier": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+      "payload_sha256": "14f9058c22962cedd0a84b6e65e50e71177ddbc0c9ea8778d136dca569f5770e",
+      "content": {
+        "actors": {
+          "application": {
+            "enabled": false,
+            "exists": true,
+            "hittable": false
+          },
+          "background-filter": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          },
+          "custom": {
+            "enabled": null,
+            "exists": false,
+            "hittable": null
+          },
+          "form": {
+            "enabled": null,
+            "exists": false,
+            "hittable": null
+          },
+          "main-window": {
+            "enabled": false,
+            "exists": true,
+            "hittable": true
+          },
+          "none": {
+            "enabled": null,
+            "exists": false,
+            "hittable": null
+          },
+          "settings-close": {
+            "enabled": null,
+            "exists": false,
+            "hittable": null
+          },
+          "settings-open": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          }
+        },
+        "boundaryFailures": [],
+        "mainWindowCount": 1,
+        "nativeSheetCount": 0,
+        "opening": 3,
+        "phase": "before-opening",
+        "version": 1
+      }
+    },
+    {
+      "identifier": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+      "payload_sha256": "8ab7eba4873d43c083a045459d9b5838bc8563b9d39f00fbc0af024ee7ccf364",
+      "content": {
+        "actors": {
+          "application": {
+            "enabled": false,
+            "exists": true,
+            "hittable": false
+          },
+          "background-filter": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          },
+          "custom": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          },
+          "form": {
+            "enabled": false,
+            "exists": true,
+            "hittable": true
+          },
+          "main-window": {
+            "enabled": false,
+            "exists": true,
+            "hittable": true
+          },
+          "none": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          },
+          "settings-close": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          },
+          "settings-open": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          }
+        },
+        "boundaryFailures": [],
+        "mainWindowCount": 1,
+        "nativeSheetCount": 1,
+        "opening": 3,
+        "phase": "after-opening",
+        "version": 1
+      }
+    },
+    {
+      "identifier": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+      "payload_sha256": "0c33943883a0f56056e73448b7b781ad92ad209f1af8e2a874fb03ed3f7d7113",
+      "content": {
+        "actors": {
+          "application": {
+            "enabled": false,
+            "exists": true,
+            "hittable": false
+          },
+          "background-filter": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          },
+          "custom": {
+            "enabled": null,
+            "exists": false,
+            "hittable": null
+          },
+          "form": {
+            "enabled": null,
+            "exists": false,
+            "hittable": null
+          },
+          "main-window": {
+            "enabled": false,
+            "exists": true,
+            "hittable": true
+          },
+          "none": {
+            "enabled": null,
+            "exists": false,
+            "hittable": null
+          },
+          "settings-close": {
+            "enabled": null,
+            "exists": false,
+            "hittable": null
+          },
+          "settings-open": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          }
+        },
+        "boundaryFailures": [],
+        "mainWindowCount": 1,
+        "nativeSheetCount": 0,
+        "opening": 3,
+        "phase": "after-closing",
+        "version": 1
+      }
+    }
+  ],
+  "shortcut_censuses": {
+    "WritingFeaturesUITests/testCSVImportPreviewsMultilineContentBeforeReplacing()": [
+      {
+        "keys": {
+          "hotkeyMode1": {
+            "exists": false
+          },
+          "hotkeyMode2": {
+            "exists": false
+          },
+          "isMiddleClickToggleEnabled": {
+            "exists": false
+          },
+          "primaryRecordingShortcut": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "custom"
+          },
+          "primaryRecordingShortcutMode": {
+            "exists": false
+          },
+          "secondaryRecordingShortcut": {
+            "exists": false
+          },
+          "secondaryRecordingShortcutMode": {
+            "exists": false
+          },
+          "selectedHotkey1": {
+            "exists": false
+          },
+          "selectedHotkey2": {
+            "exists": false
+          },
+          "Shortcut_draftRecording": {
+            "exists": false
+          },
+          "Shortcut_draftRecording_cleared": {
+            "exists": false
+          },
+          "Shortcut_LegacyCustomRecordingShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_LegacyKeyboardShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_openHistoryWindow": {
+            "exists": false
+          },
+          "Shortcut_openHistoryWindow_cleared": {
+            "exists": false
+          },
+          "Shortcut_pasteLastEnhancement": {
+            "exists": false
+          },
+          "Shortcut_pasteLastEnhancement_cleared": {
+            "exists": false
+          },
+          "Shortcut_pasteLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_pasteLastTranscription_cleared": {
+            "exists": false
+          },
+          "Shortcut_primaryRecording": {
+            "cfTypeID": 20,
+            "dataBytes": 67,
+            "exists": true
+          },
+          "Shortcut_primaryRecording_cleared": {
+            "exists": false
+          },
+          "Shortcut_quickAddToDictionary": {
+            "exists": false
+          },
+          "Shortcut_quickAddToDictionary_cleared": {
+            "exists": false
+          },
+          "Shortcut_retryLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_retryLastTranscription_cleared": {
+            "exists": false
+          },
+          "Shortcut_rewriteSelectionRecording": {
+            "exists": false
+          },
+          "Shortcut_rewriteSelectionRecording_cleared": {
+            "exists": false
+          },
+          "Shortcut_secondaryRecording": {
+            "exists": false
+          },
+          "Shortcut_secondaryRecording_cleared": {
+            "exists": false
+          },
+          "Shortcut_translateRecording": {
+            "exists": false
+          },
+          "Shortcut_translateRecording_cleared": {
+            "exists": false
+          },
+          "specialShortcutDoubleShiftTapInterval": {
+            "exists": false
+          }
+        },
+        "phase": "before",
+        "synchronized": true,
+        "version": 1
+      },
+      {
+        "keys": {
+          "hotkeyMode1": {
+            "exists": false
+          },
+          "hotkeyMode2": {
+            "exists": false
+          },
+          "isMiddleClickToggleEnabled": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": false
+          },
+          "primaryRecordingShortcut": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "custom"
+          },
+          "primaryRecordingShortcutMode": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "hybrid"
+          },
+          "secondaryRecordingShortcut": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "none"
+          },
+          "secondaryRecordingShortcutMode": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "hybrid"
+          },
+          "selectedHotkey1": {
+            "exists": false
+          },
+          "selectedHotkey2": {
+            "exists": false
+          },
+          "Shortcut_draftRecording": {
+            "exists": false
+          },
+          "Shortcut_draftRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_LegacyCustomRecordingShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_LegacyKeyboardShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_openHistoryWindow": {
+            "exists": false
+          },
+          "Shortcut_openHistoryWindow_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_pasteLastEnhancement": {
+            "exists": false
+          },
+          "Shortcut_pasteLastEnhancement_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_pasteLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_pasteLastTranscription_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_primaryRecording": {
+            "cfTypeID": 20,
+            "dataBytes": 67,
+            "exists": true
+          },
+          "Shortcut_primaryRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_quickAddToDictionary": {
+            "exists": false
+          },
+          "Shortcut_quickAddToDictionary_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_retryLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_retryLastTranscription_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_rewriteSelectionRecording": {
+            "exists": false
+          },
+          "Shortcut_rewriteSelectionRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_secondaryRecording": {
+            "exists": false
+          },
+          "Shortcut_secondaryRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_translateRecording": {
+            "exists": false
+          },
+          "Shortcut_translateRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "specialShortcutDoubleShiftTapInterval": {
+            "cfTypeID": 22,
+            "exists": true,
+            "numberEncoding": "q",
+            "value": 0
+          }
+        },
+        "phase": "isolated",
+        "synchronized": true,
+        "version": 1
+      },
+      {
+        "keys": {
+          "hotkeyMode1": {
+            "exists": false
+          },
+          "hotkeyMode2": {
+            "exists": false
+          },
+          "isMiddleClickToggleEnabled": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": false
+          },
+          "primaryRecordingShortcut": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "custom"
+          },
+          "primaryRecordingShortcutMode": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "hybrid"
+          },
+          "secondaryRecordingShortcut": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "none"
+          },
+          "secondaryRecordingShortcutMode": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "hybrid"
+          },
+          "selectedHotkey1": {
+            "exists": false
+          },
+          "selectedHotkey2": {
+            "exists": false
+          },
+          "Shortcut_draftRecording": {
+            "exists": false
+          },
+          "Shortcut_draftRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_LegacyCustomRecordingShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_LegacyKeyboardShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_openHistoryWindow": {
+            "exists": false
+          },
+          "Shortcut_openHistoryWindow_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_pasteLastEnhancement": {
+            "exists": false
+          },
+          "Shortcut_pasteLastEnhancement_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_pasteLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_pasteLastTranscription_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_primaryRecording": {
+            "cfTypeID": 20,
+            "dataBytes": 67,
+            "exists": true
+          },
+          "Shortcut_primaryRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_quickAddToDictionary": {
+            "exists": false
+          },
+          "Shortcut_quickAddToDictionary_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_retryLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_retryLastTranscription_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_rewriteSelectionRecording": {
+            "exists": false
+          },
+          "Shortcut_rewriteSelectionRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_secondaryRecording": {
+            "exists": false
+          },
+          "Shortcut_secondaryRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_translateRecording": {
+            "exists": false
+          },
+          "Shortcut_translateRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "specialShortcutDoubleShiftTapInterval": {
+            "cfTypeID": 22,
+            "exists": true,
+            "numberEncoding": "q",
+            "value": 0
+          }
+        },
+        "phase": "after-launch",
+        "synchronized": true,
+        "version": 1
+      },
+      {
+        "keys": {
+          "hotkeyMode1": {
+            "exists": false
+          },
+          "hotkeyMode2": {
+            "exists": false
+          },
+          "isMiddleClickToggleEnabled": {
+            "exists": false
+          },
+          "primaryRecordingShortcut": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "custom"
+          },
+          "primaryRecordingShortcutMode": {
+            "exists": false
+          },
+          "secondaryRecordingShortcut": {
+            "exists": false
+          },
+          "secondaryRecordingShortcutMode": {
+            "exists": false
+          },
+          "selectedHotkey1": {
+            "exists": false
+          },
+          "selectedHotkey2": {
+            "exists": false
+          },
+          "Shortcut_draftRecording": {
+            "exists": false
+          },
+          "Shortcut_draftRecording_cleared": {
+            "exists": false
+          },
+          "Shortcut_LegacyCustomRecordingShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_LegacyKeyboardShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_openHistoryWindow": {
+            "exists": false
+          },
+          "Shortcut_openHistoryWindow_cleared": {
+            "exists": false
+          },
+          "Shortcut_pasteLastEnhancement": {
+            "exists": false
+          },
+          "Shortcut_pasteLastEnhancement_cleared": {
+            "exists": false
+          },
+          "Shortcut_pasteLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_pasteLastTranscription_cleared": {
+            "exists": false
+          },
+          "Shortcut_primaryRecording": {
+            "cfTypeID": 20,
+            "dataBytes": 67,
+            "exists": true
+          },
+          "Shortcut_primaryRecording_cleared": {
+            "exists": false
+          },
+          "Shortcut_quickAddToDictionary": {
+            "exists": false
+          },
+          "Shortcut_quickAddToDictionary_cleared": {
+            "exists": false
+          },
+          "Shortcut_retryLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_retryLastTranscription_cleared": {
+            "exists": false
+          },
+          "Shortcut_rewriteSelectionRecording": {
+            "exists": false
+          },
+          "Shortcut_rewriteSelectionRecording_cleared": {
+            "exists": false
+          },
+          "Shortcut_secondaryRecording": {
+            "exists": false
+          },
+          "Shortcut_secondaryRecording_cleared": {
+            "exists": false
+          },
+          "Shortcut_translateRecording": {
+            "exists": false
+          },
+          "Shortcut_translateRecording_cleared": {
+            "exists": false
+          },
+          "specialShortcutDoubleShiftTapInterval": {
+            "exists": false
+          }
+        },
+        "phase": "restored",
+        "synchronized": true,
+        "version": 1
+      }
+    ],
+    "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()": [
+      {
+        "keys": {
+          "hotkeyMode1": {
+            "exists": false
+          },
+          "hotkeyMode2": {
+            "exists": false
+          },
+          "isMiddleClickToggleEnabled": {
+            "exists": false
+          },
+          "primaryRecordingShortcut": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "custom"
+          },
+          "primaryRecordingShortcutMode": {
+            "exists": false
+          },
+          "secondaryRecordingShortcut": {
+            "exists": false
+          },
+          "secondaryRecordingShortcutMode": {
+            "exists": false
+          },
+          "selectedHotkey1": {
+            "exists": false
+          },
+          "selectedHotkey2": {
+            "exists": false
+          },
+          "Shortcut_draftRecording": {
+            "exists": false
+          },
+          "Shortcut_draftRecording_cleared": {
+            "exists": false
+          },
+          "Shortcut_LegacyCustomRecordingShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_LegacyKeyboardShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_openHistoryWindow": {
+            "exists": false
+          },
+          "Shortcut_openHistoryWindow_cleared": {
+            "exists": false
+          },
+          "Shortcut_pasteLastEnhancement": {
+            "exists": false
+          },
+          "Shortcut_pasteLastEnhancement_cleared": {
+            "exists": false
+          },
+          "Shortcut_pasteLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_pasteLastTranscription_cleared": {
+            "exists": false
+          },
+          "Shortcut_primaryRecording": {
+            "cfTypeID": 20,
+            "dataBytes": 67,
+            "exists": true
+          },
+          "Shortcut_primaryRecording_cleared": {
+            "exists": false
+          },
+          "Shortcut_quickAddToDictionary": {
+            "exists": false
+          },
+          "Shortcut_quickAddToDictionary_cleared": {
+            "exists": false
+          },
+          "Shortcut_retryLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_retryLastTranscription_cleared": {
+            "exists": false
+          },
+          "Shortcut_rewriteSelectionRecording": {
+            "exists": false
+          },
+          "Shortcut_rewriteSelectionRecording_cleared": {
+            "exists": false
+          },
+          "Shortcut_secondaryRecording": {
+            "exists": false
+          },
+          "Shortcut_secondaryRecording_cleared": {
+            "exists": false
+          },
+          "Shortcut_translateRecording": {
+            "exists": false
+          },
+          "Shortcut_translateRecording_cleared": {
+            "exists": false
+          },
+          "specialShortcutDoubleShiftTapInterval": {
+            "exists": false
+          }
+        },
+        "phase": "before",
+        "synchronized": true,
+        "version": 1
+      },
+      {
+        "keys": {
+          "hotkeyMode1": {
+            "exists": false
+          },
+          "hotkeyMode2": {
+            "exists": false
+          },
+          "isMiddleClickToggleEnabled": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": false
+          },
+          "primaryRecordingShortcut": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "custom"
+          },
+          "primaryRecordingShortcutMode": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "hybrid"
+          },
+          "secondaryRecordingShortcut": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "none"
+          },
+          "secondaryRecordingShortcutMode": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "hybrid"
+          },
+          "selectedHotkey1": {
+            "exists": false
+          },
+          "selectedHotkey2": {
+            "exists": false
+          },
+          "Shortcut_draftRecording": {
+            "exists": false
+          },
+          "Shortcut_draftRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_LegacyCustomRecordingShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_LegacyKeyboardShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_openHistoryWindow": {
+            "exists": false
+          },
+          "Shortcut_openHistoryWindow_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_pasteLastEnhancement": {
+            "exists": false
+          },
+          "Shortcut_pasteLastEnhancement_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_pasteLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_pasteLastTranscription_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_primaryRecording": {
+            "cfTypeID": 20,
+            "dataBytes": 67,
+            "exists": true
+          },
+          "Shortcut_primaryRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_quickAddToDictionary": {
+            "exists": false
+          },
+          "Shortcut_quickAddToDictionary_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_retryLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_retryLastTranscription_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_rewriteSelectionRecording": {
+            "exists": false
+          },
+          "Shortcut_rewriteSelectionRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_secondaryRecording": {
+            "exists": false
+          },
+          "Shortcut_secondaryRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_translateRecording": {
+            "exists": false
+          },
+          "Shortcut_translateRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "specialShortcutDoubleShiftTapInterval": {
+            "cfTypeID": 22,
+            "exists": true,
+            "numberEncoding": "q",
+            "value": 0
+          }
+        },
+        "phase": "isolated",
+        "synchronized": true,
+        "version": 1
+      },
+      {
+        "keys": {
+          "hotkeyMode1": {
+            "exists": false
+          },
+          "hotkeyMode2": {
+            "exists": false
+          },
+          "isMiddleClickToggleEnabled": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": false
+          },
+          "primaryRecordingShortcut": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "custom"
+          },
+          "primaryRecordingShortcutMode": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "hybrid"
+          },
+          "secondaryRecordingShortcut": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "none"
+          },
+          "secondaryRecordingShortcutMode": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "hybrid"
+          },
+          "selectedHotkey1": {
+            "exists": false
+          },
+          "selectedHotkey2": {
+            "exists": false
+          },
+          "Shortcut_draftRecording": {
+            "exists": false
+          },
+          "Shortcut_draftRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_LegacyCustomRecordingShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_LegacyKeyboardShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_openHistoryWindow": {
+            "exists": false
+          },
+          "Shortcut_openHistoryWindow_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_pasteLastEnhancement": {
+            "exists": false
+          },
+          "Shortcut_pasteLastEnhancement_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_pasteLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_pasteLastTranscription_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_primaryRecording": {
+            "cfTypeID": 20,
+            "dataBytes": 67,
+            "exists": true
+          },
+          "Shortcut_primaryRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_quickAddToDictionary": {
+            "exists": false
+          },
+          "Shortcut_quickAddToDictionary_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_retryLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_retryLastTranscription_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_rewriteSelectionRecording": {
+            "exists": false
+          },
+          "Shortcut_rewriteSelectionRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_secondaryRecording": {
+            "exists": false
+          },
+          "Shortcut_secondaryRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_translateRecording": {
+            "exists": false
+          },
+          "Shortcut_translateRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "specialShortcutDoubleShiftTapInterval": {
+            "cfTypeID": 22,
+            "exists": true,
+            "numberEncoding": "q",
+            "value": 0
+          }
+        },
+        "phase": "after-launch",
+        "synchronized": true,
+        "version": 1
+      },
+      {
+        "keys": {
+          "hotkeyMode1": {
+            "exists": false
+          },
+          "hotkeyMode2": {
+            "exists": false
+          },
+          "isMiddleClickToggleEnabled": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": false
+          },
+          "primaryRecordingShortcut": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "custom"
+          },
+          "primaryRecordingShortcutMode": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "hybrid"
+          },
+          "secondaryRecordingShortcut": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "none"
+          },
+          "secondaryRecordingShortcutMode": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "hybrid"
+          },
+          "selectedHotkey1": {
+            "exists": false
+          },
+          "selectedHotkey2": {
+            "exists": false
+          },
+          "Shortcut_draftRecording": {
+            "exists": false
+          },
+          "Shortcut_draftRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_LegacyCustomRecordingShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_LegacyKeyboardShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_openHistoryWindow": {
+            "exists": false
+          },
+          "Shortcut_openHistoryWindow_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_pasteLastEnhancement": {
+            "exists": false
+          },
+          "Shortcut_pasteLastEnhancement_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_pasteLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_pasteLastTranscription_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_primaryRecording": {
+            "cfTypeID": 20,
+            "dataBytes": 67,
+            "exists": true
+          },
+          "Shortcut_primaryRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_quickAddToDictionary": {
+            "exists": false
+          },
+          "Shortcut_quickAddToDictionary_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_retryLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_retryLastTranscription_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_rewriteSelectionRecording": {
+            "exists": false
+          },
+          "Shortcut_rewriteSelectionRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_secondaryRecording": {
+            "exists": false
+          },
+          "Shortcut_secondaryRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_translateRecording": {
+            "exists": false
+          },
+          "Shortcut_translateRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "specialShortcutDoubleShiftTapInterval": {
+            "cfTypeID": 22,
+            "exists": true,
+            "numberEncoding": "q",
+            "value": 0
+          }
+        },
+        "phase": "after-launch",
+        "synchronized": true,
+        "version": 1
+      },
+      {
+        "keys": {
+          "hotkeyMode1": {
+            "exists": false
+          },
+          "hotkeyMode2": {
+            "exists": false
+          },
+          "isMiddleClickToggleEnabled": {
+            "exists": false
+          },
+          "primaryRecordingShortcut": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "custom"
+          },
+          "primaryRecordingShortcutMode": {
+            "exists": false
+          },
+          "secondaryRecordingShortcut": {
+            "exists": false
+          },
+          "secondaryRecordingShortcutMode": {
+            "exists": false
+          },
+          "selectedHotkey1": {
+            "exists": false
+          },
+          "selectedHotkey2": {
+            "exists": false
+          },
+          "Shortcut_draftRecording": {
+            "exists": false
+          },
+          "Shortcut_draftRecording_cleared": {
+            "exists": false
+          },
+          "Shortcut_LegacyCustomRecordingShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_LegacyKeyboardShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_openHistoryWindow": {
+            "exists": false
+          },
+          "Shortcut_openHistoryWindow_cleared": {
+            "exists": false
+          },
+          "Shortcut_pasteLastEnhancement": {
+            "exists": false
+          },
+          "Shortcut_pasteLastEnhancement_cleared": {
+            "exists": false
+          },
+          "Shortcut_pasteLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_pasteLastTranscription_cleared": {
+            "exists": false
+          },
+          "Shortcut_primaryRecording": {
+            "cfTypeID": 20,
+            "dataBytes": 67,
+            "exists": true
+          },
+          "Shortcut_primaryRecording_cleared": {
+            "exists": false
+          },
+          "Shortcut_quickAddToDictionary": {
+            "exists": false
+          },
+          "Shortcut_quickAddToDictionary_cleared": {
+            "exists": false
+          },
+          "Shortcut_retryLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_retryLastTranscription_cleared": {
+            "exists": false
+          },
+          "Shortcut_rewriteSelectionRecording": {
+            "exists": false
+          },
+          "Shortcut_rewriteSelectionRecording_cleared": {
+            "exists": false
+          },
+          "Shortcut_secondaryRecording": {
+            "exists": false
+          },
+          "Shortcut_secondaryRecording_cleared": {
+            "exists": false
+          },
+          "Shortcut_translateRecording": {
+            "exists": false
+          },
+          "Shortcut_translateRecording_cleared": {
+            "exists": false
+          },
+          "specialShortcutDoubleShiftTapInterval": {
+            "exists": false
+          }
+        },
+        "phase": "restored",
+        "synchronized": true,
+        "version": 1
+      }
+    ],
+    "WritingFeaturesUITests/testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch()": [
+      {
+        "keys": {
+          "hotkeyMode1": {
+            "exists": false
+          },
+          "hotkeyMode2": {
+            "exists": false
+          },
+          "isMiddleClickToggleEnabled": {
+            "exists": false
+          },
+          "primaryRecordingShortcut": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "custom"
+          },
+          "primaryRecordingShortcutMode": {
+            "exists": false
+          },
+          "secondaryRecordingShortcut": {
+            "exists": false
+          },
+          "secondaryRecordingShortcutMode": {
+            "exists": false
+          },
+          "selectedHotkey1": {
+            "exists": false
+          },
+          "selectedHotkey2": {
+            "exists": false
+          },
+          "Shortcut_draftRecording": {
+            "exists": false
+          },
+          "Shortcut_draftRecording_cleared": {
+            "exists": false
+          },
+          "Shortcut_LegacyCustomRecordingShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_LegacyKeyboardShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_openHistoryWindow": {
+            "exists": false
+          },
+          "Shortcut_openHistoryWindow_cleared": {
+            "exists": false
+          },
+          "Shortcut_pasteLastEnhancement": {
+            "exists": false
+          },
+          "Shortcut_pasteLastEnhancement_cleared": {
+            "exists": false
+          },
+          "Shortcut_pasteLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_pasteLastTranscription_cleared": {
+            "exists": false
+          },
+          "Shortcut_primaryRecording": {
+            "cfTypeID": 20,
+            "dataBytes": 67,
+            "exists": true
+          },
+          "Shortcut_primaryRecording_cleared": {
+            "exists": false
+          },
+          "Shortcut_quickAddToDictionary": {
+            "exists": false
+          },
+          "Shortcut_quickAddToDictionary_cleared": {
+            "exists": false
+          },
+          "Shortcut_retryLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_retryLastTranscription_cleared": {
+            "exists": false
+          },
+          "Shortcut_rewriteSelectionRecording": {
+            "exists": false
+          },
+          "Shortcut_rewriteSelectionRecording_cleared": {
+            "exists": false
+          },
+          "Shortcut_secondaryRecording": {
+            "exists": false
+          },
+          "Shortcut_secondaryRecording_cleared": {
+            "exists": false
+          },
+          "Shortcut_translateRecording": {
+            "exists": false
+          },
+          "Shortcut_translateRecording_cleared": {
+            "exists": false
+          },
+          "specialShortcutDoubleShiftTapInterval": {
+            "exists": false
+          }
+        },
+        "phase": "before",
+        "synchronized": true,
+        "version": 1
+      },
+      {
+        "keys": {
+          "hotkeyMode1": {
+            "exists": false
+          },
+          "hotkeyMode2": {
+            "exists": false
+          },
+          "isMiddleClickToggleEnabled": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": false
+          },
+          "primaryRecordingShortcut": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "custom"
+          },
+          "primaryRecordingShortcutMode": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "hybrid"
+          },
+          "secondaryRecordingShortcut": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "none"
+          },
+          "secondaryRecordingShortcutMode": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "hybrid"
+          },
+          "selectedHotkey1": {
+            "exists": false
+          },
+          "selectedHotkey2": {
+            "exists": false
+          },
+          "Shortcut_draftRecording": {
+            "exists": false
+          },
+          "Shortcut_draftRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_LegacyCustomRecordingShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_LegacyKeyboardShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_openHistoryWindow": {
+            "exists": false
+          },
+          "Shortcut_openHistoryWindow_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_pasteLastEnhancement": {
+            "exists": false
+          },
+          "Shortcut_pasteLastEnhancement_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_pasteLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_pasteLastTranscription_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_primaryRecording": {
+            "cfTypeID": 20,
+            "dataBytes": 67,
+            "exists": true
+          },
+          "Shortcut_primaryRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_quickAddToDictionary": {
+            "exists": false
+          },
+          "Shortcut_quickAddToDictionary_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_retryLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_retryLastTranscription_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_rewriteSelectionRecording": {
+            "exists": false
+          },
+          "Shortcut_rewriteSelectionRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_secondaryRecording": {
+            "exists": false
+          },
+          "Shortcut_secondaryRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_translateRecording": {
+            "exists": false
+          },
+          "Shortcut_translateRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "specialShortcutDoubleShiftTapInterval": {
+            "cfTypeID": 22,
+            "exists": true,
+            "numberEncoding": "q",
+            "value": 0
+          }
+        },
+        "phase": "isolated",
+        "synchronized": true,
+        "version": 1
+      },
+      {
+        "keys": {
+          "hotkeyMode1": {
+            "exists": false
+          },
+          "hotkeyMode2": {
+            "exists": false
+          },
+          "isMiddleClickToggleEnabled": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": false
+          },
+          "primaryRecordingShortcut": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "custom"
+          },
+          "primaryRecordingShortcutMode": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "hybrid"
+          },
+          "secondaryRecordingShortcut": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "none"
+          },
+          "secondaryRecordingShortcutMode": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "hybrid"
+          },
+          "selectedHotkey1": {
+            "exists": false
+          },
+          "selectedHotkey2": {
+            "exists": false
+          },
+          "Shortcut_draftRecording": {
+            "exists": false
+          },
+          "Shortcut_draftRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_LegacyCustomRecordingShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_LegacyKeyboardShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_openHistoryWindow": {
+            "exists": false
+          },
+          "Shortcut_openHistoryWindow_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_pasteLastEnhancement": {
+            "exists": false
+          },
+          "Shortcut_pasteLastEnhancement_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_pasteLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_pasteLastTranscription_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_primaryRecording": {
+            "cfTypeID": 20,
+            "dataBytes": 67,
+            "exists": true
+          },
+          "Shortcut_primaryRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_quickAddToDictionary": {
+            "exists": false
+          },
+          "Shortcut_quickAddToDictionary_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_retryLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_retryLastTranscription_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_rewriteSelectionRecording": {
+            "exists": false
+          },
+          "Shortcut_rewriteSelectionRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_secondaryRecording": {
+            "exists": false
+          },
+          "Shortcut_secondaryRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_translateRecording": {
+            "exists": false
+          },
+          "Shortcut_translateRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "specialShortcutDoubleShiftTapInterval": {
+            "cfTypeID": 22,
+            "exists": true,
+            "numberEncoding": "q",
+            "value": 0
+          }
+        },
+        "phase": "after-launch",
+        "synchronized": true,
+        "version": 1
+      },
+      {
+        "keys": {
+          "hotkeyMode1": {
+            "exists": false
+          },
+          "hotkeyMode2": {
+            "exists": false
+          },
+          "isMiddleClickToggleEnabled": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": false
+          },
+          "primaryRecordingShortcut": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "custom"
+          },
+          "primaryRecordingShortcutMode": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "hybrid"
+          },
+          "secondaryRecordingShortcut": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "none"
+          },
+          "secondaryRecordingShortcutMode": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "hybrid"
+          },
+          "selectedHotkey1": {
+            "exists": false
+          },
+          "selectedHotkey2": {
+            "exists": false
+          },
+          "Shortcut_draftRecording": {
+            "exists": false
+          },
+          "Shortcut_draftRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_LegacyCustomRecordingShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_LegacyKeyboardShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_openHistoryWindow": {
+            "exists": false
+          },
+          "Shortcut_openHistoryWindow_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_pasteLastEnhancement": {
+            "exists": false
+          },
+          "Shortcut_pasteLastEnhancement_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_pasteLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_pasteLastTranscription_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_primaryRecording": {
+            "cfTypeID": 20,
+            "dataBytes": 67,
+            "exists": true
+          },
+          "Shortcut_primaryRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_quickAddToDictionary": {
+            "exists": false
+          },
+          "Shortcut_quickAddToDictionary_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_retryLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_retryLastTranscription_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_rewriteSelectionRecording": {
+            "exists": false
+          },
+          "Shortcut_rewriteSelectionRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_secondaryRecording": {
+            "exists": false
+          },
+          "Shortcut_secondaryRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_translateRecording": {
+            "exists": false
+          },
+          "Shortcut_translateRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "specialShortcutDoubleShiftTapInterval": {
+            "cfTypeID": 22,
+            "exists": true,
+            "numberEncoding": "q",
+            "value": 0
+          }
+        },
+        "phase": "after-launch",
+        "synchronized": true,
+        "version": 1
+      },
+      {
+        "keys": {
+          "hotkeyMode1": {
+            "exists": false
+          },
+          "hotkeyMode2": {
+            "exists": false
+          },
+          "isMiddleClickToggleEnabled": {
+            "exists": false
+          },
+          "primaryRecordingShortcut": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "custom"
+          },
+          "primaryRecordingShortcutMode": {
+            "exists": false
+          },
+          "secondaryRecordingShortcut": {
+            "exists": false
+          },
+          "secondaryRecordingShortcutMode": {
+            "exists": false
+          },
+          "selectedHotkey1": {
+            "exists": false
+          },
+          "selectedHotkey2": {
+            "exists": false
+          },
+          "Shortcut_draftRecording": {
+            "exists": false
+          },
+          "Shortcut_draftRecording_cleared": {
+            "exists": false
+          },
+          "Shortcut_LegacyCustomRecordingShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_LegacyKeyboardShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_openHistoryWindow": {
+            "exists": false
+          },
+          "Shortcut_openHistoryWindow_cleared": {
+            "exists": false
+          },
+          "Shortcut_pasteLastEnhancement": {
+            "exists": false
+          },
+          "Shortcut_pasteLastEnhancement_cleared": {
+            "exists": false
+          },
+          "Shortcut_pasteLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_pasteLastTranscription_cleared": {
+            "exists": false
+          },
+          "Shortcut_primaryRecording": {
+            "cfTypeID": 20,
+            "dataBytes": 67,
+            "exists": true
+          },
+          "Shortcut_primaryRecording_cleared": {
+            "exists": false
+          },
+          "Shortcut_quickAddToDictionary": {
+            "exists": false
+          },
+          "Shortcut_quickAddToDictionary_cleared": {
+            "exists": false
+          },
+          "Shortcut_retryLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_retryLastTranscription_cleared": {
+            "exists": false
+          },
+          "Shortcut_rewriteSelectionRecording": {
+            "exists": false
+          },
+          "Shortcut_rewriteSelectionRecording_cleared": {
+            "exists": false
+          },
+          "Shortcut_secondaryRecording": {
+            "exists": false
+          },
+          "Shortcut_secondaryRecording_cleared": {
+            "exists": false
+          },
+          "Shortcut_translateRecording": {
+            "exists": false
+          },
+          "Shortcut_translateRecording_cleared": {
+            "exists": false
+          },
+          "specialShortcutDoubleShiftTapInterval": {
+            "exists": false
+          }
+        },
+        "phase": "restored",
+        "synchronized": true,
+        "version": 1
+      }
+    ],
+    "WritingFeaturesUITests/testTranslationTargetsReorderSelectAndPersist()": [
+      {
+        "keys": {
+          "hotkeyMode1": {
+            "exists": false
+          },
+          "hotkeyMode2": {
+            "exists": false
+          },
+          "isMiddleClickToggleEnabled": {
+            "exists": false
+          },
+          "primaryRecordingShortcut": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "custom"
+          },
+          "primaryRecordingShortcutMode": {
+            "exists": false
+          },
+          "secondaryRecordingShortcut": {
+            "exists": false
+          },
+          "secondaryRecordingShortcutMode": {
+            "exists": false
+          },
+          "selectedHotkey1": {
+            "exists": false
+          },
+          "selectedHotkey2": {
+            "exists": false
+          },
+          "Shortcut_draftRecording": {
+            "exists": false
+          },
+          "Shortcut_draftRecording_cleared": {
+            "exists": false
+          },
+          "Shortcut_LegacyCustomRecordingShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_LegacyKeyboardShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_openHistoryWindow": {
+            "exists": false
+          },
+          "Shortcut_openHistoryWindow_cleared": {
+            "exists": false
+          },
+          "Shortcut_pasteLastEnhancement": {
+            "exists": false
+          },
+          "Shortcut_pasteLastEnhancement_cleared": {
+            "exists": false
+          },
+          "Shortcut_pasteLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_pasteLastTranscription_cleared": {
+            "exists": false
+          },
+          "Shortcut_primaryRecording": {
+            "cfTypeID": 20,
+            "dataBytes": 67,
+            "exists": true
+          },
+          "Shortcut_primaryRecording_cleared": {
+            "exists": false
+          },
+          "Shortcut_quickAddToDictionary": {
+            "exists": false
+          },
+          "Shortcut_quickAddToDictionary_cleared": {
+            "exists": false
+          },
+          "Shortcut_retryLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_retryLastTranscription_cleared": {
+            "exists": false
+          },
+          "Shortcut_rewriteSelectionRecording": {
+            "exists": false
+          },
+          "Shortcut_rewriteSelectionRecording_cleared": {
+            "exists": false
+          },
+          "Shortcut_secondaryRecording": {
+            "exists": false
+          },
+          "Shortcut_secondaryRecording_cleared": {
+            "exists": false
+          },
+          "Shortcut_translateRecording": {
+            "exists": false
+          },
+          "Shortcut_translateRecording_cleared": {
+            "exists": false
+          },
+          "specialShortcutDoubleShiftTapInterval": {
+            "exists": false
+          }
+        },
+        "phase": "before",
+        "synchronized": true,
+        "version": 1
+      },
+      {
+        "keys": {
+          "hotkeyMode1": {
+            "exists": false
+          },
+          "hotkeyMode2": {
+            "exists": false
+          },
+          "isMiddleClickToggleEnabled": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": false
+          },
+          "primaryRecordingShortcut": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "custom"
+          },
+          "primaryRecordingShortcutMode": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "hybrid"
+          },
+          "secondaryRecordingShortcut": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "none"
+          },
+          "secondaryRecordingShortcutMode": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "hybrid"
+          },
+          "selectedHotkey1": {
+            "exists": false
+          },
+          "selectedHotkey2": {
+            "exists": false
+          },
+          "Shortcut_draftRecording": {
+            "exists": false
+          },
+          "Shortcut_draftRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_LegacyCustomRecordingShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_LegacyKeyboardShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_openHistoryWindow": {
+            "exists": false
+          },
+          "Shortcut_openHistoryWindow_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_pasteLastEnhancement": {
+            "exists": false
+          },
+          "Shortcut_pasteLastEnhancement_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_pasteLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_pasteLastTranscription_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_primaryRecording": {
+            "cfTypeID": 20,
+            "dataBytes": 67,
+            "exists": true
+          },
+          "Shortcut_primaryRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_quickAddToDictionary": {
+            "exists": false
+          },
+          "Shortcut_quickAddToDictionary_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_retryLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_retryLastTranscription_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_rewriteSelectionRecording": {
+            "exists": false
+          },
+          "Shortcut_rewriteSelectionRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_secondaryRecording": {
+            "exists": false
+          },
+          "Shortcut_secondaryRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_translateRecording": {
+            "exists": false
+          },
+          "Shortcut_translateRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "specialShortcutDoubleShiftTapInterval": {
+            "cfTypeID": 22,
+            "exists": true,
+            "numberEncoding": "q",
+            "value": 0
+          }
+        },
+        "phase": "isolated",
+        "synchronized": true,
+        "version": 1
+      },
+      {
+        "keys": {
+          "hotkeyMode1": {
+            "exists": false
+          },
+          "hotkeyMode2": {
+            "exists": false
+          },
+          "isMiddleClickToggleEnabled": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": false
+          },
+          "primaryRecordingShortcut": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "custom"
+          },
+          "primaryRecordingShortcutMode": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "hybrid"
+          },
+          "secondaryRecordingShortcut": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "none"
+          },
+          "secondaryRecordingShortcutMode": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "hybrid"
+          },
+          "selectedHotkey1": {
+            "exists": false
+          },
+          "selectedHotkey2": {
+            "exists": false
+          },
+          "Shortcut_draftRecording": {
+            "exists": false
+          },
+          "Shortcut_draftRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_LegacyCustomRecordingShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_LegacyKeyboardShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_openHistoryWindow": {
+            "exists": false
+          },
+          "Shortcut_openHistoryWindow_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_pasteLastEnhancement": {
+            "exists": false
+          },
+          "Shortcut_pasteLastEnhancement_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_pasteLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_pasteLastTranscription_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_primaryRecording": {
+            "cfTypeID": 20,
+            "dataBytes": 67,
+            "exists": true
+          },
+          "Shortcut_primaryRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_quickAddToDictionary": {
+            "exists": false
+          },
+          "Shortcut_quickAddToDictionary_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_retryLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_retryLastTranscription_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_rewriteSelectionRecording": {
+            "exists": false
+          },
+          "Shortcut_rewriteSelectionRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_secondaryRecording": {
+            "exists": false
+          },
+          "Shortcut_secondaryRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_translateRecording": {
+            "exists": false
+          },
+          "Shortcut_translateRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "specialShortcutDoubleShiftTapInterval": {
+            "cfTypeID": 22,
+            "exists": true,
+            "numberEncoding": "q",
+            "value": 0
+          }
+        },
+        "phase": "after-launch",
+        "synchronized": true,
+        "version": 1
+      },
+      {
+        "keys": {
+          "hotkeyMode1": {
+            "exists": false
+          },
+          "hotkeyMode2": {
+            "exists": false
+          },
+          "isMiddleClickToggleEnabled": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": false
+          },
+          "primaryRecordingShortcut": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "custom"
+          },
+          "primaryRecordingShortcutMode": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "hybrid"
+          },
+          "secondaryRecordingShortcut": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "none"
+          },
+          "secondaryRecordingShortcutMode": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "hybrid"
+          },
+          "selectedHotkey1": {
+            "exists": false
+          },
+          "selectedHotkey2": {
+            "exists": false
+          },
+          "Shortcut_draftRecording": {
+            "exists": false
+          },
+          "Shortcut_draftRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_LegacyCustomRecordingShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_LegacyKeyboardShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_openHistoryWindow": {
+            "exists": false
+          },
+          "Shortcut_openHistoryWindow_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_pasteLastEnhancement": {
+            "exists": false
+          },
+          "Shortcut_pasteLastEnhancement_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_pasteLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_pasteLastTranscription_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_primaryRecording": {
+            "cfTypeID": 20,
+            "dataBytes": 67,
+            "exists": true
+          },
+          "Shortcut_primaryRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_quickAddToDictionary": {
+            "exists": false
+          },
+          "Shortcut_quickAddToDictionary_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_retryLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_retryLastTranscription_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_rewriteSelectionRecording": {
+            "exists": false
+          },
+          "Shortcut_rewriteSelectionRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_secondaryRecording": {
+            "exists": false
+          },
+          "Shortcut_secondaryRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_translateRecording": {
+            "exists": false
+          },
+          "Shortcut_translateRecording_cleared": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "specialShortcutDoubleShiftTapInterval": {
+            "cfTypeID": 22,
+            "exists": true,
+            "numberEncoding": "q",
+            "value": 0
+          }
+        },
+        "phase": "after-launch",
+        "synchronized": true,
+        "version": 1
+      },
+      {
+        "keys": {
+          "hotkeyMode1": {
+            "exists": false
+          },
+          "hotkeyMode2": {
+            "exists": false
+          },
+          "isMiddleClickToggleEnabled": {
+            "exists": false
+          },
+          "primaryRecordingShortcut": {
+            "cfTypeID": 7,
+            "exists": true,
+            "value": "custom"
+          },
+          "primaryRecordingShortcutMode": {
+            "exists": false
+          },
+          "secondaryRecordingShortcut": {
+            "exists": false
+          },
+          "secondaryRecordingShortcutMode": {
+            "exists": false
+          },
+          "selectedHotkey1": {
+            "exists": false
+          },
+          "selectedHotkey2": {
+            "exists": false
+          },
+          "Shortcut_draftRecording": {
+            "exists": false
+          },
+          "Shortcut_draftRecording_cleared": {
+            "exists": false
+          },
+          "Shortcut_LegacyCustomRecordingShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_LegacyKeyboardShortcutsMigrated": {
+            "cfTypeID": 21,
+            "exists": true,
+            "numberEncoding": "c",
+            "value": true
+          },
+          "Shortcut_openHistoryWindow": {
+            "exists": false
+          },
+          "Shortcut_openHistoryWindow_cleared": {
+            "exists": false
+          },
+          "Shortcut_pasteLastEnhancement": {
+            "exists": false
+          },
+          "Shortcut_pasteLastEnhancement_cleared": {
+            "exists": false
+          },
+          "Shortcut_pasteLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_pasteLastTranscription_cleared": {
+            "exists": false
+          },
+          "Shortcut_primaryRecording": {
+            "cfTypeID": 20,
+            "dataBytes": 67,
+            "exists": true
+          },
+          "Shortcut_primaryRecording_cleared": {
+            "exists": false
+          },
+          "Shortcut_quickAddToDictionary": {
+            "exists": false
+          },
+          "Shortcut_quickAddToDictionary_cleared": {
+            "exists": false
+          },
+          "Shortcut_retryLastTranscription": {
+            "exists": false
+          },
+          "Shortcut_retryLastTranscription_cleared": {
+            "exists": false
+          },
+          "Shortcut_rewriteSelectionRecording": {
+            "exists": false
+          },
+          "Shortcut_rewriteSelectionRecording_cleared": {
+            "exists": false
+          },
+          "Shortcut_secondaryRecording": {
+            "exists": false
+          },
+          "Shortcut_secondaryRecording_cleared": {
+            "exists": false
+          },
+          "Shortcut_translateRecording": {
+            "exists": false
+          },
+          "Shortcut_translateRecording_cleared": {
+            "exists": false
+          },
+          "specialShortcutDoubleShiftTapInterval": {
+            "exists": false
+          }
+        },
+        "phase": "restored",
+        "synchronized": true,
+        "version": 1
+      }
+    ]
+  },
+  "screenshots": [
+    {
+      "name": "None dictation cleanup persisted after relaunch",
+      "file": "none-profile-persisted.png",
+      "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~sIdAkKvrTZDhgUSfU-LRFMgAkULULHKRNRBV8sOlTufIiY7cXMrZivpAqPPMzAqpT_SH6tY9cza3MVUgomTyrQ==",
+      "bytes": 259629,
+      "sha256": "2aafb0b01b1070868bfbdb9f683a58088ac69991c5fc86705b151c57dd4f9fac"
+    },
+    {
+      "name": "Prompt editor unsaved native sheet",
+      "file": "prompt-editor-unsaved.png",
+      "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~-BD53JRsyxiHzfscFlr3GboaOl9TQTx2LSGYBJkklCjaZCtSDqCYtzFY9RcM3a7mK4iHpFHsgrbpU5rzABLV8w==",
+      "bytes": 217805,
+      "sha256": "fda775e811ab12e1809dc090939be300d2543e2abacf5144816282a9bf826d98"
+    }
+  ],
+  "limits": [
+    "Census JSON records redacted property type/presence and byte lengths; equality here is diagnostic-shape equality, not a raw value-byte census.",
+    "Passed UI assertions additionally enforce owned shortcut restoration using their pinned fixture implementation.",
+    "Screenshots show this exact foundation head, not later Light/Clarity views."
+  ]
+}

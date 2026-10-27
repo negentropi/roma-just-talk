@@ -1,0 +1,258 @@
+[
+  {
+    "identifier": "VoiceInkTests/liveDictationMetadataPersistentStoreUpgrade()",
+    "status": "Skipped",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~2FoBH5OlPhOIIVEeGL5pfIpwRSD4CzgDw9lJaWTvwqDiJfgwfn2iOQ9bD5M87Lh_oG_3CN8ujkRn55n3oczuxA==",
+    "decoded_summary_sha256": "fb3631d35ba66fa70a7308da768378a4a26e2b18df65c9e4e424fcd20e18752a",
+    "skip_notice": {
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/DictationMetadataStoreLiveTests.swift",
+      "lineNumber": "10",
+      "message": "Test skipped",
+      "timestamp": "2026-10-27T21:07:59.576+0000"
+    },
+    "documentation": [
+      {
+        "_n": "Array"
+      },
+      {
+        "content": "Requires macOS 15",
+        "format": "plain"
+      }
+    ],
+    "declared_source_gate": {
+      "path": "VoiceInkTests/DictationMetadataStoreLiveTests.swift",
+      "line": 9,
+      "text": "    @Test(.enabled(if: DictationMetadataStoreCheck.isEnabled), .timeLimit(.minutes(2)))\n    @MainActor func liveDictationMetadataPersistentStoreUpgrade() async throws {",
+      "source_sha256": "d6c22e6adccc8f8defe6355d53f5f9a186d6827a6c9a92ba2dd12a19da10a1c0",
+      "interpretation": "The retained runtime summary says Test skipped. This pinned declaration records the enabling condition; it is not a separate runtime environment readback."
+    }
+  },
+  {
+    "identifier": "VoiceInkTests/liveNoneProfileImportQueueUsesRealWhisperRecognition()",
+    "status": "Skipped",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~zhfoVnMctU_GxcKOCGSdin2cMGnsPE2qPKlkqQOKh4II06rWxYzd_oL9n2_9Jk9D4vUrAP7BIyLeBWU2K9GHuA==",
+    "decoded_summary_sha256": "bad3937a69d82744259272f14aa3cf5437ed442f99ce2e472ebff5811026d4ec",
+    "skip_notice": {
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/DictationProfileImportLiveTests.swift",
+      "lineNumber": "10",
+      "message": "Test skipped",
+      "timestamp": "2026-10-27T21:07:59.769+0000"
+    },
+    "documentation": null,
+    "declared_source_gate": {
+      "path": "VoiceInkTests/DictationProfileImportLiveTests.swift",
+      "line": 9,
+      "text": "    @Test(.enabled(if: NoneProfileImportInputs.isEnabled), .timeLimit(.minutes(10)))\n    @MainActor func liveNoneProfileImportQueueUsesRealWhisperRecognition() async throws {",
+      "source_sha256": "6b2f84761c7a0defed6b50102f9953511b53bcabc83b36ea25c18bc1e9580f02",
+      "interpretation": "The retained runtime summary says Test skipped. This pinned declaration records the enabling condition; it is not a separate runtime environment readback."
+    }
+  },
+  {
+    "identifier": "VoiceInkTests/liveDictationPersistentStoreSeedControl()",
+    "status": "Skipped",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~QqkAZ4s5D26D3H6UqP3RIbIKQhmUYSjbqJ9OHIrAPrT55iYuHfgVr-6WCwqlUuX1wquj0xzdpy7ZJWmq1kquvQ==",
+    "decoded_summary_sha256": "6ccc9373a2c23447f24c2e159511eb83486aa17b88fdc67c0a750fd6282276af",
+    "skip_notice": {
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/DictationStoreSeedLiveTests.swift",
+      "lineNumber": "11",
+      "message": "Test skipped",
+      "timestamp": "2026-10-27T21:08:00.307+0000"
+    },
+    "documentation": [
+      {
+        "_n": "Array"
+      },
+      {
+        "content": "Requires macOS 15",
+        "format": "plain"
+      }
+    ],
+    "declared_source_gate": {
+      "path": "VoiceInkTests/DictationStoreSeedLiveTests.swift",
+      "line": 10,
+      "text": "    @Test(.enabled(if: DictationStoreSeedInputs.isEnabled), .timeLimit(.minutes(2)))\n    @MainActor func liveDictationPersistentStoreSeedControl() async throws {",
+      "source_sha256": "cdd61d3e67b96371944d2d59bb41b3313e38fc6116bfda41cf04321352d4acc5",
+      "interpretation": "The retained runtime summary says Test skipped. This pinned declaration records the enabling condition; it is not a separate runtime environment readback."
+    }
+  },
+  {
+    "identifier": "VoiceInkTests/writingProviderTranslatesJapaneseToEnglish()",
+    "status": "Skipped",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~JKI2YEVj0V9J4gkWVwb29Bw-Xqgg39xNDPwhMqIKRFVKXTVNWxQTLqgMkZjPqLHqHp3ZjZ9P-nAX8lSTTSMV2w==",
+    "decoded_summary_sha256": "93b10a7ca3b43b37adab638064b0685e433372526a704135609b9d505bbc0c92",
+    "skip_notice": {
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingActionProviderTests.swift",
+      "lineNumber": "30",
+      "message": "Test skipped",
+      "timestamp": "2026-10-27T21:08:11.677+0000"
+    },
+    "documentation": null,
+    "declared_source_gate": {
+      "path": "VoiceInkTests/WritingActionProviderTests.swift",
+      "line": 29,
+      "text": "    @Test(.enabled(if: WritingProviderEnvironment.isEnabled))\n    @MainActor func writingProviderTranslatesJapaneseToEnglish() async throws {",
+      "source_sha256": "556f37d74d40eeb1ed8fce8b2e2183e022a5a16222952c1d469a04b1580bda4c",
+      "interpretation": "The retained runtime summary says Test skipped. This pinned declaration records the enabling condition; it is not a separate runtime environment readback."
+    }
+  },
+  {
+    "identifier": "VoiceInkTests/writingProviderTranslatesEnglishToTraditionalChinese()",
+    "status": "Skipped",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~Xrh_3-PWv3jjsH9lKuSi6U0MDRcuwqfdJIo32UWGQDVugqijbtuhIlJWD40B8axQ0YL9pvAlgAvdEbTmRHCTUg==",
+    "decoded_summary_sha256": "62056ef3ca2b6d195414c7c00f811de7c4bc2bede98dd72a9662fe184c89324c",
+    "skip_notice": {
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingActionProviderTests.swift",
+      "lineNumber": "35",
+      "message": "Test skipped",
+      "timestamp": "2026-10-27T21:08:11.680+0000"
+    },
+    "documentation": null,
+    "declared_source_gate": {
+      "path": "VoiceInkTests/WritingActionProviderTests.swift",
+      "line": 34,
+      "text": "    @Test(.enabled(if: WritingProviderEnvironment.isEnabled))\n    @MainActor func writingProviderTranslatesEnglishToTraditionalChinese() async throws {",
+      "source_sha256": "556f37d74d40eeb1ed8fce8b2e2183e022a5a16222952c1d469a04b1580bda4c",
+      "interpretation": "The retained runtime summary says Test skipped. This pinned declaration records the enabling condition; it is not a separate runtime environment readback."
+    }
+  },
+  {
+    "identifier": "VoiceInkTests/writingProviderRewritesTheSuppliedSelection()",
+    "status": "Skipped",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~Vhpzw7rb56NOPU-KyzbZbRrYe8J3cGaYByAJBWPJnhe6I38pgxvo5b4Nw4tFjZjPoXQCb31Jy2FLJp1D2aEeTQ==",
+    "decoded_summary_sha256": "a81816c31126c5c6ad7a75778d3a2704e9c58e9032e1850274d0bd824c5c389e",
+    "skip_notice": {
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingActionProviderTests.swift",
+      "lineNumber": "40",
+      "message": "Test skipped",
+      "timestamp": "2026-10-27T21:08:11.687+0000"
+    },
+    "documentation": null,
+    "declared_source_gate": {
+      "path": "VoiceInkTests/WritingActionProviderTests.swift",
+      "line": 39,
+      "text": "    @Test(.enabled(if: WritingProviderEnvironment.isEnabled))\n    @MainActor func writingProviderRewritesTheSuppliedSelection() async throws {",
+      "source_sha256": "556f37d74d40eeb1ed8fce8b2e2183e022a5a16222952c1d469a04b1580bda4c",
+      "interpretation": "The retained runtime summary says Test skipped. This pinned declaration records the enabling condition; it is not a separate runtime environment readback."
+    }
+  },
+  {
+    "identifier": "VoiceInkTests/liveWritingTargetTextEditPreservesUnicodeOutsideSelection()",
+    "status": "Skipped",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~82lRqp_h9XHvtEszDj9Phx8H_opWnlfNoGkjQMs3LIiVFu-DB0zqc8hXDV4Lr5o-WI0DSb0nWFcxu4d3miSppg==",
+    "decoded_summary_sha256": "3811597834f21c9dc5da360cf501fa6d28fd608718a2434b735f337c1a437f8d",
+    "skip_notice": {
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingTargetLiveTests.swift",
+      "lineNumber": "11",
+      "message": "Test skipped",
+      "timestamp": "2026-10-27T21:08:11.691+0000"
+    },
+    "documentation": null,
+    "declared_source_gate": {
+      "path": "VoiceInkTests/WritingTargetLiveTests.swift",
+      "line": 10,
+      "text": "    @Test(.enabled(if: LiveWritingEditor.isEnabled))\n    @MainActor func liveWritingTargetTextEditPreservesUnicodeOutsideSelection() async throws {",
+      "source_sha256": "14f50537b5059809771a63f8baa536475ba47f3e1091f45f1d873fe5808edfbd",
+      "interpretation": "The retained runtime summary says Test skipped. This pinned declaration records the enabling condition; it is not a separate runtime environment readback."
+    }
+  },
+  {
+    "identifier": "VoiceInkTests/liveWritingTargetTextEditRefusesRangeTextAndFocusDrift()",
+    "status": "Skipped",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~nJZE-tk3Lezt3W2z7yV9kiq5PSQg73sgnzQjqrZtmvVNJt7kmNgQOh0tbs5bsiDerBvViZkS4dtrSRW1OrnD8Q==",
+    "decoded_summary_sha256": "df25f2e4d0c0e36090b77c6d872936b998f82cbd4597d40bc61e2eb524e82533",
+    "skip_notice": {
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingTargetLiveTests.swift",
+      "lineNumber": "27",
+      "message": "Test skipped",
+      "timestamp": "2026-10-27T21:08:11.694+0000"
+    },
+    "documentation": null,
+    "declared_source_gate": {
+      "path": "VoiceInkTests/WritingTargetLiveTests.swift",
+      "line": 26,
+      "text": "    @Test(.enabled(if: LiveWritingEditor.isEnabled))\n    @MainActor func liveWritingTargetTextEditRefusesRangeTextAndFocusDrift() async throws {",
+      "source_sha256": "14f50537b5059809771a63f8baa536475ba47f3e1091f45f1d873fe5808edfbd",
+      "interpretation": "The retained runtime summary says Test skipped. This pinned declaration records the enabling condition; it is not a separate runtime environment readback."
+    }
+  },
+  {
+    "identifier": "VoiceInkTests/liveWritingTargetSafariTextareaReplacesOnlySelection()",
+    "status": "Skipped",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~89C5gkN0ZrngONwAeAnoqkBDQ79sSsfbeFu_qRn4dw1Eoy-RHxjeqyxNsFj-VydQLyf2Vy-ROxP_THPg4tB7fw==",
+    "decoded_summary_sha256": "62131c25573300f67f9c8e14b3c5ee2f00308c16c5ac0118bc65cb40766a2a29",
+    "skip_notice": {
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingTargetLiveTests.swift",
+      "lineNumber": "61",
+      "message": "Test skipped",
+      "timestamp": "2026-10-27T21:08:11.700+0000"
+    },
+    "documentation": null,
+    "declared_source_gate": {
+      "path": "VoiceInkTests/WritingTargetLiveTests.swift",
+      "line": 60,
+      "text": "    @Test(.enabled(if: LiveWritingEditor.isEnabled))\n    @MainActor func liveWritingTargetSafariTextareaReplacesOnlySelection() async throws {",
+      "source_sha256": "14f50537b5059809771a63f8baa536475ba47f3e1091f45f1d873fe5808edfbd",
+      "interpretation": "The retained runtime summary says Test skipped. This pinned declaration records the enabling condition; it is not a separate runtime environment readback."
+    }
+  },
+  {
+    "identifier": "VoiceInkTests/liveWritingActionPipelineUsesLocalCLIAndRetainsFailure()",
+    "status": "Skipped",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~-tjRG5hKtcPl0dyjdK1JfclkqHfI4-go10DhupiDMVQcdcJ7U1BPxrESfrf1oRzRRtZhjELxRxTajsqynDQQiQ==",
+    "decoded_summary_sha256": "33d1078817795c3d48ea3e080315cf4e41b456573f1e1a07be479294276482ae",
+    "skip_notice": {
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingTargetLiveTests.swift",
+      "lineNumber": "81",
+      "message": "Test skipped",
+      "timestamp": "2026-10-27T21:08:11.709+0000"
+    },
+    "documentation": null,
+    "declared_source_gate": {
+      "path": "VoiceInkTests/WritingTargetLiveTests.swift",
+      "line": 80,
+      "text": "    @Test(.enabled(if: LiveWritingEditor.isEnabled))\n    @MainActor func liveWritingActionPipelineUsesLocalCLIAndRetainsFailure() async throws {",
+      "source_sha256": "14f50537b5059809771a63f8baa536475ba47f3e1091f45f1d873fe5808edfbd",
+      "interpretation": "The retained runtime summary says Test skipped. This pinned declaration records the enabling condition; it is not a separate runtime environment readback."
+    }
+  },
+  {
+    "identifier": "VoiceInkTests/liveWritingStartupContextRespectsOwnerAfterCancellation()",
+    "status": "Skipped",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~ynd6o_-cJoyKvhXd84opDB1ubvypK_A2QC0JAozO_GtDBlztr0yRf4JLXLQEMfyFjjo9NbUe1msdn2rYl5AbtQ==",
+    "decoded_summary_sha256": "1d851bcc680265ef80c2e105593628237604219c43d632cc9da24a486ec0dd4a",
+    "skip_notice": {
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingTargetLiveTests.swift",
+      "lineNumber": "99",
+      "message": "Test skipped",
+      "timestamp": "2026-10-27T21:08:11.714+0000"
+    },
+    "documentation": null,
+    "declared_source_gate": {
+      "path": "VoiceInkTests/WritingTargetLiveTests.swift",
+      "line": 98,
+      "text": "    @Test(.enabled(if: LiveWritingEditor.isEnabled))\n    @MainActor func liveWritingStartupContextRespectsOwnerAfterCancellation() async throws {",
+      "source_sha256": "14f50537b5059809771a63f8baa536475ba47f3e1091f45f1d873fe5808edfbd",
+      "interpretation": "The retained runtime summary says Test skipped. This pinned declaration records the enabling condition; it is not a separate runtime environment readback."
+    }
+  },
+  {
+    "identifier": "VoiceInkTests/liveDictationProfileKeepsContextEligibilityAcrossPreferenceChanges()",
+    "status": "Skipped",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~MdfQ6UrQfdJ34PRS0Vy3A5DrcRYmxD47dIecKlBiJhIS7bC8rxKtx3JD1redSr0I7HFmb2EYGhQ2F9HFe1rhvQ==",
+    "decoded_summary_sha256": "8d5bb197dc063acc930326bd1479518c9e1f57bd185d562cd4033d4a9fff66e9",
+    "skip_notice": {
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingTargetLiveTests.swift",
+      "lineNumber": "121",
+      "message": "Test skipped",
+      "timestamp": "2026-10-27T21:08:11.718+0000"
+    },
+    "documentation": null,
+    "declared_source_gate": {
+      "path": "VoiceInkTests/WritingTargetLiveTests.swift",
+      "line": 120,
+      "text": "    @Test(.enabled(if: LiveWritingEditor.isEnabled))\n    @MainActor func liveDictationProfileKeepsContextEligibilityAcrossPreferenceChanges() async throws {",
+      "source_sha256": "14f50537b5059809771a63f8baa536475ba47f3e1091f45f1d873fe5808edfbd",
+      "interpretation": "The retained runtime summary says Test skipped. This pinned declaration records the enabling condition; it is not a separate runtime environment readback."
+    }
+  }
+]

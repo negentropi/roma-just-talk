@@ -1,0 +1,137 @@
+{
+  "run_id": 40581988482,
+  "outer_artifact": {
+    "path": "/data/rjt-writing-check-01a17bef/40581988482/app-artifact.zip",
+    "bytes": 32106477,
+    "sha256": "f44bdf8a9a833957545034eb6568cd54372cd7a161337f103e80932c5290f998",
+    "zip_crc_verified": true
+  },
+  "inner_archive": {
+    "member": "roma.just.talk.app.zip",
+    "bytes": 32603130,
+    "sha256": "af75980038f2c80fc898d4b754f67e2b2c97d8a3aa7e64911debb9db897bd2f4",
+    "matches_recorded_packaging_hash": true,
+    "zip_crc_verified": true,
+    "members": 370
+  },
+  "app": {
+    "info_plist_member": "roma just talk.app/Contents/Info.plist",
+    "info_plist_sha256": "75ffa1c1abd832e8e567a4d2f8eadb163d236d38a7489bdc462e33826314de3f",
+    "bundle_identifier": "com.negentropi.RomaJustTalk",
+    "executable": "roma just talk",
+    "version": "1.95.1",
+    "build": "195.1",
+    "main_binary_member": "roma just talk.app/Contents/MacOS/roma just talk",
+    "main_binary_bytes": 104443360,
+    "main_binary_sha256": "0429ed8bde75807662985630d3f54c3eb53387398787045302f32995acf41737",
+    "mach_o_files": [
+      {
+        "member": "roma just talk.app/Contents/MacOS/roma just talk",
+        "bytes": 104443360,
+        "sha256": "0429ed8bde75807662985630d3f54c3eb53387398787045302f32995acf41737",
+        "magic": "cffaedfe"
+      },
+      {
+        "member": "roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/B/Autoupdate",
+        "bytes": 709584,
+        "sha256": "a8146503744b189717a16dd331e507109179b6dfeb01237c8ba6ee0ca7db6b26",
+        "magic": "cafebabe"
+      },
+      {
+        "member": "roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/B/Updater.app/Contents/MacOS/Updater",
+        "bytes": 290560,
+        "sha256": "310933f1f233d61fcbd8234d799250bea1cadc7824b60bfd4d36ef5d0bceb736",
+        "magic": "cafebabe"
+      },
+      {
+        "member": "roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Downloader.xpc/Contents/MacOS/Downloader",
+        "bytes": 172240,
+        "sha256": "8caaba0d77fc58b903d59640e5fde9841925f095283cb456b2c26b5714d09433",
+        "magic": "cafebabe"
+      },
+      {
+        "member": "roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Installer.xpc/Contents/MacOS/Installer",
+        "bytes": 223472,
+        "sha256": "f5bd39c2e771bcd099613b7df9cea648b7b6be3247756122cf33e96cc575aacd",
+        "magic": "cafebabe"
+      },
+      {
+        "member": "roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/B/Sparkle",
+        "bytes": 977616,
+        "sha256": "c928f1725dd91a7218dbe971ecc7fddc238a782092c8bec56701f099ba58ee49",
+        "magic": "cafebabe"
+      },
+      {
+        "member": "roma just talk.app/Contents/Frameworks/libswiftCompatibilitySpan.dylib",
+        "bytes": 187856,
+        "sha256": "0ab6d0b0f7c61ca9cd2eadea1ca356baae20e28e99588e8d1692146d4cddd539",
+        "magic": "cafebabe"
+      },
+      {
+        "member": "roma just talk.app/Contents/Frameworks/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+        "bytes": 280688,
+        "sha256": "5c71c9da0c20c04e0b071cdfdaf88f2f4aeb0f84ca2d8ae87ffdf97cbdde2598",
+        "magic": "cffaedfe"
+      }
+    ],
+    "main_binary_signature_structure": {
+      "parsed": true,
+      "cryptographic_verification_here": false,
+      "lc_code_signature_offset": 104220208,
+      "lc_code_signature_bytes": 223152,
+      "superblob_sha256": "43c9f556716e44ea19957a0727cd664db621e1bcc74733c3505cf72e8da50e7a",
+      "slots": [
+        {
+          "slot": 0,
+          "magic": "0xfade0c02",
+          "bytes": 203932,
+          "sha256": "b943cc5005077cfaf9b856e3d83d3bce1a7f127f8d212c2b408389446de307bb",
+          "code_directory_version": 132352,
+          "flags": "0x10002",
+          "ad_hoc_flag": true,
+          "hardened_runtime_flag": true
+        },
+        {
+          "slot": 2,
+          "magic": "0xfade0c01",
+          "bytes": 12,
+          "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986"
+        },
+        {
+          "slot": 5,
+          "magic": "0xfade7171",
+          "bytes": 732,
+          "sha256": "61c4122bdfe4808ee79645c80c9a090d3d32a973e907a154873e1da3df53fb0f",
+          "xml_entitlements": {
+            "com.apple.security.app-sandbox": false,
+            "com.apple.security.automation.apple-events": true,
+            "com.apple.security.cs.disable-library-validation": true,
+            "com.apple.security.device.audio-input": true,
+            "com.apple.security.files.user-selected.read-only": true,
+            "com.apple.security.get-task-allow": true,
+            "com.apple.security.network.client": true,
+            "com.apple.security.network.server": true,
+            "com.apple.security.screen-capture": true
+          }
+        },
+        {
+          "slot": 7,
+          "magic": "0xfade7172",
+          "bytes": 419,
+          "sha256": "ec737736db19f736fb1c96ee024c998d43b6da6b3b6873903b45f59a7b7eae23"
+        },
+        {
+          "slot": 65536,
+          "magic": "0xfade0b01",
+          "bytes": 8,
+          "sha256": "e6c83bc98a10348492c7d4d2378a54572ef29e1a5692ccd02b5e29f4b762d6a0"
+        }
+      ]
+    }
+  },
+  "limits": [
+    "This Linux audit verifies archive hashes/CRCs, app metadata and embedded signature structure. It does not execute the app or independently perform Apple codesign/Gatekeeper validation.",
+    "Exact-head CI Release step and retained build log provide the native signing/packaging contract checks.",
+    "No notarization, publishing or installed runtime claim."
+  ]
+}

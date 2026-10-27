@@ -1,0 +1,228 @@
+{
+  "run_id": 40581988482,
+  "head_sha": "3ada8372711c0d9a484087ea3e3300e4fac0afba",
+  "mapping_sha256": "05fbb97391b64f72fbc3292f402248b0819b78c1a20dfd590b6b014364e9fc70",
+  "unit_groups": {
+    "DictationPostprocessingPlanTests": {
+      "required": 12,
+      "single_successful_records": 12,
+      "records": [
+        {
+          "identifier": "VoiceInkTests/DictationPostprocessingPlanTests/customDefersAndNonePreservesEveryCodeUnit()",
+          "status": "Success"
+        },
+        {
+          "identifier": "VoiceInkTests/DictationPostprocessingPlanTests/entireSnippetWinsOverBothPreparationFailures()",
+          "status": "Success"
+        },
+        {
+          "identifier": "VoiceInkTests/DictationPostprocessingPlanTests/lightUsesOnlyWholeUtteranceSnippetsAndThenCapturedRules()",
+          "status": "Success"
+        },
+        {
+          "identifier": "VoiceInkTests/DictationPostprocessingPlanTests/dictionarySnapshotIsFreshAndDoesNotChangeTheCustomCache()",
+          "status": "Success"
+        },
+        {
+          "identifier": "VoiceInkTests/DictationPostprocessingPlanTests/capturedLibrariesSurviveLaterEditsAndCacheReplacement()",
+          "status": "Success"
+        },
+        {
+          "identifier": "VoiceInkTests/DictationPostprocessingPlanTests/clarityUsesFrozenStyleProviderAndPreparedTextWithoutFiltering()",
+          "status": "Success"
+        },
+        {
+          "identifier": "VoiceInkTests/DictationPostprocessingPlanTests/sameNonblankClarityKeepsMetadataWhileBlankRecognitionSkipsProcessing()",
+          "status": "Success"
+        },
+        {
+          "identifier": "VoiceInkTests/DictationPostprocessingPlanTests/preparationAndProviderErrorsFallBackToUntouchedRecognition()",
+          "status": "Success"
+        },
+        {
+          "identifier": "VoiceInkTests/DictationPostprocessingPlanTests/libraryFailureDoesNotRunClarityAndDoesNotReturnPartialLightText()",
+          "status": "Success"
+        },
+        {
+          "identifier": "VoiceInkTests/DictationPostprocessingPlanTests/cancellationBeforeProcessingDoesNotExecuteTheProvider()",
+          "status": "Success"
+        },
+        {
+          "identifier": "VoiceInkTests/DictationPostprocessingPlanTests/cancellationAfterProviderAwaitRejectsLateSuccessAndWrappedFailure()",
+          "status": "Success"
+        },
+        {
+          "identifier": "VoiceInkTests/DictationPostprocessingPlanTests/providerCancellationAndOwnerCancellationNeverBecomeFallback()",
+          "status": "Success"
+        }
+      ]
+    },
+    "ClarityProviderTests": {
+      "required": 7,
+      "single_successful_records": 7,
+      "records": [
+        {
+          "identifier": "VoiceInkTests/ClarityProviderTests/clarityPreservesLiteralProviderJSONAndCodeUnits()",
+          "status": "Success"
+        },
+        {
+          "identifier": "VoiceInkTests/ClarityProviderTests/claritySameOutputRetainsCapturedRequestMetadata()",
+          "status": "Success"
+        },
+        {
+          "identifier": "VoiceInkTests/ClarityProviderTests/clarityRejectsMalformedAndBlankProviderResponses()",
+          "status": "Success"
+        },
+        {
+          "identifier": "VoiceInkTests/ClarityProviderTests/claritySnapshotKeepsCapturedCLICommandAndProvider()",
+          "status": "Success"
+        },
+        {
+          "identifier": "VoiceInkTests/ClarityProviderTests/claritySnapshotKeepsCapturedCLITimeout()",
+          "status": "Success"
+        },
+        {
+          "identifier": "VoiceInkTests/ClarityProviderTests/writingActionsRetainLegacyFilteringAndEmptyPolicies()",
+          "status": "Success"
+        },
+        {
+          "identifier": "VoiceInkTests/ClarityProviderTests/clarityCancellationDoesNotReturnLateOutput()",
+          "status": "Success"
+        }
+      ]
+    },
+    "LocalCLIServiceTests": {
+      "required": 10,
+      "single_successful_records": 10,
+      "records": [
+        {
+          "identifier": "VoiceInkTests/LocalCLIServiceLifetimeTests/canceledBeforeInvocationDoesNotLaunchACommand()",
+          "status": "Success"
+        },
+        {
+          "identifier": "VoiceInkTests/LocalCLIServiceLifetimeTests/cancellationDuringBlockedInputStopsOnlyItsOwnedRequest()",
+          "status": "Success"
+        },
+        {
+          "identifier": "VoiceInkTests/LocalCLIServiceLifetimeTests/largeInputAndBothOutputPipesCompleteWithoutDeadlock()",
+          "status": "Success"
+        },
+        {
+          "identifier": "VoiceInkTests/LocalCLIServiceLifetimeTests/timeoutIncludesBlockedInputAndEndsItsOwnedChild()",
+          "status": "Success"
+        },
+        {
+          "identifier": "VoiceInkTests/LocalCLIServiceLifetimeTests/cancellationAndExitRacesLeaveLaterRequestsUsable()",
+          "status": "Success"
+        },
+        {
+          "identifier": "VoiceInkTests/LocalCLIServiceLifetimeTests/cancellationEndsATermIgnoringOwnedChild()",
+          "status": "Success"
+        },
+        {
+          "identifier": "VoiceInkTests/LocalCLIServiceConfigurationTests/capturedConfigurationPreservesCommandAndTimeoutWithoutPreferenceWrites()",
+          "status": "Success"
+        },
+        {
+          "identifier": "VoiceInkTests/LocalCLIServiceConfigurationTests/rawExecutionPreservesLiteralOutputAndLegacyEnhanceKeepsItsPolicies()",
+          "status": "Success"
+        },
+        {
+          "identifier": "VoiceInkTests/LocalCLIServiceConfigurationTests/earlyChildExitWithLargeInputDoesNotBreakRawOrLegacyRequests()",
+          "status": "Success"
+        },
+        {
+          "identifier": "VoiceInkTests/LocalCLIServiceConfigurationTests/nulCommandAndPromptsRefuseBothEntryPointsBeforeLaunch()",
+          "status": "Success"
+        }
+      ]
+    }
+  },
+  "native_records": [
+    {
+      "identifier": "VoiceInkTests/liveWritingTargetTextEditPreservesUnicodeOutsideSelection()",
+      "status": "Success"
+    },
+    {
+      "identifier": "VoiceInkTests/liveWritingTargetTextEditRefusesRangeTextAndFocusDrift()",
+      "status": "Success"
+    },
+    {
+      "identifier": "VoiceInkTests/liveWritingTargetSafariTextareaReplacesOnlySelection()",
+      "status": "Success"
+    },
+    {
+      "identifier": "VoiceInkTests/liveWritingActionPipelineUsesLocalCLIAndRetainsFailure()",
+      "status": "Success"
+    },
+    {
+      "identifier": "VoiceInkTests/liveWritingStartupContextRespectsOwnerAfterCancellation()",
+      "status": "Success"
+    },
+    {
+      "identifier": "VoiceInkTests/liveDictationProfileKeepsContextEligibilityAcrossPreferenceChanges()",
+      "status": "Success"
+    }
+  ],
+  "metadata_record": {
+    "identifier": "VoiceInkTests/liveDictationMetadataPersistentStoreUpgrade()",
+    "status": "Skipped"
+  },
+  "metadata_proof_in_this_full_run": false,
+  "all_actual_unit_skips": [
+    {
+      "identifier": "VoiceInkTests/liveDictationMetadataPersistentStoreUpgrade()",
+      "status": "Skipped"
+    },
+    {
+      "identifier": "VoiceInkTests/liveNoneProfileImportQueueUsesRealWhisperRecognition()",
+      "status": "Skipped"
+    },
+    {
+      "identifier": "VoiceInkTests/liveDictationPersistentStoreSeedControl()",
+      "status": "Skipped"
+    },
+    {
+      "identifier": "VoiceInkTests/writingProviderTranslatesJapaneseToEnglish()",
+      "status": "Skipped"
+    },
+    {
+      "identifier": "VoiceInkTests/writingProviderTranslatesEnglishToTraditionalChinese()",
+      "status": "Skipped"
+    },
+    {
+      "identifier": "VoiceInkTests/writingProviderRewritesTheSuppliedSelection()",
+      "status": "Skipped"
+    },
+    {
+      "identifier": "VoiceInkTests/liveWritingTargetTextEditPreservesUnicodeOutsideSelection()",
+      "status": "Skipped"
+    },
+    {
+      "identifier": "VoiceInkTests/liveWritingTargetTextEditRefusesRangeTextAndFocusDrift()",
+      "status": "Skipped"
+    },
+    {
+      "identifier": "VoiceInkTests/liveWritingTargetSafariTextareaReplacesOnlySelection()",
+      "status": "Skipped"
+    },
+    {
+      "identifier": "VoiceInkTests/liveWritingActionPipelineUsesLocalCLIAndRetainsFailure()",
+      "status": "Skipped"
+    },
+    {
+      "identifier": "VoiceInkTests/liveWritingStartupContextRespectsOwnerAfterCancellation()",
+      "status": "Skipped"
+    },
+    {
+      "identifier": "VoiceInkTests/liveDictationProfileKeepsContextEligibilityAcrossPreferenceChanges()",
+      "status": "Skipped"
+    }
+  ],
+  "all_17_captured_paste_cases_passed": true,
+  "limits": [
+    "The metadata gate status is retained separately; a skip does not prove migration.",
+    "Required records come from decoded aggregate summaries, not method declaration counts or workflow color.",
+    "These provider fixtures are deterministic process/control-flow checks, not semantic quality proof."
+  ]
+}

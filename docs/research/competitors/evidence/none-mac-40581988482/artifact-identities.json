@@ -1,0 +1,80 @@
+{
+  "artifacts": [
+    {
+      "created_at": "2026-10-27T21:45:46Z",
+      "digest": "sha256:66bce8bb3f3d069e1fbb06c85f922fb1fdc013be1a2f7044cf30e494d34b558f",
+      "expired": false,
+      "id": 12773591114,
+      "name": "roma.writing-actions-screenshots",
+      "size_in_bytes": 3633825,
+      "workflow_run": {
+        "head_branch": "ci/rjt-writing-check-none-01a17bef",
+        "head_repository_id": 1253985786,
+        "head_sha": "3ada8372711c0d9a484087ea3e3300e4fac0afba",
+        "id": 40581988482,
+        "repository_id": 1253985786
+      }
+    },
+    {
+      "created_at": "2026-10-27T21:45:44Z",
+      "digest": "sha256:935fd2f5248b19decf0dfceeb7dea66cc1d571dc9541f198fca91e3d0f5d2248",
+      "expired": false,
+      "id": 12773291422,
+      "name": "roma.writing-actions-evidence",
+      "size_in_bytes": 302875445,
+      "workflow_run": {
+        "head_branch": "ci/rjt-writing-check-none-01a17bef",
+        "head_repository_id": 1253985786,
+        "head_sha": "3ada8372711c0d9a484087ea3e3300e4fac0afba",
+        "id": 40581988482,
+        "repository_id": 1253985786
+      }
+    },
+    {
+      "created_at": "2026-10-27T21:45:50Z",
+      "digest": "sha256:f44bdf8a9a833957545034eb6568cd54372cd7a161337f103e80932c5290f998",
+      "expired": false,
+      "id": 12773086760,
+      "name": "roma.just.talk.app",
+      "size_in_bytes": 32106477,
+      "workflow_run": {
+        "head_branch": "ci/rjt-writing-check-none-01a17bef",
+        "head_repository_id": 1253985786,
+        "head_sha": "3ada8372711c0d9a484087ea3e3300e4fac0afba",
+        "id": 40581988482,
+        "repository_id": 1253985786
+      }
+    },
+    {
+      "created_at": "2026-10-27T21:21:57Z",
+      "digest": "sha256:34353c49c75c1e8fd0cc95a4fa97d2c4e439b831224b85cf27e811302a309311",
+      "expired": false,
+      "id": 12772207064,
+      "name": "roma.writing-regression-checkpoint",
+      "size_in_bytes": 75772,
+      "workflow_run": {
+        "head_branch": "ci/rjt-writing-check-none-01a17bef",
+        "head_repository_id": 1253985786,
+        "head_sha": "3ada8372711c0d9a484087ea3e3300e4fac0afba",
+        "id": 40581988482,
+        "repository_id": 1253985786
+      }
+    },
+    {
+      "created_at": "2026-10-27T21:10:15Z",
+      "digest": "sha256:1a94f439b7804f7fb330b5f0fc5da1b557cc5995bbcf9210a49dad7049a9f5b0",
+      "expired": false,
+      "id": 12770932030,
+      "name": "roma.writing-live-checkpoint",
+      "size_in_bytes": 42618,
+      "workflow_run": {
+        "head_branch": "ci/rjt-writing-check-none-01a17bef",
+        "head_repository_id": 1253985786,
+        "head_sha": "3ada8372711c0d9a484087ea3e3300e4fac0afba",
+        "id": 40581988482,
+        "repository_id": 1253985786
+      }
+    }
+  ],
+  "total_count": 5
+}

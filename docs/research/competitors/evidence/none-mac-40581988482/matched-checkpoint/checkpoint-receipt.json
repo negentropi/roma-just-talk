@@ -1,0 +1,265 @@
+{
+  "run_id": 40581988482,
+  "head_sha": "3ada8372711c0d9a484087ea3e3300e4fac0afba",
+  "artifact_id": 12772207064,
+  "artifact_bytes": 75772,
+  "artifact_sha256": "34353c49c75c1e8fd0cc95a4fa97d2c4e439b831224b85cf27e811302a309311",
+  "size_digest_and_28_zip_crcs_verified": true,
+  "classification": {
+    "classification": "matched-red-green",
+    "scope": [
+      "literal-snippets",
+      "deferred-permission-callback"
+    ],
+    "stale_startup_catch": "candidate-only coverage",
+    "candidate": "3ada8372711c0d9a484087ea3e3300e4fac0afba",
+    "baseline": "ec7bc1bcf804cb9362e342e4c3f5fbf2dd9b69eb"
+  },
+  "lane_observations": {
+    "baseline": {
+      "result": {
+        "expectation": "known-bad",
+        "exit_code": 65,
+        "tests": {
+          "spokenSnippetPipelineInsertsExactWholeTriggerContentAndSavesIt": "failed",
+          "spokenSnippetPipelinePreservesInlineCapitalsPunctuationAndParagraphs": "failed",
+          "spokenSnippetPipelineLeavesUnmatchedDictationOnItsExistingFormattingPath": "passed"
+        }
+      },
+      "selected_identifiers": [
+        "VoiceInkTests/VoiceInkTests/spokenSnippetPipelineInsertsExactWholeTriggerContentAndSavesIt()",
+        "VoiceInkTests/VoiceInkTests/spokenSnippetPipelinePreservesInlineCapitalsPunctuationAndParagraphs()",
+        "VoiceInkTests/VoiceInkTests/spokenSnippetPipelineLeavesUnmatchedDictationOnItsExistingFormattingPath()"
+      ],
+      "disabled_count": 125,
+      "execution": {
+        "spokenSnippetPipelineInsertsExactWholeTriggerContentAndSavesIt": {
+          "starts": 1,
+          "results": [
+            "failed"
+          ]
+        },
+        "spokenSnippetPipelinePreservesInlineCapitalsPunctuationAndParagraphs": {
+          "starts": 1,
+          "results": [
+            "failed"
+          ]
+        },
+        "spokenSnippetPipelineLeavesUnmatchedDictationOnItsExistingFormattingPath": {
+          "starts": 1,
+          "results": [
+            "passed"
+          ]
+        }
+      },
+      "raw_summary": [
+        [
+          "3",
+          "failed"
+        ]
+      ],
+      "log_sha256": "ba38a56c4f0ec21100f8ebe985795e8f97da513c0e437ad7bf236b2b4c0a81a9",
+      "selection_sha256": "3bba23fb4cebbb1b9a67ecc7533d54b8afb7566d57a7865e0f26c5b7acf5b9d9",
+      "issue_lines": [
+        "✘ Test spokenSnippetPipelineInsertsExactWholeTriggerContentAndSavesIt() recorded an issue at SpokenSnippetPipelineTests.swift:15:9: Expectation failed: (fixture.delivered → [\"UNEXPECTED AI OUTPUT \"]) == [\"\\nFelix C. Order\\nRJT, Inc.\\n\\n\"]",
+        "✘ Test spokenSnippetPipelineInsertsExactWholeTriggerContentAndSavesIt() recorded an issue at SpokenSnippetPipelineTests.swift:16:9: Expectation failed: (fixture.enhancementCalls → 1) == 0",
+        "✘ Test spokenSnippetPipelineInsertsExactWholeTriggerContentAndSavesIt() recorded an issue at SpokenSnippetPipelineTests.swift:17:9: Expectation failed: (record.text → \"my signature\") == \"MY SIGNATURE.\"",
+        "✘ Test spokenSnippetPipelineInsertsExactWholeTriggerContentAndSavesIt() recorded an issue at SpokenSnippetPipelineTests.swift:18:9: Expectation failed: (record.enhancedText → \"UNEXPECTED AI OUTPUT\") == (\"\\nFelix C. Order\\nRJT, Inc.\\n\\n\" → \"",
+        "✘ Test spokenSnippetPipelineInsertsExactWholeTriggerContentAndSavesIt() recorded an issue at SpokenSnippetPipelineTests.swift:22:9: Expectation failed: (saved.first?.enhancedText → \"UNEXPECTED AI OUTPUT\") == (\"\\nFelix C. Order\\nRJT, Inc.\\n\\n\" → \"",
+        "✘ Test spokenSnippetPipelinePreservesInlineCapitalsPunctuationAndParagraphs() recorded an issue at SpokenSnippetPipelineTests.swift:33:9: Expectation failed: (fixture.delivered → [\"UNEXPECTED AI OUTPUT \"]) == [\"Please send First Floor, 10 Main St.\\n\\nTaipei 100 today.\"]",
+        "✘ Test spokenSnippetPipelinePreservesInlineCapitalsPunctuationAndParagraphs() recorded an issue at SpokenSnippetPipelineTests.swift:34:9: Expectation failed: (fixture.enhancementCalls → 1) == 0",
+        "✘ Test spokenSnippetPipelinePreservesInlineCapitalsPunctuationAndParagraphs() recorded an issue at SpokenSnippetPipelineTests.swift:35:9: Expectation failed: (record.text → \"please send my address today\") == \"Please send MY ADDRESS today.\"",
+        "✘ Test spokenSnippetPipelinePreservesInlineCapitalsPunctuationAndParagraphs() recorded an issue at SpokenSnippetPipelineTests.swift:36:9: Expectation failed: (record.enhancedText → \"UNEXPECTED AI OUTPUT\") == (\"Please send First Floor, 10 Main St.\\n\\nTaipei 100 today.\" → \"Please send First Floor, 10 Main St."
+      ]
+    },
+    "candidate": {
+      "result": {
+        "expectation": "fixed",
+        "exit_code": 0,
+        "tests": {
+          "spokenSnippetPipelineInsertsExactWholeTriggerContentAndSavesIt": "passed",
+          "spokenSnippetPipelinePreservesInlineCapitalsPunctuationAndParagraphs": "passed",
+          "spokenSnippetPipelineLeavesUnmatchedDictationOnItsExistingFormattingPath": "passed"
+        }
+      },
+      "selected_identifiers": [
+        "VoiceInkTests/VoiceInkTests/spokenSnippetPipelineInsertsExactWholeTriggerContentAndSavesIt()",
+        "VoiceInkTests/VoiceInkTests/spokenSnippetPipelinePreservesInlineCapitalsPunctuationAndParagraphs()",
+        "VoiceInkTests/VoiceInkTests/spokenSnippetPipelineLeavesUnmatchedDictationOnItsExistingFormattingPath()"
+      ],
+      "disabled_count": 215,
+      "execution": {
+        "spokenSnippetPipelineInsertsExactWholeTriggerContentAndSavesIt": {
+          "starts": 1,
+          "results": [
+            "passed"
+          ]
+        },
+        "spokenSnippetPipelinePreservesInlineCapitalsPunctuationAndParagraphs": {
+          "starts": 1,
+          "results": [
+            "passed"
+          ]
+        },
+        "spokenSnippetPipelineLeavesUnmatchedDictationOnItsExistingFormattingPath": {
+          "starts": 1,
+          "results": [
+            "passed"
+          ]
+        }
+      },
+      "raw_summary": [
+        [
+          "3",
+          "passed"
+        ]
+      ],
+      "log_sha256": "8a6a8f82d468fb1422312f5fbb66c3b08b1203548189a1a17ee97e157781d5e8",
+      "selection_sha256": "6f607532cf5cdc62cc0b0c4793bc60dfb3102ece6c22c1af5ba44b7684316321",
+      "issue_lines": []
+    },
+    "baseline-permission": {
+      "result": {
+        "expectation": "known-bad",
+        "classification": "deferred-permission-callback",
+        "exit_code": 65,
+        "test": {
+          "permissionWaitReservesOneRecordingStart": [
+            "failed"
+          ]
+        },
+        "diagnostics": {
+          "permission_wait_left_state_idle": true,
+          "duplicate_permission_calls": true
+        }
+      },
+      "selected_identifiers": [
+        "VoiceInkTests/WritingActionEngineTests/permissionWaitReservesOneRecordingStart()"
+      ],
+      "disabled_count": 127,
+      "execution": {
+        "permissionWaitReservesOneRecordingStart": {
+          "starts": 1,
+          "results": [
+            "failed"
+          ]
+        }
+      },
+      "raw_summary": [
+        [
+          "1",
+          "failed"
+        ]
+      ],
+      "log_sha256": "e4a69e5ac34db6a480f19dfbed59301981aaa32640a8806dcfaa9a8da15aecc9",
+      "selection_sha256": "518a54f715601d667c372b1d017d33c694342c89e91b6f40377e16c25aba344d",
+      "issue_lines": [
+        "✘ Test permissionWaitReservesOneRecordingStart() recorded an issue at WritingActionEngineTests.swift:15:9: Expectation failed: (fixture.engine.recordingState → .idle) == .starting",
+        "✘ Test permissionWaitReservesOneRecordingStart() recorded an issue at WritingActionEngineTests.swift:28:9: Expectation failed: (gate.calls → 2) == 1"
+      ]
+    },
+    "candidate-permission": {
+      "result": {
+        "expectation": "fixed",
+        "classification": "deferred-permission-callback",
+        "exit_code": 0,
+        "test": {
+          "permissionWaitReservesOneRecordingStart": [
+            "passed"
+          ]
+        },
+        "diagnostics": {}
+      },
+      "selected_identifiers": [
+        "VoiceInkTests/WritingActionEngineTests/permissionWaitReservesOneRecordingStart()"
+      ],
+      "disabled_count": 217,
+      "execution": {
+        "permissionWaitReservesOneRecordingStart": {
+          "starts": 1,
+          "results": [
+            "passed"
+          ]
+        }
+      },
+      "raw_summary": [
+        [
+          "1",
+          "passed"
+        ]
+      ],
+      "log_sha256": "e9f945ea84c5d052b6b4f41ff39809f25aecd93bfca412911514595f7b661917",
+      "selection_sha256": "9fb4c3dfeb39bb43eea018aca88e44d189052c65f4d93f227ac6ff8b2885f847",
+      "issue_lines": []
+    }
+  },
+  "baseline_permission_instrumentation": {
+    "path": "VoiceInk/Transcription/Engine/VoiceInkEngine.swift",
+    "original_sha256": "e559a078d380d58a0ce9bb9a789925bf7c04146362bc0f09f67dbaca7305357b",
+    "instrumented_sha256": "93b9b4d11c5c01b7b3b5424243ae3316085fdf3d779164f18b9129f4594b1f4f",
+    "patch_sha256": "0e77b9e53521e786425172bd695e859a6b05cebddb6469c558578b3e49db7b48",
+    "added_lines": [
+      "    var recordPermissionRequestForTesting: (() async -> Bool)?",
+      "    var recordingStartupPreparationForTesting: (() async throws -> Void)?",
+      "        if let recordPermissionRequestForTesting { return await recordPermissionRequestForTesting() }"
+    ],
+    "scope": "optional hook at existing permission callback; no startup-preparation await or ownership fix"
+  },
+  "baseline_permission_patch_independently_reconstructed": true,
+  "identical_oracles": [
+    "VoiceInkTests/SpokenSnippetPipelineTests.swift",
+    "VoiceInkTests/WritingActionEngineTests.swift"
+  ],
+  "contract_sha256": "2da09df9067adc52ebd6561afb93829f54bf0e2451baa4748d88000543b7e3a9",
+  "canonical_package_contract": {
+    "baseline": {
+      "added_pin_identities": [
+        "grpc-swift-2",
+        "grpc-swift-nio-transport",
+        "grpc-swift-protobuf",
+        "swift-algorithms",
+        "swift-async-algorithms",
+        "swift-certificates",
+        "swift-http-structured-headers",
+        "swift-http-types",
+        "swift-log",
+        "swift-nio",
+        "swift-nio-extras",
+        "swift-nio-http2",
+        "swift-nio-ssl",
+        "swift-nio-transport-services",
+        "swift-protobuf",
+        "swift-service-lifecycle",
+        "swift-system"
+      ],
+      "changed_pins": [],
+      "declarations_identical": true,
+      "original_sha256": "2cdda5176a184329f2ca828316bfdefd9578d94bfed96a2b48b34b42b851e84c",
+      "removed_pins": [],
+      "retained_pin_count": 24
+    },
+    "canonical_pin_count": 41,
+    "canonical_sha256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f",
+    "declaration_sha256": {
+      "VoiceInk.xcodeproj/project.pbxproj": "e4a9458135e103d327477fedb1485b8f3de8e1b223f14d98e426f42e9bda3e9e",
+      "VoiceInkCore/Package.swift": "4320101452d3b079fc319d6459cc595d5e30474ea4e44899294d03a93d6ccfac",
+      "VoiceInkNVIDIA/Package.swift": "d05deef6aec46eba19ad6d529432459a0136d8bedbe22d247b43a229996ffa22",
+      "VoiceInkQwen/Package.swift": "058f93419dd0da3a92dfd135af2c8a6b664192f53ec883168c279b7564b21d4e",
+      "iOS/VoiceInk-ios.xcodeproj/project.pbxproj": "1de9826aef36e173e54a8d62b0422fde6a4657011f86b8012dc62ff8807b9676"
+    },
+    "scope": "package metadata only; existing pins and all dependency declarations unchanged",
+    "source": "reviewed Xcode resolution run 40482229518"
+  },
+  "source_hashes": {
+    "scripts/run-writing-feature-regression.sh": "3071693cf442929cc46edc881845e60044e7827fff44c2f7dc0f60faefb28a9c",
+    "VoiceInkTests/SpokenSnippetPipelineTests.swift": "60a05b44661e6070b17d29b237cf4fea7fd6572ac185d2fec46b347392ac334e",
+    "VoiceInkTests/WritingActionEngineTests.swift": "6caa4f1051afe7ec7d2c278d69e237263fb5b0f8cd64778aa6d04577d2c38ab2",
+    "VoiceInk/Transcription/Engine/TranscriptionPipeline.swift": "55351a88c085c0936ac2020e71cc7135780b61d6491f3250870f2629f30b7c40"
+  },
+  "limits": [
+    "Matched scope is literal snippets and deferred permission callback. Stale startup catch is candidate-only coverage.",
+    "Historical baseline has only the three explicitly retained test-hook lines at the existing permission boundary; independently reconstructed patch/hash confirms the scope.",
+    "These deterministic app-hosted test boundaries do not prove ASR, human speech, physical input or provider model quality.",
+    "Full normal-unit/UI/Release records await their distinct retained artifact."
+  ]
+}

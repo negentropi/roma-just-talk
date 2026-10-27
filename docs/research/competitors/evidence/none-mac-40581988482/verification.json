@@ -1,0 +1,108 @@
+{
+  "run_id": 40581988482,
+  "head_sha": "3ada8372711c0d9a484087ea3e3300e4fac0afba",
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40581988482",
+  "status": "completed",
+  "conclusion": "success",
+  "classification": "full-foundation-gate-passed",
+  "artifact_id": 12773291422,
+  "artifact_bytes": 302875445,
+  "artifact_sha256": "935fd2f5248b19decf0dfceeb7dea66cc1d571dc9541f198fca91e3d0f5d2248",
+  "artifact_size_digest_and_all_8023_zip_crcs_verified": true,
+  "core_checks": 1749,
+  "counts": {
+    "unit": {
+      "total": 220,
+      "passed": 208,
+      "failed": 0,
+      "skipped": 12,
+      "executed_non_skipped": 208
+    },
+    "live": {
+      "total": 6,
+      "passed": 6,
+      "failed": 0,
+      "skipped": 0,
+      "executed_non_skipped": 6
+    },
+    "ui": {
+      "total": 4,
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0,
+      "executed_non_skipped": 4
+    }
+  },
+  "required_ungated_unit_cases": {
+    "DictationPostprocessingPlanTests": 12,
+    "ClarityProviderTests": 7,
+    "LocalCLIServiceTests": 10
+  },
+  "all_17_captured_paste_cases_passed": true,
+  "same_debug_app_across_unit_native_ui": true,
+  "debug_app_sha256": "9a339901f04125383390d7237ac2630627b21ca66601d64a8ca280dd9e664e03",
+  "unit_ui_signature_requirements_and_compiled_csreq_equal": true,
+  "checkpoint_members_equal_full_artifact": {
+    "native": 32,
+    "matched": 28
+  },
+  "matched_regression": {
+    "classification": "matched-red-green",
+    "scope": [
+      "literal-snippets",
+      "deferred-permission-callback"
+    ],
+    "stale_startup_catch": "candidate-only coverage",
+    "candidate": "3ada8372711c0d9a484087ea3e3300e4fac0afba",
+    "baseline": "ec7bc1bcf804cb9362e342e4c3f5fbf2dd9b69eb"
+  },
+  "ui": {
+    "four_actual_success_records": true,
+    "model_sheet_boundaries_without_failures": 9,
+    "actual_background_pointer_attempts": 1,
+    "owned_shortcut_census_cases": 4,
+    "screenshots": [
+      "none-profile-persisted.png",
+      "prompt-editor-unsaved.png"
+    ],
+    "visual_review": "None remains selected after relaunch; Prompt footer and Cancel remain visible without the prior microphone banner in this retained observation."
+  },
+  "unit_skips": {
+    "count": 12,
+    "groups": {
+      "native_methods_executed_separately": 6,
+      "provider_semantic_checks": 3,
+      "real_whisper_import": 1,
+      "persistent_store_seed_control": 1,
+      "persistent_store_metadata_upgrade": 1
+    },
+    "raw_summary_and_declared_gate_records": "unit-skips.json",
+    "metadata_upgrade_proof_in_this_full_run": false
+  },
+  "release": {
+    "build_success_markers": 1,
+    "native_codesign_and_static_whisper_contract_passed_in_exact_head_ci": true,
+    "outer_app_artifact_id": 12773086760,
+    "outer_app_bytes": 32106477,
+    "outer_app_sha256": "f44bdf8a9a833957545034eb6568cd54372cd7a161337f103e80932c5290f998",
+    "outer_and_inner_zip_crc_verified": true,
+    "inner_archive_sha256": "af75980038f2c80fc898d4b754f67e2b2c97d8a3aa7e64911debb9db897bd2f4",
+    "inner_matches_ci_packaging_receipt": true,
+    "bundle_identifier": "com.negentropi.RomaJustTalk",
+    "main_binary_sha256": "0429ed8bde75807662985630d3f54c3eb53387398787045302f32995acf41737",
+    "mach_o_files": 8,
+    "linux_embedded_signature_structure_parsed": true,
+    "independent_linux_cryptographic_codesign_check": false
+  },
+  "limits": [
+    "This foundation head includes the unwired Light/Clarity preparation module and deterministic service tests. New active profiles/UI/import/retranscription integration in later ebf629 is a separate gate.",
+    "The 12 skipped unit records are retained with their raw generic skip notices and pinned enabling declarations. They are not live provider, Whisper-import or store-migration proof.",
+    "Six native tests execute separately; synthetic recognition and deterministic Local CLI subprocesses are not ASR, human-speech or general model-quality proof.",
+    "In-memory fresh-context History visibility is not crash/relaunch durable-store proof.",
+    "No independent TCC database readback, physical keyboard, saved-Keychain, rich text, notarized distribution or published release claim.",
+    "All seven native cleanup values were unavailable and do not establish window closure.",
+    "The Linux archive audit checks hashes, CRC, metadata and embedded signature structure; native CI logs provide Apple codesign contract checks.",
+    "Shortcut census JSON redacts data payloads; equal diagnostic properties do not independently establish raw-byte equality. The passed UI fixture asserts restoration using its captured values.",
+    "Other-head standalone UI/store/provider proofs have not been silently combined with this run."
+  ]
+}

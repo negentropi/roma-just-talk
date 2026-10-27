@@ -1,0 +1,49 @@
+{
+  "allActualFormatsRestoredExactly" : true,
+  "allFiveDeclaredReadbacks" : [
+    true,
+    true,
+    true,
+    true,
+    true
+  ],
+  "classification" : "actual-owned-unique-pasteboard-fixture-probe",
+  "items" : [
+    {
+      "index" : 0,
+      "types" : [
+        {
+          "dataBase64" : "T3JpZ2luYWwgY2FmZcyBIPCfp6wNCkMg",
+          "type" : "public.utf8-plain-text"
+        },
+        {
+          "dataBase64" : "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8\/x8AAwMCAO+jQ3sAAAAASUVORK5CYII=",
+          "type" : "public.png"
+        },
+        {
+          "dataBase64" : "AP8BgAANCg==",
+          "type" : "com.negentropi.RomaJustTalk.tests.clipboard-lease.binary"
+        }
+      ]
+    },
+    {
+      "index" : 1,
+      "types" : [
+        {
+          "dataBase64" : "U2Vjb25kIGl0ZW0g8J+nvw0K",
+          "type" : "public.utf8-plain-text"
+        },
+        {
+          "dataBase64" : "e1xydGYxXGFuc2kgU2Vjb25kIGl0ZW19",
+          "type" : "public.rtf"
+        },
+        {
+          "dataBase64" : "\/\/5TAGUAYwBvAG4AZAAgAGkAdABlAG0A",
+          "type" : "public.utf16-external-plain-text"
+        }
+      ]
+    }
+  ],
+  "scope" : "Ephemeral unique pasteboard only; no general clipboard, app, editor, signing or CI-runtime claim",
+  "stableChangeCount" : 1
+}

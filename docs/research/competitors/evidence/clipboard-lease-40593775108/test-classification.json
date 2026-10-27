@@ -1,0 +1,50 @@
+{
+  "errors": [
+    "singleWritingPasteHonorsDefaultRestorationDeadline did not finish exactly once with expected result",
+    "newerClipboardCopySurvivesWritingRestorationDeadline did not finish exactly once with expected result",
+    "Only three exact clipboard postcondition assertions may fail",
+    "Setup, compiler, skip, crash or launch failure cannot count as evidence"
+  ],
+  "exit_code": 65,
+  "failure_lines": [],
+  "issues": [
+    "\u2718 Test nestedWritingPastesRestoreOriginalAllFormatClipboard() recorded an issue at ClipboardRestorationLeaseTests.swift:322:13: Expectation failed: (original.count == 2 && original[0].count == 3 \u2192 true) && (original[1].count == 2 \u2192 false)",
+    "\u2718 Test writingThenOrdinaryPasteRestoresOriginalAllFormatClipboard() recorded an issue at ClipboardRestorationLeaseTests.swift:322:13: Expectation failed: (original.count == 2 && original[0].count == 3 \u2192 true) && (original[1].count == 2 \u2192 false)",
+    "\u2718 Test preparedOrdinaryPasteDoesNotRestoreRetiredWritingPayload() recorded an issue at ClipboardRestorationLeaseTests.swift:322:13: Expectation failed: (original.count == 2 && original[0].count == 3 \u2192 true) && (original[1].count == 2 \u2192 false)",
+    "\u2718 Test singleWritingPasteHonorsDefaultRestorationDeadline() recorded an issue at ClipboardRestorationLeaseTests.swift:322:13: Expectation failed: (original.count == 2 && original[0].count == 3 \u2192 true) && (original[1].count == 2 \u2192 false)",
+    "\u2718 Test newerClipboardCopySurvivesWritingRestorationDeadline() recorded an issue at ClipboardRestorationLeaseTests.swift:322:13: Expectation failed: (original.count == 2 && original[0].count == 3 \u2192 true) && (original[1].count == 2 \u2192 false)"
+  ],
+  "lane": "baseline",
+  "started_tests": [
+    "nestedWritingPastesRestoreOriginalAllFormatClipboard",
+    "writingThenOrdinaryPasteRestoresOriginalAllFormatClipboard",
+    "preparedOrdinaryPasteDoesNotRestoreRetiredWritingPayload",
+    "singleWritingPasteHonorsDefaultRestorationDeadline",
+    "newerClipboardCopySurvivesWritingRestorationDeadline"
+  ],
+  "summary": [
+    [
+      "5",
+      "1",
+      "failed"
+    ]
+  ],
+  "test_results": {
+    "nestedWritingPastesRestoreOriginalAllFormatClipboard": [
+      "failed"
+    ],
+    "newerClipboardCopySurvivesWritingRestorationDeadline": [
+      "failed"
+    ],
+    "preparedOrdinaryPasteDoesNotRestoreRetiredWritingPayload": [
+      "failed"
+    ],
+    "singleWritingPasteHonorsDefaultRestorationDeadline": [
+      "failed"
+    ],
+    "writingThenOrdinaryPasteRestoresOriginalAllFormatClipboard": [
+      "failed"
+    ]
+  },
+  "valid": false
+}

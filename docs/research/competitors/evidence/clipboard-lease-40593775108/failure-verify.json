@@ -1,0 +1,5 @@
+{
+  "classification": "invalid-or-failed",
+  "error": "Native outcomes invalid: singleWritingPasteHonorsDefaultRestorationDeadline did not finish exactly once with expected result; newerClipboardCopySurvivesWritingRestorationDeadline did not finish exactly once with expected result; Only three exact clipboard postcondition assertions may fail; Setup, compiler, skip, crash or launch failure cannot count as evidence",
+  "phase": "verify"
+}

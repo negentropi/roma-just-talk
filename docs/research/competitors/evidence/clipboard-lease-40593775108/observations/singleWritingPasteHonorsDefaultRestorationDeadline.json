@@ -1,0 +1,24 @@
+{
+  "beganBeforeFirstDeadline" : null,
+  "bundleIdentifier" : "com.negentropi.RomaJustTalk",
+  "completed" : false,
+  "confirmedWritingPastes" : 0,
+  "elapsedSeconds" : 0.0066042500000094151,
+  "error" : "ExpectationFailedError(expectation: Testing.Expectation(evaluatedExpression: Testing.__Expression.Kind.binaryOperation(lhs: Testing.__Expression.Kind.generic(\"original.count == 2 && original[0].count == 3\"), operator: \"&&\", rhs: Testing.__Expression.Kind.generic(\"original[1].count == 2\")), mismatchedErrorDescription: nil, differenceDescription: nil, mismatchedExitConditionDescription: nil, isPassing: false, isRequired: true, sourceLocation: VoiceInkTests\/ClipboardRestorationLeaseTests.swift:322:13))",
+  "events" : [
+
+  ],
+  "executablePath" : "\/Users\/runner\/work\/roma-just-talk\/roma-just-talk\/.local-build\/Build\/Products\/Debug\/roma just talk.app\/Contents\/MacOS\/roma just talk",
+  "menuAttempts" : 0,
+  "minimumTimerDelaySeconds" : 0.25,
+  "ordinaryAttempts" : 0,
+  "originalRestored" : false,
+  "pasteboardKind" : "unique",
+  "postconditionPassed" : false,
+  "processIdentifier" : 24304,
+  "scope" : "clipboard restoration only; controlled menu\/document access",
+  "setupValid" : false,
+  "test" : "singleWritingPasteHonorsDefaultRestorationDeadline",
+  "timerDelaySeconds" : 2,
+  "version" : 1
+}

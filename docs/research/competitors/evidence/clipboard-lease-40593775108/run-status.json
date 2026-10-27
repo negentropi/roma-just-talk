@@ -1,0 +1,140 @@
+{
+  "conclusion": "failure",
+  "databaseId": 40593775108,
+  "headBranch": "ci/rjt-clipboard-lease-check-01a17bef",
+  "headSha": "e7b49af2239447246af6a8144e870ace37f4b161",
+  "jobs": [
+    {
+      "completedAt": "2026-10-27T22:30:46Z",
+      "conclusion": "failure",
+      "databaseId": 122504366724,
+      "name": "regression",
+      "startedAt": "2026-10-27T22:18:21Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-27T22:18:23Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-27T22:18:22Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T22:18:27Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-10-27T22:18:23Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T22:18:42Z",
+          "conclusion": "success",
+          "name": "Keep disposable desktop and select native toolchain",
+          "number": 3,
+          "startedAt": "2026-10-27T22:18:27Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T22:18:48Z",
+          "conclusion": "success",
+          "name": "Verify strict verdict classifier",
+          "number": 4,
+          "startedAt": "2026-10-27T22:18:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T22:19:28Z",
+          "conclusion": "success",
+          "name": "Run actions/cache/restore@v4",
+          "number": 5,
+          "startedAt": "2026-10-27T22:18:48Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T22:20:43Z",
+          "conclusion": "success",
+          "name": "Bind exact source, known-bad ownership and canonical dependencies",
+          "number": 6,
+          "startedAt": "2026-10-27T22:19:28Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T22:20:47Z",
+          "conclusion": "success",
+          "name": "Prepare and verify static Whisper",
+          "number": 7,
+          "startedAt": "2026-10-27T22:20:43Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T22:20:47Z",
+          "conclusion": "skipped",
+          "name": "Run actions/cache/save@v4",
+          "number": 8,
+          "startedAt": "2026-10-27T22:20:47Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T22:29:26Z",
+          "conclusion": "success",
+          "name": "Build exact app and native clipboard oracle once",
+          "number": 9,
+          "startedAt": "2026-10-27T22:20:47Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T22:30:28Z",
+          "conclusion": "success",
+          "name": "Execute five selected clipboard observations",
+          "number": 10,
+          "startedAt": "2026-10-27T22:29:26Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T22:30:32Z",
+          "conclusion": "failure",
+          "name": "Require three intended old failures or five candidate passes",
+          "number": 11,
+          "startedAt": "2026-10-27T22:30:28Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T22:30:34Z",
+          "conclusion": "success",
+          "name": "Upload source, identity, observations and strict verdict",
+          "number": 12,
+          "startedAt": "2026-10-27T22:30:32Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T22:30:42Z",
+          "conclusion": "success",
+          "name": "Upload native logs and exact launch configuration",
+          "number": 13,
+          "startedAt": "2026-10-27T22:30:34Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T22:30:42Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 26,
+          "startedAt": "2026-10-27T22:30:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T22:30:45Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 27,
+          "startedAt": "2026-10-27T22:30:42Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40593775108/job/122504366724"
+    }
+  ],
+  "status": "completed"
+}

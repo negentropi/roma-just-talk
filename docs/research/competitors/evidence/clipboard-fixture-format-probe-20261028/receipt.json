@@ -1,0 +1,12 @@
+{
+  "classification": "actual-unique-pasteboard-os-format-calibration",
+  "sourceSHA256": "e3b32166df4131eeb0be54eb232e97068e0b0136d6521dca8d708bf078262cf3",
+  "resultSHA256": "5ceb5465a0f5ead8a8451b682971871d201d9995a82cde1ca6446451233ce2e5",
+  "noGeneralPasteboardReference": true,
+  "boardReleasedByDefer": true,
+  "allFiveDeclaredFormatsExact": true,
+  "allObservedFormatsRoundTripExact": true,
+  "osAddedSecondItemType": "public.utf16-external-plain-text",
+  "invalidOldFixtureAssumption": "Second item exposes exactly two types",
+  "scope": "Tiny local AppKit process on one newly created unique pasteboard; no app, general clipboard, user document, CI host or CursorPaster execution."
+}

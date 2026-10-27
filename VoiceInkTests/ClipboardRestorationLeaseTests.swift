@@ -195,7 +195,6 @@ private final class ClipboardLeaseFixture {
         try #require(VoiceInkPastePreference.shouldRestoreClipboardAfterPaste())
         try seedOriginal()
         setupValid = true
-        try record("original")
     }
 
     private var elapsed: Double { ProcessInfo.processInfo.systemUptime - start }
@@ -319,7 +318,24 @@ private final class ClipboardLeaseFixture {
         board.clearContents()
         try #require(board.writeObjects([first, second]))
         original = try snapshot()
-        try #require(original.count == 2 && original[0].count == 3 && original[1].count == 2)
+        try record("original")
+        try #require(original.count == 2)
+        let expected: [[ClipboardLeaseFormat]] = [
+            [
+                .init(type: NSPasteboard.PasteboardType.string.rawValue, dataBase64: Data(Self.originalText.utf8).base64EncodedString()),
+                .init(type: NSPasteboard.PasteboardType.png.rawValue, dataBase64: png.base64EncodedString()),
+                .init(type: Self.binaryType.rawValue, dataBase64: Data([0, 255, 1, 128, 0, 13, 10]).base64EncodedString())
+            ],
+            [
+                .init(type: NSPasteboard.PasteboardType.string.rawValue, dataBase64: Data("Second item 🧿\r\n".utf8).base64EncodedString()),
+                .init(type: NSPasteboard.PasteboardType.rtf.rawValue, dataBase64: Data("{\\rtf1\\ansi Second item}".utf8).base64EncodedString())
+            ]
+        ]
+        for index in expected.indices {
+            for format in expected[index] {
+                try #require(original[index].contains(format), "Every explicitly written clipboard format must retain its exact bytes")
+            }
+        }
     }
 
     func finish(originalRestored: Bool, postcondition: Bool) throws {

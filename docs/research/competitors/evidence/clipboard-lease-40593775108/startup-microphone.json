@@ -1,0 +1,11 @@
+{
+  "reason": "Normal app startup may start microphone pre-roll; no microphone inactivity claim. Clipboard delivery uses the existing controlled menu seam; no AX grant.",
+  "rows": [
+    {
+      "auth_value": 2,
+      "client": "com.negentropi.RomaJustTalk",
+      "requirement": "FADE0C000000002800000001000000080000001452440A82B6758479F44A54B7D4AF381D91760BCE",
+      "service": "kTCCServiceMicrophone"
+    }
+  ]
+}

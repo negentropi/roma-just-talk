@@ -1,0 +1,11 @@
+regression	Require three intended old failures or five candidate passes	﻿2026-10-27T22:30:28.1181330Z ##[group]Run bash scripts/run-clipboard-lease-regression.sh verify
+regression	Require three intended old failures or five candidate passes	2026-10-27T22:30:28.1182290Z ^[[36;1mbash scripts/run-clipboard-lease-regression.sh verify^[[0m
+regression	Require three intended old failures or five candidate passes	2026-10-27T22:30:28.1562700Z shell: /bin/bash -e {0}
+regression	Require three intended old failures or five candidate passes	2026-10-27T22:30:28.1564050Z env:
+regression	Require three intended old failures or five candidate passes	2026-10-27T22:30:28.1565020Z   RJT_CLIPBOARD_LEASE_LANE: baseline
+regression	Require three intended old failures or five candidate passes	2026-10-27T22:30:28.1566460Z ##[endgroup]
+regression	Require three intended old failures or five candidate passes	2026-10-27T22:30:32.6023090Z Traceback (most recent call last):
+regression	Require three intended old failures or five candidate passes	2026-10-27T22:30:32.6027450Z   File "<stdin>", line 532, in <module>
+regression	Require three intended old failures or five candidate passes	2026-10-27T22:30:32.6028700Z   File "<stdin>", line 51, in require
+regression	Require three intended old failures or five candidate passes	2026-10-27T22:30:32.6030610Z RuntimeError: Native outcomes invalid: singleWritingPasteHonorsDefaultRestorationDeadline did not finish exactly once with expected result; newerClipboardCopySurvivesWritingRestorationDeadline did not finish exactly once with expected result; Only three exact clipboard postcondition assertions may fail; Setup, compiler, skip, crash or launch failure cannot count as evidence
+regression	Require three intended old failures or five candidate passes	2026-10-27T22:30:32.6312150Z ##[error]Process completed with exit code 1.

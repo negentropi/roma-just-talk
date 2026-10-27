@@ -1,0 +1,17 @@
+{
+  "credential_contract": "Actual LOCAL_BUILD routes KeychainService to fresh lane UserDefaults; no saved Keychain query. Source/configuration assurance, not SecItem tracing.",
+  "isolated_sha256": "124dd660a5fc54ecf1fc1a198857aaa25c59768415936928b5606376addacfc8",
+  "isolated_user_home": "/Users/runner/work/_temp/clipboard-lease-proof/isolated-user",
+  "original_sha256": "78a617ff875b3507804a4e9af878e6f3abd6b88d739ccb870344006e0497ae2b",
+  "scope": "Actual NSPasteboard with existing controlled menu/document seam; no external editor/AX authorization. Normal startup pre-roll receives one exact signed-host microphone grant.",
+  "seed_preferences": {
+    "CurrentTranscriptionModel": "whisper-large-v3-turbo",
+    "IsAudioCleanupEnabled": false,
+    "IsTranscriptionCleanupEnabled": false,
+    "PrewarmModelOnWake": false,
+    "enableAnnouncements": false,
+    "hasCompletedOnboarding": true,
+    "isAIEnhancementEnabled": false,
+    "selectedAIProvider": "Local CLI"
+  }
+}

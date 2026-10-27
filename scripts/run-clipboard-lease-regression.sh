@@ -328,7 +328,7 @@ def execute_native(selection):
                     pid = value.get('processIdentifier')
                     if type(pid) is not int or pid <= 0 or pid in seen:
                         continue
-                    live = subprocess.run(['ps', '-p', str(pid), '-o', 'comm=', '-o', 'lstart='], text=True, capture_output=True)
+                    live = subprocess.run(['ps', '-p', str(pid), '-o', 'lstart=', '-o', 'comm='], text=True, capture_output=True)
                     if live.returncode == 0 and str(executable) in live.stdout:
                         seen[pid] = {'process_identifier': pid, 'ps_comm_and_start': live.stdout.strip(), 'observed_completed': value.get('completed'), 'observation_file': path.name}
                 time.sleep(0.05)
@@ -394,7 +394,16 @@ def validate_observations():
         require([event['elapsedSeconds'] for event in events] == sorted(event['elapsedSeconds'] for event in events), 'Clipboard event time moved backwards')
         original, final = events[0], events[-1]
         require(len(original['items']) == 2 and original['items'] != by_name['forward-confirmed']['items'], 'Original all-format clipboard or temporary write missing')
-        require(sorted(len(item) for item in original['items']) == [2, 3], 'Original multiple formats were not captured')
+        declared = [
+            {'public.utf8-plain-text': 'Original cafe\u0301 🧬\r\nC '.encode(),
+             'public.png': base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jQ3sAAAAASUVORK5CYII='),
+             'com.negentropi.RomaJustTalk.tests.clipboard-lease.binary': bytes([0, 255, 1, 128, 0, 13, 10])},
+            {'public.utf8-plain-text': 'Second item 🧿\r\n'.encode(), 'public.rtf': b'{\\rtf1\\ansi Second item}'},
+        ]
+        for item, expected_formats in zip(original['items'], declared, strict=True):
+            actual_formats = {entry['type']: base64.b64decode(entry['dataBase64'], validate=True) for entry in item}
+            require(all(actual_formats.get(kind) == data for kind, data in expected_formats.items()),
+                'Every declared clipboard format must retain its exact bytes; additional OS formats stay in the full snapshot')
         expected_counts = [(2, 2, 0), (2, 2, 1), (1, 1, 1), (1, 1, 0), (1, 1, 0)][index]
         require(all(type(value.get(key)) is int for key in ['confirmedWritingPastes', 'menuAttempts', 'ordinaryAttempts']), 'Typed paste attempt counts required')
         require(tuple(value.get(key) for key in ['confirmedWritingPastes', 'menuAttempts', 'ordinaryAttempts']) == expected_counts, 'Confirmed/paste attempt counts differ')

@@ -1,0 +1,106 @@
+Command line invocation:
+    /Applications/Xcode_26.6.app/Contents/Developer/usr/bin/xcodebuild test-without-building -xctestrun /Users/runner/work/_temp/clipboard-lease-proof/isolated.xctestrun -destination platform=macOS -parallel-testing-enabled NO "-only-testing:VoiceInkTests/ClipboardRestorationLeaseTests/nestedWritingPastesRestoreOriginalAllFormatClipboard()" "-only-testing:VoiceInkTests/ClipboardRestorationLeaseTests/writingThenOrdinaryPasteRestoresOriginalAllFormatClipboard()" "-only-testing:VoiceInkTests/ClipboardRestorationLeaseTests/preparedOrdinaryPasteDoesNotRestoreRetiredWritingPayload()" "-only-testing:VoiceInkTests/ClipboardRestorationLeaseTests/singleWritingPasteHonorsDefaultRestorationDeadline()" "-only-testing:VoiceInkTests/ClipboardRestorationLeaseTests/newerClipboardCopySurvivesWritingRestorationDeadline()" -resultBundlePath /Users/runner/work/_temp/clipboard-lease-proof/Native.xcresult
+
+2026-10-27 22:29:50.551 xcodebuild[24031:74481] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+Writing result bundle at path:
+	/Users/runner/work/_temp/clipboard-lease-proof/Native.xcresult
+
+2026-10-27 22:29:50.582 xcodebuild[24031:74481] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:macOS, arch:arm64e, id:644756cdf29ac123230b32d0f89f52f218293dfb, name:My Mac }
+{ platform:macOS, arch:arm64, id:644756cdf29ac123230b32d0f89f52f218293dfb, name:My Mac }
+{ platform:macOS, arch:x86_64, id:644756cdf29ac123230b32d0f89f52f218293dfb, name:My Mac }
+{ platform:macOS, arch:arm64e, variant:Mac Catalyst, id:644756cdf29ac123230b32d0f89f52f218293dfb, name:My Mac }
+{ platform:macOS, arch:arm64, variant:Mac Catalyst, id:644756cdf29ac123230b32d0f89f52f218293dfb, name:My Mac }
+{ platform:macOS, arch:x86_64, variant:Mac Catalyst, id:644756cdf29ac123230b32d0f89f52f218293dfb, name:My Mac }
+{ platform:macOS, arch:arm64e, variant:DriverKit, id:644756cdf29ac123230b32d0f89f52f218293dfb, name:My Mac }
+{ platform:macOS, arch:arm64, variant:DriverKit, id:644756cdf29ac123230b32d0f89f52f218293dfb, name:My Mac }
+{ platform:macOS, arch:arm64e, variant:Designed for [iPad,iPhone], id:644756cdf29ac123230b32d0f89f52f218293dfb, name:My Mac }
+{ platform:macOS, arch:arm64, variant:Designed for [iPad,iPhone], id:644756cdf29ac123230b32d0f89f52f218293dfb, name:My Mac }
+2026-10-27 22:29:52.029 xcodebuild[24031:74481] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+2026-10-27 22:29:59.454827+0000 roma just talk[24304:75243] [plugin] AddInstanceForFactory: No factory registered for id <CFUUID 0x98907d7a0> F8BB1C28-BAE8-11D6-9C31-00039315CD46
+2026-10-27 22:29:59.635963+0000 roma just talk[24304:75243] [MenuBarManager] updateAppActivationPolicy: switching to .accessory (dock icon hidden)
+2026-10-27 22:29:59.636908+0000 roma just talk[24304:75243] [WindowManager] resolveMainWindow: weak ref is nil, searching 0 windows by identifier
+2026-10-27 22:29:59.636977+0000 roma just talk[24304:75243] [WindowManager] resolveMainWindow: FAILED — no window found with main identifier. Total windows: 0, identifiers:
+2026-10-27 22:29:59.639998+0000 roma just talk[24304:75243] [ModelPrewarm] ModelPrewarmService initialized - listening for wake and app launch
+2026-10-27 22:29:59.640031+0000 roma just talk[24304:75243] [ModelPrewarm] App launched, scheduling prewarm
+2026-10-27 22:29:59.654397+0000 roma just talk[24304:75309] [General] Failed to connect to linkd to request update AppShortcut parameters, error: Couldn’t communicate with a helper application.
+2026-10-27 22:29:59.664133+0000 roma just talk[24304:75308] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 22:29:59.664479+0000 roma just talk[24304:75308] [Application] Error registering app with intents framework: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 22:29:59.675755+0000 roma just talk[24304:75307] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 22:29:59.675899+0000 roma just talk[24304:75307] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 22:29:59.679977+0000 roma just talk[24304:75309] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 22:29:59.680418+0000 roma just talk[24304:75309] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 22:29:59.681868+0000 roma just talk[24304:75309] [Connection] Will NOT re-try to establish the connection
+2026-10-27 22:29:59.681995+0000 roma just talk[24304:75307] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 22:29:59.682013+0000 roma just talk[24304:75307] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 22:30:01.682095+0000 roma just talk[24304:75243] [ContentView] ContentView appeared
+2026-10-27 22:30:01.721830+0000 roma just talk[24304:75243] [MenuBarManager] updateAppActivationPolicy: switching to .accessory (dock icon hidden)
+2026-10-27 22:30:01.722573+0000 roma just talk[24304:75243] [WindowManager] resolveMainWindow: weak ref is nil, searching 2 windows by identifier
+2026-10-27 22:30:01.722713+0000 roma just talk[24304:75243] [WindowManager] resolveMainWindow: FAILED — no window found with main identifier. Total windows: 2, identifiers: main-AppWindow-1, nil
+2026-10-27 22:30:01.962802+0000 roma just talk[24304:75243] [RecorderUIManager] Resetting recording state on launch
+2026-10-27 22:30:01.963785+0000 roma just talk[24304:75243] [Recorder] stopRecording called
+2026-10-27 22:30:01.964161+0000 roma just talk[24304:75243] [VoiceInkEngine] cleanupResources: releasing model resources
+2026-10-27 22:30:01.964177+0000 roma just talk[24304:75243] [WhisperModelManager] WhisperModelManager.cleanupResources: releasing whisper context
+2026-10-27 22:30:01.964328+0000 roma just talk[24304:75243] [WhisperModelManager] WhisperModelManager.cleanupResources: completed
+2026-10-27 22:30:01.965310+0000 roma just talk[24304:75243] [WindowManager] configureWindow: registering main window
+2026-10-27 22:30:02.414613+0000 roma just talk[24304:75243] [ShortcutMonitor] start: installing event tap for 1 shortcut(s)
+2026-10-27 22:30:02.414802+0000 roma just talk[24304:75243] [ShortcutMonitor] installEventTap: listen-event access is not granted
+2026-10-27 22:30:02.431204+0000 roma just talk[24304:75243] [Window] Warning: -[NSWindow makeKeyWindow] called on <NSPanel: 0x9899bd900> windowNumber=22 which returned NO from -[NSWindow canBecomeKeyWindow].
+2026-10-27 22:30:02.541320+0000 roma just talk[24304:75243] [VoiceInkEngine] cleanupResources: completed
+2026-10-27 22:30:02.542283+0000 roma just talk[24304:75478] [CoreAudioRecorder] stopRecording: skipped, not recording and no audio unit
+2026-10-27 22:30:02.542383+0000 roma just talk[24304:75478] [CoreAudioRecorder] 🎙️ Starting pre-roll buffering from device 87
+2026-10-27 22:30:02.543807+0000 roma just talk[24304:75478] [CoreAudioRecorder] 🎙️ Device info: name=Apple Virtual Sound Device, uid=AVIODevice 2
+2026-10-27 22:30:02.543869+0000 roma just talk[24304:75478] [CoreAudioRecorder] 🎙️ Device details: transport=Built-in, manufacturer=Apple Inc.
+2026-10-27 22:30:02.544169+0000 roma just talk[24304:75478] [CoreAudioRecorder] 🎙️ Buffer size: 512 frames, ~latency: 10.7ms
+2026-10-27 22:30:02.585221+0000 roma just talk[24304:75478] [logging-persist] cannot open file at line 51044 of [f0ca7bba1c]
+2026-10-27 22:30:02.585253+0000 roma just talk[24304:75478] [logging-persist] os_unix.c:51044: (2) open(/private/var/db/DetachedSignatures) - No such file or directory
+2026-10-27 22:30:02.587832+0000 roma just talk[24304:75478] [carc] Reporter disconnected. { function=sendMessage, reporterID=104384885161985 }
+2026-10-27 22:30:02.605270+0000 roma just talk[24304:75478] [CoreAudioRecorder] 🎙️ Device format: sampleRate=48000.000000, channels=2, bitsPerChannel=32
+2026-10-27 22:30:02.605313+0000 roma just talk[24304:75478] [CoreAudioRecorder] 🎙️ Output format: sampleRate=16000.000000, channels=1, bitsPerChannel=16
+2026-10-27 22:30:02.605323+0000 roma just talk[24304:75478] [CoreAudioRecorder] 🎙️ Converting: 48000Hz → 16000Hz
+Test Suite 'Selected tests' started at 2026-10-27 22:30:02.628.
+Test Suite 'VoiceInkTests.xctest' started at 2026-10-27 22:30:02.629.
+Test Suite 'VoiceInkTests.xctest' passed at 2026-10-27 22:30:02.673.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.043) seconds
+Test Suite 'Selected tests' passed at 2026-10-27 22:30:02.674.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.046) seconds
+2026-10-27 22:30:02.682176+0000 roma just talk[24304:75243] [Recorder] startPreRollBuffering: active on deviceID=87
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite ClipboardRestorationLeaseTests started.
+◇ Test nestedWritingPastesRestoreOriginalAllFormatClipboard() started.
+✘ Test nestedWritingPastesRestoreOriginalAllFormatClipboard() recorded an issue at ClipboardRestorationLeaseTests.swift:322:13: Expectation failed: (original.count == 2 && original[0].count == 3 → true) && (original[1].count == 2 → false)
+✘ Test nestedWritingPastesRestoreOriginalAllFormatClipboard() failed after 0.091 seconds with 1 issue.
+◇ Test writingThenOrdinaryPasteRestoresOriginalAllFormatClipboard() started.
+✘ Test writingThenOrdinaryPasteRestoresOriginalAllFormatClipboard() recorded an issue at ClipboardRestorationLeaseTests.swift:322:13: Expectation failed: (original.count == 2 && original[0].count == 3 → true) && (original[1].count == 2 → false)
+✘ Test writingThenOrdinaryPasteRestoresOriginalAllFormatClipboard() failed after 0.040 seconds with 1 issue.
+◇ Test preparedOrdinaryPasteDoesNotRestoreRetiredWritingPayload() started.
+✘ Test preparedOrdinaryPasteDoesNotRestoreRetiredWritingPayload() recorded an issue at ClipboardRestorationLeaseTests.swift:322:13: Expectation failed: (original.count == 2 && original[0].count == 3 → true) && (original[1].count == 2 → false)
+✘ Test preparedOrdinaryPasteDoesNotRestoreRetiredWritingPayload() failed after 0.019 seconds with 1 issue.
+◇ Test singleWritingPasteHonorsDefaultRestorationDeadline() started.
+✘ Test singleWritingPasteHonorsDefaultRestorationDeadline() recorded an issue at ClipboardRestorationLeaseTests.swift:322:13: Expectation failed: (original.count == 2 && original[0].count == 3 → true) && (original[1].count == 2 → false)
+✘ Test singleWritingPasteHonorsDefaultRestorationDeadline() failed after 0.011 seconds with 1 issue.
+◇ Test newerClipboardCopySurvivesWritingRestorationDeadline() started.
+✘ Test newerClipboardCopySurvivesWritingRestorationDeadline() recorded an issue at ClipboardRestorationLeaseTests.swift:322:13: Expectation failed: (original.count == 2 && original[0].count == 3 → true) && (original[1].count == 2 → false)
+✘ Test newerClipboardCopySurvivesWritingRestorationDeadline() failed after 0.008 seconds with 1 issue.
+✘ Suite ClipboardRestorationLeaseTests failed after 0.173 seconds with 5 issues.
+✘ Test run with 5 tests in 1 suite failed after 0.175 seconds with 5 issues.
+2026-10-27 22:30:09.544 xcodebuild[24031:74481] [MT] IDETestOperationsObserverDebug: 17.488 elapsed -- Testing started completed.
+2026-10-27 22:30:09.544 xcodebuild[24031:74481] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-10-27 22:30:09.544 xcodebuild[24031:74481] [MT] IDETestOperationsObserverDebug: 17.488 sec, +17.488 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/runner/work/_temp/clipboard-lease-proof/Native.xcresult
+
+Failing tests:
+	ClipboardRestorationLeaseTests.nestedWritingPastesRestoreOriginalAllFormatClipboard()
+	ClipboardRestorationLeaseTests.writingThenOrdinaryPasteRestoresOriginalAllFormatClipboard()
+	ClipboardRestorationLeaseTests.preparedOrdinaryPasteDoesNotRestoreRetiredWritingPayload()
+	ClipboardRestorationLeaseTests.singleWritingPasteHonorsDefaultRestorationDeadline()
+	ClipboardRestorationLeaseTests.newerClipboardCopySurvivesWritingRestorationDeadline()
+
+** TEST EXECUTE FAILED **
+
+Testing started

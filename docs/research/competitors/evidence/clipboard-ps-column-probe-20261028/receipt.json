@@ -1,0 +1,50 @@
+{
+  "classification": "actual-darwin-ps-column-order-red-green",
+  "processIdentifier": 22397,
+  "executable": "/Users/atalphalnmomhappyhouse/.pyenv/versions/3.11.9/bin/python3",
+  "executableSHA256": "ef966b96d3eea8824536c09323677335c6c1c86052f9c0e80ae8609bc4c65b64",
+  "kernelProcessStart": "Wed Oct 28 06:26:03 2026",
+  "kernel": {
+    "system": "Darwin",
+    "release": "25.6.0",
+    "version": "Darwin Kernel Version 25.6.0: Sat Jul 11 15:26:12 PDT 2026; root:xnu-12377.161.13~4/RELEASE_ARM64_T8142",
+    "machine": "arm64",
+    "processor": "arm"
+  },
+  "sameProcessBothLanes": true,
+  "lanes": [
+    {
+      "lane": "known-bad",
+      "arguments": [
+        "ps",
+        "-p",
+        "22397",
+        "-o",
+        "comm=",
+        "-o",
+        "lstart="
+      ],
+      "exitCode": 0,
+      "stdout": "/Users/atalphaln Wed Oct 28 06:26:03 2026    \n",
+      "stderr": "",
+      "exactExecutablePresent": false
+    },
+    {
+      "lane": "candidate",
+      "arguments": [
+        "ps",
+        "-p",
+        "22397",
+        "-o",
+        "lstart=",
+        "-o",
+        "comm="
+      ],
+      "exitCode": 0,
+      "stdout": "Wed Oct 28 06:26:03 2026     /Users/atalphalnmomhappyhouse/.pyenv/versions/3.11.9/bin/python3\n",
+      "stderr": "",
+      "exactExecutablePresent": true
+    }
+  ],
+  "limit": "Actual local ps output from this probe process; no app host, clipboard, native selection, signing, TCC or editor claim."
+}

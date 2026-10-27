@@ -1,0 +1,30 @@
+{
+  "captured_paste_cases": [
+    "targetDriftDuringDiscoveryLeavesTheNewDocumentAndClipboardUntouched",
+    "cancellationDuringDiscoveryRestoresTheOwnedClipboardWithoutWriting",
+    "focusOrSelectionDriftDuringDiscoveryPreventsThePaste",
+    "newerClipboardCopyDuringDiscoverySurvivesRefusal",
+    "unavailableMenuRestoresClipboardEvenWhenSuccessfulPastesWouldKeepIt",
+    "aNewClipboardGenerationWithTheSameTextAndMarkerStillRefusesPosting",
+    "confirmedReplacementRestoresAnEmptyClipboard",
+    "confirmedReplacementRestoresEveryImageAndTextClipboardFormat",
+    "aNewCopyAfterConfirmedPasteSurvivesScheduledRestoration",
+    "confirmedPasteRestoresTheClipboardAfterTheRequestedDelay",
+    "scheduledRestorationCannotOverwriteANewGenerationWithMatchingData",
+    "anErrorAfterConfirmedMutationDoesNotRepeatThePaste",
+    "acceptedNoOpRemainsUnconfirmedWithoutAnotherMutationOrClipboardRestore",
+    "failureAfterMutationCannotEnterThePreMutationRestorationPath",
+    "delayedReadbackConfirmsTheSameSingleMutation",
+    "canonicalEqualityDoesNotConfirmDifferentUTF16Output",
+    "cancellationAfterAttemptKeepsUncertainContentWithoutRetrying"
+  ],
+  "exit_code": 0,
+  "scope": "Existing full Mac unit runner, not just the new filtered native case",
+  "swift_testing_summary": [
+    [
+      "166",
+      "passed"
+    ]
+  ],
+  "valid": true
+}

@@ -1,0 +1,3 @@
+◇ Test liveWritingStartupContextRespectsOwnerAfterCancellation() started.
+✔ Test liveWritingStartupContextRespectsOwnerAfterCancellation() passed after 4.986 seconds.
+✔ Test run with 1 test in 1 suite passed after 4.994 seconds.

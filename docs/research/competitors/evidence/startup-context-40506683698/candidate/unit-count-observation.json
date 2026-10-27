@@ -1,0 +1,46 @@
+{
+  "scope": "Read-only extraction from existing CI full candidate unit log; no runtime rerun",
+  "full_artifact_sha256": "b7cdd3316db7e32ed5ae3ab9ebaf596167ef12ae70b306d3e975af759c496081",
+  "full_artifact_sha256_verified": true,
+  "unit_log_member": "_temp/writing-startup-context-proof/candidate/units.log",
+  "unit_log_sha256": "94c5411f4fffb3008ab0496f04b2d41628c545f987bb1b730b108d227b6d2a36",
+  "unit_log_bytes": 7106197,
+  "swift_testing_summary": "\u2714 Test run with 166 tests in 16 suites passed after 3.219 seconds.",
+  "declared_swift_testing_methods": 166,
+  "passed_swift_testing_methods": 158,
+  "skipped_swift_testing_methods": 8,
+  "parameterized_methods": 2,
+  "parameterized_invocations": 4,
+  "passed_xctest_methods": 8,
+  "successful_case_records": 168,
+  "skipped_case_records": 8,
+  "failed_case_records": 0,
+  "count_note": "166 is the Swift Testing declared-method summary including eight gated skips. 158 passed Swift Testing methods include two parameterized parents; replacing them with four invocations and adding eight XCTest methods gives 168 successful case records, plus8 skipped. Prior b116 had 168 successful and 7 skipped; the added gated native method adds one unit skip and executes separately in the native lane.",
+  "skipped_lines": [
+    "\u279c Test writingProviderTranslatesJapaneseToEnglish() skipped.",
+    "\u279c Test writingProviderTranslatesEnglishToTraditionalChinese() skipped.",
+    "\u279c Test writingProviderRewritesTheSuppliedSelection() skipped.",
+    "\u279c Test liveWritingTargetTextEditPreservesUnicodeOutsideSelection() skipped.",
+    "\u279c Test liveWritingTargetTextEditRefusesRangeTextAndFocusDrift() skipped.",
+    "\u279c Test liveWritingTargetSafariTextareaReplacesOnlySelection() skipped.",
+    "\u279c Test liveWritingActionPipelineUsesLocalCLIAndRetainsFailure() skipped.",
+    "\u279c Test liveWritingStartupContextRespectsOwnerAfterCancellation() skipped."
+  ],
+  "parameterized_invocation_starts": [
+    "\u25c7 Test case passing 1 argument usesURLCancellation \u2192 false to secondCallerJoinsActiveDownloadAndCancellationLeavesRetryState(usesURLCancellation:) started.",
+    "\u25c7 Test case passing 1 argument usesURLCancellation \u2192 true to secondCallerJoinsActiveDownloadAndCancellationLeavesRetryState(usesURLCancellation:) started.",
+    "\u25c7 Test case passing 1 argument finalSamples \u2192 18000 to finalPassOverlapsCancelledLivePassWithoutPublishingItsLateResult(finalSamples:) started.",
+    "\u25c7 Test case passing 1 argument finalSamples \u2192 240000 to finalPassOverlapsCancelledLivePassWithoutPublishingItsLateResult(finalSamples:) started."
+  ],
+  "xctest_case_pass_lines": [
+    "Test Case '-[VoiceInkTests.OnboardingRegionViewTests testAdvancedDisclosureRejectsPendingTaiwanSuggestion]' passed (3.877 seconds).",
+    "Test Case '-[VoiceInkTests.OnboardingRegionViewTests testContinueConfirmsCachedEnglishAcrossOnboardingReset]' passed (3.642 seconds).",
+    "Test Case '-[VoiceInkTests.OnboardingRegionViewTests testExplicitEnglishAccessibilityActionWinsBeforeTaiwanResponse]' passed (13.889 seconds).",
+    "Test Case '-[VoiceInkTests.OnboardingRegionViewTests testLateTaiwanDraftBlocksCachedEnglishContinueWithoutPersistingIt]' passed (1.687 seconds).",
+    "Test Case '-[VoiceInkTests.OnboardingRegionViewTests testProductionOnboardingWindowFitsVisibleDesktopAndKeepsUserResize]' passed (0.030 seconds).",
+    "Test Case '-[VoiceInkTests.OnboardingRegionViewTests testReopeningPreservesExplicitEnglishWithoutAnotherLookup]' passed (2.758 seconds).",
+    "Test Case '-[VoiceInkTests.OnboardingRegionViewTests testSkipUnmountsPendingLookupWithoutCommittingSuggestedModel]' passed (1.290 seconds).",
+    "Test Case '-[VoiceInkTests.OnboardingRegionViewTests testWindowAccessorReconfiguresAfterSwiftUIReusesItsView]' passed (0.064 seconds)."
+  ],
+  "native_issue_records": []
+}

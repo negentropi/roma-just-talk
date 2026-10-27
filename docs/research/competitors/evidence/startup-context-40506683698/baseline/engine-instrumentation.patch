@@ -1,0 +1,19 @@
+--- a/VoiceInk/Transcription/Engine/VoiceInkEngine.swift
++++ b/VoiceInk/Transcription/Engine/VoiceInkEngine.swift
+@@ -14,6 +14,7 @@
+     var partialTranscript: String = ""
+     var currentSession: TranscriptionSession?
+     private var activeRecordingStartID: UUID?
++    private(set) var recordingStartupTask: Task<Void, Never>?
+     private var activePipelineTranscriptionID: UUID?
+     private var canceledPipelineTranscriptionIDs = Set<UUID>()
+     private var stopRequestedDuringStart = false
+@@ -356,7 +357,7 @@
+                                 return
+                             }
+ 
+-                            Task { @MainActor [weak self] in
++                            recordingStartupTask = Task { @MainActor [weak self] in
+                                 guard let self else { return }
+ 
+                                 if let model = self.transcriptionModelManager.currentTranscriptionModel {

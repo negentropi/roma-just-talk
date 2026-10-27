@@ -1,0 +1,14 @@
+{
+  "baseline_reference_sha": "b1161b7debb720afd41f3216b7aa85924944ae17",
+  "candidate_engine_sha256": "df05d81e5d2ff4a06604d5116a6bd50b4be22dcbe366731396f37abab0e0f12b",
+  "candidate_source_sha": "ebc92f1e60fdabbb9e26b2817f414d154865a9d5",
+  "canonical_lock_sha256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f",
+  "changed_production_paths": [
+    "VoiceInk/Transcription/Engine/VoiceInkEngine.swift"
+  ],
+  "driver_sha": "ebc92f1e60fdabbb9e26b2817f414d154865a9d5",
+  "oracle_path": "VoiceInkTests/WritingTargetLiveTests.swift",
+  "oracle_sha256": "2a76c4ca7dc7870bd48d19f3244a16ad5454c2ef41b9605df94ba5d0a89ccee3",
+  "scope": "Real native engine/recorder with one shared oracle; baseline adds only a task handle for observing completion; no provider, model-weight, real context read or physical-key proof",
+  "shared_native_helper_sha256": "2ae074cdc96d8affc895bcc774abc25b4a2c7a81792a28c1106b339e7d4bfc6b"
+}

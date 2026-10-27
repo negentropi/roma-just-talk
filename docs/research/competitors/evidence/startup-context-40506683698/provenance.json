@@ -1,0 +1,29 @@
+{
+  "run_id": 40506683698,
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40506683698",
+  "head_sha": "ebc92f1e60fdabbb9e26b2817f414d154865a9d5",
+  "candidate_checkpoint_artifact": {
+    "id": 12735274982,
+    "name": "roma.startup-context-candidate",
+    "size_in_bytes": 27513,
+    "digest": "sha256:d7fa9684fb027e433b443f6fe6746f39ccad9321d61c3aeeb56f69850aea1b10",
+    "zip_digest_verified": true
+  },
+  "retention": "Exact small JSON contracts/receipts, baseline observation patch, and native-log summaries. Source files reconstructable from pinned Git SHA. App archive and xcresults remain in Actions artifact.",
+  "final_observations_artifact": {
+    "id": 12736737187,
+    "name": "roma.startup-context-observations",
+    "size_in_bytes": 190006,
+    "digest": "sha256:e88f2b5637ac035fc42f1f4dc70af0d94593b318de9cf858cd84d0e7bb0091b5",
+    "zip_digest_verified": true
+  },
+  "full_evidence_artifact": {
+    "id": 12736348508,
+    "name": "roma.startup-context-evidence",
+    "size_in_bytes": 178901018,
+    "digest": "sha256:b7cdd3316db7e32ed5ae3ab9ebaf596167ef12ae70b306d3e975af759c496081",
+    "retention": "GitHub Actions; no app archive or xcresult duplicated in repository",
+    "zip_digest_verified": true,
+    "remote_audit_archive": "/data/rjt-startup-context-40506683698/evidence.zip on decentleftover-pf"
+  }
+}

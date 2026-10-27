@@ -1,0 +1,122 @@
+{
+  "run_id": 40506683698,
+  "head_sha": "ebc92f1e60fdabbb9e26b2817f414d154865a9d5",
+  "run_url": "https://github.com/negentropi/roma-just-talk/actions/runs/40506683698",
+  "conclusion": "success",
+  "classification": "matched-red-green",
+  "candidate": {
+    "test_starts": 1,
+    "result": "passed",
+    "exit_code": 0,
+    "issue_count": 0
+  },
+  "baseline": {
+    "test_starts": 1,
+    "result": "failed",
+    "exit_code": 65,
+    "issue_count": 4,
+    "assertion_lines": [
+      452,
+      453,
+      455,
+      456
+    ],
+    "assertions": [
+      "Canceled writing startup must not capture clipboard context",
+      "Canceled writing startup must not capture screen context",
+      "Canceled ordinary startup must not capture clipboard context",
+      "Canceled ordinary startup must not capture screen context"
+    ]
+  },
+  "cases": {
+    "canceled-writing": {
+      "candidate": {
+        "clipboardReads": 0,
+        "screenReads": 0,
+        "taskCompleted": true,
+        "recordingCanceled": true,
+        "wasRecordingAtTaskCompletion": false,
+        "captureStatesWereRecording": []
+      },
+      "baseline": {
+        "clipboardReads": 1,
+        "screenReads": 1,
+        "taskCompleted": true,
+        "recordingCanceled": true,
+        "wasRecordingAtTaskCompletion": false,
+        "captureStatesWereRecording": [
+          false,
+          false
+        ]
+      }
+    },
+    "canceled-ordinary": {
+      "candidate": {
+        "clipboardReads": 0,
+        "screenReads": 0,
+        "taskCompleted": true,
+        "recordingCanceled": true,
+        "wasRecordingAtTaskCompletion": false,
+        "captureStatesWereRecording": []
+      },
+      "baseline": {
+        "clipboardReads": 1,
+        "screenReads": 1,
+        "taskCompleted": true,
+        "recordingCanceled": true,
+        "wasRecordingAtTaskCompletion": false,
+        "captureStatesWereRecording": [
+          false,
+          false
+        ]
+      }
+    },
+    "active-ordinary": {
+      "candidate": {
+        "clipboardReads": 1,
+        "screenReads": 1,
+        "taskCompleted": true,
+        "recordingCanceled": true,
+        "wasRecordingAtTaskCompletion": true,
+        "captureStatesWereRecording": [
+          true,
+          true
+        ]
+      },
+      "baseline": {
+        "clipboardReads": 1,
+        "screenReads": 1,
+        "taskCompleted": true,
+        "recordingCanceled": true,
+        "wasRecordingAtTaskCompletion": true,
+        "captureStatesWereRecording": [
+          true,
+          true
+        ]
+      }
+    }
+  },
+  "source_checks": {
+    "production_files": 581,
+    "only_changed_production_path": "VoiceInk/Transcription/Engine/VoiceInkEngine.swift",
+    "exact_candidate_and_common_oracle_match_git": true,
+    "before_after_manifests_equal_each_lane": true,
+    "baseline_instrumentation_reconstructed_from_pinned_source": true,
+    "candidate_sources_restored": true,
+    "canonical_package_pins": 41
+  },
+  "unit_count_note": "166 is the Swift Testing declared-method summary including eight gated skips. 158 passed Swift Testing methods include two parameterized parents; replacing them with four invocations and adding eight XCTest methods gives 168 successful case records, plus8 skipped. Prior b116 had 168 successful and 7 skipped; the added gated native method adds one unit skip and executes separately in the native lane.",
+  "independent_review": "No blockers; pinned classifier recomputation agrees for both actual lanes.",
+  "limits": [
+    "Actual engine and recorder lifecycle on hosted Mac with context-call spies.",
+    "No OS clipboard or screen-content capture, model weights, transcription, provider, physical-key or real-speaker proof."
+  ],
+  "retention": "Small exact receipts and source manifests only. App archive and xcresults remain in Actions artifact; no ZIP or xcresult retained here.",
+  "unit_case_records": {
+    "passed": 168,
+    "skipped": 8,
+    "failed": 0,
+    "derivation": "158 passed Swift Testing methods - 2 parameterized parents + 4 invocations + 8 XCTest methods",
+    "raw_unit_log_sha256": "94c5411f4fffb3008ab0496f04b2d41628c545f987bb1b730b108d227b6d2a36"
+  }
+}

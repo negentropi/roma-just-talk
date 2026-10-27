@@ -1,0 +1,11 @@
+◇ Test liveWritingStartupContextRespectsOwnerAfterCancellation() started.
+✘ Test liveWritingStartupContextRespectsOwnerAfterCancellation() recorded an issue at WritingTargetLiveTests.swift:452:17: Expectation failed: (enhancement.clipboardReads → 1) == 0
+↳ Canceled writing startup must not capture clipboard context
+✘ Test liveWritingStartupContextRespectsOwnerAfterCancellation() recorded an issue at WritingTargetLiveTests.swift:453:17: Expectation failed: (enhancement.screenReads → 1) == 0
+↳ Canceled writing startup must not capture screen context
+✘ Test liveWritingStartupContextRespectsOwnerAfterCancellation() recorded an issue at WritingTargetLiveTests.swift:455:17: Expectation failed: (enhancement.clipboardReads → 1) == 0
+↳ Canceled ordinary startup must not capture clipboard context
+✘ Test liveWritingStartupContextRespectsOwnerAfterCancellation() recorded an issue at WritingTargetLiveTests.swift:456:17: Expectation failed: (enhancement.screenReads → 1) == 0
+↳ Canceled ordinary startup must not capture screen context
+✘ Test liveWritingStartupContextRespectsOwnerAfterCancellation() failed after 0.791 seconds with 4 issues.
+✘ Test run with 1 test in 1 suite failed after 0.792 seconds with 4 issues.

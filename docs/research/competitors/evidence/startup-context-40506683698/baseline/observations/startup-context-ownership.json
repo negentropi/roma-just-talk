@@ -1,0 +1,61 @@
+{
+  "bundleIdentifier" : "com.negentropi.RomaJustTalk",
+  "cases" : {
+    "active-ordinary" : {
+      "actualAudioFileCreated" : true,
+      "captureStatesWereRecording" : [
+        true,
+        true
+      ],
+      "clipboardReads" : 1,
+      "gateEntered" : true,
+      "modelLoadCalls" : 1,
+      "ownerEnded" : true,
+      "recordingCanceled" : true,
+      "screenReads" : 1,
+      "taskCompleted" : true,
+      "taskDetachedOnCancellation" : false,
+      "wasRecordingAtTaskCompletion" : true
+    },
+    "canceled-ordinary" : {
+      "actualAudioFileCreated" : true,
+      "captureStatesWereRecording" : [
+        false,
+        false
+      ],
+      "clipboardReads" : 1,
+      "gateEntered" : true,
+      "modelLoadCalls" : 1,
+      "ownerEnded" : true,
+      "recordingCanceled" : true,
+      "screenReads" : 1,
+      "taskCompleted" : true,
+      "taskDetachedOnCancellation" : false,
+      "wasRecordingAtTaskCompletion" : false
+    },
+    "canceled-writing" : {
+      "actualAudioFileCreated" : true,
+      "captureStatesWereRecording" : [
+        false,
+        false
+      ],
+      "clipboardReads" : 1,
+      "gateEntered" : true,
+      "modelLoadCalls" : 1,
+      "ownerEnded" : true,
+      "recordingCanceled" : true,
+      "screenReads" : 1,
+      "taskCompleted" : true,
+      "taskDetachedOnCancellation" : false,
+      "wasRecordingAtTaskCompletion" : false
+    }
+  },
+  "checkpoint" : "startup-context-ownership",
+  "error" : null,
+  "executablePath" : "\/Users\/runner\/work\/roma-just-talk\/roma-just-talk\/.local-build\/Build\/Products\/Debug\/roma just talk.app\/Contents\/MacOS\/roma just talk",
+  "noSetupFailure" : true,
+  "processIdentifier" : 53860,
+  "scope" : "Actual engine and recorder with gated Whisper loader and context-call spies; no model weights, transcription or OS context reads",
+  "test" : "liveWritingStartupContextRespectsOwnerAfterCancellation",
+  "version" : 2
+}

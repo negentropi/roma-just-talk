@@ -259,6 +259,7 @@ case "$mode" in
       liveWritingTargetTextEditRefusesRangeTextAndFocusDrift
       liveWritingTargetSafariTextareaReplacesOnlySelection
       liveWritingActionPipelineUsesLocalCLIAndRetainsFailure
+      liveWritingStartupContextRespectsOwnerAfterCancellation
     )
     test_arguments "$repo_root" "$debug_dir"
     select_tests "${live_names[@]}"

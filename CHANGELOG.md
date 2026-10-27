@@ -9,6 +9,7 @@
 - Keep snippet and translation-target changes separate from Power Mode's saved settings.
 - Preserve dollar signs and backslashes in saved word replacements.
 - Keep dictionary replacements from changing part of an accented word or name, while preserving mixed-language matches.
+- Stop canceled recordings from collecting clipboard or screen context after delayed model preparation finishes.
 - Use a captured-target Paste command for browser writing actions, with text, selection, cancellation, and clipboard checks before the single attempt.
 
 - Double-tap Shift in Special mode to dictate hands-free, then press the assigned shortcut to finish. Set the tap interval in milliseconds or turn the gesture off.

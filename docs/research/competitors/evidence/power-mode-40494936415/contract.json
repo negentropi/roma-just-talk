@@ -1,0 +1,18 @@
+{
+  "driver_sha": "e49ebe4f68c170fcef9264726777895d47ee2b19",
+  "candidate_product_sha": "8d2568169762bad7aee2b077575c37846b6dc3d6",
+  "baseline_product_sha": "98df5fa57fa4b2a928c3b2e2f95b59726d391572",
+  "scope": "pinned candidate product only; current driver HEAD product is not tested",
+  "verified_production_sha": "7459b97b0469832a55b38df7b82753b82e430fdb",
+  "candidate_production_matches_verified_except_reviewed_lock": true,
+  "canonical_graph_receipt": "packages/canonical-graph-contract.json",
+  "oracle_sha256": "11f872a631165ceb835e51232a72ec37bb482c7262204e4571e3dc9e419f8970",
+  "candidate_original_oracle_sha256": "45c364015a390c7c083f4bbc276b7a29e53c114c010e8e19ba71bf727544eec0",
+  "scheme_sha256": "3e644b9907ce6a944c458e39e7b6fde4a04e4ca79160bf815c1abefa3a39dacb",
+  "changed_production_paths": [
+    "VoiceInk/Notifications/AppNotifications.swift",
+    "VoiceInk/Services/ImportExportService.swift",
+    "VoiceInk/Views/Dictionary/SpokenSnippetsView.swift",
+    "VoiceInk/Views/WritingActionsSettingsSection.swift"
+  ]
+}

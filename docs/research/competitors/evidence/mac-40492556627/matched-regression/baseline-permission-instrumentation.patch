@@ -1,0 +1,19 @@
+--- a/VoiceInk/Transcription/Engine/VoiceInkEngine.swift
++++ b/VoiceInk/Transcription/Engine/VoiceInkEngine.swift
+@@ -17,6 +17,8 @@
+     private var activePipelineTranscriptionID: UUID?
+     private var canceledPipelineTranscriptionIDs = Set<UUID>()
+     private var stopRequestedDuringStart = false
++    var recordPermissionRequestForTesting: (() async -> Bool)?
++    var recordingStartupPreparationForTesting: (() async throws -> Void)?
+     private var qwenStartupWarmup: Task<Void, Never>?
+     private weak var qwenRecordingSession: (any TranscriptionSession)?
+     private var qwenRecordingModelName: String?
+@@ -564,6 +566,7 @@
+     private func requestRecordPermission(
+         latencyTraceToken: VoiceInkLatencyTrace.Token?
+     ) async -> Bool {
++        if let recordPermissionRequestForTesting { return await recordPermissionRequestForTesting() }
+         let latencyTrace = VoiceInkLatencyTrace.shared
+         let traceToken = latencyTraceToken
+         let span = latencyTrace.begin("permission.authorization_status", token: traceToken)

@@ -1,0 +1,571 @@
+{
+  "classification": "matched-red-green",
+  "driver_sha": "e49ebe4f68c170fcef9264726777895d47ee2b19",
+  "candidate_product_sha": "8d2568169762bad7aee2b077575c37846b6dc3d6",
+  "baseline_product_sha": "98df5fa57fa4b2a928c3b2e2f95b59726d391572",
+  "scope": "pinned candidate product only; current driver HEAD product is not tested",
+  "tests": {
+    "baseline": {
+      "testSnippetEditsPreservePowerModeRestoration": {
+        "expected": "failed",
+        "exit_code": 65,
+        "observed_results": [
+          "failed"
+        ],
+        "xctest_totals": [
+          [
+            "1",
+            " with 4 failures (0 unexpected) in 74.403 (74.406) seconds"
+          ],
+          [
+            "1",
+            " with 4 failures (0 unexpected) in 74.403 (74.409) seconds"
+          ],
+          [
+            "1",
+            " with 4 failures (0 unexpected) in 74.403 (74.412) seconds"
+          ]
+        ],
+        "assertion_lines": [
+          157,
+          157,
+          144,
+          145
+        ],
+        "application_processes": {
+          "expected_executable": "/Users/runner/work/_temp/writing-power-mode-baseline/.power-mode-proof-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+          "processes": [
+            {
+              "pid": 28768,
+              "executable": "/Users/runner/work/_temp/writing-power-mode-baseline/.power-mode-proof-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk"
+            }
+          ],
+          "observer_completed": true
+        },
+        "observations": {
+          "before writing feature mutation": [
+            {
+              "activeConfigurationID": "09C04895-F030-4DE5-B1DA-F536ABB3CA4B",
+              "configuredCancelShortcut": {
+                "keyCode": 79,
+                "kind": "key",
+                "modifierFlagsRawValue": 0
+              },
+              "currentLowercase": true,
+              "expectedConfigurationID": "09C04895-F030-4DE5-B1DA-F536ABB3CA4B",
+              "phase": "before writing feature mutation",
+              "session": {
+                "id": "141E62A0-59E0-4852-A44E-BFE3B80860B6",
+                "originalState": {
+                  "isEnhancementEnabled": false,
+                  "isTextFormattingEnabled": false,
+                  "lowercaseTranscription": false,
+                  "punctuationCleanupMode": "keep",
+                  "removePunctuation": false,
+                  "selectedAIModel": "local-cli",
+                  "selectedAIProvider": "Local CLI",
+                  "selectedLanguage": "auto",
+                  "transcriptionModelName": "whisper-large-v3-turbo",
+                  "useScreenCaptureContext": false
+                },
+                "startTime": 814793234.105755
+              }
+            }
+          ],
+          "after snippet save": [
+            {
+              "activeConfigurationID": "09C04895-F030-4DE5-B1DA-F536ABB3CA4B",
+              "configuredCancelShortcut": {
+                "keyCode": 79,
+                "kind": "key",
+                "modifierFlagsRawValue": 0
+              },
+              "currentLowercase": true,
+              "expectedConfigurationID": "09C04895-F030-4DE5-B1DA-F536ABB3CA4B",
+              "phase": "after snippet save",
+              "session": {
+                "id": "141E62A0-59E0-4852-A44E-BFE3B80860B6",
+                "originalState": {
+                  "isEnhancementEnabled": false,
+                  "isTextFormattingEnabled": false,
+                  "lowercaseTranscription": true,
+                  "punctuationCleanupMode": "keep",
+                  "removePunctuation": false,
+                  "selectedAIModel": "local-cli",
+                  "selectedAIProvider": "Local CLI",
+                  "selectedLanguage": "auto",
+                  "transcriptionModelName": "whisper-large-v3-turbo",
+                  "useScreenCaptureContext": false
+                },
+                "startTime": 814793234.105755
+              }
+            }
+          ],
+          "after snippet toggle": [
+            {
+              "activeConfigurationID": "09C04895-F030-4DE5-B1DA-F536ABB3CA4B",
+              "configuredCancelShortcut": {
+                "keyCode": 79,
+                "kind": "key",
+                "modifierFlagsRawValue": 0
+              },
+              "currentLowercase": true,
+              "expectedConfigurationID": "09C04895-F030-4DE5-B1DA-F536ABB3CA4B",
+              "phase": "after snippet toggle",
+              "session": {
+                "id": "141E62A0-59E0-4852-A44E-BFE3B80860B6",
+                "originalState": {
+                  "isEnhancementEnabled": false,
+                  "isTextFormattingEnabled": false,
+                  "lowercaseTranscription": true,
+                  "punctuationCleanupMode": "keep",
+                  "removePunctuation": false,
+                  "selectedAIModel": "local-cli",
+                  "selectedAIProvider": "Local CLI",
+                  "selectedLanguage": "auto",
+                  "transcriptionModelName": "whisper-large-v3-turbo",
+                  "useScreenCaptureContext": false
+                },
+                "startTime": 814793234.105755
+              }
+            }
+          ],
+          "after recording cancellation": [
+            {
+              "activeConfigurationID": null,
+              "configuredCancelShortcut": {
+                "keyCode": 79,
+                "kind": "key",
+                "modifierFlagsRawValue": 0
+              },
+              "currentLowercase": true,
+              "expectedConfigurationID": "09C04895-F030-4DE5-B1DA-F536ABB3CA4B",
+              "phase": "after recording cancellation",
+              "session": null
+            }
+          ]
+        },
+        "errors": [],
+        "valid": true
+      },
+      "testTargetChangesPreservePowerModeRestoration": {
+        "expected": "failed",
+        "exit_code": 65,
+        "observed_results": [
+          "failed"
+        ],
+        "xctest_totals": [
+          [
+            "1",
+            " with 4 failures (0 unexpected) in 68.916 (68.918) seconds"
+          ],
+          [
+            "1",
+            " with 4 failures (0 unexpected) in 68.916 (68.919) seconds"
+          ],
+          [
+            "1",
+            " with 4 failures (0 unexpected) in 68.916 (68.921) seconds"
+          ]
+        ],
+        "assertion_lines": [
+          157,
+          157,
+          144,
+          145
+        ],
+        "application_processes": {
+          "expected_executable": "/Users/runner/work/_temp/writing-power-mode-baseline/.power-mode-proof-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+          "processes": [
+            {
+              "pid": 31896,
+              "executable": "/Users/runner/work/_temp/writing-power-mode-baseline/.power-mode-proof-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk"
+            }
+          ],
+          "observer_completed": true
+        },
+        "observations": {
+          "after target reorder": [
+            {
+              "activeConfigurationID": "B33717B6-22CA-4423-8758-5E5971D982AA",
+              "configuredCancelShortcut": {
+                "keyCode": 79,
+                "kind": "key",
+                "modifierFlagsRawValue": 0
+              },
+              "currentLowercase": true,
+              "expectedConfigurationID": "B33717B6-22CA-4423-8758-5E5971D982AA",
+              "phase": "after target reorder",
+              "session": {
+                "id": "30D0E5BA-4CE1-4DC8-BBD6-A55E17FC1097",
+                "originalState": {
+                  "isEnhancementEnabled": false,
+                  "isTextFormattingEnabled": false,
+                  "lowercaseTranscription": true,
+                  "punctuationCleanupMode": "keep",
+                  "removePunctuation": false,
+                  "selectedAIModel": "local-cli",
+                  "selectedAIProvider": "Local CLI",
+                  "selectedLanguage": "auto",
+                  "transcriptionModelName": "whisper-large-v3-turbo",
+                  "useScreenCaptureContext": false
+                },
+                "startTime": 814793332.227103
+              }
+            }
+          ],
+          "after target add": [
+            {
+              "activeConfigurationID": "B33717B6-22CA-4423-8758-5E5971D982AA",
+              "configuredCancelShortcut": {
+                "keyCode": 79,
+                "kind": "key",
+                "modifierFlagsRawValue": 0
+              },
+              "currentLowercase": true,
+              "expectedConfigurationID": "B33717B6-22CA-4423-8758-5E5971D982AA",
+              "phase": "after target add",
+              "session": {
+                "id": "30D0E5BA-4CE1-4DC8-BBD6-A55E17FC1097",
+                "originalState": {
+                  "isEnhancementEnabled": false,
+                  "isTextFormattingEnabled": false,
+                  "lowercaseTranscription": true,
+                  "punctuationCleanupMode": "keep",
+                  "removePunctuation": false,
+                  "selectedAIModel": "local-cli",
+                  "selectedAIProvider": "Local CLI",
+                  "selectedLanguage": "auto",
+                  "transcriptionModelName": "whisper-large-v3-turbo",
+                  "useScreenCaptureContext": false
+                },
+                "startTime": 814793332.227103
+              }
+            }
+          ],
+          "before writing feature mutation": [
+            {
+              "activeConfigurationID": "B33717B6-22CA-4423-8758-5E5971D982AA",
+              "configuredCancelShortcut": {
+                "keyCode": 79,
+                "kind": "key",
+                "modifierFlagsRawValue": 0
+              },
+              "currentLowercase": true,
+              "expectedConfigurationID": "B33717B6-22CA-4423-8758-5E5971D982AA",
+              "phase": "before writing feature mutation",
+              "session": {
+                "id": "30D0E5BA-4CE1-4DC8-BBD6-A55E17FC1097",
+                "originalState": {
+                  "isEnhancementEnabled": false,
+                  "isTextFormattingEnabled": false,
+                  "lowercaseTranscription": false,
+                  "punctuationCleanupMode": "keep",
+                  "removePunctuation": false,
+                  "selectedAIModel": "local-cli",
+                  "selectedAIProvider": "Local CLI",
+                  "selectedLanguage": "auto",
+                  "transcriptionModelName": "whisper-large-v3-turbo",
+                  "useScreenCaptureContext": false
+                },
+                "startTime": 814793332.227103
+              }
+            }
+          ],
+          "after recording cancellation": [
+            {
+              "activeConfigurationID": null,
+              "configuredCancelShortcut": {
+                "keyCode": 79,
+                "kind": "key",
+                "modifierFlagsRawValue": 0
+              },
+              "currentLowercase": true,
+              "expectedConfigurationID": "B33717B6-22CA-4423-8758-5E5971D982AA",
+              "phase": "after recording cancellation",
+              "session": null
+            }
+          ]
+        },
+        "errors": [],
+        "valid": true
+      }
+    },
+    "candidate": {
+      "testSnippetEditsPreservePowerModeRestoration": {
+        "expected": "passed",
+        "exit_code": 0,
+        "observed_results": [
+          "passed"
+        ],
+        "xctest_totals": [
+          [
+            "1",
+            " with 0 failures (0 unexpected) in 63.101 (63.103) seconds"
+          ],
+          [
+            "1",
+            " with 0 failures (0 unexpected) in 63.101 (63.104) seconds"
+          ],
+          [
+            "1",
+            " with 0 failures (0 unexpected) in 63.101 (63.106) seconds"
+          ]
+        ],
+        "assertion_lines": [],
+        "application_processes": {
+          "expected_executable": "/Users/runner/work/_temp/writing-power-mode-candidate/.power-mode-proof-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+          "processes": [
+            {
+              "pid": 49654,
+              "executable": "/Users/runner/work/_temp/writing-power-mode-candidate/.power-mode-proof-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk"
+            }
+          ],
+          "observer_completed": true
+        },
+        "observations": {
+          "after snippet toggle": [
+            {
+              "activeConfigurationID": "8B2845CF-4A79-48EE-A55E-8F68A6B9DB31",
+              "configuredCancelShortcut": {
+                "keyCode": 79,
+                "kind": "key",
+                "modifierFlagsRawValue": 0
+              },
+              "currentLowercase": true,
+              "expectedConfigurationID": "8B2845CF-4A79-48EE-A55E-8F68A6B9DB31",
+              "phase": "after snippet toggle",
+              "session": {
+                "id": "1A85EE52-8538-466D-986A-B6EDFFCC86CA",
+                "originalState": {
+                  "isEnhancementEnabled": false,
+                  "isTextFormattingEnabled": false,
+                  "lowercaseTranscription": false,
+                  "punctuationCleanupMode": "keep",
+                  "removePunctuation": false,
+                  "selectedAIModel": "local-cli",
+                  "selectedAIProvider": "Local CLI",
+                  "selectedLanguage": "auto",
+                  "transcriptionModelName": "whisper-large-v3-turbo",
+                  "useScreenCaptureContext": false
+                },
+                "startTime": 814793803.476365
+              }
+            }
+          ],
+          "after snippet save": [
+            {
+              "activeConfigurationID": "8B2845CF-4A79-48EE-A55E-8F68A6B9DB31",
+              "configuredCancelShortcut": {
+                "keyCode": 79,
+                "kind": "key",
+                "modifierFlagsRawValue": 0
+              },
+              "currentLowercase": true,
+              "expectedConfigurationID": "8B2845CF-4A79-48EE-A55E-8F68A6B9DB31",
+              "phase": "after snippet save",
+              "session": {
+                "id": "1A85EE52-8538-466D-986A-B6EDFFCC86CA",
+                "originalState": {
+                  "isEnhancementEnabled": false,
+                  "isTextFormattingEnabled": false,
+                  "lowercaseTranscription": false,
+                  "punctuationCleanupMode": "keep",
+                  "removePunctuation": false,
+                  "selectedAIModel": "local-cli",
+                  "selectedAIProvider": "Local CLI",
+                  "selectedLanguage": "auto",
+                  "transcriptionModelName": "whisper-large-v3-turbo",
+                  "useScreenCaptureContext": false
+                },
+                "startTime": 814793803.476365
+              }
+            }
+          ],
+          "after recording cancellation": [
+            {
+              "activeConfigurationID": null,
+              "configuredCancelShortcut": {
+                "keyCode": 79,
+                "kind": "key",
+                "modifierFlagsRawValue": 0
+              },
+              "currentLowercase": false,
+              "expectedConfigurationID": "8B2845CF-4A79-48EE-A55E-8F68A6B9DB31",
+              "phase": "after recording cancellation",
+              "session": null
+            }
+          ],
+          "before writing feature mutation": [
+            {
+              "activeConfigurationID": "8B2845CF-4A79-48EE-A55E-8F68A6B9DB31",
+              "configuredCancelShortcut": {
+                "keyCode": 79,
+                "kind": "key",
+                "modifierFlagsRawValue": 0
+              },
+              "currentLowercase": true,
+              "expectedConfigurationID": "8B2845CF-4A79-48EE-A55E-8F68A6B9DB31",
+              "phase": "before writing feature mutation",
+              "session": {
+                "id": "1A85EE52-8538-466D-986A-B6EDFFCC86CA",
+                "originalState": {
+                  "isEnhancementEnabled": false,
+                  "isTextFormattingEnabled": false,
+                  "lowercaseTranscription": false,
+                  "punctuationCleanupMode": "keep",
+                  "removePunctuation": false,
+                  "selectedAIModel": "local-cli",
+                  "selectedAIProvider": "Local CLI",
+                  "selectedLanguage": "auto",
+                  "transcriptionModelName": "whisper-large-v3-turbo",
+                  "useScreenCaptureContext": false
+                },
+                "startTime": 814793803.476365
+              }
+            }
+          ]
+        },
+        "errors": [],
+        "valid": true
+      },
+      "testTargetChangesPreservePowerModeRestoration": {
+        "expected": "passed",
+        "exit_code": 0,
+        "observed_results": [
+          "passed"
+        ],
+        "xctest_totals": [
+          [
+            "1",
+            " with 0 failures (0 unexpected) in 50.909 (50.911) seconds"
+          ],
+          [
+            "1",
+            " with 0 failures (0 unexpected) in 50.909 (50.912) seconds"
+          ],
+          [
+            "1",
+            " with 0 failures (0 unexpected) in 50.909 (50.914) seconds"
+          ]
+        ],
+        "assertion_lines": [],
+        "application_processes": {
+          "expected_executable": "/Users/runner/work/_temp/writing-power-mode-candidate/.power-mode-proof-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+          "processes": [
+            {
+              "pid": 52974,
+              "executable": "/Users/runner/work/_temp/writing-power-mode-candidate/.power-mode-proof-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk"
+            }
+          ],
+          "observer_completed": true
+        },
+        "observations": {
+          "before writing feature mutation": [
+            {
+              "activeConfigurationID": "FE4FC970-A3E0-405F-91B3-1947E8FE6F77",
+              "configuredCancelShortcut": {
+                "keyCode": 79,
+                "kind": "key",
+                "modifierFlagsRawValue": 0
+              },
+              "currentLowercase": true,
+              "expectedConfigurationID": "FE4FC970-A3E0-405F-91B3-1947E8FE6F77",
+              "phase": "before writing feature mutation",
+              "session": {
+                "id": "BC2B44F6-E350-4B18-990E-A49753475E74",
+                "originalState": {
+                  "isEnhancementEnabled": false,
+                  "isTextFormattingEnabled": false,
+                  "lowercaseTranscription": false,
+                  "punctuationCleanupMode": "keep",
+                  "removePunctuation": false,
+                  "selectedAIModel": "local-cli",
+                  "selectedAIProvider": "Local CLI",
+                  "selectedLanguage": "auto",
+                  "transcriptionModelName": "whisper-large-v3-turbo",
+                  "useScreenCaptureContext": false
+                },
+                "startTime": 814793897.663102
+              }
+            }
+          ],
+          "after target reorder": [
+            {
+              "activeConfigurationID": "FE4FC970-A3E0-405F-91B3-1947E8FE6F77",
+              "configuredCancelShortcut": {
+                "keyCode": 79,
+                "kind": "key",
+                "modifierFlagsRawValue": 0
+              },
+              "currentLowercase": true,
+              "expectedConfigurationID": "FE4FC970-A3E0-405F-91B3-1947E8FE6F77",
+              "phase": "after target reorder",
+              "session": {
+                "id": "BC2B44F6-E350-4B18-990E-A49753475E74",
+                "originalState": {
+                  "isEnhancementEnabled": false,
+                  "isTextFormattingEnabled": false,
+                  "lowercaseTranscription": false,
+                  "punctuationCleanupMode": "keep",
+                  "removePunctuation": false,
+                  "selectedAIModel": "local-cli",
+                  "selectedAIProvider": "Local CLI",
+                  "selectedLanguage": "auto",
+                  "transcriptionModelName": "whisper-large-v3-turbo",
+                  "useScreenCaptureContext": false
+                },
+                "startTime": 814793897.663102
+              }
+            }
+          ],
+          "after target add": [
+            {
+              "activeConfigurationID": "FE4FC970-A3E0-405F-91B3-1947E8FE6F77",
+              "configuredCancelShortcut": {
+                "keyCode": 79,
+                "kind": "key",
+                "modifierFlagsRawValue": 0
+              },
+              "currentLowercase": true,
+              "expectedConfigurationID": "FE4FC970-A3E0-405F-91B3-1947E8FE6F77",
+              "phase": "after target add",
+              "session": {
+                "id": "BC2B44F6-E350-4B18-990E-A49753475E74",
+                "originalState": {
+                  "isEnhancementEnabled": false,
+                  "isTextFormattingEnabled": false,
+                  "lowercaseTranscription": false,
+                  "punctuationCleanupMode": "keep",
+                  "removePunctuation": false,
+                  "selectedAIModel": "local-cli",
+                  "selectedAIProvider": "Local CLI",
+                  "selectedLanguage": "auto",
+                  "transcriptionModelName": "whisper-large-v3-turbo",
+                  "useScreenCaptureContext": false
+                },
+                "startTime": 814793897.663102
+              }
+            }
+          ],
+          "after recording cancellation": [
+            {
+              "activeConfigurationID": null,
+              "configuredCancelShortcut": {
+                "keyCode": 79,
+                "kind": "key",
+                "modifierFlagsRawValue": 0
+              },
+              "currentLowercase": false,
+              "expectedConfigurationID": "FE4FC970-A3E0-405F-91B3-1947E8FE6F77",
+              "phase": "after recording cancellation",
+              "session": null
+            }
+          ]
+        },
+        "errors": [],
+        "valid": true
+      }
+    }
+  }
+}

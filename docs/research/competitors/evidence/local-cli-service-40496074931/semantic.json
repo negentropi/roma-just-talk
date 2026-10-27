@@ -1,0 +1,221 @@
+{
+  "bundleIdentifier" : "com.negentropi.RomaJustTalk.WritingLocalCLIProbe.ae1a8c7adcdd4f08a892f48fe5f75cab",
+  "classification" : "passed",
+  "credentials" : "Local CLI is selected before production initialization. No connected-provider enumeration or provider switching. CLI authentication belongs to its child process.",
+  "mode" : "semantic",
+  "observations" : [
+    {
+      "checks" : [
+        {
+          "passed" : true,
+          "requirement" : "Returns nonempty output"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Preserves RJT-482 exactly"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Preserves fact: Taipei Main Station or Taipei Station or Taipei Railway Station"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Preserves fact: south exit or southern exit or south entrance or southern entrance"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Preserves fact: tomorrow"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Preserves fact: 3 p.m. or 3 pm or 3pm or 3:00 p.m. or 3:00 pm or 3:00pm or 15:00 or three in the afternoon or 3 in the afternoon or three p.m."
+        },
+        {
+          "passed" : true,
+          "requirement" : "Omits here is the translation"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Omits here's the translation"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Uses English rather than untranslated Japanese or Chinese"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Source-bound request metadata is retained"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Ordinary enhancement remains disabled"
+        }
+      ],
+      "id" : "japanese-to-english",
+      "output" : "Let's meet at the south exit of Taipei Station at 3 p.m. tomorrow. The confirmation code is RJT-482."
+    },
+    {
+      "checks" : [
+        {
+          "passed" : true,
+          "requirement" : "Returns nonempty output"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Preserves RJT-482 exactly"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Preserves fact: 台北車站 or 臺北車站 or 台北火車站 or 臺北火車站"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Preserves fact: 南口 or 南出口 or 南側出口 or 南邊出口"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Preserves fact: 明天 or 明日"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Preserves fact: 下午3 or 下午 3 or 下午三 or 午後3 or 午後 3 or 15:00"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Preserves fact: 確認 or 代碼 or 代號 or 編號"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Omits 车站"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Omits 确认"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Omits 代码"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Omits 见面"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Omits 请"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Omits 会面"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Contains Chinese text"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Source-bound request metadata is retained"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Ordinary enhancement remains disabled"
+        }
+      ],
+      "id" : "english-to-traditional-chinese",
+      "output" : "明天下午3點在台北車站南出口跟我碰面。確認碼是 RJT-482。"
+    },
+    {
+      "checks" : [
+        {
+          "passed" : true,
+          "requirement" : "Returns nonempty output"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Preserves Atlas exactly"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Preserves Mina exactly"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Preserves Friday exactly"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Preserves 10:30 exactly"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Preserves Taipei Main Station exactly"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Preserves RJT-482 exactly"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Preserves fact: review"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Preserves fact: moved or rescheduled or now scheduled or now on"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Preserves fact: reply or replies or respond or responding or response"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Omits hello"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Omits dear Mina"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Omits thank you"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Omits patience"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Omits here is"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Omits here's"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Uses English rather than untranslated Japanese or Chinese"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Uses at most 35 words"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Uses at most 1 sentence"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Source-bound request metadata is retained"
+        },
+        {
+          "passed" : true,
+          "requirement" : "Ordinary enhancement remains disabled"
+        }
+      ],
+      "id" : "concise-selection",
+      "output" : "Mina, the Atlas project review has moved to Friday at 10:30 at Taipei Main Station; please use ticket RJT-482 when you reply."
+    }
+  ],
+  "persistentProbePreferencesUnchanged" : true,
+  "scope" : "Real AIService, AIEnhancementService and LocalCLIService; no app lifecycle, recording, ASR, editor delivery, or physical shortcut proof.",
+  "sourceSHA" : "f870a0b04238f338b52855b081b49087cc8966fa"
+}

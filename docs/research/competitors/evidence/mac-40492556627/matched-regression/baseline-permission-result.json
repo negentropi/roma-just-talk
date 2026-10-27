@@ -1,0 +1,14 @@
+{
+  "expectation": "known-bad",
+  "classification": "deferred-permission-callback",
+  "exit_code": 65,
+  "test": {
+    "permissionWaitReservesOneRecordingStart": [
+      "failed"
+    ]
+  },
+  "diagnostics": {
+    "permission_wait_left_state_idle": true,
+    "duplicate_permission_calls": true
+  }
+}

@@ -1,0 +1,16 @@
+Executable=/Users/runner/work/_temp/writing-local-cli-service-probe/WritingLocalCLIProbe.app/Contents/MacOS/WritingLocalCLIProbe
+Identifier=com.negentropi.RomaJustTalk.WritingLocalCLIProbe.ae1a8c7adcdd4f08a892f48fe5f75cab
+Format=app bundle with Mach-O thin (arm64)
+CodeDirectory v=20400 size=60714 flags=0x2(adhoc) hashes=1889+3 location=embedded
+Hash type=sha256 size=32
+CandidateCDHash sha256=96b8b49110ff91f8f51e9390cad76f56a452d032
+CandidateCDHashFull sha256=96b8b49110ff91f8f51e9390cad76f56a452d032e45ba57778b7995011af95b6
+Hash choices=sha256
+CMSDigest=96b8b49110ff91f8f51e9390cad76f56a452d032e45ba57778b7995011af95b6
+CMSDigestType=2
+CDHash=96b8b49110ff91f8f51e9390cad76f56a452d032
+Signature=adhoc
+Info.plist entries=7
+TeamIdentifier=not set
+Sealed Resources version=2 rules=13 files=36
+Internal requirements count=0 size=12

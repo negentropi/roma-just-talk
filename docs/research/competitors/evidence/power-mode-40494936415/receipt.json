@@ -1,0 +1,16 @@
+{
+  "run_id": 40494936415,
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40494936415",
+  "driver_sha": "e49ebe4f68c170fcef9264726777895d47ee2b19",
+  "candidate_product_sha": "8d2568169762bad7aee2b077575c37846b6dc3d6",
+  "baseline_product_sha": "98df5fa57fa4b2a928c3b2e2f95b59726d391572",
+  "artifact_id": 12732315239,
+  "artifact_zip_sha256": "65b6f361f05865467472a90ab6b6bdbec854ee6ad1962d7b04186214e4dd7faf",
+  "parent_verification": "Checked both mutation cases per lane: same session, original snapshot before/after actual UI edits, actual configured cancellation, cleared session/configuration and expected final setting; identical before/after production manifests.",
+  "classification": "matched-red-green",
+  "limits": [
+    "Pinned notification-change product comparison; later browser-delivery changes are excluded.",
+    "Configured synthetic F18 cancellation; no physical-key or Double Escape timing proof.",
+    "No provider or ASR result was requested."
+  ]
+}

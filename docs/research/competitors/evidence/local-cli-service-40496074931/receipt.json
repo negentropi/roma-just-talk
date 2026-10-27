@@ -1,0 +1,30 @@
+{
+  "run_id": 40496074931,
+  "source_sha": "f870a0b04238f338b52855b081b49087cc8966fa",
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40496074931",
+  "artifact_ids": {
+    "evidence": 12731170532,
+    "signed_probe": 12731070681
+  },
+  "artifact_sha256": {
+    "evidence": "8feaca84390a219ddf38615e91503868c351e0b0719ff87fbdc95123fd519ff7",
+    "signed_probe": "4a9b612ad6cc100f3f88ecc5fd46a4b9d8afedf3711ae5e690d48134be83a8bb"
+  },
+  "executable_sha256_before_and_after_host_execution": "6a857aeda055534c66b4442c3a56883100b4603e304830152ff44905b66ec903",
+  "host_execution": "Same signed remotely built artifact, quiet direct executable, unique process defaults, existing installed Claude CLI API-key authentication. No credential values transferred to CI or retained in evidence.",
+  "parent_verification": "Rechecked eleven native service source hashes against exact Git revision, binary hash and signature before and after semantic execution, source-bound requests and observed outputs.",
+  "semantic_review": {
+    "reviewer_model": "gpt-6.1-sol",
+    "cases": {
+      "japanese-to-english": "PASS: invitation, tomorrow at 3 p.m., Taipei Station south exit and RJT-482 retained; no added facts.",
+      "english-to-traditional-chinese": "PASS: faithful Traditional Chinese; meeting facts and confirmation code retained.",
+      "concise-selection": "PASS: one concise sentence retains recipient, project, rescheduling, time, location and reply ticket; no greeting, sign-off or invented detail."
+    }
+  },
+  "served_model": "No override; installed CLI default. Text output did not expose actual served model metadata.",
+  "limits": [
+    "Three bounded observations, not general language quality or injection robustness.",
+    "Service-only proof; no ASR, recording, native editor, physical shortcut or full app lifecycle proof.",
+    "CLI child and normal shell startup own ambient authentication; source review establishes no RJT credential lookup on this Local CLI route."
+  ]
+}

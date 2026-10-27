@@ -1,0 +1,566 @@
+{
+  "run_id": 40492556627,
+  "head_sha": "f901c3725d59f5d2faf926448272c2557c6e7ae3",
+  "artifact_zip": "/data/rjt-writing-check-01a17bef/40492556627/evidence.zip",
+  "artifact_bytes": 464127135,
+  "source_sha_receipt": {
+    "zip_member": "_temp/writing-proof-snapshot/source-sha.txt",
+    "bytes": 41,
+    "sha256": "bf9fb421f6b053ce685dba5f7bdcd57bf0098d7e06d49429bb14b99616888158"
+  },
+  "source_sha_matches": true,
+  "extraction": "Read existing remote ZIP using Python 3.14 compression.zstd; parsed full length-prefixed xcresult trees with exact UTF-8 field lengths. No native execution or xcresulttool.",
+  "unit": {
+    "counts": {
+      "total": 174,
+      "passed": 168,
+      "failed": 0,
+      "skipped": 6,
+      "executed_non_skipped": 168
+    },
+    "aggregate_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~fEMMNlHQV6_4fvcGPGcFLOwfznYUarQK59Q65UVLMTKD2y3KKwpOwXG9_YoqQ_KKqNbFs99bRVknWLPJ5_TW0Q==",
+    "decoded_sha256": "d7d2a5e3254772a9ff63fe26e1e822cb36178e33b7be122bc0f973a1798a43e8",
+    "captured_writing_paste_results": [
+      {
+        "identifier": "CapturedWritingPasteTests/targetDriftDuringDiscoveryLeavesTheNewDocumentAndClipboardUntouched()",
+        "status": "Success"
+      },
+      {
+        "identifier": "CapturedWritingPasteTests/cancellationDuringDiscoveryRestoresTheOwnedClipboardWithoutWriting()",
+        "status": "Success"
+      },
+      {
+        "identifier": "CapturedWritingPasteTests/focusOrSelectionDriftDuringDiscoveryPreventsThePaste()",
+        "status": "Success"
+      },
+      {
+        "identifier": "CapturedWritingPasteTests/newerClipboardCopyDuringDiscoverySurvivesRefusal()",
+        "status": "Success"
+      },
+      {
+        "identifier": "CapturedWritingPasteTests/unavailableMenuRestoresClipboardEvenWhenSuccessfulPastesWouldKeepIt()",
+        "status": "Success"
+      },
+      {
+        "identifier": "CapturedWritingPasteTests/aNewClipboardGenerationWithTheSameTextAndMarkerStillRefusesPosting()",
+        "status": "Success"
+      },
+      {
+        "identifier": "CapturedWritingPasteTests/confirmedReplacementRestoresAnEmptyClipboard()",
+        "status": "Success"
+      },
+      {
+        "identifier": "CapturedWritingPasteTests/confirmedReplacementRestoresEveryImageAndTextClipboardFormat()",
+        "status": "Success"
+      },
+      {
+        "identifier": "CapturedWritingPasteTests/aNewCopyAfterConfirmedPasteSurvivesScheduledRestoration()",
+        "status": "Success"
+      },
+      {
+        "identifier": "CapturedWritingPasteTests/confirmedPasteRestoresTheClipboardAfterTheRequestedDelay()",
+        "status": "Success"
+      },
+      {
+        "identifier": "CapturedWritingPasteTests/scheduledRestorationCannotOverwriteANewGenerationWithMatchingData()",
+        "status": "Success"
+      },
+      {
+        "identifier": "CapturedWritingPasteTests/anErrorAfterConfirmedMutationDoesNotRepeatThePaste()",
+        "status": "Success"
+      },
+      {
+        "identifier": "CapturedWritingPasteTests/acceptedNoOpRemainsUnconfirmedWithoutAnotherMutationOrClipboardRestore()",
+        "status": "Success"
+      },
+      {
+        "identifier": "CapturedWritingPasteTests/failureAfterMutationCannotEnterThePreMutationRestorationPath()",
+        "status": "Success"
+      },
+      {
+        "identifier": "CapturedWritingPasteTests/delayedReadbackConfirmsTheSameSingleMutation()",
+        "status": "Success"
+      },
+      {
+        "identifier": "CapturedWritingPasteTests/canonicalEqualityDoesNotConfirmDifferentUTF16Output()",
+        "status": "Success"
+      },
+      {
+        "identifier": "CapturedWritingPasteTests/cancellationAfterAttemptKeepsUncertainContentWithoutRetrying()",
+        "status": "Success"
+      }
+    ],
+    "skipped": [
+      "VoiceInkTests/writingProviderTranslatesJapaneseToEnglish()",
+      "VoiceInkTests/writingProviderTranslatesEnglishToTraditionalChinese()",
+      "VoiceInkTests/writingProviderRewritesTheSuppliedSelection()",
+      "VoiceInkTests/liveWritingTargetTextEditPreservesUnicodeOutsideSelection()",
+      "VoiceInkTests/liveWritingTargetTextEditRefusesRangeTextAndFocusDrift()",
+      "VoiceInkTests/liveWritingTargetSafariTextareaReplacesOnlySelection()"
+    ],
+    "count_note": "Result records include parameterized invocations and gated skips. Report executed_non_skipped separately; do not call total executed.",
+    "captured_writing_paste_expected_source": {
+      "git_path": "VoiceInkTests/CapturedWritingPasteTests.swift",
+      "source_sha256": "d31dd4752b74f51be868a908f49f540eaf99b50d6c02acb76940e9dc4287cabb",
+      "all_17_exact_method_identifiers_matched": true
+    },
+    "selected_results": [
+      {
+        "identifier": "VoiceInkTests/spokenSnippetPipelineInsertsExactWholeTriggerContentAndSavesIt()",
+        "status": "Success"
+      },
+      {
+        "identifier": "VoiceInkTests/spokenSnippetPipelinePreservesInlineCapitalsPunctuationAndParagraphs()",
+        "status": "Success"
+      },
+      {
+        "identifier": "VoiceInkTests/spokenSnippetPipelineLeavesUnmatchedDictationOnItsExistingFormattingPath()",
+        "status": "Success"
+      },
+      {
+        "identifier": "WritingActionEngineTests/permissionWaitReservesOneRecordingStart()",
+        "status": "Success"
+      },
+      {
+        "identifier": "WritingActionEngineTests/oldStartupFailureDoesNotClearANewerRecordingStart()",
+        "status": "Success"
+      },
+      {
+        "identifier": "WritingTargetTests/selectionCannotSplitAnEmojiSurrogatePair()",
+        "status": "Success"
+      }
+    ],
+    "aggregate_result_record_count": 174
+  },
+  "live": {
+    "counts": {
+      "total": 3,
+      "passed": 2,
+      "failed": 1,
+      "skipped": 0,
+      "executed_non_skipped": 3
+    },
+    "aggregate_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/Live.xcresult/Data/data.0~dfOjoutBeBwYZvZDYJCzCHtprcNX2qES0fOhgnqZyZS_YROcbLwB67Hdmw3V3LIJtmz-irOlVegE9gGma1bqhw==",
+    "decoded_sha256": "cd9d0f4247049d91a55b1667e0ed0c48dccf758606c0ca251c9d25c6ae4766fa",
+    "result_records": [
+      {
+        "identifier": "VoiceInkTests/liveWritingTargetTextEditPreservesUnicodeOutsideSelection()",
+        "status": "Success"
+      },
+      {
+        "identifier": "VoiceInkTests/liveWritingTargetTextEditRefusesRangeTextAndFocusDrift()",
+        "status": "Success"
+      },
+      {
+        "identifier": "VoiceInkTests/liveWritingTargetSafariTextareaReplacesOnlySelection()",
+        "status": "Failure"
+      }
+    ],
+    "selection_receipt": {
+      "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/selection/selection-receipt.json",
+      "bytes": 17135,
+      "sha256": "9190af5028db7d7e6286e0783ff7427f802f738597c6eb71f752f1a0a6c842f0",
+      "content": {
+        "requested_identifiers": [
+          "VoiceInkTests/VoiceInkTests/liveWritingTargetTextEditPreservesUnicodeOutsideSelection()",
+          "VoiceInkTests/VoiceInkTests/liveWritingTargetTextEditRefusesRangeTextAndFocusDrift()",
+          "VoiceInkTests/VoiceInkTests/liveWritingTargetSafariTextareaReplacesOnlySelection()"
+        ],
+        "enabled_identifiers": [
+          "VoiceInkTests/VoiceInkTests/liveWritingTargetSafariTextareaReplacesOnlySelection()",
+          "VoiceInkTests/VoiceInkTests/liveWritingTargetTextEditPreservesUnicodeOutsideSelection()",
+          "VoiceInkTests/VoiceInkTests/liveWritingTargetTextEditRefusesRangeTextAndFocusDrift()"
+        ],
+        "disabled_identifiers": [
+          "VoiceInkTests/CapturedWritingPasteTests/aNewClipboardGenerationWithTheSameTextAndMarkerStillRefusesPosting()",
+          "VoiceInkTests/CapturedWritingPasteTests/aNewCopyAfterConfirmedPasteSurvivesScheduledRestoration()",
+          "VoiceInkTests/CapturedWritingPasteTests/acceptedNoOpRemainsUnconfirmedWithoutAnotherMutationOrClipboardRestore()",
+          "VoiceInkTests/CapturedWritingPasteTests/anErrorAfterConfirmedMutationDoesNotRepeatThePaste()",
+          "VoiceInkTests/CapturedWritingPasteTests/cancellationAfterAttemptKeepsUncertainContentWithoutRetrying()",
+          "VoiceInkTests/CapturedWritingPasteTests/cancellationDuringDiscoveryRestoresTheOwnedClipboardWithoutWriting()",
+          "VoiceInkTests/CapturedWritingPasteTests/canonicalEqualityDoesNotConfirmDifferentUTF16Output()",
+          "VoiceInkTests/CapturedWritingPasteTests/confirmedPasteRestoresTheClipboardAfterTheRequestedDelay()",
+          "VoiceInkTests/CapturedWritingPasteTests/confirmedReplacementRestoresAnEmptyClipboard()",
+          "VoiceInkTests/CapturedWritingPasteTests/confirmedReplacementRestoresEveryImageAndTextClipboardFormat()",
+          "VoiceInkTests/CapturedWritingPasteTests/delayedReadbackConfirmsTheSameSingleMutation()",
+          "VoiceInkTests/CapturedWritingPasteTests/failureAfterMutationCannotEnterThePreMutationRestorationPath()",
+          "VoiceInkTests/CapturedWritingPasteTests/focusOrSelectionDriftDuringDiscoveryPreventsThePaste()",
+          "VoiceInkTests/CapturedWritingPasteTests/newerClipboardCopyDuringDiscoverySurvivesRefusal()",
+          "VoiceInkTests/CapturedWritingPasteTests/scheduledRestorationCannotOverwriteANewGenerationWithMatchingData()",
+          "VoiceInkTests/CapturedWritingPasteTests/targetDriftDuringDiscoveryLeavesTheNewDocumentAndClipboardUntouched()",
+          "VoiceInkTests/CapturedWritingPasteTests/unavailableMenuRestoresClipboardEvenWhenSuccessfulPastesWouldKeepIt()",
+          "VoiceInkTests/CloudProviderVerificationTests/cartesiaKeepsStreamingOnlyVerificationAdapter()",
+          "VoiceInkTests/CloudProviderVerificationTests/coreBackedCloudProvidersShareCoreAPIKeyVerifier()",
+          "VoiceInkTests/CoreAudioPreRollBufferTests/streamingEmissionGateDropsQueuedChunksWhenCanceled()",
+          "VoiceInkTests/CoreAudioPreRollBufferTests/streamingEmissionGateQueuesLiveChunksUntilPreRollFinishes()",
+          "VoiceInkTests/FluidAudioModelManagerTests/retryForceRedownloadsInvalidExistingCache()",
+          "VoiceInkTests/FluidAudioModelManagerTests/secondCallerJoinsActiveDownloadAndCancellationLeavesRetryState(usesURLCancellation:)",
+          "VoiceInkTests/FluidAudioModelManagerTests/silentDownloadBecomesStalledThenRecoversWhenProgressResumes()",
+          "VoiceInkTests/FluidAudioStreamingCommitTests/disconnectDrainsBothPredictionsAndPreventsFinalPublication()",
+          "VoiceInkTests/FluidAudioStreamingCommitTests/finalPassOverlapsCancelledLivePassWithoutPublishingItsLateResult(finalSamples:)",
+          "VoiceInkTests/FluidAudioStreamingCommitTests/longFinalAudioKeepsSDKProgressSessionsSequential()",
+          "VoiceInkTests/LaunchAtLoginControllerTests/cachesStatusInsteadOfReadingItDuringViewUpdates()",
+          "VoiceInkTests/ModelPrewarmServiceTests/cancelledPrewarmDoesNotLoadInstalledModel()",
+          "VoiceInkTests/ModelPrewarmServiceTests/prewarmRechecksInstalledModelBeforeEveryLoad()",
+          "VoiceInkTests/OnboardingRegionViewTests/testAdvancedDisclosureRejectsPendingTaiwanSuggestion()",
+          "VoiceInkTests/OnboardingRegionViewTests/testContinueConfirmsCachedEnglishAcrossOnboardingReset()",
+          "VoiceInkTests/OnboardingRegionViewTests/testExplicitEnglishAccessibilityActionWinsBeforeTaiwanResponse()",
+          "VoiceInkTests/OnboardingRegionViewTests/testLateTaiwanDraftBlocksCachedEnglishContinueWithoutPersistingIt()",
+          "VoiceInkTests/OnboardingRegionViewTests/testProductionOnboardingWindowFitsVisibleDesktopAndKeepsUserResize()",
+          "VoiceInkTests/OnboardingRegionViewTests/testReopeningPreservesExplicitEnglishWithoutAnotherLookup()",
+          "VoiceInkTests/OnboardingRegionViewTests/testSkipUnmountsPendingLookupWithoutCommittingSuggestedModel()",
+          "VoiceInkTests/OnboardingRegionViewTests/testWindowAccessorReconfiguresAfterSwiftUIReusesItsView()",
+          "VoiceInkTests/PowerModeConfigTests/automaticRuleDetectionIgnoresDisabledRules()",
+          "VoiceInkTests/PowerModeConfigTests/automaticRuleDetectionSeparatesURLRulesFromAppAndDefaultRules()",
+          "VoiceInkTests/QwenRecordingSelectionTests/laterDeselectionJoinsInFlightTransition()",
+          "VoiceInkTests/QwenRecordingSelectionTests/rapidReselectionStillDrainsOldRecording()",
+          "VoiceInkTests/QwenRecordingSelectionTests/selectionCancelsDeferredConnectBeforeRuntimeReservation()",
+          "VoiceInkTests/RecordingStartupAudioRelayTests/clearDropsBufferedChunksBeforeSinkInstall()",
+          "VoiceInkTests/RecordingStartupAudioRelayTests/installSinkReplaysBufferedChunksAndForwardsLaterChunks()",
+          "VoiceInkTests/SpeechFirstStreamingReplayTests/blankCommittedResultStopsBeforePasteDecision()",
+          "VoiceInkTests/SpeechFirstStreamingReplayTests/cancellationWhileDrainIsBlockedNeverCommits()",
+          "VoiceInkTests/SpeechFirstStreamingReplayTests/incompleteTranscriptionDoesNotPasteOrPlayCompletionSound()",
+          "VoiceInkTests/SpeechFirstStreamingReplayTests/speechBeforeKeyDownDrainsBeforeCommitAndProducesPaste()",
+          "VoiceInkTests/TranscriptionModelCapabilityTests/localFluidAudioUsesShortFinalCommitTimeout()",
+          "VoiceInkTests/TranscriptionModelCapabilityTests/recordedFileTranscriptionIsUnavailableOnlyForStreamingOnlyProviders()",
+          "VoiceInkTests/TranscriptionModelManagerTests/loadingSavedCurrentModelBroadcastsModelAndSettingsChange()",
+          "VoiceInkTests/TranscriptionModelManagerTests/metadataRefreshUpdatesDescriptorAndPreservesExplicitPreferences()",
+          "VoiceInkTests/TranscriptionModelManagerTests/modelSwitchesPreserveLanguageIntentAcrossReloadAndRefresh()",
+          "VoiceInkTests/TranscriptionModelManagerTests/qwenModelSwitchesPreserveLanguageIntentAcrossReloadAndRefresh()",
+          "VoiceInkTests/TranscriptionModelManagerTests/refreshingRegisteredFallbackDoesNotPersistIt()",
+          "VoiceInkTests/VoiceInkTests/accessibilityCommandVMenuMatchRequiresEnabledPlainShortcut()",
+          "VoiceInkTests/VoiceInkTests/accessibilityInsertDeliversWithoutTouchingClipboard()",
+          "VoiceInkTests/VoiceInkTests/accessibilityInsertionObservationAcceptsTextOrCursorMutation()",
+          "VoiceInkTests/VoiceInkTests/accessibilityInsertionObservationRejectsSilentAXSuccess()",
+          "VoiceInkTests/VoiceInkTests/accessibilityInsertionObservationRejectsUnrelatedTextMutation()",
+          "VoiceInkTests/VoiceInkTests/accessibilityMenuBatchFailureRetainsScalarChildrenAndShortcut()",
+          "VoiceInkTests/VoiceInkTests/accessibilityMenuBatchPreservesUnsupportedAttributeSlots()",
+          "VoiceInkTests/VoiceInkTests/accessibilityMenuBatchRejectsMissingOrInvalidShortcutState()",
+          "VoiceInkTests/VoiceInkTests/accessibilityPermissionUsesInjectedSystemClient()",
+          "VoiceInkTests/VoiceInkTests/accessibilityValueReplacementRejectsInvalidRange()",
+          "VoiceInkTests/VoiceInkTests/accessibilityValueReplacementRequiresExactRangeRestore()",
+          "VoiceInkTests/VoiceInkTests/accessibilityValueReplacementUsesUTF16Selection()",
+          "VoiceInkTests/VoiceInkTests/activeRecorderToggleDefersStopInsteadOfCancelingWhileStarting()",
+          "VoiceInkTests/VoiceInkTests/aiEnhancementServiceCachesPromptTriggerEligibility()",
+          "VoiceInkTests/VoiceInkTests/automaticSystemMuteFollowsAirPodsOutput()",
+          "VoiceInkTests/VoiceInkTests/browserCaretFallbackFindsLTRAndRTLEdges()",
+          "VoiceInkTests/VoiceInkTests/browserCaretFallbackFindsSharedLTRAndRTLBoundary()",
+          "VoiceInkTests/VoiceInkTests/browserCaretFallbackRejectsAmbiguousEdges()",
+          "VoiceInkTests/VoiceInkTests/browserCaretFallbackUsesAdjacentComposedCharacters()",
+          "VoiceInkTests/VoiceInkTests/browserCommandVShortcutAbortsBeforeVAndReleasesCommandOnDrift()",
+          "VoiceInkTests/VoiceInkTests/browserCommandVShortcutPostsOneBalancedChord()",
+          "VoiceInkTests/VoiceInkTests/browserContextMenuCandidateRequiresTriggerPointProvenance()",
+          "VoiceInkTests/VoiceInkTests/browserContextMenuPointRequiresUsableBoundsAndEditorHit()",
+          "VoiceInkTests/VoiceInkTests/browserContextMenuRectAcceptsAccessibilityAndChromiumValues()",
+          "VoiceInkTests/VoiceInkTests/browserContextMenuRectConvertsChromiumScreenCoordinates()",
+          "VoiceInkTests/VoiceInkTests/browserContextMenuRightClickIsBalancedAndPositionBound()",
+          "VoiceInkTests/VoiceInkTests/browserPasteTargetRejectsFocusTextAndSelectionDrift()",
+          "VoiceInkTests/VoiceInkTests/chordAndSecureEvidenceCancelOnlyFreshShiftStart()",
+          "VoiceInkTests/VoiceInkTests/commandVPrefetchFindsDisabledPasteBeforeClipboardWrite()",
+          "VoiceInkTests/VoiceInkTests/commandVPrefetchNeverUsesTitleOnlyOrModifiedShortcuts()",
+          "VoiceInkTests/VoiceInkTests/customFinishUsesItsOwnEvidenceAndDoesNotCancelExistingRecording()",
+          "VoiceInkTests/VoiceInkTests/customSpecialShortcutStartsOnlyAfterSecondShiftRelease()",
+          "VoiceInkTests/VoiceInkTests/dictionaryServiceIgnoresDisabledWordReplacements()",
+          "VoiceInkTests/VoiceInkTests/dictionaryServiceUsesWarmedWordReplacementCacheUntilInvalidated()",
+          "VoiceInkTests/VoiceInkTests/dictionaryServiceVocabularyRemovalDeletesWord()",
+          "VoiceInkTests/VoiceInkTests/dictionaryServiceWordReplacementRemovalInvalidatesWarmedWordReplacementCache()",
+          "VoiceInkTests/VoiceInkTests/dictionaryServiceWordReplacementSaveInvalidatesWarmedWordReplacementCache()",
+          "VoiceInkTests/VoiceInkTests/directAccessibilityInsertionSkipsWebBackedEditors()",
+          "VoiceInkTests/VoiceInkTests/doubleShiftKeepsRecordingAfterReleaseAndAssignedShortcutFinishesOnce()",
+          "VoiceInkTests/VoiceInkTests/doubleShiftUsesSameSideAndStrictConfiguredGapBoundary()",
+          "VoiceInkTests/VoiceInkTests/eitherShiftCanLatchCustomShortcutAndLongSecondHoldFinishesAssignedShift()",
+          "VoiceInkTests/VoiceInkTests/expiredSecondDownCannotReplayAfterReleaseOrResetDuringSuspendedFinish()",
+          "VoiceInkTests/VoiceInkTests/freshDefaultsHideMenuBarAndDockIcons()",
+          "VoiceInkTests/VoiceInkTests/idleNoneRecorderSessionDoesNotBlockNextShortcutStart()",
+          "VoiceInkTests/VoiceInkTests/inputMonitoringPermissionUsesInjectedSystemClient()",
+          "VoiceInkTests/VoiceInkTests/intervalOffPreservesOrdinarySpecialHoldAndRelease()",
+          "VoiceInkTests/VoiceInkTests/latchedShiftTypingAndUnsafeFinishLeaveRecordingActive()",
+          "VoiceInkTests/VoiceInkTests/longShiftHoldFinishesImmediatelyWithoutDoubleTapWait()",
+          "VoiceInkTests/VoiceInkTests/macOnboardingProgressStorePersistsStageAndPermissionCursor()",
+          "VoiceInkTests/VoiceInkTests/modifierOnlyShortcutChecksPressedNonModifierKeysAtRelease()",
+          "VoiceInkTests/VoiceInkTests/modifierOnlyShortcutMarksOtherKeyUpAsTyping()",
+          "VoiceInkTests/VoiceInkTests/modifierOnlyShortcutMarksSecureInputAsUnreliableEvidence()",
+          "VoiceInkTests/VoiceInkTests/modifierOnlyShortcutTracksOtherKeyDownWithoutReleaseEvidence()",
+          "VoiceInkTests/VoiceInkTests/modifierOnlyShortcutTracksOtherModifierPressAndRelease()",
+          "VoiceInkTests/VoiceInkTests/modifierOnlyShortcutTracksSystemDefinedEvidenceDuringPress()",
+          "VoiceInkTests/VoiceInkTests/modifierOnlyShortcutUsesEventTapOrderingWhenTrackingKeyEvidence()",
+          "VoiceInkTests/VoiceInkTests/modifierOnlyShortcutsUseNSEventMonitorPath()",
+          "VoiceInkTests/VoiceInkTests/modifierOnlySpecialShortcutDoesNotStartWithoutKeyEvidenceTap()",
+          "VoiceInkTests/VoiceInkTests/monitorRefreshKeepsFinishAvailableAndStaleDeadlineCannotStopNewSession()",
+          "VoiceInkTests/VoiceInkTests/monitorRejectsSecureDoubleShiftAndDropsCallbacksFromOldGeneration()",
+          "VoiceInkTests/VoiceInkTests/monitorRoutesShiftOnlyOnceAndRejectsOverlappingShiftsAndTypingBetweenTaps()",
+          "VoiceInkTests/VoiceInkTests/monitoredAssignedShiftFinishesExistingRecorderAndSurvivingActionFinishesAfterRefresh()",
+          "VoiceInkTests/VoiceInkTests/nonInsertedAccessibilityResultsFallBackToPasteCommand()",
+          "VoiceInkTests/VoiceInkTests/noneRecorderStyleStartsSessionWithoutShowingRecorderWindow()",
+          "VoiceInkTests/VoiceInkTests/permissionNotificationSuppressionScopesNestUntilLastScopeEnds()",
+          "VoiceInkTests/VoiceInkTests/promptDetectionUsesCachedTriggerPrompts()",
+          "VoiceInkTests/VoiceInkTests/pushToTalkUsesActiveSessionWhenRecorderWindowIsNone()",
+          "VoiceInkTests/VoiceInkTests/rawShiftDoesNotStealAnotherRecordingShortcutSession()",
+          "VoiceInkTests/VoiceInkTests/resolvesAPIKeyEnvironmentReference()",
+          "VoiceInkTests/VoiceInkTests/secureInputBlocksSpecialModifierShortcutUntilRelease()",
+          "VoiceInkTests/VoiceInkTests/sessionMetricRecorderAcceptsSnapshotModelName()",
+          "VoiceInkTests/VoiceInkTests/shortSingleShiftReleaseWaitsThenFinishesWithEmptyTapFallback()",
+          "VoiceInkTests/VoiceInkTests/shortcutCooldownAllowsFastBackToBackPressAfterDuplicateGuard()",
+          "VoiceInkTests/VoiceInkTests/shortcutKeyEvidenceTraceDetailsIdentifyEveryCause()",
+          "VoiceInkTests/VoiceInkTests/shortcutRecorderCancelPreservesClearedShortcutState()",
+          "VoiceInkTests/VoiceInkTests/shortcutRecorderCancelRestoresDefaultShortcutState()",
+          "VoiceInkTests/VoiceInkTests/shortcutRecorderCancelRestoresStoredShortcut()",
+          "VoiceInkTests/VoiceInkTests/slowRecordingStartupStillLatchesAndFinishWhileStartingRunsOnce()",
+          "VoiceInkTests/VoiceInkTests/specialModeCleanReleaseStopsRecording()",
+          "VoiceInkTests/VoiceInkTests/specialModeStartsRecordingImmediatelyOnKeyDown()",
+          "VoiceInkTests/VoiceInkTests/specialModeUnsafeKeyEvidenceCancelsStartedRecording()",
+          "VoiceInkTests/VoiceInkTests/spokenSnippetPipelineInsertsExactWholeTriggerContentAndSavesIt()",
+          "VoiceInkTests/VoiceInkTests/spokenSnippetPipelineLeavesUnmatchedDictationOnItsExistingFormattingPath()",
+          "VoiceInkTests/VoiceInkTests/spokenSnippetPipelinePreservesInlineCapitalsPunctuationAndParagraphs()",
+          "VoiceInkTests/VoiceInkTests/startupFailureAndExternalCancelClearStaleLatch()",
+          "VoiceInkTests/VoiceInkTests/stoppingAndCancellationDrainBeforeNextStartAndRefreshKeepsValidPowerModeOwner()",
+          "VoiceInkTests/VoiceInkTests/unconfirmedPasteCommandDoesNotRestoreOverTranscriptClipboard()",
+          "VoiceInkTests/VoiceInkTests/writingProviderChecksRejectMissingMeaning()",
+          "VoiceInkTests/VoiceInkTests/writingProviderRewritesTheSuppliedSelection()",
+          "VoiceInkTests/VoiceInkTests/writingProviderTranslatesEnglishToTraditionalChinese()",
+          "VoiceInkTests/VoiceInkTests/writingProviderTranslatesJapaneseToEnglish()",
+          "VoiceInkTests/WritingActionEngineTests/oldStartupFailureDoesNotClearANewerRecordingStart()",
+          "VoiceInkTests/WritingActionEngineTests/permissionWaitReservesOneRecordingStart()",
+          "VoiceInkTests/WritingTargetTests/cancellationBeforeNativeReplacementLeavesTheSelectionIntact()",
+          "VoiceInkTests/WritingTargetTests/changedDocumentOrSelectionRejectsReplacement()",
+          "VoiceInkTests/WritingTargetTests/changedFocusPreventsAnyEditorMutation()",
+          "VoiceInkTests/WritingTargetTests/editsOrSelectionMovementDuringGenerationRemainUntouched()",
+          "VoiceInkTests/WritingTargetTests/emptySelectionInsertsAtTheExactCursor()",
+          "VoiceInkTests/WritingTargetTests/errorAfterConfirmedReplacementDoesNotRepeatTheReplacement()",
+          "VoiceInkTests/WritingTargetTests/errorAfterPartialMutationDoesNotOverwriteTheChangedDocument()",
+          "VoiceInkTests/WritingTargetTests/insertionAtEndAndWholeDocumentReplacementAreValid()",
+          "VoiceInkTests/WritingTargetTests/invalidAndOverflowingRangesAreRejected()",
+          "VoiceInkTests/WritingTargetTests/matchingAllowsUnavailableSelectedTextOnlyWhenValueAndRangeStillMatch()",
+          "VoiceInkTests/WritingTargetTests/rejectedSelectedTextWriteIsNotRetriedThroughAnotherMutation()",
+          "VoiceInkTests/WritingTargetTests/replacementHandlesCombiningMarksWithoutChangingAdjacentText()",
+          "VoiceInkTests/WritingTargetTests/replacementPreservesTextAroundAnEmojiSelection()",
+          "VoiceInkTests/WritingTargetTests/scalarBoundariesWithinADecomposedCharacterRemainValid()",
+          "VoiceInkTests/WritingTargetTests/selectedTextSetterReplacesOnlyTheCapturedRange()",
+          "VoiceInkTests/WritingTargetTests/selectionCannotSplitAnEmojiSurrogatePair()",
+          "VoiceInkTests/WritingTargetTests/successfulButIneffectiveSetterDoesNotAttemptAnotherMutation()",
+          "VoiceInkTests/WritingTargetTests/targetIdentityRequiresBothOriginalProcessAndFocusedElement()",
+          "VoiceInkTests/WritingTargetTests/unicodeNormalizationChangesAreDocumentDrift()",
+          "VoiceInkTests/WritingTargetTests/unsupportedSelectedTextSetterLeavesTheDocumentAndSelectionIntact()"
+        ],
+        "valid": true
+      }
+    },
+    "classification": "TextEdit replacement and drift-refusal passed; Safari fixture failed before capture/replacement."
+  },
+  "ui": {
+    "counts": {
+      "total": 3,
+      "passed": 0,
+      "failed": 3,
+      "skipped": 0,
+      "executed_non_skipped": 3
+    },
+    "aggregate_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~uCkx8P6Ekk8OXmQVymM9UemMrQnW1soxh8YsuAUm2_GdIi9PU6m3QlzM8aeznlzI46sltjjSwxEdzADLhokZOw==",
+    "decoded_sha256": "9ba7d7696411711558065d9204df8b0875007fafe9b08d52280edaeb6bf718af",
+    "result_records": [
+      {
+        "identifier": "WritingFeaturesUITests/testCSVImportPreviewsMultilineContentBeforeReplacing()",
+        "status": "Failure"
+      },
+      {
+        "identifier": "WritingFeaturesUITests/testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch()",
+        "status": "Failure"
+      },
+      {
+        "identifier": "WritingFeaturesUITests/testTranslationTargetsReorderSelectAndPersist()",
+        "status": "Failure"
+      }
+    ],
+    "test_log": {
+      "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/tests.log",
+      "bytes": 35430,
+      "sha256": "aedbf0e837372ed693df6c26c9fae49903fba263e89239093147b0f5eb6b57f5"
+    },
+    "assertion_failures": [
+      "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkUITests/WritingFeaturesUITests.swift:309: error: -[VoiceInkUITests.WritingFeaturesUITests testCSVImportPreviewsMultilineContentBeforeReplacing] : XCTAssertTrue failed - The file panel did not expose its Go to Folder field.",
+      "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkUITests/WritingFeaturesUITests.swift:217: error: -[VoiceInkUITests.WritingFeaturesUITests testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch] : failed: caught error: \"mainWindowDidNotOpen\"",
+      "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkUITests/WritingFeaturesUITests.swift:217: error: -[VoiceInkUITests.WritingFeaturesUITests testTranslationTargetsReorderSelectAndPersist] : failed: caught error: \"mainWindowDidNotOpen\""
+    ],
+    "first_csv_failures": [
+      "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkUITests/WritingFeaturesUITests.swift:309: error: -[VoiceInkUITests.WritingFeaturesUITests testCSVImportPreviewsMultilineContentBeforeReplacing] : XCTAssertTrue failed - The file panel did not expose its Go to Folder field."
+    ],
+    "driver_receipt": {
+      "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/result.json",
+      "bytes": 479,
+      "sha256": "cceed5fb4c283548a09f2093966f76897763af7387c4fbcdd64208b5aed91dd6",
+      "content": {
+        "classification": "invalid-or-failed",
+        "exit_code": 65,
+        "tests": {
+          "testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch": {
+            "starts": 1,
+            "results": [
+              "failed"
+            ]
+          },
+          "testCSVImportPreviewsMultilineContentBeforeReplacing": {
+            "starts": 1,
+            "results": [
+              "failed"
+            ]
+          },
+          "testTranslationTargetsReorderSelectAndPersist": {
+            "starts": 1,
+            "results": [
+              "failed"
+            ]
+          }
+        }
+      }
+    },
+    "classification": "CSV case stopped at file-panel field selection before preview/import; remaining cases stopped during main-window launch. No accepted settings interaction or visual-correctness claim.",
+    "first_csv_ax_receipt": {
+      "local_path": "/tmp/rjt-writing-screenshots-40492556627/screenshots/69A1A9B6-6F50-4229-B912-889CD8C7B04A.txt",
+      "sha256": "766fdf0404862993c280cd8d81b8657716e19b80eec798648f35294f2fd5c900",
+      "observed_role": "TextField",
+      "identifier": "PathTextField",
+      "parent_sheet_identifier": "GoToWindow",
+      "open_panel_identifier": "open-panel",
+      "queried_role": "ComboBox",
+      "contains_combo_box": false,
+      "evidence_lines": [
+        2,
+        108,
+        111
+      ]
+    },
+    "first_csv_classification": "Actual Go to Folder sheet exposed a keyboard-focused TextField with identifier PathTextField. Fixture queried app.comboBoxes.firstMatch and failed at line309 before entering a path or reaching import preview."
+  },
+  "matched_regression": {
+    "zip_member": "_temp/writing-feature-regression/result.json",
+    "bytes": 256,
+    "sha256": "70d154f55ef6392a18c2ab99b8cfd5a757b71a46f405669a6b0338be60d53776",
+    "content": {
+      "classification": "matched-red-green",
+      "scope": [
+        "literal-snippets",
+        "deferred-permission-callback"
+      ],
+      "stale_startup_catch": "candidate-only coverage",
+      "candidate": "f901c3725d59f5d2faf926448272c2557c6e7ae3",
+      "baseline": "ec7bc1bcf804cb9362e342e4c3f5fbf2dd9b69eb"
+    },
+    "lanes": {
+      "baseline-result": {
+        "zip_member": "_temp/writing-feature-regression/baseline-result.json",
+        "bytes": 325,
+        "sha256": "fe1394794b9f69524b5bd6217dfc898d62331f60c8676aa66040d1f593407920",
+        "content": {
+          "expectation": "known-bad",
+          "exit_code": 65,
+          "tests": {
+            "spokenSnippetPipelineInsertsExactWholeTriggerContentAndSavesIt": "failed",
+            "spokenSnippetPipelinePreservesInlineCapitalsPunctuationAndParagraphs": "failed",
+            "spokenSnippetPipelineLeavesUnmatchedDictationOnItsExistingFormattingPath": "passed"
+          }
+        }
+      },
+      "candidate-result": {
+        "zip_member": "_temp/writing-feature-regression/candidate-result.json",
+        "bytes": 320,
+        "sha256": "1272a7e247d98bc64c52e7f495e755dcf4ff1e9c2522d7be89c1a31629fabaa1",
+        "content": {
+          "expectation": "fixed",
+          "exit_code": 0,
+          "tests": {
+            "spokenSnippetPipelineInsertsExactWholeTriggerContentAndSavesIt": "passed",
+            "spokenSnippetPipelinePreservesInlineCapitalsPunctuationAndParagraphs": "passed",
+            "spokenSnippetPipelineLeavesUnmatchedDictationOnItsExistingFormattingPath": "passed"
+          }
+        }
+      },
+      "baseline-permission-result": {
+        "zip_member": "_temp/writing-feature-regression/baseline-permission-result.json",
+        "bytes": 299,
+        "sha256": "5bae0d08106698621f409bbd1f022936b84dfab9a1953afafc15976c0cdf622b",
+        "content": {
+          "expectation": "known-bad",
+          "classification": "deferred-permission-callback",
+          "exit_code": 65,
+          "test": {
+            "permissionWaitReservesOneRecordingStart": [
+              "failed"
+            ]
+          },
+          "diagnostics": {
+            "permission_wait_left_state_idle": true,
+            "duplicate_permission_calls": true
+          }
+        }
+      },
+      "candidate-permission-result": {
+        "zip_member": "_temp/writing-feature-regression/candidate-permission-result.json",
+        "bytes": 207,
+        "sha256": "6c5f0f6c4217ffdadb4fd85bd29b1d99b99429e0b996f68978cc57dffc0707c3",
+        "content": {
+          "expectation": "fixed",
+          "classification": "deferred-permission-callback",
+          "exit_code": 0,
+          "test": {
+            "permissionWaitReservesOneRecordingStart": [
+              "passed"
+            ]
+          },
+          "diagnostics": {}
+        }
+      }
+    }
+  },
+  "identities": [
+    {
+      "before": {
+        "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/identity-before.txt",
+        "bytes": 363,
+        "sha256": "817df2dce0330e9626dab5d06102c59918d07ca5992b0c8e054c28c0c1f3e4cc"
+      },
+      "after": {
+        "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/identity-after.txt",
+        "bytes": 363,
+        "sha256": "817df2dce0330e9626dab5d06102c59918d07ca5992b0c8e054c28c0c1f3e4cc"
+      },
+      "unchanged": true,
+      "app_binary_sha256": "8a7bbc4f0ae2ff7ee14c4ca96d86d796a8198ec9f43d4b953564a5b1453299c9"
+    },
+    {
+      "before": {
+        "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/identity-before.txt",
+        "bytes": 198,
+        "sha256": "806821378a98234d57debd9e401b2a5cf5e98fd3e3c2abf0967a7e9ec118f6e5"
+      },
+      "after": {
+        "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/identity-after.txt",
+        "bytes": 198,
+        "sha256": "806821378a98234d57debd9e401b2a5cf5e98fd3e3c2abf0967a7e9ec118f6e5"
+      },
+      "unchanged": true,
+      "app_binary_sha256": "8a7bbc4f0ae2ff7ee14c4ca96d86d796a8198ec9f43d4b953564a5b1453299c9"
+    },
+    {
+      "before": {
+        "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/identity-before.txt",
+        "bytes": 198,
+        "sha256": "806821378a98234d57debd9e401b2a5cf5e98fd3e3c2abf0967a7e9ec118f6e5"
+      },
+      "after": {
+        "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/identity-after.txt",
+        "bytes": 198,
+        "sha256": "806821378a98234d57debd9e401b2a5cf5e98fd3e3c2abf0967a7e9ec118f6e5"
+      },
+      "unchanged": true,
+      "app_binary_sha256": "8a7bbc4f0ae2ff7ee14c4ca96d86d796a8198ec9f43d4b953564a5b1453299c9"
+    }
+  ],
+  "same_app_binary_across_unit_live_ui": true,
+  "limits": [
+    "The unit total includes six gated skips and parameterized invocations.",
+    "No Groq/provider, microphone, ASR, physical-keyboard or general semantic robustness proof comes from these unit records.",
+    "TextEdit success does not establish full-app Safari delivery; this Safari fixture failed before capture.",
+    "Failed CSV file-panel selection and launch checks do not establish import preview, persistence or settings layout."
+  ],
+  "parent_verification": "All17 captured-paste result identifiers matched source methods from the exact tested Git SHA; all statuses Success. Length-prefixed parser also reproduced earlier pinned150Success/6Skipped receipt."
+}

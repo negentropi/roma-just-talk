@@ -5,6 +5,7 @@ import XCTest
 
 final class WritingFeaturesUITests: XCTestCase {
     private static let mainWindowIdentifier = "com.negentropi.RomaJustTalk.mainWindow"
+    private var modelSettingsOpening = 0
 
     override func setUpWithError() throws {
         continueAfterFailure = false
@@ -230,6 +231,8 @@ final class WritingFeaturesUITests: XCTestCase {
         assertProfile("Custom", storedValue: "custom", preferences: preferences, in: app)
         assertCustomFormatting(isEnabled: true, preferences: preferences, in: app)
         attachScreenshot(app, named: "Custom formatting restored without changing saved values")
+        closeModelSettings(in: app, usingKeyboard: true)
+        exerciseOtherSettingsSheets(in: app, preferences: preferences)
     }
 
     @MainActor private func prepareApp() throws -> (XCUIApplication, WritingFeaturesAppOwnership) {
@@ -332,21 +335,212 @@ final class WritingFeaturesUITests: XCTestCase {
         let settings = mainWindow(in: app).buttons["models.settings.open"]
         XCTAssertTrue(settings.waitForExistence(timeout: 10))
         reveal(settings, identifier: "models.settings.open", in: app)
+        modelSettingsOpening += 1
+        let before = modelSettingsActors(in: app)
+        attachModelSettingsBoundary("before-opening", actors: before, in: app)
+        XCTAssertTrue(before["settings-open"]?.isInteractive == true,
+                      "The model settings entry point was not enabled and hittable before opening.")
+        XCTAssertTrue(before["background-filter"]?.isInteractive == true,
+                      "The model filter was not enabled and hittable before opening settings.")
         settings.click()
-        XCTAssertTrue(mainWindow(in: app).buttons["models.settings.close"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["models.settings.close"].waitForExistence(timeout: 5))
         XCTAssertTrue(profileChoice("Custom", in: app).waitForExistence(timeout: 5))
         XCTAssertTrue(profileChoice("None", in: app).waitForExistence(timeout: 5))
+        let after = modelSettingsActors(in: app)
+        var failures = ["custom", "none", "settings-close"].filter { after[$0]?.isInteractive != true }
+        for key in ["settings-open", "background-filter"] where after[key]?.isBlocked != true {
+            failures.append(key + " remained interactive behind the panel")
+        }
+        if app.sheets.count == 0 {
+            for key in ["application", "main-window"]
+            where before[key]?.enabled == true && after[key]?.enabled != true {
+                failures.append(key + " became disabled")
+            }
+        }
+        attachModelSettingsBoundary("after-opening", actors: after, failures: failures, in: app)
+        XCTAssertTrue(failures.isEmpty, "Opening model settings disabled the panel or blocked a visible panel control.")
+        XCTAssertEqual(app.sheets.count, 1, "Model settings did not present one native sheet.")
     }
 
-    @MainActor private func closeModelSettings(in app: XCUIApplication) {
-        let close = mainWindow(in: app).buttons["models.settings.close"]
+    @MainActor private func closeModelSettings(in app: XCUIApplication, usingKeyboard: Bool = false) {
+        let close = app.buttons["models.settings.close"]
         XCTAssertTrue(close.waitForExistence(timeout: 5))
-        close.click()
-        XCTAssertTrue(waitUntil { !close.exists })
+        XCTAssertTrue(close.isEnabled && close.isHittable)
+        if usingKeyboard {
+            app.typeKey(.escape, modifierFlags: [])
+        } else {
+            close.click()
+        }
+        XCTAssertTrue(waitUntil { !close.exists && app.sheets.count == 0 })
+        let after = modelSettingsActors(in: app)
+        attachModelSettingsBoundary("after-closing", actors: after, in: app)
+        XCTAssertTrue(after["settings-open"]?.isInteractive == true,
+                      "Closing settings did not restore the model settings entry point.")
+        XCTAssertTrue(after["background-filter"]?.isInteractive == true,
+                      "Closing settings did not restore the model filter.")
+    }
+
+    @MainActor private func modelSettingsActors(in app: XCUIApplication) -> [String: SettingsActorObservation] {
+        let window = mainWindow(in: app)
+        return [
+            "application": SettingsActorObservation(app),
+            "main-window": SettingsActorObservation(window),
+            "settings-open": SettingsActorObservation(app.buttons["models.settings.open"]),
+            "background-filter": SettingsActorObservation(app.buttons["Recommended"]),
+            "form": SettingsActorObservation(app.scrollViews.containing(.any, identifier: "dictationProfile.picker").firstMatch),
+            "custom": SettingsActorObservation(profileChoice("Custom", in: app)),
+            "none": SettingsActorObservation(profileChoice("None", in: app)),
+            "settings-close": SettingsActorObservation(app.buttons["models.settings.close"])
+        ]
+    }
+
+    @MainActor private func attachModelSettingsBoundary(
+        _ phase: String,
+        actors: [String: SettingsActorObservation],
+        failures: [String] = [],
+        in app: XCUIApplication
+    ) {
+        let payload: [String: Any] = [
+            "version": 1, "phase": phase, "opening": modelSettingsOpening,
+            "mainWindowCount": app.windows.matching(identifier: Self.mainWindowIdentifier).count,
+            "nativeSheetCount": app.sheets.count,
+            "actors": actors.mapValues(\.json), "boundaryFailures": failures
+        ]
+        do {
+            let attachment = XCTAttachment(data: try JSONSerialization.data(withJSONObject: payload, options: [.prettyPrinted, .sortedKeys]),
+                                           uniformTypeIdentifier: "public.json")
+            attachment.name = "Model settings boundary " + phase
+            attachment.lifetime = .keepAlways
+            add(attachment)
+        } catch {
+            XCTFail("Unable to retain the model settings boundary observation: \(error)")
+        }
+        let hierarchy = XCTAttachment(string: app.debugDescription)
+        hierarchy.name = "Model settings hierarchy " + phase
+        hierarchy.lifetime = .keepAlways
+        add(hierarchy)
+    }
+
+    @MainActor private func exerciseOtherSettingsSheets(
+        in app: XCUIApplication,
+        preferences: WritingFeaturesDictationPreferences
+    ) {
+        mainWindow(in: app).buttons["Dictionary"].click()
+        let dictionarySettings = app.buttons["dictionary.settings.open"]
+        XCTAssertTrue(dictionarySettings.waitForExistence(timeout: 5))
+        reveal(dictionarySettings, identifier: "dictionary.settings.open", in: app)
+        XCTAssertTrue(dictionarySettings.isEnabled && dictionarySettings.isHittable)
+        dictionarySettings.click()
+        let dictionarySheet = requiredSettingsSheet(in: app)
+        let shortcutWrapper = identified("dictionary.settings.shortcut", in: dictionarySheet)
+        XCTAssertTrue(shortcutWrapper.waitForExistence(timeout: 5))
+        let shortcut: XCUIElement
+        if shortcutWrapper.elementType == .button {
+            shortcut = shortcutWrapper
+        } else {
+            XCTAssertEqual(shortcutWrapper.buttons.count, 1, "The shortcut recorder did not expose one native button.")
+            shortcut = shortcutWrapper.buttons.firstMatch
+        }
+        XCTAssertTrue(shortcut.isEnabled && shortcut.isHittable)
+        assertCoveredEntryIsBlocked(dictionarySettings)
+        attachScreenshot(app, named: "Dictionary settings native sheet")
+        dismissSettingsSheet("dictionary.settings.close", usingKeyboard: true, in: app)
+        XCTAssertTrue(dictionarySettings.isEnabled && dictionarySettings.isHittable)
+
+        mainWindow(in: app).buttons["style"].click()
+        let enhancementSettings = app.buttons["enhancement.settings.open"]
+        XCTAssertTrue(enhancementSettings.waitForExistence(timeout: 5))
+        reveal(enhancementSettings, identifier: "enhancement.settings.open", in: app)
+        enhancementSettings.click()
+        let enhancementSheet = requiredSettingsSheet(in: app)
+        let clipboard = enhancementSheet.switches["enhancement.settings.clipboard"]
+        XCTAssertTrue(clipboard.waitForExistence(timeout: 5))
+        XCTAssertTrue(clipboard.isEnabled && clipboard.isHittable)
+        assertCoveredEntryIsBlocked(enhancementSettings)
+        attachScreenshot(app, named: "Enhancement settings native sheet")
+        dismissSettingsSheet("enhancement.settings.close", usingKeyboard: true, in: app)
+        XCTAssertTrue(enhancementSettings.isEnabled && enhancementSettings.isHittable)
+
+        guard let promptSnapshot = preferences.panelValues() else {
+            XCTFail("Unable to read saved prompt settings before opening the editor.")
+            return
+        }
+        let addPrompt = app.buttons["enhancement.prompts.add"]
+        reveal(addPrompt, identifier: "enhancement.prompts.add", in: app)
+        addPrompt.click()
+        let promptSheet = requiredSettingsSheet(in: app)
+        let promptName = promptSheet.textFields["promptEditor.name"]
+        XCTAssertTrue(promptName.waitForExistence(timeout: 5))
+        XCTAssertTrue(promptName.isEnabled && promptName.isHittable)
+        let unsavedPrompt = "Unsent sheet proof " + UUID().uuidString
+        replaceText(in: promptName, with: unsavedPrompt)
+        assertValue(unsavedPrompt, of: promptName)
+        assertCoveredEntryIsBlocked(addPrompt)
+        attachScreenshot(app, named: "Prompt editor unsaved native sheet")
+        dismissSettingsSheet("promptEditor.cancel", usingKeyboard: true, in: app)
+        XCTAssertTrue(preferences.panelValuesAreUnchanged(from: promptSnapshot), "Cancel persisted an unsaved prompt draft.")
+        XCTAssertTrue(addPrompt.isEnabled && addPrompt.isHittable)
+
+        mainWindow(in: app).buttons["Power Mode"].click()
+        let addMode = app.buttons["powerMode.configuration.add"]
+        XCTAssertTrue(addMode.waitForExistence(timeout: 5))
+        guard let modeSnapshot = preferences.panelValues() else {
+            XCTFail("Unable to read saved modes before opening the editor.")
+            return
+        }
+        addMode.click()
+        let modeSheet = requiredSettingsSheet(in: app)
+        let modeName = modeSheet.textFields["powerMode.configuration.name"]
+        XCTAssertTrue(modeName.waitForExistence(timeout: 5))
+        XCTAssertTrue(modeName.isEnabled && modeName.isHittable)
+        let unsavedMode = "Unsent mode proof " + UUID().uuidString
+        replaceText(in: modeName, with: unsavedMode)
+        assertValue(unsavedMode, of: modeName)
+        assertCoveredEntryIsBlocked(addMode)
+        attachScreenshot(app, named: "Power Mode unsaved native sheet")
+        dismissSettingsSheet("powerMode.configuration.cancel", usingKeyboard: true, in: app)
+        XCTAssertTrue(preferences.panelValuesAreUnchanged(from: modeSnapshot), "Cancel persisted an unsaved Power Mode.")
+        XCTAssertTrue(addMode.isEnabled && addMode.isHittable)
+
+        let reorder = app.buttons["powerMode.reorder.open"]
+        XCTAssertTrue(reorder.waitForExistence(timeout: 5))
+        reorder.click()
+        _ = requiredSettingsSheet(in: app)
+        assertCoveredEntryIsBlocked(reorder)
+        let closeReorder = app.sheets.firstMatch.buttons["powerMode.reorder.close"]
+        XCTAssertTrue(closeReorder.waitForExistence(timeout: 5))
+        XCTAssertTrue(closeReorder.isEnabled && closeReorder.isHittable)
+        attachScreenshot(app, named: "Power Mode reorder native sheet")
+        dismissSettingsSheet("powerMode.reorder.close", usingKeyboard: false, in: app)
+        XCTAssertTrue(preferences.panelValuesAreUnchanged(from: modeSnapshot), "Opening reorder changed saved modes.")
+        XCTAssertTrue(reorder.isEnabled && reorder.isHittable)
+        XCTAssertTrue(preferences.customSettingsAreUnchanged())
+    }
+
+    @MainActor private func requiredSettingsSheet(in app: XCUIApplication) -> XCUIElement {
+        XCTAssertTrue(app.sheets.firstMatch.waitForExistence(timeout: 5))
+        XCTAssertEqual(app.sheets.count, 1, "The settings action did not present one native sheet.")
+        return app.sheets.firstMatch
+    }
+
+    @MainActor private func assertCoveredEntryIsBlocked(_ entry: XCUIElement) {
+        XCTAssertTrue(SettingsActorObservation(entry).isBlocked, "The covered settings action remained interactive.")
+    }
+
+    @MainActor private func dismissSettingsSheet(_ closeIdentifier: String, usingKeyboard: Bool, in app: XCUIApplication) {
+        let close = app.sheets.firstMatch.buttons[closeIdentifier]
+        XCTAssertTrue(close.waitForExistence(timeout: 5))
+        XCTAssertTrue(close.isEnabled && close.isHittable)
+        if usingKeyboard {
+            app.typeKey(.escape, modifierFlags: [])
+        } else {
+            close.click()
+        }
+        XCTAssertTrue(waitUntil { !close.exists && app.sheets.count == 0 }, "The native settings sheet did not dismiss.")
     }
 
     @MainActor private func profileChoice(_ title: String, in app: XCUIApplication) -> XCUIElement {
-        mainWindow(in: app).radioButtons[title]
+        app.radioButtons[title]
     }
 
     @MainActor private func assertProfile(
@@ -355,7 +549,7 @@ final class WritingFeaturesUITests: XCTestCase {
         preferences: WritingFeaturesDictationPreferences,
         in app: XCUIApplication
     ) {
-        let choices = mainWindow(in: app).radioButtons.matching(
+        let choices = app.radioButtons.matching(
             NSPredicate(format: "label IN %@", ["Custom", "None"])
         )
         XCTAssertEqual(choices.count, 2, "The cleanup picker did not expose its two native choices.")
@@ -376,7 +570,7 @@ final class WritingFeaturesUITests: XCTestCase {
             "transcriptionSettings.lowercase",
             "transcriptionSettings.appendTrailingSpace"
         ] {
-            let control = identified(identifier, in: mainWindow(in: app))
+            let control = identified(identifier, in: app)
             revealModelSettingsControl(control, preferences: preferences, in: app)
             XCTAssertEqual(control.isEnabled, isEnabled, "Unexpected enabled state for \(identifier).")
             XCTAssertEqual(String(describing: control.value ?? ""), "1", "Saved toggle value changed for \(identifier).")
@@ -390,7 +584,7 @@ final class WritingFeaturesUITests: XCTestCase {
         towardTop: Bool = false,
         in app: XCUIApplication
     ) {
-        let scrollers = mainWindow(in: app).scrollViews.containing(.any, identifier: "dictationProfile.picker")
+        let scrollers = app.scrollViews.containing(.any, identifier: "dictationProfile.picker")
         XCTAssertTrue(scrollers.firstMatch.waitForExistence(timeout: 5))
         XCTAssertEqual(scrollers.count, 1, "The cleanup controls did not belong to one settings scroller.")
         let scroller = scrollers.firstMatch
@@ -409,31 +603,21 @@ final class WritingFeaturesUITests: XCTestCase {
         }
         for _ in 0..<10 {
             if control.exists, !control.frame.isEmpty, scroller.frame.contains(control.frame) { return }
-            let anchors = [
-                "transcriptionSettings.paragraphBreaks",
-                "transcriptionSettings.lowercase",
-                "transcriptionSettings.appendTrailingSpace"
-            ].map { identified($0, in: scroller) } + [
-                scroller.buttons["Edit"],
-                scroller.radioButtons["Custom"],
-                scroller.radioButtons["None"]
-            ] + [
-                "Voice Activity Detection (VAD)",
-                "Prewarm model (Experimental)",
-                "Show Transcript Preview"
-            ].map { title in
-                scroller.switches.matching(NSPredicate(format: "label BEGINSWITH %@", title)).firstMatch
+            if scroller.isHittable {
+                scroller.scroll(byDeltaX: 0, deltaY: towardTop ? 180 : -180)
+            } else {
+                let controls = scroller.switches.allElementsBoundByIndex
+                    + scroller.radioButtons.allElementsBoundByIndex + scroller.buttons.matching(identifier: "Edit").allElementsBoundByIndex
+                guard let receiver = controls.first(where: {
+                    $0.exists && $0.isEnabled && !$0.frame.isEmpty
+                        && scroller.frame.contains($0.frame) && $0.isHittable
+                }) else {
+                    attachScrollFailure()
+                    XCTFail("The active settings sheet exposed no reachable scroll receiver.")
+                    return
+                }
+                receiver.scroll(byDeltaX: 0, deltaY: towardTop ? 180 : -180)
             }
-            guard let anchor = anchors.first(where: {
-                $0.exists && $0.isEnabled && !$0.frame.isEmpty
-                    && scroller.frame.contains($0.frame) && $0.isHittable
-            }) else {
-                attachScrollFailure()
-                XCTFail("No visible native settings control could receive the scroll event.")
-                return
-            }
-            // The Form's AX container has no hit point; a native child receives wheel events.
-            anchor.scroll(byDeltaX: 0, deltaY: towardTop ? 180 : -180)
             XCTAssertEqual(preferences.profile(), expectedProfile, "Scrolling changed the selected cleanup profile.")
             XCTAssertTrue(preferences.scrollingSettingsAreUnchanged(from: expectedScrollSettings), "Scrolling changed a saved setting.")
         }
@@ -581,6 +765,26 @@ private enum WritingFeaturesUIError: Error {
     case appAlreadyRunning, appOwnershipUnavailable, settingsMenuUnavailable, existingPowerModeSession
 }
 
+private struct SettingsActorObservation {
+    let exists: Bool
+    let enabled: Bool?
+    let hittable: Bool?
+
+    @MainActor init(_ element: XCUIElement) {
+        exists = element.exists
+        enabled = exists ? element.isEnabled : nil
+        hittable = exists ? element.isHittable : nil
+    }
+
+    var isInteractive: Bool { exists && enabled == true && hittable == true }
+    var isBlocked: Bool { !exists || enabled == false || hittable == false }
+
+    var json: [String: Any] {
+        ["exists": exists, "enabled": enabled.map { $0 as Any } ?? NSNull(),
+         "hittable": hittable.map { $0 as Any } ?? NSNull()]
+    }
+}
+
 private final class WritingFeaturesDictationPreferences {
     private static let bundleIdentifier = "com.negentropi.RomaJustTalk" as CFString
     private static let profileKey = "VoiceInkDictationProfile"
@@ -593,7 +797,8 @@ private final class WritingFeaturesDictationPreferences {
         "AppendTrailingSpace": true
     ]
     private static let scrollAnchorKeys = ["IsVADEnabled", "PrewarmModelOnWake", "showLiveTextPreview"]
-    private static let keys = [profileKey] + customValues.keys.sorted() + scrollAnchorKeys
+    private static let panelKeys = ["customPrompts", "selectedPromptId", "useClipboardContext", "powerModeConfigurationsV2"]
+    private static let keys = [profileKey, "powerModeUIFlag"] + customValues.keys.sorted() + scrollAnchorKeys + panelKeys
     private let saved: [String: Any]
 
     init() throws {
@@ -610,6 +815,7 @@ private final class WritingFeaturesDictationPreferences {
 
     func install() throws {
         Self.write("custom", for: Self.profileKey)
+        Self.write(true, for: "powerModeUIFlag")
         for (key, value) in Self.customValues { Self.write(value, for: key) }
         guard CFPreferencesAppSynchronize(Self.bundleIdentifier),
               profile() == "custom", customSettingsAreUnchanged() else {
@@ -637,6 +843,18 @@ private final class WritingFeaturesDictationPreferences {
     func scrollingSettingsAreUnchanged(from values: [String: Any]) -> Bool {
         guard customSettingsAreUnchanged() else { return false }
         return Self.scrollAnchorKeys.allSatisfy { Self.equal(values[$0], Self.read($0)) }
+    }
+
+    func panelValues() -> [String: Any]? {
+        guard CFPreferencesAppSynchronize(Self.bundleIdentifier) else { return nil }
+        return Dictionary(uniqueKeysWithValues: Self.panelKeys.compactMap { key in
+            Self.read(key).map { (key, $0) }
+        })
+    }
+
+    func panelValuesAreUnchanged(from values: [String: Any]) -> Bool {
+        guard CFPreferencesAppSynchronize(Self.bundleIdentifier) else { return false }
+        return Self.panelKeys.allSatisfy { Self.equal(values[$0], Self.read($0)) }
     }
 
     func restore() -> Bool {

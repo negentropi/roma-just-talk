@@ -427,6 +427,25 @@ PY
     requirement_hex="$(xxd -p "$out/host.csreq" | tr -d '\n')"
     test -n "$requirement_hex"
     phase=ui-permissions
+    ui_runner="$debug_dir/Build/Products/Debug/VoiceInkUITests-Runner.app"
+    ui_bundle="$ui_runner/Contents/PlugIns/VoiceInkUITests.xctest"
+    codesign --verify --deep --strict "$ui_runner"
+    test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$debug_app/Contents/Info.plist")" = com.negentropi.RomaJustTalk
+    ui_signatures() {
+      local suffix="$1"
+      codesign -d --verbose=4 "$debug_app" 2> "$out/app-signature-$suffix.txt"
+      codesign -d --verbose=4 "$ui_runner" 2> "$out/runner-signature-$suffix.txt"
+      codesign -d --verbose=4 "$ui_bundle" 2> "$out/test-bundle-signature-$suffix.txt"
+    }
+    ui_identity() {
+      local bundle executable
+      shasum -a 256 "$debug_app/Contents/MacOS/roma just talk"
+      for bundle in "$ui_runner" "$ui_bundle"; do
+        executable="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$bundle/Contents/Info.plist")"
+        test -n "$executable"
+        shasum -a 256 "$bundle/Contents/MacOS/$executable"
+      done
+    }
     grant_sql() {
       printf '%s\n' "INSERT OR REPLACE INTO access(
 service,client,client_type,auth_value,auth_reason,auth_version,csreq,
@@ -438,7 +457,24 @@ indirect_object_identifier_type,indirect_object_identifier,flags
     killall tccd 2>/dev/null || true
     sudo killall tccd 2>/dev/null || true
     sleep 2
-    shasum -a 256 "$debug_app/Contents/MacOS/roma just talk" > "$out/identity-before.txt"
+    sudo sqlite3 -json '/Library/Application Support/com.apple.TCC/TCC.db' \
+      "SELECT service,client,client_type,auth_value,hex(csreq) AS csreq FROM access WHERE client='com.negentropi.RomaJustTalk' AND service='kTCCServiceAccessibility';" > "$out/system-tcc.json"
+    sqlite3 -json "$HOME/Library/Application Support/com.apple.TCC/TCC.db" \
+      "SELECT service,client,client_type,auth_value,hex(csreq) AS csreq FROM access WHERE client='com.negentropi.RomaJustTalk' AND service='kTCCServiceMicrophone';" > "$out/microphone-tcc.json"
+    python3 - "$out" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+directory = Path(sys.argv[1])
+requirement = (directory / "host.csreq").read_bytes().hex().upper()
+for name, service in [("system-tcc.json", "kTCCServiceAccessibility"), ("microphone-tcc.json", "kTCCServiceMicrophone")]:
+    rows = json.loads((directory / name).read_text())
+    if rows != [{"service": service, "client": "com.negentropi.RomaJustTalk", "client_type": 0, "auth_value": 2, "csreq": requirement}]:
+        raise SystemExit(f"UI permission readback does not match the signed host: {name}")
+PY
+    ui_identity > "$out/identity-before.txt"
+    ui_signatures before
     phase=ui-tests
     test_exit=0
     RJT_WRITING_UI_CHECKS=1 TEST_RUNNER_RJT_WRITING_UI_CHECKS=1 \
@@ -460,9 +496,14 @@ Path(output).write_text(json.dumps({"source_sha": source_sha, "export_exit_code"
 if not available:
     print("::warning::Writing settings screenshots were not exported; inspect screenshot-export.log and retained UI.xcresult.")
 PY
-    shasum -a 256 "$debug_app/Contents/MacOS/roma just talk" > "$out/identity-after.txt"
+    ui_identity > "$out/identity-after.txt"
+    ui_signatures after
     cmp "$out/identity-before.txt" "$out/identity-after.txt"
+    for signed_bundle in app runner test-bundle; do
+      cmp "$out/$signed_bundle-signature-before.txt" "$out/$signed_bundle-signature-after.txt"
+    done
     codesign --verify --deep --strict "$debug_app"
+    codesign --verify --deep --strict "$ui_runner"
     if ! python3 - "$out/tests.log" "$test_exit" "$out/result.json" <<'PY'
 import json
 import re

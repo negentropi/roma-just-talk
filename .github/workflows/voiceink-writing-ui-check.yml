@@ -1,4 +1,4 @@
-name: Check Mac writing settings UI
+name: Compare Mac writing settings UI
 
 on:
   workflow_dispatch:
@@ -55,11 +55,17 @@ jobs:
           test "$(cat "$proof/source-sha.txt")" = "$GITHUB_SHA"
           shasum -a 256 \
             VoiceInkUITests/WritingFeaturesUITests.swift \
+            scripts/run-writing-settings-ui-regression.sh \
             scripts/run-writing-feature-regression.sh \
             .github/workflows/voiceink-writing-ui-check.yml \
             VoiceInk.xcodeproj/project.pbxproj \
             VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved \
             > "$proof/source-inputs.sha256"
+
+      - name: Verify the regression verdict classifier
+        run: |
+          set -o pipefail
+          bash scripts/run-writing-settings-ui-regression.sh --self-test | tee "$RUNNER_TEMP/writing-ui-proof/classifier-self-test.log"
 
       - uses: actions/cache/restore@v4
         id: deps-cache
@@ -86,12 +92,12 @@ jobs:
             ~/Library/Caches/org.swift.swiftpm
           key: ${{ steps.deps-cache.outputs.cache-primary-key }}
 
-      - name: Build and run four writing settings UI cases
+      - name: Compare the disabled-panel baseline and current writing settings UI
         run: |
           defaults write com.negentropi.RomaJustTalk CurrentTranscriptionModel -string whisper-large-v3-turbo
           defaults write com.negentropi.RomaJustTalk PrewarmModelOnWake -bool false
           shasum -a 256 -c "$RUNNER_TEMP/writing-ui-proof/source-inputs.sha256"
-          bash scripts/run-writing-feature-regression.sh ui
+          bash scripts/run-writing-settings-ui-regression.sh
 
       - name: Record the UI diagnostic outcome
         if: always()
@@ -108,12 +114,14 @@ jobs:
           proof = Path(sys.argv[1])
           output = Path('.local-build/onboarding-test-evidence/writing-ui')
           result = output / 'result.json'
+          comparison = Path(os.environ['RUNNER_TEMP']) / 'writing-settings-ui-regression' / 'result.json'
           payload = {
               'source_sha': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(),
               'github_run_id': os.environ['GITHUB_RUN_ID'],
               'scope': 'Debug writing settings UI diagnostics only',
               'release_validation': False,
               'driver_result': json.loads(result.read_text()) if result.exists() else None,
+              'comparison_result': json.loads(comparison.read_text()) if comparison.exists() else None,
           }
           (proof / 'diagnostic-result.json').write_text(json.dumps(payload, indent=2) + '\n')
           PY
@@ -135,6 +143,7 @@ jobs:
             .local-build/onboarding-test-evidence/writing-ui/**
             ${{ runner.temp }}/writing-ui-proof/**
             ${{ runner.temp }}/writing-package-proof/**
+            ${{ runner.temp }}/writing-settings-ui-regression/**
             ${{ runner.temp }}/writing-ui-dependency-setup.log
             ${{ runner.temp }}/writing-ui-metal-download.log
           include-hidden-files: true

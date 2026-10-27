@@ -1,4 +1,5 @@
 import AppKit
+import Carbon.HIToolbox
 import CoreFoundation
 import Foundation
 import XCTest
@@ -97,8 +98,13 @@ final class WritingPowerModeUITests: XCTestCase {
               let executable = process.executableURL else { throw PowerModeUIFixtureError.launchedProcessUnidentified }
         cleanup.process = process
         cleanup.executableURL = executable.standardizedFileURL
-        guard app.wait(for: .runningForeground, timeout: 20),
-              mainWindow(in: app).waitForExistence(timeout: 15),
+        guard app.wait(for: .runningForeground, timeout: 20) else {
+            attachLaunchState(app, fixture: fixture)
+            attachHierarchy(app, named: "App failed to enter foreground")
+            throw PowerModeUIFixtureError.appDidNotOpen
+        }
+        try openSettingsFromStatusMenu(in: app)
+        guard mainWindow(in: app).waitForExistence(timeout: 15),
               app.windows.matching(identifier: Self.mainWindowIdentifier).count == 1 else {
             attachLaunchState(app, fixture: fixture)
             attachHierarchy(app, named: "App failed to open")
@@ -131,16 +137,15 @@ final class WritingPowerModeUITests: XCTestCase {
         try assertActiveBaseline(fixture, sessionID: sessionID, phase: "before writing feature mutation")
         app.activate()
         try mutation(app, fixture, sessionID)
-        app.typeKey(.escape, modifierFlags: [])
-        app.typeKey(.escape, modifierFlags: [])
+        cancelWithConfiguredShortcut(in: app)
         XCTAssertTrue(waitUntil(timeout: 10) {
             fixture.object(for: PowerModeUIPreferences.sessionKey) == nil
-        }, "Double Escape did not end the actual Power Mode recording.")
+        }, "Configured Cancel Recording did not end the actual Power Mode recording.")
         XCTAssertTrue(waitUntil { fixture.lowercase() == false }, "Cancel restored active-mode lowercase instead of the original false value.")
         XCTAssertEqual(fixture.lowercase(), false)
         XCTAssertNil(fixture.object(for: "activeConfigurationId"))
         attachObservation(fixture, named: "after recording cancellation")
-        attachScreenshot(app, named: "Original settings restored after cancellation")
+        attachScreenshot(app, named: "After configured Cancel Recording")
     }
 
     @MainActor private func assertActiveBaseline(
@@ -160,6 +165,22 @@ final class WritingPowerModeUITests: XCTestCase {
         try reveal(required(app.buttons["snippets.new"]), identifier: "snippets.new", in: app)
     }
 
+    @MainActor private func openSettingsFromStatusMenu(in app: XCUIApplication) throws {
+        let statusItems = app.descendants(matching: .statusItem)
+        guard statusItems.firstMatch.waitForExistence(timeout: 10), statusItems.count == 1 else {
+            attachHierarchy(app, named: "Settings status menu unavailable")
+            throw PowerModeUIFixtureError.recorderMenuUnavailable
+        }
+        statusItems.firstMatch.click()
+        try required(app.menuItems["Settings"]).click()
+    }
+
+    @MainActor private func cancelWithConfiguredShortcut(in app: XCUIApplication) {
+        XCTContext.runActivity(named: "Cancel recording using the configured F18 shortcut") { _ in
+            app.typeKey(.F18, modifierFlags: [])
+        }
+    }
+
     @MainActor private func required(_ element: XCUIElement) throws -> XCUIElement {
         try XCTUnwrap(element.waitForExistence(timeout: 10) ? element : nil,
                       "A required real UI control was unavailable.")
@@ -176,11 +197,10 @@ final class WritingPowerModeUITests: XCTestCase {
             }
             attachCleanup(cleanup, phase: "before owned recording cancellation")
             cleanup.app.activate()
-            cleanup.app.typeKey(.escape, modifierFlags: [])
-            cleanup.app.typeKey(.escape, modifierFlags: [])
+            cancelWithConfiguredShortcut(in: cleanup.app)
             XCTAssertTrue(waitUntil(timeout: 10) {
                 fixture.object(for: PowerModeUIPreferences.sessionKey) == nil
-            }, "Fixture cleanup could not cancel its owned recording through double Escape.")
+            }, "Fixture cleanup could not use the configured Cancel Recording shortcut.")
         }
         cleanup.app.terminate()
     }
@@ -281,6 +301,9 @@ final class WritingPowerModeUITests: XCTestCase {
             "expectedConfigurationID": fixture.configurationID.uuidString,
             "currentLowercase": fixture.lowercase() as Any? ?? NSNull(),
             "activeConfigurationID": fixture.object(for: "activeConfigurationId") ?? NSNull(),
+            "configuredCancelShortcut": fixture.object(for: "Shortcut_cancelRecorder")
+                .flatMap { $0 as? Data }
+                .flatMap { try? JSONSerialization.jsonObject(with: $0) } ?? NSNull(),
             "session": fixture.object(for: PowerModeUIPreferences.sessionKey)
                 .flatMap { $0 as? Data }
                 .flatMap { try? JSONSerialization.jsonObject(with: $0) } ?? NSNull()
@@ -425,14 +448,17 @@ private final class PowerModeUIPreferences {
             "CurrentTranscriptionModel": "whisper-large-v3-turbo", "SelectedLanguage": "auto",
             "isAIEnhancementEnabled": false, "useClipboardContext": false, "useScreenCaptureContext": false,
             "selectedAIProvider": "Local CLI", "RecorderType": "mini", "ShowMenuBarIcon": true, "IsMenuBarOnly": false,
-            "isSoundFeedbackEnabled": false, "Shortcut_cancelRecorder_cleared": true,
+            "isSoundFeedbackEnabled": false, "Shortcut_cancelRecorder_cleared": false,
+            "Shortcut_cancelRecorder": try JSONSerialization.data(withJSONObject: [
+                "kind": "key", "keyCode": Int(kVK_F18), "modifierFlagsRawValue": 0
+            ]),
             "VoiceInkSpokenSnippets": try JSONSerialization.data(withJSONObject: []),
             "VoiceInkWritingActionPreferences": try JSONSerialization.data(withJSONObject: [
                 "targetLanguages": ["en"], "selectedTargetLanguage": "en"
             ])
         ]
         for (key, value) in values { write(value, for: key) }
-        for key in ["activeConfigurationId", Self.sessionKey, "Shortcut_cancelRecorder", "CustomRecordingShortcut_cancelRecorder", "KeyboardShortcuts_cancelRecorder"] {
+        for key in ["activeConfigurationId", Self.sessionKey, "CustomRecordingShortcut_cancelRecorder", "KeyboardShortcuts_cancelRecorder"] {
             write(nil, for: key)
         }
         guard CFPreferencesAppSynchronize(Self.bundleIdentifier as CFString) else {

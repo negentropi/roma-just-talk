@@ -195,6 +195,7 @@ final class WritingFeaturesUITests: XCTestCase {
         try ownership.requireNoRunningApplication()
         app.launchArguments = [
             "-hasCompletedOnboarding", "YES",
+            "-ShowMenuBarIcon", "YES",
             "-DidApplyLaunchAtLoginDefault", "YES",
             "-enableAnnouncements", "NO",
             "-PrewarmModelOnWake", "NO",
@@ -210,9 +211,23 @@ final class WritingFeaturesUITests: XCTestCase {
             attachLaunchFailure(app)
             throw WritingFeaturesUIError.appDidNotBecomeForeground
         }
+        // Settings opens the main SwiftUI scene even when launch restores no window.
+        let statusItems = app.descendants(matching: .statusItem)
+        guard statusItems.firstMatch.waitForExistence(timeout: 10), statusItems.count == 1 else {
+            attachLaunchFailure(app)
+            throw WritingFeaturesUIError.settingsMenuUnavailable
+        }
+        statusItems.firstMatch.click()
+        let settings = app.menuItems["Settings"]
+        guard settings.waitForExistence(timeout: 5) else {
+            attachLaunchFailure(app)
+            throw WritingFeaturesUIError.settingsMenuUnavailable
+        }
+        settings.click()
         let mainWindows = app.windows.matching(identifier: Self.mainWindowIdentifier)
         guard mainWindows.firstMatch.waitForExistence(timeout: 15), mainWindows.count == 1,
-              mainWindow(in: app).buttons["Dictionary"].waitForExistence(timeout: 10) else {
+              mainWindow(in: app).buttons["Dictionary"].waitForExistence(timeout: 10),
+              app.state == .runningForeground else {
             attachLaunchFailure(app)
             throw WritingFeaturesUIError.mainWindowDidNotOpen
         }
@@ -378,7 +393,7 @@ final class WritingFeaturesUITests: XCTestCase {
 
 private enum WritingFeaturesUIError: Error {
     case disposableRunnerRequired, preferenceSyncFailed, appDidNotBecomeForeground, mainWindowDidNotOpen
-    case appAlreadyRunning, appOwnershipUnavailable
+    case appAlreadyRunning, appOwnershipUnavailable, settingsMenuUnavailable
 }
 
 private final class WritingFeaturesAppOwnership {

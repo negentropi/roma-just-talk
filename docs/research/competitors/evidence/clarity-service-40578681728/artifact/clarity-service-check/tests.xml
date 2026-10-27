@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="TestResults" errors="0" tests="7" failures="0" skipped="0" time="6.924288333">
+    <testcase classname="VoiceInkTests.VoiceInkTests.ClarityProviderTests" name="claritySnapshotKeepsCapturedCLICommandAndProvider()" time="0.187830958" />
+    <testcase classname="VoiceInkTests.VoiceInkTests.ClarityProviderTests" name="clarityCancellationDoesNotReturnLateOutput()" time="0.186674667" />
+    <testcase classname="VoiceInkTests.VoiceInkTests.ClarityProviderTests" name="claritySnapshotKeepsCapturedCLITimeout()" time="5.237356625" />
+    <testcase classname="VoiceInkTests.VoiceInkTests.ClarityProviderTests" name="writingActionsRetainLegacyFilteringAndEmptyPolicies()" time="0.4204435" />
+    <testcase classname="VoiceInkTests.VoiceInkTests.ClarityProviderTests" name="claritySameOutputRetainsCapturedRequestMetadata()" time="0.209593041" />
+    <testcase classname="VoiceInkTests.VoiceInkTests.ClarityProviderTests" name="clarityPreservesLiteralProviderJSONAndCodeUnits()" time="0.244894583" />
+    <testcase classname="VoiceInkTests.VoiceInkTests.ClarityProviderTests" name="clarityRejectsMalformedAndBlankProviderResponses()" time="0.435742041" />
+  </testsuite>
+</testsuites>

@@ -1,0 +1,27 @@
+{
+  "bundle": "/Users/runner/work/_temp/swiftpm-testing-signature-check/package/.build/arm64-apple-macosx/debug/SignaturePreparationPackageTests.xctest",
+  "bundleManifest": {
+    "Contents/MacOS/SignaturePreparationPackageTests": "63e6c11ad60b70eceb644aa451fd6406db8d7bcc404c7a1014b2280a80c505c7",
+    "Contents/MacOS/SignaturePreparationPackageTests.dSYM/Contents/Info.plist": "aa130df9b065bfee79db1fa23955f6868b76a44cda54da065338250c3227c7ec",
+    "Contents/MacOS/SignaturePreparationPackageTests.dSYM/Contents/Resources/DWARF/SignaturePreparationPackageTests": "12eba3055f0c5fbd927a4e5205d6da739c34e67a7ccd97bda7b11827b49e280e",
+    "Contents/MacOS/SignaturePreparationPackageTests.dSYM/Contents/Resources/Relocations/aarch64/SignaturePreparationPackageTests.yml": "0bdaff5e943f4614b723b8966c452408a4a5a33454349ec5177dcfea13fb9ca1"
+  },
+  "executable": "/Users/runner/work/_temp/swiftpm-testing-signature-check/package/.build/arm64-apple-macosx/debug/SignaturePreparationPackageTests.xctest/Contents/MacOS/SignaturePreparationPackageTests",
+  "machOSHA256": "63e6c11ad60b70eceb644aa451fd6406db8d7bcc404c7a1014b2280a80c505c7",
+  "resourceBundleManifests": {
+    "SignaturePreparation_SignaturePreparationTests.bundle": {
+      "signed-resource.txt": "15bd48e3f1880d60374135a5bbd33b394ccda46d85a4a176c4676161ed26239a"
+    }
+  },
+  "sourceContract": {
+    "manifestSHA256": "a3016f835874c1f47cef5ebe78fead38adc707131112652e3d60b0525f7fe943",
+    "resourceSHA256": "15bd48e3f1880d60374135a5bbd33b394ccda46d85a4a176c4676161ed26239a",
+    "scriptPath": "/Users/runner/work/roma-just-talk/roma-just-talk/scripts/tests/swiftpm-testing-signature.test.sh",
+    "scriptSHA256": "2ab6ed8420bc680f966aca1f86e0e2b3c522eb5dfc602df27d08f8a4379375fe",
+    "testCensus": {
+      "SignaturePreparationTests/SignaturePreparationTests.swift": "6b52e82b233f08cc2872db5958f2702d51a2e86a3e525607d765af1fded5c7a2",
+      "SignaturePreparationTests/signed-resource.txt": "15bd48e3f1880d60374135a5bbd33b394ccda46d85a4a176c4676161ed26239a"
+    },
+    "testSHA256": "6b52e82b233f08cc2872db5958f2702d51a2e86a3e525607d765af1fded5c7a2"
+  }
+}

@@ -1,0 +1,6 @@
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test signaturePreparationRunsStandardSwiftTesting() started.
+✔ Test signaturePreparationRunsStandardSwiftTesting() passed after 0.005 seconds.
+✔ Test run with 1 test in 0 suites passed after 0.005 seconds.

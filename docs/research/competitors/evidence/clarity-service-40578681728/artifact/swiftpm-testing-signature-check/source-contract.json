@@ -1,0 +1,11 @@
+{
+  "manifestSHA256": "a3016f835874c1f47cef5ebe78fead38adc707131112652e3d60b0525f7fe943",
+  "resourceSHA256": "15bd48e3f1880d60374135a5bbd33b394ccda46d85a4a176c4676161ed26239a",
+  "scriptPath": "/Users/runner/work/roma-just-talk/roma-just-talk/scripts/tests/swiftpm-testing-signature.test.sh",
+  "scriptSHA256": "2ab6ed8420bc680f966aca1f86e0e2b3c522eb5dfc602df27d08f8a4379375fe",
+  "testCensus": {
+    "SignaturePreparationTests/SignaturePreparationTests.swift": "6b52e82b233f08cc2872db5958f2702d51a2e86a3e525607d765af1fded5c7a2",
+    "SignaturePreparationTests/signed-resource.txt": "15bd48e3f1880d60374135a5bbd33b394ccda46d85a4a176c4676161ed26239a"
+  },
+  "testSHA256": "6b52e82b233f08cc2872db5958f2702d51a2e86a3e525607d765af1fded5c7a2"
+}

@@ -1,0 +1,41 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+warning: 'package': dependency 'axswift' is not used by any target
+warning: 'package': dependency 'grpc-swift-2' is not used by any target
+warning: 'package': dependency 'grpc-swift-nio-transport' is not used by any target
+warning: 'package': dependency 'keysender' is not used by any target
+warning: 'package': dependency 'swift-algorithms' is not used by any target
+warning: 'package': dependency 'swift-asn1' is not used by any target
+warning: 'package': dependency 'swift-atomics' is not used by any target
+warning: 'package': dependency 'swift-certificates' is not used by any target
+warning: 'package': dependency 'swift-crypto' is not used by any target
+warning: 'package': dependency 'swift-http-structured-headers' is not used by any target
+warning: 'package': dependency 'swift-nio' is not used by any target
+warning: 'package': dependency 'swift-nio-extras' is not used by any target
+warning: 'package': dependency 'swift-nio-http2' is not used by any target
+warning: 'package': dependency 'swift-nio-transport-services' is not used by any target
+warning: 'package': dependency 'swift-numerics' is not used by any target
+warning: 'package': dependency 'swift-service-lifecycle' is not used by any target
+warning: 'package': dependency 'swift-system' is not used by any target
+[0/1] Planning build
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite VoiceInkTests started.
+◇ Suite ClarityProviderTests started.
+◇ Test clarityPreservesLiteralProviderJSONAndCodeUnits() started.
+✔ Test clarityPreservesLiteralProviderJSONAndCodeUnits() passed after 0.244 seconds.
+◇ Test claritySameOutputRetainsCapturedRequestMetadata() started.
+✔ Test claritySameOutputRetainsCapturedRequestMetadata() passed after 0.209 seconds.
+◇ Test clarityRejectsMalformedAndBlankProviderResponses() started.
+✔ Test clarityRejectsMalformedAndBlankProviderResponses() passed after 0.435 seconds.
+◇ Test claritySnapshotKeepsCapturedCLICommandAndProvider() started.
+✔ Test claritySnapshotKeepsCapturedCLICommandAndProvider() passed after 0.187 seconds.
+◇ Test claritySnapshotKeepsCapturedCLITimeout() started.
+✔ Test claritySnapshotKeepsCapturedCLITimeout() passed after 5.237 seconds.
+◇ Test writingActionsRetainLegacyFilteringAndEmptyPolicies() started.
+✔ Test writingActionsRetainLegacyFilteringAndEmptyPolicies() passed after 0.420 seconds.
+◇ Test clarityCancellationDoesNotReturnLateOutput() started.
+✔ Test clarityCancellationDoesNotReturnLateOutput() passed after 0.186 seconds.
+✔ Suite ClarityProviderTests passed after 6.923 seconds.
+✔ Suite VoiceInkTests passed after 6.923 seconds.
+✔ Test run with 7 tests in 2 suites passed after 6.924 seconds.

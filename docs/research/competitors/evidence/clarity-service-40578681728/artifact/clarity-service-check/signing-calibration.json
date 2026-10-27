@@ -1,0 +1,21 @@
+{
+  "result": {
+    "classification": "passed-signing-preparation-calibration",
+    "failureLines": [],
+    "passed": [
+      "signaturePreparationRunsStandardSwiftTesting"
+    ],
+    "scope": "Test harness signing preparation only. Native resource-signature failure, one explicit whole-bundle ad-hoc sign, strict verification and one standard Swift Testing case loading the exact processed Bundle.module resource. No Clarity feature proof.",
+    "started": [
+      "signaturePreparationRunsStandardSwiftTesting"
+    ],
+    "summaries": [
+      "1"
+    ],
+    "valid": true
+  },
+  "resultSHA256": "4dbbed121af86ba53283aae117d94bb63375f0d71451353b741bbdfc303bc353",
+  "scriptSHA256": "2ab6ed8420bc680f966aca1f86e0e2b3c522eb5dfc602df27d08f8a4379375fe",
+  "sourceSHA": "4d5b65b5c662d1b78ccff883a10bf510ed7d82f3",
+  "valid": true
+}

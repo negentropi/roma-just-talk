@@ -1,0 +1,80 @@
+{
+  "run_id": 40578681728,
+  "run_url": "https://github.com/negentropi/roma-just-talk/actions/runs/40578681728",
+  "source_head": "4d5b65b5c662d1b78ccff883a10bf510ed7d82f3",
+  "classification": "passed-seven-clarity-service-tests-with-native-signing-calibration",
+  "service_tests": {
+    "started_once": [
+      "clarityPreservesLiteralProviderJSONAndCodeUnits",
+      "claritySameOutputRetainsCapturedRequestMetadata",
+      "clarityRejectsMalformedAndBlankProviderResponses",
+      "claritySnapshotKeepsCapturedCLICommandAndProvider",
+      "claritySnapshotKeepsCapturedCLITimeout",
+      "writingActionsRetainLegacyFilteringAndEmptyPolicies",
+      "clarityCancellationDoesNotReturnLateOutput"
+    ],
+    "passed_once": [
+      "clarityPreservesLiteralProviderJSONAndCodeUnits",
+      "claritySameOutputRetainsCapturedRequestMetadata",
+      "clarityRejectsMalformedAndBlankProviderResponses",
+      "claritySnapshotKeepsCapturedCLICommandAndProvider",
+      "claritySnapshotKeepsCapturedCLITimeout",
+      "writingActionsRetainLegacyFilteringAndEmptyPolicies",
+      "clarityCancellationDoesNotReturnLateOutput"
+    ],
+    "native_exit_code": 0,
+    "total": 7,
+    "failed": 0,
+    "skipped": 0,
+    "duration_seconds": 6.924288333,
+    "case_total_seconds": {
+      "claritySnapshotKeepsCapturedCLICommandAndProvider": 0.187830958,
+      "clarityCancellationDoesNotReturnLateOutput": 0.186674667,
+      "claritySnapshotKeepsCapturedCLITimeout": 5.237356625,
+      "writingActionsRetainLegacyFilteringAndEmptyPolicies": 0.4204435,
+      "claritySameOutputRetainsCapturedRequestMetadata": 0.209593041,
+      "clarityPreservesLiteralProviderJSONAndCodeUnits": 0.244894583,
+      "clarityRejectsMalformedAndBlankProviderResponses": 0.435742041
+    },
+    "junit_and_standard_swift_testing_log_agree": true
+  },
+  "signing_calibration": {
+    "native_strict_verify_exit_code": 1,
+    "native_exact_error": "code has no resources but signature indicates they must be present",
+    "single_resource_test_passed": true,
+    "processed_resource_sha256": "15bd48e3f1880d60374135a5bbd33b394ccda46d85a4a176c4676161ed26239a",
+    "explicit_sign_exit_code": 0,
+    "prepared_and_after_strict_verify_exit_code": 0,
+    "calibration_source_bound_to_main_gate": true
+  },
+  "identity": {
+    "intentional_pre_freeze_signing_in_both_bundles": true,
+    "preparation_changes_only_main_macho_and_adds_code_resources": true,
+    "prepared_to_after_macho_full_bundle_external_resources_and_signatures_unchanged": true,
+    "service_signed_macho_sha256": "b93cb20f8b064977bb1a238ac098c764edc1160da2750cc2cfa0ea6d4af6849b",
+    "calibration_signed_macho_sha256": "e7e40052fb6618fb40f3dbdbb7632c5fd15301fe28a9ca37e0bd724668aaeeb3"
+  },
+  "source_and_pins": {
+    "source_inputs_verified": 172,
+    "real_core_nvidia_file_count": 156,
+    "actual_app_library_file_count": 11,
+    "canonical_service_pin_count": 26,
+    "pins_unchanged_after_metadata_normalization_build_and_tests": true,
+    "test_source_sha256": "85580bed6dda374494026bfd44fccd898dbc04b2cf1e8167e68f0742de03a054",
+    "service_source_sha256": "986b0c1fae4a939faec9eed4c46a8c6065f6ed5489a922ed337d88994a06bb98"
+  },
+  "toolchain": "4d5b65b5c662d1b78ccff883a10bf510ed7d82f3\nXcode 26.6\nBuild version 17F113\nswift-driver version: 1.148.6 Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0\nProductName:\t\tmacOS\nProductVersion:\t\t26.6.2\nBuildVersion:\t\t25G83\narm64\n",
+  "core_checks": {
+    "registered_in_pinned_source": 1749,
+    "executed_in_this_run": false
+  },
+  "scope": "Actual Clarity/legacy service APIs with standard Swift Testing, real SDK dependencies, memory-only SwiftData and synthetic Local CLI commands. No normal app/UI, editor delivery, profile activation, unwired processor, authenticated provider, AI-quality, release, or full CoreChecks proof.",
+  "artifact": {
+    "id": 12769670311,
+    "name": "roma.clarity-service-evidence",
+    "size_in_bytes": 124174,
+    "digest": "sha256:27b12a2c70f7c7220e79323875bb55514ca710be76bd11d12771367f1153b9c6",
+    "download_count": 1,
+    "zip_size_hash_integrity_verified": true
+  }
+}

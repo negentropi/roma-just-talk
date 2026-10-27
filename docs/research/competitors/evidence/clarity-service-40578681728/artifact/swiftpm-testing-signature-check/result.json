@@ -1,0 +1,15 @@
+{
+  "classification": "passed-signing-preparation-calibration",
+  "failureLines": [],
+  "passed": [
+    "signaturePreparationRunsStandardSwiftTesting"
+  ],
+  "scope": "Test harness signing preparation only. Native resource-signature failure, one explicit whole-bundle ad-hoc sign, strict verification and one standard Swift Testing case loading the exact processed Bundle.module resource. No Clarity feature proof.",
+  "started": [
+    "signaturePreparationRunsStandardSwiftTesting"
+  ],
+  "summaries": [
+    "1"
+  ],
+  "valid": true
+}

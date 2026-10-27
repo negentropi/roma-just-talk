@@ -1,0 +1,7 @@
+{
+  "exitCode": 1,
+  "expectedFailure": "code has no resources but signature indicates they must be present",
+  "stderr": "/Users/runner/work/_temp/swiftpm-testing-signature-check/package/.build/arm64-apple-macosx/debug/SignaturePreparationPackageTests.xctest: code has no resources but signature indicates they must be present\n",
+  "stdout": "",
+  "valid": true
+}

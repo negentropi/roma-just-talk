@@ -1,0 +1,42 @@
+{
+  "classification": "passed-seven-clarity-service-tests",
+  "exitCode": 0,
+  "expectedTests": [
+    "clarityPreservesLiteralProviderJSONAndCodeUnits",
+    "claritySameOutputRetainsCapturedRequestMetadata",
+    "clarityRejectsMalformedAndBlankProviderResponses",
+    "claritySnapshotKeepsCapturedCLICommandAndProvider",
+    "claritySnapshotKeepsCapturedCLITimeout",
+    "writingActionsRetainLegacyFilteringAndEmptyPolicies",
+    "clarityCancellationDoesNotReturnLateOutput"
+  ],
+  "failureLines": [],
+  "passedTests": [
+    "clarityPreservesLiteralProviderJSONAndCodeUnits",
+    "claritySameOutputRetainsCapturedRequestMetadata",
+    "clarityRejectsMalformedAndBlankProviderResponses",
+    "claritySnapshotKeepsCapturedCLICommandAndProvider",
+    "claritySnapshotKeepsCapturedCLITimeout",
+    "writingActionsRetainLegacyFilteringAndEmptyPolicies",
+    "clarityCancellationDoesNotReturnLateOutput"
+  ],
+  "scope": "Seven unchanged Clarity service tests through standard Swift Testing. Eleven unchanged app source files and full real Core/NVIDIA source closure. Local deterministic commands only. No app lifecycle, UI, microphone, TCC, authenticated AI provider or live editor delivery proof.",
+  "sourceSHA": "4d5b65b5c662d1b78ccff883a10bf510ed7d82f3",
+  "startedTests": [
+    "clarityPreservesLiteralProviderJSONAndCodeUnits",
+    "claritySameOutputRetainsCapturedRequestMetadata",
+    "clarityRejectsMalformedAndBlankProviderResponses",
+    "claritySnapshotKeepsCapturedCLICommandAndProvider",
+    "claritySnapshotKeepsCapturedCLITimeout",
+    "writingActionsRetainLegacyFilteringAndEmptyPolicies",
+    "clarityCancellationDoesNotReturnLateOutput"
+  ],
+  "summaries": [
+    [
+      "7",
+      "2"
+    ]
+  ],
+  "unrecognizedTestEvents": [],
+  "valid": true
+}

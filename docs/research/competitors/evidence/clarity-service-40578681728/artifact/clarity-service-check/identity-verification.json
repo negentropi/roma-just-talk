@@ -1,0 +1,57 @@
+{
+  "bundleManifest": {
+    "Contents/MacOS/ClarityServiceCheckPackageTests": "b93cb20f8b064977bb1a238ac098c764edc1160da2750cc2cfa0ea6d4af6849b",
+    "Contents/MacOS/ClarityServiceCheckPackageTests.dSYM/Contents/Info.plist": "6e5ef3559cbcc79d2d1378102dd860c27c7fcd7cb0ecbdf7150891862caf902d",
+    "Contents/MacOS/ClarityServiceCheckPackageTests.dSYM/Contents/Resources/DWARF/ClarityServiceCheckPackageTests": "0d5cdd663417403084e67783dcc9287a6b3b622d3a161f94170eb93c447a4e36",
+    "Contents/MacOS/ClarityServiceCheckPackageTests.dSYM/Contents/Resources/Relocations/aarch64/ClarityServiceCheckPackageTests.yml": "fb1f9f6523c326cd357f2d9b350bd03fe16ddd5a8ad52782e1ce162fd52a3626",
+    "Contents/_CodeSignature/CodeResources": "61276b5091abdb0a3d618760a8b293063282e8f4fe45e7a4e2e7249374629e07"
+  },
+  "bundlePath": "/Users/runner/work/_temp/clarity-service-check/package/.build/arm64-apple-macosx/debug/ClarityServiceCheckPackageTests.xctest",
+  "executablePath": "/Users/runner/work/_temp/clarity-service-check/package/.build/arm64-apple-macosx/debug/ClarityServiceCheckPackageTests.xctest/Contents/MacOS/ClarityServiceCheckPackageTests",
+  "executableSHA256": "b93cb20f8b064977bb1a238ac098c764edc1160da2750cc2cfa0ea6d4af6849b",
+  "resourceBundleManifests": {
+    "SwiftProtobuf_SwiftProtobuf.bundle": {
+      "PrivacyInfo.xcprivacy": "a07418e5fe128e224cd37964bc21c503b7aa2f575e7b4927468478ad873214fe"
+    },
+    "VoiceInkNVIDIA_VoiceInkNVIDIA.bundle": {
+      "ThirdPartyNotices/grpc-swift-2-LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "ThirdPartyNotices/grpc-swift-nio-transport-LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "ThirdPartyNotices/grpc-swift-protobuf-LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "ThirdPartyNotices/riva-common-LICENSE.txt": "9c0bb53336319c13d061a2246eea4f3f216bad31cdeb1fc9ff0fd8d8308dd543",
+      "ThirdPartyNotices/riva-protocol-NOTICE.txt": "bd5de772f32d1e6e51c8527429574e1dacc6f410d8dd3222eca32dc1f438dfe7",
+      "ThirdPartyNotices/swift-algorithms-LICENSE.txt": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55",
+      "ThirdPartyNotices/swift-asn1-LICENSE.txt": "8c6db340475136df3c1201d458fa5755698eace76e510471ecc9d857d6083dac",
+      "ThirdPartyNotices/swift-asn1-NOTICE.txt": "11dd3b3b783e6ec26098dd38ebc962986ea109b85447e28e62867b83bd0f8c5b",
+      "ThirdPartyNotices/swift-async-algorithms-LICENSE.txt": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55",
+      "ThirdPartyNotices/swift-atomics-LICENSE.txt": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55",
+      "ThirdPartyNotices/swift-certificates-LICENSE.txt": "8c6db340475136df3c1201d458fa5755698eace76e510471ecc9d857d6083dac",
+      "ThirdPartyNotices/swift-certificates-NOTICE.txt": "57d7797703d906b63c2be50d891cf70bdec307ae6f77a881638c33343f3dd195",
+      "ThirdPartyNotices/swift-collections-LICENSE.txt": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55",
+      "ThirdPartyNotices/swift-crypto-LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "ThirdPartyNotices/swift-crypto-NOTICE.txt": "b3ddc2ae068e76b3beb71be03c0400f90090f9469aa491bf7b1ac42320af37b8",
+      "ThirdPartyNotices/swift-http-structured-headers-LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "ThirdPartyNotices/swift-http-types-LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "ThirdPartyNotices/swift-http-types-NOTICE.txt": "eb79190094094bb6ce2b177a7ba7708f50bf873b9a2c5e6e1936a5f391b5ec0f",
+      "ThirdPartyNotices/swift-log-LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "ThirdPartyNotices/swift-log-NOTICE.txt": "879b241d49b407215a0ad8e1c6a71c358d7b29591b090cf379d37a5f50cff918",
+      "ThirdPartyNotices/swift-nio-LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "ThirdPartyNotices/swift-nio-NOTICE.txt": "d25ed2452b3476c342082d11e4e8bf5459174d2836124f842b499850bcebc50e",
+      "ThirdPartyNotices/swift-nio-extras-LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "ThirdPartyNotices/swift-nio-extras-NOTICE.txt": "722817c4c450c062f1f6e7b9df36733c0f6983aaad3e5e4aa5d76fe23d90010a",
+      "ThirdPartyNotices/swift-nio-http2-LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "ThirdPartyNotices/swift-nio-http2-NOTICE.txt": "56b85f4571b653e82649d82a696afe841a417206a21a25afac751bcb11c2ea87",
+      "ThirdPartyNotices/swift-nio-ssl-LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "ThirdPartyNotices/swift-nio-ssl-NOTICE.txt": "03e8ca5c65a3df21fe1ab48eef91bca7d370db56c290d8ef16eaaa09ba322abe",
+      "ThirdPartyNotices/swift-nio-transport-services-LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "ThirdPartyNotices/swift-numerics-LICENSE.txt": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55",
+      "ThirdPartyNotices/swift-protobuf-LICENSE.txt": "186c5f0192a754714a7e542233ddaaad28745626e0ad32e358d3f5af00afb84a",
+      "ThirdPartyNotices/swift-service-lifecycle-LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "ThirdPartyNotices/swift-service-lifecycle-NOTICE.txt": "e0583b716a12a866a2a1d7456c26a17d18e1ec70f0ecaf2c62ed77180d1db043",
+      "ThirdPartyNotices/swift-system-LICENSE.txt": "2245a990b635558be210fb3eb4f8a6f7a49aebc0fefbf5859146a65ddc7ddcf3"
+    },
+    "swift-nio_NIOPosix.bundle": {
+      "PrivacyInfo.xcprivacy": "982f20d820bc4460acc9d4116c3e6c8ec837f717dc82edbb7308f7400515c909"
+    }
+  },
+  "valid": true
+}

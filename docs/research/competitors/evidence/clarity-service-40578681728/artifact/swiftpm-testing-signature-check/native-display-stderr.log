@@ -1,0 +1,23 @@
+Executable=/Users/runner/work/_temp/swiftpm-testing-signature-check/package/.build/arm64-apple-macosx/debug/SignaturePreparationPackageTests.xctest/Contents/MacOS/SignaturePreparationPackageTests
+Identifier=SignaturePreparationPackageTests
+Format=bundle with Mach-O thin (arm64)
+CodeDirectory v=20400 size=889 flags=0x20002(adhoc,linker-signed) hashes=24+0 location=embedded
+VersionPlatform=1
+VersionMin=917504
+VersionSDK=1705216
+Hash type=sha256 size=32
+CandidateCDHash sha256=38d48ebd35b92e1c29013e3bf13e20bffcc2755d
+CandidateCDHashFull sha256=38d48ebd35b92e1c29013e3bf13e20bffcc2755d79df2b19375888dcc0ad76f9
+Hash choices=sha256
+CMSDigest=38d48ebd35b92e1c29013e3bf13e20bffcc2755d79df2b19375888dcc0ad76f9
+CMSDigestType=2
+Executable Segment base=0
+Executable Segment limit=12760
+Executable Segment flags=0x0
+Page size=4096
+CDHash=38d48ebd35b92e1c29013e3bf13e20bffcc2755d
+Signature=adhoc
+Info.plist=not bound
+TeamIdentifier=not set
+Sealed Resources=none
+Internal requirements=none

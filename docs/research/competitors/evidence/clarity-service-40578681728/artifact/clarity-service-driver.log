@@ -1,0 +1,57 @@
+{
+  "valid": true,
+  "started": [
+    "signaturePreparationRunsStandardSwiftTesting"
+  ],
+  "passed": [
+    "signaturePreparationRunsStandardSwiftTesting"
+  ],
+  "summaries": [
+    "1"
+  ],
+  "failureLines": [],
+  "classification": "passed-signing-preparation-calibration",
+  "scope": "Test harness signing preparation only. Native resource-signature failure, one explicit whole-bundle ad-hoc sign, strict verification and one standard Swift Testing case loading the exact processed Bundle.module resource. No Clarity feature proof."
+}
+{
+  "valid": true,
+  "classification": "passed-seven-clarity-service-tests",
+  "exitCode": 0,
+  "expectedTests": [
+    "clarityPreservesLiteralProviderJSONAndCodeUnits",
+    "claritySameOutputRetainsCapturedRequestMetadata",
+    "clarityRejectsMalformedAndBlankProviderResponses",
+    "claritySnapshotKeepsCapturedCLICommandAndProvider",
+    "claritySnapshotKeepsCapturedCLITimeout",
+    "writingActionsRetainLegacyFilteringAndEmptyPolicies",
+    "clarityCancellationDoesNotReturnLateOutput"
+  ],
+  "startedTests": [
+    "clarityPreservesLiteralProviderJSONAndCodeUnits",
+    "claritySameOutputRetainsCapturedRequestMetadata",
+    "clarityRejectsMalformedAndBlankProviderResponses",
+    "claritySnapshotKeepsCapturedCLICommandAndProvider",
+    "claritySnapshotKeepsCapturedCLITimeout",
+    "writingActionsRetainLegacyFilteringAndEmptyPolicies",
+    "clarityCancellationDoesNotReturnLateOutput"
+  ],
+  "passedTests": [
+    "clarityPreservesLiteralProviderJSONAndCodeUnits",
+    "claritySameOutputRetainsCapturedRequestMetadata",
+    "clarityRejectsMalformedAndBlankProviderResponses",
+    "claritySnapshotKeepsCapturedCLICommandAndProvider",
+    "claritySnapshotKeepsCapturedCLITimeout",
+    "writingActionsRetainLegacyFilteringAndEmptyPolicies",
+    "clarityCancellationDoesNotReturnLateOutput"
+  ],
+  "summaries": [
+    [
+      "7",
+      "2"
+    ]
+  ],
+  "failureLines": [],
+  "unrecognizedTestEvents": [],
+  "sourceSHA": "4d5b65b5c662d1b78ccff883a10bf510ed7d82f3",
+  "scope": "Seven unchanged Clarity service tests through standard Swift Testing. Eleven unchanged app source files and full real Core/NVIDIA source closure. Local deterministic commands only. No app lifecycle, UI, microphone, TCC, authenticated AI provider or live editor delivery proof."
+}

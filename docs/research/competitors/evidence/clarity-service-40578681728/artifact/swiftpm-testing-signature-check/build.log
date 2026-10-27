@@ -1,0 +1,13 @@
+Building for debugging...
+[0/7] /Users/runner/work/_temp/swiftpm-testing-signature-check/package/.build/arm64-apple-macosx/debug/SignaturePreparationPackageTests.derived/runner.swift
+[0/7] Copying signed-resource.txt
+[2/7] Write sources
+[4/7] Write swift-version-7974D3F7F03D5E95.txt
+[6/10] Compiling SignaturePreparationTests SignaturePreparationTests.swift
+[7/10] Compiling SignaturePreparationTests resource_bundle_accessor.swift
+[8/10] Emitting module SignaturePreparationTests
+[9/12] Emitting module SignaturePreparationPackageTests
+[10/12] Compiling SignaturePreparationPackageTests runner.swift
+[10/12] Write Objects.LinkFileList
+[11/12] Linking SignaturePreparationPackageTests
+Build complete! (16.42s)

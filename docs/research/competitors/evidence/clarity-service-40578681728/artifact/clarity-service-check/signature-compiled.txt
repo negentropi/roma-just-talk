@@ -1,0 +1,23 @@
+Executable=/Users/runner/work/_temp/clarity-service-check/package/.build/arm64-apple-macosx/debug/ClarityServiceCheckPackageTests.xctest/Contents/MacOS/ClarityServiceCheckPackageTests
+Identifier=ClarityServiceCheckPackageTests
+Format=bundle with Mach-O thin (arm64)
+CodeDirectory v=20400 size=351608 flags=0x20002(adhoc,linker-signed) hashes=10984+0 location=embedded
+VersionPlatform=1
+VersionMin=917504
+VersionSDK=1705216
+Hash type=sha256 size=32
+CandidateCDHash sha256=4eaa14da239aa87ee66ac720ee6584076f3f7e32
+CandidateCDHashFull sha256=4eaa14da239aa87ee66ac720ee6584076f3f7e329639d5e74e0e69bb0b46ad70
+Hash choices=sha256
+CMSDigest=4eaa14da239aa87ee66ac720ee6584076f3f7e329639d5e74e0e69bb0b46ad70
+CMSDigestType=2
+Executable Segment base=0
+Executable Segment limit=16943020
+Executable Segment flags=0x0
+Page size=4096
+CDHash=4eaa14da239aa87ee66ac720ee6584076f3f7e32
+Signature=adhoc
+Info.plist=not bound
+TeamIdentifier=not set
+Sealed Resources=none
+Internal requirements=none

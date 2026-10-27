@@ -1,0 +1,3 @@
+/tmp/rjt-literal-replacement.59XmDv/FocusedTests.swift:38: expected The .00 is due. to equal The $5.00 is due.
+/tmp/rjt-literal-replacement.59XmDv/FocusedTests.swift:38: expected Use C:Temp$1 here. to equal Use C:\Temp\$1 here.
+focused_registered_methods=5 failures=2

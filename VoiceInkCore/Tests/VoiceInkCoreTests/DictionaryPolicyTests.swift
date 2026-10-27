@@ -49,6 +49,20 @@ final class DictionaryPolicyTests: XCTestCase {
             VoiceInkWordReplacementEngine.apply(rules, to: "Use Voice Ink, not voice inking."),
             "Use roma, not voice inking."
         )
+
+        let literalCases = [
+            ("cost", "$5.00", "The cost is due.", "The $5.00 is due."),
+            ("path", #"C:\Temp\$1"#, "Use PATH here.", #"Use C:\Temp\$1 here."#)
+        ]
+        for (original, replacement, input, expected) in literalCases {
+            XCTAssertEqual(
+                VoiceInkWordReplacementEngine.apply(
+                    [.init(originalText: original, replacementText: replacement)],
+                    to: input
+                ),
+                expected
+            )
+        }
     }
 
     func testWordReplacementEngineApplySortsCommaSeparatedVariantsByLength() {
@@ -70,6 +84,14 @@ final class DictionaryPolicyTests: XCTestCase {
         XCTAssertEqual(
             VoiceInkWordReplacementEngine.apply(rules, to: "東京都 and 東京"),
             "Tokyo都 and Tokyo"
+        )
+
+        XCTAssertEqual(
+            VoiceInkWordReplacementEngine.apply(
+                [.init(originalText: "東京", replacementText: #"C:\東京\$5.00"#)],
+                to: "東京都"
+            ),
+            #"C:\東京\$5.00都"#
         )
     }
 

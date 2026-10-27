@@ -7,6 +7,7 @@
 - Keep a canceled recording start from clearing a newer recording after delayed permission or model preparation finishes.
 - Reject malformed text selections that split an emoji during writing actions.
 - Keep snippet and translation-target changes separate from Power Mode's saved settings.
+- Preserve dollar signs and backslashes in saved word replacements.
 
 - Double-tap Shift in Special mode to dictate hands-free, then press the assigned shortcut to finish. Set the tap interval in milliseconds or turn the gesture off.
 

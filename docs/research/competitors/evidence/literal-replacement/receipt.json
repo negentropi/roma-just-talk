@@ -1,0 +1,30 @@
+{
+  "head": "7c778a1eaff75f4bbe4bc2623fa9141486be3b98",
+  "source_path": "VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift",
+  "known_bad_source_sha256": "07b9eafbd70949b4a0668b2f0038ff0e983352a0fd944b46a8bf508cba6f8005",
+  "focused_test_source_sha256": "be54107e3292831eb6049a7c72fc6e8147c7d71e34d23b3e8bbc70901fe59226",
+  "test_support_sha256": "1ebc21ddd5dfe4899b789754950705d8e6c18d1403ef73809d6251f19cbda6d0",
+  "scope": "Compiled exact production engine extraction and unchanged focused registered test bodies; not full package or native app E2E",
+  "candidate_source_sha256": "aa4b2803207d87632d0d5d68f89bd137d1aa497b7fdc4ff3a146e3118aa841d1",
+  "artifacts": {
+    "Engine.swift": "e622ceb57f196e03aa62b0ee8dfc1c6833d229f660dd3eca06cffbdfcd781e33",
+    "CandidateEngine.swift": "de1cd074349fe329480f6ea1b7445cc8b596e916795e9a349501f5cf48b5721f",
+    "FocusedTests.swift": "be54107e3292831eb6049a7c72fc6e8147c7d71e34d23b3e8bbc70901fe59226",
+    "TestSupport.swift": "1ebc21ddd5dfe4899b789754950705d8e6c18d1403ef73809d6251f19cbda6d0",
+    "main.swift": "83b9452030b071bb2d2b64b8e7265a368f74f125b0ab5ae8d778a1ccae8750d2",
+    "verify.sh": "b67f73bd2f755be697b7728db55bc59ed1acde447e517105a619611405e5904d",
+    "known-bad.txt": "1fd297258753df60529ed017e2587d70ba7a3d9c1a5867eb68bc7f0544bca602",
+    "candidate.txt": "0eafb2a48755030c5c0df3d3b34160eb6732c4a73e58fe3cc6a37a9998eff40b"
+  },
+  "known_bad_result": {
+    "registered_methods": 5,
+    "failures": 2,
+    "exit": 1
+  },
+  "candidate_result": {
+    "registered_methods": 5,
+    "failures": 0,
+    "exit": 0
+  },
+  "runner_registration": "Only existing registered methods extended; no runner edit required"
+}

@@ -401,7 +401,7 @@ public enum VoiceInkWordReplacementEngine {
                         in: modifiedText,
                         options: [],
                         range: range,
-                        withTemplate: rule.replacementText
+                        withTemplate: NSRegularExpression.escapedTemplate(for: rule.replacementText)
                     )
                 }
             } else {

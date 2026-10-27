@@ -563,40 +563,48 @@ private struct HistoryCardRow: View {
                 .accessibilityLabel(Text("Select transcription"))
                 .accessibilityIdentifier("\(rowAccessibilityIdentifier).select")
 
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack(spacing: 6) {
-                        Text(VoiceInkDatePresentation.compactTimestamp(transcription.timestamp))
-                            .font(.system(size: 11, weight: .medium))
+                // The non-interactive header (timestamp, preview, chevron) is one real Button,
+                // a sibling of the checkbox, so the expand action and ID survive in the AX tree.
+                Button(action: onToggleExpand) {
+                    HStack(spacing: 10) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack(spacing: 6) {
+                                Text(VoiceInkDatePresentation.compactTimestamp(transcription.timestamp))
+                                    .font(.system(size: 11, weight: .medium))
+                                    .foregroundColor(.secondary)
+                                HistoryProcessingWarningBadge(transcription: transcription)
+                            }
+
+                            if !isExpanded {
+                                Text(
+                                    VoiceInkTranscriptPresentation.preferredText(
+                                        rawText: transcription.text,
+                                        enhancedText: transcription.enhancedText
+                                    ) ?? transcription.text
+                                )
+                                    .font(.system(size: 13))
+                                    .lineLimit(2)
+                                    .foregroundColor(.primary)
+                            }
+                        }
+
+                        Spacer()
+
+                        Image(systemName: "chevron.right")
+                            .font(.caption2.weight(.semibold))
                             .foregroundColor(.secondary)
-                        HistoryProcessingWarningBadge(transcription: transcription)
+                            .rotationEffect(.degrees(isExpanded ? 90 : 0))
+                            .animation(.easeInOut(duration: 0.2), value: isExpanded)
                     }
-
-                    if !isExpanded {
-                        Text(
-                            VoiceInkTranscriptPresentation.preferredText(
-                                rawText: transcription.text,
-                                enhancedText: transcription.enhancedText
-                            ) ?? transcription.text
-                        )
-                            .font(.system(size: 13))
-                            .lineLimit(2)
-                            .foregroundColor(.primary)
-                    }
+                    .contentShape(Rectangle())
                 }
-
-                Spacer()
-
-                Image(systemName: "chevron.right")
-                    .font(.caption2.weight(.semibold))
-                    .foregroundColor(.secondary)
-                    .rotationEffect(.degrees(isExpanded ? 90 : 0))
-                    .animation(.easeInOut(duration: 0.2), value: isExpanded)
+                .buttonStyle(.plain)
+                // Label names the action plus the recording's timestamp so rows stay distinguishable
+                // without repeating transcript text; state and the real cleanup warning are the value.
+                .accessibilityLabel(Text(expandAccessibilityLabel))
+                .accessibilityValue(Text(expandAccessibilityValue))
+                .accessibilityIdentifier("\(rowAccessibilityIdentifier).expand")
             }
-            .contentShape(Rectangle())
-            .onTapGesture { onToggleExpand() }
-            // The header itself is the expand target (it also hosts the checkbox, so it is not a Button).
-            .accessibilityElement(children: .contain)
-            .accessibilityIdentifier("\(rowAccessibilityIdentifier).expand")
 
             if isExpanded {
                 expandedContent
@@ -609,6 +617,21 @@ private struct HistoryCardRow: View {
 
     private var rowAccessibilityIdentifier: String {
         "history.row.\(transcription.id.uuidString)"
+    }
+
+    /// Action plus recording identity (full date and time, including year).
+    private var expandAccessibilityLabel: String {
+        let recordedAt = VoiceInkDatePresentation.abbreviatedTimestamp(transcription.timestamp)
+        return isExpanded
+            ? "Collapse transcription from \(recordedAt)"
+            : "Expand transcription from \(recordedAt)"
+    }
+
+    /// Expansion state, followed by the cleanup warning only when a failure was actually recorded.
+    private var expandAccessibilityValue: String {
+        let state = isExpanded ? "Expanded" : "Collapsed"
+        guard transcription.processingFailureReason != nil else { return state }
+        return "\(state), cleanup didn’t finish"
     }
 
     // MARK: - Expanded Content

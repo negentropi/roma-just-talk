@@ -1,0 +1,17 @@
+{
+  "classification": "no-actionable-receipt-or-source-claim-finding",
+  "scope": "Read-only independent audit of frozen ebf629b4 source and retained actual run evidence; no runtime rerun or artifact download.",
+  "checked": [
+    "4\u00d720 persisted History fields exact to both declared phase expectations and across phases",
+    "Vocabulary2fields/WordReplacement5fields (frozen old model, not future11field source)",
+    "Distinct native hostPIDs44043/73012, one pass each, unchanged signed app/native binaries, exact UI app hash, TCC requirement/CDhash consistency, closed normal-store handles",
+    "27 typed shortcut censuses, six cases\u00d732keys, synchronized/isolated and before/restored census equality; no restoration failure",
+    "17 originalPNG and2derivedframe hashes",
+    "16 frozen source inputs/native8source manifests/factory body/original4body source identity",
+    "Baseline precisely1 intended failure621; candidate exactly6 once, original4 pass/new2 fail before feature assertions"
+  ],
+  "not_repeated": [
+    "Whole remote233MB archive hash/4179CRC verification relied on owned prior audit receipt; no second download."
+  ],
+  "acceptance": "Six-case acceptance remains unproved."
+}

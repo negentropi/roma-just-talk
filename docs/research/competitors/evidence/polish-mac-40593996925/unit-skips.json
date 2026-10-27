@@ -1,0 +1,1136 @@
+[
+  {
+    "identifier": "ClipboardRestorationLeaseTests/nestedWritingPastesRestoreOriginalAllFormatClipboard()",
+    "status": "Skipped",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~-muwO5HKhR1cpN2P4hYZ_V91MYgJsdlmmaFD2OEHPhlobD6kh1v3ZtZqXgJLoRWhbNPxs1RIt7A89trYataEiA==",
+    "decoded_summary_sha256": "847453fdf9a9668f404e9be213b61e33c396403505afb6f6b5eb4c251054e24c",
+    "skip_notice": {
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/ClipboardRestorationLeaseTests.swift",
+      "lineNumber": "9",
+      "message": "Test skipped",
+      "timestamp": "2026-10-27T22:33:46.344+0000"
+    },
+    "documentation": null,
+    "declared_source_gate": {
+      "path": "VoiceInkTests/ClipboardRestorationLeaseTests.swift",
+      "declaration_line": 10,
+      "declaration": "    @Test func nestedWritingPastesRestoreOriginalAllFormatClipboard() async throws {",
+      "gating_source_lines": [
+        {
+          "line": 7,
+          "text": "@Suite(.serialized, .enabled(if: ClipboardLeaseInputs.isEnabled), .timeLimit(.minutes(2)))"
+        },
+        {
+          "line": 107,
+          "text": "value(\"RJT_CLIPBOARD_LEASE_CHECKS\") == \"1\" && value(\"GITHUB_ACTIONS\") == \"true\""
+        }
+      ],
+      "source_sha256": "031432be1af6f1f1da1f3b1efa5f6c33c9cc94576066a395e31aa99a358b0d56",
+      "interpretation": "Runtime notice is Test skipped; pinned source enabling declarations are not independent environment readback."
+    }
+  },
+  {
+    "identifier": "ClipboardRestorationLeaseTests/writingThenOrdinaryPasteRestoresOriginalAllFormatClipboard()",
+    "status": "Skipped",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~rsvEGaTGwL4lJmGnPfoFRCQ9bqKZHawtYHWwxTctBbThNpwxs8UxGdACPFpE7FxsjuXBCRfEgNg5d_ls-LWbUQ==",
+    "decoded_summary_sha256": "8f75a10be6f2ffbb58e447c4d0562b397064498adc78c12c9786c3e8ab1fea8e",
+    "skip_notice": {
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/ClipboardRestorationLeaseTests.swift",
+      "lineNumber": "9",
+      "message": "Test skipped",
+      "timestamp": "2026-10-27T22:33:46.345+0000"
+    },
+    "documentation": null,
+    "declared_source_gate": {
+      "path": "VoiceInkTests/ClipboardRestorationLeaseTests.swift",
+      "declaration_line": 22,
+      "declaration": "    @Test func writingThenOrdinaryPasteRestoresOriginalAllFormatClipboard() async throws {",
+      "gating_source_lines": [
+        {
+          "line": 7,
+          "text": "@Suite(.serialized, .enabled(if: ClipboardLeaseInputs.isEnabled), .timeLimit(.minutes(2)))"
+        },
+        {
+          "line": 107,
+          "text": "value(\"RJT_CLIPBOARD_LEASE_CHECKS\") == \"1\" && value(\"GITHUB_ACTIONS\") == \"true\""
+        }
+      ],
+      "source_sha256": "031432be1af6f1f1da1f3b1efa5f6c33c9cc94576066a395e31aa99a358b0d56",
+      "interpretation": "Runtime notice is Test skipped; pinned source enabling declarations are not independent environment readback."
+    }
+  },
+  {
+    "identifier": "ClipboardRestorationLeaseTests/preparedOrdinaryPasteDoesNotRestoreRetiredWritingPayload()",
+    "status": "Skipped",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~Z3QQ9NV-Wwy_vQhbg-A9Lh9T_fDDOmgCeJfxcXGd6vfwzOEMBcRvqlUmPPU5wlz4BZa32gMyqVdIT2ySpKn3lA==",
+    "decoded_summary_sha256": "8dfd69573477dd3a20fd56931f8a5e31f8d35aaaf1846d6b43cec6e2701dd715",
+    "skip_notice": {
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/ClipboardRestorationLeaseTests.swift",
+      "lineNumber": "9",
+      "message": "Test skipped",
+      "timestamp": "2026-10-27T22:33:46.346+0000"
+    },
+    "documentation": null,
+    "declared_source_gate": {
+      "path": "VoiceInkTests/ClipboardRestorationLeaseTests.swift",
+      "declaration_line": 35,
+      "declaration": "    @Test func preparedOrdinaryPasteDoesNotRestoreRetiredWritingPayload() async throws {",
+      "gating_source_lines": [
+        {
+          "line": 7,
+          "text": "@Suite(.serialized, .enabled(if: ClipboardLeaseInputs.isEnabled), .timeLimit(.minutes(2)))"
+        },
+        {
+          "line": 107,
+          "text": "value(\"RJT_CLIPBOARD_LEASE_CHECKS\") == \"1\" && value(\"GITHUB_ACTIONS\") == \"true\""
+        }
+      ],
+      "source_sha256": "031432be1af6f1f1da1f3b1efa5f6c33c9cc94576066a395e31aa99a358b0d56",
+      "interpretation": "Runtime notice is Test skipped; pinned source enabling declarations are not independent environment readback."
+    }
+  },
+  {
+    "identifier": "ClipboardRestorationLeaseTests/singleWritingPasteHonorsDefaultRestorationDeadline()",
+    "status": "Skipped",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~GTXpOKQCvZqmE07cKJHpJbPacVDaLjic4b3eM3ipdTloDWA3CQhiLL9vTZmldR2vq7apjvYT6a7UmKZhudFrmg==",
+    "decoded_summary_sha256": "85dafae97d38f94392a0df2d4e84eb5e5baa38d96c18ea0afc45d4ea426207f6",
+    "skip_notice": {
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/ClipboardRestorationLeaseTests.swift",
+      "lineNumber": "9",
+      "message": "Test skipped",
+      "timestamp": "2026-10-27T22:33:46.347+0000"
+    },
+    "documentation": null,
+    "declared_source_gate": {
+      "path": "VoiceInkTests/ClipboardRestorationLeaseTests.swift",
+      "declaration_line": 49,
+      "declaration": "    @Test func singleWritingPasteHonorsDefaultRestorationDeadline() async throws {",
+      "gating_source_lines": [
+        {
+          "line": 7,
+          "text": "@Suite(.serialized, .enabled(if: ClipboardLeaseInputs.isEnabled), .timeLimit(.minutes(2)))"
+        },
+        {
+          "line": 107,
+          "text": "value(\"RJT_CLIPBOARD_LEASE_CHECKS\") == \"1\" && value(\"GITHUB_ACTIONS\") == \"true\""
+        }
+      ],
+      "source_sha256": "031432be1af6f1f1da1f3b1efa5f6c33c9cc94576066a395e31aa99a358b0d56",
+      "interpretation": "Runtime notice is Test skipped; pinned source enabling declarations are not independent environment readback."
+    }
+  },
+  {
+    "identifier": "ClipboardRestorationLeaseTests/newerClipboardCopySurvivesWritingRestorationDeadline()",
+    "status": "Skipped",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~44_lbgBgBjFPDphHQJwDT3qIbtuN8fxs-wQ34NUeMOCg32jki4vuoZXaytK0_xzOOUmBTfILQY27WNhStlN2sA==",
+    "decoded_summary_sha256": "b733892d166e97cf37e44defa515f41e2e2f048c5d0531cc85f6f35adf6f7820",
+    "skip_notice": {
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/ClipboardRestorationLeaseTests.swift",
+      "lineNumber": "9",
+      "message": "Test skipped",
+      "timestamp": "2026-10-27T22:33:46.350+0000"
+    },
+    "documentation": null,
+    "declared_source_gate": {
+      "path": "VoiceInkTests/ClipboardRestorationLeaseTests.swift",
+      "declaration_line": 63,
+      "declaration": "    @Test func newerClipboardCopySurvivesWritingRestorationDeadline() async throws {",
+      "gating_source_lines": [
+        {
+          "line": 7,
+          "text": "@Suite(.serialized, .enabled(if: ClipboardLeaseInputs.isEnabled), .timeLimit(.minutes(2)))"
+        },
+        {
+          "line": 107,
+          "text": "value(\"RJT_CLIPBOARD_LEASE_CHECKS\") == \"1\" && value(\"GITHUB_ACTIONS\") == \"true\""
+        }
+      ],
+      "source_sha256": "031432be1af6f1f1da1f3b1efa5f6c33c9cc94576066a395e31aa99a358b0d56",
+      "interpretation": "Runtime notice is Test skipped; pinned source enabling declarations are not independent environment readback."
+    }
+  },
+  {
+    "identifier": "VoiceInkTests/liveDictationHistoryUISeed()",
+    "status": "Skipped",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~aXX7ne1Lvba-Z3-FWyZNfoGH8BGvtS5p8G7wX_rDTbmgnSdxus9jt7jNFakMZqu-8HQhzDNog5ZHzGoZhVpLuw==",
+    "decoded_summary_sha256": "1f8ac6bc48ff8e901c042c87d0ef27dfa79eb102effc9401d218ef929d7de1c1",
+    "skip_notice": {
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/DictationHistoryUISeedLiveTests.swift",
+      "lineNumber": "12",
+      "message": "Test skipped",
+      "timestamp": "2026-10-27T22:33:52.994+0000"
+    },
+    "documentation": [
+      {
+        "_n": "Array"
+      },
+      {
+        "content": "Requires macOS 15",
+        "format": "plain"
+      }
+    ],
+    "declared_source_gate": {
+      "path": "VoiceInkTests/DictationHistoryUISeedLiveTests.swift",
+      "declaration_line": 11,
+      "declaration": "    @Test(.enabled(if: DictationHistoryUISeedInputs.isEnabled), .timeLimit(.minutes(2)))\n    @MainActor func liveDictationHistoryUISeed() async throws {",
+      "gating_source_lines": [
+        {
+          "line": 11,
+          "text": "@Test(.enabled(if: DictationHistoryUISeedInputs.isEnabled), .timeLimit(.minutes(2)))"
+        },
+        {
+          "line": 46,
+          "text": "value(\"RJT_HISTORY_UI_SEED_CHECKS\") == \"1\" && value(\"GITHUB_ACTIONS\") == \"true\""
+        }
+      ],
+      "source_sha256": "5d381d292a6fd2c7d7313c8652f270a07893f0d26ef97ba00d5e9f4c8973a70f",
+      "interpretation": "Runtime notice is Test skipped; pinned source enabling declarations are not independent environment readback."
+    }
+  },
+  {
+    "identifier": "VoiceInkTests/liveDictationMetadataPersistentStoreUpgrade()",
+    "status": "Skipped",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~ejkrdVH-4FtvYh1kQ-2KThYzkWOpRrq-OrPTj6XORPHpOOnIeF9F2-oBS8gbWMIK11yEEQlO27TbICq_0JrZMw==",
+    "decoded_summary_sha256": "b84a93c4661277bccb85b6f563679460cf6272fba419616490a91f2e3910705a",
+    "skip_notice": {
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/DictationMetadataStoreLiveTests.swift",
+      "lineNumber": "10",
+      "message": "Test skipped",
+      "timestamp": "2026-10-27T22:33:53.000+0000"
+    },
+    "documentation": [
+      {
+        "_n": "Array"
+      },
+      {
+        "content": "Requires macOS 15",
+        "format": "plain"
+      }
+    ],
+    "declared_source_gate": {
+      "path": "VoiceInkTests/DictationMetadataStoreLiveTests.swift",
+      "declaration_line": 9,
+      "declaration": "    @Test(.enabled(if: DictationMetadataStoreCheck.isEnabled), .timeLimit(.minutes(2)))\n    @MainActor func liveDictationMetadataPersistentStoreUpgrade() async throws {",
+      "gating_source_lines": [
+        {
+          "line": 9,
+          "text": "@Test(.enabled(if: DictationMetadataStoreCheck.isEnabled), .timeLimit(.minutes(2)))"
+        },
+        {
+          "line": 37,
+          "text": "DictationStoreSeedInputs.value(\"RJT_DICTATION_METADATA_STORE_CHECKS\") == \"1\""
+        },
+        {
+          "line": 38,
+          "text": "&& DictationStoreSeedInputs.value(\"GITHUB_ACTIONS\") == \"true\""
+        }
+      ],
+      "source_sha256": "d6c22e6adccc8f8defe6355d53f5f9a186d6827a6c9a92ba2dd12a19da10a1c0",
+      "interpretation": "Runtime notice is Test skipped; pinned source enabling declarations are not independent environment readback."
+    }
+  },
+  {
+    "identifier": "VoiceInkTests/liveNoneProfileImportQueueUsesRealWhisperRecognition()",
+    "status": "Skipped",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~06i9qM1mFZBW0ZP2bnU0sdCnYuM1RTEQOo0iSXiN6_sx24LA2_szj9SSypJgm5z4rZnzf9Epoclz5d0WiZTrfQ==",
+    "decoded_summary_sha256": "50e5b71f1169a1a21e15fba134f8faa6487b044f38325bba3586decfc4f58a6a",
+    "skip_notice": {
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/DictationProfileImportLiveTests.swift",
+      "lineNumber": "10",
+      "message": "Test skipped",
+      "timestamp": "2026-10-27T22:33:54.598+0000"
+    },
+    "documentation": null,
+    "declared_source_gate": {
+      "path": "VoiceInkTests/DictationProfileImportLiveTests.swift",
+      "declaration_line": 9,
+      "declaration": "    @Test(.enabled(if: NoneProfileImportInputs.isEnabled), .timeLimit(.minutes(10)))\n    @MainActor func liveNoneProfileImportQueueUsesRealWhisperRecognition() async throws {",
+      "gating_source_lines": [
+        {
+          "line": 9,
+          "text": "@Test(.enabled(if: NoneProfileImportInputs.isEnabled), .timeLimit(.minutes(10)))"
+        },
+        {
+          "line": 44,
+          "text": "value(\"RJT_NONE_IMPORT_LIVE_CHECKS\") == \"1\" && value(\"GITHUB_ACTIONS\") == \"true\""
+        },
+        {
+          "line": 278,
+          "text": "@Test(.enabled(if: DictationPolishLiveInputs.isEnabled), .timeLimit(.minutes(10)))"
+        },
+        {
+          "line": 283,
+          "text": "@Test(.enabled(if: DictationPolishLiveInputs.isEnabled), .timeLimit(.minutes(10)))"
+        },
+        {
+          "line": 288,
+          "text": "@Test(.enabled(if: DictationPolishLiveInputs.isEnabled), .timeLimit(.minutes(10)))"
+        },
+        {
+          "line": 293,
+          "text": "@Test(.enabled(if: DictationPolishLiveInputs.isEnabled), .timeLimit(.minutes(10)))"
+        },
+        {
+          "line": 331,
+          "text": "value(\"RJT_DICTATION_POLISH_LIVE_CHECKS\") == \"1\" && value(\"GITHUB_ACTIONS\") == \"true\""
+        }
+      ],
+      "source_sha256": "f2b5fe8dad4ccfee08efbdda360cc2d20ca2f4685f931626f6a97fefdd78b83e",
+      "interpretation": "Runtime notice is Test skipped; pinned source enabling declarations are not independent environment readback."
+    }
+  },
+  {
+    "identifier": "VoiceInkTests/liveLightImportQueueUsesRealWhisperRecognition()",
+    "status": "Skipped",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~fv7jIhmnsRhhTXXtpZsKVElgqIFLDK6LKrPJaBS434wmdjf9fq6Vs1Nwp0EKGX4L_0tPl-fwyxxX0qKqhO65rw==",
+    "decoded_summary_sha256": "25295bfec8c1955158bc61d9ba3088f30a3c48827028ff39686dd393b7ba3bad",
+    "skip_notice": {
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/DictationProfileImportLiveTests.swift",
+      "lineNumber": "279",
+      "message": "Test skipped",
+      "timestamp": "2026-10-27T22:33:54.601+0000"
+    },
+    "documentation": null,
+    "declared_source_gate": {
+      "path": "VoiceInkTests/DictationProfileImportLiveTests.swift",
+      "declaration_line": 278,
+      "declaration": "    @Test(.enabled(if: DictationPolishLiveInputs.isEnabled), .timeLimit(.minutes(10)))\n    @MainActor func liveLightImportQueueUsesRealWhisperRecognition() async throws {",
+      "gating_source_lines": [
+        {
+          "line": 9,
+          "text": "@Test(.enabled(if: NoneProfileImportInputs.isEnabled), .timeLimit(.minutes(10)))"
+        },
+        {
+          "line": 44,
+          "text": "value(\"RJT_NONE_IMPORT_LIVE_CHECKS\") == \"1\" && value(\"GITHUB_ACTIONS\") == \"true\""
+        },
+        {
+          "line": 278,
+          "text": "@Test(.enabled(if: DictationPolishLiveInputs.isEnabled), .timeLimit(.minutes(10)))"
+        },
+        {
+          "line": 283,
+          "text": "@Test(.enabled(if: DictationPolishLiveInputs.isEnabled), .timeLimit(.minutes(10)))"
+        },
+        {
+          "line": 288,
+          "text": "@Test(.enabled(if: DictationPolishLiveInputs.isEnabled), .timeLimit(.minutes(10)))"
+        },
+        {
+          "line": 293,
+          "text": "@Test(.enabled(if: DictationPolishLiveInputs.isEnabled), .timeLimit(.minutes(10)))"
+        },
+        {
+          "line": 331,
+          "text": "value(\"RJT_DICTATION_POLISH_LIVE_CHECKS\") == \"1\" && value(\"GITHUB_ACTIONS\") == \"true\""
+        }
+      ],
+      "source_sha256": "f2b5fe8dad4ccfee08efbdda360cc2d20ca2f4685f931626f6a97fefdd78b83e",
+      "interpretation": "Runtime notice is Test skipped; pinned source enabling declarations are not independent environment readback."
+    }
+  },
+  {
+    "identifier": "VoiceInkTests/liveClarityImportQueueUsesRealWhisperRecognition()",
+    "status": "Skipped",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~x0Y9Wisp5VIBwDyd4PvI3DfviR0D62P4UzNHlt05V3k1jY3JaHk4p1LO-fyKrTKOElv1KhtZmzN5YjOSCF4jUg==",
+    "decoded_summary_sha256": "a21d58b50d6ff0fe10497d3b980c00ce4971e0739abd341c2ef7b3811507a701",
+    "skip_notice": {
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/DictationProfileImportLiveTests.swift",
+      "lineNumber": "284",
+      "message": "Test skipped",
+      "timestamp": "2026-10-27T22:33:54.603+0000"
+    },
+    "documentation": null,
+    "declared_source_gate": {
+      "path": "VoiceInkTests/DictationProfileImportLiveTests.swift",
+      "declaration_line": 283,
+      "declaration": "    @Test(.enabled(if: DictationPolishLiveInputs.isEnabled), .timeLimit(.minutes(10)))\n    @MainActor func liveClarityImportQueueUsesRealWhisperRecognition() async throws {",
+      "gating_source_lines": [
+        {
+          "line": 9,
+          "text": "@Test(.enabled(if: NoneProfileImportInputs.isEnabled), .timeLimit(.minutes(10)))"
+        },
+        {
+          "line": 44,
+          "text": "value(\"RJT_NONE_IMPORT_LIVE_CHECKS\") == \"1\" && value(\"GITHUB_ACTIONS\") == \"true\""
+        },
+        {
+          "line": 278,
+          "text": "@Test(.enabled(if: DictationPolishLiveInputs.isEnabled), .timeLimit(.minutes(10)))"
+        },
+        {
+          "line": 283,
+          "text": "@Test(.enabled(if: DictationPolishLiveInputs.isEnabled), .timeLimit(.minutes(10)))"
+        },
+        {
+          "line": 288,
+          "text": "@Test(.enabled(if: DictationPolishLiveInputs.isEnabled), .timeLimit(.minutes(10)))"
+        },
+        {
+          "line": 293,
+          "text": "@Test(.enabled(if: DictationPolishLiveInputs.isEnabled), .timeLimit(.minutes(10)))"
+        },
+        {
+          "line": 331,
+          "text": "value(\"RJT_DICTATION_POLISH_LIVE_CHECKS\") == \"1\" && value(\"GITHUB_ACTIONS\") == \"true\""
+        }
+      ],
+      "source_sha256": "f2b5fe8dad4ccfee08efbdda360cc2d20ca2f4685f931626f6a97fefdd78b83e",
+      "interpretation": "Runtime notice is Test skipped; pinned source enabling declarations are not independent environment readback."
+    }
+  },
+  {
+    "identifier": "VoiceInkTests/liveLightRetranscriptionUsesRealWhisperRecognition()",
+    "status": "Skipped",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~cIZ_pmCUe8vH6xv0euZ48ylGhVLnryXZwtrKJabG1ddFOX4UzgmbOT0mosB1IqkdKdZmLoWLZtwxIJyIaMeGbg==",
+    "decoded_summary_sha256": "f6a1fbf391e42b1ec228c9c8d8a1a02dcaad373ed7afda947ea60918896fb528",
+    "skip_notice": {
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/DictationProfileImportLiveTests.swift",
+      "lineNumber": "289",
+      "message": "Test skipped",
+      "timestamp": "2026-10-27T22:33:54.606+0000"
+    },
+    "documentation": null,
+    "declared_source_gate": {
+      "path": "VoiceInkTests/DictationProfileImportLiveTests.swift",
+      "declaration_line": 288,
+      "declaration": "    @Test(.enabled(if: DictationPolishLiveInputs.isEnabled), .timeLimit(.minutes(10)))\n    @MainActor func liveLightRetranscriptionUsesRealWhisperRecognition() async throws {",
+      "gating_source_lines": [
+        {
+          "line": 9,
+          "text": "@Test(.enabled(if: NoneProfileImportInputs.isEnabled), .timeLimit(.minutes(10)))"
+        },
+        {
+          "line": 44,
+          "text": "value(\"RJT_NONE_IMPORT_LIVE_CHECKS\") == \"1\" && value(\"GITHUB_ACTIONS\") == \"true\""
+        },
+        {
+          "line": 278,
+          "text": "@Test(.enabled(if: DictationPolishLiveInputs.isEnabled), .timeLimit(.minutes(10)))"
+        },
+        {
+          "line": 283,
+          "text": "@Test(.enabled(if: DictationPolishLiveInputs.isEnabled), .timeLimit(.minutes(10)))"
+        },
+        {
+          "line": 288,
+          "text": "@Test(.enabled(if: DictationPolishLiveInputs.isEnabled), .timeLimit(.minutes(10)))"
+        },
+        {
+          "line": 293,
+          "text": "@Test(.enabled(if: DictationPolishLiveInputs.isEnabled), .timeLimit(.minutes(10)))"
+        },
+        {
+          "line": 331,
+          "text": "value(\"RJT_DICTATION_POLISH_LIVE_CHECKS\") == \"1\" && value(\"GITHUB_ACTIONS\") == \"true\""
+        }
+      ],
+      "source_sha256": "f2b5fe8dad4ccfee08efbdda360cc2d20ca2f4685f931626f6a97fefdd78b83e",
+      "interpretation": "Runtime notice is Test skipped; pinned source enabling declarations are not independent environment readback."
+    }
+  },
+  {
+    "identifier": "VoiceInkTests/liveClarityRetranscriptionUsesRealWhisperRecognition()",
+    "status": "Skipped",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~KfK4BQFqUvDhd_-AL3jrDSqrTrro23QzzGtnwgFUxBiLvu5_VJ8ARSJSwBG7dHoNISNIvifTpD-IH2mYNcHEjg==",
+    "decoded_summary_sha256": "dae7270af7cbe4b3b06f4080c39b90fa81afb24b31db109b03cc001b53773e31",
+    "skip_notice": {
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/DictationProfileImportLiveTests.swift",
+      "lineNumber": "294",
+      "message": "Test skipped",
+      "timestamp": "2026-10-27T22:33:54.611+0000"
+    },
+    "documentation": null,
+    "declared_source_gate": {
+      "path": "VoiceInkTests/DictationProfileImportLiveTests.swift",
+      "declaration_line": 293,
+      "declaration": "    @Test(.enabled(if: DictationPolishLiveInputs.isEnabled), .timeLimit(.minutes(10)))\n    @MainActor func liveClarityRetranscriptionUsesRealWhisperRecognition() async throws {",
+      "gating_source_lines": [
+        {
+          "line": 9,
+          "text": "@Test(.enabled(if: NoneProfileImportInputs.isEnabled), .timeLimit(.minutes(10)))"
+        },
+        {
+          "line": 44,
+          "text": "value(\"RJT_NONE_IMPORT_LIVE_CHECKS\") == \"1\" && value(\"GITHUB_ACTIONS\") == \"true\""
+        },
+        {
+          "line": 278,
+          "text": "@Test(.enabled(if: DictationPolishLiveInputs.isEnabled), .timeLimit(.minutes(10)))"
+        },
+        {
+          "line": 283,
+          "text": "@Test(.enabled(if: DictationPolishLiveInputs.isEnabled), .timeLimit(.minutes(10)))"
+        },
+        {
+          "line": 288,
+          "text": "@Test(.enabled(if: DictationPolishLiveInputs.isEnabled), .timeLimit(.minutes(10)))"
+        },
+        {
+          "line": 293,
+          "text": "@Test(.enabled(if: DictationPolishLiveInputs.isEnabled), .timeLimit(.minutes(10)))"
+        },
+        {
+          "line": 331,
+          "text": "value(\"RJT_DICTATION_POLISH_LIVE_CHECKS\") == \"1\" && value(\"GITHUB_ACTIONS\") == \"true\""
+        }
+      ],
+      "source_sha256": "f2b5fe8dad4ccfee08efbdda360cc2d20ca2f4685f931626f6a97fefdd78b83e",
+      "interpretation": "Runtime notice is Test skipped; pinned source enabling declarations are not independent environment readback."
+    }
+  },
+  {
+    "identifier": "VoiceInkTests/liveDictationPersistentStoreSeedControl()",
+    "status": "Skipped",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~bNhNtaYML7PNxa2vr1ewo4jzZSENqe1AxGkf4Bb8uKdlBqg48c624wNHPiPmyLJ11PAi2xNUlEtG-NZk6FyIZQ==",
+    "decoded_summary_sha256": "c3ea2fac325dd92c7f7eb8c06839a8bef1f39f217ee88a22e8df27bc065b6c5a",
+    "skip_notice": {
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/DictationStoreSeedLiveTests.swift",
+      "lineNumber": "11",
+      "message": "Test skipped",
+      "timestamp": "2026-10-27T22:33:54.856+0000"
+    },
+    "documentation": [
+      {
+        "_n": "Array"
+      },
+      {
+        "content": "Requires macOS 15",
+        "format": "plain"
+      }
+    ],
+    "declared_source_gate": {
+      "path": "VoiceInkTests/DictationStoreSeedLiveTests.swift",
+      "declaration_line": 10,
+      "declaration": "    @Test(.enabled(if: DictationStoreSeedInputs.isEnabled), .timeLimit(.minutes(2)))\n    @MainActor func liveDictationPersistentStoreSeedControl() async throws {",
+      "gating_source_lines": [
+        {
+          "line": 10,
+          "text": "@Test(.enabled(if: DictationStoreSeedInputs.isEnabled), .timeLimit(.minutes(2)))"
+        },
+        {
+          "line": 43,
+          "text": "value(\"RJT_DICTATION_STORE_SEED_CHECKS\") == \"1\" && value(\"GITHUB_ACTIONS\") == \"true\""
+        }
+      ],
+      "source_sha256": "cdd61d3e67b96371944d2d59bb41b3313e38fc6116bfda41cf04321352d4acc5",
+      "interpretation": "Runtime notice is Test skipped; pinned source enabling declarations are not independent environment readback."
+    }
+  },
+  {
+    "identifier": "VoiceInkTests/writingProviderTranslatesJapaneseToEnglish()",
+    "status": "Skipped",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~z6RDbwMh3bte_t7EQMv3E6tssJKx18Z8CtfA8VRbKk1gmkqUZI-SHyijMt32BsInqDe4nf-y0ciYfgDi_yPKyg==",
+    "decoded_summary_sha256": "cb61dd3dbfd4f5d9776038120d96eb96d2adf0c5f0930bc5427a3a6fb9cc1fb0",
+    "skip_notice": {
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingActionProviderTests.swift",
+      "lineNumber": "30",
+      "message": "Test skipped",
+      "timestamp": "2026-10-27T22:34:05.043+0000"
+    },
+    "documentation": null,
+    "declared_source_gate": {
+      "path": "VoiceInkTests/WritingActionProviderTests.swift",
+      "declaration_line": 29,
+      "declaration": "    @Test(.enabled(if: WritingProviderEnvironment.isEnabled))\n    @MainActor func writingProviderTranslatesJapaneseToEnglish() async throws {",
+      "gating_source_lines": [
+        {
+          "line": 29,
+          "text": "@Test(.enabled(if: WritingProviderEnvironment.isEnabled))"
+        },
+        {
+          "line": 34,
+          "text": "@Test(.enabled(if: WritingProviderEnvironment.isEnabled))"
+        },
+        {
+          "line": 39,
+          "text": "@Test(.enabled(if: WritingProviderEnvironment.isEnabled))"
+        },
+        {
+          "line": 258,
+          "text": "value(\"GITHUB_ACTIONS\") == \"true\""
+        },
+        {
+          "line": 259,
+          "text": "&& value(\"RJT_WRITING_PROVIDER_CHECKS\") == \"1\""
+        }
+      ],
+      "source_sha256": "556f37d74d40eeb1ed8fce8b2e2183e022a5a16222952c1d469a04b1580bda4c",
+      "interpretation": "Runtime notice is Test skipped; pinned source enabling declarations are not independent environment readback."
+    }
+  },
+  {
+    "identifier": "VoiceInkTests/writingProviderTranslatesEnglishToTraditionalChinese()",
+    "status": "Skipped",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~auvAgwIYN0AzbNIwVuUzwEIhT5VUAkomdDsAOEX4DMU3wfmZW3LIUfqje3wPb8GNspUWJnX516sYwfr6rFY4NQ==",
+    "decoded_summary_sha256": "d78ca45e7bb2a655880d6408a9921acf5f528efd63954d71780a158d3562f114",
+    "skip_notice": {
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingActionProviderTests.swift",
+      "lineNumber": "35",
+      "message": "Test skipped",
+      "timestamp": "2026-10-27T22:34:05.047+0000"
+    },
+    "documentation": null,
+    "declared_source_gate": {
+      "path": "VoiceInkTests/WritingActionProviderTests.swift",
+      "declaration_line": 34,
+      "declaration": "    @Test(.enabled(if: WritingProviderEnvironment.isEnabled))\n    @MainActor func writingProviderTranslatesEnglishToTraditionalChinese() async throws {",
+      "gating_source_lines": [
+        {
+          "line": 29,
+          "text": "@Test(.enabled(if: WritingProviderEnvironment.isEnabled))"
+        },
+        {
+          "line": 34,
+          "text": "@Test(.enabled(if: WritingProviderEnvironment.isEnabled))"
+        },
+        {
+          "line": 39,
+          "text": "@Test(.enabled(if: WritingProviderEnvironment.isEnabled))"
+        },
+        {
+          "line": 258,
+          "text": "value(\"GITHUB_ACTIONS\") == \"true\""
+        },
+        {
+          "line": 259,
+          "text": "&& value(\"RJT_WRITING_PROVIDER_CHECKS\") == \"1\""
+        }
+      ],
+      "source_sha256": "556f37d74d40eeb1ed8fce8b2e2183e022a5a16222952c1d469a04b1580bda4c",
+      "interpretation": "Runtime notice is Test skipped; pinned source enabling declarations are not independent environment readback."
+    }
+  },
+  {
+    "identifier": "VoiceInkTests/writingProviderRewritesTheSuppliedSelection()",
+    "status": "Skipped",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~BjmGwiwq4ao0mCMQh9XiXUto2mtZG84Uav9-XAVBysO9gGV1v3jpIxcziT1YQLp37oIiA_CQHVapZGP0H8zYyg==",
+    "decoded_summary_sha256": "73b2420620166fff2c805372a3cef49a12fca3b7d35ecdc485e5106b2a2b29fc",
+    "skip_notice": {
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingActionProviderTests.swift",
+      "lineNumber": "40",
+      "message": "Test skipped",
+      "timestamp": "2026-10-27T22:34:05.048+0000"
+    },
+    "documentation": null,
+    "declared_source_gate": {
+      "path": "VoiceInkTests/WritingActionProviderTests.swift",
+      "declaration_line": 39,
+      "declaration": "    @Test(.enabled(if: WritingProviderEnvironment.isEnabled))\n    @MainActor func writingProviderRewritesTheSuppliedSelection() async throws {",
+      "gating_source_lines": [
+        {
+          "line": 29,
+          "text": "@Test(.enabled(if: WritingProviderEnvironment.isEnabled))"
+        },
+        {
+          "line": 34,
+          "text": "@Test(.enabled(if: WritingProviderEnvironment.isEnabled))"
+        },
+        {
+          "line": 39,
+          "text": "@Test(.enabled(if: WritingProviderEnvironment.isEnabled))"
+        },
+        {
+          "line": 258,
+          "text": "value(\"GITHUB_ACTIONS\") == \"true\""
+        },
+        {
+          "line": 259,
+          "text": "&& value(\"RJT_WRITING_PROVIDER_CHECKS\") == \"1\""
+        }
+      ],
+      "source_sha256": "556f37d74d40eeb1ed8fce8b2e2183e022a5a16222952c1d469a04b1580bda4c",
+      "interpretation": "Runtime notice is Test skipped; pinned source enabling declarations are not independent environment readback."
+    }
+  },
+  {
+    "identifier": "VoiceInkTests/liveWritingTargetTextEditPreservesUnicodeOutsideSelection()",
+    "status": "Skipped",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~JPRJqOi7wGAn9wB91_sagmPtS7BZD2Ae8INbYeXQzWbHRqxHkMENI_JvWXW8FvYY2EgMv0PxLhLO3ghJ88_jcg==",
+    "decoded_summary_sha256": "9aa69b2133c3be9a3abf0d542ba4a6906a366909c17c0b1575e4303059872935",
+    "skip_notice": {
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingTargetLiveTests.swift",
+      "lineNumber": "11",
+      "message": "Test skipped",
+      "timestamp": "2026-10-27T22:34:05.050+0000"
+    },
+    "documentation": null,
+    "declared_source_gate": {
+      "path": "VoiceInkTests/WritingTargetLiveTests.swift",
+      "declaration_line": 10,
+      "declaration": "    @Test(.enabled(if: LiveWritingEditor.isEnabled))\n    @MainActor func liveWritingTargetTextEditPreservesUnicodeOutsideSelection() async throws {",
+      "gating_source_lines": [
+        {
+          "line": 10,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 26,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 60,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 80,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 83,
+          "text": "try #require((environment[\"TEST_RUNNER_GITHUB_ACTIONS\"] ?? environment[\"GITHUB_ACTIONS\"]) == \"true\")"
+        },
+        {
+          "line": 98,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 101,
+          "text": "try #require((environment[\"TEST_RUNNER_GITHUB_ACTIONS\"] ?? environment[\"GITHUB_ACTIONS\"]) == \"true\")"
+        },
+        {
+          "line": 120,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 123,
+          "text": "try #require((environment[\"TEST_RUNNER_GITHUB_ACTIONS\"] ?? environment[\"GITHUB_ACTIONS\"]) == \"true\")"
+        },
+        {
+          "line": 171,
+          "text": "@Test(.enabled(if: DictationPolishLiveInputs.isEnabled), .timeLimit(.minutes(5)))"
+        },
+        {
+          "line": 846,
+          "text": "return environment[\"RJT_LIVE_WRITING_TARGET_CHECKS\"] == \"1\""
+        },
+        {
+          "line": 847,
+          "text": "|| environment[\"TEST_RUNNER_RJT_LIVE_WRITING_TARGET_CHECKS\"] == \"1\""
+        }
+      ],
+      "source_sha256": "3510438983b444d206a75b1cf2c054e7342565c99fd2f0633f307ad13cd1a677",
+      "interpretation": "Runtime notice is Test skipped; pinned source enabling declarations are not independent environment readback."
+    }
+  },
+  {
+    "identifier": "VoiceInkTests/liveWritingTargetTextEditRefusesRangeTextAndFocusDrift()",
+    "status": "Skipped",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~Ct5K3rpnxedo_gkiUgT3KJJLYzehWJ4bQrV7Qdnn9ESZBrWRMQdXKq7Lig2nfjQFOWDMbyzYGWQULXMMRK7lmg==",
+    "decoded_summary_sha256": "4615dd4d705a117fbac555a79e8ee01bb72cbbef6e7e2f7ba4bfee37a4d5da13",
+    "skip_notice": {
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingTargetLiveTests.swift",
+      "lineNumber": "27",
+      "message": "Test skipped",
+      "timestamp": "2026-10-27T22:34:05.051+0000"
+    },
+    "documentation": null,
+    "declared_source_gate": {
+      "path": "VoiceInkTests/WritingTargetLiveTests.swift",
+      "declaration_line": 26,
+      "declaration": "    @Test(.enabled(if: LiveWritingEditor.isEnabled))\n    @MainActor func liveWritingTargetTextEditRefusesRangeTextAndFocusDrift() async throws {",
+      "gating_source_lines": [
+        {
+          "line": 10,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 26,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 60,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 80,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 83,
+          "text": "try #require((environment[\"TEST_RUNNER_GITHUB_ACTIONS\"] ?? environment[\"GITHUB_ACTIONS\"]) == \"true\")"
+        },
+        {
+          "line": 98,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 101,
+          "text": "try #require((environment[\"TEST_RUNNER_GITHUB_ACTIONS\"] ?? environment[\"GITHUB_ACTIONS\"]) == \"true\")"
+        },
+        {
+          "line": 120,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 123,
+          "text": "try #require((environment[\"TEST_RUNNER_GITHUB_ACTIONS\"] ?? environment[\"GITHUB_ACTIONS\"]) == \"true\")"
+        },
+        {
+          "line": 171,
+          "text": "@Test(.enabled(if: DictationPolishLiveInputs.isEnabled), .timeLimit(.minutes(5)))"
+        },
+        {
+          "line": 846,
+          "text": "return environment[\"RJT_LIVE_WRITING_TARGET_CHECKS\"] == \"1\""
+        },
+        {
+          "line": 847,
+          "text": "|| environment[\"TEST_RUNNER_RJT_LIVE_WRITING_TARGET_CHECKS\"] == \"1\""
+        }
+      ],
+      "source_sha256": "3510438983b444d206a75b1cf2c054e7342565c99fd2f0633f307ad13cd1a677",
+      "interpretation": "Runtime notice is Test skipped; pinned source enabling declarations are not independent environment readback."
+    }
+  },
+  {
+    "identifier": "VoiceInkTests/liveWritingTargetSafariTextareaReplacesOnlySelection()",
+    "status": "Skipped",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~hz5ey5cqP8qxqtrM1Vb7acbN2Q2rBWfmeaWAXiSFvIsWsRWHAUc90DfF1Ny7lnL3NUN9oKSkCt_pFMQPJGWcDQ==",
+    "decoded_summary_sha256": "264c4d31bec8346721be04d72fafa44a913d6add2598fea7ed9d1d707127130b",
+    "skip_notice": {
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingTargetLiveTests.swift",
+      "lineNumber": "61",
+      "message": "Test skipped",
+      "timestamp": "2026-10-27T22:34:05.055+0000"
+    },
+    "documentation": null,
+    "declared_source_gate": {
+      "path": "VoiceInkTests/WritingTargetLiveTests.swift",
+      "declaration_line": 60,
+      "declaration": "    @Test(.enabled(if: LiveWritingEditor.isEnabled))\n    @MainActor func liveWritingTargetSafariTextareaReplacesOnlySelection() async throws {",
+      "gating_source_lines": [
+        {
+          "line": 10,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 26,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 60,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 80,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 83,
+          "text": "try #require((environment[\"TEST_RUNNER_GITHUB_ACTIONS\"] ?? environment[\"GITHUB_ACTIONS\"]) == \"true\")"
+        },
+        {
+          "line": 98,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 101,
+          "text": "try #require((environment[\"TEST_RUNNER_GITHUB_ACTIONS\"] ?? environment[\"GITHUB_ACTIONS\"]) == \"true\")"
+        },
+        {
+          "line": 120,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 123,
+          "text": "try #require((environment[\"TEST_RUNNER_GITHUB_ACTIONS\"] ?? environment[\"GITHUB_ACTIONS\"]) == \"true\")"
+        },
+        {
+          "line": 171,
+          "text": "@Test(.enabled(if: DictationPolishLiveInputs.isEnabled), .timeLimit(.minutes(5)))"
+        },
+        {
+          "line": 846,
+          "text": "return environment[\"RJT_LIVE_WRITING_TARGET_CHECKS\"] == \"1\""
+        },
+        {
+          "line": 847,
+          "text": "|| environment[\"TEST_RUNNER_RJT_LIVE_WRITING_TARGET_CHECKS\"] == \"1\""
+        }
+      ],
+      "source_sha256": "3510438983b444d206a75b1cf2c054e7342565c99fd2f0633f307ad13cd1a677",
+      "interpretation": "Runtime notice is Test skipped; pinned source enabling declarations are not independent environment readback."
+    }
+  },
+  {
+    "identifier": "VoiceInkTests/liveWritingActionPipelineUsesLocalCLIAndRetainsFailure()",
+    "status": "Skipped",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~RGKCWnZs4JTKVW0tMWMxv2iXlUDIvO1afMtwHf8pzL1jtrMGoqxM5xju14ek4Czu7TE4yl61fd2-5ZxcTWIPqw==",
+    "decoded_summary_sha256": "7335557cf9617568cd27a4c7f926530fda17b2754cb716077e2b5b38e6fa8cb2",
+    "skip_notice": {
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingTargetLiveTests.swift",
+      "lineNumber": "81",
+      "message": "Test skipped",
+      "timestamp": "2026-10-27T22:34:05.058+0000"
+    },
+    "documentation": null,
+    "declared_source_gate": {
+      "path": "VoiceInkTests/WritingTargetLiveTests.swift",
+      "declaration_line": 80,
+      "declaration": "    @Test(.enabled(if: LiveWritingEditor.isEnabled))\n    @MainActor func liveWritingActionPipelineUsesLocalCLIAndRetainsFailure() async throws {",
+      "gating_source_lines": [
+        {
+          "line": 10,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 26,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 60,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 80,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 83,
+          "text": "try #require((environment[\"TEST_RUNNER_GITHUB_ACTIONS\"] ?? environment[\"GITHUB_ACTIONS\"]) == \"true\")"
+        },
+        {
+          "line": 98,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 101,
+          "text": "try #require((environment[\"TEST_RUNNER_GITHUB_ACTIONS\"] ?? environment[\"GITHUB_ACTIONS\"]) == \"true\")"
+        },
+        {
+          "line": 120,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 123,
+          "text": "try #require((environment[\"TEST_RUNNER_GITHUB_ACTIONS\"] ?? environment[\"GITHUB_ACTIONS\"]) == \"true\")"
+        },
+        {
+          "line": 171,
+          "text": "@Test(.enabled(if: DictationPolishLiveInputs.isEnabled), .timeLimit(.minutes(5)))"
+        },
+        {
+          "line": 846,
+          "text": "return environment[\"RJT_LIVE_WRITING_TARGET_CHECKS\"] == \"1\""
+        },
+        {
+          "line": 847,
+          "text": "|| environment[\"TEST_RUNNER_RJT_LIVE_WRITING_TARGET_CHECKS\"] == \"1\""
+        }
+      ],
+      "source_sha256": "3510438983b444d206a75b1cf2c054e7342565c99fd2f0633f307ad13cd1a677",
+      "interpretation": "Runtime notice is Test skipped; pinned source enabling declarations are not independent environment readback."
+    }
+  },
+  {
+    "identifier": "VoiceInkTests/liveWritingStartupContextRespectsOwnerAfterCancellation()",
+    "status": "Skipped",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~dZIPGb9IUgQjnL-U4y_sMS9hEJ_jmlQahurF4ELHl5C_rXLxyElnJZ5LbOZbZ2wtVCiNtEwehcLX5NkusNhc9A==",
+    "decoded_summary_sha256": "a1b9d3a5a66db5140354402c81a5e47cc01a321ff84bd0a2bda48003fcbcbb0a",
+    "skip_notice": {
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingTargetLiveTests.swift",
+      "lineNumber": "99",
+      "message": "Test skipped",
+      "timestamp": "2026-10-27T22:34:05.061+0000"
+    },
+    "documentation": null,
+    "declared_source_gate": {
+      "path": "VoiceInkTests/WritingTargetLiveTests.swift",
+      "declaration_line": 98,
+      "declaration": "    @Test(.enabled(if: LiveWritingEditor.isEnabled))\n    @MainActor func liveWritingStartupContextRespectsOwnerAfterCancellation() async throws {",
+      "gating_source_lines": [
+        {
+          "line": 10,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 26,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 60,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 80,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 83,
+          "text": "try #require((environment[\"TEST_RUNNER_GITHUB_ACTIONS\"] ?? environment[\"GITHUB_ACTIONS\"]) == \"true\")"
+        },
+        {
+          "line": 98,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 101,
+          "text": "try #require((environment[\"TEST_RUNNER_GITHUB_ACTIONS\"] ?? environment[\"GITHUB_ACTIONS\"]) == \"true\")"
+        },
+        {
+          "line": 120,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 123,
+          "text": "try #require((environment[\"TEST_RUNNER_GITHUB_ACTIONS\"] ?? environment[\"GITHUB_ACTIONS\"]) == \"true\")"
+        },
+        {
+          "line": 171,
+          "text": "@Test(.enabled(if: DictationPolishLiveInputs.isEnabled), .timeLimit(.minutes(5)))"
+        },
+        {
+          "line": 846,
+          "text": "return environment[\"RJT_LIVE_WRITING_TARGET_CHECKS\"] == \"1\""
+        },
+        {
+          "line": 847,
+          "text": "|| environment[\"TEST_RUNNER_RJT_LIVE_WRITING_TARGET_CHECKS\"] == \"1\""
+        }
+      ],
+      "source_sha256": "3510438983b444d206a75b1cf2c054e7342565c99fd2f0633f307ad13cd1a677",
+      "interpretation": "Runtime notice is Test skipped; pinned source enabling declarations are not independent environment readback."
+    }
+  },
+  {
+    "identifier": "VoiceInkTests/liveDictationProfileKeepsContextEligibilityAcrossPreferenceChanges()",
+    "status": "Skipped",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~F-4qGuhMVcfoYpVbPzVTUOMgSFcg-Lh-E1-xPrfQ2qemhwwU779FxiJi6mmeNftnWkL7ZjBmRL25MqamPOwYww==",
+    "decoded_summary_sha256": "e66de651ea085cdb575fea3cd1df927284e660d8a8238a0296b2111b8ac82424",
+    "skip_notice": {
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingTargetLiveTests.swift",
+      "lineNumber": "121",
+      "message": "Test skipped",
+      "timestamp": "2026-10-27T22:34:05.062+0000"
+    },
+    "documentation": null,
+    "declared_source_gate": {
+      "path": "VoiceInkTests/WritingTargetLiveTests.swift",
+      "declaration_line": 120,
+      "declaration": "    @Test(.enabled(if: LiveWritingEditor.isEnabled))\n    @MainActor func liveDictationProfileKeepsContextEligibilityAcrossPreferenceChanges() async throws {",
+      "gating_source_lines": [
+        {
+          "line": 10,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 26,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 60,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 80,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 83,
+          "text": "try #require((environment[\"TEST_RUNNER_GITHUB_ACTIONS\"] ?? environment[\"GITHUB_ACTIONS\"]) == \"true\")"
+        },
+        {
+          "line": 98,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 101,
+          "text": "try #require((environment[\"TEST_RUNNER_GITHUB_ACTIONS\"] ?? environment[\"GITHUB_ACTIONS\"]) == \"true\")"
+        },
+        {
+          "line": 120,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 123,
+          "text": "try #require((environment[\"TEST_RUNNER_GITHUB_ACTIONS\"] ?? environment[\"GITHUB_ACTIONS\"]) == \"true\")"
+        },
+        {
+          "line": 171,
+          "text": "@Test(.enabled(if: DictationPolishLiveInputs.isEnabled), .timeLimit(.minutes(5)))"
+        },
+        {
+          "line": 846,
+          "text": "return environment[\"RJT_LIVE_WRITING_TARGET_CHECKS\"] == \"1\""
+        },
+        {
+          "line": 847,
+          "text": "|| environment[\"TEST_RUNNER_RJT_LIVE_WRITING_TARGET_CHECKS\"] == \"1\""
+        }
+      ],
+      "source_sha256": "3510438983b444d206a75b1cf2c054e7342565c99fd2f0633f307ad13cd1a677",
+      "interpretation": "Runtime notice is Test skipped; pinned source enabling declarations are not independent environment readback."
+    }
+  },
+  {
+    "identifier": "VoiceInkTests/liveDictationPolishPipelineDeliversLiteralTextToTextEdit()",
+    "status": "Skipped",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~k9T3t16wJ39MJOsx_6J4DARu4N3i8542okt8U4lcdud3SDe--kwh_hno1YbOwQZouzQ7--8PJwTQjkCFJB5kLg==",
+    "decoded_summary_sha256": "7c6e22b84d7f9cf5c7ed5d8e8c13d958ed104ac84b0f47ea739cf78687be919f",
+    "skip_notice": {
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingTargetLiveTests.swift",
+      "lineNumber": "172",
+      "message": "Test skipped",
+      "timestamp": "2026-10-27T22:34:05.064+0000"
+    },
+    "documentation": null,
+    "declared_source_gate": {
+      "path": "VoiceInkTests/WritingTargetLiveTests.swift",
+      "declaration_line": 171,
+      "declaration": "    @Test(.enabled(if: DictationPolishLiveInputs.isEnabled), .timeLimit(.minutes(5)))\n    @MainActor func liveDictationPolishPipelineDeliversLiteralTextToTextEdit() async throws {",
+      "gating_source_lines": [
+        {
+          "line": 10,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 26,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 60,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 80,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 83,
+          "text": "try #require((environment[\"TEST_RUNNER_GITHUB_ACTIONS\"] ?? environment[\"GITHUB_ACTIONS\"]) == \"true\")"
+        },
+        {
+          "line": 98,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 101,
+          "text": "try #require((environment[\"TEST_RUNNER_GITHUB_ACTIONS\"] ?? environment[\"GITHUB_ACTIONS\"]) == \"true\")"
+        },
+        {
+          "line": 120,
+          "text": "@Test(.enabled(if: LiveWritingEditor.isEnabled))"
+        },
+        {
+          "line": 123,
+          "text": "try #require((environment[\"TEST_RUNNER_GITHUB_ACTIONS\"] ?? environment[\"GITHUB_ACTIONS\"]) == \"true\")"
+        },
+        {
+          "line": 171,
+          "text": "@Test(.enabled(if: DictationPolishLiveInputs.isEnabled), .timeLimit(.minutes(5)))"
+        },
+        {
+          "line": 846,
+          "text": "return environment[\"RJT_LIVE_WRITING_TARGET_CHECKS\"] == \"1\""
+        },
+        {
+          "line": 847,
+          "text": "|| environment[\"TEST_RUNNER_RJT_LIVE_WRITING_TARGET_CHECKS\"] == \"1\""
+        }
+      ],
+      "source_sha256": "3510438983b444d206a75b1cf2c054e7342565c99fd2f0633f307ad13cd1a677",
+      "interpretation": "Runtime notice is Test skipped; pinned source enabling declarations are not independent environment readback."
+    }
+  }
+]

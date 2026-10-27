@@ -1,0 +1,67 @@
+{
+  "ui_log": {
+    "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/tests.log",
+    "bytes": 260067,
+    "sha256": "fdcde32484df50b7e296e79e27d81874940704e6629a3a1615a1bd137f90c407",
+    "case_lines": [
+      "Test Case '-[VoiceInkUITests.WritingFeaturesUITests testCSVImportPreviewsMultilineContentBeforeReplacing]' started.",
+      "Test Case '-[VoiceInkUITests.WritingFeaturesUITests testCSVImportPreviewsMultilineContentBeforeReplacing]' passed (120.460 seconds).",
+      "Test Case '-[VoiceInkUITests.WritingFeaturesUITests testDictationProfilePreservesCustomSettingsAndPersists]' started.",
+      "Test Case '-[VoiceInkUITests.WritingFeaturesUITests testDictationProfilePreservesCustomSettingsAndPersists]' passed (225.244 seconds).",
+      "Test Case '-[VoiceInkUITests.WritingFeaturesUITests testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings]' started.",
+      "Test Case '-[VoiceInkUITests.WritingFeaturesUITests testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings]' failed (152.849 seconds).",
+      "Test Case '-[VoiceInkUITests.WritingFeaturesUITests testHistoryPreservesRecognizedFallbackAndLegacyVariants]' started.",
+      "Test Case '-[VoiceInkUITests.WritingFeaturesUITests testHistoryPreservesRecognizedFallbackAndLegacyVariants]' failed (21.831 seconds).",
+      "Test Case '-[VoiceInkUITests.WritingFeaturesUITests testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch]' started.",
+      "Test Case '-[VoiceInkUITests.WritingFeaturesUITests testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch]' passed (107.547 seconds).",
+      "Test Case '-[VoiceInkUITests.WritingFeaturesUITests testTranslationTargetsReorderSelectAndPersist]' started.",
+      "Test Case '-[VoiceInkUITests.WritingFeaturesUITests testTranslationTargetsReorderSelectAndPersist]' passed (80.297 seconds)."
+    ],
+    "errors": [
+      "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkUITests/WritingFeaturesUITests.swift:952: error: -[VoiceInkUITests.WritingFeaturesUITests testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings] : XCTAssertTrue failed - The settings control was not fully visible after scrolling.",
+      "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkUITests/WritingFeaturesUITests.swift:496: error: -[VoiceInkUITests.WritingFeaturesUITests testHistoryPreservesRecognizedFallbackAndLegacyVariants] : failed - History must expose one exact expansion target inside its owned row."
+    ]
+  },
+  "receipt_members": [
+    {
+      "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/failure.json",
+      "bytes": 81,
+      "sha256": "68c3f5aa82ae83a127b6bad4863df0025844a31acb061bf93770aab3704b7680",
+      "content": {
+        "classification": "invalid-or-failed",
+        "boundary": "history-verify",
+        "exit_code": 1
+      }
+    },
+    {
+      "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/history-seed/seed/microphone-tcc.json",
+      "bytes": 199,
+      "sha256": "b525d9ee28ee40bad6f746eb2044066438adede2483da444589e618da05067a5",
+      "content": [
+        {
+          "service": "kTCCServiceMicrophone",
+          "client": "com.negentropi.RomaJustTalk",
+          "client_type": 0,
+          "auth_value": 2,
+          "csreq": "FADE0C0000000028000000010000000800000014C8B73A4B5FD318FF3FA9835F128B752E041961BC"
+        }
+      ]
+    },
+    {
+      "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/microphone-tcc.json",
+      "bytes": 199,
+      "sha256": "b525d9ee28ee40bad6f746eb2044066438adede2483da444589e618da05067a5",
+      "content": [
+        {
+          "service": "kTCCServiceMicrophone",
+          "client": "com.negentropi.RomaJustTalk",
+          "client_type": 0,
+          "auth_value": 2,
+          "csreq": "FADE0C0000000028000000010000000800000014C8B73A4B5FD318FF3FA9835F128B752E041961BC"
+        }
+      ]
+    }
+  ],
+  "range_bytes_read": 1690189,
+  "total_zip_members": 7906
+}

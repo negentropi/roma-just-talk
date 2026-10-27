@@ -1,0 +1,8 @@
+macos	Writing, snippet and dictation settings UI	﻿2026-10-27T22:44:50.5780470Z ##[group]Run bash scripts/run-writing-feature-regression.sh ui
+macos	Writing, snippet and dictation settings UI	2026-10-27T22:44:50.5781050Z ^[[36;1mbash scripts/run-writing-feature-regression.sh ui^[[0m
+macos	Writing, snippet and dictation settings UI	2026-10-27T22:44:50.7100210Z shell: /bin/bash -e {0}
+macos	Writing, snippet and dictation settings UI	2026-10-27T22:44:50.7100480Z env:
+macos	Writing, snippet and dictation settings UI	2026-10-27T22:44:50.7100840Z   BASELINE_REF: ec7bc1bcf804cb9362e342e4c3f5fbf2dd9b69eb
+macos	Writing, snippet and dictation settings UI	2026-10-27T22:44:50.7101160Z ##[endgroup]
+macos	Writing, snippet and dictation settings UI	2026-10-27T22:59:18.5340300Z /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/microphone-tcc.json /Users/runner/work/_temp/writing-ui-proof/history-seed/verify/microphone-tcc.json differ: char 105, line 1
+macos	Writing, snippet and dictation settings UI	2026-10-27T22:59:18.5514790Z ##[error]Process completed with exit code 1.

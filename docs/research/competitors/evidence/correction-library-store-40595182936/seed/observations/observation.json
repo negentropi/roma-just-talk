@@ -1,0 +1,14 @@
+{
+  "bundleIdentifier" : "com.negentropi.RomaJustTalk",
+  "classification" : "passed",
+  "executablePath" : "\/Users\/runner\/work\/_temp\/correction-library-store-derived-predecessor\/Build\/Products\/Debug\/roma just talk.app\/Contents\/MacOS\/roma just talk",
+  "fixturePath" : "\/Users\/runner\/work\/_temp\/correction-library-store-proof\/stores\/seed",
+  "hostPID" : 46879,
+  "normalSupportPath" : "\/Users\/runner\/Library\/Application Support\/com.negentropi.RomaJustTalk",
+  "phase" : "seed",
+  "scope" : "Actual local correction scalar upgrade and explicit backend approval fixture; no human approval, UI or CloudKit sync proof.",
+  "sourcePath" : "\/Users\/runner\/work\/_temp\/correction-library-store-predecessor\/VoiceInkTests\/CorrectionLibraryStoreUpgradeLiveTests.swift",
+  "sourceSHA" : "ebf629b4cf109f7a36109ccac7b20ac70f9f48ab",
+  "testName" : "liveCorrectionLibraryPersistentStoreUpgrade",
+  "version" : 1
+}

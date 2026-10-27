@@ -1,0 +1,20 @@
+{
+  "disabled": [
+    "VoiceInkUITests/UpdaterE2ETests/testSeamlessBackgroundUpdateInstallsAndRelaunches()",
+    "VoiceInkUITests/VoiceInkUITests/testExample()",
+    "VoiceInkUITests/VoiceInkUITests/testLaunchPerformance()",
+    "VoiceInkUITests/VoiceInkUITestsLaunchTests/testLaunch()",
+    "VoiceInkUITests/WritingFeaturesUITests/testCSVImportPreviewsMultilineContentBeforeReplacing()",
+    "VoiceInkUITests/WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+    "VoiceInkUITests/WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+    "VoiceInkUITests/WritingFeaturesUITests/testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch()",
+    "VoiceInkUITests/WritingFeaturesUITests/testTranslationTargetsReorderSelectAndPersist()",
+    "VoiceInkUITests/WritingPowerModeUITests/testSnippetEditsPreservePowerModeRestoration()",
+    "VoiceInkUITests/WritingPowerModeUITests/testTargetChangesPreservePowerModeRestoration()"
+  ],
+  "enabled": [
+    "VoiceInkUITests/WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()"
+  ],
+  "expected": "VoiceInkUITests/WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists",
+  "valid": true
+}

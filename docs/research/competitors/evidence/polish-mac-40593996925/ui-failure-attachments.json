@@ -1,0 +1,37 @@
+[
+  {
+    "title": "Model settings scroll failure",
+    "file": "ui-styles-scroll-failure.png",
+    "bytes": 265077,
+    "sha256": "2bf100b91964661274f6f3056c993480e9579da03abd77209aee2eb47cf3c358",
+    "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~xlMEhEZaCezup-V4aErB0xq5fjuoJzZfLBbRZ5MAPoekuH7wvIm8smz9xkE7Yf8R2vt2_NurFdksk-bvFtRpvA=="
+  },
+  {
+    "title": "Model settings scroll hierarchy",
+    "file": "ui-styles-scroll-hierarchy.txt",
+    "bytes": 7273,
+    "sha256": "e11124a8585043d973540a3e1164573567a9ec982c07d0bf0ca82c29c22e8fe1",
+    "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~NEGukpN55UHoKZAzJL-0OW1lQUsVl-kNqzMvDnBw58r_NJgmreAOdojiMhR1yKjvFqeAILi1LjkiG8BwdoUV4Q=="
+  },
+  {
+    "title": "History expansion target unavailable",
+    "file": "ui-history-expansion-failure.png",
+    "bytes": 116673,
+    "sha256": "3cdf28823d72f4ccbd8d322913b7b35271d157f0a2b4fdca1e5a1520923be853",
+    "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~ww8G0CwlUnrPw6h_NuitiEwBRPHxJDBCtux7Tc1zRQQDWwzqrCJcXmlIAGqjScaiM4_ujXQumrUmo0muzdbsLA=="
+  },
+  {
+    "title": "History expansion target hierarchy A1000000-0000-4000-8000-000000000001",
+    "file": "ui-history-expansion-hierarchy.txt",
+    "bytes": 45436,
+    "sha256": "7563dd388c835d21bbaa220825daad7b523c210c71ddfef4ba8bb5005e3ea256",
+    "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~sfuadqm21mQ9U3Jg2ZPXClwOwdUk437oxd6JrH0broJCAedH1qnqZAwT_26P5mf8Djyup1tc0sPgnE_MzuDSzQ=="
+  },
+  {
+    "title": "App UI hierarchy for com.negentropi.RomaJustTalk",
+    "file": "ui-history-auto-hierarchy.txt",
+    "bytes": 75635,
+    "sha256": "026074ebbb88c58a5312052ba2d6711a5750e182f4bbc027a6412ca0bb055751",
+    "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~JHQuw7I7b_Go-U4uXHPLP0DLh1ymYrek0IPqq-KeUrxiDXO29aPVS5FsMzJQNUTqFz0kXs7HPZGpu74gQU3_Sg=="
+  }
+]

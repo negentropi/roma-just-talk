@@ -1,0 +1,47 @@
+{
+  "default.store": {
+    "bytes": 86016,
+    "kind": "file",
+    "sha256": "de5dc9a5aedab7aa311a584b295d15c929a01ea57479f88a6a07f9e69dbf0e1a"
+  },
+  "default.store-shm": {
+    "bytes": 32768,
+    "kind": "file",
+    "sha256": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb"
+  },
+  "default.store-wal": {
+    "bytes": 0,
+    "kind": "file",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "dictionary.store": {
+    "bytes": 86016,
+    "kind": "file",
+    "sha256": "3e0543b4992983219975e487571e0c5d9a20d922bfd6340d5540355dc7f04f06"
+  },
+  "dictionary.store-shm": {
+    "bytes": 32768,
+    "kind": "file",
+    "sha256": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb"
+  },
+  "dictionary.store-wal": {
+    "bytes": 0,
+    "kind": "file",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stats.store": {
+    "bytes": 86016,
+    "kind": "file",
+    "sha256": "cb8905983d919162874e0c8820e3a36f30390d8c2d5c5b4c2e3a6eb61df0b7e0"
+  },
+  "stats.store-shm": {
+    "bytes": 32768,
+    "kind": "file",
+    "sha256": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb"
+  },
+  "stats.store-wal": {
+    "bytes": 0,
+    "kind": "file",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

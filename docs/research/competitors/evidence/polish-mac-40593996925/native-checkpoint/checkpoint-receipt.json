@@ -1,0 +1,305 @@
+{
+  "run_id": 40593996925,
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40593996925",
+  "head_sha": "c29ac2d7c6fa7690ea3bd0d5a38697b44a37d182",
+  "artifact_id": 12776815466,
+  "artifact_name": "roma.writing-live-checkpoint",
+  "artifact_bytes": 44255,
+  "artifact_sha256": "81d905eb066143d3a2741fe5819bb6bea5c5096af63469428acb1bedae16087a",
+  "artifact_digest_size_and_zip_crc_verified": true,
+  "classification": "native-checkpoint-passed",
+  "source_binding": "Run metadata identifies pinned head; exact selector and test declarations reconstructed using git show at that SHA. Full-artifact source-sha receipts await final artifact.",
+  "source_hashes": {
+    "scripts/run-writing-feature-regression.sh": "2645cea671fa8a613437e1c53aef70d9c75ea859abf1d1016a7ed536feb4c42f",
+    "VoiceInkTests/WritingTargetLiveTests.swift": "3510438983b444d206a75b1cf2c054e7342565c99fd2f0633f307ad13cd1a677",
+    "VoiceInk/Transcription/Engine/VoiceInkEngine.swift": "eeb60b103e4c270935f8cac05d1734b0bfcfc6bc047601d47da908dbf8a8dd3c",
+    "VoiceInk/Transcription/Engine/TranscriptionPipeline.swift": "e9229a9879a67c3b422e7a1d913c8b6386583837dc73484f28e5a0a173cd6bd9",
+    "VoiceInk/Paste/CursorPaster.swift": "c704ce58da8110738596c84ac580ba552ab53e5169571f4f8bd6893249494ba0",
+    "VoiceInkCore/Sources/VoiceInkCore/DictationProfile.swift": "4dd73a8fad0bb0838fa5a67d8076797f38fe94756906cd3b81cf504751c4479e"
+  },
+  "selector_comparison": "Pinned driver canonicalizes only trailing empty parentheses; six unparameterized identities remain distinct.",
+  "requested_identifiers": [
+    "VoiceInkTests/VoiceInkTests/liveWritingTargetTextEditPreservesUnicodeOutsideSelection",
+    "VoiceInkTests/VoiceInkTests/liveWritingTargetTextEditRefusesRangeTextAndFocusDrift",
+    "VoiceInkTests/VoiceInkTests/liveWritingTargetSafariTextareaReplacesOnlySelection",
+    "VoiceInkTests/VoiceInkTests/liveWritingActionPipelineUsesLocalCLIAndRetainsFailure",
+    "VoiceInkTests/VoiceInkTests/liveWritingStartupContextRespectsOwnerAfterCancellation",
+    "VoiceInkTests/VoiceInkTests/liveDictationProfileKeepsContextEligibilityAcrossPreferenceChanges"
+  ],
+  "enabled_identifiers": [
+    "VoiceInkTests/VoiceInkTests/liveDictationProfileKeepsContextEligibilityAcrossPreferenceChanges",
+    "VoiceInkTests/VoiceInkTests/liveWritingActionPipelineUsesLocalCLIAndRetainsFailure",
+    "VoiceInkTests/VoiceInkTests/liveWritingStartupContextRespectsOwnerAfterCancellation",
+    "VoiceInkTests/VoiceInkTests/liveWritingTargetSafariTextareaReplacesOnlySelection",
+    "VoiceInkTests/VoiceInkTests/liveWritingTargetTextEditPreservesUnicodeOutsideSelection",
+    "VoiceInkTests/VoiceInkTests/liveWritingTargetTextEditRefusesRangeTextAndFocusDrift"
+  ],
+  "disabled_count": 256,
+  "exact_test_execution": {
+    "liveWritingTargetTextEditPreservesUnicodeOutsideSelection": {
+      "starts": 1,
+      "results": [
+        "passed"
+      ]
+    },
+    "liveWritingTargetTextEditRefusesRangeTextAndFocusDrift": {
+      "starts": 1,
+      "results": [
+        "passed"
+      ]
+    },
+    "liveWritingTargetSafariTextareaReplacesOnlySelection": {
+      "starts": 1,
+      "results": [
+        "passed"
+      ]
+    },
+    "liveWritingActionPipelineUsesLocalCLIAndRetainsFailure": {
+      "starts": 1,
+      "results": [
+        "passed"
+      ]
+    },
+    "liveWritingStartupContextRespectsOwnerAfterCancellation": {
+      "starts": 1,
+      "results": [
+        "passed"
+      ]
+    },
+    "liveDictationProfileKeepsContextEligibilityAcrossPreferenceChanges": {
+      "starts": 1,
+      "results": [
+        "passed"
+      ]
+    }
+  },
+  "summary": {
+    "executed": 6,
+    "passed": 6,
+    "failed": 0,
+    "skipped": 0
+  },
+  "selection_receipt_sha256": "092a83d7fc20ad8f6146fd27a93f95f211098ba434655fdb78d97c634ff5ad68",
+  "test_log_sha256": "7e40e6c839eb4ef4db97a2e04625c95750ab4ec62b84a7083ae74772f608b8e1",
+  "binary_identity": {
+    "sha256": "59299d4767229fbff8128aa868cfec402b30dc4b8fead904e3141f0811120de4",
+    "path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+    "before_after_equal": true,
+    "signature_readback_in_checkpoint": false
+  },
+  "profile_snapshot_observation": {
+    "bundleIdentifier": "com.negentropi.RomaJustTalk",
+    "cases": {
+      "custom-to-none-during-permission": {
+        "actualAudioFileCreated": true,
+        "captureStatesWereRecording": [
+          true,
+          true
+        ],
+        "clipboardReads": 1,
+        "didFlipProfile": true,
+        "gateEntered": true,
+        "modelLoadCalls": 1,
+        "ownerEnded": true,
+        "permissionCalls": 1,
+        "profileAtStart": "custom",
+        "profileDuringPermission": "none",
+        "recordingCanceled": true,
+        "screenReads": 1,
+        "storedProfileAfterFlip": "none",
+        "storedProfileAtTaskCompletion": "none",
+        "storedProfileBeforeStart": "custom",
+        "taskCompleted": true,
+        "taskDetachedOnCancellation": false,
+        "wasRecordingAtTaskCompletion": true
+      },
+      "none-to-custom-during-permission": {
+        "actualAudioFileCreated": true,
+        "captureStatesWereRecording": [],
+        "clipboardReads": 0,
+        "didFlipProfile": true,
+        "gateEntered": true,
+        "modelLoadCalls": 1,
+        "ownerEnded": true,
+        "permissionCalls": 1,
+        "profileAtStart": "none",
+        "profileDuringPermission": "custom",
+        "recordingCanceled": true,
+        "screenReads": 0,
+        "storedProfileAfterFlip": "custom",
+        "storedProfileAtTaskCompletion": "custom",
+        "storedProfileBeforeStart": "none",
+        "taskCompleted": true,
+        "taskDetachedOnCancellation": false,
+        "wasRecordingAtTaskCompletion": true
+      }
+    },
+    "checkpoint": "dictation-profile-context-snapshot",
+    "error": null,
+    "executablePath": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+    "noSetupFailure": true,
+    "processIdentifier": 29536,
+    "scope": "Actual engine and recorder with gated Whisper loader and context-call spies; no model weights, transcription or OS context reads",
+    "test": "liveDictationProfileKeepsContextEligibilityAcrossPreferenceChanges",
+    "version": 2
+  },
+  "startup_ownership_observation": {
+    "bundleIdentifier": "com.negentropi.RomaJustTalk",
+    "cases": {
+      "active-ordinary": {
+        "actualAudioFileCreated": true,
+        "captureStatesWereRecording": [
+          true,
+          true
+        ],
+        "clipboardReads": 1,
+        "gateEntered": true,
+        "modelLoadCalls": 1,
+        "ownerEnded": true,
+        "recordingCanceled": true,
+        "screenReads": 1,
+        "taskCompleted": true,
+        "taskDetachedOnCancellation": false,
+        "wasRecordingAtTaskCompletion": true
+      },
+      "canceled-ordinary": {
+        "actualAudioFileCreated": true,
+        "captureStatesWereRecording": [],
+        "clipboardReads": 0,
+        "gateEntered": true,
+        "modelLoadCalls": 1,
+        "ownerEnded": true,
+        "recordingCanceled": true,
+        "screenReads": 0,
+        "taskCompleted": true,
+        "taskDetachedOnCancellation": true,
+        "wasRecordingAtTaskCompletion": false
+      },
+      "canceled-writing": {
+        "actualAudioFileCreated": true,
+        "captureStatesWereRecording": [],
+        "clipboardReads": 0,
+        "gateEntered": true,
+        "modelLoadCalls": 1,
+        "ownerEnded": true,
+        "recordingCanceled": true,
+        "screenReads": 0,
+        "taskCompleted": true,
+        "taskDetachedOnCancellation": true,
+        "wasRecordingAtTaskCompletion": false
+      }
+    },
+    "checkpoint": "startup-context-ownership",
+    "error": null,
+    "executablePath": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+    "noSetupFailure": true,
+    "processIdentifier": 29536,
+    "scope": "Actual engine and recorder with gated Whisper loader and context-call spies; no model weights, transcription or OS context reads",
+    "test": "liveWritingStartupContextRespectsOwnerAfterCancellation",
+    "version": 2
+  },
+  "native_editor_observations": [
+    {
+      "checkpoint": "pipeline-success-delivery",
+      "expected": "Before 👩🏽‍💻 Pipeline 台灣\nSecond line after 🧑‍🚀.\n",
+      "observed": "Before 👩🏽‍💻 Pipeline 台灣\nSecond line after 🧑‍🚀.\n",
+      "utf16_exact": true,
+      "artifact_member": "RJT-Writing-Live-0764DADB-88B7-47DE-A146-161B22832EAC-pipeline-success-delivery.json",
+      "sha256": "b0e936c5eca50b6d5f1cb20e7167e2da7cf0f452a9acaf03bb34ee9aa3ac411c"
+    },
+    {
+      "checkpoint": "safari-replacement",
+      "expected": "Before 👩🏽‍💻 Translated 日本語\nNext paragraph after 🧑‍🚀.\n",
+      "observed": "Before 👩🏽‍💻 Translated 日本語\nNext paragraph after 🧑‍🚀.\n",
+      "utf16_exact": true,
+      "artifact_member": "RJT-Writing-Live-1A001257-0BD2-40E0-A0C2-DCD08EDE9700-safari-replacement.json",
+      "sha256": "18049f5815ac855b3c85d859073b3e63aac29b64e9fb18b0059916072db12eaa"
+    },
+    {
+      "checkpoint": "pipeline-failure-delivery",
+      "expected": "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "observed": "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "utf16_exact": true,
+      "artifact_member": "RJT-Writing-Live-6B3B6DED-C765-48DC-ADEB-7F947AF64FC0-pipeline-failure-delivery.json",
+      "sha256": "76444336e3dc77ad325beb2a155c274029098223ebb3feadd91d0279253abf85"
+    },
+    {
+      "checkpoint": "textedit-replacement",
+      "expected": "Before 👩🏽‍💻 Rewritten 台灣\nSecond line after 🧑‍🚀.\n",
+      "observed": "Before 👩🏽‍💻 Rewritten 台灣\nSecond line after 🧑‍🚀.\n",
+      "utf16_exact": true,
+      "artifact_member": "RJT-Writing-Live-DB542F8E-0825-4F36-8429-03026397AE99-textedit-replacement.json",
+      "sha256": "8ec75424e3c2934963794655b20e21f473322546b61359f361aee50b851cd032"
+    },
+    {
+      "checkpoint": "textedit-focus-drift",
+      "expected": "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "observed": "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "utf16_exact": true,
+      "artifact_member": "RJT-Writing-Live-FDE61304-E79D-4B4A-823B-312AE4AF5CB2-textedit-focus-drift.json",
+      "sha256": "9c02599964319cc766530eeb3a2f967cf8de30a7eb7e05a3989f17428c9e6e6c"
+    },
+    {
+      "checkpoint": "textedit-range-drift",
+      "expected": "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "observed": "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "utf16_exact": true,
+      "artifact_member": "RJT-Writing-Live-FDE61304-E79D-4B4A-823B-312AE4AF5CB2-textedit-range-drift.json",
+      "sha256": "752c311866129cab2c7a6f4dd4101a6691d138a822d24d92439d7939efedfd39"
+    },
+    {
+      "checkpoint": "textedit-text-drift",
+      "expected": "Before 👩🏽‍💻 User's edit after 🧑‍🚀.\n",
+      "observed": "Before 👩🏽‍💻 User's edit after 🧑‍🚀.\n",
+      "utf16_exact": true,
+      "artifact_member": "RJT-Writing-Live-FDE61304-E79D-4B4A-823B-312AE4AF5CB2-textedit-text-drift.json",
+      "sha256": "d2d7e1e4e8543a35998d14acf893d08a831bfa43195dfee83ad855759459f69f"
+    }
+  ],
+  "pipeline_observations": [
+    {
+      "checkpoint": "writing-pipeline-failure",
+      "status": "failed",
+      "rawInstruction": "Rewrite this selection and retain my instruction if processing fails.",
+      "enhancedText": null,
+      "enhancementModel": null,
+      "observedDocument": "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "ordinaryEnhancementEnabled": false,
+      "preferencesChangedAfterCapture": true,
+      "childPID": 29996,
+      "recordID": "159EE1E2-AA17-4A57-B980-55BB4E449594",
+      "audioProof": "Fixed transcript session bypasses microphone and audio decoding; audio URL is a synthetic fixture reference",
+      "historyProof": "Fresh ModelContext reads saved finalization from retained in-memory store; no crash or relaunch durability claim",
+      "scope": "Real pipeline, LocalCLIService child process and Safari delivery; fixed synthetic recognizer text and CLI output",
+      "artifact_member": "RJT-Writing-Pipeline-6CC47EAA-430F-4252-ABEB-661E2DD751B8-failure.json",
+      "sha256": "df58014ae1e4cfdf32eb4e3f48e009035b50bebc271625fb6166d93be5afb4e9",
+      "stdin_sha256": "a2b703cafe5c70dbe931d64897b7a70a978c51d0dae70fb108abdc4202edfa85"
+    },
+    {
+      "checkpoint": "writing-pipeline-success",
+      "status": "completed",
+      "rawInstruction": "Rewrite the selection as two concise lines.",
+      "enhancedText": "Pipeline 台灣\nSecond line",
+      "enhancementModel": "local-cli",
+      "observedDocument": "Before 👩🏽‍💻 Pipeline 台灣\nSecond line after 🧑‍🚀.\n",
+      "ordinaryEnhancementEnabled": false,
+      "preferencesChangedAfterCapture": true,
+      "childPID": 29878,
+      "recordID": "0CFAD9BE-7F82-4408-860E-E5782661D974",
+      "audioProof": "Fixed transcript session bypasses microphone and audio decoding; audio URL is a synthetic fixture reference",
+      "historyProof": "Fresh ModelContext reads saved finalization from retained in-memory store; no crash or relaunch durability claim",
+      "scope": "Real pipeline, LocalCLIService child process and Safari delivery; fixed synthetic recognizer text and CLI output",
+      "artifact_member": "RJT-Writing-Pipeline-6CC47EAA-430F-4252-ABEB-661E2DD751B8-success.json",
+      "sha256": "728abaf6689f154bf9b8851d86da428c1708afbc070bdf482c2df5ac514cbf47",
+      "stdin_sha256": "6323da56e7e357ca214f1eb3ead7d93ae3da4fc752bcd27edf9910d608bec9b3"
+    }
+  ],
+  "limits": [
+    "Checkpoint establishes six native method executions; full-unit, UI, matched-regression and Release counts are not contained in it.",
+    "Context tests run the actual engine and recorder with a gated model loader and capture-call spies. They do not read OS clipboard/screen content or run ASR.",
+    "Pipeline test uses fixed synthetic recognition and deterministic Local CLI output. Fresh ModelContext visibility is in-memory save proof, not crash/relaunch durability.",
+    "No physical keyboard, human speech, general provider quality or independent TCC database readback proof.",
+    "Cleanup observations, whether unavailable or still readable, do not independently establish window closure and are excluded from closure-success claims.",
+    "Companion-head evidence has not been combined. Production-source equivalence must be verified before combining different tested heads."
+  ]
+}

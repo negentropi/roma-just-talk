@@ -1,0 +1,9 @@
+{
+  "member": "dictation-polish-native-proof/build.log",
+  "bytes": 4978847,
+  "sha256": "c1609427e793805cbadceca0d6fd2041be603d1c4ffeda4dcd15c2afbd1ced16",
+  "errorContexts": [
+    "    \n/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/CorrectionLibraryStoreUpgradeLiveTests.swift:89:59: error: property access can throw but is not marked with 'try'\n        let output = VoiceInkWordReplacementEngine.apply([compatibility.voiceInkRule], to: compatibilityInput)\n                                                          ^\n/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/CorrectionLibraryStoreUpgradeLiveTests.swift:89:59: note: did you mean to use 'try'?\n        let output = VoiceInkWordReplacementEngine.apply([compatibility.voiceInkRule], to: compatibilityInput)\n                                                          ^"
+  ],
+  "errorCount": 14
+}

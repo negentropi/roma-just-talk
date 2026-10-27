@@ -1,0 +1,17 @@
+{
+  "classification": "no-actionable-inconsistency",
+  "scope": "Read-only audit of frozen c29ac2d7 actual receipts/source; no runtime rerun, new artifact fetch or source edit.",
+  "checks": [
+    "62 retained original raw member hashes/CRC mappings and25 originalPNG hashes",
+    "Native51974/91239 each exactlyone pass;4\u00d720 History fields/V1twofields/W1oldfivefields exact includingUTF8/16 and unchanged contexts",
+    "Normal factory/body/schema, sameactual3paths, signed app/native binaries unchanged, closed hosts/no handles",
+    "Initial/seed/verify Accessibility/Microphone byte-equal auth2/csreq tiedactual candidate CDhash",
+    "27 typed censuses across6 cases\u00d732keys synchronized/isolated andbefore/restored equal; no teardown failure",
+    "16 frozen source inputs/native8input manifests/factory body/original4body bytes andmarker/failure lines",
+    "Actual y812target belowviewportbottom649/topscrollbar0 andtenupwardwheels; no globalHistoryexpand ID"
+  ],
+  "limits": [
+    "No future8 model/receipt comparison; no completed six-case acceptance.",
+    "Whole remote archive verification not repeated or downloaded by independent reviewer."
+  ]
+}

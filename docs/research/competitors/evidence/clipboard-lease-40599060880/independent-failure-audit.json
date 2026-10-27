@@ -1,0 +1,40 @@
+{
+  "classification": "invalid-pretest-throwing-model-projection-fixture",
+  "runID": 40599060880,
+  "sourceSHA": "641dcc6de3341acdffe41fe62f45e074bec749ef",
+  "actualNativeTestsExecuted": 0,
+  "knownBadClipboardReproduced": false,
+  "actualCompilerDiagnostic": {
+    "path": "VoiceInkTests/CorrectionLibraryStoreUpgradeLiveTests.swift",
+    "line": 89,
+    "column": 59,
+    "message": "property access can throw but is not marked with 'try'",
+    "expression": "compatibility.voiceInkRule",
+    "repeatedDiagnosticCount": 14
+  },
+  "commonOracleSHA256": "3bba815e11a289c96061f16db9967123272bd6916b29439e066f123435ac9d6a",
+  "actualPasterSHA256": "c704ce58da8110738596c84ac580ba552ab53e5169571f4f8bd6893249494ba0",
+  "failedLogFetchedOnce": true,
+  "artifacts": [
+    {
+      "id": 12777608600,
+      "bytes": 81095,
+      "sha256": "25c7296e363718d18c745a9a6a2d98bb24158dde9925d03f7bac0ec104ea5290",
+      "members": 20,
+      "CRCValid": true,
+      "downloadedOnce": "/data/rjt-writing-check-01a17bef/40599060880/evidence.zip"
+    },
+    {
+      "id": 12779215257,
+      "bytes": 234924,
+      "sha256": "670f3b90c1310bc9315774136b8ca323bff3ddca8d46f2ced4e6fe253fcdeb13",
+      "members": 5,
+      "CRCValid": true,
+      "downloadedOnce": "/data/rjt-writing-check-01a17bef/40599060880/app-artifact.zip"
+    }
+  ],
+  "limits": [
+    "App unit bundle failed compilation before any selected native clipboard execution.",
+    "No paste, timer, process-host lifetime or candidate fix acceptance."
+  ]
+}

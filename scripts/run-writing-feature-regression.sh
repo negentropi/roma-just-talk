@@ -256,6 +256,7 @@ fi
 
 run_history_ui_phase() {
   local seed_phase="$1" seed_root="$RUNNER_TEMP/writing-ui-proof/history-seed" seed_dir native_bundle native_name phase_exit=0
+  local system_tcc_query_exit=0 microphone_tcc_query_exit=0 system_tcc_cmp_exit=0 microphone_tcc_cmp_exit=0 tcc_check_exit=0 receipt
   seed_dir="$seed_root/$seed_phase"
   test ! -e "$seed_dir"
   mkdir -p "$seed_dir" "$out/history-seed/$seed_phase"
@@ -273,11 +274,48 @@ PY
   codesign -d --verbose=4 "$debug_app" 2> "$seed_dir/app-signature-before.txt"
   codesign -d --verbose=4 "$native_bundle" 2> "$seed_dir/test-bundle-signature-before.txt"
   sudo sqlite3 -json '/Library/Application Support/com.apple.TCC/TCC.db' \
-    "SELECT service,client,client_type,auth_value,hex(csreq) AS csreq FROM access WHERE client='com.negentropi.RomaJustTalk' AND service='kTCCServiceAccessibility';" > "$seed_dir/system-tcc.json"
+    "SELECT service,client,client_type,auth_value,hex(csreq) AS csreq FROM access WHERE client='com.negentropi.RomaJustTalk' AND service='kTCCServiceAccessibility';" > "$seed_dir/system-tcc.json" 2> "$seed_dir/system-tcc-query.log" || system_tcc_query_exit=$?
   sqlite3 -json "$HOME/Library/Application Support/com.apple.TCC/TCC.db" \
-    "SELECT service,client,client_type,auth_value,hex(csreq) AS csreq FROM access WHERE client='com.negentropi.RomaJustTalk' AND service='kTCCServiceMicrophone';" > "$seed_dir/microphone-tcc.json"
-  cmp "$out/system-tcc.json" "$seed_dir/system-tcc.json"
-  cmp "$out/microphone-tcc.json" "$seed_dir/microphone-tcc.json"
+    "SELECT service,client,client_type,auth_value,hex(csreq) AS csreq FROM access WHERE client='com.negentropi.RomaJustTalk' AND service='kTCCServiceMicrophone';" > "$seed_dir/microphone-tcc.json" 2> "$seed_dir/microphone-tcc-query.log" || microphone_tcc_query_exit=$?
+  cp "$out/system-tcc.json" "$seed_dir/expected-system-tcc.json"
+  cp "$out/microphone-tcc.json" "$seed_dir/expected-microphone-tcc.json"
+  cp "$out/host.csreq" "$seed_dir/expected-host.csreq"
+  for receipt in "$seed_dir"/*.json "$seed_dir"/*.txt "$seed_dir"/*.log "$seed_dir"/*.csreq; do
+    if [[ -f "$receipt" ]]; then cp "$receipt" "$out/history-seed/$seed_phase/"; fi
+  done
+  cmp "$out/system-tcc.json" "$seed_dir/system-tcc.json" > "$seed_dir/system-tcc-cmp.log" 2>&1 || system_tcc_cmp_exit=$?
+  cmp "$out/microphone-tcc.json" "$seed_dir/microphone-tcc.json" > "$seed_dir/microphone-tcc-cmp.log" 2>&1 || microphone_tcc_cmp_exit=$?
+  python3 - "$seed_dir" "$candidate_sha" "$seed_phase" "$system_tcc_query_exit" "$microphone_tcc_query_exit" "$system_tcc_cmp_exit" "$microphone_tcc_cmp_exit" <<'PY' || tcc_check_exit=$?
+import json
+import sys
+from pathlib import Path
+
+directory, source, phase = Path(sys.argv[1]), sys.argv[2], sys.argv[3]
+statuses = list(map(int, sys.argv[4:]))
+requirement = (directory / 'expected-host.csreq').read_bytes().hex().upper()
+checks = {}
+for index, (name, service) in enumerate([('system-tcc.json', 'kTCCServiceAccessibility'), ('microphone-tcc.json', 'kTCCServiceMicrophone')]):
+    actual = directory / name
+    expected = directory / ('expected-' + name)
+    def rows(path):
+        try: return json.loads(path.read_text())
+        except (UnicodeError, json.JSONDecodeError): return None
+    signed_grant = [{'service': service, 'client': 'com.negentropi.RomaJustTalk', 'client_type': 0, 'auth_value': 2, 'csreq': requirement}]
+    checks[name] = {'query_exit_code': statuses[index], 'cmp_exit_code': statuses[index + 2],
+                    'expected': rows(expected), 'actual': rows(actual), 'raw_bytes_equal': expected.read_bytes() == actual.read_bytes(),
+                    'expected_signed_grant': signed_grant}
+    checks[name]['valid'] = checks[name]['expected'] == checks[name]['actual'] == signed_grant and checks[name]['raw_bytes_equal'] and statuses[index] == statuses[index + 2] == 0
+valid = all(value['valid'] for value in checks.values())
+(directory / 'tcc-check.json').write_text(json.dumps({'valid': valid, 'sourceSHA': source, 'phase': phase, 'checks': checks}, indent=2) + '\n')
+if not valid: raise SystemExit('Native History permissions must retain both exact auth_value=2 grants for the signed host')
+PY
+  if [[ "$tcc_check_exit" != 0 ]]; then
+    printf '{"valid":false,"phase":"%s","classification":"blocked","testAttempted":false,"boundary":"native-permissions","driver_exit_code":%s}\n' "$seed_phase" "$tcc_check_exit" > "$seed_dir/failure.json"
+  fi
+  for receipt in "$seed_dir"/*.json "$seed_dir"/*.txt "$seed_dir"/*.log "$seed_dir"/*.csreq; do
+    if [[ -f "$receipt" ]]; then cp "$receipt" "$out/history-seed/$seed_phase/"; fi
+  done
+  if [[ "$tcc_check_exit" != 0 ]]; then return "$tcc_check_exit"; fi
   if [[ "$seed_phase" == verify ]]; then
     test "$(shasum -a 256 "$seed_root/seed/expected-inputs.sha256.json" | awk '{print $1}')" = "$history_expectations_sha256"
     test "$(shasum -a 256 "$seed_root/correction-inputs.sha256.json" | awk '{print $1}')" = "$history_corrections_sha256"
@@ -285,7 +323,6 @@ PY
   select_tests liveDictationHistoryUISeed
   if ! RJT_HISTORY_UI_SEED_CHECKS=1 TEST_RUNNER_RJT_HISTORY_UI_SEED_CHECKS=1 TEST_RUNNER_GITHUB_ACTIONS=true \
     preflight_selected_tests "$seed_dir"; then
-    local receipt
     for receipt in "$seed_dir"/*.json "$seed_dir"/*.txt "$seed_dir/enumeration.log"; do
       if [[ -f "$receipt" ]]; then cp "$receipt" "$out/history-seed/$seed_phase/"; fi
     done
@@ -661,7 +698,40 @@ PY
     out="$debug_dir/onboarding-test-evidence/writing-ui"
     mkdir -p "$out"
     phase=ui-build
-    trap 'code=$?; if [[ "$code" != 0 ]]; then printf "{\"classification\":\"invalid-or-failed\",\"boundary\":\"%s\",\"exit_code\":%s}\n" "$phase" "$code" > "$out/failure.json"; fi' EXIT
+    retain_ui_verdicts() {
+      python3 - "$out" "$RUNNER_TEMP/writing-ui-proof/history-seed" "$candidate_sha" "$phase" "$1" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+directory, native = map(Path, sys.argv[1:3])
+source, boundary, code = sys.argv[3:]
+def read(path):
+    if not path.is_file(): return None
+    try:
+        value = json.loads(path.read_text())
+        if isinstance(value, dict): return value
+        error = 'Expected a JSON object'
+    except (OSError, UnicodeError, json.JSONDecodeError) as failure:
+        error = str(failure)
+    return {'valid': False, 'classification': 'invalid-receipt', 'path': str(path), 'error': error}
+ui = read(directory / 'ui-verdict.json')
+if ui is None:
+    ui = {'classification': 'not-executed', 'boundary': boundary, 'sourceSHA': source}
+    (directory / 'ui-verdict.json').write_text(json.dumps(ui, indent=2) + '\n')
+phases = {phase: {'testAttempted': (native / phase / 'tests.log').is_file(), 'result': read(directory / 'history-seed' / phase / 'result.json'), 'failure': read(directory / 'history-seed' / phase / 'failure.json'), 'permissions': read(directory / 'history-seed' / phase / 'tcc-check.json')} for phase in ['seed', 'verify']}
+pair = read(directory / 'history-seed/result.json')
+passed = pair is not None and pair.get('valid') is True
+native_failure = next((value['failure'] for value in phases.values() if value['failure'] is not None), None)
+failed = native_failure is not None or (int(code) != 0 and boundary.startswith('history-'))
+native_verdict = {'sourceSHA': source, 'attempted': phases['verify']['testAttempted'], 'classification': 'passed' if passed else 'failed' if failed else 'blocked', 'boundary': native_failure.get('boundary', boundary) if native_failure else boundary, 'driver_exit_code': int(code), 'phases': phases, 'pair': pair}
+(directory / 'native-verdict.json').write_text(json.dumps(native_verdict, indent=2) + '\n')
+valid = int(code) == 0 and ui.get('classification') == 'passed' and passed
+(directory / 'verification-verdicts.json').write_text(json.dumps({'sourceSHA': source, 'valid': valid, 'driver_exit_code': int(code), 'boundary': boundary, 'ui': ui, 'native': native_verdict}, indent=2) + '\n')
+if int(code) == 0 and not valid: raise SystemExit('Writing UI acceptance requires both retained UI and native verdicts to pass')
+PY
+    }
+    trap 'code=$?; if [[ "$code" != 0 ]]; then printf "{\"classification\":\"invalid-or-failed\",\"boundary\":\"%s\",\"exit_code\":%s}\n" "$phase" "$code" > "$out/failure.json"; fi; diagnostic_exit=0; retain_ui_verdicts "$code" || diagnostic_exit=$?; [[ "$code" != 0 ]] || code="$diagnostic_exit"; exit "$code"' EXIT
     test_arguments "$repo_root" "$debug_dir"
     ui_selectors=()
     while IFS= read -r selector; do ui_selectors+=("$selector"); done < <(bash scripts/run-writing-settings-ui-regression.sh --candidate-selectors)
@@ -749,7 +819,29 @@ PY
       TEST_RUNNER_GITHUB_ACTIONS=true \
       xcodebuild test-without-building "${arguments[@]}" "${ui_selectors[@]}" \
         -resultBundlePath "$out/UI.xcresult" > "$out/tests.log" 2>&1 || test_exit=$?
-    if ! bash scripts/run-writing-settings-ui-regression.sh --classify-candidate "$out/tests.log" "$test_exit" "$out/result.json"; then
+    ui_classifier_exit=0
+    bash scripts/run-writing-settings-ui-regression.sh --classify-candidate "$out/tests.log" "$test_exit" "$out/ui-verdict.json" || ui_classifier_exit=$?
+    cp "$out/ui-verdict.json" "$out/result.json"
+    python3 - "$out" "$candidate_sha" <<'PY'
+import json
+import subprocess
+import sys
+from pathlib import Path
+
+root, source_sha = Path(sys.argv[1]), sys.argv[2]
+directory = root / 'screenshots'
+with (root / 'screenshot-export.log').open('wb') as log:
+    try:
+        exit_code = subprocess.run(['xcrun', 'xcresulttool', 'export', 'attachments', '--path', str(root / 'UI.xcresult'), '--output-path', str(directory)], stdout=log, stderr=subprocess.STDOUT, timeout=60).returncode
+    except subprocess.TimeoutExpired:
+        exit_code = 124
+images = [str(path.relative_to(directory)) for path in directory.rglob("*") if path.suffix.lower() in {".png", ".jpg", ".jpeg"}]
+available = exit_code == 0 and bool(images)
+(root / 'screenshot-export.json').write_text(json.dumps({"source_sha": source_sha, "export_exit_code": exit_code, "visual_proof": "available" if available else "missing", "images": images}, indent=2) + "\n")
+if not available:
+    print("::warning::Writing settings screenshots were not exported; inspect screenshot-export.log and retained UI.xcresult.")
+PY
+    if [[ "$ui_classifier_exit" != 0 ]]; then
       tail -n 120 "$out/tests.log" >&2
       return_exit="$test_exit"
       [[ "$return_exit" != 0 ]] || return_exit=1
@@ -805,21 +897,6 @@ PY
     cp "$history_corrections_dir/../closed-after-ui.json" "$out/history-seed/"
     phase=history-verify
     run_history_ui_phase verify
-    export_exit=0
-    xcrun xcresulttool export attachments --path "$out/UI.xcresult" \
-      --output-path "$out/screenshots" > "$out/screenshot-export.log" 2>&1 || export_exit=$?
-    python3 - "$out/screenshots" "$export_exit" "$candidate_sha" "$out/screenshot-export.json" <<'PY'
-import json
-import sys
-from pathlib import Path
-
-directory, exit_code, source_sha, output = sys.argv[1:]
-images = [str(path.relative_to(directory)) for path in Path(directory).rglob("*") if path.suffix.lower() in {".png", ".jpg", ".jpeg"}]
-available = int(exit_code) == 0 and bool(images)
-Path(output).write_text(json.dumps({"source_sha": source_sha, "export_exit_code": int(exit_code), "visual_proof": "available" if available else "missing", "images": images}, indent=2) + "\n")
-if not available:
-    print("::warning::Writing settings screenshots were not exported; inspect screenshot-export.log and retained UI.xcresult.")
-PY
     ui_identity > "$out/identity-after.txt"
     ui_signatures after
     cmp "$out/identity-before.txt" "$out/identity-after.txt"

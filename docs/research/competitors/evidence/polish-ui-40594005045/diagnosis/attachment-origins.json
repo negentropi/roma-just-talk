@@ -1,0 +1,154 @@
+[
+  {
+    "file": "style-profile-switching-preserves-the-seeded-vocabulary-library.png",
+    "attachment": "Profile switching preserves the seeded vocabulary library",
+    "test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+    "sha256": "7d61e3615d4fe6b2dc20a2e00c25f493a5c69acf0b6f1afbf19f8db0e913e0d0",
+    "bytes": 245010,
+    "source_member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~vD0qpe8Jm06pWOiPKAq19ONMrdlHlKodUX1rSRelXvqsOsDHHrRUi5Z5S7Z4uGP6NpkNXBeghExzcyD97JvC0w=="
+  },
+  {
+    "file": "style-model-settings-hierarchy-before-opening.txt",
+    "attachment": "Model settings hierarchy before-opening",
+    "test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+    "sha256": "0c9b918d0b16120368957964345e7b3731a00a39b23a170b51750dc7c68c5596",
+    "bytes": 45929,
+    "source_member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~V5WQHfYkUvXtrheJf9q7XG-3sHd78Man3S2lgtSgv7V3vVUmfk3XQJP4iTTrLEhfsoWO1XxyK4OZVAS4z_24hw=="
+  },
+  {
+    "file": "style-model-settings-hierarchy-after-opening.txt",
+    "attachment": "Model settings hierarchy after-opening",
+    "test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+    "sha256": "557f28cde2f93a68aa2d7d28a3b58573bd9d74bf4712beef31a47fe69ef4db8e",
+    "bytes": 52682,
+    "source_member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~ZqGQIgCWHhYyX8mfWTstg3DaJjQ4yEo88S6xdmCzETChImT4Rc4OSs3WijDuMhucu2MbXnNPfddMwf1-2JojyQ=="
+  },
+  {
+    "file": "style-none-profile-and-retained-library-settings.png",
+    "attachment": "None profile and retained library settings",
+    "test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+    "sha256": "0e31ec6a26da2c176c8fcac12a12299101a85948c0a62544b59cd30c3a37a11c",
+    "bytes": 269526,
+    "source_member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~YSnKljNahm_C8hbvK6x6nPyxWI4puTFAa5zbZBDB7ekIAiUj2ug9BvCyLMFX6ClczQ377qnO1VfKTUaUsO3UDw=="
+  },
+  {
+    "file": "style-light-profile-and-retained-library-settings.png",
+    "attachment": "Light profile and retained library settings",
+    "test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+    "sha256": "f2b396d2716aa0bb77bab9dc639c51f0afb9983615210f2e14e8b3ec183de214",
+    "bytes": 269889,
+    "source_member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~KodTrM-t_8OSMV_47iMW5Ee8IZMSou-DMXvfxVH_RNcaSKLyHnfLo2TKoa4cUn3LX54w7Wqn4rYDRRBB6ydvcw=="
+  },
+  {
+    "file": "style-clarity-profile-and-retained-library-settings.png",
+    "attachment": "Clarity profile and retained library settings",
+    "test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+    "sha256": "a7da358e586735e328d96188f87f64b83a102705df956830a342b7c0d67ad583",
+    "bytes": 269986,
+    "source_member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~gJO3CoxKOC5njHMKVKd32ijTwkLXegCzgzk_2Fsn-JPzDo4XwLrX20GTUUWV95ZwKYP4bRVzwwHPUqFokCRU4A=="
+  },
+  {
+    "file": "style-clarity-natural-style.png",
+    "attachment": "Clarity Natural style",
+    "test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+    "sha256": "a7da358e586735e328d96188f87f64b83a102705df956830a342b7c0d67ad583",
+    "bytes": 269986,
+    "source_member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~gJO3CoxKOC5njHMKVKd32ijTwkLXegCzgzk_2Fsn-JPzDo4XwLrX20GTUUWV95ZwKYP4bRVzwwHPUqFokCRU4A=="
+  },
+  {
+    "file": "style-clarity-casual-style.png",
+    "attachment": "Clarity Casual style",
+    "test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+    "sha256": "18df45ccdfc9235e480a06747db6a2801207a70529fd204c43cef270694cc571",
+    "bytes": 270698,
+    "source_member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~fE3Xay_zIVDzZuBhgybxmUgZ_xHpJYRm2kht6bhunilUD9lRq9TvXXFWPnxWPhLiO9c_OJiGUbWXicJdqtYdog=="
+  },
+  {
+    "file": "style-clarity-formal-style.png",
+    "attachment": "Clarity Formal style",
+    "test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+    "sha256": "758089e6debf8e25185a700cb6740fde4f9c701f22a70a81f182396a9cbba7df",
+    "bytes": 272037,
+    "source_member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~ybLgXykqITAsNb1S6Rm_MtI0qZWDMY7j3G3pyI0H-fWA0KxW4ZZ0Ljn454R_rroDKgriVSSyTXB4sT8Ia5kbYQ=="
+  },
+  {
+    "file": "style-model-settings-scroll-hierarchy.txt",
+    "attachment": "Model settings scroll hierarchy",
+    "test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+    "sha256": "a8c632b826bfcdc1e690feff1bd003add7f5736018005625677d67445d21951e",
+    "bytes": 7273,
+    "source_member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~C3VjFVCp_nooZG1NqhQ95ZGKYAofdJQ5roJpYD6LZzv76QHf3MEiG_y-bk5O_M08o2ZkTI8qiY9-xLPuoWZ7kQ=="
+  },
+  {
+    "file": "style-model-settings-scroll-failure.png",
+    "attachment": "Model settings scroll failure",
+    "test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+    "sha256": "aa1d66bfe8725806ad01dd32ba734e14b72b521a5166bb346427dbac738844ef",
+    "bytes": 265056,
+    "source_member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~KYT9N_wkHLfuTrfiKchmEzy5UhdrZsiH-4J9WL3B_z6gBcXVquCfgvFiErYuPWBQPeH9TU4I845X1W33IHe0eA=="
+  },
+  {
+    "file": "history-debug-description-for-history-row-a1000000-0000-4000-8000-000000000001-expand-any.txt",
+    "attachment": "Debug description for `\"history.row.A1000000-0000-4000-8000-000000000001.expand\" Any`",
+    "test": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+    "sha256": "4cfa6e3acfb9edcd7a8204b93adeb8384d9c298559b719865fa7ca161e1ccc46",
+    "bytes": 265,
+    "source_member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~WFuQVWdcGvLaG0olFin0leuLk_pAL9zf69_N7fl35zprbs_HPkF44_xHRPwr3q9Ipza8VGXuozbDRcnY86I3OA=="
+  },
+  {
+    "file": "history-debug-description-for-history-row-a1000000-0000-4000-8000-000000000001-expand-any.txt",
+    "attachment": "Debug description for `\"history.row.A1000000-0000-4000-8000-000000000001.expand\" Any`",
+    "test": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+    "sha256": "4cfa6e3acfb9edcd7a8204b93adeb8384d9c298559b719865fa7ca161e1ccc46",
+    "bytes": 265,
+    "source_member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~WFuQVWdcGvLaG0olFin0leuLk_pAL9zf69_N7fl35zprbs_HPkF44_xHRPwr3q9Ipza8VGXuozbDRcnY86I3OA=="
+  },
+  {
+    "file": "history-debug-description-for-history-row-a1000000-0000-4000-8000-000000000001-expand-any.txt",
+    "attachment": "Debug description for `\"history.row.A1000000-0000-4000-8000-000000000001.expand\" Any`",
+    "test": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+    "sha256": "4cfa6e3acfb9edcd7a8204b93adeb8384d9c298559b719865fa7ca161e1ccc46",
+    "bytes": 265,
+    "source_member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~WFuQVWdcGvLaG0olFin0leuLk_pAL9zf69_N7fl35zprbs_HPkF44_xHRPwr3q9Ipza8VGXuozbDRcnY86I3OA=="
+  },
+  {
+    "file": "history-debug-description-for-history-row-a1000000-0000-4000-8000-000000000001-expand-any.txt",
+    "attachment": "Debug description for `\"history.row.A1000000-0000-4000-8000-000000000001.expand\" Any`",
+    "test": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+    "sha256": "4cfa6e3acfb9edcd7a8204b93adeb8384d9c298559b719865fa7ca161e1ccc46",
+    "bytes": 265,
+    "source_member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~WFuQVWdcGvLaG0olFin0leuLk_pAL9zf69_N7fl35zprbs_HPkF44_xHRPwr3q9Ipza8VGXuozbDRcnY86I3OA=="
+  },
+  {
+    "file": "history-debug-description-for-history-row-a1000000-0000-4000-8000-000000000001-expand-any.txt",
+    "attachment": "Debug description for `\"history.row.A1000000-0000-4000-8000-000000000001.expand\" Any`",
+    "test": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+    "sha256": "4cfa6e3acfb9edcd7a8204b93adeb8384d9c298559b719865fa7ca161e1ccc46",
+    "bytes": 265,
+    "source_member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~WFuQVWdcGvLaG0olFin0leuLk_pAL9zf69_N7fl35zprbs_HPkF44_xHRPwr3q9Ipza8VGXuozbDRcnY86I3OA=="
+  },
+  {
+    "file": "history-app-ui-hierarchy-for-com-negentropi-romajusttalk.txt",
+    "attachment": "App UI hierarchy for com.negentropi.RomaJustTalk",
+    "test": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+    "sha256": "a47200ac7ead6d3757f1f59d866b2f82f423ea12c1cf2ad10a606020c5c3a071",
+    "bytes": 71320,
+    "source_member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~xhLUp2G5gVx2p6iXSWzM8e5_8aCEgOsbrtVbKcig4qX0BHTZBWYBCiBt3X9LMHH6_kqzyB29ieWIE-uSW0SAAQ=="
+  },
+  {
+    "file": "history-history-expansion-target-hierarchy-a1000000-0000-4000-8000-000000000001.txt",
+    "attachment": "History expansion target hierarchy A1000000-0000-4000-8000-000000000001",
+    "test": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+    "sha256": "bb6650d447ae961e90f73197a7416eeac7c17727fd9f3066264cc958f80e80f4",
+    "bytes": 42399,
+    "source_member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~evlACIe0KO2GeqwBu4wb-naqockO-YBcikpM5OcGz8sL5FR02BV4rIM9PBN-akwgNZ3_ewVtCeHM7CKmpVcxlA=="
+  },
+  {
+    "file": "history-history-expansion-target-unavailable.png",
+    "attachment": "History expansion target unavailable",
+    "test": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+    "sha256": "bffdace4aa569b623186d50e0fb1a1bc7895bbf7965a984005192feb8670c8de",
+    "bytes": 118160,
+    "source_member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~uuMYwQhwb65EzG9x0TyPe8EGn13allcMXdFtmA92HaLHYV1EOPBoFnpF8XmAnjVnxOQO9xX3eHzMNyJlhgin_g=="
+  }
+]

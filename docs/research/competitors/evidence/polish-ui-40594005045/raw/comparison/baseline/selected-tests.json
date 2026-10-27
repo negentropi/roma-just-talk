@@ -1,0 +1,50 @@
+{
+  "errors" : [
+
+  ],
+  "values" : [
+    {
+      "disabledTests" : [
+        {
+          "identifier" : "VoiceInkUITests/UpdaterE2ETests/testSeamlessBackgroundUpdateInstallsAndRelaunches()"
+        },
+        {
+          "identifier" : "VoiceInkUITests/VoiceInkUITests/testExample()"
+        },
+        {
+          "identifier" : "VoiceInkUITests/VoiceInkUITests/testLaunchPerformance()"
+        },
+        {
+          "identifier" : "VoiceInkUITests/VoiceInkUITestsLaunchTests/testLaunch()"
+        },
+        {
+          "identifier" : "VoiceInkUITests/WritingFeaturesUITests/testCSVImportPreviewsMultilineContentBeforeReplacing()"
+        },
+        {
+          "identifier" : "VoiceInkUITests/WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()"
+        },
+        {
+          "identifier" : "VoiceInkUITests/WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()"
+        },
+        {
+          "identifier" : "VoiceInkUITests/WritingFeaturesUITests/testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch()"
+        },
+        {
+          "identifier" : "VoiceInkUITests/WritingFeaturesUITests/testTranslationTargetsReorderSelectAndPersist()"
+        },
+        {
+          "identifier" : "VoiceInkUITests/WritingPowerModeUITests/testSnippetEditsPreservePowerModeRestoration()"
+        },
+        {
+          "identifier" : "VoiceInkUITests/WritingPowerModeUITests/testTargetChangesPreservePowerModeRestoration()"
+        }
+      ],
+      "enabledTests" : [
+        {
+          "identifier" : "VoiceInkUITests/WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()"
+        }
+      ],
+      "testPlan" : "VoiceInk"
+    }
+  ]
+}

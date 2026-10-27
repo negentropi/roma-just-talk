@@ -1,0 +1,31 @@
+{
+  "source_only": true,
+  "base_revision": "641dcc6de3341acdffe41fe62f45e074bec749ef",
+  "candidate_ui_sha256": "911039b62c26afc614cae29b252dc88105dc133f76a8201698a244470335860f",
+  "runtime_evidence_source": "c29ac2d7c6fa7690ea3bd0d5a38697b44a37d182",
+  "approved_changes": [
+    {
+      "test": "testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings",
+      "delta": "Remove only2-line redundant reveal(paragraphBreaks,towardTop:true); retain existing downward formatting/relaunch/library assertions.",
+      "before_body_sha256": "90bbfb9941a9e5487d898f5a58c53dbbf2d6e3d7fc0505a07b5a410e03a5117e",
+      "after_body_sha256": "24229d2ec9dc2579e4f808a68d4df4036d6a417181b7a63b8f05a282578f75d4"
+    },
+    {
+      "test": "testApprovedHistoryCorrectionSurvivesSourceDeletion",
+      "delta": "Future8 selection matches observed nativeCheckBox, unique wrapper resolution, enabled/hittable andexact0\u21921. This new correction case was excluded from c29 run.",
+      "before_body_sha256": "ab38d978f1c3c8822c692d3e3e3a1b72a15336731f14ef6d5e47ed22d390cb10",
+      "after_body_sha256": "123c7ed958e8ef87663d89faa5bfc5120377ee1d428624af691d8a45a655ae35"
+    },
+    {
+      "helper": "historyExpandTarget",
+      "delta": "Query exact global native Button identifier after actual Opus replaces gesture header with a semantic Button; keep uniqueness/row frame/failure diagnostics and ordinary click.",
+      "production_source_path": "VoiceInk/Views/History/InlineHistoryView.swift",
+      "production_source_sha256": "fc360008be4edf053b6b747e44cfb57e157f18ac7a31a1beeb4fa25c4b962ee6",
+      "runtime": "Pending candidate; c29 actual AX had no global expansion target."
+    }
+  ],
+  "original_four_bodies_unchanged": true,
+  "all_six_bodies_unchanged_claim": false,
+  "independent_source_review": "clean",
+  "runtime_of_candidate_fix": "pending"
+}

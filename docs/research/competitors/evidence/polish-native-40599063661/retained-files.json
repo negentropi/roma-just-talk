@@ -1,0 +1,70 @@
+{
+  "build-command.json": {
+    "bytes": 1121,
+    "sha256": "996f00063b2b71a50c6a412faace54edc8d07709c702007ead5d6a1dff1f394e"
+  },
+  "build-settings.json": {
+    "bytes": 41246,
+    "sha256": "b767bfe87bf82e479e9559b4e92817397a429bacf40745da68af7326176aa043"
+  },
+  "contract.json": {
+    "bytes": 1248,
+    "sha256": "3a3be4a838c4bfadf98c74bfa6ccca31f042d30dc75d763836059f3221065ad6"
+  },
+  "failure-native.json": {
+    "bytes": 180,
+    "sha256": "299329b16677f96785686d333d5909adf38fff11a2288d5be5110673558768c3"
+  },
+  "failure-verify.json": {
+    "bytes": 184,
+    "sha256": "4bae798fa452010603cfb2682a082a6255a207597151d9ec5226a7f62a1ac5d0"
+  },
+  "packages/candidate-strict-resolve.json": {
+    "bytes": 48,
+    "sha256": "b8d7c4a83bc62f449ed9b854ff63c039bbfd672feff6a72e84e7ade28e08c02e"
+  },
+  "packages/canonical-graph-contract.json": {
+    "bytes": 838,
+    "sha256": "135dedb03f8797e4259cf48bfb40a97123ca712b09755c26b791e4197e9bb69f"
+  },
+  "packages/canonical.Package.resolved": {
+    "bytes": 11320,
+    "sha256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f"
+  },
+  "packages-before.json": {
+    "bytes": 6824,
+    "sha256": "d2fd7ea4df957a932fd5eb85915aa8a3239c324c17f27cb433d74b96e740adf7"
+  },
+  "resolved-test-host-settings.json": {
+    "bytes": 411,
+    "sha256": "275722e248d8b74a288cfd70e2f2cc3c92753562959f176181796ad2362eaceb"
+  },
+  "source/DictationProfileImportLiveTests.swift": {
+    "bytes": 40772,
+    "sha256": "f9ea899d5d565009a545dd3846b22b9d23b143a08092e098f597113f4687ac54"
+  },
+  "source/WritingTargetLiveTests.swift": {
+    "bytes": 95557,
+    "sha256": "259a0b77b10eb58e20a2f5d6c708afe16822fcdee96c90e5cca26717ed4f751b"
+  },
+  "source-before.json": {
+    "bytes": 82889,
+    "sha256": "be8c1084f15016b6356fc5196b8a4ac534c897fab0c1f54108c8da5341f9e294"
+  },
+  "static-whisper-before.json": {
+    "bytes": 11104,
+    "sha256": "b90e912c7f892580e7c18e14626cf3dc54bb90b2c73207c03e2b605fc3bfb2c7"
+  },
+  "sw-vers.txt": {
+    "bytes": 65,
+    "sha256": "cd5d6399b3785b04ceaae75045a9ca9f80f0bbc3526eff9d0c36b170ed1ec348"
+  },
+  "swift-version.txt": {
+    "bytes": 128,
+    "sha256": "5fa4b669e41b23b9ad0760253d062493487f93cf5d8ad8c44f0d4fd635137499"
+  },
+  "xcode-version.txt": {
+    "bytes": 32,
+    "sha256": "18730ed2ae28a2c9cf0c2d5db549033a4f07089331391a7133b7b32187454fa9"
+  }
+}

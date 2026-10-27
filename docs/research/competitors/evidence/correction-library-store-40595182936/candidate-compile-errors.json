@@ -1,0 +1,162 @@
+{
+  "logSHA256": "fe6316f9715f2c571ef6cb5646c9d73501d4216d76e609e32fa020e9b991f6c0",
+  "logBytes": 5088979,
+  "diagnostics": [
+    {
+      "line": 22131,
+      "context": [
+        "final internal class Transcription : VoiceInkCore.VoiceInkStoredAudioRecord, VoiceInkCore.VoiceInkSessionMetricSource, VoiceInkCore.VoiceInkPerformanceRecord, VoiceInkCore.VoiceInkMutableTranscriptionEnhancementMetadataRecord {",
+        "                     ^",
+        "@__swiftmacro_13VoiceInkTests0042DictionaryContextFreshnessTestsswift_IyBInfMX48_16_33_7A7A27ED8CF6046CB661E5AAE672C3B3Ll7requirefMf_.swift:1:50: error: call to main actor-isolated static method 'removeWordReplacement(_:context:)' in a synchronous nonisolated context",
+        "Testing.__checkBinaryOperation(DictionaryService.removeWordReplacement(entry, context: context),{ $0 == $1() },nil,expression: .__fromBinaryOperation(.__fromSyntaxNode(\"DictionaryService.removeWordReplacement(entry, context: context)\"),\"==\",.__fromSyntaxNode(\"nil\")),comments: [],isRequired: true,sourceLocation: Testing.SourceLocation.__here()).__required()",
+        "                                                 ^",
+        "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/DictionaryContextFreshnessTests.swift:49:17: note: in expansion of macro 'require' here",
+        "            try #require(DictionaryService.removeWordReplacement(entry, context: context) == nil)"
+      ]
+    },
+    {
+      "line": 22301,
+      "context": [
+        "final internal class Transcription : VoiceInkCore.VoiceInkStoredAudioRecord, VoiceInkCore.VoiceInkSessionMetricSource, VoiceInkCore.VoiceInkPerformanceRecord, VoiceInkCore.VoiceInkMutableTranscriptionEnhancementMetadataRecord {",
+        "                     ^",
+        "@__swiftmacro_13VoiceInkTests0042DictionaryContextFreshnessTestsswift_IyBInfMX48_16_33_7A7A27ED8CF6046CB661E5AAE672C3B3Ll7requirefMf_.swift:1:50: error: call to main actor-isolated static method 'removeWordReplacement(_:context:)' in a synchronous nonisolated context",
+        "Testing.__checkBinaryOperation(DictionaryService.removeWordReplacement(entry, context: context),{ $0 == $1() },nil,expression: .__fromBinaryOperation(.__fromSyntaxNode(\"DictionaryService.removeWordReplacement(entry, context: context)\"),\"==\",.__fromSyntaxNode(\"nil\")),comments: [],isRequired: true,sourceLocation: Testing.SourceLocation.__here()).__required()",
+        "                                                 ^",
+        "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/DictionaryContextFreshnessTests.swift:49:17: note: in expansion of macro 'require' here",
+        "            try #require(DictionaryService.removeWordReplacement(entry, context: context) == nil)"
+      ]
+    },
+    {
+      "line": 22471,
+      "context": [
+        "final internal class Transcription : VoiceInkCore.VoiceInkStoredAudioRecord, VoiceInkCore.VoiceInkSessionMetricSource, VoiceInkCore.VoiceInkPerformanceRecord, VoiceInkCore.VoiceInkMutableTranscriptionEnhancementMetadataRecord {",
+        "                     ^",
+        "@__swiftmacro_13VoiceInkTests0042DictionaryContextFreshnessTestsswift_IyBInfMX48_16_33_7A7A27ED8CF6046CB661E5AAE672C3B3Ll7requirefMf_.swift:1:50: error: call to main actor-isolated static method 'removeWordReplacement(_:context:)' in a synchronous nonisolated context",
+        "Testing.__checkBinaryOperation(DictionaryService.removeWordReplacement(entry, context: context),{ $0 == $1() },nil,expression: .__fromBinaryOperation(.__fromSyntaxNode(\"DictionaryService.removeWordReplacement(entry, context: context)\"),\"==\",.__fromSyntaxNode(\"nil\")),comments: [],isRequired: true,sourceLocation: Testing.SourceLocation.__here()).__required()",
+        "                                                 ^",
+        "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/DictionaryContextFreshnessTests.swift:49:17: note: in expansion of macro 'require' here",
+        "            try #require(DictionaryService.removeWordReplacement(entry, context: context) == nil)"
+      ]
+    },
+    {
+      "line": 22641,
+      "context": [
+        "final internal class Transcription : VoiceInkCore.VoiceInkStoredAudioRecord, VoiceInkCore.VoiceInkSessionMetricSource, VoiceInkCore.VoiceInkPerformanceRecord, VoiceInkCore.VoiceInkMutableTranscriptionEnhancementMetadataRecord {",
+        "                     ^",
+        "@__swiftmacro_13VoiceInkTests0042DictionaryContextFreshnessTestsswift_IyBInfMX48_16_33_7A7A27ED8CF6046CB661E5AAE672C3B3Ll7requirefMf_.swift:1:50: error: call to main actor-isolated static method 'removeWordReplacement(_:context:)' in a synchronous nonisolated context",
+        "Testing.__checkBinaryOperation(DictionaryService.removeWordReplacement(entry, context: context),{ $0 == $1() },nil,expression: .__fromBinaryOperation(.__fromSyntaxNode(\"DictionaryService.removeWordReplacement(entry, context: context)\"),\"==\",.__fromSyntaxNode(\"nil\")),comments: [],isRequired: true,sourceLocation: Testing.SourceLocation.__here()).__required()",
+        "                                                 ^",
+        "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/DictionaryContextFreshnessTests.swift:49:17: note: in expansion of macro 'require' here",
+        "            try #require(DictionaryService.removeWordReplacement(entry, context: context) == nil)"
+      ]
+    },
+    {
+      "line": 22823,
+      "context": [
+        "final internal class Transcription : VoiceInkCore.VoiceInkStoredAudioRecord, VoiceInkCore.VoiceInkSessionMetricSource, VoiceInkCore.VoiceInkPerformanceRecord, VoiceInkCore.VoiceInkMutableTranscriptionEnhancementMetadataRecord {",
+        "                     ^",
+        "@__swiftmacro_13VoiceInkTests0042DictionaryContextFreshnessTestsswift_IyBInfMX48_16_33_7A7A27ED8CF6046CB661E5AAE672C3B3Ll7requirefMf_.swift:1:50: error: call to main actor-isolated static method 'removeWordReplacement(_:context:)' in a synchronous nonisolated context",
+        "Testing.__checkBinaryOperation(DictionaryService.removeWordReplacement(entry, context: context),{ $0 == $1() },nil,expression: .__fromBinaryOperation(.__fromSyntaxNode(\"DictionaryService.removeWordReplacement(entry, context: context)\"),\"==\",.__fromSyntaxNode(\"nil\")),comments: [],isRequired: true,sourceLocation: Testing.SourceLocation.__here()).__required()",
+        "                                                 ^",
+        "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/DictionaryContextFreshnessTests.swift:49:17: note: in expansion of macro 'require' here",
+        "            try #require(DictionaryService.removeWordReplacement(entry, context: context) == nil)"
+      ]
+    },
+    {
+      "line": 22993,
+      "context": [
+        "final internal class Transcription : VoiceInkCore.VoiceInkStoredAudioRecord, VoiceInkCore.VoiceInkSessionMetricSource, VoiceInkCore.VoiceInkPerformanceRecord, VoiceInkCore.VoiceInkMutableTranscriptionEnhancementMetadataRecord {",
+        "                     ^",
+        "@__swiftmacro_13VoiceInkTests0042DictionaryContextFreshnessTestsswift_IyBInfMX48_16_33_7A7A27ED8CF6046CB661E5AAE672C3B3Ll7requirefMf_.swift:1:50: error: call to main actor-isolated static method 'removeWordReplacement(_:context:)' in a synchronous nonisolated context",
+        "Testing.__checkBinaryOperation(DictionaryService.removeWordReplacement(entry, context: context),{ $0 == $1() },nil,expression: .__fromBinaryOperation(.__fromSyntaxNode(\"DictionaryService.removeWordReplacement(entry, context: context)\"),\"==\",.__fromSyntaxNode(\"nil\")),comments: [],isRequired: true,sourceLocation: Testing.SourceLocation.__here()).__required()",
+        "                                                 ^",
+        "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/DictionaryContextFreshnessTests.swift:49:17: note: in expansion of macro 'require' here",
+        "            try #require(DictionaryService.removeWordReplacement(entry, context: context) == nil)"
+      ]
+    },
+    {
+      "line": 23163,
+      "context": [
+        "final internal class Transcription : VoiceInkCore.VoiceInkStoredAudioRecord, VoiceInkCore.VoiceInkSessionMetricSource, VoiceInkCore.VoiceInkPerformanceRecord, VoiceInkCore.VoiceInkMutableTranscriptionEnhancementMetadataRecord {",
+        "                     ^",
+        "@__swiftmacro_13VoiceInkTests0042DictionaryContextFreshnessTestsswift_IyBInfMX48_16_33_7A7A27ED8CF6046CB661E5AAE672C3B3Ll7requirefMf_.swift:1:50: error: call to main actor-isolated static method 'removeWordReplacement(_:context:)' in a synchronous nonisolated context",
+        "Testing.__checkBinaryOperation(DictionaryService.removeWordReplacement(entry, context: context),{ $0 == $1() },nil,expression: .__fromBinaryOperation(.__fromSyntaxNode(\"DictionaryService.removeWordReplacement(entry, context: context)\"),\"==\",.__fromSyntaxNode(\"nil\")),comments: [],isRequired: true,sourceLocation: Testing.SourceLocation.__here()).__required()",
+        "                                                 ^",
+        "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/DictionaryContextFreshnessTests.swift:49:17: note: in expansion of macro 'require' here",
+        "            try #require(DictionaryService.removeWordReplacement(entry, context: context) == nil)"
+      ]
+    },
+    {
+      "line": 23333,
+      "context": [
+        "final internal class Transcription : VoiceInkCore.VoiceInkStoredAudioRecord, VoiceInkCore.VoiceInkSessionMetricSource, VoiceInkCore.VoiceInkPerformanceRecord, VoiceInkCore.VoiceInkMutableTranscriptionEnhancementMetadataRecord {",
+        "                     ^",
+        "@__swiftmacro_13VoiceInkTests0042DictionaryContextFreshnessTestsswift_IyBInfMX48_16_33_7A7A27ED8CF6046CB661E5AAE672C3B3Ll7requirefMf_.swift:1:50: error: call to main actor-isolated static method 'removeWordReplacement(_:context:)' in a synchronous nonisolated context",
+        "Testing.__checkBinaryOperation(DictionaryService.removeWordReplacement(entry, context: context),{ $0 == $1() },nil,expression: .__fromBinaryOperation(.__fromSyntaxNode(\"DictionaryService.removeWordReplacement(entry, context: context)\"),\"==\",.__fromSyntaxNode(\"nil\")),comments: [],isRequired: true,sourceLocation: Testing.SourceLocation.__here()).__required()",
+        "                                                 ^",
+        "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/DictionaryContextFreshnessTests.swift:49:17: note: in expansion of macro 'require' here",
+        "            try #require(DictionaryService.removeWordReplacement(entry, context: context) == nil)"
+      ]
+    },
+    {
+      "line": 23503,
+      "context": [
+        "final internal class Transcription : VoiceInkCore.VoiceInkStoredAudioRecord, VoiceInkCore.VoiceInkSessionMetricSource, VoiceInkCore.VoiceInkPerformanceRecord, VoiceInkCore.VoiceInkMutableTranscriptionEnhancementMetadataRecord {",
+        "                     ^",
+        "@__swiftmacro_13VoiceInkTests0042DictionaryContextFreshnessTestsswift_IyBInfMX48_16_33_7A7A27ED8CF6046CB661E5AAE672C3B3Ll7requirefMf_.swift:1:50: error: call to main actor-isolated static method 'removeWordReplacement(_:context:)' in a synchronous nonisolated context",
+        "Testing.__checkBinaryOperation(DictionaryService.removeWordReplacement(entry, context: context),{ $0 == $1() },nil,expression: .__fromBinaryOperation(.__fromSyntaxNode(\"DictionaryService.removeWordReplacement(entry, context: context)\"),\"==\",.__fromSyntaxNode(\"nil\")),comments: [],isRequired: true,sourceLocation: Testing.SourceLocation.__here()).__required()",
+        "                                                 ^",
+        "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/DictionaryContextFreshnessTests.swift:49:17: note: in expansion of macro 'require' here",
+        "            try #require(DictionaryService.removeWordReplacement(entry, context: context) == nil)"
+      ]
+    },
+    {
+      "line": 23673,
+      "context": [
+        "final internal class Transcription : VoiceInkCore.VoiceInkStoredAudioRecord, VoiceInkCore.VoiceInkSessionMetricSource, VoiceInkCore.VoiceInkPerformanceRecord, VoiceInkCore.VoiceInkMutableTranscriptionEnhancementMetadataRecord {",
+        "                     ^",
+        "@__swiftmacro_13VoiceInkTests0042DictionaryContextFreshnessTestsswift_IyBInfMX48_16_33_7A7A27ED8CF6046CB661E5AAE672C3B3Ll7requirefMf_.swift:1:50: error: call to main actor-isolated static method 'removeWordReplacement(_:context:)' in a synchronous nonisolated context",
+        "Testing.__checkBinaryOperation(DictionaryService.removeWordReplacement(entry, context: context),{ $0 == $1() },nil,expression: .__fromBinaryOperation(.__fromSyntaxNode(\"DictionaryService.removeWordReplacement(entry, context: context)\"),\"==\",.__fromSyntaxNode(\"nil\")),comments: [],isRequired: true,sourceLocation: Testing.SourceLocation.__here()).__required()",
+        "                                                 ^",
+        "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/DictionaryContextFreshnessTests.swift:49:17: note: in expansion of macro 'require' here",
+        "            try #require(DictionaryService.removeWordReplacement(entry, context: context) == nil)"
+      ]
+    },
+    {
+      "line": 23843,
+      "context": [
+        "final internal class Transcription : VoiceInkCore.VoiceInkStoredAudioRecord, VoiceInkCore.VoiceInkSessionMetricSource, VoiceInkCore.VoiceInkPerformanceRecord, VoiceInkCore.VoiceInkMutableTranscriptionEnhancementMetadataRecord {",
+        "                     ^",
+        "@__swiftmacro_13VoiceInkTests0042DictionaryContextFreshnessTestsswift_IyBInfMX48_16_33_7A7A27ED8CF6046CB661E5AAE672C3B3Ll7requirefMf_.swift:1:50: error: call to main actor-isolated static method 'removeWordReplacement(_:context:)' in a synchronous nonisolated context",
+        "Testing.__checkBinaryOperation(DictionaryService.removeWordReplacement(entry, context: context),{ $0 == $1() },nil,expression: .__fromBinaryOperation(.__fromSyntaxNode(\"DictionaryService.removeWordReplacement(entry, context: context)\"),\"==\",.__fromSyntaxNode(\"nil\")),comments: [],isRequired: true,sourceLocation: Testing.SourceLocation.__here()).__required()",
+        "                                                 ^",
+        "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/DictionaryContextFreshnessTests.swift:49:17: note: in expansion of macro 'require' here",
+        "            try #require(DictionaryService.removeWordReplacement(entry, context: context) == nil)"
+      ]
+    },
+    {
+      "line": 24013,
+      "context": [
+        "final internal class Transcription : VoiceInkCore.VoiceInkStoredAudioRecord, VoiceInkCore.VoiceInkSessionMetricSource, VoiceInkCore.VoiceInkPerformanceRecord, VoiceInkCore.VoiceInkMutableTranscriptionEnhancementMetadataRecord {",
+        "                     ^",
+        "@__swiftmacro_13VoiceInkTests0042DictionaryContextFreshnessTestsswift_IyBInfMX48_16_33_7A7A27ED8CF6046CB661E5AAE672C3B3Ll7requirefMf_.swift:1:50: error: call to main actor-isolated static method 'removeWordReplacement(_:context:)' in a synchronous nonisolated context",
+        "Testing.__checkBinaryOperation(DictionaryService.removeWordReplacement(entry, context: context),{ $0 == $1() },nil,expression: .__fromBinaryOperation(.__fromSyntaxNode(\"DictionaryService.removeWordReplacement(entry, context: context)\"),\"==\",.__fromSyntaxNode(\"nil\")),comments: [],isRequired: true,sourceLocation: Testing.SourceLocation.__here()).__required()",
+        "                                                 ^",
+        "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/DictionaryContextFreshnessTests.swift:49:17: note: in expansion of macro 'require' here",
+        "            try #require(DictionaryService.removeWordReplacement(entry, context: context) == nil)"
+      ]
+    },
+    {
+      "line": 24183,
+      "context": [
+        "final internal class Transcription : VoiceInkCore.VoiceInkStoredAudioRecord, VoiceInkCore.VoiceInkSessionMetricSource, VoiceInkCore.VoiceInkPerformanceRecord, VoiceInkCore.VoiceInkMutableTranscriptionEnhancementMetadataRecord {",
+        "                     ^",
+        "@__swiftmacro_13VoiceInkTests0042DictionaryContextFreshnessTestsswift_IyBInfMX48_16_33_7A7A27ED8CF6046CB661E5AAE672C3B3Ll7requirefMf_.swift:1:50: error: call to main actor-isolated static method 'removeWordReplacement(_:context:)' in a synchronous nonisolated context",
+        "Testing.__checkBinaryOperation(DictionaryService.removeWordReplacement(entry, context: context),{ $0 == $1() },nil,expression: .__fromBinaryOperation(.__fromSyntaxNode(\"DictionaryService.removeWordReplacement(entry, context: context)\"),\"==\",.__fromSyntaxNode(\"nil\")),comments: [],isRequired: true,sourceLocation: Testing.SourceLocation.__here()).__required()",
+        "                                                 ^",
+        "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/DictionaryContextFreshnessTests.swift:49:17: note: in expansion of macro 'require' here",
+        "            try #require(DictionaryService.removeWordReplacement(entry, context: context) == nil)"
+      ]
+    }
+  ]
+}

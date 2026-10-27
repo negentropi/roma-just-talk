@@ -1,0 +1,69 @@
+{
+  "run_id": 40594005045,
+  "source_sha": "c29ac2d7c6fa7690ea3bd0d5a38697b44a37d182",
+  "style": {
+    "viewport": [
+      312,
+      147,
+      400,
+      502
+    ],
+    "paragraph_switch": [
+      645,
+      812,
+      38,
+      18
+    ],
+    "scrollbar_value": 0,
+    "profile": "Custom",
+    "retained_style": "Formal",
+    "source_prelude_towardTop": true,
+    "actual_wheel_deltaY": 180,
+    "attempts": 10,
+    "failure": "Requested upward scrolling while the exact target is below viewport.",
+    "repair": "Delete only the redundant two-line upward reveal; existing assertCustomFormatting reveals downward."
+  },
+  "history": {
+    "row_role": "Group",
+    "row_identifier": "history.row.A1000000-0000-4000-8000-000000000001",
+    "row_frame": [
+      275,
+      152,
+      692,
+      54
+    ],
+    "selection_role": "CheckBox",
+    "selection_identifier": "circle",
+    "selection_value": 0,
+    "expand_identifier_globally_present": false,
+    "children": [
+      "CheckBox",
+      "timestamp StaticText",
+      "preview StaticText",
+      "chevron.right Image"
+    ],
+    "failure": "The gesture header has no independent accessible expansion element.",
+    "repair": "Actual Opus owns a real semantic expansion button; exact identifier and row-frame test remain strict."
+  },
+  "tcc": {
+    "standalone_rows": [
+      {
+        "file": "system-tcc.json",
+        "initial_seed_verify_byte_equal": true,
+        "rows": 1,
+        "auth_value": 2,
+        "sha256": "803b5e624fcbe042a6a226b322fe11010e5849eaf28269c676d1cea0779c1c1d",
+        "csreq_sha256": "12b1aaaf158b4b3409455f8213bc9c287d1332d292521fc42b3a1220c0343294"
+      },
+      {
+        "file": "microphone-tcc.json",
+        "initial_seed_verify_byte_equal": true,
+        "rows": 1,
+        "auth_value": 2,
+        "sha256": "88131c65f014b20b54ea2e5ca6aeddd77b0b3a450bee171ba09091dd0a297e4d",
+        "csreq_sha256": "12b1aaaf158b4b3409455f8213bc9c287d1332d292521fc42b3a1220c0343294"
+      }
+    ],
+    "limit": "Does not establish the missing post-UI row from separate full Mac run40593996925. That auth value remains unknown."
+  }
+}

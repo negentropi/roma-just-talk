@@ -1,0 +1,163 @@
+{
+  "run_id": 40593996925,
+  "head_sha": "c29ac2d7c6fa7690ea3bd0d5a38697b44a37d182",
+  "seed_phase": {
+    "actual_method_started": 1,
+    "actual_method_passed": 1,
+    "host_pid": 56770,
+    "normal_factory": "VoiceInkApp.createPersistentContainer(schema:logger:)",
+    "factory_body_sha256": "e7b262d01bcdeb97f61e6e93b26bad665f379cb69c0fcc229f307e59aaee9896",
+    "saved_counts": {
+      "SessionMetric": 0,
+      "Transcription": 4,
+      "VocabularyWord": 1,
+      "WordReplacement": 1
+    },
+    "closed_before_ui": true,
+    "files": {
+      "app-signature-after.txt": {
+        "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/history-seed/seed/app-signature-after.txt",
+        "bytes": 954,
+        "sha256": "835d6c5fa25fe7372112b73d8f1212f70a8920204efa4183017fcded01efbe16"
+      },
+      "app-signature-before.txt": {
+        "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/history-seed/seed/app-signature-before.txt",
+        "bytes": 954,
+        "sha256": "835d6c5fa25fe7372112b73d8f1212f70a8920204efa4183017fcded01efbe16"
+      },
+      "closed-write.json": {
+        "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/history-seed/seed/closed-write.json",
+        "bytes": 1775,
+        "sha256": "6c8a409951dbc0482d168f76aae0f37ca8c047d0adeb1cbb54bc529b5dbb61d8"
+      },
+      "expected-inputs.sha256.json": {
+        "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/history-seed/seed/expected-inputs.sha256.json",
+        "bytes": 192,
+        "sha256": "66fcfaab6e4756bbe72667bcf0ce1ec1c9c96a760b2d280494cc5f260809b7d4"
+      },
+      "expected-libraries.json": {
+        "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/history-seed/seed/expected-libraries.json",
+        "bytes": 3132,
+        "sha256": "99961585b4c4347e88ca3b5329845c52cf96de2c7be2f06a9bbfb54b86be1701"
+      },
+      "expected-rows.json": {
+        "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/history-seed/seed/expected-rows.json",
+        "bytes": 20340,
+        "sha256": "e238aebae556e7761bbd828567145bcd5b3978d54eb325e8781894b6c9e6035f"
+      },
+      "host-live.json": {
+        "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/history-seed/seed/host-live.json",
+        "bytes": 2210,
+        "sha256": "81322387a272dea705b94831e5f9fe40425278d5106d631e3ab9f0941967b956"
+      },
+      "host-observed.json": {
+        "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/history-seed/seed/host-observed.json",
+        "bytes": 480,
+        "sha256": "eea3cd97bc68c1fe8e6631c12351dbef79a2bf106e8e2c015bdad83850d3018d"
+      },
+      "identity-after.txt": {
+        "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/history-seed/seed/identity-after.txt",
+        "bytes": 433,
+        "sha256": "16a151dc0506d6230d0064370e4a7dda8a95700bec4b4d10ca54d3dcf802ad5a"
+      },
+      "identity-before.txt": {
+        "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/history-seed/seed/identity-before.txt",
+        "bytes": 433,
+        "sha256": "16a151dc0506d6230d0064370e4a7dda8a95700bec4b4d10ca54d3dcf802ad5a"
+      },
+      "libraries.json": {
+        "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/history-seed/seed/libraries.json",
+        "bytes": 3132,
+        "sha256": "99961585b4c4347e88ca3b5329845c52cf96de2c7be2f06a9bbfb54b86be1701"
+      },
+      "microphone-tcc.json": {
+        "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/history-seed/seed/microphone-tcc.json",
+        "bytes": 199,
+        "sha256": "b525d9ee28ee40bad6f746eb2044066438adede2483da444589e618da05067a5"
+      },
+      "observation.json": {
+        "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/history-seed/seed/observation.json",
+        "bytes": 1168,
+        "sha256": "2bb200a943404db50027130af7d63a21f0cb9365bd0c23d4c6a6651ac0c8a3b2"
+      },
+      "result.json": {
+        "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/history-seed/seed/result.json",
+        "bytes": 623,
+        "sha256": "3511c0eb6e2395db0c94a42542609116eb88c9cccea267276910099c7d73c244"
+      },
+      "rows.json": {
+        "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/history-seed/seed/rows.json",
+        "bytes": 20340,
+        "sha256": "e238aebae556e7761bbd828567145bcd5b3978d54eb325e8781894b6c9e6035f"
+      },
+      "schema-raw.json": {
+        "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/history-seed/seed/schema-raw.json",
+        "bytes": 18898,
+        "sha256": "06a72e9a17e717c24dc706a5471bcda463b8b33d00e0de718c88d9f7155eb411"
+      },
+      "selected-tests.json": {
+        "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/history-seed/seed/selected-tests.json",
+        "bytes": 37989,
+        "sha256": "e038cf4caf26c96e040a3f99be5b1a65578df99270c6723ece46f31e68affac0"
+      },
+      "selection-receipt.json": {
+        "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/history-seed/seed/selection-receipt.json",
+        "bytes": 26753,
+        "sha256": "6a386dc521c374b74b936f105b88d1ec42b5feab8bb23fa27093de3e0ba9e58b"
+      },
+      "source-inputs.json": {
+        "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/history-seed/seed/source-inputs.json",
+        "bytes": 1019,
+        "sha256": "9adb817aa7df5b978049756a95adfe89d4a1c4385e5016b10ec237f771f4f751"
+      },
+      "store-provenance.json": {
+        "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/history-seed/seed/store-provenance.json",
+        "bytes": 2584,
+        "sha256": "3d00ff2a6b7ffcd8170a06549785d5a33502429e79e41c7583da6282d8475080"
+      },
+      "system-tcc.json": {
+        "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/history-seed/seed/system-tcc.json",
+        "bytes": 202,
+        "sha256": "80db9d8e000313008f1aa809e8c79c31bb869835d9b5d0f6841cab1ca4d3a71a"
+      },
+      "test-bundle-signature-after.txt": {
+        "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/history-seed/seed/test-bundle-signature-after.txt",
+        "bytes": 988,
+        "sha256": "d97c9dd69e9312e101a768b2e7b3171ddd202d8196ddf565fd12c8fbbdbdb7e1"
+      },
+      "test-bundle-signature-before.txt": {
+        "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/history-seed/seed/test-bundle-signature-before.txt",
+        "bytes": 988,
+        "sha256": "d97c9dd69e9312e101a768b2e7b3171ddd202d8196ddf565fd12c8fbbdbdb7e1"
+      },
+      "tests-excerpt.txt": {
+        "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/history-seed/seed/tests-excerpt.txt",
+        "bytes": 177,
+        "sha256": "00b3a1e6e60b3b1103f44fa0d7f051aded1ea767d3635fc3888e53739a556b9d"
+      },
+      "xcodebuild-help.txt": {
+        "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/history-seed/seed/xcodebuild-help.txt",
+        "bytes": 24217,
+        "sha256": "f3f857451aa98d7dbaa155bec86591cf35d70cd106d742fdd2ba2c65c75b3a09"
+      }
+    }
+  },
+  "verify_phase": {
+    "executed": false,
+    "retained_files": [],
+    "reason": "Microphone TCC comparison failed before verify test selection/execution and before phase-file copy."
+  },
+  "permission_observation": {
+    "initial_and_seed_mic_readbacks_equal": true,
+    "auth_value": 2,
+    "matches_compiled_host_requirement": true,
+    "initial_byte_105_is_auth_value_2": true,
+    "post_ui_cmp_first_difference_byte": 105,
+    "post_ui_raw_row_not_retained": true
+  },
+  "limits": [
+    "Seed log excerpt proves one started/passed method; complete Native.xcresult and phase tests.log are not retained in this full-workflow artifact.",
+    "Synthetic seed save/closed normal-store proof is distinct from failed UI cases, absent verify phase, migrations, ASR and provider quality.",
+    "The post-UI comparison proves a difference at the auth_value byte; destination value is not retained and must not be invented."
+  ]
+}

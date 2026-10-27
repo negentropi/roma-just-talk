@@ -1,0 +1,76 @@
+{
+  "configurations" : [
+    {
+      "cloudKitContainerIdentifier" : null,
+      "entities" : [
+        "Transcription"
+      ],
+      "groupAppContainerIdentifier" : null,
+      "isStoredInMemoryOnly" : false,
+      "name" : "default",
+      "url" : "\/Users\/runner\/Library\/Application Support\/com.negentropi.RomaJustTalk\/default.store"
+    },
+    {
+      "cloudKitContainerIdentifier" : null,
+      "entities" : [
+        "VocabularyWord",
+        "WordReplacement"
+      ],
+      "groupAppContainerIdentifier" : null,
+      "isStoredInMemoryOnly" : false,
+      "name" : "dictionary",
+      "url" : "\/Users\/runner\/Library\/Application Support\/com.negentropi.RomaJustTalk\/dictionary.store"
+    },
+    {
+      "cloudKitContainerIdentifier" : null,
+      "entities" : [
+        "SessionMetric"
+      ],
+      "groupAppContainerIdentifier" : null,
+      "isStoredInMemoryOnly" : false,
+      "name" : "stats",
+      "url" : "\/Users\/runner\/Library\/Application Support\/com.negentropi.RomaJustTalk\/stats.store"
+    }
+  ],
+  "executablePath" : "\/Users\/runner\/work\/roma-just-talk\/roma-just-talk\/.local-build\/Build\/Products\/Debug\/roma just talk.app\/Contents\/MacOS\/roma just talk",
+  "explicitSaveCompleted" : true,
+  "factory" : "VoiceInkApp.createPersistentContainer(schema:logger:)",
+  "factoryBodySHA256" : "e7b262d01bcdeb97f61e6e93b26bad665f379cb69c0fcc229f307e59aaee9896",
+  "factorySourcePath" : "\/Users\/runner\/work\/roma-just-talk\/roma-just-talk\/VoiceInk\/VoiceInk.swift",
+  "factorySourceSHA256" : "063d2de45ce7a7b9f454421decd213a2d4bf4c4e78f37f7084f6a324502d5188",
+  "freshCounts" : {
+    "SessionMetric" : 0,
+    "Transcription" : 0,
+    "VocabularyWord" : 0,
+    "WordReplacement" : 0
+  },
+  "hostPID" : 56770,
+  "modelTypes" : [
+    "VoiceInk.Transcription",
+    "VoiceInk.VocabularyWord",
+    "VoiceInk.WordReplacement",
+    "VoiceInk.SessionMetric"
+  ],
+  "normalSupportDirectory" : "\/Users\/runner\/Library\/Application Support\/com.negentropi.RomaJustTalk",
+  "phase" : "seed",
+  "savedCounts" : {
+    "SessionMetric" : 0,
+    "Transcription" : 4,
+    "VocabularyWord" : 1,
+    "WordReplacement" : 1
+  },
+  "schemaSHA256" : "06a72e9a17e717c24dc706a5471bcda463b8b33d00e0de718c88d9f7155eb411",
+  "seedTimestamp" : 1793141187,
+  "sourceSHA" : "c29ac2d7c6fa7690ea3bd0d5a38697b44a37d182",
+  "startupStatsMigrationCompleted" : true,
+  "startupStatsMigrationRunning" : false,
+  "transcriptionTimestampOffsetsSeconds" : [
+    1,
+    2,
+    3,
+    4
+  ],
+  "verificationContextHasChanges" : false,
+  "verificationReadOnly" : false,
+  "version" : 1
+}

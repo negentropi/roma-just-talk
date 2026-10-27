@@ -1,0 +1,3 @@
+4353196a8fce0b48807754d29b5a5eadeb8373b209a545c4bc1663d12e4a2882  /Users/runner/work/_temp/writing-settings-ui-baseline/.writing-ui-regression-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk
+6b42ecfeb962542b0319037636ca6de061f41f83ab7345c062a8f3e784aacf48  /Users/runner/work/_temp/writing-settings-ui-baseline/.writing-ui-regression-build/Build/Products/Debug/VoiceInkUITests-Runner.app/Contents/MacOS/VoiceInkUITests-Runner
+a70c01c78a62103bacdc5153c110ca0daa4b3c8356079cba013095c797b6f777  /Users/runner/work/_temp/writing-settings-ui-baseline/.writing-ui-regression-build/Build/Products/Debug/VoiceInkUITests-Runner.app/Contents/PlugIns/VoiceInkUITests.xctest/Contents/MacOS/VoiceInkUITests

@@ -1,0 +1,47 @@
+{
+  "classification": "predecessor-control-passed-candidate-build-failed",
+  "runID": 40595182936,
+  "runURL": "https://github.com/negentropi/roma-just-talk/actions/runs/40595182936",
+  "testedHead": "a5601328e66d6949b5de052b81112ffadaeb1d1c",
+  "predecessorSHA": "ebf629b4cf109f7a36109ccac7b20ac70f9f48ab",
+  "artifact": {
+    "artifactID": 12776448544,
+    "bytes": 82560946,
+    "sha256": "4ab6e2b13cae44d896804f92e740d1ff5ec5619d735473f938e949a85b5f3fda",
+    "entries": 253,
+    "crcBadMember": null
+  },
+  "artifactFetches": 1,
+  "failedLogFetches": 1,
+  "predecessorArtifactDownloaded": false,
+  "predecessorHostPIDs": [
+    46879,
+    49314
+  ],
+  "predecessor39FieldsSchemaIDsAndClosedCopiesAudited": true,
+  "predecessorArchivedRuntimeFlags": [
+    "0x10002"
+  ],
+  "candidateCompileConditionsVerifiedForAppAndTests": true,
+  "uniqueCompilerDiagnostics": [
+    "@__swiftmacro_13VoiceInkTests0042DictionaryContextFreshnessTestsswift_IyBInfMX48_16_33_7A7A27ED8CF6046CB661E5AAE672C3B3Ll7requirefMf_.swift:1:50: error: call to main actor-isolated static method 'removeWordReplacement(_:context:)' in a synchronous nonisolated context"
+  ],
+  "candidateHostStarted": false,
+  "correctionMigrationProven": false,
+  "backendApprovalOrProvenancePersistenceProven": false,
+  "strictFullAuditorRejectedPartialRun": true,
+  "remoteFullArtifactPath": "/data/rjt-writing-check-01a17bef/40595182936/roma.correction-library-store-check.zip",
+  "scope": [
+    "Successful actual predecessor seed and separate reopen only.",
+    "Candidate test-target compile failed at DictionaryContextFreshnessTests.swift:49 before candidate runtime.",
+    "No six-field upgrade, new correction record persistence, human approval, UI, CloudKit sync, backward store-open, customer-store, provider call, or microphone inactivity proof.",
+    "Actual disposable app startup opened normal Application Support and attempted recorder pre-roll."
+  ],
+  "remoteAuditorSHA256": {
+    "audit_correction_closure.py": "a07138df3582d046ecd3a11aa9d0438a322f41c1aa1b50124d0233dbe68de155",
+    "audit_correction_records.py": "3d042965bc3513ef2ed3e8f9aa27af759c6a3afe5de9bdd4a6c1228f9bb16cdf",
+    "audit_correction_predecessor.py": "9cecf203fc5d819c23f4b8b667090b4027dd906f6b676a2503cedaf1ba7ae13f",
+    "inspect_signatures.py": "1afbb91ef589622db97e38c0f70ad40fa426856c36b59fb04fc19e4971b5ac36",
+    "audit_correction_partial_failure.py": "0841e4588d07b3ad434c80b24627ae2ce3639fdbc8c6edd7cea68aa216c33b6b"
+  }
+}

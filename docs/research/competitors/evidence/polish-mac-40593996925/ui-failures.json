@@ -1,0 +1,30 @@
+[
+  {
+    "identifier": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+    "status": "Failure",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~vo1m27ytacvYOSSoNBsnRIdLGVeweu9FAWee4fmIY9pgDoCDwgyhyVRMX0n1LRWNfd5RHA5gJDu8hEcHRgEUnQ==",
+    "decoded_summary_sha256": "4b33825bb6196d746b10b0f9e2bd3cdd6e6d0969abb7f7ac78f44f3a3dac6075",
+    "failures": [
+      {
+        "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkUITests/WritingFeaturesUITests.swift",
+        "lineNumber": "952",
+        "message": "XCTAssertTrue failed - The settings control was not fully visible after scrolling.",
+        "timestamp": "2026-10-27T22:55:05.637+0000"
+      }
+    ]
+  },
+  {
+    "identifier": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+    "status": "Failure",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~UpTwS0d9hUEYqs_nh68HoKnwQsoYrrI5r1hAaFn0oX4vhVKKkS-B3DqGyaMHfrS6cQYWOTz8CKX-oraB7eGsag==",
+    "decoded_summary_sha256": "2c496623a81e05dd5d5a5888f45635a5214fba622014672b4fb63e6b7b723ddf",
+    "failures": [
+      {
+        "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkUITests/WritingFeaturesUITests.swift",
+        "lineNumber": "496",
+        "message": "failed - History must expose one exact expansion target inside its owned row.",
+        "timestamp": "2026-10-27T22:55:48.698+0000"
+      }
+    ]
+  }
+]

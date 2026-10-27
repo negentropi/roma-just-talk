@@ -1,0 +1,36 @@
+{
+  "run_id": 40587701682,
+  "source_sha": "ebf629b4cf109f7a36109ccac7b20ac70f9f48ab",
+  "facts": [
+    {
+      "test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+      "line": 949,
+      "message": "XCTAssertTrue failed - Literal editor content changed.",
+      "timestamp": "2026-10-27T22:04:27.551+0000"
+    },
+    {
+      "test": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+      "line": 471,
+      "message": "XCTAssertTrue failed",
+      "timestamp": "2026-10-27T22:05:05.935+0000"
+    }
+  ],
+  "style": {
+    "declared_input": "\\r\\nProfile library Cafe\\u{301} \ud83d\udc69\ud83c\udffd\u200d\ud83d\udcbb\\r\\n",
+    "expected_character_count": 24,
+    "visible_counter": 26,
+    "recording_frame": "screenshots/style-56s.png",
+    "load_bearing_unproved_premise": "Keyboard typeText preserves literal CRLF input exactly.",
+    "repair": "Keep declared literal; use owned native Cmd-V and compare actual editor UTF8/UTF16."
+  },
+  "history": {
+    "row_id": "A1000000-0000-4000-8000-000000000001",
+    "owned_row_existed": true,
+    "owned_row_unique": true,
+    "nested_expand_existed": false,
+    "recording_frame": "screenshots/history-15s.png",
+    "load_bearing_unproved_premise": "SwiftUI expand target must appear as a descendant of the identified row.",
+    "repair": "One exact global expand ID, uniqueness and actual row-frame containment. Missing target retains AX/PNG then fails; no coordinate/role fallback."
+  },
+  "actor_census_limit": "No actual History AX hierarchy retained in failing run; visual row presence cannot establish native role/identifier placement."
+}

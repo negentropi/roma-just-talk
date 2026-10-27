@@ -1,0 +1,28 @@
+{
+  "candidate_not_built": true,
+  "classification": "predecessor-seed-and-reopen-passed",
+  "distinct_host_pids": [
+    46879,
+    49314
+  ],
+  "legacy_39_values_and_identifiers_equal": true,
+  "original_seed_immutable": true,
+  "phases": [
+    "seed",
+    "old-reopen"
+  ],
+  "schema_hashes": {
+    "old-reopen": {
+      "canonical_schema_sha256": "a384d4178a9c0f5cef58c00ffa01b9c3d1559719e4c49d9d9640bdbcec320f31",
+      "legacy_snapshots_sha256": "7d93c5cd868a756fb963fb93414045b655594c4cc069170e8955361edcb5e2d0",
+      "raw_schema_sha256": "6848d5217fe76aa5345a33b255c269abbef2c110c432513c8c5012cbc10cddc0",
+      "transcription_metadata_sha256": "4514c9203581c771c7d96cbaec0b41234df35f164aed801420bfd91ace4d6ee8"
+    },
+    "seed": {
+      "canonical_schema_sha256": "a384d4178a9c0f5cef58c00ffa01b9c3d1559719e4c49d9d9640bdbcec320f31",
+      "legacy_snapshots_sha256": "7d93c5cd868a756fb963fb93414045b655594c4cc069170e8955361edcb5e2d0",
+      "raw_schema_sha256": "1e52d364930e4a2f3ab639e3de11d1729c87f393f191e650a0dc59b56c7a4c92",
+      "transcription_metadata_sha256": "4514c9203581c771c7d96cbaec0b41234df35f164aed801420bfd91ace4d6ee8"
+    }
+  }
+}

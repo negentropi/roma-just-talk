@@ -1,0 +1,374 @@
+{
+  "native": {
+    "count": 32,
+    "all_bytes_equal": true,
+    "members": [
+      {
+        "member": "RJT-Writing-Live-0764DADB-88B7-47DE-A146-161B22832EAC-cleanup.json",
+        "full_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/RJT-Writing-Live-0764DADB-88B7-47DE-A146-161B22832EAC-cleanup.json",
+        "bytes": 279,
+        "sha256": "d708d166fe59bfb2281e563d09bffa99755807552a31024bb8f6e06828da8fd7"
+      },
+      {
+        "member": "RJT-Writing-Live-0764DADB-88B7-47DE-A146-161B22832EAC-pipeline-success-delivery.json",
+        "full_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/RJT-Writing-Live-0764DADB-88B7-47DE-A146-161B22832EAC-pipeline-success-delivery.json",
+        "bytes": 408,
+        "sha256": "b0e936c5eca50b6d5f1cb20e7167e2da7cf0f452a9acaf03bb34ee9aa3ac411c"
+      },
+      {
+        "member": "RJT-Writing-Live-1A001257-0BD2-40E0-A0C2-DCD08EDE9700-cleanup.json",
+        "full_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/RJT-Writing-Live-1A001257-0BD2-40E0-A0C2-DCD08EDE9700-cleanup.json",
+        "bytes": 346,
+        "sha256": "00d020f4f4fbf0a859e0f8e48014f48ceb64393a73f4229342b510eea1898a42"
+      },
+      {
+        "member": "RJT-Writing-Live-0764DADB-88B7-47DE-A146-161B22832EAC-fixture-startup.json",
+        "full_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/RJT-Writing-Live-0764DADB-88B7-47DE-A146-161B22832EAC-fixture-startup.json",
+        "bytes": 1184,
+        "sha256": "81b1fecc7ad83910672b00d230f85389d56869dde86669e909814dfe1a6f5e35"
+      },
+      {
+        "member": "RJT-Writing-Live-1A001257-0BD2-40E0-A0C2-DCD08EDE9700-fixture-startup.json",
+        "full_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/RJT-Writing-Live-1A001257-0BD2-40E0-A0C2-DCD08EDE9700-fixture-startup.json",
+        "bytes": 1184,
+        "sha256": "c40a13c157686b2f662cfd8c5831c612d3cbbcc1b8e483659ea1503024c1a1f8"
+      },
+      {
+        "member": "RJT-Writing-Live-1A001257-0BD2-40E0-A0C2-DCD08EDE9700-safari-replacement.json",
+        "full_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/RJT-Writing-Live-1A001257-0BD2-40E0-A0C2-DCD08EDE9700-safari-replacement.json",
+        "bytes": 417,
+        "sha256": "18049f5815ac855b3c85d859073b3e63aac29b64e9fb18b0059916072db12eaa"
+      },
+      {
+        "member": "RJT-Writing-Live-3C996E8B-10E4-4726-B746-9942BD24DFB1-cleanup.json",
+        "full_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/RJT-Writing-Live-3C996E8B-10E4-4726-B746-9942BD24DFB1-cleanup.json",
+        "bytes": 281,
+        "sha256": "857898cd116e00bb089f06de57dbe01757ca0d87b951c631d6902746c8d00ec5"
+      },
+      {
+        "member": "RJT-Writing-Live-3C996E8B-10E4-4726-B746-9942BD24DFB1-fixture-startup.json",
+        "full_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/RJT-Writing-Live-3C996E8B-10E4-4726-B746-9942BD24DFB1-fixture-startup.json",
+        "bytes": 1185,
+        "sha256": "778639a44887c7c4eafd4ce2d20b05097af81f4ac14e161a83df3b294ead3832"
+      },
+      {
+        "member": "RJT-Writing-Live-6B3B6DED-C765-48DC-ADEB-7F947AF64FC0-cleanup.json",
+        "full_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/RJT-Writing-Live-6B3B6DED-C765-48DC-ADEB-7F947AF64FC0-cleanup.json",
+        "bytes": 279,
+        "sha256": "d91c359c29b6a447c6c945e14b6070791156d717d2ced20febb3c85a1236963e"
+      },
+      {
+        "member": "RJT-Writing-Live-6B3B6DED-C765-48DC-ADEB-7F947AF64FC0-fixture-startup.json",
+        "full_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/RJT-Writing-Live-6B3B6DED-C765-48DC-ADEB-7F947AF64FC0-fixture-startup.json",
+        "bytes": 1182,
+        "sha256": "caf47d5b8644eb9ff08cacd621edf5053632ad5041c028102ee2eb2bdc4a3a53"
+      },
+      {
+        "member": "RJT-Writing-Live-6B3B6DED-C765-48DC-ADEB-7F947AF64FC0-pipeline-failure-delivery.json",
+        "full_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/RJT-Writing-Live-6B3B6DED-C765-48DC-ADEB-7F947AF64FC0-pipeline-failure-delivery.json",
+        "bytes": 372,
+        "sha256": "76444336e3dc77ad325beb2a155c274029098223ebb3feadd91d0279253abf85"
+      },
+      {
+        "member": "RJT-Writing-Live-71F78A7B-6E34-4DB0-9539-D1A8284B00C7-cleanup.json",
+        "full_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/RJT-Writing-Live-71F78A7B-6E34-4DB0-9539-D1A8284B00C7-cleanup.json",
+        "bytes": 281,
+        "sha256": "81c524873dd0b27fdb80bd28baf3f112c25ef8f4f549ab5e1426295cc12a7520"
+      },
+      {
+        "member": "RJT-Writing-Live-71F78A7B-6E34-4DB0-9539-D1A8284B00C7-fixture-startup.json",
+        "full_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/RJT-Writing-Live-71F78A7B-6E34-4DB0-9539-D1A8284B00C7-fixture-startup.json",
+        "bytes": 1185,
+        "sha256": "52790c1e605fa9edb1602a414c015a8131ac8616ba2c618add962048f3027711"
+      },
+      {
+        "member": "RJT-Writing-Live-DB542F8E-0825-4F36-8429-03026397AE99-cleanup.json",
+        "full_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/RJT-Writing-Live-DB542F8E-0825-4F36-8429-03026397AE99-cleanup.json",
+        "bytes": 281,
+        "sha256": "379dec77481239bfb5c011a9c636f6c3480c0a8dfa70156314f5065e4a5c6cea"
+      },
+      {
+        "member": "RJT-Writing-Live-DB542F8E-0825-4F36-8429-03026397AE99-fixture-startup.json",
+        "full_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/RJT-Writing-Live-DB542F8E-0825-4F36-8429-03026397AE99-fixture-startup.json",
+        "bytes": 1186,
+        "sha256": "f3bfb1644e4a87850e2d3a5164f725201aaccc57a823855a219df1f79539efb0"
+      },
+      {
+        "member": "RJT-Writing-Live-DB542F8E-0825-4F36-8429-03026397AE99-textedit-replacement.json",
+        "full_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/RJT-Writing-Live-DB542F8E-0825-4F36-8429-03026397AE99-textedit-replacement.json",
+        "bytes": 407,
+        "sha256": "8ec75424e3c2934963794655b20e21f473322546b61359f361aee50b851cd032"
+      },
+      {
+        "member": "RJT-Writing-Live-FDE61304-E79D-4B4A-823B-312AE4AF5CB2-cleanup.json",
+        "full_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/RJT-Writing-Live-FDE61304-E79D-4B4A-823B-312AE4AF5CB2-cleanup.json",
+        "bytes": 281,
+        "sha256": "50e44c7c1b5ad45b64a23fef4d2a8e08ec7fdf281bfef1e927aece26e70026ca"
+      },
+      {
+        "member": "RJT-Writing-Live-FDE61304-E79D-4B4A-823B-312AE4AF5CB2-fixture-startup.json",
+        "full_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/RJT-Writing-Live-FDE61304-E79D-4B4A-823B-312AE4AF5CB2-fixture-startup.json",
+        "bytes": 1185,
+        "sha256": "a283727e8172acb55a7c6f670597656402e12f78ee2c15fe9c93212ce6a6ed9c"
+      },
+      {
+        "member": "RJT-Writing-Live-FDE61304-E79D-4B4A-823B-312AE4AF5CB2-textedit-focus-drift.json",
+        "full_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/RJT-Writing-Live-FDE61304-E79D-4B4A-823B-312AE4AF5CB2-textedit-focus-drift.json",
+        "bytes": 369,
+        "sha256": "9c02599964319cc766530eeb3a2f967cf8de30a7eb7e05a3989f17428c9e6e6c"
+      },
+      {
+        "member": "RJT-Writing-Live-FDE61304-E79D-4B4A-823B-312AE4AF5CB2-textedit-range-drift.json",
+        "full_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/RJT-Writing-Live-FDE61304-E79D-4B4A-823B-312AE4AF5CB2-textedit-range-drift.json",
+        "bytes": 369,
+        "sha256": "752c311866129cab2c7a6f4dd4101a6691d138a822d24d92439d7939efedfd39"
+      },
+      {
+        "member": "RJT-Writing-Live-FDE61304-E79D-4B4A-823B-312AE4AF5CB2-textedit-text-drift.json",
+        "full_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/RJT-Writing-Live-FDE61304-E79D-4B4A-823B-312AE4AF5CB2-textedit-text-drift.json",
+        "bytes": 370,
+        "sha256": "d2d7e1e4e8543a35998d14acf893d08a831bfa43195dfee83ad855759459f69f"
+      },
+      {
+        "member": "RJT-Writing-Pipeline-6CC47EAA-430F-4252-ABEB-661E2DD751B8-failure.json",
+        "full_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/RJT-Writing-Pipeline-6CC47EAA-430F-4252-ABEB-661E2DD751B8-failure.json",
+        "bytes": 2181,
+        "sha256": "df58014ae1e4cfdf32eb4e3f48e009035b50bebc271625fb6166d93be5afb4e9"
+      },
+      {
+        "member": "RJT-Writing-Pipeline-6CC47EAA-430F-4252-ABEB-661E2DD751B8-success.json",
+        "full_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/RJT-Writing-Pipeline-6CC47EAA-430F-4252-ABEB-661E2DD751B8-success.json",
+        "bytes": 2157,
+        "sha256": "728abaf6689f154bf9b8851d86da428c1708afbc070bdf482c2df5ac514cbf47"
+      },
+      {
+        "member": "dictation-profile-context-snapshot.json",
+        "full_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/dictation-profile-context-snapshot.json",
+        "bytes": 2038,
+        "sha256": "5e3e0e41a5b21b32ed1b39f6010ecf9a2a25901632d97bf2612ef4bb47466761"
+      },
+      {
+        "member": "identity-after.txt",
+        "full_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/identity-after.txt",
+        "bytes": 198,
+        "sha256": "f5e079e92e2075778595f07498c67dca4be36a003ba0b6910552392e6c3cf2ae"
+      },
+      {
+        "member": "identity-before.txt",
+        "full_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/identity-before.txt",
+        "bytes": 198,
+        "sha256": "f5e079e92e2075778595f07498c67dca4be36a003ba0b6910552392e6c3cf2ae"
+      },
+      {
+        "member": "result.json",
+        "full_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/result.json",
+        "bytes": 510,
+        "sha256": "5fc2342e050733d9ca8c3087a9eb685a6b6efa2c01e2c6e2a2ade712094ed206"
+      },
+      {
+        "member": "selection/enumeration.log",
+        "full_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/selection/enumeration.log",
+        "bytes": 13482,
+        "sha256": "7d45e403eb36dc0fc5f8799067e6ed379cf91a202bbdfcb991ca7fd35869513c"
+      },
+      {
+        "member": "selection/selected-tests.json",
+        "full_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/selection/selected-tests.json",
+        "bytes": 37989,
+        "sha256": "2649f54767d59ddb40598e06e9ea90196b80df7899f1766b9d03b892e512c56a"
+      },
+      {
+        "member": "selection/selection-receipt.json",
+        "full_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/selection/selection-receipt.json",
+        "bytes": 27245,
+        "sha256": "092a83d7fc20ad8f6146fd27a93f95f211098ba434655fdb78d97c634ff5ad68"
+      },
+      {
+        "member": "startup-context-ownership.json",
+        "full_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/startup-context-ownership.json",
+        "bytes": 1852,
+        "sha256": "3395a697931ee40c0c5172aa97406f71092985196c48aa4ca0ce7a45081d9363"
+      },
+      {
+        "member": "tests.log",
+        "full_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/tests.log",
+        "bytes": 79913,
+        "sha256": "7e40e6c839eb4ef4db97a2e04625c95750ab4ec62b84a7083ae74772f608b8e1"
+      }
+    ]
+  },
+  "matched": {
+    "count": 28,
+    "all_bytes_equal": true,
+    "members": [
+      {
+        "member": "baseline-permission-instrumentation.json",
+        "full_member": "_temp/writing-feature-regression/baseline-permission-instrumentation.json",
+        "bytes": 725,
+        "sha256": "b94b1d9775bd63d0ef5f8e20b021fd44877a7fae8efa300937cfaec41b7147e4"
+      },
+      {
+        "member": "baseline-permission-result.json",
+        "full_member": "_temp/writing-feature-regression/baseline-permission-result.json",
+        "bytes": 299,
+        "sha256": "5bae0d08106698621f409bbd1f022936b84dfab9a1953afafc15976c0cdf622b"
+      },
+      {
+        "member": "baseline-permission-selection/enumeration.log",
+        "full_member": "_temp/writing-feature-regression/baseline-permission-selection/enumeration.log",
+        "bytes": 11199,
+        "sha256": "3156644153f1afbaa0069b4742a7634fa3cabb3df74a623d1062ecd3a7bdcf63"
+      },
+      {
+        "member": "baseline-permission-selection/selected-tests.json",
+        "full_member": "_temp/writing-feature-regression/baseline-permission-selection/selected-tests.json",
+        "bytes": 17814,
+        "sha256": "78d2888fbc63cb8f749afc327ed2599befb1ee622b59b7c2c3e9ee34989171b8"
+      },
+      {
+        "member": "baseline-permission-selection/selection-receipt.json",
+        "full_member": "_temp/writing-feature-regression/baseline-permission-selection/selection-receipt.json",
+        "bytes": 12364,
+        "sha256": "d208efcf830948554982b937d3f27998f1407613dca3cac08fc737b574196956"
+      },
+      {
+        "member": "baseline-permission.log",
+        "full_member": "_temp/writing-feature-regression/baseline-permission.log",
+        "bytes": 18360,
+        "sha256": "64037221739b8ec9f675e506e3327aacecb9ca92dd1cbcf4bb3b2db09809bc9c"
+      },
+      {
+        "member": "baseline-result.json",
+        "full_member": "_temp/writing-feature-regression/baseline-result.json",
+        "bytes": 325,
+        "sha256": "fe1394794b9f69524b5bd6217dfc898d62331f60c8676aa66040d1f593407920"
+      },
+      {
+        "member": "baseline-selection/enumeration.log",
+        "full_member": "_temp/writing-feature-regression/baseline-selection/enumeration.log",
+        "bytes": 11178,
+        "sha256": "b6ed4aaf602eaaa8b4c478913673500ba8b0f5f029c47f14653ea992280a093c"
+      },
+      {
+        "member": "baseline-selection/selected-tests.json",
+        "full_member": "_temp/writing-feature-regression/baseline-selection/selected-tests.json",
+        "bytes": 17814,
+        "sha256": "74b110dd21604d992d7feba1fc649c90818b968e8d99fdf03f4329d78098a4eb"
+      },
+      {
+        "member": "baseline-selection/selection-receipt.json",
+        "full_member": "_temp/writing-feature-regression/baseline-selection/selection-receipt.json",
+        "bytes": 12588,
+        "sha256": "2b9bc55263ea6bbd3e4af56e02080c79d325ab6ad5fe8a590ae068d6cb9257cd"
+      },
+      {
+        "member": "baseline-tests.log",
+        "full_member": "_temp/writing-feature-regression/baseline-tests.log",
+        "bytes": 18147,
+        "sha256": "ac408a4aae8a3a5e20617c69fdc24924fbc0751818c48708876ba5c6724b7e64"
+      },
+      {
+        "member": "candidate-permission-result.json",
+        "full_member": "_temp/writing-feature-regression/candidate-permission-result.json",
+        "bytes": 207,
+        "sha256": "6c5f0f6c4217ffdadb4fd85bd29b1d99b99429e0b996f68978cc57dffc0707c3"
+      },
+      {
+        "member": "candidate-permission-selection/enumeration.log",
+        "full_member": "_temp/writing-feature-regression/candidate-permission-selection/enumeration.log",
+        "bytes": 12409,
+        "sha256": "5049555eca8b41843dec96c33d17165f060ca729145d95c4e4ec7b9a19040976"
+      },
+      {
+        "member": "candidate-permission-selection/selected-tests.json",
+        "full_member": "_temp/writing-feature-regression/candidate-permission-selection/selected-tests.json",
+        "bytes": 37989,
+        "sha256": "0a872a58b395e0e73595f2eae03a6c83bec1f7ea2246e4256d96619c82a7c355"
+      },
+      {
+        "member": "candidate-permission-selection/selection-receipt.json",
+        "full_member": "_temp/writing-feature-regression/candidate-permission-selection/selection-receipt.json",
+        "bytes": 26777,
+        "sha256": "e29eabcab84836a84b1d664ef340b09144d3a23527cbf7fcfc791df40fc593fc"
+      },
+      {
+        "member": "candidate-permission.log",
+        "full_member": "_temp/writing-feature-regression/candidate-permission.log",
+        "bytes": 16664,
+        "sha256": "8d5d45f8cb54609150300baa40df9bcf06eea45af6fcbf9124d0a275fcd47efc"
+      },
+      {
+        "member": "candidate-result.json",
+        "full_member": "_temp/writing-feature-regression/candidate-result.json",
+        "bytes": 320,
+        "sha256": "1272a7e247d98bc64c52e7f495e755dcf4ff1e9c2522d7be89c1a31629fabaa1"
+      },
+      {
+        "member": "candidate-selection/enumeration.log",
+        "full_member": "_temp/writing-feature-regression/candidate-selection/enumeration.log",
+        "bytes": 52076,
+        "sha256": "536d83839aa2f3974e9a4c9a50f237ee982397fd646d02abecf852f698a56ca1"
+      },
+      {
+        "member": "candidate-selection/selected-tests.json",
+        "full_member": "_temp/writing-feature-regression/candidate-selection/selected-tests.json",
+        "bytes": 37989,
+        "sha256": "ac94a35e524e823e4e82d80ceb7ea47dbfd40e37b3a148a49265eefc915643db"
+      },
+      {
+        "member": "candidate-selection/selection-receipt.json",
+        "full_member": "_temp/writing-feature-regression/candidate-selection/selection-receipt.json",
+        "bytes": 27001,
+        "sha256": "997bdd9f16d894d2a562721aac4cf1b41a8168918687864d6cf2adce8a1e6e32"
+      },
+      {
+        "member": "candidate-tests.log",
+        "full_member": "_temp/writing-feature-regression/candidate-tests.log",
+        "bytes": 14859,
+        "sha256": "170426de97687a7705b0239feccc54e1f9cd231431840860658089b603c49105"
+      },
+      {
+        "member": "contract.txt",
+        "full_member": "_temp/writing-feature-regression/contract.txt",
+        "bytes": 1742,
+        "sha256": "28250faab86ef9bc6b896bfe9474a6feaf357af1e0e883b32918cc1e9f4bd0bf"
+      },
+      {
+        "member": "packages/baseline-strict-resolve.log",
+        "full_member": "_temp/writing-feature-regression/packages/baseline-strict-resolve.log",
+        "bytes": 4502,
+        "sha256": "6b6e46daa462db7e0eaf33e812d7910e8329557f3299191b300c92bb13a0d439"
+      },
+      {
+        "member": "packages/baseline-strict-resolve.json",
+        "full_member": "_temp/writing-feature-regression/packages/baseline-strict-resolve.json",
+        "bytes": 48,
+        "sha256": "b8d7c4a83bc62f449ed9b854ff63c039bbfd672feff6a72e84e7ade28e08c02e"
+      },
+      {
+        "member": "packages/candidate-strict-resolve.json",
+        "full_member": "_temp/writing-feature-regression/packages/candidate-strict-resolve.json",
+        "bytes": 48,
+        "sha256": "b8d7c4a83bc62f449ed9b854ff63c039bbfd672feff6a72e84e7ade28e08c02e"
+      },
+      {
+        "member": "packages/candidate-strict-resolve.log",
+        "full_member": "_temp/writing-feature-regression/packages/candidate-strict-resolve.log",
+        "bytes": 4499,
+        "sha256": "f00a570ebb6d8e2227b5c7301e5f47f9d9ba524e59cdf5c8762d25dd14b7a414"
+      },
+      {
+        "member": "packages/canonical-graph-contract.json",
+        "full_member": "_temp/writing-feature-regression/packages/canonical-graph-contract.json",
+        "bytes": 1564,
+        "sha256": "95bdd0c7303091be9481b2be1b3b6d1350933ece30c797ddf2b11c7676f2120a"
+      },
+      {
+        "member": "result.json",
+        "full_member": "_temp/writing-feature-regression/result.json",
+        "bytes": 256,
+        "sha256": "8196502ce17954fd479d3ee68e2ff0f78ec98498d47fd09e785da4c6892a1183"
+      }
+    ]
+  }
+}

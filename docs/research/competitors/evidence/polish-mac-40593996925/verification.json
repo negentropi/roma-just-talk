@@ -1,0 +1,148 @@
+{
+  "run_id": 40593996925,
+  "head_sha": "c29ac2d7c6fa7690ea3bd0d5a38697b44a37d182",
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40593996925",
+  "status": "completed",
+  "conclusion": "failure",
+  "classification": "two-ui-assertions-followed-by-masked-pre-verify-microphone-grant-drift",
+  "artifact_id": 12777448758,
+  "artifact_bytes": 439806090,
+  "artifact_sha256": "d2188e4f8dba2e1848ee274b154a647da75e33d929f4f1426e6de9d321648602",
+  "size_digest_and_all_7906_zip_crcs_verified": true,
+  "core_checks": 1753,
+  "counts": {
+    "unit": {
+      "total": 264,
+      "passed": 241,
+      "failed": 0,
+      "skipped": 23,
+      "executed_non_skipped": 241
+    },
+    "live": {
+      "total": 6,
+      "passed": 6,
+      "failed": 0,
+      "skipped": 0,
+      "executed_non_skipped": 6
+    },
+    "ui": {
+      "total": 6,
+      "passed": 4,
+      "failed": 2,
+      "skipped": 0,
+      "executed_non_skipped": 6
+    }
+  },
+  "required_unit_cases": {
+    "DictationPlanCaptureTests": 5,
+    "DictationPolishAudioFileTests": 11,
+    "DictationPolishPipelineTests": 17,
+    "DictationPostprocessingPlanTests": 12,
+    "ClarityProviderTests": 7,
+    "LocalCLIServiceLifetimeTests": 6,
+    "LocalCLIServiceConfigurationTests": 4
+  },
+  "required_unit_subset_total": 62,
+  "all_17_captured_paste_cases_passed": true,
+  "actual_readonly_app_regression_red_to_green": {
+    "known_bad_run": 40587793807,
+    "known_bad_head": "ebf629b4cf109f7a36109ccac7b20ac70f9f48ab",
+    "known_bad_status": "Failure",
+    "candidate_status": "Success",
+    "same_method_utf8_sha256": "98dde365d58fa5cbec1b8b5b787aae64978343c7148a58512a1840ba438b6736",
+    "complete_original_fixture_byte_identical": true,
+    "new_writable_success_case": "Success"
+  },
+  "native_checkpoint_members_match_full": 32,
+  "matched_checkpoint_members_match_full": 28,
+  "matched_regression": {
+    "classification": "matched-red-green",
+    "scope": [
+      "literal-snippets",
+      "deferred-permission-callback"
+    ],
+    "stale_startup_catch": "candidate-only coverage",
+    "candidate": "c29ac2d7c6fa7690ea3bd0d5a38697b44a37d182",
+    "baseline": "ec7bc1bcf804cb9362e342e4c3f5fbf2dd9b69eb"
+  },
+  "identity_coverage": {
+    "app_binary_sha256": "59299d4767229fbff8128aa868cfec402b30dc4b8fead904e3141f0811120de4",
+    "unit_before_after_equal": true,
+    "native_before_after_equal": true,
+    "ui_before_matches_unit_native": true,
+    "ui_after_identity_retained": false,
+    "unit_ui_host_requirements_and_compiled_csreq_equal": true,
+    "reason_ui_after_absent": "Driver aborts at pre-verify permission comparison before capturing UI after identities."
+  },
+  "ui_failures": [
+    {
+      "identifier": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+      "status": "Failure",
+      "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~vo1m27ytacvYOSSoNBsnRIdLGVeweu9FAWee4fmIY9pgDoCDwgyhyVRMX0n1LRWNfd5RHA5gJDu8hEcHRgEUnQ==",
+      "decoded_summary_sha256": "4b33825bb6196d746b10b0f9e2bd3cdd6e6d0969abb7f7ac78f44f3a3dac6075",
+      "failures": [
+        {
+          "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkUITests/WritingFeaturesUITests.swift",
+          "lineNumber": "952",
+          "message": "XCTAssertTrue failed - The settings control was not fully visible after scrolling.",
+          "timestamp": "2026-10-27T22:55:05.637+0000"
+        }
+      ]
+    },
+    {
+      "identifier": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+      "status": "Failure",
+      "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~UpTwS0d9hUEYqs_nh68HoKnwQsoYrrI5r1hAaFn0oX4vhVKKkS-B3DqGyaMHfrS6cQYWOTz8CKX-oraB7eGsag==",
+      "decoded_summary_sha256": "2c496623a81e05dd5d5a5888f45635a5214fba622014672b4fb63e6b7b723ddf",
+      "failures": [
+        {
+          "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkUITests/WritingFeaturesUITests.swift",
+          "lineNumber": "496",
+          "message": "failed - History must expose one exact expansion target inside its owned row.",
+          "timestamp": "2026-10-27T22:55:48.698+0000"
+        }
+      ]
+    }
+  ],
+  "masked_driver_failure": {
+    "boundary": "history-verify",
+    "exit_code": 1,
+    "comparison": "Initial UI microphone-tcc.json versus RUNNER_TEMP history-seed/verify/microphone-tcc.json",
+    "first_difference_1_based_byte": 105,
+    "initial_byte_is_auth_value_2": true,
+    "after_row_retained": false,
+    "cause_of_permission_change_established": false,
+    "failed_log_fetched_once": true,
+    "failed_log_bytes": 1122,
+    "failed_log_sha256": "075e8e1cee3881e2ada56c476986d910d616a59f937d1c8635d844cfa4f8dae1"
+  },
+  "history": {
+    "seed_started_once_and_passed_once": true,
+    "seed_host_pid": 56770,
+    "normal_factory_reused": true,
+    "three_normal_persistent_store_paths": true,
+    "saved_rows": 4,
+    "saved_vocabulary_words": 1,
+    "saved_replacement_rules": 1,
+    "host_exited_and_stores_closed_before_ui": true,
+    "native_verify_executed": false,
+    "native_verify_reason": "Permission comparison at pinned driver line280 aborts before selection/preflight/test launch.",
+    "seed_phase_raw_files_retained": 25,
+    "complete_phase_xcresult_retained": false
+  },
+  "gated_unit_skips": 23,
+  "release_package": "skipped",
+  "independent_read_only_audit": "Raw counts, all62 cases, both app regression records, all44 sources, native/matched members, seed phase/frozen data/closure, UI failures and missing verify/after-identity/Release proof independently checked; no evidence inconsistency.",
+  "limits": [
+    "Overall feature gate is red; do not report UI6, complete History roundtrip or Release/package success.",
+    "Four original UI cases passed; the new profiles/styles case and History variant case failed. Their later steps are not inferred successful.",
+    "History seed is genuine positive normal-factory synthetic save/closed-host proof before UI. Post-UI verify never launched; its after TCC row was not uploaded.",
+    "Initial and seed TCC database readbacks genuinely show auth_value2 bound to the compiled host requirement. Their stability after UI is not established; comparison failure is at the auth_value byte and the destination value/cause is unknown.",
+    "Only UI-before identity is retained. Unit/native before-after equality and matching UI-before do not establish UI-after identity.",
+    "All23 unit skips retain raw generic skip notices and source predicates; they do not establish actual provider/Whisper/clipboard/store/native execution in the ordinary lane.",
+    "Native6 uses real editors and deterministic synthetic recognition/Local CLI; separate polish-native and real-Whisper runs are not silently combined.",
+    "Native cleanup reports six unavailable and one still-readable Safari value; neither establishes window closure.",
+    "Later correction, import regression, import persistence fix and Undo work are excluded from this tested head.",
+    "No human speech, physical keyboard, general provider quality, saved-Keychain, notarized distribution or published release claim."
+  ]
+}

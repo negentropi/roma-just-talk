@@ -1,0 +1,19 @@
+{
+  "checkedBeforeNextAppLaunch": true,
+  "executablePath": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+  "files": {
+    "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/default.store": "f137c68caabd8ce7453693f498510788584a7fbbc8bfb4e390b2947004a2be3c",
+    "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/default.store-shm": "afa54666b5da5dd4265a793533b18ab831f46fc940eade78016a3ec2de2cae92",
+    "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/default.store-wal": "9d93a77e458957150e83097af44527655b612d6fbf1183afcfb59658dafdd390",
+    "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/dictionary.store": "167703523f25f6de195fc0f67c82dd585848b266685f2f9fa430c91b20fb4eaa",
+    "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/dictionary.store-shm": "4e34f6a96af40938af631970ebab4e01ecf554e4b42a1851e6f35d7bcb42ce25",
+    "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/dictionary.store-wal": "d97d7e7efaeb65a5920746372b27b4d3c8bbad792f475b8735f2609bc8baf661",
+    "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/stats.store": "38192a0eacfc5b1f861571778b6d5ab6cd8947b1984cc603d123d6cf3993dc8b",
+    "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/stats.store-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+    "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/stats.store-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "hostExited": true,
+  "hostPID": 51974,
+  "normalStoresHaveNoOpenDescriptors": true,
+  "valid": true
+}

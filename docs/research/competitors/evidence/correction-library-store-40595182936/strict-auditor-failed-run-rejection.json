@@ -1,0 +1,7 @@
+{
+  "classification": "strict-full-correction-auditor-rejects-actual-partial-failed-run",
+  "exitCode": 1,
+  "rejection": "Required root final result.json is absent after actual candidate test-build failure.",
+  "scope": "Negative control only. No correction-upgrade proof.",
+  "scriptSHA256": "3d042965bc3513ef2ed3e8f9aa27af759c6a3afe5de9bdd4a6c1228f9bb16cdf"
+}

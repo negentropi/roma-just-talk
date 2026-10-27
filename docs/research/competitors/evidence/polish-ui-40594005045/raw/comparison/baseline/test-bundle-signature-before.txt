@@ -1,0 +1,23 @@
+Executable=/Users/runner/work/_temp/writing-settings-ui-baseline/.writing-ui-regression-build/Build/Products/Debug/VoiceInkUITests-Runner.app/Contents/PlugIns/VoiceInkUITests.xctest/Contents/MacOS/VoiceInkUITests
+Identifier=com.negentropi.RomaJustTalkUITests
+Format=bundle with Mach-O thin (arm64)
+CodeDirectory v=20400 size=3483 flags=0x2(adhoc) hashes=102+3 location=embedded
+VersionPlatform=1
+VersionMin=983040
+VersionSDK=1705216
+Hash type=sha256 size=32
+CandidateCDHash sha256=f7e02245829e705293dd1a102133ef38c9148985
+CandidateCDHashFull sha256=f7e02245829e705293dd1a102133ef38c91489852d37e6210096b22c65223690
+Hash choices=sha256
+CMSDigest=f7e02245829e705293dd1a102133ef38c91489852d37e6210096b22c65223690
+CMSDigestType=2
+Executable Segment base=0
+Executable Segment limit=507904
+Executable Segment flags=0x0
+Page size=16384
+CDHash=f7e02245829e705293dd1a102133ef38c9148985
+Signature=adhoc
+Info.plist entries=20
+TeamIdentifier=not set
+Sealed Resources version=2 rules=13 files=0
+Internal requirements count=0 size=12

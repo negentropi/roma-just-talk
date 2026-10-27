@@ -1,0 +1,58 @@
+{
+  "approvalServiceProven": false,
+  "archiveBytes": 82560946,
+  "archiveSHA256": "4ab6e2b13cae44d896804f92e740d1ff5ec5619d735473f938e949a85b5f3fda",
+  "candidateFailure": {
+    "classification": "invalid-or-failed",
+    "error": "Command failed; inspect /Users/runner/work/_temp/correction-library-store-proof/candidate-build/build.log",
+    "mode": "candidate"
+  },
+  "candidateHostStarted": false,
+  "classification": "independent-correction-predecessor-control-audited-candidate-build-failed",
+  "distinctOldHostPIDs": [
+    46879,
+    49314
+  ],
+  "fourCorrectionRecordsProven": false,
+  "legacyGoldenFields": 35,
+  "legacyLiteralValuesAndIDsPreserved": true,
+  "legacyRowsPerModel": 2,
+  "legacySchemaFields": 39,
+  "legacyTranscriptionNullableFields": 4,
+  "limits": [
+    "Overall native run failed during candidate test build. Only old-app seed/reopen control is audited here.",
+    "No correction-write or correction-reopen host ran. No new attributes, generated preview UUID/date, disabled unknown, backend approval or source-deletion persistence proof.",
+    "Full closed-store file bytes, signed archives and dependency/source closure are audited separately by the parent. No human/UI/CloudKit/backward-open/real-user/provider/microphone-inactivity claim."
+  ],
+  "oldReaderEmptyPairNoOp": true,
+  "partialAuditorSHA256": "9cecf203fc5d819c23f4b8b667090b4027dd906f6b676a2503cedaf1ba7ae13f",
+  "phases": {
+    "old-reopen": {
+      "canonicalSchemaSHA256": "a384d4178a9c0f5cef58c00ffa01b9c3d1559719e4c49d9d9640bdbcec320f31",
+      "hostExitUnix": 1793141368.565401,
+      "hostLiveUnix": 1793141366.215094,
+      "hostPID": 49314,
+      "legacySnapshotSHA256": "7d93c5cd868a756fb963fb93414045b655594c4cc069170e8955361edcb5e2d0",
+      "rawSchemaSHA256": "6848d5217fe76aa5345a33b255c269abbef2c110c432513c8c5012cbc10cddc0",
+      "sourceSHA": "ebf629b4cf109f7a36109ccac7b20ac70f9f48ab"
+    },
+    "seed": {
+      "canonicalSchemaSHA256": "a384d4178a9c0f5cef58c00ffa01b9c3d1559719e4c49d9d9640bdbcec320f31",
+      "hostExitUnix": 1793141323.883865,
+      "hostLiveUnix": 1793141321.781587,
+      "hostPID": 46879,
+      "legacySnapshotSHA256": "7d93c5cd868a756fb963fb93414045b655594c4cc069170e8955361edcb5e2d0",
+      "rawSchemaSHA256": "1e52d364930e4a2f3ab639e3de11d1729c87f393f191e650a0dc59b56c7a4c92",
+      "sourceSHA": "ebf629b4cf109f7a36109ccac7b20ac70f9f48ab"
+    }
+  },
+  "provenanceAfterSourceDeletionProven": false,
+  "runID": 40595182936,
+  "sameOldSchemaPreserved": true,
+  "sixAttributeUpgradeProven": false,
+  "sourceSHA": {
+    "candidate": "a5601328e66d6949b5de052b81112ffadaeb1d1c",
+    "predecessor": "ebf629b4cf109f7a36109ccac7b20ac70f9f48ab"
+  },
+  "strictAuditorSHA256": "3d042965bc3513ef2ed3e8f9aa27af759c6a3afe5de9bdd4a6c1228f9bb16cdf"
+}

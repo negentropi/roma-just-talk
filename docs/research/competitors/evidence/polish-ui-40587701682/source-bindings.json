@@ -1,0 +1,40 @@
+{
+  "run_id": 40587701682,
+  "candidate_sha": "ebf629b4cf109f7a36109ccac7b20ac70f9f48ab",
+  "baseline_sha": "bdd608cf6111e8d7e88c12678f530318713acf67",
+  "none_marker_line": 621,
+  "candidate_ui_cases": [
+    "testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch",
+    "testCSVImportPreviewsMultilineContentBeforeReplacing",
+    "testTranslationTargetsReorderSelectAndPersist",
+    "testDictationProfilePreservesCustomSettingsAndPersists",
+    "testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings",
+    "testHistoryPreservesRecognizedFallbackAndLegacyVariants"
+  ],
+  "original_four_body_sha256": {
+    "testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch": "5c90e7220157d9fc878875de844946384c568a6823130e50fc8fb0e1f63ed0fe",
+    "testCSVImportPreviewsMultilineContentBeforeReplacing": "805bcdb0b8197354fee973d51dd349e4cc0ba1a00018b31a63cfe01459e0e5f0",
+    "testTranslationTargetsReorderSelectAndPersist": "feb0d027df8928bcd004273232cc4ca1dabc15bcb6cd9dcfeb60573737a3b436",
+    "testDictationProfilePreservesCustomSettingsAndPersists": "cf265df76faffd08a7524991911edd9cce7599292a07b34a03b904fc5014f7ee"
+  },
+  "original_four_compare_revision": "31651718c058593719742a220aa85c05827ded7a",
+  "inputs_sha256": {
+    "VoiceInkUITests/WritingFeaturesUITests.swift": "b15177d9b4dff602969279f86aaed407a1ab40fcf8ba6f9889ea0fc4647b5386",
+    "VoiceInkTests/DictationHistoryUISeedLiveTests.swift": "5d381d292a6fd2c7d7313c8652f270a07893f0d26ef97ba00d5e9f4c8973a70f",
+    "VoiceInk/VoiceInk.swift": "063d2de45ce7a7b9f454421decd213a2d4bf4c4e78f37f7084f6a324502d5188",
+    "VoiceInk/Models/Transcription.swift": "7a33f68bd7235304e195fab40518679e6481a077fe61ea851187b284e481039c",
+    "VoiceInk/Models/VocabularyWord.swift": "b90fbd19b9b5f8e1a99a2388c0429bbe3fcfa3ca278f9c0e7e8aabc39751684b",
+    "VoiceInk/Models/WordReplacement.swift": "602004b8f8fd7da3eea1bc3e74e5a2d03d91c56f96decb303658f68e34256d44",
+    "VoiceInk/Models/SessionMetric.swift": "dc29ab6e8bf70b82d055a189c2f09994514b37104564e889a55de805ca49fea8",
+    "VoiceInk/Views/History/HistoryProcessingViews.swift": "6702314f2fd462b91075fbe50dff9c00a4974b60bb5834ddcde713520b99bea7",
+    "VoiceInk/Views/History/InlineHistoryView.swift": "84ae9011a8e380f01ad25785b3688fbe0436667f8cf26b1865448593281312b1",
+    "VoiceInk/Views/ModelSettingsView.swift": "18676bf774c7ddd9f5e01d978081ac3989950b9d98c993596b6b37cb83262487",
+    "scripts/run-writing-settings-ui-regression.sh": "eed60b47c93e58276baa4fe96b2b749d35a5c3c349ee8faaf9ac8ec4162de72b",
+    "scripts/run-writing-feature-regression.sh": "2645cea671fa8a613437e1c53aef70d9c75ea859abf1d1016a7ed536feb4c42f",
+    "scripts/run-dictation-metadata-store-check.sh": "d3514de2d76b7163b3424bff4bd95580885cddc49ae5fcec5a999a063ca247a0",
+    ".github/workflows/voiceink-writing-ui-check.yml": "339fe245245334b954bd6b54b6133b72c49ebd04a765c718168fc90ef478423a",
+    "VoiceInk.xcodeproj/project.pbxproj": "e4a9458135e103d327477fedb1485b8f3de8e1b223f14d98e426f42e9bda3e9e",
+    "VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f"
+  },
+  "scope": "Source binding captured before execution; completed failed six-case runtime outcome is in audit.json. Native synthetic History input/store persistence is separate from ASR/provider proof."
+}

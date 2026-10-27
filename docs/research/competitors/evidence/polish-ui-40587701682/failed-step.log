@@ -1,0 +1,26 @@
+ui	Compare the disabled-panel baseline and six current writing UI cases	﻿2026-10-27T21:34:47.3315140Z ##[group]Run defaults write com.negentropi.RomaJustTalk CurrentTranscriptionModel -string whisper-large-v3-turbo
+ui	Compare the disabled-panel baseline and six current writing UI cases	2026-10-27T21:34:47.3315940Z ^[[36;1mdefaults write com.negentropi.RomaJustTalk CurrentTranscriptionModel -string whisper-large-v3-turbo^[[0m
+ui	Compare the disabled-panel baseline and six current writing UI cases	2026-10-27T21:34:47.3317530Z ^[[36;1mdefaults write com.negentropi.RomaJustTalk PrewarmModelOnWake -bool false^[[0m
+ui	Compare the disabled-panel baseline and six current writing UI cases	2026-10-27T21:34:47.3318100Z ^[[36;1mshasum -a 256 -c "$RUNNER_TEMP/writing-ui-proof/source-inputs.sha256"^[[0m
+ui	Compare the disabled-panel baseline and six current writing UI cases	2026-10-27T21:34:47.3318590Z ^[[36;1mbash scripts/run-writing-settings-ui-regression.sh^[[0m
+ui	Compare the disabled-panel baseline and six current writing UI cases	2026-10-27T21:34:47.3353010Z shell: /bin/bash -e {0}
+ui	Compare the disabled-panel baseline and six current writing UI cases	2026-10-27T21:34:47.3353350Z ##[endgroup]
+ui	Compare the disabled-panel baseline and six current writing UI cases	2026-10-27T21:34:47.4008540Z VoiceInkUITests/WritingFeaturesUITests.swift: OK
+ui	Compare the disabled-panel baseline and six current writing UI cases	2026-10-27T21:34:47.4013240Z VoiceInkTests/DictationHistoryUISeedLiveTests.swift: OK
+ui	Compare the disabled-panel baseline and six current writing UI cases	2026-10-27T21:34:47.4021290Z VoiceInk/VoiceInk.swift: OK
+ui	Compare the disabled-panel baseline and six current writing UI cases	2026-10-27T21:34:47.4031780Z VoiceInk/Models/Transcription.swift: OK
+ui	Compare the disabled-panel baseline and six current writing UI cases	2026-10-27T21:34:47.4041560Z VoiceInk/Views/ModelSettingsView.swift: OK
+ui	Compare the disabled-panel baseline and six current writing UI cases	2026-10-27T21:34:47.4050900Z VoiceInk/Views/History/HistoryProcessingViews.swift: OK
+ui	Compare the disabled-panel baseline and six current writing UI cases	2026-10-27T21:34:47.4059790Z VoiceInk/Views/History/InlineHistoryView.swift: OK
+ui	Compare the disabled-panel baseline and six current writing UI cases	2026-10-27T21:34:47.4090540Z VoiceInk/Views/History/TranscriptionDetailView.swift: OK
+ui	Compare the disabled-panel baseline and six current writing UI cases	2026-10-27T21:34:47.4093230Z scripts/run-writing-settings-ui-regression.sh: OK
+ui	Compare the disabled-panel baseline and six current writing UI cases	2026-10-27T21:34:47.4095320Z scripts/run-writing-feature-regression.sh: OK
+ui	Compare the disabled-panel baseline and six current writing UI cases	2026-10-27T21:34:47.4103660Z .github/workflows/voiceink-writing-ui-check.yml: OK
+ui	Compare the disabled-panel baseline and six current writing UI cases	2026-10-27T21:34:47.4113240Z VoiceInk.xcodeproj/project.pbxproj: OK
+ui	Compare the disabled-panel baseline and six current writing UI cases	2026-10-27T21:34:47.4115110Z VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved: OK
+ui	Compare the disabled-panel baseline and six current writing UI cases	2026-10-27T21:34:51.4380380Z From https://github.com/negentropi/roma-just-talk
+ui	Compare the disabled-panel baseline and six current writing UI cases	2026-10-27T21:34:51.4484040Z  * branch              bdd608cf6111e8d7e88c12678f530318713acf67 -> FETCH_HEAD
+ui	Compare the disabled-panel baseline and six current writing UI cases	2026-10-27T21:34:51.4586770Z Preparing worktree (detached HEAD bdd608cf)
+ui	Compare the disabled-panel baseline and six current writing UI cases	2026-10-27T21:34:51.8500290Z HEAD is now at bdd608cf test: scroll the settings Form through visible native controls
+ui	Compare the disabled-panel baseline and six current writing UI cases	2026-10-27T22:09:33.6362750Z swift-driver version: 1.148.6 Matched UI comparison requires intended baseline red, a closed normal-store seed, and six candidate cases green
+ui	Compare the disabled-panel baseline and six current writing UI cases	2026-10-27T22:09:33.6658620Z ##[error]Process completed with exit code 1.

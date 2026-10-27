@@ -1,0 +1,20 @@
+{
+  "exit_code": 0,
+  "issues": [],
+  "results": [
+    [
+      "liveCorrectionLibraryPersistentStoreUpgrade",
+      "passed"
+    ]
+  ],
+  "starts": [
+    "liveCorrectionLibraryPersistentStoreUpgrade"
+  ],
+  "summaries": [
+    [
+      "1",
+      "passed"
+    ]
+  ],
+  "valid": true
+}

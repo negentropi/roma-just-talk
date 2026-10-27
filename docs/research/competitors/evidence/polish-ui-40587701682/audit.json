@@ -1,0 +1,152 @@
+{
+  "version": 1,
+  "run_id": 40587701682,
+  "run_url": "https://github.com/negentropi/roma-just-talk/actions/runs/40587701682",
+  "source_sha": "ebf629b4cf109f7a36109ccac7b20ac70f9f48ab",
+  "oracle_sha256": "b15177d9b4dff602969279f86aaed407a1ab40fcf8ba6f9889ea0fc4647b5386",
+  "classification": "six-case-gate-failed",
+  "baseline": {
+    "sha": "bdd608cf6111e8d7e88c12678f530318713acf67",
+    "valid_intended_failure": true,
+    "assertion_line": 621,
+    "failures": [
+      "custom",
+      "none"
+    ]
+  },
+  "candidate": {
+    "executed_once": 6,
+    "passed": 4,
+    "failed": 2,
+    "tests": {
+      "testCSVImportPreviewsMultilineContentBeforeReplacing": {
+        "results": [
+          "passed"
+        ],
+        "starts": 1
+      },
+      "testDictationProfilePreservesCustomSettingsAndPersists": {
+        "results": [
+          "passed"
+        ],
+        "starts": 1
+      },
+      "testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings": {
+        "results": [
+          "failed"
+        ],
+        "starts": 1
+      },
+      "testHistoryPreservesRecognizedFallbackAndLegacyVariants": {
+        "results": [
+          "failed"
+        ],
+        "starts": 1
+      },
+      "testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch": {
+        "results": [
+          "passed"
+        ],
+        "starts": 1
+      },
+      "testTranslationTargetsReorderSelectAndPersist": {
+        "results": [
+          "passed"
+        ],
+        "starts": 1
+      }
+    },
+    "failures": [
+      {
+        "test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+        "line": 949,
+        "message": "XCTAssertTrue failed - Literal editor content changed.",
+        "timestamp": "2026-10-27T22:04:27.551+0000"
+      },
+      {
+        "test": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+        "line": 471,
+        "message": "XCTAssertTrue failed",
+        "timestamp": "2026-10-27T22:05:05.935+0000"
+      }
+    ]
+  },
+  "native_phases": [
+    {
+      "phase": "seed",
+      "hostPID": 44043,
+      "classification": "passed",
+      "closed": true,
+      "normal_store_counts": {
+        "SessionMetric": 0,
+        "Transcription": 4,
+        "VocabularyWord": 1,
+        "WordReplacement": 1
+      },
+      "all_twenty_history_fields_and_library_fields_match": true,
+      "verification_context_has_changes": false
+    },
+    {
+      "phase": "verify",
+      "hostPID": 73012,
+      "classification": "passed",
+      "closed": true,
+      "normal_store_counts": {
+        "SessionMetric": 0,
+        "Transcription": 4,
+        "VocabularyWord": 1,
+        "WordReplacement": 1
+      },
+      "all_twenty_history_fields_and_library_fields_match": true,
+      "verification_context_has_changes": false
+    }
+  ],
+  "identity_signature_process_tcc_both_lanes_valid": true,
+  "shortcut_censuses": {
+    "tests": 6,
+    "attachment_count": 27,
+    "typed_data_nonempty_branch_observed": true,
+    "before_restored_census_equal": true
+  },
+  "artifact": {
+    "id": 12774907014,
+    "bytes": 233712334,
+    "sha256": "b532748ad4c10fbaae7b3bd5dbdbe63dd4edc165752663848ee18c87b3a8d036",
+    "remote_path": "/data/rjt-writing-check-01a17bef/40587701682/evidence.zip",
+    "full_archive_digest_and_all_4179_zip_crc_verified": true,
+    "local_archive_downloaded": false
+  },
+  "failed_log": {
+    "bytes": 4220,
+    "sha256": "ff7b017dff47d7dc057f9715a1e10a0189ea4a8ccf231286f39586e6f3926a69",
+    "fetched_once": true
+  },
+  "visual_proof": {
+    "original_pngs": 17,
+    "failed_scene_frames": [
+      {
+        "path": "screenshots/style-56s.png",
+        "bytes": 169658,
+        "sha256": "8732850179fe9fdbc6ddbe3eb55bd56f06ca12da2db233f06522cc27b2ef51c8",
+        "video_sha256": "cb4511db3c7462ea72fafa07fb31f4097fe481b097e99b267a028df453b228bd",
+        "offset_seconds": 56,
+        "kind": "Derived frame from actual test recording; not an original screenshot attachment"
+      },
+      {
+        "path": "screenshots/history-15s.png",
+        "bytes": 105906,
+        "sha256": "792b4b019e4eaec2dd4ef775b334d1ff8246b8e6958462155ac77a71159904cc",
+        "video_sha256": "215797b7a8f7dbf9a0c3cbd10c9866c71766cc21e697f2dbf599cf5d90e1a69f",
+        "offset_seconds": 15,
+        "kind": "Derived frame from actual test recording; not an original screenshot attachment"
+      }
+    ],
+    "style_and_history_feature_flows_reached": false
+  },
+  "limits": [
+    "Style case failed during literal snippet keyboard input before any profile/style mutation. Expected24 characters; actual visible counter26. Exact resulting editor bytes were not retained; CRLF-to-keyboard encoding mechanism remains an inference.",
+    "History row existed uniquely but nested expand-ID query failed before header click. The History screenshot shows a healthy collapsed row; no History AX hierarchy was retained, so global expand-ID availability is unproven.",
+    "Original four UI flows passed, including None/Custom persistence and five shared native sheets. This run does not establish six-case acceptance, Light/Clarity style persistence, History variant/copy rendering, real ASR, provider or editor delivery.",
+    "Native fixture rows are synthetic product-model inputs saved through the actual normal-store factory; this is render-input/store persistence proof, not ASR creation proof."
+  ]
+}

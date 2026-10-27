@@ -1,0 +1,6 @@
+    
+/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/CorrectionLibraryStoreUpgradeLiveTests.swift:89:59: error: property access can throw but is not marked with 'try'
+        let output = VoiceInkWordReplacementEngine.apply([compatibility.voiceInkRule], to: compatibilityInput)
+                                                          ^
+/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/CorrectionLibraryStoreUpgradeLiveTests.swift:89:59: note: did you mean to use 'try'?
+        let output = VoiceInkWordReplacementEngine.apply([compatibility.voiceInkRule], to: compatibilityInput)

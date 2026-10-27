@@ -293,8 +293,6 @@ final class WritingFeaturesUITests: XCTestCase {
             assertAllProfiles(title, storedValue: value, preferences: preferences, in: app)
             assertClarityStyle("Formal", storedValue: "formal", enabled: false, preferences: preferences, in: app)
         }
-        revealModelSettingsControl(identified("transcriptionSettings.paragraphBreaks", in: app),
-                                   preferences: preferences, towardTop: true, in: app)
         assertCustomFormatting(isEnabled: true, preferences: preferences, in: app)
         selectProfile("Clarity", preferences: preferences, in: app)
         closeModelSettings(in: app)
@@ -484,10 +482,12 @@ final class WritingFeaturesUITests: XCTestCase {
         let source = openCorrectionSource(fixture, in: app)
         XCTAssertFalse(app.buttons["history.selection.delete"].exists)
         let selection = identified("history.row." + fixture.id + ".select", in: source)
-        let selectButton = try nativeButton(selection)
-        reveal(selectButton, identifier: "history.row." + fixture.id, in: app)
-        XCTAssertTrue(selectButton.isEnabled && selectButton.isHittable)
-        selectButton.click()
+        let checkbox = try nativeHistoryCheckbox(selection)
+        reveal(checkbox, identifier: "history.row." + fixture.id, in: app)
+        XCTAssertTrue(checkbox.isEnabled && checkbox.isHittable)
+        XCTAssertEqual(String(describing: checkbox.value ?? ""), "0")
+        checkbox.click()
+        XCTAssertTrue(waitUntil { String(describing: checkbox.value ?? "") == "1" })
         let delete = app.buttons["history.selection.delete"]
         XCTAssertTrue(delete.waitForExistence(timeout: 5))
         XCTAssertTrue(delete.isEnabled && delete.isHittable)
@@ -710,12 +710,12 @@ final class WritingFeaturesUITests: XCTestCase {
         return try XCTUnwrap(UUID(uuidString: String(text[range]))).uuidString
     }
 
-    @MainActor private func nativeButton(_ identifiedControl: XCUIElement) throws -> XCUIElement {
+    @MainActor private func nativeHistoryCheckbox(_ identifiedControl: XCUIElement) throws -> XCUIElement {
         XCTAssertTrue(identifiedControl.exists)
-        if identifiedControl.elementType == .button { return identifiedControl }
-        let buttons = identifiedControl.buttons
-        XCTAssertEqual(buttons.count, 1, "The source-owned control must contain exactly its native button.")
-        return try XCTUnwrap(buttons.allElementsBoundByIndex.first)
+        if identifiedControl.elementType == .checkBox { return identifiedControl }
+        let checkboxes = identifiedControl.checkBoxes
+        XCTAssertEqual(checkboxes.count, 1, "The identified History selection control must contain one native checkbox.")
+        return try XCTUnwrap(checkboxes.allElementsBoundByIndex.first)
     }
 
     @MainActor private func revealCorrectionControl(
@@ -835,7 +835,7 @@ final class WritingFeaturesUITests: XCTestCase {
 
     @MainActor private func historyExpandTarget(_ id: String, row: XCUIElement, in app: XCUIApplication) -> XCUIElement {
         let identifier = "history.row." + id + ".expand"
-        let targets = app.descendants(matching: .any).matching(identifier: identifier)
+        let targets = app.buttons.matching(identifier: identifier)
         let target = targets.firstMatch
         guard target.waitForExistence(timeout: 5), targets.count == 1,
               !row.frame.isEmpty, !target.frame.isEmpty, row.frame.contains(target.frame) else {

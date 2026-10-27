@@ -1,0 +1,136 @@
+{
+  "actualCompiledAppTestModules": {
+    "candidate": [
+      "VoiceInk",
+      "VoiceInkTests"
+    ],
+    "predecessor": [
+      "VoiceInk",
+      "VoiceInkTests"
+    ]
+  },
+  "actualCompilerSettings": {
+    "candidate": {
+      "VoiceInk": {
+        "active_conditions": "DEBUG ENABLE_NATIVE_SPEECH_ANALYZER DEBUG ENABLE_NATIVE_SPEECH_ANALYZER  LOCAL_BUILD CORRECTION_LIBRARY_CANDIDATE LOCAL_BUILD",
+        "candidate_condition": true
+      },
+      "VoiceInkTests": {
+        "active_conditions": "DEBUG ENABLE_NATIVE_SPEECH_ANALYZER  LOCAL_BUILD CORRECTION_LIBRARY_CANDIDATE LOCAL_BUILD",
+        "candidate_condition": true
+      }
+    },
+    "predecessor": {
+      "VoiceInk": {
+        "active_conditions": "DEBUG ENABLE_NATIVE_SPEECH_ANALYZER DEBUG ENABLE_NATIVE_SPEECH_ANALYZER  LOCAL_BUILD LOCAL_BUILD",
+        "candidate_condition": false
+      },
+      "VoiceInkTests": {
+        "active_conditions": "DEBUG ENABLE_NATIVE_SPEECH_ANALYZER  LOCAL_BUILD LOCAL_BUILD",
+        "candidate_condition": false
+      }
+    }
+  },
+  "archiveBytes": 82560946,
+  "artifactArchiveSHA256": "4ab6e2b13cae44d896804f92e740d1ff5ec5619d735473f938e949a85b5f3fda",
+  "candidateHostPhasesAbsent": true,
+  "candidateIdentityAbsent": true,
+  "candidateUpgradeTested": false,
+  "canonicalPackagePins": 41,
+  "classification": "independent-predecessor-control-passed-candidate-compile-failed",
+  "distinctExitedPredecessorPIDs": [
+    46879,
+    49314
+  ],
+  "failureReceipt": {
+    "classification": "invalid-or-failed",
+    "error": "Command failed; inspect /Users/runner/work/_temp/correction-library-store-proof/candidate-build/build.log",
+    "mode": "candidate"
+  },
+  "frozenFrameworkEntries": 121,
+  "fullSuccessAuditorSHA256": "a07138df3582d046ecd3a11aa9d0438a322f41c1aa1b50124d0233dbe68de155",
+  "gitBoundProductSourceCounts": {
+    "candidate": 643,
+    "predecessor": 634
+  },
+  "limits": [
+    "Linux archive audit cannot re-run macOS process liveness, TCC, code-sign verification or the app.",
+    "ZIP upload mode bits do not prove live read-only permissions. Native read-only receipts and source-bound guards are checked.",
+    "Package source byte inventories are retained runtime receipts. Canonical lock identities/revisions and inventory shape are independently checked.",
+    "Candidate app/test build failed before its identity, upgrade write or reopen host. No correction-store upgrade proof.",
+    "Predecessor semantic/schema details and cryptographic signatures are audited separately by the parent."
+  ],
+  "oldReopenWholeFilesSHA256Verified": true,
+  "originalSeedWholeFilesSHA256Verified": true,
+  "packageSourceEntryCounts": {
+    "axswift": 25,
+    "eventsource": 19,
+    "fluidaudio": 524,
+    "grpc-swift-2": 441,
+    "grpc-swift-nio-transport": 220,
+    "grpc-swift-protobuf": 107,
+    "keysender": 9,
+    "launchatlogin-modern": 9,
+    "llmkit": 32,
+    "mediaremote-adapter": 13,
+    "mlx-audio-swift": 434,
+    "mlx-swift": 741,
+    "mlx-swift-lm": 273,
+    "permissionflow": 57,
+    "selectedtextkit": 42,
+    "sparkle": 600,
+    "swift-algorithms": 119,
+    "swift-asn1": 212,
+    "swift-async-algorithms": 208,
+    "swift-atomics": 144,
+    "swift-certificates": 365,
+    "swift-collections": 842,
+    "swift-crypto": 1044,
+    "swift-http-structured-headers": 69,
+    "swift-http-types": 603,
+    "swift-huggingface": 101,
+    "swift-jinja": 37,
+    "swift-log": 144,
+    "swift-nio": 767,
+    "swift-nio-extras": 180,
+    "swift-nio-http2": 614,
+    "swift-nio-ssl": 769,
+    "swift-nio-transport-services": 61,
+    "swift-numerics": 70,
+    "swift-protobuf": 2511,
+    "swift-service-lifecycle": 51,
+    "swift-syntax": 872,
+    "swift-system": 99,
+    "swift-transformers": 95,
+    "yyjson": 903,
+    "zip": 71
+  },
+  "phaseReceipts": {
+    "old-reopen": {
+      "exitUnix": 1793141368.565401,
+      "fixturePath": "/Users/runner/work/_temp/correction-library-store-proof/stores/old-reopen",
+      "hostPID": 49314,
+      "liveUnix": 1793141366.215094,
+      "sourceSHA": "ebf629b4cf109f7a36109ccac7b20ac70f9f48ab"
+    },
+    "seed": {
+      "exitUnix": 1793141323.883865,
+      "fixturePath": "/Users/runner/work/_temp/correction-library-store-proof/stores/seed",
+      "hostPID": 46879,
+      "liveUnix": 1793141321.781587,
+      "sourceSHA": "ebf629b4cf109f7a36109ccac7b20ac70f9f48ab"
+    }
+  },
+  "phasesAudited": [
+    "seed",
+    "old-reopen"
+  ],
+  "predecessorArchiveByteTreesVerified": true,
+  "runID": 40595182936,
+  "scriptSHA256": "0841e4588d07b3ad434c80b24627ae2ce3639fdbc8c6edd7cea68aa216c33b6b",
+  "sourceSHA": {
+    "candidate": "a5601328e66d6949b5de052b81112ffadaeb1d1c",
+    "predecessor": "ebf629b4cf109f7a36109ccac7b20ac70f9f48ab"
+  },
+  "whisperSourceEntries": 2057
+}

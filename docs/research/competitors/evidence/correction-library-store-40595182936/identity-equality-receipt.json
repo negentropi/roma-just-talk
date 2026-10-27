@@ -1,0 +1,27 @@
+{
+  "classification": "all-five-raw-frozen-identity-receipts-byte-identical",
+  "retainedRepresentative": "predecessor-build/identity.json",
+  "archivedReceipts": {
+    "predecessor-build/identity.json": {
+      "bytes": 176133,
+      "sha256": "19afd623a35b61f93c4716dff2ff449025e6a0f76a9cf94693e180572fb14e5c"
+    },
+    "old-reopen/identity-after.json": {
+      "bytes": 176133,
+      "sha256": "19afd623a35b61f93c4716dff2ff449025e6a0f76a9cf94693e180572fb14e5c"
+    },
+    "old-reopen/identity-before.json": {
+      "bytes": 176133,
+      "sha256": "19afd623a35b61f93c4716dff2ff449025e6a0f76a9cf94693e180572fb14e5c"
+    },
+    "seed/identity-after.json": {
+      "bytes": 176133,
+      "sha256": "19afd623a35b61f93c4716dff2ff449025e6a0f76a9cf94693e180572fb14e5c"
+    },
+    "seed/identity-before.json": {
+      "bytes": 176133,
+      "sha256": "19afd623a35b61f93c4716dff2ff449025e6a0f76a9cf94693e180572fb14e5c"
+    }
+  },
+  "remoteFullArchivePreservesAllFive": true
+}

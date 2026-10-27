@@ -86,7 +86,8 @@ private enum CorrectionLibraryStoreCheck {
         try fixture.run()
         try historicalTranscriptionMetadata(fixture.context, inputs: inputs)
         let compatibility = WordReplacement(originalText: "", replacementText: "")
-        let output = VoiceInkWordReplacementEngine.apply([compatibility.voiceInkRule], to: compatibilityInput)
+        let compatibilityRule = try compatibility.voiceInkRule
+        let output = VoiceInkWordReplacementEngine.apply([compatibilityRule], to: compatibilityInput)
         try exact(output, compatibilityInput)
         try inputs.write([
             "version": 1, "phase": inputs.phase.rawValue, "hostPID": inputs.hostPID,

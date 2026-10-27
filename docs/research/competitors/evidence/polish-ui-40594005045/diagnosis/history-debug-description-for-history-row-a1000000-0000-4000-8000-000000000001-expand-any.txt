@@ -1,0 +1,5 @@
+Query chain:
+ →Find: Target Application 'com.negentropi.RomaJustTalk'
+  ↪︎Find: Descendants matching type Any
+    ↪︎Find: Elements matching predicate '"history.row.A1000000-0000-4000-8000-000000000001.expand" IN identifiers'
+      ↪︎Find: First Match

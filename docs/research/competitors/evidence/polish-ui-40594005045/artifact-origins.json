@@ -1,0 +1,440 @@
+{
+  "artifact_id": 12776619982,
+  "artifact_sha256": "91babfbbfedefa60043abed36b0c0581114c2043721e3397237d4e48c323683d",
+  "retained_raw_members": {
+    "candidate/app-signature-after.txt": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/app-signature-after.txt",
+      "relative": "candidate/app-signature-after.txt",
+      "bytes": 954,
+      "sha256": "0e135c075daf41f08ee675cce2dcd20369b1b75c471db356495bb8378ea8d531",
+      "crc32": "6ac4ed9d"
+    },
+    "candidate/app-signature-before.txt": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/app-signature-before.txt",
+      "relative": "candidate/app-signature-before.txt",
+      "bytes": 954,
+      "sha256": "0e135c075daf41f08ee675cce2dcd20369b1b75c471db356495bb8378ea8d531",
+      "crc32": "6ac4ed9d"
+    },
+    "candidate/history-seed/result.json": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/result.json",
+      "relative": "candidate/history-seed/result.json",
+      "bytes": 1629,
+      "sha256": "ebf9ca9c03154240466f52e92988b0fae949cef8b7d21b82a987690ee2127067",
+      "crc32": "9c5523b6"
+    },
+    "candidate/history-seed/seed/expected-inputs.sha256.json": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/expected-inputs.sha256.json",
+      "relative": "candidate/history-seed/seed/expected-inputs.sha256.json",
+      "bytes": 192,
+      "sha256": "7a24bf35eb0aef71a3f660d73b2bbdef25fead7ce5b5258be61500e896d28235",
+      "crc32": "24195bc7"
+    },
+    "candidate/history-seed/seed/closed-write.json": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/closed-write.json",
+      "relative": "candidate/history-seed/seed/closed-write.json",
+      "bytes": 1775,
+      "sha256": "46398ade92f77007023ba4442832f4ca04993003acd267a4af9fae3a88c93ac2",
+      "crc32": "3159f083"
+    },
+    "candidate/history-seed/seed/expected-libraries.json": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/expected-libraries.json",
+      "relative": "candidate/history-seed/seed/expected-libraries.json",
+      "bytes": 3132,
+      "sha256": "500141d528f4e27d59726528be38486aa1b42db1da60e77c23820cc56db1f6fc",
+      "crc32": "983c90f3"
+    },
+    "candidate/history-seed/seed/expected-rows.json": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/expected-rows.json",
+      "relative": "candidate/history-seed/seed/expected-rows.json",
+      "bytes": 20340,
+      "sha256": "de1f0d8ae08047d0e48da8e7e1fead8f686efac90539249d8b30e8fa29b61b47",
+      "crc32": "d722b52e"
+    },
+    "candidate/history-seed/seed/host-observed.json": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/host-observed.json",
+      "relative": "candidate/history-seed/seed/host-observed.json",
+      "bytes": 480,
+      "sha256": "b9262ba9cca4d6448016cb63e7b0f18bd1ae6e2eb5e6893f9bd7ae95bd345b48",
+      "crc32": "d124f0fd"
+    },
+    "candidate/history-seed/seed/identity-after.txt": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/identity-after.txt",
+      "relative": "candidate/history-seed/seed/identity-after.txt",
+      "bytes": 433,
+      "sha256": "d50dc4e4c846c840703eb47d1e940a3ed65aef6574967bdadde23fec98445dd0",
+      "crc32": "6b69dcbc"
+    },
+    "candidate/history-seed/seed/identity-before.txt": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/identity-before.txt",
+      "relative": "candidate/history-seed/seed/identity-before.txt",
+      "bytes": 433,
+      "sha256": "d50dc4e4c846c840703eb47d1e940a3ed65aef6574967bdadde23fec98445dd0",
+      "crc32": "6b69dcbc"
+    },
+    "candidate/history-seed/seed/libraries.json": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/libraries.json",
+      "relative": "candidate/history-seed/seed/libraries.json",
+      "bytes": 3132,
+      "sha256": "500141d528f4e27d59726528be38486aa1b42db1da60e77c23820cc56db1f6fc",
+      "crc32": "983c90f3"
+    },
+    "candidate/history-seed/seed/microphone-tcc.json": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/microphone-tcc.json",
+      "relative": "candidate/history-seed/seed/microphone-tcc.json",
+      "bytes": 199,
+      "sha256": "88131c65f014b20b54ea2e5ca6aeddd77b0b3a450bee171ba09091dd0a297e4d",
+      "crc32": "5a11c4b9"
+    },
+    "candidate/history-seed/seed/observation.json": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/observation.json",
+      "relative": "candidate/history-seed/seed/observation.json",
+      "bytes": 1168,
+      "sha256": "9d3de2ad1e19d7d56eee0290ec1c4e4ca7efb3acaad8c94b10b913b271efaa38",
+      "crc32": "0e99ac00"
+    },
+    "candidate/history-seed/seed/result.json": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/result.json",
+      "relative": "candidate/history-seed/seed/result.json",
+      "bytes": 623,
+      "sha256": "bd68a7c7054c59dd13c4ea4914f44e849f3998be5e4e483921dab1039037b889",
+      "crc32": "94566ba6"
+    },
+    "candidate/history-seed/seed/rows.json": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/rows.json",
+      "relative": "candidate/history-seed/seed/rows.json",
+      "bytes": 20340,
+      "sha256": "de1f0d8ae08047d0e48da8e7e1fead8f686efac90539249d8b30e8fa29b61b47",
+      "crc32": "d722b52e"
+    },
+    "candidate/history-seed/seed/source-inputs.json": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/source-inputs.json",
+      "relative": "candidate/history-seed/seed/source-inputs.json",
+      "bytes": 1019,
+      "sha256": "9adb817aa7df5b978049756a95adfe89d4a1c4385e5016b10ec237f771f4f751",
+      "crc32": "1b4a23d3"
+    },
+    "candidate/history-seed/seed/store-provenance.json": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/store-provenance.json",
+      "relative": "candidate/history-seed/seed/store-provenance.json",
+      "bytes": 2584,
+      "sha256": "dfe6c70c94a52d0be118abd26e4596f8cdde5fd7ea55ab638946c5231441c174",
+      "crc32": "65e86aa7"
+    },
+    "candidate/history-seed/seed/system-tcc.json": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/system-tcc.json",
+      "relative": "candidate/history-seed/seed/system-tcc.json",
+      "bytes": 202,
+      "sha256": "803b5e624fcbe042a6a226b322fe11010e5849eaf28269c676d1cea0779c1c1d",
+      "crc32": "0eb935d0"
+    },
+    "candidate/history-seed/seed/tests-excerpt.txt": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/tests-excerpt.txt",
+      "relative": "candidate/history-seed/seed/tests-excerpt.txt",
+      "bytes": 177,
+      "sha256": "17c07fffb49f3a041b51dd7b0285802ce59c1972d873c06960da80458fad2e8e",
+      "crc32": "65772434"
+    },
+    "candidate/history-seed/verify/closed-write.json": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/verify/closed-write.json",
+      "relative": "candidate/history-seed/verify/closed-write.json",
+      "bytes": 1775,
+      "sha256": "7d69e1d9772f9e1e131f2e83d902d9033a696d796a66a18cf78dc7dd511c1580",
+      "crc32": "9f8d9abd"
+    },
+    "candidate/history-seed/verify/expected-libraries.json": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/verify/expected-libraries.json",
+      "relative": "candidate/history-seed/verify/expected-libraries.json",
+      "bytes": 3132,
+      "sha256": "500141d528f4e27d59726528be38486aa1b42db1da60e77c23820cc56db1f6fc",
+      "crc32": "983c90f3"
+    },
+    "candidate/history-seed/verify/expected-rows.json": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/verify/expected-rows.json",
+      "relative": "candidate/history-seed/verify/expected-rows.json",
+      "bytes": 20340,
+      "sha256": "de1f0d8ae08047d0e48da8e7e1fead8f686efac90539249d8b30e8fa29b61b47",
+      "crc32": "d722b52e"
+    },
+    "candidate/history-seed/verify/host-observed.json": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/verify/host-observed.json",
+      "relative": "candidate/history-seed/verify/host-observed.json",
+      "bytes": 480,
+      "sha256": "3cca4b31293e3a85969cfafe15721ed559f5e58bac25cad87baa3fbdafe7c029",
+      "crc32": "97dd3a44"
+    },
+    "candidate/history-seed/verify/identity-after.txt": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/verify/identity-after.txt",
+      "relative": "candidate/history-seed/verify/identity-after.txt",
+      "bytes": 433,
+      "sha256": "d50dc4e4c846c840703eb47d1e940a3ed65aef6574967bdadde23fec98445dd0",
+      "crc32": "6b69dcbc"
+    },
+    "candidate/history-seed/verify/identity-before.txt": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/verify/identity-before.txt",
+      "relative": "candidate/history-seed/verify/identity-before.txt",
+      "bytes": 433,
+      "sha256": "d50dc4e4c846c840703eb47d1e940a3ed65aef6574967bdadde23fec98445dd0",
+      "crc32": "6b69dcbc"
+    },
+    "candidate/history-seed/verify/libraries.json": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/verify/libraries.json",
+      "relative": "candidate/history-seed/verify/libraries.json",
+      "bytes": 3132,
+      "sha256": "500141d528f4e27d59726528be38486aa1b42db1da60e77c23820cc56db1f6fc",
+      "crc32": "983c90f3"
+    },
+    "candidate/history-seed/verify/microphone-tcc.json": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/verify/microphone-tcc.json",
+      "relative": "candidate/history-seed/verify/microphone-tcc.json",
+      "bytes": 199,
+      "sha256": "88131c65f014b20b54ea2e5ca6aeddd77b0b3a450bee171ba09091dd0a297e4d",
+      "crc32": "5a11c4b9"
+    },
+    "candidate/history-seed/verify/observation.json": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/verify/observation.json",
+      "relative": "candidate/history-seed/verify/observation.json",
+      "bytes": 1170,
+      "sha256": "1e2a87abc49ba8fe2bc52f6197ef5ccab2ea31c3b757d436d644f631d3e2e00a",
+      "crc32": "c5099c0d"
+    },
+    "candidate/history-seed/verify/result.json": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/verify/result.json",
+      "relative": "candidate/history-seed/verify/result.json",
+      "bytes": 625,
+      "sha256": "e7899c5d1781e54c9a7fa6156ab335442c8ce775dc77307e018ad9357982d05d",
+      "crc32": "b613c9b1"
+    },
+    "candidate/history-seed/verify/rows.json": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/verify/rows.json",
+      "relative": "candidate/history-seed/verify/rows.json",
+      "bytes": 20340,
+      "sha256": "de1f0d8ae08047d0e48da8e7e1fead8f686efac90539249d8b30e8fa29b61b47",
+      "crc32": "d722b52e"
+    },
+    "candidate/history-seed/verify/source-inputs.json": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/verify/source-inputs.json",
+      "relative": "candidate/history-seed/verify/source-inputs.json",
+      "bytes": 1019,
+      "sha256": "9adb817aa7df5b978049756a95adfe89d4a1c4385e5016b10ec237f771f4f751",
+      "crc32": "1b4a23d3"
+    },
+    "candidate/history-seed/verify/store-provenance.json": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/verify/store-provenance.json",
+      "relative": "candidate/history-seed/verify/store-provenance.json",
+      "bytes": 2483,
+      "sha256": "5b508200d87105a14fb9432d9e531ef177c96758cc79cee91ef79df9c67d7f46",
+      "crc32": "e9c93b05"
+    },
+    "candidate/history-seed/verify/system-tcc.json": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/verify/system-tcc.json",
+      "relative": "candidate/history-seed/verify/system-tcc.json",
+      "bytes": 202,
+      "sha256": "803b5e624fcbe042a6a226b322fe11010e5849eaf28269c676d1cea0779c1c1d",
+      "crc32": "0eb935d0"
+    },
+    "candidate/history-seed/verify/tests-excerpt.txt": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/verify/tests-excerpt.txt",
+      "relative": "candidate/history-seed/verify/tests-excerpt.txt",
+      "bytes": 177,
+      "sha256": "a045f9cda76d6340bdde99e3a9a67294711e33cff06e5b2ec565f91b0d3d5aca",
+      "crc32": "4ea3baf0"
+    },
+    "candidate/identity-after.txt": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/identity-after.txt",
+      "relative": "candidate/identity-after.txt",
+      "bytes": 659,
+      "sha256": "d8a31c64caa13fe5b1d1e4f03b56bcfdfc83665e3a76c7731ac1699299cd3e74",
+      "crc32": "f86c6b83"
+    },
+    "candidate/identity-before.txt": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/identity-before.txt",
+      "relative": "candidate/identity-before.txt",
+      "bytes": 659,
+      "sha256": "d8a31c64caa13fe5b1d1e4f03b56bcfdfc83665e3a76c7731ac1699299cd3e74",
+      "crc32": "f86c6b83"
+    },
+    "candidate/microphone-tcc.json": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/microphone-tcc.json",
+      "relative": "candidate/microphone-tcc.json",
+      "bytes": 199,
+      "sha256": "88131c65f014b20b54ea2e5ca6aeddd77b0b3a450bee171ba09091dd0a297e4d",
+      "crc32": "5a11c4b9"
+    },
+    "candidate/result.json": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/result.json",
+      "relative": "candidate/result.json",
+      "bytes": 901,
+      "sha256": "a5503c94bc7ea865243a46e46815992af79f65f4ebcc1d0cdc8a17f554ab1b6d",
+      "crc32": "348362fc"
+    },
+    "candidate/runner-signature-after.txt": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/runner-signature-after.txt",
+      "relative": "candidate/runner-signature-after.txt",
+      "bytes": 980,
+      "sha256": "f7c7059c98557dbe7e565feca7d6ed67c17529553f0841e7d0fc155366f6d78e",
+      "crc32": "4e2ca595"
+    },
+    "candidate/runner-signature-before.txt": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/runner-signature-before.txt",
+      "relative": "candidate/runner-signature-before.txt",
+      "bytes": 980,
+      "sha256": "f7c7059c98557dbe7e565feca7d6ed67c17529553f0841e7d0fc155366f6d78e",
+      "crc32": "4e2ca595"
+    },
+    "candidate/selection/selected-tests.json": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/selection/selected-tests.json",
+      "relative": "candidate/selection/selected-tests.json",
+      "bytes": 1738,
+      "sha256": "ca5ee7968f57b2d25e6daef2e817014171a0de6f9b251bc0aa6eb5bdc3a5900b",
+      "crc32": "4267e6b2"
+    },
+    "candidate/selection/selection-receipt.json": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/selection/selection-receipt.json",
+      "relative": "candidate/selection/selection-receipt.json",
+      "bytes": 1809,
+      "sha256": "fe6cae1569a4ca0abd8efdbd51bd35151e7a6e3ac35e2e6dfad1a5c9aed3314a",
+      "crc32": "3af8f38a"
+    },
+    "candidate/system-tcc.json": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/system-tcc.json",
+      "relative": "candidate/system-tcc.json",
+      "bytes": 202,
+      "sha256": "803b5e624fcbe042a6a226b322fe11010e5849eaf28269c676d1cea0779c1c1d",
+      "crc32": "0eb935d0"
+    },
+    "candidate/test-bundle-signature-after.txt": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/test-bundle-signature-after.txt",
+      "relative": "candidate/test-bundle-signature-after.txt",
+      "bytes": 998,
+      "sha256": "0d00bea30f377d77b509ceca2542ec2780c96c59caec88b98e9023c2b3f8d909",
+      "crc32": "c0686738"
+    },
+    "candidate/test-bundle-signature-before.txt": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/test-bundle-signature-before.txt",
+      "relative": "candidate/test-bundle-signature-before.txt",
+      "bytes": 998,
+      "sha256": "0d00bea30f377d77b509ceca2542ec2780c96c59caec88b98e9023c2b3f8d909",
+      "crc32": "c0686738"
+    },
+    "candidate/tests.log": {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/tests.log",
+      "relative": "candidate/tests.log",
+      "bytes": 255057,
+      "sha256": "419daddb6ad4d846ef06c9da976ee4c0ed4d5b730a9386f966a1129723cb4396",
+      "crc32": "6de891e9"
+    },
+    "proof/source-inputs-after.txt": {
+      "member": "_temp/writing-ui-proof/source-inputs-after.txt",
+      "relative": "proof/source-inputs-after.txt",
+      "bytes": 648,
+      "sha256": "da6664fde45764dc1ce4008bf31d96c26f83bc3664a3b97a05f8697f6dc8b37f",
+      "crc32": "784707ab"
+    },
+    "comparison/baseline/app-signature-after.txt": {
+      "member": "_temp/writing-settings-ui-regression/baseline/app-signature-after.txt",
+      "relative": "comparison/baseline/app-signature-after.txt",
+      "bytes": 975,
+      "sha256": "97b21ceaf2384ba0d915333ba27edc995631022d4c37d0f07e4d98ab4677f67e",
+      "crc32": "a04eac35"
+    },
+    "comparison/baseline/app-signature-before.txt": {
+      "member": "_temp/writing-settings-ui-regression/baseline/app-signature-before.txt",
+      "relative": "comparison/baseline/app-signature-before.txt",
+      "bytes": 975,
+      "sha256": "97b21ceaf2384ba0d915333ba27edc995631022d4c37d0f07e4d98ab4677f67e",
+      "crc32": "a04eac35"
+    },
+    "comparison/baseline/identity-after.txt": {
+      "member": "_temp/writing-settings-ui-regression/baseline/identity-after.txt",
+      "relative": "comparison/baseline/identity-after.txt",
+      "bytes": 722,
+      "sha256": "47cbbc4f3c3344d2123134d0f137b1338cf772184105d8ca0879ddba1405af0c",
+      "crc32": "45d23522"
+    },
+    "comparison/baseline/identity-before.txt": {
+      "member": "_temp/writing-settings-ui-regression/baseline/identity-before.txt",
+      "relative": "comparison/baseline/identity-before.txt",
+      "bytes": 722,
+      "sha256": "47cbbc4f3c3344d2123134d0f137b1338cf772184105d8ca0879ddba1405af0c",
+      "crc32": "45d23522"
+    },
+    "comparison/baseline/microphone-tcc.json": {
+      "member": "_temp/writing-settings-ui-regression/baseline/microphone-tcc.json",
+      "relative": "comparison/baseline/microphone-tcc.json",
+      "bytes": 199,
+      "sha256": "f0d90e41682fa5e7aa7b0956b81a0288a06551530ce50f8920ad48373a341740",
+      "crc32": "21bdff82"
+    },
+    "comparison/baseline/result.json": {
+      "member": "_temp/writing-settings-ui-regression/baseline/result.json",
+      "relative": "comparison/baseline/result.json",
+      "bytes": 3535,
+      "sha256": "aee26a4455bd584f530a0d68802a4776a943765e955f8bdcdff83f14f12bb74b",
+      "crc32": "3190758c"
+    },
+    "comparison/baseline/runner-signature-after.txt": {
+      "member": "_temp/writing-settings-ui-regression/baseline/runner-signature-after.txt",
+      "relative": "comparison/baseline/runner-signature-after.txt",
+      "bytes": 1001,
+      "sha256": "f5008689cb0645283a6e035c92c98ca76448c5a93348280c760e68ab2779a99f",
+      "crc32": "a3dca024"
+    },
+    "comparison/baseline/runner-signature-before.txt": {
+      "member": "_temp/writing-settings-ui-regression/baseline/runner-signature-before.txt",
+      "relative": "comparison/baseline/runner-signature-before.txt",
+      "bytes": 1001,
+      "sha256": "f5008689cb0645283a6e035c92c98ca76448c5a93348280c760e68ab2779a99f",
+      "crc32": "a3dca024"
+    },
+    "comparison/baseline/selected-tests.json": {
+      "member": "_temp/writing-settings-ui-regression/baseline/selected-tests.json",
+      "relative": "comparison/baseline/selected-tests.json",
+      "bytes": 1738,
+      "sha256": "0dd1d05c1d6c6f1c072c45f6ed2dbf0044500f2360e9d0a474d3a9631a9bf94f",
+      "crc32": "e52f358f"
+    },
+    "comparison/baseline/selection-receipt.json": {
+      "member": "_temp/writing-settings-ui-regression/baseline/selection-receipt.json",
+      "relative": "comparison/baseline/selection-receipt.json",
+      "bytes": 1264,
+      "sha256": "c749057ee0ef5fea4dabcf139358f955ecd85c2776c7be9135d5383af964527d",
+      "crc32": "fddce2db"
+    },
+    "comparison/baseline/system-tcc.json": {
+      "member": "_temp/writing-settings-ui-regression/baseline/system-tcc.json",
+      "relative": "comparison/baseline/system-tcc.json",
+      "bytes": 202,
+      "sha256": "dd48c34b20a863654e815ab7aab72df6d1b9b890c755d6ab062cb20fd95e1996",
+      "crc32": "75150eeb"
+    },
+    "comparison/baseline/test-bundle-signature-after.txt": {
+      "member": "_temp/writing-settings-ui-regression/baseline/test-bundle-signature-after.txt",
+      "relative": "comparison/baseline/test-bundle-signature-after.txt",
+      "bytes": 1019,
+      "sha256": "89051f6a36a80c204b82f5542c995e8dfe612627b93fb652ce77f6b70e965b19",
+      "crc32": "8ff7509e"
+    },
+    "comparison/baseline/test-bundle-signature-before.txt": {
+      "member": "_temp/writing-settings-ui-regression/baseline/test-bundle-signature-before.txt",
+      "relative": "comparison/baseline/test-bundle-signature-before.txt",
+      "bytes": 1019,
+      "sha256": "89051f6a36a80c204b82f5542c995e8dfe612627b93fb652ce77f6b70e965b19",
+      "crc32": "8ff7509e"
+    },
+    "comparison/contract.json": {
+      "member": "_temp/writing-settings-ui-regression/contract.json",
+      "relative": "comparison/contract.json",
+      "bytes": 4889,
+      "sha256": "c59e907a4579f372fb7371b0c3ffa97fcc8cf6660d853c5724d006ad92b58d3f",
+      "crc32": "3b26cff2"
+    },
+    "comparison/result.json": {
+      "member": "_temp/writing-settings-ui-regression/result.json",
+      "relative": "comparison/result.json",
+      "bytes": 15159,
+      "sha256": "157ee6a2c33a98f34785ca6b0aa8c3b8943a5b80e5fac40b3a584cd6f2db8c57",
+      "crc32": "f780d993"
+    }
+  }
+}

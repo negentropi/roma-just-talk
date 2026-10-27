@@ -1,0 +1,402 @@
+{
+  "baseline": {
+    "classification": "intended-disabled-panel-failure",
+    "errors": [
+      "/Users/runner/work/_temp/writing-settings-ui-baseline/VoiceInkUITests/WritingFeaturesUITests.swift:639: error: -[VoiceInkUITests.WritingFeaturesUITests testDictationProfilePreservesCustomSettingsAndPersists] : XCTAssertTrue failed - Opening model settings disabled the panel or blocked a visible panel control."
+    ],
+    "exit_code": 65,
+    "expected_assertion_line": 639,
+    "expected_assertion_message": "Opening model settings disabled the panel or blocked a visible panel control.",
+    "observations": {
+      "after-opening": [
+        {
+          "actors": {
+            "application": {
+              "enabled": false,
+              "exists": true,
+              "hittable": false
+            },
+            "background-filter": {
+              "enabled": false,
+              "exists": true,
+              "hittable": true
+            },
+            "custom": {
+              "enabled": true,
+              "exists": true,
+              "hittable": false
+            },
+            "form": {
+              "enabled": false,
+              "exists": true,
+              "hittable": false
+            },
+            "main-window": {
+              "enabled": false,
+              "exists": true,
+              "hittable": true
+            },
+            "none": {
+              "enabled": true,
+              "exists": true,
+              "hittable": false
+            },
+            "settings-close": {
+              "enabled": true,
+              "exists": true,
+              "hittable": true
+            },
+            "settings-open": {
+              "enabled": false,
+              "exists": true,
+              "hittable": true
+            }
+          },
+          "boundaryFailures": [
+            "custom",
+            "none"
+          ],
+          "mainWindowCount": 1,
+          "nativeSheetCount": 0,
+          "opening": 1,
+          "phase": "after-opening",
+          "version": 1
+        }
+      ],
+      "before-opening": [
+        {
+          "actors": {
+            "application": {
+              "enabled": false,
+              "exists": true,
+              "hittable": false
+            },
+            "background-filter": {
+              "enabled": true,
+              "exists": true,
+              "hittable": true
+            },
+            "custom": {
+              "enabled": null,
+              "exists": false,
+              "hittable": null
+            },
+            "form": {
+              "enabled": null,
+              "exists": false,
+              "hittable": null
+            },
+            "main-window": {
+              "enabled": false,
+              "exists": true,
+              "hittable": true
+            },
+            "none": {
+              "enabled": null,
+              "exists": false,
+              "hittable": null
+            },
+            "settings-close": {
+              "enabled": null,
+              "exists": false,
+              "hittable": null
+            },
+            "settings-open": {
+              "enabled": true,
+              "exists": true,
+              "hittable": true
+            }
+          },
+          "boundaryFailures": [],
+          "mainWindowCount": 1,
+          "nativeSheetCount": 0,
+          "opening": 1,
+          "phase": "before-opening",
+          "version": 1
+        }
+      ]
+    },
+    "observed_boundary_valid": true,
+    "results": [
+      "failed"
+    ],
+    "starts": 1,
+    "valid": true,
+    "xctest_totals": [
+      [
+        "1",
+        " with 1 failure (0 unexpected) in 54.120 (54.122) seconds"
+      ],
+      [
+        "1",
+        " with 1 failure (0 unexpected) in 54.120 (54.123) seconds"
+      ],
+      [
+        "1",
+        " with 1 failure (0 unexpected) in 54.120 (54.124) seconds"
+      ]
+    ]
+  },
+  "baseline_identity_and_tcc": {
+    "identity": {
+      "binaries": [
+        {
+          "path": "/Users/runner/work/_temp/writing-settings-ui-baseline/.writing-ui-regression-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+          "sha256": "deaf2662a08f947932af9b6a1770603026089298db29709e2d6124dd6e64aacb"
+        },
+        {
+          "path": "/Users/runner/work/_temp/writing-settings-ui-baseline/.writing-ui-regression-build/Build/Products/Debug/VoiceInkUITests-Runner.app/Contents/MacOS/VoiceInkUITests-Runner",
+          "sha256": "d739d8edb6323d5c8a533b0ddbbf47fc1043370c7c0a6a87dff7e35bb64fc4a2"
+        },
+        {
+          "path": "/Users/runner/work/_temp/writing-settings-ui-baseline/.writing-ui-regression-build/Build/Products/Debug/VoiceInkUITests-Runner.app/Contents/PlugIns/VoiceInkUITests.xctest/Contents/MacOS/VoiceInkUITests",
+          "sha256": "2312166fb99f7063e7535a1dd8467dc9b7a91e902b353a41b7f54d09b5a10d5e"
+        }
+      ],
+      "signatures": {
+        "app": {
+          "bundle_identifier": "com.negentropi.RomaJustTalk",
+          "cdhash": "288241cbc37ec924e18a96c6fc91b84a3f435124",
+          "signature_sha256": "97b21ceaf2384ba0d915333ba27edc995631022d4c37d0f07e4d98ab4677f67e"
+        },
+        "runner": {
+          "bundle_identifier": "com.negentropi.RomaJustTalkUITests.xctrunner",
+          "cdhash": "bdab6f00e9f9754b0d2b25e1503f960c76737c3c",
+          "signature_sha256": "f5008689cb0645283a6e035c92c98ca76448c5a93348280c760e68ab2779a99f"
+        },
+        "test-bundle": {
+          "bundle_identifier": "com.negentropi.RomaJustTalkUITests",
+          "cdhash": "f7e02245829e705293dd1a102133ef38c9148985",
+          "signature_sha256": "89051f6a36a80c204b82f5542c995e8dfe612627b93fb652ce77f6b70e965b19"
+        }
+      },
+      "valid": true
+    },
+    "process": {
+      "observation": {
+        "expected_executable": "/Users/runner/work/_temp/writing-settings-ui-baseline/.writing-ui-regression-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+        "observer_completed": true,
+        "processes": [
+          {
+            "executable": "/Users/runner/work/_temp/writing-settings-ui-baseline/.writing-ui-regression-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+            "pid": 27958
+          }
+        ],
+        "sampling_errors": []
+      },
+      "valid": true
+    },
+    "tcc": {
+      "expected_services": [
+        "kTCCServiceAccessibility",
+        "kTCCServiceMicrophone"
+      ],
+      "host_requirement_sha256": "741ee4e0daccf8764781044f0d63061ebc7db03af07b2db402bd3bc856402b4d",
+      "scope": "Fresh permission database row readback only; native control interaction supplies separate accessibility evidence",
+      "valid": true
+    }
+  },
+  "baseline_sha": "bdd608cf6111e8d7e88c12678f530318713acf67",
+  "candidate": {
+    "classification": "invalid-or-failed",
+    "exit_code": 65,
+    "tests": {
+      "testCSVImportPreviewsMultilineContentBeforeReplacing": {
+        "results": [
+          "passed"
+        ],
+        "starts": 1
+      },
+      "testDictationProfilePreservesCustomSettingsAndPersists": {
+        "results": [
+          "passed"
+        ],
+        "starts": 1
+      },
+      "testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings": {
+        "results": [
+          "failed"
+        ],
+        "starts": 1
+      },
+      "testHistoryPreservesRecognizedFallbackAndLegacyVariants": {
+        "results": [
+          "failed"
+        ],
+        "starts": 1
+      },
+      "testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch": {
+        "results": [
+          "passed"
+        ],
+        "starts": 1
+      },
+      "testTranslationTargetsReorderSelectAndPersist": {
+        "results": [
+          "passed"
+        ],
+        "starts": 1
+      }
+    }
+  },
+  "candidate_driver_exit_code": 1,
+  "candidate_identity_and_tcc": {
+    "identity": {
+      "binaries": [
+        {
+          "path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+          "sha256": "d8b1543b5ba0522d1b6b5c4760f7d7792dbd2c2b2a37ecb88ddb0746dad52465"
+        },
+        {
+          "path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkUITests-Runner.app/Contents/MacOS/VoiceInkUITests-Runner",
+          "sha256": "d6aa4d2309867ba1bd7fd8457065e6a6daa0d51e0fde0cabc507c8c6b9fa7924"
+        },
+        {
+          "path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkUITests-Runner.app/Contents/PlugIns/VoiceInkUITests.xctest/Contents/MacOS/VoiceInkUITests",
+          "sha256": "0b2bed74e3e7f637e69095daf21f1f111daf9486e22cd91ce6cb57a392b50e2e"
+        }
+      ],
+      "signatures": {
+        "app": {
+          "bundle_identifier": "com.negentropi.RomaJustTalk",
+          "cdhash": "032c5bd4bad6f1b3bf69037cd01ffc58a00c40d8",
+          "signature_sha256": "0e135c075daf41f08ee675cce2dcd20369b1b75c471db356495bb8378ea8d531"
+        },
+        "runner": {
+          "bundle_identifier": "com.negentropi.RomaJustTalkUITests.xctrunner",
+          "cdhash": "e457c94cbcb5ef0987c86749135c224f8b334690",
+          "signature_sha256": "f7c7059c98557dbe7e565feca7d6ed67c17529553f0841e7d0fc155366f6d78e"
+        },
+        "test-bundle": {
+          "bundle_identifier": "com.negentropi.RomaJustTalkUITests",
+          "cdhash": "eab10fae5236774ee51d5a48ee226f55bb6bc5ce",
+          "signature_sha256": "0d00bea30f377d77b509ceca2542ec2780c96c59caec88b98e9023c2b3f8d909"
+        }
+      },
+      "valid": true
+    },
+    "process": {
+      "observation": {
+        "expected_executable": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+        "observer_completed": true,
+        "processes": [
+          {
+            "executable": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+            "pid": 50400
+          },
+          {
+            "executable": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+            "pid": 51974
+          },
+          {
+            "executable": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+            "pid": 53292
+          },
+          {
+            "executable": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+            "pid": 58409
+          },
+          {
+            "executable": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+            "pid": 64536
+          },
+          {
+            "executable": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+            "pid": 70785
+          },
+          {
+            "executable": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+            "pid": 79433
+          },
+          {
+            "executable": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+            "pid": 80171
+          },
+          {
+            "executable": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+            "pid": 83223
+          },
+          {
+            "executable": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+            "pid": 85362
+          },
+          {
+            "executable": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+            "pid": 87529
+          },
+          {
+            "executable": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+            "pid": 89810
+          },
+          {
+            "executable": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+            "pid": 91239
+          }
+        ],
+        "sampling_errors": []
+      },
+      "valid": true
+    },
+    "tcc": {
+      "expected_services": [
+        "kTCCServiceAccessibility",
+        "kTCCServiceMicrophone"
+      ],
+      "host_requirement_sha256": "12b1aaaf158b4b3409455f8213bc9c287d1332d292521fc42b3a1220c0343294",
+      "scope": "Fresh permission database row readback only; native control interaction supplies separate accessibility evidence",
+      "valid": true
+    }
+  },
+  "candidate_sha": "c29ac2d7c6fa7690ea3bd0d5a38697b44a37d182",
+  "candidate_valid": false,
+  "candidate_visual_available": true,
+  "classification": "invalid-or-failed",
+  "driver_sha": "c29ac2d7c6fa7690ea3bd0d5a38697b44a37d182",
+  "history_seed": {
+    "closedBeforeUI": true,
+    "scope": "Synthetic normal-store History input plus read-only native verification; no ASR or migration proof",
+    "seed": {
+      "closedAfterUI": false,
+      "closedBeforeUI": true,
+      "exit_code": 0,
+      "hostPID": 51974,
+      "normalFactoryReused": true,
+      "normalStorePaths": [
+        "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/default.store",
+        "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/dictionary.store",
+        "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/stats.store"
+      ],
+      "phase": "seed",
+      "saveCompleted": true,
+      "sourceSHA": "c29ac2d7c6fa7690ea3bd0d5a38697b44a37d182",
+      "testName": "liveDictationHistoryUISeed",
+      "valid": true,
+      "verificationReadOnly": false
+    },
+    "sourceSHA": "c29ac2d7c6fa7690ea3bd0d5a38697b44a37d182",
+    "testName": "liveDictationHistoryUISeed",
+    "valid": true,
+    "verifiedAfterUI": true,
+    "verify": {
+      "closedAfterUI": true,
+      "closedBeforeUI": false,
+      "exit_code": 0,
+      "hostPID": 91239,
+      "normalFactoryReused": true,
+      "normalStorePaths": [
+        "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/default.store",
+        "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/dictionary.store",
+        "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/stats.store"
+      ],
+      "phase": "verify",
+      "saveCompleted": false,
+      "sourceSHA": "c29ac2d7c6fa7690ea3bd0d5a38697b44a37d182",
+      "testName": "liveDictationHistoryUISeed",
+      "valid": true,
+      "verificationReadOnly": true
+    }
+  },
+  "history_seed_valid": true,
+  "oracle_sha256": "1a3ca0fdf820eca0be44b58565e3ea9bb71ce4517f4487b5f22a04174e602169",
+  "scope": "Debug six-case native UI comparison with normal-store History seed; not Release validation"
+}

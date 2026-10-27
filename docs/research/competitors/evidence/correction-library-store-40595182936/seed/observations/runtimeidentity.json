@@ -1,0 +1,121 @@
+{
+  "configurations" : [
+    {
+      "allowsSave" : true,
+      "cloudKitContainerIdentifier" : null,
+      "groupAppContainerIdentifier" : null,
+      "isStoredInMemoryOnly" : false,
+      "name" : "default",
+      "schemaEntities" : [
+        "Transcription"
+      ],
+      "url" : "\/Users\/runner\/work\/_temp\/correction-library-store-proof\/stores\/seed\/default.store"
+    },
+    {
+      "allowsSave" : true,
+      "cloudKitContainerIdentifier" : null,
+      "groupAppContainerIdentifier" : null,
+      "isStoredInMemoryOnly" : false,
+      "name" : "dictionary",
+      "schemaEntities" : [
+        "VocabularyWord",
+        "WordReplacement"
+      ],
+      "url" : "\/Users\/runner\/work\/_temp\/correction-library-store-proof\/stores\/seed\/dictionary.store"
+    },
+    {
+      "allowsSave" : true,
+      "cloudKitContainerIdentifier" : null,
+      "groupAppContainerIdentifier" : null,
+      "isStoredInMemoryOnly" : false,
+      "name" : "stats",
+      "schemaEntities" : [
+        "SessionMetric"
+      ],
+      "url" : "\/Users\/runner\/work\/_temp\/correction-library-store-proof\/stores\/seed\/stats.store"
+    }
+  ],
+  "declaredSchemaOrder" : [
+    "Transcription",
+    "VocabularyWord",
+    "WordReplacement",
+    "SessionMetric"
+  ],
+  "models" : [
+    {
+      "entityName" : "Transcription",
+      "reflectedType" : "VoiceInk.Transcription"
+    },
+    {
+      "entityName" : "VocabularyWord",
+      "reflectedType" : "VoiceInk.VocabularyWord"
+    },
+    {
+      "entityName" : "WordReplacement",
+      "reflectedType" : "VoiceInk.WordReplacement"
+    },
+    {
+      "entityName" : "SessionMetric",
+      "reflectedType" : "VoiceInk.SessionMetric"
+    }
+  ],
+  "persistentIdentifiers" : {
+    "SessionMetric" : [
+      {
+        "encodedBase64" : "eyJpbXBsZW1lbnRhdGlvbiI6eyJlbnRpdHlOYW1lIjoiU2Vzc2lvbk1ldHJpYyIsImlzVGVtcG9yYXJ5IjpmYWxzZSwicHJpbWFyeUtleSI6InAxIiwic3RvcmVJZGVudGlmaWVyIjoiODdGOUQxQUQtQTU3NC00N0FCLTgyMDYtM0ZGNTU4QkE5OTRFIiwidXJpUmVwcmVzZW50YXRpb24iOiJ4LWNvcmVkYXRhOlwvXC84N0Y5RDFBRC1BNTc0LTQ3QUItODIwNi0zRkY1NThCQTk5NEVcL1Nlc3Npb25NZXRyaWNcL3AxIn19",
+        "entityName" : "SessionMetric",
+        "storeIdentifier" : "87F9D1AD-A574-47AB-8206-3FF558BA994E"
+      },
+      {
+        "encodedBase64" : "eyJpbXBsZW1lbnRhdGlvbiI6eyJlbnRpdHlOYW1lIjoiU2Vzc2lvbk1ldHJpYyIsImlzVGVtcG9yYXJ5IjpmYWxzZSwicHJpbWFyeUtleSI6InAyIiwic3RvcmVJZGVudGlmaWVyIjoiODdGOUQxQUQtQTU3NC00N0FCLTgyMDYtM0ZGNTU4QkE5OTRFIiwidXJpUmVwcmVzZW50YXRpb24iOiJ4LWNvcmVkYXRhOlwvXC84N0Y5RDFBRC1BNTc0LTQ3QUItODIwNi0zRkY1NThCQTk5NEVcL1Nlc3Npb25NZXRyaWNcL3AyIn19",
+        "entityName" : "SessionMetric",
+        "storeIdentifier" : "87F9D1AD-A574-47AB-8206-3FF558BA994E"
+      }
+    ],
+    "Transcription" : [
+      {
+        "encodedBase64" : "eyJpbXBsZW1lbnRhdGlvbiI6eyJlbnRpdHlOYW1lIjoiVHJhbnNjcmlwdGlvbiIsImlzVGVtcG9yYXJ5IjpmYWxzZSwicHJpbWFyeUtleSI6InAyIiwic3RvcmVJZGVudGlmaWVyIjoiMEZDNUU4QjMtMEYwMi00NzEwLTkyRDQtQjVFMDk5NDE0MDI0IiwidXJpUmVwcmVzZW50YXRpb24iOiJ4LWNvcmVkYXRhOlwvXC8wRkM1RThCMy0wRjAyLTQ3MTAtOTJENC1CNUUwOTk0MTQwMjRcL1RyYW5zY3JpcHRpb25cL3AyIn19",
+        "entityName" : "Transcription",
+        "storeIdentifier" : "0FC5E8B3-0F02-4710-92D4-B5E099414024"
+      },
+      {
+        "encodedBase64" : "eyJpbXBsZW1lbnRhdGlvbiI6eyJlbnRpdHlOYW1lIjoiVHJhbnNjcmlwdGlvbiIsImlzVGVtcG9yYXJ5IjpmYWxzZSwicHJpbWFyeUtleSI6InAxIiwic3RvcmVJZGVudGlmaWVyIjoiMEZDNUU4QjMtMEYwMi00NzEwLTkyRDQtQjVFMDk5NDE0MDI0IiwidXJpUmVwcmVzZW50YXRpb24iOiJ4LWNvcmVkYXRhOlwvXC8wRkM1RThCMy0wRjAyLTQ3MTAtOTJENC1CNUUwOTk0MTQwMjRcL1RyYW5zY3JpcHRpb25cL3AxIn19",
+        "entityName" : "Transcription",
+        "storeIdentifier" : "0FC5E8B3-0F02-4710-92D4-B5E099414024"
+      }
+    ],
+    "VocabularyWord" : [
+      {
+        "encodedBase64" : "eyJpbXBsZW1lbnRhdGlvbiI6eyJlbnRpdHlOYW1lIjoiVm9jYWJ1bGFyeVdvcmQiLCJpc1RlbXBvcmFyeSI6ZmFsc2UsInByaW1hcnlLZXkiOiJwMSIsInN0b3JlSWRlbnRpZmllciI6IjE2MDY2NUM4LTQ2RTgtNEJBRi04RTVFLTIxQTNERUM5REY3QiIsInVyaVJlcHJlc2VudGF0aW9uIjoieC1jb3JlZGF0YTpcL1wvMTYwNjY1QzgtNDZFOC00QkFGLThFNUUtMjFBM0RFQzlERjdCXC9Wb2NhYnVsYXJ5V29yZFwvcDEifX0=",
+        "entityName" : "VocabularyWord",
+        "storeIdentifier" : "160665C8-46E8-4BAF-8E5E-21A3DEC9DF7B"
+      },
+      {
+        "encodedBase64" : "eyJpbXBsZW1lbnRhdGlvbiI6eyJlbnRpdHlOYW1lIjoiVm9jYWJ1bGFyeVdvcmQiLCJpc1RlbXBvcmFyeSI6ZmFsc2UsInByaW1hcnlLZXkiOiJwMiIsInN0b3JlSWRlbnRpZmllciI6IjE2MDY2NUM4LTQ2RTgtNEJBRi04RTVFLTIxQTNERUM5REY3QiIsInVyaVJlcHJlc2VudGF0aW9uIjoieC1jb3JlZGF0YTpcL1wvMTYwNjY1QzgtNDZFOC00QkFGLThFNUUtMjFBM0RFQzlERjdCXC9Wb2NhYnVsYXJ5V29yZFwvcDIifX0=",
+        "entityName" : "VocabularyWord",
+        "storeIdentifier" : "160665C8-46E8-4BAF-8E5E-21A3DEC9DF7B"
+      }
+    ],
+    "WordReplacement" : [
+      {
+        "encodedBase64" : "eyJpbXBsZW1lbnRhdGlvbiI6eyJlbnRpdHlOYW1lIjoiV29yZFJlcGxhY2VtZW50IiwiaXNUZW1wb3JhcnkiOmZhbHNlLCJwcmltYXJ5S2V5IjoicDEiLCJzdG9yZUlkZW50aWZpZXIiOiIxNjA2NjVDOC00NkU4LTRCQUYtOEU1RS0yMUEzREVDOURGN0IiLCJ1cmlSZXByZXNlbnRhdGlvbiI6IngtY29yZWRhdGE6XC9cLzE2MDY2NUM4LTQ2RTgtNEJBRi04RTVFLTIxQTNERUM5REY3QlwvV29yZFJlcGxhY2VtZW50XC9wMSJ9fQ==",
+        "entityName" : "WordReplacement",
+        "storeIdentifier" : "160665C8-46E8-4BAF-8E5E-21A3DEC9DF7B"
+      },
+      {
+        "encodedBase64" : "eyJpbXBsZW1lbnRhdGlvbiI6eyJlbnRpdHlOYW1lIjoiV29yZFJlcGxhY2VtZW50IiwiaXNUZW1wb3JhcnkiOmZhbHNlLCJwcmltYXJ5S2V5IjoicDIiLCJzdG9yZUlkZW50aWZpZXIiOiIxNjA2NjVDOC00NkU4LTRCQUYtOEU1RS0yMUEzREVDOURGN0IiLCJ1cmlSZXByZXNlbnRhdGlvbiI6IngtY29yZWRhdGE6XC9cLzE2MDY2NUM4LTQ2RTgtNEJBRi04RTVFLTIxQTNERUM5REY3QlwvV29yZFJlcGxhY2VtZW50XC9wMiJ9fQ==",
+        "entityName" : "WordReplacement",
+        "storeIdentifier" : "160665C8-46E8-4BAF-8E5E-21A3DEC9DF7B"
+      }
+    ]
+  },
+  "schemaCanonicalSHA256" : "889a671e349d680daf58a70f48eb6fbbefeb84445963f1a5b55cb93ad2d79200",
+  "schemaEntities" : [
+    "SessionMetric",
+    "Transcription",
+    "VocabularyWord",
+    "WordReplacement"
+  ],
+  "schemaNormalization" : "Sort object keys and arrays keyed entities, subentities, attributes, storedAttributes, relationships, properties, storedProperties, inheritedProperties, or options by canonical JSON bytes. Preserve every value and all other array order, including compound indices and uniqueness constraints. No defaults or runtime metadata are removed.",
+  "schemaRawSHA256" : "1e52d364930e4a2f3ab639e3de11d1729c87f393f191e650a0dc59b56c7a4c92"
+}

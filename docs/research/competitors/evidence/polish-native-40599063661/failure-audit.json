@@ -1,0 +1,40 @@
+{
+  "classification": "pre-native-test-bundle-compile-failure",
+  "runID": 40599063661,
+  "sourceSHA": "641dcc6de3341acdffe41fe62f45e074bec749ef",
+  "buildExit": 65,
+  "testFixture": "VoiceInkTests/CorrectionLibraryStoreUpgradeLiveTests.swift",
+  "fixtureSHA256": "7541a90f9ed61e2f1fd8e19179859943bc131146f30a5fbded2e0af74e377a0a",
+  "soleUniqueCompilerError": "Line89:59 compatibility.voiceInkRule getter can throw but is not marked try.",
+  "errorOccurrences": 14,
+  "actualNativeTestsExecuted": 0,
+  "publicProviderSetupFactsProduced": false,
+  "actualWhisperInferences": 0,
+  "actualEditorScenarios": 0,
+  "actualCLIRequests": 0,
+  "artifacts": [
+    {
+      "id": 12779225408,
+      "name": "roma.dictation-polish-native-evidence",
+      "bytes": 227273,
+      "sha256": "57f66fc341efbaba6b41a4df3d5718ab5bb2d221f97e2ff1d2f928a3ca4aab46",
+      "zipMembers": 5,
+      "crcValid": true,
+      "downloads": 1
+    },
+    {
+      "id": 12779185503,
+      "name": "roma.dictation-polish-native-observations",
+      "bytes": 77410,
+      "sha256": "3595dbf7936ab871e86e50e3f963ce98cf827379175416e3c2501d4941bb95f8",
+      "zipMembers": 17,
+      "crcValid": true,
+      "downloads": 1
+    }
+  ],
+  "remoteRoot": "/data/rjt-writing-check-01a17bef/40599063661/",
+  "limits": [
+    "No native feature, model inference, editor, provider initialization or new signing result in this run.",
+    "14 batch diagnostics repeat one unique source error; no distinct product failure is inferred."
+  ]
+}

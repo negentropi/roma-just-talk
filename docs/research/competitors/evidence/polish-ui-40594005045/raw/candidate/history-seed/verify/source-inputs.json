@@ -1,0 +1,13 @@
+{
+  "sha256": {
+    "VoiceInk/Models/SessionMetric.swift": "dc29ab6e8bf70b82d055a189c2f09994514b37104564e889a55de805ca49fea8",
+    "VoiceInk/Models/Transcription.swift": "7a33f68bd7235304e195fab40518679e6481a077fe61ea851187b284e481039c",
+    "VoiceInk/Models/VocabularyWord.swift": "b90fbd19b9b5f8e1a99a2388c0429bbe3fcfa3ca278f9c0e7e8aabc39751684b",
+    "VoiceInk/Models/WordReplacement.swift": "602004b8f8fd7da3eea1bc3e74e5a2d03d91c56f96decb303658f68e34256d44",
+    "VoiceInk/VoiceInk.swift": "063d2de45ce7a7b9f454421decd213a2d4bf4c4e78f37f7084f6a324502d5188",
+    "VoiceInkCore/Sources/VoiceInkCore/StoredAudioFile.swift": "ead5a0df90449b0f7fbd9cc6573c490a219abb2ce09e4fe13015ec0f19106cde",
+    "VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift": "af172491a2c5e51f98102d51f80b5951e8d76d04c20a0249f2fa709eff8c628d",
+    "VoiceInkTests/DictationHistoryUISeedLiveTests.swift": "5d381d292a6fd2c7d7313c8652f270a07893f0d26ef97ba00d5e9f4c8973a70f"
+  },
+  "sourceSHA": "c29ac2d7c6fa7690ea3bd0d5a38697b44a37d182"
+}

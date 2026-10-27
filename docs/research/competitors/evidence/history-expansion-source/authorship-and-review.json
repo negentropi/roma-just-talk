@@ -1,0 +1,62 @@
+{
+  "classification": "source-authorship-and-review-only",
+  "before": {
+    "head": "641dcc6de3341acdffe41fe62f45e074bec749ef",
+    "source_sha256": "49dc761d7ebc25b3a41ffd23e76b9c4543b81517b7f94230b7f13d9ce5a71620",
+    "evidence_sha256": {
+      "docs/research/competitors/evidence/polish-mac-40593996925/ui-history-expansion-hierarchy.txt": "7563dd388c835d21bbaa220825daad7b523c210c71ddfef4ba8bb5005e3ea256",
+      "docs/research/competitors/evidence/polish-mac-40593996925/ui-history-expansion-failure.png": "3cdf28823d72f4ccbd8d322913b7b35271d157f0a2b4fdca1e5a1520923be853"
+    }
+  },
+  "invocations": [
+    {
+      "invocation": "real-expansion-button",
+      "requested_model": "claude-opus-5-5",
+      "reported_assistant_models": [
+        "claude-opus-5-5"
+      ],
+      "raw_jsonl_sha256": "8619fb235a2f6afbe4c38f3450b2fe1595410341b3b8b47576d7c71fe7a010ed",
+      "result": {
+        "subtype": "success",
+        "is_error": false,
+        "duration_ms": 108778,
+        "total_cost_usd": 0.5267116
+      }
+    },
+    {
+      "invocation": "preserve-accessible-timestamp-and-warning",
+      "requested_model": "claude-opus-5-5",
+      "reported_assistant_models": [
+        "claude-opus-5-5"
+      ],
+      "raw_jsonl_sha256": "e799eb1a8e31ba6010bdb14a3c1a92d703ac871514ca94bc9f04e0ceb69533f1",
+      "result": {
+        "subtype": "success",
+        "is_error": false,
+        "duration_ms": 40089,
+        "total_cost_usd": 0.156574
+      }
+    }
+  ],
+  "source": "VoiceInk/Views/History/InlineHistoryView.swift",
+  "source_sha256": "fc360008be4edf053b6b747e44cfb57e157f18ac7a31a1beeb4fa25c4b962ee6",
+  "review": {
+    "actual_model": "gpt-6.1-sol",
+    "status": "exact-hash source and retained before-evidence review clean; P2 row-context finding resolved",
+    "reviewed_head": "641dcc6de3341acdffe41fe62f45e074bec749ef",
+    "finding": "Real expansion Button is a sibling of unchanged checkbox; no parent gesture/nested interactive controls. Same ID/action and expanded controls preserved. Action+actual date/time label and actual expansion/cleanup-warning value restore context without transcript duplication.",
+    "evidence_limit": "Retained old native tree has no expand ID and screenshot shows healthy collapsed row. No after hierarchy/click/keyboard/VoiceOver/resting visual proof.",
+    "remaining_context_limit": "Recordings in the same minute may share the spoken timestamp; not a new blocker."
+  },
+  "checks": {
+    "swift_frontend_parse": "passed",
+    "git_diff_check": "passed"
+  },
+  "native_after_verified": false,
+  "limits": [
+    "Actual before AX hierarchy and PNG inspected; no actual after hierarchy/click/keyboard/VoiceOver/visual proof yet.",
+    "No claim about current checkbox select-ID forwarding from older pre-ID native tree."
+  ],
+  "total_author_cost_usd": 0.6832855999999999,
+  "implementation_status": "actual Opus passes complete; source frozen"
+}

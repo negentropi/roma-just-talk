@@ -1,0 +1,138 @@
+{
+  "classification": "intended-disabled-panel-failure",
+  "errors": [
+    "/Users/runner/work/_temp/writing-settings-ui-baseline/VoiceInkUITests/WritingFeaturesUITests.swift:621: error: -[VoiceInkUITests.WritingFeaturesUITests testDictationProfilePreservesCustomSettingsAndPersists] : XCTAssertTrue failed - Opening model settings disabled the panel or blocked a visible panel control."
+  ],
+  "exit_code": 65,
+  "expected_assertion_line": 621,
+  "expected_assertion_message": "Opening model settings disabled the panel or blocked a visible panel control.",
+  "observations": {
+    "after-opening": [
+      {
+        "actors": {
+          "application": {
+            "enabled": false,
+            "exists": true,
+            "hittable": false
+          },
+          "background-filter": {
+            "enabled": false,
+            "exists": true,
+            "hittable": true
+          },
+          "custom": {
+            "enabled": true,
+            "exists": true,
+            "hittable": false
+          },
+          "form": {
+            "enabled": false,
+            "exists": true,
+            "hittable": false
+          },
+          "main-window": {
+            "enabled": false,
+            "exists": true,
+            "hittable": true
+          },
+          "none": {
+            "enabled": true,
+            "exists": true,
+            "hittable": false
+          },
+          "settings-close": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          },
+          "settings-open": {
+            "enabled": false,
+            "exists": true,
+            "hittable": true
+          }
+        },
+        "boundaryFailures": [
+          "custom",
+          "none"
+        ],
+        "mainWindowCount": 1,
+        "nativeSheetCount": 0,
+        "opening": 1,
+        "phase": "after-opening",
+        "version": 1
+      }
+    ],
+    "before-opening": [
+      {
+        "actors": {
+          "application": {
+            "enabled": false,
+            "exists": true,
+            "hittable": false
+          },
+          "background-filter": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          },
+          "custom": {
+            "enabled": null,
+            "exists": false,
+            "hittable": null
+          },
+          "form": {
+            "enabled": null,
+            "exists": false,
+            "hittable": null
+          },
+          "main-window": {
+            "enabled": false,
+            "exists": true,
+            "hittable": true
+          },
+          "none": {
+            "enabled": null,
+            "exists": false,
+            "hittable": null
+          },
+          "settings-close": {
+            "enabled": null,
+            "exists": false,
+            "hittable": null
+          },
+          "settings-open": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          }
+        },
+        "boundaryFailures": [],
+        "mainWindowCount": 1,
+        "nativeSheetCount": 0,
+        "opening": 1,
+        "phase": "before-opening",
+        "version": 1
+      }
+    ]
+  },
+  "observed_boundary_valid": true,
+  "results": [
+    "failed"
+  ],
+  "starts": 1,
+  "valid": true,
+  "xctest_totals": [
+    [
+      "1",
+      " with 1 failure (0 unexpected) in 51.985 (51.988) seconds"
+    ],
+    [
+      "1",
+      " with 1 failure (0 unexpected) in 51.985 (51.989) seconds"
+    ],
+    [
+      "1",
+      " with 1 failure (0 unexpected) in 51.985 (51.990) seconds"
+    ]
+  ]
+}

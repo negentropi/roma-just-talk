@@ -1,0 +1,18 @@
+{
+  "closedAfterUI": false,
+  "closedBeforeUI": true,
+  "exit_code": 0,
+  "hostPID": 56770,
+  "normalFactoryReused": true,
+  "normalStorePaths": [
+    "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/default.store",
+    "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/dictionary.store",
+    "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/stats.store"
+  ],
+  "phase": "seed",
+  "saveCompleted": true,
+  "sourceSHA": "c29ac2d7c6fa7690ea3bd0d5a38697b44a37d182",
+  "testName": "liveDictationHistoryUISeed",
+  "valid": true,
+  "verificationReadOnly": false
+}

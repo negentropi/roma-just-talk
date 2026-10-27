@@ -1,0 +1,157 @@
+{
+  "version": 1,
+  "run_id": 40594005045,
+  "run_url": "https://github.com/negentropi/roma-just-talk/actions/runs/40594005045",
+  "source_sha": "c29ac2d7c6fa7690ea3bd0d5a38697b44a37d182",
+  "oracle_sha256": "1a3ca0fdf820eca0be44b58565e3ea9bb71ce4517f4487b5f22a04174e602169",
+  "classification": "six-case-gate-failed",
+  "baseline": {
+    "sha": "bdd608cf6111e8d7e88c12678f530318713acf67",
+    "valid_intended_failure": true,
+    "marker": 639
+  },
+  "candidate": {
+    "executed_once": 6,
+    "passed": 4,
+    "failed": 2,
+    "tests": {
+      "testCSVImportPreviewsMultilineContentBeforeReplacing": {
+        "results": [
+          "passed"
+        ],
+        "starts": 1
+      },
+      "testDictationProfilePreservesCustomSettingsAndPersists": {
+        "results": [
+          "passed"
+        ],
+        "starts": 1
+      },
+      "testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings": {
+        "results": [
+          "failed"
+        ],
+        "starts": 1
+      },
+      "testHistoryPreservesRecognizedFallbackAndLegacyVariants": {
+        "results": [
+          "failed"
+        ],
+        "starts": 1
+      },
+      "testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch": {
+        "results": [
+          "passed"
+        ],
+        "starts": 1
+      },
+      "testTranslationTargetsReorderSelectAndPersist": {
+        "results": [
+          "passed"
+        ],
+        "starts": 1
+      }
+    },
+    "failures": [
+      {
+        "test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+        "line": 952,
+        "message": "XCTAssertTrue failed - The settings control was not fully visible after scrolling.",
+        "timestamp": "2026-10-27T22:56:24.565+0000"
+      },
+      {
+        "test": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+        "line": 496,
+        "message": "failed - History must expose one exact expansion target inside its owned row.",
+        "timestamp": "2026-10-27T22:57:07.447+0000"
+      }
+    ]
+  },
+  "native_phases": [
+    {
+      "phase": "seed",
+      "hostPID": 51974,
+      "classification": "passed",
+      "closed": true,
+      "saved_counts": {
+        "SessionMetric": 0,
+        "Transcription": 4,
+        "VocabularyWord": 1,
+        "WordReplacement": 1
+      },
+      "all_twenty_history_fields_and_library_sentinels_exact": true,
+      "verification_context_has_changes": false
+    },
+    {
+      "phase": "verify",
+      "hostPID": 91239,
+      "classification": "passed",
+      "closed": true,
+      "saved_counts": {
+        "SessionMetric": 0,
+        "Transcription": 4,
+        "VocabularyWord": 1,
+        "WordReplacement": 1
+      },
+      "all_twenty_history_fields_and_library_sentinels_exact": true,
+      "verification_context_has_changes": false
+    }
+  ],
+  "identity_signature_process_tcc_both_lanes_valid": true,
+  "tcc_observations": [
+    {
+      "file": "system-tcc.json",
+      "initial_seed_verify_byte_equal": true,
+      "rows": 1,
+      "auth_value": 2,
+      "sha256": "803b5e624fcbe042a6a226b322fe11010e5849eaf28269c676d1cea0779c1c1d",
+      "csreq_sha256": "12b1aaaf158b4b3409455f8213bc9c287d1332d292521fc42b3a1220c0343294"
+    },
+    {
+      "file": "microphone-tcc.json",
+      "initial_seed_verify_byte_equal": true,
+      "rows": 1,
+      "auth_value": 2,
+      "sha256": "88131c65f014b20b54ea2e5ca6aeddd77b0b3a450bee171ba09091dd0a297e4d",
+      "csreq_sha256": "12b1aaaf158b4b3409455f8213bc9c287d1332d292521fc42b3a1220c0343294"
+    }
+  ],
+  "shortcut_censuses": {
+    "tests": 6,
+    "attachments": 27,
+    "before_restored_equal": true
+  },
+  "partial_style_assertions_before_failure": [
+    "Literal snippet input exact UTF8/16 via actual native paste",
+    "All4 profile choices",
+    "Clarity Natural/Casual/Formal choices",
+    "Formal retained and disabled in Light/Custom",
+    "Library preference snapshots unchanged through those selections"
+  ],
+  "not_reached": [
+    "Final Custom formatting verification",
+    "Clarity Formal close/reopen and relaunch persistence",
+    "Post-relaunch library reread",
+    "History expansion/variants/copy"
+  ],
+  "artifact": {
+    "id": 12776619982,
+    "bytes": 274671513,
+    "sha256": "91babfbbfedefa60043abed36b0c0581114c2043721e3397237d4e48c323683d",
+    "remote_path": "/data/rjt-writing-check-01a17bef/40594005045/evidence.zip",
+    "full_digest_and_all_4212_zip_crc_verified": true,
+    "full_archive_local": false
+  },
+  "failed_log": {
+    "bytes": 4220,
+    "sha256": "1b943b7d2d0fda0152084ab40a9b269aa4119214fcc347fbff7e18ae1b912ed8",
+    "fetched_once": true
+  },
+  "original_pngs": 25,
+  "limits": [
+    "No six-case acceptance or final style persistence/History variant rendering proof.",
+    "Native4-row creation uses actual normal factory and synthetic data; no ASR/provider/editor-delivery proof.",
+    "Standalone TCC2 rows cannot resolve separate full-run missing post-UI row.",
+    "Application/window enabled flags are diagnostic traits, not a claim that active controls were disabled."
+  ]
+}

@@ -1,0 +1,117 @@
+{
+  "scope": "Actual application retranscription read-only save failure and original caller-context first-read invisibility",
+  "source_equivalence": {
+    "known_bad_head": "ebf629b4cf109f7a36109ccac7b20ac70f9f48ab",
+    "candidate_head": "c29ac2d7c6fa7690ea3bd0d5a38697b44a37d182",
+    "source_path": "VoiceInkTests/DictationPolishAudioFileTests.swift",
+    "original_method": {
+      "method_name": "retranscriptionReadOnlyStoreSaveFailureThrowsAndRemovesItsCopy",
+      "expected_xcresult_identifier": "VoiceInkTests/DictationPolishAudioFileTests/retranscriptionReadOnlyStoreSaveFailureThrowsAndRemovesItsCopy()",
+      "known_bad_source_line": 180,
+      "candidate_source_line": 180,
+      "method_span_scope": "Exact UTF-8 bytes from original @Test declaration through same-indentation closing brace plus newline; includes complete test method.",
+      "known_bad_bytes": 1643,
+      "candidate_bytes": 1643,
+      "known_bad_sha256": "98dde365d58fa5cbec1b8b5b787aae64978343c7148a58512a1840ba438b6736",
+      "candidate_sha256": "98dde365d58fa5cbec1b8b5b787aae64978343c7148a58512a1840ba438b6736",
+      "byte_identical": true
+    },
+    "entire_original_testfile_preserved": {
+      "candidate_minus_only_new_method_equals_known_bad_file": true,
+      "known_bad_file_bytes": 36166,
+      "known_bad_file_sha256": "8fc213b317dbdbc75622e07776cfaef27eb6f1e7b52d20fe3d0ce77a5c58c966",
+      "candidate_file_bytes": 37948,
+      "candidate_file_sha256": "daa1401f9a7a6ba797432b45d3a579211851448501b3687acc051e4fa0fd8951",
+      "only_added_method_bytes_including_separator": 1782,
+      "only_added_method_sha256": "a68a3a0ea79253a842cb65010fd15e79510e1c90c49a209d96829ad697582d1f"
+    },
+    "fixture_and_helpers": {
+      "scope": "Complete suffix from PolishAudioFailure enum through fixture, registry, spy and gates to EOF.",
+      "known_bad_suffix_bytes": 16527,
+      "candidate_suffix_bytes": 16527,
+      "known_bad_suffix_sha256": "61e8f36ef10dde22c827de87e0da78abd51bf5204a1711afba2bdeb3517fefed",
+      "candidate_suffix_sha256": "61e8f36ef10dde22c827de87e0da78abd51bf5204a1711afba2bdeb3517fefed",
+      "byte_identical": true,
+      "helper_bindings": [
+        {
+          "name": "records",
+          "bytes": 101,
+          "known_bad_sha256": "d48b71bbec3eb304107ff24bd8d70d4b5321f84008045b5bf64e6adebc7d1af8",
+          "candidate_sha256": "d48b71bbec3eb304107ff24bd8d70d4b5321f84008045b5bf64e6adebc7d1af8",
+          "byte_identical": true
+        },
+        {
+          "name": "service",
+          "bytes": 268,
+          "known_bad_sha256": "1332eca9db7364414d0a21094d515970cdec96b8b94bc0616d4bf865602755b4",
+          "candidate_sha256": "1332eca9db7364414d0a21094d515970cdec96b8b94bc0616d4bf865602755b4",
+          "byte_identical": true
+        },
+        {
+          "name": "retranscribe",
+          "bytes": 311,
+          "known_bad_sha256": "0d4bd1bd40e3a6c5a65ddc7cbaba3cc98158f7aee41b32ce0ca02d549f4b32f2",
+          "candidate_sha256": "0d4bd1bd40e3a6c5a65ddc7cbaba3cc98158f7aee41b32ce0ca02d549f4b32f2",
+          "byte_identical": true
+        },
+        {
+          "name": "readOnlyFixtureInit",
+          "bytes": 3728,
+          "known_bad_sha256": "bc4008ef5e9e520cf60c1f4dcc77d0fc30035ddded679c0a2ba5a3105d92eada",
+          "candidate_sha256": "bc4008ef5e9e520cf60c1f4dcc77d0fc30035ddded679c0a2ba5a3105d92eada",
+          "byte_identical": true
+        },
+        {
+          "name": "wordOnlySeed",
+          "bytes": 461,
+          "known_bad_sha256": "bc891ccb06455a7186bd90a704849bb23188ae002b5945b7c16ba73295778fcc",
+          "candidate_sha256": "bc891ccb06455a7186bd90a704849bb23188ae002b5945b7c16ba73295778fcc",
+          "byte_identical": true
+        }
+      ]
+    },
+    "boundary_facts": [
+      "records() still fetches Transcription from fixture.context, the original UI ModelContext; no fresh-context-only replacement.",
+      "Fixture service(registry:) still passes original context to AudioTranscriptionService.",
+      "Read-only fixture still uses new UUID directory/private read-only.store; seed inserts only one VocabularyWord; actual ModelConfiguration allowsSave:false, CloudKit.none, no in-memory fallback.",
+      "No test permission preflight or simulated save failure added. Original method still requires actual save throw, same-context emptiness, owned-copy removal, one vocabulary row and original audio intact.",
+      "Known-bad runtime red exists in separately retained EBF run40587793807. Candidate source equivalence does not establish a green execution; await exact c29 results."
+    ]
+  },
+  "known_bad": {
+    "run_id": 40587793807,
+    "head_sha": "ebf629b4cf109f7a36109ccac7b20ac70f9f48ab",
+    "record": {
+      "identifier": "VoiceInkTests/DictationPolishAudioFileTests/retranscriptionReadOnlyStoreSaveFailureThrowsAndRemovesItsCopy()",
+      "status": "Failure"
+    }
+  },
+  "candidate": {
+    "run_id": 40593996925,
+    "head_sha": "c29ac2d7c6fa7690ea3bd0d5a38697b44a37d182",
+    "record": {
+      "identifier": "VoiceInkTests/DictationPolishAudioFileTests/retranscriptionReadOnlyStoreSaveFailureThrowsAndRemovesItsCopy()",
+      "status": "Success"
+    }
+  },
+  "candidate_writable_success": {
+    "source": {
+      "method_name": "retranscriptionSavesOnlyItsRowAndReturnsTheCallersContext",
+      "expected_xcresult_identifier": "VoiceInkTests/DictationPolishAudioFileTests/retranscriptionSavesOnlyItsRowAndReturnsTheCallersContext()",
+      "source_path": "VoiceInkTests/DictationPolishAudioFileTests.swift",
+      "source_line": 208,
+      "method_bytes": 1781,
+      "method_sha256": "68f5155ca3719c26f7f01cf692263d21fa19244e9f388c42a43d28b23970f253",
+      "contract": "Private writer saves only new row; returned model belongs to caller UI context; exact recognition bytes; caller dirty vocabulary value/hasChanges preserved; fresh context sees saved row and original saved vocabulary, not unrelated unsaved edit."
+    },
+    "record": {
+      "identifier": "VoiceInkTests/DictationPolishAudioFileTests/retranscriptionSavesOnlyItsRowAndReturnsTheCallersContext()",
+      "status": "Success"
+    }
+  },
+  "acceptance": "Known-bad actual failure and candidate actual single success use the byte-identical method and complete fixture; no fresh-context-only weakening or allowsSave preflight. Source-only mapping pending-runtime note predates these decoded results.",
+  "limits": [
+    "The new import read-only regression prepared after a560 is absent from c29 and remains separate.",
+    "The overall c29 feature gate is red from two UI assertions and a masked post-UI permission comparison, despite these successful backend cases."
+  ]
+}

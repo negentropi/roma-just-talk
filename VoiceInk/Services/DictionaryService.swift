@@ -151,6 +151,12 @@ enum DictionaryService {
         return VoiceInkWordReplacementEngine.apply(replacements, to: text)
     }
 
+    static func snapshotEnabledReplacementRules(using context: ModelContext) throws -> [VoiceInkWordReplacementRule] {
+        try context.fetch(FetchDescriptor<WordReplacement>())
+            .filter(\.isEnabled)
+            .map(\.voiceInkRule)
+    }
+
     private static func replacementRules(using context: ModelContext) -> [VoiceInkWordReplacementRule] {
         if let cachedWordReplacementRules {
             return cachedWordReplacementRules

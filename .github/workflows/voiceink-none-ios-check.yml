@@ -1,0 +1,207 @@
+name: Verify shared Core iOS compile on hosted Mac
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "ci/rjt-none-ios-check-*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: none-ios-compile-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  compile:
+    runs-on: macos-26
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Bind source and dependency locks
+        run: |
+          mkdir -p "$RUNNER_TEMP/none-ios-proof"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git rev-parse HEAD > "$RUNNER_TEMP/none-ios-proof/source-sha.txt"
+          git diff --exit-code
+          python3 - <<'PYCODE'
+          import hashlib, json, os, subprocess
+          from pathlib import Path
+          proof = Path(os.environ["RUNNER_TEMP"]) / "none-ios-proof"
+          paths = subprocess.check_output(["git", "ls-files", "-z"]).decode().split("\0")
+          locks = {name: {"sha256": hashlib.sha256(Path(name).read_bytes()).hexdigest(), "value": json.loads(Path(name).read_bytes())} for name in paths if name.endswith("Package.resolved")}
+          roots = ("VoiceInk/", "VoiceInkCore/", "VoiceInkNVIDIA/", "VoiceInkQwen/", "iOS/", "VoiceInk.xcodeproj/", "VoiceInk.xcworkspace/")
+          sources = {name: hashlib.sha256(Path(name).read_bytes()).hexdigest() for name in paths if name and name not in locks and (name.startswith(roots) or name in {"Makefile", "LocalBuild.xcconfig"})}
+          (proof / "package-locks-before.json").write_text(json.dumps(locks, indent=2) + "\n")
+          (proof / "source-manifest-before.json").write_text(json.dumps(sources, indent=2) + "\n")
+          (proof / "scope.txt").write_text("Direct iOS project compilation and static packaging only. No Simulator launch, runtime tests, microphone, keyboard or device proof.\n")
+          PYCODE
+
+      - name: Select Xcode and Metal toolchain
+        run: |
+          /usr/bin/caffeinate -d -i -u -t 5400 </dev/null >/dev/null 2>&1 &
+          latest=$(ls -d /Applications/Xcode_26*.app | sort -V | tail -n 1)
+          test -n "$latest"
+          sudo xcode-select -s "$latest"
+          xcodebuild -version | tee "$RUNNER_TEMP/none-ios-proof/xcode-version.txt"
+          swift --version
+          sw_vers
+          command -v cmake >/dev/null || brew install cmake
+          if ! xcrun metal --version >/dev/null 2>&1; then
+            log="$RUNNER_TEMP/none-ios-proof/metal-download.log"
+            xcodebuild -downloadComponent MetalToolchain 2>&1 | tee "$log"
+            if ! xcrun metal --version >/dev/null 2>&1; then
+              dmg=$(sed -n 's/^Downloaded asset to: //p' "$log" | tail -n 1)
+              test -n "$dmg"
+              hdiutil attach -readonly -nobrowse "$dmg"
+            fi
+          fi
+          xcrun metal --version
+
+      - uses: actions/cache/restore@v4
+        id: deps-cache
+        with:
+          path: |
+            ~/VoiceInk-Dependencies/whisper.cpp
+            ~/Library/Caches/org.swift.swiftpm
+          key: writing-macos-${{ runner.arch }}-${{ hashFiles('Makefile', 'scripts/verify-static-whisper-xcframework.sh', 'VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
+
+      - name: Verify existing iOS configuration contracts
+        run: |
+          set -o pipefail
+          bash scripts/verify-ios-single-repo-migration.sh 2>&1 | tee "$RUNNER_TEMP/none-ios-proof/config-verifier.log"
+
+      - name: Prepare and verify static Whisper dependencies
+        run: |
+          set -o pipefail
+          make setup 2>&1 | tee "$RUNNER_TEMP/none-ios-proof/dependencies.log"
+
+      - uses: actions/cache/save@v4
+        if: steps.deps-cache.outputs.cache-hit != 'true'
+        with:
+          path: |
+            ~/VoiceInk-Dependencies/whisper.cpp
+            ~/Library/Caches/org.swift.swiftpm
+          key: ${{ steps.deps-cache.outputs.cache-primary-key }}
+
+      - name: Resolve the direct iOS project and validate package metadata
+        run: |
+          set -o pipefail
+          proof="$RUNNER_TEMP/none-ios-proof"
+          xcodebuild -list -json -project iOS/VoiceInk-ios.xcodeproj -skipPackageUpdates > "$proof/project-list.json"
+          python3 - "$proof/project-list.json" <<'PYCODE'
+          import json, sys
+          schemes = json.load(open(sys.argv[1])).get("project", {}).get("schemes", [])
+          if "VoiceInk-ios" not in schemes:
+              raise SystemExit("The direct iOS project does not expose the required scheme")
+          PYCODE
+          xcodebuild -resolvePackageDependencies \
+            -project iOS/VoiceInk-ios.xcodeproj \
+            -scheme VoiceInk-ios \
+            -configuration Debug \
+            -destination "generic/platform=iOS Simulator" \
+            -derivedDataPath "$RUNNER_TEMP/none-ios-build" \
+            -skipPackageUpdates \
+            2>&1 | tee "$proof/package-resolution.log"
+          python3 - <<'PYCODE'
+          import hashlib, json, os
+          from pathlib import Path
+          proof = Path(os.environ["RUNNER_TEMP"]) / "none-ios-proof"
+          before = json.loads((proof / "package-locks-before.json").read_text())
+          target = "iOS/VoiceInk-ios.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+          mac = "VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+          def pin_map(value):
+              pins = value["pins"]
+              result = {pin["identity"]: pin for pin in pins}
+              if len(result) != len(pins):
+                  raise SystemExit("A package graph contains duplicate identities")
+              return result
+          original = pin_map(before[target]["value"])
+          reviewed = pin_map(before[mac]["value"])
+          data = Path(target).read_bytes()
+          resolved = pin_map(json.loads(data))
+          (proof / "resolved-ios.Package.resolved").write_bytes(data)
+          if any(resolved.get(name) != pin for name, pin in original.items()):
+              raise SystemExit("iOS resolution changed an original pin; package setup remains unverified")
+          allowed = reviewed | original
+          if any(allowed.get(name) != pin for name, pin in resolved.items()):
+              raise SystemExit("iOS resolution added an unreviewed pin; inspect the retained graph before compiling")
+          for name, record in before.items():
+              if name != target and hashlib.sha256(Path(name).read_bytes()).hexdigest() != record["sha256"]:
+                  raise SystemExit("Resolution changed an unrelated package lock: " + name)
+          (proof / "package-resolution-receipt.json").write_text(json.dumps({"target": target, "original_pins_preserved": len(original), "resolved_pins": len(resolved), "all_pins_match_reviewed_sources": True, "resolved_sha256": hashlib.sha256(data).hexdigest(), "scope": "Generated resolution metadata only; no source or dependency declaration changes authorized"}, indent=2) + "\n")
+          PYCODE
+
+      - name: Compile the iOS Simulator app and shared Core
+        run: |
+          set -o pipefail
+          xcodebuild build \
+            -project iOS/VoiceInk-ios.xcodeproj \
+            -scheme VoiceInk-ios \
+            -configuration Debug \
+            -destination "generic/platform=iOS Simulator" \
+            -derivedDataPath "$RUNNER_TEMP/none-ios-build" \
+            -disableAutomaticPackageResolution \
+            -onlyUsePackageVersionsFromResolvedFile \
+            CODE_SIGNING_ALLOWED=YES \
+            CODE_SIGN_IDENTITY=- \
+            ENTITLEMENTS_ALLOWED=YES \
+            2>&1 | tee "$RUNNER_TEMP/none-ios-proof/build.log"
+
+      - name: Verify the built app and unchanged sources
+        run: |
+          set -o pipefail
+          proof="$RUNNER_TEMP/none-ios-proof"
+          app="$RUNNER_TEMP/none-ios-build/Build/Products/Debug-iphonesimulator/roma just talk.app"
+          test -d "$app"
+          codesign --verify --deep --strict "$app" 2>&1 | tee "$proof/signature-verification.log"
+          codesign -d --verbose=4 "$app" 2> "$proof/signature-identity.txt"
+          bash scripts/verify-static-whisper-app.sh "$app" 2>&1 | tee "$proof/static-whisper.log"
+          python3 - <<'PYCODE'
+          import hashlib, json, os, subprocess
+          from pathlib import Path
+          proof = Path(os.environ["RUNNER_TEMP"]) / "none-ios-proof"
+          before = json.loads((proof / "package-locks-before.json").read_text())
+          target = "iOS/VoiceInk-ios.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+          if Path(target).read_bytes() != (proof / "resolved-ios.Package.resolved").read_bytes():
+              raise SystemExit("The iOS build changed the accepted dependency graph")
+          after = {name: hashlib.sha256(Path(name).read_bytes()).hexdigest() for name in before}
+          (proof / "package-locks-after.json").write_text(json.dumps(after, indent=2) + "\n")
+          if any(after[name] != record["sha256"] for name, record in before.items() if name != target):
+              raise SystemExit("The iOS build changed an unrelated dependency lock")
+          sources = json.loads((proof / "source-manifest-before.json").read_text())
+          if any(hashlib.sha256(Path(name).read_bytes()).hexdigest() != expected for name, expected in sources.items()):
+              raise SystemExit("The iOS build changed a bound source file")
+          changed = subprocess.check_output(["git", "diff", "--name-only", "HEAD"]).decode().splitlines()
+          if set(changed) - {target}:
+              raise SystemExit("Only generated iOS resolution metadata may differ: " + repr(changed))
+          untracked = subprocess.check_output(["git", "ls-files", "--others", "--exclude-standard", "--", "iOS", "VoiceInkCore", "VoiceInkNVIDIA"]).decode().splitlines()
+          if untracked:
+              raise SystemExit("The iOS build added unbound source inputs: " + repr(untracked))
+          (proof / "source-integrity.json").write_text(json.dumps({"source_sha": os.environ["GITHUB_SHA"], "bound_source_files": len(sources), "all_sources_unchanged": True, "allowed_generated_metadata": target, "other_locks_unchanged": True}, indent=2) + "\n")
+          PYCODE
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          executable="$(/usr/libexec/PlistBuddy -c 'Print CFBundleExecutable' "$app/Info.plist")"
+          shasum -a 256 "$app/$executable" > "$proof/executable-sha256.txt"
+          ditto -c -k --keepParent "$app" "$RUNNER_TEMP/roma.just.talk.none-ios-simulator.app.zip"
+          shasum -a 256 "$RUNNER_TEMP/roma.just.talk.none-ios-simulator.app.zip" > "$proof/app-archive-sha256.txt"
+
+      - name: Upload compile evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.none-profile-ios-compile-evidence
+          path: ${{ runner.temp }}/none-ios-proof/**
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Upload the verified Simulator app
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.none-profile-ios-simulator.app
+          path: ${{ runner.temp }}/roma.just.talk.none-ios-simulator.app.zip
+          if-no-files-found: error
+          retention-days: 7

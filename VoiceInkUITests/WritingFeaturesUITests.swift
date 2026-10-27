@@ -29,12 +29,15 @@ final class WritingFeaturesUITests: XCTestCase {
 
         openSnippets(in: app)
         createSnippet(trigger: trigger, content: original, in: app)
+        searchSnippets(trigger, in: app)
         let row = snippetRow(trigger, in: app)
         XCTAssertTrue(row.waitForExistence(timeout: 10))
-        reveal(row, identifier: "snippets.row.\(trigger)", in: app)
+        let edit = row.buttons["snippets.row.edit"]
+        XCTAssertTrue(edit.waitForExistence(timeout: 5))
+        reveal(edit, identifier: "snippets.row.edit", in: app)
         attachScreenshot(app, named: "Spoken snippets library")
 
-        row.buttons["snippets.row.edit"].click()
+        edit.click()
         let content = app.textViews["snippets.editor.content"]
         assertValue(original, of: content)
         replaceText(in: content, with: revised)
@@ -45,10 +48,14 @@ final class WritingFeaturesUITests: XCTestCase {
 
         let toggle = identified("snippets.row.toggle", in: row)
         XCTAssertTrue(toggle.waitForExistence(timeout: 5))
+        reveal(toggle, identifier: "snippets.row.toggle", in: app)
         toggle.click()
         XCTAssertTrue(waitUntil { self.toggleIsOff(toggle) }, "The saved snippet did not turn off.")
 
-        row.buttons["snippets.row.delete"].click()
+        let delete = row.buttons["snippets.row.delete"]
+        XCTAssertTrue(delete.waitForExistence(timeout: 5))
+        reveal(delete, identifier: "snippets.row.delete", in: app)
+        delete.click()
         XCTAssertTrue(app.buttons["snippets.delete.cancel"].waitForExistence(timeout: 5))
         attachScreenshot(app, named: "Snippet deletion confirmation")
         app.buttons["snippets.delete.cancel"].click()
@@ -61,7 +68,10 @@ final class WritingFeaturesUITests: XCTestCase {
         let saved = snippetRow(trigger, in: app)
         XCTAssertTrue(saved.waitForExistence(timeout: 10))
         XCTAssertTrue(toggleIsOff(identified("snippets.row.toggle", in: saved)))
-        saved.buttons["snippets.row.edit"].click()
+        let savedEdit = saved.buttons["snippets.row.edit"]
+        XCTAssertTrue(savedEdit.waitForExistence(timeout: 5))
+        reveal(savedEdit, identifier: "snippets.row.edit", in: app)
+        savedEdit.click()
         assertValue(revised, of: app.textViews["snippets.editor.content"])
         app.buttons["snippets.editor.cancel"].click()
         deleteSnippet(trigger, in: app)
@@ -84,24 +94,25 @@ final class WritingFeaturesUITests: XCTestCase {
 
         openSnippets(in: app)
         createSnippet(trigger: trigger, content: original, in: app)
+        searchSnippets(trigger, in: app)
         app.buttons["snippets.import"].click()
         chooseFile(file, in: app)
-        let sheet = identified("snippets.import.sheet", in: app)
-        XCTAssertTrue(sheet.waitForExistence(timeout: 10))
-        let confirm = app.buttons["snippets.import.confirm"]
+        let sheets = mainWindow(in: app).sheets
+        XCTAssertTrue(sheets.firstMatch.waitForExistence(timeout: 10))
+        XCTAssertEqual(sheets.count, 1, "The import review did not open one owned sheet.")
+        let sheet = sheets.element(boundBy: 0)
+        let confirm = sheet.buttons["Import"]
+        XCTAssertTrue(confirm.waitForExistence(timeout: 5))
         XCTAssertFalse(confirm.isEnabled, "Duplicate replacement did not require a policy choice.")
-        let previewRow = identified("snippets.import.row.0", in: app)
+        let previewRow = sheet.disclosureTriangles["snippets.import.row.0"]
         XCTAssertTrue(previewRow.waitForExistence(timeout: 5))
-        if previewRow.disclosureTriangles.firstMatch.exists {
-            previewRow.disclosureTriangles.firstMatch.click()
-        } else {
-            previewRow.click()
-        }
-        XCTAssertTrue(waitUntil { self.containsText(original, in: previewRow) })
-        XCTAssertTrue(waitUntil { self.containsText(replacement, in: previewRow) })
+        previewRow.click()
+        XCTAssertTrue(waitUntil { String(describing: previewRow.value ?? "") == "1" })
+        XCTAssertTrue(waitUntil { self.containsText(original, in: sheet) })
+        XCTAssertTrue(waitUntil { self.containsText(replacement, in: sheet) })
         attachScreenshot(app, named: "CSV current and imported multiline preview")
 
-        let replace = app.radioButtons["Replace it with the imported row"]
+        let replace = sheet.radioButtons["Replace it with the imported row"]
         XCTAssertTrue(replace.waitForExistence(timeout: 5))
         replace.click()
         XCTAssertTrue(confirm.isEnabled)
@@ -112,7 +123,10 @@ final class WritingFeaturesUITests: XCTestCase {
         let row = snippetRow(trigger, in: app)
         XCTAssertTrue(row.waitForExistence(timeout: 5))
         XCTAssertTrue(toggleIsOff(identified("snippets.row.toggle", in: row)))
-        row.buttons["snippets.row.edit"].click()
+        let edit = row.buttons["snippets.row.edit"]
+        XCTAssertTrue(edit.waitForExistence(timeout: 5))
+        reveal(edit, identifier: "snippets.row.edit", in: app)
+        edit.click()
         assertValue(replacement, of: app.textViews["snippets.editor.content"])
         app.buttons["snippets.editor.cancel"].click()
         deleteSnippet(trigger, in: app)
@@ -285,8 +299,10 @@ final class WritingFeaturesUITests: XCTestCase {
         searchSnippets(trigger, in: app)
         let row = snippetRow(trigger, in: app)
         XCTAssertTrue(row.waitForExistence(timeout: 5))
-        reveal(row, identifier: "snippets.row.\(trigger)", in: app)
-        row.buttons["snippets.row.delete"].click()
+        let delete = row.buttons["snippets.row.delete"]
+        XCTAssertTrue(delete.waitForExistence(timeout: 5))
+        reveal(delete, identifier: "snippets.row.delete", in: app)
+        delete.click()
         let confirm = app.buttons["snippets.delete.confirm"]
         XCTAssertTrue(confirm.waitForExistence(timeout: 5))
         confirm.click()

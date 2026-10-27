@@ -2,6 +2,8 @@
 
 ## v1.95.2 - Unreleased
 
+- Keep Local CLI processing from stalling on large input or output, and apply its timeout while input is being sent.
+
 - Keep the Ollama model named in Writing Action History consistent with the model sent in its captured request, including choices made in Ollama settings.
 
 - Open settings, prompt editors and Power Mode configuration in native Mac sheets, with keyboard dismissal and one presentation owner per screen.

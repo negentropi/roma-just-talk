@@ -1,0 +1,2 @@
+PASS: SIGCHLD default/no-auto-reap before and after real Foundation Process
+PASS: exact owner 128KiB stdin/stdout, stderr, early closed input, canceled child

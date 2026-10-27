@@ -1,0 +1,49 @@
+{
+  "scope": "Tiny native Foundation/Darwin execution of the exact candidate CommandRun body plus real unmodified Core LocalCLI error enum. Only app logging identity metadata is supplied by a local literal. No Core module build, legacy enhance wrapper, PATH lookup, real app host, provider or remote gate proof.",
+  "source_sha": "124a9358e95a21cc803b0968f7e281a3670c6722",
+  "candidate_source_path": "/Users/atalphalnmomhappyhouse/.codex/worktrees/2ebd/VoiceInk/VoiceInk/Services/AIEnhancement/LocalCLIService.swift",
+  "candidate_source_sha256": "2e4ca951ed5ecc9d85439485f3bfa33332d85520aedbdcf12be8173c0c53369a",
+  "artifacts": {
+    "source": {
+      "path": "/tmp/rjt-cli-posix-owner-smoke.swift",
+      "sha256": "be8fa293fdc2b60996aa6198a38afe39280673fa9d650e3e0899597ea89ed483"
+    },
+    "stdout": {
+      "path": "/tmp/rjt-cli-posix-owner-smoke.stdout",
+      "sha256": "a5966034b6b963b0e0ea64dd8aea7dc46c5a32137121302c7075e6c486a13b47"
+    },
+    "build_log": {
+      "path": "/tmp/rjt-cli-posix-owner-smoke.build.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "binary": {
+      "path": "/tmp/rjt-cli-posix-owner-smoke",
+      "sha256": "dd74990f28e038d44f8b8008beadc4f293cb5922bbd4c749798016142a568edf"
+    }
+  },
+  "compiler_flags": [
+    "-swift-version",
+    "6",
+    "-warnings-as-errors",
+    "-parse-as-library"
+  ],
+  "host": {
+    "system": "Darwin",
+    "release": "25.6.0",
+    "machine": "arm64"
+  },
+  "observations": [
+    "SIGCHLD is default and SA_NOCLDWAIT unset before and after actual Foundation Process(/usr/bin/true)",
+    "Exact131072-byte stdin/stdout and independent stderr",
+    "Early child exit with unread131072-byte stdin does not deliver SIGPIPE to host",
+    "Cancellation returns CancellationError; this tiny fixture does not independently observe the child PID"
+  ],
+  "unproven": [
+    "Full app/test-host SIGCHLD compatibility",
+    "Real Core module compilation",
+    "Matched known-bad regression",
+    "TERM-ignoring escalation",
+    "Public legacy/raw/snapshot APIs",
+    "Independent owned PID disappearance/reap observation"
+  ]
+}

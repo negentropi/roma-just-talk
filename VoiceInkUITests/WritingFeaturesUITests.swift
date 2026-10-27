@@ -1,18 +1,31 @@
+import CoreFoundation
 import Foundation
 import XCTest
 
 final class WritingFeaturesUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
+        let environment = ProcessInfo.processInfo.environment
         try XCTSkipUnless(
-            ProcessInfo.processInfo.environment["RJT_WRITING_UI_CHECKS"] == "1",
+            environment["RJT_WRITING_UI_CHECKS"] == "1"
+                || environment["TEST_RUNNER_RJT_WRITING_UI_CHECKS"] == "1",
             "Run Writing Features UI checks only on the dedicated disposable Mac."
         )
+        guard environment["GITHUB_ACTIONS"] == "true"
+                || environment["TEST_RUNNER_GITHUB_ACTIONS"] == "true" else {
+            throw WritingFeaturesUIError.disposableRunnerRequired
+        }
     }
 
     @MainActor func testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch() throws {
-        let app = launchApp()
-        defer { app.terminate() }
+        let app = XCUIApplication()
+        app.terminate()
+        let dockPreference = try WritingFeaturesDockPreference()
+        defer {
+            app.terminate()
+            XCTAssertTrue(dockPreference.restore(), "Unable to restore the Dock preference.")
+        }
+        try launchApp(app)
         let trigger = "ui signature \(UUID().uuidString.lowercased())"
         let original = "\nFelix C. Order\nRJT \"Lab\" -- line\n\n"
         let revised = "\nFelix C. Order\nLiteral \"quotes\" -- unchanged\n\nSecond paragraph\n"
@@ -45,8 +58,7 @@ final class WritingFeaturesUITests: XCTestCase {
         XCTAssertTrue(row.exists, "Cancel deleted the snippet.")
 
         app.terminate()
-        app.launch()
-        XCTAssertTrue(app.wait(for: .runningForeground, timeout: 20))
+        try launchApp(app)
         openSnippets(in: app)
         searchSnippets(trigger, in: app)
         let saved = snippetRow(trigger, in: app)
@@ -59,8 +71,14 @@ final class WritingFeaturesUITests: XCTestCase {
     }
 
     @MainActor func testCSVImportPreviewsMultilineContentBeforeReplacing() throws {
-        let app = launchApp()
-        defer { app.terminate() }
+        let app = XCUIApplication()
+        app.terminate()
+        let dockPreference = try WritingFeaturesDockPreference()
+        defer {
+            app.terminate()
+            XCTAssertTrue(dockPreference.restore(), "Unable to restore the Dock preference.")
+        }
+        try launchApp(app)
         let trigger = "ui csv \(UUID().uuidString.lowercased())"
         let original = "Original saved text\nKeep until import"
         let replacement = "Imported \"quoted\" text, with comma\n\nSecond line"
@@ -110,8 +128,14 @@ final class WritingFeaturesUITests: XCTestCase {
     }
 
     @MainActor func testTranslationTargetsReorderSelectAndPersist() throws {
-        let app = launchApp()
-        defer { app.terminate() }
+        let app = XCUIApplication()
+        app.terminate()
+        let dockPreference = try WritingFeaturesDockPreference()
+        defer {
+            app.terminate()
+            XCTAssertTrue(dockPreference.restore(), "Unable to restore the Dock preference.")
+        }
+        try launchApp(app)
         openWritingActions(in: app)
         let languages = [("de", "German"), ("fr", "French"), ("it", "Italian"), ("es", "Spanish")]
         let available = languages.filter { !app.buttons["writingActions.target.\($0.0).select"].exists }
@@ -146,8 +170,7 @@ final class WritingFeaturesUITests: XCTestCase {
         attachScreenshot(app, named: "Writing actions and ordered translation targets")
 
         app.terminate()
-        app.launch()
-        XCTAssertTrue(app.wait(for: .runningForeground, timeout: 20))
+        try launchApp(app)
         openWritingActions(in: app)
         XCTAssertTrue(targetIsSelected(second.0, in: app))
         XCTAssertFalse(app.buttons["writingActions.target.\(second.0).moveUp"].isEnabled)
@@ -163,11 +186,9 @@ final class WritingFeaturesUITests: XCTestCase {
         XCTAssertTrue(waitUntil { !app.buttons["writingActions.target.\(second.0).select"].exists })
     }
 
-    @MainActor private func launchApp() -> XCUIApplication {
-        let app = XCUIApplication()
+    @MainActor private func launchApp(_ app: XCUIApplication) throws {
         app.launchArguments = [
             "-hasCompletedOnboarding", "YES",
-            "-IsMenuBarOnly", "NO",
             "-DidApplyLaunchAtLoginDefault", "YES",
             "-enableAnnouncements", "NO",
             "-PrewarmModelOnWake", "NO",
@@ -177,9 +198,26 @@ final class WritingFeaturesUITests: XCTestCase {
             "-selectedAIProvider", "Local CLI"
         ]
         app.launch()
-        XCTAssertTrue(app.wait(for: .runningForeground, timeout: 20))
-        XCTAssertTrue(app.windows.firstMatch.waitForExistence(timeout: 15))
-        return app
+        app.activate()
+        guard app.wait(for: .runningForeground, timeout: 20) else {
+            attachLaunchFailure(app)
+            throw WritingFeaturesUIError.appDidNotBecomeForeground
+        }
+        let mainWindow = app.windows.containing(.staticText, identifier: "Dictionary").firstMatch
+        guard mainWindow.waitForExistence(timeout: 15) else {
+            attachLaunchFailure(app)
+            throw WritingFeaturesUIError.mainWindowDidNotOpen
+        }
+    }
+
+    @MainActor private func attachLaunchFailure(_ app: XCUIApplication) {
+        let value = WritingFeaturesDockPreference.currentValue()
+        let details = "Application state: \(app.state)\nIsMenuBarOnly: \(String(describing: value))\nPreference type: \(value.map { String(reflecting: type(of: $0)) } ?? "missing")\n\n\(app.debugDescription)"
+        let hierarchy = XCTAttachment(string: details)
+        hierarchy.name = "Writing Features failed launch state and hierarchy"
+        hierarchy.lifetime = .keepAlways
+        add(hierarchy)
+        attachScreenshot(app, named: "Writing Features failed launch")
     }
 
     @MainActor private func openSnippets(in app: XCUIApplication) {
@@ -322,5 +360,42 @@ final class WritingFeaturesUITests: XCTestCase {
         attachment.name = name
         attachment.lifetime = .keepAlways
         add(attachment)
+    }
+}
+
+private enum WritingFeaturesUIError: Error {
+    case disposableRunnerRequired, preferenceSyncFailed, appDidNotBecomeForeground, mainWindowDidNotOpen
+}
+
+private final class WritingFeaturesDockPreference {
+    private static let bundleIdentifier = "com.negentropi.RomaJustTalk" as CFString
+    private static let key = "IsMenuBarOnly" as CFString
+    private let saved: Any?
+
+    init() throws {
+        guard CFPreferencesAppSynchronize(Self.bundleIdentifier) else {
+            throw WritingFeaturesUIError.preferenceSyncFailed
+        }
+        saved = Self.currentValue()
+        // The production reader requires Bool; NSArgumentDomain supplies a String.
+        Self.write(false)
+        guard CFPreferencesAppSynchronize(Self.bundleIdentifier), Self.currentValue() as? Bool == false else {
+            _ = restore()
+            throw WritingFeaturesUIError.preferenceSyncFailed
+        }
+    }
+
+    func restore() -> Bool {
+        Self.write(saved)
+        return CFPreferencesAppSynchronize(Self.bundleIdentifier)
+    }
+
+    static func currentValue() -> Any? {
+        CFPreferencesCopyValue(key, bundleIdentifier, kCFPreferencesCurrentUser, kCFPreferencesAnyHost)
+    }
+
+    private static func write(_ value: Any?) {
+        CFPreferencesSetValue(key, value as CFPropertyList?, bundleIdentifier,
+                              kCFPreferencesCurrentUser, kCFPreferencesAnyHost)
     }
 }

@@ -80,7 +80,6 @@ final class WritingPowerModeUITests: XCTestCase {
         try fixture.install()
         app.launchArguments = [
             "-hasCompletedOnboarding", "YES",
-            "-IsMenuBarOnly", "NO",
             "-DidApplyLaunchAtLoginDefault", "YES",
             "-enableAnnouncements", "NO",
             "-PrewarmModelOnWake", "NO",
@@ -91,6 +90,7 @@ final class WritingPowerModeUITests: XCTestCase {
         app.launch()
         guard app.wait(for: .runningForeground, timeout: 20),
               app.windows.firstMatch.waitForExistence(timeout: 15) else {
+            attachLaunchState(app, fixture: fixture)
             attachHierarchy(app, named: "App failed to open")
             throw PowerModeUIFixtureError.appDidNotOpen
         }
@@ -207,6 +207,27 @@ final class WritingPowerModeUITests: XCTestCase {
         attachScreenshot(app, named: name)
     }
 
+    @MainActor private func attachLaunchState(_ app: XCUIApplication, fixture: PowerModeUIPreferences) {
+        let dockPreference = fixture.object(for: "IsMenuBarOnly")
+        let details: [String: Any] = [
+            "applicationState": String(describing: app.state),
+            "bundleIdentifier": PowerModeUIPreferences.bundleIdentifier,
+            "IsMenuBarOnly": dockPreference ?? NSNull(),
+            "IsMenuBarOnlyType": dockPreference.map { String(reflecting: type(of: $0)) } ?? "missing",
+            "ShowMenuBarIcon": fixture.object(for: "ShowMenuBarIcon") ?? NSNull(),
+            "CurrentTranscriptionModel": fixture.object(for: "CurrentTranscriptionModel") ?? NSNull()
+        ]
+        guard let data = try? JSONSerialization.data(withJSONObject: details, options: [.prettyPrinted, .sortedKeys]),
+              let text = String(data: data, encoding: .utf8) else {
+            XCTFail("Unable to encode the failed launch state.")
+            return
+        }
+        let attachment = XCTAttachment(string: text)
+        attachment.name = "Power Mode fixture launch state"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
+
     @MainActor private func attachScreenshot(_ app: XCUIApplication, named name: String) {
         let attachment = XCTAttachment(screenshot: app.screenshot())
         attachment.name = name
@@ -237,7 +258,7 @@ private final class PowerModeUIPreferences {
         "LowercaseTranscription", "IsTextFormattingEnabled", "PunctuationCleanupMode", "RemovePunctuation",
         "powerModePersistConfig", "powerModeUIFlag", "CurrentTranscriptionModel", "SelectedLanguage", "TranscriptionPrompt",
         "isAIEnhancementEnabled", "useClipboardContext", "useScreenCaptureContext", "selectedAIProvider", "selectedPromptId",
-        "RecorderType", "ShowMenuBarIcon", "isSoundFeedbackEnabled", "VoiceInkSpokenSnippets", "VoiceInkWritingActionPreferences",
+        "RecorderType", "ShowMenuBarIcon", "IsMenuBarOnly", "isSoundFeedbackEnabled", "VoiceInkSpokenSnippets", "VoiceInkWritingActionPreferences",
         "Shortcut_cancelRecorder", "Shortcut_cancelRecorder_cleared", "CustomRecordingShortcut_cancelRecorder", "KeyboardShortcuts_cancelRecorder"
     ]
 
@@ -273,7 +294,7 @@ private final class PowerModeUIPreferences {
             "powerModePersistConfig": false, "powerModeUIFlag": true,
             "CurrentTranscriptionModel": "whisper-large-v3-turbo", "SelectedLanguage": "auto",
             "isAIEnhancementEnabled": false, "useClipboardContext": false, "useScreenCaptureContext": false,
-            "selectedAIProvider": "Local CLI", "RecorderType": "mini", "ShowMenuBarIcon": true,
+            "selectedAIProvider": "Local CLI", "RecorderType": "mini", "ShowMenuBarIcon": true, "IsMenuBarOnly": false,
             "isSoundFeedbackEnabled": false, "Shortcut_cancelRecorder_cleared": true,
             "VoiceInkSpokenSnippets": try JSONSerialization.data(withJSONObject: []),
             "VoiceInkWritingActionPreferences": try JSONSerialization.data(withJSONObject: [

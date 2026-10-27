@@ -26,10 +26,51 @@ jobs:
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
           git rev-parse HEAD > "$RUNNER_TEMP/none-ios-proof/source-sha.txt"
           git diff --exit-code
+          cat > "$RUNNER_TEMP/none-ios-proof/pin_contract.py" <<'PYCODE'
+          def pin_map(value):
+              pins = value["pins"]
+              result = {pin["identity"]: pin for pin in pins}
+              if len(result) != len(pins):
+                  raise SystemExit("A package graph contains duplicate identities")
+              return result
+
+          def same_pin(actual, expected):
+              return (
+                  actual["identity"] == expected["identity"]
+                  and actual["kind"] == expected["kind"]
+                  and actual["state"] == expected["state"]
+                  and actual["location"].removesuffix(".git") == expected["location"].removesuffix(".git")
+              )
+
+          def seed_graph(original_value, reviewed_value):
+              original = pin_map(original_value)
+              reviewed = pin_map(reviewed_value)
+              for name, pin in original.items():
+                  if name in reviewed and not same_pin(pin, reviewed[name]):
+                      raise SystemExit("Original and reviewed package pins conflict: " + name)
+              seed = dict(original_value)
+              seed["pins"] = sorted((reviewed | original).values(), key=lambda pin: pin["identity"])
+              return seed
+
+          def validate_resolution(resolved_value, original_value, reviewed_value):
+              original = pin_map(original_value)
+              reviewed = pin_map(reviewed_value)
+              resolved = pin_map(resolved_value)
+              for name, pin in original.items():
+                  if name not in resolved or not same_pin(resolved[name], pin):
+                      raise SystemExit("iOS resolution changed an original pin; package setup remains unverified")
+              allowed = reviewed | original
+              for name, pin in resolved.items():
+                  if name not in allowed or not same_pin(pin, allowed[name]):
+                      raise SystemExit("iOS resolution changed a reviewed package state or repository; package setup remains unverified: " + name)
+              return resolved
+          PYCODE
           python3 - <<'PYCODE'
-          import hashlib, json, os, subprocess
+          import hashlib, json, os, subprocess, sys
           from pathlib import Path
           proof = Path(os.environ["RUNNER_TEMP"]) / "none-ios-proof"
+          sys.path.insert(0, str(proof))
+          from pin_contract import pin_map, seed_graph
           paths = subprocess.check_output(["git", "ls-files", "-z"]).decode().split("\0")
           locks = {name: {"sha256": hashlib.sha256(Path(name).read_bytes()).hexdigest(), "value": json.loads(Path(name).read_bytes())} for name in paths if name.endswith("Package.resolved")}
           roots = ("VoiceInk/", "VoiceInkCore/", "VoiceInkNVIDIA/", "VoiceInkQwen/", "iOS/", "VoiceInk.xcodeproj/", "VoiceInk.xcworkspace/")
@@ -37,6 +78,21 @@ jobs:
           (proof / "package-locks-before.json").write_text(json.dumps(locks, indent=2) + "\n")
           (proof / "source-manifest-before.json").write_text(json.dumps(sources, indent=2) + "\n")
           (proof / "scope.txt").write_text("Direct iOS project compilation and static packaging only. No Simulator launch, runtime tests, microphone, keyboard or device proof.\n")
+          target = "iOS/VoiceInk-ios.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+          mac = "VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+          original = pin_map(locks[target]["value"])
+          reviewed = pin_map(locks[mac]["value"])
+          if set(original) != {"llmkit", "keyboardkit"} or len(reviewed) != 41:
+              raise SystemExit("The audited original or reviewed package graph changed")
+          if locks[mac]["sha256"] != "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f":
+              raise SystemExit("The reviewed canonical Mac package bytes changed")
+          seed = seed_graph(locks[target]["value"], locks[mac]["value"])
+          if len(seed["pins"]) != 42:
+              raise SystemExit("The audited seed graph must contain exactly 42 unique pins")
+          seed_data = (json.dumps(seed, indent=2) + "\n").encode()
+          (proof / "seed-ios.Package.resolved").write_bytes(seed_data)
+          Path(target).write_bytes(seed_data)
+          (proof / "package-seed-receipt.json").write_text(json.dumps({"target": target, "original_ios_sha256": locks[target]["sha256"], "reviewed_mac_sha256": locks[mac]["sha256"], "original_pins": sorted(original), "reviewed_pin_count": len(reviewed), "seed_pin_count": len(seed["pins"]), "seed_sha256": hashlib.sha256(seed_data).hexdigest(), "shared_identity_conflicts_checked": True, "repository_equivalence": "Only an optional terminal .git suffix is ignored; scheme, host and repository path stay exact", "scope": "Runner-only generated iOS resolution metadata seeded from existing reviewed pins before any xcodebuild invocation"}, indent=2) + "\n")
           PYCODE
 
       - name: Select Xcode and Metal toolchain
@@ -68,6 +124,45 @@ jobs:
             ~/Library/Caches/org.swift.swiftpm
           key: writing-macos-${{ runner.arch }}-${{ hashFiles('Makefile', 'scripts/verify-static-whisper-xcframework.sh', 'VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
 
+      - name: Resolve the direct iOS project and validate package metadata
+        run: |
+          set -o pipefail
+          proof="$RUNNER_TEMP/none-ios-proof"
+          xcodebuild -resolvePackageDependencies \
+            -project iOS/VoiceInk-ios.xcodeproj \
+            -scheme VoiceInk-ios \
+            -configuration Debug \
+            -destination "generic/platform=iOS Simulator" \
+            -derivedDataPath "$RUNNER_TEMP/none-ios-build" \
+            -skipPackageUpdates \
+            2>&1 | tee "$proof/package-resolution.log"
+          xcodebuild -list -json -project iOS/VoiceInk-ios.xcodeproj \
+            -onlyUsePackageVersionsFromResolvedFile -skipPackageUpdates > "$proof/project-list.json"
+          python3 - "$proof/project-list.json" <<'PYCODE'
+          import json, sys
+          schemes = json.load(open(sys.argv[1])).get("project", {}).get("schemes", [])
+          if "VoiceInk-ios" not in schemes:
+              raise SystemExit("The direct iOS project does not expose the required scheme")
+          PYCODE
+          python3 - <<'PYCODE'
+          import hashlib, json, os, sys
+          from pathlib import Path
+          proof = Path(os.environ["RUNNER_TEMP"]) / "none-ios-proof"
+          sys.path.insert(0, str(proof))
+          from pin_contract import pin_map, validate_resolution
+          before = json.loads((proof / "package-locks-before.json").read_text())
+          target = "iOS/VoiceInk-ios.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+          mac = "VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+          original = pin_map(before[target]["value"])
+          data = Path(target).read_bytes()
+          (proof / "resolved-ios.Package.resolved").write_bytes(data)
+          resolved = validate_resolution(json.loads(data), before[target]["value"], before[mac]["value"])
+          for name, record in before.items():
+              if name != target and hashlib.sha256(Path(name).read_bytes()).hexdigest() != record["sha256"]:
+                  raise SystemExit("Resolution changed an unrelated package lock: " + name)
+          (proof / "package-resolution-receipt.json").write_text(json.dumps({"target": target, "original_pins_preserved": len(original), "resolved_pins": len(resolved), "all_package_states_match_reviewed_sources": True, "repository_equivalence": "Optional terminal .git suffix only", "resolved_sha256": hashlib.sha256(data).hexdigest(), "scope": "Generated resolution metadata only; no source or dependency declaration changes authorized"}, indent=2) + "\n")
+          PYCODE
+
       - name: Verify existing iOS configuration contracts
         run: |
           set -o pipefail
@@ -85,54 +180,6 @@ jobs:
             ~/VoiceInk-Dependencies/whisper.cpp
             ~/Library/Caches/org.swift.swiftpm
           key: ${{ steps.deps-cache.outputs.cache-primary-key }}
-
-      - name: Resolve the direct iOS project and validate package metadata
-        run: |
-          set -o pipefail
-          proof="$RUNNER_TEMP/none-ios-proof"
-          xcodebuild -list -json -project iOS/VoiceInk-ios.xcodeproj -skipPackageUpdates > "$proof/project-list.json"
-          python3 - "$proof/project-list.json" <<'PYCODE'
-          import json, sys
-          schemes = json.load(open(sys.argv[1])).get("project", {}).get("schemes", [])
-          if "VoiceInk-ios" not in schemes:
-              raise SystemExit("The direct iOS project does not expose the required scheme")
-          PYCODE
-          xcodebuild -resolvePackageDependencies \
-            -project iOS/VoiceInk-ios.xcodeproj \
-            -scheme VoiceInk-ios \
-            -configuration Debug \
-            -destination "generic/platform=iOS Simulator" \
-            -derivedDataPath "$RUNNER_TEMP/none-ios-build" \
-            -skipPackageUpdates \
-            2>&1 | tee "$proof/package-resolution.log"
-          python3 - <<'PYCODE'
-          import hashlib, json, os
-          from pathlib import Path
-          proof = Path(os.environ["RUNNER_TEMP"]) / "none-ios-proof"
-          before = json.loads((proof / "package-locks-before.json").read_text())
-          target = "iOS/VoiceInk-ios.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
-          mac = "VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
-          def pin_map(value):
-              pins = value["pins"]
-              result = {pin["identity"]: pin for pin in pins}
-              if len(result) != len(pins):
-                  raise SystemExit("A package graph contains duplicate identities")
-              return result
-          original = pin_map(before[target]["value"])
-          reviewed = pin_map(before[mac]["value"])
-          data = Path(target).read_bytes()
-          resolved = pin_map(json.loads(data))
-          (proof / "resolved-ios.Package.resolved").write_bytes(data)
-          if any(resolved.get(name) != pin for name, pin in original.items()):
-              raise SystemExit("iOS resolution changed an original pin; package setup remains unverified")
-          allowed = reviewed | original
-          if any(allowed.get(name) != pin for name, pin in resolved.items()):
-              raise SystemExit("iOS resolution added an unreviewed pin; inspect the retained graph before compiling")
-          for name, record in before.items():
-              if name != target and hashlib.sha256(Path(name).read_bytes()).hexdigest() != record["sha256"]:
-                  raise SystemExit("Resolution changed an unrelated package lock: " + name)
-          (proof / "package-resolution-receipt.json").write_text(json.dumps({"target": target, "original_pins_preserved": len(original), "resolved_pins": len(resolved), "all_pins_match_reviewed_sources": True, "resolved_sha256": hashlib.sha256(data).hexdigest(), "scope": "Generated resolution metadata only; no source or dependency declaration changes authorized"}, indent=2) + "\n")
-          PYCODE
 
       - name: Compile the iOS Simulator app and shared Core
         run: |

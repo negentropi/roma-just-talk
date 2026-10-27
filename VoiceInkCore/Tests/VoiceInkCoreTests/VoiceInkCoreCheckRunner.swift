@@ -10,6 +10,11 @@ struct VoiceInkCoreCheck {
 struct VoiceInkCoreCheckRunner {
     static func main() async {
         let checks: [VoiceInkCoreCheck] = [
+            VoiceInkCoreCheck(name: "ClarityStyleBackupTests.testStyleBackupRoundTripsAndAppliesEveryStableStyle", run: { try ClarityStyleBackupTests().testStyleBackupRoundTripsAndAppliesEveryStableStyle() }),
+            VoiceInkCoreCheck(name: "ClarityStyleBackupTests.testMissingAndNullStylePreserveCurrentStyleOnLegacyImport", run: { try ClarityStyleBackupTests().testMissingAndNullStylePreserveCurrentStyleOnLegacyImport() }),
+            VoiceInkCoreCheck(name: "ClarityStyleBackupTests.testInvalidStyleRejectsBeforePreferenceOrLibraryMutation", run: { try ClarityStyleBackupTests().testInvalidStyleRejectsBeforePreferenceOrLibraryMutation() }),
+            VoiceInkCoreCheck(name: "ClarityStyleBackupTests.testDefaultBackupOmitsStyleAndPreservesExistingWireKeys", run: { try ClarityStyleBackupTests().testDefaultBackupOmitsStyleAndPreservesExistingWireKeys() }),
+            VoiceInkCoreCheck(name: "ClarityStyleBackupTests.testResetRemovesStylePreferenceAndReturnsNatural", run: { try ClarityStyleBackupTests().testResetRemovesStylePreferenceAndReturnsNatural() }),
             VoiceInkCoreCheck(name: "ClarityStylePreferenceTests.testMissingUnknownAndWrongTypeStylesUseNatural", run: { ClarityStylePreferenceTests().testMissingUnknownAndWrongTypeStylesUseNatural() }),
             VoiceInkCoreCheck(name: "ClarityStylePreferenceTests.testStyleSurvivesPreferencesReopenAndLeavesCustomSettingsIntact", run: { ClarityStylePreferenceTests().testStyleSurvivesPreferencesReopenAndLeavesCustomSettingsIntact() }),
             VoiceInkCoreCheck(name: "DictationDraftMetadataTests.testAudioDraftCarriesExactRecognitionWithoutEnhancement", run: { DictationDraftMetadataTests().testAudioDraftCarriesExactRecognitionWithoutEnhancement() }),

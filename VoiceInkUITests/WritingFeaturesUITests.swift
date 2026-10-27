@@ -1,8 +1,11 @@
+import AppKit
 import CoreFoundation
 import Foundation
 import XCTest
 
 final class WritingFeaturesUITests: XCTestCase {
+    private static let mainWindowIdentifier = "com.negentropi.RomaJustTalk.mainWindow"
+
     override func setUpWithError() throws {
         continueAfterFailure = false
         let environment = ProcessInfo.processInfo.environment
@@ -18,14 +21,8 @@ final class WritingFeaturesUITests: XCTestCase {
     }
 
     @MainActor func testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch() throws {
-        let app = XCUIApplication()
-        app.terminate()
-        let dockPreference = try WritingFeaturesDockPreference()
-        defer {
-            app.terminate()
-            XCTAssertTrue(dockPreference.restore(), "Unable to restore the Dock preference.")
-        }
-        try launchApp(app)
+        let (app, ownership) = try prepareApp()
+        try launchApp(app, ownership: ownership)
         let trigger = "ui signature \(UUID().uuidString.lowercased())"
         let original = "\nFelix C. Order\nRJT \"Lab\" -- line\n\n"
         let revised = "\nFelix C. Order\nLiteral \"quotes\" -- unchanged\n\nSecond paragraph\n"
@@ -34,7 +31,7 @@ final class WritingFeaturesUITests: XCTestCase {
         createSnippet(trigger: trigger, content: original, in: app)
         let row = snippetRow(trigger, in: app)
         XCTAssertTrue(row.waitForExistence(timeout: 10))
-        reveal(row, in: app)
+        reveal(row, identifier: "snippets.row.\(trigger)", in: app)
         attachScreenshot(app, named: "Spoken snippets library")
 
         row.buttons["snippets.row.edit"].click()
@@ -58,7 +55,7 @@ final class WritingFeaturesUITests: XCTestCase {
         XCTAssertTrue(row.exists, "Cancel deleted the snippet.")
 
         app.terminate()
-        try launchApp(app)
+        try launchApp(app, ownership: ownership)
         openSnippets(in: app)
         searchSnippets(trigger, in: app)
         let saved = snippetRow(trigger, in: app)
@@ -71,21 +68,15 @@ final class WritingFeaturesUITests: XCTestCase {
     }
 
     @MainActor func testCSVImportPreviewsMultilineContentBeforeReplacing() throws {
-        let app = XCUIApplication()
-        app.terminate()
-        let dockPreference = try WritingFeaturesDockPreference()
-        defer {
-            app.terminate()
-            XCTAssertTrue(dockPreference.restore(), "Unable to restore the Dock preference.")
-        }
-        try launchApp(app)
+        let (app, ownership) = try prepareApp()
+        try launchApp(app, ownership: ownership)
         let trigger = "ui csv \(UUID().uuidString.lowercased())"
         let original = "Original saved text\nKeep until import"
         let replacement = "Imported \"quoted\" text, with comma\n\nSecond line"
         let directory = FileManager.default.temporaryDirectory
             .appendingPathComponent("rjt-writing-ui-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-        defer { try? FileManager.default.removeItem(at: directory) }
+        addTeardownBlock { try? FileManager.default.removeItem(at: directory) }
         let file = directory.appendingPathComponent("snippet-preview.csv")
         let escaped = replacement.replacingOccurrences(of: "\"", with: "\"\"")
         try "trigger,content,enabled\r\n\(trigger),\"\(escaped)\",false\r\n"
@@ -128,14 +119,8 @@ final class WritingFeaturesUITests: XCTestCase {
     }
 
     @MainActor func testTranslationTargetsReorderSelectAndPersist() throws {
-        let app = XCUIApplication()
-        app.terminate()
-        let dockPreference = try WritingFeaturesDockPreference()
-        defer {
-            app.terminate()
-            XCTAssertTrue(dockPreference.restore(), "Unable to restore the Dock preference.")
-        }
-        try launchApp(app)
+        let (app, ownership) = try prepareApp()
+        try launchApp(app, ownership: ownership)
         openWritingActions(in: app)
         let languages = [("de", "German"), ("fr", "French"), ("it", "Italian"), ("es", "Spanish")]
         let available = languages.filter { !app.buttons["writingActions.target.\($0.0).select"].exists }
@@ -170,7 +155,7 @@ final class WritingFeaturesUITests: XCTestCase {
         attachScreenshot(app, named: "Writing actions and ordered translation targets")
 
         app.terminate()
-        try launchApp(app)
+        try launchApp(app, ownership: ownership)
         openWritingActions(in: app)
         XCTAssertTrue(targetIsSelected(second.0, in: app))
         XCTAssertFalse(app.buttons["writingActions.target.\(second.0).moveUp"].isEnabled)
@@ -186,7 +171,28 @@ final class WritingFeaturesUITests: XCTestCase {
         XCTAssertTrue(waitUntil { !app.buttons["writingActions.target.\(second.0).select"].exists })
     }
 
-    @MainActor private func launchApp(_ app: XCUIApplication) throws {
+    @MainActor private func prepareApp() throws -> (XCUIApplication, WritingFeaturesAppOwnership) {
+        let ownership = try WritingFeaturesAppOwnership()
+        let dockPreference = try WritingFeaturesDockPreference()
+        let app = XCUIApplication()
+        // XCTest runs teardown blocks in reverse order, including after a fatal UI lookup.
+        addTeardownBlock {
+            guard ownership.terminateOwnedApplications() else {
+                XCTFail("The owned app did not exit; retained the Dock preference for inspection.")
+                return
+            }
+            XCTAssertTrue(dockPreference.restore(), "Unable to restore the Dock preference.")
+        }
+        addTeardownBlock { @MainActor in
+            if ownership.hasOnlyOwnedRunningApplications {
+                app.terminate()
+            }
+        }
+        return (app, ownership)
+    }
+
+    @MainActor private func launchApp(_ app: XCUIApplication, ownership: WritingFeaturesAppOwnership) throws {
+        try ownership.requireNoRunningApplication()
         app.launchArguments = [
             "-hasCompletedOnboarding", "YES",
             "-DidApplyLaunchAtLoginDefault", "YES",
@@ -198,13 +204,15 @@ final class WritingFeaturesUITests: XCTestCase {
             "-selectedAIProvider", "Local CLI"
         ]
         app.launch()
+        try ownership.captureLaunchedApplication()
         app.activate()
         guard app.wait(for: .runningForeground, timeout: 20) else {
             attachLaunchFailure(app)
             throw WritingFeaturesUIError.appDidNotBecomeForeground
         }
-        let mainWindow = app.windows.containing(.staticText, identifier: "Dictionary").firstMatch
-        guard mainWindow.waitForExistence(timeout: 15) else {
+        let mainWindows = app.windows.matching(identifier: Self.mainWindowIdentifier)
+        guard mainWindows.firstMatch.waitForExistence(timeout: 15), mainWindows.count == 1,
+              mainWindow(in: app).buttons["Dictionary"].waitForExistence(timeout: 10) else {
             attachLaunchFailure(app)
             throw WritingFeaturesUIError.mainWindowDidNotOpen
         }
@@ -221,7 +229,7 @@ final class WritingFeaturesUITests: XCTestCase {
     }
 
     @MainActor private func openSnippets(in app: XCUIApplication) {
-        let dictionary = app.staticTexts["Dictionary"].firstMatch
+        let dictionary = mainWindow(in: app).buttons["Dictionary"]
         XCTAssertTrue(dictionary.waitForExistence(timeout: 10))
         dictionary.click()
         let snippets = identified("dictionary.section.snippets", in: app)
@@ -229,16 +237,20 @@ final class WritingFeaturesUITests: XCTestCase {
         snippets.click()
         let add = app.buttons["snippets.new"]
         XCTAssertTrue(add.waitForExistence(timeout: 10))
-        reveal(add, in: app)
+        reveal(add, identifier: "snippets.new", in: app)
     }
 
     @MainActor private func openWritingActions(in app: XCUIApplication) {
-        let style = app.staticTexts["style"].firstMatch
+        let style = mainWindow(in: app).buttons["style"]
         XCTAssertTrue(style.waitForExistence(timeout: 10))
         style.click()
         let add = app.buttons["writingActions.target.add"]
         XCTAssertTrue(add.waitForExistence(timeout: 10))
-        reveal(add, in: app)
+        reveal(add, identifier: "writingActions.target.add", in: app)
+    }
+
+    @MainActor private func mainWindow(in app: XCUIApplication) -> XCUIElement {
+        app.windows[Self.mainWindowIdentifier]
     }
 
     @MainActor private func createSnippet(trigger: String, content: String, in app: XCUIApplication) {
@@ -258,7 +270,7 @@ final class WritingFeaturesUITests: XCTestCase {
         searchSnippets(trigger, in: app)
         let row = snippetRow(trigger, in: app)
         XCTAssertTrue(row.waitForExistence(timeout: 5))
-        reveal(row, in: app)
+        reveal(row, identifier: "snippets.row.\(trigger)", in: app)
         row.buttons["snippets.row.delete"].click()
         let confirm = app.buttons["snippets.delete.confirm"]
         XCTAssertTrue(confirm.waitForExistence(timeout: 5))
@@ -269,7 +281,7 @@ final class WritingFeaturesUITests: XCTestCase {
     @MainActor private func searchSnippets(_ query: String, in app: XCUIApplication) {
         let search = app.textFields["snippets.search"]
         XCTAssertTrue(search.waitForExistence(timeout: 5))
-        reveal(search, in: app)
+        reveal(search, identifier: "snippets.search", in: app)
         replaceText(in: search, with: query)
     }
 
@@ -279,7 +291,7 @@ final class WritingFeaturesUITests: XCTestCase {
 
     @MainActor private func addLanguage(_ code: String, name: String, in app: XCUIApplication) {
         let add = app.buttons["writingActions.target.add"]
-        reveal(add, in: app)
+        reveal(add, identifier: "writingActions.target.add", in: app)
         add.click()
         let search = app.textFields["writingActions.target.search"]
         XCTAssertTrue(search.waitForExistence(timeout: 5))
@@ -337,8 +349,9 @@ final class WritingFeaturesUITests: XCTestCase {
         element.descendants(matching: .any).matching(identifier: identifier).firstMatch
     }
 
-    @MainActor private func reveal(_ element: XCUIElement, in app: XCUIApplication) {
-        let scrollView = app.scrollViews.containing(.any, identifier: element.identifier).firstMatch
+    @MainActor private func reveal(_ element: XCUIElement, identifier: String, in app: XCUIApplication) {
+        XCTAssertTrue(element.exists, "Missing control: \(identifier)")
+        let scrollView = app.scrollViews.containing(.any, identifier: identifier).firstMatch
         for _ in 0..<8 where !element.isHittable {
             guard scrollView.exists else { break }
             scrollView.scroll(byDeltaX: 0, deltaY: -180)
@@ -365,6 +378,73 @@ final class WritingFeaturesUITests: XCTestCase {
 
 private enum WritingFeaturesUIError: Error {
     case disposableRunnerRequired, preferenceSyncFailed, appDidNotBecomeForeground, mainWindowDidNotOpen
+    case appAlreadyRunning, appOwnershipUnavailable
+}
+
+private final class WritingFeaturesAppOwnership {
+    private struct OwnedProcess {
+        let pid: pid_t
+        let executableURL: URL
+        let launchDate: Date
+    }
+
+    private static let bundleIdentifier = "com.negentropi.RomaJustTalk"
+    private var processes: [OwnedProcess] = []
+
+    init() throws {
+        try requireNoRunningApplication()
+    }
+
+    func requireNoRunningApplication() throws {
+        guard Self.runningApplications.isEmpty else { throw WritingFeaturesUIError.appAlreadyRunning }
+    }
+
+    func captureLaunchedApplication() throws {
+        let applications = Self.runningApplications
+        guard applications.count == 1, let application = applications.first,
+              let executableURL = application.executableURL, let launchDate = application.launchDate else {
+            throw WritingFeaturesUIError.appOwnershipUnavailable
+        }
+        processes.append(OwnedProcess(pid: application.processIdentifier,
+                                      executableURL: executableURL, launchDate: launchDate))
+    }
+
+    var hasOnlyOwnedRunningApplications: Bool {
+        let applications = Self.runningApplications
+        return !applications.isEmpty && applications.allSatisfy(isOwned)
+    }
+
+    func terminateOwnedApplications() -> Bool {
+        let applications = Self.runningApplications
+        guard applications.allSatisfy(isOwned) else { return false }
+        for application in applications { _ = application.terminate() }
+        if waitForExit(timeout: 2) { return true }
+        let remaining = Self.runningApplications
+        guard remaining.allSatisfy(isOwned) else { return false }
+        for application in remaining { _ = application.forceTerminate() }
+        return waitForExit(timeout: 5)
+    }
+
+    private func isOwned(_ application: NSRunningApplication) -> Bool {
+        processes.contains {
+            $0.pid == application.processIdentifier
+                && $0.executableURL == application.executableURL
+                && $0.launchDate == application.launchDate
+        }
+    }
+
+    private static var runningApplications: [NSRunningApplication] {
+        NSRunningApplication.runningApplications(withBundleIdentifier: bundleIdentifier)
+    }
+
+    private func waitForExit(timeout: TimeInterval) -> Bool {
+        let deadline = Date().addingTimeInterval(timeout)
+        repeat {
+            if Self.runningApplications.isEmpty { return true }
+            RunLoop.current.run(until: Date().addingTimeInterval(0.05))
+        } while Date() < deadline
+        return Self.runningApplications.isEmpty
+    }
 }
 
 private final class WritingFeaturesDockPreference {
@@ -387,7 +467,9 @@ private final class WritingFeaturesDockPreference {
 
     func restore() -> Bool {
         Self.write(saved)
-        return CFPreferencesAppSynchronize(Self.bundleIdentifier)
+        guard CFPreferencesAppSynchronize(Self.bundleIdentifier) else { return false }
+        if let saved { return (saved as? NSObject)?.isEqual(Self.currentValue()) == true }
+        return Self.currentValue() == nil
     }
 
     static func currentValue() -> Any? {

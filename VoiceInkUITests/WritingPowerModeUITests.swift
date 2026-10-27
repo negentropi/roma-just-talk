@@ -1,3 +1,4 @@
+import AppKit
 import CoreFoundation
 import Foundation
 import XCTest
@@ -31,7 +32,7 @@ final class WritingPowerModeUITests: XCTestCase {
 
             let row = try required(identified("snippets.row.\(trigger)", in: app))
             let toggle = try required(identified("snippets.row.toggle", in: row))
-            try reveal(toggle, in: app)
+            try reveal(toggle, identifier: "snippets.row.toggle", in: app)
             toggle.click()
             XCTAssertTrue(waitUntil { fixture.snippetEnabled(trigger: trigger) == false })
             try assertActiveBaseline(fixture, sessionID: sessionID, phase: "after snippet toggle")
@@ -40,9 +41,9 @@ final class WritingPowerModeUITests: XCTestCase {
 
     @MainActor func testTargetChangesPreservePowerModeRestoration() throws {
         try withActivePowerMode { app, fixture, sessionID in
-            try required(app.staticTexts["style"].firstMatch).click()
+            try required(mainWindow(in: app).buttons["style"]).click()
             let add = try required(app.buttons["writingActions.target.add"])
-            try reveal(add, in: app)
+            try reveal(add, identifier: "writingActions.target.add", in: app)
             add.click()
             try replaceText(in: required(app.textFields["writingActions.target.search"]), with: "German")
             try required(app.buttons["writingActions.target.option.de"]).click()
@@ -50,7 +51,7 @@ final class WritingPowerModeUITests: XCTestCase {
             try assertActiveBaseline(fixture, sessionID: sessionID, phase: "after target add")
 
             let move = try required(app.buttons["writingActions.target.de.moveUp"])
-            try reveal(move, in: app)
+            try reveal(move, identifier: "writingActions.target.de.moveUp", in: app)
             XCTAssertTrue(move.isEnabled)
             move.click()
             XCTAssertTrue(waitUntil { fixture.targetLanguages() == ["de", "en"] }, "The actual target reorder did not persist.")
@@ -63,20 +64,23 @@ final class WritingPowerModeUITests: XCTestCase {
         _ mutation: (XCUIApplication, PowerModeUIPreferences, UUID) throws -> Void
     ) throws {
         let app = XCUIApplication(bundleIdentifier: PowerModeUIPreferences.bundleIdentifier)
-        guard app.state == .notRunning else { throw PowerModeUIFixtureError.appAlreadyRunning }
-        let fixture = try PowerModeUIPreferences()
-        defer {
-            if app.state != .notRunning {
-                if fixture.object(for: PowerModeUIPreferences.sessionKey) != nil {
-                    app.activate()
-                    app.typeKey(.escape, modifierFlags: [])
-                    app.typeKey(.escape, modifierFlags: [])
-                    _ = waitUntil(timeout: 10) { fixture.object(for: PowerModeUIPreferences.sessionKey) == nil }
-                }
-                app.terminate()
-            }
-            XCTAssertTrue(fixture.restore(), "The fixture's owned preference keys could not be restored.")
+        guard app.state == .notRunning,
+              NSRunningApplication.runningApplications(withBundleIdentifier: PowerModeUIPreferences.bundleIdentifier).isEmpty else {
+            throw PowerModeUIFixtureError.appAlreadyRunning
         }
+        let fixture = try PowerModeUIPreferences()
+        let cleanup = PowerModeUICleanup(app: app, preferences: fixture)
+        addTeardownBlock { [self] in
+            await MainActor.run {
+                self.restoreOwnedPreferences(cleanup)
+            }
+        }
+        addTeardownBlock { [self] in
+            await MainActor.run {
+                self.cancelOwnedRecording(cleanup)
+            }
+        }
+        cleanup.didInstall = true
         try fixture.install()
         app.launchArguments = [
             "-hasCompletedOnboarding", "YES",
@@ -88,8 +92,14 @@ final class WritingPowerModeUITests: XCTestCase {
             "-SUAutomaticallyUpdate", "NO"
         ]
         app.launch()
+        let launched = NSRunningApplication.runningApplications(withBundleIdentifier: PowerModeUIPreferences.bundleIdentifier)
+        guard launched.count == 1, let process = launched.first,
+              let executable = process.executableURL else { throw PowerModeUIFixtureError.launchedProcessUnidentified }
+        cleanup.process = process
+        cleanup.executableURL = executable.standardizedFileURL
         guard app.wait(for: .runningForeground, timeout: 20),
-              app.windows.firstMatch.waitForExistence(timeout: 15) else {
+              mainWindow(in: app).waitForExistence(timeout: 15),
+              app.windows.matching(identifier: Self.mainWindowIdentifier).count == 1 else {
             attachLaunchState(app, fixture: fixture)
             attachHierarchy(app, named: "App failed to open")
             throw PowerModeUIFixtureError.appDidNotOpen
@@ -104,7 +114,12 @@ final class WritingPowerModeUITests: XCTestCase {
         statusItems.firstMatch.click()
         try required(app.menuItems["Toggle Recorder"]).click()
         guard waitUntil(timeout: 20, {
-            fixture.lowercase() == true
+            if cleanup.sessionID == nil,
+               fixture.object(for: "activeConfigurationId") as? String == fixture.configurationID.uuidString,
+               let session = try? fixture.session() {
+                cleanup.sessionID = session.id
+            }
+            return fixture.lowercase() == true
                 && fixture.object(for: "activeConfigurationId") as? String == fixture.configurationID.uuidString
                 && fixture.object(for: PowerModeUIPreferences.sessionKey) is Data
         }) else {
@@ -112,6 +127,7 @@ final class WritingPowerModeUITests: XCTestCase {
             throw PowerModeUIFixtureError.recordingDidNotActivateMode
         }
         let sessionID = try fixture.session().id
+        cleanup.sessionID = sessionID
         try assertActiveBaseline(fixture, sessionID: sessionID, phase: "before writing feature mutation")
         app.activate()
         try mutation(app, fixture, sessionID)
@@ -139,34 +155,115 @@ final class WritingPowerModeUITests: XCTestCase {
     }
 
     @MainActor private func openSnippets(in app: XCUIApplication) throws {
-        try required(app.staticTexts["Dictionary"].firstMatch).click()
+        try required(mainWindow(in: app).buttons["Dictionary"]).click()
         try required(identified("dictionary.section.snippets", in: app)).click()
-        try reveal(required(app.buttons["snippets.new"]), in: app)
+        try reveal(required(app.buttons["snippets.new"]), identifier: "snippets.new", in: app)
     }
 
     @MainActor private func required(_ element: XCUIElement) throws -> XCUIElement {
         try XCTUnwrap(element.waitForExistence(timeout: 10) ? element : nil,
-                      "Required real UI control was unavailable: \(element.identifier)")
+                      "A required real UI control was unavailable.")
+    }
+
+    @MainActor private func cancelOwnedRecording(_ cleanup: PowerModeUICleanup) {
+        guard cleanup.didInstall, cleanup.isOwnedProcessRunning else { return }
+        let fixture = cleanup.preferences
+        if fixture.object(for: PowerModeUIPreferences.sessionKey) != nil {
+            guard cleanup.ownsStoredSession else {
+                attachCleanup(cleanup, phase: "refused foreign session cancellation")
+                XCTFail("Cleanup refused a session that was not created by this fixture.")
+                return
+            }
+            attachCleanup(cleanup, phase: "before owned recording cancellation")
+            cleanup.app.activate()
+            cleanup.app.typeKey(.escape, modifierFlags: [])
+            cleanup.app.typeKey(.escape, modifierFlags: [])
+            XCTAssertTrue(waitUntil(timeout: 10) {
+                fixture.object(for: PowerModeUIPreferences.sessionKey) == nil
+            }, "Fixture cleanup could not cancel its owned recording through double Escape.")
+        }
+        cleanup.app.terminate()
+    }
+
+    @MainActor private func restoreOwnedPreferences(_ cleanup: PowerModeUICleanup) {
+        guard cleanup.didInstall else { return }
+        if cleanup.isOwnedProcessRunning {
+            _ = cleanup.process?.terminate()
+            guard waitUntil(timeout: 10, { !cleanup.isOwnedProcessRunning }) else {
+                attachCleanup(cleanup, phase: "owned process did not exit")
+                XCTFail("Cleanup could not confirm that its exact app process exited; preferences were preserved.")
+                return
+            }
+        }
+        let unexpectedProcess = NSRunningApplication.runningApplications(withBundleIdentifier: PowerModeUIPreferences.bundleIdentifier)
+            .contains { !$0.isTerminated }
+        guard !unexpectedProcess else {
+            attachCleanup(cleanup, phase: "refused preference restoration while another app process runs")
+            XCTFail("Cleanup refused to restore preferences while an unowned app process was running.")
+            return
+        }
+        let fixture = cleanup.preferences
+        let activeConfiguration = fixture.object(for: "activeConfigurationId")
+        guard activeConfiguration == nil || activeConfiguration as? String == fixture.configurationID.uuidString else {
+            attachCleanup(cleanup, phase: "refused foreign active configuration preference restoration")
+            XCTFail("Cleanup preserved an unowned active configuration and its preferences.")
+            return
+        }
+        guard fixture.object(for: PowerModeUIPreferences.sessionKey) == nil || cleanup.ownsStoredSession else {
+            attachCleanup(cleanup, phase: "refused foreign session preference restoration")
+            XCTFail("Cleanup preserved an unowned persistent session and its preferences.")
+            return
+        }
+        attachCleanup(cleanup, phase: "before owned preference restoration")
+        XCTAssertTrue(fixture.restore(), "The fixture's owned preference keys could not be restored and read back.")
+    }
+
+    @MainActor private func attachCleanup(_ cleanup: PowerModeUICleanup, phase: String) {
+        let fixture = cleanup.preferences
+        let details: [String: Any] = [
+            "cleanupPhase": phase,
+            "ownedProcessID": cleanup.process.map { Int($0.processIdentifier) } as Any? ?? NSNull(),
+            "ownedExecutable": cleanup.executableURL?.path as Any? ?? NSNull(),
+            "ownedProcessRunning": cleanup.isOwnedProcessRunning,
+            "ownedSessionID": cleanup.sessionID?.uuidString as Any? ?? NSNull(),
+            "expectedConfigurationID": fixture.configurationID.uuidString,
+            "activeConfigurationID": fixture.object(for: "activeConfigurationId") ?? NSNull(),
+            "storedSessionID": (try? fixture.session().id.uuidString) as Any? ?? NSNull()
+        ]
+        guard let data = try? JSONSerialization.data(withJSONObject: details, options: [.prettyPrinted, .sortedKeys]),
+              let text = String(data: data, encoding: .utf8) else {
+            XCTFail("Unable to encode fixture cleanup ownership.")
+            return
+        }
+        let attachment = XCTAttachment(string: text)
+        attachment.name = phase
+        attachment.lifetime = .keepAlways
+        add(attachment)
     }
 
     @MainActor private func replaceText(in element: XCUIElement, with text: String) throws {
-        try reveal(element, in: XCUIApplication(bundleIdentifier: PowerModeUIPreferences.bundleIdentifier))
         element.click()
         element.typeKey("a", modifierFlags: .command)
         element.typeText(text)
     }
 
-    @MainActor private func reveal(_ element: XCUIElement, in app: XCUIApplication) throws {
-        let scrollView = app.scrollViews.containing(.any, identifier: element.identifier).firstMatch
+    @MainActor private func reveal(_ element: XCUIElement, identifier: String, in app: XCUIApplication) throws {
+        let scrollView = app.scrollViews.containing(.any, identifier: identifier).firstMatch
         for _ in 0..<8 where !element.isHittable {
             guard scrollView.exists else { break }
             scrollView.scroll(byDeltaX: 0, deltaY: -180)
         }
-        guard element.isHittable else { throw PowerModeUIFixtureError.unreachableControl(element.identifier) }
+        guard element.isHittable else { throw PowerModeUIFixtureError.unreachableControl(identifier) }
     }
 
     @MainActor private func identified(_ identifier: String, in element: XCUIElement) -> XCUIElement {
         element.descendants(matching: .any).matching(identifier: identifier).firstMatch
+    }
+
+    private static let mainWindowIdentifier = "com.negentropi.RomaJustTalk.mainWindow"
+
+    @MainActor private func mainWindow(in app: XCUIApplication) -> XCUIElement {
+        app.windows.matching(identifier: Self.mainWindowIdentifier).firstMatch
     }
 
     @MainActor private func waitUntil(timeout: TimeInterval = 5, _ condition: () -> Bool) -> Bool {
@@ -239,7 +336,40 @@ final class WritingPowerModeUITests: XCTestCase {
 private enum PowerModeUIFixtureError: Error {
     case disposableRunnerRequired, appAlreadyRunning, appDidNotOpen, recorderMenuUnavailable
     case recordingDidNotActivateMode, existingActiveSession, preferenceSyncFailed, missingSession
+    case launchedProcessUnidentified
     case unreachableControl(String)
+}
+
+@MainActor
+private final class PowerModeUICleanup {
+    let app: XCUIApplication
+    let preferences: PowerModeUIPreferences
+    var didInstall = false
+    var process: NSRunningApplication?
+    var executableURL: URL?
+    var sessionID: UUID?
+
+    init(app: XCUIApplication, preferences: PowerModeUIPreferences) {
+        self.app = app
+        self.preferences = preferences
+    }
+
+    var isOwnedProcessRunning: Bool {
+        guard let process, let executableURL,
+              let running = NSRunningApplication(processIdentifier: process.processIdentifier) else { return false }
+        return !running.isTerminated
+            && running.bundleIdentifier == PowerModeUIPreferences.bundleIdentifier
+            && running.launchDate == process.launchDate
+            && running.bundleURL?.standardizedFileURL == process.bundleURL?.standardizedFileURL
+            && running.executableURL?.standardizedFileURL == executableURL
+    }
+
+    var ownsStoredSession: Bool {
+        guard let sessionID,
+              let session = try? preferences.session() else { return false }
+        return session.id == sessionID
+            && preferences.object(for: "activeConfigurationId") as? String == preferences.configurationID.uuidString
+    }
 }
 
 private struct PowerModeUIObservedSession: Decodable {
@@ -312,7 +442,15 @@ private final class PowerModeUIPreferences {
 
     func restore() -> Bool {
         for key in Self.keys { write(saved[key], for: key) }
-        return CFPreferencesAppSynchronize(Self.bundleIdentifier as CFString)
+        guard CFPreferencesAppSynchronize(Self.bundleIdentifier as CFString) else { return false }
+        return Self.keys.allSatisfy { key in
+            switch (saved[key], Self.read(key)) {
+            case (nil, nil): return true
+            case let (expected?, actual?):
+                return (expected as? NSObject)?.isEqual(actual) == true
+            default: return false
+            }
+        }
     }
 
     func object(for key: String) -> Any? {

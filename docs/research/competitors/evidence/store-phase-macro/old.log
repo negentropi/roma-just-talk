@@ -1,0 +1,25 @@
+macro expansion #require:1:42: error: recursive expansion of macro 'require(_:_:sourceLocation:)'
+`- /var/folders/dr/ktjn__jx5mz4zr7shy5c670h0000gn/T/rjt-store-phase-macro-iok26q0n/old.swift:7:91: note: expanded code originates here
+ 5 |  static func value(_ key: String) -> String? { nil }
+ 6 |  init() throws {
+ 7 |         phase = try #require(Phase(rawValue: try #require(Self.value("RJT_STORE_PHASE"))))
+   |                     `- note: in expansion of macro 'require' here
+   +--- macro expansion #require ---------------------------------------
+   |1 | Testing.__checkValue(Phase(rawValue: try #require(Self.value("RJT_STORE_PHASE"))),expression: .__fromSyntaxNode(#"Phase(rawValue: try #require(Self.value("RJT_STORE_PHASE")))"#),comments: [],isRequired: true,sourceLocation: Testing.SourceLocation.__here()).__required()
+   |  |                                          `- error: recursive expansion of macro 'require(_:_:sourceLocation:)'
+   +--------------------------------------------------------------------
+ 8 |  }
+ 9 | }
+
+macro expansion #require:1:38: warning: no calls to throwing functions occur within 'try' expression
+`- /var/folders/dr/ktjn__jx5mz4zr7shy5c670h0000gn/T/rjt-store-phase-macro-iok26q0n/old.swift:7:91: note: expanded code originates here
+ 5 |  static func value(_ key: String) -> String? { nil }
+ 6 |  init() throws {
+ 7 |         phase = try #require(Phase(rawValue: try #require(Self.value("RJT_STORE_PHASE"))))
+   |                     `- note: in expansion of macro 'require' here
+   +--- macro expansion #require ---------------------------------------
+   |1 | Testing.__checkValue(Phase(rawValue: try #require(Self.value("RJT_STORE_PHASE"))),expression: .__fromSyntaxNode(#"Phase(rawValue: try #require(Self.value("RJT_STORE_PHASE")))"#),comments: [],isRequired: true,sourceLocation: Testing.SourceLocation.__here()).__required()
+   |  |                                      `- warning: no calls to throwing functions occur within 'try' expression
+   +--------------------------------------------------------------------
+ 8 |  }
+ 9 | }

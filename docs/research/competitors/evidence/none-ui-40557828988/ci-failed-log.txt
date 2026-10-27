@@ -1,0 +1,56 @@
+ui	Compare the disabled-panel baseline and current writing settings UI	﻿2026-10-27T18:14:21.8661300Z ##[group]Run defaults write com.negentropi.RomaJustTalk CurrentTranscriptionModel -string whisper-large-v3-turbo
+ui	Compare the disabled-panel baseline and current writing settings UI	2026-10-27T18:14:21.8662130Z ^[[36;1mdefaults write com.negentropi.RomaJustTalk CurrentTranscriptionModel -string whisper-large-v3-turbo^[[0m
+ui	Compare the disabled-panel baseline and current writing settings UI	2026-10-27T18:14:21.8663010Z ^[[36;1mdefaults write com.negentropi.RomaJustTalk PrewarmModelOnWake -bool false^[[0m
+ui	Compare the disabled-panel baseline and current writing settings UI	2026-10-27T18:14:21.8663550Z ^[[36;1mshasum -a 256 -c "$RUNNER_TEMP/writing-ui-proof/source-inputs.sha256"^[[0m
+ui	Compare the disabled-panel baseline and current writing settings UI	2026-10-27T18:14:21.8664100Z ^[[36;1mbash scripts/run-writing-settings-ui-regression.sh^[[0m
+ui	Compare the disabled-panel baseline and current writing settings UI	2026-10-27T18:14:21.8706930Z shell: /bin/bash -e {0}
+ui	Compare the disabled-panel baseline and current writing settings UI	2026-10-27T18:14:21.8707350Z ##[endgroup]
+ui	Compare the disabled-panel baseline and current writing settings UI	2026-10-27T18:14:21.9795410Z VoiceInkUITests/WritingFeaturesUITests.swift: OK
+ui	Compare the disabled-panel baseline and current writing settings UI	2026-10-27T18:14:21.9799480Z scripts/run-writing-settings-ui-regression.sh: OK
+ui	Compare the disabled-panel baseline and current writing settings UI	2026-10-27T18:14:21.9803240Z scripts/run-writing-feature-regression.sh: OK
+ui	Compare the disabled-panel baseline and current writing settings UI	2026-10-27T18:14:21.9805130Z .github/workflows/voiceink-writing-ui-check.yml: OK
+ui	Compare the disabled-panel baseline and current writing settings UI	2026-10-27T18:14:21.9808420Z VoiceInk.xcodeproj/project.pbxproj: OK
+ui	Compare the disabled-panel baseline and current writing settings UI	2026-10-27T18:14:21.9810450Z VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved: OK
+ui	Compare the disabled-panel baseline and current writing settings UI	2026-10-27T18:14:27.7964150Z From https://github.com/negentropi/roma-just-talk
+ui	Compare the disabled-panel baseline and current writing settings UI	2026-10-27T18:14:27.8012030Z  * branch              bdd608cf6111e8d7e88c12678f530318713acf67 -> FETCH_HEAD
+ui	Compare the disabled-panel baseline and current writing settings UI	2026-10-27T18:14:27.8219950Z Preparing worktree (detached HEAD bdd608cf)
+ui	Compare the disabled-panel baseline and current writing settings UI	2026-10-27T18:14:28.4640040Z HEAD is now at bdd608cf test: scroll the settings Form through visible native controls
+ui	Compare the disabled-panel baseline and current writing settings UI	2026-10-27T18:35:54.4986090Z swift-driver version: 1.148.6 Matched UI comparison requires intended baseline red and four candidate cases green
+ui	Compare the disabled-panel baseline and current writing settings UI	2026-10-27T18:35:54.5550360Z ##[error]Process completed with exit code 1.
+ui	Record the UI diagnostic outcome	﻿2026-10-27T18:35:54.6332050Z ##[group]Run proof="$RUNNER_TEMP/writing-ui-proof"
+ui	Record the UI diagnostic outcome	2026-10-27T18:35:54.6335720Z ^[[36;1mproof="$RUNNER_TEMP/writing-ui-proof"^[[0m
+ui	Record the UI diagnostic outcome	2026-10-27T18:35:54.6336390Z ^[[36;1mmkdir -p "$proof"^[[0m
+ui	Record the UI diagnostic outcome	2026-10-27T18:35:54.6337200Z ^[[36;1mpython3 - "$proof" <<'PY'^[[0m
+ui	Record the UI diagnostic outcome	2026-10-27T18:35:54.6340870Z ^[[36;1mimport json^[[0m
+ui	Record the UI diagnostic outcome	2026-10-27T18:35:54.6344630Z ^[[36;1mimport os^[[0m
+ui	Record the UI diagnostic outcome	2026-10-27T18:35:54.6345620Z ^[[36;1mimport subprocess^[[0m
+ui	Record the UI diagnostic outcome	2026-10-27T18:35:54.6346630Z ^[[36;1mimport sys^[[0m
+ui	Record the UI diagnostic outcome	2026-10-27T18:35:54.6354300Z ^[[36;1mfrom pathlib import Path^[[0m
+ui	Record the UI diagnostic outcome	2026-10-27T18:35:54.6367350Z ^[[36;1m^[[0m
+ui	Record the UI diagnostic outcome	2026-10-27T18:35:54.6369060Z ^[[36;1mproof = Path(sys.argv[1])^[[0m
+ui	Record the UI diagnostic outcome	2026-10-27T18:35:54.6370850Z ^[[36;1moutput = Path('.local-build/onboarding-test-evidence/writing-ui')^[[0m
+ui	Record the UI diagnostic outcome	2026-10-27T18:35:54.6372310Z ^[[36;1mresult = output / 'result.json'^[[0m
+ui	Record the UI diagnostic outcome	2026-10-27T18:35:54.6374430Z ^[[36;1mcomparison = Path(os.environ['RUNNER_TEMP']) / 'writing-settings-ui-regression' / 'result.json'^[[0m
+ui	Record the UI diagnostic outcome	2026-10-27T18:35:54.6375800Z ^[[36;1mpayload = {^[[0m
+ui	Record the UI diagnostic outcome	2026-10-27T18:35:54.6381250Z ^[[36;1m    'source_sha': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(),^[[0m
+ui	Record the UI diagnostic outcome	2026-10-27T18:35:54.6381990Z ^[[36;1m    'github_run_id': os.environ['GITHUB_RUN_ID'],^[[0m
+ui	Record the UI diagnostic outcome	2026-10-27T18:35:54.6382570Z ^[[36;1m    'scope': 'Debug writing settings UI diagnostics only',^[[0m
+ui	Record the UI diagnostic outcome	2026-10-27T18:35:54.6385840Z ^[[36;1m    'release_validation': False,^[[0m
+ui	Record the UI diagnostic outcome	2026-10-27T18:35:54.6389100Z ^[[36;1m    'driver_result': json.loads(result.read_text()) if result.exists() else None,^[[0m
+ui	Record the UI diagnostic outcome	2026-10-27T18:35:54.6390330Z ^[[36;1m    'comparison_result': json.loads(comparison.read_text()) if comparison.exists() else None,^[[0m
+ui	Record the UI diagnostic outcome	2026-10-27T18:35:54.6396100Z ^[[36;1m}^[[0m
+ui	Record the UI diagnostic outcome	2026-10-27T18:35:54.6397330Z ^[[36;1m(proof / 'diagnostic-result.json').write_text(json.dumps(payload, indent=2) + '\n')^[[0m
+ui	Record the UI diagnostic outcome	2026-10-27T18:35:54.6399220Z ^[[36;1mPY^[[0m
+ui	Record the UI diagnostic outcome	2026-10-27T18:35:54.6403750Z ^[[36;1mif [[ -f "$proof/source-inputs.sha256" ]]; then^[[0m
+ui	Record the UI diagnostic outcome	2026-10-27T18:35:54.6404400Z ^[[36;1m  shasum -a 256 -c "$proof/source-inputs.sha256" > "$proof/source-inputs-after.txt"^[[0m
+ui	Record the UI diagnostic outcome	2026-10-27T18:35:54.6405540Z ^[[36;1mfi^[[0m
+ui	Record the UI diagnostic outcome	2026-10-27T18:35:54.6406010Z ^[[36;1mapp=".local-build/Build/Products/Debug/roma just talk.app"^[[0m
+ui	Record the UI diagnostic outcome	2026-10-27T18:35:54.6406620Z ^[[36;1mif [[ -d "$app" ]]; then^[[0m
+ui	Record the UI diagnostic outcome	2026-10-27T18:35:54.6407420Z ^[[36;1m  codesign --verify --deep --strict "$app"^[[0m
+ui	Record the UI diagnostic outcome	2026-10-27T18:35:54.6408620Z ^[[36;1m  codesign -d --verbose=4 "$app" 2> "$proof/app-signature.txt"^[[0m
+ui	Record the UI diagnostic outcome	2026-10-27T18:35:54.6409720Z ^[[36;1mfi^[[0m
+ui	Record the UI diagnostic outcome	2026-10-27T18:35:54.9104260Z shell: /bin/bash -e {0}
+ui	Record the UI diagnostic outcome	2026-10-27T18:35:54.9105050Z ##[endgroup]
+ui	Record the UI diagnostic outcome	2026-10-27T18:35:55.7096480Z .local-build/Build/Products/Debug/roma just talk.app: code object is not signed at all
+ui	Record the UI diagnostic outcome	2026-10-27T18:35:55.7121210Z In architecture: arm64
+ui	Record the UI diagnostic outcome	2026-10-27T18:35:55.7127440Z ##[error]Process completed with exit code 1.

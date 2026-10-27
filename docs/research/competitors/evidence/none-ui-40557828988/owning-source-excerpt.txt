@@ -1,0 +1,6 @@
+50: 
+51:     init() throws {
+52:         try #require(Self.value("RUNNER_ENVIRONMENT") == "github-hosted", "A disposable GitHub-hosted runner is required.")
+53:         phase = try #require(Phase(rawValue: try #require(Self.value("RJT_STORE_PHASE"))))
+54:         sourceSHA = try #require(Self.value("RJT_STORE_SOURCE_SHA"))
+55:         try #require(sourceSHA.range(of: "^[0-9a-f]{40}$", options: .regularExpression) != nil)

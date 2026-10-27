@@ -1,0 +1,23 @@
+{
+  "compiler": "swift-driver version: 1.127.11.2 Apple Swift version 6.2 (swiftlang-6.2.0.16.14 clang-1700.3.16.4)\nTarget: arm64-apple-macosx26.0\n",
+  "flags": [
+    "-F",
+    "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+    "-plugin-path",
+    "/Library/Developer/CommandLineTools/usr/lib/swift/host/plugins/testing"
+  ],
+  "owningSource": "VoiceInkTests/DictationStoreSeedLiveTests.swift",
+  "scope": "Actual owning phase expressions in identical typecheck harness; no app, store or UI runtime. value() is a typed stub; no Foundation overlay is needed for this expression.",
+  "old": {
+    "exitCode": 1,
+    "sourceSHA256": "751def8d7cfa4cbdc145afcd7d5459840069d4a37346261ea06f79116919d0cf",
+    "literalOwningExcerpt": "        phase = try #require(Phase(rawValue: try #require(Self.value(\"RJT_STORE_PHASE\"))))\n",
+    "output": "macro expansion #require:1:42: error: recursive expansion of macro 'require(_:_:sourceLocation:)'\n`- /var/folders/dr/ktjn__jx5mz4zr7shy5c670h0000gn/T/rjt-store-phase-macro-iok26q0n/old.swift:7:91: note: expanded code originates here\n 5 |  static func value(_ key: String) -> String? { nil }\n 6 |  init() throws {\n 7 |         phase = try #require(Phase(rawValue: try #require(Self.value(\"RJT_STORE_PHASE\"))))\n   |                     `- note: in expansion of macro 'require' here\n   +--- macro expansion #require ---------------------------------------\n   |1 | Testing.__checkValue(Phase(rawValue: try #require(Self.value(\"RJT_STORE_PHASE\"))),expression: .__fromSyntaxNode(#\"Phase(rawValue: try #require(Self.value(\"RJT_STORE_PHASE\")))\"#),comments: [],isRequired: true,sourceLocation: Testing.SourceLocation.__here()).__required()\n   |  |                                          `- error: recursive expansion of macro 'require(_:_:sourceLocation:)'\n   +--------------------------------------------------------------------\n 8 |  }\n 9 | }\n\nmacro expansion #require:1:38: warning: no calls to throwing functions occur within 'try' expression\n`- /var/folders/dr/ktjn__jx5mz4zr7shy5c670h0000gn/T/rjt-store-phase-macro-iok26q0n/old.swift:7:91: note: expanded code originates here\n 5 |  static func value(_ key: String) -> String? { nil }\n 6 |  init() throws {\n 7 |         phase = try #require(Phase(rawValue: try #require(Self.value(\"RJT_STORE_PHASE\"))))\n   |                     `- note: in expansion of macro 'require' here\n   +--- macro expansion #require ---------------------------------------\n   |1 | Testing.__checkValue(Phase(rawValue: try #require(Self.value(\"RJT_STORE_PHASE\"))),expression: .__fromSyntaxNode(#\"Phase(rawValue: try #require(Self.value(\"RJT_STORE_PHASE\")))\"#),comments: [],isRequired: true,sourceLocation: Testing.SourceLocation.__here()).__required()\n   |  |                                      `- warning: no calls to throwing functions occur within 'try' expression\n   +--------------------------------------------------------------------\n 8 |  }\n 9 | }\n"
+  },
+  "candidate": {
+    "exitCode": 0,
+    "sourceSHA256": "6ba21bfb5281f8892d3abffb27c0b4bd8851dcc983ab4248d5018cfd06539574",
+    "literalOwningExcerpt": "        let phaseValue = try #require(Self.value(\"RJT_STORE_PHASE\"))\n        phase = try #require(Phase(rawValue: phaseValue))\n",
+    "output": ""
+  }
+}

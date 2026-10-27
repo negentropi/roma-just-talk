@@ -50,7 +50,8 @@ private struct DictationStoreSeedInputs {
 
     init() throws {
         try #require(Self.value("RUNNER_ENVIRONMENT") == "github-hosted", "A disposable GitHub-hosted runner is required.")
-        phase = try #require(Phase(rawValue: try #require(Self.value("RJT_STORE_PHASE"))))
+        let phaseValue = try #require(Self.value("RJT_STORE_PHASE"))
+        phase = try #require(Phase(rawValue: phaseValue))
         sourceSHA = try #require(Self.value("RJT_STORE_SOURCE_SHA"))
         try #require(sourceSHA.range(of: "^[0-9a-f]{40}$", options: .regularExpression) != nil)
         for key in ["RJT_STORE_RUN_ROOT", "RJT_STORE_FIXTURE", "RJT_STORE_EVIDENCE", "RJT_STORE_EXPECTED_EXE"] {

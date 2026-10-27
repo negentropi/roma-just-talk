@@ -1,0 +1,8 @@
+{
+  "baseline_intended_red": true,
+  "baseline_assertion_line": 353,
+  "candidate_ui_cases_executed": 0,
+  "candidate_boundary": "ui-build",
+  "cause": "nested require macro in DictationStoreSeedLiveTests.swift:53",
+  "candidate_accepted": false
+}

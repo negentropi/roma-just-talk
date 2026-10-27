@@ -1,0 +1,24 @@
+{
+  "run_id": 40557828988,
+  "candidate_sha": "33ddff0ce3aa3c671805df5859bdc504ac0f1875",
+  "baseline_sha": "bdd608cf6111e8d7e88c12678f530318713acf67",
+  "oracle_marker_line": 353,
+  "inputs": {
+    "VoiceInkUITests/WritingFeaturesUITests.swift": "d6980c023e3e0794df840afa173e22e097a02513898b3f010defc04d6f3e9d69",
+    "scripts/run-writing-settings-ui-regression.sh": "c992dc02b715849b362d13c13851180deb86760064f3d738e01883521e75ace8",
+    "scripts/run-writing-feature-regression.sh": "3071693cf442929cc46edc881845e60044e7827fff44c2f7dc0f60faefb28a9c",
+    ".github/workflows/voiceink-writing-ui-check.yml": "12515fc46db59e3b9e6487e6e8ec89d9a759beda85fd4e3acbb95703bd16255a",
+    "VoiceInk.xcodeproj/project.pbxproj": "e4a9458135e103d327477fedb1485b8f3de8e1b223f14d98e426f42e9bda3e9e",
+    "VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f"
+  },
+  "app_product_unchanged_from": "2734017b616b36dc0581ce75c5e4ab0bb7b7f151",
+  "compared_product_roots": [
+    "VoiceInk",
+    "VoiceInkCore",
+    "VoiceInkNVIDIA",
+    "VoiceInkQwen",
+    "iOS"
+  ],
+  "product_changed_paths": [],
+  "scope": "Source binding; runtime outcome pending."
+}

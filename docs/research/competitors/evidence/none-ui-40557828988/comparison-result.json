@@ -1,0 +1,229 @@
+{
+  "baseline": {
+    "classification": "intended-disabled-panel-failure",
+    "errors": [
+      "/Users/runner/work/_temp/writing-settings-ui-baseline/VoiceInkUITests/WritingFeaturesUITests.swift:353: error: -[VoiceInkUITests.WritingFeaturesUITests testDictationProfilePreservesCustomSettingsAndPersists] : XCTAssertTrue failed - Opening model settings disabled the panel or blocked a visible panel control."
+    ],
+    "exit_code": 65,
+    "expected_assertion_line": 353,
+    "expected_assertion_message": "Opening model settings disabled the panel or blocked a visible panel control.",
+    "observations": {
+      "after-opening": [
+        {
+          "actors": {
+            "application": {
+              "enabled": false,
+              "exists": true,
+              "hittable": false
+            },
+            "background-filter": {
+              "enabled": false,
+              "exists": true,
+              "hittable": true
+            },
+            "custom": {
+              "enabled": true,
+              "exists": true,
+              "hittable": false
+            },
+            "form": {
+              "enabled": false,
+              "exists": true,
+              "hittable": false
+            },
+            "main-window": {
+              "enabled": false,
+              "exists": true,
+              "hittable": true
+            },
+            "none": {
+              "enabled": true,
+              "exists": true,
+              "hittable": false
+            },
+            "settings-close": {
+              "enabled": true,
+              "exists": true,
+              "hittable": true
+            },
+            "settings-open": {
+              "enabled": false,
+              "exists": true,
+              "hittable": true
+            }
+          },
+          "boundaryFailures": [
+            "custom",
+            "none"
+          ],
+          "mainWindowCount": 1,
+          "nativeSheetCount": 0,
+          "opening": 1,
+          "phase": "after-opening",
+          "version": 1
+        }
+      ],
+      "before-opening": [
+        {
+          "actors": {
+            "application": {
+              "enabled": false,
+              "exists": true,
+              "hittable": false
+            },
+            "background-filter": {
+              "enabled": true,
+              "exists": true,
+              "hittable": true
+            },
+            "custom": {
+              "enabled": null,
+              "exists": false,
+              "hittable": null
+            },
+            "form": {
+              "enabled": null,
+              "exists": false,
+              "hittable": null
+            },
+            "main-window": {
+              "enabled": false,
+              "exists": true,
+              "hittable": true
+            },
+            "none": {
+              "enabled": null,
+              "exists": false,
+              "hittable": null
+            },
+            "settings-close": {
+              "enabled": null,
+              "exists": false,
+              "hittable": null
+            },
+            "settings-open": {
+              "enabled": true,
+              "exists": true,
+              "hittable": true
+            }
+          },
+          "boundaryFailures": [],
+          "mainWindowCount": 1,
+          "nativeSheetCount": 0,
+          "opening": 1,
+          "phase": "before-opening",
+          "version": 1
+        }
+      ]
+    },
+    "observed_boundary_valid": true,
+    "results": [
+      "failed"
+    ],
+    "starts": 1,
+    "valid": true,
+    "xctest_totals": [
+      [
+        "1",
+        " with 1 failure (0 unexpected) in 55.638 (55.640) seconds"
+      ],
+      [
+        "1",
+        " with 1 failure (0 unexpected) in 55.638 (55.640) seconds"
+      ],
+      [
+        "1",
+        " with 1 failure (0 unexpected) in 55.638 (55.642) seconds"
+      ]
+    ]
+  },
+  "baseline_identity_and_tcc": {
+    "identity": {
+      "binaries": [
+        {
+          "path": "/Users/runner/work/_temp/writing-settings-ui-baseline/.writing-ui-regression-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+          "sha256": "3ebe33d0aa76b1af7d0a7e4f670c29cbf8e8b631f0aa63a3f843a2308e918888"
+        },
+        {
+          "path": "/Users/runner/work/_temp/writing-settings-ui-baseline/.writing-ui-regression-build/Build/Products/Debug/VoiceInkUITests-Runner.app/Contents/MacOS/VoiceInkUITests-Runner",
+          "sha256": "0b8f959438ee926214d7f83a851526a9beb43d47d3de0641250ae10c9d4175f8"
+        },
+        {
+          "path": "/Users/runner/work/_temp/writing-settings-ui-baseline/.writing-ui-regression-build/Build/Products/Debug/VoiceInkUITests-Runner.app/Contents/PlugIns/VoiceInkUITests.xctest/Contents/MacOS/VoiceInkUITests",
+          "sha256": "5d6978b8fde5f325d5d09d78f25f6b67806ae9832459aee749663fc60703a519"
+        }
+      ],
+      "signatures": {
+        "app": {
+          "bundle_identifier": "com.negentropi.RomaJustTalk",
+          "cdhash": "e46aa4962357fdd11295a45bfbb5ecae7d9df88e",
+          "signature_sha256": "6f0d5fcc1aae9044cfbecb412f1d9a9734d1813b2c9e6db004b3832f03880421"
+        },
+        "runner": {
+          "bundle_identifier": "com.negentropi.RomaJustTalkUITests.xctrunner",
+          "cdhash": "51ca610cb1a0d009374ce09ee566b61e6959754a",
+          "signature_sha256": "27e84298f658a14087df82b09aac4bdbf4f736dd1d290fe64233c8aad47143a7"
+        },
+        "test-bundle": {
+          "bundle_identifier": "com.negentropi.RomaJustTalkUITests",
+          "cdhash": "a50a723771473d17f4bf34ed070512076d83c82a",
+          "signature_sha256": "7382764cc3bfbd4cce7c0f7366f50d386172887efa121eba7031cb9d681e09a0"
+        }
+      },
+      "valid": true
+    },
+    "process": {
+      "observation": {
+        "expected_executable": "/Users/runner/work/_temp/writing-settings-ui-baseline/.writing-ui-regression-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+        "observer_completed": true,
+        "processes": [
+          {
+            "executable": "/Users/runner/work/_temp/writing-settings-ui-baseline/.writing-ui-regression-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+            "pid": 20693
+          }
+        ],
+        "sampling_errors": []
+      },
+      "valid": true
+    },
+    "tcc": {
+      "expected_services": [
+        "kTCCServiceAccessibility",
+        "kTCCServiceMicrophone"
+      ],
+      "host_requirement_sha256": "6cbb57f694562657285a81654154327a45d484e9e6fae45183e71257e956a368",
+      "scope": "Fresh permission database row readback only; native control interaction supplies separate accessibility evidence",
+      "valid": true
+    }
+  },
+  "baseline_sha": "bdd608cf6111e8d7e88c12678f530318713acf67",
+  "candidate": {
+    "boundary": "ui-build",
+    "classification": "invalid"
+  },
+  "candidate_driver_exit_code": 1,
+  "candidate_identity_and_tcc": {
+    "identity": {
+      "valid": false
+    },
+    "process": {
+      "observation": {
+        "expected_executable": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+        "observer_completed": true,
+        "processes": [],
+        "sampling_errors": []
+      },
+      "valid": false
+    },
+    "tcc": {
+      "valid": false
+    }
+  },
+  "candidate_sha": "33ddff0ce3aa3c671805df5859bdc504ac0f1875",
+  "candidate_valid": false,
+  "candidate_visual_available": false,
+  "classification": "invalid-or-failed",
+  "driver_sha": "33ddff0ce3aa3c671805df5859bdc504ac0f1875",
+  "oracle_sha256": "d6980c023e3e0794df840afa173e22e097a02513898b3f010defc04d6f3e9d69",
+  "scope": "Debug native settings UI comparison; not Release validation"
+}

@@ -1,0 +1,47 @@
+{
+  "run_id": 40557828988,
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40557828988",
+  "head_sha": "33ddff0ce3aa3c671805df5859bdc504ac0f1875",
+  "oracle_sha256": "d6980c023e3e0794df840afa173e22e097a02513898b3f010defc04d6f3e9d69",
+  "baseline_valid_intended_red": true,
+  "baseline_assertion_line": 353,
+  "candidate_ui_cases_executed": 0,
+  "candidate_boundary": "ui-build",
+  "cause": "Swift Testing recursive require macro expansion: DictationStoreSeedLiveTests.swift:53",
+  "secondary_error": "Unsigned candidate app during outcome recording after test build failure; no signed runtime was launched.",
+  "artifact": {
+    "id": 12762315409,
+    "name": "roma.writing-ui-diagnostic-evidence",
+    "bytes": 106132451,
+    "api_digest_sha256": "c02a5cfd49934abee786cdfd1fb469b2e52bd647a3a52a363f172a97987d5577",
+    "whole_archive_downloaded": false,
+    "whole_archive_hash_verified": false,
+    "selected_range_bytes": 385476,
+    "selected_members_crc_verified_by_zipfile": true,
+    "remote_selected_path": "/data/rjt-writing-check-01a17bef/40557828988/quick/"
+  },
+  "failed_log_fetched_once": true,
+  "selected_files": [
+    {
+      "path": "comparison-result.json",
+      "sha256": "a274a54c2d29c8b864a742165868517113896bf09e568d7b1e6e250bd3fae3cf",
+      "bytes": 7668
+    },
+    {
+      "path": "candidate-driver.log",
+      "sha256": "12be2cb464933965bf3ef3334ac89dda1e320438ba3ae2a78b9e46ad970084c7",
+      "bytes": 56270
+    },
+    {
+      "path": "ci-failed-log.txt",
+      "sha256": "784bd632a9fc4f4e424b06248f5af490700f979abc9fe7662d58a3529f71f5c0",
+      "bytes": 7407
+    },
+    {
+      "path": "owning-source-excerpt.txt",
+      "sha256": "63e4e9c4473c14cd9f62a5191464a3615d93346f81d42f40a8664af982a6e1e8",
+      "bytes": 425
+    }
+  ],
+  "scope": "Invalid candidate build; no new None/Custom/persistence/PowerMode UI result, Release or VoiceOver proof."
+}

@@ -247,8 +247,10 @@ if not valid:
 PY
 }
 
-test -d "$debug_dir/onboarding-test-evidence/Debug.xcresult"
-codesign --verify --deep --strict "$debug_app"
+if [[ "$mode" == live || "$mode" == regression ]]; then
+  test -d "$debug_dir/onboarding-test-evidence/Debug.xcresult"
+  codesign --verify --deep --strict "$debug_app"
+fi
 
 case "$mode" in
   live)

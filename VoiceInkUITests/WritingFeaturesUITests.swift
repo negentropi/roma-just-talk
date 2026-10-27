@@ -203,7 +203,7 @@ final class WritingFeaturesUITests: XCTestCase {
         attachScreenshot(app, named: "Custom dictation cleanup settings")
 
         let none = profileChoice("None", in: app)
-        revealModelSettingsControl(none, towardTop: true, in: app)
+        revealModelSettingsControl(none, preferences: preferences, towardTop: true, in: app)
         XCTAssertTrue(none.isHittable)
         none.click()
         assertProfile("None", storedValue: "none", preferences: preferences, in: app)
@@ -224,7 +224,7 @@ final class WritingFeaturesUITests: XCTestCase {
         assertCustomFormatting(isEnabled: false, preferences: preferences, in: app)
 
         let custom = profileChoice("Custom", in: app)
-        revealModelSettingsControl(custom, towardTop: true, in: app)
+        revealModelSettingsControl(custom, preferences: preferences, towardTop: true, in: app)
         XCTAssertTrue(custom.isHittable)
         custom.click()
         assertProfile("Custom", storedValue: "custom", preferences: preferences, in: app)
@@ -377,7 +377,7 @@ final class WritingFeaturesUITests: XCTestCase {
             "transcriptionSettings.appendTrailingSpace"
         ] {
             let control = identified(identifier, in: mainWindow(in: app))
-            revealModelSettingsControl(control, in: app)
+            revealModelSettingsControl(control, preferences: preferences, in: app)
             XCTAssertEqual(control.isEnabled, isEnabled, "Unexpected enabled state for \(identifier).")
             XCTAssertEqual(String(describing: control.value ?? ""), "1", "Saved toggle value changed for \(identifier).")
         }
@@ -386,6 +386,7 @@ final class WritingFeaturesUITests: XCTestCase {
 
     @MainActor private func revealModelSettingsControl(
         _ control: XCUIElement,
+        preferences: WritingFeaturesDictationPreferences,
         towardTop: Bool = false,
         in app: XCUIApplication
     ) {
@@ -393,10 +394,51 @@ final class WritingFeaturesUITests: XCTestCase {
         XCTAssertTrue(scrollers.firstMatch.waitForExistence(timeout: 5))
         XCTAssertEqual(scrollers.count, 1, "The cleanup controls did not belong to one settings scroller.")
         let scroller = scrollers.firstMatch
+        func attachScrollFailure() {
+            let hierarchy = XCTAttachment(string: scroller.debugDescription)
+            hierarchy.name = "Model settings scroll hierarchy"
+            hierarchy.lifetime = .keepAlways
+            add(hierarchy)
+            attachScreenshot(app, named: "Model settings scroll failure")
+        }
+        guard let expectedProfile = preferences.profile(),
+              let expectedScrollSettings = preferences.scrollAnchorValues() else {
+            attachScrollFailure()
+            XCTFail("The current settings could not be read before scrolling.")
+            return
+        }
         for _ in 0..<10 {
             if control.exists, !control.frame.isEmpty, scroller.frame.contains(control.frame) { return }
-            scroller.scroll(byDeltaX: 0, deltaY: towardTop ? 180 : -180)
+            let anchors = [
+                "transcriptionSettings.paragraphBreaks",
+                "transcriptionSettings.lowercase",
+                "transcriptionSettings.appendTrailingSpace"
+            ].map { identified($0, in: scroller) } + [
+                scroller.buttons["Edit"],
+                scroller.radioButtons["Custom"],
+                scroller.radioButtons["None"]
+            ] + [
+                "Voice Activity Detection (VAD)",
+                "Prewarm model (Experimental)",
+                "Show Transcript Preview"
+            ].map { title in
+                scroller.switches.matching(NSPredicate(format: "label BEGINSWITH %@", title)).firstMatch
+            }
+            guard let anchor = anchors.first(where: {
+                $0.exists && $0.isEnabled && !$0.frame.isEmpty
+                    && scroller.frame.contains($0.frame) && $0.isHittable
+            }) else {
+                attachScrollFailure()
+                XCTFail("No visible native settings control could receive the scroll event.")
+                return
+            }
+            // The Form's AX container has no hit point; a native child receives wheel events.
+            anchor.scroll(byDeltaX: 0, deltaY: towardTop ? 180 : -180)
+            XCTAssertEqual(preferences.profile(), expectedProfile, "Scrolling changed the selected cleanup profile.")
+            XCTAssertTrue(preferences.scrollingSettingsAreUnchanged(from: expectedScrollSettings), "Scrolling changed a saved setting.")
         }
+        if control.exists, !control.frame.isEmpty, scroller.frame.contains(control.frame) { return }
+        attachScrollFailure()
         XCTAssertTrue(control.exists, "The settings control was not exposed.")
         XCTAssertTrue(scroller.frame.contains(control.frame), "The settings control was not fully visible after scrolling.")
     }
@@ -550,7 +592,8 @@ private final class WritingFeaturesDictationPreferences {
         "RemovePunctuation": false,
         "AppendTrailingSpace": true
     ]
-    private static let keys = [profileKey] + customValues.keys.sorted()
+    private static let scrollAnchorKeys = ["IsVADEnabled", "PrewarmModelOnWake", "showLiveTextPreview"]
+    private static let keys = [profileKey] + customValues.keys.sorted() + scrollAnchorKeys
     private let saved: [String: Any]
 
     init() throws {
@@ -582,6 +625,18 @@ private final class WritingFeaturesDictationPreferences {
     func customSettingsAreUnchanged() -> Bool {
         guard CFPreferencesAppSynchronize(Self.bundleIdentifier) else { return false }
         return Self.customValues.allSatisfy { Self.equal($0.value, Self.read($0.key)) }
+    }
+
+    func scrollAnchorValues() -> [String: Any]? {
+        guard CFPreferencesAppSynchronize(Self.bundleIdentifier) else { return nil }
+        return Dictionary(uniqueKeysWithValues: Self.scrollAnchorKeys.compactMap { key in
+            Self.read(key).map { (key, $0) }
+        })
+    }
+
+    func scrollingSettingsAreUnchanged(from values: [String: Any]) -> Bool {
+        guard customSettingsAreUnchanged() else { return false }
+        return Self.scrollAnchorKeys.allSatisfy { Self.equal(values[$0], Self.read($0)) }
     }
 
     func restore() -> Bool {

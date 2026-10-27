@@ -1,0 +1,40 @@
+{
+  "classification": "source-authorship-and-review-only",
+  "problem": "Selecting the displayed registered language returned before persisting the explicit choice; Light reads only the persistent app-domain language.",
+  "requested_model": "claude-opus-5-5",
+  "reported_assistant_models": [
+    "claude-opus-5-5"
+  ],
+  "raw_jsonl_sha256": "e64fdd39c6dcddf3eeba18d7da126557021f6bf32b16b2f995d7a89a7bedd2f8",
+  "prompt_sha256": "421709abbcd56c83dca6461ef30003394c5624cb01b75ba8f842167e1648e55d",
+  "result": {
+    "subtype": "success",
+    "is_error": false,
+    "duration_ms": 55057,
+    "total_cost_usd": 0.2780098
+  },
+  "source": "VoiceInk/Views/AI Models/LanguageSelectionView.swift",
+  "before_sha256": "1df1edcf5d0d7f507fb8410061d32dbc65f69e9fb2a13e4a08c0014ced913d8b",
+  "after_sha256": "a74fb78c6bc4dc38b15d616de8fd93740717ee04fceb5caac2e2e450745616c7",
+  "checks": {
+    "swift_frontend_parse": "passed",
+    "git_diff_check": "passed",
+    "only_same_value_guard_changed": "passed; all remaining file bytes equal HEAD"
+  },
+  "behavior": "Same-value explicit selection writes the existing SelectedLanguage key to UserDefaults.standard and synchronizes, then returns. Different-language prompt refresh and notifications remain unchanged.",
+  "review": {
+    "model": "gpt-6.1-sol",
+    "status": "clean source review",
+    "reviewed_head": "3d15daee9a274f6ce9324b07e01f8d4789381ac5",
+    "reviewed_view_git_blob": "9079cc10d78a946e90c042d56646efcbaeed9751",
+    "reviewed_plan_git_blob": "483cadffa2c2a3bd33011b200aa51765b46d9a63",
+    "finding": "No source blocker. Key/store match, changed-language behavior intact, same-value notifications unchanged, compatibility fallback display-only.",
+    "limit": "No native event or persistence test executed. Same-selection SwiftUI Picker event delivery remains unproven."
+  },
+  "native_runtime_verified": false,
+  "limits": [
+    "No native app or UI event execution.",
+    "The settings Picker may suppress a same-selection Binding setter. The menu bar uses explicit Button actions; runtime selection and persistent-domain readback remain required.",
+    "No regression test added and no before/after runtime proof claimed."
+  ]
+}

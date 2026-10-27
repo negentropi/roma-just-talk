@@ -10,6 +10,10 @@ struct VoiceInkCoreCheck {
 struct VoiceInkCoreCheckRunner {
     static func main() async {
         let checks: [VoiceInkCoreCheck] = [
+            VoiceInkCoreCheck(name: "DictationProfileRoutingTests.testAllProfilesPersistWithoutChangingUnknownDefaultsFallback", run: { try DictationProfileRoutingTests().testAllProfilesPersistWithoutChangingUnknownDefaultsFallback() }),
+            VoiceInkCoreCheck(name: "DictationProfileRoutingTests.testNewProfilesPreserveRawTextAndNeverUseLegacyPreparationOrEnhancement", run: { try DictationProfileRoutingTests().testNewProfilesPreserveRawTextAndNeverUseLegacyPreparationOrEnhancement() }),
+            VoiceInkCoreCheck(name: "DictationProfileRoutingTests.testNewProfilesRoundTripAndImportThroughExistingGeneralBackupCodec", run: { try DictationProfileRoutingTests().testNewProfilesRoundTripAndImportThroughExistingGeneralBackupCodec() }),
+            VoiceInkCoreCheck(name: "DictationProfileRoutingTests.testUnknownProfileBackupStillRejectsBeforeAnyPreferenceApplication", run: { try DictationProfileRoutingTests().testUnknownProfileBackupStillRejectsBeforeAnyPreferenceApplication() }),
             VoiceInkCoreCheck(name: "ClarityStyleBackupTests.testStyleBackupRoundTripsAndAppliesEveryStableStyle", run: { try ClarityStyleBackupTests().testStyleBackupRoundTripsAndAppliesEveryStableStyle() }),
             VoiceInkCoreCheck(name: "ClarityStyleBackupTests.testMissingAndNullStylePreserveCurrentStyleOnLegacyImport", run: { try ClarityStyleBackupTests().testMissingAndNullStylePreserveCurrentStyleOnLegacyImport() }),
             VoiceInkCoreCheck(name: "ClarityStyleBackupTests.testInvalidStyleRejectsBeforePreferenceOrLibraryMutation", run: { try ClarityStyleBackupTests().testInvalidStyleRejectsBeforePreferenceOrLibraryMutation() }),

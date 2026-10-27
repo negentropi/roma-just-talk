@@ -248,7 +248,15 @@ public enum VoiceInkTranscriptionRunPreparation {
         cleanupProfile: VoiceInkDictationProfile = .custom,
         applyingWordReplacements wordReplacement: (String) -> String = { $0 }
     ) -> VoiceInkTranscriptionEnhancementTextPlan {
-        if cleanupProfile == .none {
+        switch cleanupProfile {
+        case .custom:
+            return prepareRawTextForEnhancement(
+                rawText,
+                cleanupConfiguration: cleanupConfiguration,
+                applyingWordReplacements: wordReplacement
+            )
+        case .none, .light, .clarity:
+            // Light/Clarity require a captured operation plan; legacy callers preserve raw text.
             return VoiceInkTranscriptionEnhancementTextPlan(
                 filteredText: rawText,
                 textForEnhancement: rawText,
@@ -256,11 +264,6 @@ public enum VoiceInkTranscriptionRunPreparation {
                 cleanupProfile: cleanupProfile
             )
         }
-        return prepareRawTextForEnhancement(
-            rawText,
-            cleanupConfiguration: cleanupConfiguration,
-            applyingWordReplacements: wordReplacement
-        )
     }
 
     public static func prepareRawTextForEnhancement(

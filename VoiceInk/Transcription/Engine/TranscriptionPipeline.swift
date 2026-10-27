@@ -12,21 +12,32 @@ class TranscriptionPipeline {
     private let enhancementService: AIEnhancementService?
     private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "TranscriptionPipeline")
     private var activePasteTasks: [UUID: Task<CursorPaster.PasteResult, Never>] = [:]
+    private var activeProcessingTasks: [UUID: Task<DictationPostprocessingPlan.Output?, Error>] = [:]
+    private var activeOperationCancellations: [UUID: Bool] = [:]
+    private let reportProcessingFailure: @MainActor (String) -> Void
 
     var licenseViewModel: LicenseViewModel
 
     init(
         modelContext: ModelContext,
         serviceRegistry: TranscriptionServiceRegistry,
-        enhancementService: AIEnhancementService?
+        enhancementService: AIEnhancementService?,
+        reportProcessingFailure: @escaping @MainActor (String) -> Void = {
+            NotificationManager.shared.showNotification(title: $0, type: .warning, duration: 6)
+        }
     ) {
         self.modelContext = modelContext
         self.serviceRegistry = serviceRegistry
         self.enhancementService = enhancementService
+        self.reportProcessingFailure = reportProcessingFailure
         self.licenseViewModel = LicenseViewModel()
     }
 
     func cancelDelivery(for transcriptionID: UUID) {
+        if activeOperationCancellations[transcriptionID] != nil {
+            activeOperationCancellations[transcriptionID] = true
+        }
+        activeProcessingTasks[transcriptionID]?.cancel()
         activePasteTasks[transcriptionID]?.cancel()
     }
 
@@ -46,15 +57,25 @@ class TranscriptionPipeline {
         model: any TranscriptionModel,
         session: TranscriptionSession?,
         writingSession: WritingActionSession? = nil,
-        spokenSnippets: [VoiceInkSpokenSnippet] = VoiceInkSpokenSnippets.load(),
+        spokenSnippets: [VoiceInkSpokenSnippet]? = nil,
         cleanupProfile: VoiceInkDictationProfile = .current(),
+        dictationPlan: DictationPostprocessingPlan? = nil,
         latencyTraceToken: VoiceInkLatencyTrace.Token?,
         onStateChange: @escaping (VoiceInkRecordingState) -> Void,
-        shouldCancel: () -> Bool,
+        shouldCancel: @escaping () -> Bool,
         onCancel: @escaping () async -> Void,
         onDismiss: @escaping () async -> Void
     ) async {
-        if writingSession == nil, cleanupProfile == .none {
+        activeOperationCancellations[transcription.id] = false
+        defer {
+            activeOperationCancellations[transcription.id] = nil
+            activeProcessingTasks[transcription.id] = nil
+        }
+        func isCanceled() -> Bool {
+            shouldCancel() || Task.isCancelled || activeOperationCancellations[transcription.id] == true
+        }
+        let capturedProfile = writingSession == nil ? (dictationPlan?.profile ?? cleanupProfile) : .custom
+        if writingSession == nil, capturedProfile != .custom {
             SpecialShortcutEmptyTranscriptionFallback.clear()
         }
         let latencyTrace = VoiceInkLatencyTrace.shared
@@ -67,6 +88,8 @@ class TranscriptionPipeline {
         var finalPastedText: String?
         var literalOutput: String?
         var promptDetectionResult: VoiceInkPromptDetectionResult?
+        var processingFailureReason: String?
+        var didDeliverOrdinaryText = false
 
         func restorePromptDetectionSettingsIfNeeded() async {
             if let result = promptDetectionResult,
@@ -116,10 +139,15 @@ class TranscriptionPipeline {
             )
         }
 
-        if shouldCancel() || Task.isCancelled {
+        if isCanceled() {
             await finishCanceledTranscription()
             return
         }
+        let plan: DictationPostprocessingPlan = writingSession == nil
+            ? (dictationPlan ?? .capture(profile: capturedProfile, using: modelContext, enhancementService: enhancementService))
+            : .custom
+        let customSnippets = writingSession == nil && capturedProfile == .custom
+            ? (spokenSnippets ?? VoiceInkSpokenSnippets.load()) : []
 
         let cursorContextCheckpoint = latencyTrace.executorEnqueued(
             "pipeline.cursor_context_prefetch",
@@ -182,7 +210,7 @@ class TranscriptionPipeline {
                 )
                 throw error
             }
-            if shouldCancel() || Task.isCancelled {
+            if isCanceled() {
                 await finishCanceledTranscription()
                 return
             }
@@ -197,7 +225,7 @@ class TranscriptionPipeline {
                     let request = try writingSession.request(transcript: rawText)
                     _ = try await VoiceInkWritingActionExecution.run(
                         request: request,
-                        shouldCancel: shouldCancel,
+                        shouldCancel: isCanceled,
                         perform: { request in
                             let result = try await enhancementService.performWritingAction(request, using: writingSession.provider)
                             // Preserve generated text even when the captured destination changed.
@@ -210,12 +238,12 @@ class TranscriptionPipeline {
                             return result
                         },
                         deliver: { text in
-                            try await writingSession.target.replace(with: text, shouldCancel: shouldCancel)
+                            try await writingSession.target.replace(with: text, shouldCancel: isCanceled)
                         }
                     )
                     transcription.transcriptionState = .completed
                 } catch {
-                    if shouldCancel() || error is CancellationError {
+                    if isCanceled() || error is CancellationError {
                         await finishCanceledTranscription()
                         return
                     }
@@ -226,20 +254,46 @@ class TranscriptionPipeline {
                         duration: 6
                     )
                 }
-            } else if cleanupProfile == .none {
-                literalOutput = rawText
-                finalPastedText = rawText
+            } else if capturedProfile != .custom {
+                if isCanceled() { await finishCanceledTranscription(); return }
+                // Register before suspension so cancellation owns provider work as well as delivery.
+                let processingTask = Task { @MainActor in
+                    try Task.checkCancellation()
+                    return try await plan.process(
+                        recognitionText: rawText,
+                        using: enhancementService,
+                        shouldCancel: isCanceled,
+                        willRequestClarity: { onStateChange(.enhancing) }
+                    )
+                }
+                activeProcessingTasks[transcription.id] = processingTask
+                let processed = try await withTaskCancellationHandler {
+                    try await processingTask.value
+                } onCancel: {
+                    processingTask.cancel()
+                }
+                activeProcessingTasks[transcription.id] = nil
+                if isCanceled() { await finishCanceledTranscription(); return }
+                guard let processed else { preconditionFailure("A non-Custom plan must produce an outcome.") }
+                literalOutput = processed.literalOutput
+                finalPastedText = processed.literalOutput
+                processingFailureReason = processed.fallbackReason
                 transcription.applyCompletedDraft(VoiceInkCompletedTranscriptionDraft(
-                    cleanedText: rawText,
+                    cleanedText: processed.preparedText,
                     duration: transcription.duration,
                     audioFileURL: transcription.audioFileURL,
                     transcriptionModelName: model.displayName,
                     transcriptionDuration: Date().timeIntervalSince(transcriptionStart),
                     powerModeName: transcription.powerModeName,
-                    powerModeEmoji: transcription.powerModeEmoji
+                    powerModeEmoji: transcription.powerModeEmoji,
+                    enhancementResult: processed.enhancementResult,
+                    recognitionText: processed.recognitionText,
+                    dictationProfile: capturedProfile,
+                    clarityStyle: plan.clarityStyle,
+                    processingFailureReason: processed.fallbackReason
                 ))
             } else {
-                let snippetExpansion = VoiceInkSpokenSnippets.expansion(of: rawText, using: spokenSnippets)
+                let snippetExpansion = VoiceInkSpokenSnippets.expansion(of: rawText, using: customSnippets)
                 if snippetExpansion.didExpand {
                     // Snippet utterances stay literal so cleanup cannot rewrite saved content or its trigger.
                     literalOutput = snippetExpansion.text
@@ -249,6 +303,10 @@ class TranscriptionPipeline {
                     transcription.transcriptionModelName = model.displayName
                     transcription.transcriptionDuration = Date().timeIntervalSince(transcriptionStart)
                     transcription.transcriptionState = .completed
+                    transcription.recognitionText = rawText
+                    transcription.dictationProfileRawValue = capturedProfile.rawValue
+                    transcription.clarityStyleRawValue = nil
+                    transcription.processingFailureReason = nil
                 } else {
                     let cleanupSpan = latencyTrace.begin("pipeline.cleanup", token: traceToken)
                     let cleanupConfiguration = VoiceInkTranscriptionCleanupConfiguration.current()
@@ -265,7 +323,7 @@ class TranscriptionPipeline {
                         cleanupSpan,
                         details: "cleanedChars=\(cleanedText.count) enhancementInputChars=\(text.count)"
                     )
-                    if shouldCancel() { await finishCanceledTranscription(); return }
+                    if isCanceled() { await finishCanceledTranscription(); return }
 
                     transcription.text = cleanedText
                     transcription.transcriptionModelName = model.displayName
@@ -291,7 +349,7 @@ class TranscriptionPipeline {
 
                     if let enhancementService,
                        let enhancementRequest {
-                        if shouldCancel() { await finishCanceledTranscription(); return }
+                        if isCanceled() { await finishCanceledTranscription(); return }
 
                         onStateChange(.enhancing)
 
@@ -319,7 +377,7 @@ class TranscriptionPipeline {
                                     type: .warning
                                 )
                             }
-                            if shouldCancel() { await finishCanceledTranscription(); return }
+                            if isCanceled() { await finishCanceledTranscription(); return }
                         }
                     }
 
@@ -333,12 +391,18 @@ class TranscriptionPipeline {
                         powerModeEmoji: transcription.powerModeEmoji,
                         enhancementResult: enhancementResult,
                         enhancementFailureReason: enhancementFailureReason,
-                        enhancementFailurePolicy: .storeFailureText
+                        enhancementFailurePolicy: .storeFailureText,
+                        recognitionText: rawText,
+                        dictationProfile: capturedProfile
                     )
                     transcription.applyCompletedDraft(completedDraft)
                 }
             }
         } catch {
+            if isCanceled() || error is CancellationError {
+                await finishCanceledTranscription()
+                return
+            }
             latencyTrace.event(
                 "pipeline.transcription_failed",
                 details: "error=\(String(describing: type(of: error)))",
@@ -393,7 +457,7 @@ class TranscriptionPipeline {
 
         }
 
-        if shouldCancel() || Task.isCancelled {
+        if isCanceled() {
             await finishCanceledTranscription()
             return
         }
@@ -405,7 +469,7 @@ class TranscriptionPipeline {
         if writingSession != nil {
             SoundManager.shared.play(.stop)
             await restorePromptDetectionSettingsAndDismiss()
-        } else if cleanupProfile == .custom,
+        } else if capturedProfile == .custom,
                   SpecialShortcutEmptyTranscriptionFallback.consumeIfNeeded(
             for: transcription,
             modelContext: modelContext
@@ -436,7 +500,7 @@ class TranscriptionPipeline {
             latencyTrace.end(pastePreparationSpan, details: "chars=\(pastedText.count)")
             let pasteSpan = latencyTrace.begin("pipeline.paste_command", token: traceToken)
             await pasteAuthorizationPreflight.value
-            if shouldCancel() || Task.isCancelled {
+            if isCanceled() {
                 latencyTrace.end(pasteSpan, details: "result=cancelled_before_post")
                 await finishCanceledTranscription()
                 return
@@ -453,12 +517,13 @@ class TranscriptionPipeline {
                 pasteTask.cancel()
             }
             activePasteTasks[transcription.id] = nil
+            didDeliverOrdinaryText = pasteResult.didDeliverText
             latencyTrace.end(
                 pasteSpan,
                 details: "textDelivered=\(pasteResult.didDeliverText) result=\(String(describing: pasteResult))"
             )
             if pasteResult == .commandNotPosted,
-               pasteTask.isCancelled || shouldCancel() || Task.isCancelled {
+               pasteTask.isCancelled || isCanceled() {
                 await finishCanceledTranscription()
                 return
             }
@@ -471,7 +536,7 @@ class TranscriptionPipeline {
                 if pasteResult.didDeliverText,
                    !pasteTask.isCancelled,
                    !Task.isCancelled,
-                   !shouldCancel(),
+                   !isCanceled(),
                    let autoSendKey,
                    let delayAfterPaste = VoiceInkAutoSendPolicy.delayAfterPasteNanoseconds(for: autoSendKey) {
                     Task { @MainActor in
@@ -493,6 +558,11 @@ class TranscriptionPipeline {
             await restorePromptDetectionSettingsAndDismiss()
         }
 
+        if writingSession == nil, !didDeliverOrdinaryText, isCanceled() {
+            await finishCanceledTranscription()
+            return
+        }
+
         if transcription.transcriptionState == .completed || writingSession != nil,
            transcription.duration <= 0 {
             let durationSpan = latencyTrace.begin("pipeline.audio_duration", token: traceToken)
@@ -504,6 +574,17 @@ class TranscriptionPipeline {
             latencyTrace.executorResumed(durationResult.executorCheckpoint)
             transcription.duration = durationResult.seconds
             latencyTrace.end(durationSpan)
+        }
+
+        if writingSession == nil, !didDeliverOrdinaryText, isCanceled() {
+            await finishCanceledTranscription()
+            return
+        }
+        if let processingFailureReason, !isCanceled() {
+            let recovery = didDeliverOrdinaryText
+                ? "The original was inserted."
+                : "The original was retained."
+            reportProcessingFailure("Dictation processing failed. \(recovery) \(processingFailureReason)")
         }
 
         let saveSpan = latencyTrace.begin("pipeline.save", token: traceToken)

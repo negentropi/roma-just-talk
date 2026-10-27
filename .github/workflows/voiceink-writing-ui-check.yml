@@ -55,6 +55,13 @@ jobs:
           test "$(cat "$proof/source-sha.txt")" = "$GITHUB_SHA"
           shasum -a 256 \
             VoiceInkUITests/WritingFeaturesUITests.swift \
+            VoiceInkTests/DictationHistoryUISeedLiveTests.swift \
+            VoiceInk/VoiceInk.swift \
+            VoiceInk/Models/Transcription.swift \
+            VoiceInk/Views/ModelSettingsView.swift \
+            VoiceInk/Views/History/HistoryProcessingViews.swift \
+            VoiceInk/Views/History/InlineHistoryView.swift \
+            VoiceInk/Views/History/TranscriptionDetailView.swift \
             scripts/run-writing-settings-ui-regression.sh \
             scripts/run-writing-feature-regression.sh \
             .github/workflows/voiceink-writing-ui-check.yml \
@@ -92,7 +99,7 @@ jobs:
             ~/Library/Caches/org.swift.swiftpm
           key: ${{ steps.deps-cache.outputs.cache-primary-key }}
 
-      - name: Compare the disabled-panel baseline and current writing settings UI
+      - name: Compare the disabled-panel baseline and six current writing UI cases
         run: |
           defaults write com.negentropi.RomaJustTalk CurrentTranscriptionModel -string whisper-large-v3-turbo
           defaults write com.negentropi.RomaJustTalk PrewarmModelOnWake -bool false

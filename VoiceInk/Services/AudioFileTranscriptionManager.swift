@@ -20,12 +20,24 @@ class AudioTranscriptionManager: ObservableObject {
     private var processingTask: Task<Void, Never>?
     private var processingGeneration: UInt64 = 0
     private let audioProcessor = AudioProcessor()
+    private let serviceRegistryFactory: (@MainActor (ModelContext, VoiceInkEngine) -> TranscriptionServiceRegistry)?
+    private let processingWarning: @MainActor (String) -> Void
     private let logger = Logger(
         subsystem: VoiceInkAppIdentity.loggingSubsystem,
         category: VoiceInkMacOSLogCategory.audioTranscriptionManager
     )
 
-    private init() {}
+    init(
+        serviceRegistryFactory: (@MainActor (ModelContext, VoiceInkEngine) -> TranscriptionServiceRegistry)? = nil,
+        processingWarning: @escaping @MainActor (String) -> Void = { reason in
+            NotificationManager.shared.showNotification(
+                title: "Processing unavailable. The original recognition was retained. \(reason)", type: .warning
+            )
+        }
+    ) {
+        self.serviceRegistryFactory = serviceRegistryFactory
+        self.processingWarning = processingWarning
+    }
 
     // MARK: - Queue Management
 
@@ -78,18 +90,20 @@ class AudioTranscriptionManager: ObservableObject {
             guard let self else { return }
 
             while let item = self.nextPendingItem() {
-                guard !Task.isCancelled else { break }
-                await self.processItem(item, modelContext: modelContext, engine: engine)
+                guard !Task.isCancelled, self.processingGeneration == generation else { break }
+                await self.processItem(item, generation: generation, modelContext: modelContext, engine: engine)
             }
 
             if self.processingGeneration == generation {
                 self.isProcessingQueue = false
+                self.processingTask = nil
             }
         }
     }
 
     func cancelProcessing() {
         processingTask?.cancel()
+        processingGeneration &+= 1
         processingTask = nil
         isProcessingQueue = false
 
@@ -120,23 +134,38 @@ class AudioTranscriptionManager: ObservableObject {
         return queue.first { $0.id == id }
     }
 
-    private func processItem(_ item: AudioFileQueueItem, modelContext: ModelContext, engine: VoiceInkEngine) async {
-        let cleanupProfile = VoiceInkDictationProfile.current()
-        let serviceRegistry = TranscriptionServiceRegistry(
+    private func owns(_ item: AudioFileQueueItem, generation: UInt64) -> Bool {
+        processingGeneration == generation && queue.contains { $0 === item }
+    }
+
+    private func processItem(_ item: AudioFileQueueItem, generation: UInt64, modelContext: ModelContext, engine: VoiceInkEngine) async {
+        let plan = DictationPostprocessingPlan.capture(
+            profile: .current(), using: modelContext, enhancementService: engine.enhancementService
+        )
+        let serviceRegistry = serviceRegistryFactory?(modelContext, engine) ?? TranscriptionServiceRegistry(
             modelProvider: engine.whisperModelManager,
             modelsDirectory: engine.whisperModelManager.modelsDirectory,
             modelContext: modelContext,
             qwenRuntimeResult: engine.serviceRegistry.qwenRuntimeResult
         )
-
+        var ownedAudio: URL?
+        var committed = false
+        defer {
+            if !committed, let ownedAudio { try? FileManager.default.removeItem(at: ownedAudio) }
+        }
+        func checkOwnership() throws {
+            try Task.checkCancellation()
+            guard owns(item, generation: generation) else { throw CancellationError() }
+        }
         do {
+            try checkOwnership()
             guard let currentModel = engine.transcriptionModelManager.currentTranscriptionModel else {
                 throw VoiceInkEngineError.noTranscriptionModelSelected
             }
 
             // Phase: Loading
             item.status = .processing(phase: .loading)
-            try Task.checkCancellation()
+            try checkOwnership()
 
             // Phase: Processing Audio
             item.status = .processing(phase: .processingAudio)
@@ -145,104 +174,77 @@ class AudioTranscriptionManager: ObservableObject {
             defer { if accessing { item.url.stopAccessingSecurityScopedResource() } }
 
             let samples = try await audioProcessor.processAudioToSamples(item.url)
-            try Task.checkCancellation()
+            try checkOwnership()
 
             let audioAsset = AVURLAsset(url: item.url)
             let duration = CMTimeGetSeconds(try await audioAsset.load(.duration))
-            try Task.checkCancellation()
+            try checkOwnership()
 
             let appSupportDirectory = VoiceInkMacOSStorageDirectories.appSupportDirectory
             let recordingsDirectory = try VoiceInkStoredAudioFile.createRecordingsDirectory(in: appSupportDirectory)
 
             let permanentURL = VoiceInkStoredAudioFile.importedTranscriptionFileURL(in: recordingsDirectory)
-
+            guard !FileManager.default.fileExists(atPath: permanentURL.path) else {
+                throw CocoaError(.fileWriteFileExists)
+            }
+            ownedAudio = permanentURL
             try audioProcessor.saveSamplesAsWav(samples: samples, to: permanentURL)
-            try Task.checkCancellation()
+            try checkOwnership()
 
             // Phase: Transcribing
             item.status = .processing(phase: .transcribing)
             let transcriptionStart = Date()
             let rawText = try await serviceRegistry.transcribe(audioURL: permanentURL, model: currentModel)
-            try Task.checkCancellation()
+            try checkOwnership()
             let transcriptionDuration = Date().timeIntervalSince(transcriptionStart)
-            let cleanupConfiguration = VoiceInkTranscriptionCleanupConfiguration.current()
 
             let powerModeMetadata = VoiceInkPowerModeTranscriptionMetadata.active(
                 from: PowerModeManager.shared.activeConfiguration
             )
+            let preparation = AudioFileDictationPostprocessing.prepare(
+                recognitionText: rawText, plan: plan, modelContext: modelContext
+            )
 
-            let textPlan = VoiceInkTranscriptionRunPreparation.prepareAudioFileText(
-                rawText,
-                cleanupConfiguration: cleanupConfiguration,
-                cleanupProfile: cleanupProfile
-            ) { text in
-                DictionaryService.applyWordReplacements(to: text, using: modelContext)
-            }
-            let cleanedText = textPlan.cleanedText
-            try Task.checkCancellation()
-
-            let enhancementRequest: VoiceInkTranscriptionEnhancementRequest? = if textPlan.allowsEnhancement {
-                textPlan.enhancementRequest(
-                    isEnhancementEnabled: engine.enhancementService?.isEnhancementEnabled == true,
-                    isEnhancementConfigured: engine.enhancementService?.isConfigured == true,
-                    skipConfiguration: VoiceInkPostProcessingSkipConfiguration.current()
-                )
-            } else {
-                nil
-            }
-            let draftContext = VoiceInkAudioFileTranscriptionDraftContext(
-                cleanedText: cleanedText,
+            let draft = try await AudioFileDictationPostprocessing.completedDraft(
+                recognitionText: rawText,
+                preparation: preparation,
                 duration: duration,
                 audioFileURL: permanentURL.absoluteString,
                 transcriptionModelName: currentModel.displayName,
                 transcriptionDuration: transcriptionDuration,
-                powerModeName: powerModeMetadata.name,
-                powerModeEmoji: powerModeMetadata.emoji
-            )
-
-            if enhancementRequest != nil {
-                item.status = .processing(phase: .enhancing)
-            }
-
-            let completionResult: VoiceInkAudioFileTranscriptionCompletionResult
-            if textPlan.allowsEnhancement {
-                completionResult = await VoiceInkAudioFileTranscriptionDraft.completionResult(
-                    context: draftContext,
-                    enhancementRequest: enhancementRequest,
-                    enhancementFailurePolicy: .storeFailureText
-                ) { request in
-                    guard let enhancementService = engine.enhancementService else {
-                        throw VoiceInkEngineError.unknownError
+                powerModeMetadata: powerModeMetadata,
+                enhancementService: engine.enhancementService,
+                detectsPromptTriggers: false,
+                enhancementFailurePolicy: .storeFailureText,
+                shouldCancel: { !self.owns(item, generation: generation) },
+                willEnhance: {
+                    if self.owns(item, generation: generation), !Task.isCancelled {
+                        item.status = .processing(phase: .enhancing)
                     }
-                    return try await enhancementService.enhance(request.text)
                 }
-            } else {
-                completionResult = VoiceInkAudioFileTranscriptionCompletionResult(
-                    draft: VoiceInkAudioFileTranscriptionDraft.completed(context: draftContext)
-                )
-            }
-
-            if let errorDescription = completionResult.enhancementFailureReason {
-                let message = VoiceInkAudioFileQueueDiagnostics.enhancementFailedMessage(
-                    errorDescription: errorDescription
-                )
-                logger.error("\(message, privacy: .public)")
-            }
-
-            let transcription = Transcription(completedDraft: completionResult.draft)
-
-            try Task.checkCancellation()
+            )
+            let transcription = Transcription(completedDraft: draft)
+            try checkOwnership()
             modelContext.insert(transcription)
-            try modelContext.save()
-            NotificationCenter.default.post(name: .transcriptionCreated, object: transcription)
-            NotificationCenter.default.post(name: .transcriptionCompleted, object: transcription)
-
+            do { try modelContext.save() }
+            catch {
+                modelContext.delete(transcription)
+                throw error
+            }
+            committed = true
             item.transcription = transcription
             item.status = .completed
             lastCompletedItemId = item.id
+            NotificationCenter.default.post(name: .transcriptionCreated, object: transcription)
+            NotificationCenter.default.post(name: .transcriptionCompleted, object: transcription)
+            if owns(item, generation: generation), let reason = transcription.processingFailureReason {
+                processingWarning(reason)
+            }
 
         } catch {
-            if Task.isCancelled || error is CancellationError {
+            if !owns(item, generation: generation) {
+                // A canceled older task cannot reset a retried item's newer state.
+            } else if Task.isCancelled || error is CancellationError {
                 item.status = .pending
             } else {
                 let errorDescription = VoiceInkErrorDescription.text(for: error)

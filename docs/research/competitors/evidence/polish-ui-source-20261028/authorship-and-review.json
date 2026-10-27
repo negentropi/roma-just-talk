@@ -1,0 +1,83 @@
+{
+  "classification": "source-authorship-and-review-only",
+  "invocations": [
+    {
+      "invocation": "profiles-history",
+      "requested_model": "claude-opus-5-5",
+      "reported_assistant_models": [
+        "claude-opus-5-5"
+      ],
+      "raw_jsonl_sha256": "71d968d1356e7c78c244085589b40c64b273900a58afe832eebbeba683b3c3c1",
+      "result": {
+        "subtype": "success",
+        "is_error": false,
+        "total_cost_usd": 2.225375
+      }
+    },
+    {
+      "invocation": "player-outcome",
+      "requested_model": "claude-opus-5-5",
+      "reported_assistant_models": [
+        "claude-opus-5-5"
+      ],
+      "raw_jsonl_sha256": "64014bbca0b8aefd976fcb08fd018e83cfc2f8daf220d7870ba63f86d02df688",
+      "result": {
+        "subtype": "success",
+        "is_error": false,
+        "total_cost_usd": 0.33109560000000005
+      }
+    },
+    {
+      "invocation": "retry-outcome",
+      "requested_model": "claude-opus-5-5",
+      "reported_assistant_models": [
+        "claude-opus-5-5"
+      ],
+      "raw_jsonl_sha256": "e005be25513996cf4e219ef8d251e9205f75c2ec3ef2a251c4f9444212ce77c2",
+      "result": {
+        "subtype": "success",
+        "is_error": false,
+        "total_cost_usd": 0.35100460000000006
+      }
+    },
+    {
+      "invocation": "history-identifiers",
+      "requested_model": "claude-opus-5-5",
+      "reported_assistant_models": [
+        "claude-opus-5-5"
+      ],
+      "raw_jsonl_sha256": "c8fb10b2f795e7e5e195f18411a037c75e3617711a85f3b0825f0c81af144bb1",
+      "result": {
+        "subtype": "success",
+        "is_error": false,
+        "total_cost_usd": 0.4932148
+      }
+    },
+    {
+      "invocation": "clarity-copy",
+      "requested_model": "claude-opus-5-5",
+      "reported_assistant_models": [
+        "claude-opus-5-5"
+      ],
+      "raw_jsonl_sha256": "b5218c07c332ad9cb4d83dffaca01fe6a7624d2d5bccf6db1fec0de53762476c",
+      "result": {
+        "subtype": "success",
+        "is_error": false,
+        "total_cost_usd": 0.038686000000000005
+      }
+    }
+  ],
+  "reviewer_model": "gpt-6.1-sol",
+  "source_review": "Actual GPT-6.1 Sol reviewed five settings/History views, both outcome callbacks, the identifier follow-up and accuracy copy; no actionable source blocker. No current native UI proof.",
+  "native_new_ui_verified": false,
+  "scope": "Actual Opus source authorship and Sol read-only source review. Runtime and current screenshot/clipboard/persistence proof remains pending.",
+  "source_sha256": {
+    "VoiceInk/Views/ModelSettingsView.swift": "18676bf774c7ddd9f5e01d978081ac3989950b9d98c993596b6b37cb83262487",
+    "VoiceInk/Views/History/HistoryProcessingViews.swift": "6702314f2fd462b91075fbe50dff9c00a4974b60bb5834ddcde713520b99bea7",
+    "VoiceInk/Views/History/InlineHistoryView.swift": "84ae9011a8e380f01ad25785b3688fbe0436667f8cf26b1865448593281312b1",
+    "VoiceInk/Views/History/TranscriptionDetailView.swift": "0d020575a8e18647684ccf3f63974b994b44652e2ca4a8df7a610b4d54cd0720",
+    "VoiceInk/Views/History/TranscriptionListItem.swift": "69774febf8b9347ea13a7845fff28bcedebcea5d5c936f4bac1eef4e5a6d8832",
+    "VoiceInk/Views/AudioPlayerView.swift": "83767fc0a1aab7911ddff590f67433a0fbf22878e6a62904ae975b1c3f0ce93a",
+    "VoiceInk/Services/LastTranscriptionService.swift": "dad4c626445d37a978a22361b3d21f5fc648787f0a0fb53792e7bb3f69051fb7"
+  }
+}

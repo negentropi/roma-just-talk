@@ -22,6 +22,7 @@ struct TranscriptionListItem: View {
                     Text(VoiceInkDatePresentation.compactTimestamp(transcription.timestamp))
                         .font(.system(size: 11, weight: .medium))
                         .foregroundColor(.secondary)
+                    HistoryProcessingWarningBadge(transcription: transcription)
                     Spacer()
                     if VoiceInkDurationPresentation.shouldShowPositiveDuration(transcription.duration) {
                         Text(VoiceInkDurationPresentation.compactElapsed(transcription.duration))
@@ -59,6 +60,9 @@ struct TranscriptionListItem: View {
         }
         .contentShape(Rectangle())
         .onTapGesture { onSelect() }
+        // Row click selects (shows TranscriptionDetailView); there is no separate expand control.
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("history.row.\(transcription.id.uuidString)")
     }
 }
 

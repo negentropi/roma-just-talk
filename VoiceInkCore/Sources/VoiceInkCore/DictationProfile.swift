@@ -3,6 +3,8 @@ import Foundation
 public enum VoiceInkDictationProfile: String, Codable, CaseIterable, Sendable {
     case custom
     case none
+    case light
+    case clarity
 
     public static let storageKey = "VoiceInkDictationProfile"
 

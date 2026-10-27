@@ -17,7 +17,9 @@ MARKER = 'Opening model settings disabled the panel or blocked a visible panel c
 PRODUCT = ['VoiceInk', 'VoiceInkCore', 'VoiceInkNVIDIA', 'VoiceInkQwen', 'VoiceInk.xcodeproj', 'iOS']
 LOCK = 'VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved'
 LOCK_HASH = 'bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f'
-CASES = ['testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch', 'testCSVImportPreviewsMultilineContentBeforeReplacing', 'testTranslationTargetsReorderSelectAndPersist', METHOD]
+CASES = ['testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch', 'testCSVImportPreviewsMultilineContentBeforeReplacing', 'testTranslationTargetsReorderSelectAndPersist', METHOD, 'testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings', 'testHistoryPreservesRecognizedFallbackAndLegacyVariants']
+SEED_METHOD = 'liveDictationHistoryUISeed'
+SEED_INPUTS = ['VoiceInkTests/DictationHistoryUISeedLiveTests.swift', 'VoiceInk/VoiceInk.swift', 'VoiceInk/Models/Transcription.swift', 'scripts/run-writing-feature-regression.sh']
 digest = lambda data: hashlib.sha256(data).hexdigest()
 def write(path, value):
     Path(path).write_text(json.dumps(value, indent=2, sort_keys=True) + '\n')
@@ -59,6 +61,23 @@ def process_valid(payload, expected):
     values = payload.get('processes', [])
     return payload.get('observer_completed') is True and not payload.get('sampling_errors') and payload.get('expected_executable') == expected and bool(values) and all(isinstance(value.get('pid'), int) and value['pid'] > 0 and value.get('executable') == expected for value in values)
 
+def classify_candidate(text, exit_code):
+    observations = {}
+    for name in CASES:
+        prefix = r"Test Case '[^'\n]*WritingFeaturesUITests[ ./]" + re.escape(name) + r"(?:\(\))?\]?' "
+        observations[name] = {'starts': len(re.findall(prefix + r'started\.', text)), 'results': re.findall(prefix + r'(passed|failed|skipped)', text)}
+    starts = re.findall(r"Test Case '[^'\n]+' started\.", text)
+    finishes = re.findall(r"Test Case '[^'\n]+' (passed|failed|skipped)", text)
+    totals = re.findall(r'Executed (\d+) tests?,([^\n]+)', text)
+    valid_totals = bool(totals) and all(count == str(len(CASES)) and re.search(r'\bwith\s+0\s+failures?\b', summary) and '(0 unexpected)' in summary and not re.search(r'\b[1-9]\d*\s+(?:tests?\s+)?skipped\b', summary) for count, summary in totals)
+    valid = exit_code == 0 and len(starts) == len(finishes) == len(CASES) and valid_totals and ': error:' not in text and all(value == {'starts': 1, 'results': ['passed']} for value in observations.values())
+    return {'classification': 'passed' if valid else 'invalid-or-failed', 'exit_code': exit_code, 'tests': observations}
+
+def native_seed_valid(payload, source):
+    seed, verified = payload.get('seed', {}), payload.get('verify', {})
+    phases = all(value.get('valid') is True and value.get('phase') == phase and value.get('testName') == SEED_METHOD and value.get('sourceSHA') == source and value.get('exit_code') == 0 for phase, value in [('seed', seed), ('verify', verified)])
+    return payload.get('valid') is True and payload.get('sourceSHA') == source and payload.get('testName') == SEED_METHOD and payload.get('closedBeforeUI') is True and payload.get('verifiedAfterUI') is True and phases and seed.get('closedBeforeUI') is True and seed.get('saveCompleted') is True and verified.get('closedAfterUI') is True and verified.get('verificationReadOnly') is True and type(seed.get('hostPID')) is int and type(verified.get('hostPID')) is int and seed['hostPID'] > 0 and verified['hostPID'] > 0 and seed['hostPID'] != verified['hostPID'] and len(seed.get('normalStorePaths', [])) == 3 and seed['normalStorePaths'] == verified.get('normalStorePaths')
+
 def self_test():
     source = 'func boundary() {\n XCTAssertTrue(ready,\n "' + MARKER + '")\n}\n'
     prefix = "Test Case '-[VoiceInkUITests.WritingFeaturesUITests " + METHOD + "]' "
@@ -96,11 +115,30 @@ def self_test():
     process_cases = {'expected': (process, True), 'missing': ({}, False), 'empty': ({**process, 'processes': []}, False), 'incomplete': ({**process, 'observer_completed': False}, False), 'sampling-error': ({**process, 'sampling_errors': ['ps failed']}, False), 'candidate-launched-as-baseline': ({**process, 'processes': [{'pid': 123, 'executable': executable.replace('/baseline/', '/candidate/')}]}, False), 'mixed-foreign': ({**process, 'processes': [*process['processes'], {'pid': 456, 'executable': executable.replace('/baseline/', '/candidate/')}]}, False)}
     process_observed = {name: process_valid(payload, executable) for name, (payload, expected) in process_cases.items()}
     assert all(process_observed[name] == expected for name, (_, expected) in process_cases.items()), process_observed
-    print(json.dumps({'classifier_fixtures': observed, 'process_fixtures': process_observed, 'valid': True}, indent=2))
+    def candidate_fixture(names):
+        return ''.join("Test Case '-[VoiceInkUITests.WritingFeaturesUITests " + name + "]' started.\nTest Case '-[VoiceInkUITests.WritingFeaturesUITests " + name + "]' passed (1.0 seconds).\n" for name in names) + f'Executed {len(names)} tests, with 0 failures (0 unexpected) in 6.0 seconds\n'
+    candidate_good = candidate_fixture(CASES)
+    candidate_cases = {'six-passed': (candidate_good, True), 'five': (candidate_fixture(CASES[:-1]), False), 'seven': (candidate_fixture(CASES + ['testUnexpectedExtraCase']), False), 'skipped': (candidate_good.replace('passed (', 'skipped (', 1), False), 'missing-history': (candidate_good.replace(CASES[-1], 'unselectedHistoryMethod'), False), 'duplicate': (candidate_good + candidate_good, False), 'error': (candidate_good + '/tmp/File.swift:1: error: failure\n', False)}
+    candidate_observed = {name: classify_candidate(text, 0)['classification'] == 'passed' for name, (text, expected) in candidate_cases.items()}
+    assert all(candidate_observed[name] == expected for name, (_, expected) in candidate_cases.items()), candidate_observed
+    seed_good = {'valid': True, 'sourceSHA': 'a' * 40, 'testName': SEED_METHOD, 'closedBeforeUI': True, 'verifiedAfterUI': True,
+                 'seed': {'valid': True, 'phase': 'seed', 'testName': SEED_METHOD, 'sourceSHA': 'a' * 40, 'exit_code': 0, 'closedBeforeUI': True, 'saveCompleted': True, 'hostPID': 1, 'normalStorePaths': ['/support/default.store', '/support/dictionary.store', '/support/stats.store']},
+                 'verify': {'valid': True, 'phase': 'verify', 'testName': SEED_METHOD, 'sourceSHA': 'a' * 40, 'exit_code': 0, 'closedAfterUI': True, 'verificationReadOnly': True, 'hostPID': 2, 'normalStorePaths': ['/support/default.store', '/support/dictionary.store', '/support/stats.store']}}
+    seed_cases = {'closed-seed-and-verify': (seed_good, True), 'missing-verify': ({**seed_good, 'verify': {}}, False), 'wrong-source': ({**seed_good, 'sourceSHA': 'b' * 40}, False), 'same-host': ({**seed_good, 'verify': {**seed_good['verify'], 'hostPID': 1}}, False), 'unclosed': ({**seed_good, 'seed': {**seed_good['seed'], 'closedBeforeUI': False}}, False), 'write-during-verify': ({**seed_good, 'verify': {**seed_good['verify'], 'verificationReadOnly': False}}, False)}
+    seed_observed = {name: native_seed_valid(value, 'a' * 40) for name, (value, expected) in seed_cases.items()}
+    assert all(seed_observed[name] == expected for name, (_, expected) in seed_cases.items()), seed_observed
+    print(json.dumps({'classifier_fixtures': observed, 'process_fixtures': process_observed, 'six_case_fixtures': candidate_observed, 'history_seed_fixtures': seed_observed, 'valid': True}, indent=2))
 
 command, *args = sys.argv[1:]
 if command == 'self-test':
     self_test()
+elif command == 'candidate-selectors':
+    print('\n'.join('-only-testing:VoiceInkUITests/WritingFeaturesUITests/' + name for name in CASES))
+elif command == 'candidate':
+    log, code, output = args
+    result = classify_candidate(Path(log).read_text(errors='replace'), int(code))
+    write(output, result)
+    if result['classification'] != 'passed': raise SystemExit('UI verification requires exactly six known cases once, passed, without skips or extra cases')
 elif command == 'sources':
     candidate, baseline, output = map(Path, args)
     manifests = {label: tracked(root, PRODUCT) for label, root in [('candidate', candidate), ('baseline', baseline)]}
@@ -116,6 +154,9 @@ elif command == 'sources':
     oracle = (candidate / ORACLE).read_bytes()
     if oracle != (baseline / ORACLE).read_bytes(): raise SystemExit('UI oracle differs between lanes')
     contract = {'baseline_sha': BASELINE, 'candidate_sha': subprocess.check_output(['git', '-C', str(candidate), 'rev-parse', 'HEAD'], text=True).strip(), 'driver_sha': subprocess.check_output(['git', '-C', str(candidate), 'rev-parse', 'HEAD'], text=True).strip(), 'driver_sha256': digest((candidate / 'scripts/run-writing-settings-ui-regression.sh').read_bytes()), 'oracle_sha256': digest(oracle), 'baseline_original_oracle_sha256': digest((output / 'baseline-original-oracle.swift').read_bytes()), 'canonical_lock_sha256': LOCK_HASH, 'build_inputs_sha256': {name: digest((candidate / name).read_bytes()) for name in build_inputs}, 'bundle_identifier': 'com.negentropi.RomaJustTalk', 'baseline_method': METHOD, 'intended_assertion_line': marker_line(oracle.decode()), 'intended_assertion_message': MARKER, 'changed_production_paths': sorted(name for name in manifests['candidate'].keys() | manifests['baseline'].keys() if manifests['candidate'].get(name) != manifests['baseline'].get(name))}
+    contract['candidate_ui_cases'] = CASES
+    contract['native_seed_method'] = SEED_METHOD
+    contract['candidate_seed_inputs_sha256'] = {name: digest((candidate / name).read_bytes()) for name in SEED_INPUTS}
     write(output / 'contract.json', contract)
 elif command == 'verify-sources':
     candidate, baseline, output = map(Path, args)
@@ -126,6 +167,8 @@ elif command == 'verify-sources':
         if manifest != json.loads((output / (label + '-production-before.json')).read_text()): raise SystemExit(label + ' production source changed')
         if digest((root / ORACLE).read_bytes()) != contract['oracle_sha256']: raise SystemExit(label + ' UI oracle changed')
     if digest((candidate / 'scripts/run-writing-settings-ui-regression.sh').read_bytes()) != contract['driver_sha256']: raise SystemExit('UI comparison driver changed')
+    for name, expected in contract['candidate_seed_inputs_sha256'].items():
+        if digest((candidate / name).read_bytes()) != expected: raise SystemExit('Candidate native/UI input changed: ' + name)
     for name, expected in contract['build_inputs_sha256'].items():
         if any(digest((root / name).read_bytes()) != expected for root in [candidate, baseline]): raise SystemExit('UI build input changed: ' + name)
     write(output / 'source-verification.json', {'valid': True, 'candidate_sha': contract['candidate_sha'], 'baseline_sha': BASELINE, 'oracle_sha256': contract['oracle_sha256']})
@@ -195,12 +238,15 @@ elif command == 'combine':
     baseline_evidence = {kind: json.loads((folder / 'baseline' / (kind + '-verification.json')).read_text()) if (folder / 'baseline' / (kind + '-verification.json')).is_file() else {'valid': False} for kind in ['identity', 'tcc', 'process']}
     visual = path.parent / 'screenshot-export.json'
     visual_available = visual.is_file() and json.loads(visual.read_text()).get('visual_proof') == 'available'
-    candidate_valid = int(candidate_code) == 0 and candidate.get('classification') == 'passed' and candidate.get('exit_code') == 0 and candidate.get('tests') == expected and all(value.get('valid') is True for value in candidate_evidence.values()) and visual_available
-    valid = baseline.get('valid') is True and all(value.get('valid') is True for value in baseline_evidence.values()) and candidate_valid
+    seed_path = path.parent / 'history-seed/result.json'
+    seed = json.loads(seed_path.read_text()) if seed_path.is_file() else {'valid': False}
     contract = json.loads((folder / 'contract.json').read_text())
-    result = {'classification': 'matched-red-green' if valid else 'invalid-or-failed', 'scope': 'Debug native settings UI comparison; not Release validation', 'driver_sha': contract['driver_sha'], 'baseline_sha': BASELINE, 'candidate_sha': contract['candidate_sha'], 'oracle_sha256': contract['oracle_sha256'], 'baseline': baseline, 'candidate': candidate, 'candidate_driver_exit_code': int(candidate_code), 'candidate_valid': candidate_valid, 'candidate_identity_and_tcc': candidate_evidence, 'baseline_identity_and_tcc': baseline_evidence, 'candidate_visual_available': visual_available}
+    seed_valid = native_seed_valid(seed, contract['candidate_sha'])
+    candidate_valid = int(candidate_code) == 0 and candidate.get('classification') == 'passed' and candidate.get('exit_code') == 0 and candidate.get('tests') == expected and all(value.get('valid') is True for value in candidate_evidence.values()) and visual_available and seed_valid
+    valid = baseline.get('valid') is True and all(value.get('valid') is True for value in baseline_evidence.values()) and candidate_valid
+    result = {'classification': 'matched-red-green' if valid else 'invalid-or-failed', 'scope': 'Debug six-case native UI comparison with normal-store History seed; not Release validation', 'driver_sha': contract['driver_sha'], 'baseline_sha': BASELINE, 'candidate_sha': contract['candidate_sha'], 'oracle_sha256': contract['oracle_sha256'], 'baseline': baseline, 'candidate': candidate, 'candidate_driver_exit_code': int(candidate_code), 'candidate_valid': candidate_valid, 'candidate_identity_and_tcc': candidate_evidence, 'baseline_identity_and_tcc': baseline_evidence, 'candidate_visual_available': visual_available, 'history_seed': seed, 'history_seed_valid': seed_valid}
     write(folder / 'result.json', result)
-    if not valid: raise SystemExit('Matched UI comparison requires intended baseline red and four candidate cases green')
+    if not valid: raise SystemExit('Matched UI comparison requires intended baseline red, a closed normal-store seed, and six candidate cases green')
 else:
     raise SystemExit('Unknown proof operation')
 PY
@@ -208,6 +254,14 @@ PY
 
 if [[ "${1:-}" == --self-test ]]; then
   proof self-test
+  exit 0
+fi
+if [[ "${1:-}" == --candidate-selectors ]]; then
+  proof candidate-selectors
+  exit 0
+fi
+if [[ "${1:-}" == --classify-candidate ]]; then
+  proof candidate "${2:?Pass the UI log}" "${3:?Pass the test exit code}" "${4:?Pass the result path}"
   exit 0
 fi
 if [[ "${GITHUB_ACTIONS:-}" != true || "${RUNNER_ENVIRONMENT:-}" != github-hosted || "$(uname -s)" != Darwin ]]; then
@@ -225,6 +279,7 @@ baseline_sha=bdd608cf6111e8d7e88c12678f530318713acf67
 out="$RUNNER_TEMP/writing-settings-ui-regression"
 baseline="$RUNNER_TEMP/writing-settings-ui-baseline"
 oracle=VoiceInkUITests/WritingFeaturesUITests.swift
+seed_oracle=VoiceInkTests/DictationHistoryUISeedLiveTests.swift
 resolved=VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
 selector='-only-testing:VoiceInkUITests/WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists'
 
@@ -373,8 +428,9 @@ mkdir -p "$out"
 phase=source-contract
 trap 'code=$?; if [[ -n "${observer_pid:-}" ]]; then stop_observer "$observer_folder" || true; fi; if [[ "$code" != 0 ]]; then printf "{\"classification\":\"invalid-or-failed\",\"boundary\":\"%s\",\"exit_code\":%s}\n" "$phase" "$code" > "$out/failure.json"; fi; exit "$code"' EXIT
 git ls-files --error-unmatch scripts/run-writing-settings-ui-regression.sh > /dev/null
-git diff --quiet HEAD -- VoiceInk VoiceInkCore VoiceInkNVIDIA VoiceInkQwen VoiceInk.xcodeproj iOS "$oracle" scripts/run-writing-feature-regression.sh scripts/run-writing-settings-ui-regression.sh
-test -z "$(git ls-files --others --exclude-standard -- VoiceInk VoiceInkCore VoiceInkNVIDIA VoiceInkQwen VoiceInk.xcodeproj iOS "$oracle")"
+git ls-files --error-unmatch "$seed_oracle" > /dev/null
+git diff --quiet HEAD -- VoiceInk VoiceInkCore VoiceInkNVIDIA VoiceInkQwen VoiceInk.xcodeproj iOS "$oracle" "$seed_oracle" scripts/run-writing-feature-regression.sh scripts/run-writing-settings-ui-regression.sh
+test -z "$(git ls-files --others --exclude-standard -- VoiceInk VoiceInkCore VoiceInkNVIDIA VoiceInkQwen VoiceInk.xcodeproj iOS "$oracle" "$seed_oracle")"
 candidate_sha="$(git rev-parse HEAD)"
 test "$candidate_sha" != "$baseline_sha"
 git fetch --no-tags origin "$baseline_sha"

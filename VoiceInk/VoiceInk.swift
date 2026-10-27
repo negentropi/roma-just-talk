@@ -200,7 +200,7 @@ struct VoiceInkApp: App {
 
     // MARK: - Container Creation Helpers
 
-    private static func createPersistentContainer(schema: Schema, logger: Logger) -> ModelContainer? {
+    static func createPersistentContainer(schema: Schema, logger: Logger) -> ModelContainer? {
         do {
             // Create app-specific Application Support directory URL
             let appSupportURL = VoiceInkMacOSStorageDirectories.appSupportDirectory

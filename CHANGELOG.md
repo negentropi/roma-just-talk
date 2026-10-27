@@ -2,6 +2,10 @@
 
 ## v1.95.2 - Unreleased
 
+- Add Light dictation cleanup and Clarity AI cleanup with Natural, Casual and Formal styles. Capture the chosen profile, libraries and Clarity provider when each operation starts; keep Custom settings saved.
+- Keep recognition text separately in History, with a Recognized view and a distinct cleanup-failure warning. Preserve original recognition when cleanup fails, including imports and retries.
+- Keep older recording, cancellation and reset completions from clearing a newer recording's captured context or delivering obsolete text.
+
 - Keep Local CLI processing from stalling on large input or output, and apply its timeout while input is being sent.
 
 - Keep the Ollama model named in Writing Action History consistent with the model sent in its captured request, including choices made in Ollama settings.

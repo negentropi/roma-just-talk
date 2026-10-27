@@ -176,8 +176,9 @@ expected = [value.removeprefix("-only-testing:") for value in sys.argv[2:]]
 payload = json.loads((directory / "selected-tests.json").read_text())
 if payload.get("errors"):
     raise SystemExit("Xcode reported test-enumeration errors")
-enabled = [test["identifier"] for plan in payload.get("values", []) for test in plan.get("enabledTests", [])]
-disabled = [test.get("identifier") for plan in payload.get("values", []) for test in plan.get("disabledTests", [])]
+expected = [value.removesuffix("()") for value in expected]
+enabled = [test["identifier"].removesuffix("()") for plan in payload.get("values", []) for test in plan.get("enabledTests", [])]
+disabled = [test.get("identifier", "").removesuffix("()") for plan in payload.get("values", []) for test in plan.get("disabledTests", [])]
 valid = len(enabled) == len(expected) and sorted(enabled) == sorted(expected) and not set(disabled).intersection(expected)
 (directory / "selection-receipt.json").write_text(json.dumps({"requested_identifiers": expected, "enabled_identifiers": enabled, "disabled_identifiers": disabled, "valid": valid}, indent=2) + "\n")
 if not valid:
@@ -252,6 +253,224 @@ if [[ "$mode" == live || "$mode" == regression ]]; then
   test -d "$debug_dir/onboarding-test-evidence/Debug.xcresult"
   codesign --verify --deep --strict "$debug_app"
 fi
+
+run_history_ui_phase() {
+  local seed_phase="$1" seed_root="$RUNNER_TEMP/writing-ui-proof/history-seed" seed_dir native_bundle native_name phase_exit=0
+  seed_dir="$seed_root/$seed_phase"
+  test ! -e "$seed_dir"
+  mkdir -p "$seed_dir" "$out/history-seed/$seed_phase"
+  native_bundle="$(python3 - "$debug_dir/Build/Products/Debug" <<'PY'
+import sys
+from pathlib import Path
+values = sorted(Path(sys.argv[1]).rglob('VoiceInkTests.xctest'))
+if len(values) != 1: raise SystemExit('Exactly one native test bundle is required for History seeding')
+print(values[0])
+PY
+)"
+  native_name="$(plutil -extract CFBundleExecutable raw -o - "$native_bundle/Contents/Info.plist")"
+  codesign --verify --deep --strict "$native_bundle"
+  shasum -a 256 "$debug_app/Contents/MacOS/roma just talk" "$native_bundle/Contents/MacOS/$native_name" > "$seed_dir/identity-before.txt"
+  codesign -d --verbose=4 "$debug_app" 2> "$seed_dir/app-signature-before.txt"
+  codesign -d --verbose=4 "$native_bundle" 2> "$seed_dir/test-bundle-signature-before.txt"
+  sudo sqlite3 -json '/Library/Application Support/com.apple.TCC/TCC.db' \
+    "SELECT service,client,client_type,auth_value,hex(csreq) AS csreq FROM access WHERE client='com.negentropi.RomaJustTalk' AND service='kTCCServiceAccessibility';" > "$seed_dir/system-tcc.json"
+  sqlite3 -json "$HOME/Library/Application Support/com.apple.TCC/TCC.db" \
+    "SELECT service,client,client_type,auth_value,hex(csreq) AS csreq FROM access WHERE client='com.negentropi.RomaJustTalk' AND service='kTCCServiceMicrophone';" > "$seed_dir/microphone-tcc.json"
+  cmp "$out/system-tcc.json" "$seed_dir/system-tcc.json"
+  cmp "$out/microphone-tcc.json" "$seed_dir/microphone-tcc.json"
+  if [[ "$seed_phase" == verify ]]; then
+    test "$(shasum -a 256 "$seed_root/seed/expected-inputs.sha256.json" | awk '{print $1}')" = "$history_expectations_sha256"
+  fi
+  select_tests liveDictationHistoryUISeed
+  if ! RJT_HISTORY_UI_SEED_CHECKS=1 TEST_RUNNER_RJT_HISTORY_UI_SEED_CHECKS=1 TEST_RUNNER_GITHUB_ACTIONS=true \
+    preflight_selected_tests "$seed_dir"; then
+    local receipt
+    for receipt in "$seed_dir"/*.json "$seed_dir"/*.txt "$seed_dir/enumeration.log"; do
+      if [[ -f "$receipt" ]]; then cp "$receipt" "$out/history-seed/$seed_phase/"; fi
+    done
+    return 1
+  fi
+  python3 - "$seed_dir" "$seed_root/seed" "$seed_phase" "$candidate_sha" "$debug_app/Contents/MacOS/roma just talk" "$repo_root" \
+    xcodebuild test-without-building "${arguments[@]}" "${selectors[@]}" -resultBundlePath "$seed_dir/Native.xcresult" <<'PY' || phase_exit=$?
+import hashlib
+import json
+import os
+import re
+import signal
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+directory, seed = map(Path, sys.argv[1:3])
+phase, source, executable, repo = sys.argv[3:7]
+command = sys.argv[7:]
+expected_support = Path.home() / 'Library/Application Support/com.negentropi.RomaJustTalk'
+store_paths = [str(expected_support / name) for name in ['default.store', 'dictionary.store', 'stats.store']]
+source_paths = ['VoiceInkTests/DictationHistoryUISeedLiveTests.swift', 'VoiceInk/VoiceInk.swift', 'VoiceInk/Models/Transcription.swift',
+                'VoiceInk/Models/VocabularyWord.swift', 'VoiceInk/Models/WordReplacement.swift', 'VoiceInk/Models/SessionMetric.swift',
+                'VoiceInkCore/Sources/VoiceInkCore/StoredAudioFile.swift', 'VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift']
+source_hashes = {name: hashlib.sha256((Path(repo) / name).read_bytes()).hexdigest() for name in source_paths}
+def require(value, message):
+    if not value: raise RuntimeError(message)
+def write(name, value):
+    temporary = directory / ('.' + name + '.tmp')
+    temporary.write_text(json.dumps(value, indent=2, sort_keys=True) + '\n')
+    temporary.replace(directory / name)
+def load(path):
+    return json.loads(path.read_text())
+def identity(pid):
+    run = subprocess.run(['ps', '-p', str(pid), '-ww', '-o', 'lstart=,comm='], text=True, capture_output=True)
+    if run.returncode or not run.stdout.strip(): return None
+    values = run.stdout.strip().split(None, 5)
+    require(len(values) == 6, 'Unable to read the native host executable and launch identity')
+    return (values[5], ' '.join(values[:5]))
+def open_stores():
+    files = [Path(path + suffix) for path in store_paths for suffix in ['', '-wal', '-shm'] if Path(path + suffix).exists()]
+    require(files, 'Normal store files were not created by app startup')
+    result = subprocess.run(['lsof', '-n', '-P', '-Fpn', '--', *map(str, files)], text=True, capture_output=True)
+    require(result.returncode in (0, 1), 'Normal-store lsof inspection failed')
+    require(not result.stderr.strip(), 'Normal-store lsof inspection emitted an error')
+    pid = None
+    holders = []
+    for line in result.stdout.splitlines():
+        if line.startswith('p'): pid = int(line[1:])
+        elif line.startswith('n'): holders.append({'pid': pid, 'path': line[1:]})
+    return holders
+def close_host(seen):
+    current = identity(seen['hostPID'])
+    if current is not None:
+        require(current == (executable, seen['startedAt']), 'Refuse to terminate a reused or unrelated test-host PID')
+        try: os.kill(seen['hostPID'], signal.SIGTERM)
+        except ProcessLookupError: pass
+        deadline = time.monotonic() + 15
+        while identity(seen['hostPID']) is not None and time.monotonic() < deadline: time.sleep(0.1)
+    require(identity(seen['hostPID']) is None, 'The owned native host did not exit')
+    require(all(Path(path).is_file() and not Path(path).is_symlink() for path in store_paths), 'All three normal main stores must remain regular files after host exit')
+    require(not open_stores(), 'Normal stores still have open descriptors after host exit')
+    files = [Path(path + suffix) for path in store_paths for suffix in ['', '-wal', '-shm'] if Path(path + suffix).exists()]
+    require(all(path.is_file() and not path.is_symlink() for path in files), 'Normal store hashes require regular closed files')
+    write('closed-write.json', {'valid': True, 'hostPID': seen['hostPID'], 'executablePath': executable,
+                              'hostExited': True, 'normalStoresHaveNoOpenDescriptors': True,
+                              'checkedBeforeNextAppLaunch': True, 'files': {str(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in files}})
+require(os.environ.get('GITHUB_ACTIONS') == 'true' and os.environ.get('RUNNER_ENVIRONMENT') == 'github-hosted', 'Native History seed requires the disposable hosted runner')
+write('source-inputs.json', {'sourceSHA': source, 'sha256': source_hashes})
+settings = {'RJT_HISTORY_UI_SEED_CHECKS': '1', 'GITHUB_ACTIONS': 'true', 'RUNNER_ENVIRONMENT': 'github-hosted',
+            'RJT_HISTORY_UI_PHASE': phase, 'RJT_HISTORY_UI_SOURCE_SHA': source,
+            'RJT_HISTORY_UI_EXPECTED_EXE': executable, 'RJT_HISTORY_UI_EVIDENCE': str(directory),
+            'RJT_HISTORY_UI_SEED_EVIDENCE': str(seed), 'RUNNER_TEMP': os.environ['RUNNER_TEMP']}
+environment = dict(os.environ, **settings, **{'TEST_RUNNER_' + key: value for key, value in settings.items()})
+expected_files = ['expected-rows.json', 'expected-libraries.json']
+if phase == 'verify':
+    frozen = load(seed / 'expected-inputs.sha256.json')
+    require(all(hashlib.sha256((seed / name).read_bytes()).hexdigest() == frozen[name] for name in expected_files), 'The seed expectation receipts changed during UI checks')
+seen = None
+deadline = time.monotonic() + 600
+with (directory / 'tests.log').open('xb') as log:
+    process = subprocess.Popen(command, cwd=repo, env=environment, stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
+    try:
+        while process.poll() is None:
+            observation_path = directory / 'observation.json'
+            if seen is None and observation_path.is_file():
+                observed = load(observation_path)
+                pid = observed.get('hostPID')
+                require(type(pid) is int and pid > 0 and pid != process.pid, 'Native seed must identify the actual hosted app PID')
+                current = identity(pid)
+                require(current is not None and current[0] == executable == observed.get('executablePath'), 'Native seed host executable differs from the signed app')
+                require(observed.get('sourceSHA') == source and observed.get('appSupportDirectory') == str(expected_support), 'Native seed source or normal Support path differs')
+                require(observed.get('storePaths') == store_paths, 'Native seed normal-store filenames differ')
+                holders = open_stores()
+                require(all(value['pid'] == pid for value in holders), 'Another process has a normal store open during the native seed')
+                opened = {value['path'] for value in holders}
+                if set(store_paths).issubset(opened):
+                    seen = {'hostPID': pid, 'executablePath': executable, 'startedAt': current[1], 'openedStorePaths': store_paths, 'observedLive': True, 'openDescriptors': holders}
+                    write('host-live.json', seen)
+                    write('host-observed.json', {'hostPID': pid, 'executablePath': executable, 'openedStorePaths': store_paths})
+            require(time.monotonic() < deadline, 'Native History seed exceeded its bounded deadline')
+            time.sleep(0.05)
+    except BaseException:
+        try: os.killpg(process.pid, signal.SIGTERM)
+        except ProcessLookupError: pass
+        try: process.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            try: os.killpg(process.pid, signal.SIGKILL)
+            except ProcessLookupError: pass
+            process.wait()
+        if seen is not None: close_host(seen)
+        raise
+require(seen is not None, 'The actual normal-store app host was not observed')
+close_host(seen)
+text = (directory / 'tests.log').read_text(errors='replace')
+name = 'liveDictationHistoryUISeed'
+starts = re.findall(r'\bTest ' + name + r'\(\) started\.', text)
+finishes = re.findall(r'\bTest ' + name + r'\(\) (passed|failed|skipped) after ', text)
+totals = re.findall(r'Test run with (\d+) tests? in \d+ suites? (passed|failed)', text)
+require(process.returncode == 0 and len(starts) == 1 and finishes == ['passed'] and totals == [('1', 'passed')], 'Native History seed requires one executed pass and zero skips')
+require('recorded an issue' not in text and ': error:' not in text, 'Native History seed recorded an issue')
+observed = load(directory / 'observation.json')
+require(observed.get('classification') == 'passed' and observed.get('phase') == phase, 'Native History seed did not finish its real normal-store phase')
+require(observed.get('explicitSaveCompleted') is (phase == 'seed') and observed.get('verificationReadOnly') is (phase == 'verify'), 'Native History seed save/read-only boundary differs')
+provenance = load(directory / 'store-provenance.json')
+require(provenance.get('sourceSHA') == source and provenance.get('hostPID') == seen['hostPID'], 'Native store provenance identity differs')
+require(provenance.get('factorySourceSHA256') == hashlib.sha256((Path(repo) / 'VoiceInk/VoiceInk.swift').read_bytes()).hexdigest(), 'Native store factory source changed')
+factory_source = (Path(repo) / 'VoiceInk/VoiceInk.swift').read_text()
+factory_start = 'static func createPersistentContainer(schema: Schema, logger: Logger) -> ModelContainer? {'
+factory_end = '    private static func createInMemoryContainer(schema: Schema, logger: Logger) -> ModelContainer? {'
+require(factory_source.count(factory_start) == factory_source.count(factory_end) == 1, 'Persistent factory source anchors changed')
+factory = factory_source[factory_source.index(factory_start):factory_source.index(factory_end)]
+require(provenance.get('factoryBodySHA256') == hashlib.sha256(factory.encode()).hexdigest(), 'Native seed factory body hash differs')
+require(provenance.get('schemaSHA256') == hashlib.sha256((directory / 'schema-raw.json').read_bytes()).hexdigest(), 'Native schema receipt hash differs')
+require(provenance.get('modelTypes') == ['VoiceInk.Transcription', 'VoiceInk.VocabularyWord', 'VoiceInk.WordReplacement', 'VoiceInk.SessionMetric'], 'Native seed model namespace differs from production')
+configurations = provenance.get('configurations', [])
+require(len(configurations) == 3 and {value.get('url') for value in configurations} == set(store_paths), 'Native History seed did not use all three normal stores')
+require(all(value.get('isStoredInMemoryOnly') is False and value.get('cloudKitContainerIdentifier') is None and value.get('groupAppContainerIdentifier') is None for value in configurations), 'Native History seed used a memory, shared-group or CloudKit store')
+require(load(directory / 'rows.json') == load(seed / 'expected-rows.json'), 'Native History rows differ from the frozen seed expectations')
+require(load(directory / 'libraries.json') == load(seed / 'expected-libraries.json'), 'Native libraries differ from the frozen seed expectations')
+require(all(hashlib.sha256((Path(repo) / name).read_bytes()).hexdigest() == expected for name, expected in source_hashes.items()), 'Native History seed source bytes changed')
+if phase == 'seed':
+    (seed / 'expected-inputs.sha256.json').write_text(json.dumps({name: hashlib.sha256((seed / name).read_bytes()).hexdigest() for name in expected_files}, indent=2) + '\n')
+write('result.json', {'valid': True, 'phase': phase, 'testName': name, 'sourceSHA': source, 'exit_code': process.returncode,
+                      'hostPID': seen['hostPID'], 'closedBeforeUI': phase == 'seed', 'closedAfterUI': phase == 'verify', 'normalStorePaths': store_paths,
+                      'normalFactoryReused': True, 'saveCompleted': phase == 'seed', 'verificationReadOnly': phase == 'verify'})
+PY
+  mkdir -p "$out/history-seed/$seed_phase"
+  cp "$seed_dir"/*.json "$seed_dir"/*.txt "$out/history-seed/$seed_phase/"
+  if [[ -f "$seed_dir/tests.log" ]]; then
+    sed -n '/Test liveDictationHistoryUISeed()/p;/Test run with /p;/recorded an issue/p;/: error:/p' "$seed_dir/tests.log" > "$out/history-seed/$seed_phase/tests-excerpt.txt"
+  fi
+  if [[ "$phase_exit" != 0 ]]; then
+    printf '{"valid":false,"phase":"%s","driver_exit_code":%s}\n' "$seed_phase" "$phase_exit" > "$out/history-seed/$seed_phase/failure.json"
+    if [[ -f "$seed_dir/tests.log" ]]; then tail -n 100 "$seed_dir/tests.log" >&2; fi
+    return "$phase_exit"
+  fi
+  shasum -a 256 "$debug_app/Contents/MacOS/roma just talk" "$native_bundle/Contents/MacOS/$native_name" > "$seed_dir/identity-after.txt"
+  codesign -d --verbose=4 "$debug_app" 2> "$seed_dir/app-signature-after.txt"
+  codesign -d --verbose=4 "$native_bundle" 2> "$seed_dir/test-bundle-signature-after.txt"
+  cmp "$seed_dir/identity-before.txt" "$seed_dir/identity-after.txt"
+  cmp "$seed_dir/app-signature-before.txt" "$seed_dir/app-signature-after.txt"
+  cmp "$seed_dir/test-bundle-signature-before.txt" "$seed_dir/test-bundle-signature-after.txt"
+  verify_lock "$repo_root"
+  cp "$seed_dir"/*.json "$seed_dir"/*.txt "$out/history-seed/$seed_phase/"
+  if [[ "$seed_phase" == seed ]]; then
+    history_expectations_sha256="$(shasum -a 256 "$seed_dir/expected-inputs.sha256.json" | awk '{print $1}')"
+  fi
+  if [[ "$seed_phase" == verify ]]; then
+    cmp "$out/history-seed/seed/identity-before.txt" "$seed_dir/identity-after.txt"
+    cmp "$out/history-seed/seed/app-signature-before.txt" "$seed_dir/app-signature-after.txt"
+    cmp "$out/history-seed/seed/test-bundle-signature-before.txt" "$seed_dir/test-bundle-signature-after.txt"
+    cmp "$out/history-seed/seed/source-inputs.json" "$seed_dir/source-inputs.json"
+    python3 - "$out/history-seed" <<'PY'
+import json
+import sys
+from pathlib import Path
+root = Path(sys.argv[1])
+seed, verified = [json.loads((root / phase / 'result.json').read_text()) for phase in ['seed', 'verify']]
+if not (seed['valid'] and verified['valid'] and seed['sourceSHA'] == verified['sourceSHA'] and seed['hostPID'] != verified['hostPID'] and seed['closedBeforeUI'] and verified['closedAfterUI']):
+    raise SystemExit('History requires distinct native hosts with closed stores before and after the six UI cases')
+(root / 'result.json').write_text(json.dumps({'valid': True, 'testName': 'liveDictationHistoryUISeed', 'sourceSHA': seed['sourceSHA'], 'closedBeforeUI': True, 'verifiedAfterUI': True, 'seed': seed, 'verify': verified, 'scope': 'Synthetic normal-store History input plus read-only native verification; no ASR or migration proof'}, indent=2) + '\n')
+PY
+  fi
+}
 
 case "$mode" in
   live)
@@ -413,8 +632,11 @@ PY
     phase=ui-build
     trap 'code=$?; if [[ "$code" != 0 ]]; then printf "{\"classification\":\"invalid-or-failed\",\"boundary\":\"%s\",\"exit_code\":%s}\n" "$phase" "$code" > "$out/failure.json"; fi' EXIT
     test_arguments "$repo_root" "$debug_dir"
-    ui_selector='-only-testing:VoiceInkUITests/WritingFeaturesUITests'
-    if ! xcodebuild build-for-testing "${arguments[@]}" "$ui_selector" > "$out/build.log" 2>&1; then
+    ui_selectors=()
+    while IFS= read -r selector; do ui_selectors+=("$selector"); done < <(bash scripts/run-writing-settings-ui-regression.sh --candidate-selectors)
+    test "${#ui_selectors[@]}" = 6
+    seed_selector='-only-testing:VoiceInkTests/VoiceInkTests/liveDictationHistoryUISeed()'
+    if ! xcodebuild build-for-testing "${arguments[@]}" "${ui_selectors[@]}" "$seed_selector" > "$out/build.log" 2>&1; then
       printf '{"classification":"invalid","boundary":"ui-build"}\n' > "$out/result.json"
       tail -n 120 "$out/build.log" >&2
       exit 1
@@ -476,12 +698,20 @@ for name, service in [("system-tcc.json", "kTCCServiceAccessibility"), ("microph
 PY
     ui_identity > "$out/identity-before.txt"
     ui_signatures before
+    phase=history-seed
+    run_history_ui_phase seed
+    phase=ui-selection
+    selectors=("${ui_selectors[@]}")
+    RJT_WRITING_UI_CHECKS=1 TEST_RUNNER_RJT_WRITING_UI_CHECKS=1 TEST_RUNNER_GITHUB_ACTIONS=true \
+      preflight_selected_tests "$out/selection"
     phase=ui-tests
     test_exit=0
     RJT_WRITING_UI_CHECKS=1 TEST_RUNNER_RJT_WRITING_UI_CHECKS=1 \
       TEST_RUNNER_GITHUB_ACTIONS=true \
-      xcodebuild test-without-building "${arguments[@]}" "$ui_selector" \
+      xcodebuild test-without-building "${arguments[@]}" "${ui_selectors[@]}" \
         -resultBundlePath "$out/UI.xcresult" > "$out/tests.log" 2>&1 || test_exit=$?
+    phase=history-verify
+    run_history_ui_phase verify
     export_exit=0
     xcrun xcresulttool export attachments --path "$out/UI.xcresult" \
       --output-path "$out/screenshots" > "$out/screenshot-export.log" 2>&1 || export_exit=$?
@@ -505,34 +735,7 @@ PY
     done
     codesign --verify --deep --strict "$debug_app"
     codesign --verify --deep --strict "$ui_runner"
-    if ! python3 - "$out/tests.log" "$test_exit" "$out/result.json" <<'PY'
-import json
-import re
-import sys
-from pathlib import Path
-
-log_path, exit_code, output = sys.argv[1:]
-text = Path(log_path).read_text(errors="replace")
-names = [
-    "testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch",
-    "testCSVImportPreviewsMultilineContentBeforeReplacing",
-    "testTranslationTargetsReorderSelectAndPersist",
-    "testDictationProfilePreservesCustomSettingsAndPersists",
-]
-observations = {}
-for name in names:
-    prefix = r"Test Case '[^'\n]*WritingFeaturesUITests[ ./]" + re.escape(name) + r"(?:\(\))?\]?' "
-    started = re.findall(prefix + r"started\.", text)
-    finished = re.findall(prefix + r"(passed|failed|skipped)", text)
-    observations[name] = {"starts": len(started), "results": finished}
-counts = re.findall(r"Executed (\d+) tests?,[^\n]*?with (\d+) failures?", text)
-valid = int(exit_code) == 0 and bool(counts) and all(
-    int(count) == 4 and int(failures) == 0 for count, failures in counts
-) and all(value == {"starts": 1, "results": ["passed"]} for value in observations.values())
-Path(output).write_text(json.dumps({"classification": "passed" if valid else "invalid-or-failed", "exit_code": int(exit_code), "tests": observations}, indent=2) + "\n")
-if not valid:
-    raise SystemExit("UI verification requires exactly four started, passed tests and no skips")
-PY
+    if ! bash scripts/run-writing-settings-ui-regression.sh --classify-candidate "$out/tests.log" "$test_exit" "$out/result.json"
     then
       tail -n 120 "$out/tests.log" >&2
       exit 1

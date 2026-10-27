@@ -238,6 +238,250 @@ final class WritingFeaturesUITests: XCTestCase {
         exerciseOtherSettingsSheets(in: app, preferences: preferences)
     }
 
+    @MainActor func testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings() throws {
+        let (app, ownership) = try prepareApp()
+        let preferences = try WritingFeaturesDictationPreferences()
+        addTeardownBlock {
+            guard ownership.terminateOwnedApplications() else {
+                XCTFail("The owned app did not exit; retained profile/style preferences.")
+                return
+            }
+            XCTAssertTrue(preferences.restore())
+        }
+        try preferences.install(clarityStyle: "natural")
+        try launchApp(app, ownership: ownership)
+        assertSeededDictionaryLibrary(in: app)
+        let trigger = "ui profile library " + UUID().uuidString.lowercased()
+        let content = "\r\nProfile library Cafe\u{301} 👩🏽‍💻\r\n"
+        let snippetOwnership = try WritingFeaturesSnippetOwnership(trigger: trigger)
+        addTeardownBlock {
+            guard ownership.terminateOwnedApplications() else {
+                XCTFail("The owned app did not exit; retained its snippet for inspection.")
+                return
+            }
+            XCTAssertTrue(snippetOwnership.restore(), "The snippet library changed outside the owned entry.")
+        }
+        openSnippets(in: app)
+        createSnippet(trigger: trigger, content: content, in: app)
+        guard let libraries = preferences.panelValues() else {
+            XCTFail("Unable to snapshot the nonempty snippet library.")
+            return
+        }
+
+        openModelSettings(in: app)
+        assertAllProfiles("Custom", storedValue: "custom", preferences: preferences, in: app)
+        assertClarityStyle("Natural", storedValue: "natural", enabled: false, preferences: preferences, in: app)
+        for (title, value) in [("None", "none"), ("Light", "light"), ("Clarity", "clarity")] {
+            selectProfile(title, preferences: preferences, in: app)
+            assertAllProfiles(title, storedValue: value, preferences: preferences, in: app)
+            assertClarityStyle("Natural", storedValue: "natural", enabled: title == "Clarity", preferences: preferences, in: app)
+            XCTAssertTrue(preferences.panelValuesAreUnchanged(from: libraries))
+            attachScreenshot(app, named: title + " profile and retained library settings")
+        }
+        for (title, value) in [("Natural", "natural"), ("Casual", "casual"), ("Formal", "formal")] {
+            let style = app.radioButtons[title]
+            revealModelSettingsControl(style, preferences: preferences, in: app)
+            XCTAssertTrue(style.isEnabled && style.isHittable)
+            style.click()
+            assertClarityStyle(title, storedValue: value, enabled: true, preferences: preferences, in: app)
+            XCTAssertTrue(preferences.panelValuesAreUnchanged(from: libraries))
+            attachScreenshot(app, named: "Clarity " + title + " style")
+        }
+        for (title, value) in [("Light", "light"), ("Custom", "custom")] {
+            selectProfile(title, preferences: preferences, in: app)
+            assertAllProfiles(title, storedValue: value, preferences: preferences, in: app)
+            assertClarityStyle("Formal", storedValue: "formal", enabled: false, preferences: preferences, in: app)
+        }
+        revealModelSettingsControl(identified("transcriptionSettings.paragraphBreaks", in: app),
+                                   preferences: preferences, towardTop: true, in: app)
+        assertCustomFormatting(isEnabled: true, preferences: preferences, in: app)
+        selectProfile("Clarity", preferences: preferences, in: app)
+        closeModelSettings(in: app)
+        openModelSettings(in: app)
+        assertAllProfiles("Clarity", storedValue: "clarity", preferences: preferences, in: app)
+        assertClarityStyle("Formal", storedValue: "formal", enabled: true, preferences: preferences, in: app)
+        app.terminate()
+        try launchApp(app, ownership: ownership)
+        openModelSettings(in: app)
+        assertAllProfiles("Clarity", storedValue: "clarity", preferences: preferences, in: app)
+        assertClarityStyle("Formal", storedValue: "formal", enabled: true, preferences: preferences, in: app)
+        XCTAssertTrue(preferences.panelValuesAreUnchanged(from: libraries))
+        attachScreenshot(app, named: "Clarity Formal persisted after relaunch")
+        closeModelSettings(in: app, usingKeyboard: true)
+        assertSeededDictionaryLibrary(in: app)
+        openSnippets(in: app)
+        searchSnippets(trigger, in: app)
+        let edit = snippetRow(trigger, in: app).buttons["snippets.row.edit"]
+        reveal(edit, identifier: "snippets.row.edit", in: app)
+        edit.click()
+        assertExactText(content, in: app.textViews["snippets.editor.content"])
+        app.buttons["snippets.editor.cancel"].click()
+        deleteSnippet(trigger, in: app)
+    }
+
+    @MainActor func testHistoryPreservesRecognizedFallbackAndLegacyVariants() throws {
+        let (app, ownership) = try prepareApp()
+        let preferences = try WritingFeaturesDictationPreferences()
+        let clipboard = try WritingFeaturesPasteboardOwnership()
+        addTeardownBlock {
+            guard ownership.terminateOwnedApplications() else {
+                XCTFail("The owned app did not exit; retained History UI preferences and pasteboard.")
+                return
+            }
+            let preferencesRestored = preferences.restore()
+            let clipboardRestored = clipboard.restore()
+            XCTAssertTrue(preferencesRestored)
+            XCTAssertTrue(clipboardRestored, "The pasteboard changed ownership before restoration.")
+        }
+        try preferences.install(clarityStyle: "natural")
+        try launchApp(app, ownership: ownership)
+        XCTAssertEqual(preferences.profile(), "custom")
+        XCTAssertEqual(preferences.clarityStyle(), "natural")
+        XCTAssertNotEqual(Array(HistoryUIFixture.recognized.utf8), Array(HistoryUIFixture.processed.utf8))
+
+        for fixture in HistoryUIFixture.rows {
+            let row = openHistoryRow(fixture.id, search: fixture.search, in: app)
+            let available = row.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "history.variant."))
+            XCTAssertEqual(available.count, fixture.variants.count > 1 ? fixture.variants.count : 0)
+            if let cleanup = fixture.cleanup {
+                let label = identified("history.capturedCleanup", in: row)
+                XCTAssertTrue(label.waitForExistence(timeout: 5))
+                XCTAssertTrue(containsText(cleanup, in: label))
+            } else {
+                XCTAssertFalse(identified("history.capturedCleanup", in: row).exists)
+            }
+            if let failure = fixture.failure {
+                let warning = identified("history.processingWarning", in: row)
+                XCTAssertTrue(warning.exists)
+                XCTAssertTrue(containsText("Clarity cleanup didn’t finish", in: warning))
+                XCTAssertTrue(containsText("The recognized text was kept unchanged as Original. Nothing was removed.", in: warning))
+                assertExactText(failure, in: row.staticTexts["history.processingWarning.reason"])
+                XCTAssertFalse(row.buttons["history.variant.enhanced"].exists)
+            } else {
+                XCTAssertFalse(identified("history.processingWarning", in: row).exists)
+            }
+            XCTAssertEqual(row.buttons["history.variant.recognized"].exists, fixture.variants.contains { $0.name == "recognized" })
+            for variant in fixture.variants {
+                if fixture.variants.count > 1 {
+                    let tab = row.buttons["history.variant." + variant.name]
+                    XCTAssertTrue(tab.exists && tab.isEnabled)
+                    XCTAssertEqual(tab.label, ["recognized": "Recognized", "original": "Original", "enhanced": "Enhanced"][variant.name])
+                    reveal(tab, identifier: "history.row." + fixture.id, in: app)
+                    tab.click()
+                }
+                let text = row.staticTexts["history.text." + variant.name]
+                assertExactText(variant.text, in: text)
+                let copy = row.buttons["history.copy." + variant.name]
+                XCTAssertTrue(copy.waitForExistence(timeout: 5))
+                reveal(copy, identifier: "history.row." + fixture.id, in: app)
+                XCTAssertTrue(copy.isEnabled && copy.isHittable)
+                XCTAssertTrue(clipboard.installMarker(), "The pasteboard no longer belonged to this UI case.")
+                let previousChange = NSPasteboard.general.changeCount
+                copy.click()
+                XCTAssertTrue(waitUntil { NSPasteboard.general.changeCount != previousChange })
+                let copied = try XCTUnwrap(NSPasteboard.general.string(forType: .string))
+                XCTAssertEqual(Array(copied.utf8), Array(variant.text.utf8))
+                XCTAssertEqual(Array(copied.utf16), Array(variant.text.utf16))
+                XCTAssertTrue(clipboard.captureOwnedCopy(expected: variant.text))
+                attachScreenshot(app, named: "History " + fixture.search + " " + variant.name)
+            }
+        }
+        app.terminate()
+        try launchApp(app, ownership: ownership)
+        let saved = openHistoryRow(HistoryUIFixture.successID, search: "RJT History recognized", in: app)
+        XCTAssertTrue(containsText("Cleanup: Clarity · Formal", in: identified("history.capturedCleanup", in: saved)))
+        XCTAssertTrue(saved.buttons["history.variant.recognized"].exists)
+        attachScreenshot(app, named: "History captured Clarity Formal survives relaunch")
+    }
+
+    @MainActor private func selectProfile(
+        _ title: String, preferences: WritingFeaturesDictationPreferences, in app: XCUIApplication
+    ) {
+        let choice = profileChoice(title, in: app)
+        revealModelSettingsControl(choice, preferences: preferences, towardTop: true, in: app)
+        XCTAssertTrue(choice.isEnabled && choice.isHittable)
+        choice.click()
+    }
+
+    @MainActor private func assertAllProfiles(
+        _ title: String, storedValue: String, preferences: WritingFeaturesDictationPreferences, in app: XCUIApplication
+    ) {
+        let picker = identified("dictationProfile.picker", in: app)
+        XCTAssertEqual(picker.radioButtons.count, 4)
+        for name in ["Custom", "None", "Light", "Clarity"] {
+            XCTAssertTrue(profileChoice(name, in: app).exists)
+            XCTAssertTrue(waitUntil {
+                String(describing: self.profileChoice(name, in: app).value ?? "") == (name == title ? "1" : "0")
+            })
+        }
+        XCTAssertTrue(waitUntil { preferences.profile() == storedValue })
+        XCTAssertTrue(preferences.customSettingsAreUnchanged())
+    }
+
+    @MainActor private func assertClarityStyle(
+        _ title: String, storedValue: String, enabled: Bool,
+        preferences: WritingFeaturesDictationPreferences, in app: XCUIApplication
+    ) {
+        let picker = identified("dictationProfile.clarityStyle.picker", in: app)
+        revealModelSettingsControl(picker, preferences: preferences, in: app)
+        XCTAssertEqual(picker.radioButtons.count, 3)
+        for name in ["Natural", "Casual", "Formal"] {
+            let choice = app.radioButtons[name]
+            XCTAssertTrue(choice.exists)
+            XCTAssertEqual(choice.isEnabled, enabled)
+            XCTAssertTrue(waitUntil { String(describing: choice.value ?? "") == (name == title ? "1" : "0") })
+        }
+        XCTAssertTrue(waitUntil { preferences.clarityStyle() == storedValue })
+        XCTAssertTrue(preferences.customSettingsAreUnchanged())
+    }
+
+    @MainActor private func assertSeededDictionaryLibrary(in app: XCUIApplication) {
+        mainWindow(in: app).buttons["Dictionary"].click()
+        let replacements = identified("dictionary.section.wordReplacements", in: app)
+        XCTAssertTrue(replacements.waitForExistence(timeout: 5))
+        reveal(replacements, identifier: "dictionary.section.wordReplacements", in: app)
+        replacements.click()
+        for expected in ["RJT UI library source", "RJT UI library target Café 👩🏽‍💻\r\n"] {
+            assertLiteralLibraryText(expected, in: app)
+        }
+        let vocabulary = identified("dictionary.section.vocabulary", in: app)
+        reveal(vocabulary, identifier: "dictionary.section.vocabulary", in: app)
+        vocabulary.click()
+        assertLiteralLibraryText("RJT UI vocabulary Cafe\u{301}", in: app)
+        attachScreenshot(app, named: "Profile switching preserves the seeded vocabulary library")
+    }
+
+    @MainActor private func assertLiteralLibraryText(_ expected: String, in app: XCUIApplication) {
+        let texts = app.staticTexts.matching(NSPredicate(format: "label == %@ OR value == %@", expected, expected))
+        XCTAssertTrue(texts.firstMatch.waitForExistence(timeout: 5))
+        XCTAssertEqual(texts.count, 1, "The owned library sentinel was not unique.")
+        assertExactText(expected, in: texts.firstMatch)
+    }
+
+    @MainActor private func openHistoryRow(_ id: String, search: String, in app: XCUIApplication) -> XCUIElement {
+        mainWindow(in: app).buttons["past"].click()
+        let searchField = app.textFields["history.search"]
+        XCTAssertTrue(searchField.waitForExistence(timeout: 5))
+        replaceText(in: searchField, with: search)
+        let rows = app.descendants(matching: .any).matching(identifier: "history.row." + id)
+        XCTAssertTrue(rows.firstMatch.waitForExistence(timeout: 10))
+        XCTAssertEqual(rows.count, 1)
+        let row = rows.firstMatch
+        let expand = identified("history.row." + id + ".expand", in: row)
+        XCTAssertTrue(expand.exists)
+        reveal(expand, identifier: "history.row." + id, in: app)
+        expand.click()
+        XCTAssertTrue(row.staticTexts["history.text.original"].waitForExistence(timeout: 5))
+        return row
+    }
+
+    @MainActor private func assertExactText(_ expected: String, in element: XCUIElement) {
+        XCTAssertTrue(element.waitForExistence(timeout: 5))
+        let actual = element.value as? String ?? element.label
+        XCTAssertEqual(Array(actual.utf8), Array(expected.utf8))
+        XCTAssertEqual(Array(actual.utf16), Array(expected.utf16))
+    }
+
     @MainActor private func prepareApp() throws -> (XCUIApplication, WritingFeaturesAppOwnership) {
         let ownership = try WritingFeaturesAppOwnership()
         let shortcuts = try WritingFeaturesShortcutPreferences()
@@ -855,9 +1099,143 @@ final class WritingFeaturesUITests: XCTestCase {
     }
 }
 
+private enum HistoryUIFixture {
+    struct Row {
+        let id: String
+        let search: String
+        let cleanup: String?
+        let failure: String?
+        let variants: [(name: String, text: String)]
+    }
+    static let successID = "A1000000-0000-4000-8000-000000000002"
+    static let recognized = "RJT History recognized\r\nCafe\u{301} 👩🏽‍💻\u{00A0}42\r\n"
+    static let processed = "RJT History recognized\r\nCafé 👩🏽‍💻\u{00A0}42\r\n"
+    static let rows = [
+        Row(id: "A1000000-0000-4000-8000-000000000001", search: "RJT History legacy", cleanup: nil, failure: nil,
+            variants: [("original", "RJT History legacy\r\nCafe\u{301} 👩🏽‍💻\r\n"), ("enhanced", "RJT legacy enhanced — 42")]),
+        Row(id: successID, search: "RJT History recognized", cleanup: "Cleanup: Clarity · Formal", failure: nil,
+            variants: [("recognized", recognized), ("original", processed), ("enhanced", "RJT Clarity polished — Café 👩🏽‍💻 42\r\n")]),
+        Row(id: "A1000000-0000-4000-8000-000000000003", search: "RJT History fallback", cleanup: "Cleanup: Clarity · Casual",
+            failure: "RJT fixture provider unavailable — raw text kept",
+            variants: [("original", "RJT History fallback\r\nCafe\u{301} 👩🏽‍💻\r\n")]),
+        Row(id: "A1000000-0000-4000-8000-000000000004", search: "RJT History unknown", cleanup: nil, failure: nil,
+            variants: [("original", "RJT History unknown\r\nCafe\u{301} 👩🏽‍💻\r\n")])
+    ]
+}
+
+private final class WritingFeaturesPasteboardOwnership {
+    private let savedItems: [[(NSPasteboard.PasteboardType, Data)]]
+    private var lastOwnedChange: Int
+
+    init() throws {
+        let pasteboard = NSPasteboard.general
+        let count = pasteboard.changeCount
+        savedItems = try Self.snapshot(pasteboard)
+        guard pasteboard.changeCount == count else { throw WritingFeaturesUIError.pasteboardOwnershipChanged }
+        lastOwnedChange = count
+    }
+
+    func installMarker() -> Bool {
+        let pasteboard = NSPasteboard.general
+        guard pasteboard.changeCount == lastOwnedChange else { return false }
+        let marker = "RJT owned copy marker " + UUID().uuidString
+        pasteboard.clearContents()
+        guard pasteboard.setString(marker, forType: .string) else { return false }
+        let count = pasteboard.changeCount
+        guard pasteboard.string(forType: .string) == marker, pasteboard.changeCount == count else { return false }
+        lastOwnedChange = count
+        return true
+    }
+
+    func captureOwnedCopy(expected: String) -> Bool {
+        let pasteboard = NSPasteboard.general
+        let count = pasteboard.changeCount
+        guard let value = pasteboard.string(forType: .string),
+              value.utf8.elementsEqual(expected.utf8), value.utf16.elementsEqual(expected.utf16),
+              pasteboard.changeCount == count else { return false }
+        lastOwnedChange = count
+        return true
+    }
+
+    func restore() -> Bool {
+        let pasteboard = NSPasteboard.general
+        guard pasteboard.changeCount == lastOwnedChange else { return false }
+        pasteboard.clearContents()
+        let items = savedItems.map { values in
+            let item = NSPasteboardItem()
+            for (type, data) in values { item.setData(data, forType: type) }
+            return item
+        }
+        guard items.isEmpty || pasteboard.writeObjects(items) else { return false }
+        let count = pasteboard.changeCount
+        guard let restored = try? Self.snapshot(pasteboard), pasteboard.changeCount == count,
+              restored.count == savedItems.count else { return false }
+        return zip(restored, savedItems).allSatisfy { actual, expected in
+            actual.count == expected.count && zip(actual, expected).allSatisfy { lhs, rhs in lhs.0 == rhs.0 && lhs.1 == rhs.1 }
+        }
+    }
+
+    private static func snapshot(_ pasteboard: NSPasteboard) throws -> [[(NSPasteboard.PasteboardType, Data)]] {
+        try (pasteboard.pasteboardItems ?? []).map { item in
+            try item.types.sorted { $0.rawValue < $1.rawValue }.map { type in
+                guard let data = item.data(forType: type) else { throw WritingFeaturesUIError.pasteboardSnapshotUnavailable }
+                return (type, data)
+            }
+        }
+    }
+}
+
+private final class WritingFeaturesSnippetOwnership {
+    private static let bundleIdentifier = "com.negentropi.RomaJustTalk" as CFString
+    private static let key = "VoiceInkSpokenSnippets" as CFString
+    private let trigger: String
+    private let saved: Data?
+    private let originalRows: [[String: Any]]
+
+    init(trigger: String) throws {
+        self.trigger = trigger
+        guard CFPreferencesAppSynchronize(Self.bundleIdentifier) else { throw WritingFeaturesUIError.preferenceSyncFailed }
+        let value = CFPreferencesCopyValue(Self.key, Self.bundleIdentifier, kCFPreferencesCurrentUser, kCFPreferencesAnyHost)
+        if let value {
+            guard let data = value as? Data,
+                  let rows = try JSONSerialization.jsonObject(with: data) as? [[String: Any]] else {
+                throw WritingFeaturesUIError.preferenceSyncFailed
+            }
+            saved = data
+            originalRows = rows
+        } else {
+            saved = nil
+            originalRows = []
+        }
+        guard !originalRows.contains(where: { ($0["trigger"] as? String)?.utf8.elementsEqual(trigger.utf8) == true }) else {
+            throw WritingFeaturesUIError.preferenceSyncFailed
+        }
+    }
+
+    func restore() -> Bool {
+        guard CFPreferencesAppSynchronize(Self.bundleIdentifier) else { return false }
+        let value = CFPreferencesCopyValue(Self.key, Self.bundleIdentifier, kCFPreferencesCurrentUser, kCFPreferencesAnyHost)
+        let rows: [[String: Any]]
+        if let value {
+            guard let data = value as? Data,
+                  let decoded = try? JSONSerialization.jsonObject(with: data) as? [[String: Any]] else { return false }
+            rows = decoded
+        } else { rows = [] }
+        let unowned = rows.filter { ($0["trigger"] as? String)?.utf8.elementsEqual(trigger.utf8) != true }
+        guard let actual = try? JSONSerialization.data(withJSONObject: unowned, options: [.sortedKeys]),
+              let expected = try? JSONSerialization.data(withJSONObject: originalRows, options: [.sortedKeys]),
+              actual == expected else { return false }
+        CFPreferencesSetValue(Self.key, saved as CFPropertyList?, Self.bundleIdentifier, kCFPreferencesCurrentUser, kCFPreferencesAnyHost)
+        guard CFPreferencesAppSynchronize(Self.bundleIdentifier) else { return false }
+        let restored = CFPreferencesCopyValue(Self.key, Self.bundleIdentifier, kCFPreferencesCurrentUser, kCFPreferencesAnyHost)
+        return saved.map { ($0 as NSData).isEqual(restored) } ?? (restored == nil)
+    }
+}
+
 private enum WritingFeaturesUIError: Error {
     case disposableRunnerRequired, preferenceSyncFailed, appDidNotBecomeForeground, mainWindowDidNotOpen
     case appAlreadyRunning, appOwnershipUnavailable, settingsMenuUnavailable, existingPowerModeSession
+    case pasteboardOwnershipChanged, pasteboardSnapshotUnavailable
 }
 
 private struct SettingsActorObservation {
@@ -882,6 +1260,7 @@ private struct SettingsActorObservation {
 private final class WritingFeaturesDictationPreferences {
     private static let bundleIdentifier = "com.negentropi.RomaJustTalk" as CFString
     private static let profileKey = "VoiceInkDictationProfile"
+    private static let clarityStyleKey = "VoiceInkClarityStyle"
     private static let customValues: [String: Any] = [
         "IsTextFormattingEnabled": true,
         "LowercaseTranscription": true,
@@ -892,7 +1271,8 @@ private final class WritingFeaturesDictationPreferences {
     ]
     private static let scrollAnchorKeys = ["IsVADEnabled", "PrewarmModelOnWake", "showLiveTextPreview"]
     private static let panelKeys = ["customPrompts", "selectedPromptId", "useClipboardContext", "powerModeConfigurationsV2"]
-    private static let keys = [profileKey, "powerModeUIFlag"] + customValues.keys.sorted() + scrollAnchorKeys + panelKeys
+    private static let libraryKeys = ["VoiceInkSpokenSnippets"]
+    private static let keys = [profileKey, clarityStyleKey, "powerModeUIFlag"] + customValues.keys.sorted() + scrollAnchorKeys + panelKeys
     private let saved: [String: Any]
 
     init() throws {
@@ -907,8 +1287,9 @@ private final class WritingFeaturesDictationPreferences {
         })
     }
 
-    func install() throws {
+    func install(clarityStyle: String? = nil) throws {
         Self.write("custom", for: Self.profileKey)
+        if let clarityStyle { Self.write(clarityStyle, for: Self.clarityStyleKey) }
         Self.write(true, for: "powerModeUIFlag")
         for (key, value) in Self.customValues { Self.write(value, for: key) }
         guard CFPreferencesAppSynchronize(Self.bundleIdentifier),
@@ -920,6 +1301,11 @@ private final class WritingFeaturesDictationPreferences {
     func profile() -> String? {
         guard CFPreferencesAppSynchronize(Self.bundleIdentifier) else { return nil }
         return Self.read(Self.profileKey) as? String
+    }
+
+    func clarityStyle() -> String? {
+        guard CFPreferencesAppSynchronize(Self.bundleIdentifier) else { return nil }
+        return Self.read(Self.clarityStyleKey) as? String
     }
 
     func customSettingsAreUnchanged() -> Bool {
@@ -941,14 +1327,14 @@ private final class WritingFeaturesDictationPreferences {
 
     func panelValues() -> [String: Any]? {
         guard CFPreferencesAppSynchronize(Self.bundleIdentifier) else { return nil }
-        return Dictionary(uniqueKeysWithValues: Self.panelKeys.compactMap { key in
+        return Dictionary(uniqueKeysWithValues: (Self.panelKeys + Self.libraryKeys).compactMap { key in
             Self.read(key).map { (key, $0) }
         })
     }
 
     func panelValuesAreUnchanged(from values: [String: Any]) -> Bool {
         guard CFPreferencesAppSynchronize(Self.bundleIdentifier) else { return false }
-        return Self.panelKeys.allSatisfy { Self.equal(values[$0], Self.read($0)) }
+        return (Self.panelKeys + Self.libraryKeys).allSatisfy { Self.equal(values[$0], Self.read($0)) }
     }
 
     func restore() -> Bool {

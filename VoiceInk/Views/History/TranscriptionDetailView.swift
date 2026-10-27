@@ -9,20 +9,18 @@ struct TranscriptionDetailView: View {
         VStack(spacing: 12) {
             ScrollView {
                 VStack(spacing: 16) {
-                    MessageBubble(
-                        label: VoiceInkTranscriptTextVariant.original.title,
-                        text: transcription.text,
-                        isEnhanced: false
-                    )
+                    if transcription.dictationProfile != nil || transcription.processingFailureReason != nil {
+                        VStack(alignment: .leading, spacing: 8) {
+                            HistoryCapturedCleanupLabel(transcription: transcription)
+                            HistoryProcessingWarning(transcription: transcription)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
 
-                    if VoiceInkTranscriptTextVariant.shouldShowTabs(enhancedText: transcription.enhancedText) {
+                    ForEach(HistoryTextVariant.available(for: transcription)) { variant in
                         MessageBubble(
-                            label: VoiceInkTranscriptTextVariant.enhanced.title,
-                            text: VoiceInkTranscriptTextVariant.enhanced.displayText(
-                                rawText: transcription.text,
-                                enhancedText: transcription.enhancedText
-                            ),
-                            isEnhanced: true
+                            variant: variant,
+                            text: variant.text(for: transcription)
                         )
                     }
                 }
@@ -51,33 +49,43 @@ struct TranscriptionDetailView: View {
 }
 
 private struct MessageBubble: View {
-    let label: String
+    let variant: HistoryTextVariant
     let text: String
-    let isEnhanced: Bool
+
+    private var isEnhanced: Bool { variant == .enhanced }
 
     var body: some View {
         HStack(alignment: .bottom) {
             if isEnhanced { Spacer(minLength: 60) }
 
             VStack(alignment: isEnhanced ? .leading : .trailing, spacing: 4) {
-                Text(label)
+                Text(variant.title)
                     .font(.system(size: 9, weight: .medium))
                     .foregroundColor(.secondary.opacity(0.7))
                     .padding(.horizontal, 12)
+                    .help(variant.helpText)
 
                 ScrollView {
-                    Text(text)
+                    Text(verbatim: text)
                         .font(.system(size: 14, weight: .regular))
                         .lineSpacing(2)
                         .textSelection(.enabled)
                         .padding(.horizontal, 12)
                         .padding(.vertical, 10)
+                        .accessibilityIdentifier(variant.textAccessibilityIdentifier)
                 }
                 .frame(maxHeight: 350)
                 .background {
                     if isEnhanced {
                         RoundedRectangle(cornerRadius: 18, style: .continuous)
                             .fill(Color.accentColor.opacity(0.2))
+                    } else if variant == .recognized {
+                        // Dashed edge marks the untouched recognizer output.
+                        RoundedRectangle(cornerRadius: 18, style: .continuous)
+                            .strokeBorder(
+                                Color.secondary.opacity(0.35),
+                                style: StrokeStyle(lineWidth: 1, dash: [4, 3])
+                            )
                     } else {
                         RoundedRectangle(cornerRadius: 18, style: .continuous)
                             .fill(.thinMaterial)
@@ -89,6 +97,7 @@ private struct MessageBubble: View {
                 }
                 .overlay(alignment: .bottomTrailing) {
                     CopyIconButton(textToCopy: text)
+                        .accessibilityIdentifier("history.copy.\(variant.rawValue)")
                         .padding(8)
                 }
             }

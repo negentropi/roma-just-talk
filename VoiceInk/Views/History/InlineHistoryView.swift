@@ -129,6 +129,7 @@ struct InlineHistoryView: View {
                 TextField(VoiceInkHistoryPresentation.macOSInlineHistorySearchPrompt, text: $searchText)
                     .textFieldStyle(.plain)
                     .font(.system(size: 13))
+                    .accessibilityIdentifier("history.search")
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 6)
@@ -496,13 +497,18 @@ private struct HistoryCardRow: View {
     let onToggleCheck: () -> Void
     let onShowInfo: () -> Void
 
-    @State private var selectedTab: VoiceInkTranscriptTextVariant = .original
+    @State private var selectedTab: HistoryTextVariant = .original
+
+    private var availableTabs: [HistoryTextVariant] {
+        HistoryTextVariant.available(for: transcription)
+    }
+
+    private var visibleTab: HistoryTextVariant {
+        availableTabs.contains(selectedTab) ? selectedTab : .original
+    }
 
     private var displayText: String {
-        selectedTab.displayText(
-            rawText: transcription.text,
-            enhancedText: transcription.enhancedText
-        )
+        visibleTab.text(for: transcription)
     }
 
     private var hasAudioFile: Bool {
@@ -520,9 +526,12 @@ private struct HistoryCardRow: View {
                 .labelsHidden()
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(VoiceInkDatePresentation.compactTimestamp(transcription.timestamp))
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundColor(.secondary)
+                    HStack(spacing: 6) {
+                        Text(VoiceInkDatePresentation.compactTimestamp(transcription.timestamp))
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundColor(.secondary)
+                        HistoryProcessingWarningBadge(transcription: transcription)
+                    }
 
                     if !isExpanded {
                         Text(
@@ -547,52 +556,71 @@ private struct HistoryCardRow: View {
             }
             .contentShape(Rectangle())
             .onTapGesture { onToggleExpand() }
+            // The header itself is the expand target (it also hosts the checkbox, so it is not a Button).
+            .accessibilityElement(children: .contain)
+            .accessibilityIdentifier("\(rowAccessibilityIdentifier).expand")
 
             if isExpanded {
                 expandedContent
                     .padding(.top, 10)
             }
         }
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier(rowAccessibilityIdentifier)
+    }
+
+    private var rowAccessibilityIdentifier: String {
+        "history.row.\(transcription.id.uuidString)"
     }
 
     // MARK: - Expanded Content
 
     private var expandedContent: some View {
         VStack(alignment: .leading, spacing: 8) {
-            // Tabs
-            if VoiceInkTranscriptTextVariant.shouldShowTabs(enhancedText: transcription.enhancedText) {
+            HistoryProcessingWarning(transcription: transcription)
+
+            if availableTabs.count > 1 || transcription.dictationProfile != nil {
                 HStack(spacing: 4) {
-                    ForEach(VoiceInkTranscriptTextVariant.allCases, id: \.self) { tab in
-                        Button {
-                            withAnimation(.easeInOut(duration: 0.15)) {
-                                selectedTab = tab
+                    if availableTabs.count > 1 {
+                        ForEach(availableTabs) { tab in
+                            let isSelected = visibleTab == tab
+                            Button {
+                                withAnimation(.easeInOut(duration: 0.15)) {
+                                    selectedTab = tab
+                                }
+                            } label: {
+                                Text(tab.title)
+                                    .font(.system(size: 11, weight: .medium))
+                                    .foregroundColor(isSelected ? .primary : .secondary)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 4)
+                                    .background(
+                                        Capsule()
+                                            .fill(isSelected ? Color.secondary.opacity(0.15) : Color.clear)
+                                    )
                             }
-                        } label: {
-                            Text(tab.title)
-                                .font(.system(size: 11, weight: .medium))
-                                .foregroundColor(selectedTab == tab ? .primary : .secondary)
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 4)
-                                .background(
-                                    Capsule()
-                                        .fill(selectedTab == tab ? Color.secondary.opacity(0.15) : Color.clear)
-                                )
+                            .buttonStyle(.plain)
+                            .help(tab.helpText)
+                            .accessibilityAddTraits(isSelected ? .isSelected : [])
+                            .accessibilityIdentifier(tab.accessibilityIdentifier)
                         }
-                        .buttonStyle(.plain)
                     }
-                    Spacer()
+                    Spacer(minLength: 8)
+                    HistoryCapturedCleanupLabel(transcription: transcription)
                 }
             }
 
             ScrollView {
-                Text(displayText)
+                Text(verbatim: displayText)
                     .font(.body)
                     .textSelection(.enabled)
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .accessibilityIdentifier(visibleTab.textAccessibilityIdentifier)
             }
             .frame(maxHeight: 350)
             .overlay(alignment: .bottomTrailing) {
                 CopyIconButton(textToCopy: displayText)
+                    .accessibilityIdentifier("history.copy.\(visibleTab.rawValue)")
                     .padding(8)
             }
 

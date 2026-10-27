@@ -2,7 +2,7 @@ import Foundation
 import SwiftData
 import VoiceInkCore
 
-/// Prepared explicitly by an operation owner; no profile preference or active caller uses this yet.
+/// Capture consumed settings before an operation suspends; execution uses these copied values.
 @MainActor
 enum DictationPostprocessingPlan {
     enum PreparationFailure: Error, LocalizedError, Equatable, Sendable {
@@ -62,6 +62,50 @@ enum DictationPostprocessingPlan {
     case light(Light)
     case clarity(Clarity)
 
+    var profile: VoiceInkDictationProfile {
+        switch self {
+        case .custom: .custom
+        case .none: .none
+        case .light: .light
+        case .clarity: .clarity
+        }
+    }
+
+    var clarityStyle: VoiceInkClarityStyle? {
+        if case .clarity(let plan) = self { return plan.style }
+        return nil
+    }
+
+    static func capture(
+        profile: VoiceInkDictationProfile,
+        using context: ModelContext,
+        enhancementService: AIEnhancementService?
+    ) -> Self {
+        switch profile {
+        case .custom: return .custom
+        case .none: return .none
+        case .light:
+            return captureLight(
+                snippets: VoiceInkSpokenSnippets.load(),
+                storedLanguage: explicitlyStoredLanguage(),
+                using: context
+            )
+        case .clarity:
+            return captureClarity(
+                snippets: VoiceInkSpokenSnippets.load(), style: VoiceInkClarityStyle.current(),
+                using: context, enhancementService: enhancementService
+            )
+        }
+    }
+
+    private static func explicitlyStoredLanguage() -> String? {
+        guard let domain = Bundle.main.bundleIdentifier else { return nil }
+        // AppDefaults registers English; only an actual saved choice permits hesitation cleanup.
+        return UserDefaults.standard.persistentDomain(forName: domain)?[
+            VoiceInkUserDefaultsKey.selectedTranscriptionLanguage
+        ] as? String
+    }
+
     static func captureLight(
         snippets: [VoiceInkSpokenSnippet],
         storedLanguage: String?,
@@ -90,7 +134,8 @@ enum DictationPostprocessingPlan {
     func process(
         recognitionText: String,
         using enhancementService: AIEnhancementService?,
-        shouldCancel: () -> Bool = { false }
+        shouldCancel: () -> Bool = { false },
+        willRequestClarity: () -> Void = {}
     ) async throws -> Output? {
         func checkCancellation() throws {
             if Task.isCancelled || shouldCancel() { throw CancellationError() }
@@ -126,6 +171,8 @@ enum DictationPostprocessingPlan {
                 let provider = try plan.provider.get()
                 guard let enhancementService else { throw VoiceInkAIEnhancementError.notConfigured }
                 let request = try VoiceInkClarityRequest(transcript: prepared, style: plan.style)
+                try checkCancellation()
+                willRequestClarity()
                 try checkCancellation()
                 let enhancement = try await enhancementService.performClarity(request: request, using: provider)
                 try checkCancellation()

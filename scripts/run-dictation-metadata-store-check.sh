@@ -115,7 +115,7 @@ def source_bridge():
     for revision in [tag_sha, old_sha, "HEAD"]:
         sources = {path: git(repo, "show", revision + ":" + path) for path in model_paths}
         app = git(repo, "show", revision + ":VoiceInk/VoiceInk.swift").decode()
-        start = "    private static func createPersistentContainer(schema: Schema, logger: Logger) -> ModelContainer? {"
+        start = "static func createPersistentContainer(schema: Schema, logger: Logger) -> ModelContainer? {"
         end = "    private static func createInMemoryContainer(schema: Schema, logger: Logger) -> ModelContainer? {"
         require(app.count(start) == app.count(end) == 1, "Persistent factory anchors changed")
         factory = app[app.index(start):app.index(end)]

@@ -20,7 +20,12 @@ struct LanguageSelectionView: View {
     }
 
     private func updateLanguage(_ language: String) {
-        guard preferredLanguage != language else { return }
+        guard preferredLanguage != language else {
+            // @AppStorage may only be resolving AppDefaults' registered English; persist the explicit choice.
+            UserDefaults.standard.set(language, forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage)
+            UserDefaults.standard.synchronize()
+            return
+        }
 
         // Update UI state - the UserDefaults updating is now automatic with @AppStorage
         preferredLanguage = language

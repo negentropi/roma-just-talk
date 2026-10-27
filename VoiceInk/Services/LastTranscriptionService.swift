@@ -114,14 +114,53 @@ class LastTranscriptionService: ObservableObject {
                     for: newTranscription.lastTranscriptionCandidate,
                     preference: .preferred
                 )
-                ClipboardManager.copyToClipboard(textToCopy)
+                let didCopy = ClipboardManager.copyToClipboard(textToCopy)
 
-                showNotification(VoiceInkLastTranscriptionPolicy.retrySuccessNotification)
+                showNotification(
+                    retryCompletionNotification(
+                        processingFailureReason: newTranscription.processingFailureReason,
+                        didCopy: didCopy
+                    )
+                )
             } catch {
-                showNotification(VoiceInkLastTranscriptionPolicy.retryFailureNotification(for: error))
+                if Task.isCancelled || error is CancellationError {
+                    showNotification(retryCanceledNotification)
+                } else {
+                    showNotification(VoiceInkLastTranscriptionPolicy.retryFailureNotification(for: error))
+                }
             }
         }
     }
+
+    /// One result notice per retry. A saved retry whose Light/Clarity cleanup failed keeps
+    /// the original recognition, so the notice must not read as a cleaned-up success.
+    private static func retryCompletionNotification(
+        processingFailureReason: String?,
+        didCopy: Bool
+    ) -> VoiceInkLastTranscriptionNotificationPresentation {
+        guard let processingFailureReason else {
+            return didCopy
+                ? VoiceInkLastTranscriptionPolicy.retrySuccessNotification
+                : VoiceInkLastTranscriptionNotificationPresentation(
+                    title: VoiceInkTranscriptPresentation.failedToCopyTranscriptionTitle,
+                    kind: .error
+                )
+        }
+
+        let headline = didCopy
+            ? "Cleanup didn’t finish. Original transcription copied to clipboard."
+            : "Cleanup didn’t finish, and the original transcription couldn’t be copied."
+        let reason = processingFailureReason.trimmingCharacters(in: .whitespacesAndNewlines)
+        return VoiceInkLastTranscriptionNotificationPresentation(
+            title: reason.isEmpty ? headline : "\(headline) \(reason)",
+            kind: didCopy ? .warning : .error
+        )
+    }
+
+    private static let retryCanceledNotification = VoiceInkLastTranscriptionNotificationPresentation(
+        title: "Retry canceled. Clipboard unchanged.",
+        kind: .info
+    )
 
     @MainActor
     private static func showNotification(_ presentation: VoiceInkLastTranscriptionNotificationPresentation) {

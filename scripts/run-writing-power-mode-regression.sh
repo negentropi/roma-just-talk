@@ -25,13 +25,15 @@ mkdir -p "$out"
 phase=source-contract
 trap 'code=$?; if [[ "$code" != 0 ]]; then printf "{\"classification\":\"invalid-or-failed\",\"boundary\":\"%s\",\"exit_code\":%s}\n" "$phase" "$code" > "$out/failure.json"; fi' EXIT
 git fetch --no-tags origin "$baseline_sha" "$verified_sha"
-git diff --quiet "$verified_sha" "$candidate_sha" -- VoiceInk VoiceInkCore VoiceInkNVIDIA VoiceInkQwen VoiceInk.xcodeproj iOS
 git worktree add --detach "$baseline" "$baseline_sha"
 test -f "$repo/$oracle"
 test ! -e "$baseline/$oracle"
 cp "$repo/$oracle" "$baseline/$oracle"
 cmp "$repo/$oracle" "$baseline/$oracle"
 resolved=VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+phase=canonical-package-contract
+bash "$repo/scripts/run-writing-feature-regression.sh" packages "$out/packages" "$baseline" "$verified_sha" \
+  "$RUNNER_TEMP/writing-power-mode-packages"
 cmp "$repo/$resolved" "$baseline/$resolved"
 cmp "$repo/VoiceInk.xcodeproj/xcshareddata/xcschemes/VoiceInkUpdaterE2E.xcscheme" \
   "$baseline/VoiceInk.xcodeproj/xcshareddata/xcschemes/VoiceInkUpdaterE2E.xcscheme"
@@ -68,7 +70,7 @@ for label, root in [("baseline", baseline), ("candidate", candidate)]:
     document.write(destination, encoding="utf-8", xml_declaration=True)
 
 oracle = candidate / "VoiceInkUITests/WritingPowerModeUITests.swift"
-contract = {"candidate_sha": candidate_sha, "baseline_sha": baseline_sha, "verified_production_sha": verified_sha, "candidate_production_matches_verified": True, "oracle_sha256": digest(oracle.read_bytes()), "scheme_sha256": digest((candidate / "VoiceInk.xcodeproj/xcshareddata/xcschemes/WritingPowerModeProof.xcscheme").read_bytes())}
+contract = {"candidate_sha": candidate_sha, "baseline_sha": baseline_sha, "verified_production_sha": verified_sha, "candidate_production_matches_verified_except_reviewed_lock": True, "canonical_graph_receipt": "packages/canonical-graph-contract.json", "oracle_sha256": digest(oracle.read_bytes()), "scheme_sha256": digest((candidate / "VoiceInk.xcodeproj/xcshareddata/xcschemes/WritingPowerModeProof.xcscheme").read_bytes())}
 changed = sorted(path for path in set(manifests["baseline"]) | set(manifests["candidate"]) if manifests["baseline"].get(path) != manifests["candidate"].get(path))
 contract["changed_production_paths"] = changed
 (output / "contract.json").write_text(json.dumps(contract, indent=2) + "\n")
@@ -101,12 +103,15 @@ for lane in baseline candidate; do
     'SWIFT_ACTIVE_COMPILATION_CONDITIONS=$(inherited) LOCAL_BUILD'
   )
   phase="$lane-build"
+  cmp "$out/packages/canonical.Package.resolved" "$checkout/$resolved"
   if ! xcodebuild build-for-testing "${arguments[@]}" \
     '-only-testing:VoiceInkUITests/WritingPowerModeUITests' > "$lane_out/build.log" 2>&1; then
+    cmp "$out/packages/canonical.Package.resolved" "$checkout/$resolved"
     printf '{"classification":"invalid","boundary":"build"}\n' > "$lane_out/result.json"
     tail -n 100 "$lane_out/build.log" >&2
     continue
   fi
+  cmp "$out/packages/canonical.Package.resolved" "$checkout/$resolved"
   phase="$lane-permissions"
   test "$(plutil -extract CFBundleIdentifier raw -o - "$app/Contents/Info.plist")" = com.negentropi.RomaJustTalk
   codesign --verify --deep --strict "$app"
@@ -172,6 +177,7 @@ PY
         -resultBundlePath "$case_out/UI.xcresult" > "$case_out/tests.log" 2>&1 || test_exit=$?
     touch "$case_out/process-stop"
     wait "$observer_pid"
+    cmp "$out/packages/canonical.Package.resolved" "$checkout/$resolved"
     printf '%s\n' "$test_exit" > "$case_out/test-exit.txt"
     shasum -a 256 "$app/Contents/MacOS/roma just talk" > "$case_out/identity-after.txt"
     cmp "$case_out/identity-before.txt" "$case_out/identity-after.txt"
@@ -185,6 +191,8 @@ done
 
 phase=verdict
 cmp "$repo/$oracle" "$baseline/$oracle"
+cmp "$out/packages/canonical.Package.resolved" "$repo/$resolved"
+cmp "$out/packages/canonical.Package.resolved" "$baseline/$resolved"
 python3 - "$out" "$repo/$oracle" <<'PY'
 import json
 import re

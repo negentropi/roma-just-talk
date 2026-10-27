@@ -64,6 +64,9 @@ jobs:
             ~/Library/Caches/org.swift.swiftpm
           key: writing-macos-${{ runner.arch }}-${{ hashFiles('Makefile', 'scripts/verify-static-whisper-xcframework.sh', 'VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
 
+      - name: Verify the canonical package graph before compiling
+        run: bash scripts/run-writing-feature-regression.sh packages "$RUNNER_TEMP/writing-package-proof"
+
       - name: Shared core checks
         run: |
           set -o pipefail
@@ -88,7 +91,12 @@ jobs:
         run: |
           defaults write com.negentropi.RomaJustTalk CurrentTranscriptionModel -string whisper-large-v3-turbo
           defaults write com.negentropi.RomaJustTalk PrewarmModelOnWake -bool false
-          bash scripts/run-macos-ci-unit-tests.sh
+          lock=VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+          cmp "$RUNNER_TEMP/writing-package-proof/canonical.Package.resolved" "$lock"
+          unit_exit=0
+          bash scripts/run-macos-ci-unit-tests.sh || unit_exit=$?
+          cmp "$RUNNER_TEMP/writing-package-proof/canonical.Package.resolved" "$lock"
+          exit "$unit_exit"
 
       - name: Live TextEdit and Safari selection transactions
         id: live
@@ -126,6 +134,8 @@ jobs:
             ${{ runner.temp }}/writing-feature-regression/contract.txt
             ${{ runner.temp }}/writing-feature-regression/*selection/*.json
             ${{ runner.temp }}/writing-feature-regression/*selection/enumeration.log
+            ${{ runner.temp }}/writing-feature-regression/packages/*.json
+            ${{ runner.temp }}/writing-feature-regression/packages/*strict-resolve.log
           if-no-files-found: warn
 
       - name: Snippet and translation settings UI
@@ -146,8 +156,11 @@ jobs:
       - name: Release build and packaging contracts
         run: |
           set -o pipefail
+          lock=VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+          cmp "$RUNNER_TEMP/writing-package-proof/canonical.Package.resolved" "$lock"
           bash scripts/tests/verify-adhoc-library-validation.test.sh
           make local CONFIGURATION=Release 2>&1 | tee "$RUNNER_TEMP/writing-release-build.log"
+          cmp "$RUNNER_TEMP/writing-package-proof/canonical.Package.resolved" "$lock"
           app="$HOME/Applications/roma just talk.app"
           test "$(plutil -extract CFBundleIdentifier raw -o - "$app/Contents/Info.plist")" = com.negentropi.RomaJustTalk
           codesign --verify --deep --strict "$app"
@@ -170,6 +183,7 @@ jobs:
             ${{ runner.temp }}/writing-proof-snapshot/**
             .local-build/writing-check-evidence/**
             ${{ runner.temp }}/writing-feature-regression/**
+            ${{ runner.temp }}/writing-package-proof/**
             ${{ runner.temp }}/writing-core-checks.log
             ${{ runner.temp }}/writing-dependency-setup.log
             ${{ runner.temp }}/writing-release-build.log

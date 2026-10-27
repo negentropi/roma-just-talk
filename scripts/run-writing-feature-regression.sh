@@ -16,6 +16,111 @@ mode="${1:-}"
 candidate_sha="$(git rev-parse HEAD)"
 debug_dir="$repo_root/.local-build"
 debug_app="$debug_dir/Build/Products/Debug/roma just talk.app"
+resolved=VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+canonical_sha256=bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f
+
+verify_lock() {
+  local checkout="$1"
+  test "$(shasum -a 256 "$checkout/$resolved" | awk '{print $1}')" = "$canonical_sha256"
+}
+
+# Historical lanes receive only the reviewed lock, after their declarations match.
+if [[ "$mode" == packages ]]; then
+  package_out="${2:?Pass an evidence directory}"
+  baseline="${3:-}"
+  verified_sha="${4:-}"
+  package_checkouts="${5:-$debug_dir/SourcePackages}"
+  mkdir -p "$package_out"
+  python3 - "$repo_root" "$package_out" "$baseline" "$verified_sha" "$resolved" "$canonical_sha256" <<'PY'
+import difflib
+import hashlib
+import json
+import subprocess
+import sys
+from pathlib import Path
+
+candidate, output = map(Path, sys.argv[1:3])
+baseline_arg, verified, lock_path, expected_hash = sys.argv[3:]
+digest = lambda data: hashlib.sha256(data).hexdigest()
+canonical = (candidate / lock_path).read_bytes()
+if digest(canonical) != expected_hash:
+    raise SystemExit("Candidate lock differs from the reviewed canonical resolution")
+
+def pins(data):
+    values = json.loads(data)["pins"]
+    result = {pin["identity"]: pin for pin in values}
+    if len(result) != len(values):
+        raise SystemExit("Duplicate package identities in lock")
+    return result
+
+canonical_pins = pins(canonical)
+if len(canonical_pins) != 41:
+    raise SystemExit("Canonical graph must contain the reviewed 41 pins")
+
+def declarations(root):
+    tracked = subprocess.check_output(["git", "-C", str(root), "ls-files", "-z"]).split(b"\0")
+    return {value.decode(): (root / value.decode()).read_bytes() for value in tracked if value and (value.endswith(b"/Package.swift") or value in (b"Package.swift", b"VoiceInk.xcodeproj/project.pbxproj"))}
+
+inputs = declarations(candidate)
+receipt = {"canonical_sha256": expected_hash, "canonical_pin_count": 41, "declaration_sha256": {path: digest(data) for path, data in inputs.items()}, "source": "reviewed Xcode resolution run 40482229518", "scope": "package metadata only; existing pins and all dependency declarations unchanged"}
+(output / "canonical.Package.resolved").write_bytes(canonical)
+
+def validate_previous(original, label):
+    if digest(original) != "2cdda5176a184329f2ca828316bfdefd9578d94bfed96a2b48b34b42b851e84c":
+        raise SystemExit(f"{label}: original lock is not the reviewed 24-pin lock")
+    previous = pins(original)
+    retained = all(canonical_pins.get(key) == value for key, value in previous.items())
+    if not retained or len(previous) != 24 or len(canonical_pins.keys() - previous.keys()) != 17:
+        raise SystemExit(f"{label}: canonical lock must preserve all 24 original pins and add exactly 17")
+    (output / f"{label}-original.Package.resolved").write_bytes(original)
+    (output / f"{label}-lock.patch").write_text("".join(difflib.unified_diff(original.decode().splitlines(keepends=True), canonical.decode().splitlines(keepends=True), fromfile="a/" + lock_path, tofile="b/" + lock_path)))
+    return {"original_sha256": digest(original), "retained_pin_count": len(previous), "added_pin_identities": sorted(canonical_pins.keys() - previous.keys()), "changed_pins": [], "removed_pins": []}
+
+if baseline_arg:
+    baseline = Path(baseline_arg)
+    if declarations(baseline) != inputs:
+        raise SystemExit("Historical dependency declaration paths or bytes differ from candidate")
+    receipt["baseline"] = validate_previous((baseline / lock_path).read_bytes(), "baseline")
+    receipt["baseline"]["declarations_identical"] = True
+    (baseline / lock_path).write_bytes(canonical)
+
+if verified:
+    production = ["VoiceInk", "VoiceInkCore", "VoiceInkNVIDIA", "VoiceInkQwen", "VoiceInk.xcodeproj", "iOS"]
+    subprocess.run(["git", "-C", str(candidate), "diff", "--quiet", "HEAD", "--", *production], check=True)
+    changed = subprocess.check_output(["git", "-C", str(candidate), "diff", "--name-only", verified, "HEAD", "--", *production], text=True).splitlines()
+    if changed != [lock_path]:
+        raise SystemExit(f"Candidate differs from verified production outside the reviewed lock: {changed}")
+    for path, data in inputs.items():
+        original = subprocess.check_output(["git", "-C", str(candidate), "show", f"{verified}:{path}"])
+        if original != data:
+            raise SystemExit(f"Verified production dependency declaration differs: {path}")
+    original = subprocess.check_output(["git", "-C", str(candidate), "show", f"{verified}:{lock_path}"])
+    receipt["verified_production"] = validate_previous(original, "verified")
+    receipt["verified_production"].update({"sha": verified, "only_changed_production_path": lock_path, "declarations_identical": True})
+
+(output / "canonical-graph-contract.json").write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n")
+PY
+  for lane in candidate baseline; do
+    checkout="$repo_root"
+    [[ "$lane" != baseline ]] || checkout="$baseline"
+    [[ -n "$checkout" ]] || continue
+    verify_lock "$checkout"
+    resolve_exit=0
+    xcodebuild -resolvePackageDependencies -project "$checkout/VoiceInk.xcodeproj" -scheme VoiceInk \
+      -derivedDataPath "$RUNNER_TEMP/writing-package-derived-$lane" -clonedSourcePackagesDirPath "$package_checkouts" \
+      -disableAutomaticPackageResolution -onlyUsePackageVersionsFromResolvedFile -skipPackageUpdates \
+      > "$package_out/$lane-strict-resolve.log" 2>&1 || resolve_exit=$?
+    verify_lock "$checkout"
+    printf '{"exit_code":%s,"canonical_lock_unchanged":true}\n' "$resolve_exit" > "$package_out/$lane-strict-resolve.json"
+    if [[ "$resolve_exit" != 0 ]]; then
+      tail -n 100 "$package_out/$lane-strict-resolve.log" >&2
+      exit "$resolve_exit"
+    fi
+  done
+  exit 0
+fi
+
+verify_lock "$repo_root"
 test_names=(
   spokenSnippetPipelineInsertsExactWholeTriggerContentAndSavesIt
   spokenSnippetPipelinePreservesInlineCapitalsPunctuationAndParagraphs
@@ -28,6 +133,8 @@ test_arguments() {
     -project "$checkout/VoiceInk.xcodeproj" -scheme VoiceInk -configuration Debug
     -destination 'platform=macOS' -parallel-testing-enabled NO
     -derivedDataPath "$derived" -xcconfig "$checkout/LocalBuild.xcconfig"
+    -clonedSourcePackagesDirPath "$debug_dir/SourcePackages"
+    -disableAutomaticPackageResolution -onlyUsePackageVersionsFromResolvedFile
     CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=YES
     DEVELOPMENT_TEAM= CODE_SIGN_ENTITLEMENTS="$checkout/VoiceInk/VoiceInk.local.entitlements"
     'SWIFT_ACTIVE_COMPILATION_CONDITIONS=$(inherited) LOCAL_BUILD'
@@ -223,7 +330,8 @@ file.write_text(instrumented)
 digest = lambda value: hashlib.sha256(value.encode()).hexdigest()
 (output / "baseline-permission-instrumentation.json").write_text(json.dumps({"path": relative, "original_sha256": digest(original), "instrumented_sha256": digest(instrumented), "patch_sha256": digest(patch), "added_lines": additions, "scope": "optional hook at existing permission callback; no startup-preparation await or ownership fix"}, indent=2) + "\n")
 PY
-    resolved=VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+    phase=canonical-package-contract
+    bash "$repo_root/scripts/run-writing-feature-regression.sh" packages "$out/packages" "$baseline"
     cmp "$repo_root/$resolved" "$baseline/$resolved"
     {
       printf 'candidate=%s\nbaseline=%s\n' "$candidate_sha" "$baseline_ref"
@@ -238,12 +346,11 @@ PY
     select_tests "${test_names[@]}"
     build_selectors=("${selectors[@]}" '-only-testing:VoiceInkTests/WritingActionEngineTests/permissionWaitReservesOneRecordingStart()')
     phase=baseline-build
-    if ! xcodebuild build-for-testing "${arguments[@]}" "${build_selectors[@]}" \
-      -clonedSourcePackagesDirPath "$debug_dir/SourcePackages" \
-      -disableAutomaticPackageResolution -onlyUsePackageVersionsFromResolvedFile > "$out/baseline-build.log" 2>&1; then
+    if ! xcodebuild build-for-testing "${arguments[@]}" "${build_selectors[@]}" > "$out/baseline-build.log" 2>&1; then
       tail -n 120 "$out/baseline-build.log" >&2
       exit 1
     fi
+    verify_lock "$baseline"
     phase=baseline-tests
     preflight_selected_tests "$out/baseline-selection"
     baseline_exit=0
@@ -288,6 +395,7 @@ PY
     fi
     cmp "$repo_root/$oracle" "$baseline/$oracle"
     cmp "$repo_root/$permission_oracle" "$baseline/$permission_oracle"
+    verify_lock "$baseline"
     printf '{"classification":"matched-red-green","scope":["literal-snippets","deferred-permission-callback"],"stale_startup_catch":"candidate-only coverage","candidate":"%s","baseline":"%s"}\n' \
       "$candidate_sha" "$baseline_ref" > "$out/result.json"
     ;;
@@ -303,6 +411,7 @@ PY
       tail -n 120 "$out/build.log" >&2
       exit 1
     fi
+    verify_lock "$repo_root"
     codesign --verify --deep --strict "$debug_app"
     codesign -dr - "$debug_app" 2>&1 | sed -n \
       -e 's/^# designated => //p' -e 's/^designated => //p' > "$out/host-requirement.txt"
@@ -326,6 +435,7 @@ indirect_object_identifier_type,indirect_object_identifier,flags
     phase=ui-tests
     test_exit=0
     RJT_WRITING_UI_CHECKS=1 TEST_RUNNER_RJT_WRITING_UI_CHECKS=1 \
+      TEST_RUNNER_GITHUB_ACTIONS=true \
       xcodebuild test-without-building "${arguments[@]}" "$ui_selector" \
         -resultBundlePath "$out/UI.xcresult" > "$out/tests.log" 2>&1 || test_exit=$?
     export_exit=0
@@ -379,7 +489,8 @@ PY
     fi
     ;;
   *)
-    echo "usage: $0 live | regression <known-bad-full-sha> | ui" >&2
+    echo "usage: $0 live | regression <known-bad-full-sha> | ui | packages <evidence-dir> [historical-checkout] [verified-sha]" >&2
     exit 2
     ;;
 esac
+verify_lock "$repo_root"

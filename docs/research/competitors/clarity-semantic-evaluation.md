@@ -47,7 +47,9 @@ Reuse the isolation and artifact checks in [`run-writing-local-cli-service-probe
 
 The coordinator checked `root@decentleftover-pf` around 2026-10-27 18:50 UTC. The sanitized observation found `/usr/local/bin/codex`, version `codex-cli 0.163.0`, and no `claude`. The Codex auth-status command exited 1 and reported logged-in false. This is a current-task observation; no durable raw receipt was saved. It establishes an installed CLI and that reported auth status only. It does not establish an authenticated remote route, other CLI configuration, or future availability. No model call, OAuth file read, credential copy, or installation occurred.
 
-After the dedicated wrapper exists, the prior quiet local Mac service probe is a fallback if the remote route remains unavailable. Recheck its executable and nonsecret auth status at execution time. Prior authentication is historical evidence, not a guarantee of current access. Do not ask the user to install or copy credentials for this preparation.
+At 2026-10-27 20:13:58 UTC, a new read-only remote check again found no Claude and Codex reporting `Not logged in` (exit 1). The local `/opt/homebrew/bin/claude` reports version `2.1.310`; `claude --bare auth status --json`, projected to nonsecret fields only, reports `loggedIn: true`, `authMethod: api_key`, `apiProvider: firstParty`. No auth file, token or model call was used. This confirms the quiet local route is available for the remotely built probe, subject to its actual execution checks; it does not identify a served model.
+
+Recheck the executable/signature and nonsecret auth status at execution time. Prior authentication is historical evidence, not a guarantee of future access. Do not ask the user to install or copy credentials for this preparation.
 
 ## Keep the claims bounded
 

@@ -1,0 +1,74 @@
+[
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "33668b2f3111e0e802ee1535e7eca3b42ae0c5b4",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "72E81DB2-6552-47AE-9B0B-4BC528136977.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "CSV current and imported multiline preview_0_611F7ABE-0B7E-4E06-B512-728998F98BA3.png",
+        "timestamp" : 1793107276.71
+      }
+    ],
+    "testIdentifier" : "WritingFeaturesUITests/testCSVImportPreviewsMultilineContentBeforeReplacing()",
+    "testIdentifierURL" : "test://com.apple.xcode/VoiceInk/VoiceInkUITests/WritingFeaturesUITests/testCSVImportPreviewsMultilineContentBeforeReplacing"
+  },
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "33668b2f3111e0e802ee1535e7eca3b42ae0c5b4",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "5B23A34F-418D-49B2-92E4-93F157E000DA.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Snippet deletion confirmation_0_EDC954E5-D0BF-4322-808F-8928D1BCAA13.png",
+        "timestamp" : 1793107383.98
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "33668b2f3111e0e802ee1535e7eca3b42ae0c5b4",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "01AF8ACF-4ABA-45DC-909D-018071B4935E.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Literal multiline snippet editor_0_E839B379-53CE-4821-A732-F9F4EC346326.png",
+        "timestamp" : 1793107372.917
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "33668b2f3111e0e802ee1535e7eca3b42ae0c5b4",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "8785F68C-3AEB-47DE-8059-5B44BA2AE7E6.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Spoken snippets library_0_4F79E1A1-FFD6-4467-8066-65645D73FE82.png",
+        "timestamp" : 1793107360.955
+      }
+    ],
+    "testIdentifier" : "WritingFeaturesUITests/testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch()",
+    "testIdentifierURL" : "test://com.apple.xcode/VoiceInk/VoiceInkUITests/WritingFeaturesUITests/testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch"
+  },
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "33668b2f3111e0e802ee1535e7eca3b42ae0c5b4",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "BDCB55C5-DD5D-421C-A9C4-3BCF3C20DAD3.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Translation target persisted after relaunch_0_47DCD869-EB6A-484D-8E1D-838EE809AE70.png",
+        "timestamp" : 1793107523.31
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "33668b2f3111e0e802ee1535e7eca3b42ae0c5b4",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "8E0E6465-554C-4DE3-A410-CF723A8AB7AC.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Writing actions and ordered translation targets_0_858D1B16-84E4-413F-B6FC-8C37A1F69D83.png",
+        "timestamp" : 1793107501.289
+      }
+    ],
+    "testIdentifier" : "WritingFeaturesUITests/testTranslationTargetsReorderSelectAndPersist()",
+    "testIdentifierURL" : "test://com.apple.xcode/VoiceInk/VoiceInkUITests/WritingFeaturesUITests/testTranslationTargetsReorderSelectAndPersist"
+  }
+]

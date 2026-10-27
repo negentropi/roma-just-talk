@@ -56,4 +56,6 @@ The library holds up to 1,000 snippets. Import files must be no larger than 3 MB
 
 ## Verification status
 
-The feature checks cover literal expansion, CSV transfer, request construction, cancellation, target drift, settings backup, and recording-start ownership. Fresh remote app build and live editor evidence are recorded in the [implementation plan](research/competitors/implementation-plan.md). Source presence alone does not establish compatibility with every editor or the quality of a chosen AI provider.
+The first Mac batch passed [remote verification on `ebc92f1e`](https://github.com/negentropi/roma-just-talk/actions/runs/40507127520), including shared Core, full Mac units, five native checks, matched regressions, three actual settings workflows and Release packaging. The [retained receipt](research/competitors/evidence/mac-40507127520/debug-native-ui-release-summary.json) identifies the tested artifact and limits. The [CI app artifact](https://github.com/negentropi/roma-just-talk/actions/runs/40507127520/artifacts/12738825628) is an unreleased build.
+
+Native delivery uses controlled recognition and provider output. Separate authenticated CLI samples cover bounded translation and rewrite meaning. Neither establishes human speech, physical shortcuts, compatibility with every editor or general provider quality. The [implementation plan](research/competitors/implementation-plan.md) records those remaining boundaries and later feature work.

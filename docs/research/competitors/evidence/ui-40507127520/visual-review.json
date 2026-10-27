@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "run_id": 40507127520,
+  "run_url": "https://github.com/negentropi/roma-just-talk/actions/runs/40507127520",
+  "source_sha": "ebc92f1e60fdabbb9e26b2817f414d154865a9d5",
+  "source_binding": "Pinned first full-gate batch. Source hashes read from this committed revision, not current working files.",
+  "pinned_source_sha256": {
+    "VoiceInkUITests/WritingFeaturesUITests.swift": "ae718825461835b5ea838cb05fe489f19f0759f7f2ce4c9085091654c9872e87",
+    "VoiceInk/Views/Dictionary/SpokenSnippetSheets.swift": "97c109428002338ad2080e1ee2c99e8c6d38044e3944276161c110e64fb58858",
+    "VoiceInk/Views/Dictionary/SpokenSnippetsView.swift": "b94df60e24692ff8f48753a0f9b34354669a9397b34191d9765f889e3ad33e71",
+    "VoiceInk/Views/WritingActionsSettingsSection.swift": "66846ddd21704a665749d5e1407082473f3d6a7529cc048adbced59a40f0bfee"
+  },
+  "review_method": "Direct view_image inspection of all six original PNG attachments. No cropping, retouching or screenshot editing.",
+  "review_result": "Captured content and controls are readable. One transient microphone-permission notification overlaps the lower editor label; recorded as a limitation.",
+  "manifest_sha256": "48812793525575f6bf91bfb4350e0624734b730116c58825b41f81cbc4f6333f",
+  "download_verification_supplied_by_parent": {
+    "archive_bytes": 1308850,
+    "archive_sha256": "8ab8166da7a924d094974df4c00c60d659cee0fdcb37e997a25567a99cf6202b"
+  },
+  "native_test_receipt_scope": "Strict three-test results and logs are collected separately by mac_result_receipt. This file records image inspection and does not replace those results.",
+  "proof_limits": [
+    "Screenshots cannot establish exact leading or trailing newline bytes; require native NSTextView value assertions in the run log.",
+    "Deletion image precedes Cancel. Row retention after cancellation and relaunch persistence require corresponding native assertions.",
+    "Target image pair shows the same selection and order. Persisted state and cleanup assertions require the native test receipt.",
+    "No microphone recording, ASR accuracy, provider writing-action invocation, physical keyboard input or competitor-wide feature parity is established by these settings screenshots."
+  ],
+  "images": [
+    {
+      "filename": "72E81DB2-6552-47AE-9B0B-4BC528136977.png",
+      "observation": "Expanded CSV row shows complete two-line existing text and imported straight quotes, comma, blank paragraph and Second line. Existing state is On; imported state is Off. Trigger in use is visible. No conflict policy is selected and Import is disabled. Footer actions are fully visible.",
+      "visual_issue": null,
+      "test_identifier": "WritingFeaturesUITests/testCSVImportPreviewsMultilineContentBeforeReplacing()",
+      "attachment_name": "CSV current and imported multiline preview_0_611F7ABE-0B7E-4E06-B512-728998F98BA3.png",
+      "retained": true,
+      "sha256": "69bec806c7f20b53ca2b90254b2d664b612242e51f0c6db8e687b1ca6844569d",
+      "retention_note": "Original PNG retained without editing."
+    },
+    {
+      "filename": "01AF8ACF-4ABA-45DC-909D-018071B4935E.png",
+      "observation": "Native Edit Snippet sheet shows Felix C. Order, straight double quotes around quotes, doubled hyphen, blank paragraph and Second paragraph. An empty line and caret follow the final paragraph. Counter reads 64/4,000. Save and Cancel remain visible.",
+      "visual_issue": "A transient Microphone permission required notification overlaps the lower Use this snippet label. Inserted text, Save and Cancel remain unobscured. These settings tests do not establish microphone permission or recording readiness.",
+      "test_identifier": "WritingFeaturesUITests/testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch()",
+      "attachment_name": "Literal multiline snippet editor_0_E839B379-53CE-4821-A732-F9F4EC346326.png",
+      "retained": true,
+      "sha256": "fd539d6d96a0dcbbb4e61e47dfffdff10f5a81e3b176426bbda8b3ac9e935504",
+      "retention_note": "Original PNG retained without editing."
+    },
+    {
+      "filename": "5B23A34F-418D-49B2-92E4-93F157E000DA.png",
+      "observation": "Native deletion confirmation names the unique ui signature trigger, explains deletion cannot be undone, and exposes separate red Delete Snippet and Cancel buttons. Underlying owned row is turned off.",
+      "visual_issue": null,
+      "test_identifier": "WritingFeaturesUITests/testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch()",
+      "attachment_name": "Snippet deletion confirmation_0_EDC954E5-D0BF-4322-808F-8928D1BCAA13.png",
+      "retained": true,
+      "sha256": "c91a4910c085779d79a30d49d131f1ca7a1e3ca1887829bae76e92ea036c8d66",
+      "retention_note": "Original PNG retained without editing."
+    },
+    {
+      "filename": "8785F68C-3AEB-47DE-8059-5B44BA2AE7E6.png",
+      "observation": "Search isolates one owned signature row. Enabled switch, edit and delete controls are fully inside the visible list. Search horizontally scrolls its long UUID value without obscuring row controls.",
+      "visual_issue": null,
+      "test_identifier": "WritingFeaturesUITests/testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch()",
+      "attachment_name": "Spoken snippets library_0_4F79E1A1-FFD6-4467-8066-65645D73FE82.png",
+      "retained": false,
+      "sha256": "379f04a1e97be502ff749cc3fe78b08c83decbb5c272daf08ba37af6dde2de75",
+      "retention_note": "Original inspected; available in source screenshot artifact. Omitted from this compact evidence set."
+    },
+    {
+      "filename": "8E0E6465-554C-4DE3-A410-CF723A8AB7AC.png",
+      "observation": "Writing Actions and Translation Target sections are visible. French is selected and first, followed by English and German. First-row Move Up is disabled. The fixture has no configured Local CLI command; the visible provider warning and disabled Record buttons match that setup.",
+      "visual_issue": null,
+      "test_identifier": "WritingFeaturesUITests/testTranslationTargetsReorderSelectAndPersist()",
+      "attachment_name": "Writing actions and ordered translation targets_0_858D1B16-84E4-413F-B6FC-8C37A1F69D83.png",
+      "retained": false,
+      "sha256": "6f64a0e325be5aaf3b530d43fa4904d319c4b20d8c119e035c133f05bbaeddbb",
+      "retention_note": "Original inspected; available in source screenshot artifact. Omitted from this compact evidence set."
+    },
+    {
+      "filename": "BDCB55C5-DD5D-421C-A9C4-3BCF3C20DAD3.png",
+      "observation": "After relaunch French remains selected and first, followed by English and German. Target controls and explanatory text remain readable. The same unconfigured-provider warning is visible.",
+      "visual_issue": null,
+      "test_identifier": "WritingFeaturesUITests/testTranslationTargetsReorderSelectAndPersist()",
+      "attachment_name": "Translation target persisted after relaunch_0_47DCD869-EB6A-484D-8E1D-838EE809AE70.png",
+      "retained": false,
+      "sha256": "19a356fa0d1db27c8f2f94ba6bda77f4fb36d3bc69d4b9f36a94e9c8ed1f6d61",
+      "retention_note": "Original inspected; available in source screenshot artifact. Omitted from this compact evidence set."
+    }
+  ]
+}

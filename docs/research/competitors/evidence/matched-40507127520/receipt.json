@@ -1,0 +1,204 @@
+{
+  "run_id": 40507127520,
+  "head_sha": "ebc92f1e60fdabbb9e26b2817f414d154865a9d5",
+  "baseline_sha": "ec7bc1bcf804cb9362e342e4c3f5fbf2dd9b69eb",
+  "artifact_id": 12736876836,
+  "artifact_bytes": 71948,
+  "artifact_sha256": "9ae87b61f01828f4c65e1d906c82dd2ca986486702ff3dcacf7bc655a68c8543",
+  "artifact_sha256_matches_github_digest": true,
+  "classification": "matched-red-green",
+  "scope": [
+    "literal-snippets",
+    "deferred-permission-callback"
+  ],
+  "shared_oracles": {
+    "VoiceInkTests/SpokenSnippetPipelineTests.swift": {
+      "sha256": "4f7bebe6ef251fe5c69e8761f3409a9051b988d334061b87d8dcd9757d67c60b",
+      "candidate_and_baseline_hashes_identical": true
+    },
+    "VoiceInkTests/WritingActionEngineTests.swift": {
+      "sha256": "6caa4f1051afe7ec7d2c278d69e237263fb5b0f8cd64778aa6d04577d2c38ab2",
+      "candidate_and_baseline_hashes_identical": true
+    }
+  },
+  "oracle_and_pipeline_hashes_match_exact_git_sources": true,
+  "baseline_permission_instrumentation_reconstructed_from_exact_git_source": true,
+  "canonical_package_lock_sha256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f",
+  "canonical_pins": 41,
+  "original_pins_preserved": 24,
+  "added_pins": 17,
+  "dependency_declarations_match_exact_git_sources": true,
+  "both_strict_resolutions_exit_zero_and_lock_unchanged": true,
+  "lanes": {
+    "baseline": {
+      "snippet_results": {
+        "spokenSnippetPipelineInsertsExactWholeTriggerContentAndSavesIt": "failed",
+        "spokenSnippetPipelinePreservesInlineCapitalsPunctuationAndParagraphs": "failed",
+        "spokenSnippetPipelineLeavesUnmatchedDictationOnItsExistingFormattingPath": "passed"
+      },
+      "snippet_assertion_lines": [
+        15,
+        16,
+        17,
+        18,
+        22,
+        33,
+        34,
+        35,
+        36
+      ],
+      "permission_result": "failed",
+      "permission_assertion_lines": [
+        15,
+        28
+      ],
+      "exact_enabled_identifiers_verified": true,
+      "no_unrelated_caught_error_or_fixture_issue": true,
+      "snippet_log_sha256": "29705d75e1fdc6f0b60b0ea39bebb0b4a1ba85adabbdedb6f7c9f87c8e3f9834",
+      "permission_log_sha256": "d192d499c53577fbe85d5cdc8674fa65c66f95f88d3c3999381971eb4a84a88f",
+      "snippet_failures": [
+        {
+          "line": 15,
+          "diagnostic": "(fixture.delivered \u2192 [\"UNEXPECTED AI OUTPUT \"]) == [\"\\nFelix C. Order\\nRJT, Inc.\\n\\n\"]"
+        },
+        {
+          "line": 16,
+          "diagnostic": "(fixture.enhancementCalls \u2192 1) == 0"
+        },
+        {
+          "line": 17,
+          "diagnostic": "(record.text \u2192 \"my signature\") == \"MY SIGNATURE.\""
+        },
+        {
+          "line": 18,
+          "diagnostic": "(record.enhancedText \u2192 \"UNEXPECTED AI OUTPUT\") == (\"\\nFelix C. Order\\nRJT, Inc.\\n\\n\" \u2192 \""
+        },
+        {
+          "line": 22,
+          "diagnostic": "(saved.first?.enhancedText \u2192 \"UNEXPECTED AI OUTPUT\") == (\"\\nFelix C. Order\\nRJT, Inc.\\n\\n\" \u2192 \""
+        },
+        {
+          "line": 33,
+          "diagnostic": "(fixture.delivered \u2192 [\"UNEXPECTED AI OUTPUT \"]) == [\"Please send First Floor, 10 Main St.\\n\\nTaipei 100 today.\"]"
+        },
+        {
+          "line": 34,
+          "diagnostic": "(fixture.enhancementCalls \u2192 1) == 0"
+        },
+        {
+          "line": 35,
+          "diagnostic": "(record.text \u2192 \"please send my address today\") == \"Please send MY ADDRESS today.\""
+        },
+        {
+          "line": 36,
+          "diagnostic": "(record.enhancedText \u2192 \"UNEXPECTED AI OUTPUT\") == (\"Please send First Floor, 10 Main St.\\n\\nTaipei 100 today.\" \u2192 \"Please send First Floor, 10 Main St."
+        }
+      ],
+      "permission_failures": [
+        {
+          "line": 15,
+          "diagnostic": "(fixture.engine.recordingState \u2192 .idle) == .starting"
+        },
+        {
+          "line": 28,
+          "diagnostic": "(gate.calls \u2192 2) == 1"
+        }
+      ]
+    },
+    "candidate": {
+      "snippet_results": {
+        "spokenSnippetPipelineInsertsExactWholeTriggerContentAndSavesIt": "passed",
+        "spokenSnippetPipelinePreservesInlineCapitalsPunctuationAndParagraphs": "passed",
+        "spokenSnippetPipelineLeavesUnmatchedDictationOnItsExistingFormattingPath": "passed"
+      },
+      "snippet_assertion_lines": [],
+      "permission_result": "passed",
+      "permission_assertion_lines": [],
+      "exact_enabled_identifiers_verified": true,
+      "no_unrelated_caught_error_or_fixture_issue": true,
+      "snippet_log_sha256": "66cd36a49d649ed92bce93c7c2b44a31116b0410c29178192560b84c6b23536b",
+      "permission_log_sha256": "bb6f8a1620295c2e11c7dd3b6f624090c60fb3e9dcf8a1aa237f93bb491d1043",
+      "snippet_failures": [],
+      "permission_failures": []
+    }
+  },
+  "retained_files": [
+    {
+      "path": "result.json",
+      "bytes": 256,
+      "sha256": "de964dd28cebb7ee65615f3ddf678746bc47539a96806c83e785e538026a25ab"
+    },
+    {
+      "path": "contract.txt",
+      "bytes": 1742,
+      "sha256": "8f92d3e30af42e98efc60697501808b73d1164975917e57e8e0f7b677588345e"
+    },
+    {
+      "path": "baseline-result.json",
+      "bytes": 325,
+      "sha256": "fe1394794b9f69524b5bd6217dfc898d62331f60c8676aa66040d1f593407920"
+    },
+    {
+      "path": "candidate-result.json",
+      "bytes": 320,
+      "sha256": "1272a7e247d98bc64c52e7f495e755dcf4ff1e9c2522d7be89c1a31629fabaa1"
+    },
+    {
+      "path": "baseline-permission-result.json",
+      "bytes": 299,
+      "sha256": "5bae0d08106698621f409bbd1f022936b84dfab9a1953afafc15976c0cdf622b"
+    },
+    {
+      "path": "candidate-permission-result.json",
+      "bytes": 207,
+      "sha256": "6c5f0f6c4217ffdadb4fd85bd29b1d99b99429e0b996f68978cc57dffc0707c3"
+    },
+    {
+      "path": "baseline-permission-instrumentation.json",
+      "bytes": 725,
+      "sha256": "b94b1d9775bd63d0ef5f8e20b021fd44877a7fae8efa300937cfaec41b7147e4"
+    },
+    {
+      "path": "packages/canonical-graph-contract.json",
+      "bytes": 1559,
+      "sha256": "109fe9e8cc62502d99af26803a81805acada454b5919096420f7168e8ab9691e"
+    },
+    {
+      "path": "packages/baseline-strict-resolve.json",
+      "bytes": 48,
+      "sha256": "b8d7c4a83bc62f449ed9b854ff63c039bbfd672feff6a72e84e7ade28e08c02e"
+    },
+    {
+      "path": "packages/candidate-strict-resolve.json",
+      "bytes": 48,
+      "sha256": "b8d7c4a83bc62f449ed9b854ff63c039bbfd672feff6a72e84e7ade28e08c02e"
+    },
+    {
+      "path": "baseline-selection/selection-receipt.json",
+      "bytes": 12846,
+      "sha256": "3bba23fb4cebbb1b9a67ecc7533d54b8afb7566d57a7865e0f26c5b7acf5b9d9"
+    },
+    {
+      "path": "baseline-permission-selection/selection-receipt.json",
+      "bytes": 12618,
+      "sha256": "518a54f715601d667c372b1d017d33c694342c89e91b6f40377e16c25aba344d"
+    },
+    {
+      "path": "candidate-selection/selection-receipt.json",
+      "bytes": 17359,
+      "sha256": "115ef79528ef918eadef9a1fd8bf7b22800a003bb06be57acb13ca317ecc98af"
+    },
+    {
+      "path": "candidate-permission-selection/selection-receipt.json",
+      "bytes": 17131,
+      "sha256": "b5abc2a2d597196307a4494549dd8cf95cd841979a350caea7c341fbdd835a9b"
+    }
+  ],
+  "identity_boundary": "Recorded source SHA, oracle and pipeline hashes, package graph and xcodebuild checkout/derived-data paths verified. This small matched checkpoint has no independent baseline executable/signature fingerprint; do not infer one. Candidate native identity is retained in the separate same-run live checkpoint.",
+  "limits": [
+    "Recognized transcript and AI enhancement are controlled fixture inputs; this is production pipeline integration, not microphone/ASR/provider semantic proof.",
+    "Permission callback is deferred through an explicitly reconstructed optional test hook at the existing boundary; old production ownership logic remains unchanged.",
+    "The stale startup catch case has candidate-only coverage, not a matched regression verdict.",
+    "UI and Release results are not part of this matched checkpoint."
+  ]
+}

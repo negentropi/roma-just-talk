@@ -443,6 +443,12 @@ class RecordingShortcutManager: ObservableObject {
 
     private func handleGlobalShortcut(_ action: ShortcutAction) async {
         switch action {
+        case .translateRecording:
+            await engine.toggleWritingAction(.translate)
+        case .rewriteSelectionRecording:
+            await engine.toggleWritingAction(.rewriteSelection)
+        case .draftRecording:
+            await engine.toggleWritingAction(.draft)
         case .pasteLastTranscription:
             LastTranscriptionService.pasteLastTranscription(from: engine.modelContext)
         case .pasteLastEnhancement:

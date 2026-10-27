@@ -218,7 +218,8 @@ class ImportExportService {
         }
         let generalSettingsToExport = VoiceInkGeneralSettingsBackupPayload<ShortcutBackup>(
             shortcutBackupRecords: shortcutBackupRecords,
-            preferences: generalSettingsBackupPreferences
+            preferences: generalSettingsBackupPreferences,
+            writingActions: VoiceInkWritingActionPreferences.load()
         )
 
         let exportedSettings = VoiceInkSettingsBackupFile<ShortcutBackup>(
@@ -230,7 +231,8 @@ class ImportExportService {
             wordReplacements: wordReplacementBackupRecords,
             generalSettings: generalSettingsToExport,
             customEmojis: powerModeCustomEmojis,
-            customCloudModels: customModels
+            customCloudModels: customModels,
+            spokenSnippets: VoiceInkSpokenSnippets.load()
         )
 
         do {
@@ -332,6 +334,10 @@ class ImportExportService {
                     )
                 },
                 importSelectedCategories: { selectedCategories in
+                    let writingFeatures = try VoiceInkWritingFeatureBackupImportPlan(
+                        backup: backup,
+                        categories: selectedCategories
+                    )
                     try BackupImporter.apply(
                         backup,
                         categories: selectedCategories,
@@ -346,6 +352,9 @@ class ImportExportService {
                         modelContext: modelContext,
                         transcriptionModelManager: transcriptionModelManager
                     )
+                    writingFeatures.apply()
+                    recordingShortcutManager.updateShortcutStatus()
+                    NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
 
                     showImportSuccessAlert(
                         fileName: url.lastPathComponent,

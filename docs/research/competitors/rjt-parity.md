@@ -6,7 +6,7 @@ Checked 2026-10-27. Research input: [Wispr Flow](wispr-flow.md), [Willow](willow
 
 - **Swift target S:** current chat checkout, `9e35e991b15c94e0089cc5f02f3b75522e78362b`. macOS VoiceInk-derived app plus separate Swift iOS app.
 - **Rust target R:** `ceefa8008eef93a90e357619d27b43ad4626c793`, inspected at `/Users/atalphalnmomhappyhouse/.t3/worktrees/VoiceInk/t3-9dabace7/rjt`. Shared Rust core and Slint hub; macOS, Windows and Android hosts.
-- Target choice is pending. Do not implement against one while describing the other as current RJT.
+- Felix confirmed the existing VoiceInk-based macOS app on 2026-10-27. Swift S is the implementation target. Rust R remains comparison evidence.
 - Rust's [foundation decision](https://github.com/negentropi/roma-just-talk/blob/ceefa8008eef93a90e357619d27b43ad4626c793/docs/rjt-foundation.md) explicitly chooses Wispr-style dictation over Swift feature parity. Several enhancement modes, Power Modes and trigger words were deliberately dropped. Their existence in Swift is reference evidence, not an instruction to restore them.
 - **Present:** source and user-facing wiring found for the named basic capability. **Partial:** primitives or a narrower workflow exist. **Absent:** no implementation found in reviewed owners. **Unresolved:** documentation/platform/effect is insufficiently specified. None of these statuses is fresh runtime proof.
 - Vendor IDs below point to source URLs and detailed behavior in the three audits. Competitor marketing speed, accuracy, language totals and compliance claims are not RJT acceptance criteria.

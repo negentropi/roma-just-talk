@@ -74,7 +74,8 @@ struct EnhancementSettingsView: View {
             }
 
             APIKeyManagementView()
-                .opacity(enhancementService.isEnhancementEnabled ? 1.0 : 0.8)
+
+            WritingActionsSettingsSection()
 
             Section {
                 ReorderablePromptGrid(

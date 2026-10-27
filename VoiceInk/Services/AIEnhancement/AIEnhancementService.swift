@@ -6,6 +6,17 @@ import LLMkit
 import VoiceInkCore
 
 @MainActor
+struct WritingActionProviderSnapshot {
+    let modelName: String
+    let apiKey: String
+    let executionPlan: VoiceInkAIEnhancementRequestExecutionPlan
+    let timeoutSeconds: TimeInterval
+    let retryOnTimeout: Bool
+    fileprivate let ollama: OllamaService?
+    fileprivate let localCLI: LocalCLIService?
+}
+
+@MainActor
 class AIEnhancementService: ObservableObject {
     private let logger = Logger(
         subsystem: VoiceInkAppIdentity.loggingSubsystem,
@@ -135,6 +146,21 @@ class AIEnhancementService: ObservableObject {
         aiService.isAPIKeyValid
     }
 
+    func writingActionProviderSnapshot() throws -> WritingActionProviderSnapshot {
+        guard isConfigured else { throw VoiceInkAIEnhancementError.notConfigured }
+        let provider = aiService.selectedProvider
+        let modelName = aiService.currentModel
+        return WritingActionProviderSnapshot(
+            modelName: modelName,
+            apiKey: aiService.apiKey,
+            executionPlan: .planning(provider: provider, modelName: modelName),
+            timeoutSeconds: VoiceInkAIEnhancementRequestPreference.timeoutSeconds(),
+            retryOnTimeout: VoiceInkAIEnhancementRequestPreference.shouldRetryOnTimeout(),
+            ollama: provider == .ollama ? OllamaService() : nil,
+            localCLI: provider == .localCLI ? LocalCLIService() : nil
+        )
+    }
+
     private func waitForRateLimit() async throws {
         if let delay = rateLimitPolicy.delaySinceLastRequest(lastRequest: lastRequestTime, now: Date()) {
             try await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
@@ -165,11 +191,15 @@ class AIEnhancementService: ObservableObject {
         return await SelectedTextService.fetchSelectedText()
     }
 
-    private func makeRequest(text: String) async throws -> String {
+    private func makeRequest(
+        text: String,
+        writingRequest: VoiceInkWritingActionRequest? = nil,
+        providerSnapshot: WritingActionProviderSnapshot? = nil
+    ) async throws -> String {
         let requestPayload: VoiceInkAIEnhancementRequestPayload
         switch try VoiceInkAIEnhancementRequestPreparation.preparing(
             transcript: text,
-            isConfigured: isConfigured
+            isConfigured: providerSnapshot != nil || isConfigured
         ) {
         case .skipEmptyTranscript:
             return ""
@@ -177,27 +207,39 @@ class AIEnhancementService: ObservableObject {
             requestPayload = payload
         }
 
-        let formattedText = requestPayload.userMessage
-        let systemMessage = await getSystemMessage()
+        let formattedText: String
+        let systemMessage: String
+        if let writingRequest {
+            // Explicit actions use only the captured selection and spoken input.
+            // Do not collect live selection, screen or clipboard context here.
+            formattedText = writingRequest.userMessage
+            systemMessage = writingRequest.systemMessage
+        } else {
+            formattedText = requestPayload.userMessage
+            systemMessage = await getSystemMessage()
+        }
 
         await MainActor.run {
             self.lastSystemMessageSent = systemMessage
             self.lastUserMessageSent = formattedText
         }
 
-        let executionPlan = VoiceInkAIEnhancementRequestExecutionPlan.planning(
+        let executionPlan = providerSnapshot?.executionPlan ?? VoiceInkAIEnhancementRequestExecutionPlan.planning(
             provider: aiService.selectedProvider,
             modelName: aiService.currentModel
         )
+        let apiKey = providerSnapshot?.apiKey ?? aiService.apiKey
+        let timeoutSeconds = providerSnapshot?.timeoutSeconds ?? VoiceInkAIEnhancementRequestPreference.timeoutSeconds()
 
         return try await executionPlan.applyRuntimeState(
             ollama: { _ in
                 do {
-                    let result = try await aiService.enhanceWithOllama(
-                        text: formattedText,
-                        systemPrompt: systemMessage,
-                        timeout: VoiceInkAIEnhancementRequestPreference.timeoutSeconds()
-                    )
+                    let result: String
+                    if let ollama = providerSnapshot?.ollama {
+                        result = try await ollama.enhance(formattedText, withSystemPrompt: systemMessage, timeout: timeoutSeconds)
+                    } else {
+                        result = try await aiService.enhanceWithOllama(text: formattedText, systemPrompt: systemMessage, timeout: timeoutSeconds)
+                    }
                     return VoiceInkAIEnhancementRequestPayload.enhancedText(from: result)
                 } catch let error as VoiceInkAIEnhancementError {
                     throw error
@@ -207,10 +249,12 @@ class AIEnhancementService: ObservableObject {
             },
             localCLI: { _ in
                 do {
-                    let result = try await aiService.enhanceWithLocalCLI(
-                        systemPrompt: systemMessage,
-                        userPrompt: formattedText
-                    )
+                    let result: String
+                    if let localCLI = providerSnapshot?.localCLI {
+                        result = try await localCLI.enhance(systemPrompt: systemMessage, userPrompt: formattedText)
+                    } else {
+                        result = try await aiService.enhanceWithLocalCLI(systemPrompt: systemMessage, userPrompt: formattedText)
+                    }
                     return VoiceInkAIEnhancementRequestPayload.enhancedText(from: result)
                 } catch {
                     throw VoiceInkAIEnhancementError.localCLIExecutionFailure(error)
@@ -219,11 +263,11 @@ class AIEnhancementService: ObservableObject {
             anthropicMessages: { modelName in
                 try await executeCloudAIRequest {
                     try await AnthropicLLMClient.chatCompletion(
-                        apiKey: aiService.apiKey,
+                        apiKey: apiKey,
                         model: modelName,
                         messages: [.user(formattedText)],
                         systemPrompt: systemMessage,
-                        timeout: VoiceInkAIEnhancementRequestPreference.timeoutSeconds()
+                        timeout: timeoutSeconds
                     )
                 }
             },
@@ -231,14 +275,14 @@ class AIEnhancementService: ObservableObject {
                 try await executeCloudAIRequest {
                     try await OpenAILLMClient.chatCompletion(
                         baseURL: requestURL,
-                        apiKey: aiService.apiKey,
+                        apiKey: apiKey,
                         model: modelName,
                         messages: [.user(formattedText)],
                         systemPrompt: systemMessage,
                         temperature: requestParameters.temperature,
                         reasoningEffort: requestParameters.reasoningEffort,
                         extraBody: requestParameters.extraBodyParameters,
-                        timeout: VoiceInkAIEnhancementRequestPreference.timeoutSeconds()
+                        timeout: timeoutSeconds
                     )
                 }
             }
@@ -262,14 +306,18 @@ class AIEnhancementService: ObservableObject {
         }
     }
 
-    private func makeRequestWithRetry(text: String) async throws -> String {
+    private func makeRequestWithRetry(
+        text: String,
+        writingRequest: VoiceInkWritingActionRequest? = nil,
+        providerSnapshot: WritingActionProviderSnapshot? = nil
+    ) async throws -> String {
         var retryState = VoiceInkAIEnhancementRetryState(
-            retryOnTimeout: VoiceInkAIEnhancementRequestPreference.shouldRetryOnTimeout()
+            retryOnTimeout: providerSnapshot?.retryOnTimeout ?? VoiceInkAIEnhancementRequestPreference.shouldRetryOnTimeout()
         )
 
         while true {
             do {
-                return try await makeRequest(text: text)
+                return try await makeRequest(text: text, writingRequest: writingRequest, providerSnapshot: providerSnapshot)
             } catch let error as VoiceInkAIEnhancementError {
                 try await handleRetryDecision(
                     retryState.recordFailure(error),
@@ -350,6 +398,30 @@ class AIEnhancementService: ObservableObject {
             promptName: promptName,
             requestSystemMessage: lastSystemMessageSent,
             requestUserMessage: lastUserMessageSent
+        )
+    }
+
+    func performWritingAction(
+        _ request: VoiceInkWritingActionRequest,
+        using providerSnapshot: WritingActionProviderSnapshot
+    ) async throws -> VoiceInkAIEnhancementResult {
+        let startTime = Date()
+        let result = try await makeRequestWithRetry(
+            text: request.transcript,
+            writingRequest: request,
+            providerSnapshot: providerSnapshot
+        )
+        guard !result.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw VoiceInkWritingActionError.emptyOutput
+        }
+        return VoiceInkAIEnhancementResult.completed(
+            text: result,
+            startedAt: startTime,
+            endedAt: Date(),
+            modelName: providerSnapshot.modelName,
+            promptName: request.promptName,
+            requestSystemMessage: request.systemMessage,
+            requestUserMessage: request.userMessage
         )
     }
 

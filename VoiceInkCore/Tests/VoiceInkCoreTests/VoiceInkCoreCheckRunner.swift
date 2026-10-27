@@ -10,6 +10,18 @@ struct VoiceInkCoreCheck {
 struct VoiceInkCoreCheckRunner {
     static func main() async {
         let checks: [VoiceInkCoreCheck] = [
+            VoiceInkCoreCheck(name: "WritingActionsTests.testTranslationTargetsPersistInOrderWithoutChangingRecognitionLanguage", run: { try WritingActionsTests().testTranslationTargetsPersistInOrderWithoutChangingRecognitionLanguage() }),
+            VoiceInkCoreCheck(name: "WritingActionsTests.testTranslationUsesExplicitLocaleAndTreatsSpokenInstructionsAsContent", run: { try WritingActionsTests().testTranslationUsesExplicitLocaleAndTreatsSpokenInstructionsAsContent() }),
+            VoiceInkCoreCheck(name: "WritingActionsTests.testRewriteKeepsInstructionsAndExactSelectionSeparate", run: { try WritingActionsTests().testRewriteKeepsInstructionsAndExactSelectionSeparate() }),
+            VoiceInkCoreCheck(name: "WritingActionsTests.testFailedWritingActionDoesNotDeliverRawInstruction", run: { try await WritingActionsTests().testFailedWritingActionDoesNotDeliverRawInstruction() }),
+            VoiceInkCoreCheck(name: "WritingActionsTests.testCancellationDuringGenerationDoesNotReplaceSelectedText", run: { try await WritingActionsTests().testCancellationDuringGenerationDoesNotReplaceSelectedText() }),
+            VoiceInkCoreCheck(name: "WritingActionsTests.testWritingActionDeliversExactResultAndRejectsEmptyOutput", run: { try await WritingActionsTests().testWritingActionDeliversExactResultAndRejectsEmptyOutput() }),
+            VoiceInkCoreCheck(name: "WritingFeatureBackupTests.testLegacyBackupLeavesNewFeaturesAbsent", run: { try WritingFeatureBackupTests().testLegacyBackupLeavesNewFeaturesAbsent() }),
+            VoiceInkCoreCheck(name: "WritingFeatureBackupTests.testFeatureBackupRoundTripsExactContentTargetsAndShortcuts", run: { try WritingFeatureBackupTests().testFeatureBackupRoundTripsExactContentTargetsAndShortcuts() }),
+            VoiceInkCoreCheck(name: "WritingFeatureBackupTests.testInvalidSnippetBackupDoesNotApplyValidWritingPreferences", run: { try WritingFeatureBackupTests().testInvalidSnippetBackupDoesNotApplyValidWritingPreferences() }),
+            VoiceInkCoreCheck(name: "WritingFeatureBackupTests.testInvalidWritingTargetsRejectBeforeAnyFeatureMutation", run: { try WritingFeatureBackupTests().testInvalidWritingTargetsRejectBeforeAnyFeatureMutation() }),
+            VoiceInkCoreCheck(name: "WritingFeatureBackupTests.testImportCategoriesAndMissingFieldsPreserveUnselectedPreferences", run: { try WritingFeatureBackupTests().testImportCategoriesAndMissingFieldsPreserveUnselectedPreferences() }),
+            VoiceInkCoreCheck(name: "WritingFeatureBackupTests.testSharedResetClearsWritingFeaturesAndShortcutsOnlyWithinOwnedSettings", run: { try WritingFeatureBackupTests().testSharedResetClearsWritingFeaturesAndShortcutsOnlyWithinOwnedSettings() }),
             VoiceInkCoreCheck(name: "SpokenSnippetsTests.testExpansionReportsMatchesEvenWhenSavedContentEqualsTrigger", run: { SpokenSnippetsTests().testExpansionReportsMatchesEvenWhenSavedContentEqualsTrigger() }),
             VoiceInkCoreCheck(name: "SpokenSnippetsTests.testEntireSnippetRecognizesOnlyCompleteEnabledTriggerAndRecognitionPunctuation", run: { SpokenSnippetsTests().testEntireSnippetRecognizesOnlyCompleteEnabledTriggerAndRecognitionPunctuation() }),
             VoiceInkCoreCheck(name: "SpokenSnippetsTests.testBareTriggerPreservesExactMultilineContentWithoutRecognitionPunctuation", run: { SpokenSnippetsTests().testBareTriggerPreservesExactMultilineContentWithoutRecognitionPunctuation() }),

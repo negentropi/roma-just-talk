@@ -46,6 +46,10 @@ Current status: visible app branding uses roma-just-talk, while many internal la
 - 📝 **Personal Dictionary**: Train the AI to understand your unique terminology with custom words, industry terms, and smart text replacements
 - 🔄 **Smart Modes**: Instantly switch between AI-powered modes optimized for different writing styles and contexts
 - 🤖 **AI Assistant**: Built-in voice assistant mode for a quick chatGPT like conversational assistant
+- **Writing Actions**: Separate shortcuts translate speech, rewrite selected text, or draft from spoken instructions. Translation targets stay separate from recognition language.
+- **Spoken snippets**: Save literal text, including line breaks, and insert it by saying its trigger. Import and export the library as CSV.
+
+See [Writing Actions and spoken snippets](docs/writing-actions-and-snippets.md) for setup, supported editors, and recovery behavior.
 
 ### Dictate hands-free with Special mode
 

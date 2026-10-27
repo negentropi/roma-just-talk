@@ -1,0 +1,55 @@
+# Use Writing Actions and spoken snippets
+
+These features belong to the existing VoiceInk-based Mac app. They use your configured transcription model and AI provider.
+
+## Set up Writing Actions
+
+1. Open **AI Enhancement** and configure an AI provider.
+2. Under **Writing Actions**, assign shortcuts for **Translate dictation**, **Edit selected text**, or **Draft from instructions**.
+3. Under **Translation Target**, add the languages you use. Select a target and use the arrow controls to reorder favorites.
+
+Writing Actions work when ordinary Enhancement is off. A translation target controls the output language. It does not change the transcription language or model.
+
+## Translate or draft into a field
+
+1. Focus an editable field in another app.
+2. Press the action's shortcut and speak.
+3. Press the same shortcut to finish.
+
+Translate treats your speech as content to translate. Draft treats it as an instruction to write a message or document. Ordinary dictation keeps its existing behavior.
+
+## Edit selected text
+
+1. Select text in an editable field in another app.
+2. Press the editing shortcut.
+3. Say an instruction such as "Make this shorter" or "Rewrite this in Spanish."
+4. Press the same shortcut to finish.
+
+Keep the original app, field, text, and selection unchanged while processing runs. The app checks them before replacement. It refuses protected fields, read-only selections, and editors that do not expose safe selected-text replacement through Accessibility. It does not replace the whole document as a fallback.
+
+If generation fails or the destination changes, the instruction is not inserted. Open **History** to recover the recording, transcript, and any generated result. Canceling prevents delivery. Explicit writing actions do not use snippets, ordinary cleanup prompts, screen or clipboard context, or automatic Send.
+
+## Save and use a snippet
+
+1. Open **Dictionary**, then **Snippets**.
+2. Choose **New Snippet**.
+3. Enter a trigger and its saved content. Content can contain line breaks, links, punctuation, and spaces.
+4. Save it and say the trigger during ordinary dictation.
+
+A trigger can contain up to 60 characters. Content can contain up to 4,000 characters. Trigger matching ignores case and repeated spaces. The longest overlapping phrase wins. Latin and other spaced scripts require word boundaries. Saved expansions are not searched again for more triggers.
+
+When a dictation contains a snippet trigger, its surrounding words stay as recognized. AI rewriting, cleanup, word replacements, cursor capitalization, and added trailing spaces are bypassed for that dictation. Saved content therefore stays literal. A trigger spoken alone inserts only the saved content, without final punctuation added by recognition.
+
+Disable a snippet to keep it in the library without expanding it. Delete removes it from the library.
+
+## Transfer snippets as CSV
+
+Use **Export CSV** to save the library. Use **Import CSV** to review a file before merging it. The header is `trigger,content,enabled`; `enabled` is optional and defaults to `true`.
+
+Quoted fields can contain commas, quotes, and line breaks. Duplicate triggers require an explicit keep, replace, or reject choice. Invalid rows block the import. Import does not silently keep only the valid rows.
+
+The library holds up to 1,000 snippets. Import files must be no larger than 3 MB. Settings backup includes snippets, translation preferences, and writing shortcuts. Older backups without these fields leave them unchanged.
+
+## Verification status
+
+The feature checks cover literal expansion, CSV transfer, request construction, cancellation, target drift, settings backup, and recording-start ownership. Fresh remote app build and live editor evidence are recorded in the [implementation plan](research/competitors/implementation-plan.md). Source presence alone does not establish compatibility with every editor or the quality of a chosen AI provider.

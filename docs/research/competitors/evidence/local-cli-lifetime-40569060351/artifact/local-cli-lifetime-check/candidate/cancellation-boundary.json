@@ -1,0 +1,10 @@
+{
+  "childAliveAtBoundary" : false,
+  "completedWithinDeadline" : true,
+  "deadlineSeconds" : 1.5,
+  "elapsedSeconds" : 1.0482668750000244,
+  "stdinBytes" : 81990,
+  "stdinSHA256" : "02057511960921b49a24562d6396bd04e6b8d58f57daece050cbe30d1af65f56",
+  "survivorAliveAtBoundary" : true,
+  "typedCancellation" : true
+}

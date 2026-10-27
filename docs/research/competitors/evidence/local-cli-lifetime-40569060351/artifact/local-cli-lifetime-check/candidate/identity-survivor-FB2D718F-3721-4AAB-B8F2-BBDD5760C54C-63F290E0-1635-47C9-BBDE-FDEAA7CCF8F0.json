@@ -1,0 +1,80 @@
+{
+  "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/survivor-FB2D718F-3721-4AAB-B8F2-BBDD5760C54C-63F290E0-1635-47C9-BBDE-FDEAA7CCF8F0\/command.zsh 958A0212-E25E-4A44-A735-51119330A000",
+  "executable" : "\/bin\/zsh",
+  "identity" : {
+    "actual" : {
+      "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/survivor-FB2D718F-3721-4AAB-B8F2-BBDD5760C54C-63F290E0-1635-47C9-BBDE-FDEAA7CCF8F0\/command.zsh 958A0212-E25E-4A44-A735-51119330A000",
+      "captureErrors" : [
+
+      ],
+      "fileIdentity" : {
+        "device" : 16777229,
+        "inode" : 1152921500312571425
+      },
+      "kernelErrno" : 0,
+      "kernelImage" : "\/bin\/zsh",
+      "kernelReturnCode" : 8,
+      "pid" : 9613,
+      "ppid" : 9603,
+      "realpath" : "\/bin\/zsh"
+    },
+    "differences" : [
+
+    ],
+    "expected" : {
+      "allowedPPIDs" : [
+        9603
+      ],
+      "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/survivor-FB2D718F-3721-4AAB-B8F2-BBDD5760C54C-63F290E0-1635-47C9-BBDE-FDEAA7CCF8F0\/command.zsh 958A0212-E25E-4A44-A735-51119330A000",
+      "executable" : "\/bin\/zsh",
+      "fileIdentity" : {
+        "device" : 16777229,
+        "inode" : 1152921500312571425
+      },
+      "pid" : 9613,
+      "realpath" : "\/bin\/zsh"
+    },
+    "rawPS" : {
+      "args" : {
+        "captureErrors" : [
+
+        ],
+        "command" : [
+          "\/bin\/ps",
+          "-ww",
+          "-p",
+          "9613",
+          "-o",
+          "args="
+        ],
+        "exitCode" : 0,
+        "stderr" : "",
+        "stdout" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/survivor-FB2D718F-3721-4AAB-B8F2-BBDD5760C54C-63F290E0-1635-47C9-BBDE-FDEAA7CCF8F0\/command.zsh 958A0212-E25E-4A44-A735-51119330A000\n",
+        "timedOut" : false
+      },
+      "ppid" : {
+        "captureErrors" : [
+
+        ],
+        "command" : [
+          "\/bin\/ps",
+          "-ww",
+          "-p",
+          "9613",
+          "-o",
+          "ppid="
+        ],
+        "exitCode" : 0,
+        "stderr" : "",
+        "stdout" : " 9603\n",
+        "timedOut" : false
+      }
+    },
+    "verified" : true
+  },
+  "pid" : 9613,
+  "ppid" : 9603,
+  "script" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/survivor-FB2D718F-3721-4AAB-B8F2-BBDD5760C54C-63F290E0-1635-47C9-BBDE-FDEAA7CCF8F0\/command.zsh",
+  "token" : "958A0212-E25E-4A44-A735-51119330A000",
+  "verified" : true
+}

@@ -1,0 +1,80 @@
+{
+  "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/cancel-9846372C-C550-4CE1-B1DC-F0F073658DC9-B41D791E-A94E-4C51-89C0-21C45614BE76\/command.zsh 712EC418-28E0-4D5D-9D5B-F863A6995B7C",
+  "executable" : "\/bin\/zsh",
+  "identity" : {
+    "actual" : {
+      "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/cancel-9846372C-C550-4CE1-B1DC-F0F073658DC9-B41D791E-A94E-4C51-89C0-21C45614BE76\/command.zsh 712EC418-28E0-4D5D-9D5B-F863A6995B7C",
+      "captureErrors" : [
+
+      ],
+      "fileIdentity" : {
+        "device" : 16777229,
+        "inode" : 1152921500312571425
+      },
+      "kernelErrno" : 0,
+      "kernelImage" : "\/bin\/zsh",
+      "kernelReturnCode" : 8,
+      "pid" : 9614,
+      "ppid" : 9603,
+      "realpath" : "\/bin\/zsh"
+    },
+    "differences" : [
+
+    ],
+    "expected" : {
+      "allowedPPIDs" : [
+        9603
+      ],
+      "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/cancel-9846372C-C550-4CE1-B1DC-F0F073658DC9-B41D791E-A94E-4C51-89C0-21C45614BE76\/command.zsh 712EC418-28E0-4D5D-9D5B-F863A6995B7C",
+      "executable" : "\/bin\/zsh",
+      "fileIdentity" : {
+        "device" : 16777229,
+        "inode" : 1152921500312571425
+      },
+      "pid" : 9614,
+      "realpath" : "\/bin\/zsh"
+    },
+    "rawPS" : {
+      "args" : {
+        "captureErrors" : [
+
+        ],
+        "command" : [
+          "\/bin\/ps",
+          "-ww",
+          "-p",
+          "9614",
+          "-o",
+          "args="
+        ],
+        "exitCode" : 0,
+        "stderr" : "",
+        "stdout" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/cancel-9846372C-C550-4CE1-B1DC-F0F073658DC9-B41D791E-A94E-4C51-89C0-21C45614BE76\/command.zsh 712EC418-28E0-4D5D-9D5B-F863A6995B7C\n",
+        "timedOut" : false
+      },
+      "ppid" : {
+        "captureErrors" : [
+
+        ],
+        "command" : [
+          "\/bin\/ps",
+          "-ww",
+          "-p",
+          "9614",
+          "-o",
+          "ppid="
+        ],
+        "exitCode" : 0,
+        "stderr" : "",
+        "stdout" : " 9603\n",
+        "timedOut" : false
+      }
+    },
+    "verified" : true
+  },
+  "pid" : 9614,
+  "ppid" : 9603,
+  "script" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/cancel-9846372C-C550-4CE1-B1DC-F0F073658DC9-B41D791E-A94E-4C51-89C0-21C45614BE76\/command.zsh",
+  "token" : "712EC418-28E0-4D5D-9D5B-F863A6995B7C",
+  "verified" : true
+}

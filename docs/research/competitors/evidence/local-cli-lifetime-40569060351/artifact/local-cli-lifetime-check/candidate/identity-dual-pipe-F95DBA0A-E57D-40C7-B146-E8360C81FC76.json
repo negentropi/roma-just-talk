@@ -1,0 +1,80 @@
+{
+  "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/dual-pipe-F95DBA0A-E57D-40C7-B146-E8360C81FC76\/command.zsh 65F1C717-F95A-48E0-97D0-3C62A77D2F14",
+  "executable" : "\/bin\/zsh",
+  "identity" : {
+    "actual" : {
+      "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/dual-pipe-F95DBA0A-E57D-40C7-B146-E8360C81FC76\/command.zsh 65F1C717-F95A-48E0-97D0-3C62A77D2F14",
+      "captureErrors" : [
+
+      ],
+      "fileIdentity" : {
+        "device" : 16777229,
+        "inode" : 1152921500312571425
+      },
+      "kernelErrno" : 0,
+      "kernelImage" : "\/bin\/zsh",
+      "kernelReturnCode" : 8,
+      "pid" : 9652,
+      "ppid" : 9603,
+      "realpath" : "\/bin\/zsh"
+    },
+    "differences" : [
+
+    ],
+    "expected" : {
+      "allowedPPIDs" : [
+        9603
+      ],
+      "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/dual-pipe-F95DBA0A-E57D-40C7-B146-E8360C81FC76\/command.zsh 65F1C717-F95A-48E0-97D0-3C62A77D2F14",
+      "executable" : "\/bin\/zsh",
+      "fileIdentity" : {
+        "device" : 16777229,
+        "inode" : 1152921500312571425
+      },
+      "pid" : 9652,
+      "realpath" : "\/bin\/zsh"
+    },
+    "rawPS" : {
+      "args" : {
+        "captureErrors" : [
+
+        ],
+        "command" : [
+          "\/bin\/ps",
+          "-ww",
+          "-p",
+          "9652",
+          "-o",
+          "args="
+        ],
+        "exitCode" : 0,
+        "stderr" : "",
+        "stdout" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/dual-pipe-F95DBA0A-E57D-40C7-B146-E8360C81FC76\/command.zsh 65F1C717-F95A-48E0-97D0-3C62A77D2F14\n",
+        "timedOut" : false
+      },
+      "ppid" : {
+        "captureErrors" : [
+
+        ],
+        "command" : [
+          "\/bin\/ps",
+          "-ww",
+          "-p",
+          "9652",
+          "-o",
+          "ppid="
+        ],
+        "exitCode" : 0,
+        "stderr" : "",
+        "stdout" : " 9603\n",
+        "timedOut" : false
+      }
+    },
+    "verified" : true
+  },
+  "pid" : 9652,
+  "ppid" : 9603,
+  "script" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/dual-pipe-F95DBA0A-E57D-40C7-B146-E8360C81FC76\/command.zsh",
+  "token" : "65F1C717-F95A-48E0-97D0-3C62A77D2F14",
+  "verified" : true
+}

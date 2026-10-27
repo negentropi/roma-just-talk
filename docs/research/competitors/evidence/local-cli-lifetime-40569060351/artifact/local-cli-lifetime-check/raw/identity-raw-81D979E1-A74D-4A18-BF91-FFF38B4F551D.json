@@ -1,0 +1,80 @@
+{
+  "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/raw\/raw-81D979E1-A74D-4A18-BF91-FFF38B4F551D\/command.zsh 80E785BC-69B1-4846-B1BF-B54A77ABE39D",
+  "executable" : "\/bin\/zsh",
+  "identity" : {
+    "actual" : {
+      "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/raw\/raw-81D979E1-A74D-4A18-BF91-FFF38B4F551D\/command.zsh 80E785BC-69B1-4846-B1BF-B54A77ABE39D",
+      "captureErrors" : [
+
+      ],
+      "fileIdentity" : {
+        "device" : 16777229,
+        "inode" : 1152921500312571425
+      },
+      "kernelErrno" : 0,
+      "kernelImage" : "\/bin\/zsh",
+      "kernelReturnCode" : 8,
+      "pid" : 10129,
+      "ppid" : 10104,
+      "realpath" : "\/bin\/zsh"
+    },
+    "differences" : [
+
+    ],
+    "expected" : {
+      "allowedPPIDs" : [
+        10104
+      ],
+      "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/raw\/raw-81D979E1-A74D-4A18-BF91-FFF38B4F551D\/command.zsh 80E785BC-69B1-4846-B1BF-B54A77ABE39D",
+      "executable" : "\/bin\/zsh",
+      "fileIdentity" : {
+        "device" : 16777229,
+        "inode" : 1152921500312571425
+      },
+      "pid" : 10129,
+      "realpath" : "\/bin\/zsh"
+    },
+    "rawPS" : {
+      "args" : {
+        "captureErrors" : [
+
+        ],
+        "command" : [
+          "\/bin\/ps",
+          "-ww",
+          "-p",
+          "10129",
+          "-o",
+          "args="
+        ],
+        "exitCode" : 0,
+        "stderr" : "",
+        "stdout" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/raw\/raw-81D979E1-A74D-4A18-BF91-FFF38B4F551D\/command.zsh 80E785BC-69B1-4846-B1BF-B54A77ABE39D\n",
+        "timedOut" : false
+      },
+      "ppid" : {
+        "captureErrors" : [
+
+        ],
+        "command" : [
+          "\/bin\/ps",
+          "-ww",
+          "-p",
+          "10129",
+          "-o",
+          "ppid="
+        ],
+        "exitCode" : 0,
+        "stderr" : "",
+        "stdout" : "10104\n",
+        "timedOut" : false
+      }
+    },
+    "verified" : true
+  },
+  "pid" : 10129,
+  "ppid" : 10104,
+  "script" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/raw\/raw-81D979E1-A74D-4A18-BF91-FFF38B4F551D\/command.zsh",
+  "token" : "80E785BC-69B1-4846-B1BF-B54A77ABE39D",
+  "verified" : true
+}

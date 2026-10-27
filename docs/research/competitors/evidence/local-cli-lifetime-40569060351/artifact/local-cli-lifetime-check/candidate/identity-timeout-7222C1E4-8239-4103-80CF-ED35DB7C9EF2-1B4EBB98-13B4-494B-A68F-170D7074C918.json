@@ -1,0 +1,80 @@
+{
+  "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/timeout-7222C1E4-8239-4103-80CF-ED35DB7C9EF2-1B4EBB98-13B4-494B-A68F-170D7074C918\/command.zsh 6C4A5E62-F5C7-45EC-85BF-36BA189A2A54",
+  "executable" : "\/bin\/zsh",
+  "identity" : {
+    "actual" : {
+      "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/timeout-7222C1E4-8239-4103-80CF-ED35DB7C9EF2-1B4EBB98-13B4-494B-A68F-170D7074C918\/command.zsh 6C4A5E62-F5C7-45EC-85BF-36BA189A2A54",
+      "captureErrors" : [
+
+      ],
+      "fileIdentity" : {
+        "device" : 16777229,
+        "inode" : 1152921500312571425
+      },
+      "kernelErrno" : 0,
+      "kernelImage" : "\/bin\/zsh",
+      "kernelReturnCode" : 8,
+      "pid" : 9664,
+      "ppid" : 9603,
+      "realpath" : "\/bin\/zsh"
+    },
+    "differences" : [
+
+    ],
+    "expected" : {
+      "allowedPPIDs" : [
+        9603
+      ],
+      "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/timeout-7222C1E4-8239-4103-80CF-ED35DB7C9EF2-1B4EBB98-13B4-494B-A68F-170D7074C918\/command.zsh 6C4A5E62-F5C7-45EC-85BF-36BA189A2A54",
+      "executable" : "\/bin\/zsh",
+      "fileIdentity" : {
+        "device" : 16777229,
+        "inode" : 1152921500312571425
+      },
+      "pid" : 9664,
+      "realpath" : "\/bin\/zsh"
+    },
+    "rawPS" : {
+      "args" : {
+        "captureErrors" : [
+
+        ],
+        "command" : [
+          "\/bin\/ps",
+          "-ww",
+          "-p",
+          "9664",
+          "-o",
+          "args="
+        ],
+        "exitCode" : 0,
+        "stderr" : "",
+        "stdout" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/timeout-7222C1E4-8239-4103-80CF-ED35DB7C9EF2-1B4EBB98-13B4-494B-A68F-170D7074C918\/command.zsh 6C4A5E62-F5C7-45EC-85BF-36BA189A2A54\n",
+        "timedOut" : false
+      },
+      "ppid" : {
+        "captureErrors" : [
+
+        ],
+        "command" : [
+          "\/bin\/ps",
+          "-ww",
+          "-p",
+          "9664",
+          "-o",
+          "ppid="
+        ],
+        "exitCode" : 0,
+        "stderr" : "",
+        "stdout" : " 9603\n",
+        "timedOut" : false
+      }
+    },
+    "verified" : true
+  },
+  "pid" : 9664,
+  "ppid" : 9603,
+  "script" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/timeout-7222C1E4-8239-4103-80CF-ED35DB7C9EF2-1B4EBB98-13B4-494B-A68F-170D7074C918\/command.zsh",
+  "token" : "6C4A5E62-F5C7-45EC-85BF-36BA189A2A54",
+  "verified" : true
+}

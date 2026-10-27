@@ -1,0 +1,80 @@
+{
+  "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/precancel-5D370365-C7B9-4C17-AAF5-96CE4EAF73FB-2D6915D9-FDD2-429B-BC1E-D4BB7EE4BBB3\/command.zsh AD29D420-4785-4322-B7AC-8F32A37D9B88",
+  "executable" : "\/bin\/zsh",
+  "identity" : {
+    "actual" : {
+      "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/precancel-5D370365-C7B9-4C17-AAF5-96CE4EAF73FB-2D6915D9-FDD2-429B-BC1E-D4BB7EE4BBB3\/command.zsh AD29D420-4785-4322-B7AC-8F32A37D9B88",
+      "captureErrors" : [
+
+      ],
+      "fileIdentity" : {
+        "device" : 16777229,
+        "inode" : 1152921500312571425
+      },
+      "kernelErrno" : 0,
+      "kernelImage" : "\/bin\/zsh",
+      "kernelReturnCode" : 8,
+      "pid" : 8749,
+      "ppid" : 8738,
+      "realpath" : "\/bin\/zsh"
+    },
+    "differences" : [
+
+    ],
+    "expected" : {
+      "allowedPPIDs" : [
+        8738
+      ],
+      "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/precancel-5D370365-C7B9-4C17-AAF5-96CE4EAF73FB-2D6915D9-FDD2-429B-BC1E-D4BB7EE4BBB3\/command.zsh AD29D420-4785-4322-B7AC-8F32A37D9B88",
+      "executable" : "\/bin\/zsh",
+      "fileIdentity" : {
+        "device" : 16777229,
+        "inode" : 1152921500312571425
+      },
+      "pid" : 8749,
+      "realpath" : "\/bin\/zsh"
+    },
+    "rawPS" : {
+      "args" : {
+        "captureErrors" : [
+
+        ],
+        "command" : [
+          "\/bin\/ps",
+          "-ww",
+          "-p",
+          "8749",
+          "-o",
+          "args="
+        ],
+        "exitCode" : 0,
+        "stderr" : "",
+        "stdout" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/precancel-5D370365-C7B9-4C17-AAF5-96CE4EAF73FB-2D6915D9-FDD2-429B-BC1E-D4BB7EE4BBB3\/command.zsh AD29D420-4785-4322-B7AC-8F32A37D9B88\n",
+        "timedOut" : false
+      },
+      "ppid" : {
+        "captureErrors" : [
+
+        ],
+        "command" : [
+          "\/bin\/ps",
+          "-ww",
+          "-p",
+          "8749",
+          "-o",
+          "ppid="
+        ],
+        "exitCode" : 0,
+        "stderr" : "",
+        "stdout" : " 8738\n",
+        "timedOut" : false
+      }
+    },
+    "verified" : true
+  },
+  "pid" : 8749,
+  "ppid" : 8738,
+  "script" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/precancel-5D370365-C7B9-4C17-AAF5-96CE4EAF73FB-2D6915D9-FDD2-429B-BC1E-D4BB7EE4BBB3\/command.zsh",
+  "token" : "AD29D420-4785-4322-B7AC-8F32A37D9B88",
+  "verified" : true
+}

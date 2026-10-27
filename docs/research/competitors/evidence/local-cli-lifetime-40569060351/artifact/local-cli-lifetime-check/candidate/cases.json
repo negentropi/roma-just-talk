@@ -1,0 +1,736 @@
+[
+  {
+    "boundary" : {
+      "commandLaunched" : false,
+      "completedWithinDeadline" : true,
+      "typedCancellation" : true
+    },
+    "cleanupCompleted" : true,
+    "id" : "pre-cancelled",
+    "outcomes" : [
+      {
+        "completed" : true,
+        "errorDescription" : "CancellationError()",
+        "errorKind" : "cancellation",
+        "stdoutBytes" : 0,
+        "stdoutSHA256" : "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "timeoutSeconds" : null
+      }
+    ],
+    "passed" : true,
+    "probePID" : 9603,
+    "processes" : [
+
+    ]
+  },
+  {
+    "boundary" : {
+      "childAliveAtBoundary" : false,
+      "completedWithinDeadline" : true,
+      "deadlineSeconds" : 1.5,
+      "elapsedSeconds" : 1.0482668750000244,
+      "stdinBytes" : 81990,
+      "stdinSHA256" : "02057511960921b49a24562d6396bd04e6b8d58f57daece050cbe30d1af65f56",
+      "survivorAliveAtBoundary" : true,
+      "survivorExactAfterRelease" : true,
+      "typedCancellation" : true
+    },
+    "cleanupCompleted" : true,
+    "id" : "cancel-blocked-stdin",
+    "outcomes" : [
+      {
+        "completed" : true,
+        "errorDescription" : "CancellationError()",
+        "errorKind" : "cancellation",
+        "stdoutBytes" : 0,
+        "stdoutSHA256" : "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "timeoutSeconds" : null
+      },
+      {
+        "completed" : true,
+        "errorDescription" : "",
+        "errorKind" : "none",
+        "stdoutBytes" : 14,
+        "stdoutSHA256" : "c73c3f0e692240716af30b35792afb8fcb7ccbfdff04634afae156b3c0395dd5",
+        "timeoutSeconds" : null
+      }
+    ],
+    "passed" : true,
+    "probePID" : 9603,
+    "processes" : [
+      {
+        "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/cancel-9846372C-C550-4CE1-B1DC-F0F073658DC9-B41D791E-A94E-4C51-89C0-21C45614BE76\/command.zsh 712EC418-28E0-4D5D-9D5B-F863A6995B7C",
+        "executable" : "\/bin\/zsh",
+        "identity" : {
+          "actual" : {
+            "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/cancel-9846372C-C550-4CE1-B1DC-F0F073658DC9-B41D791E-A94E-4C51-89C0-21C45614BE76\/command.zsh 712EC418-28E0-4D5D-9D5B-F863A6995B7C",
+            "captureErrors" : [
+
+            ],
+            "fileIdentity" : {
+              "device" : 16777229,
+              "inode" : 1152921500312571425
+            },
+            "kernelErrno" : 0,
+            "kernelImage" : "\/bin\/zsh",
+            "kernelReturnCode" : 8,
+            "pid" : 9614,
+            "ppid" : 9603,
+            "realpath" : "\/bin\/zsh"
+          },
+          "differences" : [
+
+          ],
+          "expected" : {
+            "allowedPPIDs" : [
+              9603
+            ],
+            "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/cancel-9846372C-C550-4CE1-B1DC-F0F073658DC9-B41D791E-A94E-4C51-89C0-21C45614BE76\/command.zsh 712EC418-28E0-4D5D-9D5B-F863A6995B7C",
+            "executable" : "\/bin\/zsh",
+            "fileIdentity" : {
+              "device" : 16777229,
+              "inode" : 1152921500312571425
+            },
+            "pid" : 9614,
+            "realpath" : "\/bin\/zsh"
+          },
+          "rawPS" : {
+            "args" : {
+              "captureErrors" : [
+
+              ],
+              "command" : [
+                "\/bin\/ps",
+                "-ww",
+                "-p",
+                "9614",
+                "-o",
+                "args="
+              ],
+              "exitCode" : 0,
+              "stderr" : "",
+              "stdout" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/cancel-9846372C-C550-4CE1-B1DC-F0F073658DC9-B41D791E-A94E-4C51-89C0-21C45614BE76\/command.zsh 712EC418-28E0-4D5D-9D5B-F863A6995B7C\n",
+              "timedOut" : false
+            },
+            "ppid" : {
+              "captureErrors" : [
+
+              ],
+              "command" : [
+                "\/bin\/ps",
+                "-ww",
+                "-p",
+                "9614",
+                "-o",
+                "ppid="
+              ],
+              "exitCode" : 0,
+              "stderr" : "",
+              "stdout" : " 9603\n",
+              "timedOut" : false
+            }
+          },
+          "verified" : true
+        },
+        "pid" : 9614,
+        "ppid" : 9603,
+        "script" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/cancel-9846372C-C550-4CE1-B1DC-F0F073658DC9-B41D791E-A94E-4C51-89C0-21C45614BE76\/command.zsh",
+        "token" : "712EC418-28E0-4D5D-9D5B-F863A6995B7C",
+        "verified" : true
+      },
+      {
+        "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/survivor-FB2D718F-3721-4AAB-B8F2-BBDD5760C54C-63F290E0-1635-47C9-BBDE-FDEAA7CCF8F0\/command.zsh 958A0212-E25E-4A44-A735-51119330A000",
+        "executable" : "\/bin\/zsh",
+        "identity" : {
+          "actual" : {
+            "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/survivor-FB2D718F-3721-4AAB-B8F2-BBDD5760C54C-63F290E0-1635-47C9-BBDE-FDEAA7CCF8F0\/command.zsh 958A0212-E25E-4A44-A735-51119330A000",
+            "captureErrors" : [
+
+            ],
+            "fileIdentity" : {
+              "device" : 16777229,
+              "inode" : 1152921500312571425
+            },
+            "kernelErrno" : 0,
+            "kernelImage" : "\/bin\/zsh",
+            "kernelReturnCode" : 8,
+            "pid" : 9613,
+            "ppid" : 9603,
+            "realpath" : "\/bin\/zsh"
+          },
+          "differences" : [
+
+          ],
+          "expected" : {
+            "allowedPPIDs" : [
+              9603
+            ],
+            "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/survivor-FB2D718F-3721-4AAB-B8F2-BBDD5760C54C-63F290E0-1635-47C9-BBDE-FDEAA7CCF8F0\/command.zsh 958A0212-E25E-4A44-A735-51119330A000",
+            "executable" : "\/bin\/zsh",
+            "fileIdentity" : {
+              "device" : 16777229,
+              "inode" : 1152921500312571425
+            },
+            "pid" : 9613,
+            "realpath" : "\/bin\/zsh"
+          },
+          "rawPS" : {
+            "args" : {
+              "captureErrors" : [
+
+              ],
+              "command" : [
+                "\/bin\/ps",
+                "-ww",
+                "-p",
+                "9613",
+                "-o",
+                "args="
+              ],
+              "exitCode" : 0,
+              "stderr" : "",
+              "stdout" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/survivor-FB2D718F-3721-4AAB-B8F2-BBDD5760C54C-63F290E0-1635-47C9-BBDE-FDEAA7CCF8F0\/command.zsh 958A0212-E25E-4A44-A735-51119330A000\n",
+              "timedOut" : false
+            },
+            "ppid" : {
+              "captureErrors" : [
+
+              ],
+              "command" : [
+                "\/bin\/ps",
+                "-ww",
+                "-p",
+                "9613",
+                "-o",
+                "ppid="
+              ],
+              "exitCode" : 0,
+              "stderr" : "",
+              "stdout" : " 9603\n",
+              "timedOut" : false
+            }
+          },
+          "verified" : true
+        },
+        "pid" : 9613,
+        "ppid" : 9603,
+        "script" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/survivor-FB2D718F-3721-4AAB-B8F2-BBDD5760C54C-63F290E0-1635-47C9-BBDE-FDEAA7CCF8F0\/command.zsh",
+        "token" : "958A0212-E25E-4A44-A735-51119330A000",
+        "verified" : true
+      }
+    ]
+  },
+  {
+    "boundary" : {
+      "completedWithinDeadline" : true,
+      "expectedStdinSHA256" : "02057511960921b49a24562d6396bd04e6b8d58f57daece050cbe30d1af65f56",
+      "expectedStdoutSHA256" : "aaf05d2d304ac814a30bda351adb768a0c46e1a1f2edf734eb34d73230d381e9",
+      "stderrWrittenBytes" : 131072,
+      "stdinBytes" : 81990,
+      "stdinSHA256" : "02057511960921b49a24562d6396bd04e6b8d58f57daece050cbe30d1af65f56",
+      "stdoutBytes" : 131072,
+      "stdoutSHA256" : "aaf05d2d304ac814a30bda351adb768a0c46e1a1f2edf734eb34d73230d381e9"
+    },
+    "cleanupCompleted" : true,
+    "id" : "dual-pipe",
+    "outcomes" : [
+      {
+        "completed" : true,
+        "errorDescription" : "",
+        "errorKind" : "none",
+        "stdoutBytes" : 131072,
+        "stdoutSHA256" : "aaf05d2d304ac814a30bda351adb768a0c46e1a1f2edf734eb34d73230d381e9",
+        "timeoutSeconds" : null
+      }
+    ],
+    "passed" : true,
+    "probePID" : 9603,
+    "processes" : [
+      {
+        "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/dual-pipe-F95DBA0A-E57D-40C7-B146-E8360C81FC76\/command.zsh 65F1C717-F95A-48E0-97D0-3C62A77D2F14",
+        "executable" : "\/bin\/zsh",
+        "identity" : {
+          "actual" : {
+            "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/dual-pipe-F95DBA0A-E57D-40C7-B146-E8360C81FC76\/command.zsh 65F1C717-F95A-48E0-97D0-3C62A77D2F14",
+            "captureErrors" : [
+
+            ],
+            "fileIdentity" : {
+              "device" : 16777229,
+              "inode" : 1152921500312571425
+            },
+            "kernelErrno" : 0,
+            "kernelImage" : "\/bin\/zsh",
+            "kernelReturnCode" : 8,
+            "pid" : 9652,
+            "ppid" : 9603,
+            "realpath" : "\/bin\/zsh"
+          },
+          "differences" : [
+
+          ],
+          "expected" : {
+            "allowedPPIDs" : [
+              9603
+            ],
+            "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/dual-pipe-F95DBA0A-E57D-40C7-B146-E8360C81FC76\/command.zsh 65F1C717-F95A-48E0-97D0-3C62A77D2F14",
+            "executable" : "\/bin\/zsh",
+            "fileIdentity" : {
+              "device" : 16777229,
+              "inode" : 1152921500312571425
+            },
+            "pid" : 9652,
+            "realpath" : "\/bin\/zsh"
+          },
+          "rawPS" : {
+            "args" : {
+              "captureErrors" : [
+
+              ],
+              "command" : [
+                "\/bin\/ps",
+                "-ww",
+                "-p",
+                "9652",
+                "-o",
+                "args="
+              ],
+              "exitCode" : 0,
+              "stderr" : "",
+              "stdout" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/dual-pipe-F95DBA0A-E57D-40C7-B146-E8360C81FC76\/command.zsh 65F1C717-F95A-48E0-97D0-3C62A77D2F14\n",
+              "timedOut" : false
+            },
+            "ppid" : {
+              "captureErrors" : [
+
+              ],
+              "command" : [
+                "\/bin\/ps",
+                "-ww",
+                "-p",
+                "9652",
+                "-o",
+                "ppid="
+              ],
+              "exitCode" : 0,
+              "stderr" : "",
+              "stdout" : " 9603\n",
+              "timedOut" : false
+            }
+          },
+          "verified" : true
+        },
+        "pid" : 9652,
+        "ppid" : 9603,
+        "script" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/dual-pipe-F95DBA0A-E57D-40C7-B146-E8360C81FC76\/command.zsh",
+        "token" : "65F1C717-F95A-48E0-97D0-3C62A77D2F14",
+        "verified" : true
+      }
+    ]
+  },
+  {
+    "boundary" : {
+      "childAliveAtBoundary" : false,
+      "completedWithinDeadline" : true,
+      "configuredTimeoutSeconds" : 5,
+      "elapsedSeconds" : 6.0570690000000127,
+      "stdinBytes" : 81990,
+      "typedTimeout" : true
+    },
+    "cleanupCompleted" : true,
+    "id" : "timeout-blocked-stdin",
+    "outcomes" : [
+      {
+        "completed" : true,
+        "errorDescription" : "timeout(seconds: 5.0)",
+        "errorKind" : "timeout",
+        "stdoutBytes" : 0,
+        "stdoutSHA256" : "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "timeoutSeconds" : 5
+      }
+    ],
+    "passed" : true,
+    "probePID" : 9603,
+    "processes" : [
+      {
+        "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/timeout-7222C1E4-8239-4103-80CF-ED35DB7C9EF2-1B4EBB98-13B4-494B-A68F-170D7074C918\/command.zsh 6C4A5E62-F5C7-45EC-85BF-36BA189A2A54",
+        "executable" : "\/bin\/zsh",
+        "identity" : {
+          "actual" : {
+            "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/timeout-7222C1E4-8239-4103-80CF-ED35DB7C9EF2-1B4EBB98-13B4-494B-A68F-170D7074C918\/command.zsh 6C4A5E62-F5C7-45EC-85BF-36BA189A2A54",
+            "captureErrors" : [
+
+            ],
+            "fileIdentity" : {
+              "device" : 16777229,
+              "inode" : 1152921500312571425
+            },
+            "kernelErrno" : 0,
+            "kernelImage" : "\/bin\/zsh",
+            "kernelReturnCode" : 8,
+            "pid" : 9664,
+            "ppid" : 9603,
+            "realpath" : "\/bin\/zsh"
+          },
+          "differences" : [
+
+          ],
+          "expected" : {
+            "allowedPPIDs" : [
+              9603
+            ],
+            "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/timeout-7222C1E4-8239-4103-80CF-ED35DB7C9EF2-1B4EBB98-13B4-494B-A68F-170D7074C918\/command.zsh 6C4A5E62-F5C7-45EC-85BF-36BA189A2A54",
+            "executable" : "\/bin\/zsh",
+            "fileIdentity" : {
+              "device" : 16777229,
+              "inode" : 1152921500312571425
+            },
+            "pid" : 9664,
+            "realpath" : "\/bin\/zsh"
+          },
+          "rawPS" : {
+            "args" : {
+              "captureErrors" : [
+
+              ],
+              "command" : [
+                "\/bin\/ps",
+                "-ww",
+                "-p",
+                "9664",
+                "-o",
+                "args="
+              ],
+              "exitCode" : 0,
+              "stderr" : "",
+              "stdout" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/timeout-7222C1E4-8239-4103-80CF-ED35DB7C9EF2-1B4EBB98-13B4-494B-A68F-170D7074C918\/command.zsh 6C4A5E62-F5C7-45EC-85BF-36BA189A2A54\n",
+              "timedOut" : false
+            },
+            "ppid" : {
+              "captureErrors" : [
+
+              ],
+              "command" : [
+                "\/bin\/ps",
+                "-ww",
+                "-p",
+                "9664",
+                "-o",
+                "ppid="
+              ],
+              "exitCode" : 0,
+              "stderr" : "",
+              "stdout" : " 9603\n",
+              "timedOut" : false
+            }
+          },
+          "verified" : true
+        },
+        "pid" : 9664,
+        "ppid" : 9603,
+        "script" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/timeout-7222C1E4-8239-4103-80CF-ED35DB7C9EF2-1B4EBB98-13B4-494B-A68F-170D7074C918\/command.zsh",
+        "token" : "6C4A5E62-F5C7-45EC-85BF-36BA189A2A54",
+        "verified" : true
+      }
+    ]
+  },
+  {
+    "boundary" : {
+      "iterations" : 3
+    },
+    "cleanupCompleted" : true,
+    "id" : "exit-races",
+    "outcomes" : [
+      {
+        "completed" : true,
+        "errorDescription" : "CancellationError()",
+        "errorKind" : "cancellation",
+        "stdoutBytes" : 0,
+        "stdoutSHA256" : "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "timeoutSeconds" : null
+      },
+      {
+        "completed" : true,
+        "errorDescription" : "CancellationError()",
+        "errorKind" : "cancellation",
+        "stdoutBytes" : 0,
+        "stdoutSHA256" : "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "timeoutSeconds" : null
+      },
+      {
+        "completed" : true,
+        "errorDescription" : "CancellationError()",
+        "errorKind" : "cancellation",
+        "stdoutBytes" : 0,
+        "stdoutSHA256" : "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "timeoutSeconds" : null
+      }
+    ],
+    "passed" : true,
+    "probePID" : 9603,
+    "processes" : [
+      {
+        "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/race-0-D4200326-87B6-48EE-9C0F-52B6D77B35A0-9A0915F2-AB34-451C-AA69-F7FDD4E19B68\/command.zsh E7BF9432-99B7-496A-81E3-4D937F84131F",
+        "executable" : "\/bin\/zsh",
+        "identity" : {
+          "actual" : {
+            "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/race-0-D4200326-87B6-48EE-9C0F-52B6D77B35A0-9A0915F2-AB34-451C-AA69-F7FDD4E19B68\/command.zsh E7BF9432-99B7-496A-81E3-4D937F84131F",
+            "captureErrors" : [
+
+            ],
+            "fileIdentity" : {
+              "device" : 16777229,
+              "inode" : 1152921500312571425
+            },
+            "kernelErrno" : 0,
+            "kernelImage" : "\/bin\/zsh",
+            "kernelReturnCode" : 8,
+            "pid" : 9935,
+            "ppid" : 9603,
+            "realpath" : "\/bin\/zsh"
+          },
+          "differences" : [
+
+          ],
+          "expected" : {
+            "allowedPPIDs" : [
+              9603
+            ],
+            "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/race-0-D4200326-87B6-48EE-9C0F-52B6D77B35A0-9A0915F2-AB34-451C-AA69-F7FDD4E19B68\/command.zsh E7BF9432-99B7-496A-81E3-4D937F84131F",
+            "executable" : "\/bin\/zsh",
+            "fileIdentity" : {
+              "device" : 16777229,
+              "inode" : 1152921500312571425
+            },
+            "pid" : 9935,
+            "realpath" : "\/bin\/zsh"
+          },
+          "rawPS" : {
+            "args" : {
+              "captureErrors" : [
+
+              ],
+              "command" : [
+                "\/bin\/ps",
+                "-ww",
+                "-p",
+                "9935",
+                "-o",
+                "args="
+              ],
+              "exitCode" : 0,
+              "stderr" : "",
+              "stdout" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/race-0-D4200326-87B6-48EE-9C0F-52B6D77B35A0-9A0915F2-AB34-451C-AA69-F7FDD4E19B68\/command.zsh E7BF9432-99B7-496A-81E3-4D937F84131F\n",
+              "timedOut" : false
+            },
+            "ppid" : {
+              "captureErrors" : [
+
+              ],
+              "command" : [
+                "\/bin\/ps",
+                "-ww",
+                "-p",
+                "9935",
+                "-o",
+                "ppid="
+              ],
+              "exitCode" : 0,
+              "stderr" : "",
+              "stdout" : " 9603\n",
+              "timedOut" : false
+            }
+          },
+          "verified" : true
+        },
+        "pid" : 9935,
+        "ppid" : 9603,
+        "script" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/race-0-D4200326-87B6-48EE-9C0F-52B6D77B35A0-9A0915F2-AB34-451C-AA69-F7FDD4E19B68\/command.zsh",
+        "token" : "E7BF9432-99B7-496A-81E3-4D937F84131F",
+        "verified" : true
+      },
+      {
+        "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/race-1-F81E34BE-AECC-44D3-95EC-76576CAA81EA-428D8E2E-DB3C-4F36-AB89-723E23AFB7A8\/command.zsh BFCC02FA-2A37-4913-9618-A781A560F7AD",
+        "executable" : "\/bin\/zsh",
+        "identity" : {
+          "actual" : {
+            "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/race-1-F81E34BE-AECC-44D3-95EC-76576CAA81EA-428D8E2E-DB3C-4F36-AB89-723E23AFB7A8\/command.zsh BFCC02FA-2A37-4913-9618-A781A560F7AD",
+            "captureErrors" : [
+
+            ],
+            "fileIdentity" : {
+              "device" : 16777229,
+              "inode" : 1152921500312571425
+            },
+            "kernelErrno" : 0,
+            "kernelImage" : "\/bin\/zsh",
+            "kernelReturnCode" : 8,
+            "pid" : 9981,
+            "ppid" : 9603,
+            "realpath" : "\/bin\/zsh"
+          },
+          "differences" : [
+
+          ],
+          "expected" : {
+            "allowedPPIDs" : [
+              9603
+            ],
+            "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/race-1-F81E34BE-AECC-44D3-95EC-76576CAA81EA-428D8E2E-DB3C-4F36-AB89-723E23AFB7A8\/command.zsh BFCC02FA-2A37-4913-9618-A781A560F7AD",
+            "executable" : "\/bin\/zsh",
+            "fileIdentity" : {
+              "device" : 16777229,
+              "inode" : 1152921500312571425
+            },
+            "pid" : 9981,
+            "realpath" : "\/bin\/zsh"
+          },
+          "rawPS" : {
+            "args" : {
+              "captureErrors" : [
+
+              ],
+              "command" : [
+                "\/bin\/ps",
+                "-ww",
+                "-p",
+                "9981",
+                "-o",
+                "args="
+              ],
+              "exitCode" : 0,
+              "stderr" : "",
+              "stdout" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/race-1-F81E34BE-AECC-44D3-95EC-76576CAA81EA-428D8E2E-DB3C-4F36-AB89-723E23AFB7A8\/command.zsh BFCC02FA-2A37-4913-9618-A781A560F7AD\n",
+              "timedOut" : false
+            },
+            "ppid" : {
+              "captureErrors" : [
+
+              ],
+              "command" : [
+                "\/bin\/ps",
+                "-ww",
+                "-p",
+                "9981",
+                "-o",
+                "ppid="
+              ],
+              "exitCode" : 0,
+              "stderr" : "",
+              "stdout" : " 9603\n",
+              "timedOut" : false
+            }
+          },
+          "verified" : true
+        },
+        "pid" : 9981,
+        "ppid" : 9603,
+        "script" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/race-1-F81E34BE-AECC-44D3-95EC-76576CAA81EA-428D8E2E-DB3C-4F36-AB89-723E23AFB7A8\/command.zsh",
+        "token" : "BFCC02FA-2A37-4913-9618-A781A560F7AD",
+        "verified" : true
+      },
+      {
+        "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/race-2-2A12C68C-B9FF-440A-A412-994F5781AF23-0C13F0DE-CBA2-42BD-B8BC-A110C1FCA069\/command.zsh 95F545B9-77B3-44EA-B6F1-C3739397AEFC",
+        "executable" : "\/bin\/zsh",
+        "identity" : {
+          "actual" : {
+            "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/race-2-2A12C68C-B9FF-440A-A412-994F5781AF23-0C13F0DE-CBA2-42BD-B8BC-A110C1FCA069\/command.zsh 95F545B9-77B3-44EA-B6F1-C3739397AEFC",
+            "captureErrors" : [
+
+            ],
+            "fileIdentity" : {
+              "device" : 16777229,
+              "inode" : 1152921500312571425
+            },
+            "kernelErrno" : 0,
+            "kernelImage" : "\/bin\/zsh",
+            "kernelReturnCode" : 8,
+            "pid" : 10012,
+            "ppid" : 9603,
+            "realpath" : "\/bin\/zsh"
+          },
+          "differences" : [
+
+          ],
+          "expected" : {
+            "allowedPPIDs" : [
+              9603
+            ],
+            "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/race-2-2A12C68C-B9FF-440A-A412-994F5781AF23-0C13F0DE-CBA2-42BD-B8BC-A110C1FCA069\/command.zsh 95F545B9-77B3-44EA-B6F1-C3739397AEFC",
+            "executable" : "\/bin\/zsh",
+            "fileIdentity" : {
+              "device" : 16777229,
+              "inode" : 1152921500312571425
+            },
+            "pid" : 10012,
+            "realpath" : "\/bin\/zsh"
+          },
+          "rawPS" : {
+            "args" : {
+              "captureErrors" : [
+
+              ],
+              "command" : [
+                "\/bin\/ps",
+                "-ww",
+                "-p",
+                "10012",
+                "-o",
+                "args="
+              ],
+              "exitCode" : 0,
+              "stderr" : "",
+              "stdout" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/race-2-2A12C68C-B9FF-440A-A412-994F5781AF23-0C13F0DE-CBA2-42BD-B8BC-A110C1FCA069\/command.zsh 95F545B9-77B3-44EA-B6F1-C3739397AEFC\n",
+              "timedOut" : false
+            },
+            "ppid" : {
+              "captureErrors" : [
+
+              ],
+              "command" : [
+                "\/bin\/ps",
+                "-ww",
+                "-p",
+                "10012",
+                "-o",
+                "ppid="
+              ],
+              "exitCode" : 0,
+              "stderr" : "",
+              "stdout" : " 9603\n",
+              "timedOut" : false
+            }
+          },
+          "verified" : true
+        },
+        "pid" : 10012,
+        "ppid" : 9603,
+        "script" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/race-2-2A12C68C-B9FF-440A-A412-994F5781AF23-0C13F0DE-CBA2-42BD-B8BC-A110C1FCA069\/command.zsh",
+        "token" : "95F545B9-77B3-44EA-B6F1-C3739397AEFC",
+        "verified" : true
+      }
+    ]
+  },
+  {
+    "boundary" : {
+      "completedWithinDeadline" : true
+    },
+    "cleanupCompleted" : true,
+    "id" : "later-control",
+    "outcomes" : [
+      {
+        "completed" : true,
+        "errorDescription" : "",
+        "errorKind" : "none",
+        "stdoutBytes" : 19,
+        "stdoutSHA256" : "1b0ee5bca9471bbbc6dbaf240aa11da108ff7918710bcaadcb97730c31ecc13d",
+        "timeoutSeconds" : null
+      }
+    ],
+    "passed" : true,
+    "probePID" : 9603,
+    "processes" : [
+
+    ]
+  }
+]

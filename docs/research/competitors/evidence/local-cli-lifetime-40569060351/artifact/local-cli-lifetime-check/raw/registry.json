@@ -1,0 +1,26 @@
+[
+  {
+    "ready" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/raw\/captured-3DB0814D-68CD-4FF3-A73B-D762DE273F64-F4C4ABB1-C032-4F90-99AA-849628C0E876\/ready",
+    "release" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/raw\/captured-3DB0814D-68CD-4FF3-A73B-D762DE273F64-F4C4ABB1-C032-4F90-99AA-849628C0E876\/release",
+    "script" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/raw\/captured-3DB0814D-68CD-4FF3-A73B-D762DE273F64-F4C4ABB1-C032-4F90-99AA-849628C0E876\/command.zsh",
+    "token" : "DB691582-2576-4F9E-9043-B51094A938B4"
+  },
+  {
+    "ready" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/raw\/changed-8CF5D33E-AD4E-4E9C-8DB1-937AEDEECCDD-F4E9B6BB-A4FB-4B34-981E-81E9B8B129F7\/ready",
+    "release" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/raw\/changed-8CF5D33E-AD4E-4E9C-8DB1-937AEDEECCDD-F4E9B6BB-A4FB-4B34-981E-81E9B8B129F7\/release",
+    "script" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/raw\/changed-8CF5D33E-AD4E-4E9C-8DB1-937AEDEECCDD-F4E9B6BB-A4FB-4B34-981E-81E9B8B129F7\/command.zsh",
+    "token" : "4F556846-6206-49D5-9D4C-B74AFE407F18"
+  },
+  {
+    "ready" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/raw\/raw-81D979E1-A74D-4A18-BF91-FFF38B4F551D\/ready",
+    "release" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/raw\/raw-81D979E1-A74D-4A18-BF91-FFF38B4F551D\/release",
+    "script" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/raw\/raw-81D979E1-A74D-4A18-BF91-FFF38B4F551D\/command.zsh",
+    "token" : "80E785BC-69B1-4846-B1BF-B54A77ABE39D"
+  },
+  {
+    "ready" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/raw\/legacy-88949FDA-9AB0-4643-A507-2B5AB3D57F7B\/ready",
+    "release" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/raw\/legacy-88949FDA-9AB0-4643-A507-2B5AB3D57F7B\/release",
+    "script" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/raw\/legacy-88949FDA-9AB0-4643-A507-2B5AB3D57F7B\/command.zsh",
+    "token" : "7029CF51-0D62-4CE4-9184-4531A835EF27"
+  }
+]

@@ -1,0 +1,50 @@
+[
+  {
+    "ready" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/precancel-5D370365-C7B9-4C17-AAF5-96CE4EAF73FB-2D6915D9-FDD2-429B-BC1E-D4BB7EE4BBB3\/ready",
+    "release" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/precancel-5D370365-C7B9-4C17-AAF5-96CE4EAF73FB-2D6915D9-FDD2-429B-BC1E-D4BB7EE4BBB3\/release",
+    "script" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/precancel-5D370365-C7B9-4C17-AAF5-96CE4EAF73FB-2D6915D9-FDD2-429B-BC1E-D4BB7EE4BBB3\/command.zsh",
+    "token" : "AD29D420-4785-4322-B7AC-8F32A37D9B88"
+  },
+  {
+    "ready" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/cancel-49CF949C-366E-4BC6-8C47-3F238C379050-D80CC86D-6810-4C99-96EE-EAB027187F00\/ready",
+    "release" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/cancel-49CF949C-366E-4BC6-8C47-3F238C379050-D80CC86D-6810-4C99-96EE-EAB027187F00\/release",
+    "script" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/cancel-49CF949C-366E-4BC6-8C47-3F238C379050-D80CC86D-6810-4C99-96EE-EAB027187F00\/command.zsh",
+    "token" : "63CF529F-5CA9-48C3-B1B4-C101FC4B5FFE"
+  },
+  {
+    "ready" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/survivor-3B322DF5-733E-484D-B25F-4A8FA73D85F3-D900BDBB-EB0A-4F4D-B523-B958C9DE3A11\/ready",
+    "release" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/survivor-3B322DF5-733E-484D-B25F-4A8FA73D85F3-D900BDBB-EB0A-4F4D-B523-B958C9DE3A11\/release",
+    "script" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/survivor-3B322DF5-733E-484D-B25F-4A8FA73D85F3-D900BDBB-EB0A-4F4D-B523-B958C9DE3A11\/command.zsh",
+    "token" : "E542F8D3-7639-4F96-81DC-138F0323805E"
+  },
+  {
+    "ready" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/dual-pipe-92B86747-2C30-47D9-AA7E-8D8A6383E97D\/ready",
+    "release" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/dual-pipe-92B86747-2C30-47D9-AA7E-8D8A6383E97D\/release",
+    "script" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/dual-pipe-92B86747-2C30-47D9-AA7E-8D8A6383E97D\/command.zsh",
+    "token" : "DE2E25A4-8987-4E15-8C9B-D9B760C7F7D9"
+  },
+  {
+    "ready" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/timeout-D68D89DC-EC72-4F51-A358-A1EFD3FD426C-2755F1EF-3284-4416-B42A-6767B04B4200\/ready",
+    "release" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/timeout-D68D89DC-EC72-4F51-A358-A1EFD3FD426C-2755F1EF-3284-4416-B42A-6767B04B4200\/release",
+    "script" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/timeout-D68D89DC-EC72-4F51-A358-A1EFD3FD426C-2755F1EF-3284-4416-B42A-6767B04B4200\/command.zsh",
+    "token" : "A7BB92E4-21C7-4F7E-8592-CCF3A7DC9343"
+  },
+  {
+    "ready" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/race-0-99E885B1-7A7C-4DAA-849E-2C85142A5C10-7C7C8213-3236-48ED-A64A-F0455CEA3379\/ready",
+    "release" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/race-0-99E885B1-7A7C-4DAA-849E-2C85142A5C10-7C7C8213-3236-48ED-A64A-F0455CEA3379\/release",
+    "script" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/race-0-99E885B1-7A7C-4DAA-849E-2C85142A5C10-7C7C8213-3236-48ED-A64A-F0455CEA3379\/command.zsh",
+    "token" : "D961FDAF-53D6-4BF5-85A5-C302D0595A6F"
+  },
+  {
+    "ready" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/race-1-B61C926C-7B4E-4A80-82FF-C513E72682DE-10AD34F7-2B1E-421C-9FE7-B4AA61A6F867\/ready",
+    "release" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/race-1-B61C926C-7B4E-4A80-82FF-C513E72682DE-10AD34F7-2B1E-421C-9FE7-B4AA61A6F867\/release",
+    "script" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/race-1-B61C926C-7B4E-4A80-82FF-C513E72682DE-10AD34F7-2B1E-421C-9FE7-B4AA61A6F867\/command.zsh",
+    "token" : "E4BDCBD3-AAB8-4CF1-AF28-45D80CA32439"
+  },
+  {
+    "ready" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/race-2-8E406DC2-7579-4A87-82F2-1A0085EDDFB6-026AAA0A-5BFD-4651-A85D-4DC58A16F0A2\/ready",
+    "release" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/race-2-8E406DC2-7579-4A87-82F2-1A0085EDDFB6-026AAA0A-5BFD-4651-A85D-4DC58A16F0A2\/release",
+    "script" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/race-2-8E406DC2-7579-4A87-82F2-1A0085EDDFB6-026AAA0A-5BFD-4651-A85D-4DC58A16F0A2\/command.zsh",
+    "token" : "62852C0C-1396-4DA1-9447-7B641168C6E8"
+  }
+]

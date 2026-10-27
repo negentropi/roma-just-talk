@@ -1,0 +1,80 @@
+{
+  "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/race-0-D4200326-87B6-48EE-9C0F-52B6D77B35A0-9A0915F2-AB34-451C-AA69-F7FDD4E19B68\/command.zsh E7BF9432-99B7-496A-81E3-4D937F84131F",
+  "executable" : "\/bin\/zsh",
+  "identity" : {
+    "actual" : {
+      "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/race-0-D4200326-87B6-48EE-9C0F-52B6D77B35A0-9A0915F2-AB34-451C-AA69-F7FDD4E19B68\/command.zsh E7BF9432-99B7-496A-81E3-4D937F84131F",
+      "captureErrors" : [
+
+      ],
+      "fileIdentity" : {
+        "device" : 16777229,
+        "inode" : 1152921500312571425
+      },
+      "kernelErrno" : 0,
+      "kernelImage" : "\/bin\/zsh",
+      "kernelReturnCode" : 8,
+      "pid" : 9935,
+      "ppid" : 9603,
+      "realpath" : "\/bin\/zsh"
+    },
+    "differences" : [
+
+    ],
+    "expected" : {
+      "allowedPPIDs" : [
+        9603
+      ],
+      "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/race-0-D4200326-87B6-48EE-9C0F-52B6D77B35A0-9A0915F2-AB34-451C-AA69-F7FDD4E19B68\/command.zsh E7BF9432-99B7-496A-81E3-4D937F84131F",
+      "executable" : "\/bin\/zsh",
+      "fileIdentity" : {
+        "device" : 16777229,
+        "inode" : 1152921500312571425
+      },
+      "pid" : 9935,
+      "realpath" : "\/bin\/zsh"
+    },
+    "rawPS" : {
+      "args" : {
+        "captureErrors" : [
+
+        ],
+        "command" : [
+          "\/bin\/ps",
+          "-ww",
+          "-p",
+          "9935",
+          "-o",
+          "args="
+        ],
+        "exitCode" : 0,
+        "stderr" : "",
+        "stdout" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/race-0-D4200326-87B6-48EE-9C0F-52B6D77B35A0-9A0915F2-AB34-451C-AA69-F7FDD4E19B68\/command.zsh E7BF9432-99B7-496A-81E3-4D937F84131F\n",
+        "timedOut" : false
+      },
+      "ppid" : {
+        "captureErrors" : [
+
+        ],
+        "command" : [
+          "\/bin\/ps",
+          "-ww",
+          "-p",
+          "9935",
+          "-o",
+          "ppid="
+        ],
+        "exitCode" : 0,
+        "stderr" : "",
+        "stdout" : " 9603\n",
+        "timedOut" : false
+      }
+    },
+    "verified" : true
+  },
+  "pid" : 9935,
+  "ppid" : 9603,
+  "script" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/candidate\/race-0-D4200326-87B6-48EE-9C0F-52B6D77B35A0-9A0915F2-AB34-451C-AA69-F7FDD4E19B68\/command.zsh",
+  "token" : "E7BF9432-99B7-496A-81E3-4D937F84131F",
+  "verified" : true
+}

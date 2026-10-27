@@ -1,0 +1,80 @@
+{
+  "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/survivor-3B322DF5-733E-484D-B25F-4A8FA73D85F3-D900BDBB-EB0A-4F4D-B523-B958C9DE3A11\/command.zsh E542F8D3-7639-4F96-81DC-138F0323805E",
+  "executable" : "\/bin\/zsh",
+  "identity" : {
+    "actual" : {
+      "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/survivor-3B322DF5-733E-484D-B25F-4A8FA73D85F3-D900BDBB-EB0A-4F4D-B523-B958C9DE3A11\/command.zsh E542F8D3-7639-4F96-81DC-138F0323805E",
+      "captureErrors" : [
+
+      ],
+      "fileIdentity" : {
+        "device" : 16777229,
+        "inode" : 1152921500312571425
+      },
+      "kernelErrno" : 0,
+      "kernelImage" : "\/bin\/zsh",
+      "kernelReturnCode" : 8,
+      "pid" : 8785,
+      "ppid" : 8738,
+      "realpath" : "\/bin\/zsh"
+    },
+    "differences" : [
+
+    ],
+    "expected" : {
+      "allowedPPIDs" : [
+        8738
+      ],
+      "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/survivor-3B322DF5-733E-484D-B25F-4A8FA73D85F3-D900BDBB-EB0A-4F4D-B523-B958C9DE3A11\/command.zsh E542F8D3-7639-4F96-81DC-138F0323805E",
+      "executable" : "\/bin\/zsh",
+      "fileIdentity" : {
+        "device" : 16777229,
+        "inode" : 1152921500312571425
+      },
+      "pid" : 8785,
+      "realpath" : "\/bin\/zsh"
+    },
+    "rawPS" : {
+      "args" : {
+        "captureErrors" : [
+
+        ],
+        "command" : [
+          "\/bin\/ps",
+          "-ww",
+          "-p",
+          "8785",
+          "-o",
+          "args="
+        ],
+        "exitCode" : 0,
+        "stderr" : "",
+        "stdout" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/survivor-3B322DF5-733E-484D-B25F-4A8FA73D85F3-D900BDBB-EB0A-4F4D-B523-B958C9DE3A11\/command.zsh E542F8D3-7639-4F96-81DC-138F0323805E\n",
+        "timedOut" : false
+      },
+      "ppid" : {
+        "captureErrors" : [
+
+        ],
+        "command" : [
+          "\/bin\/ps",
+          "-ww",
+          "-p",
+          "8785",
+          "-o",
+          "ppid="
+        ],
+        "exitCode" : 0,
+        "stderr" : "",
+        "stdout" : " 8738\n",
+        "timedOut" : false
+      }
+    },
+    "verified" : true
+  },
+  "pid" : 8785,
+  "ppid" : 8738,
+  "script" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/survivor-3B322DF5-733E-484D-B25F-4A8FA73D85F3-D900BDBB-EB0A-4F4D-B523-B958C9DE3A11\/command.zsh",
+  "token" : "E542F8D3-7639-4F96-81DC-138F0323805E",
+  "verified" : true
+}

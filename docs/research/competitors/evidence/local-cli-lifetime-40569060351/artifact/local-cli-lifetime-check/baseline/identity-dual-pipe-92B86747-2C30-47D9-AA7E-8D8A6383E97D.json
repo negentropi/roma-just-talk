@@ -1,0 +1,80 @@
+{
+  "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/dual-pipe-92B86747-2C30-47D9-AA7E-8D8A6383E97D\/command.zsh DE2E25A4-8987-4E15-8C9B-D9B760C7F7D9",
+  "executable" : "\/bin\/zsh",
+  "identity" : {
+    "actual" : {
+      "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/dual-pipe-92B86747-2C30-47D9-AA7E-8D8A6383E97D\/command.zsh DE2E25A4-8987-4E15-8C9B-D9B760C7F7D9",
+      "captureErrors" : [
+
+      ],
+      "fileIdentity" : {
+        "device" : 16777229,
+        "inode" : 1152921500312571425
+      },
+      "kernelErrno" : 0,
+      "kernelImage" : "\/bin\/zsh",
+      "kernelReturnCode" : 8,
+      "pid" : 8913,
+      "ppid" : 8738,
+      "realpath" : "\/bin\/zsh"
+    },
+    "differences" : [
+
+    ],
+    "expected" : {
+      "allowedPPIDs" : [
+        8738
+      ],
+      "arguments" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/dual-pipe-92B86747-2C30-47D9-AA7E-8D8A6383E97D\/command.zsh DE2E25A4-8987-4E15-8C9B-D9B760C7F7D9",
+      "executable" : "\/bin\/zsh",
+      "fileIdentity" : {
+        "device" : 16777229,
+        "inode" : 1152921500312571425
+      },
+      "pid" : 8913,
+      "realpath" : "\/bin\/zsh"
+    },
+    "rawPS" : {
+      "args" : {
+        "captureErrors" : [
+
+        ],
+        "command" : [
+          "\/bin\/ps",
+          "-ww",
+          "-p",
+          "8913",
+          "-o",
+          "args="
+        ],
+        "exitCode" : 0,
+        "stderr" : "",
+        "stdout" : "\/bin\/zsh -f \/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/dual-pipe-92B86747-2C30-47D9-AA7E-8D8A6383E97D\/command.zsh DE2E25A4-8987-4E15-8C9B-D9B760C7F7D9\n",
+        "timedOut" : false
+      },
+      "ppid" : {
+        "captureErrors" : [
+
+        ],
+        "command" : [
+          "\/bin\/ps",
+          "-ww",
+          "-p",
+          "8913",
+          "-o",
+          "ppid="
+        ],
+        "exitCode" : 0,
+        "stderr" : "",
+        "stdout" : " 8738\n",
+        "timedOut" : false
+      }
+    },
+    "verified" : true
+  },
+  "pid" : 8913,
+  "ppid" : 8738,
+  "script" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/baseline\/dual-pipe-92B86747-2C30-47D9-AA7E-8D8A6383E97D\/command.zsh",
+  "token" : "DE2E25A4-8987-4E15-8C9B-D9B760C7F7D9",
+  "verified" : true
+}

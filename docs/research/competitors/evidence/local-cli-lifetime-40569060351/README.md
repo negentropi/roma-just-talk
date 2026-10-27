@@ -1,0 +1,13 @@
+# Actual Local CLI lifetime regression
+
+[Run 40569060351](https://github.com/negentropi/roma-just-talk/actions/runs/40569060351), source `77d84bd1d75927b2d8a74990346476963c80f167`: **matched old red / new green** using the same unchanged common probe and real Core/NVIDIA 22-pin dependency graph.
+
+The old service (`aaaa286a`) exited 1 with exactly four failed boundaries: pre-cancellation launched a command, blocked-input cancellation left its child alive, large output deadlocked until timeout, and blocked stdin exceeded the configured deadline. Its survivor, exit-race, and later-request controls passed. The candidate exited 0 with all six lifetime cases passing; the separate raw/snapshot executable exited 0 with all three cases passing.
+
+The candidate reaped the TERM-ignoring direct child in **1.0483 s** after cancellation (limit 1.5 s), preserving the other request and exact survivor output. Its configured five-second blocked-input timeout completed in **6.0571 s** including escalation/reaping (limit eight seconds). It preserved all 81,990 stdin bytes, returned the exact 131,072-byte stdout, and completed the 131,072-byte stderr write. Raw literal output and captured configuration passed; legacy trimming remained intact.
+
+All 154 input hashes match pinned Git blobs; the entire 150-file Core/NVIDIA closure is identical between lanes. Sources, frozen pins, signed wrappers, and signatures stayed unchanged. Independent kernel image/canonical path/device/inode, PPID, and argument observations verified the roots and children. All 336 journal rows are verified running identities or typed process absence; no watchdog, outer-supervisor cleanup action, harness signal, or remaining child occurred. Ordinary fixture gate releases followed the boundary observations and did not count as production cleanup.
+
+The original 212,930-byte evidence artifact was downloaded once and verified against GitHub's SHA-256. `artifact/` retains the native records and build log; `receipt.json` summarizes them. Run `python3 docs/research/competitors/evidence/local-cli-lifetime-40569060351/analyze-result.py` from this repository to recheck the exact pinned classifier and sources.
+
+Scope: actual service process/pipes and direct-child cleanup using synthetic local commands. This does not prove app/UI behavior, descendant cleanup, provider/credential behavior, AI output quality, profile activation, release readiness, or newer uncommitted Core changes. Core compiled here; its full check executable was not run in this narrow gate. The preceding identity-fixture failure remains invalid evidence in `local-cli-lifetime-40566195249`.

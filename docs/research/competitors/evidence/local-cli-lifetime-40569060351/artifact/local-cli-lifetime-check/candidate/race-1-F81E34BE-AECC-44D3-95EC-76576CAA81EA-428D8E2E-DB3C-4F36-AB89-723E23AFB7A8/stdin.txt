@@ -1,0 +1,7 @@
+<SYSTEM_PROMPT>
+system
+</SYSTEM_PROMPT>
+
+<USER_PROMPT>
+user
+</USER_PROMPT>

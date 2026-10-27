@@ -166,10 +166,23 @@ if isPress {
             report["actionSkipped"] = "fixture identity, foreground, or enabled state changed before press"
             resultCode = 75
         } else {
-            let error = AXUIElementPerformAction(matches[0].element, kAXPressAction as CFString)
-            report["actionError"] = error.rawValue
-            report["actionErrorDescription"] = String(describing: error)
-            resultCode = error == .success ? 0 : 74
+            // AX action callbacks can finish after the shorter attribute-query timeout.
+            // Allow one bounded acknowledgement; a timed-out press must never be repeated.
+            let actionTimeout = min(2, deadline - ProcessInfo.processInfo.systemUptime)
+            let setupError = AXUIElementSetMessagingTimeout(matches[0].element, Float(actionTimeout))
+            report["actionTimeoutSeconds"] = actionTimeout
+            report["actionTimeoutSetupError"] = setupError.rawValue
+            if setupError != .success || ProcessInfo.processInfo.systemUptime >= deadline {
+                report["actionSkipped"] = "unable to configure the bounded action acknowledgement"
+                resultCode = 75
+            } else {
+                let started = ProcessInfo.processInfo.systemUptime
+                let error = AXUIElementPerformAction(matches[0].element, kAXPressAction as CFString)
+                report["actionElapsedSeconds"] = ProcessInfo.processInfo.systemUptime - started
+                report["actionError"] = error.rawValue
+                report["actionErrorDescription"] = String(describing: error)
+                resultCode = error == .success ? 0 : 74
+            }
         }
     }
 }

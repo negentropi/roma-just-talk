@@ -24,7 +24,9 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Verify the Swift Testing result classifier
-        run: bash scripts/run-clarity-service-check.sh --self-test
+        run: |
+          bash scripts/tests/swiftpm-testing-signature.test.sh --self-test
+          bash scripts/run-clarity-service-check.sh --self-test
 
       - name: Select installed Xcode 26
         run: |
@@ -68,4 +70,9 @@ jobs:
             ${{ runner.temp }}/clarity-service-check/package/Package.resolved
             ${{ runner.temp }}/clarity-service-check/package/Sources/**
             ${{ runner.temp }}/clarity-service-check/package/Tests/**
+            ${{ runner.temp }}/swiftpm-testing-signature-check/*.json
+            ${{ runner.temp }}/swiftpm-testing-signature-check/*.txt
+            ${{ runner.temp }}/swiftpm-testing-signature-check/*.log
+            ${{ runner.temp }}/swiftpm-testing-signature-check/package/Package.swift
+            ${{ runner.temp }}/swiftpm-testing-signature-check/package/Tests/**
           if-no-files-found: error

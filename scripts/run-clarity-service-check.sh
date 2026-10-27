@@ -15,6 +15,7 @@ from pathlib import Path
 
 DRIVER = 'scripts/run-clarity-service-check.sh'
 WORKFLOW = '.github/workflows/voiceink-clarity-service-check.yml'
+SIGNING_FIXTURE = 'scripts/tests/swiftpm-testing-signature.test.sh'
 LOCK = 'VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved'
 TEST = 'VoiceInkTests/ClarityProviderTests.swift'
 TEST_HASH = '85580bed6dda374494026bfd44fccd898dbc04b2cf1e8167e68f0742de03a054'
@@ -98,10 +99,10 @@ if command == 'self-test':
 elif command == 'prepare':
     repo, out, revision = Path(args[0]), Path(args[1]), args[2]
     if git(repo, 'rev-parse', 'HEAD').decode().strip() != revision: raise SystemExit('Candidate HEAD mismatch')
-    relevant = [*SOURCES, TEST, 'VoiceInkCore', 'VoiceInkNVIDIA', LOCK, DRIVER, WORKFLOW]
+    relevant = [*SOURCES, TEST, 'VoiceInkCore', 'VoiceInkNVIDIA', LOCK, DRIVER, WORKFLOW, SIGNING_FIXTURE]
     subprocess.run(['git', '-C', str(repo), 'diff', '--exit-code', 'HEAD', '--', *relevant], check=True)
     if git(repo, 'ls-files', '--others', '--exclude-standard', '--', *relevant).strip(): raise SystemExit('Untracked relevant source is forbidden')
-    git(repo, 'ls-files', '--error-unmatch', DRIVER, WORKFLOW, TEST)
+    git(repo, 'ls-files', '--error-unmatch', DRIVER, WORKFLOW, TEST, SIGNING_FIXTURE)
     oracle = source(repo, revision, TEST)
     if digest(oracle) != TEST_HASH or re.findall(rb'@Test\s+@MainActor\s+func\s+(\w+)\(', oracle) != [name.encode() for name in CASES]: raise SystemExit('Exact seven-test oracle changed')
     if digest(source(repo, revision, SOURCES[1])) != SERVICE_HASH: raise SystemExit('Reviewed Clarity service implementation changed')
@@ -138,6 +139,7 @@ elif command == 'prepare':
     tracked = git(repo, 'ls-files', '-z', '--', *relevant).split(b'\0')
     original = {name.decode(): digest(source(repo, revision, name.decode())) for name in tracked if name}
     contract = {'version': 1, 'sourceSHA': revision, 'sourceInputs': original, 'appSources': {path: original[path] for path in SOURCES}, 'testSourceSHA256': TEST_HASH, 'serviceSourceSHA256': SERVICE_HASH, 'namespace': 'VoiceInk', 'testNamespace': 'VoiceInkTests', 'namespaceWrapperSHA256': digest(WRAPPER.encode()), 'expectedTests': CASES, 'generatedSources': files(package / 'Sources'), 'generatedTests': files(package / 'Tests'), 'dependencySources': files(dependency_root), 'packageManifestSHA256': digest(manifest.encode()), 'seededLockSHA256': digest(seeded.encode()), 'canonicalLockSHA256': digest(canonical), 'expectedPins': retained, 'omittedIdentities': sorted(set(canonical_pins) - identities), 'scope': 'Seven unchanged Clarity service tests through standard Swift Testing. Eleven unchanged app source files and full real Core/NVIDIA source closure. Local deterministic commands only. No app lifecycle, UI, microphone, TCC, authenticated AI provider or live editor delivery proof.'}
+    contract['testBundlePreparation'] = {'calibrationFixture': SIGNING_FIXTURE, 'signing': 'One explicit ad-hoc signature on the fresh owned whole test bundle before runtime identity is frozen.', 'command': ['codesign', '--sign', '-', '--force', '--timestamp=none'], 'runtimeResigning': False}
     write(out / 'source-contract.json', contract)
     write(out / 'source-before.json', original)
     (out / 'canonical-Package.resolved').write_bytes(canonical)
@@ -167,18 +169,27 @@ elif command == 'binary':
     out, binary, phase = Path(args[0]), Path(args[1]), args[2]
     bundle = binary / 'ClarityServiceCheckPackageTests.xctest'
     executable = bundle / 'Contents/MacOS/ClarityServiceCheckPackageTests'
+    if not bundle.resolve().is_relative_to((out / 'package/.build').resolve()) or bundle.is_symlink(): raise SystemExit('Test bundle is not the owned SwiftPM build product')
     if not executable.is_file(): raise SystemExit('Standard SwiftPM Clarity test executable is absent')
     resources = {path.name: files(path) for path in sorted(binary.glob('*.bundle')) if path.is_dir()}
     value = {'bundlePath': str(bundle), 'executablePath': str(executable), 'executableSHA256': digest(executable.read_bytes()), 'bundleManifest': files(bundle), 'resourceBundleManifests': resources}
     write(out / ('test-binary-' + phase + '.json'), value)
     if phase == 'after' and value != json.loads((out / 'test-binary-before.json').read_text()): raise SystemExit('Test executable, bundle or resource bytes changed')
     if phase == 'after': write(out / 'identity-verification.json', {'valid': True, **value})
+elif command == 'signing-calibration':
+    out, calibration = Path(args[0]), Path(args[1])
+    contract = json.loads((out / 'source-contract.json').read_text())
+    result = json.loads((calibration / 'result.json').read_text())
+    inputs = json.loads((calibration / 'source-contract.json').read_text())
+    valid = result.get('valid') is True and result.get('classification') == 'passed-signing-preparation-calibration' and inputs['scriptSHA256'] == contract['sourceInputs'][SIGNING_FIXTURE]
+    write(out / 'signing-calibration.json', {'valid': valid, 'sourceSHA': contract['sourceSHA'], 'scriptSHA256': inputs['scriptSHA256'], 'resultSHA256': digest((calibration / 'result.json').read_bytes()), 'result': result})
+    if not valid: raise SystemExit('Native signing calibration did not pass with the committed fixture')
 elif command == 'classify':
     out, exit_code = Path(args[0]), int(args[1])
     result = classify((out / 'tests.log').read_text(), exit_code)
     result['sourceSHA'] = json.loads((out / 'source-contract.json').read_text())['sourceSHA']
     result['scope'] = json.loads((out / 'source-contract.json').read_text())['scope']
-    result['valid'] = result['valid'] and all(json.loads((out / name).read_text()).get('valid') is True for name in ['source-verification.json', 'identity-verification.json', 'pins-after.json'])
+    result['valid'] = result['valid'] and all(json.loads((out / name).read_text()).get('valid') is True for name in ['source-verification.json', 'identity-verification.json', 'pins-after.json', 'signing-calibration.json'])
     if not result['valid']: result['classification'] = 'invalid-or-failed'
     write(out / 'result.json', result)
     print(json.dumps(result, indent=2))
@@ -211,6 +222,9 @@ trap 'code=$?; if [[ "$code" != 0 ]]; then printf "{\"valid\":false,\"phase\":\"
   uname -m
 } > "$out/toolchain.log" 2>&1
 proof prepare "$repo" "$out" "$GITHUB_SHA"
+phase=signing-calibration
+bash "$repo/scripts/tests/swiftpm-testing-signature.test.sh"
+proof signing-calibration "$out" "$RUNNER_TEMP/swiftpm-testing-signature-check"
 package="$out/package"
 args=(--package-path "$package" --configuration debug --force-resolved-versions --skip-update)
 phase=normalize-resolved-metadata
@@ -224,6 +238,15 @@ xcrun swift build "${args[@]}" --show-bin-path > "$out/bin-path.txt" 2>> "$out/b
 bin="$(cat "$out/bin-path.txt")"
 test_bundle="$bin/ClarityServiceCheckPackageTests.xctest"
 test_executable="$test_bundle/Contents/MacOS/ClarityServiceCheckPackageTests"
+phase=prepare-test-signature
+proof binary "$out" "$bin" compiled
+compiled_display_exit=0
+codesign --display --verbose=4 "$test_bundle" > "$out/signature-compiled.txt" 2>&1 || compiled_display_exit=$?
+printf '%s\n' "$compiled_display_exit" > "$out/signature-display-compiled-exit.txt"
+compiled_verify_exit=0
+codesign --verify --deep --strict "$test_bundle" > "$out/signature-verification-compiled.log" 2>&1 || compiled_verify_exit=$?
+printf '%s\n' "$compiled_verify_exit" > "$out/signature-verification-compiled-exit.txt"
+codesign --sign - --force --timestamp=none "$test_bundle" > "$out/signing-preparation.log" 2>&1
 codesign --verify --deep --strict "$test_bundle" > "$out/signature-verification-before.log" 2>&1
 codesign --display --verbose=4 "$test_bundle" > "$out/signature-before.txt" 2>&1
 proof binary "$out" "$bin" before

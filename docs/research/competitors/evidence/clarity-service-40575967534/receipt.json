@@ -1,0 +1,50 @@
+{
+  "run_id": 40575967534,
+  "run_url": "https://github.com/negentropi/roma-just-talk/actions/runs/40575967534",
+  "source_head": "de15a9bb39cfc9e06d0ef0196a1eb19692876159",
+  "classification": "invalid-pretest-test-bundle-signature",
+  "seven_test_execution_proven": false,
+  "test_execution_started": false,
+  "completed_tests": 0,
+  "compiled_actual_sources": {
+    "app_library_file_count": 11,
+    "test_file_sha256": "85580bed6dda374494026bfd44fccd898dbc04b2cf1e8167e68f0742de03a054",
+    "service_sha256": "986b0c1fae4a939faec9eed4c46a8c6065f6ed5489a922ed337d88994a06bb98",
+    "namespace": "VoiceInk",
+    "tests_registered_in_source": [
+      "clarityPreservesLiteralProviderJSONAndCodeUnits",
+      "claritySameOutputRetainsCapturedRequestMetadata",
+      "clarityRejectsMalformedAndBlankProviderResponses",
+      "claritySnapshotKeepsCapturedCLICommandAndProvider",
+      "claritySnapshotKeepsCapturedCLITimeout",
+      "writingActionsRetainLegacyFilteringAndEmptyPolicies",
+      "clarityCancellationDoesNotReturnLateOutput"
+    ],
+    "build_seconds": 194.78,
+    "standard_swift_testing_runner_linked": true
+  },
+  "pins": {
+    "canonical_subset_count": 26,
+    "before_after_build_exact_match": true,
+    "resolved_lock_sha256": "025c5b056d5db92e2b3fee004e3e8c2bf7960931dcd0cfa173b901375ec851fb"
+  },
+  "failure": {
+    "recorded_driver_phase": "build",
+    "actual_boundary": "Strict deep verification of the complete generated SwiftPM .xctest bundle, before test execution",
+    "command": "codesign --verify --deep --strict <ClarityServiceCheckPackageTests.xctest>",
+    "diagnostic": "/Users/runner/work/_temp/clarity-service-check/package/.build/arm64-apple-macosx/debug/ClarityServiceCheckPackageTests.xctest: code has no resources but signature indicates they must be present",
+    "exit_code": 1,
+    "previous_inner_executable_target_correction_insufficient": true
+  },
+  "diagnostic_limit": "The bundle binary/resource tree and detailed CodeDirectory were not retained before the failing guard. The exact seal/resource defect is not identified by this artifact alone.",
+  "next_step": "Investigate native SwiftPM test-bundle signing preparation with a tiny SDK-only test package; preserve raw bundle/signature diagnostics before a guard. Any signing change needs parent coordination.",
+  "scope": "Compilation/link and exact canonical pins proven; zero test execution. No Clarity runtime acceptance, binary/signature before-after proof, app/UI/provider/credential/AI-quality proof.",
+  "artifact": {
+    "id": 12768030576,
+    "name": "roma.clarity-service-evidence",
+    "size_in_bytes": 77115,
+    "digest": "sha256:bfe8f5c2a16a040e4eab395ee9c818f2dc09ea08e239e8fcd2c650da3ddb6250",
+    "download_count": 1,
+    "zip_size_hash_integrity_verified": true
+  }
+}

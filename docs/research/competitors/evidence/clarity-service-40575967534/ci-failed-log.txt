@@ -1,0 +1,7 @@
+service	Run all seven actual Clarity provider tests	﻿2026-10-27T20:12:49.3852960Z ##[group]Run set -o pipefail
+service	Run all seven actual Clarity provider tests	2026-10-27T20:12:49.3853370Z ^[[36;1mset -o pipefail^[[0m
+service	Run all seven actual Clarity provider tests	2026-10-27T20:12:49.3853650Z ^[[36;1mbash scripts/run-clarity-service-check.sh \^[[0m
+service	Run all seven actual Clarity provider tests	2026-10-27T20:12:49.3854070Z ^[[36;1m  2>&1 | tee "$RUNNER_TEMP/clarity-service-driver.log"^[[0m
+service	Run all seven actual Clarity provider tests	2026-10-27T20:12:49.3905640Z shell: /bin/bash --noprofile --norc -e -o pipefail {0}
+service	Run all seven actual Clarity provider tests	2026-10-27T20:12:49.3906100Z ##[endgroup]
+service	Run all seven actual Clarity provider tests	2026-10-27T20:17:44.0049570Z ##[error]Process completed with exit code 1.

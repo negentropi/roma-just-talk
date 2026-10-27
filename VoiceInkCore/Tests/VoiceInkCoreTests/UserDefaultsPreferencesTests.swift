@@ -2973,6 +2973,7 @@ final class UserDefaultsPreferencesTests: XCTestCase {
 
     func testSharedPreferenceResetClearsCoreUserSettings() {
         withIsolatedDefaults { defaults in
+            VoiceInkDictationProfile.none.save(to: defaults)
             let mode = Mode.defaultLocalWhisper()
             VoiceInkModeStorage.saveModes([mode], to: defaults)
             VoiceInkModeStorage.saveSelectedModeId(mode.id, to: defaults)
@@ -3048,6 +3049,8 @@ final class UserDefaultsPreferencesTests: XCTestCase {
 
             VoiceInkSharedPreferenceReset.clearCoreUserSettings(from: defaults, providers: [.groq])
 
+            XCTAssertEqual(VoiceInkDictationProfile.current(in: defaults), .custom)
+            XCTAssertNil(defaults.object(forKey: VoiceInkDictationProfile.storageKey))
             XCTAssertTrue(VoiceInkModeStorage.loadModes(from: defaults).isEmpty)
             XCTAssertNil(VoiceInkModeStorage.loadSelectedModeId(from: defaults))
             XCTAssertFalse(VoiceInkOnboardingPreference.hasCompletedOnboarding(from: defaults))

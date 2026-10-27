@@ -140,21 +140,29 @@ public struct VoiceInkTranscriptionEnhancementTextPlan: Equatable, Sendable {
     public let filteredText: String?
     public let textForEnhancement: String
     public let cleanedText: String
+    public let cleanupProfile: VoiceInkDictationProfile
+
+    public var allowsEnhancement: Bool {
+        cleanupProfile == .custom
+    }
 
     public init(
         filteredText: String? = nil,
         textForEnhancement: String,
-        cleanedText: String
+        cleanedText: String,
+        cleanupProfile: VoiceInkDictationProfile = .custom
     ) {
         self.filteredText = filteredText
         self.textForEnhancement = textForEnhancement
         self.cleanedText = cleanedText
+        self.cleanupProfile = cleanupProfile
     }
 
     public func shouldSkipEnhancement(
         configuration: VoiceInkPostProcessingSkipConfiguration?,
         promptTriggerForcesEnhancement: Bool = false
     ) -> Bool {
+        guard allowsEnhancement else { return true }
         guard let configuration else {
             return false
         }
@@ -172,7 +180,7 @@ public struct VoiceInkTranscriptionEnhancementTextPlan: Equatable, Sendable {
         promptDetectionResult: VoiceInkPromptDetectionResult? = nil,
         skipConfiguration: VoiceInkPostProcessingSkipConfiguration? = nil
     ) -> VoiceInkTranscriptionEnhancementRequest? {
-        guard isEnhancementEnabled, isEnhancementConfigured else {
+        guard allowsEnhancement, isEnhancementEnabled, isEnhancementConfigured else {
             return nil
         }
 
@@ -237,9 +245,18 @@ public enum VoiceInkTranscriptionRunPreparation {
     public static func prepareAudioFileText(
         _ rawText: String,
         cleanupConfiguration: VoiceInkTranscriptionCleanupConfiguration,
+        cleanupProfile: VoiceInkDictationProfile = .custom,
         applyingWordReplacements wordReplacement: (String) -> String = { $0 }
     ) -> VoiceInkTranscriptionEnhancementTextPlan {
-        prepareRawTextForEnhancement(
+        if cleanupProfile == .none {
+            return VoiceInkTranscriptionEnhancementTextPlan(
+                filteredText: rawText,
+                textForEnhancement: rawText,
+                cleanedText: rawText,
+                cleanupProfile: cleanupProfile
+            )
+        }
+        return prepareRawTextForEnhancement(
             rawText,
             cleanupConfiguration: cleanupConfiguration,
             applyingWordReplacements: wordReplacement

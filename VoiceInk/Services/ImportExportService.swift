@@ -211,7 +211,8 @@ class ImportExportService {
             audioCleanup: audioCleanupBackupPreferences,
             recordingFeedback: recordingFeedbackBackupPreferences,
             transcriptionCleanup: transcriptionCleanupBackupPreferences,
-            paste: pasteBackupPreferences
+            paste: pasteBackupPreferences,
+            dictationProfile: VoiceInkDictationProfile.current()
         )
         let shortcutBackupRecords = VoiceInkShortcutBackupPolicy.generalBackupShortcutRecords { actionIdentifier in
             ShortcutStore.shortcut(for: actionIdentifier).map(ShortcutBackup.init)

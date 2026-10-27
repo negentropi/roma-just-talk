@@ -1853,6 +1853,7 @@ public struct VoiceInkGeneralSettingsBackupPayload<ShortcutBackup: Codable>: Cod
     private let isExperimentalFeaturesEnabled: Bool?
     private let restoreClipboardAfterPaste: Bool?
     private let clipboardRestoreDelay: Double?
+    private let dictationProfile: VoiceInkDictationProfile?
 
     public init(
         shortcutBackupRecords: [VoiceInkShortcutActionIdentifier: ShortcutBackup],
@@ -1898,6 +1899,7 @@ public struct VoiceInkGeneralSettingsBackupPayload<ShortcutBackup: Codable>: Cod
         self.isExperimentalFeaturesEnabled = preferences.recordingFeedback.isExperimentalFeaturesEnabled
         self.restoreClipboardAfterPaste = preferences.paste.shouldRestoreClipboardAfterPaste
         self.clipboardRestoreDelay = preferences.paste.clipboardRestoreDelay
+        self.dictationProfile = preferences.dictationProfile
     }
 
     public var shortcutBackupRecords: [VoiceInkShortcutActionIdentifier: ShortcutBackup] {
@@ -1925,7 +1927,8 @@ public struct VoiceInkGeneralSettingsBackupPayload<ShortcutBackup: Codable>: Cod
             audioCleanup: audioCleanupBackupPreferences,
             recordingFeedback: recordingFeedbackBackupPreferences,
             transcriptionCleanup: transcriptionCleanupBackupPreferences,
-            paste: pasteBackupPreferences
+            paste: pasteBackupPreferences,
+            dictationProfile: dictationProfile
         )
     }
 
@@ -2000,6 +2003,7 @@ public struct VoiceInkGeneralSettingsBackupPreferences: Equatable, Sendable {
     public let recordingFeedback: VoiceInkRecordingFeedbackBackupPreferences
     public let transcriptionCleanup: VoiceInkTranscriptionCleanupBackupPreferences
     public let paste: VoiceInkPasteBackupPreferences
+    public let dictationProfile: VoiceInkDictationProfile?
 
     public init(
         recordingShortcut: VoiceInkRecordingShortcutBackupPreferences,
@@ -2008,7 +2012,8 @@ public struct VoiceInkGeneralSettingsBackupPreferences: Equatable, Sendable {
         audioCleanup: VoiceInkAudioCleanupBackupPreferences,
         recordingFeedback: VoiceInkRecordingFeedbackBackupPreferences,
         transcriptionCleanup: VoiceInkTranscriptionCleanupBackupPreferences,
-        paste: VoiceInkPasteBackupPreferences
+        paste: VoiceInkPasteBackupPreferences,
+        dictationProfile: VoiceInkDictationProfile? = nil
     ) {
         self.recordingShortcut = recordingShortcut
         self.macOSShell = macOSShell
@@ -2017,6 +2022,7 @@ public struct VoiceInkGeneralSettingsBackupPreferences: Equatable, Sendable {
         self.recordingFeedback = recordingFeedback
         self.transcriptionCleanup = transcriptionCleanup
         self.paste = paste
+        self.dictationProfile = dictationProfile
     }
 }
 
@@ -2028,6 +2034,7 @@ public struct VoiceInkGeneralSettingsBackupImportPlans: Equatable, Sendable {
     fileprivate let recordingFeedback: VoiceInkRecordingFeedbackBackupImportPlan
     fileprivate let transcriptionCleanup: VoiceInkTranscriptionCleanupBackupImportPlan
     fileprivate let paste: VoiceInkPasteBackupImportPlan
+    fileprivate let dictationProfile: VoiceInkDictationProfile?
 
     public init(
         recordingShortcut: VoiceInkRecordingShortcutBackupImportPlan,
@@ -2036,7 +2043,8 @@ public struct VoiceInkGeneralSettingsBackupImportPlans: Equatable, Sendable {
         audioCleanup: VoiceInkAudioCleanupBackupImportPlan,
         recordingFeedback: VoiceInkRecordingFeedbackBackupImportPlan,
         transcriptionCleanup: VoiceInkTranscriptionCleanupBackupImportPlan,
-        paste: VoiceInkPasteBackupImportPlan
+        paste: VoiceInkPasteBackupImportPlan,
+        dictationProfile: VoiceInkDictationProfile? = nil
     ) {
         self.recordingShortcut = recordingShortcut
         self.macOSShell = macOSShell
@@ -2045,6 +2053,7 @@ public struct VoiceInkGeneralSettingsBackupImportPlans: Equatable, Sendable {
         self.recordingFeedback = recordingFeedback
         self.transcriptionCleanup = transcriptionCleanup
         self.paste = paste
+        self.dictationProfile = dictationProfile
     }
 
     public func applyRuntimeState(
@@ -2074,7 +2083,8 @@ public enum VoiceInkGeneralSettingsBackupPolicy {
         audioCleanup: VoiceInkAudioCleanupBackupPreferences,
         recordingFeedback: VoiceInkRecordingFeedbackBackupPreferences,
         transcriptionCleanup: VoiceInkTranscriptionCleanupBackupPreferences,
-        paste: VoiceInkPasteBackupPreferences
+        paste: VoiceInkPasteBackupPreferences,
+        dictationProfile: VoiceInkDictationProfile? = nil
     ) -> VoiceInkGeneralSettingsBackupPreferences {
         VoiceInkGeneralSettingsBackupPreferences(
             recordingShortcut: recordingShortcut,
@@ -2083,7 +2093,8 @@ public enum VoiceInkGeneralSettingsBackupPolicy {
             audioCleanup: audioCleanup,
             recordingFeedback: recordingFeedback,
             transcriptionCleanup: transcriptionCleanup,
-            paste: paste
+            paste: paste,
+            dictationProfile: dictationProfile
         )
     }
 
@@ -2111,7 +2122,8 @@ public enum VoiceInkGeneralSettingsBackupPolicy {
             ),
             paste: VoiceInkPastePreference.backupImportPlan(
                 from: preferences.paste
-            )
+            ),
+            dictationProfile: preferences.dictationProfile
         )
     }
 
@@ -2124,6 +2136,7 @@ public enum VoiceInkGeneralSettingsBackupPolicy {
         applyRecordingFeedbackCorePreferenceImportPlan(importPlans.recordingFeedback, to: defaults)
         applyTranscriptionCleanupImportPlan(importPlans.transcriptionCleanup, to: defaults)
         applyPasteImportPlan(importPlans.paste, to: defaults)
+        importPlans.dictationProfile?.save(to: defaults)
     }
 
     private static func applyTranscriptionAutoCleanupImportPlan(
@@ -5265,6 +5278,7 @@ public enum VoiceInkSharedPreferenceReset {
         VoiceInkTranscriptionPromptPreference.clearPrompt(from: defaults)
         PunctuationCleanupMode.clearCurrent(in: defaults)
         VoiceInkTranscriptionCleanupPreferenceStorage.clearTextPreferences(from: defaults)
+        defaults.removeObject(forKey: VoiceInkDictationProfile.storageKey)
         VoiceInkFillerWordPreference.clearWords(from: defaults)
         VoiceInkWordReplacementPreference.clearRules(from: defaults)
         VoiceInkCustomVocabularyPreference.clearTerms(from: defaults)

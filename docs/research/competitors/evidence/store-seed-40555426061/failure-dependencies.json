@@ -1,0 +1,5 @@
+{
+  "classification": "invalid-or-failed",
+  "mode": "dependencies",
+  "error": "[Errno 21] Is a directory: '/Users/runner/work/_temp/dictation-store-seed-packages/checkouts/grpc-swift-2/Examples/echo-metadata/Sources/Protos/echo'"
+}

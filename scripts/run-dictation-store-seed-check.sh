@@ -22,6 +22,7 @@ import os
 import re
 import shutil
 import signal
+import stat
 import subprocess
 import sys
 import tempfile
@@ -35,7 +36,7 @@ tag_sha = "846d05df04d5821a7b5dc8588304cb58e3bd8368"
 lock_path = "VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
 lock_sha = "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f"
 oracle_path = "VoiceInkTests/DictationStoreSeedLiveTests.swift"
-helper_paths = ["scripts/run-dictation-store-seed-check.sh", ".github/workflows/voiceink-dictation-store-seed-check.yml"]
+helper_paths = ["scripts/run-dictation-store-seed-check.sh", "scripts/tests/dictation-store-source-inventory.test.py", ".github/workflows/voiceink-dictation-store-seed-check.yml"]
 product_roots = ["VoiceInk", "VoiceInkCore", "VoiceInkNVIDIA", "VoiceInkQwen", "VoiceInk.xcodeproj", "VoiceInkTests", "VoiceInkUITests", "iOS", "Makefile", "LocalBuild.xcconfig"]
 model_names = ["Transcription", "VocabularyWord", "WordReplacement", "SessionMetric"]
 model_paths = ["VoiceInk/Models/" + name + ".swift" for name in model_names]
@@ -75,6 +76,30 @@ def git(checkout, *args):
     return subprocess.check_output(["git", "-C", str(checkout), *args])
 
 
+def tracked_sources(checkout, *roots):
+    result = {}
+    entries = git(checkout, "ls-files", "--stage", "-z", "--", *roots).split(b"\0")
+    for entry in entries:
+        if not entry:
+            continue
+        metadata, raw_path = entry.split(b"\t", 1)
+        mode, object_id, stage = (value.decode("ascii") for value in metadata.split())
+        relative = os.fsdecode(raw_path)
+        require(stage == "0" and relative not in result, "Unmerged or duplicate tracked source entry: " + relative)
+        require(mode in {"100644", "100755", "120000"}, "Unsupported tracked source Git mode " + mode + ": " + relative)
+        path = checkout / relative
+        information = path.lstat()
+        identity = {"git_mode": mode, "git_object": object_id}
+        if mode == "120000":
+            require(stat.S_ISLNK(information.st_mode), "Tracked symlink changed filesystem kind: " + relative)
+            result[relative] = dict(identity, kind="symlink", target=os.readlink(path))
+        else:
+            require(stat.S_ISREG(information.st_mode), "Tracked regular source changed filesystem kind: " + relative)
+            require(bool(information.st_mode & stat.S_IXUSR) == (mode == "100755"), "Tracked source executable mode changed: " + relative)
+            result[relative] = dict(identity, kind="file", bytes=information.st_size, sha256=digest(path.read_bytes()))
+    return result
+
+
 def run(command, log, checkout=repo, environment=None, allow_failure=False):
     print("Running " + command[0] + "; log " + str(log), flush=True)
     with log.open("xb") as stream:
@@ -109,8 +134,7 @@ def store_tree(root):
 
 
 def manifest(checkout):
-    paths = git(checkout, "ls-files", "-z", "--", *product_roots).split(b"\0")
-    return {path.decode(): digest((checkout / path.decode()).read_bytes()) for path in paths if path}
+    return tracked_sources(checkout, *product_roots)
 
 
 def declarations(checkout):
@@ -157,8 +181,7 @@ def whisper_source():
     if not whisper.exists():
         return {"exists": False}
     require((whisper / ".git").exists(), "Whisper dependency must retain Git provenance")
-    paths = git(whisper, "ls-files", "-z").split(b"\0")
-    return {"exists": True, "revision": git(whisper, "rev-parse", "HEAD").decode().strip(), "tracked_sha256": {path.decode(): digest((whisper / path.decode()).read_bytes()) for path in paths if path}, "tracked_diff_sha256": digest(git(whisper, "diff", "HEAD", "--"))}
+    return {"exists": True, "revision": git(whisper, "rev-parse", "HEAD").decode().strip(), "tracked_sources": tracked_sources(whisper), "tracked_diff_sha256": digest(git(whisper, "diff", "HEAD", "--"))}
 
 
 def dependency_state():
@@ -179,8 +202,8 @@ def package_state():
         require(path.is_dir() and path.parent == packages / "checkouts", "Package checkout escaped the dedicated root")
         revision = git(path, "rev-parse", "HEAD").decode().strip()
         require(revision == checkout_state.get("revision") == pins[identity]["state"]["revision"], "Actual package revision differs from its canonical pin: " + identity)
-        tracked = git(path, "ls-files", "-z").split(b"\0")
-        result[identity] = {"revision": revision, "location": dependency["packageRef"].get("location"), "tracked_sha256": {entry.decode(): digest((path / entry.decode()).read_bytes()) for entry in tracked if entry}}
+        require(not git(path, "status", "--porcelain", "--untracked-files=no"), "Canonical package checkout has tracked changes: " + identity)
+        result[identity] = {"revision": revision, "location": dependency["packageRef"].get("location"), "tracked_sources": tracked_sources(path)}
     require(set(result) == set(pins), "Every canonical pin must have an actual resolved checkout")
     return result
 
@@ -626,6 +649,7 @@ def verify():
 
 
 def self_test():
+    subprocess.run(["python3", str(repo / "scripts/tests/dictation-store-source-inventory.test.py")], check=True)
     good = "Test " + test_name + "() started.\nTest " + test_name + "() passed after 0.1 seconds.\nTest run with 1 test in 1 suite passed\n"
     require(classify(good, 0)["valid"], "Valid exact selected test rejected")
     invalid = [good.replace("started.", "not started."), good.replace("passed after", "skipped after"), good.replace("1 test in", "0 tests in"), good + "Test other() started.\n", good + "Test " + test_name + "() recorded an issue: setup failed\n", good.replace("1 suite passed", "1 suite failed"), good + good]

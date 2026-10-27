@@ -1,0 +1,17 @@
+{
+  "artifactID": 12756893157,
+  "diagnosis": "package_state read_bytes follows a tracked symlink to a directory. Source freezing must preserve the symlink kind and target without traversing it.",
+  "exactSourceSHA": "0ada98ede86a4b546576dd8e7e6aab17fc775c99",
+  "nativeProof": "none; dependency freeze failed before either app build or actual store seed.",
+  "remoteArchive": "/data/rjt-writing-check-01a17bef/40555426061/roma.dictation-store-seed-control.zip",
+  "remoteHost": "decentleftover-pf",
+  "runURL": "https://github.com/negentropi/roma-just-talk/actions/runs/40555426061",
+  "upstreamTrackedEntry": {
+    "mode": "120000",
+    "path": "Examples/echo-metadata/Sources/Protos/echo",
+    "repository": "https://github.com/grpc/grpc-swift-2",
+    "revision": "ac33066eb6edb1a21a6ca172ea8184a9b06f3cc7",
+    "sha": "66fa3f5f5b83970e88b2e3a2f2e8a5e3573391f1",
+    "type": "blob"
+  }
+}

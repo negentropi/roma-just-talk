@@ -1,0 +1,20 @@
+store-control	Build and freeze one shared static Whisper dependency	﻿2026-10-27T17:58:01.5663830Z ##[group]Run bash scripts/run-dictation-store-seed-check.sh dependencies
+store-control	Build and freeze one shared static Whisper dependency	2026-10-27T17:58:01.5664660Z ^[[36;1mbash scripts/run-dictation-store-seed-check.sh dependencies^[[0m
+store-control	Build and freeze one shared static Whisper dependency	2026-10-27T17:58:01.5741040Z shell: /bin/bash -e {0}
+store-control	Build and freeze one shared static Whisper dependency	2026-10-27T17:58:01.5741650Z ##[endgroup]
+store-control	Build and freeze one shared static Whisper dependency	2026-10-27T17:58:01.9454180Z Running make; log /Users/runner/work/_temp/dictation-store-seed-proof/dependencies-setup.log
+store-control	Build and freeze one shared static Whisper dependency	2026-10-27T18:08:08.1869280Z Running bash; log /Users/runner/work/_temp/dictation-store-seed-proof/dependencies-static-verification.log
+store-control	Build and freeze one shared static Whisper dependency	2026-10-27T18:08:09.7027720Z Running xcodebuild; log /Users/runner/work/_temp/dictation-store-seed-proof/predecessor-strict-packages.log
+store-control	Build and freeze one shared static Whisper dependency	2026-10-27T18:09:48.1508470Z Running xcodebuild; log /Users/runner/work/_temp/dictation-store-seed-proof/candidate-strict-packages.log
+store-control	Build and freeze one shared static Whisper dependency	2026-10-27T18:10:01.1523300Z Traceback (most recent call last):
+store-control	Build and freeze one shared static Whisper dependency	2026-10-27T18:10:01.1527370Z   File "<stdin>", line 642, in <module>
+store-control	Build and freeze one shared static Whisper dependency	2026-10-27T18:10:01.1528200Z   File "<stdin>", line 548, in dependencies
+store-control	Build and freeze one shared static Whisper dependency	2026-10-27T18:10:01.1529790Z   File "<stdin>", line 167, in package_state
+store-control	Build and freeze one shared static Whisper dependency	2026-10-27T18:10:01.1537050Z   File "/opt/homebrew/Cellar/python@3.15/3.15.0_1/Frameworks/Python.framework/Versions/3.15/lib/python3.15/pathlib/__init__.py", line 976, in read_bytes
+store-control	Build and freeze one shared static Whisper dependency	2026-10-27T18:10:01.1538380Z     with self.open(mode='rb', buffering=0) as f:
+store-control	Build and freeze one shared static Whisper dependency	2026-10-27T18:10:01.1539030Z          ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+store-control	Build and freeze one shared static Whisper dependency	2026-10-27T18:10:01.1541470Z   File "/opt/homebrew/Cellar/python@3.15/3.15.0_1/Frameworks/Python.framework/Versions/3.15/lib/python3.15/pathlib/__init__.py", line 970, in open
+store-control	Build and freeze one shared static Whisper dependency	2026-10-27T18:10:01.1544390Z     return io.open(self, mode, buffering, encoding, errors, newline)
+store-control	Build and freeze one shared static Whisper dependency	2026-10-27T18:10:01.1547050Z            ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+store-control	Build and freeze one shared static Whisper dependency	2026-10-27T18:10:01.1548600Z IsADirectoryError: [Errno 21] Is a directory: '/Users/runner/work/_temp/dictation-store-seed-packages/checkouts/grpc-swift-2/Examples/echo-metadata/Sources/Protos/echo'
+store-control	Build and freeze one shared static Whisper dependency	2026-10-27T18:10:01.1816530Z ##[error]Process completed with exit code 1.

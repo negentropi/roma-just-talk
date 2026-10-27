@@ -1,0 +1,92 @@
+{
+  "canonical_lock_sha256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f",
+  "canonical_package_pins": 41,
+  "declarations": {
+    "LocalBuild.xcconfig": "67f3bd7edf3abe05d0b2870f1899469c391efb50a0078d5c1e617d81073a1844",
+    "Makefile": "c8337a54c4fcf472661eda136fe9ffd48eef2debd1dde2ebd3dc81f5685d7ff9",
+    "VoiceInk.xcodeproj/project.pbxproj": "e4a9458135e103d327477fedb1485b8f3de8e1b223f14d98e426f42e9bda3e9e",
+    "VoiceInkCore/Package.swift": "4320101452d3b079fc319d6459cc595d5e30474ea4e44899294d03a93d6ccfac",
+    "VoiceInkNVIDIA/Package.swift": "d05deef6aec46eba19ad6d529432459a0136d8bedbe22d247b43a229996ffa22",
+    "VoiceInkQwen/Package.swift": "058f93419dd0da3a92dfd135af2c8a6b664192f53ec883168c279b7564b21d4e",
+    "iOS/VoiceInk-ios.xcodeproj/project.pbxproj": "1de9826aef36e173e54a8d62b0422fde6a4657011f86b8012dc62ff8807b9676"
+  },
+  "helpers": {
+    ".github/workflows/voiceink-dictation-store-seed-check.yml": "b9d9556963523d1175663507d15b3a6c50f81bdd66091063976670c735883905",
+    "scripts/run-dictation-store-seed-check.sh": "0436efc6117e90b0a3c02f7c1d91d20ee730bd893f3bc0f01f116f7c8661a00f"
+  },
+  "oracle_path": "VoiceInkTests/DictationStoreSeedLiveTests.swift",
+  "oracle_sha256": "8a4ace980258264ef7efb8e4e77608c39768f068ff84ceeb740eb3e591692b28",
+  "product_source_roots": [
+    "VoiceInk",
+    "VoiceInkCore",
+    "VoiceInkNVIDIA",
+    "VoiceInkQwen",
+    "VoiceInk.xcodeproj",
+    "VoiceInkTests",
+    "VoiceInkUITests",
+    "iOS",
+    "Makefile",
+    "LocalBuild.xcconfig"
+  ],
+  "scope": "Actual predecessor persistent seed, separate predecessor reopen and unchanged-schema current read. No production/schema changes, future metadata migration, CloudKit sync, user-store copy, audio, recognition or provider call.",
+  "source_bridge": {
+    "846d05df04d5821a7b5dc8588304cb58e3bd8368": {
+      "factory_sha256": "c62e26b2b077071a94c0430e02fc3c104f8c1b1d09839275cd9298ee56f9d1ac",
+      "global_schema_constructor_sha256": "1f672413d034380d9cdba490d9f1b4ddaa9f9693d2655d4e0530896ab1b384a8",
+      "global_schema_order": [
+        "Transcription",
+        "VocabularyWord",
+        "WordReplacement",
+        "SessionMetric"
+      ],
+      "models": {
+        "VoiceInk/Models/SessionMetric.swift": "dc29ab6e8bf70b82d055a189c2f09994514b37104564e889a55de805ca49fea8",
+        "VoiceInk/Models/Transcription.swift": "d53202c9319d54b6e592e111aacd907ff26a24e1036a9c10a724dbc5b72afcac",
+        "VoiceInk/Models/VocabularyWord.swift": "b90fbd19b9b5f8e1a99a2388c0429bbe3fcfa3ca278f9c0e7e8aabc39751684b",
+        "VoiceInk/Models/WordReplacement.swift": "602004b8f8fd7da3eea1bc3e74e5a2d03d91c56f96decb303658f68e34256d44"
+      },
+      "module": "VoiceInk"
+    },
+    "HEAD": {
+      "factory_sha256": "c62e26b2b077071a94c0430e02fc3c104f8c1b1d09839275cd9298ee56f9d1ac",
+      "global_schema_constructor_sha256": "1f672413d034380d9cdba490d9f1b4ddaa9f9693d2655d4e0530896ab1b384a8",
+      "global_schema_order": [
+        "Transcription",
+        "VocabularyWord",
+        "WordReplacement",
+        "SessionMetric"
+      ],
+      "models": {
+        "VoiceInk/Models/SessionMetric.swift": "dc29ab6e8bf70b82d055a189c2f09994514b37104564e889a55de805ca49fea8",
+        "VoiceInk/Models/Transcription.swift": "d53202c9319d54b6e592e111aacd907ff26a24e1036a9c10a724dbc5b72afcac",
+        "VoiceInk/Models/VocabularyWord.swift": "b90fbd19b9b5f8e1a99a2388c0429bbe3fcfa3ca278f9c0e7e8aabc39751684b",
+        "VoiceInk/Models/WordReplacement.swift": "602004b8f8fd7da3eea1bc3e74e5a2d03d91c56f96decb303658f68e34256d44"
+      },
+      "module": "VoiceInk"
+    },
+    "ebc92f1e60fdabbb9e26b2817f414d154865a9d5": {
+      "factory_sha256": "c62e26b2b077071a94c0430e02fc3c104f8c1b1d09839275cd9298ee56f9d1ac",
+      "global_schema_constructor_sha256": "1f672413d034380d9cdba490d9f1b4ddaa9f9693d2655d4e0530896ab1b384a8",
+      "global_schema_order": [
+        "Transcription",
+        "VocabularyWord",
+        "WordReplacement",
+        "SessionMetric"
+      ],
+      "models": {
+        "VoiceInk/Models/SessionMetric.swift": "dc29ab6e8bf70b82d055a189c2f09994514b37104564e889a55de805ca49fea8",
+        "VoiceInk/Models/Transcription.swift": "d53202c9319d54b6e592e111aacd907ff26a24e1036a9c10a724dbc5b72afcac",
+        "VoiceInk/Models/VocabularyWord.swift": "b90fbd19b9b5f8e1a99a2388c0429bbe3fcfa3ca278f9c0e7e8aabc39751684b",
+        "VoiceInk/Models/WordReplacement.swift": "602004b8f8fd7da3eea1bc3e74e5a2d03d91c56f96decb303658f68e34256d44"
+      },
+      "module": "VoiceInk"
+    }
+  },
+  "source_sha": {
+    "candidate": "0ada98ede86a4b546576dd8e7e6aab17fc775c99",
+    "predecessor": "ebc92f1e60fdabbb9e26b2817f414d154865a9d5"
+  },
+  "tag_sha": "846d05df04d5821a7b5dc8588304cb58e3bd8368",
+  "test_identifier": "VoiceInkTests/VoiceInkTests/liveDictationPersistentStoreSeedControl()",
+  "version": 1
+}

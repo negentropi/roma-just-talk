@@ -1,0 +1,33 @@
+{
+  "actualStoreSeedStarted": false,
+  "artifactBytes": 177287,
+  "artifactID": 12756893157,
+  "artifactSHA256": "dc400481df2e7191a92faaa0c401ae91f8e9c479ddae1c75dab9e9e3bb0505b9",
+  "canonicalPackageLockSHA256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f",
+  "canonicalPins": 41,
+  "classification": "setup-failed-before-native-build",
+  "currentReadStarted": false,
+  "failure": {
+    "classification": "invalid-or-failed",
+    "error": "[Errno 21] Is a directory: '/Users/runner/work/_temp/dictation-store-seed-packages/checkouts/grpc-swift-2/Examples/echo-metadata/Sources/Protos/echo'",
+    "mode": "dependencies"
+  },
+  "frameworkEntryCount": 121,
+  "frozenOracleSHA256": "8a4ace980258264ef7efb8e4e77608c39768f068ff84ceeb740eb3e591692b28",
+  "limits": [
+    "No actual SwiftData seed, reopen, schema runtime, field persistence or migration proof.",
+    "Whisper build/static verification and both strict package resolutions completed before package-manifest failure.",
+    "Complete failed-run artifact retained on remote data volume."
+  ],
+  "nativeAppBuildStarted": false,
+  "oldReopenStarted": false,
+  "runID": 40555426061,
+  "sourceModelFactoryModuleBridgeEqual": true,
+  "sourceSHA": {
+    "candidate": "0ada98ede86a4b546576dd8e7e6aab17fc775c99",
+    "predecessor": "ebc92f1e60fdabbb9e26b2817f414d154865a9d5"
+  },
+  "whisperSourceRevision": "21ba6d269a02c14309355cb96822db6058d4cf48",
+  "whisperTrackedSourceFileCount": 2057,
+  "zipCRCValid": true
+}

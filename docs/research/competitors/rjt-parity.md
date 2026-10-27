@@ -15,6 +15,8 @@ Checked 2026-10-27. Research input: [Wispr Flow](wispr-flow.md), [Willow](willow
 
 The table below retains the audited baseline states. New Mac work is tracked in the [implementation plan](implementation-plan.md), with user instructions in [Writing Actions and spoken snippets](../../writing-actions-and-snippets.md).
 
+- A20: candidate source now adds [explicit History correction approval](../../approved-corrections.md), Dictionary enable/edit/delete and provenance, strict full-record backups and conflict review. It removes the process-wide replacement cache and keeps literal payloads outside fields older synced readers execute. Twenty-five new app cases, matched store/context checks, actual predecessor migration and eight UI workflows remain runtime acceptance work; source review does not establish them. Automatic learning remains open.
+
 - A23: `ec7bc1bc` and `827845a1` add a first-class plain-text snippet library, literal multiline delivery, enable controls, and reviewed CSV import and export. Rich-text snippets remain open.
 - A24–A26: `827845a1` adds distinct recording actions for selected-text editing, translation, and drafting, with independent ordered translation targets and captured destination checks. Read-only answers, contextual replies, web actions, transform review, and undo remain open.
 - Settings backup and reset include the new library, targets, and shortcuts while retaining older backup decoding.

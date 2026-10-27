@@ -21,7 +21,6 @@ extension VoiceInkTests {
                 fixture.defaults.set("pt", forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage)
                 rule.replacementText = "Later"
                 try fixture.context.save()
-                DictionaryService.invalidateWordReplacementCache()
                 gate.release()
                 let record = await work.value
                 #expect(record.text == "RJT")
@@ -580,7 +579,6 @@ private final class PolishRecordingFixture {
         PowerModeManager.shared.configurations = []
         PowerModeManager.shared.activeConfiguration = nil
         SoundManager.shared.isEnabled = false
-        DictionaryService.invalidateWordReplacementCache()
         SpecialShortcutEmptyTranscriptionFallback.clear()
         let ai = AIService()
         try #require(ai.selectedProvider == .localCLI && ai.isAPIKeyValid && ai.apiKey.isEmpty)
@@ -740,7 +738,6 @@ private final class PolishRecordingFixture {
             if let value = savedDefaults[key] { defaults.set(value, forKey: key) }
             else { defaults.removeObject(forKey: key) }
         }
-        DictionaryService.invalidateWordReplacementCache()
         do { try FileManager.default.removeItem(at: directory) }
         catch { Issue.record("Could not remove owned recording fixture: \(error)") }
     }

@@ -60,7 +60,7 @@ extension VoiceInkTests {
             #expect(unchanged.literalOutput == "Um, RJT")
         }
 
-        @Test @MainActor func dictionarySnapshotIsFreshAndDoesNotChangeTheCustomCache() throws {
+        @Test @MainActor func dictionarySnapshotsRemainCopiedWhileCustomReadsCurrentRules() throws {
             let fixture = try DictationPlanFixture()
             defer { fixture.restore() }
             let rule = WordReplacement(originalText: "Roma", replacementText: "First")
@@ -68,20 +68,26 @@ extension VoiceInkTests {
             fixture.context.insert(rule)
             fixture.context.insert(disabled)
             try fixture.context.save()
-            DictionaryService.warmWordReplacementCache(using: fixture.context)
+            let firstSnapshot = try DictionaryService.snapshotEnabledReplacementRules(using: fixture.context)
+            let firstExpected = [VoiceInkWordReplacementRule(originalText: "Roma", replacementText: "First")]
+            #expect(firstSnapshot == firstExpected)
+            #expect(DictionaryService.applyWordReplacements(to: "Roma", using: fixture.context) == "First")
             rule.replacementText = "Second"
             try fixture.context.save()
 
             let snapshot = try DictionaryService.snapshotEnabledReplacementRules(using: fixture.context)
             let expected = [VoiceInkWordReplacementRule(originalText: "Roma", replacementText: "Second")]
             #expect(snapshot == expected)
-            #expect(DictionaryService.applyWordReplacements(to: "Roma", using: fixture.context) == "First")
+            #expect(firstSnapshot == firstExpected)
+            #expect(DictionaryService.applyWordReplacements(to: "Roma", using: fixture.context) == "Second")
             fixture.context.delete(rule)
             try fixture.context.save()
             #expect(snapshot == expected)
+            #expect(firstSnapshot == firstExpected)
+            #expect(DictionaryService.applyWordReplacements(to: "Roma", using: fixture.context) == "Roma")
         }
 
-        @Test @MainActor func capturedLibrariesSurviveLaterEditsAndCacheReplacement() async throws {
+        @Test @MainActor func capturedLibrariesSurviveLaterEditsAndFreshReads() async throws {
             let fixture = try DictationPlanFixture()
             defer { fixture.restore() }
             let rule = WordReplacement(originalText: "Roma", replacementText: "First")
@@ -92,8 +98,6 @@ extension VoiceInkTests {
             rule.replacementText = "Later"
             snippets[0].content = "Later snippet"
             try fixture.context.save()
-            DictionaryService.invalidateWordReplacementCache()
-            DictionaryService.warmWordReplacementCache(using: fixture.context)
             let next = DictationPostprocessingPlan.captureLight(snippets: snippets, storedLanguage: "en", using: fixture.context)
 
             let processedFirst = try await captured.process(recognitionText: "Um, Roma", using: nil)
@@ -322,7 +326,6 @@ private final class DictationPlanFixture {
         let container = try ModelContainer(for: schema, configurations: [configuration])
         self.container = container
         context = ModelContext(container)
-        DictionaryService.invalidateWordReplacementCache()
     }
 
     func service() throws -> DictationPlanEnhancementSpy {
@@ -343,7 +346,6 @@ private final class DictationPlanFixture {
             if let value = saved[key] { defaults.set(value, forKey: key) }
             else { defaults.removeObject(forKey: key) }
         }
-        DictionaryService.invalidateWordReplacementCache()
     }
 }
 

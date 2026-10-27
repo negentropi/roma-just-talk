@@ -148,25 +148,16 @@ class ImportExportService {
         // Export custom models
         let customModels = CustomCloudModelManager.shared.customModels.map { VoiceInkCustomCloudModelBackup(model: $0) }
 
-        let vocabularyDescriptor = FetchDescriptor<VocabularyWord>()
-        let vocabularyWords = (try? modelContext.fetch(vocabularyDescriptor).map(\.word)) ?? []
-
-        let replacementsDescriptor = FetchDescriptor<WordReplacement>()
-        let wordReplacementRules = (try? modelContext.fetch(replacementsDescriptor).map(\.voiceInkRule)) ?? []
-        let dictionaryExportPlan = VoiceInkDictionaryPolicy.dictionaryBackupExportPlan(
-            vocabularyWords: vocabularyWords,
-            wordReplacementRules: wordReplacementRules
-        )
-        var vocabularyBackupRecords: [VoiceInkVocabularyWordBackup]?
-        var wordReplacementBackupRecords: [String: String]?
-        dictionaryExportPlan.applyRuntimeState(
-            setVocabularyBackupRecords: { records in
-                vocabularyBackupRecords = records
-            },
-            setWordReplacementBackupRecords: { records in
-                wordReplacementBackupRecords = records
-            }
-        )
+        let dictionary: DictionaryBackup.Export
+        do {
+            dictionary = try DictionaryBackup.export(using: modelContext)
+        } catch {
+            showAlert(
+                title: backupPresentation.exportErrorTitle,
+                message: backupPresentation.exportEncodingFailureMessage(localizedDescription: error.localizedDescription)
+            )
+            return
+        }
 
         let cleanupSettings = VoiceInkTranscriptionCleanupSettings.current()
         let transcriptionCleanup = VoiceInkTranscriptionAutoCleanupPreference.current()
@@ -229,12 +220,13 @@ class ImportExportService {
             customPrompts: exportablePrompts,
             powerModeConfigs: powerModeConfigs,
             powerModeShortcuts: powerModeShortcuts,
-            vocabularyWords: vocabularyBackupRecords,
-            wordReplacements: wordReplacementBackupRecords,
+            vocabularyWords: dictionary.vocabularyWords,
+            wordReplacements: dictionary.legacyWordReplacements,
             generalSettings: generalSettingsToExport,
             customEmojis: powerModeCustomEmojis,
             customCloudModels: customModels,
-            spokenSnippets: VoiceInkSpokenSnippets.load()
+            spokenSnippets: VoiceInkSpokenSnippets.load(),
+            wordReplacementLibrary: dictionary.wordReplacementLibrary
         )
 
         do {
@@ -364,11 +356,24 @@ class ImportExportService {
                     )
                 }
             )
+        } catch let conflict as DictionaryService.LibraryConflictError {
+            // Presentation only: the typed error carries every incoming/existing record pair.
+            showWordReplacementImportConflicts(conflict.conflicts)
         } catch {
             showAlert(
                 title: backupPresentation.importErrorTitle,
                 message: backupPresentation.importFailureMessage(localizedDescription: error.localizedDescription)
             )
+        }
+    }
+
+    /// Close-only review; it offers no overwrite, retry or import action.
+    @MainActor
+    private func showWordReplacementImportConflicts(_ conflicts: [VoiceInkWordReplacementLibraryConflict]) {
+        let title = backupPresentation.importErrorTitle
+        // Queued like `showAlert`, so earlier queued alerts (e.g. version review) appear first.
+        DispatchQueue.main.async {
+            WordReplacementImportConflictAlert.run(title: title, conflicts: conflicts)
         }
     }
 

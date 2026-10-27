@@ -16,6 +16,8 @@ struct InlineHistoryView: View {
     @State private var hasMoreContent = true
     @State private var lastTimestamp: Date?
     @State private var isViewCurrentlyVisible = false
+    /// Owned here, not by the row, so deleting or paging the source row can't silently drop it.
+    @State private var correctionTarget: SaveCorrectionTarget?
 
     private let exportService = VoiceInkCSVExportService()
 
@@ -93,9 +95,14 @@ struct InlineHistoryView: View {
             Button(VoiceInkHistoryPresentation.deleteConfirmationPrimaryButtonTitle, role: .destructive) {
                 deleteSelectedTranscriptions()
             }
+            .accessibilityIdentifier("history.delete.confirm")
             Button(VoiceInkHistoryPresentation.deleteConfirmationCancelButtonTitle, role: .cancel) {}
+                .accessibilityIdentifier("history.delete.cancel")
         } message: {
             Text(VoiceInkTranscriptPresentation.deleteConfirmationMessage(selectedCount: selectedTranscriptions.count))
+        }
+        .sheet(item: $correctionTarget) { target in
+            SaveCorrectionSheet(target: target)
         }
         .onAppear {
             isViewCurrentlyVisible = true
@@ -185,6 +192,7 @@ struct InlineHistoryView: View {
             }
             .buttonStyle(.plain)
             .foregroundColor(.red.opacity(0.8))
+            .accessibilityIdentifier("history.selection.delete")
 
             Divider()
                 .frame(height: 16)
@@ -260,6 +268,13 @@ struct InlineHistoryView: View {
                             withAnimation(.smooth(duration: 0.3)) {
                                 isPanelPresented = true
                             }
+                        },
+                        onSaveCorrection: { variant, displayedText in
+                            beginCorrection(
+                                transcriptionID: transcription.id,
+                                variant: variant,
+                                displayedText: displayedText
+                            )
                         }
                     )
                 }
@@ -420,6 +435,27 @@ struct InlineHistoryView: View {
         isLoading = plan.isLoading
     }
 
+    // MARK: - Save Correction
+
+    /// Captures the exact displayed text through the service; returns a visible error on failure.
+    private func beginCorrection(
+        transcriptionID: UUID,
+        variant: HistoryTextVariant,
+        displayedText: String
+    ) -> String? {
+        do {
+            correctionTarget = try SaveCorrectionTarget.capture(
+                transcriptionID: transcriptionID,
+                variant: variant,
+                displayedText: displayedText,
+                using: modelContext
+            )
+            return nil
+        } catch {
+            return error.localizedDescription
+        }
+    }
+
     // MARK: - Selection & Deletion
 
     private func toggleSelection(_ transcription: Transcription) {
@@ -496,8 +532,11 @@ private struct HistoryCardRow: View {
     let onToggleExpand: () -> Void
     let onToggleCheck: () -> Void
     let onShowInfo: () -> Void
+    /// Receives the visible variant and its exact displayed text; returns an error message on failure.
+    let onSaveCorrection: (HistoryTextVariant, String) -> String?
 
     @State private var selectedTab: HistoryTextVariant = .original
+    @State private var correctionError: (variant: HistoryTextVariant, message: String)?
 
     private var availableTabs: [HistoryTextVariant] {
         HistoryTextVariant.available(for: transcription)
@@ -505,10 +544,6 @@ private struct HistoryCardRow: View {
 
     private var visibleTab: HistoryTextVariant {
         availableTabs.contains(selectedTab) ? selectedTab : .original
-    }
-
-    private var displayText: String {
-        visibleTab.text(for: transcription)
     }
 
     private var hasAudioFile: Bool {
@@ -524,6 +559,9 @@ private struct HistoryCardRow: View {
                 ))
                 .toggleStyle(CircularCheckboxStyle())
                 .labelsHidden()
+                // Selection checkbox only; the header's ".expand" identifier is the expand target.
+                .accessibilityLabel(Text("Select transcription"))
+                .accessibilityIdentifier("\(rowAccessibilityIdentifier).select")
 
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 6) {
@@ -576,14 +614,18 @@ private struct HistoryCardRow: View {
     // MARK: - Expanded Content
 
     private var expandedContent: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        // One variant+text snapshot per evaluation: the same value is rendered, copied and
+        // captured for Save Correction; the action never re-reads the record.
+        let shownVariant = visibleTab
+        let shownText = shownVariant.text(for: transcription)
+        return VStack(alignment: .leading, spacing: 8) {
             HistoryProcessingWarning(transcription: transcription)
 
             if availableTabs.count > 1 || transcription.dictationProfile != nil {
                 HStack(spacing: 4) {
                     if availableTabs.count > 1 {
                         ForEach(availableTabs) { tab in
-                            let isSelected = visibleTab == tab
+                            let isSelected = shownVariant == tab
                             Button {
                                 withAnimation(.easeInOut(duration: 0.15)) {
                                     selectedTab = tab
@@ -611,17 +653,32 @@ private struct HistoryCardRow: View {
             }
 
             ScrollView {
-                Text(verbatim: displayText)
+                Text(verbatim: shownText)
                     .font(.body)
                     .textSelection(.enabled)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .accessibilityIdentifier(visibleTab.textAccessibilityIdentifier)
+                    .accessibilityIdentifier(shownVariant.textAccessibilityIdentifier)
             }
             .frame(maxHeight: 350)
             .overlay(alignment: .bottomTrailing) {
-                CopyIconButton(textToCopy: displayText)
-                    .accessibilityIdentifier("history.copy.\(visibleTab.rawValue)")
+                CopyIconButton(textToCopy: shownText)
+                    .accessibilityIdentifier("history.copy.\(shownVariant.rawValue)")
                     .padding(8)
+            }
+
+            // The service rejects this rendered value if the stored variant changed since.
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                if let correctionError, correctionError.variant == shownVariant {
+                    SaveCorrectionCaptureError(variant: correctionError.variant, message: correctionError.message)
+                }
+                Spacer(minLength: 0)
+                SaveCorrectionButton(variant: shownVariant) {
+                    if let message = onSaveCorrection(shownVariant, shownText) {
+                        correctionError = (variant: shownVariant, message: message)
+                    } else {
+                        correctionError = nil
+                    }
+                }
             }
 
             if let url = transcription.storedAudioAvailability().existingURL {

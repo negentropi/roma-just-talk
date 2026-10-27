@@ -61,6 +61,26 @@ enum HistoryTextVariant: String, CaseIterable, Identifiable {
     }
 }
 
+/// History tab <-> approved-correction provenance. Original is processed text before AI
+/// enhancement; only Recognized is untouched recognizer output.
+extension HistoryTextVariant {
+    init(_ sourceVariant: VoiceInkWordReplacementSourceVariant) {
+        switch sourceVariant {
+        case .recognition: self = .recognized
+        case .processed: self = .original
+        case .enhanced: self = .enhanced
+        }
+    }
+
+    var correctionSourceVariant: VoiceInkWordReplacementSourceVariant {
+        switch self {
+        case .recognized: return .recognition
+        case .original: return .processed
+        case .enhanced: return .enhanced
+        }
+    }
+}
+
 /// Inline notice for a record whose Light/Clarity processing failed.
 /// It never stands in for the enhanced result and never claims editor delivery.
 struct HistoryProcessingWarning: View {

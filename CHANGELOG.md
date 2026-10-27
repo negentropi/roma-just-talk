@@ -2,6 +2,9 @@
 
 ## v1.95.2 - Unreleased
 
+- Save an approved correction from History as one literal phrase, with a preview, source reference, enable switch and Dictionary editing. Keep complete replacement records in backups and show conflicts before importing.
+- Read replacements from the current operation's store instead of reusing a process-wide dictionary cache.
+
 - Add Light dictation cleanup and Clarity AI cleanup with Natural, Casual and Formal styles. Capture the chosen profile, libraries and Clarity provider when each operation starts; keep Custom settings saved.
 - Keep recognition text separately in History, with a Recognized view and a distinct cleanup-failure warning. Preserve original recognition when cleanup fails, including imports and retries.
 - Keep older recording, cancellation and reset completions from clearing a newer recording's captured context or delivering obsolete text.

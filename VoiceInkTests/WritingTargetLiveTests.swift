@@ -212,7 +212,6 @@ private final class LiveDictationPolishPipelineFixture {
         CursorPaster.configurePasteCommandPosterForTesting()
         environment.context.insert(WordReplacement(originalText: "Roma", replacementText: DictationPolishLiveEnvironment.replacement))
         try environment.context.save()
-        DictionaryService.invalidateWordReplacementCache()
     }
 
     func run(_ scenario: String) async throws -> [String: Any] {
@@ -229,11 +228,9 @@ private final class LiveDictationPolishPipelineFixture {
         let rule = try #require(try environment.context.fetch(FetchDescriptor<WordReplacement>()).first)
         rule.replacementText = "MUST NOT USE LATER RULE"
         try environment.context.save()
-        DictionaryService.invalidateWordReplacementCache()
         defer {
             rule.replacementText = DictationPolishLiveEnvironment.replacement
             do { try environment.context.save() } catch { Issue.record("Could not restore owned native rule: \(error)") }
-            DictionaryService.invalidateWordReplacementCache()
         }
         let raw = "Um, Roma confirms this.\r\n"
         let prepared = profile == .light

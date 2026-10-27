@@ -1,6 +1,6 @@
 # Queued Mac unit: approved corrections
 
-The approval flow remains design only. Shared matching preparation is implemented below; no History approval, SwiftData field, automatic learning or new literal entry is exposed yet. Add an explicit **Save correction** action before attempting automatic correction learning.
+The candidate now implements explicit History approval, Dictionary review and full-record backup. Native compilation, persistence, matched freshness and eight-case UI acceptance remain pending. Automatic correction learning is separate. [User instructions](../../approved-corrections.md).
 
 ## User contract
 

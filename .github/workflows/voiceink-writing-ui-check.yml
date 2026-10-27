@@ -58,10 +58,22 @@ jobs:
             VoiceInkTests/DictationHistoryUISeedLiveTests.swift \
             VoiceInk/VoiceInk.swift \
             VoiceInk/Models/Transcription.swift \
+            VoiceInk/Models/WordReplacement.swift \
+            VoiceInk/Models/VocabularyWord.swift \
+            VoiceInk/Models/SessionMetric.swift \
+            VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift \
+            VoiceInkCore/Sources/VoiceInkCore/WordReplacementLibrary.swift \
+            VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift \
+            VoiceInk/Services/HistoryCorrectionApprovalService.swift \
+            VoiceInk/Services/DictionaryService.swift \
             VoiceInk/Views/ModelSettingsView.swift \
+            VoiceInk/Views/History/SaveCorrectionSheet.swift \
             VoiceInk/Views/History/HistoryProcessingViews.swift \
             VoiceInk/Views/History/InlineHistoryView.swift \
             VoiceInk/Views/History/TranscriptionDetailView.swift \
+            VoiceInk/Views/Dictionary/WordReplacementView.swift \
+            VoiceInk/Views/Dictionary/EditReplacementSheet.swift \
+            VoiceInk/Views/Dictionary/WordReplacementReviewViews.swift \
             scripts/run-writing-settings-ui-regression.sh \
             scripts/run-writing-feature-regression.sh \
             .github/workflows/voiceink-writing-ui-check.yml \
@@ -99,7 +111,7 @@ jobs:
             ~/Library/Caches/org.swift.swiftpm
           key: ${{ steps.deps-cache.outputs.cache-primary-key }}
 
-      - name: Compare the disabled-panel baseline and six current writing UI cases
+      - name: Compare the disabled-panel baseline and eight current writing UI cases
         run: |
           defaults write com.negentropi.RomaJustTalk CurrentTranscriptionModel -string whisper-large-v3-turbo
           defaults write com.negentropi.RomaJustTalk PrewarmModelOnWake -bool false
@@ -149,6 +161,7 @@ jobs:
           path: |
             .local-build/onboarding-test-evidence/writing-ui/**
             ${{ runner.temp }}/writing-ui-proof/**
+            ${{ runner.temp }}/writing-ui-proof/history-seed/**
             ${{ runner.temp }}/writing-package-proof/**
             ${{ runner.temp }}/writing-settings-ui-regression/**
             ${{ runner.temp }}/writing-ui-dependency-setup.log

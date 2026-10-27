@@ -169,7 +169,6 @@ private final class NoneProfileImportFixture {
         VoiceInkDictationProfile.none.save()
         PowerModeManager.shared.activeConfiguration = nil
         SoundManager.shared.isEnabled = false
-        DictionaryService.invalidateWordReplacementCache()
         whisper = WhisperModelManager(modelsDirectory: directory)
         whisper.availableModels = [.init(name: "base", url: inputs.model)]
         let models = TranscriptionModelManager(whisperModelManager: whisper, fluidAudioModelManager: FluidAudioModelManager())
@@ -260,7 +259,6 @@ private final class NoneProfileImportFixture {
             if let value = savedDefaults[key] { UserDefaults.standard.set(value, forKey: key) }
             else { UserDefaults.standard.removeObject(forKey: key) }
         }
-        DictionaryService.invalidateWordReplacementCache()
         do { try FileManager.default.removeItem(at: directory) }
         catch {
             cleaned = false
@@ -431,7 +429,6 @@ final class DictationPolishLiveEnvironment {
         VoiceInkClarityStyle.natural.save()
         PowerModeManager.shared.activeConfiguration = nil
         SoundManager.shared.isEnabled = false
-        DictionaryService.invalidateWordReplacementCache()
         SpecialShortcutEmptyTranscriptionFallback.clear()
         ai = AIService()
         enhancement = AIEnhancementService(aiService: ai, modelContext: context)
@@ -494,7 +491,6 @@ final class DictationPolishLiveEnvironment {
             if let value = savedDefaults[key] { UserDefaults.standard.set(value, forKey: key) }
             else { UserDefaults.standard.removeObject(forKey: key) }
         }
-        DictionaryService.invalidateWordReplacementCache()
         try FileManager.default.removeItem(at: directory)
     }
 
@@ -544,7 +540,6 @@ private final class DictationPolishWhisperFixture {
         let context = environment.context
         context.insert(WordReplacement(originalText: "fox", replacementText: DictationPolishLiveEnvironment.replacement))
         try context.save()
-        DictionaryService.invalidateWordReplacementCache()
         profile.save()
         let fails = profile == .clarity && !retranscribing
         let command = try environment.installCommand(label: "file-command", fails: fails)

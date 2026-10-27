@@ -9,6 +9,7 @@ import re
 import subprocess
 import sys
 from pathlib import Path
+from uuid import UUID
 
 BASELINE = 'bdd608cf6111e8d7e88c12678f530318713acf67'
 ORACLE = 'VoiceInkUITests/WritingFeaturesUITests.swift'
@@ -17,9 +18,21 @@ MARKER = 'Opening model settings disabled the panel or blocked a visible panel c
 PRODUCT = ['VoiceInk', 'VoiceInkCore', 'VoiceInkNVIDIA', 'VoiceInkQwen', 'VoiceInk.xcodeproj', 'iOS']
 LOCK = 'VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved'
 LOCK_HASH = 'bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f'
-CASES = ['testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch', 'testCSVImportPreviewsMultilineContentBeforeReplacing', 'testTranslationTargetsReorderSelectAndPersist', METHOD, 'testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings', 'testHistoryPreservesRecognizedFallbackAndLegacyVariants']
+CASES = ['testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch', 'testCSVImportPreviewsMultilineContentBeforeReplacing', 'testTranslationTargetsReorderSelectAndPersist', METHOD, 'testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings', 'testHistoryPreservesRecognizedFallbackAndLegacyVariants', 'testHistoryCorrectionPreviewApprovalAndDictionaryManagement', 'testApprovedHistoryCorrectionSurvivesSourceDeletion']
 SEED_METHOD = 'liveDictationHistoryUISeed'
-SEED_INPUTS = ['VoiceInkTests/DictationHistoryUISeedLiveTests.swift', 'VoiceInk/VoiceInk.swift', 'VoiceInk/Models/Transcription.swift', 'scripts/run-writing-feature-regression.sh']
+SEED_INPUTS = [
+    'VoiceInkTests/DictationHistoryUISeedLiveTests.swift', 'VoiceInk/VoiceInk.swift',
+    'VoiceInk/Models/Transcription.swift', 'VoiceInk/Models/WordReplacement.swift',
+    'VoiceInk/Models/VocabularyWord.swift', 'VoiceInk/Models/SessionMetric.swift',
+    'VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift',
+    'VoiceInkCore/Sources/VoiceInkCore/WordReplacementLibrary.swift',
+    'VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift',
+    'VoiceInk/Services/HistoryCorrectionApprovalService.swift', 'VoiceInk/Services/DictionaryService.swift',
+    'VoiceInk/Views/History/SaveCorrectionSheet.swift', 'VoiceInk/Views/History/HistoryProcessingViews.swift',
+    'VoiceInk/Views/History/InlineHistoryView.swift', 'VoiceInk/Views/History/TranscriptionDetailView.swift',
+    'VoiceInk/Views/Dictionary/WordReplacementView.swift', 'VoiceInk/Views/Dictionary/EditReplacementSheet.swift',
+    'VoiceInk/Views/Dictionary/WordReplacementReviewViews.swift', 'scripts/run-writing-feature-regression.sh'
+]
 digest = lambda data: hashlib.sha256(data).hexdigest()
 def write(path, value):
     Path(path).write_text(json.dumps(value, indent=2, sort_keys=True) + '\n')
@@ -76,7 +89,37 @@ def classify_candidate(text, exit_code):
 def native_seed_valid(payload, source):
     seed, verified = payload.get('seed', {}), payload.get('verify', {})
     phases = all(value.get('valid') is True and value.get('phase') == phase and value.get('testName') == SEED_METHOD and value.get('sourceSHA') == source and value.get('exit_code') == 0 for phase, value in [('seed', seed), ('verify', verified)])
-    return payload.get('valid') is True and payload.get('sourceSHA') == source and payload.get('testName') == SEED_METHOD and payload.get('closedBeforeUI') is True and payload.get('verifiedAfterUI') is True and phases and seed.get('closedBeforeUI') is True and seed.get('saveCompleted') is True and verified.get('closedAfterUI') is True and verified.get('verificationReadOnly') is True and type(seed.get('hostPID')) is int and type(verified.get('hostPID')) is int and seed['hostPID'] > 0 and verified['hostPID'] > 0 and seed['hostPID'] != verified['hostPID'] and len(seed.get('normalStorePaths', [])) == 3 and seed['normalStorePaths'] == verified.get('normalStorePaths')
+    seed_counts, final_counts = seed.get('savedCounts', {}), verified.get('savedCounts', {})
+    stats_count = seed_counts.get('SessionMetric')
+    counts_valid = type(stats_count) is int and stats_count >= 0 and seed_counts == {'Transcription': 6, 'VocabularyWord': 1, 'WordReplacement': 1, 'SessionMetric': stats_count} and final_counts == {'Transcription': 5, 'VocabularyWord': 1, 'WordReplacement': 2, 'SessionMetric': stats_count}
+    corrections_valid = correction_valid(verified.get('corrections', {}), source, payload.get('correction_receipts_sha256', {}))
+    return (payload.get('valid') is True and payload.get('sourceSHA') == source and payload.get('testName') == SEED_METHOD
+            and payload.get('closedBeforeUI') is True and payload.get('verifiedAfterUI') is True
+            and payload.get('uiClosedBeforeVerify') is True and payload.get('correctionsVerified') is True
+            and phases and counts_valid and corrections_valid and verified['corrections'].get('counts') == final_counts
+            and seed.get('closedBeforeUI') is True and seed.get('saveCompleted') is True
+            and verified.get('closedAfterUI') is True and verified.get('verificationReadOnly') is True
+            and verified.get('statsUnchanged') is True and verified.get('correctionReceiptsUnchanged') is True
+            and type(seed.get('hostPID')) is int and type(verified.get('hostPID')) is int
+            and seed['hostPID'] > 0 and verified['hostPID'] > 0 and seed['hostPID'] != verified['hostPID']
+            and len(seed.get('normalStorePaths', [])) == 3 and seed['normalStorePaths'] == verified.get('normalStorePaths'))
+
+def correction_valid(value, source, frozen):
+    names = {'managed.json', 'retained.json'}
+    if not isinstance(value, dict) or not isinstance(frozen, dict): return False
+    if set(frozen) != names or not all(isinstance(item, str) and re.fullmatch('[0-9a-f]{64}', item) for item in frozen.values()): return False
+    ids = value.get('approvedIDs', {})
+    if not isinstance(ids, dict) or set(ids) != {'managed', 'retained'} or not all(isinstance(item, str) for item in ids.values()) or len(set(ids.values())) != 2: return False
+    try:
+        if any(not isinstance(item, str) or str(UUID(item)).upper() != item for item in ids.values()): return False
+    except ValueError:
+        return False
+    windows = value.get('previewWindows', {})
+    if not isinstance(windows, dict) or set(windows) != {'managed', 'retained'}: return False
+    if not all(isinstance(window, list) and len(window) == 3 and all(type(item) in (int, float) for item in window) and window[0] <= window[1] <= window[2] for window in windows.values()): return False
+    date = value.get('retainedDateAdded')
+    flags = ['retainedDateWithinPreviewApproval', 'managedCorrectionAbsent', 'retainedCorrectionPresent', 'noForeignRows', 'managedSourceRetained', 'retainedSourceDeleted']
+    return value.get('version') == 1 and value.get('sourceSHA') == source and value.get('classification') == 'passed' and value.get('receiptSHA256') == frozen and value.get('sourceIDs') == {'managed': 'A1000000-0000-4000-8000-000000000005', 'retained': 'A1000000-0000-4000-8000-000000000006'} and value.get('outcomes') == {'managed': 'deleted', 'retained': 'retained-source-deleted'} and all(value.get(flag) is True for flag in flags) and type(date) in (int, float) and windows['retained'][0] <= date <= windows['retained'][1]
 
 def self_test():
     source = 'func boundary() {\n XCTAssertTrue(ready,\n "' + MARKER + '")\n}\n'
@@ -118,16 +161,52 @@ def self_test():
     def candidate_fixture(names):
         return ''.join("Test Case '-[VoiceInkUITests.WritingFeaturesUITests " + name + "]' started.\nTest Case '-[VoiceInkUITests.WritingFeaturesUITests " + name + "]' passed (1.0 seconds).\n" for name in names) + f'Executed {len(names)} tests, with 0 failures (0 unexpected) in 6.0 seconds\n'
     candidate_good = candidate_fixture(CASES)
-    candidate_cases = {'six-passed': (candidate_good, True), 'five': (candidate_fixture(CASES[:-1]), False), 'seven': (candidate_fixture(CASES + ['testUnexpectedExtraCase']), False), 'skipped': (candidate_good.replace('passed (', 'skipped (', 1), False), 'missing-history': (candidate_good.replace(CASES[-1], 'unselectedHistoryMethod'), False), 'duplicate': (candidate_good + candidate_good, False), 'error': (candidate_good + '/tmp/File.swift:1: error: failure\n', False)}
+    candidate_cases = {
+        'eight-passed': (candidate_good, True),
+        'seven': (candidate_fixture(CASES[:-1]), False),
+        'nine': (candidate_fixture(CASES + ['testUnexpectedExtraCase']), False),
+        'skipped': (candidate_good.replace('passed (', 'skipped (', 1), False),
+        'skip-summary': (candidate_good.replace('with 0 failures', 'with 1 skipped and 0 failures'), False),
+        'missing-history': (candidate_good.replace(CASES[5], 'unselectedHistory'), False),
+        'missing-managed-correction': (candidate_good.replace(CASES[-2], 'unselectedManagedCorrection'), False),
+        'missing-retained-correction': (candidate_good.replace(CASES[-1], 'unselectedRetainedCorrection'), False),
+        'duplicate-case': (candidate_fixture(CASES[:-1] + [CASES[-2]]), False),
+        'duplicate-run': (candidate_good + candidate_good, False),
+        'error': (candidate_good + '/tmp/File.swift:1: error: failure\n', False)
+    }
     candidate_observed = {name: classify_candidate(text, 0)['classification'] == 'passed' for name, (text, expected) in candidate_cases.items()}
     assert all(candidate_observed[name] == expected for name, (_, expected) in candidate_cases.items()), candidate_observed
+    correction_hashes = {'managed.json': 'c' * 64, 'retained.json': 'd' * 64}
+    final_counts = {'Transcription': 5, 'VocabularyWord': 1, 'WordReplacement': 2, 'SessionMetric': 3}
+    corrections = {'version': 1, 'sourceSHA': 'a' * 40, 'classification': 'passed', 'receiptSHA256': correction_hashes,
+                   'approvedIDs': {'managed': 'A3000000-0000-4000-8000-000000000001', 'retained': 'A3000000-0000-4000-8000-000000000002'},
+                   'sourceIDs': {'managed': 'A1000000-0000-4000-8000-000000000005', 'retained': 'A1000000-0000-4000-8000-000000000006'},
+                   'outcomes': {'managed': 'deleted', 'retained': 'retained-source-deleted'}, 'previewWindows': {'managed': [1, 2, 3], 'retained': [4, 5, 6]},
+                   'retainedDateAdded': 4.5, 'retainedDateWithinPreviewApproval': True, 'managedCorrectionAbsent': True,
+                   'retainedCorrectionPresent': True, 'noForeignRows': True, 'managedSourceRetained': True, 'retainedSourceDeleted': True, 'counts': final_counts}
     seed_good = {'valid': True, 'sourceSHA': 'a' * 40, 'testName': SEED_METHOD, 'closedBeforeUI': True, 'verifiedAfterUI': True,
-                 'seed': {'valid': True, 'phase': 'seed', 'testName': SEED_METHOD, 'sourceSHA': 'a' * 40, 'exit_code': 0, 'closedBeforeUI': True, 'saveCompleted': True, 'hostPID': 1, 'normalStorePaths': ['/support/default.store', '/support/dictionary.store', '/support/stats.store']},
-                 'verify': {'valid': True, 'phase': 'verify', 'testName': SEED_METHOD, 'sourceSHA': 'a' * 40, 'exit_code': 0, 'closedAfterUI': True, 'verificationReadOnly': True, 'hostPID': 2, 'normalStorePaths': ['/support/default.store', '/support/dictionary.store', '/support/stats.store']}}
-    seed_cases = {'closed-seed-and-verify': (seed_good, True), 'missing-verify': ({**seed_good, 'verify': {}}, False), 'wrong-source': ({**seed_good, 'sourceSHA': 'b' * 40}, False), 'same-host': ({**seed_good, 'verify': {**seed_good['verify'], 'hostPID': 1}}, False), 'unclosed': ({**seed_good, 'seed': {**seed_good['seed'], 'closedBeforeUI': False}}, False), 'write-during-verify': ({**seed_good, 'verify': {**seed_good['verify'], 'verificationReadOnly': False}}, False)}
+                 'uiClosedBeforeVerify': True, 'correctionsVerified': True, 'correction_receipts_sha256': correction_hashes,
+                 'seed': {'valid': True, 'phase': 'seed', 'testName': SEED_METHOD, 'sourceSHA': 'a' * 40, 'exit_code': 0, 'closedBeforeUI': True, 'saveCompleted': True, 'hostPID': 1, 'normalStorePaths': ['/support/default.store', '/support/dictionary.store', '/support/stats.store'], 'savedCounts': {'Transcription': 6, 'VocabularyWord': 1, 'WordReplacement': 1, 'SessionMetric': 3}},
+                 'verify': {'valid': True, 'phase': 'verify', 'testName': SEED_METHOD, 'sourceSHA': 'a' * 40, 'exit_code': 0, 'closedAfterUI': True, 'verificationReadOnly': True, 'hostPID': 2, 'normalStorePaths': ['/support/default.store', '/support/dictionary.store', '/support/stats.store'], 'savedCounts': final_counts, 'statsUnchanged': True, 'correctionReceiptsUnchanged': True, 'corrections': corrections}}
+    seed_cases = {
+        'closed-seed-and-verify': (seed_good, True),
+        'missing-verify': ({**seed_good, 'verify': {}}, False),
+        'wrong-source': ({**seed_good, 'sourceSHA': 'b' * 40}, False),
+        'same-host': ({**seed_good, 'verify': {**seed_good['verify'], 'hostPID': 1}}, False),
+        'unclosed': ({**seed_good, 'seed': {**seed_good['seed'], 'closedBeforeUI': False}}, False),
+        'write-during-verify': ({**seed_good, 'verify': {**seed_good['verify'], 'verificationReadOnly': False}}, False),
+        'missing-managed': ({**seed_good, 'correction_receipts_sha256': {'retained.json': 'd' * 64}}, False),
+        'missing-retained': ({**seed_good, 'correction_receipts_sha256': {'managed.json': 'c' * 64}}, False),
+        'mutated-correction': ({**seed_good, 'correction_receipts_sha256': {**correction_hashes, 'managed.json': 'e' * 64}}, False),
+        'missing-correction-proof': ({**seed_good, 'verify': {**seed_good['verify'], 'corrections': {}}}, False),
+        'wrong-final-counts': ({**seed_good, 'verify': {**seed_good['verify'], 'savedCounts': {**final_counts, 'WordReplacement': 1}}}, False),
+        'stats-changed': ({**seed_good, 'verify': {**seed_good['verify'], 'statsUnchanged': False}}, False),
+        'ui-not-closed': ({**seed_good, 'uiClosedBeforeVerify': False}, False),
+        'reused-approved-id': ({**seed_good, 'verify': {**seed_good['verify'], 'corrections': {**corrections, 'approvedIDs': {'managed': corrections['approvedIDs']['managed'], 'retained': corrections['approvedIDs']['managed']}}}}, False)
+    }
     seed_observed = {name: native_seed_valid(value, 'a' * 40) for name, (value, expected) in seed_cases.items()}
     assert all(seed_observed[name] == expected for name, (_, expected) in seed_cases.items()), seed_observed
-    print(json.dumps({'classifier_fixtures': observed, 'process_fixtures': process_observed, 'six_case_fixtures': candidate_observed, 'history_seed_fixtures': seed_observed, 'valid': True}, indent=2))
+    print(json.dumps({'classifier_fixtures': observed, 'process_fixtures': process_observed, 'eight_case_fixtures': candidate_observed, 'history_seed_fixtures': seed_observed, 'valid': True}, indent=2))
 
 command, *args = sys.argv[1:]
 if command == 'self-test':
@@ -138,7 +217,13 @@ elif command == 'candidate':
     log, code, output = args
     result = classify_candidate(Path(log).read_text(errors='replace'), int(code))
     write(output, result)
-    if result['classification'] != 'passed': raise SystemExit('UI verification requires exactly six known cases once, passed, without skips or extra cases')
+    if result['classification'] != 'passed': raise SystemExit('UI verification requires exactly eight known cases once, passed, without skips or extra cases')
+elif command == 'history':
+    path, source = args
+    value = json.loads(Path(path).read_text())
+    if not native_seed_valid(value, source):
+        write(path, {**value, 'valid': False, 'classification': 'invalid-or-failed'})
+        raise SystemExit('Native History verification requires frozen UI correction receipts and the exact final stored state')
 elif command == 'sources':
     candidate, baseline, output = map(Path, args)
     manifests = {label: tracked(root, PRODUCT) for label, root in [('candidate', candidate), ('baseline', baseline)]}
@@ -244,9 +329,9 @@ elif command == 'combine':
     seed_valid = native_seed_valid(seed, contract['candidate_sha'])
     candidate_valid = int(candidate_code) == 0 and candidate.get('classification') == 'passed' and candidate.get('exit_code') == 0 and candidate.get('tests') == expected and all(value.get('valid') is True for value in candidate_evidence.values()) and visual_available and seed_valid
     valid = baseline.get('valid') is True and all(value.get('valid') is True for value in baseline_evidence.values()) and candidate_valid
-    result = {'classification': 'matched-red-green' if valid else 'invalid-or-failed', 'scope': 'Debug six-case native UI comparison with normal-store History seed; not Release validation', 'driver_sha': contract['driver_sha'], 'baseline_sha': BASELINE, 'candidate_sha': contract['candidate_sha'], 'oracle_sha256': contract['oracle_sha256'], 'baseline': baseline, 'candidate': candidate, 'candidate_driver_exit_code': int(candidate_code), 'candidate_valid': candidate_valid, 'candidate_identity_and_tcc': candidate_evidence, 'baseline_identity_and_tcc': baseline_evidence, 'candidate_visual_available': visual_available, 'history_seed': seed, 'history_seed_valid': seed_valid}
+    result = {'classification': 'matched-red-green' if valid else 'invalid-or-failed', 'scope': 'Debug eight-case native UI comparison with normal-store History seed and correction verification; not Release validation', 'driver_sha': contract['driver_sha'], 'baseline_sha': BASELINE, 'candidate_sha': contract['candidate_sha'], 'oracle_sha256': contract['oracle_sha256'], 'baseline': baseline, 'candidate': candidate, 'candidate_driver_exit_code': int(candidate_code), 'candidate_valid': candidate_valid, 'candidate_identity_and_tcc': candidate_evidence, 'baseline_identity_and_tcc': baseline_evidence, 'candidate_visual_available': visual_available, 'history_seed': seed, 'history_seed_valid': seed_valid}
     write(folder / 'result.json', result)
-    if not valid: raise SystemExit('Matched UI comparison requires intended baseline red, a closed normal-store seed, and six candidate cases green')
+    if not valid: raise SystemExit('Matched UI comparison requires intended baseline red, a closed normal-store seed, and eight candidate cases green')
 else:
     raise SystemExit('Unknown proof operation')
 PY
@@ -262,6 +347,10 @@ if [[ "${1:-}" == --candidate-selectors ]]; then
 fi
 if [[ "${1:-}" == --classify-candidate ]]; then
   proof candidate "${2:?Pass the UI log}" "${3:?Pass the test exit code}" "${4:?Pass the result path}"
+  exit 0
+fi
+if [[ "${1:-}" == --validate-history ]]; then
+  proof history "${2:?Pass the native History result}" "${3:?Pass the source SHA}"
   exit 0
 fi
 if [[ "${GITHUB_ACTIONS:-}" != true || "${RUNNER_ENVIRONMENT:-}" != github-hosted || "$(uname -s)" != Darwin ]]; then

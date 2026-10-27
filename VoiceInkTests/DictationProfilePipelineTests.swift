@@ -338,7 +338,6 @@ private final class DictationProfilePipelineFixture {
         VoiceInkPasteMethod.setCurrent(.standard)
         PowerModeManager.shared.activeConfiguration = nil
         SoundManager.shared.isEnabled = false
-        DictionaryService.invalidateWordReplacementCache()
         discardPendingFallback()
         CursorPaster.configureAccessibilityTextInserterForTesting { [weak self] text, _ in
             self?.delivered.append(text)
@@ -429,7 +428,6 @@ private final class DictationProfilePipelineFixture {
             }
         }
         PowerModeManager.shared.activeConfiguration = savedPowerMode
-        DictionaryService.invalidateWordReplacementCache()
         if let records = try? context.fetch(FetchDescriptor<Transcription>()) {
             for record in records {
                 if let value = record.audioFileURL, let url = URL(string: value),

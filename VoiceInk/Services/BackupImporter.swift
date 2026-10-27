@@ -6,7 +6,8 @@ enum BackupImporter {
     @MainActor
     static func apply(_ backup: VoiceInkSettingsBackupFile<ShortcutBackup>, categories: Set<VoiceInkSettingsBackupCategory>, enhancementService: AIEnhancementService, recordingShortcutManager: RecordingShortcutManager, menuBarManager: MenuBarManager, launchAtLoginController: LaunchAtLoginController, mediaController: MediaController, playbackController: PlaybackController, soundManager: SoundManager, recorderUIManager: RecorderUIManager, modelContext: ModelContext, transcriptionModelManager: TranscriptionModelManager) throws {
         if categories.contains(.dictionary) {
-            try importDictionary(from: backup, modelContext: modelContext)
+            let dictionary = try DictionaryBackup.prepareImport(backup, using: modelContext)
+            try dictionary.apply(using: modelContext)
         }
 
         if categories.contains(.general) {
@@ -168,71 +169,6 @@ enum BackupImporter {
             case .none:
                 break
             }
-        }
-    }
-
-    @MainActor
-    private static func importDictionary(from backup: VoiceInkSettingsBackupFile<ShortcutBackup>, modelContext: ModelContext) throws {
-        let existingWords: [String]
-        if backup.vocabularyWords != nil {
-            let descriptor = FetchDescriptor<VocabularyWord>()
-            existingWords = try modelContext.fetch(descriptor).map(\.word)
-        } else {
-            existingWords = []
-        }
-
-        let existingOriginalTexts: [String]
-        if backup.wordReplacements != nil {
-            let descriptor = FetchDescriptor<WordReplacement>()
-            existingOriginalTexts = try modelContext.fetch(descriptor).map(\.originalText)
-        } else {
-            existingOriginalTexts = []
-        }
-
-        let importPlan = VoiceInkDictionaryPolicy.dictionaryBackupImportPlan(
-            vocabularyWords: backup.vocabularyWords,
-            wordReplacements: backup.wordReplacements,
-            existingWords: existingWords,
-            existingOriginalTexts: existingOriginalTexts
-        )
-
-        do {
-            try importPlan.applyRuntimeState(
-                reportNoVocabularyBackupRecords: {
-                    print(VoiceInkSettingsBackupImportDiagnostics.noVocabularyWordsMessage)
-                },
-                reportNoWordReplacementBackupRecords: {
-                    print(VoiceInkSettingsBackupImportDiagnostics.noWordReplacementsMessage)
-                },
-                insertVocabularyWord: { word in
-                    modelContext.insert(VocabularyWord(word: word))
-                },
-                insertWordReplacementRule: { rule in
-                    modelContext.insert(WordReplacement(originalText: rule.originalText, replacementText: rule.replacementText))
-                },
-                reportNoDictionaryEntriesImported: {
-                    print(VoiceInkSettingsBackupImportDiagnostics.noDictionaryEntriesImportedMessage)
-                },
-                save: modelContext.save,
-                invalidateWordReplacementCache: DictionaryService.invalidateWordReplacementCache,
-                reportImportedEntryCounts: { vocabularyWordCount, wordReplacementCount in
-                    print(
-                        VoiceInkSettingsBackupImportDiagnostics.dictionaryEntriesImportedMessage(
-                            vocabularyWordCount: vocabularyWordCount,
-                            wordReplacementCount: wordReplacementCount
-                        )
-                    )
-                },
-                reportSkippedInvalidReplacementCount: { count in
-                    print(VoiceInkSettingsBackupImportDiagnostics.skippedInvalidReplacementsMessage(count: count))
-                }
-            )
-        } catch {
-            modelContext.rollback()
-            throw VoiceInkSettingsBackupImportError.saveFailed(
-                item: "dictionary entries",
-                localizedDescription: error.localizedDescription
-            )
         }
     }
 

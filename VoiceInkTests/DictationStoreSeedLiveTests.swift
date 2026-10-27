@@ -37,6 +37,8 @@ struct DictationStoreSeedInputs {
         case currentRead = "current-read"
         case metadataWrite = "metadata-write"
         case metadataReopen = "metadata-reopen"
+        case correctionWrite = "correction-write"
+        case correctionReopen = "correction-reopen"
     }
 
     static var isEnabled: Bool {
@@ -167,7 +169,7 @@ final class DictationStoreSeedFixture {
         context.autosaveEnabled = false
     }
 
-    func run(allowedAdditionalTranscriptionIDs: Set<UUID> = []) throws {
+    func run(allowedAdditionalTranscriptionIDs: Set<UUID> = [], allowedAdditionalWordReplacementIDs: Set<UUID> = []) throws {
         if inputs.phase == .seed {
             try #require(context.fetchCount(FetchDescriptor<Transcription>()) == 0)
             try #require(context.fetchCount(FetchDescriptor<VocabularyWord>()) == 0)
@@ -182,7 +184,11 @@ final class DictationStoreSeedFixture {
         try #require(additionalTranscriptions.count == allowedAdditionalTranscriptionIDs.count)
         let transcriptions = allTranscriptions.filter { !allowedAdditionalTranscriptionIDs.contains($0.id) }
         let vocabulary = try context.fetch(FetchDescriptor<VocabularyWord>()).sorted { Array($0.word.utf8).lexicographicallyPrecedes(Array($1.word.utf8)) }
-        let replacements = try context.fetch(FetchDescriptor<WordReplacement>()).sorted { $0.id.uuidString < $1.id.uuidString }
+        let allReplacements = try context.fetch(FetchDescriptor<WordReplacement>()).sorted { $0.id.uuidString < $1.id.uuidString }
+        let additionalReplacements = allReplacements.filter { allowedAdditionalWordReplacementIDs.contains($0.id) }
+        try #require(Set(additionalReplacements.map(\.id)) == allowedAdditionalWordReplacementIDs)
+        try #require(additionalReplacements.count == allowedAdditionalWordReplacementIDs.count)
+        let replacements = allReplacements.filter { !allowedAdditionalWordReplacementIDs.contains($0.id) }
         let metrics = try context.fetch(FetchDescriptor<SessionMetric>()).sorted { $0.id.uuidString < $1.id.uuidString }
         let snapshots: [String: Any] = [
             "Transcription": transcriptions.map(Self.transcriptionSnapshot),
@@ -347,7 +353,7 @@ final class DictationStoreSeedFixture {
          "powerModeEmoji": optionalString(row.powerModeEmoji), "transcriptionStatus": optionalString(row.transcriptionStatus)]
     }
 
-    private static func replacementSnapshot(_ row: WordReplacement) -> [String: Any] {
+    static func replacementSnapshot(_ row: WordReplacement) -> [String: Any] {
         ["id": row.id.uuidString, "originalText": string(row.originalText), "replacementText": string(row.replacementText),
          "dateAdded": row.dateAdded.timeIntervalSince1970, "isEnabled": row.isEnabled]
     }

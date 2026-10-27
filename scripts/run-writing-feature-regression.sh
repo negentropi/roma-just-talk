@@ -280,6 +280,7 @@ PY
   cmp "$out/microphone-tcc.json" "$seed_dir/microphone-tcc.json"
   if [[ "$seed_phase" == verify ]]; then
     test "$(shasum -a 256 "$seed_root/seed/expected-inputs.sha256.json" | awk '{print $1}')" = "$history_expectations_sha256"
+    test "$(shasum -a 256 "$seed_root/correction-inputs.sha256.json" | awk '{print $1}')" = "$history_corrections_sha256"
   fi
   select_tests liveDictationHistoryUISeed
   if ! RJT_HISTORY_UI_SEED_CHECKS=1 TEST_RUNNER_RJT_HISTORY_UI_SEED_CHECKS=1 TEST_RUNNER_GITHUB_ACTIONS=true \
@@ -309,7 +310,13 @@ expected_support = Path.home() / 'Library/Application Support/com.negentropi.Rom
 store_paths = [str(expected_support / name) for name in ['default.store', 'dictionary.store', 'stats.store']]
 source_paths = ['VoiceInkTests/DictationHistoryUISeedLiveTests.swift', 'VoiceInk/VoiceInk.swift', 'VoiceInk/Models/Transcription.swift',
                 'VoiceInk/Models/VocabularyWord.swift', 'VoiceInk/Models/WordReplacement.swift', 'VoiceInk/Models/SessionMetric.swift',
-                'VoiceInkCore/Sources/VoiceInkCore/StoredAudioFile.swift', 'VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift']
+                'VoiceInkCore/Sources/VoiceInkCore/StoredAudioFile.swift', 'VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift',
+                'VoiceInkCore/Sources/VoiceInkCore/WordReplacementLibrary.swift', 'VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift',
+                'VoiceInk/Services/HistoryCorrectionApprovalService.swift', 'VoiceInk/Services/DictionaryService.swift',
+                'VoiceInk/Views/History/SaveCorrectionSheet.swift', 'VoiceInk/Views/History/HistoryProcessingViews.swift',
+                'VoiceInk/Views/History/InlineHistoryView.swift', 'VoiceInk/Views/History/TranscriptionDetailView.swift',
+                'VoiceInk/Views/Dictionary/WordReplacementView.swift', 'VoiceInk/Views/Dictionary/EditReplacementSheet.swift',
+                'VoiceInk/Views/Dictionary/WordReplacementReviewViews.swift']
 source_hashes = {name: hashlib.sha256((Path(repo) / name).read_bytes()).hexdigest() for name in source_paths}
 def require(value, message):
     if not value: raise RuntimeError(message)
@@ -359,11 +366,16 @@ settings = {'RJT_HISTORY_UI_SEED_CHECKS': '1', 'GITHUB_ACTIONS': 'true', 'RUNNER
             'RJT_HISTORY_UI_PHASE': phase, 'RJT_HISTORY_UI_SOURCE_SHA': source,
             'RJT_HISTORY_UI_EXPECTED_EXE': executable, 'RJT_HISTORY_UI_EVIDENCE': str(directory),
             'RJT_HISTORY_UI_SEED_EVIDENCE': str(seed), 'RUNNER_TEMP': os.environ['RUNNER_TEMP']}
+corrections = directory.parent / 'corrections'
+if phase == 'verify': settings['RJT_HISTORY_UI_CORRECTION_RECEIPTS'] = str(corrections)
 environment = dict(os.environ, **settings, **{'TEST_RUNNER_' + key: value for key, value in settings.items()})
-expected_files = ['expected-rows.json', 'expected-libraries.json']
+expected_files = ['expected-rows.json', 'expected-libraries.json', 'expected-stats.json']
 if phase == 'verify':
     frozen = load(seed / 'expected-inputs.sha256.json')
     require(all(hashlib.sha256((seed / name).read_bytes()).hexdigest() == frozen[name] for name in expected_files), 'The seed expectation receipts changed during UI checks')
+    correction_hashes = load(directory.parent / 'correction-inputs.sha256.json')
+    require(set(correction_hashes) == {'managed.json', 'retained.json'}, 'Both actual UI correction receipts are required')
+    require(all(hashlib.sha256((corrections / name).read_bytes()).hexdigest() == expected for name, expected in correction_hashes.items()), 'The actual UI correction receipts changed before native verification')
 seen = None
 deadline = time.monotonic() + 600
 with (directory / 'tests.log').open('xb') as log:
@@ -424,14 +436,26 @@ require(provenance.get('modelTypes') == ['VoiceInk.Transcription', 'VoiceInk.Voc
 configurations = provenance.get('configurations', [])
 require(len(configurations) == 3 and {value.get('url') for value in configurations} == set(store_paths), 'Native History seed did not use all three normal stores')
 require(all(value.get('isStoredInMemoryOnly') is False and value.get('cloudKitContainerIdentifier') is None and value.get('groupAppContainerIdentifier') is None for value in configurations), 'Native History seed used a memory, shared-group or CloudKit store')
-require(load(directory / 'rows.json') == load(seed / 'expected-rows.json'), 'Native History rows differ from the frozen seed expectations')
-require(load(directory / 'libraries.json') == load(seed / 'expected-libraries.json'), 'Native libraries differ from the frozen seed expectations')
+counts = provenance.get('savedCounts', {})
+stats_count = counts.get('SessionMetric')
+require(type(stats_count) is int and stats_count >= 0 and counts == {'Transcription': 6 if phase == 'seed' else 5, 'VocabularyWord': 1, 'WordReplacement': 1 if phase == 'seed' else 2, 'SessionMetric': stats_count}, 'Native History phase row counts differ')
+require(load(directory / 'rows.json') == load(directory / 'expected-rows.json'), 'Native History rows differ from the independently expected phase state')
+require(load(directory / 'libraries.json') == load(directory / 'expected-libraries.json'), 'Native libraries differ from the independently expected phase state')
+require(load(directory / 'stats.json') == load(seed / 'expected-stats.json'), 'Native stats changed during writing UI checks')
+correction_verification = None
+if phase == 'verify':
+    require(all(hashlib.sha256((seed / name).read_bytes()).hexdigest() == frozen[name] for name in expected_files), 'Frozen seed expectations changed during native verification')
+    require(load(directory.parent / 'correction-inputs.sha256.json') == correction_hashes, 'The frozen UI correction manifest changed during native verification')
+    require(all(hashlib.sha256((corrections / name).read_bytes()).hexdigest() == expected for name, expected in correction_hashes.items()), 'The actual UI correction receipts changed during native verification')
+    correction_verification = load(directory / 'correction-verification.json')
+    require(correction_verification.get('receiptSHA256') == correction_hashes, 'Native verification used different UI correction receipts')
 require(all(hashlib.sha256((Path(repo) / name).read_bytes()).hexdigest() == expected for name, expected in source_hashes.items()), 'Native History seed source bytes changed')
 if phase == 'seed':
     (seed / 'expected-inputs.sha256.json').write_text(json.dumps({name: hashlib.sha256((seed / name).read_bytes()).hexdigest() for name in expected_files}, indent=2) + '\n')
 write('result.json', {'valid': True, 'phase': phase, 'testName': name, 'sourceSHA': source, 'exit_code': process.returncode,
                       'hostPID': seen['hostPID'], 'closedBeforeUI': phase == 'seed', 'closedAfterUI': phase == 'verify', 'normalStorePaths': store_paths,
-                      'normalFactoryReused': True, 'saveCompleted': phase == 'seed', 'verificationReadOnly': phase == 'verify'})
+                      'normalFactoryReused': True, 'saveCompleted': phase == 'seed', 'verificationReadOnly': phase == 'verify',
+                      'savedCounts': counts, 'statsUnchanged': phase == 'verify', 'correctionReceiptsUnchanged': phase == 'verify', 'corrections': correction_verification})
 PY
   mkdir -p "$out/history-seed/$seed_phase"
   cp "$seed_dir"/*.json "$seed_dir"/*.txt "$out/history-seed/$seed_phase/"
@@ -455,6 +479,8 @@ PY
     history_expectations_sha256="$(shasum -a 256 "$seed_dir/expected-inputs.sha256.json" | awk '{print $1}')"
   fi
   if [[ "$seed_phase" == verify ]]; then
+    test "$(shasum -a 256 "$seed_root/seed/expected-inputs.sha256.json" | awk '{print $1}')" = "$history_expectations_sha256"
+    test "$(shasum -a 256 "$seed_root/correction-inputs.sha256.json" | awk '{print $1}')" = "$history_corrections_sha256"
     cmp "$out/history-seed/seed/identity-before.txt" "$seed_dir/identity-after.txt"
     cmp "$out/history-seed/seed/app-signature-before.txt" "$seed_dir/app-signature-after.txt"
     cmp "$out/history-seed/seed/test-bundle-signature-before.txt" "$seed_dir/test-bundle-signature-after.txt"
@@ -466,9 +492,14 @@ from pathlib import Path
 root = Path(sys.argv[1])
 seed, verified = [json.loads((root / phase / 'result.json').read_text()) for phase in ['seed', 'verify']]
 if not (seed['valid'] and verified['valid'] and seed['sourceSHA'] == verified['sourceSHA'] and seed['hostPID'] != verified['hostPID'] and seed['closedBeforeUI'] and verified['closedAfterUI']):
-    raise SystemExit('History requires distinct native hosts with closed stores before and after the six UI cases')
-(root / 'result.json').write_text(json.dumps({'valid': True, 'testName': 'liveDictationHistoryUISeed', 'sourceSHA': seed['sourceSHA'], 'closedBeforeUI': True, 'verifiedAfterUI': True, 'seed': seed, 'verify': verified, 'scope': 'Synthetic normal-store History input plus read-only native verification; no ASR or migration proof'}, indent=2) + '\n')
+    raise SystemExit('History requires distinct native hosts with closed stores before and after the eight UI cases')
+closed = json.loads((root / 'closed-after-ui.json').read_text())
+frozen = json.loads((root / 'correction-inputs.sha256.json').read_text())
+if closed.get('valid') is not True or closed.get('ownedAppExited') is not True or closed.get('normalStoresHaveNoOpenDescriptors') is not True or closed.get('checkedBeforeCorrectionFreeze') is not True or closed.get('normalStorePaths') != seed['normalStorePaths']:
+    raise SystemExit('The UI app must close the normal stores before correction receipt freeze and native verification')
+(root / 'result.json').write_text(json.dumps({'valid': True, 'testName': 'liveDictationHistoryUISeed', 'sourceSHA': seed['sourceSHA'], 'closedBeforeUI': True, 'verifiedAfterUI': True, 'uiClosedBeforeVerify': True, 'correctionsVerified': True, 'correction_receipts_sha256': frozen, 'seed': seed, 'verify': verified, 'scope': 'Synthetic normal-store History input plus approved correction and read-only native verification; no ASR or migration proof'}, indent=2) + '\n')
 PY
+    bash scripts/run-writing-settings-ui-regression.sh --validate-history "$out/history-seed/result.json" "$candidate_sha"
   fi
 }
 
@@ -634,7 +665,7 @@ PY
     test_arguments "$repo_root" "$debug_dir"
     ui_selectors=()
     while IFS= read -r selector; do ui_selectors+=("$selector"); done < <(bash scripts/run-writing-settings-ui-regression.sh --candidate-selectors)
-    test "${#ui_selectors[@]}" = 6
+    test "${#ui_selectors[@]}" = 8
     seed_selector='-only-testing:VoiceInkTests/VoiceInkTests/liveDictationHistoryUISeed()'
     if ! xcodebuild build-for-testing "${arguments[@]}" "${ui_selectors[@]}" "$seed_selector" > "$out/build.log" 2>&1; then
       printf '{"classification":"invalid","boundary":"ui-build"}\n' > "$out/result.json"
@@ -700,6 +731,14 @@ PY
     ui_signatures before
     phase=history-seed
     run_history_ui_phase seed
+    history_corrections_dir="$RUNNER_TEMP/writing-ui-proof/history-seed/corrections"
+    test ! -e "$history_corrections_dir"
+    mkdir "$history_corrections_dir"
+    export RJT_HISTORY_UI_CORRECTION_RECEIPTS="$history_corrections_dir"
+    export TEST_RUNNER_RJT_HISTORY_UI_CORRECTION_RECEIPTS="$history_corrections_dir"
+    export RJT_HISTORY_UI_SOURCE_SHA="$candidate_sha" TEST_RUNNER_RJT_HISTORY_UI_SOURCE_SHA="$candidate_sha"
+    export TEST_RUNNER_RUNNER_TEMP="$RUNNER_TEMP"
+    export RUNNER_ENVIRONMENT=github-hosted TEST_RUNNER_RUNNER_ENVIRONMENT=github-hosted
     phase=ui-selection
     selectors=("${ui_selectors[@]}")
     RJT_WRITING_UI_CHECKS=1 TEST_RUNNER_RJT_WRITING_UI_CHECKS=1 TEST_RUNNER_GITHUB_ACTIONS=true \
@@ -710,6 +749,60 @@ PY
       TEST_RUNNER_GITHUB_ACTIONS=true \
       xcodebuild test-without-building "${arguments[@]}" "${ui_selectors[@]}" \
         -resultBundlePath "$out/UI.xcresult" > "$out/tests.log" 2>&1 || test_exit=$?
+    if ! bash scripts/run-writing-settings-ui-regression.sh --classify-candidate "$out/tests.log" "$test_exit" "$out/result.json"; then
+      tail -n 120 "$out/tests.log" >&2
+      return_exit="$test_exit"
+      [[ "$return_exit" != 0 ]] || return_exit=1
+      exit "$return_exit"
+    fi
+    phase=ui-correction-receipts
+    python3 - "$history_corrections_dir" "$candidate_sha" "$debug_app/Contents/MacOS/roma just talk" <<'PY'
+import hashlib
+import json
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+directory, source, executable = Path(sys.argv[1]), sys.argv[2], sys.argv[3]
+support = Path.home() / 'Library/Application Support/com.negentropi.RomaJustTalk'
+stores = [support / name for name in ['default.store', 'dictionary.store', 'stats.store']]
+if not all(path.is_file() and not path.is_symlink() for path in stores):
+    raise SystemExit('All three normal stores must remain regular files after UI app exit')
+deadline = time.monotonic() + 15
+while True:
+    files = [Path(str(path) + suffix) for path in stores for suffix in ['', '-wal', '-shm'] if Path(str(path) + suffix).exists()]
+    result = subprocess.run(['lsof', '-n', '-P', '-Fpn', '--', *map(str, files)], text=True, capture_output=True)
+    if result.returncode not in (0, 1) or result.stderr.strip():
+        raise SystemExit('Normal-store inspection failed after UI app exit')
+    process_list = subprocess.run(['ps', '-ax', '-ww', '-o', 'pid=,comm='], text=True, capture_output=True, check=True)
+    matching = [line.strip().split(None, 1) for line in process_list.stdout.splitlines() if line.strip()]
+    app_pids = [int(pid) for pid, command in matching if command == executable]
+    if not result.stdout.strip() and not app_pids: break
+    if time.monotonic() >= deadline:
+        raise SystemExit('The owned UI app or normal-store descriptors remain after UI app teardown')
+    time.sleep(0.1)
+(directory.parent / 'closed-after-ui.json').write_text(json.dumps({'valid': True, 'appExecutable': executable, 'ownedAppExited': True, 'ownedAppPIDs': app_pids, 'normalStorePaths': list(map(str, stores)), 'normalStoresHaveNoOpenDescriptors': True, 'checkedBeforeCorrectionFreeze': True}, indent=2) + '\n')
+names = {'managed.json', 'retained.json'}
+if directory.is_symlink() or {path.name for path in directory.iterdir()} != names:
+    raise SystemExit('Exactly two actual UI correction receipts are required')
+hashes = {}
+for name in sorted(names):
+    path = directory / name
+    if not path.is_file() or path.is_symlink():
+        raise SystemExit('UI correction receipts must be regular files')
+    raw = path.read_bytes()
+    value = json.loads(raw)
+    if value.get('version') != 1 or value.get('sourceSHA') != source or value.get('caseName') != path.stem:
+        raise SystemExit('UI correction receipt source or case differs')
+    hashes[name] = hashlib.sha256(raw).hexdigest()
+(directory.parent / 'correction-inputs.sha256.json').write_text(json.dumps(hashes, indent=2, sort_keys=True) + '\n')
+PY
+    history_corrections_sha256="$(shasum -a 256 "$history_corrections_dir/../correction-inputs.sha256.json" | awk '{print $1}')"
+    mkdir "$out/history-seed/corrections"
+    cp "$history_corrections_dir"/*.json "$out/history-seed/corrections/"
+    cp "$history_corrections_dir/../correction-inputs.sha256.json" "$out/history-seed/"
+    cp "$history_corrections_dir/../closed-after-ui.json" "$out/history-seed/"
     phase=history-verify
     run_history_ui_phase verify
     export_exit=0
@@ -735,11 +828,6 @@ PY
     done
     codesign --verify --deep --strict "$debug_app"
     codesign --verify --deep --strict "$ui_runner"
-    if ! bash scripts/run-writing-settings-ui-regression.sh --classify-candidate "$out/tests.log" "$test_exit" "$out/result.json"
-    then
-      tail -n 120 "$out/tests.log" >&2
-      exit 1
-    fi
     ;;
   *)
     echo "usage: $0 live | regression <known-bad-full-sha> | ui | packages <evidence-dir> [historical-checkout] [verified-sha]" >&2

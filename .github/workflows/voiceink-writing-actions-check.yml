@@ -184,6 +184,7 @@ jobs:
             .local-build/writing-check-evidence/**
             ${{ runner.temp }}/writing-feature-regression/**
             ${{ runner.temp }}/writing-package-proof/**
+            ${{ runner.temp }}/writing-ui-proof/history-seed/**
             ${{ runner.temp }}/writing-core-checks.log
             ${{ runner.temp }}/writing-dependency-setup.log
             ${{ runner.temp }}/writing-release-build.log

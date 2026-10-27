@@ -195,7 +195,6 @@ private final class DictationCaptureFixture {
         )
         container = try ModelContainer(for: schema, configurations: [configuration])
         context = ModelContext(container)
-        DictionaryService.invalidateWordReplacementCache()
     }
 
     func service() -> DictationCaptureEnhancementSpy {
@@ -218,7 +217,6 @@ private final class DictationCaptureFixture {
             if let value = saved[key] { defaults.set(value, forKey: key) }
             else { defaults.removeObject(forKey: key) }
         }
-        DictionaryService.invalidateWordReplacementCache()
     }
 }
 

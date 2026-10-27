@@ -23,7 +23,6 @@ extension VoiceInkTests {
                 fixture.defaults.set("pt", forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage)
                 rule.replacementText = "Later"
                 try fixture.context.save()
-                DictionaryService.invalidateWordReplacementCache()
                 let laterSnippet = "Later\r\n<tag>e\u{301}</tag> 🧪 "
                 try fixture.snippet("my signature", content: laterSnippet)
                 gate.release()
@@ -452,7 +451,6 @@ private final class PolishAudioFixture {
         defaults.set(false, forKey: VoiceInkUserDefaultsKey.isAudioCleanupEnabled)
         defaults.removeObject(forKey: VoiceInkSpokenSnippets.userDefaultsKey)
         PowerModeManager.shared.activeConfiguration = nil
-        DictionaryService.invalidateWordReplacementCache()
         let ai = AIService()
         try #require(ai.selectedProvider == .localCLI && ai.isAPIKeyValid && ai.apiKey.isEmpty)
         enhancement = PolishAudioEnhancementSpy(aiService: ai, modelContext: context)
@@ -486,7 +484,6 @@ private final class PolishAudioFixture {
         let rule = WordReplacement(originalText: source, replacementText: replacement)
         context.insert(rule)
         try context.save()
-        DictionaryService.invalidateWordReplacementCache()
         return rule
     }
 
@@ -602,7 +599,6 @@ private final class PolishAudioFixture {
                 catch { Issue.record("Could not remove owned processed audio: \(error)") }
             }
         }
-        DictionaryService.invalidateWordReplacementCache()
         PowerModeManager.shared.activeConfiguration = savedPowerMode
         for key in Self.keys {
             if let value = savedDefaults[key] { defaults.set(value, forKey: key) }

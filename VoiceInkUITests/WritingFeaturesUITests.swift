@@ -395,6 +395,357 @@ final class WritingFeaturesUITests: XCTestCase {
         attachScreenshot(app, named: "History captured Clarity Formal survives relaunch")
     }
 
+    @MainActor func testHistoryCorrectionPreviewApprovalAndDictionaryManagement() throws {
+        let proof = try WritingFeaturesCorrectionReceipt(caseName: "managed")
+        let fixture = CorrectionUIFixture.managed
+        let (app, ownership) = try prepareApp()
+        let clipboard = try ownLiteralPasteboard(ownership: ownership)
+        try launchApp(app, ownership: ownership)
+        openDictionaryReplacements(in: app)
+        let initialCount = replacementCount(in: app)
+
+        let cancelled = try previewCorrection(fixture, clipboard: clipboard, in: app)
+        app.typeKey(.return, modifierFlags: [])
+        XCTAssertFalse(identified("history.correction.outcome", in: cancelled.sheet).exists,
+                       "Ordinary Return approved a correction without an explicit Approve action.")
+        XCTAssertTrue(cancelled.sheet.buttons["history.correction.cancel"].exists)
+        cancelled.sheet.buttons["history.correction.cancel"].click()
+        XCTAssertTrue(waitUntil { !cancelled.sheet.exists })
+        openDictionaryReplacements(in: app)
+        XCTAssertEqual(replacementCount(in: app), initialCount)
+        XCTAssertFalse(replacementRow(cancelled.id, in: app).exists)
+        attachScreenshot(app, named: "Correction preview cancelled without adding a Dictionary entry")
+
+        let approved = try previewCorrection(fixture, clipboard: clipboard, verifyCanonicalEdit: true, in: app)
+        XCTAssertNotEqual(approved.id, cancelled.id)
+        let approvedAt = approveCorrection(approved, in: app)
+        openDictionaryReplacements(in: app)
+        XCTAssertEqual(replacementCount(in: app), initialCount + 1)
+        var row = assertCorrectionRow(approved.id, enabled: true, sourceState: "source available", in: app)
+        let toggle = correctionSwitch(approved.id, in: row)
+        reveal(toggle, identifier: "dictionary.replacement." + approved.id, in: app)
+        toggle.click()
+        XCTAssertTrue(waitUntil { String(describing: toggle.value ?? "") == "0" })
+        row = assertCorrectionRow(approved.id, enabled: false, sourceState: "source available", in: app)
+        var editor = openCorrectionEditor(approved.id, row: row, in: app)
+        assertExactEditor(fixture.phrase, id: "dictionary.replacement.edit.original", in: editor)
+        assertExactEditor(fixture.output, id: "dictionary.replacement.edit.replacement", in: editor)
+        let output = editor.textViews["dictionary.replacement.edit.replacement"]
+        reveal(output, identifier: "dictionary.replacement.edit.replacement", in: app)
+        pasteLiteralText(CorrectionUIFixture.managedEditedOutput, into: output, clipboard: clipboard, in: app)
+        assertExactEditor(CorrectionUIFixture.managedEditedOutput, id: "dictionary.replacement.edit.replacement", in: editor)
+        XCTAssertTrue(containsText("Off", in: identified("dictionary.replacement.edit.enabled", in: editor)))
+        attachScreenshot(app, named: "Approved literal correction edited while disabled")
+        let save = editor.buttons["dictionary.replacement.edit.save"]
+        XCTAssertTrue(save.isEnabled && save.isHittable)
+        save.click()
+        XCTAssertTrue(waitUntil { !editor.exists })
+
+        app.terminate()
+        try launchApp(app, ownership: ownership)
+        openDictionaryReplacements(in: app)
+        row = assertCorrectionRow(approved.id, enabled: false, sourceState: "source available", in: app)
+        editor = openCorrectionEditor(approved.id, row: row, in: app)
+        assertExactEditor(fixture.phrase, id: "dictionary.replacement.edit.original", in: editor)
+        assertExactEditor(CorrectionUIFixture.managedEditedOutput, id: "dictionary.replacement.edit.replacement", in: editor)
+        XCTAssertEqual(try metadataUUID("dictionary.replacement.edit.id", in: editor), approved.id)
+        attachScreenshot(app, named: "Edited disabled correction retains identity after relaunch")
+        editor.buttons["dictionary.replacement.edit.cancel"].click()
+        XCTAssertTrue(waitUntil { !editor.exists })
+        row = assertCorrectionRow(approved.id, enabled: false, sourceState: "source available", in: app)
+        let savedToggle = correctionSwitch(approved.id, in: row)
+        reveal(savedToggle, identifier: "dictionary.replacement." + approved.id, in: app)
+        savedToggle.click()
+        XCTAssertTrue(waitUntil { String(describing: savedToggle.value ?? "") == "1" })
+        row = assertCorrectionRow(approved.id, enabled: true, sourceState: "source available", in: app)
+        let delete = row.buttons["dictionary.replacement." + approved.id + ".delete"]
+        reveal(delete, identifier: "dictionary.replacement." + approved.id, in: app)
+        delete.click()
+        XCTAssertTrue(waitUntil { !self.replacementRow(approved.id, in: app).exists })
+        XCTAssertEqual(replacementCount(in: app), initialCount)
+        try proof.write(fixture: fixture, id: approved.id, previewStartedAt: approved.startedAt,
+                        approvedAt: approvedAt, outcome: "deleted", replacement: CorrectionUIFixture.managedEditedOutput)
+    }
+
+    @MainActor func testApprovedHistoryCorrectionSurvivesSourceDeletion() throws {
+        let proof = try WritingFeaturesCorrectionReceipt(caseName: "retained")
+        let fixture = CorrectionUIFixture.retained
+        let (app, ownership) = try prepareApp()
+        let clipboard = try ownLiteralPasteboard(ownership: ownership)
+        try launchApp(app, ownership: ownership)
+        openDictionaryReplacements(in: app)
+        let initialCount = replacementCount(in: app)
+        let approved = try previewCorrection(fixture, clipboard: clipboard, in: app)
+        let approvedAt = approveCorrection(approved, in: app)
+        openDictionaryReplacements(in: app)
+        XCTAssertEqual(replacementCount(in: app), initialCount + 1)
+        _ = assertCorrectionRow(approved.id, enabled: true, sourceState: "source available", in: app)
+
+        let source = openCorrectionSource(fixture, in: app)
+        XCTAssertFalse(app.buttons["history.selection.delete"].exists)
+        let selection = identified("history.row." + fixture.id + ".select", in: source)
+        let selectButton = try nativeButton(selection)
+        reveal(selectButton, identifier: "history.row." + fixture.id, in: app)
+        XCTAssertTrue(selectButton.isEnabled && selectButton.isHittable)
+        selectButton.click()
+        let delete = app.buttons["history.selection.delete"]
+        XCTAssertTrue(delete.waitForExistence(timeout: 5))
+        XCTAssertTrue(delete.isEnabled && delete.isHittable)
+        delete.click()
+        let alert = app.alerts.firstMatch
+        XCTAssertTrue(alert.waitForExistence(timeout: 5))
+        XCTAssertEqual(app.alerts.count, 1)
+        let confirm = alert.buttons["history.delete.confirm"]
+        XCTAssertTrue(confirm.exists && confirm.isEnabled && confirm.isHittable)
+        confirm.click()
+        XCTAssertTrue(waitUntil { !source.exists && !alert.exists })
+        openDictionaryReplacements(in: app)
+        _ = assertCorrectionRow(approved.id, enabled: true, sourceState: "source deleted", in: app)
+        attachScreenshot(app, named: "Saved correction keeps provenance after its History source is deleted")
+
+        app.terminate()
+        try launchApp(app, ownership: ownership)
+        openDictionaryReplacements(in: app)
+        let row = assertCorrectionRow(approved.id, enabled: true, sourceState: "source deleted", in: app)
+        let editor = openCorrectionEditor(approved.id, row: row, in: app)
+        assertExactEditor(fixture.phrase, id: "dictionary.replacement.edit.original", in: editor)
+        assertExactEditor(fixture.output, id: "dictionary.replacement.edit.replacement", in: editor)
+        XCTAssertEqual(try metadataUUID("dictionary.replacement.edit.id", in: editor), approved.id)
+        XCTAssertTrue(waitUntil {
+            self.identified("dictionary.replacement.edit.provenance", in: editor).value as? String == "source deleted"
+        })
+        attachScreenshot(app, named: "Correction remains editable after deleted-source relaunch")
+        editor.buttons["dictionary.replacement.edit.cancel"].click()
+        XCTAssertTrue(waitUntil { !editor.exists })
+        XCTAssertEqual(replacementCount(in: app), initialCount + 1)
+        try proof.write(fixture: fixture, id: approved.id, previewStartedAt: approved.startedAt,
+                        approvedAt: approvedAt, outcome: "retained-source-deleted", replacement: fixture.output)
+    }
+
+    @MainActor private func openDictionaryReplacements(in app: XCUIApplication) {
+        mainWindow(in: app).buttons["Dictionary"].click()
+        let section = identified("dictionary.section.wordReplacements", in: app)
+        XCTAssertTrue(section.waitForExistence(timeout: 5))
+        reveal(section, identifier: "dictionary.section.wordReplacements", in: app)
+        section.click()
+        XCTAssertTrue(app.buttons["dictionary.replacement.add"].waitForExistence(timeout: 5))
+    }
+
+    @MainActor private func replacementCount(in app: XCUIApplication) -> Int {
+        app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND identifier ENDSWITH %@",
+                                        "dictionary.replacement.", ".delete")).count
+    }
+
+    @MainActor private func replacementRow(_ id: String, in app: XCUIApplication) -> XCUIElement {
+        identified("dictionary.replacement." + id, in: app)
+    }
+
+    @MainActor private func assertCorrectionRow(
+        _ id: String, enabled: Bool, sourceState: String, in app: XCUIApplication
+    ) -> XCUIElement {
+        let row = replacementRow(id, in: app)
+        XCTAssertTrue(row.waitForExistence(timeout: 5))
+        let prefix = "dictionary.replacement." + id
+        XCTAssertTrue(containsText("Literal phrase", in: identified(prefix + ".kind", in: row)))
+        let provenance = identified(prefix + ".provenance", in: row)
+        XCTAssertTrue(waitUntil { provenance.value as? String == sourceState })
+        XCTAssertTrue(containsText("From History · Recognized", in: provenance))
+        let toggle = correctionSwitch(id, in: row)
+        XCTAssertTrue(toggle.isEnabled)
+        XCTAssertTrue(waitUntil { String(describing: toggle.value ?? "") == (enabled ? "1" : "0") },
+                      "The actual saved correction switch did not expose its expected state.")
+        XCTAssertEqual(identified(prefix + ".offState", in: row).exists, !enabled)
+        return row
+    }
+
+    @MainActor private func correctionSwitch(_ id: String, in row: XCUIElement) -> XCUIElement {
+        let control = identified("dictionary.replacement." + id + ".enabled", in: row)
+        XCTAssertTrue(control.waitForExistence(timeout: 5))
+        if control.elementType == .switch { return control }
+        XCTAssertEqual(control.switches.count, 1, "The identified replacement control must contain one native switch.")
+        return control.switches.firstMatch
+    }
+
+    @MainActor private func openCorrectionSource(_ fixture: CorrectionUIFixture, in app: XCUIApplication) -> XCUIElement {
+        mainWindow(in: app).buttons["past"].click()
+        let search = app.textFields["history.search"]
+        XCTAssertTrue(search.waitForExistence(timeout: 5))
+        replaceText(in: search, with: fixture.search)
+        let rows = app.descendants(matching: .any).matching(identifier: "history.row." + fixture.id)
+        XCTAssertTrue(rows.firstMatch.waitForExistence(timeout: 10))
+        XCTAssertEqual(rows.count, 1)
+        let row = rows.firstMatch
+        if !row.buttons["history.variant.recognized"].exists {
+            let expand = historyExpandTarget(fixture.id, row: row, in: app)
+            reveal(expand, identifier: "history.row." + fixture.id, in: app)
+            expand.click()
+        }
+        let recognized = row.buttons["history.variant.recognized"]
+        XCTAssertTrue(recognized.waitForExistence(timeout: 5))
+        reveal(recognized, identifier: "history.row." + fixture.id, in: app)
+        recognized.click()
+        assertExactText(fixture.source, in: row.staticTexts["history.text.recognized"])
+        return row
+    }
+
+    @MainActor private func previewCorrection(
+        _ fixture: CorrectionUIFixture, clipboard: WritingFeaturesPasteboardOwnership,
+        verifyCanonicalEdit: Bool = false, in app: XCUIApplication
+    ) throws -> (sheet: XCUIElement, id: String, startedAt: TimeInterval) {
+        let row = openCorrectionSource(fixture, in: app)
+        let capture = row.buttons["history.correction.save.recognized"]
+        reveal(capture, identifier: "history.row." + fixture.id, in: app)
+        XCTAssertTrue(capture.isEnabled && capture.isHittable)
+        capture.click()
+        let sheets = mainWindow(in: app).sheets
+        XCTAssertTrue(sheets.firstMatch.waitForExistence(timeout: 5))
+        XCTAssertEqual(sheets.count, 1)
+        let sheet = sheets.firstMatch
+        assertExactText(fixture.source, in: sheet.staticTexts["history.correction.sourceText"])
+        let preview = sheet.buttons["history.correction.previewButton"]
+        let approve = sheet.buttons["history.correction.approve"]
+        XCTAssertFalse(preview.isEnabled)
+        XCTAssertFalse(approve.isEnabled)
+        let phrase = sheet.textViews["history.correction.phrase"]
+        revealCorrectionControl(phrase, towardTop: true, in: sheet)
+        pasteLiteralText(fixture.phrase, into: phrase, clipboard: clipboard, in: app)
+        assertExactEditor(fixture.phrase, id: "history.correction.phrase", in: sheet)
+        let output = sheet.textViews["history.correction.output"]
+        revealCorrectionControl(output, in: sheet)
+        let initialOutput = verifyCanonicalEdit ? fixture.output.precomposedStringWithCanonicalMapping : fixture.output
+        pasteLiteralText(initialOutput, into: output, clipboard: clipboard, in: app)
+        assertExactEditor(initialOutput, id: "history.correction.output", in: sheet)
+        let occurrences = sheet.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "history.correction.occurrence."))
+        XCTAssertEqual(occurrences.count, fixture.occurrences)
+        if fixture.occurrences > 1 {
+            XCTAssertFalse(preview.isEnabled, "A repeated phrase was accepted without choosing its occurrence.")
+            let choice = sheet.buttons["history.correction.occurrence.1"]
+            revealCorrectionControl(choice, towardTop: true, in: sheet)
+            choice.click()
+            XCTAssertTrue(choice.isSelected)
+        }
+        XCTAssertTrue(waitUntil { preview.isEnabled })
+        XCTAssertFalse(approve.isEnabled)
+        var startedAt = Date().timeIntervalSince1970
+        XCTAssertTrue(preview.isHittable)
+        preview.click()
+        XCTAssertTrue(waitUntil { approve.isEnabled })
+        if verifyCanonicalEdit {
+            let previousID = try metadataUUID("history.correction.preview.record.id", in: sheet)
+            XCTAssertEqual(initialOutput, fixture.output)
+            XCTAssertNotEqual(Array(initialOutput.utf8), Array(fixture.output.utf8))
+            assertExactText(initialOutput, in: sheet.staticTexts["history.correction.preview.record.replacement"])
+            revealCorrectionControl(output, towardTop: true, in: sheet)
+            pasteLiteralText(fixture.output, into: output, clipboard: clipboard, in: app)
+            assertExactEditor(fixture.output, id: "history.correction.output", in: sheet)
+            XCTAssertTrue(waitUntil { !approve.isEnabled }, "A byte-different canonical edit retained its old approval.")
+            XCTAssertTrue(identified("history.correction.preview.stale", in: sheet).exists)
+            startedAt = Date().timeIntervalSince1970
+            preview.click()
+            XCTAssertTrue(waitUntil { approve.isEnabled })
+            XCTAssertNotEqual(try metadataUUID("history.correction.preview.record.id", in: sheet), previousID)
+        }
+        assertExactText(fixture.phrase, in: sheet.staticTexts["history.correction.preview.record.original"])
+        assertExactText(fixture.output, in: sheet.staticTexts["history.correction.preview.record.replacement"])
+        for (suffix, expected) in [("kind", "Literal phrase"), ("enabled", "On"),
+                                   ("provenance", "From History · Recognized"), ("sourceTranscription", fixture.id)] {
+            XCTAssertTrue(containsText(expected, in: identified("history.correction.preview.record." + suffix, in: sheet)))
+        }
+        let id = try metadataUUID("history.correction.preview.record.id", in: sheet)
+        XCTAssertFalse(identified("history.correction.outcome", in: sheet).exists)
+        revealCorrectionControl(sheet.staticTexts["history.correction.preview.record.original"], in: sheet)
+        attachScreenshot(app, named: "Explicit History correction preview " + fixture.search)
+        return (sheet, id, startedAt)
+    }
+
+    @MainActor private func approveCorrection(
+        _ preview: (sheet: XCUIElement, id: String, startedAt: TimeInterval), in app: XCUIApplication
+    ) -> TimeInterval {
+        let approve = preview.sheet.buttons["history.correction.approve"]
+        XCTAssertTrue(approve.isEnabled && approve.isHittable)
+        approve.click()
+        let outcome = identified("history.correction.outcome", in: preview.sheet)
+        XCTAssertTrue(outcome.waitForExistence(timeout: 5))
+        XCTAssertTrue(containsText("Saved to Dictionary.", in: outcome))
+        XCTAssertTrue(containsText(preview.id, in: outcome))
+        let approvedAt = Date().timeIntervalSince1970
+        attachScreenshot(app, named: "Correction saved only after explicit approval")
+        let done = preview.sheet.buttons["history.correction.done"]
+        XCTAssertTrue(done.isEnabled && done.isHittable)
+        done.click()
+        XCTAssertTrue(waitUntil { !preview.sheet.exists })
+        return approvedAt
+    }
+
+    @MainActor private func openCorrectionEditor(_ id: String, row: XCUIElement, in app: XCUIApplication) -> XCUIElement {
+        let edit = row.buttons["dictionary.replacement." + id + ".edit"]
+        reveal(edit, identifier: "dictionary.replacement." + id, in: app)
+        XCTAssertTrue(edit.isEnabled && edit.isHittable)
+        edit.click()
+        let sheets = mainWindow(in: app).sheets
+        XCTAssertTrue(sheets.firstMatch.waitForExistence(timeout: 5))
+        XCTAssertEqual(sheets.count, 1)
+        let sheet = sheets.firstMatch
+        XCTAssertTrue(containsText("Literal phrase", in: identified("dictionary.replacement.edit.kind", in: sheet)))
+        return sheet
+    }
+
+    @MainActor private func assertExactEditor(_ expected: String, id: String, in sheet: XCUIElement) {
+        let editor = sheet.textViews[id]
+        XCTAssertTrue(editor.waitForExistence(timeout: 5))
+        let actual = editor.value as? String ?? ""
+        XCTAssertEqual(Array(actual.utf8), Array(expected.utf8))
+        XCTAssertEqual(Array(actual.utf16), Array(expected.utf16))
+    }
+
+    @MainActor private func metadataUUID(_ identifier: String, in element: XCUIElement) throws -> String {
+        let value = identified(identifier, in: element)
+        XCTAssertTrue(value.waitForExistence(timeout: 5))
+        let text = value.value as? String ?? value.label
+        let pattern = "[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}"
+        let matches = try NSRegularExpression(pattern: pattern).matches(in: text, range: NSRange(text.startIndex..., in: text))
+        XCTAssertEqual(matches.count, 1, "The actual preview did not expose one entry identity.")
+        let match = try XCTUnwrap(matches.first)
+        let range = try XCTUnwrap(Range(match.range, in: text))
+        return try XCTUnwrap(UUID(uuidString: String(text[range]))).uuidString
+    }
+
+    @MainActor private func nativeButton(_ identifiedControl: XCUIElement) throws -> XCUIElement {
+        XCTAssertTrue(identifiedControl.exists)
+        if identifiedControl.elementType == .button { return identifiedControl }
+        let buttons = identifiedControl.buttons
+        XCTAssertEqual(buttons.count, 1, "The source-owned control must contain exactly its native button.")
+        return try XCTUnwrap(buttons.allElementsBoundByIndex.first)
+    }
+
+    @MainActor private func revealCorrectionControl(
+        _ target: XCUIElement, towardTop: Bool = false, in sheet: XCUIElement
+    ) {
+        XCTAssertTrue(target.exists)
+        let forms = sheet.scrollViews.containing(.any, identifier: "history.correction.phrase")
+            .containing(.any, identifier: "history.correction.output")
+        XCTAssertEqual(forms.count, 1, "The correction sheet must expose one Form containing both literal editors.")
+        let form = forms.firstMatch
+        let anchorIDs = ["history.correction.phrase", "history.correction.output", "history.correction.occurrence.0",
+                         "history.correction.occurrence.1", "history.correction.preview.record.original"]
+        for _ in 0..<12 where !target.isHittable {
+            let anchors = anchorIDs.map { identified($0, in: form) }
+            let receiver = form.isHittable ? form : anchors.first {
+                $0.exists && $0.isEnabled && $0.isHittable && !$0.frame.isEmpty && form.frame.contains($0.frame)
+            }
+            guard let receiver else {
+                let attachment = XCTAttachment(string: sheet.debugDescription)
+                attachment.name = "Correction Form has no native wheel receiver"
+                attachment.lifetime = .keepAlways
+                add(attachment)
+                XCTFail("The correction Form has no visible enabled native control to receive scrolling.")
+                return
+            }
+            receiver.scroll(byDeltaX: 0, deltaY: towardTop ? 160 : -160)
+        }
+        XCTAssertTrue(target.isHittable, "The actual correction control could not be reached in its Form.")
+    }
+
     @MainActor private func selectProfile(
         _ title: String, preferences: WritingFeaturesDictationPreferences, in app: XCUIApplication
     ) {
@@ -1154,6 +1505,80 @@ final class WritingFeaturesUITests: XCTestCase {
         attachment.name = name
         attachment.lifetime = .keepAlways
         add(attachment)
+    }
+}
+
+private struct CorrectionUIFixture {
+    let id: String
+    let search: String
+    let source: String
+    let phrase: String
+    let output: String
+    let occurrences: Int
+
+    static let managed = Self(
+        id: "A1000000-0000-4000-8000-000000000005", search: "RJT Correction managed",
+        source: "RJT Correction managed\r\nAcme, Inc. meets Acme, Inc. — Cafe\u{301} 👩🏽‍💻\r\n",
+        phrase: "Acme, Inc.", output: "  RJT, Cafe\u{301} 👩🏽‍💻\r\n  ", occurrences: 2
+    )
+    static let managedEditedOutput = "  Edited, Cafe\u{301} 👩🏽‍💻\r\n  "
+    static let retained = Self(
+        id: "A1000000-0000-4000-8000-000000000006", search: "RJT Correction retained",
+        source: "RJT Correction retained\r\nOrbit, Ltd. — Cafe\u{301} 👩🏽‍💻\r\n",
+        phrase: "Orbit, Ltd.", output: "  Kept, Cafe\u{301} 👩🏽‍💻\r\n  ", occurrences: 1
+    )
+}
+
+private struct WritingFeaturesCorrectionReceipt {
+    private let caseName: String
+    private let sourceSHA: String
+    private let output: URL
+
+    init(caseName: String) throws {
+        func value(_ key: String) -> String? {
+            let environment = ProcessInfo.processInfo.environment
+            return environment[key] ?? environment["TEST_RUNNER_" + key]
+        }
+        guard value("GITHUB_ACTIONS") == "true", value("RUNNER_ENVIRONMENT") == "github-hosted",
+              ["managed", "retained"].contains(caseName),
+              let source = value("RJT_HISTORY_UI_SOURCE_SHA"),
+              source.range(of: "^[0-9a-f]{40}$", options: .regularExpression) != nil,
+              let directoryPath = value("RJT_HISTORY_UI_CORRECTION_RECEIPTS"),
+              let runnerPath = value("RUNNER_TEMP"), directoryPath.hasPrefix("/"), runnerPath.hasPrefix("/") else {
+            throw WritingFeaturesUIError.disposableRunnerRequired
+        }
+        let directory = URL(fileURLWithPath: directoryPath, isDirectory: true).standardizedFileURL
+        let runner = URL(fileURLWithPath: runnerPath, isDirectory: true).standardizedFileURL
+        guard directory.path.hasPrefix(runner.path + "/"), directory.lastPathComponent == "corrections",
+              directory.resolvingSymlinksInPath() == directory else {
+            throw WritingFeaturesUIError.disposableRunnerRequired
+        }
+        let attributes = try directory.resourceValues(forKeys: [.isDirectoryKey, .isSymbolicLinkKey])
+        guard attributes.isDirectory == true, attributes.isSymbolicLink != true else {
+            throw WritingFeaturesUIError.disposableRunnerRequired
+        }
+        self.caseName = caseName
+        sourceSHA = source
+        output = directory.appendingPathComponent(caseName + ".json")
+        guard !FileManager.default.fileExists(atPath: output.path) else {
+            throw WritingFeaturesUIError.disposableRunnerRequired
+        }
+    }
+
+    func write(fixture: CorrectionUIFixture, id: String, previewStartedAt: TimeInterval,
+               approvedAt: TimeInterval, outcome: String, replacement: String) throws {
+        func literal(_ text: String) -> [String: Any] {
+            ["text": text, "utf8": Array(text.utf8).map(Int.init), "utf16": Array(text.utf16).map(Int.init)]
+        }
+        let payload: [String: Any] = [
+            "version": 1, "caseName": caseName, "sourceSHA": sourceSHA,
+            "sourceTranscriptionID": fixture.id, "sourceVariant": "recognition", "previewedID": id,
+            "previewStartedAt": previewStartedAt, "approvedAt": approvedAt,
+            "completedAt": Date().timeIntervalSince1970, "outcome": outcome,
+            "original": literal(fixture.phrase), "replacement": literal(replacement)
+        ]
+        try JSONSerialization.data(withJSONObject: payload, options: [.prettyPrinted, .sortedKeys])
+            .write(to: output, options: .withoutOverwriting)
     }
 }
 

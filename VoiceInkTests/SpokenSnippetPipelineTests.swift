@@ -132,7 +132,6 @@ private final class SpokenSnippetPipelineFixture {
         VoiceInkPasteMethod.setCurrent(.standard)
         PowerModeManager.shared.activeConfiguration = nil
         SoundManager.shared.isEnabled = false
-        DictionaryService.invalidateWordReplacementCache()
         CursorPaster.configureAccessibilityTextInserterForTesting { [weak self] text, _ in
             self?.delivered.append(text)
             return .inserted
@@ -178,7 +177,6 @@ private final class SpokenSnippetPipelineFixture {
             }
         }
         PowerModeManager.shared.activeConfiguration = savedPowerMode
-        DictionaryService.invalidateWordReplacementCache()
     }
 }
 

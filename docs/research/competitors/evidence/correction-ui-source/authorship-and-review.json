@@ -1,0 +1,182 @@
+{
+  "classification": "source-authorship-and-review-only",
+  "before": {
+    "head": "650fab297aa0fcc7f3c9a6549583034b32942850",
+    "source_sha256": {
+      "VoiceInk/Views/Dictionary/WordReplacementView.swift": "ee6902f5a3e2c3c958f83e7379109b784baf0be7e19a7b92aa4ad50019fab51b",
+      "VoiceInk/Views/Dictionary/EditReplacementSheet.swift": "a126957fabd4cc9c6e8ff17c4bc34a745f6b0a51b3445db88569527c2e0be917",
+      "VoiceInk/Views/Dictionary/DictionaryQuickAddPanel.swift": "7e01403a06059d78cc38d34c1e73fb14a5e37a2f8fdcd2b183128bf909fc189b",
+      "VoiceInk/Views/History/InlineHistoryView.swift": "84ae9011a8e380f01ad25785b3688fbe0436667f8cf26b1865448593281312b1",
+      "VoiceInk/Views/History/TranscriptionDetailView.swift": "0d020575a8e18647684ccf3f63974b994b44652e2ca4a8df7a610b4d54cd0720",
+      "VoiceInk/Views/History/HistoryProcessingViews.swift": "6702314f2fd462b91075fbe50dff9c00a4974b60bb5834ddcde713520b99bea7"
+    }
+  },
+  "invocations": [
+    {
+      "invocation": "read-only-design",
+      "requested_model": "claude-opus-5-5",
+      "reported_assistant_models": [
+        "claude-opus-5-5"
+      ],
+      "raw_jsonl_sha256": "7d6a8538fab1b006e5f1cc0fb41904d96ec4a6f3e201583c27f5e8d583ac2da1",
+      "result": {
+        "subtype": "success",
+        "is_error": false,
+        "duration_ms": 184681,
+        "total_cost_usd": 1.1510698
+      }
+    },
+    {
+      "invocation": "initial-implementation",
+      "requested_model": "claude-opus-5-5",
+      "reported_assistant_models": [
+        "claude-opus-5-5"
+      ],
+      "raw_jsonl_sha256": "5e8e8b2b0c5d2bc77f7003b33a532a3697a48ca7521008099e087aa5aec73718",
+      "result": {
+        "subtype": "success",
+        "is_error": false,
+        "duration_ms": 896424,
+        "total_cost_usd": 4.6483932
+      }
+    },
+    {
+      "invocation": "canonical-storage-and-approval-followup",
+      "requested_model": "claude-opus-5-5",
+      "reported_assistant_models": [
+        "claude-opus-5-5"
+      ],
+      "raw_jsonl_sha256": "b86e17d3baccd96de2785c68b66850ed88da71521c44ae2723f367667f48792c",
+      "result": {
+        "subtype": "success",
+        "is_error": false,
+        "duration_ms": 542645,
+        "total_cost_usd": 2.5797646
+      }
+    },
+    {
+      "invocation": "history-selection-delete-identifiers",
+      "requested_model": "claude-opus-5-5",
+      "reported_assistant_models": [
+        "claude-opus-5-5"
+      ],
+      "raw_jsonl_sha256": "e19bf0aa7abe7ee5c1f08b5e528d40a62f024989e6f4bf206df20a990a17c08a",
+      "result": {
+        "subtype": "success",
+        "is_error": false,
+        "duration_ms": 40433,
+        "total_cost_usd": 0.19570439999999997
+      }
+    },
+    {
+      "invocation": "plain-occurrence-label-and-current-brand",
+      "requested_model": "claude-opus-5-5",
+      "reported_assistant_models": [
+        "claude-opus-5-5"
+      ],
+      "raw_jsonl_sha256": "b4a4759fd1e7a65547d3c2f2de53d2d2a56a7c5e3096a470f3d13ead8f2677f7",
+      "result": {
+        "subtype": "success",
+        "is_error": false,
+        "duration_ms": 31891,
+        "total_cost_usd": 0.08700179999999999
+      }
+    }
+  ],
+  "implementation_status": "actual Opus author passes complete; source frozen",
+  "review": {
+    "requested_model": "gpt-6.1-sol",
+    "actual_model": "gpt-6.1-sol",
+    "status": "all nine exact-hash source files reviewed; no remaining source blocker",
+    "reviewed_head": "46dd2a13e719cb61e2a2bbf83aa24e7d15a4bf7e",
+    "finding": "Canonical record display/sort/edit; frozen target and rendered text; exact draft revision/codeunit guards; explicit occurrence choice; cancel no persistence; full conflict/revision review; unsupported rows preserved; ImportExport typed catch/helper only with business/export bytes preserved.",
+    "inline_identifiers": "Real Toggle/Button/native alert modifiers; unchanged actions, bindings and roles. Existing History identifiers and transcript counts preserved.",
+    "native_limit": "No native build, event, interaction, visual or accessibility forwarding proof.",
+    "final_copy_delta": "Actual Sol verified exact previous hashes, one text-line change each: remove visible UTF-16 offset/length and VoiceInk to RJT; other seven files unchanged. No state/identifier/modifier/layout changes."
+  },
+  "native_runtime_verified": false,
+  "limits": [
+    "No native compilation, runtime, visual or accessibility proof.",
+    "No CloudKit transport or mixed-version synchronization claim.",
+    "No automatic learning or successful editor-delivery inference.",
+    "Toggle identifier may be exposed through a custom Button style; actual native hierarchy unproven.",
+    "SwiftUI native alert button identifier forwarding unproven.",
+    "New eight-case acceptance source and screenshots remain runtime-pending."
+  ],
+  "import_presentation_baseline_sha256": "aa8a86086675bfad51c7ffcb6b69a918e57ba2e6007f4cb286190360180a929b",
+  "source_sha256": {
+    "VoiceInk/Views/Dictionary/WordReplacementView.swift": "dc8ed7f716e9e7db451c30d3defeccca8cee1462118c0ed1637753a14852f67c",
+    "VoiceInk/Views/Dictionary/EditReplacementSheet.swift": "860a500f862da0d864b6a92d2cdf1a9fb9086b1fdb71af6bf3c0631dc3c7bb4d",
+    "VoiceInk/Views/Dictionary/DictionaryQuickAddPanel.swift": "98f40ec73e7f85796a5b00dab52fa3112e576f231a346ea2948689a0c57320c5",
+    "VoiceInk/Views/Dictionary/WordReplacementReviewViews.swift": "6386578bbe5e82af28def8cf6d1c65b28cd021c44f4bc930c940b295dd1a8510",
+    "VoiceInk/Views/History/InlineHistoryView.swift": "49dc761d7ebc25b3a41ffd23e76b9c4543b81517b7f94230b7f13d9ce5a71620",
+    "VoiceInk/Views/History/TranscriptionDetailView.swift": "6a6bb8ce375fc6f32a93ad7548bbcf2ff99bf85797b21ffb36324f4c9de11933",
+    "VoiceInk/Views/History/HistoryProcessingViews.swift": "d45fd3e129092b075f67fe21adf4f3745f501ad19234dab5f7ceed5acc879c2f",
+    "VoiceInk/Views/History/SaveCorrectionSheet.swift": "542d6bbb5bb1259c5f7abdda8acd680db8aa5992165b1af6ed5a451bd828fd66",
+    "VoiceInk/Services/ImportExportService.swift": "2f66c4adc8f871f29fdcd0c56d900a889c81abb8d168e00e1d2748a26c2507ee"
+  },
+  "checks": {
+    "swift_frontend_parse": "all nine owned files passed",
+    "git_diff_check": "passed",
+    "native_build": "not run",
+    "native_UI": "not run"
+  },
+  "total_author_cost_usd": 8.6619338,
+  "accessibility_contract": {
+    "history_entry": "history.correction.save.<recognized|original|enhanced>",
+    "sheet": [
+      "history.correction.sheet",
+      "history.correction.sourceText",
+      "history.correction.phrase",
+      "history.correction.output",
+      "history.correction.occurrence.<zero-based-index>",
+      "history.correction.previewButton",
+      "history.correction.preview",
+      "history.correction.preview.record",
+      "history.correction.preview.stale",
+      "history.correction.approve",
+      "history.correction.cancel",
+      "history.correction.done",
+      "history.correction.error",
+      "history.correction.outcome"
+    ],
+    "history_delete": [
+      "history.row.<UUID>.select",
+      "history.selection.delete",
+      "history.delete.confirm",
+      "history.delete.cancel"
+    ],
+    "dictionary_row": "dictionary.replacement.<UUID>",
+    "dictionary_row_suffixes": [
+      "enabled",
+      "edit",
+      "delete",
+      "kind",
+      "unsupported",
+      "unsupportedReason",
+      "provenance",
+      "offState",
+      "error"
+    ],
+    "dictionary_edit": [
+      "dictionary.replacement.edit",
+      "dictionary.replacement.edit.original",
+      "dictionary.replacement.edit.replacement",
+      "dictionary.replacement.edit.save",
+      "dictionary.replacement.edit.cancel",
+      "dictionary.replacement.edit.error"
+    ],
+    "provenance_accessibility_values": [
+      "checking",
+      "source available",
+      "source deleted",
+      "source status unknown"
+    ],
+    "import_conflicts": [
+      "settings.import.wordReplacementConflicts",
+      "settings.import.wordReplacementConflicts.content",
+      "settings.import.wordReplacementConflicts.scroll",
+      "settings.import.wordReplacementConflicts.close"
+    ]
+  }
+}

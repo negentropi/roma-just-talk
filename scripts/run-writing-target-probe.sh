@@ -57,6 +57,26 @@ private enum ProbeFailure: Error {
     case expectation(String)
 }
 
+private struct ProbeSelectionRange: Encodable {
+    let location: Int
+    let length: Int
+}
+
+private struct ProbeReadbackSample: Encodable {
+    let startedMilliseconds: Double
+    let valueReadMilliseconds: Double
+    let elapsedMilliseconds: Double
+    let observedValue: String?
+    let observedUTF16Count: Int?
+    let selectedText: String?
+    let selectedRange: ProbeSelectionRange?
+    let exactExpectedUTF16: Bool
+    let canonicalExpectedEqual: Bool
+    let exactOriginalUTF16: Bool
+    let firstDifferentExpectedUTF16Offset: Int?
+    let contentState: String
+}
+
 @MainActor
 private enum ProbeRun {
     static var phase = ProbePhase.launch
@@ -67,7 +87,65 @@ private enum ProbeRun {
         if !condition { throw ProbeFailure.expectation(name) }
     }
 
-    static func exercise() async throws {
+    static func observeFailedReplacement(
+        _ editor: LiveWritingEditor, expected: String, error: Error, output: URL
+    ) async {
+        let started = ProcessInfo.processInfo.systemUptime
+        let deadline = started + 2
+        var samples: [ProbeReadbackSample] = []
+        repeat {
+            let sampleStarted = ProcessInfo.processInfo.systemUptime
+            let value = editor.value
+            let valueRead = ProcessInfo.processInfo.systemUptime
+            var rawText: CFTypeRef?
+            let textResult = AXUIElementCopyAttributeValue(editor.editor, kAXSelectedTextAttribute as CFString, &rawText)
+            let selection = editor.selectedRange.map { ProbeSelectionRange(location: $0.location, length: $0.length) }
+            let exactExpected = value?.utf16.elementsEqual(expected.utf16) == true
+            let exactOriginal = value?.utf16.elementsEqual(LiveWritingEditor.original.utf16) == true
+            let mismatch: Int?
+            if let value {
+                let currentUnits = Array(value.utf16)
+                let expectedUnits = Array(expected.utf16)
+                mismatch = zip(currentUnits, expectedUnits).enumerated()
+                    .first { $0.element.0 != $0.element.1 }?.offset
+                    ?? (currentUnits.count == expectedUnits.count ? nil : min(currentUnits.count, expectedUnits.count))
+            } else { mismatch = nil }
+            samples.append(ProbeReadbackSample(
+                startedMilliseconds: (sampleStarted - started) * 1_000,
+                valueReadMilliseconds: (valueRead - started) * 1_000,
+                elapsedMilliseconds: (ProcessInfo.processInfo.systemUptime - started) * 1_000,
+                observedValue: value, observedUTF16Count: value?.utf16.count,
+                selectedText: textResult == .success ? rawText as? String : nil,
+                selectedRange: selection, exactExpectedUTF16: exactExpected,
+                canonicalExpectedEqual: value == expected, exactOriginalUTF16: exactOriginal,
+                firstDifferentExpectedUTF16Offset: mismatch,
+                contentState: exactExpected ? "expected" : exactOriginal ? "original" : value == nil ? "unavailable" : "changed-unexpectedly"
+            ))
+            guard ProcessInfo.processInfo.systemUptime < deadline, samples.count < 41 else { break }
+            do { try await Task.sleep(for: .milliseconds(50)) }
+            catch { break }
+        } while ProcessInfo.processInfo.systemUptime < deadline
+        do {
+            let sampleData = try JSONEncoder().encode(samples)
+            let receipt: [String: Any] = [
+                "productionError": String(describing: error), "phase": phase.rawValue,
+                "expectedValue": expected, "expectedUTF16Count": expected.utf16.count,
+                "originalValue": LiveWritingEditor.original,
+                "pollingStartBudgetMilliseconds": 2_000, "maximumSamples": 41,
+                "actualPollingDurationMilliseconds": (ProcessInfo.processInfo.systemUptime - started) * 1_000,
+                "diagnosticAXReadTimeoutSource": "LiveWritingEditor.value and selectedRange",
+                "automaticWriteRetry": false,
+                "expectedAppearedAfterError": samples.contains { $0.exactExpectedUTF16 },
+                "finalContentState": samples.last?.contentState ?? "unobserved",
+                "samples": try JSONSerialization.jsonObject(with: sampleData)
+            ]
+            try JSONSerialization.data(withJSONObject: receipt, options: [.prettyPrinted, .sortedKeys])
+                .write(to: output.appendingPathComponent("replacement-failure.json"), options: .atomic)
+        } catch { Issue.record("Could not retain failed replacement observations: \(error)") }
+        editor.recordOperationFailure("standalone-safari-replacement-failure", expected: expected)
+    }
+
+    static func exercise(output: URL) async throws {
         phase = .editorSetup
         let editor = try await LiveWritingEditor.open(.safari)
         defer { editor.close() }
@@ -92,8 +170,12 @@ private enum ProbeRun {
         let target = try WritingTarget.capture(requiresSelection: true)
         phase = .replacement
         let replacement = "Translated 日本語\nNext paragraph"
-        try target.replace(with: replacement)
         let expected = LiveWritingEditor.prefix + replacement + LiveWritingEditor.suffix
+        do { try target.replace(with: replacement) }
+        catch {
+            await observeFailedReplacement(editor, expected: expected, error: error, output: output)
+            throw error
+        }
         try await editor.waitForValue(expected)
         try require(editor.value?.utf16.elementsEqual(expected.utf16) == true,
                     "replacement-exact-prefix-suffix")
@@ -103,7 +185,7 @@ private enum ProbeRun {
 
     static func run(output: URL) async -> Int32 {
         var failure: String?
-        do { try await exercise() }
+        do { try await exercise(output: output) }
         catch { failure = String(describing: error) }
         let expected = Set([
             "captured-selection-exact", "selected-range-drift-refused",

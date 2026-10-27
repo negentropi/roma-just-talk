@@ -1,0 +1,85 @@
+name: Prove real Ollama writing snapshot identity
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "ci/rjt-ollama-identity-check-*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: writing-ollama-identity-probe-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: macos-26
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Select Xcode and record environment
+        run: |
+          latest=$(ls -d /Applications/Xcode_26*.app | sort -V | tail -n 1)
+          test -n "$latest"
+          sudo xcode-select -s "$latest"
+          mkdir -p "$RUNNER_TEMP/writing-ollama-identity-probe"
+          {
+            git rev-parse HEAD
+            xcodebuild -version
+            swift --version
+            sw_vers
+          } > "$RUNNER_TEMP/writing-ollama-identity-probe/environment.txt"
+
+      - name: Verify fail-closed result classification
+        run: bash scripts/run-writing-ollama-identity-probe.sh self-test
+
+      - name: Freeze baseline, candidate, unchanged oracle and pinned graph
+        run: bash scripts/run-writing-ollama-identity-probe.sh prepare
+
+      - name: Retain frozen input checkpoint before native builds
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.writing-ollama-identity-inputs
+          path: |
+            ${{ runner.temp }}/writing-ollama-identity-probe/contract.json
+            ${{ runner.temp }}/writing-ollama-identity-probe/environment.txt
+          if-no-files-found: error
+
+      - name: Build and sign both actual service probes
+        run: bash scripts/run-writing-ollama-identity-probe.sh build
+
+      - name: Require two known-bad metadata failures and twelve successful HTTP executions
+        run: bash scripts/run-writing-ollama-identity-probe.sh run
+
+      - name: Retain source contracts, requests, signatures and exact outcomes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.writing-ollama-identity-evidence
+          path: |
+            ${{ runner.temp }}/writing-ollama-identity-probe/*.json
+            ${{ runner.temp }}/writing-ollama-identity-probe/*.txt
+            ${{ runner.temp }}/writing-ollama-identity-probe/baseline/*.json
+            ${{ runner.temp }}/writing-ollama-identity-probe/baseline/*.log
+            ${{ runner.temp }}/writing-ollama-identity-probe/baseline/*.txt
+            ${{ runner.temp }}/writing-ollama-identity-probe/baseline/no-keys/**
+            ${{ runner.temp }}/writing-ollama-identity-probe/baseline/divergent-keys/**
+            ${{ runner.temp }}/writing-ollama-identity-probe/baseline/coherent-keys/**
+            ${{ runner.temp }}/writing-ollama-identity-probe/baseline/package/Package.swift
+            ${{ runner.temp }}/writing-ollama-identity-probe/baseline/package/Package.resolved
+            ${{ runner.temp }}/writing-ollama-identity-probe/baseline/package/Sources/**
+            ${{ runner.temp }}/writing-ollama-identity-probe/candidate/*.json
+            ${{ runner.temp }}/writing-ollama-identity-probe/candidate/*.log
+            ${{ runner.temp }}/writing-ollama-identity-probe/candidate/*.txt
+            ${{ runner.temp }}/writing-ollama-identity-probe/candidate/no-keys/**
+            ${{ runner.temp }}/writing-ollama-identity-probe/candidate/divergent-keys/**
+            ${{ runner.temp }}/writing-ollama-identity-probe/candidate/coherent-keys/**
+            ${{ runner.temp }}/writing-ollama-identity-probe/candidate/package/Package.swift
+            ${{ runner.temp }}/writing-ollama-identity-probe/candidate/package/Package.resolved
+            ${{ runner.temp }}/writing-ollama-identity-probe/candidate/package/Sources/**
+          if-no-files-found: error

@@ -1,0 +1,164 @@
+{
+  "assertionCount": 23,
+  "assertions": [
+    {
+      "line": 7,
+      "message": "expected X,X X X X,X to equal X a b X",
+      "method": "LiteralCorrectionRuleTests.testLiteralCommaIsOneSourcePhrase",
+      "raw": "/Users/runner/work/_temp/literal-rule-check/baseline-source/VoiceInkCore/Tests/VoiceInkCoreTests/LiteralCorrectionRuleTests.swift:7: expected X,X X X X,X to equal X a b X"
+    },
+    {
+      "line": 9,
+      "message": "expected  ,  to equal  ; ",
+      "method": "LiteralCorrectionRuleTests.testLiteralCommaIsOneSourcePhrase",
+      "raw": "/Users/runner/work/_temp/literal-rule-check/baseline-source/VoiceInkCore/Tests/VoiceInkCoreTests/LiteralCorrectionRuleTests.swift:9: expected  ,  to equal  ; "
+    },
+    {
+      "line": 20,
+      "message": "expected X X to equal beta X",
+      "method": "LiteralCorrectionRuleTests.testLiteralOutputNeverFeedsAnotherReplacement",
+      "raw": "/Users/runner/work/_temp/literal-rule-check/baseline-source/VoiceInkCore/Tests/VoiceInkCoreTests/LiteralCorrectionRuleTests.swift:20: expected X X to equal beta X"
+    },
+    {
+      "line": 20,
+      "message": "expected X X to equal beta X",
+      "method": "LiteralCorrectionRuleTests.testLiteralOutputNeverFeedsAnotherReplacement",
+      "raw": "/Users/runner/work/_temp/literal-rule-check/baseline-source/VoiceInkCore/Tests/VoiceInkCoreTests/LiteralCorrectionRuleTests.swift:20: expected X X to equal beta X"
+    },
+    {
+      "line": 31,
+      "message": "expected DONE to equal cat",
+      "method": "LiteralCorrectionRuleTests.testLegacyOutputCannotCreateALiteralMatch",
+      "raw": "/Users/runner/work/_temp/literal-rule-check/baseline-source/VoiceInkCore/Tests/VoiceInkCoreTests/LiteralCorrectionRuleTests.swift:31: expected DONE to equal cat"
+    },
+    {
+      "line": 40,
+      "message": "expected Z to equal R X blue",
+      "method": "LiteralCorrectionRuleTests.testLiteralSourceBlocksWholeCrossingLegacyMatches",
+      "raw": "/Users/runner/work/_temp/literal-rule-check/baseline-source/VoiceInkCore/Tests/VoiceInkCoreTests/LiteralCorrectionRuleTests.swift:40: expected Z to equal R X blue"
+    },
+    {
+      "line": 49,
+      "message": "expected Z Y to equal X blue",
+      "method": "LiteralCorrectionRuleTests.testLiteralOverlapUsesLeftmostLongestThenDeclaredOrder",
+      "raw": "/Users/runner/work/_temp/literal-rule-check/baseline-source/VoiceInkCore/Tests/VoiceInkCoreTests/LiteralCorrectionRuleTests.swift:49: expected Z Y to equal X blue"
+    },
+    {
+      "line": 101,
+      "message": "expected [240, 159, 145, 169, 240, 159, 143, 189, 226, 128, 141, 240, 159, 146, 187, 32, 101, 204, 129, 32, 120, 32, 32, 108, 111, 110, 103, 119, 111, 114, 100, 32, 101, 110, 100, 32, 97, 44, 32, 108, 111, 110, 103, 119, 111, 114, 100, 32, 101, 110, 100, 32, 97, 44, 98, 32, 36, 53, 46, 48, 48, 92, 84, 101, 109, 112, 92, 36, 49, 13, 10, 32, 101, 204, 129, 32, 240, 159, 145, 169, 240, 159, 143, 189, 226, 128, 141, 240, 159, 146, 187, 32, 32, 36, 53, 46, 48, 48, 92, 84, 101, 109, 112, 92, 36, 49, 13, 10, 32, 101, 204, 129, 32, 240, 159, 145, 169, 240, 159, 143, 189, 226, 128, 141, 240, 159, 146, 187, 32, 44, 32, 108, 111, 110, 103, 119, 111, 114, 100, 32, 101, 110, 100, 32, 97, 44, 98, 32, 36, 53, 46, 48, 48, 92, 84, 101, 109, 112, 92, 36, 49, 13, 10, 32, 101, 204, 129, 32, 240, 159, 145, 169, 240, 159, 143, 189, 226, 128, 141, 240, 159, 146, 187, 32, 32, 118, 101, 114, 121, 32, 108, 111, 110, 103, 32, 116, 97, 105, 108, 32, 120, 32, 32, 108, 111, 110, 103, 119, 111, 114, 100, 32, 101, 110, 100, 32, 97, 44, 32, 108, 111, 110, 103, 119, 111, 114, 100, 32, 101, 110, 100, 32, 97, 44, 98, 32, 36, 53, 46, 48, 48, 92, 84, 101, 109, 112, 92, 36, 49, 13, 10, 32, 101, 204, 129, 32, 240, 159, 145, 169, 240, 159, 143, 189, 226, 128, 141, 240, 159, 146, 187, 32, 32, 36, 53, 46, 48, 48, 92, 84, 101, 109, 112, 92, 36, 49, 13, 10, 32, 101, 204, 129, 32, 240, 159, 145, 169, 240, 159, 143, 189, 226, 128, 141, 240, 159, 146, 187, 32, 44, 32, 108, 111, 110, 103, 119, 111, 114, 100, 32, 101, 110, 100, 32, 97, 44, 98, 32, 36, 53, 46, 48, 48, 92, 84, 101, 109, 112, 92, 36, 49, 13, 10, 32, 101, 204, 129, 32, 240, 159, 145, 169, 240, 159, 143, 189, 226, 128, 141, 240, 159, 146, 187, 32, 32, 118, 101, 114, 121, 32, 108, 111, 110, 103, 32, 116, 97, 105, 108] to equal [240, 159, 145, 169, 240, 159, 143, 189, 226, 128, 141, 240, 159, 146, 187, 32, 101, 204, 129, 32, 120, 32, 32, 108, 111, 110, 103, 119, 111, 114, 100, 32, 101, 110, 100, 32, 97, 44, 98, 32, 36, 53, 46, 48, 48, 92, 84, 101, 109, 112, 92, 36, 49, 13, 10, 32, 101, 204, 129, 32, 240, 159, 145, 169, 240, 159, 143, 189, 226, 128, 141, 240, 159, 146, 187, 32, 32, 118, 101, 114, 121, 32, 108, 111, 110, 103, 32, 116, 97, 105, 108, 32, 120, 32, 32, 108, 111, 110, 103, 119, 111, 114, 100, 32, 101, 110, 100, 32, 97, 44, 98, 32, 36, 53, 46, 48, 48, 92, 84, 101, 109, 112, 92, 36, 49, 13, 10, 32, 101, 204, 129, 32, 240, 159, 145, 169, 240, 159, 143, 189, 226, 128, 141, 240, 159, 146, 187, 32, 32, 118, 101, 114, 121, 32, 108, 111, 110, 103, 32, 116, 97, 105, 108]",
+      "method": "LiteralCorrectionRuleTests.testProtectedRangesRemapUTF16AndInsertExactLiteralOutputLast",
+      "raw": "/Users/runner/work/_temp/literal-rule-check/baseline-source/VoiceInkCore/Tests/VoiceInkCoreTests/LiteralCorrectionRuleTests.swift:101: expected [240, 159, 145, 169, 240, 159, 143, 189, 226, 128, 141, 240, 159, 146, 187, 32, 101, 204, 129, 32, 120, 32, 32, 108, 111, 110, 103, 119, 111, 114, 100, 32, 101, 110, 100, 32, 97, 44, 32, 108, 111, 110, 103, 119, 111, 114, 100, 32, 101, 110, 100, 32, 97, 44, 98, 32, 36, 53, 46, 48, 48, 92, 84, 101, 109, 112, 92, 36, 49, 13, 10, 32, 101, 204, 129, 32, 240, 159, 145, 169, 240, 159, 143, 189, 226, 128, 141, 240, 159, 146, 187, 32, 32, 36, 53, 46, 48, 48, 92, 84, 101, 109, 112, 92, 36, 49, 13, 10, 32, 101, 204, 129, 32, 240, 159, 145, 169, 240, 159, 143, 189, 226, 128, 141, 240, 159, 146, 187, 32, 44, 32, 108, 111, 110, 103, 119, 111, 114, 100, 32, 101, 110, 100, 32, 97, 44, 98, 32, 36, 53, 46, 48, 48, 92, 84, 101, 109, 112, 92, 36, 49, 13, 10, 32, 101, 204, 129, 32, 240, 159, 145, 169, 240, 159, 143, 189, 226, 128, 141, 240, 159, 146, 187, 32, 32, 118, 101, 114, 121, 32, 108, 111, 110, 103, 32, 116, 97, 105, 108, 32, 120, 32, 32, 108, 111, 110, 103, 119, 111, 114, 100, 32, 101, 110, 100, 32, 97, 44, 32, 108, 111, 110, 103, 119, 111, 114, 100, 32, 101, 110, 100, 32, 97, 44, 98, 32, 36, 53, 46, 48, 48, 92, 84, 101, 109, 112, 92, 36, 49, 13, 10, 32, 101, 204, 129, 32, 240, 159, 145, 169, 240, 159, 143, 189, 226, 128, 141, 240, 159, 146, 187, 32, 32, 36, 53, 46, 48, 48, 92, 84, 101, 109, 112, 92, 36, 49, 13, 10, 32, 101, 204, 129, 32, 240, 159, 145, 169, 240, 159, 143, 189, 226, 128, 141, 240, 159, 146, 187, 32, 44, 32, 108, 111, 110, 103, 119, 111, 114, 100, 32, 101, 110, 100, 32, 97, 44, 98, 32, 36, 53, 46, 48, 48, 92, 84, 101, 109, 112, 92, 36, 49, 13, 10, 32, 101, 204, 129, 32, 240, 159, 145, 169, 240, 159, 143, 189, 226, 128, 141, 240, 159, 146, 187, 32, 32, 118, 101, 114, 121, 32, 108, 111, 110, 103, 32, 116, 97, 105, 108] to equal [240, 159, 145, 169, 240, 159, 143, 189, 226, 128, 141, 240, 159, 146, 187, 32, 101, 204, 129, 32, 120, 32, 32, 108, 111, 110, 103, 119, 111, 114, 100, 32, 101, 110, 100, 32, 97, 44, 98, 32, 36, 53, 46, 48, 48, 92, 84, 101, 109, 112, 92, 36, 49, 13, 10, 32, 101, 204, 129, 32, 240, 159, 145, 169, 240, 159, 143, 189, 226, 128, 141, 240, 159, 146, 187, 32, 32, 118, 101, 114, 121, 32, 108, 111, 110, 103, 32, 116, 97, 105, 108, 32, 120, 32, 32, 108, 111, 110, 103, 119, 111, 114, 100, 32, 101, 110, 100, 32, 97, 44, 98, 32, 36, 53, 46, 48, 48, 92, 84, 101, 109, 112, 92, 36, 49, 13, 10, 32, 101, 204, 129, 32, 240, 159, 145, 169, 240, 159, 143, 189, 226, 128, 141, 240, 159, 146, 187, 32, 32, 118, 101, 114, 121, 32, 108, 111, 110, 103, 32, 116, 97, 105, 108]"
+    },
+    {
+      "line": 102,
+      "message": "expected [55357, 56425, 55356, 57341, 8205, 55357, 56507, 32, 101, 769, 32, 120, 32, 32, 108, 111, 110, 103, 119, 111, 114, 100, 32, 101, 110, 100, 32, 97, 44, 32, 108, 111, 110, 103, 119, 111, 114, 100, 32, 101, 110, 100, 32, 97, 44, 98, 32, 36, 53, 46, 48, 48, 92, 84, 101, 109, 112, 92, 36, 49, 13, 10, 32, 101, 769, 32, 55357, 56425, 55356, 57341, 8205, 55357, 56507, 32, 32, 36, 53, 46, 48, 48, 92, 84, 101, 109, 112, 92, 36, 49, 13, 10, 32, 101, 769, 32, 55357, 56425, 55356, 57341, 8205, 55357, 56507, 32, 44, 32, 108, 111, 110, 103, 119, 111, 114, 100, 32, 101, 110, 100, 32, 97, 44, 98, 32, 36, 53, 46, 48, 48, 92, 84, 101, 109, 112, 92, 36, 49, 13, 10, 32, 101, 769, 32, 55357, 56425, 55356, 57341, 8205, 55357, 56507, 32, 32, 118, 101, 114, 121, 32, 108, 111, 110, 103, 32, 116, 97, 105, 108, 32, 120, 32, 32, 108, 111, 110, 103, 119, 111, 114, 100, 32, 101, 110, 100, 32, 97, 44, 32, 108, 111, 110, 103, 119, 111, 114, 100, 32, 101, 110, 100, 32, 97, 44, 98, 32, 36, 53, 46, 48, 48, 92, 84, 101, 109, 112, 92, 36, 49, 13, 10, 32, 101, 769, 32, 55357, 56425, 55356, 57341, 8205, 55357, 56507, 32, 32, 36, 53, 46, 48, 48, 92, 84, 101, 109, 112, 92, 36, 49, 13, 10, 32, 101, 769, 32, 55357, 56425, 55356, 57341, 8205, 55357, 56507, 32, 44, 32, 108, 111, 110, 103, 119, 111, 114, 100, 32, 101, 110, 100, 32, 97, 44, 98, 32, 36, 53, 46, 48, 48, 92, 84, 101, 109, 112, 92, 36, 49, 13, 10, 32, 101, 769, 32, 55357, 56425, 55356, 57341, 8205, 55357, 56507, 32, 32, 118, 101, 114, 121, 32, 108, 111, 110, 103, 32, 116, 97, 105, 108] to equal [55357, 56425, 55356, 57341, 8205, 55357, 56507, 32, 101, 769, 32, 120, 32, 32, 108, 111, 110, 103, 119, 111, 114, 100, 32, 101, 110, 100, 32, 97, 44, 98, 32, 36, 53, 46, 48, 48, 92, 84, 101, 109, 112, 92, 36, 49, 13, 10, 32, 101, 769, 32, 55357, 56425, 55356, 57341, 8205, 55357, 56507, 32, 32, 118, 101, 114, 121, 32, 108, 111, 110, 103, 32, 116, 97, 105, 108, 32, 120, 32, 32, 108, 111, 110, 103, 119, 111, 114, 100, 32, 101, 110, 100, 32, 97, 44, 98, 32, 36, 53, 46, 48, 48, 92, 84, 101, 109, 112, 92, 36, 49, 13, 10, 32, 101, 769, 32, 55357, 56425, 55356, 57341, 8205, 55357, 56507, 32, 32, 118, 101, 114, 121, 32, 108, 111, 110, 103, 32, 116, 97, 105, 108]",
+      "method": "LiteralCorrectionRuleTests.testProtectedRangesRemapUTF16AndInsertExactLiteralOutputLast",
+      "raw": "/Users/runner/work/_temp/literal-rule-check/baseline-source/VoiceInkCore/Tests/VoiceInkCoreTests/LiteralCorrectionRuleTests.swift:102: expected [55357, 56425, 55356, 57341, 8205, 55357, 56507, 32, 101, 769, 32, 120, 32, 32, 108, 111, 110, 103, 119, 111, 114, 100, 32, 101, 110, 100, 32, 97, 44, 32, 108, 111, 110, 103, 119, 111, 114, 100, 32, 101, 110, 100, 32, 97, 44, 98, 32, 36, 53, 46, 48, 48, 92, 84, 101, 109, 112, 92, 36, 49, 13, 10, 32, 101, 769, 32, 55357, 56425, 55356, 57341, 8205, 55357, 56507, 32, 32, 36, 53, 46, 48, 48, 92, 84, 101, 109, 112, 92, 36, 49, 13, 10, 32, 101, 769, 32, 55357, 56425, 55356, 57341, 8205, 55357, 56507, 32, 44, 32, 108, 111, 110, 103, 119, 111, 114, 100, 32, 101, 110, 100, 32, 97, 44, 98, 32, 36, 53, 46, 48, 48, 92, 84, 101, 109, 112, 92, 36, 49, 13, 10, 32, 101, 769, 32, 55357, 56425, 55356, 57341, 8205, 55357, 56507, 32, 32, 118, 101, 114, 121, 32, 108, 111, 110, 103, 32, 116, 97, 105, 108, 32, 120, 32, 32, 108, 111, 110, 103, 119, 111, 114, 100, 32, 101, 110, 100, 32, 97, 44, 32, 108, 111, 110, 103, 119, 111, 114, 100, 32, 101, 110, 100, 32, 97, 44, 98, 32, 36, 53, 46, 48, 48, 92, 84, 101, 109, 112, 92, 36, 49, 13, 10, 32, 101, 769, 32, 55357, 56425, 55356, 57341, 8205, 55357, 56507, 32, 32, 36, 53, 46, 48, 48, 92, 84, 101, 109, 112, 92, 36, 49, 13, 10, 32, 101, 769, 32, 55357, 56425, 55356, 57341, 8205, 55357, 56507, 32, 44, 32, 108, 111, 110, 103, 119, 111, 114, 100, 32, 101, 110, 100, 32, 97, 44, 98, 32, 36, 53, 46, 48, 48, 92, 84, 101, 109, 112, 92, 36, 49, 13, 10, 32, 101, 769, 32, 55357, 56425, 55356, 57341, 8205, 55357, 56507, 32, 32, 118, 101, 114, 121, 32, 108, 111, 110, 103, 32, 116, 97, 105, 108] to equal [55357, 56425, 55356, 57341, 8205, 55357, 56507, 32, 101, 769, 32, 120, 32, 32, 108, 111, 110, 103, 119, 111, 114, 100, 32, 101, 110, 100, 32, 97, 44, 98, 32, 36, 53, 46, 48, 48, 92, 84, 101, 109, 112, 92, 36, 49, 13, 10, 32, 101, 769, 32, 55357, 56425, 55356, 57341, 8205, 55357, 56507, 32, 32, 118, 101, 114, 121, 32, 108, 111, 110, 103, 32, 116, 97, 105, 108, 32, 120, 32, 32, 108, 111, 110, 103, 119, 111, 114, 100, 32, 101, 110, 100, 32, 97, 44, 98, 32, 36, 53, 46, 48, 48, 92, 84, 101, 109, 112, 92, 36, 49, 13, 10, 32, 101, 769, 32, 55357, 56425, 55356, 57341, 8205, 55357, 56507, 32, 32, 118, 101, 114, 121, 32, 108, 111, 110, 103, 32, 116, 97, 105, 108]"
+    },
+    {
+      "line": 144,
+      "message": "expected   X , X   to equal  X ",
+      "method": "LiteralCorrectionRuleTests.testBlankLiteralSourcesAreNoOpsAndNonblankSourcesAreNotTrimmed",
+      "raw": "/Users/runner/work/_temp/literal-rule-check/baseline-source/VoiceInkCore/Tests/VoiceInkCoreTests/LiteralCorrectionRuleTests.swift:144: expected   X , X   to equal  X "
+    },
+    {
+      "line": 145,
+      "message": "expected  X , X  to equal a,b",
+      "method": "LiteralCorrectionRuleTests.testBlankLiteralSourcesAreNoOpsAndNonblankSourcesAreNotTrimmed",
+      "raw": "/Users/runner/work/_temp/literal-rule-check/baseline-source/VoiceInkCore/Tests/VoiceInkCoreTests/LiteralCorrectionRuleTests.swift:145: expected  X , X  to equal a,b"
+    },
+    {
+      "line": 161,
+      "message": "expected [[\"originalText\": \"a,b\", \"replacementText\": \"X\"]] to equal [[\"matchingKind\": \"literal\", \"originalText\": \"a,b\", \"replacementText\": \"X\"]]",
+      "method": "LiteralCorrectionRuleTests.testLegacyEncodingKeepsTwoKeysAndLiteralKindRoundTrips",
+      "raw": "/Users/runner/work/_temp/literal-rule-check/baseline-source/VoiceInkCore/Tests/VoiceInkCoreTests/LiteralCorrectionRuleTests.swift:161: expected [[\"originalText\": \"a,b\", \"replacementText\": \"X\"]] to equal [[\"matchingKind\": \"literal\", \"originalText\": \"a,b\", \"replacementText\": \"X\"]]"
+    },
+    {
+      "line": 170,
+      "message": "An explicit invalid kind must not reinterpret a comma-containing source as legacy",
+      "method": "LiteralCorrectionRuleTests.testExplicitInvalidMatchingKindsRejectInsteadOfBecomingLegacy",
+      "raw": "/Users/runner/work/_temp/literal-rule-check/baseline-source/VoiceInkCore/Tests/VoiceInkCoreTests/LiteralCorrectionRuleTests.swift:170: An explicit invalid kind must not reinterpret a comma-containing source as legacy"
+    },
+    {
+      "line": 170,
+      "message": "An explicit invalid kind must not reinterpret a comma-containing source as legacy",
+      "method": "LiteralCorrectionRuleTests.testExplicitInvalidMatchingKindsRejectInsteadOfBecomingLegacy",
+      "raw": "/Users/runner/work/_temp/literal-rule-check/baseline-source/VoiceInkCore/Tests/VoiceInkCoreTests/LiteralCorrectionRuleTests.swift:170: An explicit invalid kind must not reinterpret a comma-containing source as legacy"
+    },
+    {
+      "line": 170,
+      "message": "An explicit invalid kind must not reinterpret a comma-containing source as legacy",
+      "method": "LiteralCorrectionRuleTests.testExplicitInvalidMatchingKindsRejectInsteadOfBecomingLegacy",
+      "raw": "/Users/runner/work/_temp/literal-rule-check/baseline-source/VoiceInkCore/Tests/VoiceInkCoreTests/LiteralCorrectionRuleTests.swift:170: An explicit invalid kind must not reinterpret a comma-containing source as legacy"
+    },
+    {
+      "line": 170,
+      "message": "An explicit invalid kind must not reinterpret a comma-containing source as legacy",
+      "method": "LiteralCorrectionRuleTests.testExplicitInvalidMatchingKindsRejectInsteadOfBecomingLegacy",
+      "raw": "/Users/runner/work/_temp/literal-rule-check/baseline-source/VoiceInkCore/Tests/VoiceInkCoreTests/LiteralCorrectionRuleTests.swift:170: An explicit invalid kind must not reinterpret a comma-containing source as legacy"
+    },
+    {
+      "line": 170,
+      "message": "An explicit invalid kind must not reinterpret a comma-containing source as legacy",
+      "method": "LiteralCorrectionRuleTests.testExplicitInvalidMatchingKindsRejectInsteadOfBecomingLegacy",
+      "raw": "/Users/runner/work/_temp/literal-rule-check/baseline-source/VoiceInkCore/Tests/VoiceInkCoreTests/LiteralCorrectionRuleTests.swift:170: An explicit invalid kind must not reinterpret a comma-containing source as legacy"
+    },
+    {
+      "line": 170,
+      "message": "An explicit invalid kind must not reinterpret a comma-containing source as legacy",
+      "method": "LiteralCorrectionRuleTests.testExplicitInvalidMatchingKindsRejectInsteadOfBecomingLegacy",
+      "raw": "/Users/runner/work/_temp/literal-rule-check/baseline-source/VoiceInkCore/Tests/VoiceInkCoreTests/LiteralCorrectionRuleTests.swift:170: An explicit invalid kind must not reinterpret a comma-containing source as legacy"
+    },
+    {
+      "line": 170,
+      "message": "An explicit invalid kind must not reinterpret a comma-containing source as legacy",
+      "method": "LiteralCorrectionRuleTests.testExplicitInvalidMatchingKindsRejectInsteadOfBecomingLegacy",
+      "raw": "/Users/runner/work/_temp/literal-rule-check/baseline-source/VoiceInkCore/Tests/VoiceInkCoreTests/LiteralCorrectionRuleTests.swift:170: An explicit invalid kind must not reinterpret a comma-containing source as legacy"
+    },
+    {
+      "line": 190,
+      "message": "expected [[\"originalText\": \"a,b\", \"replacementText\": \"new\"]] to equal [[\"matchingKind\": \"literal\", \"originalText\": \"a,b\", \"replacementText\": \"new\"]]",
+      "method": "LiteralCorrectionRuleTests.testSharedEditReconstructionPreservesLiteralKind",
+      "raw": "/Users/runner/work/_temp/literal-rule-check/baseline-source/VoiceInkCore/Tests/VoiceInkCoreTests/LiteralCorrectionRuleTests.swift:190: expected [[\"originalText\": \"a,b\", \"replacementText\": \"new\"]] to equal [[\"matchingKind\": \"literal\", \"originalText\": \"a,b\", \"replacementText\": \"new\"]]"
+    },
+    {
+      "line": 191,
+      "message": "expected new,new new new to equal new a b",
+      "method": "LiteralCorrectionRuleTests.testSharedEditReconstructionPreservesLiteralKind",
+      "raw": "/Users/runner/work/_temp/literal-rule-check/baseline-source/VoiceInkCore/Tests/VoiceInkCoreTests/LiteralCorrectionRuleTests.swift:191: expected new,new new new to equal new a b"
+    },
+    {
+      "line": 204,
+      "message": "expected Optional([\"keep\": \"literal override\", \"a,b\": \"literal comma\"]) to equal Optional([\"keep\": \"last\"])",
+      "method": "LiteralCorrectionRuleTests.testLegacyExportMapOmitsEveryLiteralRule",
+      "raw": "/Users/runner/work/_temp/literal-rule-check/baseline-source/VoiceInkCore/Tests/VoiceInkCoreTests/LiteralCorrectionRuleTests.swift:204: expected Optional([\"keep\": \"literal override\", \"a,b\": \"literal comma\"]) to equal Optional([\"keep\": \"last\"])"
+    },
+    {
+      "line": 207,
+      "message": "expected nil",
+      "method": "LiteralCorrectionRuleTests.testLegacyExportMapOmitsEveryLiteralRule",
+      "raw": "/Users/runner/work/_temp/literal-rule-check/baseline-source/VoiceInkCore/Tests/VoiceInkCoreTests/LiteralCorrectionRuleTests.swift:207: expected nil"
+    }
+  ],
+  "classification": "intended-literal-rule-failures",
+  "errors": [],
+  "executed": 1721,
+  "exitCode": 1,
+  "failedMethods": [
+    "LiteralCorrectionRuleTests.testBlankLiteralSourcesAreNoOpsAndNonblankSourcesAreNotTrimmed",
+    "LiteralCorrectionRuleTests.testExplicitInvalidMatchingKindsRejectInsteadOfBecomingLegacy",
+    "LiteralCorrectionRuleTests.testLegacyEncodingKeepsTwoKeysAndLiteralKindRoundTrips",
+    "LiteralCorrectionRuleTests.testLegacyExportMapOmitsEveryLiteralRule",
+    "LiteralCorrectionRuleTests.testLegacyOutputCannotCreateALiteralMatch",
+    "LiteralCorrectionRuleTests.testLiteralCommaIsOneSourcePhrase",
+    "LiteralCorrectionRuleTests.testLiteralOutputNeverFeedsAnotherReplacement",
+    "LiteralCorrectionRuleTests.testLiteralOverlapUsesLeftmostLongestThenDeclaredOrder",
+    "LiteralCorrectionRuleTests.testLiteralSourceBlocksWholeCrossingLegacyMatches",
+    "LiteralCorrectionRuleTests.testProtectedRangesRemapUTF16AndInsertExactLiteralOutputLast",
+    "LiteralCorrectionRuleTests.testSharedEditReconstructionPreservesLiteralKind"
+  ],
+  "lane": "baseline",
+  "passed": 1710,
+  "registered": 1721,
+  "valid": true
+}

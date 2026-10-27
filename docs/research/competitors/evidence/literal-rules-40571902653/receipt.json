@@ -1,0 +1,65 @@
+{
+  "runID": 40571902653,
+  "runURL": "https://github.com/negentropi/roma-just-talk/actions/runs/40571902653",
+  "classification": "matched-old-red-new-green",
+  "status": "completed",
+  "conclusion": "success",
+  "candidateSHA": "808c1a36609a05a20744c6a7a3abad7fce5715bb",
+  "baselineSHA": "919670ae5b918afbfad6f4d88982a481c1c4b532",
+  "oracleSHA256": "b9a13370e94d9bea8bacbe5886e5d186a200e1107e5626755aac76c703acccfa",
+  "runnerSHA256": "4cb19deff9a9bfa28c9d6542aa3650a5241fa7703139f66f8a6249282aed5bc2",
+  "baseline": {
+    "assertions": 23,
+    "executed": 1721,
+    "exitCode": 1,
+    "failedMethods": [
+      "LiteralCorrectionRuleTests.testBlankLiteralSourcesAreNoOpsAndNonblankSourcesAreNotTrimmed",
+      "LiteralCorrectionRuleTests.testExplicitInvalidMatchingKindsRejectInsteadOfBecomingLegacy",
+      "LiteralCorrectionRuleTests.testLegacyEncodingKeepsTwoKeysAndLiteralKindRoundTrips",
+      "LiteralCorrectionRuleTests.testLegacyExportMapOmitsEveryLiteralRule",
+      "LiteralCorrectionRuleTests.testLegacyOutputCannotCreateALiteralMatch",
+      "LiteralCorrectionRuleTests.testLiteralCommaIsOneSourcePhrase",
+      "LiteralCorrectionRuleTests.testLiteralOutputNeverFeedsAnotherReplacement",
+      "LiteralCorrectionRuleTests.testLiteralOverlapUsesLeftmostLongestThenDeclaredOrder",
+      "LiteralCorrectionRuleTests.testLiteralSourceBlocksWholeCrossingLegacyMatches",
+      "LiteralCorrectionRuleTests.testProtectedRangesRemapUTF16AndInsertExactLiteralOutputLast",
+      "LiteralCorrectionRuleTests.testSharedEditReconstructionPreservesLiteralKind"
+    ],
+    "passed": 1710,
+    "registered": 1721
+  },
+  "candidate": {
+    "assertions": 0,
+    "executed": 1721,
+    "exitCode": 0,
+    "failedMethods": [],
+    "passed": 1721,
+    "registered": 1721
+  },
+  "oldControlsAllPassed": 1707,
+  "newMethods": 14,
+  "sourceFiles": {
+    "baseline": 150,
+    "candidate": 151
+  },
+  "actualGraphPins": 22,
+  "sourcePinsHelpersAndToolchainUnchanged": true,
+  "artifact": {
+    "artifactID": 12765464028,
+    "bytes": 302038,
+    "sha256": "b33519e0a78548f055a2f04a2b343d55fc089ea18adbf199d736aa48ddc71726",
+    "downloadCount": 1,
+    "wholeArchiveVerified": true,
+    "allMembersCRCVerified": true
+  },
+  "actualLogFiles": [
+    "artifact/baseline-checks.log",
+    "artifact/candidate-checks.log"
+  ],
+  "scope": "Core policy/codec/legacy-data boundaries only. No app activation, approval UI, SwiftData migration, provider or broader Unicode-quality claim.",
+  "limits": [
+    "No app activation, approval UI, complete backup/export UI, SwiftData schema/migration or provider proof.",
+    "Only exact recorded Core source, fixtures, graph and toolchain were tested; no general linguistic quality guarantee.",
+    "Whole artifact hash verified at the one download; the retained analyzer checks all extracted member hashes without redownloading."
+  ]
+}

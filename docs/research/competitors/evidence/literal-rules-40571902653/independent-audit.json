@@ -1,0 +1,47 @@
+{
+  "allRetainedArtifactFilesVerified": 23,
+  "baselineSHA": "919670ae5b918afbfad6f4d88982a481c1c4b532",
+  "candidateSHA": "808c1a36609a05a20744c6a7a3abad7fce5715bb",
+  "classification": "independent-artifact-audit-passed",
+  "graphPins": 22,
+  "lanes": {
+    "baseline": {
+      "assertions": 23,
+      "executed": 1721,
+      "exitCode": 1,
+      "failedMethods": [
+        "LiteralCorrectionRuleTests.testBlankLiteralSourcesAreNoOpsAndNonblankSourcesAreNotTrimmed",
+        "LiteralCorrectionRuleTests.testExplicitInvalidMatchingKindsRejectInsteadOfBecomingLegacy",
+        "LiteralCorrectionRuleTests.testLegacyEncodingKeepsTwoKeysAndLiteralKindRoundTrips",
+        "LiteralCorrectionRuleTests.testLegacyExportMapOmitsEveryLiteralRule",
+        "LiteralCorrectionRuleTests.testLegacyOutputCannotCreateALiteralMatch",
+        "LiteralCorrectionRuleTests.testLiteralCommaIsOneSourcePhrase",
+        "LiteralCorrectionRuleTests.testLiteralOutputNeverFeedsAnotherReplacement",
+        "LiteralCorrectionRuleTests.testLiteralOverlapUsesLeftmostLongestThenDeclaredOrder",
+        "LiteralCorrectionRuleTests.testLiteralSourceBlocksWholeCrossingLegacyMatches",
+        "LiteralCorrectionRuleTests.testProtectedRangesRemapUTF16AndInsertExactLiteralOutputLast",
+        "LiteralCorrectionRuleTests.testSharedEditReconstructionPreservesLiteralKind"
+      ],
+      "passed": 1710,
+      "registered": 1721
+    },
+    "candidate": {
+      "assertions": 0,
+      "executed": 1721,
+      "exitCode": 0,
+      "failedMethods": [],
+      "passed": 1721,
+      "registered": 1721
+    }
+  },
+  "newMethods": 14,
+  "oldControlsPassed": 1707,
+  "oracleSHA256": "b9a13370e94d9bea8bacbe5886e5d186a200e1107e5626755aac76c703acccfa",
+  "runnerSHA256": "4cb19deff9a9bfa28c9d6542aa3650a5241fa7703139f66f8a6249282aed5bc2",
+  "scope": "Core policy/codec/legacy-data boundaries only. No app activation, approval UI, SwiftData migration, provider or broader Unicode-quality claim.",
+  "sourceFiles": {
+    "baseline": 150,
+    "candidate": 151
+  },
+  "toolchainBeforeAfterEqual": true
+}

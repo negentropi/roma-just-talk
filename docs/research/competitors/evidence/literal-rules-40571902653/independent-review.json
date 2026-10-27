@@ -1,0 +1,20 @@
+{
+  "runID": 40571902653,
+  "reviewer": "/root/literal_rule_checks/literal_driver_review",
+  "classification": "clean",
+  "findings": [],
+  "verified": [
+    "Independent artifact analyzer rerun passed.",
+    "Both native logs contain all 1721 ordered check records.",
+    "All 1707 prior checks and three new control methods passed on the baseline; eleven new methods failed with 23 fixture assertions and native exit 1.",
+    "Candidate passed all 1721 checks with native exit 0.",
+    "Oracle, runner, policy blobs, 150/151-file source censuses and exact three-file Core delta match immutable Git source.",
+    "All 22 dependency checkouts match frozen pins and are clean; source and toolchain before/after records agree.",
+    "All 23 retained artifact member hashes match the download receipt.",
+    "README scope matches the retained evidence."
+  ],
+  "limits": [
+    "Whole ZIP hash and CRC verification were accepted from the owner's one-download receipt; reviewer did not download again.",
+    "Review was read-only; no build, source edit, commit or push."
+  ]
+}

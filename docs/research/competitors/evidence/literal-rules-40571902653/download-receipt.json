@@ -1,0 +1,125 @@
+{
+  "artifactID": 12765464028,
+  "bytes": 302038,
+  "sha256": "b33519e0a78548f055a2f04a2b343d55fc089ea18adbf199d736aa48ddc71726",
+  "downloadCount": 1,
+  "wholeArchiveVerified": true,
+  "allMembersCRCVerified": true,
+  "files": [
+    {
+      "path": "baseline-checks.log",
+      "bytes": 213555,
+      "sha256": "4d4bf553b0f130bd2bb7e339c57910998187684ad1debf99bc9db71ee20a3fd3"
+    },
+    {
+      "path": "baseline-command.json",
+      "bytes": 307,
+      "sha256": "9e131dfec422c23cd54e0e54866545ee23e6e8b88f18876c64947c486da6b9af"
+    },
+    {
+      "path": "baseline-exit.txt",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "path": "baseline-packages.json",
+      "bytes": 3969,
+      "sha256": "57fe2a7752b97b9e594c9cecaaa5be570a7ff3ce1a5cccf0c27198f262206f29"
+    },
+    {
+      "path": "baseline-result.json",
+      "bytes": 20278,
+      "sha256": "299f22755507569fdc5c74882b379412ab50d766728f36a9e4e91a30d9b75b83"
+    },
+    {
+      "path": "baseline-source-after.json",
+      "bytes": 37065,
+      "sha256": "15c21188c4075c8afa9f56db197b3867af091ddacdc49a4505d141bd3ac7b139"
+    },
+    {
+      "path": "baseline-source-before.json",
+      "bytes": 37065,
+      "sha256": "15c21188c4075c8afa9f56db197b3867af091ddacdc49a4505d141bd3ac7b139"
+    },
+    {
+      "path": "candidate-checks.log",
+      "bytes": 203486,
+      "sha256": "7e541914b32a8888fe57c3e80756729e1e1a7e7b697eca6d8b2b52beddd01838"
+    },
+    {
+      "path": "candidate-command.json",
+      "bytes": 309,
+      "sha256": "b570040e7dc5d705ea07c4fe2de95118ed26bbe8b6250f3c37cc755d05551765"
+    },
+    {
+      "path": "candidate-exit.txt",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "candidate-packages.json",
+      "bytes": 3969,
+      "sha256": "57fe2a7752b97b9e594c9cecaaa5be570a7ff3ce1a5cccf0c27198f262206f29"
+    },
+    {
+      "path": "candidate-result.json",
+      "bytes": 232,
+      "sha256": "909b9bf5f5f4329ae0169776806ce746143388fdb7c5f2fb56e99dd122a13390"
+    },
+    {
+      "path": "candidate-source-after.json",
+      "bytes": 37065,
+      "sha256": "280dbfd0cbb4327009b053a297a9262c43eb599710f647a598a52defbe12894c"
+    },
+    {
+      "path": "candidate-source-before.json",
+      "bytes": 37065,
+      "sha256": "280dbfd0cbb4327009b053a297a9262c43eb599710f647a598a52defbe12894c"
+    },
+    {
+      "path": "comparison-result.json",
+      "bytes": 21450,
+      "sha256": "591732b49b78694e17790126cdd4a5ada0c59cc2654f56499dd91400b2885bbe"
+    },
+    {
+      "path": "contract.json",
+      "bytes": 403432,
+      "sha256": "5c3ac16346051c0cf2d995389ccd20a2d13fa6c601264c7bbe9e625ab646fd9f"
+    },
+    {
+      "path": "oracle/LiteralCorrectionRuleTests.swift",
+      "bytes": 13136,
+      "sha256": "b9a13370e94d9bea8bacbe5886e5d186a200e1107e5626755aac76c703acccfa"
+    },
+    {
+      "path": "oracle/VoiceInkCoreCheckRunner.swift",
+      "bytes": 388139,
+      "sha256": "4cb19deff9a9bfa28c9d6542aa3650a5241fa7703139f66f8a6249282aed5bc2"
+    },
+    {
+      "path": "oracle/baseline-DictionaryPolicy.swift",
+      "bytes": 60005,
+      "sha256": "d482f2f5616f8e42d1bcd4574a2b8abdf346eb96c861bf8c7cf196608ab39880"
+    },
+    {
+      "path": "oracle/baseline-VoiceInkCoreCheckRunner.swift",
+      "bytes": 385111,
+      "sha256": "9d1802f2730901528e808da1ebfcf3ab5b5a3c539d42cceb0aa44c32eeb2a265"
+    },
+    {
+      "path": "oracle/candidate-DictionaryPolicy.swift",
+      "bytes": 66166,
+      "sha256": "5ed4974691a8ceeb85c63a4b2f8c8a1357ad223469d3705ce4baca677f2a270d"
+    },
+    {
+      "path": "toolchain-after.txt",
+      "bytes": 225,
+      "sha256": "a6bc9a0f658f75ad89cf17f2f023e1da8f38604f41f8dbfe79f59a278a8a0588"
+    },
+    {
+      "path": "toolchain-before.txt",
+      "bytes": 225,
+      "sha256": "a6bc9a0f658f75ad89cf17f2f023e1da8f38604f41f8dbfe79f59a278a8a0588"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "swift",
+    "run",
+    "--package-path",
+    "/Users/runner/work/_temp/literal-rule-check/baseline-source/VoiceInkCore",
+    "--scratch-path",
+    "/Users/runner/work/_temp/literal-rule-build-baseline",
+    "--force-resolved-versions",
+    "--skip-update",
+    "VoiceInkCoreChecks"
+  ]
+}

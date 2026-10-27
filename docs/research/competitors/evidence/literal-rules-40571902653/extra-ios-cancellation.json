@@ -1,0 +1,132 @@
+{
+  "run": {
+    "conclusion": "cancelled",
+    "createdAt": "2026-10-27T19:45:04Z",
+    "databaseId": 40571902754,
+    "headBranch": "ci/rjt-literal-rule-check-01a17bef",
+    "headSha": "808c1a36609a05a20744c6a7a3abad7fce5715bb",
+    "jobs": [
+      {
+        "completedAt": "2026-10-27T19:45:15Z",
+        "conclusion": "success",
+        "databaseId": 122428028554,
+        "name": "Find reusable exact-SHA verification",
+        "startedAt": "2026-10-27T19:45:06Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-10-27T19:45:08Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-10-27T19:45:07Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-27T19:45:12Z",
+            "conclusion": "success",
+            "name": "Checkout",
+            "number": 2,
+            "startedAt": "2026-10-27T19:45:08Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-27T19:45:12Z",
+            "conclusion": "success",
+            "name": "Check exact-SHA reuse behavior",
+            "number": 3,
+            "startedAt": "2026-10-27T19:45:12Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-27T19:45:12Z",
+            "conclusion": "success",
+            "name": "Find green verification with live proof artifacts",
+            "number": 4,
+            "startedAt": "2026-10-27T19:45:12Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-27T19:45:12Z",
+            "conclusion": "skipped",
+            "name": "Report reused verification",
+            "number": 5,
+            "startedAt": "2026-10-27T19:45:12Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-27T19:45:12Z",
+            "conclusion": "skipped",
+            "name": "Download reused Simulator app",
+            "number": 6,
+            "startedAt": "2026-10-27T19:45:12Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-27T19:45:12Z",
+            "conclusion": "skipped",
+            "name": "Download reused runtime proof",
+            "number": 7,
+            "startedAt": "2026-10-27T19:45:12Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-27T19:45:12Z",
+            "conclusion": "skipped",
+            "name": "Republish reused Simulator app",
+            "number": 8,
+            "startedAt": "2026-10-27T19:45:12Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-27T19:45:12Z",
+            "conclusion": "skipped",
+            "name": "Republish reused runtime proof",
+            "number": 9,
+            "startedAt": "2026-10-27T19:45:12Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-27T19:45:12Z",
+            "conclusion": "success",
+            "name": "Resolve reusable verification",
+            "number": 10,
+            "startedAt": "2026-10-27T19:45:12Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-27T19:45:12Z",
+            "conclusion": "success",
+            "name": "Post Checkout",
+            "number": 20,
+            "startedAt": "2026-10-27T19:45:12Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-27T19:45:12Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 21,
+            "startedAt": "2026-10-27T19:45:12Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40571902754/job/122428028554"
+      },
+      {
+        "completedAt": "2026-10-27T19:45:35Z",
+        "conclusion": "cancelled",
+        "databaseId": 122428123301,
+        "name": "Verify single-repo migration",
+        "startedAt": "2026-10-27T19:45:15Z",
+        "status": "completed",
+        "steps": [],
+        "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40571902754/job/122428123301"
+      }
+    ],
+    "status": "completed",
+    "updatedAt": "2026-10-27T19:45:36Z",
+    "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40571902754"
+  },
+  "scope": "Parent canceled only this auto-triggered iOS workflow on the exact task-owned head/ref. No app/iOS compile or runtime claim."
+}

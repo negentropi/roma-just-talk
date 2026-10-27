@@ -1,0 +1,21 @@
+{
+  "run_id": 40496608276,
+  "source_sha": "c1a0f967b11794b45f68d07d0d02e6dfb3eac81b",
+  "artifact_id": 12732187657,
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40496608276",
+  "artifact_sha256": "1791644f80eb7c6d12883d7ae1032844f5a18dcc85350e753966db0fa0e19db0",
+  "production_paths": {
+    "VoiceInk/Services/WritingActionSession.swift": "c81aeb60cccc840065cc032ba2a9949a9d8934abc2cbbfe96d4e9b53f63613cf",
+    "VoiceInk/Transcription/Engine/TranscriptionPipeline.swift": "4f4a84d113617e64e47a42349c85de55cbc0defaea5d2e8f05dea49f50b18da1",
+    "VoiceInk/Services/WritingTarget.swift": "6199faf5d2cd865dad92ee4043a7fe8e4b0272de950fbacced9488a066d3439d",
+    "VoiceInk/Services/AIEnhancement/AIEnhancementService.swift": "548333e83fe3506e661d046b36b3eaa08295299242df89bdfd8a714c8ef27961",
+    "VoiceInk/Services/AIEnhancement/LocalCLIService.swift": "3cd0a32d213f3650c33e7c62c8e10d0c6957078442f7feceffa5f8c7d5e6ec8c"
+  },
+  "fixture_sha256": "9c0d4cd7404f0480f8c0bbe81b774befe617753136b6ff82922c8579606803b0",
+  "classification": "four-native-tests-passed",
+  "limits": [
+    "Fixed synthetic recognition transcript and deterministic CLI output; no actual model or microphone proof.",
+    "Fresh ModelContext verifies explicit save visibility in a retained in-memory store, not crash/relaunch durability.",
+    "No physical shortcut or general editor compatibility claim."
+  ]
+}

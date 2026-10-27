@@ -1,0 +1,1 @@
+9cf58ba47d94bf3f4528a74471f7f811c9e2f09466c3098f6b9339adb9a0103a  /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk
